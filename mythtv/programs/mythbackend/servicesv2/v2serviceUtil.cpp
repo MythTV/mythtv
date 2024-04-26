@@ -189,8 +189,8 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
     pChannel->setCallSign(channelInfo.m_callSign);
     if (!channelInfo.m_icon.isEmpty())
     {
-        QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
-                                    .arg( channelInfo.m_chanId );
+        QString sIconURL  = QString( "/Guide/GetChannelIcon?FileName=%1")
+                                    .arg( channelInfo.m_icon );
         pChannel->setIconURL( sIconURL );
         pChannel->setIcon( channelInfo.m_icon );
     }
