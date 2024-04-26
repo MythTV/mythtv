@@ -68,7 +68,6 @@ class V2ChannelInfo : public QObject
 
         Q_INVOKABLE V2ChannelInfo(QObject *parent = nullptr)
             :   QObject           ( parent ),
-                m_Visible         ( true   ),
                 m_MplexId           (0),
                 m_ServiceId         (0),
                 m_ATSCMajorChan     (0),
@@ -78,6 +77,7 @@ class V2ChannelInfo : public QObject
                 m_InputId           (0),
                 m_CommFree          (false),
                 m_UseEIT            (false),
+                m_Visible           (true),
                 m_ServiceType       (0),
                 m_RecPriority       (0),
                 m_TimeOffset        (0),
