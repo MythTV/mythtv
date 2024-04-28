@@ -67,8 +67,8 @@
         <ng-template pTemplate="body" let-channel>
             <tr height="40" [ngClass]="{'line-through' : channel.ChanId < 0}">
                 <td style="flex-basis: 8%">
-                    <img src="{{channel.IconURL}}" height="32" width="42" *ngIf="channel.IconURL; else nullIcon"
-                        style="background-color:#000000" onerror="this.height='0'">
+                    <img src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon}}" height="32" width="42"
+                        *ngIf="channel.Icon; else nullIcon" style="background-color:#000000" onerror="this.height='0'">
                     <ng-template #nullIcon><img height="32" width="42"></ng-template>
                 </td>
                 <td style="flex-basis:  9%">{{ channel.ChanNum }}</td>
@@ -135,6 +135,41 @@
                 class="mb-2 form-control w-full" />
             <small class="block">
                 {{ 'settings.chanedit.callsign_desc' | translate }}
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <label for="icon" class="label block">{{ 'settings.chanedit.icon_label' | translate
+                }}</label>
+            <p-dropdown [options]="icons" [(ngModel)]="channel.Icon" name="icon">
+                <ng-template pTemplate="selectedItem">
+                    <div *ngIf="channel.Icon">
+                        <img *ngIf="!channel.Icon.endsWith('\t')"
+                            src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon}}"
+                            class="vertical-align-middle h-2rem" />
+                        &nbsp;&nbsp;{{channel.Icon}}
+                    </div>
+                </ng-template>
+                <ng-template let-icon pTemplate="item">
+                    <div>
+                        <!-- Name ending with tab character is code for "no icon". -->
+                        <img *ngIf="!icon.endsWith('\t')" src="{{'/Guide/GetChannelIcon?Filename=' + icon}}"
+                            class="vertical-align-middle h-2rem" />
+                        &nbsp;&nbsp;{{icon}}
+                    </div>
+                </ng-template>
+            </p-dropdown>
+            <small class="block">
+                <div [innerHTML]="'settings.chanedit.icon_desc' |
+                 translate: {iconDir: '<code>&quot;' + iconDir + '&quot;</code>'} "> </div>
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <p-button icon="pi pi-search" (onClick)="searchIconRequest();"
+                label="{{ 'settings.chanedit.iconsrch_title' | translate }}" styleClass="p-button-success"></p-button>
+            <small class="block">
+                {{ 'settings.chanedit.iconsearch_desc' | translate }}
             </small>
         </div>
 
@@ -440,7 +475,8 @@
                 </table>
             </div>
             <div class="col-12" style="text-align: left;">
-                <p-message *ngIf="icondldStatus == 2" severity="success" text="Icon Download Complete"></p-message>
+                <p-message *ngIf="icondldStatus == 2" severity="success"
+                    text="{{ 'settings.chanedit.icondld_complete' | translate }}"></p-message>
             </div>
             <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
                 styleClass="p-button-warning" [disabled]="icondldStatus == 1">
@@ -451,8 +487,52 @@
                 [disabled]="!icondldType || icondldStatus == 1 || icondldStatus == 2"></p-button>
 
             <p-button icon="pi pi-stop" (onClick)="stopIcondld();" label="{{ 'common.stop' | translate }}"
-                styleClass="p-button-success" [disabled]="!icondldType || icondldStatus != 1"></p-button>
+                styleClass="p-button-danger" [disabled]="!icondldType || icondldStatus != 1"></p-button>
+        </ng-template>
+    </p-dialog>
 
+    <p-dialog header="{{ 'settings.chanedit.iconsrch_title' | translate }}" [(visible)]="iconsrchShowDialog"
+        [style]="{height: '65vw', width: '40vw'}" [modal]="true" [closable]="false" [closeOnEscape]="false">
+        <div class="form-group field">
+            <label for="iconsrchTerm" class="label block">{{ 'settings.chanedit.iconsrchterm_title' | translate
+                }}</label>
+            <input pInputText id="iconsrchTerm" [(ngModel)]="iconsrchTerm" name="iconsrchTerm" #srchTerm="ngModel"
+                class="mb-2 form-control w-full" />
+            <small class="block">
+                {{ 'settings.chanedit.iconsrchterm_desc' | translate }}
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <p-button icon="pi pi-search" (onClick)="iconSearch();" label="{{ 'common.search' | translate }}"
+                styleClass="p-button-success"></p-button>
+        </div>
+
+        <div class="form-group field">
+            <label *ngIf="iconsrchResult.length > 0" for="srchicon" class="label block">{{
+                'settings.chanedit.iconsrch_select' | translate }}</label>
+            <label *ngIf="iconsrchResult.length == 0 && (successCount>0 || errorCount>0)" for="srchicon"
+                class="label block">{{'primeng.emptyMessage' | translate}}</label>
+            <p-listbox [options]="iconsrchResult" [(ngModel)]="iconsrchSelect" name="srchicon" optionlabel="name"
+                [listStyle]="{'max-height':'18rem'}">
+                <ng-template let-icon pTemplate="item">
+                    <div>
+                        <img src="{{icon.url}}" class="vertical-align-middle h-2rem" />
+                        &nbsp;&nbsp;{{icon.name}}
+                    </div>
+                </ng-template>
+            </p-listbox>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="errorCount > 0" severity="error" text="Icon Download Failed"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="iconsrchShowDialog=false"
+                label="{{ 'common.cancel' | translate }}" styleClass="p-button-warning">
+            </p-button>
+            <p-button icon="pi pi-save" (onClick)="iconsrchSave();" label="{{ 'common.save' | translate }}"
+                styleClass="p-button-success" [disabled]="!iconsrchSelect"></p-button>
         </ng-template>
     </p-dialog>
 

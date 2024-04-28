@@ -96,9 +96,11 @@ export class MythService {
     }
   }
 
-  public GetDirListing(DirName : string) : Observable<{DirListing: String[]}> {
+  public GetDirListing(DirName : string, Files? : boolean) : Observable<{DirListing: String[]}> {
     let params = new HttpParams()
       .set("DirName", DirName);
+      if (Files)
+        params = params.set("Files", Files)
     return this.httpClient.get<{DirListing: String[]}>('/Myth/GetDirListing', {params});
   }
 
