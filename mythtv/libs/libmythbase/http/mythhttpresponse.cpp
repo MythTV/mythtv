@@ -117,7 +117,9 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
                          "object-src 'none'; "
                          "media-src 'self'; "
                          "font-src 'self'; "
-                         "img-src 'self'; "
+                         // This img-src is needed for displaying icons in channel icon search
+                         // These icons come from many different urls
+                         "img-src http: https: data:; "
                          "form-action 'self'; "
                          "frame-ancestors 'self'; ";
 

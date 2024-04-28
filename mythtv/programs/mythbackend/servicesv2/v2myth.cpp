@@ -1299,14 +1299,9 @@ QString  V2Myth::Proxy ( const QString &urlString)
 
     auto *req = new QNetworkRequest(url);
     req->setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded"));
-    // req->setHeader(QNetworkRequest::ContentLengthHeader, data.size());
-
-    LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: posting to: %1")
-                                       .arg(url.toString()));
 
     if (GetMythDownloadManager()->post(req, &data))
     {
-        LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: result: %1").arg(QString(data)));
         return {data};
     }
 
