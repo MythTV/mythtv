@@ -5,7 +5,7 @@
     <h2>{{ 'dashboard.upcoming.heading' | translate }}</h2>
     <div class="block card w-full">
         <div style="height: 90vh">
-            <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
+            <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-gridlines"
                 [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true">
 
                 <ng-template pTemplate="header">
@@ -44,9 +44,9 @@
                     </tr>
 
                     <tr>
-                        <th style="flex-basis: 8%" class="justify-content-end p-1">
+                        <th style="flex-basis: 10%" class="p-1">
                             {{ 'dashboard.upcoming.date' | translate }} </th>
-                        <th style="flex-basis: 6%" class="justify-content-end p-1">
+                        <th style="flex-basis: 7%" class="justify-content-end p-1">
                             {{ 'dashboard.upcoming.time' | translate }} </th>
                         <th style="flex-basis: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
                         <th style="flex-basis: 8%" class="p-1">{{ 'dashboard.upcoming.encoder' |
@@ -75,13 +75,14 @@
                         </th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-program>
+                <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
                     <tr>
-                        <td style="flex-basis: 8%" class="justify-content-end p-1 overflow-hidden">
-                            <div [innerHTML]="formatStartDate(program)"></div>
+                        <td style="flex-basis: 10%" class="p-1 overflow-hidden">
+                            <div [innerHTML]="formatStartDate(program, rowIndex)"></div>
                         </td>
-                        <td style="flex-basis: 6%" class="justify-content-end p-1 overflow-hidden">
-                            {{formatStartTime(program)}}</td>
+                        <td style="flex-basis: 7%" class="justify-content-end p-1 overflow-hidden">
+                            {{formatStartTime(program)}}
+                        </td>
                         <td style="flex-basis: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1 overflow-hidden">
                             {{ getDuration(program) | number:'1.0-0' }} min</td>
                         <td style="flex-basis: 8%" class="p-1">{{program.Recording.EncoderName}}

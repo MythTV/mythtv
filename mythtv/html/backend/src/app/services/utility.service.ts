@@ -25,6 +25,8 @@ export class UtilityService {
     "Not Recording": ""
   };
 
+  dayFormatter: Intl.DateTimeFormat  = new Intl.DateTimeFormat(undefined, {weekday: "short"});
+
   constructor(private translate: TranslateService) {
     // translations
     for (const [key, value] of Object.entries(this.recTypeTrans)) {
@@ -35,15 +37,19 @@ export class UtilityService {
     }
   }
 
-  formatDate(date: string, innerHtml?: boolean): string {
-    if (!date)
+  formatDate(dateStr: string, innerHtml?: boolean, withDay?:boolean): string {
+    if (!dateStr)
       return '';
-    if (date.length == 10)
-      date = date + ' 00:00';
-    let x = new Date(date).toLocaleDateString();
+    if (dateStr.length == 10)
+      dateStr = dateStr + ' 00:00';
+    const date = new Date(dateStr);
+    let resp = '';
+    if (withDay)
+      resp = this.dayFormatter.format(date) + ' ';
+    resp += date.toLocaleDateString();
     if (innerHtml)
-      return x.replace(this.allSlashes, '/<wbr>');
-    return x;
+      return resp.replace(this.allSlashes, '/<wbr>');
+    return resp;
   }
 
   formatTime(date: string): string {

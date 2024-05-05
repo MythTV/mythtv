@@ -124,13 +124,19 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   }
 
-  formatStartDate(program: ScheduleOrProgram): string {
-    return this.utility.formatDate(program.Recording.StartTs, true);
+  formatStartDate(program: ScheduleOrProgram, rowIndex: number): string {
+    let priorDate = '';
+    if (rowIndex > 0 && this.programs[rowIndex-1].Recording.StartTs)
+      priorDate = this.utility.formatDate(this.programs[rowIndex-1].Recording.StartTs, true, true);
+    let thisDate = this.utility.formatDate(program.Recording.StartTs, true, true);
+    if (priorDate == thisDate)
+      return ' ';
+    return thisDate;
   }
 
   formatAirDate(program: ScheduleOrProgram): string {
     if (!program.Airdate)
-      return '';
+      return ' ';
     let date = program.Airdate + ' 00:00';
     return this.utility.formatDate(date, true);
   }
