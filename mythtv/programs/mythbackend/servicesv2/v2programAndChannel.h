@@ -68,6 +68,7 @@ class V2ChannelInfo : public QObject
 
         Q_INVOKABLE V2ChannelInfo(QObject *parent = nullptr)
             :   QObject           ( parent ),
+                m_ChanId            (0),
                 m_MplexId           (0),
                 m_ServiceId         (0),
                 m_ATSCMajorChan     (0),
@@ -173,7 +174,16 @@ class V2Program : public QObject
     public:
 
         Q_INVOKABLE V2Program(QObject *parent = nullptr)
-            : QObject( parent )
+            : QObject( parent ),
+            m_Repeat            (false),
+            m_Stars             (0),
+            m_ProgramFlags      (0),
+            m_VideoProps        (0),
+            m_AudioProps        (0),
+            m_Season            (0),
+            m_Episode           (0),
+            m_TotalEpisodes     (0),
+            m_FileSize          (0)
         {
         }
 
