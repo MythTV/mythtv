@@ -89,13 +89,18 @@ export class VideosComponent implements OnInit {
       request.StartIndex = event.first;
     if (event.rows) {
       request.Count = event.rows;
+      // When it only requests 50 rows, page down waits until the entire
+      // screen is empty before loading the next page. Fix this by always
+      // requesting at least 100 records.
+      if (request.Count < 100)
+        request.Count = 100;
     }
 
     this.videoService.GetVideoList(request).subscribe(data => {
       let newList = data.VideoMetadataInfoList;
       this.videos.length = data.VideoMetadataInfoList.TotalAvailable;
       // populate page of virtual programs
-      this.videos.splice(newList.StartIndex, newList.Count,
+      this.videos.splice(newList.StartIndex, newList.VideoMetadataInfos.length,
         ...newList.VideoMetadataInfos);
       // notify of change
       this.videos = [...this.videos]
