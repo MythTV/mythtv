@@ -1326,7 +1326,8 @@ V2TitleInfoList* V2Dvr::GetTitleInfoList()
 
 V2ProgramList* V2Dvr::GetConflictList( int  nStartIndex,
                                         int  nCount,
-                                        int  nRecordId       )
+                                        int  nRecordId,
+                                        const QString  &Sort )
 {
     auto *pPrograms = new V2ProgramList();
     int size = FillUpcomingList(pPrograms->GetPrograms(), pPrograms,
@@ -1334,7 +1335,8 @@ V2ProgramList* V2Dvr::GetConflictList( int  nStartIndex,
                                          nCount,
                                          true, // bShowAll,
                                          nRecordId,
-                                         RecStatus::Conflict); // nRecStatus );
+                                         RecStatus::Conflict,
+                                         Sort);
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
@@ -1350,7 +1352,8 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll,
                                         int  nRecordId,
-                                        const QString & RecStatus )
+                                        const QString & RecStatus,
+                                        const QString  &Sort )
 {
     int nRecStatus = 0;
     if (!RecStatus.isEmpty())
@@ -1372,7 +1375,8 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                          nCount,
                                          bShowAll,
                                          nRecordId,
-                                         nRecStatus );
+                                         nRecStatus,
+                                         Sort );
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );

@@ -197,13 +197,15 @@ class V2Dvr : public MythHTTPService
 
     static V2ProgramList* GetConflictList ( int              StartIndex,
                                             int              Count,
-                                            int              RecordId );
+                                            int              RecordId,
+                                            const QString   &Sort);
 
     static V2ProgramList* GetUpcomingList ( int              StartIndex,
                                             int              Count,
                                             bool             ShowAll,
                                             int              RecordId,
-                                            const QString &  RecStatus );
+                                            const QString &  RecStatus,
+                                            const QString   &Sort);
 
     static V2EncoderList*    GetEncoderList      ( );
 
