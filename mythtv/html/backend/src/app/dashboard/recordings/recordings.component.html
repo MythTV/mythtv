@@ -13,7 +13,8 @@
         <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
             [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
             selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
-            dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnelect)="onSelectChange()">
+            dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
+            sortField="Title">
             <!-- [compareSelectionBy]="'equals'"> -->
              <ng-template pTemplate="caption">
             </ng-template>

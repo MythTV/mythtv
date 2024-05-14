@@ -95,6 +95,17 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       if (request.Count < 100)
         request.Count = 100;
     }
+    if (!event.sortField)
+      event.sortField = 'StartTime';
+    if (event.sortField == 'Channel.ChanNum')
+      request.Sort = 'ChanNum';
+    else
+      request.Sort = event.sortField;
+    let sortOrder = '';
+    if (event.sortOrder && event.sortOrder < 0)
+      sortOrder = ' desc';
+    request.Sort = request.Sort + sortOrder;
+
     if (event.filters) {
       if (event.filters.ShowAll.value) {
         request.ShowAll = true;

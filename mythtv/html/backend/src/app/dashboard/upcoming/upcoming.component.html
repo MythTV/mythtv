@@ -6,7 +6,8 @@
     <div class="block card w-full">
         <div style="height: 90vh">
             <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-gridlines"
-                [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true">
+                [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+                sortField="StartTime">
 
                 <ng-template pTemplate="header">
                     <tr>
@@ -44,15 +45,15 @@
                     </tr>
 
                     <tr>
-                        <th style="flex-basis: 10%" class="p-1">
-                            {{ 'dashboard.upcoming.date' | translate }} </th>
+                        <th style="flex-basis: 10%" class="p-1" pSortableColumn="StartTime">
+                            {{ 'dashboard.upcoming.date' | translate }}<p-sortIcon field="StartTime"></p-sortIcon> </th>
                         <th style="flex-basis: 7%" class="justify-content-end p-1">
                             {{ 'dashboard.upcoming.time' | translate }} </th>
                         <th style="flex-basis: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
                         <th style="flex-basis: 8%" class="p-1">{{ 'dashboard.upcoming.encoder' |
                             translate }} </th>
-                        <th style="flex-basis: 12%" class="p-1">
-                            {{ 'dashboard.recordings.title' | translate }}</th>
+                        <th style="flex-basis: 12%" class="p-1" pSortableColumn="Title">
+                            {{ 'dashboard.recordings.title' | translate }}<p-sortIcon field="Title"></p-sortIcon></th>
                         <th style="flex-basis: 18%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
                             }}</th>
                         <th style="flex-basis: 4%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
@@ -60,8 +61,8 @@
                         <th style="flex-basis: 8%" class="justify-content-end p-1">
                             {{ 'dashboard.recordings.orig_airdate' | translate }}
                         </th>
-                        <th style="flex-basis: 10%" class="p-1">{{ 'dashboard.recordings.channel' | translate
-                            }}</th>
+                        <th style="flex-basis: 10%" class="p-1" pSortableColumn="Channel.ChanNum">{{ 'dashboard.recordings.channel' | translate
+                            }} <p-sortIcon field="Channel.ChanNum"></p-sortIcon></th>
                         <th style="flex-basis: 8%" class="p-1">
                             {{ 'dashboard.recordings.recgrp' | translate }} </th>
                         <th style="flex-basis: 7%" class="p-1">
