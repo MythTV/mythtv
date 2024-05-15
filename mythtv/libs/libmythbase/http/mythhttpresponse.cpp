@@ -44,6 +44,17 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
 
         // Content disposition
         QString filename = data ? (*data)->m_fileName : (*file)->m_fileName;
+        QString download = MythHTTP::GetHeader(m_requestHeaders, "mythtv-download");
+        if (!download.isEmpty())
+        {
+            int lastDot = filename.lastIndexOf('.');
+            if (lastDot > 0)
+            {
+                QString extension = filename.right(filename.length() - lastDot);
+                download = download + extension;
+            }
+            filename = download;
+        }
         // Warn about programmer error
         if (filename.isEmpty())
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Response has no name");

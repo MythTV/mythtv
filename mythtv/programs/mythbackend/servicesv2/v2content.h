@@ -93,9 +93,10 @@ class V2Content : public MythHTTPService
                                                   int              SecsIn,
                                                   const QString   &Format);
 
-        static QFileInfo    GetRecording        ( int              RecordedId,
+        QFileInfo    GetRecording               ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &StartTime );
+                                                  const QDateTime &StartTime,
+                                                  const QString   &Download );
 
         static QFileInfo    GetMusic            ( int Id );
         static QFileInfo    GetVideo            ( int Id );
