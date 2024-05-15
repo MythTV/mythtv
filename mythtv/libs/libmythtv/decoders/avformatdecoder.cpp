@@ -1011,7 +1011,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                     .arg(av_make_error_stdstring(error, err)));
 
                 // note - m_ic (AVFormatContext) is freed on failure
-                if (retries > 1)
+                if (retries > 2)
                 {
                     // wait a little to buffer more data
                     // 50*0.1 = 5 seconds max
