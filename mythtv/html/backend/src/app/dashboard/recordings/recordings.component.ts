@@ -218,6 +218,16 @@ export class RecordingsComponent implements OnInit {
     return duration;
   }
 
+  getDownload(program:ScheduleOrProgram) {
+    let fn = program.Title;
+    if (program.Season && program.Episode){
+      fn = fn + ' - S' + program.Season + 'E' + program.Episode;
+    }
+    if (program.SubTitle)
+      fn = fn + ' - ' + program.SubTitle;
+    return fn;
+  }
+
   // return true causes default browser right click menu to show
   // return false suppresses default browser right click menu
   onContextMenu(program: ScheduleOrProgram, event: any) {

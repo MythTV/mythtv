@@ -12,11 +12,10 @@
 
         <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
             [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-            selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
-            dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
-            sortField="Title">
+            selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true" dataKey="Recording.RecordedId"
+            (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()" sortField="Title">
             <!-- [compareSelectionBy]="'equals'"> -->
-             <ng-template pTemplate="caption">
+            <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
@@ -98,7 +97,7 @@
                         <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}
                         </div>
                     </td>
-                    <td style="flex-basis: 8%" class="justify-content-end p-1" >
+                    <td style="flex-basis: 8%" class="justify-content-end p-1">
                         <div [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
                     </td>
                     <td style="flex-basis: 8%" class="justify-content-end p-1">
@@ -112,9 +111,9 @@
                     <td style="flex-basis: 8%" class="justify-content-end p-1">
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
                     <td style="flex-basis: 4%" class="p-1" style="background: var(--surface-card);">
-                        <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)}}"
-                            target="_blank" pTooltip="{{ 'dashboard.recordings.download' | translate }}"
-                            tooltipPosition="left">
+                        <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)
+                         + '&Download=' + getDownload(program)}}"
+                            pTooltip="{{ 'dashboard.recordings.download' | translate }}" tooltipPosition="left">
                             <i class="pi pi-download text-primary" [id]="'download_'+ rowIndex"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             (click)="showContextMenu(program,$event)"></button>
@@ -219,7 +218,7 @@
                     label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
                 </p-button>
                 <p-button icon="pi pi-check-circle" (onClick)="updaterecgrp()" label="{{ 'common.ok' | translate }}"
-                    styleClass="p-button-plain"  [disabled]="!newRecGroup.trim()">
+                    styleClass="p-button-plain" [disabled]="!newRecGroup.trim()">
                 </p-button>
             </ng-template>
         </p-dialog>
