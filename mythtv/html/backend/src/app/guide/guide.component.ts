@@ -8,6 +8,7 @@ import { ScheduleLink, SchedulerSummary } from '../schedule/schedule.component';
 import { ScheduleOrProgram } from '../services/interfaces/program.interface';
 import { GetProgramListRequest } from '../services/interfaces/guide.interface';
 import { ChannelGroup } from '../services/interfaces/channelgroup.interface';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-guide',
@@ -47,35 +48,68 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   displayType = this.GRID;
   searchValue = '';
   showLegend = false;
+  startChanid?: number;
+  startTime?: Date;
+  startSchedule?: boolean;
+  startGroup?: number;
 
-  constructor(private guideService: GuideService,
+  constructor(private guideService: GuideService, private route: ActivatedRoute,
     private translate: TranslateService) {
     this.translate.onLangChange.subscribe((event: TranslationChangeEvent) => {
       console.log("Event: language change, new language (" + event.lang + ")");
       this.switchLanguage(event.lang);
-      this.fetchData();
+      // this.fetchData();
     })
   }
 
 
   ngOnInit(): void {
-    this.fetchData();
+    this.startChanid = this.route.snapshot.queryParams.Chanid;
+    let reqDate;
+    reqDate = new Date(this.route.snapshot.queryParams.StartTime);
+    if (Number.isNaN(reqDate.valueOf())) {
+      reqDate = new Date(Number(this.route.snapshot.queryParams.StartTime));
+    }
+    if (Number.isNaN(reqDate.valueOf()))
+      reqDate = undefined;
+    if (reqDate)
+      this.startTime = reqDate;
+    else
+      this.startTime = undefined;
+    // if (this.startChanid)
+    //   this.channelGroup = this.allGroup;
+    this.startSchedule = this.route.snapshot.queryParams.Schedule;
+    this.fetchData(this.startTime);
   }
 
   switchLanguage(language: string): void {
     this.translate.use(language);
-    // this.setDateFormat();
   }
 
   fetchData(reqDate?: Date): void {
     if (this.channelGroups.length == 0) {
       this.guideService.GetChannelGroupList(false).subscribe(
         data => {
-          console.log(data)
           this.channelGroups = data.ChannelGroupList.ChannelGroups;
           this.channelGroups.unshift(this.allGroup);
+          let wantedGroup = localStorage.getItem("ChannelGroup");
+          if (!wantedGroup)
+            wantedGroup = this.allGroup.Name;
+          if (this.route.snapshot.queryParams.ChannelGroup)
+            wantedGroup = this.route.snapshot.queryParams.ChannelGroup;
+          let group = this.channelGroups.find((entry) =>
+            entry.Name == wantedGroup);
+          if (group)
+            this.channelGroup = group;
+          localStorage.setItem("ChannelGroup",this.channelGroup.Name);
+          this.fetchGuide(reqDate);
         });
-    };
+    }
+    else
+      this.fetchGuide(reqDate);
+  }
+
+  fetchGuide(reqDate?: Date) {
     this.guideService.GetProgramGuide(reqDate, this.channelGroup.GroupId).subscribe(data => {
       this.m_programGuide = data;
       this.m_startDate = new Date(data.ProgramGuide.StartTime);
@@ -86,6 +120,23 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       this.loaded = true;
       this.refreshing = false;
       this.timeChange = false;
+      if (this.startChanid) {
+        setTimeout(() => {
+          const element = document.getElementById('Chan' + this.startChanid);
+          element?.scrollIntoView();
+          if (this.startSchedule) {
+            let chan = this.m_programGuide.ProgramGuide.Channels
+              .find((entry) => entry.ChanId == this.startChanid);
+            if (chan) {
+              let prog = chan.Programs.find((entry) =>
+                this.startTime?.valueOf() == new Date(entry.StartTime).valueOf());
+              if (prog)
+                this.inter.sched?.open(prog, chan);
+            }
+          }
+          this.startChanid = undefined;
+        }, 100);
+      }
     });
   }
 
@@ -149,6 +200,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
 
   refresh(): void {
     this.refreshing = true;
+    localStorage.setItem("ChannelGroup",this.channelGroup.Name);
     switch (this.displayType) {
       case this.GRID:
         if (this.m_startDate) {
