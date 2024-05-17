@@ -1537,7 +1537,9 @@ uint V2Dvr::AddRecordSchedule   (
     if (!rule.IsValid(msg))
         throw QString(msg);
 
-    rule.Save();
+    bool success = rule.Save();
+    if (!success)
+        throw QString("DATABASE ERROR: Check for duplicate recording rule");
 
     uint recid = rule.m_recordID;
 
