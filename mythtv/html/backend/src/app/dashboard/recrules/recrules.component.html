@@ -1,7 +1,7 @@
 <h2>{{ 'dashboard.recrules.heading' | translate }}</h2>
 <div class="block card w-full" style="height: 90vh" *ngIf="rulesLoaded else loading">
     <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-        [rowHover]="true" responsiveLayout="scroll">
+        [rowHover]="true" responsiveLayout="scroll" sortField="Title">
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'dashboard.recrules.new_recrule' | translate }}" icon="pi pi-plus"
                 class="p-button-success mr-2" (click)="newRecRule()"></button>

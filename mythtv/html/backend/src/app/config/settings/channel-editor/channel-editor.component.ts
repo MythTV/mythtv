@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -7,6 +7,7 @@ import { ChannelService } from 'src/app/services/channel.service';
 import { Channel, ChannelRestoreData, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
 import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
+import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
 
@@ -30,6 +31,8 @@ export class ChannelEditorComponent implements OnInit {
   sourceNames: string[] = [];
   multiplexes: VideoMultiplex[] = [];
   resSources: VideoSource[] = [];
+  icons: String[] = [];
+  iconDir = "";
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -60,10 +63,11 @@ export class ChannelEditorComponent implements OnInit {
   warningText = 'settings.common.warning';
   deleteText = 'settings.common.ru_sure';
   unassignedText = 'settings.chanedit.unassigned';
+  noneSelected = 'common.none';
 
   transDone = 0;
   visDone = 0;
-  numTranslations = 10;
+  numTranslations = 11;
   successCount = 0;
   errorCount = 0;
   selectedAdvanced = false;
@@ -89,6 +93,29 @@ export class ChannelEditorComponent implements OnInit {
   resIcon = false;
   resSearchDone = false;
   resShowDialog = false;
+  icondldShowDialog = false;
+  icondldType = "";
+  icondldMax = 0;
+  icondldCount = 0;
+  icondldPos = -1;
+  icondldFound = 0;
+  // icondldStatus -
+  // 0: No Download
+  // 1: Download in Progress
+  // 2: Download complete
+  // 3: Download terminated
+  icondldStatus = 0;
+  iconsrchShowDialog = false;
+  iconsrchTerm = "";
+  iconsrchResult: {
+    name: string,
+    url: string
+  }[] = [];
+  iconsrchSelect?: {
+    name: string,
+    url: string
+  };
+
   resResult: ChannelRestoreData = {
     NumChannels: 0,
     NumXLMTVID: 0,
@@ -103,7 +130,7 @@ export class ChannelEditorComponent implements OnInit {
   channelOperation = 0;
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
-    public setupService: SetupService, public router: Router) {
+    public setupService: SetupService, public router: Router, private mythService: MythService) {
 
     this.translate.get(this.unassignedText).subscribe(data => {
       // this translation has to be done before loading lists
@@ -137,6 +164,7 @@ export class ChannelEditorComponent implements OnInit {
       Format: 'Default',
       FrequencyId: '',
       IconURL: '',
+      Icon: '',
       InputId: 0,
       Inputs: '',
       MplexId: 0,
@@ -178,6 +206,22 @@ export class ChannelEditorComponent implements OnInit {
     }))
   }
 
+  loadIcons(seticon?: string) {
+    this.mythService.GetBackendInfo().subscribe(data => {
+      this.iconDir = data.BackendInfo.Env.MYTHCONFDIR + "/channels";
+      this.mythService.GetDirListing(this.iconDir, true).subscribe(data => {
+        // filter out resized images
+        this.icons = data.DirListing.filter((icon) => !icon.match(/\.[0-9]*x[0-9]*\./))
+        // Add 'None" to start of list
+        this.icons.unshift(this.noneSelected + '\t');
+        if (seticon) {
+          this.editingChannel!.Icon = seticon;
+          this.channel.Icon = seticon;
+        }
+      })
+    });
+  }
+
   loadTranslations(): void {
     this.visibilities.forEach(entry => {
       this.translate.get(entry.prompt).subscribe(data => {
@@ -209,6 +253,10 @@ export class ChannelEditorComponent implements OnInit {
       this.tvFormats[0].prompt = data;
       // notify of change
       this.tvFormats = [...this.tvFormats]
+      this.transDone++
+    });
+    this.translate.get(this.noneSelected).subscribe(data => {
+      this.noneSelected = data
       this.transDone++
     });
   }
@@ -245,13 +293,13 @@ export class ChannelEditorComponent implements OnInit {
     this.displayChannelDlg = true;
     this.markPristine();
     this.loadMultiplexes(channel.SourceId);
+    this.loadIcons();
     this.selectedAdvanced = false;
   }
 
   saveObserver: PartialObserver<any> = {
     next: (x: any) => {
       if (x.bool) {
-        console.log("saveObserver success", x);
         this.successCount++;
         this.currentForm.form.markAsPristine();
         switch (this.channelOperation) {
@@ -282,6 +330,7 @@ export class ChannelEditorComponent implements OnInit {
           case 2:
             // save restore data
             this.resSearchDone = false;
+            this.loadLists();
             break;
         }
       }
@@ -302,6 +351,11 @@ export class ChannelEditorComponent implements OnInit {
     this.successCount = 0;
     this.errorCount = 0;
     this.displayUnsaved = false;
+    let icon = this.channel.Icon;
+    // Icon name endiong with tab means "No Icon"
+    if (icon.endsWith('\t'))
+      icon = '';
+    this.channel.Icon = icon;
     let request: DBChannelRequest = {
       // Note - the fields we do not update are commented so they are omitted
       // ATSCMajorChan:      this.channel.ATSCMajorChan,
@@ -315,6 +369,7 @@ export class ChannelEditorComponent implements OnInit {
       ExtendedVisible: this.channel.ExtendedVisible,
       Format: this.channel.Format,
       FrequencyID: this.channel.FrequencyId,
+      Icon: icon,
       MplexID: this.channel.MplexId,
       RecPriority: this.channel.RecPriority,
       ServiceID: this.channel.ServiceId,
@@ -363,6 +418,7 @@ export class ChannelEditorComponent implements OnInit {
     this.displayChannelDlg = false;
     this.resShowDialog = false;
     this.displayUnsaved = false;
+    this.icondldShowDialog = false;
     this.editingChannel = undefined;
   }
 
@@ -381,7 +437,6 @@ export class ChannelEditorComponent implements OnInit {
     else
       // delete channel
       this.channelOperation = -1;
-    console.log("Delete Channel", channel)
     this.channelService.RemoveDBChannel(channel.ChanId).subscribe(this.saveObserver);
   }
 
@@ -431,8 +486,8 @@ export class ChannelEditorComponent implements OnInit {
         this.resResult = resp.ChannelRestore;
         this.resSearchDone = true;
       });
-      this.markPristine();
-    }
+    this.markPristine();
+  }
 
   restoreSave() {
     this.errorCount = 0;
@@ -443,6 +498,164 @@ export class ChannelEditorComponent implements OnInit {
 
   onFilter(event: any) {
     this.filterEvent = event;
+  }
+
+  downloadIconsRequest() {
+    this.icondldStatus = 0;
+    this.icondldShowDialog = true;
+    this.loadMultiplexes(0);
+  }
+
+  startIcondld() {
+    if (this.icondldStatus == 0) {
+      this.icondldCount = 0;
+      this.icondldPos = -1;
+      this.errorCount = 0;
+      this.successCount = 0;
+      this.icondldFound = 0;
+      if (this.icondldType == 'all') {
+        this.icondldMax = this.allChannels.length;
+      }
+      else {
+        this.icondldMax = 0;
+        this.allChannels.forEach(entry => {
+          if (!entry.Icon)
+            this.icondldMax++;
+        });
+      }
+    }
+    this.icondldStatus = 1;
+    this.nextIconDld();
+  }
+
+  nextIconDld() {
+    this.icondldPos++;
+    if (this.icondldPos >= this.allChannels.length) {
+      this.icondldStatus = 2;
+      return;
+    }
+    if (this.icondldType != 'all') {
+      while (this.allChannels[this.icondldPos].Icon) {
+        this.icondldPos++;
+        if (this.icondldPos >= this.allChannels.length) {
+          this.icondldStatus = 2;
+          return;
+        }
+      }
+    }
+    // Process icon for one channel
+    const baseUrl = 'http://services.mythtv.org/channel-icon/findmissing';
+    const chan = this.allChannels[this.icondldPos];
+    const mPlex = this.multiplexes.find(entry => entry.MplexId == chan.MplexId);
+    let transportId = 0;
+    let networkId = 0;
+    if (mPlex) {
+      transportId = mPlex.TransportId;
+      networkId = mPlex.NetworkId;
+    }
+    let url = `${baseUrl}?csv="${chan.ChanId}","${chan.ChannelName}","${chan.XMLTVID}","${chan.CallSign}",`
+      + `"${transportId}","${chan.ATSCMajorChan}","${chan.ATSCMinorChan}","${networkId}",`
+      + `"${chan.ServiceId}"`;
+    this.mythService.Proxy(url).subscribe({
+      next: data => {
+        let resp = data.String;
+        // resp is either # on one line or
+        // chanid, call sign, icon id, channel name, url, for example:
+        // "10033","callsign","47168","nbcsportsnetwork",
+        //       "https://github.com/picons/picons/raw/master/build-source/logos/nbcsportsnetwork.default.svg"
+
+        this.icondldCount++;
+        if (resp && resp.length > 0 && resp.charAt(0) == '"') {
+          let lines = resp.split('\n');
+          let result = JSON.parse('[' + lines[0] + ']');
+          this.icondldFound++;
+          this.channelService.CopyIconToBackend(chan.ChanId, result[4]).subscribe({
+            next: data => {
+              if (data.bool)
+                this.successCount++;
+              else
+                this.errorCount++;
+            },
+            error: err => {
+              console.log("channelService.CopyIconToBackend error", err);
+              this.errorCount++;
+              if (this.icondldStatus == 1)
+                this.nextIconDld();
+            }
+          });
+        }
+        if (this.icondldStatus == 1)
+          this.nextIconDld();
+      },
+      error: (err) => {
+        console.log("mythService.Proxy error", err);
+        this.errorCount++;
+        if (this.icondldStatus == 1)
+          this.nextIconDld();
+      }
+    });
+  }
+
+  stopIcondld() {
+    this.icondldStatus = 3;
+  }
+
+  searchIconRequest() {
+    this.iconsrchShowDialog = true;
+    this.iconsrchResult = [];
+  }
+
+  iconSearch() {
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.iconsrchResult = [];
+    const url = 'http://services.mythtv.org/channel-icon/search?s=' + this.iconsrchTerm;
+    this.mythService.Proxy(url).subscribe({
+      next: data => {
+        let resp = data.String;
+        // resp is either # on one line or
+        // icon id, channel name, url, for example:
+        // "13286","pbs","http://www.pbs.org/images/stations/standard/PBS.gif"
+        this.successCount++;
+        let lines = resp.split('\n');
+        lines.forEach(entry => {
+          if (entry.length > 1) {
+            let result = JSON.parse('[' + entry + ']');
+            this.iconsrchResult.push({
+              name: result[1],
+              url: result[2]
+            })
+          }
+        });
+        this.iconsrchResult = [...this.iconsrchResult];
+      },
+      error: (err) => {
+        console.log("mythService.Proxy error", err);
+        this.errorCount++;
+      }
+    });
+  }
+
+  iconsrchSave() {
+    if (!this.iconsrchSelect)
+      return;
+    const url = this.iconsrchSelect.url;
+    this.channelService.CopyIconToBackend(this.channel.ChanId, url).subscribe({
+      next: data => {
+        if (data.bool) {
+          this.successCount++;
+          const parts = url.split('/');
+          this.loadIcons(parts[parts.length - 1]);
+          this.iconsrchShowDialog = false;
+        }
+        else
+          this.errorCount++;
+      },
+      error: err => {
+        console.log("channelService.CopyIconToBackend error", err);
+        this.errorCount++;
+      }
+    });
   }
 
   markPristine() {

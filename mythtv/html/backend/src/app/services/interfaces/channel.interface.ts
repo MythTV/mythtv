@@ -17,6 +17,7 @@ export interface Channel {
     Format:             string;
     FrequencyId:        string; // null in sample data
     IconURL:            string;
+    Icon:               string;
     InputId:            number;
     Inputs:             string; // null in sample data
     MplexId:            number;

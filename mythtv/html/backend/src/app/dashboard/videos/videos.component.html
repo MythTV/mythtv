@@ -7,7 +7,7 @@
         <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
         <p-table #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
             [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-            responsiveLayout="scroll">
+            responsiveLayout="scroll" sortField="Title">
             <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">

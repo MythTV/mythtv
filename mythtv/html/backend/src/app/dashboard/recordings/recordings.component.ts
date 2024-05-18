@@ -140,8 +140,14 @@ export class RecordingsComponent implements OnInit {
     };
     if (event.first)
       request.StartIndex = event.first;
-    if (event.rows)
+    if (event.rows) {
       request.Count = event.rows;
+      // When it only requests 50 rows, page down waits until the entire
+      // screen is empty before loading the next page. Fix this by always
+      // requesting at least 100 records.
+      if (request.Count < 100)
+        request.Count = 100;
+    }
     if (!event.sortField)
       event.sortField = 'Title';
     request.Sort = event.sortField
@@ -187,7 +193,7 @@ export class RecordingsComponent implements OnInit {
       let recordings = data.ProgramList;
       this.programs.length = data.ProgramList.TotalAvailable;
       // populate page of virtual programs
-      this.programs.splice(recordings.StartIndex, recordings.Count,
+      this.programs.splice(recordings.StartIndex, recordings.Programs.length,
         ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
@@ -210,6 +216,16 @@ export class RecordingsComponent implements OnInit {
     const endtm = new Date(program.Recording.EndTs).getTime();
     const duration = (endtm - starttm) / 60000;
     return duration;
+  }
+
+  getDownload(program:ScheduleOrProgram) {
+    let fn = program.Title;
+    if (program.Season && program.Episode){
+      fn = fn + ' - S' + program.Season + 'E' + program.Episode;
+    }
+    if (program.SubTitle)
+      fn = fn + ' - ' + program.SubTitle;
+    return fn;
   }
 
   // return true causes default browser right click menu to show

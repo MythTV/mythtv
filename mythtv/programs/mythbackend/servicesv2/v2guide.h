@@ -85,7 +85,8 @@ class V2Guide : public MythHTTPService
 
         static QFileInfo    GetChannelIcon      ( int              ChanId,
                                                   int              Width ,
-                                                  int              Height );
+                                                  int              Height,
+                                                  const QString   &FileName );
 
         static V2ChannelGroupList*  GetChannelGroupList ( bool         IncludeEmpty );
 

@@ -130,6 +130,12 @@ HTTPMethodPtr MythHTTPMetaMethod::Create(int Index, QMetaMethod &Method, int Req
 */
 void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QString& Value)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QByteArray typeName = QMetaType::typeName(Type);
+#else
+    QByteArray typeName = QMetaType(Type).name();
+#endif
+
     // Enum types
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     auto typeflags = QMetaType::typeFlags(Type);
@@ -141,14 +147,9 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
         // QMetaEnum::keyToValue will return -1 for an unrecognised enumerant, so
         // default to -1 for all error cases
         int value = -1;
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-        QByteArray type = QMetaType::typeName(Type);
-#else
-        QByteArray type = QMetaType(Type).name();
-#endif
-        if (int index = type.lastIndexOf("::" ); index > -1)
+        if (int index = typeName.lastIndexOf("::" ); index > -1)
         {
-            QString enumname = type.mid(index + 2);
+            QString enumname = typeName.mid(index + 2);
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             const auto * metaobject = QMetaType::metaObjectForType(Type);
 #else
@@ -165,6 +166,13 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
             }
         }
         *(static_cast<int*>(Parameter)) = value;
+        return Parameter;
+    }
+
+    // Handle parameters of type std::chrono::seconds
+    if (typeName == "std::chrono::seconds")
+    {
+        *(static_cast<std::chrono::seconds*>(Parameter)) = std::chrono::seconds(Value.toInt());
         return Parameter;
     }
 
@@ -196,7 +204,9 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
             *(static_cast<QDateTime*>(Parameter)) = dt;
             break;
         }
-        default: break;
+        default:
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Unknown QMetaType:%1 %2").arg(Type).arg(QString(typeName)));
+            break;
     }
     return Parameter;
 }

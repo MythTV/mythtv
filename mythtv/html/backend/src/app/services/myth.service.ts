@@ -18,7 +18,7 @@ import {
   RemoveStorageGroupRequest,
   TestDBSettingsRequest
 } from './interfaces/myth.interface';
-import { BoolResponse } from './interfaces/common.interface';
+import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { BackendInfo } from './interfaces/backend.interface';
 import { FrontendList } from './interfaces/frontend.interface';
 
@@ -96,9 +96,11 @@ export class MythService {
     }
   }
 
-  public GetDirListing(DirName : string) : Observable<{DirListing: String[]}> {
+  public GetDirListing(DirName : string, Files? : boolean) : Observable<{DirListing: String[]}> {
     let params = new HttpParams()
       .set("DirName", DirName);
+      if (Files)
+        params = params.set("Files", Files)
     return this.httpClient.get<{DirListing: String[]}>('/Myth/GetDirListing', {params});
   }
 
@@ -160,6 +162,10 @@ export class MythService {
 
   public Shutdown(request: {Retcode?: number, Restart?: boolean}) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Myth/Shutdown', request);
+  }
+
+  public Proxy(url: String) : Observable<StringResponse> {
+    return this.httpClient.post<StringResponse>('/Myth/Proxy', {Url: url});
   }
 
 }

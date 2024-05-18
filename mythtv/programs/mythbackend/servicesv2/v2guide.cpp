@@ -413,11 +413,17 @@ V2Program* V2Guide::GetProgramDetails( int              nChanId,
 
 QFileInfo V2Guide::GetChannelIcon( int nChanId,
                                  int nWidth  /* = 0 */,
-                                 int nHeight /* = 0 */ )
+                                 int nHeight /* = 0 */,
+                                 const QString &FileName )
 {
+
+    QString sFileName;
     // Get Icon file path
 
-    QString sFileName = ChannelUtil::GetIcon( nChanId );
+    if (FileName.isEmpty())
+        sFileName = ChannelUtil::GetIcon( nChanId );
+    else
+        sFileName = FileName;
 
     if (sFileName.isEmpty())
     {

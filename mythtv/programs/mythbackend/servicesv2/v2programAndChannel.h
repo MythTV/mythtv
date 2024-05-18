@@ -38,6 +38,7 @@ class V2ChannelInfo : public QObject
     SERVICE_PROPERTY2( QString     , ChanNum        )
     SERVICE_PROPERTY2( QString     , CallSign       )
     SERVICE_PROPERTY2( QString     , IconURL        )
+    SERVICE_PROPERTY2( QString     , Icon           )
     SERVICE_PROPERTY2( QString     , ChannelName    )
     SERVICE_PROPERTY2( uint        , MplexId        )
     SERVICE_PROPERTY2( uint        , ServiceId      )
@@ -66,8 +67,22 @@ class V2ChannelInfo : public QObject
     public:
 
         Q_INVOKABLE V2ChannelInfo(QObject *parent = nullptr)
-            : QObject           ( parent ),
-              m_Visible         ( true   )
+            :   QObject           ( parent ),
+                m_ChanId            (0),
+                m_MplexId           (0),
+                m_ServiceId         (0),
+                m_ATSCMajorChan     (0),
+                m_ATSCMinorChan     (0),
+                m_FineTune          (0),
+                m_SourceId          (0),
+                m_InputId           (0),
+                m_CommFree          (false),
+                m_UseEIT            (false),
+                m_Visible           (true),
+                m_ServiceType       (0),
+                m_RecPriority       (0),
+                m_TimeOffset        (0),
+                m_CommMethod        (0)
         {
         }
 
@@ -77,6 +92,7 @@ class V2ChannelInfo : public QObject
             m_ChanNum       = src->m_ChanNum     ;
             m_CallSign      = src->m_CallSign    ;
             m_IconURL       = src->m_IconURL     ;
+            m_Icon          = src->m_Icon        ;
             m_ChannelName   = src->m_ChannelName ;
             m_ChanFilters   = src->m_ChanFilters ;
             m_SourceId      = src->m_SourceId    ;
@@ -158,7 +174,16 @@ class V2Program : public QObject
     public:
 
         Q_INVOKABLE V2Program(QObject *parent = nullptr)
-            : QObject( parent )
+            : QObject( parent ),
+            m_Repeat            (false),
+            m_Stars             (0),
+            m_ProgramFlags      (0),
+            m_VideoProps        (0),
+            m_AudioProps        (0),
+            m_Season            (0),
+            m_Episode           (0),
+            m_TotalEpisodes     (0),
+            m_FileSize          (0)
         {
         }
 

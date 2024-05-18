@@ -95,6 +95,17 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       if (request.Count < 100)
         request.Count = 100;
     }
+    if (!event.sortField)
+      event.sortField = 'StartTime';
+    if (event.sortField == 'Channel.ChanNum')
+      request.Sort = 'ChanNum';
+    else
+      request.Sort = event.sortField;
+    let sortOrder = '';
+    if (event.sortOrder && event.sortOrder < 0)
+      sortOrder = ' desc';
+    request.Sort = request.Sort + sortOrder;
+
     if (event.filters) {
       if (event.filters.ShowAll.value) {
         request.ShowAll = true;
@@ -124,13 +135,19 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   }
 
-  formatStartDate(program: ScheduleOrProgram): string {
-    return this.utility.formatDate(program.Recording.StartTs, true);
+  formatStartDate(program: ScheduleOrProgram, rowIndex: number): string {
+    let priorDate = '';
+    if (rowIndex > 0 && this.programs[rowIndex-1].Recording.StartTs)
+      priorDate = this.utility.formatDate(this.programs[rowIndex-1].Recording.StartTs, true, true);
+    let thisDate = this.utility.formatDate(program.Recording.StartTs, true, true);
+    if (priorDate == thisDate)
+      return ' ';
+    return thisDate;
   }
 
   formatAirDate(program: ScheduleOrProgram): string {
     if (!program.Airdate)
-      return '';
+      return ' ';
     let date = program.Airdate + ' 00:00';
     return this.utility.formatDate(date, true);
   }

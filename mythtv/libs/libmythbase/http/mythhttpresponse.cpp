@@ -44,6 +44,17 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
 
         // Content disposition
         QString filename = data ? (*data)->m_fileName : (*file)->m_fileName;
+        QString download = MythHTTP::GetHeader(m_requestHeaders, "mythtv-download");
+        if (!download.isEmpty())
+        {
+            int lastDot = filename.lastIndexOf('.');
+            if (lastDot > 0)
+            {
+                QString extension = filename.right(filename.length() - lastDot);
+                download = download + extension;
+            }
+            filename = download;
+        }
         // Warn about programmer error
         if (filename.isEmpty())
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Response has no name");
@@ -117,7 +128,9 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
                          "object-src 'none'; "
                          "media-src 'self'; "
                          "font-src 'self'; "
-                         "img-src 'self'; "
+                         // This img-src is needed for displaying icons in channel icon search
+                         // These icons come from many different urls
+                         "img-src http: https: data:; "
                          "form-action 'self'; "
                          "frame-ancestors 'self'; ";
 

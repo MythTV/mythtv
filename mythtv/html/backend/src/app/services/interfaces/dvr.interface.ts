@@ -129,6 +129,7 @@ export interface GetUpcomingRequest {
     ShowAll?:    boolean;
     RecordId?:   number;
     Status?:     number;
+    Sort?:       string;
 }
 
 export interface UpcomingList {

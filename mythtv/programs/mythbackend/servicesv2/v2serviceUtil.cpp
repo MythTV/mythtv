@@ -189,9 +189,10 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
     pChannel->setCallSign(channelInfo.m_callSign);
     if (!channelInfo.m_icon.isEmpty())
     {
-        QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
-                                    .arg( channelInfo.m_chanId );
+        QString sIconURL  = QString( "/Guide/GetChannelIcon?FileName=%1")
+                                    .arg( channelInfo.m_icon );
         pChannel->setIconURL( sIconURL );
+        pChannel->setIcon( channelInfo.m_icon );
     }
     pChannel->setChannelName(channelInfo.m_name);
     pChannel->setVisible(channelInfo.m_visible > kChannelNotVisible);
@@ -772,7 +773,8 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
                                         int& nCount,
                                         bool bShowAll,
                                         int  nRecordId,
-                                        int  nRecStatus )
+                                        int  nRecStatus,
+                                        const QString  &Sort )
 {
     RecordingList  recordingList; // Auto-delete deque
     RecList  tmpList; // Standard deque, objects must be deleted
@@ -821,6 +823,40 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
         delete *it;
         *it = nullptr;
     }
+
+    // Sort the list
+
+    int sortType = 0;
+    if (Sort.toLower().startsWith("channum"))
+        sortType = 10;
+    else if (Sort.toLower().startsWith("title"))
+        sortType = 20;
+    if (Sort.toLower().endsWith("desc"))
+        sortType += 1;
+
+    auto comp = [sortType](const RecordingInfo *First, const RecordingInfo *Second)
+    {
+        switch (sortType)
+        {
+            case 0:
+                return First->GetScheduledStartTime() < Second->GetScheduledStartTime();
+            case 1:
+                return First->GetScheduledStartTime() > Second->GetScheduledStartTime();
+            case 10:
+                return First->GetChanNum().replace('-','.').toDouble() < Second->GetChanNum().replace('-','.').toDouble();
+            case 11:
+                return First->GetChanNum().replace('-','.').toDouble() > Second->GetChanNum().replace('-','.').toDouble();
+            case 20:
+                return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) < 0 ;
+            case 21:
+                return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) > 0 ;
+        }
+        return false;
+    };
+
+    // no need to sort when zero because that is the default order from the scheduler
+    if (sortType > 0)
+        std::stable_sort(recordingList.begin(), recordingList.end(), comp);
 
     // ----------------------------------------------------------------------
     // Build Response

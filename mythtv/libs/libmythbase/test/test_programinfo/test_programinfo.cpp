@@ -1,3 +1,3 @@
 #include "test_programinfo.h"
 
-QTEST_APPLESS_MAIN(TestProgramInfo)
+QTEST_GUILESS_MAIN(TestProgramInfo)

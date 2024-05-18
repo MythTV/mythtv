@@ -139,4 +139,4 @@ void TestVideoList::cleanupTestCase()
 {
 }
 
-QTEST_APPLESS_MAIN(TestVideoList)
+QTEST_GUILESS_MAIN(TestVideoList)
