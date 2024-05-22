@@ -103,7 +103,7 @@ static void runHomepage()
 static void setupKeys(void)
 {
     REG_KEY("Browser", "NEXTTAB", QT_TRANSLATE_NOOP("MythControls",
-        "Move to next browser tab"), "P");
+        "Move to next browser tab"), "P,Media Play");
     REG_KEY("Browser", "PREVTAB", QT_TRANSLATE_NOOP("MythControls",
         "Move to previous browser tab"), "");
 
