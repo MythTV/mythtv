@@ -808,13 +808,13 @@ void MythMainWindow::InitKeys()
     RegisterKey("Global", "BACKSPACE", QT_TRANSLATE_NOOP("MythControls",
         "Backspace"),       "Backspace");
     RegisterKey("Global", "ESCAPE", QT_TRANSLATE_NOOP("MythControls",
-        "Escape"),                "Esc");
+        "Escape"),                "Esc,Back");
     RegisterKey("Global", "MENU", QT_TRANSLATE_NOOP("MythControls",
-        "Pop-up menu"),             "M,Meta+Enter");
+        "Pop-up menu"),             "M,Meta+Enter,Ctrl+M,Menu");
     RegisterKey("Global", "INFO", QT_TRANSLATE_NOOP("MythControls",
-        "More information"),        "I");
+        "More information"),        "I,Ctrl+I,Home Page");
     RegisterKey("Global", "DELETE", QT_TRANSLATE_NOOP("MythControls",
-        "Delete"),                  "D");
+        "Delete"),                  "D,Ctrl+E");
     RegisterKey("Global", "EDIT", QT_TRANSLATE_NOOP("MythControls",
         "Edit"),                    "E");
     RegisterKey("Global", ACTION_SCREENSHOT, QT_TRANSLATE_NOOP("MythControls",
@@ -834,9 +834,9 @@ void MythMainWindow::InitKeys()
         "Page to bottom of list"),   "");
 
     RegisterKey("Global", "PREVVIEW", QT_TRANSLATE_NOOP("MythControls",
-        "Previous View"),        "Home");
+        "Previous View"),        "Home,Media Previous");
     RegisterKey("Global", "NEXTVIEW", QT_TRANSLATE_NOOP("MythControls",
-        "Next View"),             "End");
+        "Next View"),             "End,Media Next");
 
     RegisterKey("Global", "HELP", QT_TRANSLATE_NOOP("MythControls",
         "Help"),                   "F1");
@@ -856,7 +856,7 @@ void MythMainWindow::InitKeys()
     RegisterKey("Global", "REDO", QT_TRANSLATE_NOOP("MythControls",
         "Redo"), "Ctrl+Y");
     RegisterKey("Global", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
-        "Show incremental search dialog"), "Ctrl+S");
+        "Show incremental search dialog"), "Ctrl+S,Search");
 
     RegisterKey("Global", ACTION_0, QT_TRANSLATE_NOOP("MythControls","0"), "0");
     RegisterKey("Global", ACTION_1, QT_TRANSLATE_NOOP("MythControls","1"), "1");
@@ -897,9 +897,9 @@ void MythMainWindow::InitKeys()
 
     // these are for the html viewer widget (MythUIWebBrowser)
     RegisterKey("Browser", "ZOOMIN",          QT_TRANSLATE_NOOP("MythControls",
-        "Zoom in on browser window"),           ".,>");
+        "Zoom in on browser window"),           ".,>,Ctrl+F,Media Fast Forward");
     RegisterKey("Browser", "ZOOMOUT",         QT_TRANSLATE_NOOP("MythControls",
-        "Zoom out on browser window"),          ",,<");
+        "Zoom out on browser window"),          ",,<,Ctrl+B,Media Rewind");
     RegisterKey("Browser", "TOGGLEINPUT",     QT_TRANSLATE_NOOP("MythControls",
         "Toggle where keyboard input goes to"),  "F1");
 
@@ -935,7 +935,7 @@ void MythMainWindow::InitKeys()
         "Go forward to previous page"),     "F");
 
     RegisterKey("Main Menu",    "EXITPROMPT", QT_TRANSLATE_NOOP("MythControls",
-        "Display System Exit Prompt"),      "Esc");
+        "Display System Exit Prompt"),      "Esc,Back");
     RegisterKey("Main Menu",    "EXIT",       QT_TRANSLATE_NOOP("MythControls",
         "System Exit"),                     "");
     RegisterKey("Main Menu",    "STANDBYMODE",QT_TRANSLATE_NOOP("MythControls",

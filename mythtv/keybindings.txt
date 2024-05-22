@@ -1,3 +1,35 @@
+Modern Remote Control Media Keys, MythTV 35+
+--------------------------------------------
+
+In addition to the below standard keyboard keys, modern USB HID remote
+control media keys should also work as expected in most contexts.
+They simulate the historical standard "Like" key:
+
+Like    Modern USB HID Key      Description                     Also
+====    ==================      ===========                     ====
+M       Menu                    MENU of options per context     Ctrl+M
+I       Home Page               INFORMATION per context         Ctrl+I
+Esc     Back                    ESCAPE BACK to prior screen
+Ctrl+S  Search                  incremental SEARCH of a list
+P       Media Play              PLAY or PAUSE audio / video
+O	Media Stop		STOP audio playback (in Music)
+<       Media Rewind            REWIND, move left, zoom out     Ctrl+B
+>       Media Fast Forward      FORWARD, move right, zoom in    Ctrl+F
+Home    Media Previous          PREVIOUS commercial, day, song
+End     Media Next              NEXT commercial, day, song...
+|       Volume Mute             Toggle mute                     F9
+[       Volume Down             Decrease volume                 F10
+]       Volume Up               Increase volume                 F11
+
+New version 35+ installs should get bindings for these special keys by
+default.  In existing installs the keybindings table of the database
+may still apply in which case the above keys may need mapped manually
+as recommended at:
+
+https://www.mythtv.org/wiki/MX3_Air_Mouse_Remote#Edit_Keys
+
+------------------------------------------------------------
+
 Various keys and their actions:
 
 mythfrontend
@@ -61,7 +93,7 @@ Watching TV or a recording
 - | or F9     Toggle mute
 - [ or F10    Decrease volume
 - ] or F11    Increase volume
-- Ctrl+B      Jump to the beginning of the recording / ringbuffer.
+- Ctrl+A      Jump to the beginning of the recording / ringbuffer.
 - < starts sticky rewind mode
     If a jump amount is entered, jump to that position.
 - > starts sticky fast forward mode

@@ -47,7 +47,7 @@ static void setupKeys()
     REG_JUMP("MythWeather", QT_TRANSLATE_NOOP("MythControls",
         "Weather forecasts"), "", runWeather);
     REG_KEY("Weather", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
-        "Pause current page"), "P");
+        "Pause current page"), "P,Media Play");
     REG_KEY("Weather", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
         "Search List"), "/");
     REG_KEY("Weather", "NEXTSEARCH", QT_TRANSLATE_NOOP("MythControls",
