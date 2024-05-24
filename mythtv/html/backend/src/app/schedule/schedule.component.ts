@@ -50,7 +50,6 @@ export class ScheduleComponent implements OnInit {
   successCount = 0;
   errorCount = 0;
   errortext = '';
-  htmlRegex = new RegExp("<TITLE>|</TITLE>");
   srchTypeDisabled = true;
   titleRows = 1;
   subTitleRows = 1;
@@ -65,6 +64,12 @@ export class ScheduleComponent implements OnInit {
   reqRecRule?: RecRule
   reqDate = new Date();
   reqDuration = 60;
+  metaPrefix = '';
+  templateId = 0;
+  neverRecord = false;
+  schedTypeDisabled = false;
+
+  htmlRegex = new RegExp("<TITLE>|</TITLE>");
 
   recRules: RecRule[] = [];
   playGroups: string[] = [];
@@ -127,8 +132,6 @@ export class ScheduleComponent implements OnInit {
 
   selectedPostProc: string[] = [];
 
-  metaPrefix = '';
-  templateId = 0;
 
   constructor(private dvrService: DvrService, private translate: TranslateService,
     private mythService: MythService, public utility: UtilityService, private channelService: ChannelService) {
@@ -240,6 +243,11 @@ export class ScheduleComponent implements OnInit {
     this.reqChannel = channel;
     this.reqRecRule = recRule;
     this.titleRows = 1;
+    this.neverRecord = false;
+    this.successCount = 0;
+    this.errorCount = 0;
+    this.errortext = '';
+    this.metaPrefix = '';
     if (program || recRule) {
       this.srchTypeDisabled = true;
       this.srchTypeList[0].inactive = false;
@@ -248,6 +256,7 @@ export class ScheduleComponent implements OnInit {
       this.srchTypeDisabled = false;
       this.srchTypeList[0].inactive = true;
     }
+    this.schedTypeDisabled = false;
     this.loadLists();
   }
 
@@ -268,6 +277,7 @@ export class ScheduleComponent implements OnInit {
     }
     else
       this.recRule = undefined;
+    this.channel = undefined;
     if (this.reqChannel)
       this.channel = this.reqChannel;
     else if (this.reqRecRule)
@@ -312,6 +322,10 @@ export class ScheduleComponent implements OnInit {
 
     if (newOverride)
       this.recRule.ParentId = this.program!.Recording.RecordId;
+    if (this.reqProgram?.Recording?.StatusName == 'NeverRecord') {
+      this.neverRecord = true;
+      ruleType = 'Never Record';
+    }
 
     if (!ruleType)
       ruleType = 'Not Recording';
@@ -336,6 +350,8 @@ export class ScheduleComponent implements OnInit {
       this.recRule.Inactive = false;
 
     setTimeout(() => {
+      if (newOverride)
+        ruleType = 'Not Recording';
       if (this.recRule)
         this.recRule.Type = ruleType;
       this.currentForm.form.markAsPristine();
@@ -346,6 +362,7 @@ export class ScheduleComponent implements OnInit {
     let ruleType = recRule.Type;
     this.typeList.length = 0;
     this.override = false;
+
     if (ruleType == 'Recording Template') {
       this.typeList.push(
         {
@@ -362,22 +379,45 @@ export class ScheduleComponent implements OnInit {
         );
       }
     }
-    else if (['Override Recording', 'Do not Record'].indexOf(ruleType) > -1) {
+    else if (['Override Recording', 'Do not Record'].indexOf(ruleType) > -1
+      || this.neverRecord) {
       this.override = true;
+      if (this.neverRecord)
+        this.typeList.push(
+          {
+            prompt: this.translate.instant('dashboard.sched.type.forget_history'),
+            value: 'Forget History'
+          }
+        );
+      else
+        this.typeList.push(
+          {
+            prompt: this.translate.instant('dashboard.sched.type.del_override'),
+            value: 'Not Recording'
+          },
+          {
+            prompt: this.translate.instant('dashboard.sched.type.rec_override'),
+            value: 'Override Recording'
+          },
+          {
+            prompt: this.translate.instant('dashboard.sched.type.dont_rec_override'),
+            value: 'Do not Record'
+          });
       this.typeList.push(
         {
-          prompt: this.translate.instant('dashboard.sched.type.del_override'),
-          value: 'Not Recording'
-        },
-        {
-          prompt: this.translate.instant('dashboard.sched.type.rec_override'),
-          value: 'Override Recording'
-        },
-        {
-          prompt: this.translate.instant('dashboard.sched.type.dont_rec_override'),
-          value: 'Do not Record'
+          prompt: this.translate.instant('dashboard.sched.type.never_rec_override'),
+          value: 'Never Record'
         }
       );
+
+      if (this.reqProgram?.Recording?.StatusName == 'CurrentRecording'
+        || this.reqProgram?.Recording?.StatusName == 'PreviousRecording')
+        this.typeList.push(
+          {
+            prompt: this.translate.instant('dashboard.sched.type.forget_history'),
+            value: 'Forget History'
+          }
+        );
     }
     else {
       const isManual = (recRule.SearchType == 'Manual Search');
@@ -421,7 +461,7 @@ export class ScheduleComponent implements OnInit {
           }
         );
     }
-    // If the selected entry is no longet in the available list, set it to the
+    // If the selected entry is no longer in the available list, set it to the
     // first item in the list
     if (this.typeList.findIndex((x) => x.value == recRule.Type) == -1) {
       recRule.Type = this.typeList[0].value;
@@ -627,7 +667,7 @@ export class ScheduleComponent implements OnInit {
       this.displayDlg = false;
       return;
     }
-    if (this.currentForm.dirty) {
+    if (this.currentForm.dirty && !this.schedTypeDisabled) {
       if (this.displayUnsaved) {
         // Close on the unsaved warning
         this.displayUnsaved = false;
@@ -650,9 +690,13 @@ export class ScheduleComponent implements OnInit {
   saveObserver = {
     next: (x: any) => {
       if (this.recRule) {
-        if (this.recRule.Id && x.bool) {
+        if ((this.recRule.Id || this.recRule.Type == 'Never Record'
+          || this.recRule.Type == 'Forget History') && x.bool) {
           this.successCount++;
           this.currentForm.form.markAsPristine();
+          // After setting never record, disable further changes
+          if (this.recRule.Type == 'Never Record' || this.neverRecord)
+            this.schedTypeDisabled = true;
           setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
           // after a deletion clear out the id so the next save
           // would add a new one.
@@ -692,6 +736,27 @@ export class ScheduleComponent implements OnInit {
     this.errortext = '';
     if (!this.recRule)
       return;
+    if (this.recRule.Type == 'Forget History') {
+      if (this.program && this.channel) {
+        this.dvrService.AllowReRecord(undefined, this.channel.ChanId,
+          this.program.StartTime).subscribe(this.saveObserver);
+      }
+      return;
+    }
+    if (this.neverRecord) {
+      // For a neverRecord situation the only valid entry is "Forget History"
+      // so if it gets here there is nothing to do.
+      this.currentForm.form.markAsPristine();
+      return;
+    }
+    if (this.recRule.Type == 'Never Record') {
+      this.dvrService.AddDontRecordSchedule({
+        ChanId: this.recRule.ChanId,
+        StartTime: this.recRule.StartTime,
+        NeverRecord: true
+      }).subscribe(this.saveObserver);
+      return;
+    }
     if (this.recRule.Id == 0 && this.recRule.Type == 'Not Recording')
       return;
     this.errorCount = 0;

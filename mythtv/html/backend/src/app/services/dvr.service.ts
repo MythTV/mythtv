@@ -61,8 +61,8 @@ export class DvrService {
     return this.httpClient.post<number>('/Dvr/AddRecordedProgram', json);
   }
 
-  public AllowReRecord(RecordedId: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Dvr/AllowReRecord', { RecordedId: RecordedId });
+  public AllowReRecord(RecordedId?: number, ChanId?: number, StartTime?: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/AllowReRecord', { RecordedId: RecordedId, ChanId: ChanId, StartTime: StartTime });
   }
 
   public DeleteRecording(request: DeleteRecordingRequest): Observable<BoolResponse> {
