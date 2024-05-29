@@ -32,6 +32,11 @@ set(DOXYGEN_EXCLUDES "${PROJECT_SOURCE_DIR}/libs/libmythmpeg2")
 
 set(DOXYGEN_STRIP_FROM_PATH "${PROJECT_SOURCE_DIR}/../")
 
+set(STRIP_FROM_INC_PATH_LIST
+    "${PROJECT_SOURCE_DIR}/libs"
+    "${PROJECT_SOURCE_DIR}/programs" "${PROJECT_SOURCE_DIR}/../")
+list(JOIN STRIP_FROM_INC_PATH_LIST " " DOXYGEN_STRIP_FROM_INC_PATH)
+
 configure_file(doxygen-paths.cfg.inc.in doxygen-paths.cfg.inc @ONLY)
 
 # Command to create documentation
