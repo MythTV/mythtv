@@ -1,6 +1,6 @@
 TARGETS = devdocs
 
-DOXYGEN_SOURCES=doxygen-architecture-document.cpp ../contrib ../libs ../programs ../../mythplugins
+DOXYGEN_SOURCES=doxygen-architecture-document.cpp ../libs ../programs ../../mythplugins
 DOXYGEN_EXCLUDES=../libs/libmythmpeg2
 
 all: $(TARGETS)

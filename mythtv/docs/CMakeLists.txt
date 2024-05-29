@@ -24,7 +24,7 @@ file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/doxygen-create-developer-docs.cfg
 #
 set(SOURCES_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/doxygen-architecture-document.cpp"
-    "${PROJECT_SOURCE_DIR}/contrib" "${PROJECT_SOURCE_DIR}/libs"
+    "${PROJECT_SOURCE_DIR}/libs"
     "${PROJECT_SOURCE_DIR}/programs" "${PROJECT_SOURCE_DIR}/../mythplugins")
 list(JOIN SOURCES_LIST " " DOXYGEN_SOURCES)
 
