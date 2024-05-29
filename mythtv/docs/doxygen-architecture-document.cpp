@@ -398,11 +398,13 @@ state changing commands should not be issued.
 
 \ingroup libmyth
 
-MythPlugins are shared object files (_i.e._libraries) which are loaded
-from a specific directory (_%e.g._ /usr/local/lib/mythtv/plugins).
+<p>
+MythPlugins are shared object files (_i.e._ libraries) which are loaded
+from a specific directory (_e.g._ /usr/local/lib/mythtv/plugins).
 Currently, all plugins are written in the C++ language, but there is nothing
 preventing other languages being used (the functions are in the C name space).
-c
+</p>
+
 int mythplugin_init(const char *libversion); is invoked whenever mythfrontend
 is started. This typically handles upgrading any database records - it will be
 the first method called after a new version of the plugin has been installed.
