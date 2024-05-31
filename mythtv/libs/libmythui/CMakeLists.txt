@@ -74,7 +74,22 @@ set(HEADERS_TO_INSTALL
     xmlparsebase.h)
 
 set(LIBMYTHUI_HEADERS_NOT_INSTALLED
+    devices/mythinputdevicehandler.h
     guistartup.h
+    mythdisplay.h
+    mythdisplaymode.h
+    mythedid.h
+    mythfontmanager.h
+    mythmainwindowprivate.h
+    mythnotificationcenter_private.h
+    mythpaintergpu.h
+    mythpainterwindow.h
+    mythpainterwindowqt.h
+    mythrender_base.h
+    mythscreensaver.h
+    mythudplistener.h
+    mythuiprocedural.h
+    mythvrr.h
     rawsettingseditor.h
     )
 #
@@ -82,152 +97,81 @@ set(LIBMYTHUI_HEADERS_NOT_INSTALLED
 #
 add_library(
   mythui
+  ${HEADERS_TO_INSTALL}
   ${LIBMYTHUI_HEADERS_NOT_INSTALLED}
   devices/mythinputdevicehandler.cpp
-  devices/mythinputdevicehandler.h
   guistartup.cpp
   langsettings.cpp
-  langsettings.h
   mythcolourspace.cpp
-  mythcolourspace.h
   mythdialogbox.cpp
-  mythdialogbox.h
   mythdisplay.cpp
-  mythdisplay.h
   mythdisplaymode.cpp
-  mythdisplaymode.h
   mythedid.cpp
-  mythedid.h
   mythfontmanager.cpp
-  mythfontmanager.h
   mythfontproperties.cpp
-  mythfontproperties.h
   mythgenerictree.cpp
-  mythgenerictree.h
   mythgesture.cpp
-  mythgesture.h
   mythhdr.cpp
-  mythhdr.h
   mythimage.cpp
-  mythimage.h
   mythmainwindow.cpp
-  mythmainwindow.h
   mythmainwindowprivate.cpp
-  mythmainwindowprivate.h
   mythnotification.cpp
-  mythnotification.h
   mythnotificationcenter.cpp
-  mythnotificationcenter.h
-  mythnotificationcenter_private.h
   mythpainter.cpp
-  mythpainter.h
   mythpainter_qt.cpp
-  mythpainter_qt.h
   mythpaintergpu.cpp
-  mythpaintergpu.h
   mythpainterwindow.cpp
-  mythpainterwindow.h
   mythpainterwindowqt.cpp
-  mythpainterwindowqt.h
   mythprogressdialog.cpp
-  mythprogressdialog.h
   mythrect.cpp
-  mythrect.h
   mythrender.cpp
-  mythrender_base.h
   mythscreensaver.cpp
-  mythscreensaver.h
   mythscreenstack.cpp
-  mythscreenstack.h
   mythscreentype.cpp
-  mythscreentype.h
   mythterminal.cpp
-  mythterminal.h
   myththemebase.cpp
-  myththemebase.h
   myththemedmenu.cpp
-  myththemedmenu.h
   mythudplistener.cpp
-  mythudplistener.h
-  mythuiactions.h
   mythuianimation.cpp
-  mythuianimation.h
   mythuibutton.cpp
-  mythuibutton.h
   mythuibuttonlist.cpp
-  mythuibuttonlist.h
   mythuibuttontree.cpp
-  mythuibuttontree.h
   mythuicheckbox.cpp
-  mythuicheckbox.h
   mythuiclock.cpp
-  mythuiclock.h
   mythuicomposite.cpp
-  mythuicomposite.h
   mythuieditbar.cpp
-  mythuieditbar.h
-  mythuiexp.h
   mythuifilebrowser.cpp
-  mythuifilebrowser.h
   mythuigroup.cpp
-  mythuigroup.h
   mythuiguidegrid.cpp
-  mythuiguidegrid.h
   mythuihelper.cpp
-  mythuihelper.h
   mythuiimage.cpp
-  mythuiimage.h
   mythuilocation.cpp
-  mythuilocation.h
   mythuiprocedural.cpp
-  mythuiprocedural.h
   mythuiprogressbar.cpp
-  mythuiprogressbar.h
   mythuiscreenbounds.cpp
-  mythuiscreenbounds.h
   mythuiscrollbar.cpp
-  mythuiscrollbar.h
   mythuishape.cpp
-  mythuishape.h
   mythuisimpletext.cpp
-  mythuisimpletext.h
   mythuispinbox.cpp
-  mythuispinbox.h
   mythuistatetracker.cpp
-  mythuistatetracker.h
   mythuistatetype.cpp
-  mythuistatetype.h
   mythuitext.cpp
-  mythuitext.h
   mythuitextedit.cpp
-  mythuitextedit.h
   mythuithemecache.cpp
-  mythuithemecache.h
   mythuithemehelper.cpp
-  mythuithemehelper.h
   mythuitype.cpp
-  mythuitype.h
   mythuiutils.cpp
-  mythuiutils.h
   mythuivideo.cpp
-  mythuivideo.h
   mythvirtualkeyboard.cpp
-  mythvirtualkeyboard.h
   mythvrr.cpp
-  mythvrr.h
   rawsettingseditor.cpp
   schemawizard.cpp
-  schemawizard.h
   standardsettings.cpp
-  standardsettings.h
   storagegroupeditor.cpp
-  storagegroupeditor.h
   themeinfo.cpp
-  themeinfo.h
   x11colors.cpp
-  x11colors.h
   xmlparsebase.cpp
-  xmlparsebase.h)
+  )
 
 #
 # All remaining target information
