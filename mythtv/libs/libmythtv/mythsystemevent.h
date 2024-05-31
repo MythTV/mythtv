@@ -5,7 +5,7 @@
 #include <QObject>
 
 #include "libmythbase/programinfo.h"
-#include "libmyth/rawsettingseditor.h"
+#include "libmythui/rawsettingseditor.h"
 #include "recordinginfo.h"
 
 // Helper commands for formatting and sending a MythSystemEvent

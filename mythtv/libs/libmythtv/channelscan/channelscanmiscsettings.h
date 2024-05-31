@@ -30,7 +30,7 @@
 #ifndef CHANNEL_SCAN_MISC_SETTINGS_H
 #define CHANNEL_SCAN_MISC_SETTINGS_H
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "channelscantypes.h"
 
 class TransLabelSetting;

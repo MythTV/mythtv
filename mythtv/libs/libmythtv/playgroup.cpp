@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/programinfo.h"
 #include "playgroup.h"

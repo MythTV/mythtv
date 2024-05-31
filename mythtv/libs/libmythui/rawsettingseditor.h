@@ -5,7 +5,7 @@
 #include <QHash>
 #include <QObject>
 
-#include "mythexp.h"
+#include "mythuiexp.h"
 #include "libmythui/mythscreentype.h"
 
 class MythUIButtonList;
@@ -22,7 +22,7 @@ class MythUIShape;
  *  Any inheritting class must set the title and list of settings names in
  *  its constructor.
  */
-class MPUBLIC RawSettingsEditor : public MythScreenType
+class MUI_PUBLIC RawSettingsEditor : public MythScreenType
 {
     Q_OBJECT
 
