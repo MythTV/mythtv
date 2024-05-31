@@ -93,9 +93,13 @@ add_library(
   mythdialogbox.cpp
   mythdialogbox.h
   mythdisplay.cpp
+  mythdisplay.h
   mythdisplaymode.cpp
+  mythdisplaymode.h
   mythedid.cpp
+  mythedid.h
   mythfontmanager.cpp
+  mythfontmanager.h
   mythfontproperties.cpp
   mythfontproperties.h
   mythgenerictree.cpp
@@ -109,6 +113,7 @@ add_library(
   mythmainwindow.cpp
   mythmainwindow.h
   mythmainwindowprivate.cpp
+  mythmainwindowprivate.h
   mythnotification.cpp
   mythnotification.h
   mythnotificationcenter.cpp
@@ -119,14 +124,19 @@ add_library(
   mythpainter_qt.cpp
   mythpainter_qt.h
   mythpaintergpu.cpp
+  mythpaintergpu.h
   mythpainterwindow.cpp
+  mythpainterwindow.h
   mythpainterwindowqt.cpp
+  mythpainterwindowqt.h
   mythprogressdialog.cpp
   mythprogressdialog.h
   mythrect.cpp
   mythrect.h
   mythrender.cpp
+  mythrender_base.h
   mythscreensaver.cpp
+  mythscreensaver.h
   mythscreenstack.cpp
   mythscreenstack.h
   mythscreentype.cpp
@@ -138,6 +148,7 @@ add_library(
   myththemedmenu.cpp
   myththemedmenu.h
   mythudplistener.cpp
+  mythudplistener.h
   mythuiactions.h
   mythuianimation.cpp
   mythuianimation.h
@@ -169,6 +180,7 @@ add_library(
   mythuilocation.cpp
   mythuilocation.h
   mythuiprocedural.cpp
+  mythuiprocedural.h
   mythuiprogressbar.cpp
   mythuiprogressbar.h
   mythuiscreenbounds.cpp
@@ -202,6 +214,7 @@ add_library(
   mythvirtualkeyboard.cpp
   mythvirtualkeyboard.h
   mythvrr.cpp
+  mythvrr.h
   rawsettingseditor.cpp
   schemawizard.cpp
   schemawizard.h
