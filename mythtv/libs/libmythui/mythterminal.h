@@ -10,7 +10,7 @@
 #include <QRecursiveMutex>
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythuiexp.h"
 #include "libmythui/mythscreentype.h"
 
 class MythUIButton;
@@ -18,7 +18,7 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUITextEdit;
 
-class MPUBLIC MythTerminal : public MythScreenType
+class MUI_PUBLIC MythTerminal : public MythScreenType
 {
     Q_OBJECT
 

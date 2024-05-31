@@ -12,20 +12,15 @@ endif()
 # Enumerate all headers
 #
 set(LIBMYTH_HEADERS
-    langsettings.h
     mythaverror.h
     mythcontext.h
     mythexp.h
     mythmediamonitor.h
-    mythterminal.h
     output.h
-    schemawizard.h
-    standardsettings.h
-    storagegroupeditor.h
-    visual.h)
+    visual.h
+    )
 
-set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h dbsettings.h guistartup.h
-                                  rawsettingseditor.h)
+set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h dbsettings.h)
 
 set(AUDIO_HEADERS
     audio/audioconvert.h
@@ -73,17 +68,11 @@ add_library(
   audio/volumebase.cpp
   backendselect.cpp
   dbsettings.cpp
-  guistartup.cpp
-  langsettings.cpp
   mythaverror.cpp
   mythcontext.cpp
   mythmediamonitor.cpp
-  mythterminal.cpp
   output.cpp
-  rawsettingseditor.cpp
-  schemawizard.cpp
-  standardsettings.cpp
-  storagegroupeditor.cpp)
+  )
 
 #
 # Platform stuff

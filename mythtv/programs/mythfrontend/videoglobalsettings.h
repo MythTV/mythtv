@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 class VideoGeneralSettings : public GroupSetting
 {

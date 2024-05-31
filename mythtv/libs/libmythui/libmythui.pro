@@ -52,6 +52,13 @@ HEADERS += mythvrr.h
 HEADERS += mythcolourspace.h
 HEADERS += devices/mythinputdevicehandler.h
 HEADERS += mythuiprocedural.h
+HEADERS += guistartup.h
+HEADERS += langsettings.h
+HEADERS += mythterminal.h
+HEADERS += rawsettingseditor.h
+HEADERS += schemawizard.h
+HEADERS += standardsettings.h
+HEADERS += storagegroupeditor.h
 
 SOURCES  = mythmainwindowprivate.cpp mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += mythpainterwindow.cpp mythpainterwindowqt.cpp
@@ -87,6 +94,13 @@ SOURCES += mythvrr.cpp
 SOURCES += mythcolourspace.cpp
 SOURCES += devices/mythinputdevicehandler.cpp
 SOURCES += mythuiprocedural.cpp
+SOURCES += guistartup.cpp
+SOURCES += langsettings.cpp
+SOURCES += mythterminal.cpp
+SOURCES += rawsettingseditor.cpp
+SOURCES += schemawizard.cpp
+SOURCES += standardsettings.cpp
+SOURCES += storagegroupeditor.cpp
 
 using_qtwebkit {
 HEADERS += mythuiwebbrowser.h
@@ -113,6 +127,11 @@ inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
 inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
 inc.files += mythnotificationcenter.h mythnotification.h mythuicomposite.h
 inc.files += mythhdr.h mythcolourspace.h
+inc.files += langsettings.h
+inc.files += schemawizard.h
+inc.files += standardsettings.h
+inc.files += storagegroupeditor.h
+inc.files += mythterminal.h
 
 INSTALLS += inc
 

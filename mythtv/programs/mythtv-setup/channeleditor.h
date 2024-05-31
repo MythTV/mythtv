@@ -1,7 +1,7 @@
 #ifndef CHANNELEDITOR_H
 #define CHANNELEDITOR_H
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythui/mythscreentype.h"
 
 class MythUIButton;

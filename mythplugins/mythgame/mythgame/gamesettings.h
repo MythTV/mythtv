@@ -3,7 +3,7 @@
 
 // MythTV headers
 #include <libmythbase/mythpluginexport.h>
-#include <libmyth/standardsettings.h>
+#include <libmythui/standardsettings.h>
 
 QString GetGameTypeName(const QString &GameType);
 QString GetGameTypeExtensions(const QString &GameType);

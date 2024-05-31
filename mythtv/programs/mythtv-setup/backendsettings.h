@@ -1,7 +1,7 @@
 #ifndef BACKENDSETTINGS_H
 #define BACKENDSETTINGS_H
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 class IpAddressSettings;
 class BackendSettings : public GroupSetting

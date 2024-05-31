@@ -4,7 +4,7 @@
 #include <QString>
 #include <QSqlError>
 
-#include "libmyth/schemawizard.h"
+#include "libmythui/schemawizard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/mythconfig.h"

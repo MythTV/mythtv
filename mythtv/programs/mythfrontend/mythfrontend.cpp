@@ -31,10 +31,10 @@
 
 // MythTV
 #include "libmyth/audio/audiooutput.h"
-#include "libmyth/langsettings.h"
+#include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythmediamonitor.h"
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"  // For SIG* on MinGW
 #include "libmythbase/exitcodes.h"
