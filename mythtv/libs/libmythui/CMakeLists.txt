@@ -13,6 +13,7 @@ endif()
 #
 
 set(HEADERS_TO_INSTALL
+    langsettings.h
     mythcolourspace.h
     mythdialogbox.h
     mythfontproperties.h
@@ -29,6 +30,7 @@ set(HEADERS_TO_INSTALL
     mythrect.h
     mythscreenstack.h
     mythscreentype.h
+    mythterminal.h
     myththemebase.h
     myththemedmenu.h
     mythuiactions.h
@@ -64,17 +66,28 @@ set(HEADERS_TO_INSTALL
     mythuivideo.h
     mythuiwebbrowser.h
     mythvirtualkeyboard.h
+    schemawizard.h
+    standardsettings.h
+    storagegroupeditor.h
     themeinfo.h
     x11colors.h
     xmlparsebase.h)
 
+set(LIBMYTHUI_HEADERS_NOT_INSTALLED
+    guistartup.h
+    rawsettingseditor.h
+    )
 #
 # Declare the library
 #
 add_library(
   mythui
+  ${LIBMYTHUI_HEADERS_NOT_INSTALLED}
   devices/mythinputdevicehandler.cpp
   devices/mythinputdevicehandler.h
+  guistartup.cpp
+  langsettings.cpp
+  langsettings.h
   mythcolourspace.cpp
   mythcolourspace.h
   mythdialogbox.cpp
@@ -118,6 +131,8 @@ add_library(
   mythscreenstack.h
   mythscreentype.cpp
   mythscreentype.h
+  mythterminal.cpp
+  mythterminal.h
   myththemebase.cpp
   myththemebase.h
   myththemedmenu.cpp
@@ -187,6 +202,13 @@ add_library(
   mythvirtualkeyboard.cpp
   mythvirtualkeyboard.h
   mythvrr.cpp
+  rawsettingseditor.cpp
+  schemawizard.cpp
+  schemawizard.h
+  standardsettings.cpp
+  standardsettings.h
+  storagegroupeditor.cpp
+  storagegroupeditor.h
   themeinfo.cpp
   themeinfo.h
   x11colors.cpp

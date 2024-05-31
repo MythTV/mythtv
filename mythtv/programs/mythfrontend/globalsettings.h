@@ -10,7 +10,7 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythtv/mythvideoprofile.h"
 
 class QFileInfo;

@@ -45,6 +45,8 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/portchecker.h"
 #include "libmythbase/remotefile.h"
+#include "libmythui/guistartup.h"
+#include "libmythui/langsettings.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythimage.h"
 #include "libmythui/mythmainwindow.h"
@@ -54,8 +56,6 @@
 
 #include "backendselect.h"
 #include "dbsettings.h"
-#include "guistartup.h"
-#include "langsettings.h"
 #include "mythcontext.h"
 #include "mythmediamonitor.h"
 

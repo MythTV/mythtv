@@ -44,7 +44,7 @@
 
 #include <vector>
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythui/mythuigroup.h"
 #include "libmythui/xmlparsebase.h"
 

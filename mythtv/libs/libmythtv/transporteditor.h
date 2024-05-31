@@ -34,7 +34,7 @@
 
 #include <QObject>
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 #include "mythtvexp.h"
 #include "cardutil.h"
