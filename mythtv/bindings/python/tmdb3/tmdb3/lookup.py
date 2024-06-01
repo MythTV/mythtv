@@ -12,7 +12,7 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner, Roland Ernst"
-__version__ = "0.3.10"
+__version__ = "0.3.11"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
@@ -31,6 +31,7 @@ __version__ = "0.3.10"
 # 0.3.8 Sort posters by system language or 'en', if not found for given language
 # 0.3.9 Support TV lookup
 # 0.3.10 Use new API for release dates for movies
+# 0.3.11 Allow queries for specials in series in TV lookup
 
 # ~ from optparse import OptionParser
 import sys
@@ -340,7 +341,7 @@ def buildEpisode(args, opts):
 
     # process seasons backwards because it is more likely
     # that you have a recent one than an old one
-    while season_number > 0:
+    while season_number >= 0:
         season = Season(inetref,str(season_number))
         if episode_number:
             episode = season.episodes[episode_number]
