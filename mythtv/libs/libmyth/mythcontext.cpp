@@ -47,6 +47,7 @@
 #include "libmythbase/remotefile.h"
 #include "libmythui/guistartup.h"
 #include "libmythui/langsettings.h"
+#include "libmythui/mediamonitor.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythimage.h"
 #include "libmythui/mythmainwindow.h"
@@ -57,7 +58,6 @@
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "mythcontext.h"
-#include "mythmediamonitor.h"
 
 #define LOC      QString("MythContext: ")
 

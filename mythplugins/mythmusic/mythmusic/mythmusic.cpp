@@ -11,7 +11,6 @@
 
 // MythTV headers
 #include <libmyth/mythcontext.h>
-#include <libmyth/mythmediamonitor.h>
 #include <libmythbase/compat.h>
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythdb.h>
@@ -23,6 +22,7 @@
 #include <libmythmetadata/musicfilescanner.h>
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythmetadata/musicutils.h>
+#include <libmythui/mediamonitor.h>
 #include <libmythui/mythprogressdialog.h>
 #include <libmythui/myththemedmenu.h>
 #include <libmythui/mythuihelper.h>

@@ -11,7 +11,7 @@
 #include <QDBusObjectPath>
 #endif
 
-#include "mythmediamonitor.h"
+#include "mediamonitor.h"
 
 class MediaMonitorUnix : public MediaMonitor
 {
