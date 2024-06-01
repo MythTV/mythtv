@@ -14,6 +14,7 @@ endif()
 
 set(HEADERS_TO_INSTALL
     langsettings.h
+    mediamonitor.h
     mythcolourspace.h
     mythdialogbox.h
     mythfontproperties.h
@@ -102,6 +103,7 @@ add_library(
   devices/mythinputdevicehandler.cpp
   guistartup.cpp
   langsettings.cpp
+  mediamonitor.cpp
   mythcolourspace.cpp
   mythdialogbox.cpp
   mythdisplay.cpp
@@ -350,14 +352,27 @@ if(ANDROID)
             platforms/mythscreensaverandroid.h)
 endif()
 
+if(UNIX)
+  target_sources(mythui PRIVATE mediamonitor-unix.cpp mediamonitor-unix.h)
+  if(NOT TARGET ${QT_PKG_NAME}::DBus)
+    set_source_files_properties(mediamonitor-unix.h PROPERTIES SKIP_AUTOMOC
+                                                               TRUE)
+  endif()
+endif()
+
 if(WIN32)
   target_sources(mythui PRIVATE mythpainter_d3d9.cpp mythrender_d3d9.cpp
+                                mediamonitor-windows.cpp mediamonitor-windows.h
                                 platforms/mythdisplaywindows.cpp)
   target_compile_definitions(mythui PRIVATE NODRAWTEXT)
   target_link_libraries(mythui PUBLIC user32 gdi32)
   if(HAVE_DXVA2)
     target_compile_definitions(mythui PRIVATE USING_DXVA2)
   endif()
+endif()
+
+if(MINGW OR win32-msvc)
+  target_sources(mythui PRIVATE mediamonitor-windows.cpp mediamonitor-windows.h)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -381,6 +396,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   target_compile_definitions(mythui PRIVATE USING_APPLEREMOTE)
   if(NOT ENABLE_LIRC)
     target_sources(mythui PRIVATE devices/lircevent.cpp devices/lircevent.h)
+  endif()
+  if(DARWIN_DA)
+    set_target_properties(mythui PROPERTIES COMPILE_DEFINITIONS USING_DARWIN_DA)
+    target_sources(mythui PRIVATE mediamonitor-darwin.cpp mediamonitor-darwin.h)
+    target_link_libraries(mythui PRIVATE ${APPLE_DISKARBITRATION_LIBRARY})
   endif()
 endif()
 

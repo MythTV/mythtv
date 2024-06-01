@@ -13,12 +13,12 @@
 
 // MythTV
 #include <libmyth/mythcontext.h>
-#include <libmyth/mythmediamonitor.h>
 #include <libmythbase/compat.h>
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythmiscutil.h>
 #include <libmythbase/mythsystemlegacy.h>
+#include <libmythui/mediamonitor.h>
 
 // mythmusic
 #include "musicdata.h"

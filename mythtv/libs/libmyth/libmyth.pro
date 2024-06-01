@@ -38,7 +38,7 @@ HEADERS += audio/volumebase.h audio/eldutils.h
 HEADERS += audio/audiooutputgraph.h
 HEADERS += backendselect.h dbsettings.h
 HEADERS += mythaverror.h mythcontext.h
-HEADERS += mythexp.h mythmediamonitor.h
+HEADERS += mythexp.h
 HEADERS += output.h
 HEADERS += visual.h
 
@@ -52,7 +52,6 @@ SOURCES += audio/volumebase.cpp audio/eldutils.cpp
 SOURCES += audio/audiooutputgraph.cpp
 SOURCES += backendselect.cpp dbsettings.cpp
 SOURCES += mythaverror.cpp mythcontext.cpp
-SOURCES += mythmediamonitor.cpp
 SOURCES += output.cpp
 
 INCLUDEPATH += ..
@@ -87,7 +86,7 @@ inc.path = $${PREFIX}/include/mythtv/libmyth
 inc.files  = dialogbox.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h volumecontrol.h
 inc.files += inetcomms.h
-inc.files += mythaverror.h mythmediamonitor.h
+inc.files += mythaverror.h
 inc.files += visual.h output.h
 inc.files += mythexp.h
 
@@ -114,14 +113,6 @@ using_pulse {
     }
 }
 
-unix:!cygwin {
-    SOURCES += mediamonitor-unix.cpp
-    HEADERS += mediamonitor-unix.h
-    !android {
-        using_qtdbus: QT += dbus
-    }
-}
-
 android {
 SOURCES += audio/audiooutputopensles.cpp
 SOURCES += audio/audiooutputaudiotrack.cpp
@@ -132,17 +123,15 @@ HEADERS += audio/audiooutputaudiotrack.h
 cygwin {
     QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
     DEFINES += _WIN32
-    #HEADERS += mediamonitor-windows.h
-    #SOURCES += mediamonitor-windows.cpp
 }
 
 mingw:DEFINES += USING_MINGW
 
 mingw | win32-msvc* {
     
-    SOURCES += mediamonitor-windows.cpp audio/audiooutputwin.cpp
+    SOURCES += audio/audiooutputwin.cpp
     SOURCES += audio/audiooutputdx.cpp
-    HEADERS += mediamonitor-windows.h   audio/audiooutputwin.h
+    HEADERS += audio/audiooutputwin.h
     HEADERS += audio/audiooutputdx.h
     LIBS += -lwinmm -lws2_32 -luser32 -lsamplerate -lSoundTouch
 }
@@ -151,21 +140,11 @@ macx {
     HEADERS += audio/audiooutputca.h
     SOURCES += audio/audiooutputca.cpp
 
-    darwin_da {
-        SOURCES -= mediamonitor-unix.cpp
-        HEADERS -= mediamonitor-unix.h
-        HEADERS += mediamonitor-darwin.h
-        SOURCES += mediamonitor-darwin.cpp
-        DEFINES += USING_DARWIN_DA
-    }
-
     # Mac OS X Frameworks
-    darwin_da : LIBS += -framework DiskArbitration
     LIBS += -framework ApplicationServices
     LIBS += -framework AudioUnit
     LIBS += -framework AudioToolbox
     LIBS += -framework CoreAudio
-    LIBS += -framework IOKit
 }
 
 INSTALLS += inc inc2

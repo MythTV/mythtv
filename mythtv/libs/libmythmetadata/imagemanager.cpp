@@ -4,9 +4,9 @@
 #include <QRunnable>
 #include <utility>
 
-#include "libmyth/mythmediamonitor.h"
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythdate.h"
+#include "libmythui/mediamonitor.h"
 
 #include "dbaccess.h"  // for FileAssociations
 

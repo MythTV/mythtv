@@ -33,7 +33,6 @@
 #include "libmyth/audio/audiooutput.h"
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
-#include "libmyth/mythmediamonitor.h"
 #include "libmythui/standardsettings.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"  // For SIG* on MinGW
@@ -64,6 +63,7 @@
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/tvremoteutil.h"
+#include "libmythui/mediamonitor.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/myththemedmenu.h"
 #include "libmythui/mythuihelper.h"
