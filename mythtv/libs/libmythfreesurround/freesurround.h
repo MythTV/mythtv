@@ -19,7 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef FREESURROUND_H
 #define FREESURROUND_H
 
-#include "libmythbase/compat.h"  // instead of sys/types.h, for MinGW compatibility
+#include <cstdint>
+
+#include <QtGlobal> //<QtCompilerDetection> in Qt6 // Q_DECL_EXPORT
+
+using uint = unsigned int;
 
 static constexpr uint16_t SURROUND_BUFSIZE { 8192 };
 
