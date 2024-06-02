@@ -90,6 +90,7 @@ add_executable(
   servicesv2/v2channelGroup.h
   servicesv2/v2channelGroupList.h
   servicesv2/v2channelInfoList.h
+  servicesv2/v2channelRestore.h
   servicesv2/v2channelScan.h
   servicesv2/v2commMethod.h
   servicesv2/v2config.cpp
