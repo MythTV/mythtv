@@ -24,11 +24,18 @@ file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/doxygen-create-developer-docs.cfg
 #
 set(SOURCES_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/doxygen-architecture-document.cpp"
-    "${PROJECT_SOURCE_DIR}/contrib" "${PROJECT_SOURCE_DIR}/libs"
+    "${PROJECT_SOURCE_DIR}/libs"
     "${PROJECT_SOURCE_DIR}/programs" "${PROJECT_SOURCE_DIR}/../mythplugins")
 list(JOIN SOURCES_LIST " " DOXYGEN_SOURCES)
 
 set(DOXYGEN_EXCLUDES "${PROJECT_SOURCE_DIR}/libs/libmythmpeg2")
+
+set(DOXYGEN_STRIP_FROM_PATH "${PROJECT_SOURCE_DIR}/../")
+
+set(STRIP_FROM_INC_PATH_LIST
+    "${PROJECT_SOURCE_DIR}/libs"
+    "${PROJECT_SOURCE_DIR}/programs" "${PROJECT_SOURCE_DIR}/../")
+list(JOIN STRIP_FROM_INC_PATH_LIST " " DOXYGEN_STRIP_FROM_INC_PATH)
 
 configure_file(doxygen-paths.cfg.inc.in doxygen-paths.cfg.inc @ONLY)
 
