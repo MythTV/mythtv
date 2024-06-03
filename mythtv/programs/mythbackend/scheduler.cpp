@@ -3729,10 +3729,8 @@ void Scheduler::UpdateManuals(uint recordid)
     // the services API to propegate originalairdate information.
     QDate originalairdate = QDate(query.value(12).toDate());
 
-    if (description.isEmpty())
-        description = startdt.toLocalTime().toString();
-
     bool subtitleWasEmpty = subtitle.isEmpty();
+    bool descriptionWasEmpty = description.isEmpty();
 
     query.prepare("SELECT chanid from channel "
                   "WHERE deleted IS NULL AND callsign = :STATION");
@@ -3793,6 +3791,11 @@ void Scheduler::UpdateManuals(uint recordid)
         if (subtitleWasEmpty)
         {
             subtitle = MythDate::toString(startdt, MythDate::kDatabase | MythDate::kOverrideLocal);
+        }
+
+        if (descriptionWasEmpty)
+        {
+            description = startdt.toLocalTime().toString();
         }
 
         for (uint id : chanidlist)
