@@ -278,13 +278,6 @@ private:
             } else {
                 // --- this is the old & simple steering mode ---
 
-                // calculate the amplitude/phase difference
-                float ampDiff = clamp_unit_mag((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
-                float phaseDiff = phaseL - phaseR;
-                if (phaseDiff < -PI) phaseDiff += 2*PI;
-                if (phaseDiff > PI) phaseDiff -= 2*PI;
-                phaseDiff = abs(phaseDiff);
-
                 // determine sound field x-position
                 m_xFs[f] = ampDiff;
 
