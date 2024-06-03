@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "freesurround.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -28,14 +29,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <list>
 #include <map>
 
-#include "libmythbase/compat.h"
 #include "libmythbase/mythlogging.h"
 
-#include "freesurround.h"
-#include "el_processor.h"
-
 #include <QString>
-#include <QDateTime>
+
+#include "freesurround_decoder.h"
 
 // our default internal block size, in floats
 static const unsigned default_block_size = SURROUND_BUFSIZE;
@@ -128,13 +126,6 @@ void FreeSurround::SetParams()
     }
 }
 
-FreeSurround::fsurround_params::fsurround_params(int32_t center_width,
-                                                 int32_t dimension) :
-    center_width(center_width),
-    dimension(dimension)
-{
-}
-
 FreeSurround::~FreeSurround()
 {
     LOG(VB_AUDIO, LOG_DEBUG, QString("FreeSurround::~FreeSurround"));
@@ -152,10 +143,6 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
     bool process = true;
     auto *samples = (float *)buffer;
     // demultiplex
-
-    float **inputs = m_decoder->getInputBuffers();
-    float *lt      = &inputs[0][ic];
-    float *rt      = &inputs[1][ic];
 
     if ((m_surroundMode != SurroundModePassive) && (ic+numFrames > bs))
     {
@@ -179,6 +166,9 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     process = false;
                     break;
                 default:
+                    float **inputs = m_decoder->getInputBuffers();
+                    float *lt      = &inputs[0][ic];
+                    float *rt      = &inputs[1][ic];
                     for (i=0; i<numFrames; i++)
                         *lt++ = *rt++ = *samples++;
                     process = true;
@@ -218,6 +208,9 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     process = false;
                     break;
                 default:
+                    float **inputs = m_decoder->getInputBuffers();
+                    float *lt      = &inputs[0][ic];
+                    float *rt      = &inputs[1][ic];
                     for (i=0; i<numFrames; i++)
                     {
                         *lt++ = *samples++;
