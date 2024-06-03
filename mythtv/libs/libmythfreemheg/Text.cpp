@@ -18,11 +18,17 @@
    Or, point your browser to http://www.gnu.org/copyleft/gpl.html
 
 */
-#include "libmythbase/compat.h"
-
 #include "Text.h"
 
 #include <algorithm>
+#include <array>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#include <QRect>
+#include <QString>
 
 #include "Visible.h"
 #include "Presentable.h"
