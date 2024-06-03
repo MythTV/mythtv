@@ -32,9 +32,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "libmythbase/mythlogging.h"
 
-#include "el_processor.h"
-
 #include <QString>
+
+#include "freesurround_decoder.h"
 
 // our default internal block size, in floats
 static const unsigned default_block_size = SURROUND_BUFSIZE;

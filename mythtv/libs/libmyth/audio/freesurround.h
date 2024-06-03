@@ -21,13 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <cstdint>
 
-#include <QtGlobal> //<QtCompilerDetection> in Qt6 // Q_DECL_EXPORT
-
 using uint = unsigned int;
 
 static constexpr uint16_t SURROUND_BUFSIZE { 8192 };
 
-class Q_DECL_EXPORT FreeSurround
+class FreeSurround
 {
 public:
     enum SurroundMode : std::uint8_t

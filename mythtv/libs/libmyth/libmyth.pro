@@ -36,6 +36,8 @@ HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += audio/volumebase.h audio/eldutils.h
 HEADERS += audio/audiooutputgraph.h
+HEADERS += audio/freesurround.h
+HEADERS += audio/freesurround_decoder.h
 HEADERS += backendselect.h dbsettings.h
 HEADERS += langsettings.h
 HEADERS +=
@@ -59,6 +61,8 @@ SOURCES += audio/audioconvert.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.cpp
 SOURCES += audio/volumebase.cpp audio/eldutils.cpp
 SOURCES += audio/audiooutputgraph.cpp
+SOURCES += audio/freesurround.cpp
+SOURCES += audio/freesurround_decoder.cpp
 SOURCES += backendselect.cpp dbsettings.cpp
 SOURCES += langsettings.cpp
 SOURCES +=
@@ -80,7 +84,6 @@ INCLUDEPATH += $${POSTINC}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
-LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
@@ -97,7 +100,6 @@ LIBS += -L../libmythservicecontracts         -lmythservicecontracts-$${LIBVERSIO
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-    POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 }
 
 # Install headers so that plugins can compile independently

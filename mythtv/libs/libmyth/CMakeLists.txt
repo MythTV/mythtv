@@ -43,6 +43,8 @@ set(AUDIO_HEADERS_NOT_INSTALLED
     audio/audiooutputdownmix.h
     audio/audiooutputgraph.h
     audio/audiooutputnull.h
+    audio/freesurround.h
+    audio/freesurround_decoder.h
     audio/pink.h
     audio/spdifencoder.h)
 
@@ -68,6 +70,8 @@ add_library(
   audio/audiooutpututil.cpp
   audio/audiosettings.cpp
   audio/eldutils.cpp
+  audio/freesurround.cpp
+  audio/freesurround_decoder.cpp
   audio/pink.cpp
   audio/spdifencoder.cpp
   audio/volumebase.cpp
@@ -178,7 +182,6 @@ target_link_libraries(
   PUBLIC mythbase
          mythui
          mythupnp
-         mythfreesurround
          mythbluray
          PkgConfig::LIBAVCODEC
          PkgConfig::LIBAVFORMAT

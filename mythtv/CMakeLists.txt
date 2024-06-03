@@ -246,7 +246,6 @@ set_target_properties(
   mythbase
   mythdvdnav
   mythfreemheg
-  mythfreesurround
   mythmetadata
   mythmpeg2
   mythprotoserver

@@ -22,12 +22,12 @@
 #include "libmythbase/compat.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythfreesurround/freesurround.h"
 
 #include "audiooutputbase.h"
 #include "audiooutputdigitalencoder.h"
 #include "audiooutputdownmix.h"
 #include "audiooutpututil.h"
+#include "freesurround.h"
 #include "spdifencoder.h"
 
 // AC3 encode currently disabled for Android
