@@ -97,8 +97,7 @@ There are also a few simple \ref testing "testing shortcuts".
       and some old UI widgets are implemented by libmyth.
 
       This library depends on libav*, \ref libmythbase "libmythbase",
-      \ref libmythui "libmythui", \ref libmythupnp "libmythupnp"
-      and libmythfreesurround.
+      \ref libmythui "libmythui", and \ref libmythupnp "libmythupnp".
 
       Any changes to this library's ABI may trigger a %MythTV binary version
       change because the plugins depend on it.
@@ -152,11 +151,6 @@ There are also a few simple \ref testing "testing shortcuts".
 
   <dt>libmythfreemheg
       <dd>UK interactive %TV viewer.
-
-      This library does not depend on any of our libraries.
-
-  <dt>libmythfreesurround
-      <dd>Support for some multi-channel audio transforms.
 
       This library does not depend on any of our libraries.
 
