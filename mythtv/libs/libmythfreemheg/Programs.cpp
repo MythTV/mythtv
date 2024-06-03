@@ -20,8 +20,7 @@
 */
 #include <algorithm>
 #include <limits>
-
-#include "libmythbase/mythrandom.h"
+#include <random>
 
 #include "Programs.h"
 #include "Ingredients.h"
@@ -320,7 +319,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 // ETSI ES 202 184 V2.4.1 (2016-06) §11.10.5 Random number function
                 // specifies "The returned value is undefined if the num parameter < 1."
                 // so this is fine.
-                int r = MythRandom(0, nLimit);
+                static std::random_device rd;
+                static std::mt19937 generator {rd()};
+                std::uniform_int_distribution<int> distrib {0, nLimit};
+                int r = distrib(generator);
                 engine->FindObject(
                     *(pResInt->GetReference()))->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);
