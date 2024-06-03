@@ -154,11 +154,6 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythnvctrl
-      <dd>Interface between X-windows and NVidia drivers.
-
-      This library does not depend on any of our libraries.
-
 </dl>
 The libmythmpeg2 library appears redundant with the system libsamplerate, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and
