@@ -31,6 +31,6 @@ target_include_directories(
   INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mythtv>)
 
 target_link_libraries(mythfreemheg PUBLIC Qt${QT_VERSION_MAJOR}::Core
-                                          Qt${QT_VERSION_MAJOR}::Gui mythbase)
+                                          Qt${QT_VERSION_MAJOR}::Gui)
 
 install(TARGETS mythfreemheg LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
