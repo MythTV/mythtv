@@ -16,20 +16,20 @@ pause
 robocopy share C:\ProgramData\ /E
 
 if not exist xampp-portable-windows.zip (
-    curl -L "https://sourceforge.net/projects/xampp/files/XAMPP%%20Windows/8.0.9/xampp-portable-windows-x64-8.0.9-0-VS16.zip/download" > xampp-portable-windows.zip
+    curl -kL "https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.0.25/xampp-portable-windows-x64-8.0.25-0-VS16.zip/download" > xampp-portable-windows.zip
 )
 
 if not exist timezone_2021a_leaps.zip (
-    curl -L https://downloads.mysql.com/general/timezone_2021a_leaps.zip > timezone_2021a_leaps.zip
+    curl -kL https://downloads.mysql.com/general/timezone_2021a_leaps.zip > timezone_2021a_leaps.zip
 )
 
 echo "copying files.."
-tar -xf xampp-portable-windows.zip
-tar -xf timezone_2021a_leaps.zip
+tar -vxf xampp-portable-windows.zip
+tar -vxf timezone_2021a_leaps.zip
 
 robocopy timezone_2021a_leaps\ xampp\mysql\data\mysql\
 
-rmdir -r timezone_2021a_leaps /s /q
+rmdir timezone_2021a_leaps /s /q
 
 cd xampp
 start /min cmd /k "setup_xampp.bat"
@@ -37,7 +37,8 @@ TIMEOUT 5 /nobreak
 start /min cmd /k "mysql\bin\mysqld --defaults-file=mysql\bin\my.ini --standalone"
 TIMEOUT 7 /nobreak
 echo "creating user"
-"mysql\bin\mysql.exe" -u root -e "CREATE USER 'mythtv'@'localhost' IDENTIFIED BY 'mythtv';CREATE DATABASE mythconverg;GRANT ALL PRIVILEGES ON *.* TO 'mythtv'@'localhost';"
+"mysql\bin\mysql.exe" -u root --skip-password  -e "CREATE USER 'mythtv'@'localhost' IDENTIFIED BY 'mythtv';CREATE DATABASE mythconverg;GRANT ALL PRIVILEGES ON *.* TO 'mythtv'@'localhost';"
+"mysql\bin\mysql.exe" -u root -e "SELECT user FROM mysql.user where user = 'mythtv';"
 
 cd ..
 TIMEOUT 1 /nobreak
