@@ -3778,54 +3778,60 @@ void Scheduler::UpdateManuals(uint recordid)
     while (query.next())
         chanidlist.push_back(query.value(0).toUInt());
 
-    int progcount = 0;
-    int skipdays = 1;
-    bool weekday = false;
-    int daysoff = 0;
-    QDateTime lstartdt = startdt.toLocalTime();
+    std::vector<QDateTime> startList;
+    constexpr int weeksToSchedule = 2;
+    constexpr int daysInWeek = 7;
+    // use local date/time so the local time of the recording stays constant
+    // across daylight savings time changes and weekday/weekend detection works
+    // correctly
+    const QDate startDate = startdt.toLocalTime().date();
+    const QTime startTime = startdt.toLocalTime().time();
+    // don't schedule recordings before startDate
+    qint64 offset =
+        std::max(qint64{0}, startDate.daysTo(MythDate::current().toLocalTime().date()));
 
     switch (rectype)
     {
     case kSingleRecord:
     case kOverrideRecord:
     case kDontRecord:
-        progcount = 1;
-        skipdays = 1;
-        weekday = false;
-        daysoff = 0;
+        startList.push_back(startdt);
         break;
     case kDailyRecord:
-        progcount = 13;
-        skipdays = 1;
-        weekday = (lstartdt.date().dayOfWeek() < 6);
-        daysoff = lstartdt.date().daysTo(
-            MythDate::current().toLocalTime().date());
+        for (int i = 0; i < daysInWeek * weeksToSchedule; i++)
+        {
+            if (startDate.dayOfWeek() < 6 && startDate.addDays(offset + i).dayOfWeek() >= 6)
+            {
+                continue;
+            }
 #if QT_VERSION < QT_VERSION_CHECK(6,5,0)
-        startdt = QDateTime(lstartdt.date().addDays(daysoff),
-                            lstartdt.time(), Qt::LocalTime).toUTC();
+            startList.push_back(QDateTime(startDate.addDays(offset + i),
+                                          startTime, Qt::LocalTime).toUTC());
 #else
-        startdt = QDateTime(lstartdt.date().addDays(daysoff),
-                            lstartdt.time(),
-                            QTimeZone(QTimeZone::LocalTime)
-                            ).toUTC();
+            startList.push_back(QDateTime(startDate.addDays(offset + i),
+                                          startTime,
+                                          QTimeZone(QTimeZone::LocalTime)
+                                          ).toUTC()
+                                );
 #endif
+        }
         break;
     case kWeeklyRecord:
-        progcount = 2;
-        skipdays = 7;
-        weekday = false;
-        daysoff = lstartdt.date().daysTo(
-            MythDate::current().toLocalTime().date());
-        daysoff = (daysoff + 6) / 7 * 7;
+        // round offset up to a whole number of weeks
+        offset = (offset + daysInWeek - 1) / daysInWeek * daysInWeek;
+        for (int i = 0; i < daysInWeek * weeksToSchedule; i += daysInWeek)
+        {
 #if QT_VERSION < QT_VERSION_CHECK(6,5,0)
-        startdt = QDateTime(lstartdt.date().addDays(daysoff),
-                            lstartdt.time(), Qt::LocalTime).toUTC();
+            startList.push_back(QDateTime(startDate.addDays(offset + i),
+                                          startTime, Qt::LocalTime).toUTC());
 #else
-        startdt = QDateTime(lstartdt.date().addDays(daysoff),
-                            lstartdt.time(),
-                            QTimeZone(QTimeZone::LocalTime)
-                            ).toUTC();
+            startList.push_back(QDateTime(startDate.addDays(offset + i),
+                                          startTime,
+                                          QTimeZone(QTimeZone::LocalTime)
+                                          ).toUTC()
+                                );
 #endif
+        }
         break;
     default:
         LOG(VB_GENERAL, LOG_ERR,
@@ -3833,13 +3839,10 @@ void Scheduler::UpdateManuals(uint recordid)
         return;
     }
 
-    while (progcount--)
+    for (const QDateTime& start : startList)
     {
         for (uint id : chanidlist)
         {
-            if (weekday && startdt.toLocalTime().date().dayOfWeek() >= 6)
-                continue;
-
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
                           " title, subtitle, description, manualid,"
                           " season, episode, inetref, originalairdate, generic) "
@@ -3847,8 +3850,8 @@ void Scheduler::UpdateManuals(uint recordid)
                           " :SUBTITLE, :DESCRIPTION, :RECORDID, "
                           " :SEASON, :EPISODE, :INETREF, :ORIGINALAIRDATE, 1)");
             query.bindValue(":CHANID", id);
-            query.bindValue(":STARTTIME", startdt);
-            query.bindValue(":ENDTIME", startdt.addSecs(duration));
+            query.bindValue(":STARTTIME", start);
+            query.bindValue(":ENDTIME", start.addSecs(duration));
             query.bindValue(":TITLE", title);
             query.bindValue(":SUBTITLE", subtitle);
             query.bindValue(":DESCRIPTION", description);
@@ -3863,17 +3866,6 @@ void Scheduler::UpdateManuals(uint recordid)
                 return;
             }
         }
-
-        daysoff += skipdays;
-#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
-        startdt = QDateTime(lstartdt.date().addDays(daysoff),
-                            lstartdt.time(), Qt::LocalTime).toUTC();
-#else
-        startdt = QDateTime(lstartdt.date().addDays(daysoff),
-                            lstartdt.time(),
-                            QTimeZone(QTimeZone::LocalTime)
-                            ).toUTC();
-#endif
     }
 }
 
