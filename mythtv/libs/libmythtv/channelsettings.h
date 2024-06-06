@@ -10,7 +10,7 @@
 #include <QString>
 
 // MythTV
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "mythtvexp.h"

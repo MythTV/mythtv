@@ -52,6 +52,14 @@ HEADERS += mythvrr.h
 HEADERS += mythcolourspace.h
 HEADERS += devices/mythinputdevicehandler.h
 HEADERS += mythuiprocedural.h
+HEADERS += guistartup.h
+HEADERS += langsettings.h
+HEADERS += mediamonitor.h
+HEADERS += mythterminal.h
+HEADERS += rawsettingseditor.h
+HEADERS += schemawizard.h
+HEADERS += standardsettings.h
+HEADERS += storagegroupeditor.h
 
 SOURCES  = mythmainwindowprivate.cpp mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += mythpainterwindow.cpp mythpainterwindowqt.cpp
@@ -87,6 +95,14 @@ SOURCES += mythvrr.cpp
 SOURCES += mythcolourspace.cpp
 SOURCES += devices/mythinputdevicehandler.cpp
 SOURCES += mythuiprocedural.cpp
+SOURCES += guistartup.cpp
+SOURCES += langsettings.cpp
+SOURCES += mediamonitor.cpp
+SOURCES += mythterminal.cpp
+SOURCES += rawsettingseditor.cpp
+SOURCES += schemawizard.cpp
+SOURCES += standardsettings.cpp
+SOURCES += storagegroupeditor.cpp
 
 using_qtwebkit {
 HEADERS += mythuiwebbrowser.h
@@ -113,6 +129,12 @@ inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
 inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
 inc.files += mythnotificationcenter.h mythnotification.h mythuicomposite.h
 inc.files += mythhdr.h mythcolourspace.h
+inc.files += langsettings.h
+inc.files += mediamonitor.h
+inc.files += schemawizard.h
+inc.files += standardsettings.h
+inc.files += storagegroupeditor.h
+inc.files += mythterminal.h
 
 INSTALLS += inc
 
@@ -202,6 +224,19 @@ using_qtdbus {
     SOURCES += platforms/mythdisplaymutter.cpp
 }
 
+unix:!cygwin {
+    SOURCES += mediamonitor-unix.cpp
+    HEADERS += mediamonitor-unix.h
+    !android {
+        using_qtdbus: QT += dbus
+    }
+}
+
+mingw | win32-msvc* {
+    SOURCES += mediamonitor-windows.cpp
+    HEADERS += mediamonitor-windows.h
+}
+
 macx {
     HEADERS += platforms/mythscreensaverosx.h
     HEADERS += platforms/mythosxutils.h
@@ -220,6 +255,15 @@ macx {
         SOURCES += devices/AppleRemote.cpp devices/AppleRemoteListener.cpp
         !using_lirc: HEADERS += devices/lircevent.h
         !using_lirc: SOURCES += devices/lircevent.cpp
+    }
+
+    darwin_da {
+        SOURCES -= mediamonitor-unix.cpp
+        HEADERS -= mediamonitor-unix.h
+        HEADERS += mediamonitor-darwin.h
+        SOURCES += mediamonitor-darwin.cpp
+        DEFINES += USING_DARWIN_DA
+        LIBS += -framework DiskArbitration
     }
 }
 

@@ -44,7 +44,7 @@
 #include "libmythbase/mythsystemlegacy.h"
 
 #include "mediamonitor-unix.h"
-#include "mythmediamonitor.h"
+#include "mediamonitor.h"
 
 #if HAVE_LIBUDEV
 extern "C" {
