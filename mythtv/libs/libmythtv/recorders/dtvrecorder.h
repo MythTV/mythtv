@@ -17,6 +17,7 @@
 #include "libmythtv/mpeg/H2645Parser.h"
 #include "libmythtv/mpeg/streamlisteners.h"
 #include "libmythtv/recorders/recorderbase.h"
+#include "libmythtv/scantype.h"
 
 class MPEGStreamData;
 class TSPacket;
