@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <ctime>
+#include <fstream>
 #include <unistd.h>
 
 #include "mythconfig.h"
@@ -21,15 +22,13 @@ class MSqlQuery;
 class LoggingItem;
 
 /// \brief Base class for the various logging mechanisms
-class LoggerBase : public QObject
+class LoggerBase
 {
-    Q_OBJECT
-
   public:
     /// \brief LoggerBase Constructor
     explicit LoggerBase(const char *string);
     /// \brief LoggerBase Deconstructor
-    ~LoggerBase() override;
+    virtual ~LoggerBase();
     /// \brief Process a log message for the logger instance
     /// \param item LoggingItem containing the log message to process
     virtual bool logmsg(LoggingItem *item) = 0;
@@ -42,8 +41,6 @@ class LoggerBase : public QObject
 /// \brief File-based logger - used for logfiles and console
 class FileLogger : public LoggerBase
 {
-    Q_OBJECT
-
   public:
     explicit FileLogger(const char *filename);
     ~FileLogger() override;
@@ -51,16 +48,13 @@ class FileLogger : public LoggerBase
     void reopen(void) override; // LoggerBase
     static FileLogger *create(const QString& filename, QMutex *mutex);
   private:
-    bool m_opened {false}; ///< true when the logfile is opened
-    int  m_fd     {-1};    ///< contains the file descriptor for the logfile
+    std::ofstream m_ofstream; ///< Output file stream for the log file.
 };
 
 #ifndef _WIN32
 /// \brief Syslog-based logger (not available in Windows)
 class SyslogLogger : public LoggerBase
 {
-    Q_OBJECT
-
   public:
     explicit SyslogLogger(bool open);
     ~SyslogLogger() override;
@@ -76,8 +70,6 @@ class SyslogLogger : public LoggerBase
 #if CONFIG_SYSTEMD_JOURNAL
 class JournalLogger : public LoggerBase
 {
-    Q_OBJECT
-
   public:
     JournalLogger();
     ~JournalLogger() override;
