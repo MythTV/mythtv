@@ -115,7 +115,7 @@ static void setupKeys(void)
     REG_KEY("Game", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
         "Toggle the current game as a favorite"), "?,/");
     REG_KEY("Game", "INCSEARCH", QT_TRANSLATE_NOOP("MythControls",
-        "Show incremental search dialog"), "Ctrl+S");
+        "Show incremental search dialog"), "Ctrl+S,Search");
     REG_KEY("Game", "INCSEARCHNEXT", QT_TRANSLATE_NOOP("MythControls",
         "Incremental search find next match"), "Ctrl+N");
     REG_KEY("Game","DOWNLOADDATA", QT_TRANSLATE_NOOP("MythControls",

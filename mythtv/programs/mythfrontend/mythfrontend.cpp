@@ -1636,7 +1636,7 @@ static void InitKeys(void)
      REG_KEY("Video","DECPARENT", QT_TRANSLATE_NOOP("MythControls",
          "Decrease Parental Level"), "[,{,F10");
      REG_KEY("Video","INCSEARCH", QT_TRANSLATE_NOOP("MythControls",
-         "Show Incremental Search Dialog"), "Ctrl+S");
+         "Show Incremental Search Dialog"), "Ctrl+S,Search");
      REG_KEY("Video","DOWNLOADDATA", QT_TRANSLATE_NOOP("MythControls",
          "Download metadata for current item"), "W");
      REG_KEY("Video","ITEMDETAIL", QT_TRANSLATE_NOOP("MythControls",
@@ -1644,7 +1644,7 @@ static void InitKeys(void)
 
      // Gallery keybindings
      REG_KEY("Images", "PLAY", QT_TRANSLATE_NOOP("MythControls",
-         "Start/Stop Slideshow"), "P");
+         "Start/Stop Slideshow"), "P,Media Play");
      REG_KEY("Images", "RECURSIVESHOW", QT_TRANSLATE_NOOP("MythControls",
          "Start Recursive Slideshow"), "R");
      REG_KEY("Images", "ROTRIGHT", QT_TRANSLATE_NOOP("MythControls",
@@ -1656,9 +1656,9 @@ static void InitKeys(void)
      REG_KEY("Images", "FLIPVERTICAL", QT_TRANSLATE_NOOP("MythControls",
          "Flip image vertically"), "");
      REG_KEY("Images", "ZOOMOUT", QT_TRANSLATE_NOOP("MythControls",
-         "Zoom image out"), "7");
+         "Zoom image out"), "7,<,Ctrl+B,Media Rewind");
      REG_KEY("Images", "ZOOMIN", QT_TRANSLATE_NOOP("MythControls",
-         "Zoom image in"), "9");
+         "Zoom image in"), "9,>,Ctrl+F,Media Fast Forward");
      REG_KEY("Images", "FULLSIZE", QT_TRANSLATE_NOOP("MythControls",
          "Full-size (un-zoom) image"), "0");
      REG_KEY("Images", "MARK", QT_TRANSLATE_NOOP("MythControls",

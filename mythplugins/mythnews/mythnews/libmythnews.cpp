@@ -43,9 +43,9 @@ static void setupKeys(void)
         "RSS News feed reader"), "", runNews);
 
     REG_KEY("News", "RETRIEVENEWS",
-        QT_TRANSLATE_NOOP("MythControls", "Update news items"), "I");
+        QT_TRANSLATE_NOOP("MythControls", "Update news items"), "I,Home Page");
     REG_KEY("News", "FORCERETRIEVE",
-        QT_TRANSLATE_NOOP("MythControls", "Force update news items"), "M");
+        QT_TRANSLATE_NOOP("MythControls", "Force update news items"), "M,Menu");
     REG_KEY("News", "CANCEL",
         QT_TRANSLATE_NOOP("MythControls", "Cancel news item updating"), "C");
 }
