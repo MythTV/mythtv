@@ -1,30 +1,11 @@
 #include "filesysteminfo.h"
 
-#include <unistd.h>
-#include <cstdlib>
-
-#include "compat.h"
-
 #include <QtGlobal>
-
-#ifdef __linux__
-#include <sys/vfs.h>
-#include <sys/sysinfo.h>
-#endif
-
-#ifdef Q_OS_DARWIN
-#include <mach/mach.h>
-#include <cstring>
-#endif
-
-#ifdef BSD
-#include <sys/param.h>
-#include <sys/mount.h>  // for struct statfs
-#endif
 
 #include <algorithm>
 
-#include <QList>
+#include <QByteArray>
+#include <QStorageInfo>
 #include <QString>
 #include <QStringList>
 
@@ -97,41 +78,24 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
 
 bool FileSystemInfo::refresh()
 {
-    struct statfs statbuf {};
+    QStorageInfo info {m_path};
 
-    // there are cases where statfs will return 0 (good), but f_blocks and
-    // others are invalid and set to 0 (such as when an automounted directory
-    // is not mounted but still visible because --ghost was used),
-    // so check to make sure we can have a total size > 0
-    if ((statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0) &&
-        (statbuf.f_blocks > 0) && (statbuf.f_bsize > 0)
-       )
+    if (info.isValid() && info.isReady())
     {
-        m_total = statbuf.f_blocks * statbuf.f_bsize;
-        //free  = statbuf.f_bavail * statbuf.f_bsize;
-        m_used  = m_total - statbuf.f_bavail * statbuf.f_bsize;
-        m_blksize = statbuf.f_bsize;
+        m_total   = info.bytesTotal();
+        m_used    = info.bytesTotal() - info.bytesAvailable();
+        m_blksize = info.blockSize();
 
         // TODO keep as B not KiB
         m_total >>= 10;
         m_used  >>= 10;
 
-#ifdef Q_OS_DARWIN
-        char *fstypename = statbuf.f_fstypename;
-        m_local = !(
-                    (strcmp(fstypename, "nfs")   == 0) ||  // NFS|FTP
-                    (strcmp(fstypename, "afpfs") == 0) ||  // AppleShare
-                    (strcmp(fstypename, "smbfs") == 0)     // SMB
-                   );
-#elif defined(__linux__)
-        long fstype = statbuf.f_type;
-        m_local = !(
-                    (fstype == 0x6969)  ||   // NFS
-                    (fstype == 0x517B)  ||   // SMB
-                    (fstype == 0xFF534D42L)  // CIFS
-                   );
-#else
-        m_local = true; // for equivalent behavior
+#ifdef Q_OS_WIN
+        QByteArray device = info.device();
+        m_local = (device.startsWith(R"(\\?\)") && !device.startsWith(R"(\\?\UNC\)")) ||
+                  (device.startsWith(R"(\\.\)") && !device.startsWith(R"(\\.\UNC\)"));
+#else // Unix-like
+        m_local = info.device().startsWith("/dev/");
 #endif
         return true;
     }
