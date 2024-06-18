@@ -5267,7 +5267,6 @@ void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
     }
 
     QStringList strlist;
-    FileSystemInfo fsInfo;
 
     fsInfos.clear();
 
