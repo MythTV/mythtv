@@ -31,7 +31,6 @@ set(LIBMYTHBASE_HEADERS
     mythchrono.h
     mythcommandlineparser.h
     mythcorecontext.h
-    mythcoreutil.h
     mythdate.h
     mythdb.h
     mythdbcheck.h
@@ -198,7 +197,6 @@ add_library(
   mythcommandlineparser.cpp
   mythconfig.h.in
   mythcorecontext.cpp
-  mythcoreutil.cpp
   mythdate.cpp
   mythdb.cpp
   mythdbcon.cpp
