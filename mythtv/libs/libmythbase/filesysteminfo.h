@@ -82,8 +82,8 @@ class MBASE_PUBLIC FileSystemInfo
     bool        ToStringList(QStringList &slist) const;
     QStringList ToStringList() const;
 
-    /// @brief update statfs filesystem statistics by reading from the storage device
-    /// @returns If successful
+    /// @brief update filesystem statistics by reading from the storage device
+    /// @returns Boolean, true if successful
     bool refresh();
 
   private:
