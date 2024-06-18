@@ -82,8 +82,8 @@ class MBASE_PUBLIC FileSystemInfo
     bool        ToStringList(QStringList &slist) const;
     QStringList ToStringList() const;
 
-    /// @brief update statfs filesystem statistics by reading from the storage device
-    /// @returns If successful
+    /// @brief update filesystem statistics by reading from the storage device
+    /// @returns Boolean, true if successful
     bool refresh();
 
   private:
@@ -93,10 +93,9 @@ class MBASE_PUBLIC FileSystemInfo
 
     QString m_hostname;
     QString m_path;
-    bool    m_local {false}; ///< set based on statfs
+    bool    m_local {false}; ///< set based on QStorageInfo::device()
     int     m_fsid  {-1};    ///< set by Consolidate
     int     m_grpid {-1};    ///< set by setGroupID
-    // cached from statfs
     int m_blksize   {4096};
     int64_t m_total {0};
     int64_t m_used  {0};
