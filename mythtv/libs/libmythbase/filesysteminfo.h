@@ -71,13 +71,9 @@ class MBASE_PUBLIC FileSystemInfo
     // information puts
     void setHostname(QString hostname)      { m_hostname = std::move(hostname); }
     void setPath(QString path)              { m_path     = std::move(path); }
-    void setLocal(bool local = true)        { m_local = local; }
-    void setFSysID(int id)                  { m_fsid = id; }
-    void setGroupID(int id)                 { m_grpid = id; }
-    void setBlockSize(int size)             { m_blksize = size; }
-    void setTotalSpace(int64_t size)        { m_total = size; }
-    void setUsedSpace(int64_t size)         { m_used = size; }
-    void setWeight(int weight)              { m_weight = weight; }
+    void setFSysID(int id)                  { m_fsid = id; } // TODO add regenerate option to Consolidate
+    void setUsedSpace(int64_t size)         { m_used = size; } // TODO call refresh in autoexpire after deleting? autoexpire's log message uses the wrong units, should be KiB
+    void setWeight(int weight)              { m_weight = weight; } // scheduler, use std::pair<int, FileSystemInfo>?
 
     bool        ToStringList(QStringList &slist) const;
     QStringList ToStringList() const;
