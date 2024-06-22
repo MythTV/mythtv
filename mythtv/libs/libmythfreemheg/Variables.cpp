@@ -18,9 +18,10 @@
    Or, point your browser to http://www.gnu.org/copyleft/gpl.html
 
 */
-#include "libmythbase/compat.h"
-
 #include "Variables.h"
+
+#include <cstdio>
+
 #include "Ingredients.h"
 #include "Root.h"
 #include "BaseClasses.h"
