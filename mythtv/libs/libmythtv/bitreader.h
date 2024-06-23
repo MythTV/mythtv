@@ -242,11 +242,23 @@ inline int BitReader::get_ue_golomb(unsigned max_length)
 
 inline void BitReader::refill_cache(unsigned min_bits)
 {
+    if (min_bits > 64)
+    {
+        min_bits = 64;
+    }
+
+    //if (m_bitIndex >= CHAR_BIT)
+    {
+        unsigned quotient = m_bitIndex / CHAR_BIT;
+        m_bitIndex        = m_bitIndex % CHAR_BIT;
+        m_buffer         += quotient;
+    }
+
     while (m_cacheSize < min_bits && m_buffer < m_bufferEnd)
     {
-        int shift = 64 - m_cacheSize;
-        int bits = CHAR_BIT - m_bitIndex;
-        if (shift > bits)
+        unsigned shift = 64 - m_cacheSize;
+        unsigned bits  = CHAR_BIT - m_bitIndex;
+        if (shift >= bits)
         {
             m_cache |= static_cast<uint64_t>(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
             m_bitIndex   = 0;
@@ -255,10 +267,10 @@ inline void BitReader::refill_cache(unsigned min_bits)
         }
         else
         {
-            // NOLINTNEXTLINE(clang-analyzer-core.BitwiseShift)
             m_cache |= static_cast<uint64_t>(*m_buffer & ((1 << bits) - 1)) >> (bits - shift);
             m_bitIndex  += shift;
             m_cacheSize += shift;
+            return; // m_cacheSize == 64
         }
 
     }
