@@ -55,12 +55,12 @@ class BitReader
         else
         {
             n -= m_cacheSize;
-            m_cacheSize = 0;
-            m_cache      = 0;
-            m_bitIndex += n;
-            int quotient = m_bitIndex / CHAR_BIT;
-            m_bitIndex %= CHAR_BIT;
-            m_buffer    += quotient;
+            m_cacheSize        = 0;
+            m_cache            = 0;
+            m_bitIndex        += n;
+            unsigned quotient  = m_bitIndex / CHAR_BIT;
+            m_bitIndex         = m_bitIndex % CHAR_BIT;
+            m_buffer          += quotient;
         }
     }
     uint32_t show_bits(unsigned n)
