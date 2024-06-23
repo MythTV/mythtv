@@ -261,14 +261,14 @@ inline void BitReader::refill_cache(unsigned min_bits)
         unsigned bits  = k_bitsPerRead  - m_bitIndex;
         if (shift >= bits)
         {
-            m_cache |= static_cast<uint64_t>(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
+            m_cache |= static_cast<uint64_t>(*m_buffer) << (shift - bits);
             m_bitIndex   = 0;
             m_buffer++;
             m_cacheSize += bits;
         }
         else
         {
-            m_cache |= static_cast<uint64_t>(*m_buffer & ((1 << bits) - 1)) >> (bits - shift);
+            m_cache |= static_cast<uint64_t>(*m_buffer) >> (bits - shift);
             m_bitIndex  += shift;
             m_cacheSize += shift;
             return; // m_cacheSize == k_cacheSizeMax
