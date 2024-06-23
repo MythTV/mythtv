@@ -29,7 +29,6 @@
 
 #include <array>
 #include <cstdint>
-#include <climits> // for CHAR_BIT
 
 #if __has_include(<bit>) // C++20
 #include <bit>
@@ -58,8 +57,8 @@ class BitReader
             m_cacheSize        = 0;
             m_cache            = 0;
             m_bitIndex        += n;
-            unsigned quotient  = m_bitIndex / CHAR_BIT;
-            m_bitIndex         = m_bitIndex % CHAR_BIT;
+            unsigned quotient  = m_bitIndex / k_bitsPerRead;
+            m_bitIndex         = m_bitIndex % k_bitsPerRead;
             m_buffer          += quotient;
         }
     }
@@ -155,7 +154,7 @@ class BitReader
 
     int64_t get_bits_left()
     {
-        return m_cacheSize + CHAR_BIT * int64_t(m_bufferEnd - m_buffer) - m_bitIndex;
+        return m_cacheSize + k_bitsPerRead * int64_t(m_bufferEnd - m_buffer) - m_bitIndex;
     }
 
   private:
@@ -216,6 +215,8 @@ class BitReader
     uint64_t m_cache {0};
     unsigned m_cacheSize {0};
 
+    static constexpr unsigned k_cacheSizeMax {64};
+    static constexpr unsigned k_bitsPerRead  { 8};
 };
 
 /**
@@ -242,22 +243,22 @@ inline int BitReader::get_ue_golomb(unsigned max_length)
 
 inline void BitReader::refill_cache(unsigned min_bits)
 {
-    if (min_bits > 64)
+    if (min_bits > k_cacheSizeMax)
     {
-        min_bits = 64;
+        min_bits = k_cacheSizeMax;
     }
 
-    //if (m_bitIndex >= CHAR_BIT)
+    //if (m_bitIndex >= k_bitsPerRead)
     {
-        unsigned quotient = m_bitIndex / CHAR_BIT;
-        m_bitIndex        = m_bitIndex % CHAR_BIT;
+        unsigned quotient = m_bitIndex / k_bitsPerRead;
+        m_bitIndex        = m_bitIndex % k_bitsPerRead;
         m_buffer         += quotient;
     }
 
     while (m_cacheSize < min_bits && m_buffer < m_bufferEnd)
     {
-        unsigned shift = 64 - m_cacheSize;
-        unsigned bits  = CHAR_BIT - m_bitIndex;
+        unsigned shift = k_cacheSizeMax - m_cacheSize;
+        unsigned bits  = k_bitsPerRead  - m_bitIndex;
         if (shift >= bits)
         {
             m_cache |= static_cast<uint64_t>(*m_buffer & ((1 << bits) - 1)) << (shift - bits);
@@ -270,7 +271,7 @@ inline void BitReader::refill_cache(unsigned min_bits)
             m_cache |= static_cast<uint64_t>(*m_buffer & ((1 << bits) - 1)) >> (bits - shift);
             m_bitIndex  += shift;
             m_cacheSize += shift;
-            return; // m_cacheSize == 64
+            return; // m_cacheSize == k_cacheSizeMax
         }
 
     }
