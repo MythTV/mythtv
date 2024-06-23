@@ -21,17 +21,6 @@
 
 #include "bytereader.h"
 
-extern "C" {
-#include "libavutil/intreadwrite.h"
-#ifndef AV_RB32
-#   define AV_RB32(x)                                \
-    (((uint32_t)((const uint8_t*)(x))[0] << 24) |    \
-               (((const uint8_t*)(x))[1] << 16) |    \
-               (((const uint8_t*)(x))[2] <<  8) |    \
-                ((const uint8_t*)(x))[3])
-#endif
-}
-
 const uint8_t* ByteReader::find_start_code(const uint8_t * p,
                                            const uint8_t * const end,
                                            uint32_t * const start_code)
@@ -74,7 +63,10 @@ const uint8_t* ByteReader::find_start_code(const uint8_t * p,
     if (p > end)
         p = end;
     // read the previous 4 bytes, i.e. bytes {p - 4, p - 3, p - 2, p - 1}
-    *start_code = AV_RB32(p - 4);
+    *start_code = static_cast<uint32_t>(p[-4]) << 24 |
+                  static_cast<uint32_t>(p[-3]) << 16 |
+                  static_cast<uint32_t>(p[-2]) <<  8 |
+                  static_cast<uint32_t>(p[-1]);
     return p;
 }
 
