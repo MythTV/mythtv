@@ -69,7 +69,7 @@ class BitReader
         {
             refill_cache(32);
         }
-        return uint32_t(get_upper_bits(m_cache, n));
+        return static_cast<uint32_t>(get_upper_bits(m_cache, n));
     }
     uint64_t show_bits64(unsigned n)
     {
@@ -154,7 +154,7 @@ class BitReader
 
     int64_t get_bits_left()
     {
-        return m_cacheSize + k_bitsPerRead * int64_t(m_bufferEnd - m_buffer) - m_bitIndex;
+        return m_cacheSize + k_bitsPerRead * static_cast<int64_t>(m_bufferEnd - m_buffer) - m_bitIndex;
     }
 
   private:
@@ -182,7 +182,7 @@ class BitReader
         v |= v >> 8;
         v |= v >> 16;
 
-        return 31 - MultiplyDeBruijnBitPosition[(uint32_t)(v * 0x07C4ACDDU) >> 27];
+        return 31 - MultiplyDeBruijnBitPosition[static_cast<uint32_t>(v * 0x07C4ACDDU) >> 27];
 #endif
     }
 
