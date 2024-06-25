@@ -307,7 +307,7 @@ static uint8_t * v4l2_get_drm_frame(V4L2Buffer *avbuf)
 }
 #endif
 
-static void v4l2_free_buffer(void *opaque, uint8_t *data)
+static void v4l2_free_buffer(void *opaque, uint8_t *unused)
 {
     V4L2Buffer* avbuf = opaque;
     V4L2m2mContext *s = buf_to_m2mctx(avbuf);
