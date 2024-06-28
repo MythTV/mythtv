@@ -479,8 +479,6 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
 /**
  *  Assemble PES packets out of TS packets, and then call the "section_cb"
  *  function when they are complete.
- *
- *  NOTE: "DVB Section" is DVB terminology for an MPEG PES packet.
  */
 static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
                                const uint8_t *buf, int buf_size, int is_start)
