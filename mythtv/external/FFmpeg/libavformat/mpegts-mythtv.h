@@ -140,9 +140,6 @@
 #define STREAM_TYPE_AUDIO_TRUEHD    0x83
 #define STREAM_TYPE_AUDIO_EAC3      0x87
 
-//#define STREAM_TYPE_SUBTITLE_DVB    0x100
-//#define STREAM_TYPE_VBI_DVB         0x101
-
 #define DVB_CAROUSEL_ID             0x13
 #define DVB_VBI_DATA_ID             0x45
 #define DVB_VBI_TELETEXT_ID         0x46
