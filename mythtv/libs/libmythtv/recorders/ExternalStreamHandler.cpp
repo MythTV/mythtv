@@ -21,6 +21,7 @@
 #include <QFile>
 
 // MythTV headers
+#include "config.h"
 #include "libmythbase/exitcodes.h"
 
 #include "ExternalChannel.h"
@@ -401,8 +402,12 @@ void ExternIO::Fork(void)
     }
 
     /* Close all open file descriptors except stdin/stdout/stderr */
+#if HAVE_CLOSE_RANGE
+    close_range(3, sysconf(_SC_OPEN_MAX) - 1, 0);
+#else
     for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; --i)
         close(i);
+#endif
 
     /* Set the process group id to be the same as the pid of this
      * child process.  This ensures that any subprocesses launched by this

@@ -1110,8 +1110,12 @@ void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
         }
 
         /* Close all open file descriptors except stdin/stdout/stderr */
+#if HAVE_CLOSE_RANGE
+        close_range(3, sysconf(_SC_OPEN_MAX) - 1, 0);
+#else
         for( int fd = sysconf(_SC_OPEN_MAX) - 1; fd > 2; fd-- )
             close(fd);
+#endif
 
         /* set directory */
         if( directory && chdir(directory) < 0 )
