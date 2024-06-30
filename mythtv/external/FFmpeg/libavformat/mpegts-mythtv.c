@@ -2156,12 +2156,8 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
         language[2] = get8(pp, desc_end);
         language[3] = 0;
 
-        /* dvbci->txt_type = */ i = (get8(pp, desc_end)) >> 3; // not exported, defeat compiler -Wunused-value
         if (language[0])
             av_dict_set(&st->metadata, "language", language, 0);
-        break;
-    case VBI_DATA_DESCRIPTOR:
-        // dvbci->vbi_data = 1; //not parsing the data service descriptors
         break;
     case METADATA_DESCRIPTOR:
         if (get16(pp, desc_end) == 0xFFFF)
