@@ -141,12 +141,6 @@
 #define STREAM_TYPE_AUDIO_EAC3      0x87
 
 #define DVB_CAROUSEL_ID             0x13
-#define DVB_VBI_DATA_ID             0x45
-#define DVB_VBI_TELETEXT_ID         0x46
-#define DVB_TELETEXT_ID             0x56
-#define DVB_SUBT_DESCID             0x59
-#define DVB_BROADCAST_ID            0x66
-#define DVB_DATA_STREAM             0x52
 
 /* ISO/IEC 13818-1 Table 2-22 */
 #define STREAM_ID_PROGRAM_STREAM_MAP        0xbc
@@ -172,6 +166,20 @@
 #define FMC_DESCRIPTOR               0x1f
 #define METADATA_DESCRIPTOR          0x26
 #define METADATA_STD_DESCRIPTOR      0x27
+
+/* DVB descriptor tag values [0x40, 0x7F] from
+   ETSI EN 300 468 Table 12: Possible locations of descriptors */
+#define VBI_DATA_DESCRIPTOR          0x45
+#define VBI_TELETEXT_DESCRIPTOR      0x46
+#define SERVICE_DESCRIPTOR           0x48
+#define STREAM_IDENTIFIER_DESCRIPTOR 0x52
+#define TELETEXT_DESCRIPTOR          0x56
+#define SUBTITLING_DESCRIPTOR        0x59
+#define DATA_BROADCAST_ID_DESCRIPTOR 0x66
+#define AC3_DESCRIPTOR               0x6A // AC-3_descriptor
+#define ENHANCED_AC3_DESCRIPTOR      0x7A // enhanced_AC-3_descriptor
+#define DTS_DESCRIPTOR               0x7B
+#define EXTENSION_DESCRIPTOR         0x7F
 
 typedef struct MpegTSContext MpegTSContext;
 
