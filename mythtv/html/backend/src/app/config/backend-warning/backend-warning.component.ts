@@ -67,6 +67,11 @@ export class BackendWarningComponent implements OnInit {
           this.setupService.isDatabaseIgnored = data.BackendInfo.Env.IsDatabaseIgnored;
           this.setupService.DBTimezoneSupport = data.BackendInfo.Env.DBTimezoneSupport;
           this.setupService.WebOnlyStartup = data.BackendInfo.Env.WebOnlyStartup;
+          // Sometimes conflicting results are returned by the backend, saying that
+          // scheduling is enabled when it could not be beacuse there is no database.
+          if (this.setupService.isDatabaseIgnored || !this.setupService.DBTimezoneSupport
+            || this.setupService.WebOnlyStartup != 'NONE')
+            this.setupService.schedulingEnabled = false;
           if (this.setupService.isDatabaseIgnored)
             this.wizardService.wizardItems = this.wizardService.dbSetupMenu;
           else
@@ -88,8 +93,6 @@ export class BackendWarningComponent implements OnInit {
           }
         },
         error: () => {
-          // default to true in case backend is down
-          this.setupService.schedulingEnabled = true;
           this.errorCount++;
           if (this.errorCount < this.retryCount)
             // shutdowsn doen, waiting for restart
