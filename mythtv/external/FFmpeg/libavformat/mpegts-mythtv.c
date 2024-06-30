@@ -977,8 +977,8 @@ static const StreamType DESC_types[] = {
     { 0x7a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3         }, /* E-AC-3 descriptor */
     { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
     { 0x13, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
-    { 0x45, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_DATA_ID */
-    { 0x46, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_TELETEXT_ID */ //FixMe type subtilte
+    { 0x45, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_DATA_DESCRIPTOR */
+    { 0x46, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_TELETEXT_DESCRIPTOR */
     { 0x56, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_TELETEXT },
     { 0x59, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE }, /* subtitling descriptor */
     { 0 },
@@ -2143,7 +2143,7 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                 sti->request_probe = 50;
         }
         break;
-    case DVB_BROADCAST_ID:
+    case DATA_BROADCAST_ID_DESCRIPTOR:
         st->data_id = get16(pp, desc_end);
         break;
     case DVB_CAROUSEL_ID:
@@ -2159,7 +2159,7 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
     case 0x52: /* stream identifier descriptor */
         sti->stream_identifier = 1 + get8(pp, desc_end);
         st->component_tag     = sti->stream_identifier - 1;
-    // DVB_DATA_STREAM:
+    // STREAM_IDENTIFIER_DESCRIPTOR:
         /* Audio and video are sometimes encoded in private streams labelled with
          * a component tag. */
 #if 0
@@ -2170,7 +2170,7 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                                          COMPONENT_TAG_types);
 #endif
         break;
-    case DVB_VBI_TELETEXT_ID:
+    case VBI_TELETEXT_DESCRIPTOR:
         language[0] = get8(pp, desc_end);
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
@@ -2180,7 +2180,7 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
         if (language[0])
             av_dict_set(&st->metadata, "language", language, 0);
         break;
-    case DVB_VBI_DATA_ID:
+    case VBI_DATA_DESCRIPTOR:
         // dvbci->vbi_data = 1; //not parsing the data service descriptors
         break;
     case METADATA_DESCRIPTOR:
