@@ -140,8 +140,6 @@
 #define STREAM_TYPE_AUDIO_TRUEHD    0x83
 #define STREAM_TYPE_AUDIO_EAC3      0x87
 
-#define DVB_CAROUSEL_ID             0x13
-
 /* ISO/IEC 13818-1 Table 2-22 */
 #define STREAM_ID_PROGRAM_STREAM_MAP        0xbc
 #define STREAM_ID_PRIVATE_STREAM_1          0xbd
@@ -161,6 +159,7 @@
 #define VIDEO_STREAM_DESCRIPTOR      0x02
 #define REGISTRATION_DESCRIPTOR      0x05
 #define ISO_639_LANGUAGE_DESCRIPTOR  0x0a
+#define DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR  0x13 // Defined in ISO/IEC 13818-6
 #define IOD_DESCRIPTOR               0x1d
 #define SL_DESCRIPTOR                0x1e
 #define FMC_DESCRIPTOR               0x1f
