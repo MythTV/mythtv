@@ -82,8 +82,6 @@ typedef struct SectionContext {
  * synchronization is lost */
 #define MAX_RESYNC_SIZE 65536
 
-#define MAX_PES_PAYLOAD 200 * 1024
-
 #define MAX_MP4_DESCR_COUNT 16
 
 #define MOD_UNLIKELY(modulus, dividend, divisor, prev_dividend)                \
