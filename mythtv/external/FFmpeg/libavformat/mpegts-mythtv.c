@@ -984,12 +984,6 @@ static const StreamType DESC_types[] = {
     { 0 },
 };
 
-/* component tags */
-static const StreamType COMPONENT_TAG_types[] = {
-    { 0x0a, AVMEDIA_TYPE_AUDIO,        AV_CODEC_ID_MP3 },
-    { 0x52, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
-};
-
 static void mpegts_find_stream_type(AVStream *st,
                                     uint32_t stream_type,
                                     const StreamType *types)
@@ -2159,16 +2153,6 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
     case 0x52: /* stream identifier descriptor */
         sti->stream_identifier = 1 + get8(pp, desc_end);
         st->component_tag     = sti->stream_identifier - 1;
-    // STREAM_IDENTIFIER_DESCRIPTOR:
-        /* Audio and video are sometimes encoded in private streams labelled with
-         * a component tag. */
-#if 0
-         if (st->codecpar->codec_id == AV_CODEC_ID_NONE &&
-             desc_count  == 1 &&
-             stream_type == STREAM_TYPE_PRIVATE_DATA)
-             mpegts_find_stream_type(st, st->component_tag,
-                                         COMPONENT_TAG_types);
-#endif
         break;
     case VBI_TELETEXT_DESCRIPTOR:
         language[0] = get8(pp, desc_end);
