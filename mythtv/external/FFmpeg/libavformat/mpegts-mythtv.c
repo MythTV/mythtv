@@ -890,7 +890,7 @@ static const StreamType ISO_types[] = {
     { 0x02, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
     { 0x03, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
     { 0x04, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
-    { 0x0b, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
+    { 0x0b, AVMEDIA_TYPE_DATA,  AV_CODEC_ID_DSMCC_B    }, /* STREAM_TYPE_DSMCC_B */
     { 0x0f, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AAC        },
     { 0x10, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG4      },
     /* Makito encoder sets stream type 0x11 for AAC,
@@ -976,7 +976,7 @@ static const StreamType DESC_types[] = {
     { 0x6a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_AC3          }, /* AC-3 descriptor */
     { 0x7a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3         }, /* E-AC-3 descriptor */
     { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
-    { 0x13, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
+    { 0x13, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B      }, /* DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR */
     { 0x45, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_DATA_DESCRIPTOR */
     { 0x46, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_TELETEXT_DESCRIPTOR */
     { 0x56, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_TELETEXT },
@@ -2146,7 +2146,7 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
     case DATA_BROADCAST_ID_DESCRIPTOR:
         st->data_id = get16(pp, desc_end);
         break;
-    case DVB_CAROUSEL_ID:
+    case DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR:
         {
             int carId = 0;
             carId = get8(pp, desc_end);
