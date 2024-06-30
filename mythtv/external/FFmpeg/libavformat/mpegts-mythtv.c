@@ -2141,14 +2141,10 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
         st->data_id = get16(pp, desc_end);
         break;
     case DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR:
-        {
-            int carId = 0;
-            carId = get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            st->carousel_id = carId;
-        }
+        st->carousel_id = get8(pp, desc_end) << 24 |
+                          get8(pp, desc_end) << 16 |
+                          get8(pp, desc_end) <<  8 |
+                          get8(pp, desc_end);
         break;
     case 0x52: /* stream identifier descriptor */
         sti->stream_identifier = 1 + get8(pp, desc_end);
