@@ -527,7 +527,7 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
             /* no corresponding stream */
             if (rt->transport == RTSP_TRANSPORT_RAW) {
                 if (CONFIG_RTPDEC && !rt->ts)
-                    rt->ts = avpriv_mpegts_parse_open(s);
+                    rt->ts = avpriv_mythtv_mpegts_parse_open(s);
             } else {
                 const RTPDynamicProtocolHandler *handler;
                 handler = ff_rtp_handler_find_by_id(
@@ -817,7 +817,7 @@ void ff_rtsp_close_streams(AVFormatContext *s)
         avformat_close_input(&rt->asf_ctx);
     }
     if (CONFIG_RTPDEC && rt->ts)
-        avpriv_mpegts_parse_close(rt->ts);
+        avpriv_mythtv_mpegts_parse_close(rt->ts);
     av_freep(&rt->p);
     av_freep(&rt->recvbuf);
 }
@@ -2213,7 +2213,7 @@ int ff_rtsp_fetch_packet(AVFormatContext *s, AVPacket *pkt)
         } else if (rt->transport == RTSP_TRANSPORT_RTP) {
             ret = ff_rtp_parse_packet(rt->cur_transport_priv, pkt, NULL, 0);
         } else if (CONFIG_RTPDEC && rt->ts) {
-            ret = avpriv_mpegts_parse_packet(rt->ts, pkt, rt->recvbuf + rt->recvbuf_pos, rt->recvbuf_len - rt->recvbuf_pos);
+            ret = avpriv_mythtv_mpegts_parse_packet(rt->ts, pkt, rt->recvbuf + rt->recvbuf_pos, rt->recvbuf_len - rt->recvbuf_pos);
             if (ret >= 0) {
                 rt->recvbuf_pos += ret;
                 ret = rt->recvbuf_pos < rt->recvbuf_len;
@@ -2328,7 +2328,7 @@ redo:
             }
         }
     } else if (CONFIG_RTPDEC && rt->ts) {
-        ret = avpriv_mpegts_parse_packet(rt->ts, pkt, rt->recvbuf, len);
+        ret = avpriv_mythtv_mpegts_parse_packet(rt->ts, pkt, rt->recvbuf, len);
         if (ret >= 0) {
             if (ret < len) {
                 rt->recvbuf_len = len;
