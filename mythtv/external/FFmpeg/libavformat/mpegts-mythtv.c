@@ -2080,18 +2080,8 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                     extradata[4] = get8(pp, desc_end); /* subtitling_type */
                     memcpy(extradata, *pp, 4); /* composition_page_id and ancillary_page_id */
                     extradata += 5;
-#ifdef UPSTREAM_TO_MYTHTV
 
                     *pp += 4;
-#else
-                    {
-                        int comp_page   = get16(pp, desc_end);
-                        int anc_page    = get16(pp, desc_end);
-                        int sub_id      = (anc_page << 16) | comp_page;
-                        if (sub_id && (st->codecpar->codec_id == AV_CODEC_ID_DVB_SUBTITLE))
-                            st->carousel_id = sub_id;
-                    }
-#endif
                 }
 
                 language[i * 4 - 1] = 0;
