@@ -281,7 +281,7 @@ export class ScheduleComponent implements OnInit {
     this.typeList = [];
     this.templates = [<RecRule>{ Id: 0, Title: '' }];
     this.defaultTemplate = undefined;
-    if (this.program && this.program.Recording && !newOverride)
+    if (this.program && this.program.Recording)
       recId = this.program.Recording.RecordId;
     this.recRules.forEach((entry, index) => {
       if (entry.Id == recId) {
@@ -294,6 +294,14 @@ export class ScheduleComponent implements OnInit {
           this.defaultTemplate = entry;
       }
     });
+    if (newOverride) {
+      // This works because RecRule only has elementary items.
+      this.recRule = Object.assign({}, this.recRule);
+      this.recRule.ParentId = this.recRule.Id;
+      this.recRule.Id = 0;
+      this.recRule.SearchType = 'None';
+      ruleType = "Override Recording";
+    }
     if (!this.recRule) {
       this.recRule = <RecRule>{ Id: 0 };
     }
@@ -309,9 +317,6 @@ export class ScheduleComponent implements OnInit {
 
     if (this.program && this.channel && this.recRule.SearchType == 'None')
       this.mergeProgram(this.recRule, this.program, this.channel);
-
-    if (newOverride)
-      this.recRule.ParentId = this.program!.Recording.RecordId;
 
     if (!ruleType)
       ruleType = 'Not Recording';
