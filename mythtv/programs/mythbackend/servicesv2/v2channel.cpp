@@ -52,6 +52,7 @@
 #include "libmythtv/frequencies.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythtv/restoredata.h"
+#include "libmythtv/scheduledrecording.h"
 
 // MythBackend
 #include "v2artworkInfoList.h"
@@ -292,6 +293,9 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
         channel.m_defaultAuthority, channel.m_serviceType,
         channel.m_recPriority, channel.m_tmOffset, channel.m_commMethod );
 
+    if (bResult)
+        ScheduledRecording::RescheduleMatch(0, 0, 0,
+                             QDateTime(), "UpdateDBChannel");
     return bResult;
 }
 

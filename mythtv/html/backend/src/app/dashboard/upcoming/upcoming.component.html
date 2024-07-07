@@ -12,7 +12,8 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>
-                            <p-columnFilter field="ShowAll" matchMode="equals" [showMenu]="false" [showClearButton]="false">
+                            <p-columnFilter field="ShowAll" matchMode="equals" [showMenu]="false"
+                                [showClearButton]="false">
                                 <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                     <p-checkbox inputId="showAllStatuses" [ngModel]="value" name="showAllStatuses"
                                         #showAll="ngModel" [binary]="true" (onChange)="filter($event.checked)"
@@ -24,7 +25,8 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
                             {{ 'dashboard.upcoming.recrule' | translate }}: &nbsp;
-                            <p-columnFilter field="RecordId" matchMode="equals" [showMenu]="false" [showClearButton]="false">
+                            <p-columnFilter field="RecordId" matchMode="equals" [showMenu]="false"
+                                [showClearButton]="false">
                                 <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                     <p-dropdown [ngModel]="value" [options]="recRules" name="rulefilter"
                                         (onChange)="filter($event.value)" optionLabel="Title" optionValue="Id"
@@ -37,8 +39,7 @@
                                     [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
                             <ng-template #refreshBn>
                                 <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                                    (click)="refresh()"
-                                    pTooltip="{{ 'common.refresh' | translate }}"></button>
+                                    (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
                             </ng-template>
                             &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
                         </th>
@@ -61,7 +62,8 @@
                         <th style="flex-basis: 8%" class="justify-content-end p-1">
                             {{ 'dashboard.recordings.orig_airdate' | translate }}
                         </th>
-                        <th style="flex-basis: 10%" class="p-1" pSortableColumn="Channel.ChanNum">{{ 'dashboard.recordings.channel' | translate
+                        <th style="flex-basis: 10%" class="p-1" pSortableColumn="Channel.ChanNum">{{
+                            'dashboard.recordings.channel' | translate
                             }} <p-sortIcon field="Channel.ChanNum"></p-sortIcon></th>
                         <th style="flex-basis: 8%" class="p-1">
                             {{ 'dashboard.recordings.recgrp' | translate }} </th>
@@ -103,7 +105,7 @@
                             {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
                         <td style="flex-basis: 8%" class="p-1">{{program.Recording.RecGroup}}</td>
                         <td style="flex-basis: 7%" class="p-1">
-                            <div *ngIf="program.Recording"  [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1 ?
+                            <div *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1 ?
                                 'text-green-500' : 'text-pink-500'">
                                 {{dataService.recStatusText[program.Recording.StatusName]}}
                             </div>
@@ -125,7 +127,8 @@
                             <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
                                 (click)="updateRecRule(program)"
                                 pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}" tooltipPosition="left"
-                                [disabled]="program.Recording && program.Recording.RecType == 7"></button>
+                                [disabled]="program.Recording && (program.Recording.RecType == 7 || program.Recording.RecType == 8
+                                    || program.Recording.StatusName == 'NeverRecord')"></button>
                         </td>
                     </tr>
                 </ng-template>

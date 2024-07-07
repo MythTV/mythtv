@@ -720,18 +720,38 @@ bool V2Dvr::RescheduleRecordings(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool V2Dvr::AllowReRecord ( int RecordedId )
+bool V2Dvr::AllowReRecord ( int RecordedId, int ChanId, const QDateTime &StartTime)
 {
-    if (RecordedId <= 0)
-        throw QString("RecordedId param is invalid.");
+    if (RecordedId > 0)
+    {
+        if (ChanId > 0 || StartTime.isValid())
+            throw QString("ERROR RecordedId param cannot be used with ChanId or StartTime.");
+    }
+    else if (ChanId > 0)
+    {
+        if (!StartTime.isValid())
+            throw QString("ERROR ChanId param requires a valid StartTime.");
+    }
+    else
+        throw QString("ERROR RecordedId or (ChanId and StartTime) required.");
 
-    RecordingInfo ri = RecordingInfo(RecordedId);
-
-    if (!ri.GetChanID())
-        throw QString("RecordedId %1 not found").arg(RecordedId);
-
-    ri.ForgetHistory();
-
+    if (RecordedId > 0)
+    {
+        RecordingInfo ri = RecordingInfo(RecordedId);
+        if (!ri.GetChanID())
+            throw QString("ERROR RecordedId %1 not found").arg(RecordedId);
+        ri.ForgetHistory();
+    }
+    else
+    {
+        ProgramInfo *progInfo = LoadProgramFromProgram(ChanId, StartTime);
+        if (progInfo == nullptr)
+            throw QString("ERROR Guide data for Chanid %1 at StartTime %2 not found")
+                .arg(ChanId).arg(StartTime.toString());
+        RecordingInfo recInfo(*progInfo);
+        recInfo.ForgetHistory();
+        delete progInfo;
+    }
     return true;
 }
 

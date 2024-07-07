@@ -137,8 +137,8 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   formatStartDate(program: ScheduleOrProgram, rowIndex: number): string {
     let priorDate = '';
-    if (rowIndex > 0 && this.programs[rowIndex-1].Recording.StartTs)
-      priorDate = this.utility.formatDate(this.programs[rowIndex-1].Recording.StartTs, true, true);
+    if (rowIndex > 0 && this.programs[rowIndex - 1].Recording.StartTs)
+      priorDate = this.utility.formatDate(this.programs[rowIndex - 1].Recording.StartTs, true, true);
     let thisDate = this.utility.formatDate(program.Recording.StartTs, true, true);
     if (priorDate == thisDate)
       return ' ';
@@ -171,7 +171,8 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   override(program: ScheduleOrProgram) {
     if (this.inter.sched) {
-      if (program.Recording.RecType == 7) // If already an override
+      if (program.Recording.RecType == 7 || program.Recording.RecType == 8
+        || program.Recording.StatusName == 'NeverRecord') // If already an override
         this.inter.sched.open(program);
       else
         this.inter.sched.open(program, undefined, <RecRule>{ Type: 'Override Recording' });

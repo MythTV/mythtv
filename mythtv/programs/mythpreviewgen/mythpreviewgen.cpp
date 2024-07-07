@@ -149,8 +149,12 @@ int main(int argc, char **argv)
     }
 
 #ifndef _WIN32
+#if HAVE_CLOSE_RANGE
+    close_range(UNUSED_FILENO, sysconf(_SC_OPEN_MAX) - 1, 0);
+#else
     for (long i = UNUSED_FILENO; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
+#endif
     QCoreApplication a(argc, argv);
 #else
     // MINGW application needs a window to receive messages

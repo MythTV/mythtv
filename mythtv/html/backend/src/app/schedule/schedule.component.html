@@ -106,7 +106,8 @@
                 <label for="Type" class="label block">{{ 'dashboard.sched.type_label' | translate
                     }}</label>
                 <p-dropdown [options]="typeList" [(ngModel)]="recRule.Type" [editable]="false" optionLabel="prompt"
-                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Type" #Type="ngModel">
+                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Type" #Type="ngModel"
+                    [disabled]="schedTypeDisabled">
                 </p-dropdown>
             </div>
 
@@ -316,7 +317,7 @@
                 </p-button>
                 <p-button icon="pi pi-check-circle" (onClick)="save();" label="{{ 'common.save' | translate }}"
                     styleClass="p-button-success"
-                    [disabled]="!schedform.dirty || recRule.Id == 0 && recRule.Type == 'Not Recording' || !recRule.Title"></p-button>
+                    [disabled]="!schedform.dirty || recRule.Id == 0 && recRule.Type == 'Not Recording' || !recRule.Title || schedTypeDisabled"></p-button>
             </ng-template>
 
         </p-dialog>

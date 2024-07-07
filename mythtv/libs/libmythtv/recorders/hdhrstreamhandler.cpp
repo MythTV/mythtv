@@ -182,7 +182,10 @@ void HDHRStreamHandler::run(void)
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");
 
-    RemoveAllPIDFilters();
+    if (m_tuneMode != hdhrTuneModeVChannel)
+    {
+        RemoveAllPIDFilters();
+    }
 
     {
         QMutexLocker locker(&m_hdhrLock);
@@ -237,7 +240,8 @@ bool HDHRStreamHandler::UpdateFilters(void)
     if (m_tuneMode != hdhrTuneModeFrequencyPid)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "UpdateFilters called in wrong tune mode");
+            QString("UpdateFilters called in wrong tune mode, %1")
+                .arg(m_tuneMode));
         return false;
     }
 
@@ -529,7 +533,9 @@ bool HDHRStreamHandler::TuneProgram(uint mpeg_prog_num)
 
     if (m_tuneMode != hdhrTuneModeFrequencyProgram)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "TuneProgram called in wrong tune mode");
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("TuneProgram called in wrong tune mode, %1")
+                .arg(m_tuneMode));
         return false;
     }
 
