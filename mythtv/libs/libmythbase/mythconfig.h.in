@@ -54,6 +54,7 @@
 #cmakedefine01 HAVE_LIBUDEV
 #cmakedefine01 HAVE_MALLOC_H
 #cmakedefine01 HAVE_POSIX_FADVISE
+#cmakedefine01 HAVE_POSIX_MEMALIGN
 #cmakedefine01 HAVE_STDINT_H
 #cmakedefine01 HAVE_STRUCT_HDR_METADATA_INFOFRAME
 #cmakedefine01 HAVE_SYS_DL_H
