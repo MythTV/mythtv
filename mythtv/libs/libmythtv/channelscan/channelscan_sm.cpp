@@ -1710,9 +1710,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
     {
         ChannelInsertInfo &info = *dbchan_it;
-
-        if (!info.m_chanNum.isEmpty())
-            continue;
+        qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
+        QMap<qlonglong, uint>::const_iterator it;
 
         // DVB HD Simulcast channel numbers
         //
@@ -1721,45 +1720,30 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         // and the receiver is capable of receiving the HD signal.
         // The latter is assumed correct for a MythTV system.
         //
-        if (info.m_chanNum.isEmpty())
+        it = scnChanNums.constFind(key);
+        if (it != scnChanNums.constEnd())
         {
-            qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
-            QMap<qlonglong, uint>::const_iterator it = scnChanNums.constFind(key);
-
-            if (it != scnChanNums.constEnd())
-            {
-                info.m_chanNum = QString::number(*it + m_lcnOffset);
-            }
+            info.m_simulcastChannel = *it;
         }
 
         // DVB Logical Channel Numbers (a.k.a. UK channel numbers)
-        if (info.m_chanNum.isEmpty())
+        it = ukChanNums.constFind(key);
+        if (it != ukChanNums.constEnd())
         {
-            qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
-            QMap<qlonglong, uint>::const_iterator it = ukChanNums.constFind(key);
-
-            if (it != ukChanNums.constEnd())
-            {
-                info.m_chanNum = QString::number(*it + m_lcnOffset);
-            }
+            info.m_logicalChannel = *it;
         }
 
         // Freesat and Sky channel numbers
-        if (info.m_chanNum.isEmpty())
+        it = sid_lcn.constFind(key);
+        if (it != sid_lcn.constEnd())
         {
-            qlonglong key = ((qlonglong)info.m_origNetId<<32) | info.m_serviceId;
-            QMap<qlonglong, uint>::const_iterator it = sid_lcn.constFind(key);
-
-            if (it != sid_lcn.constEnd())
-            {
-                info.m_chanNum = QString::number(*it + m_lcnOffset);
-            }
+            info.m_logicalChannel = *it;
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("GetChannelList: service %1 (0x%2) chan_num '%3' callsign '%4'")
+            QString("service %1 (0x%2) lcn:%3 scn:%4 callsign '%5'")
                 .arg(info.m_serviceId).arg(info.m_serviceId,4,16,QChar('0'))
-                .arg(info.m_chanNum, info.m_callSign));
+                .arg(info.m_logicalChannel).arg(info.m_simulcastChannel).arg(info.m_callSign));
     }
 
     // Get QAM/SCTE/MPEG channel numbers
@@ -1990,7 +1974,7 @@ void ChannelScanSM::StartScanner(void)
 }
 
 /** \fn ChannelScanSM::run(void)
- *  \brief This runs the event loop for ChannelScanSM until 'threadExit' is true.
+ *  \brief This runs the event loop for ChannelScanSM until 'm_threadExit' is true.
  */
 void ChannelScanSM::run(void)
 {

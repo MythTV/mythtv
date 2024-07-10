@@ -126,7 +126,7 @@ ScanDTVTransportList LoadScan(uint scanid)
             "    in_nit,             in_sdt,             is_encrypted,       "      // 27, 28, 29
             "    is_data_service,    is_audio_service,   is_opencable,       "      // 30, 31, 32
             "    could_be_opencable, decryption_status,  default_authority,  "      // 33, 34, 35
-            "    service_type "                                                     // 36
+            "    service_type,       logical_channel,    simulcast_channel   "      // 36, 37, 38
             "FROM channelscan_channel "
             "WHERE transportid = :TRANSPORTID");
         query2.bindValue(":TRANSPORTID", query.value(15).toUInt());
@@ -187,7 +187,9 @@ ScanDTVTransportList LoadScan(uint scanid)
                 query2.value(33).toBool(),          // could_be_opencable
                 query2.value(34).toInt(),           // decryption_status
                 query2.value(35).toString(),        // default_authority
-                query2.value(36).toUInt());         // service_type
+                query2.value(36).toUInt(),          // service_type
+                query2.value(37).toUInt(),          // logical_channel
+                query2.value(38).toUInt());         // simulcast_channel
             mux.m_channels.push_back(chan);
         }
 

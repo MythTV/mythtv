@@ -45,6 +45,31 @@ static void channum_not_empty(ChannelInsertInfo &chan)
     }
 }
 
+static uint getLcnOffset(int sourceid)
+{
+    uint lcnOffset = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+            "SELECT lcnoffset "
+            "FROM videosource "
+            "WHERE videosource.sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("ChannelImporter", query);
+    }
+    else if (query.next())
+    {
+        lcnOffset = query.value(0).toUInt();
+    }
+
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Logical Channel Number offset:%1")
+            .arg(lcnOffset));
+
+    return lcnOffset;
+}
 
 ChannelImporter::ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
@@ -76,6 +101,8 @@ ChannelImporter::ChannelImporter(bool gui, bool interactive,
 void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                               int sourceid)
 {
+    m_lcnOffset = getLcnOffset(sourceid);
+
     if (_transports.empty())
     {
         if (m_useGui)
@@ -171,6 +198,12 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
             ssMsg << FormatChannels(duplicates).toLatin1().constData() << Qt::endl;
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
+    }
+
+    // Process Logical Channel Numbers
+    if (m_doLcn)
+    {
+        ChannelNumbers(transports);
     }
 
     // Remove the channels that do not pass various criteria.
@@ -1149,6 +1182,101 @@ void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports)
             filtered.push_back(channel);
         }
         transport.m_channels = filtered;
+    }
+}
+
+// Process DVB Channel Numbers
+void ChannelImporter::ChannelNumbers(ScanDTVTransportList &transports) const
+{
+    QMap<qlonglong, uint> map_sid_scn;     // HD Simulcast channel numbers, service ID is key
+    QMap<qlonglong, uint> map_sid_lcn;     // Logical channel numbers, service ID is key
+    QMap<uint, qlonglong> map_lcn_sid;     // Logical channel numbers, channel number is key
+
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Process DVB Channel Numbers"));
+    for (auto & transport : transports)
+    {
+        for (auto & channel : transport.m_channels)
+        {
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Channel onid:%1 sid:%2 lcn:%3 scn:%4")
+                .arg(channel.m_origNetId).arg(channel.m_serviceId).arg(channel.m_logicalChannel)
+                .arg(channel.m_simulcastChannel));
+            qlonglong key = ((qlonglong)channel.m_origNetId<<32) | channel.m_serviceId;
+            if (channel.m_logicalChannel > 0)
+            {
+                map_sid_lcn[key] = channel.m_logicalChannel;
+                map_lcn_sid[channel.m_logicalChannel] = key;
+            }
+            if (channel.m_simulcastChannel > 0)
+            {
+                map_sid_scn[key] = channel.m_simulcastChannel;
+            }
+        }
+    }
+
+    // Process the HD Simulcast Channel Numbers
+    //
+    // For each channel with a HD Simulcast Channel Number, do use that
+    // number as the Logical Channel Number; the SD channel that now has
+    // this LCN does get the original LCN of the HD Simulcast channel.
+    // If this is not selected then the Logical Channel Numbers are used
+    // without the override from the HD Simulcast channel numbers.
+    // This usually means that channel numbers 1, 2, 3 etc are used for SD channels
+    // while the corresponding HD channels do have higher channel numbers.
+    // When the HD Simulcast channel numbers are enabled then channel numbers 1, 2, 3 etc are
+    // used for the HD channels and the corresponding SD channels use the high channel numbers.
+    if (m_doScn)
+    {
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Process Simulcast Channel Numbers"));
+
+        QMap<qlonglong, uint>::iterator it;
+        for (it = map_sid_scn.begin(); it != map_sid_scn.end(); ++it)
+        {
+            // Exchange LCN between the SD channel and the HD simulcast channel
+            qlonglong key_hd = it.key();                // Key of HD channel
+            uint scn_hd = *it;                          // SCN of the HD channel
+            uint lcn_sd = scn_hd;                       // Old LCN of the SD channel
+            uint lcn_hd = map_sid_lcn[key_hd];          // Old LCN of the HD channel
+
+            qlonglong key_sd = map_lcn_sid[lcn_sd];     // Key of the SD channel
+
+            map_sid_lcn[key_sd] = lcn_hd;               // SD channel gets old LCN of HD channel
+            map_sid_lcn[key_hd] = lcn_sd;               // HD channel gets old LCN of SD channel
+            map_lcn_sid[lcn_hd] = key_sd;               // SD channel gets key of SD channel
+            map_lcn_sid[lcn_sd] = key_hd;               // HD channel gets key of SD channel
+        }
+    }
+
+    // Update channels with the resulting Logical Channel Numbers
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Process Logical Channel Numbers"));
+    for (auto & transport : transports)
+    {
+        for (auto & channel : transport.m_channels)
+        {
+            if (channel.m_chanNum.isEmpty())
+            {
+                qlonglong key = ((qlonglong)channel.m_origNetId<<32) | channel.m_serviceId;
+                QMap<qlonglong, uint>::const_iterator it = map_sid_lcn.constFind(key);
+                if (it != map_sid_lcn.cend())
+                {
+                    channel.m_chanNum = QString::number(*it + m_lcnOffset);
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                        QString("Final channel sid:%1 channel %2")
+                            .arg(channel.m_serviceId).arg(channel.m_chanNum));
+                }
+                else
+                {
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                        QString("Final channel sid:%1 NO channel number")
+                            .arg(channel.m_serviceId));
+                }
+            }
+            else
+            {
+                LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                    QString("Final channel sid:%1 has already channel number %2")
+                        .arg(channel.m_serviceId).arg(channel.m_chanNum));
+            }
+        }
     }
 }
 
