@@ -149,16 +149,8 @@ function(find_or_build_ffmpeg)
     FFmpeg expose_internal_headers_hack
     DEPENDEES install
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/mythtv/external/FFmpeg
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-            ${FFMPEG_INSTALL_INCLUDEDIR}/compat/cuda
     COMMAND ${CMAKE_COMMAND} -E copy libavformat/url.h
             ${FFMPEG_INSTALL_INCLUDEDIR}/libavformat/
-    COMMAND ${CMAKE_COMMAND} -E copy libavutil/wchar_filename.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/libavutil/
-    COMMAND ${CMAKE_COMMAND} -E copy compat/w32dlfcn.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/compat/
-    COMMAND ${CMAKE_COMMAND} -E copy compat/cuda/dynlink_loader.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/compat/cuda/)
 
 endfunction()
 
