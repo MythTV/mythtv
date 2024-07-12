@@ -25,11 +25,6 @@
 // FFmpeg
 extern "C" {
 #include "libavutil/opt.h"
-#ifdef USING_V4L2_REQUEST
-#include "libavcodec/v4l2_request.h"
-#else
-struct V4L2RequestDescriptor { int drm; };
-#endif
 }
 
 #define LOC QString("V4L2_M2M: ")
@@ -177,7 +172,7 @@ bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *
         return GetBuffer(Context, Frame, AvFrame, 0);
 
     if (m_request)
-        return MythV4L2M2MContext::GetRequestBuffer(Context, Frame, AvFrame);
+        return MythDRMPRIMEContext::GetDRMBuffer(Context, Frame, AvFrame, 0);
 
     return MythDRMPRIMEContext::RetrieveFrame(Context, Frame, AvFrame);
 }
@@ -522,35 +517,4 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
 
     Context->hw_device_ctx = hwdeviceref;
     return 0;
-}
-
-bool MythV4L2M2MContext::GetRequestBuffer(AVCodecContext* Context, MythVideoFrame* Frame, AVFrame* AvFrame)
-{
-    if (!Context || !AvFrame || !Frame)
-        return false;
-
-    if (Frame->m_type != FMT_DRMPRIME || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_DRM_PRIME)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Not a DRM PRIME buffer");
-        return false;
-    }
-
-    Frame->m_width    = AvFrame->width;
-    Frame->m_height   = AvFrame->height;
-    Frame->m_pixFmt   = Context->pix_fmt;
-    Frame->m_swPixFmt = Context->sw_pix_fmt;
-    Frame->m_directRendering = true;
-    AvFrame->opaque   = Frame;
-    AvFrame->reordered_opaque = Context->reordered_opaque;
-
-    // Frame->data[0] holds V4L2RequestDescriptor which holds AVDRMFrameDescriptor
-    Frame->m_buffer = reinterpret_cast<uint8_t*>(&(reinterpret_cast<V4L2RequestDescriptor*>(AvFrame->data[0])->drm));
-    // Retain the buffer so it is not released before we display it
-    Frame->m_priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
-    // Set interop
-    Frame->m_priv[1] = reinterpret_cast<unsigned char*>(m_interop);
-    // Set the release method
-    AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0, MythCodecContext::ReleaseBuffer,
-                                       static_cast<AvFormatDecoder*>(Context->opaque), 0);
-    return true;
 }
