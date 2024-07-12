@@ -4,10 +4,9 @@
 // MythTV
 #include "opengl/mythopenglinterop.h"
 
-// FFmpeg
 extern "C" {
-#include "compat/cuda/dynlink_loader.h"
-#include "libavutil/hwcontext_cuda.h"
+#include <ffnvcodec/dynlink_cuda.h>
+struct CudaFunctions;
 }
 
 class MythNVDECInterop : public MythOpenGLInterop
