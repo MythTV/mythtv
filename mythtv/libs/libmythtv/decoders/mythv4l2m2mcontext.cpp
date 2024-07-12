@@ -502,18 +502,10 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
         return -1;
 
     // N.B. Interop support should already have been checked
-    // Allocate the device context
+    // Create the device context
     auto * hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_DRM, nullptr);
     if (!hwdeviceref)
         return -1;
-
-    // Initialise device context
-    if (av_hwdevice_ctx_init(hwdeviceref) < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise device context");
-        av_buffer_unref(&hwdeviceref);
-        return -1;
-    }
 
     Context->hw_device_ctx = hwdeviceref;
     return 0;
