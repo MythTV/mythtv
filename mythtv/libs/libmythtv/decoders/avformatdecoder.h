@@ -195,11 +195,6 @@ class AvFormatDecoder : public DecoderBase
 
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic,
                               int flags);
-    friend int open_avf(URLContext *h, const char *filename, int flags);
-    friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
-    friend int write_avf(URLContext *h, uint8_t *buf, int buf_size);
-    friend int64_t seek_avf(URLContext *h, int64_t offset, int whence);
-    friend int close_avf(URLContext *h);
 
     void DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte);
     void DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte);
