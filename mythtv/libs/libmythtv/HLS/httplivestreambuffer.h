@@ -26,11 +26,6 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythtv/io/mythmediabuffer.h"
 
-extern "C" {
-#include "libavformat/avformat.h"
-#include "libavformat/url.h"
-}
-
 class MythDownloadManager;
 class HLSStream;
 class HLSSegment;
