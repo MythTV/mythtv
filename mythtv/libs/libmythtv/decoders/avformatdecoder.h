@@ -198,7 +198,6 @@ class AvFormatDecoder : public DecoderBase
 
     void DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte);
     void DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte);
-    void InitByteContext(bool forceseek = false);
     void InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                         bool selectedStream = false);
 
@@ -259,8 +258,6 @@ class AvFormatDecoder : public DecoderBase
     MythCodecMap       m_codecMap;
 
     // AVFormatParameters params;
-
-    URLContext         m_readContext                  {};
 
     int                m_frameDecoded                 {0};
     MythVideoFrame    *m_decodedVideoFrame            {nullptr};

@@ -457,8 +457,9 @@ void AvFormatDecoder::CloseContext()
     {
         CloseCodecs();
 
-        av_free(m_ic->pb->buffer);
-        av_free(m_ic->pb);
+        delete m_avfRingBuffer;
+        m_avfRingBuffer = nullptr;
+        m_ic->pb = nullptr;
         avformat_close_input(&m_ic);
         m_ic = nullptr;
     }
@@ -863,28 +864,6 @@ bool AvFormatDecoder::CanHandle(TestBufferVec & testbuf, const QString &filename
     return av_probe_input_format2(&probe, static_cast<int>(true), &score) != nullptr;
 }
 
-void AvFormatDecoder::InitByteContext(bool forceseek)
-{
-    int buf_size                  = m_ringBuffer->BestBufferSize();
-    bool streamed                 = m_ringBuffer->IsStreamed();
-    m_readContext.prot            = MythAVFormatBuffer::GetURLProtocol();
-    m_readContext.flags           = AVIO_FLAG_READ;
-    m_readContext.is_streamed     = static_cast<int>(streamed);
-    m_readContext.max_packet_size = 0;
-    m_readContext.priv_data       = m_avfRingBuffer;
-    auto *buffer                  = (unsigned char *)av_malloc(buf_size);
-    m_ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
-                                                      &m_readContext,
-                                                      MythAVFormatBuffer::ReadPacket,
-                                                      MythAVFormatBuffer::WritePacket,
-                                                      MythAVFormatBuffer::SeekPacket);
-
-    // We can always seek during LiveTV
-    m_ic->pb->seekable = static_cast<int>(!streamed || forceseek);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1 Streamed %2 Seekable %3 Available %4")
-        .arg(buf_size).arg(streamed).arg(m_ic->pb->seekable).arg(m_ringBuffer->GetReadBufAvail()));
-}
-
 extern "C" void HandleStreamChange(void *data)
 {
     auto *decoder = reinterpret_cast<AvFormatDecoder*>(data);
@@ -938,9 +917,6 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
     // a DVD, in which case don't so that we don't show
     // anything whilst probing the data streams.
     m_processFrames = !m_ringBuffer->IsDVD();
-
-    delete m_avfRingBuffer;
-    m_avfRingBuffer = new MythAVFormatBuffer(Buffer);
 
     const AVInputFormat *fmt = nullptr;
     QString        fnames   = m_ringBuffer->GetFilename();
@@ -1002,8 +978,16 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                 return -1;
             }
 
+            delete m_avfRingBuffer;
+            m_avfRingBuffer = new MythAVFormatBuffer(m_ringBuffer, false, m_livetv);
+            m_ic->pb = m_avfRingBuffer->getAVIOContext();
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Buffer size: %1 Streamed %2 Seekable %3 Available %4")
+                .arg(m_ringBuffer->BestBufferSize())
+                .arg(m_ringBuffer->IsStreamed())
+                .arg(m_ic->pb->seekable)
+                .arg(m_ringBuffer->GetReadBufAvail()));
             m_avfRingBuffer->SetInInit(false);
-            InitByteContext(m_livetv);
 
             err = avformat_open_input(&m_ic, filename, fmt, nullptr);
             if (err < 0)
