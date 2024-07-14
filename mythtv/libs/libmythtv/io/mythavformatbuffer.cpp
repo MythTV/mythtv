@@ -10,16 +10,6 @@ MythAVFormatBuffer::MythAVFormatBuffer(MythMediaBuffer *Buffer)
 {
 }
 
-void MythAVFormatBuffer::SetBuffer(MythMediaBuffer *Buffer)
-{
-    m_buffer = Buffer;
-}
-
-MythMediaBuffer* MythAVFormatBuffer::GetBuffer(void)
-{
-    return m_buffer;
-}
-
 int MythAVFormatBuffer::Open(URLContext *Context, const char* /*Filename*/, int /*Flags*/)
 {
     Context->priv_data = nullptr;
@@ -32,7 +22,7 @@ int MythAVFormatBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
     if (!avfr)
         return 0;
 
-    int ret = avfr->GetBuffer()->Read(Buffer, Size);
+    int ret = avfr->m_buffer->Read(Buffer, Size);
 
     if (ret == 0)
         ret = AVERROR_EOF;
@@ -45,7 +35,7 @@ int MythAVFormatBuffer::Write(URLContext *Context, const uint8_t *Buffer, int Si
     if (!avfr)
         return 0;
 
-    return avfr->GetBuffer()->Write(Buffer, static_cast<uint>(Size));
+    return avfr->m_buffer->Write(Buffer, static_cast<uint>(Size));
 }
 
 int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence)
@@ -55,12 +45,12 @@ int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence
         return 0;
 
     if (Whence == AVSEEK_SIZE)
-        return avfr->GetBuffer()->GetRealFileSize();
+        return avfr->m_buffer->GetRealFileSize();
 
     if (Whence == SEEK_END)
-        return avfr->GetBuffer()->GetRealFileSize() + Offset;
+        return avfr->m_buffer->GetRealFileSize() + Offset;
 
-    return avfr->GetBuffer()->Seek(Offset, Whence);
+    return avfr->m_buffer->Seek(Offset, Whence);
 }
 
 int MythAVFormatBuffer::Close(URLContext* /*Context*/)
@@ -115,7 +105,7 @@ URLProtocol *MythAVFormatBuffer::GetURLProtocol(void)
 void MythAVFormatBuffer::SetInInit(bool State)
 {
     m_initState = State;
-    GetBuffer()->SetReadInternalMode(State);
+    m_buffer->SetReadInternalMode(State);
 }
 
 bool MythAVFormatBuffer::IsInInit(void) const
