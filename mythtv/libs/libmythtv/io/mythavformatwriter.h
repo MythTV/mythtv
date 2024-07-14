@@ -36,6 +36,7 @@ class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
     bool ReOpen              (const QString& Filename);
 
   private:
+    bool      openFileHelper();
     AVStream* AddVideoStream (void);
     bool      OpenVideo      (void);
     AVStream* AddAudioStream (void);
