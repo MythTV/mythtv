@@ -14,8 +14,6 @@ class MythAVFormatBuffer
 {
   public:
     explicit MythAVFormatBuffer(MythMediaBuffer *Buffer = nullptr);
-    void                SetBuffer      (MythMediaBuffer *Buffer);
-    MythMediaBuffer*    GetBuffer      (void);
     static URLProtocol* GetURLProtocol (void);
     static int          WritePacket    (void* Context, uint8_t *Buffer, int Size);
     static int          ReadPacket     (void* Context, uint8_t *Buffer, int Size);
