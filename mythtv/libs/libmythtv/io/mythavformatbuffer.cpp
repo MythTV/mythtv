@@ -1,105 +1,104 @@
 #include "io/mythavformatbuffer.h"
 
+// FFmpeg
+extern "C" {
+#include "libavformat/avio.h"
+#include "libavutil/error.h"
+}
+
 #include <QtGlobal>
 #include <QRecursiveMutex>
 
-URLProtocol MythAVFormatBuffer::s_avfrURL;
+#include "libmythbase/mythlogging.h"
 
-MythAVFormatBuffer::MythAVFormatBuffer(MythMediaBuffer *Buffer)
+MythAVFormatBuffer::MythAVFormatBuffer(MythMediaBuffer *Buffer, bool write_flag, bool force_seek)
   : m_buffer(Buffer)
 {
+    m_avioContext = alloc_context(write_flag, force_seek);
+    if (m_avioContext == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "MythAVFormatBuffer failed to allocate an AVIOContext.");
+    }
 }
 
-int MythAVFormatBuffer::Open(URLContext *Context, const char* /*Filename*/, int /*Flags*/)
+MythAVFormatBuffer::~MythAVFormatBuffer()
 {
-    Context->priv_data = nullptr;
-    return 0;
+    if (m_avioContext != nullptr)
+    {
+        avio_flush(m_avioContext);
+        av_freep(&(m_avioContext->buffer));
+        if (m_avioContext->write_flag)
+        {
+            LOG(VB_LIBAV, LOG_DEBUG, QString("AVIOContext (%1): %2 bytes written")
+                .arg(pointerToQString(m_avioContext), QString::number(m_avioContext->bytes_written)));
+        }
+        else
+        {
+            LOG(VB_LIBAV, LOG_DEBUG, QString("AVIOContext (%1): %2 bytes read")
+                .arg(pointerToQString(m_avioContext), QString::number(m_avioContext->bytes_read)));
+        }
+        avio_context_free(&m_avioContext);
+    }
 }
 
-int MythAVFormatBuffer::Read(URLContext *Context, uint8_t *Buffer, int Size)
+AVIOContext* MythAVFormatBuffer::alloc_context(bool write_flag, bool force_seek)
 {
-    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(Context->priv_data);
-    if (!avfr)
-        return 0;
+    AVIOContext* context = nullptr;
+    int buf_size = m_buffer->BestBufferSize();
+    auto *avio_buffer = static_cast<unsigned char *>(av_malloc(buf_size));
+    if (avio_buffer == nullptr)
+    {
+        LOG(VB_LIBAV, LOG_ERR, "av_malloc() failed to create a buffer for avio.");
+        return nullptr;
+    }
+    context = avio_alloc_context(avio_buffer, buf_size, write_flag, this,
+                                 read_packet, write_packet, seek);
+    if (context == nullptr)
+    {
+        return context;
+    }
+    if (m_buffer->IsStreamed() && !force_seek)
+    {
+        context->seekable &= ~AVIO_SEEKABLE_NORMAL;
+    }
+    return context;
+}
 
-    int ret = avfr->m_buffer->Read(Buffer, Size);
+int MythAVFormatBuffer::read_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    auto *p = reinterpret_cast<MythAVFormatBuffer*>(opaque);
+    if (!p)
+        return AVERROR(EINVAL);
+
+    int ret = p->m_buffer->Read(buf, buf_size);
 
     if (ret == 0)
         ret = AVERROR_EOF;
     return ret;
 }
 
-int MythAVFormatBuffer::Write(URLContext *Context, const uint8_t *Buffer, int Size)
+int MythAVFormatBuffer::write_packet(void *opaque, uint8_t *buf, int buf_size)
 {
-    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(Context->priv_data);
-    if (!avfr)
-        return 0;
+    auto *p = reinterpret_cast<MythAVFormatBuffer*>(opaque);
+    if (!p)
+        return AVERROR(EINVAL);
 
-    return avfr->m_buffer->Write(Buffer, static_cast<uint>(Size));
+    return p->m_buffer->Write(buf, static_cast<uint>(buf_size));
 }
 
-int64_t MythAVFormatBuffer::Seek(URLContext *Context, int64_t Offset, int Whence)
+int64_t MythAVFormatBuffer::seek(void *opaque, int64_t offset, int whence)
 {
-    auto *avfr = reinterpret_cast<MythAVFormatBuffer*>(Context->priv_data);
-    if (!avfr)
-        return 0;
+    auto *p = reinterpret_cast<MythAVFormatBuffer*>(opaque);
+    if (!p)
+        return AVERROR(EINVAL);
 
-    if (Whence == AVSEEK_SIZE)
-        return avfr->m_buffer->GetRealFileSize();
+    if (whence == AVSEEK_SIZE)
+        return p->m_buffer->GetRealFileSize();
 
-    if (Whence == SEEK_END)
-        return avfr->m_buffer->GetRealFileSize() + Offset;
+    if (whence == SEEK_END)
+        return p->m_buffer->Seek(p->m_buffer->GetRealFileSize() + offset, SEEK_SET);
 
-    return avfr->m_buffer->Seek(Offset, Whence);
-}
-
-int MythAVFormatBuffer::Close(URLContext* /*Context*/)
-{
-    return 0;
-}
-
-int MythAVFormatBuffer::WritePacket(void *Context, uint8_t *Buffer, int Size)
-{
-    if (!Context)
-        return 0;
-    return ffurl_write(reinterpret_cast<URLContext*>(Context), Buffer, Size);
-}
-
-int MythAVFormatBuffer::ReadPacket(void *Context, uint8_t *Buffer, int Size)
-{
-    if (!Context)
-        return 0;
-    return ffurl_read(reinterpret_cast<URLContext*>(Context), Buffer, Size);
-}
-
-int64_t MythAVFormatBuffer::SeekPacket(void *Context, int64_t Offset, int Whence)
-{
-    if (!Context)
-        return 0;
-    return ffurl_seek(reinterpret_cast<URLContext*>(Context), Offset, Whence);
-}
-
-URLProtocol *MythAVFormatBuffer::GetURLProtocol(void)
-{
-    static QRecursiveMutex s_avringbufferLock;
-    static bool   s_avringbufferInitialised = false;
-
-    QMutexLocker lock(&s_avringbufferLock);
-    if (!s_avringbufferInitialised)
-    {
-        // just in case URLProtocol's members do not have default constructor
-        memset(static_cast<void*>(&s_avfrURL), 0, sizeof(s_avfrURL));
-        s_avfrURL.name            = "rbuffer";
-        s_avfrURL.url_open        = Open;
-        s_avfrURL.url_read        = Read;
-        s_avfrURL.url_write       = Write;
-        s_avfrURL.url_seek        = Seek;
-        s_avfrURL.url_close       = Close;
-        s_avfrURL.priv_data_size  = 0;
-        s_avfrURL.flags           = URL_PROTOCOL_FLAG_NETWORK;
-        s_avringbufferInitialised = true;
-    }
-    return &s_avfrURL;
+    return p->m_buffer->Seek(offset, whence);
 }
 
 void MythAVFormatBuffer::SetInInit(bool State)
