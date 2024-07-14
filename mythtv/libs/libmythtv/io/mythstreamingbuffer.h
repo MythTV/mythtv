@@ -4,12 +4,6 @@
 // MythTV
 #include "io/mythmediabuffer.h"
 
-// FFmpeg
-extern "C" {
-#include "libavformat/avformat.h"
-#include "libavformat/url.h"
-}
-
 class MythStreamingBuffer : public MythMediaBuffer
 {
   public:
@@ -29,7 +23,7 @@ class MythStreamingBuffer : public MythMediaBuffer
     long long SeekInternal      (long long Position, int Whence) override;
 
   private:
-    URLContext *m_context    { nullptr };
+    struct AVIOContext *m_context    { nullptr };
     bool        m_streamed   { true    };
     bool        m_allowSeeks { false   };
 };
