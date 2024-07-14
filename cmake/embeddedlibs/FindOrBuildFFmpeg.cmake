@@ -136,18 +136,6 @@ function(find_or_build_ffmpeg)
     WORKING_DIRECTORY <BINARY_DIR>
     COMMAND ${MAKE_EXECUTABLE} install-pkgconfig)
 
-  #
-  # Install internal headers that are used by MythTV.  This must go away if
-  # MythTV is ever want to use the distribution supplied FFmpeg.
-  #
-  set(FFMPEG_INSTALL_INCLUDEDIR ${FFMPEG_INSTALL_PREFIX}/include/mythtv/)
-  ExternalProject_Add_Step(
-    FFmpeg expose_internal_headers_hack
-    DEPENDEES install
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/mythtv/external/FFmpeg
-    COMMAND ${CMAKE_COMMAND} -E copy libavformat/url.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/libavformat/
-
 endfunction()
 
 find_or_build_ffmpeg()

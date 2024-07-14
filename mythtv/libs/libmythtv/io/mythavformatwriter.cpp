@@ -44,14 +44,7 @@ extern "C" {
 
 MythAVFormatWriter::~MythAVFormatWriter()
 {
-    if (m_ctx)
-    {
-        av_write_trailer(m_ctx);
-        avio_closep(&m_ctx->pb);
-        for(uint i = 0; i < m_ctx->nb_streams; i++)
-            av_freep(reinterpret_cast<void*>(&m_ctx->streams[i]));
-        av_freep(reinterpret_cast<void*>(&m_ctx));
-    }
+    CloseFile();
 
     av_freep(reinterpret_cast<void*>(&m_audioInBuf));
     av_freep(reinterpret_cast<void*>(&m_audioInPBuf));
@@ -138,33 +131,42 @@ bool MythAVFormatWriter::Init(void)
 
 bool MythAVFormatWriter::OpenFile(void)
 {
-    if (!(m_fmt.flags & AVFMT_NOFILE))
+    bool success = openFileHelper();
+    if (!success)
     {
-        if (avio_open(&m_ctx->pb, m_filename.toLatin1().constData(), AVIO_FLAG_WRITE) < 0)
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): avio_open() failed");
-            return false;
-        }
+        Cleanup();
     }
+    return success;
+}
 
+bool MythAVFormatWriter::openFileHelper()
+{
+    delete m_buffer;
     m_buffer = MythMediaBuffer::Create(m_filename, true);
 
     if (!m_buffer || !m_buffer->GetLastError().isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + QString("OpenFile(): RingBuffer::Create() failed: '%1'")
             .arg(m_buffer ? m_buffer->GetLastError() : ""));
-        Cleanup();
         return false;
     }
 
-    m_avfBuffer    = new MythAVFormatBuffer(m_buffer);
-    auto *url      = reinterpret_cast<URLContext*>(m_ctx->pb->opaque);
-    url->prot      = MythAVFormatBuffer::GetURLProtocol();
-    url->priv_data = static_cast<void*>(m_avfBuffer);
+    delete m_avfBuffer;
+    m_avfBuffer = nullptr;
+    m_ctx->pb = nullptr;
+    if (!(m_fmt.flags & AVFMT_NOFILE))
+    {
+        m_avfBuffer = new MythAVFormatBuffer(m_buffer, true, true);
+        m_ctx->pb = m_avfBuffer->getAVIOContext();
+        if (m_ctx->pb == nullptr)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): failed to allocate AVIOContext");
+            return false;
+        }
+    }
 
     if (avformat_write_header(m_ctx, nullptr) < 0)
     {
-        Cleanup();
         return false;
     }
 
@@ -173,8 +175,6 @@ bool MythAVFormatWriter::OpenFile(void)
 
 void MythAVFormatWriter::Cleanup(void)
 {
-    if (m_ctx && m_ctx->pb)
-        avio_closep(&m_ctx->pb);
     delete m_avfBuffer;
     m_avfBuffer = nullptr;
     delete m_buffer;
@@ -186,7 +186,9 @@ bool MythAVFormatWriter::CloseFile(void)
     if (m_ctx)
     {
         av_write_trailer(m_ctx);
-        avio_close(m_ctx->pb);
+        delete m_avfBuffer;
+        m_avfBuffer = nullptr;
+        m_ctx->pb = nullptr;
         for(uint i = 0; i < m_ctx->nb_streams; i++)
             av_freep(reinterpret_cast<void*>(&m_ctx->streams[i]));
         av_freep(reinterpret_cast<void*>(&m_ctx));

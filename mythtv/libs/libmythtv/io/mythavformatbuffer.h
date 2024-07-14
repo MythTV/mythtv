@@ -6,29 +6,29 @@
 
 // FFmpeg
 extern "C" {
-#include "libavformat/avformat.h"
-#include "libavformat/url.h"
+#include "libavformat/avio.h"
 }
 
 class MythAVFormatBuffer
 {
   public:
-    explicit MythAVFormatBuffer(MythMediaBuffer *Buffer = nullptr);
-    static URLProtocol* GetURLProtocol (void);
-    static int          WritePacket    (void* Context, uint8_t *Buffer, int Size);
-    static int          ReadPacket     (void* Context, uint8_t *Buffer, int Size);
-    static int64_t      SeekPacket     (void* Context, int64_t Offset, int Whence);
-    static int          Open           (URLContext* Context, const char *Filename, int Flags);
-    static int          Read           (URLContext* Context, uint8_t *Buffer, int Size);
-    static int          Write          (URLContext* Context, const uint8_t *Buffer, int Size);
-    static int64_t      Seek           (URLContext* Context, int64_t Offset, int Whence);
-    static int          Close          (URLContext* /*Context*/);
+    MythAVFormatBuffer(MythMediaBuffer *Buffer, bool write_flag, bool force_seek);
+    ~MythAVFormatBuffer();
+
     void                SetInInit      (bool State);
     bool                IsInInit       (void) const;
 
+    AVIOContext*        getAVIOContext() { return m_avioContext; }
+
   private:
+    static int read_packet(void *opaque, uint8_t *buf, int buf_size);
+    static int write_packet(void *opaque, uint8_t *buf, int buf_size);
+    static int64_t seek(void *opaque, int64_t offset, int whence);
+
+    AVIOContext* alloc_context(bool write_flag, bool force_seek);
+
     MythMediaBuffer    *m_buffer       { nullptr };
     bool                m_initState    { true    };
-    static URLProtocol  s_avfrURL;
+    AVIOContext        *m_avioContext  { nullptr };
 };
 #endif
