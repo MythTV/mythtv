@@ -41,6 +41,7 @@
         "channeleditor": "Éditeur de chaînes",
         "guide": {
             "calendar_tip": "Sélecteur de date : sélectionnez d'abord l'heure, puis la date.",
+            "cat_search": "Recherche par catégorie",
             "catcolors": "Catégorie Couleurs",
             "channel": "Canaliser",
             "channel_group": "Groupe de chaînes",
@@ -49,6 +50,9 @@
             "color_includes": "Cette liste comprend uniquement les couleurs des programmes de la page actuelle du guide. La liste complète des couleurs se trouve dans le fichier mentionné ci-dessous.",
             "colors": "Couleurs",
             "full_search": "Recherche complète",
+            "movies": "Films",
+            "new": "Nouveau",
+            "new_search": "Nouveaux titres",
             "people_search": "Recherche de personnes",
             "retgrid": "Revenir à l'affichage de la grille",
             "title_search": "Recherche de titre",

@@ -41,6 +41,7 @@
         "channeleditor": "Kanalredaktør",
         "guide": {
             "calendar_tip": "Datovelger: Velg først klokkeslettet og deretter datoen.",
+            "cat_search": "Kategorisøk",
             "catcolors": "Kategori Farger",
             "channel": "Kanal",
             "channel_group": "Kanalgruppe",
@@ -49,6 +50,9 @@
             "color_includes": "Denne listen inkluderer kun farger for programmer på gjeldende side i veiledningen. Den fullstendige listen over farger er i filen nevnt nedenfor.",
             "colors": "Farger",
             "full_search": "Fullt søk",
+            "movies": "Filmer",
+            "new": "Ny",
+            "new_search": "Nye titler",
             "people_search": "People Search",
             "retgrid": "Gå tilbake til rutenettvisning",
             "title_search": "Tittelsøk",

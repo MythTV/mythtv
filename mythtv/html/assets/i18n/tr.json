@@ -41,6 +41,7 @@
         "channeleditor": "Kanal Editörü",
         "guide": {
             "calendar_tip": "Tarih Seçici: Önce saati, ardından tarihi seçin.",
+            "cat_search": "Kategori Arama",
             "catcolors": "Kategori Renkleri",
             "channel": "Kanal",
             "channel_group": "Kanal Grubu",
@@ -49,6 +50,9 @@
             "color_includes": "Bu liste yalnızca kılavuzun geçerli sayfasındaki programların renklerini içerir. Renklerin tam listesi aşağıda belirtilen dosyada bulunmaktadır.",
             "colors": "Renkler",
             "full_search": "Tam arama",
+            "movies": "Filmler",
+            "new": "Yeni",
+            "new_search": "Yeni Başlıklar",
             "people_search": "İnsan arama",
             "retgrid": "Izgara Görünümüne Dön",
             "title_search": "Başlık arama",

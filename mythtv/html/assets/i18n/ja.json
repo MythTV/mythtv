@@ -41,6 +41,7 @@
         "channeleditor": "チャンネル編集者",
         "guide": {
             "calendar_tip": "日付ピッカー: 最初に時刻を選択し、次に日付を選択します。",
+            "cat_search": "カテゴリ検索",
             "catcolors": "カテゴリの色",
             "channel": "チャネル",
             "channel_group": "チャネルグループ",
@@ -49,6 +50,9 @@
             "color_includes": "このリストには、ガイドの現在のページにあるプログラムの色のみが含まれています。色の完全なリストは、以下のファイルにあります。",
             "colors": "色",
             "full_search": "全検索",
+            "movies": "映画",
+            "new": "新しい",
+            "new_search": "新しいタイトル",
             "people_search": "人物検索",
             "retgrid": "グリッド表示に戻る",
             "title_search": "タイトル検索",

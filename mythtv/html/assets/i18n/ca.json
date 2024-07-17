@@ -41,6 +41,7 @@
         "channeleditor": "Editor de canals",
         "guide": {
             "calendar_tip": "Selector de dates: seleccioneu primer l'hora i després la data.",
+            "cat_search": "Cerca per categories",
             "catcolors": "Categoria Colors",
             "channel": "Canal",
             "channel_group": "Grup de canals",
@@ -49,6 +50,9 @@
             "color_includes": "Aquesta llista només inclou els colors dels programes de la pàgina actual de la guia. La llista completa de colors es troba al fitxer esmentat a continuació.",
             "colors": "Colors",
             "full_search": "Cerca completa",
+            "movies": "Pel·lícules",
+            "new": "Nou",
+            "new_search": "Nous Títols",
             "people_search": "Cerca de persones",
             "retgrid": "Torna a la pantalla de quadrícula",
             "title_search": "Cerca de títols",

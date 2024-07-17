@@ -41,6 +41,7 @@
         "channeleditor": "Rásarstjóri",
         "guide": {
             "calendar_tip": "Dagsetningarval: Veldu fyrst tímann og síðan dagsetninguna.",
+            "cat_search": "Flokkaleit",
             "catcolors": "Flokkur Litir",
             "channel": "Rás",
             "channel_group": "Rásarhópur",
@@ -49,6 +50,9 @@
             "color_includes": "Þessi listi inniheldur aðeins liti fyrir forrit á núverandi síðu handbókarinnar. Allur listi yfir liti er í skránni sem nefnd er hér að neðan.",
             "colors": "Litir",
             "full_search": "Full leit",
+            "movies": "Kvikmyndir",
+            "new": "Nýtt",
+            "new_search": "Nýir titlar",
             "people_search": "Fólksleit",
             "retgrid": "Fara aftur í Grid Display",
             "title_search": "Titilleit",

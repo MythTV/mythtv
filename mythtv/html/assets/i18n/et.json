@@ -41,6 +41,7 @@
         "channeleditor": "Kanali redaktor",
         "guide": {
             "calendar_tip": "Kuupäevavalija: valige esmalt kellaaeg ja seejärel kuupäev.",
+            "cat_search": "Kategooria otsing",
             "catcolors": "Kategooria Värvid",
             "channel": "Kanal",
             "channel_group": "Kanaligrupp",
@@ -49,6 +50,9 @@
             "color_includes": "See loend sisaldab ainult juhendi praegusel lehel olevate programmide värve. Täielik värvide loend on allpool mainitud failis.",
             "colors": "Värvid",
             "full_search": "Täielik otsing",
+            "movies": "Filmid",
+            "new": "Uus",
+            "new_search": "Uued pealkirjad",
             "people_search": "Inimeste otsing",
             "retgrid": "Naaske ruudustiku kuvale",
             "title_search": "Pealkirja otsing",

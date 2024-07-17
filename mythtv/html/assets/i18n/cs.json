@@ -41,6 +41,7 @@
         "channeleditor": "Editor kanálu",
         "guide": {
             "calendar_tip": "Výběr data: Nejprve vyberte čas a poté datum.",
+            "cat_search": "Vyhledávání kategorií",
             "catcolors": "Kategorie Barvy",
             "channel": "Kanál",
             "channel_group": "Skupina kanálů",
@@ -49,6 +50,9 @@
             "color_includes": "Tento seznam obsahuje pouze barvy pro programy na aktuální stránce průvodce. Úplný seznam barev je v souboru uvedeném níže.",
             "colors": "Barvy",
             "full_search": "Úplné vyhledávání",
+            "movies": "Filmy",
+            "new": "Nový",
+            "new_search": "Nové tituly",
             "people_search": "Vyhledávání lidí",
             "retgrid": "Návrat k zobrazení mřížky",
             "title_search": "Vyhledávání titulů",

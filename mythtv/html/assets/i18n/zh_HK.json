@@ -41,6 +41,7 @@
         "channeleditor": "頻道編輯",
         "guide": {
             "calendar_tip": "日期選擇器：先選擇時間，然後選擇日期。",
+            "cat_search": "類別搜尋",
             "catcolors": "類別 顏色",
             "channel": "渠道",
             "channel_group": "頻道組",
@@ -49,6 +50,9 @@
             "color_includes": "此清單僅包含指南目前頁面上的程式的顏色。完整的顏色清單位於下面提到的文件中。",
             "colors": "顏色",
             "full_search": "完整搜尋",
+            "movies": "電影",
+            "new": "新的",
+            "new_search": "新標題",
             "people_search": "人物搜索",
             "retgrid": "返回網格顯示",
             "title_search": "標題搜索",

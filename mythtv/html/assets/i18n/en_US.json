@@ -41,6 +41,7 @@
         "channeleditor": "Channel Editor",
         "guide": {
             "calendar_tip": "Date Picker: Select the time first, then the date.",
+            "cat_search": "Category Search",
             "catcolors": "Category Colors",
             "channel": "Channel",
             "channel_group": "Channel Group",
@@ -49,6 +50,9 @@
             "color_includes": "This list only includes colors for programs on the current page of the guide. The full list of colors is in the file mentioned below.",
             "colors": "Colors",
             "full_search": "Full Search",
+            "movies": "Movies",
+            "new": "New",
+            "new_search": "New Titles",
             "people_search": "People Search",
             "retgrid": "Return to Grid Display",
             "title_search": "Title Search",

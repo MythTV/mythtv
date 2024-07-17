@@ -41,6 +41,7 @@
         "channeleditor": "Urejevalnik kanalov",
         "guide": {
             "calendar_tip": "Izbirnik datuma: najprej izberite uro in nato datum.",
+            "cat_search": "Iskanje po kategorijah",
             "catcolors": "Barve kategorije",
             "channel": "Kanal",
             "channel_group": "Skupina kanalov",
@@ -49,6 +50,9 @@
             "color_includes": "Ta seznam vključuje samo barve za programe na trenutni strani vodnika. Celoten seznam barv je v spodnji datoteki.",
             "colors": "Barve",
             "full_search": "Celotno iskanje",
+            "movies": "Filmi",
+            "new": "Novo",
+            "new_search": "Novi naslovi",
             "people_search": "Iskanje ljudi",
             "retgrid": "Nazaj na prikaz mreže",
             "title_search": "Iskanje po naslovu",

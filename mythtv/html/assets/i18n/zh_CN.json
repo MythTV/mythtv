@@ -41,6 +41,7 @@
         "channeleditor": "频道编辑",
         "guide": {
             "calendar_tip": "日期选择器：首先选择时间，然后选择日期。",
+            "cat_search": "类别搜索",
             "catcolors": "类别 颜色",
             "channel": "渠道",
             "channel_group": "渠道组",
@@ -49,6 +50,9 @@
             "color_includes": "此列表仅包含指南当前页面上的程序的颜色。完整的颜色列表位于下面提到的文件中。",
             "colors": "颜色",
             "full_search": "完整搜索",
+            "movies": "电影",
+            "new": "新的",
+            "new_search": "新标题",
             "people_search": "人物搜索",
             "retgrid": "返回网格显示",
             "title_search": "标题搜索",

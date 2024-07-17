@@ -41,6 +41,7 @@
         "channeleditor": "Urednik kanala",
         "guide": {
             "calendar_tip": "Birač datuma: prvo odaberite vrijeme, a zatim datum.",
+            "cat_search": "Pretraga po kategoriji",
             "catcolors": "Kategorija Boje",
             "channel": "Kanal",
             "channel_group": "Grupa kanala",
@@ -49,6 +50,9 @@
             "color_includes": "Ovaj popis uključuje samo boje za programe na trenutnoj stranici vodiča. Potpuni popis boja nalazi se u datoteci navedenoj u nastavku.",
             "colors": "Boje",
             "full_search": "Potpuna pretraga",
+            "movies": "Filmovi",
+            "new": "Novi",
+            "new_search": "Novi naslovi",
             "people_search": "Pretraživanje ljudi",
             "retgrid": "Povratak na prikaz mreže",
             "title_search": "Pretraživanje naslova",

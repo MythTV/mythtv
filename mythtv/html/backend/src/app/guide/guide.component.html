@@ -30,21 +30,42 @@
         <div class="flex align-items-center p-5" *ngIf="displayType == FULLSEARCH">
             <b> {{ 'dashboard.guide.full_search' | translate }} </b>
         </div>
+        <div class="flex align-items-center p-5" *ngIf="displayType == CATSEARCH">
+            <b> {{ 'dashboard.guide.cat_search' | translate }} </b>
+        </div>
 
         <div class="flex align-items-center pl-5"
-            *ngIf="[GRID,TITLESEARCH,PEOPLESEARCH,FULLSEARCH].indexOf(displayType) > -1">
+            *ngIf="[GRID,TITLESEARCH,PEOPLESEARCH,FULLSEARCH,CATSEARCH,ANYSEARCH].indexOf(displayType) > -1">
             <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue" class="text-xl"
                 placeholder="Search" />
-            <button pButton pRipple icon="pi pi-search" class="p-button-text" (click)="titleSearch()"
+            <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="titleSearch()"
                 pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
-            <button pButton pRipple icon="pi pi-user" class="p-button-text" (click)="peopleSearch()"
+            <button pButton pRipple icon="pi pi-user" class="p-button-text w-2rem" (click)="peopleSearch()"
                 pTooltip="{{ 'dashboard.guide.people_search' | translate }}" tooltipPosition="top"></button>
-            <button pButton pRipple icon="pi pi-search-plus" class="p-button-text" (click)="fullSearch()"
+            <button pButton pRipple icon="pi pi-search-plus" class="p-button-text w-2rem" (click)="fullSearch()"
                 pTooltip="{{ 'dashboard.guide.full_search' | translate }}" tooltipPosition="top"></button>
+            <button pButton pRipple icon="pi pi-bell" class="p-button-text w-2rem" (click)="catSearch()"
+                pTooltip="{{ 'dashboard.guide.cat_search' | translate }}" tooltipPosition="top"></button>
+            <button pButton pRipple icon="pi pi-sun" class="p-button-text w-2rem" (click)="newSearch()"
+                *ngIf="displayType == GRID" pTooltip="{{ 'dashboard.guide.new_search' | translate }}"
+                tooltipPosition="top"></button>
+            <button pButton pRipple icon="pi pi-video" class="p-button-text w-2rem" (click)="movieSearch()"
+                *ngIf="displayType == GRID" pTooltip="{{ 'dashboard.guide.movies' | translate }}"
+                tooltipPosition="top"></button>
+            <p-checkbox inputId="OnlyNew" [(ngModel)]="onlyNew" name="OnlyNew" #OnlyNew="ngModel" class="mx-1"
+                *ngIf="displayType != GRID" [binary]="true" label="{{ 'dashboard.guide.new' | translate }}"
+                checkboxIcon="pi pi-check" (onChange)="newSearch()"
+                pTooltip="{{ 'dashboard.guide.new_search' | translate }}" tooltipPosition="top">
+            </p-checkbox>
+            <p-checkbox inputId="Movies" [(ngModel)]="onlyMovies" name="OnlyMovies" #OnlyMovies="ngModel" class="mx-1"
+                *ngIf="displayType != GRID" [binary]="true" label="{{ 'dashboard.guide.movies' | translate }}"
+                checkboxIcon="pi pi-check" (onChange)="newSearch()"
+                pTooltip="{{ 'dashboard.guide.movies' | translate }}" tooltipPosition="top">
+            </p-checkbox>
         </div>
 
         <div class="flex align-items-center"
-            *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH].indexOf(displayType) > -1">
+            *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH,CATSEARCH,ANYSEARCH].indexOf(displayType) > -1">
             <button pButton pRipple icon="pi pi-table" class="p-button-text"
                 pTooltip="{{ 'dashboard.guide.retgrid' | translate }}" (click)="onGrid()"
                 tooltipPosition="top"></button>
@@ -66,8 +87,8 @@
         </div>
         <div class="flex align-items-center">
             <a href="https://www.mythtv.org/wiki/Web_Application:Program_Guide" target="mythtv_wiki">
-            <button pButton pRipple icon="pi pi-question-circle" class="p-button-text"
-                pTooltip="{{ 'common.help' | translate }}" tooltipPosition="top"></button>
+                <button pButton pRipple icon="pi pi-question-circle" class="p-button-text"
+                    pTooltip="{{ 'common.help' | translate }}" tooltipPosition="top"></button>
             </a>
         </div>
     </div>
@@ -108,7 +129,7 @@
         </p-scrollPanel>
     </div>
 
-    <div *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH].indexOf(displayType) > -1 ">
+    <div *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH,CATSEARCH,ANYSEARCH].indexOf(displayType) > -1 ">
         <app-programs [inter]="inter" [programs]="listPrograms"></app-programs>
     </div>
 

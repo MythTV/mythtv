@@ -41,6 +41,7 @@
         "channeleditor": "Csatornaszerkesztő",
         "guide": {
             "calendar_tip": "Dátumválasztó: Először válassza ki az időt, majd a dátumot.",
+            "cat_search": "Kategória keresése",
             "catcolors": "Kategória Színek",
             "channel": "Csatorna",
             "channel_group": "Csatornacsoport",
@@ -49,6 +50,9 @@
             "color_includes": "Ez a lista csak az útmutató aktuális oldalán található programok színeit tartalmazza. A színek teljes listája az alábbi fájlban található.",
             "colors": "Színek",
             "full_search": "Teljes keresés",
+            "movies": "Filmek",
+            "new": "Új",
+            "new_search": "Új címek",
             "people_search": "Emberek keresése",
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
             "title_search": "Cím keresése",

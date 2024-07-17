@@ -43,6 +43,7 @@ export interface GetProgramListRequest {
     Sort?:              string;
     Descending?:        boolean;
     WithInvisible?:     boolean;
+    CatType?:           string;
 }
 
 export interface GetStoredSearchesResponse {

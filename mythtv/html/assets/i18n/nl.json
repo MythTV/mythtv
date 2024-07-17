@@ -41,6 +41,7 @@
         "channeleditor": "Kanaal-editor",
         "guide": {
             "calendar_tip": "Datumkiezer: Selecteer eerst de tijd en vervolgens de datum.",
+            "cat_search": "Categorie zoeken",
             "catcolors": "Categorie Kleuren",
             "channel": "Kanaal",
             "channel_group": "Kanaalgroep",
@@ -49,6 +50,9 @@
             "color_includes": "Deze lijst bevat alleen kleuren voor programma's op de huidige pagina van de gids. De volledige lijst met kleuren staat in het onderstaande bestand.",
             "colors": "Kleuren",
             "full_search": "Volledige zoekopdracht",
+            "movies": "Films",
+            "new": "Nieuw",
+            "new_search": "Nieuwe titels",
             "people_search": "Mensen zoeken",
             "retgrid": "Keer terug naar rasterweergave",
             "title_search": "Titel zoeken",

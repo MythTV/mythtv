@@ -41,6 +41,7 @@
         "channeleditor": "Kanavaeditori",
         "guide": {
             "calendar_tip": "Päivämäärän valitsin: Valitse ensin aika ja sitten päivämäärä.",
+            "cat_search": "Luokkahaku",
             "catcolors": "Luokka Värit",
             "channel": "kanava",
             "channel_group": "Kanavaryhmä",
@@ -49,6 +50,9 @@
             "color_includes": "Tämä luettelo sisältää vain oppaan nykyisen sivun ohjelmien värit. Täydellinen väriluettelo on alla mainitussa tiedostossa.",
             "colors": "värit",
             "full_search": "Täysi haku",
+            "movies": "Elokuvat",
+            "new": "Uusi",
+            "new_search": "Uudet otsikot",
             "people_search": "Ihmiset haku",
             "retgrid": "Palaa ruudukkonäyttöön",
             "title_search": "Otsikkohaku",

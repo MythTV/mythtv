@@ -41,6 +41,7 @@
         "channeleditor": "Kanaleditor",
         "guide": {
             "calendar_tip": "Datumsauswahl: Wählen Sie zuerst die Uhrzeit und dann das Datum aus.",
+            "cat_search": "Kategoriesuche",
             "catcolors": "Kategorie Farben",
             "channel": "Kanal",
             "channel_group": "Kanalgruppe",
@@ -49,6 +50,9 @@
             "color_includes": "Diese Liste enthält nur Farben für Programme auf der aktuellen Seite des Handbuchs. Die vollständige Liste der Farben finden Sie in der unten genannten Datei.",
             "colors": "Farben",
             "full_search": "Volle Suche",
+            "movies": "Filme",
+            "new": "Neu",
+            "new_search": "Neue Titel",
             "people_search": "Personensuche",
             "retgrid": "Zurück zur Rasteranzeige",
             "title_search": "Titelsuche",

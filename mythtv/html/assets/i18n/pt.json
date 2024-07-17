@@ -41,6 +41,7 @@
         "channeleditor": "Editor de canal",
         "guide": {
             "calendar_tip": "Seletor de data: selecione primeiro a hora e depois a data.",
+            "cat_search": "Pesquisa de categoria",
             "catcolors": "Categoria Cores",
             "channel": "Canal",
             "channel_group": "Grupo de canais",
@@ -49,6 +50,9 @@
             "color_includes": "Esta lista inclui apenas cores para programas na página atual do guia. A lista completa de cores está no arquivo mencionado abaixo.",
             "colors": "Cores",
             "full_search": "Pesquisa completa",
+            "movies": "Filmes",
+            "new": "Novo",
+            "new_search": "Novos títulos",
             "people_search": "Pesquisa de pessoas",
             "retgrid": "Retornar à Exibição da Grade",
             "title_search": "Pesquisa de título",
