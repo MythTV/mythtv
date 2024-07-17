@@ -216,7 +216,8 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
                                         bool bDetails,
                                         const QString   &sSort,
                                         bool             bDescending,
-                                        bool             bWithInvisible)
+                                        bool             bWithInvisible,
+                                        const QString& sCatType)
 {
     if (!rawStartTime.isNull() && !rawStartTime.isValid())
         throw QString( "StartTime is invalid" );
@@ -302,6 +303,12 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
         bindings[":Category"] = sCategoryFilter;
     }
 
+    if (!sCatType.isEmpty())
+    {
+        sSQL += "AND program.category_type LIKE :CatType ";
+        bindings[":CatType"] = sCatType;
+    }
+
     if (!sKeywordFilter.isEmpty())
     {
         sSQL += "AND (program.title LIKE :Keyword1 "
@@ -323,7 +330,7 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
     else if (sSort == "duration")
         sSQL += "ORDER BY (program.endtime - program.starttime) ";
     else
-        sSQL += "ORDER BY program.starttime ";
+        sSQL += "ORDER BY program.starttime, channel.channum + 0 ";
 
     if (bDescending)
         sSQL += "DESC ";
@@ -355,9 +362,27 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
     nCount        = (int)progList.size();
     int nEndIndex = (int)progList.size();
 
+    QDateTime oldestDate(dtStartTime.addYears(-5));
+
     for( int n = 0; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = progList[ n ];
+
+        if (bOnlyNew)
+        {
+            // Eliminate duplicate titles
+            bool duplicate = false;
+            for (int back = n-1 ; back >= 0 ; back--) {
+                auto prior = progList[back];
+                if (prior != nullptr)
+                    if (pInfo -> GetTitle() == prior -> GetTitle()) {
+                        duplicate = true;
+                        break;
+                }
+            }
+            if (duplicate)
+                continue;
+        }
 
         V2Program *pProgram = pPrograms->AddNewProgram();
 
