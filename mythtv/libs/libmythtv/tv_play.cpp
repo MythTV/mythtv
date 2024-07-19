@@ -457,19 +457,19 @@ void TV::SetFuncPtr(const char* Name, void* Pointer)
 void TV::InitKeys()
 {
     REG_KEY("TV Frontend", ACTION_PLAYBACK, QT_TRANSLATE_NOOP("MythControls",
-            "Play Program"), "P");
+            "Play Program"), "P,Media Play");
     REG_KEY("TV Frontend", ACTION_STOP, QT_TRANSLATE_NOOP("MythControls",
             "Stop Program"), "");
     REG_KEY("TV Frontend", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
             "Toggle recording status of current program"), "R");
     REG_KEY("TV Frontend", ACTION_DAYLEFT, QT_TRANSLATE_NOOP("MythControls",
-            "Page the program guide back one day"), "Home");
+            "Page the program guide back one day"), "Home,Media Previous");
     REG_KEY("TV Frontend", ACTION_DAYRIGHT, QT_TRANSLATE_NOOP("MythControls",
-            "Page the program guide forward one day"), "End");
+            "Page the program guide forward one day"), "End,Media Next");
     REG_KEY("TV Frontend", ACTION_PAGELEFT, QT_TRANSLATE_NOOP("MythControls",
-            "Page the program guide left"), ",,<");
+            "Page the program guide left"), ",,<,Ctrl+B,Media Rewind");
     REG_KEY("TV Frontend", ACTION_PAGERIGHT, QT_TRANSLATE_NOOP("MythControls",
-            "Page the program guide right"), ">,.");
+            "Page the program guide right"), ">,.,Ctrl+F,Media Fast Forward");
     REG_KEY("TV Frontend", ACTION_TOGGLEFAV, QT_TRANSLATE_NOOP("MythControls",
             "Toggle the current channel as a favorite"), "?");
     REG_KEY("TV Frontend", ACTION_TOGGLEPGORDER, QT_TRANSLATE_NOOP("MythControls",
@@ -547,13 +547,13 @@ void TV::InitKeys()
     REG_KEY("TV Playback", ACTION_TOGGLEBOOKMARK, QT_TRANSLATE_NOOP("MythControls",
             "Toggle Bookmark"), togBkmKeys);
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
-            "Exit or return to DVD menu"), "Esc");
+            "Exit or return to DVD menu"), "Esc,Back");
     REG_KEY("TV Playback", ACTION_MENUCOMPACT, QT_TRANSLATE_NOOP("MythControls",
             "Playback Compact Menu"), "Alt+M");
     REG_KEY("TV Playback", ACTION_CLEAROSD, QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
     REG_KEY("TV Playback", ACTION_PAUSE, QT_TRANSLATE_NOOP("MythControls",
-            "Pause"), "P,Space");
+            "Pause"), "P,Space,Media Play");
     REG_KEY("TV Playback", ACTION_SEEKFFWD, QT_TRANSLATE_NOOP("MythControls",
             "Fast Forward"), "Right");
     REG_KEY("TV Playback", ACTION_SEEKRWND, QT_TRANSLATE_NOOP("MythControls",
@@ -579,9 +579,9 @@ void TV::InitKeys()
     REG_KEY("TV Playback", ACTION_JUMPBKMRK, QT_TRANSLATE_NOOP("MythControls",
             "Jump to bookmark"), "K");
     REG_KEY("TV Playback", "FFWDSTICKY", QT_TRANSLATE_NOOP("MythControls",
-            "Fast Forward (Sticky) or Forward one second while paused"), ">,.");
+            "Fast Forward (Sticky) or Forward one second while paused"), ">,.,Ctrl+F,Media Fast Forward");
     REG_KEY("TV Playback", "RWNDSTICKY", QT_TRANSLATE_NOOP("MythControls",
-            "Rewind (Sticky) or Rewind one second while paused"), ",,<");
+            "Rewind (Sticky) or Rewind one second while paused"), ",,<,Ctrl+B,Media Rewind");
     REG_KEY("TV Playback", "NEXTSOURCE", QT_TRANSLATE_NOOP("MythControls",
             "Next Video Source"), "Y");
     REG_KEY("TV Playback", "PREVSOURCE", QT_TRANSLATE_NOOP("MythControls",
@@ -591,11 +591,11 @@ void TV::InitKeys()
     REG_KEY("TV Playback", "NEXTCARD", QT_TRANSLATE_NOOP("MythControls",
             "Next Card"), "");
     REG_KEY("TV Playback", "SKIPCOMMERCIAL", QT_TRANSLATE_NOOP("MythControls",
-            "Skip Commercial"), "Z,End");
+            "Skip Commercial"), "Z,End,Media Next");
     REG_KEY("TV Playback", "SKIPCOMMBACK", QT_TRANSLATE_NOOP("MythControls",
-            "Skip Commercial (Reverse)"), "Q,Home");
+            "Skip Commercial (Reverse)"), "Q,Home,Media Previous");
     REG_KEY("TV Playback", ACTION_JUMPSTART, QT_TRANSLATE_NOOP("MythControls",
-            "Jump to the start of the recording."), "Ctrl+B");
+            "Jump to the start of the recording."), "Ctrl+A");
     REG_KEY("TV Playback", "TOGGLEBROWSE", QT_TRANSLATE_NOOP("MythControls",
             "Toggle channel browse mode"), "O");
     REG_KEY("TV Playback", ACTION_TOGGLERECORD, QT_TRANSLATE_NOOP("MythControls",
@@ -835,19 +835,19 @@ void TV::InitKeys()
     REG_KEY("TV Editing", ACTION_CLEARMAP,    QT_TRANSLATE_NOOP("MythControls",
             "Clear editing cut points"), "C,Q,Home");
     REG_KEY("TV Editing", ACTION_INVERTMAP,   QT_TRANSLATE_NOOP("MythControls",
-            "Invert Begin/End cut points"),"I");
+            "Invert Begin/End cut points"),"I,Home Page");
     REG_KEY("TV Editing", ACTION_SAVEMAP,     QT_TRANSLATE_NOOP("MythControls",
             "Save cuts"),"");
     REG_KEY("TV Editing", ACTION_LOADCOMMSKIP,QT_TRANSLATE_NOOP("MythControls",
             "Load cuts from detected commercials"), "Z,End");
     REG_KEY("TV Editing", ACTION_NEXTCUT,     QT_TRANSLATE_NOOP("MythControls",
-            "Jump to the next cut point"), "PgDown");
+            "Jump to the next cut point"), "PgDown,Media Next");
     REG_KEY("TV Editing", ACTION_PREVCUT,     QT_TRANSLATE_NOOP("MythControls",
-            "Jump to the previous cut point"), "PgUp");
+            "Jump to the previous cut point"), "PgUp,Media Previous");
     REG_KEY("TV Editing", ACTION_BIGJUMPREW,  QT_TRANSLATE_NOOP("MythControls",
-            "Jump back 10x the normal amount"), ",,<");
+            "Jump back 10x the normal amount"), ",,<,Ctrl+B,Media Rewind");
     REG_KEY("TV Editing", ACTION_BIGJUMPFWD,  QT_TRANSLATE_NOOP("MythControls",
-            "Jump forward 10x the normal amount"), ">,.");
+            "Jump forward 10x the normal amount"), ">,.,Ctrl+F,Media Fast Forward");
     REG_KEY("TV Editing", ACTION_MENUCOMPACT, QT_TRANSLATE_NOOP("MythControls",
             "Cut point editor compact menu"), "Alt+M");
 

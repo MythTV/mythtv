@@ -799,19 +799,19 @@ static void setupKeys(void)
         "", "", showMiniPlayer, false);
 
     REG_KEY("Music", "NEXTTRACK",  QT_TRANSLATE_NOOP("MythControls",
-        "Move to the next track"),     ">,.,Z,End");
+        "Move to the next track"),     ">,.,Z,End,Media Next");
     REG_KEY("Music", "PREVTRACK",  QT_TRANSLATE_NOOP("MythControls",
-        "Move to the previous track"), ",,<,Q,Home");
+        "Move to the previous track"), ",,<,Q,Home,Media Previous");
     REG_KEY("Music", "FFWD",       QT_TRANSLATE_NOOP("MythControls",
-        "Fast forward"),               "PgDown");
+        "Fast forward"),               "PgDown,Ctrl+F,Media Fast Forward");
     REG_KEY("Music", "RWND",       QT_TRANSLATE_NOOP("MythControls",
-        "Rewind"),                     "PgUp");
+        "Rewind"),                     "PgUp,Ctrl+B,Media Rewind");
     REG_KEY("Music", "PAUSE",      QT_TRANSLATE_NOOP("MythControls",
-        "Pause/Start playback"),       "P");
+        "Pause/Start playback"),       "P,Media Play");
     REG_KEY("Music", "PLAY",       QT_TRANSLATE_NOOP("MythControls",
         "Start playback"),             "");
     REG_KEY("Music", "STOP",       QT_TRANSLATE_NOOP("MythControls",
-        "Stop playback"),              "O");
+        "Stop playback"),              "O,Media Stop");
     REG_KEY("Music", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
         "Volume down"),       "[,{,F10,Volume Down");
     REG_KEY("Music", "VOLUMEUP",   QT_TRANSLATE_NOOP("MythControls",
