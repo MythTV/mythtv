@@ -548,12 +548,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             ServiceListDescriptor services(serv_list);
             if (!authority.IsValid() || !services.IsValid())
                 continue;
-#if 0
-            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-                QString("Found default authority '%1' in BAT for services in nid %2 tid %3")
-                    .arg(authority.DefaultAuthority())
-                    .arg(netid).arg(tsid));
-#endif
+
             for (uint j = 0; j < services.ServiceCount(); ++j)
             {
                 // If the default authority is given in the SDT this
@@ -575,12 +570,12 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 {
     QMutexLocker locker(&m_lock);
-
-    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+#if 0
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
         QString("Got a Service Description Table (other) for Transport ID %1 section %2/%3")
             .arg(tsid).arg(sdt->Section()).arg(sdt->LastSection()));
     LogLines(sdt->toString());
-
+#endif
     m_otherTableTime = std::chrono::milliseconds(m_timer.elapsed()) + m_otherTableTimeout;
 
     uint netid = sdt->OriginalNetworkID();
@@ -1832,17 +1827,35 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
 
         if (!item.m_channels.empty())
         {
+            // Add a MPTS channel which can be used to record the entire transport
+            // stream multiplex. These recordings can be used in stream analyzer software.
             if (addFullTS)
             {
-                /* If addFullTS, then add a 'MPTS' channel
-                   which can be used to record the entire MPTS from
-                   the transport. */
-                dbchan_it = pnum_to_dbchan.begin();
-                ChannelInsertInfo info = *dbchan_it;
+                // Find the first channel that is present in PAT/PMT and use that as
+                // template for the new MPTS channel.
+                ChannelInsertInfo info {};
+                for (auto & channel : pnum_to_dbchan)
+                {
+                    if (channel.m_inPat && channel.m_inPmt)
+                    {
+                        info = channel;
+                        break;
+                    }
+                }
 
-                // Use transport stream ID as (fake) service ID
-                // to use in callsign and as channel number
+                // If we cannot find a valid channel then use the first channel in
+                // the list as template for the new MPTS channel.
+                if (info.m_serviceId == 0)
+                {
+                    dbchan_it = pnum_to_dbchan.begin();
+                    info = *dbchan_it;
+                }
+
+                // Use transport stream ID as (fake) service ID to use in callsign
+                // and as channel number.
                 info.m_serviceId = info.m_sdtTsId ? info.m_sdtTsId : info.m_patTsId;
+                info.m_chanNum = QString("%1").arg(info.m_serviceId);
+                info.m_logicalChannel = info.m_serviceId;
 
                 if (tuner_type == DTVTunerType::kTunerTypeASI)
                 {
