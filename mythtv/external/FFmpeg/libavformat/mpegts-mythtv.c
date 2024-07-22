@@ -57,10 +57,6 @@ typedef struct
     enum AVMediaType   codec_type;
 } pmt_entry_t;
 
-#define PMT_NOT_YET_FOUND 0
-#define PMT_NOT_IN_PAT    1
-#define PMT_FOUND         2
-
 typedef struct SectionContext {
     int pid;
     int stream_type;
@@ -186,16 +182,6 @@ struct MpegTSContext {
     int64_t cur_pcr;    /**< used to estimate the exact PCR */
     int64_t pcr_incr;   /**< used to estimate the exact PCR */
 
-    // MythTV only
-    /** if set, stop_parse is set when PAT/PMT is found      */
-    int scanning;
-    /** set to PMT_NOT_IN_PAT in pat_cb when scanning is true
-     *  and the MPEG program number "req_sid" is not found in PAT;
-     *  set to PMT_FOUND when a PMT with a the "req_sid" program
-     *  number is found. */
-    int pmt_scan_state;
-    // end MythTV only
-
     /* data needed to handle file based ts */
     /** stop parsing loop */
     int stop_parse;
@@ -230,9 +216,6 @@ struct MpegTSContext {
     AVBufferPool* pools[32];
 
     // MythTV only
-    /** MPEG program number of stream we want to decode      */
-    int req_sid;
-
     /** number of streams in the last PMT seen */
     int pid_cnt;
     /** list of streams in the last PMT seen */
@@ -2684,16 +2667,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x sec_num=%d/%d version=%d tid=%d\n",
             h->id, h->sec_num, h->last_sec_num, h->version, h->tid);
 
-    // begin MythTV
-    /* if we require a specific PMT, and this isn't it return silently */
-    if (ts->req_sid >= 0 && h->id != ts->req_sid)
-    {
-        av_log(ts->stream, AV_LOG_TRACE, "We are looking for program 0x%x, not 0x%x",
-               ts->req_sid, h->id);
-         return;
-    }
-    // end MythTV
-
     if (!ts->scan_all_pmts && ts->skip_changes)
         return;
 
@@ -2958,13 +2931,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             avctx->streams_changed(avctx->stream_change_data);
         }
     }
-
-    /* if we are scanning, tell scanner we found the PMT */
-    if (ts->scanning)
-    {
-        ts->pmt_scan_state = PMT_FOUND;
-        ts->stop_parse = 1;
-    }
     // end MythTV
 
     if (!ts->pids[pcr_pid])
@@ -3034,8 +3000,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int nb_prg = 0;
     AVProgram *program;
 
-    int found = 0; // MythTV added
-
     av_log(ts->stream, AV_LOG_TRACE, "PAT:\n");
     hex_dump_debug(ts->stream, section, section_len);
 
@@ -3068,18 +3032,12 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
         av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
         // begin MythTV
-        av_log(ts->stream, AV_LOG_TRACE, "req_sid=0x%x\n", ts->req_sid);
-
         if (pmt_pid <= 0x000F || pmt_pid >= 0x1FFF)
         {
             av_log(ts->stream, AV_LOG_ERROR, "Invalid PAT ignored "
-                   "MPEG Program Number=0x%x pid=0x%x req_sid=0x%x\n",
-                   sid, pmt_pid, ts->req_sid);
+                   "MPEG Program Number=0x%x pid=0x%x\n", sid, pmt_pid);
             return;
         }
-
-        if (sid == ts->req_sid)
-            found = 1;
         // end MythTV
 
         if (sid == 0x0000) {
@@ -3124,25 +3082,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             if (i==ts->nb_prg && !ts->skip_clear)
                 clear_avprogram(ts, ts->stream->programs[j]->id);
         }
-    }
-
-    /* if we are scanning for any PAT and not a particular PMT,
-     * tell parser it is safe to quit. */
-    if (ts->req_sid < 0 && ts->scanning)
-    {
-        av_log(ts->stream, AV_LOG_TRACE, "Found PAT, ending scan\n");
-        ts->stop_parse = 1;
-    }
-
-    /* if we are looking for a particular MPEG program number,
-     * and it is not in this PAT indicate this in "pmt_scan_state"
-     * and tell parser it is safe to quit. */
-    if (ts->req_sid >= 0 && !found)
-    {
-        av_log(ts->stream, AV_LOG_TRACE, "Program 0x%x is not in PAT, ending scan\n",
-               ts->req_sid);
-        ts->pmt_scan_state = PMT_NOT_IN_PAT;
-        ts->stop_parse = 1;
     }
 }
 
@@ -3654,13 +3593,6 @@ static int mpegts_read_header(AVFormatContext *s)
         /* first do a scan to get all the services */
         seek_back(s, pb, pos);
 
-        // begin MythTV
-        /* we don't want any PMT pid filters created on first pass */
-        ts->req_sid = -1;
-
-        ts->scanning = 1;
-        // end MythTV
-
         mpegts_open_section_filter(ts, SDT_PID, sdt_cb, ts, 1);
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
         mpegts_open_section_filter(ts, EIT_PID, eit_cb, ts, 1);
@@ -3671,62 +3603,57 @@ static int mpegts_read_header(AVFormatContext *s)
         ts->auto_guess = 1;
 
         // begin MythTV
-        ts->scanning = 1;
-        ts->pmt_scan_state = PMT_NOT_YET_FOUND;
-        /* tune to first service found */
-        for (int i = 0; ((i < ts->nb_prg) &&
-                     (ts->pmt_scan_state == PMT_NOT_YET_FOUND)); i++)
         {
-            int sid = ts->req_sid;
-            av_log(ts->stream, AV_LOG_TRACE, "Tuning to pnum: 0x%x\n",
-                   ts->prg[i].id);
+        int i = 0;
+        /* tune to first service found */
+        for (i = 0; (i < ts->nb_prg) && !ts->prg[i].pmt_found; i++)
+            ;
+        if (i == ts->nb_prg)
+            i = 0;
+        for (; (i < ts->nb_prg) && !ts->prg[i].pmt_found; i++)
+        {
+            MpegTSFilter *pmt_filter = NULL;
+            if (ts->prg[i].nb_pids > 0)
+                pmt_filter = ts->pids[ts->prg[i].pids[0]];
 
-            /* now find the info for the first service if we found any,
-               otherwise try to filter all PATs */
-
-            avio_seek(pb, pos, SEEK_SET);
-            ts->req_sid = ts->prg[i].id;
-            handle_packets(ts, probesize / ts->raw_packet_size);
+            if (pmt_filter == NULL)
+                continue;
 
             /* fallback code to deal with broken streams from
              * DBOX2/Firewire cable boxes. */
-            if (ts->pids[sid] &&
-                (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
+            if (!ts->prg[i].pmt_found)
             {
                 av_log(ts->stream, AV_LOG_ERROR,
                        "Tuning to pnum: 0x%x without CRC check on PMT\n",
                        ts->prg[i].id);
                 /* turn off crc checking */
-                ts->pids[sid]->u.section_filter.check_crc = 0;
+                pmt_filter->u.section_filter.check_crc = 0;
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
-                ts->req_sid = ts->prg[i].id;
                 handle_packets(ts, probesize / ts->raw_packet_size);
             }
 
             /* fallback code to deal with streams that are not complete PMT
              * streams (BBC iPlayer IPTV as an example) */
-            if (ts->pids[sid] &&
-                (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
+            if (!ts->prg[i].pmt_found)
             {
                 av_log(ts->stream, AV_LOG_ERROR,
                        "Overriding PMT data length, using "
                        "contents of first TS packet only!\n");
-                ts->pids[sid]->pmt_chop_at_ts = 1;
+                pmt_filter->pmt_chop_at_ts = 1;
                 /* try again */
                 avio_seek(pb, pos, SEEK_SET);
-                ts->req_sid = ts->prg[i].id;
                 handle_packets(ts, probesize / ts->raw_packet_size);
             }
         }
-        ts->scanning = 0;
 
         /* if we could not find any PMTs, fail */
-        if (ts->pmt_scan_state == PMT_NOT_YET_FOUND)
+        if (ts->nb_prg == 0 || (i == ts->nb_prg && !ts->prg[ts->nb_prg - 1].pmt_found))
         {
             av_log(ts->stream, AV_LOG_ERROR,
                    "mpegts_read_header: could not find any PMT's\n");
             return -1;
+        }
         }
         // end MythTV
 
