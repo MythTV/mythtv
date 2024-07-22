@@ -145,7 +145,6 @@ struct Stream {
 #define MAX_PIDS_PER_PROGRAM (MAX_STREAMS_PER_PROGRAM + 2)
 struct Program {
     unsigned int id; // program id/service id
-    unsigned int pid; // PMT PID (not in upstream), only used in add_pat_entry() and is_pat_same()
     unsigned int nb_pids;
     unsigned int pids[MAX_PIDS_PER_PROGRAM];
     unsigned int nb_streams;
