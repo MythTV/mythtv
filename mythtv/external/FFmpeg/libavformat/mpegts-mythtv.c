@@ -3070,7 +3070,7 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         // begin MythTV
         av_log(ts->stream, AV_LOG_TRACE, "req_sid=0x%x\n", ts->req_sid);
 
-        if (pmt_pid == 0x0)
+        if (pmt_pid <= 0x000F || pmt_pid >= 0x1FFF)
         {
             av_log(ts->stream, AV_LOG_ERROR, "Invalid PAT ignored "
                    "MPEG Program Number=0x%x pid=0x%x req_sid=0x%x\n",
