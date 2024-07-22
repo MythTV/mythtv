@@ -662,6 +662,7 @@
             "col_callsign": "Call Sign",
             "col_channum": "Chan Num",
             "col_freqid": "Freq Id",
+            "col_icon": "Icon",
             "col_name": "Name",
             "col_priority": "Priority",
             "col_source": "Source",
