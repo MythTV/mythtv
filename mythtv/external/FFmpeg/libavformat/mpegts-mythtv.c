@@ -130,12 +130,6 @@ struct MpegTSFilter {
     int64_t last_pcr;
     int discard;
     enum MpegTSFilterType type;
-    /** if set, chop off PMT at the end of the TS packet, regardless of the
-     *  data length given in the packet.  This is for use by BBC iPlayer IPTV
-     *  recordings which seem to only want to send the first packet of the PMT
-     *  but give a length that requires 3 packets.  Without this, those
-     *  recordings are unplayable */
-    int pmt_chop_at_ts; // MythTV
     union {
         MpegTSPESFilter pes_filter;
         MpegTSSectionFilter section_filter;
@@ -528,24 +522,9 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
             offset += tss->section_h_size;
             tss->section_h_size = -1;
         } else {
-            // MythTV if; originally from: Deal with incomplete PMT streams in BBC iPlayer IPTV
-            // https://github.com/MythTV/mythtv/commit/c11ee69c81198dc221c874e8132f1f30a385fa63
-            // references https://code.mythtv.org/trac/ticket/9926 issue not in upstream!
-            if (tss1->pmt_chop_at_ts && tss->section_buf[0] == PMT_TID)
-            {
-                /* HACK!  To allow BBC IPTV streams with incomplete PMTs (they
-                 * advertise a length of 383, but only send 182 bytes!), we
-                 * will not wait for the remainder of the PMT, but accept just
-                 * what is in the first TS payload, as this is enough to get
-                 * playback, although some PIDs may be filtered out as a result
-                 */
-                tss->section_h_size = tss->section_index;
-            }
-            else { // upstream follows:
             tss->section_h_size = -1;
             tss->end_of_section_reached = 0;
             break;
-            } // end MythTV if
         }
     }
 }
@@ -590,12 +569,6 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
         av_free(section_buf);
         return NULL;
     }
-
-    // MythTV Deal with incomplete PMT streams in BBC iPlayer IPTV
-    // https://github.com/MythTV/mythtv/commit/c11ee69c81198dc221c874e8132f1f30a385fa63
-    filter->pmt_chop_at_ts = 0;
-    // end MythTV
-
     sec = &filter->u.section_filter;
     sec->section_cb  = section_cb;
     sec->opaque      = opaque;
@@ -3601,61 +3574,6 @@ static int mpegts_read_header(AVFormatContext *s)
         /* if could not find service, enable auto_guess */
 
         ts->auto_guess = 1;
-
-        // begin MythTV
-        {
-        int i = 0;
-        /* tune to first service found */
-        for (i = 0; (i < ts->nb_prg) && !ts->prg[i].pmt_found; i++)
-            ;
-        if (i == ts->nb_prg)
-            i = 0;
-        for (; (i < ts->nb_prg) && !ts->prg[i].pmt_found; i++)
-        {
-            MpegTSFilter *pmt_filter = NULL;
-            if (ts->prg[i].nb_pids > 0)
-                pmt_filter = ts->pids[ts->prg[i].pids[0]];
-
-            if (pmt_filter == NULL)
-                continue;
-
-            /* fallback code to deal with broken streams from
-             * DBOX2/Firewire cable boxes. */
-            if (!ts->prg[i].pmt_found)
-            {
-                av_log(ts->stream, AV_LOG_ERROR,
-                       "Tuning to pnum: 0x%x without CRC check on PMT\n",
-                       ts->prg[i].id);
-                /* turn off crc checking */
-                pmt_filter->u.section_filter.check_crc = 0;
-                /* try again */
-                avio_seek(pb, pos, SEEK_SET);
-                handle_packets(ts, probesize / ts->raw_packet_size);
-            }
-
-            /* fallback code to deal with streams that are not complete PMT
-             * streams (BBC iPlayer IPTV as an example) */
-            if (!ts->prg[i].pmt_found)
-            {
-                av_log(ts->stream, AV_LOG_ERROR,
-                       "Overriding PMT data length, using "
-                       "contents of first TS packet only!\n");
-                pmt_filter->pmt_chop_at_ts = 1;
-                /* try again */
-                avio_seek(pb, pos, SEEK_SET);
-                handle_packets(ts, probesize / ts->raw_packet_size);
-            }
-        }
-
-        /* if we could not find any PMTs, fail */
-        if (ts->nb_prg == 0 || (i == ts->nb_prg && !ts->prg[ts->nb_prg - 1].pmt_found))
-        {
-            av_log(ts->stream, AV_LOG_ERROR,
-                   "mpegts_read_header: could not find any PMT's\n");
-            return -1;
-        }
-        }
-        // end MythTV
 
         av_log(ts->stream, AV_LOG_TRACE, "tuning done\n");
 
