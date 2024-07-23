@@ -1,7 +1,7 @@
 <h2>{{ 'settings.chanedit.title' | translate }}</h2>
 <div class="block card w-full" style="height: 90vh" *ngIf="(chansLoaded && transDone >= numTranslations) else loading">
     <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true"
-        styleClass="p-datatable-sm" [rowHover]="true" (onFilter)="onFilter($event)"
+        styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" (onFilter)="onFilter($event)"
         responsiveLayout="scroll" sortField="ChanSeq">
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
@@ -40,7 +40,7 @@
                 <th style="width:  6%">{{ 'settings.chanedit.col_priority' | translate }}</th>
                 <th style="width:  10%">{{ 'settings.chanedit.col_visibility' | translate }}</th>
                 <th style="width:  6%">{{ 'settings.chanedit.col_useeit' | translate }}</th>
-                <th style="width:  7%" style="white-space: nowrap;">
+                <th style="width:  7%; white-space: nowrap;">
                     <!-- These are disabled buttons to ensure the spacing of the heading
                          matches the spacing of the rows -->
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>

@@ -442,7 +442,6 @@ export class ChannelEditorComponent implements OnInit {
     else
       // delete channel
       this.channelOperation = -1;
-    console.log("Delete " + channel.ChanId)
     this.channelService.RemoveDBChannel(channel.ChanId).subscribe(this.saveObserver);
   }
 
