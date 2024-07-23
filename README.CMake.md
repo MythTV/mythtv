@@ -65,7 +65,6 @@
   that they don't have to be compiled as part of building MythTV.
   These are:
 
-  - mingw64-fftw
   - mingw64-flac
   - mingw64-fontconfig
   - mingw64-freetype

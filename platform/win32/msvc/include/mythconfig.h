@@ -1563,7 +1563,6 @@
 #define CONFIG_LIBCEC 0
 #define CONFIG_LIBCRYPTO 0
 #define CONFIG_LIBDNS_SD 1
-#define CONFIG_LIBFFTW3 1
 #define CONFIG_LIBMPEG2EXTERNAL 1
 #define CONFIG_LIBXML2 1
 #define CONFIG_LIBUDF 0
@@ -1580,6 +1579,6 @@
 #define CONFIG_X11 1
 #define CONFIG_XRANDR 0
 #define CONFIG_XV 0
-#define MYTH_BUILD_CONFIG " debug use_hidesyms using_alsa using_oss using_pulse using_pulseoutput using_backend using_bindings_php using_dvb using_frontend using_hdhomerun using_ceton using_hdpvr using_ivtv using_joystick_menu using_libdns_sd using_libfftw3 using_libxml2 using_lirc using_mheg using_opengl using_opengl_video using_qtscript using_qtdbus using_sdl using_taglib using_bindings_php using_mythtranscode using_opengl using_ffmpeg_threads using_mheg using_libxml2"
+#define MYTH_BUILD_CONFIG " debug use_hidesyms using_alsa using_oss using_pulse using_pulseoutput using_backend using_bindings_php using_dvb using_frontend using_hdhomerun using_ceton using_hdpvr using_ivtv using_joystick_menu using_libdns_sd using_libxml2 using_lirc using_mheg using_opengl using_opengl_video using_qtscript using_qtdbus using_sdl using_taglib using_bindings_php using_mythtranscode using_opengl using_ffmpeg_threads using_mheg using_libxml2"
 
 #endif /* MYTHTV_CONFIG_H */

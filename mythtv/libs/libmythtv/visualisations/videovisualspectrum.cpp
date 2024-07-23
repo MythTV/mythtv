@@ -5,7 +5,7 @@
 #include "videovisualspectrum.h"
 
 // FFmpeg
-static constexpr int FFTW_N { 512 };
+static constexpr int k_FFT_sample_length { 512 };
 
 // Std
 #include <algorithm>
@@ -13,10 +13,10 @@ static constexpr int FFTW_N { 512 };
 VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer* Audio, MythRender* Render)
   : VideoVisual(Audio, Render)
 {
-    m_dftL = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
-    m_dftR = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * FFTW_N));
+    m_dftL = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * k_FFT_sample_length));
+    m_dftR = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * k_FFT_sample_length));
 
-    m_fftContextForward = av_fft_init(std::log2(FFTW_N), 0);
+    m_fftContextForward = av_fft_init(std::log2(k_FFT_sample_length), 0);
 }
 
 VideoVisualSpectrum::~VideoVisualSpectrum()
@@ -55,7 +55,7 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
         }
     }
 
-    for (auto k = i; k < FFTW_N; k++)
+    for (auto k = i; k < k_FFT_sample_length; k++)
     {
         m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
         m_dftL[k] = (FFTComplex){ .re = 0, .im = 0 };
@@ -162,7 +162,7 @@ bool VideoVisualSpectrum::InitialisePriv()
     for (int i = 0, x = m_area.left(); i < m_rects.size(); i++, x+= m_barWidth)
         m_rects[i].setRect(x, y, m_barWidth - 1, 1);
 
-    m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0) / log(static_cast<double>(FFTW_N));
+    m_scaleFactor = (static_cast<double>(m_area.height()) / 2.0) / log(static_cast<double>(k_FFT_sample_length));
     m_falloff = static_cast<double>(m_area.height()) / 150.0;
 
     LOG(VB_GENERAL, LOG_INFO, DESC + QString("Initialised Spectrum with %1 bars").arg(m_scale.range()));

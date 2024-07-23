@@ -147,7 +147,6 @@ set(FILENAME_BASES
 
     # Libs we didn't have to compile
     crypto # openssl
-    fftw
     flac
     fontconfig
     freetype
