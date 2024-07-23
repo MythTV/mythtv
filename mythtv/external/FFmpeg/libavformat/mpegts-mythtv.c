@@ -49,14 +49,6 @@
 
 // MythTV only -----------------------------------------------------------------
 
-typedef struct
-{
-    int pid;
-    int type;
-    enum AVCodecID       codec_id;
-    enum AVMediaType   codec_type;
-} pmt_entry_t;
-
 typedef struct SectionContext {
     int pid;
     int stream_type;
@@ -65,12 +57,6 @@ typedef struct SectionContext {
     AVFormatContext *stream;
     AVStream *st;
 } SectionContext;
-
-/** maximum number of PMT's we expect to be described in a PAT */
-#define PAT_MAX_PMT 128
-
-/** maximum number of streams we expect to be described in a PMT */
-#define PMT_PIDS_MAX 256
 
 // end MythTV only -------------------------------------------------------------
 
@@ -147,6 +133,7 @@ struct Program {
     unsigned int id; // program id/service id
     unsigned int nb_pids;
     unsigned int pids[MAX_PIDS_PER_PROGRAM];
+    uint8_t      stream_types[MAX_PIDS_PER_PROGRAM]; // stream_type for pid at same index in pids
     unsigned int nb_streams;
     struct Stream streams[MAX_STREAMS_PER_PROGRAM];
 
@@ -207,13 +194,6 @@ struct MpegTSContext {
 
     AVStream *epg_stream;
     AVBufferPool* pools[32];
-
-    // MythTV only
-    /** number of streams in the last PMT seen */
-    int pid_cnt;
-    /** list of streams in the last PMT seen */
-    int pmt_pids[PMT_PIDS_MAX];
-    // end MythTV only
 };
 
 #define MPEGTS_OPTIONS \
@@ -364,7 +344,8 @@ static struct Program * add_program(MpegTSContext *ts, unsigned int programid)
     return p;
 }
 
-static void add_pid_to_program(struct Program *p, unsigned int pid)
+// MythTV function
+static void add_pmt_entry_to_program(struct Program *p, unsigned int pid, uint8_t stream_type)
 {
     int i;
     if (!p)
@@ -377,7 +358,13 @@ static void add_pid_to_program(struct Program *p, unsigned int pid)
         if (p->pids[i] == pid)
             return;
 
+    p->stream_types[p->nb_pids] = stream_type;
     p->pids[p->nb_pids++] = pid;
+}
+
+static void add_pid_to_program(struct Program *p, unsigned int pid)
+{
+    add_pmt_entry_to_program(p, pid, 0);
 }
 
 static void update_av_program_info(AVFormatContext *s, unsigned int programid,
@@ -2384,43 +2371,6 @@ static int is_pes_stream(int stream_type, uint32_t prog_reg_desc)
 }
 
 // begin MythTV only -------------------------------------------------------
-static int find_in_list(const int *pids, int pid)
-{
-    int i;
-    for (i=0; i<PMT_PIDS_MAX; i++)
-        if (pids[i]==pid)
-            return i;
-    return -1;
-}
-
-static int is_desired_stream(enum AVMediaType codec_type, enum AVCodecID codec_id)
-{
-    int val = 0;
-    switch (codec_type)
-    {
-        case AVMEDIA_TYPE_VIDEO:
-        case AVMEDIA_TYPE_AUDIO:
-        case AVMEDIA_TYPE_SUBTITLE:
-            val = 1;
-            break;
-        case AVMEDIA_TYPE_DATA:
-            switch (codec_id)
-            {
-                case AV_CODEC_ID_DSMCC_B:
-                case AV_CODEC_ID_DVB_VBI:
-                    val = 1;
-                    break;
-                default:
-                    break;
-            }
-            break;
-        default:
-            /* we ignore the other streams */
-            break;
-    }
-    return val;
-}
-
 static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
 {
     MpegTSFilter *tss = ts->pids[pid];
@@ -2449,118 +2399,40 @@ static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream
     return sect;
 }
 
-static void mpegts_remove_stream(MpegTSContext *ts, int pid)
+static int is_pmt_equal(const struct Program *new, const struct Program *old)
 {
-    int indx = -1;
-    av_log(ts, AV_LOG_DEBUG, "mpegts_remove_stream 0x%x\n", pid);
-    if (ts->pids[pid])
-    {
-        av_log(ts, AV_LOG_DEBUG, "closing filter for pid 0x%x\n", pid);
-        mpegts_close_filter(ts, ts->pids[pid]);
-    }
-    indx = find_in_list(ts->pmt_pids, pid);
-    if (indx >= 0)
-    {
-        memmove(ts->pmt_pids+indx, ts->pmt_pids+indx+1, PMT_PIDS_MAX-indx-1);
-        ts->pmt_pids[PMT_PIDS_MAX-1] = 0;
-        ts->pid_cnt--;
-    }
-    else
-    {
-        av_log(ts, AV_LOG_DEBUG, "ERROR: closing filter for pid 0x%x, indx = %i\n", pid, indx);
-    }
-}
+    const int offset = 2; // Program::pids[0] is pmt_pid, [1] is pcr_pid
+    int i = offset;
 
-static void mpegts_cleanup_streams(MpegTSContext *ts)
-{
-    int i;
-    int orig_pid_cnt = ts->pid_cnt;
-    for (i=0; i<ts->pid_cnt; i++)
+    if (new->nb_pids != old->nb_pids)
     {
-        if (!ts->pids[ts->pmt_pids[i]])
+        return 0;
+    }
+    if (new->nb_pids <= offset)
+    {
+        return 1;
+    }
+    for (; i < old->nb_pids; i++)
+    {
+        int j = offset;
+        for (; j < new->nb_pids; j++)
         {
-            mpegts_remove_stream(ts, ts->pmt_pids[i]);
-            i--;
+            if (new->pids[j] == old->pids[i])
+            {
+                break;
+            }
         }
-    }
-    if (orig_pid_cnt != ts->pid_cnt)
-    {
-        av_log(ts, AV_LOG_DEBUG,
-               "mpegts_cleanup_streams: pid_cnt bfr %d aft %d\n",
-               orig_pid_cnt, ts->pid_cnt);
-    }
-}
-
-// Find number of equal streams in old and new pmt starting at 0
-// and stopping at the first different stream.
-static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
-                             pmt_entry_t* items, int item_cnt)
-{
-    int limit = mpegts_ctx->pid_cnt < item_cnt ? mpegts_ctx->pid_cnt : item_cnt;
-    int idx;
-
-    for (idx = 0; idx < limit; idx++)
-    {
-        MpegTSFilter *tss;
-        /* check for pid */
-        int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
-        if (loc < 0)
+        if (j == new->nb_pids)
         {
-            av_log(mpegts_ctx, AV_LOG_TRACE,
-                   "find_in_list(..,[%d].pid=%d) => -1\n",
-                   idx, items[idx].pid);
             break;
         }
 
-        /* check stream type */
-        tss = mpegts_ctx->pids[items[idx].pid];
-        if (!tss)
+        if (new->stream_types[j] != old->stream_types[i])
         {
-            av_log(mpegts_ctx, AV_LOG_TRACE,
-                   "mpegts_ctx->pids[items[%d].pid=%d] => null\n",
-                   idx, items[idx].pid);
-            break;
-        }
-        if (tss->type == MPEGTS_PES)
-        {
-            PESContext *pes = (PESContext*) tss->u.pes_filter.opaque;
-            if (!pes)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE, "pes == null, where idx %d\n", idx);
-                break;
-            }
-            if (pes->stream_type != items[idx].type)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE,
-                       "pes->stream_type != items[%d].type\n", idx);
-                break;
-            }
-        }
-        else if (tss->type == MPEGTS_SECTION)
-        {
-            SectionContext *sect = (SectionContext*) tss->u.section_filter.opaque;
-            if (!sect)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE, "sect == null, where idx %d\n", idx);
-                break;
-            }
-            if (sect->stream_type != items[idx].type)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE,
-                       "sect->stream_type != items[%d].type\n", idx);
-                break;
-            }
-        }
-        else
-        {
-            av_log(mpegts_ctx, AV_LOG_TRACE,
-                   "tss->type != MPEGTS_PES, where idx %d\n", idx);
             break;
         }
     }
-    av_log(mpegts_ctx, AV_LOG_TRACE, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
-        idx, mpegts_ctx->pid_cnt, item_cnt, limit);
-    return idx;
+    return i == new->nb_pids;
 }
 
 /**
@@ -2607,20 +2479,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int mp4_descr_count = 0;
     Mp4Descr mp4_descr[MAX_MP4_DESCR_COUNT] = { { 0 } };
     int i;
-
-    // MythTV
-    int equal_streams = 0;
-    int last_item = 0;
-
-    pmt_entry_t items[PMT_PIDS_MAX];
-    memset(&items, 0, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
-
-    // initialize to codec_type_unknown
-    for (int i=0; i < PMT_PIDS_MAX; i++)
-        items[i].codec_type = AVMEDIA_TYPE_UNKNOWN;
-
-    mpegts_cleanup_streams(ts); /* in case someone else removed streams.. */
-    // end MythTV
 
     av_log(ts->stream, AV_LOG_TRACE, "PMT: len %i\n", section_len);
     hex_dump_debug(ts->stream, section, section_len);
@@ -2834,7 +2692,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         if (pes && !pes->stream_type)
             mpegts_set_stream_info(st, pes, stream_type, prog_reg_desc);
 
-        add_pid_to_program(prg, pid);
+        add_pmt_entry_to_program(prg, pid, stream_type); // MythTV
         if (prg) {
             prg->streams[i].idx = st->index;
             prg->streams[i].stream_identifier = stream_identifier;
@@ -2864,16 +2722,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             }
         }
         p = desc_list_end;
-
-        // MythTV only
-        if (is_desired_stream(st->codecpar->codec_type, st->codecpar->codec_id)) {
-            items[last_item].pid        = pid;
-            items[last_item].type       = stream_type;
-            items[last_item].codec_id   = st->codecpar->codec_id;
-            items[last_item].codec_type = st->codecpar->codec_type;
-            last_item++;
-        }
-        // end MythTV only
     }
 
     // begin MythTV
@@ -2882,26 +2730,12 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     av_log(ts->stream, AV_LOG_TRACE, "exporting PMT\n");
     export_pmt(ts->stream, section, section_len);
 
-    /* if the pmt has changed delete old streams,
-     * create new ones, and notify any listener.
-     */
-    equal_streams = pmt_equal_streams(ts, items, last_item);
-    if (equal_streams != last_item || ts->pid_cnt != last_item)
+    /* if the pmt has changed, notify stream_changed listener */
+    if (ts->stream->streams_changed != NULL && prg != NULL &&
+        !is_pmt_equal(prg, &old_program))
     {
-        AVFormatContext *avctx = ts->stream;
-
-        for (int i = 0; i < last_item; i++)
-        {
-            ts->pmt_pids[i] = items[i].pid;
-        }
-        ts->pid_cnt = last_item;
-
-        /* notify stream_changed listeners */
-        if (avctx->streams_changed)
-        {
-            av_log(ts->stream, AV_LOG_DEBUG, "streams_changed()\n");
-            avctx->streams_changed(avctx->stream_change_data);
-        }
+        av_log(ts->stream, AV_LOG_DEBUG, "streams_changed()\n");
+        ts->stream->streams_changed(ts->stream->stream_change_data);
     }
     // end MythTV
 
