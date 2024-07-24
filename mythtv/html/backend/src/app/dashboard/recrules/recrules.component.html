@@ -1,8 +1,9 @@
 <h2>{{ 'dashboard.recrules.heading' | translate }}</h2>
 <div class="block card w-full" style="height: 90vh" *ngIf="rulesLoaded else loading">
-    <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
+    <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped p-datatable-sm"
         [rowHover]="true" responsiveLayout="scroll" sortField="Title">
         <ng-template pTemplate="caption">
+            <!-- Buttons at top -->
             <button pButton pRipple label="{{ 'dashboard.recrules.new_recrule' | translate }}" icon="pi pi-plus"
                 class="p-button-success mr-2" (click)="newRecRule()"></button>
             <button pButton pRipple label="{{ 'dashboard.recrules.new_teplate' | translate }}"
@@ -10,26 +11,27 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th style="flex-basis: 20%" class="p-1" pSortableColumn="Title">
+                <!-- Row Headings -->
+                <th style="width: 20%" class="p-1" pSortableColumn="Title">
                     {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
-                <th style="flex-basis: 20%" class="p-1">{{ 'dashboard.recrule.type' | translate
+                <th style="width: 19%" class="p-1">{{ 'dashboard.recrule.type' | translate
                     }}</th>
-                <th style="flex-basis: 10%" class="p-1">{{ 'common.priority' | translate
+                <th style="width: 9%" class="p-1">{{ 'common.priority' | translate
                     }}</th>
-                <th style="flex-basis: 10%" class="p-1">
+                <th style="width: 9%" class="p-1">
                     {{ 'dashboard.recordings.recgrp' | translate }}
                 </th>
-                <th style="flex-basis: 10%" class="p-1">
+                <th style="width: 9%" class="p-1">
                     {{ 'dashboard.recrules.storgrp' | translate }}
                 </th>
-                <th style="flex-basis: 10%" class="justify-content-end pr-5" pSortableColumn="LastRecorded">
+                <th style="width: 9%" class="justify-content-end pr-5" pSortableColumn="LastRecorded">
                     {{ 'dashboard.recrules.lastrec' | translate }}<p-sortIcon field="LastRecorded"></p-sortIcon>
                 </th>
-                <th style="flex-basis: 15%" class="justify-content-end pr-5" pSortableColumn="NextRecording">
+                <th style="width: 14%" class="justify-content-end pr-5" pSortableColumn="NextRecording">
                     {{ 'dashboard.recrules.nextrec' | translate }}<p-sortIcon field="NextRecording"></p-sortIcon>
                 </th>
-                <th style="flex-basis: 5%" class="p-1">Active</th>
-                <th style="flex-basis: 6%" class="p-1">
+                <th style="width: 5%" class="p-1">Active</th>
+                <th style="width: 6%" class="pt-1 pb-0">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
                         [disabled]="true"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
@@ -39,24 +41,24 @@
         </ng-template>
         <ng-template pTemplate="body" let-recrule>
             <tr>
-                <td style="flex-basis: 20%" class="p-1 overflow-hidden">
+                <td  class="p-1 overflow-hidden">
                     {{recrule.Title}}</td>
-                <td style="flex-basis: 20%" class="p-1">
+                <td  class="p-1">
                     {{ utility.recTypeTrans[recrule.Type]}}</td>
-                <td style="flex-basis: 10%" class="p-1">{{recrule.RecPriority}}</td>
-                <td style="flex-basis: 10%" class="p-1">{{recrule.RecGroup}}</td>
-                <td style="flex-basis: 10%" class="p-1">{{recrule.StorageGroup}}</td>
-                <td style="flex-basis: 10%" class="justify-content-end p-1 pr-5">
+                <td  class="p-1">{{recrule.RecPriority}}</td>
+                <td  class="p-1">{{recrule.RecGroup}}</td>
+                <td  class="p-1">{{recrule.StorageGroup}}</td>
+                <td  class="justify-content-end p-1 pr-5">
                     {{utility.formatDate(recrule.LastRecorded)}}</td>
-                <td style="flex-basis: 15%" class="justify-content-end p-1 pr-5">
+                <td  class="justify-content-end p-1 pr-5">
                     {{utility.formatDate(recrule.NextRecording)}} {{utility.formatTime(recrule.NextRecording)}}</td>
-                <td style="flex-basis: 5%" class="p-1">
+                <td  class="pt-1 pb-0">
                     <i class="pi pi-times text-pink-500" *ngIf="recrule.Inactive else checkmark"></i>
                     <ng-template #checkmark>
                         <i class="pi pi-check text-green-500"></i>
                     </ng-template>
                 </td>
-                <td style="flex-basis: 6%" class="p-1">
+                <td  class="pt-1 pb-0"  style="white-space: nowrap;">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-primary"
                         (click)="updateRecRule(recrule)" pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
                         tooltipPosition="left"></button>
