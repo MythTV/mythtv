@@ -372,10 +372,11 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
             bool duplicate = false;
             for (int back = n-1 ; back >= 0 ; back--) {
                 auto prior = progList[back];
-                if (prior != nullptr)
+                if (prior != nullptr) {
                     if (pInfo -> GetTitle() == prior -> GetTitle()) {
                         duplicate = true;
                         break;
+                    }
                 }
             }
             if (duplicate)
