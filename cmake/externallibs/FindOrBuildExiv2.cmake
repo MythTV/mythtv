@@ -13,8 +13,8 @@
 #
 # A comment from 2023-01-18 in a github Exiv issue #2406 discussing releases:
 #
-#   Dear folks, Exiv2 v0.27.6 has been released!  I'll start working on the v1.0.0
-#   major release based on 9ca161d.
+# Dear folks, Exiv2 v0.27.6 has been released!  I'll start working on the v1.0.0
+# major release based on 9ca161d.
 #
 # However, Exiv2 v0.28 was released with C++17 support included, so we can use
 # that version if the distro includes it.
