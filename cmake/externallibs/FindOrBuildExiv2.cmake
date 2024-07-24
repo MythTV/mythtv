@@ -20,9 +20,9 @@
 # that version if the distro includes it.
 #
 function(find_or_build_exiv2)
-  pkg_check_modules(EXIV2 "exiv2>=0.28" QUIET IMPORTED_TARGET)
+  pkg_check_modules(EXIV2 "exiv2>=0.28" IMPORTED_TARGET)
   if(NOT EXIV2_FOUND)
-    pkg_check_modules(EXIV2 "mythexiv2>=0.28" QUIET IMPORTED_TARGET)
+    pkg_check_modules(EXIV2 "mythexiv2>=0.28" IMPORTED_TARGET)
   endif()
   if(TARGET PkgConfig::EXIV2)
     message(STATUS "Found Exiv2 ${EXIV2_VERSION} ${EXIV2_LINK_LIBRARIES}")
