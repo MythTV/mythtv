@@ -7,6 +7,7 @@
         <div style="height: 90vh">
             <p-table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
                 [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm" [virtualScroll]="true"
+                [virtualScrollItemSize]="42"
                 [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true" sortField="StartTime">
 
                 <ng-template pTemplate="caption">
@@ -15,7 +16,7 @@
                             [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
                     <ng-template #refreshBn>
                         <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                            (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                            (click)="full_refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
                         &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
                     </ng-template>
                 </ng-template>

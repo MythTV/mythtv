@@ -60,6 +60,14 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.loadLazy(this.lazyLoadEvent);
   }
 
+  full_refresh() {
+    this.refreshing = true;
+    this.loadRecRules();
+    this.showTable = false;
+    this.programs = [];
+    this.loadLazy({ first: 0, rows: 1 }, true);
+  }
+
   loadRecRules() {
     this.dvrService.GetRecordScheduleList({}).subscribe({
       next: (data) => {
@@ -133,13 +141,13 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.dvrService.GetUpcomingList(request).subscribe(data => {
       let recordings = data.ProgramList;
       this.totalRecords = data.ProgramList.TotalAvailable;
-      this.programs.length = data.ProgramList.TotalAvailable;
+      this.programs.length = this.totalRecords;
       // populate page of virtual programs
       // note that Count is returned as the count requested, even
       // if less items are returned because you hit the end.
       // Maybe we should use recordings.Programs.length
       this.programs.splice(recordings.StartIndex, recordings.Count,
-        ...recordings.Programs);
+          ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
       this.refreshing = false;
