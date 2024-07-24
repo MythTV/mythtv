@@ -362,8 +362,6 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
     nCount        = (int)progList.size();
     int nEndIndex = (int)progList.size();
 
-    QDateTime oldestDate(dtStartTime.addYears(-5));
-
     for( int n = 0; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = progList[ n ];
