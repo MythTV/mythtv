@@ -249,7 +249,7 @@
             "encoder": "Encoder",
             "heading": "In arrivo",
             "recrule": "Regola di registrazione",
-            "showall": "Tutti i valori di stato",
+            "showall": "Tutto",
             "status": "Stato",
             "time": "Ora"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Identificativo",
             "col_channum": "Num Can",
             "col_freqid": "ID freq",
+            "col_icon": "Icona",
             "col_name": "Nome",
             "col_priority": "Priorità",
             "col_source": "Sorgente",

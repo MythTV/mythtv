@@ -249,7 +249,7 @@
             "encoder": "Koder",
             "heading": "Nadolazeće",
             "recrule": "Pravilo snimanja",
-            "showall": "Sve vrijednosti statusa",
+            "showall": "svi",
             "status": "Status",
             "time": "Vrijeme"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Pozivni znak",
             "col_channum": "Chan Num",
             "col_freqid": "ID frekvencije",
+            "col_icon": "Ikona",
             "col_name": "Ime",
             "col_priority": "Prioritet",
             "col_source": "Izvor",

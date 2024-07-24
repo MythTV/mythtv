@@ -249,7 +249,7 @@
             "encoder": "codificador",
             "heading": "próximos",
             "recrule": "Regla de grabación",
-            "showall": "Todos los valores de estado",
+            "showall": "Todo",
             "status": "Estado",
             "time": "Tiempo"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Señal de llamada",
             "col_channum": "Número de canal",
             "col_freqid": "ID de frecuencia",
+            "col_icon": "Icono",
             "col_name": "Nombre",
             "col_priority": "Prioridad",
             "col_source": "Fuente",

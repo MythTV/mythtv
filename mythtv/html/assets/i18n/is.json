@@ -249,7 +249,7 @@
             "encoder": "Kóðari",
             "heading": "Væntanlegt",
             "recrule": "Upptökuregla",
-            "showall": "Öll stöðugildi",
+            "showall": "Allt",
             "status": "Staða",
             "time": "Tími"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Kallmerki",
             "col_channum": "Chan Númer",
             "col_freqid": "Tíðni auðkenni",
+            "col_icon": "Táknmynd",
             "col_name": "Nafn",
             "col_priority": "Forgangur",
             "col_source": "Heimild",

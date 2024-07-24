@@ -249,7 +249,7 @@
             "encoder": "Koder",
             "heading": "Nadchodzące",
             "recrule": "Zasada nagrywania",
-            "showall": "Wszystkie wartości stanu",
+            "showall": "Wszystko",
             "status": "Status",
             "time": "Czas"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Znak wywoławczy",
             "col_channum": "Chan Num",
             "col_freqid": "Identyfikator częstotliwości",
+            "col_icon": "Ikona",
             "col_name": "Nazwa",
             "col_priority": "Priorytet",
             "col_source": "Źródło",

@@ -249,7 +249,7 @@
             "encoder": "Codificador",
             "heading": "Por vir",
             "recrule": "regra de gravação",
-            "showall": "Todos os valores de status",
+            "showall": "Todos",
             "status": "Status",
             "time": "Tempo"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Sinal de chamada",
             "col_channum": "Chan Num",
             "col_freqid": "ID de frequência",
+            "col_icon": "Ícone",
             "col_name": "Nome",
             "col_priority": "Prioridade",
             "col_source": "Fonte",

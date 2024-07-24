@@ -249,7 +249,7 @@
             "encoder": "kodlayıcı",
             "heading": "Yaklaşan",
             "recrule": "Kayıt Kuralı",
-            "showall": "Tüm Durum Değerleri",
+            "showall": "Tüm",
             "status": "Durum",
             "time": "Zaman"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "çağrı işareti",
             "col_channum": "Chan Num",
             "col_freqid": "Sıklık Kimliği",
+            "col_icon": "Simge",
             "col_name": "İsim",
             "col_priority": "Öncelik",
             "col_source": "Kaynak",

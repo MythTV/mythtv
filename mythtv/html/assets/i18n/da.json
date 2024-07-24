@@ -249,7 +249,7 @@
             "encoder": "Encoder",
             "heading": "Kommende",
             "recrule": "Optagelsesregel",
-            "showall": "Alle statusværdier",
+            "showall": "Alle",
             "status": "Status",
             "time": "Tid"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Kaldesignal",
             "col_channum": "Chan nummer",
             "col_freqid": "Frekv.-id",
+            "col_icon": "Ikon",
             "col_name": "Navn",
             "col_priority": "Prioritet",
             "col_source": "Kilde",

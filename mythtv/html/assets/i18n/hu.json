@@ -249,7 +249,7 @@
             "encoder": "Kódoló",
             "heading": "Közelgő",
             "recrule": "Felvételi szabály",
-            "showall": "Minden állapotérték",
+            "showall": "Minden",
             "status": "Állapot",
             "time": "Idő"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Hívójel",
             "col_channum": "Chan Num",
             "col_freqid": "Freq Id",
+            "col_icon": "Ikon",
             "col_name": "Név",
             "col_priority": "Kiemelten fontos",
             "col_source": "Forrás",

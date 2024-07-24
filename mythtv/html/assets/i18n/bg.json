@@ -249,7 +249,7 @@
             "encoder": "Енкодер",
             "heading": "Предстои",
             "recrule": "Правило за запис",
-            "showall": "Всички стойности на състоянието",
+            "showall": "всичко",
             "status": "Статус",
             "time": "време"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Позивна",
             "col_channum": "Chan Num",
             "col_freqid": "Freq Id",
+            "col_icon": "Икона",
             "col_name": "Име",
             "col_priority": "Приоритет",
             "col_source": "Източник",

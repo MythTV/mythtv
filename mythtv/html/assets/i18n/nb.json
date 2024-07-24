@@ -249,7 +249,7 @@
             "encoder": "Enkoder",
             "heading": "Kommende",
             "recrule": "Opptaksregel",
-            "showall": "Alle statusverdier",
+            "showall": "Alle",
             "status": "Status",
             "time": "Tid"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Kallesignal",
             "col_channum": "Chan Num",
             "col_freqid": "Frekv.-ID",
+            "col_icon": "Ikon",
             "col_name": "Navn",
             "col_priority": "Prioritet",
             "col_source": "Kilde",

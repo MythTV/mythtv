@@ -249,7 +249,7 @@
             "encoder": "Encoder",
             "heading": "Bevorstehende",
             "recrule": "Aufzeichnungsregel",
-            "showall": "Alle Statuswerte",
+            "showall": "Alle",
             "status": "Status",
             "time": "Zeit"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Rufzeichen",
             "col_channum": "Chan Num",
             "col_freqid": "Freq-ID",
+            "col_icon": "Symbol",
             "col_name": "Name",
             "col_priority": "Priorität",
             "col_source": "Quelle",

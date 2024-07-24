@@ -249,7 +249,7 @@
             "encoder": "Encoder",
             "heading": "Kommande",
             "recrule": "Inspelningsregel",
-            "showall": "Alla statusvärden",
+            "showall": "Allt",
             "status": "Status",
             "time": "Tid"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Anropssignal",
             "col_channum": "Chan Num",
             "col_freqid": "Frekvens ID",
+            "col_icon": "Ikon",
             "col_name": "namn",
             "col_priority": "Prioritet",
             "col_source": "Källa",

@@ -249,7 +249,7 @@
             "encoder": "Kodér",
             "heading": "Nadcházející",
             "recrule": "Pravidlo nahrávání",
-            "showall": "Všechny hodnoty stavu",
+            "showall": "Všechno",
             "status": "Postavení",
             "time": "Čas"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Volací znak",
             "col_channum": "Chan Num",
             "col_freqid": "ID frekvence",
+            "col_icon": "Ikona",
             "col_name": "název",
             "col_priority": "Přednost",
             "col_source": "Zdroj",

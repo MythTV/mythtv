@@ -249,7 +249,7 @@
             "encoder": "Kodeerija",
             "heading": "Tulemas",
             "recrule": "Salvestusreegel",
-            "showall": "Kõik olekuväärtused",
+            "showall": "Kõik",
             "status": "Olek",
             "time": "Aeg"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Kutsung",
             "col_channum": "Chan Num",
             "col_freqid": "Freq Id",
+            "col_icon": "Ikoon",
             "col_name": "Nimi",
             "col_priority": "Prioriteet",
             "col_source": "Allikas",

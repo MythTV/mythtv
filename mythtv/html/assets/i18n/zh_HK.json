@@ -249,7 +249,7 @@
             "encoder": "編碼器",
             "heading": "即將到來",
             "recrule": "錄音規則",
-            "showall": "所有狀態值",
+            "showall": "全部",
             "status": "地位",
             "time": "時間"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "呼號",
             "col_channum": "陳南",
             "col_freqid": "頻率 ID",
+            "col_icon": "圖示",
             "col_name": "姓名",
             "col_priority": "優先事項",
             "col_source": "來源",

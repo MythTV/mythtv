@@ -249,7 +249,7 @@
             "encoder": "קוֹדַאִי",
             "heading": "בקרוב",
             "recrule": "כלל הקלטה",
-            "showall": "כל ערכי המצב",
+            "showall": "את כל",
             "status": "סטָטוּס",
             "time": "זְמַן"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "אות קריאה",
             "col_channum": "צ'אן מספר",
             "col_freqid": "זיהוי תדירות",
+            "col_icon": "סמל",
             "col_name": "שֵׁם",
             "col_priority": "עדיפות",
             "col_source": "מָקוֹר",

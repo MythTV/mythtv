@@ -249,7 +249,7 @@
             "encoder": "Enkooderi",
             "heading": "Tuleva",
             "recrule": "Tallennussääntö",
-            "showall": "Kaikki tilan arvot",
+            "showall": "Kaikki",
             "status": "Tila",
             "time": "Aika"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Kutsumerkki",
             "col_channum": "Chan Num",
             "col_freqid": "Freq Id",
+            "col_icon": "Kuvake",
             "col_name": "Nimi",
             "col_priority": "Prioriteetti",
             "col_source": "Lähde",

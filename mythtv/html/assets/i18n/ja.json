@@ -249,7 +249,7 @@
             "encoder": "エンコーダ",
             "heading": "今後の予定",
             "recrule": "録音ルール",
-            "showall": "すべてのステータス値",
+            "showall": "全て",
             "status": "スターテス",
             "time": "時間"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "コールサイン",
             "col_channum": "チャンヌム",
             "col_freqid": "周波数ID",
+            "col_icon": "アイコン",
             "col_name": "名前",
             "col_priority": "優先順位",
             "col_source": "ソース",

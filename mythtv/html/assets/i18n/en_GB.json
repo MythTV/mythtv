@@ -249,7 +249,7 @@
             "encoder": "Encoder",
             "heading": "Upcoming",
             "recrule": "Recording Rule",
-            "showall": "All Status Values",
+            "showall": "All",
             "status": "Status",
             "time": "Time"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Call Sign",
             "col_channum": "Chan Num",
             "col_freqid": "Freq Id",
+            "col_icon": "Icon",
             "col_name": "Name",
             "col_priority": "Priority",
             "col_source": "Source",

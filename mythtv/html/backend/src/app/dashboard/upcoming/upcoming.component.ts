@@ -39,6 +39,8 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   displayStop = false;
   errorCount = 0;
   program?: ScheduleOrProgram;
+  totalRecords = 0;
+  showTable = false;
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService, public dataService: DataService,
@@ -47,7 +49,10 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.loadRecRules();
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Initial Load
+    this.loadLazy({ first: 0, rows: 1 }, true);
+  }
 
   refresh() {
     this.refreshing = true;
@@ -78,40 +83,46 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     });
   }
 
-  loadLazy(event: LazyLoadEvent) {
+  loadLazy(event: LazyLoadEvent, initial?: boolean) {
     this.lazyLoadEvent = event;
 
     let request: GetUpcomingRequest = {
       StartIndex: 0,
       Count: 1
     };
-    if (event.first)
-      request.StartIndex = event.first;
-    if (event.rows) {
-      request.Count = event.rows;
-      // When it only requests 50 rows, page down waits until the entire
-      // screen is empty before loading the next page. Fix this by always
-      // requesting at least 100 records.
-      if (request.Count < 100)
-        request.Count = 100;
-    }
-    if (!event.sortField)
-      event.sortField = 'StartTime';
-    if (event.sortField == 'Channel.ChanNum')
-      request.Sort = 'ChanNum';
-    else
-      request.Sort = event.sortField;
-    let sortOrder = '';
-    if (event.sortOrder && event.sortOrder < 0)
-      sortOrder = ' desc';
-    request.Sort = request.Sort + sortOrder;
-
-    if (event.filters) {
-      if (event.filters.ShowAll.value) {
-        request.ShowAll = true;
+    if (initial)
+      request.ShowAll = true;
+    else {
+      if (event.first != undefined) {
+        request.StartIndex = event.first;
+        if (event.last)
+          request.Count = event.last - event.first + 1;
+        else
+          request.Count = event.rows;
+        // When it only requests 50 rows, page down waits until the entire
+        // screen is empty before loading the next page. Fix this by always
+        // requesting at least 100 records.
+        if (!request.Count || request.Count < 100)
+          request.Count = 100;
       }
-      if (event.filters.RecordId.value) {
-        request.RecordId = event.filters.RecordId.value;
+      if (!event.sortField)
+        event.sortField = 'StartTime';
+      if (event.sortField == 'Channel.ChanNum')
+        request.Sort = 'ChanNum';
+      else
+        request.Sort = event.sortField;
+      let sortOrder = '';
+      if (event.sortOrder && event.sortOrder < 0)
+        sortOrder = ' desc';
+      request.Sort = request.Sort + sortOrder;
+
+      if (event.filters) {
+        if (event.filters.ShowAll.value) {
+          request.ShowAll = true;
+        }
+        if (event.filters.RecordId.value) {
+          request.RecordId = event.filters.RecordId.value;
+        }
       }
     }
     this.recRules.length = 0;
@@ -121,6 +132,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       this.recRules.push(...this.activeRecRules)
     this.dvrService.GetUpcomingList(request).subscribe(data => {
       let recordings = data.ProgramList;
+      this.totalRecords = data.ProgramList.TotalAvailable;
       this.programs.length = data.ProgramList.TotalAvailable;
       // populate page of virtual programs
       // note that Count is returned as the count requested, even
@@ -131,13 +143,15 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       // notify of change
       this.programs = [...this.programs]
       this.refreshing = false;
+      this.showTable = true;
     });
 
   }
 
   formatStartDate(program: ScheduleOrProgram, rowIndex: number): string {
     let priorDate = '';
-    if (rowIndex > 0 && this.programs[rowIndex - 1].Recording.StartTs)
+    if (rowIndex > 0 && this.programs[rowIndex - 1]
+      && this.programs[rowIndex - 1].Recording.StartTs)
       priorDate = this.utility.formatDate(this.programs[rowIndex - 1].Recording.StartTs, true, true);
     let thisDate = this.utility.formatDate(program.Recording.StartTs, true, true);
     if (priorDate == thisDate)

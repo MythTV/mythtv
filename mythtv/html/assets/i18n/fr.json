@@ -249,7 +249,7 @@
             "encoder": "Encodeur",
             "heading": "A venir",
             "recrule": "Règle d'enregistrement",
-            "showall": "Toutes les valeurs de statut",
+            "showall": "Tous",
             "status": "Statut",
             "time": "Temps"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Signe d'appel",
             "col_channum": "ChanNum",
             "col_freqid": "ID de fréquence",
+            "col_icon": "Icône",
             "col_name": "Nom",
             "col_priority": "Priorité",
             "col_source": "Source",

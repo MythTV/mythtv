@@ -249,7 +249,7 @@
             "encoder": "Encoder",
             "heading": "Aanstaande",
             "recrule": "Opname regel",
-            "showall": "Alle statuswaarden",
+            "showall": "Alle",
             "status": "Toestand",
             "time": "Tijd"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Roepnaam",
             "col_channum": "Chan Num",
             "col_freqid": "Freq-ID",
+            "col_icon": "Icoon",
             "col_name": "Naam",
             "col_priority": "Prioriteit",
             "col_source": "Bron",

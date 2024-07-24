@@ -249,7 +249,7 @@
             "encoder": "Kodirnik",
             "heading": "Prihajajoče",
             "recrule": "Pravilo snemanja",
-            "showall": "Vse vrednosti stanja",
+            "showall": "Vse",
             "status": "Stanje",
             "time": "Čas"
         },
@@ -662,6 +662,7 @@
             "col_callsign": "Klicni znak",
             "col_channum": "Chan Num",
             "col_freqid": "ID frekvence",
+            "col_icon": "Ikona",
             "col_name": "Ime",
             "col_priority": "Prioriteta",
             "col_source": "Vir",
