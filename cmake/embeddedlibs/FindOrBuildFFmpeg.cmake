@@ -5,13 +5,15 @@
 #
 
 function(find_or_build_ffmpeg)
-  pkg_check_modules(LIBAVCODEC libmythavcodec QUIET IMPORTED_TARGET)
-  if(TARGET PkgConfig::LIBAVCODEC)
-    message(STATUS "Found FFmpeg in ${LIBAVCODEC_LIBDIR}")
-    set(ProjectDepends
-        ${ProjectDepends} PkgConfig::LIBAVCODEC
-        PARENT_SCOPE)
-    return()
+  if(LIBS_USE_INSTALLED)
+    pkg_check_modules(LIBAVCODEC libmythavcodec QUIET IMPORTED_TARGET)
+    if(TARGET PkgConfig::LIBAVCODEC)
+      message(STATUS "Found FFmpeg in ${LIBAVCODEC_LIBDIR}")
+      set(ProjectDepends
+          ${ProjectDepends} PkgConfig::LIBAVCODEC
+          PARENT_SCOPE)
+      return()
+    endif()
   endif()
 
   if(ENABLE_STRICT_BUILD_ORDER)
@@ -118,6 +120,7 @@ function(find_or_build_ffmpeg)
       $<IF:$<TARGET_EXISTS:Vulkan::Vulkan>,--enable-vulkan,--disable-vulkan>
     # $<IF:$<TARGET_EXISTS:PkgConfig::SDL2>,--enable-sdl2,--disable-sdl2>
     BUILD_COMMAND ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
+    BUILD_ALWAYS ${LIBS_ALWAYS_REBUILD}
     INSTALL_COMMAND ${MAKE_EXECUTABLE} install
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD TRUE

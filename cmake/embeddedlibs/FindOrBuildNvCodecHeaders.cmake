@@ -15,11 +15,13 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Linux|Windows" OR NOT CMAKE_SYSTEM_PROCESSOR
   return()
 endif()
 
-pkg_check_modules(FFNVCODEC ffnvcodec QUIET IMPORTED_TARGET)
-if(TARGET PkgConfig::FFNVCODEC)
-  message(STATUS "Found ffnvcodec")
-  list(APPEND FF_ARGS --enable-nvdec --enable-nvenc --enable-ffnvcodec)
-  return()
+if(LIBS_USE_INSTALLED)
+  pkg_check_modules(FFNVCODEC ffnvcodec QUIET IMPORTED_TARGET)
+  if(TARGET PkgConfig::FFNVCODEC)
+    message(STATUS "Found ffnvcodec")
+    list(APPEND FF_ARGS --enable-nvdec --enable-nvenc --enable-ffnvcodec)
+    return()
+  endif()
 endif()
 
 if(ENABLE_STRICT_BUILD_ORDER)
@@ -40,6 +42,7 @@ ExternalProject_Add(
     -DCMAKE_JOB_POOLS:STRING=${CMAKE_JOB_POOLS}
     -DPKG_CONFIG_LIBDIR:PATH=${PKG_CONFIG_LIBDIR}
     -DPKG_CONFIG_PATH:PATH=${PKG_CONFIG_PATH}
+  BUILD_ALWAYS ${LIBS_ALWAYS_REBUILD}
   DEPENDS external_libs ${after_libs})
 
 add_dependencies(embedded_libs nv-codec-headers)

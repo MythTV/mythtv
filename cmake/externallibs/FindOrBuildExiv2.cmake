@@ -20,16 +20,18 @@
 # that version if the distro includes it.
 #
 function(find_or_build_exiv2)
-  pkg_check_modules(EXIV2 "exiv2>=0.28" IMPORTED_TARGET)
-  if(NOT EXIV2_FOUND)
-    pkg_check_modules(EXIV2 "mythexiv2>=0.28" IMPORTED_TARGET)
-  endif()
-  if(TARGET PkgConfig::EXIV2)
-    message(STATUS "Found Exiv2 ${EXIV2_VERSION} ${EXIV2_LINK_LIBRARIES}")
-    set(ProjectDepends
-        ${ProjectDepends} PkgConfig::EXIV2
-        PARENT_SCOPE)
-    return()
+  if(LIBS_USE_INSTALLED)
+    pkg_check_modules(EXIV2 "exiv2>=0.28" IMPORTED_TARGET)
+    if(NOT EXIV2_FOUND)
+      pkg_check_modules(EXIV2 "mythexiv2>=0.28" IMPORTED_TARGET)
+    endif()
+    if(TARGET PkgConfig::EXIV2)
+      message(STATUS "Found Exiv2 ${EXIV2_VERSION} ${EXIV2_LINK_LIBRARIES}")
+      set(ProjectDepends
+          ${ProjectDepends} PkgConfig::EXIV2
+          PARENT_SCOPE)
+      return()
+    endif()
   endif()
 
   if(CMAKE_CROSSCOMPILING)
@@ -114,6 +116,7 @@ function(find_or_build_exiv2)
       -DCMAKE_JOB_POOLS:STRING=${CMAKE_JOB_POOLS}
       -DPKG_CONFIG_LIBDIR:PATH=${PKG_CONFIG_LIBDIR}
       -DPKG_CONFIG_PATH:PATH=${PKG_CONFIG_PATH}
+    BUILD_ALWAYS ${LIBS_ALWAYS_REBUILD}
     USES_TERMINAL_BUILD TRUE
     DEPENDS external_libs ${after_libs})
 
