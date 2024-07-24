@@ -157,6 +157,14 @@
   clean -xfd ; configure ; make` sequence since all of the build
   artifacts are contained within the build directory.
 
+  If you want to build a qt6 version of MythTV, use these commands
+  instead:
+
+  ```
+  $ cmake --preset qt6 -DCMAKE_INSTALL_PREFIX=<install_location>
+  $ cmake --build build-qt6
+  ```
+
   If you want more control over the build process, look at the first
   few lines of output from the first cmake command to see what
   variables are specified by that preset.  To create a custom build
