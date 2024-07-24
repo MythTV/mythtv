@@ -209,7 +209,7 @@ QString RestoreData::doRestore(bool do_xmltvid, bool do_icon, bool do_visible)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("RestoreData::Restore(1)", query);
-        return QString();
+        return {};
     }
     while (query.next())
     {
@@ -259,7 +259,7 @@ QString RestoreData::doRestore(bool do_xmltvid, bool do_icon, bool do_visible)
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(2)", query);
-                return QString();
+                return {};
             }
             if (query2.next())
             {
@@ -291,7 +291,7 @@ QString RestoreData::doRestore(bool do_xmltvid, bool do_icon, bool do_visible)
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(3)", query);
-                return QString();
+                return {};
             }
             if (query2.next())
             {
@@ -322,7 +322,7 @@ QString RestoreData::doRestore(bool do_xmltvid, bool do_icon, bool do_visible)
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(4)", query);
-                return QString();
+                return {};
             }
             if (query2.next())
             {
