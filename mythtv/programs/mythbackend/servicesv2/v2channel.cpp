@@ -39,7 +39,6 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/programtypes.h"
-#include "libmythbase/mythdirs.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/channelscan/scanwizardconfig.h"
