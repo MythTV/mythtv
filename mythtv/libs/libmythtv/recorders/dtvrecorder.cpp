@@ -919,9 +919,9 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
             }
 
             // must find the PES start code
-            if (tspacket->data()[i++] != 0x00 ||
-                tspacket->data()[i++] != 0x00 ||
-                tspacket->data()[i++] != 0x01)
+            if (tspacket->data()[i  ] != 0x00 ||
+                tspacket->data()[i+1] != 0x00 ||
+                tspacket->data()[i+2] != 0x01)
             {
                 if (!m_pesTimer.isRunning() || m_pesTimer.elapsed() > 20000ms)
                 {
@@ -931,6 +931,7 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                 }
                 break;
             }
+            i += 3;
 
             m_pesTimer.stop();
 
