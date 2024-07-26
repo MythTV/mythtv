@@ -7,18 +7,32 @@
         <div style="height: 90vh">
             <p-table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
                 [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm" [virtualScroll]="true"
-                [virtualScrollItemSize]="42"
-                [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true" sortField="StartTime">
+                [virtualScrollItemSize]="42" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+                sortField="StartTime">
 
                 <ng-template pTemplate="caption">
-                    <!-- Refresh button and number of rows. -->
-                    <div *ngIf="refreshing else refreshBn"><p-progressSpinner
-                            [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
-                    <ng-template #refreshBn>
-                        <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                            (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
-                        &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
-                    </ng-template>
+                    <!-- Top Buttons -->
+                    <div class="flex align-items-center">
+                        <p-checkbox inputId="showAllStatuses" [(ngModel)]="showAllStatuses" name="showAllStatuses"
+                            #showAll="ngModel" [binary]="true" (onChange)="onFilter()"
+                            label="{{ 'dashboard.upcoming.showall' | translate }} " class="'px-3">
+                        </p-checkbox>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{ 'dashboard.upcoming.recrule' | translate }}: &nbsp;
+                        <p-dropdown [(ngModel)]="selectedRule" [options]="recRules" name="rulefilter"
+                            (onChange)="onFilter()" optionLabel="Title"
+                            placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" class="'px-3">
+                        </p-dropdown>
+
+                        <!-- Refresh button and number of rows. -->
+                        <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                                [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
+                        <ng-template #refreshBn>
+                            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                                (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                            &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
+                        </ng-template>
+                    </div>
                 </ng-template>
 
                 <ng-template pTemplate="header">
@@ -56,44 +70,8 @@
                                 class="p-button-text p-button-primary"></button>
                         </th>
                     </tr>
-
-                    <tr>
-                        <!-- Column Filters -->
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th>
-                            <p-columnFilter field="RecordId" matchMode="equals" [showMenu]="false"
-                                [showClearButton]="false">
-                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                    <p-dropdown [ngModel]="value" [options]="recRules" name="rulefilter"
-                                        (onChange)="filter($event.value)" optionLabel="Title" optionValue="Id"
-                                        placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true">
-                                    </p-dropdown>
-                                </ng-template>
-                            </p-columnFilter>
-                        </th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th>
-                            <p-columnFilter field="ShowAll" matchMode="equals" [showMenu]="false"
-                                [showClearButton]="false">
-                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                    <p-checkbox inputId="showAllStatuses" [ngModel]="value" name="showAllStatuses"
-                                        #showAll="ngModel" [binary]="true" (onChange)="filter($event.checked)"
-                                        label="{{ 'dashboard.upcoming.showall' | translate }} ">
-                                    </p-checkbox>
-                                </ng-template>
-                            </p-columnFilter>
-                        </th>
-                        <th></th>
-                        <th></th>
-                    </tr>
                 </ng-template>
+
                 <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
                     <tr>
                         <td class="p-1 overflow-hidden">

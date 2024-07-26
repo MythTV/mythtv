@@ -41,6 +41,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   program?: ScheduleOrProgram;
   totalRecords = 0;
   showTable = false;
+  selectedRule: RuleListEntry | null = null;
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService, public dataService: DataService,
@@ -51,21 +52,13 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   ngOnInit(): void {
     // Initial Load
-    this.loadLazy({ first: 0, rows: 1 }, true);
+    this.loadLazy({ first: 0, rows: 1 });
   }
 
   refresh() {
     this.refreshing = true;
     this.loadRecRules();
     this.loadLazy(this.lazyLoadEvent);
-  }
-
-  full_refresh() {
-    this.refreshing = true;
-    this.loadRecRules();
-    this.showTable = false;
-    this.programs = [];
-    this.loadLazy({ first: 0, rows: 1 }, true);
   }
 
   loadRecRules() {
@@ -87,52 +80,46 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
             };
           }
         });
+        this.recRules.length = 0;
+        if (this.showAllStatuses)
+          this.recRules.push(...this.allRecRules)
+        else
+          this.recRules.push(...this.activeRecRules)
       },
     });
   }
 
-  loadLazy(event: LazyLoadEvent, initial?: boolean) {
+  loadLazy(event: LazyLoadEvent) {
     this.lazyLoadEvent = event;
 
     let request: GetUpcomingRequest = {
       StartIndex: 0,
-      Count: 1
+      Count: 1,
+      ShowAll: false
     };
-    if (initial)
-      request.ShowAll = true;
-    else {
-      if (event.first != undefined) {
-        request.StartIndex = event.first;
-        if (event.last)
-          request.Count = event.last - event.first + 1;
-        else
-          request.Count = event.rows;
-        // When it only requests 50 rows, page down waits until the entire
-        // screen is empty before loading the next page. Fix this by always
-        // requesting at least 100 records.
-        if (!request.Count || request.Count < 100)
-          request.Count = 100;
-      }
-      if (!event.sortField)
-        event.sortField = 'StartTime';
-      if (event.sortField == 'Channel.ChanNum')
-        request.Sort = 'ChanNum';
+    if (event.first != undefined) {
+      request.StartIndex = event.first;
+      if (event.last)
+        request.Count = event.last - event.first;
       else
-        request.Sort = event.sortField;
-      let sortOrder = '';
-      if (event.sortOrder && event.sortOrder < 0)
-        sortOrder = ' desc';
-      request.Sort = request.Sort + sortOrder;
-
-      if (event.filters) {
-        if (event.filters.ShowAll.value) {
-          request.ShowAll = true;
-        }
-        if (event.filters.RecordId.value) {
-          request.RecordId = event.filters.RecordId.value;
-        }
-      }
+        request.Count = event.rows;
     }
+    if (!event.sortField)
+      event.sortField = 'StartTime';
+    if (event.sortField == 'Channel.ChanNum')
+      request.Sort = 'ChanNum';
+    else
+      request.Sort = event.sortField;
+    let sortOrder = '';
+    if (event.sortOrder && event.sortOrder < 0)
+      sortOrder = ' desc';
+    request.Sort = request.Sort + sortOrder;
+
+    if (this.showAllStatuses)
+      request.ShowAll = true;
+    if (this.selectedRule != null && this.selectedRule.Id != 0)
+      request.RecordId = this.selectedRule.Id;
+    // }
     this.recRules.length = 0;
     if (request.ShowAll)
       this.recRules.push(...this.allRecRules)
@@ -147,13 +134,24 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       // if less items are returned because you hit the end.
       // Maybe we should use recordings.Programs.length
       this.programs.splice(recordings.StartIndex, recordings.Count,
-          ...recordings.Programs);
+        ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
       this.refreshing = false;
       this.showTable = true;
     });
 
+  }
+
+  onFilter() {
+    this.reload();
+  }
+
+  reload() {
+    this.showTable = false;
+    this.programs.length = 0;
+    this.refreshing = true;
+    this.loadLazy(({ first: 0, rows: 1 }));
   }
 
   formatStartDate(program: ScheduleOrProgram, rowIndex: number): string {
