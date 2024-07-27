@@ -401,7 +401,7 @@ class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
     void setValueMs (std::chrono::milliseconds newValue)
         { setValue(newValue.count()); }
     // Handle non-integer seconds
-    template<typename T, typename = typename std::enable_if<!std::is_integral<T>()>::type>
+    template<typename T, typename = std::enable_if_t<!std::is_integral<T>()>>
     void setValueMs (std::chrono::duration<T> newSecs)
         { setValueMs(duration_cast<std::chrono::milliseconds>(newSecs)); }
 };
