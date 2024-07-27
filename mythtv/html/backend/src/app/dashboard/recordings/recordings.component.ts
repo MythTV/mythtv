@@ -42,6 +42,8 @@ export class RecordingsComponent implements OnInit {
   priorRequest: GetRecordedListRequest = {};
   totalRecords = 0;
   showTable = false;
+  searchValue = '';
+  selectedRecGroup: string | null = null;
 
   msg = {
     Success: 'common.success',
@@ -134,7 +136,7 @@ export class RecordingsComponent implements OnInit {
 
   ngOnInit(): void {
     // Initial Load
-    this.loadLazy({first:0, rows: 50});
+    this.loadLazy({ first: 0, rows: 1 });
   }
 
   loadLazy(event: LazyLoadEvent) {
@@ -146,14 +148,14 @@ export class RecordingsComponent implements OnInit {
     if (event.first != undefined) {
       request.StartIndex = event.first;
       if (event.last)
-        request.Count = event.last - event.first + 1;
+        request.Count = event.last - event.first;
       else
         request.Count = event.rows;
       // When it only requests 50 rows, page down waits until the entire
       // screen is empty before loading the next page. Fix this by always
       // requesting at least 100 records.
-      if (!request.Count || request.Count < 100)
-        request.Count = 100;
+      // if (!request.Count || request.Count < 100)
+      //   request.Count = 100;
     }
     if (!event.sortField)
       event.sortField = 'Title';
@@ -169,25 +171,31 @@ export class RecordingsComponent implements OnInit {
       sortOrder = ' desc';
     request.Sort = request.Sort + sortOrder;
     request.Sort += `,title${sortOrder},originalairdate${sortOrder},season${sortOrder},episode${sortOrder}`;
-    if (event.filters) {
-      if (event.filters.Title.value) {
-        switch (event.filters.Title.matchMode) {
-          case FilterMatchMode.STARTS_WITH:
-            request.TitleRegEx = '^' + event.filters.Title.value;
-            break;
-          case FilterMatchMode.CONTAINS:
-            request.TitleRegEx = event.filters.Title.value;
-            break;
-          case FilterMatchMode.EQUALS:
-            request.TitleRegEx = '^' + event.filters.Title.value + '$';
-            break;
-        }
-      }
-      if (event.filters['Recording.RecGroup'].value) {
-        if (event.filters['Recording.RecGroup'].matchMode == FilterMatchMode.EQUALS)
-          request.RecGroup = event.filters['Recording.RecGroup'].value;
-      }
-    }
+    // if (event.filters) {
+    //   if (event.filters.Title.value) {
+    //     switch (event.filters.Title.matchMode) {
+    //       case FilterMatchMode.STARTS_WITH:
+    //         request.TitleRegEx = '^' + event.filters.Title.value;
+    //         break;
+    //       case FilterMatchMode.CONTAINS:
+    //         request.TitleRegEx = event.filters.Title.value;
+    //         break;
+    //       case FilterMatchMode.EQUALS:
+    //         request.TitleRegEx = '^' + event.filters.Title.value + '$';
+    //         break;
+    //     }
+    //   }
+    //   if (event.filters['Recording.RecGroup'].value) {
+    //     if (event.filters['Recording.RecGroup'].matchMode == FilterMatchMode.EQUALS)
+    //       request.RecGroup = event.filters['Recording.RecGroup'].value;
+    //   }
+    // }
+
+    if (this.searchValue)
+      request.TitleRegEx = this.searchValue;
+    if (this.selectedRecGroup != null)
+      request.RecGroup = this.selectedRecGroup;
+
     if (request.TitleRegEx != this.priorRequest.TitleRegEx
       || request.RecGroup != this.priorRequest.RecGroup) {
       // Do not set this.programs = []; This causes the body to have zero height
@@ -195,8 +203,8 @@ export class RecordingsComponent implements OnInit {
       this.selection = [];
       this.menu.hide();
       this.priorRequest = request;
+      this.showTable = false;
     }
-
     this.dvrService.GetRecordedList(request).subscribe(data => {
       let recordings = data.ProgramList;
       this.totalRecords = data.ProgramList.TotalAvailable;
@@ -208,8 +216,29 @@ export class RecordingsComponent implements OnInit {
       this.programs = [...this.programs]
       this.refreshing = false;
       this.showTable = true;
+      // setTimeout(() => {
+      //   this.recGroups.push(...this.recGroups)
+      //   this.selectedRecGroup = this.selectedRecGroup;
+      // }, 100);
     });
   }
+
+  onFilter() {
+    this.reload();
+  }
+
+  resetSearch() {
+    this.searchValue = '';
+    this.reload();
+  }
+
+  reload() {
+    this.showTable = false;
+    this.programs.length = 0;
+    this.refreshing = true;
+    this.loadLazy(({ first: 0, rows: 1 }));
+  }
+
 
   refresh() {
     this.selection = [];

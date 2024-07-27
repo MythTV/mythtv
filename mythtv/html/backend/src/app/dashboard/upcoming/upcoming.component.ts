@@ -119,7 +119,6 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       request.ShowAll = true;
     if (this.selectedRule != null && this.selectedRule.Id != 0)
       request.RecordId = this.selectedRule.Id;
-    // }
     this.recRules.length = 0;
     if (request.ShowAll)
       this.recRules.push(...this.allRecRules)

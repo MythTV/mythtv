@@ -10,6 +10,36 @@
         <p-tieredMenu #menu [popup]="true" [model]="menuToShow" class="font-bold">
         </p-tieredMenu>
 
+
+        <!-- Menu, Refresh button and number of rows. -->
+        <div class="flex align-items-center p-1 font-bold">
+            <button pButton pRipple icon="pi pi-bars" class="p-button-text .p-button-success"
+                (click)="showContextMenu(null, $event)" pTooltip="{{ 'common.selected_menu' | translate }}"
+                tooltipPosition="top"></button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <span class="p-input-icon-right">
+                <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
+                <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
+                    class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}" pTooltip="{{ 'dashboard.recordings.regex' | translate }}"
+                    tooltipPosition="top" />
+            </span>
+
+            <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
+                pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
+
+            &nbsp;&nbsp;&nbsp; {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp;
+
+            <p-dropdown [(ngModel)]="selectedRecGroup" [options]="recGroups" name="filter" (onChange)="onFilter()"
+                placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" class="'px-3">
+            </p-dropdown>
+
+            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"
+                tooltipPosition="top"></button>
+            &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
+        </div>
+
+
         <p-table *ngIf="showTable" [value]="programs" [totalRecords]="totalRecords"
             styleClass="p-datatable-sm p-datatable-striped" (onLazyLoad)="loadLazy($event)" [rows]="50" [lazy]="true"
             [rowHover]="true" selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
@@ -18,14 +48,6 @@
             [scrollable]="true">
 
             <ng-template pTemplate="caption">
-                <!-- Menu, Refresh button and number of rows. -->
-                <button pButton pRipple icon="pi pi-bars" class="p-button-text .p-button-success"
-                    (click)="showContextMenu(null, $event)" pTooltip="{{ 'common.selected_menu' | translate }}"
-                    tooltipPosition="top"></button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                    (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"
-                    tooltipPosition="top"></button>
-                &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
@@ -59,33 +81,6 @@
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                             [disabled]="true"></button>
                     </th>
-                </tr>
-                <tr>
-                    <!-- Column Filters -->
-                    <th><p-columnFilter type="text" field="Title" [matchModeOptions]="matchModeTitle"></p-columnFilter>
-                    </th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th>
-                        <p-columnFilter field="Recording.RecGroup" matchMode="equals" [showMenu]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-dropdown [ngModel]="value" [options]="recGroups" name="filter"
-                                    (onChange)="filter($event.value)"
-                                    placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true">
-                                    <ng-template let-option pTemplate="item">
-                                        {{option}}
-                                    </ng-template>
-                                </p-dropdown>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
