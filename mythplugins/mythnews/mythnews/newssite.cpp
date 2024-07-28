@@ -174,10 +174,10 @@ void NewsSite::customEvent(QEvent *event)
             }
             else if (tokens[1] == "FINISHED")
             {
-                QString url = args[0];
-                QString filename = args[1];
+                const QString& url = args[0];
+                const QString& filename = args[1];
                 int fileSize  = args[2].toInt();
-                QString errorStr = args[3];
+                const QString& errorStr = args[3];
                 int errorCode = args[4].toInt();
 
                 if ((errorCode != 0) || (fileSize == 0))

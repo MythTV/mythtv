@@ -835,9 +835,9 @@ void ZMServer::handleGetEventList(std::vector<std::string> tokens)
         return;
     }
 
-    std::string monitor = tokens[1];
+    const std::string& monitor = tokens[1];
     bool oldestFirst = (tokens[2] == "1");
-    std::string date = tokens[3];
+    const std::string& date = tokens[3];
     bool includeContinuous = (tokens[4] == "1");
 
     if (m_debug)
@@ -926,7 +926,7 @@ void ZMServer::handleGetEventDates(std::vector<std::string> tokens)
         return;
     }
 
-    std::string monitor = tokens[1];
+    const std::string& monitor = tokens[1];
     bool oldestFirst = (tokens[2] == "1");
 
     if (m_debug)
@@ -1148,10 +1148,10 @@ void ZMServer::handleGetEventFrame(std::vector<std::string> tokens)
         return;
     }
 
-    std::string monitorID(tokens[1]);
-    std::string eventID(tokens[2]);
+    const std::string& monitorID(tokens[1]);
+    const std::string& eventID(tokens[2]);
     int frameNo = atoi(tokens[3].c_str());
-    std::string eventTime(tokens[4]);
+    const std::string& eventTime(tokens[4]);
 
     if (m_debug)
     {
@@ -1232,10 +1232,10 @@ void ZMServer::handleGetAnalysisFrame(std::vector<std::string> tokens)
         return;
     }
 
-    std::string monitorID(tokens[1]);
-    std::string eventID(tokens[2]);
+    const std::string& monitorID(tokens[1]);
+    const std::string& eventID(tokens[2]);
     int frameNo = atoi(tokens[3].c_str());
-    std::string eventTime(tokens[4]);
+    const std::string& eventTime(tokens[4]);
     int frameID = 0;
     int frameCount = 0;
 
@@ -1957,9 +1957,9 @@ void ZMServer::handleSetMonitorFunction(std::vector<std::string> tokens)
         return;
     }
 
-    std::string monitorID(tokens[1]);
-    std::string function(tokens[2]);
-    std::string enabled(tokens[3]);
+    const std::string& monitorID(tokens[1]);
+    const std::string& function(tokens[2]);
+    const std::string& enabled(tokens[3]);
 
     // Check validity of input passed to server. Does monitor exist && is function ok
     if (m_monitorMap.find(atoi(monitorID.c_str())) == m_monitorMap.end())
