@@ -237,7 +237,7 @@ class VideoPlayerCommandPrivate
     {
         if (item)
         {
-            QString play_command = item->GetPlayCommand();
+            const QString& play_command = item->GetPlayCommand();
             QString filename;
 
             if (item->IsHostSet())

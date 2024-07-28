@@ -1063,7 +1063,7 @@ static void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
     copy_entries(dst, src, filter);
     for (auto dir = src.dirs_begin(); dir != src.dirs_end(); ++dir)
     {
-        simple_ref_ptr<meta_dir_node> node = *dir;
+        const simple_ref_ptr<meta_dir_node>& node = *dir;
         if (node == nullptr)
             continue;
 

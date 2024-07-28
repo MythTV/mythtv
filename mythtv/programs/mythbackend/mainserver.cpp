@@ -1070,7 +1070,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "BACKEND_MESSAGE")
     {
-        QString message = listline[1];
+        const QString& message = listline[1];
         QStringList extra( listline[2] );
         for (int i = 3; i < listline.size(); i++)
             extra << listline[i];
@@ -2305,7 +2305,7 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
-    QString playbackhost = slist[1];
+    const QString& playbackhost = slist[1];
 
     QStringList::const_iterator it = slist.cbegin() + 2;
     ProgramInfo pginfo(it, slist.cend());
@@ -3701,7 +3701,7 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
  */
 void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
 {
-    QString filename = slist[1];
+    const QString& filename = slist[1];
     QString storageGroup = "Default";
     QStringList retlist;
 
@@ -4508,7 +4508,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     TVRec::s_inputsLock.unlock();
 
-    QString command = slist[1];
+    const QString& command = slist[1];
 
     QStringList retlist;
 
@@ -4627,7 +4627,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "CANCEL_NEXT_RECORDING")
     {
-        QString cancel = slist[2];
+        const QString& cancel = slist[2];
         LOG(VB_GENERAL, LOG_NOTICE, LOC +
             QString("Received: CANCEL_NEXT_RECORDING %1").arg(cancel));
         enc->CancelNextRecording(cancel == "1");
@@ -4635,7 +4635,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SPAWN_LIVETV")
     {
-        QString chainid = slist[2];
+        const QString& chainid = slist[2];
         LiveTVChain *chain = GetExistingChain(chainid);
         if (!chain)
         {
@@ -4690,14 +4690,14 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SET_INPUT")
     {
-        QString input = slist[2];
+        const QString& input = slist[2];
         QString ret   = enc->SetInput(input);
         ret = (ret.isEmpty()) ? "UNKNOWN" : ret;
         retlist << ret;
     }
     else if (command == "TOGGLE_CHANNEL_FAVORITE")
     {
-        QString changroup = slist[2];
+        const QString& changroup = slist[2];
         enc->ToggleChannelFavorite(changroup);
         retlist << "OK";
     }
@@ -4709,7 +4709,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SET_CHANNEL")
     {
-        QString name = slist[2];
+        const QString& name = slist[2];
         enc->SetChannel(name);
         retlist << "OK";
     }
@@ -4774,18 +4774,18 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "CHECK_CHANNEL")
     {
-        QString name = slist[2];
+        const QString& name = slist[2];
         retlist << QString::number((int)(enc->CheckChannel(name)));
     }
     else if (command == "SHOULD_SWITCH_CARD")
     {
-        QString chanid = slist[2];
+        const QString& chanid = slist[2];
         retlist << QString::number((int)(enc->ShouldSwitchToAnotherInput(chanid)));
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {
         QString needed_spacer;
-        QString prefix        = slist[2];
+        const QString& prefix        = slist[2];
         uint    complete_valid_channel_on_rec    = 0;
         bool    is_extra_char_useful             = false;
 
@@ -4948,7 +4948,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
 
     EncoderLink *enc = *iter;
 
-    QString command = slist[1];
+    const QString& command = slist[1];
 
     if (command == "GET_STATE")
     {
@@ -5717,8 +5717,8 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
     if (pbs)
         pbssock = pbs->getSocket();
 
-    QString chanid = tokens[1];
-    QString starttime = tokens[2];
+    const QString& chanid = tokens[1];
+    const QString& starttime = tokens[2];
     long long bookmark = tokens[3].toLongLong();
 
     QDateTime recstartts = MythDate::fromSecsSinceEpoch(starttime.toLongLong());
@@ -7054,7 +7054,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     MythSocket *pbssock = pbs->getSocket();
 
     int recnum = commands[1].toInt();
-    QString command = slist[1];
+    const QString& command = slist[1];
 
     QStringList retlist;
 
@@ -7236,7 +7236,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 
     MythSocket *pbssock = pbs->getSocket();
 
-    QString message = slist[1];
+    const QString& message = slist[1];
     QStringList extra_data;
     for (uint i = 2; i < (uint) slist.size(); i++)
         extra_data.push_back(slist[i]);

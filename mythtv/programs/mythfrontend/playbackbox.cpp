@@ -1384,7 +1384,7 @@ void PlaybackBox::UpdateUIRecGroupList(void)
     QStringList::iterator it = m_recGroups.begin();
     for (; it != m_recGroups.end(); (++it), (++idx))
     {
-        QString key = (*it);
+        const QString& key = (*it);
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
 
@@ -1411,7 +1411,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
-            QString groupname = (*it);
+            const QString& groupname = (*it);
 
             auto *item = new MythUIButtonListItem(m_groupList, "",
                                          QVariant::fromValue(groupname.toLower()));
@@ -3556,7 +3556,7 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(uint recordingID,
     for (uint i = 0; i < 2; i++)
     {
         auto it = _it[i];
-        auto end = _end[i];
+        const auto& end = _end[i];
         for (; it != end; ++it)
         {
             if ((*it)->GetRecordingID() == recordingID)
@@ -3807,7 +3807,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == ACTION_1 || action == "HELP")

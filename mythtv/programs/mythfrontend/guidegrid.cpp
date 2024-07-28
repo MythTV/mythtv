@@ -681,7 +681,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
 
         if (!m_jumpToChannel)
         {
-            QString chanNum = actions[0];
+            const QString& chanNum = actions[0];
             bool isNum = false;
             (void)chanNum.toInt(&isNum);
             if (isNum)
@@ -707,7 +707,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
         if (action == ACTION_UP)
         {
@@ -1384,7 +1384,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         if (ndup && cdup)
             continue;
 
-        ChannelInfo val(channels[chan]);
+        const ChannelInfo& val(channels[chan]);
 
         channum_to_index_map[val.m_chanNum].push_back(GetChannelCount());
         callsign_to_index_map[val.m_callSign].push_back(GetChannelCount());

@@ -2386,10 +2386,10 @@ bool Scheduler::HandleReschedule(void)
 
             uint recordid = tokens[2].toUInt();
             uint findid = tokens[3].toUInt();
-            QString title = request[1];
-            QString subtitle = request[2];
-            QString descrip = request[3];
-            QString programid = request[4];
+            const QString& title = request[1];
+            const QString& subtitle = request[2];
+            const QString& descrip = request[3];
+            const QString& programid = request[4];
             runCheck = true;
             m_schedLock.unlock();
             m_recordMatchLock.lock();

@@ -201,7 +201,7 @@ bool setupTVs(bool ismaster, bool &error)
     for (size_t i = 0; i < cardids.size(); i++)
     {
         uint    cardid = cardids[i];
-        QString host   = hosts[i];
+        const QString& host   = hosts[i];
         QString cidmsg = QString("Card %1").arg(cardid);
 
         if (!ismaster)

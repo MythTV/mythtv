@@ -293,7 +293,7 @@ bool UPNPScanner::GetMetadata(QVariant &data)
     if (list.size() != 2)
         return false;
 
-    QString usn = list[0];
+    const QString& usn = list[0];
     QString object = list[1];
 
     m_lock.lock();
