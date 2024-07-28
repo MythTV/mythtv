@@ -110,7 +110,7 @@ private:
     //! A priority queue where 0 is highest priority
     using ThumbQueue = QMultiMap<int, TaskPtr>;
 
-    QString CreateThumbnail(ImagePtrK im, int thumbPriority);
+    QString CreateThumbnail(const ImagePtrK& im, int thumbPriority);
     static void RemoveTasks(ThumbQueue &queue, int devId);
 
     DBFS &m_dbfs;               //!< Database/filesystem adapter

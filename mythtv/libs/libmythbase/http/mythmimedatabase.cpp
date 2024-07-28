@@ -131,7 +131,7 @@ class MythMimeDatabasePriv
     {
         MythMimeTypes result;
         std::transform(Types.cbegin(), Types.cend(), std::back_inserter(result),
-                       [](auto Type) { return MythMimeType { Type }; });
+                       [](const auto& Type) { return MythMimeType { Type }; });
         return result;
     }
 

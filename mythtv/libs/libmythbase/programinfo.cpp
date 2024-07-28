@@ -1472,7 +1472,7 @@ QString propsValueToString (const QString& name, QMap<T,QString> propNames,
 }
 
 template <typename T>
-uint propsValueFromString (const QString& name, QMap<T,QString> propNames,
+uint propsValueFromString (const QString& name, const QMap<T,QString>& propNames,
                            const QString& props)
 {
     if (props.isEmpty())
