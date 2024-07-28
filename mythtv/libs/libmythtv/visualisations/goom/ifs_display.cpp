@@ -73,9 +73,9 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 		if ((x < width) && (y < height)) {
 			int     pos = x + (int) (y * width);
 			int     tra = 0;
-			unsigned char *bra = (unsigned char *) &back[pos];
-			unsigned char *dra = (unsigned char *) &data[pos];
-			unsigned char *cra = (unsigned char *) &couleursl;
+			auto *bra = (unsigned char *) &back[pos];
+			auto *dra = (unsigned char *) &data[pos];
+			auto *cra = (unsigned char *) &couleursl;
 
 			for (int j = 0; j < 4; j++) {
 				tra = *cra;
