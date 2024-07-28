@@ -1054,7 +1054,7 @@ uint fillSelectionsFromDir(const QDir& dir,
     return cnt;
 }
 
-V2CaptureDeviceList* getFirewireList (const QString & cardType)
+V2CaptureDeviceList* getFirewireList ([[maybe_unused]] const QString & cardType)
 {
     auto* pList = new V2CaptureDeviceList();
 
