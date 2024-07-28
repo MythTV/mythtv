@@ -67,11 +67,11 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 	emms();/*__asm__ __volatile__ ("emms");*/
 #else
 	for (int i = 0; i < nbpt; i += increment) {
-		int     x = (int) points[i].x & 0x7fffffff;
-		int     y = (int) points[i].y & 0x7fffffff;
+		int     x = points[i].x & 0x7fffffff;
+		int     y = points[i].y & 0x7fffffff;
 
 		if ((x < width) && (y < height)) {
-			int     pos = x + (int) (y * width);
+			int     pos = x + (y * width);
 			int     tra = 0;
 			auto *bra = (unsigned char *) &back[pos];
 			auto *dra = (unsigned char *) &data[pos];

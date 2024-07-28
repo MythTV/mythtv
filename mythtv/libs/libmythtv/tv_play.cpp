@@ -2603,7 +2603,7 @@ bool TV::HandleLCDTimerEvent()
 
                 lcd_time_string = info.text["playedtime"] + " / " + info.text["totaltime"];
                 // if the string is longer than the LCD width, remove all spaces
-                if (lcd_time_string.length() > static_cast<int>(lcd->getLCDWidth()))
+                if (lcd_time_string.length() > lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
             }
         }
@@ -5024,7 +5024,7 @@ void TV::DoArbSeek(ArbSeekWhence Whence, bool HonorCutlist)
     if (!ok)
         return;
 
-    int64_t time = (int(seek / 100) * 3600) + ((seek % 100) * 60);
+    int64_t time = ((seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (Whence == ARBSEEK_FORWARD)
     {
@@ -5769,7 +5769,11 @@ bool TV::ProcessSmartChannel(QString &InputStr)
         return false;
 
     // Check for and remove duplicate separator characters
-    int size = static_cast<int>(chan.size());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    int size = chan.size();
+#else
+    qsizetype size = chan.size();
+#endif
     if ((size > 2) && (chan.at(size - 1) == chan.at(size - 2)))
     {
         bool ok = false;
