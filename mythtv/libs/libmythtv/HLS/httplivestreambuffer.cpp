@@ -1807,7 +1807,7 @@ int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &
     {
         return RET_ERROR;
     }
-    QString val = list[0];
+    const QString& val = list[0];
 
     if (hls->Version() < 3)
     {

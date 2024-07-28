@@ -768,7 +768,7 @@ bool MythRemoveDirectory(QDir &aDir)
 
     for (int idx = 0; idx < count && !has_err; idx++)
     {
-        QFileInfo entryInfo = entries[idx];
+        const QFileInfo& entryInfo = entries[idx];
         QString path = entryInfo.absoluteFilePath();
         if (entryInfo.isDir())
         {

@@ -40,7 +40,7 @@ UDPPacket PacketBuffer::GetEmptyPacket(void)
         return UDPPacket(m_next_empty_packet_key++);
     }
 
-    UDPPacket packet(*it);
+    const UDPPacket& packet(*it);
     m_empty_packets.erase(it);
 
     return packet;

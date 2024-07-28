@@ -3461,7 +3461,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
-            QString action = actions[i];
+            const QString& action = actions[i];
             bool ok = false;
             int val = action.toInt(&ok);
 

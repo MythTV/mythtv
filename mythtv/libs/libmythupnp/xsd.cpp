@@ -40,7 +40,7 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName )
     // Create Parent object so we can get to its metaObject
     // ----------------------------------------------------------------------
 
-    QString sParentFQN = lstTypeParts[0];
+    const QString& sParentFQN = lstTypeParts[0];
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 

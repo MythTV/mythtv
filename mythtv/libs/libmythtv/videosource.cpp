@@ -4204,8 +4204,8 @@ void SatIPDeviceIDList::fillSelections(const QString &cur)
 
     for (uint i = 0; i < devs.size(); ++i)
     {
-        const QString dev = devs[i];
-        const QString name = names[i];
+        const QString& dev = devs[i];
+        const QString& name = names[i];
         bool dev_in_use = (dev == sel) ? false : in_use[devs[i]];
         QString desc = name + (dev_in_use ? usestr : "");
         addSelection(desc, dev, dev == sel);

@@ -849,8 +849,8 @@ void HouseKeeper::customEvent(QEvent *e)
             if (tokens.size() != 4)
                 return;
 
-            QString hostname = tokens[1];
-            QString tag = tokens[2];
+            const QString& hostname = tokens[1];
+            const QString& tag = tokens[2];
             QDateTime last = MythDate::fromString(tokens[3]);
             bool successful = me->Message().contains("SUCCESSFUL");
 

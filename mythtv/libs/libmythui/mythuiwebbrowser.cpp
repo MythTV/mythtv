@@ -417,7 +417,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {
-            QString action = actions[i];
+            const QString& action = actions[i];
             handled = true;
 
             if (action == "NEXTLINK")
@@ -674,7 +674,7 @@ void MythWebView::customEvent(QEvent *event)
             {
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
-                QString filename = args[1];
+                const QString& filename = args[1];
 
                 closeBusyPopup();
 
@@ -1527,7 +1527,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "TOGGLEINPUT")

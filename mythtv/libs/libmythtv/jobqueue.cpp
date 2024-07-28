@@ -88,7 +88,7 @@ void JobQueue::customEvent(QEvent *e)
             QString msg;
             message = message.simplified();
             QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
-            QString action = tokens[1];
+            const QString& action = tokens[1];
             int jobID = -1;
 
             if (tokens[2] == "ID")

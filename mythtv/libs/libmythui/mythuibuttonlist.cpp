@@ -2541,7 +2541,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
     // handle actions for this container
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "UP")
@@ -3942,7 +3942,7 @@ bool SearchButtonListDialog::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "0")

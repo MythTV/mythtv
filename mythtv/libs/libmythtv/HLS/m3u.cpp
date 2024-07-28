@@ -217,7 +217,7 @@ namespace M3U
             return false;
         }
 
-        QString val = list[0];
+        const QString& val = list[0];
 
         if (version < 3)
         {

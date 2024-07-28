@@ -343,7 +343,7 @@ bool WebSocketWorker::ProcessHandshake(QTcpSocket *socket)
         return false;
     }
 
-    QString path = tokens[1];
+    const QString& path = tokens[1];
 
     if (path.contains('#')) // RFC 6455 - Fragments MUST NOT be used
     {
