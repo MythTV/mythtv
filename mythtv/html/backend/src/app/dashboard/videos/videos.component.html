@@ -5,54 +5,56 @@
     <h2>{{ 'dashboard.videos.heading' | translate }}</h2>
     <div class="block card w-full" style="height: 90vh">
         <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
-        <p-table #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-            [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-            responsiveLayout="scroll" sortField="Title">
+        <p-table *ngIf="showTable" #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true"
+            styleClass="p-datatable-striped p-datatable-sm" [virtualScroll]="true" [rows]="50" [lazy]="true"
+            [totalRecords]="totalRecords" (onLazyLoad)="loadLazy($event)" [rowHover]="true" responsiveLayout="scroll"
+            [virtualScrollItemSize]="41" sortField="Title">
             <ng-template pTemplate="caption">
+                <!-- Top Buttons -->
+                <div class="flex align-items-center">
+                    <p-button (onClick)="breadCrumb(0)" label="{{ 'dashboard.videos.heading' | translate }}" class="p-1"
+                        styleClass="p-button-primary">
+                    </p-button>
+
+                    <span *ngFor="let dir of directory; index as ix">
+                        <p-button (onClick)="breadCrumb(ix+1)" label="{{ dir }}" class="px-1"
+                            styleClass="p-button-primary">
+                        </p-button>
+                    </span>
+                    &nbsp;&nbsp;&nbsp;
+                    <p-checkbox inputId="showAllVideos" [(ngModel)]="showAllVideos" name="showAllVideos"
+                        #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
+                        label="{{ 'dashboard.videos.showall' | translate }} ">
+                    </p-checkbox>
+
+                    <div *ngIf="refreshing else refreshBn">
+                        <p-progressSpinner [style]="{width: '30px', height: '30px'}"></p-progressSpinner>
+                    </div>
+                    <ng-template #refreshBn>
+                        <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                            (click)="refreshing=true;reLoadVideos()"
+                            pTooltip="{{ 'common.refresh' | translate }}"></button>
+                    </ng-template>
+                    &nbsp;&nbsp;&nbsp;{{ videos.length }}  {{ 'common.rows' | translate }}
+                </div>
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th>
-                        <p-button (onClick)="breadCrumb(0)" label="{{ 'dashboard.videos.heading' | translate }}"
-                            class="p-1" styleClass="p-button-primary">
-                        </p-button>
-
-                        <div *ngFor="let dir of directory; index as ix">
-                            <p-button (onClick)="breadCrumb(ix+1)" label="{{ dir }}" class="p-1"
-                                styleClass="p-button-primary">
-                            </p-button>
-                        </div>
-                        &nbsp;&nbsp;&nbsp;
-                        <p-checkbox inputId="showAllVideos" [(ngModel)]="showAllVideos" name="showAllVideos"
-                            #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
-                            label="{{ 'dashboard.videos.showall' | translate }} ">
-                        </p-checkbox>
-
-                        <div *ngIf="refreshing else refreshBn"><p-progressSpinner
-                                [style]="{width: '30px', height: '30px'}"></p-progressSpinner></div>
-                        <ng-template #refreshBn>
-                            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                                (click)="refreshing=true;reLoadVideos()"
-                                pTooltip="{{ 'common.refresh' | translate }}"></button>
-                        </ng-template>
-                        &nbsp;&nbsp;&nbsp;{{ videos.length }} Rows
-                    </th>
-                </tr>
-                <tr>
-                    <th style="flex-basis: 30%" class="p-1" pSortableColumn="Title">
+                    <!-- Column Headings -->
+                    <th style="width: 31%" class="p-1" pSortableColumn="Title">
                         {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
-                    <th style="flex-basis: 3%" class="p-1"></th>
-                    <th style="flex-basis: 30%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
+                    <th style="width: 3%" class="p-1"></th>
+                    <th style="width: 31%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
                         }}</th>
-                    <th style="flex-basis: 6%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
+                    <th style="width: 6%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
                         }}</th>
-                    <th style="flex-basis: 12%" class="justify-content-end p-1" pSortableColumn="ReleaseDate">
+                    <th style="width: 13%" class="justify-content-end p-1" pSortableColumn="ReleaseDate">
                         {{ 'dashboard.videos.releasedate' | translate }} <p-sortIcon field="ReleaseDate"></p-sortIcon>
                     </th>
-                    <th style="flex-basis: 10%" class="justify-content-end p-1">
+                    <th style="width: 10%" class="justify-content-end p-1">
                         {{ 'dashboard.recordings.duration' | translate }}
                     </th>
-                    <th style="flex-basis: 6%" class="p-1">
+                    <th style="width: 6%; white-space: nowrap;" class="pt-1 pb-0">
                         <a target="_blank">
                             <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
@@ -61,33 +63,36 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-video>
-                <tr>
-                    <td style="flex-basis: 30%" class="p-1 overflow-hidden">
-                        <div *ngIf="video.ContentType == 'DIRECTORY' else title">
-                            <button pButton pRipple icon="pi pi-folder" class="p-button-text p-button-primary"
-                                (click)="onDirectory(video.Title)" label="{{video.Title}}"></button>
-                        </div>
-                        <ng-template #title>
-                            {{video.Title}}
-                        </ng-template>
+
+                <!-- Directory Row -->
+                <tr *ngIf="video.ContentType == 'DIRECTORY'">
+                    <td class="pt-1 pb-0" colspan="7">
+                        <button pButton pRipple icon="pi pi-folder" class="p-button-text p-button-primary"
+                            (click)="onDirectory(video.Title)" label="{{video.Title}}"></button>
                     </td>
-                    <td style="flex-basis: 3%" class="p-1">
+                </tr>
+
+                <!-- Video Row -->
+                <tr *ngIf="video.ContentType != 'DIRECTORY'">
+                    <td class="p-1">
+                        {{video.Title}}
+                    </td>
+                    <td class="pt-1 pb-0">
                         <i class="pi pi-eye" *ngIf="video.Watched"></i>
                     </td>
-                    <td style="flex-basis: 30%" class="p-1 overflow-hidden" pTooltip="{{video.Description}}"
-                        tooltipPosition="top">
+                    <td class="p-1 overflow-hidden" pTooltip="{{video.Description}}" tooltipPosition="top">
                         {{video.SubTitle}}</td>
-                    <td style="flex-basis: 6%" class="p-1">
+                    <td class="p-1">
                         <div *ngIf="video.Season>0 || video.Episode>0"> {{video.Season}}x{{video.Episode}} </div>
                     </td>
-                    <td style="flex-basis: 12%" class="justify-content-end p-1">
+                    <td class="justify-content-end p-1">
                         <div [innerHTML]="utility.formatDate(video.ReleaseDate,true)"></div>
                     </td>
-                    <td style="flex-basis: 10%" class="justify-content-end p-1">
+                    <td class="justify-content-end p-1">
                         <div *ngIf="video.Length > 0"> {{ video.Length }} min </div>
                     </td>
-                    <td style="flex-basis: 6%" class="p-1">
-                        <div *ngIf="video.ContentType != 'DIRECTORY'">
+                    <td class="pt-1 pb-0" style="white-space: nowrap;">
+                        <div>
                             <a href="{{URLencode('/Content/GetVideo?Id=' + video.Id)}}" target="_blank"
                                 pTooltip="{{ 'dashboard.videos.download' | translate }}" tooltipPosition="left">
                                 <i class="pi pi-download text-primary"></i></a>

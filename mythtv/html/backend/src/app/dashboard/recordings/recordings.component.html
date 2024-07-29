@@ -10,67 +10,72 @@
         <p-tieredMenu #menu [popup]="true" [model]="menuToShow" class="font-bold">
         </p-tieredMenu>
 
-        <p-table [value]="programs" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-            [virtualScroll]="true" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-            selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true" dataKey="Recording.RecordedId"
-            (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()" sortField="Title">
-            <!-- [compareSelectionBy]="'equals'"> -->
+
+        <!-- Menu, Refresh button and number of rows. -->
+        <div class="flex align-items-center p-1 font-bold">
+            <button pButton pRipple icon="pi pi-bars" class="p-button-text .p-button-success"
+                (click)="showContextMenu(null, $event)" pTooltip="{{ 'common.selected_menu' | translate }}"
+                tooltipPosition="top"></button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <span class="p-input-icon-right">
+                <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
+                <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
+                    class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}" pTooltip="{{ 'dashboard.recordings.regex' | translate }}"
+                    tooltipPosition="top" />
+            </span>
+
+            <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
+                pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
+
+            &nbsp;&nbsp;&nbsp; {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp;
+
+            <p-dropdown [(ngModel)]="selectedRecGroup" [options]="recGroups" name="filter" (onChange)="onFilter()"
+                placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" class="'px-3">
+            </p-dropdown>
+
+            <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"
+                tooltipPosition="top"></button>
+            &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
+        </div>
+
+
+        <p-table *ngIf="showTable" [value]="programs" [totalRecords]="totalRecords"
+            styleClass="p-datatable-sm p-datatable-striped" (onLazyLoad)="loadLazy($event)" [rows]="50" [lazy]="true"
+            [rowHover]="true" selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
+            dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
+            sortField="Title" [virtualScroll]="true" [virtualScrollItemSize]="42" scrollHeight="flex"
+            [scrollable]="true">
+
             <ng-template pTemplate="caption">
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th class="pl-1">
-                        <button pButton pRipple icon="pi pi-bars" class="p-button-text .p-button-success"
-                            (click)="showContextMenu(null, $event)" pTooltip="{{ 'common.selected_menu' | translate }}"
-                            tooltipPosition="top"></button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {{ 'dashboard.recordings.filter' | translate }}: &nbsp;&nbsp; {{ 'dashboard.recordings.title' |
-                        translate }}: &nbsp;
-                        <p-columnFilter type="text" field="Title" [matchModeOptions]="matchModeTitle"></p-columnFilter>
-
-                        {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp;
-                        <p-columnFilter field="Recording.RecGroup" matchMode="equals" [showMenu]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-dropdown [ngModel]="value" [options]="recGroups" name="filter"
-                                    (onChange)="filter($event.value)"
-                                    placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true">
-                                    <ng-template let-option pTemplate="item">
-                                        {{option}}
-                                    </ng-template>
-                                </p-dropdown>
-                            </ng-template>
-                        </p-columnFilter>
-
-                        <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                            (click)="refreshing=true;refresh()" pTooltip="{{ 'common.refresh' | translate }}"
-                            tooltipPosition="top"></button>
-                        &nbsp;&nbsp;&nbsp;{{ programs.length }} Rows
-                    </th>
-                </tr>
-                <tr>
-                    <th style="flex-basis: 12%" class="p-1" pSortableColumn="Title">
+                    <!-- Column Headings. -->
+                    <th style="width: 14%" class="p-1" pSortableColumn="Title">
                         {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
-                    <th style="flex-basis: 2%" class="p-1"></th>
-                    <th style="flex-basis: 18%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
+                    <th style="width: 2%" class="p-1"></th>
+                    <th style="width: 20%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
                         }}</th>
-                    <th style="flex-basis: 4%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
+                    <th style="width: 5%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
                         }}</th>
-                    <th style="flex-basis: 8%" class="justify-content-end p-1" pSortableColumn="Airdate">
+                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="Airdate">
                         {{ 'dashboard.recordings.orig_airdate' | translate }} <p-sortIcon field="Airdate"></p-sortIcon>
                     </th>
-                    <th style="flex-basis: 8%" class="justify-content-end p-1" pSortableColumn="StartTime">
+                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="StartTime">
                         {{ 'dashboard.recordings.airdate' | translate }} <p-sortIcon field="StartTime"></p-sortIcon>
                     </th>
-                    <th style="flex-basis: 10%" class="p-1">{{ 'dashboard.recordings.channel' | translate
+                    <th style="width: 11%" class="p-1">{{ 'dashboard.recordings.channel' | translate
                         }}</th>
-                    <th style="flex-basis: 8%" class="p-1" pSortableColumn="Recording.RecGroup">
+                    <th style="width: 9%" class="p-1" pSortableColumn="Recording.RecGroup">
                         {{ 'dashboard.recordings.recgrp' | translate }} <p-sortIcon
                             field="Recording.RecGroup"></p-sortIcon> </th>
-                    <th style="flex-basis: 6%" class="justify-content-end p-1">
+                    <th style="width: 7%" class="justify-content-end p-1">
                         {{ 'dashboard.recordings.duration' | translate }}
                     </th>
-                    <th style="flex-basis: 8%" class="justify-content-end p-1">{{
+                    <th style="width: 9%" class="justify-content-end p-1">{{
                         'dashboard.recordings.file_size' | translate }}</th>
-                    <th style="flex-basis: 4%" class="p-1" style="background: var(--surface-card);">
+                    <th style="width: 5%; white-space: nowrap; background: var(--surface-card);" class="p-1">
                         <a target="_blank">
                             <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
@@ -81,36 +86,35 @@
             <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
                 <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}" [pSelectableRow]="program"
                     [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)">
-                    <td style="flex-basis: 12%" class="p-1 overflow-hidden">
+                    <td class="p-1 overflow-hidden">
                         <i class="pi pi-exclamation-triangle p-1" *ngIf="program.VideoPropNames.indexOf('DAMAGED') > -1"
                             pTooltip="{{ 'dashboard.recordings.damaged' | translate }}" tooltipPosition="top"></i>
                         {{program.Title}}
                     </td>
-                    <td style="flex-basis: 2%" class="p-1">
+                    <td class="p-1">
                         <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"
                             pTooltip="{{ 'dashboard.recordings.watched' | translate }}" tooltipPosition="top"></i>
                     </td>
-                    <td style="flex-basis: 18%" class="p-1 overflow-hidden" pTooltip="{{program.Description}}"
-                        tooltipPosition="top">
+                    <td class="p-1 overflow-hidden" pTooltip="{{program.Description}}" tooltipPosition="top">
                         {{program.SubTitle}}</td>
-                    <td style="flex-basis: 4%" class="p-1">
+                    <td class="p-1">
                         <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}
                         </div>
                     </td>
-                    <td style="flex-basis: 8%" class="justify-content-end p-1">
+                    <td class="justify-content-end p-1">
                         <div [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
                     </td>
-                    <td style="flex-basis: 8%" class="justify-content-end p-1">
+                    <td class="justify-content-end p-1">
                         <div [innerHTML]="utility.formatDate(program.StartTime,true)"></div>
                     </td>
-                    <td style="flex-basis: 10%" class="p-1">
+                    <td class="p-1">
                         {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
-                    <td style="flex-basis: 8%" class="p-1">{{program.Recording.RecGroup}}</td>
-                    <td style="flex-basis: 6%" class="justify-content-end p-1">{{ getDuration(program) |
+                    <td class="p-1">{{program.Recording.RecGroup}}</td>
+                    <td class="justify-content-end p-1">{{ getDuration(program) |
                         number:'1.0-0' }} min</td>
-                    <td style="flex-basis: 8%" class="justify-content-end p-1">
+                    <td class="justify-content-end p-1">
                         {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
-                    <td style="flex-basis: 4%" class="p-1" style="background: var(--surface-card);">
+                    <td class="pt-1 pb-0" style="background: var(--surface-card); white-space: nowrap;">
                         <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)
                          + '&Download=' + getDownload(program)}}"
                             pTooltip="{{ 'dashboard.recordings.download' | translate }}" tooltipPosition="left">
@@ -120,6 +124,7 @@
                     </td>
                 </tr>
             </ng-template>
+
         </p-table>
 
         <!-- Edit Metadata Dialog -->
