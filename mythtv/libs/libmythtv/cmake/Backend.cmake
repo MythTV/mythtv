@@ -91,10 +91,7 @@ target_sources(
           # Import recorder
           recorders/importrecorder.h
           recorders/importrecorder.cpp
-          recorders/RTjpegN.h
           recorders/audioinput.h
-          recorders/go7007_myth.h
-          recorders/RTjpegN.cpp
           recorders/audioinput.cpp
           # Support for RTP/UDP streams
           recorders/cetonrtsp.h
@@ -177,19 +174,6 @@ if(TARGET PkgConfig::V4L2)
             recorders/v4l2encsignalmonitor.cpp
             recorders/v4l2encstreamhandler.cpp
             recorders/v4lchannel.cpp)
-endif()
-
-if(TARGET Lame::Lame)
-  # Simple NuppelVideo Recorder
-  if(USING_FFMPEG_THREADS)
-    target_compile_definitions(mythtv PRIVATE USING_FFMPEG_THREADS)
-  endif()
-
-  if(NOT MINGW AND NOT MSVC)
-    target_sources(mythtv PRIVATE recorders/NuppelVideoRecorder.cpp
-                                  recorders/NuppelVideoRecorder.h)
-  endif()
-  target_link_libraries(mythtv PUBLIC Lame::Lame)
 endif()
 
 # Support for cable boxes that provide Firewire out
