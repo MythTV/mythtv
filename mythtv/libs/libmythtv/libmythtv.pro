@@ -103,7 +103,6 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # libmythtv proper
 
 # Headers needed by frontend & backend
-HEADERS += format.h
 HEADERS += mythframe.h
 
 # Misc. needed by backend/frontend

@@ -11,8 +11,6 @@ class ProgramInfo;
 class MythPlayer;
 class MythMediaBuffer;
 
-using KFATable = std::vector<struct kfatable_entry>;
-
 class Transcode : public QObject
 {
   public:
@@ -55,7 +53,6 @@ class Transcode : public QObject
     PlayerContext       *m_ctx                 { nullptr };
     MythMediaBuffer     *m_outBuffer           { nullptr };
     MythFIFOWriter      *m_fifow               { nullptr };
-    KFATable            *m_kfaTable            { nullptr };
     bool                 m_showProgress        { false };
     QString              m_recorderOptions;
     bool                 m_avfMode             { false };

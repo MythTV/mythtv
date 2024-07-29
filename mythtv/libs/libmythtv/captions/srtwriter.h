@@ -17,7 +17,6 @@
 // MythTV
 #include "captions/teletextextractorreader.h"
 #include "decoders/avformatdecoder.h"
-#include "format.h"
 #include "mythccextractorplayer.h"
 #include "mythplayer.h"
 
