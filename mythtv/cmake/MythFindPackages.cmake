@@ -200,9 +200,6 @@ endif()
 # libzip: fedora:libzip-devel debian:libzip-dev
 pkg_check_modules(LIBZIP "libzip" REQUIRED IMPORTED_TARGET)
 
-# liblzo: fedora:lzo-devel debian:liblzo2-dev
-pkg_check_modules(LZO2 "lzo2" REQUIRED IMPORTED_TARGET)
-
 # taglib: fedora:taglib-devel debian:libtag1-dev
 pkg_check_modules(TAGLIB "taglib>=1.11.1" REQUIRED IMPORTED_TARGET)
 add_build_config(PkgConfig::TAGLIB "taglib")

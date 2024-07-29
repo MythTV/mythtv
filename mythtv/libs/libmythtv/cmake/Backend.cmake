@@ -8,7 +8,6 @@ if(NOT ENABLE_BACKEND)
   return()
 endif()
 
-target_link_libraries(mythtv PUBLIC PkgConfig::LZO2)
 target_compile_definitions(
   mythtv
   PUBLIC USING_IPTV
