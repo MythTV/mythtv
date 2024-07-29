@@ -8,7 +8,6 @@
 #include "transcodedefs.h"
 
 class ProgramInfo;
-class NuppelVideoRecorder;
 class MythPlayer;
 class MythMediaBuffer;
 
@@ -53,9 +52,6 @@ class Transcode : public QObject
     ProgramInfo         *m_proginfo            { nullptr };
     RecordingProfile    *m_recProfile          { nullptr };
     int                  m_keyframeDist        { 30 };
-#if CONFIG_LIBMP3LAME
-    NuppelVideoRecorder *m_nvr                 { nullptr };
-#endif
     PlayerContext       *m_ctx                 { nullptr };
     MythMediaBuffer     *m_outBuffer           { nullptr };
     MythFIFOWriter      *m_fifow               { nullptr };
