@@ -54,7 +54,6 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
     uint             m_ntscVbiLineCount       {0};
     VBI608Extractor *m_vbi608                 {nullptr};
     VBIThread       *m_vbiThread              {nullptr};
-    QList<struct txtbuffertype*> m_textBuffer;
     int              m_vbiFd                  {-1};
     volatile bool    m_requestHelper          {false};
 };
