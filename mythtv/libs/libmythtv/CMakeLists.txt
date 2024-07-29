@@ -40,7 +40,6 @@ add_library(
   dbcheck.cpp
   dbcheck.h
   driveroption.h
-  format.h
   io/mythavformatbuffer.cpp
   io/mythavformatbuffer.h
   io/mythfilebuffer.cpp

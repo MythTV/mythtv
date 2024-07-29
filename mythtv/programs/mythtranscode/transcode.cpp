@@ -57,19 +57,7 @@ Transcode::~Transcode()
     SetPlayerContext(nullptr);
     delete m_outBuffer;
     delete m_fifow;
-    delete m_kfaTable;
     delete m_recProfile;
-}
-void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
-{
-    long delta = curframe - lastkey;
-    if (delta != 0 && delta != m_keyframeDist)
-    {
-        struct kfatable_entry kfate {};
-        kfate.adjust = m_keyframeDist - delta;
-        kfate.keyframe_number = num_keyframes;
-        m_kfaTable->push_back(kfate);
-    }
 }
 
 bool Transcode::GetProfile(const QString& profileName, const QString& encodingType,
@@ -322,8 +310,6 @@ int Transcode::TranscodeFile(const QString &inputname,
     int newHeight = video_height;
     bool halfFramerate = false;
     bool skippedLastFrame = false;
-
-    m_kfaTable = new std::vector<struct kfatable_entry>;
 
     if (m_avfMode)
     {

@@ -4,7 +4,6 @@
 #include "libmythbase/programinfo.h"
 
 #include "decoders/decoderbase.h"
-#include "format.h"
 #include "mythframe.h"
 
 class DummyDecoder : public DecoderBase

@@ -13,8 +13,49 @@
 #include <QRecursiveMutex>
 #include <QChar>
 
-#include "libmythtv/format.h"
 #include "libmythbase/mythchrono.h"
+
+struct teletextsubtitle
+{
+    unsigned char row;
+    unsigned char col;
+    unsigned char dbl;
+    unsigned char fg;
+    unsigned char bg;
+    unsigned char len;
+};
+
+struct ccsubtitle
+{
+    unsigned char row;
+    unsigned char rowcount;
+    unsigned char resumedirect;
+    unsigned char resumetext;
+    unsigned char clr; // clear the display
+    unsigned char len; //length of string to follow
+};
+
+// resumedirect codes
+enum CC_STYLE : std::uint8_t {
+    CC_STYLE_POPUP  = 0x00,
+    CC_STYLE_PAINT  = 0x01,
+    CC_STYLE_ROLLUP = 0x02,
+};
+
+// resumetext special codes
+static constexpr uint8_t CC_LINE_CONT  { 0x02 };
+static constexpr uint8_t CC_MODE_MASK  { 0xf0 };
+static constexpr uint8_t CC_TXT_MASK   { 0x20 };
+enum CC_MODE : std::uint8_t {
+    CC_CC1  = 0x00,
+    CC_CC2  = 0x10,
+    CC_TXT1 = 0x20,
+    CC_TXT2 = 0x30,
+    CC_CC3  = 0x40,
+    CC_CC4  = 0x50,
+    CC_TXT3 = 0x60,
+    CC_TXT4 = 0x70,
+};
 
 using CC608Seen        = std::array<bool,4>;
 using CC608ProgramType = std::array<QString,96>;
