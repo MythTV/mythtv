@@ -31,9 +31,6 @@
 #include "io/mythmediabuffer.h"
 #include "cardutil.h"
 #include "tv_rec.h"
-#if CONFIG_LIBMP3LAME
-#include "NuppelVideoRecorder.h"
-#endif
 #if CONFIG_V4L2
 #include "v4l2encrecorder.h"
 #include "v4lchannel.h"
@@ -974,14 +971,6 @@ RecorderBase *RecorderBase::CreateRecorder(
         }
     }
 #endif // USING_ASI
-#if CONFIG_LIBMP3LAME && defined(USING_V4L2)
-    else if (CardUtil::IsV4L(genOpt.m_inputType))
-    {
-        // V4L/MJPEG/GO7007 from here on
-        recorder = new NuppelVideoRecorder(tvrec, channel);
-        recorder->SetBoolOption("skipbtaudio", genOpt.m_skipBtAudio);
-    }
-#endif // USING_V4L2
 
     if (recorder)
     {
