@@ -30,7 +30,6 @@ HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
 HEADERS += mythbinaryplist.h signalhandling.h mythtimezone.h mythdate.h
 HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += mythpluginexport.h
-HEADERS += ffmpeg-mmx.h
 HEADERS += mythrandom.h
 HEADERS += stringutil.h
 HEADERS += mythsystemlegacy.h mythtypes.h

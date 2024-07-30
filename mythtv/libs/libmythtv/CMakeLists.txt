@@ -40,7 +40,6 @@ add_library(
   dbcheck.cpp
   dbcheck.h
   driveroption.h
-  format.h
   io/mythavformatbuffer.cpp
   io/mythavformatbuffer.h
   io/mythfilebuffer.cpp
@@ -245,12 +244,10 @@ if(WIN32)
 else(WIN32)
   target_sources(
     mythtv
-    PRIVATE recorders/vbitext/cc.h
-            recorders/vbitext/dllist.h
+    PRIVATE recorders/vbitext/dllist.h
             recorders/vbitext/lang.h
             recorders/vbitext/vbi.h
             recorders/vbitext/vt.h
-            recorders/vbitext/cc.cpp
             recorders/vbitext/vbi.cpp
             recorders/vbitext/lang.cpp)
 endif(WIN32)
