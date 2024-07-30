@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+#include "httplivestreambuffer.h"
 
 
 // QT
@@ -43,8 +43,9 @@
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 
-// libmythtv
-#include "httplivestreambuffer.h"
+extern "C" {
+#include "libavformat/avio.h"
+}
 
 #ifdef USING_LIBCRYPTO
 // encryption related stuff
@@ -1715,22 +1716,22 @@ bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
 bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
 {
     bool isHLS = false;
-    URLContext *context = nullptr;
 
     // Do a peek on the URL to test the format
     MythMediaBuffer::AVFormatInitNetwork();
-    int ret = ffurl_open_whitelist(&context, filename.toLatin1(),
-        AVIO_FLAG_READ, nullptr, nullptr, nullptr, nullptr, nullptr);
+
+    AVIOContext* context = nullptr;
+    int ret = avio_open(&context, filename.toLatin1(), AVIO_FLAG_READ);
     if (ret >= 0)
     {
         std::array<uint8_t,1024> buffer {};
-        ret = ffurl_read(context, buffer.data(), buffer.size());
+        ret = avio_read(context, buffer.data(), buffer.size());
         if (ret > 0)
         {
             QByteArray ba((const char*)buffer.data(), ret);
             isHLS = IsHTTPLiveStreaming(&ba);
         }
-        ffurl_close(context);
+        avio_closep(&context);
     }
     else
     {
