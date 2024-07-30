@@ -18,6 +18,7 @@
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recordingfile.h"
 #include "libmythtv/recordingquality.h"
+#include "libmythtv/scantype.h"
 
 extern "C"
 {
@@ -50,13 +51,6 @@ public:
 private:
     uint m_num;
     uint m_den;
-};
-
-enum class SCAN_t : uint8_t {
-    UNKNOWN_SCAN,
-    INTERLACED,
-    PROGRESSIVE,
-    VARIABLE
 };
 
 /** \class RecorderBase
