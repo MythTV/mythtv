@@ -3380,7 +3380,7 @@ void CardInput::channelScanner(void)
     if (ssd->Create())
     {
         connect(ssd, &StandardSettingDialog::Exiting, this,
-                [=]()
+                [srcid, this, num_channels_before]()
                 {
                     if (SourceUtil::GetChannelCount(srcid))
                         m_startChan->SetSourceID(QString::number(srcid));
