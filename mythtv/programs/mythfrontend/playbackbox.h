@@ -74,14 +74,14 @@ class PlaybackBox : public ScheduleCommon
         Categories = 4,
         CategoriesRecGroups = 5,
         RecGroups = 6,
-        ViewTypes,                  // placeholder value, not in database
+        ViewTypes = 7,              // placeholder value, not in database
     };
 
     // Sort function when TitlesOnly. Values are stored in database.
     enum ViewTitleSort : std::uint8_t {
         TitleSortAlphabetical = 0,
         TitleSortRecPriority = 1,
-        TitleSortMethods,           // placeholder value, not in database
+        TitleSortMethods = 2,       // placeholder value, not in database
     };
 
     enum ViewMask : std::uint16_t {

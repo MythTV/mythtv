@@ -15,19 +15,19 @@
 enum ProgListType : std::uint8_t {
     plUnknown = 0,
     plTitle = 1,
-    plTitleSearch,
-    plKeywordSearch,
-    plPeopleSearch,
-    plPowerSearch,
-    plSQLSearch,
-    plNewListings,
-    plMovies,
-    plCategory,
-    plChannel,
-    plTime,
-    plRecordid,
-    plStoredSearch,
-    plPreviouslyRecorded
+    plTitleSearch = 2,
+    plKeywordSearch = 3,
+    plPeopleSearch = 4,
+    plPowerSearch = 5,
+    plSQLSearch = 6,
+    plNewListings = 7,
+    plMovies = 8,
+    plCategory = 9,
+    plChannel = 10,
+    plTime = 11,
+    plRecordid = 12,
+    plStoredSearch = 13,
+    plPreviouslyRecorded = 14
 };
 
 class ProgLister : public ScheduleCommon

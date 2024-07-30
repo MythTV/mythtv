@@ -97,10 +97,10 @@ enum C0 : std::uint8_t
 
 enum C1 : std::uint8_t
 {
-    CW0=0x80, CW1, CW2, CW3, CW4, CW5, CW6, CW7,
-    CLW,      DSW, HDW, TGW, DLW, DLY, DLC, RST,
-    SPA=0x90, SPC, SPL,                     SWA=0x97,
-    DF0,      DF1, DF2, DF3, DF4, DF5, DF6, DF7,
+    CW0=0x80, CW1=0x81, CW2=0x82, CW3=0x83, CW4=0x84, CW5=0x85, CW6=0x86, CW7=0x87,
+    CLW=0x88, DSW=0x89, HDW=0x8A, TGW=0x8B, DLW=0x8C, DLY=0x8D, DLC=0x8E, RST=0x8F,
+    SPA=0x90, SPC=0x91, SPL=0x92,                                         SWA=0x97,
+    DF0=0x98, DF1=0x99, DF2=0x9A, DF3=0x9B, DF4=0x9C, DF5=0x9D, DF6=0x9E, DF7=0x9F,
 };
 
 using cc_table = std::array<const uint16_t, 0x60>;

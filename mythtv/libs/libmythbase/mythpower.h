@@ -29,7 +29,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
         BatteryLow    = 10,
         BatteryFull   = 100,
         UnknownPower  = 101,
-        Unset
+        Unset         = 102,
     };
 
     enum Feature : std::uint8_t

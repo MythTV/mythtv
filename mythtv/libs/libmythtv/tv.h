@@ -39,13 +39,13 @@ enum ChannelChangeDirection : std::uint8_t
 /// Used to request ProgramInfo for channel browsing.
 enum BrowseDirection : std::int8_t
 {
-    BROWSE_INVALID = -1,
-    BROWSE_SAME = 0, ///< Fetch browse information on current channel and time
-    BROWSE_UP,       ///< Fetch information on previous channel
-    BROWSE_DOWN,     ///< Fetch information on next channel
-    BROWSE_LEFT,     ///< Fetch information on current channel in the past
-    BROWSE_RIGHT,    ///< Fetch information on current channel in the future
-    BROWSE_FAVORITE  ///< Fetch information on the next favorite channel
+    BROWSE_INVALID  = -1,
+    BROWSE_SAME     = 0, ///< Fetch browse information on current channel and time
+    BROWSE_UP       = 1, ///< Fetch information on previous channel
+    BROWSE_DOWN     = 2, ///< Fetch information on next channel
+    BROWSE_LEFT     = 3, ///< Fetch information on current channel in the past
+    BROWSE_RIGHT    = 4, ///< Fetch information on current channel in the future
+    BROWSE_FAVORITE = 5  ///< Fetch information on the next favorite channel
 };
 
 /** \brief TVState is an enumeration of the states used by TV and TVRec.
@@ -63,33 +63,33 @@ enum TVState : std::int8_t
      *         recording and the user has control over the channel and
      *         the recorder to use.
      */
-    kState_WatchingLiveTV,
+    kState_WatchingLiveTV = 1,
     /** \brief Watching Pre-recorded is a TV only state for when we are
      *         watching a pre-existing recording.
      */
-    kState_WatchingPreRecorded,
+    kState_WatchingPreRecorded = 2,
     /** \brief Watching Video is the state when we are watching a video and is not
     *             a dvd or BD
     */
-    kState_WatchingVideo,
+    kState_WatchingVideo = 3,
     /** \brief Watching DVD is the state when we are watching a DVD */
-    kState_WatchingDVD,
+    kState_WatchingDVD = 4,
     /** \brief Watching BD is the state when we are watching a BD */
-    kState_WatchingBD,
+    kState_WatchingBD = 5,
     /** \brief Watching Recording is the state for when we are watching
      *         an in progress recording, but the user does not have control
      *         over the channel and recorder to use.
      */
-    kState_WatchingRecording,
+    kState_WatchingRecording = 6,
     /** \brief Recording Only is a TVRec only state for when we are recording
      *         a program, but there is no one currently watching it.
      */
-    kState_RecordingOnly,
+    kState_RecordingOnly = 7,
     /** \brief This is a placeholder state which we never actually enter,
      *         but is returned by GetState() when we are in the process
      *         of changing the state.
      */
-    kState_ChangingState,
+    kState_ChangingState = 8,
 };
 inline TVState myth_deque_init(const TVState */*state*/) { return (TVState)(0); }
 
@@ -135,8 +135,8 @@ enum CommSkipMode : std::uint8_t
     kCommSkipOff    = 0,
     kCommSkipOn     = 1,
     kCommSkipNotify = 2,
-    kCommSkipCount,
-    kCommSkipIncr,
+    kCommSkipCount  = 3,
+    kCommSkipIncr   = 4,
 };
 QString toString(CommSkipMode type);
 #endif

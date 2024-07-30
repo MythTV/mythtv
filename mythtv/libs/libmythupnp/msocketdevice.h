@@ -145,17 +145,17 @@ public:
 
     enum Error : std::uint8_t
     {
-        NoError,
-        AlreadyBound,
-        Inaccessible,
-        NoResources,
-        InternalError,
+        NoError = 0,
+        AlreadyBound = 1,
+        Inaccessible = 2,
+        NoResources = 3,
+        InternalError = 4,
         Bug = InternalError, // ### remove in 4.0?
-        Impossible,
-        NoFiles,
-        ConnectionRefused,
-        NetworkFailure,
-        UnknownError
+        Impossible = 5,
+        NoFiles = 6,
+        ConnectionRefused = 7,
+        NetworkFailure = 8,
+        UnknownError = 9
     };
     Error  error() const;
 
