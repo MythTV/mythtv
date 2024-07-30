@@ -82,8 +82,6 @@ typedef struct SectionContext {
  * synchronization is lost */
 #define MAX_RESYNC_SIZE 65536
 
-#define MAX_PES_PAYLOAD 200 * 1024
-
 #define MAX_MP4_DESCR_COUNT 16
 
 #define MOD_UNLIKELY(modulus, dividend, divisor, prev_dividend)                \
@@ -331,7 +329,7 @@ typedef struct PESContext {
     int merged_st;
 } PESContext;
 
-extern AVInputFormat ff_mythtv_mpegts_demuxer;
+extern const AVInputFormat ff_mythtv_mpegts_demuxer;
 
 static struct Program * get_program(MpegTSContext *ts, unsigned int programid)
 {
@@ -479,8 +477,6 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
 /**
  *  Assemble PES packets out of TS packets, and then call the "section_cb"
  *  function when they are complete.
- *
- *  NOTE: "DVB Section" is DVB terminology for an MPEG PES packet.
  */
 static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
                                const uint8_t *buf, int buf_size, int is_start)
@@ -892,7 +888,7 @@ static const StreamType ISO_types[] = {
     { 0x02, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
     { 0x03, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
     { 0x04, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
-    { 0x0b, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
+    { 0x0b, AVMEDIA_TYPE_DATA,  AV_CODEC_ID_DSMCC_B    }, /* STREAM_TYPE_DSMCC_B */
     { 0x0f, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AAC        },
     { 0x10, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG4      },
     /* Makito encoder sets stream type 0x11 for AAC,
@@ -937,10 +933,8 @@ static const StreamType SCTE_types[] = {
 /* ATSC ? */
 static const StreamType MISC_types[] = {
     { 0x81, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC3 },
-    { 0x87, AVMEDIA_TYPE_AUDIO,     AV_CODEC_ID_EAC3 },
+    { 0x87, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_EAC3 },
     { 0x8a, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS },
-    { 0x100, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE },
-    { 0x101, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI },
     { 0 },
 };
 
@@ -980,18 +974,12 @@ static const StreamType DESC_types[] = {
     { 0x6a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_AC3          }, /* AC-3 descriptor */
     { 0x7a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3         }, /* E-AC-3 descriptor */
     { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
-    { 0x13, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
-    { 0x45, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_DATA_ID */
-    { 0x46, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_TELETEXT_ID */ //FixMe type subtilte
+    { 0x13, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B      }, /* DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR */
+    { 0x45, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_DATA_DESCRIPTOR */
+    { 0x46, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_TELETEXT_DESCRIPTOR */
     { 0x56, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_TELETEXT },
     { 0x59, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE }, /* subtitling descriptor */
     { 0 },
-};
-
-/* component tags */
-static const StreamType COMPONENT_TAG_types[] = {
-    { 0x0a, AVMEDIA_TYPE_AUDIO,        AV_CODEC_ID_MP3 },
-    { 0x52, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
 };
 
 static void mpegts_find_stream_type(AVStream *st,
@@ -2092,18 +2080,8 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                     extradata[4] = get8(pp, desc_end); /* subtitling_type */
                     memcpy(extradata, *pp, 4); /* composition_page_id and ancillary_page_id */
                     extradata += 5;
-#ifdef UPSTREAM_TO_MYTHTV
 
                     *pp += 4;
-#else
-                    {
-                        int comp_page   = get16(pp, desc_end);
-                        int anc_page    = get16(pp, desc_end);
-                        int sub_id      = (anc_page << 16) | comp_page;
-                        if (sub_id && (st->codecpar->codec_id == AV_CODEC_ID_DVB_SUBTITLE))
-                            st->carousel_id = sub_id;
-                    }
-#endif
                 }
 
                 language[i * 4 - 1] = 0;
@@ -2147,45 +2125,27 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                 sti->request_probe = 50;
         }
         break;
-    case DVB_BROADCAST_ID:
+    case DATA_BROADCAST_ID_DESCRIPTOR:
         st->data_id = get16(pp, desc_end);
         break;
-    case DVB_CAROUSEL_ID:
-        {
-            int carId = 0;
-            carId = get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            st->carousel_id = carId;
-        }
+    case DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR:
+        st->carousel_id = get8(pp, desc_end) << 24 |
+                          get8(pp, desc_end) << 16 |
+                          get8(pp, desc_end) <<  8 |
+                          get8(pp, desc_end);
         break;
     case 0x52: /* stream identifier descriptor */
         sti->stream_identifier = 1 + get8(pp, desc_end);
         st->component_tag     = sti->stream_identifier - 1;
-    // DVB_DATA_STREAM:
-        /* Audio and video are sometimes encoded in private streams labelled with
-         * a component tag. */
-#if 0
-         if (st->codecpar->codec_id == AV_CODEC_ID_NONE &&
-             desc_count  == 1 &&
-             stream_type == STREAM_TYPE_PRIVATE_DATA)
-             mpegts_find_stream_type(st, st->component_tag,
-                                         COMPONENT_TAG_types);
-#endif
         break;
-    case DVB_VBI_TELETEXT_ID:
+    case VBI_TELETEXT_DESCRIPTOR:
         language[0] = get8(pp, desc_end);
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
         language[3] = 0;
 
-        /* dvbci->txt_type = */ i = (get8(pp, desc_end)) >> 3; // not exported, defeat compiler -Wunused-value
         if (language[0])
             av_dict_set(&st->metadata, "language", language, 0);
-        break;
-    case DVB_VBI_DATA_ID:
-        // dvbci->vbi_data = 1; //not parsing the data service descriptors
         break;
     case METADATA_DESCRIPTOR:
         if (get16(pp, desc_end) == 0xFFFF)
@@ -4065,7 +4025,7 @@ void avpriv_mythtv_mpegts_parse_close(MpegTSContext *ts)
     av_free(ts);
 }
 
-AVInputFormat ff_mythtv_mpegts_demuxer = {
+const AVInputFormat ff_mythtv_mpegts_demuxer = {
     .name           = "mpegts",
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-TS (MPEG-2 Transport Stream)"),
     .priv_data_size = sizeof(MpegTSContext),
@@ -4078,7 +4038,7 @@ AVInputFormat ff_mythtv_mpegts_demuxer = {
     .priv_class     = &mpegts_class,
 };
 
-AVInputFormat ff_mythtv_mpegtsraw_demuxer = {
+const AVInputFormat ff_mythtv_mpegtsraw_demuxer = {
     .name           = "mpegtsraw",
     .long_name      = NULL_IF_CONFIG_SMALL("raw MPEG-TS (MPEG-2 Transport Stream)"),
     .priv_data_size = sizeof(MpegTSContext),
