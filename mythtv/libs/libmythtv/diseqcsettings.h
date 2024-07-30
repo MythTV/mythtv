@@ -8,7 +8,7 @@
 #define DISEQCSETTINGS_H
 
 #include "diseqc.h"
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 using devid_to_setting_t = QMap<uint, StandardSetting*>;
 

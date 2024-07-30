@@ -5,7 +5,9 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "standardsettings.h"
+#include "libmythui/standardsettings.h"
+
+#include "mythexp.h"
 
 class MPUBLIC DatabaseSettings : public GroupSetting
 {

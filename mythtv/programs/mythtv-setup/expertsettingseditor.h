@@ -1,7 +1,7 @@
 #ifndef EXPERTSETTINGSEDITOR_H
 #define EXPERTSETTINGSEDITOR_H
 
-#include "libmyth/rawsettingseditor.h"
+#include "libmythui/rawsettingseditor.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 

@@ -4,7 +4,7 @@
 #ifndef GALLERYCONFIG_H
 #define GALLERYCONFIG_H
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 class GallerySettings : public GroupSetting
 {
