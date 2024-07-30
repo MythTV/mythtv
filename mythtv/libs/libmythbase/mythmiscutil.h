@@ -59,33 +59,4 @@ MBASE_PUBLIC bool MythRemoveDirectory(QDir &aDir);
 
 MBASE_PUBLIC void setHttpProxy(void);
 
-// CPU Tick timing function
-#ifdef MMX
-#ifdef _WIN32
-#include "compat.h"
-inline void rdtsc(uint64_t &x)
-{
-    QueryPerformanceCounter((LARGE_INTEGER*)(&x));
-}
-#else
-struct timing_ab_t {
-    uint a;
-    uint b;
-};
-inline void rdtsc(uint64_t &x)
-{
-    auto &y = (timing_ab_t&) x;
-    asm("rdtsc \n"
-        "mov %%eax, %0 \n"
-        "mov %%edx, %1 \n"
-        :
-        : "m"(y.a), "m"(y.b)
-        : "%eax", "%edx");
-}
-#endif
-
-#else // if !MMX
-inline void rdtsc(uint64_t &x) { x = 0ULL; }
-#endif // !MMX
-
 #endif // MYTHMISCUTIL_H_
