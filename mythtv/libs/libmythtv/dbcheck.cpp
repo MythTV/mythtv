@@ -29,6 +29,7 @@
 const QString currentDatabaseVersion = MYTH_DATABASE_VERSION;
 
 static bool doUpgradeTVDatabaseSchema(void);
+static bool tryUpgradeTVDatabaseSchema(bool upgradeAllowed, bool upgradeIfNoUI, bool informSystemd);
 
 #if CONFIG_SYSTEMD_NOTIFY
 #include <systemd/sd-daemon.h>
@@ -365,8 +366,6 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
 #endif
-    SchemaUpgradeWizard *schema_wizard = nullptr;
-
     // Suppress DB messages and turn of the settings cache,
     // These are likely to confuse the users and the code, respectively.
     GetMythDB()->SetSuppressDBMessages(true);
@@ -387,14 +386,32 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (!locked)
     {
         LOG(VB_GENERAL, LOG_INFO, "Failed to get schema upgrade lock");
-        goto upgrade_error_exit;
+        GetMythDB()->SetSuppressDBMessages(false);
+        gCoreContext->ActivateSettingsCache(true);
+        return false;
     }
 
+    bool success = tryUpgradeTVDatabaseSchema(upgradeAllowed, upgradeIfNoUI, informSystemd);
+
+    // On any exit we want to re-enable the DB messages so errors
+    // are reported and we want to make sure the setting cache is
+    // enabled for good performance and we must unlock the schema
+    // lock.
+    if (informSystemd)
+        db_sd_notify(success ? "success" : "failed");
+    GetMythDB()->SetSuppressDBMessages(false);
+    gCoreContext->ActivateSettingsCache(true);
+    DBUtil::UnlockSchema(query);
+    return success;
+}
+
+static bool tryUpgradeTVDatabaseSchema(bool upgradeAllowed, bool upgradeIfNoUI, bool informSystemd)
+{
     // Determine if an upgrade is needed
-    schema_wizard = SchemaUpgradeWizard::Get(
+    SchemaUpgradeWizard* schema_wizard = SchemaUpgradeWizard::Get(
         "DBSchemaVer", "MythTV", currentDatabaseVersion);
     if (schema_wizard->Compare() == 0) // DB schema is what we need it to be..
-        goto upgrade_ok_exit;
+        return true;
 
     if (!upgradeAllowed)
         LOG(VB_GENERAL, LOG_WARNING, "Not allowed to upgrade the database.");
@@ -406,10 +423,10 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                 "TV", upgradeAllowed, upgradeIfNoUI, MINIMUM_DBMS_VERSION))
     {
         case MYTH_SCHEMA_USE_EXISTING:
-            goto upgrade_ok_exit;
+            return true;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
-            goto upgrade_error_exit;
+            return false;
         case MYTH_SCHEMA_UPGRADE:
             break;
     }
@@ -423,33 +440,12 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (!doUpgradeTVDatabaseSchema())
     {
         LOG(VB_GENERAL, LOG_ERR, "Database schema upgrade failed.");
-        goto upgrade_error_exit;
+        return false;
     }
 
     LOG(VB_GENERAL, LOG_INFO, "Database schema upgrade complete.");
 
-    // On any exit we want to re-enable the DB messages so errors
-    // are reported and we want to make sure the setting cache is
-    // enabled for good performance and we must unlock the schema
-    // lock. We use gotos with labels so it's impossible to miss
-    // these steps.
-  upgrade_ok_exit:
-    if (informSystemd)
-        db_sd_notify("success");
-    GetMythDB()->SetSuppressDBMessages(false);
-    gCoreContext->ActivateSettingsCache(true);
-    if (locked)
-        DBUtil::UnlockSchema(query);
     return true;
-
-  upgrade_error_exit:
-    if (informSystemd)
-        db_sd_notify("failed");
-    GetMythDB()->SetSuppressDBMessages(false);
-    gCoreContext->ActivateSettingsCache(true);
-    if (locked)
-        DBUtil::UnlockSchema(query);
-    return false;
 }
 
 /** \fn doUpgradeTVDatabaseSchema(void)
