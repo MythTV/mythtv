@@ -33,10 +33,10 @@ const format_array AudioOutputSettings::kStdFormats
 };
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
-    m_invalid(invalid)
+    m_invalid(invalid),
+    m_srIt(kStdRates.begin()),
+    m_sfIt(kStdFormats.begin())
 {
-    m_srIt = kStdRates.begin();
-    m_sfIt = kStdFormats.begin();
 }
 
 AudioOutputSettings::~AudioOutputSettings()

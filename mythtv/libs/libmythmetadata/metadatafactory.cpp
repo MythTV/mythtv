@@ -76,13 +76,12 @@ MetadataFactoryVideoChanges::~MetadataFactoryVideoChanges()
 }
 
 MetadataFactory::MetadataFactory(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_lookupthread(new MetadataDownload(this)),
+    m_imagedownload(new MetadataImageDownload(this)),
+    m_videoscanner(new VideoScannerThread(this)),
+    m_mlm(new VideoMetadataListManager())
 {
-    m_lookupthread = new MetadataDownload(this);
-    m_imagedownload = new MetadataImageDownload(this);
-    m_videoscanner = new VideoScannerThread(this);
-
-    m_mlm = new VideoMetadataListManager();
 }
 
 MetadataFactory::~MetadataFactory()

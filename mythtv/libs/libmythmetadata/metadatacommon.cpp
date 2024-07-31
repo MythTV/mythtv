@@ -98,6 +98,7 @@ MetadataLookup::MetadataLookup(
     m_host(std::move(host)),
     m_filename(std::move(filename)),
     m_title(title),
+    m_baseTitle(title),
     m_network(std::move(network)),
     m_status(std::move(status)),
     m_categories(std::move(categories)),
@@ -152,7 +153,6 @@ MetadataLookup::MetadataLookup(
     m_downloads(std::move(downloads))
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-    m_baseTitle = title;
     m_baseTitle.replace(manRecSuffix,"");
 }
 
@@ -211,6 +211,7 @@ MetadataLookup::MetadataLookup(
     m_host(std::move(host)),
     m_filename(std::move(filename)),
     m_title(title),
+    m_baseTitle(title),
     m_categories(std::move(categories)),
     m_userRating(userrating),
     m_subtitle(std::move(subtitle)),
@@ -240,7 +241,6 @@ MetadataLookup::MetadataLookup(
     m_runtimeSecs(runtimesecs)
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-    m_baseTitle = title;
     m_baseTitle.replace(manRecSuffix,"");
 }
 
@@ -289,6 +289,7 @@ MetadataLookup::MetadataLookup(
     m_host(std::move(host)),
     m_filename(std::move(filename)),
     m_title(title),
+    m_baseTitle(title),
     m_categories(std::move(categories)),
     m_userRating(userrating),
     m_subtitle(std::move(subtitle)),
@@ -308,7 +309,6 @@ MetadataLookup::MetadataLookup(
     m_downloads(std::move(downloads))
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-    m_baseTitle = title;
     m_baseTitle.replace(manRecSuffix,"");
 }
 

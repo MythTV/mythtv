@@ -31,12 +31,6 @@ static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-MHOctetString::MHOctetString()
-{
-    m_nLength = 0;
-    m_pChars = nullptr;
-}
-
 // Construct from a string
 MHOctetString::MHOctetString(const char *str, int nLen)
 {
@@ -65,9 +59,8 @@ MHOctetString::MHOctetString(const char *str, int nLen)
 }
 
 MHOctetString::MHOctetString(const unsigned char *str, int nLen)
+  : m_nLength(nLen)
 {
-    m_nLength = nLen;
-
     if (nLen == 0)
     {
         m_pChars = nullptr;

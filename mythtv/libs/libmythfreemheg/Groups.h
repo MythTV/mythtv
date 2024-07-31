@@ -237,9 +237,9 @@ class MHTransitionTo: public MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
-    bool    m_fIsTagged;
-    int     m_nConnectionTag;
-    int     m_nTransitionEffect;
+    bool    m_fIsTagged         { false };
+    int     m_nConnectionTag    {     0 };
+    int     m_nTransitionEffect {    -1 };
 };
 
 // Lock and unlock functions.

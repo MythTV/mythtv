@@ -66,8 +66,8 @@ void CleanupHooks::cleanup()
 }
 
 CleanupHooks::CleanupHooks()
+  : m_imp(new CleanupHooksImp())
 {
-    m_imp = new CleanupHooksImp();
 }
 
 CleanupHooks::~CleanupHooks()

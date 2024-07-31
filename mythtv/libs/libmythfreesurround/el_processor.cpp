@@ -45,15 +45,18 @@ class fsurround_decoder::Impl {
 public:
     // create an instance of the decoder
     //  blocksize is fixed over the lifetime of this object for performance reasons
-    explicit Impl(unsigned blocksize=8192): m_n(blocksize), m_halfN(blocksize/2) {
+    explicit Impl(unsigned blocksize=8192)
+      : m_n(blocksize),
+        m_halfN(blocksize/2),
         // create lavc fft buffers
-        m_dftL = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
-        m_dftR = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
-        m_src  = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
+        m_dftL((FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2)),
+        m_dftR((FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2)),
         // TODO only valid because blocksize is always 8192:
         // (convert blocksize to log_2 (n) instead since FFmpeg only supports sizes that are powers of 2)
-        m_fftContextForward = av_fft_init(13, 0);
-        m_fftContextReverse = av_fft_init(13, 1);
+        m_fftContextForward(av_fft_init(13, 0)),
+        m_fftContextReverse(av_fft_init(13, 1)),
+        m_src((FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2))
+{
         // resize our own buffers
         m_frontR.resize(m_n);
         m_frontL.resize(m_n);

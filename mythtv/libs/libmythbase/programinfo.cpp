@@ -749,6 +749,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
 {
     ProgramInfo::clear();
 
+    //NOLINTBEGIN(cppcoreguidelines-prefer-member-initializer)
+    // These have to remain after the call to ::clear().
     m_title = _title;
     m_sortTitle = _sortTitle;
     m_subtitle = _subtitle;
@@ -760,6 +762,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     m_programId = _programid;
     m_inetRef = _inetref;
     m_year = _year;
+    //NOLINTEND(cppcoreguidelines-prefer-member-initializer)
 
     QDateTime cur = MythDate::current();
     int64_t minutes = length_in_minutes.count();

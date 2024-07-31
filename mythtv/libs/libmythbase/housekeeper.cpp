@@ -578,8 +578,8 @@ void HouseKeepingThread::run(void)
  *
  */
 HouseKeeper::HouseKeeper(void)
+  : m_timer(new QTimer(this))
 {
-    m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &HouseKeeper::Run);
     m_timer->setInterval(1min);
     m_timer->setSingleShot(false);

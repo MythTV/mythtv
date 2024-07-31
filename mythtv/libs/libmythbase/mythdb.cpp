@@ -128,9 +128,8 @@ MythDBPrivate::~MythDBPrivate()
     LOG(VB_DATABASE, LOG_INFO, "Destroying MythDBPrivate");
 }
 
-MythDB::MythDB()
+MythDB::MythDB() : d(new MythDBPrivate())
 {
-    d = new MythDBPrivate();
 }
 
 MythDB::~MythDB()

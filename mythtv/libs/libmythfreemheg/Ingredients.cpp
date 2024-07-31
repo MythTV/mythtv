@@ -30,19 +30,20 @@
 
 
 // Copy constructor for cloning.
-MHIngredient::MHIngredient(const MHIngredient &ref): MHRoot(ref)
+MHIngredient::MHIngredient(const MHIngredient &ref)
+  : MHRoot(ref),
+    m_fInitiallyActive(ref.m_fInitiallyActive),
+    m_nContentHook(ref.m_nContentHook),
+    m_fShared(ref.m_fShared),
+    m_contentType(ref.m_contentType),
+    m_nOrigContentSize(ref.m_nOrigContentSize),
+    m_nOrigCCPrio(ref.m_nOrigCCPrio),
+    m_nContentSize(ref.m_nContentSize),
+    m_nCCPrio(ref.m_nCCPrio)
 {
     // Don't copy the object reference since that's set separately.
-    m_fInitiallyActive = ref.m_fInitiallyActive;
-    m_nContentHook = ref.m_nContentHook;
-    m_contentType = ref.m_contentType;
     m_origIncludedContent.Copy(ref.m_origIncludedContent);
     m_origContentRef.Copy(ref.m_origContentRef);
-    m_nOrigContentSize = ref.m_nOrigContentSize;
-    m_nOrigCCPrio = ref.m_nOrigCCPrio;
-    m_fShared = ref.m_fShared;
-    m_nContentSize = ref.m_nContentSize;
-    m_nCCPrio = ref.m_nCCPrio;
 }
 
 

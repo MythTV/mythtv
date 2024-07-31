@@ -118,7 +118,6 @@ class META_PUBLIC MusicMetadata
     MusicMetadata(const MusicMetadata &other)
     {
         *this = other;
-         m_changed = false;
     }
 
     MusicMetadata& operator=(const MusicMetadata &rhs);

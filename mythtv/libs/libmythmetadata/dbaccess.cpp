@@ -818,8 +818,8 @@ void FileAssociations::load_data()
 }
 
 FileAssociations::FileAssociations()
+  : m_imp(new FileAssociationsImp)
 {
-    m_imp = new FileAssociationsImp;
 }
 
 FileAssociations::~FileAssociations()
