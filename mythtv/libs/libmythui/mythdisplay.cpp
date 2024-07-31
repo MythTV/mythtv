@@ -207,8 +207,8 @@ QStringList MythDisplay::GetDescription()
 }
 
 MythDisplay::MythDisplay()
+  : m_screen(GetDesiredScreen())
 {
-    m_screen = GetDesiredScreen();
     DebugScreen(m_screen, "Using");
     if (m_screen)
     {

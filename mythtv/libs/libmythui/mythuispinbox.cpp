@@ -287,12 +287,11 @@ SpinBoxEntryDialog::SpinBoxEntryDialog(MythScreenStack *parent, const char *name
     : MythScreenType(parent, name, false),
         m_parentList(parentList),
         m_searchText(std::move(searchText)),
+        m_selection(parentList->GetCurrentPos()),
         m_low(low),
         m_high(high),
         m_step(step)
-
 {
-    m_selection = parentList->GetCurrentPos();
 }
 
 

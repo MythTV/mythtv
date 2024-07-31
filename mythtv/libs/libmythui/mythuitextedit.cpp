@@ -26,10 +26,9 @@
 #define LOC      QString("MythUITextEdit: ")
 
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIType(parent, name),
+      m_message("")
 {
-    m_message = "";
-
     connect(this, &MythUIType::TakingFocus, this, &MythUITextEdit::Select);
     connect(this, &MythUIType::LosingFocus, this, &MythUITextEdit::Deselect);
 

@@ -44,10 +44,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
-    Task("UPnpNotifyTask")
+    Task("UPnpNotifyTask"),
+    m_nServicePort(nServicePort)
 {
-    m_nServicePort = nServicePort;
-
     m_nMaxAge      = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
 } 
 

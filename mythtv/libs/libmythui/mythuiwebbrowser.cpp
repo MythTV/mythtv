@@ -354,11 +354,11 @@ QString MythWebPage::userAgentForUrl(const QUrl &url) const
  */
 MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
             : QWebView(parent),
-      m_webpage(new MythWebPage(this))
+      m_webpage(new MythWebPage(this)),
+      m_parentBrowser(parentBrowser),
+      m_api(new BrowserApi(this))
 {
     setPage(m_webpage);
-
-    m_parentBrowser = parentBrowser;
 
     connect(page(), &QWebPage::unsupportedContent,
             this, &MythWebView::handleUnsupportedContent);
@@ -368,7 +368,6 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
     page()->setForwardUnsupportedContent(true);
 
-    m_api = new BrowserApi(this);
     m_api->setWebView(this);
 }
 

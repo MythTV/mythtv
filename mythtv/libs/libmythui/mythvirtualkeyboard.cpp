@@ -77,10 +77,9 @@ static const std::array<std::array<QString,3>,95> comps {{
 }};
 
 MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythUITextEdit *parentEdit)
-          : MythScreenType(parentStack, "MythUIVirtualKeyboard")
+          : MythScreenType(parentStack, "MythUIVirtualKeyboard"),
+            m_parentEdit(parentEdit)
 {
-    m_parentEdit = parentEdit;
-
     if (m_parentEdit)
         m_preferredPos = m_parentEdit->GetKeyboardPosition();
     else

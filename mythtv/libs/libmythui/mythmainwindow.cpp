@@ -129,9 +129,8 @@ MythNotificationCenter *GetNotificationCenter(void)
 }
 
 MythMainWindow::MythMainWindow(const bool UseDB)
+  : m_display(MythDisplay::Create(this))
 {
-    m_display = MythDisplay::Create(this);
-
     // Switch to desired GUI resolution
     if (m_display->UsingVideoModes())
         m_display->SwitchToGUI(true);

@@ -150,14 +150,14 @@ qint64 MFileInfo::size(void) const
 
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
                                      const QString &startPath)
-    : MythScreenType(parent, "mythuifilebrowser")
+    : MythScreenType(parent, "mythuifilebrowser"),
+      m_previewTimer(new QTimer(this))
 {
     SetPath(startPath);
 
     m_nameFilter.clear();
     m_nameFilter << "*";
 
-    m_previewTimer = new QTimer(this);
     m_previewTimer->setSingleShot(true);
     connect(m_previewTimer, &QTimer::timeout, this, &MythUIFileBrowser::LoadPreview);
 }
