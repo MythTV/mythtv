@@ -379,18 +379,18 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       // Closed Caption & Teletext decoders
       m_ccd608(new CC608Decoder(parent->GetCC608Reader())),
       m_ccd708(new CC708Decoder(parent->GetCC708Reader())),
-      m_ttd(new TeletextDecoder(parent->GetTeletextReader()))
+      m_ttd(new TeletextDecoder(parent->GetTeletextReader())),
+      m_itv(parent->GetInteractiveTV()),
+      m_audioSamples((uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer))
 {
     // this will be deleted and recreated once decoder is set up
     m_mythCodecCtx = new MythCodecContext(this, kCodec_NONE);
 
-    m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
     m_ccd608->SetIgnoreTimecode(true);
 
     av_log_set_callback(myth_av_log);
 
     m_audioIn.m_sampleSize = -32;// force SetupAudioStream to run once
-    m_itv = m_parent->GetInteractiveTV();
 
     AvFormatDecoder::SetIdrOnlyKeyframes(true);
     m_audioReadAhead = gCoreContext->GetDurSetting<std::chrono::milliseconds>("AudioReadAhead", 100ms);

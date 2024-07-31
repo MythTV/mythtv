@@ -1962,7 +1962,7 @@ class ScramblingDescriptor : public MPEGDescriptor
 class ServiceDescriptorMapping
 {
   public:
-    explicit ServiceDescriptorMapping(const uint service_type) { m_serviceType = service_type; }
+    explicit ServiceDescriptorMapping(const uint service_type) : m_serviceType(service_type) {}
     enum : std::uint8_t
     {
         kServiceTypeDigitalTelevision          = 0x01,

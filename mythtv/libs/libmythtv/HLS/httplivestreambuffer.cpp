@@ -128,6 +128,7 @@ class HLSSegment
         m_url(std::move(uri))
     {
 #ifdef USING_LIBCRYPTO
+        //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
         m_pszKeyPath = std::move(current_key_path);
 #endif
     }

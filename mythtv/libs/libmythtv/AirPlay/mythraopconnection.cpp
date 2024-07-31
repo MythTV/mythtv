@@ -77,15 +77,16 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
   : QObject(parent),
     m_socket(socket),
     m_hardwareId(std::move(id)),
-    m_dataPort(port)
+    m_dataPort(port),
+    m_cctx(EVP_CIPHER_CTX_new()),
+    m_id(GetNotificationCenter()->Register(this))
 {
-    m_id = GetNotificationCenter()->Register(this);
 #if OPENSSL_VERSION_NUMBER < 0x030000000L
     m_cipher = EVP_aes_128_cbc();
 #else
+    //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_cipher = EVP_CIPHER_fetch(nullptr, "AES-128-CBC", nullptr);
 #endif
-    m_cctx = EVP_CIPHER_CTX_new();
 }
 
 MythRAOPConnection::~MythRAOPConnection()

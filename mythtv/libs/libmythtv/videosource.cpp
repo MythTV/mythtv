@@ -659,10 +659,10 @@ void XMLTV_generic_config::RunConfig(void)
 }
 
 EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_setting)
+  : m_useEit(new UseEIT(_parent))
 {
     setVisible(false);
 
-    m_useEit = new UseEIT(_parent);
     m_useEit->setValue(true);
     m_useEit->setVisible(false);
     addChild(m_useEit);
@@ -683,8 +683,8 @@ void EITOnly_config::Save(void)
 }
 
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
+  : m_useEit(new UseEIT(_parent))
 {
-    m_useEit = new UseEIT(_parent);
     m_useEit->setValue(false);
     m_useEit->setVisible(false);
     addChild(m_useEit);
@@ -701,9 +701,9 @@ void NoGrabber_config::Save(void)
 }
 
 VideoSource::VideoSource()
-{
     // must be first
-    m_id = new ID();
+  : m_id(new ID())
+{
     addChild(m_id = new ID());
 
     setLabel(QObject::tr("Video Source Setup"));
@@ -1458,14 +1458,13 @@ class UseHDHomeRunDevice : public TransMythUICheckBoxSetting
 
 HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
         (CaptureCard& a_parent, CardType &a_cardtype) :
-    m_parent(a_parent)
+    m_parent(a_parent),
+    m_deviceId(new HDHomeRunDeviceID(a_parent, *this))
 {
     setVisible(false);
 
     // Fill Device list
     FillDeviceList();
-
-    m_deviceId   = new HDHomeRunDeviceID(m_parent, *this);
 
     QMap<QString, HDHomeRunDevice>::iterator dit;
     for (dit = m_deviceList.begin(); dit != m_deviceList.end(); ++dit)
@@ -1988,18 +1987,18 @@ void ImportConfigurationGroup::probeCard(const QString &device)
 
 VBoxConfigurationGroup::VBoxConfigurationGroup
         (CaptureCard& a_parent, CardType& a_cardtype) :
-    m_parent(a_parent)
+    m_parent(a_parent),
+    m_desc(new GroupSetting()),
+    m_deviceId(new VBoxDeviceID(a_parent)),
+    m_cardIp(new VBoxIP()),
+    m_cardTuner(new VBoxTunerIndex())
 {
     setVisible(false);
 
     // Fill Device list
     FillDeviceList();
 
-    m_deviceId     = new VBoxDeviceID(m_parent);
-    m_desc         = new GroupSetting();
     m_desc->setLabel(tr("Description"));
-    m_cardIp       = new VBoxIP();
-    m_cardTuner    = new VBoxTunerIndex();
     m_deviceIdList = new VBoxDeviceIDList(
         m_deviceId, m_desc, m_cardIp, m_cardTuner, &m_deviceList, m_parent);
 
@@ -2229,12 +2228,12 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &parent,
                                                CardType &cardtype) :
     m_parent(parent),
+    m_vbiDevice(new VBIDevice(parent)),
     m_cardInfo(new GroupSetting())
 {
     setVisible(false);
     QRegularExpression drv { "^(ivtv|(saa7164(.*)))$" };
     m_device    = new VideoDevice(m_parent, 0, 15, QString(), drv);
-    m_vbiDevice = new VBIDevice(m_parent);
     m_vbiDevice->setVisible(false);
 
     m_cardInfo->setLabel(tr("Probed info"));
@@ -3963,15 +3962,16 @@ int TunerCardAudioInput::fillSelections(const QString &device)
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
                                              CardType& cardType) :
     m_parent(a_parent),
-    m_diseqcTree(new DiSEqCDevTree())
+    m_cardNum(new DVBCardNum(a_parent)),
+    m_cardName(new DVBCardName()),
+    m_cardType(new DVBCardType(a_parent)),
+    m_signalTimeout(new SignalTimeout(a_parent, 0.5s, 0.25s)),
+    m_tuningDelay(new DVBTuningDelay(a_parent)),
+    m_diseqcTree(new DiSEqCDevTree()),
+    m_diseqcBtn(new DeviceTree(*m_diseqcTree))
 {
     setVisible(false);
 
-    m_cardNum  = new DVBCardNum(m_parent);
-    m_cardName = new DVBCardName();
-    m_cardType = new DVBCardType(m_parent);
-
-    m_signalTimeout = new SignalTimeout(m_parent, 0.5s, 0.25s);
     m_channelTimeout = new ChannelTimeout(m_parent, 3s, 1.75s);
 
     cardType.addTargetedChild("DVB", m_cardNum);
@@ -3989,11 +3989,9 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     cardType.addTargetedChild("DVB", new DVBOnDemand(m_parent));
     cardType.addTargetedChild("DVB", new DVBEITScan(m_parent));
 
-    m_diseqcBtn = new DeviceTree(*m_diseqcTree);
     m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB and Rotor Configuration)"));
     m_diseqcBtn->setHelpText(tr("Input and satellite settings."));
 
-    m_tuningDelay = new DVBTuningDelay(m_parent);
     cardType.addTargetedChild("DVB", m_tuningDelay);
     cardType.addTargetedChild("DVB", m_diseqcBtn);
     m_tuningDelay->setVisible(false);
@@ -4057,7 +4055,8 @@ class DiSEqCPosition : public MythUISpinBoxSetting
 
 SatIPConfigurationGroup::SatIPConfigurationGroup
         (CaptureCard& a_parent, CardType &a_cardtype) :
-    m_parent(a_parent)
+    m_parent(a_parent),
+    m_deviceId(new SatIPDeviceID(a_parent))
 {
     setVisible(false);
 
@@ -4066,7 +4065,6 @@ SatIPConfigurationGroup::SatIPConfigurationGroup
     m_friendlyName = new SatIPDeviceAttribute(tr("Friendly name"), tr("Friendly name of the Sat>IP server"));
     m_tunerType    = new SatIPDeviceAttribute(tr("Tuner type"),    tr("Type of the selected tuner"));
     m_tunerIndex   = new SatIPDeviceAttribute(tr("Tuner index"),   tr("Index of the tuner on the Sat>IP server"));
-    m_deviceId     = new SatIPDeviceID(m_parent);
 
     m_deviceIdList = new SatIPDeviceIDList(
         m_deviceId, m_friendlyName, m_tunerType, m_tunerIndex, &m_deviceList, m_parent);

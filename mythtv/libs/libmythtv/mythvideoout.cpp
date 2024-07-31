@@ -97,9 +97,9 @@ void MythVideoOutput::GetRenderOptions(RenderOptions& Options, MythRender* Rende
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput() :
-    m_dbLetterboxColour(static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0)))
+    m_dbLetterboxColour(static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0))),
+    m_clearColor(m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0)
 {
-    m_clearColor = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
 }
 
 /**

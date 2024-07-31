@@ -38,7 +38,8 @@ extern "C" {
  * using an HDR display. Futher work is required.
 */
 MythVideoColourSpace::MythVideoColourSpace()
-  : ReferenceCounter("Colour")
+  : ReferenceCounter("Colour"),
+    m_updatesDisabled(false)
 {
     m_dbSettings[kPictureAttribute_Brightness] = gCoreContext->GetNumSetting("PlaybackBrightness", 50);
     m_dbSettings[kPictureAttribute_Contrast]   = gCoreContext->GetNumSetting("PlaybackContrast",   50);
@@ -83,7 +84,6 @@ MythVideoColourSpace::MythVideoColourSpace()
         MythDisplay::AcquireRelease(false);
     }
     */
-    m_updatesDisabled = false;
     Update();
 }
 

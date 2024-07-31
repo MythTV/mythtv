@@ -79,8 +79,8 @@ class VideoVisualFactory
 {
   public:
     VideoVisualFactory()
+      : m_nextVideoVisualFactory(g_videoVisualFactory)
     {
-        m_nextVideoVisualFactory = g_videoVisualFactory;
         g_videoVisualFactory = this;
     }
     virtual ~VideoVisualFactory() = default;

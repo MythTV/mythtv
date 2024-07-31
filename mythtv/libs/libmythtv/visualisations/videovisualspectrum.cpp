@@ -11,12 +11,11 @@ static constexpr int k_FFT_sample_length { 512 };
 #include <algorithm>
 
 VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer* Audio, MythRender* Render)
-  : VideoVisual(Audio, Render)
+  : VideoVisual(Audio, Render),
+    m_dftL(static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * k_FFT_sample_length))),
+    m_dftR(static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * k_FFT_sample_length))),
+    m_fftContextForward(av_fft_init(std::log2(k_FFT_sample_length), 0))
 {
-    m_dftL = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * k_FFT_sample_length));
-    m_dftR = static_cast<FFTComplex*>(av_malloc(sizeof(FFTComplex) * k_FFT_sample_length));
-
-    m_fftContextForward = av_fft_init(std::log2(k_FFT_sample_length), 0);
 }
 
 VideoVisualSpectrum::~VideoVisualSpectrum()

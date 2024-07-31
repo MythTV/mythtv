@@ -109,8 +109,8 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning, int inputid)
     : StreamHandler(tuning.GetDeviceKey(), inputid)
     , m_tuning(tuning)
+    , m_useRtpStreaming(m_tuning.IsRTP())
 {
-    m_useRtpStreaming = m_tuning.IsRTP();
 }
 
 void IPTVStreamHandler::run(void)

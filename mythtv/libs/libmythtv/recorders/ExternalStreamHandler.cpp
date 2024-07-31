@@ -548,6 +548,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
 
     m_args = path.split(' ',Qt::SkipEmptyParts) +
              logPropagateArgs.split(' ', Qt::SkipEmptyParts);
+    //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_app = m_args.first();
     m_args.removeFirst();
 

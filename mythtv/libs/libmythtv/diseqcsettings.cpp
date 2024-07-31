@@ -253,18 +253,18 @@ class SwitchPortsSetting : public TransTextEditSetting
 //////////////////////////////////////// SwitchConfig
 
 SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev, StandardSetting *parent)
+  : m_deviceDescr(new DeviceDescrSetting(switch_dev)),
+    m_type(new SwitchTypeSetting(switch_dev)),
+    m_ports(new SwitchPortsSetting(switch_dev)),
+    m_address(new SwitchAddressSetting(switch_dev))
 {
     setLabel(DeviceTree::tr("Switch Configuration"));
 
     parent = this;
-    m_deviceDescr = new DeviceDescrSetting(switch_dev);
     parent->addChild(m_deviceDescr);
     parent->addChild(new DeviceRepeatSetting(switch_dev));
-    m_type = new SwitchTypeSetting(switch_dev);
     parent->addChild(m_type);
-    m_address = new SwitchAddressSetting(switch_dev);
     parent->addChild(m_address);
-    m_ports = new SwitchPortsSetting(switch_dev);
     parent->addChild(m_ports);
 
     connect(m_type, qOverload<const QString&>(&StandardSetting::valueChanged),
@@ -541,7 +541,8 @@ void RotorPosMap::PopulateList(void)
 //////////////////////////////////////// RotorConfig
 
 RotorConfig::RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent)
-    : m_rotor(rotor)
+    : m_rotor(rotor),
+      m_pos(new RotorPosMap(rotor))
 {
     setLabel(DeviceTree::tr("Rotor Configuration"));
     setValue(rotor.GetDescription());
@@ -555,7 +556,6 @@ RotorConfig::RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent)
             this,  &RotorConfig::SetType);
     parent->addChild(rtype);
 
-    m_pos = new RotorPosMap(rotor);
     m_pos->setLabel(DeviceTree::tr("Positions"));
     m_pos->setHelpText(DeviceTree::tr("Rotor position setup."));
     parent->addChild(m_pos);
@@ -920,6 +920,12 @@ class LNBPolarityInvertedSetting : public MythUICheckBoxSetting
 //////////////////////////////////////// LNBConfig
 
 LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
+  : m_preset(new LNBPresetSetting(lnb)),
+    m_type(new LNBTypeSetting(lnb)),
+    m_lofSwitch(new LNBLOFSwitchSetting(lnb)),
+    m_lofLo(new LNBLOFLowSetting(lnb)),
+    m_lofHi(new LNBLOFHighSetting(lnb)),
+    m_polInv(new LNBPolarityInvertedSetting(lnb))
 {
     setLabel(DeviceTree::tr("LNB Configuration"));
     setValue(lnb.GetDescription());
@@ -927,17 +933,11 @@ LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
     parent = this;
     auto *deviceDescr = new DeviceDescrSetting(lnb);
     parent->addChild(deviceDescr);
-    m_preset = new LNBPresetSetting(lnb);
     parent->addChild(m_preset);
-    m_type = new LNBTypeSetting(lnb);
     parent->addChild(m_type);
-    m_lofSwitch = new LNBLOFSwitchSetting(lnb);
     parent->addChild(m_lofSwitch);
-    m_lofLo = new LNBLOFLowSetting(lnb);
     parent->addChild(m_lofLo);
-    m_lofHi = new LNBLOFHighSetting(lnb);
     parent->addChild(m_lofHi);
-    m_polInv = new LNBPolarityInvertedSetting(lnb);
     parent->addChild(m_polInv);
     connect(m_type,      qOverload<const QString&>(&StandardSetting::valueChanged),
             this,        qOverload<const QString&>(&LNBConfig::UpdateType));

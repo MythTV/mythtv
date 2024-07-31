@@ -34,16 +34,16 @@ class MTV_PUBLIC PESPacket
     // does not create it's own data
     explicit PESPacket(const unsigned char *pesdata)
         : m_pesData(const_cast<unsigned char*>(pesdata)),
-          m_fullBuffer(const_cast<unsigned char*>(pesdata))
+          m_fullBuffer(const_cast<unsigned char*>(pesdata)),
+          m_badPacket(!VerifyCRC())
     {
-        m_badPacket = !VerifyCRC();
         m_pesDataSize = std::max(((int)Length())-1 + (PESPacket::HasCRC() ? 4 : 0), 0);
     }
     explicit PESPacket(const std::vector<uint8_t> &pesdata)
       : m_pesData(const_cast<unsigned char*>(pesdata.data())),
-        m_fullBuffer(const_cast<unsigned char*>(pesdata.data()))
+        m_fullBuffer(const_cast<unsigned char*>(pesdata.data())),
+        m_badPacket(!VerifyCRC())
     {
-        m_badPacket = !VerifyCRC();
         m_pesDataSize = std::max(((int)Length())-1 + (PESPacket::HasCRC() ? 4 : 0), 0);
     }
 

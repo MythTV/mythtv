@@ -80,7 +80,9 @@ const double MythPlayer::kSeekToEndOffset = 1.0;
 
 MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
   : m_playerCtx(Context),
+    m_playerThread(QThread::currentThread()),
     m_playerFlags(Flags),
+    m_liveTV(Context->m_tvchain),
     //AV subtitles
     m_subReader(this),
     // CC608/708
@@ -88,12 +90,10 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
     // Audio
     m_audio(this, (Flags & kAudioMuted) != 0)
 {
-    m_playerThread = QThread::currentThread();
 #ifdef Q_OS_ANDROID
     m_playerThreadId = gettid();
 #endif
     m_deleteMap.SetPlayerContext(m_playerCtx);
-    m_liveTV = m_playerCtx->m_tvchain;
 
     m_vbiMode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
     m_captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");

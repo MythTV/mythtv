@@ -21,12 +21,10 @@ MythVideoTextureVulkan::CreateTextures(MythVulkanObject* Vulkan,
 }
 
 MythVideoTextureVulkan::MythVideoTextureVulkan(VideoFrameType Type, VideoFrameType Format)
+  : m_frameType(Type),
+    m_frameFormat(Format),
+    m_planeCount(MythVideoFrame::GetNumPlanes(Format))
 {
-    m_frameType = Type;
-    m_frameFormat = Format;
-    m_valid = false;
-    m_plane = 0;
-    m_planeCount = MythVideoFrame::GetNumPlanes(Format);
 }
 
 void MythVideoTextureVulkan::DeleteTextures(MythVulkanObject *Vulkan,

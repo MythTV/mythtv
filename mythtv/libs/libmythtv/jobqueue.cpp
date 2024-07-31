@@ -45,6 +45,7 @@ JobQueue::JobQueue(bool master) :
 
 #ifndef USING_VALGRIND
     QMutexLocker locker(&m_queueThreadCondLock);
+    //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_processQueue = true;
     m_queueThread->start();
 #else

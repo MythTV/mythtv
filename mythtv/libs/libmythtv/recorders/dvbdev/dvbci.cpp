@@ -607,9 +607,9 @@ public:
   };
 
 cCiTransportLayer::cCiTransportLayer(int Fd, int NumSlots)
+  : m_fd(Fd),
+    m_numSlots(NumSlots)
 {
-  m_fd = Fd;
-  m_numSlots = NumSlots;
   for (int s = 0; s < m_numSlots; s++)
       ResetSlot(s);
 }
@@ -796,10 +796,10 @@ public:
   };
 
 cCiSession::cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc)
+  : m_sessionId(SessionId),
+    m_resourceId(ResourceId),
+    m_tc(Tc)
 {
-  m_sessionId = SessionId;
-  m_resourceId = ResourceId;
-  m_tc = Tc;
 }
 
 int cCiSession::GetTag(int &Length, const uint8_t **Data)
@@ -1434,9 +1434,9 @@ bool cCiMMI::SendAnswer(const char *Text)
 // --- cCiMenu ---------------------------------------------------------------
 
 cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
+  : m_mmi(MMI),
+    m_selectable(Selectable)
 {
-  m_mmi = MMI;
-  m_selectable = Selectable;
 }
 
 cCiMenu::~cCiMenu()
@@ -1498,14 +1498,13 @@ enum CPCI_IDS : std::uint8_t {
 };
 
 cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
+  : m_infoLengthPos(m_length)
 {
   m_capmt[m_length++] = cplm; // ca_pmt_list_management
   m_capmt[m_length++] = (ProgramNumber >> 8) & 0xFF;
   m_capmt[m_length++] =  ProgramNumber       & 0xFF;
   m_capmt[m_length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
 
-  // program_info_length
-  m_infoLengthPos = m_length;
   m_capmt[m_length++] = 0x00;
   m_capmt[m_length++] = 0x00;
 }
@@ -1587,10 +1586,10 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
 // -- cLlCiHandler -------------------------------------------------------------
 
 cLlCiHandler::cLlCiHandler(int Fd, int NumSlots)
+  : m_fdCa(Fd),
+    m_numSlots(NumSlots),
+    m_tpl(new cCiTransportLayer(Fd, m_numSlots))
 {
-  m_numSlots = NumSlots;
-  m_tpl = new cCiTransportLayer(Fd, m_numSlots);
-  m_fdCa = Fd;
 }
 
 cLlCiHandler::~cLlCiHandler()
@@ -1908,9 +1907,9 @@ bool cLlCiHandler::connected()
 // -- cHlCiHandler -------------------------------------------------------------
 
 cHlCiHandler::cHlCiHandler(int Fd, int NumSlots)
+  : m_fdCa(Fd),
+    m_numSlots(NumSlots)
 {
-    m_numSlots = NumSlots;
-    m_fdCa = Fd;
     esyslog("New High level CI handler");
 }
 
