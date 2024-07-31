@@ -26,9 +26,9 @@
 
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
+               m_parentalLevelChecker(new ParentalLevelChangeChecker()),
                m_archiveList(archiveList)
 {
-    m_parentalLevelChecker = new ParentalLevelChangeChecker();
     connect(m_parentalLevelChecker, &ParentalLevelChangeChecker::SigResultReady,
             this, &VideoSelector::parentalLevelChanged);
 }

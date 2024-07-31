@@ -46,12 +46,11 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI")
+       : MythScreenType(parent, "GameUI"),
+         m_query(new MetadataDownload(this)),
+         m_imageDownload(new MetadataImageDownload(this))
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    m_query = new MetadataDownload(this);
-    m_imageDownload = new MetadataImageDownload(this);
 }
 
 bool GameUI::Create()

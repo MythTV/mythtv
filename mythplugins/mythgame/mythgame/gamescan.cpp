@@ -187,8 +187,8 @@ void GameScannerThread::SendProgressEvent(uint progress, uint total,
 }
 
 GameScanner::GameScanner()
+  : m_scanThread(new GameScannerThread())
 {
-    m_scanThread = new GameScannerThread();
 }
 
 GameScanner::~GameScanner()

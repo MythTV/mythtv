@@ -26,7 +26,7 @@ class AlarmNotifyThread : public MThread
     void run(void) override; // MThread
 
   private:
-    volatile bool m_stop;
+    volatile bool m_stop{false};
 };
 
 #endif // ALARMNOTIFYTHREAD_H

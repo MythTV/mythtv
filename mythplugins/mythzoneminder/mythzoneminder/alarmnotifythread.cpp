@@ -17,9 +17,9 @@ class AlarmNotifyThread *AlarmNotifyThread::get(void)
     return m_alarmNotifyThread;
 }
 
-AlarmNotifyThread::AlarmNotifyThread(): MThread("AlarmNotifyThread")
+AlarmNotifyThread::AlarmNotifyThread()
+  : MThread("AlarmNotifyThread")
 {
-    m_stop = false;
 }
 
 AlarmNotifyThread::~AlarmNotifyThread()

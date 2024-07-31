@@ -522,7 +522,6 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
 {
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
-    m_mediaMonitorActive = false;
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon && mon->IsActive())
     {
