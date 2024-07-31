@@ -48,9 +48,6 @@ using TypeListMap = QMultiHash<QString, TypeListInfo>;
 class ScreenListInfo
 {
   public:
-    ScreenListInfo() = default;
-    ScreenListInfo(const ScreenListInfo& info) = default;
-
     TypeListInfo GetCurrentTypeList(void) const;
 
   public:
