@@ -22,16 +22,14 @@
 PlaybackSock::PlaybackSock(
     MainServer *parent, MythSocket *lsock,
     QString lhostname, PlaybackSockEventsMode eventsMode) :
-    ReferenceCounter("PlaybackSock")
+    ReferenceCounter("PlaybackSock"),
+    m_sock(lsock),
+    m_hostname(std::move(lhostname)),
+    m_ip(""),
+    m_eventsMode(eventsMode),
+    m_parent(parent)
 {
-    m_parent = parent;
     QString localhostname = gCoreContext->GetHostName();
-
-    m_sock = lsock;
-    m_hostname = std::move(lhostname);
-    m_eventsMode = eventsMode;
-    m_ip = "";
-
     m_local = (m_hostname == localhostname);
 }
 

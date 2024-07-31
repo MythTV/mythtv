@@ -400,9 +400,9 @@ void VideoFilterSettings::setTextFilter(const QString& val)
 /////////////////////////////////
 VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, const QString& lname,
         VideoList *video_list) : MythScreenType(lparent, lname),
-    m_videoList(*video_list)
+    m_videoList(*video_list),
+    m_fsp(new BasicFilterSettingsProxy<VideoList>(*video_list))
 {
-    m_fsp = new BasicFilterSettingsProxy<VideoList>(*video_list);
     m_settings = m_fsp->getSettings();
 }
 

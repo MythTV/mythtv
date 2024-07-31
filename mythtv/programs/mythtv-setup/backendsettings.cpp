@@ -129,7 +129,9 @@ class IpAddressSettings : public HostCheckBoxSetting
      HostComboBoxSetting *m_localServerIP;
      HostComboBoxSetting *m_localServerIP6;
      explicit IpAddressSettings(/*Setting* trigger*/) :
-         HostCheckBoxSetting("ListenOnAllIps")
+         HostCheckBoxSetting("ListenOnAllIps"),
+         m_localServerIP(LocalServerIP()),
+         m_localServerIP6(LocalServerIP6())
      {
          setLabel(BackendSettings::tr("Listen on All IP Addresses"));
          setValue(true);
@@ -138,8 +140,6 @@ class IpAddressSettings : public HostCheckBoxSetting
                         "Recommended for most users for ease and "
                         "reliability."));
 
-         m_localServerIP = LocalServerIP();
-         m_localServerIP6 = LocalServerIP6();
          // show ip addresses if ListenOnAllIps is off
          addTargetedChild("0", m_localServerIP);
          addTargetedChild("0", m_localServerIP6);
@@ -928,22 +928,24 @@ class MythFillSettings : public GroupSetting
 };
 
 BackendSettings::BackendSettings()
-{
+  : m_isMasterBackend(IsMasterBackend()),
+    m_localServerPort(LocalServerPort()),
+    m_backendServerAddr(BackendServerAddr()),
+    m_masterServerName(MasterServerName()),
+    m_ipAddressSettings(new IpAddressSettings()),
     // These two are included for backward compatibility -
     // used by python bindings. They could be removed later
-    m_masterServerIP = MasterServerIP();
-    m_masterServerPort = MasterServerPort();
-
+    m_masterServerIP(MasterServerIP()),
+    m_masterServerPort(MasterServerPort())
+{
     //++ Host Address Backend Setup ++
     auto* server = new GroupSetting();
     server->setLabel(tr("Host Address Backend Setup"));
-    m_localServerPort = LocalServerPort();
     server->addChild(m_localServerPort);
     server->addChild(LocalStatusPort());
     server->addChild(LocalSecurityPin());
     server->addChild(AllowConnFromAll());
     //+++ IP Addresses +++
-    m_ipAddressSettings = new IpAddressSettings();
     server->addChild(m_ipAddressSettings);
     connect(m_ipAddressSettings, &HostCheckBoxSetting::valueChanged,
             this, &BackendSettings::listenChanged);
@@ -953,14 +955,11 @@ BackendSettings::BackendSettings()
     connect(m_ipAddressSettings->m_localServerIP6,
             static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
-    m_backendServerAddr = BackendServerAddr();
     server->addChild(m_backendServerAddr);
     //++ Master Backend ++
-    m_isMasterBackend = IsMasterBackend();
     connect(m_isMasterBackend, &TransMythUICheckBoxSetting::valueChanged,
             this, &BackendSettings::masterBackendChanged);
     server->addChild(m_isMasterBackend);
-    m_masterServerName = MasterServerName();
     server->addChild(m_masterServerName);
     addChild(server);
 

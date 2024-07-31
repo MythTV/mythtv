@@ -31,13 +31,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString &sSharePath)
-  : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath)
+  : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath),
+    m_sControlUrl("/MythFE")
 {
 
     QString sUPnpDescPath = XmlConfiguration().GetValue("UPnP/DescXmlPath", m_sSharePath);
 
     m_sServiceDescFileName = sUPnpDescPath + "MFEXML_scpd.xml";
-    m_sControlUrl          = "/MythFE";
 
     // Add our Service Definition to the device.
 

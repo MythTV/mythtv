@@ -247,6 +247,7 @@ MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *_tvList,
                        Scheduler *sched, AutoExpire *_expirer) :
     m_encoderList(_tvList),
+    m_mythserver(new MythServer()),
     m_ismaster(master), m_threadPool("ProcessRequestPool"),
     m_sched(sched), m_expirer(_expirer)
 {
@@ -259,7 +260,6 @@ MainServer::MainServer(bool master, int port,
     m_masterBackendOverride =
         gCoreContext->GetBoolSetting("MasterBackendOverride", false);
 
-    m_mythserver = new MythServer();
     m_mythserver->setProxy(QNetworkProxy::NoProxy);
 
     QList<QHostAddress> listenAddrs = MythServer::DefaultListen();

@@ -111,6 +111,9 @@ void AudioConfigScreen::Init(void)
 }
 
 AudioConfigSettings::AudioConfigSettings()
+  : m_triggerDigital(new GroupSetting()),
+    m_passThroughOverride(PassThroughOverride()),
+    m_passThroughDeviceOverride(PassThroughOutputDevice())
 {
     setLabel(tr("Audio System"));
 
@@ -126,7 +129,6 @@ AudioConfigSettings::AudioConfigSettings()
     connect(rescan, &ButtonStandardSetting::clicked, this, &AudioConfigSettings::AudioRescan);
 
     // digital settings
-    m_triggerDigital = new GroupSetting();
     m_triggerDigital->setLabel(tr("Digital Audio Capabilities"));
     m_triggerDigital->addChild(m_ac3PassThrough = AC3PassThrough());
     m_triggerDigital->addChild(m_dtsPassThrough = DTSPassThrough());
@@ -146,9 +148,7 @@ AudioConfigSettings::AudioConfigSettings()
     advancedSettings->setHelpText(tr("Enable extra audio settings. Under most "
                                      "usage all options should be left alone"));
     addChild(advancedSettings);
-    m_passThroughOverride = PassThroughOverride();
     advancedSettings->addChild(m_passThroughOverride);
-    m_passThroughDeviceOverride = PassThroughOutputDevice();
     advancedSettings->addChild(m_passThroughDeviceOverride);
     m_passThroughDeviceOverride->setEnabled(m_passThroughOverride->boolValue());
     connect(m_passThroughOverride, &MythUICheckBoxSetting::valueChanged,
@@ -615,10 +615,9 @@ AudioTestThread::AudioTestThread(QObject *parent,
     MThread("AudioTest"),
     m_parent(parent), m_channels(channels), m_device(std::move(main)),
     m_passthrough(std::move(passthrough)), m_hd(hd),
+    m_samplerate(hd ? settings.BestSupportedRate() : 48000),
     m_format(hd ? settings.BestSupportedFormat() : FORMAT_S16)
 {
-    m_samplerate = hd ? settings.BestSupportedRate() : 48000;
-
     m_audioOutput = AudioOutput::OpenAudio(m_device, m_passthrough,
                                            m_format, m_channels,
                                            AV_CODEC_ID_NONE, m_samplerate,

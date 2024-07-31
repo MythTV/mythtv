@@ -83,9 +83,9 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             SchedOptMixin(*this, nullptr), FilterOptMixin(*this, nullptr),
             StoreOptMixin(*this, nullptr), PostProcMixin(*this, nullptr),
             m_recInfo(new RecordingInfo(*recInfo)),
+            m_recordingRule(new RecordingRule()),
             m_player(player)
 {
-    m_recordingRule = new RecordingRule();
     m_recordingRule->m_recordID = m_recInfo->GetRecordingRuleID();
     SchedOptMixin::SetRule(m_recordingRule);
     FilterOptMixin::SetRule(m_recordingRule);
@@ -1242,14 +1242,12 @@ MetadataOptions::MetadataOptions(MythScreenStack *parent,
                                  ScheduleEditor &editor,
                                  RecordingRule &rule,
                                  RecordingInfo *recInfo)
-    : SchedEditChild(parent, "MetadataOptions", editor, rule, recInfo)
+    : SchedEditChild(parent, "MetadataOptions", editor, rule, recInfo),
+      m_metadataFactory(new MetadataFactory(this)),
+      m_imageLookup(new MetadataDownload(this)),
+      m_imageDownload(new MetadataImageDownload(this))
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    m_metadataFactory = new MetadataFactory(this);
-    m_imageLookup = new MetadataDownload(this);
-    m_imageDownload = new MetadataImageDownload(this);
-
     m_artworkMap = GetArtwork(m_recordingRule->m_inetref,
                               m_recordingRule->m_season);
 }

@@ -381,8 +381,8 @@ VideoPlayerCommand VideoPlayerCommand::PlayerFor(const QString &filename)
 }
 
 VideoPlayerCommand::VideoPlayerCommand()
+  : m_d(new VideoPlayerCommandPrivate)
 {
-    m_d = new VideoPlayerCommandPrivate;
 }
 
 VideoPlayerCommand::~VideoPlayerCommand()
@@ -392,8 +392,8 @@ VideoPlayerCommand::~VideoPlayerCommand()
 }
 
 VideoPlayerCommand::VideoPlayerCommand(const VideoPlayerCommand &other)
+  : m_d(new VideoPlayerCommandPrivate(*other.m_d))
 {
-    m_d = new VideoPlayerCommandPrivate(*other.m_d);
 }
 
 VideoPlayerCommand &VideoPlayerCommand::operator=(const VideoPlayerCommand &rhs)

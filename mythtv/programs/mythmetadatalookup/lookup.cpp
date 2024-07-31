@@ -17,8 +17,8 @@
 #include "lookup.h"
 
 LookerUpper::LookerUpper()
+  : m_metadataFactory(new MetadataFactory(this))
 {
-    m_metadataFactory = new MetadataFactory(this);
 }
 
 LookerUpper::~LookerUpper()

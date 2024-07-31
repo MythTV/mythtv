@@ -31,6 +31,8 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
     : LogoDetectorBase(w,h),
       m_commDetector(commdetector),
       m_commDetectBorder(commdetectborder_in),
+      m_commDetectLogoSecondsNeeded((int)(1.3 * m_commDetectLogoSamplesNeeded *
+                                          m_commDetectLogoSampleSpacing)),
       m_edgeMask(new EdgeMaskEntry[m_width * m_height]),
       // cppcheck doesn't understand deleteLater
       m_logoMaxValues(new unsigned char[m_width * m_height]),
@@ -43,8 +45,6 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
         gCoreContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
     m_commDetectLogoSampleSpacing =
         gCoreContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
-    m_commDetectLogoSecondsNeeded = (int)(1.3 * m_commDetectLogoSamplesNeeded *
-                                              m_commDetectLogoSampleSpacing);
     m_commDetectLogoGoodEdgeThreshold =
         gCoreContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
         .toDouble();

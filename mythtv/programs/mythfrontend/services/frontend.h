@@ -78,9 +78,9 @@ class ScriptableFrontend : public QObject
     QScriptEngine *m_pEngine;
 
   public:
-    Q_INVOKABLE explicit ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+    Q_INVOKABLE explicit ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr )
+      : QObject( parent ), m_pEngine(pEngine)
     {
-        m_pEngine = pEngine;
     }
   public slots:
     QObject* GetStatus(void) { SCRIPT_CATCH_EXCEPTION( nullptr,

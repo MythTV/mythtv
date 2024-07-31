@@ -5169,10 +5169,10 @@ void PasswordChange::SendResult()
 
 RecMetadataEdit::RecMetadataEdit(MythScreenStack *lparent, ProgramInfo *pginfo)
   : MythScreenType(lparent, "recmetadataedit"),
-    m_progInfo(pginfo)
+    m_progInfo(pginfo),
+    m_metadataFactory(new MetadataFactory(this))
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_metadataFactory = new MetadataFactory(this);
 }
 
 bool RecMetadataEdit::Create()

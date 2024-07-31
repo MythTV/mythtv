@@ -83,8 +83,8 @@ class TreeNodeDataPrivate
 };
 
 TreeNodeData::TreeNodeData(VideoMetadata *metadata)
+  : m_d(new TreeNodeDataPrivate(metadata))
 {
-    m_d = new TreeNodeDataPrivate(metadata);
 }
 
 TreeNodeData::TreeNodeData(QString path, QString host, QString prefix)
@@ -449,8 +449,8 @@ class VideoListImp
 };
 
 VideoList::VideoList()
+  : m_imp(new VideoListImp)
 {
-    m_imp = new VideoListImp;
 }
 
 VideoList::~VideoList()
