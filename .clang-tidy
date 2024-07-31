@@ -40,6 +40,9 @@ Checks: '-*,
 
     bugprone-*,
 
+        # Skip tests that are redirects to other tests. ,
+       -bugprone-narrowing-conversions,
+
         # As of 2022-12-19, there are 1014 unique warnings. ,
        -bugprone-easily-swappable-parameters,
 
@@ -50,13 +53,38 @@ Checks: '-*,
         # As of 2023-05-22, there are 97 unique warnings. ,
        -bugprone-implicit-widening-of-multiplication-result,
 
-        # Renamed/replaced by cppcoreguidelines-narrowing-conversions. ,
-       -bugprone-narrowing-conversions,
-
         # As of 2023-09-19, there are 140 unique warnings. ,
        -bugprone-switch-missing-default-case,
 
     cert-*,
+
+        # Skip tests that are redirects to other tests. ,
+       -cert-con36-c,
+       -cert-con54-cpp,
+       -cert-ctr56-cpp,
+       -cert-dcl03-c,
+       -cert-dcl16-c,
+       -cert-dcl37-c,
+       -cert-dcl51-cpp,
+       -cert-dcl54-cpp,
+       -cert-dcl59-cpp,
+       -cert-err09-cpp,
+       -cert-err61-cpp,
+       -cert-exp42-c,
+       -cert-fio38-c,
+       -cert-flp37-c,
+       -cert-int09-c,
+       -cert-msc24-c,
+       -cert-msc30-c
+       -cert-msc32-c,
+       -cert-msc33-c,
+       -cert-msc54-cpp,
+       -cert-oop11-cpp,
+       -cert-oop54-cpp,
+       -cert-pos44-c,
+       -cert-pos47-c,
+       -cert-sig30-c,
+       -cert-str34-c,
 
         # Dont declare c-style varardic functions. As of 2022-12-19,
         # there are 2 warnings: lirc_client.cpp and vbi.cpp. ,
@@ -95,69 +123,83 @@ Checks: '-*,
        -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
        -clang-analyzer-security.insecureAPI.strcpy,
 
-    # Explicitly list the tests that arent aliases. ,
-   -cppcoreguidelines-*,
+    cppcoreguidelines-*,
 
-        # Good. ,
-        cppcoreguidelines-init-variables,
-        cppcoreguidelines-interfaces-global-init,
-        cppcoreguidelines-pro-type-member-init,
-        cppcoreguidelines-pro-type-static-cast-downcast,
+        # Skip tests that are redirects to other tests. ,
+       -cppcoreguidelines-avoid-c-arrays,
+       -cppcoreguidelines-avoid-magic-numbers,
+       -cppcoreguidelines-c-copy-assignment-signature,
+       -cppcoreguidelines-explicit-virtual-functions,
+       -cppcoreguidelines-macro-to-enum,
+       -cppcoreguidelines-noexcept-destructor,
+       -cppcoreguidelines-noexcept-move-operations,
+       -cppcoreguidelines-noexcept-swap,
+       -cppcoreguidelines-non-private-member-variables-in-classes,
+       -cppcoreguidelines-use-default-member-init,
 
-        # As of 2022-12-19, there are 142 unique warnings. ,
+        # Skip tests that recommend usage of the Microsoft Guidelines
+        # Support Library.  https://github.com/microsoft/GSL ,
+       -cppcoreguidelines-owning-memory,
+       -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+       -cppcoreguidelines-pro-bounds-constant-array-index,
+
+        # Skip tests that recommend usage of the boost:: framework to
+        # access unions. https://www.boost.org/ ,
+       -cppcoreguidelines-pro-type-union-access,
+
+       -cppcoreguidelines-prefer-member-initializer,
+
+        # As of 2024-08-01, there are 110 unique warnings. ,
+       -cppcoreguidelines-avoid-const-or-ref-data-members,
+
+        # As of 2024-08-01, there are 12256 unique warnings. ,
+       -cppcoreguidelines-avoid-do-while,
+
+        # As of 2024-08-03, there are 135 unique warnings. ,
        -cppcoreguidelines-avoid-goto,
 
         # As of 2023-05-22, there are 1257 unique warnings. ,
        -cppcoreguidelines-avoid-non-const-global-variables,
 
+        # As of 2024-08-01, there are 2 warnings. ,
+       -cppcoreguidelines-macro-usage,
+
         # As of 2023-05-22, there are 374 unique warnings. ,
        -cppcoreguidelines-narrowing-conversions,
 
-        # As of 2022-12-19, there are 212 unique warnings. ,
+        # As of 2024-08-02, there are 210 unique warnings. ,
        -cppcoreguidelines-no-malloc,
 
-        # No gsl. ,
-       -cppcoreguidelines-owning-memory,
-
-        # No gsl. Warning on every log message.
-        # "do not implicitly decay an array into a pointer; consider
-        #  using gsl::array_view or an explicit cast instead" ,
-       -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-
-        # No gsl. Recommends gsl::at be used in 1611 places. ,
-       -cppcoreguidelines-pro-bounds-constant-array-index,
-
-        # As of 2022-12-19, there are 4624 unique warnings. ,
+        # As of 2024-08-02, there are 4624 unique warnings. ,
        -cppcoreguidelines-pro-bounds-pointer-arithmetic,
 
-        # As of 2022-12-19, there are 17 unique warnings. ,
+        # As of 2024-08-02, there are 22 unique warnings. ,
        -cppcoreguidelines-pro-type-const-cast,
 
         # As of 2023-05-22, there are 744 unique warnings. ,
        -cppcoreguidelines-pro-type-cstyle-cast,
 
-        # As of 2022-12-19, there are 425 unique warnings. ,
+        # As of 2024-08-02, there are 498 unique warnings. ,
        -cppcoreguidelines-pro-type-reinterpret-cast,
-
-        # Recommends using boost:: to access unions. ,
-       -cppcoreguidelines-pro-type-union-access,
 
         # Warns on every (*)printf, sscanf,open, ioctl, etc. ,
        -cppcoreguidelines-pro-type-vararg,
 
-        # As of 2022-12-19, there are 140 unique warnings. ,
+        # As of 2024-08-02, there are 140 unique warnings. ,
        -cppcoreguidelines-slicing,
 
-        # As of 2022-12-19, there are 1283 unique warnings. ,
+        # As of 2024-08-02, there are 1547 unique warnings. ,
        -cppcoreguidelines-special-member-functions,
+
+        # As of 2024-08-01, there are 207 unique warnings. ,
+       -cppcoreguidelines-virtual-class-destructor,
 
    -google-explicit-constructor,
    -google-runtime-int,
 
     misc-*,
 
-        # New in clang15. As of 2023-05-22, there are 15546 unique
-        # warnings. ,
+        # As of 2024-08-02, there are 15970 unique warnings. ,
        -misc-const-correctness,
 
         # As of 2023-09-19, there are 115517 unique warnings. ,
@@ -166,7 +208,7 @@ Checks: '-*,
         # Complains about every public or protected variable in a class. ,
        -misc-non-private-member-variables-in-classes,
 
-        # As of 2022-12-19, there are 420 unique warnings. 195 are
+        # As of 2028-08-02, there are 420 unique warnings. 195 are
         # related to the Q_DECLARE_METATYPE macro and the other 225
         # are in MythTV. ,
        -misc-no-recursion,
@@ -180,9 +222,9 @@ Checks: '-*,
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
 
-        # As of 2023-09-29, there are 14 unique warnings
-        remaining. These all come from calls to
-        Q_GLOBAL_STATIC_WITH_ARGS and cant be fixed by us. ,
+        # As of 2024-08-08, all remaining warnings remaining come from
+        # calls to QFETCH Q_GLOBAL_STATIC_WITH_ARGS and cant be fixed
+        # by us. ,
        -modernize-type-traits,
 
         # Why would anyone want this? ,
@@ -200,15 +242,12 @@ Checks: '-*,
         # As of 2023-09-19, there are 443 unique warnings. ,
        -performance-avoid-endl,
 
-        # New in clang-18. As of 2024-03-18, there are 349 unique
-        # warnings. These warnings are all in Qt macros like
-        # Q_DECLARE_METATYPE or QStringLiteral. ,
+        # As of 2024-08-01, new filtering reduces this count to 14
+        # unique warnings. ,
        -performance-enum-size,
 
-        # The Q_DECLARE_METATYPE macro triggers a warning from this
-        # new clang12 checker.  As of 2022-12-19, the vast majority
-        # of these (236 of 292) warnings are associated with this
-        # macro; the other 56 are in the MythTV code. ,
+        # As of 2024-08-01, new filtering reduces this count to 35
+        # unique warnings. ,
        -performance-no-int-to-ptr,
 
     readability-*,
@@ -216,10 +255,14 @@ Checks: '-*,
         # As of 2023-09-19, there are 315 unique warnings. ,
        -readability-avoid-unconditional-preprocessor-if,
 
-        # Need to decide on an appropriate value. ,
+        # Need to decide on an appropriate value.  As of 2024-08-02
+        # there are 1753 unique warnings at the default complexity
+        # value. ,
        -readability-function-cognitive-complexity,
 
-        # Not investigated yet. ,
+        # Need to decide on an appropriate value.  As of 2024-08-02
+        # there are only 2 unique warnings at the default size limit
+        # of 800 statements. ,
        -readability-function-size,
 
         # Whats wrong with single character variable names? As of
