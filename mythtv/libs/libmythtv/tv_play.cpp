@@ -8512,8 +8512,11 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         for (int j = kAspect_Off; j < kAspect_END; j++)
         {
             // swap 14:9 and 16:9
-            int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
-                     ((kAspect_16_9 == j) ? kAspect_14_9 : j));
+            int i {j};
+            if (kAspect_14_9 == j)
+                i = kAspect_16_9;
+            else if (kAspect_16_9 == j)
+                i = kAspect_14_9;
             QString action = prefix + QString::number(i);
             active = (m_videoBoundsState.m_aspectOverrideMode == i);
             BUTTON(action, toString(static_cast<AspectOverrideMode>(i)));
@@ -9139,7 +9142,12 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
     bool isPlayback = (&Menu == &m_playbackMenu || &Menu == &m_playbackCompactMenu);
     bool isCutlist = (&Menu == &m_cutlistMenu || &Menu == &m_cutlistCompactMenu);
     QString text = Menu.Translate(Node.toElement().attribute("text", Menu.GetName()));
-    MythOSDDialogData menu { isPlayback ? OSD_DLG_MENU : isCutlist ? OSD_DLG_CUTPOINT : "???", text };
+    const char* windowtitle { "???" };
+    if (isPlayback)
+        windowtitle = OSD_DLG_MENU;
+    else if (isCutlist)
+        windowtitle = OSD_DLG_CUTPOINT;
+    MythOSDDialogData menu {windowtitle, text };
     Menu.Show(Node, Selected, *this, &menu);
     QDomNode parent = Node.parentNode();
     if (!parent.parentNode().isNull())
