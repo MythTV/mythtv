@@ -1879,6 +1879,35 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     }
 }
 
+void AvFormatDecoder::remove_tracks_not_in_same_AVProgram(int stream_index)
+{
+    AVProgram* program = av_find_program_from_stream(m_ic, nullptr, stream_index);
+    if (program == nullptr)
+    {
+        return;
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO,
+        QString("Removing streams not in Program %1 from track selection.")
+        .arg(QString::number(program->id)));
+
+    const auto * const begin = program->stream_index;
+    const auto * const end   = program->stream_index + program->nb_stream_indexes;
+
+    for (auto & track_list : m_tracks)
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG,
+            QString("Size before: %1").arg(QString::number(track_list.size())));
+        track_list.erase(std::remove_if(track_list.begin(), track_list.end(),
+            [&](StreamInfo i)
+            {
+                return std::find(begin, end, i.m_av_stream_index) == end;
+            }), track_list.end());
+        LOG(VB_PLAYBACK, LOG_DEBUG,
+            QString("Size after: %1").arg(QString::number(track_list.size())));
+    }
+}
+
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
     QMutexLocker avlocker(&m_avCodecLock);
@@ -1924,11 +1953,20 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         QString codectype(AVMediaTypeToString(par->codec_type));
         if (par->codec_type == AVMEDIA_TYPE_VIDEO)
             codectype += QString("(%1x%2)").arg(par->width).arg(par->height);
+        QString program_id = "null";
+        if (av_find_program_from_stream(m_ic, nullptr, strm) != nullptr)
+        {
+            program_id = QString::number(av_find_program_from_stream(m_ic, nullptr, strm)->id);
+        }
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Stream #%1: ID: 0x%2 Codec ID: %3 Type: %4 Bitrate: %5")
-                .arg(strm).arg(static_cast<uint64_t>(m_ic->streams[strm]->id), 0, 16)
-                .arg(avcodec_get_name(par->codec_id),
-                     codectype).arg(par->bit_rate));
+            QString("Stream #%1: ID: 0x%2 Program ID: %3 Codec ID: %4 Type: %5 Bitrate: %6").arg(
+                QString::number(strm),
+                QString::number(static_cast<uint64_t>(m_ic->streams[strm]->id), 16),
+                program_id,
+                avcodec_get_name(par->codec_id),
+                codectype,
+                QString::number(par->bit_rate))
+            );
 
         switch (par->codec_type)
         {
@@ -2208,6 +2246,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     m_resetHardwareDecoders = false;
     if (!novideo)
     {
+        int stream_index = -1;
         for(;;)
         {
             const AVCodec *codec = nullptr;
@@ -2225,20 +2264,20 @@ int AvFormatDecoder::ScanStreams(bool novideo)
              * If av_find_best_stream returns successfully and decoder_ret is not nullptr,
              * then *decoder_ret is guaranteed to be set to a valid AVCodec.
              */
-            int selTrack = av_find_best_stream(m_ic, AVMEDIA_TYPE_VIDEO,
+            stream_index = av_find_best_stream(m_ic, AVMEDIA_TYPE_VIDEO,
                                                -1, -1, &codec, 0);
 
-            if (selTrack < 0)
+            if (stream_index < 0)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "No video track found/selected.");
                 break;
             }
 
-            AVStream *stream = m_ic->streams[selTrack];
+            AVStream *stream = m_ic->streams[stream_index];
             if (m_averrorCount > SEQ_PKT_ERR_MAX)
                 m_codecMap.FreeCodecContext(stream);
             AVCodecContext *enc = m_codecMap.GetCodecContext(stream, codec);
-            StreamInfo si(selTrack, 0, 0, 0, 0);
+            StreamInfo si(stream_index, 0, 0, 0, 0);
 
             m_tracks[kTrackTypeVideo].push_back(si);
             m_selectedTrack[kTrackTypeVideo] = si;
@@ -2248,7 +2287,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 codectype += QString("(%1x%2)").arg(enc->width).arg(enc->height);
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
-                    .arg(selTrack).arg(static_cast<uint64_t>(stream->id), 0, 16)
+                    .arg(stream_index).arg(static_cast<uint64_t>(stream->id), 0, 16)
                     .arg(avcodec_get_name(enc->codec_id),
                          avcodec_profile_name(enc->codec_id, enc->profile),
                          codectype,
@@ -2387,7 +2426,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             InitVideoCodec(stream, enc, true);
 
-            ScanATSCCaptionStreams(selTrack);
+            ScanATSCCaptionStreams(stream_index);
             UpdateATSCCaptionTracks();
 
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
@@ -2399,6 +2438,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             break;
         }
+
+        remove_tracks_not_in_same_AVProgram(stream_index);
     }
 
     m_bitrate = std::max(static_cast<uint>(m_ic->bit_rate), m_bitrate);
@@ -4318,18 +4359,16 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     if ((ctrack >= 0) && (ctrack < (int)numStreams))
         return ctrack; // audio already selected
 
-#if 0
-    // enable this to print streams
+    LOG(VB_AUDIO, LOG_DEBUG, QString("%1 available audio streams").arg(numStreams));
     for (const auto & track : atracks)
     {
-        int idx = track.m_av_stream_index;
-        AVCodecContext *codec_ctx = m_ic->streams[idx]->codec;
-        AudioInfo item(codec_ctx->codec_id, codec_ctx->bps,
-                       codec_ctx->sample_rate, codec_ctx->channels,
-                       DoPassThrough(codec_ctx, true));
-        LOG(VB_AUDIO, LOG_DEBUG, LOC + " * " + item.toString());
+        AVCodecParameters *codecpar = m_ic->streams[track.m_av_stream_index]->codecpar;
+        LOG(VB_AUDIO, LOG_DEBUG, QString("%1: %2 bps, %3 Hz, %4 channels, passthrough(%5)")
+            .arg(avcodec_get_name(codecpar->codec_id), QString::number(codecpar->bit_rate),
+            QString::number(codecpar->sample_rate), QString::number(codecpar->ch_layout.nb_channels),
+            (DoPassThrough(codecpar, true)) ? "true" : "false")
+            );
     }
-#endif
 
     int selTrack = (1 == numStreams) ? 0 : -1;
     int wlang    = wtrack.m_language;
