@@ -250,6 +250,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool FlagIsSet(PlayerFlags arg) { return m_playerFlags & arg; }
 
+    int autoSelectVideoTrack(int& scanerror);
     void remove_tracks_not_in_same_AVProgram(int stream_index);
 
     bool               m_isDbIgnored;
