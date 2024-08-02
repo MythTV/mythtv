@@ -1879,6 +1879,196 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     }
 }
 
+int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
+{
+    const AVCodec *codec = nullptr;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to select best video track");
+
+    /*
+     *  Find the "best" stream in the file.
+     *
+     * The best stream is determined according to various heuristics as
+     * the most likely to be what the user expects. If the decoder parameter
+     * is not nullptr, av_find_best_stream will find the default decoder
+     * for the stream's codec; streams for which no decoder can be found
+     * are ignored.
+     *
+     * If av_find_best_stream returns successfully and decoder_ret is not nullptr,
+     * then *decoder_ret is guaranteed to be set to a valid AVCodec.
+     */
+    int stream_index = av_find_best_stream(m_ic, AVMEDIA_TYPE_VIDEO, -1, -1, &codec, 0);
+
+    if (stream_index < 0)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "No video track found/selected.");
+        return stream_index;
+    }
+
+    AVStream *stream = m_ic->streams[stream_index];
+    if (m_averrorCount > SEQ_PKT_ERR_MAX)
+        m_codecMap.FreeCodecContext(stream);
+    AVCodecContext *enc = m_codecMap.GetCodecContext(stream, codec);
+    StreamInfo si(stream_index, 0, 0, 0, 0);
+
+    m_tracks[kTrackTypeVideo].push_back(si);
+    m_selectedTrack[kTrackTypeVideo] = si;
+
+    QString codectype(AVMediaTypeToString(enc->codec_type));
+    if (enc->codec_type == AVMEDIA_TYPE_VIDEO)
+        codectype += QString("(%1x%2)").arg(enc->width).arg(enc->height);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
+            .arg(stream_index).arg(static_cast<uint64_t>(stream->id), 0, 16)
+            .arg(avcodec_get_name(enc->codec_id),
+                 avcodec_profile_name(enc->codec_id, enc->profile),
+                 codectype,
+                 QString::number(enc->bit_rate)));
+
+    // If ScanStreams has been called on a stream change triggered by a
+    // decoder error - because the decoder does not handle resolution
+    // changes gracefully (NVDEC and maybe MediaCodec) - then the stream/codec
+    // will still contain the old resolution but the AVCodecContext will
+    // have been updated. This causes mayhem for a second or two.
+    if ((enc->width != stream->codecpar->width) || (enc->height != stream->codecpar->height))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString(
+            "Video resolution mismatch: Context: %1x%2 Stream: %3x%4 Codec: %5 Stream change: %6")
+            .arg(enc->width).arg(enc->height)
+            .arg(stream->codecpar->width).arg(stream->codecpar->height)
+            .arg(get_decoder_name(m_videoCodecId)).arg(m_streamsChanged));
+    }
+
+    m_avcParser->Reset();
+
+    QSize dim = get_video_dim(*enc);
+    int width  = std::max(dim.width(),  16);
+    int height = std::max(dim.height(), 16);
+    QString dec = "ffmpeg";
+    uint thread_count = 1;
+    QString codecName;
+    if (enc->codec)
+        codecName = enc->codec->name;
+    // framerate appears to never be set - which is probably why
+    // GetVideoFrameRate never uses it:)
+    // So fallback to the GetVideoFrameRate call which should then ensure
+    // the video display profile gets an accurate frame rate - instead of 0
+    if (enc->framerate.den && enc->framerate.num)
+        m_fps = float(enc->framerate.num) / float(enc->framerate.den);
+    else
+        m_fps = GetVideoFrameRate(stream, enc, true);
+
+    bool foundgpudecoder = false;
+    QStringList unavailabledecoders;
+    bool allowgpu = FlagIsSet(kDecodeAllowGPU);
+
+    if (m_averrorCount > SEQ_PKT_ERR_MAX)
+    {
+        // TODO this could be improved by appending the decoder that has
+        // failed to the unavailable list - but that could lead to circular
+        // failures if there are 2 or more hardware decoders that fail
+        if (FlagIsSet(kDecodeAllowGPU) && (dec != "ffmpeg"))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString(
+                "GPU/hardware decoder '%1' failed - forcing software decode")
+                .arg(dec));
+        }
+        m_averrorCount = 0;
+        allowgpu = false;
+    }
+
+    while (unavailabledecoders.size() < 10)
+    {
+        if (!m_isDbIgnored)
+        {
+            if (!unavailabledecoders.isEmpty())
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Unavailable decoders: %1")
+                    .arg(unavailabledecoders.join(",")));
+            }
+            m_videoDisplayProfile.SetInput(QSize(width, height), m_fps, codecName, unavailabledecoders);
+            dec = m_videoDisplayProfile.GetDecoder();
+            thread_count = m_videoDisplayProfile.GetMaxCPUs();
+            bool skip_loop_filter = m_videoDisplayProfile.IsSkipLoopEnabled();
+            if  (!skip_loop_filter)
+                enc->skip_loop_filter = AVDISCARD_NONKEY;
+        }
+
+        m_videoCodecId = kCodec_NONE;
+        uint version = mpeg_version(enc->codec_id);
+        if (version)
+            m_videoCodecId = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
+
+        if (version && allowgpu && dec != "ffmpeg")
+        {
+            // We need to set this so that MythyCodecContext can callback
+            // to the player in use to check interop support.
+            enc->opaque = static_cast<void*>(this);
+            MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
+            if (hwcodec != kCodec_NONE)
+            {
+                // the context may have changed
+                enc->opaque = static_cast<void*>(this);
+                m_videoCodecId = hwcodec;
+                foundgpudecoder = true;
+            }
+            else
+            {
+                // hardware decoder is not available - try the next best profile
+                unavailabledecoders.append(dec);
+                continue;
+            }
+        }
+
+        // default to mpeg2
+        if (m_videoCodecId == kCodec_NONE)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown video codec - defaulting to MPEG2");
+            m_videoCodecId = kCodec_MPEG2;
+        }
+
+        break;
+    }
+
+    // N.B. MediaCodec and NVDEC require frame timing
+    m_useFrameTiming = false;
+    if ((m_ringBuffer && !m_ringBuffer->IsDVD() && (codec_sw_copy(m_videoCodecId) || codec_is_v4l2(m_videoCodecId))) ||
+        (codec_is_nvdec(m_videoCodecId) || codec_is_mediacodec(m_videoCodecId) || codec_is_mediacodec_dec(m_videoCodecId)))
+    {
+        m_useFrameTiming = true;
+    }
+
+    if (FlagIsSet(kDecodeSingleThreaded))
+        thread_count = 1;
+
+    if (HAVE_THREADS)
+    {
+        // Only use a single thread for hardware decoding. There is no
+        // performance improvement with multithreaded hardware decode
+        // and asynchronous callbacks create issues with decoders that
+        // use AVHWFrameContext where we need to release video resources
+        // before they are recreated
+        if (!foundgpudecoder)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
+                .arg(HAVE_THREADS ? thread_count : 1));
+            enc->thread_count = static_cast<int>(thread_count);
+        }
+    }
+
+    InitVideoCodec(stream, enc, true);
+
+    ScanATSCCaptionStreams(stream_index);
+    UpdateATSCCaptionTracks();
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
+    m_mythCodecCtx->SetDecoderOptions(enc, codec);
+    if (!OpenAVCodec(enc, codec))
+    {
+        scanerror = -1;
+    }
+    return stream_index;
+}
+
 void AvFormatDecoder::remove_tracks_not_in_same_AVProgram(int stream_index)
 {
     AVProgram* program = av_find_program_from_stream(m_ic, nullptr, stream_index);
@@ -2246,199 +2436,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     m_resetHardwareDecoders = false;
     if (!novideo)
     {
-        int stream_index = -1;
-        for(;;)
-        {
-            const AVCodec *codec = nullptr;
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to select best video track");
-
-            /*
-             *  Find the "best" stream in the file.
-             *
-             * The best stream is determined according to various heuristics as
-             * the most likely to be what the user expects. If the decoder parameter
-             * is not nullptr, av_find_best_stream will find the default decoder
-             * for the stream's codec; streams for which no decoder can be found
-             * are ignored.
-             *
-             * If av_find_best_stream returns successfully and decoder_ret is not nullptr,
-             * then *decoder_ret is guaranteed to be set to a valid AVCodec.
-             */
-            stream_index = av_find_best_stream(m_ic, AVMEDIA_TYPE_VIDEO,
-                                               -1, -1, &codec, 0);
-
-            if (stream_index < 0)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "No video track found/selected.");
-                break;
-            }
-
-            AVStream *stream = m_ic->streams[stream_index];
-            if (m_averrorCount > SEQ_PKT_ERR_MAX)
-                m_codecMap.FreeCodecContext(stream);
-            AVCodecContext *enc = m_codecMap.GetCodecContext(stream, codec);
-            StreamInfo si(stream_index, 0, 0, 0, 0);
-
-            m_tracks[kTrackTypeVideo].push_back(si);
-            m_selectedTrack[kTrackTypeVideo] = si;
-
-            QString codectype(AVMediaTypeToString(enc->codec_type));
-            if (enc->codec_type == AVMEDIA_TYPE_VIDEO)
-                codectype += QString("(%1x%2)").arg(enc->width).arg(enc->height);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
-                    .arg(stream_index).arg(static_cast<uint64_t>(stream->id), 0, 16)
-                    .arg(avcodec_get_name(enc->codec_id),
-                         avcodec_profile_name(enc->codec_id, enc->profile),
-                         codectype,
-                         QString::number(enc->bit_rate)));
-
-            // If ScanStreams has been called on a stream change triggered by a
-            // decoder error - because the decoder does not handle resolution
-            // changes gracefully (NVDEC and maybe MediaCodec) - then the stream/codec
-            // will still contain the old resolution but the AVCodecContext will
-            // have been updated. This causes mayhem for a second or two.
-            if ((enc->width != stream->codecpar->width) || (enc->height != stream->codecpar->height))
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC + QString(
-                    "Video resolution mismatch: Context: %1x%2 Stream: %3x%4 Codec: %5 Stream change: %6")
-                    .arg(enc->width).arg(enc->height)
-                    .arg(stream->codecpar->width).arg(stream->codecpar->height)
-                    .arg(get_decoder_name(m_videoCodecId)).arg(m_streamsChanged));
-            }
-
-            m_avcParser->Reset();
-
-            QSize dim = get_video_dim(*enc);
-            int width  = std::max(dim.width(),  16);
-            int height = std::max(dim.height(), 16);
-            QString dec = "ffmpeg";
-            uint thread_count = 1;
-            QString codecName;
-            if (enc->codec)
-                codecName = enc->codec->name;
-            // framerate appears to never be set - which is probably why
-            // GetVideoFrameRate never uses it:)
-            // So fallback to the GetVideoFrameRate call which should then ensure
-            // the video display profile gets an accurate frame rate - instead of 0
-            if (enc->framerate.den && enc->framerate.num)
-                m_fps = float(enc->framerate.num) / float(enc->framerate.den);
-            else
-                m_fps = GetVideoFrameRate(stream, enc, true);
-
-            bool foundgpudecoder = false;
-            QStringList unavailabledecoders;
-            bool allowgpu = FlagIsSet(kDecodeAllowGPU);
-
-            if (m_averrorCount > SEQ_PKT_ERR_MAX)
-            {
-                // TODO this could be improved by appending the decoder that has
-                // failed to the unavailable list - but that could lead to circular
-                // failures if there are 2 or more hardware decoders that fail
-                if (FlagIsSet(kDecodeAllowGPU) && (dec != "ffmpeg"))
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + QString(
-                        "GPU/hardware decoder '%1' failed - forcing software decode")
-                        .arg(dec));
-                }
-                m_averrorCount = 0;
-                allowgpu = false;
-            }
-
-            while (unavailabledecoders.size() < 10)
-            {
-                if (!m_isDbIgnored)
-                {
-                    if (!unavailabledecoders.isEmpty())
-                    {
-                        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Unavailable decoders: %1")
-                            .arg(unavailabledecoders.join(",")));
-                    }
-                    m_videoDisplayProfile.SetInput(QSize(width, height), m_fps, codecName, unavailabledecoders);
-                    dec = m_videoDisplayProfile.GetDecoder();
-                    thread_count = m_videoDisplayProfile.GetMaxCPUs();
-                    bool skip_loop_filter = m_videoDisplayProfile.IsSkipLoopEnabled();
-                    if  (!skip_loop_filter)
-                        enc->skip_loop_filter = AVDISCARD_NONKEY;
-                }
-
-                m_videoCodecId = kCodec_NONE;
-                uint version = mpeg_version(enc->codec_id);
-                if (version)
-                    m_videoCodecId = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
-
-                if (version && allowgpu && dec != "ffmpeg")
-                {
-                    // We need to set this so that MythyCodecContext can callback
-                    // to the player in use to check interop support.
-                    enc->opaque = static_cast<void*>(this);
-                    MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
-                    if (hwcodec != kCodec_NONE)
-                    {
-                        // the context may have changed
-                        enc->opaque = static_cast<void*>(this);
-                        m_videoCodecId = hwcodec;
-                        foundgpudecoder = true;
-                    }
-                    else
-                    {
-                        // hardware decoder is not available - try the next best profile
-                        unavailabledecoders.append(dec);
-                        continue;
-                    }
-                }
-
-                // default to mpeg2
-                if (m_videoCodecId == kCodec_NONE)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown video codec - defaulting to MPEG2");
-                    m_videoCodecId = kCodec_MPEG2;
-                }
-
-                break;
-            }
-
-            // N.B. MediaCodec and NVDEC require frame timing
-            m_useFrameTiming = false;
-            if ((m_ringBuffer && !m_ringBuffer->IsDVD() && (codec_sw_copy(m_videoCodecId) || codec_is_v4l2(m_videoCodecId))) ||
-                (codec_is_nvdec(m_videoCodecId) || codec_is_mediacodec(m_videoCodecId) || codec_is_mediacodec_dec(m_videoCodecId)))
-            {
-                m_useFrameTiming = true;
-            }
-
-            if (FlagIsSet(kDecodeSingleThreaded))
-                thread_count = 1;
-
-            if (HAVE_THREADS)
-            {
-                // Only use a single thread for hardware decoding. There is no
-                // performance improvement with multithreaded hardware decode
-                // and asynchronous callbacks create issues with decoders that
-                // use AVHWFrameContext where we need to release video resources
-                // before they are recreated
-                if (!foundgpudecoder)
-                {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
-                        .arg(HAVE_THREADS ? thread_count : 1));
-                    enc->thread_count = static_cast<int>(thread_count);
-                }
-            }
-
-            InitVideoCodec(stream, enc, true);
-
-            ScanATSCCaptionStreams(stream_index);
-            UpdateATSCCaptionTracks();
-
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
-            m_mythCodecCtx->SetDecoderOptions(enc, codec);
-            if (!OpenAVCodec(enc, codec))
-            {
-                scanerror = -1;
-                break;
-            }
-            break;
-        }
-
+        int stream_index = autoSelectVideoTrack(scanerror);
         remove_tracks_not_in_same_AVProgram(stream_index);
     }
 
