@@ -250,6 +250,8 @@ class AvFormatDecoder : public DecoderBase
 
     bool FlagIsSet(PlayerFlags arg) { return m_playerFlags & arg; }
 
+    void remove_tracks_not_in_same_AVProgram(int stream_index);
+
     bool               m_isDbIgnored;
 
     AVCParser         *m_avcParser                    {nullptr};
