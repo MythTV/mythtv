@@ -82,9 +82,9 @@ class MythOSDDialogData
     };
 
     QString m_dialogName;
-    QString m_message;
+    QString m_message { }; //NOLINT(readability-redundant-member-init)
     std::chrono::milliseconds m_timeout { 0ms };
-    std::vector<MythOSDDialogButton> m_buttons;
+    std::vector<MythOSDDialogButton> m_buttons { }; //NOLINT(readability-redundant-member-init)
     MythOSDBackButton m_back { };
 };
 
