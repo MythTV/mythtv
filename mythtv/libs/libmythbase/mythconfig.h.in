@@ -2,6 +2,8 @@
 #ifndef MYTHTV_CONFIG_H
 #define MYTHTV_CONFIG_H
 
+/* NOLINTBEGIN(cppcoreguidelines-macro-usage,modernize-macro-to-enum) */
+
 #define QT_MIN_VERSION_STR  "@QT_MIN_VERSION_STR@"
 #define QT_MIN_VERSION_HEX   @QT_MIN_VERSION_HEX@
 #define QT_MIN_VERSION       @QT_MIN_VERSION@
@@ -85,5 +87,7 @@
  */
 #define HAVE_LIBUDFREAD 1
 #define HAVE_LIBBLURAY 1
+
+/* NOLINTEND(cppcoreguidelines-macro-usage,modernize-macro-to-enum) */
 
 #endif /* MYTHTV_CONFIG_H */
