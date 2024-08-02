@@ -31,7 +31,6 @@ class MBroadcastSocketDevice : public MSocketDevice
         m_address(sAddress), m_port(nPort)
     {
         m_address.setAddress( sAddress );
-        m_port = nPort;
 
         setProtocol(IPv4);
         setSocket(createNewSocket(), MSocketDevice::Datagram);

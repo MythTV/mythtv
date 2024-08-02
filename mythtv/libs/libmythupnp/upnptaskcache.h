@@ -42,7 +42,6 @@ class SSDPCacheTask : public Task
 
         SSDPCacheTask() : Task("SSDPCacheTask")
         {
-            m_nExecuteCount = 0;
             m_nInterval     = 30s;
 // TODO: Rework when separating upnp/ssdp stack
 //               XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/CacheInterval", 30s);

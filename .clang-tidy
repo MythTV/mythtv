@@ -147,8 +147,6 @@ Checks: '-*,
         # access unions. https://www.boost.org/ ,
        -cppcoreguidelines-pro-type-union-access,
 
-       -cppcoreguidelines-prefer-member-initializer,
-
         # As of 2024-08-01, there are 110 unique warnings. ,
        -cppcoreguidelines-avoid-const-or-ref-data-members,
 
