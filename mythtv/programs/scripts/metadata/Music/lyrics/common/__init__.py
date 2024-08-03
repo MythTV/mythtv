@@ -1,4 +1,1 @@
-__version__ = "1.0.0"
-
-from . import utilities, audiofile
-
+__version__ = "2.0.0"
