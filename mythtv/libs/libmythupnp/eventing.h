@@ -145,7 +145,7 @@ class UPNP_PUBLIC  StateVariable : public StateVariableBase
 
         // ------------------------------------------------------------------
 
-        void SetValue( T value )
+        void SetValue( const T& value )
         {
             if ( m_value != value )
             {
@@ -191,7 +191,7 @@ class UPNP_PUBLIC StateVariables
 
         // ------------------------------------------------------------------
         template < class T >
-        bool SetValue( const QString &sName, T value )
+        bool SetValue( const QString &sName, const T& value )
         {
             SVMap::iterator it = m_map.find(sName);
             if (it == m_map.end())
