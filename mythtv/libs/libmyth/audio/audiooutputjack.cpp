@@ -94,13 +94,13 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     }
 
     // Currently this looks very similar to error code - duplicated for safety
-    free(matching_ports);
+    free(reinterpret_cast<void*>(matching_ports));
     JackClientClose(&m_client);
     return settings;
 
 err_out:
     // Our abstracted exit point in case of error
-    free(matching_ports);
+    free(reinterpret_cast<void*>(matching_ports));
     JackClientClose(&m_client);
     delete settings;
     return nullptr;
@@ -206,14 +206,14 @@ bool AudioOutputJACK::OpenDevice()
         goto err_out;
 
     // Free up some stuff
-    free(matching_ports);
+    free(reinterpret_cast<void*>(matching_ports));
 
     // Device opened successfully
     return true;
 
 err_out:
     // Our abstracted exit point in case of error
-    free(matching_ports);
+    free(reinterpret_cast<void*>(matching_ports));
     JackClientClose(&m_client);
     return false;
 }
