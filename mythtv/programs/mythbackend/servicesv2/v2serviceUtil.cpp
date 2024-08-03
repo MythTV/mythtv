@@ -479,6 +479,19 @@ void V2FillVideoMetadataInfo (
     }
 
     V2FillGenreList(pVideoMetadataInfo->Genres(), pVideoMetadataInfo->GetId());
+
+    auto castList = pMetadata->GetCast();
+    V2CastMemberList* pCastMemberList = pVideoMetadataInfo->Cast();
+
+    QString actors = QObject::tr("Actors");
+    for (VideoMetadata::cast_entry ent : castList )
+    {
+        V2CastMember *pCastMember = pCastMemberList->AddNewCastMember();
+        pCastMember->setTranslatedRole(actors);
+        pCastMember->setRole("ACTOR");
+        pCastMember->setName(ent.second);
+    }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
