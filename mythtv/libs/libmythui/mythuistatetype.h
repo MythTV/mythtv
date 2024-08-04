@@ -22,7 +22,9 @@ class MythImage;
 class MUI_PUBLIC MythUIStateType : public MythUIComposite
 {
   public:
-    enum StateType { None = 0, Off, Half, Full }; // Can be used for tri-state checks, two state toggles, etc.
+    // Can be used for tri-state checks, two state toggles, etc.
+    enum StateType : std::uint8_t
+        { None = 0, Off, Half, Full };
 
     MythUIStateType(MythUIType *parent, const QString &name);
    ~MythUIStateType() override = default;

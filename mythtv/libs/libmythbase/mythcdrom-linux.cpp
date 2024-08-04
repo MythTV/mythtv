@@ -115,7 +115,7 @@ struct CDROMdiscInfo {
 // end of kernel structures.
 };
 
-enum CDROMdiscStatus
+enum CDROMdiscStatus : std::uint8_t
 {
     MEDIA_IS_EMPTY      = 0x0,
     MEDIA_IS_APPENDABLE = 0x1,

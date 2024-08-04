@@ -10,7 +10,7 @@
               
 class UPnpMSRR;
                           
-enum UPnpMSRRMethod
+enum UPnpMSRRMethod : std::uint8_t
 {
     MSRR_Unknown                = 0,
     MSRR_GetServiceDescription  = 1,

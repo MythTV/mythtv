@@ -9,7 +9,7 @@
 
 #include "mythbaseexp.h"
 
-enum MythMediaStatus {
+enum MythMediaStatus : std::uint8_t {
     MEDIASTAT_ERROR,        ///< Unable to mount, but could be usable
     MEDIASTAT_UNKNOWN,
     MEDIASTAT_UNPLUGGED,
@@ -21,7 +21,7 @@ enum MythMediaStatus {
     MEDIASTAT_MOUNTED
 };
 
-enum MythMediaType {
+enum MythMediaType : std::uint16_t {
     MEDIATYPE_UNKNOWN  = 0x0001,
     MEDIATYPE_DATA     = 0x0002,
     MEDIATYPE_MIXED    = 0x0004,
@@ -36,7 +36,7 @@ enum MythMediaType {
 };
 // MediaType conflicts with a definition within OSX Quicktime Libraries.
 
-enum MythMediaError {
+enum MythMediaError : std::uint8_t {
     MEDIAERR_OK,
     MEDIAERR_FAILED,
     MEDIAERR_UNSUPPORTED

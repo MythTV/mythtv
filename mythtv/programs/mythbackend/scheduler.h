@@ -83,7 +83,8 @@ class Scheduler : public MThread, public MythScheduler
     QMap<QString,ProgramInfo*> GetRecording(void) const override; // MythScheduler
     RecordingInfo* GetRecording(uint recordedid) const;
 
-    enum SchedSortColumn { kSortTitle, kSortLastRecorded, kSortNextRecording,
+    enum SchedSortColumn : std::uint8_t
+                         { kSortTitle, kSortLastRecorded, kSortNextRecording,
                            kSortPriority, kSortType };
     static void GetAllScheduled(QStringList &strList,
                                 SchedSortColumn sortBy = kSortTitle,
@@ -125,7 +126,7 @@ class Scheduler : public MThread, public MythScheduler
     void run(void) override; // MThread
 
   private:
-    enum OpenEndType {
+    enum OpenEndType : std::uint8_t {
         openEndNever = 0,
         openEndDiffChannel = 1,
         openEndAlways = 2

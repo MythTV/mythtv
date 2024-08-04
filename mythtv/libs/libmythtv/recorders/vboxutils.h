@@ -32,7 +32,7 @@ class VBox
     vbox_chan_map_t *getChannels(void);
 
   protected:
-    enum ErrorCode
+    enum ErrorCode : std::uint8_t
     {
         SUCCESS = 0,
         UNKNOWN_METHOD = 1,

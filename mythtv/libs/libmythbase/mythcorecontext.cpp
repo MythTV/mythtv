@@ -383,7 +383,11 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
 
     if (!d->m_serverSock)
     {
-        QString type = IsFrontend() ? "Frontend" : (blockingClient ? "Playback" : "Monitor");
+        QString type { "Monitor" };
+        if (IsFrontend())
+            type = "Frontend";
+        else if (blockingClient)
+            type = "Playback";
         QString ann = QString("ANN %1 %2 %3")
             .arg(type, d->m_localHostname, QString::number(static_cast<int>(false)));
         d->m_serverSock = ConnectCommandSocket(
@@ -1237,8 +1241,12 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
                 addr = v6.isNull() ? QHostAddress::LocalHostIPv6 : v6;
                 break;
             default:
-                addr = v6.isNull() ?
-                    (v4.isNull() ? QHostAddress::LocalHostIPv6 : v4) : v6;
+                if (!v6.isNull())
+                    addr = v6;
+                else if (!v4.isNull())
+                    addr = v4;
+                else
+                    addr = QHostAddress::LocalHostIPv6;
                 break;
         }
     }

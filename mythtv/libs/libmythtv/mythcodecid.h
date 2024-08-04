@@ -1,13 +1,14 @@
 #ifndef MYTH_CODEC_ID_H
 #define MYTH_CODEC_ID_H
 
+#include <cstdint>
 #include <QString>
 extern "C"
 {
 #include "libavcodec/avcodec.h"
 }
 
-enum MythCodecID
+enum MythCodecID : std::uint8_t
 {
 // if you add anything to this list please update
 // myth2av_codecid and get_encoding_type

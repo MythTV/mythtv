@@ -22,7 +22,7 @@
 #define ASN1CODES_H
 
 // Universal codes _ standard across all ASN1 definitions
-enum UNIVERSAL_CODES {
+enum UNIVERSAL_CODES : std::uint8_t {
     U_BOOL      = 1,
     U_INT       = 2,
     U_STRING    = 4,
@@ -32,7 +32,7 @@ enum UNIVERSAL_CODES {
 };
 
 // Context_specific codes _ defined for MHEG 5
-enum SPECIFIC_CODES {
+enum SPECIFIC_CODES : std::uint8_t {
     C_APPLICATION               = 0,
     C_SCENE                     = 1,
     C_STANDARD_IDENTIFIER       = 2,
@@ -292,7 +292,7 @@ enum SPECIFIC_CODES {
 
 // Pseudo-codes.  These are encoded into the link condition in binary but it's convenient
 // to give them codes here since that way we can include them in the same lookup table.
-enum PSEUDO_CODES {
+enum PSEUDO_CODES : std::uint8_t {
     P_EVENT_SOURCE              = 249,
     P_EVENT_TYPE                = 250,
     P_EVENT_DATA                = 251,

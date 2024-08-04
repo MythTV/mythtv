@@ -23,7 +23,7 @@ class MBASE_PUBLIC MythCDROM : public MythMediaDevice
     static MythCDROM* get(QObject* par, const QString& devicePath,
                                   bool SuperMount, bool AllowEject);
 
-    enum ImageType
+    enum ImageType : std::uint8_t
     {
         kUnknown,
         kBluray,

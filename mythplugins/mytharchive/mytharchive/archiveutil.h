@@ -13,7 +13,7 @@
 
 class ProgramInfo;
 
-enum ARCHIVEDESTINATION
+enum ARCHIVEDESTINATION : std::uint8_t
 {
     AD_DVD_SL = 0,
     AD_DVD_DL = 1,

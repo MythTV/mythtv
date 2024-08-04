@@ -58,7 +58,7 @@ class ThemeChooser : public MythScreenType
     bool LoadVersion(const QString &version, QStringList &themesSeen,
                      bool alert_user);
 
-    enum DownloadState
+    enum DownloadState : std::uint8_t
     {
         dsIdle = 0,
         dsDownloadingOnBackend,

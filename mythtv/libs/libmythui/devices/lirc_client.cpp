@@ -21,6 +21,7 @@
 #include <cerrno>
 #include <climits>
 #include <cstdarg>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -50,7 +51,7 @@ struct filestack_t {
 	struct filestack_t *m_parent;
 };
 
-enum packet_state
+enum packet_state : std::uint8_t
 {
 	P_BEGIN,
 	P_MESSAGE,

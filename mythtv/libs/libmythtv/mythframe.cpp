@@ -24,7 +24,7 @@ MythVideoFrame::~MythVideoFrame()
     if (m_buffer && HardwareFormat(m_type))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame still contains a hardware buffer!");
     else if (m_buffer)
-        av_freep(&m_buffer);
+        av_freep(reinterpret_cast<void*>(&m_buffer));
 }
 
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats)
@@ -77,7 +77,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     if (m_buffer && (m_buffer != Buffer))
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Deleting old frame buffer");
-        av_freep(&m_buffer);
+        av_freep(reinterpret_cast<void*>(&m_buffer));
     }
 
     m_type         = Type;

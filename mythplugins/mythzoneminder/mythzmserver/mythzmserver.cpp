@@ -43,7 +43,7 @@ static constexpr const char* ZM_OVERRIDECONFIG { "/etc/zm/conf.d/01-system-paths
 // Care should be taken to keep these in sync with the exit codes in
 // libmythbase/exitcodes.h (which is not included here to keep this code 
 // separate from mythtv libraries).
-enum EXIT_CODES {
+enum EXIT_CODES : std::uint8_t {
     EXIT_OK                        =   0,
     EXIT_INVALID_CMDLINE           = 132,
     EXIT_OPENING_LOGFILE_ERROR     = 136, // mapped to _PERMISSIONS_ERROR

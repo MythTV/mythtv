@@ -26,7 +26,7 @@
 
 class PrivUdpSocket;
 
-enum PoolServerType
+enum PoolServerType : std::uint8_t
 {
     kTCPServer,
     kUDPServer,

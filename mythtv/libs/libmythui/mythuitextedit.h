@@ -16,7 +16,7 @@ class MythUIStateType;
 class MythUIImage;
 class MythUIText;
 
-enum InputFilter
+enum InputFilter : std::uint8_t
 {
     FilterNone = 0x0,
     FilterAlpha = 0x01,
@@ -53,7 +53,8 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
     void SetMaxLength(int length);
 
-    enum MoveDirection { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd };
+    enum MoveDirection : std::uint8_t
+                       { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd };
     bool MoveCursor(MoveDirection moveDir);
 
     void SetKeyboardPosition(PopupPosition pos) { m_keyboardPosition = pos; }

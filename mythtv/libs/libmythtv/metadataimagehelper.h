@@ -7,7 +7,7 @@
 
 #include "mythtvexp.h"
 
-enum VideoArtworkType {
+enum VideoArtworkType : std::uint8_t {
     kArtworkCoverart = 0,
     kArtworkFanart = 1,
     kArtworkBanner = 2,

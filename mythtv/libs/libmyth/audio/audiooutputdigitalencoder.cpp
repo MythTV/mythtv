@@ -39,17 +39,17 @@ AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
     Reset();
     if (m_outbuf)
     {
-        av_freep(&m_outbuf);
+        av_freep(reinterpret_cast<void*>(&m_outbuf));
         m_outSize = 0;
     }
     if (m_inbuf)
     {
-        av_freep(&m_inbuf);
+        av_freep(reinterpret_cast<void*>(&m_inbuf));
         m_inSize = 0;
     }
     if (m_framebuf)
     {
-        av_freep(&m_framebuf);
+        av_freep(reinterpret_cast<void*>(&m_framebuf));
     }
 }
 

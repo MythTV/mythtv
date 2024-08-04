@@ -520,7 +520,7 @@ bool Buffer::Fill(const QByteArray & buffer)
         emit m_parent->DataStarted();
     }
 
-    if (m_data.size() < MAX_QUEUE)
+    if (m_data.size() < kMaxQueue)
     {
         block_t blk(reinterpret_cast<const uint8_t *>(buffer.constData()),
                     reinterpret_cast<const uint8_t *>(buffer.constData())

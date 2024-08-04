@@ -3114,11 +3114,12 @@ void PlaybackBox::changeProfileAndTranscode(int id)
 
 void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 {
-    QString label =
-        (asFileNotFound == pginfo.GetAvailableStatus()) ?
-        tr("Recording file cannot be found") :
-        (asZeroByte     == pginfo.GetAvailableStatus()) ?
-        tr("Recording file contains no data") :
+    QString label;
+    if (asFileNotFound == pginfo.GetAvailableStatus())
+        label = tr("Recording file cannot be found");
+    else if (asZeroByte == pginfo.GetAvailableStatus())
+        label = tr("Recording file contains no data");
+    else
         tr("Recording Options");
 
     m_popupMenu = new MythMenu(label + CreateProgramInfoString(pginfo), this, "actionmenu");

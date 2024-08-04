@@ -22,7 +22,7 @@ class MythInteropGPU : public QObject, public ReferenceCounter
     Q_OBJECT
 
   public:
-    enum InteropType
+    enum InteropType : std::uint8_t
     {
         Unsupported  = 0,
         GL_VAAPIGLXCOPY,

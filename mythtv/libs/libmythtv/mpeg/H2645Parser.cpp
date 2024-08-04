@@ -323,7 +323,7 @@ void H2645Parser::vui_parameters(BitReader& br, bool hevc)
               540x576 16:9 frame with horizontal overscan
              */
             break;
-          case EXTENDED_SAR:
+          case kExtendedSar:
             m_sarWidth  = br.get_bits(16);
             m_sarHeight = br.get_bits(16);
             LOG(VB_RECORD, LOG_DEBUG,
@@ -456,7 +456,7 @@ uint H2645Parser::aspectRatio(void) const
             // 2:1
             aspect *= 2.0;
             break;
-        case EXTENDED_SAR:
+        case kExtendedSar:
             if (m_sarHeight)
                 aspect *= m_sarWidth / (double)m_sarHeight;
             else

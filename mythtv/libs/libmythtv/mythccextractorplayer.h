@@ -15,7 +15,7 @@
 
 class SRTWriter;
 
-enum sub_types
+enum sub_types : std::uint8_t
 {
     kSubCC608,
     kSubCC708,
@@ -128,7 +128,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     void IngestSubtitle(QList<OneSubtitle> &list, const QStringList &content) const;
     static void IngestSubtitle(QList<OneSubtitle> &list, const OneSubtitle &content);
 
-    enum { kProcessNormal = 0, kProcessFinalize = 1 };
+    enum : std::uint8_t { kProcessNormal = 0, kProcessFinalize = 1 };
     void Ingest608Captions(void);
     void Process608Captions(uint flags);
 

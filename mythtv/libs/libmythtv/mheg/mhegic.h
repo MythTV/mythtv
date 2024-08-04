@@ -24,7 +24,7 @@ public:
     // Properties
 public:
     // Get network status
-    enum EStatus { kActive = 0, kInactive, kDisabled };
+    enum EStatus : std::uint8_t { kActive = 0, kInactive, kDisabled };
     static EStatus status();
 
     // Operations
@@ -32,7 +32,7 @@ public:
     // Is a file ready to read?
     bool CheckFile(const QString &csPath, const QByteArray &cert = QByteArray());
     // Read a file
-    enum EResult { kError = -1, kSuccess = 0, kPending };
+    enum EResult : std::int8_t { kError = -1, kSuccess = 0, kPending };
     EResult GetFile(const QString &csPath, QByteArray &data,
                     const QByteArray &cert = QByteArray() );
 

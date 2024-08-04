@@ -86,8 +86,8 @@ vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
     ev.i3 = i3;
     ev.p1 = p1;
 
-    for (cl = static_cast<vbi_client *>((void*)vbi->clients[0].first);
-         (cln = static_cast<vbi_client *>((void*)cl->node->next)) != nullptr;
+    for (cl = reinterpret_cast<vbi_client *>(vbi->clients[0].first);
+         (cln = reinterpret_cast<vbi_client *>(cl->node->next)) != nullptr;
          cl = cln)
        cl->handler(cl->data, &ev);
 }
@@ -472,9 +472,9 @@ vbi_del_handler(struct vbi *vbi, vbic_handler handler, void *data)
 {
     struct vbi_client *cl = nullptr;
 
-    for (cl = static_cast<vbi_client*>((void*)vbi->clients->first);
+    for (cl = reinterpret_cast<vbi_client*>(vbi->clients->first);
          cl->node->next != nullptr;
-         cl = static_cast<vbi_client*>((void*)cl->node->next))
+         cl = reinterpret_cast<vbi_client*>(cl->node->next))
     {
        if (cl->handler == handler && cl->data == data)
        {

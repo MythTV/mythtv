@@ -17,7 +17,7 @@
 
 #include "mythbaseexp.h"
 
-enum RecordingType
+enum RecordingType : std::uint8_t
 {
     kNotRecording = 0,
     kSingleRecord = 1,
@@ -42,7 +42,7 @@ static inline  QVariant toVariant(RecordingType rectype)
 
 MBASE_PUBLIC int RecTypePrecedence(RecordingType rectype);
 
-enum RecordingDupInType
+enum RecordingDupInType : std::uint8_t
 {
     kDupsUnset          = 0x00,
     kDupsInRecorded     = 0x01,
@@ -59,7 +59,7 @@ MBASE_PUBLIC RecordingDupInType dupInFromStringAndBool(const QString& type, bool
 static inline  QVariant toVariant(RecordingDupInType recdupin)
     {return QVariant::fromValue(static_cast<int>(recdupin)); }
 
-enum RecordingDupMethodType
+enum RecordingDupMethodType : std::uint8_t
 {
     kDupCheckUnset    = 0x00,
     kDupCheckNone     = 0x01,
@@ -75,7 +75,7 @@ MBASE_PUBLIC RecordingDupMethodType dupMethodFromString(const QString& type);
 static inline  QVariant toVariant(RecordingDupMethodType recdupmeth)
     {return QVariant::fromValue(static_cast<int>(recdupmeth)); }
 
-enum RecSearchType
+enum RecSearchType : std::uint8_t
 {
     kNoSearch = 0,
     kPowerSearch,

@@ -38,7 +38,7 @@ class MythUIButton;
 class MythUIImage;
 class MythDialogBox;
 
-enum ViewType { kActionsByContext, kKeysByContext, kContextsByKey, };
+enum ViewType : std::uint8_t { kActionsByContext, kKeysByContext, kContextsByKey };
 
 /**
  *  \class MythControls
@@ -66,7 +66,7 @@ class MythControls : public MythScreenType
     bool Create(void) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
-    enum ListType
+    enum ListType : std::uint8_t
     {
         kContextList,
         kKeyList,

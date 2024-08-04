@@ -522,7 +522,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
         bool success = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
                 height);
-        av_freep(&scored.data[0]);
+        av_freep(reinterpret_cast<void*>(&scored.data[0]));
         if (!success)
             goto free_thresh;
 
@@ -560,13 +560,13 @@ template_alloc(const unsigned int *scores, int width, int height,
         goto free_thresh;
 
     delete []sortedscores;
-    av_freep(&thresh.data[0]);
+    av_freep(reinterpret_cast<void*>(&thresh.data[0]));
 
     return true;
 
 free_thresh:
     delete []sortedscores;
-    av_freep(&thresh.data[0]);
+    av_freep(reinterpret_cast<void*>(&thresh.data[0]));
     return false;
 }
 
@@ -655,7 +655,7 @@ bool readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, in
     QByteArray tmfile = tmplfile.toLatin1();
     if (pgm_read(tmpl->data[0], *pwidth, *pheight, tmfile.constData()))
     {
-        av_freep(&tmpl->data[0]);
+        av_freep(reinterpret_cast<void*>(&tmpl->data[0]));
         return false;
     }
 
@@ -765,8 +765,8 @@ TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
 TemplateFinder::~TemplateFinder(void)
 {
     delete []m_scores;
-    av_freep(&m_tmpl.data[0]);
-    av_freep(&m_cropped.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_tmpl.data[0]));
+    av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -832,7 +832,7 @@ TemplateFinder::MythPlayerInited(MythPlayer *player,
     return ANALYZE_OK;
 
 free_tmpl:
-    av_freep(&m_tmpl.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_tmpl.data[0]));
     return ANALYZE_FATAL;
 }
 
@@ -842,7 +842,7 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
     if (m_cwidth == newwidth && m_cheight == newheight)
         return 0;
 
-    av_freep(&m_cropped.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
 
     if (av_image_alloc(m_cropped.data, m_cropped.linesize,
         newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
@@ -1024,7 +1024,7 @@ TemplateFinder::finished([[maybe_unused]] long long nframes, bool final)
     return 0;
 
 free_tmpl:
-    av_freep(&m_tmpl.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_tmpl.data[0]));
     return -1;
 }
 

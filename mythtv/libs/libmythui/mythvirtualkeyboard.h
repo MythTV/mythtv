@@ -6,7 +6,7 @@
 class QKeyEvent;
 
 /// Preferred position to place virtual keyboard popup.
-enum PopupPosition
+enum PopupPosition : std::uint8_t
 {
     VK_POSABOVEEDIT = 1,
     VK_POSBELOWEDIT,

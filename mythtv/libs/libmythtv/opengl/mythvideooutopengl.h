@@ -14,7 +14,7 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     Q_OBJECT
 
   public:
-    enum TextureFormats
+    enum TextureFormats : std::uint8_t
     {
         AllFormats    = 0,
         LegacyFormats = 1

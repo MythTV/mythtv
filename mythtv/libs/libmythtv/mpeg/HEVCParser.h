@@ -32,7 +32,7 @@ class HEVCParser : public H2645Parser
 {
   public:
 
-    enum NAL_unit_type {
+    enum NAL_unit_type : std::uint8_t {
         TAIL_N = 0, // Coded slice segment of a non-TSA, non-STSA trailing picture
         TAIL_R = 1, // slice_segment_layer_rbsp() VCL
 
@@ -202,7 +202,7 @@ class HEVCParser : public H2645Parser
         std::array<std::array<uint8_t,64>,2> scaling_lists_32x32 {};
     };
 
-    enum QuantMatrixSize
+    enum QuantMatrixSize : std::uint8_t
     {
         QUANT_MATIX_4X4   = 0,
         QUANT_MATIX_8X8   = 1,

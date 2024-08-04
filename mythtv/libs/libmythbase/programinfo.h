@@ -73,7 +73,8 @@ class MBASE_PUBLIC ProgramInfo
     static const std::array<const QString,5> kCatName;
   public:
     static constexpr int kNumCatTypes = 5;
-    enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,
+    enum CategoryType : std::uint8_t
+                      { kCategoryNone, kCategoryMovie, kCategorySeries,
                         kCategorySports, kCategoryTVShow };
 
     /// Null constructor
@@ -422,8 +423,11 @@ class MBASE_PUBLIC ProgramInfo
     QString GetStorageGroup(void)         const { return m_storageGroup; }
     uint    GetYearOfInitialRelease(void) const
     {
-        return ((m_year) ? m_year :
-                (m_originalAirDate.isValid()) ? m_originalAirDate.year() : 0);
+        if (m_year > 0)
+            return m_year;
+        if (m_originalAirDate.isValid())
+            return m_originalAirDate.year();
+        return 0;
     }
     QDate   GetOriginalAirDate(void)      const { return m_originalAirDate; }
     QDateTime GetLastModifiedTime(void)   const { return m_lastModified; }
@@ -503,7 +507,7 @@ class MBASE_PUBLIC ProgramInfo
 
     void ProgramFlagsFromNames(const QString & names);
 
-    enum Verbosity
+    enum Verbosity : std::uint8_t
     {
         kLongDescription,
         kTitleSubtitle,
@@ -541,31 +545,31 @@ class MBASE_PUBLIC ProgramInfo
     void SetReactivated(bool reactivate)
     {
         m_programFlags &= ~FL_REACTIVATE;
-        m_programFlags |= (reactivate) ? FL_REACTIVATE : 0;
+        m_programFlags |= (reactivate) ? FL_REACTIVATE : FL_NONE;
     }
     void SetEditing(bool editing)
     {
         m_programFlags &= ~FL_EDITING;
-        m_programFlags |= (editing) ? FL_EDITING : 0;
+        m_programFlags |= (editing) ? FL_EDITING : FL_NONE;
     }
     void SetFlagging(bool flagging)
     {
         m_programFlags &= ~FL_COMMFLAG;
-        m_programFlags |= (flagging) ? FL_COMMFLAG : 0;
+        m_programFlags |= (flagging) ? FL_COMMFLAG : FL_NONE;
     }
     /// \brief If "ignore" is true GetBookmark() will return 0, otherwise
     ///        GetBookmark() will return the bookmark position if it exists.
     void SetIgnoreBookmark(bool ignore)
     {
         m_programFlags &= ~FL_IGNOREBOOKMARK;
-        m_programFlags |= (ignore) ? FL_IGNOREBOOKMARK : 0;
+        m_programFlags |= (ignore) ? FL_IGNOREBOOKMARK : FL_NONE;
     }
     /// \brief If "ignore" is true QueryProgStart() will return 0, otherwise
     ///        QueryProgStart() will return the progstart position if it exists.
     void SetIgnoreProgStart(bool ignore)
     {
         m_programFlags &= ~FL_IGNOREPROGSTART;
-        m_programFlags |= (ignore) ? FL_IGNOREPROGSTART : 0;
+        m_programFlags |= (ignore) ? FL_IGNOREPROGSTART : FL_NONE;
     }
     /// \brief If "ignore" is true QueryLastPlayPos() will return 0, otherwise
     ///        QueryLastPlayPos() will return the last playback position
@@ -573,7 +577,7 @@ class MBASE_PUBLIC ProgramInfo
     void SetIgnoreLastPlayPos(bool ignore)
     {
         m_programFlags &= ~FL_IGNORELASTPLAYPOS;
-        m_programFlags |= (ignore) ? FL_IGNORELASTPLAYPOS : 0;
+        m_programFlags |= (ignore) ? FL_IGNORELASTPLAYPOS : FL_NONE;
     }
     virtual void SetRecordingID(uint _recordedid)
         { m_recordedId = _recordedid; }

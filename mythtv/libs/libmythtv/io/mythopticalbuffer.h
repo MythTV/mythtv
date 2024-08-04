@@ -14,7 +14,7 @@ class MythOpticalBuffer : public MythMediaBuffer
     virtual bool GetNameAndSerialNum (QString& Name, QString& SerialNumber) = 0;
 
   protected:
-    enum MythOpticalState
+    enum MythOpticalState : std::uint8_t
     {
         PROCESS_NORMAL,
         PROCESS_REPROCESS,

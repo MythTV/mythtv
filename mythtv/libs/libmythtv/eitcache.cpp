@@ -117,7 +117,7 @@ static void delete_in_db(uint endtime)
         MythDB::DBError("Error deleting old eitcache entries.", query);
 }
 
-enum channel_status
+enum channel_status : std::uint8_t
 {
     EITDATA      = 0,
     CHANNEL_LOCK = 1,

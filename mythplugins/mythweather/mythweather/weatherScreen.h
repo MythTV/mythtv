@@ -15,7 +15,7 @@
 
 class Weather;
 
-enum DaysOfWeek {
+enum DaysOfWeek : std::uint8_t {
     DAY_SUNDAY, DAY_MONDAY, DAY_TUESDAY, DAY_WENDESDAY, DAY_THURSDAY,
     DAY_FRIDAY, DAY_SATURDAY
 };

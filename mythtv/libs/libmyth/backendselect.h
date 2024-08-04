@@ -38,7 +38,7 @@ class BackendSelection : public MythScreenType
     Q_OBJECT
 
   public:
-    enum Decision
+    enum Decision : std::int8_t
     {
         kManualConfigure = -1,
         kCancelConfigure = 0,

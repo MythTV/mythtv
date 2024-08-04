@@ -18,8 +18,8 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
 
     void Reset(void) override; // MythUIType
 
-    enum LayoutType { LayoutVertical, LayoutHorizontal };
-    enum EffectType { EffectReveal, EffectSlide, EffectAnimate };
+    enum LayoutType : std::uint8_t { LayoutVertical, LayoutHorizontal };
+    enum EffectType : std::uint8_t { EffectReveal, EffectSlide, EffectAnimate };
 
     void Set(int start, int total, int used);
     void SetStart(int value);

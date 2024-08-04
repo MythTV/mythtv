@@ -6,14 +6,16 @@
 struct DriverOption
 {
     // The order of this list dictates the order the options will be shown
-    enum category_t { UNKNOWN_CAT, STREAM_TYPE, VIDEO_ENCODING, VIDEO_ASPECT,
+    enum category_t : std::uint8_t
+                    { UNKNOWN_CAT, STREAM_TYPE, VIDEO_ENCODING, VIDEO_ASPECT,
                       VIDEO_B_FRAMES, VIDEO_GOP_SIZE,
                       VIDEO_BITRATE_MODE, VIDEO_BITRATE, VIDEO_BITRATE_PEAK,
                       AUDIO_ENCODING, AUDIO_BITRATE_MODE, AUDIO_SAMPLERATE,
                       AUDIO_BITRATE, AUDIO_LANGUAGE, VOLUME,
                       BRIGHTNESS, CONTRAST, SATURATION, HUE, SHARPNESS
     };
-    enum type_t { UNKNOWN_TYPE, INTEGER, BOOLEAN, STRING, MENU,
+    enum type_t : std::uint8_t
+                { UNKNOWN_TYPE, INTEGER, BOOLEAN, STRING, MENU,
                   BUTTON, BITMASK };
 
     using menu_t = QMap<int, QString>;

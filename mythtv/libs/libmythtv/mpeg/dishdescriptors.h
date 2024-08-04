@@ -134,7 +134,7 @@ class DishEventTagsDescriptor : public MPEGDescriptor
     QDate originalairdate(void) const;
 };
 
-enum DishThemeType
+enum DishThemeType : std::uint8_t
 {
     kThemeNone = 0,
     kThemeMovie,

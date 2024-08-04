@@ -70,7 +70,7 @@ static constexpr uint8_t TRAILER_OFFTAB_INDEX   { 18 };
 // Apple's Core Data epoch starts 1/1/2001
 static constexpr uint64_t CORE_DATA_EPOCH { 978307200 };
 
-enum
+enum : std::uint8_t
 {
     BPLIST_NULL    = 0x00,
     BPLIST_FALSE   = 0x08,

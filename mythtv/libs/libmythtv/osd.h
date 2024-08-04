@@ -41,7 +41,7 @@ class MythMainWindow;
 class MythPlayerUI;
 
 
-enum OSDFunctionalType
+enum OSDFunctionalType : std::uint8_t
 {
     kOSDFunctionalType_Default = 0,
     kOSDFunctionalType_PictureAdjust,
@@ -52,7 +52,7 @@ enum OSDFunctionalType
     kOSDFunctionalType_SubtitleDelayAdjust
 };
 
-enum OSDTimeout
+enum OSDTimeout : std::int8_t
 {
     kOSDTimeout_Ignore = -1, // Don't update existing timeout
     kOSDTimeout_None   = 0,  // Don't timeout

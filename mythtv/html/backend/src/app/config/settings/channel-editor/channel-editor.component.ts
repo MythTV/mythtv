@@ -282,6 +282,7 @@ export class ChannelEditorComponent implements OnInit {
     this.channel = this.resetChannel();
     this.displayChannelDlg = true;
     this.markPristine();
+    this.loadIcons();
   }
 
   editChannel(channel: MyChannel): void {
@@ -311,8 +312,12 @@ export class ChannelEditorComponent implements OnInit {
             }
             break;
           case 1:
+            this.channel.Source = this.getSource(this.channel);
             // add channel
             this.allChannels.push(this.channel);
+            // notify of change
+            this.allChannels = [...this.allChannels]
+
             break;
           case -1:
             // Delete channel

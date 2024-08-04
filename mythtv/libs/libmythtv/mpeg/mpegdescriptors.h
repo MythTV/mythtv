@@ -20,7 +20,7 @@ using desc_list_t = std::vector<const unsigned char *>;
 class DescriptorID
 {
   public:
-    enum
+    enum : std::uint8_t
     {
         // MPEG
         video_stream                = 0x02,
@@ -197,7 +197,7 @@ class DescriptorID
 class PrivateDescriptorID
 {
   public:
-    enum
+    enum : std::uint8_t
     {
         // These can conflict and should only be used
         // on these specific networks.
@@ -287,7 +287,7 @@ class PrivateDataSpecifierID
 class OriginalNetworkID
 {
   public:
-    enum
+    enum : std::uint16_t
     {
         SES2     = 0x0002,      // Société Européenne des Satellites
         BBC      = 0x003B,      // BBC / Freesat

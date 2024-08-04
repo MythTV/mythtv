@@ -17,7 +17,7 @@ using MetadataLookupList = RefCountedList<MetadataLookup>;
 class MetaGrabberScript;
 using GrabberList = QList<MetaGrabberScript>;
 
-enum GrabberType {
+enum GrabberType : std::uint8_t {
     kGrabberAll,
     kGrabberMovie,
     kGrabberTelevision,

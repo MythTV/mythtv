@@ -57,7 +57,8 @@ class MHStream : public MHPresentable
 
   protected:
     MHOwnPtrSequence <MHPresentable> m_multiplex;
-    enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage {ST_Stream};
+    enum Storage : std::uint8_t
+                 { ST_Mem = 1, ST_Stream = 2 } m_nStorage {ST_Stream};
     int         m_nLooping {0}; // Infinity
 };
 
@@ -114,7 +115,8 @@ class MHVideo : public MHVisible
 
   protected:
     int m_nComponentTag      {0};
-    enum Termination { VI_Freeze = 1, VI_Disappear } m_termination {VI_Disappear};
+    enum Termination : std::uint8_t
+                     { VI_Freeze = 1, VI_Disappear } m_termination {VI_Disappear};
     // Added in UK MHEG
     int     m_nXDecodeOffset {0};
     int     m_nYDecodeOffset {0};

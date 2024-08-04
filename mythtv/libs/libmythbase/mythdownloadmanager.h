@@ -37,7 +37,7 @@ class MBASE_PUBLIC MythCookieJar : public QNetworkCookieJar
 };
 
 // TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
-enum MRequestType {
+enum MRequestType : std::uint8_t {
     kRequestGet,
     kRequestHead,
     kRequestPost

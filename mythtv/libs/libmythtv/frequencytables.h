@@ -160,7 +160,13 @@ class TransportScanItem
                       std::chrono::milliseconds _timeoutTune);
 
     uint offset_cnt() const
-        { return (m_freqOffsets[2]) ? 3 : ((m_freqOffsets[1]) ? 2 : 1); }
+        {
+            if (m_freqOffsets[2])
+                return 3;
+            if (m_freqOffsets[1])
+                return 2;
+            return 1;
+        }
 
     uint64_t freq_offset(uint i) const;
 

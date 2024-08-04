@@ -78,7 +78,8 @@ class V2Guide : public MythHTTPService
                                                   bool             Details,
                                                   const QString   &Sort,
                                                   bool             Descending,
-                                                  bool             WithInvisible);
+                                                  bool             WithInvisible,
+                                                  const QString   &CatType);
 
         static V2Program*   GetProgramDetails   ( int              ChanId,
                                                   const QDateTime &StartTime );

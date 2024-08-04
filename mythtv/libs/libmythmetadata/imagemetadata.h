@@ -43,7 +43,7 @@ static constexpr const char* EXIF_MYTH_ORIENT { "Myth.orient" };
 
 
 //! Image transformations
-enum ImageFileTransform {
+enum ImageFileTransform : std::uint8_t {
     kResetToExif    = 0, //!< Reset to Exif value
     kRotateCW       = 1, //!< Rotate clockwise
     kRotateCCW      = 2, //!< Rotate anti-clockwise

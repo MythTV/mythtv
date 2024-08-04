@@ -22,7 +22,7 @@ PGMConverter::~PGMConverter(void)
 {
     m_width = -1;
 #ifdef PGM_CONVERT_GREYSCALE
-    av_freep(&m_pgm.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_pgm.data[0]));
     memset(&m_pgm, 0, sizeof(m_pgm));
     delete m_copy;
 #endif /* PGM_CONVERT_GREYSCALE */

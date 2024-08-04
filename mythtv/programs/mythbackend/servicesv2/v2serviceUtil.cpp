@@ -479,6 +479,19 @@ void V2FillVideoMetadataInfo (
     }
 
     V2FillGenreList(pVideoMetadataInfo->Genres(), pVideoMetadataInfo->GetId());
+
+    auto castList = pMetadata->GetCast();
+    V2CastMemberList* pCastMemberList = pVideoMetadataInfo->Cast();
+
+    QString actors = QObject::tr("Actors");
+    for (VideoMetadata::cast_entry ent : castList )
+    {
+        V2CastMember *pCastMember = pCastMemberList->AddNewCastMember();
+        pCastMember->setTranslatedRole(actors);
+        pCastMember->setRole("ACTOR");
+        pCastMember->setName(ent.second);
+    }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -827,11 +840,11 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
     // Sort the list
 
     int sortType = 0;
-    if (Sort.toLower().startsWith("channum"))
+    if (Sort.startsWith("channum", Qt::CaseInsensitive))
         sortType = 10;
-    else if (Sort.toLower().startsWith("title"))
+    else if (Sort.startsWith("title", Qt::CaseInsensitive))
         sortType = 20;
-    if (Sort.toLower().endsWith("desc"))
+    if (Sort.endsWith("desc"), Qt::CaseInsensitive)
         sortType += 1;
 
     auto comp = [sortType](const RecordingInfo *First, const RecordingInfo *Second)

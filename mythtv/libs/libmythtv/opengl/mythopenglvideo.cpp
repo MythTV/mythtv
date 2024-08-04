@@ -470,10 +470,18 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
 bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
                                        QSize Size, GLenum TextureTarget)
 {
-    QString texnew = (TextureTarget == QOpenGLTexture::TargetRectangle) ? "Rect" :
-                     (TextureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
-    QString texold = (m_textureTarget == QOpenGLTexture::TargetRectangle) ? "Rect" :
-                     (m_textureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
+    QString texnew { "2D" };
+    if (TextureTarget == QOpenGLTexture::TargetRectangle)
+        texnew = "Rect";
+    else if (TextureTarget == GL_TEXTURE_EXTERNAL_OES)
+        texnew = "OES";
+
+    QString texold { "2D" };
+    if (m_textureTarget == QOpenGLTexture::TargetRectangle)
+        texold = "Rect";
+    else if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
+        texold = "OES";
+
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New frame format: %1:%2 %3x%4 (Tex: %5) -> %6:%7 %8x%9 (Tex: %10)")
         .arg(MythVideoFrame::FormatDescription(m_inputType),
@@ -675,8 +683,11 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // nothing to display, then fallback to this framebuffer.
     // N.B. this is now strictly necessary with v4l2 and DRM PRIME direct rendering
     // but ignore now for performance reasons
-    VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->m_type) ? Framebuffer : None) :
-                                   (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
+    VideoResizing resize;
+    if (Frame)
+        resize = (MythVideoFrame::HardwareFramesFormat(Frame->m_type) ? Framebuffer : None);
+    else
+        resize = (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
 
     std::vector<MythVideoTextureOpenGL*> inputtextures = m_inputTextures;
     if (inputtextures.empty())

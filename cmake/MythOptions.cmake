@@ -194,6 +194,18 @@ option(MYTH_VERSIONED_EXTENSIONS
        ON)
 
 #
+# Library build instructions
+#
+# The first option affect the cmake configuration stage, and the seconds affects
+# the cmake build stage.
+#
+option(
+  LIBS_USE_INSTALLED
+  "Reuse libraries installed by previous runs of cmake.  Don't generate the framework to rebuild a library if it is already installed."
+  ON)
+option(LIBS_ALWAYS_REBUILD "Rebuild libraries on every call to --build." OFF)
+
+#
 # Library install locations.  Using configure/make these will be compiled every
 # time. Setting the following to ON will put these into the LIBS directory so
 # they only need to be compiled once.

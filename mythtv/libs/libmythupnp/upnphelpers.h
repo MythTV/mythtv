@@ -128,7 +128,7 @@ namespace UPnPDateTime
  */
 namespace UPNPProtocol
 {
-    enum TransferProtocol
+    enum TransferProtocol : std::uint8_t
     {
         kHTTP,
         kRTP

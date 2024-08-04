@@ -25,7 +25,7 @@ class AlbumArtImages;
 class LyricsData;
 class MetaIO;
 
-enum ImageType
+enum ImageType : std::uint8_t
 {
     IT_UNKNOWN = 0,
     IT_FRONTCOVER,
@@ -55,7 +55,7 @@ class META_PUBLIC AlbumArtImage
 
 using AlbumArtList = QList<AlbumArtImage*>;
 
-enum RepoType
+enum RepoType : std::uint8_t
 {
     RT_Database = 0,
     RT_CD       = 1,

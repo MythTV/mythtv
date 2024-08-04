@@ -530,7 +530,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
             frame.m_payloadSize = 0;
             for (int i = 0; i < payloadHeaderSize; i++)
             {
-                frame.m_payloadSize |= ((uint8_t)payloadHeader.at(i) << ((payloadHeaderSize - (i + 1)) * 8));
+                frame.m_payloadSize |= ((uint64_t)payloadHeader.at(i) << ((payloadHeaderSize - (i + 1)) * 8));
             }
         }
         else

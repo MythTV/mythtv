@@ -9,7 +9,7 @@
 #include "libmythbase/mythchrono.h"
 #include "libmythui/mythimage.h"
 
-enum ImageCacheMode
+enum ImageCacheMode : std::uint8_t
 {
     kCacheNormal          = 0x0,
     kCacheIgnoreDisk      = 0x1,

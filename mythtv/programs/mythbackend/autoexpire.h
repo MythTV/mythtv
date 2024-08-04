@@ -24,7 +24,7 @@ class MainServer;
 using pginfolist_t  = std::vector<ProgramInfo*>;
 using enclinklist_t = std::vector<EncoderLink*>;
 
-enum ExpireMethodType {
+enum ExpireMethodType : std::uint16_t {
     emOldestFirst           = 1,
     emLowestPriorityFirst   = 2,
     emWeightedTimePriority  = 3,

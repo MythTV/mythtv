@@ -83,7 +83,7 @@ class META_PUBLIC LyricsData : public QObject
     bool changed(void) const { return m_changed; }
     void setChanged(bool changed) { m_changed = changed; }
 
-    enum Status
+    enum Status : std::uint8_t
     {
       STATUS_NOTLOADED = 0, // not looked for any lyrics yet
       STATUS_SEARCHING,     // search is taking place

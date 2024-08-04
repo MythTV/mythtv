@@ -50,7 +50,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                   int alphaMod, QRect clipRect) override; // MythUIType
 
-    enum FillType { Alpha = 10, Dense, Eco, Solid };
+    enum FillType : std::uint8_t { Alpha = 10, Dense, Eco, Solid };
 
     bool isVerticalLayout(void) const { return m_verticalLayout; }
     int  getChannelCount(void) const { return m_channelCount; }

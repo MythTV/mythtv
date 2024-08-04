@@ -99,7 +99,7 @@ class WebSocketFrame
         m_fragmented = false;
     }
 
-    enum OpCode
+    enum OpCode : std::uint8_t
     {
         kOpContinuation = 0x0,
         kOpTextFrame    = 0x1,
@@ -217,7 +217,7 @@ class WebSocketWorker : public QObject
 
     void Exec();
 
-    enum ErrorCode
+    enum ErrorCode : std::uint16_t
     {
         kCloseNormal        = 1000,
         kCloseGoingAway     = 1001,

@@ -44,7 +44,7 @@ static constexpr uint8_t GPS_LEAP_SECONDS { 18 };
 class MTV_PUBLIC PESStreamID
 {
   public:
-    enum
+    enum : std::uint8_t
     {
         PictureStartCode        = 0x00,
         SliceStartCodeBegin     = 0x01,
@@ -206,7 +206,7 @@ class MTV_PUBLIC StreamID
 class PID
 {
   public:
-    enum
+    enum : std::uint16_t
     {
         MPEG_PAT_PID  = 0x0000,
         MPEG_CAT_PID  = 0x0001,
@@ -259,7 +259,7 @@ class PID
 class MTV_PUBLIC TableID
 {
   public:
-    enum
+    enum : std::uint8_t
     {
         PAT      = 0x00, // always on pid 0x00
         CAT      = 0x01, // always on pid 0x01
@@ -1064,7 +1064,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
         pesdata()[4] = (pesdata()[4] & ~0x80) | ((val) ? 0x80 : 0);
     }
     // encryption_algorithm     6   4.1
-    enum
+    enum : std::uint8_t
     {
         kNoEncryption = 0,
         kECB          = 1, // DES - ECB mode, FIPS PUB 81 (8 byte blocks)
@@ -1114,7 +1114,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
         pesdata()[12] = len & 0xff;
     }
     // splice_command_type      8  13.0
-    enum {
+    enum : std::uint8_t {
         kSCTNull                 = 0x00,
         kSCTReserved0            = 0x01,
         kSCTReserved1            = 0x02,

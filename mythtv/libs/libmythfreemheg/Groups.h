@@ -196,7 +196,7 @@ class MHSetTimer: public MHElemAction
     MHGenericInteger m_timerId;
     // A new timer may not be specified in which case this cancels the timer.
     // If the timer is specified the "absolute" flag is optional.
-    enum {
+    enum : std::uint8_t {
         ST_NoNewTimer,
         ST_TimerAbsolute,
         ST_TimerRelative

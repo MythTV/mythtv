@@ -203,14 +203,14 @@ class MTV_PUBLIC ChannelUtil
     // Are there any other possibly useful sort orders?
     // e.g. Sorting by sourceid would probably be better done by two distinct
     // calls to LoadChannels specifying the sourceid
-    enum OrderBy
+    enum OrderBy : std::uint8_t
     {
         kChanOrderByChanNum,
         kChanOrderByName,
         kChanOrderByLiveTV,
     };
 
-    enum GroupBy
+    enum GroupBy : std::uint8_t
     {
         kChanGroupByCallsign,
         kChanGroupByCallsignAndChannum,

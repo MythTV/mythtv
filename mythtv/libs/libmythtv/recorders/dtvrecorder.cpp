@@ -329,7 +329,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
     }
 }
 
-enum { kExtractPTS, kExtractDTS };
+enum : std::uint8_t { kExtractPTS, kExtractDTS };
 static int64_t extract_timestamp(
     const uint8_t *bufptr, int bytes_left, int pts_or_dts)
 {

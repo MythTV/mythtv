@@ -168,7 +168,7 @@ class DTVInversion : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kInversionOff,
         kInversionOn,
@@ -223,7 +223,7 @@ class DTVBandwidth : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kBandwidth8MHz,
         kBandwidth7MHz,
@@ -286,7 +286,7 @@ class DTVCodeRate : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kFECNone,
         kFEC_1_2,
@@ -353,7 +353,7 @@ class DTVModulation : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint16_t
     {
         kModulationQPSK,
         kModulationQAM16,
@@ -430,7 +430,7 @@ class DTVTransmitMode : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kTransmissionMode2K,
         kTransmissionMode8K,
@@ -493,7 +493,7 @@ class DTVGuardInterval : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kGuardInterval_1_32,
         kGuardInterval_1_16,
@@ -552,7 +552,7 @@ class DTVHierarchy : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kHierarchyNone,
         kHierarchy1,
@@ -609,7 +609,7 @@ class DTVPolarity : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum PolarityValues
+    enum PolarityValues : std::uint8_t
     {
         kPolarityVertical,
         kPolarityHorizontal,
@@ -650,7 +650,7 @@ class DTVModulationSystem : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         // see fe_delivery_system in frontend.h
         kModulationSystem_UNDEFINED,
@@ -731,7 +731,7 @@ class DTVRollOff : public DTVParamHelper
     static const DTVParamStringVec kParseStrings;
 
   public:
-    enum Types
+    enum Types : std::uint8_t
     {
         kRollOff_35,
         kRollOff_20,

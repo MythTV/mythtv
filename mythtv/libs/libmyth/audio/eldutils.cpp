@@ -35,13 +35,13 @@
 
 #define LOC QString("ELDUTILS: ")
 
-enum eld_versions
+enum eld_versions : std::uint8_t
 {
     ELD_VER_CEA_861D    = 2,
     ELD_VER_PARTIAL     = 31,
 };
 
-enum cea_edid_versions
+enum cea_edid_versions : std::uint8_t
 {
     CEA_EDID_VER_NONE      = 0,
     CEA_EDID_VER_CEA861    = 1,
@@ -71,7 +71,7 @@ static const std::array<const QString,4> eld_connection_type_names {
     "3-reserved"
 };
 
-enum cea_audio_coding_xtypes
+enum cea_audio_coding_xtypes : std::uint8_t
 {
     XTYPE_HE_REF_CT      = 0,
     XTYPE_HE_AAC         = 1,

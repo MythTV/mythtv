@@ -25,7 +25,7 @@ MTV_PUBLIC QString get_on_input(const QString &to_get, uint inputid);
 
 MTV_PUBLIC bool set_on_input(const QString &to_set, uint inputid, const QString &value);
 
-enum dvb_dev_type_t
+enum dvb_dev_type_t : std::uint8_t
 {
     DVB_DEV_FRONTEND = 1,
     DVB_DEV_DVR,
@@ -46,7 +46,7 @@ class MTV_PUBLIC CardUtil : public QObject
     using InputTypes = QMap<QString, QString>;
 
     /// \brief all the different inputs
-    enum INPUT_TYPES
+    enum INPUT_TYPES : std::uint8_t
     {
         ERROR_OPEN    = 0,
         ERROR_UNKNOWN = 1,

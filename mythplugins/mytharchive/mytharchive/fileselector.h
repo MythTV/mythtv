@@ -23,7 +23,7 @@ struct FileData
     int64_t size     { 0 };
 };
 
-enum FSTYPE
+enum FSTYPE : std::uint8_t
 {
     FSTYPE_FILELIST = 0,
     FSTYPE_FILE = 1,

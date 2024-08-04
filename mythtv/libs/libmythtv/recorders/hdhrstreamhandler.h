@@ -30,7 +30,7 @@ struct hdhomerun_device_t { int dummy; };
 struct hdhomerun_device_selector_t { int dummy; };
 #endif
 
-enum HDHRTuneMode {
+enum HDHRTuneMode : std::uint8_t {
     hdhrTuneModeNone = 0,
     hdhrTuneModeFrequency,
     hdhrTuneModeFrequencyPid,

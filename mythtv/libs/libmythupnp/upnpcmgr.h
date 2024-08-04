@@ -16,7 +16,7 @@
 #include "httpserver.h"
 #include "eventing.h"
               
-enum UPnpCMGRMethod
+enum UPnpCMGRMethod : std::uint8_t
 {
     CMGRM_Unknown                  = 0,
     CMGRM_GetServiceDescription    = 1,
@@ -28,7 +28,7 @@ enum UPnpCMGRMethod
 
 //////////////////////////////////////////////////////////////////////////////
 
-enum UPnpCMGRConnectionStatus
+enum UPnpCMGRConnectionStatus : std::uint8_t
 {
     CMGRSTATUS_Unknown               = 0,
     CMGRSTATUS_OK                    = 1,

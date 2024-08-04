@@ -104,7 +104,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     static QString getName(int id);
 
     // Hardcoded DB group values
-    enum RecProfileGroup
+    enum RecProfileGroup : std::uint8_t
     {
         AllGroups            =  0,
         SoftwareEncoderGroup =  1,

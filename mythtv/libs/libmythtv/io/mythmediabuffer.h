@@ -30,13 +30,22 @@ static constexpr uint8_t  BUFFER_FACTOR_MATROSKA { 2 };
 
 static constexpr int32_t  DEFAULT_CHUNK_SIZE     { 32768 };
 
+static inline QString seek2string(int Whence)
+{
+    if (SEEK_SET == Whence)
+        return "SEEK_SET";
+    if (SEEK_CUR == Whence)
+        return "SEEK_CUR";
+    return "SEEK_END";
+}
+
 class ThreadedFileWriter;
 class MythDVDBuffer;
 class MythBDBuffer;
 class LiveTVChain;
 class RemoteFile;
 
-enum MythBufferType
+enum MythBufferType : std::uint8_t
 {
     kMythBufferUnknown = 0,
     kMythBufferFile,

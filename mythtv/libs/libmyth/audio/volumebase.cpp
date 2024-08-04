@@ -88,7 +88,7 @@ class VolumeWriteBackThread : public MThread
   private:
     static QMutex s_mutex;
     QMutex mutable m_mutex;
-    enum { kStopped, kRunning, kFinished } m_state {kStopped};
+    enum : std::uint8_t { kStopped, kRunning, kFinished } m_state {kStopped};
     int m_volume {-1};
 };
 

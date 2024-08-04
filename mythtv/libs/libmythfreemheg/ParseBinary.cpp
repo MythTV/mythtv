@@ -111,7 +111,7 @@ int MHParseBinary::ParseInt(int endInt)
 MHParseNode *MHParseBinary::DoParse()
 {
     // Tag class
-    enum { Universal, Context/*, Pseudo*/ } tagClass = Universal;
+    enum : std::uint8_t { Universal, Context/*, Pseudo*/ } tagClass = Universal;
     // Byte count of end of this item.  Set to INDEFINITE_LENGTH if the length is Indefinite.
     int endOfItem = 0;
     unsigned int tagNumber = 0;

@@ -45,6 +45,31 @@ static void channum_not_empty(ChannelInsertInfo &chan)
     }
 }
 
+static uint getLcnOffset(int sourceid)
+{
+    uint lcnOffset = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+            "SELECT lcnoffset "
+            "FROM videosource "
+            "WHERE videosource.sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("ChannelImporter", query);
+    }
+    else if (query.next())
+    {
+        lcnOffset = query.value(0).toUInt();
+    }
+
+    LOG(VB_CHANSCAN, LOG_INFO, LOC +
+        QString("Logical Channel Number offset:%1")
+            .arg(lcnOffset));
+
+    return lcnOffset;
+}
 
 ChannelImporter::ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
@@ -76,6 +101,8 @@ ChannelImporter::ChannelImporter(bool gui, bool interactive,
 void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                               int sourceid)
 {
+    m_lcnOffset = getLcnOffset(sourceid);
+
     if (_transports.empty())
     {
         if (m_useGui)
@@ -89,11 +116,14 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                                               "No new channels to process") :
                                              "No channels to process.."));
 
-            QString msg(
-                channels ?
-                (m_success ? tr("Found %n channel(s)", "", channels) :
-                             tr("Failed to find any new channels!"))
-                           : tr("Failed to find any channels."));
+            QString msg;
+            if (!channels)
+                msg = tr("Failed to find any channels.");
+            else if (m_success)
+                msg = tr("Found %n channel(s)", "", channels);
+            else
+                msg = tr("Failed to find any new channels!");
+
             if (m_useWeb)
                 m_pWeb->m_dlgMsg = msg;
             else
@@ -124,9 +154,14 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     {
         bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
         bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
+        const char *desired { "all" };
+        if (require_av)
+            desired = "tv";
+        else if (require_a)
+            desired = "tv+radio";
         ssMsg << Qt::endl << Qt::endl;
         ssMsg << "Scan parameters:" << Qt::endl;
-        ssMsg << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << Qt::endl;
+        ssMsg << "Desired Services            : " << desired << Qt::endl;
         ssMsg << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << Qt::endl;
         ssMsg << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << Qt::endl;
         ssMsg << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << Qt::endl;
@@ -171,6 +206,12 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
             ssMsg << FormatChannels(duplicates).toLatin1().constData() << Qt::endl;
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
+    }
+
+    // Process Logical Channel Numbers
+    if (m_doLcn)
+    {
+        ChannelNumbers(transports);
     }
 
     // Remove the channels that do not pass various criteria.
@@ -831,6 +872,13 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
                     chan.m_sourceId, transport, tsid, chan.m_origNetId);
 
+                ChannelVisibleType visible { kChannelVisible };
+                if (chan.m_visible == kChannelAlwaysVisible ||
+                      chan.m_visible == kChannelNeverVisible)
+                    visible = chan.m_visible;
+                else if (chan.m_hidden)
+                    visible = kChannelNotVisible;
+
                 updated = ChannelUtil::UpdateChannel(
                     chan.m_dbMplexId,
                     chan.m_sourceId,
@@ -842,10 +890,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     chan.m_atscMajorChannel,
                     chan.m_atscMinorChannel,
                     chan.m_useOnAirGuide,
-                    ((chan.m_visible == kChannelAlwaysVisible ||
-                      chan.m_visible == kChannelNeverVisible) ?
-                     chan.m_visible :
-                     (chan.m_hidden ? kChannelNotVisible : kChannelVisible)),
+                    visible,
                     chan.m_freqId,
                     QString(),
                     chan.m_format,
@@ -1152,6 +1197,101 @@ void ChannelImporter::FilterRelocatedServices(ScanDTVTransportList &transports)
     }
 }
 
+// Process DVB Channel Numbers
+void ChannelImporter::ChannelNumbers(ScanDTVTransportList &transports) const
+{
+    QMap<qlonglong, uint> map_sid_scn;     // HD Simulcast channel numbers, service ID is key
+    QMap<qlonglong, uint> map_sid_lcn;     // Logical channel numbers, service ID is key
+    QMap<uint, qlonglong> map_lcn_sid;     // Logical channel numbers, channel number is key
+
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Process DVB Channel Numbers"));
+    for (auto & transport : transports)
+    {
+        for (auto & channel : transport.m_channels)
+        {
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Channel onid:%1 sid:%2 lcn:%3 scn:%4")
+                .arg(channel.m_origNetId).arg(channel.m_serviceId).arg(channel.m_logicalChannel)
+                .arg(channel.m_simulcastChannel));
+            qlonglong key = ((qlonglong)channel.m_origNetId<<32) | channel.m_serviceId;
+            if (channel.m_logicalChannel > 0)
+            {
+                map_sid_lcn[key] = channel.m_logicalChannel;
+                map_lcn_sid[channel.m_logicalChannel] = key;
+            }
+            if (channel.m_simulcastChannel > 0)
+            {
+                map_sid_scn[key] = channel.m_simulcastChannel;
+            }
+        }
+    }
+
+    // Process the HD Simulcast Channel Numbers
+    //
+    // For each channel with a HD Simulcast Channel Number, do use that
+    // number as the Logical Channel Number; the SD channel that now has
+    // this LCN does get the original LCN of the HD Simulcast channel.
+    // If this is not selected then the Logical Channel Numbers are used
+    // without the override from the HD Simulcast channel numbers.
+    // This usually means that channel numbers 1, 2, 3 etc are used for SD channels
+    // while the corresponding HD channels do have higher channel numbers.
+    // When the HD Simulcast channel numbers are enabled then channel numbers 1, 2, 3 etc are
+    // used for the HD channels and the corresponding SD channels use the high channel numbers.
+    if (m_doScn)
+    {
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Process Simulcast Channel Numbers"));
+
+        QMap<qlonglong, uint>::iterator it;
+        for (it = map_sid_scn.begin(); it != map_sid_scn.end(); ++it)
+        {
+            // Exchange LCN between the SD channel and the HD simulcast channel
+            qlonglong key_hd = it.key();                // Key of HD channel
+            uint scn_hd = *it;                          // SCN of the HD channel
+            uint lcn_sd = scn_hd;                       // Old LCN of the SD channel
+            uint lcn_hd = map_sid_lcn[key_hd];          // Old LCN of the HD channel
+
+            qlonglong key_sd = map_lcn_sid[lcn_sd];     // Key of the SD channel
+
+            map_sid_lcn[key_sd] = lcn_hd;               // SD channel gets old LCN of HD channel
+            map_sid_lcn[key_hd] = lcn_sd;               // HD channel gets old LCN of SD channel
+            map_lcn_sid[lcn_hd] = key_sd;               // SD channel gets key of SD channel
+            map_lcn_sid[lcn_sd] = key_hd;               // HD channel gets key of SD channel
+        }
+    }
+
+    // Update channels with the resulting Logical Channel Numbers
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Process Logical Channel Numbers"));
+    for (auto & transport : transports)
+    {
+        for (auto & channel : transport.m_channels)
+        {
+            if (channel.m_chanNum.isEmpty())
+            {
+                qlonglong key = ((qlonglong)channel.m_origNetId<<32) | channel.m_serviceId;
+                QMap<qlonglong, uint>::const_iterator it = map_sid_lcn.constFind(key);
+                if (it != map_sid_lcn.cend())
+                {
+                    channel.m_chanNum = QString::number(*it + m_lcnOffset);
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                        QString("Final channel sid:%1 channel %2")
+                            .arg(channel.m_serviceId).arg(channel.m_chanNum));
+                }
+                else
+                {
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                        QString("Final channel sid:%1 NO channel number")
+                            .arg(channel.m_serviceId));
+                }
+            }
+            else
+            {
+                LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                    QString("Final channel sid:%1 has already channel number %2")
+                        .arg(channel.m_serviceId).arg(channel.m_chanNum));
+            }
+        }
+    }
+}
+
 /** \fn ChannelImporter::GetDBTransports(uint,ScanDTVTransportList&) const
  *  \brief Adds found channel info to transports list,
  *         returns channels in DB which were not found in scan
@@ -1333,8 +1473,9 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
     {
         for (const auto & chan : transport.m_channels)
         {
-            int enc = (chan.m_isEncrypted) ?
-                ((chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1) : 0;
+            int enc {0};
+            if (chan.m_isEncrypted)
+                enc = (chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1;
             if (chan.m_siStandard == "atsc")      info.m_atscChannels[enc] += 1;
             if (chan.m_siStandard == "dvb")       info.m_dvbChannels[enc]  += 1;
             if (chan.m_siStandard == "mpeg")      info.m_mpegChannels[enc] += 1;

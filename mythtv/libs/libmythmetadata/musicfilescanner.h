@@ -13,7 +13,7 @@ class META_PUBLIC MusicFileScanner
 {
     Q_DECLARE_TR_FUNCTIONS(MusicFileScanner)
 
-    enum MusicFileLocation
+    enum MusicFileLocation : std::uint8_t
     {
         kFileSystem,
         kDatabase,

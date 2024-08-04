@@ -52,7 +52,7 @@ class MythVideoProfile;
 class MTV_PUBLIC MythCodecContext
 {
   public:
-    enum CodecProfile
+    enum CodecProfile : std::uint8_t
     {
         NoProfile = 0,
         MPEG1,

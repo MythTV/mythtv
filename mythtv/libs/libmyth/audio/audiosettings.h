@@ -18,7 +18,7 @@
 #include "libmyth/mythexp.h"
 #include "libmyth/audio/audiooutputsettings.h"
 
-enum AudioOutputSource {
+enum AudioOutputSource : std::uint8_t {
     AUDIOOUTPUT_UNKNOWN,
     AUDIOOUTPUT_VIDEO,
     AUDIOOUTPUT_MUSIC,

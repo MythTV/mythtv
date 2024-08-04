@@ -317,12 +317,16 @@ bool CetonStreamHandler::TuneFrequency(
     if (frequency >= 100000000)
         frequency /= 1000;
 
-    QString modulation_id = (modulation == "qam_256") ? "2" :
-                            (modulation == "qam_64")  ? "0" :
-                            (modulation == "ntsc-m") ? "4" :
-                            (modulation == "8vsb")   ? "6" :
-                                                       "";
-    if (modulation_id == "")
+    QString modulation_id;
+    if (modulation == "qam_256")
+        modulation_id = "2";
+    else if (modulation == "qam_64")
+        modulation_id = "0";
+    else if (modulation == "ntsc-m")
+        modulation_id = "4";
+    else if (modulation == "8vsb")
+        modulation_id = "6";
+    else
         return false;
 
     m_lastFrequency = frequency;

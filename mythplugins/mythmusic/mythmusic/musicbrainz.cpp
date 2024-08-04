@@ -173,8 +173,8 @@ std::string MusicBrainz::queryRelease(const std::string &discId)
                                     LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: %1: %2:%3 - %4 (%5)")
                                         .arg(track->Position())
                                         .arg(minutes, 2).arg(seconds, 2, 10, QChar('0'))
-                                        .arg(QString::fromStdString(recording->Title()))
-                                        .arg(artistsToString(artists)));
+                                        .arg(QString::fromStdString(recording->Title()),
+                                             artistsToString(artists)));
 
                                     // fill metadata
                                     MusicMetadata &metadata = m_tracks[track->Position()];
@@ -283,7 +283,7 @@ QString MusicBrainz::queryCoverart(const std::string &releaseId)
     try
     {
         std::vector<unsigned char> imageData = coverArt.FetchFront(releaseId);
-        if (imageData.size())
+        if (!imageData.empty())
         {
             LOG(VB_MEDIA, LOG_DEBUG, QString("musicbrainz: Saving front coverart to '%1'").arg(filePath));
 

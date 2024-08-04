@@ -42,7 +42,7 @@ template <class BASE> class MHSequence {
     public:
         MHSequence() = default;
         // The destructor frees the vector but not the elements.
-        ~MHSequence() { free(m_values); }
+        ~MHSequence() { free(reinterpret_cast<void*>(m_values)); }
         // Get the current size.
         int Size() const { return m_vecSize; }
         // Get an element at a particular index.
@@ -53,7 +53,7 @@ template <class BASE> class MHSequence {
         void InsertAt(BASE b, int n) {
             MHASSERT(n >= 0 && n <= m_vecSize);
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
-            BASE *ptr = (BASE*)realloc(m_values, (m_vecSize+1) * sizeof(BASE));
+            BASE *ptr = (BASE*)realloc(reinterpret_cast<void*>(m_values), (m_vecSize+1) * sizeof(BASE));
             if (ptr == nullptr) throw "Out of Memory";
             m_values = ptr;
             for (int i = m_vecSize; i > n; i--) m_values[i] = m_values[i-1];
@@ -263,7 +263,7 @@ class MHParameter
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef *GetReference(); // Get an indirect reference.
 
-    enum ParamTypes {
+    enum ParamTypes : std::uint8_t {
         P_Int,
         P_Bool,
         P_String,
@@ -295,7 +295,7 @@ class MHUnion
     void GetValueFrom(const MHParameter &value, MHEngine *engine); // Copies the argument, getting the value of an indirect args.
     QString Printable() const;
 
-    enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
+    enum UnionTypes : std::uint8_t { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
     void CheckType (enum UnionTypes t) const; // Check a type and fail if it doesn't match.
     static const char *GetAsString(enum UnionTypes t);
 

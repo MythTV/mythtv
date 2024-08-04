@@ -27,17 +27,19 @@ class MythMenu;
 
 class QUrl;
 
-enum ImageDownloadErrorState { esOK, esError, esTimeout };
+enum ImageDownloadErrorState : std::uint8_t { esOK, esError, esTimeout };
 
 class VideoDialog : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    enum DialogType { DLG_DEFAULT = 0, DLG_BROWSER = 0x1, DLG_GALLERY = 0x2,
+    enum DialogType : std::uint8_t
+                    { DLG_DEFAULT = 0, DLG_BROWSER = 0x1, DLG_GALLERY = 0x2,
                       DLG_TREE = 0x4, DLG_MANAGER = 0x8, dtLast };
 
-    enum BrowseType { BRS_FOLDER = 0, BRS_GENRE = 0x1, BRS_CATEGORY = 0x2,
+    enum BrowseType : std::uint16_t
+                    { BRS_FOLDER = 0, BRS_GENRE = 0x1, BRS_CATEGORY = 0x2,
                       BRS_YEAR = 0x4, BRS_DIRECTOR = 0x8, BRS_CAST = 0x10,
                       BRS_USERRATING = 0x20, BRS_INSERTDATE = 0x40,
                       BRS_TVMOVIE = 0x80, BRS_STUDIO = 0x100, btLast };

@@ -135,8 +135,7 @@ long long MythDVDBuffer::SeekInternal(long long Position, int Whence)
     else
     {
         QString cmd = QString("Seek(%1, %2)").arg(Position)
-            .arg((Whence == SEEK_SET) ? "SEEK_SET" :
-                 ((Whence == SEEK_CUR) ? "SEEK_CUR" : "SEEK_END"));
+            .arg(seek2string(Whence));
         LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
     }
 
@@ -629,11 +628,15 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         QString("---- DVDNAV_CELL_CHANGE - Cell #%1 Menu %2 Length %3")
                           .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
                           .arg(static_cast<double>(cell_event->cell_length) / 90000.0, 0, 'f', 1));
-                    QString still = stillTimer ? ((stillTimer < 0xff) ?
-                        QString("Stillframe: %1 seconds").arg(stillTimer) :
-                        QString("Infinite stillframe")) :
-                        QString("Length: %1 seconds")
+                    QString still;
+                    if (stillTimer == 0)
+                        still = QString("Length: %1 seconds")
                             .arg(duration_cast<std::chrono::seconds>(m_pgcLength).count());
+                    else if (stillTimer < 0xff)
+                        still = QString("Stillframe: %1 seconds").arg(stillTimer);
+                    else
+                        still = QString("Infinite stillframe");
+
                     if (m_title == 0)
                     {
                         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")
@@ -1573,9 +1576,9 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                     {
                         av_free(Subtitle->rects[i]->data[0]);
                         av_free(Subtitle->rects[i]->data[1]);
-                        av_freep(&Subtitle->rects[i]);
+                        av_freep(reinterpret_cast<void*>(&Subtitle->rects[i]));
                     }
-                    av_freep(&Subtitle->rects);
+                    av_freep(reinterpret_cast<void*>(&Subtitle->rects));
                     Subtitle->num_rects = 0;
                 }
 
@@ -1685,7 +1688,7 @@ void MythDVDBuffer::ClearMenuButton(void)
             av_free(rect->data[1]);
             av_free(rect);
         }
-        av_free(m_dvdMenuButton.rects);
+        av_free(reinterpret_cast<void*>(m_dvdMenuButton.rects));
         m_dvdMenuButton.rects = nullptr;
         m_dvdMenuButton.num_rects = 0;
         m_buttonExists = false;
@@ -2104,7 +2107,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 
     if (bottom == Subtitle->rects[0]->h)
     {
-        av_freep(&Subtitle->rects[0]->data[0]);
+        av_freep(reinterpret_cast<void*>(&Subtitle->rects[0]->data[0]));
         Subtitle->rects[0]->w = Subtitle->rects[0]->h = 0;
         return 0;
     }
@@ -2145,7 +2148,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
               (bottom + y) * Subtitle->rects[0]->linesize[0], static_cast<size_t>(width));
     }
 
-    av_freep(&Subtitle->rects[0]->data[0]);
+    av_freep(reinterpret_cast<void*>(&Subtitle->rects[0]->data[0]));
     Subtitle->rects[0]->data[0] = bitmap;
     Subtitle->rects[0]->linesize[0] = width;
     Subtitle->rects[0]->w = width;

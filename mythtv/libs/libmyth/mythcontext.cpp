@@ -827,7 +827,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     // 4 = backend awake, 5 = backend listening
     // 9 = all ok, 10 = quit
 
-    enum  startupStates {
+    enum  startupStates : std::uint8_t {
         st_start = 0,
         st_dbAwake = 1,
         st_dbStarted = 2,

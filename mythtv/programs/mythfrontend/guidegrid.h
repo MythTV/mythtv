@@ -182,7 +182,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     Q_DISABLE_COPY(GuideGrid);
 
-    enum MoveVector {
+    enum MoveVector : std::uint8_t {
         kScrollUp,
         kScrollDown,
         kScrollLeft,

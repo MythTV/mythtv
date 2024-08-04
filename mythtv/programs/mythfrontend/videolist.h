@@ -2,7 +2,7 @@
 #define VIDEOLIST_H_
 
 // Type of the item added to the tree
-enum TreeNodeType {
+enum TreeNodeType : std::int8_t {
     kSubFolder = -1,
     kUpFolder = -2,
     kRootNode = -3,
@@ -11,7 +11,7 @@ enum TreeNodeType {
 };
 
 // Tree node attribute index
-enum TreeNodeAttributes {
+enum TreeNodeAttributes : std::uint8_t {
     kNodeSort
 };
 

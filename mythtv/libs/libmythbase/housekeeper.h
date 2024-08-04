@@ -22,7 +22,7 @@
 class Scheduler;
 class HouseKeeper;
 
-enum HouseKeeperScope {
+enum HouseKeeperScope : std::uint8_t {
     kHKGlobal = 0,              ///< task should only run once per cluster
                                 ///<      e.g. mythfilldatabase
     kHKLocal,                   ///< task should only run once per machine
@@ -31,7 +31,7 @@ enum HouseKeeperScope {
                                 ///<      e.g. ServerPool update
 };
 
-enum HouseKeeperStartup {
+enum HouseKeeperStartup : std::uint8_t {
     kHKNormal = 0,              ///< task is checked normally
     kHKRunOnStartup,            ///< task is queued when HouseKeeper is started
     kHKRunImmediateOnStartup    ///< task is run during HouseKeeper startup

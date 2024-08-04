@@ -48,7 +48,7 @@ class MTV_PUBLIC CarrierDefinitionSubtable
     //     number_of_carriers   8  0.0+m_beg
     uint NumberOfCarriers(void) const { return m_beg[0]; }
     //     spacing_unit         1  1.0+m_beg
-    enum // Table 5.4 Spacing Unit & Table 5.5 frequency unit
+    enum : std::uint8_t // Table 5.4 Spacing Unit & Table 5.5 frequency unit
     {
         k10000Hz  = 0x0,
         k125000Hz = 0x1,
@@ -92,7 +92,7 @@ class ModulationModeSubtable
     ModulationModeSubtable(const unsigned char *beg, const unsigned char *end) :
         m_beg(beg), m_end(end) { }
     //     transmission_system 4   0.0+m_beg
-    enum // Table 5.7 TransmissionSystem
+    enum : std::uint8_t // Table 5.7 TransmissionSystem
     {
         kTSUnknown       = 0,
         kTSITUAnnexA     = 1, ///< Specified in Annex A of ITU Rec. J.83
@@ -108,7 +108,7 @@ class ModulationModeSubtable
     uint TransmissionSystem(void) const { return m_beg[0] >> 4; }
     QString TransmissionSystemString(void) const;
     //     inner_coding_mode   4   0.4+m_beg
-    enum // Table 5.8
+    enum : std::uint8_t // Table 5.8
     {
         kRate5_11Coding =  0,
         kRate1_2Coding  =  1,
@@ -134,7 +134,7 @@ class ModulationModeSubtable
     bool SplitBitstreamMode(void) const { return ( m_beg[1] & 0x80 ) != 0; }
     //     zero                2    1.1+m_beg
     //     modulation_format   5    1.3+m_beg
-    enum // Table 5.9
+    enum : std::uint8_t // Table 5.9
     {
         kUnknown   =  0,
         kQPSK      =  1,
@@ -219,7 +219,7 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     // transmission_medium      4   6.0       0
     uint TransmissionMedium(void) const { return pesdata()[6] >> 4; }
     // table_subtype            4   6.4
-    enum // Table 5.2 NIT Subtype
+    enum : std::uint8_t // Table 5.2 NIT Subtype
     {
         kInvalid                   = 0x0,
         kCarrierDefinitionSubtable = 0x1,
@@ -290,7 +290,7 @@ class MTV_PUBLIC NetworkTextTable : public PSIPTable
     // transmission_medium      4   7.0       0
     uint TransmissionMedium(void) const { return pesdata()[7] >> 4; }
     // table_subtype            4   7.4   see Table 5.11
-    enum
+    enum : std::uint8_t
     {
         kInvalid = 0x0,
         kSourceNameSubtable = 0x6,
@@ -389,7 +389,7 @@ class VirtualChannelMapSubtable
     bool ApplicationVirtualChannel(uint i) const { return ( _ptrs[i][1] & 0x80 ) != 0; }
     //     zero                 1 2.1+_ptrs[i]
     //     path_select          1 2.2+_ptrs[i]
-    enum // Table 5.18 path select
+    enum : std::uint8_t // Table 5.18 path select
     {
         kPath1 = 0x0,
         kPath2 = 0x1,
@@ -398,7 +398,7 @@ class VirtualChannelMapSubtable
     QString PathSelectString(uint i) const
         { return PathSelect(i) ? "Path 2" : "Path 1"; }
     //     transport_type       1 2.3+_ptrs[i]
-    enum // Table 5.19 transport type
+    enum : std::uint8_t // Table 5.19 transport type
     {
         kMPEG2Transport    = 0x0,
         kNonMPEG2Transport = 0x1,
@@ -407,7 +407,7 @@ class VirtualChannelMapSubtable
     QString TransportTypeString(uint i) const
         { return TransportType(i) ? "Non-MPEG-2" : "MPEG-2"; }
     //     channel_type         4 2.4+_ptrs[i]
-    enum // Table 5.20 channel type
+    enum : std::uint8_t // Table 5.20 channel type
     {
         kNormalChannel     = 0x0,
         kHiddenChannel     = 0x1,
@@ -436,7 +436,7 @@ class VirtualChannelMapSubtable
     bool Scrambled(uint i) const { return ( _ptrs[i][6] & 0x80 ) != 0; }
     //       zero               3 6.1+_ptrs[i]
     //       video_standard     4 6.4+_ptrs[i]
-    enum // Table 5.21 video standard
+    enum : std::uint8_t // Table 5.21 video standard
     {
         kNTSC   = 0x0,
         kPAL625 = 0x1,
@@ -519,7 +519,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     // transmission_medium      4   4.0       0
     uint TransmissionMedium(void) const { return pesdata()[4] >> 4; }
     // table_subtype            4   4.4
-    enum // Table 5.14 Table Subtype
+    enum : std::uint8_t // Table 5.14 Table Subtype
     {
         kVirtualChannelMap  = 0x0,
         kDefinedChannelsMap = 0x1,

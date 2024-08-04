@@ -32,7 +32,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-enum UPnPResultCode
+enum UPnPResultCode : std::uint16_t
 {
     UPnPResult_Success                       =   0,
 

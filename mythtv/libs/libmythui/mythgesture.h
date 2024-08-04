@@ -41,7 +41,7 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
     Q_GADGET
 
   public:
-    enum Gesture
+    enum Gesture : std::uint8_t
     {
         Unknown,
 

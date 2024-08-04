@@ -30,8 +30,8 @@ void Cutter::SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx)
 
             case MARK_CUT_END:
                 leadinLength = std::min((int64_t)(it.key() - start),
-                                   (int64_t)MAXLEADIN);
-                if (leadinLength >= MINCUT)
+                                   (int64_t)kMaxLeadIn);
+                if (leadinLength >= kMinCut)
                 {
                     m_foreshortenedCutList[it.key() - leadinLength + 2] =
                         MARK_CUT_END;

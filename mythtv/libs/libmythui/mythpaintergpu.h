@@ -13,7 +13,7 @@ class MUI_PUBLIC MythPainterGPU : public MythPainter
     Q_OBJECT
 
   public:
-    enum ViewControl
+    enum ViewControl : std::uint8_t
     {
         None        = 0x00,
         Viewport    = 0x01,

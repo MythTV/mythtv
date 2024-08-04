@@ -191,7 +191,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     MythUIImagePrivate *d                {nullptr}; // NOLINT(readability-identifier-naming)
 
-    enum AnimationCycle {kCycleStart, kCycleReverse};
+    enum AnimationCycle : std::uint8_t {kCycleStart, kCycleReverse};
     AnimationCycle  m_animationCycle     {kCycleStart};
     bool            m_animationReverse   {false};
     bool            m_animatedImage      {false};

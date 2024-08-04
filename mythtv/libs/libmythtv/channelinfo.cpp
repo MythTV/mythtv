@@ -308,7 +308,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
         "    in_nit,             in_sdt,             is_encrypted,       "
         "    is_data_service,    is_audio_service,   is_opencable,       "
         "    could_be_opencable, decryption_status,  default_authority,  "
-        "    service_type "
+        "    service_type,       logical_channel,    simulcast_channel   "
         " )  "
         "VALUES "
         " ( :SCANID,            :TRANSPORTID,                            "
@@ -324,7 +324,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
         "   :IN_NIT,            :IN_SDT,            :IS_ENCRYPTED,       "
         "   :IS_DATA_SERVICE,   :IS_AUDIO_SERVICE,  :IS_OPENCABLE,       "
         "   :COULD_BE_OPENCABLE,:DECRYPTION_STATUS, :DEFAULT_AUTHORITY,  "
-        "   :SERVICE_TYPE "
+        "   :SERVICE_TYPE,      :LOGICAL_CHANNEL,   :SIMULCAST_CHANNEL   "
         " );");
 
     query.bindValue(":SCANID", scanid);
@@ -366,6 +366,8 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     query.bindValue(":DECRYPTION_STATUS", m_decryptionStatus);
     query.bindValueNoNull(":DEFAULT_AUTHORITY", m_defaultAuthority);
     query.bindValue(":SERVICE_TYPE", m_serviceType);
+    query.bindValue(":LOGICAL_CHANNEL", m_logicalChannel);
+    query.bindValue(":SIMULCAST_CHANNEL", m_simulcastChannel);
 
     if (!query.exec())
     {

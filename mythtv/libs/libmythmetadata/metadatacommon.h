@@ -24,7 +24,7 @@
 
 class ProgramInfo;
 
-enum LookupStep {
+enum LookupStep : std::uint8_t {
     kLookupSearch = 0,
     kLookupData = 1,
     kLookupCollection = 2
@@ -39,7 +39,7 @@ struct PersonInfo
 };
 
 // What type of grabber script to use
-enum MetadataType {
+enum MetadataType : std::uint8_t {
     kMetadataVideo = 0,
     kMetadataRecording = 1,
     kMetadataMusic = 2,
@@ -47,7 +47,7 @@ enum MetadataType {
 };
 
 // Determines the lookup fallback strategy
-enum LookupType {
+enum LookupType : std::uint8_t {
     kProbableTelevision = 0,
     kProbableGenericTelevision = 1,
     kProbableMovie = 2,
@@ -57,7 +57,7 @@ enum LookupType {
 };
 
 // Actual type of content
-enum VideoContentType {
+enum VideoContentType : std::uint8_t {
     kContentMovie = 0,
     kContentTelevision = 1,
     kContentAdult = 2,
@@ -66,7 +66,7 @@ enum VideoContentType {
     kContentUnknown = 5
 };
 
-enum PeopleType {
+enum PeopleType : std::uint8_t {
     kPersonActor = 0,
     kPersonAuthor = 1,
     kPersonDirector = 2,

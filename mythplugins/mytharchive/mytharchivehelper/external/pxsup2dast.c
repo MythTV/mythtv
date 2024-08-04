@@ -207,6 +207,15 @@ static void xxfwrite(FILE * stream, const eu8 * ptr, size_t size)
 
 #define xxfwriteCS(f, s) xxfwrite(f, CUS s, sizeof (s) - 1)
 
+static inline eu8 clamp (eu8 value, eu8 low, eu8 high)
+{
+    if (value < low)
+        return low;
+    if (value > high)
+        return high;
+    return value;
+}
+
 static void yuv2rgb(int y,   int cr,  int cb,
             eu8 * r, eu8 * g, eu8 * b)  
 {
@@ -215,9 +224,9 @@ static void yuv2rgb(int y,   int cr,  int cb,
     int lg = (500 + 1164 * (y - 16) -  813 * (cr - 128) - 391 * (cb - 128)) / 1000;
     int lb = (500 + 1164 * (y - 16)                    + 2018 * (cb - 128)) / 1000;
 
-    *r = (lr < 0)? 0: (lr > 255)? 255: (eu8)lr;
-    *g = (lg < 0)? 0: (lg > 255)? 255: (eu8)lg;
-    *b = (lb < 0)? 0: (lb > 255)? 255: (eu8)lb;  
+    *r = clamp(lr, 0, 255);
+    *g = clamp(lg, 0, 255);
+    *b = clamp(lb, 0, 255);
 }
 
 static void rgb2yuv(eu8 r,   eu8   g,  eu8 b,

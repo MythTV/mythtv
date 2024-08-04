@@ -19,11 +19,12 @@ InteractiveTV::InteractiveTV(MythPlayerCaptionsUI *Player)
 {
     Restart(0, 0, false);
 
-    MHSetLogging(stdout,
-        VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_DEBUG) ? MHLogAll :
-        VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY) ?
-            MHLogError | MHLogWarning | MHLogNotifications /*| MHLogLinks | MHLogActions | MHLogDetail*/ :
-        MHLogError | MHLogWarning );
+    if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_DEBUG))
+        MHSetLogging(stdout, MHLogAll);
+    else if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY))
+        MHSetLogging(stdout, MHLogError | MHLogWarning | MHLogNotifications /*| MHLogLinks | MHLogActions | MHLogDetail*/);
+    else
+        MHSetLogging(stdout, MHLogError | MHLogWarning );
 }
 
 InteractiveTV::~InteractiveTV()

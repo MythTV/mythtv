@@ -71,7 +71,7 @@ static constexpr const char* ERROR_NO_FRAMES         { "No frames found for even
 // Subpixel ordering (from zm_rgb.h)
 // Based on byte order naming. For example, for ARGB (on both little endian or big endian)
 // byte+0 should be alpha, byte+1 should be red, and so on.
-enum ZM_SUBPIX_ORDER {
+enum ZM_SUBPIX_ORDER : std::uint8_t {
     ZM_SUBPIX_ORDER_NONE =  2,
     ZM_SUBPIX_ORDER_RGB  =  6,
     ZM_SUBPIX_ORDER_BGR  =  5,

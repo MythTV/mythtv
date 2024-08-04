@@ -42,6 +42,10 @@ check_include_file(unistd.h HAVE_UNISTD_H)
 #
 # Check for symbols in include files
 #
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+check_symbol_exists(close_range "unistd.h" HAVE_CLOSE_RANGE)
+cmake_pop_check_state()
 check_symbol_exists(fcntl "fcntl.h" HAVE_FCNTL)
 check_symbol_exists(getifaddrs "ifaddrs.h" HAVE_GETIFADDRS)
 check_symbol_exists(getmntent_r "mntent.h" HAVE_GETMNTENT_R)

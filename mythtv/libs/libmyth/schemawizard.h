@@ -11,7 +11,7 @@
 class MythUIBusyDialog;
 
 /// Return values from PromptForUpgrade()
-enum MythSchemaUpgrade
+enum MythSchemaUpgrade : std::uint8_t
 {
     MYTH_SCHEMA_EXIT         = 1,
     MYTH_SCHEMA_ERROR        = 2,

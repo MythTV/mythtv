@@ -30,7 +30,8 @@ class MHLink;
 class MHIngredient;
 class MHEngine;
 
-enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, EventIsRunning, EventIsStopped,
+enum EventType : std::uint8_t
+     { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, EventIsRunning, EventIsStopped,
        EventUserInput, EventAnchorFired, EventTimerFired, EventAsyncStopped, EventInteractionCompleted,
        EventTokenMovedFrom, EventTokenMovedTo, EventStreamEvent, EventStreamPlaying, EventStreamStopped,
        EventCounterTrigger, EventHighlightOn, EventHighlightOff, EventCursorEnter, EventCursorLeave,

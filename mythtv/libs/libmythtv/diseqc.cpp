@@ -50,7 +50,7 @@ static constexpr uint8_t    DISEQC_FRM_REPEAT     {1 << 0};
 #endif
 
 // Address byte
-enum DISEQC_ADRS {
+enum DISEQC_ADRS : std::uint8_t {
     DISEQC_ADR_ALL          = 0x00,
     DISEQC_ADR_SW_ALL       = 0x10,
     DISEQC_ADR_LNB          = 0x11,
@@ -66,7 +66,7 @@ enum DISEQC_ADRS {
 };
 
 // Command byte
-enum DISEQC_CMDS {
+enum DISEQC_CMDS : std::uint8_t {
     DISEQC_CMD_RESET        = 0x00,
     DISEQC_CMD_CLR_RESET    = 0x01,
     DISEQC_CMD_WRITE_N0     = 0x38,
@@ -800,8 +800,11 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
     if (voltage == m_lastVoltage)
         return true;
 
-    int volts = ((voltage == SEC_VOLTAGE_18) ? 18 :
-                 ((voltage == SEC_VOLTAGE_13) ? 13 : 0));
+    int volts {0};
+    if (voltage == SEC_VOLTAGE_18)
+        volts = 18;
+    else if (voltage == SEC_VOLTAGE_13)
+        volts = 13;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing LNB voltage to " +
             QString("%1V").arg(volts));

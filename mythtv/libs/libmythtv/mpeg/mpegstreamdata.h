@@ -52,7 +52,7 @@ using ts_av_listener_vec_t   = std::vector<TSPacketListenerAV*>;
 using mpeg_sp_listener_vec_t = std::vector<MPEGSingleProgramStreamListener*>;
 using ps_listener_vec_t      = std::vector<PSStreamListener*>;
 
-enum CryptStatus
+enum CryptStatus : std::uint8_t
 {
     kEncUnknown   = 0,
     kEncDecrypted = 1,
@@ -73,7 +73,7 @@ class MTV_PUBLIC CryptInfo
     uint        m_decryptedMin     {8};
 };
 
-enum PIDPriority
+enum PIDPriority : std::uint8_t
 {
     kPIDPriorityNone   = 0,
     kPIDPriorityLow    = 1,

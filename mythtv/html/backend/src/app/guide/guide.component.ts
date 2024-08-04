@@ -45,6 +45,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   readonly TITLESEARCH = 3;
   readonly PEOPLESEARCH = 4;
   readonly FULLSEARCH = 5;
+  readonly CATSEARCH = 6;
+  readonly ANYSEARCH = 7;
   displayType = this.GRID;
   searchValue = '';
   showLegend = false;
@@ -52,6 +54,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   startTime?: Date;
   startSchedule?: boolean;
   startGroup?: number;
+  onlyNew = false;
+  onlyMovies = false;
 
   constructor(private guideService: GuideService, private route: ActivatedRoute,
     private translate: TranslateService) {
@@ -101,7 +105,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
             entry.Name == wantedGroup);
           if (group)
             this.channelGroup = group;
-          localStorage.setItem("ChannelGroup",this.channelGroup.Name);
+          localStorage.setItem("ChannelGroup", this.channelGroup.Name);
           this.fetchGuide(reqDate);
         });
     }
@@ -149,23 +153,33 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       Details: true,
       StartTime: startDate.toISOString()
     };
+    if (this.searchValue == "") {
+      if (this.onlyMovies || this.onlyNew)
+        this.displayType = this.ANYSEARCH
+    }
     switch (this.displayType) {
       case this.CHANNEL:
         request.ChanId = this.channel.ChanId;
         break;
       case this.TITLESEARCH:
         request.TitleFilter = this.searchValue;
-        request.Count = 1000;
         break;
       case this.PEOPLESEARCH:
         request.PersonFilter = this.searchValue;
-        request.Count = 1000;
         break;
       case this.FULLSEARCH:
         request.KeywordFilter = this.searchValue;
-        request.Count = 1000;
+        break;
+      case this.CATSEARCH:
+        request.CategoryFilter = this.searchValue;
+        break;
+      case this.ANYSEARCH:
         break;
     }
+    request.OnlyNew = this.onlyNew;
+    if (this.onlyMovies)
+      request.CatType = 'movie';
+    request.Count = 10000;
     this.listPrograms = [];
     this.guideService.GetProgramList(request).subscribe(data => {
       this.listPrograms = data.ProgramList.Programs;
@@ -200,7 +214,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
 
   refresh(): void {
     this.refreshing = true;
-    localStorage.setItem("ChannelGroup",this.channelGroup.Name);
+    localStorage.setItem("ChannelGroup", this.channelGroup.Name);
     switch (this.displayType) {
       case this.GRID:
         if (this.m_startDate) {
@@ -212,6 +226,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       case this.TITLESEARCH:
       case this.PEOPLESEARCH:
       case this.FULLSEARCH:
+      case this.CATSEARCH:
+      case this.ANYSEARCH:
         this.refreshing = true;
         this.fetchDetails();
         break;
@@ -226,6 +242,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
 
   onGrid() {
     this.displayType = this.GRID;
+    this.onlyNew = false;
+    this.onlyMovies = false;
     this.refresh();
   }
 
@@ -235,6 +253,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       this.displayType = this.TITLESEARCH;
       this.refresh();
     }
+    else
+      this.anySearch();
   }
 
   peopleSearch() {
@@ -243,6 +263,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       this.displayType = this.PEOPLESEARCH;
       this.refresh();
     }
+    else
+      this.anySearch();
   }
 
   fullSearch() {
@@ -251,5 +273,45 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       this.displayType = this.FULLSEARCH;
       this.refresh();
     }
+    else
+      this.anySearch();
   }
+
+  anySearch() {
+    if (this.onlyMovies || this.onlyNew || this.searchValue) {
+      this.refresh();
+    }
+    else
+      this.onGrid();
+  }
+
+  catSearch() {
+    this.searchValue = this.searchValue.trim();
+    if (this.searchValue.length > 1) {
+      this.displayType = this.CATSEARCH;
+      this.refresh();
+    }
+    else
+      this.anySearch();
+  }
+
+
+  newSearch() {
+    if (this.displayType == this.GRID) {
+      this.displayType = this.ANYSEARCH;
+      this.onlyNew = true;
+      this.refresh();
+    } else
+      this.anySearch();
+  }
+
+  movieSearch() {
+    if (this.displayType == this.GRID) {
+      this.displayType = this.ANYSEARCH;
+      this.onlyMovies = true;
+      this.refresh();
+    } else
+      this.anySearch();
+  }
+
 }

@@ -56,7 +56,7 @@
 class MTV_PUBLIC TableClass
 {
   public:
-    enum kTableTypes
+    enum kTableTypes : std::int8_t
     {
         UNKNOWN = -1,
         TVCTc   =  0,

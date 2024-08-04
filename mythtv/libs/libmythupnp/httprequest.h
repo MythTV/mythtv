@@ -41,7 +41,7 @@ static constexpr const char* SOAP_ENVELOPE_END { "</s:Body>\r\n</s:Envelope>" };
 // Typedefs / Defines
 /////////////////////////////////////////////////////////////////////////////
 
-enum HttpRequestType
+enum HttpRequestType : std::uint16_t
 {
     RequestTypeUnknown      = 0x0000,
     // HTTP 1.1
@@ -63,7 +63,7 @@ enum HttpRequestType
 
 };
 
-enum HttpContentType
+enum HttpContentType : std::uint8_t
 {
     ContentType_Unknown    = 0,
     ContentType_Urlencoded = 1,
@@ -71,7 +71,7 @@ enum HttpContentType
     ContentType_JSON       = 3,
 };
 
-enum HttpResponseType
+enum HttpResponseType : std::int8_t
 {
     ResponseTypeNone     = -1,
     ResponseTypeUnknown  =  0,

@@ -1018,10 +1018,15 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
         if (info->current_picture)
         {
             int ct = info->current_picture->flags & PIC_MASK_CODING_TYPE;
-            char coding_type = (ct == PIC_FLAG_CODING_TYPE_I) ? 'I' :
-                                ((ct == PIC_FLAG_CODING_TYPE_P) ? 'P' :
-                                 ((ct == PIC_FLAG_CODING_TYPE_B) ? 'B' :
-                                  ((ct == PIC_FLAG_CODING_TYPE_D) ?'D' : 'X')));
+            char coding_type { 'X' };
+            if (ct == PIC_FLAG_CODING_TYPE_I)
+                coding_type = 'I';
+            else if (ct == PIC_FLAG_CODING_TYPE_P)
+                coding_type = 'P';
+            else if (ct == PIC_FLAG_CODING_TYPE_B)
+                coding_type = 'B';
+            else if (ct == PIC_FLAG_CODING_TYPE_D)
+                coding_type = 'D';
             char top_bottom = (info->current_picture->flags & 
                                PIC_FLAG_TOP_FIELD_FIRST) ? 'T' : 'B';
             char progressive = (info->current_picture->flags &

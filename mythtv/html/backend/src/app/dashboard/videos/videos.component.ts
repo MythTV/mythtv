@@ -31,7 +31,9 @@ export class VideosComponent implements OnInit {
   displayMetadataDlg = false;
   displayUnsaved = false;
   showAllVideos = false;
-  lazyLoadEvent!: LazyLoadEvent;
+  lazyLoadEvent : LazyLoadEvent = {};
+  totalRecords = 0;
+  showTable = false;
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -66,9 +68,12 @@ export class VideosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Initial Load
+    this.loadLazy({ first: 0, rows: 1 });
   }
 
   loadLazy(event: LazyLoadEvent) {
+    console.log(event)
     this.lazyLoadEvent = event;
     let request: GetVideoListRequest = {
       Sort: "title",
@@ -85,41 +90,37 @@ export class VideosComponent implements OnInit {
     }
     request.Sort += ',title,releasedate,season,episode'
 
-    if (event.first)
+    if (event.first != undefined) {
       request.StartIndex = event.first;
-    if (event.rows) {
-      request.Count = event.rows;
-      // When it only requests 50 rows, page down waits until the entire
-      // screen is empty before loading the next page. Fix this by always
-      // requesting at least 100 records.
-      if (request.Count < 100)
-        request.Count = 100;
+      if (event.last)
+        request.Count = event.last - event.first;
+      else
+        request.Count = event.rows;
     }
-
     this.videoService.GetVideoList(request).subscribe(data => {
       let newList = data.VideoMetadataInfoList;
-      this.videos.length = data.VideoMetadataInfoList.TotalAvailable;
+      this.totalRecords = data.VideoMetadataInfoList.TotalAvailable;
+      this.videos.length = this.totalRecords;
       // populate page of virtual programs
       this.videos.splice(newList.StartIndex, newList.VideoMetadataInfos.length,
         ...newList.VideoMetadataInfos);
       // notify of change
       this.videos = [...this.videos]
       this.refreshing = false;
+      this.showTable = true;
     });
 
   }
 
 
   reLoadVideos() {
-    this.table.resetScrollTop();
+    this.showTable = false;
     this.videos.length = 0;
-    this.lazyLoadEvent.first = 0;
-    this.lazyLoadEvent.rows = 100;
-    this.loadLazy(this.lazyLoadEvent);
+    this.refreshing = true;
+    this.loadLazy(({ first: 0, rows: 1 }));
   }
 
   showAllChange() {
-    this.refreshing = true;
     setTimeout(() => this.reLoadVideos(), 100);
   }
 

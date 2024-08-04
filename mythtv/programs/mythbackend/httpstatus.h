@@ -18,7 +18,7 @@
 #include "libmythbase/programinfo.h"
 #include "libmythupnp/httpserver.h"
 
-enum HttpStatusMethod
+enum HttpStatusMethod : std::uint8_t
 {
     HSM_Unknown         =  0,
     HSM_GetStatusHTML   =  1,

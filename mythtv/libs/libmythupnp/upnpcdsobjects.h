@@ -30,7 +30,7 @@ class QTextStream;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-enum ObjectTypes
+enum ObjectTypes : std::uint8_t
 {
     OT_Undefined  = 0,
     OT_Container  = 1,

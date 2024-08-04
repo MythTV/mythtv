@@ -66,7 +66,7 @@ class MusicPlayer : public QObject, public MythObservable
      explicit MusicPlayer(QObject *parent);
     ~MusicPlayer(void) override;
 
-    enum PlayMode
+    enum PlayMode : std::uint8_t
     {
       PLAYMODE_TRACKSPLAYLIST = 0,
       PLAYMODE_TRACKSEDITOR,
@@ -165,13 +165,13 @@ class MusicPlayer : public QObject, public MythObservable
     void         toMap(InfoMap &infoMap) const;
 
     void         showMiniPlayer(void) const;
-    enum RepeatMode
+    enum RepeatMode : std::uint8_t
     { REPEAT_OFF = 0,
       REPEAT_TRACK, 
       REPEAT_ALL, 
       MAX_REPEAT_MODES 
     };
-    enum ShuffleMode
+    enum ShuffleMode : std::uint8_t
     { SHUFFLE_OFF = 0, 
       SHUFFLE_RANDOM, 
       SHUFFLE_INTELLIGENT,
@@ -180,7 +180,7 @@ class MusicPlayer : public QObject, public MythObservable
       MAX_SHUFFLE_MODES 
     };
 
-    enum ResumeMode
+    enum ResumeMode : std::uint8_t
     { RESUME_OFF,
       RESUME_FIRST,
       RESUME_TRACK,

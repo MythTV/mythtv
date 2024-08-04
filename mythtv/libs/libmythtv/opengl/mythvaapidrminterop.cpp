@@ -452,7 +452,7 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME()
     {
         for (int i = 0; i < frame->nb_objects; i++)
             close(frame->objects[i].fd);
-        av_freep(&frame);
+        av_freep(reinterpret_cast<void*>(&frame));
     }
     m_drmFrames.clear();
 }

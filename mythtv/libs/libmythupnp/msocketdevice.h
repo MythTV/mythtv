@@ -59,8 +59,8 @@ class UPNP_PUBLIC MSocketDevice: public QIODevice
 {
 
 public:
-    enum Type { Stream, Datagram };
-    enum Protocol { IPv4, IPv6, Unknown };
+    enum Type : std::uint8_t { Stream, Datagram };
+    enum Protocol : std::uint8_t { IPv4, IPv6, Unknown };
 
     explicit MSocketDevice(Type type = Stream);
     MSocketDevice(Type type, Protocol protocol, int dummy);
@@ -135,7 +135,7 @@ public:
     virtual QHostAddress address() const;
     virtual QHostAddress peerAddress() const;
 
-    enum Error
+    enum Error : std::uint8_t
     {
         NoError,
         AlreadyBound,
@@ -173,7 +173,7 @@ private:
     MSocketDevice::Error  m_e {NoError};
     MSocketDevicePrivate *d{nullptr}; // NOLINT(readability-identifier-naming)
 
-    enum Option { Broadcast, ReceiveBuffer, ReuseAddress, SendBuffer, Keepalive };
+    enum Option : std::uint8_t { Broadcast, ReceiveBuffer, ReuseAddress, SendBuffer, Keepalive };
 
     int   option(Option opt) const;
     virtual void setOption(Option opt, int v);

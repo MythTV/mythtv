@@ -31,14 +31,14 @@ class CC608Input
                              std::chrono::milliseconds timecode, char type) = 0;
 };
 
-enum
+enum : std::uint8_t
 {
     kHasMPAA       = 0x1,
     kHasTPG        = 0x2,
     kHasCanEnglish = 0x4,
     kHasCanFrench  = 0x8,
 };
-enum
+enum : std::uint8_t
 {
     kRatingMPAA = 0,
     kRatingTPG,

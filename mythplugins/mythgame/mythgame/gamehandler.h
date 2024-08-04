@@ -21,7 +21,7 @@
 class MythMainWindow;
 class GameHandler;
 
-enum GameFound
+enum GameFound : std::uint8_t
 {
     inNone,
     inFileSystem,

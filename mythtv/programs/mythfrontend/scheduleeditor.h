@@ -224,7 +224,7 @@ class ScheduleEditor : public ScheduleCommon,
 
     bool              m_loaded          {false};
 
-    enum View
+    enum View : std::uint8_t
     {
         kMainView,
         kSchedOptView,

@@ -51,10 +51,10 @@ CannyEdgeDetector::CannyEdgeDetector(void)
 
 CannyEdgeDetector::~CannyEdgeDetector(void)
 {
-    av_freep(&m_edges.data[0]);
-    av_freep(&m_convolved.data[0]);
-    av_freep(&m_s2.data[0]);
-    av_freep(&m_s1.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_edges.data[0]));
+    av_freep(reinterpret_cast<void*>(&m_convolved.data[0]));
+    av_freep(reinterpret_cast<void*>(&m_s2.data[0]));
+    av_freep(reinterpret_cast<void*>(&m_s1.data[0]));
     delete []m_sgmSorted;
     delete []m_sgm;
     delete []m_mask;
@@ -71,10 +71,10 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
          * Sentinel value to determine whether or not stuff has already been
          * allocated.
          */
-        av_freep(&m_s1.data[0]);
-        av_freep(&m_s2.data[0]);
-        av_freep(&m_convolved.data[0]);
-        av_freep(&m_edges.data[0]);
+        av_freep(reinterpret_cast<void*>(&m_s1.data[0]));
+        av_freep(reinterpret_cast<void*>(&m_s2.data[0]));
+        av_freep(reinterpret_cast<void*>(&m_convolved.data[0]));
+        av_freep(reinterpret_cast<void*>(&m_edges.data[0]));
         delete []m_sgm;
         delete []m_sgmSorted;
         m_sgm = nullptr;
@@ -124,11 +124,11 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     return 0;
 
 free_convolved:
-    av_freep(&m_convolved.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_convolved.data[0]));
 free_s2:
-    av_freep(&m_s2.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_s2.data[0]));
 free_s1:
-    av_freep(&m_s1.data[0]);
+    av_freep(reinterpret_cast<void*>(&m_s1.data[0]));
     return -1;
 }
 

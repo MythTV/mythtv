@@ -208,7 +208,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     bool GetScopeForAddress(QHostAddress &addr) const;
     void SetScopeForAddress(const QHostAddress &addr);
     void SetScopeForAddress(const QHostAddress &addr, int scope);
-    enum ResolveType { ResolveAny = -1, ResolveIPv4 = 0, ResolveIPv6 = 1 };
+    enum ResolveType : std::int8_t { ResolveAny = -1, ResolveIPv4 = 0, ResolveIPv6 = 1 };
     QString resolveSettingAddress(const QString &name,
                                   const QString &host = QString(),
                                   ResolveType type = ResolveAny,

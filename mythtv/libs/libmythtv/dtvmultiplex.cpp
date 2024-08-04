@@ -692,7 +692,9 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             false, false, false, false,
             false, false, false, 0,
             query.value(17).toString(), /* default_authority */
-            query.value(18).toUInt());  /* service_type */
+            query.value(18).toUInt(),   /* service_type */
+            0,                          /* logical_channel */
+            0);                         /* simulcast_channel */
 
         m_channels.push_back(chan);
     }

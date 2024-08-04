@@ -246,7 +246,11 @@ MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
     if (!(data || file))
         return {};
 
-    QString filename = data ? (*data)->m_fileName : file ? (*file)->m_fileName : "";
+    QString filename;
+    if (data)
+        filename = (*data)->m_fileName;
+    else if (file)
+        filename = (*file)->m_fileName;
 
     // Look for unambiguous mime type
     auto types = MythMimeDatabase::MimeTypesForFileName(filename);

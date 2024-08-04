@@ -520,20 +520,22 @@ RecordingQuality *RecorderBase::GetRecordingQuality(
 long long RecorderBase::GetKeyframePosition(long long desired) const
 {
     QMutexLocker locker(&m_positionMapLock);
-    long long ret = -1;
 
     if (m_positionMap.empty())
-        return ret;
+        return -1;
 
     // find closest exact or previous keyframe position...
     frm_pos_map_t::const_iterator it = m_positionMap.lowerBound(desired);
     if (it == m_positionMap.end())
-        ret = *m_positionMap.begin();
-    else if ((it.key() == desired) ||
-             (--it != m_positionMap.end()))
-        ret = *it;
+        return *m_positionMap.begin();
+    if (it.key() == desired)
+        return *it;
 
-    return ret;
+    it--;
+    if (it != m_positionMap.end())
+        return *it;
+
+    return -1;
 }
 
 bool RecorderBase::GetKeyframePositions(

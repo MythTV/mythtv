@@ -11,7 +11,7 @@
 #include <QString>
 #include <QMutex>
 
-enum TTColor
+enum TTColor : std::uint8_t
 {
     kTTColorBlack       = 0,
     kTTColorRed         = 1,

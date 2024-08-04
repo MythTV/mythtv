@@ -13,7 +13,7 @@
 class MBASE_PUBLIC MythTimer
 {
   public:
-    enum StartState {
+    enum StartState : std::uint8_t {
         kStartRunning,
         kStartInactive,
     };

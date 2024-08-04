@@ -55,7 +55,7 @@ class Animation : public AbstractAnimation, public QVariantAnimation
 {
 public:
     //! Supported effects
-    enum Type {None, Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle};
+    enum Type : std::uint8_t {None, Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle};
 
     /*!
       \brief Create simple animation
@@ -185,7 +185,7 @@ signals:
     void      ImageLoaded(Slide*);
 
 private:
-    enum SlideState { kEmpty, kLoading, kLoaded, kFailed }; // Order is significant
+    enum SlideState : std::uint8_t { kEmpty, kLoading, kLoaded, kFailed }; // Order is significant
 
     SlideState    m_state         {kEmpty};  //!< Slide validity
     ImagePtrK     m_data          {nullptr}; //!< The image currently loading/loaded

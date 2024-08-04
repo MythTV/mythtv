@@ -11,7 +11,7 @@ class DirectoryView;
 class MythMenu;
 
 //! Type of captions to display
-enum ImageCaptionType {
+enum ImageCaptionType : std::uint8_t {
     kNoCaption   = 0, //!< None
     kNameCaption = 1, //!< Filenames
     kDateCaption = 2, //!< Dates

@@ -53,7 +53,7 @@ class NewsSite : public QObject
 
   public:
 
-    enum State {
+    enum State : std::uint8_t {
         Retrieving = 0,
         RetrieveFailed,
         WriteFailed,

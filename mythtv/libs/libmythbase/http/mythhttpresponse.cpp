@@ -317,7 +317,12 @@ void MythHTTPResponse::AddContentHeaders()
     // Check content type and size first
     auto * data = std::get_if<HTTPData>(&m_response);
     auto * file = std::get_if<HTTPFile>(&m_response);
-    int64_t size = data ? (*data)->size() : file ? (*file)->size() : 0;
+    int64_t size {0};
+
+    if (data)
+        size = (*data)->size();
+    else if (file)
+        size = (*file)->size();
 
     // Always add a zero length content header to keep some clients happy
     if (size < 1)

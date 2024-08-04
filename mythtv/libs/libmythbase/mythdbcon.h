@@ -223,7 +223,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();
 
-    enum ConnectionReuse
+    enum ConnectionReuse : std::uint8_t
     {
         kDedicatedConnection,
         kNormalConnection,

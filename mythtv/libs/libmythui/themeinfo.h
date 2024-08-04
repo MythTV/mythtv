@@ -10,7 +10,7 @@
 #include "libmythui/mythuiexp.h"
 #include "libmythui/xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
 
-enum ThemeType {
+enum ThemeType : std::uint8_t {
     THEME_UNKN  = 0x00,
     THEME_UI    = 0x01,
     THEME_OSD   = 0x02,

@@ -18,7 +18,7 @@
 
 
 //! Order of images in slideshow
-enum SlideOrderType {
+enum SlideOrderType : std::uint8_t {
     kOrdered  = 0, //!< Ordered as per user setting GallerySortOrder
     kShuffle  = 1, //!< Each image appears exactly once, but in random order
     kRandom   = 2, //!< Random selection from view. An image may be absent or appear multiple times

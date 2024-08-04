@@ -2231,9 +2231,12 @@ void Scheduler::run(void)
                                statuschanged);
             if (idleSince.isValid())
             {
-                nextWakeTime = MythDate::current().addSecs(
-                    (idleSince.addSecs((idleTimeoutSecs - 10s).count()) <= curtime) ? 1 :
-                    (idleSince.addSecs((idleTimeoutSecs - 30s).count()) <= curtime) ? 5 : 10);
+                int64_t secs {10};
+                if (idleSince.addSecs((idleTimeoutSecs - 10s).count()) <= curtime)
+                    secs = 1;
+                else if (idleSince.addSecs((idleTimeoutSecs - 30s).count()) <= curtime)
+                    secs = 5;
+                nextWakeTime = MythDate::current().addSecs(secs);
             }
         }
 
@@ -2909,13 +2912,14 @@ void Scheduler::HandleRecordingStatusChange(
           m_schedAfterStartMap[ri.GetParentRecordingRuleID()]));
     ri.AddHistory(doSchedAfterStart);
 
-    QString msg = (RecStatus::Recording == recStatus) ?
-        QString("Started recording") :
-        ((RecStatus::Tuning == recStatus) ?
-         QString("Tuning recording") :
-         QString("Canceled recording (%1)")
-         .arg(RecStatus::toString(ri.GetRecordingStatus(), ri.GetRecordingRuleType())));
-
+    QString msg;
+    if (RecStatus::Recording == recStatus)
+        msg = QString("Started recording");
+    else if (RecStatus::Tuning == recStatus)
+        msg = QString("Tuning recording");
+    else
+        msg = QString("Canceled recording (%1)")
+            .arg(RecStatus::toString(ri.GetRecordingStatus(), ri.GetRecordingRuleType()));
     LOG(VB_GENERAL, LOG_INFO, QString("%1: %2").arg(msg, details));
 
     if ((RecStatus::Recording == recStatus) || (RecStatus::Tuning == recStatus))

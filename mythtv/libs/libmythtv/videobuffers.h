@@ -23,7 +23,7 @@ using vbuffer_map_t  = std::map<const MythVideoFrame*, uint>;
 const QString& DebugString(const MythVideoFrame *Frame, bool Short = false);
 const QString& DebugString(uint  FrameNum, bool Short = false);
 
-enum BufferType
+enum BufferType : std::uint8_t
 {
     kVideoBuffer_avail     = 0x00000001,
     kVideoBuffer_limbo     = 0x00000002,

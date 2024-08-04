@@ -104,7 +104,7 @@ class LCDProcClient : public QObject
 
     void sendToServer(const QString &someText);
 
-    enum PRIORITY {TOP, URGENT, HIGH, MEDIUM, LOW, OFF};
+    enum PRIORITY : std::uint8_t {TOP, URGENT, HIGH, MEDIUM, LOW, OFF};
     void setPriority(const QString &screen, PRIORITY priority);
 
     void setHeartbeat (const QString &screen, bool onoff);

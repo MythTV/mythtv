@@ -38,7 +38,7 @@ class MHParseBase {
 class MHParseNode  
 {
   public:
-    enum NodeType { PNTagged, PNBool, PNInt, PNEnum, PNString, PNNull, PNSeq };
+    enum NodeType : std::uint8_t { PNTagged, PNBool, PNInt, PNEnum, PNString, PNNull, PNSeq };
   protected:
     explicit MHParseNode(enum NodeType nt): m_nNodeType(nt) {}
   public:

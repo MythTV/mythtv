@@ -54,7 +54,7 @@ class MythVDPAUHelper : public QObject
     Q_OBJECT
 
   public:
-    enum VDPMixerFeature
+    enum VDPMixerFeature : std::uint8_t
     {
         VDPMixerNone     = 0x00,
         VDPMixerTemporal = 0x01,

@@ -19,7 +19,7 @@ class PlaylistContainer;
 class Playlist;
 class MythSystemLegacy;
 
-enum InsertPLOption
+enum InsertPLOption : std::uint8_t
 {
     PL_REPLACE = 1,
     PL_INSERTATBEGINNING,
@@ -27,7 +27,7 @@ enum InsertPLOption
     PL_INSERTAFTERCURRENT
 };
 
-enum PlayPLOption
+enum PlayPLOption : std::uint8_t
 {
     PL_FIRST = 1,
     PL_FIRSTNEW,

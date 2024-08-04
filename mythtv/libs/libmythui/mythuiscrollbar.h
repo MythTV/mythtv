@@ -23,7 +23,7 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
 
     void Reset(void) override; // MythUIType
 
-    enum LayoutType { LayoutVertical, LayoutHorizontal };
+    enum LayoutType : std::uint8_t { LayoutVertical, LayoutHorizontal };
 
     void SetPageStep(int value);
     void SetSliderPosition(int value);

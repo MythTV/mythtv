@@ -104,7 +104,7 @@ static QMap<QString,SkipType> *init_skip_types(void)
     return tmp;
 }
 
-enum OutputMethod
+enum OutputMethod : std::uint8_t
 {
     kOutputMethodEssentials = 1,
     kOutputMethodFull,

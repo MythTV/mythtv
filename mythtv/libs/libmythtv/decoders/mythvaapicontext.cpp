@@ -558,16 +558,16 @@ const VAAPIProfiles& MythVAAPIContext::GetProfiles()
                                     minsize.setHeight(attrlist[k].value.value.i);
                             }
                         }
-                        av_freep(&attrlist);
+                        av_freep(reinterpret_cast<void*>(&attrlist));
                     }
                     vaDestroyConfig(hwctx->display, config);
                     s_profiles.append(VAAPIProfile(VAToMythProfile(profile), QPair<QSize,QSize>(minsize, maxsize)));
                 }
             }
-            av_freep(&entrylist);
+            av_freep(reinterpret_cast<void*>(&entrylist));
         }
     }
-    av_freep(&profilelist);
+    av_freep(reinterpret_cast<void*>(&profilelist));
     av_buffer_unref(&hwdevicectx);
     return s_profiles;
 }

@@ -250,7 +250,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
         LOG(VB_GENERAL, LOG_ERR, LOC + "av_buffersrc_parameters_set failed");
         goto end;
     }
-    av_freep(&params);
+    av_freep(reinterpret_cast<void*>(&params));
 
     /* buffer video sink: to terminate the filter chain. */
     ret = avfilter_graph_create_filter(&Sink, buffersink, "out",

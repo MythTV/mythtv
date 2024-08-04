@@ -249,7 +249,7 @@ avfDecoder::~avfDecoder(void)
         deinit();
 
     if (m_outputBuffer)
-        av_freep(&m_outputBuffer);
+        av_freep(reinterpret_cast<void*>(&m_outputBuffer));
 
     delete m_inputContext;
 }

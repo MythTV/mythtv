@@ -17,7 +17,7 @@
 #include "libmythbase/programtypes.h"
 #include "libmythtv/mythtvexp.h"
 
-enum ChannelVisibleType
+enum ChannelVisibleType : std::int8_t
 {
     kChannelAlwaysVisible = 2,
     kChannelVisible       = 1,
@@ -46,7 +46,7 @@ class MTV_PUBLIC ChannelInfo
         
     bool Load(uint lchanid = -1);
 
-    enum ChannelFormat { kChannelShort, kChannelLong };
+    enum ChannelFormat : std::uint8_t { kChannelShort, kChannelLong };
     QString GetFormatted(ChannelFormat format) const;
     void ToMap(InfoMap &infoMap);
 
@@ -161,7 +161,8 @@ class MTV_PUBLIC ChannelInsertInfo
         bool           _is_encrypted,       bool           _is_data_service,
         bool           _is_audio_service,   bool           _is_opencable,
         bool           _could_be_opencable, int            _decryption_status,
-        QString        _default_authority,  uint           _service_type) :
+        QString        _default_authority,  uint           _service_type,
+        uint           _logical_channel,    uint           _simulcast_channel ) :
     m_dbMplexId(_db_mplexid),
     m_sourceId(_source_id),
     m_channelId(_channel_id),
@@ -198,7 +199,9 @@ class MTV_PUBLIC ChannelInsertInfo
     m_isAudioService(_is_audio_service),
     m_isOpencable(_is_opencable),
     m_couldBeOpencable(_could_be_opencable),
-    m_decryptionStatus(_decryption_status) {}
+    m_decryptionStatus(_decryption_status),
+    m_logicalChannel(_logical_channel),
+    m_simulcastChannel(_simulcast_channel) {}
 
     ChannelInsertInfo(const ChannelInsertInfo &other) { (*this = other); }
     ChannelInsertInfo &operator=(const ChannelInsertInfo&) = default;
@@ -250,6 +253,8 @@ class MTV_PUBLIC ChannelInsertInfo
     bool    m_isOpencable        {false};
     bool    m_couldBeOpencable   {false};
     int     m_decryptionStatus   {0};
+    uint    m_logicalChannel     {0};
+    uint    m_simulcastChannel   {0};
 
     // Service relocated descriptor
     uint    m_oldOrigNetId       {0};

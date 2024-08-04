@@ -328,7 +328,8 @@ class VideoListImp
     using metadata_view_list = std::vector<VideoMetadata *>;
 
   private:
-    enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
+    enum metadata_list_type : std::uint8_t
+                            { ltNone, ltFileSystem, ltDBMetadata,
                               ltDBGenreGroup, ltDBCategoryGroup,
                               ltDBYearGroup, ltDBDirectorGroup,
                               ltDBStudioGroup, ltDBCastGroup,

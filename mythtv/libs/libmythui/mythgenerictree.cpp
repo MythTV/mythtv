@@ -14,7 +14,7 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
   public:
     SortableMythGenericTreeList() = default;
-    enum SortType {SORT_STRING=0, SORT_SELECTABLE=1};
+    enum SortType : std::uint8_t {SORT_STRING=0, SORT_SELECTABLE=1};
 
     void SetSortType(SortType stype) { m_sortType = stype; }
     void SetAttributeIndex(int index)

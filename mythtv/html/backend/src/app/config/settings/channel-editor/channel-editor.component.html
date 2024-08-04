@@ -1,16 +1,60 @@
 <h2>{{ 'settings.chanedit.title' | translate }}</h2>
 <div class="block card w-full" style="height: 90vh" *ngIf="(chansLoaded && transDone >= numTranslations) else loading">
-    <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped"
-        [rowHover]="true" (onFilter)="onFilter($event)" responsiveLayout="scroll" sortField="ChanSeq">
+    <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true"
+        styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" (onFilter)="onFilter($event)"
+        responsiveLayout="scroll" sortField="ChanSeq">
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
                 class="p-button-success mr-2" (click)="openNew()"
                 [disabled]="setupService.pageType == 'S' && setupService.schedulingEnabled"></button>
+            <p-button icon="pi pi-trash" (onClick)="deleteSourceRequest()" *ngIf="setupService.pageType == 'S' "
+                pTooltip="{{ 'settings.chanedit.delete_source' | translate }}" tooltipPosition="top"
+                label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"
+                [disabled]="setupService.schedulingEnabled" class="p-2">
+            </p-button>
+            <p-button icon="pi pi-history" (onClick)="restoreDataRequest()"
+                pTooltip="{{ 'settings.chanedit.res_tooltip' | translate }}" tooltipPosition="top"
+                label="{{ 'settings.chanedit.res_title' | translate }}" styleClass="p-button-success" class="p-2"
+                [disabled]="videoSources.length == 0">
+            </p-button>
+            <p-button icon="pi pi-download" pTooltip="{{ 'settings.chanedit.icondld_tooltip' | translate }}"
+                tooltipPosition="top" (onClick)="downloadIconsRequest()"
+                label="{{ 'settings.chanedit.icondld_title' | translate }}" styleClass="p-button-success" class="p-2"
+                [disabled]="videoSources.length == 0">
+            </p-button>
+            <div *ngIf="setupService.pageType != 'S' " class="p-2">
+                {{ 'settings.chanedit.delete_message' | translate }}
+            </div>
         </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th>{{ 'settings.chanedit.col_source' | translate }}:
-                    &nbsp;
+                <th style="width:  8%">{{ 'settings.chanedit.col_icon' | translate }}</th>
+                <th style="width:  8%" pSortableColumn="ChanSeq">
+                    {{ 'settings.chanedit.col_channum' | translate }} <p-sortIcon field="ChanSeq"></p-sortIcon></th>
+                <th style="width:  6%">{{ 'settings.chanedit.col_freqid' | translate }}</th>
+                <th style="width:  10%">{{ 'settings.chanedit.col_callsign' | translate }}</th>
+                <th style="width:  23%">{{ 'settings.chanedit.col_name' | translate }}</th>
+                <th style="width:  16%" pSortableColumn="Source">
+                    {{ 'settings.chanedit.col_source' | translate }} <p-sortIcon field="Source"></p-sortIcon>
+                </th>
+                <th style="width:  6%">{{ 'settings.chanedit.col_priority' | translate }}</th>
+                <th style="width:  10%">{{ 'settings.chanedit.col_visibility' | translate }}</th>
+                <th style="width:  6%">{{ 'settings.chanedit.col_useeit' | translate }}</th>
+                <th style="width:  7%; white-space: nowrap;">
+                    <!-- These are disabled buttons to ensure the spacing of the heading
+                         matches the spacing of the rows -->
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                        *ngIf="setupService.pageType == 'S'" disabled="true"></button>
+                </th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th><p-columnFilter type="text" field="CallSign"></p-columnFilter></th>
+                <th><p-columnFilter type="text" field="ChannelName"></p-columnFilter></th>
+                <th>
                     <p-columnFilter field="Source" matchMode="equals" [showMenu]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                             <p-dropdown [ngModel]="value" [options]="sourceNames" name="filter"
@@ -22,64 +66,29 @@
                             </p-dropdown>
                         </ng-template>
                     </p-columnFilter>
-                    <p-button icon="pi pi-trash" (onClick)="deleteSourceRequest()" *ngIf="setupService.pageType == 'S' "
-                        pTooltip="{{ 'settings.chanedit.delete_source' | translate }}" tooltipPosition="top"
-                        label="{{ 'common.delete' | translate }}" styleClass="p-button-danger"
-                        [disabled]="setupService.schedulingEnabled" class="p-2">
-                    </p-button>
-                    <p-button icon="pi pi-history" (onClick)="restoreDataRequest()"
-                        pTooltip="{{ 'settings.chanedit.res_tooltip' | translate }}" tooltipPosition="top"
-                        label="{{ 'settings.chanedit.res_title' | translate }}" styleClass="p-button-success"
-                        class="p-2" [disabled]="videoSources.length == 0">
-                    </p-button>
-                    <p-button icon="pi pi-download" pTooltip="{{ 'settings.chanedit.icondld_tooltip' | translate }}"
-                        tooltipPosition="top" (onClick)="downloadIconsRequest()"
-                        label="{{ 'settings.chanedit.icondld_title' | translate }}" styleClass="p-button-success"
-                        class="p-2" [disabled]="videoSources.length == 0">
-                    </p-button>
-                    <div *ngIf="setupService.pageType != 'S' " class="p-2">
-                        {{ 'settings.chanedit.delete_message' | translate }}
-                    </div>
-
                 </th>
-            </tr>
-            <tr>
-                <th style="flex-basis:  8%">&nbsp;</th>
-                <th style="flex-basis:  9%" pSortableColumn="ChanSeq">
-                    {{ 'settings.chanedit.col_channum' | translate }} <p-sortIcon field="ChanSeq"></p-sortIcon></th>
-                <th style="flex-basis:  6%">{{ 'settings.chanedit.col_freqid' | translate }}</th>
-                <th style="flex-basis:  10%">{{ 'settings.chanedit.col_callsign' | translate }}</th>
-                <th style="flex-basis:  24%">{{ 'settings.chanedit.col_name' | translate }}</th>
-                <th style="flex-basis:  16%" pSortableColumn="Source">
-                    {{ 'settings.chanedit.col_source' | translate }} <p-sortIcon field="Source"></p-sortIcon></th>
-                <th style="flex-basis:  6%">{{ 'settings.chanedit.col_priority' | translate }}</th>
-                <th style="flex-basis:  10%">{{ 'settings.chanedit.col_visibility' | translate }}</th>
-                <th style="flex-basis:  6%">{{ 'settings.chanedit.col_useeit' | translate }}</th>
-                <th style="flex-basis:  6%">
-                    <!-- These are disabled buttons to ensure the spacing of the heading
-                         matches the spacing of the rows -->
-                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>
-                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
-                        *ngIf="setupService.pageType == 'S'" disabled="true"></button>
-                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-channel>
-            <tr height="40" [ngClass]="{'line-through' : channel.ChanId < 0}">
-                <td style="flex-basis: 8%">
+            <tr [ngClass]="{'line-through' : channel.ChanId < 0}">
+                <td class="pt-1 pb-0">
                     <img src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon}}" height="32" width="42"
                         *ngIf="channel.Icon; else nullIcon" style="background-color:#000000" onerror="this.height='0'">
                     <ng-template #nullIcon><img height="32" width="42"></ng-template>
                 </td>
-                <td style="flex-basis:  9%">{{ channel.ChanNum }}</td>
-                <td style="flex-basis:  6%">{{ channel.FrequencyId }}</td>
-                <td style="flex-basis:  10%">{{ channel.CallSign }}</td>
-                <td style="flex-basis:  24%">{{ channel.ChannelName }}</td>
-                <td style="flex-basis:  16%">{{ channel.Source }}</td>
-                <td style="flex-basis:  6%">{{ channel.RecPriority }}</td>
-                <td style="flex-basis:  10%">{{ getVisibility(channel) }}</td>
-                <td style="flex-basis:  6%">{{ channel.UseEIT ? 'Y' : 'N' }}</td>
-                <td style="flex-basis:  6%">
+                <td>{{ channel.ChanNum }}</td>
+                <td>{{ channel.FrequencyId }}</td>
+                <td>{{ channel.CallSign }}</td>
+                <td>{{ channel.ChannelName }}</td>
+                <td>{{ channel.Source }}</td>
+                <td>{{ channel.RecPriority }}</td>
+                <td>{{ getVisibility(channel) }}</td>
+                <td>{{ channel.UseEIT ? 'Y' : 'N' }}</td>
+                <td class="pt-1 pb-0" style="white-space: nowrap;">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text" (click)="editChannel(channel)"
                         [disabled]="channel.ChanId < 0
                         || (setupService.pageType == 'S' && setupService.schedulingEnabled)"

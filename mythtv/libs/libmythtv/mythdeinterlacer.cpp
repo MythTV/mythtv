@@ -349,8 +349,13 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     AVFilterInOut* inputs = nullptr;
     AVFilterInOut* outputs = nullptr;
 
+    int parity {1};
+    if (m_autoFieldOrder)
+        parity = -1;
+    else if (TopFieldFirst)
+        parity = 0;
     auto deint = QString("yadif=mode=%1:parity=%2:threads=%3")
-        .arg(DoubleRate ? 1 : 0).arg(m_autoFieldOrder ? -1 : TopFieldFirst ? 0 : 1).arg(threads);
+        .arg(DoubleRate ? 1 : 0).arg(parity).arg(threads);
 
     auto graph = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1[in];[in]%4[out];[out] buffersink")
         .arg(m_width).arg(m_height).arg(m_inputFmt).arg(deint);

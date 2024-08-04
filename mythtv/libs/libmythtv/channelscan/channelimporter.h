@@ -26,7 +26,7 @@
 #include "channelscantypes.h"
 #include "channelscanner_web.h"
 
-enum OkCancelType {
+enum OkCancelType : std::int8_t {
     kOCTCancelAll = -1,
     kOCTCancel    = +0,
     kOCTOk        = +1,
@@ -84,27 +84,27 @@ class MTV_PUBLIC ChannelImporter : public QObject
     void Process(const ScanDTVTransportList &_transports, int sourceid = -1);
 
   protected:
-    enum DeleteAction
+    enum DeleteAction : std::uint8_t
     {
         kDeleteAll,
         kDeleteManual,
         kDeleteIgnoreAll,
         kDeleteInvisibleAll,
     };
-    enum InsertAction
+    enum InsertAction : std::uint8_t
     {
         kInsertAll,
         kInsertManual,
         kInsertIgnoreAll,
     };
-    enum UpdateAction
+    enum UpdateAction : std::uint8_t
     {
         kUpdateAll,
         kUpdateManual,
         kUpdateIgnoreAll,
     };
 
-    enum ChannelType
+    enum ChannelType : std::uint8_t
     {
         kChannelTypeFirst = 0,
 
@@ -132,6 +132,7 @@ class MTV_PUBLIC ChannelImporter : public QObject
     static void RemoveDuplicates(ScanDTVTransportList &transports, ScanDTVTransportList &duplicates);
     void FilterServices(ScanDTVTransportList &transports) const;
     static void FilterRelocatedServices(ScanDTVTransportList &transports);
+    void ChannelNumbers(ScanDTVTransportList &transports) const;
 
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList &transports) const;
@@ -248,6 +249,8 @@ class MTV_PUBLIC ChannelImporter : public QObject
     bool m_doDelete;
     bool m_doInsert;
     bool m_doSave;
+    bool m_doLcn                        {true};     // Use Logical Channel Numbers
+    bool m_doScn                        {true};     // Use HD Simulcast logical channel numbers
     bool m_ftaOnly                      {true};     // Only FreeToAir (non-encrypted) channels desired post scan?
     bool m_lcnOnly                      {false};    // Only services with logical channel numbers desired post scan?
     bool m_completeOnly                 {true};     // Only services with complete scandata desired post scan?
@@ -255,6 +258,7 @@ class MTV_PUBLIC ChannelImporter : public QObject
     bool m_fullChannelSearch            {false};    // Full search for old channels across transports in database
     bool m_removeDuplicates             {false};    // Remove duplicate transports and channels in scan
     bool m_success                      {false};    // To pass information IPTV channel scan succeeded
+    int  m_lcnOffset                    {0};        // Read from database table videosource
     int  m_functorRetval                {0};
     ChannelScannerWeb * m_pWeb          {nullptr};
 

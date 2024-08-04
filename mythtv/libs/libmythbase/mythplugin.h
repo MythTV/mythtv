@@ -15,7 +15,7 @@ class QSqlDatabase;
 class MythContext;
 class QPainter;
 
-enum MythPluginType {
+enum MythPluginType : std::uint8_t {
     kPluginType_Module = 0
 };
 

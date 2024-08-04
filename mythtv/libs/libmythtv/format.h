@@ -191,7 +191,7 @@ struct ccsubtitle
 };
 
 // resumedirect codes
-enum CC_STYLE {
+enum CC_STYLE : std::uint8_t {
     CC_STYLE_POPUP  = 0x00,
     CC_STYLE_PAINT  = 0x01,
     CC_STYLE_ROLLUP = 0x02,
@@ -201,7 +201,7 @@ enum CC_STYLE {
 static constexpr uint8_t CC_LINE_CONT  { 0x02 };
 static constexpr uint8_t CC_MODE_MASK  { 0xf0 };
 static constexpr uint8_t CC_TXT_MASK   { 0x20 };
-enum CC_MODE {
+enum CC_MODE : std::uint8_t {
     CC_CC1  = 0x00,
     CC_CC2  = 0x10,
     CC_TXT1 = 0x20,

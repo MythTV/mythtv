@@ -644,8 +644,11 @@ uint MpegRecorder::GetFilteredAudioLayer(void) const
 
 uint MpegRecorder::GetFilteredAudioBitRate(uint audio_layer) const
 {
-    return ((2 == audio_layer) ? std::max(m_audBitrateL2, 10) :
-            ((3 == audio_layer) ? m_audBitrateL3 : std::max(m_audBitrateL1, 6)));
+    if (2 == audio_layer)
+        return std::max(m_audBitrateL2, 10);
+    if (3 == audio_layer)
+        return  m_audBitrateL3;
+    return std::max(m_audBitrateL1, 6);
 }
 
 static int streamtype_ivtv_to_v4l2(int st)

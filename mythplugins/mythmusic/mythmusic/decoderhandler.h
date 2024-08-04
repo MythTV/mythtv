@@ -79,7 +79,7 @@ class DecoderHandler : public QObject, public MythObservable
   Q_OBJECT
 
   public:
-    enum State
+    enum State : std::uint8_t
     {
         ACTIVE,
         LOADING,

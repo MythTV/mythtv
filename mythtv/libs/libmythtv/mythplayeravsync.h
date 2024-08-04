@@ -10,7 +10,7 @@
 
 class AudioPlayer;
 
-enum AVSyncAudioPausedType
+enum AVSyncAudioPausedType : std::uint8_t
 {
     kAVSyncAudioNotPaused    = 0,
     kAVSyncAudioPaused       = 1,

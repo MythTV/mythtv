@@ -74,7 +74,7 @@ class MythMediaDevice;
 class MythMediaEvent;
 
 //! Display filter
-enum ImageDisplayType {
+enum ImageDisplayType : std::uint8_t {
     kPicAndVideo = 0, //!< Show Pictures & Videos
     kPicOnly     = 1, //!< Hide videos
     kVideoOnly   = 2  //!< Hide pictures
@@ -166,9 +166,13 @@ public:
 
     //! Determine file type from its extension
     ImageNodeType GetImageType(const QString &ext) const
-    { return m_imageFileExt.contains(ext)
-                ? kImageFile
-                : m_videoFileExt.contains(ext) ? kVideoFile : kUnknown; }
+    {
+        if (m_imageFileExt.contains(ext))
+            return kImageFile;
+        if (m_videoFileExt.contains(ext))
+            return kVideoFile;
+        return kUnknown;
+    }
 protected:
     ImageAdapterBase();
     virtual ~ImageAdapterBase() = default;

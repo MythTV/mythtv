@@ -59,7 +59,7 @@ static constexpr int    PLAYBACK_MINBUFFER { 2 }; // number of segments to prefe
 static constexpr int8_t PLAYBACK_READAHEAD { 6 }; // number of segments download queue ahead of playback
 static constexpr int8_t PLAYLIST_FAILURE   { 6 }; // number of consecutive failures after which
                                                   // playback will abort
-enum
+enum : std::int8_t
 {
     RET_ERROR = -1,
     RET_OK    = 0,
