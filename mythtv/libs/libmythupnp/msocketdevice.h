@@ -67,7 +67,15 @@ public:
     MSocketDevice(int socket, Type type);
     ~MSocketDevice() override;
 
-    bool  isValid() const;
+    /*!
+      Returns true if this is a valid socket; otherwise returns false.
+
+      \sa socket()
+    */
+    bool  isValid() const
+    {
+        return m_fd != -1;
+    }
     Type  type() const;
     Protocol  protocol() const;
 
