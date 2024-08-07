@@ -136,7 +136,9 @@ namespace
             ok = true;
         }
         else
+        {
             ok = RemoteGetFileList(host, start_path, &list, "Videos");
+        }
 
         if (!ok || (!list.isEmpty() && list.at(0).startsWith("SLAVE UNREACHABLE")))
         {

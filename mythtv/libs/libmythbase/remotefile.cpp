@@ -53,10 +53,14 @@ static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlis
             sock->DecrRef();
         }
         else
+        {
             strlist.clear();
+        }
     }
     else
+    {
         ok = gCoreContext->SendReceiveStringList(strlist);
+    }
 
     return ok;
 }
@@ -74,7 +78,9 @@ RemoteFile::RemoteFile(QString url, bool write, bool usereadahead,
         m_timeoutMs = -1ms;
     }
     else if (possibleAuxiliaryFiles)
+    {
         m_possibleAuxFiles = *possibleAuxiliaryFiles;
+    }
 
     if (!m_path.isEmpty())
         Open();
@@ -784,7 +790,9 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
             offset = ((curpos > 0) ? curpos : ::lseek64(m_localFile, 0, SEEK_CUR)) + pos;
         }
         else
+        {
             return -1;
+        }
 
         off64_t localpos = ::lseek64(m_localFile, pos, whence);
         if (localpos != pos)
@@ -1066,7 +1074,9 @@ int RemoteFile::Read(void *data, int size)
             LOG(VB_GENERAL, LOG_WARNING, "RemoteFile::Read(): Resume failed.");
         }
         else
+        {
             LOG(VB_GENERAL, LOG_NOTICE, "RemoteFile::Read(): Resume success.");
+        }
     }
     else
     {

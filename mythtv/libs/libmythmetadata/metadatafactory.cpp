@@ -688,11 +688,17 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         }
         else if (ruleepisode == 0 && pginfo->GetEpisode() == 0 &&
             pginfo->GetSubtitle().isEmpty())
+        {
             ret = kProbableMovie;
+        }
         else if (ruleepisode > 0 && pginfo->GetSubtitle().isEmpty())
+        {
             ret = kProbableGenericTelevision;
+        }
         else
+        {
             ret = kUnknownVideo;
+        }
     }
 
     return ret;

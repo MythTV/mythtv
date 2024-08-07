@@ -284,7 +284,9 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         filename = dir + "/" + path;
     }
     else
+    {
         filename = LocalFilePath(path, wantgroup);
+    }
 
     QFileInfo finfo(filename);
     if (finfo.isDir())
@@ -320,7 +322,9 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         ft = new FileTransfer(filename, socket, m_parent, writemode);
     }
     else
+    {
         ft = new FileTransfer(filename, socket, m_parent, usereadahead, timeout);
+    }
 
     ft->BlockShutdown(true);
 
@@ -533,7 +537,9 @@ QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
                     foundDirs[currentDir] = true;
                 }
                 else
+                {
                     foundDirs[currentDir] = false;
+                }
             }
         }
     }
@@ -601,7 +607,9 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
             storageGroup = slist[2];
     }
     else if (slist.size() != 2)
+    {
         return false;
+    }
 
     const QString& filename = slist[1];
     if ((filename.isEmpty()) || 
@@ -649,7 +657,9 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
         }
     }
     else
+    {
         res << "0";
+    }
 
     socket->WriteStringList(res);
     return true;
@@ -1115,7 +1125,9 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
                        + filename;
         }
         else
+        {
             res << "ERROR";
+        }
     }
     else
     {

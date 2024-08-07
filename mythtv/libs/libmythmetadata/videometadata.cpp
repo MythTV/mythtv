@@ -1216,7 +1216,9 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
         return title.trimmed();
     }
     else if (position == 2 || position == 3)
+    {
         return {"0"};
+    }
 
     return {};
 }

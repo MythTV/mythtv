@@ -142,7 +142,9 @@ void MetadataDownload::run()
             }
         }
         else if (lookup->GetType() == kMetadataGame)
+        {
             list = handleGame(lookup);
+        }
 
         // inform parent we have lookup ready for it
         if (m_parent && !list.isEmpty())

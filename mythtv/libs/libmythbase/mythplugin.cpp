@@ -119,8 +119,10 @@ MythPluginManager::MythPluginManager()
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_WARNING,
                  "No plugins directory " + filterDir.path());
+    }
 }
 
 bool MythPluginManager::init_plugin(const QString &plugname)

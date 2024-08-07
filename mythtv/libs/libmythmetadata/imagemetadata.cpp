@@ -295,8 +295,10 @@ PictureMetaData::PictureMetaData(const QString &filePath)
             m_exifData = m_image->exifData();
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Exiv2 error: Could not open file %1").arg(filePath));
+        }
     }
     catch (Exiv2::Error &e)
     {

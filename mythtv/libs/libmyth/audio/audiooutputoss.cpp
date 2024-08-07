@@ -212,7 +212,9 @@ bool AudioOutputOSS::OpenDevice()
                    "accurately! audio/video sync will be bad, continuing...");
     }
     else
+    {
         VBERRENO("Unable to get audio card capabilities");
+    }
 
     // Setup volume control
     if (m_internalVol)

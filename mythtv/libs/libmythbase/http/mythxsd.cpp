@@ -448,7 +448,9 @@ bool MythXSD::RenderXSD( const HTTPRequest2& pRequest, QObject *pClass )
                     sType = "MapOfString" + sContentName;
                 }
                 else
+                {
                     sType = "ArrayOf" + sContentType;
+                }
 
                 bCustomType = true;
 

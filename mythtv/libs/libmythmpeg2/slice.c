@@ -544,8 +544,9 @@ static int get_non_intra_block (mpeg2_decoder_t * const decoder,
     if (bit_buf >= 0x28000000) {
 	tab = DCT_B14DC_5 + (UBITS (bit_buf, 5) - 5);
 	goto entry_1;
-    } else
+    } else {
 	goto entry_2;
+    }
 
     while (1) {
 	if (bit_buf >= 0x28000000) {
@@ -773,8 +774,9 @@ static int get_mpeg1_non_intra_block (mpeg2_decoder_t * const decoder)
     if (bit_buf >= 0x28000000) {
 	tab = DCT_B14DC_5 + (UBITS (bit_buf, 5) - 5);
 	goto entry_1;
-    } else
+    } else {
 	goto entry_2;
+    }
 
     while (1) {
 	if (bit_buf >= 0x28000000) {
@@ -898,10 +900,11 @@ static inline void slice_intra_DCT (mpeg2_decoder_t * const decoder,
     if (decoder->mpeg1) {
 	if (decoder->coding_type != D_TYPE)
 	    get_mpeg1_intra_block (decoder);
-    } else if (decoder->intra_vlc_format)
+    } else if (decoder->intra_vlc_format) {
 	get_intra_block_B15 (decoder, decoder->quantizer_matrix[cc ? 2 : 0]);
-    else
+    } else {
 	get_intra_block_B14 (decoder, decoder->quantizer_matrix[cc ? 2 : 0]);
+    }
     mpeg2_idct_copy (decoder->DCTblock, dest, stride);
 #undef bit_buf
 #undef bits

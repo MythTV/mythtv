@@ -410,7 +410,9 @@ void MythUITextEditSetting::edit(MythScreenType * screen)
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void MythUITextEditSetting::resultEdit(DialogCompletionEvent *dce)
@@ -451,7 +453,9 @@ void MythUIFileBrowserSetting::edit(MythScreenType * screen)
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void MythUIFileBrowserSetting::resultEdit(DialogCompletionEvent *dce)
@@ -570,7 +574,9 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
         }
     }
     else
+    {
         delete menuPopup;
+    }
 }
 
 void MythUIComboBoxSetting::setValue(const QString& newValue)
@@ -599,10 +605,14 @@ void MythUIComboBoxSetting::resultEdit(DialogCompletionEvent *dce)
                 popupStack->AddScreen(settingdialog);
             }
             else
+            {
                 delete settingdialog;
+            }
         }
         else if (m_settingValue != dce->GetData().toString())
+        {
             StandardSetting::setValue(dce->GetData().toString());
+        }
     }
 }
 
@@ -700,7 +710,9 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void MythUISpinBoxSetting::resultEdit(DialogCompletionEvent *dce)
@@ -857,7 +869,9 @@ void StandardSettingDialog::customEvent(QEvent *event)
                     m_settingsTree->applyChange();
             }
             else if (buttonnum == 1)
+            {
                 MythScreenType::Close();
+            }
         }
     }
 }
@@ -987,10 +1001,14 @@ void StandardSettingDialog::Close(void)
             menuPopup->AddButton(tr("Cancel"));
         }
         else
+        {
             delete menuPopup;
+        }
     }
     else
+    {
         MythScreenType::Close();
+    }
 }
 
 static QKeyEvent selectEvent
@@ -1033,15 +1051,21 @@ bool StandardSettingDialog::keyPressEvent(QKeyEvent *e)
                 LevelUp();
         }
         else if (action == "RIGHT")
+        {
             LevelDown();
+        }
         else if (action == "EDIT")
         {
             keyPressEvent(&selectEvent);
         }
         else if (action == "DELETE")
+        {
             deleteEntry();
+        }
         else
+        {
             handled = MythScreenType::keyPressEvent(e);
+        }
     }
 
     return handled;

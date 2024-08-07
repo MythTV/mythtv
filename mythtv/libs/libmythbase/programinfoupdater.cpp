@@ -39,7 +39,9 @@ void ProgramInfoUpdater::insert(
         MThreadPool::globalInstance()->start(this, "ProgramInfoUpdater");
     }
     else
+    {
         m_moreWork.wakeAll();
+    }
 }
 
 void ProgramInfoUpdater::run(void)

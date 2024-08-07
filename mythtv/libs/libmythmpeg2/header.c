@@ -436,8 +436,9 @@ static void finalize_matrix (mpeg2dec_t * mpeg2dec)
                      mpeg2dec->new_quantizer_matrix[i+2], 64) != 0)) {
 	    copy_matrix (mpeg2dec, i + 2);
 	    decoder->chroma_quantizer[i] = decoder->quantizer_prescale[i+2];
-	} else if (mpeg2dec->copy_matrix & (5 << i))
+	} else if (mpeg2dec->copy_matrix & (5 << i)) {
 	    decoder->chroma_quantizer[i] = decoder->quantizer_prescale[i];
+	}
     }
 }
 
@@ -493,8 +494,9 @@ void mpeg2_header_sequence_finalize (mpeg2dec_t * mpeg2dec)
 	mpeg2dec->state = (memcmp (&(mpeg2dec->sequence), sequence,
 				   sizeof (mpeg2_sequence_t)) ?
 			   STATE_SEQUENCE_MODIFIED : STATE_SEQUENCE_REPEATED);
-    } else
+    } else {
 	decoder->stride_frame = sequence->width;
+    }
     mpeg2dec->sequence = *sequence;
     mpeg2_reset_info (&(mpeg2dec->info));
     mpeg2dec->info.sequence = &(mpeg2dec->sequence);
@@ -949,8 +951,9 @@ mpeg2_state_t mpeg2_header_end (mpeg2dec_t * mpeg2dec)
 	mpeg2dec->info.display_fbuf = mpeg2dec->fbuf[b_type];
 	if (!mpeg2dec->convert)
 	    mpeg2dec->info.discard_fbuf = mpeg2dec->fbuf[b_type + 1];
-    } else if (!mpeg2dec->convert)
+    } else if (!mpeg2dec->convert) {
 	mpeg2dec->info.discard_fbuf = mpeg2dec->fbuf[b_type];
+    }
     mpeg2dec->action = seek_sequence;
     return STATE_END;
 }

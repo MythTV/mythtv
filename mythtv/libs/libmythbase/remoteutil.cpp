@@ -465,10 +465,14 @@ bool RemoteGetFileList(const QString& host, const QString& path, QStringList* li
             sock->DecrRef();
         }
         else
+        {
             list->clear();
+        }
     }
     else
+    {
         ok = gCoreContext->SendReceiveStringList(*list);
+    }
 
 // Should the SLAVE UNREACH test be here ?
     return ok;

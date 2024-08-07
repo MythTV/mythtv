@@ -98,7 +98,9 @@ void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
             LOG(VB_HTTP, LOG_ERR, QString("Don't know how to get the parameters for MIME type: '%1'").arg(mime.Name()));
     }
     else
+    {
         LOG(VB_HTTP, LOG_ERR, QString("Unknown MIME type: '%1'").arg(types[0]));
+    }
 
 }
 

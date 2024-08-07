@@ -266,7 +266,9 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
         return ret;
     }
     else
+    {
         ret = pkt->size;
+    }
 
     if (!got_frame)
     {

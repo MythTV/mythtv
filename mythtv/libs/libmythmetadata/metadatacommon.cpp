@@ -1446,7 +1446,9 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
         }
     }
     else
+    {
         hoursShift = TimezoneOffsets.value(ltimezone, 0);
+    }
 
     if (tmp.at(0).size() == 1)
         tmp[0].prepend("0");

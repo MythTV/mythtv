@@ -103,7 +103,9 @@ void StorageGroupEditor::ShowDeleteDialog()
         popupStack->AddScreen(confirmDelete);
     }
     else
+    {
         delete confirmDelete;
+    }
 }
 
 void StorageGroupEditor::DoDeleteSlot(bool doDelete)
@@ -210,7 +212,9 @@ void StorageGroupDirSetting::ShowDeleteDialog()
         popupStack->AddScreen(confirmDelete);
     }
     else
+    {
         delete confirmDelete;
+    }
 }
 
 void StorageGroupDirSetting::DoDeleteSlot(bool doDelete)
@@ -289,7 +293,9 @@ void StorageGroupEditor::ShowFileBrowser()
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void StorageGroupEditor::customEvent(QEvent *event)
@@ -399,7 +405,9 @@ void StorageGroupListEditor::Load(void)
                      "Default");
     }
     else
+    {
         createAddDefaultButton = true;
+    }
 
     int curGroup = 0;
     QString groupName;
@@ -412,7 +420,9 @@ void StorageGroupListEditor::Load(void)
             createAddSpecialGroupButton[curGroup] = false;
         }
         else
+        {
             createAddSpecialGroupButton[curGroup] = true;
+        }
         curGroup++;
     }
 

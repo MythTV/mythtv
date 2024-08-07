@@ -106,7 +106,9 @@ void MetadataImageDownload::run()
                            new ThumbnailDLEvent(thumb));
         }
         else
+        {
             delete thumb;
+        }
     }
 
     while (true)
@@ -221,7 +223,9 @@ void MetadataImageDownload::run()
                     onMaster = true;
                 }
                 else
+                {
                     exists = RemoteFile::Exists(finalfile);
+                }
 
                 if (!exists || lookup->GetAllowOverwrites())
                 {
@@ -232,7 +236,9 @@ void MetadataImageDownload::run()
                         RemoteFile::DeleteFile(finalfile);
                     }
                     else if (exists)
+                    {
                         QFile::remove(resolvedFN);
+                    }
 
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Metadata Image Download: %1 -> %2")
@@ -391,9 +397,13 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
     }
     else if (lookup->GetType() == kMetadataVideo ||
              lookup->GetType() == kMetadataRecording)
+    {
         title = lookup->GetInetref();
+    }
     else if (lookup->GetType() == kMetadataGame)
+    {
         title = QString("%1 (%2)").arg(lookup->GetTitle(), lookup->GetSystem());
+    }
 
     if (tracknum > 0)
         inter = QString(" Track %1").arg(QString::number(tracknum));

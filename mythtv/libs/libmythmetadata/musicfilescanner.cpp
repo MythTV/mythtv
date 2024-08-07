@@ -824,7 +824,9 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
                 }
             }
             else
+            {
                 music_files[name].location = MusicFileScanner::kDatabase;
+            }
         }
     }
 }

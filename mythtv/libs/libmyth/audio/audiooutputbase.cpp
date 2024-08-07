@@ -164,7 +164,9 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsCleaned(bool digital)
             return m_outputSettingsRaw;
     }
     else if (m_outputSettingsDigitalRaw)
+    {
         return m_outputSettingsDigitalRaw;
+    }
 
     AudioOutputSettings* aosettings = GetOutputSettings(digital);
     if (aosettings)
@@ -191,7 +193,9 @@ AudioOutputSettings* AudioOutputBase::GetOutputSettingsUsers(bool digital)
             return m_outputSettings;
     }
     else if (m_outputSettingsDigital)
+    {
         return m_outputSettingsDigital;
+    }
 
     auto* aosettings = new AudioOutputSettings;
 
@@ -1038,7 +1042,9 @@ std::chrono::milliseconds AudioOutputBase::GetAudiotime(void)
         obpf = 448000 * 10 / m_sourceSampleRate;
     }
     else
+    {
         obpf = static_cast<int64_t>(m_outputBytesPerFrame) * 80;
+    }
 
     /* We want to calculate 'm_audioTime', which is the timestamp of the audio
        Which is leaving the sound card at this instant.
@@ -1375,7 +1381,9 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             frames = len / m_sourceBytesPerFrame;
         }
         else
+        {
             frames = 0;
+        }
     }
     m_lengthLastData = millisecondsFromFloat
         ((double)(len * 1000) / (m_sourceSampleRate * m_sourceBytesPerFrame));
@@ -1489,7 +1497,9 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             frames = m_srcData.output_frames_gen;
         }
         else if (m_processing)
+        {
             buffer = m_srcIn;
+        }
 
         /* we want the timecode of the last sample added but we are given the
            timecode of the first - add the time in ms that the frames added
@@ -1531,7 +1541,9 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                 m_pSoundStretch->putSamples((STST *)ABUF, (len - bdiff) / bpf);
             }
             else
+            {
                 m_pSoundStretch->putSamples((STST *)(WPOS), frames);
+            }
 
             int nFrames = m_pSoundStretch->numSamples();
             if (nFrames > frames)

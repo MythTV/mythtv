@@ -87,9 +87,13 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
         }
     }
     else if (m_passthruDevice.toLower() == "default")
+    {
         m_passthruDevice = m_mainDevice;
+    }
     else
+    {
         m_discreteDigital = true;
+    }
 
     InitSettings(settings);
     if (settings.m_init)

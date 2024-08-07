@@ -70,7 +70,9 @@ bool MetaIOWavPack::write(const QString &filename, MusicMetadata* mdata)
         tag->setItem(key, item);
     }
     else
+    {
         tag->removeItem("Album artist");
+    }
 
     saveTimeStamps();
     bool result = wpfile->save();

@@ -98,7 +98,9 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
             }
         }
         else
+        {
             return false;
+        }
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
 #ifndef _WIN32
@@ -179,7 +181,9 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
             retryCount=0;
         }
         else
+        {
             retryCount++;
+        }
         // This retry count of 6 means 3 seconds of waiting for
         // connection before aborting and starting a new connection attempt.
         if (retryCount > 6)

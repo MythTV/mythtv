@@ -70,7 +70,9 @@ BackendSelection::Decision BackendSelection::Prompt(
         mainStack->PopScreen(backendSettings, false);
     }
     else
+    {
         delete backendSettings;
+    }
 
     return ret;
 }
@@ -182,7 +184,9 @@ void BackendSelection::AddItem(DeviceLocation *dev)
         item->DisplayState(needPin ? "yes" : "no", "securitypin");
     }
     else
+    {
         m_mutex.unlock();
+    }
 }
 
 /**
@@ -373,7 +377,9 @@ void BackendSelection::PromptForPassword(void)
         popupStack->AddScreen(pwDialog);
     }
     else
+    {
         delete pwDialog;
+    }
 }
 
 void BackendSelection::Close(void)

@@ -219,7 +219,9 @@ void VideoScannerThread::run()
         gCoreContext->SendEvent(me);
     }
     else
+    {
         gCoreContext->SendMessage("VIDEO_LIST_NO_CHANGE");
+    }
 
     RunEpilog();
 }

@@ -1101,7 +1101,9 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
             metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_broadcaster, m_channel);
     }
     else
+    {
         metadataMap[prefix + "album"] = m_album;
+    }
 
     metadataMap[prefix + "title"] = m_title;
     metadataMap[prefix + "formattitle"] = FormatTitle();
@@ -1155,7 +1157,9 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
         metadataMap[prefix + "url"] = url.toString(QUrl::RemoveUserInfo);
     }
     else
+    {
         metadataMap[prefix + "url"] = m_filename;
+    }
 
     metadataMap[prefix + "logourl"] = m_logoUrl;
     metadataMap[prefix + "metadataformat"] = m_metaFormat;

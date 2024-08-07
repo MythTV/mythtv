@@ -777,8 +777,9 @@ void mpeg2_idct_add_mmxext (const int last, int16_t * const block,
 	mmxext_idct (block);
 	block_add (block, dest, stride);
 	block_zero (block);
-    } else
+    } else {
 	block_add_DC (block, dest, stride, CPU_MMXEXT);
+    }
 }
 
 
@@ -800,8 +801,9 @@ void mpeg2_idct_add_mmx (const int last, int16_t * const block,
 	mmx_idct (block);
 	block_add (block, dest, stride);
 	block_zero (block);
-    } else
+    } else {
 	block_add_DC (block, dest, stride, CPU_MMX);
+    }
 }
 
 

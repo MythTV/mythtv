@@ -248,7 +248,9 @@ void RSSSite::process(void)
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Data is not valid RSS-feed");
+    }
 
     emit finished(this);
 }

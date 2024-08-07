@@ -29,7 +29,9 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
         *m_custom = *other.m_custom;
     }
     else
+    {
         m_custom = nullptr;
+    }
 }
 
 AudioSettings::AudioSettings(
@@ -63,7 +65,9 @@ AudioSettings::AudioSettings(
         *this->m_custom = *custom;
     }
     else
+    {
         this->m_custom = nullptr;
+    }
 }
 
 AudioSettings::AudioSettings(

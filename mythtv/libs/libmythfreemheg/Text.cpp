@@ -652,9 +652,15 @@ void MHText::Redraw()
                         pCurrItem->m_colour = colourStack.Top();
                     }
                 }
-                else MHLOG(MHLogWarning, QString("Unknown text escape code 0x%1").arg(code,2,16));
+                else
+                {
+                    MHLOG(MHLogWarning, QString("Unknown text escape code 0x%1").arg(code,2,16));
+                }
             }
-            else MHLOG(MHLogWarning, QString("Unknown text escape code 0x%1").arg(code,2,16));
+            else
+            {
+                MHLOG(MHLogWarning, QString("Unknown text escape code 0x%1").arg(code,2,16));
+            }
         }
 
         else if (ch <= 0x1f)

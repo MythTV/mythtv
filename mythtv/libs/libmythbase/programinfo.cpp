@@ -1493,7 +1493,9 @@ uint propsValueFromString (const QString& name, const QMap<T,QString>& propNames
                 .arg(name, n));
         }
         else
+        {
             result |= bit;
+        }
     }
     return result;
 }

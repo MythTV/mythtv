@@ -181,7 +181,9 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                         QString("Detected MediaType ") + MediaTypeString());
             }
             else
+            {
                 onDeviceUnmounted();
+            }
 
             return true;
         }
@@ -201,7 +203,9 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                     QString("Detected MediaType ") + MediaTypeString());
         }
         else
+        {
             onDeviceUnmounted();
+        }
 
         return true;
     }

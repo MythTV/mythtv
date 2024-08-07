@@ -75,7 +75,9 @@ public:
                 MediaMonitor::GetMediaMonitor()->EjectMedia(m_media->getDevicePath());
             }
             else
+            {
                 LOG(VB_MEDIA, LOG_DEBUG, LOC + QString("Unlocked '%1'").arg(m_name));
+            }
 
             MediaMonitor::GetMediaMonitor()->Unlock(m_media);
             m_media = nullptr;
@@ -2336,7 +2338,9 @@ QString ImageManagerFe::LongDateOf(const ImagePtrK& im)
         format |= MythDate::kTime;
     }
     else
+    {
         secs = im->m_modTime;
+    }
 
     return MythDate::toString(QDateTime::fromSecsSinceEpoch(secs.count()), format);
 }
@@ -2490,7 +2494,9 @@ void ImageManagerFe::DeviceEvent(MythMediaEvent *event)
             ScanImagesAction(true, true);
         }
         else
+        {
             monitor->Unlock(dev);
+        }
         return;
     }
 

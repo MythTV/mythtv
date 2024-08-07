@@ -187,7 +187,9 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
         musicbrainz->setText(MYTH_MUSICBRAINZ_ALBUMARTIST_UUID);
     }
     else if (musicbrainz)
+    {
         tag->removeFrame(musicbrainz);
+    }
 
     // Compilation Artist Frame (TPE4/2)
     if (!mdata->CompilationArtist().isEmpty())

@@ -1049,7 +1049,9 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
         }
     }
     else
+    {
         hoursShift = m_timezoneOffsets.value(tmpTimezone, 0);
+    }
 
     if (tmp.at(0).size() == 1)
         tmp[0].prepend("0");

@@ -221,8 +221,10 @@ void ThumbThread<DBFS>::run()
             }
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Unknown task %1").arg(task->m_action));
+        }
     }
 
     RunEpilog();
@@ -293,8 +295,10 @@ QString ThumbThread<DBFS>::CreateThumbnail(const ImagePtrK &im, int thumbPriorit
             return QString("Failed to open preview %1").arg(im->m_thumbPath);
     }
     else
+    {
         return QString("Can't create thumbnail for type %1 (image %2)")
                 .arg(im->m_type).arg(imagePath);
+    }
 
     // Compensate for any Qt auto-orientation
     int orientBy = Orientation(im->m_orientation)

@@ -100,7 +100,9 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
                     *(( QJsonObject *)pParam) = doc.object();
             }
             else
+            {
                 throw QString("Invalid JSON: %1").arg(sValue);
+            }
 
             break;
         }

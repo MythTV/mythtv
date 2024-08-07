@@ -59,7 +59,9 @@ void DeleteThread::run(void)
         m_files.clear();
     }
     else
+    {
         LOG(VB_FILE, LOG_DEBUG, "Delete thread self-terminating due to idle.");
+    }
 
     RunEpilog();
 }
@@ -156,7 +158,9 @@ void DeleteThread::ProcessNew(void)
                     handler->DeleteFailed();
                 }
                 else
+                {
                     handler->DeleteFailed();
+                }
 
                 handler->DecrRef();
                 continue;
@@ -238,7 +242,9 @@ void DeleteThread::ProcessOld(void)
             }
         }
         else
+        {
             handler->m_size = 0;
+        }
 
         if (handler->m_size == 0)
         {

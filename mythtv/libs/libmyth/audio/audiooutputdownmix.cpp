@@ -205,7 +205,9 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
         }
     }
     else
+    {
         return -1;
+    }
 
     return frames;
 }

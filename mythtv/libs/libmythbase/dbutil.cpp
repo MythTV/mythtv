@@ -765,7 +765,9 @@ bool DBUtil::QueryDBMSVersion(void)
             dbmsVersion.clear();
         }
         else
+        {
             dbmsVersion = query.value(0).toString();
+        }
     }
     m_versionString = dbmsVersion;
 

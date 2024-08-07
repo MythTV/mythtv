@@ -191,7 +191,9 @@ bool LanguageSelection::prompt(bool force)
             mainStack->PopScreen(langSettings, false);
         }
         else
+        {
             delete langSettings;
+        }
     }
 
     return m_languageChanged;

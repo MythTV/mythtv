@@ -318,7 +318,9 @@ void LCD::ReadyRead(void)
             QString("last command: %1").arg(m_lastCommand));
     }
     else if (aList[0] == "KEY")
+    {
         handleKeyPress(aList.last().trimmed());
+    }
 }
 
 void LCD::handleKeyPress(const QString &keyPressed)

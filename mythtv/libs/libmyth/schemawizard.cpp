@@ -429,8 +429,10 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
                       .arg(fileName, dirName);
         }
         else
+        {
             message = tr("This cannot be un-done, so having a"
                          " database backup would be a good idea.");
+        }
         if (connections)
             message += "\n\n" + warnOtherCl;
 

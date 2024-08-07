@@ -207,10 +207,14 @@ void MythSystemLegacyIOHandler::HandleWrite(int fd, QBuffer *buff)
             BuildFDs();
         }
         else
+        {
             buff->seek(pos);
+        }
     }
     else if( rlen != len )
+    {
         buff->seek(pos+rlen);
+    }
 }
 
 void MythSystemLegacyIOHandler::insert(int fd, QBuffer *buff)
@@ -685,9 +689,13 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
 
         // handle quotes and escape characters
         else if (quote == *i)
+        {
             quoted = true;
+        }
         else if (hardquote == *i)
+        {
             hardquoted = true;
+        }
         else if (escape == *i)
         {
             escaped = true;
@@ -701,8 +709,10 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
         }
 
         else
+        {
             // pass everything else
             tmp += *i;
+        }
 
         // step forward to next character
         ++i;

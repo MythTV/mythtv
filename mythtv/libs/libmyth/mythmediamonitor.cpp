@@ -741,8 +741,10 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
         delete e;
     }
     else
+    {
         LOG(VB_MEDIA, LOG_INFO,
                  "Media status changed, but not sending event" + msg);
+    }
 
 
     if (stat == MEDIASTAT_OPEN || stat == MEDIASTAT_NODISK

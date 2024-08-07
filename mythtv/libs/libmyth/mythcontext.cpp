@@ -188,7 +188,9 @@ static void exec_program_tv_cb(const QString &cmd)
         s = s.replace(0, tokens[0].length() + 1, "");
     }
     else
+    {
         strlist << "LOCK_TUNER";
+    }
 
     gCoreContext->SendReceiveStringList(strlist);
     int cardid = strlist[0].toInt();
@@ -747,7 +749,9 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
                 m_loop->exec();
         }
         else
+        {
             delete ssd;
+        }
         SilenceDBerrors();
         EndTempWindow();
         accepted = true;
@@ -862,7 +866,9 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             startupState = st_start;
         }
         else
+        {
             startupState = st_dbAwake;
+        }
         if (attempts < 6)
             attempts = 6;
         if (!prompt)

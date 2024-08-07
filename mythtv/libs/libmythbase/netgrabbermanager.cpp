@@ -334,7 +334,9 @@ void Search::process()
         m_numIndex = Node.toElement().text().toUInt();
     }
     else
+    {
         m_numIndex = 0;
+    }
 
     Node = itemNode.namedItem(QString("nextpagetoken"));
     if (!Node.isNull())
@@ -342,7 +344,9 @@ void Search::process()
         m_nextPageToken = Node.toElement().text();
     }
     else
+    {
         m_nextPageToken = "";
+    }
 
     Node = itemNode.namedItem(QString("prevpagetoken"));
     if (!Node.isNull())
@@ -350,7 +354,9 @@ void Search::process()
         m_prevPageToken = Node.toElement().text();
     }
     else
+    {
         m_prevPageToken = "";
+    }
 }
 
 void Search::slotProcessSearchExit(uint exitcode)

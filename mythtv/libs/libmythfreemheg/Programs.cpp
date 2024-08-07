@@ -704,7 +704,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 // TODO Notify player
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
         else if (m_name.Equal("WAI"))   // WhoAmI
@@ -783,7 +786,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 // Nothing todo at present
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
         // InteractionChannelExtension
@@ -797,7 +803,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(ICstatus);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("RDa")) { // ReturnData
             if (args.Size() >= 3)
@@ -837,7 +846,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("SHF")) { // SetHybridFileSystem
             if (args.Size() == 2)
@@ -852,7 +864,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     .arg(str, str2));
                 SetSuccessFlag(success, false, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("PST")) { // PersistentStorageInfo
             if (args.Size() == 1)
@@ -860,7 +875,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(true);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("SCk")) { // SetCookie
             if (args.Size() == 4)
@@ -876,7 +894,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 MHLOG(MHLogNotifications, QString("NOTE SetCookie id=%1 MJD=%2 value=%3 secure=%4")
                     .arg(id).arg(iExpiry).arg(val).arg(bSecure) );
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("GCk")) { // GetCookie
             MHERROR("GetCookie ResidentProgram is not implemented");
@@ -897,7 +918,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(-1);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("PFG")) { // PromptForGuidance
             if (args.Size() == 2)
@@ -910,7 +934,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(true);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
 
         }
         else if (m_name.Equal("GAP") || // GetAudioDescPref
@@ -920,7 +947,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(false);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
         else if (m_name.Equal("GPS")) { // GetPINSupport
             if (args.Size() == 1)
@@ -931,7 +961,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(0);
                 SetSuccessFlag(success, true, engine);
             }
-            else SetSuccessFlag(success, false, engine);
+            else
+            {
+                SetSuccessFlag(success, false, engine);
+            }
         }
 
         // Undocumented functions

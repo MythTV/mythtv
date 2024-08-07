@@ -195,8 +195,10 @@ void ServerPool::SelectDefaultListen(bool force)
                 }
 
                 else
+                {
                     LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
                                 .arg(prettyip(ip)));
+                }
 
             }
             else
@@ -261,8 +263,10 @@ void ServerPool::SelectDefaultListen(bool force)
                 }
 
                 else
+                {
                     LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
                                 .arg(prettyip(ip)));
+                }
             }
         }
     }
@@ -686,7 +690,9 @@ void ServerPool::newTcpConnection(qintptr socket)
         emit newConnection(qsock);
     }
     else
+    {
         delete qsock;
+    }
 }
 
 void ServerPool::newUdpDatagram(void)

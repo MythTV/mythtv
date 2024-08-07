@@ -137,7 +137,9 @@ void MetaIO::readFromFilename(const QString &filename,
                 title = tracktitle_list[1].simplified();
             }
             else
+            {
                 title = part_str;
+            }
         }
         else if ( *fmt_it == "ARTIST_TITLE" )
         {

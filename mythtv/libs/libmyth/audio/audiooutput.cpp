@@ -213,10 +213,14 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
 #if defined(USING_OSS)
     else
+    {
         ret = new AudioOutputOSS(settings);
+    }
 #elif defined(Q_OS_DARWIN)
     else
+    {
         ret = new AudioOutputCA(settings);
+    }
 #endif
 
     if (!ret)
@@ -632,7 +636,9 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
         return ret;
     }
     else
+    {
         ret = pkt->size;
+    }
 
     if (!got_frame)
     {

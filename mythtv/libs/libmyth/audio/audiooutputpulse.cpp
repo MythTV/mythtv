@@ -91,7 +91,9 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
         pa_threaded_mainloop_wait(m_mainloop);
     }
     else
+    {
         VBERROR("Failed to determine default sink samplerate");
+    }
 
     pa_threaded_mainloop_unlock(m_mainloop);
 
@@ -274,8 +276,10 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
         }
     }
     else
+    {
         VBERROR(fn_log_tag + QString("stream state not good: %1")
                              .arg(sstate,0,16));
+    }
 }
 
 int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
@@ -519,7 +523,9 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                        (float)volume * (float)PA_VOLUME_NORM / 100.0F);
     }
     else
+    {
         pa_cvolume_reset(&m_volumeControl, m_channels);
+    }
 
     m_fragmentSize = (m_sampleRate * 25 * m_outputBytesPerFrame) / 1000;
 

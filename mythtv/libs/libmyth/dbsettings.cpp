@@ -156,7 +156,9 @@ void DatabaseSettings::Load(void)
         m_dbHostName->setValue(m_dbHostOverride);
     }
     else
+    {
         m_dbHostName->setValue(params.m_dbHostName);
+    }
 
     m_dbHostPing->setValue(params.m_dbHostPing);
 
