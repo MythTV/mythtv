@@ -26,7 +26,7 @@ void Histogram::generateFromImage(MythVideoFrame* frame, unsigned int frameWidth
     {
         for(unsigned int x = minScanX; x < maxScanX; x += XSpacing)
         {
-            m_data[framePtr[y * bytesPerLine + x]]++;
+            m_data[framePtr[(y * bytesPerLine) + x]]++;
             m_numberOfSamples++;
         }
     }

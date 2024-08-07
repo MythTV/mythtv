@@ -31,7 +31,7 @@ CannyEdgeDetector::CannyEdgeDetector(void)
 
     /* The SGM computations require that mask_radius >= 2. */
     m_maskRadius = std::max(2, (int)roundf(TRUNCATION * sigma));
-    int mask_width = 2 * m_maskRadius + 1;
+    int mask_width = (2 * m_maskRadius) + 1;
 
     /* Compute Gaussian mask. */
     m_mask = new double[mask_width];
@@ -80,8 +80,8 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         m_sgm = nullptr;
     }
 
-    const int   padded_width = newwidth + 2 * m_maskRadius;
-    const int   padded_height = newheight + 2 * m_maskRadius;
+    const int   padded_width = newwidth + (2 * m_maskRadius);
+    const int   padded_height = newheight + (2 * m_maskRadius);
 
     if (av_image_alloc(m_s1.data, m_s1.linesize,
         padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
@@ -154,7 +154,7 @@ CannyEdgeDetector::detectEdges(const AVFrame *pgm, int pgmheight,
      */
 
     const int   pgmwidth = pgm->linesize[0];
-    const int   padded_height = pgmheight + 2 * m_maskRadius;
+    const int   padded_height = pgmheight + (2 * m_maskRadius);
 
     if (resetBuffers(pgmwidth, pgmheight))
         return nullptr;

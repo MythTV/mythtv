@@ -3032,8 +3032,8 @@ MythMenu* PlaybackBox::createJobMenu()
         if (!add[i])
             continue;
 
-        QString stop_desc  = desc[i*2+0];
-        QString start_desc = desc[i*2+1];
+        QString stop_desc  = desc[(i*2)+0];
+        QString start_desc = desc[(i*2)+1];
 
         if (start_desc.toUInt())
         {
@@ -3049,7 +3049,7 @@ MythMenu* PlaybackBox::createJobMenu()
         MythMenu *submenu = ((kJobs[i] == JOB_TRANSCODE) && !running)
             ? createTranscodingProfilesMenu() : nullptr;
         menu->AddItem((running) ? stop_desc : start_desc,
-                      kMySlots[i * 2 + (running ? 0 : 1)], submenu);
+                      kMySlots[(i * 2) + (running ? 0 : 1)], submenu);
     }
 
     return menu;

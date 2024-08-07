@@ -174,7 +174,7 @@ bool JumpToChannel::Update(void)
         m_timer->start(kJumpToChannelTimeout);
 
         // rows_displayed to center
-        int start = i - m_rowsDisplayed/2;
+        int start = i - (m_rowsDisplayed/2);
         int cur   = m_rowsDisplayed/2;
         m_listener->GoTo(start, cur);
         return true;
@@ -512,7 +512,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
         startTime > m_originalStartTime.addSecs(-kEightHours))
         m_originalStartTime = startTime;
 
-    int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
+    int secsoffset = -(((m_originalStartTime.time().minute() % 30) * 60) +
                         m_originalStartTime.time().second());
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
     m_threadPool.setMaxThreadCount(1);

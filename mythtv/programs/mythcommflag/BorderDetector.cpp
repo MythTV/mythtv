@@ -154,7 +154,7 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
                             m_logoWidth, m_logoHeight))
                     continue;   /* Exclude logo area from analysis. */
 
-                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
                 int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
@@ -206,7 +206,7 @@ found_left:
                             m_logoWidth, m_logoHeight))
                     continue;   /* Exclude logo area from analysis. */
 
-                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
                 int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
@@ -259,7 +259,7 @@ found_right:
                             m_logoWidth, m_logoHeight))
                     continue;   /* Exclude logo area from analysis. */
 
-                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
                 int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {
@@ -308,7 +308,7 @@ found_top:
                             m_logoWidth, m_logoHeight))
                     continue;   /* Exclude logo area from analysis. */
 
-                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
                 int range = std::max(maxval, val) - std::min(minval, val) + 1;
                 if (range > kMaxRange)
                 {

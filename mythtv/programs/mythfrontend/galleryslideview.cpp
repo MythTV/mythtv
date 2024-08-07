@@ -579,7 +579,7 @@ void GallerySlideView::ShowSlide(int direction)
 void GallerySlideView::SlideAvailable(int count)
 {
     // Transition speed = 0.5x for every slide waiting. Min = 1x, Max = Half buffer size
-    float speed = 0.5 + count / 2.0;
+    float speed = 0.5 + (count / 2.0);
 
     // Are we transitioning ?
     if (m_transitioning)

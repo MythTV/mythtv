@@ -165,7 +165,7 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
                 if ((x > (m_width/4)) && (x < (m_width * 3 / 4)))
                     continue;
 
-                uint pos = y * m_width + x;
+                uint pos = (y * m_width) + x;
 
                 if (edgeCounts[pos].m_isEdge > (maxLoops * 0.66))
                 {
@@ -198,20 +198,20 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
             {
                 int neighbors = 0;
 
-                if (!m_edgeMask[y * m_width + x].m_isEdge)
+                if (!m_edgeMask[(y * m_width) + x].m_isEdge)
                     continue;
 
                 for (uint dy = y - 2; dy <= (y + 2); dy++ )
                 {
                     for (uint dx = x - 2; dx <= (x + 2); dx++ )
                     {
-                        if (m_edgeMask[dy * m_width + dx].m_isEdge)
+                        if (m_edgeMask[(dy * m_width) + dx].m_isEdge)
                             neighbors++;
                     }
                 }
 
                 if (neighbors < 5)
-                    m_edgeMask[y * m_width + x].m_isEdge = 0;
+                    m_edgeMask[(y * m_width) + x].m_isEdge = 0;
             }
         }
 
@@ -291,7 +291,7 @@ void ClassicLogoDetector::SetLogoMaskArea()
     {
         for (unsigned int x = 0; x < m_width; x++)
         {
-            if (m_edgeMask[y * m_width + x].m_isEdge)
+            if (m_edgeMask[(y * m_width) + x].m_isEdge)
             {
                 if (x < m_logoMinX)
                     m_logoMinX = x;
@@ -348,11 +348,11 @@ void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
         {
             if (fromCurrentFrame)
             {
-                std::cerr << scrPixels[framePtr[y * m_width + x] / 50];
+                std::cerr << scrPixels[framePtr[(y * m_width) + x] / 50];
             }
             else
             {
-                switch (m_logoMask[y * m_width + x])
+                switch (m_logoMask[(y * m_width) + x])
                 {
                         case 0:
                         case 2: std::cerr << " ";
@@ -389,10 +389,10 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
     {
         for (uint x = m_logoMinX; x <= m_logoMaxX; x++ )
         {
-            int pos1 = y * bytesPerLine + x;
-            int edgePos = y * m_width + x;
-            int pos2 = (y - radius) * bytesPerLine + x;
-            int pos3 = (y + radius) * bytesPerLine + x;
+            int pos1 = (y * bytesPerLine) + x;
+            int edgePos = (y * m_width) + x;
+            int pos2 = ((y - radius) * bytesPerLine) + x;
+            int pos3 = ((y + radius) * bytesPerLine) + x;
 
             int pixel = framePtr[pos1];
 
@@ -473,31 +473,31 @@ void ClassicLogoDetector::DetectEdges(MythVideoFrame *frame, EdgeMaskEntry *edge
                 )
                 continue;
 
-            uint pos = y * m_width + x;
-            uchar p = buf[y * bytesPerLine + x];
+            uint pos = (y * m_width) + x;
+            uchar p = buf[(y * bytesPerLine) + x];
 
-            if (( abs(buf[y * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
-                ( abs(buf[y * bytesPerLine + (x + r)] - p) >= edgeDiff))
+            if (( abs(buf[(y * bytesPerLine) + (x - r)] - p) >= edgeDiff) ||
+                ( abs(buf[(y * bytesPerLine) + (x + r)] - p) >= edgeDiff))
             {
                 edges[pos].m_horiz++;
                 edgeCount++;
             }
-            if (( abs(buf[(y - r) * bytesPerLine + x] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * bytesPerLine + x] - p) >= edgeDiff))
+            if (( abs(buf[((y - r) * bytesPerLine) + x] - p) >= edgeDiff) ||
+                ( abs(buf[((y + r) * bytesPerLine) + x] - p) >= edgeDiff))
             {
                 edges[pos].m_vert++;
                 edgeCount++;
             }
 
-            if (( abs(buf[(y - r) * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * bytesPerLine + (x + r)] - p) >= edgeDiff))
+            if (( abs(buf[((y - r) * bytesPerLine) + (x - r)] - p) >= edgeDiff) ||
+                ( abs(buf[((y + r) * bytesPerLine) + (x + r)] - p) >= edgeDiff))
             {
                 edges[pos].m_ldiag++;
                 edgeCount++;
             }
 
-            if (( abs(buf[(y - r) * bytesPerLine + (x + r)] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * bytesPerLine + (x - r)] - p) >= edgeDiff))
+            if (( abs(buf[((y - r) * bytesPerLine) + (x + r)] - p) >= edgeDiff) ||
+                ( abs(buf[((y + r) * bytesPerLine) + (x - r)] - p) >= edgeDiff))
             {
                 edges[pos].m_rdiag++;
                 edgeCount++;

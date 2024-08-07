@@ -77,8 +77,8 @@ pgm_scorepixels(unsigned int *scores, int width, int row, int col,
     {
         for (int cc = 0; cc < srcwidth; cc++)
         {
-            if (src->data[0][rr * srcwidth + cc])
-                scores[(row + rr) * width + col + cc]++;
+            if (src->data[0][(rr * srcwidth) + cc])
+                scores[((row + rr) * width) + col + cc]++;
         }
     }
 
@@ -104,7 +104,7 @@ bounding_score(const AVFrame *img, int row, int col, int width, int height)
     {
         for (int cc = col; cc < cc2; cc++)
         {
-            if (img->data[0][rr * imgwidth + cc])
+            if (img->data[0][(rr * imgwidth) + cc])
                 score++;
         }
     }
@@ -116,7 +116,7 @@ rowisempty(const AVFrame *img, int row, int col, int width)
 {
     const int   imgwidth = img->linesize[0];
     for (int cc = col; cc < col + width; cc++)
-        if (img->data[0][row * imgwidth + cc])
+        if (img->data[0][(row * imgwidth) + cc])
             return false;
     return true;
 }
@@ -126,7 +126,7 @@ colisempty(const AVFrame *img, int col, int row, int height)
 {
     const int   imgwidth = img->linesize[0];
     for (int rr = row; rr < row + height; rr++)
-        if (img->data[0][rr * imgwidth + col])
+        if (img->data[0][(rr * imgwidth) + col])
             return false;
     return true;
 }
@@ -942,8 +942,8 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
          */
         int excludewidth  = (int)(pgmwidth * kExcludeWidth);
         int excludeheight = (int)(pgmheight * kExcludeHeight);
-        int excluderow = (pgmheight - excludeheight) / 2 - croprow;
-        int excludecol = (pgmwidth - excludewidth) / 2 - cropcol;
+        int excluderow = ((pgmheight - excludeheight) / 2) - croprow;
+        int excludecol = ((pgmwidth - excludewidth) / 2) - cropcol;
         (void)m_edgeDetector->setExcludeArea(excluderow, excludecol,
                 excludewidth, excludeheight);
 

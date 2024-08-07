@@ -1798,7 +1798,7 @@ void LCDProcClient::dobigclock (void)
 
     // Add Hour 10's Digit
     aString = "widget_set Time d0 ";
-    aString += QString::number( m_lcdWidth/2 - 5 - xoffset) + " ";
+    aString += QString::number( (m_lcdWidth/2) - 5 - xoffset) + " ";
     if (toffset == 0)
         aString += "11";
     else
@@ -1807,25 +1807,25 @@ void LCDProcClient::dobigclock (void)
 
     // Add Hour 1's Digit
     aString = "widget_set Time d1 ";
-    aString += QString::number( m_lcdWidth/2 - 2 - xoffset) + " ";
+    aString += QString::number( (m_lcdWidth/2) - 2 - xoffset) + " ";
     aString += time.at(0 + toffset);
     sendToServer(aString);
 
     // Add the Colon
     aString = "widget_set Time sep ";
-    aString += QString::number( m_lcdWidth/2 + 1 - xoffset);
+    aString += QString::number( (m_lcdWidth/2) + 1 - xoffset);
     aString += " 10";   // 10 means: colon
     sendToServer(aString);
 
     // Add Minute 10's Digit
     aString = "widget_set Time d2 ";
-    aString += QString::number( m_lcdWidth/2 + 2 - xoffset) + " ";
+    aString += QString::number( (m_lcdWidth/2) + 2 - xoffset) + " ";
     aString += time.at(2 + toffset);
     sendToServer(aString);
 
     // Add Minute 1's Digit
     aString = "widget_set Time d3 ";
-    aString += QString::number( m_lcdWidth/2 + 5 - xoffset) + " ";
+    aString += QString::number( (m_lcdWidth/2) + 5 - xoffset) + " ";
     aString += time.at(3 + toffset);
     sendToServer(aString);
 

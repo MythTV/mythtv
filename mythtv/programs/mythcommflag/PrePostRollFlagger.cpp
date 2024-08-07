@@ -99,7 +99,7 @@ bool PrePostRollFlagger::go()
 
     emit breathe();
 
-    long long stopFrame = m_preRoll + m_fps * 120; //look up to 2 minutes past
+    long long stopFrame = m_preRoll + (m_fps * 120); //look up to 2 minutes past
     long long framesToProcess = 0;
     if(m_preRoll)
         framesToProcess += stopFrame;

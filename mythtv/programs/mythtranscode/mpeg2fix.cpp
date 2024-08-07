@@ -1915,7 +1915,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
                 .arg(GetFrameNum(spare)).arg(fname));
     }
     
-    inc2x33(&pkt->pts, ptsIncrement * GetNbFields(spare) / 2 + initPTS);
+    inc2x33(&pkt->pts, (ptsIncrement * GetNbFields(spare) / 2) + initPTS);
 
     index = m_vFrame.indexOf(spare) + 1;
     while (index < m_vFrame.count() &&
@@ -2157,7 +2157,7 @@ int MPEG2fixup::Start()
                      m_ptsIncrement * GetFrameNum(m_vFrame.first()));
     int64_t expectedvPTS = 300 * (udiff2x33(m_vFrame.first()->m_pkt->pts, initPTS) -
                          (m_ptsIncrement * GetFrameNum(m_vFrame.first())));
-    int64_t expectedDTS = expectedvPTS - 300 * m_ptsIncrement;
+    int64_t expectedDTS = expectedvPTS - (300 * m_ptsIncrement);
 
     if (m_discard)
     {

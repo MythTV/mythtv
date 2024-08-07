@@ -828,7 +828,7 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
         for(int x = m_commDetectBorder; x < (m_width - m_commDetectBorder);
                 x += m_horizSpacing)
         {
-            uchar pixel = framePtr[y * bytesPerLine + x];
+            uchar pixel = framePtr[(y * bytesPerLine) + x];
 
             if (m_commDetectMethod & COMM_DETECT_BLANKS)
             {
@@ -2250,7 +2250,7 @@ void ClassicCommDetector::DumpMap(frm_dir_map_t &map) const
         int flag = *it;
         int my_fps = (int)ceil(m_fps);
         long long hour = (frame / my_fps) / 60 / 60;
-        long long min = (frame / my_fps) / 60 - (hour * 60);
+        long long min = ((frame / my_fps) / 60) - (hour * 60);
         long long sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
         long long frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
                            (hour * 60 * 60 * my_fps));

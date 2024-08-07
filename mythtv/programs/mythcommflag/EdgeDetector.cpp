@@ -44,11 +44,11 @@ sgm_init_exclude(unsigned int *sgm, const AVFrame *src, int srcheight,
             if (!rrccinrect(rr, cc, excluderow, excludecol,
                         excludewidth, excludeheight))
             {
-                uchar *rr0 = &src->data[0][rr * srcwidth + cc];
-                uchar *rr1 = &src->data[0][(rr + 1) * srcwidth + cc];
+                uchar *rr0 = &src->data[0][(rr * srcwidth) + cc];
+                uchar *rr1 = &src->data[0][((rr + 1) * srcwidth) + cc];
                 int dx = rr1[1] - rr0[0];   /* southeast - northwest */
                 int dy = rr1[0] - rr0[1];   /* southwest - northeast */
-                sgm[rr * srcwidth + cc] = dx * dx + dy * dy;
+                sgm[(rr * srcwidth) + cc] = dx * dx + dy * dy;
             }
         }
     }
@@ -103,7 +103,7 @@ edge_mark(AVFrame *dst, int dstheight,
             if (!rrccinrect(rr, cc, excluderow, excludecol,
                         excludewidth, excludeheight))
             {
-                sgmsorted[nn++] = sgm[(extratop + rr) * padded_width +
+                sgmsorted[nn++] = sgm[((extratop + rr) * padded_width) +
                     extraleft + cc];
             }
         }
@@ -164,9 +164,9 @@ edge_mark(AVFrame *dst, int dstheight,
         {
             if (!rrccinrect(rr, cc, excluderow, excludecol,
                         excludewidth, excludeheight) &&
-                    sgm[(extratop + rr) * padded_width + extraleft + cc] >=
+                    sgm[((extratop + rr) * padded_width) + extraleft + cc] >=
                         thresholdval)
-                dst->data[0][rr * dstwidth + cc] = UCHAR_MAX;
+                dst->data[0][(rr * dstwidth) + cc] = UCHAR_MAX;
         }
     }
     return 0;

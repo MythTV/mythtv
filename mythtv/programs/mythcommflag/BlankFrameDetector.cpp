@@ -241,7 +241,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
     {
         long long brkb = iiblank.key();
         long long iilen = *iiblank;
-        long long start = brkb + iilen / 2;
+        long long start = brkb + (iilen / 2);
 
         for (const auto& type : kBreakType)
         {
@@ -251,7 +251,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             {
                 long long brke = jjblank.key();
                 long long jjlen = *jjblank;
-                long long end = brke + jjlen / 2;
+                long long end = brke + (jjlen / 2);
 
                 auto testlen = std::chrono::seconds(lroundf((end - start) / fps));
                 if (testlen > type.m_len + type.m_delta)

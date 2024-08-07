@@ -256,7 +256,7 @@ static void writeout_video(multiplex_t *mx)
 	}
 		if (mx->VBR) {
 			mx->extra_clock = ptsdiff(viu->dts + mx->video_delay, 
-						  mx->SCR + 500*CLOCK_MS);
+						  mx->SCR + (500*CLOCK_MS));
 #ifdef OUT_DEBUG1
 			LOG(VB_GENERAL, LOG_DEBUG,
 			    QString("EXTRACLOCK2: %1 %2 %3")
@@ -516,7 +516,7 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 #endif
 		
 		if (mx->extra_clock > 0.0) {
-			int64_t d = mx->extra_clock/ mx->SCRinc - 1;
+			int64_t d = (mx->extra_clock / mx->SCRinc) - 1;
 			if (d > 0)
 				mx->extra_clock = d*mx->SCRinc;
 			else
@@ -527,10 +527,10 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 			int64_t temp_scr = mx->extra_clock;
 			
 			for (int i=0; i<mx->extcnt; i++){
-				if (ptscmp(mx->SCR + temp_scr + 100*CLOCK_MS, 
+				if (ptscmp(mx->SCR + temp_scr + (100*CLOCK_MS),
 					   mx->ext[i].iu.pts) > 0) {
 					while (ptscmp(mx->SCR + temp_scr 
-						      + 100*CLOCK_MS,
+						      + (100*CLOCK_MS),
 						      mx->ext[i].iu.pts) > 0) 
 						temp_scr -= mx->SCRinc;
 					temp_scr += mx->SCRinc;
@@ -552,7 +552,7 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 		dummy_delete(&mx->ext[i].dbuf, mx->SCR);
 	
 	if (dummy_space(&mx->vdbuf) > mx->vsize && mx->viu.length > 0 &&
-	    (ptscmp(mx->viu.dts + mx->video_delay, 500*CLOCK_MS +mx->oldSCR)<0)
+	    (ptscmp(mx->viu.dts + mx->video_delay, (500*CLOCK_MS) +mx->oldSCR)<0)
 	    && ring_avail(mx->index_vrbuffer)){
 		*video_ok = 1;
                 set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
@@ -561,7 +561,7 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 	for (int i = 0; i < mx->extcnt; i++){
 		if (dummy_space(&mx->ext[i].dbuf) > mx->extsize && 
 		    mx->ext[i].iu.length > 0 &&
-		    ptscmp(mx->ext[i].pts, 500*CLOCK_MS + mx->oldSCR) < 0
+		    ptscmp(mx->ext[i].pts, (500*CLOCK_MS) + mx->oldSCR) < 0
 		    && ring_avail(&mx->index_extrbuffer[i])){
 			ext_ok[i] = true;
                         set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
@@ -670,7 +670,7 @@ static int get_ts_video_overhead(int pktsize, sequence_t *seq)
 	int pktdata = pktsize - TS_HEADER_MIN;
 	uint32_t framesize = seq->bit_rate * 50 / seq->frame_rate; //avg bytes/frame
 	uint32_t numpkt = (framesize + PES_H_MIN + 10 + pktdata -1) / pktdata;
-	return pktsize- ((pktsize * numpkt) - framesize + numpkt - 1) / numpkt;
+	return pktsize - (((pktsize * numpkt) - framesize + numpkt - 1) / numpkt);
 }
 
 static int get_ts_ext_overhead(int pktsize, audio_frame_t *extframe,

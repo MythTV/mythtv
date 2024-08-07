@@ -63,7 +63,7 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
     {
         for (int cc = 0; cc < width; cc++)
         {
-            if (!tmpl->data[0][rr * width + cc])
+            if (!tmpl->data[0][(rr * width) + cc])
                 continue;
 
             int r2min = std::max(0, rr - radius);
@@ -76,7 +76,7 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
             {
                 for (int c2 = c2min; c2 <= c2max; c2++)
                 {
-                    if (test->data[0][r2 * width + c2])
+                    if (test->data[0][(r2 * width) + c2])
                     {
                         score++;
                         goto next_pixel;
@@ -263,11 +263,11 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
 
     int local_minimum = matchstart;
     uint maxdelta = 0;
-    for (int matchcnt = matchstart + leftwidth + middlewidth / 2;
+    for (int matchcnt = matchstart + leftwidth + (middlewidth / 2);
             matchcnt < matchend - rightwidth - middlewidth / 2;
             matchcnt++)
     {
-        ushort p0 = matchcnt - leftwidth - middlewidth / 2;
+        ushort p0 = matchcnt - leftwidth - (middlewidth / 2);
         ushort p1 = p0 + leftwidth;
         ushort p2 = p1 + middlewidth;
         ushort p3 = p2 + rightwidth;
