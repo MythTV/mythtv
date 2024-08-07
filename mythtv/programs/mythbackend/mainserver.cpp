@@ -2632,6 +2632,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     int fd = -1;
     QString linktext = "";
     QByteArray fname = filename.toLocal8Bit();
+    int open_errno {0};
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("About to unlink/delete file: '%1'")
@@ -2652,6 +2653,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
         else
         {
             fd = OpenAndUnlink(linktext);
+            open_errno = errno;
             if (fd >= 0)
                 unlink(fname.constData());
         }
@@ -2659,6 +2661,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     else if (!finfo.isSymLink())
     {
         fd = OpenAndUnlink(filename);
+        open_errno = errno;
     }
     else // just delete symlinks immediately
     {
@@ -2667,7 +2670,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
             return -2; // valid result, not an error condition
     }
 
-    if (fd < 0 && errno != EISDIR)
+    if (fd < 0 && open_errno != EISDIR)
         LOG(VB_GENERAL, LOG_ERR, LOC + errmsg + ENO);
 
     return fd;
