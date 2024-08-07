@@ -117,7 +117,9 @@ conv2latin(unsigned char *p, int n, int lang)
                *p = lang_chars[lang + 1][lang_char[c]];
        }
        else if ((c & 0xe8) == 0)
+       {
            gfx = c & 0x10;
+       }
        p++;
     }
 }
@@ -140,7 +142,9 @@ add_enhance(struct enhance *eh, int dcode, std::array<unsigned int,13>& data)
        eh->next_des++;
     }
     else
+    {
        eh->next_des = -1;
+    }
 }
 
 void

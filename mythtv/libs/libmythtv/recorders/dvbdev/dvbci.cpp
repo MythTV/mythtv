@@ -303,8 +303,9 @@ cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t 
             m_data[5] = Data[0];
             m_size = 6;
             }
-         else
+         else {
             esyslog("ERROR: illegal data length for TPDU tag 0x%02X: %d", Tag, Length);
+         }
          break;
     case T_DATA_LAST:
     case T_DATA_MORE:
@@ -316,8 +317,9 @@ cTPDU::cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length, const uint8_t 
                memcpy(p, Data, Length);
             m_size = Length + (p - m_data.data());
             }
-         else
+         else {
             esyslog("ERROR: illegal data length for TPDU tag 0x%02X: %d", Tag, Length);
+         }
          break;
     default:
          esyslog("ERROR: unknown TPDU tag: 0x%02X", Tag);
@@ -1340,8 +1342,9 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                         if (!m_menu->AddEntry(s))
                            free(s);
                         }
-                     else
+                     else {
                         break;
+                        }
                      }
                }
             }
@@ -1620,10 +1623,14 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
                         " Caps.slot_type=%i", Caps.slot_type);
             }
             else
+            {
                 esyslog("ERROR: no CAM slots found");
+            }
         }
         else
+        {
             LOG_ERROR_STR(FileName);
+        }
         close(fd_ca);
     }
     return nullptr;
@@ -1780,7 +1787,9 @@ bool cLlCiHandler::Process(void)
                                 }
                             }
                             else
+                            {
                                 esyslog("ERROR: unknown session id: %d", SessionId);
+                            }
                         }
                         break;
 

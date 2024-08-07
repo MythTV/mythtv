@@ -1037,7 +1037,9 @@ class VideoCompressionSettings : public GroupSetting
                                              "medium_mpegbitratemode"));
                             }
                             else
+                            {
                                 bit_low->addChild(new BitrateMode(m_parent));
+                            }
                         }
                         else if (option.m_category == DriverOption::VIDEO_BITRATE)
                         {
@@ -1146,9 +1148,13 @@ class VideoCompressionSettings : public GroupSetting
                     m_codecName->addSelection(codec);
             }
             else if (groupType == "MPEG")
+            {
                m_codecName->addSelection("MPEG-2 Hardware Encoder");
+            }
             else if (groupType == "MJPEG")
+            {
                 m_codecName->addSelection("Hardware MJPEG");
+            }
             else if (groupType == "GO7007")
             {
                 m_codecName->addSelection("MPEG-4");
@@ -1404,7 +1410,9 @@ RecordingProfile::RecordingProfile(const QString& profName)
             addChild(m_trResize);
         }
         else
+        {
             addChild(new AutoTranscode(*this));
+        }
     }
     else
     {

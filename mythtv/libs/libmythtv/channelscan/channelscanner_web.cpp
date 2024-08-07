@@ -159,23 +159,41 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         }
     }
     else if (ScanType == "VBOXIMPORT")
+    {
         nScanType = ScanTypeSetting::VBoxImport;
+    }
     else if (ScanType == "HDHRIMPORT")
+    {
         nScanType = ScanTypeSetting::HDHRImport;
+    }
     else if (ScanType == "MPTSIMPORT")
+    {
         nScanType = ScanTypeSetting::IPTVImportMPTS;
+    }
     else if (ScanType == "M3UIMPORT")
+    {
         nScanType = ScanTypeSetting::IPTVImport;
+    }
     else if (ScanType == "ASI" || ScanType == "MPTS")
+    {
         nScanType = ScanTypeSetting::CurrentTransportScan;
+    }
     else if (ScanType == "EXTIMPORT")
+    {
         nScanType = ScanTypeSetting::ExternRecImport;
+    }
     else if (ScanType == "IMPORT")
+    {
         nScanType = ScanTypeSetting::ExistingScanImport;
+    }
     else if (ScanType == "ALLTRANSPORT")
+    {
         nScanType = ScanTypeSetting::FullTransportScan;
+    }
     else if (ScanType == "ONETRANSPORT")
+    {
         nScanType = ScanTypeSetting::TransportScan;
+    }
 
     if (nScanType == -99)
     {
@@ -333,7 +351,9 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
         ImportExternRecorder(cardid, inputname, sourceid);
     }
     else if (nScanType == ScanTypeSetting::IPTVImportMPTS)
+    {
         ImportM3U(cardid, inputname, sourceid, true);
+    }
     else
     {
         Scan(
@@ -491,21 +511,37 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
 
     }
     else if (type == ScannerEvent::kAppendTextToLog)
+    {
         log(scanEvent->strValue());
+    }
     else if (type == ScannerEvent::kSetStatusText)
+    {
         m_statusText = scanEvent->strValue();
+    }
     else if (type == ScannerEvent::kSetPercentComplete)
+    {
         m_statusProgress = scanEvent->intValue();
+    }
     else if (type == ScannerEvent::kSetStatusSignalLock)
+    {
         m_statusLock = scanEvent->boolValue();
+    }
     else if (type == ScannerEvent::kSetStatusSignalToNoise)
+    {
         m_statusSnr = scanEvent->intValue() * 100 / 65535;
+    }
     else if (type == ScannerEvent::kSetStatusTitleText)
+    {
         m_statusTitleText = scanEvent->strValue();
+    }
     else if (type == ScannerEvent::kSetStatusRotorPosition)
+    {
         m_statusRotorPosition = scanEvent->intValue();
+    }
     else if (type == ScannerEvent::kSetStatusSignalStrength)
+    {
         m_statusSignalStrength = scanEvent->intValue() * 100 / 65535;
+    }
 
     QString msg;
     if (VERBOSE_LEVEL_NONE() || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))

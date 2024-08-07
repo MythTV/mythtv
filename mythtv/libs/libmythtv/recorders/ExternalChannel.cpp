@@ -109,7 +109,9 @@ bool ExternalChannel::Tune(const QString &channum)
             m_tuneTimeout = 60s;
         }
         else
+        {
             m_tuneTimeout = std::chrono::milliseconds(result.split(":")[1].toInt());
+        }
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Using Tune timeout of %1ms")
             .arg(m_tuneTimeout.count()));

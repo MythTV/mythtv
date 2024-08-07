@@ -452,7 +452,9 @@ bool RemoteGetRecordingStatus(
             dtEnd       = progInfo.GetScheduledEndTime();
         }
         else if (!list_inactive)
+        {
             continue;
+        }
 
         if (tunerList)
         {

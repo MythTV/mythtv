@@ -613,7 +613,9 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
             strEnd = "!";
         }
         else
+        {
             strEnd.clear();
+        }
     }
 
     if (!strListEnd.empty())
@@ -953,7 +955,9 @@ void EITFixUp::FixUK(DBEventEIT &event)
                     }
                 }
                 else
+                {
                     SetUKSubtitle(event);
+                }
             }
         }
     }

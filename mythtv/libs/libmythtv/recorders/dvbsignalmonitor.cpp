@@ -327,7 +327,9 @@ void DVBSignalMonitor::UpdateValues(void)
             m_streamHandler->RetuneMonitor();
         }
         else
+        {
             RemoveFlags(SignalMonitor::kDVBSigMon_WaitForPos);
+        }
     }
 
     bool wasLocked = false;

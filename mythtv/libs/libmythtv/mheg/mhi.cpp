@@ -952,9 +952,13 @@ int MHIContext::GetChannelIndex(const QString &str)
                 nResult = query.value(0).toInt();
         }
         else if (str == "rec://svc/cur")
+        {
             nResult = m_currentStream > 0 ? m_currentStream : m_currentChannel;
+        }
         else if (str == "rec://svc/def")
+        {
             nResult = m_currentChannel;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_WARNING,

@@ -62,28 +62,46 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
             InformUser(error);
         }
         else if (!transports.empty())
+        {
             Process(transports);
+        }
 
         m_done = true;
         QCoreApplication::exit(0);
     }
     else if (scanEvent->type() == ScannerEvent::kAppendTextToLog)
+    {
         m_statusLastLog = scanEvent->strValue();
+    }
     else if (scanEvent->type() == ScannerEvent::kSetStatusText)
+    {
         m_statusText = scanEvent->strValue();
+    }
     else if (scanEvent->type() == ScannerEvent::kSetPercentComplete)
+    {
         m_statusComplete = scanEvent->intValue();
+    }
     else if (scanEvent->type() == ScannerEvent::kSetStatusSignalLock)
+    {
         m_statusLock = scanEvent->boolValue();
+    }
     else if (scanEvent->type() == ScannerEvent::kSetStatusSignalToNoise)
+    {
         m_statusSnr = scanEvent->intValue() / 65535.0;
+}
 #if 0 // THESE_ARE_CURRENTLY_IGNORED
-    else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
+    else if (scanEvent->type() == ScannerEvent::kSetStatusTitleText)
+    {
         ;
-    else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
+    }
+    else if (scanEvent->type() == ScannerEvent::kSetStatusRotorPosition)
+    {
         ;
-    else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
+    }
+    else if (scanEvent->type() == ScannerEvent::kSetStatusSignalStrength)
+    {
         ;
+    }
 #endif
 
     //cout<<"HERE<"<<verboseMask<<">"<<endl;

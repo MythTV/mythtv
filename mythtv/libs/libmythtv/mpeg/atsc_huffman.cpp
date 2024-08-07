@@ -2257,7 +2257,9 @@ QString atsc_huffman1_to_string(const unsigned char *compressed,
             node = 0;
         }
         else
+        {
             node = val;
+        }
         bit++;
     }
     /* If you get here something went wrong so just return a blank string */

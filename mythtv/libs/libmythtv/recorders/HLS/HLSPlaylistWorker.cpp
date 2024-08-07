@@ -113,11 +113,17 @@ void HLSPlaylistWorker::run(void)
                 delay = 0.5;
             }
             else if (m_parent->PlaylistRetryCount() == 1)
+            {
                 delay = 0.5;
+            }
             else if (m_parent->PlaylistRetryCount() == 2)
+            {
                 delay = 1;
+            }
             else
+            {
                 delay = 2;
+            }
         }
 
         // When should the playlist be reloaded

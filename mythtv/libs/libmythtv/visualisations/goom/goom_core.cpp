@@ -405,7 +405,10 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 				s_rndn = iRAND(STATES_RANGEMAX);
 				s_blocker = 3;
 			}
-			else if (s_blocker) s_blocker--;
+			else if (s_blocker)
+			{
+			    s_blocker--;
+			}
 
                         (void)s_rndn; // Used in the lambda. Quiet warning.
                         auto goodstate = [&](auto state)
@@ -648,7 +651,9 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			s_nombreCddc = 0;
 		}
 		else
+		{
 			s_nombreCddc++;
+		}
 	}
 
 #ifdef VERBOSE
@@ -752,7 +757,9 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	}
 	else
 		if ((cycle%80==0)&&(iRAND(5)==0)&&s_lineMode)
+		{
 			s_lineMode--;
+		}
 
 	if ((cycle % 120 == 0)
 			&& (iRAND (4) == 0)

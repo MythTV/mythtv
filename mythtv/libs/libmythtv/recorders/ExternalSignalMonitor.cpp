@@ -53,7 +53,9 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
             ExternalStreamHandler::Return(m_streamHandler, m_inputid);
     }
     else
+    {
         m_lockTimeout = GetLockTimeout();
+    }
 
     ExternalChannel *channel = GetExternalChannel();
     if (channel && channel->IsBackgroundTuning())

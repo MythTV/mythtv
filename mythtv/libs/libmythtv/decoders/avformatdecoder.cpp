@@ -2195,7 +2195,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     channels = m_ringBuffer->DVD()->GetNumAudioChannels(logical_stream_id);
                 }
                 else
+                {
                     logical_stream_id = m_ic->streams[strm]->id;
+                }
 
                 if (logical_stream_id == -1)
                 {
@@ -2668,7 +2670,9 @@ void AvFormatDecoder::RemoveAudioStreams()
             i--;
         }
         else
+        {
             i++;
+        }
     }
     m_avCodecLock.unlock();
 }
@@ -3635,7 +3639,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         pts = millisecondsFromFloat(av_q2d(Stream->time_base) * av_pts * 1000);
     }
     else
+    {
         pts = millisecondsFromFloat(av_q2d(Stream->time_base) * AvFrame->reordered_opaque * 1000);
+    }
 
     std::chrono::milliseconds temppts = pts;
     // Validate the video pts against the last pts. If it's

@@ -226,7 +226,9 @@ void V4L2encStreamHandler::run(void)
                     m_failing = true;
                 }
                 else
+                {
                     gap = true;
+                }
             }
 
             RestartEncoding();
@@ -589,7 +591,9 @@ bool V4L2encStreamHandler::StartEncoding(void)
         }
     }
     else
+    {
         LOG(VB_RECORD, LOG_INFO, LOC + "Already encoding");
+    }
 
     QMutexLocker listen_lock(&m_listenerLock);
 
@@ -773,13 +777,21 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
         }
     }
     else if (opt == "mpeg2audvolume")
+    {
         m_audioVolume = value;
+    }
     else if (opt == "low_mpegbitratemode")
+    {
         m_lowBitrateMode = value;
+    }
     else if (opt == "medium_mpegbitratemode")
+    {
         m_mediumBitrateMode = value;
+    }
     else if (opt == "high_mpegbitratemode")
+    {
         m_highBitrateMode = value;
+    }
     else if (opt.endsWith("avgbitrate"))
     {
         if (opt.startsWith("low"))
@@ -803,7 +815,9 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
             return false;
     }
     else
+    {
         return false;
+    }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetOption('%1', %2) -- success")
         .arg(opt).arg(value));
@@ -899,7 +913,9 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, const QString &value)
         }
     }
     else
+    {
         return false;
+    }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetOption('%1', '%2') -- success")
         .arg(opt, value));

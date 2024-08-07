@@ -116,7 +116,9 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
         recFile->Save();
     }
     else
+    {
         m_curRecording = nullptr;
+    }
 
     delete oldrec;
 }
@@ -165,7 +167,9 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
             SetFrameRate(29.97);
         }
         else if (value.toLower() == "pal-m")
+        {
             SetFrameRate(29.97);
+        }
         else if (value.toLower() == "atsc")
         {
             // Here we set the TV format values for ATSC. ATSC isn't really
@@ -179,7 +183,9 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
             SetFrameRate(29.97);
         }
         else
+        {
             SetFrameRate(25.00);
+        }
     }
     else
     {
@@ -481,7 +487,9 @@ void RecorderBase::FinishRecording(void)
             recFile->Save();
         }
         else
+        {
             LOG(VB_GENERAL, LOG_CRIT, "RecordingFile object is NULL. No video file metadata can be stored");
+        }
 
         SavePositionMap(true, true); // Save Position Map only, not file size
 

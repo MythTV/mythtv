@@ -156,7 +156,9 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, std::chrono::milliseconds ti
         }
     }
     else
+    {
         m_errCnt = 0;
+    }
 
     if (len == 0)
         return 0;
@@ -713,7 +715,9 @@ void ExternalStreamHandler::run(void)
             }
         }
         else
+        {
             read_len = 0;
+        }
 
         if (read_len == 0)
         {
@@ -828,7 +832,9 @@ void ExternalStreamHandler::run(void)
             good_data = (len != 0U);
         }
         else if (len == remainder)
+        {
             good_data = false;
+        }
 
         if (good_data)
         {
@@ -1159,7 +1165,9 @@ bool ExternalStreamHandler::StartStreaming(void)
         LOG(VB_RECORD, LOG_INFO, LOC + "Streaming started");
     }
     else
+    {
         LOG(VB_RECORD, LOG_INFO, LOC + "Already streaming");
+    }
 
     m_streamingCnt.ref();
 
@@ -1696,7 +1704,9 @@ bool ExternalStreamHandler::CheckForError(void)
                     err |= tokens[idx].startsWith("ERR");
             }
             else
+            {
                 err |= result.startsWith("STATUS:ERR");
+            }
 
             LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + result);
         }

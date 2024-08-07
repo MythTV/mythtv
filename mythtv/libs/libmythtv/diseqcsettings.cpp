@@ -470,7 +470,9 @@ static double AngleToFloat(const QString &angle, bool translated = true)
         }
     }
     else
+    {
         pos = angle.toDouble();
+    }
 
     return pos;
 }
@@ -1110,7 +1112,9 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
             AddDeviceTypeSetting(devtype, parent, childnum, parentSetting);
         }
         else
+        {
             delete devtype;
+        }
     }
     else
     {
@@ -1188,7 +1192,9 @@ void DeviceTree::ValueChanged(const QString &value,
             devtype->SetDevice(dev);
         }
         else
+        {
             delete dev;
+        }
     }
 
     emit settingsChanged(this);

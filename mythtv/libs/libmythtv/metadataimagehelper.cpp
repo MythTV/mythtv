@@ -43,7 +43,9 @@ ArtworkMap GetArtwork(const QString& inetref,
             querystring += "ORDER BY season = :SEASON DESC, season DESC;";
         }
         else
+        {
             querystring += "ORDER BY season DESC;";
+        }
     }
 
     query.prepare(querystring);

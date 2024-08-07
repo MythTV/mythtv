@@ -287,7 +287,9 @@ ProgramInfo *TVRec::GetRecording(void)
         tmppginfo->SetRecordingStatus(RecStatus::Recording);
     }
     else
+    {
         tmppginfo = new ProgramInfo();
+    }
     tmppginfo->SetInputID(m_inputId);
 
     return tmppginfo;
@@ -1434,7 +1436,9 @@ void TVRec::run(void)
                         gCoreContext->dispatch(me);
                     }
                     else
+                    {
                         ChangeState(kState_None);
+                    }
                 }
             }
         }
@@ -1481,7 +1485,9 @@ void TVRec::run(void)
                 }
             }
             else
+            {
                 enable_ui = false;
+            }
 
             if (enable_ui)
             {
@@ -4251,8 +4257,10 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
             SetFlags(kFlagRingBufferReady, __FILE__, __LINE__);
         }
         else
+        {
             ok = SwitchLiveTVRingBuffer(m_channel->GetChannelName(),
                                         true, !had_dummyrec && m_recorder);
+        }
         if (!ok)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create RingBuffer 2");

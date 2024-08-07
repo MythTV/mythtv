@@ -182,11 +182,17 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
             m_maxQuality = 1;
     }
     else if (opt == "mpeg4minquality")
+    {
         m_minQuality = value;
+    }
     else if (opt == "mpeg4qualdiff")
+    {
         m_qualDiff = value;
+    }
     else if (opt == "encodingthreadcount")
+    {
         m_encodingThreadCount = value;
+    }
     else if (opt == "mpeg4optionvhq")
     {
         if (value)
@@ -216,29 +222,53 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
             m_mp4Opts &= ~AV_CODEC_FLAG_INTERLACED_ME;
     }
     else if (opt == "hardwaremjpegquality")
+    {
         m_hmjpgQuality = value;
+    }
     else if (opt == "hardwaremjpeghdecimation")
+    {
         m_hmjpgHDecimation = value;
+    }
     else if (opt == "hardwaremjpegvdecimation")
+    {
         m_hmjpgVDecimation = value;
+    }
     else if (opt == "audiocompression")
+    {
         m_compressAudio = (value != 0);
+    }
     else if (opt == "mp3quality")
+    {
         m_mp3Quality = value;
+    }
     else if (opt == "samplerate")
+    {
         m_audioSampleRate = value;
+    }
     else if (opt == "audioframesize")
+    {
         m_audioBufferSize = value;
+    }
     else if (opt == "pip_mode")
+    {
         m_pipMode = value;
+    }
     else if (opt == "inpixfmt")
+    {
         m_inPixFmt = (VideoFrameType)value;
+    }
     else if (opt == "skipbtaudio")
+    {
         m_skipBtAudio = (value != 0);
+    }
     else if (opt == "volume")
+    {
         m_volume = value;
+    }
     else
+    {
         V4LRecorder::SetOption(opt, value);
+    }
 }
 
 void NuppelVideoRecorder::SetOption(const QString &name, const QString &value)
@@ -620,7 +650,9 @@ void NuppelVideoRecorder::Initialize(void)
         }
     }
     else
+    {
         m_livetv = m_ringBuffer->LiveMode();
+    }
 
     m_audioBytes = 0;
 
@@ -1006,9 +1038,12 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
                 "v4l2: format set, getting yuyv from v4l, converting");
         }
     }
-    else // cool, we can do our preferred format, most likely running on bttv.
+    else
+    {
+        // cool, we can do our preferred format, most likely running on bttv.
         LOG(VB_RECORD, LOG_INFO, LOC +
             "v4l2: format set, getting yuv420 from v4l");
+    }
 
     // VIDIOC_S_FMT might change the format, check it
     if (m_width  != (int)vfmt.fmt.pix.width ||
@@ -2416,7 +2451,9 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
             tmp = m_rtjc->Compress(m_strm, planes.data());
         }
         else
+        {
             tmp = frame->m_bufferSize;
+        }
 
         // here is lzo compression afterwards
         if (compressthis)

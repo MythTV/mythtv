@@ -402,8 +402,10 @@ uint32_t AVCParser::addBytes(const uint8_t  *bytes,
                 }
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     "AVCParser::addbytes: malformed NAL units");
+            }
         } //found start code
     }
 
@@ -603,7 +605,9 @@ bool AVCParser::decode_Header(BitReader& br)
         m_isKeyframe = true;
     }
     else
+    {
         m_isKeyframe = (m_iIsKeyframe && isKeySlice(m_sliceType));
+    }
 
     /*
       m_picOrderCntLsb specifies the picture order count modulo
@@ -627,7 +631,9 @@ bool AVCParser::decode_Header(BitReader& br)
             m_deltaPicOrderCntBottom = 0;
     }
     else
+    {
         m_deltaPicOrderCntBottom = 0;
+    }
 
     /*
       m_deltaPicOrderAlwaysZeroFlag equal to 1 specifies that

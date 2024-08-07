@@ -217,7 +217,9 @@ void V4L2encRecorder::run(void)
         m_streamData->RemoveAVListener(this);
     }
     else
+    {
         m_streamData->RemovePSStreamListener(this);
+    }
 
     Close();
 

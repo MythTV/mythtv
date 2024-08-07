@@ -1077,7 +1077,9 @@ void MythPlayerUI::SwitchToProgram()
                 SetErrored(tr("Error opening switch program file"));
         }
         else
+        {
             ResetPlaying();
+        }
     }
     else
     {
@@ -1183,7 +1185,9 @@ void MythPlayerUI::JumpToProgram()
             SetErrored(tr("Error opening jump program file"));
     }
     else
+    {
         ResetPlaying();
+    }
 
     if (IsErrored() || !m_decoder)
     {

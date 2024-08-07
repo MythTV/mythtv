@@ -113,13 +113,21 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
                 ok &= ParseVDR(list, channelNo);
         }
         else if (m_type == OFDM)
+        {
             ok &= ParseConfOFDM(list);
+        }
         else if (m_type == ATSC)
+        {
             ok &= ParseConfATSC(list);
+        }
         else if (m_type == QPSK || m_type == DVBS2)
+        {
             ok &= ParseConfQPSK(list);
+        }
         else if (m_type == QAM)
+        {
             ok &= ParseConfQAM(list);
+        }
     }
     file.close();
 

@@ -83,7 +83,9 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
             m_rowImages.insert(y, img);
         }
         else
+        {
             return nullptr;
+        }
     }
     return m_rowImages.value(y);
 }
@@ -677,7 +679,9 @@ bool TeletextScreen::InitialiseFont()
         gTTFont = mythfont;
     }
     else
+    {
         return false;
+    }
 
     gTTBackgroundAlpha = SubtitleScreen::GetTeletextBackgroundAlpha();
 

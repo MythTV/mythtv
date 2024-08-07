@@ -169,7 +169,9 @@ void PlayGroupConfig::Save()
             MythDB::DBError("PlayGroupConfig::Save", query);
     }
     else
+    {
         GroupSetting::Save();
+    }
 }
 
 bool PlayGroupConfig::canDelete(void)
@@ -288,7 +290,9 @@ void PlayGroupEditor::CreateNewPlayBackGroup() const
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void PlayGroupEditor::CreateNewPlayBackGroupSlot(const QString& name)

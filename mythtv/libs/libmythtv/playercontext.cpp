@@ -79,11 +79,17 @@ void PlayerContext::SetInitialTVState(bool islivetv)
                 kState_WatchingRecording : kState_WatchingPreRecorded;
         }
         else if (m_playingInfo->IsVideoDVD())
+        {
             newState = kState_WatchingDVD;
+        }
         else if (m_playingInfo->IsVideoBD())
+        {
             newState = kState_WatchingBD;
+        }
         else
+        {
             newState = kState_WatchingVideo;
+        }
 
         newPlaygroup = m_playingInfo->GetPlaybackGroup();
     }
@@ -430,13 +436,21 @@ QString PlayerContext::GetPlayMessage(void) const
     // Make sure these values for m_ffRewSpeed in TV::ChangeSpeed()
     // and PlayerContext::GetPlayMessage() stay in sync.
     else if (m_ffRewSpeed == 0)
+    {
         mesg += QString(" %1X").arg(m_tsNormal);
+    }
     else if (m_ffRewSpeed == -1)
+    {
         mesg += QString(" 1/3X");
+    }
     else if (m_ffRewSpeed == -2)
+    {
         mesg += QString(" 1/8X");
+    }
     else if (m_ffRewSpeed == -3)
+    {
         mesg += QString(" 1/16X");
+    }
 
     return mesg;
 }

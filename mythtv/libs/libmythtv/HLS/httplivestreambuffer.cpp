@@ -2265,17 +2265,29 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 segment_duration = std::chrono::seconds(tmp);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-TARGETDURATION")))
+            {
                 err = ParseTargetDuration(hls, line);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-MEDIA-SEQUENCE")))
+            {
                 err = ParseMediaSequence(hls, line);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-KEY")))
+            {
                 err = ParseKey(hls, line);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-PROGRAM-DATE-TIME")))
+            {
                 err = ParseProgramDateTime(hls, line);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-ALLOW-CACHE")))
+            {
                 err = ParseAllowCache(hls, line);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-DISCONTINUITY")))
+            {
                 err = ParseDiscontinuity(hls, line);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
                 int version2 = 0;
@@ -2283,7 +2295,9 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 hls->SetVersion(version2);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ENDLIST")))
+            {
                 err = ParseEndList(hls);
+            }
             else if (!line.startsWith(QLatin1String("#")) && !line.isEmpty())
             {
                 hls->AddSegment(segment_duration, title, decoded_URI(line));

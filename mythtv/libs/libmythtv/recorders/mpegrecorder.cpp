@@ -146,7 +146,9 @@ void MpegRecorder::SetOption(const QString &opt, int value)
         }
     }
     else if (opt == "mpeg2audvolume")
+    {
         m_audVolume = value;
+    }
     else if (opt.endsWith("_mpeg4avgbitrate"))
     {
         if (opt.startsWith("low"))
@@ -170,7 +172,9 @@ void MpegRecorder::SetOption(const QString &opt, int value)
             V4LRecorder::SetOption(opt, value);
     }
     else
+    {
         V4LRecorder::SetOption(opt, value);
+    }
 }
 
 void MpegRecorder::SetOption(const QString &opt, const QString &value)
@@ -1025,7 +1029,9 @@ void MpegRecorder::run(void)
                         SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
                     }
                     else
+                    {
                         gap = true;
+                    }
                 }
 
                 if (!RestartEncoding())
@@ -1056,14 +1062,20 @@ void MpegRecorder::run(void)
                         gap = false;
                     }
                     else
+                    {
                         gap_start = MythDate::current();
+                    }
                 }
                 else
+                {
                     good_data = true;
+                }
             }
         }
         else if (m_readfd < 0)
+        {
             continue;
+        }
         else
         {
             if (has_select)

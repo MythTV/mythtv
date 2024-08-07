@@ -96,7 +96,9 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 		s_happens = iRAND(200)?0:100+iRAND(60);
 		s_lock = s_happens * 3 / 2;
 	}
-	else s_lock --;
+	else {
+		s_lock --;
+	}
 //	happens = 1;
 	
 	float tmp = s_happens?8.0F:0;
@@ -133,8 +135,9 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 			s_rot += 2.0F*M_PI_F;
 		*rotangle = s_rot;
 	}
-	else
+	else {
 		*rotangle = s_rot = (tmp + 15.0F*s_rot) / 16.0F;
+	}
 }
 
 void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, float rapport, int drawit) {

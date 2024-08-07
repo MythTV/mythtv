@@ -805,7 +805,9 @@ int V4L2util::GetStreamType(void) const
         type = V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
     }
     else
+    {
         type = GetExtControl(V4L2_CID_MPEG_STREAM_TYPE, "Stream Type");
+    }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("MPEG Stream Type is currently set to %1 (%2)")

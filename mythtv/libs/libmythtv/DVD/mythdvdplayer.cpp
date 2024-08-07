@@ -360,7 +360,9 @@ void MythDVDPlayer::SetBookmark(bool Clear)
                 fields += dvdstate;
             }
             else
+            {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clear bookmark");
+            }
 
             ProgramInfo::SaveDVDBookmark(fields);
 

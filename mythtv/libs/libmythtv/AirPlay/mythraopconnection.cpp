@@ -478,7 +478,9 @@ void MythRAOPConnection::SendResendRequest(std::chrono::milliseconds timestamp,
         }
     }
     else
+    {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to send resend request.");
+    }
 }
 
 /**
@@ -820,8 +822,11 @@ void MythRAOPConnection::ProcessAudio()
             i++;
             m_audioStarted = true;
         }
-        else // QMap is sorted, so no need to continue if not found
+        else
+        {
+            // QMap is sorted, so no need to continue if not found
             break;
+        }
     }
 
     ExpireAudio(timestamp);

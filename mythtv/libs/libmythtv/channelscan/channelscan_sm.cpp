@@ -871,7 +871,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             }
         }
         else
+        {
             transport_tune_complete = false;
+        }
     }
     transport_tune_complete &= !pattmp.empty();
     sd->ReturnCachedPATTables(pattmp);

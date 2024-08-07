@@ -1102,7 +1102,9 @@ void DTVRecorder::HandleH2645Keyframe(void)
         SendMythSystemRecEvent("REC_STARTED_WRITING", m_curRecording);
     }
     else
+    {
         startpos = m_h2645Parser->keyframeAUstreamOffset();
+    }
 
     // Add key frame to position map
     m_positionMapLock.lock();

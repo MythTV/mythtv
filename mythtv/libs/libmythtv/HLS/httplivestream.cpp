@@ -765,9 +765,13 @@ void HTTPLiveStream::SetOutputVars(void)
             m_httpPrefix.append("/");
     }
     else if (m_httpPrefix.contains("/StorageGroup/Streaming/"))
+    {
         m_httpPrefixRel = "/StorageGroup/Streaming/";
+    }
     else
+    {
         m_httpPrefixRel = "";
+    }
 }
 
 HTTPLiveStreamStatus HTTPLiveStream::GetDBStatus(void) const

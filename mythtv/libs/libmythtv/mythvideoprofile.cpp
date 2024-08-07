@@ -113,7 +113,9 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
                         }
                     }
                     else
+                    {
                         value1 = capture1.toInt(&isOK);
+                    }
                 }
                 if (isOK)
                 {
@@ -135,7 +137,9 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
                             }
                         }
                         else
+                        {
                             value2 = capture3.toInt(&isOK);
+                        }
                     }
                 }
                 if (isOK)
@@ -179,10 +183,17 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
                             value2 = 99999999;
                         }
                         else if (oper == "<")
+                        {
                             value2 = value2 - 1;
+                        }
                         else if (oper == "<=")
+                        {
                             ;
-                        else isOK = false;
+                        }
+                        else
+                        {
+                            isOK = false;
+                        }
                         oper = "-";
                     }
                 }

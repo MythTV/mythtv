@@ -93,7 +93,9 @@ int BiopBinding::Process(const unsigned char *data)
         memcpy(m_objInfo, data + off, m_objInfoLen);
     }
     else
+    {
         m_objInfo = nullptr;
+    }
 
     off += m_objInfoLen;
 

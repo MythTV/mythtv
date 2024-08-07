@@ -333,7 +333,9 @@ void H2645Parser::vui_parameters(BitReader& br, bool hevc)
         }
     }
     else
+    {
         m_sarWidth = m_sarHeight = 0;
+    }
 
     if (br.next_bit()) //overscan_info_present_flag
         br.next_bit(); //overscan_appropriate_flag

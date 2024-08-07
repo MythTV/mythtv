@@ -833,13 +833,21 @@ void MythVideoBounds::Zoom(ZoomDirection Direction)
             m_manualHorizScale -= zf;
     }
     else if (kZoomUp    == Direction && (m_manualMove.y() < +kManualZoomMaxMove))
+    {
         m_manualMove.setY(m_manualMove.y() + 1);
+    }
     else if (kZoomDown  == Direction && (m_manualMove.y() > -kManualZoomMaxMove))
+    {
         m_manualMove.setY(m_manualMove.y() - 1);
+    }
     else if (kZoomLeft  == Direction && (m_manualMove.x() < +kManualZoomMaxMove))
+    {
         m_manualMove.setX(m_manualMove.x() + 2);
+    }
     else if (kZoomRight == Direction && (m_manualMove.x() > -kManualZoomMaxMove))
+    {
         m_manualMove.setX(m_manualMove.x() - 2);
+    }
 
     m_manualVertScale = snap(m_manualVertScale, 1.0F, zf / 2);
     m_manualHorizScale = snap(m_manualHorizScale, 1.0F, zf / 2);

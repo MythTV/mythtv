@@ -112,7 +112,9 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
                                ? (*cit).m_chanNum : startchannel);
             }
             else
+            {
                 ok = SetChannelByString((*cit).m_chanNum);
+            }
 
             if (ok)
             {
@@ -344,7 +346,9 @@ void ChannelBase::HandleScript(const QString &freqid)
                 m_systemStatus = 2; // failed
             }
             else
+            {
                 m_systemStatus = 3; // success
+            }
 
             HandleScriptEnd(ok);
         }
@@ -522,7 +526,9 @@ int ChannelBase::GetChanID(void) const
             visible = query.value(0).toInt();
         }
         else
+        {
             id = query.value(0).toInt();
+        }
     }
 
     if (!found)
@@ -685,7 +691,9 @@ bool ChannelBase::CheckChannel(const QString &channum) const
         MythDB::DBError("checkchannel", query);
     }
     else if (query.size() > 0)
+    {
         return true;
+    }
 
     LOG(VB_CHANNEL, LOG_ERR, LOC +
         QString("Failed to find channel(%1) on input (%2).")

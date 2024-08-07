@@ -106,8 +106,11 @@ QString DishEventTagsDescriptor::programid(void) const
             prefix = "EP";
         else
             prefix = "SH";
-    } else
+    }
+    else
+    {
         return prefix;
+    }
 
     QString id = QString("%1%2%3").arg(prefix, series).arg(episode, 4, 0);
 

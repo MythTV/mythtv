@@ -179,8 +179,10 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
             return false;
     }
     else
+    {
         LoadTemplate(proginfo->GetTitle(), proginfo->GetCategory(),
                      proginfo->GetCategoryTypeString());
+    }
 
     if (m_type != kTemplateRecord &&
         (m_searchType == kNoSearch || m_searchType == kManualSearch))
@@ -609,7 +611,9 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
             "Hours and minutes").arg(hourstring, minstring);
     }
     else
+    {
         infoMap["lentime"] = minstring;
+    }
 
 
     infoMap["timedate"] = MythDate::toString(

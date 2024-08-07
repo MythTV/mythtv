@@ -2414,7 +2414,9 @@ void JobQueue::DoUserJobThread(int jobID)
                  pginfo->toString(ProgramInfo::kRecordingKey));
     }
     else
+    {
         msg = QString("Started %1 for jobID %2").arg(jobDesc).arg(jobID);
+    }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString(msg.toLocal8Bit().constData()));
 
@@ -2466,7 +2468,9 @@ void JobQueue::DoUserJobThread(int jobID)
                      pginfo->toString(ProgramInfo::kRecordingKey));
         }
         else
+        {
             msg = QString("Finished %1 for jobID %2").arg(jobDesc).arg(jobID);
+        }
 
         LOG(VB_GENERAL, LOG_INFO, LOC + QString(msg.toLocal8Bit().constData()));
 

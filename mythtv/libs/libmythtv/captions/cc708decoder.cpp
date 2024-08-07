@@ -354,7 +354,9 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
             }
         }
         else if ((i+1)<blk_size)
+        {
             i+=2;
+        }
     }
     else if (code<=0x1f)
     {

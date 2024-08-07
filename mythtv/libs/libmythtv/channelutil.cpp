@@ -2413,7 +2413,9 @@ uint ChannelUtil::GetNextChannel(
                 }
             }
             else
+            {
                 --it;
+            }
         }
         while ((it != start) &&
                ((skip_non_visible && it->m_visible < kChannelVisible) ||

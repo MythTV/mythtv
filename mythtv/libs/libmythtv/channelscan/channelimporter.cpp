@@ -2243,7 +2243,9 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
                 m_eventLoop.exec();
             }
             else
+            {
                 delete textEdit;
+            }
         }
     }
     OkCancelType rval = kOCTCancel;
@@ -2342,7 +2344,9 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
                 m_eventLoop.exec();
             }
             else
+            {
                 delete textEdit;
+            }
         }
     }
 

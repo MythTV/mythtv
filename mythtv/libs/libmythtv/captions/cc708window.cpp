@@ -364,7 +364,9 @@ std::vector<CC708String*> CC708Window::GetStrings(void) const
                 list.push_back(cur);
             }
             else
+            {
                 delete cur;
+            }
             cur = nullptr;
         }
     }

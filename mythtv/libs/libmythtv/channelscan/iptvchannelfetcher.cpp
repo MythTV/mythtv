@@ -270,7 +270,9 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url)
                     "download from %1").arg(url));
     }
     else
+    {
         tmp = QString(data);
+    }
 
     return tmp.isNull() ? tmp : QString::fromUtf8(tmp.toLatin1().constData());
 }

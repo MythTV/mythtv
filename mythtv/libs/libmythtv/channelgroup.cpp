@@ -483,7 +483,9 @@ void ChannelGroup::UpdateChannelGroups(void)
                 allSources[query.value(0).toInt()] = query.value(1).toString();
         }
         else
+        {
             MythDB::DBError("UpdateChannelGroups videosource 1", query);
+        }
     }
 
     // Split all video sources into a list of video sources that are connected to one

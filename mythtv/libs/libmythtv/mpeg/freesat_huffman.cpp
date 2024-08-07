@@ -86,7 +86,10 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
                     bit = 0;
                     byte++;
                 }
-                else bit++;
+                else
+                {
+                    bit++;
+                }
             }
         }
         else

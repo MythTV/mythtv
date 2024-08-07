@@ -62,7 +62,9 @@ static void UpdateHashes(void)
                 hash =  RemoteFile::GetFileHash(url);
             }
             else
+            {
                 hash = FileHash(filename);
+            }
 
             if (hash == "NULL")
                 hash = QString();
@@ -578,7 +580,9 @@ bool doUpgradeVideoDatabaseSchema(void)
             }
         }
         else
+        {
             ok = false;
+        }
 
         if (!ok)
             return false;

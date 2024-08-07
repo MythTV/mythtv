@@ -222,7 +222,9 @@ int V4L2encSignalMonitor::StableResolution(void)
             return 100;
         }
         else
+        {
             return 40 + m_lockCnt;
+        }
     }
     else
     {

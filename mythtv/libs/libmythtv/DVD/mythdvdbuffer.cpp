@@ -1615,7 +1615,9 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
                                  m_buttonColor, m_buttonAlpha);
                 }
                 else
+                {
                     FindSmallestBoundingRectangle(Subtitle);
+                }
                 *GotSubtitles = 1;
             }
         }

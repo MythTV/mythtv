@@ -359,7 +359,9 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
                                 m_col[mode] = 0;
                             }
                             else if (m_style[mode] == CC_STYLE_POPUP)
+                            {
                                 ResetCC(mode);
+                            }
 
                             m_rowCount[mode] = b2 - 0x25 + 2;
                             m_style[mode] = CC_STYLE_ROLLUP;
@@ -404,7 +406,9 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
                                 m_col[mode] = 0;
                             }
                             else if (m_style[mode] == CC_STYLE_POPUP)
+                            {
                                 ResetCC(mode);
+                            }
 
                             m_style[mode] = CC_STYLE_PAINT;
                             m_rowCount[mode] = 0;
@@ -652,9 +656,13 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
                         ret += QString("[%1]").arg(cpu, 2, 16);
                 }
                 else if (cpu <= 0x80)
+                {
                     ret += QString(cp.toLatin1());
+                }
                 else if (!suppress_unknown)
+                {
                     ret += QString("{%1}").arg(cpu, 2, 16);
+                }
         }
     }
 
@@ -695,7 +703,9 @@ void CC608Decoder::BufferCC(size_t mode, int len, int clr)
         len += sizeof(ccsubtitle);
     }
     else
+    {
         len = sizeof(ccsubtitle);
+    }
 
     if ((len != 0) && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
@@ -1347,7 +1357,9 @@ bool CC608Decoder::XDSPacketParseProgram(
             }
         }
         else if (sel == 0x13 || sel == 0x1f)
+        {
             ; // Reserved according to TVTime code
+        }
         else if ((rating_system & 0x3) == 1)
         {
             if (!(kHasTPG & m_xdsRatingSystems[cf]) ||
@@ -1398,7 +1410,9 @@ bool CC608Decoder::XDSPacketParseProgram(
         ; // program data
 #endif
     else
+    {
         handled = false;
+    }
 
     return handled;
 }
@@ -1437,7 +1451,9 @@ bool CC608Decoder::XDSPacketParseChannel(const std::vector<unsigned char> &xds_b
         }
     }
     else
+    {
         handled = false;
+    }
 
     return handled;
 }

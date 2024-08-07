@@ -306,8 +306,10 @@ void NetStream::slotRequestStarted(int id, QNetworkReply *reply)
         connect(reply, &QIODevice::readyRead, this, &NetStream::slotReadyRead, Qt::DirectConnection );
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("(%1) Started but m_reply not NULL").arg(m_id));
+    }
 }
 
 static qlonglong inline ContentLength(const QNetworkReply *reply)
@@ -405,8 +407,10 @@ void NetStream::slotReadyRead()
         m_ready.wakeAll();
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("(%1) ReadyRead but m_reply = NULL").arg(m_id));
+    }
 }
 
 // signal from QNetworkReply
@@ -471,8 +475,10 @@ void NetStream::slotFinished()
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("(%1) Finished but m_reply = NULL")
             .arg(m_id));
+    }
 }
 
 #ifndef QT_NO_OPENSSL
@@ -507,8 +513,10 @@ void NetStream::slotSslErrors(const QList<QSslError> &errors)
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("(%1) SSL error but m_reply = NULL").arg(m_id) );
+    }
 }
 #endif
 
@@ -890,7 +898,9 @@ bool NAMThread::StartRequest(NetStreamRequest *p)
         emit requestStarted(p->m_id, reply);
     }
     else
+    {
         LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) NetStreamRequest cancelled").arg(p->m_id) );
+    }
     return true;
 }
 

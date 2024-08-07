@@ -307,9 +307,13 @@ SubtitleFormat::GetFont(const QString &family,
             offset.setX(-off);
         }
         else if (attr.m_edgeType == k708AttrEdgeRightDropShadow)
+        {
             shadow = true;
+        }
         else
+        {
             shadow = false;
+        }
     }
     else
     {
@@ -337,7 +341,9 @@ SubtitleFormat::GetFont(const QString &family,
             off = lroundf(scale * pixelSize / 20);
         }
         else
+        {
             outline = false;
+        }
     }
     else
     {
@@ -1062,15 +1068,25 @@ void FormattedTextSubtitleSRT::Init(const QStringList &subs)
                     }
                 }
                 else if (html == "</font>")
+                {
                     color = Qt::white;
+                }
                 else if (html == "<b>")
+                {
                     isBold = true;
+                }
                 else if (html == "</b>")
+                {
                     isBold = false;
+                }
                 else if (html == "<u>")
+                {
                     isUnderline = true;
+                }
                 else if (html == "</u>")
+                {
                     isUnderline = false;
+                }
                 else
                 {
                     LOG(VB_VBI, LOG_INFO,
@@ -2052,7 +2068,9 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                                                   displayuntil, late);
                 }
                 else
+                {
                     uh = 0;
+                }
                 int lh = rect->h - uh;
                 if (lh > 0)
                 {

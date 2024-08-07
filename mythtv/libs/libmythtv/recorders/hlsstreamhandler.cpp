@@ -213,7 +213,9 @@ void HLSStreamHandler::run(void)
             std::this_thread::sleep_for(10ms);
         }
         else
+        {
             std::this_thread::sleep_for(1ms);
+        }
     }
 
     m_hls->Throttle(false);

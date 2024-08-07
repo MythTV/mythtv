@@ -173,7 +173,9 @@ void VideoVisual::add(const void *b, unsigned long b_len,
             len = 0;
     }
     else
+    {
         len = 0;
+    }
 
     m_nodes.append(new VisualNode(l, r, len, timecode));
 }

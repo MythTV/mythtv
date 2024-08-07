@@ -148,12 +148,13 @@ QString MultipleStringStructure::Uncompressed(
         const auto* ustr = reinterpret_cast<const unsigned short*>(buf);
         for (int j=0; j<(len>>1); j++)
             str.append( QChar( (ustr[j]<<8) | (ustr[j]>>8) ) );
-    } else if (0x40<=mode && mode<=0x41)
+    } else if (0x40<=mode && mode<=0x41) {
         str = QString("TODO Tawain Characters");
-    else if (0x48==mode)
+    } else if (0x48==mode) {
         str = QString("TODO South Korean Characters");
-    else
+    } else {
         str = QString("unknown character encoding mode(%0)").arg(mode);
+    }
     return str;
 }
 

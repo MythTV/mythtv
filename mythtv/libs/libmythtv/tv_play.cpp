@@ -415,7 +415,9 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
         delete curProgram;
     }
     else if (startSysEventSent)
+    {
         gCoreContext->SendSystemEvent("PLAY_STOPPED");
+    }
 
     if (!playerError.isEmpty())
     {
@@ -2012,10 +2014,14 @@ void TV::HandleStateChange()
                     m_playerContext.m_recorder->Setup();
                 }
                 else
+                {
                     delete testrec; // If testrec isn't a valid recorder ...
+                }
             }
             else if (getit)
+            {
                 chanid = 0;
+            }
         }
 
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Spawning LiveTV Recorder -- begin");
@@ -2465,7 +2471,9 @@ void TV::timerEvent(QTimerEvent *Event)
             }
         }
         else
+        {
             ForceNextStateNone();
+        }
 
         ReturnPlayerLock();
 
@@ -3130,7 +3138,9 @@ bool TV::HandleTrackAction(const QString &Action)
             handled = false;
     }
     else
+    {
         handled = false;
+    }
     return handled;
 }
 
@@ -3803,9 +3813,13 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         }
     }
     else if (IsActionable(ACTION_JUMPRWND, Actions))
+    {
         DoJumpRWND();
+    }
     else if (IsActionable(ACTION_JUMPFFWD, Actions))
+    {
         DoJumpFFWD();
+    }
     else if (IsActionable(ACTION_JUMPBKMRK, Actions))
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
@@ -3829,7 +3843,9 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         ClearOSD();
     }
     else if (IsActionable(ACTION_VIEWSCHEDULED, Actions))
+    {
         EditSchedule(kViewSchedule);
+    }
     else if (HandleJumpToProgramAction(Actions))
     { // NOLINT(bugprone-branch-clone)
     }
@@ -3932,25 +3948,45 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         }
     }
     else if (IsActionable(ACTION_ENABLEUPMIX, Actions))
+    {
         emit ChangeUpmix(true);
+    }
     else if (IsActionable(ACTION_DISABLEUPMIX, Actions))
+    {
         emit ChangeUpmix(false);
+    }
     else if (IsActionable(ACTION_VOLUMEDOWN, Actions))
+    {
         VolumeChange(false);
+    }
     else if (IsActionable(ACTION_VOLUMEUP, Actions))
+    {
         VolumeChange(true);
+    }
     else if (IsActionable("CYCLEAUDIOCHAN", Actions))
+    {
         emit ChangeMuteState(true);
+    }
     else if (IsActionable(ACTION_MUTEAUDIO, Actions))
+    {
         emit ChangeMuteState();
+    }
     else if (IsActionable("STRETCHINC", Actions))
+    {
         ChangeTimeStretch(1);
+    }
     else if (IsActionable("STRETCHDEC", Actions))
+    {
         ChangeTimeStretch(-1);
+    }
     else if (IsActionable("MENU", Actions))
+    {
         ShowOSDMenu();
+    }
     else if (IsActionable(ACTION_MENUCOMPACT, Actions))
+    {
         ShowOSDMenu(true);
+    }
     else if (IsActionable({ "INFO", "INFOWITHCUTLIST" }, Actions))
     {
         if (HasQueuedInput())
@@ -3959,7 +3995,9 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             ToggleOSD(true);
     }
     else if (IsActionable(ACTION_TOGGLEOSDDEBUG, Actions))
+    {
         emit ChangeOSDDebug();
+    }
     else if (!IsDVDStillFrame && SeekHandleAction(Actions, IsDVD))
     {
     }
@@ -4122,17 +4160,29 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
     else if (IsActionable("NEXTFAV", Actions) && islivetv)
+    {
         ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
+    }
     else if (IsActionable("NEXTSOURCE", Actions) && islivetv)
+    {
         SwitchSource(kNextSource);
+    }
     else if (IsActionable("PREVSOURCE", Actions) && islivetv)
+    {
         SwitchSource(kPreviousSource);
+    }
     else if (IsActionable("NEXTINPUT", Actions) && islivetv)
+    {
         SwitchInputs();
+    }
     else if (IsActionable(ACTION_GUIDE, Actions))
+    {
         EditSchedule(kScheduleProgramGuide);
+    }
     else if (IsActionable("PREVCHAN", Actions) && islivetv)
+    {
         PopPreviousChannel(false);
+    }
     else if (IsActionable(ACTION_CHANNELUP, Actions))
     {
         if (islivetv)
@@ -4143,7 +4193,9 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
                 ChangeChannel(CHANNEL_DIRECTION_UP);
         }
         else
+        {
             DoJumpRWND();
+        }
     }
     else if (IsActionable(ACTION_CHANNELDOWN, Actions))
     {
@@ -4155,7 +4207,9 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
                 ChangeChannel(CHANNEL_DIRECTION_DOWN);
         }
         else
+        {
             DoJumpFFWD();
+        }
     }
     else if (IsActionable("DELETE", Actions) && !islivetv)
     {
@@ -4165,17 +4219,29 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         ShowOSDPromptDeleteRecording(tr("Are you sure you want to delete:"));
     }
     else if (IsActionable(ACTION_JUMPTODVDROOTMENU, Actions) && isdisc)
+    {
         emit GoToMenu("root");
+    }
     else if (IsActionable(ACTION_JUMPTODVDCHAPTERMENU, Actions) && isdisc)
+    {
         emit GoToMenu("chapter");
+    }
     else if (IsActionable(ACTION_JUMPTODVDTITLEMENU, Actions) && isdisc)
+    {
         emit GoToMenu("title");
+    }
     else if (IsActionable(ACTION_JUMPTOPOPUPMENU, Actions) && isdisc)
+    {
         emit GoToMenu("popup");
+    }
     else if (IsActionable(ACTION_FINDER, Actions))
+    {
         EditSchedule(kScheduleProgramFinder);
+    }
     else
+    {
         handled = false;
+    }
 
     return handled;
 }
@@ -4999,7 +5065,9 @@ void TV::DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCut
         UpdateOSDSeekMessage(Msg, paused ? kOSDTimeout_None : kOSDTimeout_Med);
     }
     else
+    {
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    }
 }
 
 void TV::DoSeekAbsolute(long long Seconds, bool HonorCutlist)
@@ -8029,11 +8097,17 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         }
     }
     else if (Result < 0)
-        ; // exit dialog // NOLINT(bugprone-branch-clone)
+    { // NOLINT(bugprone-branch-clone)
+        ; // exit dialog
+    }
     else if (HandleTrackAction(Action))
+    {
         ;
+    }
     else if (Action == ACTION_PAUSE)
+    {
         DoTogglePause(true);
+    }
     else if (Action == ACTION_STOP)
     {
         PrepareToExitPlayer(__LINE__);
@@ -8046,27 +8120,49 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         gCoreContext->dispatch(xe);
     }
     else if (Action == ACTION_JUMPFFWD)
+    {
         DoJumpFFWD();
+    }
     else if (Action == ACTION_JUMPRWND)
+    {
         DoJumpRWND();
+    }
     else if (Action == ACTION_SEEKFFWD)
+    {
         DoSeekFFWD();
+    }
     else if (Action == ACTION_SEEKRWND)
+    {
         DoSeekRWND();
+    }
     else if (Action == ACTION_TOGGLEOSDDEBUG)
+    {
         emit ChangeOSDDebug();
+    }
     else if (Action == "TOGGLEMANUALZOOM")
+    {
         SetManualZoom(true, tr("Zoom Mode ON"));
+    }
     else if (Action == ACTION_BOTTOMLINEMOVE)
+    {
         emit ToggleMoveBottomLine();
+    }
     else if (Action == ACTION_BOTTOMLINESAVE)
+    {
         emit SaveBottomLine();
+    }
     else if (Action == "TOGGLESTRETCH")
+    {
         ToggleTimeStretch();
+    }
     else if (Action == ACTION_ENABLEUPMIX)
+    {
         emit ChangeUpmix(true);
+    }
     else if (Action == ACTION_DISABLEUPMIX)
+    {
         emit ChangeUpmix(false);
+    }
     else if (Action.startsWith("ADJUSTSTRETCH"))
     {
         bool floatRead = false;
@@ -8086,40 +8182,70 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         ChangeTimeStretch(0, !floatRead);   // just display
     }
     else if (Action.startsWith("SELECTSCAN_"))
+    {
         OverrideScan(static_cast<FrameScanType>(Action.right(1).toInt()));
+    }
     else if (Action.startsWith(ACTION_TOGGELAUDIOSYNC))
+    {
         emit ChangeAudioOffset(0ms);
+    }
     else if (Action == ACTION_TOGGLESUBTITLEZOOM)
+    {
         emit AdjustSubtitleZoom(0);
+    }
     else if (Action == ACTION_TOGGLESUBTITLEDELAY)
+    {
         emit AdjustSubtitleDelay(0ms);
+    }
     else if (Action == ACTION_TOGGLEVISUALISATION)
+    {
         emit EnableVisualiser(false, true);
+    }
     else if (Action == ACTION_ENABLEVISUALISATION)
+    {
         emit EnableVisualiser(true);
+    }
     else if (Action == ACTION_DISABLEVISUALISATION)
+    {
         emit EnableVisualiser(false);
+    }
     else if (Action.startsWith(ACTION_TOGGLESLEEP))
+    {
         ToggleSleepTimer(Action.left(13));
+    }
     else if (Action.startsWith("TOGGLEPICCONTROLS"))
     {
         m_adjustingPictureAttribute = static_cast<PictureAttribute>(Action.right(1).toInt() - 1);
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
     else if (Action == "TOGGLEASPECT")
+    {
         emit ChangeAspectOverride();
+    }
     else if (Action.startsWith("TOGGLEASPECT"))
+    {
         emit ChangeAspectOverride(static_cast<AspectOverrideMode>(Action.right(1).toInt()));
+    }
     else if (Action == "TOGGLEFILL")
+    {
         emit ChangeAdjustFill();
+    }
     else if (Action.startsWith("TOGGLEFILL"))
+    {
         emit ChangeAdjustFill(static_cast<AdjustFillMode>(Action.right(1).toInt()));
+    }
     else if (Action == "MENU")
+    {
          ShowOSDMenu();
+    }
     else if (Action == "AUTODETECT_FILL")
+    {
         emit ToggleDetectLetterBox();
+    }
     else if (Action == ACTION_GUIDE)
+    {
         EditSchedule(kScheduleProgramGuide);
+    }
     else if (Action.startsWith("CHANGROUP_") && m_dbUseChannelGroups)
     {
         if (Action == "CHANGROUP_ALL_CHANNELS")
@@ -8185,15 +8311,25 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         }
     }
     else if (Action == ACTION_FINDER)
+    {
         EditSchedule(kScheduleProgramFinder);
+    }
     else if (Action == "SCHEDULE")
+    {
         EditSchedule(kScheduledRecording);
+    }
     else if (Action == ACTION_VIEWSCHEDULED)
+    {
         EditSchedule(kViewSchedule);
+    }
     else if (Action.startsWith("VISUALISER"))
+    {
         emit EnableVisualiser(true, false, Action.mid(11));
+    }
     else if (Action.startsWith("3D"))
+    {
         emit ChangeStereoOverride(ActionToStereoscopic(Action));
+    }
     else if (HandleJumpToProgramAction(QStringList(Action)))
     {
     }
@@ -8214,10 +8350,14 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
             hide = false;
         }
         else
+        {
             handled = false;
+        }
     }
     else
+    {
         handled = false;
+    }
     if (!handled && StateIsPlaying(m_playerContext.GetState()))
     {
         handled = true;
@@ -8254,7 +8394,9 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
             hide = false;
         }
         else if (Action == "TOGGLEAUTOEXPIRE")
+        {
             ToggleAutoExpire();
+        }
         else if (Action.startsWith("TOGGLECOMMSKIP"))
         {
             SetAutoCommercialSkip(static_cast<CommSkipMode>(Action.right(1).toInt()));

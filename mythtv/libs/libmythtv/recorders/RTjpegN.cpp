@@ -3110,7 +3110,10 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp+=b2s(m_block, sp, m_lB8);
+   else
+   {
+    sp+=b2s(m_block, sp, m_lB8);
+   }
    lblock += 64;
 
    DctY(bp+j+8, m_yWidth);
@@ -3119,7 +3122,10 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp += b2s(m_block, sp, m_lB8);
+   else
+   {
+    sp += b2s(m_block, sp, m_lB8);
+   }
    lblock += 64;
 
    DctY(bp1+j, m_yWidth);
@@ -3128,7 +3134,10 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp += b2s(m_block, sp, m_lB8);
+   else
+   {
+    sp += b2s(m_block, sp, m_lB8);
+   }
    lblock += 64;
 
    DctY(bp1+j+8, m_yWidth);
@@ -3137,7 +3146,10 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp += b2s(m_block, sp, m_lB8);
+   else
+   {
+    sp += b2s(m_block, sp, m_lB8);
+   }
    lblock += 64;
 
    DctY(bp2+k, m_cWidth);
@@ -3147,7 +3159,9 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
     *((uint8_t *)sp++)=255;
    }
    else
+   {
     sp+=b2s(m_block, sp, m_cB8);
+   }
    lblock+=64;
 
    DctY(bp3+k, m_cWidth);
@@ -3157,7 +3171,9 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
     *((uint8_t *)sp++)=255;
    }
    else
+   {
     sp+=b2s(m_block, sp, m_cB8);
+   }
    lblock+=64;
   }
   bp += m_width<<4;
@@ -3190,7 +3206,10 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp+=b2s(m_block, sp, m_lB8);
+   else
+   {
+    sp+=b2s(m_block, sp, m_lB8);
+   }
    lblock+=64;
 
    DctY(bp+j+8, m_yWidth);
@@ -3199,7 +3218,10 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp+=b2s(m_block, sp, m_lB8);
+   else
+   {
+    sp+=b2s(m_block, sp, m_lB8);
+   }
    lblock+=64;
 
    DctY(bp2+k, m_cWidth);
@@ -3208,7 +3230,10 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp+=b2s(m_block, sp, m_cB8);
+   else
+   {
+    sp+=b2s(m_block, sp, m_cB8);
+   }
    lblock+=64;
 
    DctY(bp3+k, m_cWidth);
@@ -3217,7 +3242,10 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
    {
     *((uint8_t *)sp++)=255;
    }
-   else sp+=b2s(m_block, sp, m_cB8);
+   else
+   {
+    sp+=b2s(m_block, sp, m_cB8);
+   }
    lblock+=64;
 
   }
@@ -3246,7 +3274,11 @@ inline int RTjpeg::mcompress8(int8_t *sp, uint8_t **planes)
    if (bcomp(m_block, lblock, &m_lMask))
    {
     *((uint8_t *)sp++)=255;
-   } else sp+=b2s(m_block, sp, m_lB8);
+   }
+   else
+   {
+    sp+=b2s(m_block, sp, m_lB8);
+   }
    lblock+=64;
   }
   bp+=m_width<<3;

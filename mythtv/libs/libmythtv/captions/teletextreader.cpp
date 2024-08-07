@@ -170,7 +170,9 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         }
     }
     else
+    {
         return false;
+    }
 
     if (newPage < 0x100)
         newPage = 0x100;
@@ -220,7 +222,9 @@ QString TeletextReader::GetPage(void)
                 str += "*";
             }
             else
+            {
                 str += " ";
+            }
 
             str += QString("%1").arg(subpage->subpagenum,2,16,QChar('0'));
 
@@ -556,7 +560,9 @@ const TeletextPage *TeletextReader::FindPageInternal(
             res = &iter->second;
         }
         else
+        {
             res = &pageIter->second;
+        }
     }
 
     if (direction == 1)
@@ -568,7 +574,9 @@ const TeletextPage *TeletextReader::FindPageInternal(
             res = &pageIter->second;
         }
         else
+        {
             res = &pageIter->second;
+        }
     }
 
     return res;

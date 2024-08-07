@@ -366,7 +366,9 @@ void OSD::SetText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout)
             win->SetTextFromMap(Map);
     }
     else
+    {
         win->SetTextFromMap(Map);
+    }
 
     SetExpiry(Window, Timeout);
 }

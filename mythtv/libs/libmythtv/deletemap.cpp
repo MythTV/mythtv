@@ -113,7 +113,9 @@ bool DeleteMap::HandleAction(const QString &action, uint64_t frame)
             AddMark(m_ctx->m_player->GetTotalFrameCount() - 1, MARK_CUT_END);
     }
     else if (action == "NEWCUT")
+    {
         NewCut(frame);
+    }
     else if (action == "DELETE")
     {
         //: Delete the current cut or preserved region
@@ -302,8 +304,11 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
             // location
             Delete(frame, "");
         }
-        else // Don't add a mark on top of a mark
+        else
+        {
+            // Don't add a mark on top of a mark
             return;
+        }
     }
 
     int       lasttype  = MARK_UNSET;
@@ -488,7 +493,9 @@ void DeleteMap::NewCut(uint64_t frame)
         }
     }
     else
+    {
         Add(frame, MARK_PLACEHOLDER);
+    }
 
     CleanMap();
     PushDeferred(initialDeleteMap, tr("New Cut"));
@@ -827,8 +834,10 @@ void DeleteMap::TrackerReset(uint64_t frame)
         }
     }
     else
+    {
         m_nextCutStart = GetNearestMark(frame, !IsInDelete(frame),
                                         &m_nextCutStartIsValid);
+    }
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Tracker next CUT_START: %1")
                                    .arg(m_nextCutStart));
 }

@@ -1970,7 +1970,9 @@ void ImportConfigurationGroup::probeCard(const QString &device)
             cs = tr("%1 MB").arg(fileInfo.size() / 1024 / 1024);
         }
         else
+        {
             ci = tr("File not readable");
+        }
     }
     else
     {
@@ -2314,7 +2316,9 @@ void DemoConfigurationGroup::probeCard(const QString &device)
             cs = tr("%1 MB").arg(fileInfo.size() / 1024 / 1024);
         }
         else
+        {
             ci = tr("File not readable");
+        }
     }
     else
     {
@@ -2485,7 +2489,9 @@ void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
             m_device->addTargetedChild(m_driverName, audioinput);
         }
         else
+        {
             delete audioinput;
+        }
 
         if (v4l2.HasSlicedVBI())
         {
@@ -2496,7 +2502,9 @@ void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
                 m_device->addTargetedChild(m_driverName, vbidev);
             }
             else
+            {
                 delete vbidev;
+            }
         }
 
         m_device->addTargetedChild(m_driverName, new EmptyVBIDevice(m_parent));
@@ -3304,7 +3312,9 @@ void CardInput::CreateNewInputGroup(void)
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void CardInput::CreateNewInputGroupSlot(const QString& name)
@@ -3392,7 +3402,9 @@ void CardInput::channelScanner(void)
         mainStack->AddScreen(ssd);
     }
     else
+    {
         delete ssd;
+    }
 
 #else
     LOG(VB_GENERAL, LOG_ERR, "You must compile the backend "
