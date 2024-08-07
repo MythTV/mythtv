@@ -629,7 +629,7 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
         QString findfrom = MythDate::toString(ldt, date_format | MythDate::kTime);
         if (m_type == kWeeklyRecord)
         {
-            int daynum = (m_findday + 5) % 7 + 1;
+            int daynum = ((m_findday + 5) % 7) + 1;
             findfrom = QString("%1, %2")
 		 .arg(gCoreContext->GetQLocale().dayName(daynum, QLocale::ShortFormat),
                       findfrom);

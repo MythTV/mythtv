@@ -114,7 +114,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
             m_badVbi[field] = 0;
             m_ccMode[field] = -1;
             m_txtMode[field*2] = 0;
-            m_txtMode[field*2 + 1] = 0;
+            m_txtMode[(field*2) + 1] = 0;
         }
         return;
     }
@@ -145,7 +145,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
     if (m_ccMode[field] >= 0)
     {
         mode = field << 2 |
-            (m_txtMode[field*2 + m_ccMode[field]] << 1) |
+            (m_txtMode[(field*2) + m_ccMode[field]] << 1) |
             m_ccMode[field];
         if (mode != std::numeric_limits<std::size_t>::max())
             len = m_ccBuf[mode].length();
@@ -199,7 +199,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
         m_lastCodeTc[field] += 67ms;
 
         int newccmode = (b1 >> 3) & 1;
-        int newtxtmode = m_txtMode[field*2 + newccmode];
+        int newtxtmode = m_txtMode[(field*2) + newccmode];
         if ((b1 & 0x06) == 0x04)
         {
             switch (b2)
@@ -222,7 +222,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
             }
         }
         m_ccMode[field] = newccmode;
-        m_txtMode[field*2 + newccmode] = newtxtmode;
+        m_txtMode[(field*2) + newccmode] = newtxtmode;
         mode = (field << 2) | (newtxtmode << 1) | m_ccMode[field];
 
         m_timeCode[mode] = tc;

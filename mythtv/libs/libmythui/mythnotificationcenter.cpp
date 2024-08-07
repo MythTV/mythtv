@@ -650,7 +650,7 @@ void MythNotificationScreen::UpdateFrom(const MythNotificationScreen &s)
 void MythNotificationScreen::AdjustYPosition(void)
 {
     MythPoint point = m_position;
-    point.setY(m_position.getY().toInt() + (GetHeight() + HGAP) * m_index);
+    point.setY(m_position.getY().toInt() + ((GetHeight() + HGAP) * m_index));
 
     if (point == GetPosition())
         return;

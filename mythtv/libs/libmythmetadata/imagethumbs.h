@@ -146,7 +146,7 @@ private:
     // Minor element = id, so thumbs are created in order they were scanned
     // If not unique, QMultiMap will process later requests before earlier ones
     int Priority(ImageItemK &im)
-    { return im.m_filePath.count('/') * 1000 + im.m_id; }
+    { return (im.m_filePath.count('/') * 1000) + im.m_id; }
 
     //! Db/filesystem adapter
     DBFS              &m_dbfs;

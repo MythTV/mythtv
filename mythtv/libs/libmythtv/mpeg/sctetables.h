@@ -478,15 +478,15 @@ class MTV_PUBLIC InverseChannelMapSubtable
     uint RecordCount(void) const { return m_data[9] & 0x7f; }
     //   for (i=0; i<record_count; i++) {
     //     source_id           16 10.0+i*4
-    uint SourceID(uint i) const { return (m_data[10+i*4]<<8) | m_data[11+i*4]; }
+    uint SourceID(uint i) const { return (m_data[10+(i*4)]<<8) | m_data[11+(i*4)]; }
     //     zero                 4 12.0+i*4
     //     virtual_channel_number 12 12.4+i*4
     uint VirtualChannelNumber(uint i) const
-        { return ((m_data[12+i*4]<<8) | m_data[13+i*4]) & 0xfff; }
+        { return ((m_data[12+(i*4)]<<8) | m_data[13+(i*4)]) & 0xfff; }
     //   }
 
     QString toStringXML(uint indent_level) const;
-    uint Size(void) const { return RecordCount() * 4 + 3; }
+    uint Size(void) const { return (RecordCount() * 4) + 3; }
 
   private:
     const unsigned char *m_data;

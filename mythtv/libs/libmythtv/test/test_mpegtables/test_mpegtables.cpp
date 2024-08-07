@@ -43,7 +43,7 @@ void TestMPEGTables::update_crc(std::vector<uint8_t> &data)
     data[size - 1] = (crc & 0x000000FF);
 }
 
-static std::array<uint8_t,3+8*12> high8 {
+static std::array<uint8_t,3+(8*12)> high8 {
     0x10, 0x00, 0x00,
     0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7,
     0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF,
@@ -2485,7 +2485,7 @@ void TestMPEGTables::ParentalRatingDescriptor_test (void)
 
 void TestMPEGTables::ExtendedEventDescriptor_test (void)
 {
-    ExtendedEventDescriptor desc(&eit_data_0000[16*13+12]);
+    ExtendedEventDescriptor desc(&eit_data_0000[(16*13)+12]);
     if (!desc.IsValid()) {
         QFAIL("The eit_data_0000 descriptor is invalid");
         return;

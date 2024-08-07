@@ -185,7 +185,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     RTjpeg             *m_rtjc                   {nullptr};
 
-    static constexpr size_t kOutLen {1024*1024 + 1024*1024 / 64 + 16 + 3};
+    static constexpr size_t kOutLen {(1024*1024) + (1024*1024 / 64) + 16 + 3};
     std::array<lzo_byte,kOutLen> m_out                {};
 
     alignas(8) std::array<uint8_t,LZO1X_1_MEM_COMPRESS> __LZO_MMODEL m_wrkmem {0} ;

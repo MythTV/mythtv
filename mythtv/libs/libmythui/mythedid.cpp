@@ -276,7 +276,7 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
     // Parse blocks
     for (size_t i = 0; i < 4; ++i)
     {
-        size_t offset = DATA_BLOCK_OFFSET + i * 18;
+        size_t offset = DATA_BLOCK_OFFSET + (i * 18);
         if (Data[offset] == 0 || Data[offset + 1] == 0 || Data[offset + 2] == 0)
             ParseDisplayDescriptor(Data, offset);
         else

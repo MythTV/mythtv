@@ -1502,7 +1502,7 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
     }
     else
     {
-        float secsMax = secsWritten - 2.F * maxtime;
+        float secsMax = secsWritten - (2.F * maxtime);
         if (secsMax <= 0.F)
             ret = 0;
         else if (secsMax < secsPlayed + ff)

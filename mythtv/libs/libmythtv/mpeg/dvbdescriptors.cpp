@@ -72,7 +72,7 @@ static QString iconv_helper(int which, char *buf, size_t length)
 
     // Allocate room for the output, including space for the Byte
     // Order Mark.
-    size_t outmaxlen = length * 2 + 2;
+    size_t outmaxlen = (length * 2) + 2;
     QByteArray outbytes;
     outbytes.resize(outmaxlen);
     char *outp = outbytes.data();
@@ -142,7 +142,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         size_t length = (raw_length - 1) / 2;
         auto *to = new QChar[length];
         for (size_t i=0; i<length; i++)
-            to[i] = QChar((src[1 + i*2] << 8) + src[1 + i*2 + 1]);
+            to[i] = QChar((src[1 + (i*2)] << 8) + src[1 + (i*2) + 1]);
         QString to2(to, length);
         delete [] to;
         return to2;

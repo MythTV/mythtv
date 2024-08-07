@@ -197,7 +197,7 @@ bool DTMFDescriptor::IsParsible(const unsigned char *data, uint safe_bytes)
 
 bool SegmentationDescriptor::Parse(void)
 {
-    _ptrs[0] = m_data + (IsProgramSegmentation() ? 12 : 13 + ComponentCount() * 6);
+    _ptrs[0] = m_data + (IsProgramSegmentation() ? 12 : 13 + (ComponentCount() * 6));
     _ptrs[1] = _ptrs[0] + (HasSegmentationDuration() ? 5 : 0);
     _ptrs[2] = _ptrs[1] + 2 + SegmentationUPIDLength();
     return true;

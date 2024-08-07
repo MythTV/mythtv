@@ -283,7 +283,7 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
 
         path.translate(adjX + textOffsetX, adjY + textOffsetY);
         QPen pen = tmp.pen();
-        pen.setWidth(outlineSize * 2 + 1);
+        pen.setWidth((outlineSize * 2) + 1);
         pen.setCapStyle(Qt::RoundCap);
         pen.setJoinStyle(Qt::RoundJoin);
         tmp.setPen(pen);

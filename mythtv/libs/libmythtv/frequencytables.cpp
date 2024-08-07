@@ -277,7 +277,7 @@ long long get_center_frequency(
 
         if ((min_freqid <= freqid) && (freqid <= max_freqid))
             return ft->m_frequencyStart +
-                ft->m_frequencyStep * (freqid - min_freqid);
+                (ft->m_frequencyStep * (freqid - min_freqid));
     }
     return -1;
 }
@@ -564,7 +564,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         6900000, 0, 0);
     fmap["dvbc_qam_bf1"] = new FrequencyTable(
-        194750000, 794750000, 100000, "BF Channel %1", 1 + (795000-203000) / 100,
+        194750000, 794750000, 100000, "BF Channel %1", 1 + ((795000-203000) / 100),
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         6900000, 0, 0);
 

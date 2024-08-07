@@ -1344,7 +1344,7 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
     {
         // Extrapolate from (key1,val1) based on fallback_ratio
         key2 = key;
-        val2 = llroundf(val1 + fallback_ratio * (key2 - key1));
+        val2 = llroundf(val1 + (fallback_ratio * (key2 - key1)));
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("TranslatePosition(key=%1, ratio=%2): "
                     "extrapolating to (%3,%4)")
@@ -1356,7 +1356,7 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
     if (key1 == key2) // this happens for an exact keyframe match
         return val2; // can also set key2 = key1 + 1 avoid dividing by zero
 
-    return llround(val1 + (double) (key - key1) * (val2 - val1) / (key2 - key1));
+    return llround(val1 + ((double) (key - key1) * (val2 - val1) / (key2 - key1)));
 }
 
 // Convert from an absolute frame number (not cutlist adjusted) to its

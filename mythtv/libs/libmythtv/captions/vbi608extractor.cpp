@@ -275,9 +275,9 @@ bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
                 maxv = std::max(uint((y+(i * static_cast<ptrdiff_t>(ypitch)))[j]), maxv);
             uint avgv = maxv / 2;
 
-            if (y[uint(m_start + (0+7) * m_rate)] > avgv ||
-                y[uint(m_start + (1+7) * m_rate)] > avgv ||
-                y[uint(m_start + (2+7) * m_rate)] < avgv)
+            if (y[uint(m_start + ((0+7) * m_rate))] > avgv ||
+                y[uint(m_start + ((1+7) * m_rate))] > avgv ||
+                y[uint(m_start + ((2+7) * m_rate))] < avgv)
             {
                 continue; // need 001 at run in..
             }
@@ -285,7 +285,7 @@ bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
             m_code[found_cnt] = 0;
             for (uint j = 0; j < 8+8; j++)
             {
-                bool bit = y[uint(m_start + (j+7+3) * m_rate)] > avgv;
+                bool bit = y[uint(m_start + ((j+7+3) * m_rate))] > avgv;
                 m_code[found_cnt] =
                     (m_code[found_cnt]>>1) | (bit?(1<<15):0);
             }
@@ -327,9 +327,9 @@ bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)
             maxv = std::max(uint(buf[j]), maxv);
         uint avgv = maxv / 2;
 
-        if (buf[uint(m_start + (0+7) * m_rate)] > avgv ||
-            buf[uint(m_start + (1+7) * m_rate)] > avgv ||
-            buf[uint(m_start + (2+7) * m_rate)] < avgv)
+        if (buf[uint(m_start + ((0+7) * m_rate))] > avgv ||
+            buf[uint(m_start + ((1+7) * m_rate))] > avgv ||
+            buf[uint(m_start + ((2+7) * m_rate))] < avgv)
         {
             LOG(VB_VBI, LOG_DEBUG, LOC + "did not find VBI 608 header");
             return false;
@@ -338,7 +338,7 @@ bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)
         m_code[0] = 0;
         for (uint j = 0; j < 8+8; j++)
         {
-            bool bit = buf[uint(m_start + (j+7+3) * m_rate)] > avgv;
+            bool bit = buf[uint(m_start + ((j+7+3) * m_rate))] > avgv;
             m_code[0] = (m_code[0]>>1) | (bit?(1<<15):0);
         }
 
@@ -357,9 +357,9 @@ bool VBI608Extractor::ExtractCC34(const unsigned char *buf, uint width)
             maxv = std::max(uint(buf[j]), maxv);
         uint avgv = maxv / 2;
 
-        if (buf[uint(m_start + (0+7) * m_rate)] > avgv ||
-            buf[uint(m_start + (1+7) * m_rate)] > avgv ||
-            buf[uint(m_start + (2+7) * m_rate)] < avgv)
+        if (buf[uint(m_start + ((0+7) * m_rate))] > avgv ||
+            buf[uint(m_start + ((1+7) * m_rate))] > avgv ||
+            buf[uint(m_start + ((2+7) * m_rate))] < avgv)
         {
             return false;
         }
@@ -367,7 +367,7 @@ bool VBI608Extractor::ExtractCC34(const unsigned char *buf, uint width)
         m_code[1] = 0;
         for (uint j = 0; j < 8+8; j++)
         {
-            bool bit = buf[uint(m_start + (j+7+3) * m_rate)] > avgv;
+            bool bit = buf[uint(m_start + ((j+7+3) * m_rate))] > avgv;
             m_code[1] = (m_code[1]>>1) | (bit?(1<<15):0);
         }
         return true;
@@ -388,9 +388,9 @@ uint VBI608Extractor::FillCCData(cc608_data &cc_data) const
 
     if (m_code[1] != UINT16_MAX)
     {
-        cc_data[2+3*cc_count] = 0x04|0x01;
-        cc_data[3+3*cc_count] = (m_code[1])    & 0xff;
-        cc_data[4+3*cc_count] = (m_code[1]>>8) & 0xff;
+        cc_data[2+(3*cc_count)] = 0x04|0x01;
+        cc_data[3+(3*cc_count)] = (m_code[1])    & 0xff;
+        cc_data[4+(3*cc_count)] = (m_code[1]>>8) & 0xff;
         cc_count++;
     }
 

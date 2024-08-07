@@ -584,7 +584,7 @@ void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
 static constexpr uint64_t CLOCK_EPOCH {0x83aa7e80};
 std::chrono::milliseconds MythRAOPConnection::NTPToLocal(uint32_t sec, uint32_t ticks)
 {
-    return std::chrono::milliseconds(((int64_t)sec - CLOCK_EPOCH) * 1000LL +
+    return std::chrono::milliseconds((((int64_t)sec - CLOCK_EPOCH) * 1000LL) +
                                      (((int64_t)ticks * 1000LL) >> 32));
 }
 void MythRAOPConnection::microsecondsToNTP(std::chrono::microseconds usec,
@@ -1534,7 +1534,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         int volume = (m_allowVolumeControl && m_audio) ?
                             m_audio->GetCurrentVolume() : 0;
                         responseData += QString("volume: %1\r\n")
-                            .arg(volume * 30.0F / 100.0F - 30.0F,1,'f',6,'0');
+                            .arg((volume * 30.0F / 100.0F) - 30.0F,1,'f',6,'0');
                     }
                 }
             }

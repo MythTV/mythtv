@@ -123,7 +123,7 @@ void VideoVisualSpectrum::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
 {
     static const QBrush kBrush(QColor(0, 0, 200, 180));
     static const QPen   kPen(QColor(255, 255, 255, 255));
-    double range = m_area.top() + m_area.height() / 2.0;
+    double range = m_area.top() + (m_area.height() / 2.0);
     int count = m_scale.range();
     Painter->Begin(Device);
     for (int i = 0; i < count; i++)

@@ -253,10 +253,10 @@ QString MythGesture::Translate(bool Timeout)
 
     /* calculate bin boundary positions */
     int bound_x_1 = m_minX + (delta_x / 3);
-    int bound_x_2 = m_minX + 2 * (delta_x / 3);
+    int bound_x_2 = m_minX + (2 * (delta_x / 3));
 
     int bound_y_1 = m_minY + (delta_y / 3);
-    int bound_y_2 = m_minY + 2 * (delta_y / 3);
+    int bound_y_2 = m_minY + (2 * (delta_y / 3));
 
     if (delta_x > m_scaleRatio * delta_y)
     {

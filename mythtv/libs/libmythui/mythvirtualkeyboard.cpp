@@ -121,38 +121,38 @@ bool MythUIVirtualKeyboard::Create()
         case VK_POSABOVEEDIT:
             if (editArea.y() - area.height() - 5 > 0)
             {
-                newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
+                newPos = QPoint(editArea.x() + (editArea.width() / 2) - (area.width() / 2),
                                 editArea.y() - area.height() - 5);
             }
             else
             {
-                newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
+                newPos = QPoint(editArea.x() + (editArea.width() / 2) - (area.width() / 2),
                                 editArea.y() + editArea.height() + 5);
             }
             break;
 
         case VK_POSTOPDIALOG:
-            newPos = QPoint(screensize.width() / 2 - area.width() / 2, 5);
+            newPos = QPoint((screensize.width() / 2) - (area.width() / 2), 5);
             break;
 
         case VK_POSBOTTOMDIALOG:
-            newPos = QPoint(screensize.width() / 2 - area.width() / 2, screensize.height() - 5 - area.height());
+            newPos = QPoint((screensize.width() / 2) - (area.width() / 2), screensize.height() - 5 - area.height());
             break;
 
         case VK_POSCENTERDIALOG:
-            newPos = QPoint(screensize.width() / 2 - area.width() / 2, screensize.height() / 2 - area.height() / 2);
+            newPos = QPoint((screensize.width() / 2) - (area.width() / 2), (screensize.height() / 2) - (area.height() / 2));
             break;
 
         default:
             // VK_POSBELOWEDIT
             if (editArea.y() + editArea.height() + area.height() + 5 < screensize.height())
             {
-                newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
+                newPos = QPoint(editArea.x() + (editArea.width() / 2) - (area.width() / 2),
                                 editArea.y() + editArea.height() + 5);
             }
             else
             {
-                newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
+                newPos = QPoint(editArea.x() + (editArea.width() / 2) - (area.width() / 2),
                                 editArea.y() - area.height() - 5);
             }
             break;

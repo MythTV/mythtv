@@ -2041,7 +2041,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
                 // split into upper/lower to allow zooming
                 QRect bbox;
-                int uh = display.height() / 2 - rect->y;
+                int uh = (display.height() / 2) - rect->y;
                 std::chrono::milliseconds displayuntil = currentFrame->m_timecode + displayfor;
                 if (uh > 0)
                 {
@@ -2113,7 +2113,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
         for (int x = bbox.left(); x <= bbox.right(); ++x)
         {
             const uint8_t color =
-                rect->data[0][y * rect->linesize[0] + x];
+                rect->data[0][(y * rect->linesize[0]) + x];
             const uint32_t pixel = *((uint32_t *)rect->data[1] + color);
             if (pixel & 0xff000000)
             {
@@ -2176,7 +2176,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
         {
             int xsrc = x + bbox.left();
             const uint8_t color =
-                rect->data[0][ysrc * rect->linesize[0] + xsrc];
+                rect->data[0][(ysrc * rect->linesize[0]) + xsrc];
             const uint32_t pixel = *((uint32_t *)rect->data[1] + color);
             qImage.setPixel(x, y, pixel);
         }

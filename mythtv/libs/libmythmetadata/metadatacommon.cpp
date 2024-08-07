@@ -1461,7 +1461,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
         result = QLocale::c().toDateTime(time, "dd MMM yy hh:mm:ss");
     if (result.isNull() || !result.isValid())
         return {};
-    result = result.addSecs(hoursShift * 3600 * (-1) + minutesShift *60 * (-1));
+    result = result.addSecs((hoursShift * 3600 * (-1)) + (minutesShift *60 * (-1)));
     result.setTimeSpec(Qt::UTC);
     return result;
 }

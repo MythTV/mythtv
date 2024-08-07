@@ -733,7 +733,7 @@ static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
     }
 
     float mult = (qctrl.maximum - qctrl.minimum) / 65535.0;
-    ctrl.value = (int)(mult * newvalue + qctrl.minimum);
+    ctrl.value = (int)((mult * newvalue) + qctrl.minimum);
     ctrl.value = std::min(ctrl.value, qctrl.maximum);
     ctrl.value = std::max(ctrl.value, qctrl.minimum);
 

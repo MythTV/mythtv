@@ -112,8 +112,8 @@ bool DetectLetterbox::Detect(MythVideoFrame *Frame, float VideoAspect, AdjustFil
     int averageY = 0;
     for (int pos : xPos)
     {
-        averageY += buf[offsets[0] + 5 * pitches[0]            + pos];
-        averageY += buf[offsets[0] + (height - 6) * pitches[0] + pos];
+        averageY += buf[offsets[0] + (5 * pitches[0])            + pos];
+        averageY += buf[offsets[0] + ((height - 6) * pitches[0]) + pos];
     }
 
     averageY /= NUMBER_OF_DETECTION_LINES * 2;
@@ -131,13 +131,13 @@ bool DetectLetterbox::Detect(MythVideoFrame *Frame, float VideoAspect, AdjustFil
     {
         for (int detectionLine = 0; detectionLine < NUMBER_OF_DETECTION_LINES; detectionLine++)
         {
-            int Y = buf[offsets[0] + y * pitches[0] + (xPos[detectionLine] << leftshift)];
+            int Y = buf[offsets[0] + (y * pitches[0]) + (xPos[detectionLine] << leftshift)];
             int U = 0;
             int V = 0;
             if (triplanar)
             {
-                U = buf[offsets[1] + (y>>1) * pitches[1] + (xPos[detectionLine] >> rightshift)];
-                V = buf[offsets[2] + (y>>1) * pitches[2] + (xPos[detectionLine] >> rightshift)];
+                U = buf[offsets[1] + ((y>>1) * pitches[1]) + (xPos[detectionLine] >> rightshift)];
+                V = buf[offsets[2] + ((y>>1) * pitches[2]) + (xPos[detectionLine] >> rightshift)];
             }
             else
             {
@@ -158,11 +158,11 @@ bool DetectLetterbox::Detect(MythVideoFrame *Frame, float VideoAspect, AdjustFil
                 maxTop = y;
             }
 
-            Y = buf[offsets[0] + (height-y-1) * pitches[0] + (xPos[detectionLine] << leftshift)];
+            Y = buf[offsets[0] + ((height-y-1) * pitches[0]) + (xPos[detectionLine] << leftshift)];
             if (triplanar)
             {
-                U = buf[offsets[1] + ((height-y-1) >> 1) * pitches[1] + (xPos[detectionLine] >> rightshift)];
-                V = buf[offsets[2] + ((height-y-1) >> 1) * pitches[2] + (xPos[detectionLine] >> rightshift)];
+                U = buf[offsets[1] + (((height-y-1) >> 1) * pitches[1]) + (xPos[detectionLine] >> rightshift)];
+                V = buf[offsets[2] + (((height-y-1) >> 1) * pitches[2]) + (xPos[detectionLine] >> rightshift)];
             }
             else
             {

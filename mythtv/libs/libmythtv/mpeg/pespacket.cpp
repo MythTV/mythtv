@@ -259,7 +259,7 @@ static unsigned char* get_188_block()
         free188.reserve(BLOCKS188);
         unsigned char* block_start = mem188.back();
         for (size_t i = 0; i < BLOCKS188; ++i)
-            free188.push_back(i * 188_UZ + block_start);
+            free188.push_back((i * 188_UZ) + block_start);
     }
 
     unsigned char *ptr = free188.back();
@@ -300,7 +300,7 @@ static unsigned char* get_4096_block()
         free4096.reserve(BLOCKS4096);
         unsigned char* block_start = mem4096.back();
         for (size_t i = 0; i < BLOCKS4096; ++i)
-            free4096.push_back(i * 4096_UZ + block_start);
+            free4096.push_back((i * 4096_UZ) + block_start);
     }
 
     unsigned char *ptr = free4096.back();

@@ -346,13 +346,13 @@ int hamm16(const uint8_t *p, int *err)
     int b = hammtab[p[1]];
     *err += a;
     *err += b;
-    return (a & 15) | (b & 15) * 16;
+    return (a & 15) | ((b & 15) * 16);
 }
 
 int hamm24(const uint8_t *p, int *err)
 {
     int e = hamm24par[0][p[0]] ^ hamm24par[1][p[1]] ^ hamm24par[2][p[2]];
-    int x = hamm24val[p[0]] + p[1] % 128 * 16 + p[2] % 128 * 2048;
+    int x = hamm24val[p[0]] + (p[1] % 128 * 16) + (p[2] % 128 * 2048);
 
     *err += hamm24err[e];
     return x ^ hamm24cor[e];

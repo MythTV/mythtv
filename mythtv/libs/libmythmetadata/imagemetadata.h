@@ -68,7 +68,7 @@ public:
     Orientation(int current, int file) : m_current(current), m_file(file) {}
 
     //! Encode original & current orientation to a single Db field
-    int Composite() const { return m_current * 10 + m_file; }
+    int Composite() const { return (m_current * 10) + m_file; }
     int Transform(int transform);
     int GetCurrent(bool compensate);
     QString Description() const;

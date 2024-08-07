@@ -852,9 +852,9 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     }
     else
     {
-        retvol = (m_mixer.volrange != 0L) ? (mixervol - m_mixer.volmin) *
-                                            100.0F / m_mixer.volrange + 0.5F
-                                            : 0;
+        retvol = (m_mixer.volrange != 0L)
+            ? ((mixervol - m_mixer.volmin) * 100.0F / m_mixer.volrange) + 0.5F
+            : 0;
         retvol = std::max(retvol, 0);
         retvol = std::min(retvol, 100);
         VBAUDIO(QString("get volume channel %1: %2")
@@ -868,7 +868,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     if (!(m_internalVol && m_mixer.elem))
         return;
 
-    long mixervol = (int64_t(volume) * m_mixer.volrange) / 100 + m_mixer.volmin;
+    long mixervol = ((int64_t(volume) * m_mixer.volrange) / 100) + m_mixer.volmin;
     mixervol = std::max(mixervol, m_mixer.volmin);
     mixervol = std::min(mixervol, m_mixer.volmax);
 

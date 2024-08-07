@@ -85,8 +85,8 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect Area, MythPainter* /*Painter*/,
 
     // Common calls
     render->glEnableVertexAttribArray(0);
-    QPointF center { m_area.left() + static_cast<qreal>(m_area.width()) / 2,
-                     m_area.top() + static_cast<qreal>(m_area.height()) / 2 };
+    QPointF center { m_area.left() + (static_cast<qreal>(m_area.width()) / 2),
+                     m_area.top() + (static_cast<qreal>(m_area.height()) / 2) };
 
     // Draw lines
     for (auto & vertex : m_vbos)

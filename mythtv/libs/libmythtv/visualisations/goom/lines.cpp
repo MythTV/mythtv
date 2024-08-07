@@ -209,8 +209,8 @@ goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 
 		lightencolor ((int *)&color, line->power);
 
-		int x1 = (int) (pt->x + cosa * line->amplitude * data[0]);
-		int y1 = (int) (pt->y + sina * line->amplitude * data[0]);
+		int x1 = (int) (pt->x + (cosa * line->amplitude * data[0]));
+		int y1 = (int) (pt->y + (sina * line->amplitude * data[0]));
 
 		for (int i = 1; i < 512; i++) {
 			pt = &(line->points[i]);
@@ -218,8 +218,8 @@ goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 			cosa = cosf (pt->angle) / 1000.0F;
 			sina = sinf (pt->angle) / 1000.0F;
 
-			int x2 = (int) (pt->x + cosa * line->amplitude * data[i]);
-			int y2 = (int) (pt->y + sina * line->amplitude * data[i]);
+			int x2 = (int) (pt->x + (cosa * line->amplitude * data[i]));
+			int y2 = (int) (pt->y + (sina * line->amplitude * data[i]));
 
 			draw_line ((int *)p, x1, y1, x2, y2, color, line->screenX, line->screenY);
 			DRAWMETHOD_DONE ();

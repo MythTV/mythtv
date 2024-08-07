@@ -456,7 +456,7 @@ QRegion MHRectangle::GetOpaqueArea()
         return {};
     }
     return {QRect(m_nPosX + m_nLineWidth, m_nPosY + m_nLineWidth,
-                  m_nBoxWidth - m_nLineWidth * 2, m_nBoxHeight - m_nLineWidth * 2)};
+                  m_nBoxWidth - (m_nLineWidth * 2), m_nBoxHeight - (m_nLineWidth * 2))};
 }
 
 void MHRectangle::Display(MHEngine *engine)
@@ -486,14 +486,14 @@ void MHRectangle::Display(MHEngine *engine)
     else
     {
         d->DrawRect(m_nPosX + m_nLineWidth, m_nPosY + m_nLineWidth,
-                    m_nBoxWidth - m_nLineWidth * 2, m_nBoxHeight - m_nLineWidth * 2, fillColour);
+                    m_nBoxWidth - (m_nLineWidth * 2), m_nBoxHeight - (m_nLineWidth * 2), fillColour);
         // Draw the lines round the outside.  UK MHEG allows us to treat all line styles as solid.
         // It isn't clear when we draw dashed and dotted lines what colour to put in the spaces.
         d->DrawRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nLineWidth, lineColour);
         d->DrawRect(m_nPosX, m_nPosY + m_nBoxHeight - m_nLineWidth, m_nBoxWidth, m_nLineWidth, lineColour);
-        d->DrawRect(m_nPosX, m_nPosY + m_nLineWidth, m_nLineWidth, m_nBoxHeight - m_nLineWidth * 2, lineColour);
+        d->DrawRect(m_nPosX, m_nPosY + m_nLineWidth, m_nLineWidth, m_nBoxHeight - (m_nLineWidth * 2), lineColour);
         d->DrawRect(m_nPosX + m_nBoxWidth - m_nLineWidth, m_nPosY + m_nLineWidth,
-                    m_nLineWidth, m_nBoxHeight - m_nLineWidth * 2, lineColour);
+                    m_nLineWidth, m_nBoxHeight - (m_nLineWidth * 2), lineColour);
     }
 }
 

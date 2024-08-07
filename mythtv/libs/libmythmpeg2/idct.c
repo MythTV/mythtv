@@ -50,7 +50,7 @@ void (* mpeg2_idct_add) (int last, int16_t * block,
  * to +-3826 - this is the worst case for a column IDCT where the
  * column inputs are 16-bit values.
  */
-uint8_t mpeg2_clip[3840 * 2 + 256];
+uint8_t mpeg2_clip[(3840 * 2) + 256];
 #define CLIP(i) ((mpeg2_clip + 3840)[i])
 
 #if 0
@@ -166,7 +166,7 @@ static void mpeg2_idct_copy_c (int16_t * block, uint8_t * dest,
     int i = 0;
 
     for (i = 0; i < 8; i++)
-	idct_row (block + 8 * i);
+	idct_row (block + (8 * i));
     for (i = 0; i < 8; i++)
 	idct_col (block + i);
     do {
@@ -194,7 +194,7 @@ static void mpeg2_idct_add_c (const int last, int16_t * block,
 
     if (last != 129 || (block[0] & (7 << 4)) == (4 << 4)) {
 	for (i = 0; i < 8; i++)
-	    idct_row (block + 8 * i);
+	    idct_row (block + (8 * i));
 	for (i = 0; i < 8; i++)
 	    idct_col (block + i);
 	do {

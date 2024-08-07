@@ -667,10 +667,10 @@ static int picture_display_ext (mpeg2dec_t * mpeg2dec)
 	nb_pos >>= 1;
 
     for (i = 0; i < nb_pos; i++) {
-	int x = ((buffer[4*i] << 24) | (buffer[4*i+1] << 16) |
-                 (buffer[4*i+2] << 8) | buffer[4*i+3]) >> (11-2*i);
-	int y = ((buffer[4*i+2] << 24) | (buffer[4*i+3] << 16) |
-                 (buffer[4*i+4] << 8) | buffer[4*i+5]) >> (10-2*i);
+	int x = ((buffer[4*i] << 24) | (buffer[(4*i)+1] << 16) |
+                 (buffer[(4*i)+2] << 8) | buffer[(4*i)+3]) >> (11-2*i);
+	int y = ((buffer[(4*i)+2] << 24) | (buffer[(4*i)+3] << 16) |
+                 (buffer[(4*i)+4] << 8) | buffer[(4*i)+5]) >> (10-2*i);
 	if (! (x & y & 1))
 	    return 1;
 	picture->display_offset[i].x = mpeg2dec->display_offset_x = x >> 1;

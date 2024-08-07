@@ -261,7 +261,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
 
            std::array<unsigned int,13> t {};
            for (ptrdiff_t i = 0; i < 13; ++i)
-               t[i] = hamm24(p + 1 + 3*i, &err);
+               t[i] = hamm24(p + 1 + (3*i), &err);
            if (err & 0xf000)
                return 4;
 
@@ -285,9 +285,9 @@ vt_line(struct vbi *vbi, unsigned char *p)
            for (ptrdiff_t i = 0; i < 6; ++i)
            {
                err = 0;
-               b1 = hamm16(p+1+6*i, &err);
-               b2 = hamm16(p+3+6*i, &err);
-               int b3 = hamm16(p+5+6*i, &err);
+               b1 = hamm16(p+1+(6*i), &err);
+               b2 = hamm16(p+3+(6*i), &err);
+               int b3 = hamm16(p+5+(6*i), &err);
                if (err & 0xf000)
                    return 1;
                int x = (b2 >> 7) | ((b3 >> 5) & 0x06);
@@ -340,7 +340,7 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
 
     /* remove DC. edge-detector */
     for (i = vbi->soc; i < vbi->eoc; ++i)
-       dt[i] = p[i+bpb/FAC] - p[i];    // amplifies the edges best.
+       dt[i] = p[i+(bpb/FAC)] - p[i];    // amplifies the edges best.
 
     /* set barrier */
     for (i = vbi->eoc; i < vbi->eoc+16; i += 2)

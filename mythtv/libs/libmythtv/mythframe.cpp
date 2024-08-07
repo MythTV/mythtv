@@ -424,7 +424,7 @@ size_t MythVideoFrame::GetBufferSize(VideoFrameType Type, int Width, int Height,
 
     // Calculate rounding as necessary.
     int remainder = (adj_w * adj_h * bpp) % bpb;
-    return static_cast<uint>((adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0));
+    return static_cast<uint>(((adj_w * adj_h * bpp) / bpb) + (remainder ? 1 : 0));
 }
 
 uint8_t *MythVideoFrame::GetAlignedBuffer(size_t Size)

@@ -193,7 +193,7 @@ class SegmentationDescriptor : public SpliceDescriptor
     uint ComponentCount(void) const { return m_data[12]; }
     //     for (i = 0; i < component_count; i++) {
     //       component_tag      8  13 + i * 6
-    uint ComponentTag(uint i) const { return m_data[13 + i * 6]; }
+    uint ComponentTag(uint i) const { return m_data[13 + (i * 6)]; }
     //       reserved           7  14.1 + i * 6
     //       pts_offset        33  14.7 + i * 6
     uint64_t PTSOffset(uint i)

@@ -205,7 +205,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		static int s_wave = 0;
 		static int s_wavesp = 0;
 
-		int yy = y + RAND () % 4 - RAND () % 4 + s_wave / 10;
+		int yy = y + (RAND () % 4) - (RAND () % 4) + (s_wave / 10);
 		if (yy < 0)
 			yy = 0;
 		if (yy >= (int)c_resoly)
@@ -248,7 +248,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		if (waveEffect) {
 			fvitesse *=
 				1024 +
-				ShiftRight (sintable[(unsigned short) (dist * 0xffff + EFFECT_DISTORS)], 6);
+				ShiftRight (sintable[(unsigned short) ((dist * 0xffff) + EFFECT_DISTORS)], 6);
 			fvitesse /= 1024;
 		}
 
@@ -333,7 +333,7 @@ setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
 	}
 #endif
 
-	buffer[y * resolx + x] =
+	buffer[(y * resolx) + x] =
 		(c.b << (BLEU * 8)) | (c.v << (VERT * 8)) | (c.r << (ROUGE * 8));
 }
 
@@ -412,7 +412,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 	int     bufsize = lprevX * lprevY * 2;
 	int     bufwidth = lprevX;
 
-	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
+	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[(lprevX*lprevY)-1]=lexpix1[(lprevX*lprevY)-lprevX]=0;
 
 	for (int myPos = 0; myPos < bufsize; myPos += 2) {
 		Color   col1 {};
@@ -432,7 +432,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
                 if (py < 0)
                     py = 0;
 
-		int pos = ((px >> PERTEDEC) + lprevX * (py >> PERTEDEC));
+		int pos = ((px >> PERTEDEC) + (lprevX * (py >> PERTEDEC)));
 		// coef en modulo 15
 		int lcoeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
 
@@ -556,13 +556,13 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			generatePrecalCoef ();
 			select_zoom_filter ();
 
-			freebrutS = (signed int *) calloc (resx * resy * 2 + 128, sizeof(signed int));
+			freebrutS = (signed int *) calloc ((resx * resy * 2) + 128, sizeof(signed int));
 			brutS = (signed int *) ((1 + ((uintptr_t) (freebrutS)) / 128) * 128);
 
-			freebrutD = (signed int *) calloc (resx * resy * 2 + 128, sizeof(signed int));
+			freebrutD = (signed int *) calloc ((resx * resy * 2) + 128, sizeof(signed int));
 			brutD = (signed int *) ((1 + ((uintptr_t) (freebrutD)) / 128) * 128);
 
-			freebrutT = (signed int *) calloc (resx * resy * 2 + 128, sizeof(signed int));
+			freebrutT = (signed int *) calloc ((resx * resy * 2) + 128, sizeof(signed int));
 			brutT = (signed int *) ((1 + ((uintptr_t) (freebrutT)) / 128) * 128);
 
 			/** modif here by jeko : plus de multiplications **/
@@ -693,8 +693,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	if (switchMult != 1.0F) {
 		buffratio =
-			(int) ((float) BUFFPOINTMASK * (1.0F - switchMult) +
-						 (float) buffratio * switchMult);
+			(int) (((float) BUFFPOINTMASK * (1.0F - switchMult)) +
+						 ((float) buffratio * switchMult));
 	}
 
 	zoom_width = prevX;

@@ -202,13 +202,13 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
         {
             uint j = 0;
             for (j = 0; j < m_column_count; ++j)
-                new_text[i * new_columns + j] = m_text[i * m_true_column_count + j];
+                new_text[(i * new_columns) + j] = m_text[(i * m_true_column_count) + j];
             for (; j < new_columns; ++j)
-                new_text[i * new_columns + j].m_attr = m_pen.m_attr;
+                new_text[(i * new_columns) + j].m_attr = m_pen.m_attr;
         }
         for (; i < new_rows; ++i)
             for (uint j = 0; j < new_columns; ++j)
-                new_text[i * new_columns + j].m_attr = m_pen.m_attr;
+                new_text[(i * new_columns) + j].m_attr = m_pen.m_attr;
 
         delete [] m_text;
         m_text = new_text;
@@ -224,16 +224,16 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
         {
             for (uint j = m_column_count; j < new_columns; ++j)
             {
-                m_text[i * m_true_column_count + j].m_character = ' ';
-                m_text[i * m_true_column_count + j].m_attr = m_pen.m_attr;
+                m_text[(i * m_true_column_count) + j].m_character = ' ';
+                m_text[(i * m_true_column_count) + j].m_attr = m_pen.m_attr;
             }
         }
         for (uint i = m_row_count; i < new_rows; ++i)
         {
             for (uint j = 0; j < new_columns; ++j)
             {
-                m_text[i * m_true_column_count + j].m_character = ' ';
-                m_text[i * m_true_column_count + j].m_attr = m_pen.m_attr;
+                m_text[(i * m_true_column_count) + j].m_character = ' ';
+                m_text[(i * m_true_column_count) + j].m_attr = m_pen.m_attr;
             }
         }
         SetChanged();
@@ -278,7 +278,7 @@ CC708Character &CC708Window::GetCCChar(void) const
     assert(m_text);
     assert(m_pen.m_row    < m_true_row_count);
     assert(m_pen.m_column < m_true_column_count);
-    return m_text[m_pen.m_row * m_true_column_count + m_pen.m_column];
+    return m_text[(m_pen.m_row * m_true_column_count) + m_pen.m_column];
 }
 
 std::vector<CC708String*> CC708Window::GetStrings(void) const
@@ -319,7 +319,7 @@ std::vector<CC708String*> CC708Window::GetStrings(void) const
         uint strStart = 0;
         for (uint i = 0; i < m_column_count; i++)
         {
-            CC708Character &chr = m_text[j * m_true_column_count + i];
+            CC708Character &chr = m_text[(j * m_true_column_count) + i];
             chars[i] = chr.m_character;
             if (!cur)
             {

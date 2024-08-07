@@ -77,8 +77,8 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 	c_offset = c_black_height * resx;
 	c_resoly = resy - c_black_height * 2;
 
-	pixel = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
-	back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
+	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
+	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
 	//RAND_INIT ();
 	srand ((uintptr_t) pixel);
 	if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
@@ -117,10 +117,10 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 	resoly = resy;
 	buffsize = resx * resy;
 
-	pixel = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
-	memset (pixel, 0, buffsize * sizeof (guint32) + 128);
-	back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
-	memset (back, 0,  buffsize * sizeof (guint32) + 128);
+	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
+	memset (pixel, 0, (buffsize * sizeof (guint32)) + 128);
+	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
+	memset (back, 0,  (buffsize * sizeof (guint32)) + 128);
 	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
 	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
@@ -234,25 +234,25 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			s_loopVar += s_speedVar*2/3 + 1;
 
 			pointFilter (p1 + c_offset, YELLOW,
-                                     ((pointWidth - 6.0F) * largfactor + 5.0F),
-                                     ((pointHeight - 6.0F) * largfactor + 5.0F),
-                                     i * 152.0F, 128.0F, s_loopVar + i * 2032);
+                                     (((pointWidth - 6.0F) * largfactor) + 5.0F),
+                                     (((pointHeight - 6.0F) * largfactor) + 5.0F),
+                                     i * 152.0F, 128.0F, s_loopVar + (i * 2032));
 			pointFilter (p1 + c_offset, ORANGE,
-                                     ((pointWidth  / 2.0F) * largfactor) / i + 10.0F * i,
-                                     ((pointHeight / 2.0F) * largfactor) / i + 10.0F * i,
+                                     (((pointWidth  / 2.0F) * largfactor) / i) + (10.0F * i),
+                                     (((pointHeight / 2.0F) * largfactor) / i) + (10.0F * i),
                                      96.0F, i * 80.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, VIOLET,
-                                     ((pointHeight / 3.0F + 5.0F) * largfactor) / i + 10.0F * i,
-                                     ((pointHeight / 3.0F + 5.0F) * largfactor) / i + 10.0F * i,
+                                     (((pointHeight / 3.0F + 5.0F) * largfactor) / i) + (10.0F * i),
+                                     (((pointHeight / 3.0F + 5.0F) * largfactor) / i) + (10.0F * i),
                                      i + 122.0F, 134.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, BLACK,
-                                     ((pointHeight / 3.0F) * largfactor + 20.0F),
-                                     ((pointHeight / 3.0F) * largfactor + 20.0F),
+                                     (((pointHeight / 3.0F) * largfactor) + 20.0F),
+                                     (((pointHeight / 3.0F) * largfactor) + 20.0F),
                                      58.0F, i * 66.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, WHITE,
                                      (pointHeight * largfactor + 10.0F * i) / i,
                                      (pointHeight * largfactor + 10.0F * i) / i,
-                                     66.0F, 74.0F, s_loopVar + i * 500); }
+                                     66.0F, 74.0F, s_loopVar + (i * 500)); }
 	}
 
 	// par défaut pas de changement de zoom

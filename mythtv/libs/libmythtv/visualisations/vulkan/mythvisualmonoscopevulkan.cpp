@@ -255,8 +255,8 @@ void MythVisualMonoScopeVulkan::Draw(const QRect Area, MythPainter* /*Painter*/,
 
     // Iterate over vertex buffers - vertex buffers run oldest to newest, which
     // ensures rendering is correct
-    float centrex = m_area.left() + m_area.width() / 2.0F;
-    float centrey = m_area.top() + m_area.height() / 2.0F;
+    float centrex = m_area.left() + (m_area.width() / 2.0F);
+    float centrey = m_area.top() + (m_area.height() / 2.0F);
 
     for (auto & vertex : m_vertexBuffers)
     {

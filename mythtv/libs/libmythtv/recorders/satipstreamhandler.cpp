@@ -118,7 +118,7 @@ SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
     // Find the port to use for receiving the RTP data.
     // First try a fixed even port number outside the range of dynamically allocated ports.
     // If this fails try to get a dynamically allocated port.
-    uint preferred_port = 26420 + 2*inputid;
+    uint preferred_port = 26420 + (2*inputid);
     m_dsocket = new QUdpSocket(nullptr);
     if (m_dsocket->bind(QHostAddress::AnyIPv4,
                         preferred_port,

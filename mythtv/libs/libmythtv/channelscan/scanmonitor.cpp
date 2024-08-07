@@ -102,7 +102,7 @@ void ScanMonitor::ScanComplete(void)
 
 void ScanMonitor::ScanPercentComplete(int pct)
 {
-    int tmp = TRANSPORT_PCT + ((100 - TRANSPORT_PCT) * pct)/100;
+    int tmp = TRANSPORT_PCT + (((100 - TRANSPORT_PCT) * pct)/100);
     post_event(this, ScannerEvent::kSetPercentComplete, tmp);
 }
 

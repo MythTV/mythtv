@@ -33,9 +33,9 @@ void MythBDOverlay::SetPalette(const BD_PG_PALETTE_ENTRY *Palette)
         int cr = Palette[i].Cr;
         int cb = Palette[i].Cb;
         int a  = Palette[i].T;
-        int r  = std::clamp(int(y + 1.4022 * (cr - 128)), 0, 0xff);
-        int b  = std::clamp(int(y + 1.7710 * (cb - 128)), 0, 0xff);
-        int g  = std::clamp(int(1.7047 * y - (0.1952 * b) - (0.5647 * r)), 0, 0xff);
+        int r  = std::clamp(int(y + (1.4022 * (cr - 128))), 0, 0xff);
+        int b  = std::clamp(int(y + (1.7710 * (cb - 128))), 0, 0xff);
+        int g  = std::clamp(int((1.7047 * y) - (0.1952 * b) - (0.5647 * r)), 0, 0xff);
         rgbpalette.push_back(static_cast<uint>((a << 24) | (r << 16) | (g << 8) | b));
     }
     m_image.setColorTable(rgbpalette);

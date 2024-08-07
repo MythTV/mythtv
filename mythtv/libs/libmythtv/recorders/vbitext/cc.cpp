@@ -112,7 +112,7 @@ static int decode(unsigned char *vbiline, int scale0, int scale1)
 
     tmp = i + scale0;
     for (i = 0; i < 16; i++)
-        if (decodebit(&vbiline[tmp + i * scale0], sample, scale1))
+        if (decodebit(&vbiline[tmp + (i * scale0)], sample, scale1))
             packedbits |= 1 << i;
     return packedbits & parityok(packedbits);
 }

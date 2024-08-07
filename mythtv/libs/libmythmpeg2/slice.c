@@ -596,7 +596,7 @@ static int get_non_intra_block (mpeg2_decoder_t * const decoder,
 
 	    DUMPBITS (bit_buf, bits, 12);
 	    NEEDBITS (bit_buf, bits, bit_ptr);
-	    int val = 2 * (SBITS (bit_buf, 12) + SBITS (bit_buf, 1)) + 1;
+	    int val = (2 * (SBITS (bit_buf, 12) + SBITS (bit_buf, 1))) + 1;
 	    val = (val * quant_matrix[j]) / 32;
 
 	    SATURATE (val);

@@ -832,7 +832,7 @@ void MHText::Redraw()
 
             if (! pItem->m_unicode.isEmpty())   // We may have blank lines.
             {
-                m_pDisplay->AddText(xOffset, yOffset + (pLine->m_nLineHeight + lineSpace) / 2 - pLine->m_nDescent,
+                m_pDisplay->AddText(xOffset, yOffset + ((pLine->m_nLineHeight + lineSpace) / 2) - pLine->m_nDescent,
                                     pItem->m_unicode.left(pItem->m_nUnicode), pItem->m_colour);
             }
 

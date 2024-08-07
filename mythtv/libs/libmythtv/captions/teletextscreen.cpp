@@ -586,9 +586,9 @@ void TeletextScreen::DrawMosaic(int x, int y, int code, bool doubleheight)
     dy = (doubleheight) ? (2 * dy) : dy;
 
     if (code & 0x10)
-        DrawRect(row, QRect(x,      y + 2*dy, dx, dy));
+        DrawRect(row, QRect(x,      y + (2*dy), dx, dy));
     if (code & 0x40)
-        DrawRect(row, QRect(x + dx, y + 2*dy, dx, dy));
+        DrawRect(row, QRect(x + dx, y + (2*dy), dx, dy));
     if (code & 0x01)
         DrawRect(row, QRect(x,      y,        dx, dy));
     if (code & 0x02)
@@ -637,7 +637,7 @@ void TeletextScreen::DrawStatus()
         else
             SetBackgroundColor(kTTColorBlack);
 
-        DrawBackground(x * 3 + 7, 0);
+        DrawBackground((x * 3) + 7, 0);
 
         if (str[x * 3] == '*')
         {
@@ -645,12 +645,12 @@ void TeletextScreen::DrawStatus()
             SetBackgroundColor(kTTColorRed);
         }
 
-        DrawBackground(x * 3 + 8, 0);
-        DrawBackground(x * 3 + 9, 0);
+        DrawBackground((x * 3) + 8, 0);
+        DrawBackground((x * 3) + 9, 0);
 
-        DrawCharacter(x * 3 + 7, 0, str[x * 3], false);
-        DrawCharacter(x * 3 + 8, 0, str[x * 3 + 1], false);
-        DrawCharacter(x * 3 + 9, 0, str[x * 3 + 2], false);
+        DrawCharacter((x * 3) + 7, 0, str[x * 3], false);
+        DrawCharacter((x * 3) + 8, 0, str[(x * 3) + 1], false);
+        DrawCharacter((x * 3) + 9, 0, str[(x * 3) + 2], false);
     }
 }
 

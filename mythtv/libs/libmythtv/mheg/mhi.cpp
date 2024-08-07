@@ -1513,25 +1513,25 @@ void MHIDLA::Draw(int x, int y)
                            m_width, m_lineWidth, m_boxLineColour);
 
         m_parent->DrawRect(x, y + m_lineWidth,
-                           m_lineWidth, m_height - m_lineWidth * 2,
+                           m_lineWidth, m_height - (m_lineWidth * 2),
                            m_boxLineColour);
 
         m_parent->DrawRect(x + m_width - m_lineWidth, y + m_lineWidth,
-                           m_lineWidth, m_height - m_lineWidth * 2,
+                           m_lineWidth, m_height - (m_lineWidth * 2),
                            m_boxLineColour);
 
         // Deflate the box to within the border.
         bounds = QRect(bounds.x() + m_lineWidth,
                        bounds.y() + m_lineWidth,
-                       bounds.width() - 2*m_lineWidth,
-                       bounds.height() - 2*m_lineWidth);
+                       bounds.width() - (2*m_lineWidth),
+                       bounds.height() - (2*m_lineWidth));
     }
 
     // Draw the background.
     m_parent->DrawRect(x + m_lineWidth,
                        y + m_lineWidth,
-                       m_width  - m_lineWidth * 2,
-                       m_height - m_lineWidth * 2,
+                       m_width  - (m_lineWidth * 2),
+                       m_height - (m_lineWidth * 2),
                        m_boxFillColour);
 
     // Now the drawing.
@@ -1656,16 +1656,16 @@ void MHIDLA::DrawBorderedRectangle(int x, int y, int width, int height)
                  m_lineColour);
 
         DrawRect(x, y + m_lineWidth,
-                 m_lineWidth, height - m_lineWidth * 2,
+                 m_lineWidth, height - (m_lineWidth * 2),
                  m_lineColour);
 
         DrawRect(x + width - m_lineWidth, y + m_lineWidth,
-                 m_lineWidth, height - m_lineWidth * 2,
+                 m_lineWidth, height - (m_lineWidth * 2),
                  m_lineColour);
 
         // Fill the rectangle.
         DrawRect(x + m_lineWidth, y + m_lineWidth,
-                 width - m_lineWidth * 2, height - m_lineWidth * 2,
+                 width - (m_lineWidth * 2), height - (m_lineWidth * 2),
                  m_fillColour);
     }
     else

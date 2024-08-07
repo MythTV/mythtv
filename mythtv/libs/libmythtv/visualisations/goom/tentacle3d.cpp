@@ -29,10 +29,10 @@ void tentacle_new (void) {
 	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
 	for (auto & tmp : grille) {
-		int z = 45+goom_rand()%30;
-		int x = 85+goom_rand()%5;
+		int z = 45+(goom_rand()%30);
+		int x = 85+(goom_rand()%5);
 		center.z = z;
-		tmp = grid3d_new (x,definitionx,z,definitionz+goom_rand()%10,center);
+		tmp = grid3d_new (x,definitionx,z,definitionz+(goom_rand()%10),center);
 		center.y += 8;
 	}
 }
@@ -173,7 +173,7 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
                 int color = s_col;
                 int colorlow = s_col;
 		
-		lightencolor(&color,s_lig * 2.0F + 2.0F);
+		lightencolor(&color,(s_lig * 2.0F) + 2.0F);
 		lightencolor(&colorlow,(s_lig/3.0F)+0.67F);
 
 		rapport = 1.0F + 2.0F * (rapport - 1.0F);

@@ -135,7 +135,7 @@ add_enhance(struct enhance *eh, int dcode, std::array<unsigned int,13>& data)
 {
     if (dcode == eh->next_des)
     {
-       memcpy(eh->trip + static_cast<ptrdiff_t>(dcode) * 13,
+       memcpy(eh->trip + (static_cast<ptrdiff_t>(dcode) * 13),
               data.cbegin(), data.size() * sizeof(unsigned int));
        eh->next_des++;
     }
@@ -151,7 +151,7 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
     if (eh->next_des < 1)
        return;
 
-    for (unsigned int *p = eh->trip, *e = p + static_cast<ptrdiff_t>(eh->next_des) * 13; p < e; p++)
+    for (unsigned int *p = eh->trip, *e = p + (static_cast<ptrdiff_t>(eh->next_des) * 13); p < e; p++)
     {
        if (*p % 2048 != 2047)
        {

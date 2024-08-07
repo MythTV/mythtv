@@ -688,7 +688,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
             m_compressAudio = false;
         }
     }
-    m_mp3BufSize = (int)(1.25 * 16384 + 7200);
+    m_mp3BufSize = (int)((1.25 * 16384) + 7200);
     m_mp3Buf = new char[m_mp3BufSize];
 
     return 0;
@@ -783,7 +783,7 @@ void NuppelVideoRecorder::ResizeVideoBuffers(void)
 void NuppelVideoRecorder::StreamAllocate(void)
 {
     delete [] m_strm;
-    m_strm = new signed char[m_width * m_height * 2 + 10];
+    m_strm = new signed char[(m_width * m_height * 2) + 10];
 }
 
 bool NuppelVideoRecorder::Open(void)

@@ -144,7 +144,7 @@ bool MythDVDStream::OpenFile(const QString &Filename, std::chrono::milliseconds 
                 name = QString("/VIDEO_TS/VTS_%1_%2.VOB").arg(title,2,10,QChar('0')).arg(part);
                 start = UDFFindFile(m_reader, qPrintable(name), &len);
                 if( start != 0 && len != 0 )
-                    m_blocks.append(BlockRange(start, Len2Blocks(len), title + part * kTitles));
+                    m_blocks.append(BlockRange(start, Len2Blocks(len), title + (part * kTitles)));
             }
         }
 

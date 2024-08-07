@@ -278,7 +278,7 @@ int eld::update_eld(const char *buf, int size)
             VBAUDIO(QString("out of range SAD %1").arg(i));
             goto out_fail;
         }
-        update_sad(i, buf + ELD_FIXED_BYTES + mnl + 3 * static_cast<ptrdiff_t>(i));
+        update_sad(i, buf + ELD_FIXED_BYTES + mnl + (3 * static_cast<ptrdiff_t>(i)));
     }
 
     /*

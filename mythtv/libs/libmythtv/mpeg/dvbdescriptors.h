@@ -56,17 +56,17 @@ static constexpr uint8_t byteBCDL2int(uint8_t i) { return i & 0x0f; };
 static constexpr uint8_t byteBCD2int(uint8_t i)
 { return (byteBCDH2int(i) * 10) + byteBCDL2int(i); };
 static constexpr uint16_t byte2BCD2int(uint8_t i, uint8_t j)
-{ return (byteBCDH2int(i) * 1000     + byteBCDL2int(i) * 100       +
-          byteBCDH2int(j) * 10       + byteBCDL2int(j)); };
+{ return ((byteBCDH2int(i) * 1000)     + (byteBCDL2int(i) * 100)       +
+          (byteBCDH2int(j) * 10)       +  byteBCDL2int(j)); };
 static constexpr uint32_t byte3BCD2int(uint8_t i, uint8_t j, uint8_t k)
-{ return (byteBCDH2int(i) * 100000   + byteBCDL2int(i) * 10000     +
-          byteBCDH2int(j) * 1000     + byteBCDL2int(j) * 100       +
-          byteBCDH2int(k) * 10       + byteBCDL2int(k)); };
+{ return ((byteBCDH2int(i) * 100000)   + (byteBCDL2int(i) * 10000)     +
+          (byteBCDH2int(j) * 1000)     + (byteBCDL2int(j) * 100)       +
+          (byteBCDH2int(k) * 10)       +  byteBCDL2int(k)); };
 static constexpr uint32_t byte4BCD2int(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
-{ return (byteBCDH2int(i) * 10000000   + byteBCDL2int(i) * 1000000 +
-          byteBCDH2int(j) * 100000     + byteBCDL2int(j) * 10000   +
-          byteBCDH2int(k) * 1000       + byteBCDL2int(k) * 100     +
-          byteBCDH2int(l) * 10         + byteBCDL2int(l)); };
+{ return ((byteBCDH2int(i) * 10000000)   + (byteBCDL2int(i) * 1000000) +
+          (byteBCDH2int(j) * 100000)     + (byteBCDL2int(j) * 10000)   +
+          (byteBCDH2int(k) * 1000)       + (byteBCDL2int(k) * 100)     +
+          (byteBCDH2int(l) * 10)         +  byteBCDL2int(l)); };
 static constexpr uint64_t byte4BCD2int64(uint8_t i, uint8_t j, uint8_t k, uint8_t l)
 { return static_cast<uint64_t>(byte4BCD2int(i, j, k, l)); }
 
@@ -231,9 +231,9 @@ class ApplicationSignallingDescriptor : public MPEGDescriptor
     //  }
     uint Count() const { return DescriptorLength() / 3; }
     uint ApplicationType(uint i) const
-        { return (m_data[2 + i*3] & 0x7F) << 8 | m_data[2 + i*3 + 1] ; }
+        { return (m_data[2 + (i*3)] & 0x7F) << 8 | m_data[2 + (i*3) + 1] ; }
     uint AITVersionNumber(uint i) const
-        { return m_data[2 + i*3 + 2] & 0x1F ; }
+        { return m_data[2 + (i*3) + 2] & 0x1F ; }
     QString toString(void) const override; // MPEGDescriptor
 };
 
@@ -336,7 +336,7 @@ class CAIdentifierDescriptor : public MPEGDescriptor
     // for (i=0; i<N; i++)
     //   { CA_system_id 16 }
     int CASystemId(uint i) const
-        { return (m_data[2 + i*2] << 8) | m_data[3 + i*2]; }
+        { return (m_data[2 + (i*2)] << 8) | m_data[3 + (i*2)]; }
     QString toString(void) const override; // MPEGDescriptor
 };
 
@@ -1240,13 +1240,13 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
 
     uint CentreFrequency(int i, int j) const
     {
-        return (m_cellPtrs[i][3+4*j] << 24) | (m_cellPtrs[i][4+4*j] << 16) | (m_cellPtrs[i][5+4*j] << 8) | m_cellPtrs[i][6+4*j];
+        return (m_cellPtrs[i][3+(4*j)] << 24) | (m_cellPtrs[i][4+(4*j)] << 16) | (m_cellPtrs[i][5+(4*j)] << 8) | m_cellPtrs[i][6+(4*j)];
     }
     uint SubcellInfoLoopLength(uint i) const { return m_subCellPtrs[i][0]; }
-    uint CellIDExtension(uint i, uint j) const { return m_subCellPtrs[i][1+5*j]; }
+    uint CellIDExtension(uint i, uint j) const { return m_subCellPtrs[i][1+(5*j)]; }
     uint TransposerFrequency(uint i, uint j) const
     {
-        return (m_subCellPtrs[i][1+5*j] << 24) | (m_subCellPtrs[i][2+5*j] << 16) | (m_subCellPtrs[i][3+5*j] << 8) | m_cellPtrs[i][4+5*j];
+        return (m_subCellPtrs[i][1+(5*j)] << 24) | (m_subCellPtrs[i][2+(5*j)] << 16) | (m_subCellPtrs[i][3+(5*j)] << 8) | m_cellPtrs[i][4+(5*j)];
     }
 
     void Parse(void) const;
@@ -1639,13 +1639,13 @@ class FrequencyListDescriptor : public MPEGDescriptor
     {
         if (kCodingTypeTerrestrial == CodingType())
         {
-            return (((unsigned long long)m_data[i*4+3]<<24) |
-                                        (m_data[i*4+4]<<16) |
-                                        (m_data[i*4+5]<<8)  |
-                                        (m_data[i*4+6]));
+            return (((unsigned long long)m_data[(i*4)+3]<<24) |
+                                        (m_data[(i*4)+4]<<16) |
+                                        (m_data[(i*4)+5]<<8)  |
+                                        (m_data[(i*4)+6]));
         }
-        return byte4BCD2int(m_data[i*4+3], m_data[i*4+4],
-                            m_data[i*4+5], m_data[i*4+6]);
+        return byte4BCD2int(m_data[(i*4)+3], m_data[(i*4)+4],
+                            m_data[(i*4)+5], m_data[(i*4)+6]);
     }
     unsigned long long FrequencyHz(uint i) const
     {
@@ -1672,40 +1672,40 @@ class MTV_PUBLIC LocalTimeOffsetDescriptor : public MPEGDescriptor
     //   country_code          24   0.0+p
     uint CountryCode(uint i) const
     {
-        int o = 2 + i*13;
+        int o = 2 + (i*13);
         return ((m_data[o] << 16) | (m_data[o+1] << 8) | m_data[o+2]);
     }
     QString CountryCodeString(uint i) const
     {
-        int o = 2 + i*13;
+        int o = 2 + (i*13);
         std::array<QChar,3> code
             { QChar(m_data[o]), QChar(m_data[o+1]), QChar(m_data[o+2]) };
         return QString(code.data(), 3);
     }
     //   country_region_id      6   3.0+p
-    uint CountryRegionId(uint i) const { return m_data[2 + i*13 + 3] >> 2; }
+    uint CountryRegionId(uint i) const { return m_data[2 + (i*13) + 3] >> 2; }
     //   reserved               1   3.6+p
     //   local_time_off_polarity 1   3.7+p
     /// -1 if true, +1 if false (behind utc, ahead of utc, resp).
     bool LocalTimeOffsetPolarity(uint i) const
-        { return (m_data[2 + i*13 + 3] & 0x01) != 0; }
+        { return (m_data[2 + (i*13) + 3] & 0x01) != 0; }
     //   local_time_offset     16   4.0+p
     uint LocalTimeOffset(uint i) const
-        { return byteBCD2int(m_data[2 + i*13 + 4]) * 60 +
-                 byteBCD2int(m_data[2 + i*13 + 5]); }
+        { return (byteBCD2int(m_data[2 + (i*13) + 4]) * 60) +
+                 byteBCD2int(m_data[2 + (i*13) + 5]); }
     int LocalTimeOffsetWithPolarity(uint i) const
         { return (LocalTimeOffsetPolarity(i) ? -1 : +1) * LocalTimeOffset(i); }
     //   time_of_change        40   6.0+p
     const unsigned char *TimeOfChangeData(uint i) const
-        { return &m_data[2 + i*13 + 6]; }
+        { return &m_data[2 + (i*13) + 6]; }
     QDateTime TimeOfChange(uint i)  const
         { return dvbdate2qt(TimeOfChangeData(i));   }
     time_t TimeOfChangeUnix(uint i) const
         { return dvbdate2unix(TimeOfChangeData(i)); }
     //   next_time_offset      16  11.0+p
     uint NextTimeOffset(uint i) const
-        { return byteBCD2int(m_data[2 + i*13 + 11]) * 60 +
-                 byteBCD2int(m_data[2 + i*13 + 12]); }
+        { return (byteBCD2int(m_data[2 + (i*13) + 11]) * 60) +
+                 byteBCD2int(m_data[2 + (i*13) + 12]); }
     // }                           13.0
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -1836,13 +1836,13 @@ class NVODReferenceDescriptor : public MPEGDescriptor
     // {
     //   transport_stream_id   16
     uint TransportStreamId(uint i) const
-        { return (m_data[i * 6 + 2] << 8) | m_data[i * 6 + 3]; }
+        { return (m_data[(i * 6) + 2] << 8) | m_data[(i * 6) + 3]; }
     //   original_network_id   16
     uint OriginalNetworkId(uint i) const
-        { return (m_data[i * 6 + 4] << 8) |  m_data[i * 6 + 5]; }
+        { return (m_data[(i * 6) + 4] << 8) |  m_data[(i * 6) + 5]; }
     //   service_id            16
     uint ServiceId(uint i) const
-        { return (m_data[i * 6 + 6] << 8) | m_data[i * 6 + 7]; }
+        { return (m_data[(i * 6) + 6] << 8) | m_data[(i * 6) + 7]; }
     // }
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -1868,7 +1868,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     // }
     QString CountryCodeString(uint i) const
     {
-        int o = 2 + i*4;
+        int o = 2 + (i*4);
         if (i >= Count())
             return {""};
         std::array<QChar,3> code
@@ -1882,7 +1882,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
             return -1;
         }
 
-        unsigned char rawRating = m_data[2 + 3 + i*4];
+        unsigned char rawRating = m_data[2 + 3 + (i*4)];
         if (rawRating == 0)
         {
             // 0x00 - undefined
@@ -2149,9 +2149,9 @@ class ServiceListDescriptor : public MPEGDescriptor
     uint ServiceCount(void) const { return DescriptorLength() / 3; }
 
     uint ServiceID(uint i) const
-        { return (m_data[2+i*3] << 8) | m_data[3+i*3]; }
+        { return (m_data[2+(i*3)] << 8) | m_data[3+(i*3)]; }
 
-    uint ServiceType(uint i) const { return m_data[4+i*3]; }
+    uint ServiceType(uint i) const { return m_data[4+(i*3)]; }
 
     QString toString(void) const override // MPEGDescriptor
     {
@@ -2690,10 +2690,10 @@ class FreesatLCNDescriptor : public MPEGDescriptor
         { return *(m_entries[i] + 4) / 4; }
 
     uint LogicalChannelNumber(size_t i, size_t j) const
-        { return (*(m_entries[i] + 5 + j*4) << 8 | *(m_entries[i] + 5 + j*4 + 1)) & 0xFFF; }
+        { return (*(m_entries[i] + 5 + (j*4)) << 8 | *(m_entries[i] + 5 + (j*4) + 1)) & 0xFFF; }
 
     uint RegionID(size_t i, size_t j) const
-        { return *(m_entries[i] + 5 + j*4 + 2) << 8 | *(m_entries[i] + 5 + j*4 + 3); }
+        { return *(m_entries[i] + 5 + (j*4) + 2) << 8 | *(m_entries[i] + 5 + (j*4) + 3); }
 
     QString toString(void) const override; // MPEGDescriptor
 
@@ -2833,19 +2833,19 @@ class SkyLCNDescriptor : public MPEGDescriptor
         { return (DescriptorLength() - 2) / 9; }
 
     uint ServiceID(size_t i) const
-        { return *(m_data + 4 + i*9) << 8 | *(m_data + 5 + i*9); }
+        { return *(m_data + 4 + (i*9)) << 8 | *(m_data + 5 + (i*9)); }
 
     uint ServiceType(size_t i) const
-        { return *(m_data + 6 + i*9); }
+        { return *(m_data + 6 + (i*9)); }
 
     uint ChannelID(size_t i) const
-        { return *(m_data + 7 + i*9) << 8 | *(m_data + 8 + i*9); }
+        { return *(m_data + 7 + (i*9)) << 8 | *(m_data + 8 + (i*9)); }
 
     uint LogicalChannelNumber(size_t i) const
-        { return *(m_data + 9 + i*9) << 8 | *(m_data + 10 + i*9); }
+        { return *(m_data + 9 + (i*9)) << 8 | *(m_data + 10 + (i*9)); }
 
     uint Flags(size_t i) const
-        { return *(m_data + 11 + i*9) << 8 | *(m_data + 12 + i*9); }
+        { return *(m_data + 11 + (i*9)) << 8 | *(m_data + 12 + (i*9)); }
 
     QString toString(void) const override; // MPEGDescriptor
 };

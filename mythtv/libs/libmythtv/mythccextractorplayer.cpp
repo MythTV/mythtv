@@ -82,7 +82,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
         double fps = frame->m_frameRate;
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();
-        double duration = 1 / fps + static_cast<double>(frame->m_repeatPic) * 0.5 / fps;
+        double duration = (1 / fps) + (static_cast<double>(frame->m_repeatPic) * 0.5 / fps);
         m_curTime += secondsFromFloat(duration);
         m_videoOutput->DoneDisplayingFrame(frame);
     }
@@ -446,7 +446,7 @@ void MythCCExtractorPlayer::Ingest708Caption(
     QMap<uint, QStringList> orderedContent;
     for (const auto& ccIt : std::as_const(cc708win))
     {
-        uint idx = ccIt.row * 1000 + ccIt.column;
+        uint idx = (ccIt.row * 1000) + ccIt.column;
         for (const auto& str : std::as_const(ccIt.text))
         {
             orderedContent[idx] += str;

@@ -703,7 +703,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         m_srcData.src_ratio = (double)m_sampleRate / settings.m_sampleRate;
         m_srcData.data_in   = m_srcIn;
-        int newsize        = (int)(kAudioSRCInputSize * m_srcData.src_ratio + 15)
+        int newsize        = (int)((kAudioSRCInputSize * m_srcData.src_ratio) + 15)
                              & ~0xf;
 
         if (m_kAudioSRCOutputSize < newsize)
@@ -1275,7 +1275,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
     len = 0;
     while (i < frames)
     {
-        i += m_upmixer->putFrames(buffer + i * off, frames - i, m_sourceChannels);
+        i += m_upmixer->putFrames(buffer + (i * off), frames - i, m_sourceChannels);
         int nFrames = m_upmixer->numFrames();
         if (!nFrames)
             continue;

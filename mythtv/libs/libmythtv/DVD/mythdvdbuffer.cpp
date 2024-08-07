@@ -693,7 +693,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 
                     // store the new clut
                     // m_clut = std::to_array(blockBuf); // C++20
-                    std::copy(blockBuf, blockBuf + 16 * sizeof(uint32_t),
+                    std::copy(blockBuf, blockBuf + (16 * sizeof(uint32_t)),
                               reinterpret_cast<uint8_t*>(m_clut.data()));
                     // release buffer
                     if (blockBuf != m_dvdBlockWriteBuf.data())
@@ -2008,9 +2008,9 @@ void MythDVDBuffer::GuessPalette(uint32_t *RGBAPalette, const PaletteArray Palet
         uint y  = (yuv >> 16) & 0xff;
         uint cr = (yuv >> 8) & 0xff;
         uint cb = (yuv >> 0) & 0xff;
-        uint r  = std::clamp(uint(y + 1.4022 * (cr - 128)), 0U, 0xFFU);
-        uint b  = std::clamp(uint(y + 1.7710 * (cb - 128)), 0U, 0xFFU);
-        uint g  = std::clamp(uint(1.7047 * y - (0.1952 * b) - (0.5647 * r)), 0U, 0xFFU);
+        uint r  = std::clamp(uint(y + (1.4022 * (cr - 128))), 0U, 0xFFU);
+        uint b  = std::clamp(uint(y + (1.7710 * (cb - 128))), 0U, 0xFFU);
+        uint g  = std::clamp(uint((1.7047 * y) - (0.1952 * b) - (0.5647 * r)), 0U, 0xFFU);
         RGBAPalette[i] = ((Alpha[i] * 17U) << 24) | (r << 16 )| (g << 8) | b;
     }
 }
@@ -2105,7 +2105,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 
     ptrdiff_t bottom = 0;
     while (bottom < Subtitle->rects[0]->h &&
-          IsTransparent(Subtitle->rects[0]->data[0] + bottom * Subtitle->rects[0]->linesize[0],
+          IsTransparent(Subtitle->rects[0]->data[0] + (bottom * Subtitle->rects[0]->linesize[0]),
                         1, Subtitle->rects[0]->w, colors))
     {
         bottom++;
@@ -2120,7 +2120,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 
     ptrdiff_t top = Subtitle->rects[0]->h - 1;
     while (top > 0 &&
-            IsTransparent(Subtitle->rects[0]->data[0] + top * Subtitle->rects[0]->linesize[0], 1,
+            IsTransparent(Subtitle->rects[0]->data[0] + (top * Subtitle->rects[0]->linesize[0]), 1,
                           Subtitle->rects[0]->w, colors))
     {
         top--;
@@ -2150,8 +2150,8 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
 
     for (int y = 0; y < height; y++)
     {
-        memcpy(bitmap + static_cast<ptrdiff_t>(width) * y, Subtitle->rects[0]->data[0] + left +
-              (bottom + y) * Subtitle->rects[0]->linesize[0], static_cast<size_t>(width));
+        memcpy(bitmap + (static_cast<ptrdiff_t>(width) * y), Subtitle->rects[0]->data[0] + left +
+              ((bottom + y) * Subtitle->rects[0]->linesize[0]), static_cast<size_t>(width));
     }
 
     av_freep(reinterpret_cast<void*>(&Subtitle->rects[0]->data[0]));

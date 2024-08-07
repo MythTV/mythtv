@@ -39,8 +39,8 @@ bool MythColourSpace::Alike(const MythColourSpace &First, const MythColourSpace 
 
 inline float CalcBy(const MythPrimariesFloat& p, const MythPrimaryFloat w)
 {
-    float val = ((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
-    (w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
+    float val = (((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1])) -
+    ((w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]));
     val /= ((1-p[2][0])/p[2][1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
     (p[2][0]/p[2][1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
     return val;
@@ -48,7 +48,7 @@ inline float CalcBy(const MythPrimariesFloat& p, const MythPrimaryFloat w)
 
 inline float CalcGy(const MythPrimariesFloat& p, const MythPrimaryFloat w, const float By)
 {
-    float val = w[0]/w[1] - p[0][0]/p[0][1] - By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]);
+    float val = (w[0]/w[1]) - (p[0][0]/p[0][1]) - (By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]));
     val /= p[1][0]/p[1][1] - p[0][0]/p[0][1];
     return val;
 }

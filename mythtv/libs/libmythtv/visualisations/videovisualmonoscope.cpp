@@ -65,7 +65,7 @@ bool VideoVisualMonoScope::UpdateVertices(float* Buffer)
 
         index += step;
         Buffer[i * 2] = x;
-        Buffer[i * 2 + 1] = y + static_cast<float>(value);
+        Buffer[(i * 2) + 1] = y + static_cast<float>(value);
         x += xstep;
     }
     return true;

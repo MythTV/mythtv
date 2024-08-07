@@ -154,7 +154,7 @@ class BitReader
 
     int64_t get_bits_left()
     {
-        return m_cacheSize + kBitsPerRead * static_cast<int64_t>(m_bufferEnd - m_buffer) - m_bitIndex;
+        return m_cacheSize + (kBitsPerRead * static_cast<int64_t>(m_bufferEnd - m_buffer)) - m_bitIndex;
     }
 
   private:

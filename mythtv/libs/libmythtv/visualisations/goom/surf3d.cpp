@@ -34,9 +34,9 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 		x = defx;
 		while (x) {
 			--x;
-			s->vertex[x+defx*y].x = (x-defx/2.0F)*sizex/defx;
-			s->vertex[x+defx*y].y = 0;
-			s->vertex[x+defx*y].z = (y-defz/2.0F)*sizez/defz;
+			s->vertex[x+(defx*y)].x = (x-defx/2.0F)*sizex/defx;
+			s->vertex[x+(defx*y)].y = 0;
+			s->vertex[x+(defx*y)].z = (y-defz/2.0F)*sizez/defz;
 		}
 	}
 	return g;

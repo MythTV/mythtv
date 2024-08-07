@@ -26,7 +26,7 @@ void VideoVisualCircles::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
     int count = m_scale.range();
     int incr = 200 / count;
     int rad = static_cast<int>(m_range);
-    QRect circ(m_area.x() + m_area.width() / 2, m_area.y() + m_area.height() / 2,
+    QRect circ(m_area.x() + (m_area.width() / 2), m_area.y() + (m_area.height() / 2),
                rad, rad);
     Painter->Begin(Device);
     for (int i = 0; i < count; i++, rad += m_range, red += incr, green -= incr)
