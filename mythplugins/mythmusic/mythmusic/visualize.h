@@ -204,7 +204,7 @@ class MelScale
     int range() const { return m_range; }
 
     void setMax(int maxscale, int maxrange, int maxfreq);
-    static double hz2mel(double hz) { return 1127 * log(1 + hz / 700); }
+    static double hz2mel(double hz) { return 1127 * log(1 + (hz / 700)); }
     static double mel2hz(double mel) { return 700 * (exp(mel / 1127) - 1); }
     int operator[](int index);
     QString note(int note);     // text of note, 0 - 125

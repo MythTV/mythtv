@@ -361,8 +361,8 @@ static void ifopalette(const char * filename,
 
     xfseek0(fh, 0xcc);
     fu32 offset = get_uint32_be(xxfread(fh, buf, 4));
-    xfseek0(fh, offset * 0x800 + 12);
-    fu32 pgc = offset * 0x800 + get_uint32_be(xxfread(fh, buf, 4));
+    xfseek0(fh, (offset * 0x800) + 12);
+    fu32 pgc = (offset * 0x800) + get_uint32_be(xxfread(fh, buf, 4));
     /* seek to palette */
     xfseek0(fh, pgc + 0xa4);
     xxfread(fh, buf, (size_t)(16 * 4));
@@ -372,7 +372,7 @@ static void ifopalette(const char * filename,
         eu8 r = 0;
         eu8 g = 0;
         eu8 b = 0;
-        eu8 * p = buf + (ptrdiff_t)(i) * 4 + 1;
+        eu8 * p = buf + ((ptrdiff_t)(i) * 4) + 1;
         yuvpalette[i][0] =p[0]; yuvpalette[i][1] =p[1]; yuvpalette[i][2] =p[2];
         yuv2rgb(p[0], p[1], p[2], &r, &g, &b);
         rgbpalette[i][0] = r; rgbpalette[i][1] = g; rgbpalette[i][2] = b; 
@@ -791,7 +791,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 if (end > 500)
                     end = 500;
 
-                eu32 endpts = tmppts + end * 1000; /* ProjectX ! (other: 900, 1024) */
+                eu32 endpts = tmppts + (end * 1000); /* ProjectX ! (other: 900, 1024) */
 
                 if (tmppts <= lastendpts)
                 {

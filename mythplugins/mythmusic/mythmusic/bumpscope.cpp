@@ -100,16 +100,16 @@ void BumpScope::generate_cmap(unsigned int color)
 
         for (uint i = 255; i > 0; i--)
         {
-             uint r = (unsigned int)((100 * static_cast<double>(red) / 255)
-                                * m_intense1[i] + m_intense2[i]);
+             uint r = (unsigned int)(((100 * static_cast<double>(red) / 255)
+                                * m_intense1[i]) + m_intense2[i]);
              if (r > 255)
                  r = 255;
-             uint g = (unsigned int)((100 * static_cast<double>(green) / 255)
-                                * m_intense1[i] + m_intense2[i]);
+             uint g = (unsigned int)(((100 * static_cast<double>(green) / 255)
+                                * m_intense1[i]) + m_intense2[i]);
              if (g > 255)
                  g = 255;
-             uint b = (unsigned int)((100 * static_cast<double>(blue) / 255)
-                                * m_intense1[i] + m_intense2[i]);
+             uint b = (unsigned int)(((100 * static_cast<double>(blue) / 255)
+                                * m_intense1[i]) + m_intense2[i]);
              if (b > 255)
                  b = 255;
 
@@ -128,8 +128,8 @@ void BumpScope::generate_phongdat(void)
     {
         for (uint x = 0; x < m_phongRad; x++)
         {
-            double i = (double)x / ((double)m_phongRad) - 1;
-            double i2 = (double)y / ((double)m_phongRad) - 1;
+            double i = ((double)x / ((double)m_phongRad)) - 1;
+            double i2 = ((double)y / ((double)m_phongRad)) - 1;
 
             //if (m_diamond)
                i = 1 - pow(i*i2,.75) - i*i - i2*i2;
@@ -353,8 +353,8 @@ bool BumpScope::process(VisualNode *node)
     if (node->m_length < 512)
         numSamps = node->m_length;
 
-    int prev_y = (int)m_height / 2 +
-        ((int)node->m_left[0] * (int)m_height) / 0x10000;
+    int prev_y = ((int)m_height / 2) +
+        (((int)node->m_left[0] * (int)m_height) / 0x10000);
 
     if (prev_y < 0)
         prev_y = 0;
@@ -399,8 +399,8 @@ bool BumpScope::draw(QPainter *p, [[maybe_unused]] const QColor &back)
             m_wasMoving = 1;
         }
 
-        m_ilx = (int)(m_width / 2.0F + cosf(m_iangle * (M_PI / 180.0)) * m_ixo);
-        m_ily = (int)(m_height / 2.0F + sinf(m_iangle * (M_PI / 180.0)) * m_iyo);
+        m_ilx = (int)((m_width / 2.0F) + (cosf(m_iangle * (M_PI / 180.0)) * m_ixo));
+        m_ily = (int)((m_height / 2.0F) + (sinf(m_iangle * (M_PI / 180.0)) * m_iyo));
 
         m_iangle += 2;
         if (m_iangle >= 360)

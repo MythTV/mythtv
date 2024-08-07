@@ -114,10 +114,10 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     for (long i = 0; i < realsamples; i++)
     {
-        buffer[0][i] = ((chars[i * 4 + 1] << 8) |
+        buffer[0][i] = ((chars[(i * 4) + 1] << 8) |
                         (chars[i * 4] & 0xff)) / 32768.0F;
-        buffer[1][i] = ((chars[i * 4 + 3] << 8) |
-                        (chars[i * 4 + 2] & 0xff)) / 32768.0F;
+        buffer[1][i] = ((chars[(i * 4) + 3] << 8) |
+                        (chars[(i * 4) + 2] & 0xff)) / 32768.0F;
     }
 
     vorbis_analysis_wrote(&m_vd, realsamples);

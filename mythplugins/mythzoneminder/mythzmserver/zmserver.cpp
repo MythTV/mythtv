@@ -1822,7 +1822,7 @@ int ZMServer::getFrame(FrameData &buffer, MONITOR *monitor)
 
     // fixup the colours if necessary we aim to always send RGB24 images
     unsigned char *data = monitor->m_sharedImages +
-        static_cast<ptrdiff_t>(monitor->getFrameSize()) * monitor->m_lastRead;
+        (static_cast<ptrdiff_t>(monitor->getFrameSize()) * monitor->m_lastRead);
     unsigned int rpos = 0;
     unsigned int wpos = 0;
 

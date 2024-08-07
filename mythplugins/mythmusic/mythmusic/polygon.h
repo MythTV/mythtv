@@ -20,7 +20,7 @@ class Bitmap
         delete[] data;
         width = w;
         height = h;
-        data = new Pixel[2*w*h+extra];
+        data = new Pixel[(2*w*h)+extra];
         clear();
     }
   

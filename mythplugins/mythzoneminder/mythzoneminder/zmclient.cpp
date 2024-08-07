@@ -301,17 +301,17 @@ void ZMClient::updateMonitorStatus(void)
 
     for (int x = 0; x < monitorCount; x++)
     {
-        int monID = strList[x * 7 + 2].toInt();
+        int monID = strList[(x * 7) + 2].toInt();
 
         if (m_monitorMap.contains(monID))
         {
             Monitor *mon = m_monitorMap.find(monID).value();
-            mon->name = strList[x * 7 + 3];
-            mon->zmcStatus = strList[x * 7 + 4];
-            mon->zmaStatus = strList[x * 7 + 5];
-            mon->events = strList[x * 7 + 6].toInt();
-            mon->function = strList[x * 7 + 7];
-            mon->enabled = (strList[x * 7 + 8].toInt() != 0);
+            mon->name = strList[(x * 7) + 3];
+            mon->zmcStatus = strList[(x * 7) + 4];
+            mon->zmaStatus = strList[(x * 7) + 5];
+            mon->events = strList[(x * 7) + 6].toInt();
+            mon->function = strList[(x * 7) + 7];
+            mon->enabled = (strList[(x * 7) + 8].toInt() != 0);
         }
     }
 }
@@ -373,8 +373,8 @@ bool ZMClient::updateAlarmStates(void)
     bool changed = false;
     for (int x = 0; x < monitorCount; x++)
     {
-        int monID = strList[x * 2 + 2].toInt();
-        auto state = (State)strList[x * 2 + 3].toInt();
+        int monID = strList[(x * 2) + 2].toInt();
+        auto state = (State)strList[(x * 2) + 3].toInt();
 
         if (m_monitorMap.contains(monID))
         {
@@ -907,11 +907,11 @@ void ZMClient::doGetMonitorList(void)
     for (int x = 0; x < monitorCount; x++)
     {
         auto *item = new Monitor;
-        item->id = strList[x * 5 + 2].toInt();
-        item->name = strList[x * 5 + 3];
-        item->width = strList[x * 5 + 4].toInt();
-        item->height = strList[x * 5 + 5].toInt();
-        item->bytes_per_pixel = strList[x * 5 + 6].toInt();
+        item->id = strList[(x * 5) + 2].toInt();
+        item->name = strList[(x * 5) + 3];
+        item->width = strList[(x * 5) + 4].toInt();
+        item->height = strList[(x * 5) + 5].toInt();
+        item->bytes_per_pixel = strList[(x * 5) + 6].toInt();
         item->zmcStatus = "";
         item->zmaStatus = "";
         item->events = 0;
