@@ -569,7 +569,9 @@ void EditMetadataDialog::updateArtistImage(void)
             m_artistIcon->Load();
         }
         else
+        {
             m_artistIcon->Reset();
+        }
     }
 }
 
@@ -635,7 +637,9 @@ void EditMetadataDialog::updateAlbumImage(void)
             m_albumIcon->Load();
         }
         else
+        {
             m_albumIcon->Reset();
+        }
     }
 }
 
@@ -686,7 +690,9 @@ void EditMetadataDialog::updateGenreImage(void)
             m_genreIcon->Load();
         }
         else
+        {
             m_genreIcon->Reset();
+        }
     }
 }
 
@@ -1226,7 +1232,9 @@ void EditAlbumartDialog::startCopyImageToTag(void)
         popupStack->AddScreen(fb);
     }
     else
+    {
         delete fb;
+    }
 }
 
 void EditAlbumartDialog::copyImageToTag(ImageType imageType)

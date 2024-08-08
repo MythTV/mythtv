@@ -214,7 +214,9 @@ static void startRipper(void)
                      Qt::QueuedConnection);
     }
     else
+    {
         delete rip;
+    }
 
 #else
     ShowOkPopup(QCoreApplication::translate("(MythMusicMain)",
@@ -252,7 +254,9 @@ static void startImport(void)
                 Qt::QueuedConnection);
     }
     else
+    {
         delete import;
+    }
 }
 
 // these point to the the mainmenu callback if found

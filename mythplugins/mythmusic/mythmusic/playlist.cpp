@@ -80,7 +80,9 @@ void Playlist::addTrack(MusicMetadata::IdType trackID, bool update_display)
             gPlayer->activePlaylistChanged(trackID, false);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Can't add track, given a bad track ID");
+    }
 }
 
 void Playlist::removeAllTracks(void)
@@ -864,7 +866,9 @@ QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
                     rawList += QString(",%1").arg(id);
             }
             else
+            {
                 rawList += QString(",%1").arg(id);
+            }
         }
     }
     else
@@ -878,7 +882,9 @@ QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
                     rawList += QString(",%1").arg(id);
             }
             else
+            {
                 rawList += QString(",%1").arg(id);
+            }
         }
     }
 

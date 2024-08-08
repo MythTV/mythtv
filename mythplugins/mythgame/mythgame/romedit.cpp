@@ -111,7 +111,9 @@ namespace
             popupStack->AddScreen(fb);
         }
         else
+        {
             delete fb;
+        }
     }
 
     const QString CEID_SCREENSHOTFILE = "screenshotfile";

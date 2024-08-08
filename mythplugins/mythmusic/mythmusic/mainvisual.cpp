@@ -200,7 +200,9 @@ void MainVisual::add(const void *buffer, unsigned long b_len,
             len = 0;
     }
     else
+    {
         len = 0;
+    }
 
     m_nodes.append(new VisualNode(l, r, len, timecode));
 }
@@ -222,7 +224,9 @@ void MainVisual::timeout()
                 // REW seek: drain buffer and start over
             }
             else if (m_nodes.first()->m_offset > timestamp)
+            {
                 break;          // at current time
+            }
 
             if (m_vis)
                 m_vis->processUndisplayed(m_nodes.first());

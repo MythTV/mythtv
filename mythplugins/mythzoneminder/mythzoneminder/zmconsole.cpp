@@ -232,7 +232,9 @@ bool ZMConsole::keyPressEvent(QKeyEvent *event)
             showEditFunctionPopup();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

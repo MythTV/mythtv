@@ -139,7 +139,9 @@ bool ZMMiniPlayer::keyPressEvent(QKeyEvent *event)
         {
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && ZMLivePlayer::keyPressEvent(event))

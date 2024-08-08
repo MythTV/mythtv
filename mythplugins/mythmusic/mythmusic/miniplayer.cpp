@@ -98,7 +98,9 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
             //showAutoMode();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MusicCommon::keyPressEvent(event))

@@ -454,7 +454,9 @@ void MusicCommon::switchView(MusicView view)
                 connect(plview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
+            {
                 delete plview;
+            }
 
             break;
         }
@@ -478,7 +480,9 @@ void MusicCommon::switchView(MusicView view)
                 connect(pleview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
+            {
                 delete pleview;
+            }
 
             if (oldView)
                 Close();
@@ -505,7 +509,9 @@ void MusicCommon::switchView(MusicView view)
                 connect(pleview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
+            {
                 delete pleview;
+            }
 
             if (oldView)
                 Close();
@@ -523,7 +529,9 @@ void MusicCommon::switchView(MusicView view)
                 connect(sview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
+            {
                 delete sview;
+            }
 
             break;
         }
@@ -538,7 +546,9 @@ void MusicCommon::switchView(MusicView view)
                 connect(vview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
+            {
                 delete vview;
+            }
 
             break;
         }
@@ -553,7 +563,9 @@ void MusicCommon::switchView(MusicView view)
                 connect(lview, &MythScreenType::Exiting, this, &MusicCommon::viewExited);
             }
             else
+            {
                 delete lview;
+            }
 
             break;
         }
@@ -660,16 +672,24 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                         Close();
                     }
                     else if (exit_action == "play")
+                    {
                         Close();
+                    }
                     else
+                    {
                         showExitMenu();
+                    }
                 }
             }
         }
         else if (action == "THMBUP")
+        {
             changeRating(true);
+        }
         else if (action == "THMBDOWN")
+        {
             changeRating(false);
+        }
         else if (action == "NEXTTRACK")
         {
             if (m_nextButton)
@@ -743,7 +763,9 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             m_currentTime = 0s;
         }
         else if (action == "CYCLEVIS")
+        {
             cycleVisualizer();
+        }
         else if (action == "BLANKSCR")
         {
             // change to the blank visualizer
@@ -755,17 +777,29 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                 switchView(MV_VISUALIZER);
         }
         else if (action == "VOLUMEDOWN")
+        {
             changeVolume(false);
+        }
         else if (action == "VOLUMEUP")
+        {
             changeVolume(true);
+        }
         else if (action == "SPEEDDOWN")
+        {
             changeSpeed(false);
+        }
         else if (action == "SPEEDUP")
+        {
             changeSpeed(true);
+        }
         else if (action == "MUTE")
+        {
             toggleMute();
+        }
         else if (action == "TOGGLEUPMIX")
+        {
             toggleUpmix();
+        }
         else if (action == "INFO" || action == "EDIT")
         {
             if (m_currentPlaylist && GetFocusWidget() == m_currentPlaylist)
@@ -801,7 +835,9 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "MENU")
+        {
             ShowMenu();
+        }
         else if (action == "REFRESH")
         {
             if (m_currentPlaylist)
@@ -835,17 +871,29 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "SWITCHTOPLAYLIST" && m_currentView != MV_PLAYLIST)
+        {
             switchView(MV_PLAYLIST);
+        }
         else if (action == "SWITCHTOPLAYLISTEDITORTREE" && m_currentView != MV_PLAYLISTEDITORTREE)
+        {
             switchView(MV_PLAYLISTEDITORTREE);
+        }
         else if (action == "SWITCHTOPLAYLISTEDITORGALLERY" && m_currentView != MV_PLAYLISTEDITORGALLERY)
+        {
             switchView(MV_PLAYLISTEDITORGALLERY);
+        }
         else if (action == "SWITCHTOSEARCH" && m_currentView != MV_SEARCH)
+        {
             switchView(MV_SEARCH);
+        }
         else if (action == "SWITCHTOVISUALISER" && m_currentView != MV_VISUALIZER)
+        {
             switchView(MV_VISUALIZER);
+        }
         else if (action == "SWITCHTORADIO" && m_currentView != MV_RADIO)
+        {
             switchView(MV_RADIO);
+        }
         else if (action == "TOGGLESHUFFLE")
         {
             gPlayer->toggleShuffleMode();
@@ -857,7 +905,9 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             updateRepeatMode();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(e))
@@ -1260,7 +1310,9 @@ void MusicCommon::customEvent(QEvent *event)
                 m_currentTime = 0s;
         }
         else
+        {
             m_currentTime = rs = oe->elapsedSeconds();
+        }
 
         QString time_string = getTimeString(rs, m_maxTime);
 
@@ -1359,13 +1411,21 @@ void MusicCommon::customEvent(QEvent *event)
                     switchView(MV_PLAYLISTEDITORGALLERY);
             }
             else if (resulttext == tr("Search for Music"))
+            {
                 switchView(MV_SEARCH);
+            }
             else if (resulttext == tr("Switch To Gallery View"))
+            {
                 switchView(MV_PLAYLISTEDITORGALLERY);
+            }
             else if (resulttext == tr("Switch To Tree View"))
+            {
                 switchView(MV_PLAYLISTEDITORTREE);
+            }
             else if (resulttext == tr("Lyrics"))
+            {
                 switchView(MV_LYRICS);
+            }
         }
         else if (resultid == "submenu")
         {
@@ -1410,7 +1470,9 @@ void MusicCommon::customEvent(QEvent *event)
                     popupStack->AddScreen(inputdialog);
                 }
                 else
+                {
                     delete inputdialog;
+                }
             }
             else if (resulttext == tr("Save To Existing Playlist"))
             {
@@ -1538,9 +1600,13 @@ void MusicCommon::customEvent(QEvent *event)
                 doUpdatePlaylist();
             }
             else if (resulttext == tr("Prefer Play Now"))
+            {
                 MusicPlayer::setPlayNow(true);
+            }
             else if (resulttext == tr("Prefer Add Tracks"))
+            {
                 MusicPlayer::setPlayNow(false);
+            }
         }
         else if (resultid == "visualizermenu")
         {
@@ -1947,7 +2013,9 @@ void MusicCommon::updateTrackInfo(MusicMetadata *mdata)
             m_coverartImage->Load();
         }
         else
+        {
             m_coverartImage->Reset();
+        }
     }
 
     if (m_ratingState)
@@ -1989,7 +2057,9 @@ void MusicCommon::playlistItemClicked(MythUIButtonListItem *item)
             item->DisplayState("off", "movestate");
     }
     else
+    {
         gPlayer->setCurrentTrackPos(m_currentPlaylist->GetCurrentPos());
+    }
 
     if (m_cycleVisualizer)
         cycleVisualizer();
@@ -2845,7 +2915,9 @@ bool TrackInfoDialog::keyPressEvent(QKeyEvent *event)
                 songID->Show();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

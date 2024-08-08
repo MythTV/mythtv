@@ -243,7 +243,9 @@ void GameHandler::promptForRemoval(const GameScan& scan)
         popupStack->AddScreen(removalPopup);
 }
     else
+    {
         delete removalPopup;
+    }
 }
 
 static void updateDisplayRom(const QString& romname, int display, const QString& Systemname)
@@ -347,7 +349,9 @@ static void UpdateGameCounts(const QStringList& updatelist)
                             basename = RomName.left(pos - 1);
                     }
                     else
+                    {
                         basename = GameName;
+                    }
 
                     if (basename == lastrom)
                     {
@@ -618,7 +622,9 @@ void GameHandler::clearAllGameData(void)
         popupStack->AddScreen(clearPopup);
     }
     else
+    {
         delete clearPopup;
+    }
 }
 
 void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
@@ -688,7 +694,9 @@ void GameHandler::processGames(GameHandler *handler)
         }
     }
     else
+    {
         maxcount = 100;
+    }
 
     if (handler->GameType() == "PC")
     {
@@ -753,7 +761,9 @@ void GameHandler::processGames(GameHandler *handler)
         handler->setRebuild(true);
     }
     else
+    {
         handler->setRebuild(false);
+    }
 }
 
 void GameHandler::processAllGames(void)

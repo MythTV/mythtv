@@ -236,7 +236,9 @@ inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
         }
     }
     else
+    {
         buffer[((y1 + 1) * m_bpl) + x + 1] = 0xff;
+    }
 }
 
 void BumpScope::render_light(int lx, int ly)

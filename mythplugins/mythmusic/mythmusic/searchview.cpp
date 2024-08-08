@@ -190,11 +190,17 @@ void SearchView::customEvent(QEvent *event)
                 }
             }
             else if (resulttext == tr("Prefer Play Now"))
+            {
                 MusicPlayer::setPlayNow(true);
+            }
             else if (resulttext == tr("Prefer Add Tracks"))
+            {
                 MusicPlayer::setPlayNow(false);
+            }
             else if (resulttext == tr("Search List..."))
+            {
                 searchButtonList();
+            }
         }
     }
 
@@ -232,7 +238,9 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
+            {
                 handled = false;
+            }
         }
         else if (action == "PLAY")
         {
@@ -246,10 +254,14 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
+            {
                 handled = false;
+            }
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MusicCommon::keyPressEvent(event))
@@ -307,7 +319,9 @@ void SearchView::ShowMenu(void)
             delete menu;
     }
     else
+    {
         MusicCommon::ShowMenu();
+    }
 }
 
 void SearchView::fieldSelected([[maybe_unused]] MythUIButtonListItem *item)
@@ -475,6 +489,8 @@ void SearchView::trackVisible(MythUIButtonListItem *item)
                 item->SetImage(mdata->getAlbumArtFile());
         }
         else
+        {
             item->SetImage("");
+        }
     }
 }

@@ -141,13 +141,21 @@ bool ZMEvents::keyPressEvent(QKeyEvent *event)
             getEventList();
         }
         else if (action == "1")
+        {
             setGridLayout(1);
+        }
         else if (action == "2")
+        {
             setGridLayout(2);
+        }
         else if (action == "3")
+        {
             setGridLayout(3);
+        }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

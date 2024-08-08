@@ -277,7 +277,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                         m_downloadImage->Show();
                 }
                 else
+                {
                     m_downloadImage->Hide();
+                }
             }
 
             if (m_enclosureImage)
@@ -288,7 +290,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                         m_enclosureImage->Show();
                 }
                 else
+                {
                     m_enclosureImage->Hide();
+                }
             }
 
             if (m_podcastImage)
@@ -346,7 +350,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                                            MythDate::kDateTimeFull | MythDate::kSimplify);
             }
             else
+            {
                 text += tr("Unknown");
+            }
             m_updatedText->SetText(text);
         }
     }
@@ -566,7 +572,9 @@ void MythNews::ShowEditDialog(bool edit)
         mainStack->AddScreen(mythnewseditor);
     }
     else
+    {
         delete mythnewseditor;
+    }
 }
 
 void MythNews::ShowFeedManager() const
@@ -581,7 +589,9 @@ void MythNews::ShowFeedManager() const
         mainStack->AddScreen(mythnewsconfig);
     }
     else
+    {
         delete mythnewsconfig;
+    }
 }
 
 void MythNews::ShowMenu(void)

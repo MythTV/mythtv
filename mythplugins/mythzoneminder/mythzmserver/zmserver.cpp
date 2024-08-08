@@ -867,7 +867,9 @@ void ZMServer::handleGetEventList(std::vector<std::string> tokens)
         }
         else
             if (!includeContinuous)
+            {
                 sql += "WHERE Cause != 'Continuous' ";
+            }
     }
 
     if (oldestFirst)
@@ -2041,10 +2043,14 @@ void ZMServer::handleSetMonitorFunction(std::vector<std::string> tokens)
         }
         else
             if (m_debug)
+            {
                 std::cout << "zm daemons are not running" << std::endl;
+            }
     }
     else
+    {
         std::cout << "Not updating monitor function as identical to existing configuration" << std::endl;
+    }
 
     ADD_STR(outStr, "OK");
     send(outStr);

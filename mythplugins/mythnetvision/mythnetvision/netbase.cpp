@@ -192,7 +192,9 @@ void NetBase::SlotDeleteVideo()
                 this, &NetBase::DoDeleteVideo);
     }
     else
+    {
         delete confirmdialog;
+    }
 }
 
 void NetBase::DoDeleteVideo(bool remove)

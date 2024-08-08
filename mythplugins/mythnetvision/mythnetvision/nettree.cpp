@@ -384,7 +384,9 @@ bool NetTree::keyPressEvent(QKeyEvent *event)
                 handled = false;
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -514,7 +516,9 @@ void NetTree::SwitchView()
         deleteLater();
     }
     else
+    {
         delete nettree;
+    }
 }
 
 void NetTree::FillTree()
@@ -691,7 +695,9 @@ void NetTree::UpdateResultItem(ResultItem *item)
         }
     }
     else if (m_thumbImage)
+    {
         m_thumbImage->Reset();
+    }
 
     if (m_downloadable)
     {
@@ -723,7 +729,9 @@ void NetTree::UpdateSiteItem(RSSSite *site)
         m_thumbImage->Load();
     }
     else if (m_thumbImage)
+    {
         m_thumbImage->Reset();
+    }
 
     if (m_downloadable)
         m_downloadable->Reset();
@@ -779,7 +787,9 @@ void NetTree::UpdateCurrentItem(void)
                 m_thumbImage->Load();
             }
             else
+            {
                 m_thumbImage->Reset();
+            }
         }
         else
         {
@@ -799,7 +809,9 @@ void NetTree::UpdateCurrentItem(void)
                 m_thumbImage->Load();
             }
             else
+            {
                 m_thumbImage->Reset();
+            }
         }
     }
 
@@ -850,7 +862,9 @@ void NetTree::RunTreeEditor() const
         mainStack->AddScreen(treeedit);
     }
     else
+    {
         delete treeedit;
+    }
 }
 
 void NetTree::RunRSSEditor() const
@@ -866,7 +880,9 @@ void NetTree::RunRSSEditor() const
         mainStack->AddScreen(rssedit);
     }
     else
+    {
         delete rssedit;
+    }
 }
 
 void NetTree::DoTreeRefresh()
@@ -969,7 +985,9 @@ void NetTree::customEvent(QEvent *event)
         }
     }
     else
+    {
         NetBase::customEvent(event);
+    }
 }
 
 void NetTree::SetSubfolderData(MythGenericTree *folder)

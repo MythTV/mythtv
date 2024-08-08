@@ -226,7 +226,9 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
             setTrack();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -306,7 +308,9 @@ void ImportMusicDialog::locationPressed()
         popupStack->AddScreen(fb);
     }
     else
+    {
         delete fb;
+    }
 }
 
 void ImportMusicDialog::coverArtPressed()
@@ -407,7 +411,9 @@ void ImportMusicDialog::addPressed()
         fillWidgets();
     }
     else
+    {
         ShowOkPopup(tr("This track is already in the database"));
+    }
 }
 
 void ImportMusicDialog::addAllNewPressed()
@@ -900,7 +906,9 @@ bool ImportCoverArtDialog::keyPressEvent(QKeyEvent *event)
             m_nextButton->Push();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

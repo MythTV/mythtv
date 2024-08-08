@@ -158,7 +158,9 @@ GCCATTR_NORETURN static void exc_throw(int type, const char * format, ...)
                     EXC.m_msgbuf[len] = '\0';
                 }
                 else
+                {
                     len += l; 
+                }
             }
         }
         EXC.m_buflen = len;

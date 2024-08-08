@@ -125,7 +125,9 @@ bool VideoSelector::keyPressEvent(QKeyEvent *event)
             setParentalLevel(ParentalLevel::plHigh);
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -415,7 +417,9 @@ std::vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
                                      query.value(8).toString());
             }
             else
+            {
                 info->title = query.value(1).toString();
+            }
 
             info->plot = query.value(2).toString();
             info->size = 0; //query.value(3).toInt();
@@ -546,6 +550,8 @@ void VideoSelector::parentalLevelChanged(bool passwordValid, ParentalLevel::Leve
         m_plText->SetText(QString::number(newLevel));
     }
     else
+    {
         ShowOkPopup(tr("You need to enter a valid password for this parental level"));
+    }
 }
 

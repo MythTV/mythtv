@@ -386,7 +386,9 @@ int mythplugin_config(void)
         mainStack->AddScreen(ssd);
     }
     else
+    {
         delete ssd;
+    }
 
     return 0;
 }

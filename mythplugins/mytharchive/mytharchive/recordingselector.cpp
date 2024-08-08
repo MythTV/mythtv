@@ -166,7 +166,9 @@ bool RecordingSelector::keyPressEvent(QKeyEvent *event)
             ShowMenu();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

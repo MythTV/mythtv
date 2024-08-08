@@ -117,7 +117,9 @@ void LyricsView::customEvent(QEvent *event)
                 rs = gPlayer->getCurrentTrackTime();
             }
             else
+            {
                 rs = oe->elapsedSeconds();
+            }
 
             int pos = 0;
             for (int x = 0; x < m_lyricsList->GetCount(); x++)
@@ -316,7 +318,9 @@ bool LyricsView::keyPressEvent(QKeyEvent *event)
             setLyricTime();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MusicCommon::keyPressEvent(event))
@@ -366,7 +370,9 @@ void LyricsView::findLyrics(const QString &grabber)
             mdata = gPlayer->getPlayedTracksList().last();
     }
     else
+    {
         mdata = gPlayer->getCurrentMetadata();
+    }
 
     if (!mdata)
         return;

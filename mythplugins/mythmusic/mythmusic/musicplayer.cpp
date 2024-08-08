@@ -440,7 +440,9 @@ void MusicPlayer::next(void)
         m_oneshotMetadata = nullptr;
     }
     else
+    {
         currentTrack++;
+    }
 
     if (currentTrack >= getCurrentPlaylist()->getTrackCount())
     {
@@ -477,7 +479,9 @@ void MusicPlayer::previous(void)
         m_oneshotMetadata = nullptr;
     }
     else
+    {
         currentTrack--;
+    }
 
     if (currentTrack >= 0)
     {
@@ -986,7 +990,9 @@ void MusicPlayer::loadPlaylist(void)
             m_currentTrack = bookmark;
         }
         else
+        {
             m_currentTrack = 0;
+        }
 
         setShuffleMode(SHUFFLE_OFF);
     }
@@ -1001,7 +1007,9 @@ void MusicPlayer::loadPlaylist(void)
             m_currentTrack = bookmark;
         }
         else
+        {
             m_currentTrack = 0;
+        }
     }
 }
 

@@ -176,7 +176,9 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
             toggleUseCutlist();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -375,7 +377,9 @@ QString MythBurn::loadFile(const QString &filename)
         file.close();
     }
     else
+    {
         return "";
+    }
 
     return res;
 }

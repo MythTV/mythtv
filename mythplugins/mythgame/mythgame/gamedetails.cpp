@@ -35,7 +35,9 @@ void GameDetailsPopup::handleImage(const QString &name, const QString &filename)
             image->Load();
         }
         else
+        {
             image->Reset();
+        }
     }
 }
 

@@ -119,7 +119,9 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
         }
 
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

@@ -391,7 +391,9 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
             slotDeleteTab();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

@@ -801,7 +801,9 @@ void Ripper::ScanFinished()
 
             }
             else
+            {
                 delete ripTrack;
+            }
         }
 
         m_artistEdit->SetText(m_artistName);
@@ -1108,7 +1110,9 @@ void Ripper::startRipper(void)
         mainStack->AddScreen(statusDialog);
     }
     else
+    {
         delete statusDialog;
+    }
 }
 
 void Ripper::RipComplete(bool result)
@@ -1220,7 +1224,9 @@ void Ripper::updateTrackList(void)
                 item->SetText(MythDate::formatTime(track->length, "mm:ss"), "length");
             }
             else
+            {
                 item->SetText("", "length");
+            }
 
 //             if (i == m_currentTrack)
 //                 m_trackList->SetItemCurrent(i);
@@ -1514,7 +1520,9 @@ bool RipStatus::keyPressEvent(QKeyEvent *event)
                 dialog->SetReturnEvent(this, "stop_ripping");
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

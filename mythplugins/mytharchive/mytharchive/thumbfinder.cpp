@@ -213,10 +213,14 @@ bool ThumbFinder::keyPressEvent(QKeyEvent *event)
                 updateThumb();
             }
             else
+            {
                 handled = false;
+            }
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -460,7 +464,9 @@ bool ThumbFinder::getThumbImages()
         m_thumbList.append(thumb);
     }
     else
+    {
         m_frameFile = thumb->filename;
+    }
 
     seekToFrame(thumb->frame);
     getFrameImage();
@@ -499,7 +505,9 @@ bool ThumbFinder::getThumbImages()
             m_thumbList.append(thumb);
         }
         else
+        {
             m_frameFile = thumb->filename;
+        }
 
         seekToFrame(thumb->frame);
         QCoreApplication::processEvents();
@@ -697,7 +705,9 @@ bool ThumbFinder::seekForward()
         return true;
     }
     else
+    {
         inc = (int) (inc * ceil(m_fps));
+    }
 
     int64_t newFrame = currentFrame + inc - m_offset;
     if (newFrame == currentFrame + 1)
@@ -734,7 +744,9 @@ bool ThumbFinder::seekBackward()
         return true;
     }
     else
+    {
         inc = (int) (-inc * ceil(m_fps));
+    }
 
     int64_t newFrame = currentFrame + inc - m_offset;
     seekToFrame(newFrame);

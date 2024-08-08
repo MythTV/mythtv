@@ -145,8 +145,10 @@ void DVDThemeSelector::getThemeList(void)
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             "MythArchive:  Theme directory does not exist!");
+    }
 }
 
 void DVDThemeSelector::themeChanged(MythUIButtonListItem *item)
@@ -198,7 +200,9 @@ void DVDThemeSelector::themeChanged(MythUIButtonListItem *item)
                                 desc.toUtf8().constData()));
     }
     else
+    {
         m_themedescText->SetText(tr("No theme description file found!"));
+    }
 }
 
 QString DVDThemeSelector::loadFile(const QString &filename)

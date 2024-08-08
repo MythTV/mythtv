@@ -110,7 +110,9 @@ bool FileSelector::keyPressEvent(QKeyEvent *event)
 
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -421,7 +423,9 @@ void FileSelector::updateFileList()
                     }
                 }
                 else
+                {
                     item->setCheckable(false);
+                }
 
                 item->SetData(QVariant::fromValue(data));
             }

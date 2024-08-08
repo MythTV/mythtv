@@ -284,7 +284,9 @@ void RSSEditPopup::SelectImagePopup(const QString &prefix,
         popupStack->AddScreen(fb);
     }
     else
+    {
         delete fb;
+    }
 }
 
 void RSSEditPopup::customEvent(QEvent *levent)
@@ -404,7 +406,9 @@ bool RSSEditor::keyPressEvent(QKeyEvent *event)
             SlotEditSite();
         }
         else
+        {
             handled = false;
+        }
     }
 
 
@@ -480,7 +484,9 @@ void RSSEditor::SlotDeleteSite()
                 this, &RSSEditor::DoDeleteSite);
     }
     else
+    {
         delete confirmdialog;
+    }
 }
 
 void RSSEditor::SlotEditSite()
@@ -502,7 +508,9 @@ void RSSEditor::SlotEditSite()
             mainStack->AddScreen(rsseditpopup);
         }
         else
+        {
             delete rsseditpopup;
+        }
     }
 }
 
@@ -521,7 +529,9 @@ void RSSEditor::SlotNewSite()
         mainStack->AddScreen(rsseditpopup);
     }
     else
+    {
         delete rsseditpopup;
+    }
 }
 
 void RSSEditor::DoDeleteSite(bool remove)

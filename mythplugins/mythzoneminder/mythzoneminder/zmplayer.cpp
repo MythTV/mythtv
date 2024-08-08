@@ -250,7 +250,9 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
             }
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -393,7 +395,9 @@ void ZMPlayer::getFrame(void)
                 m_frameTimer->start((int) (1000 * delta));
             }
             else
+            {
                 m_frameTimer->start(10ms);
+            }
         }
     }
 }

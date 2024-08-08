@@ -150,12 +150,18 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
                 GetMoreResults();
         }
         else if (action == "PREVVIEW" && m_pagenum > 1)
+        {
             GetLastResults();
+        }
         else if (action == "NEXTVIEW" && m_searchResultList->GetCount() > 0 &&
                  m_pagenum < m_maxpage)
+        {
             GetMoreResults();
+        }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -236,7 +242,9 @@ void NetSearch::ShowMenu(void)
                              &NetSearch::RunSearchEditor);
     }
     else
+    {
         delete menuPopup;
+    }
 }
 
 void NetSearch::FillGrabberButtonList()
@@ -466,7 +474,9 @@ void NetSearch::RunSearchEditor() const
         mainStack->AddScreen(searchedit);
     }
     else
+    {
         delete searchedit;
+    }
 }
 
 void NetSearch::DoListRefresh()
@@ -535,7 +545,9 @@ void NetSearch::SetThumbnail(MythUIButtonListItem *btn)
             m_thumbImage->Load();
         }
         else
+        {
             m_thumbImage->Reset();
+        }
     }
 }
 
@@ -570,5 +582,7 @@ void NetSearch::customEvent(QEvent *event)
             SetThumbnail(item);
     }
     else
+    {
         NetBase::customEvent(event);
+    }
 }

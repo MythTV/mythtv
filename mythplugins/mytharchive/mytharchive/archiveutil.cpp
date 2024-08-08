@@ -191,7 +191,9 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
         LOG(VB_JOBQUEUE, LOG_NOTICE, "File is not a MythTV recording.");
     }
     else
+    {
         LOG(VB_JOBQUEUE, LOG_NOTICE, "File is a MythTV recording.");
+    }
 
     return pinfo;
 }

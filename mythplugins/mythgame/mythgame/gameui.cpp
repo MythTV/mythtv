@@ -123,7 +123,9 @@ void GameUI::BuildTree()
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find any game handlers!"));
     }
     else
+    {
         systemFilter += ")";
+    }
 
     m_showHashed = gCoreContext->GetBoolSetting("GameTreeView");
 
@@ -279,7 +281,9 @@ void GameUI::itemClicked(MythUIButtonListItem* /*item*/)
                 popupStack->AddScreen(chooseSystemPopup);
             }
             else
+            {
                 delete chooseSystemPopup;
+            }
         }
     }
 }
@@ -389,7 +393,9 @@ void GameUI::edit(void)
             md_editor->SetReturnEvent(this, "editMetadata");
         }
         else
+        {
             delete md_editor;
+        }
     }
 }
 
@@ -410,7 +416,9 @@ void GameUI::showInfo()
             details_dialog->SetReturnEvent(this, "detailsPopup");
         }
         else
+        {
             delete details_dialog;
+        }
     }
 }
 
@@ -445,7 +453,9 @@ void GameUI::ShowMenu()
         popupStack->AddScreen(showMenuPopup);
     }
     else
+    {
         delete showMenuPopup;
+    }
 }
 
 void GameUI::searchStart(void)
@@ -477,7 +487,9 @@ void GameUI::searchStart(void)
             popupStack->AddScreen(searchDialog);
         }
         else
+        {
             delete searchDialog;
+        }
     }
 }
 
@@ -887,7 +899,9 @@ void GameUI::updateChangedNode(MythGenericTree *node, RomInfo *romInfo)
         m_gameUITree->SetCurrentNode(m_favouriteNode);
     }
     else
+    {
         nodeChanged(node);
+    }
 }
 
 void GameUI::gameSearch(MythGenericTree *node,

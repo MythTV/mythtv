@@ -403,7 +403,9 @@ void GamePlayersList::NewPlayerDialog() const
                 this,       &GamePlayersList::CreateNewPlayer);
     }
     else
+    {
         delete nameDialog;
+    }
 }
 
 void GamePlayersList::CreateNewPlayer(const QString& name)

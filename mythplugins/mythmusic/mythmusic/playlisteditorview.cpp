@@ -522,7 +522,9 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
              }
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MusicCommon::keyPressEvent(event))
@@ -863,7 +865,9 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
         }
     }
     else
+    {
         ShowMenu();
+    }
 }
 
 
@@ -1003,7 +1007,9 @@ void PlaylistEditorView::treeNodeChanged(MythGenericTree *node)
         getCDTracks(mnode);
     }
     else
+    {
         filterTracks(mnode);
+    }
 }
 
 void PlaylistEditorView::filterTracks(MusicGenericTree *node)
@@ -1492,7 +1498,9 @@ void PlaylistEditorView::getSmartPlaylists(MusicGenericTree *node)
         }
     }
     else
+    {
         MythDB::DBError("Load smartplaylist names", query);
+    }
 }
 
 void PlaylistEditorView::getSmartPlaylistTracks(MusicGenericTree *node, int playlistID)

@@ -167,7 +167,9 @@ bool ScreenSetup::keyPressEvent(QKeyEvent *event)
                 deleteScreen();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -503,8 +505,10 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
                 doLocationDialog(si);
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, "Screen cannot be used, not all required "
                                      "data is supplied by existing sources");
+        }
     }
 }
 

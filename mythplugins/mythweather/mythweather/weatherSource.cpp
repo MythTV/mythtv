@@ -594,7 +594,9 @@ void WeatherSource::processData()
                 m_data[temp[0]].append("\n" + temp[1]);
             }
             else
+            {
                 m_data[temp[0]] = temp[1];
+            }
         }
     }
 }

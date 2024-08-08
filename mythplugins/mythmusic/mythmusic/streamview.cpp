@@ -316,13 +316,19 @@ void StreamView::customEvent(QEvent *event)
                 editStream();
             }
             else
+            {
                 handled = false;
+            }
         }
         else
+        {
             handled = false;
+        }
     }
     else
+    {
         handled = false;
+    }
 
 
     if (!handled)
@@ -362,7 +368,9 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
             }
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MusicCommon::keyPressEvent(event))
@@ -690,7 +698,9 @@ bool EditStreamMetadata::Create()
         m_formatEdit->SetText(m_streamMeta->MetadataFormat());
     }
     else
+    {
         m_formatEdit->SetText("%a - %t");
+    }
 
     connect(m_searchButton, &MythUIButton::Clicked, this, &EditStreamMetadata::searchClicked);
     connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
@@ -1038,7 +1048,9 @@ void SearchStream::doUpdateStreams(void)
             doneWhere = true;
         }
         else
+        {
             sql += "AND genre = :GENRE ";
+        }
     }
 
     if (searchLanguage)
@@ -1049,7 +1061,9 @@ void SearchStream::doUpdateStreams(void)
             doneWhere = true;
         }
         else
+        {
             sql += "AND language = :LANGUAGE ";
+        }
     }
 
     if (searchCountry)
@@ -1060,7 +1074,9 @@ void SearchStream::doUpdateStreams(void)
             doneWhere = true;
         }
         else
+        {
             sql += "AND country = :COUNTRY ";
+        }
     }
 
     if (searchChannel)
@@ -1071,7 +1087,9 @@ void SearchStream::doUpdateStreams(void)
             // doneWhere = true;
         }
         else
+        {
             sql += "AND channel LIKE " + QString("'%%1%' ").arg(channel);
+        }
     }
 
     sql += "ORDER BY broadcaster, channel;";

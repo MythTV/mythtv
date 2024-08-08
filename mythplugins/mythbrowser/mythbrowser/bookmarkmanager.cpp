@@ -311,11 +311,17 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
             }
         }
         else if (action == "DELETE")
+        {
             slotDeleteCurrent();
+        }
         else if (action == "EDIT")
+        {
             slotEditBookmark();
+        }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -363,7 +369,9 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
             mainStack->AddScreen(mythbrowser);
         }
         else
+        {
             delete mythbrowser;
+        }
     }
     else
     {
@@ -608,7 +616,9 @@ void BookmarkManager::slotShowMarked(void)
             mainStack->AddScreen(mythbrowser);
         }
         else
+        {
             delete mythbrowser;
+        }
     }
     else
     {

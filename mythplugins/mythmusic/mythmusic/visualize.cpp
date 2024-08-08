@@ -1325,7 +1325,9 @@ void Spectrogram::handleKeyPress(const QString &action)
                                       QString("%1").arg(m_color));
         }
         else
+        {
             m_showtext = ! m_showtext;
+        }
     }
     if (action == "2")          // 1/3 is slower/faster, 2 should be unused
     {
@@ -2326,7 +2328,9 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         }
         else
             if (!imageFilename.isEmpty())
+            {
                 art.load(imageFilename);
+            }
 
         if (art.isNull())
         {
