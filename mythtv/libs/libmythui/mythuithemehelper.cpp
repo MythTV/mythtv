@@ -188,7 +188,9 @@ QStringList MythUIThemeHelper::GetThemeSearchPath()
                 m_searchPaths.append(themedir + '/');
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find ui theme location: %1").arg(themedir));
+            }
         }
         else
         {

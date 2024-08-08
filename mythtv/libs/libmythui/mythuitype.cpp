@@ -112,7 +112,9 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
         }
         else if ((!inheritsClass || obj->inherits(inheritsClass))
                  && (!objName || obj->objectName() == oName))
+        {
             return obj;
+        }
 
         if (recursiveSearch && (qobject_cast<MythUIGroup *>(obj) != nullptr))
         {

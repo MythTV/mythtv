@@ -530,7 +530,9 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         pRequest->FormatActionResponse(list);
     }
     else
+    {
         UPnp::FormatErrorResponse ( pRequest, eErrorCode, sErrorDesc );
+    }
 
 }
 
@@ -670,7 +672,9 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
         pRequest->FormatActionResponse(list);
     }
     else
+    {
         UPnp::FormatErrorResponse( pRequest, eErrorCode, sErrorDesc );
+    }
 }
 
 /**

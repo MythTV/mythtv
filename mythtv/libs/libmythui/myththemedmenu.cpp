@@ -115,7 +115,9 @@ void MythThemedMenu::SetMenuTheme(const QString &menufile)
             m_foundtheme = true;
     }
     else
+    {
         m_foundtheme = true;
+    }
 
     if (!m_foundtheme)
         return;
@@ -271,7 +273,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
             handleAction(action);
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -929,7 +933,9 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
         popupStack->AddScreen(dialog);
     }
     else
+    {
         delete dialog;
+    }
 
     return false;
 }

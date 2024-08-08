@@ -80,7 +80,9 @@ void MythUITextEdit::Pulse(void)
         m_blinkInterval++;
     }
     else
+    {
         m_cursorImage->SetVisible(false);
+    }
 
     MythUIType::Pulse();
 }
@@ -208,7 +210,9 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
         m_text->SetText(obscured);
     }
     else
+    {
         m_text->SetText(m_message);
+    }
 
     if (moveCursor)
         MoveCursor(MoveEnd);
@@ -571,7 +575,9 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
                 popupStack->AddScreen(kb);
             }
             else
+            {
                 delete kb;
+            }
         }
         else if (action == "CUT")
         {
@@ -586,7 +592,9 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
             PasteTextFromClipboard();
         }
         else
+        {
             handled = false;
+        }
     }
 
     return handled;

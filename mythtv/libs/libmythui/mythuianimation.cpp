@@ -268,7 +268,9 @@ void MythUIAnimation::ParseSection(const QDomElement &element,
             parseZoom(effect, start, end);
         }
         else
+        {
             continue;
+        }
 
         auto* a = new MythUIAnimation(parent, trigger, type);
         a->setStartValue(start);

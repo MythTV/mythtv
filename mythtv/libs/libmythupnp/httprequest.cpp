@@ -730,7 +730,9 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
                << m_sNameSpace << "\">\r\n";
     }
     else
+    {
         stream << "<" << m_sMethod << "Response>\r\n";
+    }
 
     for (const auto & arg : std::as_const(args))
     {
@@ -761,7 +763,9 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
                    << SOAP_ENVELOPE_END;
     }
     else
+    {
         stream << "</" << m_sMethod << "Response>\r\n";
+    }
 
     stream.flush();
 }
@@ -1051,7 +1055,9 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
             file.close();
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, sLOC + "Could not read file");
+        }
     }
 
     LOG(VB_HTTP, LOG_INFO, sLOC + "type is " + sMIME);
@@ -1160,7 +1166,9 @@ bool HTTPRequest::ParseKeepAlive()
         bKeepAlive = false;
     }
     else if (sValueList.contains("keep-alive"))
+    {
         bKeepAlive = true;
+    }
 
    return bKeepAlive;
 }
@@ -1247,7 +1255,9 @@ bool HTTPRequest::ParseRequest()
                 sLine = ReadLine( 2s );
             }
             else
+            {
                 bDone = true;
+            }
         }
 
         // Dump request header

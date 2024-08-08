@@ -83,7 +83,9 @@ bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
             // eat the escape keypress
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -157,7 +159,9 @@ bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
             // eat the escape keypress
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

@@ -269,7 +269,9 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
                                         sDetails );
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Response not created - pRequest == NULL" );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

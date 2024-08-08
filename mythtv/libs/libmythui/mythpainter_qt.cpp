@@ -106,7 +106,9 @@ void MythQtPainter::SetClipRect(const QRect clipRect)
             m_clipRegion = m_clipRegion.united(clipRect);
     }
     else
+    {
         m_painter->setClipping(false);
+    }
 }
 
 void MythQtPainter::DrawImage(const QRect r, MythImage *im,

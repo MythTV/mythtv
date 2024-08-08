@@ -555,7 +555,9 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
             popupStack->AddScreen(input);
         }
         else
+        {
             delete input;
+        }
     }
 }
 
@@ -1559,7 +1561,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
                 Scroll(0, -m_actualBrowserArea.height() / 10);
             }
             else
+            {
                 handled = false;
+            }
         }
         else if (action == "DOWN")
         {
@@ -1571,7 +1575,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
                 Scroll(0, m_actualBrowserArea.height() / 10);
             }
             else
+            {
                 handled = false;
+            }
         }
         else if (action == "LEFT")
         {
@@ -1582,7 +1588,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
                 Scroll(-m_actualBrowserArea.width() / 10, 0);
             }
             else
+            {
                 handled = false;
+            }
         }
         else if (action == "RIGHT")
         {
@@ -1594,7 +1602,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
                 Scroll(m_actualBrowserArea.width() / 10, 0);
             }
             else
+            {
                 handled = false;
+            }
         }
         else if (action == "PAGEUP")
         {
@@ -1641,7 +1651,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
             Forward();
         }
         else
+        {
             handled = false;
+        }
     }
 
     return handled;

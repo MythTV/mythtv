@@ -121,7 +121,9 @@ QString DLNAProfileName(const QString &mimeType, const QSize resolution,
             // Fallthough, no DLNA profiles
         }
         else if (audioCodec == "DTS")
+        {
             sProfileName = "MPEG_PS_SD_DTS";
+        }
         else
         {
             if (isNorthAmerica)

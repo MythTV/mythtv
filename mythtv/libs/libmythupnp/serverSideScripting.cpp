@@ -596,7 +596,9 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
             bMatchFound = false;
         }
         else
+        {
             bMatchFound = true;
+        }
         
         // ------------------------------------------------------------------
         // Add Code or Text to Line
@@ -655,7 +657,9 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
 
                 }
                 else
+                {
                     sCode << sSegment << "\n";
+                }
 
                 if (bMatchFound)
                     bInCode = false;

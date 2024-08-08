@@ -424,17 +424,29 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
                 handled = false;
         }
         else if (action == "ESCAPE")
+        {
             Close();
+        }
         else if (action == "MENU")
+        {
             ShowMenu();
+        }
         else if (action.startsWith("SYSEVENT"))
+        {
             gCoreContext->SendSystemEvent(QString("KEY_%1").arg(action.mid(8)));
+        }
         else if (action == ACTION_SCREENSHOT)
+        {
             MythMainWindow::ScreenShot();
+        }
         else if (action == ACTION_TVPOWERON || action == ACTION_TVPOWEROFF)
+        {
             GetMythMainWindow()->HandleTVAction(action);
+        }
         else
+        {
             handled = false;
+        }
     }
 
     return handled;

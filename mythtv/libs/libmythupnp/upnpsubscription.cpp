@@ -361,8 +361,11 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
             .arg(callback, usn);
         data << "NT: upnp:event\r\n";
     }
-    else // renewal
+    else
+    {
+        // renewal
         data << QString("SID: uuid:%1\r\n").arg(uuidin);
+    }
 
     data << QString("TIMEOUT: Second-%1\r\n").arg(SUBSCRIPTION_TIME);
     data << "\r\n";

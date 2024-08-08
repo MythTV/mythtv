@@ -560,7 +560,9 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, U
             }
         }
         else
+        {
             area.adjust(breakin, breakin, -breakin, -breakin);
+        }
     }
     else
     {
@@ -586,7 +588,9 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, U
             }
         }
         else
+        {
             area.adjust(breakin, breakin, -breakin, -breakin);
+        }
     }
 
     if (area.width() <= 1)

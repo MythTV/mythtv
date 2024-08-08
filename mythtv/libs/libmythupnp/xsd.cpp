@@ -432,7 +432,9 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
                     sType = "MapOfString" + sContentName;
                 }
                 else
+                {
                     sType = "ArrayOf" + sContentType;
+                }
 
                 bCustomType = true;
 

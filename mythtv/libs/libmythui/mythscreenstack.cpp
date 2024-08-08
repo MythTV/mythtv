@@ -272,7 +272,9 @@ void MythScreenStack::DoNewFadeTransition(void)
         m_drawOrder.push_back(m_newTop);
     }
     else
+    {
         RecalculateDrawOrder();
+    }
 }
 
 void MythScreenStack::CheckNewFadeTransition(void)

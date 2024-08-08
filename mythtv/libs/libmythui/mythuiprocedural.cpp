@@ -60,7 +60,9 @@ bool MythUIProcedural::ParseElement(const QString& FileName, QDomElement& Elemen
         m_fragmentSource = LoadShaderSource(parseText(Element));
     }
     else
+    {
         return MythUIType::ParseElement(FileName, Element, ShowWarnings);
+    }
 
     return true;
 }

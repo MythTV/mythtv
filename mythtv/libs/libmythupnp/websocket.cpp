@@ -636,7 +636,9 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
                     // Fall through to appropriate handler for complete payload
                 }
                 else
+                {
                     break;
+                }
                 [[fallthrough]];
             case WebSocketFrame::kOpTextFrame:
             case WebSocketFrame::kOpBinaryFrame:

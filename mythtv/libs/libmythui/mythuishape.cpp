@@ -111,7 +111,9 @@ bool MythUIShape::ParseElement(
             }
         }
         else
+        {
             m_fillBrush.setStyle(Qt::NoBrush);
+        }
     }
     else if (element.tagName() == "line")
     {
@@ -130,7 +132,9 @@ bool MythUIShape::ParseElement(
             m_linePen.setStyle(Qt::SolidLine);
         }
         else
+        {
             m_linePen.setStyle(Qt::NoPen);
+        }
     }
     else if (element.tagName() == "cornerradius")
     {

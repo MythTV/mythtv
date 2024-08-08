@@ -262,7 +262,9 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
                                          .arg(url.toString()));
     }
     else
+    {
         sXml = QString(aBuffer);
+    }
 
     // --------------------------------------------------------------
     // Parse response

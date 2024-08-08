@@ -130,8 +130,10 @@ void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
             (*it)->AddAttribute( "type", sType );
     }
     else
+    {
         LOG(VB_UPNP, LOG_WARNING,
                 QString("SetPropValue(%1) called with non-existent property.").arg(sName));
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

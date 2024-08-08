@@ -123,7 +123,9 @@ QStringList GetSourceProtocolInfos()
             protocolList << protocolStr.arg(*it, "DLNA.ORG_PN=WMAFULL;" + flags);
         }
         else
+        {
             protocolList << protocolStr.arg(*it, "*");
+        }
     }
 
     return protocolList;

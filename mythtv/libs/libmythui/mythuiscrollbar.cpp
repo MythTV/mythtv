@@ -36,9 +36,13 @@ bool MythUIScrollBar::ParseElement(
             m_layout = LayoutHorizontal;
     }
     else if (element.tagName() == "hidedelay")
+    {
         m_hideDelay = std::chrono::milliseconds(getFirstText(element).toInt());
+    }
     else
+    {
         return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

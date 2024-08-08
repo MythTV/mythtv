@@ -101,7 +101,9 @@ bool MythUIVideo::ParseElement(
         m_backgroundColor = QColor(getFirstText(element));
     }
     else
+    {
         return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

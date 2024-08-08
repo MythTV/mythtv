@@ -377,7 +377,9 @@ void SSDPCache::Add( const QString &sURI,
                     isGoodUrl=true;
                 }
                 else
+                {
                     m_badUrlList.append(hostport);
+                }
             }
             // Only add if the device can be connected
             if (isGoodUrl)

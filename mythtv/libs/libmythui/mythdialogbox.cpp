@@ -134,7 +134,9 @@ bool MythDialogBox::Create(void)
             return false;
     }
     else if (!CopyWindowFromBase(windowName, this))
+    {
         return false;
+    }
 
     bool err = false;
     if (m_fullscreen)
@@ -390,7 +392,9 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
             Select(m_buttonList->GetItemCurrent());
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

@@ -143,7 +143,9 @@ bool MythUIButton::keyPressEvent(QKeyEvent *event)
             }
         }
         else
+        {
             handled = false;
+        }
     }
 
     return handled;

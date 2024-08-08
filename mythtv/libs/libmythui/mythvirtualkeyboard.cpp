@@ -261,7 +261,9 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
                 altshift = e.attribute("altshift");
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR, "Unknown element in key definition");
+            }
         }
         n = n.nextSibling();
     }
@@ -307,11 +309,17 @@ void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::shiftClicked);
                     }
                     else if (key.type == "char")
+                    {
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::charClicked);
+                    }
                     else if (key.type == "done")
+                    {
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::returnClicked);
+                    }
                     else if (key.type == "del")
+                    {
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::delClicked);
+                    }
                     else if (key.type == "lock")
                     {
                         m_lockButton = button;
@@ -331,11 +339,17 @@ void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
                         connect(m_compButton, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::compClicked);
                     }
                     else if (key.type == "moveleft")
+                    {
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::moveleftClicked);
+                    }
                     else if (key.type == "moveright")
+                    {
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::moverightClicked);
+                    }
                     else if (key.type == "back")
+                    {
                         connect(button, &MythUIButton::Clicked, this, &MythUIVirtualKeyboard::backClicked);
+                    }
                 }
             }
             else
@@ -394,7 +408,9 @@ bool MythUIVirtualKeyboard::keyPressEvent(QKeyEvent *e)
                 SetFocusWidget(GetChild(key.right));
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(e))
@@ -541,7 +557,9 @@ void MythUIVirtualKeyboard::returnClicked(void)
         m_parentEdit->keyPressEvent(event);
     }
     else
+    {
         Close();
+    }
 }
 
 void MythUIVirtualKeyboard::moveleftClicked(void)
@@ -606,8 +624,10 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
                 res += QString(uc);
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR, QString("bad char code (%1)")
                                 .arg(sCode));
+            }
         }
         else
         {

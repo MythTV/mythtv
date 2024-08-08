@@ -352,7 +352,9 @@ class ImageLoader
                     imProps.SetMaskImage(newMaskImage);
                 }
                 else
+                {
                     imProps.SetMaskImage(nullptr);
+                }
                 newMaskImage->DecrRef();
 
                 QRect imageArea = image->rect();
@@ -662,7 +664,9 @@ void MythUIImage::Reset(void)
         Load();
     }
     else
+    {
         d->m_updateLock.unlock();
+    }
 
     MythUIType::Reset();
 }
@@ -889,7 +893,9 @@ void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
             SetDelays(delays);
     }
     else
+    {
         Reset();
+    }
 }
 
 /**
@@ -1278,7 +1284,9 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         d->m_updateLock.unlock();
     }
     else
+    {
         m_imagesLock.unlock();
+    }
 }
 
 /**
@@ -1327,9 +1335,13 @@ bool MythUIImage::ParseElement(
         m_imageProperties.m_forceSize = m_area.size();
     }
     else if (element.tagName() == "preserveaspect")
+    {
         m_imageProperties.m_preserveAspect = parseBool(element);
+    }
     else if (element.tagName() == "crop")
+    {
         m_imageProperties.m_cropRect = parseRect(element);
+    }
     else if (element.tagName() == "delay")
     {
         QString value = getFirstText(element);
@@ -1473,7 +1485,9 @@ void MythUIImage::CopyFrom(MythUIType *base)
         Load();
     }
     else
+    {
         d->m_updateLock.unlock();
+    }
 }
 
 /**
@@ -1499,7 +1513,9 @@ void MythUIImage::Finalize(void)
         Load();
     }
     else
+    {
         d->m_updateLock.unlock();
+    }
 
     MythUIType::Finalize();
 }
