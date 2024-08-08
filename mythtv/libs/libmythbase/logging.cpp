@@ -76,9 +76,10 @@ struct LogPropagateOpts {
     int     m_quiet;
     int     m_facility;
     QString m_path;
+    bool    m_loglong;
 };
 
-LogPropagateOpts        logPropagateOpts {false, 0, 0, ""};
+LogPropagateOpts        logPropagateOpts {false, 0, 0, "", false};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
@@ -212,15 +213,44 @@ char LoggingItem::getLevelChar (void)
     return '-';
 }
 
+std::string LoggingItem::toString()
+{
+    QString ptid = QString::number(pid()); // pid, add tid if non-zero
+    if(tid())
+    {
+        ptid.append("/").append(QString::number(tid()));
+    }
+    return qPrintable(QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
+                          .arg(getTimestampUs(),
+                               QString(QChar(getLevelChar())),
+                               ptid,
+                               threadName(),
+                               file(),
+                               QString::number(line()),
+                               function(),
+                               message()
+                              ));
+}
+
+std::string LoggingItem::toStringShort()
+{
+    return qPrintable(QString("%1 %2  %3\n")
+                          .arg(getTimestampUs(),
+                               QString(QChar(getLevelChar())),
+                               message()
+                              ));
+}
+
 /// \brief LoggerThread constructor.  Enables debugging of thread registration
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
 LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
-                           int facility) :
+                           int facility, bool loglong) :
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
     m_filename(std::move(filename)), m_progress(progress), m_quiet(quiet),
+    m_loglong(loglong),
     m_facility(facility), m_pid(getpid())
 {
     if (qEnvironmentVariableIsSet("VERBOSE_THREADS"))
@@ -380,41 +410,21 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     }
     else
     {
-        QString timestamp = item->getTimestampUs();
-        char shortname = item->getLevelChar();
-
-#ifndef NDEBUG
-        if (item->tid())
+#if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
+        if (true)
+#else
+        if (m_loglong)
+#endif
         {
-            line = qPrintable(QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
-                .arg(timestamp, QString(shortname),
-                     QString::number(item->pid()),
-                     QString::number(item->tid()),
-                     item->threadName(),
-                     item->m_file,
-                     QString::number(item->m_line),
-                     item->m_function,
-                     item->m_message));
+            line = item->toString();
         }
         else
         {
-            line = qPrintable(QString("%1 %2 [%3] %4 %5:%6:%7  %8\n")
-                .arg(timestamp, QString(shortname),
-                     QString::number(item->pid()),
-                     item->threadName(),
-                     item->m_file,
-                     QString::number(item->m_line),
-                     item->m_function,
-                     item->m_message));
+            line = item->toStringShort();
         }
-#else
-        line = qPrintable(QString("%1 %2  %3\n")
-                          .arg(timestamp, QString(shortname),
-                               item->m_message));
-#endif
     }
 
-    (void)write(1, line.data(), line.size());
+    std::cout << line;
 
 #else // Q_OS_ANDROID
 
@@ -593,6 +603,12 @@ void logPropagateCalc(void)
         logPropagateArgList << "--quiet";
     }
 
+    if (logPropagateOpts.m_loglong)
+    {
+        logPropagateArgs += " --loglong";
+        logPropagateArgList << "--loglong";
+    }
+
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.m_facility >= 0)
     {
@@ -635,7 +651,7 @@ bool logPropagateQuiet(void)
 /// \param  testHarness Should always be false. Set to true when
 ///                     invoked by the testing code.
 void logStart(const QString& logfile, bool progress, int quiet, int facility,
-              LogLevel_t level, bool propagate, bool testHarness)
+              LogLevel_t level, bool propagate, bool loglong, bool testHarness)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -647,6 +663,7 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     logPropagateOpts.m_propagate = propagate;
     logPropagateOpts.m_quiet = quiet;
     logPropagateOpts.m_facility = facility;
+    logPropagateOpts.m_loglong = loglong;
 
     if (propagate)
     {
@@ -660,7 +677,7 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
         return;
 
     if (!logThread)
-        logThread = new LoggerThread(logfile, progress, quiet, facility);
+        logThread = new LoggerThread(logfile, progress, quiet, facility, loglong);
 
     logThread->start();
 }
