@@ -173,7 +173,9 @@ QStringList LCDServer::parseCommand(QString &command)
             s = "";
         }
         else
+        {
             s = s + c;
+        }
     }
 
     tokens.append(s);

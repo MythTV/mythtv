@@ -942,7 +942,9 @@ int  V2Capture::AddDiseqcTree ( uint           ParentId,
 #endif
     }
     else
+    {
         query.bindValue(":PARENTID", ParentId);
+    }
     query.bindValue(":ORDINAL", Ordinal);
     query.bindValue(":TYPE", Type);
     query.bindValue(":SUBTYPE", SubType);
@@ -1024,7 +1026,9 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiSEqCId,
 #endif
     }
     else
+    {
         query.bindValue(":PARENTID", ParentId);
+    }
     query.bindValue(":ORDINAL", Ordinal);
     query.bindValue(":TYPE", Type);
     query.bindValue(":SUBTYPE", SubType);

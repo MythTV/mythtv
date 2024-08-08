@@ -292,7 +292,9 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             myth_system(mythtv_setup + logPropagateArgs);
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -364,7 +366,9 @@ void WelcomeDialog::updateScreen(void)
                        MythDate::toString(tuner.endTime, MythDate::kTime));
         }
         else
+        {
             status = tr("There are no recordings currently taking place");
+        }
 
         m_recordingText->SetText(status);
 
@@ -394,7 +398,9 @@ void WelcomeDialog::updateScreen(void)
                 m_screenScheduledNo = 0;
         }
         else
+        {
             status = tr("There are no scheduled recordings");
+        }
 
         m_scheduledText->SetText(status);
     }
@@ -568,7 +574,9 @@ bool WelcomeDialog::checkConnectionToServer(void)
             updateAll();
         }
         else
+        {
            updateScreen();
+        }
     }
 
     if (bRes)
@@ -697,8 +705,10 @@ void WelcomeDialog::shutdownNow(void)
                 );
         }
         else
+        {
             setwakeup_cmd.replace(
                 "$time", restarttime.toLocalTime().toString(wakeup_timeformat));
+        }
 
         if (!setwakeup_cmd.isEmpty())
         {

@@ -766,19 +766,33 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 moveLeftRight(kPageRight);
         }
         else if (action == ACTION_DAYLEFT)
+        {
             moveLeftRight(kDayLeft);
+        }
         else if (action == ACTION_DAYRIGHT)
+        {
             moveLeftRight(kDayRight);
+        }
         else if (action == "NEXTFAV")
+        {
             toggleGuideListing();
+        }
         else if (action == ACTION_FINDER)
+        {
             showProgFinder();
+        }
         else if (action == ACTION_CHANNELSEARCH)
+        {
             ShowChannelSearch();
+        }
         else if (action == "MENU")
+        {
             ShowMenu();
+        }
         else if (action == "ESCAPE" || action == ACTION_GUIDE)
+        {
             Close();
+        }
         else if (action == ACTION_SELECT)
         {
             ProgramInfo *pginfo =
@@ -810,19 +824,33 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             }
         }
         else if (action == "EDIT")
+        {
             EditScheduled();
+        }
         else if (action == "CUSTOMEDIT")
+        {
             EditCustom();
+        }
         else if (action == "DELETE")
+        {
             deleteRule();
+        }
         else if (action == "UPCOMING")
+        {
             ShowUpcoming();
+        }
         else if (action == "PREVRECORDED")
+        {
             ShowPrevious();
+        }
         else if (action == "DETAILS" || action == "INFO")
+        {
             ShowDetails();
+        }
         else if (action == ACTION_TOGGLERECORD)
+        {
             QuickRecord();
+        }
         else if (action == ACTION_TOGGLEFAV)
         {
             if (m_changrpid == -1)
@@ -831,15 +859,25 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 toggleChannelFavorite();
         }
         else if (action == "CHANUPDATE")
+        {
             channelUpdate();
+        }
         else if (action == ACTION_VOLUMEUP)
+        {
             emit ChangeVolume(true);
+        }
         else if (action == ACTION_VOLUMEDOWN)
+        {
             emit ChangeVolume(false);
+        }
         else if (action == "CYCLEAUDIOCHAN")
+        {
             emit ToggleMute(true);
+        }
         else if (action == ACTION_MUTEAUDIO)
+        {
             emit ToggleMute(false);
+        }
         else if (action == ACTION_TOGGLEPGORDER)
         {
             m_sortReverse = !m_sortReverse;
@@ -847,7 +885,9 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             updateChannels();
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -2004,7 +2044,9 @@ void GuideGrid::customEvent(QEvent *event)
             moveToTime(datetime);
         }
         else
+        {
             ScheduleCommon::customEvent(event);
+        }
     }
     else if (event->type() == UpdateGuideEvent::kEventType)
     {
@@ -2675,5 +2717,7 @@ void GuideGrid::ShowJumpToTime(void)
         popupStack->AddScreen(timedlg);
     }
     else
+    {
         delete timedlg;
+    }
 }

@@ -58,7 +58,9 @@ void ScheduleCommon::ShowUpcoming(const QString &title,
         mainStack->AddScreen(pl);
     }
     else
+    {
         delete pl;
+    }
 }
 
 /**
@@ -506,7 +508,9 @@ void ScheduleCommon::customEvent(QEvent *event)
                 }
             }
             else if (resulttext == tr("Record all showings"))
+            {
                 recInfo.ApplyRecordStateChange(kAllRecord);
+            }
             else if (resulttext == tr("Record one showing (this episode)") ||
                      resulttext == tr("Record one showing"))
             {
@@ -535,21 +539,31 @@ void ScheduleCommon::customEvent(QEvent *event)
                     MakeOverride(&recInfo);
             }
             else if (resulttext == tr("Restart this recording"))
+            {
                 recInfo.ReactivateRecording();
+            }
             else if (resulttext == tr("Forget previous recording"))
+            {
                 recInfo.ForgetHistory();
+            }
             else if (resulttext == tr("Don't record this showing"))
+            {
                 recInfo.ApplyRecordStateChange(kDontRecord);
+            }
             else if (resulttext == tr("Never record this episode"))
             {
                 recInfo.ApplyNeverRecord();
             }
             else if (resulttext == tr("Edit recording rule") ||
                      resulttext == tr("Edit override rule"))
+            {
                 EditScheduled(&recInfo);
+            }
             else if (resulttext == tr("Delete recording rule") ||
                      resulttext == tr("Delete override rule"))
+            {
                 recInfo.ApplyRecordStateChange(kNotRecording);
+            }
         }
     }
 }

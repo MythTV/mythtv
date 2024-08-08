@@ -940,7 +940,9 @@ void VideoListImp::buildTVList(void)
             season_node->addEntry(smart_meta_node(new meta_data_node(data)));
         }
         else
+        {
             movie_node->addEntry(smart_meta_node(new meta_data_node(data)));
+        }
     }
 }
 

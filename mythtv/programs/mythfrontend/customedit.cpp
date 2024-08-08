@@ -138,7 +138,9 @@ void CustomEdit::loadData(void)
         }
     }
     else
+    {
         MythDB::DBError("Get power search rules query", result);
+    }
 
     loadClauses();
 
@@ -645,7 +647,9 @@ void CustomEdit::testClicked(void)
         mainStack->AddScreen(pl);
     }
     else
+    {
         delete pl;
+    }
 }
 
 /**
@@ -694,7 +698,9 @@ void CustomEdit::recordClicked(void)
         connect(schededit, &ScheduleEditor::ruleSaved, this, &CustomEdit::scheduleCreated);
     }
     else
+    {
         delete schededit;
+    }
 }
 
 void CustomEdit::scheduleCreated(int ruleID)
@@ -756,7 +762,9 @@ void CustomEdit::storeClicked(void)
         mainStack->AddScreen(storediag);
     }
     else
+    {
         delete storediag;
+    }
 }
 
 
@@ -937,8 +945,11 @@ bool CustomEdit::keyPressEvent(QKeyEvent *event)
             m_evaluate = !m_evaluate;
             MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
             clauseChanged(item);
-        } else
+        }
+        else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

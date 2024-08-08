@@ -28,17 +28,29 @@ static int QueueJob(const MythUtilCommandLineParser &cmdline)
         rebuildSeektable = true;
     }
     else if (cmdline.toString("queuejob") == "metadata")
+    {
         jobType = JOB_METADATA;
+    }
     else if (cmdline.toString("queuejob") == "userjob1")
+    {
         jobType = JOB_USERJOB1;
+    }
     else if (cmdline.toString("queuejob") == "userjob2")
+    {
         jobType = JOB_USERJOB2;
+    }
     else if (cmdline.toString("queuejob") == "userjob3")
+    {
         jobType = JOB_USERJOB3;
+    }
     else if (cmdline.toString("queuejob") == "userjob4")
+    {
         jobType = JOB_USERJOB4;
+    }
     else if (cmdline.toInt("queuejob") > 0)
+    {
         jobType = cmdline.toInt("queuejob");
+    }
 
     if (jobType == JOB_NONE)
     {

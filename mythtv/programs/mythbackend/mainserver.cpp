@@ -648,7 +648,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             HandleDeleteRecording(tokens[1], tokens[2], pbs, force, forget);
         }
         else
+        {
             HandleDeleteRecording(listline, pbs, false);
+        }
     }
     else if (command == "FORCE_DELETE_RECORDING")
     {
@@ -668,11 +670,17 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             reslist << QString("ERROR: Called in master context");
         }
         else if (tokens.size() != 2)
+        {
             reslist << "ERROR: Bad ADD_CHILD_INPUT request";
+        }
         else if (HandleAddChildInput(tokens[1].toUInt()))
+        {
             reslist << "OK";
+        }
         else
+        {
             reslist << QString("ERROR: Failed to add child input");
+        }
         SendResponse(pbs->getSocket(), reslist);
     }
     else if (command == "RESCHEDULE_RECORDINGS")
@@ -1065,7 +1073,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
                 myth_system(halt_cmd);
             }
             else
+            {
                 SendErrorResponse(pbs, "Received an empty SHUTDOWN_NOW query!");
+            }
         }
     }
     else if (command == "BACKEND_MESSAGE")
@@ -1616,7 +1626,9 @@ void MainServer::customEvent(QEvent *e)
                     }
                 }
                 else if (pbs->wantsOnlySystemEvents())
+                {
                     continue;
+                }
             }
 
             MythSocket *sock = pbs->getSocket();
@@ -1969,7 +1981,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             filename = dir + "/" + path;
         }
         else
+        {
             filename = LocalFilePath(path, wantgroup);
+        }
 
         if (filename.isEmpty())
         {
@@ -3224,7 +3238,9 @@ void MainServer::HandleRescheduleRecordings(const QStringList &request,
         result = QStringList(QString::number(1));
     }
     else
+    {
         result = QStringList(QString::number(0));
+    }
 
     if (pbs)
     {
@@ -3417,7 +3433,9 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
         }
     }
     else
+    {
         BackendQueryDiskSpace(strlist, allHosts, allHosts);
+    }
 
     SendResponse(pbs->getSocket(), strlist);
 }
@@ -3756,7 +3774,9 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
         }
     }
     else
+    {
         retlist << "0";
+    }
 
     SendResponse(pbs->getSocket(), retlist);
 }
@@ -5081,10 +5101,14 @@ void MainServer::HandleIsActiveBackendQuery(const QStringList &slist,
             slave->DecrRef();
         }
         else
+        {
             retlist << "FALSE";
+        }
     }
     else
+    {
         retlist << "TRUE";
+    }
 
     SendResponse(pbs->getSocket(), retlist);
 }
@@ -5217,7 +5241,9 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     foundDirs[currentDir] = true;
                 }
                 else
+                {
                     foundDirs[currentDir] = false;
+                }
             }
         }
     }
@@ -5732,7 +5758,9 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
         retlist << "OK";
     }
     else
+    {
         retlist << "FAILED";
+    }
 
     if (pbssock)
         SendResponse(pbssock, retlist);
@@ -5814,7 +5842,9 @@ void MainServer::HandleDownloadFile(const QStringList &command,
                        + filename;
         }
         else
+        {
             retlist << "ERROR";
+        }
     }
     else
     {
@@ -5868,7 +5898,9 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
         retlist << "OK";
     }
     else
+    {
         retlist << "ERROR";
+    }
 
     if (pbssock)
         SendResponse(pbssock, retlist);
@@ -7497,7 +7529,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         } else {
             PreviewGeneratorQueue::GetPreviewImage(
                 pginfo, outputsize, outputfile, -1s, frame, token);
-}
+        }
     }
     else
     {
@@ -7569,7 +7601,9 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
             strlist = QStringList(QString::number(UINT_MAX));
     }
     else
+    {
         strlist = QStringList( "BAD" );
+    }
 
     SendResponse(pbssock, strlist);
 }

@@ -632,7 +632,9 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
         thumbsNeeded = 1;
     }
     else
+    {
         thumbDirs.append(userIm);
+    }
 
     // Fill parent thumbs from child files first
     // Whilst they're available fill as many as possible for cache

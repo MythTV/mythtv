@@ -370,8 +370,10 @@ void NetworkControl::deleteClient(NetworkControlClient *ncc)
         delete ncc;
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("deleteClient(%1), unable to "
                 "locate specified NetworkControlClient").arg((long long)ncc));
+    }
 }
 
 void NetworkControl::newControlConnection(QTcpSocket *client)
@@ -618,7 +620,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             qApp->postEvent(GetMythMainWindow(), me);
         }
         else
+        {
             return {"Unable to change to main menu to start playback!"};
+        }
     }
     else if ((nc->getArgCount() >= 4) &&
              (is_abbrev("program", nc->getArg(1))) &&
@@ -770,7 +774,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 return "unknown";
             }
             else
+            {
                 return {"ERROR: Invalid 'play music' command"};
+            }
         }
         else if (nc->getArgCount() > 3)
         {
@@ -800,7 +806,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             }
         }
         else
+        {
             return {"ERROR: Invalid 'play music' command"};
+        }
     }
     // Everything below here requires us to be in playback mode so check to
     // see if we are
@@ -859,8 +867,10 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                               .arg((hours * 3600) + (minutes * 60) + seconds);
         }
         else
+        {
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(nc->getArg(0));
+        }
     }
     else if (is_abbrev("speed", nc->getArg(1), 2))
     {
@@ -891,7 +901,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             return saveScreenshot(nc);
     }
     else if (is_abbrev("stop", nc->getArg(1), 2))
+    {
         message = QString("NETWORK_CONTROL STOP");
+    }
     else if (is_abbrev("volume", nc->getArg(1), 2))
     {
         static const QRegularExpression kVolumeRE { "^\\d+%?$" };
@@ -923,8 +935,10 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         }
     }
     else
+    {
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
+    }
 
     if (!message.isEmpty())
     {
@@ -1009,7 +1023,9 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
 
     }
     else if(is_abbrev("time", nc->getArg(1)))
+    {
         return MythDate::current_iso_string();
+    }
     else if (is_abbrev("uptime", nc->getArg(1)))
     {
         QString str;
@@ -1080,9 +1096,13 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
              is_abbrev("recording", nc->getArg(1)) &&
              (nc->getArg(2).contains(kChanID1RE)) &&
              (nc->getArg(3).contains(kStartTimeRE)))
+    {
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
+    }
     else if (is_abbrev("recordings", nc->getArg(1)))
+    {
         return listRecordings();
+    }
     else if (is_abbrev("channels", nc->getArg(1)))
     {
         if (nc->getArgCount() == 2)
@@ -1094,8 +1114,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
                        "(parameters mismatch)").arg(nc->getArg(0));
     }
     else
+    {
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
+    }
 
     return result;
 }
@@ -1784,7 +1806,9 @@ QString NetworkControl::listRecordings(const QString& chanid, const QString& sta
         }
     }
     else
+    {
         result = "ERROR: Unable to retrieve recordings list.";
+    }
 
     return result;
 }

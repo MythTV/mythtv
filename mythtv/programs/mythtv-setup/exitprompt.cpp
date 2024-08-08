@@ -57,7 +57,9 @@ void ExitPrompter::masterPromptExit()
         }
     }
     else
+    {
         quit();
+    }
 }
 
 void ExitPrompter::handleExit()
@@ -109,7 +111,9 @@ void ExitPrompter::handleExit()
         m_d->m_stk->AddScreen(dia);
     }
     else
+    {
         masterPromptExit();
+    }
 }
 
 void ExitPrompter::customEvent(QEvent *event)

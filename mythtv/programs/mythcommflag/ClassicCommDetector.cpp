@@ -573,7 +573,9 @@ bool ClassicCommDetector::go()
                     usecSleep = usecSleep * 0.25;
             }
             else if (secondsBehind < requiredBuffer)
+            {
                 usecSleep = usecPerFrame * 1.5;
+            }
 
             if (usecSleep > 0us)
                 std::this_thread::sleep_for(usecSleep);

@@ -520,7 +520,9 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
                 mFoundGroup = true;
             }
             else
+            {
                 delete g;
+            }
 
         }
         else if (e.tagName() == "setting" && includeAllChildren)

@@ -330,7 +330,9 @@ void AudioSetupWizard::slotNext(void)
         mainStack->AddScreen(sw);
     }
     else
+    {
         delete sw;
+    }
 }
 
 void AudioSetupWizard::save(void)

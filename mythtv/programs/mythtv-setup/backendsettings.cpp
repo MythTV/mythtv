@@ -1139,7 +1139,9 @@ void BackendSettings::listenChanged()
         m_backendServerAddr->setValue(currentsetting);
     }
     else
+    {
         m_backendServerAddr->setValue(0);
+    }
     m_backendServerAddr->setChanged(addrChanged);
 }
 

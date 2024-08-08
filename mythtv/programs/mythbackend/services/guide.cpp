@@ -224,7 +224,9 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         bindings[":PersonFilter"] = QString("%%1%").arg(sPersonFilter);
     }
     else
+    {
         sSQL = "WHERE ";
+    }
 
     if (bOnlyNew)
     {

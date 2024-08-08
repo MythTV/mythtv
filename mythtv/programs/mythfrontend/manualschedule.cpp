@@ -241,7 +241,9 @@ void ManualSchedule::recordClicked(void)
         connect(schededit, &ScheduleEditor::ruleSaved, this, &ManualSchedule::scheduleCreated);
     }
     else
+    {
         delete schededit;
+    }
 }
 
 void ManualSchedule::scheduleCreated(int ruleid)

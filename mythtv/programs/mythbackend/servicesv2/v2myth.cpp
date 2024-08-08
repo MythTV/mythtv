@@ -981,7 +981,9 @@ bool V2Myth::BackupDatabase(void)
         bResult = true;
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Database backup failed.");
+    }
 
     return bResult;
 }

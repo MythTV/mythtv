@@ -182,8 +182,10 @@ void MythControls::ActionButtonPressed()
         m_menuPopup->AddButton(tr("Set Binding"));
         m_menuPopup->AddButton(tr("Remove Binding"));
     }
-    else // for blank keys, no reason to ask what to do
+    else {
+        // for blank keys, no reason to ask what to do
         GrabKey();
+    }
 }
 
 /**
@@ -248,7 +250,9 @@ void MythControls::Close()
         confirmPopup->SetReturnEvent(this, "exit");
     }
     else
+    {
         MythScreenType::Close();
+    }
 }
 
 /**
@@ -550,7 +554,9 @@ void MythControls::DeleteKey(void)
         popupStack->AddScreen(confirmPopup);
     }
     else
+    {
         delete confirmPopup;
+    }
 }
 
 /**
@@ -728,7 +734,9 @@ void MythControls::customEvent(QEvent *event)
                 contents = m_bindings->GetKeys();
             }
             else
+            {
                 return;
+            }
 
             m_leftDescription->SetText(leftcaption);
             m_rightDescription->SetText(rightcaption);

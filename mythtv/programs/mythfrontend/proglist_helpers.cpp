@@ -205,7 +205,9 @@ void PhrasePopup::recordClicked(void)
         okClicked();
     }
     else
+    {
         delete schededit;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -389,7 +391,9 @@ void PowerSearchPopup::recordClicked(void)
         Close();
     }
     else
+    {
         delete schededit;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

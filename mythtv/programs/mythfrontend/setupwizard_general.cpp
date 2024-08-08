@@ -114,7 +114,9 @@ void GeneralSetupWizard::slotNext(void)
         mainStack->AddScreen(sw);
     }
     else
+    {
         delete sw;
+    }
 }
 
 void GeneralSetupWizard::slotSubmit(void)

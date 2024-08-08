@@ -111,7 +111,9 @@ void V2FillProgramInfo( V2Program *pProgram,
         }
     }
     else
+    {
         pProgram->enableChannel(false);
+    }
 
     // Build Recording Child Element
 
@@ -148,7 +150,9 @@ void V2FillProgramInfo( V2Program *pProgram,
         }
     }
     else
+    {
         pProgram->enableRecording(false);
+    }
 
     if ( bIncArtwork && !pInfo->GetInetRef().isEmpty() )
         V2FillArtworkInfoList( pProgram->Artwork(), pInfo->GetInetRef(), pInfo->GetSeason());

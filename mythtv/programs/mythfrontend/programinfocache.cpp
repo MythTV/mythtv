@@ -116,7 +116,9 @@ void ProgramInfoCache::Load(const bool updateUI)
             }
         }
         else
+        {
             MythDB::DBError("Watched progress", query);
+        }
      }
 
    locker.relock();

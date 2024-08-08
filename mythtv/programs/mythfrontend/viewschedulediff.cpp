@@ -137,7 +137,9 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem */*item*/)
         mainStack->AddScreen(dlg);
     }
     else
+    {
         delete dlg;
+    }
 }
 
 static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)

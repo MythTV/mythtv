@@ -103,7 +103,9 @@ void InfoList::Toggle(const ImagePtrK& im)
         return;
     }
     else
+    {
         m_infoVisible = kBasicInfo;
+    }
 
     Clear();
     Update(im);

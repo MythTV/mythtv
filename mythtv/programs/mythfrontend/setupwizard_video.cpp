@@ -170,7 +170,9 @@ void VideoSetupWizard::testSDVideo(void)
         DownloadSample(VIDEO_SAMPLE_SD_LOCATION, VIDEO_SAMPLE_SD_FILENAME);
     }
     else
+    {
         playVideoTest(desc, title, sdtestfile);
+    }
 }
 
 void VideoSetupWizard::testHDVideo(void)
@@ -191,7 +193,9 @@ void VideoSetupWizard::testHDVideo(void)
         DownloadSample(VIDEO_SAMPLE_HD_LOCATION, VIDEO_SAMPLE_HD_FILENAME);
     }
     else
+    {
         playVideoTest(desc, title, hdtestfile);
+    }
 }
 
 void VideoSetupWizard::playVideoTest(const QString& desc, const QString& title, const QString& file)

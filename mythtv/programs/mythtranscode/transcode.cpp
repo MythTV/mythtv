@@ -1118,7 +1118,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                     wait_recover = 0;
                 }
                 else
+                {
                     wait_recover--;
+                }
             }
             else
             {

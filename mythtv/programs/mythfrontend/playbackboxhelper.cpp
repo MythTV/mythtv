@@ -286,7 +286,9 @@ bool PBHEventHandler::event(QEvent *e)
                 m_checkAvailabilityTimerId = startTimer(0ms);
             }
             else if (!m_checkAvailabilityTimerId)
+            {
                 m_checkAvailabilityTimerId = startTimer(50ms);
+            }
         }
         else if (me->Message() == "LOCATE_ARTWORK")
         {

@@ -133,7 +133,9 @@ void IdleScreen::UpdateStatus(void)
                 statusText->SetText(status);
             }
             else
+            {
                 statusText->Reset();
+            }
         }
     }
 }

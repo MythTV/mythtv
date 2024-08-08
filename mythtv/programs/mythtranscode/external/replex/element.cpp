@@ -186,7 +186,9 @@ void pts2time(uint64_t pts, uint8_t *buf, int len)
 			c = len;
 
 
-		} else c++;
+		} else {
+			c++;
+		}
 	}
 
 }
@@ -366,7 +368,9 @@ int find_audio_sync(ringbuffer *rbuf, audio_sync_buf &buf, int off, int type, in
 				if (mring_peek(rbuf, buf.data(), l, c-1) < -1)
 					return -2;
 				return c-1-off;	
-			} else if ( b != b1) found = 0;
+			} else if ( b != b1) {
+				found = 0;
+			}
 		}
 		c++;
 	}	
@@ -408,7 +412,9 @@ int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 		case 1:
 			if ( (b&m2) == b2){
 				return c-1;	
-			} else if ( b != b1) found = 0;
+			} else if ( b != b1) {
+				found = 0;
+			}
 		}
 		c++;
 	}	

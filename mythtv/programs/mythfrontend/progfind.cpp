@@ -206,7 +206,9 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
                 GetScreenStack()->PopScreen(this, true);
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -337,7 +339,9 @@ void ProgFinder::customEvent(QEvent *event)
             SetFocusWidget(m_showList);
         }
         else
+        {
             ScheduleCommon::customEvent(event);
+        }
     }
 }
 
@@ -622,9 +626,13 @@ bool ProgFinder::formatSelectedData(QString& data)
              // nothing, use as is
         }
         else if (data.startsWith("The T"))
+        {
             data = data.mid(4) + ", The";
+        }
         else if (data.startsWith("A T"))
+        {
             data = data.mid(2) + ", A";
+        }
         else
         {
             // don't add
@@ -638,11 +646,17 @@ bool ProgFinder::formatSelectedData(QString& data)
              // nothing, use as is
         }
         else if (data.startsWith("The A"))
+        {
             data = data.mid(4) + ", The";
+        }
         else if (data.startsWith("A A"))
+        {
              data = data.mid(2) + ", A";
+        }
         else if (data.startsWith("An A"))
+        {
              data = data.mid(3) + ", An";
+        }
         else
         {
             // don't add

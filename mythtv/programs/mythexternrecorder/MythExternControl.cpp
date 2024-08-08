@@ -354,7 +354,9 @@ bool Commands::ProcessCommand(const QString & query)
             m_parent->m_flowCond.notify_all();
         }
         else
+        {
             SendStatus(cmd, "Warn", serial, "Not Streaming");
+        }
     }
     else if (cmd == "XOFF")
     {
@@ -366,7 +368,9 @@ bool Commands::ProcessCommand(const QString & query)
             m_parent->m_flowCond.notify_all();
         }
         else
+        {
             SendStatus(cmd, "Warn", serial, "Not Streaming");
+        }
     }
     else if (cmd == "TuneChannel")
     {
@@ -427,7 +431,9 @@ bool Commands::ProcessCommand(const QString & query)
         StopStreaming(serial, false);
     }
     else
+    {
         SendStatus(cmd, "ERR", serial, QString("Unrecognized command '%1'").arg(query));
+    }
 
     return true;
 }
@@ -628,7 +634,9 @@ void Buffer::Run(void)
                 }
             }
             else
+            {
                 wait = true;
+            }
         }
         else
         {

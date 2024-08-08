@@ -370,7 +370,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_reverseSort = false;
             }
             else
+            {
                 m_reverseSort = !m_reverseSort;
+            }
             SortList();
         }
         else if (action == "2")
@@ -381,7 +383,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_reverseSort = false;
             }
             else
+            {
                 m_reverseSort = !m_reverseSort;
+            }
             SortList();
         }
         else if (action == "4")
@@ -392,7 +396,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_reverseSort = false;
             }
             else
+            {
                 m_reverseSort = !m_reverseSort;
+            }
             SortList();
         }
         else if (action == "5")
@@ -416,7 +422,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_reverseSort = false;
             }
             else
+            {
                 m_reverseSort = !m_reverseSort;
+            }
             SortList();
         }
         else if (action == "7")
@@ -427,7 +435,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_reverseSort = false;
             }
             else
+            {
                 m_reverseSort = !m_reverseSort;
+            }
             SortList();
         }
         else if (action == "8")
@@ -438,7 +448,9 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_reverseSort = false;
             }
             else
+            {
                 m_reverseSort = !m_reverseSort;
+            }
             SortList();
         }
         else if (action == "PREVVIEW" || action == "NEXTVIEW")
@@ -477,9 +489,13 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
             ShowUpcoming();
         }
         else if (action == "INFO" || action == "DETAILS")
+        {
             ShowDetails();
+        }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -615,7 +631,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
                     m_reverseSort = false;
                 }
                 else
+                {
                     m_reverseSort = !m_reverseSort;
+                }
                 SortList();
             }
             else if (resulttext == tr("Sort By Priority"))
@@ -626,7 +644,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
                     m_reverseSort = false;
                 }
                 else
+                {
                     m_reverseSort = !m_reverseSort;
+                }
                 SortList();
             }
             else if (resulttext == tr("Sort By Type"))
@@ -637,7 +657,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
                     m_reverseSort = false;
                 }
                 else
+                {
                     m_reverseSort = !m_reverseSort;
+                }
                 SortList();
             }
             else if (resulttext == tr("Sort By Count"))
@@ -661,7 +683,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
                     m_reverseSort = false;
                 }
                 else
+                {
                     m_reverseSort = !m_reverseSort;
+                }
                 SortList();
             }
             else if (resulttext == tr("Sort By Last Recorded"))
@@ -672,7 +696,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
                     m_reverseSort = false;
                 }
                 else
+                {
                     m_reverseSort = !m_reverseSort;
+                }
                 SortList();
             }
             else if (resulttext == tr("Sort By Average Delay"))
@@ -683,7 +709,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
                     m_reverseSort = false;
                 }
                 else
+                {
                     m_reverseSort = !m_reverseSort;
+                }
                 SortList();
             }
         }
@@ -711,7 +739,9 @@ void ProgramRecPriority::customEvent(QEvent *event)
             newTemplate(resulttext);
         }
         else
+        {
             ScheduleCommon::customEvent(event);
+        }
     }
 }
 
@@ -738,7 +768,9 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item) const
         connect(schededit, &ScheduleEditor::ruleDeleted, this, &ProgramRecPriority::scheduleChanged);
     }
     else
+    {
         delete schededit;
+    }
 }
 
 void ProgramRecPriority::newTemplate(QString category)
@@ -776,7 +808,9 @@ void ProgramRecPriority::newTemplate(QString category)
         connect(schededit, &ScheduleEditor::ruleDeleted, this, &ProgramRecPriority::scheduleChanged);
     }
     else
+    {
         delete schededit;
+    }
 }
 
 void ProgramRecPriority::scheduleChanged(int recid)
@@ -1208,7 +1242,9 @@ void ProgramRecPriority::UpdateList()
             item->DisplayState(rating, "ratingstate");
         }
         else
+        {
             progInfo->m_subtitle.clear();
+        }
 
         QString state;
         if (progInfo->m_recType == kDontRecord ||

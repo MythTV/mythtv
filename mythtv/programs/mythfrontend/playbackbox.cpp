@@ -1784,7 +1784,9 @@ bool PlaybackBox::UpdateUILists(void)
             }
             // Filter by recgroup
             else if (!isAllProgsGroup && pRecgroup != m_recGroup)
+            {
                 continue;
+            }
 
             if (p->GetTitle().isEmpty())
                 p->SetTitle(tr("_NO_TITLE_"));
@@ -2353,7 +2355,9 @@ void PlaybackBox::popupClosed(const QString& which, int result)
         }
     }
     else
+    {
         m_doToggleMenu = true;
+    }
 }
 
 void PlaybackBox::ShowGroupPopup()
@@ -2681,8 +2685,10 @@ MythMenu* PlaybackBox::createPlaylistMenu(void)
         }
     }
     else
+    {
         menu->AddItem(tr("Toggle playlist for this recording"),
                       qOverload<>(&PlaybackBox::togglePlayListItem));
+    }
 
     menu->AddItem(tr("Storage Options"), nullptr, createPlaylistStorageMenu());
     menu->AddItem(tr("Job Options"), nullptr, createPlaylistJobMenu());
@@ -2867,7 +2873,9 @@ void PlaybackBox::DisplayPopupMenu(void)
         connect(m_menuDialog, &MythDialogBox::Closed, this, &PlaybackBox::popupClosed);
     }
     else
+    {
         delete m_menuDialog;
+    }
 }
 
 void PlaybackBox::ShowMenu()
@@ -2897,7 +2905,9 @@ void PlaybackBox::ShowMenu()
             }
         }
         else
+        {
             ShowGroupPopup();
+        }
     }
 }
 
@@ -3875,11 +3885,17 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 ShowAllRecordings();
         }
         else if (action == "CHANGERECGROUP")
+        {
             showGroupFilter();
+        }
         else if (action == "CHANGEGROUPVIEW")
+        {
             showViewChanger();
+        }
         else if (action == "EDIT")
+        {
             EditScheduled();
+        }
         else if (m_titleList.size() > 1)
         {
             if (action == "DELETE")
@@ -3902,7 +3918,9 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 handled = false;
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -4259,7 +4277,9 @@ void PlaybackBox::customEvent(QEvent *event)
         }
     }
     else
+    {
         ScheduleCommon::customEvent(event);
+    }
 }
 
 void PlaybackBox::HandleRecordingRemoveEvent(uint recordingID)
@@ -4388,7 +4408,9 @@ void PlaybackBox::showViewChanger(void)
         m_popupStack->AddScreen(viewPopup);
     }
     else
+    {
         delete viewPopup;
+    }
 }
 
 void PlaybackBox::saveViewChanges()
@@ -4469,7 +4491,9 @@ void PlaybackBox::showGroupFilter(void)
                 dispGroup = tr("Unknown");
             }
             else if (dispGroup == tr("Unknown"))
+            {
                 unknownCount += items;
+            }
 
             if ((!m_recGroupType.contains(dispGroup)) &&
                 (dispGroup != tr("Unknown")))
@@ -4519,7 +4543,9 @@ void PlaybackBox::showGroupFilter(void)
         m_popupStack->AddScreen(recGroupPopup);
     }
     else
+    {
         delete recGroupPopup;
+    }
 }
 
 void PlaybackBox::groupSelectorClosed(void)
@@ -4617,7 +4643,9 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
             pginfo = FindProgramInUILists(m_playList[0]);
     }
     else
+    {
         pginfo = GetCurrentProgram();
+    }
 
     if (!pginfo)
         return;
@@ -4663,7 +4691,9 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
         m_popupStack->AddScreen(rgChanger);
     }
     else
+    {
         delete rgChanger;
+    }
 }
 
 /// \brief Used to change the play group of a program or playlist.
@@ -4678,7 +4708,9 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
             pginfo = FindProgramInUILists(m_playList[0]);
     }
     else
+    {
         pginfo = GetCurrentProgram();
+    }
 
     if (!pginfo)
         return;
@@ -4706,7 +4738,9 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
         m_popupStack->AddScreen(pgChanger);
     }
     else
+    {
         delete pgChanger;
+    }
 }
 
 void PlaybackBox::doPlaylistExpireSetting(bool turnOn)
@@ -4758,7 +4792,9 @@ void PlaybackBox::showMetadataEditor()
         mainStack->AddScreen(editMetadata);
     }
     else
+    {
         delete editMetadata;
+    }
 }
 
 void PlaybackBox::saveRecMetadata(const QString &newTitle,
@@ -4953,7 +4989,9 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
         m_popupStack->AddScreen(pwChanger);
     }
     else
+    {
         delete pwChanger;
+    }
 }
 
 void PlaybackBox::SetRecGroupPassword(const QString &newPassword)

@@ -413,9 +413,13 @@ void ViewScheduled::UpdateUIListItem(MythUIButtonListItem* item,
              recstatus == RecStatus::DontRecord ||
              (recstatus != RecStatus::DontRecord &&
               recstatus <= RecStatus::EarlierShowing))
+    {
         state = "disabled";
+    }
     else
+    {
         state = "warning";
+    }
 
     InfoMap infoMap;
     pginfo->ToMap(infoMap);
@@ -486,7 +490,9 @@ void ViewScheduled::FillList()
             statusText->SetText(cstring);
         }
         else
+        {
             statusText->SetText(tr("No Conflicts"));
+        }
     }
 
     MythUIText *filterText = dynamic_cast<MythUIText*>(GetChild("filter"));
@@ -727,7 +733,9 @@ void ViewScheduled::customEvent(QEvent *event)
                 LoadList();
         }
         else
+        {
             ScheduleCommon::customEvent(event);
+        }
     }
 }
 

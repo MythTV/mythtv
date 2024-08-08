@@ -793,7 +793,9 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
                 m_breakMap.insert(newbrkb, newbrklen);
             }
             else
+            {
                 m_breakMap.erase(ii);
+            }
         }
 
         prevbrke = newbrke;

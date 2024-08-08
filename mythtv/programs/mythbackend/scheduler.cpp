@@ -2195,7 +2195,9 @@ void Scheduler::run(void)
                 }
             }
             else
+            {
                 break;
+            }
         }
 
         // Start any recordings that are due to be started
@@ -3357,7 +3359,9 @@ bool Scheduler::CheckShutdownServer([[maybe_unused]] std::chrono::seconds prerol
         }
     }
     else
+    {
         retval = true; // allow shutdown if now command is set.
+    }
 
     return retval;
 }
@@ -3423,8 +3427,10 @@ void Scheduler::ShutdownServer(std::chrono::seconds prerollseconds,
                 );
         }
         else
+        {
             setwakeup_cmd.replace(
                 "$time", restarttime.toLocalTime().toString(wakeup_timeformat));
+        }
 
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Running the command to set the next "
@@ -5284,11 +5290,17 @@ int Scheduler::FillRecordingDir(
                         }
                     }
                     else if (recUsage.contains(kPlayerInUseID))
+                    {
                         weightOffset += weightPerPlayback;
+                    }
                     else if (recUsage == kFlaggerInUseID)
+                    {
                         weightOffset += weightPerCommFlag;
+                    }
                     else if (recUsage == kTranscoderInUseID)
+                    {
                         weightOffset += weightPerTranscode;
+                    }
 
                     if (weightOffset)
                     {
@@ -5720,8 +5732,10 @@ bool Scheduler::WasStartedAutomatically()
             autoStart = true;
         }
         else
+        {
             LOG(VB_GENERAL, LOG_DEBUG,
                 "NOT close to auto-start time, USER-initiated startup assumed");
+        }
     }
     else if (!s.isEmpty())
     {

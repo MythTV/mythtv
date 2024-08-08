@@ -911,7 +911,9 @@ int main(int argc, char **argv)
 
     }
     else
+    {
         cmdline.PrintHelp();
+    }
 
     delete gContext;
 

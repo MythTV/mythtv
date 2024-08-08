@@ -939,7 +939,9 @@ QStringList V2Channel::GetXMLTVIdList( uint SourceID )
         }
     }
     else
+    {
         throw(QString("SourceID (%1) not found").arg(SourceID));
+    }
 
     return idList;
 }

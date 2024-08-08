@@ -154,7 +154,9 @@ void Streamer::SendBytes(void)
             QString("%1 bytes unwritten").arg(m_buffer.size()));
     }
     else
+    {
         m_buffer.clear();
+    }
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "SendBytes -- end");
 }

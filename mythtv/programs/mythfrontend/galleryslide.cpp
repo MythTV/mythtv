@@ -475,7 +475,9 @@ void Slide::Zoom(int percentage)
             m_zoomAnimation->Start();
         }
         else
+        {
             SetZoom(newZoom);
+        }
     }
 }
 
@@ -523,7 +525,9 @@ void Slide::Pan(QPoint offset)
             m_panAnimation->Start();
         }
         else
+        {
             SetPan(dest);
+        }
     }
 }
 

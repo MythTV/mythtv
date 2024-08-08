@@ -207,8 +207,10 @@ TVState EncoderLink::GetState(void)
         retval = (TVState)m_sock->GetEncoderState(m_inputid);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("Broken for input: %1")
             .arg(m_inputid));
+    }
 
     return retval;
 }
@@ -232,7 +234,9 @@ uint EncoderLink::GetFlags(void)
         retval = m_sock->GetEncoderState(m_inputid);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "GetFlags failed");
+    }
 
     return retval;
 }
@@ -972,7 +976,9 @@ void EncoderLink::GetNextProgram(BrowseDirection direction,
                            _chanid, seriesid, programid);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Should be local only query: GetNextProgram");
+    }
 }
 
 bool EncoderLink::GetChannelInfo(uint &chanid, uint &sourceid,

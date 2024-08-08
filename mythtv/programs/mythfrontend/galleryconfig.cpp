@@ -290,7 +290,9 @@ void GallerySettings::ShowConfirmDialog()
                 this,   [this](bool ok) { if (ok) emit ClearDbPressed(); });
     }
     else
+    {
         delete dialog;
+    }
 }
 
 GallerySettings::GallerySettings(bool enable)

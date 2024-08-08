@@ -131,9 +131,13 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
             tmpTime = QTime::fromString(tsTime, "HHmmss");
         }
         else if (tsTime.length() == 4)
+        {
             tmpTime = QTime::fromString(tsTime, "HHmm");
+        }
         else if (tsTime.length() == 2)
+        {
             tmpTime = QTime::fromString(tsTime, "HH");
+        }
         if (!tmpTime.isValid())
         {
             // Time part exists, but is (somehow) invalid

@@ -439,7 +439,9 @@ bool Frontend::SendKey(const QString &sKey)
             ret = true;
         }
     else
+    {
         msg = QString("SendKey: Unknown Key = '%1'").arg(sKey);
+    }
 
     if (ret)
     {

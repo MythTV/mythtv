@@ -240,7 +240,9 @@ namespace
             popupStack->AddScreen(fb);
         }
         else
+        {
             delete fb;
+        }
     }
 
     void FindVideoFilePopup(const QString &prefix, const QString &prefixAlt,
@@ -270,7 +272,9 @@ namespace
             popupStack->AddScreen(fb);
         }
         else
+        {
             delete fb;
+        }
     }
 
     const QString CEID_COVERARTFILE = "coverartfile";
@@ -432,7 +436,9 @@ void EditMetadataDialog::fillWidgets()
                                   m_workingMetadata->GetCoverFile()));
         }
         else
+        {
             m_coverart->SetFilename(m_workingMetadata->GetCoverFile());
+        }
 
         if (!m_workingMetadata->GetCoverFile().isEmpty())
             m_coverart->Load();
@@ -448,7 +454,9 @@ void EditMetadataDialog::fillWidgets()
                                   m_workingMetadata->GetScreenshot()));
         }
         else
+        {
             m_screenshot->SetFilename(m_workingMetadata->GetScreenshot());
+        }
 
         if (!m_workingMetadata->GetScreenshot().isEmpty())
             m_screenshot->Load();
@@ -464,7 +472,9 @@ void EditMetadataDialog::fillWidgets()
                                   m_workingMetadata->GetBanner()));
         }
         else
+        {
             m_banner->SetFilename(m_workingMetadata->GetBanner());
+        }
 
         if (!m_workingMetadata->GetBanner().isEmpty())
             m_banner->Load();
@@ -480,7 +490,9 @@ void EditMetadataDialog::fillWidgets()
                                   m_workingMetadata->GetFanart()));
         }
         else
+        {
             m_fanart->SetFilename(m_workingMetadata->GetFanart());
+        }
 
         if (!m_workingMetadata->GetFanart().isEmpty())
             m_fanart->Load();
@@ -785,7 +797,9 @@ void EditMetadataDialog::SetCoverArt(QString file)
             m_workingMetadata->SetCoverFile(QString());
     }
     else
+    {
         m_workingMetadata->SetCoverFile(file);
+    }
 
     CheckedSet(m_coverartText, file);
 
@@ -830,7 +844,9 @@ void EditMetadataDialog::SetBanner(QString file)
             m_workingMetadata->SetBanner(QString());
     }
     else
+    {
         m_workingMetadata->SetBanner(file);
+    }
 
     CheckedSet(m_bannerText, file);
 
@@ -875,7 +891,9 @@ void EditMetadataDialog::SetFanart(QString file)
             m_workingMetadata->SetFanart(QString());
     }
     else
+    {
         m_workingMetadata->SetFanart(file);
+    }
 
     CheckedSet(m_fanartText, file);
 
@@ -921,7 +939,9 @@ void EditMetadataDialog::SetScreenshot(QString file)
             m_workingMetadata->SetScreenshot(QString());
     }
     else
+    {
         m_workingMetadata->SetScreenshot(file);
+    }
 
     CheckedSet(m_screenshotText, file);
 
@@ -964,7 +984,9 @@ void EditMetadataDialog::SetTrailer(QString file)
             m_workingMetadata->SetTrailer(QString());
     }
     else
+    {
         m_workingMetadata->SetTrailer(file);
+    }
     CheckedSet(m_trailerText, file);
 }
 

@@ -118,7 +118,9 @@ bool setupTVs(bool ismaster, bool &error)
                 MythDB::DBError("Updating record chanid", query);
         }
         else
+        {
             MythDB::DBError("Querying minimum chanid", query);
+        }
 
         MSqlQuery records_without_station(MSqlQuery::InitCon());
         records_without_station.prepare("SELECT record.chanid,"

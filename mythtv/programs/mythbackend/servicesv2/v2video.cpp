@@ -853,7 +853,9 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
             update_required = true;
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Ignoring unknown ContentType: %1").arg(sContentType));
+        }
     }
 
     if (HAS_PARAMv2("Genres"))

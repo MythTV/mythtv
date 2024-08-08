@@ -733,7 +733,9 @@ bool V2Dvr::AllowReRecord ( int RecordedId, int ChanId, const QDateTime &StartTi
             throw QString("ERROR ChanId param requires a valid StartTime.");
     }
     else
+    {
         throw QString("ERROR RecordedId or (ChanId and StartTime) required.");
+    }
 
     if (RecordedId > 0)
     {
@@ -905,7 +907,9 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
                 return false;
     }
     else
+    {
         position = Offset;
+    }
     ri.SaveBookmark(position);
     return true;
 }
@@ -946,7 +950,9 @@ bool V2Dvr::SetLastPlayPos( int RecordedId,
                 return false;
     }
     else
+    {
         position = Offset;
+    }
     ri.SaveLastPlayPos(position);
     return true;
 }
@@ -1775,7 +1781,9 @@ bool V2Dvr::AddDontRecordSchedule(int nChanId, const QDateTime &dStartTime,
         recInfo.ApplyNeverRecord();
     }
     else
+    {
         recInfo.ApplyRecordStateChange(kDontRecord);
+    }
 
     return bResult;
 }
@@ -2196,7 +2204,9 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
                 return false;
         }
         else
+        {
             position = BookmarkOffset;
+        }
 
         ri.SaveBookmark(position);
     }

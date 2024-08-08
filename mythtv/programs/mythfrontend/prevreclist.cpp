@@ -322,7 +322,9 @@ void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
                 state = "disabled";
         }
         else
+        {
             infoMap["buttontext"] = infoMap["title"];
+        }
 
         item->SetTextFromMap(infoMap, state);
     }

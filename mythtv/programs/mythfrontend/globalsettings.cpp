@@ -1177,7 +1177,9 @@ void PlaybackProfileItemConfig::ShowDeleteDialog() const
         popupStack->AddScreen(confirmDelete);
     }
     else
+    {
         delete confirmDelete;
+    }
 }
 
 void PlaybackProfileItemConfig::DoDeleteSlot(bool doDelete)
@@ -1392,7 +1394,9 @@ void PlaybackSettings::NewPlaybackProfileSlot() const
         popupStack->AddScreen(settingdialog);
     }
     else
+    {
         delete settingdialog;
+    }
 }
 
 void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)

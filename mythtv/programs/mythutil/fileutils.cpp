@@ -84,7 +84,9 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
             ok = false;
         }
         else
+        {
             totalBytesCopied += ret;
+        }
 
         int percentComplete = totalBytesCopied * 100 / totalBytes;
         if ((percentComplete % 5) == 0)

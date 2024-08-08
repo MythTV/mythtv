@@ -83,7 +83,9 @@ void LookerUpper::HandleAllRecordings(bool updaterules)
             m_metadataFactory->Lookup(pginfo, true, false, false);
         }
         else
+        {
             delete pginfo;
+        }
     }
 }
 
@@ -108,7 +110,9 @@ void LookerUpper::HandleAllRecordingRules()
             m_metadataFactory->Lookup(pginfo, true, false, true);
         }
         else
+        {
             delete pginfo;
+        }
     }
 }
 

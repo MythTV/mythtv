@@ -453,7 +453,9 @@ int main(int argc, char *argv[])
                         .arg(orig_programid, new_programid));
             }
             else
+            {
                 found += repl.numRowsAffected();
+            }
         }
     }
 

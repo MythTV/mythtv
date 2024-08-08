@@ -44,7 +44,9 @@ void ProgInfoList::Toggle(void)
         return;
     }
     else
+    {
         m_infoVisible = kLevel1;
+    }
 
     Clear();
 

@@ -201,7 +201,9 @@ namespace
                     mainStack->AddScreen(ssd);
                 }
                 else
+                {
                     delete ssd;
+                }
             }
             else
             {
@@ -590,7 +592,9 @@ static void startPlaybackWithGroup(const QString& recGroup = "")
         mainStack->AddScreen(pbb);
     }
     else
+    {
         delete pbb;
+    }
 }
 
 static void startPlayback(void)
@@ -754,7 +758,9 @@ static void RunVideoScreen(VideoDialog::DialogType type, bool fromJump = false)
         mainStack->AddScreen(mythvideo);
     }
     else
+    {
         busyPopup->Close();
+    }
 }
 
 static void jumpScreenVideoManager() { RunVideoScreen(VideoDialog::DLG_MANAGER, true); }
@@ -910,7 +916,9 @@ static void handleGalleryMedia(MythMediaDevice *dev)
         GetMythMainWindow()->JumpTo(JUMP_GALLERY_DEFAULT);
     }
     else
+    {
         LOG(VB_MEDIA, LOG_INFO, "Main: Ignoring new gallery media - autorun not set");
+    }
 }
 
 static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
@@ -936,41 +944,77 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             startPlayback();
     }
     else if (sel == "tv_schedule")
+    {
         startGuide();
+    }
     else if (sel == "tv_manualschedule")
+    {
         startManualSchedule();
+    }
     else if (sel == "tv_custom_record")
+    {
         startCustomEdit();
+    }
     else if (sel == "tv_fix_conflicts")
+    {
         startManaged();
+    }
     else if (sel == "tv_manage_recording_rules")
+    {
         startManageRecordingRules();
+    }
     else if (sel == "tv_progfind")
+    {
         startFinder();
+    }
     else if (sel == "tv_search_title")
+    {
         startSearchTitle();
+    }
     else if (sel == "tv_search_keyword")
+    {
         startSearchKeyword();
+    }
     else if (sel == "tv_search_people")
+    {
         startSearchPeople();
+    }
     else if (sel == "tv_search_power")
+    {
         startSearchPower();
+    }
     else if (sel == "tv_search_stored")
+    {
         startSearchStored();
+    }
     else if (sel == "tv_search_channel")
+    {
         startSearchChannel();
+    }
     else if (sel == "tv_search_category")
+    {
         startSearchCategory();
+    }
     else if (sel == "tv_search_movie")
+    {
         startSearchMovie();
+    }
     else if (sel == "tv_search_new")
+    {
         startSearchNew();
+    }
     else if (sel == "tv_search_time")
+    {
         startSearchTime();
+    }
     else if (sel == "tv_previous")
+    {
         startPrevious();
+    }
     else if (sel == "tv_previous_old")
+    {
         startPreviousOld();
+    }
     else if (sel == "settings appearance")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -982,7 +1026,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings themechooser")
     {
@@ -1033,7 +1079,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings general")
     {
@@ -1046,7 +1094,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings audiogeneral")
     {
@@ -1060,7 +1110,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings maingeneral")
     {
@@ -1073,7 +1125,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings playback")
     {
@@ -1086,7 +1140,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings osd")
     {
@@ -1099,7 +1155,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings epg")
     {
@@ -1112,7 +1170,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings channelgroups")
     {
@@ -1125,7 +1185,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings generalrecpriorities")
     {
@@ -1139,7 +1201,9 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(ssd);
         }
         else
+        {
             delete ssd;
+        }
     }
     else if (sel == "settings channelrecpriorities")
     {
@@ -1197,31 +1261,49 @@ static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
             mainStack->AddScreen(fa);
     }
     else if (sel == "manager")
+    {
         RunVideoScreen(VideoDialog::DLG_MANAGER);
+    }
     else if (sel == "browser")
+    {
         RunVideoScreen(VideoDialog::DLG_BROWSER);
+    }
     else if (sel == "listing")
+    {
         RunVideoScreen(VideoDialog::DLG_TREE);
+    }
     else if (sel == "gallery")
+    {
         RunVideoScreen(VideoDialog::DLG_GALLERY);
+    }
     else if (sel == "disc_play")
     {
         playDisc();
     }
     else if (sel == "tv_status")
+    {
         showStatus();
+    }
     else if (sel == "exiting_app_prompt")
+    {
         handleExit(true);
+    }
     else if (sel == "exiting_app")
+    {
         handleExit(false);
+    }
     else if (sel == "standby_mode")
+    {
         standbyScreen();
+    }
     else if (sel == "exiting_menu")
     {
         //ignore
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
+    }
 
     if (sel.startsWith("settings ") || sel == "video_settings_general")
     {
@@ -1800,8 +1882,10 @@ static bool WasAutomaticStart(void)
                     autoStart = true;
                 }
                 else
+                {
                     LOG(VB_GENERAL, LOG_DEBUG,
                         "NOT close to auto-start time, USER-initiated startup assumed");
+                }
             }
         }
         else
@@ -1844,8 +1928,10 @@ static bool WasAutomaticStart(void)
                         autoStart = true;
                     }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_DEBUG,
                             "NOT close to auto-start time, USER-initiated startup assumed");
+                    }
 
                 }
             }

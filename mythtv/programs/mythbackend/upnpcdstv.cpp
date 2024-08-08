@@ -1112,7 +1112,9 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
             pItem->SetPropValue( "programTitle"  , sSubtitle);
         }
         else
+        {
             pItem->SetPropValue( "programTitle"  , sTitle);
+        }
 
         if ( nEpisode > 0 || nSeason > 0 ) // There has got to be a better way
         {

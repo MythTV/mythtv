@@ -505,7 +505,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             total = group;
         }
         else
+        {
             fsXML << group;
+        }
     }
 
     storage.appendChild(total);
@@ -1191,7 +1193,9 @@ int HttpStatus::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
         os << "      </div>\r\n";
     }
     else
+    {
         os << "    Job Queue is currently empty.\r\n\r\n";
+    }
 
     os << "  </div>\r\n\r\n ";
 
@@ -1438,8 +1442,10 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
                     os << " <strong>WARNING</strong>: is mythfilldatabase running?";
             }
             else
+            {
                 os << "    There's <strong>no guide data</strong> available! "
                    << "Have you run mythfilldatabase?";
+            }
         }
     }
     os << "\r\n  </div>\r\n";
@@ -1489,7 +1495,9 @@ int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, const QDomElement& info
                 linebreak = "\r\n";
             }
             else
+            {
                 linebreak = "<br />\r\n";
+            }
 
             os << "    " << display << linebreak;
         }

@@ -444,7 +444,9 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
         img.loadFromData(data);
     }
     else
+    {
         img.load(sFullFileName);
+    }
 
     if (img.isNull())
         return {};

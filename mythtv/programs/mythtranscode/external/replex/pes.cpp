@@ -120,8 +120,9 @@ int ptscmp(uint64_t pts1, uint64_t pts2)
 			ret = -1;
 		else 
 			ret = 1;
-	} else if (pts1 == pts2) ret = 0;
-	else {
+	} else if (pts1 == pts2) {
+		ret = 0;
+	} else {
 		if ((pts2 - pts1) > MAX_PTS2/2)
 			ret = 2;
 		else 
@@ -153,7 +154,9 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 	if (p->withbuf && !p->buf){
 		p->buf = static_cast<uchar*>(malloc(MAX_PLENGTH*sizeof(uint8_t)));
 		memset(p->buf,0,MAX_PLENGTH*sizeof(uint8_t));
-	} else if (rb) p->rbuf = rb;
+	} else if (rb) {
+		p->rbuf = rb;
+	}
 	if (p->rbuf) p->ini_pos = ring_wpos(p->rbuf); 
         p->done = false;
 	memset(p->pts, 0 , 5);
@@ -184,7 +187,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				if (buf[c] == 0x01) p->found++;
 				else if (buf[c] == 0){
 					p->found = 2;
-				} else p->found = 0;
+				} else {
+					p->found = 0;
+				}
 				c++;
 				break;
 			case 3:
@@ -709,8 +714,9 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 		if (pack_size - length - p <= PES_MIN){
 			stuff = pack_size - length-p;
 			length = pack_size;
-		} else 
+		} else {
 			length = length+p;
+		}
 	}
 
 	int pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1,
@@ -756,8 +762,9 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 		if (pack_size-length-p <= PES_MIN){
 			stuff = pack_size - length-p;
 			length = pack_size;
-		} else 
+		} else {
 			length = length+p;
+		}
 	}
 	int pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1,
 			      1, 0);
@@ -802,8 +809,9 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 		if (pack_size-length-p <= PES_MIN){
 			stuff = pack_size - length-p;
 			length = pack_size;
-		} else 
+		} else {
 			length = length+p;
+		}
 	}
 	int pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1,
 			      1, 0);

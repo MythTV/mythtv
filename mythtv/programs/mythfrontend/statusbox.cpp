@@ -339,10 +339,14 @@ void StatusBox::clicked(MythUIButtonListItem *item)
                                                        QVariant::fromValue(rec));
             }
             else if ((rec)->GetRecordingGroup() == "Deleted")
+            {
                 menuPopup->AddButtonV(tr("Undelete"), QVariant::fromValue(rec));
+            }
             else
+            {
                 menuPopup->AddButtonV(tr("Disable AutoExpire"),
                                                         QVariant::fromValue(rec));
+            }
             menuPopup->AddButtonV(tr("No Change"), QVariant::fromValue(rec));
 
         }
@@ -828,11 +832,17 @@ void StatusBox::doTunerStatus()
         }
         else if (state == kState_RecordingOnly ||
                  state == kState_WatchingRecording)
+        {
             info[infoid].m_recording += 1;
+        }
         else if (state == kState_WatchingLiveTV)
+        {
             info[infoid].m_livetv += 1;
+        }
         else
+        {
             info[infoid].m_available += 1;
+        }
 
         if (state == kState_RecordingOnly ||
             state == kState_WatchingRecording ||
@@ -1016,7 +1026,9 @@ void StatusBox::doJobQueueStatus()
         }
     }
     else
+    {
         AddLogLine(tr("Job Queue is currently empty."), helpmsg);
+    }
 
 }
 

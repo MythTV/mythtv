@@ -744,7 +744,9 @@ bool Dvr::SetSavedBookmark( int RecordedId,
                 return false;
     }
     else
+    {
         position = Offset;
+    }
     ri.SaveBookmark(position);
     return true;
 }
@@ -1751,7 +1753,9 @@ bool Dvr::AddDontRecordSchedule(int nChanId, const QDateTime &dStartTime,
         recInfo.ApplyNeverRecord();
     }
     else
+    {
         recInfo.ApplyRecordStateChange(kDontRecord);
+    }
 
     return bResult;
 }

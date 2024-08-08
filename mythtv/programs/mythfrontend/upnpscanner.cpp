@@ -633,7 +633,9 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
         }
     }
     else
+    {
         LOG(VB_UPNP, LOG_ERR, LOC + "Received unknown reply");
+    }
 
     reply->deleteLater();
 }
@@ -806,7 +808,9 @@ void UPNPScanner::Debug(void)
                 status = "Failed";
         }
         else
+        {
             status = "Yes";
+        }
         LOG(VB_UPNP, LOG_INFO, LOC +
             QString("'%1' Connected: %2 Subscribed: %3 SystemUpdateID: "
                     "%4 timerId: %5")

@@ -515,7 +515,9 @@ void ScheduleEditor::ShowSchedInfo()
         popupStack->AddScreen(menuPopup);
     }
     else
+    {
         delete menuPopup;
+    }
 }
 
 bool ScheduleEditor::keyPressEvent(QKeyEvent *event)
@@ -1538,7 +1540,9 @@ void MetadataOptions::FindImagePopup(const QString &prefix,
         popupStack->AddScreen(fb);
     }
     else
+    {
         delete fb;
+    }
 }
 
 QStringList MetadataOptions::GetSupportedImageExtensionFilter()

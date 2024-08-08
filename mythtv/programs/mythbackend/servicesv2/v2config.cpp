@@ -130,7 +130,9 @@ V2DatabaseStatus* V2Config::GetDatabaseStatus()
             pInfo->setSchemaVersion(QString(MYTH_DATABASE_VERSION).toInt());
         }
         else
+        {
             pInfo->setSchemaVersion(0);
+        }
     }
     else
     {

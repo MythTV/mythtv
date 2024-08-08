@@ -380,7 +380,9 @@ void ChannelEditor::fillList(void)
                     continue;
             }
             else
+            {
                 state = "warning";
+            }
 
             // Also hide channels that are not visible
             if ((!visible || channum.isEmpty()) && m_currentHideMode)
@@ -513,7 +515,9 @@ void ChannelEditor::del()
         popupStack->AddScreen(dialog);
     }
     else
+    {
         delete dialog;
+    }
 
 }
 
@@ -541,7 +545,9 @@ void ChannelEditor::deleteChannels(void)
         popupStack->AddScreen(dialog);
     }
     else
+    {
         delete dialog;
+    }
 }
 
 void ChannelEditor::edit(MythUIButtonListItem *item)
@@ -563,7 +569,9 @@ void ChannelEditor::edit(MythUIButtonListItem *item)
         mainStack->AddScreen(ssd);
     }
     else
+    {
         delete ssd;
+    }
 }
 
 void ChannelEditor::menu()
@@ -683,7 +691,9 @@ void ChannelEditor::scan(void)
         mainStack->AddScreen(ssd);
     }
     else
+    {
         delete ssd;
+    }
 }
 
 void ChannelEditor::restoreData(void)
@@ -704,7 +714,9 @@ void ChannelEditor::restoreData(void)
         mainStack->AddScreen(ssd);
     }
     else
+    {
         delete ssd;
+    }
 }
 
 void ChannelEditor::transportEditor(void)
@@ -723,7 +735,9 @@ void ChannelEditor::transportEditor(void)
         mainStack->AddScreen(ssd);
     }
     else
+    {
         delete ssd;
+    }
 }
 
 void ChannelEditor::channelIconImport(void)

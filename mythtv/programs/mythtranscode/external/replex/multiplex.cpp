@@ -209,7 +209,9 @@ static void writeout_video(multiplex_t *mx)
 				       mx->SCR, mx->muxr, outbuf.data());
 			write(mx->fd_out, outbuf.data(), mx->pack_size);
 			ptsinc(&mx->SCR, mx->SCRinc);
-		} else mx->startup = 0;
+		} else {
+			mx->startup = 0;
+		}
 #ifdef OUT_DEBUG
 		LOG(VB_GENERAL, LOG_DEBUG, " with sequence and gop header");
 #endif
@@ -240,8 +242,12 @@ static void writeout_video(multiplex_t *mx)
 				} else {
 					ptsdts = get_ptsdts(mx, viu);
 				}
-			} else break;
-		} else break;
+			} else {
+				break;
+			}
+		} else {
+			break;
+		}
 	}
 
 	if (viu->frame_start){
@@ -506,7 +512,9 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 	mx->oldSCR = mx->SCR;
 	if (!*start){ 
 		ptsinc(&mx->SCR, mx->SCRinc);
-	} else *start = 0;
+	} else {
+		*start = 0;
+	}
 	
 	if (mx->VBR) {
 #ifdef OUT_DEBUG1
@@ -540,8 +548,9 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
 			if (temp_scr > 0.0) {
 				mx->SCR += temp_scr;
 				mx->extra_clock -= temp_scr;
-			} else
+			} else {
 				mx->extra_clock = 0.0;
+			}
 		}
 	}
 	
@@ -885,5 +894,7 @@ void setup_multiplex(multiplex_t *mx)
 		write(mx->fd_out, outbuf.data(), mx->pack_size);
 		ptsinc(&mx->SCR, mx->SCRinc);
 		mx->startup = 1;
-	} else mx->startup = 0;
+	} else {
+		mx->startup = 0;
+	}
 }

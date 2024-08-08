@@ -346,7 +346,9 @@ namespace
                         m_itemsPast = 0;
                 }
                 else
+                {
                     m_itemsPast = 0;
+                }
             }
         }
 
@@ -404,7 +406,9 @@ namespace
                         image->Load();
                     }
                     else
+                    {
                         image->Reset();
+                    }
                 }
                 else
                 {
@@ -1404,7 +1408,9 @@ void VideoDialog::fetchVideos()
             m_d->m_treeLoaded = false;
     }
     else if (m_d->m_rootNode->childCount() == 0)
+    {
         m_d->m_treeLoaded = false;
+    }
 
     if (!m_d->m_currentNode || m_d->m_rootNode != oldroot)
         SetCurrentNode(m_d->m_rootNode);
@@ -1531,7 +1537,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 }
             }
             else
+            {
                 foundCover = QFile::exists(imagePath);
+            }
 
             if (foundCover)
             {
@@ -1736,7 +1744,9 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
                                     host, metadata->GetCoverFile());
                     }
                     else if (type == "Coverart")
+                    {
                         test_file = metadata->GetCoverFile();
+                    }
 
                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                         !IsDefaultCoverFile(test_file) && (gpnode.isEmpty() ||
@@ -1753,7 +1763,9 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
                                     host, metadata->GetFanart());
                     }
                     else if (type == "Fanart")
+                    {
                         test_file = metadata->GetFanart();
+                    }
 
                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                         test_file != VIDEO_FANART_DEFAULT && (gpnode.isEmpty() ||
@@ -1770,7 +1782,9 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
                                     host, metadata->GetBanner());
                     }
                     else if (type == "Banners")
+                    {
                         test_file = metadata->GetBanner();
+                    }
 
                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                         test_file != VIDEO_BANNER_DEFAULT && (gpnode.isEmpty() ||
@@ -1787,7 +1801,9 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
                                     host, metadata->GetScreenshot());
                     }
                     else if (type == "Screenshots")
+                    {
                         test_file = metadata->GetScreenshot();
+                    }
 
                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                        test_file != VIDEO_SCREENSHOT_DEFAULT && (gpnode.isEmpty() ||
@@ -1956,14 +1972,22 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
                 VideoMenu();
         }
         else if (action == "INCPARENT")
+        {
             shiftParental(1);
+        }
         else if (action == "DECPARENT")
+        {
             shiftParental(-1);
+        }
         else if (action == "1" || action == "2" ||
                  action == "3" || action == "4")
+        {
             setParentalLevel((ParentalLevel::Level)action.toInt());
+        }
         else if (action == "FILTER")
+        {
             ChangeFilter();
+        }
         else if (action == "MENU")
         {
             if (!m_menuPopup)
@@ -1981,16 +2005,22 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
                 VideoSearch();
         }
         else if (action == "INCSEARCH")
+        {
             searchStart();
+        }
         else if (action == "ITEMDETAIL")
+        {
             DoItemDetailShow();
+        }
         else if (action == "DELETE")
         {
             if (!m_menuPopup && GetMetadata(GetItemCurrent()))
                 RemoveVideo();
         }
         else if (action == "EDIT" && !m_menuPopup)
+        {
             EditMetadata();
+        }
         else if (action == "ESCAPE")
         {
             if (m_d->m_type != DLG_TREE
@@ -2001,7 +2031,9 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
                 handled = false;
         }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled)
@@ -2159,7 +2191,9 @@ void VideoDialog::searchComplete(const QString& string)
         }
     }
     else
+    {
         m_videoButtonList->SetItemCurrent(idTitle.key(string));
+    }
 }
 
 /** \fn VideoDialog::searchStart(void)
@@ -2195,7 +2229,9 @@ void VideoDialog::searchStart(void)
         popupStack->AddScreen(searchDialog);
     }
     else
+    {
         delete searchDialog;
+    }
 }
 
 /** \fn VideoDialog::goBack()
@@ -2385,7 +2421,9 @@ void VideoDialog::VideoMenu()
         }
     }
     else
+    {
         label = tr("Video Options");
+    }
 
     auto *menu = new MythMenu(label, this, "actions");
 
@@ -2424,7 +2462,9 @@ void VideoDialog::VideoMenu()
         connect(m_menuPopup, &MythDialogBox::Closed, this, &VideoDialog::popupClosed);
     }
     else
+    {
         delete m_menuPopup;
+    }
 }
 
 /** \fn VideoDialog::CreatePlayMenu()
@@ -2491,7 +2531,9 @@ void VideoDialog::DisplayMenu()
         connect(m_menuPopup, &MythDialogBox::Closed, this, &VideoDialog::popupClosed);
     }
     else
+    {
         delete m_menuPopup;
+    }
 }
 
 // Switch from the display menu to the actions menu on second

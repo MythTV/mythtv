@@ -135,8 +135,10 @@ void MythExternRecApp::ReplaceVariables(QString & cmd) const
             cmd.replace(repl, Ivar.value());
         }
         else
+        {
             LOG(VB_CHANNEL, LOG_DEBUG, QString("Did not find '%1' in '%2'")
                 .arg(repl, cmd));
+        }
     }
 }
 
@@ -204,7 +206,9 @@ bool MythExternRecApp::config(void)
         }
     }
     else
+    {
         LOG(VB_CHANNEL, LOG_DEBUG, "No VARIABLES section");
+    }
 
     if (!settings.contains("RECORDER/command"))
     {

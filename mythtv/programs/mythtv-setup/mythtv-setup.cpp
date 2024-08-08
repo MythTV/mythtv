@@ -166,7 +166,9 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
         exitPrompt->handleExit();
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
+    }
 }
 
 static bool RunMenu(const QString& themedir, const QString& themename)
@@ -464,9 +466,13 @@ int main(int argc, char *argv[])
                 scanner.ImportM3U(scanCardId, scanInputName, sourceid, true);
             }
             else if (frequencyStandard == "extern")
+            {
                 scantype = ScanTypeSetting::ExternRecImport;
+            }
             else
+            {
                 scantype = ScanTypeSetting::FullScan_ATSC;
+            }
 
             scanner.Scan(scantype,
                          /* cardid    */ scanCardId,
