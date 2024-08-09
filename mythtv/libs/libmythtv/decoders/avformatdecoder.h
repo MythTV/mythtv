@@ -185,7 +185,7 @@ class AvFormatDecoder : public DecoderBase
     void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
     void ScanTeletextCaptions(int av_index);
     void ScanRawTextCaptions(int av_stream_index);
-    void ScanDSMCCStreams(void);
+    void ScanDSMCCStreams(AVBufferRef* pmt_section);
     int  AutoSelectAudioTrack(void);
     int  filter_max_ch(const AVFormatContext *ic,
                        const sinfo_vec_t     &tracks,
@@ -237,7 +237,7 @@ class AvFormatDecoder : public DecoderBase
     void HandleGopStart(AVPacket *pkt, bool can_reliably_parse_keyframes);
 
     bool GenerateDummyVideoFrames(void);
-    bool HasVideo(const AVFormatContext *ic);
+    bool HasVideo();
     float GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise = false);
     static void av_update_stream_timings_video(AVFormatContext *ic);
     bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
@@ -258,6 +258,9 @@ class AvFormatDecoder : public DecoderBase
 
     int autoSelectVideoTrack(int& scanerror);
     void remove_tracks_not_in_same_AVProgram(int stream_index);
+
+    int get_current_AVStream_index(TrackType type);
+    AVProgram* get_current_AVProgram();
 
     bool               m_isDbIgnored;
 
