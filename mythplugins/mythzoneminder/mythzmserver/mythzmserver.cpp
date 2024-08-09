@@ -14,6 +14,7 @@
  * ============================================================ */
 
 #include <arpa/inet.h>
+#include <algorithm>
 #include <array>
 #include <csignal>
 #include <cstdio>
@@ -347,10 +348,7 @@ int main(int argc, char **argv)
                     {
                         // add to master set
                         FD_SET(newfd, &master);
-                        if (newfd > fdmax)
-                        {    // keep track of the maximum
-                            fdmax = newfd;
-                        }
+                        fdmax = std::max(newfd, fdmax); // keep track of the maximum
 
                         // create new ZMServer and add to map
                         auto *server = new ZMServer(newfd, debug);

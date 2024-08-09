@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <iostream>
 
 // Qt
@@ -77,10 +78,7 @@ bool BrowserConfig::Create()
 void BrowserConfig::slotSave(void)
 {
     float zoom = m_zoomEdit->GetText().toFloat();
-    if (zoom > 5.0F)
-        zoom = 5.0F;
-    if (zoom < 0.3F)
-        zoom = 0.3F; 
+    zoom = std::clamp(zoom, 0.3F, 5.0F);
     gCoreContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
     gCoreContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
     int checkstate = 0;

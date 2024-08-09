@@ -7,6 +7,7 @@
 //
 
 // C++
+#include <algorithm>
 #include <cinttypes>
 #include <cmath>
 #include <cstdint>
@@ -199,8 +200,7 @@ void Synaesthesia::setStarSize(double lsize)
     int factor = 0;
     if (lsize > 0.0)
         factor = int(exp(log(fadeModeFudge) / (lsize * 8.0)) * 255);
-    if (factor > 255) 
-        factor = 255;
+    factor = std::min(factor, 255);
 
     for (int i = 0; i < 256; i++)
         m_scaleDown[i] = i * factor>>8;

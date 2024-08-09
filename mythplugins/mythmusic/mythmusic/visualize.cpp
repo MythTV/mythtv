@@ -10,6 +10,7 @@
 */
 
 // C++
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -134,10 +135,8 @@ void LogScale::setMax(int maxscale, int maxrange)
     for (int i = 1; i < (int) domain; i++)
     {
         int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
-        if (scaled < 1)
-            scaled = 1;
-        if (m_indices[scaled - 1] < i)
-            m_indices[scaled - 1] = i;
+        scaled = std::max(scaled, 1);
+        m_indices[scaled - 1] = std::max(m_indices[scaled - 1], i);
     }
 }
 
@@ -726,14 +725,14 @@ bool WaveForm::processUndisplayed(VisualNode *node)
         for (uint i = 0; i < n; i++) // find min/max and sum of squares
         {
             short int val = node->m_left[i];
-            if (val > m_maxl) m_maxl = val;
-            if (val < m_minl) m_minl = val;
+            m_maxl = std::max(val, m_maxl);
+            m_minl = std::min(val, m_minl);
             m_sqrl += static_cast<long>(val) * static_cast<long>(val);
             if (m_right)
             {
                 val = node->m_right[i];
-                if (val > m_maxr) m_maxr = val;
-                if (val < m_minr) m_minr = val;
+                m_maxr = std::max(val, m_maxr);
+                m_minr = std::min(val, m_minr);
                 m_sqrr += static_cast<long>(val) * static_cast<long>(val);
             }
             m_position++;
@@ -1287,9 +1286,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 double Spectrogram::clamp(double cur, double max, double min)
 {
     if (isnan(cur)) return 0;
-    if (cur > max) cur = max;
-    if (cur < min) cur = min;
-    return cur;
+    return std::clamp(cur, min, max);
 }
 
 bool Spectrogram::draw(QPainter *p, const QColor &back)
@@ -1418,8 +1415,7 @@ void Spectrum::resize(const QSize &newsize)
 
     m_analyzerBarWidth = m_size.width() / 128;
 
-    if (m_analyzerBarWidth < 6)
-        m_analyzerBarWidth = 6;
+    m_analyzerBarWidth = std::max(m_analyzerBarWidth, 6);
 
     m_scale.setMax(m_fftlen/2, m_size.width() / m_analyzerBarWidth, 44100/2);
     m_sigL.resize(m_fftlen);
@@ -1519,41 +1515,23 @@ bool Spectrum::processUndisplayed(VisualNode *node)
         magL = 10 * log10(magL) * m_scaleFactor;
         magR = 10 * log10(magR) * m_scaleFactor;
 
-        if (magL > adjHeight)
-        {
-            magL = adjHeight;
-        }
+        magL = std::min(magL, adjHeight);
         if (magL < magnitudesp[i])
         {
             tmp = magnitudesp[i] - m_falloff;
-            if ( tmp < magL )
-            {
-                tmp = magL;
-            }
+            tmp = std::max(tmp, magL);
             magL = tmp;
         }
-        if (magL < 1)
-        {
-            magL = 1;
-        }
+        magL = std::max<float>(magL, 1);
 
-        if (magR > adjHeight)
-        {
-            magR = adjHeight;
-        }
+        magR = std::min(magR, adjHeight);
         if (magR < magnitudesp[i + m_scale.range()])
         {
             tmp = magnitudesp[i + m_scale.range()] - m_falloff;
-            if ( tmp < magR )
-            {
-                tmp = magR;
-            }
+            tmp = std::max(tmp, magR);
             magR = tmp;
         }
-        if (magR < 1)
-        {
-            magR = 1;
-        }
+        magR = std::max<float>(magR, 1);
 
         magnitudesp[i] = magL;
         magnitudesp[i + m_scale.range()] = magR;
@@ -1570,11 +1548,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
 
 double Spectrum::clamp(double cur, double max, double min)
 {
-    if (cur > max)
-        cur = max;
-    if (cur < min)
-        cur = min;
-    return cur;
+    return std::clamp(cur, min, max);
 }
 
 bool Spectrum::draw(QPainter *p, const QColor &back)
@@ -1771,15 +1745,11 @@ Piano::Piano()
 
         // Want 20 whole cycles of the current waveform at least
         double samples_required = sample_rate/current_freq * 20.0;
-        if (samples_required > sample_rate/4.0)
-        {
-            // For the really low notes, 4 updates a second is good enough...
-            samples_required = sample_rate/4.0;
-        }
-        if (samples_required < sample_rate/(double)m_fps * 0.75)
-        {   // For the high notes, use as many samples as we need in a display_fps
-            samples_required = sample_rate/(double)m_fps * 0.75;
-        }
+        // For the really low notes, 4 updates a second is good enough...
+        // For the high notes, use as many samples as we need in a display_fps
+        samples_required = std::clamp(samples_required,
+                                      sample_rate/(double)m_fps * 0.75,
+                                      sample_rate/4.0);
         m_pianoData[key].samples_process_before_display_update = (int)samples_required;
         m_pianoData[key].is_black_note = false; // Will be put right in .resize()
 
@@ -1829,8 +1799,7 @@ void Piano::resize(const QSize &newsize)
 
     // There are 88-36=52 white notes on piano keyboard
     double key_unit_size = (double)m_size.width() / 54.0;  // One white key extra spacing, if possible
-    if (key_unit_size < 10.0) // Keys have to be at least this many pixels wide
-        key_unit_size = 10.0;
+    key_unit_size = std::max(key_unit_size, 10.0); // Keys have to be at least this many pixels wide
 
     double white_width_pct = .8;
     double black_width_pct = .6;
@@ -2026,10 +1995,8 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
             }
 
             m_pianoData[key].magnitude = magnitude_av; // Store this for later : We'll do the colours from this...
-            if ( m_pianoData[key].max_magnitude_seen < magnitude_av)
-            {
-                m_pianoData[key].max_magnitude_seen = magnitude_av;
-            }
+            m_pianoData[key].max_magnitude_seen =
+                std::max(m_pianoData[key].max_magnitude_seen, magnitude_av);
             LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Updated Key %1 from %2 samples, magnitude=%3")
                     .arg(key).arg(n_samples).arg(magnitude_av));
 
@@ -2050,11 +2017,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
 double Piano::clamp(double cur, double max, double min)
 {
-    if (cur > max)
-        cur = max;
-    if (cur < min)
-        cur = min;
-    return cur;
+    return std::clamp(cur, min, max);
 }
 
 bool Piano::draw(QPainter *p, const QColor &back)
@@ -2073,8 +2036,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
 
     // Protect maximum array length
-    if(n > (uint)m_rects.size())
-        n = (uint)m_rects.size();
+    n = std::min(n, (uint)m_rects.size());
 
     // Sweep up across the keys, making sure the max_magnitude_seen is at minimum X% of its neighbours
     double mag = kPianoRmsNegligible;
@@ -2117,8 +2079,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     for (uint key = 0; key < n; key++)
     {
         mag = m_pianoData[key].magnitude / m_pianoData[key].max_magnitude_seen;
-        if (magnitude_max < mag)
-            magnitude_max = mag;
+        magnitude_max = std::max(magnitude_max, mag);
 
         magnitudep[key] = mag;
     }

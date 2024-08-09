@@ -25,6 +25,7 @@
  */
 
 // c++
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstdlib>
@@ -664,8 +665,7 @@ bool ThumbFinder::seekToFrame(int frame, bool checkPos)
                         (PRE_SEEK_AMOUNT * m_frameTime);
     int64_t requiredPTS = m_startPTS + (frame * m_frameTime);
 
-    if (timestamp < m_startTime)
-        timestamp = m_startTime;
+    timestamp = std::max(timestamp, m_startTime);
 
     if (av_seek_frame(m_inputFC, m_videostream, timestamp, AVSEEK_FLAG_ANY) < 0)
     {

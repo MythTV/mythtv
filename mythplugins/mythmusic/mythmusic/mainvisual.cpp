@@ -163,8 +163,7 @@ void MainVisual::add(const void *buffer, unsigned long b_len,
     len /= source_channels;
     len /= (bits_per_sample / 8);
 
-    if (len > m_samples)
-        len = m_samples;
+    len = std::min(len, m_samples);
 
     int cnt = len;
 

@@ -1,6 +1,7 @@
 #include "mythgoom.h"
 
 // C++
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -30,13 +31,11 @@ Goom::Goom()
     // we allow 1, 2 or 4 for the scale since goom likes its resolution to be a multiple of 2
     if (m_scaleh == 3 || m_scaleh > 4)
         m_scaleh = 4;
-    if (m_scaleh < 1)
-        m_scaleh = 1;
+    m_scaleh = std::max(m_scaleh, 1);
 
     if (m_scalew == 3 || m_scalew > 4)
         m_scalew = 4;
-    if (m_scalew < 1)
-        m_scalew = 1;
+    m_scalew = std::max(m_scalew, 1);
 }
 
 Goom::~Goom()
