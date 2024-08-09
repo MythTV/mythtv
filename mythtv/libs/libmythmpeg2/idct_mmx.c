@@ -38,6 +38,7 @@
 #define round(bias) ((int)(((bias)+0.5) * (1<<ROW_SHIFT)))
 #define rounder(bias) {round (bias), round (bias)}
 
+/* NOLINTBEGIN(readability-math-missing-parentheses) */
 
 #if 0
 /* C row IDCT - its just here to document the MMXEXT and MMX versions */
@@ -818,5 +819,7 @@ void mpeg2_idct_mmx_init (void)
 	mpeg2_scan_alt[i] = (j & 0x38) | ((j & 6) >> 1) | ((j & 1) << 2);
     }
 }
+
+/* NOLINTEND(readability-math-missing-parentheses) */
 
 #endif

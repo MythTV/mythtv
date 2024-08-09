@@ -922,6 +922,7 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     mpeg2_idct_add (last, decoder->DCTblock, dest, stride);
 }
 
+/* NOLINTBEGIN(readability-math-missing-parentheses) */
 #define MOTION_420(table,ref,motion_x,motion_y,size,y)			      \
     pos_x = 2 * decoder->offset + (motion_x);				      \
     pos_y = 2 * decoder->v_offset + (motion_y) + 2 * (y);		      \
@@ -1200,6 +1201,7 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
 	      (ref)[1] + offset, decoder->stride, 16);			      \
     (table)[4] (decoder->dest[2] + decoder->offset,			      \
 	      (ref)[2] + offset, decoder->stride, 16)
+/* NOLINTEND(readability-math-missing-parentheses) */
 
 #define bit_buf (decoder->bitstream_buf)
 #define bits (decoder->bitstream_bits)
