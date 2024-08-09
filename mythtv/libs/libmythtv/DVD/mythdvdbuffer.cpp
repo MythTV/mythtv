@@ -630,12 +630,18 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                           .arg(static_cast<double>(cell_event->cell_length) / 90000.0, 0, 'f', 1));
                     QString still;
                     if (stillTimer == 0)
+                    {
                         still = QString("Length: %1 seconds")
                             .arg(duration_cast<std::chrono::seconds>(m_pgcLength).count());
+                    }
                     else if (stillTimer < 0xff)
+                    {
                         still = QString("Stillframe: %1 seconds").arg(stillTimer);
+                    }
                     else
+                    {
                         still = QString("Infinite stillframe");
+                    }
 
                     if (m_title == 0)
                     {
