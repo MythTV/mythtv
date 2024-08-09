@@ -1575,6 +1575,21 @@ static bool cc608_good_parity(uint16_t data)
     return ret;
 }
 
+static AVBufferRef* get_pmt_section_from_AVProgram(const AVProgram *program)
+{
+    if (program == nullptr)
+    {
+        return nullptr;
+    }
+    return program->pmt_section;
+}
+
+static AVBufferRef* get_pmt_section_for_AVStream_index(AVFormatContext *context, int stream_index)
+{
+    AVProgram* program = av_find_program_from_stream(context, nullptr, stream_index);
+    return get_pmt_section_from_AVProgram(program);
+}
+
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 {
     QMutexLocker locker(&m_trackLock);
@@ -1584,16 +1599,11 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     m_pmtTrackTypes.clear();
 
     // Figure out languages of ATSC captions
-    if (!m_ic->pmt_section)
+    MythAVBufferRef pmt_buffer {get_pmt_section_for_AVStream_index(m_ic, av_index)};
+    if (!pmt_buffer.has_buffer())
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             "ScanATSCCaptionStreams() called with no PMT");
-        return;
-    }
-
-    auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
-    if (!pmt_buffer.has_buffer())
-    {
         return;
     }
     const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
@@ -1731,10 +1741,10 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     QMutexLocker locker(&m_trackLock);
 
     // ScanStreams() calls m_tracks[kTrackTypeTeletextCaptions].clear()
-    if (!m_ic->pmt_section || !m_tracks[kTrackTypeTeletextCaptions].empty())
+    if (!m_tracks[kTrackTypeTeletextCaptions].empty())
         return;
 
-    auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
+    MythAVBufferRef pmt_buffer {get_pmt_section_for_AVStream_index(m_ic, av_index)};
     if (!pmt_buffer.has_buffer())
     {
         return;
@@ -1807,21 +1817,18 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
     m_tracks[kTrackTypeRawText].push_back(si);
 }
 
-/** \fn AvFormatDecoder::ScanDSMCCStreams(void)
+/** \fn AvFormatDecoder::ScanDSMCCStreams(AVBufferRef* pmt_section)
  *  \brief Check to see whether there is a Network Boot Ifo sub-descriptor in the PMT which
  *         requires the MHEG application to reboot.
  */
-void AvFormatDecoder::ScanDSMCCStreams(void)
+void AvFormatDecoder::ScanDSMCCStreams(AVBufferRef* pmt_section)
 {
-    if (!m_ic || !m_ic->pmt_section)
-        return;
-
     if (m_itv == nullptr)
         m_itv = m_parent->GetInteractiveTV();
     if (m_itv == nullptr)
         return;
 
-    auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
+    MythAVBufferRef pmt_buffer {pmt_section};
     if (!pmt_buffer.has_buffer())
     {
         return;
@@ -2483,7 +2490,21 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (m_parent->IsErrored())
         scanerror = -1;
 
-    ScanDSMCCStreams();
+    if (!novideo && m_selectedTrack[kTrackTypeVideo].m_av_stream_index != -1)
+    {
+        ScanDSMCCStreams(
+            get_pmt_section_for_AVStream_index(m_ic, m_selectedTrack[kTrackTypeVideo].m_av_stream_index));
+    }
+    else
+    {
+        /* We don't yet know which AVProgram we want, so iterate through them
+        all.  This should be no more incorrect than using the last PMT when
+        there are multiple programs. */
+        for (unsigned i = 0; i < m_ic->nb_programs; i++)
+        {
+            ScanDSMCCStreams(m_ic->programs[i]->pmt_section);
+        }
+    }
 
     return scanerror;
 }
@@ -4821,7 +4842,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         return false;
     }
 
-    m_hasVideo = HasVideo(m_ic);
+    m_hasVideo = HasVideo();
     m_needDummyVideoFrames = false;
 
     if (!m_hasVideo && (decodetype & kDecodeVideo))
@@ -5111,15 +5132,11 @@ int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*sto
     return result;
 }
 
-bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
+bool AvFormatDecoder::HasVideo()
 {
-    if (ic && ic->pmt_section)
+    MythAVBufferRef pmt_buffer {get_pmt_section_from_AVProgram(get_current_AVProgram())};
+    if (pmt_buffer.has_buffer())
     {
-        auto pmt_buffer = MythAVBufferRef(m_ic->pmt_section);
-        if (!pmt_buffer.has_buffer())
-        {
-            return GetTrackCount(kTrackTypeVideo) != 0U;;
-        }
         const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
 
         for (uint i = 0; i < pmt.StreamCount(); i++)
@@ -5453,6 +5470,29 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
                 (double)ic->duration;
         }
     }
+}
+
+int AvFormatDecoder::get_current_AVStream_index(TrackType type)
+{
+    if (m_currentTrack[type] < 0 || static_cast<size_t>(m_currentTrack[type]) >= m_tracks[type].size())
+    {
+        return -1;
+    }
+    return m_tracks[type][m_currentTrack[type]].m_av_stream_index;
+}
+
+AVProgram* AvFormatDecoder::get_current_AVProgram()
+{
+    if (m_ic == nullptr)
+    {
+        return nullptr;
+    }
+    AVProgram* program = av_find_program_from_stream(m_ic, nullptr, get_current_AVStream_index(kTrackTypeAudio));
+    if (program == nullptr)
+    {
+        program = av_find_program_from_stream(m_ic, nullptr, get_current_AVStream_index(kTrackTypeVideo));
+    }
+    return program;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
