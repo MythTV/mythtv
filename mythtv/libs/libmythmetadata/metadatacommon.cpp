@@ -1348,7 +1348,7 @@ ArtworkMap ParseArtwork(const QDomElement& artwork)
 int editDistance( const QString& s, const QString& t )
 {
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define D( i, j ) d[(i) * n + (j)]
+#define D( i, j ) d[((i) * n) + (j)]
     size_t m = s.length() + 1;
     size_t n = t.length() + 1;
     int *d = new int[m * n];

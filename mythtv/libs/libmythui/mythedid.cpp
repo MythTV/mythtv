@@ -510,7 +510,7 @@ void MythEDID::Debug() const
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version:1.%1 Size:%2 Exensions:%3")
-            .arg(m_minorVersion).arg(m_size).arg(m_size / 128 -1));
+            .arg(m_minorVersion).arg(m_size).arg((m_size / 128) - 1));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Gamma:%1 sRGB:%2")
             .arg(static_cast<double>(m_gamma)).arg(m_sRGB));
     LOG(VB_GENERAL, LOG_INFO, LOC + "Display chromaticity:-");
