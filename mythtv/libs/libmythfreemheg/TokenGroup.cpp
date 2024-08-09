@@ -21,6 +21,9 @@
 
 
 #include "TokenGroup.h"
+
+#include <algorithm>
+
 #include "Presentable.h"
 #include "Ingredients.h"
 #include "Root.h"
@@ -639,15 +642,7 @@ void MHListGroup::Deselect(int nIndex, MHEngine *engine)
 // Return the reference to the visible at the particular position.
 void MHListGroup::GetCellItem(int nCell, const MHObjectRef &itemDest, MHEngine *engine)
 {
-    if (nCell < 1)
-    {
-        nCell = 1;    // First cell
-    }
-
-    if (nCell > m_positions.Size())
-    {
-        nCell = m_positions.Size();    // Last cell.
-    }
+    nCell = std::clamp(nCell, 1, m_positions.Size());
 
     int nVisIndex = nCell + m_nFirstItem - 2;
 

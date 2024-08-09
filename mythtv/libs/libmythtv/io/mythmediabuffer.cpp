@@ -1,4 +1,5 @@
 // Std
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -926,8 +927,7 @@ void MythMediaBuffer::run(void)
                     int old_block_size = m_readBlockSize;
                     m_readBlockSize = 3 * m_readBlockSize / 2;
                     m_readBlockSize = ((m_readBlockSize+DEFAULT_CHUNK_SIZE-1) / DEFAULT_CHUNK_SIZE) * DEFAULT_CHUNK_SIZE;
-                    if (m_readBlockSize > KB512)
-                        m_readBlockSize = KB512;
+                    m_readBlockSize = std::min(m_readBlockSize, KB512);
                     LOG(VB_FILE, LOG_INFO, LOC + QString("Avg read interval was %1 msec. "
                                                          "%2K -> %3K block size")
                         .arg(readTimeAvg.count()).arg(old_block_size/1024).arg(m_readBlockSize/1024));

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 // MythTV
 #include "libmyth/audio/audiooutput.h"
 
@@ -532,12 +534,12 @@ bool MythDVDPlayer::DoJumpChapter(int Chapter)
         if (Chapter < 0)
         {
             Chapter = current -1;
-            if (Chapter < 0) Chapter = 0;
+            Chapter = std::max(Chapter, 0);
         }
         else if (Chapter > total)
         {
             Chapter = current + 1;
-            if (Chapter > total) Chapter = total;
+            Chapter = std::min(Chapter, total);
         }
     }
 

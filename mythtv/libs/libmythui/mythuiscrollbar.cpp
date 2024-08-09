@@ -64,8 +64,7 @@ void MythUIScrollBar::SetMaximum(int value)
     if (value - 1 == m_maximum)
         return;
 
-    if (value < 1)
-        value = 1;
+    value = std::max(value, 1);
 
     m_maximum = value - 1;
     CalculatePosition();
@@ -76,11 +75,7 @@ void MythUIScrollBar::SetSliderPosition(int value)
     if (value == m_sliderPosition)
         return;
 
-    if (value < 0)
-        value = 0;
-
-    if (value > m_maximum)
-        value = m_maximum;
+    value = std::clamp(value, 0, m_maximum);
 
     m_sliderPosition = value;
     CalculatePosition();

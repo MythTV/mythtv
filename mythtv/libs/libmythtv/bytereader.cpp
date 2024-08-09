@@ -21,6 +21,8 @@
 
 #include "bytereader.h"
 
+#include <algorithm>
+
 const uint8_t* ByteReader::find_start_code(const uint8_t * p,
                                            const uint8_t * const end,
                                            uint32_t * const start_code)
@@ -60,8 +62,7 @@ const uint8_t* ByteReader::find_start_code(const uint8_t * p,
         }
     }
 
-    if (p > end)
-        p = end;
+    p = std::min(p, end);
     // read the previous 4 bytes, i.e. bytes {p - 4, p - 3, p - 2, p - 1}
     *start_code = static_cast<uint32_t>(p[-4]) << 24 |
                   static_cast<uint32_t>(p[-3]) << 16 |

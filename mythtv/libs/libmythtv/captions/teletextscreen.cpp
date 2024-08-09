@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <QFontMetrics>
 #include <QPainter>
 
@@ -156,10 +158,8 @@ void TeletextScreen::Pulse()
 
             int max_width  = (int)((float)m_colWidth * kTextPadding);
             m_fontHeight = (int)((float)m_rowHeight * kTextPadding);
-            if (max_width > (m_colWidth - 2))
-                max_width = m_colWidth -2;
-            if (m_fontHeight > (m_rowHeight - 2))
-                m_fontHeight = m_rowHeight - 2;
+            max_width = std::min(max_width, m_colWidth - 2);
+            m_fontHeight = std::min(m_fontHeight, m_rowHeight - 2);
             gTTFont->GetFace()->setPixelSize(m_fontHeight);
 
             m_fontStretch = 200;

@@ -1332,11 +1332,9 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
         // Calculate the ascent and descent of this glyph.
         int descent = slot->metrics.height - slot->metrics.horiBearingY;
 
-        if (slot->metrics.horiBearingY > maxAscent)
-            maxAscent = slot->metrics.horiBearingY;
+        maxAscent = std::max<FT_Pos>(slot->metrics.horiBearingY, maxAscent);
 
-        if (descent > maxDescent)
-            maxDescent = descent;
+        maxDescent = std::max(descent, maxDescent);
 
         width += advance;
         previous = glyphIndex;
@@ -1735,10 +1733,8 @@ void MHIDLA::DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec&
                 lineArray[nLines++].m_slope =
                     (float)(thisX-lastX) / (float)(thisY-lastY);
             }
-            if (thisY < yMin)
-                yMin = thisY;
-            if (thisY > yMax)
-                yMax = thisY;
+            yMin = std::min(thisY, yMin);
+            yMax = std::max(thisY, yMax);
             lastX = thisX;
             lastY = thisY;
         }

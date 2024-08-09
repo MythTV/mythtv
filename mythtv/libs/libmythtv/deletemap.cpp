@@ -1,6 +1,7 @@
 
 #include "deletemap.h"
 
+#include <algorithm>
 #include <cstdint>
 
 #include "libmythbase/mythcorecontext.h" // for MythCoreContext, etc
@@ -139,10 +140,7 @@ bool DeleteMap::HandleAction(const QString &action, uint64_t frame)
 void DeleteMap::UpdateSeekAmount(int change)
 {
     m_seekamountpos += change;
-    if (m_seekamountpos > 9)
-        m_seekamountpos = 9;
-    if (m_seekamountpos < 0)
-        m_seekamountpos = 0;
+    m_seekamountpos = std::clamp(m_seekamountpos, 0, 9);
 
     m_seekText = "";
     switch (m_seekamountpos)

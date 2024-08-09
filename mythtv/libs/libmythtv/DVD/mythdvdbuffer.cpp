@@ -1569,11 +1569,9 @@ bool MythDVDBuffer::DecodeSubtitles(AVSubtitle *Subtitle, int *GotSubtitles,
         if (offset1 >= 0)
         {
             int width = x2 - x1 + 1;
-            if (width < 0)
-                width = 0;
+            width = std::max(width, 0);
             int height = y2 - y1 + 1;
-            if (height < 0)
-                height = 0;
+            height = std::max(height, 0);
             if (width > 0 && height > 0)
             {
                 if (Subtitle->rects != nullptr)
@@ -2047,8 +2045,7 @@ int MythDVDBuffer::DecodeRLE(uint8_t *Bitmap, int Linesize, int Width, int Heigh
             }
         }
         int len = v >> 2;
-        if (len > (Width - x))
-            len = Width - x;
+        len = std::min(len, Width - x);
         int color = v & 0x03;
         memset(data + x, color, static_cast<size_t>(len));
         x += len;

@@ -79,8 +79,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     {
         m_srcQuality = gCoreContext->GetNumSetting("SRCQuality", QUALITY_MEDIUM);
         // Extra test to keep backward compatibility with earlier SRC setting
-        if (m_srcQuality > QUALITY_HIGH)
-            m_srcQuality = QUALITY_HIGH;
+        m_srcQuality = std::min<int>(m_srcQuality, QUALITY_HIGH);
 
         VBAUDIO(QString("SRC quality = %1").arg(quality_string(m_srcQuality)));
     }
@@ -1665,8 +1664,7 @@ void AudioOutputBase::OutputAudioLoop(void)
 
     // to reduce startup latency, write silence in 8ms chunks
     int zero_fragment_size = 8 * m_sampleRate * m_outputBytesPerFrame / 1000;
-    if (zero_fragment_size > m_fragmentSize)
-        zero_fragment_size = m_fragmentSize;
+    zero_fragment_size = std::min(zero_fragment_size, m_fragmentSize);
 
     while (!m_killAudio)
     {

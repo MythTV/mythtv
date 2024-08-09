@@ -20,6 +20,9 @@
 */
 
 #include "BaseClasses.h"
+
+#include <algorithm>
+
 #include "ParseNode.h"
 #include "Engine.h"
 #include "ASN1Codes.h"
@@ -86,15 +89,7 @@ MHOctetString::MHOctetString(const MHOctetString &str, int nOffset, int nLen)
         nLen = str.Size() - nOffset;    // The rest of the string.
     }
 
-    if (nLen < 0)
-    {
-        nLen = 0;
-    }
-
-    if (nLen > str.Size())
-    {
-        nLen = str.Size();
-    }
+    nLen = std::clamp(nLen, 0, str.Size());
 
     m_nLength = nLen;
 
@@ -171,10 +166,7 @@ int MHOctetString::Compare(const MHOctetString &str) const
 {
     int nLength = m_nLength;
 
-    if (nLength > str.m_nLength)
-    {
-        nLength = str.m_nLength;
-    }
+    nLength = std::min(nLength, str.m_nLength);
 
     // Test up to the length of the shorter string.
     int nTest = 0;

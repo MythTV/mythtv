@@ -3,6 +3,7 @@
 #include "mythuitype.h"
 
 // C++ headers
+#include <algorithm>
 #include <utility>
 
 // QT headers
@@ -426,11 +427,7 @@ void MythUIType::HandleAlphaPulse(void)
 
     m_effects.m_alpha += m_alphaChange;
 
-    if (m_effects.m_alpha > m_alphaMax)
-        m_effects.m_alpha = m_alphaMax;
-
-    if (m_effects.m_alpha < m_alphaMin)
-        m_effects.m_alpha = m_alphaMin;
+    m_effects.m_alpha = std::clamp(m_effects.m_alpha, m_alphaMin, m_alphaMax);
 
     // Reached limits so change direction
     if (m_effects.m_alpha == m_alphaMax || m_effects.m_alpha == m_alphaMin)
@@ -939,11 +936,7 @@ void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
     m_alphaMin = minalpha;
     m_alphaMax = maxalpha;
 
-    if (m_effects.m_alpha > m_alphaMax)
-        m_effects.m_alpha = m_alphaMax;
-
-    if (m_effects.m_alpha < m_alphaMin)
-        m_effects.m_alpha = m_alphaMin;
+    m_effects.m_alpha = std::clamp(m_effects.m_alpha, m_alphaMin, m_alphaMax);
 }
 
 void MythUIType::SetAlpha(int newalpha)
@@ -1277,8 +1270,7 @@ bool MythUIType::ParseElement(
         if (m_alphaMax > 255)
             m_effects.m_alpha = m_alphaMax = 255;
 
-        if (m_alphaMin < 0)
-            m_alphaMin = 0;
+        m_alphaMin = std::max(m_alphaMin, 0);
 
         m_alphaChange = element.attribute("change", "5").toInt();
     }

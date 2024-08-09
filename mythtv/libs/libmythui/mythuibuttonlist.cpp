@@ -443,8 +443,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
                     right_width += m_itemHorizSpacing + width;
                     int height = minButtonHeight(buttonstate->GetArea());
 
-                    if (row_height < height)
-                        row_height = height;
+                    row_height = std::max(row_height, height);
 
                     LOG(VB_GUI, LOG_DEBUG,
                         QString("Added button item %1 "
@@ -518,8 +517,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
                     left_width += m_itemHorizSpacing + width;
                     int height = minButtonHeight(buttonstate->GetArea());
 
-                    if (row_height < height)
-                        row_height = height;
+                    row_height = std::max(row_height, height);
 
                     LOG(VB_GUI, LOG_DEBUG,
                         QString("Added button item %1 "
@@ -602,8 +600,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
             break;
         width = minButtonWidth(buttonstate->GetArea());
 
-        if ((*col_widths)[col_idx] < width)
-            (*col_widths)[col_idx] = width;
+        (*col_widths)[col_idx] = std::max((*col_widths)[col_idx], width);
 
         // Make note of which column has the selected button
         if (selectedIdx == buttonIdx)
@@ -2499,11 +2496,9 @@ void MythUIButtonList::Init()
         MythRect itemArea = buttonSelectedState->GetArea();
         itemArea.CalculateArea(m_contentsRect);
 
-        if (m_itemHeight < itemArea.height())
-            m_itemHeight = itemArea.height();
+        m_itemHeight = std::max(m_itemHeight, itemArea.height());
 
-        if (m_itemWidth < itemArea.width())
-            m_itemWidth = itemArea.width();
+        m_itemWidth = std::max(m_itemWidth, itemArea.width());
     }
 
     // End Hack

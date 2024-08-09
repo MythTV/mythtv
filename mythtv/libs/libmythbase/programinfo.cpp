@@ -5957,8 +5957,7 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
         // For performance reasons we have to have an upper limit
         int nLimit = gCoreContext->GetNumSetting("PrevRecLimit", 20000);
         // For sanity sake at least 100
-        if (nLimit < 100)
-            nLimit = 100;
+        nLimit = std::max(nLimit, 100);
         querystr += QString("LIMIT %1 ").arg(nLimit);
     }
 

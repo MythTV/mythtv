@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath> // for isnan()
 
 #include <QDir>
@@ -561,8 +562,7 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
     m_userrating = (float)query.value(7).toDouble();
     if (std::isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
-    if (m_userrating > 10.0F)
-        m_userrating = 10.0F;
+    m_userrating = std::min(m_userrating, 10.0F);
     m_length = std::chrono::minutes(query.value(8).toInt());
     m_playcount = query.value(9).toInt();
     m_filename = query.value(10).toString();

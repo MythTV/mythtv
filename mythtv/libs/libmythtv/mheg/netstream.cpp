@@ -4,6 +4,7 @@
 #include "netstream.h"
 
 // C/C++ lib
+#include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <cinttypes>
@@ -397,8 +398,7 @@ void NetStream::slotReadyRead()
             }
         }
 
-        if (m_state < kReady)
-            m_state = kReady;
+        m_state = std::max(m_state, kReady);
 
         locker.unlock();
         emit ReadyRead(this);

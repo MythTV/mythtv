@@ -5000,8 +5000,7 @@ bool TV::SeekHandleAction(const QStringList& Actions, const bool IsDVD)
                     targetRel = 0;
                 uint64_t maxAbs = m_player->GetCurrentFrameCount();
                 uint64_t maxRel = m_player->TranslatePositionAbsToRel(maxAbs);
-                if (targetRel > maxRel)
-                    targetRel = maxRel;
+                targetRel = std::min(targetRel, maxRel);
                 uint64_t targetAbs = m_player->TranslatePositionRelToAbs(targetRel);
                 m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
                 DoPlayerSeekToFrame(targetAbs);

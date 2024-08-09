@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdint>
 
 #include "visualisations/goom/zoom_filters.h"
@@ -51,11 +52,8 @@ void zoom_filter_mmx (int prevX, int prevY,
         int py = brutSmypos +
              (((brutD[myPos2] - brutSmypos)*buffratio) >> BUFFPOINTNB);
 
-        if (px < 0)
-            px = 0;
-
-        if (py < 0)
-            py = 0;
+        px = std::max(px, 0);
+        py = std::max(py, 0);
 
         if ((py>=(int)ay) || (px>=(int)ax)) 
         {

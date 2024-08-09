@@ -869,8 +869,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         {
             startupState = st_dbAwake;
         }
-        if (attempts < 6)
-            attempts = 6;
+        attempts = std::max(attempts, 6);
         if (!prompt)
             attempts=1;
         if (wakeupTime < 5s)

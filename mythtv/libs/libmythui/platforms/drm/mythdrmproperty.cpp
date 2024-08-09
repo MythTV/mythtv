@@ -1,6 +1,9 @@
 // MythTV
 #include "platforms/drm/mythdrmproperty.h"
 
+// C++
+#include <algorithm>
+
 // Qt
 #include <QStringList>
 
@@ -68,10 +71,8 @@ MythDRMRangeProperty::MythDRMRangeProperty(uint64_t Value, drmModePropertyPtr Pr
     for (int i = 0; i < Property->count_values; ++i)
     {
         auto value = Property->values[i];
-        if (value < m_min)
-            m_min = value;
-        if (value > m_max)
-            m_max = value;
+        m_min = std::min(value, m_min);
+        m_max = std::max(value, m_max);
     }
 }
 
@@ -87,10 +88,8 @@ MythDRMSignedRangeProperty::MythDRMSignedRangeProperty(uint64_t Value, drmModePr
     for (int i = 0; i < Property->count_values; ++i)
     {
         auto value = static_cast<int64_t>(Property->values[i]);
-        if (value < m_min)
-            m_min = value;
-        if (value > m_max)
-            m_max = value;
+        m_min = std::min(value, m_min);
+        m_max = std::max(value, m_max);
     }
 }
 

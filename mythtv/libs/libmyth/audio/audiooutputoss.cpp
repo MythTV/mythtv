@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -356,10 +357,7 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
         return;
     }
 
-    if (volume > 100)
-        volume = 100;
-    if (volume < 0)
-        volume = 0;
+    volume = std::clamp(volume, 0, 100);
 
     if (m_mixerFd >= 0)
     {

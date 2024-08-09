@@ -2,6 +2,9 @@
 // Own Header
 #include "mythuiprogressbar.h"
 
+// C++
+#include <algorithm>
+
 // QT
 #include <QCoreApplication>
 #include <QDomDocument>
@@ -68,13 +71,7 @@ void MythUIProgressBar::SetStart(int value)
 
 void MythUIProgressBar::SetUsed(int value)
 {
-    if (value < m_start)
-        value = m_start;
-
-    if (value > m_total)
-        value = m_total;
-
-    m_current = value;
+    m_current = std::clamp(value, m_start, m_total);
     CalculatePosition();
 }
 

@@ -1983,8 +1983,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     {
                         static const int s_baseSize = 1920 * 1080;
                         multiplier = ((par->width * par->height) + s_baseSize - 1) / s_baseSize;
-                        if (multiplier < 1)
-                            multiplier = 1;
+                        multiplier = std::max(multiplier, 1);
                     }
                     par->bit_rate = s_baseBitrate * multiplier;
                     unknownbitrate = true;
@@ -2416,8 +2415,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
-    if (static_cast<uint>(m_ic->bit_rate) > m_bitrate)
-        m_bitrate = static_cast<uint>(m_ic->bit_rate);
+    m_bitrate = std::max(static_cast<uint>(m_ic->bit_rate), m_bitrate);
 
     if (m_bitrate > 0)
     {
@@ -5404,25 +5402,21 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
    int64_t duration = INT64_MIN;
    if (st->start_time != AV_NOPTS_VALUE && st->time_base.den) {
        int64_t start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
-       if (start_time1 < start_time)
-           start_time = start_time1;
+       start_time = std::min(start_time1, start_time);
        if (st->duration != AV_NOPTS_VALUE) {
            int64_t end_time1 = start_time1 +
                       av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
-           if (end_time1 > end_time)
-               end_time = end_time1;
+           end_time = std::max(end_time1, end_time);
        }
    }
    if (st->duration != AV_NOPTS_VALUE) {
        int64_t duration1 = av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
-       if (duration1 > duration)
-           duration = duration1;
+       duration = std::max(duration1, duration);
    }
     if (start_time != INT64_MAX) {
         ic->start_time = start_time;
         if (end_time != INT64_MIN) {
-            if (end_time - start_time > duration)
-                duration = end_time - start_time;
+            duration = std::max(end_time - start_time, duration);
         }
     }
     if (duration != INT64_MIN) {

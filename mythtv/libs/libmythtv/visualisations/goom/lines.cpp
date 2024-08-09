@@ -2,6 +2,7 @@
  *  lines.c
  */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -21,9 +22,7 @@ lighten (unsigned char value, float power)
 
 	if (t > 0) {
 		val = (int) t; // (32.0F * log (t));
-		if (val > 255)
-			val = 255;
-		return val;
+		return std::min(val, 255);
 	}
         return 0;
 }

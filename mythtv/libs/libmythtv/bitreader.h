@@ -27,6 +27,7 @@
 #ifndef BIT_READER_H
 #define BIT_READER_H
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 
@@ -243,10 +244,7 @@ inline int BitReader::get_ue_golomb(unsigned max_length)
 
 inline void BitReader::refill_cache(unsigned min_bits)
 {
-    if (min_bits > kCacheSizeMax)
-    {
-        min_bits = kCacheSizeMax;
-    }
+    min_bits = std::min(min_bits, kCacheSizeMax);
 
     //if (m_bitIndex >= kBitsPerRead)
     {

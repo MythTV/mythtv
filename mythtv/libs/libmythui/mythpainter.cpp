@@ -314,11 +314,8 @@ void MythPainter::DrawRectPriv(MythImage *im, const QRect area, int radius,
     painter.setPen(linePen);
     painter.setBrush(fillBrush);
 
-    if ((area.width() / 2) < radius)
-        radius = area.width() / 2;
-
-    if ((area.height() / 2) < radius)
-        radius = area.height() / 2;
+    radius = std::min(area.width() / 2, radius);
+    radius = std::min(area.height() / 2, radius);
 
     int lineWidth = linePen.width();
     QRect r(lineWidth, lineWidth,

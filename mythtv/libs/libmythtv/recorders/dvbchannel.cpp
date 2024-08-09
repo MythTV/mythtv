@@ -34,6 +34,7 @@
 // POSIX headers
 #include <fcntl.h>
 #include <unistd.h>
+#include <algorithm>
 #include <utility>
 #include <sys/poll.h>
 #include <sys/select.h>
@@ -1241,8 +1242,7 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
                 // convert value from -100dBm to 0dBm to a 0-1 range
                 value = svalue + 100000;
                 value = value / 100000.0;
-                if (value > 1.0)
-                    value = 1.0;
+                value = std::min(value, 1.0);
             }
         }
         else if (cmd.props->u.st.stat[0].scale == FE_SCALE_RELATIVE)

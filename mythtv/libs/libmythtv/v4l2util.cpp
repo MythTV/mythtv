@@ -4,6 +4,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
 #include <climits>
 #include <fcntl.h>
 #include <unistd.h>
@@ -485,8 +486,8 @@ void V4L2util::SetDefaultOptions(DriverOption::Options& options)
             DriverOption::menu_t::iterator Imenu = (*Iopt).m_menu.begin();
             for ( ; Imenu != (*Iopt).m_menu.end(); ++Imenu)
             {
-                if (Imenu.key() < minimum) minimum = Imenu.key();
-                if (Imenu.key() > maximum) maximum = Imenu.key();
+                minimum = std::min(Imenu.key(), minimum);
+                maximum = std::max(Imenu.key(), maximum);
             }
             if ((*Iopt).m_minimum != minimum)
             {

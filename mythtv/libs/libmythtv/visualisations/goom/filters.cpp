@@ -12,6 +12,7 @@
 
 //#define _DEBUG_PIXEL;
 
+#include <algorithm>
 #include <array>
 #include <cinttypes>
 #include <cmath>
@@ -206,8 +207,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		static int s_wavesp = 0;
 
 		int yy = y + (RAND () % 4) - (RAND () % 4) + (s_wave / 10);
-		if (yy < 0)
-			yy = 0;
+		yy = std::max(yy, 0);
 		if (yy >= (int)c_resoly)
 			yy = c_resoly - 1;
 
@@ -297,8 +297,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 			break;
 		}
 
-		if (fvitesse < -3024)
-			fvitesse = -3024;
+		fvitesse = std::max(fvitesse, -3024);
 
 		int ppx = 0;
 		int ppy = 0;
@@ -427,10 +426,8 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 		brutSmypos = lbrutS[myPos2];
 		int py = brutSmypos + (((lbrutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 
-                if (px < 0)
-                    px = 0;
-                if (py < 0)
-                    py = 0;
+                px = std::max(px, 0);
+                py = std::max(py, 0);
 
 		int pos = ((px >> PERTEDEC) + (lprevX * (py >> PERTEDEC)));
 		// coef en modulo 15
@@ -687,8 +684,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	if (switchIncr != 0) {
 		buffratio += switchIncr;
-		if (buffratio > BUFFPOINTMASK)
-			buffratio = BUFFPOINTMASK;
+		buffratio = std::min(buffratio, BUFFPOINTMASK);
 	}
 
 	if (switchMult != 1.0F) {

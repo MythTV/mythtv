@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
@@ -1467,8 +1468,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
                 fn = (fn+16)/33;
             else
                 fn = (fn+20)/40;
-            if (fn<1)
-                fn=1;
+            fn = std::max(fn, 1);
             m_tf += 2*fn; // two fields
         }
     }

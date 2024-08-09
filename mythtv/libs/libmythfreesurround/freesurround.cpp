@@ -17,6 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
@@ -312,7 +313,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
 uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
 {
     uint oc = m_outCount;
-    if (maxFrames > oc) maxFrames = oc;
+    maxFrames = std::min(maxFrames, oc);
     uint outindex = m_processedSize - oc;
     auto *output = (float *)buffer;
     if (m_channels == 8)

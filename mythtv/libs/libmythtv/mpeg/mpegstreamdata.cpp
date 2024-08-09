@@ -847,8 +847,7 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
     QMutexLocker locker(&m_siTimeLock);
     m_siTimeOffsets[m_siTimeOffsetIndx] = si_time - utc_time;
 
-    if (m_siTimeOffsetIndx + 1 > m_siTimeOffsetCnt)
-        m_siTimeOffsetCnt = m_siTimeOffsetIndx + 1;
+    m_siTimeOffsetCnt = std::max(m_siTimeOffsetIndx + 1, m_siTimeOffsetCnt);
 
     m_siTimeOffsetIndx = (m_siTimeOffsetIndx + 1) & 0xf;
 

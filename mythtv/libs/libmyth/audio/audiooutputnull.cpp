@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -92,11 +93,7 @@ void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
 
 int AudioOutputNULL::readOutputData(unsigned char *read_buffer, size_t max_length)
 {
-    size_t amount_to_read = max_length;
-    if (amount_to_read > m_pcmOutputBuffer.size())
-    {
-        amount_to_read = m_pcmOutputBuffer.size();
-    }
+    size_t amount_to_read = std::min(max_length, m_pcmOutputBuffer.size());
 
     m_pcmOutputBufferMutex.lock();
     std::copy(m_pcmOutputBuffer.cbegin(),

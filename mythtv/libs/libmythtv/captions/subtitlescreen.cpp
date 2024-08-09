@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <QFontMetrics>
 #include <QRegularExpression>
 
@@ -2136,19 +2138,15 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
             if (pixel & 0xff000000)
             {
                 empty = false;
-                if (x < xmin)
-                    xmin = x;
-                if (x > xmax)
-                    xmax = x;
+                xmin = std::min(x, xmin);
+                xmax = std::max(x, xmax);
             }
         }
 
         if (!empty)
         {
-            if (y < ymin)
-                ymin = y;
-            if (y > ymax)
-                ymax = y;
+            ymin = std::min(y, ymin);
+            ymax = std::max(y, ymax);
         }
         else if (!prev_empty)
         {

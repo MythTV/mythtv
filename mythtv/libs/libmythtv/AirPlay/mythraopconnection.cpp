@@ -1,5 +1,6 @@
 #include <unistd.h> // for usleep()
 
+#include <algorithm>
 #include <limits> // workaround QTBUG-90395
 #include <utility>
 
@@ -804,8 +805,7 @@ void MythRAOPConnection::ProcessAudio()
                         // calculate how many frames we have to drop to catch up
                     offset = (m_adjustedLatency.count() * m_frameRate / 1000) *
                         m_audio->GetBytesPerFrame();
-                    if (offset > data.length)
-                        offset = data.length;
+                    offset = std::min(offset, data.length);
                     framecnt = offset / m_audio->GetBytesPerFrame();
                     m_adjustedLatency -= framesToMs(framecnt+1);
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -1053,8 +1053,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("Base64 decoded challenge size %1, expected 16")
                 .arg(challenge_size));
-            if (challenge_size > 16)
-                challenge_size = 16;
+            challenge_size = std::min(challenge_size, 16);
         }
 
         int i = 0;

@@ -6,6 +6,7 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "v4l2util.h"
+#include <algorithm>
 #include <utility>
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
@@ -810,7 +811,7 @@ class MPEG2streamType : public MythUIComboBoxSetting, public CodecParamStorage
         MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2streamtype")
     {
-        if (maxopt > 8) maxopt = 8;
+        maxopt = std::min<uint>(maxopt, 8);
 
         setLabel(QObject::tr("Stream Type"));
 
@@ -836,7 +837,7 @@ class MPEG2aspectRatio : public MythUIComboBoxSetting, public CodecParamStorage
         MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2aspectratio")
     {
-        if (maxopt > 3) maxopt = 3;
+        maxopt = std::min<uint>(maxopt, 3);
 
         setLabel(QObject::tr("Aspect Ratio"));
 

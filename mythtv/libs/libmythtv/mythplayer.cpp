@@ -1592,8 +1592,7 @@ bool MythPlayer::DoFastForward(uint64_t frames, double inaccuracy)
     if (!m_deleteMap.IsEditing() && IsInDelete(desiredFrame))
     {
         uint64_t endcheck = m_deleteMap.GetLastFrame();
-        if (desiredFrame > endcheck)
-            desiredFrame = endcheck;
+        desiredFrame = std::min(desiredFrame, endcheck);
     }
 
     uint64_t seeksnap_wanted = UINT64_MAX;
@@ -1847,12 +1846,12 @@ bool MythPlayer::DoJumpChapter(int chapter)
         if (chapter < 0)
         {
             chapter = current -1;
-            if (chapter < 0) chapter = 0;
+            chapter = std::max(chapter, 0);
         }
         else if (chapter > total)
         {
             chapter = current + 1;
-            if (chapter > total) chapter = total;
+            chapter = std::min(chapter, total);
         }
     }
 

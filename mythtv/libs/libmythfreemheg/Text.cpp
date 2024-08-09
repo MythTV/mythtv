@@ -21,6 +21,9 @@
 #include "libmythbase/compat.h"
 
 #include "Text.h"
+
+#include <algorithm>
+
 #include "Visible.h"
 #include "Presentable.h"
 #include "Ingredients.h"
@@ -780,15 +783,9 @@ void MHText::Redraw()
             pItem->m_width = rect.width();
             pLine->m_nLineWidth += rect.width();
 
-            if (rect.height() > pLine->m_nLineHeight)
-            {
-                pLine->m_nLineHeight = rect.height();
-            }
+            pLine->m_nLineHeight = std::max(rect.height(), pLine->m_nLineHeight);
 
-            if (rect.bottom() > pLine->m_nDescent)
-            {
-                pLine->m_nDescent = rect.bottom();
-            }
+            pLine->m_nDescent = std::max(rect.bottom(), pLine->m_nDescent);
         }
     }
 

@@ -24,6 +24,7 @@
  */
 #include "eldutils.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <limits> // workaround QTBUG-90395
 #include <sys/types.h>
@@ -453,8 +454,7 @@ int eld::maxLPCMChannels()
         struct cea_sad *a = m_e.sad + i;
         if (a->format == TYPE_LPCM)
         {
-            if (a->channels > channels)
-                channels = a->channels;
+            channels = std::max(a->channels, channels);
         }
     }
     return channels;
@@ -466,8 +466,7 @@ int eld::maxChannels()
     for (int i = 0; i < m_e.sad_count; i++)
     {
         struct cea_sad *a = m_e.sad + i;
-        if (a->channels > channels)
-            channels = a->channels;
+        channels = std::max(a->channels, channels);
     }
     return channels;
 }

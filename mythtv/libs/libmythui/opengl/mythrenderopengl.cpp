@@ -1011,9 +1011,9 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
     float halfwidth = Area.width() / 2.0F;
     float halfheight = Area.height() / 2.0F;
     float radius = CornerRadius;
-    if (radius < 1.0F) radius = 1.0F;
-    if (radius > halfwidth) radius = halfwidth;
-    if (radius > halfheight) radius = halfheight;
+    radius = std::max(radius, 1.0F);
+    radius = std::min(radius, halfwidth);
+    radius = std::min(radius, halfheight);
 
     // Set shader parameters
     // Centre of the rectangle
@@ -1041,7 +1041,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
     if (edge)
     {
         float innerradius = radius - LinePen.width();
-        if (innerradius < 1.0F) innerradius = 1.0F;
+        innerradius = std::max(innerradius, 1.0F);
         m_parameters(3,0) = innerradius;
         // Adjust the size for the inner radius (edge)
         m_parameters(2,1) = halfwidth - LinePen.width();

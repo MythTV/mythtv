@@ -211,8 +211,7 @@ int MythDVDStream::SafeRead(void *Buffer, uint Size)
     }
 
     b = it->End() - m_pos;
-    if (b > block)
-        b = block;
+    b = std::min(b, block);
 
     // Request new key if change in title
     int flags = DVDINPUT_READ_DECRYPT;

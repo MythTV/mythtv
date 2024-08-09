@@ -7,6 +7,7 @@
 #include "mythuiwebbrowser.h"
 
 // c++
+#include <algorithm>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
@@ -1172,13 +1173,7 @@ void MythUIWebBrowser::SetZoom(float zoom)
     if (!m_browser)
         return;
 
-    if (zoom < 0.3F)
-        zoom = 0.3F;
-
-    if (zoom > 5.0F)
-        zoom = 5.0F;
-
-    m_zoom = zoom;
+    m_zoom = std::clamp(zoom, 0.3F, 5.0F);
     m_browser->setZoomFactor(m_zoom);
     ResetScrollBars();
     UpdateBuffer();

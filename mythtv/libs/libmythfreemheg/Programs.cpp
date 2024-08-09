@@ -392,25 +392,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 int nBeginExtract = GetInt(args.GetAt(1), engine);
                 int nEndExtract = GetInt(args.GetAt(2), engine);
 
-                if (nBeginExtract < 1)
-                {
-                    nBeginExtract = 1;
-                }
-
-                if (nBeginExtract > string.Size())
-                {
-                    nBeginExtract = string.Size();
-                }
-
-                if (nEndExtract < 1)
-                {
-                    nEndExtract = 1;
-                }
-
-                if (nEndExtract > string.Size())
-                {
-                    nEndExtract = string.Size();
-                }
+                nBeginExtract = std::clamp(nBeginExtract, 1, string.Size());
+                nEndExtract = std::clamp(nEndExtract, 1, string.Size());
 
                 MHParameter *pResString = args.GetAt(3);
                 // Returns beginExtract to endExtract inclusive.
@@ -434,10 +417,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 GetString(args.GetAt(0), string, engine);
                 int nStart = GetInt(args.GetAt(1), engine);
 
-                if (nStart < 1)
-                {
-                    nStart = 1;
-                }
+                nStart = std::max(nStart, 1);
 
                 GetString(args.GetAt(2), searchString, engine);
                 // Strings are indexed from one.
@@ -492,10 +472,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 GetString(args.GetAt(0), string, engine);
                 int nStart = GetInt(args.GetAt(1), engine);
 
-                if (nStart < 1)
-                {
-                    nStart = 1;
-                }
+                nStart = std::max(nStart, 1);
 
                 GetString(args.GetAt(2), searchString, engine);
                 // Strings are indexed from one.

@@ -1,6 +1,7 @@
 #ifndef VIDEOVISUAL_DEFS_H
 #define VIDEOVISUAL_DEFS_H
 
+#include <algorithm>
 #include <cmath>
 
 class LogScale
@@ -45,10 +46,8 @@ class LogScale
         for (int i = 1; i < (int) domain; i++)
         {
             int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
-            if (scaled < 1)
-                scaled = 1;
-            if (m_indices[scaled - 1] < i)
-                m_indices[scaled - 1] = i;
+            scaled = std::max(scaled, 1);
+            m_indices[scaled - 1] = std::max(m_indices[scaled - 1], i);
         }
     }
 

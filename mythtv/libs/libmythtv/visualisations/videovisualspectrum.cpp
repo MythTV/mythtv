@@ -84,13 +84,11 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
         if (magL < m_magnitudes[l])
         {
             tmp = m_magnitudes[l] - falloff;
-            if (tmp < magL)
-                tmp = magL;
+            tmp = std::max(tmp, magL);
             magL = tmp;
         }
 
-        if (magL < 1.0)
-            magL = 1.0;
+        magL = std::max(magL, 1.0);
 
         if (magR > m_range)
             magR = 1.0;
@@ -98,13 +96,11 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
         if (magR < m_magnitudes[r])
         {
             tmp = m_magnitudes[r] - falloff;
-            if (tmp < magR)
-                tmp = magR;
+            tmp = std::max(tmp, magR);
             magR = tmp;
         }
 
-        if (magR < 1.0)
-            magR = 1.0;
+        magR = std::max(magR, 1.0);
 
         m_magnitudes[l] = magL;
         m_magnitudes[r] = magR;
@@ -143,8 +139,7 @@ bool VideoVisualSpectrum::Initialise(const QRect Area)
 
     m_area = Area;
     m_barWidth = m_area.width() / m_numSamples;
-    if (m_barWidth < 6)
-        m_barWidth = 6;
+    m_barWidth = std::max(m_barWidth, 6);
     m_scale.setMax(192, m_area.width() / m_barWidth);
 
     m_magnitudes.resize(m_scale.range() * 2);

@@ -2673,10 +2673,7 @@ inline void RTjpeg::CalcTbls(void)
 
 int RTjpeg::SetQuality(int *quality)
 {
-    if (*quality < 1)
-        *quality = 1;
-    if (*quality > 255)
-        *quality = 255;
+    *quality = std::clamp(*quality, 1, 255);
 
     m_q = *quality;
 
@@ -2724,20 +2721,11 @@ int RTjpeg::SetSize(const int *w, const int *h)
 
 int RTjpeg::SetIntra(int *key, int *lm, int *cm)
 {
-    if (*key < 0)
-        *key = 0;
-    if (*key > 255)
-        *key = 255;
+    *key = std::clamp(*key, 0, 255);
     m_keyRate = *key;
 
-    if (*lm < 0)
-        *lm = 0;
-    if (*lm > 16)
-        *lm = 16;
-    if (*cm < 0)
-        *cm = 0;
-    if (*cm > 16)
-        *cm = 16;
+    *lm = std::clamp(*lm, 0, 16);
+    *cm = std::clamp(*cm, 0, 16);
 
 #ifdef MMX
     m_lMask.uq = (((uint64_t)(*lm)<<48)|((uint64_t)(*lm)<<32)|((uint64_t)(*lm)<<16)|(uint64_t)(*lm));

@@ -21,6 +21,9 @@
 
 #include "Root.h"
 #include "Groups.h"
+
+#include <algorithm>
+
 #include "ASN1Codes.h"
 #include "ParseNode.h"
 #include "Ingredients.h"
@@ -193,10 +196,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
                 pIngredient->Initialise(pItem, engine);
 
                 // Remember the highest numbered ingredient
-                if (pIngredient->m_ObjectReference.m_nObjectNo > m_nLastId)
-                {
-                    m_nLastId = pIngredient->m_ObjectReference.m_nObjectNo;
-                }
+                m_nLastId = std::max(pIngredient->m_ObjectReference.m_nObjectNo, m_nLastId);
 
                 // Add it to the ingedients of this group.
                 m_items.Append(pIngredient);

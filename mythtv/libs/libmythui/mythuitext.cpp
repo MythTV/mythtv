@@ -1,6 +1,7 @@
 
 #include "mythuitext.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <QCoreApplication>
@@ -621,12 +622,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
             QFontMetrics fm(GetFontProperties()->face());
 
             int bearing = fm.leftBearing(m_cutMessage[last_line]);
-            if (m_leftBearing > bearing)
-                m_leftBearing = bearing;
+            m_leftBearing = std::min(m_leftBearing, bearing);
             bearing = fm.rightBearing
                       (m_cutMessage[last_line + line.textLength() - 1]);
-            if (m_rightBearing > bearing)
-                m_rightBearing = bearing;
+            m_rightBearing = std::min(m_rightBearing, bearing);
         }
     }
 
@@ -702,8 +701,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
         if (height > m_drawRect.height())
         {
-            if (too_narrow < width)
-                too_narrow = width;
+            too_narrow = std::max<qreal>(too_narrow, width);
 
             // Too narrow?  How many lines didn't fit?
             qreal lines = roundf((height - m_drawRect.height()) / line_height);
@@ -720,8 +718,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
         }
         else
         {
-            if (best_width > width)
-                best_width = width;
+            best_width = std::min<qreal>(best_width, width);
 
             qreal lines = floor((m_area.height() - height) / line_height);
             if (lines >= 1)
@@ -738,16 +735,14 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             {
                 // Is the last line fully used?
                 width -= (1.0 - last_line_width / width) / num_lines;
-                if (width > last_line_width)
-                    width = last_line_width;
+                width = std::min(width, last_line_width);
                 if (static_cast<int>(width) == last_width)
                 {
                     m_cutdown = cutdown;
                     return true;
                 }
             }
-            if (width < too_narrow)
-                width = too_narrow;
+            width = std::max<qreal>(width, too_narrow);
         }
         last_width = width;
     }
@@ -1059,8 +1054,7 @@ int MythUIText::MoveCursor(int lines)
 
     int newLine = lineNo + lines;
 
-    if (newLine < 0)
-        newLine = 0;
+    newLine = std::max(newLine, 0);
 
     if (newLine >= lineCount)
         newLine = lineCount - 1;

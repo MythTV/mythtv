@@ -24,6 +24,7 @@
   Copyleft 1999 Phil Burk - No rights reserved.
 */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include "pink.h"
@@ -41,8 +42,7 @@ static uint32_t generate_random_number( void )
 void initialize_pink_noise( pink_noise_t *pink, int num_rows )
 {
     pink->pink_index = 0;
-    if (num_rows > PINK_MAX_RANDOM_ROWS)
-        num_rows = PINK_MAX_RANDOM_ROWS;
+    num_rows = std::min<int>(num_rows, PINK_MAX_RANDOM_ROWS);
     pink->pink_index_mask = (1ULL << num_rows) - 1;
 /* Calculate maximum possible signed random value. Extra 1 for white noise always added. */
     int32_t pmax = (num_rows + 1) * (1<<(PINK_RANDOM_BITS-1));

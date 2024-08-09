@@ -1,4 +1,5 @@
 // Std
+#include <algorithm>
 #include <chrono>
 using namespace std::chrono_literals;
 #include <limits> // workaround QTBUG-90395
@@ -471,9 +472,8 @@ void MythWebSocket::Write(int64_t Written)
     {
         auto & payload = m_writeQueue.front();
         auto written = payload->m_writePosition;
-        auto towrite = payload->size() - written;
-        if (towrite > available)
-            towrite = available;
+        auto towrite = static_cast<int64_t>(payload->size()) - written;
+        towrite = std::min(towrite, available);
         auto wrote = m_socket->write(payload->constData() + written, towrite);
 
         if (wrote < 0)

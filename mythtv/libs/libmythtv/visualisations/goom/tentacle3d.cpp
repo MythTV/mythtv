@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 
 #include "v3d.h"
@@ -45,9 +46,7 @@ lighten (unsigned char value, float power)
 
 	if (t > 0) {
 		val = (int) t; // (32.0F * log (t));
-		if (val > 255)
-			val = 255;
-		return val;
+		return std::min(val, 255);
 	}
         return 0;
 }
@@ -181,8 +180,7 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
 
 		rapport = 1.0F + 2.0F * (rapport - 1.0F);
                 rapport *= 1.2F;
-		if (rapport > 1.12F)
-			rapport = 1.12F;
+		rapport = std::min(rapport, 1.12F);
 		
 		pretty_move (cycle,&dist,&dist2,&rotangle);
 

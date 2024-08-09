@@ -170,8 +170,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	/* ! etude du signal ... */
 	int incvar = 0;				// volume du son
 	for (int i = 0; i < 512; i++) {
-		if (incvar < data[0][i])
-			incvar = data[0][i];
+		incvar = std::max<int>(incvar, data[0][i]);
 	}
 
 	int i = s_accelVar;
@@ -181,8 +180,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		s_accelVar--;
 		if (s_speedVar > 20)
 			s_accelVar--;
-		if (s_speedVar > 40)
-			s_speedVar = 40;
+		s_speedVar = std::min(s_speedVar, 40);
 	}
 	s_accelVar--;
 
@@ -198,18 +196,14 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		s_speedVar = (s_speedVar*7)/8;
 	}
 
-	if (s_speedVar < 0)
-		s_speedVar = 0;
-	if (s_speedVar > 50)
-		s_speedVar = 50;
+	s_speedVar = std::clamp(s_speedVar, 0, 50);
 
 
 	/* ! calcul du deplacement des petits points ... */
 
         // largfactor: elargissement de l'intervalle d'évolution
 	float largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
-	if (largfactor > 1.5F)
-		largfactor = 1.5F;
+	largfactor = std::min(largfactor, 1.5F);
 
 	s_decayIfs--;
 	if (s_decayIfs > 0)

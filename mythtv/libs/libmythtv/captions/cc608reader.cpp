@@ -299,8 +299,7 @@ int CC608Reader::Update(unsigned char *inpos)
             // - if caption is at bottom, row address is for last
             // row
             // - if caption is at top, row address is for first row (?)
-            if (subtitle.rowcount > 4)
-                subtitle.rowcount = 4;
+            subtitle.rowcount = std::min<int>(subtitle.rowcount, 4);
             if (m_state[streamIdx].m_outputRow < subtitle.rowcount)
             {
                 m_state[streamIdx].m_outputRow = subtitle.rowcount;
@@ -508,8 +507,7 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
         return;
     }
 
-    if (len > m_maxTextSize)
-        len = m_maxTextSize;
+    len = std::min(len, m_maxTextSize);
 
     QMutexLocker locker(&m_inputBufLock);
     int prev_readpos = (m_readPosition - 1 + MAXTBUFFER) % MAXTBUFFER;

@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 
 // ANSI C++ headers
+#include <algorithm>
 #include <cmath>
 #include <cstdarg>
 #include <cstddef>
@@ -124,8 +125,8 @@ pll_add(struct vbi *vbi, int n, int err)
     if (vbi->pll_fixed)
        return;
 
-    if (err > PLL_ERROR*2/3)   // limit burst errors
-       err = PLL_ERROR*2/3;
+    // limit burst errors
+    err = std::min(err, PLL_ERROR*2/3);
 
     vbi->pll_err += err;
     vbi->pll_cnt += n;
@@ -371,8 +372,7 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
        if (p[i] > max)
            max = p[i], sync = i;
     for (i = lo[4]; i < lo[5]; ++i)
-       if (p[i] < min)
-           min = p[i];
+       min = std::min(p[i], min);
     int thr = (min + max) / 2;
 
     p += sync;
@@ -512,10 +512,8 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
     double bpb = fs/6937500.0; // bytes per bit
     int    soc = (int)(9.2e-6*fs) - (int)p->offset;  // start of clock run-in
     int    eoc = (int)(12.9e-6*fs) - (int)p->offset; // end of clock run-in
-    if (soc < 0)
-       soc = 0;
-    if (eoc > bpl - (int)(43*8*bpb))
-       eoc = bpl - (int)(43*8*bpb);
+    soc = std::max(soc, 0);
+    eoc = std::min(eoc, bpl - (int)(43*8*bpb));
     if (eoc - soc < (int)(16*bpb))
     {
        // line too short or offset too large or wrong sample_rate

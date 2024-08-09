@@ -229,10 +229,7 @@ class HLSSegment
     uint32_t Read(uint8_t *buffer, int32_t length, FILE *fd = nullptr)
     {
         int32_t left = m_data.size() - m_played;
-        if (length > left)
-        {
-            length = left;
-        }
+        length = std::min(length, left);
         if (buffer != nullptr)
         {
             memcpy(buffer, m_data.constData() + m_played, length);

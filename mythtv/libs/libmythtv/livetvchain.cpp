@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
@@ -247,8 +249,7 @@ void LiveTVChain::ReloadAll(const QStringList &data)
     }
 
     m_curPos = ProgramIsAt(m_curChanId, m_curStartTs);
-    if (m_curPos < 0)
-        m_curPos = 0;
+    m_curPos = std::max(m_curPos, 0);
 
     if (m_switchId >= 0)
         m_switchId = ProgramIsAt(m_switchEntry.chanid,m_switchEntry.starttime);
@@ -398,8 +399,7 @@ void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
     m_curStartTs = pginfo.GetRecordingStartTime();
 
     m_curPos = ProgramIsAt(pginfo);
-    if (m_curPos < 0)
-        m_curPos = 0;
+    m_curPos = std::max(m_curPos, 0);
     m_switchId = -1;
 }
 

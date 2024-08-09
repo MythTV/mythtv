@@ -1,5 +1,6 @@
 #include "captions/teletextreader.h"
 
+#include <algorithm>
 #include <cstring>
 
 #include "captions/vbilut.h"
@@ -174,10 +175,7 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         return false;
     }
 
-    if (newPage < 0x100)
-        newPage = 0x100;
-    if (newPage > 0x899)
-        newPage = 0x899;
+    newPage = std::clamp(newPage, 0x100, 0x899);
 
     if (!numeric_input)
     {
@@ -248,8 +246,7 @@ QString TeletextReader::GetPage(void)
     {
         // try to centralize the selected sub page in the list
         int startPos = selected - 5;
-        if (startPos < 0)
-            startPos = 0;
+        startPos = std::max(startPos, 0);
         if (startPos + 9 >= count)
             startPos = count - 10;
 
