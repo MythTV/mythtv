@@ -1155,6 +1155,12 @@ typedef struct AVProgram {
     int pcr_pid;
     int pmt_version;
 
+    /**
+     * A reference-counted buffer holding the last seen PMT in an MPEG-TS.
+     * Only set by mpegts-mythtv.
+     */
+    AVBufferRef *pmt_section;
+
     /*****************************************************************
      * All fields below this line are not part of the public API. They
      * may not be used outside of libavformat and can be changed and
@@ -1336,12 +1342,6 @@ typedef struct AVFormatContext {
     /* mpeg-ts support */
     void (*streams_changed)(void*);
     void *stream_change_data;
-
-    /**
-     * A reference-counted buffer holding the last seen PMT in an MPEG-TS.
-     * Only set by mpegts-mythtv.
-     */
-    AVBufferRef *pmt_section;
     /* End Myth addons */
 
     /**
