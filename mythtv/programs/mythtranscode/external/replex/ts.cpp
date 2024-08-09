@@ -26,6 +26,7 @@
  *
  */
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <cstdio>
@@ -201,8 +202,7 @@ static int write_ts_header(uint16_t pid, int payload_start, int count,
 		int size = stuff;
 		unsigned char flags = 0;
 		if(SCR >= 0) {
-			if(size < 7)
-				size = 7;
+			size = std::max(size, 7);
 			flags |= 0x10;
 		}
 		obuf[c++] = size;

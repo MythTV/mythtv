@@ -1,4 +1,5 @@
 // ANSI C headers
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <utility>
@@ -920,14 +921,10 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
 
         auto start = nowAsDuration<std::chrono::microseconds>();
 
-        if (croprow < m_minContentRow)
-            m_minContentRow = croprow;
-        if (cropcol < m_minContentCol)
-            m_minContentCol = cropcol;
-        if (cropcol + cropwidth > m_maxContentCol1)
-            m_maxContentCol1 = cropcol + cropwidth;
-        if (croprow + cropheight > m_maxContentRow1)
-            m_maxContentRow1 = croprow + cropheight;
+        m_minContentRow = std::min(croprow, m_minContentRow);
+        m_minContentCol = std::min(cropcol, m_minContentCol);
+        m_maxContentCol1 = std::max(cropcol + cropwidth, m_maxContentCol1);
+        m_maxContentRow1 = std::max(croprow + cropheight, m_maxContentRow1);
 
         if (resetBuffers(cropwidth, cropheight))
             goto error;

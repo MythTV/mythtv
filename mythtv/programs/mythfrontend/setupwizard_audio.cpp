@@ -1,3 +1,6 @@
+// C++
+#include <algorithm>
+
 // Qt
 #include <QString>
 #include <QVariant>
@@ -230,10 +233,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
         cur_speakers = m_speakerNumberButtonList->GetItemCurrent()->GetData()
                                       .value<int>();
     }
-    if (cur_speakers > m_maxspeakers)
-    {
-        m_maxspeakers = cur_speakers;
-    }
+    m_maxspeakers = std::max(cur_speakers, m_maxspeakers);
     if (restore)
     {
         cur_speakers = m_maxspeakers;

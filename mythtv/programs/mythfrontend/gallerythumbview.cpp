@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 #include <utility>
@@ -1854,8 +1855,7 @@ void GalleryThumbView::SelectZoomWidget(int change)
     m_zoomLevel += change;
 
     // constrain to zoom levels supported by theme
-    if (m_zoomLevel < 0)
-        m_zoomLevel = 0;
+    m_zoomLevel = std::max(m_zoomLevel, 0);
     if (m_zoomLevel >= m_zoomWidgets.size())
         m_zoomLevel = m_zoomWidgets.size() - 1;
 

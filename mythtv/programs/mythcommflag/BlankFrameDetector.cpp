@@ -1,4 +1,5 @@
 // C++ headers
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <utility>
@@ -358,8 +359,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             break;
         long long addb = *iter;
         addb = addb / 2;
-        if (addb > MAX_BLANK_FRAMES)
-            addb = MAX_BLANK_FRAMES;
+        addb = std::min<long long>(addb, MAX_BLANK_FRAMES);
         iib += addb;
         /* Add trailing blanks to commercial break. */
         iter = blankMap->find(iib);
@@ -368,8 +368,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         long long adde = *iter;
         iie += adde;
         long long sube = adde / 2;
-        if (sube > MAX_BLANK_FRAMES)
-            sube = MAX_BLANK_FRAMES;
+        sube = std::min<long long>(sube, MAX_BLANK_FRAMES);
         iie -= sube;
         breakMap->insert(iib, iie - iib);
     }

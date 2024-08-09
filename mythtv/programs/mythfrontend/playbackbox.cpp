@@ -1,6 +1,7 @@
 #include "playbackbox.h"
 
 // C++
+#include <algorithm>
 #include <array>
 
 // QT
@@ -2073,8 +2074,7 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             m_recGroupIdx = m_recGroups.indexOf(m_recGroup);
-            if (m_recGroupIdx < 0)
-                m_recGroupIdx = 0;
+            m_recGroupIdx = std::max(m_recGroupIdx, 0);
         }
     }
 

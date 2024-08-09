@@ -599,8 +599,7 @@ void GuideGrid::Load(void)
         if (chanNum >= (int) m_channelInfos.size())
             continue;
 
-        if (chanNum < 0)
-            chanNum = 0;
+        chanNum = std::max(chanNum, 0);
 
         delete m_programs[y];
         m_programs[y] = getProgramListFromProgram(chanNum);
@@ -1626,8 +1625,7 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
         if (chanNum >= (int) m_channelInfos.size())
             return;
 
-        if (chanNum < 0)
-            chanNum = 0;
+        chanNum = std::max(chanNum, 0);
 
         ProgramList *proglist = nullptr;
         if (useExistingData)
@@ -2215,8 +2213,7 @@ void GuideGrid::updateInfo(void)
         chanNum -= (int)m_channelInfos.size();
     if (chanNum >= (int)m_channelInfos.size())
         return;
-    if (chanNum < 0)
-        chanNum = 0;
+    chanNum = std::max(chanNum, 0);
 
     ChannelInfo *chinfo = GetChannelInfo(chanNum);
 
@@ -2363,8 +2360,7 @@ void GuideGrid::toggleChannelFavorite(int grpid)
         chanNum -= (int)m_channelInfos.size();
     if (chanNum >= (int)m_channelInfos.size())
         return;
-    if (chanNum < 0)
-        chanNum = 0;
+    chanNum = std::max(chanNum, 0);
 
     ChannelInfo *ch = GetChannelInfo(chanNum);
     uint chanid = ch->m_chanId;

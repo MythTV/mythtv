@@ -1,5 +1,6 @@
 
 // C/C++
+#include <algorithm>
 #include <array>
 #include <fcntl.h>
 #include <iostream>
@@ -137,8 +138,7 @@ void Streamer::SendBytes(void)
         .arg(pkt_size).arg(buf_size));
 
     int write_len = m_blockSize.loadAcquire();
-    if (write_len > buf_size)
-        write_len = buf_size;
+    write_len = std::min(write_len, buf_size);
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("SendBytes -- writing %1 bytes").arg(write_len));
 

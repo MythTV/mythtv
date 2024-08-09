@@ -3,6 +3,7 @@
 #include <sys/types.h>
 
 // ANSI C headers
+#include <algorithm>
 #include <cstdlib>
 
 // Qt headers
@@ -237,8 +238,7 @@ void CleanupTask::CleanupProgramListings(void)
     // Also make sure to keep enough data so that we can flag the original
     // airdate, for when that isn't included in guide data
     int newEpiWindow = gCoreContext->GetNumSetting( "NewEpisodeWindow", 14);
-    if (newEpiWindow > offset)
-        offset = newEpiWindow;
+    offset = std::max(newEpiWindow, offset);
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "
                   "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");

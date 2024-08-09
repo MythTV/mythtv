@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <string>
@@ -14,11 +15,9 @@ void Histogram::generateFromImage(MythVideoFrame* frame, unsigned int frameWidth
     m_data.fill(0);
     m_numberOfSamples = 0;
 
-    if (maxScanX > frameWidth-1)
-        maxScanX = frameWidth-1;
+    maxScanX = std::min(maxScanX, frameWidth-1);
 
-    if (maxScanY > frameHeight-1)
-        maxScanY = frameHeight-1;
+    maxScanY = std::min(maxScanY, frameHeight-1);
 
     unsigned char* framePtr = frame->m_buffer;
     int bytesPerLine = frame->m_pitches[0];

@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // C++
+#include <algorithm>
 #include <cmath>
 
 // Qt
@@ -311,8 +312,7 @@ uint V2Channel::GetAvailableChanid ( void ) {
     }
     if (query.next())
         chanId = query.value(0).toUInt() + 1;
-    if (chanId < 1000)
-        chanId = 1000;
+    chanId = std::max<uint>(chanId, 1000);
     return chanId;
 }
 

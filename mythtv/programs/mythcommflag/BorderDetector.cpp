@@ -1,4 +1,5 @@
 #include <sys/time.h>
+#include <algorithm>
 
 #include "libmythbase/mythconfig.h"
 
@@ -165,10 +166,8 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
                         break;  /* Next column. */
                     goto found_left;
                 }
-                if (val < minval)
-                    minval = val;
-                if (val > maxval)
-                    maxval = val;
+                minval = std::min(val, minval);
+                maxval = std::max(val, maxval);
             }
             if (inrange)
             {
@@ -217,10 +216,8 @@ found_left:
                         break;  /* Next column. */
                     goto found_right;
                 }
-                if (val < minval)
-                    minval = val;
-                if (val > maxval)
-                    maxval = val;
+                minval = std::min(val, minval);
+                maxval = std::max(val, maxval);
             }
             if (inrange)
             {
@@ -270,10 +267,8 @@ found_right:
                         break;  /* Next row. */
                     goto found_top;
                 }
-                if (val < minval)
-                    minval = val;
-                if (val > maxval)
-                    maxval = val;
+                minval = std::min(val, minval);
+                maxval = std::max(val, maxval);
             }
             if (inrange)
             {
@@ -319,10 +314,8 @@ found_top:
                         break;  /* Next row. */
                     goto found_bottom;
                 }
-                if (val < minval)
-                    minval = val;
-                if (val > maxval)
-                    maxval = val;
+                minval = std::min(val, minval);
+                maxval = std::max(val, maxval);
             }
             if (inrange)
             {

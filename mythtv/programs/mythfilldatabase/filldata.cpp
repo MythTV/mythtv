@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 // C++ headers
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -477,8 +478,7 @@ bool FillData::Run(DataSourceList &sourcelist)
                 {
                     QDate newDate = MythDate::current().date();
                     i += (newDate.daysTo(qCurrentDate));
-                    if (i < 0)
-                        i = 0;
+                    i = std::max(i, 0);
                     qCurrentDate = newDate;
                 }
 

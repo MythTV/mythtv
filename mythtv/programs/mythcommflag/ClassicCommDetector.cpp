@@ -511,8 +511,7 @@ bool ClassicCommDetector::go()
             if (myTotalFrames)
                 percentage = currentFrameNumber * 100 / myTotalFrames;
 
-            if (percentage > 100)
-                percentage = 100;
+            percentage = std::min(percentage, 100);
 
             if (m_showProgress)
             {
@@ -847,17 +846,10 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
                      blankPixelsChecked++;
                      totBrightness += pixel;
 
-                     if (pixel < min)
-                          min = pixel;
-
-                     if (pixel > max)
-                          max = pixel;
-
-                     if (pixel > rowMax[y])
-                         rowMax[y] = pixel;
-
-                     if (pixel > colMax[x])
-                         colMax[x] = pixel;
+                     min = std::min<int>(pixel, min);
+                     max = std::max<int>(pixel, max);
+                     rowMax[y] = std::max(pixel, rowMax[y]);
+                     colMax[x] = std::max(pixel, colMax[x]);
                  }
             }
         }
@@ -1830,8 +1822,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                    ((m_frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartUpper++;
             uint64_t adj = (lastStartUpper - lastStartLower) / 2;
-            if (adj > MAX_BLANK_FRAMES)
-                adj = MAX_BLANK_FRAMES;
+            adj = std::min<uint64_t>(adj, MAX_BLANK_FRAMES);
             lastStart = lastStartLower + adj;
 
             if (m_verboseDebugging)
@@ -1851,8 +1842,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                    ((m_frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndLower--;
             uint64_t adj = (lastEndUpper - lastEndLower) / 2;
-            if (adj > MAX_BLANK_FRAMES)
-                adj = MAX_BLANK_FRAMES;
+            adj = std::min<uint64_t>(adj, MAX_BLANK_FRAMES);
             lastEnd = lastEndUpper - adj;
 
             if (m_verboseDebugging)
@@ -1999,8 +1989,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
         }
 
         adjustment /= 2;
-        if (adjustment > MAX_BLANK_FRAMES)
-            adjustment = MAX_BLANK_FRAMES;
+        adjustment = std::min<long long>(adjustment, MAX_BLANK_FRAMES);
         r -= adjustment;
         m_blankCommMap[r] = MARK_COMM_END;
         first_comm = false;

@@ -1,4 +1,5 @@
 // C++ headers
+#include <algorithm>
 #include <cstdlib>
 #include <thread> // for sleep_for
 
@@ -293,14 +294,10 @@ void ClassicLogoDetector::SetLogoMaskArea()
         {
             if (m_edgeMask[(y * m_width) + x].m_isEdge)
             {
-                if (x < m_logoMinX)
-                    m_logoMinX = x;
-                if (y < m_logoMinY)
-                    m_logoMinY = y;
-                if (x > m_logoMaxX)
-                    m_logoMaxX = x;
-                if (y > m_logoMaxY)
-                    m_logoMaxY = y;
+                m_logoMinX = std::min(x, m_logoMinX);
+                m_logoMinY = std::min(y, m_logoMinY);
+                m_logoMaxX = std::max(x, m_logoMaxX);
+                m_logoMaxY = std::max(y, m_logoMaxY);
             }
         }
     }
@@ -310,14 +307,10 @@ void ClassicLogoDetector::SetLogoMaskArea()
     m_logoMinY -= 5;
     m_logoMaxY += 5;
 
-    if (m_logoMinX < 4)
-        m_logoMinX = 4;
-    if (m_logoMaxX > (m_width-5))
-        m_logoMaxX = (m_width-5);
-    if (m_logoMinY < 4)
-        m_logoMinY = 4;
-    if (m_logoMaxY > (m_height-5))
-        m_logoMaxY = (m_height-5);
+    m_logoMinX = std::max<unsigned int>(m_logoMinX, 4);
+    m_logoMaxX = std::min<size_t>(m_logoMaxX, m_width-5);
+    m_logoMinY = std::max<unsigned int>(m_logoMinY, 4);
+    m_logoMaxY = std::min<size_t>(m_logoMaxY, m_height-5);
 }
 
 

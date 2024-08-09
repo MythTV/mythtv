@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
@@ -696,8 +697,7 @@ static int get_ts_ext_overhead(int pktsize, audio_frame_t *extframe,
 		int size = extframe[i].framesize * ext[i].frmperpkt;
 		int numpkt = (size + pktdata - 1) / pktdata;
 		int overhead = (pktsize * numpkt - size + numpkt - 1) / numpkt;
-		if(overhead > max)
-			max = overhead;
+		max = std::max(overhead, max);
 	}
 	return pktsize - max;
 }

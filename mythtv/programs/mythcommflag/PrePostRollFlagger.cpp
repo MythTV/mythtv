@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <thread> // for sleep_for
 
 #include "PrePostRollFlagger.h"
@@ -297,8 +298,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             int percentage = 0;
             if (stopFrame)
                 percentage = framesProcessed * 100 / totalFrames;
-            if (percentage > 100)
-                percentage = 100;
+            percentage = std::min(percentage, 100);
 
             if (m_showProgress)
             {

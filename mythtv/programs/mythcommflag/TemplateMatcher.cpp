@@ -152,10 +152,8 @@ int finishedDebug(long long nframes, const unsigned short *matches,
         score = matches[frameno];
         if (match[frameno - 1] == match[frameno])
         {
-            if (score < low)
-                low = score;
-            if (score > high)
-                high = score;
+            low = std::min(score, low);
+            high = std::max(score, high);
             continue;
         }
 
@@ -748,8 +746,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         {
             newbrkb = jj.key();
             long long adj = *jj / 2;
-            if (adj > MAX_BLANK_FRAMES)
-                adj = MAX_BLANK_FRAMES;
+            adj = std::min<long long>(adj, MAX_BLANK_FRAMES);
             newbrkb += adj;
         }
 
@@ -770,8 +767,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
             long long adj = *kk;
             newbrke += adj;
             adj /= 2;
-            if (adj > MAX_BLANK_FRAMES)
-                adj = MAX_BLANK_FRAMES;
+            adj = std::min<long long>(adj, MAX_BLANK_FRAMES);
             newbrke -= adj;
         }
 

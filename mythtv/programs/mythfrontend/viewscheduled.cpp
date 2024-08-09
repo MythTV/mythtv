@@ -1,3 +1,6 @@
+// C++
+#include <algorithm>
+
 // Qt
 #include <QCoreApplication>
 
@@ -293,8 +296,7 @@ void ViewScheduled::LoadList(bool useExistingData)
               recstatus != RecStatus::NeverRecord)))
         {
             m_inputref[pginfo->GetInputID()]++;
-            if (pginfo->GetInputID() > m_maxinput)
-                m_maxinput = pginfo->GetInputID();
+            m_maxinput = std::max(pginfo->GetInputID(), m_maxinput);
 
             QDate date = pginfo->GetRecordingStartTime().toLocalTime().date();
             m_recgroupList[date].push_back(pginfo);

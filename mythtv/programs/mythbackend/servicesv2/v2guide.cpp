@@ -24,6 +24,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // C++
+#include <algorithm>
 #include <cmath>
 
 // MythTV
@@ -101,8 +102,7 @@ V2ProgramGuide *V2Guide::GetProgramGuide( const QDateTime &rawStartTime,
     if (dtEndTime < dtStartTime)
         throw QString( "EndTime is before StartTime");
 
-    if (nStartIndex <= 0)
-        nStartIndex = 0;
+    nStartIndex = std::max(nStartIndex, 0);
 
     if (nCount <= 0)
         nCount = 20000;
@@ -272,8 +272,7 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
 
     sSQL += "program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
 
-    if (nChanId < 0)
-        nChanId = 0;
+    nChanId = std::max(nChanId, 0);
 
     if (nChanId > 0)
     {
