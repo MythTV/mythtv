@@ -133,7 +133,6 @@ struct Program {
     unsigned int id; // program id/service id
     unsigned int nb_pids;
     unsigned int pids[MAX_PIDS_PER_PROGRAM];
-    uint8_t      stream_types[MAX_PIDS_PER_PROGRAM]; // stream_type for pid at same index in pids
     unsigned int nb_streams;
     struct Stream streams[MAX_STREAMS_PER_PROGRAM];
 
@@ -344,8 +343,7 @@ static struct Program * add_program(MpegTSContext *ts, unsigned int programid)
     return p;
 }
 
-// MythTV function
-static void add_pmt_entry_to_program(struct Program *p, unsigned int pid, uint8_t stream_type)
+static void add_pid_to_program(struct Program *p, unsigned int pid)
 {
     int i;
     if (!p)
@@ -358,19 +356,14 @@ static void add_pmt_entry_to_program(struct Program *p, unsigned int pid, uint8_
         if (p->pids[i] == pid)
             return;
 
-    p->stream_types[p->nb_pids] = stream_type;
     p->pids[p->nb_pids++] = pid;
 }
 
-static void add_pid_to_program(struct Program *p, unsigned int pid)
-{
-    add_pmt_entry_to_program(p, pid, 0);
-}
-
-static void update_av_program_info(AVFormatContext *s, unsigned int programid,
+static int update_av_program_info(AVFormatContext *s, unsigned int programid,
                                    unsigned int pid, int version)
 {
     int i;
+    int ret = 0;
     for (i = 0; i < s->nb_programs; i++) {
         AVProgram *program = s->programs[i];
         if (program->id == programid) {
@@ -380,6 +373,7 @@ static void update_av_program_info(AVFormatContext *s, unsigned int programid,
             program->pmt_version = version;
 
             if (old_version != -1 && old_version != version) {
+                ret = 1;
                 av_log(s, AV_LOG_VERBOSE,
                        "detected PMT change (program=%d, version=%d/%d, pcr_pid=0x%x/0x%x)\n",
                        programid, old_version, version, old_pcr_pid, pid);
@@ -387,6 +381,7 @@ static void update_av_program_info(AVFormatContext *s, unsigned int programid,
             break;
         }
     }
+    return ret;
 }
 
 /**
@@ -2399,42 +2394,6 @@ static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream
     return sect;
 }
 
-static int is_pmt_equal(const struct Program *new, const struct Program *old)
-{
-    const int offset = 2; // Program::pids[0] is pmt_pid, [1] is pcr_pid
-    int i = offset;
-
-    if (new->nb_pids != old->nb_pids)
-    {
-        return 0;
-    }
-    if (new->nb_pids <= offset)
-    {
-        return 1;
-    }
-    for (; i < old->nb_pids; i++)
-    {
-        int j = offset;
-        for (; j < new->nb_pids; j++)
-        {
-            if (new->pids[j] == old->pids[i])
-            {
-                break;
-            }
-        }
-        if (j == new->nb_pids)
-        {
-            break;
-        }
-
-        if (new->stream_types[j] != old->stream_types[i])
-        {
-            break;
-        }
-    }
-    return i == new->nb_pids;
-}
-
 /**
 @brief Copy PMT to AVFormatContext for use by MythTV.
 
@@ -2494,6 +2453,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int mp4_descr_count = 0;
     Mp4Descr mp4_descr[MAX_MP4_DESCR_COUNT] = { { 0 } };
     int i;
+    int new_version = 0;
 
     av_log(ts->stream, AV_LOG_TRACE, "PMT: len %i\n", section_len);
     hex_dump_debug(ts->stream, section, section_len);
@@ -2535,7 +2495,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         return;
     pcr_pid &= 0x1fff;
     add_pid_to_program(prg, pcr_pid);
-    update_av_program_info(ts->stream, h->id, pcr_pid, h->version);
+    new_version = update_av_program_info(ts->stream, h->id, pcr_pid, h->version);
 
     av_log(ts->stream, AV_LOG_TRACE, "pcr_pid=0x%x\n", pcr_pid);
 
@@ -2707,7 +2667,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         if (pes && !pes->stream_type)
             mpegts_set_stream_info(st, pes, stream_type, prog_reg_desc);
 
-        add_pmt_entry_to_program(prg, pid, stream_type); // MythTV
+        add_pid_to_program(prg, pid);
         if (prg) {
             prg->streams[i].idx = st->index;
             prg->streams[i].stream_identifier = stream_identifier;
@@ -2746,8 +2706,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     export_pmt(ts->stream, h->id, section, section_len);
 
     /* if the pmt has changed, notify stream_changed listener */
-    if (ts->stream->streams_changed != NULL && prg != NULL &&
-        !is_pmt_equal(prg, &old_program))
+    if (new_version && ts->stream->streams_changed != NULL)
     {
         av_log(ts->stream, AV_LOG_DEBUG, "streams_changed()\n");
         ts->stream->streams_changed(ts->stream->stream_change_data, h->id);
