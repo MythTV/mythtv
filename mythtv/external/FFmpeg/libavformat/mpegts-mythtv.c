@@ -2750,7 +2750,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         !is_pmt_equal(prg, &old_program))
     {
         av_log(ts->stream, AV_LOG_DEBUG, "streams_changed()\n");
-        ts->stream->streams_changed(ts->stream->stream_change_data);
+        ts->stream->streams_changed(ts->stream->stream_change_data, h->id);
     }
     // end MythTV
 
