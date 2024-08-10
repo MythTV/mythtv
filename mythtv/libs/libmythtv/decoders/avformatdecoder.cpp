@@ -864,17 +864,30 @@ bool AvFormatDecoder::CanHandle(TestBufferVec & testbuf, const QString &filename
     return av_probe_input_format2(&probe, static_cast<int>(true), &score) != nullptr;
 }
 
-extern "C" void HandleStreamChange(void *data)
+void AvFormatDecoder::streams_changed(void *data, int avprogram_id)
 {
     auto *decoder = reinterpret_cast<AvFormatDecoder*>(data);
 
     int cnt = decoder->m_ic->nb_streams;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("streams_changed 0x%1 -- stream count %2")
-            .arg((uint64_t)data,0,16).arg(cnt));
+        QString("streams_changed 0x%1 -- program_number %2 stream count %3")
+            .arg((uint64_t)data,0,16).arg(QString::number(avprogram_id), QString::number(cnt)));
 
+    auto* program = decoder->get_current_AVProgram();
+    if (program != nullptr && program->id != avprogram_id)
+    {
+        return;
+    }
     decoder->m_streamsChanged = true;
+}
+
+extern "C"
+{
+    static void HandleStreamChange(void *data, int avprogram_id)
+    {
+        AvFormatDecoder::streams_changed(data, avprogram_id);
+    }
 }
 
 int AvFormatDecoder::FindStreamInfo(void)
