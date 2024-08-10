@@ -36,8 +36,6 @@ class MythSqlDatabase;
 
 struct SwsContext;
 
-extern "C" void HandleStreamChange(void *data);
-
 class AudioInfo
 {
   public:
@@ -81,8 +79,6 @@ class AudioInfo
 /// A decoder for media files.
 class AvFormatDecoder : public DecoderBase
 {
-    friend void HandleStreamChange(void *data);
-
   public:
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
@@ -177,6 +173,8 @@ class AvFormatDecoder : public DecoderBase
     virtual AudioTrackType GetAudioTrackType(uint StreamIndex);
 
     static int GetMaxReferenceFrames(AVCodecContext *Context);
+
+    static void streams_changed(void *data, int avprogram_id);
 
   protected:
     int  AutoSelectTrack(uint type) override; // DecoderBase

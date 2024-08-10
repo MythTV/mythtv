@@ -638,7 +638,7 @@ skip:
 
     /* notify the callback of the change in streams */
     if (s->streams_changed) {
-        s->streams_changed(s->stream_change_data);
+        s->streams_changed(s->stream_change_data, -1);
     }
 
 found:
