@@ -41,6 +41,16 @@ using MythMutterOutputOutList = QList<MythMutterOutputOut>;
 Q_DECLARE_METATYPE(MythMutterOutputOut);
 Q_DECLARE_METATYPE(MythMutterOutputOutList);
 
+// NOLINTBEGIN(bugprone-return-const-ref-from-parameter)
+//
+// Detects return statements that return a constant reference
+// parameter as constant reference. This may cause use-after-free
+// errors if the caller uses xvalues as arguments.
+//
+// In these functions, if a temporary object is supplied to Argument
+// the application could crash.  This shouldn't be a problem, but is
+// something to be aware of.
+
 static QDBusArgument &operator<<(QDBusArgument& Argument, const MythMutterOutputOut& Output)
 {
     Argument.beginStructure();
@@ -182,6 +192,8 @@ static const QDBusArgument &operator>>(const QDBusArgument& Argument, MythMutter
     Argument.endArray();
     return Argument;
 }
+
+// NOLINTEND(bugprone-return-const-ref-from-parameter)
 
 /*! \brief Create a valid instance
  *
