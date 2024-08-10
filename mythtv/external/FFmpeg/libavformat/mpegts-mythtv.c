@@ -1461,13 +1461,6 @@ static PESContext *add_pes_stream(MpegTSContext *ts, int pid, int pcr_pid)
     MpegTSFilter *tss;
     PESContext *pes;
 
-    // MythTV
-    if (tss = ts->pids[pid]) { /* filter already exists */
-        /* kill it, and start a new stream */
-        mpegts_close_filter(ts, tss);
-    }
-    // end MythTV
-
     /* if no pid found, then add a pid context */
     pes = av_mallocz(sizeof(PESContext));
     if (!pes)
