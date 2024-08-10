@@ -1340,7 +1340,7 @@ typedef struct AVFormatContext {
 
     /* Myth addons */
     /* mpeg-ts support */
-    void (*streams_changed)(void*);
+    void (*streams_changed)(void* stream_change_data, int avprogram_id);
     void *stream_change_data;
     /* End Myth addons */
 
