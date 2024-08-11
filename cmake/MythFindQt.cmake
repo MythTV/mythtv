@@ -81,6 +81,7 @@ get_target_property(QMAKE_EXECUTABLE ${QT_PKG_NAME}::qmake IMPORTED_LOCATION)
 
 if(TARGET ${QT_PKG_NAME}::DBus)
   target_compile_definitions(${QT_PKG_NAME}::DBus INTERFACE USING_DBUS)
+  set(CONFIG_QTDBUS ON)
 endif()
 
 # Not all of the Qt6 include directories squirrel the private headers away into
