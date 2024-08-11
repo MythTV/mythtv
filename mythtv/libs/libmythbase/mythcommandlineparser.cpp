@@ -2690,7 +2690,7 @@ void MythCommandLineParser::addLogging(
             "Set the logging level.  All log messages at lower levels will be "
             "discarded.\n"
             "In descending order: emerg, alert, crit, err, warning, notice, "
-            "info, debug\ndefaults to ") + logLevelStr, "")
+            "info, debug, trace\ndefaults to ") + logLevelStr, "")
                 ->SetGroup("Logging");
     add("--syslog", "syslog", "none",
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
