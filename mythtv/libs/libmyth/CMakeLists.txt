@@ -109,6 +109,10 @@ if(TARGET PkgConfig::PULSEAUDIO)
 endif()
 if(UNIX)
   target_sources(myth PRIVATE mediamonitor-unix.cpp mediamonitor-unix.h)
+  if(NOT TARGET ${QT_PKG_NAME}::DBus)
+    set_source_files_properties(mediamonitor-unix.h PROPERTIES SKIP_AUTOMOC
+                                                               TRUE)
+  endif()
 endif()
 if(WIN32)
   target_sources(
@@ -146,8 +150,6 @@ endif()
 #
 # All remaining target information
 #
-
-set_source_files_properties(mediamonitor-unix.h PROPERTIES SKIP_AUTOMOC TRUE)
 
 target_compile_definitions(myth PRIVATE MYTH_API)
 
