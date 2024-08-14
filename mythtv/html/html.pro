@@ -22,6 +22,5 @@ html.files = frontend_index.qsp backend_index.qsp overview.html menu.qsp robots.
 html.files += mythbackend.html mythfrontend.html
 html.files += css images js misc setup samples tv
 html.files += 3rdParty xslt video debug apps assets
-html.depends += frontend backend
 
 INSTALLS += html
