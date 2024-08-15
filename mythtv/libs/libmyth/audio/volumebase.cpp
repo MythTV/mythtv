@@ -122,7 +122,7 @@ uint VolumeBase::GetCurrentVolume(void) const
 
 void VolumeBase::SetCurrentVolume(int value)
 {
-    m_volume = std::max(std::min(value, 100), 0);
+    m_volume = std::clamp(value, 0, 100);
     UpdateVolume();
     
     // Throttle Db writes

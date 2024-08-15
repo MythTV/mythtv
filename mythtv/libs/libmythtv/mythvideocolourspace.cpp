@@ -298,7 +298,7 @@ int MythVideoColourSpace::ChangePictureAttribute(PictureAttribute Attribute, boo
             newvalue = 1;
     }
 
-    newvalue = std::min(std::max(newvalue, 0), 100);
+    newvalue = std::clamp(newvalue, 0, 100);
     if (newvalue != current)
     {
         switch (Attribute)

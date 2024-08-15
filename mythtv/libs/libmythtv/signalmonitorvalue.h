@@ -64,7 +64,7 @@ class SignalMonitorValue
     {
         float rangeconv = ((float) (newmax - newmin)) / (GetMax() - GetMin());
         int newval = (int) (((GetValue() - GetMin()) * rangeconv) + newmin);
-        return std::max( std::min(newval, newmax), newmin );
+        return std::clamp(newval, newmin, newmax);
     }
 
 
@@ -74,7 +74,7 @@ class SignalMonitorValue
     void SetValue(int _value)
     {
         m_set = true;
-        m_value = std::min(std::max(_value,m_minVal),m_maxVal);
+        m_value = std::clamp(_value,m_minVal,m_maxVal);
     }
 
     void SetMin(int _min) { m_minVal = _min; }

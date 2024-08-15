@@ -557,7 +557,7 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
     int value = (int) ((range * m_audVolume * 0.01F) + qctrl.minimum);
-    int ctrl_volume = std::min(qctrl.maximum, std::max(qctrl.minimum, value));
+    int ctrl_volume = std::clamp(value, qctrl.minimum, qctrl.maximum);
 
     // Set recording volume
     struct v4l2_control ctrl {V4L2_CID_AUDIO_VOLUME, ctrl_volume};
@@ -631,7 +631,7 @@ uint MpegRecorder::GetFilteredAudioLayer(void) const
 {
     uint layer = (uint) m_audType;
 
-    layer = std::max(std::min(layer, 3U), 1U);
+    layer = std::clamp(layer, 1U, 3U);
 
     layer = (m_driver == "ivtv") ? 2 : layer;
 
@@ -813,7 +813,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 
         if (!ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl))
         {
-            uint audio_enc = std::max(std::min(m_audType-1, qctrl.maximum), qctrl.minimum);
+            uint audio_enc = std::clamp(m_audType-1, qctrl.minimum, qctrl.maximum);
             add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING, audio_enc);
         }
         else

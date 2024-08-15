@@ -239,7 +239,7 @@ void AutoExpire::CalcParams()
     if (maxKBperMin > 0)
     {
         expireFreq = kSpaceTooBigKB / (maxKBperMin + maxKBperMin/3);
-        expireFreq = std::max(3U, std::min(expireFreq, 15U));
+        expireFreq = std::clamp(expireFreq, 3U, 15U);
     }
 
     double expireMinGB = ((maxKBperMin + maxKBperMin/3)

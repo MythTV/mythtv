@@ -1008,7 +1008,7 @@ bool V4L2util::SetVolume(int volume)
     // calculate volume in card units.
     int range = qctrl.maximum - qctrl.minimum;
     int value = (int) ((range * volume * 0.01F) + qctrl.minimum);
-    int ctrl_volume = std::min(qctrl.maximum, std::max(qctrl.minimum, value));
+    int ctrl_volume = std::clamp(value, qctrl.minimum, qctrl.maximum);
 
     // Set recording volume
     struct v4l2_control ctrl {};

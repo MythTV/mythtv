@@ -827,8 +827,8 @@ void FormattedTextSubtitle::Layout(void)
         anchor_y -= anchor_height;
 
     // Shift the anchor point back into the safe area if necessary/possible.
-    anchor_y = std::max(0, std::min(anchor_y, m_safeArea.height() - anchor_height));
-    anchor_x = std::max(0, std::min(anchor_x, m_safeArea.width() - anchor_width));
+    anchor_y = std::clamp(anchor_y, 0, m_safeArea.height() - anchor_height);
+    anchor_x = std::clamp(anchor_x, 0, m_safeArea.width() - anchor_width);
 
     m_bounds = QRect(anchor_x, anchor_y, anchor_width, anchor_height);
 
@@ -1330,7 +1330,7 @@ void FormattedTextSubtitle608::Init(const std::vector<CC608Text*> &buffers)
             QString captionText =
                 extract_cc608(text, color, isItalic, isUnderline);
             CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
-                                         kClr[std::min(std::max(0, color), 7)]);
+                                         kClr[std::clamp(color, 0, 7)]);
             FormattedTextChunk chunk(captionText, attr, m_subScreen);
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,

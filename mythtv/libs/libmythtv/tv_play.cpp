@@ -3077,7 +3077,7 @@ bool TV::HandleTrackAction(const QString &Action)
             if (m_vbimode == VBIMode::PAL_TT && valid)
                 emit SetTeletextPage(static_cast<uint>(page));
             else if (m_vbimode == VBIMode::NTSC_CC)
-                emit SetTrack(kTrackTypeCC608, static_cast<uint>(std::max(std::min(page - 1, 1), 0)));
+                emit SetTrack(kTrackTypeCC608, static_cast<uint>(std::clamp(page - 1, 0, 1)));
 
             ClearInputQueues(true);
 

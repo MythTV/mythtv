@@ -185,7 +185,7 @@ int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Val
     {
         if (m_vaapiPictureAttributes[i].type == attrib)
         {
-            Value = std::min(std::max(Value, 0), 100);
+            Value = std::clamp(Value, 0, 100);
             int newval = Value + adjustment;
             if (newval > 100) newval -= 100;
             qreal range = (m_vaapiPictureAttributes[i].max_value - m_vaapiPictureAttributes[i].min_value) / 100.0;

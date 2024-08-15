@@ -357,7 +357,7 @@ class MPEG2AudioBitrateSettings : public GroupSetting
         addTargetedChild(layers[1], new MPEG2audBitrateL2(parent));
         addTargetedChild(layers[2], new MPEG2audBitrateL3(parent));
 
-        uint desired_layer = std::max(std::min(3U, default_layer), 1U) - 1;
+        uint desired_layer = std::clamp(default_layer, 1U, 3U) - 1;
         int which = audType->getValueIndex(layers[desired_layer]);
         if (which >= 0)
             audType->setValue(which);
