@@ -696,10 +696,10 @@ class DTVModulationSystem : public DTVParamHelper
                   "Modulation System types don't match DVB includes.");
 #endif
 
-    explicit DTVModulationSystem(uint _value = kModulationSystem_UNDEFINED)
+    explicit DTVModulationSystem(uint8_t _value = kModulationSystem_UNDEFINED)
         : DTVParamHelper(_value) { }
 
-    DTVModulationSystem& operator=(uint _value)
+    DTVModulationSystem& operator=(uint8_t _value)
         { m_value = _value; return *this; }
 
     bool IsCompatible(const DTVModulationSystem other) const
