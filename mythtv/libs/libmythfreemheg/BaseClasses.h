@@ -107,7 +107,7 @@ class MHParseNode;
 class MHOctetString  
 {
   public:
-    MHOctetString();
+    MHOctetString() = default;
     MHOctetString(const char *str, int nLen = -1); // From character string
     MHOctetString(const unsigned char *str, int nLen); // From byte vector
     MHOctetString(const MHOctetString &str, int nOffset=0, int nLen=-1); // Substring

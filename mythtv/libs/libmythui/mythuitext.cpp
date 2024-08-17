@@ -44,25 +44,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 #if 0 // Not currently used
     m_usingAltArea = false;
 #endif
-    m_shrinkNarrow = true;
-    m_multiLine = false;
 
-    m_scrollStartDelay = m_scrollReturnDelay = ScrollBounceDelay;
-    m_scrollPause = 0;
-    m_scrollForwardRate = m_scrollReturnRate = 1.0;
-    m_scrollBounce = false;
-    m_scrollOffset = 0;
-    m_scrollPos = 0;
-    m_scrollPosWhole = 0;
-    m_scrollDirection = ScrollNone;
-    m_scrolling = false;
-
-    m_textCase = CaseNormal;
-    m_ascent = m_descent = m_leftBearing = m_rightBearing = 0;
-    m_leading = 1;
-    m_extraLeading = 0;
-    m_lineHeight = 0;
-    m_textCursor = -1;
     m_enableInitiator = true;
 
     MythUIText::SetArea(MythRect(displayRect));

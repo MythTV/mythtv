@@ -227,10 +227,10 @@ void StreamView::customEvent(QEvent *event)
             }
             else if (tokens[1] == "FINISHED")
             {
-                QString url = args[0];
+                const QString& url = args[0];
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
-                QString filename = args[1];
+                const QString& filename = args[1];
 
                 if ((errorCode != 0) || (fileSize == 0))
                     LOG(VB_GENERAL, LOG_ERR, QString("StreamView: failed to download radio icon from '%1'").arg(url));
@@ -339,7 +339,7 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "EDIT")

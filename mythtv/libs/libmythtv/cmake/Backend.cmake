@@ -8,6 +8,7 @@ if(NOT ENABLE_BACKEND)
   return()
 endif()
 
+target_link_libraries(mythtv PUBLIC PkgConfig::LZO2)
 target_compile_definitions(mythtv PRIVATE USING_BACKEND USING_IPTV)
 target_sources(
   mythtv
@@ -180,12 +181,12 @@ if(TARGET Lame::Lame)
   if(USING_FFMPEG_THREADS)
     target_compile_definitions(mythtv PRIVATE USING_FFMPEG_THREADS)
   endif()
-  # ~~~
-  # if(NOT mingw AND NOT win32-msvc*)
-  #   target_sources(mythtv PRIVATE
-  #                  recorders/NuppelVideoRecorder.cpp recorders/NuppelVideoRecorder.h)
-  # endif()
-  # ~~~
+
+  if(NOT MINGW AND NOT MSVC)
+    target_sources(mythtv PRIVATE recorders/NuppelVideoRecorder.cpp
+                                  recorders/NuppelVideoRecorder.h)
+  endif()
+  target_link_libraries(mythtv PUBLIC Lame::Lame)
 endif()
 
 # Support for cable boxes that provide Firewire out

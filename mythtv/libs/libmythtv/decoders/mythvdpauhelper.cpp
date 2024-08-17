@@ -234,10 +234,10 @@ static void vdpau_preemption_callback(VdpDevice /*unused*/, void* Opaque)
  * \brief A simple wrapper around VDPAU functionality.
 */
 MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
-  : m_device(Context->device),
+  : m_valid(InitProcs()),
+    m_device(Context->device),
     m_vdpGetProcAddress(Context->get_proc_address)
 {
-    m_valid = InitProcs();
     if (m_valid)
     {
         INIT_ST
@@ -254,9 +254,9 @@ static const char* DummyGetError(VdpStatus /*status*/)
 }
 
 MythVDPAUHelper::MythVDPAUHelper(void)
-  : m_createdDevice(true)
+  : m_createdDevice(true),
+    m_display(MythXDisplay::OpenMythXDisplay(false))
 {
-    m_display = MythXDisplay::OpenMythXDisplay(false);
     if (!m_display)
         return;
 

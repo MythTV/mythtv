@@ -13,19 +13,19 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            MythSocketManager *parent,
                            bool usereadahead, std::chrono::milliseconds timeout) :
     SocketHandler(remote, parent, ""),
+    m_pginfo(new ProgramInfo(filename)),
     m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout))
 {
-    m_pginfo = new ProgramInfo(filename);
     m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            MythSocketManager *parent, bool write) :
     SocketHandler(remote, parent, ""),
+    m_pginfo(new ProgramInfo(filename)),
     m_rbuffer(MythMediaBuffer::Create(filename, write)),
     m_writemode(write)
 {
-    m_pginfo = new ProgramInfo(filename);
     m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)

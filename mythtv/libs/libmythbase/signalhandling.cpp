@@ -70,6 +70,7 @@ SignalHandler::SignalHandler(QObject *parent) :
     sig_str_init();
 
 #ifndef _WIN32
+    //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_sigStack = new char[SIGSTKSZ];
     stack_t stack;
     stack.ss_sp = m_sigStack;

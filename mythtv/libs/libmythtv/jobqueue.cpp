@@ -45,6 +45,7 @@ JobQueue::JobQueue(bool master) :
 
 #ifndef USING_VALGRIND
     QMutexLocker locker(&m_queueThreadCondLock);
+    //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_processQueue = true;
     m_queueThread->start();
 #else
@@ -88,7 +89,7 @@ void JobQueue::customEvent(QEvent *e)
             QString msg;
             message = message.simplified();
             QStringList tokens = message.split(" ", Qt::SkipEmptyParts);
-            QString action = tokens[1];
+            const QString& action = tokens[1];
             int jobID = -1;
 
             if (tokens[2] == "ID")

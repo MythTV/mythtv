@@ -38,12 +38,11 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         const QString& lname, VideoMetadata *source_metadata,
         const VideoMetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata),
-    m_metaCache(cache)
+    m_metaCache(cache),
+    m_query(new MetadataDownload(this)),
+    m_imageDownload(new MetadataImageDownload(this))
 {
-    m_query = new MetadataDownload(this);
-    m_imageDownload = new MetadataImageDownload(this);
     m_workingMetadata = new VideoMetadata(*m_origMetadata);
-
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 

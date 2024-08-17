@@ -7,12 +7,12 @@ ClassicSceneChangeDetector::ClassicSceneChangeDetector(unsigned int width,
         unsigned int height, unsigned int commdetectborder_in,
         unsigned int xspacing_in, unsigned int yspacing_in):
     SceneChangeDetectorBase(width,height),
+    m_histogram(new Histogram),
+    m_previousHistogram(new Histogram),
     m_xspacing(xspacing_in),
     m_yspacing(yspacing_in),
     m_commdetectborder(commdetectborder_in)
 {
-    m_histogram = new Histogram;
-    m_previousHistogram = new Histogram;
 }
 
 ClassicSceneChangeDetector::~ClassicSceneChangeDetector()

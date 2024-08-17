@@ -14,9 +14,8 @@
 #include "webpage.h"
 
 WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
+  : m_parent(parent)
 {
-    m_parent = parent;
-
     m_listItem = new MythUIButtonListItem(parent->m_pageList, "", "", false,
                                         MythUIButtonListItem::CantCheck, false);
 
@@ -37,12 +36,10 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
 }
 
 WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
+  : m_parent(parent),
+    m_browser(browser)
 {
-    m_parent = parent;
-
     m_listItem = new MythUIButtonListItem(parent->m_pageList, "");
-
-    m_browser = browser;
 
     connect(m_browser, &MythUIWebBrowser::loadStarted,
             this, &WebPage::slotLoadStarted);

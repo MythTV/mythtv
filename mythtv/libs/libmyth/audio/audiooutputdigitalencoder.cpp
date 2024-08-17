@@ -20,8 +20,8 @@ extern "C" {
 #define LOC QString("DEnc: ")
 
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void)
+  : m_outbuf(static_cast<uint8_t*>(av_mallocz(OUTBUFSIZE)))
 {
-    m_outbuf = static_cast<uint8_t*>(av_mallocz(OUTBUFSIZE));
     if (m_outbuf)
     {
         m_outSize = OUTBUFSIZE;

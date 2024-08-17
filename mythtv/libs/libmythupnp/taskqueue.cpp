@@ -39,9 +39,10 @@ long Task::m_nTaskCount = 0;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Task::Task(const QString &debugName) : ReferenceCounter(debugName)
+Task::Task(const QString &debugName)
+  : ReferenceCounter(debugName),
+    m_nTaskId(m_nTaskCount++)
 {
-    m_nTaskId = m_nTaskCount++;
 }
 
 /////////////////////////////////////////////////////////////////////////////

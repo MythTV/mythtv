@@ -32,20 +32,20 @@
 #include "Logging.h"
 #include "freemheg.h"
 
-MHText::MHText(const MHText &ref): MHVisible(ref) // Copy constructor for cloning.
+MHText::MHText(const MHText &ref) // Copy constructor for cloning.
+  : MHVisible(ref),
+    m_nCharSet(ref.m_nCharSet),
+    m_horizJ(ref.m_horizJ),
+    m_vertJ(ref.m_vertJ),
+    m_lineOrientation(ref.m_lineOrientation),
+    m_startCorner(ref.m_startCorner),
+    m_fTextWrap(ref.m_fTextWrap),
+    m_fNeedsRedraw(ref.m_fNeedsRedraw)
 {
     m_origFont.Copy(ref.m_origFont);
     m_originalFontAttrs.Copy(ref.m_originalFontAttrs);
     m_originalTextColour.Copy(ref.m_originalTextColour);
     m_originalBgColour.Copy(ref.m_originalBgColour);
-    m_nCharSet = ref.m_nCharSet;
-    m_horizJ = ref.m_horizJ;
-    m_vertJ = ref.m_vertJ;
-    m_lineOrientation = ref.m_lineOrientation;
-    m_startCorner = ref.m_startCorner;
-    m_fTextWrap = ref.m_fTextWrap;
-    m_pDisplay = nullptr;
-    m_fNeedsRedraw = ref.m_fNeedsRedraw;
 }
 
 MHText::~MHText()
@@ -472,10 +472,10 @@ class MHTextItem
     MHTextItem();
     MHOctetString m_text;      // UTF-8 text
     QString       m_unicode;   // Unicode text
-    int           m_nUnicode;  // Number of characters in it
-    int           m_width;     // Size of this block
+    int           m_nUnicode{0};  // Number of characters in it
+    int           m_width{0};     // Size of this block
     MHRgba        m_colour;    // Colour of the text
-    int           m_nTabCount; // Number of tabs immediately before this (usually zero)
+    int           m_nTabCount{0}; // Number of tabs immediately before this (usually zero)
 
     // Generate new items inheriting properties from the previous
     MHTextItem *NewItem() const;
@@ -483,10 +483,7 @@ class MHTextItem
 
 MHTextItem::MHTextItem()
 {
-    m_nUnicode = 0;
-    m_width = 0; // Size of this block
     m_colour = MHRgba(0, 0, 0, 255);
-    m_nTabCount = 0;
 }
 
 MHTextItem *MHTextItem::NewItem() const

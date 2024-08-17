@@ -87,7 +87,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
-        ChannelInfo channelInfo = (*chanIt);
+        const ChannelInfo& channelInfo = (*chanIt);
 
         if (!FillChannelInfo(pChannelInfo, channelInfo, bDetails))
         {

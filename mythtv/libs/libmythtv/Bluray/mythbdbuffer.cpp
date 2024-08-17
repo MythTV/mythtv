@@ -78,10 +78,10 @@ static int BDRead(void *Handle, void *Buf, int LBA, int NumBlocks)
 
 MythBDBuffer::MythBDBuffer(const QString &Filename)
   : MythOpticalBuffer(kMythBufferBD),
-    m_overlayPlanes(2, nullptr)
+    m_tryHDMVNavigation(qEnvironmentVariableIsSet("MYTHTV_HDMV")),
+    m_overlayPlanes(2, nullptr),
+    m_mainThread(QThread::currentThread())
 {
-    m_tryHDMVNavigation = qEnvironmentVariableIsSet("MYTHTV_HDMV");
-    m_mainThread = QThread::currentThread();
     MythBDBuffer::OpenFile(Filename);
 }
 

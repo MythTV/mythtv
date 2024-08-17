@@ -85,7 +85,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     class UIGTCon
     {
       public:
-        UIGTCon() { m_arrow = GridTimeNormal; m_recType = m_recStat = 0; };
+        UIGTCon() : m_arrow(GridTimeNormal) { };
         UIGTCon(const QRect drawArea, QString title,
                 const QString &category, int arrow, int recType, int recStat) :
                 m_drawArea(drawArea),               m_title(std::move(title)),
@@ -100,9 +100,9 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
         QString m_title;
         QString m_category;
         QColor m_categoryColor;
-        int m_arrow;
-        int m_recType;
-        int m_recStat;
+        int m_arrow   { GridTimeNormal };
+        int m_recType { 0 };
+        int m_recStat { 0 };
     };
 
     void drawBackground(MythPainter *p, int xoffset, int yoffset,

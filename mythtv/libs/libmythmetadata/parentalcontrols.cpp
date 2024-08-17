@@ -69,8 +69,8 @@ ParentalLevel::ParentalLevel(Level pl) : m_level(pl)
 }
 
 ParentalLevel::ParentalLevel(int pl)
+  : m_level(toParentalLevel(pl))
 {
-    m_level = toParentalLevel(pl);
 }
 
 ParentalLevel::ParentalLevel(const ParentalLevel &rhs)
@@ -214,7 +214,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     Q_OBJECT
 
   public:
-    explicit ParentalLevelChangeCheckerPrivate(QObject *lparent) : QObject(lparent)
+    explicit ParentalLevelChangeCheckerPrivate(QObject *lparent)
+      : QObject(lparent)
     {
         m_pm.Add(ParentalLevel::plHigh,
                 gCoreContext->GetSetting("VideoAdminPassword"));
@@ -222,10 +223,6 @@ class ParentalLevelChangeCheckerPrivate : public QObject
                 gCoreContext->GetSetting("VideoAdminPasswordThree"));
         m_pm.Add(ParentalLevel::plLow,
                 gCoreContext->GetSetting("VideoAdminPasswordTwo"));
-
-        m_passwordOK = false;
-        m_fromLevel = ParentalLevel::plNone;
-        m_toLevel = ParentalLevel::plNone;
     }
 
     void Check(ParentalLevel::Level fromLevel, ParentalLevel::Level toLevel)
@@ -349,16 +346,16 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     }
 
   private:
-    bool m_passwordOK;
-    ParentalLevel::Level m_fromLevel;
-    ParentalLevel::Level m_toLevel;
+    bool m_passwordOK                {false};
+    ParentalLevel::Level m_fromLevel {ParentalLevel::plNone};
+    ParentalLevel::Level m_toLevel   {ParentalLevel::plNone};
     PasswordManager m_pm;
     QStringList m_validPasswords;
 };
 
 ParentalLevelChangeChecker::ParentalLevelChangeChecker()
+  : m_private(new ParentalLevelChangeCheckerPrivate(this))
 {
-    m_private = new ParentalLevelChangeCheckerPrivate(this);
     connect(m_private, &ParentalLevelChangeCheckerPrivate::SigDone,
             this, &ParentalLevelChangeChecker::OnResultReady);
 }

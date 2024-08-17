@@ -367,7 +367,6 @@ MythStreamInfoList::MythStreamInfoList(const QString& filename)
     probe.buf_size = probeBufferSize;
     memset(probe.buf, 0, probeBufferSize + AVPROBE_PADDING_SIZE);
     av_log_set_level(AV_LOG_FATAL);
-    m_errorCode = 0;
     if (filename == "")
         m_errorCode = 97;
     QFile infile(filename);

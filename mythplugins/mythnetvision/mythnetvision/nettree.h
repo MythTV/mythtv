@@ -19,7 +19,7 @@
 
 enum DialogType : std::uint8_t
                 { DLG_DEFAULT = 0, DLG_GALLERY = 0x1, DLG_TREE = 0x2,
-                  DLG_BROWSER = 0x4, dtLast };
+                  DLG_BROWSER = 0x4, dtLast = 0x5 };
 
 enum TreeNodeType : std::int8_t {
     kSubFolder = -1,

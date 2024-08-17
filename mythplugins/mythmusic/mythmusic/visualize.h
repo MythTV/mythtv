@@ -92,7 +92,9 @@ class VisualBase
 class VisFactory
 {
   public:
-    VisFactory() {m_pNextVisFactory = g_pVisFactories; g_pVisFactories = this;}
+    VisFactory()
+        : m_pNextVisFactory(g_pVisFactories)
+        { g_pVisFactories = this;}
     virtual ~VisFactory() = default;
     const VisFactory* next() const {return m_pNextVisFactory;}
     virtual const QString &name(void) const = 0;

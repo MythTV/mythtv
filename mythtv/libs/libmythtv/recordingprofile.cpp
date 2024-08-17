@@ -406,11 +406,11 @@ class AudioCompressionSettings : public GroupSetting
   public:
     AudioCompressionSettings(const RecordingProfile &parentProfile,
                              [[maybe_unused]] V4L2util* v4l2) :
-        m_parent(parentProfile)
+        m_parent(parentProfile),
+        m_codecName(new AudioCodecName(m_parent))
     {
         setName(QObject::tr("Audio Quality"));
 
-        m_codecName = new AudioCodecName(m_parent);
         addChild(m_codecName);
 
         QString label("MP3");
@@ -900,11 +900,11 @@ class VideoCompressionSettings : public GroupSetting
   public:
     VideoCompressionSettings(const RecordingProfile &parentProfile,
                              [[maybe_unused]] V4L2util* v4l2) :
-        m_parent(parentProfile)
+        m_parent(parentProfile),
+        m_codecName(new VideoCodecName(m_parent))
     {
         setName(QObject::tr("Video Compression"));
 
-        m_codecName = new VideoCodecName(m_parent);
         addChild(m_codecName);
 
         QString label("RTjpeg");
@@ -1391,10 +1391,6 @@ RecordingProfile::RecordingProfile(const QString& profName)
 
     setLabel(profName);
     addChild(m_name);
-
-    m_trFilters  = nullptr;
-    m_trLossless = nullptr;
-    m_trResize   = nullptr;
 
     if (!profName.isEmpty())
     {

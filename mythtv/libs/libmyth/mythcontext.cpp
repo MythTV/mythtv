@@ -268,9 +268,9 @@ static void eject_cb(void)
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : m_parent(lparent),
-      m_sh(new MythContextSlotHandler(this))
+      m_sh(new MythContextSlotHandler(this)),
+      m_loop(new QEventLoop(this))
 {
-    m_loop = new QEventLoop(this);
     InitializeMythDirs();
 }
 
@@ -1575,7 +1575,8 @@ void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 }
 
 MythContext::MythContext(QString binversion, bool needsBackend)
-    : m_appBinaryVersion(std::move(binversion))
+    : d(new MythContextPrivate(this)),
+      m_appBinaryVersion(std::move(binversion))
 {
 #ifdef _WIN32
     static bool WSAStarted = false;
@@ -1588,7 +1589,6 @@ MythContext::MythContext(QString binversion, bool needsBackend)
     }
 #endif
 
-    d = new MythContextPrivate(this);
     d->m_needsBackend = needsBackend;
 
     gCoreContext = new MythCoreContext(m_appBinaryVersion, d);

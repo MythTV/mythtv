@@ -97,9 +97,9 @@ static QString PtsTime(int64_t pts)
 }
 
 MPEG2frame::MPEG2frame(int size) :
+    m_pkt(av_packet_alloc()),
     m_mpeg2_seq(), m_mpeg2_gop(), m_mpeg2_pic()
 {
-    m_pkt = av_packet_alloc();
     av_new_packet(m_pkt, size);
 }
 
@@ -132,10 +132,10 @@ void MPEG2frame::set_pkt(AVPacket *newpkt) const
 }
 
 PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
+  : m_keyList(std::move(keys)),
+    m_vidId(vidid)
 {
     poq_idx_t idx {};
-    m_vidId = vidid;
-    m_keyList = std::move(keys);
     m_keyList.append(m_vidId);
 
     idx.newPTS = initPTS;

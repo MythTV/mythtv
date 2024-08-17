@@ -23,7 +23,7 @@ bool MythWebSocketEvent::HandleRawTextMessage(const DataPayloads& Payloads)
 
 bool MythWebSocketEvent::HandleTextMessage(const StringPayload& Text)
 {
-    QString message = *Text;
+    const QString& message = *Text;
 
     if (message.isEmpty())
         return false;

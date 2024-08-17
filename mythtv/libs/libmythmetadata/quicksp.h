@@ -29,8 +29,8 @@ class simple_ref_ptr
     }
 
     simple_ref_ptr(T *ptr)
+      : m_ref(new ref(ptr))
     {
-        m_ref = new ref(ptr);
     }
 
     simple_ref_ptr(const simple_ref_ptr &rhs) : m_ref(nullptr)

@@ -33,16 +33,17 @@
 
 
 // Copy constructor for cloning
-MHVisible::MHVisible(const MHVisible &ref): MHPresentable(ref)
+MHVisible::MHVisible(const MHVisible &ref)
+  : MHPresentable(ref),
+    m_nOriginalBoxWidth(ref.m_nOriginalBoxWidth),
+    m_nOriginalBoxHeight(ref.m_nOriginalBoxHeight),
+    m_nOriginalPosX(ref.m_nOriginalPosX),
+    m_nOriginalPosY(ref.m_nOriginalPosY),
+    m_nBoxWidth(ref.m_nBoxWidth),
+    m_nBoxHeight(ref.m_nBoxHeight),
+    m_nPosX(ref.m_nPosX),
+    m_nPosY(ref.m_nPosY)
 {
-    m_nOriginalBoxWidth = ref.m_nOriginalBoxWidth;
-    m_nOriginalBoxHeight = ref.m_nOriginalBoxHeight;
-    m_nOriginalPosX = ref.m_nOriginalPosX;
-    m_nOriginalPosY = ref.m_nOriginalPosY;
-    m_nBoxWidth = ref.m_nBoxWidth;
-    m_nBoxHeight = ref.m_nBoxHeight;
-    m_nPosX = ref.m_nPosX;
-    m_nPosY = ref.m_nPosY;
     m_originalPaletteRef.Copy(ref.m_originalPaletteRef);
 }
 
@@ -264,15 +265,16 @@ void MHVisible::PutBehind(const MHRoot *pRef, MHEngine *engine)
 }
 
 // Copy constructor for cloning
-MHLineArt::MHLineArt(const MHLineArt &ref): MHVisible(ref)
+MHLineArt::MHLineArt(const MHLineArt &ref)
+  : MHVisible(ref),
+    m_fBorderedBBox(ref.m_fBorderedBBox),
+    m_nOriginalLineWidth(ref.m_nOriginalLineWidth),
+    m_originalLineStyle(ref.m_originalLineStyle),
+    m_nLineWidth(ref.m_nLineWidth),
+    m_lineStyle(ref.m_lineStyle)
 {
-    m_fBorderedBBox = ref.m_fBorderedBBox;
-    m_nOriginalLineWidth = ref.m_nOriginalLineWidth;
-    m_originalLineStyle = ref.m_originalLineStyle;
     m_origLineColour.Copy(ref.m_origLineColour);
     m_origFillColour.Copy(ref.m_origFillColour);
-    m_nLineWidth = ref.m_nLineWidth;
-    m_lineStyle = ref.m_lineStyle;
 }
 
 void MHLineArt::Initialise(MHParseNode *p, MHEngine *engine)

@@ -71,7 +71,9 @@ QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter,
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
-  : Eventing( "UPnpCDS", "CDS_Event", sSharePath )
+  : Eventing( "UPnpCDS", "CDS_Event", sSharePath ),
+    m_sControlUrl("/CDS_Control"),
+    m_pShortCuts(new UPnPShortcutFeature())
 {
     m_root.m_eType       = OT_Container;
     m_root.m_sId         = "0";
@@ -97,9 +99,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     QString sUPnpDescPath = XmlConfiguration().GetValue("UPnP/DescXmlPath", sSharePath);
 
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
-    m_sControlUrl          = "/CDS_Control";
 
-    m_pShortCuts = new UPnPShortcutFeature();
     RegisterFeature(m_pShortCuts);
 
     // Add our Service Definition to the device.
@@ -1039,7 +1039,7 @@ IDTokenMap UPnpCDSExtension::TokenizeIDString(const QString& Id)
 IDToken UPnpCDSExtension::GetCurrentToken(const QString& Id)
 {
     QStringList tokens = Id.split('/');
-    QString current = tokens.last();
+    const QString& current = tokens.last();
     QString key = current.section('=', 0, 0).toLower();
     QString value = current.section('=', 1, 1);
 
@@ -1101,7 +1101,7 @@ QString UPnPShortcutFeature::CreateXML()
     for (it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
     {
         ShortCutType type = it.key();
-        QString objectID = *it;
+        const QString& objectID = *it;
         xml += "<shortcut>\r\n";
         xml += QString("<name>%1</name>\r\n").arg(TypeToName(type));
         xml += QString("<objectID>%1</objectID>\r\n").arg(HTTPRequest::Encode(objectID));

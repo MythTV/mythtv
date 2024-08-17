@@ -41,7 +41,7 @@ struct LogLine {
 
 void StatusBoxItem::Start(std::chrono::seconds Interval)
 {
-    connect(this, &QTimer::timeout, [=]() { emit UpdateRequired(this); });
+    connect(this, &QTimer::timeout, [this]() { emit UpdateRequired(this); });
     start(Interval);
 }
 

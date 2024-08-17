@@ -104,7 +104,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
     {
         DTC::VideoMetadataInfo *pVideoMetadataInfo = pVideoMetadataInfos->AddNewVideoMetadataInfo();
 
-        VideoMetadataListManager::VideoMetadataPtr metadata = videos[n];
+        const VideoMetadataListManager::VideoMetadataPtr& metadata = videos[n];
 
         if (metadata)
             FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );

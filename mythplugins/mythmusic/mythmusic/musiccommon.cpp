@@ -591,7 +591,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         // if we are currently moving an item,
@@ -2733,7 +2733,7 @@ bool MythMusicVolumeDialog::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "UP" || action == "VOLUMEUP")
@@ -2832,7 +2832,7 @@ bool TrackInfoDialog::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "INFO")

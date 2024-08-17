@@ -951,12 +951,9 @@ void MHPersistent::Perform(MHEngine *engine)
     engine->FindObject(m_succeeded)->SetVariableValue(fResult);
 }
 
-MHTransitionTo::MHTransitionTo(): MHElemAction(":TransitionTo")
-{
-    m_fIsTagged = false;
-    m_nConnectionTag = 0;
-    m_nTransitionEffect = -1;
-}
+MHTransitionTo::MHTransitionTo()
+  : MHElemAction(":TransitionTo")
+    {}
 
 void MHTransitionTo::Initialise(MHParseNode *p, MHEngine *engine)
 {

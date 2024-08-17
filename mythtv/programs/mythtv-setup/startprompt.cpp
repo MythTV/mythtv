@@ -24,8 +24,8 @@ struct StartPrompterPrivate
 };
 
 StartPrompter::StartPrompter()
+  : m_d(new StartPrompterPrivate)
 {
-    m_d = new StartPrompterPrivate;
 }
 
 StartPrompter::~StartPrompter()

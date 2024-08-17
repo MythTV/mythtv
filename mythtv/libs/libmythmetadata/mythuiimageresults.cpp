@@ -18,9 +18,9 @@ ImageSearchResultsDialog::ImageSearchResultsDialog(
 
     MythScreenType(lparent, "videosearchresultspopup"),
     m_list(std::move(list)),
-    m_type(type)
+    m_type(type),
+    m_imageDownload(new MetadataImageDownload(this))
 {
-    m_imageDownload = new MetadataImageDownload(this);
 }
 
 ImageSearchResultsDialog::~ImageSearchResultsDialog()

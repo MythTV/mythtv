@@ -77,10 +77,9 @@ static const std::array<std::array<QString,3>,95> comps {{
 }};
 
 MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythUITextEdit *parentEdit)
-          : MythScreenType(parentStack, "MythUIVirtualKeyboard")
+          : MythScreenType(parentStack, "MythUIVirtualKeyboard"),
+            m_parentEdit(parentEdit)
 {
-    m_parentEdit = parentEdit;
-
     if (m_parentEdit)
         m_preferredPos = m_parentEdit->GetKeyboardPosition();
     else
@@ -371,7 +370,7 @@ bool MythUIVirtualKeyboard::keyPressEvent(QKeyEvent *e)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "UP")

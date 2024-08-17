@@ -93,7 +93,7 @@ bool EditMetadataCommon::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "ESCAPE")
@@ -448,7 +448,7 @@ bool EditMetadataDialog::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "THMBUP")
@@ -787,7 +787,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
             if (tokens[0] == "BROWSER_DOWNLOAD_FINISHED")
             {
                 QStringList args = me->ExtraDataList();
-                QString oldFilename = args[1];
+                const QString& oldFilename = args[1];
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
 
@@ -950,7 +950,7 @@ bool EditAlbumartDialog::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "MENU")

@@ -84,8 +84,8 @@
 */
 
 H2645Parser::H2645Parser(void)
+  : m_rbspBuffer(new uint8_t[m_rbspBufferSize])
 {
-    m_rbspBuffer = new uint8_t[m_rbspBufferSize];
     if (m_rbspBuffer == nullptr)
         m_rbspBufferSize = 0;
 }

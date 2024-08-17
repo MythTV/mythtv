@@ -122,9 +122,9 @@ class ScriptableGuide : public QObject
 
     public:
 
-        Q_INVOKABLE explicit ScriptableGuide( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableGuide( QScriptEngine *pEngine, QObject *parent = nullptr )
+          : QObject( parent ), m_pEngine(pEngine)
         {
-            m_pEngine = pEngine;
         }
 
     public slots:

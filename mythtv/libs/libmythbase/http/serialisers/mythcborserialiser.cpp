@@ -8,8 +8,8 @@
 
 #include <QCborStreamWriter>
 MythCBORSerialiser::MythCBORSerialiser(const QString& Name, const QVariant& Value)
+  : m_writer(new QCborStreamWriter(&m_buffer))
 {
-    m_writer = new QCborStreamWriter(&m_buffer);
     QString name = Name;
     if (name.startsWith("V2"))
         name.remove(0,2);

@@ -145,11 +145,12 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     }
 
     /* 20,21 compatibilitydescriptorlength = 0x0000 */
-    if (data[off++] != 0 || data[off++] != 0)
+    if (data[off] != 0 || data[off+1] != 0)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[dsmcc] DSI non zero compatibilityDescriptorLen");
         return;
     }
+    off += 2;
 
     // 22,23 privateData length
     int data_len = (data[off] << 8) | data[off+1];

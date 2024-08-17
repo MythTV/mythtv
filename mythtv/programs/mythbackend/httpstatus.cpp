@@ -52,16 +52,13 @@
 
 HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched,
                         AutoExpire *expirer, bool bIsMaster )
-          : HttpServerExtension( "HttpStatus" , QString())
+          : HttpServerExtension( "HttpStatus" , QString()),
+            m_pSched(sched),
+            m_pEncoders(tvList),
+            m_pExpirer(expirer),
+            m_bIsMaster(bIsMaster)
 {
-    m_pEncoders = tvList;
-    m_pSched    = sched;
-    m_pExpirer  = expirer;
-    m_bIsMaster = bIsMaster;
-
     m_nPreRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
-
-    m_pMainServer = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////

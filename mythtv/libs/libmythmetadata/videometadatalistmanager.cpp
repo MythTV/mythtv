@@ -98,8 +98,8 @@ class VideoMetadataListManagerImp
 };
 
 VideoMetadataListManager::VideoMetadataListManager()
+  : m_imp(new VideoMetadataListManagerImp())
 {
-    m_imp = new VideoMetadataListManagerImp();
 }
 
 VideoMetadataListManager::~VideoMetadataListManager()

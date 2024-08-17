@@ -9,8 +9,8 @@ extern "C" {
 
 
 AudioBuffer::AudioBuffer()
+  : m_buffer((uint8_t *)av_malloc(ABLOCK_SIZE))
 {
-    m_buffer    = (uint8_t *)av_malloc(ABLOCK_SIZE);
     if (m_buffer == nullptr)
     {
         throw std::bad_alloc();

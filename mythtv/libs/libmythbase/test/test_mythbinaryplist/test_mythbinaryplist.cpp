@@ -101,7 +101,7 @@ void TestMythBinaryPList::plist_read(void)
 #endif
     auto list2 = variant2.value<QVariantList>();
     QCOMPARE(list2.size(), 5);
-    QVariant variant3 = list2[4];
+    const QVariant& variant3 = list2[4];
     QVERIFY(variant3.isValid());
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant3.type(), QVariant::String);

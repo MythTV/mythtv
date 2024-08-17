@@ -354,11 +354,11 @@ QString MythWebPage::userAgentForUrl(const QUrl &url) const
  */
 MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
             : QWebView(parent),
-      m_webpage(new MythWebPage(this))
+      m_webpage(new MythWebPage(this)),
+      m_parentBrowser(parentBrowser),
+      m_api(new BrowserApi(this))
 {
     setPage(m_webpage);
-
-    m_parentBrowser = parentBrowser;
 
     connect(page(), &QWebPage::unsupportedContent,
             this, &MythWebView::handleUnsupportedContent);
@@ -368,7 +368,6 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
     page()->setForwardUnsupportedContent(true);
 
-    m_api = new BrowserApi(this);
     m_api->setWebView(this);
 }
 
@@ -417,7 +416,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {
-            QString action = actions[i];
+            const QString& action = actions[i];
             handled = true;
 
             if (action == "NEXTLINK")
@@ -674,7 +673,7 @@ void MythWebView::customEvent(QEvent *event)
             {
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
-                QString filename = args[1];
+                const QString& filename = args[1];
 
                 closeBusyPopup();
 
@@ -1527,7 +1526,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "TOGGLEINPUT")

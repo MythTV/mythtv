@@ -18,9 +18,9 @@
 #include "mythuitext.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIType(parent, name),
+      m_clickTimer(new QTimer())
 {
-    m_clickTimer = new QTimer();
     m_clickTimer->setSingleShot(true);
 
     connect(m_clickTimer, &QTimer::timeout, this, &MythUIButton::UnPush);
@@ -129,7 +129,7 @@ bool MythUIButton::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "SELECT")

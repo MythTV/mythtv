@@ -25,8 +25,8 @@ struct ExitPrompterPrivate
 };
 
 ExitPrompter::ExitPrompter()
+  : m_d(new ExitPrompterPrivate)
 {
-    m_d = new ExitPrompterPrivate;
 }
 
 ExitPrompter::~ExitPrompter()

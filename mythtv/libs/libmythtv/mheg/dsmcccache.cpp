@@ -29,9 +29,9 @@
  */
 
 DSMCCCache::DSMCCCache(Dsmcc *dsmcc)
-{
     // Delete all this when the cache is deleted.
-    m_dsmcc = dsmcc;
+  : m_dsmcc(dsmcc)
+{
 }
 
 DSMCCCache::~DSMCCCache()

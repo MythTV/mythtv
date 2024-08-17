@@ -54,8 +54,10 @@ namespace M3U
         int p = line.indexOf(QLatin1String(":"));
         if (p < 0)
             return false;
-        int i = p;
-        while (++i < line.size() && line[i].isNumber());
+        int i = p + 1;
+        for ( ; i < line.size(); i++)
+            if (!line[i].isNumber())
+                break;
         if (i == p + 1)
             return false;
         target = line.mid(p + 1, i - p - 1).toInt();
@@ -71,8 +73,10 @@ namespace M3U
         int p = line.indexOf(QLatin1String(":"));
         if (p < 0)
             return false;
-        int i = p;
-        while (++i < line.size() && line[i].isNumber());
+        int i = p + 1;
+        for ( ; i < line.size(); i++)
+            if (!line[i].isNumber())
+                break;
         if (i == p + 1)
             return false;
         target = line.mid(p + 1, i - p - 1).toInt();
@@ -213,7 +217,7 @@ namespace M3U
             return false;
         }
 
-        QString val = list[0];
+        const QString& val = list[0];
 
         if (version < 3)
         {

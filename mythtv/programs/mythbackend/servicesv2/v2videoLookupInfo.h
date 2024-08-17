@@ -36,8 +36,6 @@ class V2ArtworkItem : public QObject
         Q_INVOKABLE V2ArtworkItem(QObject *parent = nullptr)
                         : QObject         ( parent )
         {
-            m_Width            = 0                      ;
-            m_Height           = 0                      ;
         }
 
         void Copy( const V2ArtworkItem *src )
@@ -91,14 +89,6 @@ class V2VideoLookup : public QObject
         Q_INVOKABLE V2VideoLookup(QObject *parent = nullptr)
                         : QObject         ( parent )
         {
-            m_Season           = 0                      ;
-            m_Episode          = 0                      ;
-            m_Year             = 0                      ;
-            m_UserRating       = 0.0                    ;
-            m_Length           = 0.0                    ;
-            m_Popularity       = 0.0                    ;
-            m_Budget           = 0                      ;
-            m_Revenue          = 0                      ;
         }
 
         void Copy( const V2VideoLookup *src )

@@ -127,9 +127,9 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
 }
 
 GrabberManager::GrabberManager()
-    : m_updateFreq(gCoreContext->GetDurSetting<std::chrono::hours>("netsite.updateFreq", 24h))
+    : m_timer(new QTimer()),
+      m_updateFreq(gCoreContext->GetDurSetting<std::chrono::hours>("netsite.updateFreq", 24h))
 {
-    m_timer = new QTimer();
     connect( m_timer, &QTimer::timeout,
                       this, &GrabberManager::timeout);
 }
@@ -171,9 +171,9 @@ void GrabberManager::refreshAll()
 }
 
 GrabberDownloadThread::GrabberDownloadThread(QObject *parent) :
-    MThread("GrabberDownload")
+    MThread("GrabberDownload"),
+    m_parent(parent)
 {
-    m_parent = parent;
 }
 
 GrabberDownloadThread::~GrabberDownloadThread()

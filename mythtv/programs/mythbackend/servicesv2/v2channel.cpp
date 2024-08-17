@@ -141,7 +141,7 @@ V2ChannelInfoList* V2Channel::GetChannelInfoList( uint nSourceID,
     {
         V2ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
-        ChannelInfo channelInfo = (*chanIt);
+        const ChannelInfo& channelInfo = (*chanIt);
 
         if (!V2FillChannelInfo(pChannelInfo, channelInfo, bDetails))
         {
@@ -983,7 +983,7 @@ V2GrabberList* V2Channel::GetGrabberList  (  )
             QString grabber_list(ostream.readLine());
             QStringList grabber_split =
                 grabber_list.split("|", Qt::SkipEmptyParts);
-            QString grabber_name = grabber_split[1];
+            const QString& grabber_name = grabber_split[1];
             QFileInfo grabber_file(grabber_split[0]);
             QString program = grabber_file.fileName();
 

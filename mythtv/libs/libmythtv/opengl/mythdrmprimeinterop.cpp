@@ -148,7 +148,7 @@ MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
     bool composed   = static_cast<uint>(drmdesc->nb_layers) == 1 && m_composable;
     auto id         = reinterpret_cast<unsigned long long>(drmdesc);
 
-    auto Separate = [=]()
+    auto Separate = [this, id, drmdesc, Frame, firstpass, ColourSpace]()
     {
         std::vector<MythVideoTextureOpenGL*> textures;
         if (!m_openglTextures.contains(id))

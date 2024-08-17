@@ -46,7 +46,7 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(this, &MythPlayerCaptionsUI::PlayInteractiveStream,   this, &MythPlayerCaptionsUI::StreamPlay);
 
     // Signalled from the decoder
-    connect(this, &MythPlayerCaptionsUI::EnableSubtitles, this, [=](bool Enable) { this->SetCaptionsEnabled(Enable, false); });
+    connect(this, &MythPlayerCaptionsUI::EnableSubtitles, this, [this](bool Enable) { this->SetCaptionsEnabled(Enable, false); });
     connect(this, &MythPlayerCaptionsUI::SignalTracksChanged, this, &MythPlayerCaptionsUI::TracksChanged);
 
     // Signalled from the base class

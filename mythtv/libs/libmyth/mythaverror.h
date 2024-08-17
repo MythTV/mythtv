@@ -52,10 +52,7 @@ extern "C" {
 class MPUBLIC MythAVFrame
 {
   public:
-    MythAVFrame(void)
-    {
-        m_frame = av_frame_alloc();
-    }
+    MythAVFrame(void) : m_frame(av_frame_alloc()) {}
     ~MythAVFrame(void)
     {
         av_frame_free(&m_frame);

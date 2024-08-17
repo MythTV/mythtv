@@ -31,9 +31,9 @@ const QEvent::Type DecoderHandlerEvent::kOperationStop = (QEvent::Type) QEvent::
 const QEvent::Type DecoderHandlerEvent::kError = (QEvent::Type) QEvent::registerEventType();
 
 DecoderHandlerEvent::DecoderHandlerEvent(Type type, const MusicMetadata &meta)
-    : MythEvent(type)
+    : MythEvent(type),
+      m_meta(new MusicMetadata(meta))
 { 
-    m_meta = new MusicMetadata(meta);
 }
 
 DecoderHandlerEvent::~DecoderHandlerEvent(void)
@@ -232,10 +232,10 @@ void DecoderHandler::customEvent(QEvent *event)
             }
             else if (tokens[1] == "FINISHED")
             {
-                QString downloadUrl = args[0];
+                const QString& downloadUrl = args[0];
                 int fileSize  = args[2].toInt();
                 int errorCode = args[4].toInt();
-                QString filename = args[1];
+                const QString& filename = args[1];
 
                 if ((errorCode != 0) || (fileSize == 0))
                 {

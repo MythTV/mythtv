@@ -132,9 +132,9 @@ class ScriptableCapture : public QObject
 
     public:
 
-        Q_INVOKABLE explicit ScriptableCapture( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableCapture( QScriptEngine *pEngine, QObject *parent = nullptr )
+          : QObject( parent ), m_pEngine(pEngine)
         {
-            m_pEngine = pEngine;
         }
 
     public slots:

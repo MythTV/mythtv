@@ -231,17 +231,6 @@ MSocketDevice::~MSocketDevice()
 
 
 /*!
-    Returns true if this is a valid socket; otherwise returns false.
-
-    \sa socket()
-*/
-bool MSocketDevice::isValid() const
-{
-    return m_fd != -1;
-}
-
-
-/*!
     \fn Type MSocketDevice::type() const
 
     Returns the socket type which is either MSocketDevice::Stream

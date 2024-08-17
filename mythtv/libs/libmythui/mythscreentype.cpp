@@ -60,12 +60,10 @@ class ScreenLoadTask : public QRunnable
 
 MythScreenType::MythScreenType(
     MythScreenStack *parent, const QString &name, bool fullscreen) :
-    MythUIComposite(parent, name)
+    MythUIComposite(parent, name),
+    m_fullScreen(fullscreen),
+    m_screenStack(parent)
 {
-    m_fullScreen = fullscreen;
-
-    m_screenStack = parent;
-
     // Can be overridden, of course, but default to full sized.
     m_area = GetMythMainWindow()->GetUIScreenRect();
 
@@ -76,10 +74,9 @@ MythScreenType::MythScreenType(
 
 MythScreenType::MythScreenType(
     MythUIType *parent, const QString &name, bool fullscreen) :
-    MythUIComposite(parent, name)
+    MythUIComposite(parent, name),
+    m_fullScreen(fullscreen)
 {
-    m_fullScreen = fullscreen;
-
     m_area = GetMythMainWindow()->GetUIScreenRect();
 
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
@@ -413,7 +410,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "LEFT" || action == "UP" || action == "PREVIOUS")

@@ -355,19 +355,19 @@ class DTVModulation : public DTVParamHelper
   public:
     enum Types : std::uint16_t
     {
-        kModulationQPSK,
-        kModulationQAM16,
-        kModulationQAM32,
-        kModulationQAM64,
-        kModulationQAM128,
-        kModulationQAM256,
-        kModulationQAMAuto,
-        kModulation8VSB,
-        kModulation16VSB,
-        kModulation8PSK,
-        kModulation16APSK,
-        kModulation32APSK,
-        kModulationDQPSK,
+        kModulationQPSK    = 0x000,
+        kModulationQAM16   = 0x001,
+        kModulationQAM32   = 0x002,
+        kModulationQAM64   = 0x003,
+        kModulationQAM128  = 0x004,
+        kModulationQAM256  = 0x005,
+        kModulationQAMAuto = 0x006,
+        kModulation8VSB    = 0x007,
+        kModulation16VSB   = 0x008,
+        kModulation8PSK    = 0x009,
+        kModulation16APSK  = 0x00A,
+        kModulation32APSK  = 0x00B,
+        kModulationDQPSK   = 0x00C,
         kModulationInvalid = 0x100, /* for removed modulations */
         kModulationAnalog  = 0x200, /* for analog channel scanner */
     };

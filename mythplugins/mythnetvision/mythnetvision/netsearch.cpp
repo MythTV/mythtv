@@ -129,7 +129,7 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "MENU")
@@ -419,7 +419,7 @@ void NetSearch::PopulateResultList(const ResultItem::resultList& list)
 {
     for (const auto & result : std::as_const(list))
     {
-        QString title = result->GetTitle();
+        const QString& title = result->GetTitle();
         auto *item = new MythUIButtonListItem(m_searchResultList, title,
                                               QVariant::fromValue(result));
         InfoMap metadataMap;

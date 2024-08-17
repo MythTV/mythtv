@@ -25,6 +25,7 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
                      const QString &sSourceProtocols, 
                      const QString &sSinkProtocols ) 
          : Eventing( "UPnpCMGR", "CMGR_Event", sSharePath)
+         , m_sControlUrl("/CMGR_Control")
 {
     AddVariable( new StateVariable< QString >( "SourceProtocolInfo"  , true ) );
     AddVariable( new StateVariable< QString >( "SinkProtocolInfo"    , true ) );
@@ -38,7 +39,6 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
 
     QString sUPnpDescPath = XmlConfiguration().GetValue( "UPnP/DescXmlPath", m_sSharePath);
     m_sServiceDescFileName = sUPnpDescPath + "CMGR_scpd.xml";
-    m_sControlUrl          = "/CMGR_Control";
 
     // Add our Service Definition to the device.
 

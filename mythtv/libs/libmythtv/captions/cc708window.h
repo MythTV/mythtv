@@ -243,9 +243,9 @@ class MTV_PUBLIC CC708Window
     bool            m_visible           {false};
  public:
     enum : std::uint8_t {
-        kAnchorUpperLeft  = 0, kAnchorUpperCenter, kAnchorUpperRight,
-        kAnchorCenterLeft = 3, kAnchorCenter,      kAnchorCenterRight,
-        kAnchorLowerLeft  = 6, kAnchorLowerCenter, kAnchorLowerRight,
+        kAnchorUpperLeft  = 0, kAnchorUpperCenter = 1, kAnchorUpperRight  = 2,
+        kAnchorCenterLeft = 3, kAnchorCenter      = 4, kAnchorCenterRight = 5,
+        kAnchorLowerLeft  = 6, kAnchorLowerCenter = 7, kAnchorLowerRight  = 8,
     };
     uint            m_anchor_point      {0};
     uint            m_relative_pos      {0};

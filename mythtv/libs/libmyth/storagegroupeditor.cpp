@@ -52,7 +52,7 @@ bool StorageGroupEditor::keyPressEvent(QKeyEvent *e)
         GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
 
         if (action == "DELETE")
         {
@@ -185,7 +185,7 @@ bool StorageGroupDirSetting::keyPressEvent(QKeyEvent *event)
         GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
 
         if (action == "DELETE")
         {

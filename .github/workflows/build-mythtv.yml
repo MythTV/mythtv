@@ -323,16 +323,6 @@ jobs:
             configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
             linkerflags: '-Wl,-ld_classic'
             cross_compile: false
-          - desc: 'macOS 14 (Sonoma) x86_64'
-            runner: 'macOS-14'
-            arch: 'x86_64'
-            python_dot_version: '3.11'
-            qt_version: 'qt5'
-            database_version: 'mysql8'
-            extrapkgs: ''
-            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
-            linkerflags: '-Wl,-ld_classic'
-            cross_compile: true
           - desc: 'macOS 14 (Sonoma) arm64'
             runner: 'macOS-14'
             arch: 'arm64'

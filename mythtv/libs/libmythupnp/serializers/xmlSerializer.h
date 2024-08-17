@@ -73,7 +73,7 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
 
         bool     PropertiesAsAttributes {true};
 
-                 XmlSerializer( QIODevice *pDevice, const QString &sRequestName );
+                 XmlSerializer( QIODevice *pDevice, QString sRequestName );
         virtual ~XmlSerializer();
 
         QString GetContentType() override; // Serializer

@@ -104,9 +104,9 @@ LoggerBase::~LoggerBase()
 /// \brief FileLogger constructor
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
-        LoggerBase(filename)
+        LoggerBase(filename),
+        m_fd(open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664))
 {
-    m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
     LOG(VB_GENERAL, LOG_INFO, QString("Added logging to %1")
              .arg(filename));

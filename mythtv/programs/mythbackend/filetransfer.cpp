@@ -19,10 +19,10 @@
 BEFileTransfer::BEFileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, std::chrono::milliseconds timeout) :
     ReferenceCounter(QString("BEFileTransfer:%1").arg(filename)),
+    m_pginfo(new ProgramInfo(filename)),
     m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout, true)),
     m_sock(remote)
 {
-    m_pginfo = new ProgramInfo(filename);
     m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
     if (m_rbuffer && m_rbuffer->IsOpen())
         m_rbuffer->Start();
@@ -30,10 +30,10 @@ BEFileTransfer::BEFileTransfer(QString &filename, MythSocket *remote,
 
 BEFileTransfer::BEFileTransfer(QString &filename, MythSocket *remote, bool write) :
     ReferenceCounter(QString("BEFileTransfer:%1").arg(filename)),
+    m_pginfo(new ProgramInfo(filename)),
     m_rbuffer(MythMediaBuffer::Create(filename, write)),
     m_sock(remote), m_writemode(write)
 {
-    m_pginfo = new ProgramInfo(filename);
     m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)

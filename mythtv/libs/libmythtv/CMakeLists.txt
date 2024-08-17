@@ -279,6 +279,7 @@ target_link_libraries(
          PkgConfig::LIBPOSTPROC
          Iconv::Iconv
          $<TARGET_NAME_IF_EXISTS:PkgConfig::LibXml2>
+         $<TARGET_NAME_IF_EXISTS:PkgConfig::SYSTEMD>
          PkgConfig::LIBCRYPTO
          PkgConfig::SoundTouch
          mythbluray

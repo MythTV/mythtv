@@ -19,9 +19,9 @@
 #define LOC      QString("MythUIVideo(0x%1): ").arg((uint64_t)this, 0, 16)
 
 MythUIVideo::MythUIVideo(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIType(parent, name),
+      m_image(GetMythPainter()->GetFormatImage())
 {
-    m_image = GetMythPainter()->GetFormatImage();
 }
 
 MythUIVideo::~MythUIVideo()

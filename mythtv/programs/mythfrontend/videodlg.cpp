@@ -849,9 +849,9 @@ class VideoListDeathDelayPrivate
 };
 
 VideoListDeathDelay::VideoListDeathDelay(const VideoDialog::VideoListPtr& toSave) :
-    QObject(QCoreApplication::instance())
+    QObject(QCoreApplication::instance()),
+    m_d(new VideoListDeathDelayPrivate(toSave))
 {
-    m_d = new VideoListDeathDelayPrivate(toSave);
     QTimer::singleShot(kDelayTimeMS, this, &VideoListDeathDelay::OnTimeUp);
 }
 
@@ -1945,7 +1945,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "INFO")
@@ -2011,7 +2011,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {
-            QString action = actions[i];
+            const QString& action = actions[i];
             if (action == "PLAYBACK")
             {
                 handled = true;

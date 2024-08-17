@@ -197,7 +197,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
     bool needUpdate = false;
     for (uint i = 0; i < uint(actions.size()) && !handled; ++i)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "PREVVIEW")

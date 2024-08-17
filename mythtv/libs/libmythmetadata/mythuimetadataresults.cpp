@@ -18,9 +18,9 @@ MetadataResultsDialog::MetadataResultsDialog(
     const MetadataLookupList &results) :
 
     MythScreenType(lparent, "metadataresultspopup"),
-    m_results(results)
+    m_results(results),
+    m_imageDownload(new MetadataImageDownload(this))
 {
-    m_imageDownload = new MetadataImageDownload(this);
 }
 
 MetadataResultsDialog::~MetadataResultsDialog()

@@ -17,10 +17,10 @@
 
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
-          : MusicCommon(parent, nullptr, "music_miniplayer")
+          : MusicCommon(parent, nullptr, "music_miniplayer"),
+            m_displayTimer(new QTimer(this))
 {
     m_currentView = MV_MINIPLAYER;
-    m_displayTimer = new QTimer(this);
     m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, &QTimer::timeout, this, &MiniPlayer::timerTimeout);
 }
@@ -80,7 +80,7 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "SELECT")

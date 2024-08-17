@@ -49,6 +49,7 @@ ProfileGroup::ProfileGroup()
     auto *cardInfo = new CardInfo(*this);
     addChild(cardInfo);
     CardType::fillSelections(cardInfo);
+    //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_host = new HostName(*this);
     addChild(m_host);
     m_host->fillSelections();

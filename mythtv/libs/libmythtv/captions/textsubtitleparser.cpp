@@ -172,9 +172,11 @@ struct local_buffer_t {
 };
 
 TextSubtitleParser::TextSubtitleParser(SubtitleReader *parent, QString fileName, TextSubtitles *target)
-    : m_parent(parent), m_target(target), m_fileName(std::move(fileName))
+    : m_parent(parent),
+      m_target(target),
+      m_fileName(std::move(fileName)),
+      m_pkt(av_packet_alloc())
 {
-    m_pkt = av_packet_alloc();
 }
 
 TextSubtitleParser::~TextSubtitleParser()

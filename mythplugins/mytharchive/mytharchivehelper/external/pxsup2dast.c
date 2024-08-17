@@ -66,17 +66,10 @@ typedef int_fast32_t fi32;	typedef uint_fast32_t fu32;
 #endif
 
 
-#if (__GNUC__ >= 3)
 #define GCCATTR_PRINTF(m, n) __attribute__ ((format (printf, m, n)))
 #define GCCATTR_UNUSED	 __attribute ((unused))
 #define GCCATTR_NORETURN __attribute ((noreturn))
 #define GCCATTR_CONST	 __attribute ((const))
-#else
-#define GCCATTR_PRINTF(m, n)
-#define GCCATTR_UNUSED
-#define GCCATTR_NORETURN
-#define GCCATTR_CONST
-#endif
 
 /* use this only to cast quoted strings in function calls */
 #define CUS (const unsigned char *)
@@ -130,15 +123,14 @@ struct
 
 #define exc_cleanup() EXC.m_last = NULL;
 
-static void __exc_throw(int type) /* protoadd GCCATTR_NORETURN */ 
+GCCATTR_NORETURN static void __exc_throw(int type)
 {
     struct exc__state * exc_s = EXC.m_last;
     EXC.m_last = EXC.m_last->m_prev;
     longjmp(exc_s->m_env, type);
 }
 
-static void exc_throw(int type, const char * format, ...)
-    /* protoadd GCCATTR_NORETURN */ 
+GCCATTR_NORETURN static void exc_throw(int type, const char * format, ...)
 {
     if (format != NULL) 
     {
@@ -305,22 +297,30 @@ static bool dexists(const char * filename)
 
 static fu32 get_uint32_be(const eu8 * bytes)  
 {
-    return (bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3]; 
+    return ((fu32)(bytes[0]) << 24) +
+           ((fu32)(bytes[1]) << 16) +
+           ((fu32)(bytes[2]) << 8) +
+            (fu32)(bytes[3]);
 }
 
 static fu16 get_uint16_be(const eu8 * bytes)
 {
-    return (bytes[0] << 8) + bytes[1]; 
+    return ((fu16)(bytes[0]) << 8) +
+            (fu16)(bytes[1]);
 }
 
 static fu32 get_uint32_le(const eu8 * bytes)  
 {
-    return (bytes[3] << 24) + (bytes[2] << 16) + (bytes[1] << 8) + bytes[0]; 
+    return ((fu32)(bytes[3]) << 24) +
+           ((fu32)(bytes[2]) << 16) +
+           ((fu32)(bytes[1]) << 8) +
+            (fu32)(bytes[0]);
 }
 
 #if 0  /* protoline */
 static fu32 get_uint16_le(const eu8 * bytes)  {
-    return (bytes[1] << 8) + bytes[0]; }
+    return ((fu16)(bytes[1]) << 8) +
+            (fu16)(bytes[0]); }
 #endif  /* protoline */
 
 
@@ -844,13 +844,14 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
         if (len != strlen(sptsstr))
             printf("ERROR: write failed");
         exc_cleanup();
+        fclose(sfh);
         return;
     }
     exc_end(1);
 }
 
 #if 0
-static void usage(const char * pn) /* protoadd GCCATTR_NORETURN */
+GCCATTR_NORETURN static void usage(const char * pn)
 {
     exc_throw(MiscError, "\n"
               "Usage: %s [--delay ms] <supfile> <ifofile>|<palette>" "\n"

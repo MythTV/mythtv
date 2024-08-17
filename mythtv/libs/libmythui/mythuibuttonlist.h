@@ -44,8 +44,8 @@ class MUI_PUBLIC MythUIButtonListItem
     enum CheckState : std::int8_t {
         CantCheck = -1,
         NotChecked = 0,
-        HalfChecked,
-        FullChecked
+        HalfChecked = 1,
+        FullChecked = 2
     };
 
     MythUIButtonListItem(MythUIButtonList *lbtype, QString text,
@@ -279,8 +279,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     enum ArrangeType : std::uint8_t
                      { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
     enum WrapStyle   : std::int8_t
-                     { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
-                       WrapFlowing };
+                     { WrapCaptive = -1, WrapNone = 0, WrapSelect = 1,
+                       WrapItems = 2, WrapFlowing = 3 };
 
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                   int alphaMod, QRect clipRect) override; // MythUIType

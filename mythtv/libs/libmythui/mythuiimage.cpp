@@ -563,13 +563,13 @@ MythUIImage::MythUIImage(const QString &filepattern,
     : MythUIType(parent, name),
       m_delay(delay),
       m_lowNum(low),
-      m_highNum(high)
+      m_highNum(high),
+      d(new MythUIImagePrivate(this))
 {
     m_imageProperties.m_filename = filepattern;
 
     m_enableInitiator = true;
 
-    d = new MythUIImagePrivate(this);
     emit DependChanged(false);
 }
 
@@ -577,23 +577,22 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
                          const QString &name)
     : MythUIType(parent, name),
       m_origFilename(filename),
-      m_delay(-1ms)
+      m_delay(-1ms),
+      d(new MythUIImagePrivate(this))
 {
     m_imageProperties.m_filename = filename;
 
     m_enableInitiator = true;
 
-    d = new MythUIImagePrivate(this);
     emit DependChanged(false);
 }
 
 MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
-      m_delay(-1ms)
+      m_delay(-1ms),
+      d(new MythUIImagePrivate(this))
 {
     m_enableInitiator = true;
-
-    d = new MythUIImagePrivate(this);
 }
 
 MythUIImage::~MythUIImage()

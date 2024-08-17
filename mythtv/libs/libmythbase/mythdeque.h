@@ -38,7 +38,7 @@ class MythDeque : public std::deque<T>
         return item;
     }
     /// \brief Adds item to the back of the list. O(1).
-    void enqueue(T d) { std::deque<T>::push_back(d); }
+    void enqueue(const T& d) { std::deque<T>::push_back(d); }
 
     using iterator = typename std::deque<T>::iterator;
     using const_iterator = typename std::deque<T>::const_iterator;

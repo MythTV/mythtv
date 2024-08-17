@@ -46,12 +46,11 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-       : MythScreenType(parent, "GameUI")
+       : MythScreenType(parent, "GameUI"),
+         m_query(new MetadataDownload(this)),
+         m_imageDownload(new MetadataImageDownload(this))
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    m_query = new MetadataDownload(this);
-    m_imageDownload = new MetadataImageDownload(this);
 }
 
 bool GameUI::Create()
@@ -187,7 +186,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "MENU")
@@ -1065,7 +1064,7 @@ void GameUI::handleDownloadedImages(MetadataLookup *lookup)
             i != downloads.end(); ++i)
     {
         VideoArtworkType type = i.key();
-        ArtworkInfo info = i.value();
+        const ArtworkInfo& info = i.value();
         QString filename = info.url;
 
         if (type == kArtworkCoverart)

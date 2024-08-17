@@ -484,7 +484,7 @@ void V2FillVideoMetadataInfo (
     V2CastMemberList* pCastMemberList = pVideoMetadataInfo->Cast();
 
     QString actors = QObject::tr("Actors");
-    for (VideoMetadata::cast_entry ent : castList )
+    for (const VideoMetadata::cast_entry& ent : castList )
     {
         V2CastMember *pCastMember = pCastMemberList->AddNewCastMember();
         pCastMember->setTranslatedRole(actors);
@@ -1054,7 +1054,7 @@ uint fillSelectionsFromDir(const QDir& dir,
     return cnt;
 }
 
-V2CaptureDeviceList* getFirewireList (const QString & cardType)
+V2CaptureDeviceList* getFirewireList ([[maybe_unused]] const QString & cardType)
 {
     auto* pList = new V2CaptureDeviceList();
 

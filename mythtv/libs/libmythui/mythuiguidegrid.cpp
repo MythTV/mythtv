@@ -26,10 +26,9 @@
 #define LOC QString("MythUIGuideGrid: ")
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIType(parent, name),
+      m_font(new MythFontProperties())
 {
-    m_font = new MythFontProperties();
-
     QMap<QString, QString> catColors;
     parseDefaultCategoryColors(catColors);
     SetCategoryColors(catColors);

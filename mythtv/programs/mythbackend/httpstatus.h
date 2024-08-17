@@ -46,7 +46,7 @@ class HttpStatus : public HttpServerExtension
         Scheduler                   *m_pSched;
         QMap<int, EncoderLink *>    *m_pEncoders;
         AutoExpire                  *m_pExpirer;
-        MainServer                  *m_pMainServer;
+        MainServer                  *m_pMainServer{nullptr};
         bool                         m_bIsMaster;
         int                          m_nPreRollSeconds;
         QMutex                       m_settingLock;

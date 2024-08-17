@@ -19,7 +19,8 @@
 
 FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                          MusicMetadata *metadata)
-           : Encoder(outfile, qualitylevel, metadata)
+           : Encoder(outfile, qualitylevel, metadata),
+             m_encoder(FLAC__stream_encoder_new())
 {
     bool streamable_subset = true;
     bool do_mid_side = true;
@@ -36,7 +37,6 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     int max_residual_partition_order = 3;
     int rice_parameter_search_dist = 0;
 
-    m_encoder = FLAC__stream_encoder_new();
     FLAC__stream_encoder_set_streamable_subset(m_encoder, streamable_subset);
     FLAC__stream_encoder_set_do_mid_side_stereo(m_encoder, do_mid_side);
     FLAC__stream_encoder_set_loose_mid_side_stereo(m_encoder, loose_mid_side);

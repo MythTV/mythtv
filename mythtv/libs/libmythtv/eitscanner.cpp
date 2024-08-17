@@ -35,12 +35,12 @@
 EITScanner::EITScanner(uint cardnum)
     : m_eitHelper(new EITHelper(cardnum)),
       m_eventThread(new MThread("EIT", this)),
-      m_cardnum(cardnum)
+      m_cardnum(cardnum),
+      m_sourceid(CardUtil::GetSourceID(cardnum))
 {
     QStringList langPref = iso639_get_language_list();
     m_eitHelper->SetLanguagePreferences(langPref);
 
-    m_sourceid = CardUtil::GetSourceID(m_cardnum);
     m_sourceName = SourceUtil::GetSourceName(m_sourceid);
     LOG(VB_EIT, LOG_INFO, LOC +
         QString("Start EIT scanner thread for source %1 '%2'")

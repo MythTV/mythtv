@@ -2603,7 +2603,7 @@ bool TV::HandleLCDTimerEvent()
 
                 lcd_time_string = info.text["playedtime"] + " / " + info.text["totaltime"];
                 // if the string is longer than the LCD width, remove all spaces
-                if (lcd_time_string.length() > static_cast<int>(lcd->getLCDWidth()))
+                if (lcd_time_string.length() > lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
             }
         }
@@ -3461,7 +3461,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
-            QString action = actions[i];
+            const QString& action = actions[i];
             bool ok = false;
             int val = action.toInt(&ok);
 
@@ -5024,7 +5024,7 @@ void TV::DoArbSeek(ArbSeekWhence Whence, bool HonorCutlist)
     if (!ok)
         return;
 
-    int64_t time = (int(seek / 100) * 3600) + ((seek % 100) * 60);
+    int64_t time = ((seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (Whence == ARBSEEK_FORWARD)
     {
@@ -5769,7 +5769,11 @@ bool TV::ProcessSmartChannel(QString &InputStr)
         return false;
 
     // Check for and remove duplicate separator characters
-    int size = static_cast<int>(chan.size());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    int size = chan.size();
+#else
+    qsizetype size = chan.size();
+#endif
     if ((size > 2) && (chan.at(size - 1) == chan.at(size - 2)))
     {
         bool ok = false;
@@ -8512,8 +8516,11 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         for (int j = kAspect_Off; j < kAspect_END; j++)
         {
             // swap 14:9 and 16:9
-            int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
-                     ((kAspect_16_9 == j) ? kAspect_14_9 : j));
+            int i {j};
+            if (kAspect_14_9 == j)
+                i = kAspect_16_9;
+            else if (kAspect_16_9 == j)
+                i = kAspect_14_9;
             QString action = prefix + QString::number(i);
             active = (m_videoBoundsState.m_aspectOverrideMode == i);
             BUTTON(action, toString(static_cast<AspectOverrideMode>(i)));
@@ -9139,7 +9146,12 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
     bool isPlayback = (&Menu == &m_playbackMenu || &Menu == &m_playbackCompactMenu);
     bool isCutlist = (&Menu == &m_cutlistMenu || &Menu == &m_cutlistCompactMenu);
     QString text = Menu.Translate(Node.toElement().attribute("text", Menu.GetName()));
-    MythOSDDialogData menu { isPlayback ? OSD_DLG_MENU : isCutlist ? OSD_DLG_CUTPOINT : "???", text };
+    const char* windowtitle { "???" };
+    if (isPlayback)
+        windowtitle = OSD_DLG_MENU;
+    else if (isCutlist)
+        windowtitle = OSD_DLG_CUTPOINT;
+    MythOSDDialogData menu {windowtitle, text };
     Menu.Show(Node, Selected, *this, &menu);
     QDomNode parent = Node.parentNode();
     if (!parent.parentNode().isNull())

@@ -258,7 +258,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
     {
         if (src[i] == 0x86)
         {
-            while ((++i < raw_length) && (src[i] != 0x87))
+            for (i = i + 1; i < raw_length && (src[i] != 0x87); i++)
             {
                 if ((src[i] < 0x80) || (src[i] > 0x9F))
                 {

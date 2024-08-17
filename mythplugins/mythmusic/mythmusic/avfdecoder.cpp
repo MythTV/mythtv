@@ -228,13 +228,11 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 }
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
-    Decoder(d, o)
+    Decoder(d, o),
+    m_outputBuffer((uint8_t *)av_malloc(AudioOutput::kMaxSizeBuffer))
 {
     MThread::setObjectName("avfDecoder");
     setURL(file);
-
-    m_outputBuffer =
-        (uint8_t *)av_malloc(AudioOutput::kMaxSizeBuffer);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);

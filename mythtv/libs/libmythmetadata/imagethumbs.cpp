@@ -235,7 +235,7 @@ void ThumbThread<DBFS>::run()
  \param thumbPriority 
  */
 template <class DBFS>
-QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
+QString ThumbThread<DBFS>::CreateThumbnail(const ImagePtrK &im, int thumbPriority)
 {
     if (QDir::root().exists(im->m_thumbPath))
     {

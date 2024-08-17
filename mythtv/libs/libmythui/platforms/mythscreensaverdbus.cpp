@@ -81,7 +81,7 @@ class ScreenSaverDBusPrivate
             if (msg.type() == QDBusMessage::ReplyMessage)
             {
                 QList<QVariant> replylist = msg.arguments();
-                QVariant reply = replylist.first();
+                const QVariant& reply = replylist.first();
                 m_cookie = reply.toUInt();
                 m_inhibited = true;
                 LOG(VB_GENERAL, LOG_INFO, LOC +

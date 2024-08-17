@@ -26,9 +26,9 @@
 
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
+               m_parentalLevelChecker(new ParentalLevelChangeChecker()),
                m_archiveList(archiveList)
 {
-    m_parentalLevelChecker = new ParentalLevelChangeChecker();
     connect(m_parentalLevelChecker, &ParentalLevelChangeChecker::SigResultReady,
             this, &VideoSelector::parentalLevelChanged);
 }
@@ -101,7 +101,7 @@ bool VideoSelector::keyPressEvent(QKeyEvent *event)
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
-        QString action = actions[i];
+        const QString& action = actions[i];
         handled = true;
 
         if (action == "MENU")

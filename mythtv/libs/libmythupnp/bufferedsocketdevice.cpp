@@ -27,9 +27,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
+  : m_pSocket(new MSocketDevice())
 {
-    m_pSocket = new MSocketDevice();
-
     m_pSocket->setSocket         ( nSocket, MSocketDevice::Stream );
     m_pSocket->setBlocking       ( false );
     m_pSocket->setAddressReusable( true );
@@ -48,17 +47,9 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 
 BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /* = nullptr*/,
                                             bool bTakeOwnership /* = false */ )
-{
-    m_pSocket            = pSocket;
-
-    m_nDestPort          = 0;
-
-    m_nMaxReadBufferSize = 0; 
-    m_nWriteSize         = 0;
-    m_nWriteIndex        = 0;
-    m_bHandleSocketDelete= bTakeOwnership;
-
-}
+  : m_pSocket(pSocket),
+    m_bHandleSocketDelete(bTakeOwnership)
+{}
 
 /////////////////////////////////////////////////////////////////////////////
 //

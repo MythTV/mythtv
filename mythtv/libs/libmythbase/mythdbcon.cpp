@@ -527,12 +527,11 @@ static void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 
 
 MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
-         : QSqlQuery(QString(), qi.qsqldb)
+         : QSqlQuery(QString(), qi.qsqldb),
+           m_db(qi.db),
+           m_isConnected(m_db && m_db->isOpen()),
+           m_returnConnection(qi.returnConnection)
 {
-    m_db = qi.db;
-    m_returnConnection = qi.returnConnection;
-
-    m_isConnected = m_db && m_db->isOpen();
 }
 
 MSqlQuery::~MSqlQuery()

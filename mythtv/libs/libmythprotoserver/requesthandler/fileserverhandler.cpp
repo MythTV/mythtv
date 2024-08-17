@@ -603,7 +603,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
     else if (slist.size() != 2)
         return false;
 
-    QString filename = slist[1];
+    const QString& filename = slist[1];
     if ((filename.isEmpty()) || 
         (filename.contains("/../")) || 
         (filename.startsWith("../")))

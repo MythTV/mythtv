@@ -24,7 +24,7 @@ class MUI_PUBLIC MythUISimpleText : public MythUIType
   public:
     MythUISimpleText(MythUIType *parent, const QString &name)
         : MythUIType(parent, name) {}
-    MythUISimpleText(const QString &text, const MythFontProperties &font,
+    MythUISimpleText(const QString &text, MythFontProperties font,
                      QRect rect, Qt::Alignment align,
                      MythUIType *parent, const QString &name);
     ~MythUISimpleText() override = default;

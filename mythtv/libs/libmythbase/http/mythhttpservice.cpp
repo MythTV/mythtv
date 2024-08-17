@@ -129,7 +129,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
 #else
         auto * newparam = QMetaType(type).create();
 #endif
-        param[count] = handler->CreateParameter(newparam, type, value);
+        param[count] = MythHTTPMetaMethod::CreateParameter(newparam, type, value);
         ++count;
     }
 
@@ -144,7 +144,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
             else
             {
                 // Retrieve result
-                returnvalue = handler->CreateReturnValue(types[0], param[0]);
+                returnvalue = MythHTTPMetaMethod::CreateReturnValue(types[0], param[0]);
             }
         }
         catch( QString &msg ) {

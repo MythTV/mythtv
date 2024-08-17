@@ -95,12 +95,11 @@ void NVRAudioThread::run(void)
 }
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
-    V4LRecorder(rec)
+    V4LRecorder(rec),
+    m_seekTable(new std::vector<struct seektable_entry>),
+    m_channelObj(channel),
+    m_ccd(new CC608Decoder(this))
 {
-    m_channelObj = channel;
-    m_seekTable = new std::vector<struct seektable_entry>;
-    m_ccd = new CC608Decoder(this);
-
     SetPositionMapType(MARK_KEYFRAME);
 
     m_containerFormat = formatNUV;

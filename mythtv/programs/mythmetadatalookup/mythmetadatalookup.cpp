@@ -40,8 +40,6 @@ namespace
     }
 }
 
-bool inJobQueue = false;
-
 int main(int argc, char *argv[])
 {
     MythMetadataLookupCommandLineParser cmdline;

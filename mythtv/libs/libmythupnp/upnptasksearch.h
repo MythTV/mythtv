@@ -66,7 +66,7 @@ class UPnpSearchTask : public Task
     public:
 
         UPnpSearchTask( int          nServicePort,
-                        QHostAddress peerAddress,
+                        const QHostAddress& peerAddress,
                         int          nPeerPort,  
                         QString      sST, 
                         QString      sUDN );
