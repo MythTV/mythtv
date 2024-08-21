@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { FilterMatchMode, LazyLoadEvent, MenuItem, MessageService, SelectItem } from 'primeng/api';
+import { FilterMatchMode, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Table } from 'primeng/table';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
 import { GetRecordedListRequest, UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
@@ -28,7 +28,7 @@ export class RecordingsComponent implements OnInit {
   actionList: ScheduleOrProgram[] = [];
   recGroups: string[] = [];
   newRecGroup = '';
-  lazyLoadEvent!: LazyLoadEvent;
+  lazyLoadEvent!: TableLazyLoadEvent;
   JobQCmds!: JobQCommands;
   program: ScheduleOrProgram = <ScheduleOrProgram>{ Title: '', Recording: {} };
   editingProgram?: ScheduleOrProgram;
@@ -139,7 +139,7 @@ export class RecordingsComponent implements OnInit {
     this.loadLazy({ first: 0, rows: 1 });
   }
 
-  loadLazy(event: LazyLoadEvent) {
+  loadLazy(event: TableLazyLoadEvent) {
     this.lazyLoadEvent = event;
     let request: GetRecordedListRequest = {
       StartIndex: 0,
@@ -149,7 +149,7 @@ export class RecordingsComponent implements OnInit {
       request.StartIndex = event.first;
       if (event.last)
         request.Count = event.last - event.first;
-      else
+      else if (event.rows)
         request.Count = event.rows;
       // When it only requests 50 rows, page down waits until the entire
       // screen is empty before loading the next page. Fix this by always
@@ -157,15 +157,20 @@ export class RecordingsComponent implements OnInit {
       // if (!request.Count || request.Count < 100)
       //   request.Count = 100;
     }
-    if (!event.sortField)
-      event.sortField = 'Title';
-    request.Sort = event.sortField
-    if (event.sortField == 'Airdate')
+    let sortField = '';
+    if (Array.isArray(event.sortField))
+      sortField = event.sortField[0];
+    else if (event.sortField)
+      sortField = event.sortField;
+    if (!sortField)
+      sortField = 'Title';
+    request.Sort = sortField;
+    if (sortField == 'Airdate')
       request.Sort = 'originalairdate';
-    else if (event.sortField == 'Recording.RecGroup')
+    else if (sortField == 'Recording.RecGroup')
       request.Sort = 'recgroup';
     else
-      request.Sort = event.sortField;
+      request.Sort = sortField;
     let sortOrder = ' asc';
     if (event.sortOrder && event.sortOrder < 0)
       sortOrder = ' desc';

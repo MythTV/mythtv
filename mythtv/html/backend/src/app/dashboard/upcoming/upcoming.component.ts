@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { LazyLoadEvent, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
 import { DvrService } from 'src/app/services/dvr.service';
@@ -34,7 +35,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   refreshing = false;
   loaded = false;
   inter: ScheduleLink = { summaryComponent: this };
-  lazyLoadEvent!: LazyLoadEvent;
+  lazyLoadEvent!: TableLazyLoadEvent;
 
   displayStop = false;
   errorCount = 0;
@@ -89,7 +90,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     });
   }
 
-  loadLazy(event: LazyLoadEvent) {
+  loadLazy(event: TableLazyLoadEvent) {
     this.lazyLoadEvent = event;
 
     let request: GetUpcomingRequest = {
@@ -101,15 +102,20 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       request.StartIndex = event.first;
       if (event.last)
         request.Count = event.last - event.first;
-      else
+      else if (event.rows)
         request.Count = event.rows;
     }
-    if (!event.sortField)
-      event.sortField = 'StartTime';
-    if (event.sortField == 'Channel.ChanNum')
+    let sortField = '';
+    if (Array.isArray(event.sortField))
+      sortField = event.sortField[0];
+    else if (event.sortField)
+      sortField = event.sortField;
+    if (!sortField)
+      sortField = 'StartTime';
+    if (sortField == 'Channel.ChanNum')
       request.Sort = 'ChanNum';
     else
-      request.Sort = event.sortField;
+      request.Sort = sortField;
     let sortOrder = '';
     if (event.sortOrder && event.sortOrder < 0)
       sortOrder = ' desc';

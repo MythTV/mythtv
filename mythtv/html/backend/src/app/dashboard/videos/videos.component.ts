@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { LazyLoadEvent, MenuItem, MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Table } from 'primeng/table';
+import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
 import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
 import { UtilityService } from 'src/app/services/utility.service';
@@ -31,7 +31,7 @@ export class VideosComponent implements OnInit {
   displayMetadataDlg = false;
   displayUnsaved = false;
   showAllVideos = false;
-  lazyLoadEvent : LazyLoadEvent = {};
+  lazyLoadEvent : TableLazyLoadEvent = {};
   totalRecords = 0;
   showTable = false;
 
@@ -72,7 +72,7 @@ export class VideosComponent implements OnInit {
     this.loadLazy({ first: 0, rows: 1 });
   }
 
-  loadLazy(event: LazyLoadEvent) {
+  loadLazy(event: TableLazyLoadEvent) {
     console.log(event)
     this.lazyLoadEvent = event;
     let request: GetVideoListRequest = {
@@ -83,20 +83,28 @@ export class VideosComponent implements OnInit {
       Count: 1
     };
 
-    if (event.sortField) {
-      request.Sort = event.sortField;
+    if (event.first != undefined) {
+      request.StartIndex = event.first;
+      if (event.last)
+        request.Count = event.last - event.first;
+      else if (event.rows)
+        request.Count = event.rows;
+    }
+
+    let sortField = '';
+    if (Array.isArray(event.sortField))
+      sortField = event.sortField[0];
+    else if (event.sortField)
+      sortField = event.sortField;
+    if (!sortField)
+      sortField = 'title';
+    if (sortField) {
+      request.Sort = sortField;
       if (event.sortOrder)
         request.Descending = (event.sortOrder < 0);
     }
     request.Sort += ',title,releasedate,season,episode'
 
-    if (event.first != undefined) {
-      request.StartIndex = event.first;
-      if (event.last)
-        request.Count = event.last - event.first;
-      else
-        request.Count = event.rows;
-    }
     this.videoService.GetVideoList(request).subscribe(data => {
       let newList = data.VideoMetadataInfoList;
       this.totalRecords = data.VideoMetadataInfoList.TotalAvailable;
