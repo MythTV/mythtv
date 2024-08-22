@@ -31,7 +31,6 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { SlideMenuModule } from 'primeng/slidemenu';
 import {InputTextareaModule} from 'primeng/inputtextarea';
 import {TieredMenuModule} from 'primeng/tieredmenu';
 
@@ -68,7 +67,6 @@ import {TieredMenuModule} from 'primeng/tieredmenu';
         ScrollPanelModule,
         TabMenuModule,
         MultiSelectModule,
-        SlideMenuModule,
         InputTextareaModule,
         TieredMenuModule
     ]

@@ -347,8 +347,11 @@ export class RecordingsComponent implements OnInit {
           this.jobs[ix + this.jobsoffset].visible = false;
       }
     }
-    // todo: implement this
+    // todo: implement this ??
     // this.menuToShow.push(this.mnu_updaterecrule);
+
+    // Notify Angular that menu has changed
+    this.menuToShow = [...this.menuToShow];
     this.menu.toggle(event);
   }
 

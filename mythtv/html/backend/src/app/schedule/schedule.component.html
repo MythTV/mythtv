@@ -258,13 +258,13 @@
             <div class="form-group field" *ngIf="recRule.Type != 'Recording Template'">
                 <label for="Inetref" class="label block">{{ 'dashboard.sched.inetref_label' | translate }}</label>
                 <div class="grid p-0">
-                    <div class="col-3 flex align-items-center">
+                    <div class="col-5 flex align-items-center">
                         <p-radioButton name="prefix" value="ttvdb4.py_" [(ngModel)]="metaPrefix" inputId="ttvdb"
                             (ngModelChange)="iCheckbox(recRule)"></p-radioButton>
                         <label for="ttvdb"><img class="pl-1 " src="images/metadata/thetvdb.png" alt="thtvdb"
                                 height="40"></label>
                     </div>
-                    <div class="col-9 flex align-items-center">
+                    <div class="col-7 flex align-items-center">
                         <a href="{{ URLencode('https://thetvdb.com/search?query='+recRule.Title) }}" target="_blank">
                             {{ 'dashboard.sched.isearch' | translate }} thetvdb.com</a>
                         <br>
@@ -280,13 +280,13 @@
                             {{ 'dashboard.sched.isearch' | translate }} tvmaze.com</a>
                         <br>
                     </div>
-                    <div class="col-3 flex align-items-center">
+                    <div class="col-5 flex align-items-center">
                         <p-radioButton name="prefix" value="tmdb3.py_" [(ngModel)]="metaPrefix" inputId="tmdb"
                             (ngModelChange)="iCheckbox(recRule)"></p-radioButton>
                         <label for="tmdb"><img class="pl-1 " src="images/metadata/themoviedb.svg" alt="themoviedb"
                                 height="40"></label>
                     </div>
-                    <div class="col-9 flex align-items-center">
+                    <div class="col-7 flex align-items-center">
                         <a href="{{ URLencode('https://www.themoviedb.org/search?query='+recRule.Title) }}"
                             target="_blank">
                             {{ 'dashboard.sched.isearch' | translate }} themoviedb.org</a>

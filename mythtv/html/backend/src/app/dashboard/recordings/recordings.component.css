@@ -4,4 +4,6 @@
 
 :host ::ng-deep .p-tieredmenu .p-submenu-list {
     border: 2px solid;
+    left: 10%;
+    top: 2em;
 }
