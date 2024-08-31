@@ -91,8 +91,8 @@
   sub-directories of MythTV. The CMake build compiles and installs
   those as separate projects, isolating them from MythTV, and
   preventing any direct access to internal headers/functions.  Here is
-  the list of the dependencies that are build as separate projects for
-  a native build, and those that are still build as part of building
+  the list of the dependencies that are built as separate projects for
+  a native build, and those that are still built as part of building
   MythTV.
 
   | Component        | Location   | Built as         | When Built     |
@@ -104,7 +104,7 @@
   | mythdvdnav       | embedded   | Part of MythTV   | always         |
   | mythbluray       | embedded   | Part of MythTV   | system < 0.9.3 |
 
-  For a cross compilation Android of Windows build, there is a much
+  For a cross compilation of Android or Windows build, there is a much
   longer list of dependencies, all of which are downloaded, compiled,
   and installed as separate projects.
 
@@ -246,7 +246,7 @@
   ```
 
   These builds will download/compile/install a much larger set of
-  dependencies thatn for native builds, and wil then compile/install
+  dependencies than for native builds, and wil then compile/install
   MythTV, and then compile/install the plugins.  Once all this is
   finished, it will create an APK file that can be uploaded to an
   android device.  This apk can be found in the build directory.  You
@@ -281,7 +281,7 @@
 
 ## Windows Cross Compile
 
-  To compile an Android version of MythTV, issue the following
+  To compile an Windows version of MythTV, issue the following
   commands.
 
   ```
@@ -345,7 +345,7 @@
   $ cmake --build build -t MythTV-tests
   ```
 
-  Tests are only build for native compiles. Cross compiling for
+  Tests are only built for native compiles. Cross compiling for
   windows or android will not create the test suite.
 
   To build the documentation, use the following command:
