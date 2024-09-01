@@ -10,6 +10,7 @@ import requests
 import re
 import random
 import difflib
+import html
 from bs4 import BeautifulSoup
 from lib.utils import *
 
@@ -20,14 +21,40 @@ __lrc__ = False
 headers = {}
 headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0'
 
+# search is not possible as it requires javascript, only direct access to the lyrics work.
 
 class LyricsFetcher:
     def __init__(self, *args, **kwargs):
         self.DEBUG = kwargs['debug']
         self.settings = kwargs['settings']
-        self.SEARCH_URL = 'https://www.musixmatch.com/search/'
-        self.LYRIC_URL = 'https://www.musixmatch.com'
+        self.SEARCH_URL = 'https://www.musixmatch.com/search?query='
+        self.LYRIC_URL = 'https://www.musixmatch.com/lyrics/%s/%s'
 
+    def get_lyrics(self, song):
+        log("%s: searching lyrics for %s - %s" % (__title__, song.artist, song.title), debug=self.DEBUG)
+        lyrics = Lyrics(settings=self.settings)
+        lyrics.song = song
+        lyrics.source = __title__
+        lyrics.lrc = __lrc__
+        artist = song.artist.replace("'", '').replace('!', '').replace('?', '').replace('"', '').replace('/', '').replace('.', '').replace('&', '').replace(',', '').replace('(', '').replace(')', '').replace(' ', '-')
+        title = song.title.replace("'", '').replace('!', '').replace('?', '').replace('"', '').replace('/', '').replace('.', '').replace('&', '').replace(',', '').replace('(', '').replace(')', '').replace(' ', '-')
+        url = self.LYRIC_URL % (artist, title)
+        try:
+            log('%s: search url: %s' % (__title__, url), debug=self.DEBUG)
+            search = requests.get(url, headers=headers, timeout=10)
+            response = search.text
+        except:
+            return None
+        matchcode = re.search('Lyrics of (.*?)Writer\(s\): ', response, flags=re.DOTALL)
+        if matchcode:
+            lyricscode = (matchcode.group(1))
+            lyr = re.sub('<[^<]+?>', '\n', lyricscode)
+            lyr = html.unescape(lyr)
+            lyrics.lyrics = lyr.replace('\n\n\n\n', '\n')
+            return lyrics
+        return None
+
+'''
     def get_lyrics(self, song):
         log("%s: searching lyrics for %s - %s" % (__title__, song.artist, song.title), debug=self.DEBUG)
         lyrics = Lyrics(settings=self.settings)
@@ -84,3 +111,4 @@ class LyricsFetcher:
                 for part in lyr:
                     lyrics = lyrics + part.get_text() + '\n'
                 return lyrics
+'''

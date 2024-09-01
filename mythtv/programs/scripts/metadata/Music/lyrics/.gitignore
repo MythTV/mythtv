@@ -3,6 +3,8 @@ addon.xml
 default.py
 README.txt
 resources
+lib/gui.py
+lib/sync.py
 
 # twitham's extra files not needed:
 filetweak.py

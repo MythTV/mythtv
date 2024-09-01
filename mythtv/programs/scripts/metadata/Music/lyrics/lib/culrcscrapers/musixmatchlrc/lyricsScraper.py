@@ -78,7 +78,7 @@ class LyricsFetcher:
         search = '%s - %s' % (artist, title)
         try:
             url = self.SEARCH_URL % 'track.search'
-            query = [('q', search), ('page_size', '5'), ('page', '1'), ('s_track_rating', 'desc'), ('quorum_factor', '1.0'), ('app_id', 'web-desktop-app-v1.0'), ('usertoken', self.token), ('t', self.current_time)]
+            query = [('q', search), ('page_size', '5'), ('page', '1'), ('app_id', 'web-desktop-app-v1.0'), ('usertoken', self.token), ('t', self.current_time)]
             response = requests.get(url, params=query, timeout=10)
             result = response.json()
         except:

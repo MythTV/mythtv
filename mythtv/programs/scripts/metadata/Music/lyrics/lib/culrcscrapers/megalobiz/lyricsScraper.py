@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from lib.utils import *
 
 __title__ = "Megalobiz"
-__priority__ = '140'
+__priority__ = '150'
 __lrc__ = True
 
 
