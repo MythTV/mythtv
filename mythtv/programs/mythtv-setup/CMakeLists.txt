@@ -1,5 +1,5 @@
 add_executable(
-  mythtvsetup
+  mythtv-setup
   backendsettings.cpp
   backendsettings.h
   channeleditor.cpp
@@ -17,10 +17,10 @@ add_executable(
   startprompt.cpp
   startprompt.h)
 
-target_include_directories(mythtvsetup PRIVATE .)
+target_include_directories(mythtv-setup PRIVATE .)
 
-target_link_libraries(mythtvsetup PUBLIC myth mythtv mythbase mythui mythupnp)
+target_link_libraries(mythtv-setup PUBLIC myth mythtv mythbase mythui mythupnp)
 
-install(TARGETS mythtvsetup RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS mythtv-setup RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 install(FILES setup.xml DESTINATION ${CMAKE_INSTALL_DATADIR}/mythtv)
