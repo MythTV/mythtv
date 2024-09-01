@@ -10,6 +10,7 @@ __title__ = 'lyricscom'
 __priority__ = '240'
 __lrc__ = False
 
+UserAgent = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"}
 
 class LyricsFetcher:
     def __init__(self, *args, **kwargs):
@@ -25,7 +26,7 @@ class LyricsFetcher:
         lyrics.source = __title__
         lyrics.lrc = __lrc__
         try:
-            request = sess.get(self.url % urllib.parse.quote_plus(song.artist), timeout=10)
+            request = sess.get(self.url % urllib.parse.quote_plus(song.artist), headers=UserAgent, timeout=10)
             response = request.text
         except:
             return
@@ -37,7 +38,7 @@ class LyricsFetcher:
                 break
         if url:
             try:
-                req = sess.get(url, timeout=10)
+                req = sess.get(url, headers=UserAgent, timeout=10)
                 resp = req.text
             except:
                 return
@@ -49,7 +50,7 @@ class LyricsFetcher:
                     break
             if url:
                 try:
-                    req2 = sess.get(url, timeout=10)
+                    req2 = sess.get(url, headers=UserAgent, timeout=10)
                     resp2 = req2.text
                 except:
                     return

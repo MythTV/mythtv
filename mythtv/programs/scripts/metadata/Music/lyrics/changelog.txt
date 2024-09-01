@@ -1,3 +1,23 @@
+v6.6.7
+- fixed RCLyricsBand scraper
+
+v6.6.6
+- fixed several scrapers
+
+v6.6.5
+- added "%A - %B - %N - %T" file format
+
+v6.6.4
+- added "%N. %A - %T" file format
+
+v6.6.3
+- fix issue with empty ListItem.Property(part1)
+- fix for spotify (and others) not in sync
+- don't search online sources for saved lyrics files
+
+v6.6.2
+- improve megalobiz scraper
+
 v6.6.1
 - add supermusic scraper
 

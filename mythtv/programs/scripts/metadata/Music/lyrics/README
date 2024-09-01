@@ -24,6 +24,7 @@ FileLyrics       90    Yes/No
 musixmatchlrc   100     Yes     NEW in v34
 lrclib          110     Yes     NEW in v34
 lyricsify       130     Yes     NEW in v34
+rclyricsband    140     Yes     NEW in v35	2024/08
 genius          200     No
 musixmatch      210     No      NEW in v34
 lyricsmode      220     No
@@ -31,7 +32,7 @@ azlyrics        230     No      NEW in v34
 lyricscom       240     No
 supermusic      250     No      NEW in v34
 darklyrics      260     No
-megalobiz       400     Yes     (too slow to be earlier, was 140)
+megalobiz       400     Yes     (too slow to be earlier, was 150)
 music163        500     Yes     (sometimes returns author only, was 120)
 
 
@@ -52,7 +53,7 @@ Simply overwrite lib/ with the latest from the source:
   2 of addon.xml in the source and update the latest version number
   into the header of ./common/culrcwrap.py
 
-* ./testlyrics -k -t
+* ./testlyrics.pl -k -t
 
 That's all!
 

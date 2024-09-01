@@ -1,17 +1,17 @@
 # -*- Mode: python; coding: utf-8; indent-tabs-mode: nil; -*-
 
 from common import culrcwrap
-from lib.culrcscrapers.lyricsify.lyricsScraper import LyricsFetcher
+from lib.culrcscrapers.rclyricsband.lyricsScraper import LyricsFetcher
 # make sure this-------^^^^^^^^^ matches this file's basename
 
 info = {
-    'name':        '*Lyricsify',
-    'description': 'Search https://lyricsify.com for synchronized lyrics',
+    'name':        'RCLyricsBand',
+    'description': 'Search http://www.rclyricsband.com for lyrics',
     'author':      'ronie',
-    'priority':    '130',
+    'priority':    '140',
     'syncronized': True,
-    'artist':      'Tears For Fears',
-    'title':       'Shout',
+    'artist':      'Taylor Swift',
+    'title':       'The Archer',
 }
 
 if __name__ == '__main__':

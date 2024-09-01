@@ -12,6 +12,7 @@ from lib.culrcscrapers.megalobiz import lyricsScraper as lyricsScraper_megalobiz
 from lib.culrcscrapers.music163 import lyricsScraper as lyricsScraper_music163
 from lib.culrcscrapers.musixmatch import lyricsScraper as lyricsScraper_musixmatch
 from lib.culrcscrapers.musixmatchlrc import lyricsScraper as lyricsScraper_musixmatchlrc
+from lib.culrcscrapers.rclyricsband import lyricsScraper as lyricsScraper_rclyricsband
 from lib.culrcscrapers.supermusic import lyricsScraper as lyricsScraper_supermusic
 
 FAILED = []
@@ -47,7 +48,7 @@ def test_scrapers():
         return
 
     # test darklyrics
-    dialog.update(8, LANGUAGE(32163) % 'darklyrics')
+    dialog.update(7, LANGUAGE(32163) % 'darklyrics')
     log('==================== darklyrics ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Neurosis'
@@ -66,7 +67,7 @@ def test_scrapers():
         return
 
     # test genius
-    dialog.update(16, LANGUAGE(32163) % 'genius')
+    dialog.update(14, LANGUAGE(32163) % 'genius')
     log('==================== genius ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Maren Morris'
@@ -85,7 +86,7 @@ def test_scrapers():
         return
 
     # test lrclib
-    dialog.update(24, LANGUAGE(32163) % 'lrclib')
+    dialog.update(21, LANGUAGE(32163) % 'lrclib')
     log('==================== lrclib ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'CHVRCHES'
@@ -104,7 +105,7 @@ def test_scrapers():
         return
 
     # test lyricscom
-    dialog.update(32, LANGUAGE(32163) % 'lyricscom')
+    dialog.update(28, LANGUAGE(32163) % 'lyricscom')
     log('==================== lyricscom ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Blur'
@@ -123,11 +124,11 @@ def test_scrapers():
         return
 
     # test lyricsify
-    dialog.update(40, LANGUAGE(32163) % 'lyricsify')
+    dialog.update(35, LANGUAGE(32163) % 'lyricsify')
     log('==================== lyricsify ====================', debug=True)
     song = Song(opt=lyricssettings)
-    song.artist = 'Madonna'
-    song.title = 'Crazy For You'
+    song.artist = 'Tears For Fears'
+    song.title = 'Shout'
     st = time.time()
     lyrics = lyricsScraper_lyricsify.LyricsFetcher(settings=lyricssettings, debug=True).get_lyrics(song)
     ft = time.time()
@@ -142,7 +143,7 @@ def test_scrapers():
         return
 
     # test lyricsmode
-    dialog.update(48, LANGUAGE(32163) % 'lyricsmode')
+    dialog.update(42, LANGUAGE(32163) % 'lyricsmode')
     log('==================== lyricsmode ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Maren Morris'
@@ -161,7 +162,7 @@ def test_scrapers():
         return
 
     # test megalobiz
-    dialog.update(56, LANGUAGE(32163) % 'megalobiz')
+    dialog.update(50, LANGUAGE(32163) % 'megalobiz')
     log('==================== megalobiz ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Michael Jackson'
@@ -180,7 +181,7 @@ def test_scrapers():
         return
 
     # test music163
-    dialog.update(64, LANGUAGE(32163) % 'music163')
+    dialog.update(58, LANGUAGE(32163) % 'music163')
     log('==================== music163 ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Madonna'
@@ -199,7 +200,7 @@ def test_scrapers():
         return
 
     # test musixmatch
-    dialog.update(72, LANGUAGE(32163) % 'musixmatch')
+    dialog.update(66, LANGUAGE(32163) % 'musixmatch')
     log('==================== musixmatch ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Kate Bush'
@@ -218,7 +219,7 @@ def test_scrapers():
         return
 
     # test musixmatchlrc
-    dialog.update(80, LANGUAGE(32163) % 'musixmatchlrc')
+    dialog.update(73, LANGUAGE(32163) % 'musixmatchlrc')
     log('==================== musixmatchlrc ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Kate Bush'
@@ -233,6 +234,25 @@ def test_scrapers():
     else:
         FAILED.append('musixmatchlrc')
         log('FAILED: musixmatchlrc', debug=True)
+    if dialog.iscanceled():
+        return
+
+    # test rclyricsband
+    dialog.update(80, LANGUAGE(32163) % 'rclyricsband')
+    log('==================== rclyricsband ====================', debug=True)
+    song = Song(opt=lyricssettings)
+    song.artist = 'Taylor Swift'
+    song.title = 'The Archer'
+    st = time.time()
+    lyrics = lyricsScraper_rclyricsband.LyricsFetcher(settings=lyricssettings, debug=True).get_lyrics(song)
+    ft = time.time()
+    tt = ft - st
+    TIMINGS.append(['rclyricsband',tt])
+    if lyrics:
+        log(lyrics.lyrics, debug=True)
+    else:
+        FAILED.append('rclyricsband')
+        log('FAILED: rclyricsband', debug=True)
     if dialog.iscanceled():
         return
 
