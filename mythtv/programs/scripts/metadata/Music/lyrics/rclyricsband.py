@@ -8,7 +8,7 @@ info = {
     'name':        'RCLyricsBand',
     'description': 'Search http://www.rclyricsband.com for lyrics',
     'author':      'ronie',
-    'priority':    '140',
+    'priority':    '130',
     'syncronized': True,
     'artist':      'Taylor Swift',
     'title':       'The Archer',

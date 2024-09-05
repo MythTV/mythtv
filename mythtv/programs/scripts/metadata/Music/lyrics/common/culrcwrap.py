@@ -7,7 +7,7 @@ Paul Harrison, ronie, Timothy Witham
 
 # UPDATE THIS from https://gitlab.com/ronie/script.cu.lrclyrics
 # second line of its addon.xml:
-__version__ = '6.6.7'
+__version__ = '6.6.8'
 
 # simulate kodi/xbmc via very simplified Kodistubs.
 import os

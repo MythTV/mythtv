@@ -1,17 +1,17 @@
-#-*- coding: utf-8 -*-
+#-*- coding: UTF-8 -*-
 '''
 Scraper for https://www.rclyricsband.com/
 '''
 
 import requests
 import re
-import difflib
 import html
+import difflib
 from bs4 import BeautifulSoup
 from lib.utils import *
 
 __title__ = "RCLyricsBand"
-__priority__ = '140'
+__priority__ = '130'
 __lrc__ = True
 
 UserAgent = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"}
