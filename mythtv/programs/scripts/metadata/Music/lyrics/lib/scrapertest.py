@@ -6,7 +6,6 @@ from lib.culrcscrapers.darklyrics import lyricsScraper as lyricsScraper_darklyri
 from lib.culrcscrapers.genius import lyricsScraper as lyricsScraper_genius
 from lib.culrcscrapers.lrclib import lyricsScraper as lyricsScraper_lrclib
 from lib.culrcscrapers.lyricscom import lyricsScraper as lyricsScraper_lyricscom
-from lib.culrcscrapers.lyricsify import lyricsScraper as lyricsScraper_lyricsify
 from lib.culrcscrapers.lyricsmode import lyricsScraper as lyricsScraper_lyricsmode
 from lib.culrcscrapers.megalobiz import lyricsScraper as lyricsScraper_megalobiz
 from lib.culrcscrapers.music163 import lyricsScraper as lyricsScraper_music163
@@ -48,7 +47,7 @@ def test_scrapers():
         return
 
     # test darklyrics
-    dialog.update(7, LANGUAGE(32163) % 'darklyrics')
+    dialog.update(8, LANGUAGE(32163) % 'darklyrics')
     log('==================== darklyrics ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Neurosis'
@@ -67,7 +66,7 @@ def test_scrapers():
         return
 
     # test genius
-    dialog.update(14, LANGUAGE(32163) % 'genius')
+    dialog.update(16, LANGUAGE(32163) % 'genius')
     log('==================== genius ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Maren Morris'
@@ -86,7 +85,7 @@ def test_scrapers():
         return
 
     # test lrclib
-    dialog.update(21, LANGUAGE(32163) % 'lrclib')
+    dialog.update(24, LANGUAGE(32163) % 'lrclib')
     log('==================== lrclib ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'CHVRCHES'
@@ -105,7 +104,7 @@ def test_scrapers():
         return
 
     # test lyricscom
-    dialog.update(28, LANGUAGE(32163) % 'lyricscom')
+    dialog.update(32, LANGUAGE(32163) % 'lyricscom')
     log('==================== lyricscom ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Blur'
@@ -123,27 +122,8 @@ def test_scrapers():
     if dialog.iscanceled():
         return
 
-    # test lyricsify
-    dialog.update(35, LANGUAGE(32163) % 'lyricsify')
-    log('==================== lyricsify ====================', debug=True)
-    song = Song(opt=lyricssettings)
-    song.artist = 'Tears For Fears'
-    song.title = 'Shout'
-    st = time.time()
-    lyrics = lyricsScraper_lyricsify.LyricsFetcher(settings=lyricssettings, debug=True).get_lyrics(song)
-    ft = time.time()
-    tt = ft - st
-    TIMINGS.append(['lyricsify',tt])
-    if lyrics:
-        log(lyrics.lyrics, debug=True)
-    else:
-        FAILED.append('lyricsify')
-        log('FAILED: lyricsify', debug=True)
-    if dialog.iscanceled():
-        return
-
     # test lyricsmode
-    dialog.update(42, LANGUAGE(32163) % 'lyricsmode')
+    dialog.update(40, LANGUAGE(32163) % 'lyricsmode')
     log('==================== lyricsmode ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Maren Morris'
@@ -162,7 +142,7 @@ def test_scrapers():
         return
 
     # test megalobiz
-    dialog.update(50, LANGUAGE(32163) % 'megalobiz')
+    dialog.update(49, LANGUAGE(32163) % 'megalobiz')
     log('==================== megalobiz ====================', debug=True)
     song = Song(opt=lyricssettings)
     song.artist = 'Michael Jackson'

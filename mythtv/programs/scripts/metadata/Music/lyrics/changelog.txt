@@ -1,3 +1,7 @@
+v6.6.8
+- remove broken lyricsify scraper
+- cleanup RCLyricsBand lyrics
+
 v6.6.7
 - fixed RCLyricsBand scraper
 
