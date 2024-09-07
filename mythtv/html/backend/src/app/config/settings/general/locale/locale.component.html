@@ -11,7 +11,7 @@
                 <p-fieldset class="mb-4 w-full" legend="{{ 'settings.locale.tvformat_label' | translate }}">
                     <div class="form-group field">
                         <label for="tvformat" class="label block">TV Format</label>
-                        <p-dropdown [options]="m_TVFormats" [(ngModel)]="TVFormat" class="w-full mb-2" name="tvformat"
+                        <p-dropdown  appendTo="body" [options]="m_TVFormats" [(ngModel)]="TVFormat" class="w-full mb-2" name="tvformat"
                             aria-describedby="tvformat-help">
                         </p-dropdown>
                         <small class="block mt-2" id="tvformat-help">
@@ -22,7 +22,7 @@
                     <div class="form-group field">
                         <label for="vbiformat" class="label block">{{ 'settings.locale.vbiformat_label' | translate
                             }}</label>
-                        <p-dropdown [options]="m_vbiFormats" [(ngModel)]="VbiFormat" class="mb-5  w-full"
+                        <p-dropdown  appendTo="body" [options]="m_vbiFormats" [(ngModel)]="VbiFormat" class="mb-5  w-full"
                             name="vbiformat" aria-describedby="vbiformat-help">
                         </p-dropdown>
                         <small class="block mt-2" id="vbiformat-help">
@@ -35,7 +35,7 @@
                     <div class="form-group field">
                         <label for="freqtable" class="label block">{{ 'settings.locale.channfreq_label' | translate
                             }}</label>
-                        <p-dropdown [options]="m_FreqTables" [(ngModel)]="FreqTable" class="mb-2 w-full"
+                        <p-dropdown  appendTo="body" [options]="m_FreqTables" [(ngModel)]="FreqTable" class="mb-2 w-full"
                             name="freqtable">
                         </p-dropdown>
                         <small class="block pt-2" id="freqtable-help">

@@ -256,7 +256,7 @@
                         <div class="form-group field">
                             <label for="inputGroupName" class="label block">{{ 'settings.iconnection.inpgroup_label' |
                                 translate }}</label>
-                            <p-dropdown [options]="selectGroups" [(ngModel)]="work.inputGroupName"
+                            <p-dropdown  appendTo="body" [options]="selectGroups" [(ngModel)]="work.inputGroupName"
                                 placeholder="Optional Group Name" [editable]="true" optionLabel="InputGroupName"
                                 optionValue="InputGroupName" scrollHeight="400px" [style]="{'minWidth':'400px'}"
                                 name="inputGroupName" #inputGroupName="ngModel">

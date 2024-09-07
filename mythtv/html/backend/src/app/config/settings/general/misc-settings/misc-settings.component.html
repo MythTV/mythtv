@@ -51,7 +51,7 @@
 
                     <div class="form-group field">
                         <label for="StorageScheduler" class="label block">{{ 'settings.misc.sg_label' | translate }}</label>
-                        <p-dropdown [options]="soptions " [(ngModel)]="StorageScheduler" optionLabel="name"
+                        <p-dropdown  appendTo="body" [options]="soptions " [(ngModel)]="StorageScheduler" optionLabel="name"
                             optionValue="code" class="block w-15rem mb-2" name="StorageScheduler">
                         </p-dropdown>
                         <small class="block">
@@ -65,7 +65,7 @@
                     [toggleable]="true" [collapsed]="true">
                     <div class="form-group field">
                         <label for="UPNPWmpSource" class="label block">{{ 'settings.misc.upnp_label' | translate }}</label>
-                        <p-dropdown [options]="uoptions" [(ngModel)]="UPNPWmpSource" optionLabel="name"
+                        <p-dropdown  appendTo="body" [options]="uoptions" [(ngModel)]="UPNPWmpSource" optionLabel="name"
                             optionValue="code" class="block w-15rem mb-2" name="UPNPWmpSource">
                         </p-dropdown>
                         <small class="block">

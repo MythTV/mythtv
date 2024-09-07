@@ -91,8 +91,9 @@
                         <div class="form-group field">
                             <label for="BackendServerIP" class="label block">{{ 'settings.hostaddress.ipv4_label' |
                                 translate }}</label>
-                            <p-dropdown [options]="m_IPsV4 " [(ngModel)]="m_HostAddressData.BackendServerIP"
-                                class="block w-15rem mb-2" name="BackendServerIP" #BackendServerIP="ngModel"
+                            <p-dropdown appendTo="body" [options]="m_IPsV4 "
+                                [(ngModel)]="m_HostAddressData.BackendServerIP" class="block w-15rem mb-2"
+                                name="BackendServerIP" #BackendServerIP="ngModel"
                                 aria-describedby="BackendServerIP-help">
                             </p-dropdown>
                             <small class="block" id="BackendServerIP-help">
@@ -107,8 +108,9 @@
                             <label for="BackendServerIP6" class="label block">
                                 {{ 'settings.hostaddress.ipv6_label' | translate }}
                             </label>
-                            <p-dropdown [options]="m_IPsV6 " [(ngModel)]="m_HostAddressData.BackendServerIP6"
-                                class="block w-15rem mb-2" name="BackendServerIP6" #BackendServerIP6="ngModel"
+                            <p-dropdown appendTo="body" [options]="m_IPsV6 "
+                                [(ngModel)]="m_HostAddressData.BackendServerIP6" class="block w-15rem mb-2"
+                                name="BackendServerIP6" #BackendServerIP6="ngModel"
                                 aria-describedby="BackendServerIP6-help">
                             </p-dropdown>
                             <small class="block" id="BackendServerIP6-help">
@@ -134,23 +136,21 @@
 
                 <p-fieldset class="mb-4 w-full" legend="{{ 'settings.hostaddress.panel.primaryadd' | translate }}">
                     <div class="form-group field">
-                        <div class="form-group field">
-                            <label for="BackendServerAddr" class="label block w-full">
-                                {{ 'settings.hostaddress.primaryip_label' | translate }}
-                            </label>
-                            <p-dropdown [options]="m_IPsAll " [(ngModel)]="m_HostAddressData.BackendServerAddr"
-                                [editable]="true" class="block mb-2 w-full" name="BackendServerAddr"
-                                #BackendServerAddr="ngModel" aria-describedby="BackendServerAddr-help">
-                            </p-dropdown>
-                            <small class="block w-full" id="BackendServerAddr-help">
-                                {{ 'settings.hostaddress.primaryip_desc' | translate }}
-                            </small>
-                        </div>
+                        <label for="BackendServerAddr" class="label block w-full">
+                            {{ 'settings.hostaddress.primaryip_label' | translate }}
+                        </label>
+                        <p-dropdown appendTo="body" [options]="m_IPsAll "
+                            [(ngModel)]="m_HostAddressData.BackendServerAddr" [editable]="true"
+                            class="block mb-2 w-full" name="BackendServerAddr" #BackendServerAddr="ngModel"
+                            aria-describedby="BackendServerAddr-help">
+                        </p-dropdown>
+                        <small class="block w-full" id="BackendServerAddr-help">
+                            {{ 'settings.hostaddress.primaryip_desc' | translate }}
+                        </small>
+                    </div>
 
-                        <div
-                            *ngIf="BackendServerAddr.invalid && (BackendServerAddr.dirty || BackendServerAddr.touched)">
-                            <small class="p-error block">Primary IP address / DNS name is required</small>
-                        </div>
+                    <div *ngIf="BackendServerAddr.invalid && (BackendServerAddr.dirty || BackendServerAddr.touched)">
+                        <small class="p-error block">Primary IP address / DNS name is required</small>
                     </div>
                 </p-fieldset>
 
