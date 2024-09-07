@@ -87,9 +87,10 @@ class Commands : public QObject
             m_thread.join();
     }
 
-    bool SendStatus(const QString & command, const QString & status);
-    bool SendStatus(const QString & command, const QString & serial,
-                    const QString & status);
+    bool SendStatus(const QString & command,
+                    const QString & status,
+                    const QString & serial,
+                    const QString & response = "");
     bool ProcessCommand(const QString & cmd);
 
   protected:
@@ -102,7 +103,7 @@ class Commands : public QObject
     void HasTuner(const QString & serial) const;
     void HasPictureAttributes(const QString & serial) const;
     void SetBlockSize(const QString & serial, int blksz);
-    void TuneChannel(const QString & serial, const QString & channum);
+    void TuneChannel(const QString & serial, const QVariantMap & args);
     void TuneStatus(const QString & serial);
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
@@ -111,6 +112,9 @@ class Commands : public QObject
 
   private:
     std::thread m_thread;
+
+    size_t       m_rep_cmd_cnt  { 0 };
+    QString      m_prev_cmd;
 
     MythExternControl* m_parent { nullptr };
     int m_apiVersion { -1 };
@@ -146,7 +150,7 @@ class MythExternControl : public QObject
     void HasTuner(const QString & serial);
     void HasPictureAttributes(const QString & serial);
     void SetBlockSize(const QString & serial, int blksz);
-    void TuneChannel(const QString & serial, const QString & channum);
+    void TuneChannel(const QString & serial, const QVariantMap & args);
     void TuneStatus(const QString & serial);
     void LoadChannels(const QString & serial);
     void FirstChannel(const QString & serial);
@@ -156,8 +160,11 @@ class MythExternControl : public QObject
 
   public slots:
     void SetDescription(const QString & desc) { m_desc = desc; }
-    void SendMessage(const QString & cmd, const QString & serial,
-                     const QString & msg);
+    void SendMessage(const QString & command,
+                     const QString & serial,
+                     const QString & message,
+                     const QString & status = "");
+
     void ErrorMessage(const QString & msg);
     void Opened(void);
     void Done(void);

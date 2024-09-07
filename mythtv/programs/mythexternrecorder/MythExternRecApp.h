@@ -27,6 +27,7 @@
 #include <QProcess>
 #include <QSettings>
 #include <QString>
+#include <QVariantMap>
 
 #include <atomic>
 #include <condition_variable>
@@ -48,13 +49,15 @@ class MythExternRecApp : public QObject
     void ReplaceVariables(QString & cmd) const;
     QString Desc(void) const;
     void MythLog(const QString & msg)
-    { emit SendMessage("", "0", QString("STATUS:%1").arg(msg)); }
+    { emit SendMessage("", "0", "STATUS", msg); }
     void SetErrorMsg(const QString & msg) { emit ErrorMessage(msg); }
 
   signals:
     void SetDescription(const QString & desc);
-    void SendMessage(const QString & func, const QString & serial,
-                     const QString & msg);
+    void SendMessage(const QString & command,
+                     const QString & serial,
+                     const QString & message,
+                     const QString & status = "");
     void ErrorMessage(const QString & msg);
     void Opened(void);
     void Done(void);
@@ -80,8 +83,8 @@ class MythExternRecApp : public QObject
     void FirstChannel(const QString & serial);
     void NextChannel(const QString & serial);
 
-    void NewEpisodeStarting(const QString & channum);
-    void TuneChannel(const QString & serial, const QString & channum);
+    void NewEpisodeStarting(void);
+    void TuneChannel(const QString & serial, const QVariantMap & args);
     void TuneStatus(const QString & serial);
     void HasPictureAttributes(const QString & serial);
     void SetBlockSize(const QString & serial, int blksz);
@@ -92,6 +95,9 @@ class MythExternRecApp : public QObject
 
   private:
     bool config(void);
+    QString sanitize_var(const QString & var) const;
+    QString replace_extra_args(const QString & var,
+                               const QVariantMap & extra_args);
 
     bool                    m_fatal        { false };
     QString                 m_fatalMsg;
@@ -114,6 +120,7 @@ class MythExternRecApp : public QObject
 
     QMap<QString, QString>  m_appEnv;
     QMap<QString, QString>  m_settingVars;
+    QVariantMap             m_chaninfo;
 
     QProcess                m_tuneProc;
     QProcess                m_finishTuneProc;

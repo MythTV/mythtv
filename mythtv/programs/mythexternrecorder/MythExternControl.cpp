@@ -27,12 +27,14 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include "libmythbase/mythlogging.h"
 
 using namespace std::chrono_literals;
 
-const QString VERSION = "1.0";
+const QString VERSION = "2.0";
 
 #define LOC Desc()
 
@@ -110,12 +112,13 @@ void MythExternControl::Fatal(const QString & msg)
     Terminate();
 }
 
-Q_SLOT void MythExternControl::SendMessage(const QString & cmd,
+Q_SLOT void MythExternControl::SendMessage(const QString & command,
                                            const QString & serial,
-                                           const QString & msg)
+                                           const QString & message,
+                                           const QString & status)
 {
     std::unique_lock<std::mutex> lk(m_msgMutex);
-    m_commands.SendStatus(cmd, serial, msg);
+    m_commands.SendStatus(command, status, serial, message);
 }
 
 Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
@@ -169,9 +172,9 @@ void Commands::SetBlockSize(const QString & serial, int blksz)
     emit m_parent->SetBlockSize(serial, blksz);
 }
 
-void Commands::TuneChannel(const QString & serial, const QString & channum)
+void Commands::TuneChannel(const QString & serial, const QVariantMap & args)
 {
-    emit m_parent->TuneChannel(serial, channum);
+    emit m_parent->TuneChannel(serial, args);
 }
 
 void Commands::TuneStatus(const QString & serial)
@@ -199,234 +202,232 @@ void Commands::Cleanup(void)
     emit m_parent->Cleanup();
 }
 
-bool Commands::SendStatus(const QString & command, const QString & status)
+bool Commands::SendStatus(const QString & command,
+                          const QString & status,
+                          const QString & serial,
+                          const QString & response)
 {
-    int len = write(2, status.toUtf8().constData(), status.size());
+    QJsonObject query;
+    if (!serial.isEmpty())
+        query["serial"] = serial;
+    query["command"] = command;
+    query["status"] = status;
+    if (!response.isEmpty())
+        query["message"] = response;
+
+    QByteArray msgbuf = QJsonDocument(query).toJson(QJsonDocument::Compact);
+    int len = write(2, msgbuf.constData(), msgbuf.size());
     len += write(2, "\n", 1);
 
-    if (len != status.size() + 1)
+    if (len != msgbuf.size() + 1)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
-            .arg(command).arg(len).arg(status.size()).arg(status));
-        return false;
-    }
-
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-        .arg(command, status));
-
-    m_parent->ClearError();
-    return true;
-}
-
-bool Commands::SendStatus(const QString & command, const QString & serial,
-                          const QString & status)
-{
-    QString msg = QString("%1:%2").arg(serial, status);
-
-    int len = write(2, msg.toUtf8().constData(), msg.size());
-    len += write(2, "\n", 1);
-
-    if (len != msg.size() + 1)
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
-            .arg(command).arg(len).arg(msg.size()).arg(msg));
+            .arg(command).arg(len).arg(msgbuf.size()).arg(QString(msgbuf)));
         return false;
     }
 
     if (!command.isEmpty())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-            .arg(command, msg));
+        if (command == m_prev_cmd)
+        {
+            if (++m_rep_cmd_cnt % 25 == 0)
+            {
+                LOG(VB_RECORD, LOG_INFO, LOC +
+                    QString("Processing '%1' --> '%2' (Repeated 25 times)")
+                    .arg(command, QString(msgbuf)));
+            }
+        }
+        else
+        {
+            if (m_rep_cmd_cnt)
+            {
+                LOG(VB_RECORD, LOG_INFO,
+                    LOC + QString("Processing '%1' (Repeated %2 times)")
+                    .arg(m_prev_cmd).arg(m_rep_cmd_cnt % 25));
+                m_rep_cmd_cnt = 0;
+            }
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("Processing '%1' --> '%2'")
+                .arg(command, QString(msgbuf)));
+        }
+        m_prev_cmd = command;
     }
-#if 0
     else
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("%1").arg(msg));
-#endif
+    {
+        m_prev_cmd.clear();
+        m_rep_cmd_cnt = 0;
+    }
 
     m_parent->ClearError();
     return true;
 }
 
-bool Commands::ProcessCommand(const QString & cmd)
+bool Commands::ProcessCommand(const QString & query)
 {
-    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Processing '%1'").arg(cmd));
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Processing '%1'").arg(query));
 
     std::unique_lock<std::mutex> lk1(m_parent->m_msgMutex);
 
-    if (cmd.startsWith("APIVersion?"))
+    if (query.startsWith("APIVersion?"))
     {
-        if (m_parent->m_fatal)
-            SendStatus(cmd, "ERR:" + m_parent->ErrorString());
-        else
-            SendStatus(cmd, "OK:2");
+        write(2, "OK:3\n", 5);
         return true;
     }
 
-    QStringList tokens = cmd.split(':', Qt::SkipEmptyParts);
-    if (tokens.size() < 2)
+    QJsonParseError parseError;
+    QJsonDocument   doc;
+    QJsonObject     jObj;
+    QString         cmd;
+    QString         serial;
+    QVariantMap     elements;
+    QByteArray      cmdbuf = query.toUtf8();
+
+    jObj = doc.object();
+    doc = QJsonDocument::fromJson(cmdbuf, &parseError);
+    elements = doc.toVariant().toMap();
+
+    cmd = elements["command"].toString();
+    serial = elements["serial"].toString();
+
+    if (parseError.error != QJsonParseError::NoError)
     {
-        SendStatus(cmd, "0",
-                   QString("0:ERR:Version 2 API expects serial_no:msg format. "
-                           "Saw '%1' instead").arg(cmd));
-        return true;
+        SendStatus(query, "ERR", serial,
+                   QString("ExternalRecorder sent invalid JSON message: %1: %2")
+                   .arg(parseError.offset).arg(parseError.errorString()));
+        return false;
+    }
+    if (m_parent->m_fatal)
+    {
+        SendStatus(query, "ERR", serial, m_parent->ErrorString());
+        return false;
     }
 
-    if (tokens[1].startsWith("APIVersion?"))
+    if (elements["command"] == "APIVersion")
     {
-        if (m_parent->m_fatal)
-            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
+        m_apiVersion = elements["value"].toInt();
+        SendStatus(cmd, "OK", serial, QString::number(m_apiVersion));
+    }
+    else if (cmd == "Version?")
+    {
+        SendStatus(cmd, "OK", serial, VERSION);
+    }
+    else if (cmd == "Description?")
+    {
+        if (m_parent->m_desc.trimmed().isEmpty())
+            SendStatus(cmd, "WARN", serial, "Not set");
         else
-            SendStatus(cmd, tokens[0], "OK:2");
+            SendStatus(cmd, "OK", serial, m_parent->m_desc.trimmed());
     }
-    else if (tokens[1].startsWith("APIVersion"))
+    else if (cmd == "HasLock?")
     {
-        if (tokens.size() > 1)
-        {
-            m_apiVersion = tokens[2].toInt();
-            SendStatus(cmd, tokens[0], QString("OK:%1").arg(m_apiVersion));
-        }
-        else
-            SendStatus(cmd, tokens[0], "ERR:Missing API Version number");
+        SendStatus(cmd, "OK", serial, m_parent->m_ready ? "Yes" : "No");
     }
-    else if (tokens[1].startsWith("Version?"))
+    else if (cmd == "SignalStrengthPercent?")
     {
-        if (m_parent->m_fatal)
-            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
-        else
-            SendStatus(cmd, tokens[0], "OK:" + VERSION);
+        SendStatus(cmd, "OK", serial, m_parent->m_ready ? "100" : "20");
     }
-    else if (tokens[1].startsWith("Description?"))
+    else if (cmd == "LockTimeout?")
     {
-        if (m_parent->m_fatal)
-            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
-        else if (m_parent->m_desc.trimmed().isEmpty())
-            SendStatus(cmd, tokens[0], "WARN:Not set");
-        else
-            SendStatus(cmd, tokens[0], "OK:" + m_parent->m_desc.trimmed());
+        LockTimeout(serial);
     }
-    else if (tokens[1].startsWith("HasLock?"))
+    else if (cmd == "HasTuner?")
     {
-        if (m_parent->m_ready)
-            SendStatus(cmd, tokens[0], "OK:Yes");
-        else
-            SendStatus(cmd, tokens[0], "OK:No");
+        HasTuner(serial);
     }
-    else if (tokens[1].startsWith("SignalStrengthPercent"))
+    else if (cmd == "HasPictureAttributes?")
     {
-        if (m_parent->m_ready)
-            SendStatus(cmd, tokens[0], "OK:100");
-        else
-            SendStatus(cmd, tokens[0], "OK:20");
+        HasPictureAttributes(serial);
     }
-    else if (tokens[1].startsWith("LockTimeout?"))
-    {
-        LockTimeout(tokens[0]);
-    }
-    else if (tokens[1].startsWith("HasTuner"))
-    {
-        HasTuner(tokens[0]);
-    }
-    else if (tokens[1].startsWith("HasPictureAttributes"))
-    {
-        HasPictureAttributes(tokens[0]);
-    }
-    else if (tokens[1].startsWith("SendBytes"))
+    else if (cmd == "SendBytes")
     {
         // Used when FlowControl is Polling
-        SendStatus(cmd, tokens[0], "ERR:Not supported");
+        SendStatus(cmd, "ERR", serial, "Not supported");
     }
-    else if (tokens[1].startsWith("XON"))
+    else if (cmd == "XON")
     {
         // Used when FlowControl is XON/XOFF
         if (m_parent->m_streaming)
         {
-            SendStatus(cmd, tokens[0], "OK");
+            SendStatus(cmd, "OK", serial, "Started Streaming");
             m_parent->m_xon = true;
             m_parent->m_flowCond.notify_all();
         }
         else
-            SendStatus(cmd, tokens[0], "WARN:Not streaming");
+            SendStatus(cmd, "Warn", serial, "Not Streaming");
     }
-    else if (tokens[1].startsWith("XOFF"))
+    else if (cmd == "XOFF")
     {
         if (m_parent->m_streaming)
         {
-            SendStatus(cmd, tokens[0], "OK");
+            SendStatus(cmd, "OK", serial, "Stopped Streaming");
             // Used when FlowControl is XON/XOFF
             m_parent->m_xon = false;
             m_parent->m_flowCond.notify_all();
         }
         else
-            SendStatus(cmd, tokens[0], "WARN:Not streaming");
+            SendStatus(cmd, "Warn", serial, "Not Streaming");
     }
-    else if (tokens[1].startsWith("TuneChannel"))
+    else if (cmd == "TuneChannel")
     {
-        if (tokens.size() > 2)
-            TuneChannel(tokens[0], tokens[2]);
-        else
-            SendStatus(cmd, tokens[0], "ERR:Missing channum");
+        TuneChannel(serial, elements);
     }
-    else if (tokens[1].startsWith("TuneStatus?"))
+    else if (cmd == "TuneStatus?")
     {
-        TuneStatus(tokens[0]);
+        TuneStatus(serial);
     }
-    else if (tokens[1].startsWith("LoadChannels"))
+    else if (cmd == "LoadChannels")
     {
-        LoadChannels(tokens[0]);
+        LoadChannels(serial);
     }
-    else if (tokens[1].startsWith("FirstChannel"))
+    else if (cmd == "FirstChannel")
     {
-        FirstChannel(tokens[0]);
+        FirstChannel(serial);
     }
-    else if (tokens[1].startsWith("NextChannel"))
+    else if (cmd == "NextChannel")
     {
-        NextChannel(tokens[0]);
+        NextChannel(serial);
     }
-    else if (tokens[1].startsWith("IsOpen?"))
+    else if (cmd == "IsOpen?")
     {
         std::unique_lock<std::mutex> lk2(m_parent->m_runMutex);
-        if (m_parent->m_fatal)
-            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
-        else if (m_parent->m_ready)
-            SendStatus(cmd, tokens[0], "OK:Open");
+        if (m_parent->m_ready)
+            SendStatus(cmd, "OK", serial, "Open");
         else
-            SendStatus(cmd, tokens[0], "WARN:Not Open yet");
+            SendStatus(cmd, "WARN", serial, "Not Open yet");
     }
-    else if (tokens[1].startsWith("CloseRecorder"))
+    else if (cmd == "CloseRecorder")
     {
         if (m_parent->m_streaming)
-            StopStreaming(tokens[0], true);
+            StopStreaming(serial, true);
         m_parent->Terminate();
-        SendStatus(cmd, tokens[0], "OK:Terminating");
+        SendStatus(cmd, "OK", serial, "Terminating");
         Cleanup();
     }
-    else if (tokens[1].startsWith("FlowControl?"))
+    else if (cmd == "FlowControl?")
     {
-        SendStatus(cmd, tokens[0], "OK:XON/XOFF");
+        SendStatus(cmd, "OK", serial, "XON/XOFF");
     }
-    else if (tokens[1].startsWith("BlockSize"))
+    else if (cmd == "BlockSize")
     {
-        if (tokens.size() > 1)
-            SetBlockSize(tokens[0], tokens[2].toUInt());
+        if (elements.find("value") == elements.end())
+            SendStatus(cmd, "ERR", serial, "Missing block size value");
         else
-            SendStatus(cmd, tokens[0], "ERR:Missing block size");
+            SetBlockSize(serial, elements["value"].toUInt());
     }
-    else if (tokens[1].startsWith("StartStreaming"))
+    else if (cmd == "StartStreaming")
     {
-        StartStreaming(tokens[0]);
+        StartStreaming(serial);
     }
-    else if (tokens[1].startsWith("StopStreaming"))
+    else if (cmd == "StopStreaming")
     {
         /* This does not close the stream!  When Myth is done with
          * this 'recording' ExternalChannel::EnterPowerSavingMode()
          * will be called, which invokes CloseRecorder() */
-        StopStreaming(tokens[0], false);
+        StopStreaming(serial, false);
     }
     else
-        SendStatus(cmd, tokens[0],
-                   QString("ERR:Unrecognized command '%1'").arg(tokens[1]));
+        SendStatus(cmd, "ERR", serial, QString("Unrecognized command '%1'").arg(query));
 
     return true;
 }

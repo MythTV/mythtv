@@ -117,16 +117,84 @@ bool ExternalChannel::Tune(const QString &channum)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + channum);
 
-    if (!m_streamHandler->ProcessCommand("TuneChannel:" + channum,
-                                         result, m_tuneTimeout))
+    if (m_streamHandler->APIVersion() < 3)
     {
-        LOG(VB_CHANNEL, LOG_ERR, LOC + QString
-            ("Failed to Tune %1: %2").arg(channum, result));
-        return false;
+        if (!m_streamHandler->ProcessCommand("TuneChannel:" + channum,
+                                             result, m_tuneTimeout))
+        {
+            LOG(VB_CHANNEL, LOG_ERR, LOC + QString
+                ("Failed to Tune %1: %2").arg(channum, result));
+            return false;
+        }
+        m_backgroundTuning = result.startsWith("OK:InProgress");
+    }
+    else
+    {
+        QVariantMap cmd, vresult;
+        QByteArray  response;
+
+        cmd["command"] = "TuneChannel";
+        cmd["channum"] = channum;
+        cmd["inputid"] = GetInputID();
+        cmd["sourceid"] = m_sourceId;
+
+        if (m_pParent)
+        {
+            ProgramInfo* prog = m_pParent->GetRecording();
+            if (prog)
+            {
+                uint recordid = prog->GetRecordingRuleID();
+                cmd["recordid"] = recordid;
+            }
+        }
+
+        uint     chanid           = 0;
+        QString  tvformat;
+        QString  modulation;
+        QString  freqtable;
+        QString  freqid;
+        int      finetune         = 0;
+        uint64_t frequency        = 0;
+        QString  dtv_si_std;
+        int      mpeg_prog_num    = 0;
+        uint     atsc_major       = 0;
+        uint     atsc_minor       = 0;
+        uint     dvb_transportid  = 0;
+        uint     dvb_networkid    = 0;
+        uint     mplexid          = 0;
+        bool     commfree         = false;
+
+        if (!ChannelUtil::GetChannelData(m_sourceId, chanid, channum,
+                                         tvformat, modulation, freqtable, freqid,
+                                         finetune, frequency, dtv_si_std,
+                                         mpeg_prog_num, atsc_major, atsc_minor,
+                                         dvb_transportid, dvb_networkid,
+                                         mplexid, commfree))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + " " +
+                QString("Failed to find channel in DB on input '%1' ")
+                .arg(m_inputId));
+        }
+        else
+        {
+            cmd["chanid"] = chanid;
+            cmd["freqid"] = freqid;
+            cmd["atsc_major"] = atsc_major;
+            cmd["atsc_minor"] = atsc_minor;
+            cmd["mplexid"] = mplexid;
+        }
+
+        if (!m_streamHandler->ProcessJson(cmd, vresult, response))
+        {
+            LOG(VB_CHANNEL, LOG_ERR, LOC + QString
+                ("Failed to Tune %1: %2").arg(channum, QString(response)));
+            return false;
+        }
+        m_backgroundTuning = vresult["message"]
+                             .toString().startsWith("InProgress");
     }
 
     UpdateDescription();
-    m_backgroundTuning = result.startsWith("OK:InProgress");
 
     return true;
 }

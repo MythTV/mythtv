@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include <QMutex>
 #include <QMap>
+#include <QVariantMap>
 #include <QStringList>
 #include <QTextStream>
 
@@ -35,7 +36,7 @@ class ExternIO
 
     bool Ready(int fd, std::chrono::milliseconds timeout, const QString & what);
     int Read(QByteArray & buffer, int maxlen, std::chrono::milliseconds timeout = 2500ms);
-    QString GetStatus(std::chrono::milliseconds timeout = 2500ms);
+    QByteArray GetStatus(std::chrono::milliseconds timeout = 2500ms);
     int Write(const QByteArray & buffer);
     bool Run(void);
     bool Error(void) const { return !m_error.isEmpty(); }
@@ -67,7 +68,7 @@ class ExternIO
 
 class ExternalStreamHandler : public StreamHandler
 {
-    enum constants { MAX_API_VERSION = 2,
+    enum constants { MAX_API_VERSION = 3,
                      TS_PACKET_SIZE = 188,
                      PACKET_SIZE = TS_PACKET_SIZE * 8192,
                      TOO_FAST_SIZE = TS_PACKET_SIZE * 32768 };
@@ -112,6 +113,12 @@ class ExternalStreamHandler : public StreamHandler
                      std::chrono::milliseconds timeout, uint retry_cnt);
     bool ProcessVer2(const QString & command, QString & result,
                      std::chrono::milliseconds timeout, uint retry_cnt);
+    bool ProcessJson(const QVariantMap & vmsg,
+                     QVariantMap & result,
+                     QByteArray & response,
+                     std::chrono::milliseconds timeout = 4s,
+                     uint retry_cnt = 3);
+    int APIVersion(void) const { return m_apiVersion; }
 
   private:
     int  StreamingCount(void) const;

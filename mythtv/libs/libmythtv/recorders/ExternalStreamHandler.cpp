@@ -19,6 +19,8 @@
 // Qt headers
 #include <QString>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 // MythTV headers
 #include "config.h"
@@ -168,7 +170,7 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, std::chrono::milliseconds ti
     return len;
 }
 
-QString ExternIO::GetStatus(std::chrono::milliseconds timeout)
+QByteArray ExternIO::GetStatus(std::chrono::milliseconds timeout)
 {
     if (Error())
     {
@@ -194,7 +196,7 @@ QString ExternIO::GetStatus(std::chrono::milliseconds timeout)
     LOG(VB_RECORD, LOG_DEBUG, QString("ExternIO::GetStatus '%1'")
         .arg(msg));
 
-    return msg;
+    return msg.toUtf8();
 }
 
 int ExternIO::Write(const QByteArray & buffer)
@@ -876,7 +878,7 @@ bool ExternalStreamHandler::SetAPIVersion(void)
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("Bad response to 'APIVersion?' - '%1'. "
-                        "Expecting 1 or 2").arg(result));
+                        "Expecting 1, 2 or 3").arg(result));
             m_apiVersion = 1;
         }
 
@@ -1234,6 +1236,23 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
 {
     QMutexLocker locker(&m_processLock);
 
+    if (m_apiVersion == 3)
+    {
+        QVariantMap vcmd, vresult;
+        QByteArray  response;
+        QStringList tokens = cmd.split(':');
+        vcmd["command"] = tokens[0];
+        if (tokens.size() > 1)
+            vcmd["value"] = tokens[1];
+
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Arguments: %1").arg(tokens.join("\n")));
+
+        bool r = ProcessJson(vcmd, vresult, response, timeout, retry_cnt);
+        result = QString("%1:%2").arg(vresult["status"].toString())
+                                 .arg(vresult["message"].toString());
+        return r;
+    }
     if (m_apiVersion == 2)
         return ProcessVer2(cmd, result, timeout, retry_cnt);
     if (m_apiVersion == 1)
@@ -1479,6 +1498,155 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("External Recorder invalid response to '%1': '%2'")
                 .arg(cmd, result));
+        }
+
+        if (++m_ioErrCnt > 10)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Too many I/O errors.");
+            m_bError = true;
+            break;
+        }
+    }
+
+    return false;
+}
+
+bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
+                                        QVariantMap & elements,
+                                        QByteArray & response,
+                                        std::chrono::milliseconds timeout,
+                                        uint retry_cnt)
+{
+    for (uint cnt = 0; cnt < retry_cnt; ++cnt)
+    {
+        QVariantMap query(vmsg);
+
+        uint serial = ++m_serialNo;
+        query["serial"] = serial;
+        QString cmd = query["command"].toString();
+
+        QJsonDocument qdoc;
+        qdoc = QJsonDocument::fromVariant(query);
+        QByteArray cmdbuf = qdoc.toJson(QJsonDocument::Compact);
+
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("ProcessJson: %1").arg(QString(cmdbuf)));
+
+        if (m_io->Error())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder in bad state: " +
+                m_io->ErrorString());
+            return false;
+        }
+
+        /* Send query */
+        m_io->Write(cmdbuf);
+        m_io->Write("\n");
+
+        MythTimer timer(MythTimer::kStartRunning);
+        while (timer.elapsed() < timeout)
+        {
+            response = m_io->GetStatus(timeout);
+            if (m_io->Error())
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to read from External Recorder: " +
+                    m_io->ErrorString());
+                    m_bError = true;
+                return false;
+            }
+
+            if (!response.isEmpty())
+            {
+                QJsonParseError parseError;
+                QJsonDocument doc;
+
+                doc = QJsonDocument::fromJson(response, &parseError);
+
+                if (parseError.error != QJsonParseError::NoError)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("ExternalRecorder returned invalid JSON message: %1: %2\n%3\nfor\n%4")
+                        .arg(parseError.offset).arg(parseError.errorString())
+                        .arg(QString(response))
+                        .arg(QString(cmdbuf)));
+                }
+                else
+                {
+                    elements = doc.toVariant().toMap();
+                    if (elements.find("serial") == elements.end())
+                        continue;
+
+                    serial = elements["serial"].toInt();
+                    if (serial >= m_serialNo)
+                        break;
+
+                    if (elements.find("status") != elements.end() &&
+                        elements["status"] != "OK")
+                    {
+                        LOG(VB_RECORD, LOG_WARNING, LOC + QString("%1: %2")
+                            .arg(elements["status"].toString())
+                            .arg(elements["message"].toString()));
+                    }
+                }
+            }
+        }
+
+        if (timer.elapsed() >= timeout)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("ProcessJson: Giving up waiting for response for "
+                        "command '%2'").arg(QString(cmdbuf)));
+
+        }
+
+        if (serial > m_serialNo)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("ProcessJson: Looking for serial no %1, "
+                        "but received %2 for command '%2'")
+                .arg(QString::number(m_serialNo))
+                .arg(serial)
+                .arg(QString(cmdbuf)));
+        }
+        else if (elements.find("status") == elements.end())
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("ProcessJson: ExternalRecorder 'status' not found in %1")
+                .arg(QString(response)));
+        }
+        else
+        {
+            QString status = elements["status"].toString();
+            bool okay = (status == "OK");
+            if (okay || status == "WARN" || status == "ERR")
+            {
+                LogLevel_t level = LOG_INFO;
+
+                m_ioErrCnt = 0;
+                if (!okay)
+                    level = LOG_WARNING;
+                else if (cmd == "SendBytes" ||
+                         (cmd == "TuneStatus" &&
+                          elements["message"] == "InProgress"))
+                    level = LOG_DEBUG;
+
+                LOG(VB_RECORD, level,
+                    LOC + QString("ProcessJson('%1') = %2:%3:%4 took %5ms %6")
+                    .arg(QString(cmdbuf))
+                    .arg(elements["serial"].toInt())
+                    .arg(elements["status"].toString())
+                    .arg(elements["message"].toString())
+                    .arg(QString::number(timer.elapsed().count()))
+                    .arg(okay ? "" : "<-- NOTE")
+                    );
+
+                return okay;
+            }
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("External Recorder invalid response to '%1': '%2'")
+                .arg(QString(cmdbuf))
+                .arg(QString(response)));
         }
 
         if (++m_ioErrCnt > 10)
