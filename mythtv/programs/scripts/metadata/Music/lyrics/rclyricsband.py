@@ -5,7 +5,7 @@ from lib.culrcscrapers.rclyricsband.lyricsScraper import LyricsFetcher
 # make sure this-------^^^^^^^^^ matches this file's basename
 
 info = {
-    'name':        'RCLyricsBand',
+    'name':        '*RCLyricsBand',
     'description': 'Search http://www.rclyricsband.com for lyrics',
     'author':      'ronie',
     'priority':    '130',
