@@ -42,6 +42,6 @@ add_custom_target(metadata_Music_lyrics ALL DEPENDS ${PROCESSED_FILES})
 install(FILES README
         DESTINATION ${CMAKE_INSTALL_DATADIR}/mythtv/metadata/Music/lyrics)
 install(
-  DIRECTORY common examples
+  DIRECTORY common examples lib Kodistubs
   DESTINATION ${CMAKE_INSTALL_DATADIR}/mythtv/metadata/Music/lyrics
   PATTERN "\.gitignore" EXCLUDE)
