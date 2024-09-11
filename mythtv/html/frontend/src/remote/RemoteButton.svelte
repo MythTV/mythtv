@@ -17,6 +17,8 @@
     }
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="item left waves-effect waves-light btn-large" on:click={handleClick}>
     {#if icon === ""}
         {title}
