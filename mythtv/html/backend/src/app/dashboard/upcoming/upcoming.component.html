@@ -1,4 +1,4 @@
-<div>
+<div  style="min-width: 960px;">
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
     </div>
@@ -30,7 +30,7 @@
                         <ng-template #refreshBn>
                             <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
                                 (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
-                            &nbsp;&nbsp;&nbsp;{{ programs.length }}  {{ 'common.rows' | translate }}
+                            &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
                         </ng-template>
                     </div>
                 </ng-template>
@@ -73,35 +73,59 @@
                 </ng-template>
 
                 <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
-                    <tr>
+                    <tr  style="height: 42px">
                         <td class="p-1 overflow-hidden">
-                            <div [innerHTML]="formatStartDate(program, rowIndex)"></div>
+                            <div class="mycell">
+                                <div class="mytext" [innerHTML]="formatStartDate(program, rowIndex)"></div>
+                            </div>
                         </td>
                         <td class="justify-content-end p-1 overflow-hidden">
-                            {{formatStartTime(program)}}
+                            <div class="mycell">
+                                <div class="mytext">{{formatStartTime(program)}} </div>
+                            </div>
                         </td>
                         <td class="justify-content-end pl-1 pr-3 pt-1 pb-1 overflow-hidden">
-                            {{ getDuration(program) | number:'1.0-0' }} min</td>
-                        <td class="p-1">{{program.Recording.EncoderName}}
+                            <div class="mycell">
+                                <div class="mytext">{{ getDuration(program) | number:'1.0-0' }} min</div>
+                            </div>
                         </td>
-                        <td class="p-1 overflow-hidden"> {{program.Title}}</td>
+                        <td class="p-1">
+                            <div class="mycell">
+                                <div class="mytext">{{program.Recording.EncoderName}}</div>
+                            </div>
+                        </td>
+                        <td class="p-1 overflow-hidden">
+                            <div class="mycell">
+                                <div class="mytext">{{program.Title}}</div>
+                            </div>
+                        </td>
                         <td class="p-1 overflow-hidden" pTooltip="{{program.Description}}" tooltipPosition="top">
-                            {{program.SubTitle.slice(0,50)}}</td>
+                            <div class="mycell">
+                                <div class="mytext">{{program.SubTitle.slice(0,50)}}</div>
+                            </div>
+                        </td>
                         <td class="p-1">
                             <div *ngIf="program.Season>0 || program.Episode>0">
                                 {{program.Season}}x{{program.Episode}}
                             </div>
                         </td>
                         <td class="justify-content-end p-1">
-                            <div [innerHTML]="formatAirDate(program)"></div>
+                            <div class="mycell">
+                                <div class="mytext" [innerHTML]="formatAirDate(program)"></div>
+                            </div>
                         </td>
                         <td class="p-1">
-                            {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
+                            <div class="mycell">
+                                <div class="mytext">{{program.Channel.ChanNum}} {{program.Channel.CallSign}}</div>
+                            </div>
+                        </td>
                         <td class="p-1">{{program.Recording.RecGroup}}</td>
                         <td class="p-1">
-                            <div *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1 ?
+                            <div class="mycell">
+                                <div class="mytext" *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1 ?
                                 'text-green-500' : 'text-pink-500'">
-                                {{dataService.recStatusText[program.Recording.StatusName]}}
+                                    {{dataService.recStatusText[program.Recording.StatusName]}}
+                                </div>
                             </div>
                         </td>
                         <td class="pt-1 pb-0" style="white-space: nowrap;">

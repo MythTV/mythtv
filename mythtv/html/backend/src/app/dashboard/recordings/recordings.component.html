@@ -1,4 +1,4 @@
-<form name="recsform" #recsform="ngForm">
+<form name="recsform" #recsform="ngForm" style="min-width: 960px;">
 
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
@@ -20,8 +20,8 @@
             <span class="p-input-icon-right">
                 <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
                 <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
-                    class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}" pTooltip="{{ 'dashboard.recordings.regex' | translate }}"
-                    tooltipPosition="top" />
+                    class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}"
+                    pTooltip="{{ 'dashboard.recordings.regex' | translate }}" tooltipPosition="top" />
             </span>
 
             <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
@@ -85,35 +85,59 @@
             </ng-template>
             <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
                 <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}" [pSelectableRow]="program"
-                    [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)">
+                    [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)" style="height: 42px">
                     <td class="p-1 overflow-hidden">
-                        <i class="pi pi-exclamation-triangle p-1" *ngIf="program.VideoPropNames.indexOf('DAMAGED') > -1"
-                            pTooltip="{{ 'dashboard.recordings.damaged' | translate }}" tooltipPosition="top"></i>
-                        {{program.Title}}
+                        <div class="mycell">
+                            <div class="mytext">
+                                <i class="pi pi-exclamation-triangle p-1"
+                                    *ngIf="program.VideoPropNames.indexOf('DAMAGED') > -1"
+                                    pTooltip="{{ 'dashboard.recordings.damaged' | translate }}"
+                                    tooltipPosition="top"></i>
+                                {{program.Title}}
+                            </div>
+                        </div>
                     </td>
                     <td class="p-1">
                         <i class="pi pi-eye" *ngIf="program.ProgramFlagNames.indexOf('WATCHED') > -1"
                             pTooltip="{{ 'dashboard.recordings.watched' | translate }}" tooltipPosition="top"></i>
                     </td>
                     <td class="p-1 overflow-hidden" pTooltip="{{program.Description}}" tooltipPosition="top">
-                        {{program.SubTitle}}</td>
+                        <div class="mycell">
+                            <div class="mytext">{{program.SubTitle}}</div>
+                        </div>
+                    </td>
                     <td class="p-1">
                         <div *ngIf="program.Season>0 || program.Episode>0"> {{program.Season}}x{{program.Episode}}
                         </div>
                     </td>
-                    <td class="justify-content-end p-1">
-                        <div [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
+                    <td class="justify-content-end p-1 overflow-hidden">
+                        <div class="mycell">
+                            <div class="mytext" [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
+                        </div>
                     </td>
-                    <td class="justify-content-end p-1">
-                        <div [innerHTML]="utility.formatDate(program.StartTime,true)"></div>
+                    <td class="justify-content-end p-1 overflow-hidden">
+                        <div class="mycell">
+                            <div class="mytext" [innerHTML]="utility.formatDate(program.StartTime,true)"></div>
+                        </div>
                     </td>
                     <td class="p-1">
-                        {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
+                        <div class="mycell">
+                            <div class="mytext">{{program.Channel.ChanNum}} {{program.Channel.CallSign}}
+                            </div>
+                        </div>
+                    </td>
                     <td class="p-1">{{program.Recording.RecGroup}}</td>
-                    <td class="justify-content-end p-1">{{ getDuration(program) |
-                        number:'1.0-0' }} min</td>
                     <td class="justify-content-end p-1">
-                        {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</td>
+                        <div class="mycell">
+                            <div class="mytext">{{ getDuration(program) | number:'1.0-0' }} min
+                            </div>
+                        </div>
+                    </td>
+                    <td class="justify-content-end p-1">
+                        <div class="mycell">
+                            <div class="mytext">{{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</div>
+                        </div>
+                    </td>
                     <td class="pt-1 pb-0" style="background: var(--surface-card); white-space: nowrap;">
                         <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)
                          + '&Download=' + getDownload(program)}}"

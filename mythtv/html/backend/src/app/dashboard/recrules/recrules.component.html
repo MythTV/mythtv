@@ -1,5 +1,5 @@
 <h2>{{ 'dashboard.recrules.heading' | translate }}</h2>
-<div class="block card w-full" style="height: 90vh" *ngIf="rulesLoaded else loading">
+<div class="block card w-full" style="height: 90vh; min-width: 960px;" *ngIf="rulesLoaded else loading">
     <p-table [value]="recRules" scrollHeight="flex" [scrollable]="true" styleClass="p-datatable-striped p-datatable-sm"
         [rowHover]="true" responsiveLayout="scroll" sortField="Title">
         <ng-template pTemplate="caption">

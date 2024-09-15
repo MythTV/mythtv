@@ -36,7 +36,7 @@ export class NavbarComponent implements OnInit {
         private router: Router) {
         this.themeService.getThemes().then((themes: Theme[]) => {
             this.m_themes$ = themes;
-            this.m_selectedTheme = this.findThemeByName(localStorage.getItem('Theme') || 'Indigo Light');
+            this.m_selectedTheme = this.findThemeByName(localStorage.getItem('Theme') || 'Blue Light');
             this.themeService.switchTheme(this.m_selectedTheme.CSS);
         });
 
