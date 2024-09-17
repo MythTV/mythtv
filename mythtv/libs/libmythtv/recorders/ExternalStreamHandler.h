@@ -114,7 +114,7 @@ class ExternalStreamHandler : public StreamHandler
     bool ProcessVer2(const QString & command, QString & result,
                      std::chrono::milliseconds timeout, uint retry_cnt);
     bool ProcessJson(const QVariantMap & vmsg,
-                     QVariantMap & result,
+                     QVariantMap & elements,
                      QByteArray & response,
                      std::chrono::milliseconds timeout = 4s,
                      uint retry_cnt = 3);

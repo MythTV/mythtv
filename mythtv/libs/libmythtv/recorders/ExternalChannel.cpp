@@ -130,7 +130,8 @@ bool ExternalChannel::Tune(const QString &channum)
     }
     else
     {
-        QVariantMap cmd, vresult;
+        QVariantMap cmd;
+        QVariantMap vresult;
         QByteArray  response;
 
         cmd["command"] = "TuneChannel";

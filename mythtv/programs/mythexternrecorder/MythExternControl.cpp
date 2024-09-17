@@ -275,7 +275,7 @@ bool Commands::ProcessCommand(const QString & query)
         return true;
     }
 
-    QJsonParseError parseError;
+    QJsonParseError parseError {};
     QJsonDocument   doc;
     QJsonObject     jObj;
     QString         cmd;

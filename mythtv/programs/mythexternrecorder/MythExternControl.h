@@ -91,7 +91,7 @@ class Commands : public QObject
                     const QString & status,
                     const QString & serial,
                     const QString & response = "");
-    bool ProcessCommand(const QString & cmd);
+    bool ProcessCommand(const QString & query);
 
   protected:
     void Run(void);

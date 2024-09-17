@@ -84,7 +84,7 @@ class MythExternRecApp : public QObject
     void NextChannel(const QString & serial);
 
     void NewEpisodeStarting(void);
-    void TuneChannel(const QString & serial, const QVariantMap & args);
+    void TuneChannel(const QString & serial, const QVariantMap & chaninfo);
     void TuneStatus(const QString & serial);
     void HasPictureAttributes(const QString & serial);
     void SetBlockSize(const QString & serial, int blksz);
@@ -95,9 +95,9 @@ class MythExternRecApp : public QObject
 
   private:
     bool config(void);
-    QString sanitize_var(const QString & var) const;
+    static QString sanitize_var(const QString & var);
     QString replace_extra_args(const QString & var,
-                               const QVariantMap & extra_args);
+                               const QVariantMap & extra_args) const;
 
     bool                    m_fatal        { false };
     QString                 m_fatalMsg;

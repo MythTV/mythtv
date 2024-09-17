@@ -177,7 +177,7 @@ QByteArray ExternIO::GetStatus(std::chrono::milliseconds timeout)
         LOG(VB_RECORD, LOG_ERR,
             QString("ExternIO::GetStatus: already in error state: '%1'")
             .arg(m_error));
-        return QByteArray();
+        return {};
     }
 
     std::chrono::milliseconds waitfor = m_status.atEnd() ? timeout : 0ms;
@@ -189,7 +189,7 @@ QByteArray ExternIO::GetStatus(std::chrono::milliseconds timeout)
     }
 
     if (m_status.atEnd())
-        return QByteArray();
+        return {};
 
     QString msg = m_status.readLine();
 
@@ -1238,7 +1238,8 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
 
     if (m_apiVersion == 3)
     {
-        QVariantMap vcmd, vresult;
+        QVariantMap vcmd;
+        QVariantMap vresult;
         QByteArray  response;
         QStringList tokens = cmd.split(':');
         vcmd["command"] = tokens[0];
@@ -1558,7 +1559,7 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
 
             if (!response.isEmpty())
             {
-                QJsonParseError parseError;
+                QJsonParseError parseError {};
                 QJsonDocument doc;
 
                 doc = QJsonDocument::fromJson(response, &parseError);

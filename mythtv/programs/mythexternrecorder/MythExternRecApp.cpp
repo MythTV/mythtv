@@ -70,7 +70,7 @@ MythExternRecApp::~MythExternRecApp(void)
 
 /* Remove any non-replaced variables along with any dependant strings.
    Dependant strings are wrapped in {} */
-QString MythExternRecApp::sanitize_var(const QString & var) const
+QString MythExternRecApp::sanitize_var(const QString & var)
 {
     qsizetype p1, p2;
     QString cleaned = var;
@@ -98,7 +98,7 @@ QString MythExternRecApp::sanitize_var(const QString & var) const
 }
 
 QString MythExternRecApp::replace_extra_args(const QString & var,
-                                             const QVariantMap & extra_args)
+                                             const QVariantMap & extra_args) const
 {
     QString result = var;
     /*
@@ -184,7 +184,8 @@ bool MythExternRecApp::config(void)
         settings.endGroup();
 
         /* Replace defined VARs in the subsequently defined VARs */
-        QMap<QString, QString>::iterator Ivar, Ivar2;
+        QMap<QString, QString>::iterator Ivar;
+        QMap<QString, QString>::iterator Ivar2;
         for (Ivar = m_settingVars.begin();
              Ivar != m_settingVars.end(); ++Ivar)
         {
