@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { FilterMatchMode, MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { TableLazyLoadEvent } from 'primeng/table';
+import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
 import { GetRecordedListRequest, UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
@@ -22,6 +22,8 @@ export class RecordingsComponent implements OnInit {
 
   @ViewChild("recsform") currentForm!: NgForm;
   @ViewChild("menu") menu!: Menu;
+  @ViewChild('table') table!: Table;
+  @ViewChildren('row') rows!: QueryList<ElementRef>;
 
   programs: ScheduleOrProgram[] = [];
   selection: ScheduleOrProgram[] = [];
@@ -42,6 +44,7 @@ export class RecordingsComponent implements OnInit {
   priorRequest: GetRecordedListRequest = {};
   totalRecords = 0;
   showTable = false;
+  virtualScrollItemSize = 0;
   searchValue = '';
   selectedRecGroup: string | null = null;
 
@@ -221,6 +224,13 @@ export class RecordingsComponent implements OnInit {
       this.programs = [...this.programs]
       this.refreshing = false;
       this.showTable = true;
+      let row = this.rows.get(0);
+      if (row && row.nativeElement.offsetHeight)
+        this.virtualScrollItemSize = row.nativeElement.offsetHeight;
+      if (this.table) {
+        this.table.totalRecords = this.totalRecords;
+        this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+      }
       // setTimeout(() => {
       //   this.recGroups.push(...this.recGroups)
       //   this.selectedRecGroup = this.selectedRecGroup;

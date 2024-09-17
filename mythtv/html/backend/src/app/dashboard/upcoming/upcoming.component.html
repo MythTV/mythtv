@@ -1,14 +1,13 @@
-<div  style="min-width: 960px;">
+<div style="min-width: 960px;">
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
     </div>
     <h2>{{ 'dashboard.upcoming.heading' | translate }}</h2>
     <div class="block card w-full">
         <div style="height: 90vh">
-            <p-table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
+            <p-table #table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
                 [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm" [virtualScroll]="true"
-                [virtualScrollItemSize]="42" [rows]="50" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-                sortField="StartTime">
+                [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true" sortField="StartTime">
 
                 <ng-template pTemplate="caption">
                     <!-- Top Buttons -->
@@ -73,7 +72,7 @@
                 </ng-template>
 
                 <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
-                    <tr  style="height: 42px">
+                    <tr #row>
                         <td class="p-1 overflow-hidden">
                             <div class="mycell">
                                 <div class="mytext" [innerHTML]="formatStartDate(program, rowIndex)"></div>

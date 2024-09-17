@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -20,6 +20,7 @@ export class VideosComponent implements OnInit {
   @ViewChild("vidsform") currentForm!: NgForm;
   @ViewChild("menu") menu!: Menu;
   @ViewChild("table") table!: Table;
+  @ViewChildren('row') rows!: QueryList<ElementRef>;
 
   videos: VideoMetadataInfo[] = [];
   refreshing = false;
@@ -34,6 +35,7 @@ export class VideosComponent implements OnInit {
   lazyLoadEvent : TableLazyLoadEvent = {};
   totalRecords = 0;
   showTable = false;
+  virtualScrollItemSize = 0;
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -73,7 +75,6 @@ export class VideosComponent implements OnInit {
   }
 
   loadLazy(event: TableLazyLoadEvent) {
-    console.log(event)
     this.lazyLoadEvent = event;
     let request: GetVideoListRequest = {
       Sort: "title",
@@ -116,6 +117,13 @@ export class VideosComponent implements OnInit {
       this.videos = [...this.videos]
       this.refreshing = false;
       this.showTable = true;
+      let row = this.rows.get(0);
+      if (row && row.nativeElement.offsetHeight)
+        this.virtualScrollItemSize = row.nativeElement.offsetHeight;
+      if (this.table) {
+        this.table.totalRecords = this.totalRecords;
+        this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+      }
     });
 
   }

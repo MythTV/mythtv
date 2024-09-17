@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
-import { TableLazyLoadEvent } from 'primeng/table';
+import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
 import { DvrService } from 'src/app/services/dvr.service';
@@ -24,6 +24,9 @@ interface RuleListEntry {
 })
 export class UpcomingComponent implements OnInit, SchedulerSummary {
 
+  @ViewChild('table') table!: Table;
+  @ViewChildren('row') rows!: QueryList<ElementRef>;
+
   programs: ScheduleOrProgram[] = [];
   recRules: RuleListEntry[] = [];
   allRecRules: RuleListEntry[] = [];
@@ -42,6 +45,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   program?: ScheduleOrProgram;
   totalRecords = 0;
   showTable = false;
+  virtualScrollItemSize = 0;
   selectedRule: RuleListEntry | null = null;
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
@@ -144,6 +148,13 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       this.programs = [...this.programs]
       this.refreshing = false;
       this.showTable = true;
+      let row = this.rows.get(0);
+      if (row && row.nativeElement.offsetHeight)
+        this.virtualScrollItemSize = row.nativeElement.offsetHeight;
+      if (this.table) {
+        this.table.totalRecords = this.totalRecords;
+        this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+      }
     });
 
   }

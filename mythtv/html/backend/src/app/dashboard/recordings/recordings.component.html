@@ -39,12 +39,11 @@
             &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
         </div>
 
-
-        <p-table *ngIf="showTable" [value]="programs" [totalRecords]="totalRecords"
-            styleClass="p-datatable-sm p-datatable-striped" (onLazyLoad)="loadLazy($event)" [rows]="50" [lazy]="true"
+        <p-table #table *ngIf="showTable" [value]="programs" [totalRecords]="totalRecords"
+            styleClass="p-datatable-sm p-datatable-striped" (onLazyLoad)="loadLazy($event)" [rows]="100" [lazy]="true"
             [rowHover]="true" selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
             dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
-            sortField="Title" [virtualScroll]="true" [virtualScrollItemSize]="42" scrollHeight="flex"
+            sortField="Title" [virtualScroll]="true" scrollHeight="flex"
             [scrollable]="true">
 
             <ng-template pTemplate="caption">
@@ -84,8 +83,8 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
-                <tr [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}" [pSelectableRow]="program"
-                    [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)" style="height: 42px">
+                <tr #row [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}" [pSelectableRow]="program"
+                    [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)" >
                     <td class="p-1 overflow-hidden">
                         <div class="mycell">
                             <div class="mytext">

@@ -6,9 +6,9 @@
     <div class="block card w-full" style="height: 90vh">
         <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
         <p-table *ngIf="showTable" #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true"
-            styleClass="p-datatable-striped p-datatable-sm" [virtualScroll]="true" [rows]="50" [lazy]="true"
+            styleClass="p-datatable-striped p-datatable-sm" [virtualScroll]="true" [rows]="100" [lazy]="true"
             [totalRecords]="totalRecords" (onLazyLoad)="loadLazy($event)" [rowHover]="true" responsiveLayout="scroll"
-            [virtualScrollItemSize]="42" sortField="Title"  [scrollable]="true">
+            sortField="Title" [scrollable]="true">
             <ng-template pTemplate="caption">
                 <!-- Top Buttons -->
                 <div class="flex align-items-center">
@@ -65,7 +65,7 @@
             <ng-template pTemplate="body" let-video>
 
                 <!-- Directory Row -->
-                <tr *ngIf="video.ContentType == 'DIRECTORY'" style="height: 42px">
+                <tr #row *ngIf="video.ContentType == 'DIRECTORY'">
                     <td class="pt-1 pb-0" colspan="7">
                         <button pButton pRipple icon="pi pi-folder" class="p-button-text p-button-primary"
                             (click)="onDirectory(video.Title)" label="{{video.Title}}"></button>
@@ -73,7 +73,7 @@
                 </tr>
 
                 <!-- Video Row -->
-                <tr *ngIf="video.ContentType != 'DIRECTORY'" style="height: 42px">
+                <tr *ngIf="video.ContentType != 'DIRECTORY'">
                     <td class="p-1 overflow-hidden">
                         <div class="mycell">
                             <div class="mytext">{{video.Title}}</div>

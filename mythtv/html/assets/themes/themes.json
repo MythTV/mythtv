@@ -79,6 +79,30 @@
             "Image": "luna-pink.png"
         },
         {
+            "Category": "Material Design Compact",
+            "Name": "Indigo Light",
+            "CSS": "mdc-light-indigo.css",
+            "Image": "md-light-indigo.svg"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Deep Purple Light",
+            "CSS": "mdc-light-deeppurple.css",
+            "Image": "md-light-deeppurple.svg"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Indigo Dark",
+            "CSS": "mdc-dark-indigo.css",
+            "Image": "md-dark-indigo.svg"
+        },
+        {
+            "Category": "Material Design Compact",
+            "Name": "Deep Purple Dark",
+            "CSS": "mdc-dark-deeppurple.css",
+            "Image": "md-dark-deeppurple.svg"
+        },
+        {
             "Category": "Legacy",
             "Name": "Nova",
             "CSS": "nova.css",
@@ -125,6 +149,12 @@
             "Name": "Saga Purple",
             "CSS": "saga-purple.css",
             "Image": "saga-purple.png"
+        },
+        {
+            "Category": "Tailwind Light",
+            "Name": "Tailwind Light",
+            "CSS": "tailwind-light.css",
+            "Image": "tailwind-light.png"
         },
         {
             "Category": "Primeone - 2021",
