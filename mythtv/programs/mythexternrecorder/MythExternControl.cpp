@@ -229,9 +229,9 @@ bool Commands::SendStatus(const QString & command,
 
     if (!command.isEmpty())
     {
-        if (command == m_prev_cmd)
+        if (command == m_prevCmd)
         {
-            if (++m_rep_cmd_cnt % 25 == 0)
+            if (++m_repCmdCnt % 25 == 0)
             {
                 LOG(VB_RECORD, LOG_INFO, LOC +
                     QString("Processing '%1' --> '%2' (Repeated 25 times)")
@@ -240,23 +240,23 @@ bool Commands::SendStatus(const QString & command,
         }
         else
         {
-            if (m_rep_cmd_cnt)
+            if (m_repCmdCnt)
             {
                 LOG(VB_RECORD, LOG_INFO,
                     LOC + QString("Processing '%1' (Repeated %2 times)")
-                    .arg(m_prev_cmd).arg(m_rep_cmd_cnt % 25));
-                m_rep_cmd_cnt = 0;
+                    .arg(m_prevCmd).arg(m_repCmdCnt % 25));
+                m_repCmdCnt = 0;
             }
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("Processing '%1' --> '%2'")
                 .arg(command, QString(msgbuf)));
         }
-        m_prev_cmd = command;
+        m_prevCmd = command;
     }
     else
     {
-        m_prev_cmd.clear();
-        m_rep_cmd_cnt = 0;
+        m_prevCmd.clear();
+        m_repCmdCnt = 0;
     }
 
     m_parent->ClearError();

@@ -113,8 +113,8 @@ class Commands : public QObject
   private:
     std::thread m_thread;
 
-    size_t       m_rep_cmd_cnt  { 0 };
-    QString      m_prev_cmd;
+    size_t       m_repCmdCnt  { 0 };
+    QString      m_prevCmd;
 
     MythExternControl* m_parent { nullptr };
     int m_apiVersion { -1 };
