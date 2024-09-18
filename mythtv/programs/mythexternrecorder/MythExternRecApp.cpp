@@ -72,7 +72,8 @@ MythExternRecApp::~MythExternRecApp(void)
    Dependant strings are wrapped in {} */
 QString MythExternRecApp::sanitize_var(const QString & var)
 {
-    qsizetype p1, p2;
+    qsizetype p1 { -1 };
+    qsizetype p2 { -1 };
     QString cleaned = var;
 
     while ((p1 = cleaned.indexOf('{')) != -1)
