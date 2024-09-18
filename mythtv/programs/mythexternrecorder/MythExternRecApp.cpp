@@ -93,7 +93,7 @@ QString MythExternRecApp::sanitize_var(const QString & var)
     }
 
     LOG(VB_CHANNEL, LOG_DEBUG, QString("Sanitized: '%1' -> '%2'")
-        .arg(var).arg(cleaned));
+        .arg(var, cleaned));
 
     return cleaned;
 }
@@ -114,7 +114,7 @@ QString MythExternRecApp::replace_extra_args(const QString & var,
                         it->second.toString());
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
             QString("Replaced '%1' with '%2'")
-            .arg(it->first.toUpper()).arg(it->second.toString()));
+            .arg(it->first.toUpper(), it->second.toString()));
     }
     result = sanitize_var(result);
 

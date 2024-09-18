@@ -1250,8 +1250,8 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
             QString("Arguments: %1").arg(tokens.join("\n")));
 
         bool r = ProcessJson(vcmd, vresult, response, timeout, retry_cnt);
-        result = QString("%1:%2").arg(vresult["status"].toString())
-                                 .arg(vresult["message"].toString());
+        result = QString("%1:%2").arg(vresult["status"].toString(),
+                                      vresult["message"].toString());
         return r;
     }
     if (m_apiVersion == 2)
@@ -1568,9 +1568,10 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("ExternalRecorder returned invalid JSON message: %1: %2\n%3\nfor\n%4")
-                        .arg(parseError.offset).arg(parseError.errorString())
-                        .arg(QString(response))
-                        .arg(QString(cmdbuf)));
+                        .arg(parseError.offset)
+                        .arg(parseError.errorString(),
+                             QString(response),
+                             QString(cmdbuf)));
                 }
                 else
                 {
@@ -1586,8 +1587,8 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                         elements["status"] != "OK")
                     {
                         LOG(VB_RECORD, LOG_WARNING, LOC + QString("%1: %2")
-                            .arg(elements["status"].toString())
-                            .arg(elements["message"].toString()));
+                            .arg(elements["status"].toString(),
+                                 elements["message"].toString()));
                     }
                 }
             }
@@ -1636,18 +1637,18 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                     LOC + QString("ProcessJson('%1') = %2:%3:%4 took %5ms %6")
                     .arg(QString(cmdbuf))
                     .arg(elements["serial"].toInt())
-                    .arg(elements["status"].toString())
-                    .arg(elements["message"].toString())
-                    .arg(QString::number(timer.elapsed().count()))
-                    .arg(okay ? "" : "<-- NOTE")
+                    .arg(elements["status"].toString(),
+                         elements["message"].toString(),
+                         QString::number(timer.elapsed().count()),
+                         okay ? "" : "<-- NOTE")
                     );
 
                 return okay;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("External Recorder invalid response to '%1': '%2'")
-                .arg(QString(cmdbuf))
-                .arg(QString(response)));
+                .arg(QString(cmdbuf),
+                     QString(response)));
         }
 
         if (++m_ioErrCnt > 10)
