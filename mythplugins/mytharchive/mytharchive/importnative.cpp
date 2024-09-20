@@ -273,6 +273,9 @@ void ArchiveFileSelector::nextPressed()
         if (native->Create())
             mainStack->AddScreen(native);
     }
+    // No memory leak. ImportNative (via MythUIType) adds the new item
+    // onto the parent mainStack.
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 void ArchiveFileSelector::prevPressed()
