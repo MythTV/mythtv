@@ -2173,15 +2173,15 @@ void LCDProcClient::outputGeneric()
 {
     if ( m_lcdHeight > 1)
     {
-    QString aString;
-    aString = "widget_set Generic progressBar ";
-    aString += QString::number ( m_busyPos );
-    aString += " ";
-    aString += QString::number( m_lcdHeight );
-    aString += " ";
-    aString += QString::number((int)std::rint( m_genericProgress * m_lcdWidth *
-                                     m_cellWidth ));
-    sendToServer(aString);
+        QString aString;
+        aString = "widget_set Generic progressBar ";
+        aString += QString::number ( m_busyPos );
+        aString += " ";
+        aString += QString::number( m_lcdHeight );
+        aString += " ";
+        aString += QString::number((int)std::rint( m_genericProgress * m_lcdWidth *
+                                                   m_cellWidth ));
+        sendToServer(aString);
     }
     else
     {
