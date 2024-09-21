@@ -26,7 +26,11 @@ if ( MINGW OR UNIX OR MSYS ) # MINGW, Linux, APPLE, CYGWIN
         # This fails under Fedora - MinGW - Gcc 8.3
         if (NOT MINGW)
             if (COMPILER_IS_GCC AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-                add_compile_options(-fstack-clash-protection -fcf-protection)
+                add_compile_options(-fstack-clash-protection)
+                check_cxx_compiler_flag(-fcf-protection HAS_FCF_PROTECTION)
+                if (${HAS_FCF_PROTECTION})
+                    add_compile_options(-fcf-protection)
+                endif()
             endif()
 
             if (COMPILER_IS_GCC OR (COMPILER_IS_CLANG AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 3.7 ))
