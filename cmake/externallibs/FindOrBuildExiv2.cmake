@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022-2023 David Hampton
+# Copyright (C) 2022-2024 David Hampton
 #
 # See the file LICENSE_FSF for licensing information.
 #
@@ -108,6 +108,7 @@ function(find_or_build_exiv2)
                -DEXIV2_BUILD_SAMPLES:BOOL=OFF
                -DEXIV2_BUILD_EXIV2_COMMAND:BOOL=OFF
                ${CMDLINE_ARGS_EXIV2}
+               ${EXIV2_PLATFORM_ARGS}
                ${PLATFORM_ARGS}
     CMAKE_CACHE_ARGS
       -DCMAKE_FIND_ROOT_PATH:STRING=${CMAKE_FIND_ROOT_PATH}

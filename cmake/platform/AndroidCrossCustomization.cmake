@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022-2023 David Hampton
+# Copyright (C) 2022-2024 David Hampton
 #
 # See the file LICENSE_FSF for licensing information.
 #
@@ -158,6 +158,13 @@ set(QT6_PLATFORM_ARGS
     -DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_ANDROID_NDK}/build/cmake/android.toolchain.cmake
 )
+if(ANDROID_MIN_SDK_VERSION LESS 28)
+  # Fire Stick 4K libz.so doesn't have the "inflateValidate" symbol needed by
+  # the libpng that is build for the QtGui lib.
+  list(APPEND QT5_PLATFORM_ARGS -no-libpng)
+  #list(APPEND QT6_PLATFORM_ARGS -DQT_FEATURE_png:BOOL=OFF)
+  list(APPEND EXIV2_PLATFORM_ARGS -DEXIV2_ENABLE_PNG:BOOL=OFF)
+endif()
 
 # Sigh, Qt cmake files don't use the same variable names as cmake proper uses.
 # Set up another variable to handle the mapping when building things that use
