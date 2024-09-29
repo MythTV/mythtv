@@ -109,8 +109,7 @@ target_link_libraries(
          mythservicecontracts
          mythfreesurround
          mythtv
-         myth
-         ${EXTRA_PACKAGES})
+         myth)
 
 install(TARGETS mythmetadata LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
