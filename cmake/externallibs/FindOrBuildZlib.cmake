@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022-2023 David Hampton
+# Copyright (C) 2022-2024 David Hampton
 #
 # See the file LICENSE_FSF for licensing information.
 #
@@ -10,10 +10,9 @@
 # cmake, C source
 #
 function(find_or_build_zlib)
-  pkg_check_modules(ZLIB "zlib" QUIET IMPORTED_TARGET)
+  find_package(ZLIB)
   if(ZLIB_FOUND)
-    message(STATUS "Found zlib ${ZLIB_VERSION} at ${ZLIB_LINK_LIBRARIES}")
-    add_library(zlib ALIAS PkgConfig::ZLIB)
+    add_library(zlib ALIAS ZLIB::ZLIB)
     return()
   endif()
 

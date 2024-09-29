@@ -5,9 +5,9 @@
 # attempt to use locate freetype2 using pkgconfig to fail, as does
 # trying to locate any other package that lists zlib as a dependency.
 
-prefix=@CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED@/sysroot/usr
+prefix=@LIBS_INSTALL_PREFIX@
 exec_prefix=${prefix}
-libdir=${prefix}/lib/@CMAKE_ANDROID_ARCH_TRIPLE@/@CMAKE_SYSTEM_VERSION@
+libdir=${prefix}/lib
 sharedlibdir=${libdir}
 includedir=${prefix}/include
 
