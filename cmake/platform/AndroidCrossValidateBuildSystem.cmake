@@ -14,23 +14,14 @@ if(CMAKE_ANDROID_NDK_VERSION VERSION_LESS 23.0)
       "Android NDK version 23.0 or better required. Found version ${CMAKE_ANDROID_NDK_VERSION}."
   )
 endif()
-set(ANDROID_TESTED_NDK
-    "23.0"
-    "23.1"
-    "23.2"
-    "24.0"
-    "25.0"
-    "25.1"
-    "25.2"
-    "26.0"
-    "26.1")
-if(NOT CMAKE_ANDROID_NDK_VERSION IN_LIST ANDROID_TESTED_NDK)
-  list(JOIN ANDROID_TESTED_NDK " " ANDROID_TESTED_NDK_STR)
+set(ANDROID_HIGHEST_NDK_TESTED 27.1)
+if(NOT CMAKE_ANDROID_NDK_VERSION VERSION_LESS_EQUAL
+   ${ANDROID_HIGHEST_NDK_TESTED})
   message(
     FATAL_ERROR
       "Android builds have not been tested with version "
-      "${CMAKE_ANDROID_NDK_VERSION} of the NDK. Please use one of these "
-      "versions: ${ANDROID_TESTED_NDK_STR}")
+      "${CMAKE_ANDROID_NDK_VERSION} of the NDK. Please use "
+      "versions ${ANDROID_HIGHEST_NDK_TESTED} or older.")
 endif()
 
 if(ANDROID_SDK_BUILD_TOOLS_REVISION)

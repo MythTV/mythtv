@@ -128,6 +128,15 @@ set(QT_ANDROID_APPLICATION_ARGUMENTS "-v general")
 # specific customization.
 #
 file(COPY ${SUPER_SOURCE_DIR}/mythtv/android-package-source DESTINATION .)
+if(ANDROID_TARGET_SDK_VERSION GREATER_EQUAL 31)
+  list(APPEND MANIFEST_APPLICATION_ACTIVITY_EXTRAS android:exported="false")
+endif()
+if(ANDROID_TARGET_SDK_VERSION GREATER 99)
+  list(APPEND MANIFEST_APPLICATION_EXTRAS android:examplsTagHere="false")
+endif()
+list(JOIN MANIFEST_APPLICATION_EXTRAS " " MANIFEST_APPLICATION_EXTRAS_STR)
+list(JOIN MANIFEST_APPLICATION_ACTIVITY_EXTRAS " "
+     MANIFEST_APPLICATION_ACTIVITY_EXTRAS_STR)
 configure_file(AndroidManifest.xml.${QT_VERSION_MAJOR}.in
                android-package-source/AndroidManifest.xml @ONLY)
 
