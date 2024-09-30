@@ -300,20 +300,29 @@ if(QT_VERSION_MAJOR EQUAL 5)
   add_custom_target(
     apk2
     COMMAND
+      # cmake-format: off
       echo ${CMAKE_COMMAND} -E env JAVA_HOME=${MYTH_JAVA_HOME}
-      ${ANDROID_DEPLOY_QT} --input
-      "${PROJECT_BINARY_DIR}/android_deployment_settings.json" --output
-      "${PROJECT_BINARY_DIR}/android-build" --apk
-      "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
-      ${android_deploy_qt_platform} ${android_deploy_qt_jdk} ${BUNDLESIGN}
-      --verbose
+        ${ANDROID_DEPLOY_QT}
+        --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json"
+        --output "${PROJECT_BINARY_DIR}/android-build"
+        --apk "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
+        ${android_deploy_qt_platform}
+        ${android_deploy_qt_jdk}
+        ${BUNDLESIGN}
+        --verbose
+      # cmake-format: on
     COMMAND
-      ${CMAKE_COMMAND} -E env JAVA_HOME=${MYTH_JAVA_HOME} ${ANDROID_DEPLOY_QT}
-      --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json" --output
-      "${PROJECT_BINARY_DIR}/android-build" --apk
-      "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
-      ${android_deploy_qt_platform} ${android_deploy_qt_jdk} ${BUNDLESIGN}
-      --verbose
+      # cmake-format: off
+      ${CMAKE_COMMAND} -E env JAVA_HOME=${MYTH_JAVA_HOME}
+        ${ANDROID_DEPLOY_QT}
+        --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json"
+        --output "${PROJECT_BINARY_DIR}/android-build"
+        --apk "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
+        ${android_deploy_qt_platform}
+        ${android_deploy_qt_jdk}
+        ${BUNDLESIGN}
+        --verbose
+      # cmake-format: on
     DEPENDS ${ANDROID_EXTRA_LIBS}
     VERBATIM USES_TERMINAL)
 
