@@ -334,6 +334,9 @@ if(QT_VERSION_MAJOR EQUAL 5)
   #
 
 elseif(QT_VERSION_MAJOR EQUAL 6)
+  set(QT_ANDROID_PLATFORM ${ANDROID_PLATFORM})
+  set(QT_ENABLE_VERBOSE_DEPLOYMENT ON)
+
   # Inject code from super-project provided modules (part 2). All the variables
   # necessary to describe the APK must be set before this include.
   #
@@ -342,6 +345,15 @@ elseif(QT_VERSION_MAJOR EQUAL 6)
   include(MythFindQt)
 
   set(CMAKE_BUILD_TYPE Debug)
+  if(QT_KNOWN_POLICY_QTP0001)
+    qt_policy(SET QTP0001 NEW)
+  endif()
+  if(QT_KNOWN_POLICY_QTP0002)
+    qt_policy(SET QTP0002 NEW)
+  endif()
+  if(QT_KNOWN_POLICY_QTP0003)
+    qt_policy(SET QTP0003 NEW)
+  endif()
 
   #
   # Create a dummy mythfrontend executable.  This is where all the magic happens

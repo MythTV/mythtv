@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022-2023 David Hampton
+# Copyright (C) 2022-2024 David Hampton
 #
 # See the file LICENSE_FSF for licensing information.
 #
@@ -86,6 +86,9 @@ function(find_or_build_qt)
   # Arch, Rawhide, SuSe Tumbleweed
   set(QT_6.6.1_SHA256
       "dd3668f65645fe270bc615d748bd4dc048bd17b9dc297025106e6ecc419ab95d")
+  # Fedora 40/41
+  set(QT_6.7.2_SHA256
+      "0aaea247db870193c260e8453ae692ca12abc1bd841faa1a6e6c99459968ca8a")
 
   # Qt6 requires that the version of the host tools match the version being
   # built.  What are the fallback target versions to build if there isn't an
@@ -95,6 +98,7 @@ function(find_or_build_qt)
   set(QT_MAP_6.4 "6.4.2")
   set(QT_MAP_6.5 "6.5.2")
   set(QT_MAP_6.6 "6.6.1")
+  set(QT_MAP_6.7 "6.7.2")
 
   # Grab the host version directly. so as not to pollute our cross-build setup.
   file(STRINGS
@@ -117,8 +121,7 @@ function(find_or_build_qt)
   if("${QT_VERSION}" STREQUAL "")
     message(
       FATAL_ERROR
-        "
-Qt6 requires that the target and host major/minor version are the same.  Your host version is ${HOST_QT_MAJMIN} and you are building ${QT_MAJMIN}."
+        "Qt6 requires that the target and host major/minor version are the same.  Your host version is ${HOST_QT_MAJMIN} but there are no instructions on how to build that version."
     )
   endif()
 
