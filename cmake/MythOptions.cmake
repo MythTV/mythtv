@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022-2023 David Hampton
+# Copyright (C) 2022-2024 David Hampton
 #
 # See the file LICENSE_FSF for licensing information.
 #
@@ -244,6 +244,18 @@ if(ANDROID
   set(ANDROID_TARGET_SDK_VERSION
       "29"
       CACHE STRING "Android target SDK version.")
+  # ~~~
+  # Minimum SDK Build Tools versions:
+  # Qt 5.15.11 (aka Gradle Plugin 7.0.2) requires 30.0.2
+  # Qt 6.7.2 (aka Gradle Plugin 7.4.1) requires 30.0.3
+  # ~~~
+  set(ANDROID_SDK_BUILD_TOOLS_REVISION
+      "30.0.2"
+      CACHE STRING
+            "Android build tools version.  This specifies which compiler "
+            "and other tools to use when building the android specific "
+            "bits of the project.  Available versions can be found in "
+            "$ENV{HOME}/Android/Sdk/build-tools")
   set(ANDROID_SDK
       ""
       CACHE

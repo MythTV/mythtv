@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022-2023 David Hampton
+# Copyright (C) 2022-2024 David Hampton
 #
 # See the file LICENSE_FSF for licensing information.
 #
@@ -369,6 +369,8 @@ elseif(QT_VERSION_MAJOR EQUAL 6)
                QT_ANDROID_VERSION_NAME ${ANDROID_VERSION_NAME}
                QT_ANDROID_MIN_SDK_VERSION ${ANDROID_MIN_SDK_VERSION}
                QT_ANDROID_TARGET_SDK_VERSION ${ANDROID_TARGET_SDK_VERSION}
+               QT_ANDROID_SDK_BUILD_TOOLS_REVISION
+               ${ANDROID_SDK_BUILD_TOOLS_REVISION}
                QT_ANDROID_PACKAGE_SOURCE_DIR ${ANDROID_PACKAGE_SOURCE_DIR}
                QT_ANDROID_EXTRA_LIBS "${ANDROID_EXTRA_LIBS}")
 
