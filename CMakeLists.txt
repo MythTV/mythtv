@@ -76,7 +76,8 @@ include(${MYTH_USER_OVERRIDES1} OPTIONAL)
 
 #
 # Initial platform customization before declaring project. (CMAKE_CROSSCOMPILING
-# isn't set yet. Nor is ANDROID or WIN32.)
+# isn't set yet. Nor is ANDROID or WIN32. The former is set by the call to
+# project, and the latter two are set by the next two includes.)
 #
 include(platform/AndroidCrossEarlyInitialization)
 include(platform/WindowsCrossEarlyInitialization)

@@ -240,10 +240,21 @@ if(ANDROID
   # Note: Any of these cache variable can be overridden on the command line.
   set(ANDROID_MIN_SDK_VERSION
       "21"
-      CACHE STRING "Android minimum SDK version.")
+      CACHE
+        STRING
+        "\
+Android minimum SDK version.  This sets the minimum \
+Java ABI level to use when compiling for android.  MythTV \
+can get by with this minimum level of features in the API.")
   set(ANDROID_TARGET_SDK_VERSION
       "29"
-      CACHE STRING "Android target SDK version.")
+      CACHE
+        STRING
+        "\
+Android target SDK version.  This sets the target \
+Java ABI level to use when compiling for android.  MythTV \
+will use features past the minimum API level up to this \
+API level if they are present.")
   # ~~~
   # Minimum SDK Build Tools versions:
   # Qt 5.15.11 (aka Gradle Plugin 7.0.2) requires 30.0.2
@@ -251,20 +262,26 @@ if(ANDROID
   # ~~~
   set(ANDROID_SDK_BUILD_TOOLS_REVISION
       "30.0.2"
-      CACHE STRING
-            "Android build tools version.  This specifies which compiler "
-            "and other tools to use when building the android specific "
-            "bits of the project.  Available versions can be found in "
-            "$ENV{HOME}/Android/Sdk/build-tools")
+      CACHE
+        STRING
+        "\
+Android build tools version.  This specifies which compiler \
+and other tools to use when building the android specific \
+bits of the project.  Available versions can be found in \
+$ENV{HOME}/Android/Sdk/build-tools")
   set(ANDROID_SDK
       ""
-      CACHE
-        PATH
-        "Location of the Android SDK.  If empty the code will attempt to figure it out from the NDK path."
-  )
+      CACHE PATH "\
+Location of the Android SDK.  If empty the code will attempt \
+to figure it out from the NDK path.")
   set(CMAKE_ANDROID_NDK
       $ENV{HOME}/Android/Sdk/ndk/26.1.10909125
-      CACHE PATH "Default Android NDK to use")
+      CACHE
+        PATH
+        "\
+Default Android NDK to use.  This sets the C/C++ ABI \
+level to use when compiling for android.  Available \
+versions can be found in $ENV{HOME}/Android/Sdk/ndk")
   # Valid values are arm64-v8a, armeabi-v7a, x86, and x86_64.
   set(CMAKE_ANDROID_ARCH_ABI
       arm64-v8a
