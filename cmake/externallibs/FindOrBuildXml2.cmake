@@ -49,6 +49,7 @@ function(find_or_build_libxml2)
                -DLIBXML2_WITH_PYTHON:BOOL=OFF
                -DLIBXML2_WITH_PROGRAMS:BOOL=OFF
                -DLIBXML2_WITH_TESTS:BOOL=OFF
+               ${XML2_PLATFORM_ARGS}
     CMAKE_CACHE_ARGS
       -DCMAKE_FIND_ROOT_PATH:STRING=${CMAKE_FIND_ROOT_PATH}
       -DCMAKE_JOB_POOL_COMPILE:STRING=compile
