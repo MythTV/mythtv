@@ -18,7 +18,7 @@
             "hidden": true,
             "cacheVariables": {
                 "LIBS_INSTALL_PREFIX": {
-                    "type": "STRING",
+                    "type": "PATH",
                     "value": "${sourceDir}/libsinstall-${presetName}"
                 }
             }
@@ -111,6 +111,53 @@
             "name": "android-x86_64-qt6",
             "inherits": [ "android-x86_64-qt5", "ci-qt6" ],
             "displayName": "Android x86_64 qt6"
+        },
+
+
+        {
+            "name": "fire-stick-4k",
+            "inherits": [ "android-v7-qt5", "ci-sibling-build" ],
+            "displayName": "Fire Stick 4K qt5 (separate lib install)",
+            "cacheVariables": {
+                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
+                "CMAKE_ANDROID_NDK": {
+                    "type": "PATH",
+                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
+                },
+                "ANDROID_MIN_SDK_VERSION": "25",
+                "ANDROID_TARGET_SDK_VERSION": "25",
+                "ANDROID_PLATFORM": "android-25"
+            }
+        },
+        {
+            "name": "fire-stick-4k-max",
+            "inherits": [ "android-v7-qt5", "ci-sibling-build" ],
+            "displayName": "Fire Stick 4K Max qt5 (separate lib install)",
+            "cacheVariables": {
+                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
+                "CMAKE_ANDROID_NDK": {
+                    "type": "PATH",
+                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
+                },
+                "ANDROID_MIN_SDK_VERSION": "25",
+                "ANDROID_TARGET_SDK_VERSION": "28",
+                "ANDROID_PLATFORM": "android-28"
+            }
+        },
+        {
+            "name": "nvidia-shield",
+            "inherits": [ "android-v8-qt5", "ci-sibling-build" ],
+            "displayName": "Firetv stick 4K qt5 (separate lib install)",
+            "cacheVariables": {
+                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
+                "CMAKE_ANDROID_NDK": {
+                    "type": "PATH",
+                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
+                },
+                "ANDROID_MIN_SDK_VERSION": "25",
+                "ANDROID_TARGET_SDK_VERSION": "29",
+                "ANDROID_PLATFORM": "android-29"
+            }
         },
 
 
