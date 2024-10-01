@@ -18,6 +18,21 @@ endif()
 if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX STREQUAL "")
   message(FATAL_ERROR "CMAKE_INSTALL_PREFIX isn't set.")
 endif()
+if(NOT ANDROID_PLATFORM)
+  if(CMAKE_SYSTEM_VERSION GREATER 34)
+    message(
+      FATAL_ERROR
+        "Cannot build to version ${CMAKE_SYSTEM_VERSION}.  ANDROID_PLATFORM higher than 34 is not currently supported."
+    )
+  endif()
+  set(ANDROID_PLATFORM android-${CMAKE_SYSTEM_VERSION})
+else()
+  string(REPLACE "android-" "" PLATFORM_NUM ${ANDROID_PLATFORM})
+  if(PLATFORM_NUM GREATER 34)
+    message(
+      FATAL_ERROR "ANDROID_PLATFORM higher than 34 is not currently supported.")
+  endif()
+endif()
 
 # Set up the PLATFORM_ARGS variable to contain arguments to pass to any cmake
 # based external projects.
@@ -27,23 +42,26 @@ list(
   "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
   "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}"
   "-DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}"
-  "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
-  "-DANDROID_PLATFORM=android-${CMAKE_SYSTEM_VERSION}")
+  "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}")
 
 # Fix the toolchain prefix variables. The android ndk screws them up for 32-bit
 # builds. No, really! It does.
 if(CMAKE_ANDROID_ARCH STREQUAL "arm")
   set(CMAKE_C_ANDROID_TOOLCHAIN_MACHINE "armv7a-linux-androideabi")
-  string(
-    REGEX
-    REPLACE "arm-linux-androideabi" "armv7a-linux-androideabi"
-            CMAKE_C_ANDROID_TOOLCHAIN_PREFIX
-            ${CMAKE_C_ANDROID_TOOLCHAIN_PREFIX})
-  string(
-    REGEX
-    REPLACE "arm-linux-androideabi" "armv7a-linux-androideabi"
-            CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX
-            ${CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX})
+  if(CMAKE_C_ANDROID_TOOLCHAIN_PREFIX)
+    string(
+      REGEX
+      REPLACE "arm-linux-androideabi" "armv7a-linux-androideabi"
+              CMAKE_C_ANDROID_TOOLCHAIN_PREFIX
+              ${CMAKE_C_ANDROID_TOOLCHAIN_PREFIX})
+  endif()
+  if(CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX)
+    string(
+      REGEX
+      REPLACE "arm-linux-androideabi" "armv7a-linux-androideabi"
+              CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX
+              ${CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX})
+  endif()
 endif()
 
 #
@@ -86,10 +104,14 @@ set(LIBBLURAY_CONFIGURE_ENV ${PLATFORM_CONFIGURE_ENV})
 #
 # Set variables for later use when building with meson.
 #
-string(REGEX REPLACE "-$" "${CMAKE_SYSTEM_VERSION}-clang" CROSS_CC
-                     ${CMAKE_C_ANDROID_TOOLCHAIN_PREFIX})
-string(REGEX REPLACE "-$" "${CMAKE_SYSTEM_VERSION}-clang++" CROSS_CXX
-                     ${CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX})
+if(CMAKE_C_ANDROID_TOOLCHAIN_PREFIX)
+  string(REGEX REPLACE "-$" "${CMAKE_SYSTEM_VERSION}-clang" CROSS_CC
+                       ${CMAKE_C_ANDROID_TOOLCHAIN_PREFIX})
+endif()
+if(CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX)
+  string(REGEX REPLACE "-$" "${CMAKE_SYSTEM_VERSION}-clang++" CROSS_CXX
+                       ${CMAKE_CXX_ANDROID_TOOLCHAIN_PREFIX})
+endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/files/meson-cross-android.in)
   if(CMAKE_ANDROID_ARCH STREQUAL "arm64")
     set(MESON_SYSTEM_CPU_FAMILY "aarch64")
@@ -152,7 +174,6 @@ set(QT5_PLATFORM_LIBS_ARGS "ICU_LIBS=-licui18n -licuuc -licudata")
 set(QT6_PLATFORM_ARGS
     -DANDROID_ABI=${CMAKE_ANDROID_ARCH_ABI}
     -DANDROID_NDK=${CMAKE_ANDROID_NDK}
-    -DANDROID_PLATFORM=android-${CMAKE_SYSTEM_VERSION}
     -DANDROID_SDK_ROOT=${ANDROID_SDK}
     -DCMAKE_SYSTEM_NAME=Android
     -DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}

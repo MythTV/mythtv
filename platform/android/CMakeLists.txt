@@ -79,6 +79,11 @@ set(CMAKE_CXX_EXTENSIONS ON)
 include(SetSearchPaths)
 
 #
+# Perform platform specific customizations.
+#
+include(platform/AndroidCrossCustomization)
+
+#
 # The Qt androiddeployqt program reads the headers of shared object files and
 # automatically includes any of their required dependencies. Add the Qt install
 # directory to the CMAKE_FIND_ROOT_PATH list so that androiddeployqt can find
@@ -117,7 +122,6 @@ set(_BUNDLE_NAME "${NDK_ABI_${CMAKE_ANDROID_ARCH_ABI}_ARCH}")
 
 set(ANDROID_PACKAGE_SOURCE_DIR
     ${CMAKE_CURRENT_BINARY_DIR}/android-package-source)
-set(ANDROID_PLATFORM android-${CMAKE_SYSTEM_VERSION})
 set(ANDROID_VERSION_CODE 1)
 set(ANDROID_VERSION_NAME
     "${_date}-qt${QT_VERSION_MAJOR}-${_BUNDLE_NAME}-${MYTHTV_SOURCE_VERSION}")
@@ -305,7 +309,7 @@ if(QT_VERSION_MAJOR EQUAL 5)
         --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json"
         --output "${PROJECT_BINARY_DIR}/android-build"
         --apk "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
-        --android-platform android-${ANDROID_TARGET_SDK_VERSION}
+        --android-platform ${ANDROID_PLATFORM}
         --jdk ${MYTH_JAVA_HOME}
         ${BUNDLESIGN}
         --verbose
@@ -316,7 +320,7 @@ if(QT_VERSION_MAJOR EQUAL 5)
         --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json"
         --output "${PROJECT_BINARY_DIR}/android-build"
         --apk "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
-        --android-platform android-${ANDROID_TARGET_SDK_VERSION}
+        --android-platform ${ANDROID_PLATFORM}
         --jdk ${MYTH_JAVA_HOME}
         ${BUNDLESIGN}
         --verbose

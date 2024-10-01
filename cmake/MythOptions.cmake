@@ -255,6 +255,14 @@ Android target SDK version.  This sets the target \
 Java ABI level to use when compiling for android.  MythTV \
 will use features past the minimum API level up to this \
 API level if they are present.")
+  set(ANDROID_PLATFORM
+      ""
+      CACHE
+        STRING
+        "\
+The Android platform target for building.  If empty, this \
+will be set based on the value of CMAKE_SYSTEM_VERSION.  \
+Available values can be found in $ENV{HOME}/Android/Sdk/platforms")
   # ~~~
   # Minimum SDK Build Tools versions:
   # Qt 5.15.11 (aka Gradle Plugin 7.0.2) requires 30.0.2
