@@ -49,17 +49,12 @@ static void *my_malloc(unsigned size, [[maybe_unused]] mpeg2_alloc_t reason)
 {
     if (size)
     {
-        char *buf = (char *) malloc (size + 63 + sizeof (void **));
-        if (buf)
-        {
-            memset(buf, 0, size + 63 + sizeof (void **));
-            char *align_buf = buf + 63 + sizeof (void **);
-            align_buf -= (long)align_buf & 63;
-            *(((void **)align_buf) - 1) = buf;
-            return align_buf;
-        }
+#ifdef _WIN32
+        return _aligned_malloc( 64, size );
+#else
+        return aligned_alloc( 64, size );
+#endif
     }
-
     return nullptr;
 }
 
