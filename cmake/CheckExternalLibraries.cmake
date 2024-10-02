@@ -80,7 +80,7 @@ if(ENABLE_VPX)
 endif()
 
 # mp3lame: fedora:lame-devel debian:libmp3lame-dev
-if(ENABLE_MP3LAME)
+if(ENABLE_MP3LAME AND (NOT MINGW AND NOT MSVC))
   find_package(Lame 3.98.3 MODULE REQUIRED)
   if(Lame_VERSION STREQUAL "unknown")
     message(STATUS "LAME VERSION IS UNKNOWN.")

@@ -37,6 +37,8 @@ function(find_or_build_libzip)
     DOWNLOAD_DIR ${TARBALL_DIR}
     URL https://libzip.org/download/${LIBZIP_PREFIX}.tar.xz
     URL_HASH SHA256=${LIBZIP_${LIBZIP_VERSION}_SHA256}
+    PATCH_COMMAND patch -p1 <
+                  ${PROJECT_SOURCE_DIR}/patches/${LIBZIP_PREFIX}.patch
     CMAKE_ARGS --no-warn-unused-cli
                ${CMDLINE_ARGS_LIBS}
                ${PLATFORM_ARGS}
