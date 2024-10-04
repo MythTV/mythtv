@@ -386,6 +386,8 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (!locked)
     {
         LOG(VB_GENERAL, LOG_INFO, "Failed to get schema upgrade lock");
+        if (informSystemd)
+            db_sd_notify("failed to get schema upgrade lock");
         GetMythDB()->SetSuppressDBMessages(false);
         gCoreContext->ActivateSettingsCache(true);
         return false;
