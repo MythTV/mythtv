@@ -207,7 +207,7 @@
             "backends_none": "Nincsenek háttérprogramok",
             "backends_title": "Háttérrendszerek",
             "card_text": "Kártya: {{ CardId }}, bemenet: {{ Id }}: {{ InputName }}, megjelenített név: {{ DisplayName }}",
-            "encoder_text": "A(z) {{ Id }} kódoló a(z) {{ HostName }} gazdagépen található, állapot: {{ State }}",
+            "encoder_text": "A {{ Id }} kódoló, a {{ CardDetails }} a {{ HostName }} gazdagépen található, állapot: {{ State }}",
             "encoder_title": "Kódoló állapota",
             "endtime_text": "Ez a felvétel a tervek szerint {{ EndTime }}-kor ér véget.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

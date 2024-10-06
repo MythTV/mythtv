@@ -207,7 +207,7 @@
             "backends_none": "Ingen backends",
             "backends_title": "Backends",
             "card_text": "Kort: {{ CardId }}, Input: {{ Id }} er {{ InputName }}, Vist navn: {{ DisplayName }}",
-            "encoder_text": "Encoder {{ Id }} er på værten {{ HostName }}, stat: {{ State }}",
+            "encoder_text": "Encoder {{ Id }}, {{ CardDetails }} er på værten {{ HostName }}, stat: {{ State }}",
             "encoder_title": "Encoder status",
             "endtime_text": "Denne optagelse er planlagt til at slutte kl. {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

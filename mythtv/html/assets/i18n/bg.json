@@ -207,7 +207,7 @@
             "backends_none": "Без бекенд",
             "backends_title": "Бекендове",
             "card_text": "Карта: {{ CardId }}, Вход: {{ Id }} е {{ InputName }}, Показвано име: {{ DisplayName }}",
-            "encoder_text": "Кодер {{ Id }} е на хост {{ HostName }}, състояние: {{ State }}",
+            "encoder_text": "Кодер {{ Id }}, {{ CardDetails }} е на хост {{ HostName }}, състояние: {{ State }}",
             "encoder_title": "Състояние на енкодера",
             "endtime_text": "Този запис е планиран да приключи в {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-порт: {{ IP }}:{{ Port }}, онлайн: {{ OnLine }}",

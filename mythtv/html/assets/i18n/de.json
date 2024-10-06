@@ -207,7 +207,7 @@
             "backends_none": "Keine Backends",
             "backends_title": "Backends",
             "card_text": "Karte: {{ CardId }}, Eingabe: {{ Id }} ist {{ InputName }}, Anzeigename: {{ DisplayName }}",
-            "encoder_text": "Encoder {{ Id }} ist auf Host {{ HostName }}, Status: {{ State }}",
+            "encoder_text": "Encoder {{ Id }}, {{ CardDetails }} ist auf Host {{ HostName }}, Status: {{ State }}",
             "encoder_title": "Encoderstatus",
             "endtime_text": "Das Ende dieser Aufzeichnung ist für {{ EndTime }} geplant.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

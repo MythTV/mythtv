@@ -207,7 +207,7 @@
             "backends_none": "Taustaprogramme pole",
             "backends_title": "Taustaprogrammid",
             "card_text": "Kaart: {{ CardId }}, sisend: {{ Id }} on {{ InputName }}, kuvatav nimi: {{ DisplayName }}",
-            "encoder_text": "Kodeerija {{ Id }} on hostis {{ HostName }}, olek: {{ State }}",
+            "encoder_text": "Kodeerija {{ Id }}, {{ CardDetails }} on hostis {{ HostName }}, olek: {{ State }}",
             "encoder_title": "Kodeerija olek",
             "endtime_text": "See salvestus on kavandatud lõppema {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-port: {{ IP }}:{{ Port }}, võrgus: {{ OnLine }}",

@@ -207,7 +207,7 @@
             "backends_none": "Brak zaplecza",
             "backends_title": "Backendy",
             "card_text": "Karta: {{ CardId }}, Wejście: {{ Id }} to {{ InputName }}, Wyświetlana nazwa: {{ DisplayName }}",
-            "encoder_text": "Koder {{ Id }} jest na hoście {{ HostName }}, stan: {{ State }}",
+            "encoder_text": "Koder {{ Id }}, {{ CardDetails }} znajduje się na hoście {{ HostName }}, stan: {{ State }}",
             "encoder_title": "Stan enkodera",
             "endtime_text": "To nagranie ma zakończyć się o {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, Port IP: {{ IP }}: {{ Port }}, Online: {{ OnLine }}",

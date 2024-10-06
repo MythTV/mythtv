@@ -207,7 +207,7 @@
             "backends_none": "Sense backends",
             "backends_title": "Backends",
             "card_text": "Targeta: {{ CardId }}, entrada: {{ Id }} és {{ InputName }}, nom visualitzat: {{ DisplayName }}",
-            "encoder_text": "El codificador {{ Id }} és a l'amfitrió {{ HostName }}, Estat: {{ State }}",
+            "encoder_text": "El codificador {{ Id }}, {{ CardDetails }} és a l'amfitrió {{ HostName }}, Estat: {{ State }}",
             "encoder_title": "Estat del codificador",
             "endtime_text": "Està previst que aquesta gravació finalitzi a les {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, Port IP: {{ IP }}:{{ Port }}, En línia: {{ OnLine }}",

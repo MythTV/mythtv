@@ -207,7 +207,7 @@
             "backends_none": "אין אחוריים",
             "backends_title": "קצוות אחוריים",
             "card_text": "כרטיס: {{ CardId }}, קלט: {{ Id }} הוא {{ InputName }}, שם תצוגה: {{ DisplayName }}",
-            "encoder_text": "המקודד {{ Id }} נמצא במארח {{ HostName }}, מדינה: {{ State }}",
+            "encoder_text": "המקודד {{ Id }}, {{ CardDetails }} נמצא במארח {{ HostName }}, מדינה: {{ State }}",
             "encoder_title": "מצב מקודד",
             "endtime_text": "הקלטה זו מתוכננת להסתיים ב-{{ EndTime }}.",
             "frontends_detail": "ממשק קצה: {{ Name }}, יציאת IP: {{ IP }}:{{ Port }}, מקוונת: {{ OnLine }}",

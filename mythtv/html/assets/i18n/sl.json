@@ -207,7 +207,7 @@
             "backends_none": "Brez ozadja",
             "backends_title": "Zaledja",
             "card_text": "Kartica: {{ CardId }}, vnos: {{ Id }} je {{ InputName }}, prikazno ime: {{ DisplayName }}",
-            "encoder_text": "Kodirnik {{ Id }} je na gostitelju {{ HostName }}, stanje: {{ State }}",
+            "encoder_text": "Kodirnik {{ Id }}, {{ CardDetails }} je na gostitelju {{ HostName }}, stanje: {{ State }}",
             "encoder_title": "Status kodirnika",
             "endtime_text": "To snemanje naj bi se končalo ob {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

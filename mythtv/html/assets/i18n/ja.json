@@ -207,7 +207,7 @@
             "backends_none": "バックエンドなし",
             "backends_title": "バックエンド",
             "card_text": "カード: {{ CardId }}、入力: {{ Id }} は {{ InputName }}、表示名: {{ DisplayName }}",
-            "encoder_text": "エンコーダ {{ Id }} はホスト {{ HostName }} 上にあり、状態: {{ State }}",
+            "encoder_text": "エンコーダ {{ Id }}、{{ CardDetails }} はホスト {{ HostName }} 上にあり、状態: {{ State }}",
             "encoder_title": "エンコーダのステータス",
             "endtime_text": "この録画は {{ EndTime }} に終了するようにスケジュールされています。",
             "frontends_detail": "フロントエンド: {{ Name }}、IP ポート: {{ IP }}:{{ Port }}、オンライン: {{ OnLine }}",

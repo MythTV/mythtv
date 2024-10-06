@@ -207,7 +207,7 @@
             "backends_none": "Nema pozadine",
             "backends_title": "Pozadine",
             "card_text": "Kartica: {{ CardId }}, Unos: {{ Id }} je {{ InputName }}, Prikazno ime: {{ DisplayName }}",
-            "encoder_text": "Enkoder {{ Id }} je na hostu {{ HostName }}, stanje: {{ State }}",
+            "encoder_text": "Enkoder {{ Id }}, {{ CardDetails }} je na glavnom računalu {{ HostName }}, stanje: {{ State }}",
             "encoder_title": "Status kodera",
             "endtime_text": "Završetak ovog snimanja zakazan je za {{ EndTime }}.",
             "frontends_detail": "Sučelje: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

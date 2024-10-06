@@ -6,7 +6,9 @@
                 <!-- TODO: The details of the Capture Card need to be pulled from the /Capture API -->
                 <li>
                     {{ 'dashboard.status.encoder_text' |
-                    translate: { Id: encoder.Id, HostName: encoder.HostName, State: EncoderStatusText(encoder.State) }
+                    translate: { Id: encoder.Id, CardDetails: cardDetails(encoder.Id),
+                        HostName: encoder.HostName, State: EncoderStatusText(encoder.State),
+                     }
                     }}
                     <!-- TVState.kState_RecordingOnly = 7 -->
                     <ng-container *ngIf="encoder.State == 7"> '{{ encoder.Recording.Title }}' on {{

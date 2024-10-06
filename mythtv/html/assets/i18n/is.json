@@ -207,7 +207,7 @@
             "backends_none": "Engir bakenda",
             "backends_title": "Bakenda",
             "card_text": "Kort: {{ CardId }}, Inntak: {{ Id }} er {{ InputName }}, Birtingarnafn: {{ DisplayName }}",
-            "encoder_text": "Kóðarinn {{ Id }} er á hýsingaraðila {{ HostName }}, ríki: {{ State }}",
+            "encoder_text": "Kóðari {{ Id }}, {{ CardDetails }} er á gestgjafa {{ HostName }}, fylki: {{ State }}",
             "encoder_title": "Staða kóðara",
             "endtime_text": "Áætlað er að þessari upptöku ljúki {{ EndTime }}.",
             "frontends_detail": "Framenda: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

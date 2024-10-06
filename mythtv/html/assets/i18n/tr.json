@@ -207,7 +207,7 @@
             "backends_none": "Arka Uç Yok",
             "backends_title": "arka uçlar",
             "card_text": "Kart: {{ CardId }}, Giriş: {{ Id }}, {{ InputName }}, Görünen Ad: {{ DisplayName }}",
-            "encoder_text": "{{ Id }} kodlayıcı {{ HostName }} ana bilgisayarında, Eyalet: {{ State }}",
+            "encoder_text": "Kodlayıcı {{ Id }}, {{ CardDetails }}, {{ HostName }} ana bilgisayarında, Durum: {{ State }}",
             "encoder_title": "Kodlayıcı Durumu",
             "endtime_text": "Bu kayıt, {{ EndTime }} tarihinde sona ermek üzere planlandı.",
             "frontends_detail": "Ön Uç: {{ Name }}, IP Bağlantı Noktası: {{ IP }}:{{ Port }}, Çevrimiçi: {{ OnLine }}",

@@ -207,7 +207,7 @@
             "backends_none": "Nessun Backend",
             "backends_title": "Backend",
             "card_text": "Scheda: {{ CardId }}, Input: {{ Id }} è {{ InputName }}, Nome visualizzato: {{ DisplayName }}",
-            "encoder_text": "Encoder {{ Id }} è sull'host {{ HostName }}, Stato: {{ State }}",
+            "encoder_text": "Il codificatore {{ Id }}, {{ CardDetails }} è sull'host {{ HostName }}, Stato: {{ State }}",
             "encoder_title": "Stato dell'encoder",
             "endtime_text": "Questa registrazione dovrebbe terminare alle {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, Porta IP: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

@@ -207,7 +207,7 @@
             "backends_none": "无后端",
             "backends_title": "后端",
             "card_text": "卡：{{ CardId }}，输入：{{ Id }} 是 {{ InputName }}，显示名称：{{ DisplayName }}",
-            "encoder_text": "编码器 {{ Id }} 位于主机 {{ HostName }} 上，状态：{{ State }}",
+            "encoder_text": "编码器 {{ Id }}，{{ CardDetails }} 位于主机 {{ HostName }} 上，状态：{{ State }}",
             "encoder_title": "编码器状态",
             "endtime_text": "该录制计划于 {{ EndTime }} 结束。",
             "frontends_detail": "前端：{{ Name }}，IP 端口：{{ IP }}：{{ Port }}，在线：{{ OnLine }}",

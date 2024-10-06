@@ -207,7 +207,7 @@
             "backends_none": "Aucun backend",
             "backends_title": "Backends",
             "card_text": "Carte : {{ CardId }}, entrée : {{ Id }} est {{ InputName }}, nom d'affichage : {{ DisplayName }}",
-            "encoder_text": "L'encodeur {{ Id }} est sur l'hôte {{ HostName }}, État : {{ State }}",
+            "encoder_text": "L'encodeur {{ Id }}, {{ CardDetails }} est sur l'hôte {{ HostName }}, État : {{ State }}",
             "encoder_title": "État de l'encodeur",
             "endtime_text": "Cet enregistrement doit se terminer à {{ EndTime }}.",
             "frontends_detail": "Frontend : {{ Name }}, IP-Port : {{ IP }} :{{ Port }}, Online : {{ OnLine }}",
