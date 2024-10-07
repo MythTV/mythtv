@@ -60,6 +60,7 @@ add_library(
   livetvchain.h
   metadataimagehelper.cpp
   metadataimagehelper.h
+  mythavrational.h
   mythavutil.cpp
   mythavutil.h
   mythframe.cpp
