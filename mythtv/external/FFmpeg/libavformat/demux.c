@@ -1240,11 +1240,6 @@ static int64_t ts_to_samples(AVStream *st, int64_t ts)
     return av_rescale(ts, st->time_base.num * st->codecpar->sample_rate, st->time_base.den);
 }
 
-/**
- * Simply sets data pointer to null.
- *
- * This will leak memory if no one else frees the memory used by the packet.
- */
 static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 {
     FFFormatContext *const si = ffformatcontext(s);
