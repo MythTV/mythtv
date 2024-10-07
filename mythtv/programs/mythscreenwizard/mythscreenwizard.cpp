@@ -23,7 +23,7 @@
 #include <QWidget>
 
 // MythTV
-#include "libmyth/langsettings.h"
+#include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"

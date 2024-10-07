@@ -2,7 +2,7 @@
 #define WELCOMESETTINGS_H
 
 // MythTV headers
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 class MythWelcomeSettings : public GroupSetting
 {
