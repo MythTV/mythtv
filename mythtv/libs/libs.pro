@@ -3,7 +3,7 @@ include (../settings.pro)
 TEMPLATE = subdirs
 
 # Libraries without dependencies
-SUBDIRS += libmythfreesurround libmythbase
+SUBDIRS += libmythbase
 SUBDIRS += libmythservicecontracts
 libmythservicecontracts.depends = libmythbase
 
@@ -16,7 +16,6 @@ SUBDIRS += libmythui libmythupnp libmyth
 libmythui.depends = libmythbase
 libmythupnp.depends = libmythbase libmythservicecontracts
 libmyth.depends =  libmythbase libmythui libmythupnp
-libmyth.depends += libmythfreesurround
 
 LIBMYTHTVDEPS = $$SUBDIRS
 

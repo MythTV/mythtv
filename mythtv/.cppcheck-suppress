@@ -9,7 +9,6 @@
 *:*/filters/*
 *:*/html/*
 *:*/libs/libmythfreemheg/*
-*:*/libs/libmythfreesurround/*
 *:*/libs/libmythmpeg2/*
 *:*/libs/libmythtv/visualisations/goom/*
 *:*/programs/mythbackend/serviceHosts/*
