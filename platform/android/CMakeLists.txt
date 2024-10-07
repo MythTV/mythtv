@@ -305,23 +305,23 @@ if(QT_VERSION_MAJOR EQUAL 5)
     apk2
     COMMAND
       # cmake-format: off
-      echo ${ANDROID_DEPLOY_QT}
+      echo ${CMAKE_COMMAND} -E env JAVA_HOME=${MYTH_JAVA_HOME}
+        ${ANDROID_DEPLOY_QT}
         --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json"
         --output "${PROJECT_BINARY_DIR}/android-build"
         --apk "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
         --android-platform ${ANDROID_PLATFORM}
-        --jdk ${MYTH_JAVA_HOME}
         ${BUNDLESIGN}
         --verbose
       # cmake-format: on
     COMMAND
       # cmake-format: off
-      ${ANDROID_DEPLOY_QT}
+      ${CMAKE_COMMAND} -E env JAVA_HOME=${MYTH_JAVA_HOME}
+        ${ANDROID_DEPLOY_QT}
         --input "${PROJECT_BINARY_DIR}/android_deployment_settings.json"
         --output "${PROJECT_BINARY_DIR}/android-build"
         --apk "${PROJECT_BINARY_DIR}/android-build/${PROJECT_NAME}.apk"
         --android-platform ${ANDROID_PLATFORM}
-        --jdk ${MYTH_JAVA_HOME}
         ${BUNDLESIGN}
         --verbose
       # cmake-format: on
