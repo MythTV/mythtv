@@ -49,18 +49,6 @@
 
 // MythTV only -----------------------------------------------------------------
 
-typedef struct
-{
-    int pid;
-    int type;
-    enum AVCodecID       codec_id;
-    enum AVMediaType   codec_type;
-} pmt_entry_t;
-
-#define PMT_NOT_YET_FOUND 0
-#define PMT_NOT_IN_PAT    1
-#define PMT_FOUND         2
-
 typedef struct SectionContext {
     int pid;
     int stream_type;
@@ -70,19 +58,11 @@ typedef struct SectionContext {
     AVStream *st;
 } SectionContext;
 
-/** maximum number of PMT's we expect to be described in a PAT */
-#define PAT_MAX_PMT 128
-
-/** maximum number of streams we expect to be described in a PMT */
-#define PMT_PIDS_MAX 256
-
 // end MythTV only -------------------------------------------------------------
 
 /* maximum size in which we look for synchronization if
  * synchronization is lost */
 #define MAX_RESYNC_SIZE 65536
-
-#define MAX_PES_PAYLOAD 200 * 1024
 
 #define MAX_MP4_DESCR_COUNT 16
 
@@ -136,12 +116,6 @@ struct MpegTSFilter {
     int64_t last_pcr;
     int discard;
     enum MpegTSFilterType type;
-    /** if set, chop off PMT at the end of the TS packet, regardless of the
-     *  data length given in the packet.  This is for use by BBC iPlayer IPTV
-     *  recordings which seem to only want to send the first packet of the PMT
-     *  but give a length that requires 3 packets.  Without this, those
-     *  recordings are unplayable */
-    int pmt_chop_at_ts; // MythTV
     union {
         MpegTSPESFilter pes_filter;
         MpegTSSectionFilter section_filter;
@@ -157,7 +131,6 @@ struct Stream {
 #define MAX_PIDS_PER_PROGRAM (MAX_STREAMS_PER_PROGRAM + 2)
 struct Program {
     unsigned int id; // program id/service id
-    unsigned int pid; // PMT PID (not in upstream), only used in add_pat_entry() and is_pat_same()
     unsigned int nb_pids;
     unsigned int pids[MAX_PIDS_PER_PROGRAM];
     unsigned int nb_streams;
@@ -187,16 +160,6 @@ struct MpegTSContext {
 
     int64_t cur_pcr;    /**< used to estimate the exact PCR */
     int64_t pcr_incr;   /**< used to estimate the exact PCR */
-
-    // MythTV only
-    /** if set, stop_parse is set when PAT/PMT is found      */
-    int scanning;
-    /** set to PMT_NOT_IN_PAT in pat_cb when scanning is true
-     *  and the MPEG program number "req_sid" is not found in PAT;
-     *  set to PMT_FOUND when a PMT with a the "req_sid" program
-     *  number is found. */
-    int pmt_scan_state;
-    // end MythTV only
 
     /* data needed to handle file based ts */
     /** stop parsing loop */
@@ -230,16 +193,6 @@ struct MpegTSContext {
 
     AVStream *epg_stream;
     AVBufferPool* pools[32];
-
-    // MythTV only
-    /** MPEG program number of stream we want to decode      */
-    int req_sid;
-
-    /** number of streams in the last PMT seen */
-    int pid_cnt;
-    /** list of streams in the last PMT seen */
-    int pmt_pids[PMT_PIDS_MAX];
-    // end MythTV only
 };
 
 #define MPEGTS_OPTIONS \
@@ -331,7 +284,7 @@ typedef struct PESContext {
     int merged_st;
 } PESContext;
 
-extern AVInputFormat ff_mythtv_mpegts_demuxer;
+extern const AVInputFormat ff_mythtv_mpegts_demuxer;
 
 static struct Program * get_program(MpegTSContext *ts, unsigned int programid)
 {
@@ -406,10 +359,11 @@ static void add_pid_to_program(struct Program *p, unsigned int pid)
     p->pids[p->nb_pids++] = pid;
 }
 
-static void update_av_program_info(AVFormatContext *s, unsigned int programid,
+static int update_av_program_info(AVFormatContext *s, unsigned int programid,
                                    unsigned int pid, int version)
 {
     int i;
+    int ret = 0;
     for (i = 0; i < s->nb_programs; i++) {
         AVProgram *program = s->programs[i];
         if (program->id == programid) {
@@ -419,6 +373,7 @@ static void update_av_program_info(AVFormatContext *s, unsigned int programid,
             program->pmt_version = version;
 
             if (old_version != -1 && old_version != version) {
+                ret = 1;
                 av_log(s, AV_LOG_VERBOSE,
                        "detected PMT change (program=%d, version=%d/%d, pcr_pid=0x%x/0x%x)\n",
                        programid, old_version, version, old_pcr_pid, pid);
@@ -426,6 +381,7 @@ static void update_av_program_info(AVFormatContext *s, unsigned int programid,
             break;
         }
     }
+    return ret;
 }
 
 /**
@@ -479,8 +435,6 @@ static void mpegts_push_section(MpegTSFilter *filter, const uint8_t *section, in
 /**
  *  Assemble PES packets out of TS packets, and then call the "section_cb"
  *  function when they are complete.
- *
- *  NOTE: "DVB Section" is DVB terminology for an MPEG PES packet.
  */
 static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
                                const uint8_t *buf, int buf_size, int is_start)
@@ -549,24 +503,9 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
             offset += tss->section_h_size;
             tss->section_h_size = -1;
         } else {
-            // MythTV if; originally from: Deal with incomplete PMT streams in BBC iPlayer IPTV
-            // https://github.com/MythTV/mythtv/commit/c11ee69c81198dc221c874e8132f1f30a385fa63
-            // references https://code.mythtv.org/trac/ticket/9926 issue not in upstream!
-            if (tss1->pmt_chop_at_ts && tss->section_buf[0] == PMT_TID)
-            {
-                /* HACK!  To allow BBC IPTV streams with incomplete PMTs (they
-                 * advertise a length of 383, but only send 182 bytes!), we
-                 * will not wait for the remainder of the PMT, but accept just
-                 * what is in the first TS payload, as this is enough to get
-                 * playback, although some PIDs may be filtered out as a result
-                 */
-                tss->section_h_size = tss->section_index;
-            }
-            else { // upstream follows:
             tss->section_h_size = -1;
             tss->end_of_section_reached = 0;
             break;
-            } // end MythTV if
         }
     }
 }
@@ -611,12 +550,6 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
         av_free(section_buf);
         return NULL;
     }
-
-    // MythTV Deal with incomplete PMT streams in BBC iPlayer IPTV
-    // https://github.com/MythTV/mythtv/commit/c11ee69c81198dc221c874e8132f1f30a385fa63
-    filter->pmt_chop_at_ts = 0;
-    // end MythTV
-
     sec = &filter->u.section_filter;
     sec->section_cb  = section_cb;
     sec->opaque      = opaque;
@@ -892,7 +825,7 @@ static const StreamType ISO_types[] = {
     { 0x02, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
     { 0x03, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
     { 0x04, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_MP3        },
-    { 0x0b, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
+    { 0x0b, AVMEDIA_TYPE_DATA,  AV_CODEC_ID_DSMCC_B    }, /* STREAM_TYPE_DSMCC_B */
     { 0x0f, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AAC        },
     { 0x10, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG4      },
     /* Makito encoder sets stream type 0x11 for AAC,
@@ -937,10 +870,8 @@ static const StreamType SCTE_types[] = {
 /* ATSC ? */
 static const StreamType MISC_types[] = {
     { 0x81, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC3 },
-    { 0x87, AVMEDIA_TYPE_AUDIO,     AV_CODEC_ID_EAC3 },
+    { 0x87, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_EAC3 },
     { 0x8a, AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS },
-    { 0x100, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE },
-    { 0x101, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI },
     { 0 },
 };
 
@@ -980,18 +911,12 @@ static const StreamType DESC_types[] = {
     { 0x6a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_AC3          }, /* AC-3 descriptor */
     { 0x7a, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_EAC3         }, /* E-AC-3 descriptor */
     { 0x7b, AVMEDIA_TYPE_AUDIO,    AV_CODEC_ID_DTS          },
-    { 0x13, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
-    { 0x45, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_DATA_ID */
-    { 0x46, AVMEDIA_TYPE_DATA,          AV_CODEC_ID_DVB_VBI }, /* DVB_VBI_TELETEXT_ID */ //FixMe type subtilte
+    { 0x13, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DSMCC_B      }, /* DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR */
+    { 0x45, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_DATA_DESCRIPTOR */
+    { 0x46, AVMEDIA_TYPE_DATA,     AV_CODEC_ID_DVB_VBI      }, /* VBI_TELETEXT_DESCRIPTOR */
     { 0x56, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_TELETEXT },
     { 0x59, AVMEDIA_TYPE_SUBTITLE, AV_CODEC_ID_DVB_SUBTITLE }, /* subtitling descriptor */
     { 0 },
-};
-
-/* component tags */
-static const StreamType COMPONENT_TAG_types[] = {
-    { 0x0a, AVMEDIA_TYPE_AUDIO,        AV_CODEC_ID_MP3 },
-    { 0x52, AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_MPEG2VIDEO },
 };
 
 static void mpegts_find_stream_type(AVStream *st,
@@ -1535,13 +1460,6 @@ static PESContext *add_pes_stream(MpegTSContext *ts, int pid, int pcr_pid)
 {
     MpegTSFilter *tss;
     PESContext *pes;
-
-    // MythTV
-    if (tss = ts->pids[pid]) { /* filter already exists */
-        /* kill it, and start a new stream */
-        mpegts_close_filter(ts, tss);
-    }
-    // end MythTV
 
     /* if no pid found, then add a pid context */
     pes = av_mallocz(sizeof(PESContext));
@@ -2092,18 +2010,8 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                     extradata[4] = get8(pp, desc_end); /* subtitling_type */
                     memcpy(extradata, *pp, 4); /* composition_page_id and ancillary_page_id */
                     extradata += 5;
-#ifdef UPSTREAM_TO_MYTHTV
 
                     *pp += 4;
-#else
-                    {
-                        int comp_page   = get16(pp, desc_end);
-                        int anc_page    = get16(pp, desc_end);
-                        int sub_id      = (anc_page << 16) | comp_page;
-                        if (sub_id && (st->codecpar->codec_id == AV_CODEC_ID_DVB_SUBTITLE))
-                            st->carousel_id = sub_id;
-                    }
-#endif
                 }
 
                 language[i * 4 - 1] = 0;
@@ -2147,45 +2055,27 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
                 sti->request_probe = 50;
         }
         break;
-    case DVB_BROADCAST_ID:
+    case DATA_BROADCAST_ID_DESCRIPTOR:
         st->data_id = get16(pp, desc_end);
         break;
-    case DVB_CAROUSEL_ID:
-        {
-            int carId = 0;
-            carId = get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            carId = (carId << 8) | get8(pp, desc_end);
-            st->carousel_id = carId;
-        }
+    case DSMCC_CAROUSEL_IDENTIFIER_DESCRIPTOR:
+        st->carousel_id = get8(pp, desc_end) << 24 |
+                          get8(pp, desc_end) << 16 |
+                          get8(pp, desc_end) <<  8 |
+                          get8(pp, desc_end);
         break;
     case 0x52: /* stream identifier descriptor */
         sti->stream_identifier = 1 + get8(pp, desc_end);
         st->component_tag     = sti->stream_identifier - 1;
-    // DVB_DATA_STREAM:
-        /* Audio and video are sometimes encoded in private streams labelled with
-         * a component tag. */
-#if 0
-         if (st->codecpar->codec_id == AV_CODEC_ID_NONE &&
-             desc_count  == 1 &&
-             stream_type == STREAM_TYPE_PRIVATE_DATA)
-             mpegts_find_stream_type(st, st->component_tag,
-                                         COMPONENT_TAG_types);
-#endif
         break;
-    case DVB_VBI_TELETEXT_ID:
+    case VBI_TELETEXT_DESCRIPTOR:
         language[0] = get8(pp, desc_end);
         language[1] = get8(pp, desc_end);
         language[2] = get8(pp, desc_end);
         language[3] = 0;
 
-        /* dvbci->txt_type = */ i = (get8(pp, desc_end)) >> 3; // not exported, defeat compiler -Wunused-value
         if (language[0])
             av_dict_set(&st->metadata, "language", language, 0);
-        break;
-    case DVB_VBI_DATA_ID:
-        // dvbci->vbi_data = 1; //not parsing the data service descriptors
         break;
     case METADATA_DESCRIPTOR:
         if (get16(pp, desc_end) == 0xFFFF)
@@ -2469,43 +2359,6 @@ static int is_pes_stream(int stream_type, uint32_t prog_reg_desc)
 }
 
 // begin MythTV only -------------------------------------------------------
-static int find_in_list(const int *pids, int pid)
-{
-    int i;
-    for (i=0; i<PMT_PIDS_MAX; i++)
-        if (pids[i]==pid)
-            return i;
-    return -1;
-}
-
-static int is_desired_stream(enum AVMediaType codec_type, enum AVCodecID codec_id)
-{
-    int val = 0;
-    switch (codec_type)
-    {
-        case AVMEDIA_TYPE_VIDEO:
-        case AVMEDIA_TYPE_AUDIO:
-        case AVMEDIA_TYPE_SUBTITLE:
-            val = 1;
-            break;
-        case AVMEDIA_TYPE_DATA:
-            switch (codec_id)
-            {
-                case AV_CODEC_ID_DSMCC_B:
-                case AV_CODEC_ID_DVB_VBI:
-                    val = 1;
-                    break;
-                default:
-                    break;
-            }
-            break;
-        default:
-            /* we ignore the other streams */
-            break;
-    }
-    return val;
-}
-
 static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type)
 {
     MpegTSFilter *tss = ts->pids[pid];
@@ -2534,131 +2387,32 @@ static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream
     return sect;
 }
 
-static void mpegts_remove_stream(MpegTSContext *ts, int pid)
-{
-    int indx = -1;
-    av_log(ts, AV_LOG_DEBUG, "mpegts_remove_stream 0x%x\n", pid);
-    if (ts->pids[pid])
-    {
-        av_log(ts, AV_LOG_DEBUG, "closing filter for pid 0x%x\n", pid);
-        mpegts_close_filter(ts, ts->pids[pid]);
-    }
-    indx = find_in_list(ts->pmt_pids, pid);
-    if (indx >= 0)
-    {
-        memmove(ts->pmt_pids+indx, ts->pmt_pids+indx+1, PMT_PIDS_MAX-indx-1);
-        ts->pmt_pids[PMT_PIDS_MAX-1] = 0;
-        ts->pid_cnt--;
-    }
-    else
-    {
-        av_log(ts, AV_LOG_DEBUG, "ERROR: closing filter for pid 0x%x, indx = %i\n", pid, indx);
-    }
-}
-
-static void mpegts_cleanup_streams(MpegTSContext *ts)
-{
-    int i;
-    int orig_pid_cnt = ts->pid_cnt;
-    for (i=0; i<ts->pid_cnt; i++)
-    {
-        if (!ts->pids[ts->pmt_pids[i]])
-        {
-            mpegts_remove_stream(ts, ts->pmt_pids[i]);
-            i--;
-        }
-    }
-    if (orig_pid_cnt != ts->pid_cnt)
-    {
-        av_log(ts, AV_LOG_DEBUG,
-               "mpegts_cleanup_streams: pid_cnt bfr %d aft %d\n",
-               orig_pid_cnt, ts->pid_cnt);
-    }
-}
-
-// Find number of equal streams in old and new pmt starting at 0
-// and stopping at the first different stream.
-static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
-                             pmt_entry_t* items, int item_cnt)
-{
-    int limit = mpegts_ctx->pid_cnt < item_cnt ? mpegts_ctx->pid_cnt : item_cnt;
-    int idx;
-
-    for (idx = 0; idx < limit; idx++)
-    {
-        MpegTSFilter *tss;
-        /* check for pid */
-        int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
-        if (loc < 0)
-        {
-            av_log(mpegts_ctx, AV_LOG_TRACE,
-                   "find_in_list(..,[%d].pid=%d) => -1\n",
-                   idx, items[idx].pid);
-            break;
-        }
-
-        /* check stream type */
-        tss = mpegts_ctx->pids[items[idx].pid];
-        if (!tss)
-        {
-            av_log(mpegts_ctx, AV_LOG_TRACE,
-                   "mpegts_ctx->pids[items[%d].pid=%d] => null\n",
-                   idx, items[idx].pid);
-            break;
-        }
-        if (tss->type == MPEGTS_PES)
-        {
-            PESContext *pes = (PESContext*) tss->u.pes_filter.opaque;
-            if (!pes)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE, "pes == null, where idx %d\n", idx);
-                break;
-            }
-            if (pes->stream_type != items[idx].type)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE,
-                       "pes->stream_type != items[%d].type\n", idx);
-                break;
-            }
-        }
-        else if (tss->type == MPEGTS_SECTION)
-        {
-            SectionContext *sect = (SectionContext*) tss->u.section_filter.opaque;
-            if (!sect)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE, "sect == null, where idx %d\n", idx);
-                break;
-            }
-            if (sect->stream_type != items[idx].type)
-            {
-                av_log(mpegts_ctx, AV_LOG_TRACE,
-                       "sect->stream_type != items[%d].type\n", idx);
-                break;
-            }
-        }
-        else
-        {
-            av_log(mpegts_ctx, AV_LOG_TRACE,
-                   "tss->type != MPEGTS_PES, where idx %d\n", idx);
-            break;
-        }
-    }
-    av_log(mpegts_ctx, AV_LOG_TRACE, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
-        idx, mpegts_ctx->pid_cnt, item_cnt, limit);
-    return idx;
-}
-
 /**
 @brief Copy PMT to AVFormatContext for use by MythTV.
 
 @param ctx          MpegTSContext.stream, assumed to be non-NULL
+@param program_number  AVProgram.id of program to update
 @param section      Buffer to be duplicated
 @param section_len  Size in bytes of the buffer copied
 */
-static void export_pmt(AVFormatContext *ctx, const uint8_t *section, int section_len)
+static void export_pmt(AVFormatContext *ctx, int program_number, const uint8_t *section, int section_len)
 {
-    AVBufferRef *buf;
-    uint8_t* tmp = av_memdup(section, section_len);
+    AVProgram* program = NULL;
+    uint8_t* tmp = NULL;
+    AVBufferRef *buf = NULL;
+
+    for (unsigned i = 0; i < ctx->nb_programs; i++)
+    {
+        if (ctx->programs[i]->id == program_number)
+        {
+            program = ctx->programs[i];
+            break;
+        }
+    }
+    if (program == NULL)
+        return;
+
+    tmp = av_memdup(section, section_len);
     if (!tmp)
         return; // AVERROR(ENOMEM)
 
@@ -2668,7 +2422,7 @@ static void export_pmt(AVFormatContext *ctx, const uint8_t *section, int section
         av_freep(&tmp);
         return; // AVERROR(ENOMEM)
     }
-    av_buffer_replace(&ctx->pmt_section, buf);
+    av_buffer_replace(&(program->pmt_section), buf);
 
     av_buffer_unref(&buf);
 }
@@ -2692,20 +2446,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int mp4_descr_count = 0;
     Mp4Descr mp4_descr[MAX_MP4_DESCR_COUNT] = { { 0 } };
     int i;
-
-    // MythTV
-    int equal_streams = 0;
-    int last_item = 0;
-
-    pmt_entry_t items[PMT_PIDS_MAX];
-    memset(&items, 0, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
-
-    // initialize to codec_type_unknown
-    for (int i=0; i < PMT_PIDS_MAX; i++)
-        items[i].codec_type = AVMEDIA_TYPE_UNKNOWN;
-
-    mpegts_cleanup_streams(ts); /* in case someone else removed streams.. */
-    // end MythTV
+    int new_version = 0;
 
     av_log(ts->stream, AV_LOG_TRACE, "PMT: len %i\n", section_len);
     hex_dump_debug(ts->stream, section, section_len);
@@ -2723,16 +2464,6 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x sec_num=%d/%d version=%d tid=%d\n",
             h->id, h->sec_num, h->last_sec_num, h->version, h->tid);
-
-    // begin MythTV
-    /* if we require a specific PMT, and this isn't it return silently */
-    if (ts->req_sid >= 0 && h->id != ts->req_sid)
-    {
-        av_log(ts->stream, AV_LOG_TRACE, "We are looking for program 0x%x, not 0x%x",
-               ts->req_sid, h->id);
-         return;
-    }
-    // end MythTV
 
     if (!ts->scan_all_pmts && ts->skip_changes)
         return;
@@ -2757,7 +2488,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         return;
     pcr_pid &= 0x1fff;
     add_pid_to_program(prg, pcr_pid);
-    update_av_program_info(ts->stream, h->id, pcr_pid, h->version);
+    new_version = update_av_program_info(ts->stream, h->id, pcr_pid, h->version);
 
     av_log(ts->stream, AV_LOG_TRACE, "pcr_pid=0x%x\n", pcr_pid);
 
@@ -2959,51 +2690,19 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             }
         }
         p = desc_list_end;
-
-        // MythTV only
-        if (is_desired_stream(st->codecpar->codec_type, st->codecpar->codec_id)) {
-            items[last_item].pid        = pid;
-            items[last_item].type       = stream_type;
-            items[last_item].codec_id   = st->codecpar->codec_id;
-            items[last_item].codec_type = st->codecpar->codec_type;
-            last_item++;
-        }
-        // end MythTV only
     }
 
     // begin MythTV
 
     /* cache pmt */
     av_log(ts->stream, AV_LOG_TRACE, "exporting PMT\n");
-    export_pmt(ts->stream, section, section_len);
+    export_pmt(ts->stream, h->id, section, section_len);
 
-    /* if the pmt has changed delete old streams,
-     * create new ones, and notify any listener.
-     */
-    equal_streams = pmt_equal_streams(ts, items, last_item);
-    if (equal_streams != last_item || ts->pid_cnt != last_item)
+    /* if the pmt has changed, notify stream_changed listener */
+    if (new_version && ts->stream->streams_changed != NULL)
     {
-        AVFormatContext *avctx = ts->stream;
-
-        for (int i = 0; i < last_item; i++)
-        {
-            ts->pmt_pids[i] = items[i].pid;
-        }
-        ts->pid_cnt = last_item;
-
-        /* notify stream_changed listeners */
-        if (avctx->streams_changed)
-        {
-            av_log(ts->stream, AV_LOG_DEBUG, "streams_changed()\n");
-            avctx->streams_changed(avctx->stream_change_data);
-        }
-    }
-
-    /* if we are scanning, tell scanner we found the PMT */
-    if (ts->scanning)
-    {
-        ts->pmt_scan_state = PMT_FOUND;
-        ts->stop_parse = 1;
+        av_log(ts->stream, AV_LOG_DEBUG, "streams_changed()\n");
+        ts->stream->streams_changed(ts->stream->stream_change_data, h->id);
     }
     // end MythTV
 
@@ -3074,8 +2773,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int nb_prg = 0;
     AVProgram *program;
 
-    int found = 0; // MythTV added
-
     av_log(ts->stream, AV_LOG_TRACE, "PAT:\n");
     hex_dump_debug(ts->stream, section, section_len);
 
@@ -3108,18 +2805,12 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
         av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
         // begin MythTV
-        av_log(ts->stream, AV_LOG_TRACE, "req_sid=0x%x\n", ts->req_sid);
-
-        if (pmt_pid == 0x0)
+        if (pmt_pid <= 0x000F || pmt_pid >= 0x1FFF)
         {
             av_log(ts->stream, AV_LOG_ERROR, "Invalid PAT ignored "
-                   "MPEG Program Number=0x%x pid=0x%x req_sid=0x%x\n",
-                   sid, pmt_pid, ts->req_sid);
+                   "MPEG Program Number=0x%x pid=0x%x\n", sid, pmt_pid);
             return;
         }
-
-        if (sid == ts->req_sid)
-            found = 1;
         // end MythTV
 
         if (sid == 0x0000) {
@@ -3164,25 +2855,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             if (i==ts->nb_prg && !ts->skip_clear)
                 clear_avprogram(ts, ts->stream->programs[j]->id);
         }
-    }
-
-    /* if we are scanning for any PAT and not a particular PMT,
-     * tell parser it is safe to quit. */
-    if (ts->req_sid < 0 && ts->scanning)
-    {
-        av_log(ts->stream, AV_LOG_TRACE, "Found PAT, ending scan\n");
-        ts->stop_parse = 1;
-    }
-
-    /* if we are looking for a particular MPEG program number,
-     * and it is not in this PAT indicate this in "pmt_scan_state"
-     * and tell parser it is safe to quit. */
-    if (ts->req_sid >= 0 && !found)
-    {
-        av_log(ts->stream, AV_LOG_TRACE, "Program 0x%x is not in PAT, ending scan\n",
-               ts->req_sid);
-        ts->pmt_scan_state = PMT_NOT_IN_PAT;
-        ts->stop_parse = 1;
     }
 }
 
@@ -3694,13 +3366,6 @@ static int mpegts_read_header(AVFormatContext *s)
         /* first do a scan to get all the services */
         seek_back(s, pb, pos);
 
-        // begin MythTV
-        /* we don't want any PMT pid filters created on first pass */
-        ts->req_sid = -1;
-
-        ts->scanning = 1;
-        // end MythTV
-
         mpegts_open_section_filter(ts, SDT_PID, sdt_cb, ts, 1);
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
         mpegts_open_section_filter(ts, EIT_PID, eit_cb, ts, 1);
@@ -3709,66 +3374,6 @@ static int mpegts_read_header(AVFormatContext *s)
         /* if could not find service, enable auto_guess */
 
         ts->auto_guess = 1;
-
-        // begin MythTV
-        ts->scanning = 1;
-        ts->pmt_scan_state = PMT_NOT_YET_FOUND;
-        /* tune to first service found */
-        for (int i = 0; ((i < ts->nb_prg) &&
-                     (ts->pmt_scan_state == PMT_NOT_YET_FOUND)); i++)
-        {
-            int sid = ts->req_sid;
-            av_log(ts->stream, AV_LOG_TRACE, "Tuning to pnum: 0x%x\n",
-                   ts->prg[i].id);
-
-            /* now find the info for the first service if we found any,
-               otherwise try to filter all PATs */
-
-            avio_seek(pb, pos, SEEK_SET);
-            ts->req_sid = ts->prg[i].id;
-            handle_packets(ts, probesize / ts->raw_packet_size);
-
-            /* fallback code to deal with broken streams from
-             * DBOX2/Firewire cable boxes. */
-            if (ts->pids[sid] &&
-                (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
-            {
-                av_log(ts->stream, AV_LOG_ERROR,
-                       "Tuning to pnum: 0x%x without CRC check on PMT\n",
-                       ts->prg[i].id);
-                /* turn off crc checking */
-                ts->pids[sid]->u.section_filter.check_crc = 0;
-                /* try again */
-                avio_seek(pb, pos, SEEK_SET);
-                ts->req_sid = ts->prg[i].id;
-                handle_packets(ts, probesize / ts->raw_packet_size);
-            }
-
-            /* fallback code to deal with streams that are not complete PMT
-             * streams (BBC iPlayer IPTV as an example) */
-            if (ts->pids[sid] &&
-                (ts->pmt_scan_state == PMT_NOT_YET_FOUND))
-            {
-                av_log(ts->stream, AV_LOG_ERROR,
-                       "Overriding PMT data length, using "
-                       "contents of first TS packet only!\n");
-                ts->pids[sid]->pmt_chop_at_ts = 1;
-                /* try again */
-                avio_seek(pb, pos, SEEK_SET);
-                ts->req_sid = ts->prg[i].id;
-                handle_packets(ts, probesize / ts->raw_packet_size);
-            }
-        }
-        ts->scanning = 0;
-
-        /* if we could not find any PMTs, fail */
-        if (ts->pmt_scan_state == PMT_NOT_YET_FOUND)
-        {
-            av_log(ts->stream, AV_LOG_ERROR,
-                   "mpegts_read_header: could not find any PMT's\n");
-            return -1;
-        }
-        // end MythTV
 
         av_log(ts->stream, AV_LOG_TRACE, "tuning done\n");
 
@@ -3927,7 +3532,8 @@ static void mpegts_free(MpegTSContext *ts)
         if (ts->pids[i])
             mpegts_close_filter(ts, ts->pids[i]);
 
-    av_buffer_unref(&ts->stream->pmt_section); // MythTV
+    for (i = 0; i < ts->stream->nb_programs; i++)
+        av_buffer_unref(&(ts->stream->programs[i]->pmt_section)); // MythTV
 }
 
 static int mpegts_read_close(AVFormatContext *s)
@@ -4065,7 +3671,7 @@ void avpriv_mythtv_mpegts_parse_close(MpegTSContext *ts)
     av_free(ts);
 }
 
-AVInputFormat ff_mythtv_mpegts_demuxer = {
+const AVInputFormat ff_mythtv_mpegts_demuxer = {
     .name           = "mpegts",
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-TS (MPEG-2 Transport Stream)"),
     .priv_data_size = sizeof(MpegTSContext),
@@ -4078,7 +3684,7 @@ AVInputFormat ff_mythtv_mpegts_demuxer = {
     .priv_class     = &mpegts_class,
 };
 
-AVInputFormat ff_mythtv_mpegtsraw_demuxer = {
+const AVInputFormat ff_mythtv_mpegtsraw_demuxer = {
     .name           = "mpegtsraw",
     .long_name      = NULL_IF_CONFIG_SMALL("raw MPEG-TS (MPEG-2 Transport Stream)"),
     .priv_data_size = sizeof(MpegTSContext),
