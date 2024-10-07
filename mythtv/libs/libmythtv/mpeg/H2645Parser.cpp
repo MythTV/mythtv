@@ -6,7 +6,6 @@
 #include "recorders/dtvrecorder.h" // for FrameRate and ScanType
 #include "bitreader.h"
 
-#include <cmath>
 #include <strings.h>
 
 /*
@@ -388,10 +387,10 @@ void H2645Parser::vui_parameters(BitReader& br, bool hevc)
 uint H2645Parser::aspectRatio(void) const
 {
 
-    double aspect = 0.0;
+    MythAVRational aspect {0};
 
     if (m_picHeight)
-        aspect = pictureWidthCropped() / (double)pictureHeightCropped();
+        aspect = MythAVRational(pictureWidthCropped(), pictureHeightCropped());
 
     switch (m_aspectRatioIdc)
     {
@@ -400,82 +399,80 @@ uint H2645Parser::aspectRatio(void) const
             break;
         case 2:
             // 12:11
-            aspect *= 1.0909090909090908;
+            aspect *= MythAVRational(12, 11);
             break;
         case 3:
             // 10:11
-            aspect *= 0.90909090909090906;
+            aspect *= MythAVRational(10, 11);
             break;
         case 4:
             // 16:11
-            aspect *= 1.4545454545454546;
+            aspect *= MythAVRational(16, 11);
             break;
         case 5:
             // 40:33
-            aspect *= 1.2121212121212122;
+            aspect *= MythAVRational(40, 33);
             break;
         case 6:
             // 24:11
-            aspect *= 2.1818181818181817;
+            aspect *= MythAVRational(24, 11);
             break;
         case 7:
             // 20:11
-            aspect *= 1.8181818181818181;
+            aspect *= MythAVRational(20, 11);
             break;
         case 8:
             // 32:11
-            aspect *= 2.9090909090909092;
+            aspect *= MythAVRational(32, 11);
             break;
         case 9:
             // 80:33
-            aspect *= 2.4242424242424243;
+            aspect *= MythAVRational(80, 33);
             break;
         case 10:
             // 18:11
-            aspect *= 1.6363636363636365;
+            aspect *= MythAVRational(18, 11);
             break;
         case 11:
             // 15:11
-            aspect *= 1.3636363636363635;
+            aspect *= MythAVRational(15, 11);
             break;
         case 12:
             // 64:33
-            aspect *= 1.9393939393939394;
+            aspect *= MythAVRational(64, 33);
             break;
         case 13:
             // 160:99
-            aspect *= 1.6161616161616161;
+            aspect *= MythAVRational(160, 99);
             break;
         case 14:
             // 4:3
-            aspect *= 1.3333333333333333;
+            aspect *= MythAVRational(4, 3);
             break;
         case 15:
             // 3:2
-            aspect *= 1.5;
+            aspect *= MythAVRational(3, 2);
             break;
         case 16:
             // 2:1
-            aspect *= 2.0;
+            aspect *= MythAVRational(2, 1);
             break;
         case kExtendedSar:
             if (m_sarHeight)
-                aspect *= m_sarWidth / (double)m_sarHeight;
+                aspect *= MythAVRational(m_sarWidth, m_sarHeight);
             else
-                aspect = 0.0;
+                aspect = MythAVRational(0);
             break;
     }
 
-    // TODO use an integer-based Rational number instead of floating point
-    static constexpr double eps = 1E-5;
-    if (aspect == 0.0)
+    if (aspect == MythAVRational(0))
         return 0;
-    if (fabs(aspect - 1.3333333333333333) < eps)
+    if (aspect == MythAVRational(4, 3))  // 1.3333333333333333
         return 2;
-    if (fabs(aspect - 1.7777777777777777) < eps)
+    if (aspect == MythAVRational(16, 9)) // 1.7777777777777777
         return 3;
-    if (fabs(aspect - 2.21) < eps)
+    if (aspect == MythAVRational(221, 100)) // 2.21
         return 4;
 
-    return aspect * 1000000;
+    return aspect.toFixed(1000000);
 }

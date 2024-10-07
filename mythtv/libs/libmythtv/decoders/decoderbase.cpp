@@ -17,7 +17,6 @@
 DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
     : m_parent(parent), m_playbackInfo(new ProgramInfo(pginfo)),
       m_audio(m_parent->GetAudio()),
-      m_totalDuration(AVRationalInit(0)),
 
       // language preference
       m_languagePreference(iso639_get_language_key_list())
@@ -61,7 +60,7 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
         m_frameCounter += 100;
         m_fpsSkip = 0;
         m_framesRead = 0;
-        m_totalDuration = AVRationalInit(0);
+        m_totalDuration = MythAVRational(0);
         m_dontSyncPositionMap = false;
     }
 
@@ -883,7 +882,7 @@ void DecoderBase::FileChanged(void)
     ResetPosMap();
     m_framesPlayed = 0;
     m_framesRead = 0;
-    m_totalDuration = AVRationalInit(0);
+    m_totalDuration = MythAVRational(0);
 
     m_waitingForChange = false;
     m_justAfterChange = true;
@@ -1293,10 +1292,10 @@ QString toString(AudioTrackType type)
 
 void DecoderBase::SaveTotalDuration(void)
 {
-    if (!m_playbackInfo || av_q2d(m_totalDuration) == 0)
+    if (!m_playbackInfo || !m_totalDuration.isNonzero() || !m_totalDuration.isValid())
         return;
 
-    m_playbackInfo->SaveTotalDuration(millisecondsFromFloat(1000 * av_q2d(m_totalDuration)));
+    m_playbackInfo->SaveTotalDuration(std::chrono::milliseconds{m_totalDuration.toFixed(1000)});
 }
 
 void DecoderBase::SaveTotalFrames(void)
