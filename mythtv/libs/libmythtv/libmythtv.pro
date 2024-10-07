@@ -143,6 +143,7 @@ HEADERS += io/mythstreamingbuffer.h
 HEADERS += io/mythinteractivebuffer.h
 HEADERS += io/mythopticalbuffer.h
 HEADERS += metadataimagehelper.h
+HEADERS += mythavrational.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
