@@ -365,7 +365,7 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
                     else
                     {
                         LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
-                            QString("LoadCacheImage: Could not load :%1")
+                            QString("LoadCacheImage: Could not load: %1")
                             .arg(cachefilepath));
 
                         ret->SetIsInCache(false);
