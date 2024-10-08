@@ -58,6 +58,14 @@ foreach(var IN LISTS vars)
   endif()
 endforeach()
 
+# Collapse all the various ways of specifying an android build down into a
+# single flag.
+if(ARM64
+   OR SDK
+   OR CMAKE_ANDROID_ARCH_ABI)
+  set(ANDROID ON)
+endif()
+
 #
 # Copied from cmake/Modules/CMakeGenericSystem.cmake.  That module isn't
 # included on windows builds, and we need this variable set properly.
@@ -70,6 +78,7 @@ endif()
 # Read user options (part 1).  On android, several of these options affect the
 # initialization performed by the project function.
 #
+message(STATUS "Including default MythTV options")
 include(MythOptions)
 message(STATUS "Including user overrides ${MYTH_USER_OVERRIDES1}")
 include(${MYTH_USER_OVERRIDES1} OPTIONAL)

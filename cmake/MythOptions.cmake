@@ -230,10 +230,7 @@ option(MYTH_BUILD_THEMESTRING_TOOL
 #
 # Android Related Options
 #
-if(ANDROID
-   OR ARM64
-   OR SDK
-   OR CMAKE_ANDROID_ARCH_ABI)
+if(ANDROID)
   # As per:
   # https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling-for-android
   #
@@ -331,6 +328,7 @@ if(ANDROID)
   foreach(DIR "jbr" "jre")
     set(FILENAME "$ENV{HOME}/Android/android-studio/${DIR}")
     if(EXISTS ${FILENAME})
+      message(STATUS "Defaulting MYTH_JAVA_HOME to ${FILENAME}")
       set(MYTH_JAVA_HOME
           ${FILENAME}
           CACHE PATH "Path to JDK home directory")

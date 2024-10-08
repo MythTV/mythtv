@@ -115,7 +115,10 @@ function(find_or_build_qt)
           -L "${LIBS_INSTALL_PREFIX}/lib64/mariadb"
           ${QT5_PLATFORM_LIBS_ARGS}
           # cmake-format: on
-    BUILD_COMMAND ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
+    BUILD_COMMAND ${CMAKE_COMMAND} -E env ${QT_PLATFORM_BUILD_ENV}
+                  ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E env ${QT_PLATFORM_INSTALL_ENV}
+                    ${MAKE_EXECUTABLE} install
     USES_TERMINAL_CONFIGURE ON
     USES_TERMINAL_BUILD ON
     USES_TERMINAL_INSTALL ON
