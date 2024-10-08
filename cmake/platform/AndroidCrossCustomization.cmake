@@ -187,15 +187,11 @@ if(ANDROID_MIN_SDK_VERSION LESS 28)
   # Fire Stick 4K libz.so doesn't have the "inflateValidate" symbol needed by
   # the libpng that is build for the QtGui lib.
   list(APPEND QT5_PLATFORM_ARGS -no-libpng)
-  #list(APPEND QT6_PLATFORM_ARGS -DQT_FEATURE_png:BOOL=OFF)
-  list(
-    APPEND EXIV2_PLATFORM_ARGS -DEXIV2_ENABLE_PNG:BOOL=OFF
-    -DIconv_INCLUDE_DIR=${LIBS_INSTALL_PREFIX}/include
-  )
-  list(
-    APPEND XML2_PLATFORM_ARGS
-    -DIconv_INCLUDE_DIR=${LIBS_INSTALL_PREFIX}/include
-  )
+  # list(APPEND QT6_PLATFORM_ARGS -DQT_FEATURE_png:BOOL=OFF)
+  list(APPEND EXIV2_PLATFORM_ARGS -DEXIV2_ENABLE_PNG:BOOL=OFF
+       -DIconv_INCLUDE_DIR=${LIBS_INSTALL_PREFIX}/include)
+  list(APPEND XML2_PLATFORM_ARGS
+       -DIconv_INCLUDE_DIR=${LIBS_INSTALL_PREFIX}/include)
 endif()
 
 # Sigh, Qt cmake files don't use the same variable names as cmake proper uses.
