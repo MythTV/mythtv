@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <memory>
+#include "zlib.h"
 
 // Qt
 #include <QtGlobal>
@@ -2088,6 +2089,15 @@ Q_DECL_EXPORT int main(int argc, char **argv)
     if (maxImageSize >=0)
         QImageReader::setAllocationLimit(maxImageSize);
 #endif
+    LOG(VB_GENERAL, LOG_DEBUG,
+        QString("Built against zlib %1, linked against %2.")
+        .arg(ZLIB_VERSION, zlibVersion()));
+    QList<QByteArray> formats = QImageReader::supportedImageFormats();
+    QString format_str = formats.takeFirst();
+    for (const auto& format : std::as_const(formats))
+        format_str += ", " + format;
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Supported image formats: %1").arg(format_str));
+
     QCoreApplication::setSetuidAllowed(true);
 
     if (revokeRoot() != 0)
