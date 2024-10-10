@@ -51,7 +51,6 @@ include(GetDefine)
 #
 get_define(vulkan/vulkan_core.h VK_HEADER_VERSION
            "^#define +VK_HEADER_VERSION +([0-9]+)$")
-get_define(zlib.h ZLIB_VERSION "^#define +ZLIB_VERSION +\"([^\"]+)\" *$")
 
 # There are no header files that provides exact version numbers for OpenGL.
 # These version numbers are based on the presence of #ifdef statements in the
@@ -62,25 +61,9 @@ set(GLES2_VERSION 2.0)
 set(GLES3_VERSION 3.2)
 
 #
-# Copy the Android ndk's copy of zlib.so/libz.a into our target install
-# directory.  The android ndk puts the libz.so file in a version specific
-# sub-directory instead of the same directory as libz.a.  This causes cmake
-# find_xxx lookups to miss libz.so and choose libz.a instead.  Putting both
-# files into our install directory allows libz.so to be found.
-#
-file(
-  COPY ${CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED}/sysroot/usr/lib/${CMAKE_ANDROID_ARCH_TRIPLE}/${CMAKE_SYSTEM_VERSION}/libz.so
-  DESTINATION ${LIBS_INSTALL_PREFIX}/lib)
-file(
-  COPY ${CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED}/sysroot/usr/lib/${CMAKE_ANDROID_ARCH_TRIPLE}/libz.a
-  DESTINATION ${LIBS_INSTALL_PREFIX}/lib)
-file(COPY ${CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED}/sysroot/usr/include/zlib.h
-     DESTINATION ${LIBS_INSTALL_PREFIX}/include)
-
-#
 # Create all the pkgconfig files
 #
-foreach(NAME IN ITEMS egl glesv1_cm glesv2 glesv3 vulkan zlib)
+foreach(NAME IN ITEMS egl glesv1_cm glesv2 glesv3 vulkan)
   if(NOT EXISTS ${LIBS_INSTALL_PREFIX}/lib/pkgconfig/${NAME}.pc)
     message(
       STATUS "Created file ${LIBS_INSTALL_PREFIX}/lib/pkgconfig/${NAME}.pc")

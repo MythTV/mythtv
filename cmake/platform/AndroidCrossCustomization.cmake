@@ -183,12 +183,13 @@ set(QT6_PLATFORM_ARGS
     -DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_ANDROID_NDK}/build/cmake/android.toolchain.cmake
 )
+
 if(ANDROID_MIN_SDK_VERSION LESS 28)
-  # Fire Stick 4K libz.so doesn't have the "inflateValidate" symbol needed by
-  # the libpng that is build for the QtGui lib.
-  list(APPEND QT5_PLATFORM_ARGS -no-libpng)
-  # list(APPEND QT6_PLATFORM_ARGS -DQT_FEATURE_png:BOOL=OFF)
-  list(APPEND EXIV2_PLATFORM_ARGS -DEXIV2_ENABLE_PNG:BOOL=OFF
+  # Fix compiling of libxml2.  Android < 28 doesn't include iconv, so we have to
+  # build it ourselves.  Make sure the compile of XML2 finds the include file
+  # from our build, instead of from the Android SDK.   Iconv vs libiconv is a
+  # PITA.
+  list(APPEND EXIV2_PLATFORM_ARGS
        -DIconv_INCLUDE_DIR=${LIBS_INSTALL_PREFIX}/include)
   list(APPEND XML2_PLATFORM_ARGS
        -DIconv_INCLUDE_DIR=${LIBS_INSTALL_PREFIX}/include)
