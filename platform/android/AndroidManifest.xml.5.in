@@ -28,11 +28,10 @@
         android:banner="@drawable/banner"
         android:debuggable="true"
         android:theme="@style/AppTheme"
-        android:extractNativeLibs="true"
         @MANIFEST_APPLICATION_EXTRAS_STR@
         >
         <activity
-            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
+            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc"
             android:name="org.qtproject.qt5.android.bindings.QtActivity"
             android:label="-- %%INSERT_APP_NAME%% --"
             android:screenOrientation="landscape"
