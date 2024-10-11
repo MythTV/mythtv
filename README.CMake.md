@@ -254,18 +254,15 @@
   build as nothing is installed.
 
   The external libraries that are downloaded and compiled will be
-  installed the directory <builddir>/tmp-libsinstall-<arch>-qt5 and
-  the mythtv components will be installed into the directory
-  <builddir>/tmp-install-<arch>-qt5.  (There should be no need to
-  modify these directory locations, but they could be change by
-  setting values into the LIBS_INSTALL_PREFIX and CMAKE_INSTALL_PREFIX
-  directories.)  Because these directories are located underneath the
-  build directory, they will both be deleted when the build directory
-  is deleted. If you want the libraries to survive deleting the build
-  directory, you may place the LIBS_INSTALL_DIRECTORY anywhere you
-  want.  The easiest solution is to use one of the presets ending with
-  "-libs" that will place the library directory next to the build
-  directory instead of underneath the build directory.
+  installed the directory libsinstall-<preset> and the mythtv
+  components will be installed into the directory build-<preset>.
+  (There should be no need to modify these directory locations, but
+  they could be change by setting values into the LIBS_INSTALL_PREFIX
+  and CMAKE_INSTALL_PREFIX directories.)  When you delete the build
+  directory, the compiled external libraries will survive in the
+  libsinstall-<preset> directory.  If you need to perform a complete
+  rebuild, you will need to delete both the build-<preset> and
+  libsinstall-<preset> directories.
 
   To set the [android
   architecture](https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html)
