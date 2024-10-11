@@ -39,7 +39,7 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
     QString GetThemeWebSite() const { return m_themesite; }
 
     QString GetLocalURL() const { return m_themeurl; }
-    QString GetDirectoryName() const { return m_theme.fileName(); }
+    QString GetDirectoryName() const;
 
     void ToMap(InfoMap &infoMap) const;
 

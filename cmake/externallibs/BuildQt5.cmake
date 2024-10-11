@@ -30,7 +30,7 @@ function(find_or_build_qt)
       PROPERTY MANUALLY_ADDED_DEPENDENCIES)
   endif()
 
-  set(QT_VERSION "5.15.11")
+  set(QT_VERSION "5.15.15")
   string(REGEX MATCH "^([0-9]+\.[0-9]+)" QT_MAJMIN ${QT_VERSION})
   set(QT_PREFIX "qt-${QT_VERSION}")
   set(QT_URL
@@ -40,6 +40,8 @@ function(find_or_build_qt)
       "26d5f36134db03abe4a6db794c7570d729c92a3fc1b0bf9b1c8f86d0573cd02f")
   set(QT_5.15.11_SHA256
       "7426b1eaab52ed169ce53804bdd05dfe364f761468f888a0f15a308dc1dc2951")
+  set(QT_5.15.15_SHA256
+      "b423c30fe3ace7402e5301afbb464febfb3da33d6282a37a665be1e51502335e")
   ExternalProject_Add(
     qt
     DOWNLOAD_DIR ${TARBALL_DIR}

@@ -175,9 +175,10 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
 
     QDir dir(directory);
     QStringList nameFilters = QStringList() << "*.ttf" << "*.otf" << "*.ttc";
-    QStringList fontFiles = dir.entryList(nameFilters);
-    for (const auto & path : std::as_const(fontFiles))
-        LoadFontFile(dir.absoluteFilePath(path), registeredFor);
+    QFileInfoList fontFileInfos = dir.entryInfoList(nameFilters);
+    for (const auto & info : std::as_const(fontFileInfos)) {
+        LoadFontFile(info.absoluteFilePath(), registeredFor);
+    }
 }
 
 /**

@@ -1,0 +1,167 @@
+diff --git a/qtbase/mkspecs/android-clang/qmake.conf b/qtbase/mkspecs/android-clang/qmake.conf
+index eafcce9036..e37395fd89 100644
+--- a/qtbase/mkspecs/android-clang/qmake.conf
++++ b/qtbase/mkspecs/android-clang/qmake.conf
+@@ -42,6 +42,7 @@ isEmpty(ALL_ANDROID_ABIS): ALL_ANDROID_ABIS = $$DEFAULT_ANDROID_ABIS
+ isEmpty(ALL_ANDROID_ABIS): ALL_ANDROID_ABIS = arm64-v8a armeabi-v7a x86_64 x86
+ 
+ CONFIG += $$ANDROID_PLATFORM
++CONFIG += rtti exceptions
+ 
+ ANDROID_MIN_SDK_VERSION = $$replace(ANDROID_PLATFORM, "android-", "")
+ ANDROID_TARGET_SDK_VERSION = 31
+diff --git a/qtbase/mkspecs/common/g++-win32.conf b/qtbase/mkspecs/common/g++-win32.conf
+index c3a1f3a373..a87a68b325 100644
+--- a/qtbase/mkspecs/common/g++-win32.conf
++++ b/qtbase/mkspecs/common/g++-win32.conf
+@@ -31,7 +31,7 @@ QMAKE_YACCFLAGS         = -d
+ 
+ QMAKE_CFLAGS_SSE2      += -mstackrealign
+ 
+-QMAKE_CXXFLAGS_EXCEPTIONS_ON = -fexceptions -mthreads
++QMAKE_CXXFLAGS_EXCEPTIONS_ON = -fexceptions
+ 
+ QMAKE_INCDIR            =
+ 
+@@ -40,9 +40,10 @@ QMAKE_RUN_CC_IMP        = $(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
+ QMAKE_RUN_CXX           = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $obj $src
+ QMAKE_RUN_CXX_IMP       = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+ 
+-QMAKE_LFLAGS_EXCEPTIONS_ON = -mthreads
++#QMAKE_CFLAGS += -mconsole
++#QMAKE_LFLAGS_EXCEPTIONS_ON = -mthreads
+ QMAKE_LFLAGS_RELEASE    = -Wl,-s
+-QMAKE_LFLAGS_CONSOLE    = -Wl,-subsystem,console
++#QMAKE_LFLAGS_CONSOLE    = -Wl,-subsystem,console
+ QMAKE_LFLAGS_WINDOWS    = -Wl,-subsystem,windows
+ QMAKE_LFLAGS_DLL        = -shared
+ QMAKE_LFLAGS_GCSECTIONS = -Wl,--gc-sections
+diff --git a/qtbase/mkspecs/features/android/default_pre.prf b/qtbase/mkspecs/features/android/default_pre.prf
+index 2328b728ac..68d1e9a1b4 100644
+--- a/qtbase/mkspecs/features/android/default_pre.prf
++++ b/qtbase/mkspecs/features/android/default_pre.prf
+@@ -67,8 +67,7 @@ QMAKE_CXXFLAGS_THREAD   = $$QMAKE_CFLAGS_THREAD
+ QMAKE_LIBS_EGL          = -lEGL
+ QMAKE_LIBS_OPENGL_ES2   = -lGLESv2
+ 
+-QMAKE_STRIP             =
+-#$${CROSS_COMPILE}strip
++QMAKE_STRIP             = $$NDK_LLVM_PATH/bin/llvm-strip
+ 
+ 
+ equals(QT_ARCH, x86): CROSS_COMPILE = $$NDK_LLVM_PATH/bin/i686-linux-android-
+diff --git a/qtbase/mkspecs/win32-g++/qmake.conf b/qtbase/mkspecs/win32-g++/qmake.conf
+index 5de482f23b..7838c5bbd2 100644
+--- a/qtbase/mkspecs/win32-g++/qmake.conf
++++ b/qtbase/mkspecs/win32-g++/qmake.conf
+@@ -13,11 +13,18 @@ include(../common/windows-desktop.conf)
+ # modifications to g++-win32.conf
+ 
+ QMAKE_CC                = $${CROSS_COMPILE}gcc
+-QMAKE_CFLAGS           += -fno-keep-inline-dllexport
++#QMAKE_CFLAGS          += -fno-keep-inline-dllexport
++QMAKE_CFLAGS           += -fcf-protection
+ QMAKE_CFLAGS_WARN_ON   += -Wextra
+ 
+ QMAKE_CXX               = $${CROSS_COMPILE}g++
+-QMAKE_CXXFLAGS         += -fno-keep-inline-dllexport
++#QMAKE_CXXFLAGS        += -fno-keep-inline-dllexport
++QMAKE_CXXFLAGS         += -fcf-protection
++# Fix error about too many sections
++QMAKE_CXXFLAGS         += -Wa,-mbig-obj
++# Quiet ton of warnings about functions that are redeclared without
++# dllimport attribute
++QMAKE_CXXFLAGS         += -Wno-attributes
+ QMAKE_CXXFLAGS_WARN_ON  = $$QMAKE_CFLAGS_WARN_ON
+ 
+ QMAKE_LINK              = $${CROSS_COMPILE}g++
+diff --git a/qtbase/src/3rdparty/libjpeg/lib12bits/lib12bits.pro b/qtbase/src/3rdparty/libjpeg/lib12bits/lib12bits.pro
+index cad3e7fa35..de09c746dd 100644
+--- a/qtbase/src/3rdparty/libjpeg/lib12bits/lib12bits.pro
++++ b/qtbase/src/3rdparty/libjpeg/lib12bits/lib12bits.pro
+@@ -5,3 +5,5 @@ include($$PWD/../common.pri)
+ DEFINES += BITS_IN_JSAMPLE=12
+ 
+ SOURCES = $$JPEG12_SOURCES
++
++android: OBJECTS_DIR = $$OBJECTS_DIR/$${QT_ARCH}
+diff --git a/qtbase/src/3rdparty/libjpeg/lib16bits/lib16bits.pro b/qtbase/src/3rdparty/libjpeg/lib16bits/lib16bits.pro
+index 42fe0d884e..a7bf06bee5 100644
+--- a/qtbase/src/3rdparty/libjpeg/lib16bits/lib16bits.pro
++++ b/qtbase/src/3rdparty/libjpeg/lib16bits/lib16bits.pro
+@@ -5,3 +5,5 @@ include($$PWD/../common.pri)
+ DEFINES += BITS_IN_JSAMPLE=16
+ 
+ SOURCES = $$JPEG16_SOURCES
++
++android: OBJECTS_DIR = $$OBJECTS_DIR/$${QT_ARCH}
+diff --git a/qtbase/src/corelib/Qt5AndroidSupport.cmake b/qtbase/src/corelib/Qt5AndroidSupport.cmake
+index 8ed9d7b4cc..70fdead01b 100644
+--- a/qtbase/src/corelib/Qt5AndroidSupport.cmake
++++ b/qtbase/src/corelib/Qt5AndroidSupport.cmake
+@@ -69,6 +69,7 @@ if (NOT ${PROJECT_NAME}-MultiAbiBuild)
+   @QT_ANDROID_MIN_SDK_VERSION@
+   @QT_ANDROID_EXTRA_LIBS@
+   @QT_QML_IMPORT_PATH@
++  "extraPrefixDirs" : [ @EXTRA_PREFIX_LIST@ ],
+   "ndk": "@ANDROID_NDK@",
+   "ndk-host": "@ANDROID_HOST_TAG@",
+   "qml-root-path": "@CMAKE_CURRENT_SOURCE_DIR@",
+@@ -130,6 +131,15 @@ if (NOT ${PROJECT_NAME}-MultiAbiBuild)
+   generate_json_variable(ANDROID_MIN_SDK_VERSION "android-min-sdk-version")
+   generate_json_variable(ANDROID_TARGET_SDK_VERSION "android-target-sdk-version")
+ 
++  # Extra prefix paths - This clause is from Qt6, but the rest of
++  # the code to support extraPrefixDirs already exists in Qt5.
++  foreach(prefix IN LISTS CMAKE_FIND_ROOT_PATH)
++      if (NOT "${prefix}" STREQUAL "${qt_android_install_dir_native}")
++          file(TO_CMAKE_PATH "${prefix}" prefix)
++          list(APPEND EXTRA_PREFIX_LIST "\"${prefix}\"")
++      endif()
++  endforeach()
++  string (REPLACE ";" "," EXTRA_PREFIX_LIST "${EXTRA_PREFIX_LIST}")
+ 
+   configure_file(
+     "${CMAKE_BINARY_DIR}/android_deployment_settings.json.in"
+diff --git a/qtbase/src/corelib/global/qlogging.cpp b/qtbase/src/corelib/global/qlogging.cpp
+index 93c4731cc5..5530295f8a 100644
+--- a/qtbase/src/corelib/global/qlogging.cpp
++++ b/qtbase/src/corelib/global/qlogging.cpp
+@@ -109,7 +109,9 @@
+ #  elif defined(Q_OS_ANDROID) && __ANDROID_API__ < 33
+     // Android lacked backtrace logging until API level 33.
+ #  elif (defined(__GLIBC__) && defined(__GLIBCXX__)) || (__has_include(<cxxabi.h>) && __has_include(<execinfo.h>))
+-#    define QLOGGING_HAVE_BACKTRACE
++#    if __ANDROID_API__ >= 33
++#      define QLOGGING_HAVE_BACKTRACE
++#    endif
+ #  endif
+ #endif
+ 
+diff --git a/qtbase/src/network/ssl/ssl.pri b/qtbase/src/network/ssl/ssl.pri
+index 230c45c26f..d7527949e9 100644
+--- a/qtbase/src/network/ssl/ssl.pri
++++ b/qtbase/src/network/ssl/ssl.pri
+@@ -117,7 +117,7 @@ qtConfig(ssl) {
+ 
+         qtConfig(openssl-linked): {
+             android {
+-                build_pass|single_android_abi: LIBS_PRIVATE += -lssl_$${QT_ARCH} -lcrypto_$${QT_ARCH}
++                build_pass|single_android_abi: LIBS_PRIVATE += -lssl -lcrypto
+             } else: QMAKE_USE_FOR_PRIVATE += openssl
+         } else: \
+             QMAKE_USE_FOR_PRIVATE += openssl/nolink
+diff --git a/qtbase/src/tools/androiddeployqt/main.cpp b/qtbase/src/tools/androiddeployqt/main.cpp
+index b7e96a0b59..7f15ad6ab1 100644
+--- a/qtbase/src/tools/androiddeployqt/main.cpp
++++ b/qtbase/src/tools/androiddeployqt/main.cpp
+@@ -631,7 +631,8 @@ bool quasiLexicographicalReverseLessThan(const QFileInfo &fi1, const QFileInfo &
+ bool alwaysOverwritableFile(const QString &fileName)
+ {
+     return (fileName.endsWith(QLatin1String("/res/values/libs.xml"))
+-            || fileName.endsWith(QLatin1String("/AndroidManifest.xml"))
++            // Don't override our Manifest file at every build.
++            // || fileName.endsWith(QLatin1String("/AndroidManifest.xml"))
+             || fileName.endsWith(QLatin1String("/res/values/strings.xml"))
+             || fileName.endsWith(QLatin1String("/src/org/qtproject/qt5/android/bindings/QtActivity.java")));
+ }
