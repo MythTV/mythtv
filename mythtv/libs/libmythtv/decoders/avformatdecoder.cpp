@@ -703,11 +703,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         m_lastAPts = 0ms;
         m_lastVPts = 0ms;
         m_lastCcPtsu = 0us;
-        m_faultyPts = m_faultyDts = 0;
-        m_lastPtsForFaultDetection = 0;
-        m_lastDtsForFaultDetection = 0;
-        m_ptsDetected = false;
-        m_reorderedPtsDetected = false;
 
         avformat_flush(m_ic);
 
@@ -1223,9 +1218,6 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                      MythDate::formatTime(msec, "HH:mm:ss.zzz"),
                      QString::number(framenum)));
     }
-
-    if (qEnvironmentVariableIsSet("FORCE_DTS_TIMESTAMPS"))
-        m_forceDtsTimestamps = true;
 
     if (m_ringBuffer->IsDVD())
     {
@@ -2049,14 +2041,6 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
         break;
     }
 
-    // N.B. MediaCodec and NVDEC require frame timing
-    m_useFrameTiming = false;
-    if ((m_ringBuffer && !m_ringBuffer->IsDVD() && (codec_sw_copy(m_videoCodecId) || codec_is_v4l2(m_videoCodecId))) ||
-        (codec_is_nvdec(m_videoCodecId) || codec_is_mediacodec(m_videoCodecId) || codec_is_mediacodec_dec(m_videoCodecId)))
-    {
-        m_useFrameTiming = true;
-    }
-
     if (FlagIsSet(kDecodeSingleThreaded))
         thread_count = 1;
 
@@ -2780,7 +2764,6 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     }
 
     pic->opaque = frame;
-    pic->reordered_opaque = c->reordered_opaque;
 
     // Set release method
     AVBufferRef *buffer = av_buffer_create(reinterpret_cast<uint8_t*>(frame), 0,
@@ -2810,7 +2793,6 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
     }
     pic->opaque      = frame;
     frame->m_pixFmt  = c->pix_fmt;
-    pic->reordered_opaque = c->reordered_opaque;
     pic->data[0] = (uint8_t*)frame->m_buffer;
     pic->data[3] = (uint8_t*)frame->m_buffer;
 
@@ -3181,11 +3163,6 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 m_firstVPts = m_lastAPts = m_lastVPts = 0ms;
                 m_lastCcPtsu = 0us;
                 m_firstVPtsInuse = true;
-                m_faultyPts = m_faultyDts = 0;
-                m_lastPtsForFaultDetection = 0;
-                m_lastDtsForFaultDetection = 0;
-                m_ptsDetected = false;
-                m_reorderedPtsDetected = false;
 
                 // fps debugging info
                 float avFPS = GetVideoFrameRate(stream, context);
@@ -3300,11 +3277,6 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_firstVPts = m_lastAPts = m_lastVPts = 0ms;
             m_lastCcPtsu = 0us;
             m_firstVPtsInuse = true;
-            m_faultyPts = m_faultyDts = 0;
-            m_lastPtsForFaultDetection = 0;
-            m_lastDtsForFaultDetection = 0;
-            m_ptsDetected = false;
-            m_reorderedPtsDetected = false;
 
             // fps debugging info
             auto avFPS = static_cast<double>(GetVideoFrameRate(stream, context));
@@ -3389,17 +3361,11 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     MythAVFrame mpa_pic;
     if (!mpa_pic)
         return false;
-    mpa_pic->reordered_opaque = AV_NOPTS_VALUE;
-
-    if (pkt->pts != AV_NOPTS_VALUE)
-        m_ptsDetected = true;
 
     bool sentPacket = false;
     int ret2 = 0;
 
     m_avCodecLock.lock();
-    if (!m_useFrameTiming)
-        context->reordered_opaque = pkt->pts;
 
     //  SUGGESTION
     //  Now that avcodec_decode_video2 is deprecated and replaced
@@ -3488,57 +3454,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
                 .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->pts)
                 .arg(mpa_pic->pkt_dts));
 
-        if (!m_useFrameTiming)
-        {
-            int64_t pts = 0;
-
-            // Detect faulty video timestamps using logic from ffplay.
-            if (pkt->dts != AV_NOPTS_VALUE)
-            {
-                if (pkt->dts <= m_lastDtsForFaultDetection)
-                    m_faultyDts += 1;
-                m_lastDtsForFaultDetection = pkt->dts;
-            }
-            if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
-            {
-                if (mpa_pic->reordered_opaque <= m_lastPtsForFaultDetection)
-                    m_faultyPts += 1;
-                m_lastPtsForFaultDetection = mpa_pic->reordered_opaque;
-                m_reorderedPtsDetected = true;
-            }
-
-            // Explicity use DTS for DVD since they should always be valid for every
-            // frame and fixups aren't enabled for DVD.
-            // Select reordered_opaque (PTS) timestamps if they are less faulty or the
-            // the DTS timestamp is missing. Also use fixups for missing PTS instead of
-            // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
-            // more faulty or never detected.
-            if (m_forceDtsTimestamps || m_ringBuffer->IsDVD())
-            {
-                if (pkt->dts != AV_NOPTS_VALUE)
-                    pts = pkt->dts;
-                m_ptsSelected = false;
-            }
-            else if (m_faultyPts <= m_faultyDts && m_reorderedPtsDetected)
-            {
-                if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
-                    pts = mpa_pic->reordered_opaque;
-                m_ptsSelected = true;
-            }
-            else if (pkt->dts != AV_NOPTS_VALUE)
-            {
-                pts = pkt->dts;
-                m_ptsSelected = false;
-            }
-
-            LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_DEBUG, LOC +
-                QString("video packet timestamps reordered %1 pts %2 dts %3 (%4)")
-                    .arg(mpa_pic->reordered_opaque).arg(pkt->pts).arg(pkt->dts)
-                    .arg((m_forceDtsTimestamps) ? "dts forced" :
-                        (m_ptsSelected) ? "reordered" : "dts"));
-
-            mpa_pic->reordered_opaque = pts;
-        }
         ProcessVideoFrame(curstream, mpa_pic);
     }
 
@@ -3680,26 +3595,14 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         return false;
     }
 
-    std::chrono::milliseconds pts = 0ms;
-    if (m_useFrameTiming)
-    {
-        long long av_pts = AvFrame->pts;
-        if (av_pts == AV_NOPTS_VALUE)
-            av_pts = AvFrame->pkt_dts;
-        if (av_pts == AV_NOPTS_VALUE)
-            av_pts = AvFrame->reordered_opaque;
-        if (av_pts == AV_NOPTS_VALUE)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process video.");
-            return false;
-        }
-        pts = millisecondsFromFloat(av_q2d(Stream->time_base) * av_pts * 1000);
-    }
-    else
-    {
-        pts = millisecondsFromFloat(av_q2d(Stream->time_base) * AvFrame->reordered_opaque * 1000);
-    }
 
+    if (AvFrame->best_effort_timestamp == AV_NOPTS_VALUE)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process video.");
+        return false;
+    }
+    std::chrono::milliseconds pts = millisecondsFromFloat(av_q2d(Stream->time_base) *
+        AvFrame->best_effort_timestamp * 1000);
     std::chrono::milliseconds temppts = pts;
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
@@ -3734,7 +3637,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("video timecode %1 %2 %3 %4%5")
-            .arg(m_useFrameTiming ? AvFrame->pts : AvFrame->reordered_opaque)
+            .arg(AvFrame->best_effort_timestamp)
             .arg(pts.count()).arg(temppts.count()).arg(m_lastVPts.count())
             .arg((pts != temppts) ? " fixup" : ""));
 
@@ -4701,27 +4604,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         if (firstloop && pkt->pts != AV_NOPTS_VALUE)
             m_lastAPts = millisecondsFromFloat(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
-        if (!m_useFrameTiming)
-        {
-            // This code under certain conditions causes jump backwards to lose
-            // audio.
-            if (m_skipAudio && m_selectedTrack[kTrackTypeVideo].m_av_stream_index > -1)
-            {
-                if ((m_lastAPts < m_lastVPts - millisecondsFromFloat(10.0 / m_fps)) ||
-                    m_lastVPts == 0ms)
-                    break;
-                m_skipAudio = false;
-            }
-
-            // skip any audio frames preceding first video frame
-            if (m_firstVPtsInuse && (m_firstVPts != 0ms) && (m_lastAPts < m_firstVPts))
-            {
-                LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-                    QString("discarding early audio timecode %1 %2 %3")
-                        .arg(pkt->pts).arg(pkt->dts).arg(m_lastAPts.count()));
-                break;
-            }
-        }
         m_firstVPtsInuse = false;
         m_avCodecLock.lock();
         data_size = 0;
