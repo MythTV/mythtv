@@ -183,7 +183,11 @@ bool SPDIFEncoder::SetMaxHDRate(int rate)
 /**
  * funcIO: Internal callback function that will receive encoded frames
  */
+#if (LIBAVFORMAT_VERSION_MAJOR < 61)
 int SPDIFEncoder::funcIO(void *opaque, unsigned char *buf, int size)
+#else
+int SPDIFEncoder::funcIO(void *opaque, const uint8_t *buf, int size)
+#endif
 {
     auto *enc = static_cast<SPDIFEncoder *>(opaque);
 
