@@ -24,13 +24,11 @@
  */
 
 #include "avfilter.h"
-#include "formats.h"
+#include "filters.h"
 #include "video.h"
-#include "internal.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/opt.h"
-#include "libavutil/parseutils.h"
 #include "libavutil/lfg.h"
 #include "libavutil/random_seed.h"
 #include <float.h>
@@ -63,9 +61,9 @@ static const AVOption sierpinski_options[] = {
     {"r",    "set frame rate", OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str="25"},      0,    INT_MAX, FLAGS },
     {"seed", "set the seed",   OFFSET(seed),       AV_OPT_TYPE_INT64,      {.i64=-1},       -1, UINT32_MAX, FLAGS },
     {"jump", "set the jump",   OFFSET(jump),       AV_OPT_TYPE_INT,        {.i64=100},       1,      10000, FLAGS },
-    {"type","set fractal type",OFFSET(type),       AV_OPT_TYPE_INT,        {.i64=0},         0,          1, FLAGS, "type" },
-    {"carpet", "sierpinski carpet", 0,             AV_OPT_TYPE_CONST,      {.i64=0},         0,          0, FLAGS, "type" },
-    {"triangle", "sierpinski triangle", 0,         AV_OPT_TYPE_CONST,      {.i64=1},         0,          0, FLAGS, "type" },
+    {"type","set fractal type",OFFSET(type),       AV_OPT_TYPE_INT,        {.i64=0},         0,          1, FLAGS, .unit = "type" },
+    {"carpet", "sierpinski carpet", 0,             AV_OPT_TYPE_CONST,      {.i64=0},         0,          0, FLAGS, .unit = "type" },
+    {"triangle", "sierpinski triangle", 0,         AV_OPT_TYPE_CONST,      {.i64=1},         0,          0, FLAGS, .unit = "type" },
     {NULL},
 };
 
@@ -140,6 +138,7 @@ static int draw_carpet_slice(AVFilterContext *ctx, void *arg, int job, int nb_jo
 static int config_output(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
+    FilterLink *l = ff_filter_link(outlink);
     SierpinskiContext *s = ctx->priv;
 
     if (av_image_check_size(s->w, s->h, 0, ctx) < 0)
@@ -149,7 +148,7 @@ static int config_output(AVFilterLink *outlink)
     outlink->h = s->h;
     outlink->time_base = av_inv_q(s->frame_rate);
     outlink->sample_aspect_ratio = (AVRational) {1, 1};
-    outlink->frame_rate = s->frame_rate;
+    l->frame_rate = s->frame_rate;
     if (s->seed == -1)
         s->seed = av_get_random_seed();
     av_lfg_init(&s->lfg, s->seed);
@@ -196,6 +195,7 @@ static int sierpinski_request_frame(AVFilterLink *link)
 
     frame->sample_aspect_ratio = (AVRational) {1, 1};
     frame->pts = s->pts++;
+    frame->duration = 1;
 
     draw_sierpinski(link->src, frame);
 

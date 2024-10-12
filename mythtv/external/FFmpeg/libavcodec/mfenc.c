@@ -25,6 +25,7 @@
 #include "encode.h"
 #include "mf_utils.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/time.h"
 #include "codec_internal.h"
@@ -248,7 +249,7 @@ static int mf_sample_to_avpacket(AVCodecContext *avctx, IMFSample *sample, AVPac
     if ((ret = ff_get_encode_buffer(avctx, avpkt, len, 0)) < 0)
         return ret;
 
-    IMFSample_ConvertToContiguousBuffer(sample, &buffer);
+    hr = IMFSample_ConvertToContiguousBuffer(sample, &buffer);
     if (FAILED(hr))
         return AVERROR_EXTERNAL;
 
@@ -344,7 +345,7 @@ static IMFSample *mf_v_avframe_to_sample(AVCodecContext *avctx, const AVFrame *f
         return NULL;
     }
 
-    IMFSample_SetSampleDuration(sample, mf_to_mf_time(avctx, frame->pkt_duration));
+    IMFSample_SetSampleDuration(sample, mf_to_mf_time(avctx, frame->duration));
 
     return sample;
 }
@@ -659,7 +660,11 @@ static int mf_encv_output_adjust(AVCodecContext *avctx, IMFMediaType *type)
         framerate = avctx->framerate;
     } else {
         framerate = av_inv_q(avctx->time_base);
+#if FF_API_TICKS_PER_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
         framerate.den *= avctx->ticks_per_frame;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     }
 
     ff_MFSetAttributeRatio((IMFAttributes *)type, &MF_MT_FRAME_RATE, framerate.num, framerate.den);
@@ -668,10 +673,10 @@ static int mf_encv_output_adjust(AVCodecContext *avctx, IMFMediaType *type)
     if (avctx->codec_id == AV_CODEC_ID_H264) {
         UINT32 profile = ff_eAVEncH264VProfile_Base;
         switch (avctx->profile) {
-        case FF_PROFILE_H264_MAIN:
+        case AV_PROFILE_H264_MAIN:
             profile = ff_eAVEncH264VProfile_Main;
             break;
-        case FF_PROFILE_H264_HIGH:
+        case AV_PROFILE_H264_HIGH:
             profile = ff_eAVEncH264VProfile_High;
             break;
         }
@@ -690,6 +695,21 @@ static int mf_encv_output_adjust(AVCodecContext *avctx, IMFMediaType *type)
 
         if (c->opt_enc_quality >= 0)
             ICodecAPI_SetValue(c->codec_api, &ff_CODECAPI_AVEncCommonQuality, FF_VAL_VT_UI4(c->opt_enc_quality));
+
+        if (avctx->rc_max_rate > 0)
+            ICodecAPI_SetValue(c->codec_api, &ff_CODECAPI_AVEncCommonMaxBitRate, FF_VAL_VT_UI4(avctx->rc_max_rate));
+
+        if (avctx->gop_size > 0)
+            ICodecAPI_SetValue(c->codec_api, &ff_CODECAPI_AVEncMPVGOPSize, FF_VAL_VT_UI4(avctx->gop_size));
+
+        if(avctx->rc_buffer_size > 0)
+            ICodecAPI_SetValue(c->codec_api, &ff_CODECAPI_AVEncCommonBufferSize, FF_VAL_VT_UI4(avctx->rc_buffer_size));
+
+        if(avctx->compression_level >= 0)
+            ICodecAPI_SetValue(c->codec_api, &ff_CODECAPI_AVEncCommonQualityVsSpeed, FF_VAL_VT_UI4(avctx->compression_level));
+
+        if(avctx->global_quality > 0)
+            ICodecAPI_SetValue(c->codec_api, &ff_CODECAPI_AVEncVideoEncodeQP, FF_VAL_VT_UI4(avctx->global_quality ));
 
         // Always set the number of b-frames. Qualcomm's HEVC encoder on SD835
         // defaults this to 1, and that setting is buggy with many of the
@@ -1214,13 +1234,12 @@ static int mf_init(AVCodecContext *avctx)
                 return 0;
         }
     }
-    mf_close(avctx);
     return ret;
 }
 
 #define OFFSET(x) offsetof(MFContext, x)
 
-#define MF_ENCODER(MEDIATYPE, NAME, ID, OPTS, FMTS, CAPS) \
+#define MF_ENCODER(MEDIATYPE, NAME, ID, OPTS, FMTS, CAPS, DEFAULTS) \
     static const AVClass ff_ ## NAME ## _mf_encoder_class = {                  \
         .class_name = #NAME "_mf",                                             \
         .item_name  = av_default_item_name,                                    \
@@ -1230,7 +1249,7 @@ static int mf_init(AVCodecContext *avctx)
     const FFCodec ff_ ## NAME ## _mf_encoder = {                               \
         .p.priv_class   = &ff_ ## NAME ## _mf_encoder_class,                   \
         .p.name         = #NAME "_mf",                                         \
-        .p.long_name    = NULL_IF_CONFIG_SMALL(#ID " via MediaFoundation"),    \
+        CODEC_LONG_NAME(#ID " via MediaFoundation"),                           \
         .p.type         = AVMEDIA_TYPE_ ## MEDIATYPE,                          \
         .p.id           = AV_CODEC_ID_ ## ID,                                  \
         .priv_data_size = sizeof(MFContext),                                   \
@@ -1239,8 +1258,8 @@ static int mf_init(AVCodecContext *avctx)
         FF_CODEC_RECEIVE_PACKET_CB(mf_receive_packet),                         \
         FMTS                                                                   \
         CAPS                                                                   \
-        .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |                       \
-                          FF_CODEC_CAP_INIT_CLEANUP,                           \
+        .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,                           \
+        .defaults       = DEFAULTS,                                            \
     };
 
 #define AFMTS \
@@ -1250,35 +1269,40 @@ static int mf_init(AVCodecContext *avctx)
         .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HYBRID |           \
                           AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE,
 
-MF_ENCODER(AUDIO, aac,         AAC, NULL, AFMTS, ACAPS);
-MF_ENCODER(AUDIO, ac3,         AC3, NULL, AFMTS, ACAPS);
-MF_ENCODER(AUDIO, mp3,         MP3, NULL, AFMTS, ACAPS);
+MF_ENCODER(AUDIO, aac,         AAC, NULL, AFMTS, ACAPS, NULL);
+MF_ENCODER(AUDIO, ac3,         AC3, NULL, AFMTS, ACAPS, NULL);
+MF_ENCODER(AUDIO, mp3,         MP3, NULL, AFMTS, ACAPS, NULL);
 
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption venc_opts[] = {
-    {"rate_control",  "Select rate control mode", OFFSET(opt_enc_rc), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, VE, "rate_control"},
-    { "default",      "Default mode", 0, AV_OPT_TYPE_CONST, {.i64 = -1}, 0, 0, VE, "rate_control"},
-    { "cbr",          "CBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_CBR}, 0, 0, VE, "rate_control"},
-    { "pc_vbr",       "Peak constrained VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_PeakConstrainedVBR}, 0, 0, VE, "rate_control"},
-    { "u_vbr",        "Unconstrained VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_UnconstrainedVBR}, 0, 0, VE, "rate_control"},
-    { "quality",      "Quality mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_Quality}, 0, 0, VE, "rate_control" },
+    {"rate_control",  "Select rate control mode", OFFSET(opt_enc_rc), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, VE, .unit = "rate_control"},
+    { "default",      "Default mode", 0, AV_OPT_TYPE_CONST, {.i64 = -1}, 0, 0, VE, .unit = "rate_control"},
+    { "cbr",          "CBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_CBR}, 0, 0, VE, .unit = "rate_control"},
+    { "pc_vbr",       "Peak constrained VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_PeakConstrainedVBR}, 0, 0, VE, .unit = "rate_control"},
+    { "u_vbr",        "Unconstrained VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_UnconstrainedVBR}, 0, 0, VE, .unit = "rate_control"},
+    { "quality",      "Quality mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_Quality}, 0, 0, VE, .unit = "rate_control" },
     // The following rate_control modes require Windows 8.
-    { "ld_vbr",       "Low delay VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_LowDelayVBR}, 0, 0, VE, "rate_control"},
-    { "g_vbr",        "Global VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_GlobalVBR}, 0, 0, VE, "rate_control" },
-    { "gld_vbr",      "Global low delay VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_GlobalLowDelayVBR}, 0, 0, VE, "rate_control"},
+    { "ld_vbr",       "Low delay VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_LowDelayVBR}, 0, 0, VE, .unit = "rate_control"},
+    { "g_vbr",        "Global VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_GlobalVBR}, 0, 0, VE, .unit = "rate_control" },
+    { "gld_vbr",      "Global low delay VBR mode", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVEncCommonRateControlMode_GlobalLowDelayVBR}, 0, 0, VE, .unit = "rate_control"},
 
-    {"scenario",          "Select usage scenario", OFFSET(opt_enc_scenario), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, VE, "scenario"},
-    { "default",          "Default scenario", 0, AV_OPT_TYPE_CONST, {.i64 = -1}, 0, 0, VE, "scenario"},
-    { "display_remoting", "Display remoting", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_DisplayRemoting}, 0, 0, VE, "scenario"},
-    { "video_conference", "Video conference", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_VideoConference}, 0, 0, VE, "scenario"},
-    { "archive",          "Archive", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_Archive}, 0, 0, VE, "scenario"},
-    { "live_streaming",   "Live streaming", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_LiveStreaming}, 0, 0, VE, "scenario"},
-    { "camera_record",    "Camera record", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_CameraRecord}, 0, 0, VE, "scenario"},
-    { "display_remoting_with_feature_map", "Display remoting with feature map", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_DisplayRemotingWithFeatureMap}, 0, 0, VE, "scenario"},
+    {"scenario",          "Select usage scenario", OFFSET(opt_enc_scenario), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, VE, .unit = "scenario"},
+    { "default",          "Default scenario", 0, AV_OPT_TYPE_CONST, {.i64 = -1}, 0, 0, VE, .unit = "scenario"},
+    { "display_remoting", "Display remoting", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_DisplayRemoting}, 0, 0, VE, .unit = "scenario"},
+    { "video_conference", "Video conference", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_VideoConference}, 0, 0, VE, .unit = "scenario"},
+    { "archive",          "Archive", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_Archive}, 0, 0, VE, .unit = "scenario"},
+    { "live_streaming",   "Live streaming", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_LiveStreaming}, 0, 0, VE, .unit = "scenario"},
+    { "camera_record",    "Camera record", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_CameraRecord}, 0, 0, VE, .unit = "scenario"},
+    { "display_remoting_with_feature_map", "Display remoting with feature map", 0, AV_OPT_TYPE_CONST, {.i64 = ff_eAVScenarioInfo_DisplayRemotingWithFeatureMap}, 0, 0, VE, .unit = "scenario"},
 
     {"quality",       "Quality", OFFSET(opt_enc_quality), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 100, VE},
     {"hw_encoding",   "Force hardware encoding", OFFSET(opt_enc_hw), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, VE},
     {NULL}
+};
+
+static const FFCodecDefault defaults[] = {
+    { "g", "0" },
+    { NULL },
 };
 
 #define VFMTS \
@@ -1289,5 +1313,5 @@ static const AVOption venc_opts[] = {
         .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HYBRID |           \
                           AV_CODEC_CAP_DR1,
 
-MF_ENCODER(VIDEO, h264,        H264, venc_opts, VFMTS, VCAPS);
-MF_ENCODER(VIDEO, hevc,        HEVC, venc_opts, VFMTS, VCAPS);
+MF_ENCODER(VIDEO, h264,        H264, venc_opts, VFMTS, VCAPS, defaults);
+MF_ENCODER(VIDEO, hevc,        HEVC, venc_opts, VFMTS, VCAPS, defaults);

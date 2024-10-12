@@ -31,7 +31,7 @@
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "libopenh264.h"
 
 typedef struct SVCContext {
@@ -52,12 +52,8 @@ static av_cold int svc_decode_init(AVCodecContext *avctx)
 {
     SVCContext *s = avctx->priv_data;
     SDecodingParam param = { 0 };
-    int err;
     int log_level;
     WelsTraceCallback callback_function;
-
-    if ((err = ff_libopenh264_check_version(avctx)) < 0)
-        return AVERROR_DECODER_NOT_FOUND;
 
     if (WelsCreateDecoder(&s->decoder)) {
         av_log(avctx, AV_LOG_ERROR, "Unable to create decoder\n");
@@ -141,7 +137,8 @@ static int svc_decode_frame(AVCodecContext *avctx, AVFrame *avframe,
     linesize[0] = info.UsrData.sSystemBuffer.iStride[0];
     linesize[1] = linesize[2] = info.UsrData.sSystemBuffer.iStride[1];
     linesize[3] = 0;
-    av_image_copy(avframe->data, avframe->linesize, (const uint8_t **) ptrs, linesize, avctx->pix_fmt, avctx->width, avctx->height);
+    av_image_copy2(avframe->data, avframe->linesize, ptrs, linesize,
+                   avctx->pix_fmt, avctx->width, avctx->height);
 
     avframe->pts     = info.uiOutYuvTimeStamp;
     avframe->pkt_dts = AV_NOPTS_VALUE;
@@ -158,7 +155,7 @@ static int svc_decode_frame(AVCodecContext *avctx, AVFrame *avframe,
 
 const FFCodec ff_libopenh264_decoder = {
     .p.name         = "libopenh264",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("OpenH264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
+    CODEC_LONG_NAME("OpenH264 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_H264,
     .priv_data_size = sizeof(SVCContext),
@@ -166,7 +163,7 @@ const FFCodec ff_libopenh264_decoder = {
     FF_CODEC_DECODE_CB(svc_decode_frame),
     .close          = svc_decode_close,
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_SETS_PKT_DTS | FF_CODEC_CAP_INIT_THREADSAFE |
+    .caps_internal  = FF_CODEC_CAP_SETS_PKT_DTS |
                       FF_CODEC_CAP_INIT_CLEANUP,
     .bsfs           = "h264_mp4toannexb",
     .p.wrapper_name = "libopenh264",

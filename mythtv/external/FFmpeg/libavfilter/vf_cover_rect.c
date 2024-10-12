@@ -22,9 +22,10 @@
  * @todo switch to dualinput
  */
 
-#include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
-#include "internal.h"
+#include "filters.h"
+#include "video.h"
 
 #include "lavfutils.h"
 
@@ -46,9 +47,9 @@ typedef struct CoverContext {
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 static const AVOption cover_rect_options[] = {
     { "cover",  "cover bitmap filename",  OFFSET(cover_filename),  AV_OPT_TYPE_STRING, {.str = NULL}, .flags = FLAGS },
-    { "mode", "set removal mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64 = MODE_BLUR}, 0, NB_MODES - 1, FLAGS, "mode" },
-        { "cover", "cover area with bitmap", 0, AV_OPT_TYPE_CONST, {.i64 = MODE_COVER}, INT_MIN, INT_MAX, FLAGS, "mode" },
-        { "blur", "blur area", 0, AV_OPT_TYPE_CONST, {.i64 = MODE_BLUR}, INT_MIN, INT_MAX, FLAGS, "mode" },
+    { "mode", "set removal mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64 = MODE_BLUR}, 0, NB_MODES - 1, FLAGS, .unit = "mode" },
+        { "cover", "cover area with bitmap", 0, AV_OPT_TYPE_CONST, {.i64 = MODE_COVER}, INT_MIN, INT_MAX, FLAGS, .unit = "mode" },
+        { "blur", "blur area", 0, AV_OPT_TYPE_CONST, {.i64 = MODE_BLUR}, INT_MIN, INT_MAX, FLAGS, .unit = "mode" },
     { NULL }
 };
 
@@ -125,7 +126,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AVFilterContext *ctx = inlink->dst;
     CoverContext *cover = ctx->priv;
     AVDictionaryEntry *ex, *ey, *ew, *eh;
-    int x = -1, y = -1, w = -1, h = -1;
+    int ret, x = -1, y = -1, w = -1, h = -1;
     char *xendptr = NULL, *yendptr = NULL, *wendptr = NULL, *hendptr = NULL;
 
     ex = av_dict_get(in->metadata, "lavfi.rect.x", NULL, AV_DICT_MATCH_CASE);
@@ -170,7 +171,11 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     x = av_clip(x, 0, in->width  - w);
     y = av_clip(y, 0, in->height - h);
 
-    av_frame_make_writable(in);
+    ret = ff_inlink_make_frame_writable(inlink, &in);
+    if (ret < 0) {
+        av_frame_free(&in);
+        return ret;
+    }
 
     if (cover->mode == MODE_BLUR) {
         blur (cover, in, x, y);
@@ -227,13 +232,6 @@ static const AVFilterPad cover_rect_inputs[] = {
     },
 };
 
-static const AVFilterPad cover_rect_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_cover_rect = {
     .name            = "cover_rect",
     .description     = NULL_IF_CONFIG_SMALL("Find and cover a user specified object."),
@@ -241,7 +239,7 @@ const AVFilter ff_vf_cover_rect = {
     .init            = init,
     .uninit          = uninit,
     FILTER_INPUTS(cover_rect_inputs),
-    FILTER_OUTPUTS(cover_rect_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS(AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUVJ420P),
     .priv_class      = &cover_rect_class,
 };

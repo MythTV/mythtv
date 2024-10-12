@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/thread.h"
@@ -217,11 +218,10 @@ static int dcadec_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         if (asset && (asset->extension_mask & DCA_EXSS_XLL)) {
             if ((ret = ff_dca_xll_parse(&s->xll, input, asset)) < 0) {
                 // Conceal XLL synchronization error
-                if (ret == AVERROR(EAGAIN)
-                    && (prev_packet & DCA_PACKET_XLL)
-                    && (s->packet & DCA_PACKET_CORE))
-                    s->packet |= DCA_PACKET_XLL | DCA_PACKET_RECOVERY;
-                else if (ret == AVERROR(ENOMEM) || (avctx->err_recognition & AV_EF_EXPLODE))
+                if (ret == AVERROR(EAGAIN)) {
+                    if ((prev_packet & DCA_PACKET_XLL) && (s->packet & DCA_PACKET_CORE))
+                        s->packet |= DCA_PACKET_XLL | DCA_PACKET_RECOVERY;
+                } else if (ret == AVERROR(ENOMEM) || (avctx->err_recognition & AV_EF_EXPLODE))
                     return ret;
             } else {
                 s->packet |= DCA_PACKET_XLL;
@@ -353,26 +353,21 @@ static av_cold int dcadec_init(AVCodecContext *avctx)
 
     s->crctab = av_crc_get_table(AV_CRC_16_CCITT);
 
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (avctx->request_channel_layout & AV_CH_LAYOUT_NATIVE)
-        s->output_channel_order = CHANNEL_ORDER_CODED;
-
-    if (avctx->request_channel_layout & ~AV_CH_LAYOUT_NATIVE) {
-        av_channel_layout_uninit(&s->downmix_layout);
-        av_channel_layout_from_mask(&s->downmix_layout, avctx->request_channel_layout & ~AV_CH_LAYOUT_NATIVE);
-    }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     if (s->downmix_layout.nb_channels) {
         if (!av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO) ||
-            !av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO_DOWNMIX))
+            !av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO_DOWNMIX)) {
             s->request_channel_layout = DCA_SPEAKER_LAYOUT_STEREO;
-        else if (!av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT0))
+            av_channel_layout_uninit(&avctx->ch_layout);
+            avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
+        } else if (!av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT0)) {
             s->request_channel_layout = DCA_SPEAKER_LAYOUT_5POINT0;
-        else if (!av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT1))
+            av_channel_layout_uninit(&avctx->ch_layout);
+            avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT0;
+        } else if (!av_channel_layout_compare(&s->downmix_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT1)) {
             s->request_channel_layout = DCA_SPEAKER_LAYOUT_5POINT1;
+            av_channel_layout_uninit(&avctx->ch_layout);
+            avctx->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT1;
+        }
         else
             av_log(avctx, AV_LOG_WARNING, "Invalid downmix layout\n");
     }
@@ -390,11 +385,11 @@ static const AVOption dcadec_options[] = {
 
     { "channel_order", "Order in which the channels are to be exported",
         OFFSET(output_channel_order), AV_OPT_TYPE_INT,
-        { .i64 = CHANNEL_ORDER_DEFAULT }, 0, 1, PARAM, "channel_order" },
+        { .i64 = CHANNEL_ORDER_DEFAULT }, 0, 1, PARAM, .unit = "channel_order" },
       { "default", "normal libavcodec channel order", 0, AV_OPT_TYPE_CONST,
-        { .i64 = CHANNEL_ORDER_DEFAULT }, .flags = PARAM, "channel_order" },
+        { .i64 = CHANNEL_ORDER_DEFAULT }, .flags = PARAM, .unit = "channel_order" },
       { "coded",    "order in which the channels are coded in the bitstream",
-        0, AV_OPT_TYPE_CONST, { .i64 = CHANNEL_ORDER_CODED }, .flags = PARAM, "channel_order" },
+        0, AV_OPT_TYPE_CONST, { .i64 = CHANNEL_ORDER_CODED }, .flags = PARAM, .unit = "channel_order" },
 
     { "downmix", "Request a specific channel layout from the decoder", OFFSET(downmix_layout),
         AV_OPT_TYPE_CHLAYOUT, {.str = NULL}, .flags = PARAM },
@@ -412,7 +407,7 @@ static const AVClass dcadec_class = {
 
 const FFCodec ff_dca_decoder = {
     .p.name         = "dca",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("DCA (DTS Coherent Acoustics)"),
+    CODEC_LONG_NAME("DCA (DTS Coherent Acoustics)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_DTS,
     .priv_data_size = sizeof(DCAContext),
@@ -425,5 +420,5 @@ const FFCodec ff_dca_decoder = {
                                                       AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE },
     .p.priv_class   = &dcadec_class,
     .p.profiles     = NULL_IF_CONFIG_SMALL(ff_dca_profiles),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

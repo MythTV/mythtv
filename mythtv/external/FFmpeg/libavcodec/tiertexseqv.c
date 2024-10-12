@@ -27,8 +27,8 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 
 
 typedef struct SeqVideoContext {
@@ -182,7 +182,11 @@ static int seqvideo_decode(SeqVideoContext *seq, const unsigned char *data, int 
                 c[j] = (*data << 2) | (*data >> 4);
             palette[i] = 0xFFU << 24 | AV_RB24(c);
         }
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
         seq->frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     }
 
     if (flags & 2) {
@@ -263,7 +267,7 @@ static av_cold int seqvideo_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_tiertexseqvideo_decoder = {
     .p.name         = "tiertexseqvideo",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Tiertex Limited SEQ video"),
+    CODEC_LONG_NAME("Tiertex Limited SEQ video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TIERTEXSEQVIDEO,
     .priv_data_size = sizeof(SeqVideoContext),
@@ -271,5 +275,4 @@ const FFCodec ff_tiertexseqvideo_decoder = {
     .close          = seqvideo_decode_end,
     FF_CODEC_DECODE_CB(seqvideo_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

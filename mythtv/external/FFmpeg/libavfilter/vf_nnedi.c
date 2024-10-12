@@ -22,14 +22,15 @@
 #include <float.h>
 
 #include "libavutil/common.h"
+#include "libavutil/file_open.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 static const size_t NNEDI_WEIGHTS_SIZE = 13574928;
@@ -119,45 +120,45 @@ typedef struct NNEDIContext {
 
 static const AVOption nnedi_options[] = {
     {"weights",  "set weights file", OFFSET(weights_file),  AV_OPT_TYPE_STRING, {.str="nnedi3_weights.bin"}, 0, 0, FLAGS },
-    {"deint",         "set which frames to deinterlace", OFFSET(deint),         AV_OPT_TYPE_INT, {.i64=0}, 0, 1, RFLAGS, "deint" },
-        {"all",        "deinterlace all frames",                       0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, "deint" },
-        {"interlaced", "only deinterlace frames marked as interlaced", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "deint" },
-    {"field",  "set mode of operation", OFFSET(field),         AV_OPT_TYPE_INT, {.i64=-1}, -2, 3, RFLAGS, "field" },
-        {"af", "use frame flags, both fields",  0, AV_OPT_TYPE_CONST, {.i64=-2}, 0, 0, RFLAGS, "field" },
-        {"a",  "use frame flags, single field", 0, AV_OPT_TYPE_CONST, {.i64=-1}, 0, 0, RFLAGS, "field" },
-        {"t",  "use top field only",            0, AV_OPT_TYPE_CONST, {.i64=0},  0, 0, RFLAGS, "field" },
-        {"b",  "use bottom field only",         0, AV_OPT_TYPE_CONST, {.i64=1},  0, 0, RFLAGS, "field" },
-        {"tf", "use both fields, top first",    0, AV_OPT_TYPE_CONST, {.i64=2},  0, 0, RFLAGS, "field" },
-        {"bf", "use both fields, bottom first", 0, AV_OPT_TYPE_CONST, {.i64=3},  0, 0, RFLAGS, "field" },
+    {"deint",         "set which frames to deinterlace", OFFSET(deint),         AV_OPT_TYPE_INT, {.i64=0}, 0, 1, RFLAGS, .unit = "deint" },
+        {"all",        "deinterlace all frames",                       0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, .unit = "deint" },
+        {"interlaced", "only deinterlace frames marked as interlaced", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "deint" },
+    {"field",  "set mode of operation", OFFSET(field),         AV_OPT_TYPE_INT, {.i64=-1}, -2, 3, RFLAGS, .unit = "field" },
+        {"af", "use frame flags, both fields",  0, AV_OPT_TYPE_CONST, {.i64=-2}, 0, 0, RFLAGS, .unit = "field" },
+        {"a",  "use frame flags, single field", 0, AV_OPT_TYPE_CONST, {.i64=-1}, 0, 0, RFLAGS, .unit = "field" },
+        {"t",  "use top field only",            0, AV_OPT_TYPE_CONST, {.i64=0},  0, 0, RFLAGS, .unit = "field" },
+        {"b",  "use bottom field only",         0, AV_OPT_TYPE_CONST, {.i64=1},  0, 0, RFLAGS, .unit = "field" },
+        {"tf", "use both fields, top first",    0, AV_OPT_TYPE_CONST, {.i64=2},  0, 0, RFLAGS, .unit = "field" },
+        {"bf", "use both fields, bottom first", 0, AV_OPT_TYPE_CONST, {.i64=3},  0, 0, RFLAGS, .unit = "field" },
     {"planes", "set which planes to process", OFFSET(process_plane), AV_OPT_TYPE_INT, {.i64=7}, 0, 15, RFLAGS },
-    {"nsize",  "set size of local neighborhood around each pixel, used by the predictor neural network", OFFSET(nsize), AV_OPT_TYPE_INT, {.i64=6}, 0, 6, RFLAGS, "nsize" },
-        {"s8x6",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, "nsize" },
-        {"s16x6",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "nsize" },
-        {"s32x6",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, "nsize" },
-        {"s48x6",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=3}, 0, 0, RFLAGS, "nsize" },
-        {"s8x4",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=4}, 0, 0, RFLAGS, "nsize" },
-        {"s16x4",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=5}, 0, 0, RFLAGS, "nsize" },
-        {"s32x4",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=6}, 0, 0, RFLAGS, "nsize" },
-    {"nns",    "set number of neurons in predictor neural network", OFFSET(nnsparam), AV_OPT_TYPE_INT, {.i64=1}, 0, 4, RFLAGS, "nns" },
-        {"n16",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, "nns" },
-        {"n32",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "nns" },
-        {"n64",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, "nns" },
-        {"n128",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=3}, 0, 0, RFLAGS, "nns" },
-        {"n256",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=4}, 0, 0, RFLAGS, "nns" },
-    {"qual",  "set quality", OFFSET(qual), AV_OPT_TYPE_INT, {.i64=1}, 1, 2, RFLAGS, "qual" },
-        {"fast", NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "qual" },
-        {"slow", NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, "qual" },
-    {"etype", "set which set of weights to use in the predictor", OFFSET(etype), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, RFLAGS, "etype" },
-        {"a",  "weights trained to minimize absolute error", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, "etype" },
-        {"abs","weights trained to minimize absolute error", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, "etype" },
-        {"s",  "weights trained to minimize squared error",  0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "etype" },
-        {"mse","weights trained to minimize squared error",  0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "etype" },
-    {"pscrn", "set prescreening", OFFSET(pscrn), AV_OPT_TYPE_INT, {.i64=2}, 0, 4, RFLAGS, "pscrn" },
-        {"none",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, "pscrn" },
-        {"original",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, "pscrn" },
-        {"new",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, "pscrn" },
-        {"new2",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=3}, 0, 0, RFLAGS, "pscrn" },
-        {"new3",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=4}, 0, 0, RFLAGS, "pscrn" },
+    {"nsize",  "set size of local neighborhood around each pixel, used by the predictor neural network", OFFSET(nsize), AV_OPT_TYPE_INT, {.i64=6}, 0, 6, RFLAGS, .unit = "nsize" },
+        {"s8x6",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, .unit = "nsize" },
+        {"s16x6",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "nsize" },
+        {"s32x6",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, .unit = "nsize" },
+        {"s48x6",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=3}, 0, 0, RFLAGS, .unit = "nsize" },
+        {"s8x4",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=4}, 0, 0, RFLAGS, .unit = "nsize" },
+        {"s16x4",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=5}, 0, 0, RFLAGS, .unit = "nsize" },
+        {"s32x4",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=6}, 0, 0, RFLAGS, .unit = "nsize" },
+    {"nns",    "set number of neurons in predictor neural network", OFFSET(nnsparam), AV_OPT_TYPE_INT, {.i64=1}, 0, 4, RFLAGS, .unit = "nns" },
+        {"n16",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, .unit = "nns" },
+        {"n32",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "nns" },
+        {"n64",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, .unit = "nns" },
+        {"n128",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=3}, 0, 0, RFLAGS, .unit = "nns" },
+        {"n256",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=4}, 0, 0, RFLAGS, .unit = "nns" },
+    {"qual",  "set quality", OFFSET(qual), AV_OPT_TYPE_INT, {.i64=1}, 1, 2, RFLAGS, .unit = "qual" },
+        {"fast", NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "qual" },
+        {"slow", NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, .unit = "qual" },
+    {"etype", "set which set of weights to use in the predictor", OFFSET(etype), AV_OPT_TYPE_INT, {.i64=0}, 0, 1, RFLAGS, .unit = "etype" },
+        {"a",  "weights trained to minimize absolute error", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, .unit = "etype" },
+        {"abs","weights trained to minimize absolute error", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, .unit = "etype" },
+        {"s",  "weights trained to minimize squared error",  0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "etype" },
+        {"mse","weights trained to minimize squared error",  0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "etype" },
+    {"pscrn", "set prescreening", OFFSET(pscrn), AV_OPT_TYPE_INT, {.i64=2}, 0, 4, RFLAGS, .unit = "pscrn" },
+        {"none",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, RFLAGS, .unit = "pscrn" },
+        {"original",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, RFLAGS, .unit = "pscrn" },
+        {"new",       NULL, 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, RFLAGS, .unit = "pscrn" },
+        {"new2",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=3}, 0, 0, RFLAGS, .unit = "pscrn" },
+        {"new3",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=4}, 0, 0, RFLAGS, .unit = "pscrn" },
     { NULL }
 };
 
@@ -172,9 +173,11 @@ static int config_output(AVFilterLink *outlink)
     outlink->w             = ctx->inputs[0]->w;
     outlink->h             = ctx->inputs[0]->h;
 
-    if (s->field == -2 || s->field > 1)
-        outlink->frame_rate = av_mul_q(ctx->inputs[0]->frame_rate,
-                                       (AVRational){2, 1});
+    if (s->field == -2 || s->field > 1) {
+        FilterLink *il = ff_filter_link(ctx->inputs[0]);
+        FilterLink *ol = ff_filter_link(outlink);
+        ol->frame_rate = av_mul_q(il->frame_rate, (AVRational){2, 1});
+    }
 
     return 0;
 }
@@ -540,8 +543,8 @@ static int filter_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
     const float in_scale = s->in_scale;
     const float out_scale = s->out_scale;
     const int depth = s->depth;
-    const int interlaced = in->interlaced_frame;
-    const int tff = s->field_n == (s->field < 0 ? interlaced ? in->top_field_first : 1 :
+    const int interlaced = !!(in->flags & AV_FRAME_FLAG_INTERLACED);
+    const int tff = s->field_n == (s->field < 0 ? interlaced ? (in->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) : 1 :
                                   (s->field & 1) ^ 1);
 
 
@@ -665,7 +668,12 @@ static int get_frame(AVFilterContext *ctx, int is_second)
     if (!dst)
         return AVERROR(ENOMEM);
     av_frame_copy_props(dst, s->prev);
+#if FF_API_INTERLACED_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
     dst->interlaced_frame = 0;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+    dst->flags &= ~AV_FRAME_FLAG_INTERLACED;
     dst->pts = s->pts;
 
     ff_filter_execute(ctx, filter_slice, dst, NULL,
@@ -688,7 +696,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         return 0;
     }
 
-    if ((s->deint && !s->prev->interlaced_frame) || ctx->is_disabled) {
+    if ((s->deint && !(s->prev->flags & AV_FRAME_FLAG_INTERLACED)) || ctx->is_disabled) {
         s->prev->pts *= 2;
         ret = ff_filter_frame(ctx->outputs[0], s->prev);
         s->prev = in;
@@ -723,11 +731,12 @@ static int request_frame(AVFilterLink *link)
 
     if (ret == AVERROR_EOF && s->prev) {
         AVFrame *next = av_frame_clone(s->prev);
+        FilterLink *l = ff_filter_link(ctx->outputs[0]);
 
         if (!next)
             return AVERROR(ENOMEM);
 
-        next->pts = s->prev->pts + av_rescale_q(1, av_inv_q(ctx->outputs[0]->frame_rate),
+        next->pts = s->prev->pts + av_rescale_q(1, av_inv_q(l->frame_rate),
                                                 ctx->outputs[0]->time_base);
         s->eof = 1;
 

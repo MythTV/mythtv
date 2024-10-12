@@ -22,11 +22,11 @@
 #include "httpauth.h"
 #include "libavutil/base64.h"
 #include "libavutil/avstring.h"
+#include "libavutil/mem.h"
 #include "internal.h"
 #include "libavutil/random_seed.h"
 #include "libavutil/md5.h"
 #include "urldecode.h"
-#include "avformat.h"
 
 static void handle_basic_params(HTTPAuthState *state, const char *key,
                                 int key_len, char **dest, int *dest_len)

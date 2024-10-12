@@ -27,15 +27,12 @@
 
 #include <float.h>
 
-#include "libavutil/avstring.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
+#include "filters.h"
 #include "framesync.h"
-#include "drawutils.h"
-#include "formats.h"
-#include "internal.h"
-#include "video.h"
 
 #define NUM_DATA_BUFS 13
 
@@ -63,7 +60,7 @@ static const AVOption vif_options[] = {
     { NULL }
 };
 
-AVFILTER_DEFINE_CLASS(vif);
+FRAMESYNC_DEFINE_CLASS(vif, VIFContext, fs);
 
 static const uint8_t vif_filter1d_width1[4] = { 17, 9, 5, 3 };
 
@@ -305,8 +302,8 @@ static int compute_vif2(AVFilterContext *ctx,
     float *main_sq_filt = data_buf[11];
     float *ref_main_filt = data_buf[12];
 
-    float *curr_ref_scale = (float *)ref;
-    float *curr_main_scale = (float *)main;
+    const float *curr_ref_scale  = ref;
+    const float *curr_main_scale = main;
     int curr_ref_stride = ref_stride;
     int curr_main_stride = main_stride;
 
@@ -553,6 +550,8 @@ static int config_output(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     VIFContext *s = ctx->priv;
     AVFilterLink *mainlink = ctx->inputs[0];
+    FilterLink *il = ff_filter_link(mainlink);
+    FilterLink *ol = ff_filter_link(outlink);
     FFFrameSyncIn *in;
     int ret;
 
@@ -560,7 +559,7 @@ static int config_output(AVFilterLink *outlink)
     outlink->h = mainlink->h;
     outlink->time_base = mainlink->time_base;
     outlink->sample_aspect_ratio = mainlink->sample_aspect_ratio;
-    outlink->frame_rate = mainlink->frame_rate;
+    ol->frame_rate = il->frame_rate;
     if ((ret = ff_framesync_init(&s->fs, ctx, 2)) < 0)
         return ret;
 
@@ -631,6 +630,7 @@ static const AVFilterPad vif_outputs[] = {
 const AVFilter ff_vf_vif = {
     .name          = "vif",
     .description   = NULL_IF_CONFIG_SMALL("Calculate the VIF between two video streams."),
+    .preinit       = vif_framesync_preinit,
     .uninit        = uninit,
     .priv_size     = sizeof(VIFContext),
     .priv_class    = &vif_class,

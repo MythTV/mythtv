@@ -23,18 +23,14 @@
 
 #include "config_components.h"
 
-#include <limits.h>
-
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "decode.h"
+#include "hwaccel_internal.h"
 #include "internal.h"
 #include "mpegvideodec.h"
-#include "vc1.h"
 #include "vdpau.h"
 #include "vdpau_internal.h"
-
-// XXX: at the time of adding this ifdefery, av_assert* wasn't use outside.
-// When dropping it, make sure other av_assert* were not added since then.
 
 /**
  * @addtogroup VDPAU_Decoding
@@ -66,15 +62,19 @@ static int vdpau_error(VdpStatus status)
     }
 }
 
+#if FF_API_VDPAU_ALLOC_GET_SET
 AVVDPAUContext *av_alloc_vdpaucontext(void)
 {
+FF_DISABLE_DEPRECATION_WARNINGS
     return av_vdpau_alloc_context();
+FF_ENABLE_DEPRECATION_WARNINGS
 }
 
 #define MAKE_ACCESSORS(str, name, type, field) \
     type av_##name##_get_##field(const str *s) { return s->field; } \
     void av_##name##_set_##field(str *s, type v) { s->field = v; }
 MAKE_ACCESSORS(AVVDPAUContext, vdpau_hwaccel, AVVDPAU_Render2, render2)
+#endif
 
 int av_vdpau_get_surface_parameters(AVCodecContext *avctx,
                                     VdpChromaType *type,
@@ -324,8 +324,8 @@ static int ff_vdpau_common_reinit(AVCodecContext *avctx)
         avctx->coded_height == vdctx->height && (!hwctx || !hwctx->reset))
         return 0;
 
-    avctx->hwaccel->uninit(avctx);
-    return avctx->hwaccel->init(avctx);
+    FF_HW_SIMPLE_CALL(avctx, uninit);
+    return FF_HW_SIMPLE_CALL(avctx, init);
 }
 
 int ff_vdpau_common_start_frame(struct vdpau_picture_context *pic_ctx,
@@ -370,7 +370,7 @@ int ff_vdpau_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
 int ff_vdpau_mpeg_end_frame(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
-    Picture *pic = s->current_picture_ptr;
+    MPVPicture *pic = s->cur_pic.ptr;
     struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
     int val;
 
@@ -402,10 +402,12 @@ int ff_vdpau_add_buffer(struct vdpau_picture_context *pic_ctx,
     return 0;
 }
 
+#if FF_API_VDPAU_ALLOC_GET_SET
 AVVDPAUContext *av_vdpau_alloc_context(void)
 {
     return av_mallocz(sizeof(VDPAUHWContext));
 }
+#endif
 
 int av_vdpau_bind_context(AVCodecContext *avctx, VdpDevice device,
                           VdpGetProcAddress *get_proc, unsigned flags)

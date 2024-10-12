@@ -30,10 +30,9 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "indeo2data.h"
-#include "internal.h"
-#include "mathops.h"
 
 typedef struct Ir2Context{
     AVCodecContext *avctx;
@@ -43,12 +42,12 @@ typedef struct Ir2Context{
 } Ir2Context;
 
 #define CODE_VLC_BITS 14
-static VLC ir2_vlc;
+static VLCElem ir2_vlc[1 << CODE_VLC_BITS];
 
 /* Indeo 2 codes are in range 0x01..0x7F and 0x81..0x90 */
 static inline int ir2_get_code(GetBitContext *gb)
 {
-    return get_vlc2(gb, ir2_vlc.table, CODE_VLC_BITS, 1);
+    return get_vlc2(gb, ir2_vlc, CODE_VLC_BITS, 1);
 }
 
 static int ir2_decode_plane(Ir2Context *ctx, int width, int height, uint8_t *dst,
@@ -227,9 +226,9 @@ static int ir2_decode_frame(AVCodecContext *avctx, AVFrame *picture,
 
 static av_cold void ir2_init_static(void)
 {
-    INIT_VLC_STATIC_FROM_LENGTHS(&ir2_vlc, CODE_VLC_BITS, IR2_CODES,
-                                 &ir2_tab[0][1], 2, &ir2_tab[0][0], 2, 1,
-                                 0, INIT_VLC_OUTPUT_LE, 1 << CODE_VLC_BITS);
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(ir2_vlc, CODE_VLC_BITS, IR2_CODES,
+                                       &ir2_tab[0][1], 2, &ir2_tab[0][0], 2, 1,
+                                       0, VLC_INIT_OUTPUT_LE);
 }
 
 static av_cold int ir2_decode_init(AVCodecContext *avctx)
@@ -261,7 +260,7 @@ static av_cold int ir2_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_indeo2_decoder = {
     .p.name         = "indeo2",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Intel Indeo 2"),
+    CODEC_LONG_NAME("Intel Indeo 2"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_INDEO2,
     .priv_data_size = sizeof(Ir2Context),
@@ -269,5 +268,4 @@ const FFCodec ff_indeo2_decoder = {
     .close          = ir2_decode_end,
     FF_CODEC_DECODE_CB(ir2_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

@@ -22,11 +22,12 @@
  */
 
 #include "libavutil/common.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "golomb.h"
 
@@ -406,11 +407,11 @@ static int fic_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                               NULL, nslices, sizeof(ctx->slice_data[0]))) < 0)
         return ret;
 
-    ctx->frame->key_frame = 1;
+    ctx->frame->flags |= AV_FRAME_FLAG_KEY;
     ctx->frame->pict_type = AV_PICTURE_TYPE_I;
     for (slice = 0; slice < nslices; slice++) {
         if (ctx->slice_data[slice].p_frame) {
-            ctx->frame->key_frame = 0;
+            ctx->frame->flags &= ~AV_FRAME_FLAG_KEY;
             ctx->frame->pict_type = AV_PICTURE_TYPE_P;
             break;
         }
@@ -486,7 +487,7 @@ static const AVClass fic_decoder_class = {
 
 const FFCodec ff_fic_decoder = {
     .p.name         = "fic",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Mirillis FIC"),
+    CODEC_LONG_NAME("Mirillis FIC"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_FIC,
     .priv_data_size = sizeof(FICContext),
@@ -495,5 +496,4 @@ const FFCodec ff_fic_decoder = {
     .close          = fic_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS,
     .p.priv_class   = &fic_decoder_class,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

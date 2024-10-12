@@ -26,42 +26,46 @@
 #include "libavutil/attributes.h"
 #include "aacpsdsp.h"
 
-static void ps_add_squares_c(INTFLOAT *dst, const INTFLOAT (*src)[2], int n)
+static void ps_add_squares_c(INTFLOAT *restrict dst,
+                             const INTFLOAT (*src)[2], int n)
 {
-    int i;
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         dst[i] += (UINTFLOAT)AAC_MADD28(src[i][0], src[i][0], src[i][1], src[i][1]);
 }
 
-static void ps_mul_pair_single_c(INTFLOAT (*dst)[2], INTFLOAT (*src0)[2], INTFLOAT *src1,
+static void ps_mul_pair_single_c(INTFLOAT (*restrict dst)[2],
+                                 INTFLOAT (*src0)[2], INTFLOAT *src1,
                                  int n)
 {
-    int i;
-    for (i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         dst[i][0] = AAC_MUL16(src0[i][0], src1[i]);
         dst[i][1] = AAC_MUL16(src0[i][1], src1[i]);
     }
 }
 
-static void ps_hybrid_analysis_c(INTFLOAT (*out)[2], INTFLOAT (*in)[2],
+static void ps_hybrid_analysis_c(INTFLOAT (*restrict out)[2],
+                                 INTFLOAT (*in)[2],
                                  const INTFLOAT (*filter)[8][2],
                                  ptrdiff_t stride, int n)
 {
-    int i, j;
+    INT64FLOAT inre0[6], inre1[6], inim0[6], inim1[6];
 
-    for (i = 0; i < n; i++) {
+    for (int j = 0; j < 6; j++) {
+        inre0[j] = in[j][0] + in[12 - j][0];
+        inre1[j] = in[j][1] - in[12 - j][1];
+        inim0[j] = in[j][1] + in[12 - j][1];
+        inim1[j] = in[j][0] - in[12 - j][0];
+    }
+
+    for (int i = 0; i < n; i++) {
         INT64FLOAT sum_re = (INT64FLOAT)filter[i][6][0] * in[6][0];
         INT64FLOAT sum_im = (INT64FLOAT)filter[i][6][0] * in[6][1];
 
-        for (j = 0; j < 6; j++) {
-            INT64FLOAT in0_re = in[j][0];
-            INT64FLOAT in0_im = in[j][1];
-            INT64FLOAT in1_re = in[12-j][0];
-            INT64FLOAT in1_im = in[12-j][1];
-            sum_re += (INT64FLOAT)filter[i][j][0] * (in0_re + in1_re) -
-                      (INT64FLOAT)filter[i][j][1] * (in0_im - in1_im);
-            sum_im += (INT64FLOAT)filter[i][j][0] * (in0_im + in1_im) +
-                      (INT64FLOAT)filter[i][j][1] * (in0_re - in1_re);
+        for (int j = 0; j < 6; j++) {
+            sum_re += (INT64FLOAT)filter[i][j][0] * inre0[j] -
+                      (INT64FLOAT)filter[i][j][1] * inre1[j];
+            sum_im += (INT64FLOAT)filter[i][j][0] * inim0[j] +
+                      (INT64FLOAT)filter[i][j][1] * inim1[j];
         }
 #if USE_FIXED
         out[i * stride][0] = (int)((sum_re + 0x40000000) >> 31);
@@ -73,13 +77,12 @@ static void ps_hybrid_analysis_c(INTFLOAT (*out)[2], INTFLOAT (*in)[2],
     }
 }
 
-static void ps_hybrid_analysis_ileave_c(INTFLOAT (*out)[32][2], INTFLOAT L[2][38][64],
-                                      int i, int len)
+static void ps_hybrid_analysis_ileave_c(INTFLOAT (*restrict out)[32][2],
+                                        INTFLOAT L[2][38][64],
+                                        int i, int len)
 {
-    int j;
-
     for (; i < 64; i++) {
-        for (j = 0; j < len; j++) {
+        for (int j = 0; j < len; j++) {
             out[i][j][0] = L[0][j][i];
             out[i][j][1] = L[1][j][i];
         }
@@ -87,13 +90,11 @@ static void ps_hybrid_analysis_ileave_c(INTFLOAT (*out)[32][2], INTFLOAT L[2][38
 }
 
 static void ps_hybrid_synthesis_deint_c(INTFLOAT out[2][38][64],
-                                      INTFLOAT (*in)[32][2],
-                                      int i, int len)
+                                        INTFLOAT (*restrict in)[32][2],
+                                        int i, int len)
 {
-    int n;
-
     for (; i < 64; i++) {
-        for (n = 0; n < len; n++) {
+        for (int n = 0; n < len; n++) {
             out[0][n][i] = in[i][n][0];
             out[1][n][i] = in[i][n][1];
         }
@@ -225,8 +226,8 @@ av_cold void AAC_RENAME(ff_psdsp_init)(PSDSPContext *s)
     ff_psdsp_init_arm(s);
 #elif ARCH_AARCH64
     ff_psdsp_init_aarch64(s);
-#elif ARCH_MIPS
-    ff_psdsp_init_mips(s);
+#elif ARCH_RISCV
+    ff_psdsp_init_riscv(s);
 #elif ARCH_X86
     ff_psdsp_init_x86(s);
 #endif

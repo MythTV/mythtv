@@ -19,7 +19,7 @@
  */
 
 #include "libavutil/avstring.h"
-#include "libavfilter/internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/common.h"
 #include "libavutil/cpu.h"
 #include "libavutil/opt.h"
@@ -240,7 +240,7 @@ static int tx_channel(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
         AVComplexFloat *fft_in = s->fft_in[ch];
         AVComplexFloat *fft_out = s->fft_out[ch];
 
-        s->tx_fn(s->fft[ch], fft_out, fft_in, sizeof(float));
+        s->tx_fn(s->fft[ch], fft_out, fft_in, sizeof(*fft_in));
     }
 
     return 0;
@@ -292,7 +292,7 @@ static int filter_channel(AVFilterContext *ctx, void *arg, int jobnr, int nb_job
             }
         }
 
-        s->itx_fn(s->ifft[ch], fft_out, fft_temp, sizeof(float));
+        s->itx_fn(s->ifft[ch], fft_out, fft_temp, sizeof(*fft_temp));
 
         memmove(buf, buf + s->hop_size, window_size * sizeof(float));
         for (int i = 0; i < window_size; i++)
@@ -345,7 +345,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         goto fail;
     }
 
-    out->pts = in->pts;
+    av_frame_copy_props(out, in);
     out->nb_samples = in->nb_samples;
 
     for (ch = 0; ch < inlink->ch_layout.nb_channels; ch++) {
@@ -439,20 +439,13 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-static const AVFilterPad outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_afftfilt = {
     .name            = "afftfilt",
     .description     = NULL_IF_CONFIG_SMALL("Apply arbitrary expressions to samples in frequency domain."),
     .priv_size       = sizeof(AFFTFiltContext),
     .priv_class      = &afftfilt_class,
     FILTER_INPUTS(inputs),
-    FILTER_OUTPUTS(outputs),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
     FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_FLTP),
     .activate        = activate,
     .uninit          = uninit,

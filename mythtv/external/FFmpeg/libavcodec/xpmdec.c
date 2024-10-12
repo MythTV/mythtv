@@ -21,11 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/parseutils.h"
 #include "libavutil/avstring.h"
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 #define MIN_ELEMENT ' '
 #define MAX_ELEMENT 0xfe
@@ -194,15 +194,22 @@ static const ColorEntry color_table[] = {
 
 static unsigned hex_char_to_number(uint8_t x)
 {
-    if (x >= 'a' && x <= 'f')
-        x -= 'a' - 10;
-    else if (x >= 'A' && x <= 'F')
-        x -= 'A' - 10;
-    else if (x >= '0' && x <= '9')
-        x -= '0';
-    else
-        x = 0;
-    return x;
+#define TIMES256(idx) \
+TIMES64(4 * (idx)) TIMES64(4 * (idx) + 1) TIMES64(4 * (idx) + 2) TIMES64(4 * (idx) + 3)
+#define TIMES64(idx) \
+TIMES16(4 * (idx)) TIMES16(4 * (idx) + 1) TIMES16(4 * (idx) + 2) TIMES16(4 * (idx) + 3)
+#define TIMES16(idx) \
+TIMES4(4 * (idx)) TIMES4(4 * (idx) + 1) TIMES4(4 * (idx) + 2) TIMES4(4 * (idx) + 3)
+#define TIMES4(idx) \
+ENTRY(4 * (idx)) ENTRY(4 * (idx) + 1) ENTRY(4 * (idx) + 2) ENTRY(4 * (idx) + 3)
+#define ENTRY(x) [x] = ((x) >= 'a' && (x) <= 'f') ? (x) - ('a' - 10) : \
+                       ((x) >= 'A' && (x) <= 'F') ? (x) - ('A' - 10) : \
+                       ((x) >= '0' && (x) <= '9') ? (x) - '0' : 0,
+
+    static const uint8_t lut[] = {
+        TIMES256(0)
+    };
+    return lut[x];
 }
 
 /*
@@ -234,13 +241,11 @@ static size_t mod_strcspn(const char *string, const char *reject)
     return i;
 }
 
-static uint32_t color_string_to_rgba(const char *p, int len)
+static uint32_t color_string_to_rgba(const char *p, size_t len)
 {
     uint32_t ret = 0xFF000000;
     const ColorEntry *entry;
     char color_name[100];
-
-    len = FFMIN(FFMAX(len, 0), sizeof(color_name) - 1);
 
     if (*p == '#') {
         p++;
@@ -272,6 +277,7 @@ static uint32_t color_string_to_rgba(const char *p, int len)
                    (hex_char_to_number(p[0]) << 28);
         }
     } else {
+        len = FFMIN(len, sizeof(color_name) - 1);
         strncpy(color_name, p, len);
         color_name[len] = '\0';
 
@@ -355,11 +361,17 @@ static int xpm_decode_frame(AVCodecContext *avctx, AVFrame *p,
         return AVERROR_INVALIDDATA;
     }
 
+    if (size > SIZE_MAX / 4)
+        return AVERROR(ENOMEM);
+
     size *= 4;
 
     ptr += mod_strcspn(ptr, ",") + 1;
     if (end - ptr < 1)
         return AVERROR_INVALIDDATA;
+
+    if (avctx->skip_frame >= AVDISCARD_ALL)
+        return avpkt->size;
 
     if ((ret = ff_get_buffer(avctx, p, 0)) < 0)
         return ret;
@@ -370,7 +382,7 @@ static int xpm_decode_frame(AVCodecContext *avctx, AVFrame *p,
 
     for (i = 0; i < ncolors; i++) {
         const uint8_t *index;
-        int len;
+        size_t len;
 
         ptr += mod_strcspn(ptr, "\"") + 1;
         if (end - ptr < cpp)
@@ -417,9 +429,6 @@ static int xpm_decode_frame(AVCodecContext *avctx, AVFrame *p,
         ptr += mod_strcspn(ptr, ",") + 1;
     }
 
-    p->key_frame = 1;
-    p->pict_type = AV_PICTURE_TYPE_I;
-
     *got_frame = 1;
 
     return avpkt->size;
@@ -438,11 +447,12 @@ static av_cold int xpm_decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_xpm_decoder = {
     .p.name         = "xpm",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("XPM (X PixMap) image"),
+    CODEC_LONG_NAME("XPM (X PixMap) image"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_XPM,
     .p.capabilities = AV_CODEC_CAP_DR1,
     .priv_data_size = sizeof(XPMDecContext),
     .close          = xpm_decode_close,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     FF_CODEC_DECODE_CB(xpm_decode_frame),
 };

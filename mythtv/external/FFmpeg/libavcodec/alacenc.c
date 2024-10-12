@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 
 #include "avcodec.h"
@@ -617,21 +618,6 @@ static int alac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     return 0;
 }
 
-#if FF_API_OLD_CHANNEL_LAYOUT
-static const uint64_t alac_channel_layouts[ALAC_MAX_CHANNELS + 1] = {
-    AV_CH_LAYOUT_MONO,
-    AV_CH_LAYOUT_STEREO,
-    AV_CH_LAYOUT_SURROUND,
-    AV_CH_LAYOUT_4POINT0,
-    AV_CH_LAYOUT_5POINT0_BACK,
-    AV_CH_LAYOUT_5POINT1_BACK,
-    AV_CH_LAYOUT_6POINT1_BACK,
-    AV_CH_LAYOUT_7POINT1_WIDE_BACK,
-    0
-};
-#endif
-
-
 #define OFFSET(x) offsetof(AlacEncodeContext, x)
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
@@ -648,25 +634,20 @@ static const AVClass alacenc_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-FF_DISABLE_DEPRECATION_WARNINGS
 const FFCodec ff_alac_encoder = {
     .p.name         = "alac",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("ALAC (Apple Lossless Audio Codec)"),
+    CODEC_LONG_NAME("ALAC (Apple Lossless Audio Codec)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_ALAC,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SMALL_LAST_FRAME |
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size = sizeof(AlacEncodeContext),
     .p.priv_class   = &alacenc_class,
     .init           = alac_encode_init,
     FF_CODEC_ENCODE_CB(alac_encode_frame),
     .close          = alac_encode_close,
-    .p.capabilities = AV_CODEC_CAP_SMALL_LAST_FRAME,
-#if FF_API_OLD_CHANNEL_LAYOUT
-    .p.channel_layouts = alac_channel_layouts,
-#endif
     .p.ch_layouts   = ff_alac_ch_layouts,
     .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32P,
                                                      AV_SAMPLE_FMT_S16P,
                                                      AV_SAMPLE_FMT_NONE },
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
-FF_ENABLE_DEPRECATION_WARNINGS

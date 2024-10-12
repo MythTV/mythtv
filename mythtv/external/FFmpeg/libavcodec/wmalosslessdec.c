@@ -26,15 +26,15 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "put_bits.h"
 #include "lossless_audiodsp.h"
-#include "wma.h"
 #include "wma_common.h"
 
 /** current decoder limitations */
@@ -783,7 +783,6 @@ static void revert_cdlms ## bits (WmallDecodeCtx *s, int ch, \
             s->channel_residues[ch][icoef] = input; \
         } \
     } \
-    if (bits <= 16) emms_c(); \
 }
 
 CD_LMS(16, WMALL_COEFF_PAD_SIZE)
@@ -1194,15 +1193,14 @@ static int decode_packet(AVCodecContext *avctx, AVFrame *rframe,
 
     s->frame->nb_samples = 0;
 
-    if (!buf_size && s->num_saved_bits > get_bits_count(&s->gb)) {
+    if (!buf_size) {
         s->packet_done = 0;
+        if (s->num_saved_bits <= get_bits_count(&s->gb))
+            return 0;
         if (!decode_frame(s))
             s->num_saved_bits = 0;
     } else if (s->packet_done || s->packet_loss) {
         s->packet_done = 0;
-
-        if (!buf_size)
-            return 0;
 
         s->next_packet_start = buf_size - FFMIN(avctx->block_align, buf_size);
         buf_size             = FFMIN(avctx->block_align, buf_size);
@@ -1301,7 +1299,7 @@ static int decode_packet(AVCodecContext *avctx, AVFrame *rframe,
 
     s->packet_offset = get_bits_count(gb) & 7;
 
-    return (s->packet_loss) ? AVERROR_INVALIDDATA : buf_size ? get_bits_count(gb) >> 3 : 0;
+    return (s->packet_loss) ? AVERROR_INVALIDDATA : get_bits_count(gb) >> 3;
 }
 
 static void flush(AVCodecContext *avctx)
@@ -1329,7 +1327,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_wmalossless_decoder = {
     .p.name         = "wmalossless",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Windows Media Audio Lossless"),
+    CODEC_LONG_NAME("Windows Media Audio Lossless"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_WMALOSSLESS,
     .priv_data_size = sizeof(WmallDecodeCtx),
@@ -1337,8 +1335,12 @@ const FFCodec ff_wmalossless_decoder = {
     .close          = decode_close,
     FF_CODEC_DECODE_CB(decode_packet),
     .flush          = flush,
-    .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .p.capabilities =
+#if FF_API_SUBFRAMES
+                      AV_CODEC_CAP_SUBFRAMES |
+#endif
+                      AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },

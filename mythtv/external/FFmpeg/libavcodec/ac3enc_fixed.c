@@ -27,7 +27,6 @@
  */
 
 #define AC3ENC_FLOAT 0
-#define FFT_FLOAT 0
 #include "audiodsp.h"
 #include "ac3enc.h"
 #include "codec_internal.h"
@@ -66,19 +65,7 @@ static CoefType calc_cpl_coord(CoefSumType energy_ch, CoefSumType energy_cpl)
     }
 }
 
-
 #include "ac3enc_template.c"
-
-
-/**
- * Finalize MDCT and free allocated memory.
- *
- * @param s  AC-3 encoder private context
- */
-static av_cold void ac3_fixed_mdct_end(AC3EncodeContext *s)
-{
-    ff_mdct_end(&s->mdct);
-}
 
 /**
  * Initialize MDCT tables.
@@ -86,59 +73,57 @@ static av_cold void ac3_fixed_mdct_end(AC3EncodeContext *s)
  * @param s  AC-3 encoder private context
  * @return   0 on success, negative error code on failure
  */
-static av_cold int ac3_fixed_mdct_init(AC3EncodeContext *s)
+static av_cold int ac3_fixed_mdct_init(AVCodecContext *avctx, AC3EncodeContext *s)
 {
     float fwin[AC3_BLOCK_SIZE];
+    const float scale = -1.0f;
 
-    int32_t *iwin = av_malloc_array(AC3_BLOCK_SIZE, sizeof(*iwin));
-    if (!iwin)
-        return AVERROR(ENOMEM);
+    int32_t *iwin = s->mdct_window_fixed;
 
     ff_kbd_window_init(fwin, 5.0, AC3_BLOCK_SIZE);
     for (int i = 0; i < AC3_BLOCK_SIZE; i++)
         iwin[i] = lrintf(fwin[i] * (1 << 22));
 
-    s->mdct_window = iwin;
-
-    s->fdsp = avpriv_alloc_fixed_dsp(s->avctx->flags & AV_CODEC_FLAG_BITEXACT);
+    s->fdsp = avpriv_alloc_fixed_dsp(avctx->flags & AV_CODEC_FLAG_BITEXACT);
     if (!s->fdsp)
         return AVERROR(ENOMEM);
 
-    return ff_mdct_init(&s->mdct, 9, 0, -1.0);
+    return av_tx_init(&s->tx, &s->tx_fn, AV_TX_INT32_MDCT, 0,
+                      AC3_BLOCK_SIZE, &scale, 0);
 }
 
 
 static av_cold int ac3_fixed_encode_init(AVCodecContext *avctx)
 {
     AC3EncodeContext *s = avctx->priv_data;
+    int ret;
+
     s->fixed_point = 1;
-    s->mdct_end                = ac3_fixed_mdct_end;
-    s->mdct_init               = ac3_fixed_mdct_init;
-    s->allocate_sample_buffers = allocate_sample_buffers;
+    s->encode_frame            = encode_frame;
+
+    ret = ac3_fixed_mdct_init(avctx, s);
+    if (ret < 0)
+        return ret;
+
     return ff_ac3_encode_init(avctx);
 }
 
 
-FF_DISABLE_DEPRECATION_WARNINGS
 const FFCodec ff_ac3_fixed_encoder = {
     .p.name          = "ac3_fixed",
-    .p.long_name     = NULL_IF_CONFIG_SMALL("ATSC A/52A (AC-3)"),
+    CODEC_LONG_NAME("ATSC A/52A (AC-3)"),
     .p.type          = AVMEDIA_TYPE_AUDIO,
     .p.id            = AV_CODEC_ID_AC3,
-    .p.capabilities  = AV_CODEC_CAP_DR1,
+    .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size  = sizeof(AC3EncodeContext),
     .init            = ac3_fixed_encode_init,
-    FF_CODEC_ENCODE_CB(ff_ac3_fixed_encode_frame),
+    FF_CODEC_ENCODE_CB(ff_ac3_encode_frame),
     .close           = ff_ac3_encode_close,
     .p.sample_fmts   = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },
     .p.priv_class    = &ff_ac3enc_class,
-    .caps_internal   = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
     .p.supported_samplerates = ff_ac3_sample_rate_tab,
-#if FF_API_OLD_CHANNEL_LAYOUT
-    .p.channel_layouts = ff_ac3_channel_layouts,
-#endif
     .p.ch_layouts    = ff_ac3_ch_layouts,
     .defaults        = ff_ac3_enc_defaults,
 };
-FF_ENABLE_DEPRECATION_WARNINGS

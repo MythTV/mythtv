@@ -23,6 +23,7 @@
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
+#include "demux.h"
 #include "internal.h"
 #include "avformat.h"
 
@@ -68,19 +69,19 @@ static int ser_read_header(AVFormatContext *s)
     avio_skip(s->pb, 8);
 
     switch (color_id) {
-    case   0: pix_fmt = depth <= 8 ? AV_PIX_FMT_GRAY8       : endian ? AV_PIX_FMT_GRAY16LE       : AV_PIX_FMT_GRAY16BE;       break;
-    case   8: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_RGGB8 : endian ? AV_PIX_FMT_BAYER_RGGB16LE : AV_PIX_FMT_BAYER_RGGB16BE; break;
-    case   9: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_GRBG8 : endian ? AV_PIX_FMT_BAYER_GRBG16LE : AV_PIX_FMT_BAYER_GRBG16BE; break;
-    case  10: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_GBRG8 : endian ? AV_PIX_FMT_BAYER_GBRG16LE : AV_PIX_FMT_BAYER_GBRG16BE; break;
-    case  11: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_BGGR8 : endian ? AV_PIX_FMT_BAYER_BGGR16LE : AV_PIX_FMT_BAYER_BGGR16BE; break;
-    case 100: pix_fmt = depth <= 8 ? AV_PIX_FMT_RGB24       : endian ? AV_PIX_FMT_RGB48LE        : AV_PIX_FMT_RGB48BE;        break;
-    case 101: pix_fmt = depth <= 8 ? AV_PIX_FMT_BGR24       : endian ? AV_PIX_FMT_BGR48LE        : AV_PIX_FMT_BGR48BE;        break;
+    case   0: pix_fmt = depth <= 8 ? AV_PIX_FMT_GRAY8       : endian ? AV_PIX_FMT_GRAY16BE       : AV_PIX_FMT_GRAY16LE;       break;
+    case   8: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_RGGB8 : endian ? AV_PIX_FMT_BAYER_RGGB16BE : AV_PIX_FMT_BAYER_RGGB16LE; break;
+    case   9: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_GRBG8 : endian ? AV_PIX_FMT_BAYER_GRBG16BE : AV_PIX_FMT_BAYER_GRBG16LE; break;
+    case  10: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_GBRG8 : endian ? AV_PIX_FMT_BAYER_GBRG16BE : AV_PIX_FMT_BAYER_GBRG16LE; break;
+    case  11: pix_fmt = depth <= 8 ? AV_PIX_FMT_BAYER_BGGR8 : endian ? AV_PIX_FMT_BAYER_BGGR16BE : AV_PIX_FMT_BAYER_BGGR16LE; break;
+    case 100: pix_fmt = depth <= 8 ? AV_PIX_FMT_RGB24       : endian ? AV_PIX_FMT_RGB48BE        : AV_PIX_FMT_RGB48LE;        break;
+    case 101: pix_fmt = depth <= 8 ? AV_PIX_FMT_BGR24       : endian ? AV_PIX_FMT_BGR48BE        : AV_PIX_FMT_BGR48LE;        break;
     default:
         return AVERROR_PATCHWELCOME;
     }
 
     st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codecpar->codec_id = s->iformat->raw_codec_id;
+    st->codecpar->codec_id   = AV_CODEC_ID_RAWVIDEO;
 
     avpriv_set_pts_info(st, 64, ser->framerate.den, ser->framerate.num);
 
@@ -132,15 +133,15 @@ static const AVClass ser_demuxer_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVInputFormat ff_ser_demuxer = {
-    .name           = "ser",
-    .long_name      = NULL_IF_CONFIG_SMALL("SER (Simple uncompressed video format for astronomical capturing)"),
+const FFInputFormat ff_ser_demuxer = {
+    .p.name         = "ser",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("SER (Simple uncompressed video format for astronomical capturing)"),
+    .p.flags        = AVFMT_GENERIC_INDEX,
+    .p.extensions   = "ser",
+    .p.priv_class   = &ser_demuxer_class,
     .priv_data_size = sizeof(SERDemuxerContext),
     .read_probe     = ser_probe,
     .read_header    = ser_read_header,
     .read_packet    = ser_read_packet,
-    .flags          = AVFMT_GENERIC_INDEX,
-    .extensions     = "ser",
     .raw_codec_id   = AV_CODEC_ID_RAWVIDEO,
-    .priv_class     = &ser_demuxer_class,
 };

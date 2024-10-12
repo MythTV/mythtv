@@ -24,19 +24,16 @@
  * @todo support float pixel format
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/tx.h"
 #include "libavutil/avassert.h"
-#include "libavutil/channel_layout.h"
 #include "libavutil/cpu.h"
 #include "libavutil/ffmath.h"
 #include "libavutil/opt.h"
-#include "libavutil/parseutils.h"
 #include "avfilter.h"
 #include "formats.h"
 #include "audio.h"
-#include "video.h"
 #include "filters.h"
-#include "internal.h"
 #include "window_func.h"
 
 enum MagnitudeScale { LINEAR, LOG, NB_SCALES };
@@ -78,19 +75,19 @@ typedef struct SpectrumSynthContext {
 static const AVOption spectrumsynth_options[] = {
     { "sample_rate", "set sample rate",  OFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = 44100}, 15,  INT_MAX, A },
     { "channels",    "set channels",     OFFSET(channels), AV_OPT_TYPE_INT, {.i64 = 1}, 1, 8, A },
-    { "scale",       "set input amplitude scale", OFFSET(scale), AV_OPT_TYPE_INT, {.i64 = LOG}, 0, NB_SCALES-1, V, "scale" },
-        { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, V, "scale" },
-        { "log",  "logarithmic", 0, AV_OPT_TYPE_CONST, {.i64=LOG},    0, 0, V, "scale" },
-    { "slide", "set input sliding mode", OFFSET(sliding), AV_OPT_TYPE_INT, {.i64 = FULLFRAME}, 0, NB_SLIDES-1, V, "slide" },
-        { "replace",   "consume old columns with new",   0, AV_OPT_TYPE_CONST, {.i64=REPLACE},   0, 0, V, "slide" },
-        { "scroll",    "consume only most right column", 0, AV_OPT_TYPE_CONST, {.i64=SCROLL},    0, 0, V, "slide" },
-        { "fullframe", "consume full frames",            0, AV_OPT_TYPE_CONST, {.i64=FULLFRAME}, 0, 0, V, "slide" },
-        { "rscroll",   "consume only most left column",  0, AV_OPT_TYPE_CONST, {.i64=RSCROLL},   0, 0, V, "slide" },
+    { "scale",       "set input amplitude scale", OFFSET(scale), AV_OPT_TYPE_INT, {.i64 = LOG}, 0, NB_SCALES-1, V, .unit = "scale" },
+        { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, V, .unit = "scale" },
+        { "log",  "logarithmic", 0, AV_OPT_TYPE_CONST, {.i64=LOG},    0, 0, V, .unit = "scale" },
+    { "slide", "set input sliding mode", OFFSET(sliding), AV_OPT_TYPE_INT, {.i64 = FULLFRAME}, 0, NB_SLIDES-1, V, .unit = "slide" },
+        { "replace",   "consume old columns with new",   0, AV_OPT_TYPE_CONST, {.i64=REPLACE},   0, 0, V, .unit = "slide" },
+        { "scroll",    "consume only most right column", 0, AV_OPT_TYPE_CONST, {.i64=SCROLL},    0, 0, V, .unit = "slide" },
+        { "fullframe", "consume full frames",            0, AV_OPT_TYPE_CONST, {.i64=FULLFRAME}, 0, 0, V, .unit = "slide" },
+        { "rscroll",   "consume only most left column",  0, AV_OPT_TYPE_CONST, {.i64=RSCROLL},   0, 0, V, .unit = "slide" },
     WIN_FUNC_OPTION("win_func", OFFSET(win_func), A, 0),
     { "overlap", "set window overlap",  OFFSET(overlap), AV_OPT_TYPE_FLOAT, {.dbl=1}, 0,  1, A },
-    { "orientation", "set orientation", OFFSET(orientation), AV_OPT_TYPE_INT, {.i64=VERTICAL}, 0, NB_ORIENTATIONS-1, V, "orientation" },
-        { "vertical",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=VERTICAL},   0, 0, V, "orientation" },
-        { "horizontal", NULL, 0, AV_OPT_TYPE_CONST, {.i64=HORIZONTAL}, 0, 0, V, "orientation" },
+    { "orientation", "set orientation", OFFSET(orientation), AV_OPT_TYPE_INT, {.i64=VERTICAL}, 0, NB_ORIENTATIONS-1, V, .unit = "orientation" },
+        { "vertical",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=VERTICAL},   0, 0, V, .unit = "orientation" },
+        { "horizontal", NULL, 0, AV_OPT_TYPE_CONST, {.i64=HORIZONTAL}, 0, 0, V, .unit = "orientation" },
     { NULL }
 };
 
@@ -142,10 +139,12 @@ static int config_output(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     SpectrumSynthContext *s = ctx->priv;
+    FilterLink *inl0 = ff_filter_link(ctx->inputs[0]);
+    FilterLink *inl1 = ff_filter_link(ctx->inputs[1]);
     int width = ctx->inputs[0]->w;
     int height = ctx->inputs[0]->h;
     AVRational time_base  = ctx->inputs[0]->time_base;
-    AVRational frame_rate = ctx->inputs[0]->frame_rate;
+    AVRational frame_rate = inl0->frame_rate;
     float factor, overlap, scale;
     int i, ch, ret;
 
@@ -166,12 +165,12 @@ static int config_output(AVFilterLink *outlink)
                ctx->inputs[1]->time_base.num,
                ctx->inputs[1]->time_base.den);
         return AVERROR_INVALIDDATA;
-    } else if (av_cmp_q(frame_rate, ctx->inputs[1]->frame_rate) != 0) {
+    } else if (av_cmp_q(frame_rate, inl1->frame_rate) != 0) {
         av_log(ctx, AV_LOG_ERROR,
                "Magnitude and Phase framerates differ (%d/%d vs %d/%d).\n",
                frame_rate.num, frame_rate.den,
-               ctx->inputs[1]->frame_rate.num,
-               ctx->inputs[1]->frame_rate.den);
+               inl1->frame_rate.num,
+               inl1->frame_rate.den);
         return AVERROR_INVALIDDATA;
     }
 
@@ -342,7 +341,7 @@ static void synth_window(AVFilterContext *ctx, int x)
             s->fft_in[ch][y].im = -s->fft_in[ch][f].im;
         }
 
-        s->tx_fn(s->fft, s->fft_out[ch], s->fft_in[ch], sizeof(float));
+        s->tx_fn(s->fft, s->fft_out[ch], s->fft_in[ch], sizeof(AVComplexFloat));
     }
 }
 

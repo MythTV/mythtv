@@ -32,7 +32,7 @@
 #include "videodsp_template.c"
 #undef BIT_DEPTH
 
-static void just_return(uint8_t *buf, ptrdiff_t stride, int h)
+static void just_return(const uint8_t *buf, ptrdiff_t stride, int h)
 {
 }
 
@@ -51,6 +51,8 @@ av_cold void ff_videodsp_init(VideoDSPContext *ctx, int bpc)
     ff_videodsp_init_arm(ctx, bpc);
 #elif ARCH_PPC
     ff_videodsp_init_ppc(ctx, bpc);
+#elif ARCH_RISCV
+    ff_videodsp_init_riscv(ctx, bpc);
 #elif ARCH_X86
     ff_videodsp_init_x86(ctx, bpc);
 #elif ARCH_MIPS

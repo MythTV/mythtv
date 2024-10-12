@@ -275,6 +275,33 @@ For example, to convert a GIF file given inline with @command{ffmpeg}:
 ffmpeg -i "data:image/gif;base64,R0lGODdhCAAIAMIEAAAAAAAA//8AAP//AP///////////////ywAAAAACAAIAAADF0gEDLojDgdGiJdJqUX02iB4E8Q9jUMkADs=" smiley.png
 @end example
 
+@section fd
+
+File descriptor access protocol.
+
+The accepted syntax is:
+@example
+fd: -fd @var{file_descriptor}
+@end example
+
+If @option{fd} is not specified, by default the stdout file descriptor will be
+used for writing, stdin for reading. Unlike the pipe protocol, fd protocol has
+seek support if it corresponding to a regular file. fd protocol doesn't support
+pass file descriptor via URL for security.
+
+This protocol accepts the following options:
+
+@table @option
+@item blocksize
+Set I/O operation maximum block size, in bytes. Default value is
+@code{INT_MAX}, which results in not limiting the requested block size.
+Setting this value reasonably low improves user termination request reaction
+time, which is valuable if data transmission is slow.
+
+@item fd
+Set file descriptor.
+@end table
+
 @section file
 
 File access protocol.
@@ -415,9 +442,6 @@ value is -1.
 @item chunked_post
 If set to 1 use chunked Transfer-Encoding for posts, default is 1.
 
-@item content_type
-Set a specific content type for the POST messages or for listen mode.
-
 @item http_proxy
 set HTTP proxy to tunnel through e.g. http://example.com:1234
 
@@ -425,41 +449,32 @@ set HTTP proxy to tunnel through e.g. http://example.com:1234
 Set custom HTTP headers, can override built in default headers. The
 value must be a string encoding the headers.
 
+@item content_type
+Set a specific content type for the POST messages or for listen mode.
+
+@item user_agent
+Override the User-Agent header. If not specified the protocol will use a
+string describing the libavformat build. ("Lavf/<version>")
+
+@item referer
+Set the Referer header. Include 'Referer: URL' header in HTTP request.
+
 @item multiple_requests
 Use persistent connections if set to 1, default is 0.
 
 @item post_data
 Set custom HTTP post data.
 
-@item referer
-Set the Referer header. Include 'Referer: URL' header in HTTP request.
-
-@item user_agent
-Override the User-Agent header. If not specified the protocol will use a
-string describing the libavformat build. ("Lavf/<version>")
-
-@item reconnect_at_eof
-If set then eof is treated like an error and causes reconnection, this is useful
-for live / endless streams.
-
-@item reconnect_streamed
-If set then even streamed/non seekable streams will be reconnected on errors.
-
-@item reconnect_on_network_error
-Reconnect automatically in case of TCP/TLS errors during connect.
-
-@item reconnect_on_http_error
-A comma separated list of HTTP status codes to reconnect on. The list can
-include specific status codes (e.g. '503') or the strings '4xx' / '5xx'.
-
-@item reconnect_delay_max
-Sets the maximum delay in seconds after which to give up reconnecting
-
 @item mime_type
 Export the MIME type.
 
 @item http_version
 Exports the HTTP response version number. Usually "1.0" or "1.1".
+
+@item cookies
+Set the cookies to be sent in future requests. The format of each cookie is the
+same as the value of a Set-Cookie HTTP response field. Multiple cookies can be
+delimited by a newline character.
 
 @item icy
 If set to 1 request ICY (SHOUTcast) metadata from the server. If the server
@@ -477,10 +492,40 @@ contains the last non-empty metadata packet sent by the server. It should be
 polled in regular intervals by applications interested in mid-stream metadata
 updates.
 
-@item cookies
-Set the cookies to be sent in future requests. The format of each cookie is the
-same as the value of a Set-Cookie HTTP response field. Multiple cookies can be
-delimited by a newline character.
+@item metadata
+Set an exported dictionary containing Icecast metadata from the bitstream, if present.
+Only useful with the C API.
+
+@item auth_type
+
+Set HTTP authentication type. No option for Digest, since this method requires
+getting nonce parameters from the server first and can't be used straight away like
+Basic.
+
+@table @option
+@item none
+Choose the HTTP authentication type automatically. This is the default.
+@item basic
+
+Choose the HTTP basic authentication.
+
+Basic authentication sends a Base64-encoded string that contains a user name and password
+for the client. Base64 is not a form of encryption and should be considered the same as
+sending the user name and password in clear text (Base64 is a reversible encoding).
+If a resource needs to be protected, strongly consider using an authentication scheme
+other than basic authentication. HTTPS/TLS should be used with basic authentication.
+Without these additional security enhancements, basic authentication should not be used
+to protect sensitive or valuable information.
+@end table
+
+@item send_expect_100
+Send an Expect: 100-continue header for POST. If set to 1 it will send, if set
+to 0 it won't, if set to -1 it will try to send if it is applicable. Default
+value is -1.
+
+@item location
+An exported dictionary containing the content location. Only useful with the C
+API.
 
 @item offset
 Set initial byte offset.
@@ -497,6 +542,37 @@ If the expected and the received HTTP method do not match the client will
 be given a Bad Request response.
 When unset the HTTP method is not checked for now. This will be replaced by
 autodetection in the future.
+
+@item reconnect
+Reconnect automatically when disconnected before EOF is hit.
+
+@item reconnect_at_eof
+If set then eof is treated like an error and causes reconnection, this is useful
+for live / endless streams.
+
+@item reconnect_on_network_error
+Reconnect automatically in case of TCP/TLS errors during connect.
+
+@item reconnect_on_http_error
+A comma separated list of HTTP status codes to reconnect on. The list can
+include specific status codes (e.g. '503') or the strings '4xx' / '5xx'.
+
+@item reconnect_streamed
+If set then even streamed/non seekable streams will be reconnected on errors.
+
+@item reconnect_delay_max
+Set the maximum delay in seconds after which to give up reconnecting.
+
+@item reconnect_max_retries
+Set the maximum number of times to retry a connection. Default unset.
+
+@item reconnect_delay_total_max
+Set the maximum total delay in seconds after which to give up reconnecting.
+
+@item respect_retry_after
+If enabled, and a Retry-After header is encountered, its requested reconnection
+delay will be honored, rather than using exponential backoff. Useful for 429 and
+503 errors. Default enabled.
 
 @item listen
 If set to 1 enables experimental HTTP server. This can be used to send data when
@@ -524,32 +600,16 @@ ffmpeg -i somefile.ogg -chunked_post 0 -c copy -f ogg http://@var{server}:@var{p
 wget --post-file=somefile.ogg http://@var{server}:@var{port}
 @end example
 
-@item send_expect_100
-Send an Expect: 100-continue header for POST. If set to 1 it will send, if set
-to 0 it won't, if set to -1 it will try to send if it is applicable. Default
-value is -1.
+@item resource
+The resource requested by a client, when the experimental HTTP server is in use.
 
-@item auth_type
+@item reply_code
+The HTTP code returned to the client, when the experimental HTTP server is in use.
 
-Set HTTP authentication type. No option for Digest, since this method requires
-getting nonce parameters from the server first and can't be used straight away like
-Basic.
-
-@table @option
-@item none
-Choose the HTTP authentication type automatically. This is the default.
-@item basic
-
-Choose the HTTP basic authentication.
-
-Basic authentication sends a Base64-encoded string that contains a user name and password
-for the client. Base64 is not a form of encryption and should be considered the same as
-sending the user name and password in clear text (Base64 is a reversible encoding).
-If a resource needs to be protected, strongly consider using an authentication scheme
-other than basic authentication. HTTPS/TLS should be used with basic authentication.
-Without these additional security enhancements, basic authentication should not be used
-to protect sensitive or valuable information.
-@end table
+@item short_seek_size
+Set the threshold, in bytes, for when a readahead should be prefered over a seek and
+new HTTP request. This is useful, for example, to make sure the same connection
+is used for reading large video packets with small audio packets in between.
 
 @end table
 
@@ -622,9 +682,6 @@ This protocol wraps the IPFS native protocols (ipfs:// and ipns://) to be sent
 to such a gateway. Users can (and should) host their own node which means this
 protocol will use one's local gateway to access files on the IPFS network.
 
-If a user doesn't have a node of their own then the public gateway @code{https://dweb.link}
-is used by default.
-
 This protocol accepts the following options:
 
 @table @option
@@ -632,18 +689,18 @@ This protocol accepts the following options:
 @item gateway
 Defines the gateway to use. When not set, the protocol will first try
 locating the local gateway by looking at @code{$IPFS_GATEWAY}, @code{$IPFS_PATH}
-and @code{$HOME/.ipfs/}, in that order. If that fails @code{https://dweb.link} will be used.
+and @code{$HOME/.ipfs/}, in that order.
 
 @end table
 
 One can use this protocol in 2 ways. Using IPFS:
 @example
-ffplay ipfs://QmbGtJg23skhvFmu9mJiePVByhfzu5rwo74MEkVDYAmF5T
+ffplay ipfs://<hash>
 @end example
 
 Or the IPNS protocol (IPNS is mutable IPFS):
 @example
-ffplay ipns://QmbGtJg23skhvFmu9mJiePVByhfzu5rwo74MEkVDYAmF5T
+ffplay ipns://<hash>
 @end example
 
 @section mmst
@@ -690,7 +747,7 @@ The accepted syntax is:
 pipe:[@var{number}]
 @end example
 
-@var{number} is the number corresponding to the file descriptor of the
+If @option{fd} isn't specified, @var{number} is the number corresponding to the file descriptor of the
 pipe (e.g. 0 for stdin, 1 for stdout, 2 for stderr).  If @var{number}
 is not specified, by default the stdout file descriptor will be used
 for writing, stdin for reading.
@@ -717,6 +774,8 @@ Set I/O operation maximum block size, in bytes. Default value is
 @code{INT_MAX}, which results in not limiting the requested block size.
 Setting this value reasonably low improves user termination request reaction
 time, which is valuable if data transmission is slow.
+@item fd
+Set file descriptor.
 @end table
 
 Note that some formats (typically MOV), require the output protocol to
@@ -869,6 +928,13 @@ FALSE or TRUE, respectively.  Likewise for Objects the data must be 0 or
 be named, by prefixing the type with 'N' and specifying the name before
 the value (i.e. @code{NB:myFlag:1}). This option may be used multiple
 times to construct arbitrary AMF sequences.
+
+@item rtmp_enhanced_codecs
+Specify the list of codecs the client advertises to support in an
+enhanced RTMP stream. This option should be set to a comma separated
+list of fourcc values, like @code{hvc1,av01,vp09} for multiple codecs
+or @code{hvc1} for only one codec. The specified list will be presented
+in the "fourCcLive" property of the Connect Command Message.
 
 @item rtmp_flashver
 Version of the Flash plugin used to run the SWF player. The default
@@ -1178,6 +1244,59 @@ Options can be set on the @command{ffmpeg}/@command{ffplay} command
 line, or set in code via @code{AVOption}s or in
 @code{avformat_open_input}.
 
+@subsection Muxer
+The following options are supported.
+
+@table @option
+@item rtsp_transport
+Set RTSP transport protocols.
+
+It accepts the following values:
+@table @samp
+@item udp
+Use UDP as lower transport protocol.
+
+@item tcp
+Use TCP (interleaving within the RTSP control channel) as lower
+transport protocol.
+@end table
+
+Default value is @samp{0}.
+
+@item rtsp_flags
+Set RTSP flags.
+
+The following values are accepted:
+@table @samp
+@item latm
+Use MP4A-LATM packetization instead of MPEG4-GENERIC for AAC.
+@item rfc2190
+Use RFC 2190 packetization instead of RFC 4629 for H.263.
+@item skip_rtcp
+Don't send RTCP sender reports.
+@item h264_mode0
+Use mode 0 for H.264 in RTP.
+@item send_bye
+Send RTCP BYE packets when finishing.
+@end table
+
+Default value is @samp{0}.
+
+
+@item min_port
+Set minimum local UDP port. Default value is 5000.
+
+@item max_port
+Set maximum local UDP port. Default value is 65000.
+
+@item buffer_size
+Set the maximum socket buffer size in bytes.
+
+@item pkt_size
+Set max send packet size (in bytes). Default value is 1472.
+@end table
+
+@subsection Demuxer
 The following options are supported.
 
 @table @option
@@ -1203,6 +1322,10 @@ Use UDP multicast as lower transport protocol.
 @item http
 Use HTTP tunneling as lower transport protocol, which is useful for
 passing proxies.
+
+@item https
+Use HTTPs tunneling as lower transport protocol, which is useful for
+passing proxies and widely used for security consideration.
 @end table
 
 Multiple lower transport protocols may be specified, in that case they are
@@ -1220,6 +1343,9 @@ Accept packets only from negotiated peer address and port.
 Act as a server, listening for an incoming connection.
 @item prefer_tcp
 Try TCP for RTP transport first, if TCP is available as RTSP RTP transport.
+@item satip_raw
+Export raw MPEG-TS stream instead of demuxing. The flag will simply write out
+the raw stream, with the original PAT/PMT/PIDs intact.
 @end table
 
 Default value is @samp{none}.
@@ -1232,6 +1358,7 @@ The following flags are accepted:
 @item video
 @item audio
 @item data
+@item subtitle
 @end table
 
 By default it accepts all media types.
@@ -1256,6 +1383,9 @@ Set socket TCP I/O timeout in microseconds.
 @item user_agent
 Override User-Agent header. If not specified, it defaults to the
 libavformat identifier string.
+
+@item buffer_size
+Set the maximum socket buffer size in bytes.
 @end table
 
 When receiving data over UDP, the demuxer tries to reorder received packets
@@ -1791,6 +1921,12 @@ The list of supported options follows.
 @item listen=@var{2|1|0}
 Listen for an incoming connection. 0 disables listen, 1 enables listen in
 single client mode, 2 enables listen in multi-client mode. Default value is 0.
+
+@item local_addr=@var{addr}
+Local IP address of a network interface used for tcp socket connect.
+
+@item local_port=@var{port}
+Local port used for tcp socket connect.
 
 @item timeout=@var{microseconds}
 Set raise error timeout, expressed in microseconds.

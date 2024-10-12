@@ -21,6 +21,7 @@
 
 #include "avformat.h"
 #include "internal.h"
+#include "mux.h"
 #include "libavutil/intreadwrite.h"
 
 #define SUP_PGS_MAGIC 0x5047 /* "PG", big endian */
@@ -71,26 +72,23 @@ static int sup_write_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-static int sup_write_header(AVFormatContext *s)
+static av_cold int sup_init(AVFormatContext *s)
 {
-    if (s->nb_streams != 1) {
-        av_log(s, AV_LOG_ERROR, "%s files have exactly one stream\n",
-               s->oformat->name);
-        return AVERROR(EINVAL);
-    }
-
     avpriv_set_pts_info(s->streams[0], 32, 1, 90000);
 
     return 0;
 }
 
-const AVOutputFormat ff_sup_muxer = {
-    .name           = "sup",
-    .long_name      = NULL_IF_CONFIG_SMALL("raw HDMV Presentation Graphic Stream subtitles"),
-    .extensions     = "sup",
-    .mime_type      = "application/x-pgs",
-    .subtitle_codec = AV_CODEC_ID_HDMV_PGS_SUBTITLE,
-    .write_header   = sup_write_header,
+const FFOutputFormat ff_sup_muxer = {
+    .p.name           = "sup",
+    .p.long_name      = NULL_IF_CONFIG_SMALL("raw HDMV Presentation Graphic Stream subtitles"),
+    .p.extensions     = "sup",
+    .p.mime_type      = "application/x-pgs",
+    .p.video_codec    = AV_CODEC_ID_NONE,
+    .p.audio_codec    = AV_CODEC_ID_NONE,
+    .p.subtitle_codec = AV_CODEC_ID_HDMV_PGS_SUBTITLE,
+    .p.flags          = AVFMT_VARIABLE_FPS | AVFMT_TS_NONSTRICT,
+    .flags_internal   = FF_OFMT_FLAG_MAX_ONE_OF_EACH,
+    .init             = sup_init,
     .write_packet   = sup_write_packet,
-    .flags          = AVFMT_VARIABLE_FPS | AVFMT_TS_NONSTRICT,
 };

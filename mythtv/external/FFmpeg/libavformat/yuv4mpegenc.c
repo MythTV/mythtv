@@ -19,9 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/frame.h"
 #include "libavutil/pixdesc.h"
 #include "avformat.h"
 #include "internal.h"
+#include "mux.h"
 #include "yuv4mpeg.h"
 
 static int yuv4_write_header(AVFormatContext *s)
@@ -188,19 +190,25 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 
     avio_printf(s->pb, Y4M_FRAME_MAGIC "\n");
 
+    if (st->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
+        avio_write(pb, pkt->data, pkt->size);
+        return 0;
+    }
+
     width  = st->codecpar->width;
     height = st->codecpar->height;
     desc   = av_pix_fmt_desc_get(st->codecpar->format);
 
     /* The following code presumes all planes to be non-interleaved. */
     for (int k = 0; k < desc->nb_components; k++) {
-        int plane_height = height, plane_width = width * desc->comp[k].step;
+        int plane_height = height, plane_width = width;
         const uint8_t *ptr = frame->data[k];
 
         if (desc->nb_components >= 3 && (k == 1 || k == 2)) { /* chroma? */
             plane_width  = AV_CEIL_RSHIFT(plane_width,  desc->log2_chroma_w);
             plane_height = AV_CEIL_RSHIFT(plane_height, desc->log2_chroma_h);
         }
+        plane_width *= desc->comp[k].step;
 
         for (int i = 0; i < plane_height; i++) {
             avio_write(pb, ptr, plane_width);
@@ -213,10 +221,8 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 
 static int yuv4_init(AVFormatContext *s)
 {
-    if (s->nb_streams != 1)
-        return AVERROR(EIO);
-
-    if (s->streams[0]->codecpar->codec_id != AV_CODEC_ID_WRAPPED_AVFRAME) {
+    if (s->streams[0]->codecpar->codec_id != AV_CODEC_ID_WRAPPED_AVFRAME &&
+        s->streams[0]->codecpar->codec_id != AV_CODEC_ID_RAWVIDEO) {
         av_log(s, AV_LOG_ERROR, "ERROR: Codec not supported.\n");
         return AVERROR_INVALIDDATA;
     }
@@ -282,13 +288,15 @@ static int yuv4_init(AVFormatContext *s)
     return 0;
 }
 
-const AVOutputFormat ff_yuv4mpegpipe_muxer = {
-    .name              = "yuv4mpegpipe",
-    .long_name         = NULL_IF_CONFIG_SMALL("YUV4MPEG pipe"),
-    .extensions        = "y4m",
-    .audio_codec       = AV_CODEC_ID_NONE,
-    .video_codec       = AV_CODEC_ID_WRAPPED_AVFRAME,
+const FFOutputFormat ff_yuv4mpegpipe_muxer = {
+    .p.name            = "yuv4mpegpipe",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("YUV4MPEG pipe"),
+    .p.extensions      = "y4m",
+    .p.audio_codec     = AV_CODEC_ID_NONE,
+    .p.video_codec     = AV_CODEC_ID_WRAPPED_AVFRAME,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
     .init              = yuv4_init,
     .write_header      = yuv4_write_header,
     .write_packet      = yuv4_write_packet,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH,
 };

@@ -26,10 +26,12 @@
 #include "libavcodec/codec_par.h"
 #include "libavcodec/packet.h"
 #include "libavcodec/mpeg4audio.h"
+#include "libavcodec/mpeg4audio_copy_pce.h"
 #include "libavutil/opt.h"
 #include "avformat.h"
 #include "apetag.h"
 #include "id3v2.h"
+#include "mux.h"
 
 #define ADTS_HEADER_SIZE 7
 
@@ -104,10 +106,6 @@ static int adts_init(AVFormatContext *s)
     ADTSContext *adts = s->priv_data;
     AVCodecParameters *par = s->streams[0]->codecpar;
 
-    if (par->codec_id != AV_CODEC_ID_AAC) {
-        av_log(s, AV_LOG_ERROR, "Only AAC streams can be muxed by the ADTS muxer\n");
-        return AVERROR(EINVAL);
-    }
     if (par->extradata_size > 0)
         return adts_decode_extradata(s, adts, par->extradata,
                                      par->extradata_size);
@@ -125,14 +123,14 @@ static int adts_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int adts_write_frame_header(ADTSContext *ctx,
+static int adts_write_frame_header(AVFormatContext *s, ADTSContext *ctx,
                                    uint8_t *buf, int size, int pce_size)
 {
     PutBitContext pb;
 
     unsigned full_frame_size = (unsigned)ADTS_HEADER_SIZE + size + pce_size;
     if (full_frame_size > ADTS_MAX_FRAME_BYTES) {
-        av_log(NULL, AV_LOG_ERROR, "ADTS frame size too large: %u (max %d)\n",
+        av_log(s, AV_LOG_ERROR, "frame size too large: %u (max %d)\n",
                full_frame_size, ADTS_MAX_FRAME_BYTES);
         return AVERROR_INVALIDDATA;
     }
@@ -190,7 +188,7 @@ static int adts_write_packet(AVFormatContext *s, AVPacket *pkt)
         }
     }
     if (adts->write_adts) {
-        int err = adts_write_frame_header(adts, buf, pkt->size,
+        int err = adts_write_frame_header(s, adts, buf, pkt->size,
                                              adts->pce_size);
         if (err < 0)
             return err;
@@ -231,18 +229,21 @@ static const AVClass adts_muxer_class = {
     .version        = LIBAVUTIL_VERSION_INT,
 };
 
-const AVOutputFormat ff_adts_muxer = {
-    .name              = "adts",
-    .long_name         = NULL_IF_CONFIG_SMALL("ADTS AAC (Advanced Audio Coding)"),
-    .mime_type         = "audio/aac",
-    .extensions        = "aac,adts",
+const FFOutputFormat ff_adts_muxer = {
+    .p.name            = "adts",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("ADTS AAC (Advanced Audio Coding)"),
+    .p.mime_type       = "audio/aac",
+    .p.extensions      = "aac,adts",
     .priv_data_size    = sizeof(ADTSContext),
-    .audio_codec       = AV_CODEC_ID_AAC,
-    .video_codec       = AV_CODEC_ID_NONE,
+    .p.audio_codec     = AV_CODEC_ID_AAC,
+    .p.video_codec     = AV_CODEC_ID_NONE,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH |
+                         FF_OFMT_FLAG_ONLY_DEFAULT_CODECS,
     .init              = adts_init,
     .write_header      = adts_write_header,
     .write_packet      = adts_write_packet,
     .write_trailer     = adts_write_trailer,
-    .priv_class        = &adts_muxer_class,
-    .flags             = AVFMT_NOTIMESTAMPS,
+    .p.priv_class      = &adts_muxer_class,
+    .p.flags           = AVFMT_NOTIMESTAMPS,
 };

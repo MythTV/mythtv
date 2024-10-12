@@ -30,7 +30,7 @@
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 static av_cold int sgirle_decode_init(AVCodecContext *avctx)
 {
@@ -115,6 +115,9 @@ static int sgirle_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 {
     int ret;
 
+    if (avpkt->size * 192ll / 2 < avctx->width * avctx->height)
+        return AVERROR_INVALIDDATA;
+
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
 
@@ -123,9 +126,6 @@ static int sgirle_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     if (ret < 0)
         return ret;
 
-    frame->pict_type = AV_PICTURE_TYPE_I;
-    frame->key_frame = 1;
-
     *got_frame = 1;
 
     return avpkt->size;
@@ -133,11 +133,10 @@ static int sgirle_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_sgirle_decoder = {
     .p.name         = "sgirle",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Silicon Graphics RLE 8-bit video"),
+    CODEC_LONG_NAME("Silicon Graphics RLE 8-bit video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_SGIRLE,
     .init           = sgirle_decode_init,
     FF_CODEC_DECODE_CB(sgirle_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

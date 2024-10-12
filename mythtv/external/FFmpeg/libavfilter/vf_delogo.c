@@ -33,8 +33,7 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/eval.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 static const char * const var_names[] = {
     "x",
@@ -287,6 +286,7 @@ static int config_input(AVFilterLink *inlink)
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
+    FilterLink *inl = ff_filter_link(inlink);
     DelogoContext *s = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
@@ -298,7 +298,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     AVRational sar;
     int ret;
 
-    s->var_values[VAR_N] = inlink->frame_count_out;
+    s->var_values[VAR_N] = inl->frame_count_out;
     s->var_values[VAR_T] = TS2T(in->pts, inlink->time_base);
     s->x = av_expr_eval(s->x_pexpr, s->var_values, s);
     s->y = av_expr_eval(s->y_pexpr, s->var_values, s);
@@ -381,13 +381,6 @@ static const AVFilterPad avfilter_vf_delogo_inputs[] = {
     },
 };
 
-static const AVFilterPad avfilter_vf_delogo_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_delogo = {
     .name          = "delogo",
     .description   = NULL_IF_CONFIG_SMALL("Remove logo from input video."),
@@ -396,7 +389,7 @@ const AVFilter ff_vf_delogo = {
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(avfilter_vf_delogo_inputs),
-    FILTER_OUTPUTS(avfilter_vf_delogo_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

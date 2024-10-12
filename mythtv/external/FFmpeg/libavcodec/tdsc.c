@@ -37,11 +37,12 @@
 #include <zlib.h>
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 #define BITMAPINFOHEADER_SIZE 0x28
 #define TDSF_HEADER_SIZE      0x56
@@ -127,7 +128,6 @@ static av_cold int tdsc_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     ctx->jpeg_avctx->flags = avctx->flags;
     ctx->jpeg_avctx->flags2 = avctx->flags2;
-    ctx->jpeg_avctx->dct_algo = avctx->dct_algo;
     ctx->jpeg_avctx->idct_algo = avctx->idct_algo;
     ret = avcodec_open2(ctx->jpeg_avctx, codec, NULL);
     if (ret < 0)
@@ -612,7 +612,7 @@ static int tdsc_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     /* Frame is ready to be output */
     if (keyframe) {
         frame->pict_type = AV_PICTURE_TYPE_I;
-        frame->key_frame = 1;
+        frame->flags |= AV_FRAME_FLAG_KEY;
     } else {
         frame->pict_type = AV_PICTURE_TYPE_P;
     }
@@ -623,7 +623,7 @@ static int tdsc_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_tdsc_decoder = {
     .p.name         = "tdsc",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("TDSC"),
+    CODEC_LONG_NAME("TDSC"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TDSC,
     .init           = tdsc_init,
@@ -631,6 +631,5 @@ const FFCodec ff_tdsc_decoder = {
     .close          = tdsc_close,
     .priv_data_size = sizeof(TDSCContext),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

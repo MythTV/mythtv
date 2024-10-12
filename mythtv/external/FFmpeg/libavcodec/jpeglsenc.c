@@ -26,6 +26,7 @@
  */
 
 #define UNCHECKED_BITSTREAM_READER 1
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "bytestream.h"
@@ -413,8 +414,6 @@ static int encode_picture_ls(AVCodecContext *avctx, AVPacket *pkt,
     /* End of image */
     put_marker_byteu(&pb, EOI);
 
-    emms_c();
-
     av_shrink_packet(pkt, bytestream2_tell_p(&pb));
     *got_packet = 1;
     return 0;
@@ -434,7 +433,7 @@ static av_cold int encode_jpegls_init(AVCodecContext *avctx)
         ctx->comps = 1;
     else
         ctx->comps = 3;
-    size = AV_INPUT_BUFFER_MIN_SIZE;
+    size = FF_INPUT_BUFFER_MIN_SIZE;
     /* INT_MAX due to PutBit-API. */
     if (avctx->width * (unsigned)avctx->height > (INT_MAX - size) / 4 / ctx->comps)
         return AVERROR(ERANGE);
@@ -458,10 +457,10 @@ static av_cold int encode_jpegls_close(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(JPEGLSContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-{ "pred", "Prediction method", OFFSET(pred), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 2, VE, "pred" },
-    { "left",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 0 }, INT_MIN, INT_MAX, VE, "pred" },
-    { "plane",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 1 }, INT_MIN, INT_MAX, VE, "pred" },
-    { "median", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 2 }, INT_MIN, INT_MAX, VE, "pred" },
+{ "pred", "Prediction method", OFFSET(pred), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 2, VE, .unit = "pred" },
+    { "left",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 0 }, INT_MIN, INT_MAX, VE, .unit = "pred" },
+    { "plane",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 1 }, INT_MIN, INT_MAX, VE, .unit = "pred" },
+    { "median", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 2 }, INT_MIN, INT_MAX, VE, .unit = "pred" },
 
     { NULL},
 };
@@ -475,10 +474,11 @@ static const AVClass jpegls_class = {
 
 const FFCodec ff_jpegls_encoder = {
     .p.name         = "jpegls",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("JPEG-LS"),
+    CODEC_LONG_NAME("JPEG-LS"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_JPEGLS,
-    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size = sizeof(JPEGLSContext),
     .p.priv_class   = &jpegls_class,
     .init           = encode_jpegls_init,
@@ -489,6 +489,5 @@ const FFCodec ff_jpegls_encoder = {
         AV_PIX_FMT_GRAY8, AV_PIX_FMT_GRAY16,
         AV_PIX_FMT_NONE
     },
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

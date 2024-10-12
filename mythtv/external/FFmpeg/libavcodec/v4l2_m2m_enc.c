@@ -103,17 +103,17 @@ static inline unsigned int v4l2_h264_profile_from_ff(int p)
         unsigned int ffmpeg_val;
         unsigned int v4l2_val;
     } profile[] = {
-        { FF_PROFILE_H264_CONSTRAINED_BASELINE, MPEG_VIDEO(H264_PROFILE_CONSTRAINED_BASELINE) },
-        { FF_PROFILE_H264_HIGH_444_PREDICTIVE, MPEG_VIDEO(H264_PROFILE_HIGH_444_PREDICTIVE) },
-        { FF_PROFILE_H264_HIGH_422_INTRA, MPEG_VIDEO(H264_PROFILE_HIGH_422_INTRA) },
-        { FF_PROFILE_H264_HIGH_444_INTRA, MPEG_VIDEO(H264_PROFILE_HIGH_444_INTRA) },
-        { FF_PROFILE_H264_HIGH_10_INTRA, MPEG_VIDEO(H264_PROFILE_HIGH_10_INTRA) },
-        { FF_PROFILE_H264_HIGH_422, MPEG_VIDEO(H264_PROFILE_HIGH_422) },
-        { FF_PROFILE_H264_BASELINE, MPEG_VIDEO(H264_PROFILE_BASELINE) },
-        { FF_PROFILE_H264_EXTENDED, MPEG_VIDEO(H264_PROFILE_EXTENDED) },
-        { FF_PROFILE_H264_HIGH_10, MPEG_VIDEO(H264_PROFILE_HIGH_10) },
-        { FF_PROFILE_H264_MAIN, MPEG_VIDEO(H264_PROFILE_MAIN) },
-        { FF_PROFILE_H264_HIGH, MPEG_VIDEO(H264_PROFILE_HIGH) },
+        { AV_PROFILE_H264_CONSTRAINED_BASELINE, MPEG_VIDEO(H264_PROFILE_CONSTRAINED_BASELINE) },
+        { AV_PROFILE_H264_HIGH_444_PREDICTIVE, MPEG_VIDEO(H264_PROFILE_HIGH_444_PREDICTIVE) },
+        { AV_PROFILE_H264_HIGH_422_INTRA, MPEG_VIDEO(H264_PROFILE_HIGH_422_INTRA) },
+        { AV_PROFILE_H264_HIGH_444_INTRA, MPEG_VIDEO(H264_PROFILE_HIGH_444_INTRA) },
+        { AV_PROFILE_H264_HIGH_10_INTRA, MPEG_VIDEO(H264_PROFILE_HIGH_10_INTRA) },
+        { AV_PROFILE_H264_HIGH_422, MPEG_VIDEO(H264_PROFILE_HIGH_422) },
+        { AV_PROFILE_H264_BASELINE, MPEG_VIDEO(H264_PROFILE_BASELINE) },
+        { AV_PROFILE_H264_EXTENDED, MPEG_VIDEO(H264_PROFILE_EXTENDED) },
+        { AV_PROFILE_H264_HIGH_10, MPEG_VIDEO(H264_PROFILE_HIGH_10) },
+        { AV_PROFILE_H264_MAIN, MPEG_VIDEO(H264_PROFILE_MAIN) },
+        { AV_PROFILE_H264_HIGH, MPEG_VIDEO(H264_PROFILE_HIGH) },
     };
     int i;
 
@@ -130,11 +130,11 @@ static inline int v4l2_mpeg4_profile_from_ff(int p)
         unsigned int ffmpeg_val;
         unsigned int v4l2_val;
     } profile[] = {
-        { FF_PROFILE_MPEG4_ADVANCED_CODING, MPEG_VIDEO(MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY) },
-        { FF_PROFILE_MPEG4_ADVANCED_SIMPLE, MPEG_VIDEO(MPEG4_PROFILE_ADVANCED_SIMPLE) },
-        { FF_PROFILE_MPEG4_SIMPLE_SCALABLE, MPEG_VIDEO(MPEG4_PROFILE_SIMPLE_SCALABLE) },
-        { FF_PROFILE_MPEG4_SIMPLE, MPEG_VIDEO(MPEG4_PROFILE_SIMPLE) },
-        { FF_PROFILE_MPEG4_CORE, MPEG_VIDEO(MPEG4_PROFILE_CORE) },
+        { AV_PROFILE_MPEG4_ADVANCED_CODING, MPEG_VIDEO(MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY) },
+        { AV_PROFILE_MPEG4_ADVANCED_SIMPLE, MPEG_VIDEO(MPEG4_PROFILE_ADVANCED_SIMPLE) },
+        { AV_PROFILE_MPEG4_SIMPLE_SCALABLE, MPEG_VIDEO(MPEG4_PROFILE_SIMPLE_SCALABLE) },
+        { AV_PROFILE_MPEG4_SIMPLE, MPEG_VIDEO(MPEG4_PROFILE_SIMPLE) },
+        { AV_PROFILE_MPEG4_CORE, MPEG_VIDEO(MPEG4_PROFILE_CORE) },
     };
     int i;
 
@@ -206,7 +206,7 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
 
     switch (avctx->codec_id) {
     case AV_CODEC_ID_H264:
-        if (avctx->profile != FF_PROFILE_UNKNOWN) {
+        if (avctx->profile != AV_PROFILE_UNKNOWN) {
             val = v4l2_h264_profile_from_ff(avctx->profile);
             if (val < 0)
                 av_log(avctx, AV_LOG_WARNING, "h264 profile not found\n");
@@ -219,7 +219,7 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
         qmax = 51;
         break;
     case AV_CODEC_ID_MPEG4:
-        if (avctx->profile != FF_PROFILE_UNKNOWN) {
+        if (avctx->profile != AV_PROFILE_UNKNOWN) {
             val = v4l2_mpeg4_profile_from_ff(avctx->profile);
             if (val < 0)
                 av_log(avctx, AV_LOG_WARNING, "mpeg4 profile not found\n");
@@ -423,7 +423,7 @@ static const FFCodecDefault v4l2_m2m_defaults[] = {
     M2MENC_CLASS(NAME, OPTIONS_NAME) \
     const FFCodec ff_ ## NAME ## _v4l2m2m_encoder = { \
         .p.name         = #NAME "_v4l2m2m" , \
-        .p.long_name    = NULL_IF_CONFIG_SMALL("V4L2 mem2mem " LONGNAME " encoder wrapper"), \
+        CODEC_LONG_NAME("V4L2 mem2mem " LONGNAME " encoder wrapper"), \
         .p.type         = AVMEDIA_TYPE_VIDEO, \
         .p.id           = CODEC , \
         .priv_data_size = sizeof(V4L2m2mPriv), \
@@ -433,7 +433,9 @@ static const FFCodecDefault v4l2_m2m_defaults[] = {
         .close          = v4l2_encode_close, \
         .defaults       = v4l2_m2m_defaults, \
         .p.capabilities = AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_DELAY, \
-        .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP, \
+        .color_ranges   = AVCOL_RANGE_MPEG, \
+        .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE | \
+                          FF_CODEC_CAP_INIT_CLEANUP, \
         .p.wrapper_name = "v4l2m2m", \
     }
 

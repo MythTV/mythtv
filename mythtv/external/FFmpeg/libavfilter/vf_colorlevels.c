@@ -18,13 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/imgutils.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "drawutils.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 #include "preserve_color.h"
 
@@ -74,14 +72,14 @@ static const AVOption colorlevels_options[] = {
     { "gomax", "set output green white point", OFFSET(range[G].out_max), AV_OPT_TYPE_DOUBLE, {.dbl=1},  0, 1, FLAGS },
     { "bomax", "set output blue white point",  OFFSET(range[B].out_max), AV_OPT_TYPE_DOUBLE, {.dbl=1},  0, 1, FLAGS },
     { "aomax", "set output alpha white point", OFFSET(range[A].out_max), AV_OPT_TYPE_DOUBLE, {.dbl=1},  0, 1, FLAGS },
-    { "preserve", "set preserve color mode",   OFFSET(preserve_color),   AV_OPT_TYPE_INT,    {.i64=0},  0, NB_PRESERVE-1, FLAGS, "preserve" },
-    { "none",  "disabled",                     0,                        AV_OPT_TYPE_CONST,  {.i64=P_NONE}, 0, 0, FLAGS, "preserve" },
-    { "lum",   "luminance",                    0,                        AV_OPT_TYPE_CONST,  {.i64=P_LUM},  0, 0, FLAGS, "preserve" },
-    { "max",   "max",                          0,                        AV_OPT_TYPE_CONST,  {.i64=P_MAX},  0, 0, FLAGS, "preserve" },
-    { "avg",   "average",                      0,                        AV_OPT_TYPE_CONST,  {.i64=P_AVG},  0, 0, FLAGS, "preserve" },
-    { "sum",   "sum",                          0,                        AV_OPT_TYPE_CONST,  {.i64=P_SUM},  0, 0, FLAGS, "preserve" },
-    { "nrm",   "norm",                         0,                        AV_OPT_TYPE_CONST,  {.i64=P_NRM},  0, 0, FLAGS, "preserve" },
-    { "pwr",   "power",                        0,                        AV_OPT_TYPE_CONST,  {.i64=P_PWR},  0, 0, FLAGS, "preserve" },
+    { "preserve", "set preserve color mode",   OFFSET(preserve_color),   AV_OPT_TYPE_INT,    {.i64=0},  0, NB_PRESERVE-1, FLAGS, .unit = "preserve" },
+    { "none",  "disabled",                     0,                        AV_OPT_TYPE_CONST,  {.i64=P_NONE}, 0, 0, FLAGS, .unit = "preserve" },
+    { "lum",   "luminance",                    0,                        AV_OPT_TYPE_CONST,  {.i64=P_LUM},  0, 0, FLAGS, .unit = "preserve" },
+    { "max",   "max",                          0,                        AV_OPT_TYPE_CONST,  {.i64=P_MAX},  0, 0, FLAGS, .unit = "preserve" },
+    { "avg",   "average",                      0,                        AV_OPT_TYPE_CONST,  {.i64=P_AVG},  0, 0, FLAGS, .unit = "preserve" },
+    { "sum",   "sum",                          0,                        AV_OPT_TYPE_CONST,  {.i64=P_SUM},  0, 0, FLAGS, .unit = "preserve" },
+    { "nrm",   "norm",                         0,                        AV_OPT_TYPE_CONST,  {.i64=P_NRM},  0, 0, FLAGS, .unit = "preserve" },
+    { "pwr",   "power",                        0,                        AV_OPT_TYPE_CONST,  {.i64=P_PWR},  0, 0, FLAGS, .unit = "preserve" },
     { NULL }
 };
 
@@ -97,11 +95,13 @@ typedef struct ThreadData {
 
     int h;
 
+    float fimin[4];
+    float fomin[4];
     int imin[4];
     int omin[4];
 } ThreadData;
 
-#define DO_COMMON(type, clip, preserve, planar)                                 \
+#define DO_COMMON(type, ptype, clip, preserve, planar)                          \
     const ThreadData *td = arg;                                                 \
     const int linesize = s->linesize;                                           \
     const int step = s->step;                                                   \
@@ -118,14 +118,14 @@ typedef struct ThreadData {
     type *dst_g = (type *)(td->dstrow[G]) + src_linesize * slice_start;         \
     type *dst_b = (type *)(td->dstrow[B]) + src_linesize * slice_start;         \
     type *dst_a = (type *)(td->dstrow[A]) + src_linesize * slice_start;         \
-    const int imin_r = td->imin[R];                                             \
-    const int imin_g = td->imin[G];                                             \
-    const int imin_b = td->imin[B];                                             \
-    const int imin_a = td->imin[A];                                             \
-    const int omin_r = td->omin[R];                                             \
-    const int omin_g = td->omin[G];                                             \
-    const int omin_b = td->omin[B];                                             \
-    const int omin_a = td->omin[A];                                             \
+    const ptype imin_r = s->depth == 32 ? td->fimin[R] : td->imin[R];           \
+    const ptype imin_g = s->depth == 32 ? td->fimin[G] : td->imin[G];           \
+    const ptype imin_b = s->depth == 32 ? td->fimin[B] : td->imin[B];           \
+    const ptype imin_a = s->depth == 32 ? td->fimin[A] : td->imin[A];           \
+    const ptype omin_r = s->depth == 32 ? td->fomin[R] : td->omin[R];           \
+    const ptype omin_g = s->depth == 32 ? td->fomin[G] : td->omin[G];           \
+    const ptype omin_b = s->depth == 32 ? td->fomin[B] : td->omin[B];           \
+    const ptype omin_a = s->depth == 32 ? td->fomin[A] : td->omin[A];           \
     const float coeff_r = td->coeff[R];                                         \
     const float coeff_g = td->coeff[G];                                         \
     const float coeff_b = td->coeff[B];                                         \
@@ -133,12 +133,12 @@ typedef struct ThreadData {
                                                                                 \
     for (int y = slice_start; y < slice_end; y++) {                             \
         for (int x = 0; x < linesize; x += step) {                              \
-            int ir, ig, ib, or, og, ob;                                         \
+            ptype ir, ig, ib, or, og, ob;                                       \
             ir = src_r[x];                                                      \
             ig = src_g[x];                                                      \
             ib = src_b[x];                                                      \
             if (preserve) {                                                     \
-                float ratio, icolor, ocolor, max = s->max;                      \
+                float ratio, icolor, ocolor, max = s->depth==32 ? 1.f : s->max; \
                                                                                 \
                 or = (ir - imin_r) * coeff_r + omin_r;                          \
                 og = (ig - imin_g) * coeff_g + omin_g;                          \
@@ -180,39 +180,40 @@ typedef struct ThreadData {
 
 #define CLIP8(x, depth) av_clip_uint8(x)
 #define CLIP16(x, depth) av_clip_uint16(x)
+#define NOCLIP(x, depth) (x)
 
 static int colorlevels_slice_8(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint8_t, CLIP8, 0, 0)
+    DO_COMMON(uint8_t, int, CLIP8, 0, 0)
     return 0;
 }
 
 static int colorlevels_slice_16(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;\
-    DO_COMMON(uint16_t, CLIP16, 0, 0)
+    DO_COMMON(uint16_t, int, CLIP16, 0, 0)
     return 0;
 }
 
 static int colorlevels_preserve_slice_8(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint8_t, CLIP8, 1, 0)
+    DO_COMMON(uint8_t, int, CLIP8, 1, 0)
     return 0;
 }
 
 static int colorlevels_preserve_slice_16(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint16_t, CLIP16, 1, 0)
+    DO_COMMON(uint16_t, int, CLIP16, 1, 0)
     return 0;
 }
 
 static int colorlevels_slice_8_planar(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint8_t, CLIP8, 0, 1)
+    DO_COMMON(uint8_t, int, CLIP8, 0, 1)
     return 0;
 }
 
@@ -220,7 +221,7 @@ static int colorlevels_slice_9_planar(AVFilterContext *ctx, void *arg, int jobnr
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 9;
-    DO_COMMON(uint16_t, av_clip_uintp2, 0, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 0, 1)
     return 0;
 }
 
@@ -228,7 +229,7 @@ static int colorlevels_slice_10_planar(AVFilterContext *ctx, void *arg, int jobn
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 10;
-    DO_COMMON(uint16_t, av_clip_uintp2, 0, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 0, 1)
     return 0;
 }
 
@@ -236,7 +237,7 @@ static int colorlevels_slice_12_planar(AVFilterContext *ctx, void *arg, int jobn
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 12;
-    DO_COMMON(uint16_t, av_clip_uintp2, 0, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 0, 1)
     return 0;
 }
 
@@ -244,21 +245,28 @@ static int colorlevels_slice_14_planar(AVFilterContext *ctx, void *arg, int jobn
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 14;
-    DO_COMMON(uint16_t, av_clip_uintp2, 0, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 0, 1)
     return 0;
 }
 
 static int colorlevels_slice_16_planar(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint16_t, CLIP16, 0, 1)
+    DO_COMMON(uint16_t, int, CLIP16, 0, 1)
+    return 0;
+}
+
+static int colorlevels_slice_32_planar(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
+{
+    ColorLevelsContext *s = ctx->priv;
+    DO_COMMON(float, float, NOCLIP, 0, 1)
     return 0;
 }
 
 static int colorlevels_preserve_slice_8_planar(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint8_t, CLIP8, 1, 1)
+    DO_COMMON(uint8_t, int, CLIP8, 1, 1)
     return 0;
 }
 
@@ -266,7 +274,7 @@ static int colorlevels_preserve_slice_9_planar(AVFilterContext *ctx, void *arg, 
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 9;
-    DO_COMMON(uint16_t, av_clip_uintp2, 1, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 1, 1)
     return 0;
 }
 
@@ -274,7 +282,7 @@ static int colorlevels_preserve_slice_10_planar(AVFilterContext *ctx, void *arg,
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 10;
-    DO_COMMON(uint16_t, av_clip_uintp2, 1, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 1, 1)
     return 0;
 }
 
@@ -282,7 +290,7 @@ static int colorlevels_preserve_slice_12_planar(AVFilterContext *ctx, void *arg,
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 12;
-    DO_COMMON(uint16_t, av_clip_uintp2, 1, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 1, 1)
     return 0;
 }
 
@@ -290,14 +298,21 @@ static int colorlevels_preserve_slice_14_planar(AVFilterContext *ctx, void *arg,
 {
     ColorLevelsContext *s = ctx->priv;
     const int depth = 14;
-    DO_COMMON(uint16_t, av_clip_uintp2, 1, 1)
+    DO_COMMON(uint16_t, int, av_clip_uintp2, 1, 1)
     return 0;
 }
 
 static int colorlevels_preserve_slice_16_planar(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ColorLevelsContext *s = ctx->priv;
-    DO_COMMON(uint16_t, CLIP16, 1, 1)
+    DO_COMMON(uint16_t, int, CLIP16, 1, 1)
+    return 0;
+}
+
+static int colorlevels_preserve_slice_32_planar(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
+{
+    ColorLevelsContext *s = ctx->priv;
+    DO_COMMON(float, float, NOCLIP, 1, 1)
     return 0;
 }
 
@@ -348,6 +363,10 @@ static int config_input(AVFilterLink *inlink)
         case 16:
             s->colorlevels_slice[0] = colorlevels_slice_16_planar;
             s->colorlevels_slice[1] = colorlevels_preserve_slice_16_planar;
+            break;
+        case 32:
+            s->colorlevels_slice[0] = colorlevels_slice_32_planar;
+            s->colorlevels_slice[1] = colorlevels_preserve_slice_32_planar;
             break;
         }
     }
@@ -479,6 +498,46 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
             td.omin[i]  = omin;
         }
         break;
+    case 4:
+        for (int i = 0; i < s->nb_comp; i++) {
+            Range *r = &s->range[i];
+            const uint8_t offset = s->rgba_map[i];
+            const uint8_t *srcrow = in->data[0];
+            float imin = r->in_min;
+            float imax = r->in_max;
+            float omin = r->out_min;
+            float omax = r->out_max;
+            float coeff;
+
+            if (imin < 0.f) {
+                imin = 1.f;
+                for (int y = 0; y < inlink->h; y++) {
+                    const float *src = (const float *)srcrow;
+
+                    for (int x = 0; x < s->linesize; x += step)
+                        imin = fminf(imin, src[x + offset]);
+                    srcrow += in->linesize[0];
+                }
+            }
+            if (imax < 0.f) {
+                srcrow = in->data[0];
+                imax = 0.f;
+                for (int y = 0; y < inlink->h; y++) {
+                    const float *src = (const float *)srcrow;
+
+                    for (int x = 0; x < s->linesize; x += step)
+                        imax = fmaxf(imax, src[x + offset]);
+                    srcrow += in->linesize[0];
+                }
+            }
+
+            coeff = (omax - omin) / (double)(imax - imin);
+
+            td.coeff[i] = coeff;
+            td.fimin[i] = imin;
+            td.fomin[i] = omin;
+        }
+        break;
     }
 
     ff_filter_execute(ctx, s->colorlevels_slice[s->preserve_color > 0], &td, NULL,
@@ -498,20 +557,13 @@ static const AVFilterPad colorlevels_inputs[] = {
     },
 };
 
-static const AVFilterPad colorlevels_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_colorlevels = {
     .name          = "colorlevels",
     .description   = NULL_IF_CONFIG_SMALL("Adjust the color levels."),
     .priv_size     = sizeof(ColorLevelsContext),
     .priv_class    = &colorlevels_class,
     FILTER_INPUTS(colorlevels_inputs),
-    FILTER_OUTPUTS(colorlevels_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS(AV_PIX_FMT_0RGB,   AV_PIX_FMT_0BGR,
                    AV_PIX_FMT_ARGB,   AV_PIX_FMT_ABGR,
                    AV_PIX_FMT_RGB0,   AV_PIX_FMT_BGR0,
@@ -524,7 +576,8 @@ const AVFilter ff_vf_colorlevels = {
                    AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRAP10,
                    AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRAP12,
                    AV_PIX_FMT_GBRP14,
-                   AV_PIX_FMT_GBRP16, AV_PIX_FMT_GBRAP16),
+                   AV_PIX_FMT_GBRP16, AV_PIX_FMT_GBRAP16,
+                   AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32),
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

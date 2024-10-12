@@ -21,11 +21,8 @@
 
 #include "libavutil/common.h"
 #include "libavutil/pixdesc.h"
-#include "libavutil/imgutils.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
-#include "video.h"
+#include "filters.h"
 #include "yadif.h"
 
 typedef struct ThreadData {
@@ -252,17 +249,6 @@ static void filter(AVFilterContext *ctx, AVFrame *dstpic,
         ff_filter_execute(ctx, filter_slice, &td, NULL,
                           FFMIN(h, ff_filter_get_nb_threads(ctx)));
     }
-
-    emms_c();
-}
-
-static av_cold void uninit(AVFilterContext *ctx)
-{
-    YADIFContext *yadif = ctx->priv;
-
-    av_frame_free(&yadif->prev);
-    av_frame_free(&yadif->cur );
-    av_frame_free(&yadif->next);
 }
 
 static const enum AVPixelFormat pix_fmts[] = {
@@ -287,19 +273,11 @@ static int config_output(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     YADIFContext *s = ctx->priv;
+    int ret;
 
-    outlink->time_base = av_mul_q(ctx->inputs[0]->time_base, (AVRational){1, 2});
-    outlink->w             = ctx->inputs[0]->w;
-    outlink->h             = ctx->inputs[0]->h;
-
-    if(s->mode & 1)
-        outlink->frame_rate = av_mul_q(ctx->inputs[0]->frame_rate,
-                                    (AVRational){2, 1});
-
-    if (outlink->w < 3 || outlink->h < 3) {
-        av_log(ctx, AV_LOG_ERROR, "Video of less than 3 columns or lines is not supported\n");
-        return AVERROR(EINVAL);
-    }
+    ret = ff_yadif_config_output_common(outlink);
+    if (ret < 0)
+        return ret;
 
     s->csp = av_pix_fmt_desc_get(outlink->format);
     s->filter = filter;
@@ -349,7 +327,7 @@ const AVFilter ff_vf_yadif = {
     .description   = NULL_IF_CONFIG_SMALL("Deinterlace the input image."),
     .priv_size     = sizeof(YADIFContext),
     .priv_class    = &yadif_class,
-    .uninit        = uninit,
+    .uninit        = ff_yadif_uninit,
     FILTER_INPUTS(avfilter_vf_yadif_inputs),
     FILTER_OUTPUTS(avfilter_vf_yadif_outputs),
     FILTER_PIXFMTS_ARRAY(pix_fmts),

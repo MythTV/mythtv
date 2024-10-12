@@ -27,8 +27,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+#include "libavutil/mem.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/internal.h"
+#include "decode.h"
 #include "v4l2_buffers.h"
 #include "v4l2_fmt.h"
 #include "v4l2_m2m.h"
@@ -327,9 +328,13 @@ start:
 
     /* 0. handle errors */
     if (pfd.revents & POLLERR) {
-        /* if we are trying to get free buffers but none have been queued yet
-           no need to raise a warning */
+        /* if we are trying to get free buffers but none have been queued yet,
+         * or if no buffers have been allocated yet, no need to raise a warning
+         */
         if (timeout == 0) {
+            if (!ctx->buffers)
+                return NULL;
+
             for (i = 0; i < ctx->num_buffers; i++) {
                 if (ctx->buffers[i].status != V4L2BUF_AVAILABLE)
                     av_log(logger(ctx), AV_LOG_WARNING, "%s POLLERR\n", ctx->name);

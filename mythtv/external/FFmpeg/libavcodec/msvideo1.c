@@ -26,8 +26,6 @@
  *   http://www.pcisys.net/~melanson/codecs/
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "libavutil/internal.h"
@@ -35,7 +33,6 @@
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "decode.h"
-#include "internal.h"
 
 #define PALETTE_COUNT 256
 #define CHECK_STREAM_PTR(n) \
@@ -315,7 +312,14 @@ static int msvideo1_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         return ret;
 
     if (s->mode_8bit) {
-        s->frame->palette_has_changed = ff_copy_palette(s->pal, avpkt, avctx);
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
+        s->frame->palette_has_changed =
+#endif
+        ff_copy_palette(s->pal, avpkt, avctx);
+#if FF_API_PALETTE_HAS_CHANGED
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     }
 
     if (s->mode_8bit)
@@ -343,7 +347,7 @@ static av_cold int msvideo1_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_msvideo1_decoder = {
     .p.name         = "msvideo1",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Microsoft Video 1"),
+    CODEC_LONG_NAME("Microsoft Video 1"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_MSVIDEO1,
     .priv_data_size = sizeof(Msvideo1Context),
@@ -351,5 +355,4 @@ const FFCodec ff_msvideo1_decoder = {
     .close          = msvideo1_decode_end,
     FF_CODEC_DECODE_CB(msvideo1_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

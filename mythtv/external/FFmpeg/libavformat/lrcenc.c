@@ -1,5 +1,5 @@
 /*
- * LRC lyrics file format decoder
+ * LRC lyrics file format muxer
  * Copyright (c) 2014 StarBrilliant <m13253@hotmail.com>
  *
  * This file is part of FFmpeg.
@@ -37,12 +37,6 @@ static int lrc_write_header(AVFormatContext *s)
 {
     const AVDictionaryEntry *metadata_item;
 
-    if(s->nb_streams != 1 ||
-       s->streams[0]->codecpar->codec_type != AVMEDIA_TYPE_SUBTITLE) {
-        av_log(s, AV_LOG_ERROR,
-               "LRC supports only a single subtitle stream.\n");
-        return AVERROR(EINVAL);
-    }
     if(s->streams[0]->codecpar->codec_id != AV_CODEC_ID_SUBRIP &&
        s->streams[0]->codecpar->codec_id != AV_CODEC_ID_TEXT) {
         av_log(s, AV_LOG_ERROR, "Unsupported subtitle codec: %s\n",
@@ -63,8 +57,7 @@ static int lrc_write_header(AVFormatContext *s)
         av_dict_set(&s->metadata, "ve", NULL, 0);
     }
     for(metadata_item = NULL;
-       (metadata_item = av_dict_get(s->metadata, "", metadata_item,
-                                    AV_DICT_IGNORE_SUFFIX));) {
+       (metadata_item = av_dict_iterate(s->metadata, metadata_item));) {
         char *delim;
         if(!metadata_item->value[0]) {
             continue;
@@ -105,7 +98,7 @@ static int lrc_write_packet(AVFormatContext *s, AVPacket *pkt)
                     size--;
                 next_line++;
             }
-            if(line[0] == '[') {
+            if (size && line[0] == '[') {
                 av_log(s, AV_LOG_WARNING,
                        "Subtitle starts with '[', may cause problems with LRC format.\n");
             }
@@ -126,14 +119,17 @@ static int lrc_write_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-const AVOutputFormat ff_lrc_muxer = {
-    .name           = "lrc",
-    .long_name      = NULL_IF_CONFIG_SMALL("LRC lyrics"),
-    .extensions     = "lrc",
+const FFOutputFormat ff_lrc_muxer = {
+    .p.name           = "lrc",
+    .p.long_name      = NULL_IF_CONFIG_SMALL("LRC lyrics"),
+    .p.extensions     = "lrc",
+    .p.flags          = AVFMT_VARIABLE_FPS | AVFMT_GLOBALHEADER |
+                        AVFMT_TS_NEGATIVE | AVFMT_TS_NONSTRICT,
+    .p.video_codec    = AV_CODEC_ID_NONE,
+    .p.audio_codec    = AV_CODEC_ID_NONE,
+    .p.subtitle_codec = AV_CODEC_ID_SUBRIP,
+    .flags_internal   = FF_OFMT_FLAG_MAX_ONE_OF_EACH,
     .priv_data_size = 0,
     .write_header   = lrc_write_header,
     .write_packet   = lrc_write_packet,
-    .flags          = AVFMT_VARIABLE_FPS | AVFMT_GLOBALHEADER |
-                      AVFMT_TS_NEGATIVE | AVFMT_TS_NONSTRICT,
-    .subtitle_codec = AV_CODEC_ID_SUBRIP
 };

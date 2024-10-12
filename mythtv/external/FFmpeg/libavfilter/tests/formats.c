@@ -19,6 +19,7 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavfilter/audio.h"
 #include "libavfilter/formats.c"
 
 #undef printf
@@ -118,9 +119,6 @@ int main(void)
         "65C",
         "5.1",
         "stereo",
-        "1+1+1+1",
-        "1c+1c+1c+1c",
-        "2c+1c",
         "0x3",
     };
 

@@ -27,8 +27,7 @@
 #include "libavutil/reverse.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
-#include "mathops.h"
+#include "decode.h"
 
 #define AES3_HEADER_LEN 4
 
@@ -212,11 +211,11 @@ static int s302m_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 #define FLAGS AV_OPT_FLAG_AUDIO_PARAM|AV_OPT_FLAG_DECODING_PARAM
 static const AVOption s302m_options[] = {
-    {"non_pcm_mode", "Chooses what to do with NON-PCM", offsetof(S302Context, non_pcm_mode), AV_OPT_TYPE_INT, {.i64 = 3}, 0, 3, FLAGS, "non_pcm_mode"},
-    {"copy"        , "Pass NON-PCM through unchanged"     , 0, AV_OPT_TYPE_CONST, {.i64 = 0}, 0, 3, FLAGS, "non_pcm_mode"},
-    {"drop"        , "Drop NON-PCM"                       , 0, AV_OPT_TYPE_CONST, {.i64 = 1}, 0, 3, FLAGS, "non_pcm_mode"},
-    {"decode_copy" , "Decode if possible else passthrough", 0, AV_OPT_TYPE_CONST, {.i64 = 2}, 0, 3, FLAGS, "non_pcm_mode"},
-    {"decode_drop" , "Decode if possible else drop"       , 0, AV_OPT_TYPE_CONST, {.i64 = 3}, 0, 3, FLAGS, "non_pcm_mode"},
+    {"non_pcm_mode", "Chooses what to do with NON-PCM", offsetof(S302Context, non_pcm_mode), AV_OPT_TYPE_INT, {.i64 = 3}, 0, 3, FLAGS, .unit = "non_pcm_mode"},
+    {"copy"        , "Pass NON-PCM through unchanged"     , 0, AV_OPT_TYPE_CONST, {.i64 = 0}, 0, 3, FLAGS, .unit = "non_pcm_mode"},
+    {"drop"        , "Drop NON-PCM"                       , 0, AV_OPT_TYPE_CONST, {.i64 = 1}, 0, 3, FLAGS, .unit = "non_pcm_mode"},
+    {"decode_copy" , "Decode if possible else passthrough", 0, AV_OPT_TYPE_CONST, {.i64 = 2}, 0, 3, FLAGS, .unit = "non_pcm_mode"},
+    {"decode_drop" , "Decode if possible else drop"       , 0, AV_OPT_TYPE_CONST, {.i64 = 3}, 0, 3, FLAGS, .unit = "non_pcm_mode"},
     {NULL}
 };
 
@@ -229,7 +228,7 @@ static const AVClass s302m_class = {
 
 const FFCodec ff_s302m_decoder = {
     .p.name         = "s302m",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("SMPTE 302M"),
+    CODEC_LONG_NAME("SMPTE 302M"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_S302M,
     .p.priv_class   = &s302m_class,

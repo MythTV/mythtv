@@ -12,7 +12,7 @@ FATE_LAVF_VIDEO-$(call ENCDEC, WRAPPED_AVFRAME RAWVIDEO, YUV4MPEGPIPE) += y4m
 FATE_LAVF_VIDEO-$(CONFIG_SCALE_FILTER) += $(FATE_LAVF_VIDEO_SCALE-yes)
 FATE_LAVF_VIDEO = $(FATE_LAVF_VIDEO-yes:%=fate-lavf-%)
 FATE_LAVF_VIDEO := $(if $(call ALLYES, IMAGE2_DEMUXER PGMYUV_DECODER \
-                                       RAWVIDEO_ENCODER CRC_MUXER),  \
+                                       RAWVIDEO_ENCODER CRC_MUXER, PIPE_PROTOCOL), \
                         $(FATE_LAVF_VIDEO))
 
 $(FATE_LAVF_VIDEO): CMD = lavf_video
@@ -27,7 +27,7 @@ fate-lavf-gbrp.fits: CMD = lavf_video "-pix_fmt gbrp"
 fate-lavf-gbrap.fits: CMD = lavf_video "-pix_fmt gbrap"
 fate-lavf-gbrp16be.fits: CMD = lavf_video "-pix_fmt gbrp16be"
 fate-lavf-gbrap16be.fits: CMD = lavf_video "-pix_fmt gbrap16be"
-fate-lavf-gif: CMD = lavf_video "-pix_fmt rgb24"
+fate-lavf-gif: CMD = lavf_video "-pix_fmt rgb8"
 
 FATE_AVCONV += $(FATE_LAVF_VIDEO)
 fate-lavf-video fate-lavf: $(FATE_LAVF_VIDEO)

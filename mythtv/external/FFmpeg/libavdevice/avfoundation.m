@@ -29,9 +29,11 @@
 #include <pthread.h>
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "libavutil/avstring.h"
+#include "libavformat/demux.h"
 #include "libavformat/internal.h"
 #include "libavutil/internal.h"
 #include "libavutil/parseutils.h"
@@ -706,8 +708,7 @@ static int get_audio_config(AVFormatContext *s)
 
     stream->codecpar->codec_type     = AVMEDIA_TYPE_AUDIO;
     stream->codecpar->sample_rate    = basic_desc->mSampleRate;
-    stream->codecpar->channels       = basic_desc->mChannelsPerFrame;
-    stream->codecpar->channel_layout = av_get_default_channel_layout(stream->codecpar->channels);
+    av_channel_layout_default(&stream->codecpar->ch_layout, basic_desc->mChannelsPerFrame);
 
     ctx->audio_channels        = basic_desc->mChannelsPerFrame;
     ctx->audio_bits_per_sample = basic_desc->mBitsPerChannel;
@@ -762,6 +763,64 @@ static int get_audio_config(AVFormatContext *s)
     return 0;
 }
 
+static NSArray* getDevicesWithMediaType(AVMediaType mediaType) {
+#if ((TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 100000) || (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500))
+    NSMutableArray *deviceTypes = nil;
+    if (mediaType == AVMediaTypeVideo) {
+        deviceTypes = [NSMutableArray arrayWithArray:@[AVCaptureDeviceTypeBuiltInWideAngleCamera]];
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 100000)
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInDualCamera];
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInTelephotoCamera];
+        #endif
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 110100)
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInTrueDepthCamera];
+        #endif
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 130000)
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInTripleCamera];
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInDualWideCamera];
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInUltraWideCamera];
+        #endif
+        #if (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 130000)
+            [deviceTypes addObject: AVCaptureDeviceTypeDeskViewCamera];
+        #endif
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 150400)
+            [deviceTypes addObject: AVCaptureDeviceTypeBuiltInLiDARDepthCamera];
+        #endif
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 170000 || (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000))
+            [deviceTypes addObject: AVCaptureDeviceTypeContinuityCamera];
+            [deviceTypes addObject: AVCaptureDeviceTypeExternal];
+        #elif (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED < 140000)
+            [deviceTypes addObject: AVCaptureDeviceTypeExternalUnknown];
+        #endif
+    } else if (mediaType == AVMediaTypeAudio) {
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 170000 || (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000))
+            deviceTypes = [NSMutableArray arrayWithArray:@[AVCaptureDeviceTypeMicrophone]];
+        #else
+            deviceTypes = [NSMutableArray arrayWithArray:@[AVCaptureDeviceTypeBuiltInMicrophone]];
+        #endif
+    } else if (mediaType == AVMediaTypeMuxed) {
+        #if (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED >= 170000 || (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000))
+            deviceTypes = [NSMutableArray arrayWithArray:@[AVCaptureDeviceTypeExternal]];
+        #elif (TARGET_OS_OSX && __MAC_OS_X_VERSION_MIN_REQUIRED < 140000)
+            deviceTypes = [NSMutableArray arrayWithArray:@[AVCaptureDeviceTypeExternalUnknown]];
+        #else
+            return nil;
+        #endif
+    } else {
+        return nil;
+    }
+
+    AVCaptureDeviceDiscoverySession *captureDeviceDiscoverySession =
+        [AVCaptureDeviceDiscoverySession
+        discoverySessionWithDeviceTypes:deviceTypes
+                              mediaType:mediaType
+                               position:AVCaptureDevicePositionUnspecified];
+    return [captureDeviceDiscoverySession devices];
+#else
+    return [AVCaptureDevice devicesWithMediaType:mediaType];
+#endif
+}
+
 static int avf_read_header(AVFormatContext *s)
 {
     int ret = 0;
@@ -771,8 +830,8 @@ static int avf_read_header(AVFormatContext *s)
     AVCaptureDevice *video_device = nil;
     AVCaptureDevice *audio_device = nil;
     // Find capture device
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    NSArray *devices_muxed = [AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed];
+    NSArray *devices       = getDevicesWithMediaType(AVMediaTypeVideo);
+    NSArray *devices_muxed = getDevicesWithMediaType(AVMediaTypeMuxed);
 
     ctx->num_video_devices = [devices count] + [devices_muxed count];
 
@@ -807,7 +866,7 @@ static int avf_read_header(AVFormatContext *s)
 #endif
 
         av_log(ctx, AV_LOG_INFO, "AVFoundation audio devices:\n");
-        devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio];
+        devices = getDevicesWithMediaType(AVMediaTypeAudio);
         for (AVCaptureDevice *device in devices) {
             const char *name = [[device localizedName] UTF8String];
             int index  = [devices indexOfObject:device];
@@ -931,7 +990,7 @@ static int avf_read_header(AVFormatContext *s)
 
     // get audio device
     if (ctx->audio_device_index >= 0) {
-        NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio];
+        NSArray *devices = getDevicesWithMediaType(AVMediaTypeAudio);
 
         if (ctx->audio_device_index >= [devices count]) {
             av_log(ctx, AV_LOG_ERROR, "Invalid audio device index\n");
@@ -944,7 +1003,7 @@ static int avf_read_header(AVFormatContext *s)
         if (!strncmp(ctx->audio_filename, "default", 7)) {
             audio_device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
         } else {
-        NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio];
+        NSArray *devices = getDevicesWithMediaType(AVMediaTypeAudio);
 
         for (AVCaptureDevice *device in devices) {
             if (!strncmp(ctx->audio_filename, [[device localizedName] UTF8String], strlen(ctx->audio_filename))) {
@@ -1238,13 +1297,13 @@ static const AVClass avf_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
-const AVInputFormat ff_avfoundation_demuxer = {
-    .name           = "avfoundation",
-    .long_name      = NULL_IF_CONFIG_SMALL("AVFoundation input device"),
+const FFInputFormat ff_avfoundation_demuxer = {
+    .p.name         = "avfoundation",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("AVFoundation input device"),
+    .p.flags        = AVFMT_NOFILE,
+    .p.priv_class   = &avf_class,
     .priv_data_size = sizeof(AVFContext),
     .read_header    = avf_read_header,
     .read_packet    = avf_read_packet,
     .read_close     = avf_close,
-    .flags          = AVFMT_NOFILE,
-    .priv_class     = &avf_class,
 };

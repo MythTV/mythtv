@@ -27,6 +27,7 @@
 #include "config_components.h"
 
 #include "avcodec.h"
+#include "avcodec_internal.h"
 #include "codec_internal.h"
 #include "libavutil/avassert.h"
 #include "libavutil/internal.h"
@@ -124,7 +125,6 @@ static int init_context_defaults(AVCodecContext *s, const AVCodec *codec)
     s->sw_pix_fmt          = AV_PIX_FMT_NONE;
     s->sample_fmt          = AV_SAMPLE_FMT_NONE;
 
-    s->reordered_opaque    = AV_NOPTS_VALUE;
     if(codec && codec2->priv_data_size){
         s->priv_data = av_mallocz(codec2->priv_data_size);
         if (!s->priv_data)
@@ -168,11 +168,12 @@ void avcodec_free_context(AVCodecContext **pavctx)
     if (!avctx)
         return;
 
-    avcodec_close(avctx);
+    ff_codec_close(avctx);
 
     av_freep(&avctx->extradata);
     av_freep(&avctx->subtitle_header);
     av_freep(&avctx->intra_matrix);
+    av_freep(&avctx->chroma_intra_matrix);
     av_freep(&avctx->inter_matrix);
     av_freep(&avctx->rc_override);
     av_channel_layout_uninit(&avctx->ch_layout);
@@ -185,39 +186,6 @@ const AVClass *avcodec_get_class(void)
     return &av_codec_context_class;
 }
 
-#if FF_API_GET_FRAME_CLASS
-FF_DISABLE_DEPRECATION_WARNINGS
-#define FOFFSET(x) offsetof(AVFrame,x)
-
-static const AVOption frame_options[]={
-{"best_effort_timestamp", "", FOFFSET(best_effort_timestamp), AV_OPT_TYPE_INT64, {.i64 = AV_NOPTS_VALUE }, INT64_MIN, INT64_MAX, 0},
-{"pkt_pos", "", FOFFSET(pkt_pos), AV_OPT_TYPE_INT64, {.i64 = -1 }, INT64_MIN, INT64_MAX, 0},
-{"pkt_size", "", FOFFSET(pkt_size), AV_OPT_TYPE_INT64, {.i64 = -1 }, INT64_MIN, INT64_MAX, 0},
-{"sample_aspect_ratio", "", FOFFSET(sample_aspect_ratio), AV_OPT_TYPE_RATIONAL, {.dbl = 0 }, 0, INT_MAX, 0},
-{"width", "", FOFFSET(width), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
-{"height", "", FOFFSET(height), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
-{"format", "", FOFFSET(format), AV_OPT_TYPE_INT, {.i64 = -1 }, 0, INT_MAX, 0},
-#if FF_API_OLD_CHANNEL_LAYOUT
-{"channel_layout", "", FOFFSET(channel_layout), AV_OPT_TYPE_INT64, {.i64 = 0 }, 0, INT64_MAX, 0},
-#endif
-{"sample_rate", "", FOFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
-{NULL},
-};
-
-static const AVClass av_frame_class = {
-    .class_name              = "AVFrame",
-    .item_name               = NULL,
-    .option                  = frame_options,
-    .version                 = LIBAVUTIL_VERSION_INT,
-};
-
-const AVClass *avcodec_get_frame_class(void)
-{
-    return &av_frame_class;
-}
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
 #define SROFFSET(x) offsetof(AVSubtitleRect,x)
 
 static const AVOption subtitle_rect_options[]={
@@ -226,7 +194,7 @@ static const AVOption subtitle_rect_options[]={
 {"w", "", SROFFSET(w), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
 {"h", "", SROFFSET(h), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
 {"type", "", SROFFSET(type), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, 0},
-{"flags", "", SROFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64 = 0}, 0, 1, 0, "flags"},
+{"flags", "", SROFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64 = 0}, 0, 1, 0, .unit = "flags"},
 {"forced", "", SROFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64 = 0}, 0, 1, 0},
 {NULL},
 };

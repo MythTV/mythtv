@@ -23,6 +23,7 @@
 #include "avcodec.h"
 #include "nvdec.h"
 #include "decode.h"
+#include "hwaccel_internal.h"
 #include "internal.h"
 #include "vp8.h"
 
@@ -39,7 +40,7 @@ static int nvdec_vp8_start_frame(AVCodecContext *avctx, const uint8_t *buffer, u
     CUVIDPICPARAMS     *pp = &ctx->pic_params;
     FrameDecodeData *fdd;
     NVDECFrame *cf;
-    AVFrame *cur_frame = h->framep[VP56_FRAME_CURRENT]->tf.f;
+    AVFrame *cur_frame = h->framep[VP8_FRAME_CURRENT]->tf.f;
 
     int ret;
 
@@ -61,9 +62,9 @@ static int nvdec_vp8_start_frame(AVCodecContext *avctx, const uint8_t *buffer, u
 
             .first_partition_size        = h->header_partition_size,
 
-            .LastRefIdx                  = safe_get_ref_idx(h->framep[VP56_FRAME_PREVIOUS]),
-            .GoldenRefIdx                = safe_get_ref_idx(h->framep[VP56_FRAME_GOLDEN]),
-            .AltRefIdx                   = safe_get_ref_idx(h->framep[VP56_FRAME_GOLDEN2]),
+            .LastRefIdx                  = safe_get_ref_idx(h->framep[VP8_FRAME_PREVIOUS]),
+            .GoldenRefIdx                = safe_get_ref_idx(h->framep[VP8_FRAME_GOLDEN]),
+            .AltRefIdx                   = safe_get_ref_idx(h->framep[VP8_FRAME_ALTREF]),
             /*
              * Explicit braces for anonymous inners and unnamed fields
              * to work around limitations in ancient versions of gcc.
@@ -90,11 +91,11 @@ static int nvdec_vp8_frame_params(AVCodecContext *avctx,
     return ff_nvdec_frame_params(avctx, hw_frames_ctx, 3, 0);
 }
 
-AVHWAccel ff_vp8_nvdec_hwaccel = {
-    .name                 = "vp8_nvdec",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_VP8,
-    .pix_fmt              = AV_PIX_FMT_CUDA,
+const FFHWAccel ff_vp8_nvdec_hwaccel = {
+    .p.name               = "vp8_nvdec",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_VP8,
+    .p.pix_fmt            = AV_PIX_FMT_CUDA,
     .start_frame          = nvdec_vp8_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = ff_nvdec_simple_decode_slice,

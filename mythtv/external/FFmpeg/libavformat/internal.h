@@ -23,11 +23,9 @@
 
 #include <stdint.h>
 
-#include "libavcodec/avcodec.h"
 #include "libavcodec/packet_internal.h"
 
 #include "avformat.h"
-#include "os_support.h"
 
 #define MAX_URL_SIZE 4096
 
@@ -40,12 +38,6 @@
 #else
 #    define hex_dump_debug(class, buf, size) do { if (0) av_hex_dump_log(class, AV_LOG_DEBUG, buf, size); } while(0)
 #endif
-
-/**
- * For an AVInputFormat with this flag set read_close() needs to be called
- * by the caller upon read_header() failure.
- */
-#define FF_FMT_INIT_CLEANUP                             (1 << 0)
 
 typedef struct AVCodecTag {
     enum AVCodecID id;
@@ -149,14 +141,18 @@ typedef struct FFFormatContext {
     int missing_ts_warning;
 #endif
 
+#if FF_API_AVSTREAM_SIDE_DATA
     int inject_global_side_data;
+#endif
 
     int avoid_negative_ts_use_pts;
 
+#if FF_API_LAVF_SHORTEST
     /**
      * Timestamp of the end of the shortest stream.
      */
     int64_t shortest_end;
+#endif
 
     /**
      * Whether or not avformat_init_output has already been called
@@ -200,6 +196,7 @@ typedef struct FFStream {
      */
     AVStream pub;
 
+    AVFormatContext *fmtctx;
     /**
      * Set to 1 if the codec allows reordering, so pts can be different
      * from dts.
@@ -221,7 +218,7 @@ typedef struct FFStream {
     /**
      * The codec context used by avformat_find_stream_info, the parser, etc.
      */
-    AVCodecContext *avctx;
+    struct AVCodecContext *avctx;
     /**
      * 1 if avctx has been initialized with the values from the codec parameters
      */
@@ -242,7 +239,7 @@ typedef struct FFStream {
 
     int is_intra_only;
 
-    FFFrac *priv_pts;
+    FFFrac priv_pts;
 
     /**
      * Stream information used internally by avformat_find_stream_info()
@@ -311,6 +308,13 @@ typedef struct FFStream {
     int64_t mux_ts_offset;
 
     /**
+     * This is the lowest ts allowed in this track; it may be set by the muxer
+     * during init or write_header and influences the automatic timestamp
+     * shifting code.
+     */
+    int64_t lowest_ts_allowed;
+
+    /**
      * Internal data to check for wrapping of the time stamp
      */
     int64_t pts_wrap_reference;
@@ -349,10 +353,12 @@ typedef struct FFStream {
     uint8_t dts_ordered;
     uint8_t dts_misordered;
 
+#if FF_API_AVSTREAM_SIDE_DATA
     /**
      * Internal data to inject global side data
      */
     int inject_global_side_data;
+#endif
 
     /**
      * display aspect ratio (0 if unknown)
@@ -402,6 +408,12 @@ typedef struct FFStream {
      */
     int64_t first_dts;
     int64_t cur_dts;
+
+    const struct AVCodecDescriptor *codec_desc;
+
+#if FF_API_INTERNAL_TIMING
+    AVRational transferred_mux_tb;
+#endif
 } FFStream;
 
 static av_always_inline FFStream *ffstream(AVStream *st)
@@ -411,7 +423,27 @@ static av_always_inline FFStream *ffstream(AVStream *st)
 
 static av_always_inline const FFStream *cffstream(const AVStream *st)
 {
-    return (FFStream*)st;
+    return (const FFStream*)st;
+}
+
+typedef struct FFStreamGroup {
+    /**
+     * The public context.
+     */
+    AVStreamGroup pub;
+
+    AVFormatContext *fmtctx;
+} FFStreamGroup;
+
+
+static av_always_inline FFStreamGroup *ffstreamgroup(AVStreamGroup *stg)
+{
+    return (FFStreamGroup*)stg;
+}
+
+static av_always_inline const FFStreamGroup *cffstreamgroup(const AVStreamGroup *stg)
+{
+    return (const FFStreamGroup*)stg;
 }
 
 #ifdef __GNUC__
@@ -559,8 +591,8 @@ void ff_parse_key_value(const char *str, ff_parse_key_val_cb callback_get_buf,
 
 enum AVCodecID ff_guess_image2_codec(const char *filename);
 
-const AVCodec *ff_find_decoder(AVFormatContext *s, const AVStream *st,
-                               enum AVCodecID codec_id);
+const struct AVCodec *ff_find_decoder(AVFormatContext *s, const AVStream *st,
+                                      enum AVCodecID codec_id);
 
 /**
  * Set the time base and wrapping info for a given stream. This will be used
@@ -595,6 +627,18 @@ void ff_free_stream(AVStream **st);
  */
 void ff_remove_stream(AVFormatContext *s, AVStream *st);
 
+/**
+ * Frees a stream group without modifying the corresponding AVFormatContext.
+ * Must only be called if the latter doesn't matter or if the stream
+ * is not yet attached to an AVFormatContext.
+ */
+void ff_free_stream_group(AVStreamGroup **pstg);
+/**
+ * Remove a stream group from its AVFormatContext and free it.
+ * The stream group must be the last stream group of the AVFormatContext.
+ */
+void ff_remove_stream_group(AVFormatContext *s, AVStreamGroup *stg);
+
 unsigned int ff_codec_get_tag(const AVCodecTag *tags, enum AVCodecID id);
 
 enum AVCodecID ff_codec_get_id(const AVCodecTag *tags, unsigned int tag);
@@ -624,6 +668,17 @@ enum AVCodecID ff_get_pcm_codec_id(int bps, int flt, int be, int sflags);
  * @return >=0 on success, AVERROR code on error
  */
 int ff_stream_side_data_copy(AVStream *dst, const AVStream *src);
+
+/**
+ * Create a new stream and copy to it all parameters from a source stream, with
+ * the exception of the index field, which is set when the new stream is
+ * created.
+ *
+ * @param dst_ctx pointer to the context in which the new stream is created
+ * @param src pointer to source AVStream
+ * @return pointer to the new stream or NULL on error
+ */
+AVStream *ff_stream_clone(AVFormatContext *dst_ctx, const AVStream *src);
 
 /**
  * Wrap ffurl_move() and log if error happens.
@@ -660,10 +715,6 @@ int ff_copy_whiteblacklists(AVFormatContext *dst, const AVFormatContext *src);
  */
 int ff_format_io_close(AVFormatContext *s, AVIOContext **pb);
 
-/* Default io_close callback, not to be used directly, use ff_format_io_close
- * instead. */
-void ff_format_io_close_default(AVFormatContext *s, AVIOContext *pb);
-
 /**
  * Utility function to check if the file uses http or https protocol
  *
@@ -678,9 +729,6 @@ struct AVBPrint;
  */
 int ff_bprint_to_codecpar_extradata(AVCodecParameters *par, struct AVBPrint *buf);
 
-int ff_lock_avformat(void);
-int ff_unlock_avformat(void);
-
 /**
  * Set AVFormatContext url field to the provided pointer. The pointer must
  * point to a valid string. The existing url field is freed if necessary. Also
@@ -688,6 +736,34 @@ int ff_unlock_avformat(void);
  */
 void ff_format_set_url(AVFormatContext *s, char *url);
 
-void avpriv_register_devices(const AVOutputFormat * const o[], const AVInputFormat * const i[]);
+/**
+ * Return a positive value if the given url has one of the given
+ * extensions, negative AVERROR on error, 0 otherwise.
+ *
+ * @param url        url to check against the given extensions
+ * @param extensions a comma-separated list of filename extensions
+ */
+int ff_match_url_ext(const char *url, const char *extensions);
+
+/**
+ * Return in 'buf' the path with '%d' replaced by a number.
+ *
+ * Also handles the '%0nd' format where 'n' is the total number
+ * of digits and '%%'.
+ *
+ * @param buf destination buffer
+ * @param buf_size destination buffer size
+ * @param path path with substitution template
+ * @param number the number to substitute
+ * @param flags AV_FRAME_FILENAME_FLAGS_*
+ * @return 0 if OK, -1 on format error
+ */
+int ff_get_frame_filename(char *buf, int buf_size, const char *path,
+                          int64_t number, int flags);
+
+struct FFOutputFormat;
+struct FFInputFormat;
+void avpriv_register_devices(const struct FFOutputFormat * const o[],
+                             const struct FFInputFormat * const i[]);
 
 #endif /* AVFORMAT_INTERNAL_H */

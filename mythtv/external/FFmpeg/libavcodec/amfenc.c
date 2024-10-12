@@ -36,6 +36,57 @@
 #include "amfenc.h"
 #include "encode.h"
 #include "internal.h"
+#include "libavutil/mastering_display_metadata.h"
+
+static int amf_save_hdr_metadata(AVCodecContext *avctx, const AVFrame *frame, AMFHDRMetadata *hdrmeta)
+{
+    AVFrameSideData            *sd_display;
+    AVFrameSideData            *sd_light;
+    AVMasteringDisplayMetadata *display_meta;
+    AVContentLightMetadata     *light_meta;
+
+    sd_display = av_frame_get_side_data(frame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+    if (sd_display) {
+        display_meta = (AVMasteringDisplayMetadata *)sd_display->data;
+        if (display_meta->has_luminance) {
+            const unsigned int luma_den = 10000;
+            hdrmeta->maxMasteringLuminance =
+                (amf_uint32)(luma_den * av_q2d(display_meta->max_luminance));
+            hdrmeta->minMasteringLuminance =
+                FFMIN((amf_uint32)(luma_den * av_q2d(display_meta->min_luminance)), hdrmeta->maxMasteringLuminance);
+        }
+        if (display_meta->has_primaries) {
+            const unsigned int chroma_den = 50000;
+            hdrmeta->redPrimary[0] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[0][0])), chroma_den);
+            hdrmeta->redPrimary[1] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[0][1])), chroma_den);
+            hdrmeta->greenPrimary[0] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[1][0])), chroma_den);
+            hdrmeta->greenPrimary[1] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[1][1])), chroma_den);
+            hdrmeta->bluePrimary[0] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[2][0])), chroma_den);
+            hdrmeta->bluePrimary[1] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[2][1])), chroma_den);
+            hdrmeta->whitePoint[0] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->white_point[0])), chroma_den);
+            hdrmeta->whitePoint[1] =
+                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->white_point[1])), chroma_den);
+        }
+
+        sd_light = av_frame_get_side_data(frame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+        if (sd_light) {
+            light_meta = (AVContentLightMetadata *)sd_light->data;
+            if (light_meta) {
+                hdrmeta->maxContentLightLevel = (amf_uint16)light_meta->MaxCLL;
+                hdrmeta->maxFrameAverageLightLevel = (amf_uint16)light_meta->MaxFALL;
+            }
+        }
+        return 0;
+    }
+    return 1;
+}
 
 #if CONFIG_D3D11VA
 #include <d3d11.h>
@@ -60,6 +111,7 @@ const enum AVPixelFormat ff_amf_pix_fmts[] = {
 #if CONFIG_DXVA2
     AV_PIX_FMT_DXVA2_VLD,
 #endif
+    AV_PIX_FMT_P010,
     AV_PIX_FMT_NONE
 };
 
@@ -72,6 +124,7 @@ static const FormatMap format_map[] =
 {
     { AV_PIX_FMT_NONE,       AMF_SURFACE_UNKNOWN },
     { AV_PIX_FMT_NV12,       AMF_SURFACE_NV12 },
+    { AV_PIX_FMT_P010,       AMF_SURFACE_P010 },
     { AV_PIX_FMT_BGR0,       AMF_SURFACE_BGRA },
     { AV_PIX_FMT_RGB0,       AMF_SURFACE_RGBA },
     { AV_PIX_FMT_GRAY8,      AMF_SURFACE_GRAY8 },
@@ -349,6 +402,9 @@ static int amf_init_encoder(AVCodecContext *avctx)
         case AV_CODEC_ID_HEVC:
             codec_id = AMFVideoEncoder_HEVC;
             break;
+        case AV_CODEC_ID_AV1 :
+            codec_id = AMFVideoEncoder_AV1;
+            break;
         default:
             break;
     }
@@ -358,6 +414,10 @@ static int amf_init_encoder(AVCodecContext *avctx)
         pix_fmt = ((AVHWFramesContext*)ctx->hw_frames_ctx->data)->sw_format;
     else
         pix_fmt = avctx->pix_fmt;
+
+    if (pix_fmt == AV_PIX_FMT_P010) {
+        AMF_RETURN_IF_FALSE(ctx, ctx->version >= AMF_MAKE_FULL_VERSION(1, 4, 32, 0), AVERROR_UNKNOWN, "10-bit encoder is not supported by AMD GPU drivers versions lower than 23.30.\n");
+    }
 
     ctx->format = amf_av_to_amf_format(pix_fmt);
     AMF_RETURN_IF_FALSE(ctx, ctx->format != AMF_SURFACE_UNKNOWN, AVERROR(EINVAL),
@@ -427,9 +487,9 @@ static int amf_copy_surface(AVCodecContext *avctx, const AVFrame *frame,
         dst_data[i] = plane->pVtbl->GetNative(plane);
         dst_linesize[i] = plane->pVtbl->GetHPitch(plane);
     }
-    av_image_copy(dst_data, dst_linesize,
-        (const uint8_t**)frame->data, frame->linesize, frame->format,
-        avctx->width, avctx->height);
+    av_image_copy2(dst_data, dst_linesize,
+                   frame->data, frame->linesize, frame->format,
+                   avctx->width, avctx->height);
 
     return 0;
 }
@@ -460,6 +520,11 @@ static int amf_copy_buffer(AVCodecContext *avctx, AVPacket *pkt, AMFBuffer *buff
                 pkt->flags = AV_PKT_FLAG_KEY;
             }
             break;
+        case AV_CODEC_ID_AV1:
+            buffer->pVtbl->GetProperty(buffer, AMF_VIDEO_ENCODER_AV1_OUTPUT_FRAME_TYPE, &var);
+            if (var.int64Value == AMF_VIDEO_ENCODER_AV1_OUTPUT_FRAME_TYPE_KEY) {
+                pkt->flags = AV_PKT_FLAG_KEY;
+            }
         default:
             break;
     }
@@ -473,7 +538,7 @@ static int amf_copy_buffer(AVCodecContext *avctx, AVPacket *pkt, AMFBuffer *buff
                         AVERROR_UNKNOWN, "timestamp_list is empty\n");
 
     // calc dts shift if max_b_frames > 0
-    if (avctx->max_b_frames > 0 && ctx->dts_delay == 0) {
+    if ((ctx->max_b_frames > 0 || ((ctx->pa_adaptive_mini_gop == 1) ? true : false)) && ctx->dts_delay == 0) {
         int64_t timestamp_last = AV_NOPTS_VALUE;
         size_t can_read = av_fifo_can_read(ctx->timestamp_list);
 
@@ -585,6 +650,8 @@ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt)
     AMFData    *data = NULL;
     AVFrame    *frame = ctx->delayed_frame;
     int         block_and_wait;
+    int         query_output_data_flag = 0;
+    AMF_RESULT  res_resubmit;
 
     if (!ctx->encoder)
         return AVERROR(EINVAL);
@@ -671,6 +738,28 @@ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt)
             frame_ref_storage_buffer->pVtbl->Release(frame_ref_storage_buffer);
         }
 
+        // HDR10 metadata
+        if (frame->color_trc == AVCOL_TRC_SMPTE2084) {
+            AMFBuffer * hdrmeta_buffer = NULL;
+            res = ctx->context->pVtbl->AllocBuffer(ctx->context, AMF_MEMORY_HOST, sizeof(AMFHDRMetadata), &hdrmeta_buffer);
+            if (res == AMF_OK) {
+                AMFHDRMetadata * hdrmeta = (AMFHDRMetadata*)hdrmeta_buffer->pVtbl->GetNative(hdrmeta_buffer);
+                if (amf_save_hdr_metadata(avctx, frame, hdrmeta) == 0) {
+                    switch (avctx->codec->id) {
+                    case AV_CODEC_ID_H264:
+                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_INPUT_HDR_METADATA, hdrmeta_buffer); break;
+                    case AV_CODEC_ID_HEVC:
+                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_INPUT_HDR_METADATA, hdrmeta_buffer); break;
+                    case AV_CODEC_ID_AV1:
+                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_INPUT_HDR_METADATA, hdrmeta_buffer); break;
+                    }
+                    res = amf_set_property_buffer(surface, L"av_frame_hdrmeta", hdrmeta_buffer);
+                    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "SetProperty failed for \"av_frame_hdrmeta\" with error %d\n", res);
+                }
+                hdrmeta_buffer->pVtbl->Release(hdrmeta_buffer);
+            }
+        }
+
         surface->pVtbl->SetPts(surface, frame->pts);
         AMF_ASSIGN_PROPERTY_INT64(res, surface, PTS_PROP, frame->pts);
 
@@ -681,6 +770,7 @@ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt)
         case AV_CODEC_ID_HEVC:
             AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_HEVC_INSERT_AUD, !!ctx->aud);
             break;
+        //case AV_CODEC_ID_AV1 not supported
         default:
             break;
         }
@@ -706,56 +796,75 @@ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt)
     do {
         block_and_wait = 0;
         // poll data
-        res_query = ctx->encoder->pVtbl->QueryOutput(ctx->encoder, &data);
-        if (data) {
-            // copy data to packet
-            AMFBuffer* buffer;
-            AMFGuid guid = IID_AMFBuffer();
-            data->pVtbl->QueryInterface(data, &guid, (void**)&buffer); // query for buffer interface
-            ret = amf_copy_buffer(avctx, avpkt, buffer);
+        if (!avpkt->data && !avpkt->buf) {
+            res_query = ctx->encoder->pVtbl->QueryOutput(ctx->encoder, &data);
+            if (data) {
+                // copy data to packet
+                AMFBuffer *buffer;
+                AMFGuid guid = IID_AMFBuffer();
+                query_output_data_flag = 1;
+                data->pVtbl->QueryInterface(data, &guid, (void**)&buffer); // query for buffer interface
+                ret = amf_copy_buffer(avctx, avpkt, buffer);
 
-            buffer->pVtbl->Release(buffer);
+                buffer->pVtbl->Release(buffer);
 
-            if (data->pVtbl->HasProperty(data, L"av_frame_ref")) {
-                AMFBuffer *frame_ref_storage_buffer;
-                res = amf_get_property_buffer(data, L"av_frame_ref", &frame_ref_storage_buffer);
-                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "GetProperty failed for \"av_frame_ref\" with error %d\n", res);
-                amf_release_buffer_with_frame_ref(frame_ref_storage_buffer);
-                ctx->hwsurfaces_in_queue--;
-            }
-
-            data->pVtbl->Release(data);
-
-            AMF_RETURN_IF_FALSE(ctx, ret >= 0, ret, "amf_copy_buffer() failed with error %d\n", ret);
-
-            if (ctx->delayed_surface != NULL) { // try to resubmit frame
-                res = ctx->encoder->pVtbl->SubmitInput(ctx->encoder, (AMFData*)ctx->delayed_surface);
-                if (res != AMF_INPUT_FULL) {
-                    int64_t pts = ctx->delayed_surface->pVtbl->GetPts(ctx->delayed_surface);
-                    ctx->delayed_surface->pVtbl->Release(ctx->delayed_surface);
-                    ctx->delayed_surface = NULL;
-                    av_frame_unref(ctx->delayed_frame);
-                    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated SubmitInput() failed with error %d\n", res);
-
-                    ret = av_fifo_write(ctx->timestamp_list, &pts, 1);
-                    if (ret < 0)
-                        return ret;
-                } else {
-                    av_log(avctx, AV_LOG_WARNING, "Data acquired but delayed frame submission got AMF_INPUT_FULL- should not happen\n");
+                if (data->pVtbl->HasProperty(data, L"av_frame_ref")) {
+                    AMFBuffer* frame_ref_storage_buffer;
+                    res = amf_get_property_buffer(data, L"av_frame_ref", &frame_ref_storage_buffer);
+                    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "GetProperty failed for \"av_frame_ref\" with error %d\n", res);
+                    amf_release_buffer_with_frame_ref(frame_ref_storage_buffer);
+                    ctx->hwsurfaces_in_queue--;
                 }
-            } else if (ctx->delayed_drain) { // try to resubmit drain
-                res = ctx->encoder->pVtbl->Drain(ctx->encoder);
-                if (res != AMF_INPUT_FULL) {
-                    ctx->delayed_drain = 0;
-                    ctx->eof = 1; // drain started
-                    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated Drain() failed with error %d\n", res);
-                } else {
-                    av_log(avctx, AV_LOG_WARNING, "Data acquired but delayed drain submission got AMF_INPUT_FULL- should not happen\n");
-                }
+
+                data->pVtbl->Release(data);
+
+                AMF_RETURN_IF_FALSE(ctx, ret >= 0, ret, "amf_copy_buffer() failed with error %d\n", ret);
             }
-        } else if (ctx->delayed_surface != NULL || ctx->delayed_drain || (ctx->eof && res_query != AMF_EOF) || (ctx->hwsurfaces_in_queue >= ctx->hwsurfaces_in_queue_max)) {
-            block_and_wait = 1;
-            av_usleep(1000); // wait and poll again
+        }
+        res_resubmit = AMF_OK;
+        if (ctx->delayed_surface != NULL) { // try to resubmit frame
+            if (ctx->delayed_surface->pVtbl->HasProperty(ctx->delayed_surface, L"av_frame_hdrmeta")) {
+                AMFBuffer * hdrmeta_buffer = NULL;
+                res = amf_get_property_buffer((AMFData *)ctx->delayed_surface, L"av_frame_hdrmeta", &hdrmeta_buffer);
+                AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "GetProperty failed for \"av_frame_hdrmeta\" with error %d\n", res);
+                switch (avctx->codec->id) {
+                case AV_CODEC_ID_H264:
+                    AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_INPUT_HDR_METADATA, hdrmeta_buffer); break;
+                case AV_CODEC_ID_HEVC:
+                    AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_INPUT_HDR_METADATA, hdrmeta_buffer); break;
+                case AV_CODEC_ID_AV1:
+                    AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_INPUT_HDR_METADATA, hdrmeta_buffer); break;
+                }
+                hdrmeta_buffer->pVtbl->Release(hdrmeta_buffer);
+            }
+            res_resubmit = ctx->encoder->pVtbl->SubmitInput(ctx->encoder, (AMFData*)ctx->delayed_surface);
+            if (res_resubmit != AMF_INPUT_FULL) {
+                int64_t pts = ctx->delayed_surface->pVtbl->GetPts(ctx->delayed_surface);
+                ctx->delayed_surface->pVtbl->Release(ctx->delayed_surface);
+                ctx->delayed_surface = NULL;
+                av_frame_unref(ctx->delayed_frame);
+                AMF_RETURN_IF_FALSE(ctx, res_resubmit == AMF_OK, AVERROR_UNKNOWN, "Repeated SubmitInput() failed with error %d\n", res_resubmit);
+
+                ret = av_fifo_write(ctx->timestamp_list, &pts, 1);
+                if (ret < 0)
+                    return ret;
+            }
+        } else if (ctx->delayed_drain) { // try to resubmit drain
+            res = ctx->encoder->pVtbl->Drain(ctx->encoder);
+            if (res != AMF_INPUT_FULL) {
+                ctx->delayed_drain = 0;
+                ctx->eof = 1; // drain started
+                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated Drain() failed with error %d\n", res);
+            } else {
+                av_log(avctx, AV_LOG_WARNING, "Data acquired but delayed drain submission got AMF_INPUT_FULL- should not happen\n");
+            }
+        }
+
+        if (query_output_data_flag == 0) {
+            if (res_resubmit == AMF_INPUT_FULL || ctx->delayed_drain || (ctx->eof && res_query != AMF_EOF) || (ctx->hwsurfaces_in_queue >= ctx->hwsurfaces_in_queue_max)) {
+                block_and_wait = 1;
+                av_usleep(1000);
+            }
         }
     } while (block_and_wait);
 
@@ -767,6 +876,41 @@ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt)
         ret = 0;
     }
     return ret;
+}
+
+int ff_amf_get_color_profile(AVCodecContext *avctx)
+{
+    amf_int64 color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_UNKNOWN;
+    if (avctx->color_range == AVCOL_RANGE_JPEG) {
+        /// Color Space for Full (JPEG) Range
+        switch (avctx->colorspace) {
+        case AVCOL_SPC_SMPTE170M:
+            color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_FULL_601;
+            break;
+        case AVCOL_SPC_BT709:
+            color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_FULL_709;
+            break;
+        case AVCOL_SPC_BT2020_NCL:
+        case AVCOL_SPC_BT2020_CL:
+            color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_FULL_2020;
+            break;
+        }
+    } else {
+        /// Color Space for Limited (MPEG) range
+        switch (avctx->colorspace) {
+        case AVCOL_SPC_SMPTE170M:
+            color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_601;
+            break;
+        case AVCOL_SPC_BT709:
+            color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_709;
+            break;
+        case AVCOL_SPC_BT2020_NCL:
+        case AVCOL_SPC_BT2020_CL:
+            color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_2020;
+            break;
+        }
+    }
+    return color_profile;
 }
 
 const AVCodecHWConfigInternal *const ff_amfenc_hw_configs[] = {

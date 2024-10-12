@@ -28,7 +28,7 @@
 #include "libavutil/common.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
 #include "framesync.h"
 #include "video.h"
 
@@ -70,12 +70,12 @@ typedef struct ColorMapContext {
 static const AVOption colormap_options[] = {
     { "patch_size", "set patch size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str = "64x64"}, 0, 0, FLAGS },
     { "nb_patches", "set number of patches", OFFSET(size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, MAX_SIZE, FLAGS },
-    { "type", "set the target type used",  OFFSET(target_type), AV_OPT_TYPE_INT, {.i64=1}, 0, 1, FLAGS, "type" },
-    {   "relative", "the target colors are relative", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 1, FLAGS, "type" },
-    {   "absolute", "the target colors are absolute", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 1, FLAGS, "type" },
-    { "kernel", "set the kernel used for measuring color difference",  OFFSET(kernel_type), AV_OPT_TYPE_INT, {.i64=0}, 0, NB_KERNELS-1, FLAGS, "kernel" },
-    {   "euclidean",   "square root of sum of squared differences",         0, AV_OPT_TYPE_CONST, {.i64=EUCLIDEAN},   0, 0, FLAGS, "kernel" },
-    {   "weuclidean",  "weighted square root of sum of squared differences",0, AV_OPT_TYPE_CONST, {.i64=WEUCLIDEAN},  0, 0, FLAGS, "kernel" },
+    { "type", "set the target type used",  OFFSET(target_type), AV_OPT_TYPE_INT, {.i64=1}, 0, 1, FLAGS, .unit = "type" },
+    {   "relative", "the target colors are relative", 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 1, FLAGS, .unit = "type" },
+    {   "absolute", "the target colors are absolute", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 1, FLAGS, .unit = "type" },
+    { "kernel", "set the kernel used for measuring color difference",  OFFSET(kernel_type), AV_OPT_TYPE_INT, {.i64=0}, 0, NB_KERNELS-1, FLAGS, .unit = "kernel" },
+    {   "euclidean",   "square root of sum of squared differences",         0, AV_OPT_TYPE_CONST, {.i64=EUCLIDEAN},   0, 0, FLAGS, .unit = "kernel" },
+    {   "weuclidean",  "weighted square root of sum of squared differences",0, AV_OPT_TYPE_CONST, {.i64=WEUCLIDEAN},  0, 0, FLAGS, .unit = "kernel" },
     { NULL }
 };
 
@@ -482,16 +482,18 @@ static int process_frame(FFFrameSync *fs)
 
 static int config_output(AVFilterLink *outlink)
 {
+    FilterLink *outl     = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
     ColorMapContext *s = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
+    FilterLink      *inl = ff_filter_link(inlink);
     AVFilterLink *source = ctx->inputs[1];
     AVFilterLink *target = ctx->inputs[2];
     FFFrameSyncIn *in;
     int ret;
 
     outlink->time_base = inlink->time_base;
-    outlink->frame_rate = inlink->frame_rate;
+    outl->frame_rate   = inl->frame_rate;
     outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
     outlink->w = inlink->w;
     outlink->h = inlink->h;

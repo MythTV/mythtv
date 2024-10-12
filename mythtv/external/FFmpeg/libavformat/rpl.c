@@ -25,6 +25,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 #define RPL_SIGNATURE "ARMovie\x0A"
@@ -117,7 +118,7 @@ static int rpl_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     RPLContext *rpl = s->priv_data;
     AVStream *vst = NULL, *ast = NULL;
-    int total_audio_size;
+    int64_t total_audio_size;
     int error = 0;
     const char *endptr;
     char audio_type[RPL_LINE_LENGTH];
@@ -201,6 +202,8 @@ static int rpl_read_header(AVFormatContext *s)
         ast->codecpar->codec_type      = AVMEDIA_TYPE_AUDIO;
         ast->codecpar->codec_tag       = audio_format;
         ast->codecpar->sample_rate     = read_line_and_int(pb, &error);  // audio bitrate
+        if (ast->codecpar->sample_rate < 0)
+            return AVERROR_INVALIDDATA;
         channels                       = read_line_and_int(pb, &error);  // number of audio channels
         error |= read_line(pb, line, sizeof(line));
         ast->codecpar->bits_per_coded_sample = read_int(line, &endptr, &error);  // audio bits per sample
@@ -268,6 +271,9 @@ static int rpl_read_header(AVFormatContext *s)
                "Video stream will be broken!\n", av_fourcc2str(vst->codecpar->codec_tag));
 
     number_of_chunks = read_line_and_int(pb, &error);  // number of chunks in the file
+    if (number_of_chunks == INT_MAX)
+        return AVERROR_INVALIDDATA;
+
     // The number in the header is actually the index of the last chunk.
     number_of_chunks++;
 
@@ -279,7 +285,7 @@ static int rpl_read_header(AVFormatContext *s)
     error |= read_line(pb, line, sizeof(line));  // size of "helpful" sprite
     if (vst) {
         error |= read_line(pb, line, sizeof(line));  // offset to key frame list
-        vst->duration = number_of_chunks * rpl->frames_per_chunk;
+        vst->duration = number_of_chunks * (int64_t)rpl->frames_per_chunk;
     }
 
     // Read the index
@@ -299,6 +305,8 @@ static int rpl_read_header(AVFormatContext *s)
         if (ast)
             av_add_index_entry(ast, offset + video_size, total_audio_size,
                                audio_size, audio_size * 8, 0);
+        if (total_audio_size/8 + (uint64_t)audio_size >= INT64_MAX/8)
+            return AVERROR_INVALIDDATA;
         total_audio_size += audio_size * 8;
     }
 
@@ -390,9 +398,9 @@ static int rpl_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-const AVInputFormat ff_rpl_demuxer = {
-    .name           = "rpl",
-    .long_name      = NULL_IF_CONFIG_SMALL("RPL / ARMovie"),
+const FFInputFormat ff_rpl_demuxer = {
+    .p.name         = "rpl",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("RPL / ARMovie"),
     .priv_data_size = sizeof(RPLContext),
     .read_probe     = rpl_probe,
     .read_header    = rpl_read_header,

@@ -1,5 +1,5 @@
 /*
- * General DV muxer/demuxer
+ * General DV demuxer
  * Copyright (c) 2003 Roman Shaposhnik
  *
  * Many thanks to Dan Dennedy <dan@dennedy.org> for providing wealth
@@ -34,8 +34,6 @@ typedef struct DVDemuxContext DVDemuxContext;
 DVDemuxContext* avpriv_dv_init_demux(AVFormatContext* s);
 int avpriv_dv_get_packet(DVDemuxContext*, AVPacket *);
 int avpriv_dv_produce_packet(DVDemuxContext*, AVPacket*, uint8_t*, int, int64_t);
-void ff_dv_offset_reset(DVDemuxContext *c, int64_t frame_offset);
-
-typedef struct DVMuxContext DVMuxContext;
+void ff_dv_ts_reset(DVDemuxContext *c, int64_t ts_video);
 
 #endif /* AVFORMAT_DV_H */

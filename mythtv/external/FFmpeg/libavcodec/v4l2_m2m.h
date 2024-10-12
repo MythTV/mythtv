@@ -38,7 +38,7 @@
 
 #define V4L_M2M_DEFAULT_OPTS \
     { "num_output_buffers", "Number of buffers in the output context",\
-        OFFSET(num_output_buffers), AV_OPT_TYPE_INT, { .i64 = 16 }, 6, INT_MAX, FLAGS }
+        OFFSET(num_output_buffers), AV_OPT_TYPE_INT, { .i64 = 16 }, 2, INT_MAX, FLAGS }
 
 typedef struct V4L2m2mContext {
     char devname[PATH_MAX];
@@ -62,7 +62,7 @@ typedef struct V4L2m2mContext {
     AVFrame *frame;
 
     /* Reference to self; only valid while codec is active. */
-    AVBufferRef *self_ref;
+    struct V4L2m2mContext *self_ref;
 
     /* reference back to V4L2m2mPriv */
     void *priv;
@@ -76,8 +76,7 @@ typedef struct V4L2m2mContext {
 typedef struct V4L2m2mPriv {
     AVClass *class;
 
-    V4L2m2mContext *context;
-    AVBufferRef    *context_ref;
+    V4L2m2mContext *context;   ///< RefStruct reference
 
     int num_output_buffers;
     int num_capture_buffers;

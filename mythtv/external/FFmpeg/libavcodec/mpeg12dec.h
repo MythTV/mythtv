@@ -24,25 +24,17 @@
 
 #include "get_bits.h"
 #include "mpeg12vlc.h"
-#include "rl.h"
 
-#define INIT_2D_VLC_RL(rl, static_size, flags)\
-{\
-    static RL_VLC_ELEM rl_vlc_table[static_size];\
-    rl.rl_vlc[0] = rl_vlc_table;\
-    ff_init_2d_vlc_rl(&rl, static_size, flags);\
-}
-
-void ff_init_2d_vlc_rl(RLTable *rl, unsigned static_size, int flags);
+#define MB_TYPE_ZERO_MV   MB_TYPE_CODEC_SPECIFIC
 
 static inline int decode_dc(GetBitContext *gb, int component)
 {
     int code, diff;
 
     if (component == 0) {
-        code = get_vlc2(gb, ff_dc_lum_vlc.table, DC_VLC_BITS, 2);
+        code = get_vlc2(gb, ff_dc_lum_vlc, DC_VLC_BITS, 2);
     } else {
-        code = get_vlc2(gb, ff_dc_chroma_vlc.table, DC_VLC_BITS, 2);
+        code = get_vlc2(gb, ff_dc_chroma_vlc, DC_VLC_BITS, 2);
     }
     if (code == 0) {
         diff = 0;

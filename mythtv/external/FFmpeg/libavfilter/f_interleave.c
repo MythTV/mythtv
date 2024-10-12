@@ -30,9 +30,7 @@
 #include "libavutil/opt.h"
 
 #include "avfilter.h"
-#include "formats.h"
 #include "filters.h"
-#include "internal.h"
 #include "audio.h"
 #include "video.h"
 
@@ -54,10 +52,10 @@ static const AVOption filt_name##_options[] = {                     \
    { "nb_inputs", "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64 = 2}, 1, INT_MAX, .flags = flags_ }, \
    { "n",         "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64 = 2}, 1, INT_MAX, .flags = flags_ }, \
    { "duration", "how to determine the end-of-stream",              \
-       OFFSET(duration_mode), AV_OPT_TYPE_INT, { .i64 = DURATION_LONGEST }, 0,  2, flags_, "duration" }, \
-       { "longest",  "Duration of longest input",  0, AV_OPT_TYPE_CONST, { .i64 = DURATION_LONGEST  }, 0, 0, flags_, "duration" }, \
-       { "shortest", "Duration of shortest input", 0, AV_OPT_TYPE_CONST, { .i64 = DURATION_SHORTEST }, 0, 0, flags_, "duration" }, \
-       { "first",    "Duration of first input",    0, AV_OPT_TYPE_CONST, { .i64 = DURATION_FIRST    }, 0, 0, flags_, "duration" }, \
+       OFFSET(duration_mode), AV_OPT_TYPE_INT, { .i64 = DURATION_LONGEST }, 0,  2, flags_, .unit = "duration" }, \
+       { "longest",  "Duration of longest input",  0, AV_OPT_TYPE_CONST, { .i64 = DURATION_LONGEST  }, 0, 0, flags_, .unit = "duration" }, \
+       { "shortest", "Duration of shortest input", 0, AV_OPT_TYPE_CONST, { .i64 = DURATION_SHORTEST }, 0, 0, flags_, .unit = "duration" }, \
+       { "first",    "Duration of first input",    0, AV_OPT_TYPE_CONST, { .i64 = DURATION_FIRST    }, 0, 0, flags_, .unit = "duration" }, \
    { NULL }                                                         \
 }
 
@@ -184,6 +182,7 @@ static av_cold int init(AVFilterContext *ctx)
 
 static int config_output(AVFilterLink *outlink)
 {
+    FilterLink *l = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
     AVFilterLink *inlink0 = ctx->inputs[0];
     int i;
@@ -194,7 +193,7 @@ static int config_output(AVFilterLink *outlink)
         outlink->h                   = inlink0->h;
         outlink->sample_aspect_ratio = inlink0->sample_aspect_ratio;
         outlink->format              = inlink0->format;
-        outlink->frame_rate = (AVRational) {1, 0};
+        l->frame_rate = (AVRational) {1, 0};
         for (i = 1; i < ctx->nb_inputs; i++) {
             AVFilterLink *inlink = ctx->inputs[i];
 

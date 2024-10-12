@@ -28,6 +28,7 @@
 #include <stdint.h>
 
 #include "libavcodec/vp9.h"
+#include "libavutil/attributes_internal.h"
 
 typedef void (*vp9_mc_func)(uint8_t *dst, ptrdiff_t dst_stride,
                             const uint8_t *ref, ptrdiff_t ref_stride,
@@ -120,7 +121,7 @@ typedef struct VP9DSPContext {
     vp9_scaled_mc_func smc[5][N_FILTERS][2];
 } VP9DSPContext;
 
-extern const int16_t ff_vp9_subpel_filters[3][16][8];
+extern const int16_t attribute_visibility_hidden ff_vp9_subpel_filters[3][16][8];
 
 void ff_vp9dsp_init(VP9DSPContext *dsp, int bpp, int bitexact);
 
@@ -130,6 +131,7 @@ void ff_vp9dsp_init_12(VP9DSPContext *dsp);
 
 void ff_vp9dsp_init_aarch64(VP9DSPContext *dsp, int bpp);
 void ff_vp9dsp_init_arm(VP9DSPContext *dsp, int bpp);
+void ff_vp9dsp_init_riscv(VP9DSPContext *dsp, int bpp, int bitexact);
 void ff_vp9dsp_init_x86(VP9DSPContext *dsp, int bpp, int bitexact);
 void ff_vp9dsp_init_mips(VP9DSPContext *dsp, int bpp);
 void ff_vp9dsp_init_loongarch(VP9DSPContext *dsp, int bpp);

@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "hwconfig.h"
+#include "hwaccel_internal.h"
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "mpegvideodec.h"
@@ -42,12 +42,12 @@ static inline int mpeg2_get_is_frame_start(const MpegEncContext *s)
 static int vaapi_mpeg2_start_frame(AVCodecContext *avctx, av_unused const uint8_t *buffer, av_unused uint32_t size)
 {
     const MpegEncContext *s = avctx->priv_data;
-    VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->cur_pic.ptr->hwaccel_picture_private;
     VAPictureParameterBufferMPEG2 pic_param;
     VAIQMatrixBufferMPEG2 iq_matrix;
     int i, err;
 
-    pic->output_surface = ff_vaapi_get_surface_id(s->current_picture_ptr->f);
+    pic->output_surface = ff_vaapi_get_surface_id(s->cur_pic.ptr->f);
 
     pic_param = (VAPictureParameterBufferMPEG2) {
         .horizontal_size                 = s->width,
@@ -73,10 +73,10 @@ static int vaapi_mpeg2_start_frame(AVCodecContext *avctx, av_unused const uint8_
 
     switch (s->pict_type) {
     case AV_PICTURE_TYPE_B:
-        pic_param.backward_reference_picture = ff_vaapi_get_surface_id(s->next_picture.f);
+        pic_param.backward_reference_picture = ff_vaapi_get_surface_id(s->next_pic.ptr->f);
         // fall-through
     case AV_PICTURE_TYPE_P:
-        pic_param.forward_reference_picture = ff_vaapi_get_surface_id(s->last_picture.f);
+        pic_param.forward_reference_picture = ff_vaapi_get_surface_id(s->last_pic.ptr->f);
         break;
     }
 
@@ -115,7 +115,7 @@ fail:
 static int vaapi_mpeg2_end_frame(AVCodecContext *avctx)
 {
     MpegEncContext     *s   = avctx->priv_data;
-    VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->cur_pic.ptr->hwaccel_picture_private;
     int ret;
 
     ret = ff_vaapi_decode_issue(avctx, pic);
@@ -131,7 +131,7 @@ fail:
 static int vaapi_mpeg2_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, uint32_t size)
 {
     const MpegEncContext *s = avctx->priv_data;
-    VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->cur_pic.ptr->hwaccel_picture_private;
     VASliceParameterBufferMPEG2 slice_param;
     GetBitContext gb;
     uint32_t quantiser_scale_code, intra_slice_flag, macroblock_offset;
@@ -162,7 +162,7 @@ static int vaapi_mpeg2_decode_slice(AVCodecContext *avctx, const uint8_t *buffer
     };
 
     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
-                                            &slice_param, sizeof(slice_param),
+                                            &slice_param, 1, sizeof(slice_param),
                                             buffer, size);
     if (err < 0) {
         ff_vaapi_decode_cancel(avctx, pic);
@@ -172,11 +172,11 @@ static int vaapi_mpeg2_decode_slice(AVCodecContext *avctx, const uint8_t *buffer
     return 0;
 }
 
-const AVHWAccel ff_mpeg2_vaapi_hwaccel = {
-    .name                 = "mpeg2_vaapi",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_MPEG2VIDEO,
-    .pix_fmt              = AV_PIX_FMT_VAAPI,
+const FFHWAccel ff_mpeg2_vaapi_hwaccel = {
+    .p.name               = "mpeg2_vaapi",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_MPEG2VIDEO,
+    .p.pix_fmt            = AV_PIX_FMT_VAAPI,
     .start_frame          = &vaapi_mpeg2_start_frame,
     .end_frame            = &vaapi_mpeg2_end_frame,
     .decode_slice         = &vaapi_mpeg2_decode_slice,

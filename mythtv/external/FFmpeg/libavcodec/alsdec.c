@@ -34,12 +34,13 @@
 #include "bgmc.h"
 #include "bswapdsp.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "internal.h"
 #include "mlz.h"
+#include "libavutil/mem.h"
 #include "libavutil/samplefmt.h"
 #include "libavutil/crc.h"
 #include "libavutil/softfloat_ieee754.h"
-#include "libavutil/intfloat.h"
 #include "libavutil/intreadwrite.h"
 
 #include <stdint.h>
@@ -1027,7 +1028,7 @@ static int read_block(ALSDecContext *ctx, ALSBlockData *bd)
 
     *bd->shift_lsbs = 0;
 
-    if (get_bits_left(gb) < 1)
+    if (get_bits_left(gb) < 7)
         return AVERROR_INVALIDDATA;
 
     // read block type flag and read the samples accordingly
@@ -1659,7 +1660,8 @@ static int read_frame_data(ALSDecContext *ctx, unsigned int ra_frame)
 
     if (!sconf->mc_coding || ctx->js_switch) {
         int independent_bs = !sconf->joint_stereo;
-
+        if (get_bits_left(gb) < 7*channels*ctx->num_blocks)
+            return AVERROR_INVALIDDATA;
         for (c = 0; c < channels; c++) {
             js_blocks[0] = 0;
             js_blocks[1] = 0;
@@ -2108,9 +2110,9 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     if (sconf->floating) {
         ctx->acf               = av_malloc_array(channels, sizeof(*ctx->acf));
-        ctx->shift_value       = av_malloc_array(channels, sizeof(*ctx->shift_value));
-        ctx->last_shift_value  = av_malloc_array(channels, sizeof(*ctx->last_shift_value));
-        ctx->last_acf_mantissa = av_malloc_array(channels, sizeof(*ctx->last_acf_mantissa));
+        ctx->shift_value       = av_calloc(channels, sizeof(*ctx->shift_value));
+        ctx->last_shift_value  = av_calloc(channels, sizeof(*ctx->last_shift_value));
+        ctx->last_acf_mantissa = av_calloc(channels, sizeof(*ctx->last_acf_mantissa));
         ctx->raw_mantissa      = av_calloc(channels, sizeof(*ctx->raw_mantissa));
 
         ctx->larray = av_malloc_array(ctx->cur_frame_length * 4, sizeof(*ctx->larray));
@@ -2180,7 +2182,7 @@ static av_cold void flush(AVCodecContext *avctx)
 
 const FFCodec ff_als_decoder = {
     .p.name         = "als",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("MPEG-4 Audio Lossless Coding (ALS)"),
+    CODEC_LONG_NAME("MPEG-4 Audio Lossless Coding (ALS)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_MP4ALS,
     .priv_data_size = sizeof(ALSDecContext),
@@ -2188,6 +2190,10 @@ const FFCodec ff_als_decoder = {
     .close          = decode_end,
     FF_CODEC_DECODE_CB(decode_frame),
     .flush          = flush,
-    .p.capabilities = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .p.capabilities =
+#if FF_API_SUBFRAMES
+                      AV_CODEC_CAP_SUBFRAMES |
+#endif
+                      AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

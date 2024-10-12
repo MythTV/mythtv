@@ -23,9 +23,8 @@
 #define AVCODEC_LPC_H
 
 #include <stdint.h>
-#include "libavutil/avassert.h"
+#include <stddef.h>
 #include "libavutil/lls.h"
-#include "aac_defines.h"
 
 #define ORDER_METHOD_EST     0
 #define ORDER_METHOD_2LEVEL  1
@@ -64,7 +63,7 @@ typedef struct LPCContext {
      * @param len     number of input samples
      * @param w_data  output samples
      */
-    void (*lpc_apply_welch_window)(const int32_t *data, int len,
+    void (*lpc_apply_welch_window)(const int32_t *data, ptrdiff_t len,
                                    double *w_data);
     /**
      * Perform autocorrelation on input samples with delay of 0 to lag.
@@ -79,7 +78,7 @@ typedef struct LPCContext {
      * @param autoc output autocorrelation coefficients.
      *              constraints: array size must be at least lag+1.
      */
-    void (*lpc_compute_autocorr)(const double *data, int len, int lag,
+    void (*lpc_compute_autocorr)(const double *data, ptrdiff_t len, int lag,
                                  double *autoc);
 
     // TODO: these should be allocated to reduce ABI compatibility issues
@@ -108,106 +107,12 @@ double ff_lpc_calc_ref_coefs_f(LPCContext *s, const float *samples, int len,
  */
 int ff_lpc_init(LPCContext *s, int blocksize, int max_order,
                 enum FFLPCType lpc_type);
+void ff_lpc_init_riscv(LPCContext *s);
 void ff_lpc_init_x86(LPCContext *s);
 
 /**
  * Uninitialize LPCContext.
  */
 void ff_lpc_end(LPCContext *s);
-
-#if USE_FIXED
-typedef int LPC_TYPE;
-typedef unsigned LPC_TYPE_U;
-#else
-#ifdef LPC_USE_DOUBLE
-typedef double LPC_TYPE;
-typedef double LPC_TYPE_U;
-#else
-typedef float LPC_TYPE;
-typedef float LPC_TYPE_U;
-#endif
-#endif // USE_FIXED
-
-/**
- * Schur recursion.
- * Produces reflection coefficients from autocorrelation data.
- */
-static inline void compute_ref_coefs(const LPC_TYPE *autoc, int max_order,
-                                     LPC_TYPE *ref, LPC_TYPE *error)
-{
-    int i, j;
-    LPC_TYPE err;
-    LPC_TYPE gen0[MAX_LPC_ORDER], gen1[MAX_LPC_ORDER];
-
-    for (i = 0; i < max_order; i++)
-        gen0[i] = gen1[i] = autoc[i + 1];
-
-    err    = autoc[0];
-    ref[0] = -gen1[0] / ((USE_FIXED || err) ? err : 1);
-    err   +=  gen1[0] * ref[0];
-    if (error)
-        error[0] = err;
-    for (i = 1; i < max_order; i++) {
-        for (j = 0; j < max_order - i; j++) {
-            gen1[j] = gen1[j + 1] + ref[i - 1] * gen0[j];
-            gen0[j] = gen1[j + 1] * ref[i - 1] + gen0[j];
-        }
-        ref[i] = -gen1[0] / ((USE_FIXED || err) ? err : 1);
-        err   +=  gen1[0] * ref[i];
-        if (error)
-            error[i] = err;
-    }
-}
-
-/**
- * Levinson-Durbin recursion.
- * Produce LPC coefficients from autocorrelation data.
- */
-static inline int AAC_RENAME(compute_lpc_coefs)(const LPC_TYPE *autoc, int max_order,
-                                    LPC_TYPE *lpc, int lpc_stride, int fail,
-                                    int normalize)
-{
-    int i, j;
-    LPC_TYPE err = 0;
-    LPC_TYPE *lpc_last = lpc;
-
-    av_assert2(normalize || !fail);
-
-    if (normalize)
-        err = *autoc++;
-
-    if (fail && (autoc[max_order - 1] == 0 || err <= 0))
-        return -1;
-
-    for(i=0; i<max_order; i++) {
-        LPC_TYPE r = AAC_SRA_R(-autoc[i], 5);
-
-        if (normalize) {
-            for(j=0; j<i; j++)
-                r -= lpc_last[j] * autoc[i-j-1];
-
-            if (err)
-                r /= err;
-            err *= FIXR(1.0) - (r * r);
-        }
-
-        lpc[i] = r;
-
-        for(j=0; j < (i+1)>>1; j++) {
-            LPC_TYPE f = lpc_last[    j];
-            LPC_TYPE b = lpc_last[i-1-j];
-            lpc[    j] = f + (LPC_TYPE_U)AAC_MUL26(r, b);
-            lpc[i-1-j] = b + (LPC_TYPE_U)AAC_MUL26(r, f);
-        }
-
-        if (fail && err < 0)
-            return -1;
-
-        lpc_last = lpc;
-        lpc += lpc_stride;
-    }
-
-    return 0;
-}
 
 #endif /* AVCODEC_LPC_H */

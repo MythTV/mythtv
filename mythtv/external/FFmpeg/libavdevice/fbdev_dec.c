@@ -34,12 +34,14 @@
 #include <time.h>
 #include <linux/fb.h>
 
+#include "libavutil/file_open.h"
 #include "libavutil/internal.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavutil/time.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
+#include "libavformat/demux.h"
 #include "libavformat/internal.h"
 #include "avdevice.h"
 #include "fbdev_common.h"
@@ -231,14 +233,14 @@ static const AVClass fbdev_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
-const AVInputFormat ff_fbdev_demuxer = {
-    .name           = "fbdev",
-    .long_name      = NULL_IF_CONFIG_SMALL("Linux framebuffer"),
+const FFInputFormat ff_fbdev_demuxer = {
+    .p.name          = "fbdev",
+    .p.long_name     = NULL_IF_CONFIG_SMALL("Linux framebuffer"),
+    .p.flags         = AVFMT_NOFILE,
+    .p.priv_class    = &fbdev_class,
     .priv_data_size = sizeof(FBDevContext),
     .read_header    = fbdev_read_header,
     .read_packet    = fbdev_read_packet,
     .read_close     = fbdev_read_close,
     .get_device_list = fbdev_get_device_list,
-    .flags          = AVFMT_NOFILE,
-    .priv_class     = &fbdev_class,
 };

@@ -19,9 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 enum PsdCompr {
     PSD_RAW,
@@ -532,7 +533,11 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *picture,
     }
 
     if (s->color_mode == PSD_INDEXED) {
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
         picture->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         memcpy(picture->data[1], s->palette, AVPALETTE_SIZE);
     }
 
@@ -546,7 +551,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *picture,
 
 const FFCodec ff_psd_decoder = {
     .p.name           = "psd",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("Photoshop PSD file"),
+    CODEC_LONG_NAME("Photoshop PSD file"),
     .p.type           = AVMEDIA_TYPE_VIDEO,
     .p.id             = AV_CODEC_ID_PSD,
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,

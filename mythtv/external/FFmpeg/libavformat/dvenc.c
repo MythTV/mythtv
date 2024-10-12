@@ -39,11 +39,12 @@
 #include "libavutil/fifo.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/pixdesc.h"
 #include "libavutil/timecode.h"
 
 #define MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32-bit audio
 
-struct DVMuxContext {
+typedef struct DVMuxContext {
     AVClass          *av_class;
     const AVDVProfile*  sys;           /* current DV profile, e.g.: 525/60, 625/50 */
     int               n_ast;         /* number of stereo audio streams (up to 2) */
@@ -55,7 +56,7 @@ struct DVMuxContext {
     int               has_video;     /* frame under construction has video */
     uint8_t           frame_buf[DV_MAX_FRAME_SIZE]; /* frame under construction */
     AVTimecode        tc;            /* timecode context */
-};
+} DVMuxContext;
 
 static const int dv_aaux_packs_dist[12][9] = {
     { 0xff, 0xff, 0xff, 0x50, 0x51, 0x52, 0x53, 0xff, 0xff },
@@ -94,7 +95,7 @@ static int dv_audio_frame_size(const AVDVProfile* sys, int frame, int sample_rat
                                             sizeof(sys->audio_samples_dist[0]))];
 }
 
-static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* buf, int channel, int seq)
+static int dv_write_pack(enum DVPackType pack_id, DVMuxContext *c, uint8_t* buf, int channel, int seq)
 {
     struct tm tc;
     time_t ct;
@@ -103,12 +104,12 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
 
     buf[0] = (uint8_t)pack_id;
     switch (pack_id) {
-    case dv_timecode:
+    case DV_TIMECODE:
         timecode  = av_timecode_get_smpte_from_framenum(&c->tc, c->frames);
         timecode |= 1<<23 | 1<<15 | 1<<7 | 1<<6; // biphase and binary group flags
         AV_WB32(buf + 1, timecode);
         break;
-    case dv_audio_source:  /* AAUX source pack */
+    case DV_AUDIO_SOURCE:  /* AAUX source pack */
         if (c->ast[channel]->codecpar->sample_rate == 44100) {
             audio_type = 1;
         } else if (c->ast[channel]->codecpar->sample_rate == 32000)
@@ -132,7 +133,7 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
                   0;        /* quantization: 0 -- 16-bit linear, 1 -- 12-bit nonlinear */
 
         break;
-    case dv_audio_control:
+    case DV_AUDIO_CONTROL:
         buf[1] = (0 << 6) | /* copy protection: 0 -- unrestricted */
                  (1 << 4) | /* input source: 1 -- digital input */
                  (3 << 2) | /* compression: 3 -- no information */
@@ -147,8 +148,8 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
         buf[4] = (1 << 7) | /* reserved -- always 1 */
                   0x7f;     /* genre category */
         break;
-    case dv_audio_recdate:
-    case dv_video_recdate:  /* VAUX recording date */
+    case DV_AUDIO_RECDATE:
+    case DV_VIDEO_RECDATE:  /* VAUX recording date */
         ct = c->start_time + av_rescale_rnd(c->frames, c->sys->time_base.num,
                                             c->sys->time_base.den, AV_ROUND_DOWN);
         brktimegm(ct, &tc);
@@ -163,8 +164,8 @@ static int dv_write_pack(enum dv_pack_type pack_id, DVMuxContext *c, uint8_t* bu
         buf[4] = (((tc.tm_year % 100) / 10) << 4) | /* Tens of year */
                  (tc.tm_year % 10);                 /* Units of year */
         break;
-    case dv_audio_rectime:  /* AAUX recording time */
-    case dv_video_rectime:  /* VAUX recording time */
+    case DV_AUDIO_RECTIME:  /* AAUX recording time */
+    case DV_VIDEO_RECTIME:  /* VAUX recording time */
         ct = c->start_time + av_rescale_rnd(c->frames, c->sys->time_base.num,
                                                        c->sys->time_base.den, AV_ROUND_DOWN);
         brktimegm(ct, &tc);
@@ -219,22 +220,22 @@ static void dv_inject_metadata(DVMuxContext *c, uint8_t* frame)
         /* DV subcode: 2nd and 3d DIFs */
         for (j = 80; j < 80 * 3; j += 80) {
             for (k = 6; k < 6 * 8; k += 8)
-                dv_write_pack(dv_timecode, c, &buf[j+k], 0, seq);
+                dv_write_pack(DV_TIMECODE, c, &buf[j+k], 0, seq);
 
             if (((long)(buf-frame)/(c->sys->frame_size/(c->sys->difseg_size*c->sys->n_difchan))%c->sys->difseg_size) > 5) { /* FIXME: is this really needed ? */
-                dv_write_pack(dv_video_recdate, c, &buf[j+14], 0, seq);
-                dv_write_pack(dv_video_rectime, c, &buf[j+22], 0, seq);
-                dv_write_pack(dv_video_recdate, c, &buf[j+38], 0, seq);
-                dv_write_pack(dv_video_rectime, c, &buf[j+46], 0, seq);
+                dv_write_pack(DV_VIDEO_RECDATE, c, &buf[j+14], 0, seq);
+                dv_write_pack(DV_VIDEO_RECTIME, c, &buf[j+22], 0, seq);
+                dv_write_pack(DV_VIDEO_RECDATE, c, &buf[j+38], 0, seq);
+                dv_write_pack(DV_VIDEO_RECTIME, c, &buf[j+46], 0, seq);
             }
         }
 
         /* DV VAUX: 4th, 5th and 6th 3DIFs */
         for (j = 80*3 + 3; j < 80*6; j += 80) {
-            dv_write_pack(dv_video_recdate, c, &buf[j+5* 2], 0, seq);
-            dv_write_pack(dv_video_rectime, c, &buf[j+5* 3], 0, seq);
-            dv_write_pack(dv_video_recdate, c, &buf[j+5*11], 0, seq);
-            dv_write_pack(dv_video_rectime, c, &buf[j+5*12], 0, seq);
+            dv_write_pack(DV_VIDEO_RECDATE, c, &buf[j+5* 2], 0, seq);
+            dv_write_pack(DV_VIDEO_RECTIME, c, &buf[j+5* 3], 0, seq);
+            dv_write_pack(DV_VIDEO_RECDATE, c, &buf[j+5*11], 0, seq);
+            dv_write_pack(DV_VIDEO_RECTIME, c, &buf[j+5*12], 0, seq);
         }
     }
 }
@@ -308,62 +309,107 @@ static int dv_assemble_frame(AVFormatContext *s,
     return 0;
 }
 
-static DVMuxContext* dv_init_mux(AVFormatContext* s)
+static int dv_init_mux(AVFormatContext* s)
 {
     DVMuxContext *c = s->priv_data;
     AVStream *vst = NULL;
     int i;
 
-    /* we support at most 1 video and 2 audio streams */
-    if (s->nb_streams > 5)
-        return NULL;
+    if (s->nb_streams > 5) {
+        av_log(s, AV_LOG_ERROR,
+               "Invalid number of streams %d, the muxer supports at most 1 video channel and 4 audio channels.\n",
+               s->nb_streams);
+        return AVERROR_INVALIDDATA;
+    }
 
     /* We have to sort out where audio and where video stream is */
     for (i=0; i<s->nb_streams; i++) {
         AVStream *st = s->streams[i];
         switch (st->codecpar->codec_type) {
         case AVMEDIA_TYPE_VIDEO:
-            if (vst) return NULL;
-            if (st->codecpar->codec_id != AV_CODEC_ID_DVVIDEO)
-                goto bail_out;
+            if (vst) {
+                av_log(s, AV_LOG_ERROR,
+                       "More than one video stream found, only one is accepted.\n");
+                return AVERROR_INVALIDDATA;
+            }
+            if (st->codecpar->codec_id != AV_CODEC_ID_DVVIDEO) {
+                av_log(s, AV_LOG_ERROR,
+                       "Invalid codec for video stream, only DVVIDEO is supported.\n");
+                return AVERROR_INVALIDDATA;
+            }
             vst = st;
             break;
         case AVMEDIA_TYPE_AUDIO:
-            if (c->n_ast > 1) return NULL;
+            if (c->n_ast > 1) {
+                av_log(s, AV_LOG_ERROR,
+                       "More than two audio streams found, at most 2 are accepted.\n");
+                return AVERROR_INVALIDDATA;
+            }
             /* Some checks -- DV format is very picky about its incoming streams */
-            if(st->codecpar->codec_id    != AV_CODEC_ID_PCM_S16LE ||
-               st->codecpar->ch_layout.nb_channels    != 2)
-                goto bail_out;
+            if (st->codecpar->codec_id != AV_CODEC_ID_PCM_S16LE) {
+                av_log(s, AV_LOG_ERROR,
+                       "Invalid codec for stream %d, only PCM_S16LE is supported\n.", i);
+                return AVERROR_INVALIDDATA;
+            }
+            if (st->codecpar->ch_layout.nb_channels != 2) {
+                av_log(s, AV_LOG_ERROR,
+                       "Invalid number of audio channels %d for stream %d, only 2 channels are supported\n.",
+                       st->codecpar->ch_layout.nb_channels, i);
+                return AVERROR_INVALIDDATA;
+            }
             if (st->codecpar->sample_rate != 48000 &&
                 st->codecpar->sample_rate != 44100 &&
-                st->codecpar->sample_rate != 32000    )
-                goto bail_out;
+                st->codecpar->sample_rate != 32000) {
+                av_log(s, AV_LOG_ERROR,
+                       "Invalid audio sample rate %d for stream %d, only 32000, 44100, and 48000 are supported.\n",
+                       st->codecpar->sample_rate, i);
+                return AVERROR_INVALIDDATA;
+            }
             c->ast[c->n_ast++] = st;
             break;
         default:
-            goto bail_out;
+            av_log(s, AV_LOG_ERROR,
+                   "Invalid media type for stream %d, only audio and video are supported.\n", i);
+            return AVERROR_INVALIDDATA;
         }
     }
 
-    if (!vst)
-        goto bail_out;
+    if (!vst) {
+        av_log(s, AV_LOG_ERROR,
+               "Missing video stream, must be present\n");
+        return AVERROR_INVALIDDATA;
+    }
 
     c->sys = av_dv_codec_profile2(vst->codecpar->width, vst->codecpar->height,
                                   vst->codecpar->format, vst->time_base);
-    if (!c->sys)
-        goto bail_out;
-
-    if ((c->sys->time_base.den != 25 && c->sys->time_base.den != 50) || c->sys->time_base.num != 1) {
-        if (c->ast[0] && c->ast[0]->codecpar->sample_rate != 48000)
-            goto bail_out;
-        if (c->ast[1] && c->ast[1]->codecpar->sample_rate != 48000)
-            goto bail_out;
+    if (!c->sys) {
+        av_log(s, AV_LOG_ERROR,
+               "Could not find a valid video profile for size:%dx%d format:%s tb:%d%d\n",
+               vst->codecpar->width, vst->codecpar->height,
+               av_get_pix_fmt_name(vst->codecpar->format),
+               vst->time_base.num, vst->time_base.den);
+        return AVERROR_INVALIDDATA;
     }
 
-    if (((c->n_ast > 1) && (c->sys->n_difchan < 2)) ||
-        ((c->n_ast > 2) && (c->sys->n_difchan < 4))) {
-        /* only 2 stereo pairs allowed in 50Mbps mode */
-        goto bail_out;
+    if ((c->sys->time_base.den != 25 && c->sys->time_base.den != 50) || c->sys->time_base.num != 1) {
+        for (i = 0; i < 2; i++) {
+            if (c->ast[i] && c->ast[i]->codecpar->sample_rate != 48000) {
+                av_log(s, AV_LOG_ERROR,
+                       "Invalid sample rate %d for audio stream #%d for this video profile, must be 48000.\n",
+                       c->ast[i]->codecpar->sample_rate, i);
+                return AVERROR_INVALIDDATA;
+            }
+        }
+    }
+
+    for (i = 1; i < 2; i++) {
+        if (((c->n_ast > i) && (c->sys->n_difchan < (2 * i)))) {
+            const char *mode = c->n_ast > 1 ? "50Mps" : "25Mps";
+            av_log(s, AV_LOG_ERROR,
+                   "Invalid number of channels %d, only %d stereo pairs is allowed in %s mode.\n",
+                   c->n_ast, i, mode);
+            return AVERROR_INVALIDDATA;
+        }
     }
 
     /* Ok, everything seems to be in working order */
@@ -376,14 +422,12 @@ static DVMuxContext* dv_init_mux(AVFormatContext* s)
         if (!c->ast[i])
            continue;
         c->audio_data[i] = av_fifo_alloc2(100 * MAX_AUDIO_FRAME_SIZE, 1, 0);
-        if (!c->audio_data[i])
-            goto bail_out;
+        if (!c->audio_data[i]) {
+            return AVERROR(ENOMEM);
+        }
     }
 
-    return c;
-
-bail_out:
-    return NULL;
+    return 0;
 }
 
 static int dv_write_header(AVFormatContext *s)
@@ -392,12 +436,12 @@ static int dv_write_header(AVFormatContext *s)
     DVMuxContext *dvc = s->priv_data;
     AVDictionaryEntry *tcr = av_dict_get(s->metadata, "timecode", NULL, 0);
 
-    if (!dv_init_mux(s)) {
+    if (dv_init_mux(s) < 0) {
         av_log(s, AV_LOG_ERROR, "Can't initialize DV format!\n"
-                    "Make sure that you supply exactly two streams:\n"
-                    "     video: 25fps or 29.97fps, audio: 2ch/48|44|32kHz/PCM\n"
+                    "Make sure that you supply at least two streams:\n"
+                    "     video: 25fps or 29.97fps, audio: 2ch/48|44.1|32kHz/PCM\n"
                     "     (50Mbps allows an optional second audio stream)\n");
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
     rate.num = dvc->sys->ltc_divisor;
     rate.den = 1;
@@ -442,13 +486,13 @@ static void dv_deinit(AVFormatContext *s)
         av_fifo_freep2(&c->audio_data[i]);
 }
 
-const AVOutputFormat ff_dv_muxer = {
-    .name              = "dv",
-    .long_name         = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
-    .extensions        = "dv",
+const FFOutputFormat ff_dv_muxer = {
+    .p.name            = "dv",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
+    .p.extensions      = "dv",
     .priv_data_size    = sizeof(DVMuxContext),
-    .audio_codec       = AV_CODEC_ID_PCM_S16LE,
-    .video_codec       = AV_CODEC_ID_DVVIDEO,
+    .p.audio_codec     = AV_CODEC_ID_PCM_S16LE,
+    .p.video_codec     = AV_CODEC_ID_DVVIDEO,
     .write_header      = dv_write_header,
     .write_packet      = dv_write_packet,
     .deinit            = dv_deinit,

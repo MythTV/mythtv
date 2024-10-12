@@ -52,12 +52,14 @@
  */
 
 #include "libavutil/avassert.h"
+#include "libavutil/avstring.h"
 #include "libavutil/float_dsp.h"
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "speexdata.h"
 
 #define SPEEX_NB_MODES 3
@@ -1397,9 +1399,9 @@ static int parse_speex_extradata(AVCodecContext *avctx,
     const uint8_t *extradata, int extradata_size)
 {
     SpeexContext *s = avctx->priv_data;
-    const uint8_t *buf = extradata;
+    const uint8_t *buf = av_strnstr(extradata, "Speex   ", extradata_size);
 
-    if (memcmp(buf, "Speex   ", 8))
+    if (!buf)
         return AVERROR_INVALIDDATA;
 
     buf += 28;
@@ -1420,8 +1422,10 @@ static int parse_speex_extradata(AVCodecContext *avctx,
         return AVERROR_INVALIDDATA;
     s->bitrate = bytestream_get_le32(&buf);
     s->frame_size = bytestream_get_le32(&buf);
-    if (s->frame_size < NB_FRAME_SIZE << s->mode)
+    if (s->frame_size < NB_FRAME_SIZE << (s->mode > 0) ||
+        s->frame_size >     INT32_MAX >> (s->mode > 0))
         return AVERROR_INVALIDDATA;
+    s->frame_size <<= (s->mode > 0);
     s->vbr = bytestream_get_le32(&buf);
     s->frames_per_packet = bytestream_get_le32(&buf);
     if (s->frames_per_packet <= 0 ||
@@ -1452,7 +1456,7 @@ static av_cold int speex_decode_init(AVCodecContext *avctx)
             return AVERROR_INVALIDDATA;
 
         s->nb_channels = avctx->ch_layout.nb_channels;
-        if (s->nb_channels <= 0)
+        if (s->nb_channels <= 0 || s->nb_channels > 2)
             return AVERROR_INVALIDDATA;
 
         switch (s->rate) {
@@ -1462,7 +1466,7 @@ static av_cold int speex_decode_init(AVCodecContext *avctx)
         default: s->mode = 2;
         }
 
-        s->frames_per_packet = 1;
+        s->frames_per_packet = 64;
         s->frame_size = NB_FRAME_SIZE << s->mode;
     }
 
@@ -1537,6 +1541,7 @@ static int speex_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                               int *got_frame_ptr, AVPacket *avpkt)
 {
     SpeexContext *s = avctx->priv_data;
+    int frames_per_packet = s->frames_per_packet;
     const float scale = 1.f / 32768.f;
     int buf_size = avpkt->size;
     float *dst;
@@ -1547,26 +1552,31 @@ static int speex_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     if ((ret = init_get_bits8(&s->gb, avpkt->data, buf_size)) < 0)
         return ret;
 
-    frame->nb_samples = FFALIGN(s->frame_size * s->frames_per_packet, 4);
+    frame->nb_samples = FFALIGN(s->frame_size * frames_per_packet, 4);
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
 
     dst = (float *)frame->extended_data[0];
-    for (int i = 0; i < s->frames_per_packet; i++) {
+    for (int i = 0; i < frames_per_packet; i++) {
         ret = speex_modes[s->mode].decode(avctx, &s->st[s->mode], &s->gb, dst + i * s->frame_size);
         if (ret < 0)
             return ret;
         if (avctx->ch_layout.nb_channels == 2)
             speex_decode_stereo(dst + i * s->frame_size, s->frame_size, &s->stereo);
+        if (get_bits_left(&s->gb) < 5 ||
+            show_bits(&s->gb, 5) == 15) {
+            frames_per_packet = i + 1;
+            break;
+        }
     }
 
     dst = (float *)frame->extended_data[0];
     s->fdsp->vector_fmul_scalar(dst, dst, scale, frame->nb_samples * frame->ch_layout.nb_channels);
-    frame->nb_samples = s->frame_size * s->frames_per_packet;
+    frame->nb_samples = s->frame_size * frames_per_packet;
 
     *got_frame_ptr = 1;
 
-    return buf_size;
+    return (get_bits_count(&s->gb) + 7) >> 3;
 }
 
 static av_cold int speex_decode_close(AVCodecContext *avctx)
@@ -1578,7 +1588,7 @@ static av_cold int speex_decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_speex_decoder = {
     .p.name         = "speex",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Speex"),
+    CODEC_LONG_NAME("Speex"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_SPEEX,
     .init           = speex_decode_init,
@@ -1586,5 +1596,5 @@ const FFCodec ff_speex_decoder = {
     .close          = speex_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .priv_data_size = sizeof(SpeexContext),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

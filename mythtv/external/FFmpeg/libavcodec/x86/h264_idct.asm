@@ -42,7 +42,7 @@ scan8_mem: db  4+ 1*8, 5+ 1*8, 4+ 2*8, 5+ 2*8
            db  6+11*8, 7+11*8, 6+12*8, 7+12*8
            db  4+13*8, 5+13*8, 4+14*8, 5+14*8
            db  6+13*8, 7+13*8, 6+14*8, 7+14*8
-%ifdef PIC
+%if PIC
 %define npicregs 1
 %define scan8 picregq
 %else
@@ -322,7 +322,7 @@ INIT_XMM sse2
 cglobal h264_idct8_add4_8, 5, 8 + npicregs, 10, dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
     movsxdifnidn r3, r3d
     xor          r5, r5
-%ifdef PIC
+%if PIC
     lea     picregq, [scan8_mem]
 %endif
 .nextblock:
@@ -354,7 +354,7 @@ INIT_MMX cpuname
     add          r2, 128
     cmp          r5, 16
     jl .nextblock
-    REP_RET
+    RET
 .no_dc:
 INIT_XMM cpuname
     mov       dst2d, dword [r1+r5*4]
@@ -368,7 +368,7 @@ INIT_XMM cpuname
     add          r2, 128
     cmp          r5, 16
     jl .nextblock
-    REP_RET
+    RET
 
 INIT_MMX mmx
 h264_idct_add8_mmx_plane:
@@ -398,7 +398,7 @@ h264_idct_add8_mmx_plane:
 cglobal h264_idct_add8_422_8, 5, 8 + npicregs, 0, dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
 ; dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
     movsxdifnidn r3, r3d
-%ifdef PIC
+%if PIC
     lea     picregq, [scan8_mem]
 %endif
 %if ARCH_X86_64
@@ -508,7 +508,7 @@ cglobal h264_idct_add16_8, 5, 5 + ARCH_X86_64, 8
     add16_sse2_cycle 5, 0x24
     add16_sse2_cycle 6, 0x1e
     add16_sse2_cycle 7, 0x26
-REP_RET
+RET
 
 %macro add16intra_sse2_cycle 2
     movzx       r0, word [r4+%2]
@@ -555,7 +555,7 @@ cglobal h264_idct_add16intra_8, 5, 7 + ARCH_X86_64, 8
     add16intra_sse2_cycle 5, 0x24
     add16intra_sse2_cycle 6, 0x1e
     add16intra_sse2_cycle 7, 0x26
-REP_RET
+RET
 
 %macro add8_sse2_cycle 2
     movzx       r0, word [r4+%2]
@@ -610,7 +610,7 @@ cglobal h264_idct_add8_8, 5, 7 + ARCH_X86_64, 8
 %endif
     add8_sse2_cycle 2, 0x5c
     add8_sse2_cycle 3, 0x64
-REP_RET
+RET
 
 ;void ff_h264_luma_dc_dequant_idct_mmx(int16_t *output, int16_t *input, int qmul)
 
@@ -716,11 +716,9 @@ REP_RET
 %endif
 %endmacro
 
-%macro IDCT_DC_DEQUANT 1
-cglobal h264_luma_dc_dequant_idct, 3, 4, %1
-    ; manually spill XMM registers for Win64 because
-    ; the code here is initialized with INIT_MMX
-    WIN64_SPILL_XMM %1
+INIT_XMM sse2
+cglobal h264_luma_dc_dequant_idct, 3, 4, 7
+INIT_MMX cpuname
     movq        m3, [r1+24]
     movq        m2, [r1+16]
     movq        m1, [r1+ 8]
@@ -757,10 +755,6 @@ cglobal h264_luma_dc_dequant_idct, 3, 4, %1
     movd      xmm6, t1d
     DEQUANT_STORE xmm6
     RET
-%endmacro
-
-INIT_MMX sse2
-IDCT_DC_DEQUANT 7
 
 %ifdef __NASM_VER__
 %if __NASM_MAJOR__ >= 2 && __NASM_MINOR__ >= 4

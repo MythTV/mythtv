@@ -34,8 +34,8 @@
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "audio.h"
+#include "filters.h"
 #include "formats.h"
-#include "internal.h"
 #include "video.h"
 #include "scene_sad.h"
 
@@ -82,11 +82,18 @@ static const char *const var_names[] = {
     "prev_selected_n",   ///< number of the last selected frame
 
     "key",               ///< tell if the frame is a key frame
+#if FF_API_FRAME_PKT
     "pos",               ///< original position in the file of the frame
+#endif
 
     "scene",
 
     "concatdec_select",  ///< frame is within the interval set by the concat demuxer
+
+    "ih",                ///< ih: Represents the height of the input video frame.
+    "iw",                ///< iw: Represents the width of the input video frame.
+
+    "view",
 
     NULL
 };
@@ -134,11 +141,18 @@ enum var_name {
     VAR_PREV_SELECTED_N,
 
     VAR_KEY,
+#if FF_API_FRAME_PKT
     VAR_POS,
+#endif
 
     VAR_SCENE,
 
     VAR_CONCATDEC_SELECT,
+
+    VAR_IH,
+    VAR_IW,
+
+    VAR_VIEW,
 
     VAR_VARS_NB
 };
@@ -229,6 +243,7 @@ static int config_input(AVFilterLink *inlink)
 
     select->var_values[VAR_TB] = av_q2d(inlink->time_base);
 
+    select->var_values[VAR_PREV_SELECTED_N]   = NAN;
     select->var_values[VAR_PREV_PTS]          = NAN;
     select->var_values[VAR_PREV_SELECTED_PTS] = NAN;
     select->var_values[VAR_PREV_SELECTED_T]   = NAN;
@@ -258,6 +273,9 @@ static int config_input(AVFilterLink *inlink)
     select->var_values[VAR_SCENE]             = NAN;
     select->var_values[VAR_CONSUMED_SAMPLES_N] = NAN;
     select->var_values[VAR_SAMPLES_N]          = NAN;
+
+    select->var_values[VAR_IH] = NAN;
+    select->var_values[VAR_IW] = NAN;
 
     select->var_values[VAR_SAMPLE_RATE] =
         inlink->type == AVMEDIA_TYPE_AUDIO ? inlink->sample_rate : NAN;
@@ -292,7 +310,6 @@ static double get_scene_score(AVFilterContext *ctx, AVFrame *frame)
             count += select->width[plane] * select->height[plane];
         }
 
-        emms_c();
         mafd = (double)sad / count / (1ULL << (select->bitdepth - 8));
         diff = fabs(mafd - select->prev_mafd);
         ret  = av_clipf(FFMIN(mafd, diff) / 100., 0, 1);
@@ -329,6 +346,8 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
 {
     SelectContext *select = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
+    FilterLink      *inl = ff_filter_link(inlink);
+    const AVFrameSideData *sd;
     double res;
 
     if (isnan(select->var_values[VAR_START_PTS]))
@@ -336,11 +355,15 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
     if (isnan(select->var_values[VAR_START_T]))
         select->var_values[VAR_START_T] = TS2D(frame->pts) * av_q2d(inlink->time_base);
 
-    select->var_values[VAR_N  ] = inlink->frame_count_out;
+    select->var_values[VAR_N  ] = inl->frame_count_out;
     select->var_values[VAR_PTS] = TS2D(frame->pts);
     select->var_values[VAR_T  ] = TS2D(frame->pts) * av_q2d(inlink->time_base);
+#if FF_API_FRAME_PKT
+FF_DISABLE_DEPRECATION_WARNINGS
     select->var_values[VAR_POS] = frame->pkt_pos == -1 ? NAN : frame->pkt_pos;
-    select->var_values[VAR_KEY] = frame->key_frame;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+    select->var_values[VAR_KEY] = !!(frame->flags & AV_FRAME_FLAG_KEY);
     select->var_values[VAR_CONCATDEC_SELECT] = get_concatdec_select(frame, av_rescale_q(frame->pts, inlink->time_base, AV_TIME_BASE_Q));
 
     switch (inlink->type) {
@@ -349,9 +372,12 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
         break;
 
     case AVMEDIA_TYPE_VIDEO:
+        select->var_values[VAR_IH] = frame->height;
+        select->var_values[VAR_IW] = frame->width;
+
         select->var_values[VAR_INTERLACE_TYPE] =
-            !frame->interlaced_frame ? INTERLACE_TYPE_P :
-        frame->top_field_first ? INTERLACE_TYPE_T : INTERLACE_TYPE_B;
+            !(frame->flags & AV_FRAME_FLAG_INTERLACED) ? INTERLACE_TYPE_P :
+        (frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) ? INTERLACE_TYPE_T : INTERLACE_TYPE_B;
         select->var_values[VAR_PICT_TYPE] = frame->pict_type;
         if (select->do_scene_detect) {
             char buf[32];
@@ -360,6 +386,10 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
             snprintf(buf, sizeof(buf), "%f", select->var_values[VAR_SCENE]);
             av_dict_set(&frame->metadata, "lavfi.scene_score", buf, 0);
         }
+
+        sd = av_frame_side_data_get(frame->side_data, frame->nb_side_data,
+                                    AV_FRAME_DATA_VIEW_ID);
+        select->var_values[VAR_VIEW] = sd ? *(int*)sd->data : NAN;
         break;
     }
 
@@ -369,13 +399,13 @@ static void select_frame(AVFilterContext *ctx, AVFrame *frame)
            select->var_values[VAR_N],
            select->var_values[VAR_PTS],
            select->var_values[VAR_T],
-           frame->key_frame);
+           !!(frame->flags & AV_FRAME_FLAG_KEY));
 
     switch (inlink->type) {
     case AVMEDIA_TYPE_VIDEO:
         av_log(inlink->dst, AV_LOG_DEBUG, " interlace_type:%c pict_type:%c scene:%f",
-               (!frame->interlaced_frame) ? 'P' :
-               frame->top_field_first     ? 'T' : 'B',
+               !(frame->flags & AV_FRAME_FLAG_INTERLACED)     ? 'P' :
+               (frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) ? 'T' : 'B',
                av_get_picture_type_char(frame->pict_type),
                select->var_values[VAR_SCENE]);
         break;

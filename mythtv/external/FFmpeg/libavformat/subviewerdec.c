@@ -25,6 +25,7 @@
  */
 
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "subtitles.h"
 #include "avio_internal.h"
@@ -50,26 +51,32 @@ static int subviewer_probe(const AVProbeData *p)
     return 0;
 }
 
+static int get_multiplier(int e) {
+    switch (e) {
+    case 1  : return 100;
+    case 2  : return 10;
+    case 3  : return 1;
+    default : return -1;
+    }
+}
+
 static int read_ts(const char *s, int64_t *start, int *duration)
 {
     int64_t end;
     int hh1, mm1, ss1, ms1;
     int hh2, mm2, ss2, ms2;
-    int multiplier = 1;
+    int multiplier1, multiplier2;
+    int ms1p1, ms1p2, ms2p1, ms2p2;
 
-    if (sscanf(s, "%u:%u:%u.%2u,%u:%u:%u.%2u",
-               &hh1, &mm1, &ss1, &ms1, &hh2, &mm2, &ss2, &ms2) == 8) {
-        multiplier = 10;
-    } else if (sscanf(s, "%u:%u:%u.%1u,%u:%u:%u.%1u",
-                      &hh1, &mm1, &ss1, &ms1, &hh2, &mm2, &ss2, &ms2) == 8) {
-        multiplier = 100;
-    }
-    if (sscanf(s, "%u:%u:%u.%u,%u:%u:%u.%u",
-               &hh1, &mm1, &ss1, &ms1, &hh2, &mm2, &ss2, &ms2) == 8) {
-        ms1 = FFMIN(ms1, 999);
-        ms2 = FFMIN(ms2, 999);
-        end    = (hh2*3600LL + mm2*60LL + ss2) * 1000LL + ms2 * multiplier;
-        *start = (hh1*3600LL + mm1*60LL + ss1) * 1000LL + ms1 * multiplier;
+    if (sscanf(s, "%u:%u:%u.%n%u%n,%u:%u:%u.%n%u%n",
+               &hh1, &mm1, &ss1, &ms1p1, &ms1, &ms1p2, &hh2, &mm2, &ss2, &ms2p1, &ms2, &ms2p2) == 8) {
+        multiplier1 = get_multiplier(ms1p2 - ms1p1);
+        multiplier2 = get_multiplier(ms2p2 - ms2p1);
+        if (multiplier1 <= 0 ||multiplier2 <= 0)
+            return -1;
+
+        end    = (hh2*3600LL + mm2*60LL + ss2) * 1000LL + ms2 * multiplier2;
+        *start = (hh1*3600LL + mm1*60LL + ss1) * 1000LL + ms1 * multiplier1;
         *duration = end - *start;
         return 0;
     }
@@ -179,14 +186,14 @@ end:
     return res;
 }
 
-const AVInputFormat ff_subviewer_demuxer = {
-    .name           = "subviewer",
-    .long_name      = NULL_IF_CONFIG_SMALL("SubViewer subtitle format"),
+const FFInputFormat ff_subviewer_demuxer = {
+    .p.name         = "subviewer",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("SubViewer subtitle format"),
+    .p.extensions   = "sub",
     .priv_data_size = sizeof(SubViewerContext),
-    .flags_internal = FF_FMT_INIT_CLEANUP,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .read_probe     = subviewer_probe,
     .read_header    = subviewer_read_header,
-    .extensions     = "sub",
     .read_packet    = ff_subtitles_read_packet,
     .read_seek2     = ff_subtitles_read_seek,
     .read_close     = ff_subtitles_read_close,

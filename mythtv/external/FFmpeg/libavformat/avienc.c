@@ -25,9 +25,9 @@
 #include "internal.h"
 #include "avi.h"
 #include "avio_internal.h"
-#include "config_components.h"
 #include "riff.h"
 #include "mpegts.h"
+#include "mux.h"
 #include "rawutils.h"
 #include "libavformat/avlanguage.h"
 #include "libavutil/avstring.h"
@@ -35,6 +35,7 @@
 #include "libavutil/internal.h"
 #include "libavutil/dict.h"
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavutil/timestamp.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
@@ -1003,19 +1004,19 @@ static const AVClass avi_muxer_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVOutputFormat ff_avi_muxer = {
-    .name           = "avi",
-    .long_name      = NULL_IF_CONFIG_SMALL("AVI (Audio Video Interleaved)"),
-    .mime_type      = "video/x-msvideo",
-    .extensions     = "avi",
+const FFOutputFormat ff_avi_muxer = {
+    .p.name         = "avi",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("AVI (Audio Video Interleaved)"),
+    .p.mime_type    = "video/x-msvideo",
+    .p.extensions   = "avi",
     .priv_data_size = sizeof(AVIContext),
-    .audio_codec    = CONFIG_LIBMP3LAME ? AV_CODEC_ID_MP3 : AV_CODEC_ID_AC3,
-    .video_codec    = AV_CODEC_ID_MPEG4,
+    .p.audio_codec  = CONFIG_LIBMP3LAME ? AV_CODEC_ID_MP3 : AV_CODEC_ID_AC3,
+    .p.video_codec  = AV_CODEC_ID_MPEG4,
     .init           = avi_init,
     .deinit         = avi_deinit,
     .write_header   = avi_write_header,
     .write_packet   = avi_write_packet,
     .write_trailer  = avi_write_trailer,
-    .codec_tag      = ff_riff_codec_tags_list,
-    .priv_class     = &avi_muxer_class,
+    .p.codec_tag    = ff_riff_codec_tags_list,
+    .p.priv_class   = &avi_muxer_class,
 };

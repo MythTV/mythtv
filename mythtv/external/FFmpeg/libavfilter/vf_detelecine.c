@@ -28,8 +28,8 @@
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
+#include "filters.h"
 #include "formats.h"
-#include "internal.h"
 #include "video.h"
 
 typedef struct DetelecineContext {
@@ -58,11 +58,11 @@ typedef struct DetelecineContext {
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 
 static const AVOption detelecine_options[] = {
-    {"first_field", "select first field", OFFSET(first_field), AV_OPT_TYPE_INT,   {.i64=0}, 0, 1, FLAGS, "field"},
-        {"top",    "select top field first",                0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "field"},
-        {"t",      "select top field first",                0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "field"},
-        {"bottom", "select bottom field first",             0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "field"},
-        {"b",      "select bottom field first",             0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "field"},
+    {"first_field", "select first field", OFFSET(first_field), AV_OPT_TYPE_INT,   {.i64=0}, 0, 1, FLAGS, .unit = "field"},
+        {"top",    "select top field first",                0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, .unit = "field"},
+        {"t",      "select top field first",                0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, .unit = "field"},
+        {"bottom", "select bottom field first",             0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, .unit = "field"},
+        {"b",      "select bottom field first",             0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, .unit = "field"},
     {"pattern", "pattern that describe for how many fields a frame is to be displayed", OFFSET(pattern), AV_OPT_TYPE_STRING, {.str="23"}, 0, 0, FLAGS},
     {"start_frame", "position of first frame with respect to the pattern if stream is cut", OFFSET(start_frame), AV_OPT_TYPE_INT, {.i64=0}, 0, 13, FLAGS},
     {NULL}
@@ -162,10 +162,12 @@ static int config_input(AVFilterLink *inlink)
 
 static int config_output(AVFilterLink *outlink)
 {
+    FilterLink     *outl = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
     DetelecineContext *s = ctx->priv;
     const AVFilterLink *inlink = ctx->inputs[0];
-    AVRational fps = inlink->frame_rate;
+    const FilterLink      *inl = ff_filter_link(ctx->inputs[0]);
+    AVRational fps = inl->frame_rate;
 
     if (!fps.num || !fps.den) {
         av_log(ctx, AV_LOG_ERROR, "The input needs a constant frame rate; "
@@ -174,9 +176,9 @@ static int config_output(AVFilterLink *outlink)
     }
     fps = av_mul_q(fps, av_inv_q(s->pts));
     av_log(ctx, AV_LOG_VERBOSE, "FPS: %d/%d -> %d/%d\n",
-           inlink->frame_rate.num, inlink->frame_rate.den, fps.num, fps.den);
+           inl->frame_rate.num, inl->frame_rate.den, fps.num, fps.den);
 
-    outlink->frame_rate = fps;
+    outl->frame_rate = fps;
     outlink->time_base = av_mul_q(inlink->time_base, s->pts);
     av_log(ctx, AV_LOG_VERBOSE, "TB: %d/%d -> %d/%d\n",
            inlink->time_base.num, inlink->time_base.den, outlink->time_base.num, outlink->time_base.den);
@@ -190,6 +192,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
 {
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
+    FilterLink *outl = ff_filter_link(outlink);
     DetelecineContext *s = ctx->priv;
     int i, len = 0, ret = 0, out = 0;
 
@@ -329,7 +332,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
 
         av_frame_copy_props(frame, inpicref);
         frame->pts = ((s->start_time == AV_NOPTS_VALUE) ? 0 : s->start_time) +
-                     av_rescale(outlink->frame_count_in, s->ts_unit.num,
+                     av_rescale(outl->frame_count_in, s->ts_unit.num,
                                 s->ts_unit.den);
         ret = ff_filter_frame(outlink, frame);
     }

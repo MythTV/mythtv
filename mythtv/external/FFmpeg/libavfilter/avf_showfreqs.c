@@ -21,6 +21,7 @@
 #include <float.h>
 #include <math.h>
 
+#include "libavutil/mem.h"
 #include "libavutil/tx.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
@@ -30,9 +31,9 @@
 #include "libavutil/parseutils.h"
 #include "audio.h"
 #include "filters.h"
+#include "formats.h"
 #include "video.h"
 #include "avfilter.h"
-#include "internal.h"
 #include "window_func.h"
 
 enum DataMode       { MAGNITUDE, PHASE, DELAY, NB_DATA };
@@ -83,32 +84,32 @@ static const AVOption showfreqs_options[] = {
     { "s",    "set video size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str = "1024x512"}, 0, 0, FLAGS },
     { "rate", "set video rate",  OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, INT_MAX, FLAGS },
     { "r",    "set video rate",  OFFSET(frame_rate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, INT_MAX, FLAGS },
-    { "mode", "set display mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=BAR}, 0, NB_MODES-1, FLAGS, "mode" },
-        { "line", "show lines",  0, AV_OPT_TYPE_CONST, {.i64=LINE},   0, 0, FLAGS, "mode" },
-        { "bar",  "show bars",   0, AV_OPT_TYPE_CONST, {.i64=BAR},    0, 0, FLAGS, "mode" },
-        { "dot",  "show dots",   0, AV_OPT_TYPE_CONST, {.i64=DOT},    0, 0, FLAGS, "mode" },
-    { "ascale", "set amplitude scale", OFFSET(ascale), AV_OPT_TYPE_INT, {.i64=AS_LOG}, 0, NB_ASCALES-1, FLAGS, "ascale" },
-        { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=AS_LINEAR}, 0, 0, FLAGS, "ascale" },
-        { "sqrt", "square root", 0, AV_OPT_TYPE_CONST, {.i64=AS_SQRT},   0, 0, FLAGS, "ascale" },
-        { "cbrt", "cubic root",  0, AV_OPT_TYPE_CONST, {.i64=AS_CBRT},   0, 0, FLAGS, "ascale" },
-        { "log",  "logarithmic", 0, AV_OPT_TYPE_CONST, {.i64=AS_LOG},    0, 0, FLAGS, "ascale" },
-    { "fscale", "set frequency scale", OFFSET(fscale), AV_OPT_TYPE_INT, {.i64=FS_LINEAR}, 0, NB_FSCALES-1, FLAGS, "fscale" },
-        { "lin",  "linear",              0, AV_OPT_TYPE_CONST, {.i64=FS_LINEAR}, 0, 0, FLAGS, "fscale" },
-        { "log",  "logarithmic",         0, AV_OPT_TYPE_CONST, {.i64=FS_LOG},    0, 0, FLAGS, "fscale" },
-        { "rlog", "reverse logarithmic", 0, AV_OPT_TYPE_CONST, {.i64=FS_RLOG},   0, 0, FLAGS, "fscale" },
+    { "mode", "set display mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=BAR}, 0, NB_MODES-1, FLAGS, .unit = "mode" },
+        { "line", "show lines",  0, AV_OPT_TYPE_CONST, {.i64=LINE},   0, 0, FLAGS, .unit = "mode" },
+        { "bar",  "show bars",   0, AV_OPT_TYPE_CONST, {.i64=BAR},    0, 0, FLAGS, .unit = "mode" },
+        { "dot",  "show dots",   0, AV_OPT_TYPE_CONST, {.i64=DOT},    0, 0, FLAGS, .unit = "mode" },
+    { "ascale", "set amplitude scale", OFFSET(ascale), AV_OPT_TYPE_INT, {.i64=AS_LOG}, 0, NB_ASCALES-1, FLAGS, .unit = "ascale" },
+        { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=AS_LINEAR}, 0, 0, FLAGS, .unit = "ascale" },
+        { "sqrt", "square root", 0, AV_OPT_TYPE_CONST, {.i64=AS_SQRT},   0, 0, FLAGS, .unit = "ascale" },
+        { "cbrt", "cubic root",  0, AV_OPT_TYPE_CONST, {.i64=AS_CBRT},   0, 0, FLAGS, .unit = "ascale" },
+        { "log",  "logarithmic", 0, AV_OPT_TYPE_CONST, {.i64=AS_LOG},    0, 0, FLAGS, .unit = "ascale" },
+    { "fscale", "set frequency scale", OFFSET(fscale), AV_OPT_TYPE_INT, {.i64=FS_LINEAR}, 0, NB_FSCALES-1, FLAGS, .unit = "fscale" },
+        { "lin",  "linear",              0, AV_OPT_TYPE_CONST, {.i64=FS_LINEAR}, 0, 0, FLAGS, .unit = "fscale" },
+        { "log",  "logarithmic",         0, AV_OPT_TYPE_CONST, {.i64=FS_LOG},    0, 0, FLAGS, .unit = "fscale" },
+        { "rlog", "reverse logarithmic", 0, AV_OPT_TYPE_CONST, {.i64=FS_RLOG},   0, 0, FLAGS, .unit = "fscale" },
     { "win_size", "set window size", OFFSET(fft_size), AV_OPT_TYPE_INT, {.i64=2048}, 16, 65536, FLAGS },
     WIN_FUNC_OPTION("win_func", OFFSET(win_func), FLAGS, WFUNC_HANNING),
     { "overlap",  "set window overlap", OFFSET(overlap), AV_OPT_TYPE_FLOAT, {.dbl=1.}, 0., 1., FLAGS },
     { "averaging", "set time averaging", OFFSET(avg), AV_OPT_TYPE_INT, {.i64=1}, 0, INT32_MAX, FLAGS },
     { "colors", "set channels colors", OFFSET(colors), AV_OPT_TYPE_STRING, {.str = "red|green|blue|yellow|orange|lime|pink|magenta|brown" }, 0, 0, FLAGS },
-    { "cmode", "set channel mode", OFFSET(cmode), AV_OPT_TYPE_INT, {.i64=COMBINED}, 0, NB_CMODES-1, FLAGS, "cmode" },
-        { "combined", "show all channels in same window",  0, AV_OPT_TYPE_CONST, {.i64=COMBINED}, 0, 0, FLAGS, "cmode" },
-        { "separate", "show each channel in own window",   0, AV_OPT_TYPE_CONST, {.i64=SEPARATE}, 0, 0, FLAGS, "cmode" },
+    { "cmode", "set channel mode", OFFSET(cmode), AV_OPT_TYPE_INT, {.i64=COMBINED}, 0, NB_CMODES-1, FLAGS, .unit = "cmode" },
+        { "combined", "show all channels in same window",  0, AV_OPT_TYPE_CONST, {.i64=COMBINED}, 0, 0, FLAGS, .unit = "cmode" },
+        { "separate", "show each channel in own window",   0, AV_OPT_TYPE_CONST, {.i64=SEPARATE}, 0, 0, FLAGS, .unit = "cmode" },
     { "minamp",  "set minimum amplitude", OFFSET(minamp), AV_OPT_TYPE_FLOAT, {.dbl=1e-6}, FLT_MIN, 1e-6, FLAGS },
-    { "data", "set data mode", OFFSET(data_mode), AV_OPT_TYPE_INT, {.i64=MAGNITUDE}, 0, NB_DATA-1, FLAGS, "data" },
-        { "magnitude", "show magnitude",  0, AV_OPT_TYPE_CONST, {.i64=MAGNITUDE}, 0, 0, FLAGS, "data" },
-        { "phase",     "show phase",      0, AV_OPT_TYPE_CONST, {.i64=PHASE},     0, 0, FLAGS, "data" },
-        { "delay",     "show group delay",0, AV_OPT_TYPE_CONST, {.i64=DELAY},     0, 0, FLAGS, "data" },
+    { "data", "set data mode", OFFSET(data_mode), AV_OPT_TYPE_INT, {.i64=MAGNITUDE}, 0, NB_DATA-1, FLAGS, .unit = "data" },
+        { "magnitude", "show magnitude",  0, AV_OPT_TYPE_CONST, {.i64=MAGNITUDE}, 0, 0, FLAGS, .unit = "data" },
+        { "phase",     "show phase",      0, AV_OPT_TYPE_CONST, {.i64=PHASE},     0, 0, FLAGS, .unit = "data" },
+        { "delay",     "show group delay",0, AV_OPT_TYPE_CONST, {.i64=DELAY},     0, 0, FLAGS, .unit = "data" },
     { "channels", "set channels to draw", OFFSET(ch_layout_str), AV_OPT_TYPE_STRING, {.str="all"}, 0, 0, FLAGS },
     { NULL }
 };
@@ -148,10 +149,11 @@ static int query_formats(AVFilterContext *ctx)
 
 static int config_output(AVFilterLink *outlink)
 {
+    FilterLink *l = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
     AVFilterLink *inlink = ctx->inputs[0];
     ShowFreqsContext *s = ctx->priv;
-    float overlap, scale;
+    float overlap, scale = 1.f;
     int i, ret;
 
     s->old_pts = AV_NOPTS_VALUE;
@@ -221,8 +223,8 @@ static int config_output(AVFilterLink *outlink)
     if (!s->window)
         return AVERROR(ENOMEM);
 
-    outlink->frame_rate = s->frame_rate;
-    outlink->time_base = av_inv_q(outlink->frame_rate);
+    l->frame_rate = s->frame_rate;
+    outlink->time_base = av_inv_q(l->frame_rate);
     outlink->sample_aspect_ratio = (AVRational){1,1};
     outlink->w = s->w;
     outlink->h = s->h;
@@ -295,6 +297,7 @@ static inline void plot_freq(ShowFreqsContext *s, int ch,
                              double a, int f, uint8_t fg[4], int *prev_y,
                              AVFrame *out, AVFilterLink *outlink)
 {
+    FilterLink *outl = ff_filter_link(outlink);
     const int w = s->w;
     const float min = s->minamp;
     const float avg = s->avg_data[ch][f];
@@ -334,12 +337,12 @@ static inline void plot_freq(ShowFreqsContext *s, int ch,
 
     switch (s->avg) {
     case 0:
-        y = s->avg_data[ch][f] = !outlink->frame_count_in ? y : FFMIN(0, y);
+        y = s->avg_data[ch][f] = !outl->frame_count_in ? y : FFMIN(0, y);
         break;
     case 1:
         break;
     default:
-        s->avg_data[ch][f] = avg + y * (y - avg) / (FFMIN(outlink->frame_count_in + 1, s->avg) * (float)y);
+        s->avg_data[ch][f] = avg + y * (y - avg) / (FFMIN(outl->frame_count_in + 1, s->avg) * (float)y);
         y = av_clip(s->avg_data[ch][f], 0, outlink->h - 1);
         break;
     }
@@ -403,7 +406,7 @@ static int plot_freqs(AVFilterLink *inlink, int64_t pts)
         if (s->bypass[ch])
             continue;
 
-        s->tx_fn(s->fft, s->fft_data[ch], s->fft_input[ch], sizeof(float));
+        s->tx_fn(s->fft, s->fft_data[ch], s->fft_input[ch], sizeof(AVComplexFloat));
     }
 
     s->pts = av_rescale_q(pts, inlink->time_base, outlink->time_base);
@@ -469,6 +472,7 @@ static int plot_freqs(AVFilterLink *inlink, int64_t pts)
 
     av_free(colors);
     out->pts = s->pts;
+    out->duration = 1;
     out->sample_aspect_ratio = (AVRational){1,1};
     return ff_filter_frame(outlink, out);
 }
@@ -546,13 +550,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_frame_free(&s->window);
 }
 
-static const AVFilterPad showfreqs_inputs[] = {
-    {
-        .name         = "default",
-        .type         = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 static const AVFilterPad showfreqs_outputs[] = {
     {
         .name          = "default",
@@ -567,7 +564,7 @@ const AVFilter ff_avf_showfreqs = {
     .uninit        = uninit,
     .priv_size     = sizeof(ShowFreqsContext),
     .activate      = activate,
-    FILTER_INPUTS(showfreqs_inputs),
+    FILTER_INPUTS(ff_audio_default_filterpad),
     FILTER_OUTPUTS(showfreqs_outputs),
     FILTER_QUERY_FUNC(query_formats),
     .priv_class    = &showfreqs_class,

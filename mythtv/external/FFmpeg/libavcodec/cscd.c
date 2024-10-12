@@ -18,13 +18,11 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
-#include "libavutil/common.h"
+#include "decode.h"
+#include "libavutil/mem.h"
 
 #if CONFIG_ZLIB
 #include <zlib.h>
@@ -72,6 +70,9 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     int buf_size = avpkt->size;
     CamStudioContext *c = avctx->priv_data;
     int ret;
+    int bpp = avctx->bits_per_coded_sample / 8;
+    int bugdelta = FFALIGN(avctx->width * bpp, 4)       * avctx->height
+                 -        (avctx->width     & ~3) * bpp * avctx->height;
 
     if (buf_size < 2) {
         av_log(avctx, AV_LOG_ERROR, "coded frame too small\n");
@@ -85,7 +86,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     switch ((buf[0] >> 1) & 7) {
     case 0: { // lzo compression
         int outlen = c->decomp_size, inlen = buf_size - 2;
-        if (av_lzo1x_decode(c->decomp_buf, &outlen, &buf[2], &inlen) || outlen) {
+        if (av_lzo1x_decode(c->decomp_buf, &outlen, &buf[2], &inlen) || (outlen && outlen != bugdelta)) {
             av_log(avctx, AV_LOG_ERROR, "error during lzo decompression\n");
             return AVERROR_INVALIDDATA;
         }
@@ -94,7 +95,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     case 1: { // zlib compression
 #if CONFIG_ZLIB
         unsigned long dlen = c->decomp_size;
-        if (uncompress(c->decomp_buf, &dlen, &buf[2], buf_size - 2) != Z_OK || dlen != c->decomp_size) {
+        if (uncompress(c->decomp_buf, &dlen, &buf[2], buf_size - 2) != Z_OK || (dlen != c->decomp_size && dlen != c->decomp_size - bugdelta)) {
             av_log(avctx, AV_LOG_ERROR, "error during zlib decompression\n");
             return AVERROR_INVALIDDATA;
         }
@@ -112,12 +113,12 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     // flip upside down, add difference frame
     if (buf[0] & 1) { // keyframe
         c->pic->pict_type = AV_PICTURE_TYPE_I;
-        c->pic->key_frame = 1;
+        c->pic->flags |= AV_FRAME_FLAG_KEY;
               copy_frame_default(c->pic, c->decomp_buf,
                                  c->linelen, c->height);
     } else {
         c->pic->pict_type = AV_PICTURE_TYPE_P;
-        c->pic->key_frame = 0;
+        c->pic->flags &= ~AV_FRAME_FLAG_KEY;
               add_frame_default(c->pic, c->decomp_buf,
                                 c->linelen, c->height);
     }
@@ -169,7 +170,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_cscd_decoder = {
     .p.name         = "camstudio",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("CamStudio"),
+    CODEC_LONG_NAME("CamStudio"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_CSCD,
     .priv_data_size = sizeof(CamStudioContext),
@@ -177,5 +178,5 @@ const FFCodec ff_cscd_decoder = {
     .close          = decode_end,
     FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

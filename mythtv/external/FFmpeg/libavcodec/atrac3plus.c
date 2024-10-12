@@ -66,8 +66,8 @@ static av_cold void build_canonical_huff(const uint8_t *cb, const uint8_t **xlat
     out_vlc->table = &tables_data[*tab_offset];
     out_vlc->table_allocated = 1 << max_len;
 
-    ff_init_vlc_from_lengths(out_vlc, max_len, index, bits, 1,
-                             *xlat, 1, 1, 0, INIT_VLC_USE_NEW_STATIC, NULL);
+    ff_vlc_init_from_lengths(out_vlc, max_len, index, bits, 1,
+                             *xlat, 1, 1, 0, VLC_INIT_USE_STATIC, NULL);
 
     *tab_offset += 1 << max_len;
     *xlat       += index;
@@ -734,7 +734,7 @@ static void decode_qu_spectra(GetBitContext *gb, const Atrac3pSpecCodeTab *tab,
                 val = get_vlc2(gb, vlc_tab->table, vlc_tab->bits, 1);
 
                 for (i = 0; i < num_coeffs; i++) {
-                    cf = av_mod_uintp2(val, bits);
+                    cf = av_zero_extend(val, bits);
                     if (is_signed)
                         cf = sign_extend(cf, bits);
                     else if (cf && get_bits1(gb))
@@ -1391,9 +1391,9 @@ static int decode_band_numwavs(GetBitContext *gb, Atrac3pChanUnitCtx *ctx,
         if (band_has_tones[sb]) {
             if (ctx->waves_info->tones_index + dst[sb].num_wavs > 48) {
                 av_log(avctx, AV_LOG_ERROR,
-                       "Too many tones: %d (max. 48), frame: %d!\n",
+                       "Too many tones: %d (max. 48), frame: %"PRId64"!\n",
                        ctx->waves_info->tones_index + dst[sb].num_wavs,
-                       avctx->frame_number);
+                       avctx->frame_num);
                 return AVERROR_INVALIDDATA;
             }
             dst[sb].start_index           = ctx->waves_info->tones_index;
