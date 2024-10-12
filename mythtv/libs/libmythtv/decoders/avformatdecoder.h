@@ -297,19 +297,6 @@ class AvFormatDecoder : public DecoderBase
     std::chrono::milliseconds  m_firstVPts            {0ms};
     bool               m_firstVPtsInuse               {false};
 
-    int64_t            m_faultyPts                    {0};
-    int64_t            m_faultyDts                    {0};
-    int64_t            m_lastPtsForFaultDetection     {0};
-    int64_t            m_lastDtsForFaultDetection     {0};
-    bool               m_ptsDetected                  {false};
-    bool               m_reorderedPtsDetected         {false};
-    bool               m_ptsSelected                  {true};
-    // set use_frame_timing true to utilize the pts values in returned
-    // frames. Set fale to use deprecated method.
-    bool               m_useFrameTiming               {false};
-
-    bool               m_forceDtsTimestamps           {false};
-
     PlayerFlags        m_playerFlags;
     MythCodecID        m_videoCodecId                 {kCodec_NONE};
 

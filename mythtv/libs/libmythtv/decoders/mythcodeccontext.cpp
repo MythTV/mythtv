@@ -336,7 +336,6 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     }
     Frame->opaque           = videoframe;
     videoframe->m_pixFmt    = Context->pix_fmt;
-    Frame->reordered_opaque = Context->reordered_opaque;
 
     int ret = avcodec_default_get_buffer2(Context, Frame, Flags);
     if (ret < 0)
@@ -386,7 +385,6 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, MythVideoFrame
     Frame->m_directRendering = true;
     Frame->m_colorshifted = true;
 
-    AvFrame->reordered_opaque = Context->reordered_opaque;
     AvFrame->opaque = Frame;
 
     // retrieve the software format
