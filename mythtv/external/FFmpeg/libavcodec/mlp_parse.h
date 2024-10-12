@@ -58,6 +58,9 @@ typedef struct MLPHeaderInfo
     int peak_bitrate;                       ///< Peak bitrate for VBR, actual bitrate (==peak) for CBR
 
     int num_substreams;                     ///< Number of substreams within stream
+
+    int extended_substream_info;            ///< Which substream of substreams carry 16-channel presentation
+    int substream_info;                     ///< Which substream of substreams carry 2/6/8-channel presentation
 } MLPHeaderInfo;
 
 static const uint8_t thd_chancount[13] = {
@@ -108,6 +111,18 @@ static inline uint64_t truehd_layout(int chanmap)
         layout |= thd_layout[i] * ((chanmap >> i) & 1);
 
     return layout;
+}
+
+static inline int layout_truehd(uint64_t layout)
+{
+    int chanmap = 0;
+
+    for (int i = 0; i < 13; i++) {
+        if ((layout & thd_layout[i]) == thd_layout[i])
+            chanmap |= 1 << i;
+    }
+
+    return chanmap;
 }
 
 int ff_mlp_read_major_sync(void *log, MLPHeaderInfo *mh, GetBitContext *gb);

@@ -50,11 +50,13 @@ DISPOSITION:visual_impaired=0
 DISPOSITION:clean_effects=0
 DISPOSITION:attached_pic=0
 DISPOSITION:timed_thumbnails=0
+DISPOSITION:non_diegetic=0
 DISPOSITION:captions=0
 DISPOSITION:descriptions=0
 DISPOSITION:metadata=0
 DISPOSITION:dependent=0
 DISPOSITION:still_image=0
+DISPOSITION:multilayer=0
 TAG:file_package_umid=0x060A2B340101010501010D1313000000AE86B200913105800000080046A54011
 [SIDE_DATA]
 side_data_type=CPB properties
@@ -77,6 +79,7 @@ sample_rate=48000
 channels=8
 channel_layout=unknown
 bits_per_sample=16
+initial_padding=0
 id=N/A
 r_frame_rate=0/0
 avg_frame_rate=0/0
@@ -103,11 +106,13 @@ DISPOSITION:visual_impaired=0
 DISPOSITION:clean_effects=0
 DISPOSITION:attached_pic=0
 DISPOSITION:timed_thumbnails=0
+DISPOSITION:non_diegetic=0
 DISPOSITION:captions=0
 DISPOSITION:descriptions=0
 DISPOSITION:metadata=0
 DISPOSITION:dependent=0
 DISPOSITION:still_image=0
+DISPOSITION:multilayer=0
 TAG:file_package_umid=0x060A2B340101010501010D1313000000AE86B200913105800000080046A54011
 [/STREAM]
 [FORMAT]

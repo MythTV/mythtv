@@ -30,7 +30,9 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "libavcodec/bethsoftvideo.h"
 
@@ -290,9 +292,9 @@ static int vid_read_packet(AVFormatContext *s,
     }
 }
 
-const AVInputFormat ff_bethsoftvid_demuxer = {
-    .name           = "bethsoftvid",
-    .long_name      = NULL_IF_CONFIG_SMALL("Bethesda Softworks VID"),
+const FFInputFormat ff_bethsoftvid_demuxer = {
+    .p.name         = "bethsoftvid",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Bethesda Softworks VID"),
     .priv_data_size = sizeof(BVID_DemuxContext),
     .read_probe     = vid_probe,
     .read_header    = vid_read_header,

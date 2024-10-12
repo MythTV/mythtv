@@ -22,7 +22,9 @@
 #include <inttypes.h>
 #include <stdint.h>
 
+#include "libavutil/mem.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "riff.h"
 
@@ -151,7 +153,7 @@ static int xwma_read_header(AVFormatContext *s)
                st->codecpar->ch_layout.nb_channels);
         return AVERROR_INVALIDDATA;
     }
-    if (!st->codecpar->bits_per_coded_sample) {
+    if (!st->codecpar->bits_per_coded_sample || st->codecpar->bits_per_coded_sample > 64) {
         av_log(s, AV_LOG_WARNING, "Invalid bits_per_coded_sample: %d\n",
                st->codecpar->bits_per_coded_sample);
         return AVERROR_INVALIDDATA;
@@ -278,7 +280,7 @@ static int xwma_read_header(AVFormatContext *s)
          * the total duration using the average bits per sample and the
          * total data length.
          */
-        st->duration = (size<<3) * st->codecpar->sample_rate / st->codecpar->bit_rate;
+        st->duration = av_rescale((size<<3), st->codecpar->sample_rate, st->codecpar->bit_rate);
     }
 
 fail:
@@ -313,9 +315,9 @@ static int xwma_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-const AVInputFormat ff_xwma_demuxer = {
-    .name           = "xwma",
-    .long_name      = NULL_IF_CONFIG_SMALL("Microsoft xWMA"),
+const FFInputFormat ff_xwma_demuxer = {
+    .p.name         = "xwma",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Microsoft xWMA"),
     .priv_data_size = sizeof(XWMAContext),
     .read_probe     = xwma_probe,
     .read_header    = xwma_read_header,

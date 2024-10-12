@@ -20,7 +20,6 @@
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%include "config.asm"
 %include "libavutil/x86/x86util.asm"
 
 %ifdef __NASM_VER__
@@ -74,7 +73,7 @@ SECTION .text
 ; "movaps m0, [r5 + r4]" if PIC is enabled
 ; "movaps m0, [constant_name + r4]" if texrel are used
 %macro SET_PIC_BASE 3; reg, const_label
-%ifdef PIC
+%if PIC
     %{1}     %2, [%3]      ; lea r5, [rip+const]
     %define  pic_base_%3 %2
 %else
@@ -195,7 +194,7 @@ align 16
 ; PIC relative addressing. Use this
 ; to count it in cglobal
 ;
-%ifdef PIC
+%if PIC
   %define num_pic_regs 1
 %else
   %define num_pic_regs 0

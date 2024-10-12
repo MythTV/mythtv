@@ -33,22 +33,16 @@
 #include "libavutil/frame.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
-#include "libavutil/pixdesc.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "encode.h"
-#include "idctdsp.h"
 #include "jpegtables.h"
-#include "mathops.h"
 #include "mjpegenc_common.h"
 #include "mjpeg.h"
 
 typedef struct LJpegEncContext {
     AVClass *class;
-    IDCTDSPContext idsp;
-    ScanTable scantable;
-    uint16_t matrix[64];
 
     int vsample[4];
     int hsample[4];
@@ -78,7 +72,7 @@ static int ljpeg_encode_bgr(AVCodecContext *avctx, PutBitContext *pb,
 
     for (y = 0; y < height; y++) {
         const int modified_predictor = y ? s->pred : 1;
-        uint8_t *ptr = frame->data[0] + (linesize * y);
+        const uint8_t *ptr = frame->data[0] + (linesize * y);
 
         if (put_bytes_left(pb, 0) < width * 4 * 4) {
             av_log(avctx, AV_LOG_ERROR, "encoded frame too large\n");
@@ -132,7 +126,7 @@ static inline void ljpeg_encode_yuv_mb(LJpegEncContext *s, PutBitContext *pb,
 
     if (mb_x == 0 || mb_y == 0) {
         for (i = 0; i < 3; i++) {
-            uint8_t *ptr;
+            const uint8_t *ptr;
             int x, y, h, v, linesize;
             h = s->hsample[i];
             v = s->vsample[i];
@@ -166,7 +160,7 @@ static inline void ljpeg_encode_yuv_mb(LJpegEncContext *s, PutBitContext *pb,
         }
     } else {
         for (i = 0; i < 3; i++) {
-            uint8_t *ptr;
+            const uint8_t *ptr;
             int x, y, h, v, linesize;
             h = s->hsample[i];
             v = s->vsample[i];
@@ -220,7 +214,7 @@ static int ljpeg_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     const int height = avctx->height;
     const int mb_width  = (width  + s->hsample[0] - 1) / s->hsample[0];
     const int mb_height = (height + s->vsample[0] - 1) / s->vsample[0];
-    size_t max_pkt_size = AV_INPUT_BUFFER_MIN_SIZE;
+    size_t max_pkt_size = FF_INPUT_BUFFER_MIN_SIZE;
     int ret, header_bits;
 
     if(    avctx->pix_fmt == AV_PIX_FMT_BGR0
@@ -240,8 +234,8 @@ static int ljpeg_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
     init_put_bits(&pb, pkt->data, pkt->size);
 
-    ff_mjpeg_encode_picture_header(avctx, &pb, pict, NULL, &s->scantable,
-                                   s->pred, s->matrix, s->matrix, 0);
+    ff_mjpeg_encode_picture_header(avctx, &pb, pict, NULL, NULL,
+                                   s->pred, NULL, NULL, 0);
 
     header_bits = put_bits_count(&pb);
 
@@ -253,8 +247,6 @@ static int ljpeg_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         ret = ljpeg_encode_yuv(avctx, &pb, pict);
     if (ret < 0)
         return ret;
-
-    emms_c();
 
     ff_mjpeg_escape_FF(&pb, header_bits >> 3);
     ff_mjpeg_encode_picture_trailer(&pb, header_bits);
@@ -287,10 +279,6 @@ static av_cold int ljpeg_encode_init(AVCodecContext *avctx)
     if (!s->scratch)
         return AVERROR(ENOMEM);
 
-    ff_idctdsp_init(&s->idsp, avctx);
-    ff_init_scantable(s->idsp.idct_permutation, &s->scantable,
-                      ff_zigzag_direct);
-
     ff_mjpeg_init_hvsample(avctx, s->hsample, s->vsample);
 
     ff_mjpeg_build_huffman_codes(s->huff_size_dc_luminance,
@@ -308,10 +296,10 @@ static av_cold int ljpeg_encode_init(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(LJpegEncContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-{ "pred", "Prediction method", OFFSET(pred), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, 3, VE, "pred" },
-    { "left",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 1 }, INT_MIN, INT_MAX, VE, "pred" },
-    { "plane",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 2 }, INT_MIN, INT_MAX, VE, "pred" },
-    { "median", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 3 }, INT_MIN, INT_MAX, VE, "pred" },
+{ "pred", "Prediction method", OFFSET(pred), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, 3, VE, .unit = "pred" },
+    { "left",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 1 }, INT_MIN, INT_MAX, VE, .unit = "pred" },
+    { "plane",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 2 }, INT_MIN, INT_MAX, VE, .unit = "pred" },
+    { "median", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = 3 }, INT_MIN, INT_MAX, VE, .unit = "pred" },
 
     { NULL},
 };
@@ -325,19 +313,20 @@ static const AVClass ljpeg_class = {
 
 const FFCodec ff_ljpeg_encoder = {
     .p.name         = "ljpeg",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Lossless JPEG"),
+    CODEC_LONG_NAME("Lossless JPEG"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_LJPEG,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size = sizeof(LJpegEncContext),
     .p.priv_class   = &ljpeg_class,
     .init           = ljpeg_encode_init,
     FF_CODEC_ENCODE_CB(ljpeg_encode_frame),
     .close          = ljpeg_encode_close,
-    .p.capabilities = AV_CODEC_CAP_FRAME_THREADS,
     .p.pix_fmts     = (const enum AVPixelFormat[]){
         AV_PIX_FMT_BGR24   , AV_PIX_FMT_BGRA    , AV_PIX_FMT_BGR0,
         AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ422P,
         AV_PIX_FMT_YUV420P , AV_PIX_FMT_YUV444P , AV_PIX_FMT_YUV422P,
         AV_PIX_FMT_NONE},
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
+    .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
 };

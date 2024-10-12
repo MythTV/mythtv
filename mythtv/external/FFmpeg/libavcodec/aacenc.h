@@ -22,18 +22,24 @@
 #ifndef AVCODEC_AACENC_H
 #define AVCODEC_AACENC_H
 
+#include <stdint.h>
+
 #include "libavutil/channel_layout.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/mem_internal.h"
+#include "libavutil/tx.h"
 
 #include "avcodec.h"
 #include "put_bits.h"
 
 #include "aac.h"
+#include "aacencdsp.h"
 #include "audio_frame_queue.h"
 #include "psymodel.h"
 
 #include "lpc.h"
+
+#define CLIP_AVOIDANCE_FACTOR 0.95f
 
 typedef enum AACCoder {
     AAC_CODER_ANMR = 0,
@@ -42,6 +48,20 @@ typedef enum AACCoder {
 
     AAC_CODER_NB,
 }AACCoder;
+
+/**
+ * Predictor State
+ */
+typedef struct PredictorState {
+    float cor0;
+    float cor1;
+    float var0;
+    float var1;
+    float r0;
+    float r1;
+    float k1;
+    float x_est;
+} PredictorState;
 
 typedef struct AACEncOptions {
     int coder;
@@ -53,6 +73,90 @@ typedef struct AACEncOptions {
     int mid_side;
     int intensity_stereo;
 } AACEncOptions;
+
+/**
+ * Long Term Prediction
+ */
+typedef struct LongTermPrediction {
+    int8_t present;
+    int16_t lag;
+    int coef_idx;
+    float coef;
+    int8_t used[MAX_LTP_LONG_SFB];
+} LongTermPrediction;
+
+/**
+ * Individual Channel Stream
+ */
+typedef struct IndividualChannelStream {
+    uint8_t max_sfb;            ///< number of scalefactor bands per group
+    enum WindowSequence window_sequence[2];
+    uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sine window.
+    uint8_t group_len[8];
+    LongTermPrediction ltp;
+    const uint16_t *swb_offset; ///< table of offsets to the lowest spectral coefficient of a scalefactor band, sfb, for a particular window
+    const uint8_t *swb_sizes;   ///< table of scalefactor band sizes for a particular window
+    int num_swb;                ///< number of scalefactor window bands
+    int num_windows;
+    int tns_max_bands;
+    int predictor_present;
+    int predictor_initialized;
+    int predictor_reset_group;
+    int predictor_reset_count[31];  ///< used to count prediction resets
+    uint8_t prediction_used[41];
+    uint8_t window_clipping[8]; ///< set if a certain window is near clipping
+    float clip_avoidance_factor; ///< set if any window is near clipping to the necessary atennuation factor to avoid it
+} IndividualChannelStream;
+
+/**
+ * Temporal Noise Shaping
+ */
+typedef struct TemporalNoiseShaping {
+    int present;
+    int n_filt[8];
+    int length[8][4];
+    int direction[8][4];
+    int order[8][4];
+    int coef_idx[8][4][TNS_MAX_ORDER];
+    float coef[8][4][TNS_MAX_ORDER];
+} TemporalNoiseShaping;
+
+/**
+ * Single Channel Element - used for both SCE and LFE elements.
+ */
+typedef struct SingleChannelElement {
+    IndividualChannelStream ics;
+    TemporalNoiseShaping tns;
+    Pulse pulse;
+    enum BandType band_type[128];                   ///< band types
+    enum BandType band_alt[128];                    ///< alternative band type
+    int sf_idx[128];                                ///< scalefactor indices
+    uint8_t zeroes[128];                            ///< band is not coded
+    uint8_t can_pns[128];                           ///< band is allowed to PNS (informative)
+    float  is_ener[128];                            ///< Intensity stereo pos
+    float pns_ener[128];                            ///< Noise energy values
+    DECLARE_ALIGNED(32, float, pcoeffs)[1024];      ///< coefficients for IMDCT, pristine
+    DECLARE_ALIGNED(32, float, coeffs)[1024];       ///< coefficients for IMDCT, maybe processed
+    DECLARE_ALIGNED(32, float, ret_buf)[2048];      ///< PCM output buffer
+    DECLARE_ALIGNED(16, float, ltp_state)[3072];    ///< time signal for LTP
+    DECLARE_ALIGNED(32, float, lcoeffs)[1024];      ///< MDCT of LTP coefficients
+    DECLARE_ALIGNED(32, float, prcoeffs)[1024];     ///< Main prediction coefs
+    PredictorState predictor_state[MAX_PREDICTORS];
+} SingleChannelElement;
+
+/**
+ * channel element - generic struct for SCE/CPE/CCE/LFE
+ */
+typedef struct ChannelElement {
+    // CPE specific
+    int common_window;        ///< Set if channels share a common 'IndividualChannelStream' in bitstream.
+    int     ms_mode;          ///< Signals mid/side stereo flags coding mode
+    uint8_t is_mode;          ///< Set if any bands have been encoded using intensity stereo
+    uint8_t ms_mask[128];     ///< Set if mid/side stereo is used for each scalefactor window band
+    uint8_t is_mask[128];     ///< Set if intensity stereo is used
+    // shared
+    SingleChannelElement ch[2];
+} ChannelElement;
 
 struct AACEncContext;
 
@@ -103,287 +207,16 @@ typedef struct AACPCEInfo {
 } AACPCEInfo;
 
 /**
- * List of PCE (Program Configuration Element) for the channel layouts listed
- * in channel_layout.h
- *
- * For those wishing in the future to add other layouts:
- *
- * - num_ele: number of elements in each group of front, side, back, lfe channels
- *            (an element is of type SCE (single channel), CPE (channel pair) for
- *            the first 3 groups; and is LFE for LFE group).
- *
- * - pairing: 0 for an SCE element or 1 for a CPE; does not apply to LFE group
- *
- * - index: there are three independent indices for SCE, CPE and LFE;
- *     they are incremented irrespective of the group to which the element belongs;
- *     they are not reset when going from one group to another
- *
- *     Example: for 7.0 channel layout,
- *        .pairing = { { 1, 0 }, { 1 }, { 1 }, }, (3 CPE and 1 SCE in front group)
- *        .index = { { 0, 0 }, { 1 }, { 2 }, },
- *               (index is 0 for the single SCE but goes from 0 to 2 for the CPEs)
- *
- *     The index order impacts the channel ordering. But is otherwise arbitrary
- *     (the sequence could have been 2, 0, 1 instead of 0, 1, 2).
- *
- *     Spec allows for discontinuous indices, e.g. if one has a total of two SCE,
- *     SCE.0 SCE.15 is OK per spec; BUT it won't be decoded by our AAC decoder
- *     which at this time requires that indices fully cover some range starting
- *     from 0 (SCE.1 SCE.0 is OK but not SCE.0 SCE.15).
- *
- * - config_map: total number of elements and their types. Beware, the way the
- *               types are ordered impacts the final channel ordering.
- *
- * - reorder_map: reorders the channels.
- *
- */
-static const AACPCEInfo aac_pce_configs[] = {
-    {
-        .layout = AV_CHANNEL_LAYOUT_MONO,
-        .num_ele = { 1, 0, 0, 0 },
-        .pairing = { { 0 }, },
-        .index = { { 0 }, },
-        .config_map = { 1, TYPE_SCE, },
-        .reorder_map = { 0 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_STEREO,
-        .num_ele = { 1, 0, 0, 0 },
-        .pairing = { { 1 }, },
-        .index = { { 0 }, },
-        .config_map = { 1, TYPE_CPE, },
-        .reorder_map = { 0, 1 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_2POINT1,
-        .num_ele = { 1, 0, 0, 1 },
-        .pairing = { { 1 }, },
-        .index = { { 0 },{ 0 },{ 0 },{ 0 } },
-        .config_map = { 2, TYPE_CPE, TYPE_LFE },
-        .reorder_map = { 0, 1, 2 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_2_1,
-        .num_ele = { 1, 0, 1, 0 },
-        .pairing = { { 1 },{ 0 },{ 0 } },
-        .index = { { 0 },{ 0 },{ 0 }, },
-        .config_map = { 2, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_SURROUND,
-        .num_ele = { 2, 0, 0, 0 },
-        .pairing = { { 1, 0 }, },
-        .index = { { 0, 0 }, },
-        .config_map = { 2, TYPE_CPE, TYPE_SCE, },
-        .reorder_map = { 0, 1, 2 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_3POINT1,
-        .num_ele = { 2, 0, 0, 1 },
-        .pairing = { { 1, 0 }, },
-        .index = { { 0, 0 }, { 0 }, { 0 }, { 0 }, },
-        .config_map = { 3, TYPE_CPE, TYPE_SCE, TYPE_LFE },
-        .reorder_map = { 0, 1, 2, 3 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_4POINT0,
-        .num_ele = { 2, 0, 1, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 0 }, },
-        .index = { { 0, 0 }, { 0 }, { 1 } },
-        .config_map = { 3, TYPE_CPE, TYPE_SCE, TYPE_SCE },
-        .reorder_map = {  0, 1, 2, 3 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_4POINT1,
-        .num_ele = { 2, 1, 1, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 0 }, },
-        .index = { { 0, 0 }, { 1 }, { 2 }, { 0 } },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_2_2,
-        .num_ele = { 1, 1, 0, 0 },
-        .pairing = { { 1 }, { 1 }, },
-        .index = { { 0 }, { 1 }, },
-        .config_map = { 2, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_QUAD,
-        .num_ele = { 1, 0, 1, 0 },
-        .pairing = { { 1 }, { 0 }, { 1 }, },
-        .index = { { 0 }, { 0 }, { 1 } },
-        .config_map = { 2, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_5POINT0,
-        .num_ele = { 2, 1, 0, 0 },
-        .pairing = { { 1, 0 }, { 1 }, },
-        .index = { { 0, 0 }, { 1 } },
-        .config_map = { 3, TYPE_CPE, TYPE_SCE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_5POINT1,
-        .num_ele = { 2, 1, 1, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 1 } },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_5POINT0_BACK,
-        .num_ele = { 2, 0, 1, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1 } },
-        .index = { { 0, 0 }, { 0 }, { 1 } },
-        .config_map = { 3, TYPE_CPE, TYPE_SCE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_5POINT1_BACK,
-        .num_ele = { 2, 1, 1, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 1 } },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_6POINT0,
-        .num_ele = { 2, 1, 1, 0 },
-        .pairing = { { 1, 0 }, { 1 }, { 0 }, },
-        .index = { { 0, 0 }, { 1 }, { 1 } },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_6POINT0_FRONT,
-        .num_ele = { 2, 1, 0, 0 },
-        .pairing = { { 1, 1 }, { 1 } },
-        .index = { { 1, 0 }, { 2 }, },
-        .config_map = { 3, TYPE_CPE, TYPE_CPE, TYPE_CPE, },
-        .reorder_map = { 0, 1, 2, 3, 4, 5 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_HEXAGONAL,
-        .num_ele = { 2, 0, 2, 0 },
-        .pairing = { { 1, 0 },{ 0 },{ 1, 0 }, },
-        .index = { { 0, 0 },{ 0 },{ 1, 1 } },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE, },
-        .reorder_map = { 0, 1, 2, 3, 4, 5 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_6POINT1,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 },{ 0 },{ 1, 0 }, },
-        .index = { { 0, 0 },{ 1 },{ 1, 2 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_6POINT1_BACK,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1, 0 }, },
-        .index = { { 0, 0 }, { 1 }, { 1, 2 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_6POINT1_FRONT,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1, 0 }, },
-        .index = { { 0, 0 }, { 1 }, { 1, 2 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_7POINT0,
-        .num_ele = { 2, 1, 1, 0 },
-        .pairing = { { 1, 0 }, { 1 }, { 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 2 }, },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_7POINT0_FRONT,
-        .num_ele = { 2, 1, 1, 0 },
-        .pairing = { { 1, 0 }, { 1 }, { 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 2 }, },
-        .config_map = { 4, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_7POINT1,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1, 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 1, 2 }, { 0 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE,  TYPE_SCE, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_7POINT1_WIDE,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 }, { 0 },{  1, 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 1, 2 }, { 0 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_7POINT1_WIDE_BACK,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 }, { 0 }, { 1, 1 }, },
-        .index = { { 0, 0 }, { 1 }, { 1, 2 }, { 0 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE, TYPE_SCE, TYPE_CPE, TYPE_CPE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_OCTAGONAL,
-        .num_ele = { 2, 1, 2, 0 },
-        .pairing = { { 1, 0 }, { 1 }, { 1, 0 }, },
-        .index = { { 0, 0 }, { 1 }, { 2, 1 } },
-        .config_map = { 5, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7 },
-    },
-    {   /* Meant for order 2/mixed ambisonics */
-        .layout = { .order = AV_CHANNEL_ORDER_NATIVE, .nb_channels = 9,
-                    .u.mask = AV_CH_LAYOUT_OCTAGONAL | AV_CH_TOP_CENTER },
-        .num_ele = { 2, 2, 2, 0 },
-        .pairing = { { 1, 0 }, { 1, 0 }, { 1, 0 }, },
-        .index = { { 0, 0 }, { 1, 1 }, { 2, 2 } },
-        .config_map = { 6, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7, 8 },
-    },
-    {   /* Meant for order 2/mixed ambisonics */
-        .layout = { .order = AV_CHANNEL_ORDER_NATIVE, .nb_channels = 10,
-                    .u.mask = AV_CH_LAYOUT_6POINT0_FRONT | AV_CH_BACK_CENTER |
-                              AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT | AV_CH_TOP_CENTER },
-        .num_ele = { 2, 2, 2, 0 },
-        .pairing = { { 1, 1 }, { 1, 0 }, { 1, 0 }, },
-        .index = { { 0, 1 }, { 2, 0 }, { 3, 1 } },
-        .config_map = { 6, TYPE_CPE, TYPE_CPE, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-    },
-    {
-        .layout = AV_CHANNEL_LAYOUT_HEXADECAGONAL,
-        .num_ele = { 4, 2, 4, 0 },
-        .pairing = { { 1, 0, 1, 0 }, { 1, 1 }, { 1, 0, 1, 0 }, },
-        .index = { { 0, 0, 1, 1 }, { 2, 3 }, { 4, 2, 5, 3 } },
-        .config_map = { 10, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_CPE, TYPE_CPE, TYPE_SCE, TYPE_CPE, TYPE_SCE },
-        .reorder_map = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-    },
-};
-
-/**
  * AAC encoder context
  */
 typedef struct AACEncContext {
     AVClass *av_class;
     AACEncOptions options;                       ///< encoding options
     PutBitContext pb;
-    FFTContext mdct1024;                         ///< long (1024 samples) frame transform context
-    FFTContext mdct128;                          ///< short (128 samples) frame transform context
+    AVTXContext *mdct1024;                       ///< long (1024 samples) frame transform context
+    av_tx_fn mdct1024_fn;
+    AVTXContext *mdct128;                        ///< short (128 samples) frame transform context
+    av_tx_fn mdct128_fn;
     AVFloatDSPContext *fdsp;
     AACPCEInfo pce;                              ///< PCE data, if needed
     float *planar_samples[16];                   ///< saved preprocessed input
@@ -409,24 +242,19 @@ typedef struct AACEncContext {
     enum RawDataBlockType cur_type;              ///< channel group type cur_channel belongs to
 
     AudioFrameQueue afq;
-    DECLARE_ALIGNED(16, int,   qcoefs)[96];      ///< quantized coefficients
+    DECLARE_ALIGNED(32, int,   qcoefs)[96];      ///< quantized coefficients
     DECLARE_ALIGNED(32, float, scoefs)[1024];    ///< scaled coefficients
 
     uint16_t quantize_band_cost_cache_generation;
     AACQuantizeBandCostCacheEntry quantize_band_cost_cache[256][128]; ///< memoization area for quantize_band_cost
 
-    void (*abs_pow34)(float *out, const float *in, const int size);
-    void (*quant_bands)(int *out, const float *in, const float *scaled,
-                        int size, int is_signed, int maxval, const float Q34,
-                        const float rounding);
+    AACEncDSPContext aacdsp;
 
     struct {
         float *samples;
     } buffer;
 } AACEncContext;
 
-void ff_aac_dsp_init_x86(AACEncContext *s);
-void ff_aac_coder_init_mips(AACEncContext *c);
 void ff_quantize_band_cost_cache_init(struct AACEncContext *s);
 
 

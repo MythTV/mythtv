@@ -34,13 +34,10 @@
  * Supports: BGR8,BGR555,BGR24 - only BGR8 and BGR555 tested
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "decode.h"
-#include "internal.h"
 #include "msrledec.h"
 #include "zlib_wrapper.h"
 
@@ -110,7 +107,11 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
 
     /* make the palette available on the way out */
     if (c->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
         frame->palette_has_changed = palette_has_changed;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         memcpy(frame->data[1], c->pal, AVPALETTE_SIZE);
     }
 
@@ -172,7 +173,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_tscc_decoder = {
     .p.name         = "camtasia",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("TechSmith Screen Capture Codec"),
+    CODEC_LONG_NAME("TechSmith Screen Capture Codec"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TSCC,
     .priv_data_size = sizeof(CamtasiaContext),
@@ -180,5 +181,5 @@ const FFCodec ff_tscc_decoder = {
     .close          = decode_end,
     FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

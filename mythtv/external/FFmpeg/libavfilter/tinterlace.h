@@ -32,6 +32,7 @@
 #include "libavutil/pixdesc.h"
 #include "drawutils.h"
 #include "avfilter.h"
+#include "ccfifo.h"
 
 #define TINTERLACE_FLAG_VLPF 01
 #define TINTERLACE_FLAG_CVLPF 2
@@ -70,13 +71,14 @@ typedef struct TInterlaceContext {
     int vsub;                   ///< chroma vertical subsampling
     AVFrame *cur;
     AVFrame *next;
-    uint8_t *black_data[4];     ///< buffer used to fill padded lines
+    uint8_t *black_data[2][4];  ///< buffer used to fill padded lines (limited/full)
     int black_linesize[4];
     FFDrawContext draw;
     FFDrawColor color;
     const AVPixFmtDescriptor *csp;
     void (*lowpass_line)(uint8_t *dstp, ptrdiff_t width, const uint8_t *srcp,
                          ptrdiff_t mref, ptrdiff_t pref, int clip_max);
+    CCFifo cc_fifo;
 } TInterlaceContext;
 
 void ff_tinterlace_init_x86(TInterlaceContext *interlace);

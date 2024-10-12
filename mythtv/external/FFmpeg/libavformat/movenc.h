@@ -85,7 +85,7 @@ typedef struct MOVFragmentInfo {
 
 typedef struct MOVTrack {
     int         mode;
-    int         entry;
+    int         entry, entry_written;
     unsigned    timescale;
     uint64_t    time;
     int64_t     track_duration;
@@ -114,6 +114,7 @@ typedef struct MOVTrack {
     int         vos_len;
     uint8_t     *vos_data;
     MOVIentry   *cluster;
+    MOVIentry   *cluster_written;
     unsigned    cluster_capacity;
     int         audio_vbr;
     int         height; ///< active picture (w/o VBI) height for D-10/IMX
@@ -170,6 +171,11 @@ typedef struct MOVTrack {
     unsigned int squash_fragment_samples_to_one; //< flag to note formats where all samples for a fragment are to be squashed
 
     PacketList squashed_packet_queue;
+
+    struct IAMFContext *iamf;
+    int first_iamf_idx;
+    int last_iamf_idx;
+    AVIOContext *iamf_buf;
 } MOVTrack;
 
 typedef enum {
@@ -189,6 +195,7 @@ typedef struct MOVMuxContext {
     int     mode;
     int64_t time;
     int     nb_streams;
+    int     nb_tracks;
     int     nb_meta_tmcd;  ///< number of new created tmcd track based on metadata (aka not data copy)
     int     chapter_track; ///< qt chapter track number
     int64_t mdat_pos;
@@ -249,6 +256,7 @@ typedef struct MOVMuxContext {
     int64_t avif_extent_pos[2];  // index 0 is YUV and 1 is Alpha.
     int avif_extent_length[2];   // index 0 is YUV and 1 is Alpha.
     int is_animated_avif;
+    int avif_loop_count;
 } MOVMuxContext;
 
 #define FF_MOV_FLAG_RTP_HINT              (1 <<  0)
@@ -275,6 +283,7 @@ typedef struct MOVMuxContext {
 #define FF_MOV_FLAG_SKIP_SIDX             (1 << 21)
 #define FF_MOV_FLAG_CMAF                  (1 << 22)
 #define FF_MOV_FLAG_PREFER_ICC            (1 << 23)
+#define FF_MOV_FLAG_HYBRID_FRAGMENTED     (1 << 24)
 
 int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt);
 

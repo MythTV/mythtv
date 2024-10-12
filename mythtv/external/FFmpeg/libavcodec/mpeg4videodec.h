@@ -27,7 +27,9 @@
 
 #include "get_bits.h"
 #include "mpegvideo.h"
+#include "mpeg4videodsp.h"
 
+#include "libavutil/mem_internal.h"
 
 typedef struct Mpeg4DecContext {
     MpegEncContext m;
@@ -37,7 +39,11 @@ typedef struct Mpeg4DecContext {
     int shape;
     int vol_sprite_usage;
     int sprite_brightness_change;
+    int sprite_warping_accuracy;
     int num_sprite_warping_points;
+    int real_sprite_warping_points;
+    int sprite_offset[2][2];         ///< sprite offset[isChroma][isMVY]
+    int sprite_delta[2][2];          ///< sprite_delta [isY][isMVY]
     /// sprite trajectory points
     uint16_t sprite_traj[4][2];
     /// sprite shift [isChroma]
@@ -53,6 +59,8 @@ typedef struct Mpeg4DecContext {
     int new_pred;
     int enhancement_type;
     int scalability;
+
+    int quant_precision;
 
     /// QP above which the ac VLC should be used for intra dc
     int intra_dc_threshold;
@@ -76,7 +84,9 @@ typedef struct Mpeg4DecContext {
 
     int rgb;
 
-    int32_t block32[12][64];
+    Mpeg4VideoDSPContext mdsp;
+
+    DECLARE_ALIGNED(8, int32_t, block32)[12][64];
     // 0 = DCT, 1 = DPCM top to bottom scan, -1 = DPCM bottom to top scan
     int dpcm_direction;
     int16_t dpcm_macroblock[3][256];
@@ -87,6 +97,9 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb,
 void ff_mpeg4_decode_studio(MpegEncContext *s, uint8_t *dest_y, uint8_t *dest_cb,
                             uint8_t *dest_cr, int block_size, int uvlinesize,
                             int dct_linesize, int dct_offset);
+void ff_mpeg4_mcsel_motion(MpegEncContext *s,
+                           uint8_t *dest_y, uint8_t *dest_cb, uint8_t *dest_cr,
+                           uint8_t *const *ref_picture);
 int ff_mpeg4_decode_partitions(Mpeg4DecContext *ctx);
 int ff_mpeg4_decode_video_packet_header(Mpeg4DecContext *ctx);
 int ff_mpeg4_decode_studio_slice_header(Mpeg4DecContext *ctx);

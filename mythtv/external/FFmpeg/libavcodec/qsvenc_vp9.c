@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <mfx/mfxvideo.h>
+#include <mfxvideo.h>
 
 #include "libavutil/common.h"
 #include "libavutil/opt.h"
@@ -30,7 +30,6 @@
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "qsv.h"
-#include "qsv_internal.h"
 #include "qsvenc.h"
 
 typedef struct QSVVP9EncContext {
@@ -66,12 +65,12 @@ static av_cold int qsv_enc_close(AVCodecContext *avctx)
 static const AVOption options[] = {
     QSV_COMMON_OPTS
 
-    { "profile",   NULL, OFFSET(qsv.profile), AV_OPT_TYPE_INT,   { .i64 = MFX_PROFILE_UNKNOWN },   0,       INT_MAX,  VE,  "profile" },
-    { "unknown",   NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_UNKNOWN},   INT_MIN,  INT_MAX,  VE,  "profile" },
-    { "profile0",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_0   },  INT_MIN,  INT_MAX,  VE,  "profile" },
-    { "profile1",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_1   },  INT_MIN,  INT_MAX,  VE,  "profile" },
-    { "profile2",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_2   },  INT_MIN,  INT_MAX,  VE,  "profile" },
-    { "profile3",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_3   },  INT_MIN,  INT_MAX,  VE,  "profile" },
+    { "profile",   NULL, OFFSET(qsv.profile), AV_OPT_TYPE_INT,   { .i64 = MFX_PROFILE_UNKNOWN },   0,       INT_MAX,  VE,  .unit = "profile" },
+    { "unknown",   NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_UNKNOWN},   INT_MIN,  INT_MAX,  VE,  .unit = "profile" },
+    { "profile0",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_0   },  INT_MIN,  INT_MAX,  VE,  .unit = "profile" },
+    { "profile1",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_1   },  INT_MIN,  INT_MAX,  VE,  .unit = "profile" },
+    { "profile2",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_2   },  INT_MIN,  INT_MAX,  VE,  .unit = "profile" },
+    { "profile3",  NULL, 0,                   AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_VP9_3   },  INT_MIN,  INT_MAX,  VE,  .unit = "profile" },
 
 #if QSV_HAVE_EXT_VP9_TILES
     /* The minimum tile width in luma pixels is 256, set maximum tile_cols to 32 for 8K video */
@@ -94,7 +93,7 @@ static const AVClass class = {
 };
 
 static const FFCodecDefault qsv_enc_defaults[] = {
-    { "b",         "1M"    },
+    { "b",         "0"     },
     { "refs",      "0"     },
     { "g",         "250"   },
     { "trellis",   "-1"    },
@@ -104,7 +103,7 @@ static const FFCodecDefault qsv_enc_defaults[] = {
 
 const FFCodec ff_vp9_qsv_encoder = {
     .p.name         = "vp9_qsv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("VP9 video (Intel Quick Sync Video acceleration)"),
+    CODEC_LONG_NAME("VP9 video (Intel Quick Sync Video acceleration)"),
     .priv_data_size = sizeof(QSVVP9EncContext),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_VP9,
@@ -114,11 +113,15 @@ const FFCodec ff_vp9_qsv_encoder = {
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HYBRID,
     .p.pix_fmts     = (const enum AVPixelFormat[]){ AV_PIX_FMT_NV12,
                                                     AV_PIX_FMT_P010,
+                                                    AV_PIX_FMT_VUYX,
                                                     AV_PIX_FMT_QSV,
+                                                    AV_PIX_FMT_XV30,
                                                     AV_PIX_FMT_NONE },
+    .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
     .p.priv_class   = &class,
     .defaults       = qsv_enc_defaults,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE |
+                      FF_CODEC_CAP_INIT_CLEANUP,
     .p.wrapper_name = "qsv",
     .hw_configs     = ff_qsv_enc_hw_configs,
 };

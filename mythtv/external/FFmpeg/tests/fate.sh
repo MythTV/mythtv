@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 config=$1
 
@@ -30,14 +30,14 @@ lock(){
 checkout(){
     case "$repo" in
         file:*|/*) src="${repo#file:}"      ;;
-        git:*)     git clone --quiet --branch "$branch" "$repo" "$src" ;;
+        git:*|https:*) git clone --quiet --branch "$branch" "$repo" "$src" ;;
     esac
 }
 
 update()(
     cd ${src} || return
     case "$repo" in
-        git:*) git fetch --quiet --force && git reset --quiet --hard "origin/$branch" ;;
+        git:*|https:*) git fetch --quiet --force && git reset --quiet --hard "origin/$branch" ;;
     esac
 )
 
@@ -75,7 +75,19 @@ compile()(
 fate()(
     test "$build_only" = "yes" && return
     cd ${build} || return
-    ${make} ${makeopts_fate-${makeopts}} -k fate
+    if [ -n "${fate_environments}" ]; then
+        ret=0
+        for e in ${fate_environments}; do
+            eval "curenv=\${${e}_env}"
+            echo Testing environment ${e}: ${curenv}
+            ${make} ${makeopts_fate-${makeopts}} -k ${fate_targets} FATE_SUFFIX=_${e} ${curenv}
+            cur_ret=$?
+            test $cur_ret != 0 && ret=$cur_ret
+        done
+        return $ret
+    else
+        ${make} ${makeopts_fate-${makeopts}} -k ${fate_targets}
+    fi
 )
 
 clean(){
@@ -103,6 +115,7 @@ cd ${workdir}       || die "cd ${workdir} failed"
 src=${workdir}/src
 : ${build:=${workdir}/build}
 : ${inst:=${workdir}/install}
+: ${fate_targets:=fate}
 
 test -d "$src" && update || checkout || die "Error fetching source"
 

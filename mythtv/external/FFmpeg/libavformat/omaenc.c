@@ -24,6 +24,7 @@
 #include "avio_internal.h"
 #include "id3v2.h"
 #include "internal.h"
+#include "mux.h"
 #include "oma.h"
 #include "rawenc.h"
 
@@ -91,14 +92,17 @@ static av_cold int oma_write_header(AVFormatContext *s)
     return 0;
 }
 
-const AVOutputFormat ff_oma_muxer = {
-    .name              = "oma",
-    .long_name         = NULL_IF_CONFIG_SMALL("Sony OpenMG audio"),
-    .mime_type         = "audio/x-oma",
-    .extensions        = "oma",
-    .audio_codec       = AV_CODEC_ID_ATRAC3,
+const FFOutputFormat ff_oma_muxer = {
+    .p.name            = "oma",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("Sony OpenMG audio"),
+    .p.mime_type       = "audio/x-oma",
+    .p.extensions      = "oma",
+    .p.video_codec     = AV_CODEC_ID_NONE,
+    .p.audio_codec     = AV_CODEC_ID_ATRAC3,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
     .write_header      = oma_write_header,
     .write_packet      = ff_raw_write_packet,
-    .codec_tag         = ff_oma_codec_tags_list,
-    .flags             = AVFMT_NOTIMESTAMPS,
+    .p.codec_tag       = ff_oma_codec_tags_list,
+    .p.flags           = AVFMT_NOTIMESTAMPS,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH,
 };

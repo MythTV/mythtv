@@ -32,6 +32,7 @@
 
 #include "avcodec.h"
 #include "internal.h"
+#include "refstruct.h"
 
 typedef struct FramePool {
     /**
@@ -52,67 +53,33 @@ typedef struct FramePool {
     int samples;
 } FramePool;
 
-static void frame_pool_free(void *opaque, uint8_t *data)
+static void frame_pool_free(FFRefStructOpaque unused, void *obj)
 {
-    FramePool *pool = (FramePool*)data;
+    FramePool *pool = obj;
     int i;
 
     for (i = 0; i < FF_ARRAY_ELEMS(pool->pools); i++)
         av_buffer_pool_uninit(&pool->pools[i]);
-
-    av_freep(&data);
-}
-
-static AVBufferRef *frame_pool_alloc(void)
-{
-    FramePool *pool = av_mallocz(sizeof(*pool));
-    AVBufferRef *buf;
-
-    if (!pool)
-        return NULL;
-
-    buf = av_buffer_create((uint8_t*)pool, sizeof(*pool),
-                           frame_pool_free, NULL, 0);
-    if (!buf) {
-        av_freep(&pool);
-        return NULL;
-    }
-
-    return buf;
 }
 
 static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
 {
-    FramePool *pool = avctx->internal->pool ?
-                      (FramePool*)avctx->internal->pool->data : NULL;
-    AVBufferRef *pool_buf;
-    int i, ret, ch, planes;
-
-    if (avctx->codec_type == AVMEDIA_TYPE_AUDIO) {
-        int planar = av_sample_fmt_is_planar(frame->format);
-        ch     = frame->ch_layout.nb_channels;
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-        if (!ch)
-            ch = frame->channels;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-        planes = planar ? ch : 1;
-    }
+    FramePool *pool = avctx->internal->pool;
+    int i, ret;
 
     if (pool && pool->format == frame->format) {
         if (avctx->codec_type == AVMEDIA_TYPE_VIDEO &&
             pool->width == frame->width && pool->height == frame->height)
             return 0;
-        if (avctx->codec_type == AVMEDIA_TYPE_AUDIO && pool->planes == planes &&
-            pool->channels == ch && frame->nb_samples == pool->samples)
+        if (avctx->codec_type == AVMEDIA_TYPE_AUDIO &&
+            pool->channels == frame->ch_layout.nb_channels &&
+            frame->nb_samples == pool->samples)
             return 0;
     }
 
-    pool_buf = frame_pool_alloc();
-    if (!pool_buf)
+    pool = ff_refstruct_alloc_ext(sizeof(*pool), 0, NULL, frame_pool_free);
+    if (!pool)
         return AVERROR(ENOMEM);
-    pool = (FramePool*)pool_buf->data;
 
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_VIDEO: {
@@ -169,7 +136,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
         break;
         }
     case AVMEDIA_TYPE_AUDIO: {
-        ret = av_samples_get_buffer_size(&pool->linesize[0], ch,
+        ret = av_samples_get_buffer_size(&pool->linesize[0],
+                                         frame->ch_layout.nb_channels,
                                          frame->nb_samples, frame->format, 0);
         if (ret < 0)
             goto fail;
@@ -181,26 +149,26 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
 
         pool->format     = frame->format;
-        pool->planes     = planes;
-        pool->channels   = ch;
+        pool->channels   = frame->ch_layout.nb_channels;
         pool->samples = frame->nb_samples;
+        pool->planes     = av_sample_fmt_is_planar(pool->format) ? pool->channels : 1;
         break;
         }
     default: av_assert0(0);
     }
 
-    av_buffer_unref(&avctx->internal->pool);
-    avctx->internal->pool = pool_buf;
+    ff_refstruct_unref(&avctx->internal->pool);
+    avctx->internal->pool = pool;
 
     return 0;
 fail:
-    av_buffer_unref(&pool_buf);
+    ff_refstruct_unref(&pool);
     return ret;
 }
 
 static int audio_get_buffer(AVCodecContext *avctx, AVFrame *frame)
 {
-    FramePool *pool = (FramePool*)avctx->internal->pool->data;
+    FramePool *pool = avctx->internal->pool;
     int planes = pool->planes;
     int i;
 
@@ -245,20 +213,12 @@ fail:
 
 static int video_get_buffer(AVCodecContext *s, AVFrame *pic)
 {
-    FramePool *pool = (FramePool*)s->internal->pool->data;
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pic->format);
+    FramePool *pool = s->internal->pool;
     int i;
 
     if (pic->data[0] || pic->data[1] || pic->data[2] || pic->data[3]) {
         av_log(s, AV_LOG_ERROR, "pic->data[*]!=NULL in avcodec_default_get_buffer\n");
         return -1;
-    }
-
-    if (!desc) {
-        av_log(s, AV_LOG_ERROR,
-            "Unable to get pixel format descriptor for format %s\n",
-            av_get_pix_fmt_name(pic->format));
-        return AVERROR(EINVAL);
     }
 
     memset(pic->data, 0, sizeof(pic->data));
@@ -293,6 +253,22 @@ int avcodec_default_get_buffer2(AVCodecContext *avctx, AVFrame *frame, int flags
 
     if (avctx->hw_frames_ctx) {
         ret = av_hwframe_get_buffer(avctx->hw_frames_ctx, frame, 0);
+        if (ret == AVERROR(ENOMEM)) {
+            AVHWFramesContext *frames_ctx =
+                (AVHWFramesContext*)avctx->hw_frames_ctx->data;
+            if (frames_ctx->initial_pool_size > 0 &&
+                !avctx->internal->warned_on_failed_allocation_from_fixed_pool) {
+                av_log(avctx, AV_LOG_WARNING, "Failed to allocate a %s/%s "
+                       "frame from a fixed pool of hardware frames.\n",
+                       av_get_pix_fmt_name(frames_ctx->format),
+                       av_get_pix_fmt_name(frames_ctx->sw_format));
+                av_log(avctx, AV_LOG_WARNING, "Consider setting "
+                       "extra_hw_frames to a larger value "
+                       "(currently set to %d, giving a pool size of %d).\n",
+                       avctx->extra_hw_frames, frames_ctx->initial_pool_size);
+                avctx->internal->warned_on_failed_allocation_from_fixed_pool = 1;
+            }
+        }
         frame->width  = avctx->coded_width;
         frame->height = avctx->coded_height;
         return ret;

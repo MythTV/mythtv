@@ -22,10 +22,10 @@
 #include "libavcodec/ass.h"
 #include "codec_internal.h"
 #include "libavcodec/dvbtxt.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/bprint.h"
 #include "libavutil/internal.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/common.h"
 
@@ -791,10 +791,10 @@ static const AVOption options[] = {
     {"txt_page",        "page numbers to decode, subtitle for subtitles, * for all", OFFSET(pgno),   AV_OPT_TYPE_STRING, {.str = "*"},      0, 0,        SD},
     {"txt_default_region", "default G0 character set used for decoding",     OFFSET(default_region), AV_OPT_TYPE_INT,    {.i64 = -1},      -1, 87,       SD},
     {"txt_chop_top",    "discards the top teletext line",                    OFFSET(chop_top),       AV_OPT_TYPE_INT,    {.i64 = 1},        0, 1,        SD},
-    {"txt_format",      "format of the subtitles (bitmap or text or ass)",   OFFSET(format_id),      AV_OPT_TYPE_INT,    {.i64 = 0},        0, 2,        SD,  "txt_format"},
-    {"bitmap",          NULL,                                                0,                      AV_OPT_TYPE_CONST,  {.i64 = 0},        0, 0,        SD,  "txt_format"},
-    {"text",            NULL,                                                0,                      AV_OPT_TYPE_CONST,  {.i64 = 1},        0, 0,        SD,  "txt_format"},
-    {"ass",             NULL,                                                0,                      AV_OPT_TYPE_CONST,  {.i64 = 2},        0, 0,        SD,  "txt_format"},
+    {"txt_format",      "format of the subtitles (bitmap or text or ass)",   OFFSET(format_id),      AV_OPT_TYPE_INT,    {.i64 = 0},        0, 2,        SD,  .unit = "txt_format"},
+    {"bitmap",          NULL,                                                0,                      AV_OPT_TYPE_CONST,  {.i64 = 0},        0, 0,        SD,  .unit = "txt_format"},
+    {"text",            NULL,                                                0,                      AV_OPT_TYPE_CONST,  {.i64 = 1},        0, 0,        SD,  .unit = "txt_format"},
+    {"ass",             NULL,                                                0,                      AV_OPT_TYPE_CONST,  {.i64 = 2},        0, 0,        SD,  .unit = "txt_format"},
     {"txt_left",        "x offset of generated bitmaps",                     OFFSET(x_offset),       AV_OPT_TYPE_INT,    {.i64 = 0},        0, 65535,    SD},
     {"txt_top",         "y offset of generated bitmaps",                     OFFSET(y_offset),       AV_OPT_TYPE_INT,    {.i64 = 0},        0, 65535,    SD},
     {"txt_chop_spaces", "chops leading and trailing spaces from text",       OFFSET(chop_spaces),    AV_OPT_TYPE_INT,    {.i64 = 1},        0, 1,        SD},
@@ -813,12 +813,13 @@ static const AVClass teletext_class = {
 
 const FFCodec ff_libzvbi_teletext_decoder = {
     .p.name         = "libzvbi_teletextdec",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Libzvbi DVB teletext decoder"),
+    CODEC_LONG_NAME("Libzvbi DVB teletext decoder"),
     .p.type         = AVMEDIA_TYPE_SUBTITLE,
     .p.id           = AV_CODEC_ID_DVB_TELETEXT,
     .p.capabilities = AV_CODEC_CAP_DELAY,
     .p.priv_class   = &teletext_class,
     .p.wrapper_name = "libzvbi",
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE,
     .priv_data_size = sizeof(TeletextContext),
     .init      = teletext_init_decoder,
     .close     = teletext_close_decoder,

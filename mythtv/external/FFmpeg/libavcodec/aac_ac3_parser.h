@@ -24,39 +24,21 @@
 #define AVCODEC_AAC_AC3_PARSER_H
 
 #include <stdint.h>
+#include "libavutil/crc.h"
 #include "avcodec.h"
 #include "parser.h"
 
-typedef enum {
-    AAC_AC3_PARSE_ERROR_SYNC        = -0x1030c0a,
-    AAC_AC3_PARSE_ERROR_BSID        = -0x2030c0a,
-    AAC_AC3_PARSE_ERROR_SAMPLE_RATE = -0x3030c0a,
-    AAC_AC3_PARSE_ERROR_FRAME_SIZE  = -0x4030c0a,
-    AAC_AC3_PARSE_ERROR_FRAME_TYPE  = -0x5030c0a,
-    AAC_AC3_PARSE_ERROR_CRC         = -0x6030c0a,
-    AAC_AC3_PARSE_ERROR_CHANNEL_CFG = -0x7030c0a,
-} AACAC3ParseError;
-
 typedef struct AACAC3ParseContext {
     ParseContext pc;
-    int frame_size;
     int header_size;
-    int (*sync)(uint64_t state, struct AACAC3ParseContext *hdr_info,
-            int *need_next_header, int *new_frame_start);
+    int (*sync)(uint64_t state, int *need_next_header, int *new_frame_start);
 
-    int channels;
-    int sample_rate;
-    int bit_rate;
-    int samples;
-    uint64_t channel_layout;
-    int service_type;
-
+    const AVCRC *crc_ctx;
     int remaining_size;
     uint64_t state;
 
     int need_next_header;
     int frame_number;
-    enum AVCodecID codec_id;
 } AACAC3ParseContext;
 
 int ff_aac_ac3_parse(AVCodecParserContext *s1,

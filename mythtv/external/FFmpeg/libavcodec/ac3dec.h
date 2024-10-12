@@ -50,6 +50,7 @@
 #ifndef AVCODEC_AC3DEC_H
 #define AVCODEC_AC3DEC_H
 
+#include "libavutil/tx.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/fixed_dsp.h"
 #include "libavutil/lfg.h"
@@ -57,9 +58,9 @@
 
 #include "ac3.h"
 #include "ac3dsp.h"
+#include "avcodec.h"
 #include "bswapdsp.h"
 #include "get_bits.h"
-#include "fft.h"
 #include "fmtconvert.h"
 
 #define AC3_OUTPUT_LFEON  8
@@ -89,7 +90,6 @@ typedef struct AC3DecodeContext {
     int lfe_on;                             ///< lfe channel in use
     int dialog_normalization[2];            ///< dialog level in dBFS                   (dialnorm)
     int compression_exists[2];              ///< compression field is valid for frame   (compre)
-    int compression_gain[2];                ///< gain to apply for heavy compression    (compr)
     int channel_map;                        ///< custom channel map                     (chanmap)
     int preferred_downmix;                  ///< Preferred 2-channel downmix mode       (dmixmod)
     int center_mix_level;                   ///< Center mix level index
@@ -99,8 +99,8 @@ typedef struct AC3DecodeContext {
     int lfe_mix_level_exists;               ///< indicates if lfemixlevcod is specified (lfemixlevcode)
     int lfe_mix_level;                      ///< LFE mix level index                    (lfemixlevcod)
     int eac3;                               ///< indicates if current frame is E-AC-3
-    int eac3_frame_dependent_found;         ///< bitstream has E-AC-3 dependent frame(s)
     int eac3_subsbtreamid_found;            ///< bitstream has E-AC-3 additional substream(s)
+    int eac3_extension_type_a;              ///< bitstream has E-AC-3 extension type A enabled frame(s)
     int dolby_surround_mode;                ///< dolby surround mode                    (dsurmod)
     int dolby_surround_ex_mode;             ///< dolby surround ex mode                 (dsurexmod)
     int dolby_headphone_mode;               ///< dolby headphone mode                   (dheadphonmod)
@@ -222,8 +222,8 @@ typedef struct AC3DecodeContext {
 
 ///@name IMDCT
     int block_switch[AC3_MAX_CHANNELS];     ///< block switch flags                     (blksw)
-    FFTContext imdct_512;                   ///< for 512 sample IMDCT
-    FFTContext imdct_256;                   ///< for 256 sample IMDCT
+    AVTXContext *tx_128, *tx_256;
+    av_tx_fn tx_fn_128, tx_fn_256;
 ///@}
 
 ///@name Optimization

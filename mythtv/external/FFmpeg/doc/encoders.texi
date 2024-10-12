@@ -144,8 +144,7 @@ If this option is unspecified it is set to @samp{aac_low}.
 
 AC-3 audio encoders.
 
-These encoders implement part of ATSC A/52:2010 and ETSI TS 102 366, as well as
-the undocumented RealAudio 3 (a.k.a. dnet).
+These encoders implement part of ATSC A/52:2010 and ETSI TS 102 366.
 
 The @var{ac3} encoder uses floating-point math, while the @var{ac3_fixed}
 encoder only uses fixed-point integer math. This does not mean that one is
@@ -615,7 +614,7 @@ and slightly improves compression.
 
 Opus encoder.
 
-This is a native FFmpeg encoder for the Opus format. Currently its in development and
+This is a native FFmpeg encoder for the Opus format. Currently, it's in development and
 only implements the CELT part of the codec. Its quality is usually worse and at best
 is equal to the libopus encoder.
 
@@ -789,6 +788,11 @@ about 80-96 kbps/channel
 @end table
 
 Default value is 0.
+
+@item frame_length
+Set the audio frame length in samples. Default value is the internal
+default of the library. Refer to the library's documentation for information
+about supported values.
 @end table
 
 @subsection Examples
@@ -808,6 +812,63 @@ High-Efficiency AAC profile:
 ffmpeg -i input.wav -c:a libfdk_aac -profile:a aac_he -b:a 64k output.m4a
 @end example
 @end itemize
+
+@anchor{liblc3-enc}
+@section liblc3
+
+liblc3 LC3 (Low Complexity Communication Codec) encoder wrapper.
+
+Requires the presence of the liblc3 headers and library during configuration.
+You need to explicitly configure the build with @code{--enable-liblc3}.
+
+This encoder has support for the Bluetooth SIG LC3 codec for the LE Audio
+protocol, and the following features of LC3plus:
+@itemize
+@item
+Frame duration of 2.5 and 5ms.
+@item
+High-Resolution mode, 48 KHz, and 96 kHz sampling rates.
+@end itemize
+
+For more information see the liblc3 project at
+@url{https://github.com/google/liblc3}.
+
+@subsection Options
+
+The following options are mapped on the shared FFmpeg codec options.
+
+@table @option
+@item b @var{bitrate}
+Set the bit rate in bits/s. This will determine the fixed size of the encoded
+frames, for a selected frame duration.
+
+@item ar @var{frequency}
+Set the audio sampling rate (in Hz).
+
+@item channels
+Set the number of audio channels.
+
+@item frame_duration
+Set the audio frame duration in milliseconds. Default value is 10ms.
+Allowed frame durations are 2.5ms, 5ms, 7.5ms and 10ms.
+LC3 (Bluetooth LE Audio), allows 7.5ms and 10ms; and LC3plus 2.5ms, 5ms
+and 10ms.
+
+The 10ms frame duration is available in LC3 and LC3 plus standard.
+In this mode, the produced bitstream can be referenced either as LC3 or LC3plus.
+
+@item high_resolution @var{boolean}
+Enable the high-resolution mode if set to 1. The high-resolution mode is
+available with all LC3plus frame durations and for a sampling rate of 48 KHz,
+and 96 KHz.
+
+The encoder automatically turns off this mode at lower sampling rates and
+activates it at 96 KHz.
+
+This mode should be preferred at high bitrates. In this mode, the audio
+bandwidth is always up to the Nyquist frequency, compared to LC3 at 48 KHz,
+which limits the bandwidth to 20 KHz.
+@end table
 
 @anchor{libmp3lame}
 @section libmp3lame
@@ -859,6 +920,13 @@ Enable the encoder to use ABR when set to 1. The @command{lame}
 @option{--abr} sets the target bitrate, while this options only
 tells FFmpeg to use ABR still relies on @option{b} to set bitrate.
 
+@item copyright (@emph{-c})
+Set MPEG audio copyright flag when set to 1. The default value is 0
+(disabled).
+
+@item original (@emph{-o})
+Set MPEG audio original flag when set to 1. The default value is 1
+(enabled).
 @end table
 
 @section libopencore-amrnb
@@ -965,14 +1033,17 @@ Favor improved speech intelligibility.
 @item audio
 Favor faithfulness to the input (the default).
 @item lowdelay
-Restrict to only the lowest delay modes.
+Restrict to only the lowest delay modes by disabling voice-optimized
+modes.
 @end table
 
 @item cutoff (N.A.)
 Set cutoff bandwidth in Hz. The argument must be exactly one of the
 following: 4000, 6000, 8000, 12000, or 20000, corresponding to
 narrowband, mediumband, wideband, super wideband, and fullband
-respectively. The default is 0 (cutoff disabled).
+respectively. The default is 0 (cutoff disabled). Note that libopus
+forces a wideband cutoff for bitrates < 15 kbps, unless CELT-only
+(@option{application} set to @samp{lowdelay}) mode is used.
 
 @item mapping_family (@emph{mapping_family})
 Set channel mapping family to be used by the encoder. The default value of -1
@@ -1949,22 +2020,6 @@ Set the number of slices, used in parallelized encoding. Default value
 is 0. This is only used when @option{slice_mode} is set to
 @samp{fixed}.
 
-@item slice_mode
-Set slice mode. Can assume one of the following possible values:
-
-@table @samp
-@item fixed
-a fixed number of slices
-@item rowmb
-one slice per row of macroblocks
-@item auto
-automatic number of slices according to number of threads
-@item dyn
-dynamic slicing
-@end table
-
-Default value is @samp{auto}.
-
 @item loopfilter
 Enable loop filter, if set to 1 (automatically enabled). To disable
 set a value of 0.
@@ -2176,6 +2231,8 @@ Set altref noise reduction filter type: backward, forward, centered.
 Set altref noise reduction filter strength.
 @item rc-lookahead, lag-in-frames (@emph{lag-in-frames})
 Set number of frames to look ahead for frametype and ratecontrol.
+@item min-gf-interval
+Set minimum golden/alternate reference frame interval (VP9 only).
 @end table
 
 @item error-resilient
@@ -2234,6 +2291,12 @@ Three temporal layers. 0-2-1-2...; with single reference frame.
 Same as option "3", except there is a dependency between
 the two temporal layer 2 frames within the temporal period.
 @end table
+@end table
+
+@item VP8-specific options
+@table @option
+@item screen-content-mode
+Screen content mode, one of: 0 (off), 1 (screen), 2 (screen with more aggressive rate control).
 @end table
 
 @item VP9-specific options
@@ -2314,6 +2377,70 @@ Indicates frame duration
 
 For more information about libvpx see:
 @url{http://www.webmproject.org/}
+
+@section libvvenc
+
+VVenC H.266/VVC encoder wrapper.
+
+This encoder requires the presence of the libvvenc headers and library
+during configuration. You need to explicitly configure the build with
+@option{--enable-libvvenc}.
+
+The VVenC project website is at
+@url{https://github.com/fraunhoferhhi/vvenc}.
+
+@subsection Supported Pixel Formats
+
+VVenC supports only 10-bit color spaces as input. But the internal (encoded)
+bit depth can be set to 8-bit or 10-bit at runtime.
+
+@subsection Options
+
+@table @option
+@item b
+Sets target video bitrate.
+
+@item g
+Set the GOP size. Currently support for g=1 (Intra only) or default.
+
+@item preset
+Set the VVenC preset.
+
+@item levelidc
+Set level idc.
+
+@item tier
+Set vvc tier.
+
+@item qp
+Set constant quantization parameter.
+
+@item subopt @var{boolean}
+Set subjective (perceptually motivated) optimization. Default is 1 (on).
+
+@item bitdepth8 @var{boolean}
+Set 8bit coding mode instead of using 10bit. Default is 0 (off).
+
+@item period
+set (intra) refresh period in seconds.
+
+@item vvenc-params
+Set vvenc options using a list of @var{key}=@var{value} couples separated
+by ":". See @command{vvencapp --fullhelp} or @command{vvencFFapp --fullhelp} for a list of options.
+
+For example, the options might be provided as:
+
+@example
+intraperiod=64:decodingrefreshtype=idr:poc0idr=1:internalbitdepth=8
+@end example
+
+For example the encoding options might be provided with @option{-vvenc-params}:
+
+@example
+ffmpeg -i input -c:v libvvenc -b 1M -vvenc-params intraperiod=64:decodingrefreshtype=idr:poc0idr=1:internalbitdepth=8 output.mp4
+@end example
+
+@end table
 
 @section libwebp
 
@@ -2420,6 +2547,10 @@ To get a more accurate and extensive documentation of the libx264
 options, invoke the command @command{x264 --fullhelp} or consult
 the libx264 documentation.
 
+In the list below, note that the @command{x264} option name is shown
+in parentheses after the libavcodec corresponding name, in case there
+is a direct mapping.
+
 @table @option
 @item b (@emph{bitrate})
 Set bitrate in bits/s. Note that FFmpeg's @option{b} option is
@@ -2427,17 +2558,19 @@ expressed in bits/s, while @command{x264}'s @option{bitrate} is in
 kilobits/s.
 
 @item bf (@emph{bframes})
+Number of B-frames between I and P-frames
 
 @item g (@emph{keyint})
+Maximum GOP size
 
 @item qmin (@emph{qpmin})
-Minimum quantizer scale.
+Minimum quantizer scale
 
 @item qmax (@emph{qpmax})
-Maximum quantizer scale.
+Maximum quantizer scale
 
 @item qdiff (@emph{qpstep})
-Maximum difference between quantizer scales.
+Maximum difference between quantizer scales
 
 @item qblur (@emph{qblur})
 Quantizer curve blur
@@ -2446,7 +2579,21 @@ Quantizer curve blur
 Quantizer curve compression factor
 
 @item refs (@emph{ref})
-Number of reference frames each P-frame can use. The range is from @var{0-16}.
+Number of reference frames each P-frame can use. The range is @var{0-16}.
+
+@item level (@emph{level})
+Set the @code{x264_param_t.i_level_idc} value in case the value is
+positive, it is ignored otherwise.
+
+This value can be set using the @code{AVCodecContext} API (e.g. by
+setting the @code{AVCodecContext} value directly), and is specified as
+an integer mapped on a corresponding level (e.g. the value 31 maps
+to H.264 level IDC "3.1", as defined in the @code{x264_levels}
+table). It is ignored when set to a non positive value.
+
+Alternatively it can be set as a private option, overriding the value
+set in @code{AVCodecContext}, and in this case must be specified as
+the level IDC identifier (e.g. "3.1"), as defined by H.264 Annex A.
 
 @item sc_threshold (@emph{scenecut})
 Sets the threshold for the scene change detection.
@@ -2454,7 +2601,8 @@ Sets the threshold for the scene change detection.
 @item trellis (@emph{trellis})
 Performs Trellis quantization to increase efficiency. Enabled by default.
 
-@item nr  (@emph{nr})
+@item nr (@emph{nr})
+Noise reduction
 
 @item me_range (@emph{merange})
 Maximum range of the motion search in pixels.
@@ -2535,6 +2683,7 @@ open GOP by setting it to @code{-cgop}. The result is similar to
 the behavior of @command{x264}'s @option{--open-gop} option.
 
 @item rc_init_occupancy (@emph{vbv-init})
+Initial VBV buffer occupancy
 
 @item preset (@emph{preset})
 Set the encoding preset.
@@ -2580,7 +2729,7 @@ Set AQ strength, reduce blocking and blurring in flat and textured areas.
 Use psychovisual optimizations when set to 1. When set to 0, it has the
 same effect as @command{x264}'s @option{--no-psy} option.
 
-@item psy-rd  (@emph{psy-rd})
+@item psy-rd (@emph{psy-rd})
 Set strength of psychovisual optimization, in
 @var{psy-rd}:@var{psy-trellis} format.
 
@@ -2612,7 +2761,7 @@ to 1.
 
 @item avcintra-class (@emph{class})
 Configure the encoder to generate AVC-Intra.
-Valid values are 50,100 and 200
+Valid values are 50, 100 and 200
 
 @item bluray-compat (@emph{bluray-compat})
 Configure the encoder to be compatible with the bluray standard.
@@ -2663,8 +2812,8 @@ Set loop filter parameters, in @var{alpha}:@var{beta} form.
 Set fluctuations reduction in QP (before curve compression).
 
 @item partitions (@emph{partitions})
-Set partitions to consider as a comma-separated list of. Possible
-values in the list:
+Set partitions to consider as a comma-separated list of values.
+Possible values in the list:
 
 @table @samp
 @item p8x8
@@ -2720,18 +2869,31 @@ Variable bit rate.
 Constant bit rate (not allowed in MP4 container).
 @end table
 
-@item x264opts (N.A.)
-Set any x264 option, see @command{x264 --fullhelp} for a list.
+@item x264opts @var{opts}
+@item x264-params @var{opts}
+Override the x264 configuration using a :-separated list of key=value
+options.
 
-Argument is a list of @var{key}=@var{value} couples separated by
-":". In @var{filter} and @var{psy-rd} options that use ":" as a separator
-themselves, use "," instead. They accept it as well since long ago but this
-is kept undocumented for some reason.
+The argument for both options is a list of @var{key}=@var{value}
+couples separated by ":". With @option{x264opts} the value can be
+omitted, and the value @code{1} is assumed in that case.
+
+For @var{filter} and @var{psy-rd} options values that use ":" as a
+separator themselves, use "," instead. They accept it as well since
+long ago but this is kept undocumented for some reason.
+
+For example, the options might be provided as:
+@example
+level=30:bframes=0:weightp=0:cabac=0:ref=1:vbv-maxrate=768:vbv-bufsize=2000:analyse=all:me=umh:no-fast-pskip=1:subq=6:8x8dct=0:trellis=0
+@end example
 
 For example to specify libx264 encoding options with @command{ffmpeg}:
 @example
 ffmpeg -i foo.mpg -c:v libx264 -x264opts keyint=123:min-keyint=20 -an out.mkv
 @end example
+
+To get the complete list of the libx264 options, invoke the command
+@command{x264 --fullhelp} or consult the libx264 documentation.
 
 @item a53cc @var{boolean}
 Import closed captions (which must be ATSC compatible format) into output.
@@ -2740,19 +2902,9 @@ Only the mpeg2 and h264 decoders provide these. Default is 1 (on).
 @item udu_sei @var{boolean}
 Import user data unregistered SEI if available into output. Default is 0 (off).
 
-@item x264-params (N.A.)
-Override the x264 configuration using a :-separated list of key=value
-parameters.
-
-This option is functionally the same as the @option{x264opts}, but is
-duplicated for compatibility with the Libav fork.
-
-For example to specify libx264 encoding options with @command{ffmpeg}:
-@example
-ffmpeg -i INPUT -c:v libx264 -x264-params level=30:bframes=0:weightp=0:\
-cabac=0:ref=1:vbv-maxrate=768:vbv-bufsize=2000:analyse=all:me=umh:\
-no-fast-pskip=1:subq=6:8x8dct=0:trellis=0 OUTPUT
-@end example
+@item mb_info @var{boolean}
+Set mb_info data through AVFrameSideData, only useful when used from the
+API. Default is 0 (off).
 @end table
 
 Encoding ffpresets for common usages are provided so they can be used with the
@@ -2892,6 +3044,75 @@ ffmpeg -i input -c:v libxavs2 -xavs2-params RdoqLevel=0 output.avs2
 @end example
 @end table
 
+@section libxeve
+
+eXtra-fast Essential Video Encoder (XEVE) MPEG-5 EVC encoder wrapper.
+The xeve-equivalent options or values are listed in parentheses for easy migration.
+
+This encoder requires the presence of the libxeve headers and library
+during configuration. You need to explicitly configure the build with
+@option{--enable-libxeve}.
+
+@float NOTE
+Many libxeve encoder options are mapped to FFmpeg global codec options,
+while unique encoder options are provided through private options.
+Additionally the xeve-params private options allows one to pass a list
+of key=value tuples as accepted by the libxeve @code{parse_xeve_params} function.
+@end float
+
+The xeve project website is at @url{https://github.com/mpeg5/xeve}.
+
+@subsection Options
+
+The following options are supported by the libxeve wrapper.
+The xeve-equivalent options or values are listed in parentheses for easy migration.
+
+@float NOTE
+To reduce the duplication of documentation, only the private options
+and some others requiring special attention are documented here. For
+the documentation of the undocumented generic options, see
+@ref{codec-options,,the Codec Options chapter}.
+@end float
+
+@float NOTE
+To get a more accurate and extensive documentation of the libxeve options,
+invoke the command  @code{xeve_app --help} or consult the libxeve documentation.
+@end float
+
+@table @option
+@item b (@emph{bitrate})
+Set target video bitrate in bits/s.
+Note that FFmpeg's b option is expressed in bits/s, while xeve's bitrate is in kilobits/s.
+
+@item bf (@emph{bframes})
+Set the maximum number of B frames (1,3,7,15).
+
+@item g (@emph{keyint})
+Set the GOP size (I-picture period).
+
+@item preset (@emph{preset})
+Set the xeve preset.
+Set the encoder preset value to determine encoding speed [fast, medium, slow, placebo]
+
+@item tune (@emph{tune})
+Set the encoder tune parameter [psnr, zerolatency]
+
+@item profile (@emph{profile})
+Set the encoder profile [0: baseline; 1: main]
+
+@item crf (@emph{crf})
+Set the quality for constant quality mode.
+Constant rate factor <10..49> [default: 32]
+
+@item qp (@emph{qp})
+Set constant quantization rate control method parameter.
+Quantization parameter qp <0..51> [default: 32]
+
+@item threads (@emph{threads})
+Force to use a specific number of threads
+
+@end table
+
 @section libxvid
 
 Xvid MPEG-4 Part 2 encoder wrapper.
@@ -2944,9 +3165,6 @@ Enable high quality AC prediction.
 @item gray
 Only encode grayscale.
 
-@item gmc
-Enable the use of global motion compensation (GMC).
-
 @item qpel
 Enable quarter-pixel motion compensation.
 
@@ -2958,29 +3176,28 @@ Place global headers in extradata instead of every keyframe.
 
 @end table
 
-@item trellis
+@item gmc
+Enable the use of global motion compensation (GMC).  Default is 0
+(disabled).
 
-@item me_method
-Set motion estimation method. Possible values in decreasing order of
+@item me_quality
+Set motion estimation quality level. Possible values in decreasing order of
 speed and increasing order of quality:
 
 @table @samp
-@item zero
+@item 0
 Use no motion estimation (default).
 
-@item phods
-@item x1
-@item log
+@item 1, 2
 Enable advanced diamond zonal search for 16x16 blocks and half-pixel
-refinement for 16x16 blocks. @samp{x1} and @samp{log} are aliases for
-@samp{phods}.
+refinement for 16x16 blocks.
 
-@item epzs
+@item 3, 4
 Enable all of the things described above, plus advanced diamond zonal
-search for 8x8 blocks, half-pixel refinement for 8x8 blocks, and motion
-estimation on chroma planes.
+search for 8x8 blocks and half-pixel refinement for 8x8 blocks, also
+enable motion estimation on chroma planes for P and B-frames.
 
-@item full
+@item 5, 6
 Enable all of the things described above, plus extended 16x16 and 8x8
 blocks search.
 @end table
@@ -3015,6 +3232,9 @@ When combined with @option{lumi_aq}, the resulting quality will not
 be better than any of the two specified individually. In other
 words, the resulting quality will be the worse one of the two
 effects.
+
+@item trellis
+Set rate-distortion optimal quantization.
 
 @item ssim
 Set structural similarity (SSIM) displaying method. Possible values:
@@ -3062,6 +3282,20 @@ MediaFoundation framework. It can access both SW and HW encoders.
 Video encoders can take input in either of nv12 or yuv420p form
 (some encoders support both, some support only either - in practice,
 nv12 is the safer choice, especially among HW encoders).
+
+@section Microsoft RLE
+
+Microsoft RLE aka MSRLE encoder.
+Only 8-bit palette mode supported.
+Compatible with Windows 3.1 and Windows 95.
+
+@subsection Options
+
+@table @option
+@item g @var{integer}
+Keyframe interval.
+A keyframe is inserted at least every @code{-g} frames, sometimes sooner.
+@end table
 
 @section mpeg2
 
@@ -3202,8 +3436,8 @@ recommended value) and do not set a size constraint.
 
 @section QSV Encoders
 
-The family of Intel QuickSync Video encoders (MPEG-2, H.264, HEVC, JPEG/MJPEG
-and VP9)
+The family of Intel QuickSync Video encoders (MPEG-2, H.264, HEVC, JPEG/MJPEG,
+VP9, AV1)
 
 @subsection Ratecontrol Method
 The ratecontrol method is selected as follows:
@@ -3226,8 +3460,8 @@ quality range is 1 to 51, with 1 being the best quality.
 @end itemize
 
 @item
-Otherwise, a bitrate-based mode is used. For all of those, you should specify at
-least the desired average bitrate with the @option{b} option.
+Otherwise when the desired average bitrate is specified with the @option{b}
+option, a bitrate-based mode is used.
 @itemize @minus
 @item
 @var{LA} - VBR with lookahead, when the @option{look_ahead} option is specified.
@@ -3244,10 +3478,13 @@ the average bitrate.
 than the average bitrate.
 
 @item
-@var{AVBR} - average VBR mode, when @option{maxrate} is not specified. This mode
-is further configured by the @option{avbr_accuracy} and
-@option{avbr_convergence} options.
+@var{AVBR} - average VBR mode, when @option{maxrate} is not specified, both
+@option{avbr_accuracy} and @option{avbr_convergence} are set to non-zero. This
+mode is available for H264 and HEVC on Windows.
 @end itemize
+
+@item
+Otherwise the default ratecontrol method @var{CQP} is used.
 @end itemize
 
 Note that depending on your system, a different mode than the one you specified
@@ -3300,19 +3537,6 @@ Specifies how many asynchronous operations an application performs
 before the application explicitly synchronizes the result. If zero,
 the value is not specified.
 
-@item @var{avbr_accuracy}
-Accuracy of the AVBR ratecontrol (unit of tenth of percent).
-
-@item @var{avbr_convergence}
-Convergence of the AVBR ratecontrol (unit of 100 frames)
-
-The parameters @var{avbr_accuracy} and @var{avbr_convergence} are for the
-average variable bitrate control (AVBR) algorithm.
-The algorithm focuses on overall encoding quality while meeting the specified
-bitrate, @var{target_bitrate}, within the accuracy range @var{avbr_accuracy},
-after a @var{avbr_Convergence} period. This method does not follow HRD and the
-instant bitrate is not capped or padded.
-
 @item @var{preset}
 This option itemizes a range of choices from veryfast (best speed) to veryslow
 (best quality).
@@ -3337,10 +3561,69 @@ For encoders set this flag to ON to reduce power consumption and GPU usage.
 Following options can be used durning qsv encoding.
 
 @table @option
-@item @var{qsv_config_qp}
+@item @var{global_quality}
+@item @var{i_quant_factor}
+@item @var{i_quant_offset}
+@item @var{b_quant_factor}
+@item @var{b_quant_offset}
 Supported in h264_qsv and hevc_qsv.
-This option can be set in per-frame metadata. QP parameter can be dynamically
-changed when encoding in CQP mode.
+Change these value to reset qsv codec's qp configuration.
+
+@item @var{max_frame_size}
+Supported in h264_qsv and hevc_qsv.
+Change this value to reset qsv codec's MaxFrameSize configuration.
+
+@item @var{gop_size}
+Change this value to reset qsv codec's gop configuration.
+
+@item @var{int_ref_type}
+@item @var{int_ref_cycle_size}
+@item @var{int_ref_qp_delta}
+@item @var{int_ref_cycle_dist}
+Supported in h264_qsv and hevc_qsv.
+Change these value to reset qsv codec's Intra Refresh configuration.
+
+@item @var{qmax}
+@item @var{qmin}
+@item @var{max_qp_i}
+@item @var{min_qp_i}
+@item @var{max_qp_p}
+@item @var{min_qp_p}
+@item @var{max_qp_b}
+@item @var{min_qp_b}
+Supported in h264_qsv.
+Change these value to reset qsv codec's max/min qp configuration.
+
+@item @var{low_delay_brc}
+Supported in h264_qsv, hevc_qsv and av1_qsv.
+Change this value to reset qsv codec's low_delay_brc configuration.
+
+@item @var{framerate}
+Change this value to reset qsv codec's framerate configuration.
+
+@item @var{bit_rate}
+@item @var{rc_buffer_size}
+@item @var{rc_initial_buffer_occupancy}
+@item @var{rc_max_rate}
+Change these value to reset qsv codec's bitrate control configuration.
+
+@item @var{pic_timing_sei}
+Supported in h264_qsv and hevc_qsv.
+Change this value to reset qsv codec's pic_timing_sei configuration.
+
+@item @var{qsv_params}
+Set QSV encoder parameters as a colon-separated list of key-value pairs.
+
+The @option{qsv_params} should be formatted as @code{key1=value1:key2=value2:...}.
+
+These parameters are passed directly to the underlying Intel Quick Sync Video (QSV) encoder using the MFXSetParameter function.
+
+Example:
+@example
+ffmpeg -i input.mp4 -c:v h264_qsv -qsv_params "CodingOption1=1:CodingOption2=2" output.mp4
+@end example
+
+This option allows fine-grained control over various encoder-specific settings provided by the QSV encoder.
 @end table
 
 @subsection H264 options
@@ -3444,8 +3727,10 @@ Specifies intra refresh type. The major goal of intra refresh is improvement of
 error resilience without significant impact on encoded bitstream size caused by
 I frames. The SDK encoder achieves this by encoding part of each frame in
 refresh cycle using intra MBs. @var{none} means no refresh. @var{vertical} means
-vertical refresh, by column of MBs. To enable intra refresh, B frame should be
-set to 0.
+vertical refresh, by column of MBs. @var{horizontal} means horizontal refresh,
+by rows of MBs. @var{slice} means horizontal refresh by slices without
+overlapping. In case of @var{slice}, in_ref_cycle_size is ignored. To enable
+intra refresh, B frame should be set to 0.
 
 @item @var{int_ref_cycle_size}
 Specifies number of pictures within refresh cycle starting from 2. 0 and 1 are
@@ -3500,6 +3785,52 @@ Maximum video quantizer scale for B frame.
 
 @item @var{min_qp_b}
 Minimum video quantizer scale for B frame.
+
+@item @var{scenario}
+Provides a hint to encoder about the scenario for the encoding session.
+@table @samp
+@item unknown
+@item displayremoting
+@item videoconference
+@item archive
+@item livestreaming
+@item cameracapture
+@item videosurveillance
+@item gamestreaming
+@item remotegaming
+@end table
+
+@item @var{avbr_accuracy}
+Accuracy of the AVBR ratecontrol (unit of tenth of percent).
+
+@item @var{avbr_convergence}
+Convergence of the AVBR ratecontrol (unit of 100 frames)
+
+The parameters @var{avbr_accuracy} and @var{avbr_convergence} are for the
+average variable bitrate control (AVBR) algorithm.
+The algorithm focuses on overall encoding quality while meeting the specified
+bitrate, @var{target_bitrate}, within the accuracy range @var{avbr_accuracy},
+after a @var{avbr_Convergence} period. This method does not follow HRD and the
+instant bitrate is not capped or padded.
+
+@item @var{skip_frame}
+Use per-frame metadata "qsv_skip_frame" to skip frame when encoding. This option
+defines the usage of this metadata.
+@table @samp
+@item no_skip
+Frame skipping is disabled.
+@item insert_dummy
+Encoder inserts into bitstream frame where all macroblocks are encoded as
+skipped.
+@item insert_nothing
+Similar to insert_dummy, but encoder inserts nothing into bitstream. The skipped
+frames are still used in brc. For example, gop still include skipped frames, and
+the frames after skipped frames will be larger in size.
+@item brc_only
+skip_frame metadata indicates the number of missed frames before the current
+frame.
+@end table
+
 @end table
 
 @subsection HEVC Options
@@ -3539,6 +3870,13 @@ on performance and objective visual quality metric.
 Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: -1-default 0-off 1-on
+
+@item @var{adaptive_i}
+This flag controls insertion of I frames by the QSV encoder. Turn ON this flag
+to allow changing of frame type from P and B to I.
+
+@item @var{adaptive_b}
+This flag controls changing of frame type from B to P.
 
 @item @var{p_strategy}
 Enable P-pyramid: 0-default 1-simple 2-pyramid(bf need to be set to 0).
@@ -3583,6 +3921,15 @@ Set the encoding profile (scc requires libmfx >= 1.32).
 @item scc
 @end table
 
+@item @var{tier}
+Set the encoding tier (only level >= 4 can support high tier).
+This option only takes effect when the level option is specified.
+
+@table @samp
+@item main
+@item high
+@end table
+
 @item @var{gpb}
 1: GPB (generalized P/B frame)
 
@@ -3609,8 +3956,10 @@ Specifies intra refresh type. The major goal of intra refresh is improvement of
 error resilience without significant impact on encoded bitstream size caused by
 I frames. The SDK encoder achieves this by encoding part of each frame in
 refresh cycle using intra MBs. @var{none} means no refresh. @var{vertical} means
-vertical refresh, by column of MBs. To enable intra refresh, B frame should be
-set to 0.
+vertical refresh, by column of MBs. @var{horizontal} means horizontal refresh,
+by rows of MBs. @var{slice} means horizontal refresh by slices without
+overlapping. In case of @var{slice}, in_ref_cycle_size is ignored. To enable
+intra refresh, B frame should be set to 0.
 
 @item @var{int_ref_cycle_size}
 Specifies number of pictures within refresh cycle starting from 2. 0 and 1 are
@@ -3641,6 +3990,52 @@ Maximum video quantizer scale for B frame.
 
 @item @var{min_qp_b}
 Minimum video quantizer scale for B frame.
+
+@item @var{scenario}
+Provides a hint to encoder about the scenario for the encoding session.
+@table @samp
+@item unknown
+@item displayremoting
+@item videoconference
+@item archive
+@item livestreaming
+@item cameracapture
+@item videosurveillance
+@item gamestreaming
+@item remotegaming
+@end table
+
+@item @var{avbr_accuracy}
+Accuracy of the AVBR ratecontrol (unit of tenth of percent).
+
+@item @var{avbr_convergence}
+Convergence of the AVBR ratecontrol (unit of 100 frames)
+
+The parameters @var{avbr_accuracy} and @var{avbr_convergence} are for the
+average variable bitrate control (AVBR) algorithm.
+The algorithm focuses on overall encoding quality while meeting the specified
+bitrate, @var{target_bitrate}, within the accuracy range @var{avbr_accuracy},
+after a @var{avbr_Convergence} period. This method does not follow HRD and the
+instant bitrate is not capped or padded.
+
+@item @var{skip_frame}
+Use per-frame metadata "qsv_skip_frame" to skip frame when encoding. This option
+defines the usage of this metadata.
+@table @samp
+@item no_skip
+Frame skipping is disabled.
+@item insert_dummy
+Encoder inserts into bitstream frame where all macroblocks are encoded as
+skipped.
+@item insert_nothing
+Similar to insert_dummy, but encoder inserts nothing into bitstream. The skipped
+frames are still used in brc. For example, gop still include skipped frames, and
+the frames after skipped frames will be larger in size.
+@item brc_only
+skip_frame metadata indicates the number of missed frames before the current
+frame.
+@end table
+
 @end table
 
 @subsection MPEG2 Options
@@ -3672,6 +4067,56 @@ Number of columns for tiled encoding (requires libmfx >= 1.29).
 
 @item @var{tile_rows}
 Number of rows for tiled encoding (requires libmfx  >= 1.29).
+@end table
+
+@subsection AV1 Options
+These options are used by av1_qsv (requires libvpl).
+@table @option
+@item @var{profile}
+@table @samp
+@item unknown
+@item main
+@end table
+
+@item @var{tile_cols}
+Number of columns for tiled encoding.
+
+@item @var{tile_rows}
+Number of rows for tiled encoding.
+
+@item @var{adaptive_i}
+This flag controls insertion of I frames by the QSV encoder. Turn ON this flag
+to allow changing of frame type from P and B to I.
+
+@item @var{adaptive_b}
+This flag controls changing of frame type from B to P.
+
+@item @var{b_strategy}
+This option controls usage of B frames as reference.
+
+@item @var{extbrc}
+Extended bitrate control.
+
+@item @var{look_ahead_depth}
+Depth of look ahead in number frames, available when extbrc option is enabled.
+
+@item @var{low_delay_brc}
+Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+more accurate bitrate control to minimize the variance of bitstream size frame
+by frame. Value: -1-default 0-off 1-on
+
+@item @var{max_frame_size}
+Set the allowed max size in bytes for each frame. If the frame size exceeds
+the limitation, encoder will adjust the QP value to control the frame size.
+Invalid in CQP rate control mode.
+
+@item @var{max_frame_size_i}
+Maximum encoded frame size for I frames in bytes. If this value is set as larger
+than zero, then for I frames the value set by max_frame_size is ignored.
+
+@item @var{max_frame_size_p}
+Maximum encoded frame size for P frames in bytes. If this value is set as larger
+than zero, then for P frames the value set by max_frame_size is ignored.
 @end table
 
 @section snow
@@ -3788,10 +4233,28 @@ Quality-defined variable-bitrate.
 Average variable bitrate.
 @end table
 
+@item blbrc
+Enable block level rate control, which assigns different bitrate block by block.
+Invalid for CQP mode.
+
 @end table
 
 Each encoder also has its own specific options:
 @table @option
+
+@item av1_vaapi
+@option{profile} sets the value of @emph{seq_profile}.
+@option{tier} sets the value of @emph{seq_tier}.
+@option{level} sets the value of @emph{seq_level_idx}.
+
+@table @option
+@item tiles
+Set the number of tiles to encode the input video with, as columns x rows.
+(default is auto, which means use minimal tile column/row number).
+@item tile_groups
+Set tile groups number. All the tiles will be distributed as evenly as possible to
+each tile group. (default is 1).
+@end table
 
 @item h264_vaapi
 @option{profile} sets the value of @emph{profile_idc} and the @emph{constraint_set*_flag}s.

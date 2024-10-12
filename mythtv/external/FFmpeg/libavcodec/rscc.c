@@ -40,12 +40,12 @@
 
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
 #include "decode.h"
-#include "internal.h"
 
 #define TILE_SIZE 8
 
@@ -340,14 +340,21 @@ static int rscc_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     /* Keyframe when the number of pixels updated matches the whole surface */
     if (pixel_size == ctx->inflated_size) {
         frame->pict_type = AV_PICTURE_TYPE_I;
-        frame->key_frame = 1;
+        frame->flags |= AV_FRAME_FLAG_KEY;
     } else {
         frame->pict_type = AV_PICTURE_TYPE_P;
     }
 
     /* Palette handling */
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
-        frame->palette_has_changed = ff_copy_palette(ctx->palette, avpkt, avctx);
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
+        frame->palette_has_changed =
+#endif
+        ff_copy_palette(ctx->palette, avpkt, avctx);
+#if FF_API_PALETTE_HAS_CHANGED
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         memcpy(frame->data[1], ctx->palette, AVPALETTE_SIZE);
     }
     // We only return a picture when enough of it is undamaged, this avoids copying nearly broken frames around
@@ -364,7 +371,7 @@ end:
 
 const FFCodec ff_rscc_decoder = {
     .p.name         = "rscc",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("innoHeim/Rsupport Screen Capture Codec"),
+    CODEC_LONG_NAME("innoHeim/Rsupport Screen Capture Codec"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_RSCC,
     .init           = rscc_init,
@@ -372,6 +379,5 @@ const FFCodec ff_rscc_decoder = {
     .close          = rscc_close,
     .priv_data_size = sizeof(RsccContext),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

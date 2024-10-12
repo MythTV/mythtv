@@ -22,11 +22,11 @@
 #include "libavutil/avassert.h"
 #include "libavutil/eval.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 #define SUB_PIXEL_BITS  8
@@ -77,15 +77,15 @@ static const AVOption perspective_options[] = {
     { "y2", "set bottom left y coordinate",  OFFSET(expr_str[2][1]), AV_OPT_TYPE_STRING, {.str="H"}, 0, 0, FLAGS },
     { "x3", "set bottom right x coordinate", OFFSET(expr_str[3][0]), AV_OPT_TYPE_STRING, {.str="W"}, 0, 0, FLAGS },
     { "y3", "set bottom right y coordinate", OFFSET(expr_str[3][1]), AV_OPT_TYPE_STRING, {.str="H"}, 0, 0, FLAGS },
-    { "interpolation", "set interpolation", OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=LINEAR}, 0, 1, FLAGS, "interpolation" },
-    {      "linear", "", 0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, FLAGS, "interpolation" },
-    {       "cubic", "", 0, AV_OPT_TYPE_CONST, {.i64=CUBIC},  0, 0, FLAGS, "interpolation" },
-    { "sense",   "specify the sense of the coordinates", OFFSET(sense), AV_OPT_TYPE_INT, {.i64=PERSPECTIVE_SENSE_SOURCE}, 0, 1, FLAGS, "sense"},
+    { "interpolation", "set interpolation", OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=LINEAR}, 0, 1, FLAGS, .unit = "interpolation" },
+    {      "linear", "", 0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, FLAGS, .unit = "interpolation" },
+    {       "cubic", "", 0, AV_OPT_TYPE_CONST, {.i64=CUBIC},  0, 0, FLAGS, .unit = "interpolation" },
+    { "sense",   "specify the sense of the coordinates", OFFSET(sense), AV_OPT_TYPE_INT, {.i64=PERSPECTIVE_SENSE_SOURCE}, 0, 1, FLAGS, .unit = "sense"},
     {       "source", "specify locations in source to send to corners in destination",
-                0, AV_OPT_TYPE_CONST, {.i64=PERSPECTIVE_SENSE_SOURCE}, 0, 0, FLAGS, "sense"},
+                0, AV_OPT_TYPE_CONST, {.i64=PERSPECTIVE_SENSE_SOURCE}, 0, 0, FLAGS, .unit = "sense"},
     {       "destination", "specify locations in destination to send corners of source",
-                0, AV_OPT_TYPE_CONST, {.i64=PERSPECTIVE_SENSE_DESTINATION}, 0, 0, FLAGS, "sense"},
-    { "eval", "specify when to evaluate expressions", OFFSET(eval_mode), AV_OPT_TYPE_INT, {.i64 = EVAL_MODE_INIT}, 0, EVAL_MODE_NB-1, FLAGS, "eval" },
+                0, AV_OPT_TYPE_CONST, {.i64=PERSPECTIVE_SENSE_DESTINATION}, 0, 0, FLAGS, .unit = "sense"},
+    { "eval", "specify when to evaluate expressions", OFFSET(eval_mode), AV_OPT_TYPE_INT, {.i64 = EVAL_MODE_INIT}, 0, EVAL_MODE_NB-1, FLAGS, .unit = "eval" },
          { "init",  "eval expressions once during initialization", 0, AV_OPT_TYPE_CONST, {.i64=EVAL_MODE_INIT},  .flags = FLAGS, .unit = "eval" },
          { "frame", "eval expressions per-frame",                  0, AV_OPT_TYPE_CONST, {.i64=EVAL_MODE_FRAME}, .flags = FLAGS, .unit = "eval" },
 
@@ -122,13 +122,15 @@ enum                                   { VAR_W, VAR_H, VAR_IN, VAR_ON, VAR_VARS_
 
 static int calc_persp_luts(AVFilterContext *ctx, AVFilterLink *inlink)
 {
+    FilterLink *inl       = ff_filter_link(inlink);
     PerspectiveContext *s = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
+    FilterLink *outl      = ff_filter_link(outlink);
     double (*ref)[2]      = s->ref;
 
     double values[VAR_VARS_NB] = { [VAR_W] = inlink->w, [VAR_H] = inlink->h,
-                                   [VAR_IN] = inlink->frame_count_out + 1,
-                                   [VAR_ON] = outlink->frame_count_in + 1 };
+                                   [VAR_IN] = inl->frame_count_out + 1,
+                                   [VAR_ON] = outl->frame_count_in + 1 };
     const int h = values[VAR_H];
     const int w = values[VAR_W];
     double x0, x1, x2, x3, x4, x5, x6, x7, x8, q;
@@ -495,13 +497,6 @@ static const AVFilterPad perspective_inputs[] = {
     },
 };
 
-static const AVFilterPad perspective_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_perspective = {
     .name          = "perspective",
     .description   = NULL_IF_CONFIG_SMALL("Correct the perspective of video."),
@@ -509,7 +504,7 @@ const AVFilter ff_vf_perspective = {
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(perspective_inputs),
-    FILTER_OUTPUTS(perspective_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .priv_class    = &perspective_class,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,

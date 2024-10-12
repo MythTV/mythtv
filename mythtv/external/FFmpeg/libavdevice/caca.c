@@ -19,9 +19,18 @@
  */
 
 #include <caca.h>
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
+#include "libavformat/mux.h"
 #include "avdevice.h"
+
+enum {
+    LIST_ALGORITHMS  = 1 << 0,
+    LIST_ANTIALIASES = 1 << 1,
+    LIST_CHARSETS    = 1 << 2,
+    LIST_COLORS      = 1 << 3,
+};
 
 typedef struct CACAContext {
     AVClass         *class;
@@ -37,7 +46,7 @@ typedef struct CACAContext {
     char            *charset, *color;
     char            *driver;
 
-    char            *list_dither;
+    int             list_dither;
     int             list_drivers;
 } CACAContext;
 
@@ -98,21 +107,14 @@ static int caca_write_header(AVFormatContext *s)
         return AVERROR_EXIT;
     }
     if (c->list_dither) {
-        if (!strcmp(c->list_dither, "colors")) {
+        if (c->list_dither & LIST_COLORS)
             list_dither_color(c);
-        } else if (!strcmp(c->list_dither, "charsets")) {
+        if (c->list_dither & LIST_CHARSETS)
             list_dither_charset(c);
-        } else if (!strcmp(c->list_dither, "algorithms")) {
+        if (c->list_dither & LIST_ALGORITHMS)
             list_dither_algorithm(c);
-        } else if (!strcmp(c->list_dither, "antialiases")) {
+        if (c->list_dither & LIST_ANTIALIASES)
             list_dither_antialias(c);
-        } else {
-            av_log(s, AV_LOG_ERROR,
-                   "Invalid argument '%s', for 'list_dither' option\n"
-                   "Argument must be one of 'algorithms, 'antialiases', 'charsets', 'colors'\n",
-                   c->list_dither);
-            return AVERROR(EINVAL);
-        }
         return AVERROR_EXIT;
     }
 
@@ -204,11 +206,11 @@ static const AVOption options[] = {
     { "charset",      "set charset used to render output", OFFSET(charset), AV_OPT_TYPE_STRING, {.str = "default" }, 0, 0, ENC },
     { "color",        "set color used to render output",   OFFSET(color),   AV_OPT_TYPE_STRING, {.str = "default" }, 0, 0, ENC },
     { "list_drivers", "list available drivers",  OFFSET(list_drivers), AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, ENC },
-    { "list_dither", "list available dither options", OFFSET(list_dither), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 1, ENC, "list_dither" },
-    { "algorithms",   NULL, 0, AV_OPT_TYPE_CONST, {.str = "algorithms"}, 0, 0, ENC, "list_dither" },
-    { "antialiases",  NULL, 0, AV_OPT_TYPE_CONST, {.str = "antialiases"},0, 0, ENC, "list_dither" },
-    { "charsets",     NULL, 0, AV_OPT_TYPE_CONST, {.str = "charsets"},   0, 0, ENC, "list_dither" },
-    { "colors",       NULL, 0, AV_OPT_TYPE_CONST, {.str = "colors"},     0, 0, ENC, "list_dither" },
+    { "list_dither", "list available dither options", OFFSET(list_dither), AV_OPT_TYPE_FLAGS, { .i64 = 0 }, 0, INT_MAX, ENC, .unit = "list_dither" },
+    { "algorithms",   NULL, 0, AV_OPT_TYPE_CONST, {.i64 = LIST_ALGORITHMS },  0, 0, ENC, .unit = "list_dither" },
+    { "antialiases",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = LIST_ANTIALIASES }, 0, 0, ENC, .unit = "list_dither" },
+    { "charsets",     NULL, 0, AV_OPT_TYPE_CONST, {.i64 = LIST_CHARSETS },    0, 0, ENC, .unit = "list_dither" },
+    { "colors",       NULL, 0, AV_OPT_TYPE_CONST, {.i64 = LIST_COLORS },      0, 0, ENC, .unit = "list_dither" },
     { NULL },
 };
 
@@ -220,15 +222,15 @@ static const AVClass caca_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_OUTPUT,
 };
 
-const AVOutputFormat ff_caca_muxer = {
-    .name           = "caca",
-    .long_name      = NULL_IF_CONFIG_SMALL("caca (color ASCII art) output device"),
+const FFOutputFormat ff_caca_muxer = {
+    .p.name         = "caca",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("caca (color ASCII art) output device"),
     .priv_data_size = sizeof(CACAContext),
-    .audio_codec    = AV_CODEC_ID_NONE,
-    .video_codec    = AV_CODEC_ID_RAWVIDEO,
+    .p.audio_codec  = AV_CODEC_ID_NONE,
+    .p.video_codec  = AV_CODEC_ID_RAWVIDEO,
     .write_header   = caca_write_header,
     .write_packet   = caca_write_packet,
     .deinit         = caca_deinit,
-    .flags          = AVFMT_NOFILE,
-    .priv_class     = &caca_class,
+    .p.flags        = AVFMT_NOFILE,
+    .p.priv_class   = &caca_class,
 };

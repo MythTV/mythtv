@@ -27,15 +27,14 @@
 #include <zlib.h>
 
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
-#include "libavutil/pixdesc.h"
+#include "libavutil/float2half.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
 #include "encode.h"
-#include "float2half.h"
 
 enum ExrCompr {
     EXR_RAW,
@@ -87,15 +86,14 @@ typedef struct EXRContext {
 
     EXRScanlineData *scanline;
 
-    uint16_t basetable[512];
-    uint8_t shifttable[512];
+    Float2HalfTables f2h_tables;
 } EXRContext;
 
 static av_cold int encode_init(AVCodecContext *avctx)
 {
     EXRContext *s = avctx->priv_data;
 
-    float2half_tables(s->basetable, s->shifttable);
+    ff_init_float2half_tables(&s->f2h_tables);
 
     switch (avctx->pix_fmt) {
     case AV_PIX_FMT_GBRPF32:
@@ -253,10 +251,10 @@ static int encode_scanline_rle(EXRContext *s, const AVFrame *frame)
             for (int p = 0; p < s->planes; p++) {
                 int ch = s->ch_order[p];
                 uint16_t *dst = (uint16_t *)(scanline->uncompressed_data + frame->width * 2 * p);
-                uint32_t *src = (uint32_t *)(frame->data[ch] + y * frame->linesize[ch]);
+                const uint32_t *src = (const uint32_t *)(frame->data[ch] + y * frame->linesize[ch]);
 
                 for (int x = 0; x < frame->width; x++)
-                    dst[x] = float2half(src[x], s->basetable, s->shifttable);
+                    dst[x] = float2half(src[x], &s->f2h_tables);
             }
             break;
         }
@@ -321,10 +319,10 @@ static int encode_scanline_zip(EXRContext *s, const AVFrame *frame)
                 for (int p = 0; p < s->planes; p++) {
                     int ch = s->ch_order[p];
                     uint16_t *dst = (uint16_t *)(scanline->uncompressed_data + scanline_size * l + p * frame->width * 2);
-                    uint32_t *src = (uint32_t *)(frame->data[ch] + (y * s->scanline_height + l) * frame->linesize[ch]);
+                    const uint32_t *src = (const uint32_t *)(frame->data[ch] + (y * s->scanline_height + l) * frame->linesize[ch]);
 
                     for (int x = 0; x < frame->width; x++)
-                        dst[x] = float2half(src[x], s->basetable, s->shifttable);
+                        dst[x] = float2half(src[x], &s->f2h_tables);
                 }
             }
             break;
@@ -479,10 +477,10 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                 bytestream2_put_le32(pb, s->planes * avctx->width * 2);
                 for (int p = 0; p < s->planes; p++) {
                     int ch = s->ch_order[p];
-                    uint32_t *src = (uint32_t *)(frame->data[ch] + y * frame->linesize[ch]);
+                    const uint32_t *src = (const uint32_t *)(frame->data[ch] + y * frame->linesize[ch]);
 
                     for (int x = 0; x < frame->width; x++)
-                        bytestream2_put_le16(pb, float2half(src[x], s->basetable, s->shifttable));
+                        bytestream2_put_le16(pb, float2half(src[x], &s->f2h_tables));
                 }
             }
         }
@@ -522,14 +520,14 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 #define OFFSET(x) offsetof(EXRContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "compression", "set compression type", OFFSET(compression), AV_OPT_TYPE_INT,   {.i64=0}, 0, EXR_NBCOMPR-1, VE, "compr" },
-    { "none",        "none",                 0,                   AV_OPT_TYPE_CONST, {.i64=EXR_RAW}, 0, 0, VE, "compr" },
-    { "rle" ,        "RLE",                  0,                   AV_OPT_TYPE_CONST, {.i64=EXR_RLE}, 0, 0, VE, "compr" },
-    { "zip1",        "ZIP1",                 0,                   AV_OPT_TYPE_CONST, {.i64=EXR_ZIP1}, 0, 0, VE, "compr" },
-    { "zip16",       "ZIP16",                0,                   AV_OPT_TYPE_CONST, {.i64=EXR_ZIP16}, 0, 0, VE, "compr" },
-    { "format", "set pixel type", OFFSET(pixel_type), AV_OPT_TYPE_INT,   {.i64=EXR_FLOAT}, EXR_HALF, EXR_UNKNOWN-1, VE, "pixel" },
-    { "half" ,       NULL,                   0,                   AV_OPT_TYPE_CONST, {.i64=EXR_HALF},  0, 0, VE, "pixel" },
-    { "float",       NULL,                   0,                   AV_OPT_TYPE_CONST, {.i64=EXR_FLOAT}, 0, 0, VE, "pixel" },
+    { "compression", "set compression type", OFFSET(compression), AV_OPT_TYPE_INT,   {.i64=0}, 0, EXR_NBCOMPR-1, VE, .unit = "compr" },
+    { "none",        "none",                 0,                   AV_OPT_TYPE_CONST, {.i64=EXR_RAW}, 0, 0, VE, .unit = "compr" },
+    { "rle" ,        "RLE",                  0,                   AV_OPT_TYPE_CONST, {.i64=EXR_RLE}, 0, 0, VE, .unit = "compr" },
+    { "zip1",        "ZIP1",                 0,                   AV_OPT_TYPE_CONST, {.i64=EXR_ZIP1}, 0, 0, VE, .unit = "compr" },
+    { "zip16",       "ZIP16",                0,                   AV_OPT_TYPE_CONST, {.i64=EXR_ZIP16}, 0, 0, VE, .unit = "compr" },
+    { "format", "set pixel type", OFFSET(pixel_type), AV_OPT_TYPE_INT,   {.i64=EXR_FLOAT}, EXR_HALF, EXR_UNKNOWN-1, VE, .unit = "pixel" },
+    { "half" ,       NULL,                   0,                   AV_OPT_TYPE_CONST, {.i64=EXR_HALF},  0, 0, VE, .unit = "pixel" },
+    { "float",       NULL,                   0,                   AV_OPT_TYPE_CONST, {.i64=EXR_FLOAT}, 0, 0, VE, .unit = "pixel" },
     { "gamma", "set gamma", OFFSET(gamma), AV_OPT_TYPE_FLOAT, {.dbl=1.f}, 0.001, FLT_MAX, VE },
     { NULL},
 };
@@ -543,12 +541,13 @@ static const AVClass exr_class = {
 
 const FFCodec ff_exr_encoder = {
     .p.name         = "exr",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("OpenEXR image"),
+    CODEC_LONG_NAME("OpenEXR image"),
     .priv_data_size = sizeof(EXRContext),
     .p.priv_class   = &exr_class,
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_EXR,
-    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .init           = encode_init,
     FF_CODEC_ENCODE_CB(encode_frame),
     .close          = encode_close,
@@ -557,5 +556,4 @@ const FFCodec ff_exr_encoder = {
                                                  AV_PIX_FMT_GBRPF32,
                                                  AV_PIX_FMT_GBRAPF32,
                                                  AV_PIX_FMT_NONE },
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

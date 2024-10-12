@@ -23,8 +23,8 @@
 #include "libavutil/pixdesc.h"
 
 #include "avfilter.h"
+#include "filters.h"
 #include "formats.h"
-#include "internal.h"
 #include "video.h"
 
 typedef struct HWMapContext {
@@ -52,9 +52,11 @@ static int hwmap_query_formats(AVFilterContext *avctx)
 
 static int hwmap_config_output(AVFilterLink *outlink)
 {
+    FilterLink       *outl = ff_filter_link(outlink);
     AVFilterContext *avctx = outlink->src;
     HWMapContext      *ctx = avctx->priv;
     AVFilterLink   *inlink = avctx->inputs[0];
+    FilterLink        *inl = ff_filter_link(inlink);
     AVHWFramesContext *hwfc;
     AVBufferRef *device;
     const AVPixFmtDescriptor *desc;
@@ -69,8 +71,8 @@ static int hwmap_config_output(AVFilterLink *outlink)
     device = avctx->hw_device_ctx;
     device_is_derived = 0;
 
-    if (inlink->hw_frames_ctx) {
-        hwfc = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
+    if (inl->hw_frames_ctx) {
+        hwfc = (AVHWFramesContext*)inl->hw_frames_ctx->data;
 
         if (ctx->derive_device_type) {
             enum AVHWDeviceType type;
@@ -114,7 +116,7 @@ static int hwmap_config_output(AVFilterLink *outlink)
             err = av_hwframe_ctx_create_derived(&ctx->hwframes_ref,
                                                 outlink->format,
                                                 device,
-                                                inlink->hw_frames_ctx,
+                                                inl->hw_frames_ctx,
                                                 ctx->mode);
             if (err < 0) {
                 av_log(avctx, AV_LOG_ERROR, "Failed to create derived "
@@ -171,8 +173,8 @@ static int hwmap_config_output(AVFilterLink *outlink)
             // the format it expects.  If there were any additional
             // constraints on the output frames there then this may
             // break nastily.
-            av_buffer_unref(&inlink->hw_frames_ctx);
-            inlink->hw_frames_ctx = source;
+            av_buffer_unref(&inl->hw_frames_ctx);
+            inl->hw_frames_ctx = source;
 
         } else if ((outlink->format == hwfc->format &&
                     inlink->format  == hwfc->sw_format) ||
@@ -180,7 +182,7 @@ static int hwmap_config_output(AVFilterLink *outlink)
             // Map from a hardware format to a software format, or
             // undo an existing such mapping.
 
-            ctx->hwframes_ref = av_buffer_ref(inlink->hw_frames_ctx);
+            ctx->hwframes_ref = av_buffer_ref(inl->hw_frames_ctx);
             if (!ctx->hwframes_ref) {
                 err = AVERROR(ENOMEM);
                 goto fail;
@@ -241,8 +243,8 @@ static int hwmap_config_output(AVFilterLink *outlink)
         return AVERROR(EINVAL);
     }
 
-    outlink->hw_frames_ctx = av_buffer_ref(ctx->hwframes_ref);
-    if (!outlink->hw_frames_ctx) {
+    outl->hw_frames_ctx = av_buffer_ref(ctx->hwframes_ref);
+    if (!outl->hw_frames_ctx) {
         err = AVERROR(ENOMEM);
         goto fail;
     }
@@ -263,11 +265,12 @@ fail:
 
 static AVFrame *hwmap_get_buffer(AVFilterLink *inlink, int w, int h)
 {
+    FilterLink          *l = ff_filter_link(inlink);
     AVFilterContext *avctx = inlink->dst;
     AVFilterLink  *outlink = avctx->outputs[0];
     HWMapContext      *ctx = avctx->priv;
 
-    if (ctx->reverse && !inlink->hw_frames_ctx) {
+    if (ctx->reverse && !l->hw_frames_ctx) {
         AVFrame *src, *dst;
         int err;
 
@@ -373,20 +376,20 @@ static const AVOption hwmap_options[] = {
     { "mode", "Frame mapping mode",
       OFFSET(mode), AV_OPT_TYPE_FLAGS,
       { .i64 = AV_HWFRAME_MAP_READ | AV_HWFRAME_MAP_WRITE },
-      0, INT_MAX, FLAGS, "mode" },
+      0, INT_MAX, FLAGS, .unit = "mode" },
 
     { "read", "Mapping should be readable",
       0, AV_OPT_TYPE_CONST, { .i64 = AV_HWFRAME_MAP_READ },
-      INT_MIN, INT_MAX, FLAGS, "mode" },
+      INT_MIN, INT_MAX, FLAGS, .unit = "mode" },
     { "write", "Mapping should be writeable",
       0, AV_OPT_TYPE_CONST, { .i64 = AV_HWFRAME_MAP_WRITE },
-      INT_MIN, INT_MAX, FLAGS, "mode" },
+      INT_MIN, INT_MAX, FLAGS, .unit = "mode" },
     { "overwrite", "Mapping will always overwrite the entire frame",
       0, AV_OPT_TYPE_CONST, { .i64 = AV_HWFRAME_MAP_OVERWRITE },
-      INT_MIN, INT_MAX, FLAGS, "mode" },
+      INT_MIN, INT_MAX, FLAGS, .unit = "mode" },
     { "direct", "Mapping should not involve any copying",
       0, AV_OPT_TYPE_CONST, { .i64 = AV_HWFRAME_MAP_DIRECT },
-      INT_MIN, INT_MAX, FLAGS, "mode" },
+      INT_MIN, INT_MAX, FLAGS, .unit = "mode" },
 
     { "derive_device", "Derive a new device of this type",
       OFFSET(derive_device_type), AV_OPT_TYPE_STRING,
@@ -427,4 +430,5 @@ const AVFilter ff_vf_hwmap = {
     FILTER_OUTPUTS(hwmap_outputs),
     FILTER_QUERY_FUNC(hwmap_query_formats),
     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
+    .flags          = AVFILTER_FLAG_HWDEVICE,
 };

@@ -24,15 +24,15 @@
  * Zip Motion Blocks Video decoder
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "zlib_wrapper.h"
 
 #include <zlib.h>
@@ -560,11 +560,11 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return ret;
 
     if (c->flags & ZMBV_KEYFRAME) {
-        frame->key_frame = 1;
+        frame->flags |= AV_FRAME_FLAG_KEY;
         frame->pict_type = AV_PICTURE_TYPE_I;
         zmbv_decode_intra(c);
     } else {
-        frame->key_frame = 0;
+        frame->flags &= ~AV_FRAME_FLAG_KEY;
         frame->pict_type = AV_PICTURE_TYPE_P;
         if (c->decomp_len < 2LL * ((c->width + c->bw - 1) / c->bw) * ((c->height + c->bh - 1) / c->bh))
             return AVERROR_INVALIDDATA;
@@ -647,7 +647,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_zmbv_decoder = {
     .p.name         = "zmbv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Zip Motion Blocks Video"),
+    CODEC_LONG_NAME("Zip Motion Blocks Video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_ZMBV,
     .priv_data_size = sizeof(ZmbvContext),
@@ -655,5 +655,5 @@ const FFCodec ff_zmbv_decoder = {
     .close          = decode_end,
     FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

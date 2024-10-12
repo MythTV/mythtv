@@ -34,8 +34,10 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
+#include "libavutil/mem.h"
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
+#include "demux.h"
 #include "id3v2.h"
 #include "internal.h"
 
@@ -217,7 +219,7 @@ static int parse_dsd_diin(AVFormatContext *s, AVStream *st, uint64_t eof)
 {
     AVIOContext *pb = s->pb;
 
-    while (avio_tell(pb) + 12 <= eof && !avio_feof(pb)) {
+    while (av_sat_add64(avio_tell(pb), 12) <= eof && !avio_feof(pb)) {
         uint32_t tag      = avio_rl32(pb);
         uint64_t size     = avio_rb64(pb);
         uint64_t orig_pos = avio_tell(pb);
@@ -254,7 +256,7 @@ static int parse_dsd_prop(AVFormatContext *s, AVStream *st, uint64_t eof)
     int dsd_layout[6];
     ID3v2ExtraMeta *id3v2_extra_meta;
 
-    while (avio_tell(pb) + 12 <= eof && !avio_feof(pb)) {
+    while (av_sat_add64(avio_tell(pb), 12) <= eof && !avio_feof(pb)) {
         uint32_t tag      = avio_rl32(pb);
         uint64_t size     = avio_rb64(pb);
         uint64_t orig_pos = avio_tell(pb);
@@ -501,6 +503,9 @@ static int iff_read_header(AVFormatContext *s)
         case ID_DST:
         case ID_MDAT:
             iff->body_pos = avio_tell(pb);
+            if (iff->body_pos < 0 || iff->body_pos + data_size > INT64_MAX)
+                return AVERROR_INVALIDDATA;
+
             iff->body_end = iff->body_pos + data_size;
             iff->body_size = data_size;
             if (chunk_id == ID_DST) {
@@ -898,12 +903,12 @@ static int iff_read_packet(AVFormatContext *s,
     return ret;
 }
 
-const AVInputFormat ff_iff_demuxer = {
-    .name           = "iff",
-    .long_name      = NULL_IF_CONFIG_SMALL("IFF (Interchange File Format)"),
+const FFInputFormat ff_iff_demuxer = {
+    .p.name         = "iff",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("IFF (Interchange File Format)"),
+    .p.flags        = AVFMT_GENERIC_INDEX | AVFMT_NO_BYTE_SEEK,
     .priv_data_size = sizeof(IffDemuxContext),
     .read_probe     = iff_probe,
     .read_header    = iff_read_header,
     .read_packet    = iff_read_packet,
-    .flags          = AVFMT_GENERIC_INDEX | AVFMT_NO_BYTE_SEEK,
 };

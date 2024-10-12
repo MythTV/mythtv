@@ -23,6 +23,7 @@
 #include "avio_internal.h"
 #include "internal.h"
 #include "ast.h"
+#include "mux.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 
@@ -48,15 +49,8 @@ static int ast_write_header(AVFormatContext *s)
 {
     ASTMuxContext *ast = s->priv_data;
     AVIOContext *pb = s->pb;
-    AVCodecParameters *par;
+    AVCodecParameters *par = s->streams[0]->codecpar;
     unsigned int codec_tag;
-
-    if (s->nb_streams == 1) {
-        par = s->streams[0]->codecpar;
-    } else {
-        av_log(s, AV_LOG_ERROR, "only one stream is supported\n");
-        return AVERROR(EINVAL);
-    }
 
     if (par->codec_id == AV_CODEC_ID_ADPCM_AFC) {
         av_log(s, AV_LOG_ERROR, "muxing ADPCM AFC is not implemented\n");
@@ -142,14 +136,16 @@ static int ast_write_trailer(AVFormatContext *s)
 
         /* Loopstart if provided */
         if (ast->loopstart > 0) {
-        if (ast->loopstart >= samples) {
-            av_log(s, AV_LOG_WARNING, "Loopstart value is out of range and will be ignored\n");
-            ast->loopstart = -1;
+            if (ast->loopstart >= samples) {
+                av_log(s, AV_LOG_WARNING, "Loopstart value is out of range and will be ignored\n");
+                ast->loopstart = -1;
+                avio_skip(pb, 4);
+            } else {
+                avio_wb32(pb, ast->loopstart);
+            }
+        } else {
             avio_skip(pb, 4);
-        } else
-        avio_wb32(pb, ast->loopstart);
-        } else
-            avio_skip(pb, 4);
+        }
 
         /* Loopend if provided. Otherwise number of samples again */
         if (ast->loopend && ast->loopstart >= 0) {
@@ -194,16 +190,18 @@ static const AVClass ast_muxer_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVOutputFormat ff_ast_muxer = {
-    .name              = "ast",
-    .long_name         = NULL_IF_CONFIG_SMALL("AST (Audio Stream)"),
-    .extensions        = "ast",
+const FFOutputFormat ff_ast_muxer = {
+    .p.name            = "ast",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("AST (Audio Stream)"),
+    .p.extensions      = "ast",
     .priv_data_size    = sizeof(ASTMuxContext),
-    .audio_codec       = AV_CODEC_ID_PCM_S16BE_PLANAR,
-    .video_codec       = AV_CODEC_ID_NONE,
+    .p.audio_codec     = AV_CODEC_ID_PCM_S16BE_PLANAR,
+    .p.video_codec     = AV_CODEC_ID_NONE,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH,
     .write_header      = ast_write_header,
     .write_packet      = ast_write_packet,
     .write_trailer     = ast_write_trailer,
-    .priv_class        = &ast_muxer_class,
-    .codec_tag         = ff_ast_codec_tags_list,
+    .p.priv_class      = &ast_muxer_class,
+    .p.codec_tag       = ff_ast_codec_tags_list,
 };

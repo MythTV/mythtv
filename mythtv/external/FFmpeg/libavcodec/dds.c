@@ -34,9 +34,8 @@
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "texturedsp.h"
-#include "thread.h"
 
 #define DDPF_FOURCC    (1 <<  2)
 #define DDPF_PALETTE   (1 <<  5)
@@ -637,7 +636,9 @@ static int dds_decode(AVCodecContext *avctx, AVFrame *frame,
         ctx->dec.tex_data.in = gbc->buffer;
         ctx->dec.frame_data.out = frame->data[0];
         ctx->dec.stride = frame->linesize[0];
-        avctx->execute2(avctx, ff_texturedsp_decompress_thread, &ctx->dec, NULL, ctx->dec.slice_count);
+        ctx->dec.width  = avctx->coded_width;
+        ctx->dec.height = avctx->coded_height;
+        ff_texturedsp_exec_decompress_threads(avctx, &ctx->dec);
     } else if (!ctx->paletted && ctx->bpp == 4 && avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         uint8_t *dst = frame->data[0];
         int x, y, i;
@@ -652,7 +653,11 @@ static int dds_decode(AVCodecContext *avctx, AVFrame *frame,
                     ((unsigned)frame->data[1][3+i*4]<<24)
             );
         }
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
         frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
         if (bytestream2_get_bytes_left(gbc) < frame->height * frame->width / 2) {
             av_log(avctx, AV_LOG_ERROR, "Buffer is too small (%d < %d).\n",
@@ -683,7 +688,11 @@ static int dds_decode(AVCodecContext *avctx, AVFrame *frame,
                         ((unsigned)frame->data[1][3+i*4]<<24)
                 );
 
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
             frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         }
 
         if (bytestream2_get_bytes_left(gbc) < frame->height * linesize) {
@@ -702,8 +711,6 @@ static int dds_decode(AVCodecContext *avctx, AVFrame *frame,
         run_postproc(avctx, frame);
 
     /* Frame is ready to be output. */
-    frame->pict_type = AV_PICTURE_TYPE_I;
-    frame->key_frame = 1;
     *got_frame = 1;
 
     return avpkt->size;
@@ -711,11 +718,10 @@ static int dds_decode(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_dds_decoder = {
     .p.name         = "dds",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("DirectDraw Surface image decoder"),
+    CODEC_LONG_NAME("DirectDraw Surface image decoder"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_DDS,
     FF_CODEC_DECODE_CB(dds_decode),
     .priv_data_size = sizeof(DDSContext),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE
 };

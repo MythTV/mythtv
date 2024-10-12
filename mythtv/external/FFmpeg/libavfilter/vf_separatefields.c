@@ -21,7 +21,7 @@
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "filters.h"
-#include "internal.h"
+#include "video.h"
 
 typedef struct SeparateFieldsContext {
     int nb_planes;
@@ -33,6 +33,8 @@ static int config_props_output(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     SeparateFieldsContext *s = ctx->priv;
     AVFilterLink *inlink = ctx->inputs[0];
+    FilterLink       *il = ff_filter_link(inlink);
+    FilterLink       *ol = ff_filter_link(outlink);
 
     s->nb_planes = av_pix_fmt_count_planes(inlink->format);
 
@@ -43,8 +45,8 @@ static int config_props_output(AVFilterLink *outlink)
 
     outlink->time_base.num = inlink->time_base.num;
     outlink->time_base.den = inlink->time_base.den * 2;
-    outlink->frame_rate.num = inlink->frame_rate.num * 2;
-    outlink->frame_rate.den = inlink->frame_rate.den;
+    ol->frame_rate.num = il->frame_rate.num * 2;
+    ol->frame_rate.den = il->frame_rate.den;
     outlink->w = inlink->w;
     outlink->h = inlink->h / 2;
 
@@ -70,14 +72,19 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
     int ret;
 
     inpicref->height = outlink->h;
+#if FF_API_INTERLACED_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
     inpicref->interlaced_frame = 0;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+    inpicref->flags &= ~AV_FRAME_FLAG_INTERLACED;
 
     if (!s->second) {
         goto clone;
     } else {
         AVFrame *second = s->second;
 
-        extract_field(second, s->nb_planes, second->top_field_first);
+        extract_field(second, s->nb_planes, !!(second->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST));
 
         if (second->pts != AV_NOPTS_VALUE &&
             inpicref->pts != AV_NOPTS_VALUE)
@@ -94,7 +101,7 @@ clone:
             return AVERROR(ENOMEM);
     }
 
-    extract_field(inpicref, s->nb_planes, !inpicref->top_field_first);
+    extract_field(inpicref, s->nb_planes, !(inpicref->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST));
 
     if (inpicref->pts != AV_NOPTS_VALUE)
         inpicref->pts *= 2;
@@ -110,7 +117,7 @@ static int flush_frame(AVFilterLink *outlink, int64_t pts, int64_t *out_pts)
 
     if (s->second) {
         *out_pts = s->second->pts += pts;
-        extract_field(s->second, s->nb_planes, s->second->top_field_first);
+        extract_field(s->second, s->nb_planes, !!(s->second->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST));
         ret = ff_filter_frame(outlink, s->second);
         s->second = NULL;
     }
@@ -156,13 +163,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_frame_free(&s->second);
 }
 
-static const AVFilterPad separatefields_inputs[] = {
-    {
-        .name         = "default",
-        .type         = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 static const AVFilterPad separatefields_outputs[] = {
     {
         .name          = "default",
@@ -177,6 +177,6 @@ const AVFilter ff_vf_separatefields = {
     .priv_size   = sizeof(SeparateFieldsContext),
     .activate    = activate,
     .uninit      = uninit,
-    FILTER_INPUTS(separatefields_inputs),
+    FILTER_INPUTS(ff_video_default_filterpad),
     FILTER_OUTPUTS(separatefields_outputs),
 };

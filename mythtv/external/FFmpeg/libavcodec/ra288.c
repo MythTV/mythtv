@@ -22,15 +22,16 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "celp_filters.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
-#include "lpc.h"
+#include "lpc_functions.h"
 #include "ra288.h"
 
 #define MAX_BACKWARD_FILTER_ORDER  36
@@ -239,12 +240,11 @@ static int ra288_decode_frame(AVCodecContext * avctx, AVFrame *frame,
 
 const FFCodec ff_ra_288_decoder = {
     .p.name         = "real_288",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("RealAudio 2.0 (28.8K)"),
+    CODEC_LONG_NAME("RealAudio 2.0 (28.8K)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_RA_288,
     .priv_data_size = sizeof(RA288Context),
     .init           = ra288_decode_init,
     FF_CODEC_DECODE_CB(ra288_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

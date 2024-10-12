@@ -28,14 +28,14 @@
 #include "config_components.h"
 #include "libavutil/attributes.h"
 #include "libavutil/float_dsp.h"
+#include "libavutil/mem.h"
 #include "libavutil/reverse.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "encode.h"
-#include "internal.h"
-#include "mathops.h"
 #include "pcm_tablegen.h"
 
 static av_cold int pcm_encode_init(AVCodecContext *avctx)
@@ -254,15 +254,6 @@ static av_cold int pcm_decode_init(AVCodecContext *avctx)
     PCMDecode *s = avctx->priv_data;
     AVFloatDSPContext *fdsp;
     int i;
-
-// Breaks playback of some DVDs which feature an empty audio stream
-//
-//    if (avctx->ch_layout.nb_channels <= 0) {
-    if (avctx->ch_layout.nb_channels < 0) {
-
-        av_log(avctx, AV_LOG_ERROR, "PCM channels out of bounds\n");
-        return AVERROR(EINVAL);
-    }
 
     switch (avctx->codec_id) {
     case AV_CODEC_ID_PCM_ALAW:
@@ -548,7 +539,6 @@ static int pcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         s->vector_fmul_scalar((float *)frame->extended_data[0],
                               (const float *)frame->extended_data[0],
                               s->scale, FFALIGN(frame->nb_samples * avctx->ch_layout.nb_channels, 4));
-        emms_c();
     }
 
     *got_frame_ptr = 1;
@@ -560,15 +550,15 @@ static int pcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 #define PCM_ENCODER_1(id_, sample_fmt_, name_, long_name_)                  \
 const FFCodec ff_ ## name_ ## _encoder = {                                  \
     .p.name       = #name_,                                                 \
-    .p.long_name  = NULL_IF_CONFIG_SMALL(long_name_),                       \
+    CODEC_LONG_NAME(long_name_),                                            \
     .p.type       = AVMEDIA_TYPE_AUDIO,                                     \
     .p.id         = AV_CODEC_ID_ ## id_,                                    \
-    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE,    \
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_VARIABLE_FRAME_SIZE | \
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,                \
     .init         = pcm_encode_init,                                        \
     FF_CODEC_ENCODE_CB(pcm_encode_frame),                                   \
     .p.sample_fmts = (const enum AVSampleFormat[]){ sample_fmt_,             \
                                                    AV_SAMPLE_FMT_NONE },    \
-    .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,                          \
 }
 
 #define PCM_ENCODER_2(cf, id, sample_fmt, name, long_name)                  \
@@ -582,16 +572,15 @@ const FFCodec ff_ ## name_ ## _encoder = {                                  \
 #define PCM_DECODER_1(id_, sample_fmt_, name_, long_name_)                  \
 const FFCodec ff_ ## name_ ## _decoder = {                                  \
     .p.name         = #name_,                                               \
-    .p.long_name    = NULL_IF_CONFIG_SMALL(long_name_),                     \
+    CODEC_LONG_NAME(long_name_),                                            \
     .p.type         = AVMEDIA_TYPE_AUDIO,                                   \
     .p.id           = AV_CODEC_ID_ ## id_,                                  \
     .priv_data_size = sizeof(PCMDecode),                                    \
     .init           = pcm_decode_init,                                      \
     FF_CODEC_DECODE_CB(pcm_decode_frame),                                    \
-    .p.capabilities = AV_CODEC_CAP_DR1,                                     \
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_PARAM_CHANGE,         \
     .p.sample_fmts  = (const enum AVSampleFormat[]){ sample_fmt_,           \
                                                      AV_SAMPLE_FMT_NONE },  \
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,                         \
 }
 
 #define PCM_DECODER_2(cf, id, sample_fmt, name, long_name)                  \

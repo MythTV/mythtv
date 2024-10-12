@@ -29,7 +29,6 @@
 #include <linux/videodev2.h>
 
 #include "libavutil/hwcontext_drm.h"
-#include "libavutil/buffer.h"
 #include "libavutil/frame.h"
 #include "packet.h"
 
@@ -50,8 +49,9 @@ typedef struct V4L2Buffer {
     AVDRMFrameDescriptor drm_frame;
 
     /* This object is refcounted per-plane, so we need to keep track
-     * of how many context-refs we are holding. */
-    AVBufferRef *context_ref;
+     * of how many context-refs we are holding.
+     * This pointer is a RefStruct reference. */
+    const struct V4L2m2mContext *context_ref;
     atomic_uint context_refcount;
 
     /* keep track of the mmap address and mmap length */

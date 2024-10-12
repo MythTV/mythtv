@@ -25,11 +25,12 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "cga_data.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 typedef struct PicContext {
     int width, height;
@@ -162,6 +163,25 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
     if (av_image_check_size(s->width, s->height, 0, avctx) < 0)
         return -1;
+
+    /*
+        There are 2 coding modes, RLE and RAW.
+        Undamaged RAW should be proportional to W*H and thus bigger than RLE
+        RLE codes the most compressed runs by
+        1 byte for val (=marker)
+        1 byte run (=0)
+        2 bytes run
+        1 byte val
+        thats 5 bytes and the maximum run we can code is 65535
+
+        The RLE decoder can exit prematurly but it does not on any image available
+        Based on this the formula is assumed correct for undamaged images.
+        If an image is found which exploits the special end
+        handling and breaks this formula then this needs to be adapted.
+    */
+    if (bytestream2_get_bytes_left(&s->g) < s->width * s->height / 65535 * 5)
+        return AVERROR_INVALIDDATA;
+
     if (s->width != avctx->width || s->height != avctx->height) {
         ret = ff_set_dimensions(avctx, s->width, s->height);
         if (ret < 0)
@@ -172,7 +192,11 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return ret;
     memset(frame->data[0], 0, s->height * frame->linesize[0]);
     frame->pict_type           = AV_PICTURE_TYPE_I;
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
     frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
     pos_after_pal = bytestream2_tell(&s->g) + esize;
     palette = (uint32_t*)frame->data[1];
@@ -243,8 +267,6 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
                         run = bytestream2_get_le16(&s->g);
                     val = bytestream2_get_byte(&s->g);
                 }
-                if (!bytestream2_get_bytes_left(&s->g))
-                    break;
 
                 if (bits_per_plane == 8) {
                     picmemset_8bpp(s, frame, val, run, &x, &y);
@@ -281,7 +303,7 @@ finish:
 
 const FFCodec ff_pictor_decoder = {
     .p.name         = "pictor",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Pictor/PC Paint"),
+    CODEC_LONG_NAME("Pictor/PC Paint"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_PICTOR,
     .p.capabilities = AV_CODEC_CAP_DR1,

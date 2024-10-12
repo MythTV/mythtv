@@ -34,20 +34,20 @@
 
 #include <math.h>
 #include <stddef.h>
-#include <stdio.h>
 
 #include "libavutil/attributes.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/libm.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/thread.h"
+#include "libavutil/tx.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "fft.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 
 #include "atrac.h"
 #include "atrac3data.h"
@@ -116,7 +116,8 @@ typedef struct ATRAC3Context {
     //@}
 
     AtracGCContext    gainc_ctx;
-    FFTContext        mdct_ctx;
+    AVTXContext      *mdct_ctx;
+    av_tx_fn          mdct_fn;
     void (*vector_fmul)(float *dst, const float *src0, const float *src1,
                         int len);
 } ATRAC3Context;
@@ -148,7 +149,7 @@ static void imlt(ATRAC3Context *q, float *input, float *output, int odd_band)
             FFSWAP(float, input[i], input[255 - i]);
     }
 
-    q->mdct_ctx.imdct_calc(&q->mdct_ctx, output, input);
+    q->mdct_fn(q->mdct_ctx, output, input, sizeof(float));
 
     /* Perform windowing on the output. */
     q->vector_fmul(output, output, mdct_window, MDCT_SIZE);
@@ -202,7 +203,7 @@ static av_cold int atrac3_decode_close(AVCodecContext *avctx)
     av_freep(&q->units);
     av_freep(&q->decoded_bytes_buffer);
 
-    ff_mdct_end(&q->mdct_ctx);
+    av_tx_uninit(&q->mdct_ctx);
 
     return 0;
 }
@@ -863,10 +864,10 @@ static av_cold void atrac3_init_static_data(void)
     for (i = 0; i < 7; i++) {
         spectral_coeff_tab[i].table           = table;
         spectral_coeff_tab[i].table_allocated = 256;
-        ff_init_vlc_from_lengths(&spectral_coeff_tab[i], ATRAC3_VLC_BITS, huff_tab_sizes[i],
+        ff_vlc_init_from_lengths(&spectral_coeff_tab[i], ATRAC3_VLC_BITS, huff_tab_sizes[i],
                                  &hufftabs[0][1], 2,
                                  &hufftabs[0][0], 2, 1,
-                                 -31, INIT_VLC_USE_NEW_STATIC, NULL);
+                                 -31, VLC_INIT_USE_STATIC, NULL);
         hufftabs += huff_tab_sizes[i];
         table += 256;
     }
@@ -880,6 +881,7 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
     const uint8_t *edata_ptr = avctx->extradata;
     ATRAC3Context *q = avctx->priv_data;
     AVFloatDSPContext *fdsp;
+    float scale = 1.0 / 32768;
     int channels = avctx->ch_layout.nb_channels;
 
     if (channels < MIN_CHANNELS || channels > MAX_CHANNELS) {
@@ -978,7 +980,8 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
     avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
     /* initialize the MDCT transform */
-    if ((ret = ff_mdct_init(&q->mdct_ctx, 9, 1, 1.0 / 32768)) < 0) {
+    if ((ret = av_tx_init(&q->mdct_ctx, &q->mdct_fn, AV_TX_FLOAT_MDCT, 1, 256,
+                          &scale, AV_TX_FULL_IMDCT)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "Error initializing MDCT\n");
         return ret;
     }
@@ -1017,30 +1020,38 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_atrac3_decoder = {
     .p.name           = "atrac3",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("ATRAC3 (Adaptive TRansform Acoustic Coding 3)"),
+    CODEC_LONG_NAME("ATRAC3 (Adaptive TRansform Acoustic Coding 3)"),
     .p.type           = AVMEDIA_TYPE_AUDIO,
     .p.id             = AV_CODEC_ID_ATRAC3,
     .priv_data_size   = sizeof(ATRAC3Context),
     .init             = atrac3_decode_init,
     .close            = atrac3_decode_close,
     FF_CODEC_DECODE_CB(atrac3_decode_frame),
-    .p.capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1,
+    .p.capabilities   =
+#if FF_API_SUBFRAMES
+                        AV_CODEC_CAP_SUBFRAMES |
+#endif
+                        AV_CODEC_CAP_DR1,
     .p.sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                         AV_SAMPLE_FMT_NONE },
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
 };
 
 const FFCodec ff_atrac3al_decoder = {
     .p.name           = "atrac3al",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("ATRAC3 AL (Adaptive TRansform Acoustic Coding 3 Advanced Lossless)"),
+    CODEC_LONG_NAME("ATRAC3 AL (Adaptive TRansform Acoustic Coding 3 Advanced Lossless)"),
     .p.type           = AVMEDIA_TYPE_AUDIO,
     .p.id             = AV_CODEC_ID_ATRAC3AL,
     .priv_data_size   = sizeof(ATRAC3Context),
     .init             = atrac3_decode_init,
     .close            = atrac3_decode_close,
     FF_CODEC_DECODE_CB(atrac3al_decode_frame),
-    .p.capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1,
+    .p.capabilities   =
+#if FF_API_SUBFRAMES
+                        AV_CODEC_CAP_SUBFRAMES |
+#endif
+                        AV_CODEC_CAP_DR1,
     .p.sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
                                                         AV_SAMPLE_FMT_NONE },
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
 };

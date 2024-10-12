@@ -39,18 +39,17 @@
 static int put_huffman_table(PutBitContext *p, int table_class, int table_id,
                              const uint8_t *bits_table, const uint8_t *value_table)
 {
-    int n, i;
+    int n = 0;
 
     put_bits(p, 4, table_class);
     put_bits(p, 4, table_id);
 
-    n = 0;
-    for(i=1;i<=16;i++) {
+    for (int i = 1; i <= 16; i++) {
         n += bits_table[i];
         put_bits(p, 8, bits_table[i]);
     }
 
-    for(i=0;i<n;i++)
+    for (int i = 0; i < n; i++)
         put_bits(p, 8, value_table[i]);
 
     return n + 17;
@@ -58,18 +57,16 @@ static int put_huffman_table(PutBitContext *p, int table_class, int table_id,
 
 static void jpeg_table_header(AVCodecContext *avctx, PutBitContext *p,
                               MJpegContext *m,
-                              ScanTable *intra_scantable,
+                              const uint8_t intra_matrix_permutation[64],
                               uint16_t luma_intra_matrix[64],
                               uint16_t chroma_intra_matrix[64],
-                              int hsample[3], int use_slices)
+                              int hsample[3], int use_slices, int matrices_differ)
 {
-    int i, j, size;
+    int size;
     uint8_t *ptr;
 
     if (m) {
-        int matrix_count = 1 + !!memcmp(luma_intra_matrix,
-                                        chroma_intra_matrix,
-                                        sizeof(luma_intra_matrix[0]) * 64);
+        int matrix_count = 1 + matrices_differ;
         if (m->force_duplicated_matrix)
             matrix_count = 2;
         /* quant matrixes */
@@ -78,15 +75,15 @@ static void jpeg_table_header(AVCodecContext *avctx, PutBitContext *p,
         put_bits(p, 4, 0); /* 8 bit precision */
         put_bits(p, 4, 0); /* table 0 */
         for (int i = 0; i < 64; i++) {
-            uint8_t j = intra_scantable->permutated[i];
+            uint8_t j = intra_matrix_permutation[i];
             put_bits(p, 8, luma_intra_matrix[j]);
         }
 
         if (matrix_count > 1) {
             put_bits(p, 4, 0); /* 8 bit precision */
             put_bits(p, 4, 1); /* table 1 */
-            for(i=0;i<64;i++) {
-                j = intra_scantable->permutated[i];
+            for (int i = 0; i < 64; i++) {
+                uint8_t j = intra_matrix_permutation[i];
                 put_bits(p, 8, chroma_intra_matrix[j]);
             }
         }
@@ -277,7 +274,7 @@ void ff_mjpeg_init_hvsample(AVCodecContext *avctx, int hsample[4], int vsample[4
 
 void ff_mjpeg_encode_picture_header(AVCodecContext *avctx, PutBitContext *pb,
                                     const AVFrame *frame, struct MJpegContext *m,
-                                    ScanTable *intra_scantable, int pred,
+                                    const uint8_t intra_matrix_permutation[64], int pred,
                                     uint16_t luma_intra_matrix[64],
                                     uint16_t chroma_intra_matrix[64],
                                     int use_slices)
@@ -285,9 +282,7 @@ void ff_mjpeg_encode_picture_header(AVCodecContext *avctx, PutBitContext *pb,
     const int lossless = !m;
     int hsample[4], vsample[4];
     int components = 3 + (avctx->pix_fmt == AV_PIX_FMT_BGRA);
-    int chroma_matrix = !!memcmp(luma_intra_matrix,
-                                 chroma_intra_matrix,
-                                 sizeof(luma_intra_matrix[0])*64);
+    int chroma_matrix;
 
     ff_mjpeg_init_hvsample(avctx, hsample, vsample);
 
@@ -299,9 +294,12 @@ void ff_mjpeg_encode_picture_header(AVCodecContext *avctx, PutBitContext *pb,
 
     jpeg_put_comments(avctx, pb, frame);
 
-    jpeg_table_header(avctx, pb, m, intra_scantable,
+    chroma_matrix = !lossless && !!memcmp(luma_intra_matrix,
+                                          chroma_intra_matrix,
+                                          sizeof(luma_intra_matrix[0]) * 64);
+    jpeg_table_header(avctx, pb, m, intra_matrix_permutation,
                       luma_intra_matrix, chroma_intra_matrix, hsample,
-                      use_slices);
+                      use_slices, chroma_matrix);
 
     switch (avctx->codec_id) {
     case AV_CODEC_ID_MJPEG:  put_marker(pb, SOF0 ); break;
@@ -309,7 +307,7 @@ void ff_mjpeg_encode_picture_header(AVCodecContext *avctx, PutBitContext *pb,
     default: av_assert0(0);
     }
 
-    put_bits(pb, 16, 17);
+    put_bits(pb, 16, 8 + 3 * components);
     if (lossless && (  avctx->pix_fmt == AV_PIX_FMT_BGR0
                     || avctx->pix_fmt == AV_PIX_FMT_BGRA
                     || avctx->pix_fmt == AV_PIX_FMT_BGR24))
@@ -424,7 +422,6 @@ void ff_mjpeg_escape_FF(PutBitContext *pb, int start)
 
     if(ff_count==0) return;
 
-    flush_put_bits(pb);
     skip_put_bytes(pb, ff_count);
 
     for(i=size-1; ff_count; i--){

@@ -68,9 +68,9 @@ typedef struct AudioGateContext {
 
 static const AVOption options[] = {
     { "level_in",  "set input level",        OFFSET(level_in),  AV_OPT_TYPE_DOUBLE, {.dbl=1},           0.015625,   64, A },
-    { "mode",      "set mode",               OFFSET(mode),      AV_OPT_TYPE_INT,    {.i64=0},           0, 1, A, "mode" },
-    {   "downward",0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=0},           0, 0, A, "mode" },
-    {   "upward",  0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=1},           0, 0, A, "mode" },
+    { "mode",      "set mode",               OFFSET(mode),      AV_OPT_TYPE_INT,    {.i64=0},           0, 1, A, .unit = "mode" },
+    {   "downward",0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=0},           0, 0, A, .unit = "mode" },
+    {   "upward",  0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=1},           0, 0, A, .unit = "mode" },
     { "range",     "set max gain reduction", OFFSET(range),     AV_OPT_TYPE_DOUBLE, {.dbl=0.06125},     0, 1, A },
     { "threshold", "set threshold",          OFFSET(threshold), AV_OPT_TYPE_DOUBLE, {.dbl=0.125},       0, 1, A },
     { "ratio",     "set ratio",              OFFSET(ratio),     AV_OPT_TYPE_DOUBLE, {.dbl=2},           1,  9000, A },
@@ -78,12 +78,12 @@ static const AVOption options[] = {
     { "release",   "set release",            OFFSET(release),   AV_OPT_TYPE_DOUBLE, {.dbl=250},         0.01, 9000, A },
     { "makeup",    "set makeup gain",        OFFSET(makeup),    AV_OPT_TYPE_DOUBLE, {.dbl=1},           1,   64, A },
     { "knee",      "set knee",               OFFSET(knee),      AV_OPT_TYPE_DOUBLE, {.dbl=2.828427125}, 1,    8, A },
-    { "detection", "set detection",          OFFSET(detection), AV_OPT_TYPE_INT,    {.i64=1},           0,    1, A, "detection" },
-    {   "peak",    0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=0},           0,    0, A, "detection" },
-    {   "rms",     0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=1},           0,    0, A, "detection" },
-    { "link",      "set link",               OFFSET(link),      AV_OPT_TYPE_INT,    {.i64=0},           0,    1, A, "link" },
-    {   "average", 0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=0},           0,    0, A, "link" },
-    {   "maximum", 0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=1},           0,    0, A, "link" },
+    { "detection", "set detection",          OFFSET(detection), AV_OPT_TYPE_INT,    {.i64=1},           0,    1, A, .unit = "detection" },
+    {   "peak",    0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=0},           0,    0, A, .unit = "detection" },
+    {   "rms",     0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=1},           0,    0, A, .unit = "detection" },
+    { "link",      "set link",               OFFSET(link),      AV_OPT_TYPE_INT,    {.i64=0},           0,    1, A, .unit = "link" },
+    {   "average", 0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=0},           0,    0, A, .unit = "link" },
+    {   "maximum", 0,                        0,                 AV_OPT_TYPE_CONST,  {.i64=1},           0,    0, A, .unit = "link" },
     { "level_sc",  "set sidechain gain",     OFFSET(level_sc),  AV_OPT_TYPE_DOUBLE, {.dbl=1},           0.015625,   64, A },
     { NULL }
 };
@@ -228,20 +228,13 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-static const AVFilterPad outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_agate = {
     .name           = "agate",
     .description    = NULL_IF_CONFIG_SMALL("Audio gate."),
     .priv_class     = &agate_sidechaingate_class,
     .priv_size      = sizeof(AudioGateContext),
     FILTER_INPUTS(inputs),
-    FILTER_OUTPUTS(outputs),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
     FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBL),
     .process_command = ff_filter_process_command,
     .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
@@ -317,26 +310,28 @@ static int activate(AVFilterContext *ctx)
     return 0;
 }
 
-static int scquery_formats(AVFilterContext *ctx)
+static int scquery_formats(const AVFilterContext *ctx,
+                           AVFilterFormatsConfig **cfg_in,
+                           AVFilterFormatsConfig **cfg_out)
 {
     static const enum AVSampleFormat sample_fmts[] = {
         AV_SAMPLE_FMT_DBL,
         AV_SAMPLE_FMT_NONE
     };
-    int ret = ff_channel_layouts_ref(ff_all_channel_counts(),
-                                     &ctx->inputs[1]->outcfg.channel_layouts);
+    int ret;
+
+    /* Generic code will link the channel properties of the main input and the
+     * output; it won't touch the second input as its channel_layouts is already
+     * set. */
+    ret = ff_channel_layouts_ref(ff_all_channel_counts(),
+                                 &cfg_in[1]->channel_layouts);
     if (ret < 0)
         return ret;
 
-    /* This will link the channel properties of the main input and the output;
-     * it won't touch the second input as its channel_layouts is already set. */
-    if ((ret = ff_set_common_all_channel_counts(ctx)) < 0)
+    if ((ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts)) < 0)
         return ret;
 
-    if ((ret = ff_set_common_formats_from_list(ctx, sample_fmts)) < 0)
-        return ret;
-
-    return ff_set_common_all_samplerates(ctx);
+    return 0;
 }
 
 static int scconfig_output(AVFilterLink *outlink)
@@ -392,7 +387,7 @@ const AVFilter ff_af_sidechaingate = {
     .uninit         = uninit,
     FILTER_INPUTS(sidechaingate_inputs),
     FILTER_OUTPUTS(sidechaingate_outputs),
-    FILTER_QUERY_FUNC(scquery_formats),
+    FILTER_QUERY_FUNC2(scquery_formats),
     .process_command = ff_filter_process_command,
     .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

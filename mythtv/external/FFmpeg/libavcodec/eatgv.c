@@ -28,14 +28,13 @@
  * http://wiki.multimedia.cx/index.php?title=Electronic_Arts_TGV
  */
 
-#include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "get_bits.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 #define EA_PREAMBLE_SIZE    8
 #define kVGT_TAG MKTAG('k', 'V', 'G', 'T')
@@ -311,7 +310,7 @@ static int tgv_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
     if (chunk_type == kVGT_TAG) {
         int y;
-        frame->key_frame = 1;
+        frame->flags |= AV_FRAME_FLAG_KEY;
         frame->pict_type = AV_PICTURE_TYPE_I;
 
         if (!s->frame_buffer &&
@@ -331,7 +330,7 @@ static int tgv_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             av_log(avctx, AV_LOG_WARNING, "inter frame without corresponding intra frame\n");
             return buf_size;
         }
-        frame->key_frame = 0;
+        frame->flags &= ~AV_FRAME_FLAG_KEY;
         frame->pict_type = AV_PICTURE_TYPE_P;
         if (tgv_decode_inter(s, frame, buf, buf_end) < 0) {
             av_log(avctx, AV_LOG_WARNING, "truncated inter frame\n");
@@ -339,8 +338,7 @@ static int tgv_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         }
     }
 
-    av_frame_unref(s->last_frame);
-    if ((ret = av_frame_ref(s->last_frame, frame)) < 0)
+    if ((ret = av_frame_replace(s->last_frame, frame)) < 0)
         return ret;
 
     *got_frame = 1;
@@ -360,7 +358,7 @@ static av_cold int tgv_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_eatgv_decoder = {
     .p.name         = "eatgv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Electronic Arts TGV video"),
+    CODEC_LONG_NAME("Electronic Arts TGV video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TGV,
     .priv_data_size = sizeof(TgvContext),
@@ -368,5 +366,4 @@ const FFCodec ff_eatgv_decoder = {
     .close          = tgv_decode_end,
     FF_CODEC_DECODE_CB(tgv_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

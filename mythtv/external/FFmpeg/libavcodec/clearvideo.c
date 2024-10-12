@@ -24,24 +24,25 @@
  * ClearVideo decoder
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/thread.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "idctdsp.h"
-#include "internal.h"
 #include "mathops.h"
 #include "clearvideodata.h"
 
 #define CLV_VLC_BITS 9
 
 typedef struct LevelCodes {
-    VLC         flags_cb;
-    VLC         mv_cb;
-    VLC         bias_cb;
+    const VLCElem *flags_cb;
+    const VLCElem *mv_cb;
+    const VLCElem *bias_cb;
 } LevelCodes;
 
 typedef struct MV {
@@ -59,13 +60,6 @@ typedef struct MVInfo {
     MV  *mv;
 } MVInfo;
 
-typedef struct TileInfo {
-    uint16_t        flags;
-    int16_t         bias;
-    MV              mv;
-    struct TileInfo *child[4];
-} TileInfo;
-
 typedef struct CLVContext {
     AVCodecContext *avctx;
     IDCTDSPContext idsp;
@@ -82,9 +76,8 @@ typedef struct CLVContext {
     int            top_dc[3], left_dc[4];
 } CLVContext;
 
-static VLC        dc_vlc, ac_vlc;
+static VLCElem    dc_vlc[1104], ac_vlc[554];
 static LevelCodes lev[4 + 3 + 3]; // 0..3: Y, 4..6: U, 7..9: V
-static VLCElem    vlc_buf[16716];
 
 static inline int decode_block(CLVContext *ctx, int16_t *blk, int has_ac,
                                int ac_quant)
@@ -93,13 +86,13 @@ static inline int decode_block(CLVContext *ctx, int16_t *blk, int has_ac,
     int idx = 1, last = 0, val, skip;
 
     memset(blk, 0, sizeof(*blk) * 64);
-    blk[0] = get_vlc2(gb, dc_vlc.table, CLV_VLC_BITS, 3);
+    blk[0] = get_vlc2(gb, dc_vlc, CLV_VLC_BITS, 3);
 
     if (!has_ac)
         return 0;
 
     while (idx < 64 && !last) {
-        val = get_vlc2(gb, ac_vlc.table, CLV_VLC_BITS, 2);
+        val = get_vlc2(gb, ac_vlc, CLV_VLC_BITS, 2);
         if (val < 0)
             return AVERROR_INVALIDDATA;
         if (val != 0x1BFF) {
@@ -222,14 +215,15 @@ static int decode_mb(CLVContext *c, int x, int y)
     return 0;
 }
 
-static int copy_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
+static int copy_block(AVCodecContext *avctx, AVFrame *dst, const AVFrame *src,
                       int plane, int x, int y, int dx, int dy, int size)
 {
     int shift = plane > 0;
     int sx = x + dx;
     int sy = y + dy;
     int sstride, dstride, soff, doff;
-    uint8_t *sbuf, *dbuf;
+    uint8_t *dbuf;
+    const uint8_t *sbuf;
     int i;
 
     if (x < 0 || sx < 0 || y < 0 || sy < 0 ||
@@ -248,7 +242,7 @@ static int copy_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
 
     for (i = 0; i < size; i++) {
         uint8_t *dptr = &dbuf[doff];
-        uint8_t *sptr = &sbuf[soff];
+        const uint8_t *sptr = &sbuf[soff];
 
         memcpy(dptr, sptr, size);
         doff += dstride;
@@ -258,7 +252,7 @@ static int copy_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
     return 0;
 }
 
-static int copyadd_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
+static int copyadd_block(AVCodecContext *avctx, AVFrame *dst, const AVFrame *src,
                          int plane, int x, int y, int dx, int dy, int size, int bias)
 {
     int shift = plane > 0;
@@ -267,7 +261,7 @@ static int copyadd_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
     int sstride   = src->linesize[plane];
     int dstride   = dst->linesize[plane];
     int soff      = sx + sy * sstride;
-    uint8_t *sbuf = src->data[plane];
+    const uint8_t *sbuf = src->data[plane];
     int doff      = x + y * dstride;
     uint8_t *dbuf = dst->data[plane];
     int i, j;
@@ -281,7 +275,7 @@ static int copyadd_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
 
     for (j = 0; j < size; j++) {
         uint8_t *dptr = &dbuf[doff];
-        uint8_t *sptr = &sbuf[soff];
+        const uint8_t *sptr = &sbuf[soff];
 
         for (i = 0; i < size; i++) {
             int val = sptr[i] + bias;
@@ -296,7 +290,7 @@ static int copyadd_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
     return 0;
 }
 
-static MV mvi_predict(MVInfo *mvi, int mb_x, int mb_y, MV diff)
+static MV *mvi_predict(MVInfo *mvi, int mb_x, int mb_y)
 {
     MV res, pred_mv;
     int left_mv, right_mv, top_mv, bot_mv;
@@ -336,10 +330,16 @@ static MV mvi_predict(MVInfo *mvi, int mb_x, int mb_y, MV diff)
         res.y = bot_mv;
     }
 
-    mvi->mv[mvi->mb_stride + mb_x].x = res.x + diff.x;
-    mvi->mv[mvi->mb_stride + mb_x].y = res.y + diff.y;
+    mvi->mv[mvi->mb_stride + mb_x].x = res.x;
+    mvi->mv[mvi->mb_stride + mb_x].y = res.y;
 
-    return res;
+    return &mvi->mv[mvi->mb_stride + mb_x];
+}
+
+static void mvi_update_prediction(MV *mv, MV diff)
+{
+    mv->x += diff.x;
+    mv->y += diff.y;
 }
 
 static void mvi_reset(MVInfo *mvi, int mb_w, int mb_h, int mb_size)
@@ -362,60 +362,7 @@ static void mvi_update_row(MVInfo *mvi)
     }
 }
 
-static TileInfo *decode_tile_info(GetBitContext *gb, const LevelCodes *lc, int level)
-{
-    TileInfo *ti;
-    int i, flags = 0;
-    int16_t bias = 0;
-    MV mv = { 0 };
-
-    if (lc[level].flags_cb.table) {
-        flags = get_vlc2(gb, lc[level].flags_cb.table, CLV_VLC_BITS, 2);
-    }
-
-    if (lc[level].mv_cb.table) {
-        uint16_t mv_code = get_vlc2(gb, lc[level].mv_cb.table, CLV_VLC_BITS, 2);
-
-        if (mv_code != MV_ESC) {
-            mv.x = (int8_t)(mv_code & 0xff);
-            mv.y = (int8_t)(mv_code >> 8);
-        } else {
-            mv.x = get_sbits(gb, 8);
-            mv.y = get_sbits(gb, 8);
-        }
-    }
-
-    if (lc[level].bias_cb.table) {
-        uint16_t bias_val = get_vlc2(gb, lc[level].bias_cb.table, CLV_VLC_BITS, 2);
-
-        if (bias_val != BIAS_ESC) {
-            bias = (int16_t)(bias_val);
-        } else {
-            bias = get_sbits(gb, 16);
-        }
-    }
-
-    ti = av_calloc(1, sizeof(*ti));
-    if (!ti)
-        return NULL;
-
-    ti->flags = flags;
-    ti->mv = mv;
-    ti->bias = bias;
-
-    if (ti->flags) {
-        for (i = 0; i < 4; i++) {
-            if (ti->flags & (1 << i)) {
-                TileInfo *subti = decode_tile_info(gb, lc, level + 1);
-                ti->child[i] = subti;
-            }
-        }
-    }
-
-    return ti;
-}
-
-static int tile_do_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
+static int tile_do_block(AVCodecContext *avctx, AVFrame *dst, const AVFrame *src,
                          int plane, int x, int y, int dx, int dy, int size, int bias)
 {
     int ret;
@@ -429,35 +376,69 @@ static int tile_do_block(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
     return ret;
 }
 
-static int restore_tree(AVCodecContext *avctx, AVFrame *dst, AVFrame *src,
-                        int plane, int x, int y, int size,
-                        TileInfo *tile, MV root_mv)
+static int decode_tile(AVCodecContext *avctx, GetBitContext *gb,
+                       const LevelCodes *lc,
+                       AVFrame *dst, const AVFrame *src,
+                       int plane, int x, int y, int size,
+                       MV root_mv, MV *pred)
 {
-    int ret;
-    MV mv;
+    int i, flags = 0;
+    int16_t bias = 0;
+    MV mv = { 0 };
+    int err;
 
-    mv.x = root_mv.x + tile->mv.x;
-    mv.y = root_mv.y + tile->mv.y;
+    if (lc->flags_cb)
+        flags = get_vlc2(gb, lc->flags_cb, CLV_VLC_BITS, 2);
 
-    if (!tile->flags) {
-        ret = tile_do_block(avctx, dst, src, plane, x, y, mv.x, mv.y, size, tile->bias);
-    } else {
-        int i, hsize = size >> 1;
+    if (lc->mv_cb) {
+        uint16_t mv_code = get_vlc2(gb, lc->mv_cb, CLV_VLC_BITS, 2);
 
+        if (mv_code != MV_ESC) {
+            mv.x = (int8_t)(mv_code & 0xff);
+            mv.y = (int8_t)(mv_code >> 8);
+        } else {
+            mv.x = get_sbits(gb, 8);
+            mv.y = get_sbits(gb, 8);
+        }
+        if (pred)
+            mvi_update_prediction(pred, mv);
+    }
+    mv.x += root_mv.x;
+    mv.y += root_mv.y;
+
+    if (lc->bias_cb) {
+        uint16_t bias_val = get_vlc2(gb, lc->bias_cb, CLV_VLC_BITS, 2);
+
+        if (bias_val != BIAS_ESC) {
+            bias = (int16_t)(bias_val);
+        } else {
+            bias = get_sbits(gb, 16);
+        }
+    }
+
+    if (flags) {
+        int hsize = size >> 1;
         for (i = 0; i < 4; i++) {
             int xoff = (i & 2) == 0 ? 0 : hsize;
             int yoff = (i & 1) == 0 ? 0 : hsize;
 
-            if (tile->child[i]) {
-                ret = restore_tree(avctx, dst, src, plane, x + xoff, y + yoff, hsize, tile->child[i], root_mv);
-                av_freep(&tile->child[i]);
+            if (flags & (1 << i)) {
+                err = decode_tile(avctx, gb, lc + 1, dst, src, plane,
+                                  x + xoff, y + yoff, hsize, root_mv, NULL);
             } else {
-                ret = tile_do_block(avctx, dst, src, plane, x + xoff, y + yoff, mv.x, mv.y, hsize, tile->bias);
+                err = tile_do_block(avctx, dst, src, plane, x + xoff, y + yoff,
+                                    mv.x, mv.y, hsize, bias);
             }
+            if (err < 0)
+                return err;
         }
+    } else {
+        err = tile_do_block(avctx, dst, src, plane, x, y, mv.x, mv.y, size, bias);
+        if (err < 0)
+            return err;
     }
 
-    return ret;
+    return 0;
 }
 
 static void extend_edges(AVFrame *buf, int tile_size)
@@ -530,7 +511,7 @@ static int clv_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         if ((ret = ff_reget_buffer(avctx, c->pic, 0)) < 0)
             return ret;
 
-        c->pic->key_frame = 1;
+        c->pic->flags |= AV_FRAME_FLAG_KEY;
         c->pic->pict_type = AV_PICTURE_TYPE_I;
 
         bytestream2_get_be32(&gb); // frame size;
@@ -576,11 +557,13 @@ static int clv_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
 
         for (j = 0; j < c->pmb_height; j++) {
             for (i = 0; i < c->pmb_width; i++) {
+                MV *mvp, mv;
                 if (get_bits_left(&c->gb) <= 0)
                     return AVERROR_INVALIDDATA;
-                if (get_bits1(&c->gb)) {
-                    MV mv = mvi_predict(&c->mvi, i, j, zero_mv);
 
+                mvp = mvi_predict(&c->mvi, i, j);
+                mv  = *mvp;
+                if (get_bits1(&c->gb)) {
                     for (plane = 0; plane < 3; plane++) {
                         int16_t x = plane == 0 ? i << c->tile_shift : i << (c->tile_shift - 1);
                         int16_t y = plane == 0 ? j << c->tile_shift : j << (c->tile_shift - 1);
@@ -596,45 +579,33 @@ static int clv_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                     int x = i << c->tile_shift;
                     int y = j << c->tile_shift;
                     int size = 1 << c->tile_shift;
-                    TileInfo *tile;
-                    MV mv, cmv;
+                    MV cmv;
 
-                    tile = decode_tile_info(&c->gb, &lev[0], 0); // Y
-                    if (!tile)
-                        return AVERROR(ENOMEM);
-                    mv = mvi_predict(&c->mvi, i, j, tile->mv);
-                    ret = restore_tree(avctx, c->pic, c->prev, 0, x, y, size, tile, mv);
+                    ret = decode_tile(avctx, &c->gb, &lev[0], c->pic, c->prev,  // Y
+                                      0, x, y, size, mv, mvp);
                     if (ret < 0)
                         mb_ret = ret;
                     x = i << (c->tile_shift - 1);
                     y = j << (c->tile_shift - 1);
                     size = 1 << (c->tile_shift - 1);
-                    cmv.x = mv.x + tile->mv.x;
-                    cmv.y = mv.y + tile->mv.y;
+                    cmv = *mvp;
                     cmv.x /= 2;
                     cmv.y /= 2;
-                    av_freep(&tile);
-                    tile = decode_tile_info(&c->gb, &lev[4], 0); // U
-                    if (!tile)
-                        return AVERROR(ENOMEM);
-                    ret = restore_tree(avctx, c->pic, c->prev, 1, x, y, size, tile, cmv);
+                    ret = decode_tile(avctx, &c->gb, &lev[4], c->pic, c->prev,  // U
+                                      1, x, y, size, cmv, NULL);
                     if (ret < 0)
                         mb_ret = ret;
-                    av_freep(&tile);
-                    tile = decode_tile_info(&c->gb, &lev[7], 0); // V
-                    if (!tile)
-                        return AVERROR(ENOMEM);
-                    ret = restore_tree(avctx, c->pic, c->prev, 2, x, y, size, tile, cmv);
+                    ret = decode_tile(avctx, &c->gb, &lev[7], c->pic, c->prev,  // U
+                                      2, x, y, size, cmv, NULL);
                     if (ret < 0)
                         mb_ret = ret;
-                    av_freep(&tile);
                 }
             }
             mvi_update_row(&c->mvi);
         }
         extend_edges(c->pic, c->tile_size);
 
-        c->pic->key_frame = 0;
+        c->pic->flags &= ~AV_FRAME_FLAG_KEY;
         c->pic->pict_type = AV_PICTURE_TYPE_P;
     }
 
@@ -651,10 +622,12 @@ static int clv_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     return mb_ret < 0 ? mb_ret : buf_size;
 }
 
-static av_cold void build_vlc(VLC *vlc, const uint8_t counts[16],
-                              const uint16_t **syms, unsigned *offset)
+static av_cold const VLCElem *build_vlc(VLCInitState *state,
+                                        const uint8_t counts[16],
+                                        const uint16_t **syms)
 {
     uint8_t lens[MAX_VLC_ENTRIES];
+    const uint16_t *symbols = *syms;
     unsigned num = 0;
 
     for (int i = 0; i < 16; i++) {
@@ -664,42 +637,39 @@ static av_cold void build_vlc(VLC *vlc, const uint8_t counts[16],
         for (count += num; num < count; num++)
             lens[num] = i + 1;
     }
-    vlc->table           = &vlc_buf[*offset];
-    vlc->table_allocated = FF_ARRAY_ELEMS(vlc_buf) - *offset;
-    ff_init_vlc_from_lengths(vlc, CLV_VLC_BITS, num, lens, 1,
-                             *syms, 2, 2, 0, INIT_VLC_STATIC_OVERLONG, NULL);
     *syms += num;
-    *offset += vlc->table_size;
+    return ff_vlc_init_tables_from_lengths(state, CLV_VLC_BITS, num, lens, 1,
+                                           symbols, 2, 2, 0, 0);
 }
 
 static av_cold void clv_init_static(void)
 {
+    static VLCElem vlc_buf[16716];
+    VLCInitState state = VLC_INIT_STATE(vlc_buf);
     const uint16_t *mv_syms = clv_mv_syms, *bias_syms = clv_bias_syms;
 
-    INIT_VLC_STATIC_FROM_LENGTHS(&dc_vlc, CLV_VLC_BITS, NUM_DC_CODES,
-                                 clv_dc_lens, 1,
-                                 clv_dc_syms, 1, 1, -63, 0, 1104);
-    INIT_VLC_STATIC_FROM_LENGTHS(&ac_vlc, CLV_VLC_BITS, NUM_AC_CODES,
-                                 clv_ac_bits, 1,
-                                 clv_ac_syms, 2, 2, 0, 0, 554);
-    for (unsigned i = 0, j = 0, k = 0, offset = 0;; i++) {
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(dc_vlc, CLV_VLC_BITS, NUM_DC_CODES,
+                                       clv_dc_lens, 1,
+                                       clv_dc_syms, 1, 1, -63, 0);
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(ac_vlc, CLV_VLC_BITS, NUM_AC_CODES,
+                                       clv_ac_bits, 1,
+                                       clv_ac_syms, 2, 2, 0, 0);
+    for (unsigned i = 0, j = 0, k = 0;; i++) {
         if (0x36F & (1 << i)) {
-            build_vlc(&lev[i].mv_cb, clv_mv_len_counts[k], &mv_syms, &offset);
+            lev[i].mv_cb = build_vlc(&state, clv_mv_len_counts[k], &mv_syms);
             k++;
         }
         if (i == FF_ARRAY_ELEMS(lev) - 1)
             break;
         if (0x1B7 & (1 << i)) {
-            lev[i].flags_cb.table           = &vlc_buf[offset];
-            lev[i].flags_cb.table_allocated = FF_ARRAY_ELEMS(vlc_buf) - offset;
-            ff_init_vlc_from_lengths(&lev[i].flags_cb, CLV_VLC_BITS, 16,
-                                     clv_flags_bits[j], 1,
-                                     clv_flags_syms[j], 1, 1,
-                                     0, INIT_VLC_STATIC_OVERLONG, NULL);
-            offset += lev[i].flags_cb.table_size;
+            lev[i].flags_cb =
+                ff_vlc_init_tables_from_lengths(&state, CLV_VLC_BITS, 16,
+                                                clv_flags_bits[j], 1,
+                                                clv_flags_syms[j], 1, 1,
+                                                0, 0);
 
-            build_vlc(&lev[i + 1].bias_cb, clv_bias_len_counts[j],
-                      &bias_syms, &offset);
+            lev[i + 1].bias_cb = build_vlc(&state, clv_bias_len_counts[j],
+                                           &bias_syms);
             j++;
         }
     }
@@ -769,7 +739,7 @@ static av_cold int clv_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_clearvideo_decoder = {
     .p.name         = "clearvideo",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Iterated Systems ClearVideo"),
+    CODEC_LONG_NAME("Iterated Systems ClearVideo"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_CLEARVIDEO,
     .priv_data_size = sizeof(CLVContext),
@@ -777,5 +747,5 @@ const FFCodec ff_clearvideo_decoder = {
     .close          = clv_decode_end,
     FF_CODEC_DECODE_CB(clv_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

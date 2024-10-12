@@ -26,16 +26,15 @@
 #include "libavutil/attributes.h"
 #include "libavutil/avstring.h"
 #include "libavutil/channel_layout.h"
-#include "libavutil/eval.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 
 #include "audio.h"
 #include "avfilter.h"
 #include "filters.h"
 #include "formats.h"
-#include "internal.h"
 
 #define MAX_SPLITS 16
 #define MAX_BANDS MAX_SPLITS + 1
@@ -87,31 +86,33 @@ typedef struct AudioCrossoverContext {
 
 static const AVOption acrossover_options[] = {
     { "split", "set split frequencies", OFFSET(splits_str), AV_OPT_TYPE_STRING, {.str="500"}, 0, 0, AF },
-    { "order", "set filter order",      OFFSET(order_opt),  AV_OPT_TYPE_INT,    {.i64=1},     0, 9, AF, "m" },
-    { "2nd",   "2nd order (12 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=0},     0, 0, AF, "m" },
-    { "4th",   "4th order (24 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=1},     0, 0, AF, "m" },
-    { "6th",   "6th order (36 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=2},     0, 0, AF, "m" },
-    { "8th",   "8th order (48 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=3},     0, 0, AF, "m" },
-    { "10th",  "10th order (60 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=4},     0, 0, AF, "m" },
-    { "12th",  "12th order (72 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=5},     0, 0, AF, "m" },
-    { "14th",  "14th order (84 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=6},     0, 0, AF, "m" },
-    { "16th",  "16th order (96 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=7},     0, 0, AF, "m" },
-    { "18th",  "18th order (108 dB/8ve)",0,                 AV_OPT_TYPE_CONST,  {.i64=8},     0, 0, AF, "m" },
-    { "20th",  "20th order (120 dB/8ve)",0,                 AV_OPT_TYPE_CONST,  {.i64=9},     0, 0, AF, "m" },
+    { "order", "set filter order",      OFFSET(order_opt),  AV_OPT_TYPE_INT,    {.i64=1},     0, 9, AF, .unit = "m" },
+    { "2nd",   "2nd order (12 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=0},     0, 0, AF, .unit = "m" },
+    { "4th",   "4th order (24 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=1},     0, 0, AF, .unit = "m" },
+    { "6th",   "6th order (36 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=2},     0, 0, AF, .unit = "m" },
+    { "8th",   "8th order (48 dB/8ve)", 0,                  AV_OPT_TYPE_CONST,  {.i64=3},     0, 0, AF, .unit = "m" },
+    { "10th",  "10th order (60 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=4},     0, 0, AF, .unit = "m" },
+    { "12th",  "12th order (72 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=5},     0, 0, AF, .unit = "m" },
+    { "14th",  "14th order (84 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=6},     0, 0, AF, .unit = "m" },
+    { "16th",  "16th order (96 dB/8ve)",0,                  AV_OPT_TYPE_CONST,  {.i64=7},     0, 0, AF, .unit = "m" },
+    { "18th",  "18th order (108 dB/8ve)",0,                 AV_OPT_TYPE_CONST,  {.i64=8},     0, 0, AF, .unit = "m" },
+    { "20th",  "20th order (120 dB/8ve)",0,                 AV_OPT_TYPE_CONST,  {.i64=9},     0, 0, AF, .unit = "m" },
     { "level", "set input gain",        OFFSET(level_in),   AV_OPT_TYPE_FLOAT,  {.dbl=1},     0, 1, AF },
     { "gain",  "set output bands gain", OFFSET(gains_str),  AV_OPT_TYPE_STRING, {.str="1.f"}, 0, 0, AF },
-    { "precision",  "set processing precision", OFFSET(precision),   AV_OPT_TYPE_INT,   {.i64=0}, 0, 2, AF, "precision" },
-    {  "auto",  "set auto processing precision",                  0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, AF, "precision" },
-    {  "float", "set single-floating point processing precision", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, AF, "precision" },
-    {  "double","set double-floating point processing precision", 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, AF, "precision" },
+    { "precision",  "set processing precision", OFFSET(precision),   AV_OPT_TYPE_INT,   {.i64=0}, 0, 2, AF, .unit = "precision" },
+    {  "auto",  "set auto processing precision",                  0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, AF, .unit = "precision" },
+    {  "float", "set single-floating point processing precision", 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, AF, .unit = "precision" },
+    {  "double","set double-floating point processing precision", 0, AV_OPT_TYPE_CONST, {.i64=2}, 0, 0, AF, .unit = "precision" },
     { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(acrossover);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    AudioCrossoverContext *s = ctx->priv;
+    const AudioCrossoverContext *s = ctx->priv;
     static const enum AVSampleFormat auto_sample_fmts[] = {
         AV_SAMPLE_FMT_FLTP,
         AV_SAMPLE_FMT_DBLP,
@@ -122,9 +123,7 @@ static int query_formats(AVFilterContext *ctx)
         AV_SAMPLE_FMT_NONE
     };
     const enum AVSampleFormat *sample_fmts_list = sample_fmts;
-    int ret = ff_set_common_all_channel_counts(ctx);
-    if (ret < 0)
-        return ret;
+    int ret;
 
     switch (s->precision) {
     case 0:
@@ -139,11 +138,11 @@ static int query_formats(AVFilterContext *ctx)
     default:
         break;
     }
-    ret = ff_set_common_formats_from_list(ctx, sample_fmts_list);
+    ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts_list);
     if (ret < 0)
         return ret;
 
-    return ff_set_common_all_samplerates(ctx);
+    return 0;
 }
 
 static int parse_gains(AVFilterContext *ctx)
@@ -628,7 +627,7 @@ const AVFilter ff_af_acrossover = {
     .uninit         = uninit,
     FILTER_INPUTS(inputs),
     .outputs        = NULL,
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
     .flags          = AVFILTER_FLAG_DYNAMIC_OUTPUTS |
                       AVFILTER_FLAG_SLICE_THREADS,
 };

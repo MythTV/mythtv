@@ -76,6 +76,27 @@ enum FFFrameSyncExtMode {
 };
 
 /**
+ * Timestamp syncronization mode
+ *
+ * Describe how the frames of a stream are syncronized based on timestamp
+ * distance.
+ */
+enum FFFrameTSSyncMode {
+
+    /**
+     * Sync to frames from secondary input with the nearest, lower or equal
+     * timestamp to the frame event one.
+     */
+    TS_DEFAULT,
+
+    /**
+     * Sync to frames from secondary input with the absolute nearest timestamp
+     * to the frame event one.
+     */
+    TS_NEAREST,
+};
+
+/**
  * Input stream structure
  */
 typedef struct FFFrameSyncIn {
@@ -138,6 +159,7 @@ typedef struct FFFrameSyncIn {
      */
     unsigned sync;
 
+    enum FFFrameTSSyncMode ts_mode;
 } FFFrameSyncIn;
 
 /**
@@ -205,6 +227,7 @@ typedef struct FFFrameSync {
     int opt_repeatlast;
     int opt_shortest;
     int opt_eof_action;
+    int opt_ts_sync_mode;
 
 } FFFrameSync;
 
@@ -293,6 +316,7 @@ int ff_framesync_dualinput_get(FFFrameSync *fs, AVFrame **f0, AVFrame **f1);
 int ff_framesync_dualinput_get_writable(FFFrameSync *fs, AVFrame **f0, AVFrame **f1);
 
 const AVClass *ff_framesync_child_class_iterate(void **iter);
+extern const AVClass ff_framesync_class;
 
 #define FRAMESYNC_DEFINE_PURE_CLASS(name, desc, func_prefix, options) \
 static const AVClass name##_class = {                                 \

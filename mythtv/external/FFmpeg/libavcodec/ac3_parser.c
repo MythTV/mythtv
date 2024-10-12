@@ -20,10 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config.h"
 #include "config_components.h"
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem.h"
 #include "parser.h"
 #include "ac3defs.h"
 #include "ac3tab.h"
@@ -53,6 +53,25 @@ static const uint8_t center_levels[4] = { 4, 5, 6, 5 };
  */
 static const uint8_t surround_levels[4] = { 4, 6, 7, 6 };
 
+int ff_ac3_find_syncword(const uint8_t *buf, int buf_size)
+{
+    int i;
+
+    for (i = 1; i < buf_size; i += 2) {
+        if (buf[i] == 0x77 || buf[i] == 0x0B) {
+            if ((buf[i] ^ buf[i-1]) == (0x77 ^ 0x0B)) {
+                i--;
+                break;
+            } else if ((buf[i] ^ buf[i+1]) == (0x77 ^ 0x0B)) {
+                break;
+            }
+        }
+    }
+    if (i >= buf_size)
+        return AVERROR_INVALIDDATA;
+
+    return i;
+}
 
 int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr)
 {
@@ -62,12 +81,12 @@ int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr)
 
     hdr->sync_word = get_bits(gbc, 16);
     if(hdr->sync_word != 0x0B77)
-        return AAC_AC3_PARSE_ERROR_SYNC;
+        return AC3_PARSE_ERROR_SYNC;
 
     /* read ahead to bsid to distinguish between AC-3 and E-AC-3 */
     hdr->bitstream_id = show_bits_long(gbc, 29) & 0x1F;
     if(hdr->bitstream_id > 16)
-        return AAC_AC3_PARSE_ERROR_BSID;
+        return AC3_PARSE_ERROR_BSID;
 
     hdr->num_blocks = 6;
     hdr->ac3_bit_rate_code = -1;
@@ -84,11 +103,11 @@ int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr)
         hdr->crc1 = get_bits(gbc, 16);
         hdr->sr_code = get_bits(gbc, 2);
         if(hdr->sr_code == 3)
-            return AAC_AC3_PARSE_ERROR_SAMPLE_RATE;
+            return AC3_PARSE_ERROR_SAMPLE_RATE;
 
         frame_size_code = get_bits(gbc, 6);
         if(frame_size_code > 37)
-            return AAC_AC3_PARSE_ERROR_FRAME_SIZE;
+            return AC3_PARSE_ERROR_FRAME_SIZE;
 
         hdr->ac3_bit_rate_code = (frame_size_code >> 1);
 
@@ -119,19 +138,19 @@ int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr)
         hdr->crc1 = 0;
         hdr->frame_type = get_bits(gbc, 2);
         if(hdr->frame_type == EAC3_FRAME_TYPE_RESERVED)
-            return AAC_AC3_PARSE_ERROR_FRAME_TYPE;
+            return AC3_PARSE_ERROR_FRAME_TYPE;
 
         hdr->substreamid = get_bits(gbc, 3);
 
         hdr->frame_size = (get_bits(gbc, 11) + 1) << 1;
         if(hdr->frame_size < AC3_HEADER_SIZE)
-            return AAC_AC3_PARSE_ERROR_FRAME_SIZE;
+            return AC3_PARSE_ERROR_FRAME_SIZE;
 
         hdr->sr_code = get_bits(gbc, 2);
         if (hdr->sr_code == 3) {
             int sr_code2 = get_bits(gbc, 2);
             if(sr_code2 == 3)
-                return AAC_AC3_PARSE_ERROR_SAMPLE_RATE;
+                return AC3_PARSE_ERROR_SAMPLE_RATE;
             hdr->sample_rate = ff_ac3_sample_rate_tab[sr_code2] / 2;
             hdr->sr_shift = 1;
         } else {
@@ -185,7 +204,9 @@ int av_ac3_parse_header(const uint8_t *buf, size_t size,
     AC3HeaderInfo hdr;
     int err;
 
-    init_get_bits8(&gb, buf, size);
+    err = init_get_bits8(&gb, buf, size);
+    if (err < 0)
+        return AVERROR_INVALIDDATA;
     err = ff_ac3_parse_header(&gb, &hdr);
     if (err < 0)
         return AVERROR_INVALIDDATA;
@@ -196,8 +217,7 @@ int av_ac3_parse_header(const uint8_t *buf, size_t size,
     return 0;
 }
 
-static int ac3_sync(uint64_t state, AACAC3ParseContext *hdr_info,
-        int *need_next_header, int *new_frame_start)
+static int ac3_sync(uint64_t state, int *need_next_header, int *new_frame_start)
 {
     int err;
     union {
@@ -219,19 +239,6 @@ static int ac3_sync(uint64_t state, AACAC3ParseContext *hdr_info,
     if(err < 0)
         return 0;
 
-    hdr_info->sample_rate = hdr.sample_rate;
-    hdr_info->bit_rate = hdr.bit_rate;
-    hdr_info->channels = hdr.channels;
-    hdr_info->channel_layout = hdr.channel_layout;
-    hdr_info->samples = hdr.num_blocks * 256;
-    hdr_info->service_type = hdr.bitstream_mode;
-    if (hdr.bitstream_mode == 0x7 && hdr.channels > 1)
-        hdr_info->service_type = AV_AUDIO_SERVICE_TYPE_KARAOKE;
-    if(hdr.bitstream_id>10)
-        hdr_info->codec_id = AV_CODEC_ID_EAC3;
-    else if (hdr_info->codec_id == AV_CODEC_ID_NONE)
-        hdr_info->codec_id = AV_CODEC_ID_AC3;
-
     *new_frame_start  = (hdr.frame_type != EAC3_FRAME_TYPE_DEPENDENT);
     *need_next_header = *new_frame_start || (hdr.frame_type != EAC3_FRAME_TYPE_AC3_CONVERT);
     return hdr.frame_size;
@@ -241,6 +248,7 @@ static av_cold int ac3_parse_init(AVCodecParserContext *s1)
 {
     AACAC3ParseContext *s = s1->priv_data;
     s->header_size = AC3_HEADER_SIZE;
+    s->crc_ctx = av_crc_get_table(AV_CRC_16_ANSI);
     s->sync = ac3_sync;
     return 0;
 }

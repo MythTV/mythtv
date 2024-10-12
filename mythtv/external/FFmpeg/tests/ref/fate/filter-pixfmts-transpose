@@ -23,6 +23,8 @@ gbrap10be           3e3be2d8f9aa5f449a1df404e27d0054
 gbrap10le           db4e4861010cbbf726492fad282d5813
 gbrap12be           1518c9a565d1ba1a45dd369acc1aa75e
 gbrap12le           714fe318af81a46f83655c6e7e13351e
+gbrap14be           929c440a44fbeab41111ebbf1d724464
+gbrap14le           577112fe137e056b4fb145403d5846e6
 gbrap16be           39d488528aacff466aac7539c9b948a8
 gbrap16le           5426ac9457289927bfe2ec03038a8780
 gbrapf32be          ea02b3912372c8671ff4eacbcbda740a
@@ -59,10 +61,14 @@ nv24                ea9de8b47faed722ee40182f89489beb
 nv42                636af6cd6a4f3ac5edc0fc3ce3c56d63
 p010be              ad0de2cc9bff81688b182a870fcf7000
 p010le              e7ff5143595021246733ce6bd0a769e8
+p012be              ad0de2cc9bff81688b182a870fcf7000
+p012le              024ef1cf56a4872f202b96a6a4bbf10a
 p016be              ad0de2cc9bff81688b182a870fcf7000
 p016le              e7ff5143595021246733ce6bd0a769e8
 p410be              8b3e0ccb31b6a20ff00a29253fb2dec3
 p410le              4e5f78dfccda9a6387e81354a56a033a
+p412be              88e4578d2c6d99399a6cf1db9e4c0553
+p412le              7905a6e5a0c29b68e025824c7e29adb8
 p416be              350a90bda53349435d89ec13533726b7
 p416le              7bb46e2aec65669a27502ec452941237
 rgb0                31ea5da7fe779c6ea0a33f1d28aad918
@@ -80,8 +86,12 @@ rgb8                c90feb30c3c9391ef5f470209d7b7a15
 rgba                4d76a9542143752a4ac30f82f88f68f1
 rgba64be            a60041217f4c0cd796d19d3940a12a41
 rgba64le            ad47197774858858ae7b0c177dffa459
+vuya                9ece18a345beb17cd19e09e443eca4bf
+vuyx                46b5b821d7ee6ddedb3ddafd1e5b007c
 x2bgr10le           4aa774b6d8f6d446a64f1f288e5c97eb
 x2rgb10le           09cb1d98fe17ad8a6d9d3bec97ddc845
+xv30le              b1ac5a12f46d32c70acb63f89838ab76
+xv36le              a819ca57db4187a3effe2bd5e374e932
 xyz12be             68e5cba640f6e4ef72dff950e88b5342
 xyz12le             8b6b6a6db4d7561e80db88ccaecce7a9
 ya16be              3e161cb5f225922a80fefdc9cc02a4f9

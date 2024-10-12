@@ -32,6 +32,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/crc.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 
 #define BITSTREAM_READER_LE
@@ -160,7 +161,8 @@ static av_cold int tta_decode_init(AVCodecContext * avctx)
         av_channel_layout_uninit(&avctx->ch_layout);
         if (s->channels > 1 && s->channels < 9) {
             av_channel_layout_from_mask(&avctx->ch_layout, tta_channel_layouts[s->channels-2]);
-        } else {
+        }
+        if (avctx->ch_layout.nb_channels == 0) {
             avctx->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
             avctx->ch_layout.nb_channels = s->channels;
         }
@@ -210,7 +212,7 @@ static av_cold int tta_decode_init(AVCodecContext * avctx)
         av_log(avctx, AV_LOG_DEBUG, "data_length: %d frame_length: %d last: %d total: %d\n",
             s->data_length, s->frame_length, s->last_frame_length, total_frames);
 
-        if(s->frame_length >= UINT_MAX / (s->channels * sizeof(int32_t))){
+        if (s->frame_length >= UINT_MAX / (s->channels * sizeof(int32_t))) {
             av_log(avctx, AV_LOG_ERROR, "frame_length too large\n");
             return AVERROR_INVALIDDATA;
         }
@@ -305,14 +307,14 @@ static int tta_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             rice->sum1 += value - (rice->sum1 >> 4);
             if (rice->k1 > 0 && rice->sum1 < ff_tta_shift_16[rice->k1])
                 rice->k1--;
-            else if(rice->sum1 > ff_tta_shift_16[rice->k1 + 1])
+            else if (rice->sum1 > ff_tta_shift_16[rice->k1 + 1])
                 rice->k1++;
             value += ff_tta_shift_1[rice->k0];
         default:
             rice->sum0 += value - (rice->sum0 >> 4);
             if (rice->k0 > 0 && rice->sum0 < ff_tta_shift_16[rice->k0])
                 rice->k0--;
-            else if(rice->sum0 > ff_tta_shift_16[rice->k0 + 1])
+            else if (rice->sum0 > ff_tta_shift_16[rice->k0 + 1])
                 rice->k0++;
         }
 
@@ -341,7 +343,7 @@ static int tta_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             if (s->channels > 1) {
                 int32_t *r = p - 1;
                 for (*p += *r / 2; r > (int32_t*)p - s->channels; r--)
-                    *r = *(r + 1) - *r;
+                    *r = *(r + 1) - (unsigned)*r;
             }
             cur_chan = 0;
             i++;
@@ -364,21 +366,24 @@ static int tta_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     switch (s->bps) {
     case 1: {
         uint8_t *samples = (uint8_t *)frame->data[0];
-        for (p = s->decode_buffer; (int32_t*)p < s->decode_buffer + (framelen * s->channels); p++)
-            *samples++ = *p + 0x80;
+        p = s->decode_buffer;
+        for (i = 0; i < framelen * s->channels; i++)
+            samples[i] = p[i] + 0x80;
         break;
         }
     case 2: {
         int16_t *samples = (int16_t *)frame->data[0];
-        for (p = s->decode_buffer; (int32_t*)p < s->decode_buffer + (framelen * s->channels); p++)
-            *samples++ = *p;
+        p = s->decode_buffer;
+        for (i = 0; i < framelen * s->channels; i++)
+            samples[i] = p[i];
         break;
         }
     case 3: {
         // shift samples for 24-bit sample format
         int32_t *samples = (int32_t *)frame->data[0];
+
         for (i = 0; i < framelen * s->channels; i++)
-            *samples++ *= 256;
+            samples[i] = samples[i] * 256U;
         // reset decode buffer
         s->decode_buffer = NULL;
         break;
@@ -395,7 +400,8 @@ error:
     return ret;
 }
 
-static av_cold int tta_decode_close(AVCodecContext *avctx) {
+static av_cold int tta_decode_close(AVCodecContext *avctx)
+{
     TTAContext *s = avctx->priv_data;
 
     if (s->bps < 3)
@@ -422,7 +428,7 @@ static const AVClass tta_decoder_class = {
 
 const FFCodec ff_tta_decoder = {
     .p.name         = "tta",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
+    CODEC_LONG_NAME("TTA (True Audio)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_TTA,
     .priv_data_size = sizeof(TTAContext),
@@ -431,5 +437,5 @@ const FFCodec ff_tta_decoder = {
     FF_CODEC_DECODE_CB(tta_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
     .p.priv_class   = &tta_decoder_class,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

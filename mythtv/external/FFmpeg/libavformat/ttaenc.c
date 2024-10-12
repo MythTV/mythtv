@@ -27,6 +27,7 @@
 #include "avformat.h"
 #include "avio_internal.h"
 #include "internal.h"
+#include "mux.h"
 
 typedef struct TTAMuxContext {
     AVIOContext *seek_table;
@@ -39,13 +40,7 @@ typedef struct TTAMuxContext {
 static int tta_init(AVFormatContext *s)
 {
     TTAMuxContext *tta = s->priv_data;
-    AVCodecParameters *par;
-
-    if (s->nb_streams != 1) {
-        av_log(s, AV_LOG_ERROR, "Only one stream is supported\n");
-        return AVERROR(EINVAL);
-    }
-    par = s->streams[0]->codecpar;
+    AVCodecParameters *par = s->streams[0]->codecpar;
 
     if (par->codec_id != AV_CODEC_ID_TTA) {
         av_log(s, AV_LOG_ERROR, "Unsupported codec\n");
@@ -165,14 +160,17 @@ static void tta_deinit(AVFormatContext *s)
     avpriv_packet_list_free(&tta->queue);
 }
 
-const AVOutputFormat ff_tta_muxer = {
-    .name              = "tta",
-    .long_name         = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
-    .mime_type         = "audio/x-tta",
-    .extensions        = "tta",
+const FFOutputFormat ff_tta_muxer = {
+    .p.name            = "tta",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("TTA (True Audio)"),
+    .p.mime_type       = "audio/x-tta",
+    .p.extensions      = "tta",
     .priv_data_size    = sizeof(TTAMuxContext),
-    .audio_codec       = AV_CODEC_ID_TTA,
-    .video_codec       = AV_CODEC_ID_NONE,
+    .p.audio_codec     = AV_CODEC_ID_TTA,
+    .p.video_codec     = AV_CODEC_ID_NONE,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH |
+                         FF_OFMT_FLAG_ONLY_DEFAULT_CODECS,
     .init              = tta_init,
     .deinit            = tta_deinit,
     .write_header      = tta_write_header,

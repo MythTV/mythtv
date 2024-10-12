@@ -26,11 +26,10 @@
 
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
-#include "libavutil/intreadwrite.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 typedef struct YopDecContext {
     AVCodecContext *avctx;
@@ -208,7 +207,7 @@ static int yop_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     if ((ret = ff_reget_buffer(avctx, frame, 0)) < 0)
         return ret;
 
-    if (!avctx->frame_number)
+    if (!avctx->frame_num)
         memset(frame->data[1], 0, AVPALETTE_SIZE);
 
     s->dstbuf     = frame->data[0];
@@ -233,7 +232,11 @@ static int yop_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                                    (palette[i + firstcolor] >> 6) & 0x30303;
     }
 
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
     frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
     for (y = 0; y < avctx->height; y += 2) {
         for (x = 0; x < avctx->width; x += 2) {
@@ -268,12 +271,12 @@ static int yop_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
 
 const FFCodec ff_yop_decoder = {
     .p.name         = "yop",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Psygnosis YOP Video"),
+    CODEC_LONG_NAME("Psygnosis YOP Video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_YOP,
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .priv_data_size = sizeof(YopDecContext),
     .init           = yop_decode_init,
     .close          = yop_decode_close,
     FF_CODEC_DECODE_CB(yop_decode_frame),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

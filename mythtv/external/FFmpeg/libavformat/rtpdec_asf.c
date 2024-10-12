@@ -28,6 +28,7 @@
 #include "libavutil/base64.h"
 #include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "rtpdec_formats.h"
 #include "rtsp.h"
 #include "asf.h"
@@ -210,7 +211,7 @@ static int asfrtp_parse_packet(AVFormatContext *s, PayloadContext *asf,
 
         av_freep(&asf->buf);
 
-        ffio_init_context(pb0, (uint8_t *)buf, len, 0, NULL, NULL, NULL, NULL);
+        ffio_init_read_context(pb0, buf, len);
 
         while (avio_tell(pb) + 4 < len) {
             int start_off = avio_tell(pb);

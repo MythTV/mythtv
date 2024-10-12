@@ -28,16 +28,14 @@
 #define _BSD_SOURCE     /* Needed for using struct ip_mreq with recent glibc */
 
 #include "avformat.h"
-#include "avio_internal.h"
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/fifo.h"
 #include "libavutil/intreadwrite.h"
-#include "libavutil/avstring.h"
 #include "libavutil/opt.h"
 #include "libavutil/log.h"
 #include "libavutil/time.h"
-#include "internal.h"
 #include "network.h"
 #include "os_support.h"
 #include "url.h"
@@ -487,6 +485,8 @@ static void *circular_buffer_task_rx( void *_URLContext)
     UDPContext *s = h->priv_data;
     int old_cancelstate;
 
+    ff_thread_setname("udp-rx");
+
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &old_cancelstate);
     pthread_mutex_lock(&s->mutex);
     if (ff_socket_nonblock(s->udp_fd, 0) < 0) {
@@ -551,6 +551,8 @@ static void *circular_buffer_task_tx( void *_URLContext)
     int64_t sent_bits = 0;
     int64_t burst_interval = s->bitrate ? (s->burst_bits * 1000000 / s->bitrate) : 0;
     int64_t max_delay = s->bitrate ?  ((int64_t)h->max_packet_size * 8 * 1000000 / s->bitrate + 1) : 0;
+
+    ff_thread_setname("udp-tx");
 
     pthread_mutex_lock(&s->mutex);
 
@@ -736,6 +738,10 @@ static int udp_open(URLContext *h, const char *uri, int flags)
         if (av_find_info_tag(buf, sizeof(buf), "localaddr", p)) {
             av_freep(&s->localaddr);
             s->localaddr = av_strdup(buf);
+            if (!s->localaddr) {
+                ret = AVERROR(ENOMEM);
+                goto fail;
+            }
         }
         if (av_find_info_tag(buf, sizeof(buf), "sources", p)) {
             if ((ret = ff_ip_parse_sources(h, buf, &s->filters)) < 0)

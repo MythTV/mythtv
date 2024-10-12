@@ -28,10 +28,11 @@
 #include "ac3_parser_internal.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "mpegaudiodecheader.h"
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/log.h"
 
@@ -71,10 +72,12 @@ static UInt32 ffat_get_format_id(enum AVCodecID codec, int profile)
         return kAudioFormatAMR;
     case AV_CODEC_ID_EAC3:
         return kAudioFormatEnhancedAC3;
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
     case AV_CODEC_ID_GSM_MS:
         return kAudioFormatMicrosoftGSM;
     case AV_CODEC_ID_ILBC:
         return kAudioFormatiLBC;
+#endif
     case AV_CODEC_ID_MP1:
         return kAudioFormatMPEGLayer1;
     case AV_CODEC_ID_MP2:
@@ -591,7 +594,7 @@ static av_cold int ffat_close_decoder(AVCodecContext *avctx)
     FFAT_DEC_CLASS(NAME) \
     const FFCodec ff_##NAME##_at_decoder = { \
         .p.name         = #NAME "_at", \
-        .p.long_name    = NULL_IF_CONFIG_SMALL(#NAME " (AudioToolbox)"), \
+        CODEC_LONG_NAME(#NAME " (AudioToolbox)"), \
         .p.type         = AVMEDIA_TYPE_AUDIO, \
         .p.id           = ID, \
         .priv_data_size = sizeof(ATDecodeContext), \
@@ -602,7 +605,7 @@ static av_cold int ffat_close_decoder(AVCodecContext *avctx)
         .p.priv_class   = &ffat_##NAME##_dec_class, \
         .bsfs           = bsf_name, \
         .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_CHANNEL_CONF, \
-        .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP, \
+        .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP, \
         .p.wrapper_name = "at", \
     };
 

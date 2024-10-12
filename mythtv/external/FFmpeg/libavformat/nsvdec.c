@@ -23,7 +23,9 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/mathematics.h"
+#include "libavutil/mem.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "libavutil/dict.h"
 #include "libavutil/intreadwrite.h"
@@ -195,6 +197,7 @@ static const AVCodecTag nsv_codec_video_tags[] = {
     { AV_CODEC_ID_VP4, MKTAG('V', 'P', '4', '0') },
 */
     { AV_CODEC_ID_MPEG4, MKTAG('X', 'V', 'I', 'D') }, /* cf sample xvid decoder from nsv_codec_sdk.zip */
+    { AV_CODEC_ID_H264,  MKTAG('H', '2', '6', '4') },
     { AV_CODEC_ID_RAWVIDEO, MKTAG('R', 'G', 'B', '3') },
     { AV_CODEC_ID_NONE, 0 },
 };
@@ -203,6 +206,7 @@ static const AVCodecTag nsv_codec_audio_tags[] = {
     { AV_CODEC_ID_MP3,       MKTAG('M', 'P', '3', ' ') },
     { AV_CODEC_ID_AAC,       MKTAG('A', 'A', 'C', ' ') },
     { AV_CODEC_ID_AAC,       MKTAG('A', 'A', 'C', 'P') },
+    { AV_CODEC_ID_AAC,       MKTAG('A', 'A', 'V', ' ') },
     { AV_CODEC_ID_AAC,       MKTAG('V', 'L', 'B', ' ') },
     { AV_CODEC_ID_SPEEX,     MKTAG('S', 'P', 'X', ' ') },
     { AV_CODEC_ID_PCM_U16LE, MKTAG('P', 'C', 'M', ' ') },
@@ -461,6 +465,22 @@ static int nsv_parse_NSVs_header(AVFormatContext *s)
             st->codecpar->codec_tag = atag;
             st->codecpar->codec_id = ff_codec_get_id(nsv_codec_audio_tags, atag);
 
+            if (atag == MKTAG('A', 'A', 'V', ' ')) {
+                static const uint8_t aav_pce[] = {
+                    0x12, 0x00, 0x05, 0x08, 0x48, 0x00,
+                    0x20, 0x00, 0xC6, 0x40, 0x04, 0x4C,
+                    0x61, 0x76, 0x63, 0x56, 0xE5, 0x00,
+                    0x00, 0x00,
+                };
+                int ret;
+
+                if ((ret = ff_alloc_extradata(st->codecpar, sizeof(aav_pce))) < 0)
+                    return ret;
+
+                st->codecpar->sample_rate = 44100;
+                memcpy(st->codecpar->extradata, aav_pce, sizeof(aav_pce));
+            }
+
             ffstream(st)->need_parsing = AVSTREAM_PARSE_FULL; /* for PCM we will read a chunk later and put correct info */
 
             /* set timebase to common denominator of ms and framerate */
@@ -597,7 +617,7 @@ null_chunk_retry:
         pkt = &nsv->ahead[NSV_ST_AUDIO];
         /* read raw audio specific header on the first audio chunk... */
         /* on ALL audio chunks ?? seems so! */
-        if (asize && st[NSV_ST_AUDIO]->codecpar->codec_tag == MKTAG('P', 'C', 'M', ' ')/* && fill_header*/) {
+        if (asize >= 4 && st[NSV_ST_AUDIO]->codecpar->codec_tag == MKTAG('P', 'C', 'M', ' ')/* && fill_header*/) {
             uint8_t bps;
             uint8_t channels;
             uint16_t samplerate;
@@ -729,11 +749,11 @@ static int nsv_probe(const AVProbeData *p)
     return score;
 }
 
-const AVInputFormat ff_nsv_demuxer = {
-    .name           = "nsv",
-    .long_name      = NULL_IF_CONFIG_SMALL("Nullsoft Streaming Video"),
+const FFInputFormat ff_nsv_demuxer = {
+    .p.name         = "nsv",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Nullsoft Streaming Video"),
     .priv_data_size = sizeof(NSVContext),
-    .flags_internal = FF_FMT_INIT_CLEANUP,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .read_probe     = nsv_probe,
     .read_header    = nsv_read_header,
     .read_packet    = nsv_read_packet,

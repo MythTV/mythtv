@@ -20,6 +20,7 @@
  */
 
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "framequeue.h"
 
 static inline FFFrameBucket *bucket(FFFrameQueue *fq, size_t idx)
@@ -79,9 +80,8 @@ int ff_framequeue_add(FFFrameQueue *fq, AVFrame *frame)
             FFFrameBucket *nq = av_realloc_array(fq->queue, na, sizeof(*nq));
             if (!nq)
                 return AVERROR(ENOMEM);
-            if (fq->tail + fq->queued > fq->allocated)
-                memmove(nq + fq->allocated, nq,
-                        (fq->tail + fq->queued - fq->allocated) * sizeof(*nq));
+            if (fq->tail)
+                memmove(nq + fq->allocated, nq, fq->tail * sizeof(*nq));
             fq->queue = nq;
             fq->allocated = na;
         }

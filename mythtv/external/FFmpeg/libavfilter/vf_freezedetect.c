@@ -29,6 +29,7 @@
 #include "avfilter.h"
 #include "filters.h"
 #include "scene_sad.h"
+#include "video.h"
 
 typedef struct FreezeDetectContext {
     const AVClass *class;
@@ -130,7 +131,6 @@ static int is_frozen(FreezeDetectContext *s, AVFrame *reference, AVFrame *frame)
             count += s->width[plane] * s->height[plane];
         }
     }
-    emms_c();
     mafd = (double)sad / count / (1ULL << s->bitdepth);
     return (mafd <= s->noise);
 }
@@ -146,6 +146,7 @@ static int activate(AVFilterContext *ctx)
     int ret;
     AVFilterLink *inlink = ctx->inputs[0];
     AVFilterLink *outlink = ctx->outputs[0];
+    FilterLink         *l = ff_filter_link(inlink);
     FreezeDetectContext *s = ctx->priv;
     AVFrame *frame;
 
@@ -162,7 +163,7 @@ static int activate(AVFilterContext *ctx)
         if (s->reference_frame) {
             int64_t duration;
             if (s->reference_frame->pts == AV_NOPTS_VALUE || frame->pts == AV_NOPTS_VALUE || frame->pts < s->reference_frame->pts)     // Discontinuity?
-                duration = inlink->frame_rate.num > 0 ? av_rescale_q(s->n - s->reference_n, av_inv_q(inlink->frame_rate), AV_TIME_BASE_Q) : 0;
+                duration = l->frame_rate.num > 0 ? av_rescale_q(s->n - s->reference_n, av_inv_q(l->frame_rate), AV_TIME_BASE_Q) : 0;
             else
                 duration = av_rescale_q(frame->pts - s->reference_frame->pts, inlink->time_base, AV_TIME_BASE_Q);
 
@@ -204,13 +205,6 @@ static const AVFilterPad freezedetect_inputs[] = {
     },
 };
 
-static const AVFilterPad freezedetect_outputs[] = {
-    {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_freezedetect = {
     .name          = "freezedetect",
     .description   = NULL_IF_CONFIG_SMALL("Detects frozen video input."),
@@ -219,7 +213,7 @@ const AVFilter ff_vf_freezedetect = {
     .uninit        = uninit,
     .flags         = AVFILTER_FLAG_METADATA_ONLY,
     FILTER_INPUTS(freezedetect_inputs),
-    FILTER_OUTPUTS(freezedetect_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .activate      = activate,
 };

@@ -31,6 +31,12 @@ fate-matroska-zlib-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/subtit
 FATE_MATROSKA-$(CONFIG_MATROSKA_DEMUXER) += fate-matroska-lzo-decompression
 fate-matroska-lzo-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/lzo.mka -c copy
 
+# This tests that the ALAC extradata is correctly transformed upon remuxing.
+# It also tests setting the AV_DISPOSITION_COMMENT disposition as well as
+# writing creation_time metadata.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, MOV_DEMUXER) += fate-matroska-alac-remux
+fate-matroska-alac-remux: CMD = transcode mov $(TARGET_SAMPLES)/lossless-audio/inside.m4a matroska "-map 0:a -c copy -metadata creation_time=2009-01-25T16:08:26.000000Z -disposition +comment" "-c copy" "-show_entries format_tags:stream_disposition"
+
 # This tests that the matroska demuxer correctly propagates
 # the channel layout contained in vorbis comments in the CodecPrivate
 # of flac tracks. It also tests header removal compression.
@@ -48,6 +54,12 @@ FATE_MATROSKA-$(call ALLYES, FLAC_DECODER FLAC_ENCODER FLAC_PARSER \
                 MATROSKA_DEMUXER MATROSKA_MUXER) += fate-matroska-flac-extradata-update
 fate-matroska-flac-extradata-update: CMD = transcode matroska $(TARGET_SAMPLES)/mkv/flac_channel_layouts.mka \
                                            matroska "-map 0 -map 0:0 -c flac -frames:a:2 8" "-map 0 -c copy"
+
+# This tests that the Matroska/WebM muxer writes the AV1 CodecPrivate
+# via extradata obtained from packet side data. It also tests that
+# the aspect ratio is only written with pixels as DisplayUnit for WebM.
+FATE_MATROSKA-$(call REMUX, WEBM MATROSKA, IVF_DEMUXER AV1_PARSER EXTRACT_EXTRADATA_BSF) += fate-webm-av1-extradata-update
+fate-webm-av1-extradata-update: CMD = transcode ivf $(TARGET_SAMPLES)/av1/decode_model.ivf webm "-c copy -bsf extract_extradata -sar 3:1" "-c copy" "" "" "-nofind_stream_info" "-nofind_stream_info"
 
 # This test tests demuxing Vorbis and chapters from ogg and muxing it in and
 # demuxing it from Matroska/WebM. It furthermore tests the WebM muxer, in
@@ -77,6 +89,16 @@ fate-matroska-zero-length-block: CMD = transcode matroska $(TARGET_SAMPLES)/mkv/
 FATE_MATROSKA-$(call TRANSCODE, PCM_S24BE PCM_S24LE, MATROSKA, WAV_DEMUXER) \
                 += fate-matroska-move-cues-to-front
 fate-matroska-move-cues-to-front: CMD = transcode wav $(TARGET_SAMPLES)/audio-reference/divertimenti_2ch_96kHz_s24.wav matroska "-map 0 -map 0 -c:a:0 pcm_s24be -c:a:1 copy -cluster_time_limit 5 -cues_to_front yes -metadata_header_padding 7840 -write_crc32 0" "-map 0 -c copy -t 0.1"
+
+# This test covers the case in which a displaymatrix is not a rotation
+# and is therefore ignored by the muxer, i.e. the ffprobe output of
+# side data should be empty.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, MOV_DEMUXER H264_PARSER H264_DECODER) \
+                               += fate-matroska-non-rotation-displaymatrix
+fate-matroska-non-rotation-displaymatrix: CMD = transcode mov $(TARGET_SAMPLES)/mov/displaymatrix.mov matroska \
+    "-c copy -frames:v 5" \
+    "-c copy" \
+    "-show_entries stream_side_data_list"
 
 # This tests DOVI (reading from MP4 and Matroska and writing to Matroska)
 # as well as writing the Cues at the front (by shifting data) if
@@ -108,7 +130,7 @@ fate-matroska-avoid-negative-ts: CMD = transcode mpegts $(TARGET_SAMPLES)/mpeg2/
 # It furthermore tests writing the Cues at the front if the cues_to_front
 # option is set and more than enough space has been reserved in advance.
 # (Btw: The keyframe flags of the input video stream seem wrong.)
-FATE_MATROSKA-$(call REMUX, MATROSKA, AVI_DEMUXER) += fate-matroska-ms-mode
+FATE_MATROSKA-$(call REMUX, MATROSKA, AVI_DEMUXER SPEEX_DECODER) += fate-matroska-ms-mode
 fate-matroska-ms-mode: CMD = transcode avi $(TARGET_SAMPLES)/vp5/potter512-400-partial.avi matroska "-map 0 -c copy -cues_to_front yes -reserve_index_space 5000" "-map 0 -c copy -t 1"
 
 # This tests Matroska's QT-compatibility mode.
@@ -163,6 +185,25 @@ FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, MPEGTS_DEMUXER AC3_DECODER)
                                += fate-matroska-mpegts-remux
 fate-matroska-mpegts-remux: CMD = transcode mpegts $(TARGET_SAMPLES)/mpegts/pmtchange.ts matroska "-map 0:2 -map 0:2 -c copy -disposition:a:1 -visual_impaired+hearing_impaired -default_mode infer" "-map 0 -c copy" "-show_entries stream_disposition:stream=index"
 
+# Tests maintaining codec delay while remuxing from Matroska.
+# For some reason, ffmpeg shifts the timestamps of the input file
+# to make them zero before reaching the muxer while it does not
+# for the ogg-opus-remux test. -avoid_negative_ts make_zero counters this.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, OPUS_PARSER OPUS_DECODER) += fate-matroska-opus-remux
+fate-matroska-opus-remux: CMD = transcode matroska $(TARGET_SAMPLES)/mkv/codec_delay_opus.mkv matroska "-avoid_negative_ts make_zero -c copy" "-copyts -c copy" "-show_packets -show_entries stream=codec_name,initial_padding -read_intervals %0.05"
+
+# Tests maintaining codec delay while remuxing from ogg.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, OGG_DEMUXER OPUS_PARSER OPUS_DECODER) += fate-matroska-ogg-opus-remux
+fate-matroska-ogg-opus-remux: CMD = transcode ogg $(TARGET_SAMPLES)/ogg/intro-partial.opus matroska "-c copy" "-copyts -c copy" "-show_packets -show_entries stream=codec_name,initial_padding -read_intervals %0.05"
+
+# This tests reencoding with an audio encoder that adds initial padding.
+# The initial padding is currently not maintained.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, MXF_DEMUXER PCM_S16LE_DECODER \
+                                           MP2FIXED_ENCODER ARESAMPLE_FILTER       \
+                                           MPEG2VIDEO_DECODER MPEGVIDEO_PARSER     \
+                                           EXTRACT_EXTRADATA_BSF) += fate-matroska-encoding-delay
+fate-matroska-encoding-delay: CMD = transcode mxf $(TARGET_SAMPLES)/mxf/Sony-00001.mxf matroska "-c:v copy -af aresample -c:a mp2fixed" "-copyts -c copy" "-show_packets -show_entries stream=codec_name,initial_padding -read_intervals %0.05"
+
 FATE_MATROSKA-$(call REMUX, MATROSKA, SUP_DEMUXER) += fate-matroska-pgs-remux
 fate-matroska-pgs-remux: CMD = transcode sup $(TARGET_SAMPLES)/sub/pgs_sub.sup matroska "-copyts -c:s copy" "-copyts -c:s copy"
 
@@ -184,6 +225,29 @@ fate-matroska-dvbsub-remux: CMD = transcode mpegts $(TARGET_SAMPLES)/sub/dvbsubt
 FATE_MATROSKA_FFPROBE-$(call ALLYES, MATROSKA_DEMUXER) += fate-matroska-spherical-mono
 fate-matroska-spherical-mono: CMD = run ffprobe$(PROGSSUF)$(EXESUF) -show_entries stream_side_data_list -select_streams v -v 0 $(TARGET_SAMPLES)/mkv/spherical.mkv
 
+# This test tests the handling of AVStereo3D information, in particular
+# the ability to set it via metadata in the muxer (the file itself is
+# actually an ordinary file with a single view). It also tests
+# correctly writing the display dimensions in the presence of stereo metadata.
+# The test also covers reformatting Theora extradata as well as testing
+# default_mode infer in the presence of tracks already marked as default.
+# It furthermore tests tag languages as well as stream languages,
+# in particular in their various forms (e.g. de vs deu vs ger for German)
+# and also the language-country code form.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, OGG_DEMUXER THEORA_DECODER) += fate-matroska-stereo_mode
+fate-matroska-stereo_mode: CMD = transcode ogg $(TARGET_SAMPLES)/vp3/offset_test.ogv matroska \
+    "-c copy -write_crc32 0 -default_mode infer \
+     -map 0 -disposition:s:0 +original+dub -metadata:s:0 language=ger \
+     -map 0 -metadata:s:1 stereo_mode=left_right -metadata:s:1 language=ger-at -metadata:s:1 description-ger=Deutsch -metadata:s:1 description-fre=Francais \
+     -map 0 -metadata:s:2 stereo_mode=bottom_top -metadata:s:2 language=eng -metadata:s:2 description-de=Deutsch -metadata:s:2 description-fra=Francais \
+     -map 0 -metadata:s:3 stereo_mode=row_interleaved_rl -sar:3 3:1 -disposition:3 +default -metadata:s:3 language=deu-at \
+     -map 0 -metadata:s:4 stereo_mode=col_interleaved_rl -sar:4 16:9 -metadata:s:4 language=fre -metadata:s:4 description-deu-at=Oesterreichisch \
+     -map 0 -metadata:s:5 stereo_mode=anaglyph_cyan_red -sar:5 16:9 -disposition:5 +default -metadata:s:5 language=fra \
+     -map 0 -metadata:s:6 stereo_mode=12 -sar:6 2:1 -metadata:s:6 language=de -metadata:s:6 description-deu=Deutsch" \
+    "-map 0 -c copy" \
+    "-show_entries stream_disposition=default,original,dub:stream_tags:stream_side_data_list"
+
+
 # The following test tests the various flavours of WebVTT in WebM.
 # It also tests that dispositions not supported by WebM are not written
 # (and therefore lost). It moreover tests that the muxer writes CuePoints
@@ -191,6 +255,20 @@ fate-matroska-spherical-mono: CMD = run ffprobe$(PROGSSUF)$(EXESUF) -show_entrie
 FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, WEBM MATROSKA, WEBVTT_DEMUXER) \
                                += fate-webm-webvtt-remux
 fate-webm-webvtt-remux: CMD = transcode webvtt $(TARGET_SAMPLES)/sub/WebVTT_capability_tester.vtt webm "-map 0 -map 0 -map 0 -map 0 -c:s copy -disposition:0 original+descriptions+hearing_impaired -disposition:1 lyrics+default+metadata -disposition:2 comment+forced -disposition:3 karaoke+captions+dub" "-map 0:0 -map 0:1 -c copy" "-show_entries stream_disposition:stream=index,codec_name:packet=stream_index,pts:packet_side_data_list -show_data_hash CRC32"
+
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, WEBM MATROSKA, VP9_PARSER) \
+                               += fate-webm-hdr10-plus-remux
+fate-webm-hdr10-plus-remux: CMD = transcode webm $(TARGET_SAMPLES)/mkv/hdr10_plus_vp9_sample.webm webm "-map 0 -c:v copy" "-map 0 -c:v copy" "-show_packets"
+
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, VP9_PARSER) \
+                               += fate-matroska-hdr10-plus-remux
+fate-matroska-hdr10-plus-remux: CMD = transcode webm $(TARGET_SAMPLES)/mkv/hdr10_plus_vp9_sample.webm matroska "-map 0 -c:v copy" "-map 0 -c:v copy" "-show_packets"
+
+fate-matroska-side-data-pref-codec: CMD = run ffprobe$(PROGSSUF)$(EXESUF) $(TARGET_SAMPLES)/mkv/hdr10tags-both.mkv \
+    -select_streams v:0 -show_streams -show_frames -show_entries stream=stream_side_data:frame=frame_side_data_list
+fate-matroska-side-data-pref-packet: CMD = run ffprobe$(PROGSSUF)$(EXESUF) $(TARGET_SAMPLES)/mkv/hdr10tags-both.mkv \
+    -select_streams v:0 -show_streams -show_frames -show_entries stream=stream_side_data:frame=frame_side_data_list -side_data_prefer_packet mastering_display_metadata,content_light_level
+FATE_MATROSKA_FFPROBE-$(call ALLYES, MATROSKA_DEMUXER HEVC_DECODER) += fate-matroska-side-data-pref-codec fate-matroska-side-data-pref-packet
 
 FATE_SAMPLES_AVCONV += $(FATE_MATROSKA-yes)
 FATE_SAMPLES_FFPROBE += $(FATE_MATROSKA_FFPROBE-yes)

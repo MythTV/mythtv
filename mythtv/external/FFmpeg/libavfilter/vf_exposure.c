@@ -21,10 +21,8 @@
 #include <float.h>
 
 #include "libavutil/opt.h"
-#include "libavutil/imgutils.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 typedef struct ExposureContext {
@@ -38,41 +36,80 @@ typedef struct ExposureContext {
                     int jobnr, int nb_jobs);
 } ExposureContext;
 
+typedef struct ThreadData {
+    AVFrame *out, *in;
+} ThreadData;
+
 static int exposure_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     ExposureContext *s = ctx->priv;
-    AVFrame *frame = arg;
-    const int width = frame->width;
-    const int height = frame->height;
+    ThreadData *td = arg;
+    const int width = td->out->width;
+    const int height = td->out->height;
     const int slice_start = (height * jobnr) / nb_jobs;
     const int slice_end = (height * (jobnr + 1)) / nb_jobs;
     const float black = s->black;
     const float scale = s->scale;
 
     for (int p = 0; p < 3; p++) {
-        const int linesize = frame->linesize[p] / 4;
-        float *ptr = (float *)frame->data[p] + slice_start * linesize;
+        const int slinesize = td->in->linesize[p] / 4;
+        const int dlinesize = td->out->linesize[p] / 4;
+        const float *src = (const float *)td->in->data[p] + slice_start * slinesize;
+        float *ptr = (float *)td->out->data[p] + slice_start * dlinesize;
         for (int y = slice_start; y < slice_end; y++) {
             for (int x = 0; x < width; x++)
-                ptr[x] = (ptr[x] - black) * scale;
+                ptr[x] = (src[x] - black) * scale;
 
-            ptr += linesize;
+            ptr += dlinesize;
+            src += slinesize;
+        }
+    }
+
+    if (td->in->data[3] && td->in->linesize[3] && td->in != td->out) {
+        const int slinesize = td->in->linesize[3] / 4;
+        const int dlinesize = td->out->linesize[3] / 4;
+        const float *src = (const float *)td->in->data[3] + slice_start * slinesize;
+        float *ptr = (float *)td->out->data[3] + slice_start * dlinesize;
+        for (int y = slice_start; y < slice_end; y++) {
+            memcpy(ptr, src, width * sizeof(*ptr));
+            ptr += dlinesize;
+            src += slinesize;
         }
     }
 
     return 0;
 }
 
-static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
+static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
     AVFilterContext *ctx = inlink->dst;
+    AVFilterLink *outlink = ctx->outputs[0];
     ExposureContext *s = ctx->priv;
+    float diff = fabsf(exp2f(-s->exposure) - s->black);
+    ThreadData td;
+    AVFrame *out;
 
-    s->scale = 1.f / (exp2f(-s->exposure) - s->black);
-    ff_filter_execute(ctx, s->do_slice, frame, NULL,
-                      FFMIN(frame->height, ff_filter_get_nb_threads(ctx)));
+    if (av_frame_is_writable(in)) {
+        out = in;
+    } else {
+        out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+        if (!out) {
+            av_frame_free(&in);
+            return AVERROR(ENOMEM);
+        }
+        av_frame_copy_props(out, in);
+    }
 
-    return ff_filter_frame(ctx->outputs[0], frame);
+    diff = diff > 0.f ? diff : 1.f / 1024.f;
+    s->scale = 1.f / diff;
+    td.out = out;
+    td.in = in;
+    ff_filter_execute(ctx, s->do_slice, &td, NULL,
+                      FFMIN(out->height, ff_filter_get_nb_threads(ctx)));
+
+    if (out != in)
+        av_frame_free(&in);
+    return ff_filter_frame(outlink, out);
 }
 
 static av_cold int config_input(AVFilterLink *inlink)
@@ -89,16 +126,8 @@ static const AVFilterPad exposure_inputs[] = {
     {
         .name           = "default",
         .type           = AVMEDIA_TYPE_VIDEO,
-        .flags          = AVFILTERPAD_FLAG_NEEDS_WRITABLE,
         .filter_frame   = filter_frame,
         .config_props   = config_input,
-    },
-};
-
-static const AVFilterPad exposure_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
     },
 };
 
@@ -119,7 +148,7 @@ const AVFilter ff_vf_exposure = {
     .priv_size     = sizeof(ExposureContext),
     .priv_class    = &exposure_class,
     FILTER_INPUTS(exposure_inputs),
-    FILTER_OUTPUTS(exposure_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS(AV_PIX_FMT_GBRPF32, AV_PIX_FMT_GBRAPF32),
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,

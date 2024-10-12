@@ -22,7 +22,6 @@
 
 #include "avfilter.h"
 #include "filters.h"
-#include "internal.h"
 #include "opencl.h"
 #include "opencl_source.h"
 #include "video.h"
@@ -93,7 +92,7 @@ static int xfade_opencl_load(AVFilterContext *avctx,
     if (ctx->transition == CUSTOM) {
         err = ff_opencl_filter_load_program_from_file(avctx, ctx->source_file);
     } else {
-        err = ff_opencl_filter_load_program(avctx, &ff_opencl_source_xfade, 1);
+        err = ff_opencl_filter_load_program(avctx, &ff_source_xfade_cl, 1);
     }
     if (err < 0)
         return err;
@@ -216,6 +215,8 @@ static int xfade_opencl_config_output(AVFilterLink *outlink)
     XFadeOpenCLContext *ctx = avctx->priv;
     AVFilterLink *inlink0 = avctx->inputs[0];
     AVFilterLink *inlink1 = avctx->inputs[1];
+    FilterLink *il = ff_filter_link(inlink0);
+    FilterLink *ol = ff_filter_link(outlink);
     int err;
 
     err = ff_opencl_filter_config_output(outlink);
@@ -245,7 +246,7 @@ static int xfade_opencl_config_output(AVFilterLink *outlink)
 
     outlink->time_base = inlink0->time_base;
     outlink->sample_aspect_ratio = inlink0->sample_aspect_ratio;
-    outlink->frame_rate = inlink0->frame_rate;
+    ol->frame_rate = il->frame_rate;
 
     if (ctx->duration)
         ctx->duration_pts = av_rescale_q(ctx->duration, AV_TIME_BASE_Q, outlink->time_base);
@@ -293,7 +294,9 @@ static int xfade_opencl_activate(AVFilterContext *avctx)
             if (ctx->first_pts + ctx->offset_pts > ctx->xf[0]->pts) {
                 ctx->xf[0] = NULL;
                 ctx->need_second = 0;
-                ff_inlink_consume_frame(avctx->inputs[0], &in);
+                ret = ff_inlink_consume_frame(avctx->inputs[0], &in);
+                if (ret < 0)
+                    return ret;
                 return ff_filter_frame(outlink, in);
             }
 
@@ -302,8 +305,14 @@ static int xfade_opencl_activate(AVFilterContext *avctx)
     }
 
     if (ctx->xf[0] && ff_inlink_queued_frames(avctx->inputs[1]) > 0) {
-        ff_inlink_consume_frame(avctx->inputs[0], &ctx->xf[0]);
-        ff_inlink_consume_frame(avctx->inputs[1], &ctx->xf[1]);
+        ret = ff_inlink_consume_frame(avctx->inputs[0], &ctx->xf[0]);
+        if (ret < 0)
+            return ret;
+        ret = ff_inlink_consume_frame(avctx->inputs[1], &ctx->xf[1]);
+        if (ret < 0) {
+            av_frame_free(&ctx->xf[0]);
+            return ret;
+        }
 
         ctx->last_pts = ctx->xf[1]->pts;
         ctx->pts = ctx->xf[0]->pts;
@@ -378,17 +387,17 @@ static AVFrame *get_video_buffer(AVFilterLink *inlink, int w, int h)
 #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
 
 static const AVOption xfade_opencl_options[] = {
-    { "transition", "set cross fade transition", OFFSET(transition), AV_OPT_TYPE_INT, {.i64=1}, 0, NB_TRANSITIONS-1, FLAGS, "transition" },
-    {   "custom",    "custom transition",     0, AV_OPT_TYPE_CONST, {.i64=CUSTOM},    0, 0, FLAGS, "transition" },
-    {   "fade",      "fade transition",       0, AV_OPT_TYPE_CONST, {.i64=FADE},      0, 0, FLAGS, "transition" },
-    {   "wipeleft",  "wipe left transition",  0, AV_OPT_TYPE_CONST, {.i64=WIPELEFT},  0, 0, FLAGS, "transition" },
-    {   "wiperight", "wipe right transition", 0, AV_OPT_TYPE_CONST, {.i64=WIPERIGHT}, 0, 0, FLAGS, "transition" },
-    {   "wipeup",    "wipe up transition",    0, AV_OPT_TYPE_CONST, {.i64=WIPEUP},    0, 0, FLAGS, "transition" },
-    {   "wipedown",  "wipe down transition",  0, AV_OPT_TYPE_CONST, {.i64=WIPEDOWN},  0, 0, FLAGS, "transition" },
-    {   "slideleft",  "slide left transition",  0, AV_OPT_TYPE_CONST, {.i64=SLIDELEFT},  0, 0, FLAGS, "transition" },
-    {   "slideright", "slide right transition", 0, AV_OPT_TYPE_CONST, {.i64=SLIDERIGHT}, 0, 0, FLAGS, "transition" },
-    {   "slideup",    "slide up transition",    0, AV_OPT_TYPE_CONST, {.i64=SLIDEUP},    0, 0, FLAGS, "transition" },
-    {   "slidedown",  "slide down transition",  0, AV_OPT_TYPE_CONST, {.i64=SLIDEDOWN},  0, 0, FLAGS, "transition" },
+    { "transition", "set cross fade transition", OFFSET(transition), AV_OPT_TYPE_INT, {.i64=1}, 0, NB_TRANSITIONS-1, FLAGS, .unit = "transition" },
+    {   "custom",    "custom transition",     0, AV_OPT_TYPE_CONST, {.i64=CUSTOM},    0, 0, FLAGS, .unit = "transition" },
+    {   "fade",      "fade transition",       0, AV_OPT_TYPE_CONST, {.i64=FADE},      0, 0, FLAGS, .unit = "transition" },
+    {   "wipeleft",  "wipe left transition",  0, AV_OPT_TYPE_CONST, {.i64=WIPELEFT},  0, 0, FLAGS, .unit = "transition" },
+    {   "wiperight", "wipe right transition", 0, AV_OPT_TYPE_CONST, {.i64=WIPERIGHT}, 0, 0, FLAGS, .unit = "transition" },
+    {   "wipeup",    "wipe up transition",    0, AV_OPT_TYPE_CONST, {.i64=WIPEUP},    0, 0, FLAGS, .unit = "transition" },
+    {   "wipedown",  "wipe down transition",  0, AV_OPT_TYPE_CONST, {.i64=WIPEDOWN},  0, 0, FLAGS, .unit = "transition" },
+    {   "slideleft",  "slide left transition",  0, AV_OPT_TYPE_CONST, {.i64=SLIDELEFT},  0, 0, FLAGS, .unit = "transition" },
+    {   "slideright", "slide right transition", 0, AV_OPT_TYPE_CONST, {.i64=SLIDERIGHT}, 0, 0, FLAGS, .unit = "transition" },
+    {   "slideup",    "slide up transition",    0, AV_OPT_TYPE_CONST, {.i64=SLIDEUP},    0, 0, FLAGS, .unit = "transition" },
+    {   "slidedown",  "slide down transition",  0, AV_OPT_TYPE_CONST, {.i64=SLIDEDOWN},  0, 0, FLAGS, .unit = "transition" },
     { "source", "set OpenCL program source file for custom transition", OFFSET(source_file), AV_OPT_TYPE_STRING, {.str = NULL}, .flags = FLAGS },
     { "kernel", "set kernel name in program file for custom transition", OFFSET(kernel_name), AV_OPT_TYPE_STRING, {.str = NULL}, .flags = FLAGS },
     { "duration", "set cross fade duration", OFFSET(duration), AV_OPT_TYPE_DURATION, {.i64=1000000}, 0, 60000000, FLAGS },
@@ -433,4 +442,5 @@ const AVFilter ff_vf_xfade_opencl = {
     FILTER_OUTPUTS(xfade_opencl_outputs),
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
     .flags_internal  = FF_FILTER_FLAG_HWFRAME_AWARE,
+    .flags          = AVFILTER_FLAG_HWDEVICE,
 };

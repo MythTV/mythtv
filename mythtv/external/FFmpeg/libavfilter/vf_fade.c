@@ -33,8 +33,8 @@
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "drawutils.h"
+#include "filters.h"
 #include "formats.h"
-#include "internal.h"
 #include "video.h"
 
 #define R 0
@@ -442,6 +442,7 @@ static int config_input(AVFilterLink *inlink)
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 {
+    FilterLink      *inl = ff_filter_link(inlink);
     AVFilterContext *ctx = inlink->dst;
     FadeContext *s       = ctx->priv;
 
@@ -449,7 +450,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     if (s->fade_state == VF_FADE_WAITING) {
         s->factor=0;
         if (frame->pts >= s->start_time_pts
-            && inlink->frame_count_out >= s->start_frame) {
+            && inl->frame_count_out >= s->start_frame) {
             // Time to start fading
             s->fade_state = VF_FADE_FADING;
 
@@ -460,15 +461,15 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 
             // Save start frame in case we are starting based on time and fading based on frames
             if (s->start_time_pts != 0 && s->start_frame == 0) {
-                s->start_frame = inlink->frame_count_out;
+                s->start_frame = inl->frame_count_out;
             }
         }
     }
     if (s->fade_state == VF_FADE_FADING) {
         if (s->duration_pts == 0) {
             // Fading based on frame count
-            s->factor = (inlink->frame_count_out - s->start_frame) * s->fade_per_frame;
-            if (inlink->frame_count_out > s->start_frame + s->nb_frames) {
+            s->factor = (inl->frame_count_out - s->start_frame) * s->fade_per_frame;
+            if (inl->frame_count_out > s->start_frame + s->nb_frames) {
                 s->fade_state = VF_FADE_DONE;
             }
 
@@ -519,8 +520,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
 
 static const AVOption fade_options[] = {
-    { "type", "set the fade direction", OFFSET(type), AV_OPT_TYPE_INT, { .i64 = FADE_IN }, FADE_IN, FADE_OUT, FLAGS, "type" },
-    { "t",    "set the fade direction", OFFSET(type), AV_OPT_TYPE_INT, { .i64 = FADE_IN }, FADE_IN, FADE_OUT, FLAGS, "type" },
+    { "type", "set the fade direction", OFFSET(type), AV_OPT_TYPE_INT, { .i64 = FADE_IN }, FADE_IN, FADE_OUT, FLAGS, .unit = "type" },
+    { "t",    "set the fade direction", OFFSET(type), AV_OPT_TYPE_INT, { .i64 = FADE_IN }, FADE_IN, FADE_OUT, FLAGS, .unit = "type" },
         { "in",  "fade-in",  0, AV_OPT_TYPE_CONST, { .i64 = FADE_IN },  .flags = FLAGS, .unit = "type" },
         { "out", "fade-out", 0, AV_OPT_TYPE_CONST, { .i64 = FADE_OUT }, .flags = FLAGS, .unit = "type" },
     { "start_frame", "Number of the first frame to which to apply the effect.",
@@ -557,13 +558,6 @@ static const AVFilterPad avfilter_vf_fade_inputs[] = {
     },
 };
 
-static const AVFilterPad avfilter_vf_fade_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_fade = {
     .name          = "fade",
     .description   = NULL_IF_CONFIG_SMALL("Fade in/out input video."),
@@ -571,7 +565,7 @@ const AVFilter ff_vf_fade = {
     .priv_size     = sizeof(FadeContext),
     .priv_class    = &fade_class,
     FILTER_INPUTS(avfilter_vf_fade_inputs),
-    FILTER_OUTPUTS(avfilter_vf_fade_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_QUERY_FUNC(query_formats),
     .flags         = AVFILTER_FLAG_SLICE_THREADS |
                      AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,

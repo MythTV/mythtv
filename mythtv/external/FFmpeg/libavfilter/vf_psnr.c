@@ -26,15 +26,15 @@
  */
 
 #include "libavutil/avstring.h"
+#include "libavutil/file_open.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "drawutils.h"
-#include "formats.h"
+#include "filters.h"
 #include "framesync.h"
-#include "internal.h"
 #include "psnr.h"
-#include "video.h"
 
 typedef struct PSNRContext {
     const AVClass *class;
@@ -189,6 +189,13 @@ static int do_psnr(FFFrameSync *fs)
         td.planeheight[c] = s->planeheight[c];
     }
 
+    if (master->color_range != ref->color_range) {
+        av_log(ctx, AV_LOG_WARNING, "master and reference "
+               "frames use different color ranges (%s != %s)\n",
+               av_color_range_name(master->color_range),
+               av_color_range_name(ref->color_range));
+    }
+
     ff_filter_execute(ctx, compute_images_mse, &td, NULL,
                       FFMIN(s->planeheight[1], s->nb_threads));
 
@@ -283,10 +290,8 @@ static av_cold int init(AVFilterContext *ctx)
             s->stats_file = avpriv_fopen_utf8(s->stats_file_str, "w");
             if (!s->stats_file) {
                 int err = AVERROR(errno);
-                char buf[128];
-                av_strerror(err, buf, sizeof(buf));
                 av_log(ctx, AV_LOG_ERROR, "Could not open stats file %s: %s\n",
-                       s->stats_file_str, buf);
+                       s->stats_file_str, av_err2str(err));
                 return err;
             }
         }
@@ -376,6 +381,8 @@ static int config_output(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     PSNRContext *s = ctx->priv;
     AVFilterLink *mainlink = ctx->inputs[0];
+    FilterLink *il = ff_filter_link(mainlink);
+    FilterLink *ol = ff_filter_link(outlink);
     int ret;
 
     ret = ff_framesync_init_dualinput(&s->fs, ctx);
@@ -385,7 +392,7 @@ static int config_output(AVFilterLink *outlink)
     outlink->h = mainlink->h;
     outlink->time_base = mainlink->time_base;
     outlink->sample_aspect_ratio = mainlink->sample_aspect_ratio;
-    outlink->frame_rate = mainlink->frame_rate;
+    ol->frame_rate = il->frame_rate;
     if ((ret = ff_framesync_configure(&s->fs)) < 0)
         return ret;
 

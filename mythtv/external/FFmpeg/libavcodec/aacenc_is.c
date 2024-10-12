@@ -59,24 +59,24 @@ struct AACISError ff_aac_is_encoding_err(AACEncContext *s, ChannelElement *cpe,
         float minthr = FFMIN(band0->threshold, band1->threshold);
         for (i = 0; i < sce0->ics.swb_sizes[g]; i++)
             IS[i] = (L[start+(w+w2)*128+i] + phase*R[start+(w+w2)*128+i])*sqrt(ener0/ener01);
-        s->abs_pow34(L34, &L[start+(w+w2)*128], sce0->ics.swb_sizes[g]);
-        s->abs_pow34(R34, &R[start+(w+w2)*128], sce0->ics.swb_sizes[g]);
-        s->abs_pow34(I34, IS,                   sce0->ics.swb_sizes[g]);
+        s->aacdsp.abs_pow34(L34, &L[start+(w+w2)*128], sce0->ics.swb_sizes[g]);
+        s->aacdsp.abs_pow34(R34, &R[start+(w+w2)*128], sce0->ics.swb_sizes[g]);
+        s->aacdsp.abs_pow34(I34, IS,                   sce0->ics.swb_sizes[g]);
         maxval = find_max_val(1, sce0->ics.swb_sizes[g], I34);
         is_band_type = find_min_book(maxval, is_sf_idx);
         dist1 += quantize_band_cost(s, &L[start + (w+w2)*128], L34,
                                     sce0->ics.swb_sizes[g],
                                     sce0->sf_idx[w*16+g],
                                     sce0->band_type[w*16+g],
-                                    s->lambda / band0->threshold, INFINITY, NULL, NULL, 0);
+                                    s->lambda / band0->threshold, INFINITY, NULL, NULL);
         dist1 += quantize_band_cost(s, &R[start + (w+w2)*128], R34,
                                     sce1->ics.swb_sizes[g],
                                     sce1->sf_idx[w*16+g],
                                     sce1->band_type[w*16+g],
-                                    s->lambda / band1->threshold, INFINITY, NULL, NULL, 0);
+                                    s->lambda / band1->threshold, INFINITY, NULL, NULL);
         dist2 += quantize_band_cost(s, IS, I34, sce0->ics.swb_sizes[g],
                                     is_sf_idx, is_band_type,
-                                    s->lambda / minthr, INFINITY, NULL, NULL, 0);
+                                    s->lambda / minthr, INFINITY, NULL, NULL);
         for (i = 0; i < sce0->ics.swb_sizes[g]; i++) {
             dist_spec_err += (L34[i] - I34[i])*(L34[i] - I34[i]);
             dist_spec_err += (R34[i] - I34[i]*e01_34)*(R34[i] - I34[i]*e01_34);

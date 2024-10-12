@@ -27,7 +27,6 @@
 #define SAMPLE_SIZE 16
 #define PLANAR 0
 #include "flacdsp_template.c"
-#include "flacdsp_lpc_template.c"
 
 #undef  PLANAR
 #define PLANAR 1
@@ -38,7 +37,6 @@
 #define SAMPLE_SIZE 32
 #define PLANAR 0
 #include "flacdsp_template.c"
-#include "flacdsp_lpc_template.c"
 
 #undef  PLANAR
 #define PLANAR 1
@@ -86,13 +84,41 @@ static void flac_lpc_32_c(int32_t *decoded, const int coeffs[32],
 
 }
 
-av_cold void ff_flacdsp_init(FLACDSPContext *c, enum AVSampleFormat fmt, int channels,
-                             int bps)
+static void flac_lpc_33_c(int64_t *decoded, const int32_t *residual,
+                          const int coeffs[32], int pred_order,
+                          int qlevel, int len)
+{
+    int i, j;
+
+    for (i = pred_order; i < len; i++, decoded++) {
+        int64_t sum = 0;
+        for (j = 0; j < pred_order; j++)
+            sum += (int64_t)coeffs[j] * (uint64_t)decoded[j];
+        decoded[j] = residual[i] + (sum >> qlevel);
+    }
+}
+
+static void flac_wasted_32_c(int32_t *decoded, int wasted, int len)
+{
+    for (int i = 0; i < len; i++)
+        decoded[i] = (unsigned)decoded[i] << wasted;
+}
+
+static void flac_wasted_33_c(int64_t *decoded, const int32_t *residual,
+                             int wasted, int len)
+{
+    for (int i = 0; i < len; i++)
+        decoded[i] = (uint64_t)residual[i] << wasted;
+}
+
+av_cold void ff_flacdsp_init(FLACDSPContext *c, enum AVSampleFormat fmt, int channels)
 {
     c->lpc16        = flac_lpc_16_c;
     c->lpc32        = flac_lpc_32_c;
-    c->lpc16_encode = flac_lpc_encode_c_16;
-    c->lpc32_encode = flac_lpc_encode_c_32;
+    c->lpc33        = flac_lpc_33_c;
+
+    c->wasted32     = flac_wasted_32_c;
+    c->wasted33     = flac_wasted_33_c;
 
     switch (fmt) {
     case AV_SAMPLE_FMT_S32:
@@ -125,8 +151,10 @@ av_cold void ff_flacdsp_init(FLACDSPContext *c, enum AVSampleFormat fmt, int cha
     }
 
 #if ARCH_ARM
-    ff_flacdsp_init_arm(c, fmt, channels, bps);
+    ff_flacdsp_init_arm(c, fmt, channels);
+#elif ARCH_RISCV
+    ff_flacdsp_init_riscv(c, fmt, channels);
 #elif ARCH_X86
-    ff_flacdsp_init_x86(c, fmt, channels, bps);
+    ff_flacdsp_init_x86(c, fmt, channels);
 #endif
 }

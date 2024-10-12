@@ -24,6 +24,7 @@
 #include "libavutil/buffer.h"
 #include "libavutil/frame.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/imgutils_internal.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixfmt.h"
 
@@ -234,11 +235,6 @@ AVFrame *ff_frame_pool_get(FFFramePool *pool)
         break;
     case AVMEDIA_TYPE_AUDIO:
         frame->nb_samples = pool->nb_samples;
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->channels = pool->channels;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         frame->ch_layout.nb_channels = pool->channels;
         frame->format = pool->format;
         frame->linesize[0] = pool->linesize[0];

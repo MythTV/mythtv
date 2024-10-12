@@ -26,6 +26,7 @@
  */
 
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "subtitles.h"
 #include "libavcodec/jacosub.h"
@@ -124,35 +125,35 @@ shift_and_ret:
     return buf + len;
 }
 
-static int get_shift(int timeres, const char *buf)
+static int get_shift(unsigned timeres, const char *buf)
 {
     int sign = 1;
-    int a = 0, b = 0, c = 0, d = 0;
+    int h = 0, m = 0, s = 0, d = 0;
     int64_t ret;
 #define SSEP "%*1[.:]"
-    int n = sscanf(buf, "%d"SSEP"%d"SSEP"%d"SSEP"%d", &a, &b, &c, &d);
+    int n = sscanf(buf, "%d"SSEP"%d"SSEP"%d"SSEP"%d", &h, &m, &s, &d);
 #undef SSEP
 
-    if (a == INT_MIN)
+    if (h == INT_MIN)
         return 0;
 
-    if (*buf == '-' || a < 0) {
+    if (*buf == '-' || h < 0) {
         sign = -1;
-        a = FFABS(a);
+        h = FFABS(h);
     }
 
     ret = 0;
     switch (n) {
-    case 4:
-        ret = sign * (((int64_t)a*3600 + b*60 + c) * timeres + d);
-        break;
-    case 3:
-        ret = sign * ((         (int64_t)a*60 + b) * timeres + c);
-        break;
-    case 2:
-        ret = sign * ((                (int64_t)a) * timeres + b);
-        break;
+    case 1:        h = 0;                   //clear all in case of a single parameter
+    case 2: s = m; m = h; h = 0;            //shift into second subsecondd
+    case 3: d = s; s = m; m = h; h = 0;     //shift into minute second subsecond
     }
+
+    ret = (int64_t)h*3600 + (int64_t)m*60 + s;
+    if (FFABS(ret) > (INT64_MAX - FFABS((int64_t)d)) / timeres)
+        return 0;
+    ret = sign * (ret * timeres + d);
+
     if ((int)ret != ret)
         ret = 0;
 
@@ -227,13 +228,16 @@ static int jacosub_read_header(AVFormatContext *s)
             }
             av_bprintf(&header, "#S %s", p);
             break;
-        case 'T': // ...but must be placed after TIMERES
-            jacosub->timeres = strtol(p, NULL, 10);
-            if (!jacosub->timeres)
+        case 'T': { // ...but must be placed after TIMERES
+            int64_t timeres = strtol(p, NULL, 10);
+            if (timeres <= 0 || timeres > UINT32_MAX) {
                 jacosub->timeres = 30;
-            else
+            } else {
+                jacosub->timeres = timeres;
                 av_bprintf(&header, "#T %s", p);
+            }
             break;
+        }
         }
     }
 
@@ -253,11 +257,11 @@ static int jacosub_read_header(AVFormatContext *s)
     return 0;
 }
 
-const AVInputFormat ff_jacosub_demuxer = {
-    .name           = "jacosub",
-    .long_name      = NULL_IF_CONFIG_SMALL("JACOsub subtitle format"),
+const FFInputFormat ff_jacosub_demuxer = {
+    .p.name         = "jacosub",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("JACOsub subtitle format"),
     .priv_data_size = sizeof(JACOsubContext),
-    .flags_internal = FF_FMT_INIT_CLEANUP,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .read_probe     = jacosub_probe,
     .read_header    = jacosub_read_header,
     .read_packet    = ff_subtitles_read_packet,
