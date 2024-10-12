@@ -21,14 +21,13 @@
  */
 
 #include "libavutil/avassert.h"
-#include "libavutil/bswap.h"
-#include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "copy_block.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 #define NGLYPHS 256
 #define GLYPH_COORD_VECT_SIZE 16
@@ -1486,11 +1485,13 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
             return ret;
 
         ctx->rotate_code = header.rotate_code;
-        if ((ctx->frame->key_frame = !header.seq_num)) {
+        if (!header.seq_num) {
+            ctx->frame->flags |= AV_FRAME_FLAG_KEY;
             ctx->frame->pict_type = AV_PICTURE_TYPE_I;
             fill_frame(ctx->frm1, ctx->npixels, header.bg_color);
             fill_frame(ctx->frm2, ctx->npixels, header.bg_color);
         } else {
+            ctx->frame->flags &= ~AV_FRAME_FLAG_KEY;
             ctx->frame->pict_type = AV_PICTURE_TYPE_P;
         }
 
@@ -1518,7 +1519,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_sanm_decoder = {
     .p.name         = "sanm",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("LucasArts SANM/Smush video"),
+    CODEC_LONG_NAME("LucasArts SANM/Smush video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_SANM,
     .priv_data_size = sizeof(SANMVideoContext),
@@ -1526,5 +1527,4 @@ const FFCodec ff_sanm_decoder = {
     .close          = decode_end,
     FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

@@ -62,14 +62,16 @@ void  free(void *ptr);
 
 #endif /* MALLOC_PREFIX */
 
-#define ALIGN (HAVE_AVX512 ? 64 : (HAVE_AVX ? 32 : 16))
+#define ALIGN (HAVE_SIMD_ALIGN_64 ? 64 : (HAVE_SIMD_ALIGN_32 ? 32 : 16))
+
+#define FF_MEMORY_POISON 0x2a
 
 /* NOTE: if you want to override these functions with your own
  * implementations (not recommended) you have to link libav* as
  * dynamic libraries and remove -Wl,-Bsymbolic from the linker flags.
  * Note that this will cost performance. */
 
-static atomic_size_t max_alloc_size = ATOMIC_VAR_INIT(INT_MAX);
+static atomic_size_t max_alloc_size = INT_MAX;
 
 void av_max_alloc(size_t max){
     atomic_store_explicit(&max_alloc_size, max, memory_order_relaxed);
@@ -211,16 +213,6 @@ void *av_malloc_array(size_t nmemb, size_t size)
         return NULL;
     return av_malloc(result);
 }
-
-#if FF_API_AV_MALLOCZ_ARRAY
-void *av_mallocz_array(size_t nmemb, size_t size)
-{
-    size_t result;
-    if (size_mult(nmemb, size, &result) < 0)
-        return NULL;
-    return av_mallocz(result);
-}
-#endif
 
 void *av_realloc_array(void *ptr, size_t nmemb, size_t size)
 {

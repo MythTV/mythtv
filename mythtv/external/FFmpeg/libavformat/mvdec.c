@@ -28,9 +28,11 @@
 #include "libavutil/eval.h"
 #include "libavutil/intfloat.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "libavutil/rational.h"
 
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 typedef struct MvContext {
@@ -254,7 +256,8 @@ static int read_table(AVFormatContext *avctx, AVStream *st,
         if (avio_feof(pb))
             return AVERROR_EOF;
 
-        avio_read(pb, name, 16);
+        if (avio_read(pb, name, 16) != 16)
+            return AVERROR_INVALIDDATA;
         name[sizeof(name) - 1] = 0;
         size = avio_rb32(pb);
         if (size < 0) {
@@ -539,9 +542,9 @@ static int mv_read_seek(AVFormatContext *avctx, int stream_index,
     return 0;
 }
 
-const AVInputFormat ff_mv_demuxer = {
-    .name           = "mv",
-    .long_name      = NULL_IF_CONFIG_SMALL("Silicon Graphics Movie"),
+const FFInputFormat ff_mv_demuxer = {
+    .p.name         = "mv",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Silicon Graphics Movie"),
     .priv_data_size = sizeof(MvContext),
     .read_probe     = mv_probe,
     .read_header    = mv_read_header,

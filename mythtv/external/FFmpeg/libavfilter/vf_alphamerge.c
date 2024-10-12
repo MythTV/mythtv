@@ -33,7 +33,6 @@
 #include "formats.h"
 #include "filters.h"
 #include "framesync.h"
-#include "internal.h"
 #include "video.h"
 
 enum { Y, U, V, A };
@@ -59,6 +58,12 @@ static int do_alphamerge(FFFrameSync *fs)
         return ret;
     if (!alpha_buf)
         return ff_filter_frame(ctx->outputs[0], main_buf);
+
+    if (alpha_buf->color_range == AVCOL_RANGE_MPEG) {
+        av_log(ctx, AV_LOG_WARNING, "alpha plane color range tagged as %s, "
+               "output will be wrong!\n",
+               av_color_range_name(alpha_buf->color_range));
+    }
 
     if (s->is_packed_rgb) {
         int x, y;
@@ -122,9 +127,11 @@ static int config_input_main(AVFilterLink *inlink)
 
 static int config_output(AVFilterLink *outlink)
 {
+    FilterLink *outl = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
     AlphaMergeContext *s = ctx->priv;
     AVFilterLink *mainlink = ctx->inputs[0];
+    FilterLink *ml = ff_filter_link(mainlink);
     AVFilterLink *alphalink = ctx->inputs[1];
     int ret;
 
@@ -143,7 +150,7 @@ static int config_output(AVFilterLink *outlink)
     outlink->h = mainlink->h;
     outlink->time_base = mainlink->time_base;
     outlink->sample_aspect_ratio = mainlink->sample_aspect_ratio;
-    outlink->frame_rate = mainlink->frame_rate;
+    outl->frame_rate = ml->frame_rate;
 
     return ff_framesync_configure(&s->fs);
 }

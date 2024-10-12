@@ -24,8 +24,8 @@
  * SAUCE header parser
  */
 
-#include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
+#include "libavutil/mem.h"
 #include "avformat.h"
 #include "sauce.h"
 
@@ -34,7 +34,12 @@ int ff_sauce_read(AVFormatContext *avctx, uint64_t *fsize, int *got_width, int g
     AVIOContext *pb = avctx->pb;
     char buf[36];
     int datatype, filetype, t1, t2, nb_comments;
-    uint64_t start_pos = avio_size(pb) - 128;
+    int64_t start_pos = avio_size(pb);
+
+    if (start_pos < 128)
+        return AVERROR_INVALIDDATA;
+
+    start_pos -= 128;
 
     avio_seek(pb, start_pos, SEEK_SET);
     if (avio_read(pb, buf, 7) != 7)

@@ -216,7 +216,16 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
      *   - the DRM frame format is passed in the DRM frame descriptor layer.
      *       check the v4l2_get_drm_frame function.
      */
-    switch (ff_get_format(avctx, avctx->codec->pix_fmts)) {
+    {
+    const enum AVPixelFormat *pix_fmts = NULL;
+    int num_pix_fmts = 0;
+    ret = avcodec_get_supported_config(avctx, NULL, AV_CODEC_CONFIG_PIX_FORMAT,
+                                       0, (const void **) &pix_fmts, &num_pix_fmts);
+    if (ret < 0)
+        return ret;
+    if (pix_fmts == NULL || num_pix_fmts < 1)
+        return -1;
+    switch (ff_get_format(avctx, pix_fmts)) {
     case AV_PIX_FMT_DRM_PRIME:
         s->output_drm = 1;
         break;
@@ -225,6 +234,7 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
         break;
     default:
         break;
+    }
     }
 
     s->device_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_DRM);
@@ -279,7 +289,7 @@ static const AVCodecHWConfigInternal *v4l2_m2m_hw_configs[] = {
 
 #define M2MDEC_CLASS(NAME) \
     static const AVClass v4l2_m2m_ ## NAME ## _dec_class = { \
-        .class_name = #NAME "_v4l2_m2m_decoder", \
+        .class_name = #NAME "_v4l2m2m_decoder", \
         .item_name  = av_default_item_name, \
         .option     = options, \
         .version    = LIBAVUTIL_VERSION_INT, \
@@ -289,7 +299,7 @@ static const AVCodecHWConfigInternal *v4l2_m2m_hw_configs[] = {
     M2MDEC_CLASS(NAME) \
     const FFCodec ff_ ## NAME ## _v4l2m2m_decoder = { \
         .p.name         = #NAME "_v4l2m2m" , \
-        .p.long_name    = NULL_IF_CONFIG_SMALL("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
+        CODEC_LONG_NAME("V4L2 mem2mem " LONGNAME " decoder wrapper"), \
         .p.type         = AVMEDIA_TYPE_VIDEO, \
         .p.id           = CODEC , \
         .priv_data_size = sizeof(V4L2m2mPriv), \
@@ -304,7 +314,8 @@ static const AVCodecHWConfigInternal *v4l2_m2m_hw_configs[] = {
         .bsfs           = bsf_name, \
         .hw_configs     = v4l2_m2m_hw_configs, \
         .p.capabilities = AV_CODEC_CAP_HARDWARE | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AVOID_PROBING, \
-        .caps_internal  = FF_CODEC_CAP_SETS_PKT_DTS | FF_CODEC_CAP_INIT_CLEANUP, \
+        .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE | \
+                          FF_CODEC_CAP_INIT_CLEANUP, \
         .p.wrapper_name = "v4l2m2m", \
     }
 

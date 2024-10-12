@@ -20,16 +20,33 @@
  */
 
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 #define CDG_PACKET_SIZE    24
 #define CDG_COMMAND        0x09
 #define CDG_MASK           0x3F
 
+static int read_probe(const AVProbeData *p)
+{
+    const int cnt = p->buf_size / CDG_PACKET_SIZE;
+    int score = 0;
+
+    for (int i = 0; i < cnt; i++) {
+        const int x = p->buf[i * CDG_PACKET_SIZE] & CDG_MASK;
+
+        score += x == CDG_COMMAND;
+        if (x != CDG_COMMAND && x != 0)
+            return 0;
+    }
+
+    return FFMIN(score, AVPROBE_SCORE_MAX);
+}
+
 static int read_header(AVFormatContext *s)
 {
     AVStream *vst;
-    int ret;
+    int64_t ret;
 
     vst = avformat_new_stream(s, NULL);
     if (!vst)
@@ -67,11 +84,12 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-const AVInputFormat ff_cdg_demuxer = {
-    .name           = "cdg",
-    .long_name      = NULL_IF_CONFIG_SMALL("CD Graphics"),
+const FFInputFormat ff_cdg_demuxer = {
+    .p.name         = "cdg",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("CD Graphics"),
+    .p.flags        = AVFMT_GENERIC_INDEX,
+    .p.extensions   = "cdg",
+    .read_probe     = read_probe,
     .read_header    = read_header,
     .read_packet    = read_packet,
-    .flags          = AVFMT_GENERIC_INDEX,
-    .extensions     = "cdg",
 };

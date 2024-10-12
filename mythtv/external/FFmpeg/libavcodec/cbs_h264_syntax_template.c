@@ -510,9 +510,9 @@ static int FUNC(pps)(CodedBitstreamContext *ctx, RWContext *rw,
     return 0;
 }
 
-static int FUNC(sei_buffering_period)(CodedBitstreamContext *ctx, RWContext *rw,
-                                      H264RawSEIBufferingPeriod *current,
-                                      SEIMessageState *sei)
+SEI_FUNC(sei_buffering_period, (CodedBitstreamContext *ctx, RWContext *rw,
+                                H264RawSEIBufferingPeriod *current,
+                                SEIMessageState *sei))
 {
     CodedBitstreamH264Context *h264 = ctx->priv_data;
     const H264RawSPS *sps;
@@ -604,9 +604,8 @@ static int FUNC(sei_pic_timestamp)(CodedBitstreamContext *ctx, RWContext *rw,
     return 0;
 }
 
-static int FUNC(sei_pic_timing)(CodedBitstreamContext *ctx, RWContext *rw,
-                                H264RawSEIPicTiming *current,
-                                SEIMessageState *sei)
+SEI_FUNC(sei_pic_timing, (CodedBitstreamContext *ctx, RWContext *rw,
+                          H264RawSEIPicTiming *current, SEIMessageState *sei))
 {
     CodedBitstreamH264Context *h264 = ctx->priv_data;
     const H264RawSPS *sps;
@@ -676,9 +675,9 @@ static int FUNC(sei_pic_timing)(CodedBitstreamContext *ctx, RWContext *rw,
     return 0;
 }
 
-static int FUNC(sei_pan_scan_rect)(CodedBitstreamContext *ctx, RWContext *rw,
-                                   H264RawSEIPanScanRect *current,
-                                   SEIMessageState *sei)
+SEI_FUNC(sei_pan_scan_rect, (CodedBitstreamContext *ctx, RWContext *rw,
+                             H264RawSEIPanScanRect *current,
+                             SEIMessageState *sei))
 {
     int err, i;
 
@@ -703,9 +702,9 @@ static int FUNC(sei_pan_scan_rect)(CodedBitstreamContext *ctx, RWContext *rw,
     return 0;
 }
 
-static int FUNC(sei_recovery_point)(CodedBitstreamContext *ctx, RWContext *rw,
-                                    H264RawSEIRecoveryPoint *current,
-                                    SEIMessageState *sei)
+SEI_FUNC(sei_recovery_point, (CodedBitstreamContext *ctx, RWContext *rw,
+                              H264RawSEIRecoveryPoint *current,
+                              SEIMessageState *sei))
 {
     int err;
 
@@ -719,9 +718,9 @@ static int FUNC(sei_recovery_point)(CodedBitstreamContext *ctx, RWContext *rw,
     return 0;
 }
 
-static int FUNC(film_grain_characteristics)(CodedBitstreamContext *ctx, RWContext *rw,
-                                            H264RawFilmGrainCharacteristics *current,
-                                            SEIMessageState *state)
+SEI_FUNC(film_grain_characteristics, (CodedBitstreamContext *ctx, RWContext *rw,
+                                      H264RawFilmGrainCharacteristics *current,
+                                      SEIMessageState *state))
 {
     CodedBitstreamH264Context *h264 = ctx->priv_data;
     const H264RawSPS *sps;
@@ -802,9 +801,43 @@ static int FUNC(film_grain_characteristics)(CodedBitstreamContext *ctx, RWContex
     return 0;
 }
 
-static int FUNC(sei_display_orientation)(CodedBitstreamContext *ctx, RWContext *rw,
-                                         H264RawSEIDisplayOrientation *current,
-                                         SEIMessageState *sei)
+SEI_FUNC(sei_frame_packing_arrangement, (CodedBitstreamContext *ctx, RWContext *rw,
+                                         H264RawSEIFramePackingArrangement *current,
+                                         SEIMessageState *sei))
+{
+    int err;
+
+    HEADER("Frame Packing Arrangement");
+
+    ue(frame_packing_arrangement_id, 0, MAX_UINT_BITS(31));
+    flag(frame_packing_arrangement_cancel_flag);
+    if (!current->frame_packing_arrangement_cancel_flag) {
+        u(7, frame_packing_arrangement_type, 0, 7);
+        flag(quincunx_sampling_flag);
+        u(6, content_interpretation_type, 0, 2);
+        flag(spatial_flipping_flag);
+        flag(frame0_flipped_flag);
+        flag(field_views_flag);
+        flag(current_frame_is_frame0_flag);
+        flag(frame0_self_contained_flag);
+        flag(frame1_self_contained_flag);
+        if (!current->quincunx_sampling_flag && current->frame_packing_arrangement_type != 5) {
+            ub(4, frame0_grid_position_x);
+            ub(4, frame0_grid_position_y);
+            ub(4, frame1_grid_position_x);
+            ub(4, frame1_grid_position_y);
+        }
+        fixed(8, frame_packing_arrangement_reserved_byte, 0);
+        ue(frame_packing_arrangement_repetition_period, 0, 16384);
+    }
+    flag(frame_packing_arrangement_extension_flag);
+
+    return 0;
+}
+
+SEI_FUNC(sei_display_orientation, (CodedBitstreamContext *ctx, RWContext *rw,
+                                   H264RawSEIDisplayOrientation *current,
+                                   SEIMessageState *sei))
 {
     int err;
 

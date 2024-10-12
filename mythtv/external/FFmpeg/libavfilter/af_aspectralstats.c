@@ -21,13 +21,29 @@
 #include <float.h>
 #include <math.h>
 
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/tx.h"
 #include "audio.h"
 #include "avfilter.h"
 #include "filters.h"
-#include "internal.h"
 #include "window_func.h"
+
+#define MEASURE_ALL       UINT_MAX
+#define MEASURE_NONE      0
+#define MEASURE_MEAN     (1 <<  0)
+#define MEASURE_VARIANCE (1 <<  1)
+#define MEASURE_CENTROID (1 <<  2)
+#define MEASURE_SPREAD   (1 <<  3)
+#define MEASURE_SKEWNESS (1 <<  4)
+#define MEASURE_KURTOSIS (1 <<  5)
+#define MEASURE_ENTROPY  (1 <<  6)
+#define MEASURE_FLATNESS (1 <<  7)
+#define MEASURE_CREST    (1 <<  8)
+#define MEASURE_FLUX     (1 <<  9)
+#define MEASURE_SLOPE    (1 << 10)
+#define MEASURE_DECREASE (1 << 11)
+#define MEASURE_ROLLOFF  (1 << 12)
 
 typedef struct ChannelSpectralStats {
     float mean;
@@ -47,6 +63,7 @@ typedef struct ChannelSpectralStats {
 
 typedef struct AudioSpectralStatsContext {
     const AVClass *class;
+    unsigned measure;
     int win_size;
     int win_func;
     float overlap;
@@ -70,6 +87,22 @@ static const AVOption aspectralstats_options[] = {
     { "win_size", "set the window size", OFFSET(win_size), AV_OPT_TYPE_INT, {.i64=2048}, 32, 65536, A },
     WIN_FUNC_OPTION("win_func", OFFSET(win_func), A, WFUNC_HANNING),
     { "overlap", "set window overlap", OFFSET(overlap), AV_OPT_TYPE_FLOAT, {.dbl=0.5}, 0,  1, A },
+    { "measure", "select the parameters which are measured", OFFSET(measure), AV_OPT_TYPE_FLAGS, {.i64=MEASURE_ALL}, 0, UINT_MAX, A, .unit = "measure" },
+    { "none",     "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_NONE    }, 0, 0, A, .unit = "measure" },
+    { "all",      "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_ALL     }, 0, 0, A, .unit = "measure" },
+    { "mean",     "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_MEAN    }, 0, 0, A, .unit = "measure" },
+    { "variance", "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_VARIANCE}, 0, 0, A, .unit = "measure" },
+    { "centroid", "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_CENTROID}, 0, 0, A, .unit = "measure" },
+    { "spread",   "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_SPREAD  }, 0, 0, A, .unit = "measure" },
+    { "skewness", "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_SKEWNESS}, 0, 0, A, .unit = "measure" },
+    { "kurtosis", "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_KURTOSIS}, 0, 0, A, .unit = "measure" },
+    { "entropy",  "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_ENTROPY }, 0, 0, A, .unit = "measure" },
+    { "flatness", "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_FLATNESS}, 0, 0, A, .unit = "measure" },
+    { "crest",    "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_CREST   }, 0, 0, A, .unit = "measure" },
+    { "flux",     "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_FLUX    }, 0, 0, A, .unit = "measure" },
+    { "slope",    "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_SLOPE   }, 0, 0, A, .unit = "measure" },
+    { "decrease", "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_DECREASE}, 0, 0, A, .unit = "measure" },
+    { "rolloff",  "", 0, AV_OPT_TYPE_CONST, {.i64=MEASURE_ROLLOFF }, 0, 0, A, .unit = "measure" },
     { NULL }
 };
 
@@ -78,7 +111,7 @@ AVFILTER_DEFINE_CLASS(aspectralstats);
 static int config_output(AVFilterLink *outlink)
 {
     AudioSpectralStatsContext *s = outlink->src->priv;
-    float overlap, scale;
+    float overlap, scale = 1.f;
     int ret;
 
     s->nb_channels = outlink->ch_layout.nb_channels;
@@ -166,19 +199,32 @@ static void set_metadata(AudioSpectralStatsContext *s, AVDictionary **metadata)
     for (int ch = 0; ch < s->nb_channels; ch++) {
         ChannelSpectralStats *stats = &s->stats[ch];
 
-        set_meta(metadata, ch + 1, "mean",     "%g", stats->mean);
-        set_meta(metadata, ch + 1, "variance", "%g", stats->variance);
-        set_meta(metadata, ch + 1, "centroid", "%g", stats->centroid);
-        set_meta(metadata, ch + 1, "spread",   "%g", stats->spread);
-        set_meta(metadata, ch + 1, "skewness", "%g", stats->skewness);
-        set_meta(metadata, ch + 1, "kurtosis", "%g", stats->kurtosis);
-        set_meta(metadata, ch + 1, "entropy",  "%g", stats->entropy);
-        set_meta(metadata, ch + 1, "flatness", "%g", stats->flatness);
-        set_meta(metadata, ch + 1, "crest",    "%g", stats->crest);
-        set_meta(metadata, ch + 1, "flux",     "%g", stats->flux);
-        set_meta(metadata, ch + 1, "slope",    "%g", stats->slope);
-        set_meta(metadata, ch + 1, "decrease", "%g", stats->decrease);
-        set_meta(metadata, ch + 1, "rolloff",  "%g", stats->rolloff);
+        if (s->measure & MEASURE_MEAN)
+            set_meta(metadata, ch + 1, "mean",     "%g", stats->mean);
+        if (s->measure & MEASURE_VARIANCE)
+            set_meta(metadata, ch + 1, "variance", "%g", stats->variance);
+        if (s->measure & MEASURE_CENTROID)
+            set_meta(metadata, ch + 1, "centroid", "%g", stats->centroid);
+        if (s->measure & MEASURE_SPREAD)
+            set_meta(metadata, ch + 1, "spread",   "%g", stats->spread);
+        if (s->measure & MEASURE_SKEWNESS)
+            set_meta(metadata, ch + 1, "skewness", "%g", stats->skewness);
+        if (s->measure & MEASURE_KURTOSIS)
+            set_meta(metadata, ch + 1, "kurtosis", "%g", stats->kurtosis);
+        if (s->measure & MEASURE_ENTROPY)
+            set_meta(metadata, ch + 1, "entropy",  "%g", stats->entropy);
+        if (s->measure & MEASURE_FLATNESS)
+            set_meta(metadata, ch + 1, "flatness", "%g", stats->flatness);
+        if (s->measure & MEASURE_CREST)
+            set_meta(metadata, ch + 1, "crest",    "%g", stats->crest);
+        if (s->measure & MEASURE_FLUX)
+            set_meta(metadata, ch + 1, "flux",     "%g", stats->flux);
+        if (s->measure & MEASURE_SLOPE)
+            set_meta(metadata, ch + 1, "slope",    "%g", stats->slope);
+        if (s->measure & MEASURE_DECREASE)
+            set_meta(metadata, ch + 1, "decrease", "%g", stats->decrease);
+        if (s->measure & MEASURE_ROLLOFF)
+            set_meta(metadata, ch + 1, "rolloff",  "%g", stats->rolloff);
     }
 }
 
@@ -414,7 +460,7 @@ static int filter_channel(AVFilterContext *ctx, void *arg, int jobnr, int nb_job
             fft_in[n].im = 0;
         }
 
-        s->tx_fn(s->fft[ch], fft_out, fft_in, sizeof(float));
+        s->tx_fn(s->fft[ch], fft_out, fft_in, sizeof(*fft_in));
 
         for (int n = 0; n < s->win_size / 2; n++) {
             fft_out[n].re *= scale;
@@ -424,19 +470,32 @@ static int filter_channel(AVFilterContext *ctx, void *arg, int jobnr, int nb_job
         for (int n = 0; n < s->win_size / 2; n++)
             magnitude[n] = hypotf(fft_out[n].re, fft_out[n].im);
 
-        stats->mean     = spectral_mean(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->variance = spectral_variance(magnitude, s->win_size / 2, in->sample_rate / 2, stats->mean);
-        stats->centroid = spectral_centroid(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->spread   = spectral_spread(magnitude, s->win_size / 2, in->sample_rate / 2, stats->centroid);
-        stats->skewness = spectral_skewness(magnitude, s->win_size / 2, in->sample_rate / 2, stats->centroid, stats->spread);
-        stats->kurtosis = spectral_kurtosis(magnitude, s->win_size / 2, in->sample_rate / 2, stats->centroid, stats->spread);
-        stats->entropy  = spectral_entropy(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->flatness = spectral_flatness(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->crest    = spectral_crest(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->flux     = spectral_flux(magnitude, prev_magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->slope    = spectral_slope(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->decrease = spectral_decrease(magnitude, s->win_size / 2, in->sample_rate / 2);
-        stats->rolloff  = spectral_rolloff(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & (MEASURE_MEAN | MEASURE_VARIANCE))
+            stats->mean     = spectral_mean(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_VARIANCE)
+            stats->variance = spectral_variance(magnitude, s->win_size / 2, in->sample_rate / 2, stats->mean);
+        if (s->measure & (MEASURE_SPREAD | MEASURE_KURTOSIS | MEASURE_SKEWNESS | MEASURE_CENTROID))
+            stats->centroid = spectral_centroid(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & (MEASURE_SPREAD | MEASURE_KURTOSIS | MEASURE_SKEWNESS))
+            stats->spread   = spectral_spread(magnitude, s->win_size / 2, in->sample_rate / 2, stats->centroid);
+        if (s->measure & MEASURE_SKEWNESS)
+            stats->skewness = spectral_skewness(magnitude, s->win_size / 2, in->sample_rate / 2, stats->centroid, stats->spread);
+        if (s->measure & MEASURE_KURTOSIS)
+            stats->kurtosis = spectral_kurtosis(magnitude, s->win_size / 2, in->sample_rate / 2, stats->centroid, stats->spread);
+        if (s->measure & MEASURE_ENTROPY)
+            stats->entropy  = spectral_entropy(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_FLATNESS)
+            stats->flatness = spectral_flatness(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_CREST)
+            stats->crest    = spectral_crest(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_FLUX)
+            stats->flux     = spectral_flux(magnitude, prev_magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_SLOPE)
+            stats->slope    = spectral_slope(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_DECREASE)
+            stats->decrease = spectral_decrease(magnitude, s->win_size / 2, in->sample_rate / 2);
+        if (s->measure & MEASURE_ROLLOFF)
+            stats->rolloff  = spectral_rolloff(magnitude, s->win_size / 2, in->sample_rate / 2);
 
         memcpy(prev_magnitude, magnitude, s->win_size * sizeof(float));
     }
@@ -541,13 +600,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_frame_free(&s->window);
 }
 
-static const AVFilterPad aspectralstats_inputs[] = {
-    {
-        .name         = "default",
-        .type         = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 static const AVFilterPad aspectralstats_outputs[] = {
     {
         .name         = "default",
@@ -563,7 +615,7 @@ const AVFilter ff_af_aspectralstats = {
     .priv_class    = &aspectralstats_class,
     .uninit        = uninit,
     .activate      = activate,
-    FILTER_INPUTS(aspectralstats_inputs),
+    FILTER_INPUTS(ff_audio_default_filterpad),
     FILTER_OUTPUTS(aspectralstats_outputs),
     FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_FLTP),
     .flags         = AVFILTER_FLAG_SLICE_THREADS,

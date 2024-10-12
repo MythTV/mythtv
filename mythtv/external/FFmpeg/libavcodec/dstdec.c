@@ -29,11 +29,10 @@
 #include "libavutil/mem_internal.h"
 #include "libavutil/reverse.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "avcodec.h"
 #include "golomb.h"
-#include "mathops.h"
 #include "dsd.h"
 
 #define DST_MAX_CHANNELS 6
@@ -216,7 +215,7 @@ static uint8_t prob_dst_x_bit(int c)
     return (ff_reverse[c & 127] >> 1) + 1;
 }
 
-static void build_filter(int16_t table[DST_MAX_ELEMENTS][16][256], const Table *fsets)
+static int build_filter(int16_t table[DST_MAX_ELEMENTS][16][256], const Table *fsets)
 {
     int i, j, k, l;
 
@@ -227,14 +226,17 @@ static void build_filter(int16_t table[DST_MAX_ELEMENTS][16][256], const Table *
             int total = av_clip(length - j * 8, 0, 8);
 
             for (k = 0; k < 256; k++) {
-                int v = 0;
+                int64_t v = 0;
 
                 for (l = 0; l < total; l++)
                     v += (((k >> l) & 1) * 2 - 1) * fsets->coeff[i][j * 8 + l];
+                if ((int16_t)v != v)
+                    return AVERROR_INVALIDDATA;
                 table[i][j][k] = v;
             }
         }
     }
+    return 0;
 }
 
 static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
@@ -329,7 +331,9 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return AVERROR_INVALIDDATA;
     ac_init(ac, gb);
 
-    build_filter(s->filter, &s->fsets);
+    ret = build_filter(s->filter, &s->fsets);
+    if (ret < 0)
+        return ret;
 
     memset(s->status, 0xAA, sizeof(s->status));
     memset(dsd, 0, frame->nb_samples * 4 * channels);
@@ -381,7 +385,7 @@ dsd:
 
 const FFCodec ff_dst_decoder = {
     .p.name         = "dst",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("DST (Digital Stream Transfer)"),
+    CODEC_LONG_NAME("DST (Digital Stream Transfer)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_DST,
     .priv_data_size = sizeof(DSTContext),
@@ -390,5 +394,4 @@ const FFCodec ff_dst_decoder = {
     .p.capabilities = AV_CODEC_CAP_DR1,
     .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLT,
                                                       AV_SAMPLE_FMT_NONE },
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

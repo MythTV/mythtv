@@ -29,6 +29,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 enum {
@@ -103,6 +104,10 @@ static int tmv_read_header(AVFormatContext *s)
     char_cols = avio_r8(pb);
     char_rows = avio_r8(pb);
     tmv->video_chunk_size = char_cols * char_rows * 2;
+    if (!tmv->video_chunk_size) {
+        av_log(s, AV_LOG_ERROR, "invalid video chunk size\n");
+        return AVERROR_INVALIDDATA;
+    }
 
     features  = avio_r8(pb);
     if (features & ~(TMV_PADDING | TMV_STEREO)) {
@@ -181,13 +186,13 @@ static int tmv_read_seek(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-const AVInputFormat ff_tmv_demuxer = {
-    .name           = "tmv",
-    .long_name      = NULL_IF_CONFIG_SMALL("8088flex TMV"),
+const FFInputFormat ff_tmv_demuxer = {
+    .p.name         = "tmv",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("8088flex TMV"),
+    .p.flags        = AVFMT_GENERIC_INDEX,
     .priv_data_size = sizeof(TMVContext),
     .read_probe     = tmv_probe,
     .read_header    = tmv_read_header,
     .read_packet    = tmv_read_packet,
     .read_seek      = tmv_read_seek,
-    .flags          = AVFMT_GENERIC_INDEX,
 };

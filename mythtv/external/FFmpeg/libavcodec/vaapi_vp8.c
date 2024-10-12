@@ -19,7 +19,7 @@
 #include <va/va.h>
 #include <va/va_dec_vp8.h>
 
-#include "hwconfig.h"
+#include "hwaccel_internal.h"
 #include "vaapi_decode.h"
 #include "vp8.h"
 
@@ -36,21 +36,21 @@ static int vaapi_vp8_start_frame(AVCodecContext          *avctx,
                                  av_unused uint32_t       size)
 {
     const VP8Context *s = avctx->priv_data;
-    VAAPIDecodePicture *pic = s->framep[VP56_FRAME_CURRENT]->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->framep[VP8_FRAME_CURRENT]->hwaccel_picture_private;
     VAPictureParameterBufferVP8 pp;
     VAProbabilityDataBufferVP8 prob;
     VAIQMatrixBufferVP8 quant;
     int err, i, j, k;
 
-    pic->output_surface = vaapi_vp8_surface_id(s->framep[VP56_FRAME_CURRENT]);
+    pic->output_surface = vaapi_vp8_surface_id(s->framep[VP8_FRAME_CURRENT]);
 
     pp = (VAPictureParameterBufferVP8) {
         .frame_width                     = avctx->width,
         .frame_height                    = avctx->height,
 
-        .last_ref_frame                  = vaapi_vp8_surface_id(s->framep[VP56_FRAME_PREVIOUS]),
-        .golden_ref_frame                = vaapi_vp8_surface_id(s->framep[VP56_FRAME_GOLDEN]),
-        .alt_ref_frame                   = vaapi_vp8_surface_id(s->framep[VP56_FRAME_GOLDEN2]),
+        .last_ref_frame                  = vaapi_vp8_surface_id(s->framep[VP8_FRAME_PREVIOUS]),
+        .golden_ref_frame                = vaapi_vp8_surface_id(s->framep[VP8_FRAME_GOLDEN]),
+        .alt_ref_frame                   = vaapi_vp8_surface_id(s->framep[VP8_FRAME_ALTREF]),
         .out_of_loop_frame               = VA_INVALID_SURFACE,
 
         .pic_fields.bits = {
@@ -67,8 +67,8 @@ static int vaapi_vp8_start_frame(AVCodecContext          *avctx,
             .loop_filter_adj_enable      = s->lf_delta.enabled,
             .mode_ref_lf_delta_update    = s->lf_delta.update,
 
-            .sign_bias_golden            = s->sign_bias[VP56_FRAME_GOLDEN],
-            .sign_bias_alternate         = s->sign_bias[VP56_FRAME_GOLDEN2],
+            .sign_bias_golden            = s->sign_bias[VP8_FRAME_GOLDEN],
+            .sign_bias_alternate         = s->sign_bias[VP8_FRAME_ALTREF],
 
             .mb_no_coeff_skip            = s->mbskip_enabled,
             .loop_filter_disable         = s->filter.level == 0,
@@ -177,7 +177,7 @@ fail:
 static int vaapi_vp8_end_frame(AVCodecContext *avctx)
 {
     const VP8Context *s = avctx->priv_data;
-    VAAPIDecodePicture *pic = s->framep[VP56_FRAME_CURRENT]->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->framep[VP8_FRAME_CURRENT]->hwaccel_picture_private;
 
     return ff_vaapi_decode_issue(avctx, pic);
 }
@@ -187,7 +187,7 @@ static int vaapi_vp8_decode_slice(AVCodecContext *avctx,
                                   uint32_t        size)
 {
     const VP8Context *s = avctx->priv_data;
-    VAAPIDecodePicture *pic = s->framep[VP56_FRAME_CURRENT]->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->framep[VP8_FRAME_CURRENT]->hwaccel_picture_private;
     VASliceParameterBufferVP8 sp;
     int err, i;
 
@@ -209,7 +209,7 @@ static int vaapi_vp8_decode_slice(AVCodecContext *avctx,
     for (i = 0; i < 8; i++)
         sp.partition_size[i+1] = s->coeff_partition_size[i];
 
-    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &sp, sizeof(sp), data, data_size);
+    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &sp, 1, sizeof(sp), data, data_size);
     if (err)
         goto fail;
 
@@ -220,11 +220,11 @@ fail:
     return err;
 }
 
-const AVHWAccel ff_vp8_vaapi_hwaccel = {
-    .name                 = "vp8_vaapi",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_VP8,
-    .pix_fmt              = AV_PIX_FMT_VAAPI,
+const FFHWAccel ff_vp8_vaapi_hwaccel = {
+    .p.name               = "vp8_vaapi",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_VP8,
+    .p.pix_fmt            = AV_PIX_FMT_VAAPI,
     .start_frame          = &vaapi_vp8_start_frame,
     .end_frame            = &vaapi_vp8_end_frame,
     .decode_slice         = &vaapi_vp8_decode_slice,

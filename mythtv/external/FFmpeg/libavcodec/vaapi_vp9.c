@@ -22,7 +22,7 @@
 
 #include "libavutil/pixdesc.h"
 
-#include "hwconfig.h"
+#include "hwaccel_internal.h"
 #include "vaapi_decode.h"
 #include "vp9shared.h"
 
@@ -100,7 +100,7 @@ static int vaapi_vp9_start_frame(AVCodecContext          *avctx,
     }
 
     for (i = 0; i < 8; i++) {
-        if (h->refs[i].f->buf[0])
+        if (h->refs[i].f)
             pic_param.reference_frames[i] = ff_vaapi_get_surface_id(h->refs[i].f);
         else
             pic_param.reference_frames[i] = VA_INVALID_ID;
@@ -158,7 +158,7 @@ static int vaapi_vp9_decode_slice(AVCodecContext *avctx,
     }
 
     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
-                                            &slice_param, sizeof(slice_param),
+                                            &slice_param, 1, sizeof(slice_param),
                                             buffer, size);
     if (err) {
         ff_vaapi_decode_cancel(avctx, pic);
@@ -168,11 +168,11 @@ static int vaapi_vp9_decode_slice(AVCodecContext *avctx,
     return 0;
 }
 
-const AVHWAccel ff_vp9_vaapi_hwaccel = {
-    .name                 = "vp9_vaapi",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_VP9,
-    .pix_fmt              = AV_PIX_FMT_VAAPI,
+const FFHWAccel ff_vp9_vaapi_hwaccel = {
+    .p.name               = "vp9_vaapi",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_VP9,
+    .p.pix_fmt            = AV_PIX_FMT_VAAPI,
     .start_frame          = vaapi_vp9_start_frame,
     .end_frame            = vaapi_vp9_end_frame,
     .decode_slice         = vaapi_vp9_decode_slice,

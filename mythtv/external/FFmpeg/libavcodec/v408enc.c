@@ -20,9 +20,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config_components.h"
-
-#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "encode.h"
@@ -40,7 +37,7 @@ static int v408_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                              const AVFrame *pic, int *got_packet)
 {
     uint8_t *dst;
-    uint8_t *y, *u, *v, *a;
+    const uint8_t *y, *u, *v, *a;
     int i, j, ret;
 
     ret = ff_get_encode_buffer(avctx, pkt, avctx->width * avctx->height * 4, 0);
@@ -55,17 +52,10 @@ static int v408_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
     for (i = 0; i < avctx->height; i++) {
         for (j = 0; j < avctx->width; j++) {
-           if (avctx->codec_id==AV_CODEC_ID_AYUV) {
-                *dst++ = v[j];
-                *dst++ = u[j];
-                *dst++ = y[j];
-                *dst++ = a[j];
-            } else {
-                *dst++ = u[j];
-                *dst++ = y[j];
-                *dst++ = v[j];
-                *dst++ = a[j];
-            }
+            *dst++ = u[j];
+            *dst++ = y[j];
+            *dst++ = v[j];
+            *dst++ = a[j];
         }
         y += pic->linesize[0];
         u += pic->linesize[1];
@@ -79,29 +69,13 @@ static int v408_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
 static const enum AVPixelFormat pix_fmt[] = { AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE };
 
-#if CONFIG_AYUV_ENCODER
-const FFCodec ff_ayuv_encoder = {
-    .p.name       = "ayuv",
-    .p.long_name  = NULL_IF_CONFIG_SMALL("Uncompressed packed MS 4:4:4:4"),
-    .p.type       = AVMEDIA_TYPE_VIDEO,
-    .p.id         = AV_CODEC_ID_AYUV,
-    .p.capabilities = AV_CODEC_CAP_DR1,
-    .init         = v408_encode_init,
-    FF_CODEC_ENCODE_CB(v408_encode_frame),
-    .p.pix_fmts   = pix_fmt,
-    .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,
-};
-#endif
-#if CONFIG_V408_ENCODER
 const FFCodec ff_v408_encoder = {
     .p.name       = "v408",
-    .p.long_name  = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
+    CODEC_LONG_NAME("Uncompressed packed QT 4:4:4:4"),
     .p.type       = AVMEDIA_TYPE_VIDEO,
     .p.id         = AV_CODEC_ID_V408,
-    .p.capabilities = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .init         = v408_encode_init,
     FF_CODEC_ENCODE_CB(v408_encode_frame),
     .p.pix_fmts   = pix_fmt,
-    .caps_internal = FF_CODEC_CAP_INIT_THREADSAFE,
 };
-#endif

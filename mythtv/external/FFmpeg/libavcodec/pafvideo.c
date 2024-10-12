@@ -20,12 +20,13 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "copy_block.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 
 static const uint8_t block_sequences[16][8] = {
@@ -296,10 +297,10 @@ static int paf_video_decode(AVCodecContext *avctx, AVFrame *rframe,
     if (code & 0x20) {  // frame is keyframe
         memset(c->pic->data[1], 0, AVPALETTE_SIZE);
         c->current_frame  = 0;
-        c->pic->key_frame = 1;
+        c->pic->flags |= AV_FRAME_FLAG_KEY;
         c->pic->pict_type = AV_PICTURE_TYPE_I;
     } else {
-        c->pic->key_frame = 0;
+        c->pic->flags &= ~AV_FRAME_FLAG_KEY;
         c->pic->pict_type = AV_PICTURE_TYPE_P;
     }
 
@@ -327,7 +328,11 @@ static int paf_video_decode(AVCodecContext *avctx, AVFrame *rframe,
             b = b << 2 | b >> 4;
             *out++ = (0xFFU << 24) | (r << 16) | (g << 8) | b;
         }
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
         c->pic->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     }
 
     c->dirty[c->current_frame] = 1;
@@ -410,7 +415,7 @@ static int paf_video_decode(AVCodecContext *avctx, AVFrame *rframe,
 
 const FFCodec ff_paf_video_decoder = {
     .p.name         = "paf_video",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Amazing Studio Packed Animation File Video"),
+    CODEC_LONG_NAME("Amazing Studio Packed Animation File Video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_PAF_VIDEO,
     .priv_data_size = sizeof(PAFVideoDecContext),
@@ -418,5 +423,5 @@ const FFCodec ff_paf_video_decoder = {
     .close          = paf_video_close,
     FF_CODEC_DECODE_CB(paf_video_decode),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

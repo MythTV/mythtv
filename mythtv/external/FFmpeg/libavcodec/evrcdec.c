@@ -30,7 +30,7 @@
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "get_bits.h"
 #include "evrcdata.h"
 #include "acelp_vectors.h"
@@ -221,8 +221,8 @@ static evrc_packet_rate determine_bitrate(AVCodecContext *avctx,
 static void warn_insufficient_frame_quality(AVCodecContext *avctx,
                                             const char *message)
 {
-    av_log(avctx, AV_LOG_WARNING, "Frame #%d, %s\n",
-           avctx->frame_number, message);
+    av_log(avctx, AV_LOG_WARNING, "Frame #%"PRId64", %s\n",
+           avctx->frame_num, message);
 }
 
 /**
@@ -495,11 +495,11 @@ static void fcb_excitation(EVRCContext *e, const uint16_t *codebook,
 /**
  * Synthesis of the decoder output signal.
  *
- * param[in]     in              input signal
- * param[in]     filter_coeffs   LPC coefficients
- * param[in/out] memory          synthesis filter memory
- * param         buffer_length   amount of data to process
- * param[out]    samples         output samples
+ * @param[in]     in              input signal
+ * @param[in]     filter_coeffs   LPC coefficients
+ * @param[in/out] memory          synthesis filter memory
+ * @param         buffer_length   amount of data to process
+ * @param[out]    samples         output samples
  *
  * TIA/IS-127 5.2.3.15, 5.7.3.4
  */
@@ -931,7 +931,7 @@ static const AVClass evrcdec_class = {
 
 const FFCodec ff_evrc_decoder = {
     .p.name         = "evrc",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("EVRC (Enhanced Variable Rate Codec)"),
+    CODEC_LONG_NAME("EVRC (Enhanced Variable Rate Codec)"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_EVRC,
     .init           = evrc_decode_init,
@@ -939,5 +939,4 @@ const FFCodec ff_evrc_decoder = {
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .priv_data_size = sizeof(EVRCContext),
     .p.priv_class   = &evrcdec_class,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

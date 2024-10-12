@@ -20,19 +20,23 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
+#include "libavutil/error.h"
+#include "libavutil/mem.h"
 #include "adts_header.h"
 #include "adts_parser.h"
 
 int av_adts_header_parse(const uint8_t *buf, uint32_t *samples, uint8_t *frames)
 {
 #if CONFIG_ADTS_HEADER
-    GetBitContext gb;
+    uint8_t tmpbuf[AV_AAC_ADTS_HEADER_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
     AACADTSHeaderInfo hdr;
-    int err = init_get_bits8(&gb, buf, AV_AAC_ADTS_HEADER_SIZE);
-    if (err < 0)
-        return err;
-    err = ff_adts_header_parse(&gb, &hdr);
+    int err;
+    if (!buf)
+        return AVERROR(EINVAL);
+    memcpy(tmpbuf, buf, AV_AAC_ADTS_HEADER_SIZE);
+    err = ff_adts_header_parse_buf(tmpbuf, &hdr);
     if (err < 0)
         return err;
     *samples = hdr.samples;
@@ -47,24 +51,22 @@ int avpriv_adts_header_parse(AACADTSHeaderInfo **phdr, const uint8_t *buf, size_
 {
 #if CONFIG_ADTS_HEADER
     int ret = 0;
-    GetBitContext gb;
+    int allocated = 0;
 
     if (!phdr || !buf || size < AV_AAC_ADTS_HEADER_SIZE)
         return AVERROR_INVALIDDATA;
 
-    *phdr = av_mallocz(sizeof(AACADTSHeaderInfo));
+    if (!*phdr) {
+        allocated = 1;
+        *phdr = av_mallocz(sizeof(AACADTSHeaderInfo));
+    }
     if (!*phdr)
         return AVERROR(ENOMEM);
 
-    ret = init_get_bits8(&gb, buf, AV_AAC_ADTS_HEADER_SIZE);
+    ret = ff_adts_header_parse_buf(buf, *phdr);
     if (ret < 0) {
-        av_freep(phdr);
-        return ret;
-    }
-
-    ret = ff_adts_header_parse(&gb, *phdr);
-    if (ret < 0) {
-        av_freep(phdr);
+        if (allocated)
+            av_freep(phdr);
         return ret;
     }
 

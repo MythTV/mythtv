@@ -35,7 +35,7 @@
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
@@ -405,6 +405,11 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     s->w >>= width_shift;
     if (s->w & 1) {
         avpriv_request_sample(s->avctx, "Frame with odd width");
+        return AVERROR_PATCHWELCOME;
+    }
+
+    if (s->h & 3) {
+        avpriv_request_sample(s->avctx, "Frame with height not being a multiple of 4");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -912,7 +917,7 @@ static av_cold int truemotion1_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_truemotion1_decoder = {
     .p.name         = "truemotion1",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Duck TrueMotion 1.0"),
+    CODEC_LONG_NAME("Duck TrueMotion 1.0"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TRUEMOTION1,
     .priv_data_size = sizeof(TrueMotion1Context),
@@ -920,5 +925,5 @@ const FFCodec ff_truemotion1_decoder = {
     .close          = truemotion1_decode_end,
     FF_CODEC_DECODE_CB(truemotion1_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
