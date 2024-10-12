@@ -19,11 +19,11 @@
  */
 
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "filters.h"
 #include "framesync.h"
-#include "internal.h"
 
 #define OFFSET(member) offsetof(FFFrameSync, member)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
@@ -36,15 +36,22 @@ static const char *framesync_name(void *ptr)
 static const AVOption framesync_options[] = {
     { "eof_action", "Action to take when encountering EOF from secondary input ",
         OFFSET(opt_eof_action), AV_OPT_TYPE_INT, { .i64 = EOF_ACTION_REPEAT },
-        EOF_ACTION_REPEAT, EOF_ACTION_PASS, .flags = FLAGS, "eof_action" },
-        { "repeat", "Repeat the previous frame.",   0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_REPEAT }, .flags = FLAGS, "eof_action" },
-        { "endall", "End both streams.",            0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_ENDALL }, .flags = FLAGS, "eof_action" },
-        { "pass",   "Pass through the main input.", 0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_PASS },   .flags = FLAGS, "eof_action" },
+        EOF_ACTION_REPEAT, EOF_ACTION_PASS, .flags = FLAGS, .unit = "eof_action" },
+        { "repeat", "Repeat the previous frame.",   0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_REPEAT }, .flags = FLAGS, .unit = "eof_action" },
+        { "endall", "End both streams.",            0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_ENDALL }, .flags = FLAGS, .unit = "eof_action" },
+        { "pass",   "Pass through the main input.", 0, AV_OPT_TYPE_CONST, { .i64 = EOF_ACTION_PASS },   .flags = FLAGS, .unit = "eof_action" },
     { "shortest", "force termination when the shortest input terminates", OFFSET(opt_shortest), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
     { "repeatlast", "extend last frame of secondary streams beyond EOF", OFFSET(opt_repeatlast), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
+    { "ts_sync_mode", "How strictly to sync streams based on secondary input timestamps",
+        OFFSET(opt_ts_sync_mode), AV_OPT_TYPE_INT, { .i64 = TS_DEFAULT },
+        TS_DEFAULT, TS_NEAREST, .flags = FLAGS, .unit = "ts_sync_mode" },
+        { "default", "Frame from secondary input with the nearest lower or equal timestamp to the primary input frame",
+            0, AV_OPT_TYPE_CONST, { .i64 = TS_DEFAULT }, .flags = FLAGS, .unit = "ts_sync_mode" },
+        { "nearest", "Frame from secondary input with the absolute nearest timestamp to the primary input frame",
+            0, AV_OPT_TYPE_CONST, { .i64 = TS_NEAREST }, .flags = FLAGS, .unit = "ts_sync_mode" },
     { NULL }
 };
-static const AVClass framesync_class = {
+const AVClass ff_framesync_class = {
     .version                   = LIBAVUTIL_VERSION_INT,
     .class_name                = "framesync",
     .item_name                 = framesync_name,
@@ -55,7 +62,7 @@ static const AVClass framesync_class = {
 
 const AVClass *ff_framesync_child_class_iterate(void **iter)
 {
-    const AVClass *c = *iter ? NULL : &framesync_class;
+    const AVClass *c = *iter ? NULL : &ff_framesync_class;
     *iter = (void *)(uintptr_t)c;
     return c;
 }
@@ -72,7 +79,7 @@ void ff_framesync_preinit(FFFrameSync *fs)
 {
     if (fs->class)
         return;
-    fs->class  = &framesync_class;
+    fs->class  = &ff_framesync_class;
     av_opt_set_defaults(fs);
 }
 
@@ -88,8 +95,11 @@ int ff_framesync_init(FFFrameSync *fs, AVFilterContext *parent, unsigned nb_in)
     fs->nb_in  = nb_in;
 
     fs->in = av_calloc(nb_in, sizeof(*fs->in));
-    if (!fs->in)
+    if (!fs->in) {
+        fs->nb_in = 0;
         return AVERROR(ENOMEM);
+    }
+
     return 0;
 }
 
@@ -110,6 +120,14 @@ static void framesync_sync_level_update(FFFrameSync *fs)
     av_assert0(level <= fs->sync_level);
     if (level < fs->sync_level)
         av_log(fs, AV_LOG_VERBOSE, "Sync level %u\n", level);
+    if (fs->opt_ts_sync_mode > TS_DEFAULT) {
+        for (i = 0; i < fs->nb_in; i++) {
+            if (fs->in[i].sync < level)
+                fs->in[i].ts_mode = fs->opt_ts_sync_mode;
+            else
+                fs->in[i].ts_mode = TS_DEFAULT;
+        }
+    }
     if (level)
         fs->sync_level = level;
     else
@@ -187,6 +205,10 @@ static int framesync_advance(FFFrameSync *fs)
         }
         for (i = 0; i < fs->nb_in; i++) {
             if (fs->in[i].pts_next == pts ||
+                (fs->in[i].ts_mode == TS_NEAREST &&
+                 fs->in[i].have_next &&
+                 fs->in[i].pts_next != INT64_MAX && fs->in[i].pts != AV_NOPTS_VALUE &&
+                 fs->in[i].pts_next - pts < pts - fs->in[i].pts) ||
                 (fs->in[i].before == EXT_INFINITY &&
                  fs->in[i].state == STATE_BOF)) {
                 av_frame_free(&fs->in[i].frame);
@@ -251,7 +273,6 @@ int ff_framesync_get_frame(FFFrameSync *fs, unsigned in, AVFrame **rframe,
     AVFrame *frame;
     unsigned need_copy = 0, i;
     int64_t pts_next;
-    int ret;
 
     if (!fs->in[in].frame) {
         *rframe = NULL;
@@ -269,10 +290,6 @@ int ff_framesync_get_frame(FFFrameSync *fs, unsigned in, AVFrame **rframe,
         if (need_copy) {
             if (!(frame = av_frame_clone(frame)))
                 return AVERROR(ENOMEM);
-            if ((ret = av_frame_make_writable(frame)) < 0) {
-                av_frame_free(&frame);
-                return ret;
-            }
         } else {
             fs->in[in].frame = NULL;
         }
@@ -335,7 +352,10 @@ static int consume_from_fifos(FFFrameSync *fs)
 
 int ff_framesync_activate(FFFrameSync *fs)
 {
+    AVFilterContext *ctx = fs->parent;
     int ret;
+
+    FF_FILTER_FORWARD_STATUS_BACK_ALL(ctx->outputs[0], ctx);
 
     ret = framesync_advance(fs);
     if (ret < 0)

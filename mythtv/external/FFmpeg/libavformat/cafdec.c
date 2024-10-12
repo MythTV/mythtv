@@ -36,6 +36,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/intfloat.h"
 #include "libavutil/dict.h"
+#include "libavutil/mem.h"
 #include "caf.h"
 
 typedef struct CafContext {
@@ -52,9 +53,15 @@ typedef struct CafContext {
 
 static int probe(const AVProbeData *p)
 {
-    if (AV_RB32(p->buf) == MKBETAG('c','a','f','f') && AV_RB16(&p->buf[4]) == 1)
-        return AVPROBE_SCORE_MAX;
-    return 0;
+    if (AV_RB32(p->buf) != MKBETAG('c','a','f','f'))
+        return 0;
+    if (AV_RB16(&p->buf[4]) != 1)
+        return 0;
+    if (AV_RB32(p->buf + 8) != MKBETAG('d','e','s','c'))
+        return 0;
+    if (AV_RB64(p->buf + 12) != 32)
+        return 0;
+    return AVPROBE_SCORE_MAX;
 }
 
 /** Read audio description chunk */
@@ -265,7 +272,7 @@ static int read_pakt_chunk(AVFormatContext *s, int64_t size)
         }
     }
 
-    if (avio_tell(pb) - ccount > size) {
+    if (avio_tell(pb) - ccount > size || size > INT64_MAX - ccount) {
         av_log(s, AV_LOG_ERROR, "error reading packet table\n");
         return AVERROR_INVALIDDATA;
     }
@@ -337,6 +344,9 @@ static int read_header(AVFormatContext *s)
             avio_skip(pb, 4); /* edit count */
             caf->data_start = avio_tell(pb);
             caf->data_size  = size < 0 ? -1 : size - 4;
+            if (caf->data_start < 0 || caf->data_size > INT64_MAX - caf->data_start)
+                return AVERROR_INVALIDDATA;
+
             if (caf->data_size > 0 && (pb->seekable & AVIO_SEEKABLE_NORMAL))
                 avio_skip(pb, caf->data_size);
             found_data = 1;
@@ -387,7 +397,7 @@ static int read_header(AVFormatContext *s)
 
 found_data:
     if (caf->bytes_per_packet > 0 && caf->frames_per_packet > 0) {
-        if (caf->data_size > 0)
+        if (caf->data_size > 0 && caf->data_size / caf->bytes_per_packet < INT64_MAX / caf->frames_per_packet)
             st->nb_frames = (caf->data_size / caf->bytes_per_packet) * caf->frames_per_packet;
     } else if (ffstream(st)->nb_index_entries && st->duration > 0) {
         if (st->codecpar->sample_rate && caf->data_size / st->duration > INT64_MAX / st->codecpar->sample_rate / 8) {
@@ -506,13 +516,13 @@ static int read_seek(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-const AVInputFormat ff_caf_demuxer = {
-    .name           = "caf",
-    .long_name      = NULL_IF_CONFIG_SMALL("Apple CAF (Core Audio Format)"),
+const FFInputFormat ff_caf_demuxer = {
+    .p.name         = "caf",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Apple CAF (Core Audio Format)"),
+    .p.codec_tag    = ff_caf_codec_tags_list,
     .priv_data_size = sizeof(CafContext),
     .read_probe     = probe,
     .read_header    = read_header,
     .read_packet    = read_packet,
     .read_seek      = read_seek,
-    .codec_tag      = ff_caf_codec_tags_list,
 };

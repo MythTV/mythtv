@@ -109,7 +109,7 @@ static void vector_fmul_reverse_c(float *dst, const float *src0,
         dst[i] = src0[i] * src1[-i];
 }
 
-static void butterflies_float_c(float *av_restrict v1, float *av_restrict v2,
+static void butterflies_float_c(float *restrict v1, float *restrict v2,
                                 int len)
 {
     int i;
@@ -132,6 +132,17 @@ float avpriv_scalarproduct_float_c(const float *v1, const float *v2, int len)
     return p;
 }
 
+double ff_scalarproduct_double_c(const double *v1, const double *v2,
+                                 size_t len)
+{
+    double p = 0.0;
+
+    for (size_t i = 0; i < len; i++)
+        p += v1[i] * v2[i];
+
+    return p;
+}
+
 av_cold AVFloatDSPContext *avpriv_float_dsp_alloc(int bit_exact)
 {
     AVFloatDSPContext *fdsp = av_mallocz(sizeof(AVFloatDSPContext));
@@ -149,6 +160,7 @@ av_cold AVFloatDSPContext *avpriv_float_dsp_alloc(int bit_exact)
     fdsp->vector_fmul_reverse = vector_fmul_reverse_c;
     fdsp->butterflies_float = butterflies_float_c;
     fdsp->scalarproduct_float = avpriv_scalarproduct_float_c;
+    fdsp->scalarproduct_double = ff_scalarproduct_double_c;
 
 #if ARCH_AARCH64
     ff_float_dsp_init_aarch64(fdsp);
@@ -156,6 +168,8 @@ av_cold AVFloatDSPContext *avpriv_float_dsp_alloc(int bit_exact)
     ff_float_dsp_init_arm(fdsp);
 #elif ARCH_PPC
     ff_float_dsp_init_ppc(fdsp, bit_exact);
+#elif ARCH_RISCV
+    ff_float_dsp_init_riscv(fdsp);
 #elif ARCH_X86
     ff_float_dsp_init_x86(fdsp);
 #elif ARCH_MIPS

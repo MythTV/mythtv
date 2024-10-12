@@ -23,15 +23,13 @@
  * implementing a generic image processing filter using deep learning networks.
  */
 
-#include "libavformat/avio.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
 #include "filters.h"
 #include "dnn_filter_common.h"
-#include "formats.h"
-#include "internal.h"
+#include "video.h"
 #include "libswscale/swscale.h"
 #include "libavutil/time.h"
 
@@ -45,19 +43,20 @@ typedef struct DnnProcessingContext {
 #define OFFSET(x) offsetof(DnnProcessingContext, dnnctx.x)
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM
 static const AVOption dnn_processing_options[] = {
-    { "dnn_backend", "DNN backend",                OFFSET(backend_type),     AV_OPT_TYPE_INT,       { .i64 = 0 },    INT_MIN, INT_MAX, FLAGS, "backend" },
-    { "native",      "native backend flag",        0,                        AV_OPT_TYPE_CONST,     { .i64 = 0 },    0, 0, FLAGS, "backend" },
+    { "dnn_backend", "DNN backend",                OFFSET(backend_type),     AV_OPT_TYPE_INT,       { .i64 = DNN_TF },    INT_MIN, INT_MAX, FLAGS, .unit = "backend" },
 #if (CONFIG_LIBTENSORFLOW == 1)
-    { "tensorflow",  "tensorflow backend flag",    0,                        AV_OPT_TYPE_CONST,     { .i64 = 1 },    0, 0, FLAGS, "backend" },
+    { "tensorflow",  "tensorflow backend flag",    0,                        AV_OPT_TYPE_CONST,     { .i64 = DNN_TF },    0, 0, FLAGS, .unit = "backend" },
 #endif
 #if (CONFIG_LIBOPENVINO == 1)
-    { "openvino",    "openvino backend flag",      0,                        AV_OPT_TYPE_CONST,     { .i64 = 2 },    0, 0, FLAGS, "backend" },
+    { "openvino",    "openvino backend flag",      0,                        AV_OPT_TYPE_CONST,     { .i64 = DNN_OV },    0, 0, FLAGS, .unit = "backend" },
 #endif
-    DNN_COMMON_OPTIONS
+#if (CONFIG_LIBTORCH == 1)
+    { "torch",       "torch backend flag",         0,                        AV_OPT_TYPE_CONST,     { .i64 = DNN_TH },    0, 0, FLAGS, "backend" },
+#endif
     { NULL }
 };
 
-AVFILTER_DEFINE_CLASS(dnn_processing);
+AVFILTER_DNN_DEFINE_CLASS(dnn_processing, DNN_TF | DNN_OV | DNN_TH);
 
 static av_cold int init(AVFilterContext *context)
 {
@@ -79,22 +78,29 @@ static const enum AVPixelFormat pix_fmts[] = {
            "the frame's format %s does not match "          \
            "the model input channel %d\n",                  \
            av_get_pix_fmt_name(fmt),                        \
-           model_input->channels);
+           model_input->dims[dnn_get_channel_idx_by_layout(model_input->layout)]);
 
 static int check_modelinput_inlink(const DNNData *model_input, const AVFilterLink *inlink)
 {
     AVFilterContext *ctx   = inlink->dst;
     enum AVPixelFormat fmt = inlink->format;
+    int width_idx, height_idx;
 
+    width_idx = dnn_get_width_idx_by_layout(model_input->layout);
+    height_idx = dnn_get_height_idx_by_layout(model_input->layout);
     // the design is to add explicit scale filter before this filter
-    if (model_input->height != -1 && model_input->height != inlink->h) {
+    if (model_input->dims[height_idx] != -1 &&
+        model_input->dims[height_idx] != inlink->h) {
         av_log(ctx, AV_LOG_ERROR, "the model requires frame height %d but got %d\n",
-                                   model_input->height, inlink->h);
+                                   model_input->dims[height_idx],
+                                   inlink->h);
         return AVERROR(EIO);
     }
-    if (model_input->width != -1 && model_input->width != inlink->w) {
+    if (model_input->dims[width_idx] != -1 &&
+        model_input->dims[width_idx] != inlink->w) {
         av_log(ctx, AV_LOG_ERROR, "the model requires frame width %d but got %d\n",
-                                   model_input->width, inlink->w);
+                                   model_input->dims[width_idx],
+                                   inlink->w);
         return AVERROR(EIO);
     }
     if (model_input->dt != DNN_FLOAT) {
@@ -105,11 +111,12 @@ static int check_modelinput_inlink(const DNNData *model_input, const AVFilterLin
     switch (fmt) {
     case AV_PIX_FMT_RGB24:
     case AV_PIX_FMT_BGR24:
-        if (model_input->channels != 3) {
+        if (model_input->dims[dnn_get_channel_idx_by_layout(model_input->layout)] != 3) {
             LOG_FORMAT_CHANNEL_MISMATCH();
             return AVERROR(EIO);
         }
         return 0;
+    case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_GRAYF32:
     case AV_PIX_FMT_YUV420P:
     case AV_PIX_FMT_YUV422P:
@@ -117,7 +124,7 @@ static int check_modelinput_inlink(const DNNData *model_input, const AVFilterLin
     case AV_PIX_FMT_YUV410P:
     case AV_PIX_FMT_YUV411P:
     case AV_PIX_FMT_NV12:
-        if (model_input->channels != 1) {
+        if (model_input->dims[dnn_get_channel_idx_by_layout(model_input->layout)] != 1) {
             LOG_FORMAT_CHANNEL_MISMATCH();
             return AVERROR(EIO);
         }
@@ -364,6 +371,7 @@ const AVFilter ff_vf_dnn_processing = {
     .name          = "dnn_processing",
     .description   = NULL_IF_CONFIG_SMALL("Apply DNN processing filter to the input."),
     .priv_size     = sizeof(DnnProcessingContext),
+    .preinit       = ff_dnn_filter_init_child_class,
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(dnn_processing_inputs),

@@ -31,6 +31,7 @@
 #include "libavutil/float_dsp.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "audio_frame_queue.h"
@@ -55,6 +56,8 @@ typedef struct LAMEContext {
     float *samples_flt[2];
     AudioFrameQueue afq;
     AVFloatDSPContext *fdsp;
+    int copyright;
+    int original;
 } LAMEContext;
 
 
@@ -136,6 +139,12 @@ static av_cold int mp3lame_encode_init(AVCodecContext *avctx)
 
     /* bit reservoir usage */
     lame_set_disable_reservoir(s->gfp, !s->reservoir);
+
+    /* copyright flag */
+    lame_set_copyright(s->gfp, s->copyright);
+
+    /* original flag */
+    lame_set_original(s->gfp, s->original);
 
     /* set specified parameters */
     if (lame_init_params(s->gfp) < 0) {
@@ -280,17 +289,14 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         // Check if subtraction resulted in an overflow
         if ((discard_padding < avctx->frame_size) != (avpkt->duration > 0)) {
             av_log(avctx, AV_LOG_ERROR, "discard padding overflow\n");
-            av_packet_unref(avpkt);
             return AVERROR(EINVAL);
         }
         if ((!s->delay_sent && avctx->initial_padding > 0) || discard_padding > 0) {
             uint8_t* side_data = av_packet_new_side_data(avpkt,
                                                          AV_PKT_DATA_SKIP_SAMPLES,
                                                          10);
-            if(!side_data) {
-                av_packet_unref(avpkt);
+            if (!side_data)
                 return AVERROR(ENOMEM);
-            }
             if (!s->delay_sent) {
                 AV_WL32(side_data, avctx->initial_padding);
                 s->delay_sent = 1;
@@ -306,9 +312,11 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 #define OFFSET(x) offsetof(LAMEContext, x)
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "reservoir",    "use bit reservoir", OFFSET(reservoir),    AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, AE },
-    { "joint_stereo", "use joint stereo",  OFFSET(joint_stereo), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, AE },
-    { "abr",          "use ABR",           OFFSET(abr),          AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, AE },
+    { "reservoir",    "use bit reservoir",  OFFSET(reservoir),    AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, AE },
+    { "joint_stereo", "use joint stereo",   OFFSET(joint_stereo), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, AE },
+    { "abr",          "use ABR",            OFFSET(abr),          AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, AE },
+    { "copyright",    "set copyright flag", OFFSET(copyright),    AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, AE},
+    { "original",     "set original flag",  OFFSET(original),     AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, AE},
     { NULL },
 };
 
@@ -330,11 +338,12 @@ static const int libmp3lame_sample_rates[] = {
 
 const FFCodec ff_libmp3lame_encoder = {
     .p.name                = "libmp3lame",
-    .p.long_name           = NULL_IF_CONFIG_SMALL("libmp3lame MP3 (MPEG audio layer 3)"),
+    CODEC_LONG_NAME("libmp3lame MP3 (MPEG audio layer 3)"),
     .p.type                = AVMEDIA_TYPE_AUDIO,
     .p.id                  = AV_CODEC_ID_MP3,
     .p.capabilities        = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_SMALL_LAST_FRAME,
+    .caps_internal         = FF_CODEC_CAP_NOT_INIT_THREADSAFE,
     .priv_data_size        = sizeof(LAMEContext),
     .init                  = mp3lame_encode_init,
     FF_CODEC_ENCODE_CB(mp3lame_encode_frame),
@@ -344,11 +353,6 @@ const FFCodec ff_libmp3lame_encoder = {
                                                              AV_SAMPLE_FMT_S16P,
                                                              AV_SAMPLE_FMT_NONE },
     .p.supported_samplerates = libmp3lame_sample_rates,
-#if FF_API_OLD_CHANNEL_LAYOUT
-    .p.channel_layouts     = (const uint64_t[]) { AV_CH_LAYOUT_MONO,
-                                                  AV_CH_LAYOUT_STEREO,
-                                                  0 },
-#endif
     .p.ch_layouts          = (const AVChannelLayout[]) { AV_CHANNEL_LAYOUT_MONO,
                                                          AV_CHANNEL_LAYOUT_STEREO,
                                                          { 0 },

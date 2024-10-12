@@ -27,12 +27,11 @@
  */
 
 #include "avfilter.h"
-#include "formats.h"
+#include "filters.h"
 #include "video.h"
-#include "internal.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
-#include "libavutil/parseutils.h"
 #include <float.h>
 #include <math.h>
 
@@ -102,17 +101,17 @@ static const AVOption mandelbrot_options[] = {
     {"morphyf",     "set morph y frequency",         OFFSET(morphyf), AV_OPT_TYPE_DOUBLE,     {.dbl=0.0123}, -FLT_MAX, FLT_MAX, FLAGS },
     {"morphamp",    "set morph amplitude",           OFFSET(morphamp), AV_OPT_TYPE_DOUBLE,    {.dbl=0},      -FLT_MAX, FLT_MAX, FLAGS },
 
-    {"outer",       "set outer coloring mode",       OFFSET(outer), AV_OPT_TYPE_INT, {.i64=NORMALIZED_ITERATION_COUNT}, 0, INT_MAX, FLAGS, "outer" },
-    {"iteration_count", "set iteration count mode",  0, AV_OPT_TYPE_CONST, {.i64=ITERATION_COUNT}, INT_MIN, INT_MAX, FLAGS, "outer" },
-    {"normalized_iteration_count", "set normalized iteration count mode",   0, AV_OPT_TYPE_CONST, {.i64=NORMALIZED_ITERATION_COUNT}, INT_MIN, INT_MAX, FLAGS, "outer" },
-    {"white", "set white mode",                      0, AV_OPT_TYPE_CONST, {.i64=WHITE}, INT_MIN, INT_MAX, FLAGS, "outer" },
-    {"outz",        "set outz mode",                 0, AV_OPT_TYPE_CONST, {.i64=OUTZ}, INT_MIN, INT_MAX, FLAGS, "outer" },
+    {"outer",       "set outer coloring mode",       OFFSET(outer), AV_OPT_TYPE_INT, {.i64=NORMALIZED_ITERATION_COUNT}, 0, INT_MAX, FLAGS, .unit = "outer" },
+    {"iteration_count", "set iteration count mode",  0, AV_OPT_TYPE_CONST, {.i64=ITERATION_COUNT}, INT_MIN, INT_MAX, FLAGS, .unit = "outer" },
+    {"normalized_iteration_count", "set normalized iteration count mode",   0, AV_OPT_TYPE_CONST, {.i64=NORMALIZED_ITERATION_COUNT}, INT_MIN, INT_MAX, FLAGS, .unit = "outer" },
+    {"white", "set white mode",                      0, AV_OPT_TYPE_CONST, {.i64=WHITE}, INT_MIN, INT_MAX, FLAGS, .unit = "outer" },
+    {"outz",        "set outz mode",                 0, AV_OPT_TYPE_CONST, {.i64=OUTZ}, INT_MIN, INT_MAX, FLAGS, .unit = "outer" },
 
-    {"inner",       "set inner coloring mode",       OFFSET(inner), AV_OPT_TYPE_INT, {.i64=MINCOL}, 0, INT_MAX, FLAGS, "inner" },
-    {"black",       "set black mode",                0, AV_OPT_TYPE_CONST, {.i64=BLACK}, INT_MIN, INT_MAX, FLAGS, "inner"},
-    {"period",      "set period mode",               0, AV_OPT_TYPE_CONST, {.i64=PERIOD}, INT_MIN, INT_MAX, FLAGS, "inner"},
-    {"convergence", "show time until convergence",   0, AV_OPT_TYPE_CONST, {.i64=CONVTIME}, INT_MIN, INT_MAX, FLAGS, "inner"},
-    {"mincol",      "color based on point closest to the origin of the iterations",   0, AV_OPT_TYPE_CONST, {.i64=MINCOL}, INT_MIN, INT_MAX, FLAGS, "inner"},
+    {"inner",       "set inner coloring mode",       OFFSET(inner), AV_OPT_TYPE_INT, {.i64=MINCOL}, 0, INT_MAX, FLAGS, .unit = "inner" },
+    {"black",       "set black mode",                0, AV_OPT_TYPE_CONST, {.i64=BLACK}, INT_MIN, INT_MAX, FLAGS, .unit = "inner"},
+    {"period",      "set period mode",               0, AV_OPT_TYPE_CONST, {.i64=PERIOD}, INT_MIN, INT_MAX, FLAGS, .unit = "inner"},
+    {"convergence", "show time until convergence",   0, AV_OPT_TYPE_CONST, {.i64=CONVTIME}, INT_MIN, INT_MAX, FLAGS, .unit = "inner"},
+    {"mincol",      "color based on point closest to the origin of the iterations",   0, AV_OPT_TYPE_CONST, {.i64=MINCOL}, INT_MIN, INT_MAX, FLAGS, .unit = "inner"},
 
     {NULL},
 };
@@ -152,6 +151,7 @@ static av_cold void uninit(AVFilterContext *ctx)
 static int config_props(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
+    FilterLink *l = ff_filter_link(outlink);
     MBContext *s = ctx->priv;
 
     if (av_image_check_size(s->w, s->h, 0, ctx) < 0)
@@ -160,7 +160,7 @@ static int config_props(AVFilterLink *outlink)
     outlink->w = s->w;
     outlink->h = s->h;
     outlink->time_base = av_inv_q(s->frame_rate);
-    outlink->frame_rate = s->frame_rate;
+    l->frame_rate = s->frame_rate;
 
     return 0;
 }
@@ -395,6 +395,7 @@ static int request_frame(AVFilterLink *link)
 
     picref->sample_aspect_ratio = (AVRational) {1, 1};
     picref->pts = s->pts++;
+    picref->duration = 1;
 
     draw_mandelbrot(link->src, (uint32_t*)picref->data[0], picref->linesize[0]/4, picref->pts);
     return ff_filter_frame(link, picref);

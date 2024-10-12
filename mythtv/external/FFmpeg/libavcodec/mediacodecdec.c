@@ -27,6 +27,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/pixfmt.h"
@@ -37,9 +38,10 @@
 #include "decode.h"
 #include "h264_parse.h"
 #include "h264_ps.h"
-#include "hevc_parse.h"
+#include "hevc/parse.h"
 #include "hwconfig.h"
 #include "internal.h"
+#include "jni.h"
 #include "mediacodec_wrapper.h"
 #include "mediacodecdec_common.h"
 
@@ -54,6 +56,7 @@ typedef struct MediaCodecH264DecContext {
     int delay_flush;
     int amlogic_mpeg2_api23_workaround;
 
+    int use_ndk_codec;
 } MediaCodecH264DecContext;
 
 static av_cold int mediacodec_decode_close(AVCodecContext *avctx)
@@ -144,14 +147,14 @@ static int h264_set_extradata(AVCodecContext *avctx, FFAMediaFormat *format)
 
     for (i = 0; i < MAX_PPS_COUNT; i++) {
         if (ps.pps_list[i]) {
-            pps = (const PPS*)ps.pps_list[i]->data;
+            pps = ps.pps_list[i];
             break;
         }
     }
 
     if (pps) {
         if (ps.sps_list[pps->sps_id]) {
-            sps = (const SPS*)ps.sps_list[pps->sps_id]->data;
+            sps = ps.sps_list[pps->sps_id];
         }
     }
 
@@ -221,21 +224,21 @@ static int hevc_set_extradata(AVCodecContext *avctx, FFAMediaFormat *format)
 
     for (i = 0; i < HEVC_MAX_VPS_COUNT; i++) {
         if (ps.vps_list[i]) {
-            vps = (const HEVCVPS*)ps.vps_list[i]->data;
+            vps = ps.vps_list[i];
             break;
         }
     }
 
     for (i = 0; i < HEVC_MAX_PPS_COUNT; i++) {
         if (ps.pps_list[i]) {
-            pps = (const HEVCPPS*)ps.pps_list[i]->data;
+            pps = ps.pps_list[i];
             break;
         }
     }
 
     if (pps) {
         if (ps.sps_list[pps->sps_id]) {
-            sps = (const HEVCSPS*)ps.sps_list[pps->sps_id]->data;
+            sps = ps.sps_list[pps->sps_id];
         }
     }
 
@@ -287,7 +290,12 @@ done:
 #if CONFIG_MPEG2_MEDIACODEC_DECODER || \
     CONFIG_MPEG4_MEDIACODEC_DECODER || \
     CONFIG_VP8_MEDIACODEC_DECODER   || \
-    CONFIG_VP9_MEDIACODEC_DECODER
+    CONFIG_VP9_MEDIACODEC_DECODER   || \
+    CONFIG_AV1_MEDIACODEC_DECODER   || \
+    CONFIG_AAC_MEDIACODEC_DECODER   || \
+    CONFIG_AMRNB_MEDIACODEC_DECODER || \
+    CONFIG_AMRWB_MEDIACODEC_DECODER || \
+    CONFIG_MP3_MEDIACODEC_DECODER
 static int common_set_extradata(AVCodecContext *avctx, FFAMediaFormat *format)
 {
     int ret = 0;
@@ -310,7 +318,10 @@ static av_cold int mediacodec_decode_init(AVCodecContext *avctx)
     FFAMediaFormat *format = NULL;
     MediaCodecH264DecContext *s = avctx->priv_data;
 
-    format = ff_AMediaFormat_new();
+    if (s->use_ndk_codec < 0)
+        s->use_ndk_codec = !av_jni_get_java_vm(avctx);
+
+    format = ff_AMediaFormat_new(s->use_ndk_codec);
     if (!format) {
         av_log(avctx, AV_LOG_ERROR, "Failed to create media format\n");
         ret = AVERROR_EXTERNAL;
@@ -318,6 +329,15 @@ static av_cold int mediacodec_decode_init(AVCodecContext *avctx)
     }
 
     switch (avctx->codec_id) {
+#if CONFIG_AV1_MEDIACODEC_DECODER
+    case AV_CODEC_ID_AV1:
+        codec_mime = "video/av01";
+
+        ret = common_set_extradata(avctx, format);
+        if (ret < 0)
+            goto done;
+        break;
+#endif
 #if CONFIG_H264_MEDIACODEC_DECODER
     case AV_CODEC_ID_H264:
         codec_mime = "video/avc";
@@ -372,13 +392,55 @@ static av_cold int mediacodec_decode_init(AVCodecContext *avctx)
             goto done;
         break;
 #endif
+#if CONFIG_AAC_MEDIACODEC_DECODER
+    case AV_CODEC_ID_AAC:
+        codec_mime = "audio/mp4a-latm";
+
+        ret = common_set_extradata(avctx, format);
+        if (ret < 0)
+            goto done;
+        break;
+#endif
+#if CONFIG_AMRNB_MEDIACODEC_DECODER
+    case AV_CODEC_ID_AMR_NB:
+        codec_mime = "audio/3gpp";
+
+        ret = common_set_extradata(avctx, format);
+        if (ret < 0)
+            goto done;
+        break;
+#endif
+#if CONFIG_AMRWB_MEDIACODEC_DECODER
+    case AV_CODEC_ID_AMR_WB:
+        codec_mime = "audio/amr-wb";
+
+        ret = common_set_extradata(avctx, format);
+        if (ret < 0)
+            goto done;
+        break;
+#endif
+#if CONFIG_MP3_MEDIACODEC_DECODER
+    case AV_CODEC_ID_MP3:
+        codec_mime = "audio/mpeg";
+
+        ret = common_set_extradata(avctx, format);
+        if (ret < 0)
+            goto done;
+        break;
+#endif
     default:
         av_assert0(0);
     }
 
     ff_AMediaFormat_setString(format, "mime", codec_mime);
-    ff_AMediaFormat_setInt32(format, "width", avctx->width);
-    ff_AMediaFormat_setInt32(format, "height", avctx->height);
+
+    if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+        ff_AMediaFormat_setInt32(format, "width", avctx->width);
+        ff_AMediaFormat_setInt32(format, "height", avctx->height);
+    } else {
+        ff_AMediaFormat_setInt32(format, "channel-count", avctx->ch_layout.nb_channels);
+        ff_AMediaFormat_setInt32(format, "sample-rate", avctx->sample_rate);
+    }
 
     s->ctx = av_mallocz(sizeof(*s->ctx));
     if (!s->ctx) {
@@ -388,6 +450,7 @@ static av_cold int mediacodec_decode_init(AVCodecContext *avctx)
     }
 
     s->ctx->delay_flush = s->delay_flush;
+    s->ctx->use_ndk_codec = s->use_ndk_codec;
 
     if ((ret = ff_mediacodec_dec_init(avctx, s->ctx, codec_mime, format)) < 0) {
         s->ctx = NULL;
@@ -399,7 +462,13 @@ static av_cold int mediacodec_decode_init(AVCodecContext *avctx)
            s->ctx->codec_name, ret);
 
     sdk_int = ff_Build_SDK_INT(avctx);
-    if (sdk_int <= 23 &&
+    /* ff_Build_SDK_INT can fail when target API < 24 and JVM isn't available.
+     * If we don't check sdk_int > 0, the workaround might be enabled by
+     * mistake.
+     * JVM is required to make the workaround works reliably. On the other hand,
+     * missing a workaround should not be a serious issue, we do as best we can.
+     */
+    if (sdk_int > 0 && sdk_int <= 23 &&
         strcmp(s->ctx->codec_name, "OMX.amlogic.mpeg2.decoder.awesome") == 0) {
         av_log(avctx, AV_LOG_INFO, "Enabling workaround for %s on API=%d\n",
                s->ctx->codec_name, sdk_int);
@@ -439,12 +508,21 @@ static int mediacodec_receive_frame(AVCodecContext *avctx, AVFrame *frame)
 
     /* feed decoder */
     while (1) {
-        if (s->ctx->current_input_buffer < 0) {
+        if (s->ctx->current_input_buffer < 0 && !s->ctx->draining) {
             /* poll for input space */
             index = ff_AMediaCodec_dequeueInputBuffer(s->ctx->codec, 0);
             if (index < 0) {
                 /* no space, block for an output frame to appear */
-                return ff_mediacodec_dec_receive(avctx, s->ctx, frame, true);
+                ret = ff_mediacodec_dec_receive(avctx, s->ctx, frame, true);
+                /* Try again if both input port and output port return EAGAIN.
+                 * If no data is consumed and no frame in output, it can make
+                 * both avcodec_send_packet() and avcodec_receive_frame()
+                 * return EAGAIN, which violate the design.
+                 */
+                if (ff_AMediaCodec_infoTryAgainLater(s->ctx->codec, index) &&
+                    ret == AVERROR(EAGAIN))
+                    continue;
+                return ret;
             }
             s->ctx->current_input_buffer = index;
         }
@@ -519,6 +597,8 @@ static const AVCodecHWConfigInternal *const mediacodec_hw_configs[] = {
 static const AVOption ff_mediacodec_vdec_options[] = {
     { "delay_flush", "Delay flush until hw output buffers are returned to the decoder",
                      OFFSET(delay_flush), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, VD },
+    { "ndk_codec", "Use MediaCodec from NDK",
+                   OFFSET(use_ndk_codec), AV_OPT_TYPE_BOOL, {.i64 = -1}, -1, 1, VD },
     { NULL }
 };
 
@@ -534,7 +614,7 @@ static const AVClass ff_##short_name##_mediacodec_dec_class = { \
 DECLARE_MEDIACODEC_VCLASS(short_name)                                                          \
 const FFCodec ff_ ## short_name ## _mediacodec_decoder = {                                     \
     .p.name         = #short_name "_mediacodec",                                               \
-    .p.long_name    = NULL_IF_CONFIG_SMALL(full_name " Android MediaCodec decoder"),           \
+    CODEC_LONG_NAME(full_name " Android MediaCodec decoder"),                                  \
     .p.type         = AVMEDIA_TYPE_VIDEO,                                                      \
     .p.id           = codec_id,                                                                \
     .p.priv_class   = &ff_##short_name##_mediacodec_dec_class,                                 \
@@ -544,7 +624,7 @@ const FFCodec ff_ ## short_name ## _mediacodec_decoder = {                      
     .flush          = mediacodec_decode_flush,                                                 \
     .close          = mediacodec_decode_close,                                                 \
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AVOID_PROBING | AV_CODEC_CAP_HARDWARE, \
-    .caps_internal  = FF_CODEC_CAP_SETS_PKT_DTS,                                               \
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE,                                        \
     .bsfs           = bsf,                                                                     \
     .hw_configs     = mediacodec_hw_configs,                                                   \
     .p.wrapper_name = "mediacodec",                                                            \
@@ -572,4 +652,58 @@ DECLARE_MEDIACODEC_VDEC(vp8, "VP8", AV_CODEC_ID_VP8, NULL)
 
 #if CONFIG_VP9_MEDIACODEC_DECODER
 DECLARE_MEDIACODEC_VDEC(vp9, "VP9", AV_CODEC_ID_VP9, NULL)
+#endif
+
+#if CONFIG_AV1_MEDIACODEC_DECODER
+DECLARE_MEDIACODEC_VDEC(av1, "AV1", AV_CODEC_ID_AV1, NULL)
+#endif
+
+#define AD AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_DECODING_PARAM
+static const AVOption ff_mediacodec_adec_options[] = {
+    { "ndk_codec", "Use MediaCodec from NDK",
+                   OFFSET(use_ndk_codec), AV_OPT_TYPE_BOOL, {.i64 = -1}, -1, 1, AD },
+    { NULL }
+};
+
+#define DECLARE_MEDIACODEC_ACLASS(short_name)                   \
+static const AVClass ff_##short_name##_mediacodec_dec_class = { \
+    .class_name = #short_name "_mediacodec",                    \
+    .item_name  = av_default_item_name,                         \
+    .option     = ff_mediacodec_adec_options,                   \
+    .version    = LIBAVUTIL_VERSION_INT,                        \
+};
+
+#define DECLARE_MEDIACODEC_ADEC(short_name, full_name, codec_id, bsf)                          \
+DECLARE_MEDIACODEC_VCLASS(short_name)                                                          \
+const FFCodec ff_ ## short_name ## _mediacodec_decoder = {                                     \
+    .p.name         = #short_name "_mediacodec",                                               \
+    CODEC_LONG_NAME(full_name " Android MediaCodec decoder"),                                  \
+    .p.type         = AVMEDIA_TYPE_AUDIO,                                                      \
+    .p.id           = codec_id,                                                                \
+    .p.priv_class   = &ff_##short_name##_mediacodec_dec_class,                                 \
+    .priv_data_size = sizeof(MediaCodecH264DecContext),                                        \
+    .init           = mediacodec_decode_init,                                                  \
+    FF_CODEC_RECEIVE_FRAME_CB(mediacodec_receive_frame),                                       \
+    .flush          = mediacodec_decode_flush,                                                 \
+    .close          = mediacodec_decode_close,                                                 \
+    .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE,                              \
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE,                                        \
+    .bsfs           = bsf,                                                                     \
+    .p.wrapper_name = "mediacodec",                                                            \
+};                                                                                             \
+
+#if CONFIG_AAC_MEDIACODEC_DECODER
+DECLARE_MEDIACODEC_ADEC(aac, "AAC", AV_CODEC_ID_AAC, "aac_adtstoasc")
+#endif
+
+#if CONFIG_AMRNB_MEDIACODEC_DECODER
+DECLARE_MEDIACODEC_ADEC(amrnb, "AMR-NB", AV_CODEC_ID_AMR_NB, NULL)
+#endif
+
+#if CONFIG_AMRWB_MEDIACODEC_DECODER
+DECLARE_MEDIACODEC_ADEC(amrwb, "AMR-WB", AV_CODEC_ID_AMR_WB, NULL)
+#endif
+
+#if CONFIG_MP3_MEDIACODEC_DECODER
+DECLARE_MEDIACODEC_ADEC(mp3, "MP3", AV_CODEC_ID_MP3, NULL)
 #endif

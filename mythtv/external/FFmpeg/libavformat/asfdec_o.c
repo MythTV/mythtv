@@ -19,11 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <time.h>
+
 #include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/dict.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
+#include "libavutil/mem.h"
 #include "libavutil/time_internal.h"
 
 #include "avformat.h"
@@ -109,6 +112,7 @@ typedef struct ASFContext {
     int64_t data_offset;
     int64_t first_packet_offset; // packet offset
     int64_t unknown_offset;   // for top level header objects or subobjects without specified behavior
+    int in_asf_read_unknown;
 
     // ASF file must not contain more than 128 streams according to the specification
     ASFStream *asf_st[ASF_MAX_STREAMS];
@@ -173,7 +177,7 @@ static int asf_read_unknown(AVFormatContext *s, const GUIDParseTable *g)
     uint64_t size   = avio_rl64(pb);
     int ret;
 
-    if (size > INT64_MAX)
+    if (size > INT64_MAX || asf->in_asf_read_unknown > 5)
         return AVERROR_INVALIDDATA;
 
     if (asf->is_header)
@@ -182,8 +186,11 @@ static int asf_read_unknown(AVFormatContext *s, const GUIDParseTable *g)
     if (!g->is_subobject) {
         if (!(ret = strcmp(g->name, "Header Extension")))
             avio_skip(pb, 22); // skip reserved fields and Data Size
-        if ((ret = detect_unknown_subobject(s, asf->unknown_offset,
-                                            asf->unknown_size)) < 0)
+        asf->in_asf_read_unknown ++;
+        ret = detect_unknown_subobject(s, asf->unknown_offset,
+                                            asf->unknown_size);
+        asf->in_asf_read_unknown --;
+        if (ret < 0)
             return ret;
     } else {
         if (size < 24) {
@@ -860,6 +867,9 @@ static int asf_read_simple_index(AVFormatContext *s, const GUIDParseTable *g)
     int64_t offset;
     uint64_t size = avio_rl64(pb);
 
+    if (size < 24)
+        return AVERROR_INVALIDDATA;
+
     // simple index objects should be ordered by stream number, this loop tries to find
     // the first not indexed video stream
     for (i = 0; i < asf->nb_streams; i++) {
@@ -884,6 +894,8 @@ static int asf_read_simple_index(AVFormatContext *s, const GUIDParseTable *g)
             av_log(s, AV_LOG_ERROR, "Skipping failed in asf_read_simple_index.\n");
             return offset;
         }
+        if (asf->first_packet_offset > INT64_MAX - asf->packet_size * pkt_num)
+            return AVERROR_INVALIDDATA;
         if (prev_pkt_num != pkt_num) {
             av_add_index_entry(st, asf->first_packet_offset + asf->packet_size *
                                pkt_num, av_rescale(interval, i, 10000),
@@ -1238,6 +1250,8 @@ static int asf_read_packet_header(AVFormatContext *s)
     unsigned char error_flags, len_flags, pay_flags;
 
     asf->packet_offset = avio_tell(pb);
+    if (asf->packet_offset > INT64_MAX/2)
+        asf->packet_offset = 0;
     error_flags = avio_r8(pb); // read Error Correction Flags
     if (error_flags & ASF_PACKET_FLAG_ERROR_CORRECTION_PRESENT) {
         if (!(error_flags & ASF_ERROR_CORRECTION_LENGTH_TYPE)) {
@@ -1664,9 +1678,10 @@ failed:
     return ret;
 }
 
-const AVInputFormat ff_asf_o_demuxer = {
-    .name           = "asf_o",
-    .long_name      = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
+const FFInputFormat ff_asf_o_demuxer = {
+    .p.name         = "asf_o",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
+    .p.flags        = AVFMT_NOBINSEARCH | AVFMT_NOGENSEARCH,
     .priv_data_size = sizeof(ASFContext),
     .read_probe     = asf_probe,
     .read_header    = asf_read_header,
@@ -1674,5 +1689,4 @@ const AVInputFormat ff_asf_o_demuxer = {
     .read_close     = asf_read_close,
     .read_timestamp = asf_read_timestamp,
     .read_seek      = asf_read_seek,
-    .flags          = AVFMT_NOBINSEARCH | AVFMT_NOGENSEARCH,
 };

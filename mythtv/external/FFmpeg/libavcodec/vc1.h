@@ -279,7 +279,7 @@ typedef struct VC1Context{
      */
     uint8_t mvrange;                ///< Extended MV range flag
     uint8_t pquantizer;             ///< Uniform (over sequence) quantizer in use
-    VLC *cbpcy_vlc;                 ///< CBPCY VLC table
+    const VLCElem *cbpcy_vlc;       ///< CBPCY VLC table
     int tt_index;                   ///< Index for Transform Type tables (to decode TTMB)
     uint8_t* mv_type_mb_plane;      ///< bitplane for mv_type == (4MV)
     uint8_t* direct_mb_plane;       ///< bitplane for "direct" MBs
@@ -293,6 +293,7 @@ typedef struct VC1Context{
     uint8_t next_luty[2][256], next_lutuv[2][256];  ///< lookup tables used for intensity compensation
     uint8_t (*curr_luty)[256]  ,(*curr_lutuv)[256];
     int last_use_ic, *curr_use_ic, next_use_ic, aux_use_ic;
+    int last_interlaced, next_interlaced; ///< whether last_pic, next_pic is interlaced
     int rnd;                        ///< rounding control
     int cbptab;
 
@@ -334,10 +335,10 @@ typedef struct VC1Context{
     int intcomp;
     uint8_t lumscale2;  ///< for interlaced field P picture
     uint8_t lumshift2;
-    VLC* mbmode_vlc;
-    VLC* imv_vlc;
-    VLC* twomvbp_vlc;
-    VLC* fourmvbp_vlc;
+    const VLCElem *mbmode_vlc;
+    const VLCElem *imv_vlc;
+    const VLCElem *twomvbp_vlc;
+    const VLCElem *fourmvbp_vlc;
     uint8_t twomvbp;
     uint8_t fourmvbp;
     uint8_t* fieldtx_plane;
@@ -413,7 +414,7 @@ int ff_vc1_parse_frame_header    (VC1Context *v, GetBitContext *gb);
 int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext *gb);
 void ff_vc1_init_common(VC1Context *v);
 
-int  ff_vc1_decode_init_alloc_tables(VC1Context *v);
+int  ff_vc1_decode_init(AVCodecContext *avctx);
 void ff_vc1_init_transposed_scantables(VC1Context *v);
 int  ff_vc1_decode_end(AVCodecContext *avctx);
 void ff_vc1_decode_blocks(VC1Context *v);

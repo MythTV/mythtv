@@ -27,13 +27,13 @@
 #include <math.h>
 
 #include "libavutil/colorspace.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/pixdesc.h"
 
 #include "avfilter.h"
 #include "drawutils.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 typedef struct LenscorrectionCtx {
@@ -59,9 +59,9 @@ static const AVOption lenscorrection_options[] = {
     { "cy", "set relative center y", OFFSET(cy), AV_OPT_TYPE_DOUBLE, {.dbl=0.5}, 0, 1, .flags=FLAGS },
     { "k1", "set quadratic distortion factor", OFFSET(k1), AV_OPT_TYPE_DOUBLE, {.dbl=0.0}, -1, 1, .flags=FLAGS },
     { "k2", "set double quadratic distortion factor", OFFSET(k2), AV_OPT_TYPE_DOUBLE, {.dbl=0.0}, -1, 1, .flags=FLAGS },
-    { "i",  "set interpolation type", OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=0}, 0, 64, .flags=FLAGS, "i" },
-    {  "nearest",  "nearest neighbour", 0,                   AV_OPT_TYPE_CONST, {.i64=0},0, 0, .flags=FLAGS, "i" },
-    {  "bilinear", "bilinear",          0,                   AV_OPT_TYPE_CONST, {.i64=1},0, 0, .flags=FLAGS, "i" },
+    { "i",  "set interpolation type", OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=0}, 0, 64, .flags=FLAGS, .unit = "i" },
+    {  "nearest",  "nearest neighbour", 0,                   AV_OPT_TYPE_CONST, {.i64=0},0, 0, .flags=FLAGS, .unit = "i" },
+    {  "bilinear", "bilinear",          0,                   AV_OPT_TYPE_CONST, {.i64=1},0, 0, .flags=FLAGS, .unit = "i" },
     { "fc", "set the color of the unmapped pixels", OFFSET(fill_rgba), AV_OPT_TYPE_COLOR, {.str="black@0"}, .flags = FLAGS },
     { NULL }
 };

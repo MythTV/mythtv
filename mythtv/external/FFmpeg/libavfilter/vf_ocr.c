@@ -22,8 +22,7 @@
 
 #include "libavutil/opt.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 typedef struct OCRContext {
@@ -129,13 +128,6 @@ static const AVFilterPad ocr_inputs[] = {
     },
 };
 
-static const AVFilterPad ocr_outputs[] = {
-    {
-        .name         = "default",
-        .type         = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_ocr = {
     .name          = "ocr",
     .description   = NULL_IF_CONFIG_SMALL("Optical Character Recognition."),
@@ -145,6 +137,6 @@ const AVFilter ff_vf_ocr = {
     .uninit        = uninit,
     .flags         = AVFILTER_FLAG_METADATA_ONLY,
     FILTER_INPUTS(ocr_inputs),
-    FILTER_OUTPUTS(ocr_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
 };
