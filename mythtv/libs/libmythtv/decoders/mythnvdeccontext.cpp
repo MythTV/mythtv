@@ -425,7 +425,6 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, MythVideoFrame 
     Frame->m_directRendering = true;
 
     AvFrame->opaque = Frame;
-    AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // set the pixel format - normally NV12 but P010 for 10bit etc. Set here rather than guessing later.
     if (AvFrame->hw_frames_ctx)
