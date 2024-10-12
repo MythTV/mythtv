@@ -6761,7 +6761,7 @@ ffmpeg_optset ar nm ranlib
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
-ffmpeg_optenable crystalhd sdl2 ffplay
+ffmpeg_optenable sdl2 ffplay
 
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
