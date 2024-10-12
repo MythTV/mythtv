@@ -19,13 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
 
 #define BITSTREAM_READER_LE
@@ -33,7 +28,7 @@
 #include "get_bits.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 typedef struct MidiVidContext {
     GetByteContext gb;
@@ -203,12 +198,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     bytestream2_skip(gb, 8);
     uncompressed = bytestream2_get_le32(gb);
 
-    if ((ret = ff_reget_buffer(avctx, s->frame, 0)) < 0)
-        return ret;
-
-    if (uncompressed) {
-        ret = decode_mvdv(s, avctx, frame);
-    } else {
+    if (!uncompressed) {
         av_fast_padded_malloc(&s->uncompressed, &s->uncompressed_size, 16LL * (avpkt->size - 12));
         if (!s->uncompressed)
             return AVERROR(ENOMEM);
@@ -217,8 +207,12 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         if (ret < 0)
             return ret;
         bytestream2_init(gb, s->uncompressed, ret);
-        ret = decode_mvdv(s, avctx, frame);
     }
+
+    if ((ret = ff_reget_buffer(avctx, s->frame, 0)) < 0)
+        return ret;
+
+    ret = decode_mvdv(s, avctx, frame);
 
     if (ret < 0)
         return ret;
@@ -228,7 +222,10 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         return ret;
 
     frame->pict_type = key ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
-    frame->key_frame = key;
+    if (key)
+        frame->flags |= AV_FRAME_FLAG_KEY;
+    else
+        frame->flags &= ~AV_FRAME_FLAG_KEY;
     *got_frame = 1;
 
     return avpkt->size;
@@ -280,7 +277,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
 
 const FFCodec ff_mvdv_decoder = {
     .p.name         = "mvdv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("MidiVid VQ"),
+    CODEC_LONG_NAME("MidiVid VQ"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_MVDV,
     .priv_data_size = sizeof(MidiVidContext),
@@ -289,5 +286,5 @@ const FFCodec ff_mvdv_decoder = {
     .flush          = decode_flush,
     .close          = decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

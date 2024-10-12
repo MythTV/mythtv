@@ -26,9 +26,10 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/ffmath.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
-#include "aactab.h"
+#include "aac.h"
 #include "psymodel.h"
 
 /***********************************
@@ -222,10 +223,6 @@ static const float psy_fir_coeffs[] = {
     -5.52212e-17 * 2, -0.313819 * 2
 };
 
-#if ARCH_MIPS
-#   include "mips/aacpsy_mips.h"
-#endif /* ARCH_MIPS */
-
 /**
  * Calculate the ABR attack threshold from the above LAME psymodel table.
  */
@@ -267,7 +264,7 @@ static av_cold void lame_window_init(AacPsyContext *ctx, AVCodecContext *avctx)
         AacPsyChannel *pch = &ctx->ch[i];
 
         if (avctx->flags & AV_CODEC_FLAG_QSCALE)
-            pch->attack_threshold = psy_vbr_map[avctx->global_quality / FF_QP2LAMBDA].st_lrm;
+            pch->attack_threshold = psy_vbr_map[av_clip(avctx->global_quality / FF_QP2LAMBDA, 0, 10)].st_lrm;
         else
             pch->attack_threshold = lame_calc_attack_threshold(avctx->bit_rate / avctx->ch_layout.nb_channels / 1000);
 

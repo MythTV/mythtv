@@ -20,7 +20,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <libxml/parser.h>
+#include <time.h>
 #include "libavutil/bprint.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/time.h"
 #include "libavutil/parseutils.h"
@@ -28,6 +30,7 @@
 #include "avio_internal.h"
 #include "dash.h"
 #include "demux.h"
+#include "url.h"
 
 #define INITIAL_BUFFER_SIZE 32768
 
@@ -956,13 +959,18 @@ static int parse_manifest_representation(AVFormatContext *s, const char *url,
             xmlFree(val);
         }
         if (adaptionset_supplementalproperty_node) {
-            if (!av_strcasecmp(xmlGetProp(adaptionset_supplementalproperty_node,"schemeIdUri"), "http://dashif.org/guidelines/last-segment-number")) {
-                val = xmlGetProp(adaptionset_supplementalproperty_node,"value");
-                if (!val) {
-                    av_log(s, AV_LOG_ERROR, "Missing value attribute in adaptionset_supplementalproperty_node\n");
-                } else {
-                    rep->last_seq_no =(int64_t) strtoll(val, NULL, 10) - 1;
-                    xmlFree(val);
+            char *scheme_id_uri = xmlGetProp(adaptionset_supplementalproperty_node, "schemeIdUri");
+            if (scheme_id_uri) {
+                int is_last_segment_number = !av_strcasecmp(scheme_id_uri, "http://dashif.org/guidelines/last-segment-number");
+                xmlFree(scheme_id_uri);
+                if (is_last_segment_number) {
+                    val = xmlGetProp(adaptionset_supplementalproperty_node, "value");
+                    if (!val) {
+                        av_log(s, AV_LOG_ERROR, "Missing value attribute in adaptionset_supplementalproperty_node\n");
+                    } else {
+                        rep->last_seq_no = (int64_t)strtoll(val, NULL, 10) - 1;
+                        xmlFree(val);
+                    }
                 }
             }
         }
@@ -1947,17 +1955,6 @@ static int open_demux_for_component(AVFormatContext *s, struct representation *p
 
         // copy disposition
         st->disposition = ist->disposition;
-
-        // copy side data
-        for (int i = 0; i < ist->nb_side_data; i++) {
-            const AVPacketSideData *sd_src = &ist->side_data[i];
-            uint8_t *dst_data;
-
-            dst_data = av_stream_new_side_data(st, sd_src->type, sd_src->size);
-            if (!dst_data)
-                return AVERROR(ENOMEM);
-            memcpy(dst_data, sd_src->data, sd_src->size);
-        }
     }
 
     return 0;
@@ -2211,9 +2208,9 @@ static int dash_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (cur->is_restart_needed) {
             cur->cur_seg_offset = 0;
             cur->init_sec_buf_read_offset = 0;
+            cur->is_restart_needed = 0;
             ff_format_io_close(cur->parent, &cur->input);
             ret = reopen_demux_for_component(s, cur);
-            cur->is_restart_needed = 0;
         }
     }
     return AVERROR_EOF;
@@ -2359,16 +2356,16 @@ static const AVClass dash_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVInputFormat ff_dash_demuxer = {
-    .name           = "dash",
-    .long_name      = NULL_IF_CONFIG_SMALL("Dynamic Adaptive Streaming over HTTP"),
-    .priv_class     = &dash_class,
+const FFInputFormat ff_dash_demuxer = {
+    .p.name         = "dash",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Dynamic Adaptive Streaming over HTTP"),
+    .p.priv_class   = &dash_class,
+    .p.flags        = AVFMT_NO_BYTE_SEEK,
     .priv_data_size = sizeof(DASHContext),
-    .flags_internal = FF_FMT_INIT_CLEANUP,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .read_probe     = dash_probe,
     .read_header    = dash_read_header,
     .read_packet    = dash_read_packet,
     .read_close     = dash_close,
     .read_seek      = dash_read_seek,
-    .flags          = AVFMT_NO_BYTE_SEEK,
 };

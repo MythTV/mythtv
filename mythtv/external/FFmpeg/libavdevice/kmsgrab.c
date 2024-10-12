@@ -36,12 +36,14 @@
 #include "libavutil/hwcontext_drm.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixfmt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/time.h"
 
 #include "libavformat/avformat.h"
+#include "libavformat/demux.h"
 #include "libavformat/internal.h"
 
 typedef struct KMSGrabContext {
@@ -708,13 +710,13 @@ static const AVClass kmsgrab_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT,
 };
 
-const AVInputFormat ff_kmsgrab_demuxer = {
-    .name           = "kmsgrab",
-    .long_name      = NULL_IF_CONFIG_SMALL("KMS screen capture"),
+const FFInputFormat ff_kmsgrab_demuxer = {
+    .p.name         = "kmsgrab",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("KMS screen capture"),
+    .p.flags        = AVFMT_NOFILE,
+    .p.priv_class   = &kmsgrab_class,
     .priv_data_size = sizeof(KMSGrabContext),
     .read_header    = &kmsgrab_read_header,
     .read_packet    = &kmsgrab_read_packet,
     .read_close     = &kmsgrab_read_close,
-    .flags          = AVFMT_NOFILE,
-    .priv_class     = &kmsgrab_class,
 };

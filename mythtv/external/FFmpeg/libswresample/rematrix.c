@@ -21,6 +21,7 @@
 #include "swresample_internal.h"
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem.h"
 
 #define TEMPLATE_REMATRIX_FLT
 #include "rematrix_template.c"
@@ -64,37 +65,14 @@
 int swr_set_matrix(struct SwrContext *s, const double *matrix, int stride)
 {
     int nb_in, nb_out, in, out;
-    int user_in_chlayout_nb_channels, user_out_chlayout_nb_channels;
 
     if (!s || s->in_convert) // s needs to be allocated but not initialized
         return AVERROR(EINVAL);
     memset(s->matrix, 0, sizeof(s->matrix));
     memset(s->matrix_flt, 0, sizeof(s->matrix_flt));
 
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-    user_in_chlayout_nb_channels = av_get_channel_layout_nb_channels(s->user_in_ch_layout);
-FF_ENABLE_DEPRECATION_WARNINGS
-    if (!user_in_chlayout_nb_channels)
-#endif
-    user_in_chlayout_nb_channels = s->user_in_chlayout.nb_channels;
-    nb_in =
-#if FF_API_OLD_CHANNEL_LAYOUT
-            (s->user_in_ch_count > 0) ? s->user_in_ch_count :
-#endif
-            user_in_chlayout_nb_channels;
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-    user_out_chlayout_nb_channels = av_get_channel_layout_nb_channels(s->user_out_ch_layout);
-FF_ENABLE_DEPRECATION_WARNINGS
-    if (!user_out_chlayout_nb_channels)
-#endif
-    user_out_chlayout_nb_channels = s->user_out_chlayout.nb_channels;
-    nb_out =
-#if FF_API_OLD_CHANNEL_LAYOUT
-             (s->user_out_ch_count > 0) ? s->user_out_ch_count :
-#endif
-             user_out_chlayout_nb_channels;
+    nb_in = s->user_in_chlayout.nb_channels;
+    nb_out = s->user_out_chlayout.nb_channels;
     for (out = 0; out < nb_out; out++) {
         for (in = 0; in < nb_in; in++)
             s->matrix_flt[out][in] = s->matrix[out][in] = matrix[in];
@@ -138,32 +116,13 @@ static int sane_layout(AVChannelLayout *ch_layout) {
         return 0;
     if(!even(av_channel_layout_subset(ch_layout, (AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER))))
         return 0;
+    if(!even(av_channel_layout_subset(ch_layout, (AV_CH_TOP_FRONT_LEFT | AV_CH_TOP_FRONT_RIGHT))))
+        return 0;
     if(ch_layout->nb_channels >= SWR_CH_MAX)
         return 0;
 
     return 1;
 }
-
-#if FF_API_OLD_CHANNEL_LAYOUT
-av_cold int swr_build_matrix(uint64_t in_ch_layout_param, uint64_t out_ch_layout_param,
-                             double center_mix_level, double surround_mix_level,
-                             double lfe_mix_level, double maxval,
-                             double rematrix_volume, double *matrix_param,
-                             int stride, enum AVMatrixEncoding matrix_encoding, void *log_context)
-{
-    AVChannelLayout in_ch_layout = { 0 }, out_ch_layout = { 0 };
-    int ret;
-
-    ret  = av_channel_layout_from_mask(&in_ch_layout, in_ch_layout_param);
-    ret |= av_channel_layout_from_mask(&out_ch_layout, out_ch_layout_param);
-    if (ret < 0)
-        return ret;
-
-    return swr_build_matrix2(&in_ch_layout, &out_ch_layout, center_mix_level, surround_mix_level,
-                             lfe_mix_level, maxval, rematrix_volume, matrix_param,
-                             stride, matrix_encoding, log_context);
-}
-#endif
 
 av_cold int swr_build_matrix2(const AVChannelLayout *in_layout, const AVChannelLayout *out_layout,
                               double center_mix_level, double surround_mix_level,
@@ -369,6 +328,28 @@ av_cold int swr_build_matrix2(const AVChannelLayout *in_layout, const AVChannelL
         }else
             av_assert0(0);
     }
+
+    if (unaccounted & AV_CH_TOP_FRONT_LEFT) {
+        if (av_channel_layout_index_from_channel(&out_ch_layout, AV_CHAN_TOP_FRONT_CENTER) >= 0) {
+            matrix[TOP_FRONT_CENTER][TOP_FRONT_LEFT ] += M_SQRT1_2;
+            matrix[TOP_FRONT_CENTER][TOP_FRONT_RIGHT] += M_SQRT1_2;
+            if (av_channel_layout_index_from_channel(&in_ch_layout, AV_CHAN_TOP_FRONT_CENTER) >= 0)
+                matrix[TOP_FRONT_CENTER][TOP_FRONT_CENTER] = center_mix_level * sqrt(2);
+        } else if (av_channel_layout_index_from_channel(&out_ch_layout, AV_CHAN_FRONT_LEFT) >= 0) {
+            if (av_channel_layout_index_from_channel(&in_ch_layout, AV_CHAN_FRONT_LEFT) >= 0) {
+                matrix[FRONT_LEFT ][TOP_FRONT_LEFT ] += M_SQRT1_2;
+                matrix[FRONT_RIGHT][TOP_FRONT_RIGHT] += M_SQRT1_2;
+            } else {
+                matrix[FRONT_LEFT ][TOP_FRONT_LEFT ] += 1.0;
+                matrix[FRONT_RIGHT][TOP_FRONT_RIGHT] += 1.0;
+            }
+        } else if (av_channel_layout_index_from_channel(&out_ch_layout, AV_CHAN_FRONT_CENTER) >= 0) {
+            matrix[FRONT_CENTER][TOP_FRONT_LEFT ] += M_SQRT1_2;
+            matrix[FRONT_CENTER][TOP_FRONT_RIGHT] += M_SQRT1_2;
+        } else
+            av_assert0(0);
+    }
+
     /* mix LFE into front left/right or center */
     if (unaccounted & AV_CH_LOW_FREQUENCY) {
         if (av_channel_layout_index_from_channel(&out_ch_layout, AV_CHAN_FRONT_CENTER) >= 0) {
@@ -468,7 +449,7 @@ av_cold static int auto_matrix(SwrContext *s)
 
 av_cold int swri_rematrix_init(SwrContext *s){
     int i, j;
-    int nb_in  = s->used_ch_count;
+    int nb_in  = s->used_ch_layout.nb_channels;
     int nb_out = s->out.ch_count;
 
     s->mix_any_f = NULL;

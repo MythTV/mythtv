@@ -61,6 +61,7 @@ int ff_fill_rgba_map(uint8_t *rgba_map, enum AVPixelFormat pix_fmt)
 
             had0 |= pos == 0;
             rgba_map[i] = pos;
+            depthb = db;
         }
 
         if (desc->nb_components == 3)
@@ -127,9 +128,6 @@ int ff_draw_init2(FFDrawContext *draw, enum AVPixelFormat format, enum AVColorSp
         /* strange interleaving */
         if (pixelstep[c->plane] != 0 &&
             pixelstep[c->plane] != c->step)
-            return AVERROR(ENOSYS);
-        if (pixelstep[c->plane] == 6 &&
-            c->depth == 16)
             return AVERROR(ENOSYS);
         pixelstep[c->plane] = c->step;
         if (pixelstep[c->plane] >= 8)

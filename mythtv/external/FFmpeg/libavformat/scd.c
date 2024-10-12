@@ -21,13 +21,16 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include "libavutil/avstring.h"
+
+#include <stddef.h>
+
 #include "libavutil/intreadwrite.h"
 #include "libavutil/internal.h"
 #include "libavutil/macros.h"
-#include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 #include "libavformat/internal.h"
 #include "avformat.h"
+#include "demux.h"
 
 #define SCD_MAGIC              ((uint64_t)MKBETAG('S', 'E', 'D', 'B') << 32 | \
                                           MKBETAG('S', 'S', 'C', 'F'))
@@ -187,7 +190,7 @@ static int scd_read_track(AVFormatContext *s, SCDTrackHeader *track, int index)
 
     /* Not sure what to do with these, it seems to be fine to ignore them. */
     if (track->aux_count != 0)
-        av_log(s, AV_LOG_DEBUG, "[%d] Track has %u auxillary chunk(s).\n", index, track->aux_count);
+        av_log(s, AV_LOG_DEBUG, "[%d] Track has %u auxiliary chunk(s).\n", index, track->aux_count);
 
     if ((st = avformat_new_stream(s, NULL)) == NULL)
         return AVERROR(ENOMEM);
@@ -365,11 +368,11 @@ static int scd_read_close(AVFormatContext *s)
     return 0;
 }
 
-const AVInputFormat ff_scd_demuxer = {
-    .name           = "scd",
-    .long_name      = NULL_IF_CONFIG_SMALL("Square Enix SCD"),
+const FFInputFormat ff_scd_demuxer = {
+    .p.name         = "scd",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Square Enix SCD"),
     .priv_data_size = sizeof(SCDDemuxContext),
-    .flags_internal = FF_FMT_INIT_CLEANUP,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .read_probe     = scd_probe,
     .read_header    = scd_read_header,
     .read_packet    = scd_read_packet,

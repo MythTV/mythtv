@@ -23,7 +23,9 @@
 #include "config_components.h"
 
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
+#include "mux.h"
 #include "rawenc.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/internal.h"
@@ -148,7 +150,7 @@ static int apm_read_header(AVFormatContext *s)
     par->codec_id              = AV_CODEC_ID_ADPCM_IMA_APM;
     par->format                = AV_SAMPLE_FMT_S16;
     par->bit_rate              = par->ch_layout.nb_channels *
-                                 par->sample_rate *
+                                 (int64_t)par->sample_rate *
                                  par->bits_per_coded_sample;
 
     if ((ret = avio_read(s->pb, buf, APM_FILE_EXTRADATA_SIZE)) < 0)
@@ -201,9 +203,9 @@ static int apm_read_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-const AVInputFormat ff_apm_demuxer = {
-    .name           = "apm",
-    .long_name      = NULL_IF_CONFIG_SMALL("Ubisoft Rayman 2 APM"),
+const FFInputFormat ff_apm_demuxer = {
+    .p.name         = "apm",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Ubisoft Rayman 2 APM"),
     .read_probe     = apm_probe,
     .read_header    = apm_read_header,
     .read_packet    = apm_read_packet
@@ -213,20 +215,7 @@ const AVInputFormat ff_apm_demuxer = {
 #if CONFIG_APM_MUXER
 static int apm_write_init(AVFormatContext *s)
 {
-    AVCodecParameters *par;
-
-    if (s->nb_streams != 1) {
-        av_log(s, AV_LOG_ERROR, "APM files have exactly one stream\n");
-        return AVERROR(EINVAL);
-    }
-
-    par = s->streams[0]->codecpar;
-
-    if (par->codec_id != AV_CODEC_ID_ADPCM_IMA_APM) {
-        av_log(s, AV_LOG_ERROR, "%s codec not supported\n",
-               avcodec_get_name(par->codec_id));
-        return AVERROR(EINVAL);
-    }
+    AVCodecParameters *par = s->streams[0]->codecpar;
 
     if (par->ch_layout.nb_channels > 2) {
         av_log(s, AV_LOG_ERROR, "APM files only support up to 2 channels\n");
@@ -303,12 +292,15 @@ static int apm_write_trailer(AVFormatContext *s)
     return 0;
 }
 
-const AVOutputFormat ff_apm_muxer = {
-    .name           = "apm",
-    .long_name      = NULL_IF_CONFIG_SMALL("Ubisoft Rayman 2 APM"),
-    .extensions     = "apm",
-    .audio_codec    = AV_CODEC_ID_ADPCM_IMA_APM,
-    .video_codec    = AV_CODEC_ID_NONE,
+const FFOutputFormat ff_apm_muxer = {
+    .p.name         = "apm",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Ubisoft Rayman 2 APM"),
+    .p.extensions   = "apm",
+    .p.audio_codec  = AV_CODEC_ID_ADPCM_IMA_APM,
+    .p.video_codec  = AV_CODEC_ID_NONE,
+    .p.subtitle_codec = AV_CODEC_ID_NONE,
+    .flags_internal   = FF_OFMT_FLAG_MAX_ONE_OF_EACH |
+                        FF_OFMT_FLAG_ONLY_DEFAULT_CODECS,
     .init           = apm_write_init,
     .write_header   = apm_write_header,
     .write_packet   = ff_raw_write_packet,

@@ -18,9 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
 #include "audio.h"
 
 typedef struct ChannelParams {
@@ -264,13 +265,6 @@ static const AVFilterPad avfilter_af_aexciter_inputs[] = {
     },
 };
 
-static const AVFilterPad avfilter_af_aexciter_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_aexciter = {
     .name          = "aexciter",
     .description   = NULL_IF_CONFIG_SMALL("Enhance high frequency part of audio."),
@@ -278,7 +272,7 @@ const AVFilter ff_af_aexciter = {
     .priv_class    = &aexciter_class,
     .uninit        = uninit,
     FILTER_INPUTS(avfilter_af_aexciter_inputs),
-    FILTER_OUTPUTS(avfilter_af_aexciter_outputs),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
     FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_DBL),
     .process_command = process_command,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,

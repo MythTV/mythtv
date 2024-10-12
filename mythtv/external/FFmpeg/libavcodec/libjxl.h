@@ -28,6 +28,7 @@
 #define AVCODEC_LIBJXL_H
 
 #include <jxl/memory_manager.h>
+#include <jxl/version.h>
 
 /**
  * Transform threadcount in ffmpeg to one used by libjxl.

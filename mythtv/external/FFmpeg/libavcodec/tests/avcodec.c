@@ -20,7 +20,6 @@
 #include "libavcodec/codec.h"
 #include "libavcodec/codec_desc.h"
 #include "libavcodec/codec_internal.h"
-#include "libavcodec/internal.h"
 
 static const char *get_type_string(enum AVMediaType type)
 {
@@ -142,19 +141,25 @@ int main(void){
                     ret = 1;
                 }
             }
-            if (codec2->caps_internal & (FF_CODEC_CAP_ALLOCATE_PROGRESS |
+            if (codec2->caps_internal & (FF_CODEC_CAP_USES_PROGRESSFRAMES |
                                         FF_CODEC_CAP_SETS_PKT_DTS |
                                         FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM |
                                         FF_CODEC_CAP_EXPORTS_CROPPING |
                                         FF_CODEC_CAP_SETS_FRAME_PROPS) ||
                 codec->capabilities  & (AV_CODEC_CAP_AVOID_PROBING |
                                         AV_CODEC_CAP_CHANNEL_CONF  |
-                                        AV_CODEC_CAP_DRAW_HORIZ_BAND |
-                                        AV_CODEC_CAP_SUBFRAMES))
+                                        AV_CODEC_CAP_DRAW_HORIZ_BAND))
                 ERR("Encoder %s has decoder-only capabilities set\n");
             if (codec->capabilities & AV_CODEC_CAP_FRAME_THREADS &&
                 codec->capabilities & AV_CODEC_CAP_ENCODER_FLUSH)
                 ERR("Frame-threaded encoder %s claims to support flushing\n");
+            if (codec->capabilities & AV_CODEC_CAP_FRAME_THREADS &&
+                codec->capabilities & AV_CODEC_CAP_DELAY)
+                ERR("Frame-threaded encoder %s claims to have delay\n");
+
+            if (codec2->caps_internal & FF_CODEC_CAP_EOF_FLUSH &&
+                !(codec->capabilities & AV_CODEC_CAP_DELAY))
+                ERR("EOF_FLUSH encoder %s is not marked as having delay\n");
         } else {
             if ((codec->type == AVMEDIA_TYPE_SUBTITLE) != (codec2->cb_type == FF_CODEC_CB_TYPE_DECODE_SUB))
                 ERR("Subtitle decoder %s does not implement decode_sub callback\n");
@@ -166,10 +171,10 @@ int main(void){
                                        AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE |
                                        AV_CODEC_CAP_ENCODER_FLUSH))
                 ERR("Decoder %s has encoder-only capabilities\n");
-            if (codec2->caps_internal & FF_CODEC_CAP_ALLOCATE_PROGRESS &&
-                !(codec->capabilities & AV_CODEC_CAP_FRAME_THREADS))
-                ERR("Decoder %s wants allocated progress without supporting"
-                    "frame threads\n");
+            if (codec2->cb_type != FF_CODEC_CB_TYPE_DECODE &&
+                codec2->caps_internal & FF_CODEC_CAP_SETS_PKT_DTS)
+                ERR("Decoder %s is marked as setting pkt_dts when it doesn't have"
+                    "any effect\n");
         }
         if (priv_data_size_wrong(codec2))
             ERR_EXT("Private context of codec %s is impossibly-sized (size %d).",

@@ -30,7 +30,6 @@
 #include "config.h"
 
 #if HAVE_WINDOWS_H
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 #if HAVE_OPENGL_GL3_H
@@ -53,6 +52,8 @@
 #endif
 
 #include "libavutil/common.h"
+#include "libavutil/frame.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
@@ -155,7 +156,7 @@ typedef struct FFOpenGLFunctions {
 {\
     GLenum err_code; \
     if ((err_code = glGetError()) != GL_NO_ERROR) { \
-        av_log(ctx, AV_LOG_ERROR, "OpenGL error occurred in '%s', line %d: %d\n", __FUNCTION__, __LINE__, err_code); \
+        av_log(ctx, AV_LOG_ERROR, "OpenGL error occurred in '%s', line %d: %d\n", __func__, __LINE__, err_code); \
         goto fail; \
     } \
 }\
@@ -227,6 +228,8 @@ typedef struct OpenGLContext {
     int picture_height;                ///< Rendered height
     int window_width;
     int window_height;
+
+    int warned;
 } OpenGLContext;
 
 static const struct OpenGLFormatDesc {
@@ -599,7 +602,8 @@ static av_cold int opengl_read_limits(AVFormatContext *h)
     }
 
     av_log(h, AV_LOG_DEBUG, "OpenGL version: %s\n", version);
-    sscanf(version, "%d.%d", &major, &minor);
+    if (sscanf(version, "%d.%d", &major, &minor) != 2)
+        return AVERROR(ENOSYS);
 
     for (i = 0; required_extensions[i].extension; i++) {
         if (major < required_extensions[i].major &&
@@ -1064,6 +1068,15 @@ static av_cold int opengl_write_header(AVFormatContext *h)
     AVStream *st;
     int ret;
 
+    if (!opengl->warned) {
+        av_log(opengl, AV_LOG_WARNING,
+            "The opengl output device is deprecated due to being fundamentally incompatible with libavformat API. "
+            "For monitoring purposes in ffmpeg you can output to a file or use pipes and a video player.\n"
+            "Example: ffmpeg -i INPUT -f nut -c:v rawvideo - | ffplay -loglevel warning -vf setpts=0 -\n"
+        );
+        opengl->warned = 1;
+    }
+
     if (h->nb_streams != 1 ||
         par->codec_type != AVMEDIA_TYPE_VIDEO ||
         (par->codec_id != AV_CODEC_ID_WRAPPED_AVFRAME && par->codec_id != AV_CODEC_ID_RAWVIDEO)) {
@@ -1205,6 +1218,10 @@ static int opengl_draw(AVFormatContext *h, void *input, int repaint, int is_pkt)
     int ret;
 
 #if CONFIG_SDL2
+    /* At this point, opengl->glcontext implies opengl->glcontext */
+    if (opengl->glcontext)
+        SDL_GL_MakeCurrent(opengl->window, opengl->glcontext);
+
     if (!opengl->no_window && (ret = opengl_sdl_process_events(h)) < 0)
         goto fail;
 #endif
@@ -1297,17 +1314,17 @@ static const AVClass opengl_class = {
     .category   = AV_CLASS_CATEGORY_DEVICE_VIDEO_OUTPUT,
 };
 
-const AVOutputFormat ff_opengl_muxer = {
-    .name           = "opengl",
-    .long_name      = NULL_IF_CONFIG_SMALL("OpenGL output"),
+const FFOutputFormat ff_opengl_muxer = {
+    .p.name              = "opengl",
+    .p.long_name         = NULL_IF_CONFIG_SMALL("OpenGL output"),
+    .p.audio_codec       = AV_CODEC_ID_NONE,
+    .p.video_codec       = AV_CODEC_ID_WRAPPED_AVFRAME,
+    .p.flags             = AVFMT_NOFILE | AVFMT_VARIABLE_FPS | AVFMT_NOTIMESTAMPS,
+    .p.priv_class        = &opengl_class,
     .priv_data_size = sizeof(OpenGLContext),
-    .audio_codec    = AV_CODEC_ID_NONE,
-    .video_codec    = AV_CODEC_ID_WRAPPED_AVFRAME,
     .write_header   = opengl_write_header,
     .write_packet   = opengl_write_packet,
     .write_uncoded_frame = opengl_write_frame,
     .write_trailer  = opengl_write_trailer,
     .control_message = opengl_control_message,
-    .flags          = AVFMT_NOFILE | AVFMT_VARIABLE_FPS | AVFMT_NOTIMESTAMPS,
-    .priv_class     = &opengl_class,
 };

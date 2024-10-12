@@ -24,6 +24,7 @@
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
 #include "avio_internal.h"
+#include "demux.h"
 #include "internal.h"
 #include "id3v1.h"
 #include "id3v2.h"
@@ -113,12 +114,12 @@ static int adts_aac_read_header(AVFormatContext *s)
         return AVERROR(ENOMEM);
 
     st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
-    st->codecpar->codec_id   = s->iformat->raw_codec_id;
+    st->codecpar->codec_id   = AV_CODEC_ID_AAC;
     ffstream(st)->need_parsing = AVSTREAM_PARSE_FULL_RAW;
 
     ff_id3v1_read(s);
     if ((s->pb->seekable & AVIO_SEEKABLE_NORMAL) &&
-        !av_dict_get(s->metadata, "", NULL, AV_DICT_IGNORE_SUFFIX)) {
+        !av_dict_count(s->metadata)) {
         int64_t cur = avio_tell(s->pb);
         ff_ape_parse_tag(s);
         avio_seek(s->pb, cur, SEEK_SET);
@@ -142,11 +143,10 @@ static int handle_id3(AVFormatContext *s, AVPacket *pkt)
     int ret;
 
     ret = av_append_packet(s->pb, pkt, ff_id3v2_tag_len(pkt->data) - pkt->size);
-    if (ret < 0) {
+    if (ret < 0)
         return ret;
-    }
 
-    ffio_init_context(&pb, pkt->data, pkt->size, 0, NULL, NULL, NULL, NULL);
+    ffio_init_read_context(&pb, pkt->data, pkt->size);
     ff_id3v2_read_dict(&pb.pub, &metadata, ID3v2_DEFAULT_MAGIC, &id3v2_extra_meta);
     if ((ret = ff_id3v2_parse_priv_dict(&metadata, id3v2_extra_meta)) < 0)
         goto error;
@@ -174,9 +174,8 @@ retry:
     if (ret < 0)
         return ret;
 
-    if (ret < ADTS_HEADER_SIZE) {
+    if (ret < ADTS_HEADER_SIZE)
         return AVERROR(EIO);
-    }
 
     if ((AV_RB16(pkt->data) >> 4) != 0xfff) {
         // Parse all the ID3 headers between frames
@@ -184,9 +183,8 @@ retry:
 
         av_assert2(append > 0);
         ret = av_append_packet(s->pb, pkt, append);
-        if (ret != append) {
+        if (ret != append)
             return AVERROR(EIO);
-        }
         if (!ff_id3v2_match(pkt->data, ID3v2_DEFAULT_MAGIC)) {
             av_packet_unref(pkt);
             ret = adts_aac_resync(s);
@@ -199,23 +197,22 @@ retry:
     }
 
     fsize = (AV_RB32(pkt->data + 3) >> 13) & 0x1FFF;
-    if (fsize < ADTS_HEADER_SIZE) {
+    if (fsize < ADTS_HEADER_SIZE)
         return AVERROR_INVALIDDATA;
-    }
 
     ret = av_append_packet(s->pb, pkt, fsize - pkt->size);
 
     return ret;
 }
 
-const AVInputFormat ff_aac_demuxer = {
-    .name         = "aac",
-    .long_name    = NULL_IF_CONFIG_SMALL("raw ADTS AAC (Advanced Audio Coding)"),
+const FFInputFormat ff_aac_demuxer = {
+    .p.name       = "aac",
+    .p.long_name  = NULL_IF_CONFIG_SMALL("raw ADTS AAC (Advanced Audio Coding)"),
+    .p.flags      = AVFMT_GENERIC_INDEX,
+    .p.extensions = "aac",
+    .p.mime_type  = "audio/aac,audio/aacp,audio/x-aac",
     .read_probe   = adts_aac_probe,
     .read_header  = adts_aac_read_header,
     .read_packet  = adts_aac_read_packet,
-    .flags        = AVFMT_GENERIC_INDEX,
-    .extensions   = "aac",
-    .mime_type    = "audio/aac,audio/aacp,audio/x-aac",
     .raw_codec_id = AV_CODEC_ID_AAC,
 };

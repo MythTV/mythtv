@@ -31,6 +31,7 @@
 #include "avformat.h"
 #include "avio_internal.h"
 #include "internal.h"
+#include "mux.h"
 #include <stdint.h>
 
 #define AUD_CHUNK_SIGNATURE 0x0000DEAF
@@ -42,24 +43,12 @@ typedef struct AUDMuxContext {
 
 static int wsaud_write_init(AVFormatContext *ctx)
 {
-    AVStream     *st = ctx->streams[0];
     AVIOContext  *pb = ctx->pb;
 
     /* Stream must be seekable to correctly write the file. */
     if (!(pb->seekable & AVIO_SEEKABLE_NORMAL)) {
-        av_log(ctx->streams[0], AV_LOG_ERROR, "Cannot write Westwood AUD to"
+        av_log(ctx, AV_LOG_ERROR, "Cannot write Westwood AUD to"
                " non-seekable stream.\n");
-        return AVERROR(EINVAL);
-    }
-
-    if (st->codecpar->codec_id != AV_CODEC_ID_ADPCM_IMA_WS) {
-        av_log(st, AV_LOG_ERROR, "%s codec not supported for Westwood AUD.\n",
-               avcodec_get_name(st->codecpar->codec_id));
-        return AVERROR(EINVAL);
-    }
-
-    if (ctx->nb_streams != 1) {
-        av_log(st, AV_LOG_ERROR, "AUD files have exactly one stream\n");
         return AVERROR(EINVAL);
     }
 
@@ -125,15 +114,18 @@ static int wsaud_write_trailer(AVFormatContext *ctx)
     return 0;
 }
 
-const AVOutputFormat ff_wsaud_muxer = {
-    .name              = "wsaud",
-    .long_name         = NULL_IF_CONFIG_SMALL("Westwood Studios audio"),
-    .extensions        = "aud",
+const FFOutputFormat ff_wsaud_muxer = {
+    .p.name            = "wsaud",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("Westwood Studios audio"),
+    .p.extensions      = "aud",
     .priv_data_size    = sizeof(AUDMuxContext),
-    .audio_codec       = AV_CODEC_ID_ADPCM_IMA_WS,
-    .video_codec       = AV_CODEC_ID_NONE,
+    .p.audio_codec     = AV_CODEC_ID_ADPCM_IMA_WS,
+    .p.video_codec     = AV_CODEC_ID_NONE,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
     .init              = wsaud_write_init,
     .write_header      = wsaud_write_header,
     .write_packet      = wsaud_write_packet,
     .write_trailer     = wsaud_write_trailer,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH |
+                         FF_OFMT_FLAG_ONLY_DEFAULT_CODECS,
 };

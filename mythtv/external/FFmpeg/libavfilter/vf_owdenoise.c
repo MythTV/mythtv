@@ -34,11 +34,13 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
+#include "video.h"
 
 typedef struct OWDenoiseContext {
     const AVClass *class;
@@ -354,20 +356,13 @@ static const AVFilterPad owdenoise_inputs[] = {
     },
 };
 
-static const AVFilterPad owdenoise_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_owdenoise = {
     .name          = "owdenoise",
     .description   = NULL_IF_CONFIG_SMALL("Denoise using wavelets."),
     .priv_size     = sizeof(OWDenoiseContext),
     .uninit        = uninit,
     FILTER_INPUTS(owdenoise_inputs),
-    FILTER_OUTPUTS(owdenoise_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .priv_class    = &owdenoise_class,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
