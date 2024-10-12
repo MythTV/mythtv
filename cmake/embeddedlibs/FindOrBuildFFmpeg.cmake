@@ -103,7 +103,6 @@ function(find_or_build_ffmpeg)
       ${CMAKE_COMMAND} -E env ${_PROGS} PKG_CONFIG_PATH=${PKG_CONFIG_PATH_STR}
       ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/FFmpeg/configure ${FF_ARGS}
       "${FF_PLATFORM_ARGS}"
-      $<IF:$<BOOL:${CRYSTALHD_FOUND}>,--enable-crystalhd,--disable-crystalhd>
       $<IF:$<BOOL:${SYSTEM_LIBBLURAY_FOUND}>,--enable-libbluray,--disable-libbluray>
       $<IF:$<TARGET_EXISTS:Fontconfig::Fontconfig::LIBXVID>,--enable-libfontconfig,--disable-libfontconfig>
       $<IF:$<TARGET_EXISTS:LibX264::LibX264>,--enable-libx264,--disable-libx264>

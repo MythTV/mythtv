@@ -191,12 +191,6 @@ if(ENABLE_DRM)
   endif()
 endif()
 
-# Needed to pass right config option to FFmpeg
-#
-# crystalhd: fedora:libcrystalhd-devel debian:libcrystalhd-dev
-find_library(CRYSTALHD crystalhd)
-add_build_config(CRYSTALHD "crystalhd")
-
 #
 # See if there is a system libbluray for FFmpeg.
 #
