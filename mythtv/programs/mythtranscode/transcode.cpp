@@ -530,7 +530,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
     }
 
-    player->InitForTranscode(false, false);
+    player->InitForTranscode();
     if (player->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR,
