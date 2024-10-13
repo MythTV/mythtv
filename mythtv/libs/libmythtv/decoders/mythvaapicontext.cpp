@@ -659,8 +659,8 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext* Context, AVFrame* Fra
         if (ret == 0)
         {
             // preserve interlaced flags
-            m_lastInterlaced = Frame->interlaced_frame;
-            m_lastTopFieldFirst = (Frame->top_field_first != 0);
+            m_lastInterlaced = (Frame->flags & AV_FRAME_FLAG_INTERLACED) != 0;
+            m_lastTopFieldFirst = (Frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) != 0;
         }
 
         if (ret < 0)

@@ -3565,8 +3565,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         {
             // Set the frame flags, but then discard it
             // since we are not using it for display.
-            oldframe->m_interlaced     = AvFrame->interlaced_frame;
-            oldframe->m_topFieldFirst  = AvFrame->top_field_first != 0;
+            oldframe->m_interlaced     = (AvFrame->flags & AV_FRAME_FLAG_INTERLACED) != 0;
+            oldframe->m_topFieldFirst  = (AvFrame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) != 0;
             oldframe->m_colorspace     = AvFrame->colorspace;
             oldframe->m_colorrange     = AvFrame->color_range;
             oldframe->m_colorprimaries = AvFrame->color_primaries;
@@ -3643,8 +3643,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
             .arg(pts.count()).arg(temppts.count()).arg(m_lastVPts.count())
             .arg((pts != temppts) ? " fixup" : ""));
 
-    frame->m_interlaced          = AvFrame->interlaced_frame;
-    frame->m_topFieldFirst       = AvFrame->top_field_first != 0;
+    frame->m_interlaced          = (AvFrame->flags & AV_FRAME_FLAG_INTERLACED) != 0;
+    frame->m_topFieldFirst       = (AvFrame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) != 0;
     frame->m_newGOP              = m_nextDecodedFrameIsKeyFrame;
     frame->m_repeatPic           = AvFrame->repeat_pict != 0;
     frame->m_displayTimecode     = NormalizeVideoTimecode(Stream, std::chrono::milliseconds(temppts));

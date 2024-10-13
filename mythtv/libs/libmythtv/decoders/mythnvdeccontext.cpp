@@ -337,7 +337,7 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, MythVideoFr
     // Remove interlacing flags and set deinterlacer if necessary
     if (Frame && m_deinterlacer)
     {
-        Frame->m_interlaced = 0;
+        Frame->m_interlaced = false;
         Frame->m_interlacedReverse = false;
         Frame->m_topFieldFirst = false;
         Frame->m_deinterlaceInuse = m_deinterlacer | DEINT_DRIVER;
