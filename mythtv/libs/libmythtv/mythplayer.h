@@ -150,7 +150,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Bool Gets
     bool    IsPaused(void) const              { return m_allPaused;      }
-    bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return m_limitKeyRepeat; }
     EofState GetEof(void) const;
     bool    IsErrored(void) const;

@@ -115,18 +115,6 @@ class AvFormatDecoder : public DecoderBase
                          [[maybe_unused]] std::chrono::milliseconds timecodeOffset) override {} // DecoderBase
 
     /// This is a No-op for this class.
-    void SetRawAudioState(bool state) override { (void)state; } // DecoderBase
-
-    /// This is a No-op for this class.
-    bool GetRawAudioState(void) const override { return false; } // DecoderBase
-
-    /// This is a No-op for this class.
-    void SetRawVideoState(bool state) override { (void)state; } // DecoderBase
-
-    /// This is a No-op for this class.
-    bool GetRawVideoState(void) const override { return false; } // DecoderBase
-
-    /// This is a No-op for this class.
     long UpdateStoredFrameNum(long frame) override { (void)frame; return 0;} // DecoderBase
 
     QString      GetCodecDecoderName(void) const override; // DecoderBase
