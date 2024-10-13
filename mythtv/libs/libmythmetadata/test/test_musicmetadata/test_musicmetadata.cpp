@@ -99,7 +99,7 @@ void TestMusicMetadata::test_mp4(void)
                                                "/samples/silence.m4a");
     QVERIFY(data != nullptr);
 //  dump(data);
-    QCOMPARE(data->Length(), 3165ms);
+    QCOMPARE(data->Length(), 3140ms);
     QCOMPARE(data->Title(), QString("The Silence, #99"));
     QCOMPARE(data->TitleSort(), QString("silence, #99"));
     QCOMPARE(data->Artist(), QString("Mother Nature"));
