@@ -155,7 +155,7 @@ void MythVideoFrame::ClearMetadata()
     m_timecode            = 0ms;
     m_displayTimecode     = 0ms;
     m_priv                = { nullptr };
-    m_interlaced          = 0;
+    m_interlaced          = false;
     m_topFieldFirst       = true;
     m_interlacedReverse   = false;
     m_newGOP              = false;
