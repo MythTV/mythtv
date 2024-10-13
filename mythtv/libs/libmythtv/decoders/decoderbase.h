@@ -179,11 +179,6 @@ class DecoderBase
         { return timecode; }
 
     virtual bool IsLastFrameKey(void) const = 0;
-    virtual void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
-                                 std::chrono::milliseconds timecodeOffset) = 0;
-    virtual void ClearStoredData(void) { }
-
-    virtual long UpdateStoredFrameNum(long frame) = 0;
 
     virtual double  GetFPS(void) const { return m_fps; }
     /// Returns the estimated bitrate if the video were played at normal speed.
