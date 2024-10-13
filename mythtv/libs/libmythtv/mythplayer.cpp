@@ -1715,13 +1715,6 @@ QString MythPlayer::GetEncodingType(void) const
     return {};
 }
 
-bool MythPlayer::GetRawAudioState(void) const
-{
-    if (m_decoder)
-        return m_decoder->GetRawAudioState();
-    return false;
-}
-
 QString MythPlayer::GetXDS(const QString &key) const
 {
     if (!m_decoder)
