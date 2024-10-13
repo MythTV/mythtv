@@ -109,14 +109,6 @@ class AvFormatDecoder : public DecoderBase
 
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
-    /// This is a No-op for this class.
-    void WriteStoredData([[maybe_unused]] MythMediaBuffer *Buffer,
-                         [[maybe_unused]] bool storevid,
-                         [[maybe_unused]] std::chrono::milliseconds timecodeOffset) override {} // DecoderBase
-
-    /// This is a No-op for this class.
-    long UpdateStoredFrameNum(long frame) override { (void)frame; return 0;} // DecoderBase
-
     QString      GetCodecDecoderName(void) const override; // DecoderBase
     QString      GetRawEncodingType(void) override; // DecoderBase
     MythCodecID  GetVideoCodecID(void) const override { return m_videoCodecId; } // DecoderBase
