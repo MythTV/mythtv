@@ -1421,17 +1421,19 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         m_directRendering = true;
 
     // retrieve rotation information
-    uint8_t* displaymatrix = av_stream_get_side_data(stream, AV_PKT_DATA_DISPLAYMATRIX, nullptr);
-    if (displaymatrix)
-        m_videoRotation = static_cast<int>(-av_display_rotation_get(reinterpret_cast<int32_t*>(displaymatrix)));
+    const AVPacketSideData *sd = av_packet_side_data_get(stream->codecpar->coded_side_data,
+        stream->codecpar->nb_coded_side_data, AV_PKT_DATA_DISPLAYMATRIX);
+    if (sd)
+        m_videoRotation = static_cast<int>(-av_display_rotation_get(reinterpret_cast<int32_t*>(sd->data)));
     else
         m_videoRotation = 0;
 
     // retrieve 3D type
-    uint8_t* stereo3d = av_stream_get_side_data(stream, AV_PKT_DATA_STEREO3D, nullptr);
-    if (stereo3d)
+    sd = av_packet_side_data_get(stream->codecpar->coded_side_data,
+        stream->codecpar->nb_coded_side_data, AV_PKT_DATA_STEREO3D);
+    if (sd)
     {
-        auto * avstereo = reinterpret_cast<AVStereo3D*>(stereo3d);
+        auto * avstereo = reinterpret_cast<AVStereo3D*>(sd->data);
         m_stereo3D = avstereo->type;
     }
 
