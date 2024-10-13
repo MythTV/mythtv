@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <vector>
 extern "C" {
 #include "libavutil/mem.h"
-#include "libavcodec/avfft.h"
+#include "libavutil/tx.h"
 }
 
 using cfloat = std::complex<float>;
@@ -48,15 +48,15 @@ public:
     explicit Impl(unsigned blocksize=8192)
       : m_n(blocksize),
         m_halfN(blocksize/2),
-        // TODO only valid because blocksize is always 8192:
-        // (convert blocksize to log_2 (n) instead since FFmpeg only supports sizes that are powers of 2)
-        m_fftContextForward(av_fft_init(13, 0)),
-        m_fftContextReverse(av_fft_init(13, 1)),
         // create lavc fft buffers
-        m_dftL((FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2)),
-        m_dftR((FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2)),
-        m_src((FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2))
-{
+        m_dftL((AVComplexFloat*)av_malloc(sizeof(AVComplexFloat) * m_n * 2)),
+        m_dftR((AVComplexFloat*)av_malloc(sizeof(AVComplexFloat) * m_n * 2)),
+        m_src ((AVComplexFloat*)av_malloc(sizeof(AVComplexFloat) * m_n * 2))
+    {
+        // If av_tx_init() fails (returns < 0), the contexts will be nullptr and will crash later,
+        // but av_malloc() is not checked to succeed either.
+        av_tx_init(&m_fftContext , &m_fft , AV_TX_FLOAT_FFT, 0, m_n, &k_scale, AV_TX_INPLACE);
+        av_tx_init(&m_ifftContext, &m_ifft, AV_TX_FLOAT_FFT, 1, m_n, &k_scale, AV_TX_INPLACE);
         // resize our own buffers
         m_frontR.resize(m_n);
         m_frontL.resize(m_n);
@@ -89,8 +89,8 @@ public:
 
     // destructor
     ~Impl() {
-        av_fft_end(m_fftContextForward);
-        av_fft_end(m_fftContextReverse);
+        av_tx_uninit(&m_fftContext);
+        av_tx_uninit(&m_ifftContext);
         av_free(m_src);
         av_free(m_dftR);
         av_free(m_dftL);
@@ -187,8 +187,8 @@ public:
 private:
     // polar <-> cartesian coodinates conversion
     static cfloat polar(float a, float p) { return {a*std::cos(p), a*std::sin(p)}; }
-    static float amplitude(FFTComplex z) { return std::hypot(z.re, z.im); }
-    static float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
+    static float amplitude(AVComplexFloat z) { return std::hypot(z.re, z.im); }
+    static float phase(AVComplexFloat z) { return std::atan2(z.im, z.re); }
 
     /// Clamp the input to the interval [-1, 1], i.e. clamp the magnitude to the unit interval [0, 1]
     static float clamp_unit_mag(float x) { return std::clamp(x, -1.0F, 1.0F); }
@@ -212,19 +212,16 @@ private:
         // input2 is in the falling half of the window
         for (unsigned k = 0; k < m_halfN; k++)
         {
-            m_dftL[k]           = (FFTComplex){ .re = input1[0][k] * m_wnd[k], .im = (FFTSample)0 };
-            m_dftR[k]           = (FFTComplex){ .re = input1[1][k] * m_wnd[k], .im = (FFTSample)0 };
+            m_dftL[k]           = (AVComplexFloat){ .re = input1[0][k] * m_wnd[k], .im = 0 };
+            m_dftR[k]           = (AVComplexFloat){ .re = input1[1][k] * m_wnd[k], .im = 0 };
 
-            m_dftL[k + m_halfN] = (FFTComplex){ .re = input2[0][k] * m_wnd[k + m_halfN], .im = (FFTSample)0 };
-            m_dftR[k + m_halfN] = (FFTComplex){ .re = input2[1][k] * m_wnd[k + m_halfN], .im = (FFTSample)0 };
+            m_dftL[k + m_halfN] = (AVComplexFloat){ .re = input2[0][k] * m_wnd[k + m_halfN], .im = 0 };
+            m_dftR[k + m_halfN] = (AVComplexFloat){ .re = input2[1][k] * m_wnd[k + m_halfN], .im = 0 };
         }
 
         // ... and tranform it into the frequency domain
-        av_fft_permute(m_fftContextForward, m_dftL);
-        av_fft_calc(m_fftContextForward, m_dftL);
-
-        av_fft_permute(m_fftContextForward, m_dftR);
-        av_fft_calc(m_fftContextForward, m_dftR);
+        m_fft(m_fftContext, m_dftL, m_dftL, sizeof(AVComplexFloat));
+        m_fft(m_fftContext, m_dftR, m_dftR, sizeof(AVComplexFloat));
 
         // 2. compare amplitude and phase of each DFT bin and produce the X/Y coordinates in the sound field
         //    but dont do DC or N/2 component
@@ -406,8 +403,7 @@ private:
             m_src[m_n - f].re =  m_src[f].re;
             m_src[m_n - f].im = -m_src[f].im;   // complex conjugate
         }
-        av_fft_permute(m_fftContextReverse, m_src);
-        av_fft_calc(m_fftContextReverse, m_src);
+        m_ifft(m_ifftContext, m_src, m_src, sizeof(AVComplexFloat));
 
         // add the result to target, windowed
         for (unsigned int k = 0; k < m_halfN; k++)
@@ -421,12 +417,15 @@ private:
 
     size_t m_n;                          // the block size
     size_t m_halfN;                      // half block size precalculated
-    FFTContext *m_fftContextForward {nullptr};
-    FFTContext *m_fftContextReverse {nullptr};
+    static constexpr float k_scale {1.0F};
+    AVTXContext *m_fftContext  {nullptr};
+    av_tx_fn     m_fft         {nullptr};
+    AVTXContext *m_ifftContext {nullptr};
+    av_tx_fn     m_ifft        {nullptr};
     // FFTs are computed in-place in these buffers on copies of the input
-    FFTComplex *m_dftL {nullptr};
-    FFTComplex *m_dftR {nullptr};
-    FFTComplex *m_src  {nullptr}; ///< Used only in apply_filter
+    AVComplexFloat *m_dftL {nullptr};
+    AVComplexFloat *m_dftR {nullptr};
+    AVComplexFloat *m_src  {nullptr}; ///< Used only in apply_filter
     // buffers
     std::vector<cfloat> m_frontL,m_frontR,m_avg,m_surL,m_surR; // the signal (phase-corrected) in the frequency domain
     std::vector<cfloat> m_trueavg;       // for lfe generation
