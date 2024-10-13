@@ -1220,17 +1220,35 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
 
     if (info->display_picture->nb_fields % 2)
     {
-        m_picture->top_field_first = ((info->display_picture->flags &
-                                       PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 0 : 1;
+        if ((info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST) != 0)
+        {
+            m_picture->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
+        }
+        else
+        {
+            m_picture->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+        }
     }
     else
     {
-        m_picture->top_field_first = ((info->display_picture->flags &
-                                       PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 1 : 0;
+        if ((info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST) != 0)
+        {
+            m_picture->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+        }
+        else
+        {
+            m_picture->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
+        }
     }
 
-    m_picture->interlaced_frame = ((info->display_picture->flags &
-                                    PIC_FLAG_PROGRESSIVE_FRAME) != 0) ? 0 : 1;
+    if ((info->display_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME) != 0)
+    {
+        m_picture->flags &= ~AV_FRAME_FLAG_INTERLACED;
+    }
+    else
+    {
+        m_picture->flags |= AV_FRAME_FLAG_INTERLACED;
+    }
 
     const AVCodec *out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
     if (!out_codec)
@@ -1245,7 +1263,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     //sequence->progressive == frame->progressive
     //We fix the discrepancy by discarding avcodec's sequence header, and
     //replace it with the original
-    if (m_picture->interlaced_frame)
+    if ((m_picture->flags & AV_FRAME_FLAG_INTERLACED) != 0)
         c->flags |= AV_CODEC_FLAG_INTERLACED_DCT;
 
     c->bit_rate = info->sequence->byte_rate << 3; //not used
@@ -1275,7 +1293,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     m_picture->height = info->sequence->height;
     m_picture->format = AV_PIX_FMT_YUV420P;
     m_picture->pts = AV_NOPTS_VALUE;
-    m_picture->key_frame = 1;
+    m_picture->flags |= AV_FRAME_FLAG_KEY;
     m_picture->pict_type = AV_PICTURE_TYPE_NONE;
     m_picture->quality = 0;
 
