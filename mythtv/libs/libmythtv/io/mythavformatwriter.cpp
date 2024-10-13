@@ -599,13 +599,20 @@ AVStream* MythAVFormatWriter::AddAudioStream(void)
 
 bool MythAVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, const AVCodec *Codec, AVSampleFormat Format)
 {
-    if (Codec->sample_fmts)
+    const AVSampleFormat *sample_fmts = nullptr;
+    int out_num_configs = 0;
+    int ret = avcodec_get_supported_config(nullptr, Codec, AV_CODEC_CONFIG_SAMPLE_FORMAT,
+                                           0, (const void **) &sample_fmts, &out_num_configs);
+    if (ret < 0)
+        return false;
+
+    if (sample_fmts)
     {
-        for (int i = 0; Codec->sample_fmts[i] != AV_SAMPLE_FMT_NONE; i++)
+        for (int i = 0; i < out_num_configs; i++)
         {
-            if (av_get_packed_sample_fmt(Codec->sample_fmts[i]) == Format)
+            if (av_get_packed_sample_fmt(sample_fmts[i]) == Format)
             {
-                Ctx->sample_fmt = Codec->sample_fmts[i];
+                Ctx->sample_fmt = sample_fmts[i];
                 return true;
             }
         }
@@ -694,28 +701,33 @@ AVRational MythAVFormatWriter::GetCodecTimeBase(void)
     result.den = static_cast<int>(floor(m_frameRate * 100));
     result.num = 100;
 
-    if (m_avVideoCodec && m_avVideoCodec->supported_framerates)
+    if (m_avVideoCodec)
     {
-        const AVRational *rates = m_avVideoCodec->supported_framerates;
-        AVRational req = { result.den, result.num };
-        const AVRational *best = nullptr;
-        AVRational best_error= { INT_MAX, 1 };
-        for (; rates->den != 0; rates++)
+        const AVRational *supported_framerates = nullptr;
+        int out_num_configs = 0;
+        int ret = avcodec_get_supported_config(nullptr, m_avVideoCodec, AV_CODEC_CONFIG_FRAME_RATE,
+                                               0, (const void **) &supported_framerates, &out_num_configs);
+        if (ret >= 0)
         {
-            AVRational error = av_sub_q(req, *rates);
-            if (error.num < 0)
-                error.num *= -1;
-            if (av_cmp_q(error, best_error) < 0)
+            const AVRational *best = nullptr;
+            AVRational best_error = { INT_MAX, 1 };
+            for (int i = 0; i < out_num_configs; i++)
             {
-                best_error = error;
-                best = rates;
+                AVRational error = av_sub_q(result, supported_framerates[i]);
+                if (error.num < 0)
+                    error.num *= -1;
+                if (av_cmp_q(error, best_error) < 0)
+                {
+                    best_error = error;
+                    best = supported_framerates + i;
+                }
             }
-        }
 
-        if (best && best->num && best->den)
-        {
-            result.den = best->num;
-            result.num = best->den;
+            if (best && best->num && best->den)
+            {
+                result.den = best->num;
+                result.num = best->den;
+            }
         }
     }
 
