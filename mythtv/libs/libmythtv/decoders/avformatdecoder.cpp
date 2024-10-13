@@ -614,9 +614,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     if (m_recordingHasPositionMap || m_livetv)
         return DecoderBase::DoFastForward(desiredFrame, discardFrames);
 
-    bool oldrawstate = m_getRawFrames;
-    m_getRawFrames = false;
-
     int seekDelta = desiredFrame - m_framesPlayed;
 
     // avoid using av_frame_seek if we are seeking frame-by-frame when paused
@@ -624,7 +621,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     {
         SeekReset(m_framesPlayed, seekDelta, false, true);
         m_parent->SetFramesPlayed(m_framesPlayed + 1);
-        m_getRawFrames = oldrawstate;
         return true;
     }
 
@@ -645,7 +641,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("av_seek_frame(ic, -1, %1, 0) -- error").arg(ts));
-        m_getRawFrames = oldrawstate;
         return false;
     }
     if (auto* reader = m_parent->GetSubReader(); reader)
@@ -666,8 +661,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         m_parent->SetFramesPlayed(m_framesPlayed + 1);
 
     m_doRewind = false;
-
-    m_getRawFrames = oldrawstate;
 
     return true;
 }
