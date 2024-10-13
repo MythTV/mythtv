@@ -35,10 +35,8 @@ void MythTranscodePlayer::InitForTranscode(bool CopyAudio, bool CopyVideo)
     m_framesPlayed = 0;
     ClearAfterSeek();
 
-    if (CopyVideo && m_decoder)
-        m_decoder->SetRawVideoState(true);
-    if (CopyAudio && m_decoder)
-        m_decoder->SetRawAudioState(true);
+    m_rawAudio = CopyAudio;
+    m_rawVideo = CopyVideo;
     if (m_decoder)
         m_decoder->SetSeekSnap(0);
 }
@@ -120,7 +118,7 @@ bool MythTranscodePlayer::WriteStoredData(MythMediaBuffer* OutBuffer,
 {
     if (!m_decoder)
         return false;
-    if (Writevideo && !m_decoder->GetRawVideoState())
+    if (Writevideo && !m_rawVideo)
         Writevideo = false;
     m_decoder->WriteStoredData(OutBuffer, Writevideo, TimecodeOffset);
     return Writevideo;
