@@ -91,7 +91,6 @@ bool MythTranscodePlayer::TranscodeGetNextFrame(int &DidFF, bool &KeyFrame, bool
 
             // For 0.25, move this to DoJumpToFrame(jumpto)
             WaitForSeek(jumpto, 0);
-            m_decoder->ClearStoredData();
             ClearAfterSeek();
             m_decoderChangeLock.lock();
             DoGetFrame(kDecodeAV);
@@ -103,23 +102,4 @@ bool MythTranscodePlayer::TranscodeGetNextFrame(int &DidFF, bool &KeyFrame, bool
         return false;
     KeyFrame = m_decoder->IsLastFrameKey();
     return true;
-}
-
-long MythTranscodePlayer::UpdateStoredFrameNum(long CurrentFrameNum)
-{
-    if (m_decoder)
-        return m_decoder->UpdateStoredFrameNum(CurrentFrameNum);
-    return 0;
-}
-
-bool MythTranscodePlayer::WriteStoredData(MythMediaBuffer* OutBuffer,
-                                          bool Writevideo,
-                                          std::chrono::milliseconds TimecodeOffset)
-{
-    if (!m_decoder)
-        return false;
-    if (Writevideo && !m_rawVideo)
-        Writevideo = false;
-    m_decoder->WriteStoredData(OutBuffer, Writevideo, TimecodeOffset);
-    return Writevideo;
 }
