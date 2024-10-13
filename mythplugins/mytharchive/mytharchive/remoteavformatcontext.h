@@ -118,7 +118,11 @@ class ArchiveRemoteAVFormatContext
         return rf->Read(buf, buf_size);
     }
 
+#if (LIBAVFORMAT_VERSION_MAJOR < 61)
     static int WriteFunc(void */*opaque*/, uint8_t */*buf*/, int /*buf_size*/)
+#else
+    static int WriteFunc(void */*opaque*/, const uint8_t */*buf*/, int /*buf_size*/)
+#endif
         {  return -1; }
 
     static int64_t SeekFunc(void *opaque, int64_t offset, int whence)
