@@ -182,10 +182,6 @@ class DecoderBase
     virtual void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
                                  std::chrono::milliseconds timecodeOffset) = 0;
     virtual void ClearStoredData(void) { }
-    virtual void SetRawAudioState(bool state) { m_getRawFrames = state; }
-    virtual bool GetRawAudioState(void) const { return m_getRawFrames; }
-    virtual void SetRawVideoState(bool state) { m_getRawVideo = state; }
-    virtual bool GetRawVideoState(void) const { return m_getRawVideo; }
 
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
@@ -328,9 +324,6 @@ class DecoderBase
     bool                 m_watchingRecording       {false};
 
     bool                 m_hasKeyFrameAdjustTable  {false};
-
-    bool                 m_getRawFrames            {false};
-    bool                 m_getRawVideo             {false};
 
     bool                 m_errored                 {false};
 
