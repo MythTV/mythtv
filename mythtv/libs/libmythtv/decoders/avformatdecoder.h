@@ -234,6 +234,8 @@ class AvFormatDecoder : public DecoderBase
     int get_current_AVStream_index(TrackType type);
     AVProgram* get_current_AVProgram();
 
+    bool do_av_seek(long long desiredFrame, bool discardFrames, int flags);
+
     bool               m_isDbIgnored;
 
     AVCParser         *m_avcParser                    {nullptr};
@@ -249,8 +251,6 @@ class AvFormatDecoder : public DecoderBase
 
     struct SwsContext *m_swsCtx                       {nullptr};
     bool               m_directRendering              {false};
-
-    bool               m_doRewind                     {false};
 
     bool               m_gopSet                       {false};
     /// A flag to indicate that we've seen a GOP frame.  Used in junction with seq_count.
