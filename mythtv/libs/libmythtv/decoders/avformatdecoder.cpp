@@ -107,20 +107,6 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "mythvideoprofile.h"
 #include "remoteencoder.h"
 
-#ifdef _MSC_VER
-// MSVC isn't C99 compliant...
-# ifdef AV_TIME_BASE_Q
-#  undef AV_TIME_BASE_Q
-# endif
-#define AV_TIME_BASE_Q  GetAVTimeBaseQ()
-
-__inline AVRational GetAVTimeBaseQ()
-{
-    AVRational av = {1, AV_TIME_BASE};
-    return av;
-}
-#endif
-
 #define LOC QString("AFD: ")
 
 // Maximum number of sequential invalid data packet errors before we try
