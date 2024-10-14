@@ -1,4 +1,6 @@
 ﻿// MythTV
+#include "libmyth/mythavframe.h"
+
 #ifdef USING_DRM_VIDEO
 #include "libmythui/platforms/mythdisplaydrm.h"
 #endif
