@@ -83,6 +83,7 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
 #include "libmythui/mythuihelper.h"
 
@@ -602,10 +603,8 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame, bool discardFrames)
     if (m_recordingHasPositionMap || m_livetv)
         return DecoderBase::DoRewind(desiredFrame, discardFrames);
 
-    m_doRewind = true;
-
     // avformat-based seeking
-    return DoFastForward(desiredFrame, discardFrames);
+    return do_av_seek(desiredFrame, discardFrames, AVSEEK_FLAG_BACKWARD);
 }
 
 bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
@@ -621,13 +620,17 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     int seekDelta = desiredFrame - m_framesPlayed;
 
     // avoid using av_frame_seek if we are seeking frame-by-frame when paused
-    if (seekDelta >= 0 && seekDelta < 2 && !m_doRewind && m_parent->GetPlaySpeed() == 0.0F)
+    if (seekDelta >= 0 && seekDelta < 2 && m_parent->GetPlaySpeed() == 0.0F)
     {
         SeekReset(m_framesPlayed, seekDelta, false, true);
         m_parent->SetFramesPlayed(m_framesPlayed + 1);
         return true;
     }
+    return do_av_seek(desiredFrame, discardFrames, 0);
+}
 
+bool AvFormatDecoder::do_av_seek(long long desiredFrame, bool discardFrames, int flags)
+{
     long long ts = 0;
     if (m_ic->start_time != AV_NOPTS_VALUE)
         ts = m_ic->start_time;
@@ -639,12 +642,21 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     // XXX figure out how to do snapping in this case
     bool exactseeks = DecoderBase::GetSeekSnap() == 0U;
 
-    int flags = (m_doRewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
+    if (exactseeks)
+    {
+        flags |= AVSEEK_FLAG_BACKWARD;
+    }
 
-    if (av_seek_frame(m_ic, -1, ts, flags) < 0)
+    int ret = av_seek_frame(m_ic, -1, ts, flags);
+    if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("av_seek_frame(ic, -1, %1, 0) -- error").arg(ts));
+            QString("av_seek_frame(m_ic, -1, %1, 0b%2) error: %3").arg(
+                QString::number(ts),
+                QString::number(flags, 2),
+                QString::fromStdString(av_make_error_stdstring(ret))
+                )
+            );
         return false;
     }
     if (auto* reader = m_parent->GetSubReader(); reader)
@@ -663,8 +675,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     if (discardFrames)
         m_parent->SetFramesPlayed(m_framesPlayed + 1);
-
-    m_doRewind = false;
 
     return true;
 }
