@@ -13,6 +13,7 @@ endif()
 #
 set(LIBMYTH_HEADERS
     mythaverror.h
+    mythavframe.h
     mythcontext.h
     mythexp.h
     output.h

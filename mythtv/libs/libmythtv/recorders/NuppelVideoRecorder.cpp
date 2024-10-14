@@ -14,6 +14,8 @@
 #include <QStringList>
 #include <QtEndian>
 
+#include "libmyth/mythaverror.h"
+#include "libmyth/mythavframe.h"
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"

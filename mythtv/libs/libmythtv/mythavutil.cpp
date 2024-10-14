@@ -12,6 +12,7 @@
 #include <QFile>
 
 // MythTV
+#include "libmyth/mythaverror.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "mythdeinterlacer.h"
