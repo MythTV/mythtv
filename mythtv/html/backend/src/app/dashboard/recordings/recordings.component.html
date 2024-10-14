@@ -43,8 +43,7 @@
             styleClass="p-datatable-sm p-datatable-striped" (onLazyLoad)="loadLazy($event)" [rows]="100" [lazy]="true"
             [rowHover]="true" selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
             dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
-            sortField="Title" [virtualScroll]="true" scrollHeight="flex"
-            [scrollable]="true">
+            sortField="Title" [virtualScroll]="true" scrollHeight="flex" [scrollable]="true">
 
             <ng-template pTemplate="caption">
             </ng-template>
@@ -83,11 +82,12 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
-                <tr #row [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}" [pSelectableRow]="program"
-                    [pSelectableRowIndex]="rowIndex" (contextmenu)="onContextMenu(program,$event)" >
+                <tr #row [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}"
+                    [pSelectableRow]="program" [pSelectableRowIndex]="rowIndex"
+                    (contextmenu)="onContextMenu(program,$event)">
                     <td class="p-1 overflow-hidden">
                         <div class="mycell">
-                            <div class="mytext">
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
                                 <i class="pi pi-exclamation-triangle p-1"
                                     *ngIf="program.VideoPropNames.indexOf('DAMAGED') > -1"
                                     pTooltip="{{ 'dashboard.recordings.damaged' | translate }}"
@@ -102,7 +102,8 @@
                     </td>
                     <td class="p-1 overflow-hidden" pTooltip="{{program.Description}}" tooltipPosition="top">
                         <div class="mycell">
-                            <div class="mytext">{{program.SubTitle}}</div>
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                                {{program.SubTitle}}</div>
                         </div>
                     </td>
                     <td class="p-1">
@@ -111,30 +112,35 @@
                     </td>
                     <td class="justify-content-end p-1 overflow-hidden">
                         <div class="mycell">
-                            <div class="mytext" [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}"
+                                [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
                         </div>
                     </td>
                     <td class="justify-content-end p-1 overflow-hidden">
                         <div class="mycell">
-                            <div class="mytext" [innerHTML]="utility.formatDate(program.StartTime,true)"></div>
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}"
+                                [innerHTML]="utility.formatDate(program.StartTime,true)"></div>
                         </div>
                     </td>
                     <td class="p-1">
                         <div class="mycell">
-                            <div class="mytext">{{program.Channel.ChanNum}} {{program.Channel.CallSign}}
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                                {{program.Channel.ChanNum}} {{program.Channel.CallSign}}
                             </div>
                         </div>
                     </td>
                     <td class="p-1">{{program.Recording.RecGroup}}</td>
                     <td class="justify-content-end p-1">
                         <div class="mycell">
-                            <div class="mytext">{{ getDuration(program) | number:'1.0-0' }} min
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                                {{ getDuration(program) | number:'1.0-0' }} min
                             </div>
                         </div>
                     </td>
                     <td class="justify-content-end p-1">
                         <div class="mycell">
-                            <div class="mytext">{{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</div>
+                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                                {{program.Recording.FileSize / 1000000 | number:'1.0-0'}} MB</div>
                         </div>
                     </td>
                     <td class="pt-1 pb-0" style="background: var(--surface-card); white-space: nowrap;">
