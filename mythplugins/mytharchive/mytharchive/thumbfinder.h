@@ -12,6 +12,7 @@ extern "C" {
 #include <QScopedPointer>
 
 // mythtv
+#include <libmyth/mythavframe.h>
 #include <libmythbase/programtypes.h>
 #include <libmythtv/mythavutil.h>
 #include <libmythui/mythscreentype.h>

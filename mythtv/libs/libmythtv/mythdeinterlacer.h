@@ -2,6 +2,8 @@
 #define MYTHDEINTERLACER_H
 
 // MythTV
+#include "libmyth/mythavframe.h"
+
 #include "videoouttypes.h"
 #include "mythavutil.h"
 
