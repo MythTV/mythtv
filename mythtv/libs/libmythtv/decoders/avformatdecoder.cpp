@@ -4827,15 +4827,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
                 SetEof(true);
                 av_packet_free(&pkt);
-                std::string errbuf(256,'\0');
-                QString errmsg;
-                if (av_strerror_stdstring(retval, errbuf) == 0)
-                    errmsg = QString::fromStdString(errbuf);
-                else
-                    errmsg = "UNKNOWN";
 
                 LOG(VB_GENERAL, LOG_ERR, QString("decoding error %1 (%2)")
-                    .arg(errmsg).arg(retval));
+                    .arg(QString::fromStdString(av_make_error_stdstring_unknown(retval)),
+                        QString::number(retval)));
                 return false;
             }
 

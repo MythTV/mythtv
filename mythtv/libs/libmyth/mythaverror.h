@@ -84,5 +84,33 @@ class MPUBLIC MythAVFrame
 
 MPUBLIC int av_strerror_stdstring (int errnum, std::string &errbuf);
 MPUBLIC char *av_make_error_stdstring(std::string &errbuf, int errnum);
+/**
+A C++ equivalent to av_make_error_string() which does not need an input buffer,
+similar to FFmpeg's av_err2str() macro.
+*/
+MPUBLIC inline std::string av_make_error_stdstring(int errnum)
+{
+    auto errbuf = std::string(AV_ERROR_MAX_STRING_SIZE, '\0'); // must use () to select correct constructor
+    av_strerror(errnum, errbuf.data(), errbuf.size());
+    errbuf.resize(errbuf.find('\0'));
+    return errbuf;
+}
+/**
+@return the string returned by av_str_error() if it succeeded, otherwise returns
+        "UNKNOWN" instead of av_str_error()'s generic message which indicates
+        the input errnum.
+*/
+MPUBLIC inline std::string av_make_error_stdstring_unknown(int errnum)
+{
+    using namespace std::string_literals;
+    auto errbuf = std::string(AV_ERROR_MAX_STRING_SIZE, '\0'); // must use () to select correct constructor
+    int rc = av_strerror(errnum, errbuf.data(), errbuf.size());
+    if (rc == 0)
+    {
+        errbuf.resize(errbuf.find('\0'));
+        return errbuf;
+    }
+    return "UNKNOWN"s;
+}
 
 #endif // MYTHAVERROR_H
