@@ -5,7 +5,6 @@
 #include <QRect>
 
 // MythTV
-#include "libmyth/mythaverror.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythtv/mythtvexp.h"
 
