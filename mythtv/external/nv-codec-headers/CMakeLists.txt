@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.20)
 #
 project(
   nv-codec-headers
-  VERSION 9.1.23.2
+  VERSION 12.2.72.1
   LANGUAGES C)
 
 include(GNUInstallDirs)
