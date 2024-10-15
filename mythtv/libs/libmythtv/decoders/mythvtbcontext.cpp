@@ -321,7 +321,6 @@ void MythVTBContext::InitFramesContext(AVCodecContext *Context)
     if (codec_is_vtb(m_codecID) && m_parent->GetPlayer())
         m_parent->GetPlayer()->DiscardVideoFrames(true, true);
 
-    av_videotoolbox_default_free(Context);
     av_buffer_unref(&m_framesContext);
 
     AVBufferRef* framesref = av_hwframe_ctx_alloc(Context->hw_device_ctx);
