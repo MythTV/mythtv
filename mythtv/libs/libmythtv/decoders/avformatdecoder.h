@@ -36,8 +36,6 @@ class MythSqlDatabase;
 
 struct SwsContext;
 
-extern "C" void HandleStreamChange(void *data);
-
 class AudioInfo
 {
   public:
@@ -81,8 +79,6 @@ class AudioInfo
 /// A decoder for media files.
 class AvFormatDecoder : public DecoderBase
 {
-    friend void HandleStreamChange(void *data);
-
   public:
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
@@ -178,6 +174,8 @@ class AvFormatDecoder : public DecoderBase
 
     static int GetMaxReferenceFrames(AVCodecContext *Context);
 
+    static void streams_changed(void *data, int avprogram_id);
+
   protected:
     int  AutoSelectTrack(uint type) override; // DecoderBase
     void ScanATSCCaptionStreams(int av_index);
@@ -185,7 +183,7 @@ class AvFormatDecoder : public DecoderBase
     void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
     void ScanTeletextCaptions(int av_index);
     void ScanRawTextCaptions(int av_stream_index);
-    void ScanDSMCCStreams(void);
+    void ScanDSMCCStreams(AVBufferRef* pmt_section);
     int  AutoSelectAudioTrack(void);
     int  filter_max_ch(const AVFormatContext *ic,
                        const sinfo_vec_t     &tracks,
@@ -237,7 +235,7 @@ class AvFormatDecoder : public DecoderBase
     void HandleGopStart(AVPacket *pkt, bool can_reliably_parse_keyframes);
 
     bool GenerateDummyVideoFrames(void);
-    bool HasVideo(const AVFormatContext *ic);
+    bool HasVideo();
     float GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise = false);
     static void av_update_stream_timings_video(AVFormatContext *ic);
     bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
@@ -255,6 +253,12 @@ class AvFormatDecoder : public DecoderBase
     virtual int ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
 
     bool FlagIsSet(PlayerFlags arg) { return m_playerFlags & arg; }
+
+    int autoSelectVideoTrack(int& scanerror);
+    void remove_tracks_not_in_same_AVProgram(int stream_index);
+
+    int get_current_AVStream_index(TrackType type);
+    AVProgram* get_current_AVProgram();
 
     bool               m_isDbIgnored;
 
