@@ -22,11 +22,7 @@ class MythAVFormatBuffer
 
   private:
     static int read_packet(void *opaque, uint8_t *buf, int buf_size);
-#if (LIBAVFORMAT_VERSION_MAJOR < 61)
-    static int write_packet(void *opaque, uint8_t *buf, int buf_size);
-#else
     static int write_packet(void *opaque, const uint8_t *buf, int buf_size);
-#endif
     static int64_t seek(void *opaque, int64_t offset, int whence);
 
     AVIOContext* alloc_context(bool write_flag, bool force_seek);
