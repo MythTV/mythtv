@@ -25,11 +25,7 @@ class MPUBLIC SPDIFEncoder
     bool SetMaxHDRate(int rate);
 
   private:
-#if (LIBAVFORMAT_VERSION_MAJOR < 61)
-    static int funcIO(void *opaque, unsigned char *buf, int size);
-#else
     static int funcIO(void *opaque, const uint8_t *buf, int size);
-#endif
     void Destroy();
 
   private:
