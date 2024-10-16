@@ -147,7 +147,7 @@
         {
             "name": "nvidia-shield",
             "inherits": [ "android-v8-qt5", "ci-sibling-build" ],
-            "displayName": "Firetv stick 4K qt5 (separate lib install)",
+            "displayName": "Nvidia Shield qt5 (separate lib install)",
             "cacheVariables": {
                 "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
                 "CMAKE_ANDROID_NDK": {
