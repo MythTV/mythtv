@@ -45,19 +45,6 @@ extern "C" {
 #define O_LARGEFILE 0
 #endif
 
-static void *my_malloc(unsigned size, [[maybe_unused]] mpeg2_alloc_t reason)
-{
-    if (size)
-    {
-#ifdef _WIN32
-        return _aligned_malloc( 64, size );
-#else
-        return aligned_alloc( 64, size );
-#endif
-    }
-    return nullptr;
-}
-
 static void my_av_print([[maybe_unused]] void *ptr,
                         int level, const char* fmt, va_list vl)
 {
@@ -266,7 +253,6 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         m_useSecondary = true;
     }
 
-    mpeg2_malloc_hooks(my_malloc, nullptr);
     m_headerDecoder = mpeg2_init();
     m_imgDecoder = mpeg2_init();
 
