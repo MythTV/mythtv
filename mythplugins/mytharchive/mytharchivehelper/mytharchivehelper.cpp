@@ -50,6 +50,7 @@
 
 // MythTV headers
 #include <mythconfig.h>
+#include <libmyth/mythavframe.h>
 #include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythcommandlineparser.h>
@@ -1653,7 +1654,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
                     frameFinished = true;
                 if (ret == 0 || ret == AVERROR(EAGAIN))
                     avcodec_send_packet(codecCtx, &pkt);
-                int keyFrame = frame->key_frame;
+                bool keyFrame = (frame->flags & AV_FRAME_FLAG_KEY) != 0;
 
                 while (!frameFinished || !keyFrame)
                 {
@@ -1670,7 +1671,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
                             frameFinished = true;
                         if (ret == 0 || ret == AVERROR(EAGAIN))
                             avcodec_send_packet(codecCtx, &pkt);
-                        keyFrame = frame->key_frame;
+                        keyFrame = (frame->flags & AV_FRAME_FLAG_KEY) != 0;
                     }
                 }
 

@@ -9,6 +9,14 @@
 #include "opengl/mythnvdecinterop.h"
 
 extern "C" {
+#include "libavutil/log.h"
+#define FFNV_LOG_FUNC(logctx, msg, ...) av_log(logctx, AV_LOG_ERROR, msg,  __VA_ARGS__)
+#define FFNV_DEBUG_LOG_FUNC(logctx, msg, ...) av_log(logctx, AV_LOG_DEBUG, msg,  __VA_ARGS__)
+#include <ffnvcodec/dynlink_loader.h>
+}
+
+extern "C" {
+#include "libavutil/hwcontext_cuda.h"
 #include "libavutil/opt.h"
 }
 
@@ -417,7 +425,6 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, MythVideoFrame 
     Frame->m_directRendering = true;
 
     AvFrame->opaque = Frame;
-    AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // set the pixel format - normally NV12 but P010 for 10bit etc. Set here rather than guessing later.
     if (AvFrame->hw_frames_ctx)

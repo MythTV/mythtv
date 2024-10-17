@@ -20,10 +20,13 @@
 
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/tx.h"
-#include "internal.h"
+
+#include "filters.h"
+#include "video.h"
 #include "window_func.h"
 
 #define MAX_BLOCK 256
@@ -94,11 +97,11 @@ static const AVOption fftdnoiz_options[] = {
     { "overlap", "set block overlap",
         OFFSET(overlap),    AV_OPT_TYPE_FLOAT, {.dbl=0.5},    0.2, 0.8, .flags = FLAGS },
     { "method",  "set method of denoising",
-        OFFSET(method),     AV_OPT_TYPE_INT,   {.i64=0},        0,   1, .flags = TFLAGS, "method" },
+        OFFSET(method),     AV_OPT_TYPE_INT,   {.i64=0},        0,   1, .flags = TFLAGS, .unit = "method" },
     { "wiener", "wiener method",
-        0,                  AV_OPT_TYPE_CONST, {.i64=0},        0,   0, .flags = TFLAGS, "method" },
+        0,                  AV_OPT_TYPE_CONST, {.i64=0},        0,   0, .flags = TFLAGS, .unit = "method" },
     { "hard",   "hard thresholding",
-        0,                  AV_OPT_TYPE_CONST, {.i64=1},        0,   0, .flags = TFLAGS, "method" },
+        0,                  AV_OPT_TYPE_CONST, {.i64=1},        0,   0, .flags = TFLAGS, .unit = "method" },
     { "prev",    "set number of previous frames for temporal denoising",
         OFFSET(nb_prev),    AV_OPT_TYPE_INT,   {.i64=0},        0,   1, .flags = FLAGS },
     { "next",    "set number of next frames for temporal denoising",
@@ -208,13 +211,17 @@ static int config_input(AVFilterLink *inlink)
 
     for (int i = 0; i < s->nb_threads; i++) {
         float scale = 1.f, iscale = 1.f;
+        int ret;
 
-        av_tx_init(&s->fft[i],  &s->tx_fn,  AV_TX_FLOAT_FFT, 0, s->block_size, &scale,  0);
-        av_tx_init(&s->ifft[i], &s->itx_fn, AV_TX_FLOAT_FFT, 1, s->block_size, &iscale, 0);
-        av_tx_init(&s->fft_r[i],  &s->tx_r_fn,  AV_TX_FLOAT_FFT, 0, 1 + s->nb_prev + s->nb_next, &scale,  0);
-        av_tx_init(&s->ifft_r[i], &s->itx_r_fn, AV_TX_FLOAT_FFT, 1, 1 + s->nb_prev + s->nb_next, &iscale, 0);
-        if (!s->fft[i] || !s->ifft[i] || !s->fft_r[i] || !s->ifft_r[i])
-            return AVERROR(ENOMEM);
+        if ((ret = av_tx_init(&s->fft[i],    &s->tx_fn,    AV_TX_FLOAT_FFT,
+                              0, s->block_size,               &scale,  0)) < 0 ||
+            (ret = av_tx_init(&s->ifft[i],   &s->itx_fn,   AV_TX_FLOAT_FFT,
+                              1, s->block_size,               &iscale, 0)) < 0 ||
+            (ret = av_tx_init(&s->fft_r[i],  &s->tx_r_fn,  AV_TX_FLOAT_FFT,
+                              0, 1 + s->nb_prev + s->nb_next, &scale,  0)) < 0 ||
+            (ret = av_tx_init(&s->ifft_r[i], &s->itx_r_fn, AV_TX_FLOAT_FFT,
+                              1, 1 + s->nb_prev + s->nb_next, &iscale, 0)) < 0)
+            return ret;
     }
 
     for (i = 0; i < s->nb_planes; i++) {
@@ -301,13 +308,14 @@ static void import_block(FFTdnoizContext *s,
             dst[j].re = dst[rw - 1].re;
             dst[j].im = 0.f;
         }
-        s->tx_fn(s->fft[jobnr], dst_out, dst, sizeof(float));
+        s->tx_fn(s->fft[jobnr], dst_out, dst, sizeof(AVComplexFloat));
 
         ddst = dst_out;
         dst += data_linesize;
         dst_out += data_linesize;
     }
 
+    dst = dst_out;
     for (int i = rh; i < block; i++) {
         for (int j = 0; j < block; j++) {
             dst[j].re = ddst[j].re;
@@ -322,7 +330,7 @@ static void import_block(FFTdnoizContext *s,
     for (int i = 0; i < block; i++) {
         for (int j = 0; j < block; j++)
             dst[j] = ssrc[j * data_linesize + i];
-        s->tx_fn(s->fft[jobnr], bdst, dst, sizeof(float));
+        s->tx_fn(s->fft[jobnr], bdst, dst, sizeof(AVComplexFloat));
 
         dst += data_linesize;
         bdst += buffer_linesize;
@@ -347,8 +355,8 @@ static void export_block(FFTdnoizContext *s,
     AVComplexFloat *hdata = p->hdata[jobnr];
     AVComplexFloat *hdata_out = p->hdata_out[jobnr];
     AVComplexFloat *vdata_out = p->vdata_out[jobnr];
-    const int rw = FFMIN(size, width  - x * size + hoverlap);
-    const int rh = FFMIN(size, height - y * size + hoverlap);
+    const int rw = FFMIN(size, width  - x * size);
+    const int rh = FFMIN(size, height - y * size);
     AVComplexFloat *hdst, *vdst = vdata_out, *hdst_out = hdata_out;
     float *bsrc = buffer;
 
@@ -356,7 +364,7 @@ static void export_block(FFTdnoizContext *s,
     buffer_linesize /= sizeof(float);
 
     for (int i = 0; i < block; i++) {
-        s->itx_fn(s->ifft[jobnr], vdst, bsrc, sizeof(float));
+        s->itx_fn(s->ifft[jobnr], vdst, bsrc, sizeof(AVComplexFloat));
         for (int j = 0; j < block; j++)
             hdst[j * data_linesize + i] = vdst[j];
 
@@ -368,7 +376,7 @@ static void export_block(FFTdnoizContext *s,
     for (int i = 0; i < rh && (y * size + i) < height; i++) {
         uint8_t *dst = dstp + dst_linesize * (y * size + i) + x * size * bpp;
 
-        s->itx_fn(s->ifft[jobnr], hdst_out, hdst, sizeof(float));
+        s->itx_fn(s->ifft[jobnr], hdst_out, hdst, sizeof(AVComplexFloat));
         s->export_row(hdst_out + hoverlap, dst, rw, depth, s->win[i + hoverlap] + hoverlap);
 
         hdst += data_linesize;
@@ -405,7 +413,7 @@ static void filter_block3d2(FFTdnoizContext *s, int plane, float *pbuffer, float
             buffer[2].re = nbuff[2 * j    ];
             buffer[2].im = nbuff[2 * j + 1];
 
-            s->tx_r_fn(s->fft_r[jobnr], outbuffer, buffer, sizeof(float));
+            s->tx_r_fn(s->fft_r[jobnr], outbuffer, buffer, sizeof(AVComplexFloat));
 
             for (int z = 0; z < 3; z++) {
                 const float re = outbuffer[z].re;
@@ -426,7 +434,7 @@ static void filter_block3d2(FFTdnoizContext *s, int plane, float *pbuffer, float
                 outbuffer[z].im *= factor;
             }
 
-            s->itx_r_fn(s->ifft_r[jobnr], buffer, outbuffer, sizeof(float));
+            s->itx_r_fn(s->ifft_r[jobnr], buffer, outbuffer, sizeof(AVComplexFloat));
 
             cbuff[2 * j + 0] = buffer[1].re;
             cbuff[2 * j + 1] = buffer[1].im;
@@ -463,7 +471,7 @@ static void filter_block3d1(FFTdnoizContext *s, int plane, float *pbuffer,
             buffer[1].re = cbuff[2 * j    ];
             buffer[1].im = cbuff[2 * j + 1];
 
-            s->tx_r_fn(s->fft_r[jobnr], outbuffer, buffer, sizeof(float));
+            s->tx_r_fn(s->fft_r[jobnr], outbuffer, buffer, sizeof(AVComplexFloat));
 
             for (int z = 0; z < 2; z++) {
                 const float re = outbuffer[z].re;
@@ -484,7 +492,7 @@ static void filter_block3d1(FFTdnoizContext *s, int plane, float *pbuffer,
                 outbuffer[z].im *= factor;
             }
 
-            s->itx_r_fn(s->ifft_r[jobnr], buffer, outbuffer, sizeof(float));
+            s->itx_r_fn(s->ifft_r[jobnr], buffer, outbuffer, sizeof(AVComplexFloat));
 
             cbuff[2 * j + 0] = buffer[1].re;
             cbuff[2 * j + 1] = buffer[1].im;

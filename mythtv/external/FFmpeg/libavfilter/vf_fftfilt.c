@@ -24,10 +24,11 @@
  * FFT domain filtering.
  */
 
-#include "libavfilter/internal.h"
+#include "filters.h"
+#include "video.h"
 #include "libavutil/common.h"
 #include "libavutil/cpu.h"
-#include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/tx.h"
@@ -95,7 +96,7 @@ static const AVOption fftfilt_options[] = {
     { "weight_Y", "set luminance expression in Y plane",   OFFSET(weight_str[Y]), AV_OPT_TYPE_STRING, {.str = "1"}, 0, 0, FLAGS },
     { "weight_U", "set chrominance expression in U plane", OFFSET(weight_str[U]), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
     { "weight_V", "set chrominance expression in V plane", OFFSET(weight_str[V]), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
-    { "eval", "specify when to evaluate expressions", OFFSET(eval_mode), AV_OPT_TYPE_INT, {.i64 = EVAL_MODE_INIT}, 0, EVAL_MODE_NB-1, FLAGS, "eval" },
+    { "eval", "specify when to evaluate expressions", OFFSET(eval_mode), AV_OPT_TYPE_INT, {.i64 = EVAL_MODE_INIT}, 0, EVAL_MODE_NB-1, FLAGS, .unit = "eval" },
          { "init",  "eval expressions once during initialization", 0, AV_OPT_TYPE_CONST, {.i64=EVAL_MODE_INIT},  .flags = FLAGS, .unit = "eval" },
          { "frame", "eval expressions per-frame",                  0, AV_OPT_TYPE_CONST, {.i64=EVAL_MODE_FRAME}, .flags = FLAGS, .unit = "eval" },
     {NULL},
@@ -201,7 +202,7 @@ static int irdft_horizontal8(AVFilterContext *ctx, void *arg, int jobnr, int nb_
             s->ihtx_fn(s->ihrdft[jobnr][plane],
                        s->rdft_hdata_out[plane] + i * s->rdft_hstride[plane],
                        s->rdft_hdata_in[plane] + i * s->rdft_hstride[plane],
-                       sizeof(float));
+                       sizeof(AVComplexFloat));
 
         for (int i = slice_start; i < slice_end; i++) {
             const float scale = 1.f / (s->rdft_hlen[plane] * s->rdft_vlen[plane]);
@@ -232,7 +233,7 @@ static int irdft_horizontal16(AVFilterContext *ctx, void *arg, int jobnr, int nb
             s->ihtx_fn(s->ihrdft[jobnr][plane],
                        s->rdft_hdata_out[plane] + i * s->rdft_hstride[plane],
                        s->rdft_hdata_in[plane] + i * s->rdft_hstride[plane],
-                       sizeof(float));
+                       sizeof(AVComplexFloat));
 
         for (int i = slice_start; i < slice_end; i++) {
             const float scale = 1.f / (s->rdft_hlen[plane] * s->rdft_vlen[plane]);
@@ -283,10 +284,11 @@ static av_cold int initialize(AVFilterContext *ctx)
 
 static void do_eval(FFTFILTContext *s, AVFilterLink *inlink, int plane)
 {
+    FilterLink *l = ff_filter_link(inlink);
     double values[VAR_VARS_NB];
     int i, j;
 
-    values[VAR_N] = inlink->frame_count_out;
+    values[VAR_N] = l->frame_count_out;
     values[VAR_W] = s->planewidth[plane];
     values[VAR_H] = s->planeheight[plane];
     values[VAR_WS] = s->rdft_hlen[plane];
@@ -306,7 +308,7 @@ static int config_props(AVFilterLink *inlink)
 {
     FFTFILTContext *s = inlink->dst->priv;
     const AVPixFmtDescriptor *desc;
-    int i, plane;
+    int ret, i, plane;
 
     desc = av_pix_fmt_desc_get(inlink->format);
     s->depth = desc->comp[0].depth;
@@ -335,12 +337,14 @@ static int config_props(AVFilterLink *inlink)
         for (int j = 0; j < s->nb_threads; j++) {
             float scale = 1.f, iscale = 1.f;
 
-            av_tx_init(&s->hrdft[j][i], &s->htx_fn, AV_TX_FLOAT_RDFT, 0, 1 << s->rdft_hbits[i], &scale, 0);
-            if (!s->hrdft[j][i])
-                return AVERROR(ENOMEM);
-            av_tx_init(&s->ihrdft[j][i], &s->ihtx_fn, AV_TX_FLOAT_RDFT, 1, 1 << s->rdft_hbits[i], &iscale, 0);
-            if (!s->ihrdft[j][i])
-                return AVERROR(ENOMEM);
+            ret = av_tx_init(&s->hrdft[j][i], &s->htx_fn, AV_TX_FLOAT_RDFT,
+                             0, 1 << s->rdft_hbits[i], &scale, 0);
+            if (ret < 0)
+                return ret;
+            ret = av_tx_init(&s->ihrdft[j][i], &s->ihtx_fn, AV_TX_FLOAT_RDFT,
+                             1, 1 << s->rdft_hbits[i], &iscale, 0);
+            if (ret < 0)
+                return ret;
         }
 
         /* RDFT - Array initialization for Vertical pass*/
@@ -356,12 +360,14 @@ static int config_props(AVFilterLink *inlink)
         for (int j = 0; j < s->nb_threads; j++) {
             float scale = 1.f, iscale = 1.f;
 
-            av_tx_init(&s->vrdft[j][i], &s->vtx_fn, AV_TX_FLOAT_RDFT, 0, 1 << s->rdft_vbits[i], &scale, 0);
-            if (!s->vrdft[j][i])
-                return AVERROR(ENOMEM);
-            av_tx_init(&s->ivrdft[j][i], &s->ivtx_fn, AV_TX_FLOAT_RDFT, 1, 1 << s->rdft_vbits[i], &iscale, 0);
-            if (!s->ivrdft[j][i])
-                return AVERROR(ENOMEM);
+            ret = av_tx_init(&s->vrdft[j][i], &s->vtx_fn, AV_TX_FLOAT_RDFT,
+                             0, 1 << s->rdft_vbits[i], &scale, 0);
+            if (ret < 0)
+                return ret;
+            ret = av_tx_init(&s->ivrdft[j][i], &s->ivtx_fn, AV_TX_FLOAT_RDFT,
+                             1, 1 << s->rdft_vbits[i], &iscale, 0);
+            if (ret < 0)
+                return ret;
         }
     }
 
@@ -377,11 +383,9 @@ static int config_props(AVFilterLink *inlink)
     if (s->depth <= 8) {
         s->rdft_horizontal = rdft_horizontal8;
         s->irdft_horizontal = irdft_horizontal8;
-    } else if (s->depth > 8) {
+    } else {
         s->rdft_horizontal = rdft_horizontal16;
         s->irdft_horizontal = irdft_horizontal16;
-    } else {
-        return AVERROR_BUG;
     }
     return 0;
 }
@@ -464,7 +468,7 @@ static int irdft_vertical(AVFilterContext *ctx, void *arg, int jobnr, int nb_job
             s->ivtx_fn(s->ivrdft[jobnr][plane],
                        s->rdft_vdata_in[plane] + i * s->rdft_vstride[plane],
                        s->rdft_vdata_out[plane] + i * s->rdft_vstride[plane],
-                       sizeof(float));
+                       sizeof(AVComplexFloat));
     }
 
     return 0;
@@ -588,20 +592,13 @@ static const AVFilterPad fftfilt_inputs[] = {
     },
 };
 
-static const AVFilterPad fftfilt_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_fftfilt = {
     .name            = "fftfilt",
     .description     = NULL_IF_CONFIG_SMALL("Apply arbitrary expressions to pixels in frequency domain."),
     .priv_size       = sizeof(FFTFILTContext),
     .priv_class      = &fftfilt_class,
     FILTER_INPUTS(fftfilt_inputs),
-    FILTER_OUTPUTS(fftfilt_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pixel_fmts_fftfilt),
     .init            = initialize,
     .uninit          = uninit,

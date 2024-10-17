@@ -22,9 +22,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/random_seed.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
-#include "video.h"
+#include "filters.h"
 
 #define MAX_FRAMES 512
 
@@ -37,6 +35,7 @@ typedef struct RandomContext {
     int nb_frames_filled;
     AVFrame *frames[MAX_FRAMES];
     int64_t pts[MAX_FRAMES];
+    int64_t duration[MAX_FRAMES];
     int flush_idx;
 } RandomContext;
 
@@ -74,6 +73,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     if (s->nb_frames_filled < s->nb_frames) {
         s->frames[s->nb_frames_filled] = in;
+        s->duration[s->nb_frames_filled] = in->duration;
         s->pts[s->nb_frames_filled++] = in->pts;
         return 0;
     }
@@ -82,9 +82,12 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     out = s->frames[idx];
     out->pts = s->pts[0];
+    out->duration = s->duration[0];
     memmove(&s->pts[0], &s->pts[1], (s->nb_frames - 1) * sizeof(s->pts[0]));
+    memmove(&s->duration[0], &s->duration[1], (s->nb_frames - 1) * sizeof(s->duration[0]));
     s->frames[idx] = in;
     s->pts[s->nb_frames - 1] = in->pts;
+    s->duration[s->nb_frames - 1] = in->duration;
 
     return ff_filter_frame(outlink, out);
 }
@@ -104,6 +107,7 @@ next:
             s->nb_frames--;
             goto next;
         }
+        out->duration = s->duration[s->flush_idx];
         out->pts = s->pts[s->flush_idx++];
         ret = ff_filter_frame(outlink, out);
         s->frames[s->nb_frames - 1] = NULL;

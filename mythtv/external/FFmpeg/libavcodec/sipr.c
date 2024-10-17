@@ -32,8 +32,8 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "lsp.h"
 #include "acelp_vectors.h"
 #include "acelp_pitch_delay.h"
@@ -532,7 +532,6 @@ static int sipr_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     int subframe_size = ctx->mode == MODE_16k ? L_SUBFR_16k : SUBFR_SIZE;
     int i, ret;
 
-    ctx->avctx = avctx;
     if (avpkt->size < (mode_par->bits_per_frame >> 3)) {
         av_log(avctx, AV_LOG_ERROR,
                "Error processing packet: packet size (%d) too small\n",
@@ -564,12 +563,11 @@ static int sipr_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_sipr_decoder = {
     .p.name         = "sipr",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("RealAudio SIPR / ACELP.NET"),
+    CODEC_LONG_NAME("RealAudio SIPR / ACELP.NET"),
     .p.type         = AVMEDIA_TYPE_AUDIO,
     .p.id           = AV_CODEC_ID_SIPR,
     .priv_data_size = sizeof(SiprContext),
     .init           = sipr_decoder_init,
     FF_CODEC_DECODE_CB(sipr_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

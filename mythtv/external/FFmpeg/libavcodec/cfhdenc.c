@@ -23,11 +23,11 @@
  * Cineform HD video encoder
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>
 
-#include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
+#include "libavutil/pixdesc.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
@@ -36,7 +36,6 @@
 #include "codec_internal.h"
 #include "encode.h"
 #include "put_bits.h"
-#include "thread.h"
 
 /* Derived from existing tables from decoder */
 static const unsigned codebook[256][2] = {
@@ -258,6 +257,11 @@ static av_cold int cfhd_encode_init(AVCodecContext *avctx)
     if (ret < 0)
         return ret;
 
+    if (avctx->height < 32) {
+        av_log(avctx, AV_LOG_ERROR, "Height must be >= 32.\n");
+        return AVERROR_INVALIDDATA;
+    }
+
     if (avctx->width & 15) {
         av_log(avctx, AV_LOG_ERROR, "Width must be multiple of 16.\n");
         return AVERROR_INVALIDDATA;
@@ -267,22 +271,21 @@ static av_cold int cfhd_encode_init(AVCodecContext *avctx)
 
     for (int i = 0; i < s->planes; i++) {
         int w8, h8, w4, h4, w2, h2;
-        int width  = i ? avctx->width >> s->chroma_h_shift : avctx->width;
-        int height = i ? FFALIGN(avctx->height >> s->chroma_v_shift, 8) :
-                         FFALIGN(avctx->height >> s->chroma_v_shift, 8);
-        ptrdiff_t stride = (FFALIGN(width / 8, 8) + 64) * 8;
+        const int a_height = FFALIGN(avctx->height, 8);
+        int width  = i ? AV_CEIL_RSHIFT(avctx->width, s->chroma_h_shift) : avctx->width;
+        int height = i ? a_height >> s->chroma_v_shift: a_height;
 
-        w8 = FFALIGN(width / 8, 8) + 64;
-        h8 = FFALIGN(height, 8) / 8;
+        w8 = width / 8 + 64;
+        h8 = height / 8;
         w4 = w8 * 2;
         h4 = h8 * 2;
         w2 = w4 * 2;
         h2 = h4 * 2;
 
         s->plane[i].dwt_buf =
-            av_calloc(height * stride, sizeof(*s->plane[i].dwt_buf));
+            av_calloc(h8 * 8 * w8 * 8, sizeof(*s->plane[i].dwt_buf));
         s->plane[i].dwt_tmp =
-            av_malloc_array(height * stride, sizeof(*s->plane[i].dwt_tmp));
+            av_malloc_array(h8 * 8 * w8 * 8, sizeof(*s->plane[i].dwt_tmp));
         if (!s->plane[i].dwt_buf || !s->plane[i].dwt_tmp)
             return AVERROR(ENOMEM);
 
@@ -300,7 +303,7 @@ static av_cold int cfhd_encode_init(AVCodecContext *avctx)
         for (int j = 0; j < DWT_LEVELS; j++) {
             for (int k = 0; k < FF_ARRAY_ELEMS(s->plane[i].band[j]); k++) {
                 s->plane[i].band[j][k].width  = (width / 8) << j;
-                s->plane[i].band[j][k].height = (height / 8) << j;
+                s->plane[i].band[j][k].height = height >> (DWT_LEVELS - j);
                 s->plane[i].band[j][k].a_width  = w8 << j;
                 s->plane[i].band[j][k].a_height = h8 << j;
             }
@@ -433,11 +436,13 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     int ret;
 
     for (int plane = 0; plane < s->planes; plane++) {
+        const int h_shift = plane ? s->chroma_h_shift : 0;
         int width = s->plane[plane].band[2][0].width;
         int a_width = s->plane[plane].band[2][0].a_width;
         int height = s->plane[plane].band[2][0].height;
         int act_plane = plane == 1 ? 2 : plane == 2 ? 1 : plane;
-        int16_t *input = (int16_t *)frame->data[act_plane];
+        const int16_t *input = (int16_t *)frame->data[act_plane];
+        int16_t *buf;
         int16_t *low = s->plane[plane].l_h[6];
         int16_t *high = s->plane[plane].l_h[7];
         ptrdiff_t in_stride = frame->linesize[act_plane] / 2;
@@ -452,7 +457,7 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
 
         dsp->horiz_filter(input, low, high,
                           in_stride, a_width, a_width,
-                          width * 2, height * 2);
+                          avctx->width >> h_shift, avctx->height);
 
         input = s->plane[plane].l_h[7];
         low = s->plane[plane].subband[7];
@@ -481,13 +486,13 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         high = s->plane[plane].l_h[4];
         high_stride = s->plane[plane].band[1][0].a_width;
 
+        buf = s->plane[plane].l_h[7];
         for (int i = 0; i < height * 2; i++) {
             for (int j = 0; j < width * 2; j++)
-                input[j] /= 4;
-            input += a_width * 2;
+                buf[j] /= 4;
+            buf += a_width * 2;
         }
 
-        input = s->plane[plane].l_h[7];
         dsp->horiz_filter(input, low, high,
                           a_width * 2, low_stride, high_stride,
                           width * 2, height * 2);
@@ -518,14 +523,14 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         high_stride = s->plane[plane].band[0][0].a_width;
 
         if (avctx->pix_fmt != AV_PIX_FMT_YUV422P10) {
+            int16_t *buf = s->plane[plane].l_h[4];
             for (int i = 0; i < height * 2; i++) {
                 for (int j = 0; j < width * 2; j++)
-                    input[j] /= 4;
-                input += a_width * 2;
+                    buf[j] /= 4;
+                buf += a_width * 2;
             }
         }
 
-        input = s->plane[plane].l_h[4];
         dsp->horiz_filter(input, low, high,
                           a_width * 2, low_stride, high_stride,
                           width * 2, height * 2);
@@ -547,7 +552,7 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                          width, height * 2);
     }
 
-    ret = ff_alloc_packet(avctx, pkt, 64LL + s->planes * (2LL * avctx->width * avctx->height + 1000LL));
+    ret = ff_alloc_packet(avctx, pkt, 256LL + s->planes * (4LL * avctx->width * (avctx->height + 15) + 2048LL));
     if (ret < 0)
         return ret;
 
@@ -590,6 +595,9 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     bytestream2_put_be16(pby, avctx->width);
 
     bytestream2_put_be16(pby, ImageHeight);
+    bytestream2_put_be16(pby, FFALIGN(avctx->height, 8));
+
+    bytestream2_put_be16(pby, -DisplayHeight);
     bytestream2_put_be16(pby, avctx->height);
 
     bytestream2_put_be16(pby, -FrameNumber);
@@ -752,7 +760,6 @@ static int cfhd_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                         } else if (count > 0) {
                             count = put_runcode(pb, count, rb);
                         }
-
                         put_bits(pb, cb[index].size, cb[index].bits);
                     }
 
@@ -821,20 +828,20 @@ static av_cold int cfhd_encode_close(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(CFHDEncContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "quality", "set quality", OFFSET(quality), AV_OPT_TYPE_INT,   {.i64= 0}, 0, 12, VE, "q" },
-    { "film3+",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 0}, 0,  0, VE, "q" },
-    { "film3",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 1}, 0,  0, VE, "q" },
-    { "film2+",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 2}, 0,  0, VE, "q" },
-    { "film2",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 3}, 0,  0, VE, "q" },
-    { "film1.5",  NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 4}, 0,  0, VE, "q" },
-    { "film1+",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 5}, 0,  0, VE, "q" },
-    { "film1",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 6}, 0,  0, VE, "q" },
-    { "high+",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 7}, 0,  0, VE, "q" },
-    { "high",     NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 8}, 0,  0, VE, "q" },
-    { "medium+",  NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 9}, 0,  0, VE, "q" },
-    { "medium",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64=10}, 0,  0, VE, "q" },
-    { "low+",     NULL,         0,               AV_OPT_TYPE_CONST, {.i64=11}, 0,  0, VE, "q" },
-    { "low",      NULL,         0,               AV_OPT_TYPE_CONST, {.i64=12}, 0,  0, VE, "q" },
+    { "quality", "set quality", OFFSET(quality), AV_OPT_TYPE_INT,   {.i64= 0}, 0, 12, VE, .unit = "q" },
+    { "film3+",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 0}, 0,  0, VE, .unit = "q" },
+    { "film3",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 1}, 0,  0, VE, .unit = "q" },
+    { "film2+",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 2}, 0,  0, VE, .unit = "q" },
+    { "film2",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 3}, 0,  0, VE, .unit = "q" },
+    { "film1.5",  NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 4}, 0,  0, VE, .unit = "q" },
+    { "film1+",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 5}, 0,  0, VE, .unit = "q" },
+    { "film1",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 6}, 0,  0, VE, .unit = "q" },
+    { "high+",    NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 7}, 0,  0, VE, .unit = "q" },
+    { "high",     NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 8}, 0,  0, VE, .unit = "q" },
+    { "medium+",  NULL,         0,               AV_OPT_TYPE_CONST, {.i64= 9}, 0,  0, VE, .unit = "q" },
+    { "medium",   NULL,         0,               AV_OPT_TYPE_CONST, {.i64=10}, 0,  0, VE, .unit = "q" },
+    { "low+",     NULL,         0,               AV_OPT_TYPE_CONST, {.i64=11}, 0,  0, VE, .unit = "q" },
+    { "low",      NULL,         0,               AV_OPT_TYPE_CONST, {.i64=12}, 0,  0, VE, .unit = "q" },
     { NULL},
 };
 
@@ -847,20 +854,22 @@ static const AVClass cfhd_class = {
 
 const FFCodec ff_cfhd_encoder = {
     .p.name           = "cfhd",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("GoPro CineForm HD"),
+    CODEC_LONG_NAME("GoPro CineForm HD"),
     .p.type           = AVMEDIA_TYPE_VIDEO,
     .p.id             = AV_CODEC_ID_CFHD,
+    .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
+                        AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size   = sizeof(CFHDEncContext),
     .p.priv_class     = &cfhd_class,
     .init             = cfhd_encode_init,
     .close            = cfhd_encode_close,
     FF_CODEC_ENCODE_CB(cfhd_encode_frame),
-    .p.capabilities   = AV_CODEC_CAP_FRAME_THREADS,
     .p.pix_fmts       = (const enum AVPixelFormat[]) {
                           AV_PIX_FMT_YUV422P10,
                           AV_PIX_FMT_GBRP12,
                           AV_PIX_FMT_GBRAP12,
                           AV_PIX_FMT_NONE
                         },
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .color_ranges     = AVCOL_RANGE_MPEG,
+    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
 };

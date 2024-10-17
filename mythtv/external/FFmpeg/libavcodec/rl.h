@@ -49,6 +49,16 @@ typedef struct RLTable {
 } RLTable;
 
 /**
+ * Initialize max_level and index_run from table_run and table_level;
+ * this is equivalent to initializing RLTable.max_level[0] and
+ * RLTable.index_run[0] with ff_rl_init().
+ */
+void ff_rl_init_level_run(uint8_t max_level[MAX_LEVEL + 1],
+                          uint8_t index_run[MAX_RUN + 1],
+                          const uint8_t table_run[/* n */],
+                          const uint8_t table_level[/* n*/], int n);
+
+/**
  * Initialize index_run, max_level and max_run from n, last, table_vlc,
  * table_run and table_level.
  * @param static_store static uint8_t array[2][2*MAX_RUN + MAX_LEVEL + 3]
@@ -70,7 +80,7 @@ void ff_rl_init(RLTable *rl, uint8_t static_store[2][2*MAX_RUN + MAX_LEVEL + 3])
  */
 void ff_rl_init_vlc(RLTable *rl, unsigned static_size);
 
-#define INIT_VLC_RL(rl, static_size)\
+#define VLC_INIT_RL(rl, static_size)\
 {\
     static RL_VLC_ELEM rl_vlc_table[32][static_size];\
 \

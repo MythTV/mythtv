@@ -19,9 +19,11 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "audio.h"
+#include "filters.h"
 #include "formats.h"
 
 #define MAX_HAAS_DELAY 40
@@ -60,11 +62,11 @@ static const AVOption haas_options[] = {
     { "level_in",      "set level in",      OFFSET(level_in),         AV_OPT_TYPE_DOUBLE,  {.dbl=1}, 0.015625,  64, A },
     { "level_out",     "set level out",     OFFSET(level_out),        AV_OPT_TYPE_DOUBLE,  {.dbl=1}, 0.015625,  64, A },
     { "side_gain",     "set side gain",     OFFSET(par_side_gain),    AV_OPT_TYPE_DOUBLE,  {.dbl=1}, 0.015625,  64, A },
-    { "middle_source", "set middle source", OFFSET(par_m_source),     AV_OPT_TYPE_INT,     {.i64=2},        0,   3, A, "source" },
-    {   "left",        0,                   0,                        AV_OPT_TYPE_CONST,   {.i64=0},        0,   0, A, "source" },
-    {   "right",       0,                   0,                        AV_OPT_TYPE_CONST,   {.i64=1},        0,   0, A, "source" },
-    {   "mid",         "L+R",               0,                        AV_OPT_TYPE_CONST,   {.i64=2},        0,   0, A, "source" },
-    {   "side",        "L-R",               0,                        AV_OPT_TYPE_CONST,   {.i64=3},        0,   0, A, "source" },
+    { "middle_source", "set middle source", OFFSET(par_m_source),     AV_OPT_TYPE_INT,     {.i64=2},        0,   3, A, .unit = "source" },
+    {   "left",        0,                   0,                        AV_OPT_TYPE_CONST,   {.i64=0},        0,   0, A, .unit = "source" },
+    {   "right",       0,                   0,                        AV_OPT_TYPE_CONST,   {.i64=1},        0,   0, A, .unit = "source" },
+    {   "mid",         "L+R",               0,                        AV_OPT_TYPE_CONST,   {.i64=2},        0,   0, A, .unit = "source" },
+    {   "side",        "L-R",               0,                        AV_OPT_TYPE_CONST,   {.i64=3},        0,   0, A, .unit = "source" },
     { "middle_phase",  "set middle phase",  OFFSET(par_middle_phase), AV_OPT_TYPE_BOOL,    {.i64=0},        0,   1, A },
     { "left_delay",    "set left delay",    OFFSET(par_delay0),       AV_OPT_TYPE_DOUBLE,  {.dbl=2.05},     0,  MAX_HAAS_DELAY, A },
     { "left_balance",  "set left balance",  OFFSET(par_balance0),     AV_OPT_TYPE_DOUBLE,  {.dbl=-1.0},    -1,   1, A },
@@ -79,19 +81,29 @@ static const AVOption haas_options[] = {
 
 AVFILTER_DEFINE_CLASS(haas);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layout = NULL;
+    static const enum AVSampleFormat formats[] = {
+        AV_SAMPLE_FMT_DBL,
+        AV_SAMPLE_FMT_NONE,
+    };
+    static const AVChannelLayout layouts[] = {
+        AV_CHANNEL_LAYOUT_STEREO,
+        { .nb_channels = 0 },
+    };
     int ret;
 
-    if ((ret = ff_add_format                 (&formats, AV_SAMPLE_FMT_DBL  )) < 0 ||
-        (ret = ff_set_common_formats         (ctx     , formats            )) < 0 ||
-        (ret = ff_add_channel_layout         (&layout , &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO)) < 0 ||
-        (ret = ff_set_common_channel_layouts (ctx     , layout             )) < 0)
+    ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, formats);
+    if (ret < 0)
         return ret;
 
-    return ff_set_common_all_samplerates(ctx);
+    ret = ff_set_common_channel_layouts_from_list2(ctx, cfg_in, cfg_out, layouts);
+    if (ret < 0)
+        return ret;
+
+    return 0;
 }
 
 static int config_input(AVFilterLink *inlink)
@@ -206,13 +218,6 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-static const AVFilterPad outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_haas = {
     .name           = "haas",
     .description    = NULL_IF_CONFIG_SMALL("Apply Haas Stereo Enhancer."),
@@ -220,6 +225,6 @@ const AVFilter ff_af_haas = {
     .priv_class     = &haas_class,
     .uninit         = uninit,
     FILTER_INPUTS(inputs),
-    FILTER_OUTPUTS(outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
+    FILTER_QUERY_FUNC2(query_formats),
 };

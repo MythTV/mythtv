@@ -19,14 +19,12 @@
  */
 
 #include "libavutil/colorspace.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "drawutils.h"
-#include "formats.h"
+#include "filters.h"
 #include "framesync.h"
-#include "internal.h"
 #include "opencl.h"
 #include "opencl_source.h"
 #include "video.h"
@@ -50,9 +48,9 @@ typedef struct RemapOpenCLContext {
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 
 static const AVOption remap_opencl_options[] = {
-    { "interp", "set interpolation method", OFFSET(interp), AV_OPT_TYPE_INT,   {.i64=1}, 0, 1, FLAGS, "interp" },
-    {  "near",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, "interp" },
-    {  "linear", NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, "interp" },
+    { "interp", "set interpolation method", OFFSET(interp), AV_OPT_TYPE_INT,   {.i64=1}, 0, 1, FLAGS, .unit = "interp" },
+    {  "near",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=0}, 0, 0, FLAGS, .unit = "interp" },
+    {  "linear", NULL, 0, AV_OPT_TYPE_CONST, {.i64=1}, 0, 0, FLAGS, .unit = "interp" },
     { "fill", "set the color of the unmapped pixels", OFFSET(fill_rgba), AV_OPT_TYPE_COLOR, {.str="black"}, .flags = FLAGS },
     { NULL }
 };
@@ -73,7 +71,7 @@ static int remap_opencl_load(AVFilterContext *avctx,
 {
     RemapOpenCLContext *ctx = avctx->priv;
     cl_int cle;
-    const char *source = ff_opencl_source_remap;
+    const char *source = ff_source_remap_cl;
     const char *kernel = kernels[ctx->interp];
     const AVPixFmtDescriptor *main_desc;
     int err, main_planes;
@@ -235,6 +233,8 @@ static int config_output(AVFilterLink *outlink)
     AVFilterLink *srclink = ctx->inputs[0];
     AVFilterLink *xlink = ctx->inputs[1];
     AVFilterLink *ylink = ctx->inputs[2];
+    FilterLink *il = ff_filter_link(srclink);
+    FilterLink *ol = ff_filter_link(outlink);
     FFFrameSyncIn *in;
     int ret;
 
@@ -250,7 +250,7 @@ static int config_output(AVFilterLink *outlink)
     outlink->w = xlink->w;
     outlink->h = xlink->h;
     outlink->sample_aspect_ratio = srclink->sample_aspect_ratio;
-    outlink->frame_rate = srclink->frame_rate;
+    ol->frame_rate = il->frame_rate;
 
     ret = ff_framesync_init(&s->fs, ctx, 3);
     if (ret < 0)
@@ -351,4 +351,5 @@ const AVFilter ff_vf_remap_opencl = {
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
     .priv_class    = &remap_opencl_class,
     .flags_internal  = FF_FILTER_FLAG_HWFRAME_AWARE,
+    .flags          = AVFILTER_FLAG_HWDEVICE,
 };

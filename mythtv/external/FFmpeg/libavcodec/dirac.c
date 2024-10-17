@@ -26,9 +26,13 @@
  * @author Marco Gerards <marco@gnu.org>, David Conrad, Jordi Ortiz <nenjordi@gmail.com>
  */
 
+#include "config.h"
+
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 
 #include "dirac.h"
+#include "get_bits.h"
 #include "golomb.h"
 #include "mpeg12data.h"
 

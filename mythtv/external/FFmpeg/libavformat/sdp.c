@@ -24,6 +24,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/base64.h"
 #include "libavutil/dict.h"
+#include "libavutil/mem.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/opt.h"
 #include "libavcodec/xiph.h"
@@ -32,7 +33,9 @@
 #include "internal.h"
 #include "avc.h"
 #include "hevc.h"
+#include "nal.h"
 #include "rtp.h"
+#include "version.h"
 #if CONFIG_NETWORK
 #include "network.h"
 #endif
@@ -188,19 +191,21 @@ static int extradata2psets(AVFormatContext *s, const AVCodecParameters *par,
     }
     memcpy(psets, pset_string, strlen(pset_string));
     p = psets + strlen(pset_string);
-    r = ff_avc_find_startcode(extradata, extradata + extradata_size);
+    r = ff_nal_find_startcode(extradata, extradata + extradata_size);
     while (r < extradata + extradata_size) {
         const uint8_t *r1;
         uint8_t nal_type;
 
         while (!*(r++));
         nal_type = *r & 0x1f;
-        r1 = ff_avc_find_startcode(r, extradata + extradata_size);
+        r1 = ff_nal_find_startcode(r, extradata + extradata_size);
         if (nal_type != 7 && nal_type != 8) { /* Only output SPS and PPS */
             r = r1;
             continue;
         }
         if (p != (psets + strlen(pset_string))) {
+            if (p - psets >= MAX_PSET_SIZE)
+                goto fail_in_loop;
             *p = ',';
             p++;
         }
@@ -211,6 +216,7 @@ static int extradata2psets(AVFormatContext *s, const AVCodecParameters *par,
         if (!av_base64_encode(p, MAX_PSET_SIZE - (p - psets), r, r1 - r)) {
             av_log(s, AV_LOG_ERROR, "Cannot Base64-encode %"PTRDIFF_SPECIFIER" %"PTRDIFF_SPECIFIER"!\n",
                    MAX_PSET_SIZE - (p - psets), r1 - r);
+fail_in_loop:
             av_free(psets);
             av_free(tmpbuf);
 

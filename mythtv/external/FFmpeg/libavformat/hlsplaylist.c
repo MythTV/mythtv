@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include <stdint.h>
+#include <time.h>
 
 #include "libavutil/time_internal.h"
 
@@ -38,7 +39,7 @@ void ff_hls_write_playlist_version(AVIOContext *out, int version)
 
 void ff_hls_write_audio_rendition(AVIOContext *out, const char *agroup,
                                   const char *filename, const char *language,
-                                  int name_id, int is_default)
+                                  int name_id, int is_default, int nb_channels)
 {
     if (!out || !agroup || !filename)
         return;
@@ -47,6 +48,9 @@ void ff_hls_write_audio_rendition(AVIOContext *out, const char *agroup,
     avio_printf(out, ",NAME=\"audio_%d\",DEFAULT=%s,", name_id, is_default ? "YES" : "NO");
     if (language) {
         avio_printf(out, "LANGUAGE=\"%s\",", language);
+    }
+    if (nb_channels) {
+        avio_printf(out, "CHANNELS=\"%d\",", nb_channels);
     }
     avio_printf(out, "URI=\"%s\"\n", filename);
 }
@@ -67,6 +71,7 @@ void ff_hls_write_subtitle_rendition(AVIOContext *out, const char *sgroup,
 }
 
 void ff_hls_write_stream_info(AVStream *st, AVIOContext *out, int bandwidth,
+                              int avg_bandwidth,
                               const char *filename, const char *agroup,
                               const char *codecs, const char *ccgroup,
                               const char *sgroup)
@@ -81,6 +86,8 @@ void ff_hls_write_stream_info(AVStream *st, AVIOContext *out, int bandwidth,
     }
 
     avio_printf(out, "#EXT-X-STREAM-INF:BANDWIDTH=%d", bandwidth);
+    if (avg_bandwidth)
+        avio_printf(out, ",AVERAGE-BANDWIDTH=%d", avg_bandwidth);
     if (st && st->codecpar->width > 0 && st->codecpar->height > 0)
         avio_printf(out, ",RESOLUTION=%dx%d", st->codecpar->width,
                 st->codecpar->height);

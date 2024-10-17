@@ -20,6 +20,7 @@
 
 #include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 #include "avfilter.h"
@@ -27,7 +28,6 @@
 #include "formats.h"
 #include "audio.h"
 #include "video.h"
-#include "internal.h"
 
 typedef struct AudioBitScopeContext {
     const AVClass *class;
@@ -56,10 +56,10 @@ static const AVOption abitscope_options[] = {
     { "size", "set video size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str="1024x256"}, 0, 0, FLAGS },
     { "s",    "set video size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str="1024x256"}, 0, 0, FLAGS },
     { "colors", "set channels colors", OFFSET(colors), AV_OPT_TYPE_STRING, {.str = "red|green|blue|yellow|orange|lime|pink|magenta|brown" }, 0, 0, FLAGS },
-    { "mode", "set output mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, FLAGS, "mode" },
-    { "m",    "set output mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, FLAGS, "mode" },
-    { "bars",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, "mode" },
-    { "trace", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, "mode" },
+    { "mode", "set output mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, FLAGS, .unit = "mode" },
+    { "m",    "set output mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, FLAGS, .unit = "mode" },
+    { "bars",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, .unit = "mode" },
+    { "trace", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, .unit = "mode" },
     { NULL }
 };
 
@@ -138,34 +138,40 @@ static int config_input(AVFilterLink *inlink)
 static int config_output(AVFilterLink *outlink)
 {
     AudioBitScopeContext *s = outlink->src->priv;
+    FilterLink *l = ff_filter_link(outlink);
 
     outlink->w = s->w;
     outlink->h = s->h;
     outlink->sample_aspect_ratio = (AVRational){1,1};
-    outlink->frame_rate = s->frame_rate;
+    l->frame_rate = s->frame_rate;
+    outlink->time_base = av_inv_q(l->frame_rate);
 
     return 0;
 }
 
+#define BITCOUNTER(type, depth, one)                                        \
+        memset(counter, 0, sizeof(s->counter));                             \
+        for (int i = 0; i < nb_samples; i++) {                              \
+            const type x = in[i];                                           \
+            for (int j = 0; j < depth && x; j++)                            \
+                counter[j] += !!(x & (one << j));                           \
+        }
+
 #define BARS(type, depth, one)                                              \
     for (int ch = 0; ch < inlink->ch_layout.nb_channels; ch++) {            \
+        const int nb_samples = insamples->nb_samples;                       \
         const type *in = (const type *)insamples->extended_data[ch];        \
         const int w = outpicref->width / inlink->ch_layout.nb_channels;     \
         const int h = outpicref->height / depth;                            \
         const uint32_t color = AV_RN32(&s->fg[4 * ch]);                     \
+        uint64_t *counter = s->counter;                                     \
                                                                             \
-        memset(s->counter, 0, sizeof(s->counter));                          \
-        for (int i = 0; i < insamples->nb_samples; i++) {                   \
-            for (int j = 0; j < depth; j++) {                               \
-                if (in[i] & (one << j))                                     \
-                    s->counter[j]++;                                        \
-            }                                                               \
-        }                                                                   \
+        BITCOUNTER(type, depth, one)                                        \
                                                                             \
         for (int b = 0; b < depth; b++) {                                   \
             for (int j = 1; j < h - 1; j++) {                               \
                 uint8_t *dst = outpicref->data[0] + (b * h + j) * outpicref->linesize[0] + w * ch * 4; \
-                const int ww = (s->counter[depth - b - 1] / (float)insamples->nb_samples) * (w - 1); \
+                const int ww = (counter[depth - b - 1] / (float)nb_samples) * (w - 1); \
                                                                             \
                 for (int i = 0; i < ww; i++) {                              \
                     AV_WN32(&dst[i * 4], color);                            \
@@ -176,25 +182,21 @@ static int config_output(AVFilterLink *outlink)
 
 #define DO_TRACE(type, depth, one)                                          \
     for (int ch = 0; ch < inlink->ch_layout.nb_channels; ch++) {            \
+        const int nb_samples = insamples->nb_samples;                       \
         const int w = outpicref->width / inlink->ch_layout.nb_channels;     \
         const type *in = (const type *)insamples->extended_data[ch];        \
+        uint64_t *counter = s->counter;                                     \
         const int wb = w / depth;                                           \
         int wv;                                                             \
                                                                             \
-        memset(s->counter, 0, sizeof(s->counter));                          \
-        for (int i = 0; i < insamples->nb_samples; i++) {                   \
-            for (int j = 0; j < depth; j++) {                               \
-                if (in[i] & (one << j))                                     \
-                    s->counter[j]++;                                        \
-            }                                                               \
-        }                                                                   \
+        BITCOUNTER(type, depth, one)                                        \
                                                                             \
         for (int b = 0; b < depth; b++) {                                   \
             uint8_t colors[4];                                              \
             uint32_t color;                                                 \
             uint8_t *dst = outpicref->data[0] + w * ch * 4 + wb * b * 4 +   \
                            s->current_vpos * outpicref->linesize[0];        \
-            wv = (s->counter[depth - b - 1] * 255) / insamples->nb_samples; \
+            wv = (counter[depth - b - 1] * 255) / nb_samples;               \
             colors[0] = (wv * s->fg[ch * 4 + 0] + 127) / 255;               \
             colors[1] = (wv * s->fg[ch * 4 + 1] + 127) / 255;               \
             colors[2] = (wv * s->fg[ch * 4 + 2] + 127) / 255;               \
@@ -212,6 +214,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
     AVFilterLink *outlink = ctx->outputs[0];
     AudioBitScopeContext *s = ctx->priv;
     AVFrame *outpicref;
+    int ret;
 
     if (s->mode == 0 || !s->outpicref) {
         outpicref = ff_get_video_buffer(outlink, outlink->w, outlink->h);
@@ -227,13 +230,20 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
     }
 
     if (s->mode == 1) {
-        av_frame_make_writable(s->outpicref);
+        ret = ff_inlink_make_frame_writable(outlink, &s->outpicref);
+        if (ret < 0) {
+            av_frame_free(&insamples);
+            return ret;
+        }
         outpicref = av_frame_clone(s->outpicref);
-        if (!outpicref)
+        if (!outpicref) {
+            av_frame_free(&insamples);
             return AVERROR(ENOMEM);
+        }
     }
 
-    outpicref->pts = insamples->pts;
+    outpicref->pts = av_rescale_q(insamples->pts, inlink->time_base, outlink->time_base);
+    outpicref->duration = 1;
     outpicref->sample_aspect_ratio = (AVRational){1,1};
 
     switch (insamples->format) {

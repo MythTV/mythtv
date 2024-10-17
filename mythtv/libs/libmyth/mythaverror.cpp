@@ -16,28 +16,29 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <cstring>
 #include "mythaverror.h"
 
-// \brief A quick and dirty C++ equivalent to av_strerror
-//
-// The caller must supply the stdstring.
-//
-// \see av_strerror
+/** \brief A quick and dirty C++ equivalent to av_strerror
+
+The caller must supply the stdstring.
+
+\see av_strerror
+*/
 int av_strerror_stdstring (int errnum, std::string &errbuf)
 {
     errbuf.resize(AV_ERROR_MAX_STRING_SIZE);
     int rc = av_strerror(errnum, errbuf.data(), errbuf.size());
-    errbuf.resize(strlen(errbuf.data()));
+    errbuf.resize(errbuf.find('\0'));
     return rc;
 }
 
-// \brief A C++ equivalent to av_make_error_string
-//
-// The caller must supply the stdstring so that the data pointer
-// remains valid after this function returns.
-//
-// \see av_make_error_string
+/** \brief A C++ equivalent to av_make_error_string
+
+The caller must supply the stdstring so that the data pointer
+remains valid after this function returns.
+
+\see av_make_error_string
+*/
 char *av_make_error_stdstring(std::string &errbuf, int errnum)
 {
     av_strerror_stdstring(errnum, errbuf);

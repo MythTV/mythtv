@@ -13,8 +13,16 @@ class MythTranscodePlayer : public MythPlayer
     void InitForTranscode      (bool CopyAudio, bool CopyVideo);
     void SetCutList            (const frm_dir_map_t& CutList);
     bool TranscodeGetNextFrame (int& DidFF, bool& KeyFrame, bool HonorCutList);
-    bool WriteStoredData       (MythMediaBuffer* OutBuffer, bool WriteVideo, std::chrono::milliseconds TimecodeOffset);
-    long UpdateStoredFrameNum  (long CurrentFrameNum);
+
+    void SetRawAudioState(bool state) { m_rawAudio = state; }
+    bool GetRawAudioState() const     { return m_rawAudio ; }
+
+    void SetRawVideoState(bool state) { m_rawVideo = state; }
+    bool GetRawVideoState() const     { return m_rawVideo; }
+
+  private:
+    bool m_rawAudio {false};
+    bool m_rawVideo {false};
 };
 
 #endif

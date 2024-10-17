@@ -26,12 +26,11 @@
  */
 
 #include "libavutil/avassert.h"
-#include "libavutil/imgutils.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "roqvideo.h"
 
 static void roqvideo_decode_frame(RoqContext *ri, GetByteContext *gb)
@@ -73,7 +72,7 @@ static void roqvideo_decode_frame(RoqContext *ri, GetByteContext *gb)
     xpos = ypos = 0;
 
     if (chunk_size > bytestream2_get_bytes_left(gb)) {
-        av_log(ri->avctx, AV_LOG_ERROR, "Chunk does not fit in input buffer\n");
+        av_log(ri->logctx, AV_LOG_ERROR, "Chunk does not fit in input buffer\n");
         chunk_size = bytestream2_get_bytes_left(gb);
     }
 
@@ -81,7 +80,7 @@ static void roqvideo_decode_frame(RoqContext *ri, GetByteContext *gb)
         for (yp = ypos; yp < ypos + 16; yp += 8)
             for (xp = xpos; xp < xpos + 16; xp += 8) {
                 if (bytestream2_tell(gb) >= chunk_start + chunk_size) {
-                    av_log(ri->avctx, AV_LOG_VERBOSE, "Chunk is too short\n");
+                    av_log(ri->logctx, AV_LOG_VERBOSE, "Chunk is too short\n");
                     return;
                 }
                 if (vqflg_pos < 0) {
@@ -115,7 +114,7 @@ static void roqvideo_decode_frame(RoqContext *ri, GetByteContext *gb)
                         if(k & 0x02) y += 4;
 
                         if (bytestream2_tell(gb) >= chunk_start + chunk_size) {
-                            av_log(ri->avctx, AV_LOG_VERBOSE, "Chunk is too short\n");
+                            av_log(ri->logctx, AV_LOG_VERBOSE, "Chunk is too short\n");
                             return;
                         }
                         if (vqflg_pos < 0) {
@@ -170,7 +169,7 @@ static av_cold int roq_decode_init(AVCodecContext *avctx)
 {
     RoqContext *s = avctx->priv_data;
 
-    s->avctx = avctx;
+    s->logctx = avctx;
 
     if (avctx->width % 16 || avctx->height % 16) {
         avpriv_request_sample(avctx, "Dimensions not being a multiple of 16");
@@ -235,7 +234,7 @@ static av_cold int roq_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_roq_decoder = {
     .p.name         = "roqvideo",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("id RoQ video"),
+    CODEC_LONG_NAME("id RoQ video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_ROQ,
     .priv_data_size = sizeof(RoqContext),
@@ -243,5 +242,5 @@ const FFCodec ff_roq_decoder = {
     .close          = roq_decode_end,
     FF_CODEC_DECODE_CB(roq_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

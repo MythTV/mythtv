@@ -29,9 +29,13 @@
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/eval.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
-#include "internal.h"
+
+#include "filters.h"
+#include "formats.h"
+#include "video.h"
 
 #define MAX_NB_THREADS 32
 #define NB_PLANES 4
@@ -84,12 +88,12 @@ static const AVOption geq_options[] = {
     { "g",          "set green expression",       OFFSET(expr_str[G]), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 0, FLAGS },
     { "blue_expr",  "set blue expression",        OFFSET(expr_str[B]), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 0, FLAGS },
     { "b",          "set blue expression",        OFFSET(expr_str[B]), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 0, FLAGS },
-    { "interpolation","set interpolation method", OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=INTERP_BILINEAR}, 0, NB_INTERP-1, FLAGS, "interp" },
-    { "i",          "set interpolation method",   OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=INTERP_BILINEAR}, 0, NB_INTERP-1, FLAGS, "interp" },
-    { "nearest",    "nearest interpolation",      0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_NEAREST},  0, 0, FLAGS, "interp" },
-    { "n",          "nearest interpolation",      0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_NEAREST},  0, 0, FLAGS, "interp" },
-    { "bilinear",   "bilinear interpolation",     0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_BILINEAR}, 0, 0, FLAGS, "interp" },
-    { "b",          "bilinear interpolation",     0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_BILINEAR}, 0, 0, FLAGS, "interp" },
+    { "interpolation","set interpolation method", OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=INTERP_BILINEAR}, 0, NB_INTERP-1, FLAGS, .unit = "interp" },
+    { "i",          "set interpolation method",   OFFSET(interpolation), AV_OPT_TYPE_INT, {.i64=INTERP_BILINEAR}, 0, NB_INTERP-1, FLAGS, .unit = "interp" },
+    { "nearest",    "nearest interpolation",      0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_NEAREST},  0, 0, FLAGS, .unit = "interp" },
+    { "n",          "nearest interpolation",      0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_NEAREST},  0, 0, FLAGS, .unit = "interp" },
+    { "bilinear",   "bilinear interpolation",     0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_BILINEAR}, 0, 0, FLAGS, .unit = "interp" },
+    { "b",          "bilinear interpolation",     0,                   AV_OPT_TYPE_CONST, {.i64=INTERP_BILINEAR}, 0, 0, FLAGS, .unit = "interp" },
     {NULL},
 };
 
@@ -109,8 +113,12 @@ static inline double getpix(void *priv, double x, double y, int plane)
         return 0;
 
     if (geq->interpolation == INTERP_BILINEAR) {
-        xi = x = av_clipd(x, 0, w - 2);
-        yi = y = av_clipd(y, 0, h - 2);
+        int xn, yn;
+
+        xi = x = av_clipd(x, 0, w - 1);
+        yi = y = av_clipd(y, 0, h - 1);
+        xn = FFMIN(xi + 1, w - 1);
+        yn = FFMIN(yi + 1, h - 1);
 
         x -= xi;
         y -= yi;
@@ -119,17 +127,17 @@ static inline double getpix(void *priv, double x, double y, int plane)
             const uint16_t *src16 = (const uint16_t*)src;
             linesize /= 2;
 
-            return (1-y)*((1-x)*src16[xi +  yi    * linesize] + x*src16[xi + 1 +  yi    * linesize])
-                  +   y *((1-x)*src16[xi + (yi+1) * linesize] + x*src16[xi + 1 + (yi+1) * linesize]);
+            return (1-y)*((1-x)*src16[xi + yi * linesize] + x*src16[xn + yi * linesize])
+                  +   y *((1-x)*src16[xi + yn * linesize] + x*src16[xn + yn * linesize]);
         } else if (geq->bps == 32) {
             const float *src32 = (const float*)src;
             linesize /= 4;
 
-            return (1-y)*((1-x)*src32[xi +  yi    * linesize] + x*src32[xi + 1 +  yi    * linesize])
-                  +   y *((1-x)*src32[xi + (yi+1) * linesize] + x*src32[xi + 1 + (yi+1) * linesize]);
+            return (1-y)*((1-x)*src32[xi + yi * linesize] + x*src32[xn + yi * linesize])
+                  +   y *((1-x)*src32[xi + yn * linesize] + x*src32[xn + yn * linesize]);
         } else if (geq->bps == 8) {
-            return (1-y)*((1-x)*src[xi +  yi    * linesize] + x*src[xi + 1 +  yi    * linesize])
-                  +   y *((1-x)*src[xi + (yi+1) * linesize] + x*src[xi + 1 + (yi+1) * linesize]);
+            return (1-y)*((1-x)*src[xi + yi * linesize] + x*src[xn + yi * linesize])
+                  +   y *((1-x)*src[xi + yn * linesize] + x*src[xn + yn * linesize]);
         }
     } else {
         xi = av_clipd(x, 0, w - 1);
@@ -446,13 +454,14 @@ static int slice_geq_filter(AVFilterContext *ctx, void *arg, int jobnr, int nb_j
 static int geq_filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
     int plane;
+    FilterLink *inl = ff_filter_link(inlink);
     AVFilterContext *ctx = inlink->dst;
     const int nb_threads = FFMIN(MAX_NB_THREADS, ff_filter_get_nb_threads(ctx));
     GEQContext *geq = ctx->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
     AVFrame *out;
 
-    geq->values[VAR_N] = inlink->frame_count_out,
+    geq->values[VAR_N] = inl->frame_count_out,
     geq->values[VAR_T] = in->pts == AV_NOPTS_VALUE ? NAN : in->pts * av_q2d(inlink->time_base),
 
     geq->picref = in;
@@ -515,13 +524,6 @@ static const AVFilterPad geq_inputs[] = {
     },
 };
 
-static const AVFilterPad geq_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_geq = {
     .name          = "geq",
     .description   = NULL_IF_CONFIG_SMALL("Apply generic equation to each pixel."),
@@ -529,7 +531,7 @@ const AVFilter ff_vf_geq = {
     .init          = geq_init,
     .uninit        = geq_uninit,
     FILTER_INPUTS(geq_inputs),
-    FILTER_OUTPUTS(geq_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_QUERY_FUNC(geq_query_formats),
     .priv_class    = &geq_class,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,

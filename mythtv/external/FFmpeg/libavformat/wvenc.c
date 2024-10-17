@@ -24,22 +24,12 @@
 
 #include "apetag.h"
 #include "avformat.h"
+#include "mux.h"
 #include "wv.h"
 
 typedef struct WvMuxContext {
     int64_t samples;
 } WvMuxContext;
-
-static av_cold int wv_init(AVFormatContext *ctx)
-{
-    if (ctx->nb_streams > 1 ||
-        ctx->streams[0]->codecpar->codec_id != AV_CODEC_ID_WAVPACK) {
-        av_log(ctx, AV_LOG_ERROR, "This muxer only supports a single WavPack stream.\n");
-        return AVERROR(EINVAL);
-    }
-
-    return 0;
-}
 
 static int wv_write_packet(AVFormatContext *ctx, AVPacket *pkt)
 {
@@ -76,16 +66,18 @@ static av_cold int wv_write_trailer(AVFormatContext *ctx)
     return 0;
 }
 
-const AVOutputFormat ff_wv_muxer = {
-    .name              = "wv",
-    .long_name         = NULL_IF_CONFIG_SMALL("raw WavPack"),
-    .mime_type         = "audio/x-wavpack",
-    .extensions        = "wv",
+const FFOutputFormat ff_wv_muxer = {
+    .p.name            = "wv",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("raw WavPack"),
+    .p.mime_type       = "audio/x-wavpack",
+    .p.extensions      = "wv",
     .priv_data_size    = sizeof(WvMuxContext),
-    .audio_codec       = AV_CODEC_ID_WAVPACK,
-    .video_codec       = AV_CODEC_ID_NONE,
-    .init              = wv_init,
+    .p.audio_codec     = AV_CODEC_ID_WAVPACK,
+    .p.video_codec     = AV_CODEC_ID_NONE,
+    .p.subtitle_codec  = AV_CODEC_ID_NONE,
     .write_packet      = wv_write_packet,
     .write_trailer     = wv_write_trailer,
-    .flags             = AVFMT_NOTIMESTAMPS,
+    .p.flags           = AVFMT_NOTIMESTAMPS,
+    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH |
+                         FF_OFMT_FLAG_ONLY_DEFAULT_CODECS,
 };
