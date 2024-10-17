@@ -60,8 +60,6 @@ private:
  *  For a digital streams specialization, see the DTVRecorder.
  *  For a specialization for MPEG hardware encoded analog streams,
  *  see MpegRecorder.
- *  For a specialization for software encoding of frame grabber
- *  recorders, see NuppelVideoRecorder.
  *
  *  \sa TVRec
  */
