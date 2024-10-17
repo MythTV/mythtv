@@ -8,6 +8,13 @@
 #include <chrono>
 #include <thread>
 
+extern "C" {
+#include "libavutil/log.h"
+#define FFNV_LOG_FUNC(logctx, msg, ...) av_log(logctx, AV_LOG_ERROR, msg,  __VA_ARGS__)
+#define FFNV_DEBUG_LOG_FUNC(logctx, msg, ...) av_log(logctx, AV_LOG_DEBUG, msg,  __VA_ARGS__)
+#include <ffnvcodec/dynlink_loader.h>
+}
+
 #define LOC QString("NVDECInterop: ")
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)

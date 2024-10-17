@@ -15,7 +15,8 @@ extern "C" {
 #include "libavutil/hwcontext.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/pixdesc.h"
-#include "compat/cuda/dynlink_loader.h"
+#include <ffnvcodec/dynlink_cuda.h>
+#include <ffnvcodec/dynlink_cuviddec.h>
 }
 
 // Std
