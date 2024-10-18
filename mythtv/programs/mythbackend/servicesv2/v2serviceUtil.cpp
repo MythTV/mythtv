@@ -851,6 +851,8 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
     if (Sort.endsWith("desc", Qt::CaseInsensitive))
         sortType += 1;
 
+    static QRegularExpression regex("[_-]");
+
     auto comp = [sortType](const RecordingInfo *First, const RecordingInfo *Second)
     {
         switch (sortType)
@@ -860,9 +862,11 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
             case 1:
                 return First->GetScheduledStartTime() > Second->GetScheduledStartTime();
             case 10:
-                return First->GetChanNum().replace('-','.').toDouble() < Second->GetChanNum().replace('-','.').toDouble();
+                return First->GetChanNum().replace(regex,".").toDouble()
+                     < Second->GetChanNum().replace(regex,".").toDouble();
             case 11:
-                return First->GetChanNum().replace('-','.').toDouble() > Second->GetChanNum().replace('-','.').toDouble();
+                return First->GetChanNum().replace(regex,".").toDouble()
+                     > Second->GetChanNum().replace(regex,".").toDouble();
             case 20:
                 return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) < 0 ;
             case 21:
