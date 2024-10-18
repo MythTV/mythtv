@@ -848,7 +848,7 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
         sortType = 10;
     else if (Sort.startsWith("title", Qt::CaseInsensitive))
         sortType = 20;
-    if (Sort.endsWith("desc"), Qt::CaseInsensitive)
+    if (Sort.endsWith("desc", Qt::CaseInsensitive))
         sortType += 1;
 
     auto comp = [sortType](const RecordingInfo *First, const RecordingInfo *Second)
