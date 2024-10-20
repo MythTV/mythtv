@@ -100,8 +100,6 @@ class MythVDPAUHelper : public QObject
     bool   InitProcs(void);
 
   private:
-    bool                              m_valid                            { false   };
-    bool                              m_createdDevice                    { false   };
     VdpDevice                         m_device                           { 0       };
     MythXDisplay                     *m_display                          { nullptr };
 
@@ -123,6 +121,9 @@ class MythVDPAUHelper : public QObject
     VdpOutputSurfaceDestroy          *m_vdpOutputSurfaceDestroy          { nullptr };
     VdpVideoSurfaceGetParameters     *m_vdpVideoSurfaceGetParameters     { nullptr };
     VdpPreemptionCallbackRegister    *m_vdpPreemptionCallbackRegister    { nullptr };
+
+    bool                              m_createdDevice                    { false   };
+    bool                              m_valid                            { false   };
 };
 
 #endif // MYTHVDPAUHELPER_H
