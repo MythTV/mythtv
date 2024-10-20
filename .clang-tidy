@@ -215,6 +215,9 @@ Checks: '-*,
         # warnings. ,
        -misc-use-anonymous-namespace,
 
+        # Temporarily disable this. ,
+       -misc-use-internal-linkage,
+
     modernize-*,
 
         # Noisy!!!  foo(void) => foo()  ,
