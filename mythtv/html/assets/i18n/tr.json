@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "İptal edildi",
+            "All": "Tüm",
             "Cancelled": "İptal edildi",
             "Conflict": "Anlaşmazlık",
             "CurrentRecording": "Güncel Kayıt",
+            "Default": "Varsayılan",
             "DontRecord": "Kaydetme",
             "EarlierShowing": "Daha önce gösteriliyor",
             "Failed": "Arızalı",

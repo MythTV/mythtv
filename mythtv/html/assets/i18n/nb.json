@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Abortert",
+            "All": "Alle",
             "Cancelled": "avbrutt",
             "Conflict": "Konflikt",
             "CurrentRecording": "Gjeldende opptak",
+            "Default": "Misligholde",
             "DontRecord": "Ikke ta opp",
             "EarlierShowing": "Tidligere visning",
             "Failed": "Mislyktes",

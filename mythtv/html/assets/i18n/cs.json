@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Přerušeno",
+            "All": "Vše",
             "Cancelled": "Zrušeno",
             "Conflict": "Konflikt",
             "CurrentRecording": "Aktuální záznam",
+            "Default": "Výchozí",
             "DontRecord": "Nenahrávat",
             "EarlierShowing": "Dřívější zobrazení",
             "Failed": "Nepodařilo se",

@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Prekinut",
+            "All": "Sve",
             "Cancelled": "Otkazano",
             "Conflict": "Sukob",
             "CurrentRecording": "Trenutačna snimka",
+            "Default": "Zadano",
             "DontRecord": "Ne snimaj",
             "EarlierShowing": "Ranije prikazivanje",
             "Failed": "Neuspjeh",

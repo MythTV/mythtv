@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "afgebroken",
+            "All": "Alle",
             "Cancelled": "Geannuleerd",
             "Conflict": "Conflict",
             "CurrentRecording": "Huidige opname",
+            "Default": "Standaard",
             "DontRecord": "Neem niet op",
             "EarlierShowing": "Eerdere vertoning",
             "Failed": "Mislukt",

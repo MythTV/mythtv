@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Katkestatud",
+            "All": "Kõik",
             "Cancelled": "Tühistatud",
             "Conflict": "Konflikt",
             "CurrentRecording": "Praegune salvestus",
+            "Default": "Vaikimisi",
             "DontRecord": "Ära salvesta",
             "EarlierShowing": "Varasem näitamine",
             "Failed": "Ebaõnnestunud",

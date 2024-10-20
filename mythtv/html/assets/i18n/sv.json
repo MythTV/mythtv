@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Avbruten",
+            "All": "Alla",
             "Cancelled": "Inställt",
             "Conflict": "Konflikt",
             "CurrentRecording": "Aktuell inspelning",
+            "Default": "Standard",
             "DontRecord": "Spela inte in",
             "EarlierShowing": "Tidigare visning",
             "Failed": "Misslyckades",

@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Прекратено",
+            "All": "Всички",
             "Cancelled": "Отменен",
             "Conflict": "Конфликт",
             "CurrentRecording": "Текущ запис",
+            "Default": "По подразбиране",
             "DontRecord": "Не записвайте",
             "EarlierShowing": "По-ранно показване",
             "Failed": "Се провали",

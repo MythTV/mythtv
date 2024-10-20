@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Ματαιώθηκε",
+            "All": "Ολοι",
             "Cancelled": "Ακυρώθηκε",
             "Conflict": "σύγκρουση",
             "CurrentRecording": "Τρέχουσα εγγραφή",
+            "Default": "Αθέτηση",
             "DontRecord": "Μην καταγράψετε",
             "EarlierShowing": "Εμφάνιση νωρίτερα",
             "Failed": "Απέτυχε",

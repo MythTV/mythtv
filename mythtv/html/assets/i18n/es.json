@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Abortado",
+            "All": "Todo",
             "Cancelled": "Cancelado",
             "Conflict": "Conflicto",
             "CurrentRecording": "Grabación actual",
+            "Default": "Por defecto",
             "DontRecord": "No grabar",
             "EarlierShowing": "Demostración anterior",
             "Failed": "Fallido",

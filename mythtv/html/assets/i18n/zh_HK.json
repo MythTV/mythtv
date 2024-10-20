@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "中止",
+            "All": "全部",
             "Cancelled": "取消",
             "Conflict": "衝突",
             "CurrentRecording": "當前錄音",
+            "Default": "預設",
             "DontRecord": "不記錄",
             "EarlierShowing": "較早放映",
             "Failed": "失敗的",

@@ -12,10 +12,13 @@
                 <ng-template pTemplate="caption">
                     <!-- Top Buttons -->
                     <div class="flex align-items-center">
-                        <p-checkbox inputId="showAllStatuses" [(ngModel)]="showAllStatuses" name="showAllStatuses"
-                            #showAll="ngModel" [binary]="true" (onChange)="onFilter()"
-                            label="{{ 'dashboard.upcoming.showall' | translate }} " class="'px-3">
-                        </p-checkbox>
+
+                        {{ 'dashboard.upcoming.status' | translate }}: &nbsp;
+                        <p-dropdown [(ngModel)]="selectedStatus" [options]="dataService.recStatusList"
+                            optionLabel="Name" optionValue="Status" name="Statusfilter" (onChange)="onFilter()"
+                            placeholder="{{ 'data.recstatus.Default' | translate }}" [showClear]="true" class="'px-3">
+                        </p-dropdown>
+
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {{ 'dashboard.upcoming.recrule' | translate }}: &nbsp;
                         <p-dropdown [(ngModel)]="selectedRule" [options]="recRules" name="rulefilter"

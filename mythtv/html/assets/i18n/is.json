@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Hætt við",
+            "All": "Allt",
             "Cancelled": "Hætt við",
             "Conflict": "Átök",
             "CurrentRecording": "Núverandi upptaka",
+            "Default": "Sjálfgefið",
             "DontRecord": "Ekki taka upp",
             "EarlierShowing": "Fyrri sýning",
             "Failed": "Mistókst",

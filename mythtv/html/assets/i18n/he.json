@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "הופסק",
+            "All": "כֹּל",
             "Cancelled": "מבוטל",
             "Conflict": "סְתִירָה",
             "CurrentRecording": "הקלטה נוכחית",
+            "Default": "בְּרִירַת מֶחדָל",
             "DontRecord": "לא להקליט",
             "EarlierShowing": "הצגה מוקדמת יותר",
             "Failed": "נִכשָׁל",

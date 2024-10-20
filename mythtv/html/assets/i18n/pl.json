@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Niedonoszony",
+            "All": "Wszystko",
             "Cancelled": "Odwołany",
             "Conflict": "Konflikt",
             "CurrentRecording": "Bieżące nagranie",
+            "Default": "Domyślny",
             "DontRecord": "Nie nagrywaj",
             "EarlierShowing": "Wcześniejszy pokaz",
             "Failed": "Przegrany",

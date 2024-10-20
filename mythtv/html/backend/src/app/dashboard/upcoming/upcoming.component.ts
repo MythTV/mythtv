@@ -34,7 +34,6 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   defaultRecRule: RuleListEntry = { Id: 0, Title: 'settings.chanedit.all' };
   editingProgram?: ScheduleOrProgram;
   displayUpdateDlg = false;
-  showAllStatuses = false;
   refreshing = false;
   loaded = false;
   inter: ScheduleLink = { summaryComponent: this };
@@ -47,6 +46,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   showTable = false;
   virtualScrollItemSize = 0;
   selectedRule: RuleListEntry | null = null;
+  selectedStatus = '';
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService, public dataService: DataService,
@@ -86,7 +86,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
           }
         });
         this.recRules.length = 0;
-        if (this.showAllStatuses)
+        if (this.selectedStatus == 'All')
           this.recRules.push(...this.allRecRules)
         else
           this.recRules.push(...this.activeRecRules)
@@ -125,8 +125,10 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       sortOrder = ' desc';
     request.Sort = request.Sort + sortOrder;
 
-    if (this.showAllStatuses)
+    if (this.selectedStatus == 'All')
       request.ShowAll = true;
+    else if (this.selectedStatus && this.selectedStatus != 'Default')
+      request.RecStatus = this.selectedStatus;
     if (this.selectedRule != null && this.selectedRule.Id != 0)
       request.RecordId = this.selectedRule.Id;
     this.recRules.length = 0;

@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Keskeytetty",
+            "All": "Kaikki",
             "Cancelled": "Peruutettu",
             "Conflict": "Konflikti",
             "CurrentRecording": "Nykyinen tallennus",
+            "Default": "Oletus",
             "DontRecord": "Älä Tallenna",
             "EarlierShowing": "Aikaisempi esitys",
             "Failed": "Epäonnistui",

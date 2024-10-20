@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "Megszakítva",
+            "All": "Minden",
             "Cancelled": "Törölve",
             "Conflict": "Konfliktus",
             "CurrentRecording": "Aktuális felvétel",
+            "Default": "Alapértelmezett",
             "DontRecord": "Ne rögzítse",
             "EarlierShowing": "Korábbi bemutató",
             "Failed": "nem sikerült",

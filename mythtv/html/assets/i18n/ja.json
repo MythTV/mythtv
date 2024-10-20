@@ -266,9 +266,11 @@
     "data": {
         "recstatus": {
             "Aborted": "中止されました",
+            "All": "全て",
             "Cancelled": "キャンセル",
             "Conflict": "対立",
             "CurrentRecording": "現在の録音",
+            "Default": "デフォルト",
             "DontRecord": "録音しないでください",
             "EarlierShowing": "以前の上映",
             "Failed": "失敗した",
