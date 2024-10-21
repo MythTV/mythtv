@@ -7,7 +7,6 @@
 #include <cstdint>
 #include "libmythbase/compat.h"
 #include "libmythtv/captions/cc708window.h"
-#include "libmythtv/format.h"
 
 class MythPlayer;
 

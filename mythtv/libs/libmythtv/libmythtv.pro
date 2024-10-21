@@ -81,12 +81,10 @@ using_valgrind:DEFINES += USING_VALGRIND
 #using_v4l2 {
 
     !mingw:!win32-msvc* {
-        HEADERS += recorders/vbitext/cc.h
         HEADERS += recorders/vbitext/dllist.h
         HEADERS += recorders/vbitext/lang.h
         HEADERS += recorders/vbitext/vbi.h
         HEADERS += recorders/vbitext/vt.h
-        SOURCES += recorders/vbitext/cc.cpp
         SOURCES += recorders/vbitext/vbi.cpp
         SOURCES += recorders/vbitext/lang.cpp
     }
@@ -103,7 +101,6 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # libmythtv proper
 
 # Headers needed by frontend & backend
-HEADERS += format.h
 HEADERS += mythframe.h
 
 # Misc. needed by backend/frontend
@@ -817,18 +814,8 @@ using_backend {
     HEADERS += recorders/importrecorder.h
     SOURCES += recorders/importrecorder.cpp
 
-    using_libmp3lame {
-      # Simple NuppelVideo Recorder
-      using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
-      !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
-      !mingw:!win32-msvc*:SOURCES += recorders/NuppelVideoRecorder.cpp
-    }
-
-    HEADERS += recorders/RTjpegN.h
     HEADERS += recorders/audioinput.h
-    HEADERS += recorders/go7007_myth.h
 
-    SOURCES += recorders/RTjpegN.cpp
     SOURCES += recorders/audioinput.cpp
     using_alsa {
         HEADERS += recorders/audioinputalsa.h
@@ -1137,8 +1124,6 @@ LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
-using_backend:using_mp3lame: LIBS += -lmp3lame
-using_backend: LIBS += -llzo2
 using_hdhomerun: LIBS += -lhdhomerun
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 

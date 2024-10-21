@@ -19,7 +19,7 @@ void MythTranscodePlayer::SetTranscoding(bool Transcoding)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No decoder yet - cannot set transcoding");
 }
 
-void MythTranscodePlayer::InitForTranscode(bool CopyAudio, bool CopyVideo)
+void MythTranscodePlayer::InitForTranscode()
 {
     // Are these really needed?
     SetPlaying(true);
@@ -35,10 +35,6 @@ void MythTranscodePlayer::InitForTranscode(bool CopyAudio, bool CopyVideo)
     m_framesPlayed = 0;
     ClearAfterSeek();
 
-    if (CopyVideo && m_decoder)
-        m_decoder->SetRawVideoState(true);
-    if (CopyAudio && m_decoder)
-        m_decoder->SetRawAudioState(true);
     if (m_decoder)
         m_decoder->SetSeekSnap(0);
 }
@@ -93,7 +89,6 @@ bool MythTranscodePlayer::TranscodeGetNextFrame(int &DidFF, bool &KeyFrame, bool
 
             // For 0.25, move this to DoJumpToFrame(jumpto)
             WaitForSeek(jumpto, 0);
-            m_decoder->ClearStoredData();
             ClearAfterSeek();
             m_decoderChangeLock.lock();
             DoGetFrame(kDecodeAV);
@@ -105,23 +100,4 @@ bool MythTranscodePlayer::TranscodeGetNextFrame(int &DidFF, bool &KeyFrame, bool
         return false;
     KeyFrame = m_decoder->IsLastFrameKey();
     return true;
-}
-
-long MythTranscodePlayer::UpdateStoredFrameNum(long CurrentFrameNum)
-{
-    if (m_decoder)
-        return m_decoder->UpdateStoredFrameNum(CurrentFrameNum);
-    return 0;
-}
-
-bool MythTranscodePlayer::WriteStoredData(MythMediaBuffer* OutBuffer,
-                                          bool Writevideo,
-                                          std::chrono::milliseconds TimecodeOffset)
-{
-    if (!m_decoder)
-        return false;
-    if (Writevideo && !m_decoder->GetRawVideoState())
-        Writevideo = false;
-    m_decoder->WriteStoredData(OutBuffer, Writevideo, TimecodeOffset);
-    return Writevideo;
 }
