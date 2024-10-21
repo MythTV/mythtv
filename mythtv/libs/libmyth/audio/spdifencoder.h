@@ -25,7 +25,7 @@ class MPUBLIC SPDIFEncoder
     bool SetMaxHDRate(int rate);
 
   private:
-    static int funcIO(void *opaque, unsigned char *buf, int size);
+    static int funcIO(void *opaque, const uint8_t *buf, int size);
     void Destroy();
 
   private:

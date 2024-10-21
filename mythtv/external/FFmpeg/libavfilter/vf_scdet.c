@@ -29,6 +29,7 @@
 #include "avfilter.h"
 #include "filters.h"
 #include "scene_sad.h"
+#include "video.h"
 
 typedef struct SCDetContext {
     const AVClass *class;
@@ -52,8 +53,8 @@ typedef struct SCDetContext {
 static const AVOption scdet_options[] = {
     { "threshold",   "set scene change detect threshold",        OFFSET(threshold),  AV_OPT_TYPE_DOUBLE,   {.dbl = 10.},     0,  100., V|F },
     { "t",           "set scene change detect threshold",        OFFSET(threshold),  AV_OPT_TYPE_DOUBLE,   {.dbl = 10.},     0,  100., V|F },
-    { "sc_pass",     "Set the flag to pass scene change frames", OFFSET(sc_pass),    AV_OPT_TYPE_BOOL,     {.dbl =  0  },    0,    1,  V|F },
-    { "s",           "Set the flag to pass scene change frames", OFFSET(sc_pass),    AV_OPT_TYPE_BOOL,     {.dbl =  0  },    0,    1,  V|F },
+    { "sc_pass",     "Set the flag to pass scene change frames", OFFSET(sc_pass),    AV_OPT_TYPE_BOOL,     {.i64 = 0  },     0,    1,  V|F },
+    { "s",           "Set the flag to pass scene change frames", OFFSET(sc_pass),    AV_OPT_TYPE_BOOL,     {.i64 = 0  },     0,    1,  V|F },
     {NULL}
 };
 
@@ -125,7 +126,6 @@ static double get_scene_score(AVFilterContext *ctx, AVFrame *frame)
             count += s->width[plane] * s->height[plane];
         }
 
-        emms_c();
         mafd = (double)sad * 100. / count / (1ULL << s->bitdepth);
         diff = fabs(mafd - s->prev_mafd);
         ret  = av_clipf(FFMIN(mafd, diff), 0, 100.);
@@ -163,14 +163,14 @@ static int activate(AVFilterContext *ctx)
         snprintf(buf, sizeof(buf), "%0.3f", s->scene_score);
         set_meta(s, frame, "lavfi.scd.score", buf);
 
-        if (s->scene_score > s->threshold) {
+        if (s->scene_score >= s->threshold) {
             av_log(s, AV_LOG_INFO, "lavfi.scd.score: %.3f, lavfi.scd.time: %s\n",
                     s->scene_score, av_ts2timestr(frame->pts, &inlink->time_base));
             set_meta(s, frame, "lavfi.scd.time",
                     av_ts2timestr(frame->pts, &inlink->time_base));
         }
         if (s->sc_pass) {
-            if (s->scene_score > s->threshold)
+            if (s->scene_score >= s->threshold)
                 return ff_filter_frame(outlink, frame);
             else {
                 av_frame_free(&frame);
@@ -193,13 +193,6 @@ static const AVFilterPad scdet_inputs[] = {
     },
 };
 
-static const AVFilterPad scdet_outputs[] = {
-    {
-        .name          = "default",
-        .type          = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_scdet = {
     .name          = "scdet",
     .description   = NULL_IF_CONFIG_SMALL("Detect video scene change"),
@@ -208,7 +201,7 @@ const AVFilter ff_vf_scdet = {
     .uninit        = uninit,
     .flags         = AVFILTER_FLAG_METADATA_ONLY,
     FILTER_INPUTS(scdet_inputs),
-    FILTER_OUTPUTS(scdet_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .activate      = activate,
 };

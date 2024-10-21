@@ -27,6 +27,7 @@
  * This is very similar to intra-only MPEG-1.
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
@@ -44,7 +45,7 @@ typedef struct MDECContext {
     BswapDSPContext bbdsp;
     IDCTDSPContext idsp;
     GetBitContext gb;
-    ScanTable scantable;
+    uint8_t permutated_scantable[64];
     int version;
     int qscale;
     int last_dc[3];
@@ -63,13 +64,12 @@ static inline int mdec_decode_block_intra(MDECContext *a, int16_t *block, int n)
 {
     int level, diff, i, j, run;
     int component;
-    RLTable *rl = &ff_rl_mpeg1;
-    uint8_t * const scantable = a->scantable.permutated;
+    const uint8_t *const scantable = a->permutated_scantable;
     const uint16_t *quant_matrix = a->quant_matrix;
     const int qscale = a->qscale;
 
     /* DC coefficient */
-    if (a->version == 2) {
+    if (a->version <= 2) {
         block[0] = 2 * get_sbits(&a->gb, 10) + 1024;
     } else {
         component = (n <= 3 ? 0 : n - 4 + 1);
@@ -84,7 +84,7 @@ static inline int mdec_decode_block_intra(MDECContext *a, int16_t *block, int n)
         /* now quantify & encode AC coefficients */
         for (;;) {
             UPDATE_CACHE(re, &a->gb);
-            GET_RL_VLC(level, run, re, &a->gb, rl->rl_vlc[0], TEX_VLC_BITS, 2, 0);
+            GET_RL_VLC(level, run, re, &a->gb, ff_mpeg1_rl_vlc, TEX_VLC_BITS, 2, 0);
 
             if (level == 127) {
                 break;
@@ -177,8 +177,6 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
     if ((ret = ff_thread_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    frame->pict_type = AV_PICTURE_TYPE_I;
-    frame->key_frame = 1;
 
     av_fast_padded_malloc(&a->bitstream_buffer, &a->bitstream_buffer_size, buf_size);
     if (!a->bitstream_buffer)
@@ -219,12 +217,12 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     a->avctx           = avctx;
 
-    ff_blockdsp_init(&a->bdsp, avctx);
+    ff_blockdsp_init(&a->bdsp);
     ff_bswapdsp_init(&a->bbdsp);
     ff_idctdsp_init(&a->idsp, avctx);
     ff_mpeg12_init_vlcs();
-    ff_init_scantable(a->idsp.idct_permutation, &a->scantable,
-                      ff_zigzag_direct);
+    ff_permute_scantable(a->permutated_scantable, ff_zigzag_direct,
+                         a->idsp.idct_permutation);
 
     avctx->pix_fmt  = AV_PIX_FMT_YUVJ420P;
     avctx->color_range = AVCOL_RANGE_JPEG;
@@ -251,7 +249,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_mdec_decoder = {
     .p.name           = "mdec",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("Sony PlayStation MDEC (Motion DECoder)"),
+    CODEC_LONG_NAME("Sony PlayStation MDEC (Motion DECoder)"),
     .p.type           = AVMEDIA_TYPE_VIDEO,
     .p.id             = AV_CODEC_ID_MDEC,
     .priv_data_size   = sizeof(MDECContext),
@@ -259,5 +257,4 @@ const FFCodec ff_mdec_decoder = {
     .close            = decode_end,
     FF_CODEC_DECODE_CB(decode_frame),
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE,
 };

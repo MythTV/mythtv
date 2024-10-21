@@ -24,20 +24,14 @@
 
 typedef struct IVFEncContext {
     unsigned frame_cnt;
-    uint64_t last_pts, sum_delta_pts, last_pkt_duration;
+    uint64_t last_pts, last_pkt_duration;
 } IVFEncContext;
 
 static int ivf_init(AVFormatContext *s)
 {
-    AVCodecParameters *par;
+    AVCodecParameters *par = s->streams[0]->codecpar;
 
-    if (s->nb_streams != 1) {
-        av_log(s, AV_LOG_ERROR, "Format supports only exactly one video stream\n");
-        return AVERROR(EINVAL);
-    }
-    par = s->streams[0]->codecpar;
-    if (par->codec_type != AVMEDIA_TYPE_VIDEO ||
-        !(par->codec_id == AV_CODEC_ID_AV1 ||
+    if (!(par->codec_id == AV_CODEC_ID_AV1 ||
           par->codec_id == AV_CODEC_ID_VP8 ||
           par->codec_id == AV_CODEC_ID_VP9)) {
         av_log(s, AV_LOG_ERROR, "Currently only VP8, VP9 and AV1 are supported!\n");
@@ -72,7 +66,8 @@ static int ivf_write_header(AVFormatContext *s)
     avio_wl16(pb, par->height);
     avio_wl32(pb, s->streams[0]->time_base.den);
     avio_wl32(pb, s->streams[0]->time_base.num);
-    avio_wl64(pb, 0xFFFFFFFFFFFFFFFFULL); // length is overwritten at the end of muxing
+    avio_wl32(pb, 0xFFFFFFFF); // "number of frames" is overwritten at the end of muxing
+    avio_wl32(pb, 0); // unused
 
     return 0;
 }
@@ -85,8 +80,6 @@ static int ivf_write_packet(AVFormatContext *s, AVPacket *pkt)
     avio_wl32(pb, pkt->size);
     avio_wl64(pb, pkt->pts);
     avio_write(pb, pkt->data, pkt->size);
-    if (ctx->frame_cnt)
-        ctx->sum_delta_pts += pkt->pts - ctx->last_pts;
     ctx->last_pkt_duration = pkt->duration;
     ctx->frame_cnt++;
     ctx->last_pts = pkt->pts;
@@ -99,16 +92,12 @@ static int ivf_write_trailer(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     IVFEncContext *ctx = s->priv_data;
 
-    if ((pb->seekable & AVIO_SEEKABLE_NORMAL) &&
-        (ctx->frame_cnt > 1 || (ctx->frame_cnt == 1 && ctx->last_pkt_duration))) {
+    // overwrite the "number of frames"
+    if ((pb->seekable & AVIO_SEEKABLE_NORMAL)) {
         int64_t end = avio_tell(pb);
 
         avio_seek(pb, 24, SEEK_SET);
-        // overwrite the "length" field (duration)
-        avio_wl32(pb, ctx->last_pkt_duration ?
-                  ctx->sum_delta_pts + ctx->last_pkt_duration :
-                  ctx->frame_cnt * ctx->sum_delta_pts / (ctx->frame_cnt - 1));
-        avio_wl32(pb, 0); // zero out unused bytes
+        avio_wl32(pb, ctx->frame_cnt);
         avio_seek(pb, end, SEEK_SET);
     }
 
@@ -122,16 +111,18 @@ static const AVCodecTag codec_ivf_tags[] = {
     { AV_CODEC_ID_NONE, 0 }
 };
 
-const AVOutputFormat ff_ivf_muxer = {
+const FFOutputFormat ff_ivf_muxer = {
+    .p.name         = "ivf",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("On2 IVF"),
+    .p.extensions   = "ivf",
+    .p.audio_codec  = AV_CODEC_ID_NONE,
+    .p.video_codec  = AV_CODEC_ID_VP8,
+    .p.subtitle_codec = AV_CODEC_ID_NONE,
+    .p.codec_tag    = (const AVCodecTag* const []){ codec_ivf_tags, 0 },
+    .flags_internal   = FF_OFMT_FLAG_MAX_ONE_OF_EACH,
     .priv_data_size = sizeof(IVFEncContext),
-    .name         = "ivf",
-    .long_name    = NULL_IF_CONFIG_SMALL("On2 IVF"),
-    .extensions   = "ivf",
-    .audio_codec  = AV_CODEC_ID_NONE,
-    .video_codec  = AV_CODEC_ID_VP8,
     .init         = ivf_init,
     .write_header = ivf_write_header,
     .write_packet = ivf_write_packet,
     .write_trailer = ivf_write_trailer,
-    .codec_tag    = (const AVCodecTag* const []){ codec_ivf_tags, 0 },
 };

@@ -25,6 +25,7 @@
  * @author Stefan Gehrer <stefan.gehrer@gmx.de>
  */
 
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "golomb.h"
 #include "h264chroma.h"
@@ -792,15 +793,14 @@ int ff_cavs_init_top_lines(AVSContext *h)
 av_cold int ff_cavs_init(AVCodecContext *avctx)
 {
     AVSContext *h = avctx->priv_data;
+    uint8_t permutation[64];
 
-    ff_blockdsp_init(&h->bdsp, avctx);
+    ff_blockdsp_init(&h->bdsp);
     ff_h264chroma_init(&h->h264chroma, 8);
-    ff_idctdsp_init(&h->idsp, avctx);
     ff_videodsp_init(&h->vdsp, 8);
-    ff_cavsdsp_init(&h->cdsp, avctx);
-    ff_init_scantable_permutation(h->idsp.idct_permutation,
-                                  h->cdsp.idct_perm);
-    ff_init_scantable(h->idsp.idct_permutation, &h->scantable, ff_zigzag_direct);
+    ff_cavsdsp_init(&h->cdsp);
+    ff_init_scantable_permutation(permutation, h->cdsp.idct_perm);
+    ff_permute_scantable(h->permutated_scantable, ff_zigzag_direct, permutation);
 
     h->avctx       = avctx;
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;

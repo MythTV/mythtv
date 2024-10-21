@@ -24,6 +24,7 @@
 #include "libavutil/error.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
+#include "libavutil/mem.h"
 #include "avformat.h"
 #include "avio_internal.h"
 #include "demux.h"
@@ -58,7 +59,7 @@ enum AVCodecID ff_codec_guid_get_id(const AVCodecGuid *guids, ff_asf_guid guid)
  * an openended structure.
  */
 
-static void parse_waveformatex(AVFormatContext *s, AVIOContext *pb, AVCodecParameters *par)
+static void parse_waveformatex(void *logctx, AVIOContext *pb, AVCodecParameters *par)
 {
     ff_asf_guid subformat;
     int bps;
@@ -84,23 +85,25 @@ static void parse_waveformatex(AVFormatContext *s, AVIOContext *pb, AVCodecParam
     } else {
         par->codec_id = ff_codec_guid_get_id(ff_codec_wav_guids, subformat);
         if (!par->codec_id)
-            av_log(s, AV_LOG_WARNING,
+            av_log(logctx, AV_LOG_WARNING,
                    "unknown subformat:"FF_PRI_GUID"\n",
                    FF_ARG_GUID(subformat));
     }
 }
 
 /* "big_endian" values are needed for RIFX file format */
-int ff_get_wav_header(AVFormatContext *s, AVIOContext *pb,
+int ff_get_wav_header(void *logctx, AVIOContext *pb,
                       AVCodecParameters *par, int size, int big_endian)
 {
-    int id, channels;
+    int id, channels = 0, ret;
     uint64_t bitrate = 0;
 
     if (size < 14) {
-        avpriv_request_sample(s, "wav header size < 14");
+        avpriv_request_sample(logctx, "wav header size < 14");
         return AVERROR_INVALIDDATA;
     }
+
+    av_channel_layout_uninit(&par->ch_layout);
 
     par->codec_type  = AVMEDIA_TYPE_AUDIO;
     if (!big_endian) {
@@ -137,19 +140,20 @@ int ff_get_wav_header(AVFormatContext *s, AVIOContext *pb,
     if (size >= 18 && id != 0x0165) {  /* We're obviously dealing with WAVEFORMATEX */
         int cbSize = avio_rl16(pb); /* cbSize */
         if (big_endian) {
-            avpriv_report_missing_feature(s, "WAVEFORMATEX support for RIFX files");
+            avpriv_report_missing_feature(logctx, "WAVEFORMATEX support for RIFX files");
             return AVERROR_PATCHWELCOME;
         }
         size  -= 18;
         cbSize = FFMIN(size, cbSize);
         if (cbSize >= 22 && id == 0xfffe) { /* WAVEFORMATEXTENSIBLE */
-            parse_waveformatex(s, pb, par);
+            parse_waveformatex(logctx, pb, par);
             cbSize -= 22;
             size   -= 22;
         }
         if (cbSize > 0) {
-            if (ff_get_extradata(s, par, pb, cbSize) < 0)
-                return AVERROR(ENOMEM);
+            ret = ff_get_extradata(logctx, par, pb, cbSize);
+            if (ret < 0)
+                return ret;
             size -= cbSize;
         }
 
@@ -160,8 +164,9 @@ int ff_get_wav_header(AVFormatContext *s, AVIOContext *pb,
         int nb_streams, i;
 
         size -= 4;
-        if (ff_get_extradata(s, par, pb, size) < 0)
-            return AVERROR(ENOMEM);
+        ret = ff_get_extradata(logctx, par, pb, size);
+        if (ret < 0)
+            return ret;
         nb_streams         = AV_RL16(par->extradata + 4);
         par->sample_rate   = AV_RL32(par->extradata + 12);
         channels           = 0;
@@ -175,7 +180,7 @@ int ff_get_wav_header(AVFormatContext *s, AVIOContext *pb,
     par->bit_rate = bitrate;
 
     if (par->sample_rate <= 0) {
-        av_log(s, AV_LOG_ERROR,
+        av_log(logctx, AV_LOG_ERROR,
                "Invalid sample rate: %d\n", par->sample_rate);
         return AVERROR_INVALIDDATA;
     }
@@ -189,9 +194,12 @@ int ff_get_wav_header(AVFormatContext *s, AVIOContext *pb,
     if (par->codec_id == AV_CODEC_ID_ADPCM_G726 && par->sample_rate)
         par->bits_per_coded_sample = par->bit_rate / par->sample_rate;
 
-    av_channel_layout_uninit(&par->ch_layout);
-    par->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
-    par->ch_layout.nb_channels = channels;
+    /* ignore WAVEFORMATEXTENSIBLE layout if different from channel count */
+    if (channels != par->ch_layout.nb_channels) {
+        av_channel_layout_uninit(&par->ch_layout);
+        par->ch_layout.order       = AV_CHANNEL_ORDER_UNSPEC;
+        par->ch_layout.nb_channels = channels;
+    }
 
     return 0;
 }

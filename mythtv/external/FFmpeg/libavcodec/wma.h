@@ -24,9 +24,9 @@
 
 #include "libavutil/float_dsp.h"
 #include "libavutil/mem_internal.h"
+#include "libavutil/tx.h"
 
 #include "avcodec.h"
-#include "fft.h"
 #include "get_bits.h"
 #include "put_bits.h"
 
@@ -115,8 +115,9 @@ typedef struct WMACodecContext {
     float max_exponent[MAX_CHANNELS];
     WMACoef coefs1[MAX_CHANNELS][BLOCK_MAX_SIZE];
     DECLARE_ALIGNED(32, float, coefs)[MAX_CHANNELS][BLOCK_MAX_SIZE];
-    DECLARE_ALIGNED(32, FFTSample, output)[BLOCK_MAX_SIZE * 2];
-    FFTContext mdct_ctx[BLOCK_NB_SIZES];
+    DECLARE_ALIGNED(32, float, output)[BLOCK_MAX_SIZE * 2];
+    AVTXContext *mdct_ctx[BLOCK_NB_SIZES];
+    av_tx_fn mdct_fn[BLOCK_NB_SIZES];
     const float *windows[BLOCK_NB_SIZES];
     /* output buffer for one frame and the last for IMDCT windowing */
     DECLARE_ALIGNED(32, float, frame_out)[MAX_CHANNELS][BLOCK_MAX_SIZE * 2];
@@ -154,7 +155,7 @@ int ff_wma_total_gain_to_bits(int total_gain);
 int ff_wma_end(AVCodecContext *avctx);
 unsigned int ff_wma_get_large_val(GetBitContext *gb);
 int ff_wma_run_level_decode(AVCodecContext *avctx, GetBitContext *gb,
-                            VLC *vlc, const float *level_table,
+                            const VLCElem *vlc, const float *level_table,
                             const uint16_t *run_table, int version,
                             WMACoef *ptr, int offset, int num_coefs,
                             int block_len, int frame_len_bits,

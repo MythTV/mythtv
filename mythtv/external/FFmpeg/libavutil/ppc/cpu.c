@@ -20,6 +20,11 @@
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
+#elif HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
+#ifdef __FreeBSD__
+#include <machine/cpu.h>
+#endif
+#include <sys/auxv.h>
 #elif defined(__linux__)
 #include <asm/cputable.h>
 #include <linux/auxvec.h>
@@ -27,7 +32,7 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#elif defined(__OpenBSD__)
+#elif defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <machine/cpu.h>
@@ -56,8 +61,28 @@ int ff_get_cpu_flags_ppc(void)
     if (result == VECTORTYPE_ALTIVEC)
         return AV_CPU_FLAG_ALTIVEC;
     return 0;
-#elif defined(__APPLE__) || defined(__OpenBSD__)
-#ifdef __OpenBSD__
+#elif HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
+    int flags = 0;
+
+    unsigned long hwcap = ff_getauxval(AT_HWCAP);
+#ifdef PPC_FEATURE2_ARCH_2_07
+    unsigned long hwcap2 = ff_getauxval(AT_HWCAP2);
+#endif
+
+    if (hwcap & PPC_FEATURE_HAS_ALTIVEC)
+       flags |= AV_CPU_FLAG_ALTIVEC;
+#ifdef PPC_FEATURE_HAS_VSX
+    if (hwcap & PPC_FEATURE_HAS_VSX)
+       flags |= AV_CPU_FLAG_VSX;
+#endif
+#ifdef PPC_FEATURE2_ARCH_2_07
+    if (hwcap2 & PPC_FEATURE2_ARCH_2_07)
+       flags |= AV_CPU_FLAG_POWER8;
+#endif
+
+    return flags;
+#elif defined(__APPLE__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#if defined(__NetBSD__) || defined(__OpenBSD__)
     int sels[2] = {CTL_MACHDEP, CPU_ALTIVEC};
 #else
     int sels[2] = {CTL_HW, HW_VECTORUNIT};
@@ -95,12 +120,15 @@ int ff_get_cpu_flags_ppc(void)
 #endif
                 if (ret & AV_CPU_FLAG_VSX)
                     av_assert0(ret & AV_CPU_FLAG_ALTIVEC);
-            } else if (buf[i] == AT_HWCAP2) {
+            }
+#ifdef AT_HWCAP2 /* not introduced until glibc 2.18 */
+            else if (buf[i] == AT_HWCAP2) {
 #ifdef PPC_FEATURE2_ARCH_2_07
                 if (buf[i + 1] & PPC_FEATURE2_ARCH_2_07)
                     ret |= AV_CPU_FLAG_POWER8;
 #endif
             }
+#endif /* AT_HWCAP2 */
         }
     }
 

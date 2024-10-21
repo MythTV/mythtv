@@ -30,9 +30,9 @@
 
 #include "avformat.h"
 #include "mms.h"
-#include "internal.h"
 #include "avio_internal.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "libavcodec/bytestream.h"
 #include "network.h"
 #include "url.h"
@@ -157,8 +157,8 @@ static int mms_put_utf16(MMSContext *mms, const uint8_t *src)
     FFIOContext bic;
     int size = mms->write_out_ptr - mms->out_buffer;
     int len;
-    ffio_init_context(&bic, mms->write_out_ptr,
-            sizeof(mms->out_buffer) - size, 1, NULL, NULL, NULL, NULL);
+    ffio_init_write_context(&bic, mms->write_out_ptr,
+                            sizeof(mms->out_buffer) - size);
 
     len = avio_put_str16le(&bic.pub, src);
     if (len < 0)

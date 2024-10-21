@@ -26,8 +26,12 @@
 
 #include <math.h>
 
+#include "config.h"
+
 #include "libavutil/attributes.h"
 #include "libavutil/common.h"
+#include "libavutil/log.h"
+#include "libavutil/mem.h"
 
 #include "iirfilter.h"
 
@@ -271,20 +275,6 @@ av_cold struct FFIIRFilterState *ff_iir_filter_init_state(int order)
         src0   += sstep;                                                    \
         dst0   += dstep;                                                    \
     }                                                                       \
-}
-
-void ff_iir_filter(const struct FFIIRFilterCoeffs *c,
-                   struct FFIIRFilterState *s, int size,
-                   const int16_t *src, ptrdiff_t sstep,
-                   int16_t *dst, ptrdiff_t dstep)
-{
-    if (c->order == 2) {
-        FILTER_O2(int16_t, S16)
-    } else if (c->order == 4) {
-        FILTER_BW_O4(int16_t, S16)
-    } else {
-        FILTER_DIRECT_FORM_II(int16_t, S16)
-    }
 }
 
 /**

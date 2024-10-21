@@ -24,10 +24,11 @@
  * Delphine Software International CIN video decoder
  */
 
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 
 typedef enum CinVideoBitmapIndex {
     CIN_CUR_BMP = 0, /* current */
@@ -293,7 +294,11 @@ static int cinvideo_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         return res;
 
     memcpy(cin->frame->data[1], cin->palette, sizeof(cin->palette));
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
     cin->frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     for (y = 0; y < cin->avctx->height; ++y)
         memcpy(cin->frame->data[0] + (cin->avctx->height - 1 - y) * cin->frame->linesize[0],
                cin->bitmap_table[CIN_CUR_BMP] + y * cin->avctx->width,
@@ -323,13 +328,13 @@ static av_cold int cinvideo_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_dsicinvideo_decoder = {
     .p.name         = "dsicinvideo",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Delphine Software International CIN video"),
+    CODEC_LONG_NAME("Delphine Software International CIN video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_DSICINVIDEO,
     .priv_data_size = sizeof(CinVideoContext),
     .init           = cinvideo_decode_init,
     .close          = cinvideo_decode_end,
     FF_CODEC_DECODE_CB(cinvideo_decode_frame),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.capabilities = AV_CODEC_CAP_DR1,
 };

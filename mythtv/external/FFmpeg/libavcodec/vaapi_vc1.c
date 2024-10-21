@@ -22,11 +22,11 @@
 
 #include "config_components.h"
 
-#include "hwconfig.h"
+#include "libavutil/mem.h"
+#include "hwaccel_internal.h"
 #include "mpegvideodec.h"
 #include "vaapi_decode.h"
 #include "vc1.h"
-#include "vc1data.h"
 
 /** Translate FFmpeg MV modes to VA API */
 static int get_VAMvModeVC1(enum MVModes mv_mode)
@@ -253,11 +253,11 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
 {
     const VC1Context *v = avctx->priv_data;
     const MpegEncContext *s = &v->s;
-    VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->cur_pic.ptr->hwaccel_picture_private;
     VAPictureParameterBufferVC1 pic_param;
     int err;
 
-    pic->output_surface = ff_vaapi_get_surface_id(s->current_picture_ptr->f);
+    pic->output_surface = ff_vaapi_get_surface_id(s->cur_pic.ptr->f);
 
     pic_param = (VAPictureParameterBufferVC1) {
         .forward_reference_picture         = VA_INVALID_ID,
@@ -374,10 +374,12 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
 
     switch (s->pict_type) {
     case AV_PICTURE_TYPE_B:
-        pic_param.backward_reference_picture = ff_vaapi_get_surface_id(s->next_picture.f);
+        if (s->next_pic.ptr)
+            pic_param.backward_reference_picture = ff_vaapi_get_surface_id(s->next_pic.ptr->f);
         // fall-through
     case AV_PICTURE_TYPE_P:
-        pic_param.forward_reference_picture = ff_vaapi_get_surface_id(s->last_picture.f);
+        if (s->last_pic.ptr)
+            pic_param.forward_reference_picture = ff_vaapi_get_surface_id(s->last_pic.ptr->f);
         break;
     }
 
@@ -450,14 +452,12 @@ static int vaapi_vc1_end_frame(AVCodecContext *avctx)
 {
     VC1Context *v = avctx->priv_data;
     MpegEncContext *s = &v->s;
-    VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->cur_pic.ptr->hwaccel_picture_private;
     int ret;
 
     ret = ff_vaapi_decode_issue(avctx, pic);
     if (ret < 0)
         goto fail;
-
-    ff_mpeg_draw_horiz_band(s, 0, s->avctx->height);
 
 fail:
     return ret;
@@ -467,7 +467,7 @@ static int vaapi_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
 {
     const VC1Context *v = avctx->priv_data;
     const MpegEncContext *s = &v->s;
-    VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
+    VAAPIDecodePicture *pic = s->cur_pic.ptr->hwaccel_picture_private;
     VASliceParameterBufferVC1 slice_param;
     int mb_height;
     int err;
@@ -492,7 +492,7 @@ static int vaapi_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
     };
 
     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
-                                            &slice_param, sizeof(slice_param),
+                                            &slice_param, 1, sizeof(slice_param),
                                             buffer, size);
     if (err < 0) {
         ff_vaapi_decode_cancel(avctx, pic);
@@ -503,11 +503,11 @@ static int vaapi_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
 }
 
 #if CONFIG_WMV3_VAAPI_HWACCEL
-const AVHWAccel ff_wmv3_vaapi_hwaccel = {
-    .name                 = "wmv3_vaapi",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_WMV3,
-    .pix_fmt              = AV_PIX_FMT_VAAPI,
+const FFHWAccel ff_wmv3_vaapi_hwaccel = {
+    .p.name               = "wmv3_vaapi",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_WMV3,
+    .p.pix_fmt            = AV_PIX_FMT_VAAPI,
     .start_frame          = &vaapi_vc1_start_frame,
     .end_frame            = &vaapi_vc1_end_frame,
     .decode_slice         = &vaapi_vc1_decode_slice,
@@ -520,11 +520,11 @@ const AVHWAccel ff_wmv3_vaapi_hwaccel = {
 };
 #endif
 
-const AVHWAccel ff_vc1_vaapi_hwaccel = {
-    .name                 = "vc1_vaapi",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_VC1,
-    .pix_fmt              = AV_PIX_FMT_VAAPI,
+const FFHWAccel ff_vc1_vaapi_hwaccel = {
+    .p.name               = "vc1_vaapi",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_VC1,
+    .p.pix_fmt            = AV_PIX_FMT_VAAPI,
     .start_frame          = &vaapi_vc1_start_frame,
     .end_frame            = &vaapi_vc1_end_frame,
     .decode_slice         = &vaapi_vc1_decode_slice,

@@ -22,6 +22,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 typedef struct GENHDemuxContext {
@@ -78,6 +79,8 @@ static int genh_read_header(AVFormatContext *s)
     case  0: st->codecpar->codec_id = AV_CODEC_ID_ADPCM_PSX;        break;
     case  1:
     case 11: st->codecpar->bits_per_coded_sample = 4;
+             if (st->codecpar->ch_layout.nb_channels > INT_MAX / 36)
+                return AVERROR_INVALIDDATA;
              st->codecpar->block_align = 36 * st->codecpar->ch_layout.nb_channels;
              st->codecpar->codec_id = AV_CODEC_ID_ADPCM_IMA_WAV;    break;
     case  2: st->codecpar->codec_id = AV_CODEC_ID_ADPCM_DTK;        break;
@@ -193,12 +196,12 @@ static int genh_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-const AVInputFormat ff_genh_demuxer = {
-    .name           = "genh",
-    .long_name      = NULL_IF_CONFIG_SMALL("GENeric Header"),
+const FFInputFormat ff_genh_demuxer = {
+    .p.name         = "genh",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("GENeric Header"),
+    .p.extensions   = "genh",
     .priv_data_size = sizeof(GENHDemuxContext),
     .read_probe     = genh_probe,
     .read_header    = genh_read_header,
     .read_packet    = genh_read_packet,
-    .extensions     = "genh",
 };
