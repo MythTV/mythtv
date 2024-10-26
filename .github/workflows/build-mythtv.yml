@@ -303,16 +303,6 @@ jobs:
       matrix:
         os:
           # macOS group
-          - desc: 'macOS 12 (Monterey) x86_64'
-            runner: 'macOS-12'
-            arch: 'x86_64'
-            python_dot_version: '3.11'
-            qt_version: 'qt5'
-            database_version: 'mysql8'
-            extrapkgs: ''
-            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
-            linkerflags: ''
-            cross_compile: false
           - desc: 'macOS 13 (Ventura) x86_64'
             runner: 'macOS-13'
             arch: 'x86_64'
