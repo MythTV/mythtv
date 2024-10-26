@@ -616,13 +616,25 @@ void V2FillCastMemberList(V2CastMemberList* pCastMemberList,
 }
 
 
-void V2FillCutList(V2CutList* pCutList, ProgramInfo* rInfo, int marktype)
+void V2FillCutList(V2CutList* pCutList, ProgramInfo* rInfo, int marktype, bool includeFps)
 {
     frm_dir_map_t markMap;
     frm_dir_map_t::const_iterator it;
 
     if (rInfo && rInfo->GetChanID())
     {
+        if (includeFps)
+        {
+            rInfo->QueryMarkupMap(markMap, MARK_VIDEO_RATE);
+            it = markMap.cbegin();
+            if (it != markMap.cend())
+            {
+                V2Cutting *pCutting = pCutList->AddNewCutting();
+                pCutting->setMark(*it);
+                pCutting->setOffset(it.key());
+            }
+            markMap.clear();
+        }
         rInfo->QueryCutList(markMap);
 
         for (it = markMap.cbegin(); it != markMap.cend(); ++it)
@@ -658,13 +670,25 @@ void V2FillCutList(V2CutList* pCutList, ProgramInfo* rInfo, int marktype)
     }
 }
 
-void V2FillCommBreak(V2CutList* pCutList, ProgramInfo* rInfo, int marktype)
+void V2FillCommBreak(V2CutList* pCutList, ProgramInfo* rInfo, int marktype, bool includeFps)
 {
     frm_dir_map_t markMap;
     frm_dir_map_t::const_iterator it;
 
     if (rInfo)
     {
+        if (includeFps)
+        {
+            rInfo->QueryMarkupMap(markMap, MARK_VIDEO_RATE);
+            it = markMap.cbegin();
+            if (it != markMap.cend())
+            {
+                V2Cutting *pCutting = pCutList->AddNewCutting();
+                pCutting->setMark(*it);
+                pCutting->setOffset(it.key());
+            }
+            markMap.clear();
+        }
         rInfo->QueryCommBreakList(markMap);
 
         for (it = markMap.cbegin(); it != markMap.cend(); ++it)

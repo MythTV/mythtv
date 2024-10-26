@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Program Name: dvr.h
 // Created     : Mar. 7, 2011
 //
@@ -35,6 +35,7 @@
 #include "v2recRuleFilterList.h"
 #include "v2titleInfoList.h"
 #include "v2recRuleList.h"
+#include "v2playGroup.h"
 
 #define DVR_SERVICE QString("/Dvr/")
 #define DVR_HANDLE  QString("Dvr")
@@ -75,7 +76,9 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("DupInToString",        "methods=GET,POST,HEAD;name=String")
     Q_CLASSINFO("DupInToDescription",   "methods=GET,POST,HEAD;name=String")
     Q_CLASSINFO("ManageJobQueue",       "methods=POST;name=int")
-    Q_CLASSINFO("UpdateRecordedMetadata", "methods=POST")
+    Q_CLASSINFO("AddPlayGroup",         "methods=POST")
+    Q_CLASSINFO("UpdatePlayGroup",      "methods=POST")
+    Q_CLASSINFO("RemovePlayGroup",      "methods=POST")
 
   public:
     V2Dvr();
@@ -182,12 +185,14 @@ class V2Dvr : public MythHTTPService
     static V2CutList* GetRecordedCutList  ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
-                                            const QString   &OffsetType );
+                                            const QString   &OffsetType,
+                                            bool IncludeFps );
 
     static V2CutList* GetRecordedCommBreak( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
-                                            const QString   &OffsetType );
+                                            const QString   &OffsetType,
+                                            bool IncludeFps );
 
     static V2CutList* GetRecordedSeek     ( int              RecordedId,
                                             const QString   &OffsetType );
@@ -220,6 +225,24 @@ class V2Dvr : public MythHTTPService
     static QStringList       GetRecStorageGroupList ( );
 
     static QStringList       GetPlayGroupList    ( );
+
+    static V2PlayGroup*      GetPlayGroup    ( const QString & Name );
+
+    static bool              RemovePlayGroup    ( const QString & Name );
+
+    static bool              AddPlayGroup    ( const QString & Name,
+                                               const QString & TitleMatch,
+                                               int             SkipAhead,
+                                               int             SkipBack,
+                                               int             TimeStretch,
+                                               int             Jump );
+
+    bool                     UpdatePlayGroup ( const QString & Name,
+                                               const QString & TitleMatch,
+                                               int             SkipAhead,
+                                               int             SkipBack,
+                                               int             TimeStretch,
+                                               int             Jump );
 
     static V2RecRuleFilterList* GetRecRuleFilterList ( );
 

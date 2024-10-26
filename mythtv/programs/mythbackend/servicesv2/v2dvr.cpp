@@ -78,6 +78,7 @@ void V2Dvr::RegisterCustomTypes()
     qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
     qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
     qRegisterMetaType<V2CastMember*>("V2CastMember");
+    qRegisterMetaType<V2PlayGroup*>("V2PlayGroup");
 }
 
 V2Dvr::V2Dvr()
@@ -960,7 +961,8 @@ bool V2Dvr::SetLastPlayPos( int RecordedId,
 V2CutList* V2Dvr::GetRecordedCutList ( int RecordedId,
                                         int chanid,
                                         const QDateTime &StartTime,
-                                        const QString &offsettype )
+                                        const QString &offsettype,
+                                        bool IncludeFps )
 {
     int marktype = 0;
     if ((RecordedId <= 0) &&
@@ -981,7 +983,7 @@ V2CutList* V2Dvr::GetRecordedCutList ( int RecordedId,
     else
         marktype = 0;
 
-    V2FillCutList(pCutList, &ri, marktype);
+    V2FillCutList(pCutList, &ri, marktype, IncludeFps);
 
     return pCutList;
 }
@@ -993,7 +995,8 @@ V2CutList* V2Dvr::GetRecordedCutList ( int RecordedId,
 V2CutList* V2Dvr::GetRecordedCommBreak ( int RecordedId,
                                           int chanid,
                                           const QDateTime &StartTime,
-                                          const QString &offsettype )
+                                          const QString &offsettype,
+                                          bool IncludeFps )
 {
     int marktype = 0;
     if ((RecordedId <= 0) &&
@@ -1014,7 +1017,7 @@ V2CutList* V2Dvr::GetRecordedCommBreak ( int RecordedId,
     else
         marktype = 0;
 
-    V2FillCommBreak(pCutList, &ri, marktype);
+    V2FillCommBreak(pCutList, &ri, marktype, IncludeFps);
 
     return pCutList;
 }
@@ -1246,6 +1249,143 @@ QStringList V2Dvr::GetRecStorageGroupList()
 QStringList V2Dvr::GetPlayGroupList()
 {
     return PlayGroup::GetNames();
+}
+
+V2PlayGroup* V2Dvr::GetPlayGroup    ( const QString & Name )
+{
+    auto* playGroup = new V2PlayGroup();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT name, titlematch, skipahead, skipback, timestretch, jump "
+                "FROM playgroup WHERE name = :NAME ");
+    query.bindValue(":NAME", Name);
+
+    if (query.exec())
+    {
+        if (query.next())
+        {
+            playGroup->setName(query.value(0).toString());
+            playGroup->setTitleMatch(query.value(1).toString());
+            playGroup->setSkipAhead(query.value(2).toInt());
+            playGroup->setSkipBack(query.value(3).toInt());
+            playGroup->setTimeStretch(query.value(4).toInt());
+            playGroup->setJump(query.value(5).toInt());
+        }
+        else
+            throw QString("Play Group Not Found.");
+   }
+    return playGroup;
+}
+
+bool V2Dvr::RemovePlayGroup    ( const QString & Name )
+{
+
+    if (Name.compare("Default", Qt::CaseInsensitive) == 0)
+        throw QString("ERROR: Cannot delete Default entry");
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM playgroup "
+        "WHERE name = :NAME");
+
+    query.bindValue(":NAME", Name);
+
+    if (query.exec())
+    {
+        return true;
+    }
+    return false;
+}
+
+bool V2Dvr::AddPlayGroup    ( const QString & Name,
+                              const QString & TitleMatch,
+                              int             SkipAhead,
+                              int             SkipBack,
+                              int             TimeStretch,
+                              int             Jump )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO playgroup "
+        "(name, titlematch, skipahead, skipback, timestretch, jump) "
+        " VALUES(:NAME, :TITLEMATCH, :SKIPAHEAD, :SKIPBACK, :TIMESTRETCH, :JUMP)");
+    query.bindValue(":NAME", Name);
+    query.bindValue(":TITLEMATCH", TitleMatch);
+    query.bindValue(":SKIPAHEAD", SkipAhead);
+    query.bindValue(":SKIPBACK", SkipBack);
+    query.bindValue(":TIMESTRETCH", TimeStretch);
+    query.bindValue(":JUMP", Jump);
+
+    if (query.exec())
+        return true;
+    return false;
+}
+
+bool V2Dvr::UpdatePlayGroup ( const QString & Name,
+                              const QString & TitleMatch,
+                              int             SkipAhead,
+                              int             SkipBack,
+                              int             TimeStretch,
+                              int             Jump )
+{
+    if (Name.isEmpty())
+        throw QString("ERROR: Name is not specified");
+
+    bool ok = false;
+
+    QString sql = "UPDATE playgroup SET ";
+    if (HAS_PARAMv2("TitleMatch"))
+    {
+        sql.append(" titlematch = :TITLEMATCH ");
+        ok = true;
+    }
+    if (HAS_PARAMv2("SkipAhead"))
+    {
+        if (ok)
+            sql.append(",");
+        sql.append(" skipahead = :SKIPAHEAD ");
+        ok = true;
+    }
+    if (HAS_PARAMv2("SkipBack"))
+    {
+        if (ok)
+            sql.append(",");
+        sql.append(" skipback = :SKIPBACK ");
+        ok = true;
+    }
+    if (HAS_PARAMv2("TimeStretch"))
+    {
+        if (ok)
+            sql.append(",");
+        sql.append(" timestretch = :TIMESTRETCH ");
+        ok = true;
+    }
+    if (HAS_PARAMv2("Jump"))
+    {
+        if (ok)
+            sql.append(",");
+        sql.append(" jump = :JUMP ");
+        ok = true;
+    }
+    if (ok)
+    {
+        sql.append(" WHERE name = :NAME ");
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(sql);
+        query.bindValue(":NAME", Name);
+        if (HAS_PARAMv2("TitleMatch"))
+            query.bindValue(":TITLEMATCH", TitleMatch);
+        if (HAS_PARAMv2("SkipAhead"))
+            query.bindValue(":SKIPAHEAD", SkipAhead);
+        if (HAS_PARAMv2("SkipBack"))
+            query.bindValue(":SKIPBACK", SkipBack);
+        if (HAS_PARAMv2("TimeStretch"))
+            query.bindValue(":TIMESTRETCH", TimeStretch);
+        if (HAS_PARAMv2("Jump"))
+            query.bindValue(":JUMP", Jump);
+        if (query.exec())
+            return true;
+    }
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////

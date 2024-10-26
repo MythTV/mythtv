@@ -3692,7 +3692,7 @@ void ProgramInfo::QueryMarkupMap(
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT mark, type "
+    query.prepare("SELECT mark, type, offset "
                   "FROM filemarkup "
                   "WHERE filename = :PATH AND "
                   "      type     = :TYPE "
@@ -3708,8 +3708,14 @@ void ProgramInfo::QueryMarkupMap(
 
     while (query.next())
     {
-        marks[query.value(0).toLongLong()] =
-            (MarkTypes) query.value(1).toInt();
+        // marks[query.value(0).toLongLong()] =
+        //     (MarkTypes) query.value(1).toInt();
+        int type = query.value(1).toInt();
+        if (type == MARK_VIDEO_RATE)
+            marks[query.value(2).toLongLong()] = (MarkTypes) type;
+        else
+            marks[query.value(0).toLongLong()] = (MarkTypes) type;
+
     }
 }
 
@@ -3722,7 +3728,7 @@ void ProgramInfo::QueryMarkupMap(
         marks.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT mark, type "
+    query.prepare("SELECT mark, type, data "
                   "FROM recordedmarkup "
                   "WHERE chanid    = :CHANID AND "
                   "      starttime = :STARTTIME AND"
@@ -3740,8 +3746,13 @@ void ProgramInfo::QueryMarkupMap(
 
     while (query.next())
     {
-        marks[query.value(0).toULongLong()] =
-            (MarkTypes) query.value(1).toInt();
+        // marks[query.value(0).toULongLong()] =
+        //     (MarkTypes) query.value(1).toInt();
+        int type = query.value(1).toInt();
+        if (type == MARK_VIDEO_RATE)
+            marks[query.value(2).toULongLong()] = (MarkTypes) type;
+        else
+            marks[query.value(0).toULongLong()] = (MarkTypes) type;
     }
 }
 

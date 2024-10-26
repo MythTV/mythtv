@@ -63,7 +63,7 @@ HEADERS += servicesv2/v2frontend.h servicesv2/v2frontendList.h servicesv2/v2sett
 HEADERS += servicesv2/v2backendInfo.h servicesv2/v2buildInfo.h servicesv2/v2envInfo.h
 HEADERS += servicesv2/v2logInfo.h
 
-HEADERS += servicesv2/v2video.h
+HEADERS += servicesv2/v2video.h servicesv2/v2playGroup.h
 HEADERS += servicesv2/v2videoMetadataInfo.h servicesv2/v2videoMetadataInfoList.h
 HEADERS += servicesv2/v2artworkInfo.h servicesv2/v2artworkInfoList.h
 HEADERS += servicesv2/v2genre.h servicesv2/v2genreList.h

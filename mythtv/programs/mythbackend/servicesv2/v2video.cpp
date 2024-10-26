@@ -1103,7 +1103,8 @@ V2VideoStreamInfoList* V2Video::GetStreamInfo
 /////////////////////////////////////////////////////////////////////////////
 
 V2CutList* V2Video::GetVideoCutList ( int Id,
-                                          const QString &offsettype )
+                                          const QString &offsettype,
+                                          bool includeFps )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1153,7 +1154,7 @@ V2CutList* V2Video::GetVideoCutList ( int Id,
     else
         marktype = 0;
 
-    V2FillCutList(pCutList, &pi, marktype);
+    V2FillCutList(pCutList, &pi, marktype, includeFps);
 
     return pCutList;
 }
@@ -1164,7 +1165,8 @@ V2CutList* V2Video::GetVideoCutList ( int Id,
 /////////////////////////////////////////////////////////////////////////////
 
 V2CutList* V2Video::GetVideoCommBreak ( int Id,
-                                          const QString &offsettype )
+                                          const QString &offsettype,
+                                          bool includeFps )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1214,7 +1216,7 @@ V2CutList* V2Video::GetVideoCommBreak ( int Id,
     else
         marktype = 0;
 
-    V2FillCommBreak(pCutList, &pi, marktype);
+    V2FillCommBreak(pCutList, &pi, marktype, includeFps);
 
     return pCutList;
 }

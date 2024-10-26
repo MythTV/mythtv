@@ -108,10 +108,12 @@ class V2Video : public MythHTTPService
                                                   const QString &FileName  );
 
     static V2CutList* GetVideoCutList     ( int              Id,
-                                            const QString   &OffsetType );
+                                            const QString   &OffsetType,
+                                            bool IncludeFps );
 
     static V2CutList* GetVideoCommBreak   ( int              Id,
-                                            const QString   &OffsetType );
+                                            const QString   &OffsetType,
+                                            bool IncludeFps );
 
   private:
     Q_DISABLE_COPY(V2Video)
