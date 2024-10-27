@@ -76,6 +76,7 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("DupInToString",        "methods=GET,POST,HEAD;name=String")
     Q_CLASSINFO("DupInToDescription",   "methods=GET,POST,HEAD;name=String")
     Q_CLASSINFO("ManageJobQueue",       "methods=POST;name=int")
+    Q_CLASSINFO("UpdateRecordedMetadata", "methods=POST")
     Q_CLASSINFO("AddPlayGroup",         "methods=POST")
     Q_CLASSINFO("UpdatePlayGroup",      "methods=POST")
     Q_CLASSINFO("RemovePlayGroup",      "methods=POST")
