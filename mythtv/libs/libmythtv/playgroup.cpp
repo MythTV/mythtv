@@ -95,10 +95,9 @@ class TimeStretch : public MythUISpinBoxSetting
   public:
     explicit TimeStretch(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "timestretch"),
-                             45, 200, 5, 0,
-                             PlayGroupConfig::tr("(default)"))
+                             50, 200, 5, 1)
     {
-        setValue(45);
+        setValue(100);
         setLabel(PlayGroupConfig::tr("Time stretch (speed x 100)"));
         setHelpText(PlayGroupConfig::tr("Initial playback speed with adjusted "
                                         "audio. Use 100 for normal speed, 50 "
@@ -151,6 +150,9 @@ void PlayGroupConfig::Save()
 {
     if (m_isNew)
     {
+        QString titleMatch = m_titleMatch->getValue();
+        if (titleMatch.isNull())
+            titleMatch = "";
         MSqlQuery query(MSqlQuery::InitCon());
 
         query.prepare("INSERT playgroup "
@@ -159,7 +161,7 @@ void PlayGroupConfig::Save()
                         "(:NEWNAME, :TITLEMATCH, :SKIPAHEAD, :SKIPBACK, :JUMP, :TIMESTRETCH);");
 
         query.bindValue(":NEWNAME",     getName());
-        query.bindValue(":TITLEMATCH",  m_titleMatch->getValue());
+        query.bindValue(":TITLEMATCH",  titleMatch);
         query.bindValue(":SKIPAHEAD",   m_skipAhead->intValue());
         query.bindValue(":SKIPBACK",    m_skipBack->intValue());
         query.bindValue(":JUMP",        m_jumpMinutes->intValue());
