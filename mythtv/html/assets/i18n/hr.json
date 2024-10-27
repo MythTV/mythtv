@@ -60,6 +60,24 @@
             "title_search": "Pretraživanje naslova",
             "typecolors": "Vrsta kategorije Boje"
         },
+        "playgroup": {
+            "delete_details": "Ovo će izbrisati grupu za reprodukciju {{ Name }}.",
+            "delete_this": "Izbriši grupu za reprodukciju",
+            "edit": "Uredi grupu reprodukcije",
+            "heading": "Grupe za reprodukciju",
+            "jump_desc": "Koliko minuta za skok naprijed ili nazad kada se pritisnu tipke za skok. Zadano je 10 minuta.",
+            "jump_label": "Količina skoka (minute)",
+            "name_label": "Ime",
+            "new": "Nova grupa za reprodukciju",
+            "skipahead_desc": "Koliko sekundi preskočiti unaprijed pri premotavanju unaprijed. Zadano je 30 sekundi.",
+            "skipahead_label": "Preskoči unaprijed (sekunde)",
+            "skipback_desc": "Koliko sekundi preskočiti unatrag pri premotavanju unatrag. Zadano je 5 sekundi.",
+            "skipback_label": "Preskoči unatrag (sekunde)",
+            "timestretch_desc": "Početna brzina reprodukcije s prilagođenim zvukom. Koristite 100 za normalnu brzinu, 50 za pola brzine i 200 za dvostruku brzinu.",
+            "timestretch_label": "Vremensko rastezanje (brzina x 100)",
+            "titlematch_desc": "Automatski postavite nova pravila snimanja za korištenje ove grupe ako naslov odgovara ovom regularnom izrazu. Na primjer, \"(Vijesti|CNN)\" odgovara bilo kojem naslovu u kojem se pojavljuje \"Vijesti\" ili \"CNN\".",
+            "titlematch_label": "Podudaranje naslova (regex)"
+        },
         "programguide": "Programski vodič",
         "recordings": {
             "actionsselected": "Radnje na {{ num }} odabranim snimkama",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Pomicanje kartica ulijevo",
         "scrolltabsright": "Pomicanje kartica udesno",
+        "settings": {
+            "heading": "postavke"
+        },
         "status": {
             "backends_detail": "Pozadina: {{ Name }} je {{ Type }} na IP-u {{ IP }}",
             "backends_none": "Nema pozadine",

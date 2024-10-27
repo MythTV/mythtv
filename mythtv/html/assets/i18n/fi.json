@@ -60,6 +60,24 @@
             "title_search": "Otsikkohaku",
             "typecolors": "Luokka Tyyppi Värit"
         },
+        "playgroup": {
+            "delete_details": "Tämä poistaa toistoryhmän {{ Name }}.",
+            "delete_this": "Poista toistoryhmä",
+            "edit": "Muokkaa toistoryhmää",
+            "heading": "Toistoryhmät",
+            "jump_desc": "Kuinka monta minuuttia hypätä eteen- tai taaksepäin, kun hyppynäppäimiä painetaan. Oletusarvo on 10 minuuttia.",
+            "jump_label": "Hyppymäärä (minuuttia)",
+            "name_label": "Nimi",
+            "new": "Uusi toistoryhmä",
+            "skipahead_desc": "Kuinka monta sekuntia eteenpäin kelattaessa. Oletus on 30 sekuntia.",
+            "skipahead_label": "Ohita eteenpäin (sekuntia)",
+            "skipback_desc": "Kuinka monta sekuntia ohitetaan taaksepäin kelattaessa. Oletusarvo on 5 sekuntia.",
+            "skipback_label": "Hyppää takaisin (sekuntia)",
+            "timestretch_desc": "Alkutoistonopeus säädetyllä äänellä. Käytä 100 normaalinopeudelle, 50 puolinopeudelle ja 200 kaksinkertaiselle nopeudelle.",
+            "timestretch_label": "Ajan venytys (nopeus x 100)",
+            "titlematch_desc": "Aseta automaattisesti uudet tallennussäännöt käyttämään tätä ryhmää, jos otsikko vastaa tätä säännöllistä lauseketta. Esimerkiksi \"(News|CNN)\" vastaa mitä tahansa otsikkoa, jossa \"News\" tai \"CNN\" esiintyy.",
+            "titlematch_label": "Otsikkoosuma (säännöllinen lauseke)"
+        },
         "programguide": "Ohjelmaopas",
         "recordings": {
             "actionsselected": "Toiminnot {{ num }} valituille tallenteille",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Vieritä välilehtiä vasemmalle",
         "scrolltabsright": "Vieritä välilehtiä oikealle",
+        "settings": {
+            "heading": "Asetukset"
+        },
         "status": {
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",

@@ -60,6 +60,24 @@
             "title_search": "Titelsuche",
             "typecolors": "Kategorietypfarben"
         },
+        "playgroup": {
+            "delete_details": "Dadurch wird die Wiedergabegruppe {{ Name }} gelöscht.",
+            "delete_this": "Wiedergabegruppe löschen",
+            "edit": "Wiedergabegruppe bearbeiten",
+            "heading": "Wiedergabegruppen",
+            "jump_desc": "Gibt an, wie viele Minuten vorwärts oder rückwärts gesprungen werden sollen, wenn die Sprungtasten gedrückt werden. Der Standardwert beträgt 10 Minuten.",
+            "jump_label": "Sprungmenge (Minuten)",
+            "name_label": "Name",
+            "new": "Neue Wiedergabegruppe",
+            "skipahead_desc": "Wie viele Sekunden soll bei einem Schnellvorlauf vorwärts gesprungen werden? Der Standardwert beträgt 30 Sekunden.",
+            "skipahead_label": "Vorwärts springen (Sekunden)",
+            "skipback_desc": "Wie viele Sekunden beim Zurückspulen zurückgesprungen werden sollen. Der Standardwert beträgt 5 Sekunden.",
+            "skipback_label": "Zurückspringen (Sekunden)",
+            "timestretch_desc": "Anfängliche Wiedergabegeschwindigkeit mit angepasstem Audio. Verwenden Sie 100 für normale Geschwindigkeit, 50 für halbe Geschwindigkeit und 200 für doppelte Geschwindigkeit.",
+            "timestretch_label": "Zeitdehnung (Geschwindigkeit x 100)",
+            "titlematch_desc": "Legen Sie automatisch neue Aufnahmeregeln fest, um diese Gruppe zu verwenden, wenn der Titel mit diesem regulären Ausdruck übereinstimmt. Beispielsweise würde „(News|CNN)“ mit jedem Titel übereinstimmen, in dem „News“ oder „CNN“ vorkommt.",
+            "titlematch_label": "Titelübereinstimmung (Regex)"
+        },
         "programguide": "Programm",
         "recordings": {
             "actionsselected": "Aktionen für {{ num }} ausgewählte Aufzeichnungen",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Tabs nach links scrollen",
         "scrolltabsright": "Scrollen Sie durch die Tabs nach rechts",
+        "settings": {
+            "heading": "Einstellungen"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} ist ein {{ Type }} auf IP {{ IP }}",
             "backends_none": "Keine Backends",

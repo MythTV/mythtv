@@ -22,7 +22,8 @@ import {
   UnDeleteRecordingRequest,
   UpdateRecordedMetadataRequest,
   RecordScheduleRequest,
-  ManageJobQueueRequest
+  ManageJobQueueRequest,
+  PlayGroup
 } from './interfaces/dvr.interface';
 import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -50,7 +51,7 @@ export class DvrService {
   }
 
   public RemoveRecordSchedule(RecordId: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Dvr/RemoveRecordSchedule', {RecordId: RecordId});
+    return this.httpClient.post<BoolResponse>('/Dvr/RemoveRecordSchedule', { RecordId: RecordId });
   }
 
   public AddRecordedCredits(request: AddRecordedCreditsRequest): Observable<BoolResponse> {
@@ -78,7 +79,7 @@ export class DvrService {
   }
 
   public DisableRecordSchedule(recordid: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Dvr/DisableRecordSchedule', {RecordId: recordid});
+    return this.httpClient.post<BoolResponse>('/Dvr/DisableRecordSchedule', { RecordId: recordid });
   }
 
   public DupInToDescription(DupIn: string): Observable<string> {
@@ -128,8 +129,8 @@ export class DvrService {
     return this.httpClient.get<ProgramList>('/Dvr/GetExpiringList', { params });
   }
 
-  public GetInputList(): Observable<{InputList: InputList}> {
-    return this.httpClient.get<{InputList: InputList}>('/Dvr/GetInputList');
+  public GetInputList(): Observable<{ InputList: InputList }> {
+    return this.httpClient.get<{ InputList: InputList }>('/Dvr/GetInputList');
   }
 
   public GetLastPlayPos(request: GetLastPlayPosRequest): Observable<number> {
@@ -159,36 +160,54 @@ export class DvrService {
     return this.httpClient.get<PlayGroupList>('/Dvr/GetPlayGroupList');
   }
 
+  public GetPlayGroup(playGroup: string): Observable<{ PlayGroup: PlayGroup }> {
+    let params = new HttpParams()
+      .set("Name", playGroup)
+    return this.httpClient.get<{ PlayGroup: PlayGroup }>('/Dvr/GetPlayGroup', { params });
+  }
+
+  public AddPlayGroup(request: PlayGroup): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/AddPlayGroup', request);
+  }
+
+  public UpdatePlayGroup(request: PlayGroup): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/UpdatePlayGroup', request);
+  }
+
+  public removePlayGroup(name: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/RemovePlayGroup', { Name: name });
+  }
+
   public GetProgramCategories(OnlyRecorded: boolean): Observable<ProgramCategories> {
     let params = new HttpParams()
       .set("OnlyRecorded", OnlyRecorded);
-    return this.httpClient.get<ProgramCategories>('/Dvr/GetProgramCategories')
+    return this.httpClient.get<ProgramCategories>('/Dvr/GetProgramCategories', { params })
   }
 
   public GetRecGroupList(): Observable<RecGroupList> {
     return this.httpClient.get<RecGroupList>('/Dvr/GetRecGroupList');
   }
 
-  public GetRecRuleFilterList(): Observable<{RecRuleFilterList: RecRuleFilterList}> {
-    return this.httpClient.get<{RecRuleFilterList: RecRuleFilterList}>('/Dvr/GetRecRuleFilterList');
+  public GetRecRuleFilterList(): Observable<{ RecRuleFilterList: RecRuleFilterList }> {
+    return this.httpClient.get<{ RecRuleFilterList: RecRuleFilterList }>('/Dvr/GetRecRuleFilterList');
   }
 
   public GetRecStorageGroupList(): Observable<RecStorageGroupList> {
     return this.httpClient.get<RecStorageGroupList>('/Dvr/GetRecStorageGroupList');
   }
 
-  public GetRecordSchedule(request: GetRecordScheduleRequest): Observable<{RecRule: RecRule}> {
+  public GetRecordSchedule(request: GetRecordScheduleRequest): Observable<{ RecRule: RecRule }> {
     let params = new HttpParams()
     for (const [key, value] of Object.entries(request))
       params = params.set(key, value);
-    return this.httpClient.get<{RecRule: RecRule}>('/Dvr/GetRecordSchedule', { params });
+    return this.httpClient.get<{ RecRule: RecRule }>('/Dvr/GetRecordSchedule', { params });
   }
 
-  public GetRecordScheduleList(request: GetRecordScheduleListRequest): Observable<{RecRuleList: RecRuleList}> {
+  public GetRecordScheduleList(request: GetRecordScheduleListRequest): Observable<{ RecRuleList: RecRuleList }> {
     let params = new HttpParams()
     for (const [key, value] of Object.entries(request))
       params = params.set(key, value);
-    return this.httpClient.get<{RecRuleList: RecRuleList}>('/Dvr/GetRecordScheduleList', { params });
+    return this.httpClient.get<{ RecRuleList: RecRuleList }>('/Dvr/GetRecordScheduleList', { params });
   }
 
   public GetRecorded(request: GetRecordedRequest): Observable<{ Program: ScheduleOrProgram }> {
@@ -220,12 +239,12 @@ export class DvrService {
     return this.httpClient.get<StringResponse>('/Dvr/RecStatusToString', { params });
   }
 
-  public ManageJobQueue(request: ManageJobQueueRequest): Observable<{int: number}> {
-    return this.httpClient.post<{int: number}>('/Dvr/ManageJobQueue', request);
+  public ManageJobQueue(request: ManageJobQueueRequest): Observable<{ int: number }> {
+    return this.httpClient.post<{ int: number }>('/Dvr/ManageJobQueue', request);
   }
 
   public StopRecording(recordedId: number): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Dvr/StopRecording', {RecordedId: recordedId});
+    return this.httpClient.post<BoolResponse>('/Dvr/StopRecording', { RecordedId: recordedId });
   }
 
 }

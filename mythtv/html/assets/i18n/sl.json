@@ -60,6 +60,24 @@
             "title_search": "Iskanje po naslovu",
             "typecolors": "Vrsta kategorije Barve"
         },
+        "playgroup": {
+            "delete_details": "S tem boste izbrisali skupino za predvajanje {{ Name }}.",
+            "delete_this": "Izbriši skupino predvajanja",
+            "edit": "Uredi skupino predvajanja",
+            "heading": "Skupine za predvajanje",
+            "jump_desc": "Koliko minut za skok naprej ali nazaj, ko pritisnete tipke za skok. Privzeto je 10 minut.",
+            "jump_label": "Količina skoka (minute)",
+            "name_label": "Ime",
+            "new": "Nova skupina za predvajanje",
+            "skipahead_desc": "Za koliko sekund preskočiti naprej pri hitrem previjanju naprej. Privzeto je 30 sekund.",
+            "skipahead_label": "Preskoči naprej (sekunde)",
+            "skipback_desc": "Za koliko sekund preskočiti nazaj pri previjanju nazaj. Privzeto je 5 sekund.",
+            "skipback_label": "Preskoči nazaj (sekunde)",
+            "timestretch_desc": "Začetna hitrost predvajanja s prilagojenim zvokom. Uporabite 100 za običajno hitrost, 50 za polovično hitrost in 200 za dvojno hitrost.",
+            "timestretch_label": "Časovni raztezek (hitrost x 100)",
+            "titlematch_desc": "Samodejno nastavi nova pravila snemanja za uporabo te skupine, če se naslov ujema s tem regularnim izrazom. Na primer, \"(Novice|CNN)\" bi se ujemal s katerim koli naslovom, v katerem se pojavi \"Novice\" ali \"CNN\".",
+            "titlematch_label": "Ujemanje naslova (regex)"
+        },
         "programguide": "Vodnik po programu",
         "recordings": {
             "actionsselected": "Dejanja na {{ num }} izbranih posnetkih",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Drsenje po zavihkih levo",
         "scrolltabsright": "Pomik po zavihkih v desno",
+        "settings": {
+            "heading": "nastavitve"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Brez ozadja",

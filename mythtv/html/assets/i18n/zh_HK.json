@@ -60,6 +60,24 @@
             "title_search": "標題搜索",
             "typecolors": "類別 類型 顏色"
         },
+        "playgroup": {
+            "delete_details": "這將刪除播放組 {{ Name }}。",
+            "delete_this": "刪除播放群組",
+            "edit": "編輯播放群組",
+            "heading": "回放組",
+            "jump_desc": "按下跳躍鍵時向前或向後跳躍多少分鐘。預設值為 10 分鐘。",
+            "jump_label": "跳躍量（分鐘）",
+            "name_label": "姓名",
+            "new": "新播放組",
+            "skipahead_desc": "快轉時向前跳過多少秒。預設值為 30 秒。",
+            "skipahead_label": "快轉（秒）",
+            "skipback_desc": "倒帶時向後跳多少秒。預設值為 5 秒。",
+            "skipback_label": "向後跳（秒）",
+            "timestretch_desc": "調整音訊後的初始播放速度。正常速度使用 100，半速使用 50，雙速使用 200。",
+            "timestretch_label": "時間拉伸（速度 x 100）",
+            "titlematch_desc": "如果標題與此正規表示式匹配，則自動設定新的記錄規則以使用該群組。例如，「(News|CNN)」將符合出現「News」或「CNN」的任何標題。",
+            "titlematch_label": "標題匹配（正規表示式）"
+        },
         "programguide": "節目指南",
         "recordings": {
             "actionsselected": "對 {{ num }} 個選定錄音執行的操作",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "向左滾動選項卡",
         "scrolltabsright": "向右滾動選項卡",
+        "settings": {
+            "heading": "設定"
+        },
         "status": {
             "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "無後端",

@@ -60,6 +60,24 @@
             "title_search": "Recherche de titre",
             "typecolors": "Catégorie Type Couleurs"
         },
+        "playgroup": {
+            "delete_details": "Cela supprimera le groupe de lecture {{ Name }}.",
+            "delete_this": "Supprimer le groupe de lecture",
+            "edit": "Modifier le groupe de lecture",
+            "heading": "Groupes de lecture",
+            "jump_desc": "Combien de minutes pour avancer ou reculer lorsque les touches de saut sont enfoncées. La valeur par défaut est de 10 minutes.",
+            "jump_label": "Montant du saut (minutes)",
+            "name_label": "Nom",
+            "new": "Nouveau groupe de lecture",
+            "skipahead_desc": "Combien de secondes faut-il avancer en avance rapide. La valeur par défaut est de 30 secondes.",
+            "skipahead_label": "Avancer (secondes)",
+            "skipback_desc": "Combien de secondes faut-il revenir en arrière lors d'un rembobinage. La valeur par défaut est de 5 secondes.",
+            "skipback_label": "Revenir en arrière (secondes)",
+            "timestretch_desc": "Vitesse de lecture initiale avec audio ajusté. Utilisez 100 pour la vitesse normale, 50 pour la demi-vitesse et 200 pour la double vitesse.",
+            "timestretch_label": "Étirement temporel (vitesse x 100)",
+            "titlematch_desc": "Définissez automatiquement de nouvelles règles d'enregistrement pour utiliser ce groupe si le titre correspond à cette expression régulière. Par exemple, \"(News|CNN)\" correspondra à n'importe quel titre dans lequel \"News\" ou \"CNN\" apparaît.",
+            "titlematch_label": "Correspondance de titre (regex)"
+        },
         "programguide": "Guide du programme",
         "recordings": {
             "actionsselected": "Actions sur {{ num }} enregistrements sélectionnés",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Faire défiler les onglets vers la gauche",
         "scrolltabsright": "Faire défiler les onglets vers la droite",
+        "settings": {
+            "heading": "Paramètres"
+        },
         "status": {
             "backends_detail": "Backend : {{ Name }} est un {{ Type }} sur l'IP {{ IP }}",
             "backends_none": "Aucun backend",

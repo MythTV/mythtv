@@ -60,6 +60,24 @@
             "title_search": "Titel zoeken",
             "typecolors": "Categorie Type Kleuren"
         },
+        "playgroup": {
+            "delete_details": "Hierdoor wordt de afspeelgroep {{ Name }} verwijderd.",
+            "delete_this": "Afspeelgroep verwijderen",
+            "edit": "Afspeelgroep bewerken",
+            "heading": "Afspeelgroepen",
+            "jump_desc": "Hoeveel minuten moet er vooruit of achteruit worden gesprongen als de springtoetsen worden ingedrukt. Standaard is 10 minuten.",
+            "jump_label": "Sprongbedrag (minuten)",
+            "name_label": "Naam",
+            "new": "Nieuwe afspeelgroep",
+            "skipahead_desc": "Hoeveel seconden vooruitspoelen bij snel vooruitspoelen. Standaard is 30 seconden.",
+            "skipahead_label": "Vooruit springen (seconden)",
+            "skipback_desc": "Hoeveel seconden moet je achteruit springen bij terugspoelen? Standaard is 5 seconden.",
+            "skipback_label": "Terugspringen (seconden)",
+            "timestretch_desc": "Initiële afspeelsnelheid met aangepaste audio. Gebruik 100 voor normale snelheid, 50 voor halve snelheid en 200 voor dubbele snelheid.",
+            "timestretch_label": "Tijdrek (snelheid x 100)",
+            "titlematch_desc": "Stel automatisch nieuwe opnameregels in om deze groep te gebruiken als de titel overeenkomt met deze reguliere expressie. '(Nieuws|CNN)' komt bijvoorbeeld overeen met elke titel waarin 'Nieuws' of 'CNN' voorkomt.",
+            "titlematch_label": "Titelovereenkomst (regex)"
+        },
         "programguide": "Programma gids",
         "recordings": {
             "actionsselected": "Acties op {{ num }} geselecteerde opnamen",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Blader door tabbladen naar links",
         "scrolltabsright": "Blader door tabbladen naar rechts",
+        "settings": {
+            "heading": "Instellingen"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",

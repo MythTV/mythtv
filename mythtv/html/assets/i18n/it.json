@@ -60,6 +60,24 @@
             "title_search": "Ricerca del titolo",
             "typecolors": "Colori Tipo Categoria"
         },
+        "playgroup": {
+            "delete_details": "Questa operazione eliminerà il gruppo di riproduzione {{ Name }}.",
+            "delete_this": "Elimina gruppo di riproduzione",
+            "edit": "Modifica gruppo di riproduzione",
+            "heading": "Gruppi di riproduzione",
+            "jump_desc": "Quanti minuti per saltare avanti o indietro quando vengono premuti i tasti di salto. L'impostazione predefinita è 10 minuti.",
+            "jump_label": "Quantità di salto (minuti)",
+            "name_label": "Nome",
+            "new": "Nuovo gruppo di riproduzione",
+            "skipahead_desc": "Quanti secondi saltare in avanti con l'avanzamento veloce. L'impostazione predefinita è 30 secondi.",
+            "skipahead_label": "Salta avanti (secondi)",
+            "skipback_desc": "Quanti secondi saltare indietro durante un riavvolgimento. L'impostazione predefinita è 5 secondi.",
+            "skipback_label": "Salta indietro (secondi)",
+            "timestretch_desc": "Velocità di riproduzione iniziale con audio regolato. Utilizzare 100 per la velocità normale, 50 per metà velocità e 200 per doppia velocità.",
+            "timestretch_label": "Dilatazione del tempo (velocità x 100)",
+            "titlematch_desc": "Imposta automaticamente nuove regole di registrazione per utilizzare questo gruppo se il titolo corrisponde a questa espressione regolare. Ad esempio, \"(News|CNN)\" corrisponderà a qualsiasi titolo in cui appare \"News\" o \"CNN\".",
+            "titlematch_label": "Corrispondenza titolo (regex)"
+        },
         "programguide": "Guida programmi",
         "recordings": {
             "actionsselected": "Azioni su {{ num }} registrazioni selezionate",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Scorri schede a sinistra",
         "scrolltabsright": "Scorri schede a destra",
+        "settings": {
+            "heading": "Impostazioni"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} è un {{ Type }} su IP {{ IP }}",
             "backends_none": "Nessun Backend",

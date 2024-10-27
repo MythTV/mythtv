@@ -204,3 +204,12 @@ export interface ManageJobQueueRequest {
     RemoteHost?:    string;
     JobArgs?:       string;
 }
+
+export interface PlayGroup {
+    Name:        string;
+    TitleMatch:  string;
+    SkipAhead:   number;
+    SkipBack:    number;
+    Jump:        number;
+    TimeStretch: number;
+}

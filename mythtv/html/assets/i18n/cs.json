@@ -60,6 +60,24 @@
             "title_search": "Vyhledávání titulů",
             "typecolors": "Kategorie Typ Barvy"
         },
+        "playgroup": {
+            "delete_details": "Tím se odstraní skupina přehrávání {{ Name }}.",
+            "delete_this": "Odstranit skupinu přehrávání",
+            "edit": "Upravit skupinu přehrávání",
+            "heading": "Skupiny přehrávání",
+            "jump_desc": "O kolik minut se má skočit vpřed nebo vzad, když jsou stisknuty klávesy skoku. Výchozí hodnota je 10 minut.",
+            "jump_label": "Množství skoku (minuty)",
+            "name_label": "Jméno",
+            "new": "Nová skupina přehrávání",
+            "skipahead_desc": "Kolik sekund se má přeskočit vpřed při rychlém posunu vpřed. Výchozí hodnota je 30 sekund.",
+            "skipahead_label": "Přeskočit vpřed (sekundy)",
+            "skipback_desc": "Kolik sekund přeskočit zpět při přetočení zpět. Výchozí hodnota je 5 sekund.",
+            "skipback_label": "Přeskočit zpět (sekundy)",
+            "timestretch_desc": "Počáteční rychlost přehrávání s upraveným zvukem. Použijte 100 pro normální rychlost, 50 pro poloviční rychlost a 200 pro dvojnásobnou rychlost.",
+            "timestretch_label": "Časový úsek (rychlost x 100)",
+            "titlematch_desc": "Automaticky nastavit nová pravidla nahrávání pro použití této skupiny, pokud název odpovídá tomuto regulárnímu výrazu. Například „(News|CNN)“ by odpovídalo jakémukoli titulu, ve kterém se vyskytuje „News“ nebo „CNN“.",
+            "titlematch_label": "Shoda názvu (regulární výraz)"
+        },
         "programguide": "Programový průvodce",
         "recordings": {
             "actionsselected": "Akce s {{ num }} vybranými nahrávkami",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Posuňte záložky doleva",
         "scrolltabsright": "Posuňte záložky doprava",
+        "settings": {
+            "heading": "Nastavení"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Žádné backendy",

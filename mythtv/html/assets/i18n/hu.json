@@ -60,6 +60,24 @@
             "title_search": "Cím keresése",
             "typecolors": "Kategória Típus Színek"
         },
+        "playgroup": {
+            "delete_details": "Ezzel törli a lejátszási csoportot: {{ Name }}.",
+            "delete_this": "Lejátszási csoport törlése",
+            "edit": "Lejátszási csoport szerkesztése",
+            "heading": "Lejátszási csoportok",
+            "jump_desc": "Hány percet kell előre vagy hátra ugrani az ugrás gombok megnyomásakor. Az alapértelmezett 10 perc.",
+            "jump_label": "Ugrás összege (perc)",
+            "name_label": "Név",
+            "new": "Új lejátszási csoport",
+            "skipahead_desc": "Hány másodpercet kell előre ugrani gyors előretekeréssel. Az alapértelmezett 30 másodperc.",
+            "skipahead_label": "Ugrás előre (másodperc)",
+            "skipback_desc": "Hány másodpercet kell visszaugrani visszatekeréskor. Az alapértelmezett 5 másodperc.",
+            "skipback_label": "Ugrás vissza (másodperc)",
+            "timestretch_desc": "Kezdeti lejátszási sebesség beállított hanggal. Használja a 100-at a normál sebességhez, az 50-et a félsebességhez és a 200-ast a dupla sebességhez.",
+            "timestretch_label": "Időszakasz (sebesség x 100)",
+            "titlematch_desc": "Új rögzítési szabályok automatikus beállítása ennek a csoportnak a használatához, ha a cím megegyezik ezzel a reguláris kifejezéssel. Például a \"(News|CNN)\" minden olyan címre egyezne, amelyben a \"Hírek\" vagy a \"CNN\" szerepel.",
+            "titlematch_label": "Címegyezés (regex)"
+        },
         "programguide": "Programkalauz",
         "recordings": {
             "actionsselected": "Műveletek a {{ num }} kiválasztott felvételeken",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Görgesse a lapokat balra",
         "scrolltabsright": "Görgesse a lapokat jobbra",
+        "settings": {
+            "heading": "Beállítások elemre"
+        },
         "status": {
             "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
             "backends_none": "Nincsenek háttérprogramok",

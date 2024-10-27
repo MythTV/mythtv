@@ -60,6 +60,24 @@
             "title_search": "Titelsökning",
             "typecolors": "Kategori Typ Färger"
         },
+        "playgroup": {
+            "delete_details": "Detta tar bort uppspelningsgruppen {{ Name }}.",
+            "delete_this": "Ta bort uppspelningsgrupp",
+            "edit": "Redigera uppspelningsgrupp",
+            "heading": "Uppspelningsgrupper",
+            "jump_desc": "Hur många minuter att hoppa framåt eller bakåt när hoppknapparna trycks ned. Standard är 10 minuter.",
+            "jump_label": "Hoppmängd (minuter)",
+            "name_label": "Namn",
+            "new": "Ny uppspelningsgrupp",
+            "skipahead_desc": "Hur många sekunder att hoppa framåt på en snabbspolning framåt. Standard är 30 sekunder.",
+            "skipahead_label": "Hoppa framåt (sekunder)",
+            "skipback_desc": "Hur många sekunder att hoppa bakåt på en bakåtspolning. Standard är 5 sekunder.",
+            "skipback_label": "Hoppa tillbaka (sekunder)",
+            "timestretch_desc": "Initial uppspelningshastighet med justerat ljud. Använd 100 för normal hastighet, 50 för halvfart och 200 för dubbel hastighet.",
+            "timestretch_label": "Tidsträcka (hastighet x 100)",
+            "titlematch_desc": "Ställ automatiskt in nya inspelningsregler för att använda den här gruppen om titeln matchar detta reguljära uttryck. Till exempel skulle \"(News|CNN)\" matcha vilken titel som helst där \"News\" eller \"CNN\" förekommer.",
+            "titlematch_label": "Titelmatchning (regex)"
+        },
         "programguide": "Programguide",
         "recordings": {
             "actionsselected": "Åtgärder på {{ num }} valda inspelningar",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Bläddra flikarna åt vänster",
         "scrolltabsright": "Rulla flikar åt höger",
+        "settings": {
+            "heading": "Inställningar"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
             "backends_none": "Inga backends",

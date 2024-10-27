@@ -60,6 +60,24 @@
             "title_search": "Tittelsøk",
             "typecolors": "Kategori Type Farger"
         },
+        "playgroup": {
+            "delete_details": "Dette vil slette avspillingsgruppen {{ Name }}.",
+            "delete_this": "Slett avspillingsgruppe",
+            "edit": "Rediger avspillingsgruppe",
+            "heading": "Avspillingsgrupper",
+            "jump_desc": "Hvor mange minutter å hoppe forover eller bakover når hopptastene trykkes. Standard er 10 minutter.",
+            "jump_label": "Hoppmengde (minutter)",
+            "name_label": "Navn",
+            "new": "Ny avspillingsgruppe",
+            "skipahead_desc": "Hvor mange sekunder å hoppe fremover på en spole fremover. Standard er 30 sekunder.",
+            "skipahead_label": "Hopp videre (sekunder)",
+            "skipback_desc": "Hvor mange sekunder å hoppe bakover på en tilbakespoling. Standard er 5 sekunder.",
+            "skipback_label": "Hopp tilbake (sekunder)",
+            "timestretch_desc": "Innledende avspillingshastighet med justert lyd. Bruk 100 for normal hastighet, 50 for halv hastighet og 200 for dobbel hastighet.",
+            "timestretch_label": "Tidsstrekk (hastighet x 100)",
+            "titlematch_desc": "Angi automatisk nye opptaksregler for å bruke denne gruppen hvis tittelen samsvarer med dette regulære uttrykket. For eksempel vil \"(News|CNN)\" samsvare med alle titler der \"News\" eller \"CNN\" vises.",
+            "titlematch_label": "Tittelmatch (regex)"
+        },
         "programguide": "Programguide",
         "recordings": {
             "actionsselected": "Handlinger på {{ num }} valgte opptak",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Rull faner til venstre",
         "scrolltabsright": "Rull faner til høyre",
+        "settings": {
+            "heading": "Innstillinger"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
             "backends_none": "Ingen backends",

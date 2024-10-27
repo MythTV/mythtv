@@ -60,6 +60,24 @@
             "title_search": "Titelsøgning",
             "typecolors": "Kategori Type Farver"
         },
+        "playgroup": {
+            "delete_details": "Dette vil slette afspilningsgruppen {{ Name }}.",
+            "delete_this": "Slet afspilningsgruppe",
+            "edit": "Rediger afspilningsgruppe",
+            "heading": "Afspilningsgrupper",
+            "jump_desc": "Hvor mange minutter der skal springes frem eller tilbage, når der trykkes på springtasterne. Standard er 10 minutter.",
+            "jump_label": "Springmængde (minutter)",
+            "name_label": "Navn",
+            "new": "Ny afspilningsgruppe",
+            "skipahead_desc": "Hvor mange sekunder skal man springe frem på et hurtigt fremspoling. Standard er 30 sekunder.",
+            "skipahead_label": "Spring frem (sekunder)",
+            "skipback_desc": "Hvor mange sekunder der skal springes tilbage ved en tilbagespoling. Standard er 5 sekunder.",
+            "skipback_label": "Spring tilbage (sekunder)",
+            "timestretch_desc": "Indledende afspilningshastighed med justeret lyd. Brug 100 for normal hastighed, 50 for halv hastighed og 200 for dobbelt hastighed.",
+            "timestretch_label": "Tidsstrækning (hastighed x 100)",
+            "titlematch_desc": "Indstil automatisk nye optagelsesregler for at bruge denne gruppe, hvis titlen matcher dette regulære udtryk. For eksempel ville \"(News|CNN)\" matche enhver titel, hvor \"News\" eller \"CNN\" vises.",
+            "titlematch_label": "Titelmatch (regex)"
+        },
         "programguide": "Programguide",
         "recordings": {
             "actionsselected": "Handlinger på {{ num }} valgte optagelser",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Rul faner til venstre",
         "scrolltabsright": "Rul faner til højre",
+        "settings": {
+            "heading": "Indstillinger"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
             "backends_none": "Ingen backends",

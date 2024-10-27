@@ -60,6 +60,24 @@
             "title_search": "Başlık arama",
             "typecolors": "Kategori Tip Renkler"
         },
+        "playgroup": {
+            "delete_details": "Bu, {{ Name }} Oynatma Grubunu silecektir.",
+            "delete_this": "Oynatma Grubunu Sil",
+            "edit": "Oynatma Grubunu Düzenle",
+            "heading": "Oynatma Grupları",
+            "jump_desc": "Atlama tuşlarına basıldığında kaç dakika ileri veya geri atlanacağı. Varsayılan 10 dakikadır.",
+            "jump_label": "Atlama miktarı (dakika)",
+            "name_label": "İsim",
+            "new": "Yeni Oynatma Grubu",
+            "skipahead_desc": "Hızlı ileri sarmada kaç saniye ileri atlanır. Varsayılan 30 saniyedir.",
+            "skipahead_label": "İleri Atla (saniye)",
+            "skipback_desc": "Geri sarmada kaç saniye geri atlanır. Varsayılan 5 saniyedir.",
+            "skipback_label": "Geri Atla (saniye)",
+            "timestretch_desc": "Ayarlanmış ses ile başlangıç ​​oynatma hızı. Normal hız için 100, yarım hız için 50 ve çift hız için 200'ü kullanın.",
+            "timestretch_label": "Zaman uzatma (hız x 100)",
+            "titlematch_desc": "Başlık bu normal ifadeyle eşleşiyorsa, bu grubu kullanacak yeni kayıt kurallarını otomatik olarak ayarlayın. Örneğin, \"(Haberler|CNN)\", \"Haberler\" veya \"CNN\"in yer aldığı herhangi bir başlıkla eşleşir.",
+            "titlematch_label": "Başlık Eşleşmesi (regex)"
+        },
         "programguide": "Program Rehberi",
         "recordings": {
             "actionsselected": "{{ num }} Seçilen Kayıtlara İlişkin İşlemler",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Sekmeleri Sola Kaydır",
         "scrolltabsright": "Sekmeleri Sağa Kaydır",
+        "settings": {
+            "heading": "Ayarlar"
+        },
         "status": {
             "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
             "backends_none": "Arka Uç Yok",

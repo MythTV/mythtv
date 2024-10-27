@@ -60,6 +60,24 @@
             "title_search": "Titilleit",
             "typecolors": "Flokkur Tegund Litir"
         },
+        "playgroup": {
+            "delete_details": "Þetta mun eyða spilunarhópi {{ Name }}.",
+            "delete_this": "Eyða spilunarhópi",
+            "edit": "Breyta spilunarhópi",
+            "heading": "Spilunarhópar",
+            "jump_desc": "Hversu margar mínútur á að hoppa fram eða til baka þegar ýtt er á stökktakkana. Sjálfgefið er 10 mínútur.",
+            "jump_label": "Stökkmagn (mínútur)",
+            "name_label": "Nafn",
+            "new": "Nýr spilunarhópur",
+            "skipahead_desc": "Hversu margar sekúndur á að sleppa áfram á hröðu áfram. Sjálfgefið er 30 sekúndur.",
+            "skipahead_label": "Hoppaðu áfram (sekúndur)",
+            "skipback_desc": "Hversu margar sekúndur á að sleppa afturábak þegar spólað er til baka. Sjálfgefið er 5 sekúndur.",
+            "skipback_label": "Fara til baka (sekúndur)",
+            "timestretch_desc": "Upphaflegur spilunarhraði með stilltu hljóði. Notaðu 100 fyrir venjulegan hraða, 50 fyrir hálfan hraða og 200 fyrir tvöfaldan hraða.",
+            "timestretch_label": "Tímalengd (hraði x 100)",
+            "titlematch_desc": "Stilltu sjálfkrafa nýjar upptökureglur til að nota þennan hóp ef titillinn passar við þessa reglulegu tjáningu. Til dæmis, \"(News|CNN)\" myndi passa við hvaða titil sem \"News\" eða \"CNN\" birtist í.",
+            "titlematch_label": "Titilsamsvörun (reglubundið)"
+        },
         "programguide": "Dagskrárleiðbeiningar",
         "recordings": {
             "actionsselected": "Aðgerðir á {{ num }} völdum upptökum",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Skrunaðu flipa til vinstri",
         "scrolltabsright": "Skrunaðu flipa til hægri",
+        "settings": {
+            "heading": "Stillingar"
+        },
         "status": {
             "backends_detail": "Bakendi: {{ Name }} er {{ Type }} á IP {{ IP }}",
             "backends_none": "Engir bakenda",

@@ -20,6 +20,7 @@ export class DashboardComponent implements OnInit {
     { label: 'dashboard.upcoming.heading', routerLink: 'upcoming' },
     { label: 'dashboard.recrules.heading', routerLink: 'recrules' },
     { label: 'dashboard.videos.heading', routerLink: 'videos' },
+    { label: 'dashboard.settings.heading', routerLink: 'settings' },
   ]
 
   activeItem = this.fullMenu[0];

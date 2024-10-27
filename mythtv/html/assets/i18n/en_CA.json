@@ -60,6 +60,24 @@
             "title_search": "Title Search",
             "typecolors": "Category Type Colours"
         },
+        "playgroup": {
+            "delete_details": "This will delete Playback Group {{ Name }}.",
+            "delete_this": "Delete Playback Group",
+            "edit": "Edit Playback Group",
+            "heading": "Playback Groups",
+            "jump_desc": "How many minutes to jump forward or backward when the jump keys are pressed. Default is 10 minutes.",
+            "jump_label": "Jump amount (minutes)",
+            "name_label": "Name",
+            "new": "New Playback Group",
+            "skipahead_desc": "How many seconds to skip forward on a fast forward. Default is 30 seconds.",
+            "skipahead_label": "Skip Ahead (seconds)",
+            "skipback_desc": "How many seconds to skip backward on a rewind. Default is 5 seconds.",
+            "skipback_label": "Skip Back (seconds)",
+            "timestretch_desc": "Initial playback speed with adjusted audio. Use 100 for normal speed, 50 for half speed and 200 for double speed.",
+            "timestretch_label": "Time stretch (speed x 100)",
+            "titlematch_desc": "Automatically set new recording rules to use this group if the title matches this regular expression. For example, \"(News|CNN)\" would match any title in which \"News\" or \"CNN\" appears.",
+            "titlematch_label": "Title Match (regex)"
+        },
         "programguide": "Program Guide",
         "recordings": {
             "actionsselected": "Actions on {{ num }} Selected Recordings",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Scroll Tabs Left",
         "scrolltabsright": "Scroll Tabs Right",
+        "settings": {
+            "heading": "Settings"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
             "backends_none": "No Backends",

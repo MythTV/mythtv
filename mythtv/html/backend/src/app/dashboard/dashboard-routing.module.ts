@@ -8,6 +8,7 @@ import { RecordingsComponent } from './recordings/recordings.component';
 import { UpcomingComponent } from './upcoming/upcoming.component';
 import { RecrulesComponent } from './recrules/recrules.component';
 import { VideosComponent } from './videos/videos.component';
+import { DashboardSettingsComponent } from './dashboard-settings/dashboard-settings.component';
 
 @NgModule({
 	imports: [
@@ -21,6 +22,7 @@ import { VideosComponent } from './videos/videos.component';
 					{ path: 'upcoming', component: UpcomingComponent },
 					{ path: 'recrules', component: RecrulesComponent },
 					{ path: 'videos', component: VideosComponent },
+					{ path: 'settings', component: DashboardSettingsComponent },
 				]
 			}
 		])

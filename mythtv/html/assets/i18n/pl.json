@@ -60,6 +60,24 @@
             "title_search": "Wyszukiwanie tytułów",
             "typecolors": "Kategoria Typ Kolory"
         },
+        "playgroup": {
+            "delete_details": "Spowoduje to usunięcie grupy odtwarzania {{ Name }}.",
+            "delete_this": "Usuń grupę odtwarzania",
+            "edit": "Edytuj grupę odtwarzania",
+            "heading": "Grupy odtwarzania",
+            "jump_desc": "Ile minut należy przeskoczyć do przodu lub do tyłu po naciśnięciu klawiszy skoku. Wartość domyślna to 10 minut.",
+            "jump_label": "Wartość skoku (minuty)",
+            "name_label": "Nazwa",
+            "new": "Nowa grupa odtwarzania",
+            "skipahead_desc": "Ile sekund należy przeskoczyć do przodu podczas szybkiego przewijania do przodu. Wartość domyślna to 30 sekund.",
+            "skipahead_label": "Przejdź do przodu (sekundy)",
+            "skipback_desc": "Ile sekund należy przewinąć do tyłu podczas przewijania do tyłu. Wartość domyślna to 5 sekund.",
+            "skipback_label": "Przejdź do tyłu (sekundy)",
+            "timestretch_desc": "Początkowa prędkość odtwarzania z dostosowanym dźwiękiem. Użyj 100 dla normalnej prędkości, 50 dla połowy prędkości i 200 dla podwójnej prędkości.",
+            "timestretch_label": "Rozciągnięcie czasu (prędkość x 100)",
+            "titlematch_desc": "Automatycznie ustaw nowe reguły nagrywania, aby używać tej grupy, jeśli tytuł pasuje do tego wyrażenia regularnego. Na przykład „(News|CNN)” będzie pasować do dowolnego tytułu, w którym pojawia się „Wiadomości” lub „CNN”.",
+            "titlematch_label": "Dopasowanie tytułu (regex)"
+        },
         "programguide": "Przewodnik po programach",
         "recordings": {
             "actionsselected": "Działania na {{ num }} wybranych nagraniach",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Przewiń karty w lewo",
         "scrolltabsright": "Przewiń karty w prawo",
+        "settings": {
+            "heading": "Ustawienia"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
             "backends_none": "Brak zaplecza",

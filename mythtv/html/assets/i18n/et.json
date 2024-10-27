@@ -60,6 +60,24 @@
             "title_search": "Pealkirja otsing",
             "typecolors": "Kategooria Tüüp Värvid"
         },
+        "playgroup": {
+            "delete_details": "See kustutab taasesitusrühma {{ Name }}.",
+            "delete_this": "Kustuta taasesitusrühm",
+            "edit": "Redigeeri taasesitusgruppi",
+            "heading": "Taasesituse rühmad",
+            "jump_desc": "Mitu minutit hüppeklahvide vajutamisel edasi või tagasi hüpata. Vaikimisi on 10 minutit.",
+            "jump_label": "Hüppesumma (minutites)",
+            "name_label": "Nimi",
+            "new": "Uus esitusrühm",
+            "skipahead_desc": "Mitu sekundit edasikerimisel edasi hüpata. Vaikimisi on 30 sekundit.",
+            "skipahead_label": "Jätke vahele (sekundites)",
+            "skipback_desc": "Mitu sekundit tagasikerimisel tagasi hüpata. Vaikimisi on 5 sekundit.",
+            "skipback_label": "Hüppa tagasi (sekundites)",
+            "timestretch_desc": "Esialgne taasesituse kiirus reguleeritud heliga. Kasutage tavakiiruse jaoks 100, poole kiiruse jaoks 50 ja topeltkiiruse jaoks 200.",
+            "timestretch_label": "Aja venitus (kiirus x 100)",
+            "titlematch_desc": "Määrake selle rühma kasutamiseks automaatselt uued salvestusreeglid, kui pealkiri vastab sellele regulaaravaldisele. Näiteks \"(News|CNN)\" vastaks igale pealkirjale, milles \"News\" või \"CNN\" on.",
+            "titlematch_label": "Pealkirja vaste (regulaarne väljend)"
+        },
         "programguide": "Saatejuht",
         "recordings": {
             "actionsselected": "Toimingud {{ num }} valitud salvestistega",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Kerige vahekaarte vasakule",
         "scrolltabsright": "Kerige vahekaarte paremale",
+        "settings": {
+            "heading": "Seaded"
+        },
         "status": {
             "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
             "backends_none": "Taustaprogramme pole",

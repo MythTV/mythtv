@@ -60,6 +60,24 @@
             "title_search": "Buscar título",
             "typecolors": "Categoría Tipo Colores"
         },
+        "playgroup": {
+            "delete_details": "Esto eliminará el grupo de reproducción {{ Name }}.",
+            "delete_this": "Eliminar grupo de reproducción",
+            "edit": "Editar grupo de reproducción",
+            "heading": "Grupos de reproducción",
+            "jump_desc": "Cuántos minutos saltar hacia adelante o hacia atrás cuando se presionan las teclas de salto. El valor predeterminado es 10 minutos.",
+            "jump_label": "Cantidad de salto (minutos)",
+            "name_label": "Nombre",
+            "new": "Nuevo grupo de reproducción",
+            "skipahead_desc": "Cuántos segundos saltar hacia adelante en un avance rápido. El valor predeterminado es 30 segundos.",
+            "skipahead_label": "Saltar adelante (segundos)",
+            "skipback_desc": "Cuántos segundos saltar hacia atrás en un rebobinado. El valor predeterminado es 5 segundos.",
+            "skipback_label": "Saltar atrás (segundos)",
+            "timestretch_desc": "Velocidad de reproducción inicial con audio ajustado. Utilice 100 para velocidad normal, 50 para velocidad media y 200 para velocidad doble.",
+            "timestretch_label": "Estiramiento de tiempo (velocidad x 100)",
+            "titlematch_desc": "Establezca automáticamente nuevas reglas de grabación para usar este grupo si el título coincide con esta expresión regular. Por ejemplo, \"(Noticias|CNN)\" coincidiría con cualquier título en el que aparezca \"Noticias\" o \"CNN\".",
+            "titlematch_label": "Coincidencia de título (expresión regular)"
+        },
         "programguide": "Guía del programa",
         "recordings": {
             "actionsselected": "Acciones en {{ num }} grabaciones seleccionadas",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Desplazar pestañas hacia la izquierda",
         "scrolltabsright": "Desplazar pestañas hacia la derecha",
+        "settings": {
+            "heading": "Ajustes"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} es un {{ Type }} en IP {{ IP }}",
             "backends_none": "Sin backends",

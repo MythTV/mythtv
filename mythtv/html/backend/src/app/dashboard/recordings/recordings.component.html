@@ -209,8 +209,9 @@
             <div class="form-group field">
                 <label for="RecGroup" class="label block">{{ 'dashboard.sched.recgroup_label' | translate
                     }}</label>
-                <p-dropdown [options]="recGroups" [(ngModel)]="program.Recording.RecGroup" [editable]="true"
-                    [maxlength]="64" [style]="{'minWidth':'400px'}" name="RecGroup" #RecGroup="ngModel">
+                <p-dropdown appendTo="body" [options]="recGroups" [(ngModel)]="program.Recording.RecGroup"
+                    [editable]="true" [maxlength]="64" [style]="{'minWidth':'400px'}" name="RecGroup"
+                    #RecGroup="ngModel">
                 </p-dropdown>
             </div>
 

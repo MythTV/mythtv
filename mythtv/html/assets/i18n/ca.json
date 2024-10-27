@@ -60,6 +60,24 @@
             "title_search": "Cerca de títols",
             "typecolors": "Categoria Tipus Colors"
         },
+        "playgroup": {
+            "delete_details": "Això suprimirà el grup de reproducció {{ Name }}.",
+            "delete_this": "Suprimeix el grup de reproducció",
+            "edit": "Edita el grup de reproducció",
+            "heading": "Grups de reproducció",
+            "jump_desc": "Quants minuts cal saltar cap endavant o cap enrere quan es prem les tecles de salt. El valor predeterminat és de 10 minuts.",
+            "jump_label": "Import del salt (minuts)",
+            "name_label": "Nom",
+            "new": "Nou grup de reproducció",
+            "skipahead_desc": "Quants segons cal saltar endavant en un avançament ràpid. El valor predeterminat és de 30 segons.",
+            "skipahead_label": "Saltar endavant (segons)",
+            "skipback_desc": "Quants segons cal saltar cap enrere en un rebobinat. El valor per defecte és de 5 segons.",
+            "skipback_label": "Saltar enrere (segons)",
+            "timestretch_desc": "Velocitat de reproducció inicial amb àudio ajustat. Utilitzeu 100 per a velocitat normal, 50 per a mitja velocitat i 200 per a velocitat doble.",
+            "timestretch_label": "Extensió temporal (velocitat x 100)",
+            "titlematch_desc": "Establiu noves regles d'enregistrament automàticament per utilitzar aquest grup si el títol coincideix amb aquesta expressió regular. Per exemple, \"(Notícies|CNN)\" coincidiria amb qualsevol títol en què aparegui \"Notícies\" o \"CNN\".",
+            "titlematch_label": "Coincidència de títol (regex)"
+        },
         "programguide": "Guia del programa",
         "recordings": {
             "actionsselected": "Accions a {{ num }} Enregistraments seleccionats",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "Desplaça les pestanyes a l'esquerra",
         "scrolltabsright": "Desplaça les pestanyes a la dreta",
+        "settings": {
+            "heading": "Configuració"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} és un {{ Type }} a la IP {{ IP }}",
             "backends_none": "Sense backends",

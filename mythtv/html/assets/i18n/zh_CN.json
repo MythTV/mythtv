@@ -60,6 +60,24 @@
             "title_search": "标题搜索",
             "typecolors": "类别 类型 颜色"
         },
+        "playgroup": {
+            "delete_details": "这将删除播放组 {{ Name }}。",
+            "delete_this": "删除播放组",
+            "edit": "编辑播放组",
+            "heading": "回放组",
+            "jump_desc": "按下跳跃键时向前或向后跳跃多少分钟。默认值为 10 分钟。",
+            "jump_label": "跳跃量（分钟）",
+            "name_label": "姓名",
+            "new": "新播放组",
+            "skipahead_desc": "快进时向前跳过多少秒。默认值为 30 秒。",
+            "skipahead_label": "快进（秒）",
+            "skipback_desc": "倒带时向后跳多少秒。默认值为 5 秒。",
+            "skipback_label": "向后跳（秒）",
+            "timestretch_desc": "调整音频后的初始播放速度。正常速度使用 100，半速使用 50，双速使用 200。",
+            "timestretch_label": "时间拉伸（速度 x 100）",
+            "titlematch_desc": "如果标题与此正则表达式匹配，则自动设置新的记录规则以使用该组。例如，“(News|CNN)”将匹配出现“News”或“CNN”的任何标题。",
+            "titlematch_label": "标题匹配（正则表达式）"
+        },
         "programguide": "节目指南",
         "recordings": {
             "actionsselected": "对 {{ num }} 个选定录音执行的操作",
@@ -202,6 +220,9 @@
         },
         "scrolltabsleft": "向左滚动选项卡",
         "scrolltabsright": "向右滚动选项卡",
+        "settings": {
+            "heading": "设置"
+        },
         "status": {
             "backends_detail": "后端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "无后端",
