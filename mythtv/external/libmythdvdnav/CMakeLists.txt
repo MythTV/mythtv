@@ -122,6 +122,9 @@ target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
 if(APPLE)
   target_link_libraries(mythdvdnav PRIVATE ${APPLE_CORE_FOUNDATION})
 endif()
+if(HAVE_DVDCSS_DVDCSS_H)
+  target_link_libraries(mythdvdnav PRIVATE dvdcss)
+endif()
 
 #
 # The MythTV customization to dvdnav adds references to the MythFile* functions,
