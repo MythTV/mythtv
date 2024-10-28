@@ -2525,12 +2525,6 @@ static int extract_extradata(FFFormatContext *si, AVStream *st, const AVPacket *
     return 0;
 }
 
-/* absolute maximum size we read until we abort (MythTV) */
-#define MAX_READ_SIZE        5000000
-
-/** Number of frames to read, max. (MythTV) */
-#define MAX_FRAMES           45
-
 int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 {
     FFFormatContext *const si = ffformatcontext(ic);
@@ -2547,10 +2541,6 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
     int64_t probesize = ic->probesize;
     int eof_reached = 0;
     int *missing_streams = av_opt_ptr(ic->iformat->priv_class, ic->priv_data, "missing_streams");
-
-    int hasaudio        = 0;
-    int hasvideo        = 0;
-    int read_packets    = 0;
 
     flush_codecs = probesize > 0;
 
@@ -2684,12 +2674,9 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
             if (sti->first_dts == AV_NOPTS_VALUE &&
                 (!(ic->iformat->flags & AVFMT_NOTIMESTAMPS) || sti->need_parsing == AVSTREAM_PARSE_FULL_RAW) &&
                 sti->codec_info_nb_frames < ((st->disposition & AV_DISPOSITION_ATTACHED_PIC) ? 1 : ic->max_ts_probe) &&
-                st->codecpar->codec_id != AV_CODEC_ID_DSMCC_B)
-                 break;
-            if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
-                hasvideo = 1;
-            else if (st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
-                hasaudio = 1;
+                (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO ||
+                 st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO))
+                break;
         }
         analyzed_all_streams = 0;
         if (!missing_streams || !*missing_streams)
@@ -2697,21 +2684,11 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 analyzed_all_streams = 1;
                 /* NOTE: If the format has no header, then we need to read some
                  * packets to get most of the streams, so we cannot stop here. */
-                /* There are MythTV changes here */
-                if (!(ic->ctx_flags & AVFMTCTX_NOHEADER) ||
-                    (read_size >= MAX_READ_SIZE || read_packets >= MAX_FRAMES) ||
-                    (hasvideo && hasaudio)) {
+                if (!(ic->ctx_flags & AVFMTCTX_NOHEADER)) {
                     /* If we found the info for all the codecs, we can stop. */
                     ret = count;
                     av_log(ic, AV_LOG_DEBUG, "All info found\n");
                     flush_codecs = 0;
-                    break;
-                }
-                /* Is this is an MHEG only stream? Then we really can stop. */
-                if (i == 1 && ic->streams[0]->codecpar->codec_id == AV_CODEC_ID_DSMCC_B)
-                {
-                    ret = count;
-                    av_log(ic, AV_LOG_DEBUG, "All DSM info found\n");
                     break;
                 }
             }
@@ -2737,9 +2714,6 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
         /* NOTE: A new stream can be added there if no header in file
          * (AVFMTCTX_NOHEADER). */
         ret = read_frame_internal(ic, pkt1);
-
-        read_packets++;
-
         if (ret == AVERROR(EAGAIN))
             continue;
 
