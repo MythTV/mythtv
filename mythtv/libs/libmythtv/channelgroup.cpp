@@ -413,7 +413,7 @@ int ChannelGroup::GetChannelGroupId(const QString& changroupname)
     return 0;
 }
 
-static void AddChannelGroup(const QString &groupName)
+int ChannelGroup::AddChannelGroup(const QString &groupName)
 {
     int groupId = ChannelGroup::GetChannelGroupId(groupName);
     if (groupId == 0)
@@ -426,10 +426,12 @@ static void AddChannelGroup(const QString &groupName)
 
         if (!query.exec())
             MythDB::DBError("AddChannelGroup", query);
+        groupId =  query.lastInsertId().toInt();
     }
+    return groupId;
 }
 
-static void RemoveChannelGroup(const QString &groupName)
+bool ChannelGroup::RemoveChannelGroup(const QString &groupName)
 {
     int groupId = ChannelGroup::GetChannelGroupId(groupName);
     if (groupId > 0)
@@ -455,7 +457,31 @@ static void RemoveChannelGroup(const QString &groupName)
     else
     {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Channelgroup %1 not found").arg(groupName));
+        return false;
     }
+    return true;
+}
+
+bool ChannelGroup::UpdateChannelGroup(const QString & oldName, const QString & newName)
+{
+    // Check if new name already exists
+    int groupId = ChannelGroup::GetChannelGroupId(newName);
+    if (groupId > 0)
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr = "UPDATE channelgroupnames set name = :NEWNAME "
+                    " WHERE name = :OLDNAME ;";
+    query.prepare(qstr);
+    query.bindValue(":NEWNAME", newName);
+    query.bindValue(":OLDNAME", oldName);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelGroup::UpdateChannelGroup fail", query);
+        return false;
+    }
+    return true;
 }
 
 // UpdateChannelGroups

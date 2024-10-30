@@ -4891,41 +4891,11 @@ void ChannelGroupSetting::Save()
         {
             MSqlQuery query(MSqlQuery::InitCon());
             QString newname = m_groupName ? m_groupName->getValue() : "undefined";
-            QString qstr =
-                "INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);";
-            query.prepare(qstr);
-            query.bindValue(":NEWNAME", newname);
-
-            if (!query.exec())
-                MythDB::DBError("ChannelGroupSetting::Save 1", query);
-            else
-            {
-                //update m_groupId
-                QString qstr2 = "SELECT grpid FROM channelgroupnames "
-                                "WHERE name = :NEWNAME;";
-                query.prepare(qstr2);
-                query.bindValue(":NEWNAME", newname);
-                if (!query.exec())
-                    MythDB::DBError("ChannelGroupSetting::Save 2", query);
-                else
-                    if (query.next())
-                        m_groupId = query.value(0).toUInt();
-            }
+            m_groupId = ChannelGroup::AddChannelGroup(newname);
         }
         else
         {
-            MSqlQuery query(MSqlQuery::InitCon());
-            QString qstr = "UPDATE channelgroupnames set name = :NEWNAME "
-                            " WHERE name = :OLDNAME ;";
-            query.prepare(qstr);
-            query.bindValue(":NEWNAME", m_groupName->getValue());
-            query.bindValue(":OLDNAME", getValue());
-
-            if (!query.exec())
-                MythDB::DBError("ChannelGroupSetting::Save 3", query);
-            else
-                if (query.next())
-                    m_groupId = query.value(0).toUInt();
+            ChannelGroup::UpdateChannelGroup( getValue(), m_groupName->getValue());
         }
     }
 

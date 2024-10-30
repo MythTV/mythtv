@@ -50,6 +50,10 @@ class MTV_PUBLIC ChannelGroup
     static QString           GetChannelGroupName(int grpid);
     static int               GetChannelGroupId(const QString& changroupname);
     static void              UpdateChannelGroups(void);
+    static int               AddChannelGroup(const QString &groupName);
+    static bool              RemoveChannelGroup(const QString &groupName);
+    static bool              UpdateChannelGroup(const QString & oldName, const QString & newName);
+
   private:
 
 };
