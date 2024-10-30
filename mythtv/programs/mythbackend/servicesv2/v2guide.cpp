@@ -672,4 +672,20 @@ bool V2Guide::RemoveFromChannelGroup ( int nChannelGroupId,
     return bResult;
 }
 
+int V2Guide::AddChannelGroup       ( const QString &Name)
+{
+    return ChannelGroup::AddChannelGroup(Name);
+}
+
+bool V2Guide::RemoveChannelGroup  ( const QString &Name )
+{
+    return ChannelGroup::RemoveChannelGroup(Name);
+}
+
+bool V2Guide::UpdateChannelGroup  ( const QString & oldName, const QString & newName)
+{
+    return ChannelGroup::UpdateChannelGroup(oldName, newName);
+}
+
+
 // NOLINTEND(modernize-return-braced-init-list)

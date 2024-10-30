@@ -49,6 +49,9 @@ class V2Guide : public MythHTTPService
     Q_CLASSINFO("Version",      "2.4")
     Q_CLASSINFO("AddToChannelGroup",      "methods=POST;name=bool")
     Q_CLASSINFO("RemoveFromChannelGroup", "methods=POST;name=bool")
+    Q_CLASSINFO("AddChannelGroup",        "methods=POST;name=int")
+    Q_CLASSINFO("RemoveChannelGroup",     "methods=POST;name=bool")
+    Q_CLASSINFO("UpdateChannelGroup",     "methods=POST;name=bool")
 
     public:
         V2Guide();
@@ -98,8 +101,16 @@ class V2Guide : public MythHTTPService
         static bool         AddToChannelGroup   ( int              ChannelGroupId,
                                                   int              ChanId );
 
-        static bool         RemoveFromChannelGroup ( int           ChannelGroupId,
-                                                     int           ChanId );
+        static bool      RemoveFromChannelGroup ( int           ChannelGroupId,
+                                                  int           ChanId );
+
+        static int          AddChannelGroup     ( const QString &Name);
+
+        static bool         RemoveChannelGroup  ( const QString &Name);
+
+        static bool         UpdateChannelGroup  ( const QString &OldName,
+                                                  const QString &NewName);
+
     private:
         Q_DISABLE_COPY(V2Guide)
 
