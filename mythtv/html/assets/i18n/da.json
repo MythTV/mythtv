@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredaktør",
+        "channelgroup": {
+            "delete_details": "Dette vil slette kanalgruppen {{ Name }}.",
+            "delete_label": "Slet kanalgruppe",
+            "edit": "Rediger kanalgruppe",
+            "edit_label": "Rediger kanalgruppe",
+            "heading": "Kanalgrupper",
+            "name_desc": "Navn på kanalgruppen",
+            "name_label": "Navn",
+            "new": "Ny kanalgruppe"
+        },
         "guide": {
             "calendar_tip": "Datovælger: Vælg først tidspunktet og derefter datoen.",
             "cat_search": "Kategorisøgning",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Dette vil slette afspilningsgruppen {{ Name }}.",
+            "delete_label": "Slet afspilningsgruppe",
             "delete_this": "Slet afspilningsgruppe",
             "edit": "Rediger afspilningsgruppe",
+            "edit_label": "Rediger afspilningsgruppe",
             "heading": "Afspilningsgrupper",
             "jump_desc": "Hvor mange minutter der skal springes frem eller tilbage, når der trykkes på springtasterne. Standard er 10 minutter.",
             "jump_label": "Springmængde (minutter)",

@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Taustajärjestelmän tila",
         "channeleditor": "Kanavaeditori",
+        "channelgroup": {
+            "delete_details": "Tämä poistaa kanavaryhmän {{ Name }}.",
+            "delete_label": "Poista kanavaryhmä",
+            "edit": "Muokkaa kanavaryhmää",
+            "edit_label": "Muokkaa kanavaryhmää",
+            "heading": "Kanavaryhmät",
+            "name_desc": "Kanavaryhmän nimi",
+            "name_label": "Nimi",
+            "new": "Uusi kanavaryhmä"
+        },
         "guide": {
             "calendar_tip": "Päivämäärän valitsin: Valitse ensin aika ja sitten päivämäärä.",
             "cat_search": "Luokkahaku",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Tämä poistaa toistoryhmän {{ Name }}.",
+            "delete_label": "Poista toistoryhmä",
             "delete_this": "Poista toistoryhmä",
             "edit": "Muokkaa toistoryhmää",
+            "edit_label": "Muokkaa toistoryhmää",
             "heading": "Toistoryhmät",
             "jump_desc": "Kuinka monta minuuttia hypätä eteen- tai taaksepäin, kun hyppynäppäimiä painetaan. Oletusarvo on 10 minuuttia.",
             "jump_label": "Hyppymäärä (minuuttia)",

@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Stan zaplecza",
         "channeleditor": "Edytor kanału",
+        "channelgroup": {
+            "delete_details": "Spowoduje to usunięcie grupy kanałów {{ Name }}.",
+            "delete_label": "Usuń grupę kanałów",
+            "edit": "Edytuj grupę kanałów",
+            "edit_label": "Edytuj grupę kanałów",
+            "heading": "Grupy kanałów",
+            "name_desc": "Nazwa grupy kanałów",
+            "name_label": "Nazwa",
+            "new": "Nowa grupa kanałów"
+        },
         "guide": {
             "calendar_tip": "Wybór daty: najpierw wybierz godzinę, a następnie datę.",
             "cat_search": "Wyszukiwanie kategorii",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Spowoduje to usunięcie grupy odtwarzania {{ Name }}.",
+            "delete_label": "Usuń grupę odtwarzania",
             "delete_this": "Usuń grupę odtwarzania",
             "edit": "Edytuj grupę odtwarzania",
+            "edit_label": "Edytuj grupę odtwarzania",
             "heading": "Grupy odtwarzania",
             "jump_desc": "Ile minut należy przeskoczyć do przodu lub do tyłu po naciśnięciu klawiszy skoku. Wartość domyślna to 10 minut.",
             "jump_label": "Wartość skoku (minuty)",

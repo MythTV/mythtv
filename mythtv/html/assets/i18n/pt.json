@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Status do back-end",
         "channeleditor": "Editor de canal",
+        "channelgroup": {
+            "delete_details": "Isso excluirá o grupo de canais {{ Name }}.",
+            "delete_label": "Excluir grupo de canais",
+            "edit": "Editar grupo de canais",
+            "edit_label": "Editar grupo de canais",
+            "heading": "Grupos de Canais",
+            "name_desc": "Nome do grupo de canais",
+            "name_label": "Nome",
+            "new": "Novo grupo de canais"
+        },
         "guide": {
             "calendar_tip": "Seletor de data: selecione primeiro a hora e depois a data.",
             "cat_search": "Pesquisa de categoria",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Isso excluirá o grupo de reprodução {{ Name }}.",
+            "delete_label": "Excluir grupo de reprodução",
             "delete_this": "Excluir grupo de reprodução",
             "edit": "Editar grupo de reprodução",
+            "edit_label": "Editar grupo de reprodução",
             "heading": "Grupos de reprodução",
             "jump_desc": "Quantos minutos para avançar ou retroceder quando as teclas de salto são pressionadas. O padrão é 10 minutos.",
             "jump_label": "Quantidade de salto (minutos)",

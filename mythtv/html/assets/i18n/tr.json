@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Arka Uç Durumu",
         "channeleditor": "Kanal Editörü",
+        "channelgroup": {
+            "delete_details": "Bu, {{ Name }} Kanal Grubunu silecektir.",
+            "delete_label": "Kanal Grubunu Sil",
+            "edit": "Kanal Grubunu Düzenle",
+            "edit_label": "Kanal Grubunu Düzenle",
+            "heading": "Kanal Grupları",
+            "name_desc": "Kanal Grubunun Adı",
+            "name_label": "İsim",
+            "new": "Yeni Kanal Grubu"
+        },
         "guide": {
             "calendar_tip": "Tarih Seçici: Önce saati, ardından tarihi seçin.",
             "cat_search": "Kategori Arama",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Bu, {{ Name }} Oynatma Grubunu silecektir.",
+            "delete_label": "Oynatma Grubunu Sil",
             "delete_this": "Oynatma Grubunu Sil",
             "edit": "Oynatma Grubunu Düzenle",
+            "edit_label": "Oynatma Grubunu Düzenle",
             "heading": "Oynatma Grupları",
             "jump_desc": "Atlama tuşlarına basıldığında kaç dakika ileri veya geri atlanacağı. Varsayılan 10 dakikadır.",
             "jump_label": "Atlama miktarı (dakika)",

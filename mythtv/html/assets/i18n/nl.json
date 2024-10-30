@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Backend-status",
         "channeleditor": "Kanaal-editor",
+        "channelgroup": {
+            "delete_details": "Hiermee wordt kanaalgroep {{ Name }} verwijderd.",
+            "delete_label": "Kanaalgroep verwijderen",
+            "edit": "Kanaalgroep bewerken",
+            "edit_label": "Kanaalgroep bewerken",
+            "heading": "Kanaalgroepen",
+            "name_desc": "Naam voor de kanaalgroep",
+            "name_label": "Naam",
+            "new": "Nieuwe kanaalgroep"
+        },
         "guide": {
             "calendar_tip": "Datumkiezer: Selecteer eerst de tijd en vervolgens de datum.",
             "cat_search": "Categorie zoeken",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Hierdoor wordt de afspeelgroep {{ Name }} verwijderd.",
+            "delete_label": "Afspeelgroep verwijderen",
             "delete_this": "Afspeelgroep verwijderen",
             "edit": "Afspeelgroep bewerken",
+            "edit_label": "Afspeelgroep bewerken",
             "heading": "Afspeelgroepen",
             "jump_desc": "Hoeveel minuten moet er vooruit of achteruit worden gesprongen als de springtoetsen worden ingedrukt. Standaard is 10 minuten.",
             "jump_label": "Sprongbedrag (minuten)",

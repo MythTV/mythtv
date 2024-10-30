@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Háttérrendszer állapota",
         "channeleditor": "Csatornaszerkesztő",
+        "channelgroup": {
+            "delete_details": "Ezzel törli a(z) {{ Name }} csatornacsoportot.",
+            "delete_label": "Csatornacsoport törlése",
+            "edit": "Csatornacsoport szerkesztése",
+            "edit_label": "Csatornacsoport szerkesztése",
+            "heading": "Csatornacsoportok",
+            "name_desc": "A csatornacsoport neve",
+            "name_label": "Név",
+            "new": "Új csatornacsoport"
+        },
         "guide": {
             "calendar_tip": "Dátumválasztó: Először válassza ki az időt, majd a dátumot.",
             "cat_search": "Kategória keresése",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Ezzel törli a lejátszási csoportot: {{ Name }}.",
+            "delete_label": "Lejátszási csoport törlése",
             "delete_this": "Lejátszási csoport törlése",
             "edit": "Lejátszási csoport szerkesztése",
+            "edit_label": "Lejátszási csoport szerkesztése",
             "heading": "Lejátszási csoportok",
             "jump_desc": "Hány percet kell előre vagy hátra ugrani az ugrás gombok megnyomásakor. Az alapértelmezett 10 perc.",
             "jump_label": "Ugrás összege (perc)",

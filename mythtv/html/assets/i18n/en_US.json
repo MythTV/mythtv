@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Backend Status",
         "channeleditor": "Channel Editor",
+        "channelgroup": {
+            "delete_details": "This will delete Channel Group {{ Name }}.",
+            "delete_label": "Delete Channel Group",
+            "edit": "Edit Channel Group",
+            "edit_label": "Edit Channel Group",
+            "heading": "Channel Groups",
+            "name_desc": "Name for the Channel Group",
+            "name_label": "Name",
+            "new": "New Channel Group"
+        },
         "guide": {
             "calendar_tip": "Date Picker: Select the time first, then the date.",
             "cat_search": "Category Search",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "This will delete Playback Group {{ Name }}.",
+            "delete_label": "Delete Playback Group",
             "delete_this": "Delete Playback Group",
             "edit": "Edit Playback Group",
+            "edit_label": "Edit Playback Group",
             "heading": "Playback Groups",
             "jump_desc": "How many minutes to jump forward or backward when the jump keys are pressed. Default is 10 minutes.",
             "jump_label": "Jump amount (minutes)",

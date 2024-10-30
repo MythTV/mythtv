@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Backend-Status",
         "channeleditor": "Kanaleditor",
+        "channelgroup": {
+            "delete_details": "Dadurch wird die Kanalgruppe {{ Name }} gelöscht.",
+            "delete_label": "Kanalgruppe löschen",
+            "edit": "Kanalgruppe bearbeiten",
+            "edit_label": "Kanalgruppe bearbeiten",
+            "heading": "Kanalgruppen",
+            "name_desc": "Name für die Kanalgruppe",
+            "name_label": "Name",
+            "new": "Neue Kanalgruppe"
+        },
         "guide": {
             "calendar_tip": "Datumsauswahl: Wählen Sie zuerst die Uhrzeit und dann das Datum aus.",
             "cat_search": "Kategoriesuche",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Dadurch wird die Wiedergabegruppe {{ Name }} gelöscht.",
+            "delete_label": "Wiedergabegruppe löschen",
             "delete_this": "Wiedergabegruppe löschen",
             "edit": "Wiedergabegruppe bearbeiten",
+            "edit_label": "Wiedergabegruppe bearbeiten",
             "heading": "Wiedergabegruppen",
             "jump_desc": "Gibt an, wie viele Minuten vorwärts oder rückwärts gesprungen werden sollen, wenn die Sprungtasten gedrückt werden. Der Standardwert beträgt 10 Minuten.",
             "jump_label": "Sprungmenge (Minuten)",

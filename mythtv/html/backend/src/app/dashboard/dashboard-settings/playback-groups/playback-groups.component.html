@@ -1,4 +1,4 @@
-<div class="block card w-full" style="height: 90vh" *ngIf="loaded">
+<div class="block card w-full" *ngIf="loaded">
     <p-table [value]="playGroups" scrollHeight="flex" [scrollable]="true" sortField="Name"
         styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
@@ -33,9 +33,9 @@
                 <td>{{ group.TimeStretch }}</td>
                 <td class="pt-1 pb-0" style="white-space: nowrap;">
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text" (click)="editGroup(group)"
-                        pTooltip="Edit Playback Group" tooltipPosition="left"></button>
+                        pTooltip="{{ 'dashboard.playgroup.edit_label' | translate }}" tooltipPosition="left"></button>
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
-                        (click)="deleteRequest(group)" pTooltip="Delete Playback Group"
+                        (click)="deleteRequest(group)" pTooltip="{{ 'dashboard.playgroup.delete_label' | translate }}"
                         [disabled]="group.Name == 'Default'" tooltipPosition="left"></button>
                 </td>
             </tr>

@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Status pozadine",
         "channeleditor": "Urednik kanala",
+        "channelgroup": {
+            "delete_details": "Ovo će izbrisati grupu kanala {{ Name }}.",
+            "delete_label": "Izbriši grupu kanala",
+            "edit": "Uredi grupu kanala",
+            "edit_label": "Uredi grupu kanala",
+            "heading": "Grupe kanala",
+            "name_desc": "Naziv grupe kanala",
+            "name_label": "Ime",
+            "new": "Nova grupa kanala"
+        },
         "guide": {
             "calendar_tip": "Birač datuma: prvo odaberite vrijeme, a zatim datum.",
             "cat_search": "Pretraga po kategoriji",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Ovo će izbrisati grupu za reprodukciju {{ Name }}.",
+            "delete_label": "Izbriši grupu za reprodukciju",
             "delete_this": "Izbriši grupu za reprodukciju",
             "edit": "Uredi grupu reprodukcije",
+            "edit_label": "Uredi grupu reprodukcije",
             "heading": "Grupe za reprodukciju",
             "jump_desc": "Koliko minuta za skok naprijed ili nazad kada se pritisnu tipke za skok. Zadano je 10 minuta.",
             "jump_label": "Količina skoka (minute)",

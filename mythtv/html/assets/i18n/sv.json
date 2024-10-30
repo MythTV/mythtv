@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredigerare",
+        "channelgroup": {
+            "delete_details": "Detta tar bort kanalgruppen {{ Name }}.",
+            "delete_label": "Ta bort kanalgrupp",
+            "edit": "Redigera kanalgrupp",
+            "edit_label": "Redigera kanalgrupp",
+            "heading": "Kanalgrupper",
+            "name_desc": "Namn på kanalgruppen",
+            "name_label": "Namn",
+            "new": "Ny kanalgrupp"
+        },
         "guide": {
             "calendar_tip": "Datumväljare: Välj först tid och sedan datum.",
             "cat_search": "Kategorisökning",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Detta tar bort uppspelningsgruppen {{ Name }}.",
+            "delete_label": "Ta bort uppspelningsgrupp",
             "delete_this": "Ta bort uppspelningsgrupp",
             "edit": "Redigera uppspelningsgrupp",
+            "edit_label": "Redigera uppspelningsgrupp",
             "heading": "Uppspelningsgrupper",
             "jump_desc": "Hur många minuter att hoppa framåt eller bakåt när hoppknapparna trycks ned. Standard är 10 minuter.",
             "jump_label": "Hoppmängd (minuter)",

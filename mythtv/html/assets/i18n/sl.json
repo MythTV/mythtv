@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Stanje zaledja",
         "channeleditor": "Urejevalnik kanalov",
+        "channelgroup": {
+            "delete_details": "S tem boste izbrisali skupino kanalov {{ Name }}.",
+            "delete_label": "Izbriši skupino kanalov",
+            "edit": "Uredi skupino kanalov",
+            "edit_label": "Uredi skupino kanalov",
+            "heading": "Skupine kanalov",
+            "name_desc": "Ime za skupino kanalov",
+            "name_label": "Ime",
+            "new": "Nova skupina kanalov"
+        },
         "guide": {
             "calendar_tip": "Izbirnik datuma: najprej izberite uro in nato datum.",
             "cat_search": "Iskanje po kategorijah",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "S tem boste izbrisali skupino za predvajanje {{ Name }}.",
+            "delete_label": "Izbriši skupino predvajanja",
             "delete_this": "Izbriši skupino predvajanja",
             "edit": "Uredi skupino predvajanja",
+            "edit_label": "Uredi skupino predvajanja",
             "heading": "Skupine za predvajanje",
             "jump_desc": "Koliko minut za skok naprej ali nazaj, ko pritisnete tipke za skok. Privzeto je 10 minut.",
             "jump_label": "Količina skoka (minute)",

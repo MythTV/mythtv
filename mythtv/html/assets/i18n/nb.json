@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredaktør",
+        "channelgroup": {
+            "delete_details": "Dette vil slette kanalgruppen {{ Name }}.",
+            "delete_label": "Slett kanalgruppe",
+            "edit": "Rediger kanalgruppe",
+            "edit_label": "Rediger kanalgruppe",
+            "heading": "Kanalgrupper",
+            "name_desc": "Navn på kanalgruppen",
+            "name_label": "Navn",
+            "new": "Ny kanalgruppe"
+        },
         "guide": {
             "calendar_tip": "Datovelger: Velg først klokkeslettet og deretter datoen.",
             "cat_search": "Kategorisøk",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Dette vil slette avspillingsgruppen {{ Name }}.",
+            "delete_label": "Slett avspillingsgruppe",
             "delete_this": "Slett avspillingsgruppe",
             "edit": "Rediger avspillingsgruppe",
+            "edit_label": "Rediger avspillingsgruppe",
             "heading": "Avspillingsgrupper",
             "jump_desc": "Hvor mange minutter å hoppe forover eller bakover når hopptastene trykkes. Standard er 10 minutter.",
             "jump_label": "Hoppmengde (minutter)",

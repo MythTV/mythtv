@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Statut du serveur principal",
         "channeleditor": "Éditeur de chaînes",
+        "channelgroup": {
+            "delete_details": "Cela supprimera le groupe de chaînes {{ Name }}.",
+            "delete_label": "Supprimer un groupe de chaînes",
+            "edit": "Modifier le groupe de chaînes",
+            "edit_label": "Modifier le groupe de chaînes",
+            "heading": "Groupes de chaînes",
+            "name_desc": "Nom du groupe de chaînes",
+            "name_label": "Nom",
+            "new": "Nouveau groupe de chaînes"
+        },
         "guide": {
             "calendar_tip": "Sélecteur de date : sélectionnez d'abord l'heure, puis la date.",
             "cat_search": "Recherche par catégorie",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Cela supprimera le groupe de lecture {{ Name }}.",
+            "delete_label": "Supprimer le groupe de lecture",
             "delete_this": "Supprimer le groupe de lecture",
             "edit": "Modifier le groupe de lecture",
+            "edit_label": "Modifier le groupe de lecture",
             "heading": "Groupes de lecture",
             "jump_desc": "Combien de minutes pour avancer ou reculer lorsque les touches de saut sont enfoncées. La valeur par défaut est de 10 minutes.",
             "jump_label": "Montant du saut (minutes)",

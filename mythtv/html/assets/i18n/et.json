@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Taustaprogrammi olek",
         "channeleditor": "Kanali redaktor",
+        "channelgroup": {
+            "delete_details": "See kustutab kanalirühma {{ Name }}.",
+            "delete_label": "Kustuta kanalirühm",
+            "edit": "Redigeeri kanalirühma",
+            "edit_label": "Redigeeri kanalirühma",
+            "heading": "Kanalirühmad",
+            "name_desc": "Kanalirühma nimi",
+            "name_label": "Nimi",
+            "new": "Uus kanalirühm"
+        },
         "guide": {
             "calendar_tip": "Kuupäevavalija: valige esmalt kellaaeg ja seejärel kuupäev.",
             "cat_search": "Kategooria otsing",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "See kustutab taasesitusrühma {{ Name }}.",
+            "delete_label": "Kustuta taasesitusrühm",
             "delete_this": "Kustuta taasesitusrühm",
             "edit": "Redigeeri taasesitusgruppi",
+            "edit_label": "Redigeeri taasesitusgruppi",
             "heading": "Taasesituse rühmad",
             "jump_desc": "Mitu minutit hüppeklahvide vajutamisel edasi või tagasi hüpata. Vaikimisi on 10 minutit.",
             "jump_label": "Hüppesumma (minutites)",

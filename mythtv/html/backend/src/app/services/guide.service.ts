@@ -108,4 +108,17 @@ export class GuideService {
   public RemoveFromChannelGroup(request: ChannelGroupRequest): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Guide/RemoveFromChannelGroup', request);
   }
+
+  public AddChannelGroup(Name: string): Observable<number> {
+    return this.httpClient.post<number>('/Guide/AddChannelGroup', {Name: Name});
+  }
+
+  public UpdateChannelGroup(oldName: string, newName: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Guide/UpdateChannelGroup', {OldName: oldName, newName: newName});
+  }
+
+  public RemoveChannelGroup(Name: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Guide/RemoveChannelGroup', {Name: Name});
+  }
+
 }

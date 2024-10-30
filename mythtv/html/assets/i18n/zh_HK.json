@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "後端狀態",
         "channeleditor": "頻道編輯",
+        "channelgroup": {
+            "delete_details": "這將刪除頻道組 {{ Name }}。",
+            "delete_label": "刪除頻道組",
+            "edit": "編輯頻道組",
+            "edit_label": "編輯頻道組",
+            "heading": "頻道組",
+            "name_desc": "頻道組的名稱",
+            "name_label": "姓名",
+            "new": "新通路集團"
+        },
         "guide": {
             "calendar_tip": "日期選擇器：先選擇時間，然後選擇日期。",
             "cat_search": "類別搜尋",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "這將刪除播放組 {{ Name }}。",
+            "delete_label": "刪除播放群組",
             "delete_this": "刪除播放群組",
             "edit": "編輯播放群組",
+            "edit_label": "編輯播放群組",
             "heading": "回放組",
             "jump_desc": "按下跳躍鍵時向前或向後跳躍多少分鐘。預設值為 10 分鐘。",
             "jump_label": "跳躍量（分鐘）",

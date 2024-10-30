@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Staða bakenda",
         "channeleditor": "Rásarstjóri",
+        "channelgroup": {
+            "delete_details": "Þetta mun eyða rásarhópnum {{ Name }}.",
+            "delete_label": "Eyða rásarhópi",
+            "edit": "Breyta rásarhópi",
+            "edit_label": "Breyta rásarhópi",
+            "heading": "Rásarhópar",
+            "name_desc": "Nafn fyrir rásarhópinn",
+            "name_label": "Nafn",
+            "new": "Nýr ráshópur"
+        },
         "guide": {
             "calendar_tip": "Dagsetningarval: Veldu fyrst tímann og síðan dagsetninguna.",
             "cat_search": "Flokkaleit",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Þetta mun eyða spilunarhópi {{ Name }}.",
+            "delete_label": "Eyða spilunarhópi",
             "delete_this": "Eyða spilunarhópi",
             "edit": "Breyta spilunarhópi",
+            "edit_label": "Breyta spilunarhópi",
             "heading": "Spilunarhópar",
             "jump_desc": "Hversu margar mínútur á að hoppa fram eða til baka þegar ýtt er á stökktakkana. Sjálfgefið er 10 mínútur.",
             "jump_label": "Stökkmagn (mínútur)",

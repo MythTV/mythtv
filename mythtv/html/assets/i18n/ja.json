@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "バックエンドのステータス",
         "channeleditor": "チャンネル編集者",
+        "channelgroup": {
+            "delete_details": "これにより、チャネル グループ {{ Name }} が削除されます。",
+            "delete_label": "チャネルグループの削除",
+            "edit": "チャンネルグループの編集",
+            "edit_label": "チャンネルグループの編集",
+            "heading": "チャネルグループ",
+            "name_desc": "チャネルグループの名前",
+            "name_label": "名前",
+            "new": "新しいチャネルグループ"
+        },
         "guide": {
             "calendar_tip": "日付ピッカー: 最初に時刻を選択し、次に日付を選択します。",
             "cat_search": "カテゴリ検索",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "これにより、再生グループ {{ Name }} が削除されます。",
+            "delete_label": "再生グループの削除",
             "delete_this": "再生グループの削除",
             "edit": "再生グループの編集",
+            "edit_label": "再生グループの編集",
             "heading": "再生グループ",
             "jump_desc": "ジャンプキーを押したときに、何分前または後ろにジャンプするか。デフォルトは 10 分です。",
             "jump_label": "ジャンプ量(分)",

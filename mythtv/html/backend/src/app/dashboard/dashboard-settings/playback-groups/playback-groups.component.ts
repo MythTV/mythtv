@@ -82,19 +82,16 @@ export class PlaybackGroupsComponent implements OnInit {
     this.successCount = 0;
     this.errorCount = 0;
     this.dialogHeader = this.msg.headingNew;
-    // this.channel = Object.assign({}, channel);
     this.displayGroupDlg = true;
     this.operation = 1;
   }
 
   editGroup(group: PlayGroup) {
-    this.group = group;
+    this.group = Object.assign({}, group);
     this.successCount = 0;
     this.errorCount = 0;
     this.dialogHeader = this.msg.headingEdit;
-    // this.channel = Object.assign({}, channel);
     this.displayGroupDlg = true;
-    // this.markPristine();
     this.operation = 0;
   }
 

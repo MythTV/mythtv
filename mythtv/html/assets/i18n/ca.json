@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Estat del backend",
         "channeleditor": "Editor de canals",
+        "channelgroup": {
+            "delete_details": "Això suprimirà el grup de canals {{ Name }}.",
+            "delete_label": "Suprimeix el grup de canals",
+            "edit": "Edita el grup de canals",
+            "edit_label": "Edita el grup de canals",
+            "heading": "Grups de canals",
+            "name_desc": "Nom del grup de canals",
+            "name_label": "Nom",
+            "new": "Nou grup de canals"
+        },
         "guide": {
             "calendar_tip": "Selector de dates: seleccioneu primer l'hora i després la data.",
             "cat_search": "Cerca per categories",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Això suprimirà el grup de reproducció {{ Name }}.",
+            "delete_label": "Suprimeix el grup de reproducció",
             "delete_this": "Suprimeix el grup de reproducció",
             "edit": "Edita el grup de reproducció",
+            "edit_label": "Edita el grup de reproducció",
             "heading": "Grups de reproducció",
             "jump_desc": "Quants minuts cal saltar cap endavant o cap enrere quan es prem les tecles de salt. El valor predeterminat és de 10 minuts.",
             "jump_label": "Import del salt (minuts)",

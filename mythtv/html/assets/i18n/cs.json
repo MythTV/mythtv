@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "Stav backendu",
         "channeleditor": "Editor kanálu",
+        "channelgroup": {
+            "delete_details": "Tímto smažete skupinu kanálů {{ Name }}.",
+            "delete_label": "Smazat skupinu kanálů",
+            "edit": "Upravit skupinu kanálů",
+            "edit_label": "Upravit skupinu kanálů",
+            "heading": "Skupiny kanálů",
+            "name_desc": "Název skupiny kanálů",
+            "name_label": "Jméno",
+            "new": "Nová skupina kanálů"
+        },
         "guide": {
             "calendar_tip": "Výběr data: Nejprve vyberte čas a poté datum.",
             "cat_search": "Vyhledávání kategorií",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "Tím se odstraní skupina přehrávání {{ Name }}.",
+            "delete_label": "Odstranit skupinu přehrávání",
             "delete_this": "Odstranit skupinu přehrávání",
             "edit": "Upravit skupinu přehrávání",
+            "edit_label": "Upravit skupinu přehrávání",
             "heading": "Skupiny přehrávání",
             "jump_desc": "O kolik minut se má skočit vpřed nebo vzad, když jsou stisknuty klávesy skoku. Výchozí hodnota je 10 minut.",
             "jump_label": "Množství skoku (minuty)",

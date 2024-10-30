@@ -41,6 +41,16 @@
     "dashboard": {
         "backendStatus": "后端状态",
         "channeleditor": "频道编辑",
+        "channelgroup": {
+            "delete_details": "这将删除频道组 {{ Name }}。",
+            "delete_label": "删除频道组",
+            "edit": "编辑频道组",
+            "edit_label": "编辑频道组",
+            "heading": "频道组",
+            "name_desc": "频道组的名称",
+            "name_label": "姓名",
+            "new": "新渠道集团"
+        },
         "guide": {
             "calendar_tip": "日期选择器：首先选择时间，然后选择日期。",
             "cat_search": "类别搜索",
@@ -62,8 +72,10 @@
         },
         "playgroup": {
             "delete_details": "这将删除播放组 {{ Name }}。",
+            "delete_label": "删除播放组",
             "delete_this": "删除播放组",
             "edit": "编辑播放组",
+            "edit_label": "编辑播放组",
             "heading": "回放组",
             "jump_desc": "按下跳跃键时向前或向后跳跃多少分钟。默认值为 10 分钟。",
             "jump_label": "跳跃量（分钟）",
