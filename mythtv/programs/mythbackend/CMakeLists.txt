@@ -134,6 +134,7 @@ add_executable(
   servicesv2/v2musicMetadataInfoList.h
   servicesv2/v2myth.cpp
   servicesv2/v2myth.h
+  servicesv2/v2playGroup.h
   servicesv2/v2programAndChannel.h
   servicesv2/v2programGuide.h
   servicesv2/v2programList.h
