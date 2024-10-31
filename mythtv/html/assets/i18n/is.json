@@ -91,6 +91,25 @@
             "title_search": "Titilleit",
             "typecolors": "Flokkur Tegund Litir"
         },
+        "jobs": {
+            "deferral_desc": "Ef það er ekki núll, munu sjálfvirkar umskráningarvinnur vera áætlaðar að keyra marga daga eftir að upptöku lýkur í stað þess að vera strax á eftir.",
+            "deferral_label": "Frestunardagar fyrir sjálfvirkt umskráningarverk",
+            "heading": "Störf",
+            "method_all": "Allar tiltækar aðferðir",
+            "method_blank": "Blank Frame Detection",
+            "method_blank_scene": "Autt rammi + senubreyting",
+            "method_desc": "Þetta ákvarðar aðferðina sem MythTV notar til að greina hvenær auglýsingar hefjast og enda.",
+            "method_exp_blank_logo": "Tilraunatilraun: Blank Frame + Merkigreining",
+            "method_label": "Auglýsingagreiningaraðferð",
+            "method_logo": "Merkigreining",
+            "method_roll_blank_scene": "Pre & Post Roll: Blank Frame + Scene Change",
+            "method_scene": "Uppgötvun senubreytinga",
+            "speedup_desc": "Ef það er virkt verður tilraunaskynjunarskynjunarhraða virkjað.",
+            "speedup_label": "Tilraunahraða á uppgötvun í atvinnuskyni",
+            "strict_desc": "Virkja strangari viðskiptaskynjunarkóða. Slökktu á því ef einhverjar auglýsingar finnast ekki.",
+            "strict_label": "Strangt uppgötvun í atvinnuskyni",
+            "subtitle": "Auglýsingauppgötvun og umkóðun vinnustillingar"
+        },
         "playgroup": {
             "delete_details": "Þetta mun eyða spilunarhópi {{ Name }}.",
             "delete_label": "Eyða spilunarhópi",

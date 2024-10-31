@@ -91,6 +91,25 @@
             "title_search": "Iskanje po naslovu",
             "typecolors": "Vrsta kategorije Barve"
         },
+        "jobs": {
+            "deferral_desc": "Če ni nič, bodo opravila samodejnega prekodiranja načrtovana za izvajanje toliko dni po zaključku snemanja namesto takoj zatem.",
+            "deferral_label": "Dnevi odloga za opravila s samodejnim prekodiranjem",
+            "heading": "delovna mesta",
+            "method_all": "Vse razpoložljive metode",
+            "method_blank": "Zaznavanje praznega okvirja",
+            "method_blank_scene": "Prazen okvir + sprememba scene",
+            "method_desc": "To določa metodo, ki jo uporablja MythTV za zaznavanje začetka in konca reklam.",
+            "method_exp_blank_logo": "Eksperimentalno: prazen okvir + zaznavanje logotipa",
+            "method_label": "Komercialna metoda odkrivanja",
+            "method_logo": "Zaznavanje logotipa",
+            "method_roll_blank_scene": "Pred in po zvitku: prazen okvir + sprememba scene",
+            "method_scene": "Zaznavanje spremembe scene",
+            "speedup_desc": "Če je omogočeno, bodo omogočene poskusne komercialne pospešitve zaznavanja.",
+            "speedup_label": "Eksperimentalna pospešitev komercialne detekcije",
+            "strict_desc": "Omogoči strožjo komercialno zaznavno kodo. Onemogoči, če nekatere reklame niso zaznane.",
+            "strict_label": "Strogo komercialno odkrivanje",
+            "subtitle": "Komercialno zaznavanje in nastavitve posla za prekodiranje"
+        },
         "playgroup": {
             "delete_details": "S tem boste izbrisali skupino za predvajanje {{ Name }}.",
             "delete_label": "Izbriši skupino predvajanja",

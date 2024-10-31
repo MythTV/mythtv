@@ -91,6 +91,25 @@
             "title_search": "Titel zoeken",
             "typecolors": "Categorie Type Kleuren"
         },
+        "jobs": {
+            "deferral_desc": "Als er geen nul is, worden automatische transcoderingstaken gepland voor zoveel dagen nadat een opname is voltooid, in plaats van onmiddellijk daarna.",
+            "deferral_label": "Uitsteldagen voor automatische transcoderingstaken",
+            "heading": "Banen",
+            "method_all": "Alle beschikbare methoden",
+            "method_blank": "Detectie van blanco frames",
+            "method_blank_scene": "Leeg frame + scènewijziging",
+            "method_desc": "Dit bepaalt de methode die MythTV gebruikt om te detecteren wanneer reclames beginnen en eindigen.",
+            "method_exp_blank_logo": "Experimenteel: blanco frame + logodetectie",
+            "method_label": "Commerciële detectiemethode",
+            "method_logo": "Logodetectie",
+            "method_roll_blank_scene": "Pre- en post-roll: leeg frame + scènewijziging",
+            "method_scene": "Detectie van scènewijzigingen",
+            "speedup_desc": "Indien ingeschakeld, worden experimentele commerciële detectieversnellingen ingeschakeld.",
+            "speedup_label": "Experimentele versnelling van commerciële detectie",
+            "strict_desc": "Schakel strengere commerciële detectiecode in. Schakel uit als bepaalde reclames niet worden gedetecteerd.",
+            "strict_label": "Strikte commerciële detectie",
+            "subtitle": "Commerciële detectiea en transcodeeropdrachtinstellingen"
+        },
         "playgroup": {
             "delete_details": "Hierdoor wordt de afspeelgroep {{ Name }} verwijderd.",
             "delete_label": "Afspeelgroep verwijderen",

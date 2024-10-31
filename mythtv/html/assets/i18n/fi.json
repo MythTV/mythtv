@@ -91,6 +91,25 @@
             "title_search": "Otsikkohaku",
             "typecolors": "Luokka Tyyppi Värit"
         },
+        "jobs": {
+            "deferral_desc": "Jos arvo ei ole nolla, automaattiset transkoodaustyöt ajoitetaan suoritettavaksi näin monta päivää tallennuksen päättymisen jälkeen sen sijaan, että se olisi suoritettu välittömästi.",
+            "deferral_label": "Automaattisten transkoodaustöiden lykkäyspäivät",
+            "heading": "Työpaikat",
+            "method_all": "Kaikki käytettävissä olevat menetelmät",
+            "method_blank": "Tyhjän kehyksen tunnistus",
+            "method_blank_scene": "Tyhjä kehys + kohtauksen vaihto",
+            "method_desc": "Tämä määrittää menetelmän, jota MythTV käyttää mainosten alkamisen ja päättymisen havaitsemiseen.",
+            "method_exp_blank_logo": "Kokeellinen: tyhjä kehys + logon tunnistus",
+            "method_label": "Kaupallinen tunnistusmenetelmä",
+            "method_logo": "Logon tunnistus",
+            "method_roll_blank_scene": "Rullaa edeltävä ja jälkeinen: tyhjä kehys + kohtauksen vaihto",
+            "method_scene": "Kohtauksen muutoksen tunnistus",
+            "speedup_desc": "Jos tämä on käytössä, kokeelliset kaupalliset havaitsemisnopeudet otetaan käyttöön.",
+            "speedup_label": "Kokeellinen kaupallisen havaitsemisen nopeuttaminen",
+            "strict_desc": "Ota käyttöön tiukempi kaupallinen tunnistuskoodi. Poista käytöstä, jos joitain mainoksia ei havaita.",
+            "strict_label": "Tiukka kaupallinen havaitseminen",
+            "subtitle": "Kaupalliset tunnistus- ja transkoodaustyöasetukset"
+        },
         "playgroup": {
             "delete_details": "Tämä poistaa toistoryhmän {{ Name }}.",
             "delete_label": "Poista toistoryhmä",

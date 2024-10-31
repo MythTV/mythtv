@@ -91,6 +91,25 @@
             "title_search": "Vyhledávání titulů",
             "typecolors": "Kategorie Typ Barvy"
         },
+        "jobs": {
+            "deferral_desc": "Pokud není nula, automatické úlohy překódování budou naplánovány tak, aby se spouštěly tolik dní po dokončení záznamu, nikoli bezprostředně poté.",
+            "deferral_label": "Dny odkladu pro úlohy automatického překódování",
+            "heading": "Práce",
+            "method_all": "Všechny dostupné metody",
+            "method_blank": "Detekce prázdného snímku",
+            "method_blank_scene": "Prázdný snímek + změna scény",
+            "method_desc": "To určuje metodu, kterou MythTV používá k detekci začátku a konce reklam.",
+            "method_exp_blank_logo": "Experimentální: Prázdný rámeček + detekce loga",
+            "method_label": "Komerční detekční metoda",
+            "method_logo": "Detekce loga",
+            "method_roll_blank_scene": "Pre & Post Roll: Prázdný snímek + změna scény",
+            "method_scene": "Detekce změny scény",
+            "speedup_desc": "Pokud je povoleno, bude povoleno experimentální zrychlení komerční detekce.",
+            "speedup_label": "Experimentální zrychlení komerční detekce",
+            "strict_desc": "Povolit přísnější kód komerční detekce. Zakázat, pokud některé reklamy nejsou detekovány.",
+            "strict_label": "Přísná komerční detekce",
+            "subtitle": "Komerční detekce a nastavení úlohy Transcode"
+        },
         "playgroup": {
             "delete_details": "Tím se odstraní skupina přehrávání {{ Name }}.",
             "delete_label": "Odstranit skupinu přehrávání",

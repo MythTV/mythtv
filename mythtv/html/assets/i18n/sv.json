@@ -91,6 +91,25 @@
             "title_search": "Titelsökning",
             "typecolors": "Kategori Typ Färger"
         },
+        "jobs": {
+            "deferral_desc": "Om de inte är noll kommer automatiska omkodningsjobb att schemaläggas att köras så många dagar efter att en inspelning slutförts istället för omedelbart efteråt.",
+            "deferral_label": "Uppskovsdagar för jobb med automatisk omkodning",
+            "heading": "Jobb",
+            "method_all": "Alla tillgängliga metoder",
+            "method_blank": "Detektering av tom ram",
+            "method_blank_scene": "Tom ram + Scenändring",
+            "method_desc": "Detta avgör metoden som används av MythTV för att upptäcka när reklam börjar och slutar.",
+            "method_exp_blank_logo": "Experimentell: Tom ram + logotypdetektion",
+            "method_label": "Kommersiell detekteringsmetod",
+            "method_logo": "Logotypdetektering",
+            "method_roll_blank_scene": "Pre & Post Roll: Tom ram + Scenbyte",
+            "method_scene": "Scenförändringsdetektering",
+            "speedup_desc": "Om det är aktiverat kommer experimentella kommersiella detektionshastigheter att aktiveras.",
+            "speedup_label": "Experimentell påskyndning av kommersiell upptäckt",
+            "strict_desc": "Aktivera striktare kommersiell identifieringskod. Inaktivera om vissa reklamfilmer inte upptäcks.",
+            "strict_label": "Strikt kommersiell upptäckt",
+            "subtitle": "Kommersiell upptäckt och omkodningsjobbinställningar"
+        },
         "playgroup": {
             "delete_details": "Detta tar bort uppspelningsgruppen {{ Name }}.",
             "delete_label": "Ta bort uppspelningsgrupp",

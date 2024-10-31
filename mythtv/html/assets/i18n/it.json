@@ -91,6 +91,25 @@
             "title_search": "Ricerca del titolo",
             "typecolors": "Colori Tipo Categoria"
         },
+        "jobs": {
+            "deferral_desc": "Se diverso da zero, i processi di transcodifica automatica verranno pianificati per l'esecuzione tanti giorni dopo il completamento di una registrazione anziché immediatamente dopo.",
+            "deferral_label": "Giorni di differimento per i processi di transcodifica automatica",
+            "heading": "Lavori",
+            "method_all": "Tutti i metodi disponibili",
+            "method_blank": "Rilevamento fotogrammi vuoti",
+            "method_blank_scene": "Fotogramma vuoto + cambio scena",
+            "method_desc": "Ciò determina il metodo utilizzato da MythTV per rilevare quando iniziano e finiscono gli spot pubblicitari.",
+            "method_exp_blank_logo": "Sperimentale: cornice vuota + rilevamento logo",
+            "method_label": "Metodo di rilevamento commerciale",
+            "method_logo": "Rilevamento del logo",
+            "method_roll_blank_scene": "Pre e post roll: fotogramma vuoto + cambio scena",
+            "method_scene": "Rilevamento del cambiamento di scena",
+            "speedup_desc": "Se abilitato, verranno abilitate le accelerazioni del rilevamento commerciale sperimentale.",
+            "speedup_label": "Accelerazione sperimentale del rilevamento commerciale",
+            "strict_desc": "Abilita un codice di rilevamento commerciale più rigoroso. Disabilitare se alcuni spot pubblicitari non vengono rilevati.",
+            "strict_label": "Rilevamento commerciale rigoroso",
+            "subtitle": "Rilevamento commerciale e impostazioni del lavoro di transcodifica"
+        },
         "playgroup": {
             "delete_details": "Questa operazione eliminerà il gruppo di riproduzione {{ Name }}.",
             "delete_label": "Elimina gruppo di riproduzione",

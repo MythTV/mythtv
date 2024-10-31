@@ -91,6 +91,25 @@
             "title_search": "Tittelsøk",
             "typecolors": "Kategori Type Farger"
         },
+        "jobs": {
+            "deferral_desc": "Hvis ikke-null, vil automatiske transkodejobber bli planlagt å kjøre så mange dager etter at et opptak er fullført i stedet for umiddelbart etterpå.",
+            "deferral_label": "Utsettelsesdager for jobber med automatisk transkoding",
+            "heading": "Jobber",
+            "method_all": "Alle tilgjengelige metoder",
+            "method_blank": "Blank Frame Deteksjon",
+            "method_blank_scene": "Blank ramme + sceneendring",
+            "method_desc": "Dette bestemmer metoden som brukes av MythTV for å oppdage når reklamer starter og slutter.",
+            "method_exp_blank_logo": "Eksperimentell: Blank ramme + logogjenkjenning",
+            "method_label": "Kommersiell deteksjonsmetode",
+            "method_logo": "Logogjenkjenning",
+            "method_roll_blank_scene": "Før- og etterrulling: Blank ramme + sceneendring",
+            "method_scene": "Deteksjon av sceneendring",
+            "speedup_desc": "Hvis aktivert, vil eksperimentelle kommersielle deteksjonshastigheter bli aktivert.",
+            "speedup_label": "Eksperimentell fremskyndelse av kommersiell deteksjon",
+            "strict_desc": "Aktiver strengere kommersiell deteksjonskode. Deaktiver hvis noen reklamer ikke blir oppdaget.",
+            "strict_label": "Streng kommersiell deteksjon",
+            "subtitle": "Kommersiell deteksjona og transkode jobbinnstillinger"
+        },
         "playgroup": {
             "delete_details": "Dette vil slette avspillingsgruppen {{ Name }}.",
             "delete_label": "Slett avspillingsgruppe",

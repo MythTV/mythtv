@@ -91,6 +91,25 @@
             "title_search": "Titelsuche",
             "typecolors": "Kategorietypfarben"
         },
+        "jobs": {
+            "deferral_desc": "Bei einem Wert ungleich Null werden automatische Transkodierungsaufträge so geplant, dass sie so viele Tage nach Abschluss einer Aufzeichnung ausgeführt werden, und nicht unmittelbar danach.",
+            "deferral_label": "Verzögerungstage für automatische Transkodierungsaufträge",
+            "heading": "Jobs",
+            "method_all": "Alle verfügbaren Methoden",
+            "method_blank": "Erkennung leerer Rahmen",
+            "method_blank_scene": "Leerbild + Szenenwechsel",
+            "method_desc": "Dies bestimmt die Methode, mit der MythTV erkennt, wann Werbespots beginnen und enden.",
+            "method_exp_blank_logo": "Experimentell: Leerer Rahmen + Logo-Erkennung",
+            "method_label": "Kommerzielle Nachweismethode",
+            "method_logo": "Logo-Erkennung",
+            "method_roll_blank_scene": "Pre- und Post-Roll: Leerbild + Szenenwechsel",
+            "method_scene": "Szenenwechselerkennung",
+            "speedup_desc": "Wenn diese Option aktiviert ist, werden experimentelle Beschleunigungen bei der kommerziellen Erkennung aktiviert.",
+            "speedup_label": "Experimentelle Beschleunigung der kommerziellen Erkennung",
+            "strict_desc": "Aktivieren Sie einen strengeren kommerziellen Erkennungscode. Deaktivieren Sie diese Option, wenn einige Werbespots nicht erkannt werden.",
+            "strict_label": "Strenge kommerzielle Erkennung",
+            "subtitle": "Kommerzielle Erkennung und Transkodierungsauftragseinstellungen"
+        },
         "playgroup": {
             "delete_details": "Dadurch wird die Wiedergabegruppe {{ Name }} gelöscht.",
             "delete_label": "Wiedergabegruppe löschen",

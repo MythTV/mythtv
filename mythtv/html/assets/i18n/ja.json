@@ -91,6 +91,25 @@
             "title_search": "タイトル検索",
             "typecolors": "カテゴリタイプの色"
         },
+        "jobs": {
+            "deferral_desc": "0 以外の場合、自動トランスコード ジョブは、記録の完了直後ではなく、この日数後に実行されるようにスケジュールされます。",
+            "deferral_label": "自動トランスコードジョブの延期日数",
+            "heading": "求人",
+            "method_all": "利用可能なすべての方法",
+            "method_blank": "ブランクフレーム検出",
+            "method_blank_scene": "ブランクフレーム+シーンチェンジ",
+            "method_desc": "これにより、MythTV がコマーシャルの開始と終了を検出するために使用する方法が決まります。",
+            "method_exp_blank_logo": "実験的: 空白フレーム + ロゴ検出",
+            "method_label": "コマーシャル検出方法",
+            "method_logo": "ロゴの検出",
+            "method_roll_blank_scene": "プレ＆ポストロール: ブランクフレーム + シーンチェンジ",
+            "method_scene": "シーンチェンジ検出",
+            "speedup_desc": "有効にすると、実験的な商用検出の高速化が有効になります。",
+            "speedup_label": "コマーシャル検出の高速化実験",
+            "strict_desc": "より厳密な商用検出コードを有効にします。一部のコマーシャルが検出されない場合は無効にします。",
+            "strict_label": "厳密な商用検出",
+            "subtitle": "商用検出とトランスコード ジョブの設定"
+        },
         "playgroup": {
             "delete_details": "これにより、再生グループ {{ Name }} が削除されます。",
             "delete_label": "再生グループの削除",

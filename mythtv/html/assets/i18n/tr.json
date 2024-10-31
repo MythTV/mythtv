@@ -91,6 +91,25 @@
             "title_search": "Başlık arama",
             "typecolors": "Kategori Tip Renkler"
         },
+        "jobs": {
+            "deferral_desc": "Sıfır değilse, otomatik kod dönüştürme işleri, kayıt tamamlandıktan hemen sonra değil, birkaç gün sonra çalışacak şekilde planlanacaktır.",
+            "deferral_label": "Otomatik kod dönüştürme işleri için erteleme günleri",
+            "heading": "İşler",
+            "method_all": "Mevcut Tüm Yöntemler",
+            "method_blank": "Boş Çerçeve Algılama",
+            "method_blank_scene": "Boş Çerçeve + Sahne Değişikliği",
+            "method_desc": "Bu, MythTV'nin reklamların ne zaman başlayıp bittiğini tespit etmek için kullandığı yöntemi belirler.",
+            "method_exp_blank_logo": "Deneysel: Boş Çerçeve + Logo Algılama",
+            "method_label": "Ticari tespit yöntemi",
+            "method_logo": "Logo Algılama",
+            "method_roll_blank_scene": "Ön ve Son Rulo: Boş Çerçeve + Sahne Değişikliği",
+            "method_scene": "Sahne Değişikliği Algılama",
+            "speedup_desc": "Etkinleştirilirse deneysel ticari algılama hızlandırmaları etkinleştirilecektir.",
+            "speedup_label": "Ticari tespitin deneysel olarak hızlandırılması",
+            "strict_desc": "Daha katı ticari tespit kodunu etkinleştirin. Bazı reklamlar algılanmıyorsa devre dışı bırakın.",
+            "strict_label": "Sıkı ticari tespit",
+            "subtitle": "Ticari Tespit ve Kod Dönüştürme İş Ayarları"
+        },
         "playgroup": {
             "delete_details": "Bu, {{ Name }} Oynatma Grubunu silecektir.",
             "delete_label": "Oynatma Grubunu Sil",

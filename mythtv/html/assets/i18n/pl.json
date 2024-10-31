@@ -91,6 +91,25 @@
             "title_search": "Wyszukiwanie tytułów",
             "typecolors": "Kategoria Typ Kolory"
         },
+        "jobs": {
+            "deferral_desc": "Jeśli wartość jest różna od zera, automatyczne zadania transkodowania zostaną zaplanowane na tyle dni po zakończeniu nagrywania, a nie bezpośrednio po nim.",
+            "deferral_label": "Dni odroczenia dla zadań automatycznego transkodowania",
+            "heading": "Praca",
+            "method_all": "Wszystkie dostępne metody",
+            "method_blank": "Wykrywanie pustych ramek",
+            "method_blank_scene": "Pusta ramka + zmiana sceny",
+            "method_desc": "Określa to metodę stosowaną przez MythTV do wykrywania rozpoczęcia i zakończenia reklam.",
+            "method_exp_blank_logo": "Eksperymentalnie: pusta ramka + wykrywanie logo",
+            "method_label": "Komercyjna metoda wykrywania",
+            "method_logo": "Wykrywanie logo",
+            "method_roll_blank_scene": "Przed i po rolce: pusta ramka + zmiana sceny",
+            "method_scene": "Wykrywanie zmiany sceny",
+            "speedup_desc": "Jeśli ta opcja jest włączona, zostaną włączone eksperymentalne przyspieszenia wykrywania komercyjnego.",
+            "speedup_label": "Eksperymentalne przyspieszenie wykrywania komercyjnego",
+            "strict_desc": "Włącz bardziej rygorystyczny komercyjny kod wykrywania. Wyłącz, jeśli niektóre reklamy nie są wykrywane.",
+            "strict_label": "Ścisłe wykrywanie komercyjne",
+            "subtitle": "Ustawienia zadań wykrywania komercyjnych i transkodowania"
+        },
         "playgroup": {
             "delete_details": "Spowoduje to usunięcie grupy odtwarzania {{ Name }}.",
             "delete_label": "Usuń grupę odtwarzania",

@@ -91,6 +91,25 @@
             "title_search": "Recherche de titre",
             "typecolors": "Catégorie Type Couleurs"
         },
+        "jobs": {
+            "deferral_desc": "Si la valeur est différente de zéro, les tâches de transcodage automatique seront planifiées pour s'exécuter autant de jours après la fin d'un enregistrement au lieu d'immédiatement après.",
+            "deferral_label": "Jours de report pour les tâches de transcodage automatique",
+            "heading": "Emplois",
+            "method_all": "Toutes les méthodes disponibles",
+            "method_blank": "Détection de trame vierge",
+            "method_blank_scene": "Cadre vide + changement de scène",
+            "method_desc": "Ceci détermine la méthode utilisée par MythTV pour détecter le début et la fin des publicités.",
+            "method_exp_blank_logo": "Expérimental : cadre vierge + détection de logo",
+            "method_label": "Méthode de détection commerciale",
+            "method_logo": "Détection de logos",
+            "method_roll_blank_scene": "Pré et post-roll : cadre vierge + changement de scène",
+            "method_scene": "Détection de changement de scène",
+            "speedup_desc": "Si cette option est activée, les accélérations expérimentales de la détection commerciale seront activées.",
+            "speedup_label": "Accélération expérimentale de la détection commerciale",
+            "strict_desc": "Activez un code de détection commerciale plus strict. Désactivez-le si certaines publicités ne sont pas détectées.",
+            "strict_label": "Détection commerciale stricte",
+            "subtitle": "Paramètres de détection commerciale et de travail de transcodage"
+        },
         "playgroup": {
             "delete_details": "Cela supprimera le groupe de lecture {{ Name }}.",
             "delete_label": "Supprimer le groupe de lecture",

@@ -91,6 +91,25 @@
             "title_search": "标题搜索",
             "typecolors": "类别 类型 颜色"
         },
+        "jobs": {
+            "deferral_desc": "如果非零，自动转码作业将安排在录制完成后几天运行，而不是在录制完成后立即运行。",
+            "deferral_label": "自动转码作业的延迟天数",
+            "heading": "工作机会",
+            "method_all": "所有可用的方法",
+            "method_blank": "空白帧检测",
+            "method_blank_scene": "空白帧+场景变换",
+            "method_desc": "这决定了 MythTV 用于检测广告何时开始和结束的方法。",
+            "method_exp_blank_logo": "实验：空白框+标志检测",
+            "method_label": "商业检测方法",
+            "method_logo": "标识检测",
+            "method_roll_blank_scene": "前后卷：空白帧+场景变化",
+            "method_scene": "场景变化检测",
+            "speedup_desc": "如果启用，将启用实验性商业检测加速。",
+            "speedup_label": "商业检测的实验加速",
+            "strict_desc": "启用更严格的商业检测代码。如果未检测到某些广告，请禁用。",
+            "strict_label": "严格商业检测",
+            "subtitle": "商业检测a和转码作业设置"
+        },
         "playgroup": {
             "delete_details": "这将删除播放组 {{ Name }}。",
             "delete_label": "删除播放组",

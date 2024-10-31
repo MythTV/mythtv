@@ -91,6 +91,25 @@
             "title_search": "Cím keresése",
             "typecolors": "Kategória Típus Színek"
         },
+        "jobs": {
+            "deferral_desc": "Ha nem nulla, az automatikus átkódolási feladatok a rögzítés befejezése után ennyi napon belül futnak, nem pedig közvetlenül utána.",
+            "deferral_label": "Halasztási napok az automatikus átkódolási feladatokhoz",
+            "heading": "Állások",
+            "method_all": "Minden elérhető módszer",
+            "method_blank": "Üres keret észlelése",
+            "method_blank_scene": "Üres képkocka + jelenetváltás",
+            "method_desc": "Ez határozza meg a MythTV által használt módszert a reklámok kezdetének és befejezésének észlelésére.",
+            "method_exp_blank_logo": "Kísérleti: Üres keret + embléma észlelése",
+            "method_label": "Kereskedelmi kimutatási módszer",
+            "method_logo": "Logo észlelése",
+            "method_roll_blank_scene": "Tekercs előtt és után: Üres képkocka + jelenetváltás",
+            "method_scene": "Jelenetváltás észlelése",
+            "speedup_desc": "Ha engedélyezve van, a kísérleti kereskedelmi észlelési felgyorsítások engedélyezve lesznek.",
+            "speedup_label": "A kereskedelmi felderítés kísérleti felgyorsítása",
+            "strict_desc": "Engedélyezze a szigorúbb kereskedelmi észlelési kódot. Tiltsa le, ha egyes reklámokat nem észlel a rendszer.",
+            "strict_label": "Szigorú kereskedelmi észlelés",
+            "subtitle": "Kereskedelmi Detectiona és Transcode Job beállítások"
+        },
         "playgroup": {
             "delete_details": "Ezzel törli a lejátszási csoportot: {{ Name }}.",
             "delete_label": "Lejátszási csoport törlése",

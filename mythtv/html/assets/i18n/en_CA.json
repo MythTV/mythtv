@@ -91,6 +91,25 @@
             "title_search": "Title Search",
             "typecolors": "Category Type Colours"
         },
+        "jobs": {
+            "deferral_desc": "If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.",
+            "deferral_label": "Deferral days for auto transcode jobs",
+            "heading": "Jobs",
+            "method_all": "All Available Methods",
+            "method_blank": "Blank Frame Detection",
+            "method_blank_scene": "Blank Frame + Scene Change",
+            "method_desc": "This determines the method used by MythTV to detect when commercials start and end.",
+            "method_exp_blank_logo": "Experimental: Blank Frame + Logo Detection",
+            "method_label": "Commercial detection method",
+            "method_logo": "Logo Detection",
+            "method_roll_blank_scene": "Pre & Post Roll: Blank Frame + Scene Change",
+            "method_scene": "Scene Change Detection",
+            "speedup_desc": "If enabled, experimental commercial detection speedups will be enabled.",
+            "speedup_label": "Experimental speedup of commercial detection",
+            "strict_desc": "Enable stricter commercial detection code. Disable if some commercials are not being detected.",
+            "strict_label": "Strict commercial detection",
+            "subtitle": "Commercial Detectiona and Transcode Job Settings"
+        },
         "playgroup": {
             "delete_details": "This will delete Playback Group {{ Name }}.",
             "delete_label": "Delete Playback Group",

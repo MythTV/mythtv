@@ -91,6 +91,25 @@
             "title_search": "Pesquisa de título",
             "typecolors": "Categoria Tipo Cores"
         },
+        "jobs": {
+            "deferral_desc": "Se for diferente de zero, os trabalhos de transcodificação automática serão agendados para execução tantos dias após a conclusão da gravação, em vez de imediatamente depois.",
+            "deferral_label": "Dias de adiamento para jobs de transcodificação automática",
+            "heading": "Empregos",
+            "method_all": "Todos os métodos disponíveis",
+            "method_blank": "Detecção de quadro em branco",
+            "method_blank_scene": "Quadro em branco + mudança de cena",
+            "method_desc": "Isso determina o método usado pela MythTV para detectar quando os comerciais começam e terminam.",
+            "method_exp_blank_logo": "Experimental: moldura em branco + detecção de logotipo",
+            "method_label": "Método de detecção comercial",
+            "method_logo": "Detecção de logotipo",
+            "method_roll_blank_scene": "Pré e pós rolo: quadro em branco + mudança de cena",
+            "method_scene": "Detecção de mudança de cena",
+            "speedup_desc": "Se ativado, as acelerações experimentais de detecção comercial serão ativadas.",
+            "speedup_label": "Aceleração experimental de detecção comercial",
+            "strict_desc": "Habilite um código de detecção comercial mais rigoroso. Desative se alguns comerciais não estiverem sendo detectados.",
+            "strict_label": "Detecção comercial estrita",
+            "subtitle": "Configurações de trabalho de detecção e transcodificação comercial"
+        },
         "playgroup": {
             "delete_details": "Isso excluirá o grupo de reprodução {{ Name }}.",
             "delete_label": "Excluir grupo de reprodução",

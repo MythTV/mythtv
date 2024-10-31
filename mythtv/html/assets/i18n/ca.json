@@ -91,6 +91,25 @@
             "title_search": "Cerca de títols",
             "typecolors": "Categoria Tipus Colors"
         },
+        "jobs": {
+            "deferral_desc": "Si són diferents de zero, les tasques de transcodificació automàtica es programaran per executar-se molts dies després que s'hagi completat una gravació en lloc de immediatament després.",
+            "deferral_label": "Dies d'ajornament per a tasques de transcodificació automàtica",
+            "heading": "Feines",
+            "method_all": "Tots els mètodes disponibles",
+            "method_blank": "Detecció de marcs en blanc",
+            "method_blank_scene": "Marc en blanc + Canvi d'escena",
+            "method_desc": "Això determina el mètode utilitzat per MythTV per detectar quan comencen i acaben els anuncis.",
+            "method_exp_blank_logo": "Experimental: marc en blanc + detecció de logotip",
+            "method_label": "Mètode de detecció comercial",
+            "method_logo": "Detecció de logotip",
+            "method_roll_blank_scene": "Pre i post roll: marc en blanc + canvi d'escena",
+            "method_scene": "Detecció de canvis d'escena",
+            "speedup_desc": "Si està activat, s'habilitaran les acceleracions de detecció comercial experimental.",
+            "speedup_label": "Acceleració experimental de la detecció comercial",
+            "strict_desc": "Activa un codi de detecció comercial més estricte. Desactiveu si no es detecten alguns anuncis.",
+            "strict_label": "Detecció comercial estricta",
+            "subtitle": "Paràmetres de treball de detecció comercial i transcodificació"
+        },
         "playgroup": {
             "delete_details": "Això suprimirà el grup de reproducció {{ Name }}.",
             "delete_label": "Suprimeix el grup de reproducció",

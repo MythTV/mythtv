@@ -91,6 +91,25 @@
             "title_search": "Pretraživanje naslova",
             "typecolors": "Vrsta kategorije Boje"
         },
+        "jobs": {
+            "deferral_desc": "Ako nije nula, poslovi automatskog transkodiranja bit će zakazani za izvođenje toliko dana nakon završetka snimanja umjesto odmah nakon toga.",
+            "deferral_label": "Dani odgode za poslove automatskog transkodiranja",
+            "heading": "Poslovi",
+            "method_all": "Sve dostupne metode",
+            "method_blank": "Detekcija praznih okvira",
+            "method_blank_scene": "Prazan okvir + promjena scene",
+            "method_desc": "Ovo određuje metodu koju koristi MythTV za otkrivanje početka i kraja reklama.",
+            "method_exp_blank_logo": "Eksperimentalno: prazan okvir + otkrivanje logotipa",
+            "method_label": "Komercijalna metoda otkrivanja",
+            "method_logo": "Otkrivanje logotipa",
+            "method_roll_blank_scene": "Pre & Post Roll: prazan okvir + promjena scene",
+            "method_scene": "Detekcija promjene scene",
+            "speedup_desc": "Ako je omogućeno, bit će omogućena eksperimentalna komercijalna ubrzanja otkrivanja.",
+            "speedup_label": "Eksperimentalno ubrzanje komercijalne detekcije",
+            "strict_desc": "Omogući stroži komercijalni kod za otkrivanje. Isključite ako se neke reklame ne otkrivaju.",
+            "strict_label": "Stroga komercijalna detekcija",
+            "subtitle": "Komercijalno otkrivanje i postavke poslova transkodiranja"
+        },
         "playgroup": {
             "delete_details": "Ovo će izbrisati grupu za reprodukciju {{ Name }}.",
             "delete_label": "Izbriši grupu za reprodukciju",

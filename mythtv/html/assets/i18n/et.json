@@ -91,6 +91,25 @@
             "title_search": "Pealkirja otsing",
             "typecolors": "Kategooria Tüüp Värvid"
         },
+        "jobs": {
+            "deferral_desc": "Kui see ei ole null, siis ajastatakse automaatsed ümberkodeerimistööd nii mitu päeva pärast salvestamise lõppu, mitte kohe pärast seda.",
+            "deferral_label": "Automaatse ümberkodeerimise tööde edasilükkamise päevad",
+            "heading": "Töökohad",
+            "method_all": "Kõik saadaolevad meetodid",
+            "method_blank": "Tühja kaadri tuvastamine",
+            "method_blank_scene": "Tühi kaader + stseeni vahetus",
+            "method_desc": "See määrab meetodi, mida MythTV kasutab reklaamide alguse ja lõpu tuvastamiseks.",
+            "method_exp_blank_logo": "Eksperimentaalne: tühi raam + logo tuvastamine",
+            "method_label": "Kaubanduslik tuvastamismeetod",
+            "method_logo": "Logo tuvastamine",
+            "method_roll_blank_scene": "Rulli eel ja järel: tühi kaader + stseenivahetus",
+            "method_scene": "Stseeni muutmise tuvastamine",
+            "speedup_desc": "Kui see on lubatud, lubatakse eksperimentaalsed kommertstuvastuse kiirendamised.",
+            "speedup_label": "Kaubandusliku tuvastamise eksperimentaalne kiirendamine",
+            "strict_desc": "Lubage rangem kaubandusliku tuvastamise kood. Keelake, kui mõnda reklaami ei tuvastata.",
+            "strict_label": "Range kaubanduslik tuvastamine",
+            "subtitle": "Kaubandusliku tuvastamise ja ümberkodeerimise töö sätted"
+        },
         "playgroup": {
             "delete_details": "See kustutab taasesitusrühma {{ Name }}.",
             "delete_label": "Kustuta taasesitusrühm",

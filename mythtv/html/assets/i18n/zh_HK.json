@@ -91,6 +91,25 @@
             "title_search": "標題搜索",
             "typecolors": "類別 類型 顏色"
         },
+        "jobs": {
+            "deferral_desc": "如果非零，自動轉碼作業將安排在錄製完成後幾天運行，而不是在錄製完成後立即運行。",
+            "deferral_label": "自動轉碼作業的延遲天數",
+            "heading": "工作機會",
+            "method_all": "所有可用的方法",
+            "method_blank": "空白影格偵測",
+            "method_blank_scene": "空白影格+場景變換",
+            "method_desc": "這決定了 MythTV 用於偵測廣告何時開始和結束的方法。",
+            "method_exp_blank_logo": "實驗：空白框+標誌偵測",
+            "method_label": "商業檢測方法",
+            "method_logo": "標識偵測",
+            "method_roll_blank_scene": "前後卷：空白畫面+場景變化",
+            "method_scene": "場景變化偵測",
+            "speedup_desc": "如果啟用，將啟用實驗性商業偵測加速。",
+            "speedup_label": "商業檢測的實驗加速",
+            "strict_desc": "啟用更嚴格的商業檢測代碼。如果未偵測到某些廣告，請停用。",
+            "strict_label": "嚴格商業檢測",
+            "subtitle": "商業檢測a和轉碼作業設置"
+        },
         "playgroup": {
             "delete_details": "這將刪除播放組 {{ Name }}。",
             "delete_label": "刪除播放群組",
