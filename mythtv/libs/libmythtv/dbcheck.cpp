@@ -4064,6 +4064,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1380")
+    {
+        DBUpdates updates {
+            "ALTER TABLE filemarkup ADD INDEX (type);"
+        } ;
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1381", dbver))
+            return false;
+    }
+
     return true;
 }
 
