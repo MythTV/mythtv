@@ -39,6 +39,27 @@
         "yes": "Sì"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Determina il numero massimo di giorni prima che il ripristino dell'eliminazione di una registrazione diventi impossibile. Un valore pari a zero significa che la registrazione verrà eliminata definitivamente tra 5 e 20 minuti dopo. Un valore meno uno indica che le registrazioni verranno conservate finché non sarà richiesto spazio. Una registrazione verrà sempre rimossa prima di questo momento se è necessario spazio per una nuova registrazione.",
+            "deleted_label": "Tempo di conservazione delle registrazioni cancellate (giorni)",
+            "disk_desc": "Spazio su disco extra (in gigabyte) oltre quello richiesto da MythTV che vuoi mantenere libero sui file system di registrazione.",
+            "disk_label": "Spazio su disco aggiuntivo (GB)",
+            "heading": "Scadenza automatica",
+            "livetv_desc": "La scadenza automatica forzerà la scadenza delle registrazioni TV in diretta quando avranno raggiunto questo numero di giorni. Se necessario, le registrazioni della TV in diretta potrebbero anche scadere anticipatamente per liberare spazio su disco.",
+            "livetv_label": "Età massima per la TV in diretta (giorni)",
+            "method_desc": "Metodo utilizzato per determinare quali programmi registrati eliminare per primi. Le registrazioni TV in diretta scadono sempre prima delle normali registrazioni.",
+            "method_label": "Metodo di scadenza automatica",
+            "method_lowest": "Prima la priorità più bassa",
+            "method_oldest": "Prima lo spettacolo più vecchio",
+            "method_weighted": "Combinazione tempo/priorità ponderata",
+            "priority_desc": "Il numero di giorni di bonus che un programma ottiene per ciascun punto di priorità. Viene utilizzato solo quando è selezionato il metodo di scadenza automatica tempo/priorità ponderato.",
+            "priority_label": "Peso prioritario",
+            "rerecord_desc": "Se abilitato, i programmi che sono stati contrassegnati come guardati e che sono scaduti automaticamente verranno registrati nuovamente se vengono mostrati di nuovo.",
+            "rerecord_label": "Guardato nuovamente la registrazione",
+            "subtitle": "Impostazioni che controllano quando le registrazioni vengono eliminate dall'archivio.",
+            "watched_desc": "Se abilitato, i programmi contrassegnati come guardati scadranno prima dei programmi che non sono stati guardati.",
+            "watched_label": "Visto prima non guardato"
+        },
         "backendStatus": "Stato Back-end",
         "channeleditor": "Editor Canali",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Impostazioni di localizzazione",
             "tvformat_desc": "Lo standard TV da utilizzare per guardare la TV.",
             "tvformat_label": "Formati TV",
+            "tvformats_label": "Formati televisivi",
             "vbiformat_desc": "Il VBI (Vertical Blanking Interval) viene utilizzato per contenere dati Teletext o Sottotitoli.",
             "vbiformat_label": "Formato VBI"
         },

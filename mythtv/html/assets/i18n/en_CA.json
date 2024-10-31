@@ -39,6 +39,27 @@
         "yes": "Yes"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.",
+            "deleted_label": "Time to retain deleted recordings (days)",
+            "disk_desc": "Extra disk space (in gigabytes) beyond what MythTV requires that you want to keep free on the recording file systems.",
+            "disk_label": "Extra disk space (GB)",
+            "heading": "Auto-Expire",
+            "livetv_desc": "Auto-Expire will force expiration of Live TV recordings when they are this many days old. Live TV recordings may also be expired early if necessary to free up disk space.",
+            "livetv_label": "Live TV max age (days)",
+            "method_desc": "Method used to determine which recorded shows to delete first. Live TV recordings will always expire before normal recordings.",
+            "method_label": "Auto-Expire Method",
+            "method_lowest": "Lowest priority first",
+            "method_oldest": "Oldest show first",
+            "method_weighted": "Weighted time/priority combination",
+            "priority_desc": "The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.",
+            "priority_label": "Priority weight",
+            "rerecord_desc": "If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.",
+            "rerecord_label": "Re-record watched",
+            "subtitle": "Settings that control when recordings are deleted from storage.",
+            "watched_desc": "If enabled, programs that have been marked as watched will be expired before programs that have not been watched.",
+            "watched_label": "Watched before unwatched"
+        },
         "backendStatus": "Backend Status",
         "channeleditor": "Channel Editor",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Locale Settings",
             "tvformat_desc": "The TV standard to use for viewing TV.",
             "tvformat_label": "TV Formats",
+            "tvformats_label": "TV Formats",
             "vbiformat_desc": "The VBI (Vertical Blanking Interval) is used to carry Teletext or Closed Captions data.",
             "vbiformat_label": "VBI Format"
         },

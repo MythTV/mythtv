@@ -39,6 +39,27 @@
         "yes": "Evet"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Bir kaydın silinmesinin imkansız hale gelmesinden önceki maksimum gün sayısını belirler. Sıfır değeri, kaydın 5 ila 20 dakika sonra kalıcı olarak silineceği anlamına gelir. Eksi bir değeri, kayıtların alan gerekene kadar saklanacağı anlamına gelir. Yeni bir kayıt için alana ihtiyaç duyulursa, kayıt her zaman bu süreden önce kaldırılacaktır.",
+            "deleted_label": "Silinen kayıtları saklama süresi (gün)",
+            "disk_desc": "Kayıt dosya sistemlerinde boş tutmak istediğiniz MythTV'nin gerektirdiğinin ötesinde ekstra disk alanı (gigabayt cinsinden).",
+            "disk_label": "Ekstra disk alanı (GB)",
+            "heading": "Otomatik Sona Erme",
+            "livetv_desc": "Otomatik Süre Sonu, Canlı TV kayıtlarının bu kadar eski olduğunda sona ermesini zorlayacaktır. Disk alanını boşaltmak için gerekirse canlı TV kayıtlarının süresi de erken dolabilir.",
+            "livetv_label": "Canlı TV maksimum yaşı (gün)",
+            "method_desc": "Hangi kayıtlı programın ilk önce silineceğini belirlemek için kullanılan yöntem. Canlı TV kayıtları her zaman normal kayıtlardan önce sona erecektir.",
+            "method_label": "Otomatik Sona Erme Yöntemi",
+            "method_lowest": "Önce en düşük öncelik",
+            "method_oldest": "En eski gösteri ilk sırada",
+            "method_weighted": "Ağırlıklı zaman/öncelik kombinasyonu",
+            "priority_desc": "Bir programın her öncelik noktası için aldığı bonus gün sayısı. Bu yalnızca Ağırlıklı süre/öncelik Otomatik Sona Erme yöntemi seçildiğinde kullanılır.",
+            "priority_label": "Öncelik ağırlığı",
+            "rerecord_desc": "Etkinleştirilirse, izlendi olarak işaretlenen ve Otomatik Süresi Dolmuş programlar, tekrar gösterilmeleri durumunda yeniden kaydedilecektir.",
+            "rerecord_label": "İzlenenleri yeniden kaydet",
+            "subtitle": "Kayıtların depolama alanından ne zaman silineceğini kontrol eden ayarlar.",
+            "watched_desc": "Etkinleştirilirse, izlendi olarak işaretlenen programların süresi, izlenmeyen programlardan önce dolacaktır.",
+            "watched_label": "İzlenmeden önce izlendi"
+        },
         "backendStatus": "Arka Uç Durumu",
         "channeleditor": "Kanal Editörü",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Yerel Ayarlar",
             "tvformat_desc": "TV izlemek için kullanılacak TV standardı.",
             "tvformat_label": "TV Formatları",
+            "tvformats_label": "TV Formatları",
             "vbiformat_desc": "Teletext veya Kapalı Altyazı verilerini taşımak için VBI (Dikey Boşluk Aralığı) kullanılır.",
             "vbiformat_label": "VBI Biçimi"
         },

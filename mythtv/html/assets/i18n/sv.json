@@ -39,6 +39,27 @@
         "yes": "Ja"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Bestämmer det maximala antalet dagar innan det blir omöjligt att återställa en inspelning. Ett värde på noll betyder att inspelningen kommer att raderas permanent mellan 5 och 20 minuter senare. Ett värde på minus ett betyder att inspelningar kommer att behållas tills utrymme krävs. En inspelning kommer alltid att tas bort före denna tidpunkt om utrymme behövs för en ny inspelning.",
+            "deleted_label": "Dags att behålla raderade inspelningar (dagar)",
+            "disk_desc": "Extra diskutrymme (i gigabyte) utöver vad MythTV kräver att du vill ha ledigt på inspelningsfilsystemen.",
+            "disk_label": "Extra diskutrymme (GB)",
+            "heading": "Utgår automatiskt",
+            "livetv_desc": "Auto-Expire kommer att tvinga utgången av Live TV-inspelningar när de är så många dagar gamla. Live-TV-inspelningar kan också förfalla tidigt om det behövs för att frigöra diskutrymme.",
+            "livetv_label": "Max ålder för live-tv (dagar)",
+            "method_desc": "Metod som används för att avgöra vilka inspelade program som ska raderas först. Live-TV-inspelningar kommer alltid att upphöra före normala inspelningar.",
+            "method_label": "Auto-Expire-metod",
+            "method_lowest": "Lägsta prioritet först",
+            "method_oldest": "Äldsta föreställningen först",
+            "method_weighted": "Viktad kombination av tid/prioritet",
+            "priority_desc": "Antalet dagars bonus ett program får för varje prioritetspoäng. Detta används endast när metoden viktad tid/prioritet Auto-Expire är vald.",
+            "priority_label": "Prioriterad vikt",
+            "rerecord_desc": "Om det är aktiverat kommer program som har markerats som sedda och som har löpt ut automatiskt att spelas in igen om de visas igen.",
+            "rerecord_label": "Återinspelning sågs",
+            "subtitle": "Inställningar som styr när inspelningar raderas från lagringen.",
+            "watched_desc": "Om det är aktiverat kommer program som har markerats som sedda att förfalla före program som inte har setts.",
+            "watched_label": "Tittade innan osett"
+        },
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredigerare",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Lokalinställningar",
             "tvformat_desc": "TV-standarden att använda för att titta på TV.",
             "tvformat_label": "TV-format",
+            "tvformats_label": "TV-format",
             "vbiformat_desc": "VBI (Vertical Blanking Interval) används för att överföra text-TV eller stängda bildtexter.",
             "vbiformat_label": "VBI-format"
         },

@@ -1,16 +1,20 @@
 <p-card>
     <h2>{{ 'dashboard.settings.heading' | translate }}</h2>
     <p-accordion class="col-12 w-full p-0" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
-        <p-accordionTab header="{{ 'dashboard.channelgroup.heading' | translate }}">
+        <p-accordionTab header="{{ 'dashboard.autoexpire.heading' | translate }}">
             <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[0] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-auto-expire></app-auto-expire>
+            </ng-template>
+        </p-accordionTab>
+        <p-accordionTab header="{{ 'dashboard.channelgroup.heading' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[1] }}</b></ng-template>
             <ng-template pTemplate="content">
                 <app-channel-groups></app-channel-groups>
             </ng-template>
         </p-accordionTab>
-    </p-accordion>
-    <p-accordion class="col-12 w-full p-0" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
         <p-accordionTab header="{{ 'dashboard.playgroup.heading' | translate }}">
-            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[1] }}</b></ng-template>
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[2] }}</b></ng-template>
             <ng-template pTemplate="content">
                 <app-playback-groups></app-playback-groups>
             </ng-template>

@@ -39,6 +39,27 @@
         "yes": "是的"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "确定无法取消删除录音之前的最大天数。值为零表示录音将在 5 到 20 分钟后永久删除。值减一表示将保留录音，直到需要空间为止。如果新录音需要空间，则在此时间之前录音将始终被删除。",
+            "deleted_label": "保留已删除录音的时间（天）",
+            "disk_desc": "超出 MythTV 要求的额外磁盘空间（以 GB 为单位），您希望在录制文件系统上保持空闲。",
+            "disk_label": "额外磁盘空间 (GB)",
+            "heading": "自动过期",
+            "livetv_desc": "当直播电视录制已经存在这么多天时，自动过期将强制它们过期。如果需要释放磁盘空间，直播电视录制也可能会提前过期。",
+            "livetv_label": "直播电视最长时长（天）",
+            "method_desc": "用于确定首先删除哪些录制节目的方法。直播电视录制始终会在正常录制之前过期。",
+            "method_label": "自动过期方法",
+            "method_lowest": "优先级最低的优先",
+            "method_oldest": "最旧的节目优先",
+            "method_weighted": "加权时间/优先级组合",
+            "priority_desc": "计划为每个优先点获得的奖励天数。仅当选择加权时间/优先级自动过期方法时才使用此选项。",
+            "priority_label": "优先权重",
+            "rerecord_desc": "如果启用，已标记为已观看且自动过期的节目如果再次显示，将重新录制。",
+            "rerecord_label": "重新录制观看过的内容",
+            "subtitle": "控制何时从存储中删除录音的设置。",
+            "watched_desc": "如果启用，已标记为已观看的节目将先于未观看的节目过期。",
+            "watched_label": "在未观看之前观看过"
+        },
         "backendStatus": "后端状态",
         "channeleditor": "频道编辑",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "区域设置",
             "tvformat_desc": "用于观看电视的电视标准。",
             "tvformat_label": "电视格式",
+            "tvformats_label": "电视格式",
             "vbiformat_desc": "VBI（垂直消隐间隔）用于传送图文电视或隐藏式字幕数据。",
             "vbiformat_label": "VBI格式"
         },

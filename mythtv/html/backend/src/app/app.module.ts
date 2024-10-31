@@ -85,6 +85,7 @@ import { LegendComponent } from './guide/components/legend/legend.component';
 import { DashboardSettingsComponent } from './dashboard/dashboard-settings/dashboard-settings.component';
 import { PlaybackGroupsComponent } from './dashboard/dashboard-settings/playback-groups/playback-groups.component';
 import { ChannelGroupsComponent } from './dashboard/dashboard-settings/channel-groups/channel-groups.component';
+import { AutoExpireComponent } from './dashboard/dashboard-settings/auto-expire/auto-expire.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -165,6 +166,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     DashboardSettingsComponent,
     PlaybackGroupsComponent,
     ChannelGroupsComponent,
+    AutoExpireComponent,
   ],
   imports: [
     BrowserModule,

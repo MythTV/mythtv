@@ -4,6 +4,7 @@ import { TranslateService } from "@ngx-translate/core";
 import { Observable, of, PartialObserver } from "rxjs";
 import { DvrService } from "src/app/services/dvr.service";
 import { PlayGroup } from "src/app/services/interfaces/dvr.interface";
+import { SetupService } from "src/app/services/setup.service";
 
 @Component({
   selector: 'app-playback-groups',
@@ -38,12 +39,17 @@ export class PlaybackGroupsComponent implements OnInit {
 
   group: PlayGroup = this.resetGroup();
 
-  constructor(private dvrService: DvrService, private translate: TranslateService) {
+  constructor(private dvrService: DvrService, private translate: TranslateService,
+    private setupService: SetupService) {
   }
 
   ngOnInit(): void {
     this.loadTranslations();
     this.loadGroups();
+  }
+
+  ngAfterViewInit() {
+    this.setupService.setCurrentForm(this.currentForm);
   }
 
   loadTranslations(): void {

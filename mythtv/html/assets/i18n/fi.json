@@ -39,6 +39,27 @@
         "yes": "Joo"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Määrittää päivien enimmäismäärän, ennen kuin tallenteen poistaminen tulee mahdottomaksi. Arvo nolla tarkoittaa, että tallenne poistetaan pysyvästi 5–20 minuutin kuluttua. Arvo miinus yksi tarkoittaa, että tallenteet säilytetään, kunnes tilaa tarvitaan. Tallenne poistetaan aina ennen tätä aikaa, jos tilaa tarvitaan uudelle tallenteelle.",
+            "deleted_label": "Poistettujen tallenteiden säilytysaika (päiviä)",
+            "disk_desc": "Ylimääräistä levytilaa (gigatavuina) enemmän kuin mitä MythTV vaatii, jotta haluat pitää vapaana tallennustiedostojärjestelmissä.",
+            "disk_label": "Ylimääräistä levytilaa (GB)",
+            "heading": "Automaattinen vanheneminen",
+            "livetv_desc": "Auto-Expire pakottaa suorien TV-tallenteiden vanhenemisen, kun ne ovat näin monta päivää vanhoja. Suorat TV-tallenteet voidaan myös vanhentua aikaisin, jos se on tarpeen levytilan vapauttamiseksi.",
+            "livetv_label": "Live-TV:n enimmäisikä (päivää)",
+            "method_desc": "Menetelmä, jolla määritetään, mitkä tallennetut ohjelmat poistetaan ensin. Suorat TV-tallenteet vanhenevat aina ennen normaaleja tallennuksia.",
+            "method_label": "Automaattinen vanhenemismenetelmä",
+            "method_lowest": "Alhaisin prioriteetti ensin",
+            "method_oldest": "Vanhin esitys ensin",
+            "method_weighted": "Painotettu aika/prioriteetti-yhdistelmä",
+            "priority_desc": "Päivien lukumäärä bonusta, jonka ohjelma saa jokaisesta prioriteettipisteestä. Tätä käytetään vain, kun Painotettu aika/prioriteetti automaattinen vanhenemismenetelmä on valittuna.",
+            "priority_label": "Prioriteettipaino",
+            "rerecord_desc": "Jos tämä on käytössä, katsotuiksi merkityt ja automaattisesti vanhentuneet ohjelmat tallennetaan uudelleen, jos ne näytetään uudelleen.",
+            "rerecord_label": "Uudelleennauhoitus katsottu",
+            "subtitle": "Asetukset, joilla määritetään, milloin tallenteet poistetaan tallennustilasta.",
+            "watched_desc": "Jos tämä on käytössä, katsotuiksi merkityt ohjelmat vanhenevat ennen ohjelmia, joita ei ole katsottu.",
+            "watched_label": "Katsottu ennen katsomatta"
+        },
         "backendStatus": "Taustajärjestelmän tila",
         "channeleditor": "Kanavaeditori",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Kieliasetukset",
             "tvformat_desc": "TV-standardi, jota käytetään television katseluun.",
             "tvformat_label": "TV-muodot",
+            "tvformats_label": "TV-muodot",
             "vbiformat_desc": "VBI:tä (Vertical Blanking Interval) käytetään teksti-tv- tai tekstitystietojen kuljettamiseen.",
             "vbiformat_label": "VBI-muoto"
         },

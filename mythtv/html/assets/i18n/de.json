@@ -39,6 +39,27 @@
         "yes": "Ja"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Legt die maximale Anzahl an Tagen fest, bevor das Wiederherstellen einer Aufzeichnung unmöglich wird. Ein Wert von Null bedeutet, dass die Aufnahme nach 5 bis 20 Minuten endgültig gelöscht wird. Ein Wert von minus eins bedeutet, dass die Aufzeichnungen so lange aufbewahrt werden, bis Speicherplatz benötigt wird. Eine Aufnahme wird immer vor diesem Zeitpunkt entfernt, wenn der Platz für eine neue Aufnahme benötigt wird.",
+            "deleted_label": "Aufbewahrungszeit gelöschter Aufnahmen (Tage)",
+            "disk_desc": "Zusätzlicher Speicherplatz (in Gigabyte), der über den von MythTV benötigten Speicherplatz hinausgeht und den Sie auf den Aufnahmedateisystemen freihalten möchten.",
+            "disk_label": "Zusätzlicher Speicherplatz (GB)",
+            "heading": "Automatisches Ablaufen",
+            "livetv_desc": "Die automatische Ablaufzeit erzwingt den Ablauf von Live-TV-Aufzeichnungen, wenn diese so viele Tage alt sind. Live-TV-Aufzeichnungen können bei Bedarf auch vorzeitig abgelaufen werden, um Speicherplatz freizugeben.",
+            "livetv_label": "Maximales Live-TV-Alter (Tage)",
+            "method_desc": "Methode zur Bestimmung, welche aufgezeichneten Sendungen zuerst gelöscht werden sollen. Live-TV-Aufzeichnungen laufen immer vor normalen Aufzeichnungen ab.",
+            "method_label": "Auto-Expire-Methode",
+            "method_lowest": "Niedrigste Priorität zuerst",
+            "method_oldest": "Älteste Show zuerst",
+            "method_weighted": "Gewichtete Zeit-/Prioritätskombination",
+            "priority_desc": "Die Anzahl der Bonustage, die ein Programm für jeden Prioritätspunkt erhält. Dies wird nur verwendet, wenn die Methode „Gewichtete Zeit/Priorität Auto-Ablauf“ ausgewählt ist.",
+            "priority_label": "Prioritätsgewicht",
+            "rerecord_desc": "Wenn diese Option aktiviert ist, werden Sendungen, die als angesehen markiert wurden und automatisch abgelaufen sind, neu aufgezeichnet, wenn sie erneut angezeigt werden.",
+            "rerecord_label": "Neuaufnahme angesehen",
+            "subtitle": "Einstellungen, die steuern, wann Aufnahmen aus dem Speicher gelöscht werden.",
+            "watched_desc": "Wenn diese Option aktiviert ist, laufen Sendungen, die als angesehen markiert wurden, vor Sendungen ab, die nicht angesehen wurden.",
+            "watched_label": "Gesehen, bevor man es nicht mehr sah"
+        },
         "backendStatus": "Backend-Status",
         "channeleditor": "Kanaleditor",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Gebietsschemaeinstellungen",
             "tvformat_desc": "Der zum Fernsehen zu verwendende TV-Standard.",
             "tvformat_label": "TV-Formate",
+            "tvformats_label": "TV-Formate",
             "vbiformat_desc": "Das VBI (Vertical Blanking Interval) wird zur Übertragung von Teletext- oder Untertiteldaten verwendet.",
             "vbiformat_label": "VBI-Format"
         },

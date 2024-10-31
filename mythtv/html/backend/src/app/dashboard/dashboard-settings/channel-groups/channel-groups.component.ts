@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
@@ -7,6 +7,7 @@ import { GuideService } from 'src/app/services/guide.service';
 import { Channel } from 'src/app/services/interfaces/channel.interface';
 import { ChannelGroup } from 'src/app/services/interfaces/channelgroup.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
+import { SetupService } from 'src/app/services/setup.service';
 
 
 interface MyChannel extends Channel {
@@ -26,7 +27,7 @@ interface MyChannelGroup extends ChannelGroup {
   templateUrl: './channel-groups.component.html',
   styleUrls: ['./channel-groups.component.css']
 })
-export class ChannelGroupsComponent implements OnInit {
+export class ChannelGroupsComponent implements OnInit, AfterViewInit {
 
   @ViewChild("changrpform") currentForm!: NgForm;
 
@@ -62,13 +63,17 @@ export class ChannelGroupsComponent implements OnInit {
   group: MyChannelGroup = this.resetGroup();
 
   constructor(private channelService: ChannelService, private guideService: GuideService,
-    private translate: TranslateService) {
+    private translate: TranslateService, private setupService: SetupService ) {
   }
 
   ngOnInit(): void {
     this.loadTranslations();
     this.loadGroups();
     this.loadAllChannels();
+  }
+
+  ngAfterViewInit() {
+    this.setupService.setCurrentForm(this.currentForm);
   }
 
   loadTranslations(): void {

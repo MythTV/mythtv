@@ -39,6 +39,27 @@
         "yes": "Já"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Ákveður hámarksfjölda daga áður en það verður ómögulegt að afturkalla upptöku. Gildi núll þýðir að upptökunni verður eytt varanlega á milli 5 og 20 mínútum síðar. Gildi mínus einn þýðir að upptökur verða geymdar þar til pláss þarf. Upptaka verður alltaf fjarlægð fyrir þann tíma ef pláss þarf fyrir nýja upptöku.",
+            "deleted_label": "Tími til að varðveita eyddar upptökur (dagar)",
+            "disk_desc": "Auka pláss á plássi (í gígabætum) umfram það sem MythTV krefst sem þú vilt halda lausu í upptökuskráarkerfunum.",
+            "disk_label": "Auka pláss (GB)",
+            "heading": "Rennur sjálfkrafa út",
+            "livetv_desc": "Auto-Expire mun knýja á um að sjónvarpsupptökur í beinni renna út þegar þær eru svona margra daga gamlar. Sjónvarpsupptökur í beinni geta einnig runnið út snemma ef nauðsyn krefur til að losa um pláss.",
+            "livetv_label": "Hámarksaldur sjónvarps í beinni (dagar)",
+            "method_desc": "Aðferð notuð til að ákvarða hvaða uppteknum þáttum á að eyða fyrst. Sjónvarpsupptökur í beinni munu alltaf renna út fyrir venjulegar upptökur.",
+            "method_label": "Sjálfvirk útrunnunaraðferð",
+            "method_lowest": "Lægsti forgangur fyrst",
+            "method_oldest": "Elsta sýning fyrst",
+            "method_weighted": "Vegin samsetning tíma/forgangs",
+            "priority_desc": "Fjöldi daga bónus sem forrit fær fyrir hvern forgangspunkt. Þetta er aðeins notað þegar Weighted time/forgang Auto-Expire aðferðin er valin.",
+            "priority_label": "Forgangsþyngd",
+            "rerecord_desc": "Ef það er virkt verða þættir sem hafa verið merktir sem áhorfendur og eru útrunnir sjálfkrafa teknir upp aftur ef þeir eru sýndir aftur.",
+            "rerecord_label": "Skoðað var aftur upptöku",
+            "subtitle": "Stillingar sem stjórna því hvenær upptökum er eytt úr geymslu.",
+            "watched_desc": "Ef þetta er virkt munu þættir sem hafa verið merktir sem horft verða útrunnir á undan forritum sem ekki hefur verið horft á.",
+            "watched_label": "Horfði áður óhorft"
+        },
         "backendStatus": "Staða bakenda",
         "channeleditor": "Rásarstjóri",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Staðarstillingar",
             "tvformat_desc": "Sjónvarpsstaðalinn til að nota til að skoða sjónvarp.",
             "tvformat_label": "Sjónvarpssnið",
+            "tvformats_label": "Sjónvarpssnið",
             "vbiformat_desc": "VBI (Vertical Blanking Interval) er notað til að flytja textavarps- eða skjátextagögn.",
             "vbiformat_label": "VBI snið"
         },

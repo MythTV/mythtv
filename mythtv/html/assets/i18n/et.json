@@ -39,6 +39,27 @@
         "yes": "Jah"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Määrab maksimaalse päevade arvu, enne kui salvestuse kustutamine muutub võimatuks. Väärtus null tähendab, et salvestis kustutatakse jäädavalt 5–20 minuti pärast. Väärtus miinus üks tähendab, et salvestisi säilitatakse seni, kuni ruumi on vaja. Salvestis eemaldatakse alati enne seda aega, kui uue salvestuse jaoks on vaja ruumi.",
+            "deleted_label": "Kustutatud salvestiste säilitamise aeg (päevad)",
+            "disk_desc": "Täiendav kettaruum (gigabaitides) rohkem kui MythTV nõuab, et soovite salvestusfailisüsteemides vaba hoida.",
+            "disk_label": "Täiendav kettaruum (GB)",
+            "heading": "Automaatne aegumine",
+            "livetv_desc": "Automaatne aegumine sunnib telesaadete otsesaadete aeguma, kui need on nii mitu päeva vanad. Vajadusel kettaruumi vabastamiseks võivad telesaadete otseülekanded aeguda ka varakult.",
+            "livetv_label": "TV otseülekande maksimaalne vanus (päevades)",
+            "method_desc": "Meetod, mida kasutatakse selleks, et määrata, millised salvestatud saated kõigepealt kustutada. Telesaadete otseülekanded aeguvad alati enne tavalisi salvestusi.",
+            "method_label": "Automaatse aegumise meetod",
+            "method_lowest": "Madalaim prioriteet kõigepealt",
+            "method_oldest": "Kõigepealt vanim saade",
+            "method_weighted": "Kaalutud aja/prioriteedi kombinatsioon",
+            "priority_desc": "Päevade arv boonust, mille programm iga prioriteetse punkti eest saab. Seda kasutatakse ainult siis, kui valitud on Kaalutud aja/prioriteediga automaatse aegumise meetod.",
+            "priority_label": "Prioriteetne kaal",
+            "rerecord_desc": "Kui see on lubatud, salvestatakse vaadatuks märgitud ja automaatselt aegunud saated uuesti, kui neid uuesti näidatakse.",
+            "rerecord_label": "Salvestus uuesti vaadatud",
+            "subtitle": "Seaded, mis määravad, millal salvestised salvestusruumist kustutatakse.",
+            "watched_desc": "Kui see on lubatud, aeguvad vaadatuks märgitud saated enne neid saateid, mida pole vaadatud.",
+            "watched_label": "Vaadatud enne vaatamata"
+        },
         "backendStatus": "Taustaprogrammi olek",
         "channeleditor": "Kanali redaktor",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Lokaadi sätted",
             "tvformat_desc": "Teleri vaatamise standard.",
             "tvformat_label": "TV formaadid",
+            "tvformats_label": "TV formaadid",
             "vbiformat_desc": "VBI-d (Vertical Blanking Interval) kasutatakse teleteksti või subtiitrite andmete edastamiseks.",
             "vbiformat_label": "VBI-vorming"
         },

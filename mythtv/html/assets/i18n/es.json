@@ -39,6 +39,27 @@
         "yes": "Sí"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Determina el número máximo de días antes de que sea imposible recuperar una grabación. Un valor de cero significa que la grabación se eliminará permanentemente entre 5 y 20 minutos después. Un valor de menos uno significa que las grabaciones se conservarán hasta que se requiera espacio. Una grabación siempre se eliminará antes de este tiempo si se necesita espacio para una nueva grabación.",
+            "deleted_label": "Tiempo para conservar las grabaciones eliminadas (días)",
+            "disk_desc": "Espacio adicional en disco (en gigabytes) más allá de lo que MythTV requiere y que desea mantener libre en los sistemas de archivos de grabación.",
+            "disk_label": "Espacio extra en disco (GB)",
+            "heading": "Caducidad automática",
+            "livetv_desc": "La caducidad automática forzará la caducidad de las grabaciones de Live TV cuando tengan tantos días de antigüedad. Las grabaciones de TV en vivo también pueden caducar antes de tiempo si es necesario para liberar espacio en el disco.",
+            "livetv_label": "Edad máxima de TV en vivo (días)",
+            "method_desc": "Método utilizado para determinar qué programas grabados eliminar primero. Las grabaciones de TV en vivo siempre caducan antes que las grabaciones normales.",
+            "method_label": "Método de caducidad automática",
+            "method_lowest": "La prioridad más baja primero",
+            "method_oldest": "El programa más antiguo primero",
+            "method_weighted": "Combinación ponderada de tiempo/prioridad",
+            "priority_desc": "La cantidad de días de bonificación que obtiene un programa por cada punto de prioridad. Esto solo se utiliza cuando se selecciona el método de caducidad automática de prioridad/tiempo ponderado.",
+            "priority_label": "Peso prioritario",
+            "rerecord_desc": "Si está habilitado, los programas que han sido marcados como vistos y caducan automáticamente se volverán a grabar si se muestran nuevamente.",
+            "rerecord_label": "Volver a grabar visto",
+            "subtitle": "Configuraciones que controlan cuándo se eliminan las grabaciones del almacenamiento.",
+            "watched_desc": "Si está habilitado, los programas que se hayan marcado como vistos caducarán antes que los programas que no se hayan visto.",
+            "watched_label": "Visto antes de no visto"
+        },
         "backendStatus": "Estado de back-end",
         "channeleditor": "Editor de canales",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Configuración regional",
             "tvformat_desc": "El estándar de TV que se utilizará para ver la televisión.",
             "tvformat_label": "Formatos de televisión",
+            "tvformats_label": "Formatos de televisión",
             "vbiformat_desc": "El VBI (Intervalo de Supresión Vertical) se utiliza para transportar datos de Teletexto o Subtítulos.",
             "vbiformat_label": "Formato VBI"
         },

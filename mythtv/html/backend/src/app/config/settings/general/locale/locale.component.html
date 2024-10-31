@@ -8,9 +8,9 @@
         </ng-template>
         <ng-template pTemplate="TV Formats">
             <div class="grid">
-                <p-fieldset class="mb-4 w-full" legend="{{ 'settings.locale.tvformat_label' | translate }}">
+                <p-fieldset class="mb-4 w-full" legend="{{ 'settings.locale.tvformats_label' | translate }}">
                     <div class="form-group field">
-                        <label for="tvformat" class="label block">TV Format</label>
+                        <label for="tvformat" class="label block">{{ 'settings.locale.tvformat_label' | translate }}</label>
                         <p-dropdown  appendTo="body" [options]="m_TVFormats" [(ngModel)]="TVFormat" class="w-full mb-2" name="tvformat"
                             aria-describedby="tvformat-help">
                         </p-dropdown>

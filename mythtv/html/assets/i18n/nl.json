@@ -39,6 +39,27 @@
         "yes": "Ja"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Bepaalt het maximale aantal dagen voordat het ongedaan maken van de verwijdering van een opname onmogelijk wordt. Een waarde nul betekent dat de opname tussen 5 en 20 minuten later definitief wordt verwijderd. Een waarde van min één betekent dat de opnames worden bewaard totdat er ruimte nodig is. Een opname wordt altijd vóór dit tijdstip verwijderd als er ruimte nodig is voor een nieuwe opname.",
+            "deleted_label": "Tijd om verwijderde opnamen te bewaren (dagen)",
+            "disk_desc": "Extra schijfruimte (in gigabytes) die verder gaat dan wat MythTV vereist en die u vrij wilt houden op de opnamebestandssystemen.",
+            "disk_label": "Extra schijfruimte (GB)",
+            "heading": "Automatisch verlopen",
+            "livetv_desc": "Auto-Expire forceert het verlopen van Live TV-opnamen als ze zoveel dagen oud zijn. Live tv-opnamen kunnen indien nodig ook vroegtijdig vervallen om schijfruimte vrij te maken.",
+            "livetv_label": "Max. leeftijd live tv (dagen)",
+            "method_desc": "Methode die wordt gebruikt om te bepalen welke opgenomen programma's als eerste moeten worden verwijderd. Live tv-opnames verlopen altijd eerder dan normale opnames.",
+            "method_label": "Automatische vervalmethode",
+            "method_lowest": "Laagste prioriteit eerst",
+            "method_oldest": "Oudste show eerst",
+            "method_weighted": "Gewogen tijd/prioriteitcombinatie",
+            "priority_desc": "Het aantal bonusdagen dat een programma krijgt voor elk prioriteitspunt. Dit wordt alleen gebruikt als de methode Gewogen tijd/prioriteit automatisch verlopen is geselecteerd.",
+            "priority_label": "Prioriteitsgewicht",
+            "rerecord_desc": "Indien ingeschakeld, worden programma's die zijn gemarkeerd als bekeken en automatisch verlopen, opnieuw opgenomen als ze opnieuw worden weergegeven.",
+            "rerecord_label": "Opnieuw opnemen bekeken",
+            "subtitle": "Instellingen die bepalen wanneer opnamen uit de opslag worden verwijderd.",
+            "watched_desc": "Indien ingeschakeld, verlopen programma's die als bekeken zijn gemarkeerd eerder dan programma's die niet zijn bekeken.",
+            "watched_label": "Eerder bekeken dan niet bekeken"
+        },
         "backendStatus": "Backend-status",
         "channeleditor": "Kanaal-editor",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Lokale instellingen",
             "tvformat_desc": "De tv-standaard om tv te kijken.",
             "tvformat_label": "Tv-formaten",
+            "tvformats_label": "TV-formaten",
             "vbiformat_desc": "De VBI (Vertical Blanking Interval) wordt gebruikt om teletekst- of ondertitelingsgegevens over te dragen.",
             "vbiformat_label": "VBI-indeling"
         },

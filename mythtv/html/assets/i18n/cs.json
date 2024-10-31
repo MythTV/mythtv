@@ -39,6 +39,27 @@
         "yes": "Ano"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Určuje maximální počet dní, než bude obnovení záznamu nemožné. Hodnota nula znamená, že záznam bude trvale smazán mezi 5 a 20 minutami později. Hodnota mínus jedna znamená, že nahrávky budou uchovány, dokud nebude potřeba místo. Nahrávka bude vždy před touto dobou odstraněna, pokud je potřeba místo pro novou nahrávku.",
+            "deleted_label": "Čas pro uchování smazaných nahrávek (dny)",
+            "disk_desc": "Dodatečný prostor na disku (v gigabajtech) nad rámec toho, co MythTV vyžaduje, který chcete ponechat volný v systémech souborů nahrávání.",
+            "disk_label": "Místo na disku navíc (GB)",
+            "heading": "Automatické vypršení platnosti",
+            "livetv_desc": "Automatické vypršení platnosti vynutí vypršení platnosti nahrávek živého televizního vysílání, když jsou staré tolik dní. Je-li to nutné, aby se uvolnilo místo na disku, může také předčasně vypršet platnost nahrávek živého televizního vysílání.",
+            "livetv_label": "Maximální věk pro živé televizní vysílání (dny)",
+            "method_desc": "Metoda používaná k určení, které nahrané pořady se mají smazat jako první. Živé televizní nahrávky vždy vyprší dříve než normální nahrávky.",
+            "method_label": "Metoda automatického vypršení platnosti",
+            "method_lowest": "Nejdříve nejnižší priorita",
+            "method_oldest": "Nejdříve nejstarší představení",
+            "method_weighted": "Vážená kombinace čas/priorita",
+            "priority_desc": "Počet dní bonusu, který program získá za každý prioritní bod. Toto se používá pouze v případě, že je vybrána metoda automatického vypršení platnosti váženého času/priority.",
+            "priority_label": "Přednostní váha",
+            "rerecord_desc": "Pokud je povoleno, programy, které byly označeny jako sledované a jejichž platnost automaticky vypršela, budou znovu zaznamenány, pokud se znovu zobrazí.",
+            "rerecord_label": "Sledováno znovu nahrávání",
+            "subtitle": "Nastavení, která řídí, kdy jsou nahrávky smazány z úložiště.",
+            "watched_desc": "Pokud je povoleno, programy, které byly označeny jako sledované, vyprší dříve, než programy, které nebyly sledovány.",
+            "watched_label": "Sledováno předtím nesledováno"
+        },
         "backendStatus": "Stav backendu",
         "channeleditor": "Editor kanálu",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Nastavení národního prostředí",
             "tvformat_desc": "Televizní standard používaný pro sledování televize.",
             "tvformat_label": "TV formáty",
+            "tvformats_label": "TV formáty",
             "vbiformat_desc": "VBI (Vertical Blanking Interval) se používá k přenosu dat teletextu nebo skrytých titulků.",
             "vbiformat_label": "Formát VBI"
         },

@@ -39,6 +39,27 @@
         "yes": "Sim"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Determina o número máximo de dias antes que a recuperação de uma gravação se torne impossível. Um valor zero significa que a gravação será excluída permanentemente entre 5 e 20 minutos depois. Um valor menos um significa que as gravações serão retidas até que seja necessário espaço. Uma gravação será sempre removida antes deste horário se for necessário espaço para uma nova gravação.",
+            "deleted_label": "Tempo para reter gravações excluídas (dias)",
+            "disk_desc": "Espaço extra em disco (em gigabytes) além do que o MythTV exige e que você deseja manter livre nos sistemas de arquivos de gravação.",
+            "disk_label": "Espaço extra em disco (GB)",
+            "heading": "Expiração automática",
+            "livetv_desc": "A expiração automática forçará a expiração das gravações de TV ao vivo quando elas tiverem tantos dias. As gravações de TV ao vivo também podem expirar antecipadamente, se necessário, para liberar espaço em disco.",
+            "livetv_label": "Idade máxima da TV ao vivo (dias)",
+            "method_desc": "Método usado para determinar quais programas gravados serão excluídos primeiro. As gravações de TV ao vivo sempre expirarão antes das gravações normais.",
+            "method_label": "Método de expiração automática",
+            "method_lowest": "Prioridade mais baixa primeiro",
+            "method_oldest": "Programa mais antigo primeiro",
+            "method_weighted": "Combinação ponderada de tempo/prioridade",
+            "priority_desc": "O número de dias de bônus que um programa recebe para cada ponto de prioridade. Isso só é usado quando o método de expiração automática de tempo ponderado/prioridade é selecionado.",
+            "priority_label": "Peso prioritário",
+            "rerecord_desc": "Se ativado, os programas que foram marcados como assistidos e expirados automaticamente serão regravados se forem exibidos novamente.",
+            "rerecord_label": "Regravar assistido",
+            "subtitle": "Configurações que controlam quando as gravações são excluídas do armazenamento.",
+            "watched_desc": "Se ativado, os programas marcados como assistidos expirarão antes dos programas que não foram assistidos.",
+            "watched_label": "Assistido antes de não assistido"
+        },
         "backendStatus": "Status do back-end",
         "channeleditor": "Editor de canal",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Configurações de localidade",
             "tvformat_desc": "O padrão de TV a ser usado para assistir TV.",
             "tvformat_label": "Formatos de TV",
+            "tvformats_label": "Formatos de TV",
             "vbiformat_desc": "O VBI (Vertical Blanking Interval) é usado para transportar dados de Teletexto ou Closed Captions.",
             "vbiformat_label": "Formato VBI"
         },

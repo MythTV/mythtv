@@ -39,6 +39,27 @@
         "yes": "Igen"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Meghatározza a napok maximális számát, mielőtt a felvétel visszaállítása lehetetlenné válik. A nulla érték azt jelenti, hogy a felvétel véglegesen törlődik 5 és 20 perc között. A mínusz egy érték azt jelenti, hogy a felvételek mindaddig megmaradnak, amíg hely nem lesz szükséges. A felvétel mindig ez előtt az idő előtt törlődik, ha új felvételhez van szükség.",
+            "deleted_label": "A törölt felvételek megőrzésének ideje (nap)",
+            "disk_desc": "Extra lemezterület (gigabájtban), amely meghaladja azt, amit a MythTV megkövetel, hogy szabad maradjon a rögzítési fájlrendszereken.",
+            "disk_label": "Extra lemezterület (GB)",
+            "heading": "Automatikus lejárat",
+            "livetv_desc": "Az Auto-Expire kikényszeríti az élő TV-felvételek lejáratát, ha ennyi naposak. Az élő TV-felvételek lejárati ideje is lejárhat, ha szükséges lemezterület felszabadítása érdekében.",
+            "livetv_label": "Élő TV maximális életkora (nap)",
+            "method_desc": "A módszer annak meghatározására, hogy mely rögzített műsorokat kell először törölni. Az élő TV-felvételek mindig a normál felvételek előtt járnak le.",
+            "method_label": "Automatikus lejárati módszer",
+            "method_lowest": "Először a legalacsonyabb prioritás",
+            "method_oldest": "Először a legrégebbi műsor",
+            "method_weighted": "Súlyozott idő/prioritás kombináció",
+            "priority_desc": "A napok száma bónusz, amelyet egy program minden prioritási pontért kap. Ez csak akkor használható, ha a Súlyozott idő/prioritású automatikus lejárati módszer van kiválasztva.",
+            "priority_label": "Elsőbbségi súly",
+            "rerecord_desc": "Ha engedélyezve van, a megtekintettként megjelölt és automatikusan lejárt műsorokat a rendszer újra rögzíti, ha ismét megjelenik.",
+            "rerecord_label": "Újrafelvétel megnézve",
+            "subtitle": "Beállítások, amelyek szabályozzák, hogy mikor törlődnek a felvételek a tárhelyről.",
+            "watched_desc": "Ha engedélyezve van, a megtekintettként megjelölt programok a meg nem nézett műsorok előtt lejárnak.",
+            "watched_label": "Nézettség előtt megtekintve"
+        },
         "backendStatus": "Háttérrendszer állapota",
         "channeleditor": "Csatornaszerkesztő",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Nyelv-beállítások",
             "tvformat_desc": "A tévénézéshez használt TV szabvány.",
             "tvformat_label": "TV formátumok",
+            "tvformats_label": "TV formátumok",
             "vbiformat_desc": "A VBI (Vertical Blanking Interval) a Teletext vagy a Closed Captions adatok átvitelére szolgál.",
             "vbiformat_label": "VBI formátum"
         },

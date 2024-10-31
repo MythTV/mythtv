@@ -39,6 +39,27 @@
         "yes": "ja"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Določa največje število dni, preden razveljavitev izbrisa posnetka postane nemogoča. Vrednost nič pomeni, da bo posnetek trajno izbrisan med 5 in 20 minutami kasneje. Vrednost minus ena pomeni, da bodo posnetki shranjeni, dokler ne bo potreben prostor. Posnetek bo vedno odstranjen pred tem časom, če je potreben prostor za nov posnetek.",
+            "deleted_label": "Čas hrambe izbrisanih posnetkov (dnevi)",
+            "disk_desc": "Dodaten prostor na disku (v gigabajtih), ki presega potrebe MythTV, ki ga želite obdržati v snemalnih datotečnih sistemih.",
+            "disk_label": "Dodaten prostor na disku (GB)",
+            "heading": "Samodejni potek",
+            "livetv_desc": "Auto-Expire bo vsilil potek TV posnetkov v živo, ko so stari toliko dni. Posnetki TV v živo lahko tudi predčasno potečejo, da se sprosti prostor na disku.",
+            "livetv_label": "Največja starost TV v živo (dnevi)",
+            "method_desc": "Metoda, ki se uporablja za določanje, katere posnete oddaje je treba najprej izbrisati. Posnetki TV v živo vedno potečejo pred običajnimi posnetki.",
+            "method_label": "Metoda samodejnega izteka",
+            "method_lowest": "Najprej najnižja prioriteta",
+            "method_oldest": "Najprej najstarejša oddaja",
+            "method_weighted": "Utežena kombinacija časa/prednosti",
+            "priority_desc": "Število dni bonusa, ki ga program prejme za vsako prednostno točko. To se uporablja le, če je izbrana metoda uteženega časa/prioritetnega samodejnega poteka.",
+            "priority_label": "Prednostna teža",
+            "rerecord_desc": "Če je omogočeno, bodo programi, ki so bili označeni kot gledani in so samodejno potekli, znova posneti, če bodo znova prikazani.",
+            "rerecord_label": "Ponovno posneti gledano",
+            "subtitle": "Nastavitve, ki nadzorujejo, kdaj so posnetki izbrisani iz pomnilnika.",
+            "watched_desc": "Če je omogočeno, bodo programi, ki so bili označeni kot gledani, potekli pred programi, ki niso bili gledani.",
+            "watched_label": "Gledano prej neogledano"
+        },
         "backendStatus": "Stanje zaledja",
         "channeleditor": "Urejevalnik kanalov",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Lokalne nastavitve",
             "tvformat_desc": "TV standard, ki se uporablja za gledanje televizije.",
             "tvformat_label": "TV formati",
+            "tvformats_label": "TV formati",
             "vbiformat_desc": "VBI (Vertical Blanking Interval) se uporablja za prenos podatkov teleteksta ali podnapisov.",
             "vbiformat_label": "Format VBI"
         },

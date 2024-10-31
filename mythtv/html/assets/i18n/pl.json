@@ -39,6 +39,27 @@
         "yes": "Tak"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Określa maksymalną liczbę dni, po upływie których odzyskanie nagrania stanie się niemożliwe. Wartość zero oznacza, że ​​nagranie zostanie trwale usunięte po 5–20 minutach. Wartość minus jeden oznacza, że ​​nagrania będą przechowywane, dopóki nie będzie potrzebne wolne miejsce. Nagranie zostanie zawsze usunięte przed tym czasem, jeśli potrzebne będzie miejsce na nowe nagranie.",
+            "deleted_label": "Czas przechowywania usuniętych nagrań (dni)",
+            "disk_desc": "Dodatkowe miejsce na dysku (w gigabajtach) przekraczające wymagania MythTV, które chcesz zachować w systemach plików z nagraniami.",
+            "disk_label": "Dodatkowe miejsce na dysku (GB)",
+            "heading": "Automatyczne wygaśnięcie",
+            "livetv_desc": "Funkcja automatycznego wygaśnięcia wymusi wygaśnięcie nagrań telewizji na żywo, gdy mają tyle dni. Nagrania telewizyjne na żywo mogą również wygasnąć wcześniej, jeśli jest to konieczne, aby zwolnić miejsce na dysku.",
+            "livetv_label": "Maksymalny wiek telewizji na żywo (dni)",
+            "method_desc": "Metoda używana do określenia, które nagrane programy należy usunąć jako pierwsze. Nagrania telewizyjne na żywo zawsze wygasają przed normalnymi nagraniami.",
+            "method_label": "Metoda automatycznego wygaśnięcia",
+            "method_lowest": "Najpierw najniższy priorytet",
+            "method_oldest": "Najpierw najstarszy program",
+            "method_weighted": "Ważona kombinacja czasu/priorytetu",
+            "priority_desc": "Liczba dni premii, jaką program otrzymuje za każdy punkt priorytetu. Jest to używane tylko wtedy, gdy wybrana jest metoda automatycznego wygaśnięcia ważonego czasu/priorytetu.",
+            "priority_label": "Waga priorytetowa",
+            "rerecord_desc": "Jeśli ta opcja jest włączona, programy oznaczone jako obejrzane i których ważność wygasła automatycznie, zostaną ponownie nagrane, jeśli zostaną ponownie wyświetlone.",
+            "rerecord_label": "Nagraj ponownie obejrzane",
+            "subtitle": "Ustawienia kontrolujące usuwanie nagrań z pamięci.",
+            "watched_desc": "Jeśli ta opcja jest włączona, programy oznaczone jako obejrzane stracą ważność przed programami, które nie były oglądane.",
+            "watched_label": "Oglądane przed nieobejrzanym"
+        },
         "backendStatus": "Stan zaplecza",
         "channeleditor": "Edytor kanału",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Ustawienia regionalne",
             "tvformat_desc": "Standard telewizyjny używany do oglądania telewizji.",
             "tvformat_label": "Formaty telewizyjne",
+            "tvformats_label": "Formaty telewizyjne",
             "vbiformat_desc": "VBI (Vertical Blanking Interval) służy do przenoszenia danych telegazety lub napisów kodowanych.",
             "vbiformat_label": "formacie VBI"
         },

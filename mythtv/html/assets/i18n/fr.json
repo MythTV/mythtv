@@ -39,6 +39,27 @@
         "yes": "Oui"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Détermine le nombre maximum de jours avant que la restauration d'un enregistrement ne devienne impossible. Une valeur de zéro signifie que l'enregistrement sera définitivement supprimé entre 5 et 20 minutes plus tard. Une valeur de moins un signifie que les enregistrements seront conservés jusqu'à ce que de l'espace soit requis. Un enregistrement sera toujours supprimé avant cette heure si l'espace est nécessaire pour un nouvel enregistrement.",
+            "deleted_label": "Temps de conservation des enregistrements supprimés (jours)",
+            "disk_desc": "Espace disque supplémentaire (en gigaoctets) au-delà de ce dont MythTV a besoin et que vous souhaitez conserver sur les systèmes de fichiers d'enregistrement.",
+            "disk_label": "Espace disque supplémentaire (Go)",
+            "heading": "Expiration automatique",
+            "livetv_desc": "L'expiration automatique forcera l'expiration des enregistrements TV en direct lorsqu'ils ont autant de jours. Les enregistrements TV en direct peuvent également expirer prématurément si nécessaire pour libérer de l'espace disque.",
+            "livetv_label": "Âge maximum de la télévision en direct (jours)",
+            "method_desc": "Méthode utilisée pour déterminer quelles émissions enregistrées doivent être supprimées en premier. Les enregistrements TV en direct expireront toujours avant les enregistrements normaux.",
+            "method_label": "Méthode d'expiration automatique",
+            "method_lowest": "Priorité la plus basse en premier",
+            "method_oldest": "L'émission la plus ancienne en premier",
+            "method_weighted": "Combinaison temps/priorité pondérée",
+            "priority_desc": "Le nombre de jours de bonus qu'un programme obtient pour chaque point prioritaire. Ceci n’est utilisé que lorsque la méthode d’expiration automatique à temps/priorité pondéré est sélectionnée.",
+            "priority_label": "Poids prioritaire",
+            "rerecord_desc": "Si cette option est activée, les programmes qui ont été marqués comme regardés et qui sont automatiquement expirés seront réenregistrés s'ils sont à nouveau affichés.",
+            "rerecord_label": "Réenregistrer regardé",
+            "subtitle": "Paramètres qui contrôlent le moment où les enregistrements sont supprimés du stockage.",
+            "watched_desc": "Si cette option est activée, les programmes marqués comme regardés expireront avant les programmes qui n'ont pas été regardés.",
+            "watched_label": "Regardé avant non regardé"
+        },
         "backendStatus": "Statut du serveur principal",
         "channeleditor": "Éditeur de chaînes",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Paramètres régionaux",
             "tvformat_desc": "La norme TV à utiliser pour regarder la télévision.",
             "tvformat_label": "Formats de télévision",
+            "tvformats_label": "Formats de télévision",
             "vbiformat_desc": "Le VBI (Vertical Blanking Interval) est utilisé pour transporter des données de télétexte ou de sous-titrage.",
             "vbiformat_label": "Format VBI"
         },

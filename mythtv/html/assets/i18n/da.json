@@ -39,6 +39,27 @@
         "yes": "Ja"
     },
     "dashboard": {
+        "autoexpire": {
+            "deleted_desc": "Bestemmer det maksimale antal dage, før det bliver umuligt at fortryde en optagelse. En værdi på nul betyder, at optagelsen slettes permanent mellem 5 og 20 minutter senere. En værdi på minus én betyder, at optagelser vil blive bevaret, indtil der kræves plads. En optagelse vil altid blive fjernet før dette tidspunkt, hvis der er brug for plads til en ny optagelse.",
+            "deleted_label": "Tid til at opbevare slettede optagelser (dage)",
+            "disk_desc": "Ekstra diskplads (i gigabyte) ud over, hvad MythTV kræver, som du vil have fri på optagelsesfilsystemerne.",
+            "disk_label": "Ekstra diskplads (GB)",
+            "heading": "Automatisk udløb",
+            "livetv_desc": "Auto-Expire vil tvinge udløb af Live TV-optagelser, når de er så mange dage gamle. Live tv-optagelser kan også udløbe tidligt, hvis det er nødvendigt for at frigøre diskplads.",
+            "livetv_label": "Maks. alder for live-tv (dage)",
+            "method_desc": "Metode, der bruges til at bestemme, hvilke optagede shows, der skal slettes først. Live tv-optagelser vil altid udløbe før normale optagelser.",
+            "method_label": "Automatisk udløbsmetode",
+            "method_lowest": "Laveste prioritet først",
+            "method_oldest": "Ældste show først",
+            "method_weighted": "Vægtet tid/prioritet kombination",
+            "priority_desc": "Antallet af dages bonus et program får for hvert prioritetspunkt. Dette bruges kun, når metoden Vægtet tid/prioritet Auto-udløb er valgt.",
+            "priority_label": "Prioritetsvægt",
+            "rerecord_desc": "Hvis aktiveret, vil programmer, der er blevet markeret som set og er udløbet automatisk, blive optaget igen, hvis de vises igen.",
+            "rerecord_label": "Genoptagelse set",
+            "subtitle": "Indstillinger, der styrer, hvornår optagelser slettes fra lageret.",
+            "watched_desc": "Hvis aktiveret, vil programmer, der er blevet markeret som set, udløbe før programmer, der ikke er blevet set.",
+            "watched_label": "Set før ikke set"
+        },
         "backendStatus": "Backend Status",
         "channeleditor": "Kanalredaktør",
         "channelgroup": {
@@ -1098,6 +1119,7 @@
             "title": "Lokale indstillinger",
             "tvformat_desc": "TV-standarden, der skal bruges til at se tv.",
             "tvformat_label": "TV-formater",
+            "tvformats_label": "TV-formater",
             "vbiformat_desc": "VBI (Vertical Blanking Interval) bruges til at overføre tekst-tv eller lukkede billedtekstdata.",
             "vbiformat_label": "VBI format"
         },
