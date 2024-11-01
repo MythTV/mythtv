@@ -88,6 +88,7 @@ import { ChannelGroupsComponent } from './dashboard/dashboard-settings/channel-g
 import { AutoExpireComponent } from './dashboard/dashboard-settings/auto-expire/auto-expire.component';
 import { JobsComponent } from './dashboard/dashboard-settings/jobs/jobs.component';
 import { RecQualityComponent } from './dashboard/dashboard-settings/rec-quality/rec-quality.component';
+import { RecPrioritiesComponent } from './dashboard/dashboard-settings/rec-priorities/rec-priorities.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -171,6 +172,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AutoExpireComponent,
     JobsComponent,
     RecQualityComponent,
+    RecPrioritiesComponent,
   ],
   imports: [
     BrowserModule,

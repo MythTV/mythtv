@@ -19,14 +19,20 @@
                 <app-rec-quality></app-rec-quality>
             </ng-template>
         </p-accordionTab>
-        <p-accordionTab header="{{ 'dashboard.channelgroup.heading' | translate }}">
+        <p-accordionTab header="{{ 'dashboard.priorities.heading' | translate }}">
             <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[3] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-rec-priorities></app-rec-priorities>
+            </ng-template>
+        </p-accordionTab>
+        <p-accordionTab header="{{ 'dashboard.channelgroup.heading' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[4] }}</b></ng-template>
             <ng-template pTemplate="content">
                 <app-channel-groups></app-channel-groups>
             </ng-template>
         </p-accordionTab>
         <p-accordionTab header="{{ 'dashboard.playgroup.heading' | translate }}">
-            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[4] }}</b></ng-template>
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[5] }}</b></ng-template>
             <ng-template pTemplate="content">
                 <app-playback-groups></app-playback-groups>
             </ng-template>
