@@ -45,14 +45,14 @@
             "disk_desc": "Ylimääräistä levytilaa (gigatavuina) enemmän kuin mitä MythTV vaatii, jotta haluat pitää vapaana tallennustiedostojärjestelmissä.",
             "disk_label": "Ylimääräistä levytilaa (GB)",
             "heading": "Automaattinen vanheneminen",
-            "livetv_desc": "Auto-Expire pakottaa suorien TV-tallenteiden vanhenemisen, kun ne ovat näin monta päivää vanhoja. Suorat TV-tallenteet voidaan myös vanhentua aikaisin, jos se on tarpeen levytilan vapauttamiseksi.",
+            "livetv_desc": "Automaattinen vanheneminen pakottaa suorien TV-tallenteiden vanhenemisen, kun ne ovat näin monta päivää vanhoja. Suorat TV-tallenteet voidaan myös vanhentua aikaisin, jos se on tarpeen levytilan vapauttamiseksi.",
             "livetv_label": "Live-TV:n enimmäisikä (päivää)",
             "method_desc": "Menetelmä, jolla määritetään, mitkä tallennetut ohjelmat poistetaan ensin. Suorat TV-tallenteet vanhenevat aina ennen normaaleja tallennuksia.",
             "method_label": "Automaattinen vanhenemismenetelmä",
             "method_lowest": "Alhaisin prioriteetti ensin",
             "method_oldest": "Vanhin esitys ensin",
             "method_weighted": "Painotettu aika/prioriteetti-yhdistelmä",
-            "priority_desc": "Päivien lukumäärä bonusta, jonka ohjelma saa jokaisesta prioriteettipisteestä. Tätä käytetään vain, kun Painotettu aika/prioriteetti automaattinen vanhenemismenetelmä on valittuna.",
+            "priority_desc": "Päivien lukumäärä bonusta, jonka ohjelma saa jokaisesta prioriteettipisteestä. Tätä käytetään vain, kun painotettu aika/prioriteetti automaattinen vanhenemismenetelmä on valittuna.",
             "priority_label": "Prioriteettipaino",
             "rerecord_desc": "Jos tämä on käytössä, katsotuiksi merkityt ja automaattisesti vanhentuneet ohjelmat tallennetaan uudelleen, jos ne näytetään uudelleen.",
             "rerecord_label": "Uudelleennauhoitus katsottu",
@@ -131,6 +131,26 @@
             "titlematch_label": "Otsikkoosuma (säännöllinen lauseke)"
         },
         "programguide": "Ohjelmaopas",
+        "quality": {
+            "category_desc": "Jos kyseessä on erikoisluokka (esim. \"Urheilutapahtuma\"), pyydä esitysten automaattista laajennusta. Toimii vain, jos ohjelman luokka voidaan määrittää.",
+            "category_label": "Esityskategoriaa laajennetaan",
+            "catovertime_desc": "Määritetyn kategorian tallennusta yritetään pidentää määritetyllä minuuttien määrällä. Se jätetään huomioimatta, kun kaksi esitystä on varattu ilman, että niiden välillä on riittävästi aikaa.",
+            "catovertime_label": "Nauhoitus ohjelman päättymisen jälkeen (minuuttia)",
+            "endgap_desc": "Jos enemmän kuin tämä sekuntimäärä puuttuu tallennuksen lopusta, se katsotaan aukoksi tallennuksen laadun arvioinnissa. Tallenne voidaan merkitä vaurioituneeksi.",
+            "endgap_label": "Suurin loppuväli (tiedot)",
+            "heading": "Tallennuksen laatu",
+            "minimum_desc": "Jos tallennuslaatu on tämän arvon alapuolella, tallennus merkitään vaurioituneeksi.",
+            "minimum_label": "Minimitallennuslaatu (prosenttia)",
+            "overtime_desc": "Tämä yleinen asetus sallii tallentimen tallentaa ajastetun lopetusajan jälkeen. Se ei vaikuta aikatauluun. Se jätetään huomioimatta, kun kaksi esitystä on varattu ilman, että niiden välillä on riittävästi aikaa.",
+            "overtime_label": "Aika tallentaa esityksen lopussa (sekuntia)",
+            "panel": {
+                "overtime": "Luokkaennätys ajan kuluessa"
+            },
+            "preroll_desc": "Tämä yleinen asetus mahdollistaa tallentimen käynnistymisen ennen ajastettua aloitusaikaa. Se ei vaikuta aikatauluun. Se jätetään huomioimatta, kun kaksi esitystä on varattu ilman, että niiden välillä on riittävästi aikaa.",
+            "preroll_label": "Tallennusaika ennen esityksen alkua (sekuntia)",
+            "startgap_desc": "Jos enemmän kuin tämä sekuntimäärä puuttuu tallennuksen alussa, se katsotaan aukoksi tallennuslaadun arvioinnissa. Tallenne voidaan merkitä vaurioituneeksi.",
+            "startgap_label": "Suurin aloitusväli (s)"
+        },
         "recordings": {
             "actionsselected": "Toiminnot {{ num }} valituille tallenteille",
             "airdate": "Lähetyspäivä",

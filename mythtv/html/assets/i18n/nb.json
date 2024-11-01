@@ -45,14 +45,14 @@
             "disk_desc": "Ekstra diskplass (i gigabyte) utover det MythTV krever at du vil ha ledig på opptaksfilsystemene.",
             "disk_label": "Ekstra diskplass (GB)",
             "heading": "Utløper automatisk",
-            "livetv_desc": "Auto-Expire vil tvinge utløp av Live TV-opptak når de er så mange dager gamle. Direkte TV-opptak kan også utløpe tidlig om nødvendig for å frigjøre diskplass.",
+            "livetv_desc": "Auto Expire vil tvinge utløpet av Live TV-opptak når de er så mange dager gamle. Direkte TV-opptak kan også utløpe tidlig om nødvendig for å frigjøre diskplass.",
             "livetv_label": "Maks alder på direktesendt TV (dager)",
             "method_desc": "Metode som brukes til å bestemme hvilke innspilte programmer som skal slettes først. Direkte TV-opptak vil alltid utløpe før vanlige opptak.",
             "method_label": "Automatisk utløpsmetode",
             "method_lowest": "Laveste prioritet først",
             "method_oldest": "Eldste show først",
             "method_weighted": "Vektet tid/prioritet kombinasjon",
-            "priority_desc": "Antall dager bonus et program får for hvert prioritert poeng. Dette brukes bare når metoden for vektet tid/prioritert automatisk utløp er valgt.",
+            "priority_desc": "Antall dager bonus et program får for hvert prioritert poeng. Dette brukes bare når metoden for vektet tid/prioritet automatisk utløp er valgt.",
             "priority_label": "Prioritert vekt",
             "rerecord_desc": "Hvis den er aktivert, vil programmer som er merket som sett og som er utløpt automatisk, bli tatt opp på nytt hvis de vises igjen.",
             "rerecord_label": "Re-record sett",
@@ -131,6 +131,26 @@
             "titlematch_label": "Tittelmatch (regex)"
         },
         "programguide": "Programguide",
+        "quality": {
+            "category_desc": "For en spesiell kategori (f.eks. «Sportsarrangement»), be om at showene blir automatisk utvidet. Fungerer bare hvis en forestillings kategori kan bestemmes.",
+            "category_label": "Utstillingskategorien skal utvides",
+            "catovertime_desc": "For den angitte kategorien vil det bli gjort et forsøk på å utvide opptaket med det angitte antall minutter. Det ignoreres når to show har blitt planlagt uten nok tid i mellom.",
+            "catovertime_label": "Ta opp siste slutten av showet (min.)",
+            "endgap_desc": "Hvis mer enn dette antall sekunder mangler på slutten av et opptak, vil dette bli sett på som et gap for vurdering av opptakskvalitet. Opptaket kan merkes som skadet.",
+            "endgap_label": "Maksimalt sluttgap (spesifikasjoner)",
+            "heading": "Opptakskvalitet",
+            "minimum_desc": "Hvis opptakskvaliteten er under denne verdien, merkes opptaket som skadet.",
+            "minimum_label": "Minimum opptakskvalitet (prosent)",
+            "overtime_desc": "Denne globale innstillingen lar opptakeren ta opp utover den planlagte slutttiden. Det påvirker ikke planleggeren. Det ignoreres når to show er planlagt uten nok tid i mellom.",
+            "overtime_label": "Tid for å ta opp siste slutten av showet (sekunder)",
+            "panel": {
+                "overtime": "Kategorirekord over tid"
+            },
+            "preroll_desc": "Denne globale innstillingen lar opptakeren starte før det planlagte starttidspunktet. Det påvirker ikke planleggeren. Det ignoreres når to show er planlagt uten nok tid i mellom.",
+            "preroll_label": "Tid for opptak før start av show (sekunder)",
+            "startgap_desc": "Hvis mer enn dette antall sekunder mangler ved starten av et opptak, vil dette bli sett på som et gap for vurdering av opptakskvalitet. Opptaket kan merkes som skadet.",
+            "startgap_label": "Maksimalt startgap (sek.)"
+        },
         "recordings": {
             "actionsselected": "Handlinger på {{ num }} valgte opptak",
             "airdate": "Airdate",

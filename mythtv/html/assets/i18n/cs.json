@@ -54,7 +54,7 @@
             "method_weighted": "Vážená kombinace čas/priorita",
             "priority_desc": "Počet dní bonusu, který program získá za každý prioritní bod. Toto se používá pouze v případě, že je vybrána metoda automatického vypršení platnosti váženého času/priority.",
             "priority_label": "Přednostní váha",
-            "rerecord_desc": "Pokud je povoleno, programy, které byly označeny jako sledované a jejichž platnost automaticky vypršela, budou znovu zaznamenány, pokud se znovu zobrazí.",
+            "rerecord_desc": "Pokud je povoleno, programy, které byly označeny jako sledované a jejichž platnost vypršela automaticky, budou znovu zaznamenány, pokud se znovu zobrazí.",
             "rerecord_label": "Sledováno znovu nahrávání",
             "subtitle": "Nastavení, která řídí, kdy jsou nahrávky smazány z úložiště.",
             "watched_desc": "Pokud je povoleno, programy, které byly označeny jako sledované, vyprší dříve, než programy, které nebyly sledovány.",
@@ -131,6 +131,26 @@
             "titlematch_label": "Shoda názvu (regulární výraz)"
         },
         "programguide": "Programový průvodce",
+        "quality": {
+            "category_desc": "U speciální kategorie (např. „Sportovní událost“) požádejte o automatické rozšíření pořadů. Funguje pouze v případě, že lze určit kategorii pořadu.",
+            "category_label": "Kategorie pořadů bude rozšířena",
+            "catovertime_desc": "U zadané kategorie bude proveden pokus o prodloužení záznamu o zadaný počet minut. Ignoruje se, pokud byly naplánovány dvě představení bez dostatečného času mezi nimi.",
+            "catovertime_label": "Záznam po skončení pořadu (min)",
+            "endgap_desc": "Pokud na konci záznamu chybí více než tento počet sekund, bude to považováno za mezeru pro posouzení kvality záznamu. Záznam může být označen jako poškozený.",
+            "endgap_label": "Maximální koncová mezera (specifikace)",
+            "heading": "Kvalita záznamu",
+            "minimum_desc": "Pokud je kvalita záznamu pod touto hodnotou, záznam je označen jako poškozený.",
+            "minimum_label": "Minimální kvalita záznamu (procenta)",
+            "overtime_desc": "Toto globální nastavení umožňuje rekordéru nahrávat i po plánovaném čase ukončení. Nemá vliv na plánovač. Ignoruje se, pokud byly naplánovány dvě představení bez dostatečného času mezi nimi.",
+            "overtime_label": "Čas pro záznam po skončení pořadu (v sekundách)",
+            "panel": {
+                "overtime": "Kategorie Záznam v čase"
+            },
+            "preroll_desc": "Toto globální nastavení umožňuje diktafon spustit před plánovaným časem spuštění. Nemá vliv na plánovač. Ignoruje se, pokud byly naplánovány dvě představení bez dostatečného času mezi nimi.",
+            "preroll_label": "Čas nahrávání před začátkem show (v sekundách)",
+            "startgap_desc": "Pokud na začátku záznamu chybí více než tento počet sekund, bude to považováno za mezeru pro posouzení kvality záznamu. Záznam může být označen jako poškozený.",
+            "startgap_label": "Maximální počáteční mezera (s)"
+        },
         "recordings": {
             "actionsselected": "Akce s {{ num }} vybranými nahrávkami",
             "airdate": "Datum vysílání",

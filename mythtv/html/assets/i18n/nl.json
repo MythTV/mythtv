@@ -45,7 +45,7 @@
             "disk_desc": "Extra schijfruimte (in gigabytes) die verder gaat dan wat MythTV vereist en die u vrij wilt houden op de opnamebestandssystemen.",
             "disk_label": "Extra schijfruimte (GB)",
             "heading": "Automatisch verlopen",
-            "livetv_desc": "Auto-Expire forceert het verlopen van Live TV-opnamen als ze zoveel dagen oud zijn. Live tv-opnamen kunnen indien nodig ook vroegtijdig vervallen om schijfruimte vrij te maken.",
+            "livetv_desc": "Auto Expire forceert het verlopen van Live TV-opnamen als ze zoveel dagen oud zijn. Live tv-opnamen kunnen indien nodig ook vroegtijdig vervallen om schijfruimte vrij te maken.",
             "livetv_label": "Max. leeftijd live tv (dagen)",
             "method_desc": "Methode die wordt gebruikt om te bepalen welke opgenomen programma's als eerste moeten worden verwijderd. Live tv-opnames verlopen altijd eerder dan normale opnames.",
             "method_label": "Automatische vervalmethode",
@@ -131,6 +131,26 @@
             "titlematch_label": "Titelovereenkomst (regex)"
         },
         "programguide": "Programma gids",
+        "quality": {
+            "category_desc": "Voor een speciale categorie (bijvoorbeeld 'Sportevenement') kunt u een verzoek indienen om de shows automatisch te verlengen. Werkt alleen als de categorie van een show kan worden bepaald.",
+            "category_label": "Categorie shows wordt uitgebreid",
+            "catovertime_desc": "Voor de opgegeven categorie wordt geprobeerd de opname met het opgegeven aantal minuten te verlengen. Het wordt genegeerd als er twee shows zijn gepland zonder voldoende tijd ertussen.",
+            "catovertime_label": "Opnemen na einde van de show (minuten)",
+            "endgap_desc": "Als er meer dan dit aantal seconden ontbreken aan het einde van een opname, wordt dit beschouwd als een leemte voor het beoordelen van de opnamekwaliteit. De opname kan als beschadigd worden gemarkeerd.",
+            "endgap_label": "Maximale eindafstand (specificaties)",
+            "heading": "Opnamekwaliteit",
+            "minimum_desc": "Als de opnamekwaliteit onder deze waarde ligt, wordt de opname als beschadigd gemarkeerd.",
+            "minimum_label": "Minimale opnamekwaliteit (procent)",
+            "overtime_desc": "Met deze algemene instelling kan de recorder na de geplande eindtijd opnemen. Dit heeft geen invloed op de planner. Het wordt genegeerd als er twee shows zijn gepland zonder voldoende tijd ertussen.",
+            "overtime_label": "Tijd om op te nemen na het einde van de show (seconden)",
+            "panel": {
+                "overtime": "Categorierecord in de loop van de tijd"
+            },
+            "preroll_desc": "Met deze algemene instelling kan de recorder vóór de geplande starttijd starten. Dit heeft geen invloed op de planner. Het wordt genegeerd als er twee shows zijn gepland zonder voldoende tijd ertussen.",
+            "preroll_label": "Tijd om op te nemen vóór aanvang van de show (seconden)",
+            "startgap_desc": "Als er meer dan dit aantal seconden ontbreken aan het begin van een opname, wordt dit beschouwd als een leemte voor het beoordelen van de opnamekwaliteit. De opname kan als beschadigd worden gemarkeerd.",
+            "startgap_label": "Maximale startafstand (sec)"
+        },
         "recordings": {
             "actionsselected": "Acties op {{ num }} geselecteerde opnamen",
             "airdate": "Airdate",

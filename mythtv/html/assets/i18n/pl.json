@@ -45,7 +45,7 @@
             "disk_desc": "Dodatkowe miejsce na dysku (w gigabajtach) przekraczające wymagania MythTV, które chcesz zachować w systemach plików z nagraniami.",
             "disk_label": "Dodatkowe miejsce na dysku (GB)",
             "heading": "Automatyczne wygaśnięcie",
-            "livetv_desc": "Funkcja automatycznego wygaśnięcia wymusi wygaśnięcie nagrań telewizji na żywo, gdy mają tyle dni. Nagrania telewizyjne na żywo mogą również wygasnąć wcześniej, jeśli jest to konieczne, aby zwolnić miejsce na dysku.",
+            "livetv_desc": "Funkcja automatycznego wygaśnięcia wymusi wygaśnięcie nagrań telewizji na żywo po upływie określonej liczby dni. Nagrania telewizyjne na żywo mogą również wygasnąć wcześniej, jeśli jest to konieczne, aby zwolnić miejsce na dysku.",
             "livetv_label": "Maksymalny wiek telewizji na żywo (dni)",
             "method_desc": "Metoda używana do określenia, które nagrane programy należy usunąć jako pierwsze. Nagrania telewizyjne na żywo zawsze wygasają przed normalnymi nagraniami.",
             "method_label": "Metoda automatycznego wygaśnięcia",
@@ -131,6 +131,26 @@
             "titlematch_label": "Dopasowanie tytułu (regex)"
         },
         "programguide": "Przewodnik po programach",
+        "quality": {
+            "category_desc": "W przypadku kategorii specjalnej (np. „Wydarzenie sportowe”) poproś o automatyczne przedłużenie pokazów. Działa tylko wtedy, gdy można określić kategorię programu.",
+            "category_label": "Kategoria spektakli zostanie rozszerzona",
+            "catovertime_desc": "Dla określonej kategorii zostanie podjęta próba przedłużenia nagrania o określoną liczbę minut. Jest ignorowany, jeśli zaplanowano dwa występy bez wystarczającej ilości czasu pomiędzy nimi.",
+            "catovertime_label": "Nagraj ostatni koniec programu (w minutach)",
+            "endgap_desc": "Jeżeli na końcu nagrania brakuje większej liczby sekund, będzie to traktowane jako przerwa w ocenie jakości nagrania. Nagranie może być oznaczone jako uszkodzone.",
+            "endgap_label": "Maksymalny odstęp końcowy (specyfikacje)",
+            "heading": "Jakość nagrywania",
+            "minimum_desc": "Jeśli jakość nagrania jest niższa od tej wartości, nagranie zostaje oznaczone jako uszkodzone.",
+            "minimum_label": "Minimalna jakość nagrania (w procentach)",
+            "overtime_desc": "To ustawienie globalne umożliwia rejestratorowi nagrywanie po zaplanowanym czasie zakończenia. Nie ma to wpływu na harmonogram. Jest ignorowany, jeśli zaplanowano dwa występy bez wystarczającej ilości czasu pomiędzy nimi.",
+            "overtime_label": "Czas nagrania ostatniego końca programu (sekundy)",
+            "panel": {
+                "overtime": "Rekord kategorii w czasie"
+            },
+            "preroll_desc": "To ustawienie globalne umożliwia uruchomienie rejestratora przed zaplanowanym czasem rozpoczęcia. Nie ma to wpływu na harmonogram. Jest ignorowany, jeśli zaplanowano dwa występy bez wystarczającej ilości czasu pomiędzy nimi.",
+            "preroll_label": "Czas nagrania przed rozpoczęciem pokazu (sekundy)",
+            "startgap_desc": "Jeżeli na początku nagrania brakuje większej liczby sekund, będzie to traktowane jako przerwa w ocenie jakości nagrania. Nagranie może być oznaczone jako uszkodzone.",
+            "startgap_label": "Maksymalna przerwa początkowa (s)"
+        },
         "recordings": {
             "actionsselected": "Działania na {{ num }} wybranych nagraniach",
             "airdate": "Data emisji",

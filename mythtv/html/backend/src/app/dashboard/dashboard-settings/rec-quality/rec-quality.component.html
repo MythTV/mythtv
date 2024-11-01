@@ -1,0 +1,106 @@
+<form class="ml-3 mr-3" name="quality" #quality="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'dashboard.quality.heading' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="RecordPreRoll" class="label block">{{ 'dashboard.quality.preroll_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="RecordPreRoll" name="RecordPreRoll" id="RecordPreRoll"
+                            [showButtons]="true" [min]="0" [max]="600" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'dashboard.quality.preroll_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="RecordOverTime" class="label block">{{ 'dashboard.quality.overtime_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="RecordOverTime" name="RecordOverTime" id="RecordOverTime"
+                            [showButtons]="true" [min]="0" [max]="1800" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'dashboard.quality.overtime_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="MaxStartGap" class="label block">{{ 'dashboard.quality.startgap_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="MaxStartGap" name="MaxStartGap" id="MaxStartGap"
+                            [showButtons]="true" [min]="0" [max]="300" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'dashboard.quality.startgap_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="MaxEndGap" class="label block">{{ 'dashboard.quality.endgap_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="MaxEndGap" name="MaxEndGap" id="MaxEndGap" [showButtons]="true"
+                            [min]="0" [max]="300" [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'dashboard.quality.endgap_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="MinimumRecordingQuality" class="label block">{{ 'dashboard.quality.minimum_label' |
+                            translate }}</label>
+                        <p-inputNumber [(ngModel)]="MinimumRecordingQuality" name="MinimumRecordingQuality"
+                            id="MinimumRecordingQuality" [showButtons]="true" [min]="0" [max]="300"
+                            [step]="1"></p-inputNumber>
+                        <small class="block">
+                            {{ 'dashboard.quality.minimum_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <p-fieldset class="mb-4 w-full" legend="{{ 'dashboard.quality.panel.overtime' | translate }}"
+                        [toggleable]="true" [collapsed]="true">
+
+                        <div class="form-group field">
+                            <label for="OverTimeCategory" class="label block">{{ 'dashboard.quality.category_label' |
+                                translate }}</label>
+                            <p-dropdown appendTo="body" [options]="CategoryList" [(ngModel)]="OverTimeCategory"
+                                class="w-full mb-2" name="OverTimeCategory" aria-describedby="OverTimeCategory-help">
+                            </p-dropdown>
+                            <small class="block mt-2" id="OverTimeCategory-help">
+                                {{ 'dashboard.quality.category_desc' | translate }}
+                            </small>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="CategoryOverTime" class="label block">{{ 'dashboard.quality.catovertime_label' |
+                                translate }}</label>
+                            <p-inputNumber [(ngModel)]="CategoryOverTime" name="CategoryOverTime" id="CategoryOverTime"
+                                [showButtons]="true" [min]="0" [max]="180" [step]="1"></p-inputNumber>
+                            <small class="block">
+                                {{ 'dashboard.quality.catovertime_desc' | translate }}
+                            </small>
+                        </div>
+
+                    </p-fieldset>
+
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="successCount > 0 && errorCount == 0 && !quality.dirty" severity="success"
+                        text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); quality.form.markAsPristine()" [disabled]="!quality.dirty"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>

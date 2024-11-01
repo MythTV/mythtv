@@ -45,14 +45,14 @@
             "disk_desc": "Zusätzlicher Speicherplatz (in Gigabyte), der über den von MythTV benötigten Speicherplatz hinausgeht und den Sie auf den Aufnahmedateisystemen freihalten möchten.",
             "disk_label": "Zusätzlicher Speicherplatz (GB)",
             "heading": "Automatisches Ablaufen",
-            "livetv_desc": "Die automatische Ablaufzeit erzwingt den Ablauf von Live-TV-Aufzeichnungen, wenn diese so viele Tage alt sind. Live-TV-Aufzeichnungen können bei Bedarf auch vorzeitig abgelaufen werden, um Speicherplatz freizugeben.",
+            "livetv_desc": "Die automatische Ablauffunktion erzwingt den Ablauf von Live-TV-Aufzeichnungen, wenn diese so viele Tage alt sind. Live-TV-Aufzeichnungen können bei Bedarf auch vorzeitig abgelaufen werden, um Speicherplatz freizugeben.",
             "livetv_label": "Maximales Live-TV-Alter (Tage)",
             "method_desc": "Methode zur Bestimmung, welche aufgezeichneten Sendungen zuerst gelöscht werden sollen. Live-TV-Aufzeichnungen laufen immer vor normalen Aufzeichnungen ab.",
             "method_label": "Auto-Expire-Methode",
             "method_lowest": "Niedrigste Priorität zuerst",
             "method_oldest": "Älteste Show zuerst",
             "method_weighted": "Gewichtete Zeit-/Prioritätskombination",
-            "priority_desc": "Die Anzahl der Bonustage, die ein Programm für jeden Prioritätspunkt erhält. Dies wird nur verwendet, wenn die Methode „Gewichtete Zeit/Priorität Auto-Ablauf“ ausgewählt ist.",
+            "priority_desc": "Die Anzahl der Bonustage, die ein Programm für jeden Prioritätspunkt erhält. Dies wird nur verwendet, wenn die Methode „Auto Expire“ mit gewichteter Zeit/Priorität ausgewählt ist.",
             "priority_label": "Prioritätsgewicht",
             "rerecord_desc": "Wenn diese Option aktiviert ist, werden Sendungen, die als angesehen markiert wurden und automatisch abgelaufen sind, neu aufgezeichnet, wenn sie erneut angezeigt werden.",
             "rerecord_label": "Neuaufnahme angesehen",
@@ -131,6 +131,26 @@
             "titlematch_label": "Titelübereinstimmung (Regex)"
         },
         "programguide": "Programm",
+        "quality": {
+            "category_desc": "Fordern Sie für eine spezielle Kategorie (z. B. „Sportveranstaltung“) die automatische Verlängerung von Sendungen an. Funktioniert nur, wenn die Kategorie einer Sendung bestimmt werden kann.",
+            "category_label": "Kategorie der Shows, die erweitert werden sollen",
+            "catovertime_desc": "Für die angegebene Kategorie wird versucht, die Aufnahme um die angegebene Anzahl Minuten zu verlängern. Es wird ignoriert, wenn zwei Shows ohne genügend Zeit dazwischen geplant wurden.",
+            "catovertime_label": "Aufzeichnung über das Ende der Show hinaus (Minuten)",
+            "endgap_desc": "Fehlen am Ende einer Aufnahme mehr als diese Sekunden, wird dies als Lücke zur Beurteilung der Aufnahmequalität gewertet. Die Aufnahme kann als beschädigt markiert sein.",
+            "endgap_label": "Maximaler Endspalt (Spezifikationen)",
+            "heading": "Aufnahmequalität",
+            "minimum_desc": "Wenn die Aufnahmequalität unter diesem Wert liegt, wird die Aufnahme als beschädigt markiert.",
+            "minimum_label": "Mindestaufnahmequalität (Prozent)",
+            "overtime_desc": "Diese globale Einstellung ermöglicht es dem Rekorder, über die geplante Endzeit hinaus aufzunehmen. Es hat keine Auswirkungen auf den Planer. Es wird ignoriert, wenn zwischen zwei Shows nicht genügend Zeit dazwischen liegt.",
+            "overtime_label": "Zeit zum Aufzeichnen nach dem Ende der Show (Sekunden)",
+            "panel": {
+                "overtime": "Kategorierekord im Zeitverlauf"
+            },
+            "preroll_desc": "Diese globale Einstellung ermöglicht es dem Rekorder, vor der geplanten Startzeit zu starten. Es hat keine Auswirkungen auf den Planer. Es wird ignoriert, wenn zwischen zwei Shows nicht genügend Zeit dazwischen liegt.",
+            "preroll_label": "Aufnahmezeit vor Beginn der Show (Sekunden)",
+            "startgap_desc": "Fehlen zu Beginn einer Aufnahme mehr als diese Sekunden, wird dies als Lücke zur Beurteilung der Aufnahmequalität gewertet. Die Aufnahme kann als beschädigt markiert sein.",
+            "startgap_label": "Maximale Startlücke (Sek.)"
+        },
         "recordings": {
             "actionsselected": "Aktionen für {{ num }} ausgewählte Aufzeichnungen",
             "airdate": "Luftdatum",

@@ -52,7 +52,7 @@
             "method_lowest": "Priorité la plus basse en premier",
             "method_oldest": "L'émission la plus ancienne en premier",
             "method_weighted": "Combinaison temps/priorité pondérée",
-            "priority_desc": "Le nombre de jours de bonus qu'un programme obtient pour chaque point prioritaire. Ceci n’est utilisé que lorsque la méthode d’expiration automatique à temps/priorité pondéré est sélectionnée.",
+            "priority_desc": "Le nombre de jours de bonus qu'un programme obtient pour chaque point prioritaire. Ceci n’est utilisé que lorsque la méthode d’expiration automatique de temps/priorité pondérée est sélectionnée.",
             "priority_label": "Poids prioritaire",
             "rerecord_desc": "Si cette option est activée, les programmes qui ont été marqués comme regardés et qui sont automatiquement expirés seront réenregistrés s'ils sont à nouveau affichés.",
             "rerecord_label": "Réenregistrer regardé",
@@ -131,6 +131,26 @@
             "titlematch_label": "Correspondance de titre (regex)"
         },
         "programguide": "Guide du programme",
+        "quality": {
+            "category_desc": "Pour une catégorie spéciale (par exemple \"Événement sportif\"), demandez que les émissions soient automatiquement prolongées. Ne fonctionne que si la catégorie d'une émission peut être déterminée.",
+            "category_label": "Catégorie de spectacles à étendre",
+            "catovertime_desc": "Pour la catégorie spécifiée, une tentative sera faite pour prolonger l'enregistrement du nombre de minutes spécifié. Il est ignoré lorsque deux émissions ont été programmées sans suffisamment de temps entre elles.",
+            "catovertime_label": "Enregistrer après la fin du spectacle (minutes)",
+            "endgap_desc": "S'il manque plus de ce nombre de secondes à la fin d'un enregistrement, cela sera considéré comme un écart pour évaluer la qualité de l'enregistrement. L'enregistrement peut être marqué comme endommagé.",
+            "endgap_label": "Écart de fin maximum (spécifications)",
+            "heading": "Qualité d'enregistrement",
+            "minimum_desc": "Si la qualité d'enregistrement est inférieure à cette valeur, l'enregistrement est marqué comme endommagé.",
+            "minimum_label": "Qualité d'enregistrement minimale (pourcentage)",
+            "overtime_desc": "Ce paramètre global permet à l'enregistreur d'enregistrer au-delà de l'heure de fin programmée. Cela n'affecte pas le planificateur. Il est ignoré lorsque deux émissions ont été programmées sans suffisamment de temps entre elles.",
+            "overtime_label": "Temps d'enregistrement après la fin de l'émission (secondes)",
+            "panel": {
+                "overtime": "Record de catégorie au fil du temps"
+            },
+            "preroll_desc": "Ce paramètre global permet à l'enregistreur de démarrer avant l'heure de démarrage programmée. Cela n'affecte pas le planificateur. Il est ignoré lorsque deux émissions ont été programmées sans suffisamment de temps entre elles.",
+            "preroll_label": "Temps d'enregistrement avant le début du spectacle (secondes)",
+            "startgap_desc": "S'il manque plus de ce nombre de secondes au début d'un enregistrement, cela sera considéré comme un écart pour évaluer la qualité de l'enregistrement. L'enregistrement peut être marqué comme endommagé.",
+            "startgap_label": "Écart de démarrage maximum (secondes)"
+        },
         "recordings": {
             "actionsselected": "Actions sur {{ num }} enregistrements sélectionnés",
             "airdate": "Date de diffusion",

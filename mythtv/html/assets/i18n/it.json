@@ -131,6 +131,26 @@
             "titlematch_label": "Corrispondenza titolo (regex)"
         },
         "programguide": "Guida programmi",
+        "quality": {
+            "category_desc": "Per una categoria speciale (ad esempio \"Evento sportivo\"), richiedi che la visualizzazione venga estesa automaticamente. Funziona solo se è possibile determinare la categoria di uno spettacolo.",
+            "category_label": "Categoria di spettacoli da ampliare",
+            "catovertime_desc": "Per la categoria specificata, verrà effettuato un tentativo di estendere la registrazione del numero di minuti specificato. Viene ignorato quando sono stati programmati due spettacoli senza un tempo sufficiente tra loro.",
+            "catovertime_label": "Registra dopo la fine dello spettacolo (minuti)",
+            "endgap_desc": "Se alla fine della registrazione mancano più di questo numero di secondi, ciò verrà considerato come un intervallo per la valutazione della qualità della registrazione. La registrazione potrebbe essere contrassegnata come danneggiata.",
+            "endgap_label": "Spazio finale massimo (specifiche)",
+            "heading": "Qualità di registrazione",
+            "minimum_desc": "Se la qualità della registrazione è inferiore a questo valore, la registrazione viene contrassegnata come danneggiata.",
+            "minimum_label": "Qualità di registrazione minima (percentuale)",
+            "overtime_desc": "Questa impostazione globale consente al registratore di registrare oltre l'orario di fine programmato. Non influisce sullo scheduler. Viene ignorato quando sono stati programmati due spettacoli senza abbastanza tempo tra loro.",
+            "overtime_label": "Tempo di registrazione dopo la fine dello spettacolo (secondi)",
+            "panel": {
+                "overtime": "Record di categoria nel tempo"
+            },
+            "preroll_desc": "Questa impostazione globale consente al registratore di avviarsi prima dell'orario di avvio programmato. Non influisce sullo scheduler. Viene ignorato quando sono stati programmati due spettacoli senza abbastanza tempo tra loro.",
+            "preroll_label": "Tempo di registrazione prima dell'inizio dello spettacolo (secondi)",
+            "startgap_desc": "Se all'inizio di una registrazione mancano più di questo numero di secondi, ciò verrà considerato come un intervallo per la valutazione della qualità della registrazione. La registrazione potrebbe essere contrassegnata come danneggiata.",
+            "startgap_label": "Intervallo iniziale massimo (secondi)"
+        },
         "recordings": {
             "actionsselected": "Azioni su {{ num }} registrazioni selezionate",
             "airdate": "Messa in onda",

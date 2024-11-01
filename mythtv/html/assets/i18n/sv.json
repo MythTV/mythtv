@@ -45,14 +45,14 @@
             "disk_desc": "Extra diskutrymme (i gigabyte) utöver vad MythTV kräver att du vill ha ledigt på inspelningsfilsystemen.",
             "disk_label": "Extra diskutrymme (GB)",
             "heading": "Utgår automatiskt",
-            "livetv_desc": "Auto-Expire kommer att tvinga utgången av Live TV-inspelningar när de är så många dagar gamla. Live-TV-inspelningar kan också förfalla tidigt om det behövs för att frigöra diskutrymme.",
+            "livetv_desc": "Auto Expire kommer att tvinga utgången av Live TV-inspelningar när de är så många dagar gamla. Live-TV-inspelningar kan också förfalla tidigt om det behövs för att frigöra diskutrymme.",
             "livetv_label": "Max ålder för live-tv (dagar)",
             "method_desc": "Metod som används för att avgöra vilka inspelade program som ska raderas först. Live-TV-inspelningar kommer alltid att upphöra före normala inspelningar.",
             "method_label": "Auto-Expire-metod",
             "method_lowest": "Lägsta prioritet först",
             "method_oldest": "Äldsta föreställningen först",
             "method_weighted": "Viktad kombination av tid/prioritet",
-            "priority_desc": "Antalet dagars bonus ett program får för varje prioritetspoäng. Detta används endast när metoden viktad tid/prioritet Auto-Expire är vald.",
+            "priority_desc": "Antalet dagars bonus ett program får för varje prioritetspoäng. Detta används endast när metoden Väktad tid/prioritet Auto Expire är vald.",
             "priority_label": "Prioriterad vikt",
             "rerecord_desc": "Om det är aktiverat kommer program som har markerats som sedda och som har löpt ut automatiskt att spelas in igen om de visas igen.",
             "rerecord_label": "Återinspelning sågs",
@@ -131,6 +131,26 @@
             "titlematch_label": "Titelmatchning (regex)"
         },
         "programguide": "Programguide",
+        "quality": {
+            "category_desc": "För en speciell kategori (t.ex. \"Sportevenemang\"), begär att föreställningarna ska förlängas automatiskt. Fungerar bara om en series kategori kan bestämmas.",
+            "category_label": "Kategori av shower ska utökas",
+            "catovertime_desc": "För den angivna kategorin kommer ett försök att göras att förlänga inspelningen med det angivna antalet minuter. Det ignoreras när två shower har schemalagts utan tillräckligt med tid däremellan.",
+            "catovertime_label": "Spela in senaste slutet av showen (minut)",
+            "endgap_desc": "Om mer än detta antal sekunder saknas i slutet av en inspelning kommer det att betraktas som en lucka för att bedöma inspelningskvaliteten. Inspelningen kan markeras som skadad.",
+            "endgap_label": "Maximalt slutgap (specifikationer)",
+            "heading": "Inspelningskvalitet",
+            "minimum_desc": "Om inspelningskvaliteten är under detta värde markeras inspelningen som skadad.",
+            "minimum_label": "Lägsta inspelningskvalitet (procent)",
+            "overtime_desc": "Denna globala inställning gör att brännaren kan spela in efter den schemalagda sluttiden. Det påverkar inte schemaläggaren. Det ignoreras när två shower har schemalagts utan tillräckligt med tid emellan.",
+            "overtime_label": "Dags att spela in tidigare slutet av showen (sekunder)",
+            "panel": {
+                "overtime": "Kategorirekord över tid"
+            },
+            "preroll_desc": "Denna globala inställning gör att brännaren kan starta före den schemalagda starttiden. Det påverkar inte schemaläggaren. Det ignoreras när två shower har schemalagts utan tillräckligt med tid emellan.",
+            "preroll_label": "Tid att spela in innan showen börjar (sekunder)",
+            "startgap_desc": "Om mer än detta antal sekunder saknas i början av en inspelning kommer det att betraktas som en lucka för bedömning av inspelningskvalitet. Inspelningen kan markeras som skadad.",
+            "startgap_label": "Maximalt startgap (sekunder)"
+        },
         "recordings": {
             "actionsselected": "Åtgärder på {{ num }} valda inspelningar",
             "airdate": "Sändningsdatum",

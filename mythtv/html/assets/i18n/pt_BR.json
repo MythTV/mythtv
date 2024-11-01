@@ -45,14 +45,14 @@
             "disk_desc": "Espaço extra em disco (em gigabytes) além do que o MythTV exige e que você deseja manter livre nos sistemas de arquivos de gravação.",
             "disk_label": "Espaço extra em disco (GB)",
             "heading": "Expiração automática",
-            "livetv_desc": "A expiração automática forçará a expiração das gravações de TV ao vivo quando elas tiverem tantos dias. As gravações de TV ao vivo também podem expirar antecipadamente, se necessário, para liberar espaço em disco.",
+            "livetv_desc": "A Expiração Automática forçará a expiração das gravações de TV ao vivo quando elas tiverem tantos dias. As gravações de TV ao vivo também podem expirar antecipadamente, se necessário, para liberar espaço em disco.",
             "livetv_label": "Idade máxima da TV ao vivo (dias)",
             "method_desc": "Método usado para determinar quais programas gravados serão excluídos primeiro. As gravações de TV ao vivo sempre expirarão antes das gravações normais.",
             "method_label": "Método de expiração automática",
             "method_lowest": "Prioridade mais baixa primeiro",
             "method_oldest": "Programa mais antigo primeiro",
             "method_weighted": "Combinação ponderada de tempo/prioridade",
-            "priority_desc": "O número de dias de bônus que um programa recebe para cada ponto de prioridade. Isso só é usado quando o método de expiração automática de tempo ponderado/prioridade é selecionado.",
+            "priority_desc": "O número de dias de bônus que um programa recebe para cada ponto de prioridade. Isso é usado apenas quando o método Expiração automática de tempo ponderado/prioridade é selecionado.",
             "priority_label": "Peso prioritário",
             "rerecord_desc": "Se ativado, os programas que foram marcados como assistidos e expirados automaticamente serão regravados se forem exibidos novamente.",
             "rerecord_label": "Regravar assistido",
@@ -131,6 +131,26 @@
             "titlematch_label": "Correspondência de título (regex)"
         },
         "programguide": "Guia do programa",
+        "quality": {
+            "category_desc": "Para uma categoria especial (por exemplo, \"Evento esportivo\"), solicite que os shows sejam estendidos automaticamente. Só funciona se a categoria de um programa puder ser determinada.",
+            "category_label": "Categoria de shows será ampliada",
+            "catovertime_desc": "Para a categoria especificada, será feita uma tentativa de estender a gravação pelo número especificado de minutos. É ignorado quando dois shows foram agendados sem tempo suficiente entre eles.",
+            "catovertime_label": "Registrar o final do show (minutos)",
+            "endgap_desc": "Se faltar mais do que este número de segundos no final de uma gravação, isso será considerado uma lacuna para avaliar a qualidade da gravação. A gravação pode ser marcada como danificada.",
+            "endgap_label": "Espaço final máximo (especificações)",
+            "heading": "Qualidade de gravação",
+            "minimum_desc": "Se a qualidade da gravação estiver abaixo deste valor, a gravação será marcada como danificada.",
+            "minimum_label": "Qualidade mínima de gravação (porcentagem)",
+            "overtime_desc": "Esta configuração global permite que o gravador grave além do horário de término programado. Isso não afeta o agendador. É ignorado quando dois shows foram agendados sem tempo suficiente entre eles.",
+            "overtime_label": "Tempo para gravar após o final do show (segundos)",
+            "panel": {
+                "overtime": "Registro de categoria ao longo do tempo"
+            },
+            "preroll_desc": "Esta configuração global permite que o gravador inicie antes da hora de início programada. Isso não afeta o agendador. É ignorado quando dois shows foram agendados sem tempo suficiente entre eles.",
+            "preroll_label": "Tempo para gravar antes do início do show (segundos)",
+            "startgap_desc": "Se faltar mais do que este número de segundos no início de uma gravação, isso será considerado uma lacuna para avaliar a qualidade da gravação. A gravação pode ser marcada como danificada.",
+            "startgap_label": "Intervalo inicial máximo (seg)"
+        },
         "recordings": {
             "actionsselected": "Ações em {{ num }} gravações selecionadas",
             "airdate": "Airdate",

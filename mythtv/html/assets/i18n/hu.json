@@ -45,7 +45,7 @@
             "disk_desc": "Extra lemezterület (gigabájtban), amely meghaladja azt, amit a MythTV megkövetel, hogy szabad maradjon a rögzítési fájlrendszereken.",
             "disk_label": "Extra lemezterület (GB)",
             "heading": "Automatikus lejárat",
-            "livetv_desc": "Az Auto-Expire kikényszeríti az élő TV-felvételek lejáratát, ha ennyi naposak. Az élő TV-felvételek lejárati ideje is lejárhat, ha szükséges lemezterület felszabadítása érdekében.",
+            "livetv_desc": "Az Auto Expire kikényszeríti az élő TV-felvételek lejáratát, ha ennyi naposak. Az élő TV-felvételek lejárati ideje is lejárhat, ha szükséges lemezterület felszabadítása érdekében.",
             "livetv_label": "Élő TV maximális életkora (nap)",
             "method_desc": "A módszer annak meghatározására, hogy mely rögzített műsorokat kell először törölni. Az élő TV-felvételek mindig a normál felvételek előtt járnak le.",
             "method_label": "Automatikus lejárati módszer",
@@ -131,6 +131,26 @@
             "titlematch_label": "Címegyezés (regex)"
         },
         "programguide": "Programkalauz",
+        "quality": {
+            "category_desc": "Egy speciális kategória (pl. „Sportesemény”) esetén kérje a műsorok automatikus kiterjesztését. Csak akkor működik, ha a műsor kategóriája meghatározható.",
+            "category_label": "Bővítendő műsorok kategóriája",
+            "catovertime_desc": "A megadott kategóriánál a felvétel megkísérlik a megadott percszámmal meghosszabbítani. Figyelmen kívül hagyja, ha két előadást ütemeztek anélkül, hogy elegendő idő lenne közöttük.",
+            "catovertime_label": "Az előadás végének felvétele (perc)",
+            "endgap_desc": "Ha ennél több másodperc hiányzik a felvétel végén, az a felvétel minőségének értékelése szempontjából hiányosnak minősül. A felvétel sérültként lehet megjelölve.",
+            "endgap_label": "Maximális véghézag (specifikációk)",
+            "heading": "Felvételi minőség",
+            "minimum_desc": "Ha a felvétel minősége ennél az értéknél alacsonyabb, a felvétel sérültként kerül megjelölésre.",
+            "minimum_label": "Minimális felvételi minőség (százalék)",
+            "overtime_desc": "Ez a globális beállítás lehetővé teszi, hogy a felvevő az ütemezett befejezési időponton túl is rögzítsen. Az ütemezőt nem érinti. Figyelmen kívül hagyja, ha két előadást ütemeztek anélkül, hogy elegendő idő lenne közöttük.",
+            "overtime_label": "Felvételi idő a műsor végén (másodperc)",
+            "panel": {
+                "overtime": "Kategória rekord idővel"
+            },
+            "preroll_desc": "Ez a globális beállítás lehetővé teszi, hogy a felvevő az ütemezett kezdési időpont előtt elinduljon. Az ütemezőt nem érinti. Figyelmen kívül hagyja, ha két előadást ütemeztek anélkül, hogy elegendő idő lenne közöttük.",
+            "preroll_label": "Felvételi idő az előadás kezdete előtt (másodperc)",
+            "startgap_desc": "Ha ennél több másodperc hiányzik a felvétel elején, az a felvétel minőségének értékelése szempontjából hiányosnak minősül. A felvétel sérültként lehet megjelölve.",
+            "startgap_label": "Maximális kezdési távolság (másodperc)"
+        },
         "recordings": {
             "actionsselected": "Műveletek a {{ num }} kiválasztott felvételeken",
             "airdate": "Kiadás dátuma",

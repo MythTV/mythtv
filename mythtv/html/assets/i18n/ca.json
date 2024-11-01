@@ -44,7 +44,7 @@
             "deleted_label": "Temps per conservar els enregistraments suprimits (dies)",
             "disk_desc": "Espai addicional en disc (en gigabytes) més enllà del que MythTV requereix que voleu mantenir lliure als sistemes de fitxers de gravació.",
             "disk_label": "Espai addicional en disc (GB)",
-            "heading": "Caduca automàticament",
+            "heading": "Caducitat automàtica",
             "livetv_desc": "La caducitat automàtica forçarà la caducitat de les gravacions de TV en directe quan tinguin tants dies d'antiguitat. Les gravacions de televisió en directe també poden caducar abans d'hora si cal per alliberar espai al disc.",
             "livetv_label": "Edat màxima de televisió en directe (dies)",
             "method_desc": "Mètode utilitzat per determinar quins programes gravats s'han d'eliminar primer. Les gravacions de televisió en directe sempre caducaran abans de les gravacions normals.",
@@ -52,9 +52,9 @@
             "method_lowest": "Primer la prioritat més baixa",
             "method_oldest": "Primer l'espectacle més antic",
             "method_weighted": "Combinació ponderada temps/prioritat",
-            "priority_desc": "El nombre de dies de bonificació que rep un programa per cada punt de prioritat. Només s'utilitza quan s'ha seleccionat el mètode d'expiració automàtica de prioritat/temps ponderat.",
+            "priority_desc": "El nombre de dies de bonificació que rep un programa per cada punt de prioritat. Això només s'utilitza quan s'ha seleccionat el mètode de caducitat automàtica de prioritat/temps ponderat.",
             "priority_label": "Pes prioritari",
-            "rerecord_desc": "Si està activat, els programes que s'han marcat com a vists i que caduquen automàticament es tornaran a gravar si es tornen a mostrar.",
+            "rerecord_desc": "Si està activat, els programes que s'han marcat com a vists i que han caducat automàticament es tornaran a gravar si es tornen a mostrar.",
             "rerecord_label": "S'ha tornat a gravar",
             "subtitle": "Configuració que controla quan s'eliminen les gravacions de l'emmagatzematge.",
             "watched_desc": "Si està activat, els programes que s'han marcat com a vists caducaran abans que els programes que no s'hagin vist.",
@@ -131,6 +131,26 @@
             "titlematch_label": "Coincidència de títol (regex)"
         },
         "programguide": "Guia del programa",
+        "quality": {
+            "category_desc": "Per a una categoria especial (p. ex., \"Esdeveniment esportiu\"), sol·liciteu que els espectacles s'ampliïn automàticament. Només funciona si es pot determinar la categoria d'un espectacle.",
+            "category_label": "Categoria d'espectacles a ampliar",
+            "catovertime_desc": "Per a la categoria especificada, s'intentarà ampliar l'enregistrament el nombre especificat de minuts. S'ignora quan s'han programat dos espectacles sense temps entremig.",
+            "catovertime_label": "Enregistrar el final del programa (min)",
+            "endgap_desc": "Si falten més d'aquest nombre de segons al final d'una gravació, es considerarà un buit per avaluar la qualitat de l'enregistrament. La gravació pot estar marcada com a danyada.",
+            "endgap_label": "Espai màxim d'extrem (especificacions)",
+            "heading": "Qualitat de gravació",
+            "minimum_desc": "Si la qualitat de l'enregistrament és inferior a aquest valor, l'enregistrament es marcarà com a danyat.",
+            "minimum_label": "Qualitat d'enregistrament mínima (percentatge)",
+            "overtime_desc": "Aquesta configuració global permet que la gravadora enregistri més enllà de l'hora de finalització programada. No afecta el planificador. S'ignora quan s'han programat dos espectacles sense temps suficient entremig.",
+            "overtime_label": "Temps per gravar el final del programa (segons)",
+            "panel": {
+                "overtime": "Registre de categoria al llarg del temps"
+            },
+            "preroll_desc": "Aquesta configuració global permet que la gravadora s'iniciï abans de l'hora d'inici programada. No afecta el planificador. S'ignora quan s'han programat dos espectacles sense temps suficient entremig.",
+            "preroll_label": "Temps per gravar abans de l'inici de l'espectacle (segons)",
+            "startgap_desc": "Si falten més d'aquest nombre de segons a l'inici d'una gravació, es considerarà un buit per avaluar la qualitat de l'enregistrament. La gravació pot estar marcada com a danyada.",
+            "startgap_label": "Interval màxim d'inici (segons)"
+        },
         "recordings": {
             "actionsselected": "Accions a {{ num }} Enregistraments seleccionats",
             "airdate": "Data d'emissió",

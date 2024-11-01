@@ -4,7 +4,7 @@ export interface ChannelGroupRequest {
 }
 
 export interface GetCategoryListResponse {
-    CategoryList:       String[];
+    CategoryList:       string[];
 }
 
 export interface GetChannelIconRequest {

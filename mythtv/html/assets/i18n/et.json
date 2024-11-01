@@ -52,9 +52,9 @@
             "method_lowest": "Madalaim prioriteet kõigepealt",
             "method_oldest": "Kõigepealt vanim saade",
             "method_weighted": "Kaalutud aja/prioriteedi kombinatsioon",
-            "priority_desc": "Päevade arv boonust, mille programm iga prioriteetse punkti eest saab. Seda kasutatakse ainult siis, kui valitud on Kaalutud aja/prioriteediga automaatse aegumise meetod.",
+            "priority_desc": "Päevade arv boonust, mille programm iga prioriteetse punkti eest saab. Seda kasutatakse ainult siis, kui valitud on Kaalutud aja/prioriteediga automaatne aegumise meetod.",
             "priority_label": "Prioriteetne kaal",
-            "rerecord_desc": "Kui see on lubatud, salvestatakse vaadatuks märgitud ja automaatselt aegunud saated uuesti, kui neid uuesti näidatakse.",
+            "rerecord_desc": "Kui see on lubatud, salvestatakse saated, mis on märgitud vaadatuks ja on automaatselt aegunud, kui neid uuesti näidatakse.",
             "rerecord_label": "Salvestus uuesti vaadatud",
             "subtitle": "Seaded, mis määravad, millal salvestised salvestusruumist kustutatakse.",
             "watched_desc": "Kui see on lubatud, aeguvad vaadatuks märgitud saated enne neid saateid, mida pole vaadatud.",
@@ -131,6 +131,26 @@
             "titlematch_label": "Pealkirja vaste (regulaarne väljend)"
         },
         "programguide": "Saatejuht",
+        "quality": {
+            "category_desc": "Erikategooria (nt \"Spordisündmus\") jaoks taotlege saadete automaatset pikendamist. Töötab ainult siis, kui saate kategooria saab määrata.",
+            "category_label": "Näituste kategooria, mida tuleb laiendada",
+            "catovertime_desc": "Määratud kategooria puhul üritatakse salvestust pikendada määratud arvu minutite võrra. Seda eiratakse, kui kaks etendust on planeeritud, ilma et nende vahel oleks piisavalt aega.",
+            "catovertime_label": "Salvestada saate lõpp (min)",
+            "endgap_desc": "Kui salvestuse lõpus on puudu rohkem kui see arv sekundeid, loetakse salvestuskvaliteedi hindamisel tühimik. Salvestis võib olla kahjustatud.",
+            "endgap_label": "Maksimaalne lõpuvahe (spetsifikatsioonid)",
+            "heading": "Salvestuskvaliteet",
+            "minimum_desc": "Kui salvestuskvaliteet on sellest väärtusest madalam, märgitakse salvestus kahjustatuks.",
+            "minimum_label": "Minimaalne salvestuskvaliteet (protsenti)",
+            "overtime_desc": "See üldine säte võimaldab salvestil salvestada pärast ajastatud lõppaega. See ei mõjuta planeerijat. Seda eiratakse, kui kaks etendust on planeeritud, ilma et nende vahel oleks piisavalt aega.",
+            "overtime_label": "Aeg salvestamiseks pärast saate lõppu (sekundites)",
+            "panel": {
+                "overtime": "Kategooria rekord aja jooksul"
+            },
+            "preroll_desc": "See üldine säte võimaldab salvestil käivituda enne ajastatud algusaega. See ei mõjuta planeerijat. Seda eiratakse, kui kaks etendust on planeeritud, ilma et nende vahel oleks piisavalt aega.",
+            "preroll_label": "Salvestamise aeg enne etenduse algust (sekundites)",
+            "startgap_desc": "Kui salvestuse alguses on puudu rohkem kui see arv sekundeid, loetakse salvestuskvaliteedi hindamisel tühimik. Salvestis võib olla kahjustatud.",
+            "startgap_label": "Maksimaalne algusvahe (s)"
+        },
         "recordings": {
             "actionsselected": "Toimingud {{ num }} valitud salvestistega",
             "airdate": "Lennukuupäev",
