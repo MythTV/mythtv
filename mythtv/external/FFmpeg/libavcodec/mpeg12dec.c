@@ -66,7 +66,8 @@ enum Mpeg2ClosedCaptionsFormat {
     CC_FORMAT_AUTO,
     CC_FORMAT_A53_PART4,
     CC_FORMAT_SCTE20,
-    CC_FORMAT_DVD
+    CC_FORMAT_DVD,
+    CC_FORMAT_DISH
 };
 
 typedef struct Mpeg1Context {
@@ -2060,6 +2061,69 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
             mpeg_set_cc_format(avctx, CC_FORMAT_DVD, "DVD");
         }
         return 1;
+    } else if ((!s1->cc_format || s1->cc_format == CC_FORMAT_DISH) &&
+               buf_size >= 12 &&
+               p[0] == 0x05 && p[1] == 0x02) {
+        /* extract Dish Network DVB CC data */
+        const uint8_t cc_header = 0xf8 | 0x04 /* valid */ | 0x00 /* line 21 field 1 */;
+        uint8_t cc_data[4] = {0};
+        int cc_count = 0;
+        uint8_t dvb_cc_type = p[7];
+        p += 8;
+        buf_size -= 8;
+
+        if (dvb_cc_type == 0x05 && buf_size >= 7) {
+            dvb_cc_type = p[6];
+            p += 7;
+            buf_size -= 7;
+        }
+
+        if (dvb_cc_type == 0x02 && buf_size >= 4) { /* 2-byte caption, can be repeated */
+            cc_count = 1;
+            cc_data[0] = p[1];
+            cc_data[1] = p[2];
+            dvb_cc_type = p[3];
+
+            /* Only repeat characters when the next type flag
+             * is 0x04 and the characters are repeatable (i.e., less than
+             * 32 with the parity stripped).
+             */
+            if (dvb_cc_type == 0x04 && (cc_data[0] & 0x7f) < 32) {
+                cc_count = 2;
+                cc_data[2] = cc_data[0];
+                cc_data[3] = cc_data[1];
+            }
+        } else if (dvb_cc_type == 0x04 && buf_size >= 5) { /* 4-byte caption, not repeated */
+            cc_count = 2;
+            cc_data[0] = p[1];
+            cc_data[1] = p[2];
+            cc_data[2] = p[3];
+            cc_data[3] = p[4];
+        }
+
+        if (cc_count > 0) {
+            int ret;
+            int old_size = s1->a53_buf_ref ? s1->a53_buf_ref->size : 0;
+            const uint64_t new_size = (old_size + cc_count * UINT64_C(3));
+            if (new_size > 3 * A53_MAX_CC_COUNT)
+                return AVERROR(EINVAL);
+
+            ret = av_buffer_realloc(&s1->a53_buf_ref, new_size);
+            if (ret >= 0) {
+                s1->a53_buf_ref->data[0] = cc_header;
+                s1->a53_buf_ref->data[1] = cc_data[0];
+                s1->a53_buf_ref->data[2] = cc_data[1];
+                if (cc_count == 2) {
+                    s1->a53_buf_ref->data[3] = cc_header;
+                    s1->a53_buf_ref->data[4] = cc_data[2];
+                    s1->a53_buf_ref->data[5] = cc_data[3];
+                }
+            }
+
+            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
+            mpeg_set_cc_format(avctx, CC_FORMAT_DISH, "Dish Network DVB");
+        }
+        return 1;
     }
     return 0;
 }
@@ -2102,191 +2166,6 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
             s1->afd     = p[0] & 0x0f;
         }
     } else if (buf_end - p >= 6 &&
-               p[0] == 0x43 && p[1] == 0x43 && p[2] == 0x01 && p[3] == 0xf8 &&
-               p[4] == 0x9e) {
-#undef fprintf
-        Mpeg1Context *s1 = avctx->priv_data;
-        MpegEncContext *s = &s1->mpeg_enc_ctx;
-        int atsc_cnt_loc = s->tmp_atsc_cc_len;
-        uint8_t real_count = 0;
-        unsigned int i;
-
-        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&real_count);
-        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
-
-        for (i=5; i < (buf_end - p - 2) &&
-                 (s->tmp_atsc_cc_len + 3) < ATSC_CC_BUF_SIZE; i++)
-        {
-            if ((p[i]&0xfe) == 0xfe) // CC1&CC2 || CC3&CC4
-            {
-                uint8_t type = (p[i] & 0x01) ^ 0x01;
-                uint8_t cc_data_1 = p[++i];
-                uint8_t cc_data_2 = p[++i];
-                uint8_t valid = 1;
-                uint8_t cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
-                real_count++;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_1;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_2;
-                continue;
-            }
-            break;
-        }
-        if (!real_count)
-        {
-            s->tmp_atsc_cc_len = atsc_cnt_loc;
-        }
-        else
-        {
-            s->tmp_atsc_cc_buf[atsc_cnt_loc] = 0x40 | (0x1f&real_count);
-            s->tmp_atsc_cc_len = atsc_cnt_loc + 2 + 3 * real_count;
-        }
-    } else if (buf_end - p >= 6 &&
-               p[0] == 'G' && p[1] == 'A' && p[2] == '9' && p[3] == '4') {
-        /* Parse CEA-708/608 Closed Captions in ATSC user data */
-        int user_data_type_code = p[4];
-        if (user_data_type_code == 0x03) { // caption data
-            Mpeg1Context   *s1 = avctx->priv_data;
-            MpegEncContext *s  = &s1->mpeg_enc_ctx;
-            int cccnt = p[5] & 0x1f;
-            int cclen = 3 * cccnt + 2;
-            //int proc  = (p[5] >> 6) & 1;
-            int blen  = s->tmp_atsc_cc_len;
-
-            p += 5;
-
-            if ((cclen <= buf_end - p) && ((cclen + blen) < ATSC_CC_BUF_SIZE)) {
-                uint8_t *dst = s->tmp_atsc_cc_buf + s->tmp_atsc_cc_len;
-                memcpy(dst, p, cclen);
-                s->tmp_atsc_cc_len += cclen;
-            }
-        }
-        else if (user_data_type_code == 0x04) {
-            // additional CEA-608 data, as per SCTE 21
-        }
-        else if (user_data_type_code == 0x05) {
-            // luma PAM data, as per SCTE 21
-        }
-        else if (user_data_type_code == 0x06) {
-            // bar data (letterboxing info)
-        }
-    } else if (buf_end - p >= 3 && p[0] == 0x03 && ((p[1]&0x7f) == 0x01)) {
-        // SCTE 20 encoding of CEA-608
-        unsigned int cc_count = p[2]>>3;
-        unsigned int cc_bits = cc_count * 26;
-        unsigned int cc_bytes = (cc_bits + 7 - 3) / 8;
-        Mpeg1Context *s1 = avctx->priv_data;
-        MpegEncContext *s = &s1->mpeg_enc_ctx;
-        if (buf_end - p >= (2+cc_bytes) && (s->tmp_scte_cc_len + 2 + 3*cc_count) < SCTE_CC_BUF_SIZE) {
-            int scte_cnt_loc = s->tmp_scte_cc_len;
-            uint8_t real_count = 0, marker = 1, i;
-            GetBitContext gb;
-            init_get_bits(&gb, p+2, (buf_end-p-2) * sizeof(uint8_t));
-            get_bits(&gb, 5); // swallow cc_count
-            s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = 0x40 | (0x1f&cc_count);
-            s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = 0x00; // em_data
-            for (i = 0; i < cc_count; i++) {
-                uint8_t valid, cc608_hdr;
-                uint8_t priority = get_bits(&gb, 2);
-                uint8_t field_no = get_bits(&gb, 2);
-                uint8_t line_offset = get_bits(&gb, 5);
-                uint8_t cc_data_1 = ff_reverse[get_bits(&gb, 8)];
-                uint8_t cc_data_2 = ff_reverse[get_bits(&gb, 8)];
-                uint8_t type = (2 == field_no) ? 0x01 : 0x00;
-                if (!s->top_field_first)
-                    type ^= 0x01;
-                (void) priority; // we use all the data, don't need priority
-                marker &= get_bits(&gb, 1);
-                // dump if marker bit missing
-                valid = marker;
-                // ignore forbidden field numbers
-                valid = valid && (0 != field_no);
-                // ignore content not in line 21
-                valid = valid && (11 == line_offset);
-                if (!valid)
-                    continue;
-                cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
-                real_count++;
-                s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = cc608_hdr;
-                s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = cc_data_1;
-                s->tmp_scte_cc_buf[s->tmp_scte_cc_len++] = cc_data_2;
-            }
-            if (!real_count)
-            {
-                s->tmp_scte_cc_len = scte_cnt_loc;
-            }
-            else
-            {
-                s->tmp_scte_cc_buf[scte_cnt_loc] = 0x40 | (0x1f&real_count);
-                s->tmp_scte_cc_len = scte_cnt_loc + 2 + 3 * real_count;
-            }
-        }
-    } else if (buf_end - p >= 11 &&
-               p[0] == 0x05 && p[1] == 0x02) {
-        /* parse EIA-608 captions embedded in a DVB stream. */
-        Mpeg1Context   *s1 = avctx->priv_data;
-        MpegEncContext *s  = &s1->mpeg_enc_ctx;
-        uint8_t dvb_cc_type = p[7];
-        p += 8;
-
-        /* Predictive frame tag, but MythTV reorders predictive
-         * frames for us along with the CC data, so we ignore it.
-         */
-        if (dvb_cc_type == 0x05) {
-            dvb_cc_type = p[6];
-            p += 7;
-        }
-
-        if (dvb_cc_type == 0x02) { /* 2-byte caption, can be repeated */
-            int type = 0x00; // line 21 field 1 == 0x00, field 2 == 0x01
-            uint8_t cc608_hdr = 0xf8 | 0x04/*valid*/ | type;
-            uint8_t hi = p[1] & 0xFF;
-            uint8_t lo = p[2] & 0xFF;
-
-            dvb_cc_type = p[3];
-
-            if ((2 <= buf_end - p) && ((3 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&1/*cc_count*/);
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = hi;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = lo;
-
-                /* Only repeat characters when the next type flag
-                 * is 0x04 and the characters are repeatable (i.e., less than
-                 * 32 with the parity stripped).
-                 */
-                if (dvb_cc_type == 0x04 && (hi & 0x7f) < 32) {
-                    if ((2 <= buf_end - p) && ((3 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
-                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&1/*cc_count*/);
-                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
-                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
-                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = hi;
-                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = lo;
-                    }
-                }
-            }
-
-            p += 6;
-        } else if (dvb_cc_type == 0x04) { /* 4-byte caption, not repeated */
-            if ((4 <= buf_end - p) &&
-                ((6 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
-                int type = 0x00; // line 21 field 1 == 0x00, field 2 == 0x01
-                uint8_t cc608_hdr = 0xf8 | 0x04/*valid*/ | type;
-
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&2/*cc_count*/);
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[1] & 0xFF;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[2] & 0xFF;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[3] & 0xFF;
-                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[4] & 0xFF;
-            }
-
-            p += 9;
-        }
-    } else if (buf_end - p >= 6 &&
                p[0] == 'J' && p[1] == 'P' && p[2] == '3' && p[3] == 'D' &&
                p[4] == 0x03) { // S3D_video_format_length
         // the 0x7F mask ignores the reserved_bit value
@@ -2317,9 +2196,6 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
     } else if (mpeg_decode_a53_cc(avctx, p, buf_size)) {
         return;
     }
-    // For other CEA-608 embedding options see:
-    /* SCTE 21 */
-    /* ETSI EN 301 775 */
 }
 
 static int mpeg_decode_gop(AVCodecContext *avctx,
@@ -2818,6 +2694,8 @@ static const AVOption mpeg2video_options[] = {
         { .i64 =   CC_FORMAT_SCTE20 },              .flags = M2V_PARAM, .unit = "cc_format" },
        { "dvd",    "pick DVD CC substream",         0, AV_OPT_TYPE_CONST,
         { .i64 =   CC_FORMAT_DVD },                 .flags = M2V_PARAM, .unit = "cc_format" },
+       { "dish",   "pick Dish Network DVB CC substream", 0, AV_OPT_TYPE_CONST,
+        { .i64 =   CC_FORMAT_DISH },                 .flags = M2V_PARAM, .unit = "cc_format" },
     { NULL }
 };
 

@@ -471,15 +471,6 @@ typedef struct MpegEncContext {
     int rtp_mode;
     int rtp_payload_size;
 
-#define ATSC_CC_BUF_SIZE 1024
-    /// Used to hold cached user_data about caption packets before the
-    /// frame for these packets has been created in MPV_frame_start().
-    uint8_t tmp_atsc_cc_buf[ATSC_CC_BUF_SIZE];
-    int     tmp_atsc_cc_len;
-#define SCTE_CC_BUF_SIZE 1024
-    uint8_t tmp_scte_cc_buf[SCTE_CC_BUF_SIZE];
-    int     tmp_scte_cc_len;
-
     uint8_t *ptr_lastgob;
 
     int16_t (*block)[64]; ///< points to one of the following blocks
