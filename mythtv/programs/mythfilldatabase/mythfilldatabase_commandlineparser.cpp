@@ -139,9 +139,9 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
 
     add("--dd-grab-all", "ddgraball", false, "", "")
-        ->SetDeprecated("It's no longer valid with Schedules Direct XMLTV.\n"
+        ->SetRemoved("It's no longer valid with Schedules Direct XMLTV.\n"
           "          Remove in mythtv-setup General -> Program Schedule\n"
-          "          -> Downloading Options -> Guide Data Arguements");
+                     "          -> Downloading Options -> Guide Data Arguements", "35.0");
     add("--no-resched", "noresched", false,
             "Do not invoke the rescheduler in the backend.",
 	    "This option prevents mythfilldatabase from asking the backend "
