@@ -345,7 +345,7 @@ bool FillData::Run(DataSourceList &sourcelist)
             else
             {
                 LOG(VB_GENERAL, LOG_INFO,
-                    QString("No channels are configured to use grabber."));
+                    QString("No channels are configured to use grabber (none have XMLTVIDs)."));
             }
         }
         else
