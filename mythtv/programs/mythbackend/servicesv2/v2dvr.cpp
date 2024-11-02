@@ -736,7 +736,7 @@ bool V2Dvr::AllowReRecord ( int RecordedId )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Prefer Dvr/UpdateRecordedMetadata. Some day, this should go away.
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
@@ -744,7 +744,7 @@ bool V2Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
                                         const QDateTime &StartTime,
                                         bool  watched)
 {
-    LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
+    // LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
 
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
@@ -851,7 +851,7 @@ long V2Dvr::GetLastPlayPos( int RecordedId,
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Prefer Dvr/UpdateRecordedMetadata. Some day, this should go away.
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::SetSavedBookmark( int RecordedId,
@@ -860,7 +860,7 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
                             const QString &offsettype,
                             long Offset )
 {
-    LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
+    // LOG(VB_GENERAL, LOG_WARNING, "Deprecated, use Dvr/UpdateRecordedMetadata.");
 
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
