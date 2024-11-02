@@ -226,16 +226,6 @@ static int alloc_picture(MpegEncContext *s, MPVWorkPicture *dst, int reference)
 
     pic->reference = reference;
 
-    /* Myth Change - Begin */
-    /* Put ATSC captions cached from parse_user_data into the correct frame */
-    memcpy(pic->f->atsc_cc_buf, s->tmp_atsc_cc_buf, s->tmp_atsc_cc_len);
-    pic->f->atsc_cc_len = s->tmp_atsc_cc_len;
-    s->tmp_atsc_cc_len = 0;
-    memcpy(pic->f->scte_cc_buf, s->tmp_scte_cc_buf, s->tmp_scte_cc_len);
-    pic->f->scte_cc_len = s->tmp_scte_cc_len;
-    s->tmp_scte_cc_len = 0;
-    /* Myth Change - End */
-
     /* WM Image / Screen codecs allocate internal buffers with different
      * dimensions / colorspaces; ignore user-defined callbacks for these. */
     if (avctx->codec_id != AV_CODEC_ID_WMV3IMAGE &&

@@ -2806,32 +2806,7 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 }
 #endif
 
-void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte)
-{
-    if (!buf_size)
-        return;
-
-    // closed caption data
-    //cc_data() {
-    // reserved                1 0.0   1
-    // process_cc_data_flag    1 0.1   bslbf
-    bool process_cc_data = (buf[0] & 0x40) != 0;
-    if (!process_cc_data)
-        return; // early exit if process_cc_data_flag false
-
-    // additional_data_flag    1 0.2   bslbf
-    //bool additional_data = buf[0] & 0x20;
-    // cc_count                5 0.3   uimsbf
-    uint cc_count = buf[0] & 0x1f;
-    // em_data                 8 1.0
-
-    if (buf_size < 2+(3*cc_count))
-        return;
-
-    DecodeCCx08(buf+2, cc_count*3, scte);
-}
-
-void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
+void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size)
 {
     if (buf_size < 3)
         return;
@@ -2855,26 +2830,12 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
             continue;
         }
 
-        if (scte || cc_type <= 0x1) // EIA-608 field-1/2
+        if (cc_type <= 0x1) // EIA-608 field-1/2
         {
-            uint field = cc_type;
-
             if (cc608_good_parity(data))
             {
-                // in film mode, we may start at the wrong field;
-                // correct if XDS start/cont/end code is detected
-                // (must be field 2)
-                if (scte && field == 0 &&
-                    (data1 & 0x7f) <= 0x0f && (data1 & 0x7f) != 0x00)
-                {
-                    field = 1;
-
-                    // flush decoder
-                    m_ccd608->FormatCC(0ms, -1, -1);
-                }
-
                 had_608 = true;
-                m_ccd608->FormatCCField(duration_cast<std::chrono::milliseconds>(m_lastCcPtsu), field, data);
+                m_ccd608->FormatCCField(duration_cast<std::chrono::milliseconds>(m_lastCcPtsu), cc_type, data);
             }
         }
         else
@@ -3452,44 +3413,10 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 
     auto * context = m_codecMap.GetCodecContext(Stream);
 
-    // We need to mediate between ATSC and SCTE data when both are present.  If
-    // both are present, we generally want to prefer ATSC.  However, there may
-    // be large sections of the recording where ATSC is used and other sections
-    // where SCTE is used.  In that case, we want to allow a natural transition
-    // from ATSC back to SCTE.  We do this by allowing 10 consecutive SCTE
-    // frames, without an intervening ATSC frame, to cause a switch back to
-    // considering SCTE frames.  The number 10 is somewhat arbitrarily chosen.
-
-    uint cc_len = static_cast<uint>(std::max(AvFrame->scte_cc_len,0));
-    uint8_t *cc_buf = AvFrame->scte_cc_buf;
-    bool scte = true;
-
-    // If we saw SCTE, then decrement a nonzero ignore_scte count.
-    if (cc_len > 0 && m_ignoreScte)
-        --m_ignoreScte;
-
-    // If both ATSC and SCTE caption data are available, prefer ATSC
-    if ((AvFrame->atsc_cc_len > 0) || m_ignoreScte)
-    {
-        cc_len = static_cast<uint>(std::max(AvFrame->atsc_cc_len, 0));
-        cc_buf = AvFrame->atsc_cc_buf;
-        scte = false;
-        // If we explicitly saw ATSC, then reset ignore_scte count.
-        if (cc_len > 0)
-            m_ignoreScte = 10;
-    }
-
-    // Decode CEA-608 and CEA-708 captions
-    for (uint i = 0; i < cc_len; i += ((cc_buf[i] & 0x1f) * 3) + 2)
-        DecodeDTVCC(cc_buf + i, cc_len - i, scte);
-
     // look for A53 captions
-    if (cc_len == 0)
-    {
-        auto * side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
-        if (side_data && (side_data->size > 0))
-            DecodeCCx08(side_data->data, static_cast<uint>(side_data->size), false);
-    }
+    auto * side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
+    if (side_data && (side_data->size > 0))
+        DecodeCCx08(side_data->data, static_cast<uint>(side_data->size));
 
     auto * frame = static_cast<MythVideoFrame*>(AvFrame->opaque);
     if (frame)
