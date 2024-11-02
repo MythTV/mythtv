@@ -1274,7 +1274,9 @@ V2PlayGroup* V2Dvr::GetPlayGroup    ( const QString & Name )
             playGroup->setJump(query.value(5).toInt());
         }
         else
+        {
             throw QString("Play Group Not Found.");
+        }
    }
     return playGroup;
 }
@@ -1290,11 +1292,7 @@ bool V2Dvr::RemovePlayGroup    ( const QString & Name )
 
     query.bindValue(":NAME", Name);
 
-    if (query.exec())
-    {
-        return true;
-    }
-    return false;
+    return query.exec();
 }
 
 bool V2Dvr::AddPlayGroup    ( const QString & Name,
@@ -1316,9 +1314,7 @@ bool V2Dvr::AddPlayGroup    ( const QString & Name,
     query.bindValue(":TIMESTRETCH", TimeStretch);
     query.bindValue(":JUMP", Jump);
 
-    if (query.exec())
-        return true;
-    return false;
+    return query.exec();
 }
 
 bool V2Dvr::UpdatePlayGroup ( const QString & Name,

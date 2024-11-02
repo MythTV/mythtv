@@ -32,11 +32,7 @@ class V2PlayGroup : public QObject
     public:
 
         Q_INVOKABLE V2PlayGroup(QObject *parent = nullptr)
-            : QObject( parent ),
-            m_SkipAhead   (0),
-            m_SkipBack    (0),
-            m_TimeStretch (0),
-            m_Jump        (0)
+            : QObject( parent )
         {
         }
 
