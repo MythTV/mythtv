@@ -174,8 +174,7 @@ class AvFormatDecoder : public DecoderBase
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic,
                               int flags);
 
-    void DecodeDTVCC(const uint8_t *buf, uint buf_size, bool scte);
-    void DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte);
+    void DecodeCCx08(const uint8_t *buf, uint buf_size);
     void InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                         bool selectedStream = false);
 
@@ -284,7 +283,6 @@ class AvFormatDecoder : public DecoderBase
     int                m_averrorCount                 {0};
 
     // Caption/Subtitle/Teletext decoders
-    uint               m_ignoreScte                   {0};
     CC608Decoder      *m_ccd608                       {nullptr};
     CC708Decoder      *m_ccd708                       {nullptr};
     TeletextDecoder   *m_ttd                          {nullptr};

@@ -719,20 +719,6 @@ typedef struct AVFrame {
 #define FF_DECODE_ERROR_CONCEALMENT_ACTIVE  4
 #define FF_DECODE_ERROR_DECODE_SLICES       8
 
-    /** ATSC CC data CEA-608/708
-     * - encoding: unused
-     * - decoding: Set by libavcodec
-     */
-    uint8_t atsc_cc_buf[1024];
-    int atsc_cc_len;
-
-    /** SCTE CC data CEA-608
-     * - encoding: unused
-     * - decoding: Set by libavcodec
-     */
-    uint8_t scte_cc_buf[1024];
-    int scte_cc_len;
-
 #if FF_API_FRAME_PKT
     /**
      * size of the corresponding packet containing the compressed
