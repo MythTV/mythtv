@@ -2857,17 +2857,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 
         if (scte || cc_type <= 0x1) // EIA-608 field-1/2
         {
-            uint field = 0;
-            if (cc_type == 0x2)
-            {
-                // SCTE repeated field
-                field = (m_lastScteField == 0 ? 1 : 0);
-                m_invertScteField = (m_invertScteField == 0 ? 1 : 0);
-            }
-            else
-            {
-                field = cc_type ^ m_invertScteField;
-            }
+            uint field = cc_type;
 
             if (cc608_good_parity(data))
             {
@@ -2877,8 +2867,6 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
                 if (scte && field == 0 &&
                     (data1 & 0x7f) <= 0x0f && (data1 & 0x7f) != 0x00)
                 {
-                    if (cc_type == 1)
-                        m_invertScteField = 0;
                     field = 1;
 
                     // flush decoder
@@ -2887,8 +2875,6 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 
                 had_608 = true;
                 m_ccd608->FormatCCField(duration_cast<std::chrono::milliseconds>(m_lastCcPtsu), field, data);
-
-                m_lastScteField = field;
             }
         }
         else

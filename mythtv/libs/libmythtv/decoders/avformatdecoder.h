@@ -285,8 +285,6 @@ class AvFormatDecoder : public DecoderBase
 
     // Caption/Subtitle/Teletext decoders
     uint               m_ignoreScte                   {0};
-    uint               m_invertScteField              {0};
-    uint               m_lastScteField                {0};
     CC608Decoder      *m_ccd608                       {nullptr};
     CC708Decoder      *m_ccd708                       {nullptr};
     TeletextDecoder   *m_ttd                          {nullptr};
