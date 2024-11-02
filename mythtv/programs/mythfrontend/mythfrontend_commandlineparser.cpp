@@ -36,16 +36,6 @@ void MythFrontendCommandLineParser::LoadArguments(void)
             ->SetGroup("Startup Behavior")
             ->SetBlocks("jumppoint");
 
-    add(QStringList{"-G", "--get-setting"},
-        "getsetting", "", "", "")
-            ->SetRemoved("Use the Services API instead.", "0.25");
-    add(QStringList{"-u", "--upgrade-schema"},
-        "upgradeschema", "", "", "")
-            ->SetRemoved("The frontend is no longer allowed to update\n"
-               "          the primary database schema. Use mythtv-setup\n"
-               "          or restart your primary backend to have it\n"
-               "          perform the task automatically.", "0.25");
-
     add(QStringList{"-vrr", "--vrr"}, "vrr", 0U,
                     "Try to enable (1) or disable (0) variable refresh rate (FreeSync or GSync)","");
 }
