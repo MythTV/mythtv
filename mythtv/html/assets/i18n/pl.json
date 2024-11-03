@@ -72,6 +72,16 @@
             "name_label": "Nazwa",
             "new": "Nowa grupa kanałów"
         },
+        "datasources": {
+            "daily_desc": "Jeśli jest ustawione, backend będzie codziennie próbował aktualizować grafikę nagrań. Kiedy rozpocznie się nagrywanie nowych sezonów, spróbujemy zapewnić świeżą, odpowiednią grafikę, zachowując jednocześnie grafikę przypisaną do starych nagrań.",
+            "daily_label": "Wykonuj codzienne aktualizacje okładek nagrań",
+            "heading": "Grafika i źródła danych",
+            "movie_desc": "Wybierz źródło, z którego będziesz korzystać podczas wyszukiwania informacji i grafik na temat filmów.",
+            "movie_label": "Źródło metadanych filmu",
+            "subtitle": "Skonfiguruj źródła grafiki i metadanych",
+            "tv_desc": "Wybierz źródło, z którego będziesz korzystać podczas wyszukiwania informacji i grafik na temat programów telewizyjnych.",
+            "tv_label": "Źródło metadanych telewizji"
+        },
         "guide": {
             "calendar_tip": "Wybór daty: najpierw wybierz godzinę, a następnie datę.",
             "cat_search": "Wyszukiwanie kategorii",

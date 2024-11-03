@@ -72,6 +72,16 @@
             "name_label": "Naam",
             "new": "Nieuwe kanaalgroep"
         },
+        "datasources": {
+            "daily_desc": "Indien ingesteld, probeert de backend dagelijks artwork-updates voor opnamen uit te voeren. Wanneer er nieuwe seizoenen worden opgenomen, wordt geprobeerd u van nieuw, relevant artwork te voorzien, terwijl het artwork dat aan oude opnames is toegewezen, behouden blijft.",
+            "daily_label": "Voer dagelijkse updates uit van opnamekunstwerken",
+            "heading": "Kunstwerken en gegevensbronnen",
+            "movie_desc": "Selecteer een bron die u wilt gebruiken bij het zoeken naar informatie en illustraties over films.",
+            "movie_label": "Metagegevensbron voor films",
+            "subtitle": "Configureer bronnen van illustraties en metadata",
+            "tv_desc": "Selecteer een bron die u wilt gebruiken bij het zoeken naar informatie en illustraties over televisieprogramma's.",
+            "tv_label": "Bron van metagegevens van televisie"
+        },
         "guide": {
             "calendar_tip": "Datumkiezer: Selecteer eerst de tijd en vervolgens de datum.",
             "cat_search": "Categorie zoeken",

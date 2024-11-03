@@ -72,6 +72,16 @@
             "name_label": "Nom",
             "new": "Nouveau groupe de chaînes"
         },
+        "datasources": {
+            "daily_desc": "S'il est défini, le backend tentera d'effectuer quotidiennement des mises à jour des illustrations pour les enregistrements. Lorsque l'enregistrement de nouvelles saisons commencera, cela tentera de vous fournir des illustrations fraîches et pertinentes tout en préservant les illustrations attribuées aux anciens enregistrements.",
+            "daily_label": "Effectuer des mises à jour quotidiennes des illustrations d'enregistrement",
+            "heading": "Illustrations et sources de données",
+            "movie_desc": "Sélectionnez une source à utiliser lors de la recherche d’informations et d’illustrations sur des films.",
+            "movie_label": "Source des métadonnées du film",
+            "subtitle": "Configurer les sources d'illustrations et de métadonnées",
+            "tv_desc": "Sélectionnez une source à utiliser lors de la recherche d’informations et d’œuvres d’art sur des émissions de télévision.",
+            "tv_label": "Source de métadonnées de télévision"
+        },
         "guide": {
             "calendar_tip": "Sélecteur de date : sélectionnez d'abord l'heure, puis la date.",
             "cat_search": "Recherche par catégorie",

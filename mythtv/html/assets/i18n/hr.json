@@ -72,6 +72,16 @@
             "name_label": "Ime",
             "new": "Nova grupa kanala"
         },
+        "datasources": {
+            "daily_desc": "Ako je postavljeno, pozadina će svakodnevno pokušavati ažurirati ilustracije za snimke. Kada se počnu snimati nove sezone, pokušat će vam se pružiti svježa, relevantna slika dok će se sačuvati slika dodijeljena starim snimkama.",
+            "daily_label": "Obavljajte dnevna ažuriranja umjetničkih djela snimanja",
+            "heading": "Umjetnička djela i izvori podataka",
+            "movie_desc": "Odaberite izvor koji ćete koristiti kada tražite informacije i umjetnička djela o filmovima.",
+            "movie_label": "Izvor metapodataka filma",
+            "subtitle": "Konfigurirajte izvore umjetničkih djela i metapodataka",
+            "tv_desc": "Odaberite izvor koji ćete koristiti kada tražite informacije i umjetnička djela o televizijskim emisijama.",
+            "tv_label": "Izvor televizijskih metapodataka"
+        },
         "guide": {
             "calendar_tip": "Birač datuma: prvo odaberite vrijeme, a zatim datum.",
             "cat_search": "Pretraga po kategoriji",

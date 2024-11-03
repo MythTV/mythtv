@@ -72,6 +72,16 @@
             "name_label": "Jméno",
             "new": "Nová skupina kanálů"
         },
+        "datasources": {
+            "daily_desc": "Je-li nastaveno, backend se pokusí provádět aktualizace kresby pro nahrávky denně. Když se začnou nahrávat nové sezóny, pokusí se vám poskytnout čerstvé, relevantní umělecké dílo a zároveň zachovat umělecká díla přiřazená ke starým nahrávkám.",
+            "daily_label": "Provádějte každodenní aktualizace nahrávek",
+            "heading": "Umělecká díla a zdroje dat",
+            "movie_desc": "Vyberte zdroj, který chcete použít při vyhledávání informací a uměleckých děl o filmech.",
+            "movie_label": "Zdroj metadat filmu",
+            "subtitle": "Nakonfigurujte zdroje uměleckých děl a metadat",
+            "tv_desc": "Vyberte zdroj, který chcete použít při vyhledávání informací a uměleckých děl o televizních pořadech.",
+            "tv_label": "Zdroj televizních metadat"
+        },
         "guide": {
             "calendar_tip": "Výběr data: Nejprve vyberte čas a poté datum.",
             "cat_search": "Vyhledávání kategorií",

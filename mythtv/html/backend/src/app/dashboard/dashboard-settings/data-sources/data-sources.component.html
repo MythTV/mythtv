@@ -1,0 +1,65 @@
+<form class="ml-3 mr-3" name="datasources" #datasources="ngForm">
+    <p-card class="m-5">
+        <ng-template pTemplate="title">
+            {{ 'dashboard.datasources.heading' | translate }}
+        </ng-template>
+        <ng-template pTemplate="subtitle">
+            {{ 'dashboard.datasources.subtitle' | translate }}
+        </ng-template>
+        <ng-template pTemplate="content">
+            <div class="grid">
+                <div class="mb-4 w-full">
+
+                    <div class="form-group field">
+                        <label for="MovieGrabber" class="label block">{{ 'dashboard.datasources.movie_label' |
+                            translate }}</label>
+                        <p-dropdown appendTo="body" [options]="movieList" [(ngModel)]="MovieGrabber" class="w-full mb-2"
+                            name="MovieGrabber" aria-describedby="MovieGrabber-help" optionLabel="Label"
+                            optionValue="Value">
+                        </p-dropdown>
+                        <small class="block mt-2" id="MovieGrabber-help">
+                            {{ 'dashboard.datasources.movie_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <label for="TelevisionGrabber" class="label block">{{ 'dashboard.datasources.tv_label' |
+                            translate }}</label>
+                        <p-dropdown appendTo="body" [options]="tvList" [(ngModel)]="TelevisionGrabber"
+                            class="w-full mb-2" name="TelevisionGrabber" aria-describedby="TelevisionGrabber-help"
+                            optionLabel="Label" optionValue="Value">
+                        </p-dropdown>
+                        <small class="block mt-2" id="TelevisionGrabber-help">
+                            {{ 'dashboard.datasources.tv_desc' | translate }}
+                        </small>
+                    </div>
+
+                    <div class="form-group field">
+                        <p-checkbox inputId="RerecordWatched" [(ngModel)]="DailyArtworkUpdates"
+                            name="DailyArtworkUpdates" class="mb-2 w-full label" [binary]="true"
+                            label="{{ 'dashboard.datasources.daily_label' | translate }}">
+                        </p-checkbox>
+                        <small class="block">
+                            {{ 'dashboard.datasources.daily_desc' | translate }}
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <div class="grid nogutter">
+                <div class="col-12">
+                    <p-message *ngIf="successCount > 0 && errorCount == 0 && !datasources.dirty" severity="success"
+                        text="{{ 'common.savesuccess' | translate }}"></p-message>
+                    <p-message *ngIf="this.errorCount > 0" severity="error"
+                        text="{{ 'common.networkfail' | translate }}"></p-message>
+                </div>
+                <p-button class="col pr-1" label="{{'common.save' | translate}}" icon="pi pi-save" iconPos="left"
+                    (onClick)="saveForm(); datasources.form.markAsPristine()"
+                    [disabled]="!datasources.dirty"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</form>

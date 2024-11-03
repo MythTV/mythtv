@@ -72,6 +72,16 @@
             "name_label": "Namn",
             "new": "Ny kanalgrupp"
         },
+        "datasources": {
+            "daily_desc": "Om det är inställt kommer backend att försöka utföra konstverksuppdateringar för inspelningar dagligen. När nya säsonger börjar spelas in kommer detta att försöka ge dig färska, relevanta konstverk samtidigt som de konstverk som tilldelats gamla inspelningar bevaras.",
+            "daily_label": "Utför dagliga uppdateringar av inspelningskonstverk",
+            "heading": "Konstverk och datakällor",
+            "movie_desc": "Välj en källa att använda när du söker efter information och konstverk om filmer.",
+            "movie_label": "Filmens metadatakälla",
+            "subtitle": "Konfigurera källor för konstverk och metadata",
+            "tv_desc": "Välj en källa att använda när du söker efter information och konstverk om tv-program.",
+            "tv_label": "Televisions metadatakälla"
+        },
         "guide": {
             "calendar_tip": "Datumväljare: Välj först tid och sedan datum.",
             "cat_search": "Kategorisökning",

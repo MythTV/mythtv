@@ -72,6 +72,16 @@
             "name_label": "Name",
             "new": "New Channel Group"
         },
+        "datasources": {
+            "daily_desc": "If set, the backend will attempt to perform artwork updates for recordings daily. When new seasons begin to record, this will attempt to provide you with fresh, relevant artwork while preserving the artwork assigned to old recordings.",
+            "daily_label": "Perform daily updates of recording artwork",
+            "heading": "Artwork and Data Sources",
+            "movie_desc": "Select a source to use when searching for information and artwork about movies.",
+            "movie_label": "Movie Metadata Source",
+            "subtitle": "Configure sources of artwork and metadata",
+            "tv_desc": "Select a source to use when searching for information and artwork about television shows.",
+            "tv_label": "Television Metadata Source"
+        },
         "guide": {
             "calendar_tip": "Date Picker: Select the time first, then the date.",
             "cat_search": "Category Search",

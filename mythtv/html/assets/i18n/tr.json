@@ -72,6 +72,16 @@
             "name_label": "İsim",
             "new": "Yeni Kanal Grubu"
         },
+        "datasources": {
+            "daily_desc": "Ayarlanırsa arka uç, kayıtlar için görsel güncellemelerini günlük olarak gerçekleştirmeye çalışacaktır. Yeni sezonlar kayıt yapmaya başladığında bu, eski kayıtlara atanan çizimleri korurken size yeni, ilgili çizimler sağlamaya çalışacaktır.",
+            "daily_label": "Kayıt resminin günlük güncellemelerini gerçekleştirin",
+            "heading": "Çizimler ve Veri Kaynakları",
+            "movie_desc": "Filmler hakkında bilgi ve çizim ararken kullanılacak kaynağı seçin.",
+            "movie_label": "Film Meta Veri Kaynağı",
+            "subtitle": "Resim ve meta veri kaynaklarını yapılandırma",
+            "tv_desc": "Televizyon programlarıyla ilgili bilgi ve çizim ararken kullanılacak kaynağı seçin.",
+            "tv_label": "Televizyon Meta Veri Kaynağı"
+        },
         "guide": {
             "calendar_tip": "Tarih Seçici: Önce saati, ardından tarihi seçin.",
             "cat_search": "Kategori Arama",

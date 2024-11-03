@@ -72,6 +72,16 @@
             "name_label": "Ime",
             "new": "Nova skupina kanalov"
         },
+        "datasources": {
+            "daily_desc": "Če je nastavljeno, bo zaledje vsakodnevno poskušalo izvajati posodobitve umetniških del za posnetke. Ko se začnejo snemati nove sezone, vam bo to poskušalo zagotoviti sveže, ustrezne umetnine, hkrati pa ohraniti umetnine, dodeljene starim posnetkom.",
+            "daily_label": "Izvedite dnevne posodobitve umetniških del snemanja",
+            "heading": "Umetniška dela in viri podatkov",
+            "movie_desc": "Izberite vir, ki ga želite uporabiti pri iskanju informacij in umetniških del o filmih.",
+            "movie_label": "Vir metapodatkov filma",
+            "subtitle": "Konfigurirajte vire umetniških del in metapodatkov",
+            "tv_desc": "Izberite vir, ki ga želite uporabiti pri iskanju informacij in umetniških del o televizijskih oddajah.",
+            "tv_label": "Vir televizijskih metapodatkov"
+        },
         "guide": {
             "calendar_tip": "Izbirnik datuma: najprej izberite uro in nato datum.",
             "cat_search": "Iskanje po kategorijah",

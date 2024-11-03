@@ -72,6 +72,16 @@
             "name_label": "Nafn",
             "new": "Nýr ráshópur"
         },
+        "datasources": {
+            "daily_desc": "Ef þetta er stillt mun bakendinn reyna að framkvæma uppfærslur á listaverkum fyrir upptökur daglega. Þegar nýjar árstíðir byrja að taka upp mun þetta reyna að veita þér ferskt, viðeigandi listaverk á meðan það varðveitir listaverkið sem úthlutað er á gamla upptökur.",
+            "daily_label": "Framkvæmdu daglegar uppfærslur á upptökulistaverkum",
+            "heading": "Listaverk og gagnaheimildir",
+            "movie_desc": "Veldu heimild til að nota þegar leitað er að upplýsingum og listaverkum um kvikmyndir.",
+            "movie_label": "Uppspretta lýsigagna kvikmynda",
+            "subtitle": "Stilltu heimildir listaverka og lýsigagna",
+            "tv_desc": "Veldu heimild til að nota þegar leitað er að upplýsingum og listaverkum um sjónvarpsþætti.",
+            "tv_label": "Uppspretta lýsigagna sjónvarps"
+        },
         "guide": {
             "calendar_tip": "Dagsetningarval: Veldu fyrst tímann og síðan dagsetninguna.",
             "cat_search": "Flokkaleit",

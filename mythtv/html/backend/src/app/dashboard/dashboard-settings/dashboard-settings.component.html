@@ -37,5 +37,11 @@
                 <app-playback-groups></app-playback-groups>
             </ng-template>
         </p-accordionTab>
+        <p-accordionTab header="{{ 'dashboard.datasources.heading' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[6] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-data-sources></app-data-sources>
+            </ng-template>
+        </p-accordionTab>
     </p-accordion>
 </p-card>

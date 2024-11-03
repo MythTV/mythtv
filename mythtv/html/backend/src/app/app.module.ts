@@ -89,6 +89,7 @@ import { AutoExpireComponent } from './dashboard/dashboard-settings/auto-expire/
 import { JobsComponent } from './dashboard/dashboard-settings/jobs/jobs.component';
 import { RecQualityComponent } from './dashboard/dashboard-settings/rec-quality/rec-quality.component';
 import { RecPrioritiesComponent } from './dashboard/dashboard-settings/rec-priorities/rec-priorities.component';
+import { DataSourcesComponent } from './dashboard/dashboard-settings/data-sources/data-sources.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -173,6 +174,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     JobsComponent,
     RecQualityComponent,
     RecPrioritiesComponent,
+    DataSourcesComponent,
   ],
   imports: [
     BrowserModule,

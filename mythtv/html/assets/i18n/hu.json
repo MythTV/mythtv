@@ -72,6 +72,16 @@
             "name_label": "Név",
             "new": "Új csatornacsoport"
         },
+        "datasources": {
+            "daily_desc": "Ha be van állítva, a háttérprogram naponta megpróbálja frissíteni a felvételeket. Amikor új évadokat kezdenek rögzíteni, ez megpróbálja friss, releváns alkotásokkal szolgálni, miközben megőrzi a régi felvételekhez rendelt alkotásokat.",
+            "daily_label": "Végezze el a felvételi műalkotások napi frissítését",
+            "heading": "Műalkotások és adatforrások",
+            "movie_desc": "Válassza ki a filmekkel kapcsolatos információk és grafikák keresésekor használni kívánt forrást.",
+            "movie_label": "Film metaadatforrása",
+            "subtitle": "Konfigurálja a műalkotások és metaadatok forrásait",
+            "tv_desc": "Válassza ki a forrást, amelyet a televíziós műsorokkal kapcsolatos információk és műalkotások keresésekor használni szeretne.",
+            "tv_label": "Televíziós metaadatforrás"
+        },
         "guide": {
             "calendar_tip": "Dátumválasztó: Először válassza ki az időt, majd a dátumot.",
             "cat_search": "Kategória keresése",

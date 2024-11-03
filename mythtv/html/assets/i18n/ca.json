@@ -72,6 +72,16 @@
             "name_label": "Nom",
             "new": "Nou grup de canals"
         },
+        "datasources": {
+            "daily_desc": "Si s'estableix, el backend intentarà actualitzar les obres d'art per a les gravacions diàriament. Quan es comencin a gravar noves temporades, s'intentarà oferir-vos obres d'art fresques i rellevants alhora que es conserven les obres d'art assignades a les gravacions antigues.",
+            "daily_label": "Realitzeu actualitzacions diàries de la gravació d'obres d'art",
+            "heading": "Il·lustracions i fonts de dades",
+            "movie_desc": "Seleccioneu una font per utilitzar quan cerqueu informació i obres d'art sobre pel·lícules.",
+            "movie_label": "Font de metadades de la pel·lícula",
+            "subtitle": "Configureu les fonts d'obres d'art i metadades",
+            "tv_desc": "Seleccioneu una font per utilitzar quan cerqueu informació i obres d'art sobre programes de televisió.",
+            "tv_label": "Font de metadades de televisió"
+        },
         "guide": {
             "calendar_tip": "Selector de dates: seleccioneu primer l'hora i després la data.",
             "cat_search": "Cerca per categories",

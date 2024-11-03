@@ -72,6 +72,16 @@
             "name_label": "Name",
             "new": "Neue Kanalgruppe"
         },
+        "datasources": {
+            "daily_desc": "Wenn dies festgelegt ist, versucht das Backend täglich, Bildmaterialaktualisierungen für Aufnahmen durchzuführen. Wenn mit den Aufnahmen für neue Staffeln begonnen wird, wird versucht, Ihnen frische, relevante Grafiken zu liefern und gleichzeitig die alten Aufnahmen beizubehalten.",
+            "daily_label": "Führen Sie tägliche Aktualisierungen der Aufnahmegrafiken durch",
+            "heading": "Bildmaterial und Datenquellen",
+            "movie_desc": "Wählen Sie eine Quelle aus, die Sie bei der Suche nach Informationen und Bildmaterial zu Filmen verwenden möchten.",
+            "movie_label": "Quelle der Filmmetadaten",
+            "subtitle": "Konfigurieren Sie Quellen für Grafiken und Metadaten",
+            "tv_desc": "Wählen Sie eine Quelle aus, die Sie bei der Suche nach Informationen und Bildmaterial zu Fernsehsendungen verwenden möchten.",
+            "tv_label": "Quelle für Fernsehmetadaten"
+        },
         "guide": {
             "calendar_tip": "Datumsauswahl: Wählen Sie zuerst die Uhrzeit und dann das Datum aus.",
             "cat_search": "Kategoriesuche",

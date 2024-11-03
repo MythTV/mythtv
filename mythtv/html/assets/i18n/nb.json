@@ -72,6 +72,16 @@
             "name_label": "Navn",
             "new": "Ny kanalgruppe"
         },
+        "datasources": {
+            "daily_desc": "Hvis den er angitt, vil backend forsøke å utføre kunstverkoppdateringer for opptak daglig. Når nye sesonger begynner å spille inn, vil dette forsøke å gi deg ferske, relevante kunstverk samtidig som kunstverket som er tilordnet gamle opptak bevares.",
+            "daily_label": "Utfør daglige oppdateringer av opptak av kunstverk",
+            "heading": "Kunstverk og datakilder",
+            "movie_desc": "Velg en kilde du vil bruke når du søker etter informasjon og kunstverk om filmer.",
+            "movie_label": "Filmmetadatakilde",
+            "subtitle": "Konfigurer kilder til kunstverk og metadata",
+            "tv_desc": "Velg en kilde du vil bruke når du søker etter informasjon og kunstverk om TV-programmer.",
+            "tv_label": "TV-metadatakilde"
+        },
         "guide": {
             "calendar_tip": "Datovelger: Velg først klokkeslettet og deretter datoen.",
             "cat_search": "Kategorisøk",

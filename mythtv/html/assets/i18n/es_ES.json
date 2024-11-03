@@ -72,6 +72,16 @@
             "name_label": "Nombre",
             "new": "Nuevo grupo de canales"
         },
+        "datasources": {
+            "daily_desc": "Si está configurado, el backend intentará realizar actualizaciones de arte para las grabaciones diariamente. Cuando comiencen a grabarse nuevas temporadas, se intentará brindarle obras de arte nuevas y relevantes, preservando al mismo tiempo las obras de arte asignadas a las grabaciones antiguas.",
+            "daily_label": "Realizar actualizaciones diarias de las ilustraciones de grabación.",
+            "heading": "Ilustraciones y fuentes de datos",
+            "movie_desc": "Seleccione una fuente para usar cuando busque información e ilustraciones sobre películas.",
+            "movie_label": "Fuente de metadatos de la película",
+            "subtitle": "Configurar fuentes de ilustraciones y metadatos",
+            "tv_desc": "Seleccione una fuente para usar cuando busque información y obras de arte sobre programas de televisión.",
+            "tv_label": "Fuente de metadatos de televisión"
+        },
         "guide": {
             "calendar_tip": "Selector de fecha: seleccione primero la hora y luego la fecha.",
             "cat_search": "Búsqueda de categorías",

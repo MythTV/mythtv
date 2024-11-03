@@ -72,6 +72,16 @@
             "name_label": "Navn",
             "new": "Ny kanalgruppe"
         },
+        "datasources": {
+            "daily_desc": "Hvis indstillet, vil backend forsøge at udføre illustrationsopdateringer til optagelser dagligt. Når nye sæsoner begynder at optage, vil dette forsøge at give dig frisk, relevant kunst, samtidig med at det kunstværk, der er tildelt gamle optagelser, bevares.",
+            "daily_label": "Udfør daglige opdateringer af optagelseskunst",
+            "heading": "Kunstværker og datakilder",
+            "movie_desc": "Vælg en kilde, der skal bruges, når du søger efter information og illustrationer om film.",
+            "movie_label": "Filmmetadatakilde",
+            "subtitle": "Konfigurer kilder til illustrationer og metadata",
+            "tv_desc": "Vælg en kilde, der skal bruges, når du søger efter information og kunst om tv-shows.",
+            "tv_label": "Tv-metadatakilde"
+        },
         "guide": {
             "calendar_tip": "Datovælger: Vælg først tidspunktet og derefter datoen.",
             "cat_search": "Kategorisøgning",

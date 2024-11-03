@@ -72,6 +72,16 @@
             "name_label": "Nimi",
             "new": "Uusi kanavaryhmä"
         },
+        "datasources": {
+            "daily_desc": "Jos asetus on asetettu, taustaohjelma yrittää päivittää tallenteiden kuvituspäivityksiä päivittäin. Kun uusien kausien nauhoittaminen alkaa, tämä yrittää tarjota sinulle tuoretta, asiaankuuluvaa taideteosta säilyttäen samalla vanhoille äänityksille määritetyn taiteen.",
+            "daily_label": "Päivitä tallenneteoksia päivittäin",
+            "heading": "Taideteokset ja tietolähteet",
+            "movie_desc": "Valitse lähde, jota haluat käyttää etsiessäsi tietoa ja taideteoksia elokuvista.",
+            "movie_label": "Elokuvan metatietolähde",
+            "subtitle": "Määritä kuvien ja metatietojen lähteet",
+            "tv_desc": "Valitse lähde, jota haluat käyttää etsiessäsi tietoa ja taideteoksia televisio-ohjelmista.",
+            "tv_label": "Television metatietolähde"
+        },
         "guide": {
             "calendar_tip": "Päivämäärän valitsin: Valitse ensin aika ja sitten päivämäärä.",
             "cat_search": "Luokkahaku",

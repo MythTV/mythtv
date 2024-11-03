@@ -72,6 +72,16 @@
             "name_label": "Nimi",
             "new": "Uus kanalirühm"
         },
+        "datasources": {
+            "daily_desc": "Kui see on määratud, proovib taustaprogramm salvestuste jaoks kunstiteoseid iga päev värskendada. Kui uusi hooaegu hakatakse salvestama, üritab see pakkuda teile värsket asjakohast kunstiteost, säilitades samas vanadele salvestistele määratud kunstiteosed.",
+            "daily_label": "Tehke iga päev salvestatud kunstiteose värskendusi",
+            "heading": "Kunstiteos ja andmeallikad",
+            "movie_desc": "Valige allikas, mida kasutada filmide kohta teabe ja kunstiteoste otsimisel.",
+            "movie_label": "Filmi metaandmete allikas",
+            "subtitle": "Konfigureerige kunstiteoste ja metaandmete allikad",
+            "tv_desc": "Valige telesaadete kohta teabe ja kunstiteoste otsimisel kasutatav allikas.",
+            "tv_label": "Televisiooni metaandmete allikas"
+        },
         "guide": {
             "calendar_tip": "Kuupäevavalija: valige esmalt kellaaeg ja seejärel kuupäev.",
             "cat_search": "Kategooria otsing",
