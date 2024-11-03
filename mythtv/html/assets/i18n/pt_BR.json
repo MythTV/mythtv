@@ -163,6 +163,7 @@
             "signlang_label": "Prioridade de gravação de linguagem de sinais",
             "subcc_desc": "Prioridade adicional quando uma exibição é marcada como tendo legendas ou closed caption (CC) disponíveis.",
             "subcc_label": "Prioridade de gravação de legendas/CC",
+            "subtitle": "Prioridade e agendamento de gravação global",
             "wstv_desc": "Prioridade adicional quando uma exibição é marcada como widescreen nas listas de TV.",
             "wstv_label": "Prioridade de gravação widescreen"
         },

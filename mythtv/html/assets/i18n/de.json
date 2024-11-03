@@ -163,6 +163,7 @@
             "signlang_label": "Priorität bei der Aufzeichnung der Gebärdensprache",
             "subcc_desc": "Zusätzliche Priorität, wenn für eine Vorführung Untertitel oder Untertitel (CC) verfügbar sind.",
             "subcc_label": "Untertitel/CC-Aufnahmepriorität",
+            "subtitle": "Globale Aufnahmepriorität und -planung",
             "wstv_desc": "Zusätzliche Priorität, wenn eine Sendung im TV-Programm als Breitbildformat gekennzeichnet ist.",
             "wstv_label": "Priorität der Breitbildaufnahme"
         },

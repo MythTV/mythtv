@@ -163,6 +163,7 @@
             "signlang_label": "Prednost snemanja znakovnega jezika",
             "subcc_desc": "Dodatna prednost, ko je predvajanje označeno, da ima na voljo podnapise (CC).",
             "subcc_label": "Prednost snemanja podnapisov/CC",
+            "subtitle": "Globalna prioriteta snemanja in načrtovanje",
             "wstv_desc": "Dodatna prednost, ko je oddaja v TV seznamih označena kot širokozaslonska.",
             "wstv_label": "Prednost širokozaslonskega snemanja"
         },

@@ -163,6 +163,7 @@
             "signlang_label": "Priorytet nagrywania w języku migowym",
             "subcc_desc": "Dodatkowy priorytet, gdy program jest oznaczony jako zawierający dostępne napisy lub napisy kodowane (CC).",
             "subcc_label": "Priorytet nagrywania napisów/CC",
+            "subtitle": "Globalny priorytet i harmonogram nagrywania",
             "wstv_desc": "Dodatkowy priorytet, gdy program jest oznaczony jako panoramiczny w listach programów telewizyjnych.",
             "wstv_label": "Priorytet nagrywania panoramicznego"
         },

@@ -163,6 +163,7 @@
             "signlang_label": "Priorità di registrazione della lingua dei segni",
             "subcc_desc": "Priorità aggiuntiva quando una proiezione è contrassegnata come avente sottotitoli o sottotitoli codificati (CC) disponibili.",
             "subcc_label": "Priorità registrazione sottotitoli/CC",
+            "subtitle": "Priorità e programmazione globali della registrazione",
             "wstv_desc": "Priorità aggiuntiva quando una trasmissione è contrassegnata come widescreen nel palinsesto TV.",
             "wstv_label": "Priorità di registrazione widescreen"
         },

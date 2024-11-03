@@ -163,6 +163,7 @@
             "signlang_label": "Táknmálsupptöku forgangur",
             "subcc_desc": "Viðbótarforgangur þegar sýning er merkt með texta eða skjátexta tiltækan.",
             "subcc_label": "Forgangur texta/CC upptöku",
+            "subtitle": "Alheimsupptökuforgangur og tímasetning",
             "wstv_desc": "Viðbótarforgangur þegar sýning er merkt sem breiðskjár í sjónvarpsskránum.",
             "wstv_label": "Breiðskjár upptökuforgangur"
         },

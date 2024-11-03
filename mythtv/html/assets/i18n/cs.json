@@ -163,6 +163,7 @@
             "signlang_label": "Priorita nahrávání znakového jazyka",
             "subcc_desc": "Další priorita, když je pořad označen jako s dostupnými titulky nebo skrytými titulky (CC).",
             "subcc_label": "Priorita nahrávání titulků/CC",
+            "subtitle": "Globální priorita nahrávání a plánování",
             "wstv_desc": "Další priorita, když je pořad označen jako širokoúhlý v TV seznamech.",
             "wstv_label": "Priorita širokoúhlého nahrávání"
         },

@@ -163,6 +163,7 @@
             "signlang_label": "Viipekeele salvestamise prioriteet",
             "subcc_desc": "Täiendav prioriteet, kui saatel on subtiitrid või subtiitrid (CC) saadaval.",
             "subcc_label": "Subtiitrite/CC salvestamise prioriteet",
+            "subtitle": "Ülemaailmne salvestamise prioriteet ja ajastamine",
             "wstv_desc": "Täiendav prioriteet, kui saade on teleloendis laiekraaniks märgitud.",
             "wstv_label": "Laiekraani salvestamise prioriteet"
         },

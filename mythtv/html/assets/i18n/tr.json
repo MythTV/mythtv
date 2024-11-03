@@ -163,6 +163,7 @@
             "signlang_label": "İşaret dili kayıt önceliği",
             "subcc_desc": "Bir gösterinin altyazılı veya altyazılı (CC) mevcut olarak işaretlenmesi durumunda ek öncelik.",
             "subcc_label": "Altyazı/CC kayıt önceliği",
+            "subtitle": "Küresel kayıt önceliği ve zamanlaması",
             "wstv_desc": "TV listelerinde bir gösterinin geniş ekran olarak işaretlenmesi durumunda ek öncelik.",
             "wstv_label": "Geniş ekran kayıt önceliği"
         },

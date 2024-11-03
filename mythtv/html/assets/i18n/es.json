@@ -163,6 +163,7 @@
             "signlang_label": "Prioridad de grabación en lengua de signos",
             "subcc_desc": "Prioridad adicional cuando una proyección está marcada como que tiene subtítulos o subtítulos (CC) disponibles.",
             "subcc_label": "Prioridad de grabación de subtítulos/CC",
+            "subtitle": "Prioridad y programación de grabación global",
             "wstv_desc": "Prioridad adicional cuando un programa está marcado como panorámico en los listados de TV.",
             "wstv_label": "Prioridad de grabación en pantalla ancha"
         },

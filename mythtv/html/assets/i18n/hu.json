@@ -163,6 +163,7 @@
             "signlang_label": "Jelnyelvi rögzítés elsőbbsége",
             "subcc_desc": "További prioritás, ha egy műsort úgy jelölik meg, hogy elérhető felirat vagy feliratozás (CC).",
             "subcc_label": "Feliratok/CC rögzítési prioritás",
+            "subtitle": "Globális rögzítési prioritás és ütemezés",
             "wstv_desc": "További prioritás, ha egy műsor szélesvásznúként van megjelölve a TV-listában.",
             "wstv_label": "Szélesvásznú felvételi prioritás"
         },

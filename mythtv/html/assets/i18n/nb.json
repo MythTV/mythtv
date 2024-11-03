@@ -163,6 +163,7 @@
             "signlang_label": "Tegnspråkopptak prioritet",
             "subcc_desc": "Ytterligere prioritet når en visning er merket med undertekster eller teksting (CC) tilgjengelig.",
             "subcc_label": "Undertekster/CC-opptaksprioritet",
+            "subtitle": "Global opptaksprioritet og planlegging",
             "wstv_desc": "Ekstra prioritet når en visning er merket som widescreen i TV-oppføringene.",
             "wstv_label": "Widescreen-opptaksprioritet"
         },

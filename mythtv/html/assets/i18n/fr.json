@@ -163,6 +163,7 @@
             "signlang_label": "Priorité à l'enregistrement en langue des signes",
             "subcc_desc": "Priorité supplémentaire lorsqu'une diffusion est marquée comme ayant des sous-titres ou des sous-titres codés (CC) disponibles.",
             "subcc_label": "Priorité à l'enregistrement des sous-titres/CC",
+            "subtitle": "Priorité et planification globales des enregistrements",
             "wstv_desc": "Priorité supplémentaire lorsqu'une diffusion est marquée comme écran large dans les programmes TV.",
             "wstv_label": "Priorité d'enregistrement sur écran large"
         },

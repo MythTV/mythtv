@@ -163,6 +163,7 @@
             "signlang_label": "Sign language recording priority",
             "subcc_desc": "Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.",
             "subcc_label": "Subtitles/CC recording priority",
+            "subtitle": "Global recording priority and scheduling",
             "wstv_desc": "Additional priority when a showing is marked as widescreen in the TV listings.",
             "wstv_label": "Widescreen recording priority"
         },

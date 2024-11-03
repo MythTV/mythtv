@@ -163,6 +163,7 @@
             "signlang_label": "Prioritet snimanja znakovnog jezika",
             "subcc_desc": "Dodatni prioritet kada je prikazivanje označeno kao da ima dostupne titlove (CC).",
             "subcc_label": "Prioritet snimanja titlova/CC",
+            "subtitle": "Globalni prioritet i raspored snimanja",
             "wstv_desc": "Dodatni prioritet kada je prikazivanje označeno kao široki ekran u TV popisima.",
             "wstv_label": "Prioritet snimanja širokog ekrana"
         },

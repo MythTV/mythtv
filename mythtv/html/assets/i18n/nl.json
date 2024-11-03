@@ -163,6 +163,7 @@
             "signlang_label": "Prioriteit voor het opnemen van gebarentaal",
             "subcc_desc": "Extra prioriteit wanneer voor een vertoning is gemarkeerd dat er ondertiteling of ondertiteling (CC) beschikbaar is.",
             "subcc_label": "Ondertiteling/CC-opnameprioriteit",
+            "subtitle": "Globale opnameprioriteit en planning",
             "wstv_desc": "Extra prioriteit wanneer een uitzending in het tv-overzicht als breedbeeld is gemarkeerd.",
             "wstv_label": "Prioriteit voor breedbeeldopnamen"
         },

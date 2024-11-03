@@ -163,6 +163,7 @@
             "signlang_label": "Viittomakielen tallennuksen prioriteetti",
             "subcc_desc": "Lisäprioriteetti, kun näytöksessä on tekstitys tai tekstitys (CC) saatavilla.",
             "subcc_label": "Tekstitykset/CC-tallennusprioriteetti",
+            "subtitle": "Yleinen tallennuksen prioriteetti ja ajoitus",
             "wstv_desc": "Lisäprioriteetti, kun esitys on merkitty laajakuvaksi TV-luetteloissa.",
             "wstv_label": "Laajakuvanauhoituksen prioriteetti"
         },

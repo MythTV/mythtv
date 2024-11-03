@@ -163,6 +163,7 @@
             "signlang_label": "Teckenspråksinspelning prioritet",
             "subcc_desc": "Ytterligare prioritet när en föreställning är markerad som att ha undertexter eller dold textning (CC) tillgänglig.",
             "subcc_label": "Undertexter/CC-inspelningsprioritet",
+            "subtitle": "Global inspelningsprioritet och schemaläggning",
             "wstv_desc": "Ytterligare prioritet när en visning är markerad som widescreen i TV-listorna.",
             "wstv_label": "Bredbildsinspelningsprioritet"
         },
