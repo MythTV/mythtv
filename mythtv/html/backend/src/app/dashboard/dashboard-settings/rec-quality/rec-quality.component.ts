@@ -16,7 +16,6 @@ export class RecQualityComponent implements OnInit, AfterViewInit {
 
   successCount = 0;
   errorCount = 0;
-
   CategoryList: string[] = [];
 
   RecordPreRoll = 0;
@@ -34,7 +33,6 @@ export class RecQualityComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.loadValues();
-    this.markPristine();
   }
 
   ngAfterViewInit() {
@@ -45,6 +43,7 @@ export class RecQualityComponent implements OnInit, AfterViewInit {
     this.guideService.GetCategoryList().subscribe((data) => {
       this.CategoryList = data.CategoryList;
       this.CategoryList.unshift('');
+      this.markPristine();
     });
 
     this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "RecordPreRoll", Default: "0" })
