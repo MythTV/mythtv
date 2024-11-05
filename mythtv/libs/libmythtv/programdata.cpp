@@ -884,7 +884,7 @@ uint DBEvent::UpdateDB(
     query.bindValue(":SERIESID",    denullify(lseriesId));
     query.bindValue(":PROGRAMID",   denullify(lprogramId));
     query.bindValue(":PREVSHOWN",   lpreviouslyshown);
-    query.bindValue(":INETREF",     linetref);
+    query.bindValue(":INETREF",     denullify(linetref));
 
     if (!query.exec())
     {
@@ -1194,7 +1194,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid,
     query.bindValue(":SEASON",      m_season);
     query.bindValue(":EPISODE",     m_episode);
     query.bindValue(":TOTALEPISODES", m_totalepisodes);
-    query.bindValue(":INETREF",     m_inetref);
+    query.bindValue(":INETREF",     denullify(m_inetref));
 
     if (!query.exec())
     {
@@ -1360,13 +1360,13 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid,
     query.bindValue(":PROGRAMID",   denullify(m_programId));
     query.bindValue(":PREVSHOWN",   m_previouslyshown);
     query.bindValue(":STARS",       m_stars);
-    query.bindValue(":SHOWTYPE",    m_showtype);
-    query.bindValue(":TITLEPRON",   m_title_pronounce);
-    query.bindValue(":COLORCODE",   m_colorcode);
+    query.bindValue(":SHOWTYPE",    denullify(m_showtype));
+    query.bindValue(":TITLEPRON",   denullify(m_title_pronounce));
+    query.bindValue(":COLORCODE",   denullify(m_colorcode));
     query.bindValue(":SEASON",      m_season);
     query.bindValue(":EPISODE",     m_episode);
     query.bindValue(":TOTALEPISODES", m_totalepisodes);
-    query.bindValue(":INETREF",     m_inetref);
+    query.bindValue(":INETREF",     denullify(m_inetref));
 
     if (!query.exec())
     {
@@ -1744,22 +1744,22 @@ bool ProgramData::IsUnchanged(
     query.bindValue(":STARS1",     pi.m_stars);
     query.bindValue(":STARS2",     pi.m_stars);
     query.bindValue(":PREVIOUSLYSHOWN", pi.m_previouslyshown);
-    query.bindValue(":TITLE_PRONOUNCE", pi.m_title_pronounce);
+    query.bindValue(":TITLE_PRONOUNCE", denullify(pi.m_title_pronounce));
     query.bindValue(":AUDIOPROP",  pi.m_audioProps);
     query.bindValue(":VIDEOPROP",  pi.m_videoProps);
     query.bindValue(":SUBTYPES",   pi.m_subtitleType);
     query.bindValue(":PARTNUMBER", pi.m_partnumber);
     query.bindValue(":PARTTOTAL",  pi.m_parttotal);
     query.bindValue(":SERIESID",   denullify(pi.m_seriesId));
-    query.bindValue(":SHOWTYPE",   pi.m_showtype);
-    query.bindValue(":COLORCODE",  pi.m_colorcode);
+    query.bindValue(":SHOWTYPE",   denullify(pi.m_showtype));
+    query.bindValue(":COLORCODE",  denullify(pi.m_colorcode));
     query.bindValue(":SYNDICATEDEPISODENUMBER",
                     denullify(pi.m_syndicatedepisodenumber));
     query.bindValue(":PROGRAMID",  denullify(pi.m_programId));
     query.bindValue(":SEASON",     pi.m_season);
     query.bindValue(":EPISODE",    pi.m_episode);
     query.bindValue(":TOTALEPISODES", pi.m_totalepisodes);
-    query.bindValue(":INETREF",    pi.m_inetref);
+    query.bindValue(":INETREF",    denullify(pi.m_inetref));
 
     if (query.exec() && query.next())
         return query.value(0).toUInt() > 0;
