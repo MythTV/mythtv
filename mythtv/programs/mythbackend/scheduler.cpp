@@ -1095,7 +1095,9 @@ bool Scheduler::FindNextConflict(
             continue;
 
         if (debugConflicts)
-            msg = QString("comparing with '%1' ").arg(q->GetTitle());
+            msg = QString("comparing '%1' on %2 with '%3' on %4")
+                .arg(p->GetTitle()).arg(p->GetChanNum())
+                .arg(q->GetTitle()).arg(q->GetChanNum());
 
         if (p->GetInputID() != q->GetInputID() && !ignoreinput)
         {
@@ -1119,6 +1121,8 @@ bool Scheduler::FindNextConflict(
         }
 
         bool mplexid_ok =
+            (m_sinputInfoMap[p->m_sgroupId].m_reclimit > 1) &&
+            (m_sinputInfoMap[q->m_sgroupId].m_reclimit > 1) &&
             (p->m_sgroupId != q->m_sgroupId ||
              m_sinputInfoMap[p->m_sgroupId].m_schedGroup) &&
             (((p->m_mplexId != 0U) && p->m_mplexId == q->m_mplexId) ||
@@ -1145,7 +1149,7 @@ bool Scheduler::FindNextConflict(
         {
             LOG(VB_SCHEDULE, LOG_INFO, msg);
             LOG(VB_SCHEDULE, LOG_INFO,
-                QString("  cardid's: [%1], [%2] Share an input group"
+                QString("  cardid's: [%1], [%2] Share an input group, "
                         "mplexid's: %3, %4")
                      .arg(p->GetInputID()).arg(q->GetInputID())
                      .arg(p->m_mplexId).arg(q->m_mplexId));
@@ -5843,7 +5847,7 @@ bool Scheduler::InitInputInfoMap(void)
     // rereading it from the database.
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT cardid, parentid, schedgroup "
+    query.prepare("SELECT cardid, parentid, schedgroup, reclimit "
                   "FROM capturecard "
                   "WHERE sourceid > 0 "
                   "ORDER BY cardid");
@@ -5872,6 +5876,7 @@ bool Scheduler::InitInputInfoMap(void)
             siinfo.m_groupInputs = CardUtil::GetChildInputIDs(inputid);
             siinfo.m_groupInputs.insert(siinfo.m_groupInputs.begin(), inputid);
         }
+        siinfo.m_reclimit = query.value(3).toUInt();
         siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(inputid);
         LOG(VB_SCHEDULE, LOG_INFO,
             QString("Added SchedInputInfo i=%1, g=%2, sg=%3")
@@ -5896,6 +5901,7 @@ void Scheduler::AddChildInput(uint parentid, uint childid)
     else
         siinfo.m_sgroupId = childid;
     siinfo.m_schedGroup = false;
+    siinfo.m_reclimit = m_sinputInfoMap[parentid].m_reclimit;
     siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(childid);
 
     siinfo.m_conflictList = m_sinputInfoMap[parentid].m_conflictList;
