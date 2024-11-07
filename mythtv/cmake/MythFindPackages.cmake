@@ -103,7 +103,6 @@ if(ENABLE_BINDINGS_PYTHON)
       Python3Modules
       OPTIONAL_COMPONENTS
         MySQLdb
-        future
         lxml
         pip>=23.0.1
         requests
