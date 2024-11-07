@@ -77,8 +77,11 @@ foreach(_module IN LISTS Python3Modules_FIND_COMPONENTS)
     continue()
   endif()
 
-  if(${_output} MATCHES "([0-9]+.[0-9]+.[0-9]+)")
+  if(${_output} MATCHES "([0-9]+(\.[0-9]+(\.[0-9]+)?)?)")
     set(_version ${CMAKE_MATCH_1})
+    if(_mod_ver)
+      message(DEBUG "  Comparing requested ${_mod_ver} to actual ${_version})")
+    endif()
     if(NOT _mod_op STREQUAL "")
       if((${_mod_op} STREQUAL "<" AND ${_version} VERSION_LESS ${_mod_ver})
          OR (${_mod_op} STREQUAL "<=" AND ${_version} VERSION_LESS_EQUAL

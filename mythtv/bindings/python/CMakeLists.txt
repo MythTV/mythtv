@@ -27,7 +27,17 @@ file(
 
 if("pip" IN_LIST Python3Modules_COMPONENTS_FOUND
    AND "wheel" IN_LIST Python3Modules_COMPONENTS_FOUND)
+  message(STATUS "Using python pip install method")
   set(USE_PYTHON_PIP TRUE)
+else()
+  if(NOT "pip" IN_LIST Python3Modules_COMPONENTS_FOUND)
+    list(APPEND _pi_missing "pip")
+  endif()
+  if(NOT "wheel" IN_LIST Python3Modules_COMPONENTS_FOUND)
+    list(APPEND _pi_missing "wheel")
+  endif()
+  message(STATUS "Python pip install not available (missing module(s): ${_pi_missing})")
+  message(STATUS "Using python setup.py install method")
 endif()
 
 #
