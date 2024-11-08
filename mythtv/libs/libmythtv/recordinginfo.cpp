@@ -25,11 +25,6 @@ const QRegularExpression RecordingInfo::kReSearchTypeName { R"(\s*\(.*\)$)" };
 const QRegularExpression RecordingInfo::kReLeadingAnd
         { R"(^\s*AND\s*)", QRegularExpression::CaseInsensitiveOption };
 
-static inline QString null_to_empty(const QString &str)
-{
-    return str.isEmpty() ? "" : str;
-}
-
 QString RecordingInfo::s_unknownTitle;
 // works only for integer divisors of 60
 static const uint kUnknownProgramLength = 30;
@@ -686,7 +681,7 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
                   " SET recgroup = :RECGROUP, "
                   "     recgroupid = :RECGROUPID "
                   " WHERE recordedid = :RECORDEDID");
-    query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
+    query.bindValueNoNull(":RECGROUP", newrecgroup);
     query.bindValue(":RECGROUPID", newrecgroupid);
     query.bindValue(":RECORDEDID", m_recordedId);
 
@@ -713,7 +708,7 @@ void RecordingInfo::ApplyRecordRecGroupChange(int newrecgroupid)
                     "     recgroupid = :RECGROUPID "
                     " WHERE chanid = :CHANID"
                     " AND starttime = :START ;");
-        query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
+        query.bindValueNoNull(":RECGROUP", newrecgroup);
         query.bindValue(":RECGROUPID", newrecgroupid);
         query.bindValue(":START", m_recStartTs);
         query.bindValue(":CHANID", m_chanId);
@@ -745,7 +740,7 @@ void RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
                   " SET playgroup = :PLAYGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":PLAYGROUP", null_to_empty(newplaygroup));
+    query.bindValueNoNull(":PLAYGROUP", newplaygroup);
     query.bindValue(":START", m_recStartTs);
     query.bindValue(":CHANID", m_chanId);
 
@@ -770,7 +765,7 @@ void RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
                   " SET storagegroup = :STORAGEGROUP"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
-    query.bindValue(":STORAGEGROUP", null_to_empty(newstoragegroup));
+    query.bindValueNoNull(":STORAGEGROUP", newstoragegroup);
     query.bindValue(":START", m_recStartTs);
     query.bindValue(":CHANID", m_chanId);
 
@@ -800,7 +795,7 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
 
     query.prepare(sql);
     query.bindValue(":TITLE", newTitle);
-    query.bindValue(":SUBTITLE", null_to_empty(newSubtitle));
+    query.bindValueNoNull(":SUBTITLE", newSubtitle);
     if (!newDescription.isNull())
         query.bindValue(":DESCRIPTION", newDescription);
     query.bindValue(":CHANID", m_chanId);
@@ -1196,17 +1191,17 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     query.bindValue(":STARTS",      pg->m_recStartTs);
     query.bindValue(":ENDS",        pg->m_recEndTs);
     query.bindValue(":TITLE",       pg->m_title);
-    query.bindValue(":SUBTITLE",    null_to_empty(pg->m_subtitle));
-    query.bindValue(":DESC",        null_to_empty(pg->m_description));
+    query.bindValueNoNull(":SUBTITLE",    pg->m_subtitle);
+    query.bindValueNoNull(":DESC",        pg->m_description);
     query.bindValue(":SEASON",      pg->m_season);
     query.bindValue(":EPISODE",     pg->m_episode);
     query.bindValue(":HOSTNAME",    pg->m_hostname);
-    query.bindValue(":CATEGORY",    null_to_empty(pg->m_category));
-    query.bindValue(":RECGROUP",    null_to_empty(pg->m_recGroup));
+    query.bindValueNoNull(":CATEGORY",    pg->m_category);
+    query.bindValueNoNull(":RECGROUP",    pg->m_recGroup);
     query.bindValue(":AUTOEXP",     rule->m_autoExpire);
-    query.bindValue(":SERIESID",    null_to_empty(pg->m_seriesId));
-    query.bindValue(":PROGRAMID",   null_to_empty(pg->m_programId));
-    query.bindValue(":INETREF",     null_to_empty(pg->m_inetRef));
+    query.bindValueNoNull(":SERIESID",    pg->m_seriesId);
+    query.bindValueNoNull(":PROGRAMID",   pg->m_programId);
+    query.bindValueNoNull(":INETREF",     pg->m_inetRef);
     query.bindValue(":FINDID",      pg->m_findId);
     query.bindValue(":STARS",       pg->m_stars);
     query.bindValue(":REPEAT",      pg->IsRepeat());
@@ -1214,10 +1209,10 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     query.bindValue(":PLAYGROUP",   pg->m_playGroup);
     query.bindValue(":RECPRIORITY", rule->m_recPriority);
     query.bindValue(":BASENAME",    pg->m_pathname);
-    query.bindValue(":STORGROUP",   null_to_empty(pg->m_storageGroup));
+    query.bindValueNoNull(":STORGROUP",   pg->m_storageGroup);
     query.bindValue(":PROGSTART",   pg->m_startTs);
     query.bindValue(":PROGEND",     pg->m_endTs);
-    query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
+    query.bindValueNoNull(":PROFILE",     rule->m_recProfile);
     query.bindValue(":INPUTNAME",   inputname);
     query.bindValue(":RECGROUPID",  recgroupid);
 
@@ -1396,17 +1391,17 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     result.bindValue(":START", m_startTs);
     result.bindValue(":END", m_endTs);
     result.bindValue(":TITLE", m_title);
-    result.bindValue(":SUBTITLE", null_to_empty(m_subtitle));
-    result.bindValue(":DESC", null_to_empty(m_description));
+    result.bindValueNoNull(":SUBTITLE", m_subtitle);
+    result.bindValueNoNull(":DESC", m_description);
     result.bindValue(":SEASON", m_season);
     result.bindValue(":EPISODE", m_episode);
-    result.bindValue(":CATEGORY", null_to_empty(m_category));
-    result.bindValue(":SERIESID", null_to_empty(m_seriesId));
-    result.bindValue(":PROGRAMID", null_to_empty(m_programId));
-    result.bindValue(":INETREF", null_to_empty(m_inetRef));
+    result.bindValueNoNull(":CATEGORY", m_category);
+    result.bindValueNoNull(":SERIESID", m_seriesId);
+    result.bindValueNoNull(":PROGRAMID", m_programId);
+    result.bindValueNoNull(":INETREF", m_inetRef);
     result.bindValue(":FINDID", m_findId);
     result.bindValue(":RECORDID", erecid);
-    result.bindValue(":STATION", null_to_empty(m_chanSign));
+    result.bindValueNoNull(":STATION", m_chanSign);
     result.bindValue(":RECTYPE", m_recType);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
@@ -1536,22 +1531,22 @@ void RecordingInfo::ForgetHistory(void)
             "        ) "
             "      )" );
         result.bindValue(":TITLE", m_title);
-        result.bindValue(":SUBTITLE1", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE2", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE3", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE4", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE5", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE6", null_to_empty(m_subtitle));
-        result.bindValue(":DESCRIPTION1", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION2", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION3", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION4", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION5", null_to_empty(m_description));
-        result.bindValue(":PROGRAMID1", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID2", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID3", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID4", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID5", null_to_empty(m_programId));
+        result.bindValueNoNull(":SUBTITLE1", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE2", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE3", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE4", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE5", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE6", m_subtitle);
+        result.bindValueNoNull(":DESCRIPTION1", m_description);
+        result.bindValueNoNull(":DESCRIPTION2", m_description);
+        result.bindValueNoNull(":DESCRIPTION3", m_description);
+        result.bindValueNoNull(":DESCRIPTION4", m_description);
+        result.bindValueNoNull(":DESCRIPTION5", m_description);
+        result.bindValueNoNull(":PROGRAMID1", m_programId);
+        result.bindValueNoNull(":PROGRAMID2", m_programId);
+        result.bindValueNoNull(":PROGRAMID3", m_programId);
+        result.bindValueNoNull(":PROGRAMID4", m_programId);
+        result.bindValueNoNull(":PROGRAMID5", m_programId);
         result.bindValue(":DUPMETHOD1", dmeth);
         result.bindValue(":DUPMETHOD2", dmeth);
         result.bindValue(":DUPMETHOD3", dmeth);
@@ -1607,22 +1602,22 @@ void RecordingInfo::ForgetHistory(void)
             "        ) "
             "      )" );
         result.bindValue(":TITLE", m_title);
-        result.bindValue(":SUBTITLE1", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE2", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE3", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE4", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE5", null_to_empty(m_subtitle));
-        result.bindValue(":SUBTITLE6", null_to_empty(m_subtitle));
-        result.bindValue(":DESCRIPTION1", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION2", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION3", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION4", null_to_empty(m_description));
-        result.bindValue(":DESCRIPTION5", null_to_empty(m_description));
-        result.bindValue(":PROGRAMID1", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID2", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID3", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID4", null_to_empty(m_programId));
-        result.bindValue(":PROGRAMID5", null_to_empty(m_programId));
+        result.bindValueNoNull(":SUBTITLE1", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE2", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE3", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE4", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE5", m_subtitle);
+        result.bindValueNoNull(":SUBTITLE6", m_subtitle);
+        result.bindValueNoNull(":DESCRIPTION1", m_description);
+        result.bindValueNoNull(":DESCRIPTION2", m_description);
+        result.bindValueNoNull(":DESCRIPTION3", m_description);
+        result.bindValueNoNull(":DESCRIPTION4", m_description);
+        result.bindValueNoNull(":DESCRIPTION5", m_description);
+        result.bindValueNoNull(":PROGRAMID1", m_programId);
+        result.bindValueNoNull(":PROGRAMID2", m_programId);
+        result.bindValueNoNull(":PROGRAMID3", m_programId);
+        result.bindValueNoNull(":PROGRAMID4", m_programId);
+        result.bindValueNoNull(":PROGRAMID5", m_programId);
         result.bindValue(":DUPMETHOD1", dmeth);
         result.bindValue(":DUPMETHOD2", dmeth);
         result.bindValue(":DUPMETHOD3", dmeth);
@@ -1671,9 +1666,9 @@ void RecordingInfo::SetDupHistory(void)
                    " (programid <> '' AND programid = :PROGRAMID) OR "
                    " (findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", m_title);
-    result.bindValue(":SUBTITLE", null_to_empty(m_subtitle));
-    result.bindValue(":DESC", null_to_empty(m_description));
-    result.bindValue(":PROGRAMID", null_to_empty(m_programId));
+    result.bindValueNoNull(":SUBTITLE", m_subtitle);
+    result.bindValueNoNull(":DESC", m_description);
+    result.bindValueNoNull(":PROGRAMID", m_programId);
     result.bindValue(":FINDID", m_findId);
 
     if (!result.exec())
@@ -1708,7 +1703,7 @@ uint RecordingInfo::GetRecgroupID(const QString& recGroup)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT recgroupid FROM recgroups WHERE recgroup = :RECGROUP");
-    query.bindValue(":RECGROUP", null_to_empty(recGroup));
+    query.bindValueNoNull(":RECGROUP", recGroup);
 
     if (!query.exec())
         MythDB::DBError("RecGroup update", query);
