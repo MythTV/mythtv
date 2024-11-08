@@ -5585,7 +5585,7 @@ enabled libx264           && { use_pkg_config libx264 x264 x264.h x264_encoder_e
                              require_cpp_condition x264.h "X264_BUILD >= 118" &&
                              { check_cpp_condition x264.h "X264_MPEG2" &&
                                enable libx262; }
-enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml/xmlversion.h xmlCheckVersion
+enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml2/libxml/xmlversion.h xmlCheckVersion
 
 enabled drm && use_pkg_config libdrm libdrm xf86drm.h drmGetVersion || disable drm
 enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)' || disable drm
