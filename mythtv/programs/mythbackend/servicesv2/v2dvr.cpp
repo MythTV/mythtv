@@ -79,6 +79,8 @@ void V2Dvr::RegisterCustomTypes()
     qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
     qRegisterMetaType<V2CastMember*>("V2CastMember");
     qRegisterMetaType<V2PlayGroup*>("V2PlayGroup");
+    qRegisterMetaType<V2PowerPriority*>("V2PowerPriority");
+    qRegisterMetaType<V2PowerPriorityList*>("V2PowerPriorityList");
 }
 
 V2Dvr::V2Dvr()
@@ -2460,4 +2462,140 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
         ri.ApplyRecordRecGroupChange(RecGroup);
 
     return true;
+}
+
+// Get a single record by filling PriorityName, otherwise all records
+V2PowerPriorityList* V2Dvr::GetPowerPriorityList (const QString &PriorityName )
+{
+    auto *pList = new V2PowerPriorityList();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString sql("SELECT priorityname, recpriority, selectclause "
+                "FROM powerpriority ");
+
+    if (!PriorityName.isEmpty())
+        sql.append(" WHERE priorityname = :NAME ");
+
+    query.prepare(sql);
+
+    if (!PriorityName.isEmpty())
+        query.bindValue(":NAME", PriorityName);
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            V2PowerPriority * pRec = pList->AddNewPowerPriority();
+            pRec->setPriorityName(query.value(0).toString());
+            pRec->setRecPriority(query.value(1).toInt());
+            pRec->setSelectClause(query.value(2).toString());
+        }
+    }
+    else
+        throw (QString("Error accessing powerpriority table"));
+
+    return pList;
+}
+
+bool V2Dvr::RemovePowerPriority ( const QString & PriorityName )
+{
+    if (PriorityName.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM powerpriority WHERE priorityname = :PRIORITYNAME");
+    query.bindValue(":PRIORITYNAME", PriorityName);
+
+    return query.exec();
+}
+
+bool V2Dvr::AddPowerPriority    ( const QString & PriorityName,
+                                  int             RecPriority,
+                                  const QString & SelectClause )
+{
+    if (PriorityName.isEmpty())
+        throw QString("ERROR: PriorityName is not specified");
+    if (SelectClause.isEmpty())
+        throw QString("ERROR: SelectClause is required");
+    QString msg = CheckPowerQuery(SelectClause);
+    if (! msg.isEmpty() )
+        throw(msg);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO powerpriority "
+                " (priorityname, recpriority, selectclause) "
+                " VALUES(:PRIORITYNAME, :RECPRIORITY, :SELECTCLAUSE) ");
+    query.bindValue(":PRIORITYNAME", PriorityName);
+    query.bindValue(":RECPRIORITY", RecPriority);
+    query.bindValue(":SELECTCLAUSE", SelectClause);
+    if (!query.exec())
+        throw(query.lastError().databaseText());
+    return true;
+}
+
+bool V2Dvr::UpdatePowerPriority ( const QString & PriorityName,
+                                  int             RecPriority,
+                                  const QString & SelectClause )
+{
+    if (PriorityName.isEmpty())
+        throw QString("ERROR: PriorityName is not specified");
+    if (!HAS_PARAMv2("RecPriority") && !HAS_PARAMv2("SelectClause"))
+        throw QString("ERROR: RecPriority or SelectClause is required");
+
+    if (HAS_PARAMv2("SelectClause"))
+    {
+        QString msg = CheckPowerQuery(SelectClause);
+        if (! msg.isEmpty() )
+            throw(msg);
+    }
+    MSqlQuery query(MSqlQuery::InitCon());
+    bool comma = false;
+    QString sql("UPDATE powerpriority SET ");
+    if ( HAS_PARAMv2("RecPriority") )
+    {
+        sql.append(" recpriority = :RECPRIORITY ");
+        comma = true;
+    }
+    if ( HAS_PARAMv2("SelectClause") )
+    {
+        if (comma)
+            sql.append(" , ");
+        sql.append(" selectclause = :SELECTCLAUSE ");
+    }
+    sql.append(" where priorityname = :PRIORITYNAME ");
+    query.prepare(sql);
+    query.bindValue(":PRIORITYNAME", PriorityName);
+    if ( HAS_PARAMv2("RecPriority") )
+        query.bindValue(":RECPRIORITY", RecPriority);
+    if ( HAS_PARAMv2("SelectClause") )
+        query.bindValue(":SELECTCLAUSE", SelectClause);
+    if (!query.exec())
+        throw(query.lastError().databaseText());
+    return query.numRowsAffected() > 0;
+}
+
+QString V2Dvr::CheckPowerQuery(const QString & SelectClause)
+{
+    QString msg;
+    QString sql = QString("SELECT (%1) FROM (recordmatch, record, "
+                           "program, channel, capturecard, "
+                           "oldrecorded) WHERE NULL").arg(SelectClause);
+    while (true)
+    {
+        int i = sql.indexOf("RECTABLE");
+        if (i == -1) break;
+        sql = sql.replace(i, strlen("RECTABLE"), "record");
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(sql);
+
+    if (!query.exec())
+    {
+        msg = tr("An error was found when checking") + ":\n\n";
+        msg += query.executedQuery();
+        msg += "\n\n" + tr("The database error was") + ":\n";
+        msg += query.lastError().databaseText();
+    }
+    return msg;
 }

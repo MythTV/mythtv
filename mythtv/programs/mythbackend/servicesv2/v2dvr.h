@@ -36,6 +36,7 @@
 #include "v2titleInfoList.h"
 #include "v2recRuleList.h"
 #include "v2playGroup.h"
+#include "v2powerPriority.h"
 
 #define DVR_SERVICE QString("/Dvr/")
 #define DVR_HANDLE  QString("Dvr")
@@ -80,6 +81,10 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("AddPlayGroup",         "methods=POST")
     Q_CLASSINFO("UpdatePlayGroup",      "methods=POST")
     Q_CLASSINFO("RemovePlayGroup",      "methods=POST")
+    Q_CLASSINFO("RemovePowerPriority",  "methods=POST")
+    Q_CLASSINFO("AddPowerPriority",     "methods=POST")
+    Q_CLASSINFO("UpdatePowerPriority",  "methods=POST")
+    Q_CLASSINFO("CheckPowerQuery",      "methods=GET,POST,HEAD")
 
   public:
     V2Dvr();
@@ -413,6 +418,20 @@ class V2Dvr : public MythHTTPService
                                                const QString   &Title,
                                                bool             Watched,
                                                const QString   &RecGroup );
+
+    static V2PowerPriorityList* GetPowerPriorityList (const QString &PriorityName );
+
+    static bool       RemovePowerPriority ( const QString & PriorityName );
+
+    static bool       AddPowerPriority    ( const QString & PriorityName,
+                                            int             RecPriority,
+                                            const QString & SelectClause );
+
+    bool              UpdatePowerPriority ( const QString & PriorityName,
+                                            int             RecPriority,
+                                            const QString & SelectClause );
+
+    static QString    CheckPowerQuery( const QString & SelectClause );
 
   private:
     Q_DISABLE_COPY(V2Dvr)

@@ -103,7 +103,7 @@ HEADERS += servicesv2/v2captureCard.h servicesv2/v2captureCardList.h
 HEADERS += servicesv2/v2recordingProfile.h
 HEADERS += servicesv2/v2music.h
 HEADERS += servicesv2/v2musicMetadataInfo.h servicesv2/v2musicMetadataInfoList.h
-HEADERS += servicesv2/v2config.h
+HEADERS += servicesv2/v2config.h servicesv2/v2powerPriority.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
