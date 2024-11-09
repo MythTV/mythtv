@@ -3118,10 +3118,6 @@ AVRational av_stream_get_codec_timebase(const AVStream *st);
 #endif
 
 
-/* MythTV changes */
-void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
-/* End MythTV changes */
-
 /**
  * @}
  */
