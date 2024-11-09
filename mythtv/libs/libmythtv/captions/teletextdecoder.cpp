@@ -22,7 +22,6 @@
 
 extern "C" {
 #include <cinttypes>
-#include "recorders/vbitext/vt.h"
 }
 
 #include "libmythbase/mythlogging.h"

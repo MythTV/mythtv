@@ -77,19 +77,6 @@ cygwin:DEFINES += _WIN32
 # Enable Valgrind, i.e. disable some timeouts
 using_valgrind:DEFINES += USING_VALGRIND
 
-# old libvbitext (Caption decoder)
-#using_v4l2 {
-
-    !mingw:!win32-msvc* {
-        HEADERS += recorders/vbitext/dllist.h
-        HEADERS += recorders/vbitext/lang.h
-        HEADERS += recorders/vbitext/vbi.h
-        HEADERS += recorders/vbitext/vt.h
-        SOURCES += recorders/vbitext/vbi.cpp
-        SOURCES += recorders/vbitext/lang.cpp
-    }
-#}
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 ##########################################################################
