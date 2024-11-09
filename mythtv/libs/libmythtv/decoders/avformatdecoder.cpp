@@ -7,6 +7,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <set>
 
@@ -2693,20 +2694,37 @@ void AvFormatDecoder::RemoveAudioStreams()
         return;
 
     m_avCodecLock.lock();
-    for (uint i = 0; i < m_ic->nb_streams;)
+    bool do_flush = false;
+    for (uint i = 0; i < m_ic->nb_streams; i++)
     {
         AVStream *st = m_ic->streams[i];
+        st->index = i;
         AVCodecContext *avctx = m_codecMap.FindCodecContext(st);
         if (avctx && avctx->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             m_codecMap.FreeCodecContext(st);
-            av_remove_stream(m_ic, st->id, 0);
+            LOG(VB_LIBAV, LOG_DEBUG, QString("removing audio stream (id: 0x%1, index: %2, nb_streams: %3)")
+                .arg(QString::number(st->id, 16),
+                    QString::number(i),
+                    QString::number(m_ic->nb_streams)
+                    )
+                );
+            m_ic->nb_streams--;
+            if ((m_ic->nb_streams - i) > 0) {
+                std::memmove(&m_ic->streams[i], &m_ic->streams[i + 1],
+                             (m_ic->nb_streams - i) * sizeof(AVFormatContext*));
+            }
+            else
+            {
+                m_ic->streams[i] = nullptr;
+            }
+            do_flush = true;
             i--;
         }
-        else
-        {
-            i++;
-        }
+    }
+    if (do_flush)
+    {
+        avformat_flush(m_ic);
     }
     m_avCodecLock.unlock();
 }
