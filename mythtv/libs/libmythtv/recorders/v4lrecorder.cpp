@@ -14,7 +14,6 @@
 
 #include "captions/vbi608extractor.h"
 #include "v4lrecorder.h"
-#include "vbitext/vbi.h"
 #include "tv_rec.h"
 
 #define TVREC_CARDNUM \
@@ -65,58 +64,18 @@ void V4LRecorder::SetOption(const QString &name, const QString &value)
         DTVRecorder::SetOption(name, value);
 }
 
-static void vbi_event(void *data_in, struct vt_event *ev)
-{
-    auto *data = static_cast<struct VBIData *>(data_in);
-    switch (ev->type)
-    {
-       case EV_PAGE:
-       {
-            auto *vtp = (struct vt_page *) ev->p1;
-            if (vtp->flags & PG_SUBTITLE)
-            {
-#if 0
-                LOG(VB_GENERAL, LOG_DEBUG, QString("subtitle page %1.%2")
-                      .arg(vtp->pgno, 0, 16) .arg(vtp->subno, 0, 16));
-#endif
-                data->foundteletextpage = true;
-                memcpy(&(data->teletextpage), vtp, sizeof(vt_page));
-            }
-       }
-       break;
-
-       case EV_HEADER:
-       case EV_XPACKET:
-           break;
-    }
-}
-
 int V4LRecorder::OpenVBIDevice(void)
 {
     int fd = -1;
     if (m_vbiFd >= 0)
         return m_vbiFd;
 
-    struct VBIData *vbi_cb = nullptr;
-    struct vbi     *pal_tt = nullptr;
     uint width = 0;
     uint start_line = 0;
     uint line_count = 0;
 
     QByteArray vbidev = m_vbiDeviceName.toLatin1();
-    if (VBIMode::PAL_TT == m_vbiMode)
-    {
-        pal_tt = vbi_open(vbidev.constData(), nullptr, 99, -1);
-        if (pal_tt)
-        {
-            fd = pal_tt->fd;
-            vbi_cb = new VBIData;
-            memset(vbi_cb, 0, sizeof(VBIData));
-            vbi_cb->nvr = this;
-            vbi_add_handler(pal_tt, vbi_event, vbi_cb);
-        }
-    }
-    else if (VBIMode::NTSC_CC == m_vbiMode)
+    if (VBIMode::NTSC_CC == m_vbiMode)
     {
         fd = open(vbidev.constData(), O_RDONLY/*|O_NONBLOCK*/);
     }
@@ -181,12 +140,7 @@ int V4LRecorder::OpenVBIDevice(void)
 #endif // USING_V4L2
     }
 
-    if (VBIMode::PAL_TT == m_vbiMode)
-    {
-        m_palVbiCb = vbi_cb;
-        m_palVbiTt = pal_tt;
-    }
-    else if (VBIMode::NTSC_CC == m_vbiMode)
+    if (VBIMode::NTSC_CC == m_vbiMode)
     {
         m_ntscVbiWidth     = width;
         m_ntscVbiStartLine = start_line;
@@ -204,14 +158,6 @@ void V4LRecorder::CloseVBIDevice(void)
     if (m_vbiFd < 0)
         return;
 
-    if (m_palVbiTt)
-    {
-        vbi_del_handler(m_palVbiTt, vbi_event, m_palVbiCb);
-        vbi_close(m_palVbiTt);
-        delete m_palVbiCb;
-        m_palVbiCb = nullptr;
-    }
-    else
     {
         delete m_vbi608; m_vbi608 = nullptr;
         close(m_vbiFd);
@@ -259,17 +205,7 @@ void V4LRecorder::RunVBIDevice(void)
                 LOG(VB_GENERAL, LOG_DEBUG, LOC + "vbi select timed out");
             continue; // either failed or timed out..
         }
-        if (VBIMode::PAL_TT == m_vbiMode)
-        {
-            m_palVbiCb->foundteletextpage = false;
-            vbi_handler(m_palVbiTt, m_palVbiTt->fd);
-            if (m_palVbiCb->foundteletextpage)
-            {
-                // decode VBI as teletext subtitles
-                FormatTT(m_palVbiCb);
-            }
-        }
-        else if (VBIMode::NTSC_CC == m_vbiMode)
+        if (VBIMode::NTSC_CC == m_vbiMode)
         {
             int ret = read(m_vbiFd, ptr, ptr_end - ptr);
             ptr = (ret > 0) ? ptr + ret : ptr;
