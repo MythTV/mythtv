@@ -309,6 +309,8 @@ void HDHRChannelFetcher::run(void)
     m_threadRunning = true;
     m_lock.unlock();
 
+    bool usingCableCard = CardUtil::IsCableCardPresent(m_cardId, QString("HDHOMERUN"));
+
     // Step 1/3 : Get the IP of the HDHomeRun to query
     QString dev = CardUtil::GetVideoDevice(m_cardId);
     QString ip = HDHRIPv4Address(dev);
@@ -421,23 +423,37 @@ void HDHRChannelFetcher::run(void)
                 }
             }
 
-            // A new dtv_multiplex entry will be created if necessary, otherwise an existing one is returned
-            uint mplexID = ChannelUtil::CreateMultiplex(m_sourceId, sistandard, frequency, modulation,
-                                                        transportID, networkID, symbolrate, bandwidth,
-                                                        'v', 'a', 'a', QString(), QString(), 'a', QString(),
-                                                        QString(), QString(), modsys.toString(), "0.35");
-            if (mplexID == 0)
+            uint mplexID;
+            QString freqID;
+
+            if (usingCableCard)
             {
-                LOG(VB_GENERAL, LOG_ERR, QString("No multiplex for %1 sid:%2 freq:%3 url:%4")
-                    .arg(msg).arg(serviceID, -5, 10, QChar(' ')).arg(frequency).arg((*it).m_tuning.GetDataURL().toString()));
-                continue;
+                // With a CableCard, we're going to use virtual
+                // channel tuning, so no dtv_multiplex is needed.
+                mplexID = 0;
+                // When virtual channel tuning, vchan is acquired from freqid field
+                freqID = channum;
+            }
+            else
+            {
+                // A new dtv_multiplex entry will be created if necessary, otherwise an existing one is returned
+                mplexID = ChannelUtil::CreateMultiplex(m_sourceId, sistandard, frequency, modulation,
+                                                       transportID, networkID, symbolrate, bandwidth,
+                                                       'v', 'a', 'a', QString(), QString(), 'a', QString(),
+                                                       QString(), QString(), modsys.toString(), "0.35");
+                if (mplexID == 0)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("No multiplex for %1 sid:%2 freq:%3 url:%4")
+                        .arg(msg).arg(serviceID, -5, 10, QChar(' ')).arg(frequency).arg((*it).m_tuning.GetDataURL().toString()));
+                    continue;
+                }
             }
 
             if (adding_channel)
             {
                 ChannelUtil::CreateChannel(mplexID, m_sourceId, chanid, name, name,
                                         channum, serviceID, atsc_major_channel, atsc_minor_channel,
-                                        use_on_air_guide, kChannelVisible, QString(),
+                                        use_on_air_guide, kChannelVisible, freqID,
                                         QString(), "Default", QString());
 
                 ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
@@ -446,7 +462,7 @@ void HDHRChannelFetcher::run(void)
             {
                 ChannelUtil::UpdateChannel(mplexID, m_sourceId, chanid, name, name,
                                         channum, serviceID, atsc_major_channel, atsc_minor_channel,
-                                        use_on_air_guide, kChannelVisible, QString(),
+                                        use_on_air_guide, kChannelVisible, freqID,
                                         QString(), "Default", QString());
 
                 ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);

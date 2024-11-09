@@ -1121,8 +1121,6 @@ bool Scheduler::FindNextConflict(
         }
 
         bool mplexid_ok =
-            (m_sinputInfoMap[p->m_sgroupId].m_reclimit > 1) &&
-            (m_sinputInfoMap[q->m_sgroupId].m_reclimit > 1) &&
             (p->m_sgroupId != q->m_sgroupId ||
              m_sinputInfoMap[p->m_sgroupId].m_schedGroup) &&
             (((p->m_mplexId != 0U) && p->m_mplexId == q->m_mplexId) ||
