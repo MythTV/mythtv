@@ -72,6 +72,21 @@
             "name_label": "Nimi",
             "new": "Uus kanalirühm"
         },
+        "custom": {
+            "delete_details": "See kustutab kohandatud prioriteedireegli {{ Name }}",
+            "delete_label": "Kustuta reegel",
+            "delete_this": "Kas kustutada kohandatud prioriteedi reegel?",
+            "edit": "Redigeeri reeglit",
+            "edit_label": "Redigeeri reeglit",
+            "heading": "Kohandatud prioriteedid",
+            "name_label": "Reegli nimi",
+            "new": "Uus reegel",
+            "priority_desc": "Summa, mille võrra prioriteet muutub, kui see reegel vastab kuvale.",
+            "priority_label": "Prioriteedi muutus",
+            "select_desc": "SQL-avaldis järgmiste tabelite veergude abil: recordmatch, record, program, channel, capturecard, oldrecorded. SQL-avaldiste näited on MythTV vikis alloleval lingil.",
+            "select_label": "SQL-i tingimus",
+            "validate_label": "Kinnitage"
+        },
         "datasources": {
             "daily_desc": "Kui see on määratud, proovib taustaprogramm salvestuste jaoks kunstiteoseid iga päev värskendada. Kui uusi hooaegu hakatakse salvestama, üritab see pakkuda teile värsket asjakohast kunstiteost, säilitades samas vanadele salvestistele määratud kunstiteosed.",
             "daily_label": "Tehke iga päev salvestatud kunstiteose värskendusi",
@@ -291,6 +306,7 @@
                 "autotranscode": "Salvestiste ümberkodeerimine"
             },
             "postproc_label": "Järeltöötluse valikud",
+            "powersearch_desc": "Näited SQL-i lisatabelitest ja tingimuste kohta, kus on MythTV vikis aadressil",
             "prefinput_label": "Eelistatud sisend",
             "priority_label": "Salvestamise prioriteet",
             "recgroup_label": "Salvestusgrupp",

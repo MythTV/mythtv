@@ -72,6 +72,21 @@
             "name_label": "Ime",
             "new": "Nova grupa kanala"
         },
+        "custom": {
+            "delete_details": "Ovo će izbrisati prilagođeno pravilo prioriteta {{ Name }}",
+            "delete_label": "Izbriši pravilo",
+            "delete_this": "Izbrisati prilagođeno pravilo prioriteta?",
+            "edit": "Uredi pravilo",
+            "edit_label": "Uredi pravilo",
+            "heading": "Prilagođeni prioriteti",
+            "name_label": "Naziv pravila",
+            "new": "Novo pravilo",
+            "priority_desc": "Iznos za koji će se promijeniti prioritet kada se ovo pravilo podudara s prikazom.",
+            "priority_label": "Promjena prioriteta",
+            "select_desc": "SQL izraz koji koristi stupce iz sljedećih tablica: recordmatch, record, program, channel, capturecard, oldrecorded. Primjeri SQL izraza nalaze se u MythTV wikiju na poveznici ispod.",
+            "select_label": "SQL uvjet",
+            "validate_label": "Potvrdi"
+        },
         "datasources": {
             "daily_desc": "Ako je postavljeno, pozadina će svakodnevno pokušavati ažurirati ilustracije za snimke. Kada se počnu snimati nove sezone, pokušat će vam se pružiti svježa, relevantna slika dok će se sačuvati slika dodijeljena starim snimkama.",
             "daily_label": "Obavljajte dnevna ažuriranja umjetničkih djela snimanja",
@@ -291,6 +306,7 @@
                 "autotranscode": "Prekodiranje snimaka"
             },
             "postproc_label": "Opcije naknadne obrade",
+            "powersearch_desc": "Primjeri SQL dodatnih tablica i uvjeta gdje su u MythTV wikiju na",
             "prefinput_label": "Preferirani unos",
             "priority_label": "Prioritet snimanja",
             "recgroup_label": "Grupa za snimanje",

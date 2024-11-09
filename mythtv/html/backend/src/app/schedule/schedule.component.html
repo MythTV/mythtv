@@ -65,12 +65,11 @@
                     [disabled]="['None','Manual Search'].indexOf(recRule.SearchType) > -1" [rows]="descriptionRows">
                 </textarea>
             </div>
-
             <div *ngIf="recRule.SearchType == 'Power Search'">
-                Examples of SQL Additional Tables and Where Conditions are in the MythTV wiki at<br>
+                {{ 'dashboard.sched.powersearch_desc' | translate }}
+                <br>
                 <a href="https://www.mythtv.org/wiki/Power_Search" target="_blank">Power Search</a>
             </div>
-
             <!-- Manual Search Settings -->
             <div *ngIf="recRule.SearchType == 'Manual Search'">
                 <p-divider></p-divider>
@@ -122,8 +121,7 @@
             <div class="form-group field">
                 <p-checkbox inputId="Active" [(ngModel)]="recRule.Inactive" name="Active" #Active="ngModel"
                     class="label mb-2 w-full" [binary]="true" label="{{ 'dashboard.sched.active_label' | translate }}"
-                    [trueValue]="false" [falseValue]="true"
-                    [disabled]="override">
+                    [trueValue]="false" [falseValue]="true" [disabled]="override">
                 </p-checkbox>
             </div>
 

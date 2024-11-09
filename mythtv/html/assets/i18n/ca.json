@@ -72,6 +72,21 @@
             "name_label": "Nom",
             "new": "Nou grup de canals"
         },
+        "custom": {
+            "delete_details": "Això suprimirà la regla de prioritat personalitzada {{ Name }}",
+            "delete_label": "Suprimeix la regla",
+            "delete_this": "Vols suprimir la regla de prioritat personalitzada?",
+            "edit": "Edita la regla",
+            "edit_label": "Edita la regla",
+            "heading": "Prioritats personalitzades",
+            "name_label": "Nom de la regla",
+            "new": "Nova regla",
+            "priority_desc": "L'import pel qual canviarà la prioritat quan aquesta regla coincideixi amb una presentació.",
+            "priority_label": "Canvi de prioritat",
+            "select_desc": "Expressió SQL utilitzant columnes de les taules següents: recordmatch, record, program, channel, capturecard, oldrecorded. Hi ha exemples d'expressions SQL a la wiki de MythTV a l'enllaç següent.",
+            "select_label": "Condició SQL",
+            "validate_label": "Valida"
+        },
         "datasources": {
             "daily_desc": "Si s'estableix, el backend intentarà actualitzar les obres d'art per a les gravacions diàriament. Quan es comencin a gravar noves temporades, s'intentarà oferir-vos obres d'art fresques i rellevants alhora que es conserven les obres d'art assignades a les gravacions antigues.",
             "daily_label": "Realitzeu actualitzacions diàries de la gravació d'obres d'art",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transcodificació d'enregistraments"
             },
             "postproc_label": "Opcions de processament posterior",
+            "powersearch_desc": "Exemples de taules addicionals d'SQL i on es troben les condicions al wiki de MythTV a",
             "prefinput_label": "Entrada preferida",
             "priority_label": "Prioritat de gravació",
             "recgroup_label": "Grup de gravació",

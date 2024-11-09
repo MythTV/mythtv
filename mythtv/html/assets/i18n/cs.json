@@ -72,6 +72,21 @@
             "name_label": "Jméno",
             "new": "Nová skupina kanálů"
         },
+        "custom": {
+            "delete_details": "Tímto smažete vlastní pravidlo priority {{ Name }}",
+            "delete_label": "Smazat pravidlo",
+            "delete_this": "Smazat vlastní pravidlo priority?",
+            "edit": "Upravit pravidlo",
+            "edit_label": "Upravit pravidlo",
+            "heading": "Vlastní priority",
+            "name_label": "Název pravidla",
+            "new": "Nové pravidlo",
+            "priority_desc": "Částka, o kterou se změní priorita, když toto pravidlo odpovídá zobrazení.",
+            "priority_label": "Změna priority",
+            "select_desc": "SQL výraz pomocí sloupců z následujících tabulek: recordmatch, record, program, channel, capturecard, oldrecorded. Příklady SQL Expressions jsou na MythTV wiki pod odkazem níže.",
+            "select_label": "Podmínka SQL",
+            "validate_label": "Ověřit"
+        },
         "datasources": {
             "daily_desc": "Je-li nastaveno, backend se pokusí provádět aktualizace kresby pro nahrávky denně. Když se začnou nahrávat nové sezóny, pokusí se vám poskytnout čerstvé, relevantní umělecké dílo a zároveň zachovat umělecká díla přiřazená ke starým nahrávkám.",
             "daily_label": "Provádějte každodenní aktualizace nahrávek",
@@ -291,6 +306,7 @@
                 "autotranscode": "Překódované nahrávky"
             },
             "postproc_label": "Možnosti následného zpracování",
+            "powersearch_desc": "Příklady dodatečných tabulek SQL a kde jsou podmínky na wiki MythTV na adrese",
             "prefinput_label": "Preferovaný vstup",
             "priority_label": "Priorita nahrávání",
             "recgroup_label": "Nahrávací skupina",

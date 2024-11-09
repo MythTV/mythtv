@@ -72,6 +72,21 @@
             "name_label": "名前",
             "new": "新しいチャネルグループ"
         },
+        "custom": {
+            "delete_details": "これにより、カスタム優先度ルール {{ Name }} が削除されます",
+            "delete_label": "ルールの削除",
+            "delete_this": "カスタム優先度ルールを削除しますか?",
+            "edit": "ルールの編集",
+            "edit_label": "ルールの編集",
+            "heading": "カスタム優先度",
+            "name_label": "ルール名",
+            "new": "新しいルール",
+            "priority_desc": "このルールが上映に一致する場合に優先度が変更される量。",
+            "priority_label": "優先順位の変更",
+            "select_desc": "次のテーブルの列を使用した SQL 式: Recordmatch、record、program、channel、capturecard、oldrecorded。 SQL 式の例は、以下のリンクにある MythTV wiki にあります。",
+            "select_label": "SQL条件",
+            "validate_label": "検証する"
+        },
         "datasources": {
             "daily_desc": "設定すると、バックエンドは毎日録画のアートワークの更新を実行しようとします。新しいシーズンの録画が始まると、古い録画に割り当てられたアートワークを保持しながら、新鮮で関連性のあるアートワークを提供しようとします。",
             "daily_label": "レコーディングアートワークを毎日更新する",
@@ -291,6 +306,7 @@
                 "autotranscode": "トランスコード録音"
             },
             "postproc_label": "後処理オプション",
+            "powersearch_desc": "SQL 追加テーブルと Where 条件の例については、MythTV wiki を参照してください。",
             "prefinput_label": "優先入力",
             "priority_label": "録画の優先順位",
             "recgroup_label": "録音グループ",

@@ -72,6 +72,21 @@
             "name_label": "İsim",
             "new": "Yeni Kanal Grubu"
         },
+        "custom": {
+            "delete_details": "Bu, {{ Name }} Özel Öncelik Kuralını silecektir",
+            "delete_label": "Kuralı Sil",
+            "delete_this": "Özel Öncelik Kuralı Silinsin mi?",
+            "edit": "Kuralı Düzenle",
+            "edit_label": "Kuralı Düzenle",
+            "heading": "Özel Öncelikler",
+            "name_label": "Kural Adı",
+            "new": "Yeni Kural",
+            "priority_desc": "Bu kural bir gösterimle eşleştiğinde önceliğin değişeceği miktar.",
+            "priority_label": "Öncelik Değişikliği",
+            "select_desc": "Aşağıdaki tablolardan sütunları kullanan SQL ifadesi: kayıt eşleşmesi, kayıt, program, kanal, yakalama kartı, eski kayıt. SQL İfadelerinin örnekleri aşağıdaki bağlantıdaki MythTV wiki'sinde bulunmaktadır.",
+            "select_label": "SQL Durumu",
+            "validate_label": "Doğrula"
+        },
         "datasources": {
             "daily_desc": "Ayarlanırsa arka uç, kayıtlar için görsel güncellemelerini günlük olarak gerçekleştirmeye çalışacaktır. Yeni sezonlar kayıt yapmaya başladığında bu, eski kayıtlara atanan çizimleri korurken size yeni, ilgili çizimler sağlamaya çalışacaktır.",
             "daily_label": "Kayıt resminin günlük güncellemelerini gerçekleştirin",
@@ -291,6 +306,7 @@
                 "autotranscode": "Kod Dönüştürme Kayıtları"
             },
             "postproc_label": "Sonradan İşleme Seçenekleri",
+            "powersearch_desc": "MythTV wiki'sinde SQL Ek Tabloları ve Koşulların Bulunduğu Yerlere ilişkin örnekler:",
             "prefinput_label": "Tercih Edilen Giriş",
             "priority_label": "Kayıt Önceliği",
             "recgroup_label": "Kayıt Grubu",

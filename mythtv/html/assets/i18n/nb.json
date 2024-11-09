@@ -72,6 +72,21 @@
             "name_label": "Navn",
             "new": "Ny kanalgruppe"
         },
+        "custom": {
+            "delete_details": "Dette vil slette egendefinert prioritetsregel {{ Name }}",
+            "delete_label": "Slett regel",
+            "delete_this": "Vil du slette egendefinert prioritetsregel?",
+            "edit": "Rediger regel",
+            "edit_label": "Rediger regel",
+            "heading": "Egendefinerte prioriteringer",
+            "name_label": "Regelnavn",
+            "new": "Ny regel",
+            "priority_desc": "Beløpet som prioritet endres med når denne regelen samsvarer med en visning.",
+            "priority_label": "Prioritetsendring",
+            "select_desc": "SQL-uttrykk ved hjelp av kolonner fra følgende tabeller: recordmatch, record, program, channel, capturecard, oldrecorded. Eksempler på SQL-uttrykk er i MythTV-wikien på lenken nedenfor.",
+            "select_label": "SQL-tilstand",
+            "validate_label": "Bekreft"
+        },
         "datasources": {
             "daily_desc": "Hvis den er angitt, vil backend forsøke å utføre kunstverkoppdateringer for opptak daglig. Når nye sesonger begynner å spille inn, vil dette forsøke å gi deg ferske, relevante kunstverk samtidig som kunstverket som er tilordnet gamle opptak bevares.",
             "daily_label": "Utfør daglige oppdateringer av opptak av kunstverk",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transkode opptak"
             },
             "postproc_label": "Alternativer for etterbehandling",
+            "powersearch_desc": "Eksempler på SQL-tilleggstabeller og hvor betingelser er i MythTV-wikien på",
             "prefinput_label": "Foretrukket inngang",
             "priority_label": "Opptaksprioritet",
             "recgroup_label": "Opptaksgruppe",

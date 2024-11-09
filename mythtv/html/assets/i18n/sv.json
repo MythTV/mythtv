@@ -72,6 +72,21 @@
             "name_label": "Namn",
             "new": "Ny kanalgrupp"
         },
+        "custom": {
+            "delete_details": "Detta tar bort anpassad prioritetsregel {{ Name }}",
+            "delete_label": "Ta bort regel",
+            "delete_this": "Ta bort anpassad prioritetsregel?",
+            "edit": "Redigera regel",
+            "edit_label": "Redigera regel",
+            "heading": "Anpassade prioriteringar",
+            "name_label": "Regelnamn",
+            "new": "Ny regel",
+            "priority_desc": "Det belopp med vilket prioritet ändras när denna regel matchar en visning.",
+            "priority_label": "Prioritetsändring",
+            "select_desc": "SQL-uttryck med kolumner från följande tabeller: recordmatch, record, program, channel, capturecard, oldrecorded. Exempel på SQL-uttryck finns i MythTV-wikin på länken nedan.",
+            "select_label": "SQL-villkor",
+            "validate_label": "Bekräfta"
+        },
         "datasources": {
             "daily_desc": "Om det är inställt kommer backend att försöka utföra konstverksuppdateringar för inspelningar dagligen. När nya säsonger börjar spelas in kommer detta att försöka ge dig färska, relevanta konstverk samtidigt som de konstverk som tilldelats gamla inspelningar bevaras.",
             "daily_label": "Utför dagliga uppdateringar av inspelningskonstverk",
@@ -291,6 +306,7 @@
                 "autotranscode": "Omkoda inspelningar"
             },
             "postproc_label": "Alternativ för efterbearbetning",
+            "powersearch_desc": "Exempel på SQL-tilläggstabeller och var villkor finns i MythTV-wikin på",
             "prefinput_label": "Föredragen ingång",
             "priority_label": "Inspelningsprioritet",
             "recgroup_label": "Inspelningsgrupp",

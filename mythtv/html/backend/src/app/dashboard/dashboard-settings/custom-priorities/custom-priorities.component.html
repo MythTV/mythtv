@@ -1,0 +1,123 @@
+<div class="block card w-full" *ngIf="loaded">
+    <p-table [value]="rules" scrollHeight="flex" [scrollable]="true" sortField="Name"
+        styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template pTemplate="caption">
+            <button pButton pRipple label="{{ 'dashboard.custom.new' | translate }}" icon="pi pi-plus"
+                class="p-button-success mr-2" (click)="openNew()"></button>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <!-- style="width:  8%" -->
+                <th style="width: 20%">{{ 'dashboard.custom.name_label' | translate }}</th>
+                <th style="width: 10%">{{ 'dashboard.custom.priority_label' | translate }}</th>
+                <th style="width: 60%">{{ 'dashboard.custom.select_label' | translate }}</th>
+                <th style="width:  7%; white-space: nowrap;">
+                    <!-- These are disabled buttons to ensure the spacing of the heading
+                         matches the spacing of the rows -->
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                        disabled="true"></button>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rule>
+            <tr>
+                <td>{{ rule.PriorityName }}</td>
+                <td>{{ rule.RecPriority }}</td>
+                <td>{{ rule.SelectClause }}</td>
+                <td class="pt-1 pb-0" style="white-space: nowrap;">
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" (click)="editRule(rule)"
+                        pTooltip="{{ 'dashboard.custom.edit_label' | translate }}" tooltipPosition="left"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                        (click)="deleteRequest(rule)" pTooltip="{{ 'dashboard.custom.delete_label' | translate }}"
+                        tooltipPosition="left"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<form class="ml-3 mr-3" name="customform" #customform="ngForm">
+
+    <p-dialog header="{{ dialogHeader }}" [(visible)]="displayRuleDlg" [modal]="true"
+        [style]="{height: '75vw', width: '50vw'}" [closable]="false" [closeOnEscape]="false">
+
+        <div class="form-group field">
+            <label for="PriorityName" class="label block">{{ 'dashboard.custom.name_label' | translate }}</label>
+            <input pInputText id="PriorityName" [(ngModel)]="rule.PriorityName" name="PriorityName"
+                #PriorityName="ngModel" class="mb-2 form-control w-full" [disabled]="operation == 0" />
+            <small class="block">
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <label for="RecPriority" class="label block">{{ 'dashboard.custom.priority_label' | translate }}</label>
+            <p-inputNumber [(ngModel)]="rule.RecPriority" name="RecPriority" id="RecPriority" [showButtons]="true"
+                [min]="-99" [max]="99" [step]="1"></p-inputNumber>
+            <small class="block">
+                {{ 'dashboard.custom.priority_desc' | translate }}
+            </small>
+        </div>
+
+        <div class="form-group field">
+            <label for="SelectClause" class="label block">{{ 'dashboard.custom.select_label' | translate }}</label>
+            <input pInputText id="SelectClause" [(ngModel)]="rule.SelectClause" name="SelectClause"
+                #PriorityName="ngModel" class="mb-2 form-control w-full" />
+            <small class="block">
+                {{ 'dashboard.custom.select_desc' | translate }}
+            </small>
+            <a href="https://www.mythtv.org/wiki/Custom_Priority" target="_blank">Custom Priority</a>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="successCount > 0 && errorCount == 0 && !customform.dirty" severity="success"
+                    text="{{ 'common.savesuccess' | translate }}"></p-message>
+                <p-message *ngIf="errorMsg" severity="error" text="{{ errorMsg }}"></p-message>
+                <p-message *ngIf="successMsg" severity="success" text="{{ successMsg }}"></p-message>
+                <p-message *ngIf="errorCount > 0" severity="error"
+                    text="{{ 'common.networkfail' | translate }}"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
+                styleClass="p-button-warning">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="validate(rule.SelectClause);"
+                label="{{ 'dashboard.custom.validate_label' | translate }}" styleClass="p-button-info"
+                [disabled]="rule.SelectClause.trim() == '' "></p-button>
+            <p-button icon="pi pi-save" (onClick)="saveRule();" label="{{ 'common.save' | translate }}"
+                styleClass="p-button-success"
+                [disabled]="!customform.dirty || rule.PriorityName.trim() == '' || rule.SelectClause.trim() == '' "></p-button>
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="{{ 'common.unsaved_heading' | translate }}" [(visible)]="displayUnsaved" [modal]="true">
+        <p>{{ 'common.unsaved_message' | translate }}</p>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.nosave' | translate }}"
+                styleClass="p-button-danger">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="displayUnsaved=false"
+                label="{{ 'common.continue' | translate }}" styleClass="p-button-success">
+            </p-button>
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="{{ 'dashboard.custom.delete_this' | translate }}" [(visible)]="displayDelete" [modal]="true"
+        [draggable]="false" [resizable]="false">
+        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
+        <p>{{ 'dashboard.custom.delete_details' |
+            translate: {Name: rule.PriorityName} }}</p>
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="errorCount > 0" severity="error"
+                    text="{{ 'common.networkfail' | translate }}"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="displayDelete=false; customform.form.markAsPristine();"
+                label="{{ 'common.close' | translate }}" styleClass="p-button-warning">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="deleteRule(rule)" label="{{ 'common.delete' | translate }}"
+                styleClass="p-button-danger"></p-button>
+        </ng-template>
+    </p-dialog>
+
+</form>

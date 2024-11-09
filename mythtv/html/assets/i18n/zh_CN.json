@@ -72,6 +72,21 @@
             "name_label": "姓名",
             "new": "新渠道集团"
         },
+        "custom": {
+            "delete_details": "这将删除自定义优先级规则 {{ Name }}",
+            "delete_label": "删除规则",
+            "delete_this": "删除自定义优先级规则？",
+            "edit": "编辑规则",
+            "edit_label": "编辑规则",
+            "heading": "自定义优先级",
+            "name_label": "规则名称",
+            "new": "新规则",
+            "priority_desc": "当此规则与放映匹配时优先级将改变的量。",
+            "priority_label": "优先级变更",
+            "select_desc": "使用下表中的列的 SQL 表达式：recordmatch、record、program、channel、capturecard、oldrecorded。 SQL 表达式的示例位于 MythTV wiki 中，链接如下。",
+            "select_label": "SQL条件",
+            "validate_label": "证实"
+        },
         "datasources": {
             "daily_desc": "如果设置，后端将尝试每天对录音执行艺术作品更新。当新的季节开始录制时，这将尝试为您提供新鲜的、相关的艺术作品，同时保留分配给旧录音的艺术作品。",
             "daily_label": "每日更新录制作品",
@@ -291,6 +306,7 @@
                 "autotranscode": "转码录音"
             },
             "postproc_label": "后处理选项",
+            "powersearch_desc": "SQL 附加表和Where 条件的示例位于 MythTV wiki 中：",
             "prefinput_label": "首选输入",
             "priority_label": "录音优先级",
             "recgroup_label": "录音组",

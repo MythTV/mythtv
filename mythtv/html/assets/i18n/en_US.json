@@ -72,6 +72,21 @@
             "name_label": "Name",
             "new": "New Channel Group"
         },
+        "custom": {
+            "delete_details": "This will delete Custom Priority Rule {{ Name }}",
+            "delete_label": "Delete Rule",
+            "delete_this": "Delete Custom Priority Rule?",
+            "edit": "Edit Rule",
+            "edit_label": "Edit Rule",
+            "heading": "Custom Priorities",
+            "name_label": "Rule Name",
+            "new": "New Rule",
+            "priority_desc": "The amount by which priority will change when this rule matches a showing.",
+            "priority_label": "Priority Change",
+            "select_desc": "SQL expression using columns from the following tables: recordmatch, record, program, channel, capturecard, oldrecorded. Examples of SQL Expressions are in the MythTV wiki at the link below.",
+            "select_label": "SQL Condition",
+            "validate_label": "Validate"
+        },
         "datasources": {
             "daily_desc": "If set, the backend will attempt to perform artwork updates for recordings daily. When new seasons begin to record, this will attempt to provide you with fresh, relevant artwork while preserving the artwork assigned to old recordings.",
             "daily_label": "Perform daily updates of recording artwork",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transcode Recordings"
             },
             "postproc_label": "Post Processing Options",
+            "powersearch_desc": "Examples of SQL Additional Tables and Where Conditions are in the MythTV wiki at",
             "prefinput_label": "Preferred Input",
             "priority_label": "Recording Priority",
             "recgroup_label": "Recording Group",

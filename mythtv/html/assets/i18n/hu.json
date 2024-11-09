@@ -72,6 +72,21 @@
             "name_label": "Név",
             "new": "Új csatornacsoport"
         },
+        "custom": {
+            "delete_details": "Ezzel törli a(z) {{ Name }} egyéni prioritási szabályt",
+            "delete_label": "Szabály törlése",
+            "delete_this": "Törli az egyéni prioritási szabályt?",
+            "edit": "Szabály szerkesztése",
+            "edit_label": "Szabály szerkesztése",
+            "heading": "Egyéni prioritások",
+            "name_label": "Szabály neve",
+            "new": "Új szabály",
+            "priority_desc": "Az az összeg, amellyel a prioritás megváltozik, ha ez a szabály megegyezik a megjelenítéssel.",
+            "priority_label": "Prioritás változás",
+            "select_desc": "SQL kifejezés a következő táblák oszlopaival: recordmatch, record, program, channel, capturecard, oldrecorded. Az SQL-kifejezések példái a MythTV wikiben találhatók az alábbi linken.",
+            "select_label": "SQL feltétel",
+            "validate_label": "Érvényesít"
+        },
         "datasources": {
             "daily_desc": "Ha be van állítva, a háttérprogram naponta megpróbálja frissíteni a felvételeket. Amikor új évadokat kezdenek rögzíteni, ez megpróbálja friss, releváns alkotásokkal szolgálni, miközben megőrzi a régi felvételekhez rendelt alkotásokat.",
             "daily_label": "Végezze el a felvételi műalkotások napi frissítését",
@@ -291,6 +306,7 @@
                 "autotranscode": "Felvételek átkódolása"
             },
             "postproc_label": "Utófeldolgozási lehetőségek",
+            "powersearch_desc": "Példák az SQL további tábláira és a hol feltételekre a MythTV wikiben a címen",
             "prefinput_label": "Preferált bemenet",
             "priority_label": "Felvételi prioritás",
             "recgroup_label": "Felvevőcsoport",

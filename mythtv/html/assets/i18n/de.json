@@ -72,6 +72,21 @@
             "name_label": "Name",
             "new": "Neue Kanalgruppe"
         },
+        "custom": {
+            "delete_details": "Dadurch wird die benutzerdefinierte Prioritätsregel {{ Name }} gelöscht.",
+            "delete_label": "Regel löschen",
+            "delete_this": "Benutzerdefinierte Prioritätsregel löschen?",
+            "edit": "Regel bearbeiten",
+            "edit_label": "Regel bearbeiten",
+            "heading": "Benutzerdefinierte Prioritäten",
+            "name_label": "Regelname",
+            "new": "Neue Regel",
+            "priority_desc": "Der Betrag, um den sich die Priorität ändert, wenn diese Regel mit einer Vorführung übereinstimmt.",
+            "priority_label": "Prioritätsänderung",
+            "select_desc": "SQL-Ausdruck unter Verwendung von Spalten aus den folgenden Tabellen: Recordmatch, Record, Program, Channel, Capturecard, Oldrecorded. Beispiele für SQL-Ausdrücke finden Sie im MythTV-Wiki unter dem folgenden Link.",
+            "select_label": "SQL-Bedingung",
+            "validate_label": "Bestätigen"
+        },
         "datasources": {
             "daily_desc": "Wenn dies festgelegt ist, versucht das Backend täglich, Bildmaterialaktualisierungen für Aufnahmen durchzuführen. Wenn mit den Aufnahmen für neue Staffeln begonnen wird, wird versucht, Ihnen frische, relevante Grafiken zu liefern und gleichzeitig die alten Aufnahmen beizubehalten.",
             "daily_label": "Führen Sie tägliche Aktualisierungen der Aufnahmegrafiken durch",
@@ -291,6 +306,7 @@
                 "autotranscode": "Aufnahmen transkodieren"
             },
             "postproc_label": "Nachbearbeitungsoptionen",
+            "powersearch_desc": "Beispiele für zusätzliche SQL-Tabellen und Where-Bedingungen finden Sie im MythTV-Wiki unter",
             "prefinput_label": "Bevorzugter Eingang",
             "priority_label": "Aufnahmepriorität",
             "recgroup_label": "Aufnahmegruppe",

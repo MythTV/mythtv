@@ -90,6 +90,7 @@ import { JobsComponent } from './dashboard/dashboard-settings/jobs/jobs.componen
 import { RecQualityComponent } from './dashboard/dashboard-settings/rec-quality/rec-quality.component';
 import { RecPrioritiesComponent } from './dashboard/dashboard-settings/rec-priorities/rec-priorities.component';
 import { DataSourcesComponent } from './dashboard/dashboard-settings/data-sources/data-sources.component';
+import { CustomPrioritiesComponent } from './dashboard/dashboard-settings/custom-priorities/custom-priorities.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -175,6 +176,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     RecQualityComponent,
     RecPrioritiesComponent,
     DataSourcesComponent,
+    CustomPrioritiesComponent,
   ],
   imports: [
     BrowserModule,

@@ -213,3 +213,13 @@ export interface PlayGroup {
     Jump:        number;
     TimeStretch: number;
 }
+
+export interface PowerPriority {
+    PriorityName:   string;
+    RecPriority:    number;
+    SelectClause:   string;
+}
+
+export interface PowerPriorityList {
+    PowerPriorities : PowerPriority []; 
+}

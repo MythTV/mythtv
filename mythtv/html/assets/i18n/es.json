@@ -72,6 +72,21 @@
             "name_label": "Nombre",
             "new": "Nuevo grupo de canales"
         },
+        "custom": {
+            "delete_details": "Esto eliminará la regla de prioridad personalizada {{ Name }}",
+            "delete_label": "Eliminar regla",
+            "delete_this": "¿Eliminar regla de prioridad personalizada?",
+            "edit": "Editar regla",
+            "edit_label": "Editar regla",
+            "heading": "Prioridades personalizadas",
+            "name_label": "Nombre de la regla",
+            "new": "Nueva regla",
+            "priority_desc": "La cantidad en la que la prioridad cambiará cuando esta regla coincida con una visita.",
+            "priority_label": "Cambio de prioridad",
+            "select_desc": "Expresión SQL que utiliza columnas de las siguientes tablas: recordmatch, record, program, canal, capturecard, oldrecorded. Hay ejemplos de expresiones SQL en la wiki de MythTV en el siguiente enlace.",
+            "select_label": "Condición SQL",
+            "validate_label": "Validar"
+        },
         "datasources": {
             "daily_desc": "Si está configurado, el backend intentará realizar actualizaciones de arte para las grabaciones diariamente. Cuando comiencen a grabarse nuevas temporadas, se intentará brindarle obras de arte nuevas y relevantes, preservando al mismo tiempo las obras de arte asignadas a las grabaciones antiguas.",
             "daily_label": "Realizar actualizaciones diarias de las ilustraciones de grabación.",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transcodificar grabaciones"
             },
             "postproc_label": "Opciones de posprocesamiento",
+            "powersearch_desc": "Ejemplos de tablas adicionales de SQL y dónde están las condiciones en la wiki de MythTV en",
             "prefinput_label": "Entrada preferida",
             "priority_label": "Prioridad de grabación",
             "recgroup_label": "Grupo de grabación",

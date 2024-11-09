@@ -72,6 +72,21 @@
             "name_label": "姓名",
             "new": "新通路集團"
         },
+        "custom": {
+            "delete_details": "這將刪除自訂優先權規則 {{ Name }}",
+            "delete_label": "刪除規則",
+            "delete_this": "刪除自訂優先規則？",
+            "edit": "編輯規則",
+            "edit_label": "編輯規則",
+            "heading": "自訂優先級",
+            "name_label": "規則名稱",
+            "new": "新規則",
+            "priority_desc": "當此規則與放映相符時優先順序將改變的量。",
+            "priority_label": "優先權變更",
+            "select_desc": "使用下表中的欄位的 SQL 表達式：recordmatch、record、program、channel、capturecard、oldrecorded。 SQL 表達式的範例位於 MythTV wiki 中，連結如下。",
+            "select_label": "SQL條件",
+            "validate_label": "證實"
+        },
         "datasources": {
             "daily_desc": "如果設置，後端將嘗試每天對錄音執行藝術作品更新。當新的季節開始錄製時，這將嘗試為您提供新鮮的、相關的藝術作品，同時保留分配給舊錄音的藝術作品。",
             "daily_label": "每日更新錄製作品",
@@ -291,6 +306,7 @@
                 "autotranscode": "轉碼錄音"
             },
             "postproc_label": "後處理選項",
+            "powersearch_desc": "SQL 附加資料表和Where 條件的範例位於 MythTV wiki 中：",
             "prefinput_label": "首選輸入",
             "priority_label": "錄音優先級",
             "recgroup_label": "錄音組",

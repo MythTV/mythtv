@@ -72,6 +72,21 @@
             "name_label": "Nome",
             "new": "Novo grupo de canais"
         },
+        "custom": {
+            "delete_details": "Isso excluirá a regra de prioridade personalizada {{ Name }}",
+            "delete_label": "Excluir regra",
+            "delete_this": "Excluir regra de prioridade personalizada?",
+            "edit": "Editar regra",
+            "edit_label": "Editar regra",
+            "heading": "Prioridades personalizadas",
+            "name_label": "Nome da regra",
+            "new": "Nova regra",
+            "priority_desc": "O valor pelo qual a prioridade mudará quando esta regra corresponder a uma exibição.",
+            "priority_label": "Mudança de prioridade",
+            "select_desc": "Expressão SQL usando colunas das seguintes tabelas: recordmatch, record, program, channel, capturecard, oldrecorded. Exemplos de expressões SQL estão no wiki da MythTV no link abaixo.",
+            "select_label": "Condição SQL",
+            "validate_label": "Validar"
+        },
         "datasources": {
             "daily_desc": "Se definido, o back-end tentará realizar atualizações de arte para gravações diariamente. Quando novas temporadas começarem a ser gravadas, isso tentará fornecer obras de arte novas e relevantes, preservando ao mesmo tempo a arte atribuída a gravações antigas.",
             "daily_label": "Realize atualizações diárias da arte da gravação",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transcodificar gravações"
             },
             "postproc_label": "Opções de pós-processamento",
+            "powersearch_desc": "Exemplos de tabelas adicionais SQL e condições de localização no wiki MythTV em",
             "prefinput_label": "Entrada preferida",
             "priority_label": "Prioridade de Gravação",
             "recgroup_label": "Grupo de gravação",

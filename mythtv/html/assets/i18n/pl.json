@@ -72,6 +72,21 @@
             "name_label": "Nazwa",
             "new": "Nowa grupa kanałów"
         },
+        "custom": {
+            "delete_details": "Spowoduje to usunięcie niestandardowej reguły priorytetu {{ Name }}",
+            "delete_label": "Usuń regułę",
+            "delete_this": "Usunąć niestandardową regułę priorytetu?",
+            "edit": "Edytuj regułę",
+            "edit_label": "Edytuj regułę",
+            "heading": "Niestandardowe priorytety",
+            "name_label": "Nazwa reguły",
+            "new": "Nowa zasada",
+            "priority_desc": "Kwota, o jaką zmieni się priorytet, gdy ta reguła pasuje do pokazu.",
+            "priority_label": "Zmiana priorytetu",
+            "select_desc": "Wyrażenie SQL wykorzystujące kolumny z następujących tabel: rekord, rekord, program, kanał, karta przechwytująca, stare nagranie. Przykłady wyrażeń SQL znajdują się na wiki MythTV pod linkiem poniżej.",
+            "select_label": "Warunek SQL",
+            "validate_label": "Uprawomocnić"
+        },
         "datasources": {
             "daily_desc": "Jeśli jest ustawione, backend będzie codziennie próbował aktualizować grafikę nagrań. Kiedy rozpocznie się nagrywanie nowych sezonów, spróbujemy zapewnić świeżą, odpowiednią grafikę, zachowując jednocześnie grafikę przypisaną do starych nagrań.",
             "daily_label": "Wykonuj codzienne aktualizacje okładek nagrań",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transkoduj nagrania"
             },
             "postproc_label": "Opcje przetwarzania końcowego",
+            "powersearch_desc": "Przykłady dodatkowych tabel SQL i warunków Where znajdują się na wiki MythTV pod adresem",
             "prefinput_label": "Preferowane wejście",
             "priority_label": "Priorytet nagrywania",
             "recgroup_label": "Grupa nagrań",

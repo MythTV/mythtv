@@ -72,6 +72,21 @@
             "name_label": "Nimi",
             "new": "Uusi kanavaryhmä"
         },
+        "custom": {
+            "delete_details": "Tämä poistaa mukautetun prioriteetin säännön {{ Name }}",
+            "delete_label": "Poista sääntö",
+            "delete_this": "Poistetaanko muokattu prioriteettisääntö?",
+            "edit": "Muokkaa sääntöä",
+            "edit_label": "Muokkaa sääntöä",
+            "heading": "Mukautetut prioriteetit",
+            "name_label": "Säännön nimi",
+            "new": "Uusi sääntö",
+            "priority_desc": "Summa, jolla prioriteetti muuttuu, kun tämä sääntö vastaa näyttöä.",
+            "priority_label": "Prioriteettimuutos",
+            "select_desc": "SQL-lauseke käyttämällä sarakkeita seuraavista taulukoista: recordmatch, record, program, channel, capturecard, oldrecorded. Esimerkkejä SQL-lausekkeista on MythTV-wikissä alla olevasta linkistä.",
+            "select_label": "SQL-ehto",
+            "validate_label": "Vahvista"
+        },
         "datasources": {
             "daily_desc": "Jos asetus on asetettu, taustaohjelma yrittää päivittää tallenteiden kuvituspäivityksiä päivittäin. Kun uusien kausien nauhoittaminen alkaa, tämä yrittää tarjota sinulle tuoretta, asiaankuuluvaa taideteosta säilyttäen samalla vanhoille äänityksille määritetyn taiteen.",
             "daily_label": "Päivitä tallenneteoksia päivittäin",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transkoodaa tallenteet"
             },
             "postproc_label": "Jälkikäsittelyvaihtoehdot",
+            "powersearch_desc": "Esimerkkejä SQL:n lisätaulukoista ja missä ehdoista on MythTV-wikissä osoitteessa",
             "prefinput_label": "Ensisijainen syöttö",
             "priority_label": "Tallennusprioriteetti",
             "recgroup_label": "Äänitysryhmä",

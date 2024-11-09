@@ -23,7 +23,9 @@ import {
   UpdateRecordedMetadataRequest,
   RecordScheduleRequest,
   ManageJobQueueRequest,
-  PlayGroup
+  PlayGroup,
+  PowerPriorityList,
+  PowerPriority
 } from './interfaces/dvr.interface';
 import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -245,6 +247,30 @@ export class DvrService {
 
   public StopRecording(recordedId: number): Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Dvr/StopRecording', { RecordedId: recordedId });
+  }
+
+  public GetPowerPriorityList(PriorityName?: string): Observable<{PowerPriorityList:PowerPriorityList}> {
+    let params = new HttpParams();
+    if (PriorityName)
+      params = params.set("PriorityName", PriorityName);
+    return this.httpClient.get<{PowerPriorityList:PowerPriorityList}>('/Dvr/GetPowerPriorityList', { params });
+  }
+
+  public CheckPowerQuery(request: string): Observable<StringResponse> {
+    let params = new HttpParams().set("SelectClause",request);
+    return this.httpClient.get<StringResponse>('/Dvr/CheckPowerQuery', { params });
+  }
+
+  public AddPowerPriority(request: PowerPriority): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/AddPowerPriority', request);
+  }
+
+  public UpdatePowerPriority(request: PowerPriority): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/UpdatePowerPriority', request);
+  }
+
+  public RemovePowerPriority(request: string): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/RemovePowerPriority', { PriorityName: request });
   }
 
 }

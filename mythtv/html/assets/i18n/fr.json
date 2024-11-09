@@ -72,6 +72,21 @@
             "name_label": "Nom",
             "new": "Nouveau groupe de chaînes"
         },
+        "custom": {
+            "delete_details": "Cela supprimera la règle de priorité personnalisée {{ Name }}",
+            "delete_label": "Supprimer la règle",
+            "delete_this": "Supprimer la règle de priorité personnalisée ?",
+            "edit": "Modifier la règle",
+            "edit_label": "Modifier la règle",
+            "heading": "Priorités personnalisées",
+            "name_label": "Nom de la règle",
+            "new": "Nouvelle règle",
+            "priority_desc": "Le montant de la modification de la priorité lorsque cette règle correspond à une diffusion.",
+            "priority_label": "Changement de priorité",
+            "select_desc": "Expression SQL utilisant les colonnes des tables suivantes : recordmatch, record, program, channel, capturecard, oldrecorded. Des exemples d'expressions SQL se trouvent dans le wiki MythTV sur le lien ci-dessous.",
+            "select_label": "Condition SQL",
+            "validate_label": "Valider"
+        },
         "datasources": {
             "daily_desc": "S'il est défini, le backend tentera d'effectuer quotidiennement des mises à jour des illustrations pour les enregistrements. Lorsque l'enregistrement de nouvelles saisons commencera, cela tentera de vous fournir des illustrations fraîches et pertinentes tout en préservant les illustrations attribuées aux anciens enregistrements.",
             "daily_label": "Effectuer des mises à jour quotidiennes des illustrations d'enregistrement",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transcoder les enregistrements"
             },
             "postproc_label": "Options de post-traitement",
+            "powersearch_desc": "Exemples de tables SQL supplémentaires et où se trouvent les conditions dans le wiki MythTV à l'adresse",
             "prefinput_label": "Entrée préférée",
             "priority_label": "Priorité d'enregistrement",
             "recgroup_label": "Groupe d'enregistrement",

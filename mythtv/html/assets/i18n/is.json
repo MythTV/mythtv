@@ -72,6 +72,21 @@
             "name_label": "Nafn",
             "new": "Nýr ráshópur"
         },
+        "custom": {
+            "delete_details": "Þetta mun eyða sérsniðinni forgangsreglu {{ Name }}",
+            "delete_label": "Eyða reglu",
+            "delete_this": "Eyða sérsniðinni forgangsreglu?",
+            "edit": "Breyta reglu",
+            "edit_label": "Breyta reglu",
+            "heading": "Sérsniðin forgangsröðun",
+            "name_label": "Regluheiti",
+            "new": "Ný regla",
+            "priority_desc": "Upphæðin sem forgangurinn breytist um þegar þessi regla passar við sýningu.",
+            "priority_label": "Forgangsbreyting",
+            "select_desc": "SQL tjáning með dálkum úr eftirfarandi töflum: recordmatch, record, program, channel, capturecard, oldrecorded. Dæmi um SQL tjáningar eru í MythTV wiki á hlekknum hér að neðan.",
+            "select_label": "SQL ástand",
+            "validate_label": "Staðfesta"
+        },
         "datasources": {
             "daily_desc": "Ef þetta er stillt mun bakendinn reyna að framkvæma uppfærslur á listaverkum fyrir upptökur daglega. Þegar nýjar árstíðir byrja að taka upp mun þetta reyna að veita þér ferskt, viðeigandi listaverk á meðan það varðveitir listaverkið sem úthlutað er á gamla upptökur.",
             "daily_label": "Framkvæmdu daglegar uppfærslur á upptökulistaverkum",
@@ -291,6 +306,7 @@
                 "autotranscode": "Umkóðun upptökur"
             },
             "postproc_label": "Eftirvinnsluvalkostir",
+            "powersearch_desc": "Dæmi um SQL viðbótartöflur og hvar skilyrði eru í MythTV wiki á",
             "prefinput_label": "Æskilegt inntak",
             "priority_label": "Upptökuforgangur",
             "recgroup_label": "Upptökuhópur",

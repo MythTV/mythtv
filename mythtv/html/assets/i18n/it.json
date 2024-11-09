@@ -72,6 +72,21 @@
             "name_label": "Nome",
             "new": "Nuovo gruppo di canali"
         },
+        "custom": {
+            "delete_details": "Questa operazione eliminerà la regola di priorità personalizzata {{ Name }}",
+            "delete_label": "Elimina regola",
+            "delete_this": "Eliminare la regola di priorità personalizzata?",
+            "edit": "Modifica regola",
+            "edit_label": "Modifica regola",
+            "heading": "Priorità personalizzate",
+            "name_label": "Nome della regola",
+            "new": "Nuova regola",
+            "priority_desc": "L'importo in base al quale la priorità cambierà quando questa regola corrisponde a una presentazione.",
+            "priority_label": "Cambio di priorità",
+            "select_desc": "Espressione SQL che utilizza le colonne delle seguenti tabelle: recordmatch, record, program, channel, capturecard, oldrecorded. Esempi di espressioni SQL si trovano nel wiki di MythTV al collegamento seguente.",
+            "select_label": "Condizione SQL",
+            "validate_label": "Convalidare"
+        },
         "datasources": {
             "daily_desc": "Se impostato, il backend tenterà di eseguire quotidianamente aggiornamenti della grafica per le registrazioni. Quando inizieranno a registrare le nuove stagioni, questo tenterà di fornirti opere d'arte fresche e pertinenti preservando al tempo stesso l'opera d'arte assegnata alle vecchie registrazioni.",
             "daily_label": "Esegui aggiornamenti giornalieri della grafica della registrazione",
@@ -291,6 +306,7 @@
                 "autotranscode": "Transcodifica registrazioni"
             },
             "postproc_label": "Opzioni di post-elaborazione",
+            "powersearch_desc": "Esempi di tabelle aggiuntive SQL e condizioni di dove si trovano nel wiki di MythTV all'indirizzo",
             "prefinput_label": "Ingresso preferito",
             "priority_label": "Priorità di registrazione",
             "recgroup_label": "Gruppo di registrazione",

@@ -72,6 +72,21 @@
             "name_label": "Ime",
             "new": "Nova skupina kanalov"
         },
+        "custom": {
+            "delete_details": "S tem boste izbrisali prednostno pravilo po meri {{ Name }}",
+            "delete_label": "Izbriši pravilo",
+            "delete_this": "Želite izbrisati prednostno pravilo po meri?",
+            "edit": "Uredi pravilo",
+            "edit_label": "Uredi pravilo",
+            "heading": "Prioritete po meri",
+            "name_label": "Ime pravila",
+            "new": "Novo pravilo",
+            "priority_desc": "Znesek, za katerega se bo prioriteta spremenila, ko se to pravilo ujema s prikazom.",
+            "priority_label": "Sprememba prioritete",
+            "select_desc": "Izraz SQL z uporabo stolpcev iz naslednjih tabel: recordmatch, record, program, channel, capturecard, oldrecorded. Primeri izrazov SQL so v wikiju MythTV na spodnji povezavi.",
+            "select_label": "Pogoj SQL",
+            "validate_label": "Potrdi"
+        },
         "datasources": {
             "daily_desc": "Če je nastavljeno, bo zaledje vsakodnevno poskušalo izvajati posodobitve umetniških del za posnetke. Ko se začnejo snemati nove sezone, vam bo to poskušalo zagotoviti sveže, ustrezne umetnine, hkrati pa ohraniti umetnine, dodeljene starim posnetkom.",
             "daily_label": "Izvedite dnevne posodobitve umetniških del snemanja",
@@ -291,6 +306,7 @@
                 "autotranscode": "Prekodiranje posnetkov"
             },
             "postproc_label": "Možnosti naknadne obdelave",
+            "powersearch_desc": "Primeri dodatnih tabel SQL in pogojev kje so v wikiju MythTV na naslovu",
             "prefinput_label": "Prednostni vnos",
             "priority_label": "Prioriteta snemanja",
             "recgroup_label": "Snemalna skupina",

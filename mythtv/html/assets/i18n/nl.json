@@ -72,6 +72,21 @@
             "name_label": "Naam",
             "new": "Nieuwe kanaalgroep"
         },
+        "custom": {
+            "delete_details": "Hiermee wordt de aangepaste prioriteitsregel {{ Name }} verwijderd",
+            "delete_label": "Regel verwijderen",
+            "delete_this": "Aangepaste prioriteitsregel verwijderen?",
+            "edit": "Regel bewerken",
+            "edit_label": "Regel bewerken",
+            "heading": "Aangepaste prioriteiten",
+            "name_label": "Regelnaam",
+            "new": "Nieuwe regel",
+            "priority_desc": "Het bedrag waarmee de prioriteit verandert als deze regel overeenkomt met een vertoning.",
+            "priority_label": "Prioriteitswijziging",
+            "select_desc": "SQL-expressie met behulp van kolommen uit de volgende tabellen: recordmatch, record, program, channel, capturecard, oldrecorded. Voorbeelden van SQL-expressies vindt u in de MythTV-wiki via de onderstaande link.",
+            "select_label": "SQL-voorwaarde",
+            "validate_label": "Valideer"
+        },
         "datasources": {
             "daily_desc": "Indien ingesteld, probeert de backend dagelijks artwork-updates voor opnamen uit te voeren. Wanneer er nieuwe seizoenen worden opgenomen, wordt geprobeerd u van nieuw, relevant artwork te voorzien, terwijl het artwork dat aan oude opnames is toegewezen, behouden blijft.",
             "daily_label": "Voer dagelijkse updates uit van opnamekunstwerken",
@@ -291,6 +306,7 @@
                 "autotranscode": "Opnames transcoderen"
             },
             "postproc_label": "Opties voor nabewerking",
+            "powersearch_desc": "Voorbeelden van aanvullende SQL-tabellen en waar de voorwaarden zich bevinden in de MythTV-wiki op",
             "prefinput_label": "Voorkeursinvoer",
             "priority_label": "Opname prioriteit",
             "recgroup_label": "Opname groep",
