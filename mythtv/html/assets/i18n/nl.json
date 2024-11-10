@@ -1125,7 +1125,7 @@
             "longitude_east": "Oosters",
             "longitude_label": "Satelliet lengtegraad (graden)",
             "longitude_west": "Westers",
-            "maxrec_desc": "Maximum aantal gelijktijdige opnames MythTV zal proberen dit apparaat te gebruiken. Indien ingesteld op een andere waarde dan 1, kan MythTV soms meerdere programma's opnemen op dezelfde multiplex of overlappende kopieën van hetzelfde programma op een enkel kanaal.",
+            "maxrec_desc": "Maximaal aantal gelijktijdige opnames MythTV zal proberen dit apparaat te gebruiken. Indien ingesteld op een andere waarde dan 1, kan MythTV soms meerdere programma's opnemen op dezelfde multiplex of overlappende kopieën van hetzelfde programma op één kanaal. Als schema als groep is ingeschakeld, wordt deze instelling automatisch verhoogd wanneer het mogelijk is om meerdere programma's op te nemen.",
             "maxrec_label": "Maximale opnames",
             "quicktune": {
                 "always": "Altijd",

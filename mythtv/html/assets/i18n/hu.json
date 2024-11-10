@@ -1125,7 +1125,7 @@
             "longitude_east": "Keleti",
             "longitude_label": "Műholdas hosszúság (fok)",
             "longitude_west": "Nyugati",
-            "maxrec_desc": "Az egyidejű felvételek maximális száma A MythTV megkísérli használni ezt az eszközt. Ha 1-től eltérő értékre van állítva, a MythTV néha több műsort is rögzíthet ugyanarra a multiplexre, vagy ugyanazon program átfedő másolatait egyetlen csatornán.",
+            "maxrec_desc": "Az egyidejű felvételek maximális száma A MythTV megkísérli használni ezt az eszközt. Ha 1-től eltérő értékre van állítva, a MythTV néha több műsort is rögzíthet ugyanarra a multiplexre, vagy ugyanazon program átfedő másolatait egyetlen csatornán. Ha az ütemezés csoportként engedélyezve van, ez a beállítás automatikusan megnövekszik, ha lehetséges több műsor rögzítése.",
             "maxrec_label": "Max Recordings",
             "quicktune": {
                 "always": "Mindig",

@@ -1125,7 +1125,7 @@
             "longitude_east": "Ida",
             "longitude_label": "Satelliidi pikkuskraad (kraadid)",
             "longitude_west": "Lääne",
-            "maxrec_desc": "Samaaegsete salvestuste maksimaalne arv MythTV proovib seda seadet kasutada. Kui on seatud mõni muu väärtus kui 1, võib MythTV mõnikord salvestada mitu saadet samale multipleksile või sama programmi kattuvaid koopiaid ühel kanalil.",
+            "maxrec_desc": "Samaaegsete salvestuste maksimaalne arv MythTV proovib seda seadet kasutada. Kui on seatud mõni muu väärtus kui 1, võib MythTV mõnikord salvestada mitu saadet samale multipleksile või sama programmi kattuvaid koopiaid ühel kanalil. Kui ajakava rühmana on lubatud, suurendatakse seda sätet automaatselt, kui on võimalik salvestada mitu saadet.",
             "maxrec_label": "Max salvestused",
             "quicktune": {
                 "always": "Alati",

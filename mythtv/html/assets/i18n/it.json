@@ -1125,7 +1125,7 @@
             "longitude_east": "Orientale",
             "longitude_label": "Longitudine satellitare (gradi)",
             "longitude_west": "Occidentale",
-            "maxrec_desc": "Numero massimo di registrazioni simultanee che MythTV tenterà di usare su questo dispositivo. Se impostato su un valore diverso da 1, MythTV a volte può registrare più programmi sullo stesso multiplex o copie sovrapposte dello stesso programma su un singolo canale.",
+            "maxrec_desc": "Numero massimo di registrazioni simultanee che MythTV tenterà di utilizzare questo dispositivo. Se impostato su un valore diverso da 1, MythTV a volte può registrare più programmi sullo stesso multiplex o copie sovrapposte dello stesso programma su un singolo canale. Se la pianificazione come gruppo è abilitata, questa impostazione verrà aumentata automaticamente quando sarà possibile registrare più programmi.",
             "maxrec_label": "Registrazioni massime",
             "quicktune": {
                 "always": "Sempre",

@@ -1125,7 +1125,7 @@
             "longitude_east": "东",
             "longitude_label": "卫星经度（度）",
             "longitude_west": "西",
-            "maxrec_desc": "MythTV 将尝试使用此设备的最大同时录制数。如果设置为 1 以外的值，MythTV 有时可以在同一多路复用中录制多个节目，或者在单个频道上录制同一节目的重叠副本。",
+            "maxrec_desc": "MythTV 将尝试使用此设备的最大同时录制数。如果设置为 1 以外的值，MythTV 有时可以在同一多路复用中录制多个节目，或者在单个频道上录制同一节目的重叠副本。如果启用按组安排，则当可以录制多个节目时，此设置将自动增加。",
             "maxrec_label": "最大录音数",
             "quicktune": {
                 "always": "总是",

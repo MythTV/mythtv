@@ -1125,7 +1125,7 @@
             "longitude_east": "Austurland",
             "longitude_label": "Lengdargráða gervihnatta (gráður)",
             "longitude_west": "Vestur",
-            "maxrec_desc": "Hámarksfjöldi samtímis upptöku MythTV mun reyna að nota þetta tæki. Ef stillt er á annað gildi en 1, getur MythTV stundum tekið upp mörg forrit á sama multiplex eða skarast afrit af sama forriti á einni rás.",
+            "maxrec_desc": "Hámarksfjöldi samtímis upptöku MythTV mun reyna að nota þetta tæki. Ef stillt er á annað gildi en 1, getur MythTV stundum tekið upp mörg forrit á sama multiplex eða skarast afrit af sama forriti á einni rás. Ef kveikt er á áætlun sem hópur mun þessi stilling hækka sjálfkrafa þegar hægt er að taka upp mörg forrit.",
             "maxrec_label": "Max Recordings",
             "quicktune": {
                 "always": "Alltaf",

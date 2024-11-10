@@ -1125,7 +1125,7 @@
             "longitude_east": "Východní",
             "longitude_label": "Zeměpisná délka satelitu (stupně)",
             "longitude_west": "Západní",
-            "maxrec_desc": "Maximální počet simultánních záznamů MythTV se pokusí pomocí tohoto zařízení. Pokud je nastavena na jinou hodnotu než 1, může MythTV někdy nahrávat více programů na stejný multiplex nebo překrývající se kopie stejného programu na jednom kanálu.",
+            "maxrec_desc": "Maximální počet simultánních záznamů MythTV se pokusí pomocí tohoto zařízení. Pokud je nastavena na jinou hodnotu než 1, může MythTV někdy nahrávat více programů na stejný multiplex nebo překrývající se kopie stejného programu na jednom kanálu. Pokud je povoleno naplánovat jako skupinu, toto nastavení se automaticky zvýší, když je možné nahrávat více programů.",
             "maxrec_label": "Maximální počet nahrávek",
             "quicktune": {
                 "always": "Vždy",

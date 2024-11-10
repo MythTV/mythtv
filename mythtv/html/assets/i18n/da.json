@@ -1125,7 +1125,7 @@
             "longitude_east": "østlige",
             "longitude_label": "Satellitlængdegrad (grader)",
             "longitude_west": "Vestlig",
-            "maxrec_desc": "Maksimalt antal samtidige optagelser MythTV vil forsøge at bruge denne enhed. Hvis indstillet til en anden værdi end 1, kan MythTV nogle gange optage flere programmer på samme multiplex eller overlappende kopier af det samme program på en enkelt kanal.",
+            "maxrec_desc": "Maksimalt antal samtidige optagelser MythTV vil forsøge at bruge denne enhed. Hvis indstillet til en anden værdi end 1, kan MythTV nogle gange optage flere programmer på samme multiplex eller overlappende kopier af det samme program på en enkelt kanal. Hvis planlægning som gruppe er aktiveret, øges denne indstilling automatisk, når det er muligt at optage flere programmer.",
             "maxrec_label": "Max optagelser",
             "quicktune": {
                 "always": "Altid",

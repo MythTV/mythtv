@@ -1125,7 +1125,7 @@
             "longitude_east": "Östra",
             "longitude_label": "Satellitlängdgrad (grader)",
             "longitude_west": "Västra",
-            "maxrec_desc": "Maximalt antal samtidiga inspelningar MythTV kommer att försöka använda den här enheten. Om det är inställt på ett annat värde än 1, kan MythTV ibland spela in flera program på samma multiplex eller överlappande kopior av samma program på en enda kanal.",
+            "maxrec_desc": "Maximalt antal samtidiga inspelningar MythTV kommer att försöka använda den här enheten. Om det är inställt på ett annat värde än 1, kan MythTV ibland spela in flera program på samma multiplex eller överlappande kopior av samma program på en enda kanal. Om schema som grupp är aktiverat, kommer denna inställning att ökas automatiskt när det är möjligt att spela in flera program.",
             "maxrec_label": "Max inspelningar",
             "quicktune": {
                 "always": "Alltid",

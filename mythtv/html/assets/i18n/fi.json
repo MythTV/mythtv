@@ -1125,7 +1125,7 @@
             "longitude_east": "Itäinen",
             "longitude_label": "Satelliittipituusaste (astetta)",
             "longitude_west": "Läntinen",
-            "maxrec_desc": "Samanaikaisten tallenteiden enimmäismäärä MythTV yrittää käyttää tätä laitetta. Jos arvo on muu kuin 1, MythTV voi joskus tallentaa useita ohjelmia samalle multipleksille tai päällekkäisiä kopioita samasta ohjelmasta yhdelle kanavalle.",
+            "maxrec_desc": "Samanaikaisten tallenteiden enimmäismäärä MythTV yrittää käyttää tätä laitetta. Jos arvo on muu kuin 1, MythTV voi joskus tallentaa useita ohjelmia samalle multipleksille tai päällekkäisiä kopioita samasta ohjelmasta yhdelle kanavalle. Jos ajastus ryhmänä on käytössä, tätä asetusta suurennetaan automaattisesti, kun on mahdollista tallentaa useita ohjelmia.",
             "maxrec_label": "Max Recordings",
             "quicktune": {
                 "always": "Aina",

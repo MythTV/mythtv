@@ -1125,7 +1125,7 @@
             "longitude_east": "Doğu",
             "longitude_label": "Uydu Boylamı (Derece)",
             "longitude_west": "Batılı",
-            "maxrec_desc": "Maksimum eşzamanlı kayıt sayısı MythTV bu cihazı kullanmayı deneyecek. 1'den farklı bir değere ayarlanırsa, MythTV bazen birden fazla programı tek bir kanalda aynı multipleks veya aynı programın çakışan kopyalarına kaydedebilir.",
+            "maxrec_desc": "MythTV'nin bu cihazı kullanarak deneyeceği maksimum eşzamanlı kayıt sayısı. 1 dışında bir değere ayarlanırsa, MythTV bazen birden fazla programı aynı kanala veya aynı programın örtüşen kopyalarına tek bir kanala kaydedebilir. Grup olarak planlama etkinleştirilirse, birden fazla programın kaydedilmesi mümkün olduğunda bu ayar otomatik olarak artırılacaktır.",
             "maxrec_label": "Maksimum Kayıt",
             "quicktune": {
                 "always": "Her zaman",

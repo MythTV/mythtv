@@ -1125,7 +1125,7 @@
             "longitude_east": "istočnjački",
             "longitude_label": "Satelitska dužina (stupnjevi)",
             "longitude_west": "Zapadni",
-            "maxrec_desc": "Maksimalan broj istodobnih snimanja MythTV će pokušati koristiti ovaj uređaj. Ako se postavi na vrijednost koja nije 1, MythTV ponekad može snimati više programa na istom multipleksu ili preklapajuće kopije istog programa na jednom kanalu.",
+            "maxrec_desc": "Maksimalan broj istovremenih snimanja MythTV će pokušati koristiti ovaj uređaj. Ako je postavljen na vrijednost koja nije 1, MythTV ponekad može snimati više programa na istom multipleksu ili preklapajuće kopije istog programa na jednom kanalu. Ako je omogućen raspored kao grupa, ova će se postavka automatski povećati kada je moguće snimiti više programa.",
             "maxrec_label": "Max Recordings",
             "quicktune": {
                 "always": "Stalno",
