@@ -38,14 +38,7 @@ DatabaseSettings::DatabaseSettings(QString DBhostOverride) :
                              "This information is required."));
     addChild(m_dbHostName);
 
-    m_dbHostPing = new TransMythUICheckBoxSetting();
-    m_dbHostPing->setLabel(DatabaseSettings::tr("Ping test server?"));
-    m_dbHostPing->setHelpText(
-        DatabaseSettings::tr("Test basic host connectivity using "
-                             "the ping command. Turn off if your "
-                             "host or network don't support ping "
-                             "(ICMP ECHO) packets"));
-    addChild(m_dbHostPing);
+    // Ping database host is no longer used
 
     m_dbPort = new TransTextEditSetting();
     m_dbPort->setLabel(DatabaseSettings::tr("Port"));
@@ -160,8 +153,6 @@ void DatabaseSettings::Load(void)
         m_dbHostName->setValue(params.m_dbHostName);
     }
 
-    m_dbHostPing->setValue(params.m_dbHostPing);
-
     if (params.m_dbPort)
         m_dbPort->setValue(QString::number(params.m_dbPort));
 
@@ -190,7 +181,8 @@ void DatabaseSettings::Save(void)
     DatabaseParams params = GetMythDB()->GetDatabaseParams();
 
     params.m_dbHostName = m_dbHostName->getValue();
-    params.m_dbHostPing = m_dbHostPing->boolValue();
+    // Ping database host is no longer used
+    params.m_dbHostPing = false;
     params.m_dbPort = m_dbPort->getValue().toInt();
     params.m_dbUserName = m_dbUserName->getValue();
     params.m_dbPassword = m_dbPassword->getValue();

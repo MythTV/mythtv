@@ -20,7 +20,7 @@ class MBASE_PUBLIC DatabaseParams
         { return !((*this)==other); }
 
     QString m_dbHostName    {"localhost"};  ///< database server
-    bool    m_dbHostPing    {true};         ///< Can we test connectivity using ping?
+    bool    m_dbHostPing    {false};        ///< No longer used
     int     m_dbPort        {3306};         ///< database port
     QString m_dbUserName    {"mythtv"};     ///< DB user name
     QString m_dbPassword    {"mythtv"};     ///< DB password
