@@ -5845,7 +5845,7 @@ bool Scheduler::InitInputInfoMap(void)
     // rereading it from the database.
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT cardid, parentid, schedgroup, reclimit "
+    query.prepare("SELECT cardid, parentid, schedgroup "
                   "FROM capturecard "
                   "WHERE sourceid > 0 "
                   "ORDER BY cardid");
@@ -5874,7 +5874,6 @@ bool Scheduler::InitInputInfoMap(void)
             siinfo.m_groupInputs = CardUtil::GetChildInputIDs(inputid);
             siinfo.m_groupInputs.insert(siinfo.m_groupInputs.begin(), inputid);
         }
-        siinfo.m_reclimit = query.value(3).toUInt();
         siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(inputid);
         LOG(VB_SCHEDULE, LOG_INFO,
             QString("Added SchedInputInfo i=%1, g=%2, sg=%3")
@@ -5899,7 +5898,6 @@ void Scheduler::AddChildInput(uint parentid, uint childid)
     else
         siinfo.m_sgroupId = childid;
     siinfo.m_schedGroup = false;
-    siinfo.m_reclimit = m_sinputInfoMap[parentid].m_reclimit;
     siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(childid);
 
     siinfo.m_conflictList = m_sinputInfoMap[parentid].m_conflictList;

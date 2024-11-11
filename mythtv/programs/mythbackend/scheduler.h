@@ -37,7 +37,6 @@ class SchedInputInfo
     uint          m_inputId      {0};
     uint          m_sgroupId     {0};
     bool          m_schedGroup   {false};
-    uint          m_reclimit     {0};
     std::vector<unsigned int>  m_groupInputs;
     std::vector<unsigned int>  m_conflictingInputs;
     RecList      *m_conflictList {nullptr};
