@@ -1095,9 +1095,7 @@ bool Scheduler::FindNextConflict(
             continue;
 
         if (debugConflicts)
-            msg = QString("comparing '%1' on %2 with '%3' on %4")
-                .arg(p->GetTitle()).arg(p->GetChanNum())
-                .arg(q->GetTitle()).arg(q->GetChanNum());
+            msg = QString("comparing with '%1' ").arg(q->GetTitle());
 
         if (p->GetInputID() != q->GetInputID() && !ignoreinput)
         {
@@ -1147,7 +1145,7 @@ bool Scheduler::FindNextConflict(
         {
             LOG(VB_SCHEDULE, LOG_INFO, msg);
             LOG(VB_SCHEDULE, LOG_INFO,
-                QString("  cardid's: [%1], [%2] Share an input group, "
+                QString("  cardid's: [%1], [%2] Share an input group"
                         "mplexid's: %3, %4")
                      .arg(p->GetInputID()).arg(q->GetInputID())
                      .arg(p->m_mplexId).arg(q->m_mplexId));
