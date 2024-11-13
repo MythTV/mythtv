@@ -76,33 +76,42 @@ class StreamInfo
 {
   public:
     StreamInfo() = default;
-    StreamInfo(int a, int b, uint c, int d, int e, bool f = false,
-               bool g = false, bool h = false,
-               AudioTrackType i = kAudioTypeNormal) :
-        m_av_stream_index(a),
-        m_language(b), m_language_index(c), m_stream_id(d),
-        m_easy_reader(f), m_wide_aspect_ratio(g), m_orig_num_channels(e), m_forced(h),
-        m_audio_type(i) {}
-    StreamInfo(int a, int b, uint c, int d, int e, int f,
-               bool g = false, bool h = false, bool i = false,
-               AudioTrackType j = kAudioTypeNormal) :
-        m_av_stream_index(a), m_av_substream_index(e),
-        m_language(b), m_language_index(c), m_stream_id(d),
-        m_easy_reader(g), m_wide_aspect_ratio(h), m_orig_num_channels(f), m_forced(i),
-        m_audio_type(j) {}
+    /*
+    Video and Attachment use only the first two parameters; the rest are used
+    for Subtitle, CC, Teletext, and RawText.
+    */
+    StreamInfo(int av_stream_index, int stream_id, int language = 0, uint language_index = 0,
+               bool forced = false) :
+        m_av_stream_index(av_stream_index),
+        m_stream_id(stream_id),
+        m_language(language),
+        m_language_index(language_index),
+        m_forced(forced)
+    {}
+    /*
+    For Audio
+    */
+    StreamInfo(int av_stream_index, int stream_id, int language, uint language_index,
+               int orig_num_channels, AudioTrackType audio_type) :
+        m_av_stream_index(av_stream_index),
+        m_stream_id(stream_id),
+        m_language(language),
+        m_language_index(language_index),
+        m_orig_num_channels(orig_num_channels),
+        m_audio_type(audio_type)
+    {}
 
   public:
     int            m_av_stream_index    {-1};
-    /// -1 for no substream, 0 for first dual audio stream, 1 for second dual
-    int            m_av_substream_index {-1};
-    int            m_language           {-2}; ///< ISO639 canonical language key
-    uint           m_language_index     {0};
     int            m_stream_id          {-1};
-    bool           m_easy_reader        {false};
-    bool           m_wide_aspect_ratio  {false};
-    int            m_orig_num_channels  {2};
-    bool           m_forced             {false};
-    AudioTrackType m_audio_type {kAudioTypeNormal};
+    /// ISO639 canonical language key; Audio, Subtitle, CC, Teletext, RawText
+    int            m_language           {-2};
+    uint           m_language_index     {0}; ///< Audio, Subtitle, Teletext
+    bool           m_forced             {false}; ///< Subtitle and RawText
+    int            m_orig_num_channels  {2}; ///< Audio only
+    AudioTrackType m_audio_type {kAudioTypeNormal}; // Audio only
+    /// Audio only; -1 for no substream, 0 for first dual audio stream, 1 for second dual
+    int            m_av_substream_index {-1};
 
     bool operator<(const StreamInfo& b) const
     {

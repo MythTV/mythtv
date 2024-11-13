@@ -1647,10 +1647,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
             int type = csd.Type(k) ? 1 : 0;
             if (type)
             {
-                StreamInfo si(av_index, lang, 0/*lang_idx*/,
-                              csd.CaptionServiceNumber(k),
-                              static_cast<int>(csd.EasyReader(k)),
-                              csd.WideAspectRatio(k));
+                StreamInfo si {av_index, csd.CaptionServiceNumber(k), lang};
                 uint key = csd.CaptionServiceNumber(k) + 4;
                 m_ccX08InPmt[key] = true;
                 m_pmtTracks.push_back(si);
@@ -1659,7 +1656,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
             else
             {
                 int line21 = csd.Line21Field(k) ? 3 : 1;
-                StreamInfo si(av_index, lang, 0/*lang_idx*/, line21, 0);
+                StreamInfo si {av_index, line21, lang};
                 m_ccX08InPmt[line21-1] = true;
                 m_pmtTracks.push_back(si);
                 m_pmtTrackTypes.push_back(kTrackTypeCC608);
@@ -1768,12 +1765,12 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
             {
                 int type = td.TeletextType(k);
                 int language = td.CanonicalLanguageKey(k);
-                int magazine = td.TeletextMagazineNum(k);
+                uint magazine = td.TeletextMagazineNum(k);
                 if (magazine == 0)
                     magazine = 8;
-                int pagenum  = td.TeletextPageNum(k);
-                int lang_idx = (magazine << 8) | pagenum;
-                StreamInfo si(av_index, language, lang_idx, 0, 0);
+                uint pagenum  = td.TeletextPageNum(k);
+                uint lang_idx = (magazine << 8) | pagenum;
+                StreamInfo si {av_index, 0, language, lang_idx};
                 if (type == 2 || type == 1)
                 {
                     TrackType track = (type == 2) ? kTrackTypeTeletextCaptions :
@@ -1812,7 +1809,7 @@ void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
                 "and is in the %3 language(%4), forced=%5.")
                     .arg(m_tracks[kTrackTypeRawText].size()).arg(av_stream_index)
                     .arg(iso639_key_toName(lang)).arg(lang).arg(forced));
-    StreamInfo si(av_stream_index, lang, 0, 0, 0, false, false, forced);
+    StreamInfo si {av_stream_index, 0, lang, 0, forced};
     m_tracks[kTrackTypeRawText].push_back(si);
 }
 
@@ -1914,7 +1911,7 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
     if (m_averrorCount > SEQ_PKT_ERR_MAX)
         m_codecMap.FreeCodecContext(stream);
     AVCodecContext *enc = m_codecMap.GetCodecContext(stream, codec);
-    StreamInfo si(stream_index, 0, 0, 0, 0);
+    StreamInfo si {stream_index, 0};
 
     m_tracks[kTrackTypeVideo].push_back(si);
     m_selectedTrack[kTrackTypeVideo] = si;
@@ -2247,8 +2244,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case AVMEDIA_TYPE_ATTACHMENT:
             {
                 if (par->codec_id == AV_CODEC_ID_TTF)
-                   m_tracks[kTrackTypeAttachment].emplace_back(
-                       static_cast<int>(strm), 0, 0, m_ic->streams[strm]->id, 0);
+                   m_tracks[kTrackTypeAttachment].emplace_back(static_cast<int>(strm), m_ic->streams[strm]->id);
                 m_bitrate += par->bit_rate;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Attachment codec (%1)")
@@ -2370,7 +2366,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             subtitleStreamCount++;
 
             m_tracks[kTrackTypeSubtitle].emplace_back(
-                static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, 0, 0, false, false, forced);
+                static_cast<int>(strm), m_ic->streams[strm]->id, lang, lang_indx, forced);
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Subtitle track #%1 is A/V stream #%2 "
@@ -2390,12 +2386,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (enc->avcodec_dual_language)
             {
                 m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, channels,
-                               false, false, false, type);
+                    static_cast<int>(strm), m_ic->streams[strm]->id, lang, lang_indx, channels, type);
                 lang_indx = lang_aud_cnt[lang]++;
                 m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), lang, lang_indx, m_ic->streams[strm]->id, channels,
-                               true, false, false, type);
+                    static_cast<int>(strm), m_ic->streams[strm]->id, lang, lang_indx, channels, type);
             }
             else
             {
@@ -2417,8 +2411,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), lang, lang_indx, logical_stream_id, channels,
-                              false, false, false, type);
+                    static_cast<int>(strm), logical_stream_id, lang, lang_indx, channels, type);
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
@@ -2905,16 +2898,16 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     m_streamTrackTypes.clear();
     int av_index = m_selectedTrack[kTrackTypeVideo].m_av_stream_index;
     int lang = iso639_str3_to_key("und");
-    for (uint i = 1; i < 64; i++)
+    for (int i = 1; i < 64; i++)
     {
         if (seen_708[i] && !m_ccX08InPmt[i+4])
         {
-            StreamInfo si(av_index, lang, 0/*lang_idx*/, i, 0, false/*easy*/, true/*wide*/);
+            StreamInfo si {av_index, i, lang};
             m_streamTracks.push_back(si);
             m_streamTrackTypes.push_back(kTrackTypeCC708);
         }
     }
-    for (uint i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         if (seen_608[i] && !m_ccX08InPmt[i])
         {
@@ -2925,7 +2918,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
             else
                 lang = iso639_str3_to_key("und");
 
-            StreamInfo si(av_index, lang, 0/*lang_idx*/, i+1, 0, false/*easy*/, false/*wide*/);
+            StreamInfo si {av_index, i+1, lang};
             m_streamTracks.push_back(si);
             m_streamTrackTypes.push_back(kTrackTypeCC608);
         }
@@ -3661,7 +3654,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 m_trackLock.lock();
                 if (m_tracks[kTrackTypeTeletextMenu].empty())
                 {
-                    StreamInfo si(pkt->stream_index, 0, 0, 0, 0);
+                    StreamInfo si {pkt->stream_index, 0};
                     m_trackLock.lock();
                     m_tracks[kTrackTypeTeletextMenu].push_back(si);
                     m_trackLock.unlock();
@@ -4081,7 +4074,7 @@ bool AvFormatDecoder::SetVideoByComponentTag(int Tag)
         {
             if (stream->component_tag == Tag)
             {
-                StreamInfo si(static_cast<int>(i), 0, 0, 0, 0);
+                StreamInfo si {static_cast<int>(i), 0};
                 m_selectedTrack[kTrackTypeVideo] = si;
                 return true;
             }
