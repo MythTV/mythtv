@@ -108,11 +108,9 @@ QString DLNAProfileName(const QString &mimeType, const QSize resolution,
     // HACK This is just temporary until we start storing more video
     // information in the database for each file and can determine this
     // stuff 'properly'
-    QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode().toLower();
+    QString sCountryCode = gCoreContext->GetLocale()->GetCountryCode();
     bool isNorthAmerica = (sCountryCode == "us" || sCountryCode == "ca" ||
                             sCountryCode == "mx"); // North America (NTSC/ATSC)
-
-    bool isSweden = (sCountryCode == "se"); //Sweden dvb svt1/2 use MPEG_TS_SD_EU_ISO also for HD
 
     if (container == "MPEG2-PS")
     {
@@ -147,7 +145,7 @@ QString DLNAProfileName(const QString &mimeType, const QSize resolution,
         }
         else // Europe standard (DVB)
         {
-            if ((vidCodec == "H264" || isHD) && !isSweden ) // All HD is AVC with DVB except for Sweden
+            if (vidCodec == "H264" || isHD) // All HD is AVC with DVB
                 sProfileName = "AVC_TS_EU_ISO";
             else // if (videoCodec == "MPEG2VIDEO")
                 sProfileName = "MPEG_TS_SD_EU_ISO";
