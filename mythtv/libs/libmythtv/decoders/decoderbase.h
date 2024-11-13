@@ -92,12 +92,11 @@ class StreamInfo
     For Audio
     */
     StreamInfo(int av_stream_index, int stream_id, int language, uint language_index,
-               int orig_num_channels, AudioTrackType audio_type) :
+               AudioTrackType audio_type) :
         m_av_stream_index(av_stream_index),
         m_stream_id(stream_id),
         m_language(language),
         m_language_index(language_index),
-        m_orig_num_channels(orig_num_channels),
         m_audio_type(audio_type)
     {}
 
@@ -108,7 +107,6 @@ class StreamInfo
     int            m_language           {-2};
     uint           m_language_index     {0}; ///< Audio, Subtitle, Teletext
     bool           m_forced             {false}; ///< Subtitle and RawText
-    int            m_orig_num_channels  {2}; ///< Audio only
     AudioTrackType m_audio_type {kAudioTypeNormal}; // Audio only
     /// Audio only; -1 for no substream, 0 for first dual audio stream, 1 for second dual
     int            m_av_substream_index {-1};

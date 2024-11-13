@@ -2377,7 +2377,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             int lang = GetAudioLanguage(audioStreamCount, strm);
             AudioTrackType type = GetAudioTrackType(strm);
-            int channels  = par->ch_layout.nb_channels;
             uint lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
 
@@ -2385,8 +2384,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (m_ringBuffer && m_ringBuffer->IsDVD())
             {
                 stream_id = m_ringBuffer->DVD()->GetAudioTrackNum(stream_id);
-                channels = m_ringBuffer->DVD()->GetNumAudioChannels(stream_id);
-
                 if (stream_id == -1)
                 {
                     // This stream isn't mapped, so skip it
@@ -2395,13 +2392,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
 
             m_tracks[kTrackTypeAudio].emplace_back(
-                static_cast<int>(strm), stream_id, lang, lang_indx, channels, type);
+                static_cast<int>(strm), stream_id, lang, lang_indx, type);
 
             if (enc->avcodec_dual_language)
             {
                 lang_indx = lang_aud_cnt[lang]++;
                 m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), stream_id, lang, lang_indx, channels, type);
+                    static_cast<int>(strm), stream_id, lang, lang_indx, type);
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
@@ -3964,9 +3961,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
                     if (!user_title.isEmpty())
                         msg += user_title;
 
-                    int channels = 0;
-                    if (m_ringBuffer->IsDVD() || par->ch_layout.nb_channels)
-                        channels = m_tracks[kTrackTypeAudio][TrackNo].m_orig_num_channels;
+                    int channels = par->ch_layout.nb_channels;
 
                     if (channels == 0)
                         msg += QString(" ?ch");

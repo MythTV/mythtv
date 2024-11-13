@@ -22,7 +22,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       m_languagePreference(iso639_get_language_key_list())
 {
     ResetTracks();
-    m_tracks[kTrackTypeAudio].emplace_back(0, 0, 0, 0, 0, kAudioTypeNormal);
+    m_tracks[kTrackTypeAudio].emplace_back(0, 0, 0, 0, kAudioTypeNormal);
     m_tracks[kTrackTypeCC608].emplace_back(0, 1);
     m_tracks[kTrackTypeCC608].emplace_back(0, 3);
 }
