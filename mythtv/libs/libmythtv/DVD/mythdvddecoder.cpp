@@ -459,7 +459,7 @@ void MythDVDDecoder::PostProcessTracks(void)
                 {
                     // This stream is mapped in the current program chain
                     int lang = static_cast<int>(m_ringBuffer->DVD()->GetSubtitleLanguage(static_cast<int>(i)));
-                    int lang_indx = static_cast<int>(lang_sub_cnt[lang]++);
+                    uint lang_indx = lang_sub_cnt[lang]++;
                     int trackNo = -1;
 
                     if (stream2idx.count(streamid) != 0)
@@ -469,8 +469,7 @@ void MythDVDDecoder::PostProcessTracks(void)
                     {
                         // Create a dummy track if the physical stream has not
                         // yet been seen.
-                        filteredTracks.emplace_back(-1, lang, static_cast<uint>(lang_indx),
-                                                    streamid, 0, 0, false, false, false);
+                        filteredTracks.emplace_back(-1, streamid, lang, lang_indx);
                     }
                     else
                     {
@@ -478,7 +477,7 @@ void MythDVDDecoder::PostProcessTracks(void)
                         filteredTracks.push_back(m_tracks[kTrackTypeSubtitle][static_cast<uint>(trackNo)]);
                         filteredTracks.back().m_stream_id &= 0x1f;
                         filteredTracks.back().m_language = lang;
-                        filteredTracks.back().m_language_index = static_cast<uint>(lang_indx);
+                        filteredTracks.back().m_language_index = lang_indx;
                     }
                 }
             }
