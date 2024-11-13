@@ -2383,35 +2383,27 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             uint lang_indx = lang_aud_cnt[lang]++;
             audioStreamCount++;
 
-            if (enc->avcodec_dual_language)
+            int stream_id = m_ic->streams[strm]->id;
+            if (m_ringBuffer && m_ringBuffer->IsDVD())
             {
-                m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), m_ic->streams[strm]->id, lang, lang_indx, channels, type);
-                lang_indx = lang_aud_cnt[lang]++;
-                m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), m_ic->streams[strm]->id, lang, lang_indx, channels, type);
-            }
-            else
-            {
-                int logical_stream_id = 0;
-                if (m_ringBuffer && m_ringBuffer->IsDVD())
-                {
-                    logical_stream_id = m_ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[strm]->id);
-                    channels = m_ringBuffer->DVD()->GetNumAudioChannels(logical_stream_id);
-                }
-                else
-                {
-                    logical_stream_id = m_ic->streams[strm]->id;
-                }
+                stream_id = m_ringBuffer->DVD()->GetAudioTrackNum(stream_id);
+                channels = m_ringBuffer->DVD()->GetNumAudioChannels(stream_id);
 
-                if (logical_stream_id == -1)
+                if (stream_id == -1)
                 {
                     // This stream isn't mapped, so skip it
                     continue;
                 }
+            }
 
+            m_tracks[kTrackTypeAudio].emplace_back(
+                static_cast<int>(strm), stream_id, lang, lang_indx, channels, type);
+
+            if (enc->avcodec_dual_language)
+            {
+                lang_indx = lang_aud_cnt[lang]++;
                 m_tracks[kTrackTypeAudio].emplace_back(
-                    static_cast<int>(strm), logical_stream_id, lang, lang_indx, channels, type);
+                    static_cast<int>(strm), stream_id, lang, lang_indx, channels, type);
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
