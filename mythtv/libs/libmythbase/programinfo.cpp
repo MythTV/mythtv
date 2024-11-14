@@ -3710,11 +3710,11 @@ void ProgramInfo::QueryMarkupMap(
     {
         // marks[query.value(0).toLongLong()] =
         //     (MarkTypes) query.value(1).toInt();
-        int type = query.value(1).toInt();
-        if (type == MARK_VIDEO_RATE)
-            marks[query.value(2).toLongLong()] = (MarkTypes) type;
+        int entryType = query.value(1).toInt();
+        if (entryType == MARK_VIDEO_RATE)
+            marks[query.value(2).toLongLong()] = (MarkTypes) entryType;
         else
-            marks[query.value(0).toLongLong()] = (MarkTypes) type;
+            marks[query.value(0).toLongLong()] = (MarkTypes) entryType;
 
     }
 }
@@ -3748,11 +3748,11 @@ void ProgramInfo::QueryMarkupMap(
     {
         // marks[query.value(0).toULongLong()] =
         //     (MarkTypes) query.value(1).toInt();
-        int type = query.value(1).toInt();
-        if (type == MARK_VIDEO_RATE)
-            marks[query.value(2).toULongLong()] = (MarkTypes) type;
+        int entryType = query.value(1).toInt();
+        if (entryType == MARK_VIDEO_RATE)
+            marks[query.value(2).toULongLong()] = (MarkTypes) entryType;
         else
-            marks[query.value(0).toULongLong()] = (MarkTypes) type;
+            marks[query.value(0).toULongLong()] = (MarkTypes) entryType;
     }
 }
 
