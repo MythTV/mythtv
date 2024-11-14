@@ -1231,15 +1231,6 @@ typedef struct AVCodecContext {
      */
     int (*get_buffer2)(struct AVCodecContext *s, AVFrame *frame, int flags);
 
-    /**
-     * set when bilingual audio data has been detected.
-     * 0 normally, 1 if dual language flag is set
-     *
-     * - encoding: unused (called delay in this case...)
-     * - decoding: set by lavc
-     */
-    int avcodec_dual_language;
-
     /* - encoding parameters */
     /**
      * number of bits the bitstream is allowed to diverge from the reference.

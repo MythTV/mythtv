@@ -346,10 +346,10 @@ static av_cold int ffat_create_decoder(AVCodecContext *avctx,
                 avctx->codec_id == AV_CODEC_ID_MP2 ||
                 avctx->codec_id == AV_CODEC_ID_MP3)) {
         enum AVCodecID codec_id;
-        int bit_rate;
+        int bit_rate, dual_mono;
         if (ff_mpa_decode_header(AV_RB32(pkt->data), &avctx->sample_rate,
                                  &in_format.mChannelsPerFrame, &avctx->frame_size,
-                                 &bit_rate, &codec_id, &avctx->avcodec_dual_language) < 0)
+                                 &bit_rate, &codec_id, &dual_mono) < 0)
             return AVERROR_INVALIDDATA;
         avctx->bit_rate = bit_rate;
         in_format.mSampleRate = avctx->sample_rate;
