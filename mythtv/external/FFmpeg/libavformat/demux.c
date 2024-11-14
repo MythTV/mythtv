@@ -1418,8 +1418,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                    av_ts2str(pkt->dts),
                    pkt->size, pkt->duration, pkt->flags);
 
-        if (/* MythTV null checks */ st && st->codecpar &&
-            sti->need_parsing && !sti->parser && !(s->flags & AVFMT_FLAG_NOPARSE)) {
+        if (sti->need_parsing && !sti->parser && !(s->flags & AVFMT_FLAG_NOPARSE)) {
             sti->parser = av_parser_init(st->codecpar->codec_id);
             if (!sti->parser) {
                 av_log(s, AV_LOG_VERBOSE, "parser not found for codec "
