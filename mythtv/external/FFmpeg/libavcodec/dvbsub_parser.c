@@ -124,11 +124,7 @@ static int dvbsub_parse(AVCodecParserContext *s,
             {
                 len = AV_RB16(p + 4);
 
-                // MythTV #5978 "<=" -> "<"
-                // This is unresolved ffmpeg issue 378, use
-                // their solution if/when this is fixed upstream.
-                //if (len + 6 <= p_end - p)
-                if (len + 6 < p_end - p)
+                if (len + 6 <= p_end - p)
                 {
                     out_size += len + 6;
 
