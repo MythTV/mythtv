@@ -2093,6 +2093,14 @@ void AvFormatDecoder::remove_tracks_not_in_same_AVProgram(int stream_index)
     }
 }
 
+static bool is_dual_mono(const AVChannelLayout& ch_layout)
+{
+    return (ch_layout.order == AV_CHANNEL_ORDER_CUSTOM) &&
+           (ch_layout.nb_channels == 2) &&
+           (ch_layout.u.map[0].id == AV_CHAN_FRONT_CENTER) &&
+           (ch_layout.u.map[1].id == AV_CHAN_FRONT_CENTER);
+}
+
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
     QMutexLocker avlocker(&m_avCodecLock);
@@ -2396,7 +2404,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_tracks[kTrackTypeAudio].emplace_back(
                 static_cast<int>(strm), stream_id, lang, lang_indx, type);
 
-            if (enc->avcodec_dual_language)
+            if (is_dual_mono(enc->ch_layout))
             {
                 lang_indx = lang_aud_cnt[lang]++;
                 m_tracks[kTrackTypeAudio].emplace_back(
@@ -4454,7 +4462,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         // detect switches between stereo and dual languages
         bool wasDual = audSubIdx != -1;
-        bool isDual = ctx->avcodec_dual_language != 0;
+        bool isDual = is_dual_mono(ctx->ch_layout);
         if ((wasDual && !isDual) || (!wasDual &&  isDual))
         {
             SetupAudioStreamSubIndexes(audIdx);
