@@ -176,10 +176,10 @@
 #define TELETEXT_DESCRIPTOR          0x56
 #define SUBTITLING_DESCRIPTOR        0x59
 #define DATA_BROADCAST_ID_DESCRIPTOR 0x66
-#define AC3_DESCRIPTOR               0x6A // AC-3_descriptor
-#define ENHANCED_AC3_DESCRIPTOR      0x7A // enhanced_AC-3_descriptor
-#define DTS_DESCRIPTOR               0x7B
-#define EXTENSION_DESCRIPTOR         0x7F
+#define AC3_DESCRIPTOR               0x6a /* AC-3_descriptor */
+#define ENHANCED_AC3_DESCRIPTOR      0x7a /* enhanced_AC-3_descriptor */
+#define DTS_DESCRIPTOR               0x7b
+#define EXTENSION_DESCRIPTOR         0x7f
 
 typedef struct MpegTSContext MpegTSContext;
 
