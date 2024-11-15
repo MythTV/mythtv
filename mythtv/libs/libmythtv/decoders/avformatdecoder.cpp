@@ -108,6 +108,8 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "mythvideoprofile.h"
 #include "remoteencoder.h"
 
+using namespace std::string_view_literals;
+
 #define LOC QString("AFD: ")
 
 // Maximum number of sequential invalid data packet errors before we try
@@ -1740,57 +1742,51 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     if (!m_tracks[kTrackTypeTeletextCaptions].empty())
         return;
 
-    MythAVBufferRef pmt_buffer {get_pmt_section_for_AVStream_index(m_ic, av_index)};
-    if (!pmt_buffer.has_buffer())
+    AVStream* st = m_ic->streams[av_index];
+    const AVDictionaryEntry* language_dictionary_entry =
+        av_dict_get(st->metadata, "language", nullptr, 0);
+
+    if (language_dictionary_entry == nullptr ||
+        language_dictionary_entry->value == nullptr ||
+        st->codecpar->extradata == nullptr
+       )
     {
         return;
     }
-    const ProgramMapTable pmt(PSIPTable(pmt_buffer.data()));
 
-    for (uint i = 0; i < pmt.StreamCount(); i++)
+    std::vector<std::string_view> languages {StringUtil::split_sv(language_dictionary_entry->value, ","sv)};
+
+    if (st->codecpar->extradata_size != static_cast<int>(languages.size() * 2))
     {
-        if (pmt.StreamType(i) != StreamID::PrivData)
-            continue;
-
-        const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
-            pmt.StreamInfo(i), pmt.StreamInfoLength(i),
-            DescriptorID::teletext);
-
-        for (const auto *desc : desc_list)
+        return;
+    }
+    for (size_t i = 0; i < languages.size(); i++)
+    {
+        if (languages[i].size() != 3)
         {
-            const TeletextDescriptor td(desc);
-            if (!td.IsValid())
-                continue;
-            for (uint k = 0; k < td.StreamCount(); k++)
-            {
-                int type = td.TeletextType(k);
-                int language = td.CanonicalLanguageKey(k);
-                uint magazine = td.TeletextMagazineNum(k);
-                if (magazine == 0)
-                    magazine = 8;
-                uint pagenum  = td.TeletextPageNum(k);
-                uint lang_idx = (magazine << 8) | pagenum;
-                StreamInfo si {av_index, 0, language, lang_idx};
-                if (type == 2 || type == 1)
-                {
-                    TrackType track = (type == 2) ? kTrackTypeTeletextCaptions :
-                                                    kTrackTypeTeletextMenu;
-                    m_tracks[track].push_back(si);
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("Teletext stream #%1 (%2) is in the %3 language"
-                                " on page %4 %5.")
-                            .arg(QString::number(k),
-                                 (type == 2) ? "Caption" : "Menu",
-                                 iso639_key_toName(language),
-                                 QString::number(magazine),
-                                 QString::number(pagenum)));
-                }
-            }
+            continue;
         }
-
-        // Assume there is only one multiplexed teletext stream in PMT..
-        if (!m_tracks[kTrackTypeTeletextCaptions].empty())
-            break;
+        int language = iso639_str3_to_key(languages[i].data());
+        uint8_t teletext_type = st->codecpar->extradata[i * 2] >> 3;
+        uint8_t teletext_magazine_number = st->codecpar->extradata[i * 2] & 0x7;
+        if (teletext_magazine_number == 0)
+            teletext_magazine_number = 8;
+        uint8_t teletext_page_number = st->codecpar->extradata[i * 2 + 1];
+        if (teletext_type == 2 || teletext_type == 1)
+        {
+            TrackType track = (teletext_type == 2) ?
+                                kTrackTypeTeletextCaptions :
+                                kTrackTypeTeletextMenu;
+            m_tracks[track].emplace_back(av_index, 0, language,
+                (static_cast<unsigned>(teletext_magazine_number) << 8) | teletext_page_number);
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Teletext stream #%1 (%2) is in the %3 language on page %4 %5.")
+                    .arg(QString::number(i),
+                         (teletext_type == 2) ? "Caption" : "Menu",
+                         iso639_key_toName(language),
+                         QString::number(teletext_magazine_number),
+                         QString::number(teletext_page_number)));
+        }
     }
 }
 
@@ -2243,7 +2239,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case AVMEDIA_TYPE_DATA:
             {
-                ScanTeletextCaptions(static_cast<int>(strm));
+                if (par->codec_id == AV_CODEC_ID_DVB_VBI)
+                    ScanTeletextCaptions(static_cast<int>(strm));
                 m_bitrate += par->bit_rate;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("data codec (%1)")
                         .arg(AVMediaTypeToString(par->codec_type)));

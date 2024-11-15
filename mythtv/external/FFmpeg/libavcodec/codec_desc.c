@@ -3623,12 +3623,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("ivtv proprietary embedded VBI captions"),
     },
     {
-        .id        = AV_CODEC_ID_DVB_VBI,
-        .type      = AVMEDIA_TYPE_DATA,
-        .name      = "dvb_vbi",
-        .long_name = NULL_IF_CONFIG_SMALL("dvb teletext"),
-    },
-    {
         .id        = AV_CODEC_ID_DSMCC_B,
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "dsmcc_b",
@@ -3719,6 +3713,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "lcevc",
         .long_name = NULL_IF_CONFIG_SMALL("LCEVC (Low Complexity Enhancement Video Coding) / MPEG-5 LCEVC / MPEG-5 part 2"),
+    },
+    {
+        .id        = AV_CODEC_ID_DVB_VBI,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "dvb_vbi",
+        .long_name = NULL_IF_CONFIG_SMALL("DVB VBI data"),
     },
     {
         .id        = AV_CODEC_ID_MPEG2TS,

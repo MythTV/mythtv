@@ -1917,6 +1917,7 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
             }
         }
         break;
+    case VBI_TELETEXT_DESCRIPTOR:
     case 0x56: /* DVB teletext descriptor */
         {
             uint8_t *extradata = NULL;
@@ -2069,15 +2070,6 @@ int ff_mythtv_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stre
     case 0x52: /* stream identifier descriptor */
         sti->stream_identifier = 1 + get8(pp, desc_end);
         st->component_tag     = sti->stream_identifier - 1;
-        break;
-    case VBI_TELETEXT_DESCRIPTOR:
-        language[0] = get8(pp, desc_end);
-        language[1] = get8(pp, desc_end);
-        language[2] = get8(pp, desc_end);
-        language[3] = 0;
-
-        if (language[0])
-            av_dict_set(&st->metadata, "language", language, 0);
         break;
     case METADATA_DESCRIPTOR:
         if (get16(pp, desc_end) == 0xFFFF)
