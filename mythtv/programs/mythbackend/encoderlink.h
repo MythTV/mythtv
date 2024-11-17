@@ -81,7 +81,6 @@ class EncoderLink
     bool IsTunerLocked(void) const { return m_locked; }
 
     bool CheckFile(ProgramInfo *pginfo);
-    void GetDiskSpace(QStringList &o_strlist);
     long long GetMaxBitrate(void);
     std::chrono::milliseconds SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend);
 

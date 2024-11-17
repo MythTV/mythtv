@@ -138,16 +138,17 @@ bool PlaybackSock::GoToSleep(void)
 }
 
 /**
- *  \brief Appends host's dir's total and used space in kilobytes.
+ *  \brief Gets the total and used space in kilobytes for the host's directories.
  */
-void PlaybackSock::GetDiskSpace(QStringList &o_strlist)
+FileSystemInfoList PlaybackSock::GetDiskSpace()
 {
-    QStringList strlist(QString("QUERY_FREE_SPACE")); // should this be ..._SUMMARY? based on the comment above
+    QStringList strlist(QString("QUERY_FREE_SPACE"));
 
-    if (SendReceiveStringList(strlist, 8)) // TODO replace magic numbers FileSystemInfo::k_lines; return a list of FileSystemInfos instead?
+    if (SendReceiveStringList(strlist, FileSystemInfo::k_lines))
     {
-        o_strlist += strlist;
+        return FileSystemInfoManager::FromStringList(strlist);
     }
+    return {};
 }
 
 int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
