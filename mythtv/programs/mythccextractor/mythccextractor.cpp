@@ -12,6 +12,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/signalhandling.h"

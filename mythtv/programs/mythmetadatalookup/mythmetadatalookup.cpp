@@ -18,6 +18,7 @@
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
