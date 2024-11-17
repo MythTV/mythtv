@@ -1,7 +1,10 @@
 #include "imagemetadata.h"
 
-#include "libmythbase/mythcorecontext.h"
+#include <QTextStream>
+
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythdirs.h"         // for GetAppBinDir
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h" // for ffprobe
 
 // libexiv2 for Exif metadata

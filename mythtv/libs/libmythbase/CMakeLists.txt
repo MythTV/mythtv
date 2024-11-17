@@ -88,6 +88,7 @@ set(LIBMYTHBASE_HEADERS_NOT_INSTALLED
     housekeeper.h
     logging.h
     mconcurrent.h
+    mythappname.h
     mythhdd.h
     mythpower.h
     mythscheduler.h

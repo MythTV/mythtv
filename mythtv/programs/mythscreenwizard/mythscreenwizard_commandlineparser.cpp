@@ -1,7 +1,8 @@
 #include <QString>
 
-#include "libmythbase/mythcorecontext.h"
 #include "mythscreenwizard_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythScreenWizardCommandLineParser::MythScreenWizardCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHSCREENWIZARD)

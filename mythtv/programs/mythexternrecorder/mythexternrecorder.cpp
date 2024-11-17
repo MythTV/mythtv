@@ -29,6 +29,7 @@
 // MythTV
 #include "libmyth/mythcontext.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
     }
 
     QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("mythexternrecorder");
+    QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHEXTERNRECORDER);
 
     int retval = cmdline.ConfigureLogging();
     if (retval != GENERIC_EXIT_OK)

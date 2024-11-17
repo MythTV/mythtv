@@ -40,6 +40,7 @@ HEADERS += cleanupguard.h portchecker.h
 HEADERS += mythsorthelper.h mythdbcheck.h
 HEADERS += mythpower.h
 HEADERS += configuration.h
+HEADERS += mythappname.h
 HEADERS += netgrabbermanager.h
 HEADERS += netutils.h
 HEADERS += programinfo.h

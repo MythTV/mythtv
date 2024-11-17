@@ -14,6 +14,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"

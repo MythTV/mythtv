@@ -2,7 +2,7 @@
 #include <QString>
 
 // MythTV
-#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythappname.h"
 #include "mythavtest_commandlineparser.h"
 
 MythAVTestCommandLineParser::MythAVTestCommandLineParser()

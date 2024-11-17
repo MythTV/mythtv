@@ -26,6 +26,7 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/hardwareprofile.h"
 #include "libmythbase/housekeeper.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
