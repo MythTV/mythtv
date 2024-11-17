@@ -1,11 +1,10 @@
 // Qt
 #include <QString>
 
-// MythTV
-#include "libmythbase/mythcorecontext.h"
-
 // MythMediaServer
 #include "mythmediaserver_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythMediaServerCommandLineParser::MythMediaServerCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHMEDIASERVER)

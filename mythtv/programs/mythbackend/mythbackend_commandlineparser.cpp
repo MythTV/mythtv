@@ -1,6 +1,6 @@
 #include <QString>
 
-#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythappname.h"
 #include "mythbackend_commandlineparser.h"
 
 MythBackendCommandLineParser::MythBackendCommandLineParser() :

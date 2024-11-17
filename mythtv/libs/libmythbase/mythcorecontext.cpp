@@ -34,6 +34,7 @@
 
 // MythTV
 #include "compat.h"
+#include "mythappname.h"
 #include "mythdownloadmanager.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"

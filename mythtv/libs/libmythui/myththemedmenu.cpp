@@ -12,6 +12,7 @@
 
 // libmythbase headers
 #include "libmythbase/lcddevice.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"

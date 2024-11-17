@@ -14,6 +14,7 @@
 // Qt headers
 #include <QCoreApplication> // for tr()
 #include <QDateTime>
+#include <QHash>
 #include <QStringBuilder>
 #include <QStringList>
 

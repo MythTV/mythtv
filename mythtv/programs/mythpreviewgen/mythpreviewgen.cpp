@@ -28,7 +28,7 @@
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
-#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
