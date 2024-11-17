@@ -1,3 +1,5 @@
+#include "mythcontext.h"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -33,6 +35,7 @@
 #include "libmythbase/configuration.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
@@ -56,7 +59,6 @@
 #include "dbsettings.h"
 #include "guistartup.h"
 #include "langsettings.h"
-#include "mythcontext.h"
 #include "mythmediamonitor.h"
 
 #define LOC      QString("MythContext: ")
