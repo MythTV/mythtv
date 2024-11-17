@@ -143,3 +143,8 @@ foreach(FLAG IN LISTS FF_LD_FLAGS)
   list(APPEND FF_PLATFORM_ARGS "--extra-ldflags=${FLAG}"
                                "--host-ldflags=${FLAG}")
 endforeach()
+
+# if we're signing an application, bundling must be enabled
+if (DARWIN_GENERATE_DISTRIBUTION AND NOT DARWIN_FRONTEND_BUNDLE)
+  message(FATAL_ERROR "Error: Generating a Drag And Drop Installer requires at least one App Bundle to be made.")
+endif()

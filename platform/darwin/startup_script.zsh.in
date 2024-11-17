@@ -1,0 +1,36 @@
+#!/bin/zsh
+
+# This script sets the Python and Mythtv paths
+
+# First set the default language so the python
+# metadata grabbes work correctly
+export LANG=$(defaults read -g AppleLanguages | sed '/"/!d;s/["[:space:]]//g;s/-/_/').UTF-8
+
+# get the directory of the calling funcitons
+BASE_DIR=$(dirname $0)
+BASE_DIR=$(realpath $BASE_DIR)
+if [ ${BASE_DIR:0:1} = "." ] ;then
+  BASE_DIR=$(pwd)/${BASE_DIR:2}
+fi
+
+# get the location of the APP_BUNDLE
+APP_DIR=$(realpath "$BASE_DIR/../..")
+RSRC_DIR=$APP_DIR/Contents/Resources
+
+# Add the App Bundle's executables to the search path
+export PATH=$BASE_DIR:$RSRC_DIR/bin:$PATH
+
+# The hash command must be called to get it to forget past
+# commands. Without forgetting past commands the $PATH changes
+# we made may not be respected
+hash -r 2>/dev/null || true
+
+# Set the python3 path
+PYTHON_BASE_PATH=$RSRC_DIR/lib/@PYTHON_BASENAME@
+export PYTHONPATH=$PYTHON_BASE_PATH:$PYTHON_BASE_PATH/site-packages:$PYTHON_BASE_PATH/lib-dynload
+
+# set the mythtv share dir
+export MYTHTVDIR="$RSRC_DIR"
+
+cd $BASE_DIR
+./@APP_EXE_NAME@ $@

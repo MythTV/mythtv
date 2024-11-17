@@ -182,22 +182,15 @@ void InitializeMythDirs(void)
 
 #else
 
+    if (installprefix.isEmpty())
+            installprefix = QString(RUNPREFIX);
+
     #if defined(Q_OS_DARWIN)
-
-        if (installprefix.isEmpty())
-            installprefix = QString("../Resources");
-
         // Check to see if the RUNPREFIX exists, if it does not, this is
         // likely an APP bundle and so RUNPREFIX needs to be pointed
         // internally to the APP Bundle.
         if (! QDir(installprefix).exists())
-            installprefix = QString(RUNPREFIX);
-        
-    #else
-
-        if (installprefix.isEmpty())
-            installprefix = QString(RUNPREFIX);
-
+            installprefix = QString("../Resources");
     #endif
 
     QDir prefixDir = qApp->applicationDirPath();
