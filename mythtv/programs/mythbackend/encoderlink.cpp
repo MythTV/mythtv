@@ -340,20 +340,6 @@ bool EncoderLink::CheckFile(ProgramInfo *pginfo)
     return pginfo->IsLocal();
 }
 
-/**
- *  \brief Appends total and used disk space in Kilobytes
- *
- *  \param o_strlist list to append to
- */
-void EncoderLink::GetDiskSpace(QStringList &o_strlist)
-{
-    if (HasSockAndIncrRef())
-    {
-        ReferenceLocker rlocker(m_sock);
-        m_sock->GetDiskSpace(o_strlist);
-    }
-}
-
 /** \fn EncoderLink::GetMaxBitrate()
  *  \brief Returns maximum bits per second this recorder might output.
  *
