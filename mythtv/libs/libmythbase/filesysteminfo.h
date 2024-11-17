@@ -89,7 +89,7 @@ class MBASE_PUBLIC FileSystemInfo
 
     QString m_hostname;
     QString m_path;
-    bool    m_local {false}; ///< set based on statfs
+    bool    m_local {false}; ///< set based on QStorageInfo::device()
     int     m_fsid  {-1};    ///< set by Consolidate
     int     m_grpid {-1};    ///< set by setGroupID
     // cached from statfs
