@@ -1,3 +1,5 @@
+#include "mainserver.h"
+
 // C++
 #include <algorithm>
 #include <cerrno>
@@ -59,6 +61,7 @@
 #include "libmythmetadata/metaio.h"
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythmetadata/videoutils.h"
+#include "libmythprotoserver/requesthandler/fileserverhandler.h"
 #include "libmythprotoserver/requesthandler/fileserverutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/io/mythmediabuffer.h"
@@ -74,7 +77,6 @@
 // mythbackend headers
 #include "autoexpire.h"
 #include "backendcontext.h"
-#include "mainserver.h"
 #include "scheduler.h"
 
 /** Milliseconds to wait for an existing thread from
@@ -5129,65 +5131,7 @@ size_t MainServer::GetCurrentMaxBitrate(void)
 void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
-    // TODO deduplicate mythbackend and libmythprotoserver code
-    // FileServerHandler::QueryFileSystems()
-    const QString localHostName = gCoreContext->GetHostName(); // cache this
-    QStringList groups(StorageGroup::kSpecialGroups);
-    groups.removeAll("LiveTV");
-    QString specialGroups = groups.join("', '");
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT MIN(id),dirname "
-                            "FROM storagegroup "
-                           "WHERE hostname = :HOSTNAME "
-                             "AND groupname NOT IN ( '%1' ) "
-                           "GROUP BY dirname;").arg(specialGroups));
-    query.bindValue(":HOSTNAME", localHostName);
-
-    FileSystemInfoList fsInfos;
-    if (query.exec() && query.isActive())
-    {
-        // If we don't have any dirs of our own, fallback to list of Default
-        // dirs since that is what StorageGroup::Init() does.
-        if (!query.size())
-        {
-            query.prepare("SELECT MIN(id),dirname "
-                            "FROM storagegroup "
-                           "WHERE groupname = :GROUP "
-                           "GROUP BY dirname;");
-            query.bindValue(":GROUP", "Default");
-            if (!query.exec())
-                MythDB::DBError("BackendQueryFileSystems", query);
-        }
-
-        QMap<QString, bool> foundDirs;
-
-        while (query.next())
-        {
-            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
-             * uses QString::fromAscii() for toString(). Explicitly convert the
-             * value using QString::fromUtf8() to prevent corruption. */
-            QString currentDir {QString::fromUtf8(query.value(1).toByteArray().constData())};
-            if (currentDir.endsWith("/"))
-                currentDir.remove(currentDir.length() - 1, 1);
-
-            if (!foundDirs.contains(currentDir))
-            {
-                if (QDir(currentDir).exists())
-                {
-                    fsInfos.push_back(FileSystemInfo(localHostName, currentDir, query.value(0).toInt()));
-
-                    foundDirs[currentDir] = true;
-                }
-                else
-                {
-                    foundDirs[currentDir] = false;
-                }
-            }
-        }
-    }
-    // end FileServerHandler::QueryFileSystems()
-
+    FileSystemInfoList fsInfos = FileServerHandler::QueryFileSystems();
     QString allHostList;
     QStringList tmplist;
     if (allHosts)
