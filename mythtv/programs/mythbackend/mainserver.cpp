@@ -5133,7 +5133,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 {
     FileSystemInfoList fsInfos = FileServerHandler::QueryFileSystems();
     QString allHostList;
-    QStringList tmplist;
     if (allHosts)
     {
         allHostList = gCoreContext->GetHostName();
@@ -5159,29 +5158,21 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         m_sockListLock.unlock();
 
         for (auto & pbs : localPlaybackList) {
-            pbs->GetDiskSpace(tmplist); // QUERY_FREE_SPACE
+            fsInfos << pbs->GetDiskSpace(); // QUERY_FREE_SPACE
             pbs->DecrRef();
         }
     }
 
-    if (!consolidated)
+    if (consolidated)
     {
-        strlist << FileSystemInfoManager::ToStringList(fsInfos) << tmplist;
-        return;
+        // Consolidate hosts sharing storage
+        int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
+        maxWriteFiveSec = std::max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
+
+        FileSystemInfoManager::Consolidate(fsInfos, true, maxWriteFiveSec, allHostList);
     }
 
-    fsInfos.append(FileSystemInfoManager::FromStringList(tmplist));
-    tmplist.clear(); // not used after this point
-    strlist.clear();
-
-    // Consolidate hosts sharing storage
-    int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
-    maxWriteFiveSec = std::max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
-
-    FileSystemInfoManager::Consolidate(fsInfos, true, maxWriteFiveSec, allHostList);
-
-    // Pass the cleaned list back
-    strlist << FileSystemInfoManager::ToStringList(fsInfos);
+    strlist = FileSystemInfoManager::ToStringList(fsInfos);
 }
 
 void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
