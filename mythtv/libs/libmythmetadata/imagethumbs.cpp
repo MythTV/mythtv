@@ -300,9 +300,7 @@ QString ThumbThread<DBFS>::CreateThumbnail(const ImagePtrK &im, int thumbPriorit
                 .arg(im->m_type).arg(imagePath);
     }
 
-    // Compensate for any Qt auto-orientation
-    int orientBy = Orientation(im->m_orientation)
-            .GetCurrent(im->m_type == kImageFile);
+    int orientBy = Orientation(im->m_orientation).GetCurrent();
 
     // Orientate now to optimise load/display time - no orientation
     // is required when displaying thumbnails

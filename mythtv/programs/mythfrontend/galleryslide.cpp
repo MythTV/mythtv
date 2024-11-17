@@ -415,9 +415,9 @@ bool Slide::LoadSlide(const ImagePtrK& im, int direction, bool notifyCompletion)
     }
     else
     {
-        // Load image, compensating for any Qt auto-orientation
+        // Load image
         SetFilename(im->m_url);
-        SetOrientation(Orientation(m_data->m_orientation).GetCurrent(true));
+        SetOrientation(Orientation(m_data->m_orientation).GetCurrent());
     }
 
     // Load in background
