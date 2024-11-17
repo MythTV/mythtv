@@ -29,73 +29,12 @@ int Orientation::Transform(int transform)
     return Composite();
 }
 
-
-/*!
-   \brief Initialises conversion matrix for Qt 5.4.1
-   \return Matrix of orientation codes such that:
-    Qt 5.4.1 orientation = matrix(file orientation, current orientation)
- */
-Orientation::Matrix Orientation::InitOrientationMatrix()
-{
-    Orientation::Matrix matrix;
-
-    if (krunningQt541)
-    {
-        // Each row/string defines codes for a single file orientation
-        // Each col/value defines applicable code for corresponding current orientation
-        // As current orientation is applicable to raw camera image, these codes
-        // define the current orientation relative to 1/Normal (as Qt 5.4.1 has already
-        // applied the file orientation)
-        QStringList vals = QStringList()
-                << "0 1 2 3 4 5 6 7 8"
-                << "0 1 2 3 4 5 6 7 8"
-                << "0 2 1 4 3 8 7 6 5"
-                << "0 3 4 1 2 7 8 5 6"
-                << "0 4 3 2 1 6 5 8 7"
-                << "0 5 6 7 8 1 2 3 4"
-                << "0 8 7 6 5 2 1 4 3"
-                << "0 7 8 5 6 3 4 1 2"
-                << "0 6 5 8 7 4 3 2 1";
-
-        for (int row = 0; row < vals.size(); ++row)
-        {
-            QStringList rowVals = vals.at(row).split(' ');
-            for (int col = 0; col < rowVals.size(); ++col)
-                matrix[row][col] = rowVals.at(col).toInt();
-        }
-    }
-    return matrix;
-}
-
-const bool Orientation::krunningQt541 = (strcmp(qVersion(), "5.4.1") == 0);
-const Orientation::Matrix Orientation::kQt541_orientation =
-        Orientation::InitOrientationMatrix();
-
-
 /*!
  * \brief Determines orientation required for an image
- * \details Some Qt versions automatically apply file orientation when an image
- * is loaded. This compensates for that to ensure images are always orientated
-   correctly.
- * \param compensate Whether to compensate for Qt auto-rotation
  * \return Exif orientation code to apply after the image has been loaded.
  */
-int Orientation::GetCurrent(bool compensate)
+int Orientation::GetCurrent()
 {
-    // Qt 5.4.1 automatically applies the file orientation when loading images
-    // Ref: https://codereview.qt-project.org/#/c/111398/
-    // Ref: https://codereview.qt-project.org/#/c/110685/
-    // https://bugreports.qt.io/browse/QTBUG-37946
-    if (compensate && krunningQt541)
-    {
-        // Deduce orientation relative to 1/Normal from file & current orientations
-        int old = m_current;
-        m_current = kQt541_orientation.value(m_file).value(m_current);
-
-        LOG(VB_FILE, LOG_DEBUG, LOC +
-            QString("Adjusted orientation %1 to %2 for Qt 5.4.1")
-            .arg(old).arg(m_current));
-    }
     return m_current;
 }
 
