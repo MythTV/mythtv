@@ -409,13 +409,7 @@ bool FileServerHandler::HandleQuery(SocketHandler *socket, QStringList &commands
 
 bool FileServerHandler::HandleQueryFreeSpace(SocketHandler *socket)
 {
-    QStringList res;
-
-    FileSystemInfoList disks = QueryFileSystems();
-    for (const auto & disk : std::as_const(disks))
-        disk.ToStringList(res);
-
-    socket->WriteStringList(res);
+    socket->WriteStringList(FileSystemInfoManager::ToStringList(QueryFileSystems()));
     return true;
 }
 
