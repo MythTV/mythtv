@@ -663,8 +663,6 @@ QString StorageGroup::FindNextDirMostFree(void)
 {
     QString nextDir;
     int64_t nextDirFree = 0;
-    int64_t thisDirFree = 0;
-    FileSystemInfo fsInfo;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("FindNextDirMostFree: Starting"));
 
@@ -680,8 +678,7 @@ QString StorageGroup::FindNextDirMostFree(void)
             continue;
         }
 
-        fsInfo = FileSystemInfo(QString(), dir);
-        thisDirFree = fsInfo.getFreeSpace();
+        int64_t thisDirFree = FileSystemInfo(QString(), dir).getFreeSpace();
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("FindNextDirMostFree: '%1' has %2 KiB free")
                 .arg(dir, QString::number(thisDirFree)));
