@@ -121,15 +121,20 @@ FileSystemInfoList FileSystemInfoManager::GetInfoList(MythSocket *sock)
 
 // O(n^2)
 void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
-                                        bool merge, int64_t fuzz)
+                                        bool merge, int64_t fuzz,
+                                        QString total_name)
 {
     int newid = 0;
+    int64_t total_total = 0;
+    int64_t total_used  = 0;
 
     for (auto it1 = disks.begin(); it1 != disks.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
         {
             it1->setFSysID(newid++);
+            total_total += it1->getTotalSpace();
+            total_used  += it1->getUsedSpace();
             if (merge)
                 it1->setPath(it1->getHostname().section(".", 0, 0)
                                 + ":" + it1->getPath());
@@ -163,6 +168,11 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
                 }
             }
         }
+    }
+    if (!total_name.isEmpty())
+    {
+        disks.append(FileSystemInfo(total_name, "TotalDiskSpace", false, -2, -2,
+                                    0, total_total, total_used));
     }
 }
 

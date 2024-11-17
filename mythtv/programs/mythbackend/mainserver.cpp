@@ -5129,8 +5129,6 @@ size_t MainServer::GetCurrentMaxBitrate(void)
 void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
-    QString allHostList = gCoreContext->GetHostName();
-
     // TODO deduplicate mythbackend and libmythprotoserver code
     // FileServerHandler::QueryFileSystems()
     const QString localHostName = gCoreContext->GetHostName(); // cache this
@@ -5190,9 +5188,11 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     }
     // end FileServerHandler::QueryFileSystems()
 
+    QString allHostList;
     QStringList tmplist;
     if (allHosts)
     {
+        allHostList = gCoreContext->GetHostName();
         QMap <QString, bool> backendsCounted;
         std::list<PlaybackSock *> localPlaybackList;
 
@@ -5234,23 +5234,10 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
     maxWriteFiveSec = std::max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
 
-    FileSystemInfoManager::Consolidate(fsInfos, true, maxWriteFiveSec);
+    FileSystemInfoManager::Consolidate(fsInfos, true, maxWriteFiveSec, allHostList);
 
     // Pass the cleaned list back
     strlist << FileSystemInfoManager::ToStringList(fsInfos);
-
-    if (allHosts)
-    {
-        int64_t totalKB = 0;
-        int64_t usedKB  = 0;
-        for (const auto & fsInfo : std::as_const(fsInfos))
-        {
-            totalKB += fsInfo.getTotalSpace();
-            usedKB  += fsInfo.getUsedSpace();
-        }
-        strlist << FileSystemInfo(allHostList, "TotalDiskSpace", false, -2, -2,
-                                  0, totalKB, usedKB).ToStringList();
-    }
 }
 
 void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
