@@ -341,6 +341,29 @@ set(MYTH_JAVA_HOME
 )
 
 #
+# Darwin Related Options
+#
+if(APPLE)
+  option(DARWIN_FRONTEND_BUNDLE
+         "Generate an application bundle for mythfrontend." OFF)
+  option(DARWIN_SIGNING_ID
+         "\
+The name of your Apple supplied code signing certificate \
+for the application. The name usually takes the form \
+Developer ID Application: [Name] or \
+3rd Party Mac Developer Application: [Name] \
+If this variable is not set the application will not be signed." "")
+  option(DARWIN_NOTARIZATION_KEYCHAIN
+         "\
+Keychain where valid apple notarization credentials are stored.\
+These include the apple-id, team-id, and the Apple Generated APP_PWD\
+These can be stored by running the following command:\
+  xcrun notarytool store-credentials KEYCHAIN_NAME \
+        --apple-id YOUR_APPLE_ID \
+        --team-id=YOUR_TEAM_ID \
+        --password YOUR_APP_PWD" "")
+endif()
+#
 # Load any user overrides to these values.
 #
 set(MYTH_USER_OVERRIDES1 "$ENV{HOME}/.config/MythTV/BuildOverridesPre.cmake")
