@@ -415,7 +415,6 @@ bool FileServerHandler::HandleQueryFreeSpace(SocketHandler *socket)
 
 bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
 {
-    QStringList res;
     QStringList hosts;
 
     FileSystemInfoList disks = QueryAllFileSystems();
@@ -424,41 +423,20 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
             hosts << disk.getHostname();
 
     // TODO: get max bitrate from encoderlink
-    FileSystemInfoManager::Consolidate(disks, true, 14000);
+    FileSystemInfoManager::Consolidate(disks, true, 14000, hosts.join(","));
 
-    long long total = 0;
-    long long used = 0;
-    for (const auto & disk : std::as_const(disks))
-    {
-        disk.ToStringList(res);
-        total += disk.getTotalSpace();
-        used  += disk.getUsedSpace();
-    }
-
-    res << FileSystemInfo(hosts.join(","), "TotalDiskSpace", false, -2, -2,
-                          0, total, used).ToStringList();
-
-    socket->WriteStringList(res);
+    socket->WriteStringList(FileSystemInfoManager::ToStringList(disks));
     return true;
 }
 
 bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
 {
-    QStringList res;
     FileSystemInfoList disks = QueryAllFileSystems();
     // TODO: get max bitrate from encoderlink
-    FileSystemInfoManager::Consolidate(disks, true, 14000);
+    FileSystemInfoManager::Consolidate(disks, true, 14000, "FreeSpaceSummary");
 
-    long long total = 0;
-    long long used = 0;
-    for (const auto & disk : std::as_const(disks))
-    {
-        total += disk.getTotalSpace();
-        used  += disk.getUsedSpace();
-    }
-
-    res << QString::number(total) << QString::number(used);
-    socket->WriteStringList(res);
+    socket->WriteStringList({QString::number(disks.back().getTotalSpace()),
+                             QString::number(disks.back().getUsedSpace())});
     return true;
 }
 
