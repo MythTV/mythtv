@@ -1,36 +1,6 @@
 #include "mythdbparams.h"
 #include "mythlogging.h"
 
-/// Load sensible connection defaults.
-///
-/// This duplicates the initializer information, but is needed so that
-/// an existing object can be reset to the default values instead of
-/// creating a new object.
-void DatabaseParams::LoadDefaults(void)
-{
-    m_dbHostName    = "localhost";
-    m_dbHostPing    = true;
-    m_dbPort        = 3306;
-    m_dbUserName    = "mythtv";
-    m_dbPassword    = "mythtv";
-    m_dbName        = "mythconverg";
-    m_dbType        = "QMYSQL";
-
-    m_localEnabled  = false;
-    m_localHostName = "my-unique-identifier-goes-here";
-
-    m_wolEnabled    = false;
-    m_wolReconnect  = 0s;
-    m_wolRetry      = 5;
-    m_wolCommand    = "echo 'WOLsqlServerCommand not set'";
-
-    m_verVersion.clear();
-    m_verBranch.clear();
-    m_verProtocol.clear();
-    m_verBinary.clear();
-    m_verSchema.clear();
-}
-
 bool DatabaseParams::IsValid(const QString &source) const
 {
     // Print some warnings if things look fishy..

@@ -566,7 +566,7 @@ bool MythContext::Impl::LoadDatabaseSettings()
 {
     auto config = XmlConfiguration(); // read-only
 
-    m_dbParams.LoadDefaults();
+    m_dbParams = {};
 
     m_dbParams.m_localHostName  = config.GetValue("LocalHostName", "");
     m_dbParams.m_dbHostPing     = config.GetValue(XmlConfiguration::kDefaultDB + "PingHost", true);
@@ -585,7 +585,7 @@ bool MythContext::Impl::LoadDatabaseSettings()
     bool ok = m_dbParams.IsValid(XmlConfiguration::kDefaultFilename);
 
     if (!ok)
-        m_dbParams.LoadDefaults();
+        m_dbParams = {};
 
     m_dbParams.m_localEnabled = !(m_dbParams.m_localHostName.isEmpty() ||
         m_dbParams.m_localHostName == "my-unique-identifier-goes-here");
