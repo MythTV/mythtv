@@ -110,6 +110,8 @@ class UPNP_PUBLIC SSDP : public MThread
  
     public:
 
+        static inline const QString kBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
+
         static SSDP* Instance();
         static void Shutdown();
 

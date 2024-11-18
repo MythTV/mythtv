@@ -14,11 +14,6 @@ class MythUIButton;
 
 class DatabaseParams;
 
-// TODO: The following do not belong here, but I cannot think of a better
-//       location at this moment in time
-// Some common UPnP search and XML value strings
-const QString kBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
-
 using ItemMap = QMap <QString, DeviceLocation*>;
 
 /**
