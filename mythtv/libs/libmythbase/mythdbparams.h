@@ -12,7 +12,6 @@ class MBASE_PUBLIC DatabaseParams
   public:
     DatabaseParams() = default;
 
-    void LoadDefaults(void);
     bool IsValid(const QString &source = QString("Unknown")) const;
 
     bool operator==(const DatabaseParams &other) const;
