@@ -120,8 +120,8 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
         {
             auto config = XmlConfiguration(m_configFilename);
             if (!m_pinCode.isEmpty())
-                config.SetValue(kDefaultPIN, m_pinCode);
-            config.SetValue(kDefaultUSN, m_usn);
+                config.SetValue(XmlConfiguration::kDefaultPIN, m_pinCode);
+            config.SetValue(XmlConfiguration::kDefaultUSN, m_usn);
             config.Save();
         }
         CloseWithDecision(kAcceptConfigure);

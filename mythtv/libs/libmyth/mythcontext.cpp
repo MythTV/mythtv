@@ -580,18 +580,18 @@ bool MythContext::Impl::LoadDatabaseSettings()
     DatabaseParams dbParams;
 
     dbParams.m_localHostName  = config.GetValue("LocalHostName", "");
-    dbParams.m_dbHostPing     = config.GetValue(kDefaultDB + "PingHost", true);
-    dbParams.m_dbHostName     = config.GetValue(kDefaultDB + "Host", "");
-    dbParams.m_dbUserName     = config.GetValue(kDefaultDB + "UserName", "");
-    dbParams.m_dbPassword     = config.GetValue(kDefaultDB + "Password", "");
-    dbParams.m_dbName         = config.GetValue(kDefaultDB + "DatabaseName", "");
-    dbParams.m_dbPort         = config.GetValue(kDefaultDB + "Port", 0);
+    dbParams.m_dbHostPing     = config.GetValue(XmlConfiguration::kDefaultDB + "PingHost", true);
+    dbParams.m_dbHostName     = config.GetValue(XmlConfiguration::kDefaultDB + "Host", "");
+    dbParams.m_dbUserName     = config.GetValue(XmlConfiguration::kDefaultDB + "UserName", "");
+    dbParams.m_dbPassword     = config.GetValue(XmlConfiguration::kDefaultDB + "Password", "");
+    dbParams.m_dbName         = config.GetValue(XmlConfiguration::kDefaultDB + "DatabaseName", "");
+    dbParams.m_dbPort         = config.GetValue(XmlConfiguration::kDefaultDB + "Port", 0);
 
-    dbParams.m_wolEnabled     = config.GetValue(kDefaultWOL + "Enabled", false);
+    dbParams.m_wolEnabled     = config.GetValue(XmlConfiguration::kDefaultWOL + "Enabled", false);
     dbParams.m_wolReconnect   =
-        config.GetDuration<std::chrono::seconds>(kDefaultWOL + "SQLReconnectWaitTime", 0s);
-    dbParams.m_wolRetry       = config.GetValue(kDefaultWOL + "SQLConnectRetry", 5);
-    dbParams.m_wolCommand     = config.GetValue(kDefaultWOL + "Command", "");
+        config.GetDuration<std::chrono::seconds>(XmlConfiguration::kDefaultWOL + "SQLReconnectWaitTime", 0s);
+    dbParams.m_wolRetry       = config.GetValue(XmlConfiguration::kDefaultWOL + "SQLConnectRetry", 5);
+    dbParams.m_wolCommand     = config.GetValue(XmlConfiguration::kDefaultWOL + "Command", "");
 
     bool ok = dbParams.IsValid(XmlConfiguration::kDefaultFilename);
 
@@ -685,7 +685,7 @@ bool DatabaseParamsCache::SaveDatabaseParams(
 
         config.SetValue("LocalHostName", params.m_localHostName);
 
-        config.SetValue(kDefaultDB + "PingHost", params.m_dbHostPing);
+        config.SetValue(XmlConfiguration::kDefaultDB + "PingHost", params.m_dbHostPing);
 
         // If dbHostName is an IPV6 address with scope,
         // remove the scope. Unescaped % signs are an
@@ -697,17 +697,17 @@ bool DatabaseParamsCache::SaveDatabaseParams(
             addr.setScopeId(QString());
             dbHostName = addr.toString();
         }
-        config.SetValue(kDefaultDB + "Host",     dbHostName);
-        config.SetValue(kDefaultDB + "UserName", params.m_dbUserName);
-        config.SetValue(kDefaultDB + "Password", params.m_dbPassword);
-        config.SetValue(kDefaultDB + "DatabaseName", params.m_dbName);
-        config.SetValue(kDefaultDB + "Port",     params.m_dbPort);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Host",     dbHostName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "UserName", params.m_dbUserName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Password", params.m_dbPassword);
+        config.SetValue(XmlConfiguration::kDefaultDB + "DatabaseName", params.m_dbName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Port",     params.m_dbPort);
 
-        config.SetValue(kDefaultWOL + "Enabled", params.m_wolEnabled);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "Enabled", params.m_wolEnabled);
         config.SetDuration(
-            kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
-        config.SetValue(kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
-        config.SetValue(kDefaultWOL + "Command", params.m_wolCommand);
+            XmlConfiguration::kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "Command", params.m_wolCommand);
 
         // actually save the file
         success = config.Save();
@@ -1294,8 +1294,8 @@ bool MythContext::Impl::DefaultUPnP(QString& Error)
     QString usn;
     {
         auto config = XmlConfiguration(); // read-only
-        pin = config.GetValue(kDefaultPIN, QString(""));
-        usn = config.GetValue(kDefaultUSN, QString(""));
+        pin = config.GetValue(XmlConfiguration::kDefaultPIN, QString(""));
+        usn = config.GetValue(XmlConfiguration::kDefaultUSN, QString(""));
     }
 
     if (usn.isEmpty())
