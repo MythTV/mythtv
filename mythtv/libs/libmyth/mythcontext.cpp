@@ -549,9 +549,7 @@ DBfound:
     m_dbParams.m_wolRetry = dbParamsFromFile.m_wolRetry;
     m_dbParams.m_wolCommand = dbParamsFromFile.m_wolCommand;
 
-    SaveDatabaseParams(m_dbParams,
-                       !loaded || m_dbParams.m_forceSave ||
-                       dbParamsFromFile != m_dbParams);
+    SaveDatabaseParams(m_dbParams, !loaded || dbParamsFromFile != m_dbParams);
     EnableDBerrors();
     ResetDatabase(m_dbParams);
     return true;

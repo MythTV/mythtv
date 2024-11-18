@@ -37,8 +37,6 @@ class MBASE_PUBLIC DatabaseParams
     QString m_wolCommand    {"echo 'WOLsqlServerCommand not set'"};
                                           ///< command to use for wake-on-lan
 
-    bool    m_forceSave     {false};        ///< set to true to force a save of the settings file
-
     QString m_verVersion;         ///< git version string
     QString m_verBranch;          ///< git branch
     QString m_verProtocol;        ///< backend protocol

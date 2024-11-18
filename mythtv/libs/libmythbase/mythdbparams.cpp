@@ -24,8 +24,6 @@ void DatabaseParams::LoadDefaults(void)
     m_wolRetry      = 5;
     m_wolCommand    = "echo 'WOLsqlServerCommand not set'";
 
-    m_forceSave     = false;
-
     m_verVersion.clear();
     m_verBranch.clear();
     m_verProtocol.clear();
