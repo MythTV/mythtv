@@ -17,7 +17,6 @@ QObject::customEvent to receive event notifications for subscribed services.
 #endif
 #include <utility>
 
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"
 
@@ -50,7 +49,6 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
         addr = UPnp::g_IPAddrList.at(0);
 
     QString host;
-    // taken from MythCoreContext
     if (addr.protocol() == QAbstractSocket::IPv6Protocol)
         host = "[" + addr.toString() + "]";
     else

@@ -14,8 +14,8 @@
 #include <QTimer>
 
 // MythTV headers
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 
 #include "mythmainwindow.h"
 #include "mythnotificationcenter.h"

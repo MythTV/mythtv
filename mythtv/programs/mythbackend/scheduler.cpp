@@ -29,6 +29,7 @@
 // MythTV
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"

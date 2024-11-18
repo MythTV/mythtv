@@ -1,7 +1,9 @@
 #include "mythuianimation.h"
+
+#include "libmythbase/mythdb.h"
+
 #include "mythuitype.h"
 #include "mythmainwindow.h"
-#include "libmythbase/mythcorecontext.h"
 
 #include <QDomDocument>
 

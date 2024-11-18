@@ -1,5 +1,6 @@
 
 #include "libmyth/audio/audiooutput.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythui/mythnotificationcenter.h"
 
 #include "audioplayer.h"

@@ -8,6 +8,7 @@
 
 // mythtv
 #include "libmythbase/mythchrono.h"
+#include "libmythbase/mythcorecontext.h"
 
 // libmythmetadata
 #include "lyricsdata.h"

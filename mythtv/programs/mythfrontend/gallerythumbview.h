@@ -119,7 +119,7 @@ private slots:
     void    Copy()                     { Copy(false); }
     void    Move();
     void    ShowPassword();
-    static void DoRepeat(int on)       { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void DoRepeat(int on);
     static void RepeatOn()             { DoRepeat(1); }
     static void RepeatOff()            { DoRepeat(0); }
 

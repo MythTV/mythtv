@@ -24,6 +24,7 @@
 #include <utility>
 
 #include "filesysteminfo.h"
+#include "mythcorecontext.h"
 #include "mythcoreutil.h"
 
 // for deserialization

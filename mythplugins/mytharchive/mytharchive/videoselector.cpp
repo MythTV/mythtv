@@ -12,7 +12,7 @@
 #include <libmythbase/mythdb.h>
 #include <libmythbase/remotefile.h>
 #include <libmythbase/stringutil.h>
-#include <libmythmetadata/videoutils.h>
+#include <libmythbase/storagegroup.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>
@@ -451,7 +451,7 @@ std::vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
                 if (info->filename.isEmpty())
                 {
                     // file must not be local or doesn't exist
-                    info->filename = generate_file_url("Videos", host, filename);
+                    info->filename = StorageGroup::generate_file_url("Videos", host, filename);
                 }
             }
 

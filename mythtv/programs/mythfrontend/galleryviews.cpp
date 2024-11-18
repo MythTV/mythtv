@@ -7,6 +7,7 @@
 #include <random>
 #include <vector>
 
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 
 #define LOC QString("Galleryviews: ")

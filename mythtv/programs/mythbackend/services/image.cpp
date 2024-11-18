@@ -22,10 +22,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //////////////////////////////////////////////////////////////////////////////
-
-//#include "libmythbase/mythcorecontext.h"
-
 #include "image.h"
+
+#include "libmythbase/mythlogging.h"
 
 #define LOC QString("ImageService: ")
 

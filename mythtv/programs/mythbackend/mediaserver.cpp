@@ -21,6 +21,7 @@
 #ifdef USING_LIBDNS_SD
 #include "libmythbase/bonjourregister.h"
 #endif
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythupnp/htmlserver.h"

@@ -2,6 +2,7 @@
 
 // MythTV
 #include "libmyth/audio/audiooutput.h"
+#include "libmythbase/mythcorecontext.h"
 
 #include "DVD/mythdvdbuffer.h"
 #include "DVD/mythdvddecoder.h"

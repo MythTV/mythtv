@@ -29,6 +29,7 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/hardwareprofile.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimezone.h"

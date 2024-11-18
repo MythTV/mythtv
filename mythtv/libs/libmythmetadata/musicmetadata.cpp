@@ -2339,3 +2339,10 @@ void AlbumArtImages::dumpToDatabase(void)
         }
     }
 }
+
+void AlbumArtScannerThread::run_real()
+{
+    RunProlog();
+    gCoreContext->SendReceiveStringList(m_strList);
+    RunEpilog();
+}

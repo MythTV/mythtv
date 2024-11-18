@@ -79,6 +79,14 @@ void showLogViewer(void)
     }
 }
 
+LogViewer::LogViewer(MythScreenStack *parent)
+    : MythScreenType(parent, "logviewer"),
+      m_autoUpdate(gCoreContext->GetBoolSetting("LogViewerAutoUpdate", true)),
+      m_updateTime(gCoreContext->GetDurSetting<std::chrono::seconds>(
+                       "LogViewerUpdateTime", DEFAULT_UPDATE_TIME))
+{
+}
+
 LogViewer::~LogViewer(void)
 {
     gCoreContext->SaveDurSetting("LogViewerUpdateTime", m_updateTime);

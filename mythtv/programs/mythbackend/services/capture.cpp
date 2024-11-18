@@ -30,8 +30,8 @@
 
 // MythTV
 #include "libmythbase/compat.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythversion.h"
 #include "libmythtv/cardutil.h"
 

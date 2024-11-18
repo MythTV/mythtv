@@ -16,9 +16,9 @@
 #include <QTextStream>
 
 // MythTV
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/netgrabbermanager.h"
 #include "libmythbase/rssparse.h"

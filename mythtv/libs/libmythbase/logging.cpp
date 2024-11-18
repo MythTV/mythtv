@@ -18,7 +18,6 @@
 #include "loggingserver.h"
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythcorecontext.h"
 #include "mythsystemlegacy.h"
 #include "dbutil.h"
 #include "exitcodes.h"

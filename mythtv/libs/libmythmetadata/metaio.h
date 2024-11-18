@@ -17,8 +17,7 @@ static constexpr const char* MYTH_MUSICBRAINZ_ALBUMARTIST_UUID { "89ad4ac3-39f7-
 class META_PUBLIC MetaIO
 {
   public:
-    MetaIO(void)
-        : m_filenameFormat(gCoreContext->GetSetting("NonID3FileNameFormat").toUpper()) {};
+    MetaIO();
     virtual ~MetaIO(void) = default;
 
     /*!

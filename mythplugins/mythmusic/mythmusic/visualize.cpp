@@ -22,6 +22,7 @@
 #include <QDir>
 
 // MythTV
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/remotefile.h>
 #include <libmythbase/sizetliteral.h>

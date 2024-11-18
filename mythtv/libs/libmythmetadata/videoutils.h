@@ -58,18 +58,4 @@ META_PUBLIC QString WatchedToState(bool watched);
 META_PUBLIC VideoContentType ContentTypeFromString(const QString &type);
 META_PUBLIC QString ContentTypeToString(VideoContentType type);
 
-// this needs to be an inline and pull in the storage group and context
-// headers since it this used in dbcheck.cpp.
-#include <libmythbase/storagegroup.h>
-#include <libmythbase/mythcorecontext.h>
-inline QString generate_file_url(
-    const QString &storage_group, const QString &host, const QString &path)
-{
-    uint port = gCoreContext->GetBackendServerPort(host);
-
-    return MythCoreContext::GenMythURL(host, port, path,
-                                    StorageGroup::GetGroupToUse(host, storage_group));
-
-}
-
 #endif // VIDEOUTILS_H_
