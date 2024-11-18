@@ -20,6 +20,8 @@
 #include "test_musicmetadata.h"
 #include <iostream>
 
+#include "libmythbase/mythcorecontext.h"
+
 void TestMusicMetadata::initTestCase()
 {
     gCoreContext = new MythCoreContext("test_mythmusicdata_1.0", nullptr);

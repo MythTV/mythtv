@@ -2,6 +2,7 @@
 #include <utility>
 
 // MythTV
+#include "libmythbase/mythcorecontext.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuitext.h"
@@ -818,4 +819,9 @@ void GallerySlideView::ClearStatus(const Slide &slide)
             m_uiStatus->Reset();
         }
     }
+}
+
+void GallerySlideView::RepeatOn(int on)
+{
+    gCoreContext->SaveSetting("GalleryRepeat", on);
 }

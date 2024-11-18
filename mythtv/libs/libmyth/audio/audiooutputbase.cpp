@@ -21,6 +21,7 @@
 // MythTV headers
 #include "libmythbase/compat.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "audiooutputbase.h"

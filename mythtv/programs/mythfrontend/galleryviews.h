@@ -13,6 +13,9 @@
 
 #include <utility>
 
+#include <QSet>
+#include <QVector>
+
 // MythTV headers
 #include "libmythmetadata/imagemanager.h"
 

@@ -8,7 +8,6 @@
 #include <QRunnable>
 
 // myth
-#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythpluginexport.h>
 
 // mythmusic
@@ -25,10 +24,7 @@ class SendStringListThread : public QRunnable
     explicit SendStringListThread(QStringList strList)
         : m_strList(std::move(strList)) {}
 
-    void run() override // QRunnable
-    {
-        gCoreContext->SendReceiveStringList(m_strList);
-    }
+    void run() override; // QRunnable
 
   private:
     QStringList m_strList;

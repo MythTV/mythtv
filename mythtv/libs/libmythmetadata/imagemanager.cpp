@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythui/mediamonitor.h"
 
@@ -402,6 +403,23 @@ void ImageAdapterLocal::Notify(const QString &mesg,
     gCoreContext->SendEvent(MythEvent(QString("%1 %2").arg(mesg, host), extra));
 }
 
+ImageAdapterSg::ImageAdapterSg() :
+    m_hostname(gCoreContext->GetMasterHostName()),
+    m_hostport(MythCoreContext::GetMasterServerPort()),
+    m_sg(StorageGroup(IMAGE_STORAGE_GROUP, m_hostname, false))
+{
+}
+
+QString ImageAdapterSg::MakeFileUrl(const QString &path) const
+{
+    return MythCoreContext::GenMythURL(m_hostname, m_hostport, path, IMAGE_STORAGE_GROUP);
+}
+
+QString ImageAdapterSg::MakeThumbUrl(const QString &devPath, const QString &path) const
+{
+    return MythCoreContext::GenMythURL(m_hostname, m_hostport, devPath + "/" + path,
+                                       THUMBNAIL_STORAGE_GROUP);
+}
 
 /*!
  \brief Construct a remote image from a file

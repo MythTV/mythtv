@@ -14,6 +14,7 @@
 #include <QPainter>
 
 // MythTV
+#include <libmythbase/mythcorecontext.h>
 #include <libmythui/mythuivideo.h>
 
 // mythmusic

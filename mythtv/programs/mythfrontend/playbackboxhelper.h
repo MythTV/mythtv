@@ -11,7 +11,6 @@
 
 // MythTV
 #include "libmythbase/mthread.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythtypes.h"
 #include "libmythmetadata/metadatacommon.h"
 

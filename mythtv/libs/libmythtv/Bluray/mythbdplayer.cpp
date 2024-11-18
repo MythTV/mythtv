@@ -4,6 +4,7 @@
 #include "Bluray/mythbddecoder.h"
 #include "Bluray/mythbdplayer.h"
 
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 
 // Std

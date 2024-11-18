@@ -4,9 +4,9 @@
 #include <QDir>
 #include <QFile>
 
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythui/mythuibuttonlist.h"
 
 #include "metadataimagedownload.h"

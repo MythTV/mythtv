@@ -19,7 +19,6 @@
 #include "logging.h"
 #include "loggingserver.h"
 #include "mythdb.h"
-#include "mythcorecontext.h"
 #include "dbutil.h"
 #include "exitcodes.h"
 #include "compat.h"

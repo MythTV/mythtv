@@ -16,6 +16,7 @@
 
 // MythTV headers
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"

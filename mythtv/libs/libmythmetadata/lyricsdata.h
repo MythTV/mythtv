@@ -10,7 +10,6 @@
 
 // MythTV
 #include "libmythbase/mythdate.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythmetadata/mythmetaexp.h"
 

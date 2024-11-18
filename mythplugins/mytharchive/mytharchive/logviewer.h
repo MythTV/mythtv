@@ -5,7 +5,6 @@
 #include <QTimer>
 
 // myth
-#include <libmythbase/mythcorecontext.h>
 #include <libmythui/mythscreentype.h>
 
 static constexpr std::chrono::seconds DEFAULT_UPDATE_TIME { 5s };
@@ -22,12 +21,7 @@ class LogViewer : public MythScreenType
 
   public:
 
-    explicit LogViewer(MythScreenStack *parent)
-        : MythScreenType(parent, "logviewer"),
-          m_autoUpdate(gCoreContext->GetBoolSetting("LogViewerAutoUpdate", true)),
-          m_updateTime(gCoreContext->GetDurSetting<std::chrono::seconds>(
-                           "LogViewerUpdateTime", DEFAULT_UPDATE_TIME))
-        {};
+    explicit LogViewer(MythScreenStack *parent);
    ~LogViewer(void) override;
 
     bool Create(void) override; // MythScreenType

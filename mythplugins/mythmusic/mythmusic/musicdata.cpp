@@ -6,6 +6,7 @@
 
 // MythTV
 #include <libmythbase/mthreadpool.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythmetadata/musicfilescanner.h>
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythmetadata/musicutils.h>
@@ -20,9 +21,10 @@
 // this is the global MusicData object shared thoughout MythMusic
 MusicData  *gMusicData = nullptr;
 
-
-///////////////////////////////////////////////////////////////////////////////
-
+void SendStringListThread::run()
+{
+    gCoreContext->SendReceiveStringList(m_strList);
+}
 
 MusicData::~MusicData(void)
 {

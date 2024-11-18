@@ -16,6 +16,7 @@
 
 // MythTV
 #include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"

@@ -1,4 +1,5 @@
 // MythTV other libs
+#include "libmythbase/mythcorecontext.h"
 #include "libmythui/mythmainwindow.h"
 
 // MythTV

@@ -27,7 +27,6 @@
 // MythTV
 #include "libmyth/audio/audiooutpututil.h"
 #include "libmyth/mythaverror.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "mythavutil.h"
 

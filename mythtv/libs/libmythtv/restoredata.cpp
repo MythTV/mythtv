@@ -42,7 +42,6 @@
 #include <iostream>
 
 // MythTV includes
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythuiimage.h"

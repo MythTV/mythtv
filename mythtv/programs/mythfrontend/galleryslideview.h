@@ -59,7 +59,7 @@ private slots:
     void Stop();
     void Play(bool useTransition);
     void Play() { Play(true); };
-    static void RepeatOn(int on)       { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void RepeatOn(int on);
     static void RepeatOn()             { RepeatOn(1); }
     static void RepeatOff()            { RepeatOn(0); }
     void ShowInfo();
