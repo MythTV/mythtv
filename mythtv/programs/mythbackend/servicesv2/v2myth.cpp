@@ -185,7 +185,7 @@ bool V2Myth::SetConnectionInfo(const QString &Host, const QString &UserName, con
     dbparms.m_wolRetry = 3;
     dbparms.m_wolCommand = QString();
 
-    bResult = gContext->SaveDatabaseParams(dbparms);
+    bResult = GetMythDB()->SaveDatabaseParams(dbparms, false);
 
     return bResult;
 }
