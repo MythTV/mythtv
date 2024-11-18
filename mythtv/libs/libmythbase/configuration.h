@@ -54,6 +54,12 @@ class MBASE_PUBLIC XmlConfiguration
 
     static constexpr auto kDefaultFilename = "config.xml";
 
+    static inline const QString kDefaultDB  {"Database/"};
+    static inline const QString kDefaultWOL {"WakeOnLAN/"};
+    static inline const QString kDefaultMFE {"UPnP/MythFrontend/DefaultBackend/"};
+    static inline const QString kDefaultPIN {kDefaultMFE + "SecurityPin"};
+    static inline const QString kDefaultUSN {kDefaultMFE + "USN"};
+
     XmlConfiguration() { Load(); }
     explicit XmlConfiguration(QString fileName)
         : m_fileName(std::move(fileName))
