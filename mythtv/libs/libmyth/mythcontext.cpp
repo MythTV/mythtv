@@ -1139,11 +1139,12 @@ void MythContext::Impl::SilenceDBerrors()
     // still display it in the DatabaseSettings screens
     DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
     if (!dbParams.m_dbHostName.isEmpty())
+    {
         m_dbHostCp = dbParams.m_dbHostName;
-
-    dbParams.m_dbHostName.clear();
-    m_dbParamCache.SetDatabaseParams(dbParams);
-    gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+        dbParams.m_dbHostName.clear();
+        m_dbParamCache.SetDatabaseParams(dbParams);
+        gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+    }
 }
 
 void MythContext::Impl::EnableDBerrors()
