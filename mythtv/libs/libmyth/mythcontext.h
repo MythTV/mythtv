@@ -27,7 +27,6 @@ class MPUBLIC MythContext
               bool disableAutoDiscovery = false,
               bool ignoreDB = false);
 
-    bool SaveDatabaseParams(const DatabaseParams &params, bool force = false);
     bool saveSettingsCache();
 
     void SetDisableEventPopup(bool check);

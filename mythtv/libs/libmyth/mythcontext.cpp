@@ -95,17 +95,6 @@ class GUISettingsCache
     static const std::array<QString, 13> kSettings;
 };
 
-class DatabaseParamsCache
-{
-  public:
-    DatabaseParamsCache() = default;
-    DatabaseParams GetDatabaseParams(void) const { return m_dbParam; }
-    void SetDatabaseParams(const DatabaseParams &params) { m_dbParam = params; }
-    bool SaveDatabaseParams(const DatabaseParams &params, bool force);
-  private:
-    DatabaseParams m_dbParam;
-};
-
 } // anonymous namespace
 
 class MythContext::Impl : public QObject
@@ -163,7 +152,6 @@ class MythContext::Impl : public QObject
 
     QString                 m_masterhostname;  ///< master backend hostname
 
-    DatabaseParamsCache     m_dbParamCache;  ///< Current database host & WOL details
     QString                 m_dbHostCp;  ///< dbHostName backup
 
     bool                   m_disableeventpopup   {false};
@@ -454,8 +442,7 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
 
     // 1. Either load XmlConfiguration::k_default_filename or use sensible "localhost" defaults:
     bool loaded = LoadDatabaseSettings();
-    DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
-    gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     setLocalHostName(dbParams.m_localHostName);
     DatabaseParams dbParamsFromFile = dbParams;
 
@@ -560,7 +547,7 @@ DBfound:
     dbParams.m_wolRetry = dbParamsFromFile.m_wolRetry;
     dbParams.m_wolCommand = dbParamsFromFile.m_wolCommand;
 
-    m_dbParamCache.SaveDatabaseParams(dbParams, !loaded || dbParamsFromFile != dbParams);
+    GetMythDB()->SaveDatabaseParams(dbParams, !loaded || dbParamsFromFile != dbParams);
     EnableDBerrors();
     ResetDatabase(dbParams);
     return true;
@@ -601,7 +588,7 @@ bool MythContext::Impl::LoadDatabaseSettings()
     dbParams.m_localEnabled = !(dbParams.m_localHostName.isEmpty() ||
         dbParams.m_localHostName == "my-unique-identifier-goes-here");
 
-    m_dbParamCache.SetDatabaseParams(dbParams);
+    GetMythDB()->SetDatabaseParams(dbParams);
     return ok;
 }
 
@@ -669,60 +656,6 @@ QString MythContext::Impl::setLocalHostName(QString hostname)
     return hostname;
 }
 
-bool DatabaseParamsCache::SaveDatabaseParams(
-    const DatabaseParams &params, bool force)
-{
-    bool success = true;
-
-    // only rewrite file if it has changed
-    if (force || (params != m_dbParam))
-    {
-        /* Read in the current file on the filesystem, only setting/clearing as
-        necessary.  This prevents losing changes to the file from between when it
-        was read at startup of MythTV and when this function is called.
-        */
-        auto config = XmlConfiguration();
-
-        config.SetValue("LocalHostName", params.m_localHostName);
-
-        config.SetValue(XmlConfiguration::kDefaultDB + "PingHost", params.m_dbHostPing);
-
-        // If dbHostName is an IPV6 address with scope,
-        // remove the scope. Unescaped % signs are an
-        // xml violation
-        QString dbHostName(params.m_dbHostName);
-        QHostAddress addr;
-        if (addr.setAddress(dbHostName))
-        {
-            addr.setScopeId(QString());
-            dbHostName = addr.toString();
-        }
-        config.SetValue(XmlConfiguration::kDefaultDB + "Host",     dbHostName);
-        config.SetValue(XmlConfiguration::kDefaultDB + "UserName", params.m_dbUserName);
-        config.SetValue(XmlConfiguration::kDefaultDB + "Password", params.m_dbPassword);
-        config.SetValue(XmlConfiguration::kDefaultDB + "DatabaseName", params.m_dbName);
-        config.SetValue(XmlConfiguration::kDefaultDB + "Port",     params.m_dbPort);
-
-        config.SetValue(XmlConfiguration::kDefaultWOL + "Enabled", params.m_wolEnabled);
-        config.SetDuration(
-            XmlConfiguration::kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
-        config.SetValue(XmlConfiguration::kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
-        config.SetValue(XmlConfiguration::kDefaultWOL + "Command", params.m_wolCommand);
-
-        // actually save the file
-        success = config.Save();
-
-        // Use the new settings:
-        m_dbParam = params;
-        GetMythDB()->SetDatabaseParams(m_dbParam);
-
-        // If database has changed, force its use:
-        auto* db = GetMythDB();
-        db->GetDBManager()->CloseDatabases();
-        db->ClearSettingsCache();
-    }
-    return success;
-}
 
 void MythContext::Impl::OnCloseDialog()
 {
@@ -774,7 +707,7 @@ bool MythContext::Impl::PromptForDatabaseParams(const QString &error)
     }
     else
     {
-        DatabaseParams params = m_dbParamCache.GetDatabaseParams();
+        DatabaseParams params = GetMythDB()->GetDatabaseParams();
         QString        response;
         std::this_thread::sleep_for(1s);
         // give user chance to skip config
@@ -823,7 +756,7 @@ bool MythContext::Impl::PromptForDatabaseParams(const QString &error)
                                                 params.m_wolCommand);
         }
 
-        accepted = m_dbParamCache.SaveDatabaseParams(params, false);
+        accepted = GetMythDB()->SaveDatabaseParams(params, false);
     }
     return accepted;
 }
@@ -862,7 +795,7 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
 
     auto secondsStartupScreenDelay = gCoreContext->GetDurSetting<std::chrono::seconds>("StartupScreenDelay", 2s);
     auto msStartupScreenDelay = std::chrono::duration_cast<std::chrono::milliseconds>(secondsStartupScreenDelay);
-    DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     do
     {
         QElapsedTimer timer;
@@ -959,8 +892,7 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
                 if (dbParams.m_dbHostName != host)
                 {
                     dbParams.m_dbHostName = host;
-                    m_dbParamCache.SetDatabaseParams(dbParams);
-                    gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+                    GetMythDB()->SetDatabaseParams(dbParams);
                 }
                 EnableDBerrors();
                 ResetDatabase(dbParams);
@@ -1137,25 +1069,23 @@ void MythContext::Impl::SilenceDBerrors()
 
     // Save the configured hostname, so that we can
     // still display it in the DatabaseSettings screens
-    DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     if (!dbParams.m_dbHostName.isEmpty())
     {
         m_dbHostCp = dbParams.m_dbHostName;
         dbParams.m_dbHostName.clear();
-        m_dbParamCache.SetDatabaseParams(dbParams);
-        gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+        GetMythDB()->SetDatabaseParams(dbParams);
     }
 }
 
 void MythContext::Impl::EnableDBerrors()
 {
     // Restore (possibly) blanked hostname
-    DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     if (dbParams.m_dbHostName.isNull() && !m_dbHostCp.isEmpty())
     {
         dbParams.m_dbHostName = m_dbHostCp;
-        m_dbParamCache.SetDatabaseParams(dbParams);
-        gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+        GetMythDB()->SetDatabaseParams(dbParams);
     }
 
     gCoreContext->GetDB()->SetSuppressDBMessages(false);
@@ -1198,10 +1128,10 @@ BackendSelection::Decision MythContext::Impl::ChooseBackend(const QString &error
 
     LOG(VB_GENERAL, LOG_INFO, "Putting up the UPnP backend chooser");
 
-    DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     BackendSelection::Decision ret =
         BackendSelection::Prompt(&dbParams, XmlConfiguration::kDefaultFilename);
-    m_dbParamCache.SetDatabaseParams(dbParams);
+    GetMythDB()->SetDatabaseParams(dbParams);
 
     EndTempWindow();
 
@@ -1373,14 +1303,13 @@ bool MythContext::Impl::UPnPconnect(const DeviceLocation *backend,
     QString        loc = "UPnPconnect() - ";
     QString        URL = backend->m_sLocation;
     MythXMLClient  client(URL);
-    DatabaseParams dbParams = m_dbParamCache.GetDatabaseParams();
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
 
     LOG(VB_UPNP, LOG_INFO, loc + QString("Trying host at %1").arg(URL));
     switch (client.GetConnectionInfo(PIN, &dbParams, error))
     {
         case UPnPResult_Success:
-            m_dbParamCache.SetDatabaseParams(dbParams);
-            gCoreContext->GetDB()->SetDatabaseParams(dbParams);
+            GetMythDB()->SetDatabaseParams(dbParams);
             LOG(VB_UPNP, LOG_INFO, loc +
                 "Got database hostname: " + dbParams.m_dbHostName);
             return true;
@@ -1407,7 +1336,7 @@ bool MythContext::Impl::UPnPconnect(const DeviceLocation *backend,
 
     LOG(VB_UPNP, LOG_INFO, "Trying default DB credentials at " + URL);
     dbParams.m_dbHostName = URL;
-    m_dbParamCache.SetDatabaseParams(dbParams);
+    GetMythDB()->SetDatabaseParams(dbParams);
 
     return true;
 }
@@ -1756,11 +1685,6 @@ MythContext::~MythContext()
 void MythContext::SetDisableEventPopup(bool check)
 {
     m_impl->m_disableeventpopup = check;
-}
-
-bool MythContext::SaveDatabaseParams(const DatabaseParams &params, bool force)
-{
-    return m_impl->m_dbParamCache.SaveDatabaseParams(params, force);
 }
 
 bool MythContext::saveSettingsCache()

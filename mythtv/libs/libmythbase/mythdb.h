@@ -24,6 +24,7 @@ class MBASE_PUBLIC MythDB
     QString GetDatabaseName() const;
     DatabaseParams GetDatabaseParams(void) const;
     void SetDatabaseParams(const DatabaseParams &params);
+    bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
     void SetLocalHostname(const QString &name);
     QString GetHostName(void) const;

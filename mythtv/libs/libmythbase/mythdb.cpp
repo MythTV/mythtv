@@ -12,6 +12,7 @@
 #include <QRegularExpression>
 #include <QStandardPaths>
 
+#include "configuration.h"
 #include "mythconfig.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
@@ -255,6 +256,58 @@ DatabaseParams MythDB::GetDatabaseParams(void) const
 void MythDB::SetDatabaseParams(const DatabaseParams &params)
 {
     d->m_dbParams = params;
+}
+
+bool MythDB::SaveDatabaseParams(const DatabaseParams &params, bool force)
+{
+    bool success = true;
+
+    // only rewrite file if it has changed
+    if (force || (params != d->m_dbParams))
+    {
+        /* Read in the current file on the filesystem, only setting/clearing as
+        necessary.  This prevents losing changes to the file from between when it
+        was read at startup of MythTV and when this function is called.
+        */
+        auto config = XmlConfiguration();
+
+        config.SetValue("LocalHostName", params.m_localHostName);
+
+        config.SetValue(XmlConfiguration::kDefaultDB + "PingHost", params.m_dbHostPing);
+
+        // If dbHostName is an IPV6 address with scope,
+        // remove the scope. Unescaped % signs are an
+        // xml violation
+        QString dbHostName(params.m_dbHostName);
+        QHostAddress addr;
+        if (addr.setAddress(dbHostName))
+        {
+            addr.setScopeId(QString());
+            dbHostName = addr.toString();
+        }
+        config.SetValue(XmlConfiguration::kDefaultDB + "Host",     dbHostName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "UserName", params.m_dbUserName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Password", params.m_dbPassword);
+        config.SetValue(XmlConfiguration::kDefaultDB + "DatabaseName", params.m_dbName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Port",     params.m_dbPort);
+
+        config.SetValue(XmlConfiguration::kDefaultWOL + "Enabled", params.m_wolEnabled);
+        config.SetDuration(
+            XmlConfiguration::kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "Command", params.m_wolCommand);
+
+        // actually save the file
+        success = config.Save();
+
+        // Use the new settings:
+        d->m_dbParams = params;
+
+        // If database has changed, force its use:
+        GetDBManager()->CloseDatabases();
+        ClearSettingsCache();
+    }
+    return success;
 }
 
 void MythDB::SetLocalHostname(const QString &name)
