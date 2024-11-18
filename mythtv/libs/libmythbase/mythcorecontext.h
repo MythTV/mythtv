@@ -12,7 +12,6 @@
 #include "mythbaseexp.h"
 #include "mythobservable.h"
 #include "mythsocket_cb.h"
-#include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythsession.h"
 

@@ -1,3 +1,5 @@
+#include "mythcorecontext.h"
+
 // Qt
 #include <QtGlobal>
 #include <QCoreApplication>
@@ -36,7 +38,6 @@
 #include "compat.h"
 #include "mythappname.h"
 #include "mythdownloadmanager.h"
-#include "mythcorecontext.h"
 #include "mythsocket.h"
 #include "mythsystemlegacy.h"
 #include "mthreadpool.h"

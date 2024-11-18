@@ -8,6 +8,7 @@
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 
 #include "dbaccess.h"  // for FileAssociations
 

@@ -26,6 +26,7 @@
 #include "filesysteminfo.h"
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
+#include "mythlogging.h"
 
 // for deserialization
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)

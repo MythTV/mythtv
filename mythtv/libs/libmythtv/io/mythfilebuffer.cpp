@@ -7,6 +7,7 @@
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimer.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/threadedfilewriter.h"
