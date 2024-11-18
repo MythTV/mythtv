@@ -1,4 +1,5 @@
 // MythTV
+#include "libmythbase/mythlogging.h"
 #include "mythrenderopengl.h"
 #include "mythegl.h"
 

@@ -43,6 +43,7 @@
 
 // MythTV includes
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythuiimage.h"
 #include "libmythui/mythuitext.h"

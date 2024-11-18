@@ -8,6 +8,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythtv/recordingrule.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"

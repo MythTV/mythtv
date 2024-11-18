@@ -1,4 +1,6 @@
 // MythTV
+#include "libmythbase/mythlogging.h"
+
 #include "mythplayerui.h"
 #include "mythvideocolourspace.h"
 #include "mythdrmprimeinterop.h"

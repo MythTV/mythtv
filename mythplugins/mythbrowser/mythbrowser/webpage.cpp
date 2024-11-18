@@ -6,7 +6,6 @@
 #include <QIcon>
 
 // MythTV
-#include <libmythbase/mythlogging.h>
 #include <libmythui/mythmainwindow.h>
 
 // mythbrowser

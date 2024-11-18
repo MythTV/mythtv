@@ -17,6 +17,7 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remotefile.h"

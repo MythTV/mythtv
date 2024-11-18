@@ -19,6 +19,7 @@
 
 // MythTV
 #include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/sizetliteral.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>

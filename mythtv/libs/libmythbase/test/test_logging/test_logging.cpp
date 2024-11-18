@@ -19,6 +19,16 @@
  */
 #include "test_logging.h"
 
+#include <iostream>
+#include <sstream>
+
+#include <QTest>
+
+#include "mythsyslog.h"
+#include "exitcodes.h"
+#include "logging.h"
+#include "mythlogging.h"
+
 void TestLogging::initialize (void)
 {
     QCOMPARE(logLevelGet("force initialization"), LOG_UNKNOWN);

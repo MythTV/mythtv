@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
 
 #include "dtvchannel.h"
 #include "dtvsignalmonitor.h"

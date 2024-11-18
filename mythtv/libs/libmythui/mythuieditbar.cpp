@@ -4,9 +4,6 @@
 // C++
 #include <cmath>
 
-// MythBase
-#include "libmythbase/mythlogging.h"
-
 // MythUI
 #include "mythuishape.h"
 #include "mythuiimage.h"

@@ -11,6 +11,7 @@
 
 // MythTV headers
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"
 #include "dvbchannel.h"

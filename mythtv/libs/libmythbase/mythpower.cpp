@@ -1,5 +1,6 @@
 // MythTV
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 #include "mythpower.h"
 
 #ifdef USING_DBUS

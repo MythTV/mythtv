@@ -10,6 +10,7 @@
 // MythTV
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remotefile.h"
 #include "libmythui/mythdialogbox.h"

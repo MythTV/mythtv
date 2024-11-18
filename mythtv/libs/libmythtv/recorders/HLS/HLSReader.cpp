@@ -7,6 +7,8 @@
 #include <QStringConverter>
 #endif
 
+#include "libmythbase/mythlogging.h"
+
 #include "HLSReader.h"
 #include "HLS/m3u.h"
 

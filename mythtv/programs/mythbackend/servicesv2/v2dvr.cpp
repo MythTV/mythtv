@@ -30,6 +30,7 @@
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"

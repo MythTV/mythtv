@@ -3,6 +3,7 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 
 #include "tv_play.h"
 #include "livetvchain.h"

@@ -10,6 +10,8 @@
 #include <thread> // for sleep_for
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
+
 #include "iptvchannel.h"
 #include "iptvrecorder.h"
 #include "mpeg/mpegstreamdata.h"

@@ -22,7 +22,6 @@
 #include "libmythbase/mythsingledownload.h"
 #endif
 
-#include "libmythbase/mythlogging.h"
 #include "libmythtv/mythtvexp.h"
 
 #include "HLSSegment.h"

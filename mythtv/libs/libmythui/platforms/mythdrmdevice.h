@@ -2,7 +2,6 @@
 #define MYTHDRMDEVICE_H
 
 // MythTV
-#include "libmythbase/mythlogging.h"
 #include "libmythui/mythdisplay.h"
 #if defined (USING_QTPRIVATEHEADERS)
 #include "libmythbase/mythcommandlineparser.h"

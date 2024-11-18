@@ -5,9 +5,6 @@
 #include <QRect>
 #include <QDomDocument>
 
-// libmythbase
-#include "libmythbase/mythlogging.h"
-
 // Mythui
 #include "mythpainter.h"
 #include "mythmainwindow.h"

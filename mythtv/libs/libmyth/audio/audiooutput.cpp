@@ -8,6 +8,7 @@
 #include <QDir>
 
 #include "libmythbase/compat.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 
 #include "audiooutput.h"

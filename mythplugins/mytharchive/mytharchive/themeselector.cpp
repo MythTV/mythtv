@@ -13,6 +13,7 @@
 // myth
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuibuttonlist.h>

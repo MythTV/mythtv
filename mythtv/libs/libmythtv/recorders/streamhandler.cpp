@@ -6,6 +6,7 @@
 // MythTV headers
 #include "streamhandler.h"
 
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/threadedfilewriter.h"
 
 #ifndef O_LARGEFILE

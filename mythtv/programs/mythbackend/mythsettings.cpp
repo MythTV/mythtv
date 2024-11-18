@@ -5,6 +5,7 @@
 
 // MythTV
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythtv/channelsettings.h" // for ChannelTVFormat::GetFormats()
 #include "libmythtv/frequencies.h"
 

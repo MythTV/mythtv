@@ -58,6 +58,7 @@
 #include "mythdbcon.h"
 #include "housekeeper.h"
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 
 /** \class HouseKeeperTask
  *  \ingroup housekeeper

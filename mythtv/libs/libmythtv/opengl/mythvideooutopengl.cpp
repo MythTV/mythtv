@@ -3,6 +3,7 @@
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
 #include "libmythui/opengl/mythopenglperf.h"

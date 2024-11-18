@@ -7,6 +7,7 @@
 // MythTV
 #include <libmythbase/mthreadpool.h>
 #include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythmetadata/musicfilescanner.h>
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythmetadata/musicutils.h>

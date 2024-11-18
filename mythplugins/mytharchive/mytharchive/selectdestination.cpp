@@ -9,6 +9,7 @@
 // myth
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/stringutil.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythuibutton.h>

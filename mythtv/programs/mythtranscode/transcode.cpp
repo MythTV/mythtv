@@ -23,6 +23,7 @@
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 #include "libmythtv/HLS/httplivestream.h"
 #include "libmythtv/deletemap.h"

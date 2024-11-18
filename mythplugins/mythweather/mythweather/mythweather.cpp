@@ -4,6 +4,7 @@
 // MythTV headers
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythplugin.h>
 #include <libmythbase/mythpluginapi.h>
 #include <libmythbase/mythversion.h>

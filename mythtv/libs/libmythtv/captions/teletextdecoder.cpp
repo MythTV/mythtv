@@ -24,8 +24,6 @@ extern "C" {
 #include <cinttypes>
 }
 
-#include "libmythbase/mythlogging.h"
-
 #include "captions/teletextdecoder.h"
 #include "captions/teletextreader.h"
 #include "osd.h"

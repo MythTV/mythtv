@@ -19,6 +19,7 @@
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"
 #include "dtvsignalmonitor.h"

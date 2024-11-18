@@ -1,5 +1,3 @@
-// MythTV
-#include "libmythbase/mythlogging.h"
 #include "platforms/mythscreensaverdrm.h"
 
 #define LOC QString("ScreenSaverDRM: ")

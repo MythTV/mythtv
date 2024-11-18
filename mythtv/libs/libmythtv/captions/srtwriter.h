@@ -15,6 +15,8 @@
 #include <QtXml/QDomElement>
 
 // MythTV
+#include "libmythbase/mythlogging.h"
+
 #include "captions/teletextextractorreader.h"
 #include "decoders/avformatdecoder.h"
 #include "mythccextractorplayer.h"

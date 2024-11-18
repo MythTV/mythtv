@@ -22,6 +22,8 @@
 #include <QString>
 
 // MythTV includes
+#include "libmythbase/mythlogging.h"
+
 #include "ExternalStreamHandler.h"
 #include "ExternalRecorder.h"
 #include "ExternalChannel.h"

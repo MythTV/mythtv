@@ -11,7 +11,6 @@
 // libmyth* includes
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdirs.h"
-#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystem.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/remoteutil.h"

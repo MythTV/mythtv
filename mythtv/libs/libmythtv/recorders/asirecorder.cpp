@@ -23,6 +23,7 @@
 
 // MythTV includes
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 #include "asichannel.h"
 #include "asirecorder.h"

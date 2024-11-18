@@ -2,6 +2,7 @@
 #include <thread> // for sleep_for
 
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 
 #include "cardutil.h"

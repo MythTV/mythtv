@@ -1,6 +1,7 @@
 
 // libmythbase
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 // qt
 #include <QBuffer>

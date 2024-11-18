@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 #define LOC     QString("PulseAudio: ")
 

@@ -2,6 +2,7 @@
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythpluginapi.h>
 #include <libmythbase/mythversion.h>
 #include <libmythui/myththemedmenu.h>

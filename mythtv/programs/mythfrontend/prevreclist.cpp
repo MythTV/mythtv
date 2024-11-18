@@ -29,6 +29,7 @@
 //MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/recordingrule.h"

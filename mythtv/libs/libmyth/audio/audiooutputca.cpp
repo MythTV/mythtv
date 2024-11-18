@@ -24,6 +24,7 @@
 #include <AvailabilityMacros.h>
 
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputca.h"
 
 // kAudioObjectPropertyElementMaster was deprecated in OS_X 12

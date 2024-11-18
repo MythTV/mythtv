@@ -10,7 +10,6 @@
 #include <QFileInfo>
 #include <QDir>
 
-#include "mythlogging.h"
 #include "mythdate.h"
 
 namespace MythTZ

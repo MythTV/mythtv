@@ -5,6 +5,7 @@
 // MythTV
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythpainter_qt.h"
 #include "mythpainterwindowqt.h"

@@ -34,6 +34,8 @@
 
 #include "audiooutputbase.h"
 
+#include "libmythbase/mythlogging.h"
+
 #define LOC QString("ELDUTILS: ")
 
 enum eld_versions : std::uint8_t

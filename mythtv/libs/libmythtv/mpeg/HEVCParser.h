@@ -25,6 +25,7 @@
 
 #include <array>
 #include <map>
+#include <vector>
 
 #include "mpeg/H2645Parser.h"
 

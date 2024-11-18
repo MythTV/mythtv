@@ -16,6 +16,7 @@
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythmiscutil.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythui/mediamonitor.h>

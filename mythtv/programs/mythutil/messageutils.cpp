@@ -13,7 +13,6 @@ using std::endl;
 // libmyth* includes
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
-#include "libmythbase/mythlogging.h"
 
 // Local includes
 #include "messageutils.h"

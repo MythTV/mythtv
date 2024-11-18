@@ -4,6 +4,7 @@
 // MythTV stuff
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythtv/tvremoteutil.h"
 #include "libmythui/mythdialogbox.h"

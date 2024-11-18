@@ -20,6 +20,7 @@
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"
 #include "channelutil.h"

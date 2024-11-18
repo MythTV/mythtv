@@ -11,7 +11,6 @@
 
 // MythTV headers
 #include "libmythbase/mthread.h"
-#include "libmythbase/mythlogging.h"
 
 #include "audiooutput.h"
 #include "samplerate.h"

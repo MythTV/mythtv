@@ -1,6 +1,9 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include "atsctables.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "atscdescriptors.h"
 
 QString MasterGuideTable::TableClassString(uint i) const

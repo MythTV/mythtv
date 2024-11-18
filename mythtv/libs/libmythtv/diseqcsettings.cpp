@@ -11,7 +11,6 @@
 
 // MythTV headers
 #include "libmythbase/mythdbcon.h"
-#include "libmythbase/mythlogging.h"
 #include "diseqcsettings.h"
 
 /* Lat/Long items relocated from videosource.cpp */

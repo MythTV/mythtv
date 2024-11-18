@@ -1,5 +1,6 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythdisplayosx.h"
 #import  "mythosxutils.h"

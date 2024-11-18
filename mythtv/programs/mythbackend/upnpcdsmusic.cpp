@@ -18,6 +18,7 @@
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythupnp/httprequest.h"
 #include "libmythupnp/upnphelpers.h"

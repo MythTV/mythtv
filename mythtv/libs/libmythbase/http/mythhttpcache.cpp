@@ -2,7 +2,6 @@
 #include <QCryptographicHash>
 
 // MythTV
-#include "mythlogging.h"
 #include "mythdate.h"
 #include "http/mythhttpdata.h"
 #include "http/mythhttpfile.h"

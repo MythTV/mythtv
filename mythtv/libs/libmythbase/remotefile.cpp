@@ -23,6 +23,7 @@ static constexpr int8_t O_LARGEFILE { 0 };
 #include "mythtimer.h"
 #include "mythdate.h"
 #include "mythmiscutil.h"
+#include "mythlogging.h"
 #include "threadedfilewriter.h"
 #include "storagegroup.h"
 

@@ -1,6 +1,9 @@
 #include <algorithm>
 
 #include "captions/cc608reader.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "mythplayer.h"
 
 CC608Reader::CC608Reader(MythPlayer *parent)

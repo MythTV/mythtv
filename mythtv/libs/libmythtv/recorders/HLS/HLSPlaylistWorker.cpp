@@ -1,4 +1,7 @@
 #include "HLSPlaylistWorker.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "HLSReader.h"
 
 const int PLAYLIST_FAILURE = 20;  // number of consecutive failures after which

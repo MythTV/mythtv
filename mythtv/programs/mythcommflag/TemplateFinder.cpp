@@ -13,6 +13,7 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"  /* gContext */
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythtv/mythframe.h"          /* VideoFrame */
 #include "libmythtv/mythplayer.h"

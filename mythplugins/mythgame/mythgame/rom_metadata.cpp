@@ -61,10 +61,6 @@ QString crcinfo(const QString& romname, const QString& GameType, QString *key, R
     QString crcRes;
 
     int blocksize = 8192;
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG,
-        QString("crcinfo : %1 : %2 :").arg(romname).arg(GameType));
-#endif
 
     int err { ZIP_ER_OK };
     zip_t *zf = zip_open(qPrintable(romname), 0, &err);

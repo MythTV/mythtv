@@ -30,7 +30,6 @@
 #include <QStack>
 
 // MythTV
-#include "libmythbase/mythlogging.h"
 #include "libmythui/mythuiexp.h"
 #include "libmythui/mythrender_base.h"
 #include "libmythui/mythuianimation.h"

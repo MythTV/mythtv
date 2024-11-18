@@ -10,6 +10,7 @@
 // mythtv
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/remotefile.h>
 #include <libmythbase/stringutil.h>
 #include <libmythbase/storagegroup.h>

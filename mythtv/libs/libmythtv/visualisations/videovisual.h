@@ -8,7 +8,6 @@
 #include <QDateTime>
 
 #include "libmyth/visual.h"
-#include "libmythbase/mythlogging.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythui/mythpainter.h"
 #include "libmythui/mythrender_base.h"

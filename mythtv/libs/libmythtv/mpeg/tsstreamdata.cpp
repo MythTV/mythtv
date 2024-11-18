@@ -3,6 +3,8 @@
 
 #include "tsstreamdata.h"
 
+#include "libmythbase/mythlogging.h"
+
 #define LOC QString("TSStream[%1](0x%2): ").arg(m_cardId).arg((intptr_t)this, QT_POINTER_SIZE, 16, QChar('0'))
 
 /** \class TSStreamData

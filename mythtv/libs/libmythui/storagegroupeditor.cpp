@@ -10,7 +10,6 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
-#include "libmythbase/mythlogging.h"
 #include "libmythui/mythuifilebrowser.h"
 
 #include "storagegroupeditor.h"

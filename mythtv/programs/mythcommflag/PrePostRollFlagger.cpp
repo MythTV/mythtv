@@ -8,6 +8,7 @@
 
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 #include "libmythtv/mythcommflagplayer.h"
 

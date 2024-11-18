@@ -12,6 +12,7 @@
 #include <QRegularExpression>
 
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
 
 #include "channelutil.h"

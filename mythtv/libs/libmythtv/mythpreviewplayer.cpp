@@ -4,6 +4,8 @@
 // MythTV
 #include "mythpreviewplayer.h"
 
+#include "libmythbase/mythlogging.h"
+
 #define LOC QString("PreviewPlayer: ")
 
 MythPreviewPlayer::MythPreviewPlayer(PlayerContext* Context, PlayerFlags Flags)

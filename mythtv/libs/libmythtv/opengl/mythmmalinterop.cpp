@@ -1,4 +1,6 @@
 // MythTV
+#include "libmythbase/mythlogging.h"
+
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
 #include "opengl/mythmmalinterop.h"

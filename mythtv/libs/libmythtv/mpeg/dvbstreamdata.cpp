@@ -4,6 +4,9 @@
 
 #include <QSharedPointer>
 #include "dvbstreamdata.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "dvbtables.h"
 #include "mpegdescriptors.h"
 #include "mpegtables.h"

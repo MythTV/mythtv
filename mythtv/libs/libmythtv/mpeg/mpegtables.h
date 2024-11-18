@@ -7,6 +7,7 @@
 #include <utility>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h" // for xml_indent
 #include "libmythtv/mpeg/mpegdescriptors.h"
 #include "libmythtv/mpeg/pespacket.h"

@@ -1,5 +1,4 @@
 // MythTV
-#include "mythlogging.h"
 #include "http/mythhttpservices.h"
 #include "http/mythhttpmetaservice.h"
 

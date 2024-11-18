@@ -10,6 +10,7 @@
 #endif
 
 // MythTV
+#include "libmythbase/mythlogging.h"
 #include "mythedid.h"
 #include "platforms/drm/mythdrmvrr.h"
 #include "platforms/drm/mythdrmencoder.h"

@@ -6,6 +6,7 @@
 
 #include <QFile>
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputalsa.h"
 
 #define LOC QString("ALSA: ")

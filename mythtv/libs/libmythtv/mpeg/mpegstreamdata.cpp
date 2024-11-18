@@ -10,6 +10,7 @@
 #include <QString>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
 #include "mpegstreamdata.h"
 #include "mpegtables.h"
 

@@ -1,7 +1,6 @@
 #include <QStringList>
 #include <utility>
 
-#include "libmythbase/mythlogging.h"
 #include "sockethandler.h"
 
 SocketHandler::SocketHandler(MythSocket *sock, MythSocketManager *parent,

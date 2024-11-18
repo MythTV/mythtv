@@ -18,6 +18,7 @@
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
