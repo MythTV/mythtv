@@ -1220,7 +1220,7 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
         .arg(seconds.count()));
 
-    SSDP::Instance()->PerformSearch(kBackendURI, seconds);
+    SSDP::Instance()->PerformSearch(SSDP::kBackendURI, seconds);
 
     // Search for a total of 'milliSeconds' ms, sending new search packet
     // about every 250 ms until less than one second remains.
@@ -1235,12 +1235,12 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
             auto ttlSeconds = duration_cast<std::chrono::seconds>(ttl);
             LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
                 .arg(ttlSeconds.count()));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
+            SSDP::Instance()->PerformSearch(SSDP::kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }
 
-    SSDPCacheEntries *backends = SSDP::Find(kBackendURI);
+    SSDPCacheEntries *backends = SSDP::Find(SSDP::kBackendURI);
 
     if (!backends)
     {
@@ -1314,7 +1314,7 @@ bool MythContext::Impl::DefaultUPnP(QString& Error)
     auto timeout_s = duration_cast<std::chrono::seconds>(timeout_ms);
     LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
         .arg(timeout_s.count()));
-    SSDP::Instance()->PerformSearch(kBackendURI, timeout_s);
+    SSDP::Instance()->PerformSearch(SSDP::kBackendURI, timeout_s);
 
     // ----------------------------------------------------------------------
     // We need to give the server time to respond...
@@ -1327,7 +1327,7 @@ bool MythContext::Impl::DefaultUPnP(QString& Error)
     searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        devicelocation = SSDP::Find(kBackendURI, usn);
+        devicelocation = SSDP::Find(SSDP::kBackendURI, usn);
         if (devicelocation)
             break;
 
@@ -1339,7 +1339,7 @@ bool MythContext::Impl::DefaultUPnP(QString& Error)
             auto ttlSeconds = duration_cast<std::chrono::seconds>(ttl);
             LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
                 .arg(ttlSeconds.count()));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
+            SSDP::Instance()->PerformSearch(SSDP::kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }

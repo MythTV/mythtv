@@ -252,12 +252,12 @@ void BackendSelection::Cancel(void)
 void BackendSelection::Load(void)
 {
     SSDP::AddListener(this);
-    SSDP::Instance()->PerformSearch(kBackendURI);
+    SSDP::Instance()->PerformSearch(SSDP::kBackendURI);
 }
 
 void BackendSelection::Init(void)
 {
-    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find(kBackendURI);
+    SSDPCacheEntries *pEntries = SSDPCache::Instance()->Find(SSDP::kBackendURI);
     if (pEntries)
     {
         EntryMap ourMap;
