@@ -62,7 +62,7 @@ class Testvideometadata: public QObject
     {
         // With Spaces as separator
         TestMetadata(QString("A Movie Title (1984).mpg"),
-                     QString("A Movie Title"),
+                     QString("A Movie Title (1984)"),
                      QString(""),
                      0,
                      0);
