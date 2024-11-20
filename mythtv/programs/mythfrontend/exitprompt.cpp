@@ -162,15 +162,8 @@ void ExitPrompter::MainDialogClosed(const QString& /*unused*/, int Id)
 
 void ExitPrompter::HandleExit()
 {
-    // HACK IsFrontendOnly() triggers a popup if there is no BE connection.
-    // We really don't need that right now. This hack prevents it.
-    gContext->SetDisableEventPopup(true);
-
     // first of all find out, if this is a frontend only host...
     bool frontendOnly = gCoreContext->IsFrontendOnly();
-
-    // HACK Undo the hack, just in case we _don't_ quit:
-    gContext->SetDisableEventPopup(false);
 
     // how do you want to quit today?
     bool allowExit     = false;
@@ -297,10 +290,8 @@ void ExitPrompter::Confirm(MythPower::Feature Action)
         default: break;
     }
 
-    gContext->SetDisableEventPopup(true);
     if (!gCoreContext->IsFrontendOnly())
         msg.prepend(tr("Mythbackend is running on this system. "));
-    gContext->SetDisableEventPopup(false);
 
     auto *dlg = new MythConfirmationDialog(ss, msg);
 
