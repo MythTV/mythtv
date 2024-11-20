@@ -6,6 +6,7 @@
 #include <QEvent>
 #include <QDir>
 #include <QUrl>
+#include <QRegularExpression>
 
 // myth
 #include "libmythbase/mythcorecontext.h"
@@ -199,7 +200,7 @@ void MetadataDownload::run()
                     MetadataLookup *newlookup = list.takeFirst();
 
                     // pass through automatic type
-                    newlookup->SetAutomatic(true);   // ### XXX RER
+                    newlookup->SetAutomatic(true);
                     newlookup->SetStep(kLookupData);
                     // Type may have changed
                     LookupType ret = GuessLookupType(newlookup);
@@ -252,11 +253,20 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
 {
     unsigned int exactMatches = 0;
     unsigned int exactMatchesWithArt = 0;
+    static const QRegularExpression year { R"( \(\d{4}\)$)" };
 
     for (const auto& lkup : std::as_const(list))
     {
-        // Consider exact title matches (ignoring case)
-        if ((QString::compare(lkup->GetTitle(), originaltitle, Qt::CaseInsensitive) == 0))
+        // Consider exact title matches with or without trailing '(year)' (ignoring case)
+        QString titlewoyear = originaltitle;
+        auto match = year.match(titlewoyear);
+        if (match.hasMatch())
+        {
+            titlewoyear.remove(match.capturedStart(), match.capturedLength());
+        }
+
+        if ((QString::compare(lkup->GetTitle(), originaltitle, Qt::CaseInsensitive) == 0) ||
+            (QString::compare(lkup->GetTitle(), titlewoyear, Qt::CaseInsensitive) == 0))
         {
             // In lookup by name, the television database tends to only include Banner artwork.
             // In lookup by name, the movie database tends to include only Fan and Cover artwork.
@@ -285,24 +295,53 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     int exactMatches = 0;
     int exactMatchesWithArt = 0;
     bool foundMatchWithArt = false;
+    bool foundMatchWithYear = false;
+    uint year = 0;
+
+    QString titlewoyear = originaltitle;
+
+    static const QRegularExpression regexyear { R"( \(\d{4}\)$)" };
+
+    auto match = regexyear.match(titlewoyear);
+    if (match.hasMatch())
+    {
+        titlewoyear.remove(match.capturedStart(), match.capturedLength());
+        year = match.captured(0).replace(" (","").replace(")","").toUInt();
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Looking for: '%1' with release year: '%2'")
+                                            .arg(titlewoyear, QString::number(year)));
+    }
 
     // Build a list of all the titles
     for (const auto& lkup : std::as_const(list))
     {
         QString title = lkup->GetTitle();
-        LOG(VB_GENERAL, LOG_INFO, QString("Comparing metadata title '%1' [%2] to recording title '%3'")
-                .arg(title, lkup->GetReleaseDate().toString(), originaltitle));
-        // Consider exact title matches (ignoring case), which have some artwork available.
-        if (QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0)
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Comparing metadata title '%1' [%2] to recording title '%3' [%4]")
+                    .arg(title, lkup->GetReleaseDate().toString(), titlewoyear,
+                         (year == 0) ? "N/A" : QString::number(year)));
+
+        // Consider exact title matches with or without trailing '(year)' (ignoring case),
+        // which have some artwork available.
+        if ((QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0) ||
+            (QString::compare(title, titlewoyear, Qt::CaseInsensitive) == 0))
         {
             bool hasArtwork = ((!(lkup->GetArtwork(kArtworkFanart)).empty()) ||
                                (!(lkup->GetArtwork(kArtworkCoverart)).empty()) ||
                                (!(lkup->GetArtwork(kArtworkBanner)).empty()));
 
-            LOG(VB_GENERAL, LOG_INFO, QString("'%1', popularity = %2, ReleaseDate = %3")
+            if ((lkup->GetYear() != 0) && (year == lkup->GetYear()))
+            {
+                exactTitleDate = lkup->GetReleaseDate();
+                exactTitlePopularity = lkup->GetPopularity();
+                foundMatchWithYear = true;
+                ret = lkup;
+            }
+
+            LOG(VB_GENERAL, LOG_INFO, QString("'%1', popularity = %2, ReleaseDate = %3, Year = %4")
                     .arg(title)
                     .arg(lkup->GetPopularity())
-                    .arg(lkup->GetReleaseDate().toString()));
+                    .arg(lkup->GetReleaseDate().toString())
+                    .arg(lkup->GetYear()));
 
             // After the first exact match, prefer any more popular one.
             // Most of the Movie database entries have Popularity fields.
@@ -310,8 +349,9 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
             // so if none are found so far in the search, pick the most recently
             // released entry with artwork. Also, if the first exact match had
             // no artwork, prefer any later exact match with artwork.
+            // Stop searching if we have already found a match with correct year.
             if ((ret == nullptr) ||
-                (hasArtwork &&
+                (hasArtwork && !foundMatchWithYear &&
                  ((!foundMatchWithArt) ||
                   ((lkup->GetPopularity() > exactTitlePopularity)) ||
                   ((exactTitlePopularity == 0.0F) && (lkup->GetReleaseDate() > exactTitleDate)))))
@@ -320,6 +360,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                 exactTitlePopularity = lkup->GetPopularity();
                 ret = lkup;
             }
+
             exactMatches++;
             if (hasArtwork)
             {
@@ -348,8 +389,10 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
         {
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Multiple exact title matches found for '%1'. "
-                        "Selecting most popular or most recent [%2]")
-                    .arg(originaltitle, exactTitleDate.toString()));
+                        "Selecting by exact year [%2] or most popular or most recent [%3]")
+                        .arg(originaltitle,
+                             (year == 0) ? "N/A" : QString::number(year),
+                             exactTitleDate.toString()));
         }
         return ret;
     }
