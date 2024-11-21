@@ -2493,7 +2493,9 @@ V2PowerPriorityList* V2Dvr::GetPowerPriorityList (const QString &PriorityName )
         }
     }
     else
+    {
         throw (QString("Error accessing powerpriority table"));
+    }
 
     return pList;
 }
