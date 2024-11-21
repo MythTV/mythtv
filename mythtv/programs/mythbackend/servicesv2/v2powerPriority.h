@@ -29,7 +29,7 @@ class V2PowerPriority : public QObject
     public:
 
         Q_INVOKABLE V2PowerPriority(QObject *parent = nullptr)
-            : QObject( parent ), m_RecPriority(0)
+            : QObject( parent )
         {
         }
 
