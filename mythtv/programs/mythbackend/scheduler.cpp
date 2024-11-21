@@ -1095,9 +1095,11 @@ bool Scheduler::FindNextConflict(
             continue;
 
         if (debugConflicts)
+        {
             msg = QString("comparing '%1' on %2 with '%3' on %4")
-                .arg(p->GetTitle()).arg(p->GetChanNum())
-                .arg(q->GetTitle()).arg(q->GetChanNum());
+                .arg(p->GetTitle(), p->GetChanNum(),
+                     q->GetTitle(), q->GetChanNum());
+        }
 
         if (p->GetInputID() != q->GetInputID() && !ignoreinput)
         {
