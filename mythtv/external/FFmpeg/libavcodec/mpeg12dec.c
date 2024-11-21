@@ -67,7 +67,7 @@ enum Mpeg2ClosedCaptionsFormat {
     CC_FORMAT_A53_PART4,
     CC_FORMAT_SCTE20,
     CC_FORMAT_DVD,
-    CC_FORMAT_DISH
+    CC_FORMAT_DVB_0502
 };
 
 typedef struct Mpeg1Context {
@@ -2060,10 +2060,10 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
             mpeg_set_cc_format(avctx, CC_FORMAT_DVD, "DVD");
         }
         return 1;
-    } else if ((!s1->cc_format || s1->cc_format == CC_FORMAT_DISH) &&
+    } else if ((!s1->cc_format || s1->cc_format == CC_FORMAT_DVB_0502) &&
                buf_size >= 12 &&
                p[0] == 0x05 && p[1] == 0x02) {
-        /* extract Dish Network DVB CC data */
+        /* extract DVB 0502 CC data */
         const uint8_t cc_header = 0xf8 | 0x04 /* valid */ | 0x00 /* line 21 field 1 */;
         uint8_t cc_data[4] = {0};
         int cc_count = 0;
@@ -2119,8 +2119,7 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
                 }
             }
 
-            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
-            mpeg_set_cc_format(avctx, CC_FORMAT_DISH, "Dish Network DVB");
+            mpeg_set_cc_format(avctx, CC_FORMAT_DVB_0502, "DVB 0502");
         }
         return 1;
     }
@@ -2693,8 +2692,8 @@ static const AVOption mpeg2video_options[] = {
         { .i64 =   CC_FORMAT_SCTE20 },              .flags = M2V_PARAM, .unit = "cc_format" },
        { "dvd",    "pick DVD CC substream",         0, AV_OPT_TYPE_CONST,
         { .i64 =   CC_FORMAT_DVD },                 .flags = M2V_PARAM, .unit = "cc_format" },
-       { "dish",   "pick Dish Network DVB CC substream", 0, AV_OPT_TYPE_CONST,
-        { .i64 =   CC_FORMAT_DISH },                 .flags = M2V_PARAM, .unit = "cc_format" },
+       { "dvb_0502", "pick DVB 0502 CC substream",  0, AV_OPT_TYPE_CONST,
+        { .i64 =   CC_FORMAT_DVB_0502 },            .flags = M2V_PARAM, .unit = "cc_format" },
     { NULL }
 };
 
