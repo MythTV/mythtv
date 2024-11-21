@@ -423,7 +423,7 @@ void HDHRChannelFetcher::run(void)
                 }
             }
 
-            uint mplexID;
+            uint mplexID {0};
             QString freqID;
 
             if (usingCableCard)
