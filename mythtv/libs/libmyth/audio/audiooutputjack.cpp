@@ -17,6 +17,7 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
@@ -71,7 +72,9 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
         goto err_out;
     }
     else
+    {
         settings->AddSupportedRate(rate);
+    }
 
     // Jack only wants float format samples (de-interleaved for preference)
     settings->AddSupportedFormat(FORMAT_FLT);
@@ -270,7 +273,9 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
                                                                 10000.0);
         }
         else
+        {
             volumes[channel] = 1.0 / 1.0; // ie no effect
+        }
     }
 
     if (m_channels == 2)
@@ -478,8 +483,7 @@ int AudioOutputJACK::JackGraphOrderCallback(void)
     {
         jack_port_get_latency_range( m_ports[i], JackPlaybackLatency, &latency_range );
         jack_nframes_t port_latency = latency_range.max;
-        if (port_latency > max_latency)
-            max_latency = port_latency;
+        max_latency = std::max(port_latency, max_latency);
     }
 
     m_jackLatency = max_latency;
