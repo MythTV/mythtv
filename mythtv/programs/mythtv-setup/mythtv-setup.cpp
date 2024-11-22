@@ -16,7 +16,6 @@
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmythui/storagegroupeditor.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
@@ -29,7 +28,6 @@
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/channelimporter.h"
 #include "libmythtv/channelscan/channelscanner_cli.h"
@@ -58,11 +56,6 @@ ExitPrompter   *exitPrompt  = nullptr;
 StartPrompter  *startPrompt = nullptr;
 
 static MythThemedMenu *menu;
-
-static void cleanup()
-{
-    SignalHandler::Done();
-}
 
 static void SetupMenuCallback(void* /* data */, QString& selection)
 {
@@ -298,10 +291,6 @@ int main(int argc, char *argv[])
     }
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     if (cmdline.toBool("geometry"))
         geometry = cmdline.toString("geometry");
 
@@ -378,7 +367,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    CleanupGuard callCleanup(cleanup);
     cmdline.ApplySettingsOverride();
 
     if (!GetMythDB()->HaveSchema())

@@ -20,7 +20,6 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jitterometer.h"
 #include "libmythtv/mythplayerui.h"
@@ -250,10 +249,6 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
 
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     if (cmdline.toBool("test"))
     {
         std::chrono::seconds seconds = 5s;
@@ -288,8 +283,6 @@ int main(int argc, char *argv[])
             TV::StartTV(&pginfo, kStartTVNoFlags);
         }
     }
-
-    SignalHandler::Done();
 
     return GENERIC_EXIT_OK;
 }

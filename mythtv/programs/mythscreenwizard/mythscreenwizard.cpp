@@ -25,7 +25,6 @@
 // MythTV
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
@@ -34,7 +33,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/mythsystemevent.h"
 #include "libmythui/mythdisplay.h"
 #include "libmythui/mythmainwindow.h"
@@ -47,14 +45,6 @@
 #define LOC      QString("MythScreenWizard: ")
 #define LOC_WARN QString("MythScreenWizard, Warning: ")
 #define LOC_ERR  QString("MythScreenWizard, Error: ")
-
-namespace
-{
-    void cleanup()
-    {
-        SignalHandler::Done();
-    }
-}
 
 // If the theme specified in the DB is somehow broken, try a standard one:
 //
@@ -122,13 +112,6 @@ int main(int argc, char **argv)
     int retval = cmdline.ConfigureLogging(mask, false);
     if (retval != GENERIC_EXIT_OK)
         return retval;
-
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
 
     retval = cmdline.ConfigureLogging();
     if (retval != GENERIC_EXIT_OK)

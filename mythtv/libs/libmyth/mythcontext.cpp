@@ -50,6 +50,7 @@
 #include "libmythbase/portchecker.h"
 #include "libmythbase/referencecounter.h"
 #include "libmythbase/remotefile.h"
+#include "libmythbase/signalhandling.h"
 #include "libmythui/guistartup.h"
 #include "libmythui/langsettings.h"
 #include "libmythui/mediamonitor.h"
@@ -1550,6 +1551,7 @@ MythContext::MythContext(QString binversion, bool needsBackend)
     }
 #endif
 
+    SignalHandler::Init();
     m_impl->m_needsBackend = needsBackend;
 
     gCoreContext = new MythCoreContext(m_appBinaryVersion, m_impl);
@@ -1667,6 +1669,7 @@ MythContext::~MythContext()
         DestroyMythMainWindow();
     }
 
+    SignalHandler::Done();
     gCoreContext->InitPower(false /*destroy*/);
     if (MThreadPool::globalInstance()->activeThreadCount())
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");

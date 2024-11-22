@@ -26,7 +26,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/tv_play.h"
 
 // mythlcdserver
@@ -104,17 +103,12 @@ int main(int argc, char **argv)
         }
     }
 
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     //  Get the MythTV context and db hooks
     MythContext context {MYTH_BINARY_VERSION};
     if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "lcdserver: Could not initialize MythContext. Exiting.");
-        SignalHandler::Done();
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -134,8 +128,6 @@ int main(int argc, char **argv)
     QCoreApplication::exec();
 
     delete server;
-
-    SignalHandler::Done();
 
     return GENERIC_EXIT_OK;
 }
