@@ -51,9 +51,6 @@ QString   logfile  = "";
 
 static void cleanup(void)
 {
-    delete gContext;
-    gContext = nullptr;
-
     if (!pidfile.isEmpty())
     {
         unlink(pidfile.toLatin1().constData());
@@ -104,8 +101,8 @@ int main(int argc, char *argv[])
 #endif
 
     ms_sd_notify("STATUS=Connecting to database.");
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

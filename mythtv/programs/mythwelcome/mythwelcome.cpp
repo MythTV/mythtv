@@ -79,10 +79,10 @@ int main(int argc, char **argv)
     SignalHandler::Init();
 #endif
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, true);
+    MythContext context {MYTH_BINARY_VERSION, true};
 
     cmdline.ApplySettingsOverride();
-    if (!gContext->Init())
+    if (!context.Init())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "mythwelcome: Could not initialize MythContext. Exiting.");
@@ -142,9 +142,6 @@ int main(int argc, char **argv)
     }
 
     mw_sd_notify("STOPPING=1\nSTATUS=Exiting");
-    DestroyMythMainWindow();
-
-    delete gContext;
 
     SignalHandler::Done();
 

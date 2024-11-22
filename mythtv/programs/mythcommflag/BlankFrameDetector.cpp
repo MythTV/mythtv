@@ -5,7 +5,7 @@
 #include <utility>
 
 // MythTV headers
-#include "libmythbase/mythcorecontext.h"    /* gContext */
+#include "libmythbase/mythcorecontext.h"
 #include "libmythtv/mythplayer.h"
 
 // Commercial Flagging headers

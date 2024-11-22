@@ -11,7 +11,7 @@
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"
-#include "libmythbase/mythcorecontext.h"  /* gContext */
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythtv/mythframe.h"          /* VideoFrame */

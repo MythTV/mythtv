@@ -851,8 +851,8 @@ int main(int argc, char **argv)
     SignalHandler::Init();
 #endif
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Error: "
             "Could not initialize MythContext. Exiting.\n");
@@ -916,8 +916,6 @@ int main(int argc, char **argv)
     {
         cmdline.PrintHelp();
     }
-
-    delete gContext;
 
     SignalHandler::Done();
 

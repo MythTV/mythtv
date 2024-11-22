@@ -31,29 +31,13 @@ class MPUBLIC MythContext
 
     void SetDisableEventPopup(bool check);
 
-    enum WebOnlyStartup : std::uint8_t {
-        kWebOnlyNone = 0,
-        kWebOnlyDBSetup = 1,
-        kWebOnlyDBTimezone = 2,
-        kWebOnlyWebOnlyParm = 3,
-        kWebOnlyIPAddress = 4,
-        kWebOnlySchemaUpdate = 5
-    };
-
-    void setWebOnly(WebOnlyStartup w) {m_webOnly = w;}
-    WebOnlyStartup getWebOnly() {return m_webOnly;}
-
   private:
     Q_DISABLE_COPY(MythContext)
 
     class Impl;
     Impl   *m_impl {nullptr}; ///< PIMPL idiom
     QString             m_appBinaryVersion;
-    WebOnlyStartup      m_webOnly {kWebOnlyNone};
 };
-
-/// This global variable contains the MythContext instance for the application
-extern MPUBLIC MythContext *gContext;
 
 #endif
 

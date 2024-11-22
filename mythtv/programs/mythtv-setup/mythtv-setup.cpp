@@ -62,11 +62,6 @@ static QString  logfile;
 
 static void cleanup()
 {
-    DestroyMythMainWindow();
-
-    delete gContext;
-    gContext = nullptr;
-
     SignalHandler::Done();
 }
 
@@ -182,7 +177,7 @@ static bool RunMenu(const QString& themedir, const QString& themename)
 
     if (menu->foundTheme())
     {
-        menu->setCallback(SetupMenuCallback, gContext);
+        menu->setCallback(SetupMenuCallback, nullptr);
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return true;
     }
@@ -292,7 +287,6 @@ int main(int argc, char *argv[])
     }
 
     std::unique_ptr<QCoreApplication> app {nullptr};
-    CleanupGuard callCleanup(cleanup);
 
     if (use_display)
     {
@@ -376,15 +370,16 @@ int main(int argc, char *argv[])
     if (!geometry.isEmpty())
         MythMainWindow::ParseGeometryOverride(geometry);
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    MythContext context {MYTH_BINARY_VERSION};
 
     cmdline.ApplySettingsOverride();
-    if (!gContext->Init(use_display,false,true)) // No Upnp, Prompt for db
+    if (!context.Init(use_display,false,true)) // No Upnp, Prompt for db
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+    CleanupGuard callCleanup(cleanup);
     cmdline.ApplySettingsOverride();
 
     if (!GetMythDB()->HaveSchema())

@@ -9,7 +9,6 @@
 #include <QUrl>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
@@ -299,7 +298,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
         return true;
     }
-    else if ((request->m_sMethod == "Database") || (nullptr == gContext))
+    else if (request->m_sMethod == "Database")
     {
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_database.xml";

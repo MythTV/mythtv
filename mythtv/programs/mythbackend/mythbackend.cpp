@@ -32,6 +32,7 @@
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
@@ -56,6 +57,7 @@
 #include "mythbackend_main_helpers.h"
 #include "scheduler.h"
 
+#include "servicesv2/v2myth.h"
 
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
@@ -128,8 +130,6 @@ int main(int argc, char **argv)
         // Don't listen to console input if daemonized
         close(0);
 
-    CleanupGuard callCleanup(cleanup);
-
 #ifndef _WIN32
     SignalHandler::Init();
 #endif
@@ -137,31 +137,31 @@ int main(int argc, char **argv)
 #if CONFIG_SYSTEMD_NOTIFY
     (void)sd_notify(0, "STATUS=Connecting to database.");
 #endif
-    gContext = new MythContext(MYTH_BINARY_VERSION);
 
+    /*
+    InitializeMythDirs() is called by MythContext(), but we need to call it
+    first so XmlConfiguration() can find the configuration file.
+    */
+    InitializeMythDirs();
     // If setup has not been done (ie. the config.xml does not exist),
     // set the ignoreDB flag, which will cause only the web-app to
     // start, so that setup can be done.
-
-    bool ignoreDB = false;
-    {
-        auto config = XmlConfiguration();
-        ignoreDB = !config.FileExists();
-        if (ignoreDB)
-            gContext->setWebOnly(MythContext::kWebOnlyDBSetup);
-    }
+    bool ignoreDB = !(XmlConfiguration().FileExists());
+    if (ignoreDB)
+        V2Myth::s_WebOnlyStartup = V2Myth::kWebOnlyDBSetup;
 
     // Init Parameters:
     // bool Init(bool gui = true,
     //           bool promptForBackend = false,
     //           bool disableAutoDiscovery = false,
     //           bool ignoreDB = false);
-
-    if (!gContext->Init(false,false,false,ignoreDB))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false,false,false,ignoreDB))
     {
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+    CleanupGuard callCleanup(cleanup);
 
     MythTranslation::load("mythfrontend");
 
