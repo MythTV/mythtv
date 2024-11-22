@@ -39,7 +39,6 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
@@ -129,10 +128,6 @@ int main(int argc, char **argv)
     if (daemonize)
         // Don't listen to console input if daemonized
         close(0);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
 
 #if CONFIG_SYSTEMD_NOTIFY
     (void)sd_notify(0, "STATUS=Connecting to database.");

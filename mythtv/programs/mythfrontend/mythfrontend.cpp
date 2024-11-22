@@ -348,8 +348,6 @@ namespace
             delete g_settingsHelper;
             g_settingsHelper = nullptr;
         }
-
-        SignalHandler::Done();
     }
 }
 
@@ -1992,12 +1990,6 @@ Q_DECL_EXPORT int main(int argc, char **argv)
            .toUtf8().constData(), 1);
 #endif
 
-#ifndef _WIN32
-    SignalHandler::Init();
-    SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
-    SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
-#endif
-
 #if defined(Q_OS_ANDROID)
     auto config = QSslConfiguration::defaultConfiguration();
     config.setCaCertificates(QSslConfiguration::systemCaCertificates());
@@ -2033,6 +2025,9 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
     CleanupGuard callCleanup(cleanup);
+
+    SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
+    SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
 
     cmdline.ApplySettingsOverride();
 

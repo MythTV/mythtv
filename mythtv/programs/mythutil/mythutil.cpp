@@ -15,7 +15,6 @@
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/signalhandling.h"
 
 // Local includes
 #include "backendutils.h"
@@ -123,10 +122,6 @@ int main(int argc, char *argv[])
     if (!cmdline.toBool("loglevel"))
         logLevel = defaultLevel;
 
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     MythContext context {MYTH_BINARY_VERSION};
     if (!context.Init(false))
     {
@@ -166,8 +161,6 @@ int main(int argc, char *argv[])
         cmdline.PrintHelp();
         cmdResult = GENERIC_EXIT_INVALID_CMDLINE;
     }
-
-    SignalHandler::Done();
 
     return cmdResult;
 }

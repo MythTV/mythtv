@@ -36,7 +36,6 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/eitcache.h"
@@ -322,8 +321,6 @@ void cleanup(void)
         QFile::remove(gPidFile);
         gPidFile.clear();
     }
-
-    SignalHandler::Done();
 }
 
 int handle_command(const MythBackendCommandLineParser &cmdline)
