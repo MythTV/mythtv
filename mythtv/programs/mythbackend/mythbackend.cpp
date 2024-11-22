@@ -25,7 +25,6 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/exitcodes.h"
@@ -156,7 +155,7 @@ int main(int argc, char **argv)
         LOG(VB_GENERAL, LOG_CRIT, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-    CleanupGuard callCleanup(cleanup);
+    context.setCleanup(cleanup);
 
     MythTranslation::load("mythfrontend");
 

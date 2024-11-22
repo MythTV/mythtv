@@ -83,7 +83,6 @@ set(LIBMYTHBASE_HEADERS
 
 set(LIBMYTHBASE_HEADERS_NOT_INSTALLED
     mythbinaryplist.h
-    cleanupguard.h
     configuration.h
     housekeeper.h
     logging.h
@@ -145,7 +144,6 @@ add_library(
   ${LIBMYTHBASE_HEADERS}
   ${LIBMYTHBASE_HEADERS_NOT_INSTALLED}
   ${LIBMYTHBASE_HTTP_HEADERS}
-  cleanupguard.cpp
   configuration.cpp
   dbcheckcommon.cpp
   dbutil.cpp

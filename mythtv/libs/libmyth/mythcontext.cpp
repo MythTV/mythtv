@@ -1664,6 +1664,11 @@ bool MythContext::Init(const bool gui,
 
 MythContext::~MythContext()
 {
+    if (m_cleanup != nullptr)
+    {
+        m_cleanup();
+    }
+
     if (m_impl->m_gui)
     {
         DestroyMythMainWindow();

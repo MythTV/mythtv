@@ -27,6 +27,9 @@ class MPUBLIC MythContext
               bool disableAutoDiscovery = false,
               bool ignoreDB = false);
 
+    using CleanupFunction = void (*)();
+    void setCleanup(CleanupFunction cleanup) { m_cleanup = cleanup; }
+
     bool saveSettingsCache();
 
     void SetDisableEventPopup(bool check);
@@ -37,6 +40,11 @@ class MPUBLIC MythContext
     class Impl;
     Impl   *m_impl {nullptr}; ///< PIMPL idiom
     QString             m_appBinaryVersion;
+    /**
+    This is used to destroy global state before main() returns.  It is called
+    first before anything else is done in ~MythContext() if it is not nullptr.
+    */
+    CleanupFunction     m_cleanup {nullptr};
 };
 
 #endif
