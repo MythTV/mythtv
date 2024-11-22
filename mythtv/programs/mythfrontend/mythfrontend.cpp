@@ -36,7 +36,6 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythmediamonitor.h"
 #include "libmyth/standardsettings.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"  // For SIG* on MinGW
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/hardwareprofile.h"
@@ -2024,7 +2023,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         gCoreContext->SetExiting(true);
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-    CleanupGuard callCleanup(cleanup);
+    context.setCleanup(cleanup);
 
     SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
     SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
