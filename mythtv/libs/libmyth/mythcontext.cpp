@@ -48,6 +48,7 @@
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/portchecker.h"
+#include "libmythbase/referencecounter.h"
 #include "libmythbase/remotefile.h"
 #include "libmythui/guistartup.h"
 #include "libmythui/langsettings.h"
@@ -63,9 +64,6 @@
 #include "dbsettings.h"
 
 #define LOC      QString("MythContext: ")
-
-MythContext *gContext = nullptr;
-
 static const QString sLocation = "MythContext";
 
 namespace
@@ -1664,6 +1662,11 @@ bool MythContext::Init(const bool gui,
 
 MythContext::~MythContext()
 {
+    if (m_impl->m_gui)
+    {
+        DestroyMythMainWindow();
+    }
+
     gCoreContext->InitPower(false /*destroy*/);
     if (MThreadPool::globalInstance()->activeThreadCount())
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
@@ -1680,6 +1683,8 @@ MythContext::~MythContext()
     gCoreContext = nullptr;
 
     delete m_impl;
+
+    ReferenceCounter::PrintDebug();
 }
 
 void MythContext::SetDisableEventPopup(bool check)

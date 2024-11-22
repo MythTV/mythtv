@@ -2391,12 +2391,10 @@ static int main_local(int argc, char **argv)
     // Don't listen to console input
     close(0);
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
-        delete gContext;
-        gContext = nullptr;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -2556,9 +2554,6 @@ static int main_local(int argc, char **argv)
     {
         cmdline.PrintHelp();
     }
-
-    delete gContext;
-    gContext = nullptr;
 
     exit(res);
 }

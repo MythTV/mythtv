@@ -52,13 +52,6 @@ namespace
 {
     void cleanup()
     {
-        DestroyMythMainWindow();
-
-        delete gContext;
-        gContext = nullptr;
-
-        ReferenceCounter::PrintDebug();
-
         SignalHandler::Done();
     }
 }
@@ -141,8 +134,8 @@ int main(int argc, char **argv)
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(true, false, true))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(true, false, true))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

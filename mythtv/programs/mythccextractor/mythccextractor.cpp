@@ -25,8 +25,6 @@
 namespace {
     void cleanup()
     {
-        delete gContext;
-        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -137,8 +135,8 @@ int main(int argc, char *argv[])
     SignalHandler::Init();
 #endif
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(
             false/*use gui*/, false/*prompt for backend*/,
             false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {

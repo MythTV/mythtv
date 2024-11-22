@@ -109,8 +109,8 @@ int main(int argc, char **argv)
 #endif
 
     //  Get the MythTV context and db hooks
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "lcdserver: Could not initialize MythContext. Exiting.");
@@ -134,7 +134,6 @@ int main(int argc, char **argv)
     QCoreApplication::exec();
 
     delete server;
-    delete gContext;
 
     SignalHandler::Done();
 

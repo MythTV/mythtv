@@ -45,9 +45,6 @@
 JobQueue *jobqueue = nullptr;
 static void cleanup(void)
 {
-    delete gContext;
-    gContext = nullptr;
-
     SignalHandler::Done();
 }
 
@@ -91,8 +88,8 @@ int main(int argc, char *argv[])
     SignalHandler::Init();
 #endif
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

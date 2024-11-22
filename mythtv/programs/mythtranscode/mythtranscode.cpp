@@ -141,8 +141,6 @@ namespace
 {
     void cleanup()
     {
-        delete gContext;
-        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -382,8 +380,8 @@ int main(int argc, char *argv[])
 #endif
 
     //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
