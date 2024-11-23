@@ -562,7 +562,7 @@ void ChannelGroup::UpdateChannelGroups(void)
             if (query.numRowsAffected() > 0)
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Removed %1 channels from channelgroup %2")
-                    .arg(query.numRowsAffected()).arg(chgrp.m_grpId));
+                    .arg(query.numRowsAffected()).arg(chgrp.m_name));
             }
         }
     }
