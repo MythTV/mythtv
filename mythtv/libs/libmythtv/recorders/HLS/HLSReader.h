@@ -40,7 +40,7 @@ class MTV_PUBLIC  HLSReader
     using StreamContainer = QMap<QString, HLSRecStream* >;
     using SegmentContainer = QVector<HLSRecSegment>;
 
-    HLSReader(void) = default;
+    HLSReader(int inputId) { m_inputId = inputId; };
     ~HLSReader(void);
 
     bool Open(const QString & m3u, int bitrate_index = 0);
@@ -56,6 +56,7 @@ class MTV_PUBLIC  HLSReader
     void ResetStream(void)
       { QMutexLocker lock(&m_streamLock); m_curstream = nullptr; }
     void ResetSequence(void) { m_curSeq = -1; }
+    void SetDiscontinuitySequence(int s) { m_sequence = s; }
 
     QString StreamURL(void) const
     { return QString("%1").arg(m_curstream ? m_curstream->M3U8Url() : ""); }
@@ -106,7 +107,7 @@ class MTV_PUBLIC  HLSReader
     bool               m_fatal          {false};
     bool               m_cancel         {false};
     bool               m_throttle       {true};
-                     // only print one time that the media is encrypted
+    // Only print one time that the media is encrypted
     bool               m_aesMsg         {false};
 
     HLSPlaylistWorker *m_playlistWorker {nullptr};
@@ -127,6 +128,11 @@ class MTV_PUBLIC  HLSReader
     int                m_slowCnt        {0};
     QByteArray         m_buffer;
     QMutex             m_bufLock;
+
+    int                m_sequence       {0};     // Discontinuity sequence number
+
+    // Log message
+    int                m_inputId        {0};
 };
 
 #endif // HLS_READER_H

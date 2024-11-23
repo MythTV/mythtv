@@ -4,6 +4,7 @@
 #include <cinttypes>
 
 #include <QDateTime>
+#include <QString>
 
 namespace M3U
 {
@@ -30,8 +31,11 @@ namespace M3U
 			      QDateTime &date);
     bool ParseAllowCache(const QString& line, const QString& loc,
 			 bool& do_cache);
+    bool ParseDiscontinuitySequence(const QString& line, const QString& loc,
+            int &discontinuity_sequence);
     bool ParseDiscontinuity(const QString& line, const QString& loc);
     bool ParseEndList(const QString& loc, bool& is_vod);
+    bool ParseIndependentSegments(const QString& line, const QString& loc);
 }
 
 #endif // MYTHTV_M3U_H

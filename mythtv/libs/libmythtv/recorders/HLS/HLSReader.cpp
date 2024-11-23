@@ -9,7 +9,8 @@
 #include "HLSReader.h"
 #include "HLS/m3u.h"
 
-#define LOC QString("%1: ").arg(m_curstream ? m_curstream->M3U8Url() : "HLSReader")
+#define LOC QString("HLSReader[%1]%2: ")\
+.arg(m_inputId).arg(m_curstream ? "(" + m_curstream->M3U8Url() + ")" : "")
 
 /**
  * Handles relative URLs without breaking URI encoded parameters by avoiding
@@ -264,7 +265,11 @@ bool HLSReader::IsValidPlaylist(QTextStream & text)
 {
     /* Parse stream and search for
      * EXT-X-TARGETDURATION or EXT-X-STREAM-INF tag, see
-     * http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8 */
+     * http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8
+     *
+     * Updated with latest available version from 2017, see
+     * https://datatracker.ietf.org/doc/html/rfc8216
+     */
     QString line = text.readLine();
     if (!line.startsWith((const char*)"#EXTM3U"))
         return false;
@@ -509,11 +514,24 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                     return false;
                 hls->SetCache(do_cache);
             }
+            else if (line.startsWith(QLatin1String("#EXT-X-DISCONTINUITY-SEQUENCE")))
+            {
+                int sequence = 0;
+                if (!M3U::ParseDiscontinuitySequence(line, StreamURL(), sequence))
+                    return false;
+                SetDiscontinuitySequence(sequence);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-DISCONTINUITY")))
             {
                 if (!M3U::ParseDiscontinuity(line, StreamURL()))
                     return false;
                 ResetSequence();
+            }
+            else if (line.startsWith(QLatin1String("#EXT-X-INDEPENDENT-SEGMENTS")))
+            {
+                if (!M3U::ParseIndependentSegments(line, StreamURL()))
+                    return false;
+                // Not handled yet
             }
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {

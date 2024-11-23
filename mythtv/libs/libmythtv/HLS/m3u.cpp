@@ -105,10 +105,10 @@ namespace M3U
             return false;
         }
 
-        if (version <= 0 || version > 3)
+        if (version < 1 || version > 7)
         {
             LOG(VB_RECORD, LOG_ERR, loc +
-                QString("#EXT-X-VERSION is %1, but we only understand 0 through 3")
+                QString("#EXT-X-VERSION is %1, but we only understand 1 to 7")
                 .arg(version));
             return false;
         }
@@ -341,6 +341,11 @@ namespace M3U
             path = DecodedURI(uri.remove(QChar(QLatin1Char('"'))));
             iv = ParseAttributes(line, "IV");
         }
+        else if (attr.startsWith(QLatin1String("SAMPLE-AES")))
+        {
+            LOG(VB_RECORD, LOG_ERR, loc + "encryption SAMPLE-AES not supported.");
+            return false;
+        }
 #endif
         else
         {
@@ -405,6 +410,30 @@ namespace M3U
         return true;
     }
 
+    bool ParseDiscontinuitySequence(const QString& line, const QString& loc, int &discontinuity_sequence)
+    {
+        /*
+         * The EXT-X-DISCONTINUITY-SEQUENCE tag allows synchronization between
+         * different Renditions of the same Variant Stream or different Variant
+         * Streams that have EXT-X-DISCONTINUITY tags in their Media Playlists.
+         *
+         * Its format is:
+         *
+         * #EXT-X-DISCONTINUITY-SEQUENCE:<number>
+         *
+         * where number is a decimal-integer
+         */
+        if (!ParseDecimalValue(line, discontinuity_sequence))
+        {
+            LOG(VB_RECORD, LOG_ERR, loc + "expected #EXT-X-DISCONTINUITY-SEQUENCE:<s>");
+            return false;
+        }
+
+        LOG(VB_RECORD, LOG_DEBUG, loc + QString("#EXT-X-DISCONTINUITY-SEQUENCE %1")
+            .arg(line));
+        return true;
+    }
+
     bool ParseDiscontinuity(const QString& line, const QString& loc)
     {
         /* Not handled, never seen so far */
@@ -425,4 +454,23 @@ namespace M3U
         return true;
     }
 
-} // Namespace M3U
+    bool ParseIndependentSegments(const QString& line, const QString& loc)
+    {
+        /* #EXT-X-INDEPENDENT-SEGMENTS
+         *
+         * The EXT-X-INDEPENDENT-SEGMENTS tag indicates that all media samples
+         * in a Media Segment can be decoded without information from other
+         * segments.  It applies to every Media Segment in the Playlist.
+         *
+         * Its format is:
+         *
+         * #EXT-X-INDEPENDENT-SEGMENTS
+         */
+
+        // Not handled yet
+        LOG(VB_RECORD, LOG_DEBUG, loc + QString("#EXT-X-INDEPENDENT-SEGMENTS %1")
+            .arg(line));
+        return true;
+    }
+
+} // namespace M3U
