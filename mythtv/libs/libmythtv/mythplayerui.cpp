@@ -21,6 +21,8 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
   : MythPlayerEditorUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
+    m_display = MainWindow->GetDisplay();
+
     // Finish setting up the overlays
     m_osd.SetPlayer(this);
     m_captionsOverlay.SetPlayer(this);
@@ -840,6 +842,12 @@ void MythPlayerUI::GetPlaybackData(InfoMap& Map)
     Map["load"] = m_outputJmeter.GetLastCPUStats();
 
     GetCodecDescription(Map);
+
+    QString displayfps = QString("%1x%2@%3Hz")
+        .arg(m_display->GetResolution().width())
+        .arg(m_display->GetResolution().height())
+        .arg(m_display->GetRefreshRate(), 0, 'f', 2);
+    Map["displayfps"] = displayfps;
 }
 
 void MythPlayerUI::GetCodecDescription(InfoMap& Map)

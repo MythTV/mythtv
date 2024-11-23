@@ -140,6 +140,17 @@
             <area>805,80,250,25</area>
             <align>left,vcenter</align>
         </textarea>
+        <textarea name="display">
+            <font>medium</font>
+            <area>650,105,150,25</area>
+            <align>right,vcenter</align>
+            <value>Display :</value>
+        </textarea>
+        <textarea name="displayfps">
+            <font>medium</font>
+            <area>805,105,200,25</area>
+            <align>left,vcenter</align>
+        </textarea>
 
         <textarea name="audio">
             <font>medium</font>

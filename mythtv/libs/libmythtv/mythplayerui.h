@@ -7,6 +7,8 @@
 #include "jitterometer.h"
 #include "mythplayer.h"
 
+class MythDisplay;
+
 class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanTracker
 {
     Q_OBJECT
@@ -66,6 +68,8 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanT
 
     bool    m_osdDebug { false };
     QTimer  m_osdDebugTimer;
+
+    MythDisplay *m_display { nullptr };
 };
 
 #endif
