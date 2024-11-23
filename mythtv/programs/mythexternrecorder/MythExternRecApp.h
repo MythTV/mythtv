@@ -99,6 +99,7 @@ class MythExternRecApp : public QObject
     QString replace_extra_args(const QString & var,
                                const QVariantMap & extra_args) const;
 
+    mutable bool            m_terminating  { false };
     bool                    m_fatal        { false };
     QString                 m_fatalMsg;
 

@@ -327,13 +327,7 @@ bool MythExternRecApp::Open(void)
 
 void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc) const
 {
-    if (proc.state() == QProcess::Running)
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGINT to %1(%2)").arg(desc).arg(proc.processId()));
-        kill(proc.processId(), SIGINT);
-        proc.waitForFinished(5000);
-    }
+    m_terminating = true;
     if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
@@ -348,6 +342,7 @@ void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc) c
         proc.kill();
         proc.waitForFinished();
     }
+    m_terminating = false;
 }
 
 Q_SLOT void MythExternRecApp::Close(void)
@@ -974,7 +969,7 @@ Q_SLOT void MythExternRecApp::StopStreaming(const QString & serial, bool silent)
         if (silent)
         {
             emit SendMessage("StopStreaming", serial,
-                             "Already not Streaming", "STATUS");
+                             "Already not Streaming", "INFO");
         }
         else
         {
@@ -1031,32 +1026,61 @@ Q_SLOT void MythExternRecApp::ProcStateChanged(QProcess::ProcessState newState)
     if (unexpected)
     {
         emit Streaming(false);
-        MythLog("ERR Unexpected " + msg);
+        emit SendMessage("STATUS", "0", "Unexpected: " + msg, "ERR");
     }
 }
 
 Q_SLOT void MythExternRecApp::ProcError(QProcess::ProcessError /*error */)
 {
-    LOG(VB_RECORD, LOG_ERR, LOC + QString(": Error: %1")
-        .arg(m_proc.errorString()));
-    MythLog(m_proc.errorString());
+    if (m_terminating)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString(": %1")
+            .arg(m_proc.errorString()));
+        emit SendMessage("STATUS", "0", m_proc.errorString(), "INFO");
+    }
+    else
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + QString(": Error: %1")
+            .arg(m_proc.errorString()));
+        emit SendMessage("STATUS", "0", m_proc.errorString(), "ERR");
+    }
 }
 
 Q_SLOT void MythExternRecApp::ProcReadStandardError(void)
 {
     QByteArray buf = m_proc.readAllStandardError();
     QString    msg = QString::fromUtf8(buf).trimmed();
+    QList<QString> msgs = msg.split('\n');
+    QString    message;
 
-    // Log any error messages
-    if (!msg.isEmpty())
+    for (int idx=0; idx < msgs.count(); ++idx)
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString(">>> %1")
-            .arg(msg));
-#if 0 // Show even long messages in mythbackend log
-        if (msg.size() > 79)
-            msg = QString("Application message: see '%1'").arg(m_logFile);
-#endif
-        MythLog(msg);
+        // Log any error messages
+        if (!msgs[idx].isEmpty())
+        {
+            QStringList tokens = QString(msgs[idx])
+                                 .split(':', Qt::SkipEmptyParts);
+            tokens.removeFirst();
+            if (tokens.empty())
+                message = msgs[idx];
+            else
+                message = tokens.join(':');
+            if (msgs[idx].startsWith("err", Qt::CaseInsensitive))
+            {
+                LOG(VB_RECORD, LOG_ERR, LOC + QString(">>> %1").arg(msgs[idx]));
+                emit SendMessage("STATUS", "0", message, "ERR");
+            }
+            else if (msgs[idx].startsWith("warn", Qt::CaseInsensitive))
+            {
+                LOG(VB_RECORD, LOG_WARNING, LOC + QString(">>> %1").arg(msgs[idx]));
+                emit SendMessage("STATUS", "0", message, "WARN");
+            }
+            else
+            {
+                LOG(VB_RECORD, LOG_DEBUG, LOC + QString(">>> %1").arg(msgs[idx]));
+                emit SendMessage("STATUS", "0", message, "INFO");
+            }
+        }
     }
 }
 

@@ -88,6 +88,8 @@ class ExternalStreamHandler : public StreamHandler
 
     QString GetDescription(void) { return m_loc; }
     QString UpdateDescription(void);
+    bool IsDamaged(void) const { return m_damaged; }
+    void ClearDamaged(void) { m_damaged = false; }
     bool IsAppOpen(void);
     bool IsTSOpen(void);
     bool HasTuner(void) const { return m_hasTuner; }
@@ -144,6 +146,7 @@ class ExternalStreamHandler : public StreamHandler
     QByteArray    m_replayBuffer;
     bool          m_replay               {false};
     bool          m_xon                  {false};
+    bool          m_damaged              {false};
 
     // for implementing Get & Return
     static QMutex                            s_handlersLock;

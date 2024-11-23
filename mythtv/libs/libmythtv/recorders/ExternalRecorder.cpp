@@ -103,6 +103,15 @@ void ExternalRecorder::run(void)
             m_error = "Stream handler died unexpectedly.";
             LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         }
+
+        if (m_streamHandler->IsDamaged())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Recording is damaged. Setting status to %1")
+                .arg(RecStatus::toString(RecStatus::Failing, kSingleRecord)));
+            SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);
+            m_streamHandler->ClearDamaged();
+        }
     }
 
     StopStreaming();

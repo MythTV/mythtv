@@ -677,7 +677,8 @@ void ExternalStreamHandler::run(void)
                         std::this_thread::sleep_for(20s);
                     if (!RestartStream())
                     {
-                        LOG(VB_RECORD, LOG_ERR, LOC + "Failed to restart stream.");
+                        LOG(VB_RECORD, LOG_ERR, LOC +
+                            "Failed to restart stream.");
                         m_bError = true;
                     }
                     continue;
@@ -1073,6 +1074,7 @@ bool ExternalStreamHandler::RestartStream(void)
     bool streaming = (StreamingCount() > 0);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
+    m_damaged = true;
 
     if (streaming)
         StopStreaming();
@@ -1637,7 +1639,7 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                 if (!okay)
                     level = LOG_WARNING;
                 else if (cmd == "SendBytes" ||
-                         (cmd == "TuneStatus" &&
+                         (cmd == "TuneStatus?" &&
                           elements["message"] == "InProgress"))
                     level = LOG_DEBUG;
 
@@ -1672,8 +1674,8 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
 
 bool ExternalStreamHandler::CheckForError(void)
 {
-    QString result;
-    bool    err = false;
+    QByteArray response;
+    bool       err = false;
 
     QMutexLocker locker(&m_ioLock);
 
@@ -1692,26 +1694,82 @@ bool ExternalStreamHandler::CheckForError(void)
 
     do
     {
-        result = m_io->GetStatus(0ms);
-        if (!result.isEmpty())
+        response = m_io->GetStatus(0ms);
+        if (!response.isEmpty())
         {
-            if (m_apiVersion > 1)
+            if (m_apiVersion > 2)
             {
-                QStringList tokens = result.split(':', Qt::SkipEmptyParts);
-                tokens.removeFirst();
-                result = tokens.join(':');
-                for (int idx = 1; idx < tokens.size(); ++idx)
-                    err |= tokens[idx].startsWith("ERR");
+                QJsonParseError parseError;
+                QJsonDocument doc;
+                QVariantMap   elements;
+
+                doc = QJsonDocument::fromJson(response, &parseError);
+
+                if (parseError.error != QJsonParseError::NoError)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("ExternalRecorder returned invalid JSON message: %1: %2\n%3\n")
+                        .arg(parseError.offset).arg(parseError.errorString())
+                        .arg(QString(response)));
+                }
+                else
+                {
+                    LogLevel_t level;
+                    elements = doc.toVariant().toMap();
+                    if (elements.find("command") != elements.end() &&
+                        elements["command"] == "STATUS")
+                    {
+                        QString status = elements["status"].toString();
+                        if (status.startsWith("err", Qt::CaseInsensitive))
+                        {
+                            level = LOG_ERR;
+                            err |= true;
+                        }
+                        else if (status.startsWith("warn",
+                                                   Qt::CaseInsensitive))
+                            level = LOG_WARNING;
+                        else if (status.startsWith("damage",
+                                                   Qt::CaseInsensitive))
+                        {
+                            level = LOG_WARNING;
+                            m_damaged |= true;
+                        }
+                        else
+                            level = LOG_INFO;
+                        LOG(VB_RECORD, level,
+                            LOC + elements["message"].toString());
+                    }
+                }
             }
             else
             {
-                err |= result.startsWith("STATUS:ERR");
-            }
+                QString res = QString(response);
+                if (m_apiVersion == 2)
+                {
+                    QStringList tokens = res.split(':', Qt::SkipEmptyParts);
+                    tokens.removeFirst();
+                    res = tokens.join(':');
+                    for (int idx = 1; idx < tokens.size(); ++idx)
+                    {
+                        err |= tokens[idx].startsWith("ERR",
+                                                      Qt::CaseInsensitive);
+                        m_damaged |= tokens[idx].startsWith("damage",
+                                                           Qt::CaseInsensitive);
+                    }
+                }
+                else
+                {
+                    err |= res.startsWith("STATUS:ERR",
+                                          Qt::CaseInsensitive);
+                    m_damaged |= res.startsWith("STATUS:DAMAGE",
+                                               Qt::CaseInsensitive);
+                }
 
-            LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + result);
+                LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + res);
+            }
         }
     }
-    while (!result.isEmpty());
+    while (!response.isEmpty());
 
     return err;
 }

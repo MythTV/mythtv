@@ -215,7 +215,6 @@ bool ExternalChannel::EnterPowerSavingMode(void)
 
 uint ExternalChannel::GetTuneStatus(void)
 {
-
     if (!m_backgroundTuning)
         return 3;
 

@@ -229,11 +229,11 @@ bool Commands::SendStatus(const QString & command,
 
     if (!command.isEmpty())
     {
-        if (command == m_prevCmd)
+        if (command + response + status == m_prevStatus)
         {
             if (++m_repCmdCnt % 25 == 0)
             {
-                LOG(VB_RECORD, LOG_INFO, LOC +
+                LOG(VB_RECORD, LOG_DEBUG, LOC +
                     QString("Processing '%1' --> '%2' (Repeated 25 times)")
                     .arg(command, QString(msgbuf)));
             }
@@ -242,20 +242,22 @@ bool Commands::SendStatus(const QString & command,
         {
             if (m_repCmdCnt)
             {
-                LOG(VB_RECORD, LOG_INFO,
-                    LOC + QString("Processing '%1' (Repeated %2 times)")
-                    .arg(m_prevCmd).arg(m_repCmdCnt % 25));
+                LOG(VB_RECORD, LOG_DEBUG,
+                    LOC + QString("Processing '%1' --> '%2' (Repeated %2 times)")
+                    .arg(m_prevMsgBuf).arg(m_repCmdCnt % 25));
                 m_repCmdCnt = 0;
             }
-            LOG(VB_RECORD, LOG_INFO, LOC +
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
                 QString("Processing '%1' --> '%2'")
                 .arg(command, QString(msgbuf)));
         }
-        m_prevCmd = command;
+        m_prevStatus = command + response + status;
+        m_prevMsgBuf = QString(msgbuf);
     }
     else
     {
-        m_prevCmd.clear();
+        m_prevStatus.clear();
+        m_prevMsgBuf.clear();
         m_repCmdCnt = 0;
     }
 
