@@ -3692,7 +3692,7 @@ void ProgramInfo::QueryMarkupMap(
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT mark, type, offset "
+    query.prepare("SELECT mark, type, `offset` "
                   "FROM filemarkup "
                   "WHERE filename = :PATH AND "
                   "      type     = :TYPE "
