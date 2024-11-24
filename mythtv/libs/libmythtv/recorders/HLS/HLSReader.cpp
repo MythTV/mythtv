@@ -988,7 +988,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     }
 #endif
 
-    int segment_len = buffer.size();
+    int64_t segment_len = buffer.size();
 
     m_bufLock.lock();
     if (m_buffer.size() > segment_len * playlist_size)
