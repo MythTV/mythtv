@@ -1727,7 +1727,9 @@ bool ExternalStreamHandler::CheckForError(void)
                         }
                         else if (status.startsWith("warn",
                                                    Qt::CaseInsensitive))
+                        {
                             level = LOG_WARNING;
+                        }
                         else if (status.startsWith("damage",
                                                    Qt::CaseInsensitive))
                         {
