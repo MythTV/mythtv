@@ -19,10 +19,9 @@
 MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
                            PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerEditorUI(MainWindow, Tv, Context, Flags),
-    MythVideoScanTracker(this)
+    MythVideoScanTracker(this),
+    m_display(MainWindow->GetDisplay())
 {
-    m_display = MainWindow->GetDisplay();
-
     // Finish setting up the overlays
     m_osd.SetPlayer(this);
     m_captionsOverlay.SetPlayer(this);
