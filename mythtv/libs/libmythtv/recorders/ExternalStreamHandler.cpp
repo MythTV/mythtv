@@ -1699,7 +1699,7 @@ bool ExternalStreamHandler::CheckForError(void)
         {
             if (m_apiVersion > 2)
             {
-                QJsonParseError parseError;
+                QJsonParseError parseError {};
                 QJsonDocument doc;
                 QVariantMap   elements;
 
@@ -1714,11 +1714,11 @@ bool ExternalStreamHandler::CheckForError(void)
                 }
                 else
                 {
-                    LogLevel_t level;
                     elements = doc.toVariant().toMap();
                     if (elements.find("command") != elements.end() &&
                         elements["command"] == "STATUS")
                     {
+                        LogLevel_t level { LOG_INFO };
                         QString status = elements["status"].toString();
                         if (status.startsWith("err", Qt::CaseInsensitive))
                         {
@@ -1734,8 +1734,6 @@ bool ExternalStreamHandler::CheckForError(void)
                             level = LOG_WARNING;
                             m_damaged |= true;
                         }
-                        else
-                            level = LOG_INFO;
                         LOG(VB_RECORD, level,
                             LOC + elements["message"].toString());
                     }
