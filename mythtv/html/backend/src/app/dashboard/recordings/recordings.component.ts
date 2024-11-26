@@ -179,26 +179,8 @@ export class RecordingsComponent implements OnInit {
       sortOrder = ' desc';
     request.Sort = request.Sort + sortOrder;
     request.Sort += `,title${sortOrder},originalairdate${sortOrder},season${sortOrder},episode${sortOrder}`;
-    // if (event.filters) {
-    //   if (event.filters.Title.value) {
-    //     switch (event.filters.Title.matchMode) {
-    //       case FilterMatchMode.STARTS_WITH:
-    //         request.TitleRegEx = '^' + event.filters.Title.value;
-    //         break;
-    //       case FilterMatchMode.CONTAINS:
-    //         request.TitleRegEx = event.filters.Title.value;
-    //         break;
-    //       case FilterMatchMode.EQUALS:
-    //         request.TitleRegEx = '^' + event.filters.Title.value + '$';
-    //         break;
-    //     }
-    //   }
-    //   if (event.filters['Recording.RecGroup'].value) {
-    //     if (event.filters['Recording.RecGroup'].matchMode == FilterMatchMode.EQUALS)
-    //       request.RecGroup = event.filters['Recording.RecGroup'].value;
-    //   }
-    // }
 
+    this.searchValue = this.searchValue.trim();
     if (this.searchValue)
       request.TitleRegEx = this.searchValue;
     if (this.selectedRecGroup != null)
