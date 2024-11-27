@@ -576,6 +576,29 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             return false;
         }
 
+        // For near-live skip all segments that are in the past.
+        if (m_curSeq < 0)
+        {
+            // Compute number of segments for 20 seconds buffer from live.
+            // If the duration is not know keep 4 segments.
+            int numseg = 4;
+            if (hls->TargetDuration() > 0s)
+            {
+                numseg = 20s / hls->TargetDuration();
+                numseg = std::clamp(numseg, 2, 20);
+            }
+
+            if (new_segments.size() > numseg)
+            {
+                int size_before = new_segments.size();
+                SegmentContainer::iterator Iseg = new_segments.begin() + (new_segments.size() - numseg);
+                new_segments.erase(new_segments.begin(), Iseg);
+                LOG(VB_RECORD, LOG_INFO, LOC +
+                    QString(" Read last %1 segments instead of %2 for near-live")
+                        .arg(new_segments.size()).arg(size_before));
+            }
+        }
+
         SegmentContainer::iterator Inew = new_segments.begin();
         SegmentContainer::iterator Iseg = m_segments.end() - 1;
 
