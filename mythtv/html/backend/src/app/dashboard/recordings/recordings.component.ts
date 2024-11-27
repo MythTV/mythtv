@@ -240,6 +240,7 @@ export class RecordingsComponent implements OnInit {
   refresh() {
     this.selection = [];
     this.menu.hide();
+    this.showTable = false;
     this.loadLazy(this.lazyLoadEvent);
   }
 

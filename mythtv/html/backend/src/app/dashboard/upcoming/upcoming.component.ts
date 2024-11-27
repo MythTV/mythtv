@@ -62,6 +62,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   refresh() {
     this.refreshing = true;
+    this.showTable = false;
     this.loadRecRules();
     this.loadLazy(this.lazyLoadEvent);
   }
