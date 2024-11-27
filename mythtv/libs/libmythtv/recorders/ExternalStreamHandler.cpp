@@ -1709,8 +1709,8 @@ bool ExternalStreamHandler::CheckForError(void)
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("ExternalRecorder returned invalid JSON message: %1: %2\n%3\n")
-                        .arg(parseError.offset).arg(parseError.errorString())
-                        .arg(QString(response)));
+                        .arg(parseError.offset)
+                        .arg(parseError.errorString(), QString(response)));
                 }
                 else
                 {
