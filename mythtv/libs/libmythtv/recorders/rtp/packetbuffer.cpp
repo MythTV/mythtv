@@ -40,6 +40,7 @@ UDPPacket PacketBuffer::GetEmptyPacket(void)
         return UDPPacket(m_next_empty_packet_key++);
     }
 
+    // NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
     UDPPacket packet(*it);
     m_empty_packets.erase(it);
 
