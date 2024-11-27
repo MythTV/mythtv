@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QDomDocument>
 #include <QFile>
+#include <QFileInfo>
 #include <QStringList>
 #include <QUrl>
 #include <QXmlStreamReader>
@@ -198,6 +199,18 @@ bool XMLTVParser::parseFile(
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error unable to open '%1' for reading.") .arg(filename));
         return false;
+    }
+
+    if (filename != "-")
+    {
+        QFileInfo info(f);
+        if (info.size() == 0)
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("File %1 exists but is empty. Did the grabber fail?").arg(filename));
+            f.close();
+            return false;
+        }
     }
 
     QXmlStreamReader xml(&f);
