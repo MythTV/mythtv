@@ -585,9 +585,6 @@ static int handle_new_packet(AVFormatContext *s, AVPacket *pkt, int allow_passth
     st  = s->streams[pkt->stream_index];
     sti = ffstream(st);
 
-    if (!st)
-        return -1;
-
     update_timestamps(s, st, pkt);
 
     if (sti->request_probe <= 0 && allow_passthrough && !si->raw_packet_buffer.head)
@@ -693,10 +690,6 @@ static void compute_frame_duration(AVFormatContext *s, int *pnum, int *pden,
 
     *pnum = 0;
     *pden = 0;
-
-    if (!st || !st->codecpar)
-        return;
-
     switch (st->codecpar->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
         if (st->r_frame_rate.num && (!pc || !codec_framerate.num)) {
@@ -862,9 +855,6 @@ static void update_initial_timestamps(AVFormatContext *s, int stream_index,
     PacketListEntry *pktl = si->packet_buffer.head ? si->packet_buffer.head : si->parse_queue.head;
 
     uint64_t shift;
-
-    if (!st)
-        return;
 
     if (sti->first_dts != AV_NOPTS_VALUE ||
         dts           == AV_NOPTS_VALUE ||
