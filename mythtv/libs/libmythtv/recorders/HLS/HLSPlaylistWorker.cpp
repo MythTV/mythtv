@@ -129,9 +129,15 @@ void HLSPlaylistWorker::run(void)
         // When should the playlist be reloaded
         wakeup = m_parent->TargetDuration() > 0s ?
                  m_parent->TargetDuration() : 10s;
-        wakeup *= delay;
+
+        wakeup = std::chrono::milliseconds(static_cast<int>(delay * wakeup.count()));
+
         if (wakeup > 60s)
             wakeup = 60s;
+
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString(" TargetDuration:%1s").arg(m_parent->TargetDuration().count()) +
+            QString(" wakeup:%1ms delay:%2").arg(wakeup.count()).arg(delay));
     }
 
     if (downloader)
