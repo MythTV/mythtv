@@ -1048,8 +1048,6 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 
     if (IsVideoPID(tspacket.PID()))
     {
-        QMutexLocker locker(&m_listenerLock);
-
         for (auto & listener : m_tsAvListeners)
             listener->ProcessVideoTSPacket(tspacket);
 
@@ -1058,8 +1056,6 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 
     if (IsAudioPID(tspacket.PID()))
     {
-        QMutexLocker locker(&m_listenerLock);
-
         for (auto & listener : m_tsAvListeners)
             listener->ProcessAudioTSPacket(tspacket);
 
