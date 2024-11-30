@@ -333,7 +333,8 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
     if (fetcher)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        QString sql = "select MAX(CONVERT(channum, UNSIGNED INTEGER)) from channel where sourceid = :SOURCEID;";
+        QString sql = "SELECT MAX(CONVERT(channum, UNSIGNED INTEGER)) FROM channel "
+                      "WHERE sourceid = :SOURCEID  AND  deleted IS NULL";
 
         query.prepare(sql);
         query.bindValue(":SOURCEID", fetcher->m_sourceId);
