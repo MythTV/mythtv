@@ -1068,6 +1068,8 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 
     if (IsWritingPID(tspacket.PID()))
     {
+        QMutexLocker locker(&m_listenerLock);
+
         for (auto & listener : m_tsWritingListeners)
             listener->ProcessTSPacket(tspacket);
     }
