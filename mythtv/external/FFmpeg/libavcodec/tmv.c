@@ -30,7 +30,7 @@
 
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "libavutil/internal.h"
 #include "libavutil/xga_font_data.h"
 
@@ -56,11 +56,13 @@ static int tmv_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return AVERROR_INVALIDDATA;
     }
 
-    frame->pict_type = AV_PICTURE_TYPE_I;
-    frame->key_frame = 1;
     dst              = frame->data[0];
 
+#if FF_API_PALETTE_HAS_CHANGED
+FF_DISABLE_DEPRECATION_WARNINGS
     frame->palette_has_changed = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
     memcpy(frame->data[1], ff_cga_palette, 16 * 4);
     memset(frame->data[1] + 16 * 4, 0, AVPALETTE_SIZE - 16 * 4);
 
@@ -88,11 +90,10 @@ static av_cold int tmv_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_tmv_decoder = {
     .p.name         = "tmv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("8088flex TMV"),
+    CODEC_LONG_NAME("8088flex TMV"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TMV,
     .init           = tmv_decode_init,
     FF_CODEC_DECODE_CB(tmv_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

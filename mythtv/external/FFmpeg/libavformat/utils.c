@@ -26,7 +26,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
 #include "libavutil/internal.h"
-#include "libavutil/thread.h"
+#include "libavutil/mem.h"
 #include "libavutil/time.h"
 
 #include "libavcodec/internal.h"
@@ -37,23 +37,12 @@
 #if CONFIG_NETWORK
 #include "network.h"
 #endif
-
-static AVMutex avformat_mutex = AV_MUTEX_INITIALIZER;
+#include "os_support.h"
 
 /**
  * @file
  * various utility functions for use within FFmpeg
  */
-
-int ff_lock_avformat(void)
-{
-    return ff_mutex_lock(&avformat_mutex) ? -1 : 0;
-}
-
-int ff_unlock_avformat(void)
-{
-    return ff_mutex_unlock(&avformat_mutex) ? -1 : 0;
-}
 
 /* an arbitrarily chosen "sane" max packet size -- 50M */
 #define SANE_CHUNK_SIZE (50000000)
@@ -291,7 +280,7 @@ uint64_t ff_parse_ntp_time(uint64_t ntp_ts)
     return (sec * 1000000) + usec;
 }
 
-int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number, int flags)
+int ff_get_frame_filename(char *buf, int buf_size, const char *path, int64_t number, int flags)
 {
     const char *p;
     char *q, buf1[20], c;
@@ -324,7 +313,7 @@ int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number
                 percentd_found = 1;
                 if (number < 0)
                     nd += 1;
-                snprintf(buf1, sizeof(buf1), "%0*d", nd, number);
+                snprintf(buf1, sizeof(buf1), "%0*" PRId64, nd, number);
                 len = strlen(buf1);
                 if ((q - buf + len) > buf_size - 1)
                     goto fail;
@@ -349,9 +338,14 @@ fail:
     return -1;
 }
 
+int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number, int flags)
+{
+    return ff_get_frame_filename(buf, buf_size, path, number, flags);
+}
+
 int av_get_frame_filename(char *buf, int buf_size, const char *path, int number)
 {
-    return av_get_frame_filename2(buf, buf_size, path, number, 0);
+    return ff_get_frame_filename(buf, buf_size, path, number, 0);
 }
 
 void av_url_split(char *proto, int proto_size,
@@ -601,50 +595,4 @@ int ff_bprint_to_codecpar_extradata(AVCodecParameters *par, struct AVBPrint *buf
      * zeros. */
     par->extradata_size = buf->len;
     return 0;
-}
-
-/**
- * @brief Remove a stream from a media stream.
- *
- * This is used by mpegts, so we can track streams as indicated by the PMT.
- *
- * @param s MPEG media stream handle
- * @param id stream id of stream to remove
- * @param remove_ts if true, remove any matching MPEG-TS filter as well
- */
-void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
-    int i;
-    int changes = 0;
-
-    for (i=0; i<s->nb_streams; i++) {
-        if (s->streams[i]->id != id)
-            continue;
-
-        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream 0x%x\n", id);
-
-        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: removing... "
-               "s->nb_streams=%d i=%d\n", s->nb_streams, i);
-        /* actually remove av stream */
-        s->nb_streams--;
-        if ((s->nb_streams - i) > 0) {
-            memmove(&s->streams[i], &s->streams[i+1],
-                    (s->nb_streams-i)*sizeof(AVFormatContext *));
-        }
-        else
-            s->streams[i] = NULL;
-
-        changes = 1;
-    }
-    if (changes)
-    {
-        // flush queued packets after a stream change (might need to make smarter)
-        ff_flush_packet_queue(s);
-
-        /* renumber the streams */
-        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: renumbering streams\n");
-        for (i=0; i<s->nb_streams; i++)
-            s->streams[i]->index=i;
-    }
-
-    (void)remove_ts;
 }

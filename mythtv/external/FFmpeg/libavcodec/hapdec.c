@@ -34,6 +34,7 @@
 #include <stdint.h>
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
@@ -323,12 +324,12 @@ static int hap_decode(AVCodecContext *avctx, AVFrame *frame,
 
         ctx->dec[t].frame_data.out = frame->data[0];
         ctx->dec[t].stride = frame->linesize[0];
-        avctx->execute2(avctx, ff_texturedsp_decompress_thread, &ctx->dec[t], NULL, ctx->dec[t].slice_count);
+        ctx->dec[t].width  = avctx->coded_width;
+        ctx->dec[t].height = avctx->coded_height;
+        ff_texturedsp_exec_decompress_threads(avctx, &ctx->dec[t]);
     }
 
     /* Frame is ready to be output */
-    frame->pict_type = AV_PICTURE_TYPE_I;
-    frame->key_frame = 1;
     *got_frame = 1;
 
     return avpkt->size;
@@ -337,6 +338,7 @@ static int hap_decode(AVCodecContext *avctx, AVFrame *frame,
 static av_cold int hap_init(AVCodecContext *avctx)
 {
     HapContext *ctx = avctx->priv_data;
+    TextureDSPContext dxtc;
     const char *texture_name;
     int ret = av_image_check_size(avctx->width, avctx->height, 0, avctx);
 
@@ -350,7 +352,7 @@ static av_cold int hap_init(AVCodecContext *avctx)
     avctx->coded_width  = FFALIGN(avctx->width,  TEXTURE_BLOCK_W);
     avctx->coded_height = FFALIGN(avctx->height, TEXTURE_BLOCK_H);
 
-    ff_texturedsp_init(&ctx->dxtc);
+    ff_texturedsp_init(&dxtc);
 
     ctx->texture_count  = 1;
     ctx->dec[0].raw_ratio = 16;
@@ -361,25 +363,25 @@ static av_cold int hap_init(AVCodecContext *avctx)
     case MKTAG('H','a','p','1'):
         texture_name = "DXT1";
         ctx->dec[0].tex_ratio = 8;
-        ctx->dec[0].tex_funct = ctx->dxtc.dxt1_block;
+        ctx->dec[0].tex_funct = dxtc.dxt1_block;
         avctx->pix_fmt = AV_PIX_FMT_RGB0;
         break;
     case MKTAG('H','a','p','5'):
         texture_name = "DXT5";
         ctx->dec[0].tex_ratio = 16;
-        ctx->dec[0].tex_funct = ctx->dxtc.dxt5_block;
+        ctx->dec[0].tex_funct = dxtc.dxt5_block;
         avctx->pix_fmt = AV_PIX_FMT_RGBA;
         break;
     case MKTAG('H','a','p','Y'):
         texture_name = "DXT5-YCoCg-scaled";
         ctx->dec[0].tex_ratio = 16;
-        ctx->dec[0].tex_funct = ctx->dxtc.dxt5ys_block;
+        ctx->dec[0].tex_funct = dxtc.dxt5ys_block;
         avctx->pix_fmt = AV_PIX_FMT_RGB0;
         break;
     case MKTAG('H','a','p','A'):
         texture_name = "RGTC1";
         ctx->dec[0].tex_ratio = 8;
-        ctx->dec[0].tex_funct = ctx->dxtc.rgtc1u_gray_block;
+        ctx->dec[0].tex_funct = dxtc.rgtc1u_gray_block;
         ctx->dec[0].raw_ratio = 4;
         avctx->pix_fmt = AV_PIX_FMT_GRAY8;
         break;
@@ -387,8 +389,8 @@ static av_cold int hap_init(AVCodecContext *avctx)
         texture_name  = "DXT5-YCoCg-scaled / RGTC1";
         ctx->dec[0].tex_ratio = 16;
         ctx->dec[1].tex_ratio = 8;
-        ctx->dec[0].tex_funct = ctx->dxtc.dxt5ys_block;
-        ctx->dec[1].tex_funct = ctx->dxtc.rgtc1u_alpha_block;
+        ctx->dec[0].tex_funct = dxtc.dxt5ys_block;
+        ctx->dec[1].tex_funct = dxtc.rgtc1u_alpha_block;
         ctx->dec[1].raw_ratio = 16;
         ctx->dec[1].slice_count = ctx->dec[0].slice_count;
         avctx->pix_fmt = AV_PIX_FMT_RGBA;
@@ -414,7 +416,7 @@ static av_cold int hap_close(AVCodecContext *avctx)
 
 const FFCodec ff_hap_decoder = {
     .p.name         = "hap",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Vidvox Hap"),
+    CODEC_LONG_NAME("Vidvox Hap"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_HAP,
     .init           = hap_init,
@@ -423,8 +425,7 @@ const FFCodec ff_hap_decoder = {
     .priv_data_size = sizeof(HapContext),
     .p.capabilities = AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .codec_tags     = (const uint32_t []){
         MKTAG('H','a','p','1'),
         MKTAG('H','a','p','5'),

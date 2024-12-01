@@ -38,6 +38,11 @@
 #include "musicplayer.h"
 #include "visualize.h"
 
+extern "C" {
+    #include <libavutil/mem.h>
+    #include <libavutil/tx.h>
+}
+
 VisFactory* VisFactory::g_pVisFactories = nullptr;
 
 VisualBase::VisualBase(bool screensaverenable)
@@ -986,10 +991,12 @@ Spectrogram::Spectrogram(bool hist)
         m_image->fill(Qt::black);
     }
 
-    m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
-    m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+    m_dftL = static_cast<float*>(av_malloc(sizeof(float) * m_fftlen));
+    m_dftR = static_cast<float*>(av_malloc(sizeof(float) * m_fftlen));
+    m_rdftTmp = static_cast<float*>(av_malloc(sizeof(float) * (m_fftlen + 2)));
 
-    m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
+    // should probably check that this succeeds
+    av_tx_init(&m_rdftContext, &m_rdft, AV_TX_FLOAT_RDFT, 0, m_fftlen, &k_txScale, 0x0);
 
     // hack!!! Should 44100 sample rate be queried or measured?
     // Likely close enough for most audio recordings...
@@ -1041,7 +1048,8 @@ Spectrogram::~Spectrogram()
 {
     av_freep(reinterpret_cast<void*>(&m_dftL));
     av_freep(reinterpret_cast<void*>(&m_dftR));
-    av_rdft_end(m_rdftContext);
+    av_freep(reinterpret_cast<void*>(&m_rdftTmp));
+    av_tx_uninit(&m_rdftContext);
 }
 
 void Spectrogram::resize(const QSize &newsize)
@@ -1174,8 +1182,13 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             m_dftR[k] = m_sigR[k] * mult;
         }
     }
-    av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
-    av_rdft_calc(m_rdftContext, m_dftR);
+    // run the real FFT!
+    m_rdft(m_rdftContext, m_rdftTmp, m_dftL, sizeof(float));
+    m_rdftTmp[1] = m_rdftTmp[m_fftlen];
+    memcpy(m_dftL, m_rdftTmp, m_fftlen * sizeof(float));
+    m_rdft(m_rdftContext, m_rdftTmp, m_dftR, sizeof(float));
+    m_rdftTmp[1] = m_rdftTmp[m_fftlen];
+    memcpy(m_dftR, m_rdftTmp, m_fftlen * sizeof(float));
 
     QPainter painter(m_image);
     painter.setPen(Qt::black);  // clear prior content
@@ -1390,17 +1403,20 @@ Spectrum::Spectrum()
 
     m_fps = 40;         // getting 1152 samples / 44100 = 38.28125 fps
 
-    m_dftL = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
-    m_dftR = static_cast<FFTSample*>(av_malloc(sizeof(FFTSample) * m_fftlen));
+    m_dftL = static_cast<float*>(av_malloc(sizeof(float) * m_fftlen));
+    m_dftR = static_cast<float*>(av_malloc(sizeof(float) * m_fftlen));
+    m_rdftTmp = static_cast<float*>(av_malloc(sizeof(float) * (m_fftlen + 2)));
 
-    m_rdftContext = av_rdft_init(std::log2(m_fftlen), DFT_R2C);
+    // should probably check that this succeeds
+    av_tx_init(&m_rdftContext, &m_rdft, AV_TX_FLOAT_RDFT, 0, m_fftlen, &k_txScale, 0x0);
 }
 
 Spectrum::~Spectrum()
 {
     av_freep(reinterpret_cast<void*>(&m_dftL));
     av_freep(reinterpret_cast<void*>(&m_dftR));
-    av_rdft_end(m_rdftContext);
+    av_freep(reinterpret_cast<void*>(&m_rdftTmp));
+    av_tx_uninit(&m_rdftContext);
 }
 
 void Spectrum::resize(const QSize &newsize)
@@ -1488,8 +1504,13 @@ bool Spectrum::processUndisplayed(VisualNode *node)
             m_dftR[k] = m_sigR[k] * mult;
         }
     }
-    av_rdft_calc(m_rdftContext, m_dftL); // run the real FFT!
-    av_rdft_calc(m_rdftContext, m_dftR);
+    // run the real FFT!
+    m_rdft(m_rdftContext, m_rdftTmp, m_dftL, sizeof(float));
+    m_rdftTmp[1] = m_rdftTmp[m_fftlen];
+    memcpy(m_dftL, m_rdftTmp, m_fftlen * sizeof(float));
+    m_rdft(m_rdftContext, m_rdftTmp, m_dftR, sizeof(float));
+    m_rdftTmp[1] = m_rdftTmp[m_fftlen];
+    memcpy(m_dftR, m_rdftTmp, m_fftlen * sizeof(float));
 
     long w = 0;
     QRect *rectspL = m_rectsL.data();

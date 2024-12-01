@@ -25,7 +25,7 @@
 #include "avcodec.h"
 #include "internal.h"
 #include "av1dec.h"
-#include "hwconfig.h"
+#include "hwaccel_internal.h"
 #include "vdpau.h"
 #include "vdpau_internal.h"
 
@@ -91,9 +91,7 @@ static int vdpau_av1_start_frame(AVCodecContext *avctx,
     info->show_frame                   = frame_header->show_frame;
     info->disable_cdf_update           = frame_header->disable_cdf_update;
     info->allow_screen_content_tools   = frame_header->allow_screen_content_tools;
-    info->force_integer_mv             = frame_header->force_integer_mv ||
-                                    frame_header->frame_type == AV1_FRAME_INTRA_ONLY ||
-                                    frame_header->frame_type == AV1_FRAME_KEY;
+    info->force_integer_mv             = s->cur_frame.force_integer_mv;
     info->coded_denom                  = frame_header->coded_denom;
     info->allow_intrabc                = frame_header->allow_intrabc;
     info->allow_high_precision_mv      = frame_header->allow_high_precision_mv;
@@ -219,7 +217,8 @@ static int vdpau_av1_start_frame(AVCodecContext *avctx,
         info->loop_filter_ref_deltas[i] = frame_header->loop_filter_ref_deltas[i];
 
         /* Reference Frames */
-        info->ref_frame_map[i] = ff_vdpau_get_surface_id(s->ref[i].f) ? ff_vdpau_get_surface_id(s->ref[i].f) : VDP_INVALID_HANDLE;
+        info->ref_frame_map[i] = s->ref[i].f && ff_vdpau_get_surface_id(s->ref[i].f) ?
+                                     ff_vdpau_get_surface_id(s->ref[i].f) : VDP_INVALID_HANDLE;
     }
 
     if (frame_header->primary_ref_frame == AV1_PRIMARY_REF_NONE) {
@@ -235,8 +234,8 @@ static int vdpau_av1_start_frame(AVCodecContext *avctx,
         AVFrame *ref_frame = s->ref[ref_idx].f;
 
         info->ref_frame[i].index = info->ref_frame_map[ref_idx];
-        info->ref_frame[i].width = ref_frame->width;
-        info->ref_frame[i].height = ref_frame->height;
+        info->ref_frame[i].width  = ref_frame ? ref_frame->width  : 0;
+        info->ref_frame[i].height = ref_frame ? ref_frame->height : 0;
 
         /* Global Motion */
         info->global_motion[i].invalid = !frame_header->is_global[AV1_REF_FRAME_LAST + i];
@@ -337,13 +336,13 @@ static int vdpau_av1_init(AVCodecContext *avctx)
     uint32_t level = avctx->level;
 
     switch (avctx->profile) {
-    case FF_PROFILE_AV1_MAIN:
+    case AV_PROFILE_AV1_MAIN:
         profile = VDP_DECODER_PROFILE_AV1_MAIN;
         break;
-    case FF_PROFILE_AV1_HIGH:
+    case AV_PROFILE_AV1_HIGH:
         profile = VDP_DECODER_PROFILE_AV1_HIGH;
         break;
-    case FF_PROFILE_AV1_PROFESSIONAL:
+    case AV_PROFILE_AV1_PROFESSIONAL:
         profile = VDP_DECODER_PROFILE_AV1_PROFESSIONAL;
         break;
     default:
@@ -353,11 +352,11 @@ static int vdpau_av1_init(AVCodecContext *avctx)
     return ff_vdpau_common_init(avctx, profile, level);
 }
 
-const AVHWAccel ff_av1_vdpau_hwaccel = {
-    .name           = "av1_vdpau",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_AV1,
-    .pix_fmt        = AV_PIX_FMT_VDPAU,
+const FFHWAccel ff_av1_vdpau_hwaccel = {
+    .p.name         = "av1_vdpau",
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_AV1,
+    .p.pix_fmt      = AV_PIX_FMT_VDPAU,
     .start_frame    = vdpau_av1_start_frame,
     .end_frame      = vdpau_av1_end_frame,
     .decode_slice   = vdpau_av1_decode_slice,

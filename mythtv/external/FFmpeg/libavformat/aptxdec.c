@@ -24,6 +24,7 @@
 
 #include "libavutil/opt.h"
 #include "avformat.h"
+#include "demux.h"
 
 #define APTX_BLOCK_SIZE   4
 #define APTX_PACKET_SIZE  (256*APTX_BLOCK_SIZE)
@@ -58,7 +59,6 @@ static int aptx_read_header(AVFormatContext *s)
     st->codecpar->codec_id = AV_CODEC_ID_APTX;
     st->codecpar->bits_per_coded_sample = 4;
     st->codecpar->block_align = APTX_BLOCK_SIZE;
-    st->codecpar->frame_size = APTX_PACKET_SIZE;
     return 0;
 }
 
@@ -70,18 +70,23 @@ static int aptx_hd_read_header(AVFormatContext *s)
     st->codecpar->codec_id = AV_CODEC_ID_APTX_HD;
     st->codecpar->bits_per_coded_sample = 6;
     st->codecpar->block_align = APTX_HD_BLOCK_SIZE;
-    st->codecpar->frame_size = APTX_HD_PACKET_SIZE;
     return 0;
 }
 
 static int aptx_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    return av_get_packet(s->pb, pkt, APTX_PACKET_SIZE);
+    int ret = av_get_packet(s->pb, pkt, APTX_PACKET_SIZE);
+    if (ret >= 0 && !(ret % APTX_BLOCK_SIZE))
+        pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
+    return ret >= 0 ? 0 : ret;
 }
 
 static int aptx_hd_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    return av_get_packet(s->pb, pkt, APTX_HD_PACKET_SIZE);
+    int ret = av_get_packet(s->pb, pkt, APTX_HD_PACKET_SIZE);
+    if (ret >= 0 && !(ret % APTX_HD_BLOCK_SIZE))
+        pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
+    return ret >= 0 ? 0 : ret;
 }
 
 static const AVOption aptx_options[] = {
@@ -97,27 +102,27 @@ static const AVClass aptx_demuxer_class = {
 };
 
 #if CONFIG_APTX_DEMUXER
-const AVInputFormat ff_aptx_demuxer = {
-    .name           = "aptx",
-    .long_name      = NULL_IF_CONFIG_SMALL("raw aptX"),
-    .extensions     = "aptx",
+const FFInputFormat ff_aptx_demuxer = {
+    .p.name         = "aptx",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("raw aptX"),
+    .p.extensions   = "aptx",
+    .p.flags        = AVFMT_GENERIC_INDEX,
+    .p.priv_class   = &aptx_demuxer_class,
     .priv_data_size = sizeof(AptXDemuxerContext),
     .read_header    = aptx_read_header,
     .read_packet    = aptx_read_packet,
-    .flags          = AVFMT_GENERIC_INDEX,
-    .priv_class     = &aptx_demuxer_class,
 };
 #endif
 
 #if CONFIG_APTX_HD_DEMUXER
-const AVInputFormat ff_aptx_hd_demuxer = {
-    .name           = "aptx_hd",
-    .long_name      = NULL_IF_CONFIG_SMALL("raw aptX HD"),
-    .extensions     = "aptxhd",
+const FFInputFormat ff_aptx_hd_demuxer = {
+    .p.name         = "aptx_hd",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("raw aptX HD"),
+    .p.extensions   = "aptxhd",
+    .p.flags        = AVFMT_GENERIC_INDEX,
+    .p.priv_class   = &aptx_demuxer_class,
     .priv_data_size = sizeof(AptXDemuxerContext),
     .read_header    = aptx_hd_read_header,
     .read_packet    = aptx_hd_read_packet,
-    .flags          = AVFMT_GENERIC_INDEX,
-    .priv_class     = &aptx_demuxer_class,
 };
 #endif

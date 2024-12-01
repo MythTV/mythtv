@@ -541,7 +541,6 @@ bool MythV4L2M2MContext::GetRequestBuffer(AVCodecContext* Context, MythVideoFram
     Frame->m_swPixFmt = Context->sw_pix_fmt;
     Frame->m_directRendering = true;
     AvFrame->opaque   = Frame;
-    AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // Frame->data[0] holds V4L2RequestDescriptor which holds AVDRMFrameDescriptor
     Frame->m_buffer = reinterpret_cast<uint8_t*>(&(reinterpret_cast<V4L2RequestDescriptor*>(AvFrame->data[0])->drm));

@@ -640,8 +640,6 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext* Context, AVFrame* Fra
                 if (m_filterPriorPTS[0] && m_filterPTSUsed == m_filterPriorPTS[1])
                 {
                     Frame->pts = m_filterPriorPTS[1] + (m_filterPriorPTS[1] - m_filterPriorPTS[0]) / 2;
-                    Frame->scte_cc_len = 0;
-                    Frame->atsc_cc_len = 0;
                     av_frame_remove_side_data(Frame, AV_FRAME_DATA_A53_CC);
                 }
                 else
@@ -659,8 +657,8 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext* Context, AVFrame* Fra
         if (ret == 0)
         {
             // preserve interlaced flags
-            m_lastInterlaced = Frame->interlaced_frame;
-            m_lastTopFieldFirst = (Frame->top_field_first != 0);
+            m_lastInterlaced = (Frame->flags & AV_FRAME_FLAG_INTERLACED) != 0;
+            m_lastTopFieldFirst = (Frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) != 0;
         }
 
         if (ret < 0)

@@ -5,7 +5,6 @@
 #include <QRect>
 
 // MythTV
-#include "libmyth/mythaverror.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythtv/mythtvexp.h"
 
@@ -131,7 +130,7 @@ class MTV_PUBLIC MythVideoFrame
     std::chrono::milliseconds m_timecode          { 0ms };
     std::chrono::milliseconds m_displayTimecode   { 0ms };
     std::array<uint8_t*,4> m_priv      { nullptr };
-    int            m_interlaced        { 0    };
+    bool           m_interlaced        { false };
     bool           m_topFieldFirst     { true };
     bool           m_interlacedReverse { false };
     bool           m_newGOP            { false };

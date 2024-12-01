@@ -24,7 +24,7 @@
 #include <vdpau/vdpau.h>
 
 #include "avcodec.h"
-#include "hwconfig.h"
+#include "hwaccel_internal.h"
 #include "mpeg4videodec.h"
 #include "vdpau.h"
 #include "vdpau_internal.h"
@@ -34,7 +34,7 @@ static int vdpau_mpeg4_start_frame(AVCodecContext *avctx,
 {
     Mpeg4DecContext *ctx = avctx->priv_data;
     MpegEncContext * const s = &ctx->m;
-    Picture *pic             = s->current_picture_ptr;
+    MPVPicture *pic          = s->cur_pic.ptr;
     struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
     VdpPictureInfoMPEG4Part2 *info = &pic_ctx->info.mpeg4;
     VdpVideoSurface ref;
@@ -47,13 +47,13 @@ static int vdpau_mpeg4_start_frame(AVCodecContext *avctx,
 
     switch (s->pict_type) {
     case AV_PICTURE_TYPE_B:
-        ref = ff_vdpau_get_surface_id(s->next_picture.f);
+        ref = ff_vdpau_get_surface_id(s->next_pic.ptr->f);
         assert(ref != VDP_INVALID_HANDLE);
         info->backward_reference = ref;
         info->vop_coding_type    = 2;
         /* fall-through */
     case AV_PICTURE_TYPE_P:
-        ref = ff_vdpau_get_surface_id(s->last_picture.f);
+        ref = ff_vdpau_get_surface_id(s->last_pic.ptr->f);
         assert(ref != VDP_INVALID_HANDLE);
         info->forward_reference  = ref;
     }
@@ -74,8 +74,9 @@ static int vdpau_mpeg4_start_frame(AVCodecContext *avctx,
     info->alternate_vertical_scan_flag      = s->alternate_scan;
     info->top_field_first                   = s->top_field_first;
     for (i = 0; i < 64; ++i) {
-        info->intra_quantizer_matrix[i]     = s->intra_matrix[i];
-        info->non_intra_quantizer_matrix[i] = s->inter_matrix[i];
+        int n = s->idsp.idct_permutation[i];
+        info->intra_quantizer_matrix[i]     = s->intra_matrix[n];
+        info->non_intra_quantizer_matrix[i] = s->inter_matrix[n];
     }
 
     ff_vdpau_common_start_frame(pic_ctx, buffer, size);
@@ -94,13 +95,13 @@ static int vdpau_mpeg4_init(AVCodecContext *avctx)
     VdpDecoderProfile profile;
 
     switch (avctx->profile) {
-    case FF_PROFILE_MPEG4_SIMPLE:
+    case AV_PROFILE_MPEG4_SIMPLE:
         profile = VDP_DECODER_PROFILE_MPEG4_PART2_SP;
         break;
     // As any ASP decoder must be able to decode SP, this
     // should be a safe fallback if profile is unknown/unspecified.
-    case FF_PROFILE_UNKNOWN:
-    case FF_PROFILE_MPEG4_ADVANCED_SIMPLE:
+    case AV_PROFILE_UNKNOWN:
+    case AV_PROFILE_MPEG4_ADVANCED_SIMPLE:
         profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
         break;
     default:
@@ -110,11 +111,11 @@ static int vdpau_mpeg4_init(AVCodecContext *avctx)
     return ff_vdpau_common_init(avctx, profile, avctx->level);
 }
 
-const AVHWAccel ff_mpeg4_vdpau_hwaccel = {
-    .name           = "mpeg4_vdpau",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_MPEG4,
-    .pix_fmt        = AV_PIX_FMT_VDPAU,
+const FFHWAccel ff_mpeg4_vdpau_hwaccel = {
+    .p.name         = "mpeg4_vdpau",
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_MPEG4,
+    .p.pix_fmt      = AV_PIX_FMT_VDPAU,
     .start_frame    = vdpau_mpeg4_start_frame,
     .end_frame      = ff_vdpau_mpeg_end_frame,
     .decode_slice   = vdpau_mpeg4_decode_slice,

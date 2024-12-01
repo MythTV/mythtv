@@ -22,18 +22,22 @@
 #include "config_components.h"
 
 #include "avformat.h"
+#include "mux.h"
 #include "rawenc.h"
 
 #define PCMDEF_0(name_, long_name_, ext, codec)
 #define PCMDEF_1(name_, long_name_, ext, codec)             \
-const AVOutputFormat ff_pcm_ ## name_ ## _muxer = {         \
-    .name         = #name_,                                 \
-    .long_name    = NULL_IF_CONFIG_SMALL(long_name_),       \
-    .extensions   = ext,                                    \
-    .audio_codec  = codec,                                  \
-    .video_codec  = AV_CODEC_ID_NONE,                          \
+const FFOutputFormat ff_pcm_ ## name_ ## _muxer = {         \
+    .p.name        = #name_,                                \
+    .p.long_name   = NULL_IF_CONFIG_SMALL(long_name_),      \
+    .p.extensions  = ext,                                   \
+    .p.audio_codec = codec,                                 \
+    .p.video_codec = AV_CODEC_ID_NONE,                      \
+    .p.subtitle_codec = AV_CODEC_ID_NONE,                   \
+    .p.flags       = AVFMT_NOTIMESTAMPS,                    \
+    .flags_internal   = FF_OFMT_FLAG_MAX_ONE_OF_EACH |      \
+                        FF_OFMT_FLAG_ONLY_DEFAULT_CODECS,   \
     .write_packet = ff_raw_write_packet,                    \
-    .flags        = AVFMT_NOTIMESTAMPS,                     \
 };
 #define PCMDEF_2(name, long_name, ext, codec, enabled)      \
     PCMDEF_ ## enabled(name, long_name, ext, codec)

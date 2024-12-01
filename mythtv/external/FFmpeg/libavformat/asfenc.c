@@ -24,7 +24,9 @@
 #include "libavutil/avassert.h"
 #include "libavutil/dict.h"
 #include "libavutil/mathematics.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
+#include "libavcodec/codec_desc.h"
 #include "avformat.h"
 #include "avlanguage.h"
 #include "avio_internal.h"
@@ -569,10 +571,10 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size,
         end_header(pb, hpos);
     }
     if (metadata_count) {
-        AVDictionaryEntry *tag = NULL;
+        const AVDictionaryEntry *tag = NULL;
         hpos = put_header(pb, &ff_asf_extended_content_header);
         avio_wl16(pb, metadata_count);
-        while ((tag = av_dict_get(s->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+        while ((tag = av_dict_iterate(s->metadata, tag))) {
             put_str16(pb, dyn_buf, tag->key);
             avio_wl16(pb, 0);
             put_str16(pb, dyn_buf, tag->value);
@@ -772,8 +774,7 @@ static int asf_write_header(AVFormatContext *s)
     asf->packet_nb_payloads     = 0;
     asf->packet_timestamp_start = -1;
     asf->packet_timestamp_end   = -1;
-    ffio_init_context(&asf->pb, asf->packet_buf, s->packet_size, 1,
-                      NULL, NULL, NULL, NULL);
+    ffio_init_write_context(&asf->pb, asf->packet_buf, s->packet_size);
 
     if (s->avoid_negative_ts < 0)
         s->avoid_negative_ts = 1;
@@ -865,8 +866,7 @@ static void flush_packet(AVFormatContext *s)
     asf->packet_nb_payloads     = 0;
     asf->packet_timestamp_start = -1;
     asf->packet_timestamp_end   = -1;
-    ffio_init_context(&asf->pb, asf->packet_buf, s->packet_size, 1,
-                      NULL, NULL, NULL, NULL);
+    ffio_init_write_context(&asf->pb, asf->packet_buf, s->packet_size);
 }
 
 static void put_payload_header(AVFormatContext *s, ASFStream *stream,
@@ -1128,39 +1128,39 @@ static const AVClass asf_muxer_class = {
 };
 
 #if CONFIG_ASF_MUXER
-const AVOutputFormat ff_asf_muxer = {
-    .name           = "asf",
-    .long_name      = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
-    .mime_type      = "video/x-ms-asf",
-    .extensions     = "asf,wmv,wma",
+const FFOutputFormat ff_asf_muxer = {
+    .p.name         = "asf",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
+    .p.mime_type    = "video/x-ms-asf",
+    .p.extensions   = "asf,wmv,wma",
+    .p.audio_codec  = AV_CODEC_ID_WMAV2,
+    .p.video_codec  = AV_CODEC_ID_MSMPEG4V3,
+    .p.flags        = AVFMT_GLOBALHEADER,
+    .p.codec_tag    = asf_codec_tags,
+    .p.priv_class   = &asf_muxer_class,
     .priv_data_size = sizeof(ASFContext),
-    .audio_codec    = AV_CODEC_ID_WMAV2,
-    .video_codec    = AV_CODEC_ID_MSMPEG4V3,
     .write_header   = asf_write_header,
     .write_packet   = asf_write_packet,
     .write_trailer  = asf_write_trailer,
-    .flags          = AVFMT_GLOBALHEADER,
-    .codec_tag      = asf_codec_tags,
-    .priv_class        = &asf_muxer_class,
     .deinit         = asf_deinit,
 };
 #endif /* CONFIG_ASF_MUXER */
 
 #if CONFIG_ASF_STREAM_MUXER
-const AVOutputFormat ff_asf_stream_muxer = {
-    .name           = "asf_stream",
-    .long_name      = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
-    .mime_type      = "video/x-ms-asf",
-    .extensions     = "asf,wmv,wma",
+const FFOutputFormat ff_asf_stream_muxer = {
+    .p.name         = "asf_stream",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
+    .p.mime_type    = "video/x-ms-asf",
+    .p.extensions   = "asf,wmv,wma",
     .priv_data_size = sizeof(ASFContext),
-    .audio_codec    = AV_CODEC_ID_WMAV2,
-    .video_codec    = AV_CODEC_ID_MSMPEG4V3,
+    .p.audio_codec  = AV_CODEC_ID_WMAV2,
+    .p.video_codec  = AV_CODEC_ID_MSMPEG4V3,
     .write_header   = asf_write_stream_header,
     .write_packet   = asf_write_packet,
     .write_trailer  = asf_write_trailer,
-    .flags          = AVFMT_GLOBALHEADER,
-    .codec_tag      = asf_codec_tags,
-    .priv_class     = &asf_muxer_class,
+    .p.flags        = AVFMT_GLOBALHEADER,
+    .p.codec_tag    = asf_codec_tags,
+    .p.priv_class   = &asf_muxer_class,
     .deinit         = asf_deinit,
 };
 #endif /* CONFIG_ASF_STREAM_MUXER */

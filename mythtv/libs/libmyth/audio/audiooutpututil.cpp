@@ -10,6 +10,7 @@
 
 #include "audioconvert.h"
 #include "mythaverror.h"
+#include "mythavframe.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

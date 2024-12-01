@@ -190,7 +190,6 @@ bool MythMMALContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Frame, 
                                   MythVideoFrame::GetHeightForPlane(Frame->m_type, AvFrame->height, plane));
     }
 
-    AvFrame->reordered_opaque = Context->reordered_opaque;
     return true;
 }
 
@@ -216,7 +215,6 @@ bool MythMMALContext::GetBuffer2(AVCodecContext *Context, MythVideoFrame *Frame,
     Frame->m_swPixFmt = Context->sw_pix_fmt;
     Frame->m_directRendering = 1;
     AvFrame->opaque = Frame;
-    AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // Frame->data[3] holds MMAL_BUFFER_HEADER_T
     Frame->m_buffer = AvFrame->data[3];

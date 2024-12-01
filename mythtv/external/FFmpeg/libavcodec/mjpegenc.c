@@ -32,7 +32,7 @@
 
 #include "config_components.h"
 
-#include "libavutil/pixdesc.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
@@ -80,8 +80,8 @@ static av_cold void init_uni_ac_vlc(const uint8_t huff_size_ac[256],
 
 static void mjpeg_encode_picture_header(MpegEncContext *s)
 {
-    ff_mjpeg_encode_picture_header(s->avctx, &s->pb, s->picture->f, s->mjpeg_ctx,
-                                   &s->intra_scantable, 0,
+    ff_mjpeg_encode_picture_header(s->avctx, &s->pb, s->cur_pic.ptr->f, s->mjpeg_ctx,
+                                   s->intra_scantable.permutated, 0,
                                    s->intra_matrix, s->chroma_intra_matrix,
                                    s->slice_context_count > 1);
 
@@ -595,9 +595,7 @@ static int amv_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
     MpegEncContext *s = avctx->priv_data;
     AVFrame *pic;
     int i, ret;
-    int chroma_h_shift, chroma_v_shift;
-
-    av_pix_fmt_get_chroma_sub_sample(avctx->pix_fmt, &chroma_h_shift, &chroma_v_shift);
+    int chroma_v_shift = 1; /* AMV is 420-only */
 
     if ((avctx->height & 15) && avctx->strict_std_compliance > FF_COMPLIANCE_UNOFFICIAL) {
         av_log(avctx, AV_LOG_ERROR,
@@ -627,9 +625,9 @@ static int amv_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
 FF_MPV_COMMON_OPTS
-{ "huffman", "Huffman table strategy", OFFSET(huffman), AV_OPT_TYPE_INT, { .i64 = HUFFMAN_TABLE_OPTIMAL }, 0, NB_HUFFMAN_TABLE_OPTION - 1, VE, "huffman" },
-    { "default", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = HUFFMAN_TABLE_DEFAULT }, INT_MIN, INT_MAX, VE, "huffman" },
-    { "optimal", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = HUFFMAN_TABLE_OPTIMAL }, INT_MIN, INT_MAX, VE, "huffman" },
+{ "huffman", "Huffman table strategy", OFFSET(huffman), AV_OPT_TYPE_INT, { .i64 = HUFFMAN_TABLE_OPTIMAL }, 0, NB_HUFFMAN_TABLE_OPTION - 1, VE, .unit = "huffman" },
+    { "default", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = HUFFMAN_TABLE_DEFAULT }, INT_MIN, INT_MAX, VE, .unit = "huffman" },
+    { "optimal", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = HUFFMAN_TABLE_OPTIMAL }, INT_MIN, INT_MAX, VE, .unit = "huffman" },
 { "force_duplicated_matrix", "Always write luma and chroma matrix for mjpeg, useful for rtp streaming.", OFFSET(force_duplicated_matrix), AV_OPT_TYPE_BOOL, {.i64 = 0 }, 0, 1, VE },
 { NULL},
 };
@@ -642,17 +640,38 @@ static const AVClass mjpeg_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const FFCodec ff_mjpeg_encoder = {
+static int mjpeg_get_supported_config(const AVCodecContext *avctx,
+                                      const AVCodec *codec,
+                                      enum AVCodecConfig config,
+                                      unsigned flags, const void **out,
+                                      int *out_num)
+{
+    if (config == AV_CODEC_CONFIG_COLOR_RANGE) {
+        static const enum AVColorRange mjpeg_ranges[] = {
+            AVCOL_RANGE_MPEG, AVCOL_RANGE_JPEG, AVCOL_RANGE_UNSPECIFIED,
+        };
+        int strict = avctx ? avctx->strict_std_compliance : 0;
+        int index = strict > FF_COMPLIANCE_UNOFFICIAL ? 1 : 0;
+        *out = &mjpeg_ranges[index];
+        *out_num = FF_ARRAY_ELEMS(mjpeg_ranges) - index - 1;
+        return 0;
+    }
+
+    return ff_default_get_supported_config(avctx, codec, config, flags, out, out_num);
+}
+
+FFCodec ff_mjpeg_encoder = {
     .p.name         = "mjpeg",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("MJPEG (Motion JPEG)"),
+    CODEC_LONG_NAME("MJPEG (Motion JPEG)"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_MJPEG,
     .priv_data_size = sizeof(MJPEGEncContext),
     .init           = ff_mpv_encode_init,
     FF_CODEC_ENCODE_CB(ff_mpv_encode_picture),
     .close          = mjpeg_encode_close,
-    .p.capabilities = AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .p.capabilities = AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS |
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_ICC_PROFILES,
     .p.pix_fmts     = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ444P,
         AV_PIX_FMT_YUV420P,  AV_PIX_FMT_YUV422P,  AV_PIX_FMT_YUV444P,
@@ -660,6 +679,7 @@ const FFCodec ff_mjpeg_encoder = {
     },
     .p.priv_class   = &mjpeg_class,
     .p.profiles     = NULL_IF_CONFIG_SMALL(ff_mjpeg_profiles),
+    .get_supported_config = mjpeg_get_supported_config,
 };
 #endif
 
@@ -673,17 +693,19 @@ static const AVClass amv_class = {
 
 const FFCodec ff_amv_encoder = {
     .p.name         = "amv",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("AMV Video"),
+    CODEC_LONG_NAME("AMV Video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_AMV,
     .priv_data_size = sizeof(MJPEGEncContext),
     .init           = ff_mpv_encode_init,
     FF_CODEC_ENCODE_CB(amv_encode_picture),
     .close          = mjpeg_encode_close,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.pix_fmts     = (const enum AVPixelFormat[]) {
         AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_NONE
     },
+    .color_ranges   = AVCOL_RANGE_JPEG,
     .p.priv_class   = &amv_class,
+    .p.capabilities = AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
 };
 #endif

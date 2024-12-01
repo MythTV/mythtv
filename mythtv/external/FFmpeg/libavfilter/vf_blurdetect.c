@@ -30,11 +30,14 @@
  * @author Thilo Borgmann <thilo.borgmann _at_ mail.de>
  */
 
-#include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
+#include "libavutil/pixdesc.h"
 #include "libavutil/qsort.h"
-#include "internal.h"
+
+#include "filters.h"
 #include "edge_common.h"
+#include "video.h"
 
 static int comp(const float *a,const float *b)
 {
@@ -254,6 +257,7 @@ static void set_meta(AVDictionary **metadata, const char *key, float d)
 
 static int blurdetect_filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
+    FilterLink      *inl  = ff_filter_link(inlink);
     AVFilterContext *ctx  = inlink->dst;
     BLRContext *s         = ctx->priv;
     AVFilterLink *outlink = ctx->outputs[0];
@@ -283,12 +287,12 @@ static int blurdetect_filter_frame(AVFilterLink *inlink, AVFrame *in)
         nplanes++;
 
         // gaussian filter to reduce noise
-        ff_gaussian_blur(w, h,
-                         filterbuf,  w,
-                         in->data[plane], in->linesize[plane]);
+        ff_gaussian_blur_8(w, h,
+                           filterbuf,  w,
+                           in->data[plane], in->linesize[plane], 1);
 
         // compute the 16-bits gradients and directions for the next step
-        ff_sobel(w, h, gradients, w, directions, w, filterbuf, w);
+        ff_sobel_8(w, h, gradients, w, directions, w, filterbuf, w, 1);
 
         // non_maximum_suppression() will actually keep & clip what's necessary and
         // ignore the rest, so we need a clean output buffer
@@ -314,7 +318,7 @@ static int blurdetect_filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     set_meta(metadata, "lavfi.blur", blur);
 
-    s->nb_frames = inlink->frame_count_in;
+    s->nb_frames = inl->frame_count_in;
 
     return ff_filter_frame(outlink, in);
 }
@@ -356,13 +360,6 @@ static const AVFilterPad blurdetect_inputs[] = {
     },
 };
 
-static const AVFilterPad blurdetect_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_blurdetect = {
     .name          = "blurdetect",
     .description   = NULL_IF_CONFIG_SMALL("Blurdetect filter."),
@@ -371,7 +368,7 @@ const AVFilter ff_vf_blurdetect = {
     .uninit        = blurdetect_uninit,
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     FILTER_INPUTS(blurdetect_inputs),
-    FILTER_OUTPUTS(blurdetect_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     .priv_class    = &blurdetect_class,
     .flags         = AVFILTER_FLAG_METADATA_ONLY,
 };

@@ -335,7 +335,7 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Fr
 
     Frame->m_deinterlaceInuse = DEINT_BASIC | DEINT_DRIVER;
     Frame->m_deinterlaceInuse2x = false;
-    Frame->m_interlaced = 0;
+    Frame->m_interlaced = false;
     Frame->m_interlacedReverse = false;
     Frame->m_topFieldFirst = false;
     Frame->m_deinterlaceAllowed = DEINT_NONE;

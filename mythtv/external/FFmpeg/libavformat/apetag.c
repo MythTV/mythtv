@@ -23,6 +23,7 @@
 #include <inttypes.h>
 
 #include "libavutil/dict.h"
+#include "libavutil/mem.h"
 #include "avformat.h"
 #include "avio_internal.h"
 #include "apetag.h"
@@ -120,7 +121,8 @@ int64_t ff_ape_parse_tag(AVFormatContext *s)
 
     avio_seek(pb, file_size - APE_TAG_FOOTER_BYTES, SEEK_SET);
 
-    avio_read(pb, buf, 8);     /* APETAGEX */
+    if(avio_read(pb, buf, 8) != 8)     /* APETAGEX */
+        return 0;
     if (strncmp(buf, APE_TAG_PREAMBLE, 8)) {
         return 0;
     }
@@ -175,7 +177,7 @@ static int string_is_ascii(const uint8_t *str)
 
 int ff_ape_write_tag(AVFormatContext *s)
 {
-    AVDictionaryEntry *e = NULL;
+    const AVDictionaryEntry *e = NULL;
     int size, ret, count = 0;
     AVIOContext *dyn_bc;
     uint8_t *dyn_buf;
@@ -184,7 +186,7 @@ int ff_ape_write_tag(AVFormatContext *s)
         return ret;
 
     ff_standardize_creation_time(s);
-    while ((e = av_dict_get(s->metadata, "", e, AV_DICT_IGNORE_SUFFIX))) {
+    while ((e = av_dict_iterate(s->metadata, e))) {
         int val_len;
 
         if (!string_is_ascii(e->key)) {

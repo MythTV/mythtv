@@ -24,6 +24,23 @@
 
 #include "rl.h"
 
+av_cold void ff_rl_init_level_run(uint8_t max_level[MAX_LEVEL + 1],
+                                  uint8_t index_run[MAX_RUN + 1],
+                                  const uint8_t table_run[/* n */],
+                                  const uint8_t table_level[/* n*/],
+                                  int n)
+{
+    memset(index_run, n, MAX_RUN + 1);
+    for (int i = 0; i < n; i++) {
+        int run   = table_run[i];
+        int level = table_level[i];
+        if (index_run[run] == n)
+            index_run[run] = i;
+        if (level > max_level[run])
+            max_level[run] = level;
+    }
+}
+
 av_cold void ff_rl_init(RLTable *rl,
                         uint8_t static_store[2][2 * MAX_RUN + MAX_LEVEL + 3])
 {
@@ -65,7 +82,9 @@ av_cold void ff_rl_init_vlc(RLTable *rl, unsigned static_size)
     VLCElem table[1500] = { 0 };
     VLC vlc = { .table = table, .table_allocated = static_size };
     av_assert0(static_size <= FF_ARRAY_ELEMS(table));
-    init_vlc(&vlc, 9, rl->n + 1, &rl->table_vlc[0][1], 4, 2, &rl->table_vlc[0][0], 4, 2, INIT_VLC_USE_NEW_STATIC);
+    vlc_init(&vlc, 9, rl->n + 1,
+             &rl->table_vlc[0][1], 4, 2,
+             &rl->table_vlc[0][0], 4, 2, VLC_INIT_USE_STATIC);
 
     for (q = 0; q < 32; q++) {
         int qmul = q * 2;

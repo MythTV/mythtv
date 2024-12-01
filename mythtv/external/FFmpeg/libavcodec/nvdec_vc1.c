@@ -23,6 +23,7 @@
 #include "config_components.h"
 
 #include "avcodec.h"
+#include "hwaccel_internal.h"
 #include "internal.h"
 #include "nvdec.h"
 #include "decode.h"
@@ -37,7 +38,7 @@ static int nvdec_vc1_start_frame(AVCodecContext *avctx, const uint8_t *buffer, u
     CUVIDPICPARAMS     *pp = &ctx->pic_params;
     FrameDecodeData *fdd;
     NVDECFrame *cf;
-    AVFrame *cur_frame = s->current_picture.f;
+    AVFrame *cur_frame = s->cur_pic.ptr->f;
 
     int ret;
 
@@ -62,8 +63,8 @@ static int nvdec_vc1_start_frame(AVCodecContext *avctx, const uint8_t *buffer, u
                              s->pict_type == AV_PICTURE_TYPE_P,
 
         .CodecSpecific.vc1 = {
-            .ForwardRefIdx     = ff_nvdec_get_ref_idx(s->last_picture.f),
-            .BackwardRefIdx    = ff_nvdec_get_ref_idx(s->next_picture.f),
+            .ForwardRefIdx     = ff_nvdec_get_ref_idx(s->last_pic.ptr ? s->last_pic.ptr->f : NULL),
+            .BackwardRefIdx    = ff_nvdec_get_ref_idx(s->next_pic.ptr ? s->next_pic.ptr->f : NULL),
             .FrameWidth        = cur_frame->width,
             .FrameHeight       = cur_frame->height,
 
@@ -113,11 +114,11 @@ static int nvdec_vc1_frame_params(AVCodecContext *avctx,
     return ff_nvdec_frame_params(avctx, hw_frames_ctx, 2, 0);
 }
 
-const AVHWAccel ff_vc1_nvdec_hwaccel = {
-    .name                 = "vc1_nvdec",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_VC1,
-    .pix_fmt              = AV_PIX_FMT_CUDA,
+const FFHWAccel ff_vc1_nvdec_hwaccel = {
+    .p.name               = "vc1_nvdec",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_VC1,
+    .p.pix_fmt            = AV_PIX_FMT_CUDA,
     .start_frame          = nvdec_vc1_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = ff_nvdec_simple_decode_slice,
@@ -128,11 +129,11 @@ const AVHWAccel ff_vc1_nvdec_hwaccel = {
 };
 
 #if CONFIG_WMV3_NVDEC_HWACCEL
-const AVHWAccel ff_wmv3_nvdec_hwaccel = {
-    .name                 = "wmv3_nvdec",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_WMV3,
-    .pix_fmt              = AV_PIX_FMT_CUDA,
+const FFHWAccel ff_wmv3_nvdec_hwaccel = {
+    .p.name               = "wmv3_nvdec",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_WMV3,
+    .p.pix_fmt            = AV_PIX_FMT_CUDA,
     .start_frame          = nvdec_vc1_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = ff_nvdec_simple_decode_slice,
