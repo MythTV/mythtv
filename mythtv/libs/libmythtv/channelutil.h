@@ -289,6 +289,9 @@ class MTV_PUBLIC ChannelUtil
                                       uint           sourceid,
                                       const QString &channum);
 
+    static QString GetChannelNumber(uint           sourceid,
+                                    const QString &channel_name);
+
     static bool    IsOnSameMultiplex(uint srcid,
                                      const QString &new_channum,
                                      const QString &old_channum);

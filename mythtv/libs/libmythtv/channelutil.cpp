@@ -988,6 +988,29 @@ int ChannelUtil::GetChannelValueInt(const QString &channel_field,
     return (retval) ? retval : -1;
 }
 
+QString ChannelUtil::GetChannelNumber(uint sourceid, const QString &channel_name)
+{
+    if (channel_name.isEmpty())
+        return {};
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT channum FROM channel WHERE sourceid = :SOURCEID "
+                  "AND name = :NAME "
+                  "AND deleted IS NULL;" );
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":NAME", channel_name.left(64));    // Field channel.name is 64 characters
+    if (!query.exec())
+    {
+        MythDB::DBError("GetChannelNumber", query);
+        return {};
+    }
+
+    if (!query.next())
+        return {};
+
+    return query.value(0).toString();
+}
+
 bool ChannelUtil::IsOnSameMultiplex(uint srcid,
                                     const QString &new_channum,
                                     const QString &old_channum)
