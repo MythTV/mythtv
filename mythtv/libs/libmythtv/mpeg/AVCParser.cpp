@@ -1074,12 +1074,12 @@ double AVCParser::frameRate(void) const
     return fps;
 }
 
-void AVCParser::getFrameRate(FrameRate &result) const
+MythAVRational AVCParser::getFrameRate() const
 {
     if (m_unitsInTick == 0)
-        result = FrameRate(0);
+        return MythAVRational(0);
     else if (m_timeScale & 0x1)
-        result = FrameRate(m_timeScale, m_unitsInTick * 2);
+        return MythAVRational(m_timeScale, m_unitsInTick * 2);
     else
-        result = FrameRate(m_timeScale / 2, m_unitsInTick);
+        return MythAVRational(m_timeScale / 2, m_unitsInTick);
 }

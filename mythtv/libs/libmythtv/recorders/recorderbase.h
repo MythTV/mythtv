@@ -16,6 +16,7 @@
 #include "libmythbase/programtypes.h" // for MarkTypes, frm_pos_map_t
 
 #include "libmythtv/mythtvexp.h"
+#include "libmythtv/mythavrational.h"
 #include "libmythtv/recordingfile.h"
 #include "libmythtv/recordingquality.h"
 #include "libmythtv/scantype.h"
@@ -34,24 +35,6 @@ class RecorderBase;
 class ChannelBase;
 class MythMediaBuffer;
 class TVRec;
-
-class FrameRate
-{
-public:
-    explicit FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
-    double toDouble(void) const { return m_num / (double)m_den; }
-    bool isNonzero(void) const { return m_num != 0U; }
-    uint getNum(void) const { return m_num; }
-    uint getDen(void) const { return m_den; }
-    QString toString(void) const { return QString("%1/%2").arg(m_num).arg(m_den); }
-    bool operator==(const FrameRate other) const {
-        return m_num == other.m_num && m_den == other.m_den;
-    }
-    bool operator!=(const FrameRate other) const { return !(*this == other); }
-private:
-    uint m_num;
-    uint m_den;
-};
 
 /** \class RecorderBase
  *  \brief This is the abstract base class for supporting
@@ -78,7 +61,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     {
         m_videoFrameRate = rate;
         m_ntscFrameRate = (29.96 <= rate && 29.98 >= rate);
-        m_frameRate = FrameRate(lround(rate * 100), 100);
+        m_frameRate = MythAVRational(lround(rate * 100), 100);
     }
 
     /** \brief Changes the Recording from the one set initially with
@@ -324,7 +307,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     uint           m_videoHeight          {0};
     uint           m_videoWidth           {0};
-    FrameRate      m_frameRate            {0};
+    MythAVRational m_frameRate            {0};
 
     RecordingInfo *m_curRecording         {nullptr};
 
