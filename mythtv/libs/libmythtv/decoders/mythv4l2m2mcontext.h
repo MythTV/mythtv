@@ -28,7 +28,6 @@ class MythV4L2M2MContext : public MythDRMPRIMEContext
 
     static enum AVPixelFormat GetV4L2RequestFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt);
     static int  InitialiseV4L2RequestContext(AVCodecContext *Context);
-    bool        GetRequestBuffer(AVCodecContext* Context, MythVideoFrame* Frame, AVFrame* AvFrame);
 
   protected:
     static const V4L2Profiles& GetStandardProfiles();
