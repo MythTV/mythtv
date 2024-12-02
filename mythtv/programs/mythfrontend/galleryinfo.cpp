@@ -2,7 +2,7 @@
 #include <chrono>
 
 // MythTV
-#include "libmythbase/mythcoreutil.h"
+#include "libmythbase/filesysteminfo.h"
 #include "libmythbase/mythdate.h"
 #include "libmythmetadata/imagemetadata.h"
 
@@ -176,9 +176,10 @@ void InfoList::CreateCount(ImageItemK &im)
     if (im.IsDevice() && im.IsLocal())
     {
         // Returns KiB
-        int64_t total = 0;
-        int64_t used = 0;
-        int64_t free = getDiskSpace(im.m_filePath, total, used);
+        auto fsInfo   = FileSystemInfo(QString(), im.m_filePath);
+        int64_t total = fsInfo.getTotalSpace();
+        int64_t used  = fsInfo.getUsedSpace();
+        int64_t free  = fsInfo.getFreeSpace();
         if (total > 0)
         {
             CreateButton(tr("Free space"), tr("%L1 (%L2\%) Used: %L3 / %L4")
