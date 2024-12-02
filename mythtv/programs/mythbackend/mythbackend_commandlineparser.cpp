@@ -79,6 +79,12 @@ void MythBackendCommandLineParser::LoadArguments(void)
             "recordings.");
     add("--user", "username", "",
             "Drop permissions to username after starting.", "");
+#ifndef NDEBUG
+    add("--upgradedbonly", "upgradedbonly", false,
+        "Upgrade the database and then exit.",
+        "Intended for development use only, Upgrade the database "
+        "and then immediately exit.");
+#endif
 }
 
 QString MythBackendCommandLineParser::GetHelpHeader(void) const

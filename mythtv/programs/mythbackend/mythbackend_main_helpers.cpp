@@ -568,6 +568,13 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         gContext->setWebOnly(MythContext::kWebOnlySchemaUpdate);
         return run_setup_webserver();
     }
+#ifndef NDEBUG
+    if (cmdline.toBool("upgradedbonly"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Exiting as requested.");
+        return GENERIC_EXIT_OK;
+    }
+#endif
 
     be_sd_notify("STATUS=Loading translation");
     MythTranslation::load("mythfrontend");
