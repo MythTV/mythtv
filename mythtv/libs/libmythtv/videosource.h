@@ -6,7 +6,7 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythbase/mthread.h"
 
 #include "mythtvexp.h"

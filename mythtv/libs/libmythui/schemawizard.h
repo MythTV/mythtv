@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QString>
 
-#include "libmyth/mythexp.h"
+#include "libmythui/mythuiexp.h"
 #include "libmythbase/dbutil.h"
 
 class MythUIBusyDialog;
@@ -22,7 +22,7 @@ enum MythSchemaUpgrade : std::uint8_t
 /** \brief Provides UI and helper functions for DB Schema updates.
  *  See dbcheck.cpp's UpgradeTVDatabaseSchema() for usage.
  */
-class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
+class MUI_PUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
 {
     Q_OBJECT
 
