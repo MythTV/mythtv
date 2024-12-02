@@ -20,6 +20,8 @@
 
 #include "test_musicutils.h"
 
+#include "libmythbase/mythcorecontext.h"
+
 void TestMusicUtils::initTestCase()
 {
     gCoreContext = new MythCoreContext("test_mythmusicutils_1.0", nullptr);

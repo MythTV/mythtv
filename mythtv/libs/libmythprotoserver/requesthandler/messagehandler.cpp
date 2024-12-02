@@ -1,5 +1,6 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythevent.h"
+#include "libmythbase/mythlogging.h"
 
 #include "requesthandler/messagehandler.h"
 

@@ -22,6 +22,8 @@
 #include <QString>
 
 // MythTV includes
+#include "libmythbase/mythcorecontext.h"
+
 #include "asichannel.h"
 #include "asirecorder.h"
 #include "asistreamhandler.h"

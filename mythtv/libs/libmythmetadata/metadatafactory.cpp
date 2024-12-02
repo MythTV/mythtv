@@ -11,11 +11,12 @@
 #include <QUrl>
 
 // mythtv
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remoteutil.h"
+#include "libmythbase/storagegroup.h"
 #include "libmythtv/recordingrule.h"
 
 // libmythmetadata
@@ -184,7 +185,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     lookup->SetSeason(metadata->GetSeason());
     lookup->SetEpisode(metadata->GetEpisode());
     lookup->SetInetref(metadata->GetInetRef());
-    lookup->SetFilename(generate_file_url("Videos", metadata->GetHost(),
+    lookup->SetFilename(StorageGroup::generate_file_url("Videos", metadata->GetHost(),
                                       metadata->GetFilename()));
 
     if (m_lookupthread->isRunning())

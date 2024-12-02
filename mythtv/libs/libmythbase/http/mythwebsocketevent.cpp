@@ -1,5 +1,6 @@
 #include "http/mythwebsocketevent.h"
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 
 MythWebSocketEvent::MythWebSocketEvent()
 {

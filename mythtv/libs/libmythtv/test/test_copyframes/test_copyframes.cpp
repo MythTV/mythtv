@@ -2,7 +2,6 @@
 
 #include <climits>
 
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythrandom.h"
 #include "libmythtv/mythframe.h"
 

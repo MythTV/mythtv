@@ -4,6 +4,7 @@
 #include "mythsorthelper.h"
 
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 
 /**
  *  \brief Common code for creating a MythSortHelper object.

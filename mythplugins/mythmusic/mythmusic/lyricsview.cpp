@@ -10,10 +10,11 @@
 
 // MythTV
 #include <libmyth/audio/audiooutput.h>
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythversion.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>

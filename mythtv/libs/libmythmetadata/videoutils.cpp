@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 // mythtv
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/storagegroup.h"

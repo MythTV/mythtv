@@ -24,11 +24,11 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include <QMap>
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/hardwareprofile.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimezone.h"
@@ -36,7 +36,6 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/eitcache.h"
@@ -311,10 +310,6 @@ void cleanup(void)
         delete rec;
     }
 
-
-    delete gContext;
-    gContext = nullptr;
-
     delete mainServer;
     mainServer = nullptr;
 
@@ -326,8 +321,6 @@ void cleanup(void)
         QFile::remove(gPidFile);
         gPidFile.clear();
     }
-
-    SignalHandler::Done();
 }
 
 int handle_command(const MythBackendCommandLineParser &cmdline)
@@ -555,7 +548,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             "Please install it and try again.  "
             "See 'mysql_tzinfo_to_sql' for assistance.");
         gCoreContext->GetDB()->IgnoreDatabase(true);
-        gContext->setWebOnly(MythContext::kWebOnlyDBTimezone);
+        V2Myth::s_WebOnlyStartup = V2Myth::kWebOnlyDBTimezone;
         return run_setup_webserver();
     }
     bool ismaster = gCoreContext->IsMasterHost();
@@ -565,7 +558,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't upgrade database to new schema on %1 backend.")
             .arg(ismaster ? "master" : "slave"));
-        gContext->setWebOnly(MythContext::kWebOnlySchemaUpdate);
+        V2Myth::s_WebOnlyStartup = V2Myth::kWebOnlySchemaUpdate;
         return run_setup_webserver();
     }
 
@@ -574,7 +567,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (cmdline.toBool("webonly"))
     {
-        gContext->setWebOnly(MythContext::kWebOnlyWebOnlyParm);
+        V2Myth::s_WebOnlyStartup = V2Myth::kWebOnlyWebOnlyParm;
         return run_setup_webserver();
     }
     if (!ismaster)
@@ -592,7 +585,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         std::cerr << "No setting found for this machine's BackendServerAddr.\n"
                   << "MythBackend starting in Web App only mode for initial setup.\n"
                   << "Use http://<yourBackend>:6544 to perform setup.\n";
-        gContext->setWebOnly(MythContext::kWebOnlyIPAddress);
+        V2Myth::s_WebOnlyStartup = V2Myth::kWebOnlyIPAddress;
         return run_setup_webserver();
     }
 

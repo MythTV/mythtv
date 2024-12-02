@@ -10,6 +10,7 @@
 #include "libmythbase/dbutil.h"
 #include "libmythbase/hardwareprofile.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
@@ -23,7 +24,6 @@
 #include "libmythtv/tv_rec.h"
 
 // MythBackend
-#include "backendcontext.h"
 #include "scheduler.h"
 #include "v2databaseInfo.h"
 #include "v2myth.h"
@@ -175,7 +175,7 @@ bool V2Myth::SetConnectionInfo(const QString &Host, const QString &UserName, con
     dbparms.m_wolRetry = 3;
     dbparms.m_wolCommand = QString();
 
-    bResult = gContext->SaveDatabaseParams(dbparms);
+    bResult = GetMythDB()->SaveDatabaseParams(dbparms, false);
 
     return bResult;
 }
@@ -1129,25 +1129,24 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     pLog->setLogArgs       ( logPropagateArgs      );
     pEnv->setIsDatabaseIgnored(gCoreContext->GetDB()->IsDatabaseIgnored());
     pEnv->setDBTimezoneSupport(DBUtil::CheckTimeZoneSupport());
-    auto nWebOnly = gContext->getWebOnly();
     QString webOnly;
-    switch (nWebOnly) {
-        case MythContext::kWebOnlyNone:
+    switch (s_WebOnlyStartup) {
+        case kWebOnlyNone:
             webOnly = "NONE";
             break;
-        case MythContext::kWebOnlyDBSetup:
+        case kWebOnlyDBSetup:
             webOnly = "DBSETUP";
             break;
-        case MythContext::kWebOnlyDBTimezone:
+        case kWebOnlyDBTimezone:
             webOnly = "DBTIMEZONE";
             break;
-        case MythContext::kWebOnlyWebOnlyParm:
+        case kWebOnlyWebOnlyParm:
             webOnly = "WEBONLYPARM";
             break;
-        case MythContext::kWebOnlyIPAddress:
+        case kWebOnlyIPAddress:
             webOnly = "IPADDRESS";
             break;
-        case MythContext::kWebOnlySchemaUpdate:
+        case kWebOnlySchemaUpdate:
             webOnly = "SCHEMAUPDATE";
             break;
     }

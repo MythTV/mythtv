@@ -1,7 +1,8 @@
 #include <QString>
 
-#include "libmythbase/mythcorecontext.h"
 #include "mythpreviewgen_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythPreviewGeneratorCommandLineParser::MythPreviewGeneratorCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHPREVIEWGEN)

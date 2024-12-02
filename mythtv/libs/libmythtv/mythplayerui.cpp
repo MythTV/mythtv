@@ -2,6 +2,7 @@
 
 // MythTV
 #include "libmyth/audio/audiooutput.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythui/mythmainwindow.h"
 
 #include "decoders/avformatdecoder.h"

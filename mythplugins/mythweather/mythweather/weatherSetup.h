@@ -5,7 +5,6 @@
 #include <QList>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythscreentype.h>

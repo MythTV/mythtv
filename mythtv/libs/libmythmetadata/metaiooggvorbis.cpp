@@ -4,9 +4,6 @@
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-// Libmyth
-#include "libmyth/mythcontext.h"
-
 /*!
 * \brief Open the file to read the tag
 *

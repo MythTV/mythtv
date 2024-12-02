@@ -25,6 +25,8 @@
 // C++ headers
 #include <algorithm>
 
+#include "libmythbase/mythcorecontext.h"
+
 #define LOC     QString("PulseAudio: ")
 
 static constexpr int8_t PULSE_MAX_CHANNELS { 8 };

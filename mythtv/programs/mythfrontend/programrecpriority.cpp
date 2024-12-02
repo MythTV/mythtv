@@ -6,6 +6,7 @@
 
 // MythTV headers
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/remoteutil.h"
 #include "libmythbase/stringutil.h"

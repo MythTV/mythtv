@@ -1,7 +1,8 @@
 #include <QString>
 
-#include "libmythbase/mythcorecontext.h"
 #include "mythshutdown_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythShutdownCommandLineParser::MythShutdownCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHSHUTDOWN)

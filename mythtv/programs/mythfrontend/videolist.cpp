@@ -10,8 +10,9 @@
 #include <QScopedPointer>
 
 // MythTV
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
 #include "libmythui/mythgenerictree.h"
 #include "libmythmetadata/videometadatalistmanager.h"

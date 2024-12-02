@@ -72,7 +72,7 @@ class SystemEventThread : public QRunnable
 /** \fn MythSystemEventHandler::MythSystemEventHandler(void)
  *  \brief Null Constructor
  *
- *  Adds this object as a gContext event listener.
+ *  Adds this object as a gCoreContext event listener.
  */
 MythSystemEventHandler::MythSystemEventHandler(void)
 {
@@ -83,7 +83,7 @@ MythSystemEventHandler::MythSystemEventHandler(void)
 /** \fn MythSystemEventHandler::~MythSystemEventHandler()
  *  \brief Destructor
  *
- *  Removes this object as a gContext event listener.
+ *  Removes this object as a gCoreContext event listener.
  */
 MythSystemEventHandler::~MythSystemEventHandler()
 {

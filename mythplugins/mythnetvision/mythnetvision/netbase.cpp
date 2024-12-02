@@ -1,12 +1,14 @@
 #include <QDir>
 
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/remotefile.h>
 #include <libmythbase/remoteutil.h>
+#include <libmythbase/storagegroup.h>
 #include <libmythmetadata/metadataimagedownload.h>
-#include <libmythmetadata/videoutils.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 #include <libmythui/mythprogressdialog.h>
@@ -287,7 +289,7 @@ void NetBase::DoDownloadAndPlay()
     QString baseFilename = GetDownloadFilename(item->GetTitle(),
                                                item->GetMediaURL());
 
-    QString finalFilename = generate_file_url("Default",
+    QString finalFilename = StorageGroup::generate_file_url("Default",
                                               gCoreContext->GetMasterHostName(),
                                               baseFilename);
 

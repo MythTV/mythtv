@@ -2,7 +2,7 @@
 #include <utility>
 
 // MythTV
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
 #include "libmythui/opengl/mythopenglperf.h"

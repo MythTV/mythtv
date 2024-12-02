@@ -9,11 +9,12 @@
 #include <QThread>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythcoreutil.h>
+#include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythdownloadmanager.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythmetadata/musicutils.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>

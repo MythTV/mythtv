@@ -12,7 +12,6 @@
 #include "libmythbase/mythlogging.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "libmyth/mythcontext.h"
 #include "recorders/vboxutils.h"
 #include "scanmonitor.h"
 #include "vboxchannelfetcher.h"

@@ -7,6 +7,7 @@
 // MythTV
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 
 // MythGame
 #include "gamesettings.h"

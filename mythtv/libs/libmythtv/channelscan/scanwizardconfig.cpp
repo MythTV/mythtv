@@ -1,5 +1,7 @@
 #include "scanwizardconfig.h"
 
+#include "libmythbase/mythcorecontext.h"
+
 #include "cardutil.h"
 #include "channelscanmiscsettings.h"
 #include "channelutil.h"

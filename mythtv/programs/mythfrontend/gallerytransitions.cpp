@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 
 #define LOC QString("Transition: ")

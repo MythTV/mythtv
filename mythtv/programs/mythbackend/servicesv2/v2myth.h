@@ -55,6 +55,16 @@ class V2Myth : public MythHTTPService
    ~V2Myth() override = default;
     static void RegisterCustomTypes();
 
+    enum WebOnlyStartup : std::uint8_t {
+        kWebOnlyNone = 0,
+        kWebOnlyDBSetup = 1,
+        kWebOnlyDBTimezone = 2,
+        kWebOnlyWebOnlyParm = 3,
+        kWebOnlyIPAddress = 4,
+        kWebOnlySchemaUpdate = 5
+    };
+    static inline WebOnlyStartup s_WebOnlyStartup {kWebOnlyNone};
+
   public slots:
 
     static V2ConnectionInfo*   GetConnectionInfo   ( const QString   &Pin );

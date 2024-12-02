@@ -4,10 +4,10 @@
 #include <QProcess>
 
 // libmyth* headers
-#include "libmyth/mythcontext.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"

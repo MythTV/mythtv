@@ -15,7 +15,6 @@
 #ifdef LEAK_DEBUG
 #include <QReadWriteLock>
 #include <QMap>
-#include "../libmythui/mythimage.h"
 static QReadWriteLock leakLock;
 struct LeakInfo
 {

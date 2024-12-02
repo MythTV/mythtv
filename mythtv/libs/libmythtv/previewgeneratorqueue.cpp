@@ -15,9 +15,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/remoteutil.h"
 
-// libmyth
-#include "libmyth/mythcontext.h"
-
 // libmythtv
 #include "previewgenerator.h"
 

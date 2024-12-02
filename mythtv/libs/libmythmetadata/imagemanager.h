@@ -51,7 +51,7 @@
 #include <QTemporaryDir>
 
 // MythTV headers
-#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/storagegroup.h"
 
@@ -231,13 +231,10 @@ protected:
  \details Scanner will scan SG. Creates images with positive ids and relative filepaths
  Thumbnails are stored in Temp SG.
 */
-class ImageAdapterSg : public ImageAdapterBase
+class META_PUBLIC ImageAdapterSg : public ImageAdapterBase
 {
 public:
-    ImageAdapterSg() :
-        m_hostname(gCoreContext->GetMasterHostName()),
-        m_hostport(MythCoreContext::GetMasterServerPort()),
-        m_sg(StorageGroup(IMAGE_STORAGE_GROUP, m_hostname, false)) {}
+    ImageAdapterSg();
 
     ImageItem *CreateItem(const QFileInfo &fi, int parentId, int devId,
                           const QString &base) const;
@@ -245,15 +242,10 @@ public:
     QString    GetAbsFilePath(const ImagePtrK &im) const;
 
     //! Construct URL of a remote image.
-    QString MakeFileUrl(const QString &path) const
-    { return MythCoreContext::GenMythURL(m_hostname, m_hostport, path,
-                                      IMAGE_STORAGE_GROUP); }
+    QString MakeFileUrl(const QString &path) const;
 
     //! Construct URL of the thumbnail of a remote image
-    QString MakeThumbUrl(const QString &devPath, const QString &path = "") const
-    { return MythCoreContext::GenMythURL(m_hostname, m_hostport,
-                                      devPath + "/" + path,
-                                      THUMBNAIL_STORAGE_GROUP); }
+    QString MakeThumbUrl(const QString &devPath, const QString &path = "") const;
 
     static void Notify(const QString &mesg, const QStringList &extra) ;
 

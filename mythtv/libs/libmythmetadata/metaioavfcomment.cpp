@@ -9,7 +9,6 @@ extern "C" {
 #include "musicmetadata.h"
 
 // libmyth
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythconfig.h"
 
 /*!

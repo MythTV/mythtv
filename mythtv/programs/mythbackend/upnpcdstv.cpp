@@ -20,6 +20,7 @@
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythupnp/httprequest.h"

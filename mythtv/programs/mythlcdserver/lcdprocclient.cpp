@@ -24,11 +24,12 @@
 #include <QTimer>
 
 // mythtv
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/lcddevice.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythtv/tv.h"
 
 // mythlcdserver

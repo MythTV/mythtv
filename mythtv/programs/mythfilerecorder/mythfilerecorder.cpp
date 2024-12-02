@@ -11,12 +11,15 @@
 // Qt
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
+#include <QTextStream>
 #include <QThread>
 #include <QTime>
 
 // MythTV
 #include "libmyth/mythcontext.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 

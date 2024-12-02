@@ -11,10 +11,10 @@
 // libmyth* includes
 #include "libmyth/mythcontext.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/signalhandling.h"
 
 // Local includes
 #include "backendutils.h"
@@ -122,12 +122,8 @@ int main(int argc, char *argv[])
     if (!cmdline.toBool("loglevel"))
         logLevel = defaultLevel;
 
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
@@ -165,10 +161,6 @@ int main(int argc, char *argv[])
         cmdline.PrintHelp();
         cmdResult = GENERIC_EXIT_INVALID_CMDLINE;
     }
-
-    delete gContext;
-
-    SignalHandler::Done();
 
     return cmdResult;
 }

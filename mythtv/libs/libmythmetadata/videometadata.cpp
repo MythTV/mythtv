@@ -6,7 +6,6 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
@@ -443,7 +442,7 @@ bool VideoMetadataImp::DeleteFile()
 
     if (!m_host.isEmpty())
     {
-        QString url = generate_file_url("Videos", m_host, m_filename);
+        QString url = StorageGroup::generate_file_url("Videos", m_host, m_filename);
         isremoved = RemoteFile::DeleteFile(url);
     }
     else
@@ -890,7 +889,7 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
         && !GetCoverFile().isEmpty()
         && !IsDefaultCoverFile(GetCoverFile()))
     {
-        coverfile = generate_file_url(QStringLiteral(u"Coverart"), GetHost(),
+        coverfile = StorageGroup::generate_file_url(QStringLiteral(u"Coverart"), GetHost(),
                                       GetCoverFile());
     }
     else
@@ -905,7 +904,7 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
     if (IsHostSet() && !GetScreenshot().startsWith(u'/')
         && !GetScreenshot().isEmpty())
     {
-        screenshotfile = generate_file_url(QStringLiteral(u"Screenshots"),
+        screenshotfile = StorageGroup::generate_file_url(QStringLiteral(u"Screenshots"),
                                            GetHost(), GetScreenshot());
     }
     else
@@ -920,7 +919,7 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
     if (IsHostSet() && !GetBanner().startsWith(u'/')
         && !GetBanner().isEmpty())
     {
-        bannerfile = generate_file_url(QStringLiteral(u"Banners"), GetHost(),
+        bannerfile = StorageGroup::generate_file_url(QStringLiteral(u"Banners"), GetHost(),
                                        GetBanner());
     }
     else
@@ -935,7 +934,7 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
     if (IsHostSet() && !GetFanart().startsWith('/')
         && !GetFanart().isEmpty())
     {
-        fanartfile = generate_file_url(QStringLiteral(u"Fanart"), GetHost(),
+        fanartfile = StorageGroup::generate_file_url(QStringLiteral(u"Fanart"), GetHost(),
                                        GetFanart());
     }
     else
@@ -964,7 +963,7 @@ QString VideoMetadataImp::GetImage(const QString& name) const
             && !coverfile.startsWith(u'/')
             && !coverfile.isEmpty()
             && !IsDefaultCoverFile(coverfile))
-            return generate_file_url(QStringLiteral(u"Coverart"), GetHost(),
+            return StorageGroup::generate_file_url(QStringLiteral(u"Coverart"), GetHost(),
                                      coverfile);
         return coverfile;
     }
@@ -975,7 +974,7 @@ QString VideoMetadataImp::GetImage(const QString& name) const
         QString screenshot = GetScreenshot();
         if (IsHostSet() && !screenshot.startsWith(u'/')
             && !screenshot.isEmpty())
-            return generate_file_url(QStringLiteral(u"Screenshots"),
+            return StorageGroup::generate_file_url(QStringLiteral(u"Screenshots"),
                                      GetHost(), screenshot);
         return screenshot;
     }
@@ -986,7 +985,7 @@ QString VideoMetadataImp::GetImage(const QString& name) const
         QString bannerfile = GetBanner();
         if (IsHostSet() && !bannerfile.startsWith(u'/')
             && !bannerfile.isEmpty())
-            return generate_file_url(QStringLiteral(u"Banners"), GetHost(),
+            return StorageGroup::generate_file_url(QStringLiteral(u"Banners"), GetHost(),
                                      bannerfile);
         return bannerfile;
     }
@@ -997,7 +996,7 @@ QString VideoMetadataImp::GetImage(const QString& name) const
         QString fanartfile = GetFanart();
         if (IsHostSet() && !fanartfile.startsWith('/')
             && !fanartfile.isEmpty())
-            return generate_file_url(QStringLiteral(u"Fanart"), GetHost(),
+            return StorageGroup::generate_file_url(QStringLiteral(u"Fanart"), GetHost(),
                                      fanartfile);
         return fanartfile;
     }
@@ -1129,7 +1128,7 @@ QString VideoMetadata::VideoFileHash(const QString &file_name,
         return FileHash(fullname);
     }
 
-    QString url = generate_file_url("Videos", host, file_name);
+    QString url = StorageGroup::generate_file_url("Videos", host, file_name);
 
     return RemoteFile::GetFileHash(url);
 }

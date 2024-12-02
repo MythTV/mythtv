@@ -2784,6 +2784,13 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #endif
 }
 
+CaptureCard::Hostname::Hostname(const CaptureCard &parent) :
+    StandardSetting(new CaptureCardDBStorage(this, parent, "hostname"))
+{
+    setVisible(false);
+    setValue(gCoreContext->GetHostName());
+}
+
 class InputName : public MythUIComboBoxSetting
 {
   public:

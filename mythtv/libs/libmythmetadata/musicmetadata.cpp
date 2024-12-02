@@ -10,7 +10,7 @@
 #include <utility>
 
 // mythtv
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
@@ -2338,4 +2338,11 @@ void AlbumArtImages::dumpToDatabase(void)
                 image->m_id = query.lastInsertId().toInt();
         }
     }
+}
+
+void AlbumArtScannerThread::run_real()
+{
+    RunProlog();
+    gCoreContext->SendReceiveStringList(m_strList);
+    RunEpilog();
 }

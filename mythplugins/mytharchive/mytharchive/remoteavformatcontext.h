@@ -5,7 +5,6 @@
 
 #include <QString>
 
-#include <libmythbase/mythlogging.h>
 #include <libmythbase/remotefile.h>
 
 extern "C" {

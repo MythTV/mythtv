@@ -8,7 +8,6 @@
 #include <QUrl>
 
 // myth
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"

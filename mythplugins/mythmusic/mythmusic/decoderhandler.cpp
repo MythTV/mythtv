@@ -9,7 +9,6 @@
 #include <QUrl>
 
 // MythTV
-#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythdownloadmanager.h>
 #include <libmythbase/mythlogging.h>

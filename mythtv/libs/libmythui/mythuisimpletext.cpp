@@ -11,7 +11,6 @@
 #include <QtGlobal>
 
 #include "libmythbase/compat.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "mythuihelper.h"

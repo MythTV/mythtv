@@ -2,7 +2,6 @@
 #include <QUrl>
 
 // MythTV
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "io/mythstreamingbuffer.h"
 

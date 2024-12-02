@@ -10,7 +10,8 @@ extern "C" {
 // MythTV
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
-#include "libmythbase/mythcorecontext.h"    /* gContext */
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 
 // Commercial Flagging headers
 #include "BorderDetector.h"
