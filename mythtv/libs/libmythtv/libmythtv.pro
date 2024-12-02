@@ -539,7 +539,7 @@ using_frontend {
         DEFINES += USING_VAAPI
         HEADERS += decoders/mythvaapicontext.h
         SOURCES += decoders/mythvaapicontext.cpp
-        LIBS    += -lva -lva-x11 -lva-glx -lva-drm
+        LIBS    += -lva -lva-drm
     }
 
     using_nvdec {
@@ -606,10 +606,9 @@ using_frontend {
         SOURCES += opengl/mythopengltonemap.cpp
         SOURCES += visualisations/videovisualcircles.cpp
 
-
         using_vaapi {
-            HEADERS += opengl/mythvaapiinterop.h   opengl/mythvaapiglxinterop.h
-            SOURCES += opengl/mythvaapiinterop.cpp opengl/mythvaapiglxinterop.cpp
+            HEADERS += opengl/mythvaapiinterop.h
+            SOURCES += opengl/mythvaapiinterop.cpp
         }
 
         using_vdpau:using_x11 {
@@ -649,6 +648,12 @@ using_frontend {
             using_vaapi {
                 HEADERS += opengl/mythvaapidrminterop.h
                 SOURCES += opengl/mythvaapidrminterop.cpp
+            }
+        } else {
+            using_vaapi {
+                HEADERS += opengl/mythvaapiglxinterop.h
+                SOURCES += opengl/mythvaapiglxinterop.cpp
+                LIBS    += -lva-x11 -lva-glx
             }
         }
 
