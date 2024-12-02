@@ -11,8 +11,6 @@
 
 // MythTV headers
 #include "mpegstreamdata.h"
-#include "mpegtables.h"
-
 #include "atscstreamdata.h"
 #include "atsctables.h"
 
@@ -119,6 +117,8 @@ void MPEGStreamData::SetEITRate(float rate)
 
 void MPEGStreamData::Reset(int desiredProgram)
 {
+    DumpErrors();
+
     m_desiredProgram      = desiredProgram;
     m_recordingType       = "all";
     m_stripPmtDescriptors = false;
@@ -161,6 +161,8 @@ void MPEGStreamData::Reset(int desiredProgram)
             DeleteCachedTable(cached);
         m_cachedCats.clear();
     }
+
+    m_parseErrors.fill(0);
 
     ResetDecryptionMonitoringState();
 
@@ -467,7 +469,14 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         LOG(VB_RECORD, LOG_ERR, LOC + "no PAT yet...");
         return false; // no way to properly rewrite pids without PAT
     }
-    pmt.Parse();
+    try {
+        pmt.Parse();
+    }
+    catch (const PsipParseException& e)
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + "can't parse PMT...");
+        return false;
+    }
 
     uint programNumber = 1; // MPEG Program Number
 
@@ -707,24 +716,36 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             uint prog_num = psip.TableIDExtension();
             m_pmtStatus.SetSectionSeen(prog_num, version, psip.Section(), psip.LastSection());
 
-            ProgramMapTable pmt(psip);
+            try {
+                ProgramMapTable pmt(psip);
 
-            if (m_cacheTables)
-                CachePMT(&pmt);
+                if (m_cacheTables)
+                    CachePMT(&pmt);
 
-            ProcessPMT(&pmt);
+                ProcessPMT(&pmt);
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
 
             return true;
         }
         case TableID::SITscte:
         {
-            SpliceInformationTable sit(psip);
-            sit.setSCTEPID(pid);
+            try {
+                SpliceInformationTable sit(psip);
+                sit.setSCTEPID(pid);
 
-            m_listenerLock.lock();
-            for (auto & listener : m_mpegListeners)
-                listener->HandleSplice(&sit);
-            m_listenerLock.unlock();
+                m_listenerLock.lock();
+                for (auto & listener : m_mpegListeners)
+                    listener->HandleSplice(&sit);
+                m_listenerLock.unlock();
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
 
             return true;
         }
@@ -1991,4 +2012,26 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     for (size_t i = 0; i < pnum_del_list.size(); i++)
         RemoveEncryptionTestPIDs(pnums[i]);
+}
+
+void MPEGStreamData::DumpErrors() const
+{
+    if (m_parseErrors[PsipParseException::SitLength] ||
+        m_parseErrors[PsipParseException::SitBandwidth] ||
+        m_parseErrors[PsipParseException::SitTimeSignal] ||
+        m_parseErrors[PsipParseException::SitSpliceSchedInfo1] ||
+        m_parseErrors[PsipParseException::SitSpliceSchedInfo2] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo1] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo2] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo3] ||
+        m_parseErrors[PsipParseException::SitSpliceInsertInfo4])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("SIT parsing error: %1/%2/%3/%4/%5/%6")
+            .arg(m_parseErrors[PsipParseException::SitLength])
+            .arg(m_parseErrors[PsipParseException::SitSpliceSchedInfo1])
+            .arg(m_parseErrors[PsipParseException::SitSpliceSchedInfo2])
+            .arg(m_parseErrors[PsipParseException::SitSpliceInsertInfo1])
+            .arg(m_parseErrors[PsipParseException::SitSpliceInsertInfo2])
+            .arg(m_parseErrors[PsipParseException::SitSpliceInsertInfo3]));
+    }
 }
