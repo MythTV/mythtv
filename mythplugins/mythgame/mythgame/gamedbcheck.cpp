@@ -9,6 +9,7 @@
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcheck.h>
+#include <libmythbase/mythlogging.h>
 
 // MythGame
 #include "gamedbcheck.h"

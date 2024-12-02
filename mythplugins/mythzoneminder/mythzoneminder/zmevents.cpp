@@ -24,6 +24,7 @@
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythmainwindow.h>
 
 // zoneminder

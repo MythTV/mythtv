@@ -11,6 +11,7 @@
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythrandom.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuibutton.h>

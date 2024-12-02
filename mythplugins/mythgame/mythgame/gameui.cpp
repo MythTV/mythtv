@@ -6,6 +6,7 @@
 // MythTV
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythmetadata/mythuimetadataresults.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythgenerictree.h>

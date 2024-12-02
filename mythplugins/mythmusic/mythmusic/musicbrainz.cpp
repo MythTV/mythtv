@@ -6,6 +6,7 @@
 #include <QFile>
 
 // MythTV
+#include <libmythbase/mythlogging.h>
 #include "libmythbase/mythmiscutil.h"
 
 #ifdef HAVE_MUSICBRAINZ

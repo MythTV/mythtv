@@ -8,6 +8,7 @@
 #include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythsorthelper.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythbase/netgrabbermanager.h>

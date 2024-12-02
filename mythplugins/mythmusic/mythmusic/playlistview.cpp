@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 
 // MythTV
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythdialogbox.h>
 
 // mythmusic

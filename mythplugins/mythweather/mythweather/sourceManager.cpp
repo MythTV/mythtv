@@ -11,6 +11,7 @@
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythprogressdialog.h>
 
 // MythWeather headers

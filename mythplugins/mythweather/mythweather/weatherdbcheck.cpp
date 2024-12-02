@@ -8,6 +8,7 @@
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcheck.h>
+#include <libmythbase/mythlogging.h>
 
 // MythWeather
 #include "weatherdbcheck.h"

@@ -7,6 +7,7 @@
 
 // MythTV
 #include <libmythbase/lcddevice.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythmainwindow.h>
 
 // mythmusic

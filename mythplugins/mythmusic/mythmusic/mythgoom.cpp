@@ -13,7 +13,6 @@
 // MythTV
 #include <libmythbase/compat.h>
 #include <libmythbase/mythcorecontext.h>
-#include <libmythbase/mythlogging.h>
 
 // Goom
 #include "libmythtv/visualisations/goom/goom_tools.h"
