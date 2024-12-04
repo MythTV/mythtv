@@ -541,12 +541,10 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
         return;
     }
 
-#ifdef Q_OS_ANDROID
     // Ensure surface type is always OpenGL
     m_window->setSurfaceType(QWindow::OpenGLSurface);
     if (native && native->windowHandle())
         native->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
-#endif
 
 #ifdef USING_QTWEBENGINE
     auto * globalcontext = QOpenGLContext::globalShareContext();
