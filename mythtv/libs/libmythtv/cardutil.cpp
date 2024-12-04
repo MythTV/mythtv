@@ -2894,8 +2894,7 @@ bool CardUtil::DeleteAllInputs(void)
     return (query.exec("TRUNCATE TABLE inputgroup") &&
             query.exec("TRUNCATE TABLE diseqc_config") &&
             query.exec("TRUNCATE TABLE diseqc_tree") &&
-            query.exec("TRUNCATE TABLE capturecard") &&
-            query.exec("TRUNCATE TABLE iptv_channel"));
+            query.exec("TRUNCATE TABLE capturecard"));
 }
 
 std::vector<uint> CardUtil::GetInputList(void)
