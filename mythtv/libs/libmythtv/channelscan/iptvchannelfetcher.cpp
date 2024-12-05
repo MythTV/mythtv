@@ -628,6 +628,22 @@ static bool parse_extinf(const QString &line,
         return true;
     }
 
+    // #EXTINF:0,Channel Title
+    {
+        static const QRegularExpression chanNumName
+            { "^(\\d+),(.*)$" };
+        match = chanNumName.match(line);
+        if (match.hasMatch())
+        {
+            channum = match.captured(1).simplified();
+            name = match.captured(2).simplified();
+
+            if (name.isEmpty())
+                return false;
+
+            return true;
+        }
+    }
 
     // Not one of the formats we support
     QString msg = LOC + QString("Invalid header in channel list line \n\t\t\tEXTINF:%1").arg(line);
