@@ -21,7 +21,6 @@ extern "C" {
 
 #include "captions/vbilut.h"
 #include "decoderbase.h"
-#include "format.h"
 #include "io/mythavformatbuffer.h"
 #include "mpeg/AVCParser.h"
 #include "mythcodeccontext.h"
@@ -112,26 +111,6 @@ class AvFormatDecoder : public DecoderBase
     bool GetFrame(DecodeType Type, bool &Retry) override; // DecoderBase
 
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
-
-    /// This is a No-op for this class.
-    void WriteStoredData([[maybe_unused]] MythMediaBuffer *Buffer,
-                         [[maybe_unused]] bool storevid,
-                         [[maybe_unused]] std::chrono::milliseconds timecodeOffset) override {} // DecoderBase
-
-    /// This is a No-op for this class.
-    void SetRawAudioState(bool state) override { (void)state; } // DecoderBase
-
-    /// This is a No-op for this class.
-    bool GetRawAudioState(void) const override { return false; } // DecoderBase
-
-    /// This is a No-op for this class.
-    void SetRawVideoState(bool state) override { (void)state; } // DecoderBase
-
-    /// This is a No-op for this class.
-    bool GetRawVideoState(void) const override { return false; } // DecoderBase
-
-    /// This is a No-op for this class.
-    long UpdateStoredFrameNum(long frame) override { (void)frame; return 0;} // DecoderBase
 
     QString      GetCodecDecoderName(void) const override; // DecoderBase
     QString      GetRawEncodingType(void) override; // DecoderBase
