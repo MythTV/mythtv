@@ -397,7 +397,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
                 {
                     LOG(VB_RECORD, LOG_INFO, LOC +
                         QString("Found channel in database, channel number: %1 for channel: %2")
-                            .arg(channum_db).arg(info.m_name));
+                            .arg(channum_db, info.m_name));
 
                     channum = channum_db;
                 }
@@ -621,11 +621,7 @@ static bool parse_extinf(const QString &line,
     {
         channum = match.captured(1).simplified();
         name = match.captured(2).simplified();
-
-        if (name.isEmpty())
-            return false;
-
-        return true;
+        return !name.isEmpty();
     }
 
     // #EXTINF:0,Channel Title
@@ -637,11 +633,7 @@ static bool parse_extinf(const QString &line,
         {
             channum = match.captured(1).simplified();
             name = match.captured(2).simplified();
-
-            if (name.isEmpty())
-                return false;
-
-            return true;
+            return !name.isEmpty();
         }
     }
 
