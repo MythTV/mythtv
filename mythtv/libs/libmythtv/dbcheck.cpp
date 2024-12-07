@@ -4074,6 +4074,17 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1381")
+    {
+        DBUpdates updates {
+            "ALTER TABLE iptv_channel ADD INDEX (chanid);"
+            "ALTER TABLE channelgroup ADD INDEX (chanid);"
+        } ;
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1382", dbver))
+            return false;
+    }
+
     return true;
 }
 
