@@ -204,6 +204,9 @@ void CleanupTask::CleanupChannelTables(void)
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deleteQuery(MSqlQuery::InitCon());
 
+    // Delete all channels from the database that have already
+    // been deleted for at least one day and that are not referenced
+    // anymore by a recording.
     query.prepare(QString("DELETE channel "
                           "FROM channel "
                           "LEFT JOIN recorded r "
@@ -219,6 +222,8 @@ void CleanupTask::CleanupChannelTables(void)
         MythDB::DBError("CleanupTask::CleanupChannelTables "
                         "(channel table)", query);
 
+    // Delete all multiplexes from the database that are not
+    // referenced anymore by a channel.
     query.prepare(QString("DELETE dtv_multiplex "
                           "FROM dtv_multiplex "
                           "LEFT JOIN channel c "
@@ -227,6 +232,17 @@ void CleanupTask::CleanupChannelTables(void)
     if (!query.exec())
         MythDB::DBError("CleanupTask::CleanupChannelTables "
                         "(dtv_multiplex table)", query);
+
+    // Delete all IPTV channel data extension records from the database
+    // when the channel it refers to does not exist anymore.
+    query.prepare(QString("DELETE iptv_channel "
+                          "FROM iptv_channel "
+                          "LEFT JOIN channel c "
+                          "    ON c.chanid = iptv_channel.chanid "
+                          "WHERE c.chanid IS NULL"));
+    if (!query.exec())
+        MythDB::DBError("CleanupTask::CleanupChannelTables "
+                        "(iptv_channel table)", query);
 }
 
 void CleanupTask::CleanupProgramListings(void)
