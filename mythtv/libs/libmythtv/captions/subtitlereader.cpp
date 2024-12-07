@@ -77,7 +77,7 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
 
     if (!m_avSubtitlesEnabled && !isExternal)
     {
-        if (!forced)
+        if (!(is_selected_forced_track || forced))
         {
             FreeAVSubtitle(subtitle);
             return enableforced;
