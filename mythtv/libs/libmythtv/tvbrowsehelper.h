@@ -72,7 +72,6 @@ class TVBrowseHelper : public MThread
 
     TV*                     m_parent                { nullptr };
     ChannelInfoList         m_dbAllChannels;
-    ChannelInfoList         m_dbAllVisibleChannels;
     std::chrono::seconds    m_dbBrowseMaxForward    { 0s };
     bool                    m_dbBrowseAllTuners     { false };
     bool                    m_dbUseChannelGroups    { false };
