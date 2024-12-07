@@ -54,8 +54,6 @@ void TVBrowseHelper::BrowseInit(std::chrono::seconds BrowseMaxForward, bool Brow
         m_dbChannumToChanids.insert(chan.m_chanNum,chan.m_chanId);
     }
 
-    m_dbAllVisibleChannels = ChannelUtil::GetChannels(0, true, "channum, callsign");
-    ChannelUtil::SortChannels(m_dbAllVisibleChannels, DBChannelOrdering, false);
     start();
 }
 
@@ -342,7 +340,7 @@ void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infoma
 
     if (chandir != -1)
     {
-        chanid = ChannelUtil::GetNextChannel(m_dbAllVisibleChannels,
+        chanid = ChannelUtil::GetNextChannel(m_dbAllChannels,
                                             chanid,
                                              0 /* mplexid_restriction */,
                                              0 /* chanid restriction */,
