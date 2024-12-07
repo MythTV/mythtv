@@ -1210,8 +1210,8 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
         title = title.right(title.length() -
                      title.lastIndexOf('/') -1);
 
+        // Allow parentheses "()", but remove content inside other braces
         title = eatBraces(title, "[", "]");
-        title = eatBraces(title, "(", ")");
         title = eatBraces(title, "{", "}");
         return title.trimmed();
     }
