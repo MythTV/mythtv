@@ -485,7 +485,7 @@ static QStringList BuildFileList(const QString &dir, const QStringList &filters)
     return ret;
 }
 
-static void handleMedia(MythMediaDevice *cd)
+static void handleMedia(MythMediaDevice *cd, bool forcePlayback)
 {
     static QString s_mountPath;
 
@@ -526,7 +526,7 @@ static void handleMedia(MythMediaDevice *cd)
     s_mountPath.clear();
 
     // don't show the music screen if AutoPlayCD is off
-    if (!gCoreContext->GetBoolSetting("AutoPlayCD", false))
+    if (!forcePlayback && !gCoreContext->GetBoolSetting("AutoPlayCD", false))
         return;
 
     if (!gMusicData->m_initialized)
@@ -631,7 +631,7 @@ static void handleMedia(MythMediaDevice *cd)
 }
 
 #ifdef HAVE_CDIO
-static void handleCDMedia(MythMediaDevice *cd)
+static void handleCDMedia(MythMediaDevice *cd, bool forcePlayback)
 {
 
     if (!cd)
@@ -743,7 +743,7 @@ static void handleCDMedia(MythMediaDevice *cd)
 
     // if the AutoPlayCD setting is set we remove all the existing tracks
     // from the playlist and replace them with the new CD tracks found
-    if (gCoreContext->GetBoolSetting("AutoPlayCD", false))
+    if (forcePlayback || gCoreContext->GetBoolSetting("AutoPlayCD", false))
     {
         gMusicData->m_all_playlists->getActive()->removeAllTracks();
 
@@ -780,7 +780,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     }
 }
 #else
-static void handleCDMedia([[maybe_unused]] MythMediaDevice *cd)
+static void handleCDMedia([[maybe_unused]] MythMediaDevice *cd, [[maybe_unused]] bool forcePlayback)
 {
     LOG(VB_GENERAL, LOG_NOTICE, "MythMusic got a media changed event"
                                 "but cdio support is not compiled in");

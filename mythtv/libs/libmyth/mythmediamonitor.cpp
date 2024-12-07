@@ -631,14 +631,13 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
  *  \param description Unused.
  *  \param callback    The function to call when an event occurs.
  *  \param mediaType   The type of media supported by this callback. The
- *                     value must be an enum of type MythMediaType.
+ *                     value must be a bitmask of enums of type MythMediaType.
  *  \param extensions A list of file name extensions supported by this
  *  callback.
  */
 void MediaMonitor::RegisterMediaHandler(const QString  &destination,
                                         const QString  &description,
-                                        void          (*callback)
-                                              (MythMediaDevice*),
+                                        MediaCallback  callback,
                                         int             mediaType,
                                         const QString  &extensions)
 {
@@ -673,7 +672,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
  * to allow the user to select which one to use,
  * but for now, we're going to just use the first one.
  */
-void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
+void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia, bool forcePlayback)
 {
     QVector<MHData>                  handlers;
     QMap<QString, MHData>::Iterator  itr = m_handlerMap.begin();
@@ -701,7 +700,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
     // if user didn't cancel, selected = handlers.at(choice);
     int selected = 0;
 
-    handlers.at(selected).callback(pMedia);
+    handlers.at(selected).callback(pMedia, forcePlayback);
 }
 
 /**
@@ -817,7 +816,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
             {
                 if ((*itr).MythMediaType & (int)pDev->getMediaType() ||
                     pDev->getStatus() == MEDIASTAT_OPEN)
-                    (*itr).callback(pDev);
+                    (*itr).callback(pDev, false);
                 itr++;
             }
         }
