@@ -1822,17 +1822,6 @@ bool ChannelUtil::DeleteChannel(uint channel_id)
         return false;
     }
 
-    query.prepare(
-        "DELETE FROM iptv_channel "
-        "WHERE chanid = :ID");
-    query.bindValue(":ID", channel_id);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("Delete Channel 2", query);
-        return false;
-    }
-
     return true;
 }
 
