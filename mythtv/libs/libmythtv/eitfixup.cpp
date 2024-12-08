@@ -1737,75 +1737,85 @@ static const QMap<QString,DBPerson::Role> deCrewTitle {
  */
 void EITFixUp::FixPRO7(DBEventEIT &event)
 {
-    static const QRegularExpression pro7Subtitle { R"(,{0,1}([^,]*?),([^,]+?)\s{0,1}(\d{4})$)" };
-    auto match = pro7Subtitle.match(event.m_subtitle);
+    // strip repeat info and set previouslyshown flag
+    static const QRegularExpression pro7Repeat
+        { R"((?<=\s|^)\(WH vom \w+, \d{2}\.\d{2}\.\d{4}, \d{2}:\d{2} Uhr\)$)" };
+    auto match = pro7Repeat.match(event.m_subtitle);
     if (match.hasMatch())
     {
-        if (event.m_airdate == 0)
-        {
-            event.m_airdate = match.captured(3).toUInt();
-        }
+        event.m_previouslyshown = true;
         event.m_subtitle.remove(match.capturedStart(0),
                                 match.capturedLength(0));
+        event.m_subtitle = event.m_subtitle.trimmed();
     }
 
-    /* handle cast, the very last in description */
-    static const QRegularExpression pro7Cast { "\n\nDarsteller:\n(.*)$",
-        QRegularExpression::DotMatchesEverythingOption };
-    match = pro7Cast.match(event.m_description);
+    // strip "Mit Gebärdensprache (Online-Stream)"
+    static const QRegularExpression pro7signLanguage
+        { R"((?<=\s|^)Mit Gebärdensprache \(Online\-Stream\)$)" };
+    match = pro7signLanguage.match(event.m_subtitle);
     if (match.hasMatch())
     {
-        QStringList cast = match.captured(1).split("\n");
-        for (const auto& line : std::as_const(cast))
-        {
-            static const QRegularExpression pro7CastOne { R"(^([^\(]*?)\((.*)\)$)" };
-            auto match2 = pro7CastOne.match(line);
-            if (match2.hasMatch())
-            {
-                /* Possible TODO: if EIT inlcude the priority and/or character
-                 * names for the actors, include them in AddPerson call. */
-                event.AddPerson (DBPerson::kActor, match2.captured(1).simplified());
-            }
-        }
-        event.m_description.remove(match.capturedStart(0),
-                                   match.capturedLength(0));
+        event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
+        event.m_subtitle = event.m_subtitle.trimmed();
     }
 
-    /* handle crew, the new very last in description
-     * format: "Role: Name" or "Role: Name1, Name2"
-     */
-    static const QRegularExpression pro7Crew { "\n\n(Regie:.*)$",
-        QRegularExpression::DotMatchesEverythingOption };
-    match = pro7Crew.match(event.m_description);
+    // move age ratings into metadata
+    static const QRegularExpression pro7ratingAllAges
+        { R"((?<=\s|^)Altersfreigabe: Ohne Altersbeschränkung$)" };
+    match = pro7ratingAllAges.match(event.m_subtitle);
     if (match.hasMatch())
     {
-        QStringList crew = match.captured(1).split("\n");
-        for (const auto& line : std::as_const(crew))
-        {
-            static const QRegularExpression pro7CrewOne { R"(^(.*?):\s+(.*)$)" };
-            auto match2 = pro7CrewOne.match(line);
-            if (match2.hasMatch())
-            {
-                DBPerson::Role role = DBPerson::kUnknown;
-                if (deCrewTitle.contains(match2.captured(1)))
-                    role = deCrewTitle[match2.captured(1)];
-                QStringList names = match2.captured(2).simplified().split(R"(\s*,\s*)");
-                for (const auto & name : std::as_const(names))
-                {
-                    /* Possible TODO: if EIT inlcude the priority
-                     * and/or character names for the actors, include
-                     * them in AddPerson call. */
-                    event.AddPerson (role, name);
-                }
-            }
-        }
-        event.m_description.remove(match.capturedStart(0),
-                                   match.capturedLength(0));
+        EventRating prograting;
+        prograting.m_system="DE";
+        prograting.m_rating = "0";
+        event.m_ratings.push_back(prograting);
+
+        event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
+        event.m_subtitle = event.m_subtitle.trimmed();
+    }
+    static const QRegularExpression pro7rating
+        { R"((?<=\s|^)Altersfreigabe: ab (\d+)$)" };
+    match = pro7rating.match(event.m_subtitle);
+    if (match.hasMatch())
+    {
+        EventRating prograting;
+        prograting.m_system="DE";
+        prograting.m_rating = match.captured(1);
+        event.m_ratings.push_back(prograting);
+
+        event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
+        event.m_subtitle = event.m_subtitle.trimmed();
     }
 
-    /* FIXME unless its Jamie Oliver, then there is neither Crew nor Cast only
-     * \n\nKoch: Jamie Oliver
-     */
+    // move category and (original) airdate into metadata, add country and airdate to description
+    static const QRegularExpression pro7CategoryOriginalairdate
+        { R"((?<=\s|^)(Late Night Show|Live Shopping|Real Crime|Real Life Doku|Romantic Comedy|Scripted Reality|\S+), ([A-Z]+(?:\/[A-Z]+)*) (\d{4})$)" };
+    match = pro7CategoryOriginalairdate.match(event.m_subtitle);
+    if (match.hasMatch())
+    {
+        event.m_category = match.captured(1);
+
+        event.m_description.append(" (").append(match.captured(2)).append(" ").append(match.captured(3)).append(")");
+
+        uint y = match.captured(3).toUInt();
+        event.m_originalairdate = QDate(y, 1, 1);
+        if (event.m_airdate == 0)
+        {
+            event.m_airdate = y;
+        }
+
+        event.m_subtitle.remove(match.capturedStart(0),
+                                match.capturedLength(0));
+        event.m_subtitle = event.m_subtitle.trimmed();
+    }
+
+    // remove subtitle if equal to title
+    if (event.m_title == event.m_subtitle) {
+        event.m_subtitle = "";
+    }
 }
 
 /**
