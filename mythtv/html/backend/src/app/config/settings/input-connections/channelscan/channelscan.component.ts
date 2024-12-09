@@ -250,7 +250,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   unprocDesc = 'unprocessed';
 
   satTuning: SatTuning = this.satTuningTable[0];
-
+  scanLog = '';
   scanRequest: ChannelScanRequest = {
     CardId: 0,
     DesiredServices: 'tv',
@@ -582,6 +582,8 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   refreshStatus(doChannels: boolean ) {
     this.channelService.GetScanStatus().subscribe(data => {
       this.scanStatus = data.ScanStatus;
+      // this.scanLog = data.ScanStatus.StatusLog.replaceAll('\n','<br>')
+      this.scanLog = data.ScanStatus.StatusLog.split('\n').join('<br>');
       this.scrollpanel.scrollTop(100000);
       if (this.scanStatus.Status == 'RUNNING')
         this.refreshCount = 5;

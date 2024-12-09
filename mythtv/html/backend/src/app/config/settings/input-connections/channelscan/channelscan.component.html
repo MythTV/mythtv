@@ -200,7 +200,8 @@
     <div class="form-group field">
         <label for="Frequency" class="label block">{{ 'settings.channelscan.frequency_label' | translate
             }}</label>
-        <p-inputNumber [(ngModel)]="scanRequest.Frequency" name="Frequency" id="Frequency" [min]="0" [max]="999999999"></p-inputNumber>
+        <p-inputNumber [(ngModel)]="scanRequest.Frequency" name="Frequency" id="Frequency" [min]="0"
+            [max]="999999999"></p-inputNumber>
         <small class="block">
             <div [translate]="'settings.channelscan.frequency_desc'"
                 [translateParams]="{unit: ['DVBS','DVBS2'].includes(scanSubType) ? 'kHZ' : 'Hz'}">
@@ -549,7 +550,7 @@
             <br>
 
             <div class="form-group field" *ngIf="scanStatus.DialogMsg">
-                <div class="col-10"  style="color:black; background-color:pink">
+                <div class="col-10" style="color:black; background-color:pink">
                     <b>{{ scanStatus.DialogMsg }}</b> &nbsp;
                 </div>
                 <br>
@@ -587,9 +588,10 @@
             </div>
 
         </div> <!-- col-6 -->
-        <div class="col-6" style="white-space: 'pre-line'">
-            <p-scrollPanel #scroll [style]="{ width: '100%', height: '400px' }">
-                {{ scanStatus.StatusLog }}
+        <div class="col-6">
+            <p-scrollPanel #scroll [style]="{ width: '100%', height: '400px'}">
+                <div [innerHTML]="scanLog">
+                </div>
             </p-scrollPanel>
         </div>
     </div> <!-- grid -->
