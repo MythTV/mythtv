@@ -187,7 +187,12 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
 {
     QUrl url(m_url);
 
-    url.setPath(m_sControlPath);
+    QString path  = m_sControlPath;
+    path.append("/");
+    path.append(sMethod);
+
+    // Service url port is 6 less than upnp port (see MediaServer::Init)
+    url.setPort(m_url.port() - 6);
 
     nErrCode = UPnPResult_Success;
     sErrDesc = "";
@@ -215,44 +220,21 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     // --------------------------------------------------------------
 
     QByteArray  aBuffer;
-    QTextStream os( &aBuffer );
-
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    os.setCodec("UTF-8");
-#else
-    os.setEncoding(QStringConverter::Utf8);
-#endif
-
-    os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"; 
-    os << "<s:Envelope "
-        " s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\""
-        " xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n";
-    os << " <s:Body>\r\n";
-    os << "  <u:" << sMethod << " xmlns:u=\"" << m_sNamespace << "\">\r\n";
-
-    // --------------------------------------------------------------
-    // Add parameters from list
-    // --------------------------------------------------------------
-
+    QUrlQuery query;
     for (QStringMap::iterator it = list.begin(); it != list.end(); ++it)
-    {                                                               
-        os << "   <" << it.key() << ">";
-        os << HTTPRequest::Encode( *it );
-        os << "</"   << it.key() << ">\r\n";
+    {
+        query.addQueryItem(it.key(),*it);
     }
 
-    os << "  </u:" << sMethod << ">\r\n";
-    os << " </s:Body>\r\n";
-    os << "</s:Envelope>\r\n";
-
-    os.flush();
+    url.setPath(path);
+    url.setQuery(query);
 
     // --------------------------------------------------------------
     // Perform Request
     // --------------------------------------------------------------
 
     LOG(VB_UPNP, LOG_DEBUG,
-        QString("SOAPClient(%1) sending:\n %2").arg(url.toString(), aBuffer.constData()));
+        QString("SOAPClient(%1) sending:\n %2").arg(url.toString() /*, aBuffer.constData()*/ ));
 
     QString sXml;
 
@@ -289,68 +271,6 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
                      QString::number(nErrCode), sErrDesc, sXml));
         return xmlResult;
     }
-
-    // --------------------------------------------------------------
-    // Is this a valid response?
-    // --------------------------------------------------------------
-
-    QString      sResponseName = sMethod + "Response";
-    QDomNodeList oNodeList     =
-        doc.elementsByTagNameNS(m_sNamespace, sResponseName);
-
-    if (oNodeList.count() == 0)
-    {
-        // --------------------------------------------------------------
-        // Must be a fault... parse it to return reason
-        // --------------------------------------------------------------
-
-        nErrCode = GetNodeValue(
-            doc, "Envelope/Body/Fault/detail/UPnPResult/errorCode", 500);
-        sErrDesc = GetNodeValue(
-            doc, "Envelope/Body/Fault/detail/UPnPResult/errorDescription", "");
-        if (sErrDesc.isEmpty())
-            sErrDesc = QString("Unknown #%1").arg(nErrCode);
-
-        QDomNode oNode  = FindNode( "Envelope/Body/Fault", doc );
-
-        oNode = xmlResult.importNode( oNode, true );
-        xmlResult.appendChild( oNode );
-
-        return xmlResult;
-    }
-
-    QDomNode oMethod = oNodeList.item(0);
-    if (oMethod.isNull())
-        return xmlResult;
-
-    QDomNode oNode = oMethod.firstChild(); 
-    for (; !oNode.isNull(); oNode = oNode.nextSibling())
-    {
-        QDomElement e = oNode.toElement();
-        if (e.isNull())
-            continue;
-
-        QString sName  = e.tagName();
-        QString sValue = "";
-    
-        QDomText  oText = oNode.firstChild().toText();
-    
-        if (!oText.isNull())
-            sValue = oText.nodeValue();
-
-        list.insert(QUrl::fromPercentEncoding(sName.toUtf8()),
-                    QUrl::fromPercentEncoding(sValue.toUtf8()));
-    }
-
-    // Create copy of oMethod that can be used with xmlResult.
-
-    oMethod = xmlResult.importNode( oMethod.firstChild(), true  );
-
-    // importNode does not attach the new nodes to the document,
-    // do it here.
-
-    xmlResult.appendChild( oMethod );
-
-    return xmlResult;
+    return doc;
 }
 

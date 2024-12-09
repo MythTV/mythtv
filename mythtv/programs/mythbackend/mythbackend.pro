@@ -30,17 +30,6 @@ HEADERS += internetContent.h mythbackend_main_helpers.h backendcontext.h
 HEADERS += httpconfig.h mythsettings.h mythbackend_commandlineparser.h
 HEADERS += recordingextender.h
 
-HEADERS += serviceHosts/mythServiceHost.h    serviceHosts/guideServiceHost.h
-HEADERS += serviceHosts/contentServiceHost.h serviceHosts/dvrServiceHost.h
-HEADERS += serviceHosts/channelServiceHost.h serviceHosts/videoServiceHost.h
-HEADERS += serviceHosts/captureServiceHost.h serviceHosts/imageServiceHost.h
-HEADERS += serviceHosts/musicServiceHost.h
-
-HEADERS += services/myth.h services/guide.h services/content.h services/dvr.h
-HEADERS += services/serviceUtil.h services/channel.h services/video.h
-HEADERS += services/capture.h services/image.h services/music.h
-
-
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += mythbackend.cpp mainserver.cpp playbacksock.cpp scheduler.cpp
 SOURCES += backendhousekeeper.cpp
@@ -48,11 +37,6 @@ SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
 SOURCES += internetContent.cpp mythbackend_main_helpers.cpp backendcontext.cpp
 SOURCES += httpconfig.cpp mythsettings.cpp mythbackend_commandlineparser.cpp
 SOURCES += recordingextender.cpp
-
-SOURCES += services/myth.cpp services/guide.cpp services/content.cpp
-SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp
-SOURCES += services/serviceUtil.cpp services/capture.cpp
-SOURCES += services/image.cpp services/music.cpp
 
 HEADERS += servicesv2/v2myth.h servicesv2/v2connectionInfo.h servicesv2/v2wolInfo.h
 HEADERS += servicesv2/v2databaseInfo.h servicesv2/v2versionInfo.h

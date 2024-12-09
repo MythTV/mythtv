@@ -33,15 +33,6 @@
 #include "upnpcdstv.h"
 #include "upnpcdsvideo.h"
 
-#include "serviceHosts/mythServiceHost.h"
-#include "serviceHosts/guideServiceHost.h"
-#include "serviceHosts/contentServiceHost.h"
-#include "serviceHosts/dvrServiceHost.h"
-#include "serviceHosts/channelServiceHost.h"
-#include "serviceHosts/videoServiceHost.h"
-#include "serviceHosts/musicServiceHost.h"
-#include "serviceHosts/captureServiceHost.h"
-#include "serviceHosts/imageServiceHost.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -133,17 +124,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     pHttpServer->RegisterExtension( new HttpConfig() );
     pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
 
-    pHttpServer->RegisterExtension( new MythServiceHost   ( m_sSharePath ));
-    pHttpServer->RegisterExtension( new GuideServiceHost  ( m_sSharePath ));
-    pHttpServer->RegisterExtension( new ContentServiceHost( m_sSharePath ));
-    pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
-    pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
-    pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
-    pHttpServer->RegisterExtension( new MusicServiceHost  ( m_sSharePath ));
-    pHttpServer->RegisterExtension( new CaptureServiceHost( m_sSharePath ));
-    pHttpServer->RegisterExtension( new ImageServiceHost  ( m_sSharePath ));
-
-
     // ------------------------------------------------------------------
     // Register Service Types with Scripting Engine
     //
@@ -153,30 +133,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     //          classes. - dblain
     // ------------------------------------------------------------------
 
-#if CONFIG_QTSCRIPT
-     QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
-
-     pEngine->globalObject().setProperty("Myth"   ,
-         pEngine->scriptValueFromQMetaObject< ScriptableMyth    >() );
-     pEngine->globalObject().setProperty("Guide"  ,
-         pEngine->scriptValueFromQMetaObject< ScriptableGuide   >() );
-     pEngine->globalObject().setProperty("Content",
-         pEngine->scriptValueFromQMetaObject< ScriptableContent >() );
-     pEngine->globalObject().setProperty("Dvr"    ,
-         pEngine->scriptValueFromQMetaObject< ScriptableDvr     >() );
-     pEngine->globalObject().setProperty("Channel",
-         pEngine->scriptValueFromQMetaObject< ScriptableChannel >() );
-     pEngine->globalObject().setProperty("Video"  ,
-         pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
-     pEngine->globalObject().setProperty("Music"  ,
-         pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
-     pEngine->globalObject().setProperty("Capture"  ,
-         pEngine->scriptValueFromQMetaObject< ScriptableCapture  >() );
-     pEngine->globalObject().setProperty("Image"  ,
-         pEngine->scriptValueFromQMetaObject< ScriptableImage   >() );
-#endif
-
-    // ------------------------------------------------------------------
 
     if (bDisableUPnp)
     {

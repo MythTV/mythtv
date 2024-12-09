@@ -43,35 +43,6 @@ add_executable(
   recordingextender.h
   scheduler.cpp
   scheduler.h
-  serviceHosts/captureServiceHost.h
-  serviceHosts/channelServiceHost.h
-  serviceHosts/contentServiceHost.h
-  serviceHosts/dvrServiceHost.h
-  serviceHosts/guideServiceHost.h
-  serviceHosts/imageServiceHost.h
-  serviceHosts/musicServiceHost.h
-  serviceHosts/mythServiceHost.h
-  serviceHosts/videoServiceHost.h
-  services/capture.cpp
-  services/capture.h
-  services/channel.cpp
-  services/channel.h
-  services/content.cpp
-  services/content.h
-  services/dvr.cpp
-  services/dvr.h
-  services/guide.cpp
-  services/guide.h
-  services/image.cpp
-  services/image.h
-  services/music.cpp
-  services/music.h
-  services/myth.cpp
-  services/myth.h
-  services/serviceUtil.cpp
-  services/serviceUtil.h
-  services/video.cpp
-  services/video.h
   servicesv2/preformat.h
   servicesv2/v2artworkInfo.h
   servicesv2/v2artworkInfoList.h
