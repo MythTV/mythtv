@@ -1629,15 +1629,15 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    visible         = :VISIBLE,   service_type    = :SERVICETYPE "
         "WHERE chanid=:CHANID")
         .arg((!set_channum)       ? "" : "channum  = :CHANNUM,  ",
-             (freqid.isNull())    ? "" : "freqid   = :FREQID,   ",
-             (icon.isNull())      ? "" : "icon     = :ICON,     ",
-             (tvformat.isNull())  ? "" : "tvformat = :TVFORMAT, ",
-             (xmltvid.isNull())   ? "" : "xmltvid  = :XMLTVID,  ",
-             (default_authority.isNull()) ?
-             "" : "default_authority = :AUTHORITY,",
+             (freqid.isEmpty())   ? "" : "freqid   = :FREQID,   ",
+             (icon.isEmpty())     ? "" : "icon     = :ICON,     ",
+             (tvformat.isEmpty()) ? "" : "tvformat = :TVFORMAT, ",
+             (xmltvid.isEmpty())  ? "" : "xmltvid  = :XMLTVID,  ",
+             (default_authority.isEmpty()) ?
+                "" : "default_authority = :AUTHORITY,",
              (recpriority == INT_MIN) ? "" : "recpriority = :RECPRIORITY, ",
-             (tmOffset == INT_MIN) ? "" : "tmOffset = :TMOFFSET, ",
-             (commMethod == INT_MIN) ? "" : "commmethod = :COMMMETHOD, ");
+             (tmOffset    == INT_MIN) ? "" : "tmOffset    = :TMOFFSET, ",
+             (commMethod  == INT_MIN) ? "" : "commmethod  = :COMMMETHOD, ");
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(qstr);
