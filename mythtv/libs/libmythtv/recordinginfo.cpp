@@ -1097,6 +1097,26 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         return false;
     }
 
+    // Catchall - in the event that the group doesn't exist, then to avoid
+    // breakage, we need to create it
+    if (recgroupid == 0)
+    {
+        query.prepare("INSERT INTO recgroups SET recgroup = :NAME, "
+                      "displayname = :DISPLAYNAME");
+        query.bindValue(":NAME", pg->m_recGroup);
+        query.bindValue(":DISPLAYNAME", pg->m_recGroup);
+
+        if (query.exec())
+            recgroupid = query.lastInsertId().toInt();
+
+        if (recgroupid <= 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Could not create recording group (%1). "
+                                            "Does it already exist?")
+                .arg(pg->m_recGroup));
+        }
+    }
+
     query.prepare(
         "SELECT recordid "
         "    FROM recorded "
