@@ -1772,11 +1772,12 @@ static void ReloadKeys(void)
 
 static void SetFuncPtrs(void)
 {
-    TV::SetFuncPtr("playbackbox", (void *)PlaybackBox::RunPlaybackBox);
+    TV::SetFuncPtr("playbackbox",   (void *)PlaybackBox::RunPlaybackBox);
     TV::SetFuncPtr("viewscheduled", (void *)ViewScheduled::RunViewScheduled);
-    TV::SetFuncPtr("programguide", (void *)GuideGrid::RunProgramGuide);
-    TV::SetFuncPtr("programfinder", (void *)RunProgramFinder);
+    TV::SetFuncPtr("programguide",  (void *)GuideGrid::RunProgramGuide);
+    TV::SetFuncPtr("programlist",   (void *)ProgLister::RunProgramList);
     TV::SetFuncPtr("scheduleeditor", (void *)ScheduleEditor::RunScheduleEditor);
+    TV::SetFuncPtr("programfinder",  (void *)RunProgramFinder);
 }
 
 /**
@@ -1943,7 +1944,7 @@ static bool WasAutomaticStart(void)
 }
 
 // from https://www.raspberrypi.org/forums/viewtopic.php?f=33&t=16897
-// The old way of revoking root with setuid(getuid()) 
+// The old way of revoking root with setuid(getuid())
 // causes system hang in certain cases on raspberry pi
 
 static int revokeRoot (void)

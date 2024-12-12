@@ -12,6 +12,8 @@
 #include "proglist_helpers.h"
 #include "schedulecommon.h"
 
+class TV;
+
 enum ProgListType : std::uint8_t {
     plUnknown = 0,
     plTitle = 1,
@@ -43,15 +45,22 @@ class ProgLister : public ScheduleCommon
     ProgLister(MythScreenStack *parent, ProgListType pltype,
                QString view, QString extraArg,
                QDateTime selectedTime = QDateTime());
+    ProgLister(MythScreenStack *parent, TV* player,
+               ProgListType pltype, const QString & extraArg);
     explicit ProgLister(MythScreenStack *parent, uint recid = 0,
                         QString title = QString());
-    ~ProgLister() override;
+    ~ProgLister(void) override;
+
+    static void * RunProgramList(void *player, ProgListType pltype,
+                                 const QString & extraArg);
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
+    void Close(void) override; // MythScreenType
+
     void HandleSelected(MythUIButtonListItem *item);
     void HandleVisible(MythUIButtonListItem *item);
 
@@ -131,6 +140,8 @@ class ProgLister : public ScheduleCommon
     MythUIText       *m_messageText     {nullptr};
 
     bool              m_allowViewDialog {true};
+
+    TV               *m_player          {nullptr};
 };
 
 #endif

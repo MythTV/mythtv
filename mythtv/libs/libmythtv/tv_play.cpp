@@ -38,6 +38,7 @@
 #include "libmythbase/programtypes.h"
 #include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
+#include "libmythbase/stringutil.h"
 
 // libmythui
 #include "libmythui/mythdialogbox.h"
@@ -78,6 +79,62 @@
 #define DEBUG_ACTIONS        0 /**< set to 1 to debug actions           */
 
 #define LOC      QString("TV::%1(): ").arg(__func__)
+
+static int comp_originalAirDate(const ProgramInfo *a, const ProgramInfo *b)
+{
+    QDate dt1 = (a->GetOriginalAirDate().isValid()) ?
+        a->GetOriginalAirDate() : a->GetScheduledStartTime().date();
+    QDate dt2 = (b->GetOriginalAirDate().isValid()) ?
+        b->GetOriginalAirDate() : b->GetScheduledStartTime().date();
+
+    if (dt1 == dt2)
+        return (a->GetRecordingStartTime() <
+                b->GetRecordingStartTime() ? 1 : -1);
+    return (dt1 < dt2 ? 1 : -1);
+}
+
+static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
+{
+    QDate dt1 = (a->GetOriginalAirDate().isValid()) ?
+        a->GetOriginalAirDate() : a->GetScheduledStartTime().date();
+    QDate dt2 = (b->GetOriginalAirDate().isValid()) ?
+        b->GetOriginalAirDate() : b->GetScheduledStartTime().date();
+
+    if (dt1 == dt2)
+        return (a->GetRecordingStartTime() >
+                b->GetRecordingStartTime() ? 1 : -1);
+    return (dt1 > dt2 ? 1 : -1);
+}
+
+static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetSeason() == 0 || b->GetSeason() == 0)
+        return comp_originalAirDate(a, b);
+    if (a->GetSeason() != b->GetSeason())
+        return (a->GetSeason() < b->GetSeason() ? 1 : -1);
+    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
+        return comp_originalAirDate(a, b);
+    return (a->GetEpisode() < b->GetEpisode() ? 1 : -1);
+}
+
+static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
+{
+    if (a->GetSeason() == 0 || b->GetSeason() == 0)
+        return comp_originalAirDate_rev(a, b);
+    if (a->GetSeason() != b->GetSeason())
+        return (a->GetSeason() > b->GetSeason() ? 1 : -1);
+    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
+        return comp_originalAirDate_rev(a, b);
+    return (a->GetEpisode() > b->GetEpisode() ? 1 : -1);
+}
+
+static bool comp_title(const ProgramInfo *a, const ProgramInfo *b)
+{
+    int cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+    if (cmp != 0)
+        return cmp < 0;
+    return comp_season_rev(a, b) < 0;
+}
 
 /**
  * \brief If any cards are configured, return the number.
@@ -454,6 +511,8 @@ void TV::SetFuncPtr(const char* Name, void* Pointer)
         RunProgramFinderPtr = reinterpret_cast<EMBEDRETURNVOIDFINDER>(Pointer);
     else if (name == "scheduleeditor")
         RunScheduleEditorPtr = reinterpret_cast<EMBEDRETURNVOIDSCHEDIT>(Pointer);
+    else if (name == "programlist")
+        RunProgramListPtr = reinterpret_cast<EMBEDRETURNVOIDPROGLIST>(Pointer);
 }
 
 void TV::InitKeys()
@@ -816,6 +875,9 @@ void TV::InitKeys()
             "Zoom mode - quit and abandon changes"), "");
     REG_KEY("TV Playback", ACTION_ZOOMCOMMIT, QT_TRANSLATE_NOOP("MythControls",
             "Zoom mode - commit changes"), "");
+
+    REG_KEY("TV Playback", ACTION_CAST, QT_TRANSLATE_NOOP("MythControls",
+            "Display list of cast members"), "");
 
     /* Interactive Television keys */
     REG_KEY("TV Playback", ACTION_MENURED,    QT_TRANSLATE_NOOP("MythControls",
@@ -1875,6 +1937,8 @@ int TV::Playback(const ProgramInfo& ProgInfo)
         return 0;
     }
 
+    RetrieveCast(ProgInfo);
+
     m_playerContext.SetPlayingInfo(&ProgInfo);
     m_playerContext.SetInitialTVState(false);
     HandleStateChange();
@@ -2121,7 +2185,8 @@ void TV::HandleStateChange()
 
                 m_playerContext.SetRecorder(rec);
 
-                if (!m_playerContext.m_recorder || !m_playerContext.m_recorder->IsValidRecorder())
+                if (!m_playerContext.m_recorder ||
+                    !m_playerContext.m_recorder->IsValidRecorder())
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         "Couldn't find recorder for in-progress recording");
@@ -2459,7 +2524,8 @@ void TV::timerEvent(QTimerEvent *Event)
         {
             if (!m_lastProgram->IsFileReadable())
             {
-                emit ChangeOSDMessage(tr("Last Program: %1 Doesn't Exist").arg(m_lastProgram->GetTitle()));
+                emit ChangeOSDMessage(tr("Last Program: \"%1\" Doesn't Exist")
+                                      .arg(m_lastProgram->GetTitle()));
                 lastProgramStringList.clear();
                 SetLastProgram(nullptr);
                 LOG(VB_PLAYBACK, LOG_ERR, LOC + "Last Program File does not exist");
@@ -5167,7 +5233,7 @@ void TV::ChangeSpeed(int Direction)
         m_playerContext.m_ffRewSpeed = old_speed;
         return;
     }
-     
+
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player && !m_player->Play(speed, m_playerContext.m_ffRewSpeed == 0))
     {
@@ -6137,7 +6203,8 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
             return;
         }
 
-        if (!m_playerContext.m_prevChan.empty() && m_playerContext.m_prevChan.back() == channum)
+        if (!m_playerContext.m_prevChan.empty() &&
+            m_playerContext.m_prevChan.back() == channum)
         {
             // need to remove it if the new channel is the same as the old.
             m_playerContext.m_prevChan.pop_back();
@@ -6832,7 +6899,7 @@ bool TV::DoSetPauseState(bool Pause)
     return waspaused;
 }
 
-void TV::DoEditSchedule(int EditType)
+void TV::DoEditSchedule(int EditType, const QString & EditArg)
 {
     // Prevent nesting of the pop-up UI
     if (m_ignoreKeyPresses)
@@ -6920,6 +6987,16 @@ void TV::DoEditSchedule(int EditType)
             m_ignoreKeyPresses = true;
             break;
         }
+        case kScheduleProgramList:
+        {
+            /*
+              4 = plPeopleSearch in mythfrontend/proglist.h
+              This could be expanded to view other program lists...
+            */
+            RunProgramListPtr(this, 4, EditArg);
+            m_ignoreKeyPresses = true;
+            break;
+        }
         case kScheduledRecording:
         {
             RunScheduleEditorPtr(&pginfo, reinterpret_cast<void*>(this));
@@ -6949,10 +7026,10 @@ void TV::DoEditSchedule(int EditType)
     }
 }
 
-void TV::EditSchedule(int EditType)
+void TV::EditSchedule(int EditType, const QString arg)
 {
     // post the request so the guide will be created in the UI thread
-    QString message = QString("START_EPG %1").arg(EditType);
+    QString message = QString("START_EPG %1 %2").arg(EditType).arg(arg);
     auto* me = new MythEvent(message);
     QCoreApplication::postEvent(this, me);
 }
@@ -7541,7 +7618,8 @@ void TV::customEvent(QEvent *Event)
     if (message.startsWith("START_EPG"))
     {
         int editType = tokens[1].toInt();
-        DoEditSchedule(editType);
+        QString arg = message.section(" ", 2, -1);
+        DoEditSchedule(editType, arg);
     }
 
     if (message.startsWith("COMMFLAG_START") && (tokens.size() >= 2))
@@ -8321,6 +8399,21 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     {
         EditSchedule(kViewSchedule);
     }
+    else if (Action == ACTION_CAST)
+    {
+        FillOSDMenuCast();
+        hide = false;
+    }
+    else if (Action.startsWith("JUMPCAST-"))
+    {
+        QStringList tokens = Action.split("-");
+        if (tokens.size() == 3)
+            FillOSDMenuActorShows(tokens[1], tokens[2].toInt());
+        else if (tokens.size() == 4)
+            FillOSDMenuActorShows(tokens[1], tokens[2].toInt(), tokens[3]);
+
+        hide = false;
+    }
     else if (Action.startsWith("VISUALISER"))
     {
         emit EnableVisualiser(true, false, Action.mid(11));
@@ -8620,7 +8713,8 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
 }
 
 // Returns true if at least one item should be displayed.
-bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDialogData *Menu)
+bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context,
+                                 MythOSDDialogData *Menu)
 {
     MenuCategory category = Context.m_category;
     const QString &actionName = Context.m_action;
@@ -9161,6 +9255,12 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
                 BUTTON(actionName, tr("Low Quality"));
             }
         }
+        else if (actionName == ACTION_CAST)
+        {
+            if (!m_actors.isEmpty() || !m_guest_stars.isEmpty() ||
+                !m_guests.isEmpty())
+                BUTTON(actionName, tr("Cast"));
+        }
         else
         {
             // Allow an arbitrary action if it has a translated
@@ -9263,7 +9363,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         MythVideoOutput *vo = m_player->GetVideoOutput();
         if (vo)
         {
-            m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
+            m_tvmFillAutoDetect = vo->HasSoftwareFrames();
         }
     }
     m_playerContext.LockPlayingInfo(__FILE__, __LINE__);
@@ -9353,6 +9453,9 @@ void TV::MenuStrings()
     (void)tr("Switch Source");
     (void)tr("Jobs");
     (void)tr("Begin Transcoding");
+    (void)tr("Cast");
+    (void)tr("Recorded");
+    (void)tr("Upcoming");
 
     // Cutlist editor menu
     (void)tr("Edit Cut Points");
@@ -9482,6 +9585,175 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
         }
     }
 
+    emit ChangeOSDDialog(dialog);
+}
+
+void TV::RetrieveCast(const ProgramInfo& ProgInfo)
+{
+    bool  recorded = (ProgInfo.GetFilesize() > 0);
+    QString table = recorded ? "recordedcredits" : "credits";
+
+    m_actors.clear();
+    m_guest_stars.clear();
+    m_guests.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(QString("SELECT role, people.name,"
+                          " roles.name, people.person FROM %1"
+                          " AS credits"
+                          " LEFT JOIN people ON"
+                          "  credits.person = people.person"
+                          " LEFT JOIN roles ON"
+                          "  credits.roleid = roles.roleid"
+                          " WHERE credits.chanid = :CHANID"
+                          " AND credits.starttime = :STARTTIME"
+                          " AND role IN ('guest','actor','guest_star')"
+                          " ORDER BY role, priority;").arg(table));
+
+    query.bindValue(":CHANID",    ProgInfo.GetChanID());
+    query.bindValue(":STARTTIME", ProgInfo.GetScheduledStartTime());
+
+    if (query.exec() && query.size() > 0)
+    {
+        QStringList plist;
+        QString rstr;
+        QString role;
+        QString pname;
+        QString character;
+        int pid;
+
+        while(query.next())
+        {
+            role = query.value(0).toString();
+            /* The people.name, roles.name columns uses utf8_bin collation.
+             * Qt-MySQL drivers use QVariant::ByteArray for string-type
+             * MySQL fields marked with the BINARY attribute (those using a
+             * *_bin collation) and QVariant::String for all others.
+             * Since QVariant::toString() uses QString::fromAscii()
+             * (through QVariant::convert()) when the QVariant's type is
+             * QVariant::ByteArray, we have to use QString::fromUtf8()
+             * explicitly to prevent corrupting characters.
+             * The following code should be changed to use the simpler
+             * toString() approach, as above, if we do a DB update to
+             * coalesce the people.name values that differ only in case and
+             * change the collation to utf8_general_ci, to match the
+             * majority of other columns, or we'll have the same problem in
+             * reverse.
+             */
+            pid = query.value(3).toInt();
+            pname = QString::fromUtf8(query.value(1)
+                                      .toByteArray().constData()) +
+                    "-" + QString::number(pid);
+            character = QString::fromUtf8(query.value(2)
+                                          .toByteArray().constData());
+
+            if (role == "actor")
+                m_actors.append(qMakePair(pname, character));
+            else if (role == "guest_star")
+                m_guest_stars.append(qMakePair(pname, character));
+            else if (role == "guest")
+                m_guests.append(qMakePair(pname, character));
+        }
+    }
+
+}
+
+void TV::FillOSDMenuCastButton(MythOSDDialogData & dialog,
+                               const QVector<string_pair> & people)
+{
+    for (const auto & [actor, role] : std::as_const(people))
+    {
+        if (role.isEmpty())
+            dialog.m_buttons.push_back( {actor.split('-')[0],
+                    QString("JUMPCAST-%1").arg(actor), true} );
+        else
+            dialog.m_buttons.push_back( {QString("%1 as %2")
+                    .arg(actor.split('-')[0], role),
+                    QString("JUMPCAST-%1").arg(actor), true} );
+    }
+}
+
+void TV::FillOSDMenuCast(void)
+{
+    MythOSDDialogData dialog { "osd_cast", tr("Cast") };
+    const ProgramInfo pginfo(*m_playerContext.m_playingInfo);
+
+    FillOSDMenuCastButton(dialog, m_actors);
+    FillOSDMenuCastButton(dialog, m_guest_stars);
+    FillOSDMenuCastButton(dialog, m_guests);
+
+    emit ChangeOSDDialog(dialog);
+}
+
+void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
+                               const QString & category)
+{
+    MythOSDDialogData dialog { actor, actor };
+
+    if (category.isEmpty())
+    {
+        dialog.m_buttons.push_back( {"Recorded",
+                QString("JUMPCAST-%1-%2-Recorded").arg(actor).arg(person_id) } );
+        dialog.m_buttons.push_back( {"Upcoming",
+                QString("JUMPCAST-%1-%2-Upcoming").arg(actor).arg(person_id) } );
+        emit ChangeOSDDialog(dialog);
+        return;
+    }
+
+    if (category == "Upcoming")
+    {
+        EditSchedule(kScheduleProgramList, actor);
+        return;
+    }
+
+    /*
+      JUMPCAST-Amanda Burton-133897-Recorded
+      JUMPCAST-Amanda Burton-133897-Upcoming
+    */
+    if (m_progLists.find(actor) == m_progLists.end())
+    {
+        QString table = "recordedcredits";
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(QString("SELECT chanid, starttime from %1"
+                              " where person = :PERSON"
+                              " ORDER BY starttime;").arg(table));
+        query.bindValue(":PERSON", person_id);
+
+        int       chanid;
+        QDateTime starttime;
+        if (query.exec() && query.size() > 0)
+        {
+            while(query.next())
+            {
+                chanid = query.value(0).toInt();
+                starttime = MythDate::fromString(query.value(1).toString());
+                ProgramInfo *pi = new ProgramInfo(chanid, starttime.toUTC());
+                if (!pi->GetTitle().isEmpty() &&
+                    pi->GetRecordingGroup() != "LiveTV" &&
+                    pi->GetRecordingGroup() != "Deleted")
+                    m_progLists[actor].push_back(pi);
+            }
+
+            std::stable_sort(m_progLists[actor].begin(),
+                             m_progLists[actor].end(), comp_title);
+        }
+    }
+
+    QString   show;
+    int       idx = -1;
+    for (auto & pi : m_progLists[actor])
+    {
+        show = pi->GetTitle();
+        if (show.isEmpty())
+            continue;
+        if (!pi->GetSubtitle().isEmpty())
+            show += QString(" %1x%2 %3").arg(pi->GetSeason())
+                                         .arg(pi->GetEpisode())
+                                         .arg(pi->GetSubtitle());
+
+        dialog.m_buttons.push_back( {show,
+                QString("JUMPPROG %1 %2").arg(actor).arg(++idx) });
+    }
     emit ChangeOSDDialog(dialog);
 }
 

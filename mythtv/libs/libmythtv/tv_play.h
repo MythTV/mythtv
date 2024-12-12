@@ -58,6 +58,7 @@ struct osdInfo;
 using EMBEDRETURNVOID        = void (*) (void *, bool);
 using EMBEDRETURNVOIDEPG     = void (*) (uint, const QString &, const QDateTime, TV *, bool, bool, int);
 using EMBEDRETURNVOIDFINDER  = void (*) (TV *, bool, bool);
+using EMBEDRETURNVOIDPROGLIST = void (*) (TV *, int, const QString &);
 using EMBEDRETURNVOIDSCHEDIT = void (*) (const ProgramInfo *, void *);
 
 // Locking order
@@ -94,7 +95,8 @@ enum scheduleEditTypes {
     kScheduleProgramFinder,
     kScheduledRecording,
     kViewSchedule,
-    kPlaybackBox
+    kPlaybackBox,
+    kScheduleProgramList
 };
 
 /**
@@ -155,6 +157,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     friend class GuideGrid;
     friend class TVBrowseHelper;
 
+    using string_pair = QPair<QString, QString>;
+
     Q_OBJECT
 
   public:
@@ -194,6 +198,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     static inline EMBEDRETURNVOIDEPG RunProgramGuidePtr = nullptr;
     static inline EMBEDRETURNVOIDFINDER RunProgramFinderPtr = nullptr;
     static inline EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr = nullptr;
+    static inline EMBEDRETURNVOIDPROGLIST RunProgramListPtr = nullptr;
 
     explicit TV(MythMainWindow* MainWindow);
    ~TV() override;
@@ -250,11 +255,13 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void HandleSaveLastPlayPosEvent();
 
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
-    void EditSchedule(int EditType = kScheduleProgramGuide);
+    void EditSchedule(int EditType = kScheduleProgramGuide,
+                      const QString arg = "");
     bool IsTunablePriv(uint ChanId);
     static QVector<uint> IsTunableOn(PlayerContext* Context, uint ChanId);
     void ChangeChannel(const ChannelInfoList& Options);
-    void DoEditSchedule(int EditType = kScheduleProgramGuide);
+    void DoEditSchedule(int EditType = kScheduleProgramGuide,
+                        const QString & EditArg = "");
     QString GetRecordingGroup() const;
     void UpdateChannelList(int GroupID);
 
@@ -484,6 +491,11 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Menu dialog
     void ShowOSDMenu(bool isCompact = false);
     void FillOSDMenuJumpRec(const QString &Category = "", int Level = 0, const QString &Selected = "");
+    void FillOSDMenuCastButton(MythOSDDialogData & dialog,
+                               const QVector<string_pair> & people);
+    void FillOSDMenuCast(void);
+    void FillOSDMenuActorShows(const QString & actor, int person_id,
+                               const QString & category = "");
     void PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QDomNode &Selected);
     bool MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu) override;
     bool MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu);
@@ -500,6 +512,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void ShowLCDDVDInfo();
 
   private:
+    void RetrieveCast(const ProgramInfo& ProgInfo);
+
     MythMainWindow*   m_mainWindow { nullptr };
 
     // Configuration variables from database
@@ -555,6 +569,10 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     QMutex                    m_progListsLock;
     QMap<QString,ProgramList> m_progLists;
+
+    QVector<string_pair> m_actors;
+    QVector<string_pair> m_guest_stars;
+    QVector<string_pair> m_guests;
 
     mutable QRecursiveMutex m_chanEditMapLock; ///< Lock for chanEditMap and ddMap
     InfoMap        m_chanEditMap;          ///< Channel Editing initial map

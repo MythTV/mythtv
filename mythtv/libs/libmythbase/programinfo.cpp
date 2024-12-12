@@ -1389,7 +1389,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     NEXT_STR(); m_chanName = ts;                             // 11
     NEXT_STR(); m_pathname = ts;                             // 12
     NEXT_STR(); m_fileSize = ts.toLongLong();                // 13
-                                                             
+
     NEXT_STR(); m_startTs = DateTimeFromListItem(ts);        // 14
     NEXT_STR(); m_endTs = DateTimeFromListItem(ts);          // 15
     NEXT_STR(); m_findId = ts.toLongLong();                  // 16

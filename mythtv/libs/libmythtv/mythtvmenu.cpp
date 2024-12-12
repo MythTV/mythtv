@@ -355,5 +355,3 @@ MythTVMenuNodeTuple::MythTVMenuNodeTuple(MenuTypeId Id, QString Path)
     m_path(std::move(Path))
 {
 }
-
-

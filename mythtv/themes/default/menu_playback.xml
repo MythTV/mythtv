@@ -5,6 +5,7 @@
      is omitted. -->
 
 <menu text="Playback Menu">
+  <item action="CAST" XXXtext="Display cast members" current="active" />
   <menu text="Audio">
     <menu text="Select Audio Track">
       <itemlist actiongroup="SELECTAUDIO_" current="active" />

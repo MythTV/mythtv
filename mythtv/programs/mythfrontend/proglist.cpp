@@ -20,6 +20,7 @@
 #include "libmythtv/recordingrule.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/tv_actions.h"       // for ACTION_CHANNELSEARCH
+#include "libmythtv/tv_play.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythuibuttonlist.h"
 #include "libmythui/mythuistatetype.h"
@@ -31,6 +32,21 @@
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")
 #define LOC_ERR  QString("ProgLister, Error: ")
+
+void *ProgLister::RunProgramList(void *player, ProgListType pltype,
+                                 const QString & extraArg)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    auto *vsb = new ProgLister(mainStack, static_cast<TV*>(player),
+                               pltype, extraArg);
+
+    if (vsb->Create())
+        mainStack->AddScreen(vsb, (player == nullptr));
+    else
+        delete vsb;
+
+    return nullptr;
+}
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
                        QString view, QString extraArg,
@@ -71,6 +87,37 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     }
 }
 
+// From tv_play
+ProgLister::ProgLister(MythScreenStack *parent, TV* player,
+                       ProgListType pltype, const QString & extraArg) :
+    ScheduleCommon(parent, "ProgLister"),
+    m_type(pltype),
+    m_extraArg(std::move(extraArg)),
+    m_startTime(MythDate::current()),
+    m_searchTime(m_startTime),
+    m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
+    m_player(player)
+{
+    if (m_player)
+        m_player->IncrRef();
+
+    switch (pltype)
+    {
+        case plTitleSearch:   m_searchType = kTitleSearch;   break;
+        case plKeywordSearch: m_searchType = kKeywordSearch; break;
+        case plPeopleSearch:  m_searchType = kPeopleSearch;  break;
+        case plPowerSearch:
+        case plSQLSearch:
+        case plStoredSearch:  m_searchType = kPowerSearch;   break;
+        default:              m_searchType = kNoSearch;      break;
+    }
+
+    m_view = extraArg;
+    m_viewList.push_back(extraArg);
+    m_viewTextList.push_back(extraArg);
+    m_curView = m_viewList.size() - 1;
+}
+
 // previously recorded ctor
 ProgLister::ProgLister(
     MythScreenStack *parent, uint recid, QString title) :
@@ -86,14 +133,30 @@ ProgLister::ProgLister(
 {
 }
 
-ProgLister::~ProgLister()
+ProgLister::~ProgLister(void)
 {
     m_itemList.clear();
     m_itemListSave.clear();
     gCoreContext->removeListener(this);
+
+    // if we have a player, we need to tell we are done
+    if (m_player)
+    {
+        emit m_player->RequestEmbedding(false);
+        m_player->DecrRef();
+    }
 }
 
-bool ProgLister::Create()
+void ProgLister::Close(void)
+{
+    // don't fade the screen if we are returning to the player
+    if (m_player)
+        GetScreenStack()->PopScreen(this, false);
+    else
+        GetScreenStack()->PopScreen(this, true);
+}
+
+bool ProgLister::Create(void)
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "programlist", this))
         return false;
@@ -162,6 +225,9 @@ bool ProgLister::Create()
     gCoreContext->addListener(this);
 
     LoadInBackground();
+
+    if (m_player)
+        emit m_player->RequestEmbedding(true);
 
     return true;
 }
@@ -876,6 +942,7 @@ void ProgLister::FillViewList(const QString &view)
         }
         else
         {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Failed to load viewList"));
             m_curView = -1;
         }
     }
