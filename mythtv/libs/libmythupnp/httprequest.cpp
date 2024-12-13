@@ -797,7 +797,7 @@ void HTTPRequest::FormatFileResponse( const QString &sFileName )
     if (!m_sFileName.isEmpty() && file.exists())
     {
         QDateTime ims = QDateTime::fromString(GetRequestHeader("if-modified-since", ""), Qt::RFC2822Date);
-        ims.setTimeSpec(Qt::OffsetFromUTC);
+        ims.setTimeSpec(Qt::UTC);
         if (ims.isValid() && ims <= file.lastModified()) // Strong validator
         {
             m_eResponseType = ResponseTypeHeader;
