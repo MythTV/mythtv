@@ -58,11 +58,12 @@ void MythNewsConfig::populateSites(void)
         return;
     }
 
+    QDomDocument domDoc;
+
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
-
-    QDomDocument domDoc;
 
     if (!domDoc.setContent(&xmlFile, false, &errorMsg,
                            &errorLine, &errorColumn))
@@ -74,6 +75,19 @@ void MythNewsConfig::populateSites(void)
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
         return;
     }
+#else
+    auto parseResult = domDoc.setContent(&xmlFile);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Could not read content of news-sites.xml" +
+                QString("\n\t\t\tError parsing %1").arg(filename) +
+                QString("\n\t\t\tat line: %1  column: %2 msg: %3")
+                .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+                .arg(parseResult.errorMessage));
+        return;
+    }
+#endif
 
     m_priv->m_categoryList.clear();
 

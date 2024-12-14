@@ -260,6 +260,7 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     list.clear();
 
     QDomDocument doc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     int ErrLineNum = 0;
 
     if (!doc.setContent(sXml, true, &sErrDesc, &ErrLineNum))
@@ -271,6 +272,18 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
                      QString::number(nErrCode), sErrDesc, sXml));
         return xmlResult;
     }
+#else
+    auto parseResult = doc.setContent(sXml,QDomDocument::ParseOption::UseNamespaceProcessing);
+    if (!parseResult)
+    {
+        nErrCode = UPnPResult_MythTV_XmlParseError;
+        LOG(VB_UPNP, LOG_ERR,
+            QString("SendSOAPRequest(%1) - Invalid response from %2. Error %3: %4. Response: %5")
+                .arg(sMethod, url.toString(),
+                     QString::number(nErrCode), parseResult.errorMessage, sXml));
+        return xmlResult;
+    }
+#endif
     return doc;
 }
 

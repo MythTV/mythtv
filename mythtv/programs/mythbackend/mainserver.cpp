@@ -6976,6 +6976,7 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
         QString result = p.readAllStandardOutput();
 
         QDomDocument domDoc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QString errorMsg;
         int errorLine = 0;
         int errorColumn = 0;
@@ -6987,6 +6988,19 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
                 QString("\n\t\t\tError at line: %1  column: %2 msg: %3").arg(errorLine).arg(errorColumn).arg(errorMsg));
             continue;
         }
+#else
+        auto parseResult = domDoc.setContent(result);
+        if (!parseResult)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("FindLyrics: Could not parse version from %1")
+                    .arg(scripts.at(x)) +
+                QString("\n\t\t\tError at line: %1  column: %2 msg: %3")
+                    .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+                    .arg(parseResult.errorMessage));
+            continue;
+        }
+#endif
 
         QDomNodeList itemList = domDoc.elementsByTagName("grabber");
         QDomNode itemNode = itemList.item(0);

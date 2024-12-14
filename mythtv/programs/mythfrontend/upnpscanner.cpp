@@ -1002,6 +1002,7 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
 
     // Open the response for parsing
     auto *parent = new QDomDocument();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMessage;
     int errorLine   = 0;
     int errorColumn = 0;
@@ -1014,6 +1015,18 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
         delete parent;
         return;
     }
+#else
+    auto parseResult = parent->setContent(data);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
+                .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+                .arg(parseResult.errorMessage));
+        delete parent;
+        return;
+    }
+#endif
 
     LOG(VB_UPNP, LOG_INFO, "\n\n" + parent->toString(4) + "\n\n");
 
@@ -1185,10 +1198,11 @@ QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
         updateid = node.text().toUInt();
     if (node.tagName() == "Result" && !result)
     {
+        result = new QDomDocument();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QString errorMessage;
         int errorLine   = 0;
         int errorColumn = 0;
-        result = new QDomDocument();
         if (!result->setContent(node.text(), true, &errorMessage, &errorLine, &errorColumn))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1197,6 +1211,20 @@ QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
             delete result;
             result = nullptr;
         }
+#else
+        auto parseResult =
+            result->setContent(node.text(),
+                               QDomDocument::ParseOption::UseNamespaceProcessing);
+        if (!parseResult)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
+                    .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+                    .arg(parseResult.errorMessage));
+            delete result;
+            result = nullptr;
+        }
+#endif
     }
 
     QDomNode next = node.firstChild();
@@ -1235,6 +1263,7 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     QString URLBase = QString();
 
     QDomDocument doc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMessage;
     int errorLine   = 0;
     int errorColumn = 0;
@@ -1247,6 +1276,19 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
             .arg(errorLine).arg(errorColumn).arg(errorMessage));
         return false;
     }
+#else
+    auto parseResult = doc.setContent(data);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to parse device description from %1")
+                .arg(url.toString()));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Line: %1 Col: %2 Error: '%3'")
+            .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+            .arg(parseResult.errorMessage));
+        return false;
+    }
+#endif
 
     QDomElement docElem = doc.documentElement();
     QDomNode n = docElem.firstChild();

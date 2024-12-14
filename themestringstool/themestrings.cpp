@@ -134,6 +134,7 @@ void parseDirectory(QString dir)
             continue;
         }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QString errorMsg;
         int errorLine = 0;
         int errorColumn = 0;
@@ -147,6 +148,18 @@ void parseDirectory(QString dir)
             fin.close();
             continue;
         }
+#else
+        auto parseResult = doc.setContent(&fin);
+        if (!parseResult)
+        {
+            std::cerr << "Error parsing: " << qPrintable((*it).absoluteFilePath()) << std::endl;
+            std::cerr << "at line: " << parseResult.errorLine << "  column: "
+                      << parseResult.errorColumn << std::endl;
+            std::cerr << qPrintable(parseResult.errorMessage) << std::endl;
+            fin.close();
+            continue;
+        }
+#endif
 
         fin.close();
 

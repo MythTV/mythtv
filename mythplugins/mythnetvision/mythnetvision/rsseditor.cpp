@@ -196,7 +196,12 @@ void RSSEditPopup::SlotCheckRedirect(QNetworkReply* reply)
 void RSSEditPopup::SlotSave(QNetworkReply* reply)
 {
     QDomDocument document;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     document.setContent(reply->read(reply->bytesAvailable()), true);
+#else
+    document.setContent(reply->read(reply->bytesAvailable()),
+                        QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
 
     QString text = document.toString();
 

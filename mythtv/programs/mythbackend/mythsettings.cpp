@@ -656,6 +656,7 @@ bool parse_settings(MythSettingList &settings, const QString &filename,
         return false;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -669,6 +670,19 @@ bool parse_settings(MythSettingList &settings, const QString &filename,
         f.close();
         return false;
     }
+#else
+    auto parseResult = doc.setContent(&f);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("parse_settings: ") +
+            QString("Parsing: %1 at line: %2 column: %3")
+                .arg(filename).arg(parseResult.errorLine)
+                .arg(parseResult.errorColumn) +
+            QString("\n\t\t\t%1").arg(parseResult.errorMessage));
+        f.close();
+        return false;
+    }
+#endif
     f.close();
 
     settings.clear();

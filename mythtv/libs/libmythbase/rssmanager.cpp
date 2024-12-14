@@ -209,7 +209,13 @@ void RSSSite::process(void)
 
     QDomDocument domDoc;
 
-    if (!domDoc.setContent(m_data, true))
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+    bool success = domDoc.setContent(m_data, true);
+#else
+    auto parseResult = domDoc.setContent(m_data, QDomDocument::ParseOption::UseNamespaceProcessing);
+    bool success { parseResult };
+#endif
+    if (!success)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Failed to set content from downloaded XML");

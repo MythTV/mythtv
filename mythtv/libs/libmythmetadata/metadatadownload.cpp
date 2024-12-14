@@ -399,7 +399,11 @@ MetadataLookupList MetadataDownload::runGrabber(const QString& cmd, const QStrin
     if (!result.isEmpty())
     {
         QDomDocument doc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         doc.setContent(result, true);
+#else
+        doc.setContent(result, QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
         QDomElement root = doc.documentElement();
         QDomElement item = root.firstChildElement("item");
 
@@ -481,7 +485,13 @@ MetadataLookupList MetadataDownload::readMXML(const QString& MXMLpath,
             if (loaded)
             {
                 QDomDocument doc;
-                if (doc.setContent(mxmlraw, true))
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+                bool success = doc.setContent(mxmlraw, true);
+#else
+                auto parseResult = doc.setContent(mxmlraw, QDomDocument::ParseOption::UseNamespaceProcessing);
+                bool success { parseResult };
+#endif
+                if (!success)
                 {
                     lookup->SetStep(kLookupData);
                     QDomElement root = doc.documentElement();
@@ -532,7 +542,13 @@ MetadataLookupList MetadataDownload::readNFO(const QString& NFOpath,
             {
                 QDomDocument doc;
 
-                if (doc.setContent(nforaw, true))
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+                bool success = doc.setContent(nforaw, true);
+#else
+                auto parseResult = doc.setContent(nforaw, QDomDocument::ParseOption::UseNamespaceProcessing);
+                bool success { parseResult };
+#endif
+                if (success)
                 {
                     lookup->SetStep(kLookupData);
                     item = doc.documentElement();

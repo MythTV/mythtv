@@ -69,6 +69,7 @@ bool sendQuery(const QString& query, QDomDocument* xmlDoc)
     if (!GetMythDownloadManager()->download(query, &result, true))
         return false;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -80,6 +81,17 @@ bool sendQuery(const QString& query, QDomDocument* xmlDoc)
                 arg(query).arg(errorLine).arg(errorColumn).arg(errorMsg));
         return false;
     }
+#else
+    auto parseResult = xmlDoc->setContent(result);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Error parsing: %1\nat line: %2  column: %3 msg: %4").
+                arg(query).arg(parseResult.errorLine).arg(parseResult.errorColumn)
+               .arg(parseResult.errorMessage));
+        return false;
+    }
+#endif
 
     // Check for a status or error element
     QDomNodeList statusNodes = xmlDoc->elementsByTagName("Status");

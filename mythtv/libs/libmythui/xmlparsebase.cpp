@@ -646,6 +646,7 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
             continue;
 
         QDomDocument doc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QString errorMsg;
         int errorLine = 0;
         int errorColumn = 0;
@@ -660,7 +661,20 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
             f.close();
             continue;
         }
-
+#else
+        auto parseResult = doc.setContent(&f);
+        if (!parseResult)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Location: '%1' @ %2 column: %3"
+                        "\n\t\t\tError: %4")
+                    .arg(qPrintable(themefile)).arg(parseResult.errorLine)
+                    .arg(parseResult.errorColumn)
+                    .arg(qPrintable(parseResult.errorMessage)));
+            f.close();
+            continue;
+        }
+#endif
         f.close();
 
         QDomElement docElem = doc.documentElement();
@@ -723,6 +737,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
     if (!f.open(QIODevice::ReadOnly))
         return false;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -737,6 +752,20 @@ bool XMLParseBase::doLoad(const QString &windowname,
         f.close();
         return false;
     }
+#else
+    auto parseResult = doc.setContent(&f);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Location: '%1' @ %2 column: %3"
+                    "\n\t\t\tError: %4")
+                .arg(qPrintable(filename)).arg(parseResult.errorLine)
+                .arg(parseResult.errorColumn)
+                .arg(qPrintable(parseResult.errorMessage)));
+        f.close();
+        return false;
+    }
+#endif
 
     f.close();
 

@@ -54,6 +54,7 @@ bool UPnpDeviceDesc::Load( const QString &sFileName )
     if ( !file.open( QIODevice::ReadOnly ) )
         return false;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString sErrMsg;
     int     nErrLine = 0;
     int     nErrCol  = 0;
@@ -73,6 +74,23 @@ bool UPnpDeviceDesc::Load( const QString &sFileName )
             QString("UPnpDeviceDesc::Load - Error Msg: %1" ) .arg(sErrMsg));
         return false;
     }
+#else
+    auto parseResult = doc.setContent( &file );
+
+    file.close();
+
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("UPnpDeviceDesc::Load - Error parsing: %1 "
+                    "at line: %2  column: %3")
+                .arg(sFileName) .arg(parseResult.errorLine)
+                                .arg(parseResult.errorColumn));
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("UPnpDeviceDesc::Load - Error Msg: %1" ) .arg(parseResult.errorMessage));
+        return false;
+    }
+#endif
 
     // --------------------------------------------------------------
     // XML Document Loaded... now parse it into the UPnpDevice Hierarchy
@@ -628,11 +646,17 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
 
     if (ok && sXml.startsWith( QString("<?xml") ))
     {
-        QString sErrorMsg;
-
         QDomDocument xml( "upnp" );
 
-        if ( xml.setContent( sXml, false, &sErrorMsg ))
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+        QString sErrorMsg;
+        bool success = xml.setContent( sXml, false, &sErrorMsg );
+#else
+        auto parseResult = xml.setContent( sXml );
+        bool success { parseResult };
+        QString sErrorMsg { parseResult.errorMessage };
+#endif
+        if ( success )
         {
             pDevice = new UPnpDeviceDesc();
             pDevice->Load( xml );

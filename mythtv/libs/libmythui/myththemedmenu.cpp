@@ -595,6 +595,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
         return false;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -611,6 +612,22 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
                         .arg(menuname));
         return false;
     }
+#else
+    auto parseResult = doc.setContent(&f);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Error parsing: %1\nat line: %2  column: %3 msg: %4")
+            .arg(filename).arg(parseResult.errorLine)
+            .arg(parseResult.errorColumn).arg(parseResult.errorMessage));
+        f.close();
+
+        if (menuname != "mainmenu.xml")
+            ShowOkPopup(tr("The menu file %1 is incomplete.")
+                        .arg(menuname));
+        return false;
+    }
+#endif
 
     f.close();
 

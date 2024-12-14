@@ -1597,7 +1597,8 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
         QString("HTTPRequest::ProcessSOAPPayload : %1 : ").arg(sSOAPAction));
     QDomDocument doc ( "request" );
 
-    QString sErrMsg;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+   QString sErrMsg;
     int     nErrLine = 0;
     int     nErrCol  = 0;
 
@@ -1608,6 +1609,18 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
                 .arg(nErrLine) .arg(nErrCol) .arg(sErrMsg));
         return( false );
     }
+#else
+    auto parseResult =doc.setContent( m_sPayload,
+                                      QDomDocument::ParseOption::UseNamespaceProcessing );
+    if (parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString( "Error parsing request at line: %1 column: %2 : %3" )
+                .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+                .arg(parseResult.errorMessage));
+        return( false );
+    }
+#endif
 
     // --------------------------------------------------------------
     // XML Document Loaded... now parse it

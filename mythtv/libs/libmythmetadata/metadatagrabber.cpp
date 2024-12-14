@@ -306,7 +306,11 @@ MetaGrabberScript::MetaGrabberScript(const QString &path)
         return;
 
     QDomDocument doc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     doc.setContent(result, true);
+#else
+    doc.setContent(result, QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
     QDomElement root = doc.documentElement();
     if (root.isNull())
         // no valid XML
@@ -401,7 +405,11 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
     if (!result.isEmpty())
     {
         QDomDocument doc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         doc.setContent(result, true);
+#else
+        doc.setContent(result, QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
         QDomElement root = doc.documentElement();
         QDomElement item = root.firstChildElement("item");
 

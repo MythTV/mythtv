@@ -51,7 +51,11 @@ void GrabberScript::run()
         QByteArray result = getTree.ReadAll();
 
         QDomDocument domDoc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         domDoc.setContent(result, true);
+#else
+        domDoc.setContent(result, QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
         QDomElement root = domDoc.documentElement();
         QDomElement channel = root.firstChildElement("channel");
 
@@ -385,7 +389,11 @@ void Search::slotProcessSearchExit(uint exitcode)
             "Internet Search Successfully Completed");
 
         m_data = m_searchProcess->ReadAll();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         m_document.setContent(m_data, true);
+#else
+        m_document.setContent(m_data, QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
     }
 
     m_searchProcess->deleteLater();
@@ -401,6 +409,9 @@ void Search::slotProcessSearchExit(void)
 void Search::SetData(QByteArray data)
 {
     m_data = std::move(data);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     m_document.setContent(m_data, true);
-
+#else
+    m_document.setContent(m_data, QDomDocument::ParseOption::UseNamespaceProcessing);
+#endif
 }

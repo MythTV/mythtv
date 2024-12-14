@@ -354,12 +354,13 @@ bool MusicMetadata::updateStreamList(void)
     // uncompress the data
     uncompressedData = gzipUncompress(compressedData);
 
+    // load the xml
+    QDomDocument domDoc;
+
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
-
-    // load the xml
-    QDomDocument domDoc;
 
     if (!domDoc.setContent(uncompressedData, false, &errorMsg,
                            &errorLine, &errorColumn))
@@ -372,6 +373,20 @@ bool MusicMetadata::updateStreamList(void)
         gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
         return false;
     }
+#else
+    auto parseResult = domDoc.setContent(uncompressedData);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "MusicMetadata: Could not read content of streams.xml" +
+                QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
+                QString("\n\t\t\tat line: %1  column: %2 msg: %3")
+                .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+                .arg(parseResult.errorMessage));
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
+        return false;
+    }
+#endif
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM music_streams;");

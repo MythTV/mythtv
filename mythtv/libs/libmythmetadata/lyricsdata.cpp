@@ -230,6 +230,7 @@ void LyricsData::customEvent(QEvent *event)
 void LyricsData::loadLyrics(const QString &xmlData)
 {
     QDomDocument domDoc;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -242,6 +243,19 @@ void LyricsData::loadLyrics(const QString &xmlData)
         m_status = STATUS_NOTFOUND;
         return;
     }
+#else
+    auto parseResult = domDoc.setContent(xmlData);
+    if (!parseResult)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("LyricsData:: Could not parse lyrics from %1").arg(xmlData) +
+            QString("\n\t\t\tError at line: %1  column: %2 msg: %3")
+            .arg(parseResult.errorLine).arg(parseResult.errorColumn)
+            .arg(parseResult.errorMessage));
+        m_status = STATUS_NOTFOUND;
+        return;
+    }
+#endif
 
     QDomNodeList itemList = domDoc.elementsByTagName("lyrics");
     QDomNode itemNode = itemList.item(0);

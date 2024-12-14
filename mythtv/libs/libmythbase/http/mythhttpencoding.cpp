@@ -152,6 +152,7 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
     LOG(VB_HTTP, LOG_DEBUG, QString("Found method call (%1)").arg(Request->m_fileName));
 
     auto payload = QDomDocument();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QString err_msg;
     int err_line {-1};
     int err_col {-1};
@@ -163,6 +164,18 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
                                           .arg(err_line).arg(err_col).arg(err_msg));
         return;
     }
+#else
+    auto parseresult = payload.setContent(Request->m_content->constData(),
+                                          QDomDocument::ParseOption::UseNamespaceProcessing);
+    if (!parseresult)
+    {
+        LOG(VB_HTTP, LOG_WARNING, "Unable to parse XML request body");
+        LOG(VB_HTTP, LOG_WARNING, QString("- Error at line %1, column %2, msg: %3")
+            .arg(parseresult.errorLine).arg(parseresult.errorColumn)
+            .arg(parseresult.errorMessage));
+        return;
+    }
+#endif
     QString doc_name = payload.documentElement().localName();
     if (doc_name.compare("envelope", Qt::CaseInsensitive) == 0)
     {

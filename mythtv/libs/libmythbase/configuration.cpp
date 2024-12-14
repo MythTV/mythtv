@@ -48,6 +48,7 @@ bool XmlConfiguration::Load()
             return false;
         }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QString error;
         int  line    = 0;
         int  column  = 0;
@@ -64,6 +65,22 @@ bool XmlConfiguration::Load()
             LOG(VB_GENERAL, LOG_ERR, QString("Error Msg: %1").arg(error));
             return false;
         }
+#else
+        auto parseresult = m_config.setContent(&file);
+
+        file.close();
+
+        if (!parseresult)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error parsing: %1 at line: %2  column: %3")
+                .arg(pathName, QString::number(parseresult.errorLine),
+                     QString::number(parseresult.errorColumn)));
+
+            LOG(VB_GENERAL, LOG_ERR, QString("Error Msg: %1").arg(parseresult.errorMessage));
+            return false;
+        }
+#endif
 
         m_rootNode = m_config.namedItem("Configuration");
     }
