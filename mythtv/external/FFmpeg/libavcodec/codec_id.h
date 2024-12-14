@@ -573,11 +573,9 @@ enum AVCodecID {
     AV_CODEC_ID_HDMV_TEXT_SUBTITLE,
     AV_CODEC_ID_TTML,
     AV_CODEC_ID_ARIB_CAPTION,
+    AV_CODEC_ID_IVTV_VBI,
 
     /* MythTV */
-    /* teletext codecs */
-    AV_CODEC_ID_MPEG2VBI,
-
     /* DSMCC codec */
     AV_CODEC_ID_DSMCC_B,
 

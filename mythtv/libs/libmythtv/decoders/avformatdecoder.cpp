@@ -3871,9 +3871,6 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 
     switch (codec_id)
     {
-        case AV_CODEC_ID_MPEG2VBI:
-            ProcessVBIDataPacket(curstream, pkt);
-            break;
         case AV_CODEC_ID_DVB_VBI:
             ProcessDVBDataPacket(curstream, pkt);
             break;
@@ -4769,6 +4766,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 continue;
             case AV_CODEC_ID_DVB_TELETEXT:
                 ProcessDVBDataPacket(curstream, pkt);
+                av_packet_unref(pkt);
+                continue;
+            case AV_CODEC_ID_IVTV_VBI:
+                ProcessVBIDataPacket(curstream, pkt);
                 av_packet_unref(pkt);
                 continue;
             default:

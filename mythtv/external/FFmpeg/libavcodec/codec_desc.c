@@ -3617,10 +3617,10 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .profiles  = NULL_IF_CONFIG_SMALL(ff_arib_caption_profiles),
     },
     {
-        .id        = AV_CODEC_ID_MPEG2VBI,
-        .type      = AVMEDIA_TYPE_DATA,
-        .name      = "mpeg2vbi",
-        .long_name = NULL_IF_CONFIG_SMALL("ivtv proprietary embedded VBI captions"),
+        .id        = AV_CODEC_ID_IVTV_VBI,
+        .type      = AVMEDIA_TYPE_SUBTITLE,
+        .name      = "ivtv_vbi",
+        .long_name = NULL_IF_CONFIG_SMALL("ivtv VBI captions"),
     },
     {
         .id        = AV_CODEC_ID_DSMCC_B,
