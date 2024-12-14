@@ -1184,9 +1184,15 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
         static const QRegularExpression comHemDirector { "[Rr]egi" };
         static const QRegularExpression comHemActor    { "[Ss]kådespelare|[Ii] rollerna" };
         static const QRegularExpression comHemHost     { "[Pp]rogramledare" };
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         auto dmatch = comHemDirector.match(pmatch.capturedView(1));
         auto amatch = comHemActor.match(pmatch.capturedView(1));
         auto hmatch = comHemHost.match(pmatch.capturedView(1));
+#else
+        auto dmatch = comHemDirector.matchView(pmatch.capturedView(1));
+        auto amatch = comHemActor.matchView(pmatch.capturedView(1));
+        auto hmatch = comHemHost.matchView(pmatch.capturedView(1));
+#endif
         if (dmatch.hasMatch())
             role = DBPerson::kDirector;
         else if (amatch.hasMatch())
@@ -1254,7 +1260,11 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
     }
 
     // Rerun with day, month and possibly year specified
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     match2 = comHemRerun2.match(match.capturedView(1));
+#else
+    match2 = comHemRerun2.matchView(match.capturedView(1));
+#endif
     if (match2.hasMatch())
     {
         int day   = match2.capturedView(1).toInt();
