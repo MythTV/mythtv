@@ -6,6 +6,7 @@
 
 // Qt headers
 #include <QMap>
+#include <QTimeZone>
 
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
@@ -322,11 +323,19 @@ RecordingInfo::RecordingInfo(
     }
 
     // Round endtime up to the next half-hour.
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     m_endTs = QDateTime(
         m_endTs.date(),
         QTime(m_endTs.time().hour(),
               m_endTs.time().minute() / kUnknownProgramLength
               * kUnknownProgramLength), Qt::UTC);
+#else
+    m_endTs = QDateTime(m_endTs.date(),
+                        QTime(m_endTs.time().hour(),
+                              m_endTs.time().minute() / kUnknownProgramLength
+                              * kUnknownProgramLength),
+                        QTimeZone(QTimeZone::UTC));
+#endif
     m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60LL);
 
     // if under a minute, bump it up to the next half hour

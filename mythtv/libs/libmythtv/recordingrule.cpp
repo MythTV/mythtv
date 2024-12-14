@@ -3,6 +3,8 @@
 
 #include <utility>
 
+#include <QTimeZone>
+
 // libmythbase
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
@@ -573,12 +575,20 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
         infoMap["category"] = m_category;
     infoMap["callsign"] = m_station;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime starttm(m_startdate, m_starttime, Qt::UTC);
+#else
+    QDateTime starttm(m_startdate, m_starttime, QTimeZone(QTimeZone::UTC));
+#endif
     infoMap["starttime"] = MythDate::toString(starttm, date_format | MythDate::kTime);
     infoMap["startdate"] = MythDate::toString(
         starttm, date_format | MythDate::kDateFull | MythDate::kSimplify);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime endtm(m_enddate, m_endtime, Qt::UTC);
+#else
+    QDateTime endtm(m_enddate, m_endtime, QTimeZone(QTimeZone::UTC));
+#endif
     infoMap["endtime"] = MythDate::toString(endtm, date_format | MythDate::kTime);
     infoMap["enddate"] = MythDate::toString(
         endtm, date_format | MythDate::kDateFull | MythDate::kSimplify);
@@ -587,8 +597,14 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
     infoMap["chanid"] = QString::number(m_channelid);
     infoMap["channel"] = m_station;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime startts(m_startdate, m_starttime, Qt::UTC);
     QDateTime endts(m_enddate, m_endtime, Qt::UTC);
+#else
+    static const QTimeZone utc(QTimeZone::UTC);
+    QDateTime startts(m_startdate, m_starttime, utc);
+    QDateTime endts(m_enddate, m_endtime, utc);
+#endif
 
     int seconds = startts.secsTo(endts);
     int minutes = seconds / 60;
@@ -627,9 +643,14 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
 
     if (m_type == kDailyRecord || m_type == kWeeklyRecord)
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QDateTime ldt =
             QDateTime(MythDate::current().toLocalTime().date(), m_findtime,
                       Qt::LocalTime);
+#else
+        QDateTime ldt =
+            QDateTime(MythDate::current().toLocalTime().date(), m_findtime, utc);
+#endif
         QString findfrom = MythDate::toString(ldt, date_format | MythDate::kTime);
         if (m_type == kWeeklyRecord)
         {
@@ -964,8 +985,14 @@ bool RecordingRule::IsValid(QString &msg) const
             msg = QString("Invalid start/end date/time.");
             return false;
         }
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         qint64 secsto = QDateTime(m_startdate, m_starttime, Qt::UTC)
             .secsTo(QDateTime(m_enddate, m_endtime, Qt::UTC));
+#else
+        static const QTimeZone utc(QTimeZone::UTC);
+        qint64 secsto = QDateTime(m_startdate, m_starttime, utc)
+            .secsTo(QDateTime(m_enddate, m_endtime, utc));
+#endif
         if (secsto <= 0 || secsto > (8 * 3600))
         {
             msg = QString("Invalid duration.");

@@ -1,6 +1,7 @@
 // Qt
 #include <QDateTime>
 #include <QFileInfo>
+#include <QTimeZone>
 
 // MythTV
 #include "mythlogging.h"
@@ -200,7 +201,11 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
         case QMetaType::QDateTime :
         {
             QDateTime dt = QDateTime::fromString(Value, Qt::ISODate);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             dt.setTimeSpec(Qt::UTC);
+#else
+            dt.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
             *(static_cast<QDateTime*>(Parameter)) = dt;
             break;
         }

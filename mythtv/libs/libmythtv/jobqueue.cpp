@@ -11,6 +11,7 @@
 #include <QFileInfo>
 #include <QEvent>
 #include <QCoreApplication>
+#include <QTimeZone>
 
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
@@ -612,8 +613,14 @@ bool JobQueue::QueueJobs(int jobTypes, uint chanid, const QDateTime &recstartts,
             int defer = gCoreContext->GetNumSetting("DeferAutoTranscodeDays", 0);
             if (defer)
             {
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
                 schedruntime = QDateTime(schedruntime.addDays(defer).date(),
                                          QTime(0,0,0), Qt::UTC);
+#else
+                schedruntime = QDateTime(schedruntime.addDays(defer).date(),
+                                         QTime(0,0,0),
+                                         QTimeZone(QTimeZone::UTC));
+#endif
             }
 
             QueueJob(JOB_TRANSCODE, chanid, recstartts, args, comment, host,
@@ -1196,8 +1203,14 @@ bool JobQueue::InJobRunWindow(std::chrono::minutes orStartsWithinMins)
         {
             // We passed the start time for today, try tomorrow
             QDateTime curDateTime = MythDate::current();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             QDateTime startDateTime = QDateTime(
                 curDateTime.date(), queueStartTime, Qt::UTC).addDays(1);
+#else
+            QDateTime startDateTime =
+                QDateTime(curDateTime.date(), queueStartTime,
+                          QTimeZone(QTimeZone::UTC)).addDays(1);
+#endif
 
             if (curDateTime.secsTo(startDateTime) <= duration_cast<std::chrono::seconds>(orStartsWithinMins).count())
             {

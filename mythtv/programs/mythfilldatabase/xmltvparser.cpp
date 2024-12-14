@@ -149,7 +149,11 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         }
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime tmpDT = QDateTime(tmpDate, tmpTime, Qt::UTC);
+#else
+    QDateTime tmpDT = QDateTime(tmpDate, tmpTime, QTimeZone(QTimeZone::UTC));
+#endif
     if (!tmpDT.isValid())
     {
         LOG(VB_XMLTV, LOG_ERR,

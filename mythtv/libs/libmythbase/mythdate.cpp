@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QRegularExpression>
+#include <QTimeZone>
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
@@ -27,7 +28,11 @@ QString current_iso_string(bool stripped)
 QDateTime as_utc(const QDateTime &old_dt)
 {
     QDateTime dt(old_dt);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     dt.setTimeSpec(Qt::UTC);
+#else
+    dt.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
     return dt;
 }
 
@@ -53,7 +58,11 @@ QDateTime fromString(const QString &dtstr)
 MBASE_PUBLIC QDateTime fromString(const QString &str, const QString &format)
 {
     QDateTime dt = QDateTime::fromString(str, format);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     dt.setTimeSpec(Qt::UTC);
+#else
+    dt.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
     return dt;
 }
 

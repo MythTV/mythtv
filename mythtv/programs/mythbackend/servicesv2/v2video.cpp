@@ -416,9 +416,16 @@ V2VideoLookupList* V2Video::LookupVideo( const QString    &Title,
             pVideoLookup->setInetref(lookup->GetInetref());
             pVideoLookup->setCollectionref(lookup->GetCollectionref());
             pVideoLookup->setHomePage(lookup->GetHomepage());
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             pVideoLookup->setReleaseDate(
                 QDateTime(lookup->GetReleaseDate(),
                           QTime(0,0),Qt::LocalTime).toUTC());
+#else
+            pVideoLookup->setReleaseDate(
+                QDateTime(lookup->GetReleaseDate(),
+                          QTime(0,0),
+                          QTimeZone(QTimeZone::LocalTime)).toUTC());
+#endif
             pVideoLookup->setUserRating(lookup->GetUserRating());
             pVideoLookup->setLength(lookup->GetRuntime().count());
             pVideoLookup->setLanguage(lookup->GetLanguage());

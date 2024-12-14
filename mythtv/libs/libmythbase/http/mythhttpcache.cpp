@@ -113,7 +113,11 @@ void MythHTTPCache::PreConditionCheck(const HTTPResponse& Response)
         auto ParseModified = [](const QString& Modified)
         {
             QDateTime time = QDateTime::fromString(Modified, Qt::RFC2822Date);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             time.setTimeSpec(Qt::UTC);
+#else
+            time.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
             return time;
         };
 

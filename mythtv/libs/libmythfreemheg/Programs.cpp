@@ -35,6 +35,7 @@
 #include <QDateTime>
 #include <QLocale>
 #include <QStringList>
+#include <QTimeZone>
 #include <QUrl>
 #include <QUrlQuery>
 
@@ -161,7 +162,12 @@ Therefore, for consistency, I will assume all dates are in the local timezone.
 Thus, the meaning of FormatDate using the output of GetCurrentDate is equivalent
 to QDateTime::currentDateTime().toString(…) with a suitably converted format string.
 */
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
 static const QDateTime k_mJD_epoch = QDateTime(QDate(1858, 11, 17), QTime(0, 0), Qt::LocalTime);
+#else
+static const QDateTime k_mJD_epoch = QDateTime(QDate(1858, 11, 17), QTime(0, 0),
+                                               QTimeZone(QTimeZone::LocalTime));
+#endif
 
 // match types with Qt
 static inline QDateTime recoverDateTime(int64_t mJDN, int64_t seconds)

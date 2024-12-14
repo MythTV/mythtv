@@ -83,7 +83,11 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
         case QMetaType::QDateTime   :
         {
             QDateTime dt = QDateTime::fromString( sValue, Qt::ISODate );
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             dt.setTimeSpec( Qt::UTC );
+#else
+            dt.setTimeZone( QTimeZone(QTimeZone::UTC) );
+#endif
             *(( QDateTime      *)pParam) = dt;
             break;
         }

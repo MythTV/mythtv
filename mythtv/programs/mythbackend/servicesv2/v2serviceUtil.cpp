@@ -277,10 +277,18 @@ void V2FillRecRuleInfo( V2RecRule  *pRecRule,
     pRecRule->setSeason         (  pRule->m_season                 );
     pRecRule->setEpisode        (  pRule->m_episode                );
     pRecRule->setCategory       (  pRule->m_category               );
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     pRecRule->setStartTime      (  QDateTime(pRule->m_startdate,
                                              pRule->m_starttime, Qt::UTC));
     pRecRule->setEndTime        (  QDateTime(pRule->m_enddate,
                                              pRule->m_endtime, Qt::UTC));
+#else
+    static const QTimeZone utc(QTimeZone::UTC);
+    pRecRule->setStartTime      (  QDateTime(pRule->m_startdate,
+                                             pRule->m_starttime, utc));
+    pRecRule->setEndTime        (  QDateTime(pRule->m_enddate,
+                                             pRule->m_endtime, utc));
+#endif
     pRecRule->setSeriesId       (  pRule->m_seriesid               );
     pRecRule->setProgramId      (  pRule->m_programid              );
     pRecRule->setInetref        (  pRule->m_inetref                );
@@ -403,12 +411,22 @@ void V2FillVideoMetadataInfo (
     pVideoMetadataInfo->setInetref(pMetadata->GetInetRef());
     pVideoMetadataInfo->setCollectionref(pMetadata->GetCollectionRef());
     pVideoMetadataInfo->setHomePage(pMetadata->GetHomepage());
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     pVideoMetadataInfo->setReleaseDate(
         QDateTime(pMetadata->GetReleaseDate(),
                   QTime(0,0),Qt::LocalTime).toUTC());
     pVideoMetadataInfo->setAddDate(
         QDateTime(pMetadata->GetInsertdate(),
                   QTime(0,0),Qt::LocalTime).toUTC());
+#else
+    static const QTimeZone localtime(QTimeZone::LocalTime);
+    pVideoMetadataInfo->setReleaseDate(
+        QDateTime(pMetadata->GetReleaseDate(),
+                  QTime(0,0),localtime).toUTC());
+    pVideoMetadataInfo->setAddDate(
+        QDateTime(pMetadata->GetInsertdate(),
+                  QTime(0,0),localtime).toUTC());
+#endif
     pVideoMetadataInfo->setUserRating(pMetadata->GetUserRating());
     pVideoMetadataInfo->setChildID(pMetadata->GetChildID());
     pVideoMetadataInfo->setLength(pMetadata->GetLength().count());

@@ -1,5 +1,6 @@
 // Qt
 #include <QDateTime>
+#include <QTimeZone>
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"
@@ -183,9 +184,17 @@ void ManualSchedule::dateChanged(void)
     int hr = m_starthourSpin->GetIntValue();
     int min = m_startminuteSpin->GetIntValue();
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     m_startDateTime = QDateTime(
         m_nowDateTime.toLocalTime().addDays(m_daysahead).date(),
         QTime(hr, min), Qt::LocalTime).toUTC();
+#else
+    m_startDateTime =
+        QDateTime(m_nowDateTime.toLocalTime().addDays(m_daysahead).date(),
+                  QTime(hr, min),
+                  QTimeZone(QTimeZone::LocalTime))
+        .toUTC();
+#endif
 
     LOG(VB_SCHEDULE, LOG_INFO, QString("Start Date Time: %1")
         .arg(m_startDateTime.toString(Qt::ISODate)));
@@ -193,17 +202,32 @@ void ManualSchedule::dateChanged(void)
     // Note we allow start times up to one hour in the past so
     // if it is 20:25 the user can start a recording at 20:30
     // by first setting the hour and then the minute.
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime tmp = QDateTime(
         m_startDateTime.toLocalTime().date(),
         QTime(m_startDateTime.toLocalTime().time().hour(),59,59),
         Qt::LocalTime).toUTC();
+#else
+    QDateTime tmp =
+        QDateTime(m_startDateTime.toLocalTime().date(),
+                  QTime(m_startDateTime.toLocalTime().time().hour(),59,59),
+                  QTimeZone(QTimeZone::LocalTime))
+        .toUTC();
+#endif
     if (tmp < m_nowDateTime)
     {
         hr = m_nowDateTime.toLocalTime().time().hour();
         m_starthourSpin->SetValue(hr);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         m_startDateTime =
             QDateTime(m_nowDateTime.toLocalTime().date(),
                       QTime(hr, min), Qt::LocalTime).toUTC();
+#else
+        m_startDateTime = QDateTime(m_nowDateTime.toLocalTime().date(),
+                                    QTime(hr, min),
+                                    QTimeZone(QTimeZone::LocalTime))
+            .toUTC();
+#endif
     }
     connectSignals();
 }

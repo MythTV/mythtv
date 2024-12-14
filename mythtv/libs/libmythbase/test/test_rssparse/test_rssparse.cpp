@@ -57,7 +57,12 @@ void TestRSSParse::test_rfc822(void)
     QFETCH(QTime, expectedTime);
 
     QDateTime result = Parse::RFC822TimeToQDateTime(dateString);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedResult(expectedDate, expectedTime, Qt::UTC);
+#else
+    QDateTime expectedResult(expectedDate, expectedTime,
+                             QTimeZone(QTimeZone::UTC));
+#endif
     QCOMPARE(result, expectedResult);
 }
 
@@ -100,7 +105,12 @@ void TestRSSParse::test_rfc3339(void)
     QFETCH(QTime, expectedTime);
 
     QDateTime result = Parse::FromRFC3339(dateString);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedResult(expectedDate, expectedTime, Qt::UTC);
+#else
+    QDateTime expectedResult(expectedDate, expectedTime,
+                             QTimeZone(QTimeZone::UTC));
+#endif
     QCOMPARE(result, expectedResult);
 }
 

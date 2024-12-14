@@ -21,7 +21,11 @@ int calc_utc_offset(void)
 {
     QDateTime loc = QDateTime::currentDateTime();
     QDateTime utc = loc.toUTC();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     loc = QDateTime(loc.date(), loc.time(), Qt::UTC);
+#else
+    loc = QDateTime(loc.date(), loc.time(), QTimeZone(QTimeZone::UTC));
+#endif
     return utc.secsTo(loc);
 }
 

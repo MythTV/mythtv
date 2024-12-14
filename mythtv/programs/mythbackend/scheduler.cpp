@@ -2864,9 +2864,16 @@ bool Scheduler::HandleRecording(
     }
 
     QDateTime recstartts = MythDate::current(true).addSecs(30);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     recstartts = QDateTime(
         recstartts.date(),
         QTime(recstartts.time().hour(), recstartts.time().minute()), Qt::UTC);
+#else
+    recstartts = QDateTime(
+        recstartts.date(),
+        QTime(recstartts.time().hour(), recstartts.time().minute()),
+        QTimeZone(QTimeZone::UTC));
+#endif
     ri.SetRecordingStartTime(recstartts);
     tempri.SetRecordingStartTime(recstartts);
 
@@ -3729,11 +3736,21 @@ void Scheduler::UpdateManuals(uint recordid)
     QString subtitle = query.value(2).toString();
     QString description = query.value(3).toString();
     QString station = query.value(4).toString();
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime startdt = QDateTime(query.value(5).toDate(),
                                   query.value(6).toTime(), Qt::UTC);
     int duration = startdt.secsTo(
         QDateTime(query.value(7).toDate(),
                   query.value(8).toTime(), Qt::UTC));
+#else
+    QDateTime startdt = QDateTime(query.value(5).toDate(),
+                                  query.value(6).toTime(),
+                                  QTimeZone(QTimeZone::UTC));
+    int duration = startdt.secsTo(
+        QDateTime(query.value(7).toDate(),
+                  query.value(8).toTime(),
+                  QTimeZone(QTimeZone::UTC)));
+#endif
 
     int season = query.value(9).toInt();
     int episode = query.value(10).toInt();
@@ -3781,8 +3798,15 @@ void Scheduler::UpdateManuals(uint recordid)
         weekday = (lstartdt.date().dayOfWeek() < 6);
         daysoff = lstartdt.date().daysTo(
             MythDate::current().toLocalTime().date());
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         startdt = QDateTime(lstartdt.date().addDays(daysoff),
                             lstartdt.time(), Qt::LocalTime).toUTC();
+#else
+        startdt = QDateTime(lstartdt.date().addDays(daysoff),
+                            lstartdt.time(),
+                            QTimeZone(QTimeZone::LocalTime)
+                            ).toUTC();
+#endif
         break;
     case kWeeklyRecord:
         progcount = 2;
@@ -3791,8 +3815,15 @@ void Scheduler::UpdateManuals(uint recordid)
         daysoff = lstartdt.date().daysTo(
             MythDate::current().toLocalTime().date());
         daysoff = (daysoff + 6) / 7 * 7;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         startdt = QDateTime(lstartdt.date().addDays(daysoff),
                             lstartdt.time(), Qt::LocalTime).toUTC();
+#else
+        startdt = QDateTime(lstartdt.date().addDays(daysoff),
+                            lstartdt.time(),
+                            QTimeZone(QTimeZone::LocalTime)
+                            ).toUTC();
+#endif
         break;
     default:
         LOG(VB_GENERAL, LOG_ERR,
@@ -3832,8 +3863,15 @@ void Scheduler::UpdateManuals(uint recordid)
         }
 
         daysoff += skipdays;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         startdt = QDateTime(lstartdt.date().addDays(daysoff),
                             lstartdt.time(), Qt::LocalTime).toUTC();
+#else
+        startdt = QDateTime(lstartdt.date().addDays(daysoff),
+                            lstartdt.time(),
+                            QTimeZone(QTimeZone::LocalTime)
+                            ).toUTC();
+#endif
     }
 }
 
@@ -4835,10 +4873,18 @@ void Scheduler::AddNotListed(void) {
     while (result.next())
     {
         RecordingType rectype = RecordingType(result.value(21).toInt());
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QDateTime startts(
             result.value(16).toDate(), result.value(17).toTime(), Qt::UTC);
         QDateTime endts(
             result.value(18).toDate(), result.value(19).toTime(), Qt::UTC);
+#else
+        static const QTimeZone utc(QTimeZone::UTC);
+        QDateTime startts(
+            result.value(16).toDate(), result.value(17).toTime(), utc);
+        QDateTime endts(
+            result.value(18).toDate(), result.value(19).toTime(), utc);
+#endif
 
         QDateTime recstartts = startts.addSecs(result.value(25).toInt() * -60LL);
         QDateTime recendts   = endts.addSecs(  result.value(26).toInt() * +60LL);
@@ -4977,14 +5023,29 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
     while (result.next())
     {
         RecordingType rectype = RecordingType(result.value(21).toInt());
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
         QDateTime startts = QDateTime(result.value(16).toDate(),
                                       result.value(17).toTime(), Qt::UTC);
         QDateTime endts = QDateTime(result.value(18).toDate(),
                                     result.value(19).toTime(), Qt::UTC);
+#else
+        static const QTimeZone utc(QTimeZone::UTC);
+        QDateTime startts = QDateTime(result.value(16).toDate(),
+                                      result.value(17).toTime(), utc);
+        QDateTime endts = QDateTime(result.value(18).toDate(),
+                                    result.value(19).toTime(), utc);
+#endif
         // Prevent invalid date/time warnings later
         if (!startts.isValid())
+        {
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             startts = QDateTime(MythDate::current().date(), QTime(0,0),
                                 Qt::UTC);
+#else
+            startts = QDateTime(MythDate::current().date(), QTime(0,0),
+                                QTimeZone(QTimeZone::UTC));
+#endif
+        }
         if (!endts.isValid())
             endts = startts;
 

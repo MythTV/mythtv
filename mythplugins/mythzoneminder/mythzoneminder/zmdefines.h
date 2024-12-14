@@ -21,6 +21,7 @@
 // qt
 #include <QString>
 #include <QDateTime>
+#include <QTimeZone>
 
 /// Event details
 class Event
@@ -51,6 +52,7 @@ class Event
 
     QString monitorName(void) const { return m_monitorName; }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     /// Returns time using specified Qt::TimeSpec.
     QDateTime startTime(Qt::TimeSpec spec) const
     {
@@ -61,6 +63,13 @@ class Event
         return (Qt::LocalTime == spec) ?
             m_startTime : m_startTime.toTimeSpec(spec);
     }
+#else
+    /// Returns time using specified QTimeZone.
+    QDateTime startTime(const QTimeZone& zone) const
+    {
+        return m_startTime.toTimeZone(zone);
+    }
+#endif
 
     /// Returns time with native Qt::TimeSpec (subject to revision).
     /// Use only if the code using this functions properly with any timeSpec.

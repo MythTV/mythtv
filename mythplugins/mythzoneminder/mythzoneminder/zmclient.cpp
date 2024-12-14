@@ -650,7 +650,12 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
     strList << QString::number(event->monitorID());
     strList << QString::number(event->eventID());
     strList << QString::number(frameNo);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     strList << event->startTime(Qt::LocalTime).toString("yy/MM/dd/hh/mm/ss");
+#else
+    static const QTimeZone localtime(QTimeZone::LocalTime);
+    strList << event->startTime(localtime).toString("yy/MM/dd/hh/mm/ss");
+#endif
     if (!sendReceiveStringList(strList))
         return;
 
@@ -695,7 +700,12 @@ void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
     strList << QString::number(event->monitorID());
     strList << QString::number(event->eventID());
     strList << QString::number(frameNo);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     strList << event->startTime(Qt::LocalTime).toString("yy/MM/dd/hh/mm/ss");
+#else
+    static const QTimeZone localtime(QTimeZone::LocalTime);
+    strList << event->startTime(localtime).toString("yy/MM/dd/hh/mm/ss");
+#endif
     if (!sendReceiveStringList(strList))
     {
         image = QImage();

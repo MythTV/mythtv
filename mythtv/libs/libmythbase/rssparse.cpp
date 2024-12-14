@@ -1067,7 +1067,11 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
     if (result.isNull() || !result.isValid())
         return {};
     result = result.addSecs((hoursShift * 3600 * (-1)) + (minutesShift * 60 * (-1)));
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     result.setTimeSpec(Qt::UTC);
+#else
+    result.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
     return result;
 }
 
@@ -1102,7 +1106,11 @@ QDateTime Parse::FromRFC3339(const QString& t)
         int minutesShift = match.capturedView(3).toInt();
         result = result.addSecs((hoursShift * 3600 * multiplier) + (minutesShift * 60 * multiplier));
     }
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     result.setTimeSpec(Qt::UTC);
+#else
+    result.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
     return result;
 }
 

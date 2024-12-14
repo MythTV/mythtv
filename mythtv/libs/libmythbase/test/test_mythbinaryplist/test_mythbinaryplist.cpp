@@ -28,7 +28,11 @@ void TestMythBinaryPList::initTestCase(void)
 {
     auto date = QDate(2021, 4, 21);
     auto time = QTime(13, 26, 03);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     test_datetime = QDateTime(date, time, Qt::UTC);
+#else
+    test_datetime = QDateTime(date, time, QTimeZone(QTimeZone::UTC));
+#endif
 }
 
 // called at the end of these sets of tests

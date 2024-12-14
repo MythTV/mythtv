@@ -26,6 +26,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QThread>
+#include <QTimeZone>
 #include <QUrl>
 #ifndef QT_NO_OPENSSL
 #include <QSslConfiguration>
@@ -999,7 +1000,11 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
                     .arg(h.second.constData()));
                 continue;
             }
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
             d.setTimeSpec(Qt::UTC);
+#else
+            d.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
             lastMod = d;
         }
     }

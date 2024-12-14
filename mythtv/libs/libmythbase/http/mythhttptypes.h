@@ -16,6 +16,7 @@
 #ifndef QT_NO_OPENSSL
 #include <QSslConfiguration>
 #endif
+#include <QTimeZone>
 
 // MythTV
 #include "libmythbase/http/mythhttpcommon.h"

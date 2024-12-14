@@ -8,6 +8,7 @@
 #include <QtGlobal>
 #include <QCoreApplication>
 #include <QFile>
+#include <QTimeZone>
 
 // MythTV
 #include "libmyth/mythcontext.h"
@@ -214,11 +215,13 @@ static QDateTime getDailyWakeupTime(const QString& sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime, "hh:mm");
-    QDateTime dtDateTime = QDateTime(
-        MythDate::current().toLocalTime().date(),
-        tTime, Qt::LocalTime).toUTC();
-
-    return dtDateTime;
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+    return QDateTime(MythDate::current().toLocalTime().date(),
+                     tTime, Qt::LocalTime).toUTC();
+#else
+    return QDateTime(MythDate::current().toLocalTime().date(),
+                     tTime, QTimeZone(QTimeZone::LocalTime)).toUTC();
+#endif
 }
 
 static bool isRecording()

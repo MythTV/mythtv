@@ -40,6 +40,7 @@
 #include <QDateTime>
 #include <QSequentialIterable>
 #include <QTextStream>
+#include <QTimeZone>
 #include <QBuffer>
 
 // MythTV
@@ -450,7 +451,12 @@ QVariant MythBinaryPList::ParseBinaryDate(uint8_t* Data)
         return result;
 
     auto sec = static_cast<uint64_t>(convert_float<double>(Data));
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     result = QDateTime::fromSecsSinceEpoch(CORE_DATA_EPOCH + sec, Qt::UTC);
+#else
+    result = QDateTime::fromSecsSinceEpoch(CORE_DATA_EPOCH + sec,
+                                           QTimeZone(QTimeZone::UTC));
+#endif
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return {result};

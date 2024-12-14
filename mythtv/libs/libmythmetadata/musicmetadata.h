@@ -13,6 +13,7 @@
 #include <QMap>
 #include <QMetaType>
 #include <QStringList>
+#include <QTimeZone>
 
 // MythTV
 #include "libmythbase/mthread.h"

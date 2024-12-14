@@ -948,7 +948,11 @@ bool MetaIOID3::writeLastPlay(TagLib::ID3v2::Tag *tag, QDateTime lastPlay)
         tag->addFrame(txxx);
         txxx->setDescription("MythTVLastPlayed");
     }
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     lastPlay.setTimeSpec(Qt::UTC);
+#else
+    lastPlay.setTimeZone(QTimeZone(QTimeZone::UTC));
+#endif
     txxx->setText(QStringToTString(lastPlay.toString(Qt::ISODate)));
 
     return true;

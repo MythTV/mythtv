@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QTimeZone>
 
 // MythTV headers
 #include "libmythbase/compat.h"
@@ -768,7 +769,12 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     int64_t minutes = length_in_minutes.count();
     m_recStartTs = cur.addSecs((minutes + 1) * -60);
     m_recEndTs   = m_recStartTs.addSecs(minutes * 60);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     m_startTs    = QDateTime(QDate(m_year,1,1),QTime(0,0,0), Qt::UTC);
+#else
+    m_startTs    = QDateTime(QDate(m_year,1,1),QTime(0,0,0),
+                             QTimeZone(QTimeZone::UTC));
+#endif
     m_endTs      = m_startTs.addSecs(minutes * 60);
 
     QString pn = _pathname;

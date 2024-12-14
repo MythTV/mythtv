@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QDomDocument>
+#include <QTimeZone>
 
 #include "mythpainter.h"
 #include "mythmainwindow.h"
@@ -54,9 +55,15 @@ QString MythUIClock::GetTimeText(void)
     QString newMsg = gCoreContext->GetQLocale().toString(dt, m_format);
 
     m_nextUpdate = m_time.addSecs(1);
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     m_nextUpdate = QDateTime(m_time.date(),
                              m_time.time().addMSecs(m_time.time().msec()),
                              Qt::UTC);
+#else
+    m_nextUpdate = QDateTime(m_time.date(),
+                             m_time.time().addMSecs(m_time.time().msec()),
+                             QTimeZone(QTimeZone::UTC));
+#endif
 
     return newMsg;
 }

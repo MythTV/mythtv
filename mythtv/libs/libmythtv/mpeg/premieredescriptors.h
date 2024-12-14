@@ -10,6 +10,7 @@
 // Qt headers
 #include <QString>
 #include <QDateTime>
+#include <QTimeZone>
 
 // MythTV headers
 #include "mpegdescriptors.h"

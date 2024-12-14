@@ -1297,7 +1297,12 @@ void TestMPEGTables::atsc_eit_test1a(void)
     QCOMPARE (eit.EventCount(),                     6U);
 
     // EIT table data
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedDT {QDate(2022,07,18), QTime(20,00,18), Qt::UTC};
+#else
+    static const QTimeZone utc { QTimeZone::UTC };
+    QDateTime expectedDT {QDate(2022,07,18), QTime(20,00,18), utc};
+#endif
     QCOMPARE (eit.EventID(0),                       3U);
     QCOMPARE (eit.StartTimeRaw(0),         1342209618U);
     QCOMPARE (eit.StartTimeGPS(0),          expectedDT);
@@ -1313,7 +1318,11 @@ void TestMPEGTables::atsc_eit_test1a(void)
     }
     QCOMPARE (eit.DescriptorsLength(0),            54U);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     expectedDT = QDateTime(QDate(2022,07,18), QTime(21,00,18), Qt::UTC);
+#else
+    expectedDT = QDateTime(QDate(2022,07,18), QTime(21,00,18), utc);
+#endif
     QCOMPARE (eit.EventID(1),                       4U);
     QCOMPARE (eit.StartTimeRaw(1),         1342213218U);
     QCOMPARE (eit.StartTimeGPS(1),          expectedDT);
@@ -1329,7 +1338,11 @@ void TestMPEGTables::atsc_eit_test1a(void)
     }
     QCOMPARE (eit.DescriptorsLength(1),            33U);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     expectedDT = QDateTime(QDate(2022,07,18), QTime(22,00,18), Qt::UTC);
+#else
+    expectedDT = QDateTime(QDate(2022,07,18), QTime(22,00,18), utc);
+#endif
     QCOMPARE (eit.EventID(2),                       5U);
     QCOMPARE (eit.StartTimeRaw(2),         1342216818U);
     QCOMPARE (eit.StartTimeGPS(2),          expectedDT);
@@ -1493,7 +1506,12 @@ void TestMPEGTables::atsc_stt_test(void)
         0xCD, 0xF0, 0x11, 0x00, 0x00, 0xC1, 0x00, 0x00, 0x00, 0x4F, 0xFC, 0x7B, 0x4B, 0x12, 0xFE, 0x02,
         0XD7, 0xF8, 0xF6, 0x81,
     };
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedDT { QDate(2022,07,15), QTime(18,58,19), Qt::UTC };
+#else
+    QDateTime expectedDT { QDate(2022,07,15), QTime(18,58,19),
+                           QTimeZone(QTimeZone::UTC) };
+#endif
 
     PSIPTable si_table(si_data);
     QVERIFY  (si_table.IsGood());
@@ -2086,7 +2104,12 @@ void TestMPEGTables::dvb_eit_test1(void)
     QCOMPARE (eit.LastTableID(),                   78U);
 
     // EIT table data
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedDT {QDate(2022,07,10), QTime(11,00,00), Qt::UTC};
+#else
+    QDateTime expectedDT {QDate(2022,07,10), QTime(11,00,00),
+                          QTimeZone(QTimeZone::UTC)};
+#endif
     QCOMPARE (eit.EventID(0),                     181U);
     QCOMPARE (eit.StartTimeUTC(0),          expectedDT);
     QCOMPARE (eit.StartTimeUnixUTC(0),     1657450800U);
@@ -2107,7 +2130,12 @@ void TestMPEGTables::dvb_tdt_test1(void)
     const std::vector<uint8_t> si_data {
         0x70, 0x70, 0x05, 0xE9, 0x69, 0x03, 0x46, 0x24,
     };
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedDT { QDate(2022,06,23), QTime(03,46,24), Qt::UTC };
+#else
+    QDateTime expectedDT { QDate(2022,06,23), QTime(03,46,24),
+                           QTimeZone(QTimeZone::UTC) };
+#endif
     PSIPTable si_table(si_data);
     QVERIFY  (!si_table.HasCRC());
     QVERIFY  (si_table.VerifyCRC());
@@ -2127,7 +2155,12 @@ void TestMPEGTables::dvb_tdt_test2(void)
     const std::vector<uint8_t> nz_tdt_data {
         0x70, 0x70, 0x05, 0xE9, 0x7A, 0x12, 0x23, 0x52,
     };
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedDT { QDate(2022,07,10), QTime(12,23,52), Qt::UTC };
+#else
+    QDateTime expectedDT { QDate(2022,07,10), QTime(12,23,52),
+                           QTimeZone(QTimeZone::UTC) };
+#endif
     PSIPTable si_table(nz_tdt_data);
     QVERIFY  (!si_table.HasCRC());
     QVERIFY  (si_table.VerifyCRC());
@@ -2149,7 +2182,12 @@ void TestMPEGTables::dvb_tot_test2(void)
         0x73, 0x70, 0x1A, 0xE9, 0x7A, 0x12, 0x23, 0x52, 0xF0, 0x0F, 0x58, 0x0D, 0x4E, 0x5A, 0x4C, 0x02,
         0x12, 0x00, 0xE9, 0x17, 0x14, 0x00, 0x00, 0x12, 0x00, 0xF2, 0x8F, 0xF4, 0x04,
     };
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime expectedDT { QDate(2022,07,10), QTime(12,23,52), Qt::UTC };
+#else
+    static const QTimeZone utc { QTimeZone::UTC };
+    QDateTime expectedDT { QDate(2022,07,10), QTime(12,23,52), utc };
+#endif
     PSIPTable si_table(nz_tot_data);
     QVERIFY  (si_table.HasCRC());
     QVERIFY  (si_table.VerifyCRC());
@@ -2167,7 +2205,11 @@ void TestMPEGTables::dvb_tot_test2(void)
     QCOMPARE (tot.DescriptorsLength(),        15U);
     QCOMPARE (tot.Descriptors(),   tot.data()+10U);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,5,0)
     QDateTime ToCexpectedDT { QDate(2022,04,02), QTime(14,00,00), Qt::UTC };
+#else
+    QDateTime ToCexpectedDT { QDate(2022,04,02), QTime(14,00,00), utc };
+#endif
     LocalTimeOffsetDescriptor lto(tot.Descriptors(), tot.DescriptorsLength());
     QCOMPARE (lto.Count(),                       1U);
     QCOMPARE (lto.CountryCode(0),         0x4E5A4CU);
