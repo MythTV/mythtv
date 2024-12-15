@@ -7,9 +7,6 @@
 if(CMAKE_ANDROID_ARCH_ABI)
   set(ANDROID ON)
 endif()
-if(NOT ANDROID)
-  return()
-endif()
 
 # Can use cmake features introduced in 3.21.
 cmake_minimum_required(VERSION 3.21)
