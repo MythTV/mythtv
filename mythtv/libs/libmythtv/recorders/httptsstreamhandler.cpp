@@ -72,7 +72,7 @@ void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref, int inputid)
     QMap<QString,HTTPTSStreamHandler*>::iterator it = s_httphandlers.find(devname);
     if ((it != s_httphandlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("HTTPTSSH[%1]: Closing handler for %1")
+        LOG(VB_RECORD, LOG_INFO, QString("HTTPTSSH[%1]: Closing handler for %2")
             .arg(inputid).arg(devname));
         ref->Stop();
         delete *it;
