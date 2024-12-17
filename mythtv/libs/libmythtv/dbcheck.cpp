@@ -4092,16 +4092,17 @@ static bool doUpgradeTVDatabaseSchema(void)
  * command to get the the initial database layout from an empty database:
  *
  * mysqldump \
- *     --skip-comments --skip-opt --compact --skip-quote-names \
- *     --create-options --ignore-table=mythconverg.schemalock mythconverg | \
- *   sed '/^\(SET\|INS\).*;$/d;/^\/\*!40101.*$/d;s/^.*[^;]$/"&"/;s/^).*;$/"&",/'
+ *     --compact --skip-opt --create-options --no-tablespaces \
+ *     --ignore-table=mythconverg.schemalock mythconverg | \
+ *   sed -e '/^\(SET\|INS\).*;$/d;/^\/\*!40101.*$/d;/^\/\*M!999999.*$/d;' | \
+ *   sed -e 's/utf8mb./utf8/' | \
+ *   sed -e 's/^.*[^;]$/"&"/;s/^).*;$/"&",/'
  *
  * command to get the initial data:
  *
  * mysqldump \
- *     --skip-comments --skip-opt --compact --skip-quote-names -t \
- *     --ignore-table=mythconverg.logging mythconverg |
- *   sed -e 's/^.*$/"&",/' -e 's#\\#\\\\#g'
+ *     --compact --skip-opt --no-tablespaces -t mythconverg | \
+ *   sed -e '/^\/\*M!999999.*$/d;s/^.*$/"&",/' -e 's#\\#\\\\#g'
  *
  * don't forget to delete host specific data
  *
@@ -4127,9 +4128,22 @@ bool InitializeMythSchema(void)
     LOG(VB_GENERAL, LOG_NOTICE,
         "Inserting MythTV initial database information.");
 
+// Don't try to moderinze string literals in this section.  This lets
+// us cut-n-paste the output of mysqldump into the code without
+// generating any warning messages.
+// NOLINTBEGIN(modernize-raw-string-literal)
+
     DBUpdates updates {
+"CREATE TABLE `bdbookmark` ("
+"  `serialid` varchar(40) NOT NULL DEFAULT '',"
+"  `name` varchar(128) DEFAULT NULL,"
+"  `bdstate` varchar(4096) NOT NULL DEFAULT '',"
+"  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+"  PRIMARY KEY (`serialid`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `capturecard` ("
 "  `cardid` int unsigned NOT NULL AUTO_INCREMENT,"
+"  `parentid` int unsigned NOT NULL DEFAULT '0',"
 "  `videodevice` varchar(128) DEFAULT NULL,"
 "  `audiodevice` varchar(128) DEFAULT NULL,"
 "  `vbidevice` varchar(128) DEFAULT NULL,"
@@ -4155,6 +4169,21 @@ bool InitializeMythSchema(void)
 "  `hue` int NOT NULL DEFAULT '0',"
 "  `diseqcid` int unsigned DEFAULT NULL,"
 "  `dvb_eitscan` tinyint(1) NOT NULL DEFAULT '1',"
+"  `inputname` varchar(32) NOT NULL DEFAULT 'None',"
+"  `sourceid` int unsigned NOT NULL DEFAULT '0',"
+"  `externalcommand` varchar(128) DEFAULT NULL,"
+"  `changer_device` varchar(128) DEFAULT NULL,"
+"  `changer_model` varchar(128) DEFAULT NULL,"
+"  `tunechan` varchar(10) DEFAULT NULL,"
+"  `startchan` varchar(10) DEFAULT NULL,"
+"  `displayname` varchar(64) NOT NULL DEFAULT '',"
+"  `dishnet_eit` tinyint(1) NOT NULL DEFAULT '0',"
+"  `recpriority` int NOT NULL DEFAULT '0',"
+"  `quicktune` tinyint NOT NULL DEFAULT '0',"
+"  `schedorder` int unsigned NOT NULL DEFAULT '1',"
+"  `livetvorder` int unsigned NOT NULL DEFAULT '1',"
+"  `reclimit` int unsigned NOT NULL DEFAULT '1',"
+"  `schedgroup` tinyint(1) NOT NULL DEFAULT '1',"
 "  PRIMARY KEY (`cardid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `cardinput` ("
@@ -4197,6 +4226,7 @@ bool InitializeMythSchema(void)
 "  `useonairguide` tinyint(1) DEFAULT '0',"
 "  `mplexid` smallint DEFAULT NULL,"
 "  `serviceid` mediumint unsigned DEFAULT NULL,"
+"  `service_type` int unsigned DEFAULT '0',"
 "  `tmoffset` int NOT NULL DEFAULT '0',"
 "  `atsc_major_chan` int unsigned NOT NULL DEFAULT '0',"
 "  `atsc_minor_chan` int unsigned NOT NULL DEFAULT '0',"
@@ -4204,6 +4234,7 @@ bool InitializeMythSchema(void)
 "  `default_authority` varchar(32) NOT NULL DEFAULT '',"
 "  `commmethod` int NOT NULL DEFAULT '-1',"
 "  `iptvid` smallint unsigned DEFAULT NULL,"
+"  `deleted` timestamp NULL DEFAULT NULL,"
 "  PRIMARY KEY (`chanid`),"
 "  KEY `channel_src` (`channum`,`sourceid`),"
 "  KEY `sourceid` (`sourceid`,`xmltvid`,`chanid`),"
@@ -4213,7 +4244,8 @@ bool InitializeMythSchema(void)
 "  `id` int unsigned NOT NULL AUTO_INCREMENT,"
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
 "  `grpid` int NOT NULL DEFAULT '1',"
-"  PRIMARY KEY (`id`)"
+"  PRIMARY KEY (`id`),"
+"  KEY `chanid` (`chanid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `channelgroupnames` ("
 "  `grpid` int unsigned NOT NULL AUTO_INCREMENT,"
@@ -4266,7 +4298,10 @@ bool InitializeMythSchema(void)
 "  `is_opencable` tinyint unsigned NOT NULL DEFAULT '0',"
 "  `could_be_opencable` tinyint unsigned NOT NULL DEFAULT '0',"
 "  `decryption_status` smallint unsigned NOT NULL DEFAULT '0',"
-"  `default_authority` varchar(32) NOT NULL DEFAULT ''"
+"  `default_authority` varchar(32) NOT NULL DEFAULT '',"
+"  `service_type` int unsigned NOT NULL DEFAULT '0',"
+"  `logical_channel` int unsigned NOT NULL DEFAULT '0',"
+"  `simulcast_channel` int unsigned NOT NULL DEFAULT '0'"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `channelscan_dtv_multiplex` ("
 "  `transportid` int unsigned NOT NULL AUTO_INCREMENT,"
@@ -4289,6 +4324,7 @@ bool InitializeMythSchema(void)
 "  `sistandard` varchar(10) NOT NULL,"
 "  `tuner_type` smallint unsigned NOT NULL,"
 "  `default_authority` varchar(32) NOT NULL DEFAULT '',"
+"  `signal_strength` int NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (`transportid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `codecparams` ("
@@ -4302,7 +4338,9 @@ bool InitializeMythSchema(void)
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
 "  `starttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
 "  `role` set('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL DEFAULT '',"
-"  UNIQUE KEY `chanid` (`chanid`,`starttime`,`person`,`role`),"
+"  `priority` tinyint unsigned DEFAULT '0',"
+"  `roleid` mediumint unsigned DEFAULT '0',"
+"  UNIQUE KEY `chanid` (`chanid`,`starttime`,`person`,`role`,`roleid`),"
 "  KEY `person` (`person`,`role`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `customexample` ("
@@ -4335,6 +4373,9 @@ bool InitializeMythSchema(void)
 "  `cmd_repeat` int NOT NULL DEFAULT '1',"
 "  `lnb_pol_inv` tinyint NOT NULL DEFAULT '0',"
 "  `address` tinyint unsigned NOT NULL DEFAULT '0',"
+"  `scr_userband` int unsigned NOT NULL DEFAULT '0',"
+"  `scr_frequency` int unsigned NOT NULL DEFAULT '1400',"
+"  `scr_pin` int NOT NULL DEFAULT '-1',"
 "  PRIMARY KEY (`diseqcid`),"
 "  KEY `parentid` (`parentid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
@@ -4395,6 +4436,7 @@ bool InitializeMythSchema(void)
 "  `subtitlenum` tinyint NOT NULL DEFAULT '-1',"
 "  `framenum` bigint NOT NULL DEFAULT '0',"
 "  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+"  `dvdstate` varchar(1024) NOT NULL DEFAULT '',"
 "  PRIMARY KEY (`serialid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `dvdinput` ("
@@ -4451,17 +4493,49 @@ bool InitializeMythSchema(void)
 "  `mark` mediumint unsigned NOT NULL DEFAULT '0',"
 "  `offset` bigint unsigned DEFAULT NULL,"
 "  `type` tinyint NOT NULL DEFAULT '0',"
-"  KEY `filename` (`filename`(255))"
+"  KEY `filename` (`filename`(255)),"
+"  KEY `type` (`type`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `gallery_directories` ("
+"  `dir_id` int NOT NULL AUTO_INCREMENT,"
+"  `filename` varchar(255) NOT NULL,"
+"  `name` varchar(255) NOT NULL,"
+"  `path` varchar(255) NOT NULL,"
+"  `parent_id` int NOT NULL,"
+"  `dir_count` int NOT NULL DEFAULT '0',"
+"  `file_count` int NOT NULL DEFAULT '0',"
+"  `hidden` tinyint(1) NOT NULL DEFAULT '0',"
+"  PRIMARY KEY (`dir_id`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `gallery_files` ("
+"  `file_id` int NOT NULL AUTO_INCREMENT,"
+"  `filename` varchar(255) NOT NULL,"
+"  `name` varchar(255) NOT NULL,"
+"  `path` varchar(255) NOT NULL,"
+"  `dir_id` int NOT NULL DEFAULT '0',"
+"  `type` int NOT NULL DEFAULT '0',"
+"  `modtime` int NOT NULL DEFAULT '0',"
+"  `size` int NOT NULL DEFAULT '0',"
+"  `extension` varchar(255) NOT NULL,"
+"  `angle` int NOT NULL DEFAULT '0',"
+"  `date` int NOT NULL DEFAULT '0',"
+"  `zoom` int NOT NULL DEFAULT '0',"
+"  `hidden` tinyint(1) NOT NULL DEFAULT '0',"
+"  `orientation` int NOT NULL DEFAULT '0',"
+"  PRIMARY KEY (`file_id`),"
+"  KEY `dir_id` (`dir_id`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `housekeeping` ("
-"  `tag` varchar(64) NOT NULL DEFAULT '',"
+"  `tag` varchar(64) NOT NULL,"
+"  `hostname` varchar(64) DEFAULT NULL,"
 "  `lastrun` datetime DEFAULT NULL,"
-"  PRIMARY KEY (`tag`)"
+"  `lastsuccess` datetime DEFAULT NULL,"
+"  UNIQUE KEY `task` (`tag`,`hostname`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `inputgroup` ("
 "  `cardinputid` int unsigned NOT NULL,"
 "  `inputgroupid` int unsigned NOT NULL,"
-"  `inputgroupname` varchar(32) NOT NULL"
+"  `inputgroupname` varchar(128) DEFAULT NULL"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `internetcontent` ("
 "  `name` varchar(255) NOT NULL,"
@@ -4525,7 +4599,8 @@ bool InitializeMythSchema(void)
 "  `url` text NOT NULL,"
 "  `type` set('data','rfc2733-1','rfc2733-2','rfc5109-1','rfc5109-2','smpte2022-1','smpte2022-2') DEFAULT NULL,"
 "  `bitrate` int unsigned NOT NULL,"
-"  PRIMARY KEY (`iptvid`)"
+"  PRIMARY KEY (`iptvid`),"
+"  KEY `chanid` (`chanid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `jobqueue` ("
 "  `id` int NOT NULL AUTO_INCREMENT,"
@@ -4592,24 +4667,6 @@ bool InitializeMythSchema(void)
 "  `outbase` varchar(128) NOT NULL,"
 "  PRIMARY KEY (`id`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
-"CREATE TABLE `logging` ("
-"  `id` bigint unsigned NOT NULL AUTO_INCREMENT,"
-"  `host` varchar(64) NOT NULL DEFAULT '',"
-"  `application` varchar(64) NOT NULL DEFAULT '',"
-"  `pid` int NOT NULL DEFAULT '0',"
-"  `tid` int NOT NULL DEFAULT '0',"
-"  `thread` varchar(64) NOT NULL DEFAULT '',"
-"  `filename` varchar(255) NOT NULL DEFAULT '',"
-"  `line` int NOT NULL DEFAULT '0',"
-"  `function` varchar(255) NOT NULL DEFAULT '',"
-"  `msgtime` datetime NOT NULL,"
-"  `level` int NOT NULL DEFAULT '0',"
-"  `message` varchar(2048) NOT NULL,"
-"  PRIMARY KEY (`id`),"
-"  KEY `host` (`host`,`application`,`pid`,`msgtime`),"
-"  KEY `msgtime` (`msgtime`),"
-"  KEY `level` (`level`)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `mythlog` ("
 "  `logid` int unsigned NOT NULL AUTO_INCREMENT,"
 "  `module` varchar(32) NOT NULL DEFAULT '',"
@@ -4642,8 +4699,8 @@ bool InitializeMythSchema(void)
 "  `season` smallint NOT NULL,"
 "  `episode` smallint NOT NULL,"
 "  `category` varchar(64) NOT NULL DEFAULT '',"
-"  `seriesid` varchar(40) NOT NULL DEFAULT '',"
-"  `programid` varchar(40) NOT NULL DEFAULT '',"
+"  `seriesid` varchar(64) DEFAULT NULL,"
+"  `programid` varchar(64) DEFAULT NULL,"
 "  `inetref` varchar(40) NOT NULL,"
 "  `findid` int NOT NULL DEFAULT '0',"
 "  `recordid` int NOT NULL DEFAULT '0',"
@@ -4703,7 +4760,7 @@ bool InitializeMythSchema(void)
 "  PRIMARY KEY (`id`),"
 "  UNIQUE KEY `name` (`name`,`hostname`),"
 "  KEY `cardtype` (`cardtype`)"
-") ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;",
+") ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;",
 "CREATE TABLE `program` ("
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
 "  `starttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
@@ -4736,10 +4793,13 @@ bool InitializeMythSchema(void)
 "  `last` tinyint(1) NOT NULL DEFAULT '0',"
 "  `audioprop` set('STEREO','MONO','SURROUND','DOLBY','HARDHEAR','VISUALIMPAIR') NOT NULL,"
 "  `subtitletypes` set('HARDHEAR','NORMAL','ONSCREEN','SIGNED') NOT NULL,"
-"  `videoprop` set('HDTV','WIDESCREEN','AVC') NOT NULL,"
+"  `videoprop` set('WIDESCREEN','HDTV','MPEG2','AVC','HEVC') NOT NULL,"
+"  `inetref` varchar(40) DEFAULT '',"
+"  `season` int NOT NULL DEFAULT '0',"
+"  `episode` int NOT NULL DEFAULT '0',"
+"  `totalepisodes` int NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (`chanid`,`starttime`,`manualid`),"
 "  KEY `endtime` (`endtime`),"
-"  KEY `title` (`title`),"
 "  KEY `title_pronounce` (`title_pronounce`),"
 "  KEY `seriesid` (`seriesid`),"
 "  KEY `id_start_end` (`chanid`,`starttime`,`endtime`),"
@@ -4748,7 +4808,8 @@ bool InitializeMythSchema(void)
 "  KEY `programid` (`programid`,`starttime`),"
 "  KEY `starttime` (`starttime`),"
 "  KEY `subtitle` (`subtitle`),"
-"  KEY `description` (`description`(255))"
+"  KEY `description` (`description`(255)),"
+"  KEY `title_subtitle_start` (`title`,`subtitle`,`starttime`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `programgenres` ("
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
@@ -4761,8 +4822,8 @@ bool InitializeMythSchema(void)
 "CREATE TABLE `programrating` ("
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
 "  `starttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
-"  `system` varchar(8) DEFAULT NULL,"
-"  `rating` varchar(16) DEFAULT NULL,"
+"  `system` varchar(128) DEFAULT NULL,"
+"  `rating` varchar(128) DEFAULT NULL,"
 "  UNIQUE KEY `chanid` (`chanid`,`starttime`,`system`,`rating`),"
 "  KEY `starttime` (`starttime`,`system`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
@@ -4771,14 +4832,23 @@ bool InitializeMythSchema(void)
 "  `password` varchar(10) NOT NULL DEFAULT '',"
 "  PRIMARY KEY (`recgroup`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `recgroups` ("
+"  `recgroupid` smallint NOT NULL AUTO_INCREMENT,"
+"  `recgroup` varchar(64) NOT NULL DEFAULT '',"
+"  `displayname` varchar(64) NOT NULL DEFAULT '',"
+"  `password` varchar(40) NOT NULL DEFAULT '',"
+"  `special` tinyint(1) NOT NULL DEFAULT '0',"
+"  PRIMARY KEY (`recgroupid`),"
+"  UNIQUE KEY `recgroup` (`recgroup`)"
+") ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;",
 "CREATE TABLE `record` ("
 "  `recordid` int unsigned NOT NULL AUTO_INCREMENT,"
 "  `type` int unsigned NOT NULL DEFAULT '0',"
 "  `chanid` int unsigned DEFAULT NULL,"
-"  `starttime` time NOT NULL DEFAULT '00:00:00',"
-"  `startdate` date NOT NULL DEFAULT '0000-00-00',"
-"  `endtime` time NOT NULL DEFAULT '00:00:00',"
-"  `enddate` date NOT NULL DEFAULT '0000-00-00',"
+"  `starttime` time DEFAULT NULL,"
+"  `startdate` date DEFAULT NULL,"
+"  `endtime` time DEFAULT NULL,"
+"  `enddate` date DEFAULT NULL,"
 "  `title` varchar(128) NOT NULL DEFAULT '',"
 "  `subtitle` varchar(128) NOT NULL DEFAULT '',"
 "  `description` varchar(16000) NOT NULL DEFAULT '',"
@@ -4796,8 +4866,8 @@ bool InitializeMythSchema(void)
 "  `dupmethod` int NOT NULL DEFAULT '6',"
 "  `dupin` int NOT NULL DEFAULT '15',"
 "  `station` varchar(20) NOT NULL DEFAULT '',"
-"  `seriesid` varchar(40) NOT NULL DEFAULT '',"
-"  `programid` varchar(40) NOT NULL DEFAULT '',"
+"  `seriesid` varchar(64) DEFAULT NULL,"
+"  `programid` varchar(64) DEFAULT NULL,"
 "  `inetref` varchar(40) NOT NULL,"
 "  `search` int unsigned NOT NULL DEFAULT '0',"
 "  `autotranscode` tinyint(1) NOT NULL DEFAULT '0',"
@@ -4815,20 +4885,23 @@ bool InitializeMythSchema(void)
 "  `transcoder` int NOT NULL DEFAULT '0',"
 "  `playgroup` varchar(32) NOT NULL DEFAULT 'Default',"
 "  `prefinput` int NOT NULL DEFAULT '0',"
-"  `next_record` datetime NOT NULL,"
-"  `last_record` datetime NOT NULL,"
-"  `last_delete` datetime NOT NULL,"
+"  `next_record` datetime DEFAULT NULL,"
+"  `last_record` datetime DEFAULT NULL,"
+"  `last_delete` datetime DEFAULT NULL,"
 "  `storagegroup` varchar(32) NOT NULL DEFAULT 'Default',"
 "  `avg_delay` int NOT NULL DEFAULT '100',"
 "  `filter` int unsigned NOT NULL DEFAULT '0',"
+"  `recgroupid` smallint NOT NULL DEFAULT '1',"
+"  `autoextend` tinyint unsigned DEFAULT '0',"
 "  PRIMARY KEY (`recordid`),"
-"  KEY `chanid` (`chanid`,`starttime`),"
+"  UNIQUE KEY `chanid` (`chanid`,`starttime`,`startdate`,`title`,`type`),"
 "  KEY `title` (`title`),"
 "  KEY `seriesid` (`seriesid`),"
 "  KEY `programid` (`programid`),"
 "  KEY `maxepisodes` (`maxepisodes`),"
 "  KEY `search` (`search`),"
-"  KEY `type` (`type`)"
+"  KEY `type` (`type`),"
+"  KEY `recgroupid` (`recgroupid`)"
 ") ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;",
 "CREATE TABLE `recorded` ("
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
@@ -4842,14 +4915,15 @@ bool InitializeMythSchema(void)
 "  `category` varchar(64) NOT NULL DEFAULT '',"
 "  `hostname` varchar(64) NOT NULL DEFAULT '',"
 "  `bookmark` tinyint(1) NOT NULL DEFAULT '0',"
+"  `lastplay` tinyint unsigned DEFAULT '0',"
 "  `editing` int unsigned NOT NULL DEFAULT '0',"
 "  `cutlist` tinyint(1) NOT NULL DEFAULT '0',"
 "  `autoexpire` int NOT NULL DEFAULT '0',"
 "  `commflagged` int unsigned NOT NULL DEFAULT '0',"
 "  `recgroup` varchar(32) NOT NULL DEFAULT 'Default',"
 "  `recordid` int DEFAULT NULL,"
-"  `seriesid` varchar(40) NOT NULL DEFAULT '',"
-"  `programid` varchar(40) NOT NULL DEFAULT '',"
+"  `seriesid` varchar(64) DEFAULT NULL,"
+"  `programid` varchar(64) DEFAULT NULL,"
 "  `inetref` varchar(40) NOT NULL,"
 "  `lastmodified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
 "  `filesize` bigint NOT NULL DEFAULT '0',"
@@ -4872,14 +4946,19 @@ bool InitializeMythSchema(void)
 "  `watched` tinyint NOT NULL DEFAULT '0',"
 "  `storagegroup` varchar(32) NOT NULL DEFAULT 'Default',"
 "  `bookmarkupdate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',"
-"  PRIMARY KEY (`chanid`,`starttime`),"
+"  `recgroupid` smallint NOT NULL DEFAULT '1',"
+"  `recordedid` int unsigned NOT NULL AUTO_INCREMENT,"
+"  `inputname` varchar(32) DEFAULT NULL,"
+"  PRIMARY KEY (`recordedid`),"
+"  UNIQUE KEY `chanid` (`chanid`,`starttime`),"
 "  KEY `endtime` (`endtime`),"
 "  KEY `seriesid` (`seriesid`),"
 "  KEY `programid` (`programid`),"
 "  KEY `title` (`title`),"
 "  KEY `recordid` (`recordid`),"
 "  KEY `deletepending` (`deletepending`,`lastmodified`),"
-"  KEY `recgroup` (`recgroup`,`endtime`)"
+"  KEY `recgroup` (`recgroup`,`endtime`),"
+"  KEY `recgroupid` (`recgroupid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `recordedartwork` ("
 "  `inetref` varchar(255) NOT NULL,"
@@ -4887,19 +4966,20 @@ bool InitializeMythSchema(void)
 "  `host` text NOT NULL,"
 "  `coverart` text NOT NULL,"
 "  `fanart` text NOT NULL,"
-"  `banner` text NOT NULL"
+"  `banner` text NOT NULL,"
+"  KEY `recordedartwork_ix1` (`inetref`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `recordedcredits` ("
 "  `person` mediumint unsigned NOT NULL DEFAULT '0',"
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
 "  `starttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
 "  `role` set('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL DEFAULT '',"
-"  UNIQUE KEY `chanid` (`chanid`,`starttime`,`person`,`role`),"
+"  `priority` tinyint unsigned DEFAULT '0',"
+"  `roleid` mediumint unsigned DEFAULT '0',"
+"  UNIQUE KEY `chanid` (`chanid`,`starttime`,`person`,`role`,`roleid`),"
 "  KEY `person` (`person`,`role`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `recordedfile` ("
-"  `chanid` int unsigned NOT NULL DEFAULT '0',"
-"  `starttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
 "  `basename` varchar(128) NOT NULL DEFAULT '',"
 "  `filesize` bigint NOT NULL DEFAULT '0',"
 "  `width` smallint unsigned NOT NULL DEFAULT '0',"
@@ -4907,16 +4987,22 @@ bool InitializeMythSchema(void)
 "  `fps` float(6,3) NOT NULL DEFAULT '0.000',"
 "  `aspect` float(8,6) NOT NULL DEFAULT '0.000000',"
 "  `audio_sample_rate` smallint unsigned NOT NULL DEFAULT '0',"
-"  `audio_bits_per_sample` smallint unsigned NOT NULL DEFAULT '0',"
 "  `audio_channels` tinyint unsigned NOT NULL DEFAULT '0',"
-"  `audio_type` varchar(255) NOT NULL DEFAULT '',"
-"  `video_type` varchar(255) NOT NULL DEFAULT '',"
+"  `audio_codec` varchar(255) NOT NULL DEFAULT '',"
+"  `video_codec` varchar(255) NOT NULL DEFAULT '',"
 "  `comment` varchar(255) NOT NULL DEFAULT '',"
 "  `hostname` varchar(64) NOT NULL,"
 "  `storagegroup` varchar(32) NOT NULL,"
 "  `id` int NOT NULL AUTO_INCREMENT,"
+"  `recordedid` int unsigned NOT NULL,"
+"  `container` varchar(255) NOT NULL DEFAULT '',"
+"  `total_bitrate` mediumint unsigned NOT NULL DEFAULT '0',"
+"  `video_avg_bitrate` mediumint unsigned NOT NULL DEFAULT '0',"
+"  `video_max_bitrate` mediumint unsigned NOT NULL DEFAULT '0',"
+"  `audio_avg_bitrate` mediumint unsigned NOT NULL DEFAULT '0',"
+"  `audio_max_bitrate` mediumint unsigned NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (`id`),"
-"  UNIQUE KEY `chanid` (`chanid`,`starttime`,`basename`),"
+"  UNIQUE KEY `recordedid` (`recordedid`),"
 "  KEY `basename` (`basename`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `recordedmarkup` ("
@@ -4946,12 +5032,12 @@ bool InitializeMythSchema(void)
 "  `closecaptioned` tinyint(1) NOT NULL DEFAULT '0',"
 "  `partnumber` int NOT NULL DEFAULT '0',"
 "  `parttotal` int NOT NULL DEFAULT '0',"
-"  `seriesid` varchar(40) NOT NULL DEFAULT '',"
+"  `seriesid` varchar(64) DEFAULT NULL,"
 "  `originalairdate` date DEFAULT NULL,"
 "  `showtype` varchar(30) NOT NULL DEFAULT '',"
 "  `colorcode` varchar(20) NOT NULL DEFAULT '',"
 "  `syndicatedepisodenumber` varchar(20) NOT NULL DEFAULT '',"
-"  `programid` varchar(40) NOT NULL DEFAULT '',"
+"  `programid` varchar(64) DEFAULT NULL,"
 "  `manualid` int unsigned NOT NULL DEFAULT '0',"
 "  `generic` tinyint(1) DEFAULT '0',"
 "  `listingsource` int NOT NULL DEFAULT '0',"
@@ -4959,7 +5045,11 @@ bool InitializeMythSchema(void)
 "  `last` tinyint(1) NOT NULL DEFAULT '0',"
 "  `audioprop` set('STEREO','MONO','SURROUND','DOLBY','HARDHEAR','VISUALIMPAIR') NOT NULL,"
 "  `subtitletypes` set('HARDHEAR','NORMAL','ONSCREEN','SIGNED') NOT NULL,"
-"  `videoprop` set('HDTV','WIDESCREEN','AVC','720','1080','DAMAGED') NOT NULL,"
+"  `videoprop` set('WIDESCREEN','HDTV','MPEG2','AVC','HEVC','720','1080','4K','3DTV','PROGRESSIVE','DAMAGED') NOT NULL,"
+"  `inetref` varchar(40) DEFAULT '',"
+"  `season` int NOT NULL DEFAULT '0',"
+"  `episode` int NOT NULL DEFAULT '0',"
+"  `totalepisodes` int NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (`chanid`,`starttime`,`manualid`),"
 "  KEY `endtime` (`endtime`),"
 "  KEY `title` (`title`),"
@@ -4971,8 +5061,8 @@ bool InitializeMythSchema(void)
 "CREATE TABLE `recordedrating` ("
 "  `chanid` int unsigned NOT NULL DEFAULT '0',"
 "  `starttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
-"  `system` varchar(8) DEFAULT NULL,"
-"  `rating` varchar(16) DEFAULT NULL,"
+"  `system` varchar(128) DEFAULT NULL,"
+"  `rating` varchar(128) DEFAULT NULL,"
 "  UNIQUE KEY `chanid` (`chanid`,`starttime`,`system`,`rating`),"
 "  KEY `starttime` (`starttime`,`system`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
@@ -4999,7 +5089,7 @@ bool InitializeMythSchema(void)
 "  `profilegroup` int unsigned NOT NULL DEFAULT '0',"
 "  PRIMARY KEY (`id`),"
 "  KEY `profilegroup` (`profilegroup`)"
-") ENGINE=MyISAM AUTO_INCREMENT=70 DEFAULT CHARSET=utf8;",
+") ENGINE=MyISAM AUTO_INCREMENT=78 DEFAULT CHARSET=utf8;",
 "CREATE TABLE `recordmatch` ("
 "  `recordid` int unsigned NOT NULL,"
 "  `chanid` int unsigned NOT NULL,"
@@ -5013,6 +5103,12 @@ bool InitializeMythSchema(void)
 "  UNIQUE KEY `recordid` (`recordid`,`chanid`,`starttime`),"
 "  KEY `chanid` (`chanid`,`starttime`,`manualid`),"
 "  KEY `recordid_2` (`recordid`,`findid`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `roles` ("
+"  `roleid` mediumint unsigned NOT NULL AUTO_INCREMENT,"
+"  `name` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',"
+"  PRIMARY KEY (`roleid`),"
+"  UNIQUE KEY `name` (`name`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE `scannerfile` ("
 "  `fileid` bigint unsigned NOT NULL AUTO_INCREMENT,"
@@ -5035,6 +5131,32 @@ bool InitializeMythSchema(void)
 "  `hostname` varchar(64) DEFAULT NULL,"
 "  KEY `value` (`value`,`hostname`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `sportsapi` ("
+"  `id` int unsigned NOT NULL,"
+"  `provider` tinyint unsigned DEFAULT '0',"
+"  `name` varchar(128) NOT NULL,"
+"  `key1` varchar(64) NOT NULL,"
+"  `key2` varchar(64) NOT NULL,"
+"  PRIMARY KEY (`id`),"
+"  UNIQUE KEY `provider` (`provider`,`key1`(25),`key2`(50))"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `sportscleanup` ("
+"  `id` int unsigned NOT NULL AUTO_INCREMENT,"
+"  `provider` tinyint unsigned DEFAULT '0',"
+"  `weight` int unsigned NOT NULL,"
+"  `key1` varchar(256) NOT NULL,"
+"  `name` varchar(256) NOT NULL,"
+"  `pattern` varchar(256) NOT NULL,"
+"  `nth` tinyint unsigned NOT NULL,"
+"  `replacement` varchar(128) NOT NULL,"
+"  PRIMARY KEY (`id`)"
+") ENGINE=MyISAM AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;",
+"CREATE TABLE `sportslisting` ("
+"  `id` int unsigned NOT NULL AUTO_INCREMENT,"
+"  `api` int unsigned NOT NULL,"
+"  `title` varchar(128) NOT NULL,"
+"  PRIMARY KEY (`id`)"
+") ENGINE=MyISAM AUTO_INCREMENT=96 DEFAULT CHARSET=utf8;",
 "CREATE TABLE `storagegroup` ("
 "  `id` int NOT NULL AUTO_INCREMENT,"
 "  `groupname` varchar(32) NOT NULL,"
@@ -5082,6 +5204,29 @@ bool InitializeMythSchema(void)
 "  KEY `filepath` (`filepath`(333)),"
 "  KEY `parentid` (`parentid`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `user_permissions` ("
+"  `userid` int unsigned NOT NULL,"
+"  `permission` varchar(128) NOT NULL DEFAULT '',"
+"  PRIMARY KEY (`userid`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `user_sessions` ("
+"  `sessiontoken` varchar(40) NOT NULL DEFAULT '',"
+"  `userid` int unsigned NOT NULL,"
+"  `client` varchar(128) NOT NULL,"
+"  `created` datetime NOT NULL,"
+"  `lastactive` datetime NOT NULL,"
+"  `expires` datetime NOT NULL,"
+"  PRIMARY KEY (`sessiontoken`),"
+"  UNIQUE KEY `userid_client` (`userid`,`client`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+"CREATE TABLE `users` ("
+"  `userid` int unsigned NOT NULL AUTO_INCREMENT,"
+"  `username` varchar(128) NOT NULL DEFAULT '',"
+"  `password_digest` varchar(32) NOT NULL DEFAULT '',"
+"  `lastlogin` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
+"  PRIMARY KEY (`userid`),"
+"  KEY `username` (`username`)"
+") ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;",
 "CREATE TABLE `videocast` ("
 "  `intid` int unsigned NOT NULL AUTO_INCREMENT,"
 "  `cast` varchar(128) NOT NULL,"
@@ -5200,13 +5345,17 @@ bool InitializeMythSchema(void)
 "  `sourceid` int unsigned NOT NULL AUTO_INCREMENT,"
 "  `name` varchar(128) NOT NULL DEFAULT '',"
 "  `xmltvgrabber` varchar(128) DEFAULT NULL,"
-"  `userid` varchar(128) NOT NULL DEFAULT '',"
+"  `userid` varchar(128) DEFAULT NULL,"
 "  `freqtable` varchar(16) NOT NULL DEFAULT 'default',"
 "  `lineupid` varchar(64) DEFAULT NULL,"
 "  `password` varchar(64) DEFAULT NULL,"
 "  `useeit` smallint NOT NULL DEFAULT '0',"
 "  `configpath` varchar(4096) DEFAULT NULL,"
 "  `dvb_nit_id` int DEFAULT '-1',"
+"  `bouquet_id` int unsigned DEFAULT NULL,"
+"  `region_id` int unsigned DEFAULT NULL,"
+"  `scanfrequency` int unsigned DEFAULT '0',"
+"  `lcnoffset` int unsigned DEFAULT '0',"
 "  PRIMARY KEY (`sourceid`),"
 "  UNIQUE KEY `name` (`name`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
@@ -5220,7 +5369,7 @@ bool InitializeMythSchema(void)
 ") ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;",
 
 "INSERT INTO `channelgroupnames` VALUES (1,'Favorites');",
-R"(INSERT INTO `customexample` VALUES ('New Flix','','program.category_type = \'movie\' AND program.airdate >= \n     YEAR(DATE_SUB(NOW(), INTERVAL 1 YEAR)) \nAND program.stars > 0.5 ',1);)",
+"INSERT INTO `customexample` VALUES ('New Flix','','program.category_type = \\'movie\\' AND program.airdate >= \\n     YEAR(DATE_SUB(NOW(), INTERVAL 1 YEAR)) \\nAND program.stars > 0.5 ',1);",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',9018,'channel_numbers','131');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',9018,'guide_fixup','2');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',256,'guide_fixup','1');",
@@ -5300,22 +5449,32 @@ R"(INSERT INTO `customexample` VALUES ('New Flix','','program.category_type = \'
 "INSERT INTO `profilegroups` VALUES (7,'FireWire Input','FIREWIRE',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (8,'USB Mpeg-4 Encoder (Plextor ConvertX, etc)','GO7007',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (14,'Import Recorder','IMPORT',1,NULL);",
-"INSERT INTO `profilegroups` VALUES (10,'Freebox Input','Freebox',1,NULL);",
+"INSERT INTO `profilegroups` VALUES (10,'Freebox Input','FREEBOX',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (11,'HDHomeRun Recorders','HDHOMERUN',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (12,'CRC IP Recorders','CRC_IP',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (13,'HD-PVR Recorders','HDPVR',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (15,'ASI Recorder (DVEO)','ASI',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (16,'OCUR Recorder (CableLabs)','OCUR',1,NULL);",
 "INSERT INTO `profilegroups` VALUES (17,'Ceton Recorder','CETON',1,NULL);",
-"INSERT INTO `record` VALUES (1,11,0,'21:57:44','2012-08-11','21:57:44','2012-08-11','Default (Template)','','',0,0,'Default','Default',0,0,0,0,0,0,'Default',6,15,'','','','',0,0,1,0,0,0,0,1,-1,'00:00:00',735091,0,0,0,'Default',0,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00','Default',100,0);",
+"INSERT INTO `profilegroups` VALUES (18,'VBox Recorder','VBOX',1,NULL);",
+"INSERT INTO `profilegroups` VALUES (19,'Sat>IP Recorder','SATIP',1,NULL);",
+"INSERT INTO `recgroups` VALUES (1,'Default','','',1);",
+"INSERT INTO `recgroups` VALUES (2,'LiveTV','','',1);",
+"INSERT INTO `recgroups` VALUES (3,'Deleted','','',1);",
+"INSERT INTO `record` VALUES (1,11,0,'21:57:44','2012-08-11','21:57:44','2012-08-11','Default (Template)','','',0,0,'Default','Default',0,0,0,0,0,0,'Default',6,15,'','','','',0,0,1,0,0,0,0,1,-1,'00:00:00',735091,0,0,0,'Default',0,NULL,NULL,NULL,'Default',100,0,1,0);",
 "INSERT INTO `recordfilter` VALUES (0,'New episode','program.previouslyshown = 0',0);",
 "INSERT INTO `recordfilter` VALUES (1,'Identifiable episode','program.generic = 0',0);",
 "INSERT INTO `recordfilter` VALUES (2,'First showing','program.first > 0',0);",
-R"(INSERT INTO `recordfilter` VALUES (3,'Prime time','HOUR(CONVERT_TZ(program.starttime, \'Etc/UTC\', \'SYSTEM\')) >= 19 AND HOUR(CONVERT_TZ(program.starttime, \'Etc/UTC\', \'SYSTEM\')) < 22',0);)",
+"INSERT INTO `recordfilter` VALUES (3,'Prime time','HOUR(CONVERT_TZ(program.starttime, \\'Etc/UTC\\', \\'SYSTEM\\')) >= 19 AND HOUR(CONVERT_TZ(program.starttime, \\'Etc/UTC\\', \\'SYSTEM\\')) < 22',0);",
 "INSERT INTO `recordfilter` VALUES (4,'Commercial free','channel.commmethod = -2',0);",
 "INSERT INTO `recordfilter` VALUES (5,'High definition','program.hdtv > 0',0);",
-R"(INSERT INTO `recordfilter` VALUES (6,'This episode','(RECTABLE.programid <> \'\' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = \'\' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)',0);)",
+"INSERT INTO `recordfilter` VALUES (6,'This episode','(RECTABLE.programid <> \\'\\' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = \\'\\' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)',0);",
 "INSERT INTO `recordfilter` VALUES (7,'This series','(RECTABLE.seriesid <> \\'\\' AND program.seriesid = RECTABLE.seriesid)',0);",
+"INSERT INTO `recordfilter` VALUES (8,'This time','ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ(  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), \\'Etc/UTC\\', \\'SYSTEM\\'),   CONVERT_TZ(program.starttime, \\'Etc/UTC\\', \\'SYSTEM\\'))) MOD 1440   NOT BETWEEN 11 AND 1429',0);",
+"INSERT INTO `recordfilter` VALUES (9,'This day and time','ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ(  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), \\'Etc/UTC\\', \\'SYSTEM\\'),   CONVERT_TZ(program.starttime, \\'Etc/UTC\\', \\'SYSTEM\\'))) MOD 10080   NOT BETWEEN 11 AND 10069',0);",
+"INSERT INTO `recordfilter` VALUES (10,'This channel','channel.callsign = RECTABLE.station',0);",
+"INSERT INTO `recordfilter` VALUES (11,'No episodes','program.category_type <> \\'series\\'',0);",
+"INSERT INTO `recordfilter` VALUES (12,'Priority channel','channel.recpriority > 0',0);",
 "INSERT INTO `recordingprofiles` VALUES (1,'Default',NULL,NULL,1);",
 "INSERT INTO `recordingprofiles` VALUES (2,'Live TV',NULL,NULL,1);",
 "INSERT INTO `recordingprofiles` VALUES (3,'High Quality',NULL,NULL,1);",
@@ -5385,13 +5544,432 @@ R"(INSERT INTO `recordfilter` VALUES (6,'This episode','(RECTABLE.programid <> \
 "INSERT INTO `recordingprofiles` VALUES (67,'Live TV',NULL,NULL,17);",
 "INSERT INTO `recordingprofiles` VALUES (68,'High Quality',NULL,NULL,17);",
 "INSERT INTO `recordingprofiles` VALUES (69,'Low Quality',NULL,NULL,17);",
+"INSERT INTO `recordingprofiles` VALUES (70,'Default',NULL,NULL,18);",
+"INSERT INTO `recordingprofiles` VALUES (71,'Live TV',NULL,NULL,18);",
+"INSERT INTO `recordingprofiles` VALUES (72,'High Quality',NULL,NULL,18);",
+"INSERT INTO `recordingprofiles` VALUES (73,'Low Quality',NULL,NULL,18);",
+"INSERT INTO `recordingprofiles` VALUES (74,'Default',NULL,NULL,19);",
+"INSERT INTO `recordingprofiles` VALUES (75,'Live TV',NULL,NULL,19);",
+"INSERT INTO `recordingprofiles` VALUES (76,'High Quality',NULL,NULL,19);",
+"INSERT INTO `recordingprofiles` VALUES (77,'Low Quality',NULL,NULL,19);",
 "INSERT INTO `settings` VALUES ('mythfilldatabaseLastRunStart','',NULL);",
 "INSERT INTO `settings` VALUES ('mythfilldatabaseLastRunEnd','',NULL);",
 "INSERT INTO `settings` VALUES ('mythfilldatabaseLastRunStatus','',NULL);",
 "INSERT INTO `settings` VALUES ('DataDirectMessage','',NULL);",
 "INSERT INTO `settings` VALUES ('HaveRepeats','0',NULL);",
-"INSERT INTO `settings` VALUES ('DBSchemaVer','1307',NULL);",
-"INSERT INTO `settings` VALUES ('DefaultTranscoder','0',NULL);",
+"INSERT INTO `settings` VALUES ('DBSchemaVer','1382',NULL);",
+"INSERT INTO `settings` VALUES ('HardwareProfileEnabled','0',NULL);",
+"INSERT INTO `settings` VALUES ('ImageStorageGroupName','Images',NULL);",
+"INSERT INTO `settings` VALUES ('ImageSortOrder','0',NULL);",
+"INSERT INTO `settings` VALUES ('ImageShowHiddenFiles','0',NULL);",
+"INSERT INTO `settings` VALUES ('ImageSlideShowTime','3500',NULL);",
+"INSERT INTO `settings` VALUES ('ImageTransitionType','1',NULL);",
+"INSERT INTO `settings` VALUES ('ImageTransitionTime','1000',NULL);",
+"INSERT INTO `sportsapi` VALUES (1,1,'Major League Baseball','baseball','mlb');",
+"INSERT INTO `sportsapi` VALUES (2,1,'NCAA Men\\'s Baseball','baseball','college-baseball');",
+"INSERT INTO `sportsapi` VALUES (3,1,'NCAA Women\\'s Softball','baseball','college-softball');",
+"INSERT INTO `sportsapi` VALUES (4,1,'Olympic Men\\'s Baseball','baseball','olympics-baseball');",
+"INSERT INTO `sportsapi` VALUES (5,1,'World Baseball Classic','baseball','world-baseball-classic');",
+"INSERT INTO `sportsapi` VALUES (6,1,'Little League Baseball','baseball','llb');",
+"INSERT INTO `sportsapi` VALUES (7,1,'Caribbean Series','baseball','caribbean-series');",
+"INSERT INTO `sportsapi` VALUES (8,1,'Dominican Winter League','baseball','dominican-winter-league');",
+"INSERT INTO `sportsapi` VALUES (9,1,'Venezuelan Winter League','baseball','venezuelan-winter-league');",
+"INSERT INTO `sportsapi` VALUES (10,1,'Mexican League','baseball','mexican-winter-league');",
+"INSERT INTO `sportsapi` VALUES (11,1,'Puerto Rican Winter League','baseball','puerto-rican-winter-league');",
+"INSERT INTO `sportsapi` VALUES (20,1,'National Football League','football','nfl');",
+"INSERT INTO `sportsapi` VALUES (21,1,'NCAA - Football','football','college-football');",
+"INSERT INTO `sportsapi` VALUES (22,1,'XFL','football','xfl');",
+"INSERT INTO `sportsapi` VALUES (23,1,'Canadian Football League','football','cfl');",
+"INSERT INTO `sportsapi` VALUES (40,1,'National Basketball Association','basketball','nba');",
+"INSERT INTO `sportsapi` VALUES (41,1,'Women\\'s National Basketball Association','basketball','wnba');",
+"INSERT INTO `sportsapi` VALUES (42,1,'NCAA Men\\'s Basketball','basketball','mens-college-basketball');",
+"INSERT INTO `sportsapi` VALUES (43,1,'NCAA Women\\'s Basketball','basketball','womens-college-basketball');",
+"INSERT INTO `sportsapi` VALUES (44,1,'Olympics Men\\'s Basketball','basketball','mens-olympic-basketball');",
+"INSERT INTO `sportsapi` VALUES (45,1,'Olympics Women\\'s Basketball','basketball','womens-olympic-basketball');",
+"INSERT INTO `sportsapi` VALUES (46,1,'National Basketball Association Summer League Las Vegas','basketball','nba-summer-las-vegas');",
+"INSERT INTO `sportsapi` VALUES (47,1,'National Basketball Association Summer League Utah','basketball','nba-summer-utah');",
+"INSERT INTO `sportsapi` VALUES (48,1,'National Basketball Association Summer League Orlando','basketball','nba-summer-orlando');",
+"INSERT INTO `sportsapi` VALUES (49,1,'National Basketball Association Summer League Sacramento','basketball','nba-summer-sacramento');",
+"INSERT INTO `sportsapi` VALUES (50,1,'NBA G League','basketball','nba-development');",
+"INSERT INTO `sportsapi` VALUES (51,1,'International Basketball Federation','basketball','fiba');",
+"INSERT INTO `sportsapi` VALUES (60,1,'National Hockey League','hockey','nfl');",
+"INSERT INTO `sportsapi` VALUES (61,1,'NCAA Men\\'s Ice Hockey','hockey','mens-college-hockey');",
+"INSERT INTO `sportsapi` VALUES (62,1,'NCAA Women\\'s Hockey','hockey','womens-college-hockey');",
+"INSERT INTO `sportsapi` VALUES (63,1,'World Cup of Hockey','hockey','hockey-world-cup');",
+"INSERT INTO `sportsapi` VALUES (64,1,'Men\\'s Olympic Ice Hockey','hockey','mens-olympic-hockey');",
+"INSERT INTO `sportsapi` VALUES (65,1,'Women\\'s Olympic Ice Hockey','hockey','womens-olympic-hockey');",
+"INSERT INTO `sportsapi` VALUES (66,1,'NCAA Women\\'s Field Hockey','field-hockey','womens-college-field-hockey');",
+"INSERT INTO `sportsapi` VALUES (80,1,'NCAA Men\\'s Volleyball','volleyball','mens-college-volleyball');",
+"INSERT INTO `sportsapi` VALUES (81,1,'NCAA Women\\'s Volleyball','volleyball','womens-college-volleyball');",
+"INSERT INTO `sportsapi` VALUES (100,1,'NCAA Men\\'s Lacrosse','lacrosse','mens-college-lacrosse');",
+"INSERT INTO `sportsapi` VALUES (101,1,'NCAA Women\\'s Lacrosse','lacrosse','womens-college-lacrosse');",
+"INSERT INTO `sportsapi` VALUES (120,1,'NCAA Men\\'s Water Polo','water-polo','mens-college-water-polo');",
+"INSERT INTO `sportsapi` VALUES (121,1,'NCAA Women\\'s Water Polo','water-polo','womens-college-water-polo');",
+"INSERT INTO `sportsapi` VALUES (200,1,'NCAA Men\\'s Soccer','soccer','usa.ncaa.m.1');",
+"INSERT INTO `sportsapi` VALUES (201,1,'NCAA Women\\'s Soccer','soccer','usa.ncaa.w.1');",
+"INSERT INTO `sportsapi` VALUES (202,1,'Major League Soccer','soccer','usa.1');",
+"INSERT INTO `sportsapi` VALUES (203,1,'English Premier League','soccer','eng.1');",
+"INSERT INTO `sportsapi` VALUES (204,1,'English League Championship','soccer','eng.2');",
+"INSERT INTO `sportsapi` VALUES (205,1,'Italian Serie A','soccer','ita.1');",
+"INSERT INTO `sportsapi` VALUES (206,1,'French Ligue 1','soccer','fra.1');",
+"INSERT INTO `sportsapi` VALUES (207,1,'French Ligue 2','soccer','fra.2');",
+"INSERT INTO `sportsapi` VALUES (208,1,'Spanish LaLiga','soccer','esp.1');",
+"INSERT INTO `sportsapi` VALUES (209,1,'German Bundesliga','soccer','ger.1');",
+"INSERT INTO `sportsapi` VALUES (210,1,'German 2. Bundesliga','soccer','ger.2');",
+"INSERT INTO `sportsapi` VALUES (211,1,'Mexican Liga BBVA MX','soccer','mex.1');",
+"INSERT INTO `sportsapi` VALUES (212,1,'Copa Do Brasil','soccer','bra.copa_do_brazil');",
+"INSERT INTO `sportsapi` VALUES (213,1,'CONCACAF Leagues Cup','soccer','concacaf.leagues.cup');",
+"INSERT INTO `sportsapi` VALUES (214,1,'CONCACAF League','soccer','concacaf.league');",
+"INSERT INTO `sportsapi` VALUES (215,1,'CONCACAF Champions League','soccer','concacaf.champions');",
+"INSERT INTO `sportsapi` VALUES (216,1,'CONCACAF Nations League','soccer','concacaf.nations.league');",
+"INSERT INTO `sportsapi` VALUES (217,1,'CONCACAF Gold Cup','soccer','concacaf.gold');",
+"INSERT INTO `sportsapi` VALUES (218,1,'FIFA World Cup','soccer','fifa.world');",
+"INSERT INTO `sportsapi` VALUES (219,1,'FIFA World Cup Qualifying - UEFA','soccer','fifa.worldq.uefa');",
+"INSERT INTO `sportsapi` VALUES (220,1,'FIFA World Cup Qualifying - CONCACAF','soccer','fifa.worldq.concacaf');",
+"INSERT INTO `sportsapi` VALUES (221,1,'FIFA World Cup Qualifying - CONMEBOL','soccer','fifa.worldq.conmebol');",
+"INSERT INTO `sportsapi` VALUES (222,1,'FIFA World Cup Qualifying - AFC','soccer','fifa.worldq.afc');",
+"INSERT INTO `sportsapi` VALUES (223,1,'FIFA World Cup Qualifying - CAF','soccer','fifa.worldq.caf');",
+"INSERT INTO `sportsapi` VALUES (224,1,'FIFA World Cup Qualifying - OFC','soccer','fifa.worldq.ofc');",
+"INSERT INTO `sportsapi` VALUES (225,1,'UEFA Champions League','soccer','uefa.champions');",
+"INSERT INTO `sportsapi` VALUES (226,1,'UEFA Europa League','soccer','uefa.europa');",
+"INSERT INTO `sportsapi` VALUES (227,1,'UEFA Europa Conference League','soccer','uefa.europa.conf');",
+"INSERT INTO `sportsapi` VALUES (228,1,'English Carabao Cup','soccer','eng.league_cup');",
+"INSERT INTO `sportsapi` VALUES (229,1,'USL Championship','soccer','usa.usl.1');",
+"INSERT INTO `sportsapi` VALUES (230,1,'United States NWSL','soccer','usa.nwsl');",
+"INSERT INTO `sportsapi` VALUES (231,1,'FA Women\\'s Super League','soccer','eng.w.1');",
+"INSERT INTO `sportsapi` VALUES (232,1,'English FA Cup','soccer','eng.fa');",
+"INSERT INTO `sportsapi` VALUES (233,1,'Spanish Copa del Rey','soccer','esp.copa_del_rey');",
+"INSERT INTO `sportsapi` VALUES (234,1,'German DFB Pokal','soccer','ger.dfb_pokal');",
+"INSERT INTO `sportsapi` VALUES (235,1,'Italian Coppa Italia','soccer','ita.coppa_italia');",
+"INSERT INTO `sportsapi` VALUES (236,1,'French Coupe de France','soccer','fra.coupe_de_france');",
+"INSERT INTO `sportsapi` VALUES (237,1,'AFC Champions League','soccer','afc.champions');",
+"INSERT INTO `sportsapi` VALUES (238,1,'Dutch KNVB Beker','soccer','ned.cup');",
+"INSERT INTO `sportsapi` VALUES (239,1,'Dutch Eredivisie','soccer','ned.1');",
+"INSERT INTO `sportsapi` VALUES (240,1,'Portuguese Liga','soccer','por.1');",
+"INSERT INTO `sportsapi` VALUES (241,1,'Russian Premier League','soccer','rus.1');",
+"INSERT INTO `sportsapi` VALUES (242,1,'Mexican Liga de Expansión MX','soccer','mex.2');",
+"INSERT INTO `sportsapi` VALUES (243,1,'Mexican Copa MX','soccer','mex.copa_mx');",
+"INSERT INTO `sportsapi` VALUES (244,1,'Campeones Cup','soccer','campeones.cup');",
+"INSERT INTO `sportsapi` VALUES (245,1,'United States Open Cup','soccer','usa.open');",
+"INSERT INTO `sportsapi` VALUES (246,1,'USL League One','soccer','usa.usl.l1');",
+"INSERT INTO `sportsapi` VALUES (247,1,'Scottish Premiership','soccer','sco.1');",
+"INSERT INTO `sportsapi` VALUES (248,1,'Chinese Super League','soccer','chn.1');",
+"INSERT INTO `sportsapi` VALUES (249,1,'Australian A-League','soccer','aus.1');",
+"INSERT INTO `sportsapi` VALUES (250,1,'International Friendly','soccer','fifa.friendly');",
+"INSERT INTO `sportsapi` VALUES (251,1,'Women\\'s International Friendly','soccer','fifa.friendly.w');",
+"INSERT INTO `sportsapi` VALUES (252,1,'UEFA European Under-21 Championship Qualifying','soccer','uefa.euro_u21_qual');",
+"INSERT INTO `sportsapi` VALUES (253,1,'FIFA Women\\'s World Cup','soccer','fifa.wwc');",
+"INSERT INTO `sportsapi` VALUES (254,1,'FIFA Club World Cup','soccer','fifa.cwc');",
+"INSERT INTO `sportsapi` VALUES (255,1,'CONCACAF Gold Cup Qualifying','soccer','concacaf.gold_qual');",
+"INSERT INTO `sportsapi` VALUES (256,1,'CONCACAF Nations League Qualifying','soccer','concacaf.nations.league_qual');",
+"INSERT INTO `sportsapi` VALUES (257,1,'CONCACAF Cup','soccer','concacaf.confederations_playoff');",
+"INSERT INTO `sportsapi` VALUES (258,1,'UEFA Nations League','soccer','uefa.nations');",
+"INSERT INTO `sportsapi` VALUES (259,1,'UEFA European Championship','soccer','uefa.euro');",
+"INSERT INTO `sportsapi` VALUES (260,1,'UEFA European Championship Qualifying','soccer','uefa.euroq');",
+"INSERT INTO `sportsapi` VALUES (261,1,'Copa America','soccer','conmebol.america');",
+"INSERT INTO `sportsapi` VALUES (262,1,'AFC Asian Cup','soccer','afc.asian.cup');",
+"INSERT INTO `sportsapi` VALUES (263,1,'AFC Asian Cup Qualifiers','soccer','afc.cupq');",
+"INSERT INTO `sportsapi` VALUES (264,1,'Africa Cup of Nations qualifying','soccer','caf.nations_qual');",
+"INSERT INTO `sportsapi` VALUES (265,1,'Africa Cup of Nations','soccer','caf.nations');",
+"INSERT INTO `sportsapi` VALUES (266,1,'Africa Nations Championship','soccer','caf.championship');",
+"INSERT INTO `sportsapi` VALUES (267,1,'WAFU Cup of Nations','soccer','wafu.nations');",
+"INSERT INTO `sportsapi` VALUES (268,1,'SheBelieves Cup','soccer','fifa.shebelieves');",
+"INSERT INTO `sportsapi` VALUES (269,1,'FIFA Confederations Cup','soccer','fifa.confederations');",
+"INSERT INTO `sportsapi` VALUES (270,1,'Non-FIFA Friendly','soccer','nonfifa');",
+"INSERT INTO `sportsapi` VALUES (271,1,'Spanish LaLiga 2','soccer','esp.2');",
+"INSERT INTO `sportsapi` VALUES (272,1,'Spanish Supercopa','soccer','esp.super_cup');",
+"INSERT INTO `sportsapi` VALUES (273,1,'Portuguese Liga Promotion/Relegation Playoffs','soccer','por.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (274,1,'Belgian First Division A - Promotion/Relegation Playoffs','soccer','bel.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (275,1,'Belgian First Division A','soccer','bel.1');",
+"INSERT INTO `sportsapi` VALUES (276,1,'Austrian Bundesliga','soccer','aut.1');",
+"INSERT INTO `sportsapi` VALUES (277,1,'Turkish Super Lig','soccer','tur.1');",
+"INSERT INTO `sportsapi` VALUES (278,1,'Austrian Bundesliga Promotion/Relegation Playoffs','soccer','aut.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (279,1,'Greek Super League','soccer','gre.1');",
+"INSERT INTO `sportsapi` VALUES (280,1,'Greek Super League Promotion/Relegation Playoffs','soccer','gre.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (281,1,'Swiss Super League','soccer','sui.1');",
+"INSERT INTO `sportsapi` VALUES (282,1,'Swiss Super League Promotion/Relegation Playoffs','soccer','sui.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (283,1,'UEFA Women\\'s Champions League','soccer','uefa.wchampions');",
+"INSERT INTO `sportsapi` VALUES (284,1,'International Champions Cup','soccer','global.champs_cup');",
+"INSERT INTO `sportsapi` VALUES (285,1,'Women\\'s International Champions Cup','soccer','global.wchamps_cup');",
+"INSERT INTO `sportsapi` VALUES (286,1,'Club Friendly','soccer','club.friendly');",
+"INSERT INTO `sportsapi` VALUES (287,1,'UEFA Champions League Qualifying','soccer','uefa.champions_qual');",
+"INSERT INTO `sportsapi` VALUES (288,1,'UEFA Europa Conference League Qualifying','soccer','uefa.europa.conf_qual');",
+"INSERT INTO `sportsapi` VALUES (289,1,'UEFA Europa League Qualifying','soccer','uefa.europa_qual');",
+"INSERT INTO `sportsapi` VALUES (290,1,'UEFA Super Cup','soccer','uefa.super_cup');",
+"INSERT INTO `sportsapi` VALUES (291,1,'English FA Community Shield','soccer','eng.charity');",
+"INSERT INTO `sportsapi` VALUES (292,1,'Supercoppa Italiana','soccer','ita.super_cup');",
+"INSERT INTO `sportsapi` VALUES (293,1,'French Trophee des Champions','soccer','fra.super_cup');",
+"INSERT INTO `sportsapi` VALUES (294,1,'Dutch Johan Cruyff Shield','soccer','ned.supercup');",
+"INSERT INTO `sportsapi` VALUES (295,1,'Trofeo Joan Gamper','soccer','esp.joan_gamper');",
+"INSERT INTO `sportsapi` VALUES (296,1,'German DFL-Supercup','soccer','ger.super_cup');",
+"INSERT INTO `sportsapi` VALUES (297,1,'Audi Cup','soccer','ger.audi_cup');",
+"INSERT INTO `sportsapi` VALUES (298,1,'Premier League Asia Trophy','soccer','eng.asia_trophy');",
+"INSERT INTO `sportsapi` VALUES (299,1,'Emirates Cup','soccer','friendly.emirates_cup');",
+"INSERT INTO `sportsapi` VALUES (300,1,'Japanese J League World Challenge','soccer','jpn.world_challenge');",
+"INSERT INTO `sportsapi` VALUES (301,1,'SuperCopa Euroamericana','soccer','euroamericana.supercopa');",
+"INSERT INTO `sportsapi` VALUES (302,1,'Men\\'s Olympic Tournament','soccer','fifa.olympics');",
+"INSERT INTO `sportsapi` VALUES (303,1,'Women\\'s Olympic Tournament','soccer','fifa.w.olympics');",
+"INSERT INTO `sportsapi` VALUES (304,1,'CONMEBOL Pre-Olympic Tournament','soccer','fifa.conmebol.olympicsq');",
+"INSERT INTO `sportsapi` VALUES (305,1,'CONCACAF Men\\'s Olympic Qualifying','soccer','fifa.concacaf.olympicsq');",
+"INSERT INTO `sportsapi` VALUES (306,1,'CONCACAF Women\\'s Olympic Qualifying Tournament','soccer','fifa.w.concacaf.olympicsq');",
+"INSERT INTO `sportsapi` VALUES (307,1,'CONCACAF Women\\'s Championship','soccer','concacaf.womens.championship');",
+"INSERT INTO `sportsapi` VALUES (308,1,'FIFA Under-20 World Cup','soccer','fifa.world.u20');",
+"INSERT INTO `sportsapi` VALUES (309,1,'FIFA Under-17 World Cup','soccer','fifa.world.u17');",
+"INSERT INTO `sportsapi` VALUES (310,1,'Toulon Tournament','soccer','global.toulon');",
+"INSERT INTO `sportsapi` VALUES (311,1,'UEFA European Under-21 Championship','soccer','uefa.euro_u21');",
+"INSERT INTO `sportsapi` VALUES (312,1,'UEFA European Under-19 Championship','soccer','uefa.euro.u19');",
+"INSERT INTO `sportsapi` VALUES (313,1,'Under-21 International Friendly','soccer','fifa.friendly_u21');",
+"INSERT INTO `sportsapi` VALUES (314,1,'UEFA Women\\'s European Championship','soccer','uefa.weuro');",
+"INSERT INTO `sportsapi` VALUES (315,1,'German Bundesliga Promotion/Relegation Playoff','soccer','ger.playoff.relegation');",
+"INSERT INTO `sportsapi` VALUES (316,1,'German 2. Bundesliga Promotion/Relegation Playoffs','soccer','ger.2.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (317,1,'English Women\\'s FA Cup','soccer','eng.w.fa');",
+"INSERT INTO `sportsapi` VALUES (318,1,'English Women\\'s FA Community Shield','soccer','eng.w.charity');",
+"INSERT INTO `sportsapi` VALUES (319,1,'English EFL Trophy','soccer','eng.trophy');",
+"INSERT INTO `sportsapi` VALUES (320,1,'English National League','soccer','eng.5');",
+"INSERT INTO `sportsapi` VALUES (321,1,'English League One','soccer','eng.3');",
+"INSERT INTO `sportsapi` VALUES (322,1,'English League Two','soccer','eng.4');",
+"INSERT INTO `sportsapi` VALUES (323,1,'Scottish Cup','soccer','sco.tennents');",
+"INSERT INTO `sportsapi` VALUES (324,1,'Scottish League Cup','soccer','sco.cis');",
+"INSERT INTO `sportsapi` VALUES (325,1,'Scottish Premiership Promotion/Relegation Playoffs','soccer','sco.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (326,1,'Scottish League One','soccer','sco.3');",
+"INSERT INTO `sportsapi` VALUES (327,1,'Scottish Championship','soccer','sco.2');",
+"INSERT INTO `sportsapi` VALUES (328,1,'Scottish Championship Promotion/Relegation Playoffs','soccer','sco.2.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (329,1,'Scottish League One Promotion/Relegation Playoffs','soccer','sco.3.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (330,1,'Scottish League Two Promotion/Relegation Playoffs','soccer','sco.4.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (331,1,'Scottish League Two','soccer','sco.4');",
+"INSERT INTO `sportsapi` VALUES (332,1,'Scottish League Challenge Cup','soccer','sco.challenge');",
+"INSERT INTO `sportsapi` VALUES (333,1,'Dutch Eredivisie Promotion/Relegation Playoffs','soccer','ned.playoff.relegation');",
+"INSERT INTO `sportsapi` VALUES (334,1,'Dutch Eredivisie Cup','soccer','ned.w.eredivisie_cup');",
+"INSERT INTO `sportsapi` VALUES (335,1,'Dutch Keuken Kampioen Divisie','soccer','ned.2');",
+"INSERT INTO `sportsapi` VALUES (336,1,'Dutch Tweede Divisie','soccer','ned.3');",
+"INSERT INTO `sportsapi` VALUES (337,1,'Dutch KNVB Beker Vrouwen','soccer','ned.w.knvb_cup');",
+"INSERT INTO `sportsapi` VALUES (338,1,'Dutch Vrouwen Eredivisie','soccer','ned.w.1');",
+"INSERT INTO `sportsapi` VALUES (339,1,'Italian Serie B','soccer','ita.2');",
+"INSERT INTO `sportsapi` VALUES (340,1,'French Ligue 1 Promotion/Relegation Playoffs','soccer','fra.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (341,1,'French Ligue 2 Promotion/Relegation Playoffs','soccer','fra.2.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (342,1,'Swedish Allsvenskan','soccer','swe.1');",
+"INSERT INTO `sportsapi` VALUES (343,1,'Swedish Allsvenskanliga Promotion/Relegation Playoffs','soccer','swe.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (344,1,'Danish Superliga','soccer','den.1');",
+"INSERT INTO `sportsapi` VALUES (345,1,'Danish SAS-Ligaen Promotion/Relegation Playoffs','soccer','den.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (346,1,'Romanian Liga 1 Promotion/Relegation Playoffs','soccer','rou.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (347,1,'Romanian Liga 1','soccer','rou.1');",
+"INSERT INTO `sportsapi` VALUES (348,1,'Norwegian Eliteserien Promotion/Relegation Playoffs','soccer','nor.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (349,1,'Norwegian Eliteserien','soccer','nor.1');",
+"INSERT INTO `sportsapi` VALUES (350,1,'Maltese Premier League','soccer','mlt.1');",
+"INSERT INTO `sportsapi` VALUES (351,1,'Israeli Premier League','soccer','isr.1');",
+"INSERT INTO `sportsapi` VALUES (352,1,'Irish Premier Division Promotion/Relegation Playoffs','soccer','ir1.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (353,1,'Irish Premier Division','soccer','irl.1');",
+"INSERT INTO `sportsapi` VALUES (354,1,'Welsh Premier League','soccer','wal.1');",
+"INSERT INTO `sportsapi` VALUES (355,1,'Northern Irish Premiership','soccer','nir.1');",
+"INSERT INTO `sportsapi` VALUES (356,1,'CONMEBOL Copa Libertadores','soccer','conmebol.libertadores');",
+"INSERT INTO `sportsapi` VALUES (357,1,'CONMEBOL Copa Sudamericana','soccer','conmebol.sudamericana');",
+"INSERT INTO `sportsapi` VALUES (358,1,'CONMEBOL Recopa Sudamericana','soccer','conmebol.recopa');",
+"INSERT INTO `sportsapi` VALUES (359,1,'Argentine Liga Profesional de Fútbol','soccer','arg.1');",
+"INSERT INTO `sportsapi` VALUES (360,1,'Copa Argentina','soccer','arg.copa');",
+"INSERT INTO `sportsapi` VALUES (361,1,'Argentine Copa de la Liga Profesional','soccer','arg.copa_lpf');",
+"INSERT INTO `sportsapi` VALUES (362,1,'Argentine Copa de la Superliga','soccer','arg.copa_de_la_superliga');",
+"INSERT INTO `sportsapi` VALUES (363,1,'Argentine Trofeo de Campeones de la Superliga','soccer','arg.trofeo_de_la_campeones');",
+"INSERT INTO `sportsapi` VALUES (364,1,'Argentine Supercopa','soccer','arg.supercopa');",
+"INSERT INTO `sportsapi` VALUES (365,1,'Argentine Nacional B','soccer','arg.2');",
+"INSERT INTO `sportsapi` VALUES (366,1,'Argentine Primera B','soccer','arg.3');",
+"INSERT INTO `sportsapi` VALUES (367,1,'Argentine Primera C','soccer','arg.4');",
+"INSERT INTO `sportsapi` VALUES (368,1,'Argentine Primera D','soccer','arg.5');",
+"INSERT INTO `sportsapi` VALUES (369,1,'Supercopa Do Brazil','soccer','bra.supercopa_do_brazil');",
+"INSERT INTO `sportsapi` VALUES (370,1,'Brazilian Serie A','soccer','bra.1');",
+"INSERT INTO `sportsapi` VALUES (371,1,'Brazilian Serie B','soccer','bra.2');",
+"INSERT INTO `sportsapi` VALUES (372,1,'Brazilian Serie C','soccer','bra.3');",
+"INSERT INTO `sportsapi` VALUES (373,1,'Copa Do Nordeste','soccer','bra.copa_do_nordeste');",
+"INSERT INTO `sportsapi` VALUES (374,1,'Brazilian Campeonato Carioca','soccer','bra.camp.carioca');",
+"INSERT INTO `sportsapi` VALUES (375,1,'Brazilian Campeonato Paulista','soccer','bra.camp.paulista');",
+"INSERT INTO `sportsapi` VALUES (376,1,'Brazilian Campeonato Gaucho','soccer','bra.camp.gaucho');",
+"INSERT INTO `sportsapi` VALUES (377,1,'Brazilian Campeonato Mineiro','soccer','bra.camp.mineiro');",
+"INSERT INTO `sportsapi` VALUES (378,1,'Chilean Primera División','soccer','chi.1');",
+"INSERT INTO `sportsapi` VALUES (379,1,'Copa Chile','soccer','chi.copa_chi');",
+"INSERT INTO `sportsapi` VALUES (380,1,'International U20 Friendly','soccer','fifa.u20.friendly');",
+"INSERT INTO `sportsapi` VALUES (381,1,'Segunda División de Chile','soccer','chi.2');",
+"INSERT INTO `sportsapi` VALUES (382,1,'Chilean Supercopa','soccer','chi.super_cup');",
+"INSERT INTO `sportsapi` VALUES (383,1,'Uruguayan Primera Division','soccer','uru.1');",
+"INSERT INTO `sportsapi` VALUES (384,1,'Segunda División de Uruguay','soccer','uru.2');",
+"INSERT INTO `sportsapi` VALUES (385,1,'Colombian SuperLiga','soccer','col.superliga');",
+"INSERT INTO `sportsapi` VALUES (386,1,'Colombian Primera A','soccer','col.1');",
+"INSERT INTO `sportsapi` VALUES (387,1,'Colombian Primera B','soccer','col.2');",
+"INSERT INTO `sportsapi` VALUES (388,1,'Peruvian Supercopa','soccer','per.supercopa');",
+"INSERT INTO `sportsapi` VALUES (389,1,'Copa Colombia','soccer','col.copa');",
+"INSERT INTO `sportsapi` VALUES (390,1,'Peruvian Primera Profesional','soccer','per.1');",
+"INSERT INTO `sportsapi` VALUES (391,1,'Paraguayan Primera Division','soccer','par.1');",
+"INSERT INTO `sportsapi` VALUES (392,1,'Ecuadoran Primera A','soccer','ecu.1');",
+"INSERT INTO `sportsapi` VALUES (393,1,'Ecuadoran Supercopa','soccer','ecu.supercopa');",
+"INSERT INTO `sportsapi` VALUES (394,1,'Ecuador Serie B','soccer','ecu.2');",
+"INSERT INTO `sportsapi` VALUES (395,1,'Venezuelan Primera Profesional','soccer','ven.1');",
+"INSERT INTO `sportsapi` VALUES (396,1,'United States NWSL Challenge Cup','soccer','usa.nwsl.cup');",
+"INSERT INTO `sportsapi` VALUES (397,1,'Segunda División de Venezuela','soccer','ven.2');",
+"INSERT INTO `sportsapi` VALUES (398,1,'Bolivian Liga Profesional','soccer','bol.1');",
+"INSERT INTO `sportsapi` VALUES (399,1,'Mexican Supercopa MX','soccer','mex.supercopa');",
+"INSERT INTO `sportsapi` VALUES (400,1,'Mexican Campeon de Campeones','soccer','mex.campeon');",
+"INSERT INTO `sportsapi` VALUES (401,1,'CONCACAF Champions Cup','soccer','concacaf.champions_cup');",
+"INSERT INTO `sportsapi` VALUES (402,1,'CONCACAF U23 Tournament','soccer','concacaf.u23');",
+"INSERT INTO `sportsapi` VALUES (403,1,'Honduran Primera Division','soccer','hon.1');",
+"INSERT INTO `sportsapi` VALUES (404,1,'Costa Rican Primera Division','soccer','crc.1');",
+"INSERT INTO `sportsapi` VALUES (405,1,'Jamaican Premier League','soccer','jam.1');",
+"INSERT INTO `sportsapi` VALUES (406,1,'Guatemalan Liga Nacional','soccer','gua.1');",
+"INSERT INTO `sportsapi` VALUES (407,1,'Australian W-League','soccer','aus.w.1');",
+"INSERT INTO `sportsapi` VALUES (408,1,'Salvadoran Primera Division','soccer','slv.1');",
+"INSERT INTO `sportsapi` VALUES (409,1,'AFF Cup','soccer','aff.championship');",
+"INSERT INTO `sportsapi` VALUES (410,1,'AFC Cup','soccer','afc.cup');",
+"INSERT INTO `sportsapi` VALUES (411,1,'SAFF Championship','soccer','afc.saff.championship');",
+"INSERT INTO `sportsapi` VALUES (412,1,'Chinese Super League Promotion/Relegation Playoffs','soccer','chn.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (413,1,'Japanese J League','soccer','jpn.1');",
+"INSERT INTO `sportsapi` VALUES (414,1,'Indonesian Liga 1','soccer','idn.1');",
+"INSERT INTO `sportsapi` VALUES (415,1,'Indian Super League','soccer','ind.1');",
+"INSERT INTO `sportsapi` VALUES (416,1,'Indian I-League','soccer','ind.2');",
+"INSERT INTO `sportsapi` VALUES (417,1,'Malaysian Super League','soccer','mys.1');",
+"INSERT INTO `sportsapi` VALUES (418,1,'Singaporean Premier League','soccer','sgp.1');",
+"INSERT INTO `sportsapi` VALUES (419,1,'Thai League 1','soccer','tha.1');",
+"INSERT INTO `sportsapi` VALUES (420,1,'Bangabandhu Cup','soccer','bangabandhu.cup');",
+"INSERT INTO `sportsapi` VALUES (421,1,'COSAFA Cup','soccer','caf.cosafa');",
+"INSERT INTO `sportsapi` VALUES (422,1,'CAF Champions League','soccer','caf.champions');",
+"INSERT INTO `sportsapi` VALUES (423,1,'South African Premiership Promotion/Relegation Playoffs','soccer','rsa.1.promotion.relegation');",
+"INSERT INTO `sportsapi` VALUES (424,1,'CAF Confederations Cup','soccer','caf.confed');",
+"INSERT INTO `sportsapi` VALUES (425,1,'South African Premiership','soccer','rsa.1');",
+"INSERT INTO `sportsapi` VALUES (426,1,'South African First Division','soccer','rsa.2');",
+"INSERT INTO `sportsapi` VALUES (427,1,'South African Telkom Knockout','soccer','rsa.telkom_knockout');",
+"INSERT INTO `sportsapi` VALUES (428,1,'South African Nedbank Cup','soccer','rsa.nedbank');",
+"INSERT INTO `sportsapi` VALUES (429,1,'MTN 8 Cup','soccer','rsa.mtn8');",
+"INSERT INTO `sportsapi` VALUES (430,1,'Nigerian Professional League','soccer','nga.1');",
+"INSERT INTO `sportsapi` VALUES (431,1,'Ghanaian Premier League','soccer','gha.1');",
+"INSERT INTO `sportsapi` VALUES (432,1,'Zambian Super League','soccer','zam.1');",
+"INSERT INTO `sportsapi` VALUES (433,1,'Kenyan Premier League','soccer','ken.1');",
+"INSERT INTO `sportsapi` VALUES (434,1,'Zimbabwean Premier Soccer League','soccer','zim.1');",
+"INSERT INTO `sportsapi` VALUES (435,1,'Ugandan Premier League','soccer','uga.1');",
+"INSERT INTO `sportsapi` VALUES (436,1,'Misc. U.S. Soccer Games','soccer','generic.ussf');",
+"INSERT INTO `sportsapi` VALUES (1000,2,'Major League Baseball','baseball','mlb');",
+"INSERT INTO `sportscleanup` VALUES (1,1,1000,'soccer','(SE)','\\\\(\\\\w+\\\\)',0,'');",
+"INSERT INTO `sportscleanup` VALUES (2,1,1000,'soccer','AFC','\\\\AA\\\\.?F\\\\.?C\\\\.?|\\\\bA\\\\.?F\\\\.?C\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (3,1,1000,'soccer','AC etc.','\\\\AA\\\\.?[AC]\\\\.?|\\\\bA\\\\.?[AC]\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (4,1,1000,'soccer','BK','\\\\AB\\\\.?K\\\\.?|\\\\bB\\\\.?K\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (5,1,1000,'soccer','BSC','\\\\AB\\\\.?S\\\\.?C\\\\.?|\\\\bB\\\\.?S\\\\.?C\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (6,1,1000,'soccer','CSyD','\\\\AC\\\\.?S\\\\.?( y )?D\\\\.?|\\\\bC\\\\.?S\\\\.?( y )?D\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (7,1,1000,'soccer','CD etc.','\\\\AC\\\\.?[ADFRS]\\\\.?|\\\\bC\\\\.?[ADFRS]\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (8,1,1000,'soccer','FC','\\\\AF\\\\.?C\\\\.?|\\\\bF\\\\.?C\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (9,1,1000,'soccer','HSC','\\\\AH\\\\.?S\\\\.?C\\\\.?|\\\\bH\\\\.?S\\\\.?C\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (10,1,1000,'soccer','RC etc.','\\\\AR\\\\.?[BC]\\\\.?|\\\\bR\\\\.?[BC]\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (11,1,1000,'soccer','SC etc.','\\\\AS\\\\.?[ACV]\\\\.?|\\\\bS\\\\.?[ACV]\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (12,1,1000,'soccer','TSG','\\\\AT\\\\.?S\\\\.?G\\\\.?|\\\\bT\\\\.?S\\\\.?G\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (13,1,1000,'soccer','VFB etc.','\\\\AV\\\\.?F\\\\.?[BL]\\\\.?|\\\\bV\\\\.?F\\\\.?[BL]\\\\.?\\\\Z',0,'');",
+"INSERT INTO `sportscleanup` VALUES (14,1,2000,'all','','Inglaterra',0,'England');",
+"INSERT INTO `sportscleanup` VALUES (15,1,2000,'all','','Munchen',0,'Munich');",
+"INSERT INTO `sportscleanup` VALUES (16,1,1100,'basketball','Cal State','Cal State',0,'CSU');",
+"INSERT INTO `sportscleanup` VALUES (17,1,1000,'basketball','Grambling','Grambling State',0,'Grambling');",
+"INSERT INTO `sportscleanup` VALUES (18,1,1000,'basketball','Hawaii','Hawaii',0,'Hawai\\'i');",
+"INSERT INTO `sportscleanup` VALUES (19,1,1000,'basketball','LIU','LIU',0,'Long Island University');",
+"INSERT INTO `sportscleanup` VALUES (20,1,1100,'basketball','Loyola','Loyola-',0,'Loyola ');",
+"INSERT INTO `sportscleanup` VALUES (21,1,1000,'basketball','Loyola (Md.)','Loyola (Md.)',0,'Loyola (MD)');",
+"INSERT INTO `sportscleanup` VALUES (22,1,1000,'basketball','McNeese','McNeese State',0,'McNeese');",
+"INSERT INTO `sportscleanup` VALUES (23,1,1000,'basketball','Miami (OH)','Miami (Ohio)',0,'Miami (OH)');",
+"INSERT INTO `sportscleanup` VALUES (24,1,1000,'basketball','UAB','Alabama-Birmingham',0,'UAB');",
+"INSERT INTO `sportscleanup` VALUES (25,1,1000,'basketball','UConn','Connecticut',0,'UConn');",
+"INSERT INTO `sportscleanup` VALUES (26,1,1000,'basketball','UMass','Massachusetts',0,'UMass');",
+"INSERT INTO `sportscleanup` VALUES (27,1,1100,'basketball','UNC','UNC-',0,'UNC ');",
+"INSERT INTO `sportscleanup` VALUES (28,1,1000,'basketball','UTEP','Texas-El Paso',0,'UTEP');",
+"INSERT INTO `sportscleanup` VALUES (29,1,1100,'basketball','Texas','Texas-',0,'UT ');",
+"INSERT INTO `sportscleanup` VALUES (30,1,1000,'basketball','Chattanooga','UT-Chattanooga',0,'Chattanooga');",
+"INSERT INTO `sportscleanup` VALUES (31,1,1100,'basketball','UT','UT-',0,'UT ');",
+"INSERT INTO `sportslisting` VALUES (1,1,'\\\\A(?:MLB Baseball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (2,1,'\\\\A(?:Béisbol MLB)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (3,1,'\\\\A(?:MLB All-Star Game)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (4,1,'\\\\A(?:World Series)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (5,2,'\\\\A(?:College Baseball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (6,2,'\\\\A(?:College World Series)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (7,3,'\\\\A(?:College Softball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (8,4,'\\\\A(?:Women\\'s College World Series)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (9,10,'\\\\A(?:Béisbol Liga Mexicana)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (10,20,'\\\\A(?:N\\\\w+ Football)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (11,20,'\\\\A(?:Super Bowl( [CLXVI]+)?)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (12,20,'\\\\A(?:Fútbol Americano NFL)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (13,21,'\\\\A(?:College Football)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (14,21,'\\\\A(?:\\\\w+ Bowl)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (15,21,'\\\\A(?:Fútbol Americano de Universitario)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (16,40,'\\\\A(?:NBA Basketball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (17,40,'\\\\A(?:NBA Finals)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (18,41,'\\\\A(?:WNBA Basketball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (19,41,'\\\\A(?:WNBA Finals)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (20,42,'\\\\A(?:College Basketball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (21,42,'\\\\A(?:NCAA Basketball Tournament)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (22,43,'\\\\A(?:Women\\'s College Basketball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (23,43,'\\\\A(?:NCAA Women\\'s Basketball Tournament)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (24,60,'\\\\A(?:NHL Hockey)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (25,60,'\\\\A(?:NHL Winter Classic)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (26,60,'\\\\A(?:NHL \\\\w+ Conference Final)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (27,60,'\\\\A(?:Stanley Cup Finals)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (28,61,'\\\\A(?:College Hockey)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (29,61,'\\\\A(?:Frozen Four)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (30,62,'\\\\A(?:Women\\'s College Hockey)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (31,66,'\\\\A(?:College Field Hockey)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (32,80,'\\\\A(?:College Volleyball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (33,81,'\\\\A(?:Women\\'s College Volleyball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (34,100,'\\\\A(?:College Lacrosse)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (35,101,'\\\\A(?:Women\\'s College Lacrosse)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (36,120,'\\\\A(?:College Water Polo)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (37,121,'\\\\A(?:Women\\'s College Water Polo)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (38,200,'\\\\A(?:College Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (39,201,'\\\\A(?:Women\\'s College Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (40,202,'\\\\A(?:MLS Soccer|Fútbol MLS)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (41,203,'\\\\A(?:(Premier League|EPL) Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (42,203,'\\\\A(?:English Premier League)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (43,203,'\\\\A(?:Fútbol Premier League)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (44,205,'\\\\A(?:Italian Serie A Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (45,339,'\\\\A(?:Italian Serie B Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (46,206,'\\\\A(?:French Ligue 1 Soccer|Fútbol Ligue 1|Fútbol Liga 1)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (47,207,'\\\\A(?:French Ligue 2 Soccer|Fútbol Ligue 2|Fútbol Liga 2)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (48,208,'\\\\A(?:Fútbol LaLiga)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (49,208,'\\\\A(?:Fútbol Español Primera Division)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (50,208,'\\\\A(?:Spanish Primera Division Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (51,209,'\\\\A(?:(German )?Bundesliga Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (52,209,'\\\\A(?:Fútbol Bundesliga)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (53,209,'\\\\A(?:Fútbol Copa de Alemania)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (54,210,'\\\\A(?:German 2. Bundesliga Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (55,211,'\\\\A(?:Fútbol Mexicano Primera División|Fútbol Mexicano Liga Premier|Fútbol Mexicano)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (56,211,'\\\\A(?:Mexico Primera Division Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (57,212,'\\\\A(?:Copa do Brazil Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (58,214,'\\\\A(?:CONCACAF League Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (59,215,'\\\\A(?:CONCACAF Champions League Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (60,216,'\\\\A(?:CONCACAF Nations League Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (61,217,'\\\\A(?:CONCACAF Gold Cup Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (62,218,'\\\\A(?:FIFA World Cup Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (63,219,'\\\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (64,220,'\\\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (65,221,'\\\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (66,222,'\\\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (67,223,'\\\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (68,224,'\\\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (69,225,'\\\\A(?:Fútbol UEFA Champions League)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (70,225,'\\\\A(?:UEFA Champions League Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (71,226,'\\\\A(?:Fútbol UEFA Europa League)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (72,229,'\\\\A(?:Fútbol USL Championship)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (73,229,'\\\\A(?:USL Championship Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (74,230,'\\\\A(?:NWSL Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (75,231,'\\\\A(?:FA Women\\'s Super League)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (76,242,'\\\\A(?:Fútbol Mexicano Liga Expansión)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (77,258,'\\\\A(?:UEFA Nations League Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (78,258,'\\\\A(?:Fútbol UEFA Nations League)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (79,271,'\\\\A(?:Fútbol Español Segunda Division)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (80,277,'\\\\A(?:Fútbol Turco Superliga)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (81,277,'\\\\A(?:Turkish Super Lig Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (82,279,'\\\\A(?:Superleague Greek Soccer)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (83,356,'\\\\A(?:Fútbol CONMEBOL Libertadores)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (84,357,'\\\\A(?:Fútbol CONMEBOL Sudamericana)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (85,359,'\\\\A(?:Fútbol Argentino Primera División)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (86,360,'\\\\A(?:Fútbol Copa Argentina)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (87,365,'\\\\A(?:Fútbol Argentino Primera Nacional( B)?)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (88,366,'\\\\A(?:Fútbol Argentino Primera B)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (89,367,'\\\\A(?:Fútbol Argentino Primera C)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (90,368,'\\\\A(?:Fútbol Argentino Primera D)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (91,386,'\\\\A(?:Fútbol Columbiano Primera División)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (92,403,'\\\\A(?:Fútbol Hondureño Primera División)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (93,404,'\\\\A(?:Fútbol Costarricense Primera División)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (94,1000,'\\\\A(?:MLB Baseball)\\\\z');",
+"INSERT INTO `sportslisting` VALUES (95,1000,'\\\\A(?:Béisbol MLB)\\\\z');",
+"INSERT INTO `users` VALUES (1,'admin','bcd911b2ecb15ffbd6d8e6e744d60cf6','0000-00-00 00:00:00');",
 "INSERT INTO `videotypes` VALUES (1,'txt','',1,0);",
 "INSERT INTO `videotypes` VALUES (2,'log','',1,0);",
 "INSERT INTO `videotypes` VALUES (3,'mpg','Internal',0,0);",
@@ -5422,11 +6000,14 @@ R"(INSERT INTO `recordfilter` VALUES (6,'This episode','(RECTABLE.programid <> \
 "INSERT INTO `videotypes` VALUES (30,'swf','Internal',0,0);",
 "INSERT INTO `videotypes` VALUES (31,'f4v','Internal',0,0);",
 "INSERT INTO `videotypes` VALUES (32,'nuv','Internal',0,0);"
+
+// NOLINTEND(modernize-raw-string-literal)
+
 };
 
     QString dbver = "";
     if (!performActualUpdate("MythTV", "DBSchemaVer",
-                             updates, "1307", dbver))
+                             updates, "1382", dbver))
         return false;
 
     GetMythDB()->SetHaveSchema(true);
