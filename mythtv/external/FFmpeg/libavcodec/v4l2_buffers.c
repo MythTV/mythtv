@@ -140,43 +140,6 @@ static enum AVColorRange v4l2_get_color_range(V4L2Buffer *buf)
      return AVCOL_RANGE_UNSPECIFIED;
 }
 
-static void v4l2_get_interlacing(AVFrame *frame, V4L2Buffer *buf)
-{
-    enum v4l2_field field;
-    field = V4L2_TYPE_IS_MULTIPLANAR(buf->buf.type) ?
-        buf->context->format.fmt.pix_mp.field :
-        buf->context->format.fmt.pix.field;
-
-    if (field == V4L2_FIELD_INTERLACED || field == V4L2_FIELD_INTERLACED_TB) {
-        frame->flags |=  AV_FRAME_FLAG_INTERLACED;
-        frame->flags |=  AV_FRAME_FLAG_TOP_FIELD_FIRST;
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->interlaced_frame = 1;
-        frame->top_field_first  = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-    } else if (field == V4L2_FIELD_INTERLACED_BT) {
-        frame->flags |=  AV_FRAME_FLAG_INTERLACED;
-        frame->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->interlaced_frame = 1;
-        frame->top_field_first  = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-    } else {
-        frame->flags &= ~AV_FRAME_FLAG_INTERLACED;
-        frame->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->interlaced_frame = 0;
-        frame->top_field_first  = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-    }
-}
-
 static enum AVColorSpace v4l2_get_color_space(V4L2Buffer *buf)
 {
     enum v4l2_ycbcr_encoding ycbcr;
@@ -251,6 +214,23 @@ static enum AVColorTransferCharacteristic v4l2_get_color_trc(V4L2Buffer *buf)
     }
 
     return AVCOL_TRC_UNSPECIFIED;
+}
+
+static void v4l2_get_interlacing(AVFrame *frame, V4L2Buffer *buf)
+{
+    enum v4l2_field field = V4L2_TYPE_IS_MULTIPLANAR(buf->buf.type) ?
+        buf->context->format.fmt.pix_mp.field :
+        buf->context->format.fmt.pix.field;
+
+    switch (field) {
+    case V4L2_FIELD_INTERLACED:
+    case V4L2_FIELD_INTERLACED_TB:
+        frame->flags |=  AV_FRAME_FLAG_TOP_FIELD_FIRST;
+        /* fallthrough */
+    case V4L2_FIELD_INTERLACED_BT:
+        frame->flags |=  AV_FRAME_FLAG_INTERLACED;
+        break;
+    }
 }
 
 #if CONFIG_LIBDRM
