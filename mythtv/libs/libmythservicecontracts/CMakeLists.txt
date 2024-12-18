@@ -13,9 +13,7 @@ set(HEADERS serviceexp.h service.h datacontracthelper.h)
 set(DATACONTRACTS_HEADERS
     datacontracts/enum.h
     datacontracts/enumItem.h
-    datacontracts/frontend.h
     datacontracts/frontendActionList.h
-    datacontracts/frontendList.h
     datacontracts/frontendStatus.h
     datacontracts/liveStreamInfo.h
     datacontracts/liveStreamInfoList.h
