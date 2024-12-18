@@ -1,5 +1,5 @@
 <h2>{{ 'dashboard.programguide' | translate }} </h2>
-<div *ngIf="loaded; else loading"  style="min-width: 960px;">
+<div *ngIf="loaded; else loading" style="min-width: 960px;">
     <div class="flex">
 
         <div class="flex align-items-center pr-5" *ngIf="displayType == GRID">
@@ -93,7 +93,7 @@
         </div>
     </div>
     <div *ngIf="displayType == GRID">
-        <p-scrollPanel [style]="{width: '100%', height: '90vh'}">
+        <div style="width:100%; height: 90vh; overflow-y: auto;">
             <p-dataView [value]="m_programGuide.ProgramGuide.Channels"
                 [totalRecords]="m_programGuide.ProgramGuide.TotalAvailable">
                 <ng-template pTemplate="header" styleClass="timeHeader">
@@ -126,7 +126,7 @@
                     </div>
                 </ng-template>
             </p-dataView>
-        </p-scrollPanel>
+        </div>
     </div>
 
     <div *ngIf="[CHANNEL,TITLESEARCH,PEOPLESEARCH,FULLSEARCH,CATSEARCH,ANYSEARCH].indexOf(displayType) > -1 ">
