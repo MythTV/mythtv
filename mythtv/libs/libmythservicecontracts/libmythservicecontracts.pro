@@ -25,7 +25,6 @@ HEADERS += services/rttiServices.h
 
 HEADERS += datacontracts/enum.h                  datacontracts/enumItem.h
 HEADERS += datacontracts/frontendActionList.h    datacontracts/frontendStatus.h
-HEADERS += datacontracts/liveStreamInfo.h        datacontracts/liveStreamInfoList.h
 
 SOURCES += service.cpp
 
@@ -36,7 +35,6 @@ incServices.files += services/frontendServices.h
 incServices.files += services/rttiServices.h
 
 incDatacontracts.files += datacontracts/frontendStatus.h      datacontracts/frontendActionList.h
-incDatacontracts.files += datacontracts/liveStreamInfo.h      datacontracts/liveStreamInfoList.h
 incDatacontracts.files += datacontracts/enum.h                datacontracts/enumItem.h
 
 INSTALLS += inc incServices incDatacontracts

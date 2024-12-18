@@ -15,8 +15,6 @@ set(DATACONTRACTS_HEADERS
     datacontracts/enumItem.h
     datacontracts/frontendActionList.h
     datacontracts/frontendStatus.h
-    datacontracts/liveStreamInfo.h
-    datacontracts/liveStreamInfoList.h
    )
 
 set(SERVICES_HEADERS
