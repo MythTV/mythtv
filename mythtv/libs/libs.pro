@@ -62,13 +62,7 @@ libmythmetadata-test.target = buildtestmythmetadata
 libmythmetadata-test.commands = cd libmythmetadata/test && $(QMAKE) && $(MAKE)
 unix:QMAKE_EXTRA_TARGETS += libmythmetadata-test
 
-# unit tests libmythservicecontracts
-libmythservicecontracts-test.depends = sub-libmythservicecontracts
-libmythservicecontracts-test.target = buildtestmythservicecontracts
-libmythservicecontracts-test.commands = cd libmythservicecontracts/test && $(QMAKE) && $(MAKE)
-unix:QMAKE_EXTRA_TARGETS += libmythservicecontracts-test
-
-unittest.depends = libmyth-test libmythbase-test libmythui-test libmythtv-test libmythmetadata-test libmythservicecontracts-test
+unittest.depends = libmyth-test libmythbase-test libmythui-test libmythtv-test libmythmetadata-test
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest
