@@ -5,10 +5,9 @@
 //
 // WARNING
 //
-// The enums in this header are used in libmythservicecontracts,
-// and for database values: hence when removing something from
-// these enums leave a gap, and when adding a new value give it
-// a explicit integer value.
+// The enums in this header are used for database values:
+// hence when removing something from these enums leave a gap,
+// and when adding a new value give it an explicit integer value.
 //
 //////////////////////////////////////////////////////////////////////
 
