@@ -22,7 +22,6 @@
 #include <stdarg.h>
 #include "avcodec.h"
 #include "libavutil/opt.h"
-#include "libavutil/avstring.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
 #include "libavutil/common.h"
@@ -170,7 +169,6 @@ static int mov_text_encode_close(AVCodecContext *avctx)
     ff_ass_split_free(s->ass_ctx);
     av_freep(&s->style_attributes);
     av_freep(&s->fonts);
-    av_bprint_finalize(&s->buffer, NULL);
     return 0;
 }
 
@@ -183,6 +181,9 @@ static int encode_sample_description(AVCodecContext *avctx)
     int font_names_total_len = 0;
     MovTextContext *s = avctx->priv_data;
     uint8_t buf[30], *p = buf;
+    int ret;
+
+    av_bprint_init(&s->buffer, 0, INT_MAX - AV_INPUT_BUFFER_PADDING_SIZE + 1);
 
     //  0x00, 0x00, 0x00, 0x00, // uint32_t displayFlags
     //  0x01,                   // int8_t horizontal-justification
@@ -306,19 +307,23 @@ static int encode_sample_description(AVCodecContext *avctx)
     //     };
 
     if (!av_bprint_is_complete(&s->buffer)) {
-        return AVERROR(ENOMEM);
+        ret = AVERROR(ENOMEM);
+        goto fail;
     }
 
     avctx->extradata_size = s->buffer.len;
     avctx->extradata = av_mallocz(avctx->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!avctx->extradata) {
-        return AVERROR(ENOMEM);
+        ret = AVERROR(ENOMEM);
+        goto fail;
     }
 
     memcpy(avctx->extradata, s->buffer.str, avctx->extradata_size);
-    av_bprint_clear(&s->buffer);
+    ret = 0;
+fail:
+    av_bprint_finalize(&s->buffer, NULL);
 
-    return 0;
+    return ret;
 }
 
 static av_cold int mov_text_encode_init(AVCodecContext *avctx)
@@ -326,8 +331,6 @@ static av_cold int mov_text_encode_init(AVCodecContext *avctx)
     int ret;
     MovTextContext *s = avctx->priv_data;
     s->avctx = avctx;
-
-    av_bprint_init(&s->buffer, 0, AV_BPRINT_SIZE_UNLIMITED);
 
     s->ass_ctx = ff_ass_split(avctx->subtitle_header);
     if (!s->ass_ctx)
@@ -640,10 +643,14 @@ static int mov_text_encode_frame(AVCodecContext *avctx, unsigned char *buf,
     ASSDialog *dialog;
     int i, length;
 
+    if (bufsize < 3)
+        goto too_small;
+
     s->text_pos = 0;
     s->count = 0;
     s->box_flags = 0;
-    av_bprint_clear(&s->buffer);
+
+    av_bprint_init_for_buffer(&s->buffer, buf + 2, bufsize - 2);
     for (i = 0; i < sub->num_rects; i++) {
         const char *ass = sub->rects[i]->ass;
 
@@ -663,23 +670,19 @@ static int mov_text_encode_frame(AVCodecContext *avctx, unsigned char *buf,
     if (s->buffer.len > UINT16_MAX)
         return AVERROR(ERANGE);
     AV_WB16(buf, s->buffer.len);
-    buf += 2;
 
     for (size_t j = 0; j < box_count; j++)
         box_types[j].encode(s);
 
-    if (!av_bprint_is_complete(&s->buffer))
-        return AVERROR(ENOMEM);
-
     if (!s->buffer.len)
         return 0;
 
-    if (s->buffer.len > bufsize - 3) {
+    if (!av_bprint_is_complete(&s->buffer)) {
+too_small:
         av_log(avctx, AV_LOG_ERROR, "Buffer too small for ASS event.\n");
         return AVERROR_BUFFER_TOO_SMALL;
     }
 
-    memcpy(buf, s->buffer.str, s->buffer.len);
     length = s->buffer.len + 2;
 
     return length;
@@ -701,7 +704,7 @@ static const AVClass mov_text_encoder_class = {
 
 const FFCodec ff_movtext_encoder = {
     .p.name         = "mov_text",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("3GPP Timed Text subtitle"),
+    CODEC_LONG_NAME("3GPP Timed Text subtitle"),
     .p.type         = AVMEDIA_TYPE_SUBTITLE,
     .p.id           = AV_CODEC_ID_MOV_TEXT,
     .priv_data_size = sizeof(MovTextContext),
@@ -709,5 +712,5 @@ const FFCodec ff_movtext_encoder = {
     .init           = mov_text_encode_init,
     FF_CODEC_ENCODE_SUB_CB(mov_text_encode_frame),
     .close          = mov_text_encode_close,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

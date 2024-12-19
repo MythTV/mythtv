@@ -1,6 +1,8 @@
 #ifndef MYTHAVUTIL_H
 #define MYTHAVUTIL_H
 
+#include <utility>
+
 // Qt
 #include <QMap>
 #include <QRecursiveMutex>
@@ -113,21 +115,34 @@ You must verify that the instance has_buffer() before calling any other function
 class MTV_PUBLIC MythAVBufferRef {
   public:
     /**
-    @param buf The AVBufferRef* to reference, must be non-NULL.
+    @param buf The AVBufferRef* to reference, may be NULL.
     */
-    explicit MythAVBufferRef(AVBufferRef* buf) : m_buffer(av_buffer_ref(buf))
+    explicit MythAVBufferRef(const AVBufferRef* buf = nullptr) : m_buffer(ref(buf)) {}
+    ~MythAVBufferRef() { unref(); }
+
+    // Copy constructor
+    MythAVBufferRef(const MythAVBufferRef& other) : MythAVBufferRef(other.m_buffer) {}
+    // Move constructor
+    MythAVBufferRef(MythAVBufferRef&& other) noexcept : MythAVBufferRef() { swap(*this, other); }
+    // Copy assignment operator
+    MythAVBufferRef& operator=(MythAVBufferRef other)
     {
-        if (!m_buffer)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "av_buffer_ref() failed to allocate memory.");
-        }
+        swap(*this, other);
+        return *this;
     }
-    ~MythAVBufferRef()
+    // Move assignment operator
+    MythAVBufferRef& operator=(MythAVBufferRef&& other) noexcept
     {
-        if (has_buffer())
-        {
-            av_buffer_unref(&m_buffer);
-        }
+        // release resources held by this, but prevent suicide on self-assignment
+        MythAVBufferRef tmp {std::move(other)};
+        swap(*this, tmp);
+        return *this;
+    }
+
+    friend void swap(MythAVBufferRef& a, MythAVBufferRef& b) noexcept
+    {
+        using std::swap;
+        swap(a.m_buffer, b.m_buffer);
     }
 
     bool has_buffer()       { return m_buffer != nullptr; }
@@ -135,6 +150,21 @@ class MTV_PUBLIC MythAVBufferRef {
     const uint8_t*  data()  { return m_buffer->data; }
     size_t          size()  { return m_buffer->size; }
   private:
+    static AVBufferRef* ref(const AVBufferRef* buf)
+    {
+        if (buf == nullptr)
+        {
+            return nullptr;
+        }
+        AVBufferRef* reference = av_buffer_ref(buf);
+        if (reference == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "av_buffer_ref() failed to allocate memory.");
+        }
+        return reference;
+    }
+    void unref() { av_buffer_unref(&m_buffer); }
+
     AVBufferRef* m_buffer {nullptr};
 };
 

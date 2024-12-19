@@ -23,7 +23,9 @@
 #include "config_components.h"
 
 #include "avcodec.h"
+#include "hwaccel_internal.h"
 #include "internal.h"
+#include "mpegutils.h"
 #include "mpegvideo.h"
 #include "nvdec.h"
 #include "decode.h"
@@ -37,7 +39,7 @@ static int nvdec_mpeg12_start_frame(AVCodecContext *avctx, const uint8_t *buffer
     CUVIDMPEG2PICPARAMS *ppc = &pp->CodecSpecific.mpeg2;
     FrameDecodeData *fdd;
     NVDECFrame *cf;
-    AVFrame *cur_frame = s->current_picture.f;
+    AVFrame *cur_frame = s->cur_pic.ptr->f;
 
     int ret, i;
 
@@ -62,8 +64,8 @@ static int nvdec_mpeg12_start_frame(AVCodecContext *avctx, const uint8_t *buffer
                              s->pict_type == AV_PICTURE_TYPE_P,
 
         .CodecSpecific.mpeg2 = {
-            .ForwardRefIdx     = ff_nvdec_get_ref_idx(s->last_picture.f),
-            .BackwardRefIdx    = ff_nvdec_get_ref_idx(s->next_picture.f),
+            .ForwardRefIdx     = ff_nvdec_get_ref_idx(s->last_pic.ptr ? s->last_pic.ptr->f : NULL),
+            .BackwardRefIdx    = ff_nvdec_get_ref_idx(s->next_pic.ptr ? s->next_pic.ptr->f : NULL),
 
             .picture_coding_type        = s->pict_type,
             .full_pel_forward_vector    = s->full_pel[0],
@@ -83,8 +85,9 @@ static int nvdec_mpeg12_start_frame(AVCodecContext *avctx, const uint8_t *buffer
     };
 
     for (i = 0; i < 64; ++i) {
-        ppc->QuantMatrixIntra[i] = s->intra_matrix[i];
-        ppc->QuantMatrixInter[i] = s->inter_matrix[i];
+        int n = s->idsp.idct_permutation[i];
+        ppc->QuantMatrixIntra[i] = s->intra_matrix[n];
+        ppc->QuantMatrixInter[i] = s->inter_matrix[n];
     }
 
     return 0;
@@ -98,11 +101,11 @@ static int nvdec_mpeg12_frame_params(AVCodecContext *avctx,
 }
 
 #if CONFIG_MPEG2_NVDEC_HWACCEL
-const AVHWAccel ff_mpeg2_nvdec_hwaccel = {
-    .name                 = "mpeg2_nvdec",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_MPEG2VIDEO,
-    .pix_fmt              = AV_PIX_FMT_CUDA,
+const FFHWAccel ff_mpeg2_nvdec_hwaccel = {
+    .p.name               = "mpeg2_nvdec",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_MPEG2VIDEO,
+    .p.pix_fmt            = AV_PIX_FMT_CUDA,
     .start_frame          = nvdec_mpeg12_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = ff_nvdec_simple_decode_slice,
@@ -114,11 +117,11 @@ const AVHWAccel ff_mpeg2_nvdec_hwaccel = {
 #endif
 
 #if CONFIG_MPEG1_NVDEC_HWACCEL
-const AVHWAccel ff_mpeg1_nvdec_hwaccel = {
-    .name                 = "mpeg1_nvdec",
-    .type                 = AVMEDIA_TYPE_VIDEO,
-    .id                   = AV_CODEC_ID_MPEG1VIDEO,
-    .pix_fmt              = AV_PIX_FMT_CUDA,
+const FFHWAccel ff_mpeg1_nvdec_hwaccel = {
+    .p.name               = "mpeg1_nvdec",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_MPEG1VIDEO,
+    .p.pix_fmt            = AV_PIX_FMT_CUDA,
     .start_frame          = nvdec_mpeg12_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = ff_nvdec_simple_decode_slice,

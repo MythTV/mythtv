@@ -23,9 +23,13 @@
 
 %include "libavutil/x86/x86util.asm"
 
+SECTION_RODATA
+
+vector:  db 0,1,4,5,8,9,12,13,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,4,5,8,9,12,13,
+
 SECTION .text
 
-%macro PMACSDQL 5
+%macro PMACSDQL 3
 %if cpuflag(xop)
     pmacsdql %1, %2, %3, %1
 %else
@@ -34,11 +38,12 @@ SECTION .text
 %endif
 %endmacro
 
-%macro LPC_32 1
+%macro LPC_32 3
 INIT_XMM %1
-cglobal flac_lpc_32, 5,6,5, decoded, coeffs, pred_order, qlevel, len, j
+cglobal flac_lpc_%2, 5,6,5, decoded, coeffs, pred_order, qlevel, len, j
     sub    lend, pred_orderd
     jle .ret
+    movsxdifnidn pred_orderq, pred_orderd
     lea    decodedq, [decodedq+pred_orderq*4-8]
     lea    coeffsq, [coeffsq+pred_orderq*4]
     neg    pred_orderq
@@ -54,34 +59,84 @@ ALIGN 16
     test   jq, jq
     jz .end_order
 .loop_order:
-    PMACSDQL m2, m0, m1, m2, m0
+    PMACSDQL m2, m0, m1
     movd   m0, [decodedq+jq*4]
-    PMACSDQL m3, m1, m0, m3, m1
+    PMACSDQL m3, m1, m0
     movd   m1, [coeffsq+jq*4]
     inc    jq
     jl .loop_order
 .end_order:
-    PMACSDQL m2, m0, m1, m2, m0
-    psrlq  m2, m4
+    PMACSDQL m2, m0, m1
+    %3     m2, m4
     movd   m0, [decodedq]
     paddd  m0, m2
     movd   [decodedq], m0
     sub  lend, 2
     jl .ret
-    PMACSDQL m3, m1, m0, m3, m1
-    psrlq  m3, m4
+    PMACSDQL m3, m1, m0
+    %3     m3, m4
     movd   m1, [decodedq+4]
     paddd  m1, m3
     movd   [decodedq+4], m1
     jg .loop_sample
 .ret:
-    REP_RET
+    RET
 %endmacro
 
+LPC_32 sse4, 16, psrad
+LPC_32 sse4, 32, psrlq
 %if HAVE_XOP_EXTERNAL
-LPC_32 xop
+LPC_32 xop,  32, psrlq
 %endif
-LPC_32 sse4
+
+INIT_XMM sse2
+cglobal flac_wasted_32, 3,3,5, decoded, wasted, len
+    shl   lend, 2
+    add   decodedq, lenq
+    neg   lenq
+    movd  m4, wastedd
+ALIGN 16
+.loop:
+    mova  m0, [decodedq+lenq+mmsize*0]
+    mova  m1, [decodedq+lenq+mmsize*1]
+    mova  m2, [decodedq+lenq+mmsize*2]
+    mova  m3, [decodedq+lenq+mmsize*3]
+    pslld m0, m4
+    pslld m1, m4
+    pslld m2, m4
+    pslld m3, m4
+    mova  [decodedq+lenq+mmsize*0], m0
+    mova  [decodedq+lenq+mmsize*1], m1
+    mova  [decodedq+lenq+mmsize*2], m2
+    mova  [decodedq+lenq+mmsize*3], m3
+    add lenq, mmsize * 4
+    jl .loop
+    RET
+
+INIT_XMM sse4
+cglobal flac_wasted_33, 4,4,5, decoded, residuals, wasted, len
+    shl   lend, 2
+    lea   decodedq, [decodedq+lenq*2]
+    add   residualsq, lenq
+    neg   lenq
+    movd  m4, wastedd
+ALIGN 16
+.loop:
+    pmovsxdq  m0, [residualsq+lenq+mmsize*0]
+    pmovsxdq  m1, [residualsq+lenq+mmsize/2]
+    pmovsxdq  m2, [residualsq+lenq+mmsize*1]
+    pmovsxdq  m3, [residualsq+lenq+mmsize*1+mmsize/2]
+    psllq m0, m4
+    psllq m1, m4
+    psllq m2, m4
+    psllq m3, m4
+    mova  [decodedq+lenq*2+mmsize*0], m0
+    mova  [decodedq+lenq*2+mmsize*1], m1
+    mova  [decodedq+lenq*2+mmsize*2], m2
+    mova  [decodedq+lenq*2+mmsize*3], m3
+    add lenq, mmsize * 2
+    jl .loop
+    RET
 
 ;----------------------------------------------------------------------------------
 ;void ff_flac_decorrelate_[lrm]s_16_sse2(uint8_t **out, int32_t **in, int channels,
@@ -89,6 +144,9 @@ LPC_32 sse4
 ;----------------------------------------------------------------------------------
 %macro FLAC_DECORRELATE_16 3-4
 cglobal flac_decorrelate_%1_16, 2, 4, 4, out, in0, in1, len
+%ifidn %1, indep2
+    VBROADCASTI128 m2, [vector]
+%endif
 %if ARCH_X86_32
     mov      lend, lenm
 %endif
@@ -112,15 +170,21 @@ align 16
 %endif
 %ifnidn %1, indep2
     p%4d       m2, m0, m1
+    packssdw   m%2, m%2
+    packssdw   m%3, m%3
+    punpcklwd  m%2, m%3
+    psllw      m%2, m3
+%else
+    pslld      m%2, m3
+    pslld      m%3, m3
+    pshufb     m%2, m%2, m2
+    pshufb     m%3, m%3, m2
+    punpcklwd  m%2, m%3
 %endif
-    packssdw  m%2, m%2
-    packssdw  m%3, m%3
-    punpcklwd m%2, m%3
-    psllw     m%2, m3
     mova [outq + lenq], m%2
     add      lenq, 16
     jl .loop
-    REP_RET
+    RET
 %endmacro
 
 INIT_XMM sse2
@@ -164,7 +228,7 @@ align 16
     add      outq, mmsize*2
     sub      lend, mmsize/4
     jg .loop
-    REP_RET
+    RET
 %endmacro
 
 INIT_XMM sse2
@@ -289,10 +353,10 @@ align 16
     add      outq, mmsize*REPCOUNT
     sub      lend, mmsize/4
     jg .loop
-    REP_RET
+    RET
 %endmacro
 
-INIT_XMM sse2
+INIT_XMM ssse3
 FLAC_DECORRELATE_16 indep2, 0, 1 ; Reuse stereo 16bits macro
 FLAC_DECORRELATE_INDEP 32, 2, 3, d
 FLAC_DECORRELATE_INDEP 16, 4, 3, w

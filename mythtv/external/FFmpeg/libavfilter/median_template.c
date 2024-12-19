@@ -22,8 +22,6 @@
 
 #include "libavutil/avassert.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
 #include "video.h"
 
 #undef pixel

@@ -21,8 +21,10 @@
 
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
+#include "libavutil/mem.h"
 #include "libavcodec/dca.h"
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 
 #define AUPR_HDR 0x415550522D484452
@@ -55,7 +57,7 @@ static int dtshd_read_header(AVFormatContext *s)
     DTSHDDemuxContext *dtshd = s->priv_data;
     AVIOContext *pb = s->pb;
     uint64_t chunk_type, chunk_size;
-    int64_t duration, data_start;
+    int64_t duration, orig_nb_samples, data_start;
     AVStream *st;
     int ret;
     char *value;
@@ -103,9 +105,12 @@ static int dtshd_read_header(AVFormatContext *s)
             duration  = avio_rb32(pb); // num_frames
             duration *= avio_rb16(pb); // samples_per_frames
             st->duration = duration;
-            avio_skip(pb, 5);
+            orig_nb_samples  = avio_rb32(pb);
+            orig_nb_samples <<= 8;
+            orig_nb_samples |= avio_r8(pb);
             st->codecpar->ch_layout.nb_channels = ff_dca_count_chs_for_mask(avio_rb16(pb));
             st->codecpar->initial_padding = avio_rb16(pb);
+            st->codecpar->trailing_padding = FFMAX(st->duration - orig_nb_samples - st->codecpar->initial_padding, 0);
             avio_skip(pb, chunk_size - 21);
             break;
         case FILEINFO:
@@ -159,14 +164,14 @@ static int raw_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ret;
 }
 
-const AVInputFormat ff_dtshd_demuxer = {
-    .name           = "dtshd",
-    .long_name      = NULL_IF_CONFIG_SMALL("raw DTS-HD"),
+const FFInputFormat ff_dtshd_demuxer = {
+    .p.name         = "dtshd",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("raw DTS-HD"),
+    .p.flags        = AVFMT_GENERIC_INDEX,
+    .p.extensions   = "dtshd",
     .priv_data_size = sizeof(DTSHDDemuxContext),
     .read_probe     = dtshd_probe,
     .read_header    = dtshd_read_header,
     .read_packet    = raw_read_packet,
-    .flags          = AVFMT_GENERIC_INDEX,
-    .extensions     = "dtshd",
     .raw_codec_id   = AV_CODEC_ID_DTS,
 };

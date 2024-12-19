@@ -141,7 +141,7 @@ class RemoteAVFormatContext
         return ret;
     }
 
-    static int WriteFunc(void */*opaque*/, uint8_t */*buf*/, int/*buf_size*/)
+    static int WriteFunc(void */*opaque*/, const uint8_t */*buf*/, int/*buf_size*/)
     {  return -1; }
 
     static int64_t SeekFunc(void *opaque, int64_t offset, int whence)

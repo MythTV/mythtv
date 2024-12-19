@@ -19,12 +19,14 @@
  */
 
 #include "libavutil/avassert.h"
+#include "libavutil/file_open.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
+#include "formats.h"
 #include "video.h"
 
 enum HintModes {
@@ -55,10 +57,10 @@ typedef struct FieldHintContext {
 
 static const AVOption fieldhint_options[] = {
     { "hint", "set hint file", OFFSET(hint_file_str), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 0, FLAGS },
-    { "mode", "set hint mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=0}, 0, NB_HINTS-1, FLAGS, "mode" },
-    {   "absolute", 0, 0, AV_OPT_TYPE_CONST, {.i64=ABSOLUTE_HINT}, 0, 0, FLAGS, "mode" },
-    {   "relative", 0, 0, AV_OPT_TYPE_CONST, {.i64=RELATIVE_HINT}, 0, 0, FLAGS, "mode" },
-    {   "pattern",  0, 0, AV_OPT_TYPE_CONST, {.i64=PATTERN_HINT},  0, 0, FLAGS, "mode" },
+    { "mode", "set hint mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=0}, 0, NB_HINTS-1, FLAGS, .unit = "mode" },
+    {   "absolute", 0, 0, AV_OPT_TYPE_CONST, {.i64=ABSOLUTE_HINT}, 0, 0, FLAGS, .unit = "mode" },
+    {   "relative", 0, 0, AV_OPT_TYPE_CONST, {.i64=RELATIVE_HINT}, 0, 0, FLAGS, .unit = "mode" },
+    {   "pattern",  0, 0, AV_OPT_TYPE_CONST, {.i64=PATTERN_HINT},  0, 0, FLAGS, .unit = "mode" },
     { NULL }
 };
 
@@ -111,8 +113,10 @@ static int config_input(AVFilterLink *inlink)
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
+    FilterLink *inl = ff_filter_link(inlink);
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
+    FilterLink *outl = ff_filter_link(outlink);
     FieldHintContext *s = ctx->priv;
     AVFrame *out, *top, *bottom;
     char buf[1024] = { 0 };
@@ -150,9 +154,9 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
             }
             switch (s->mode) {
             case ABSOLUTE_HINT:
-                if (tf > outlink->frame_count_in + 1 || tf < FFMAX(0, outlink->frame_count_in - 1) ||
-                    bf > outlink->frame_count_in + 1 || bf < FFMAX(0, outlink->frame_count_in - 1)) {
-                    av_log(ctx, AV_LOG_ERROR, "Out of range frames %"PRId64" and/or %"PRId64" on line %"PRId64" for %"PRId64". input frame.\n", tf, bf, s->line, inlink->frame_count_out);
+                if (tf > outl->frame_count_in + 1 || tf < FFMAX(0, outl->frame_count_in - 1) ||
+                    bf > outl->frame_count_in + 1 || bf < FFMAX(0, outl->frame_count_in - 1)) {
+                    av_log(ctx, AV_LOG_ERROR, "Out of range frames %"PRId64" and/or %"PRId64" on line %"PRId64" for %"PRId64". input frame.\n", tf, bf, s->line, inl->frame_count_out);
                     return AVERROR_INVALIDDATA;
                 }
                 break;
@@ -160,7 +164,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
             case RELATIVE_HINT:
                 if (tf > 1 || tf < -1 ||
                     bf > 1 || bf < -1) {
-                    av_log(ctx, AV_LOG_ERROR, "Out of range %"PRId64" and/or %"PRId64" on line %"PRId64" for %"PRId64". input frame.\n", tf, bf, s->line, inlink->frame_count_out);
+                    av_log(ctx, AV_LOG_ERROR, "Out of range %"PRId64" and/or %"PRId64" on line %"PRId64" for %"PRId64". input frame.\n", tf, bf, s->line, inl->frame_count_out);
                     return AVERROR_INVALIDDATA;
                 }
                 break;
@@ -173,7 +177,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
                 fseek(s->hint, 0, SEEK_SET);
                 continue;
             }
-            av_log(ctx, AV_LOG_ERROR, "Missing entry for %"PRId64". input frame.\n", inlink->frame_count_out);
+            av_log(ctx, AV_LOG_ERROR, "Missing entry for %"PRId64". input frame.\n", inl->frame_count_out);
             return AVERROR_INVALIDDATA;
         }
     }
@@ -185,8 +189,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     switch (s->mode) {
     case ABSOLUTE_HINT:
-        top    = s->frame[tf - outlink->frame_count_in + 1];
-        bottom = s->frame[bf - outlink->frame_count_in + 1];
+        top    = s->frame[tf - outl->frame_count_in + 1];
+        bottom = s->frame[bf - outl->frame_count_in + 1];
         break;
     case PATTERN_HINT:
     case RELATIVE_HINT:
@@ -216,10 +220,20 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     switch (hint) {
     case '+':
+#if FF_API_INTERLACED_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
         out->interlaced_frame = 1;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+        out->flags |= AV_FRAME_FLAG_INTERLACED;
         break;
     case '-':
+#if FF_API_INTERLACED_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
         out->interlaced_frame = 0;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+        out->flags &= ~AV_FRAME_FLAG_INTERLACED;
         break;
     case '=':
         break;

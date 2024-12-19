@@ -82,11 +82,35 @@ const char *swscale_license(void);
 #define SWS_PRINT_INFO              0x1000
 
 //the following 3 flags are not completely implemented
-//internal chrominance subsampling info
+
+/**
+ * Perform full chroma upsampling when upscaling to RGB.
+ *
+ * For example, when converting 50x50 yuv420p to 100x100 rgba, setting this flag
+ * will scale the chroma plane from 25x25 to 100x100 (4:4:4), and then convert
+ * the 100x100 yuv444p image to rgba in the final output step.
+ *
+ * Without this flag, the chroma plane is instead scaled to 50x100 (4:2:2),
+ * with a single chroma sample being re-used for both of the horizontally
+ * adjacent RGBA output pixels.
+ */
 #define SWS_FULL_CHR_H_INT    0x2000
-//input subsampling info
+
+/**
+ * Perform full chroma interpolation when downscaling RGB sources.
+ *
+ * For example, when converting a 100x100 rgba source to 50x50 yuv444p, setting
+ * this flag will generate a 100x100 (4:4:4) chroma plane, which is then
+ * downscaled to the required 50x50.
+ *
+ * Without this flag, the chroma plane is instead generated at 50x100 (dropping
+ * every other pixel), before then being downscaled to the required 50x50
+ * resolution.
+ */
 #define SWS_FULL_CHR_H_INP    0x4000
+
 #define SWS_DIRECT_BGR        0x8000
+
 #define SWS_ACCURATE_RND      0x40000
 #define SWS_BITEXACT          0x80000
 #define SWS_ERROR_DIFFUSION  0x800000
@@ -234,6 +258,7 @@ int sws_scale(struct SwsContext *c, const uint8_t *const srcSlice[],
  * - sws_receive_slice(0, dst->height)
  * - sws_frame_end()
  *
+ * @param c   The scaling context
  * @param dst The destination frame. See documentation for sws_frame_start() for
  *            more details.
  * @param src The source frame.
@@ -249,6 +274,7 @@ int sws_scale_frame(struct SwsContext *c, AVFrame *dst, const AVFrame *src);
  * This function will retain references to src and dst, so they must both use
  * refcounted buffers (if allocated by the caller, in case of dst).
  *
+ * @param c   The scaling context
  * @param dst The destination frame.
  *
  *            The data buffers may either be already allocated by the caller or
@@ -273,6 +299,8 @@ int sws_frame_start(struct SwsContext *c, AVFrame *dst, const AVFrame *src);
  * submitted with sws_frame_start(). Must be called after all sws_send_slice()
  * and sws_receive_slice() calls are done, before any new sws_frame_start()
  * calls.
+ *
+ * @param c   The scaling context
  */
 void sws_frame_end(struct SwsContext *c);
 
@@ -282,6 +310,7 @@ void sws_frame_end(struct SwsContext *c);
  * any order, but may not overlap. For vertically subsampled pixel formats, the
  * slices must be aligned according to subsampling.
  *
+ * @param c   The scaling context
  * @param slice_start first row of the slice
  * @param slice_height number of rows in the slice
  *
@@ -294,6 +323,7 @@ int sws_send_slice(struct SwsContext *c, unsigned int slice_start,
  * Request a horizontal slice of the output data to be written into the frame
  * previously provided to sws_frame_start().
  *
+ * @param c   The scaling context
  * @param slice_start first row of the slice; must be a multiple of
  *                    sws_receive_slice_alignment()
  * @param slice_height number of rows in the slice; must be a multiple of
@@ -310,6 +340,9 @@ int sws_receive_slice(struct SwsContext *c, unsigned int slice_start,
                       unsigned int slice_height);
 
 /**
+ * Get the alignment required for slices
+ *
+ * @param c   The scaling context
  * @return alignment required for output slices requested with sws_receive_slice().
  *         Slice offsets and sizes passed to sws_receive_slice() must be
  *         multiples of the value returned from this function.
@@ -317,6 +350,7 @@ int sws_receive_slice(struct SwsContext *c, unsigned int slice_start,
 unsigned int sws_receive_slice_alignment(const struct SwsContext *c);
 
 /**
+ * @param c the scaling context
  * @param dstRange flag indicating the while-black range of the output (1=jpeg / 0=mpeg)
  * @param srcRange flag indicating the while-black range of the input (1=jpeg / 0=mpeg)
  * @param table the yuv2rgb coefficients describing the output yuv space, normally ff_yuv2rgb_coeffs[x]
@@ -324,22 +358,17 @@ unsigned int sws_receive_slice_alignment(const struct SwsContext *c);
  * @param brightness 16.16 fixed point brightness correction
  * @param contrast 16.16 fixed point contrast correction
  * @param saturation 16.16 fixed point saturation correction
-#if LIBSWSCALE_VERSION_MAJOR > 6
- * @return negative error code on error, non negative otherwise
-#else
- * @return -1 if not supported
-#endif
+ *
+ * @return A negative error code on error, non negative otherwise.
+ *         If `LIBSWSCALE_VERSION_MAJOR < 7`, returns -1 if not supported.
  */
 int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
                              int srcRange, const int table[4], int dstRange,
                              int brightness, int contrast, int saturation);
 
 /**
-#if LIBSWSCALE_VERSION_MAJOR > 6
- * @return negative error code on error, non negative otherwise
-#else
- * @return -1 if not supported
-#endif
+ * @return A negative error code on error, non negative otherwise.
+ *         If `LIBSWSCALE_VERSION_MAJOR < 7`, returns -1 if not supported.
  */
 int sws_getColorspaceDetails(struct SwsContext *c, int **inv_table,
                              int *srcRange, int **table, int *dstRange,

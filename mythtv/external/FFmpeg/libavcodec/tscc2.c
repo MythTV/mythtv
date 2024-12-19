@@ -26,14 +26,15 @@
 
 #include <inttypes.h>
 
+#include "libavutil/mem.h"
 #include "libavutil/thread.h"
 
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "mathops.h"
 #include "tscc2data.h"
 
@@ -61,9 +62,9 @@ static av_cold void tscc2_init_vlc(VLC *vlc, int *offset, int nb_codes,
 
     vlc->table           = &vlc_buf[*offset];
     vlc->table_allocated = FF_ARRAY_ELEMS(vlc_buf) - *offset;
-    ff_init_vlc_from_lengths(vlc, TSCC2_VLC_BITS, nb_codes,
+    ff_vlc_init_from_lengths(vlc, TSCC2_VLC_BITS, nb_codes,
                              lens, 1, syms, sym_length, sym_length, 0,
-                             INIT_VLC_STATIC_OVERLONG | INIT_VLC_OUTPUT_LE, NULL);
+                             VLC_INIT_STATIC_OVERLONG | VLC_INIT_OUTPUT_LE, NULL);
     *offset += vlc->table_size;
 }
 
@@ -358,7 +359,7 @@ static av_cold int tscc2_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_tscc2_decoder = {
     .p.name         = "tscc2",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("TechSmith Screen Codec 2"),
+    CODEC_LONG_NAME("TechSmith Screen Codec 2"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_TSCC2,
     .priv_data_size = sizeof(TSCC2Context),
@@ -366,5 +367,5 @@ const FFCodec ff_tscc2_decoder = {
     .close          = tscc2_decode_end,
     FF_CODEC_DECODE_CB(tscc2_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

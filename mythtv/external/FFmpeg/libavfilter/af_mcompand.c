@@ -30,11 +30,12 @@
 
 #include "libavutil/avstring.h"
 #include "libavutil/ffmath.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/samplefmt.h"
 #include "audio.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
 
 typedef struct CompandSegment {
     double x, y;
@@ -417,8 +418,8 @@ static int config_output(AVFilterLink *outlink)
         }
 
         new_nb_items += sscanf(tstr2, "%lf", &s->bands[i].topfreq) == 1;
-        if (s->bands[i].topfreq < 0 || s->bands[i].topfreq >= outlink->sample_rate / 2) {
-            av_log(ctx, AV_LOG_ERROR, "crossover_frequency: %f, should be >=0 and lower than half of sample rate: %d.\n", s->bands[i].topfreq, outlink->sample_rate / 2);
+        if (s->bands[i].topfreq < 0 || s->bands[i].topfreq >= outlink->sample_rate / 2.0) {
+            av_log(ctx, AV_LOG_ERROR, "crossover_frequency: %f, should be >=0 and lower than half of sample rate: %f.\n", s->bands[i].topfreq, outlink->sample_rate / 2.0);
             return AVERROR(EINVAL);
         }
 

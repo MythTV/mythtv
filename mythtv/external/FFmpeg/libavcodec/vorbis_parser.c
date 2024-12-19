@@ -28,9 +28,9 @@
 #include "config_components.h"
 
 #include "libavutil/log.h"
+#include "libavutil/mem.h"
 
 #include "get_bits.h"
-#include "parser.h"
 #include "xiph.h"
 #include "vorbis_parser_internal.h"
 
@@ -234,7 +234,8 @@ int av_vorbis_parse_frame_flags(AVVorbisParseContext *s, const uint8_t *buf,
             else if (buf[0] == 5)
                 *flags |= VORBIS_FLAG_SETUP;
             else
-                goto bad_packet;
+                av_log(s, AV_LOG_VERBOSE, "Ignoring packet with unknown type %u\n",
+                       buf[0]);
 
             /* Special packets have no duration. */
             return 0;

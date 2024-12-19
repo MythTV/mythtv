@@ -25,8 +25,8 @@
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
+#include "filters.h"
 #include "formats.h"
-#include "internal.h"
 #include "video.h"
 
 enum CieSystem {
@@ -77,40 +77,40 @@ typedef struct CiescopeContext {
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 
 static const AVOption ciescope_options[] = {
-    { "system",     "set color system", OFFSET(color_system), AV_OPT_TYPE_INT, {.i64=Rec709system}, 0, NB_CS-1, FLAGS, "system" },
-    {   "ntsc",       "NTSC 1953 Y'I'O' (ITU-R BT.470 System M)", 0, AV_OPT_TYPE_CONST, {.i64=NTSCsystem},     0, 0, FLAGS, "system" },
-    {   "470m",       "NTSC 1953 Y'I'O' (ITU-R BT.470 System M)", 0, AV_OPT_TYPE_CONST, {.i64=NTSCsystem},     0, 0, FLAGS, "system" },
-    {   "ebu",        "EBU Y'U'V' (PAL/SECAM) (ITU-R BT.470 System B, G)", 0, AV_OPT_TYPE_CONST, {.i64=EBUsystem},      0, 0, FLAGS, "system" },
-    {   "470bg",      "EBU Y'U'V' (PAL/SECAM) (ITU-R BT.470 System B, G)", 0, AV_OPT_TYPE_CONST, {.i64=EBUsystem},      0, 0, FLAGS, "system" },
-    {   "smpte",      "SMPTE-C RGB",            0, AV_OPT_TYPE_CONST, {.i64=SMPTEsystem},    0, 0, FLAGS, "system" },
-    {   "240m",       "SMPTE-240M Y'PbPr",      0, AV_OPT_TYPE_CONST, {.i64=SMPTE240Msystem},0, 0, FLAGS, "system" },
-    {   "apple",      "Apple RGB",              0, AV_OPT_TYPE_CONST, {.i64=APPLEsystem},    0, 0, FLAGS, "system" },
-    {   "widergb",    "Adobe Wide Gamut RGB",   0, AV_OPT_TYPE_CONST, {.i64=wRGBsystem},     0, 0, FLAGS, "system" },
-    {   "cie1931",    "CIE 1931 RGB",           0, AV_OPT_TYPE_CONST, {.i64=CIE1931system},  0, 0, FLAGS, "system" },
-    {   "hdtv",       "ITU.BT-709 Y'CbCr",      0, AV_OPT_TYPE_CONST, {.i64=Rec709system},   0, 0, FLAGS, "system" },
-    {   "rec709",     "ITU.BT-709 Y'CbCr",      0, AV_OPT_TYPE_CONST, {.i64=Rec709system},   0, 0, FLAGS, "system" },
-    {   "uhdtv",      "ITU-R.BT-2020",          0, AV_OPT_TYPE_CONST, {.i64=Rec2020system},  0, 0, FLAGS, "system" },
-    {   "rec2020",    "ITU-R.BT-2020",          0, AV_OPT_TYPE_CONST, {.i64=Rec2020system},  0, 0, FLAGS, "system" },
-    {   "dcip3",      "DCI-P3",                 0, AV_OPT_TYPE_CONST, {.i64=DCIP3},          0, 0, FLAGS, "system" },
-    { "cie",        "set cie system", OFFSET(cie), AV_OPT_TYPE_INT,   {.i64=XYY}, 0, NB_CIE-1, FLAGS, "cie" },
-    {   "xyy",      "CIE 1931 xyY", 0, AV_OPT_TYPE_CONST, {.i64=XYY}, 0, 0, FLAGS, "cie" },
-    {   "ucs",      "CIE 1960 UCS", 0, AV_OPT_TYPE_CONST, {.i64=UCS}, 0, 0, FLAGS, "cie" },
-    {   "luv",      "CIE 1976 Luv", 0, AV_OPT_TYPE_CONST, {.i64=LUV}, 0, 0, FLAGS, "cie" },
-    { "gamuts",     "set what gamuts to draw", OFFSET(gamuts), AV_OPT_TYPE_FLAGS, {.i64=0}, 0, 0xFFF, FLAGS, "gamuts" },
-    {   "ntsc",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<NTSCsystem},      0, 0, FLAGS, "gamuts" },
-    {   "470m",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<NTSCsystem},      0, 0, FLAGS, "gamuts" },
-    {   "ebu",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<EBUsystem},       0, 0, FLAGS, "gamuts" },
-    {   "470bg",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<EBUsystem},       0, 0, FLAGS, "gamuts" },
-    {   "smpte",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<SMPTEsystem},     0, 0, FLAGS, "gamuts" },
-    {   "240m",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<SMPTE240Msystem}, 0, 0, FLAGS, "gamuts" },
-    {   "apple",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<APPLEsystem},     0, 0, FLAGS, "gamuts" },
-    {   "widergb",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<wRGBsystem},      0, 0, FLAGS, "gamuts" },
-    {   "cie1931",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<CIE1931system},   0, 0, FLAGS, "gamuts" },
-    {   "hdtv",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec709system},    0, 0, FLAGS, "gamuts" },
-    {   "rec709",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec709system},    0, 0, FLAGS, "gamuts" },
-    {   "uhdtv",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec2020system},   0, 0, FLAGS, "gamuts" },
-    {   "rec2020",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec2020system},   0, 0, FLAGS, "gamuts" },
-    {   "dcip3",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<DCIP3},           0, 0, FLAGS, "gamuts" },
+    { "system",     "set color system", OFFSET(color_system), AV_OPT_TYPE_INT, {.i64=Rec709system}, 0, NB_CS-1, FLAGS, .unit = "system" },
+    {   "ntsc",       "NTSC 1953 Y'I'O' (ITU-R BT.470 System M)", 0, AV_OPT_TYPE_CONST, {.i64=NTSCsystem},     0, 0, FLAGS, .unit = "system" },
+    {   "470m",       "NTSC 1953 Y'I'O' (ITU-R BT.470 System M)", 0, AV_OPT_TYPE_CONST, {.i64=NTSCsystem},     0, 0, FLAGS, .unit = "system" },
+    {   "ebu",        "EBU Y'U'V' (PAL/SECAM) (ITU-R BT.470 System B, G)", 0, AV_OPT_TYPE_CONST, {.i64=EBUsystem},      0, 0, FLAGS, .unit = "system" },
+    {   "470bg",      "EBU Y'U'V' (PAL/SECAM) (ITU-R BT.470 System B, G)", 0, AV_OPT_TYPE_CONST, {.i64=EBUsystem},      0, 0, FLAGS, .unit = "system" },
+    {   "smpte",      "SMPTE-C RGB",            0, AV_OPT_TYPE_CONST, {.i64=SMPTEsystem},    0, 0, FLAGS, .unit = "system" },
+    {   "240m",       "SMPTE-240M Y'PbPr",      0, AV_OPT_TYPE_CONST, {.i64=SMPTE240Msystem},0, 0, FLAGS, .unit = "system" },
+    {   "apple",      "Apple RGB",              0, AV_OPT_TYPE_CONST, {.i64=APPLEsystem},    0, 0, FLAGS, .unit = "system" },
+    {   "widergb",    "Adobe Wide Gamut RGB",   0, AV_OPT_TYPE_CONST, {.i64=wRGBsystem},     0, 0, FLAGS, .unit = "system" },
+    {   "cie1931",    "CIE 1931 RGB",           0, AV_OPT_TYPE_CONST, {.i64=CIE1931system},  0, 0, FLAGS, .unit = "system" },
+    {   "hdtv",       "ITU.BT-709 Y'CbCr",      0, AV_OPT_TYPE_CONST, {.i64=Rec709system},   0, 0, FLAGS, .unit = "system" },
+    {   "rec709",     "ITU.BT-709 Y'CbCr",      0, AV_OPT_TYPE_CONST, {.i64=Rec709system},   0, 0, FLAGS, .unit = "system" },
+    {   "uhdtv",      "ITU-R.BT-2020",          0, AV_OPT_TYPE_CONST, {.i64=Rec2020system},  0, 0, FLAGS, .unit = "system" },
+    {   "rec2020",    "ITU-R.BT-2020",          0, AV_OPT_TYPE_CONST, {.i64=Rec2020system},  0, 0, FLAGS, .unit = "system" },
+    {   "dcip3",      "DCI-P3",                 0, AV_OPT_TYPE_CONST, {.i64=DCIP3},          0, 0, FLAGS, .unit = "system" },
+    { "cie",        "set cie system", OFFSET(cie), AV_OPT_TYPE_INT,   {.i64=XYY}, 0, NB_CIE-1, FLAGS, .unit = "cie" },
+    {   "xyy",      "CIE 1931 xyY", 0, AV_OPT_TYPE_CONST, {.i64=XYY}, 0, 0, FLAGS, .unit = "cie" },
+    {   "ucs",      "CIE 1960 UCS", 0, AV_OPT_TYPE_CONST, {.i64=UCS}, 0, 0, FLAGS, .unit = "cie" },
+    {   "luv",      "CIE 1976 Luv", 0, AV_OPT_TYPE_CONST, {.i64=LUV}, 0, 0, FLAGS, .unit = "cie" },
+    { "gamuts",     "set what gamuts to draw", OFFSET(gamuts), AV_OPT_TYPE_FLAGS, {.i64=0}, 0, 0xFFF, FLAGS, .unit = "gamuts" },
+    {   "ntsc",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<NTSCsystem},      0, 0, FLAGS, .unit = "gamuts" },
+    {   "470m",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<NTSCsystem},      0, 0, FLAGS, .unit = "gamuts" },
+    {   "ebu",      NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<EBUsystem},       0, 0, FLAGS, .unit = "gamuts" },
+    {   "470bg",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<EBUsystem},       0, 0, FLAGS, .unit = "gamuts" },
+    {   "smpte",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<SMPTEsystem},     0, 0, FLAGS, .unit = "gamuts" },
+    {   "240m",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<SMPTE240Msystem}, 0, 0, FLAGS, .unit = "gamuts" },
+    {   "apple",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<APPLEsystem},     0, 0, FLAGS, .unit = "gamuts" },
+    {   "widergb",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<wRGBsystem},      0, 0, FLAGS, .unit = "gamuts" },
+    {   "cie1931",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<CIE1931system},   0, 0, FLAGS, .unit = "gamuts" },
+    {   "hdtv",     NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec709system},    0, 0, FLAGS, .unit = "gamuts" },
+    {   "rec709",   NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec709system},    0, 0, FLAGS, .unit = "gamuts" },
+    {   "uhdtv",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec2020system},   0, 0, FLAGS, .unit = "gamuts" },
+    {   "rec2020",  NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<Rec2020system},   0, 0, FLAGS, .unit = "gamuts" },
+    {   "dcip3",    NULL, 0, AV_OPT_TYPE_CONST, {.i64=1<<DCIP3},           0, 0, FLAGS, .unit = "gamuts" },
     { "size",       "set ciescope size", OFFSET(size), AV_OPT_TYPE_INT, {.i64=512}, 256, 8192, FLAGS },
     { "s",          "set ciescope size", OFFSET(size), AV_OPT_TYPE_INT, {.i64=512}, 256, 8192, FLAGS },
     { "intensity",  "set ciescope intensity", OFFSET(intensity), AV_OPT_TYPE_FLOAT, {.dbl=0.001}, 0, 1, FLAGS },
@@ -855,8 +855,6 @@ rgb_to_xy(float rc,
     *z = m[2][0] * rc + m[2][1] * gc + m[2][2] * bc;
 
     scale = *x + *y + *z;
-    if (scale == 0.f)
-        scale = 1.f;
     scale = 1.f / scale;
     *x = *x * scale;
     *y = *y * scale;
@@ -1010,27 +1008,44 @@ static void draw_line(uint16_t *const pixels, int linesize,
                       int w, int h,
                       const uint16_t *const rgbcolor)
 {
-    int dx  = FFABS(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    int dy  = FFABS(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = (dx > dy ? dx : -dy) / 2, e2;
+    int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, x2;
+    int dx = FFABS(x1-x0), dy = FFABS(y1-y0), err = dx * dx + dy * dy;
+    int e2 = err == 0 ? 1 : 0xffffff / (dx + dy);
+
+    dx *= e2;
+    dy *= e2;
+    err = dx - dy;
 
     for (;;) {
-        pixels[y0 * linesize + x0 * 4 + 0] = rgbcolor[0];
-        pixels[y0 * linesize + x0 * 4 + 1] = rgbcolor[1];
-        pixels[y0 * linesize + x0 * 4 + 2] = rgbcolor[2];
-        pixels[y0 * linesize + x0 * 4 + 3] = rgbcolor[3];
-
-        if (x0 == x1 && y0 == y1)
-            break;
+        pixels[y0 * linesize + x0 * 4 + 0] = rgbcolor[0]-(FFABS(err - dx + dy) >> 8);
+        pixels[y0 * linesize + x0 * 4 + 1] = rgbcolor[1]-(FFABS(err - dx + dy) >> 8);
+        pixels[y0 * linesize + x0 * 4 + 2] = rgbcolor[2]-(FFABS(err - dx + dy) >> 8);
+        pixels[y0 * linesize + x0 * 4 + 3] = rgbcolor[3]-(FFABS(err - dx + dy) >> 8);
 
         e2 = err;
-
-        if (e2 >-dx) {
+        x2 = x0;
+        if (2 * e2 >= -dx) {
+            if (x0 == x1)
+                break;
+            if (e2 + dy < 0xff0000) {
+                pixels[(y0 + sy) * linesize + x0 * 4 + 0] = rgbcolor[0]-(FFABS(e2 + dy) >> 8);
+                pixels[(y0 + sy) * linesize + x0 * 4 + 1] = rgbcolor[1]-(FFABS(e2 + dy) >> 8);
+                pixels[(y0 + sy) * linesize + x0 * 4 + 2] = rgbcolor[2]-(FFABS(e2 + dy) >> 8);
+                pixels[(y0 + sy) * linesize + x0 * 4 + 3] = rgbcolor[3]-(FFABS(e2 + dy) >> 8);
+            }
             err -= dy;
             x0 += sx;
         }
 
-        if (e2 < dy) {
+        if (2 * e2 <= dy) {
+            if (y0 == y1)
+                break;
+            if (dx - e2 < 0xff0000) {
+                pixels[y0 * linesize + (x2 + sx) * 4 + 0] = rgbcolor[0]-(FFABS(dx - e2) >> 8);
+                pixels[y0 * linesize + (x2 + sx) * 4 + 1] = rgbcolor[1]-(FFABS(dx - e2) >> 8);
+                pixels[y0 * linesize + (x2 + sx) * 4 + 2] = rgbcolor[2]-(FFABS(dx - e2) >> 8);
+                pixels[y0 * linesize + (x2 + sx) * 4 + 3] = rgbcolor[3]-(FFABS(dx - e2) >> 8);
+            }
             err += dx;
             y0 += sy;
         }
@@ -1253,11 +1268,11 @@ static void filter_rgb48(AVFilterContext *ctx, const uint8_t *ptr,
                          float *cx, float *cy, int x, int y)
 {
     CiescopeContext *s = ctx->priv;
-    const float scale = 1. / 65535.;
+    const float scale = 1.f / 65535.f;
     const uint16_t *src = (const uint16_t*)(ptr + linesize * y + x * 6);
-    float r = src[0] * scale;
-    float g = src[1] * scale;
-    float b = src[2] * scale;
+    float r = (src[0] + 0.01f) * scale;
+    float g = (src[1] + 0.01f) * scale;
+    float b = (src[2] + 0.01f) * scale;
     float cz;
 
     rgb_to_xy(r, g, b, cx, cy, &cz, (const float (*)[3])s->m);
@@ -1268,11 +1283,11 @@ static void filter_rgba64(AVFilterContext *ctx, const uint8_t *ptr,
                           float *cx, float *cy, int x, int y)
 {
     CiescopeContext *s = ctx->priv;
-    const float scale = 1. / 65535.;
+    const float scale = 1.f / 65535.f;
     const uint16_t *src = (const uint16_t*)(ptr + linesize * y + x * 8);
-    float r = src[0] * scale;
-    float g = src[1] * scale;
-    float b = src[2] * scale;
+    float r = (src[0] + 0.01f) * scale;
+    float g = (src[1] + 0.01f) * scale;
+    float b = (src[2] + 0.01f) * scale;
     float cz;
 
     rgb_to_xy(r, g, b, cx, cy, &cz, (const float (*)[3])s->m);
@@ -1283,11 +1298,11 @@ static void filter_rgb24(AVFilterContext *ctx, const uint8_t *ptr,
                          float *cx, float *cy, int x, int y)
 {
     CiescopeContext *s = ctx->priv;
-    const float scale = 1. / 255.;
+    const float scale = 1.f / 255.f;
     const uint8_t *src = ptr + linesize * y + x * 3;
-    float r = src[0] * scale;
-    float g = src[1] * scale;
-    float b = src[2] * scale;
+    float r = (src[0] + 0.01f) * scale;
+    float g = (src[1] + 0.01f) * scale;
+    float b = (src[2] + 0.01f) * scale;
     float cz;
 
     rgb_to_xy(r, g, b, cx, cy, &cz, (const float (*)[3])s->m);
@@ -1298,11 +1313,11 @@ static void filter_rgba(AVFilterContext *ctx, const uint8_t *ptr,
                         float *cx, float *cy, int x, int y)
 {
     CiescopeContext *s = ctx->priv;
-    const float scale = 1. / 255.;
+    const float scale = 1.f / 255.f;
     const uint8_t *src = ptr + linesize * y + x * 4;
-    float r = src[0] * scale;
-    float g = src[1] * scale;
-    float b = src[2] * scale;
+    float r = (src[0] + 0.01f) * scale;
+    float g = (src[1] + 0.01f) * scale;
+    float b = (src[2] + 0.01f) * scale;
     float cz;
 
     rgb_to_xy(r, g, b, cx, cy, &cz, (const float (*)[3])s->m);
@@ -1392,6 +1407,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
         return AVERROR(ENOMEM);
     }
     out->pts = in->pts;
+    out->duration = in->duration;
 
     if (!s->background) {
         ret = draw_background(ctx);

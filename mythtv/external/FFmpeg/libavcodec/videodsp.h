@@ -72,7 +72,7 @@ typedef struct VideoDSPContext {
      * @param stride distance between two lines of buf (in bytes)
      * @param h      number of lines to prefetch
      */
-    void (*prefetch)(uint8_t *buf, ptrdiff_t stride, int h);
+    void (*prefetch)(const uint8_t *buf, ptrdiff_t stride, int h);
 } VideoDSPContext;
 
 void ff_videodsp_init(VideoDSPContext *ctx, int bpc);
@@ -81,6 +81,7 @@ void ff_videodsp_init(VideoDSPContext *ctx, int bpc);
 void ff_videodsp_init_aarch64(VideoDSPContext *ctx, int bpc);
 void ff_videodsp_init_arm(VideoDSPContext *ctx, int bpc);
 void ff_videodsp_init_ppc(VideoDSPContext *ctx, int bpc);
+void ff_videodsp_init_riscv(VideoDSPContext *ctx, int bpc);
 void ff_videodsp_init_x86(VideoDSPContext *ctx, int bpc);
 void ff_videodsp_init_mips(VideoDSPContext *ctx, int bpc);
 void ff_videodsp_init_loongarch(VideoDSPContext *ctx, int bpc);

@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "swscale_internal.h"
 
 static void free_lines(SwsSlice *s)
@@ -282,7 +283,13 @@ int ff_init_filters(SwsContext * c)
     c->descIndex[0] = num_ydesc + (need_gamma ? 1 : 0);
     c->descIndex[1] = num_ydesc + num_cdesc + (need_gamma ? 1 : 0);
 
-
+    if (isFloat16(c->srcFormat)) {
+        c->h2f_tables = av_malloc(sizeof(*c->h2f_tables));
+        if (!c->h2f_tables)
+            return AVERROR(ENOMEM);
+        ff_init_half2float_tables(c->h2f_tables);
+        c->input_opaque = c->h2f_tables;
+    }
 
     c->desc  = av_calloc(c->numDesc,  sizeof(*c->desc));
     if (!c->desc)
@@ -393,5 +400,6 @@ int ff_free_filters(SwsContext *c)
             free_slice(&c->slice[i]);
         av_freep(&c->slice);
     }
+    av_freep(&c->h2f_tables);
     return 0;
 }

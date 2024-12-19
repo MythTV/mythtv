@@ -14,6 +14,7 @@ endif()
 set(LIBMYTH_HEADERS
     langsettings.h
     mythaverror.h
+    mythavframe.h
     mythcontext.h
     mythexp.h
     mythmediamonitor.h
