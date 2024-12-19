@@ -52,7 +52,7 @@ function(find_or_build_ffmpeg)
     --disable-stripping
     --disable-static
     --enable-shared
-    --extra-cflags=-w)
+    )
 
   if(NOT LIBS_INSTALL_PREFIX STREQUAL CMAKE_INSTALL_PREFIX)
     list(APPEND FF_ARGS --extra-cflags=-I${LIBS_INSTALL_PREFIX}/include
