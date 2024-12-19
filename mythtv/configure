@@ -6800,7 +6800,6 @@ if enabled lto; then
     ffopts="$ffopts --enable-lto"
 fi
 
-ffmpeg_extra_cflags="$extra_cflags -w"
 if test "$ID" = "raspbian"; then
     case $cpu in
         armv*) ffmpeg_extra_ldflags="$ffmpeg_extra_libs -latomic" ;;
