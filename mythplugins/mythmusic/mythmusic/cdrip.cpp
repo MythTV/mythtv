@@ -24,7 +24,6 @@
 
 // MythTV includes
 #include <libmyth/mythcontext.h>
-#include <libmyth/mythmediamonitor.h>
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>
@@ -34,6 +33,7 @@
 #include <libmythbase/remotefile.h>
 #include <libmythbase/storagegroup.h>
 #include <libmythmetadata/musicutils.h>
+#include <libmythui/mediamonitor.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythprogressdialog.h>
 #include <libmythui/mythscreenstack.h>
