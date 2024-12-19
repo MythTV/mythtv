@@ -6821,8 +6821,7 @@ append ffopts \
 --extra-cflags=\'"$ffmpeg_extra_cflags"\' \
 --extra-ldflags=\'"$ffmpeg_extra_ldflags"\' \
 --extra-libs=\'"$ffmpeg_extra_ldflags"\' \
---enable-stripping \
---strip=\'"echo skipping strip"\' \
+--disable-stripping \
 --disable-manpages  \
 --disable-podpages  \
 --disable-doc \
