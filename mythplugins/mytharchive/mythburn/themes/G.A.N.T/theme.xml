@@ -9,7 +9,7 @@
 
     <intro filename="mythtv_intro.mpg"/>
 
-    <menu background="GANT-Background.png">
+    <menu background="G.A.N.T-Background.png">
         <!-- item holds the position of a menu item ie. recording -->
         <item>
             <text x="40" y="44" w="160" h="32" hindent="3" value="Page %page" font="description"  static="True" halign="left" valign="center" bgcolor="#5a5a5a" bgalpha="100"/>
@@ -67,7 +67,7 @@
         </item>
     </menu>
 
-    <submenu background="GANT-Background.png">
+    <submenu background="G.A.N.T-Background.png">
         <!-- Describes a menu or short video that will appear after the recording has been selected -->
         <chapter>
             <graphic filename="%chapterthumbnail" x="55" y="45" w="145" h="110" static="True"/>
@@ -153,7 +153,7 @@
         </chapter>
     </submenu>
 
-    <detailspage background="GANT-Background.png" music="silence.ac3" length="5">
+    <detailspage background="G.A.N.T-Background.png" music="silence.ac3" length="5">
         <graphic filename="%thumbnail" x="40" y="50" w="275" h="205" static="False" bgcolor="#5a5a5a" bgalpha="100"/>
 
         <text x="330" y="50" w="350" h="55" hindent="3" vindent="3" value="%title" font="title" color="yellow" static="False" halign="left" valign="top" bgcolor="#5a5a5a" bgalpha="100"/>
