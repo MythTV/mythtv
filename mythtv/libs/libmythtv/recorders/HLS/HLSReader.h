@@ -56,7 +56,7 @@ class MTV_PUBLIC  HLSReader
     void ResetStream(void)
       { QMutexLocker lock(&m_streamLock); m_curstream = nullptr; }
     void ResetSequence(void) { m_curSeq = -1; }
-    void SetDiscontinuitySequence(int s) { m_sequence = s; }
+
 
     QString StreamURL(void) const
     { return QString("%1").arg(m_curstream ? m_curstream->M3U8Url() : ""); }
@@ -88,7 +88,6 @@ class MTV_PUBLIC  HLSReader
     void IncreaseBitrate(int progid);
 
     // Downloading
-    bool LoadSegments(HLSRecStream & hlsstream);
     int DownloadSegmentData(MythSingleDownload& downloader, HLSRecStream* hls,
 			    const HLSRecSegment& segment, int playlist_size);
 
@@ -116,11 +115,16 @@ class MTV_PUBLIC  HLSReader
     int                m_playlistSize   {0};
     bool               m_bandwidthCheck {false};
     uint               m_prebufferCnt   {10};
+
     QMutex             m_seqLock;
+
     mutable QMutex     m_streamLock;
+
     mutable QMutex     m_workerLock;
+
     QMutex             m_throttleLock;
     QWaitCondition     m_throttleCond;
+
     bool               m_debug          {false};
     int                m_debugCnt       {0};
 
@@ -128,8 +132,6 @@ class MTV_PUBLIC  HLSReader
     int                m_slowCnt        {0};
     QByteArray         m_buffer;
     QMutex             m_bufLock;
-
-    int                m_sequence       {0};     // Discontinuity sequence number
 
     // Log message
     int                m_inputId        {0};

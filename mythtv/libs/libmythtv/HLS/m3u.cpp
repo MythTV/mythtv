@@ -456,7 +456,7 @@ namespace M3U
          * file; it MUST NOT occur more than once.  Its format is:
          */
         is_vod = true;
-        LOG(VB_RECORD, LOG_INFO, loc + "video on demand (vod) mode");
+        LOG(VB_RECORD, LOG_INFO, loc + " video on demand (vod) mode");
         return true;
     }
 

@@ -32,6 +32,8 @@ class HLSRecStream
     void SetVersion(int x)          { m_version = x; }
     std::chrono::seconds TargetDuration(void) const  { return m_targetDuration; }
     void SetTargetDuration(std::chrono::seconds x)   { m_targetDuration = x; }
+    int DiscontinuitySequence(void)       { return m_discontSeq; }
+    void SetDiscontinuitySequence(int s)  { m_discontSeq = s; }
     uint64_t AverageBandwidth(void) const { return static_cast<uint64_t>(m_bandwidth); }
     uint64_t Bitrate(void) const    { return m_bitrate; }
     void SetBitrate(uint64_t bitrate) { m_bitrate = bitrate; }
@@ -82,6 +84,7 @@ class HLSRecStream
     uint64_t    m_curByteRate    {0};
     uint64_t    m_bitrate;                // bitrate of stream content (bits per second)
     std::chrono::seconds m_duration {0s};   // duration of the stream
+    int         m_discontSeq     {0};     // Discontinuity sequence number
     bool        m_live           {true};
     int64_t     m_bandwidth      {0};     // measured average download bandwidth (bits/second)
     double      m_sumBandwidth   {0.0};
