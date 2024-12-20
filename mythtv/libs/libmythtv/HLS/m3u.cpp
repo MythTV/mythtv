@@ -130,15 +130,12 @@ namespace M3U
          */
         QString attr;
 
-        /* The PROGRAM-ID attribute of the EXT-X-STREAM-INF and the EXT-X-I-
-         * FRAME-STREAM-INF tags was removed in protocol version 6.
-         */
         attr = ParseAttributes(line, "PROGRAM-ID");
         if (attr.isNull())
         {
             LOG(VB_RECORD, LOG_INFO, loc +
-                "#EXT-X-STREAM-INF: No PROGRAM-ID=<value>, using 1");
-            id = 1;
+                "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>, using -1");
+            id = -1;
         }
         else
         {
@@ -276,7 +273,6 @@ namespace M3U
         if (!ParseDecimalValue(line, sequence_num))
         {
             LOG(VB_RECORD, LOG_ERR, loc + "expected #EXT-X-MEDIA-SEQUENCE:<s>");
-            sequence_num = 0;
             return false;
         }
 
@@ -395,8 +391,6 @@ namespace M3U
          * #EXT-X-ALLOW-CACHE:<YES|NO>
          */
 
-        /* The EXT-X-ALLOW-CACHE tag was removed in protocol version 7.
-         */
         int pos = line.indexOf(QLatin1String(":"));
         if (pos < 0)
         {
