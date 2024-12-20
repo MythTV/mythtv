@@ -87,10 +87,21 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
     }
     else if (int(m_ccLast) == cc)
     {
-        // do nothing with repeats
+        // Do nothing with repeats
+        if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_DEBUG))
+        {
+            LOG(VB_RECORD, LOG_ERR,
+                QString("AddTSPacket[%1]: Repeat packet!! ").arg(cardid) +
+                QString("PID: 0x%1, continuity counter: %2 ").arg(packet->PID(),0,16).arg(cc) +
+                QString("(expected %1)").arg(ccExp));
+        }
+        return true;
     }
     else
     {
+        // Even if the packet is out of sync it is still the last packet received
+        m_ccLast = cc;
+
         LOG(VB_RECORD, LOG_ERR,
             QString("AddTSPacket[%1]: Out of sync!!! Need to wait for next payloadStart ").arg(cardid) +
             QString("PID: 0x%1, continuity counter: %2 ").arg(packet->PID(),0,16).arg(cc) +
