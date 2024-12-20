@@ -591,7 +591,8 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         {
             // Compute number of segments for 30 seconds buffer from live.
             // If the duration is not know keep 3 segments.
-            int numseg = std::min(3, new_segments.size());
+            int numseg = new_segments.size();
+            numseg = std::min(numseg, 3);
             if (hls->TargetDuration() > 0s)
             {
                 numseg = 30s / hls->TargetDuration();
