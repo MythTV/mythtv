@@ -16,6 +16,7 @@ extern "C" {
 
 #include "audiooutputdigitalencoder.h"
 #include "audiooutpututil.h"
+#include "mythaverror.h"
 
 #define LOC QString("DEnc: ")
 

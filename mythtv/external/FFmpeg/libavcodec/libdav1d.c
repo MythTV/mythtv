@@ -24,16 +24,20 @@
 #include "libavutil/avassert.h"
 #include "libavutil/cpu.h"
 #include "libavutil/film_grain_params.h"
+#include "libavutil/hdr_dynamic_metadata.h"
 #include "libavutil/mastering_display_metadata.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/opt.h"
 
 #include "atsc_a53.h"
+#include "av1_parse.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
 #include "decode.h"
+#include "dovi_rpu.h"
 #include "internal.h"
+#include "itut35.h"
 
 #define FF_DAV1D_VERSION_AT_LEAST(x,y) \
     (DAV1D_API_VERSION_MAJOR > (x) || DAV1D_API_VERSION_MAJOR == (x) && DAV1D_API_VERSION_MINOR >= (y))
@@ -41,15 +45,14 @@
 typedef struct Libdav1dContext {
     AVClass *class;
     Dav1dContext *c;
-    /* This packet coincides with AVCodecInternal.in_pkt
-     * and is not owned by us. */
-    AVPacket *pkt;
     AVBufferPool *pool;
+    DOVIContext dovi;
     int pool_size;
 
     Dav1dData data;
     int tile_threads;
     int frame_threads;
+    int max_frame_delay;
     int apply_grain;
     int operating_point;
     int all_layers;
@@ -155,12 +158,9 @@ static void libdav1d_init_params(AVCodecContext *c, const Dav1dSequenceHeader *s
     else
         c->pix_fmt = pix_fmt[seq->layout][seq->hbd];
 
-    if (seq->num_units_in_tick && seq->time_scale) {
-        av_reduce(&c->framerate.den, &c->framerate.num,
-                  seq->num_units_in_tick, seq->time_scale, INT_MAX);
-        if (seq->equal_picture_interval)
-            c->ticks_per_frame = seq->num_ticks_per_picture;
-    }
+    c->framerate = ff_av1_framerate(seq->num_ticks_per_picture,
+                                    (unsigned)seq->num_units_in_tick,
+                                    (unsigned)seq->time_scale);
 
    if (seq->film_grain_present)
        c->properties |= FF_CODEC_PROPERTY_FILM_GRAIN;
@@ -216,11 +216,10 @@ static av_cold int libdav1d_init(AVCodecContext *c)
 #else
     int threads = (c->thread_count ? c->thread_count : av_cpu_count()) * 3 / 2;
 #endif
+    const AVPacketSideData *sd;
     int res;
 
-    dav1d->pkt = c->internal->in_pkt;
-
-    av_log(c, AV_LOG_INFO, "libdav1d %s\n", dav1d_version());
+    av_log(c, AV_LOG_VERBOSE, "libdav1d %s\n", dav1d_version());
 
     dav1d_default_settings(&s);
     s.logger.cookie = c;
@@ -246,7 +245,9 @@ static av_cold int libdav1d_init(AVCodecContext *c)
         s.n_threads = FFMAX(dav1d->frame_threads, dav1d->tile_threads);
     else
         s.n_threads = FFMIN(threads, DAV1D_MAX_THREADS);
-    s.max_frame_delay = (c->flags & AV_CODEC_FLAG_LOW_DELAY) ? 1 : 0;
+    if (dav1d->max_frame_delay > 0 && (c->flags & AV_CODEC_FLAG_LOW_DELAY))
+        av_log(c, AV_LOG_WARNING, "Low delay mode requested, forcing max_frame_delay 1\n");
+    s.max_frame_delay = (c->flags & AV_CODEC_FLAG_LOW_DELAY) ? 1 : dav1d->max_frame_delay;
     av_log(c, AV_LOG_DEBUG, "Using %d threads, %d max_frame_delay\n",
            s.n_threads, s.max_frame_delay);
 #else
@@ -256,8 +257,19 @@ static av_cold int libdav1d_init(AVCodecContext *c)
     s.n_frame_threads = dav1d->frame_threads
                       ? dav1d->frame_threads
                       : FFMIN(ceil(threads / s.n_tile_threads), DAV1D_MAX_FRAME_THREADS);
+    if (dav1d->max_frame_delay > 0)
+        s.n_frame_threads = FFMIN(s.n_frame_threads, dav1d->max_frame_delay);
     av_log(c, AV_LOG_DEBUG, "Using %d frame threads, %d tile threads\n",
            s.n_frame_threads, s.n_tile_threads);
+#endif
+
+#if FF_DAV1D_VERSION_AT_LEAST(6,8)
+    if (c->skip_frame >= AVDISCARD_NONKEY)
+        s.decode_frame_type = DAV1D_DECODEFRAMETYPE_KEY;
+    else if (c->skip_frame >= AVDISCARD_NONINTRA)
+        s.decode_frame_type = DAV1D_DECODEFRAMETYPE_INTRA;
+    else if (c->skip_frame >= AVDISCARD_NONREF)
+        s.decode_frame_type = DAV1D_DECODEFRAMETYPE_REFERENCE;
 #endif
 
     res = libdav1d_parse_extradata(c);
@@ -268,6 +280,20 @@ static av_cold int libdav1d_init(AVCodecContext *c)
     if (res < 0)
         return AVERROR(ENOMEM);
 
+#if FF_DAV1D_VERSION_AT_LEAST(6,7)
+    res = dav1d_get_frame_delay(&s);
+    if (res < 0) // Should not happen
+        return AVERROR_EXTERNAL;
+
+    // When dav1d_get_frame_delay() returns 1, there's no delay whatsoever
+    c->delay = res > 1 ? res : 0;
+#endif
+
+    dav1d->dovi.logctx = c;
+    dav1d->dovi.cfg.dv_profile = 10; // default for AV1
+    sd = ff_get_coded_side_data(c, AV_PKT_DATA_DOVI_CONF);
+    if (sd && sd->size >= sizeof(dav1d->dovi.cfg))
+        dav1d->dovi.cfg = *(AVDOVIDecoderConfigurationRecord *) sd->data;
     return 0;
 }
 
@@ -286,61 +312,51 @@ static void libdav1d_data_free(const uint8_t *data, void *opaque) {
 }
 
 static void libdav1d_user_data_free(const uint8_t *data, void *opaque) {
+    AVPacket *pkt = opaque;
     av_assert0(data == opaque);
-    av_free(opaque);
+    av_packet_free(&pkt);
 }
 
-static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
+static int libdav1d_receive_frame_internal(AVCodecContext *c, Dav1dPicture *p)
 {
     Libdav1dContext *dav1d = c->priv_data;
     Dav1dData *data = &dav1d->data;
-    Dav1dPicture pic = { 0 }, *p = &pic;
-#if FF_DAV1D_VERSION_AT_LEAST(5,1)
-    enum Dav1dEventFlags event_flags = 0;
-#endif
     int res;
 
     if (!data->sz) {
-        AVPacket *const pkt = dav1d->pkt;
+        AVPacket *pkt = av_packet_alloc();
+
+        if (!pkt)
+            return AVERROR(ENOMEM);
 
         res = ff_decode_get_packet(c, pkt);
-        if (res < 0 && res != AVERROR_EOF)
+        if (res < 0 && res != AVERROR_EOF) {
+            av_packet_free(&pkt);
             return res;
+        }
 
         if (pkt->size) {
             res = dav1d_data_wrap(data, pkt->data, pkt->size,
                                   libdav1d_data_free, pkt->buf);
             if (res < 0) {
-                av_packet_unref(pkt);
+                av_packet_free(&pkt);
                 return res;
             }
 
-            data->m.timestamp = pkt->pts;
-            data->m.offset    = pkt->pos;
-            data->m.duration  = pkt->duration;
-
             pkt->buf = NULL;
-            av_packet_unref(pkt);
 
-            if (c->reordered_opaque != AV_NOPTS_VALUE) {
-                uint8_t *reordered_opaque = av_memdup(&c->reordered_opaque,
-                                                      sizeof(c->reordered_opaque));
-                if (!reordered_opaque) {
-                    dav1d_data_unref(data);
-                    return AVERROR(ENOMEM);
-                }
-
-                res = dav1d_data_wrap_user_data(data, reordered_opaque,
-                                                libdav1d_user_data_free, reordered_opaque);
-                if (res < 0) {
-                    av_free(reordered_opaque);
-                    dav1d_data_unref(data);
-                    return res;
-                }
+            res = dav1d_data_wrap_user_data(data, (const uint8_t *)pkt,
+                                            libdav1d_user_data_free, pkt);
+            if (res < 0) {
+                av_packet_free(&pkt);
+                dav1d_data_unref(data);
+                return res;
             }
-        } else if (res >= 0) {
-            av_packet_unref(pkt);
-            return AVERROR(EAGAIN);
+            pkt = NULL;
+        } else {
+            av_packet_free(&pkt);
+            if (res >= 0)
+                return AVERROR(EAGAIN);
         }
     }
 
@@ -358,11 +374,29 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     if (res < 0) {
         if (res == AVERROR(EINVAL))
             res = AVERROR_INVALIDDATA;
-        else if (res == AVERROR(EAGAIN) && c->internal->draining)
-            res = AVERROR_EOF;
-
-        return res;
+        else if (res == AVERROR(EAGAIN))
+            res = c->internal->draining ? AVERROR_EOF : 1;
     }
+
+    return res;
+}
+
+static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
+{
+    Libdav1dContext *dav1d = c->priv_data;
+    Dav1dPicture pic = { 0 }, *p = &pic;
+    const AVPacket *pkt;
+#if FF_DAV1D_VERSION_AT_LEAST(5,1)
+    enum Dav1dEventFlags event_flags = 0;
+#endif
+    int res;
+
+    do {
+        res = libdav1d_receive_frame_internal(c, p);
+    } while (res > 0);
+
+    if (res < 0)
+        return res;
 
     av_assert0(p->data[0] && p->allocator_data);
 
@@ -405,18 +439,18 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
               INT_MAX);
     ff_set_sar(c, frame->sample_aspect_ratio);
 
-    if (p->m.user_data.data)
-        memcpy(&frame->reordered_opaque, p->m.user_data.data, sizeof(frame->reordered_opaque));
-    else
-        frame->reordered_opaque = AV_NOPTS_VALUE;
+    pkt = (const AVPacket *)p->m.user_data.data;
 
     // match timestamps and packet size
-    frame->pts = p->m.timestamp;
-    frame->pkt_dts = p->m.timestamp;
-    frame->pkt_pos = p->m.offset;
-    frame->pkt_size = p->m.size;
-    frame->pkt_duration = p->m.duration;
-    frame->key_frame = p->frame_hdr->frame_type == DAV1D_FRAME_TYPE_KEY;
+    res = ff_decode_frame_props_from_pkt(c, frame, pkt);
+    if (res < 0)
+        goto fail;
+
+    frame->pkt_dts = pkt->pts;
+    if (p->frame_hdr->frame_type == DAV1D_FRAME_TYPE_KEY)
+        frame->flags |= AV_FRAME_FLAG_KEY;
+    else
+        frame->flags &= ~AV_FRAME_FLAG_KEY;
 
     switch (p->frame_hdr->frame_type) {
     case DAV1D_FRAME_TYPE_KEY:
@@ -435,65 +469,128 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     }
 
     if (p->mastering_display) {
-        AVMasteringDisplayMetadata *mastering = av_mastering_display_metadata_create_side_data(frame);
-        if (!mastering) {
-            res = AVERROR(ENOMEM);
+        AVMasteringDisplayMetadata *mastering;
+
+        res = ff_decode_mastering_display_new(c, frame, &mastering);
+        if (res < 0)
             goto fail;
+
+        if (mastering) {
+            for (int i = 0; i < 3; i++) {
+                mastering->display_primaries[i][0] = av_make_q(p->mastering_display->primaries[i][0], 1 << 16);
+                mastering->display_primaries[i][1] = av_make_q(p->mastering_display->primaries[i][1], 1 << 16);
+            }
+            mastering->white_point[0] = av_make_q(p->mastering_display->white_point[0], 1 << 16);
+            mastering->white_point[1] = av_make_q(p->mastering_display->white_point[1], 1 << 16);
+
+            mastering->max_luminance = av_make_q(p->mastering_display->max_luminance, 1 << 8);
+            mastering->min_luminance = av_make_q(p->mastering_display->min_luminance, 1 << 14);
+
+            mastering->has_primaries = 1;
+            mastering->has_luminance = 1;
         }
-
-        for (int i = 0; i < 3; i++) {
-            mastering->display_primaries[i][0] = av_make_q(p->mastering_display->primaries[i][0], 1 << 16);
-            mastering->display_primaries[i][1] = av_make_q(p->mastering_display->primaries[i][1], 1 << 16);
-        }
-        mastering->white_point[0] = av_make_q(p->mastering_display->white_point[0], 1 << 16);
-        mastering->white_point[1] = av_make_q(p->mastering_display->white_point[1], 1 << 16);
-
-        mastering->max_luminance = av_make_q(p->mastering_display->max_luminance, 1 << 8);
-        mastering->min_luminance = av_make_q(p->mastering_display->min_luminance, 1 << 14);
-
-        mastering->has_primaries = 1;
-        mastering->has_luminance = 1;
     }
     if (p->content_light) {
-        AVContentLightMetadata *light = av_content_light_metadata_create_side_data(frame);
-        if (!light) {
-            res = AVERROR(ENOMEM);
+        AVContentLightMetadata *light;
+
+        res = ff_decode_content_light_new(c, frame, &light);
+        if (res < 0)
             goto fail;
+
+        if (light) {
+            light->MaxCLL = p->content_light->max_content_light_level;
+            light->MaxFALL = p->content_light->max_frame_average_light_level;
         }
-        light->MaxCLL = p->content_light->max_content_light_level;
-        light->MaxFALL = p->content_light->max_frame_average_light_level;
     }
     if (p->itut_t35) {
+#if FF_DAV1D_VERSION_AT_LEAST(6,9)
+        for (size_t i = 0; i < p->n_itut_t35; i++) {
+            const Dav1dITUTT35 *itut_t35 = &p->itut_t35[i];
+#else
+        const Dav1dITUTT35 *itut_t35 = p->itut_t35;
+#endif
         GetByteContext gb;
-        unsigned int user_identifier;
+        int provider_code;
 
-        bytestream2_init(&gb, p->itut_t35->payload, p->itut_t35->payload_size);
-        bytestream2_skip(&gb, 1); // terminal provider code
-        bytestream2_skip(&gb, 1); // terminal provider oriented code
-        user_identifier = bytestream2_get_be32(&gb);
-        switch (user_identifier) {
-        case MKBETAG('G', 'A', '9', '4'): { // closed captions
-            AVBufferRef *buf = NULL;
+        bytestream2_init(&gb, itut_t35->payload, itut_t35->payload_size);
 
-            res = ff_parse_a53_cc(&buf, gb.buffer, bytestream2_get_bytes_left(&gb));
-            if (res < 0)
-                goto fail;
-            if (!res)
+        provider_code = bytestream2_get_be16(&gb);
+        switch (provider_code) {
+        case ITU_T_T35_PROVIDER_CODE_ATSC: {
+            uint32_t user_identifier = bytestream2_get_be32(&gb);
+            switch (user_identifier) {
+            case MKBETAG('G', 'A', '9', '4'): { // closed captions
+                AVBufferRef *buf = NULL;
+
+                res = ff_parse_a53_cc(&buf, gb.buffer, bytestream2_get_bytes_left(&gb));
+                if (res < 0)
+                    goto fail;
+                if (!res)
+                    break;
+
+                res = ff_frame_new_side_data_from_buf(c, frame, AV_FRAME_DATA_A53_CC, &buf);
+                if (res < 0)
+                    goto fail;
+
+                c->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
+                break;
+            }
+            default: // ignore unsupported identifiers
+                break;
+            }
+            break;
+        }
+        case ITU_T_T35_PROVIDER_CODE_SMTPE: {
+            AVDynamicHDRPlus *hdrplus;
+            int provider_oriented_code = bytestream2_get_be16(&gb);
+            int application_identifier = bytestream2_get_byte(&gb);
+
+            if (itut_t35->country_code != ITU_T_T35_COUNTRY_CODE_US ||
+                provider_oriented_code != 1 || application_identifier != 4)
                 break;
 
-            if (!av_frame_new_side_data_from_buf(frame, AV_FRAME_DATA_A53_CC, buf))
-                av_buffer_unref(&buf);
+            hdrplus = av_dynamic_hdr_plus_create_side_data(frame);
+            if (!hdrplus) {
+                res = AVERROR(ENOMEM);
+                goto fail;
+            }
 
-            c->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
+            res = av_dynamic_hdr_plus_from_t35(hdrplus, gb.buffer,
+                                               bytestream2_get_bytes_left(&gb));
+            if (res < 0)
+                goto fail;
             break;
         }
-        default: // ignore unsupported identifiers
+        case ITU_T_T35_PROVIDER_CODE_DOLBY: {
+            int provider_oriented_code = bytestream2_get_be32(&gb);
+            if (itut_t35->country_code != ITU_T_T35_COUNTRY_CODE_US ||
+                provider_oriented_code != 0x800)
+                break;
+
+            res = ff_dovi_rpu_parse(&dav1d->dovi, gb.buffer, gb.buffer_end - gb.buffer,
+                                    c->err_recognition);
+            if (res < 0) {
+                av_log(c, AV_LOG_WARNING, "Error parsing DOVI OBU.\n");
+                break; // ignore
+            }
+
+            res = ff_dovi_attach_side_data(&dav1d->dovi, frame);
+            if (res < 0)
+                goto fail;
             break;
         }
+        default: // ignore unsupported provider codes
+            break;
+        }
+#if FF_DAV1D_VERSION_AT_LEAST(6,9)
+        }
+#endif
     }
     if (p->frame_hdr->film_grain.present && (!dav1d->apply_grain ||
         (c->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN))) {
         AVFilmGrainParams *fgp = av_film_grain_params_create_side_data(frame);
+        const AVPixFmtDescriptor *pixdesc = av_pix_fmt_desc_get(frame->format);
+        av_assert0(pixdesc);
         if (!fgp) {
             res = AVERROR(ENOMEM);
             goto fail;
@@ -501,6 +598,14 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
 
         fgp->type = AV_FILM_GRAIN_PARAMS_AV1;
         fgp->seed = p->frame_hdr->film_grain.data.seed;
+        fgp->width = frame->width;
+        fgp->height = frame->height;
+        fgp->color_range = frame->color_range;
+        fgp->color_primaries = frame->color_primaries;
+        fgp->color_trc = frame->color_trc;
+        fgp->color_space = frame->colorspace;
+        fgp->subsampling_x = pixdesc->log2_chroma_w;
+        fgp->subsampling_y = pixdesc->log2_chroma_h;
         fgp->codec.aom.num_y_points = p->frame_hdr->film_grain.data.num_y_points;
         fgp->codec.aom.chroma_scaling_from_luma = p->frame_hdr->film_grain.data.chroma_scaling_from_luma;
         fgp->codec.aom.scaling_shift = p->frame_hdr->film_grain.data.scaling_shift;
@@ -543,6 +648,7 @@ static av_cold int libdav1d_close(AVCodecContext *c)
     Libdav1dContext *dav1d = c->priv_data;
 
     av_buffer_pool_uninit(&dav1d->pool);
+    ff_dovi_ctx_unref(&dav1d->dovi);
     dav1d_data_unref(&dav1d->data);
     dav1d_close(&dav1d->c);
 
@@ -555,12 +661,16 @@ static av_cold int libdav1d_close(AVCodecContext *c)
 #ifndef DAV1D_MAX_TILE_THREADS
 #define DAV1D_MAX_TILE_THREADS DAV1D_MAX_THREADS
 #endif
+#ifndef DAV1D_MAX_FRAME_DELAY
+#define DAV1D_MAX_FRAME_DELAY DAV1D_MAX_FRAME_THREADS
+#endif
 
 #define OFFSET(x) offsetof(Libdav1dContext, x)
 #define VD AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption libdav1d_options[] = {
     { "tilethreads", "Tile threads", OFFSET(tile_threads), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_TILE_THREADS, VD | AV_OPT_FLAG_DEPRECATED },
     { "framethreads", "Frame threads", OFFSET(frame_threads), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_FRAME_THREADS, VD | AV_OPT_FLAG_DEPRECATED },
+    { "max_frame_delay", "Max frame delay", OFFSET(max_frame_delay), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_FRAME_DELAY, VD },
     { "filmgrain", "Apply Film Grain", OFFSET(apply_grain), AV_OPT_TYPE_BOOL, { .i64 = -1 }, -1, 1, VD | AV_OPT_FLAG_DEPRECATED },
     { "oppoint",  "Select an operating point of the scalable bitstream", OFFSET(operating_point), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 31, VD },
     { "alllayers", "Output all spatial layers", OFFSET(all_layers), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VD },
@@ -576,7 +686,7 @@ static const AVClass libdav1d_class = {
 
 const FFCodec ff_libdav1d_decoder = {
     .p.name         = "libdav1d",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("dav1d AV1 decoder by VideoLAN"),
+    CODEC_LONG_NAME("dav1d AV1 decoder by VideoLAN"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_AV1,
     .priv_data_size = sizeof(Libdav1dContext),
@@ -585,7 +695,7 @@ const FFCodec ff_libdav1d_decoder = {
     .flush          = libdav1d_flush,
     FF_CODEC_RECEIVE_FRAME_CB(libdav1d_receive_frame),
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_SETS_PKT_DTS |
+    .caps_internal  = FF_CODEC_CAP_SETS_FRAME_PROPS |
                       FF_CODEC_CAP_AUTO_THREADS,
     .p.priv_class   = &libdav1d_class,
     .p.wrapper_name = "libdav1d",

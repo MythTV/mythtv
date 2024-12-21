@@ -19,6 +19,7 @@
  */
 
 #include "avstring.h"
+#include "macros.h"
 #include "mem.h"
 #include "spherical.h"
 
@@ -27,6 +28,8 @@ AVSphericalMapping *av_spherical_alloc(size_t *size)
     AVSphericalMapping *spherical = av_mallocz(sizeof(AVSphericalMapping));
     if (!spherical)
         return NULL;
+
+    spherical->projection = AV_SPHERICAL_RECTILINEAR;
 
     if (size)
         *size = sizeof(*spherical);
@@ -56,6 +59,9 @@ static const char *const spherical_projection_names[] = {
     [AV_SPHERICAL_EQUIRECTANGULAR]      = "equirectangular",
     [AV_SPHERICAL_CUBEMAP]              = "cubemap",
     [AV_SPHERICAL_EQUIRECTANGULAR_TILE] = "tiled equirectangular",
+    [AV_SPHERICAL_HALF_EQUIRECTANGULAR] = "half equirectangular",
+    [AV_SPHERICAL_RECTILINEAR]          = "rectilinear",
+    [AV_SPHERICAL_FISHEYE]              = "fisheye",
 };
 
 const char *av_spherical_projection_name(enum AVSphericalProjection projection)

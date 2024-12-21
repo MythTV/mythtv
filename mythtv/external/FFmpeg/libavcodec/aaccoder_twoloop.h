@@ -53,8 +53,6 @@
 /** Frequency in Hz for lower limit of noise substitution **/
 #define NOISE_LOW_LIMIT 4000
 
-#define sclip(x) av_clip(x,60,218)
-
 /* Reflects the cost to change codebooks */
 static inline int ff_pns_bits(SingleChannelElement *sce, int w, int g)
 {
@@ -103,7 +101,7 @@ static void search_for_quantizers_twoloop(AVCodecContext *avctx,
      */
     float sfoffs = av_clipf(log2f(120.0f / lambda) * 4.0f, -5, 10);
 
-    int fflag, minscaler, maxscaler, nminscaler;
+    int fflag, minscaler, nminscaler;
     int its  = 0;
     int maxits = 30;
     int allz = 0;
@@ -291,7 +289,7 @@ static void search_for_quantizers_twoloop(AVCodecContext *avctx,
 
     if (!allz)
         return;
-    s->abs_pow34(s->scoefs, sce->coeffs, 1024);
+    s->aacdsp.abs_pow34(s->scoefs, sce->coeffs, 1024);
     ff_quantize_band_cost_cache_init(s);
 
     for (i = 0; i < sizeof(minsf) / sizeof(minsf[0]); ++i)
@@ -574,12 +572,10 @@ static void search_for_quantizers_twoloop(AVCodecContext *avctx,
         }
 
         minscaler = SCALE_MAX_POS;
-        maxscaler = 0;
         for (w = 0; w < sce->ics.num_windows; w += sce->ics.group_len[w]) {
             for (g = 0;  g < sce->ics.num_swb; g++) {
                 if (!sce->zeroes[w*16+g]) {
                     minscaler = FFMIN(minscaler, sce->sf_idx[w*16+g]);
-                    maxscaler = FFMAX(maxscaler, sce->sf_idx[w*16+g]);
                 }
             }
         }

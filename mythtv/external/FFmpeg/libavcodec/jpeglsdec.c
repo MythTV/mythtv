@@ -25,6 +25,7 @@
  * JPEG-LS decoder.
  */
 
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "get_bits.h"
@@ -382,6 +383,19 @@ int ff_jpegls_decode_picture(MJpegDecodeContext *s, int near,
     state->T3     = s->t3;
     state->reset  = s->reset;
     ff_jpegls_reset_coding_parameters(state, 0);
+
+    /* Testing parameters here, we cannot test in LSE or SOF because
+     * these interdepend and are allowed in either order
+     */
+    if (state->maxval >= (1<<state->bpp) ||
+        state->T1 > state->T2 ||
+        state->T2 > state->T3 ||
+        state->T3 > state->maxval ||
+        state->reset > FFMAX(255, state->maxval)) {
+        ret = AVERROR_INVALIDDATA;
+        goto end;
+    }
+
     ff_jpegls_init_state(state);
 
     if (s->bits <= 8)
@@ -552,14 +566,13 @@ end:
 
 const FFCodec ff_jpegls_decoder = {
     .p.name         = "jpegls",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("JPEG-LS"),
+    CODEC_LONG_NAME("JPEG-LS"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_JPEGLS,
     .priv_data_size = sizeof(MJpegDecodeContext),
     .init           = ff_mjpeg_decode_init,
     .close          = ff_mjpeg_decode_end,
-    FF_CODEC_RECEIVE_FRAME_CB(ff_mjpeg_receive_frame),
+    FF_CODEC_DECODE_CB(ff_mjpeg_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP |
-                      FF_CODEC_CAP_SETS_PKT_DTS,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

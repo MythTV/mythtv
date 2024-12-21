@@ -12,7 +12,6 @@
 #include "libmyth/audio/audiooutputsettings.h"
 #include "libmyth/audio/audiosettings.h"
 #include "libmyth/audio/volumebase.h"
-#include "libmyth/mythaverror.h"
 #include "libmyth/output.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"

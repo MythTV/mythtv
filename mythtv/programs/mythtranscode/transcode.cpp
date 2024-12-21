@@ -1211,8 +1211,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
-                    long sync_offset =
-                        player->UpdateStoredFrameNum(curFrameNum);
+                    long sync_offset = 0;
                     m_nvr->UpdateSeekTable(num_keyframes, sync_offset);
                     ReencoderAddKFA(curFrameNum, lastKeyFrame, num_keyframes);
                     num_keyframes++;
@@ -1231,7 +1230,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 // from here on the timecode is on the output time base
             frame.m_timecode -= timecodeOffset;
 
-            if (!player->WriteStoredData(m_outBuffer, (did_ff == 0), timecodeOffset))
+            if (!((did_ff == 0) && copyvideo))
             {
                 if (video_aspect != new_aspect)
                 {

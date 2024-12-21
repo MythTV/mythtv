@@ -28,6 +28,7 @@
 #include <math.h>
 #include <mysofa.h>
 
+#include "libavutil/mem.h"
 #include "libavutil/tx.h"
 #include "libavutil/avstring.h"
 #include "libavutil/channel_layout.h"
@@ -36,7 +37,7 @@
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "filters.h"
-#include "internal.h"
+#include "formats.h"
 #include "audio.h"
 
 #define TIME_DOMAIN      0
@@ -525,7 +526,7 @@ static int sofalizer_fast_convolute(AVFilterContext *ctx, void *arg, int jobnr, 
         }
 
         /* transform input signal of current channel to frequency domain */
-        tx_fn(fft, fft_out, fft_in, sizeof(float));
+        tx_fn(fft, fft_out, fft_in, sizeof(*fft_in));
 
         for (j = 0; j < n_fft; j++) {
             const AVComplexFloat *hcomplex = hrtf_offset + j;
@@ -541,7 +542,7 @@ static int sofalizer_fast_convolute(AVFilterContext *ctx, void *arg, int jobnr, 
     }
 
     /* transform output signal of current channel back to time domain */
-    itx_fn(ifft, fft_out, fft_acc, sizeof(float));
+    itx_fn(ifft, fft_out, fft_acc, sizeof(*fft_acc));
 
     for (j = 0; j < in->nb_samples; j++) {
         /* write output signal of current channel to output buffer */
@@ -597,7 +598,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     } else if (s->type == FREQUENCY_DOMAIN) {
         ff_filter_execute(ctx, sofalizer_fast_convolute, &td, NULL, 2);
     }
-    emms_c();
 
     /* display error message if clipping occurred */
     if (n_clippings[0] + n_clippings[1] > 0) {
@@ -634,9 +634,11 @@ static int activate(AVFilterContext *ctx)
     return FFERROR_NOT_READY;
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    struct SOFAlizerContext *s = ctx->priv;
+    const SOFAlizerContext *s = ctx->priv;
     AVFilterChannelLayouts *layouts = NULL;
     int ret, sample_rates[] = { 48000, -1 };
     static const enum AVSampleFormat sample_fmts[] = {
@@ -644,7 +646,7 @@ static int query_formats(AVFilterContext *ctx)
         AV_SAMPLE_FMT_NONE
     };
 
-    ret = ff_set_common_formats_from_list(ctx, sample_fmts);
+    ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts);
     if (ret)
         return ret;
 
@@ -652,7 +654,7 @@ static int query_formats(AVFilterContext *ctx)
     if (!layouts)
         return AVERROR(ENOMEM);
 
-    ret = ff_channel_layouts_ref(layouts, &ctx->inputs[0]->outcfg.channel_layouts);
+    ret = ff_channel_layouts_ref(layouts, &cfg_in[0]->channel_layouts);
     if (ret)
         return ret;
 
@@ -661,12 +663,12 @@ static int query_formats(AVFilterContext *ctx)
     if (ret)
         return ret;
 
-    ret = ff_channel_layouts_ref(layouts, &ctx->outputs[0]->incfg.channel_layouts);
+    ret = ff_channel_layouts_ref(layouts, &cfg_out[0]->channel_layouts);
     if (ret)
         return ret;
 
     sample_rates[0] = s->sample_rate;
-    return ff_set_common_samplerates_from_list(ctx, sample_rates);
+    return ff_set_common_samplerates_from_list2(ctx, cfg_in, cfg_out, sample_rates);
 }
 
 static int getfilter_float(AVFilterContext *ctx, float x, float y, float z,
@@ -832,7 +834,7 @@ static int load_data(AVFilterContext *ctx, int azim, int elev, float radius, int
     s->n_fft = n_fft = 1 << (32 - ff_clz(n_max + s->framesize));
 
     if (s->type == FREQUENCY_DOMAIN) {
-        float scale;
+        float scale = 1.f;
 
         av_tx_uninit(&s->fft[0]);
         av_tx_uninit(&s->fft[1]);
@@ -927,9 +929,9 @@ static int load_data(AVFilterContext *ctx, int azim, int elev, float radius, int
             }
 
             /* actually transform to frequency domain (IRs -> HRTFs) */
-            s->tx_fn[0](s->fft[0], fft_out_l, fft_in_l, sizeof(float));
+            s->tx_fn[0](s->fft[0], fft_out_l, fft_in_l, sizeof(*fft_in_l));
             memcpy(data_hrtf_l + offset, fft_out_l, n_fft * sizeof(*fft_out_l));
-            s->tx_fn[1](s->fft[1], fft_out_r, fft_in_r, sizeof(float));
+            s->tx_fn[1](s->fft[1], fft_out_r, fft_in_r, sizeof(*fft_in_r));
             memcpy(data_hrtf_r + offset, fft_out_r, n_fft * sizeof(*fft_out_r));
         }
     }
@@ -1062,9 +1064,9 @@ static const AVOption sofalizer_options[] = {
     { "rotation",  "set rotation"  , OFFSET(rotation),  AV_OPT_TYPE_FLOAT,  {.dbl=0},    -360, 360, .flags = FLAGS },
     { "elevation", "set elevation",  OFFSET(elevation), AV_OPT_TYPE_FLOAT,  {.dbl=0},     -90,  90, .flags = FLAGS },
     { "radius",    "set radius",     OFFSET(radius),    AV_OPT_TYPE_FLOAT,  {.dbl=1},       0,   5, .flags = FLAGS },
-    { "type",      "set processing", OFFSET(type),      AV_OPT_TYPE_INT,    {.i64=1},       0,   1, .flags = FLAGS, "type" },
-    { "time",      "time domain",      0,               AV_OPT_TYPE_CONST,  {.i64=0},       0,   0, .flags = FLAGS, "type" },
-    { "freq",      "frequency domain", 0,               AV_OPT_TYPE_CONST,  {.i64=1},       0,   0, .flags = FLAGS, "type" },
+    { "type",      "set processing", OFFSET(type),      AV_OPT_TYPE_INT,    {.i64=1},       0,   1, .flags = FLAGS, .unit = "type" },
+    { "time",      "time domain",      0,               AV_OPT_TYPE_CONST,  {.i64=0},       0,   0, .flags = FLAGS, .unit = "type" },
+    { "freq",      "frequency domain", 0,               AV_OPT_TYPE_CONST,  {.i64=1},       0,   0, .flags = FLAGS, .unit = "type" },
     { "speakers",  "set speaker custom positions", OFFSET(speakers_pos), AV_OPT_TYPE_STRING,  {.str=0},    0, 0, .flags = FLAGS },
     { "lfegain",   "set lfe gain",                 OFFSET(lfe_gain),     AV_OPT_TYPE_FLOAT,   {.dbl=0},  -20,40, .flags = FLAGS },
     { "framesize", "set frame size", OFFSET(framesize), AV_OPT_TYPE_INT,    {.i64=1024},1024,96000, .flags = FLAGS },
@@ -1086,13 +1088,6 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-static const AVFilterPad outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_sofalizer = {
     .name          = "sofalizer",
     .description   = NULL_IF_CONFIG_SMALL("SOFAlizer (Spatially Oriented Format for Acoustics)."),
@@ -1102,7 +1097,7 @@ const AVFilter ff_af_sofalizer = {
     .activate      = activate,
     .uninit        = uninit,
     FILTER_INPUTS(inputs),
-    FILTER_OUTPUTS(outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
+    FILTER_QUERY_FUNC2(query_formats),
     .flags         = AVFILTER_FLAG_SLICE_THREADS,
 };

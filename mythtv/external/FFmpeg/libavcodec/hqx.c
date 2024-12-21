@@ -504,9 +504,6 @@ static int hqx_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
     avctx->execute2(avctx, decode_slice_thread, NULL, NULL, 16);
 
-    ctx->pic->key_frame = 1;
-    ctx->pic->pict_type = AV_PICTURE_TYPE_I;
-
     *got_picture_ptr = 1;
 
     return avpkt->size;
@@ -517,9 +514,9 @@ static av_cold int hqx_decode_close(AVCodecContext *avctx)
     int i;
     HQXContext *ctx = avctx->priv_data;
 
-    ff_free_vlc(&ctx->cbp_vlc);
+    ff_vlc_free(&ctx->cbp_vlc);
     for (i = 0; i < 3; i++) {
-        ff_free_vlc(&ctx->dc_vlc[i]);
+        ff_vlc_free(&ctx->dc_vlc[i]);
     }
 
     return 0;
@@ -536,7 +533,7 @@ static av_cold int hqx_decode_init(AVCodecContext *avctx)
 
 const FFCodec ff_hqx_decoder = {
     .p.name         = "hqx",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Canopus HQX"),
+    CODEC_LONG_NAME("Canopus HQX"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_HQX,
     .priv_data_size = sizeof(HQXContext),
@@ -545,6 +542,5 @@ const FFCodec ff_hqx_decoder = {
     .close          = hqx_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
-                      FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

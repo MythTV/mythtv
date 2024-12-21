@@ -29,8 +29,7 @@
 
 #include <complex>
 extern "C" {
-    #include <libavutil/mem.h>
-    #include <libavcodec/avfft.h>
+    #include <libavutil/tx.h>
 }
 
 static constexpr uint16_t SAMPLES_DEFAULT_SIZE { 512 };
@@ -253,9 +252,13 @@ class Spectrogram : public VisualBase
     int            m_color {0};          // color or grayscale
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
-    FFTSample*     m_dftL { nullptr }; // real in, complex out
-    FFTSample*     m_dftR { nullptr };
-    RDFTContext*   m_rdftContext { nullptr };
+    float*         m_dftL { nullptr }; // real in, complex out
+    float*         m_dftR { nullptr };
+    float*         m_rdftTmp { nullptr };
+    static constexpr float k_txScale { 1.0F };
+    AVTXContext*   m_rdftContext { nullptr };
+    av_tx_fn       m_rdft        { nullptr };
+
     std::array<int,256*6> m_red   {0}; // continuous color spectrum
     std::array<int,256*6> m_green {0};
     std::array<int,256*6> m_blue  {0};
@@ -299,9 +302,12 @@ class Spectrum : public VisualBase
     int            m_fftlen {16 * 1024}; // window width
     QVector<float> m_sigL;               // decaying signal window
     QVector<float> m_sigR;
-    FFTSample*     m_dftL { nullptr }; // real in, complex out
-    FFTSample*     m_dftR { nullptr };
-    RDFTContext*   m_rdftContext { nullptr };
+    float*         m_dftL { nullptr }; // real in, complex out
+    float*         m_dftR { nullptr };
+    float*         m_rdftTmp { nullptr };
+    static constexpr float k_txScale { 1.0F };
+    AVTXContext*   m_rdftContext { nullptr };
+    av_tx_fn       m_rdft        { nullptr };
 };
 
 class Squares : public Spectrum

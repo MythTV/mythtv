@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-static int FUNC(filler_payload)
-    (CodedBitstreamContext *ctx, RWContext *rw,
-     SEIRawFillerPayload *current, SEIMessageState *state)
+SEI_FUNC(filler_payload, (CodedBitstreamContext *ctx, RWContext *rw,
+                          SEIRawFillerPayload *current,
+                          SEIMessageState *state))
 {
     int err, i;
 
@@ -34,9 +34,9 @@ static int FUNC(filler_payload)
     return 0;
 }
 
-static int FUNC(user_data_registered)
-    (CodedBitstreamContext *ctx, RWContext *rw,
-     SEIRawUserDataRegistered *current, SEIMessageState *state)
+SEI_FUNC(user_data_registered, (CodedBitstreamContext *ctx, RWContext *rw,
+                                SEIRawUserDataRegistered *current,
+                                SEIMessageState *state))
 {
     int err, i, j;
 
@@ -66,9 +66,9 @@ static int FUNC(user_data_registered)
     return 0;
 }
 
-static int FUNC(user_data_unregistered)
-    (CodedBitstreamContext *ctx, RWContext *rw,
-     SEIRawUserDataUnregistered *current, SEIMessageState *state)
+SEI_FUNC(user_data_unregistered, (CodedBitstreamContext *ctx, RWContext *rw,
+                                  SEIRawUserDataUnregistered *current,
+                                  SEIMessageState *state))
 {
     int err, i;
 
@@ -94,9 +94,72 @@ static int FUNC(user_data_unregistered)
     return 0;
 }
 
-static int FUNC(mastering_display_colour_volume)
-    (CodedBitstreamContext *ctx, RWContext *rw,
-     SEIRawMasteringDisplayColourVolume *current, SEIMessageState *state)
+SEI_FUNC(frame_packing_arrangement, (CodedBitstreamContext *ctx, RWContext *rw,
+                                     SEIRawFramePackingArrangement *current,
+                                     SEIMessageState *unused))
+{
+    int err;
+
+    HEADER("Frame Packing Arrangement");
+
+    ue(fp_arrangement_id, 0, MAX_UINT_BITS(31));
+    flag(fp_arrangement_cancel_flag);
+    if (!current->fp_arrangement_cancel_flag) {
+        u(7, fp_arrangement_type, 3, 5);
+        flag(fp_quincunx_sampling_flag);
+        u(6, fp_content_interpretation_type, 0, 2);
+        flag(fp_spatial_flipping_flag);
+        flag(fp_frame0_flipped_flag);
+        flag(fp_field_views_flag);
+        flag(fp_current_frame_is_frame0_flag);
+        flag(fp_frame0_self_contained_flag);
+        flag(fp_frame1_self_contained_flag);
+        if (!current->fp_quincunx_sampling_flag && current->fp_arrangement_type != 5) {
+            ub(4, fp_frame0_grid_position_x);
+            ub(4, fp_frame0_grid_position_y);
+            ub(4, fp_frame1_grid_position_x);
+            ub(4, fp_frame1_grid_position_y);
+        }
+        fixed(8, fp_arrangement_reserved_byte, 0);
+        flag(fp_arrangement_persistence_flag);
+    }
+    flag(fp_upsampled_aspect_ratio_flag);
+
+    return 0;
+}
+
+SEI_FUNC(decoded_picture_hash, (CodedBitstreamContext *ctx,
+                                RWContext *rw,
+                                SEIRawDecodedPictureHash *current,
+                                SEIMessageState *unused))
+{
+    int err, c_idx, i;
+
+    HEADER("Decoded Picture Hash");
+
+    u(8, dph_sei_hash_type, 0, 2);
+    flag(dph_sei_single_component_flag);
+    ub(7, dph_sei_reserved_zero_7bits);
+
+    for (c_idx = 0; c_idx < (current->dph_sei_single_component_flag ? 1 : 3);
+         c_idx++) {
+        if (current->dph_sei_hash_type == 0) {
+            for (i = 0; i < 16; i++)
+                us(8, dph_sei_picture_md5[c_idx][i], 0x00, 0xff, 2, c_idx, i);
+        } else if (current->dph_sei_hash_type == 1) {
+            us(16, dph_sei_picture_crc[c_idx], 0x0000, 0xffff, 1, c_idx);
+        } else if (current->dph_sei_hash_type == 2) {
+            us(32, dph_sei_picture_checksum[c_idx], 0x00000000, 0xffffffff, 1,
+               c_idx);
+        }
+    }
+    return 0;
+}
+
+SEI_FUNC(mastering_display_colour_volume,
+         (CodedBitstreamContext *ctx, RWContext *rw,
+          SEIRawMasteringDisplayColourVolume *current,
+          SEIMessageState *state))
 {
     int err, c;
 
@@ -116,9 +179,9 @@ static int FUNC(mastering_display_colour_volume)
     return 0;
 }
 
-static int FUNC(content_light_level_info)
-    (CodedBitstreamContext *ctx, RWContext *rw,
-     SEIRawContentLightLevelInfo *current, SEIMessageState *state)
+SEI_FUNC(content_light_level_info, (CodedBitstreamContext *ctx, RWContext *rw,
+                                    SEIRawContentLightLevelInfo *current,
+                                    SEIMessageState *state))
 {
     int err;
 
@@ -130,16 +193,33 @@ static int FUNC(content_light_level_info)
     return 0;
 }
 
-static int FUNC(alternative_transfer_characteristics)
-    (CodedBitstreamContext *ctx, RWContext *rw,
-     SEIRawAlternativeTransferCharacteristics *current,
-     SEIMessageState *state)
+SEI_FUNC(alternative_transfer_characteristics,
+         (CodedBitstreamContext *ctx, RWContext *rw,
+          SEIRawAlternativeTransferCharacteristics *current,
+          SEIMessageState *state))
 {
     int err;
 
     HEADER("Alternative Transfer Characteristics");
 
     ub(8, preferred_transfer_characteristics);
+
+    return 0;
+}
+
+SEI_FUNC(ambient_viewing_environment,
+         (CodedBitstreamContext *ctx, RWContext *rw,
+          SEIRawAmbientViewingEnvironment *current,
+          SEIMessageState *state))
+{
+    static const uint16_t max_ambient_light_value = 50000;
+    int err;
+
+    HEADER("Ambient Viewing Environment");
+
+    u(32, ambient_illuminance, 1, MAX_UINT_BITS(32));
+    u(16, ambient_light_x, 0, max_ambient_light_value);
+    u(16, ambient_light_y, 0, max_ambient_light_value);
 
     return 0;
 }
@@ -217,7 +297,12 @@ static int FUNC(message)(CodedBitstreamContext *ctx, RWContext *rw,
     } else {
         uint8_t *data;
 
+#ifdef READ
+        allocate(current->payload_ref, current->payload_size);
+        current->payload = current->payload_ref;
+#else
         allocate(current->payload, current->payload_size);
+#endif
         data = current->payload;
 
         for (i = 0; i < current->payload_size; i++)

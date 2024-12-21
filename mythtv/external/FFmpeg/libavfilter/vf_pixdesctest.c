@@ -24,9 +24,10 @@
  */
 
 #include "libavutil/common.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 typedef struct PixdescTestContext {
@@ -115,18 +116,11 @@ static const AVFilterPad avfilter_vf_pixdesctest_inputs[] = {
     },
 };
 
-static const AVFilterPad avfilter_vf_pixdesctest_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_pixdesctest = {
     .name        = "pixdesctest",
     .description = NULL_IF_CONFIG_SMALL("Test pixel format definitions."),
     .priv_size   = sizeof(PixdescTestContext),
     .uninit      = uninit,
     FILTER_INPUTS(avfilter_vf_pixdesctest_inputs),
-    FILTER_OUTPUTS(avfilter_vf_pixdesctest_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
 };

@@ -19,9 +19,11 @@
  */
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "avfilter.h"
 #include "audio.h"
+#include "filters.h"
 #include "formats.h"
 
 typedef struct StereoToolsContext {
@@ -69,18 +71,18 @@ static const AVOption stereotools_options[] = {
     { "muter",       "mute R",           OFFSET(mute_r),      AV_OPT_TYPE_BOOL,   {.i64=0},   0,          1, A },
     { "phasel",      "phase L",          OFFSET(phase_l),     AV_OPT_TYPE_BOOL,   {.i64=0},   0,          1, A },
     { "phaser",      "phase R",          OFFSET(phase_r),     AV_OPT_TYPE_BOOL,   {.i64=0},   0,          1, A },
-    { "mode",        "set stereo mode",  OFFSET(mode),        AV_OPT_TYPE_INT,    {.i64=0},   0,         10, A, "mode" },
-    {     "lr>lr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=0},   0,          0, A, "mode" },
-    {     "lr>ms",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=1},   0,          0, A, "mode" },
-    {     "ms>lr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=2},   0,          0, A, "mode" },
-    {     "lr>ll",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=3},   0,          0, A, "mode" },
-    {     "lr>rr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=4},   0,          0, A, "mode" },
-    {     "lr>l+r",  0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=5},   0,          0, A, "mode" },
-    {     "lr>rl",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=6},   0,          0, A, "mode" },
-    {     "ms>ll",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=7},   0,          0, A, "mode" },
-    {     "ms>rr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=8},   0,          0, A, "mode" },
-    {     "ms>rl",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=9},   0,          0, A, "mode" },
-    {     "lr>l-r",  0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=10},  0,          0, A, "mode" },
+    { "mode",        "set stereo mode",  OFFSET(mode),        AV_OPT_TYPE_INT,    {.i64=0},   0,         10, A, .unit = "mode" },
+    {     "lr>lr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=0},   0,          0, A, .unit = "mode" },
+    {     "lr>ms",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=1},   0,          0, A, .unit = "mode" },
+    {     "ms>lr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=2},   0,          0, A, .unit = "mode" },
+    {     "lr>ll",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=3},   0,          0, A, .unit = "mode" },
+    {     "lr>rr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=4},   0,          0, A, .unit = "mode" },
+    {     "lr>l+r",  0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=5},   0,          0, A, .unit = "mode" },
+    {     "lr>rl",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=6},   0,          0, A, .unit = "mode" },
+    {     "ms>ll",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=7},   0,          0, A, .unit = "mode" },
+    {     "ms>rr",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=8},   0,          0, A, .unit = "mode" },
+    {     "ms>rl",   0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=9},   0,          0, A, .unit = "mode" },
+    {     "lr>l-r",  0,                  0,                   AV_OPT_TYPE_CONST,  {.i64=10},  0,          0, A, .unit = "mode" },
     { "slev",        "set side level",   OFFSET(slev),        AV_OPT_TYPE_DOUBLE, {.dbl=1},   0.015625,  64, A },
     { "sbal",        "set side balance", OFFSET(sbal),        AV_OPT_TYPE_DOUBLE, {.dbl=0},  -1,          1, A },
     { "mlev",        "set middle level", OFFSET(mlev),        AV_OPT_TYPE_DOUBLE, {.dbl=1},   0.015625,  64, A },
@@ -89,29 +91,41 @@ static const AVOption stereotools_options[] = {
     { "delay",       "set delay",        OFFSET(delay),       AV_OPT_TYPE_DOUBLE, {.dbl=0}, -20,         20, A },
     { "sclevel",     "set S/C level",    OFFSET(sc_level),    AV_OPT_TYPE_DOUBLE, {.dbl=1},   1,        100, A },
     { "phase",       "set stereo phase", OFFSET(phase),       AV_OPT_TYPE_DOUBLE, {.dbl=0},   0,        360, A },
-    { "bmode_in",    "set balance in mode", OFFSET(bmode_in), AV_OPT_TYPE_INT,    {.i64=0},   0,          2, A, "bmode" },
-    {     "balance",   0,                0,                   AV_OPT_TYPE_CONST,  {.i64=0},   0,          0, A, "bmode" },
-    {     "amplitude", 0,                0,                   AV_OPT_TYPE_CONST,  {.i64=1},   0,          0, A, "bmode" },
-    {     "power",     0,                0,                   AV_OPT_TYPE_CONST,  {.i64=2},   0,          0, A, "bmode" },
-    { "bmode_out", "set balance out mode", OFFSET(bmode_out), AV_OPT_TYPE_INT,    {.i64=0},   0,          2, A, "bmode" },
+    { "bmode_in",    "set balance in mode", OFFSET(bmode_in), AV_OPT_TYPE_INT,    {.i64=0},   0,          2, A, .unit = "bmode" },
+    {     "balance",   0,                0,                   AV_OPT_TYPE_CONST,  {.i64=0},   0,          0, A, .unit = "bmode" },
+    {     "amplitude", 0,                0,                   AV_OPT_TYPE_CONST,  {.i64=1},   0,          0, A, .unit = "bmode" },
+    {     "power",     0,                0,                   AV_OPT_TYPE_CONST,  {.i64=2},   0,          0, A, .unit = "bmode" },
+    { "bmode_out", "set balance out mode", OFFSET(bmode_out), AV_OPT_TYPE_INT,    {.i64=0},   0,          2, A, .unit = "bmode" },
     { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(stereotools);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layout = NULL;
+    static const enum AVSampleFormat formats[] = {
+        AV_SAMPLE_FMT_DBL,
+        AV_SAMPLE_FMT_NONE,
+    };
+    static const AVChannelLayout layouts[] = {
+        AV_CHANNEL_LAYOUT_STEREO,
+        { .nb_channels = 0 },
+    };
+
     int ret;
 
-    if ((ret = ff_add_format                 (&formats, AV_SAMPLE_FMT_DBL  )) < 0 ||
-        (ret = ff_set_common_formats         (ctx     , formats            )) < 0 ||
-        (ret = ff_add_channel_layout         (&layout , &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO)) < 0 ||
-        (ret = ff_set_common_channel_layouts (ctx     , layout             )) < 0)
+
+    ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, formats);
+    if (ret < 0)
         return ret;
 
-    return ff_set_common_all_samplerates(ctx);
+    ret = ff_set_common_channel_layouts_from_list2(ctx, cfg_in, cfg_out, layouts);
+    if (ret < 0)
+        return ret;
+
+    return 0;
 }
 
 static int config_input(AVFilterLink *inlink)
@@ -119,7 +133,7 @@ static int config_input(AVFilterLink *inlink)
     AVFilterContext *ctx = inlink->dst;
     StereoToolsContext *s = ctx->priv;
 
-    s->length = FFALIGN(inlink->sample_rate / 10, 2);
+    s->length = FFALIGN((inlink->sample_rate + 9) / 10, 2);
     if (!s->buffer)
         s->buffer = av_calloc(s->length, sizeof(*s->buffer));
     if (!s->buffer)
@@ -365,13 +379,6 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-static const AVFilterPad outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_stereotools = {
     .name           = "stereotools",
     .description    = NULL_IF_CONFIG_SMALL("Apply various stereo tools."),
@@ -379,8 +386,8 @@ const AVFilter ff_af_stereotools = {
     .priv_class     = &stereotools_class,
     .uninit         = uninit,
     FILTER_INPUTS(inputs),
-    FILTER_OUTPUTS(outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = process_command,
     .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

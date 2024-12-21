@@ -19,11 +19,11 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 typedef struct DBlurContext {
@@ -47,7 +47,7 @@ typedef struct DBlurContext {
 
 static const AVOption dblur_options[] = {
     { "angle",  "set angle",            OFFSET(angle),  AV_OPT_TYPE_FLOAT, {.dbl=45},  0.0,  360, FLAGS },
-    { "radius", "set radius",           OFFSET(radius), AV_OPT_TYPE_FLOAT, {.dbl=5},     1, 8192, FLAGS },
+    { "radius", "set radius",           OFFSET(radius), AV_OPT_TYPE_FLOAT, {.dbl=5},     0, 8192, FLAGS },
     { "planes", "set planes to filter", OFFSET(planes), AV_OPT_TYPE_INT,   {.i64=0xF},   0,  0xF, FLAGS },
     { NULL }
 };
@@ -67,7 +67,7 @@ static int filter_horizontally(AVFilterContext *ctx, int width, int height)
     float g;
 
     if (s->R3 > 0) {
-        for (int y = 1; y < height - 1; y++) {
+        for (int y = 1; y < height; y++) {
             g = q * f(y, 0) + c * f(y, 0);
             for (int x = 0; x < width; x++) {
                 f(y, x) = b0 * f(y, x) + b1 * f(y - 1, x) + g;
@@ -83,7 +83,7 @@ static int filter_horizontally(AVFilterContext *ctx, int width, int height)
             }
         }
     } else {
-        for (int y = 1; y < height - 1; y++) {
+        for (int y = 1; y < height; y++) {
             g = q * f(y, width - 1) + c * f(y, width - 1);
             for (int x = width - 1; x >= 0; x--) {
                 f(y, x) = b0 * f(y, x) + b1 * f(y - 1, x) + g;
@@ -299,13 +299,6 @@ static const AVFilterPad dblur_inputs[] = {
     },
 };
 
-static const AVFilterPad dblur_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_dblur = {
     .name          = "dblur",
     .description   = NULL_IF_CONFIG_SMALL("Apply Directional Blur filter."),
@@ -313,7 +306,7 @@ const AVFilter ff_vf_dblur = {
     .priv_class    = &dblur_class,
     .uninit        = uninit,
     FILTER_INPUTS(dblur_inputs),
-    FILTER_OUTPUTS(dblur_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     .process_command = ff_filter_process_command,

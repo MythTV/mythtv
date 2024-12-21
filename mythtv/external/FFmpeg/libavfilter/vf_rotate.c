@@ -33,7 +33,7 @@
 
 #include "avfilter.h"
 #include "drawutils.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 #include <float.h>
@@ -258,8 +258,8 @@ static uint8_t *interpolate_bilinear16(uint8_t *dst_color,
 {
     int int_x = av_clip(x>>16, 0, max_x);
     int int_y = av_clip(y>>16, 0, max_y);
-    int frac_x = x&0xFFFF;
-    int frac_y = y&0xFFFF;
+    int64_t frac_x = x&0xFFFF;
+    int64_t frac_y = y&0xFFFF;
     int i;
     int int_x1 = FFMIN(int_x+1, max_x);
     int int_y1 = FFMIN(int_y+1, max_y);
@@ -269,10 +269,10 @@ static uint8_t *interpolate_bilinear16(uint8_t *dst_color,
         int s01 = AV_RL16(&src[src_linestep * int_x1 + i + src_linesize * int_y ]);
         int s10 = AV_RL16(&src[src_linestep * int_x  + i + src_linesize * int_y1]);
         int s11 = AV_RL16(&src[src_linestep * int_x1 + i + src_linesize * int_y1]);
-        int s0 = (((1<<16) - frac_x)*s00 + frac_x*s01);
-        int s1 = (((1<<16) - frac_x)*s10 + frac_x*s11);
+        int64_t s0 = (((1<<16) - frac_x)*s00 + frac_x*s01);
+        int64_t s1 = (((1<<16) - frac_x)*s10 + frac_x*s11);
 
-        AV_WL16(&dst_color[i], ((int64_t)((1<<16) - frac_y)*s0 + (int64_t)frac_y*s1) >> 32);
+        AV_WL16(&dst_color[i], (((1<<16) - frac_y)*s0 + frac_y*s1) >> 32);
     }
 
     return dst_color;
@@ -288,7 +288,9 @@ static int config_props(AVFilterLink *outlink)
     double res;
     char *expr;
 
-    ff_draw_init(&rot->draw, inlink->format, 0);
+    ret = ff_draw_init2(&rot->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    if (ret < 0)
+        return ret;
     ff_draw_color(&rot->draw, &rot->color, rot->fillcolor);
 
     rot->hsub = pixdesc->log2_chroma_w;
@@ -499,6 +501,7 @@ static int filter_slice(AVFilterContext *ctx, void *arg, int job, int nb_jobs)
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
+    FilterLink *inl = ff_filter_link(inlink);
     AVFilterContext *ctx = inlink->dst;
     AVFilterLink *outlink = ctx->outputs[0];
     AVFrame *out;
@@ -513,7 +516,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
     av_frame_copy_props(out, in);
 
-    rot->var_values[VAR_N] = inlink->frame_count_out;
+    rot->var_values[VAR_N] = inl->frame_count_out;
     rot->var_values[VAR_T] = TS2T(in->pts, inlink->time_base);
     rot->angle = res = av_expr_eval(rot->angle_expr, rot->var_values, rot);
 

@@ -45,15 +45,15 @@ static void test_motion(const char *name, me_cmp_func test_func)
     /* motion estimation can look up to 17 bytes ahead */
     static const int look_ahead = 17;
 
-    int i, x, y, d1, d2;
+    int i, x, y, h, d1, d2;
     uint8_t *ptr;
 
     LOCAL_ALIGNED_16(uint8_t, img1, [WIDTH * HEIGHT]);
     LOCAL_ALIGNED_16(uint8_t, img2, [WIDTH * HEIGHT]);
 
     declare_func_emms(AV_CPU_FLAG_MMX, int, struct MpegEncContext *c,
-                      uint8_t *blk1 /* align width (8 or 16) */,
-                      uint8_t *blk2 /* align 1 */, ptrdiff_t stride,
+                      const uint8_t *blk1 /* align width (8 or 16) */,
+                      const uint8_t *blk2 /* align 1 */, ptrdiff_t stride,
                       int h);
 
     if (test_func == NULL) {
@@ -68,18 +68,21 @@ static void test_motion(const char *name, me_cmp_func test_func)
         for (i = 0; i < ITERATIONS; i++) {
             x = rnd() % (WIDTH - look_ahead);
             y = rnd() % (HEIGHT - look_ahead);
+            // Pick a random h between 4 and 16; pick an even value.
+            h = 4 + ((rnd() % (16 + 1 - 4)) & ~1);
 
             ptr = img2 + y * WIDTH + x;
-            d2 = call_ref(NULL, img1, ptr, WIDTH, 8);
-            d1 = call_new(NULL, img1, ptr, WIDTH, 8);
+            d2 = call_ref(NULL, img1, ptr, WIDTH, h);
+            d1 = call_new(NULL, img1, ptr, WIDTH, h);
 
             if (d1 != d2) {
                 fail();
-                printf("func: %s, x=%d y=%d, error: asm=%d c=%d\n", name, x, y, d1, d2);
+                printf("func: %s, x=%d y=%d h=%d, error: asm=%d c=%d\n", name, x, y, h, d1, d2);
                 break;
             }
         }
-        // benchmark with the final value of ptr
+        // Test with a fixed offset, for benchmark stability
+        ptr = img2 + 3 * WIDTH + 3;
         bench_new(NULL, img1, ptr, WIDTH, 8);
     }
 }
@@ -91,12 +94,6 @@ static void test_motion(const char *name, me_cmp_func test_func)
     XX(vsad)                                                                   \
     XX(vsse)                                                                   \
     XX(nsse)                                                                   \
-    XX(me_pre_cmp)                                                             \
-    XX(me_cmp)                                                                 \
-    XX(me_sub_cmp)                                                             \
-    XX(mb_cmp)                                                                 \
-    XX(ildct_cmp)                                                              \
-    XX(frame_skip_cmp)                                                         \
     XX(median_sad)
 
 // tests for functions not yet implemented
@@ -115,16 +112,11 @@ static void test_motion(const char *name, me_cmp_func test_func)
 static void check_motion(void)
 {
     char buf[64];
-    AVCodecContext *av_ctx;
+    /* Setup AVCodecContext in a way that does not pull in all of libavcodec */
+    AVCodecContext av_ctx = { .codec_id = AV_CODEC_ID_NONE, .flags = AV_CODEC_FLAG_BITEXACT };
     MECmpContext me_ctx;
 
-    memset(&me_ctx, 0, sizeof(me_ctx));
-
-    /* allocate AVCodecContext */
-    av_ctx = avcodec_alloc_context3(NULL);
-    av_ctx->flags |= AV_CODEC_FLAG_BITEXACT;
-
-    ff_me_cmp_init(&me_ctx, av_ctx);
+    ff_me_cmp_init(&me_ctx, &av_ctx);
 
     for (int i = 0; i < FF_ARRAY_ELEMS(me_ctx.pix_abs); i++) {
         for (int j = 0; j < FF_ARRAY_ELEMS(me_ctx.pix_abs[0]); j++) {
@@ -140,8 +132,6 @@ static void check_motion(void)
     }
     ME_CMP_1D_ARRAYS(XX)
 #undef XX
-
-    avcodec_free_context(&av_ctx);
 }
 
 void checkasm_check_motion(void)

@@ -73,6 +73,12 @@ MBASE_PUBLIC QString logStrerror(int errnum);
 #define ENO (QString("\n\t\t\teno: ") + logStrerror(errno))
 #define ENO_STR ENO.toLocal8Bit().constData()
 
+inline QString pointerToQString(const void *p)
+{
+    return QStringLiteral("0x%1").arg(reinterpret_cast<quintptr>(p),
+                    sizeof(void*) * 2, 16, QChar('0'));
+}
+
 #endif
 
 /*

@@ -1,4 +1,6 @@
 ﻿// MythTV
+#include "libmyth/mythavframe.h"
+
 #ifdef USING_DRM_VIDEO
 #include "libmythui/platforms/mythdisplaydrm.h"
 #endif
@@ -474,9 +476,12 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
 
                 // add another frame
                 MythAVFrame sourceframe;
-                sourceframe->top_field_first =
-                    static_cast<int>(Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst);
-                sourceframe->interlaced_frame = 1;
+                sourceframe->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
+                if (Frame->m_interlacedReverse ^ Frame->m_topFieldFirst)
+                {
+                    sourceframe->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+                }
+                sourceframe->flags |= AV_FRAME_FLAG_INTERLACED;
                 sourceframe->data[3] = Frame->m_buffer;
                 auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->m_priv[0]);
                 sourceframe->buf[0] = buffer ? av_buffer_ref(buffer) : nullptr;

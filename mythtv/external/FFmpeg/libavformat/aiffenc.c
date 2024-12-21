@@ -30,6 +30,7 @@
 #include "avio_internal.h"
 #include "isom.h"
 #include "id3v2.h"
+#include "mux.h"
 
 typedef struct AIFFOutputContext {
     const AVClass *class;
@@ -53,7 +54,7 @@ static int put_id3v2_tags(AVFormatContext *s, AIFFOutputContext *aiff)
     if (!s->metadata && !s->nb_chapters && !list_entry)
         return 0;
 
-    avio_wl32(pb, MKTAG('I', 'D', '3', ' '));
+    avio_wb32(pb, MKBETAG('I', 'D', '3', ' '));
     avio_wb32(pb, 0);
     pos = avio_tell(pb);
 
@@ -86,13 +87,15 @@ static void put_meta(AVFormatContext *s, const char *key, uint32_t id)
     AVIOContext *pb = s->pb;
 
     if (tag = av_dict_get(s->metadata, key, NULL, 0)) {
-        int size = strlen(tag->value);
+        size_t size = strlen(tag->value);
 
-        avio_wl32(pb, id);
-        avio_wb32(pb, FFALIGN(size, 2));
+        // AIFF tags are zero-padded to an even length.
+        // So simply copy the terminating \0 if the length is odd.
+        size = FFALIGN(size, 2);
+
+        avio_wb32(pb, id);
+        avio_wb32(pb, size);
         avio_write(pb, tag->value, size);
-        if (size & 1)
-            avio_w8(pb, 0);
     }
 }
 
@@ -150,10 +153,10 @@ static int aiff_write_header(AVFormatContext *s)
         ff_mov_write_chan(pb, par->ch_layout.u.mask);
     }
 
-    put_meta(s, "title",     MKTAG('N', 'A', 'M', 'E'));
-    put_meta(s, "author",    MKTAG('A', 'U', 'T', 'H'));
-    put_meta(s, "copyright", MKTAG('(', 'c', ')', ' '));
-    put_meta(s, "comment",   MKTAG('A', 'N', 'N', 'O'));
+    put_meta(s, "title",     MKBETAG('N', 'A', 'M', 'E'));
+    put_meta(s, "author",    MKBETAG('A', 'U', 'T', 'H'));
+    put_meta(s, "copyright", MKBETAG('(', 'c', ')', ' '));
+    put_meta(s, "comment",   MKBETAG('A', 'N', 'N', 'O'));
 
     /* Common chunk */
     ffio_wfourcc(pb, "COMM");
@@ -284,18 +287,18 @@ static const AVClass aiff_muxer_class = {
     .version        = LIBAVUTIL_VERSION_INT,
 };
 
-const AVOutputFormat ff_aiff_muxer = {
-    .name              = "aiff",
-    .long_name         = NULL_IF_CONFIG_SMALL("Audio IFF"),
-    .mime_type         = "audio/aiff",
-    .extensions        = "aif,aiff,afc,aifc",
+const FFOutputFormat ff_aiff_muxer = {
+    .p.name            = "aiff",
+    .p.long_name       = NULL_IF_CONFIG_SMALL("Audio IFF"),
+    .p.mime_type       = "audio/aiff",
+    .p.extensions      = "aif,aiff,afc,aifc",
     .priv_data_size    = sizeof(AIFFOutputContext),
-    .audio_codec       = AV_CODEC_ID_PCM_S16BE,
-    .video_codec       = AV_CODEC_ID_PNG,
+    .p.audio_codec     = AV_CODEC_ID_PCM_S16BE,
+    .p.video_codec     = AV_CODEC_ID_PNG,
     .write_header      = aiff_write_header,
     .write_packet      = aiff_write_packet,
     .write_trailer     = aiff_write_trailer,
     .deinit            = aiff_deinit,
-    .codec_tag         = ff_aiff_codec_tags_list,
-    .priv_class        = &aiff_muxer_class,
+    .p.codec_tag       = ff_aiff_codec_tags_list,
+    .p.priv_class      = &aiff_muxer_class,
 };

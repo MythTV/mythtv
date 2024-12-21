@@ -26,10 +26,11 @@
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "texturedsp.h"
 #include "vbn.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 
 typedef struct VBNContext {
     TextureDSPContext texdsp;
@@ -150,9 +151,6 @@ static int vbn_decode_frame(AVCodecContext *avctx,
     if (ret < 0)
         goto out;
 
-    frame->pict_type = AV_PICTURE_TYPE_I;
-    frame->key_frame = 1;
-
     if (format == VBN_FORMAT_RAW) {
         uint8_t *flipped = frame->data[0] + frame->linesize[0] * (frame->height - 1);
         av_image_copy_plane(flipped, -frame->linesize[0], image_buf ? image_buf : gb->buffer, linesize, linesize, frame->height);
@@ -162,7 +160,9 @@ static int vbn_decode_frame(AVCodecContext *avctx,
         ctx->dec.raw_ratio = 16;
         ctx->dec.frame_data.out = frame->data[0] + frame->linesize[0] * (frame->height - 1);
         ctx->dec.stride = -frame->linesize[0];
-        avctx->execute2(avctx, ff_texturedsp_decompress_thread, &ctx->dec, NULL, ctx->dec.slice_count);
+        ctx->dec.width  = avctx->coded_width;
+        ctx->dec.height = avctx->coded_height;
+        ff_texturedsp_exec_decompress_threads(avctx, &ctx->dec);
     }
 
     *got_frame = 1;
@@ -175,12 +175,11 @@ out:
 
 const FFCodec ff_vbn_decoder = {
     .p.name         = "vbn",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Vizrt Binary Image"),
+    CODEC_LONG_NAME("Vizrt Binary Image"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_VBN,
     .init           = vbn_init,
     FF_CODEC_DECODE_CB(vbn_decode_frame),
     .priv_data_size = sizeof(VBNContext),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE
 };

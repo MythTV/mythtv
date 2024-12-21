@@ -52,7 +52,7 @@ function(find_or_build_ffmpeg)
     --disable-stripping
     --disable-static
     --enable-shared
-    --extra-cflags=-w)
+    )
 
   if(NOT LIBS_INSTALL_PREFIX STREQUAL CMAKE_INSTALL_PREFIX)
     list(APPEND FF_ARGS --extra-cflags=-I${LIBS_INSTALL_PREFIX}/include
@@ -99,7 +99,6 @@ function(find_or_build_ffmpeg)
       ${CMAKE_COMMAND} -E env ${_PROGS} PKG_CONFIG_PATH=${PKG_CONFIG_PATH_STR}
       ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/FFmpeg/configure ${FF_ARGS}
       "${FF_PLATFORM_ARGS}"
-      $<IF:$<BOOL:${CRYSTALHD_FOUND}>,--enable-crystalhd,--disable-crystalhd>
       $<IF:$<BOOL:${SYSTEM_LIBBLURAY_FOUND}>,--enable-libbluray,--disable-libbluray>
       $<IF:$<TARGET_EXISTS:Fontconfig::Fontconfig::LIBXVID>,--enable-libfontconfig,--disable-libfontconfig>
       $<IF:$<TARGET_EXISTS:LibX264::LibX264>,--enable-libx264,--disable-libx264>
@@ -135,26 +134,6 @@ function(find_or_build_ffmpeg)
     DEPENDEES install
     WORKING_DIRECTORY <BINARY_DIR>
     COMMAND ${MAKE_EXECUTABLE} install-pkgconfig)
-
-  #
-  # Install internal headers that are used by MythTV.  This must go away if
-  # MythTV is ever want to use the distribution supplied FFmpeg.
-  #
-  set(FFMPEG_INSTALL_INCLUDEDIR ${FFMPEG_INSTALL_PREFIX}/include/mythtv/)
-  ExternalProject_Add_Step(
-    FFmpeg expose_internal_headers_hack
-    DEPENDEES install
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/mythtv/external/FFmpeg
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-            ${FFMPEG_INSTALL_INCLUDEDIR}/compat/cuda
-    COMMAND ${CMAKE_COMMAND} -E copy libavformat/url.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/libavformat/
-    COMMAND ${CMAKE_COMMAND} -E copy libavutil/wchar_filename.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/libavutil/
-    COMMAND ${CMAKE_COMMAND} -E copy compat/w32dlfcn.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/compat/
-    COMMAND ${CMAKE_COMMAND} -E copy compat/cuda/dynlink_loader.h
-            ${FFMPEG_INSTALL_INCLUDEDIR}/compat/cuda/)
 
 endfunction()
 

@@ -19,12 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/tx.h"
 #include "audio.h"
 #include "avfilter.h"
 #include "filters.h"
-#include "internal.h"
 
 typedef struct AudioPsyClipContext {
     const AVClass *class;
@@ -188,7 +188,7 @@ static int config_input(AVFilterLink *inlink)
     AudioPsyClipContext *s = ctx->priv;
     static const int points[][2] = { {0,14}, {125,14}, {250,16}, {500,18}, {1000,20}, {2000,20}, {4000,20}, {8000,17}, {16000,14}, {20000,-10} };
     static const int num_points = 10;
-    float scale;
+    float scale = 1.f;
     int ret;
 
     s->fft_size = inlink->sample_rate > 100000 ? 1024 : inlink->sample_rate > 50000 ? 512 : 256;
@@ -417,7 +417,7 @@ static void feed(AVFilterContext *ctx, int ch,
 
     apply_window(s, in_frame, windowed_frame, 0);
     r2c(windowed_frame, s->fft_size);
-    s->tx_fn(s->tx_ctx[ch], spectrum_buf, windowed_frame, sizeof(float));
+    s->tx_fn(s->tx_ctx[ch], spectrum_buf, windowed_frame, sizeof(AVComplexFloat));
     c2r(windowed_frame, s->fft_size);
     calculate_mask_curve(s, spectrum_buf, mask_curve);
 
@@ -447,11 +447,11 @@ static void feed(AVFilterContext *ctx, int ch,
         clip_to_window(s, windowed_frame, clipping_delta, delta_boost);
 
         r2c(clipping_delta, s->fft_size);
-        s->tx_fn(s->tx_ctx[ch], spectrum_buf, clipping_delta, sizeof(float));
+        s->tx_fn(s->tx_ctx[ch], spectrum_buf, clipping_delta, sizeof(AVComplexFloat));
 
         limit_clip_spectrum(s, spectrum_buf, mask_curve);
 
-        s->itx_fn(s->itx_ctx[ch], clipping_delta, spectrum_buf, sizeof(float));
+        s->itx_fn(s->itx_ctx[ch], clipping_delta, spectrum_buf, sizeof(AVComplexFloat));
         c2r(clipping_delta, s->fft_size);
 
         for (int i = 0; i < s->fft_size; i++)
@@ -556,6 +556,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
 
     s->in = in;
+    av_frame_copy_props(out, in);
     ff_filter_execute(ctx, psy_channels, out, NULL,
                       FFMIN(outlink->ch_layout.nb_channels, ff_filter_get_nb_threads(ctx)));
 
@@ -636,13 +637,6 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-static const AVFilterPad outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_AUDIO,
-    },
-};
-
 const AVFilter ff_af_apsyclip = {
     .name            = "apsyclip",
     .description     = NULL_IF_CONFIG_SMALL("Audio Psychoacoustic Clipper."),
@@ -650,7 +644,7 @@ const AVFilter ff_af_apsyclip = {
     .priv_class      = &apsyclip_class,
     .uninit          = uninit,
     FILTER_INPUTS(inputs),
-    FILTER_OUTPUTS(outputs),
+    FILTER_OUTPUTS(ff_audio_default_filterpad),
     FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_FLTP),
     .flags           = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
                        AVFILTER_FLAG_SLICE_THREADS,
