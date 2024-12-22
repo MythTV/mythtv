@@ -33,14 +33,18 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux|Windows" AND CMAKE_SYSTEM_PROCESSOR MATCHES
     find_program(_ffmpeg mythffmpeg)
     find_library(_avcodec mythavdevice)
     cmake_path(GET _avcodec PARENT_PATH _avcodec_path)
-    if(_ffmpeg AND _avcodec)
-      execute_process(
-        COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${_avcodec_path}
-                ${_ffmpeg} -decoders
-        OUTPUT_VARIABLE _output
-        ERROR_QUIET)
-      string(FIND ${_output} cuvid CUVID_OFFSET)
+    if(NOT EXISTS ${_ffmpeg})
+      message(FATAL_ERROR "Cannot find our ffmpeg executable at ${_ffmpeg}")
     endif()
+    if(NOT EXISTS ${_avcodec})
+      message(FATAL_ERROR "Cannot find our mythavdevice library ${_avcodec}")
+    endif()
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${_avcodec_path}
+              ${_ffmpeg} -decoders
+      OUTPUT_VARIABLE _output
+      ERROR_QUIET)
+    string(FIND ${_output} cuvid CUVID_OFFSET)
     if(NOT CUVID_OFFSET EQUAL -1)
       target_compile_definitions(PkgConfig::FFNVCODEC INTERFACE USING_NVDEC)
     endif()
@@ -513,14 +517,19 @@ if(APPLE)
   find_program(_ffmpeg mythffmpeg)
   find_library(_avcodec mythavdevice)
   cmake_path(GET _avcodec PARENT_PATH _avcodec_path)
-  if(_ffmpeg AND _avcodec)
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${_avcodec_path}
-              ${_ffmpeg} -decoders
-      OUTPUT_VARIABLE _output
-      ERROR_QUIET)
-    string(FIND ${_output} videotoolbox VIDEOTOOLBOX_OFFSET)
+  if(NOT EXISTS ${_ffmpeg})
+    message(FATAL_ERROR "Cannot find our ffmpeg executable at ${_ffmpeg}")
   endif()
+  if(NOT EXISTS ${_avcodec})
+    message(FATAL_ERROR "Cannot find our mythavdevice library ${_avcodec}")
+  endif()
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${_avcodec_path}
+            ${_ffmpeg} -decoders
+    OUTPUT_VARIABLE _output
+    ERROR_QUIET)
+    message(STATUS "Looking for videotoolbox: ${_output}")
+  string(FIND ${_output} videotoolbox VIDEOTOOLBOX_OFFSET)
   if(VIDEOTOOLBOX_OFFSET EQUAL -1)
     unset(APPLE_VIDEOTOOLBOX_LIBRARY)
   endif()
