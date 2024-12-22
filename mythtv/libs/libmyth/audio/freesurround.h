@@ -19,11 +19,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef FREESURROUND_H
 #define FREESURROUND_H
 
-#include "libmythbase/compat.h"  // instead of sys/types.h, for MinGW compatibility
+#include <cstdint>
+
+using uint = unsigned int;
 
 static constexpr uint16_t SURROUND_BUFSIZE { 8192 };
 
-class Q_DECL_EXPORT FreeSurround
+class FreeSurround
 {
 public:
     enum SurroundMode : std::uint8_t
@@ -61,16 +63,14 @@ private:
 
     // the changeable parameters
     struct fsurround_params {
-        int32_t center_width;           // presence of the center channel
-        int32_t dimension;              // dimension
+        int32_t center_width { 100 };   // presence of the center channel
+        int32_t dimension {      0 };   // dimension
         float   coeff_a   { 0.8165 };   // surround mixing coefficients
         float   coeff_b   { 0.5774 };   // surround mixing coefficients
         int32_t phasemode {      0 };   // phase shifting mode
         int32_t steering  {      1 };   // steering mode (0=simple, 1=linear)
         int32_t front_sep {    100 };   // front stereo separation
         int32_t rear_sep  {    100 };   // rear stereo separation
-        // (default) constructor
-        explicit fsurround_params(int32_t center_width=100, int32_t dimension=0);
     } m_params;
 
     // additional settings

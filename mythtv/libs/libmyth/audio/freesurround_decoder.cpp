@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "freesurround_decoder.h"
 
-#include "el_processor.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -277,13 +277,6 @@ private:
 
             } else {
                 // --- this is the old & simple steering mode ---
-
-                // calculate the amplitude/phase difference
-                float ampDiff = clamp_unit_mag((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
-                float phaseDiff = phaseL - phaseR;
-                if (phaseDiff < -PI) phaseDiff += 2*PI;
-                if (phaseDiff > PI) phaseDiff -= 2*PI;
-                phaseDiff = abs(phaseDiff);
 
                 // determine sound field x-position
                 m_xFs[f] = ampDiff;

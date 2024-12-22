@@ -107,7 +107,6 @@ target_link_libraries(
          mythbase
          mythui
          mythservicecontracts
-         mythfreesurround
          mythtv
          myth)
 
