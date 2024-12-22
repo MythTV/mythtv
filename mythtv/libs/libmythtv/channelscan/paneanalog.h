@@ -5,7 +5,7 @@
 #ifndef PANE_ANALOG_H
 #define PANE_ANALOG_H
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 class TransFreqTableSelector;
 

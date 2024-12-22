@@ -33,7 +33,7 @@
 #define SCANWIZARD_H
 
 // MythTV headers
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/scanwizardconfig.h"
