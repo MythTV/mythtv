@@ -4,14 +4,6 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
-if(NOT APPLE)
-  return()
-endif()
-
-if(NOT DARWIN_FRONTEND_BUNDLE)
-  return()
-endif()
-
 set(APP_NAME mythfrontend)
 set(APP_EXE_NAME ${APP_NAME})
 set(APP_EXES ${APP_NAME} mythpreviewgen mythutil mythmetadatalookup)
