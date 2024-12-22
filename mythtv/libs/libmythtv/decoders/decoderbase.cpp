@@ -734,10 +734,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         return DoRewind(desiredFrame, discardFrames);
     desiredFrame = std::max(desiredFrame, m_framesPlayed);
 
-    // Save rawframe state, for later restoration...
-    bool oldrawstate = m_getRawFrames;
-    m_getRawFrames = false;
-
     ConditionallyUpdatePosMap(desiredFrame);
 
     // Fetch last keyframe in position map
@@ -777,8 +773,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
         if (m_atEof)
         {
-            // Re-enable rawframe state if it was enabled before FF
-            m_getRawFrames = oldrawstate;
             return false;
         }
     }
@@ -787,8 +781,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         QMutexLocker locker(&m_positionMapLock);
         if (m_positionMap.empty())
         {
-            // Re-enable rawframe state if it was enabled before FF
-            m_getRawFrames = oldrawstate;
             return false;
         }
     }
@@ -805,9 +797,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
     if (discardFrames || m_transcoding)
         m_parent->SetFramesPlayed(m_framesPlayed+1);
-
-    // Re-enable rawframe state if it was enabled before FF
-    m_getRawFrames = oldrawstate;
 
     return true;
 }
