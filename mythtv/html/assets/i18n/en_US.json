@@ -155,6 +155,9 @@
             "titlematch_desc": "Automatically set new recording rules to use this group if the title matches this regular expression. For example, \"(News|CNN)\" would match any title in which \"News\" or \"CNN\" appears.",
             "titlematch_label": "Title Match (regex)"
         },
+        "prevrecs": {
+            "heading": "Previously Recorded"
+        },
         "priorities": {
             "audiodesc_desc": "Additional priority when a showing is marked as being Audio Described.",
             "audiodesc_label": "Audio described priority",
