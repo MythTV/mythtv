@@ -71,7 +71,7 @@ file(
   #include <lame/lame.h>
   int main (int argc, char **argv)
   {
-    printf(get_lame_short_version());
+    printf(\"%s\", get_lame_short_version());
   }
   ")
 if(NOT CMAKE_CROSSCOMPILING)
