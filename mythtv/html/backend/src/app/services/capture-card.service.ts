@@ -42,6 +42,11 @@ export class CaptureCardService {
       { CardInputId: Cardid });
   }
 
+  public DeleteAllCaptureCards(): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Capture/RemoveAllCaptureCards' ,
+      { });
+  }
+
   public AddCaptureCard(card: CaptureCard): Observable<number> {
     return this.httpClient.post<number>('/Capture/AddCaptureCard',
       card);

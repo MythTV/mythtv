@@ -290,20 +290,14 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     if (this.successCount + this.errorCount < this.expectedCount)
       return;
     this.displayDeleteAll = false;
-    // delete on this host
-    this.deleteAllOnHost();
-    // delete on others
-    this.m_CaptureCardList.CaptureCardList.CaptureCards.forEach(card => {
-      if (card.HostName != this.m_hostName) {
-        // Delete any diseqc tree attached to the card
-        // this.deleteDiseqc(card.DiSEqCId);
-        card.DiSEqCId = 0;
-        console.log("DeleteThis (other host):", card.CardId);
-        this.expectedCount++;
-        this.captureCardService.DeleteCaptureCard(card.CardId)
-          .subscribe(this.delObserver);
-      }
-    });
+    this.errorCount = 0;
+    this.successCount = 0;
+    this.expectedCount = 0;
+    this.deletedTab = -1;
+    this.deleteAll = true;
+    this.expectedCount++;
+    this.captureCardService.DeleteAllCaptureCards()
+      .subscribe(this.delObserver);
   }
 
   confirm(message?: string): Observable<boolean> {
