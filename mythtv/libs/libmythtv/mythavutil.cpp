@@ -12,6 +12,7 @@
 #include <QFile>
 
 // MythTV
+#include "libmyth/mythaverror.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "mythdeinterlacer.h"
@@ -473,11 +474,7 @@ MythStreamInfoList::MythStreamInfoList(const QString& filename)
                 m_errorMsg = "File could not be opened";
                 break;
             default:
-                std::string errbuf;
-                if (av_strerror_stdstring(m_errorCode, errbuf) == 0)
-                    m_errorMsg = QString::fromStdString(errbuf);
-                else
-                    m_errorMsg = "UNKNOWN";
+                m_errorMsg = QString::fromStdString(av_make_error_stdstring_unknown(m_errorCode));
         }
         LOG(VB_GENERAL, LOG_ERR,
             QString("MythStreamInfoList failed for %1. Error code:%2 Message:%3")

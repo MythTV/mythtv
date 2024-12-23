@@ -22,13 +22,17 @@
 #include <stdint.h>
 
 #include "libavutil/attributes.h"
+#include "avcodec.h"
 #include "codec.h"
+#include "config.h"
 
 /**
- * The codec does not modify any global variables in the init function,
- * allowing to call the init function without locking any global mutexes.
+ * The codec is not known to be init-threadsafe (i.e. it might be unsafe
+ * to initialize this codec and another codec concurrently, typically because
+ * the codec calls external APIs that are not known to be thread-safe).
+ * Therefore calling the codec's init function needs to be guarded with a lock.
  */
-#define FF_CODEC_CAP_INIT_THREADSAFE        (1 << 0)
+#define FF_CODEC_CAP_NOT_INIT_THREADSAFE    (1 << 0)
 /**
  * The codec allows calling the close function for deallocation even if
  * the init function returned a failure. Without this capability flag, a
@@ -59,11 +63,10 @@
  * Codec initializes slice-based threading with a main function
  */
 #define FF_CODEC_CAP_SLICE_THREAD_HAS_MF    (1 << 5)
-/*
- * The codec supports frame threading and has inter-frame dependencies, so it
- * uses ff_thread_report/await_progress().
+/**
+ * The decoder might make use of the ProgressFrame API.
  */
-#define FF_CODEC_CAP_ALLOCATE_PROGRESS      (1 << 6)
+#define FF_CODEC_CAP_USES_PROGRESSFRAMES    (1 << 6)
 /**
  * Codec handles avctx->thread_count == 0 (auto) internally.
  */
@@ -73,6 +76,18 @@
  * internal logic derive them from AVCodecInternal.last_pkt_props.
  */
 #define FF_CODEC_CAP_SETS_FRAME_PROPS       (1 << 8)
+/**
+ * Codec supports embedded ICC profiles (AV_FRAME_DATA_ICC_PROFILE).
+ */
+#define FF_CODEC_CAP_ICC_PROFILES           (1 << 9)
+/**
+ * The encoder has AV_CODEC_CAP_DELAY set, but does not actually have delay - it
+ * only wants to be flushed at the end to update some context variables (e.g.
+ * 2pass stats) or produce a trailing packet. Besides that it immediately
+ * produces exactly one output packet per each input frame, just as no-delay
+ * encoders do.
+ */
+#define FF_CODEC_CAP_EOF_FLUSH              (1 << 10)
 
 /**
  * FFCodec.codec_tags termination value
@@ -118,7 +133,13 @@ typedef struct FFCodec {
     /**
      * Internal codec capabilities FF_CODEC_CAP_*.
      */
-    unsigned caps_internal:29;
+    unsigned caps_internal:27;
+
+    /**
+     * This field determines the video color ranges supported by an encoder.
+     * Should be set to a bitmask of AVCOL_RANGE_MPEG and AVCOL_RANGE_JPEG.
+     */
+    unsigned color_ranges:2;
 
     /**
      * This field determines the type of the codec (decoder/encoder)
@@ -151,14 +172,6 @@ typedef struct FFCodec {
      * Private codec-specific defaults.
      */
     const FFCodecDefault *defaults;
-
-    /**
-     * Initialize codec static data, called from av_codec_iterate().
-     *
-     * This is not intended for time consuming operations as it is
-     * run for every codec regardless of that codec being used.
-     */
-    void (*init_static_data)(struct FFCodec *codec);
 
     int (*init)(struct AVCodecContext *);
 
@@ -249,7 +262,51 @@ typedef struct FFCodec {
      * List of supported codec_tags, terminated by FF_CODEC_TAGS_END.
      */
     const uint32_t *codec_tags;
+
+    /**
+     * Custom callback for avcodec_get_supported_config(). If absent,
+     * ff_default_get_supported_config() will be used. `out_num_configs` will
+     * always be set to a valid pointer.
+     */
+    int (*get_supported_config)(const AVCodecContext *avctx,
+                                const AVCodec *codec,
+                                enum AVCodecConfig config,
+                                unsigned flags,
+                                const void **out_configs,
+                                int *out_num_configs);
 } FFCodec;
+
+/**
+ * Default implementation for avcodec_get_supported_config(). Will return the
+ * relevant fields from AVCodec if present, or NULL otherwise.
+ *
+ * For AVCODEC_CONFIG_COLOR_RANGE, the output will depend on the bitmask in
+ * FFCodec.color_ranges, with a value of 0 returning NULL.
+ */
+int ff_default_get_supported_config(const AVCodecContext *avctx,
+                                    const AVCodec *codec,
+                                    enum AVCodecConfig config,
+                                    unsigned flags,
+                                    const void **out_configs,
+                                    int *out_num_configs);
+
+#if CONFIG_SMALL
+#define CODEC_LONG_NAME(str) .p.long_name = NULL
+#else
+#define CODEC_LONG_NAME(str) .p.long_name = str
+#endif
+
+#if HAVE_THREADS
+#define UPDATE_THREAD_CONTEXT(func) \
+        .update_thread_context          = (func)
+#define UPDATE_THREAD_CONTEXT_FOR_USER(func) \
+        .update_thread_context_for_user = (func)
+#else
+#define UPDATE_THREAD_CONTEXT(func) \
+        .update_thread_context          = NULL
+#define UPDATE_THREAD_CONTEXT_FOR_USER(func) \
+        .update_thread_context_for_user = NULL
+#endif
 
 #define FF_CODEC_DECODE_CB(func)                          \
     .cb_type           = FF_CODEC_CB_TYPE_DECODE,         \

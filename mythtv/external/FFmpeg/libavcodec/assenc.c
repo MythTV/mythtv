@@ -45,49 +45,46 @@ static int ass_encode_frame(AVCodecContext *avctx,
                             unsigned char *buf, int bufsize,
                             const AVSubtitle *sub)
 {
-    int i, len, total_len = 0;
+    size_t len;
 
-    for (i=0; i<sub->num_rects; i++) {
-        const char *ass = sub->rects[i]->ass;
-
-        if (sub->rects[i]->type != SUBTITLE_ASS) {
-            av_log(avctx, AV_LOG_ERROR, "Only SUBTITLE_ASS type supported.\n");
-            return AVERROR(EINVAL);
-        }
-
-        len = av_strlcpy(buf+total_len, ass, bufsize-total_len);
-
-        if (len > bufsize-total_len-1) {
-            av_log(avctx, AV_LOG_ERROR, "Buffer too small for ASS event.\n");
-            return AVERROR_BUFFER_TOO_SMALL;
-        }
-
-        total_len += len;
+    if (sub->num_rects != 1) {
+        av_log(avctx, AV_LOG_ERROR, "Only one rect per AVSubtitle is supported in ASS.\n");
+        return AVERROR_INVALIDDATA;
     }
 
-    return total_len;
+    if (sub->rects[0]->type != SUBTITLE_ASS) {
+        av_log(avctx, AV_LOG_ERROR, "Only SUBTITLE_ASS type supported.\n");
+        return AVERROR(EINVAL);
+    }
+
+    len = av_strlcpy(buf, sub->rects[0]->ass, bufsize);
+
+    if (len >= bufsize) {
+        av_log(avctx, AV_LOG_ERROR, "Buffer too small for ASS event.\n");
+        return AVERROR_BUFFER_TOO_SMALL;
+    }
+
+    return len;
 }
 
 #if CONFIG_SSA_ENCODER
 const FFCodec ff_ssa_encoder = {
     .p.name       = "ssa",
-    .p.long_name  = NULL_IF_CONFIG_SMALL("ASS (Advanced SubStation Alpha) subtitle"),
+    CODEC_LONG_NAME("ASS (Advanced SubStation Alpha) subtitle"),
     .p.type       = AVMEDIA_TYPE_SUBTITLE,
     .p.id         = AV_CODEC_ID_ASS,
     .init         = ass_encode_init,
     FF_CODEC_ENCODE_SUB_CB(ass_encode_frame),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif
 
 #if CONFIG_ASS_ENCODER
 const FFCodec ff_ass_encoder = {
     .p.name       = "ass",
-    .p.long_name  = NULL_IF_CONFIG_SMALL("ASS (Advanced SubStation Alpha) subtitle"),
+    CODEC_LONG_NAME("ASS (Advanced SubStation Alpha) subtitle"),
     .p.type       = AVMEDIA_TYPE_SUBTITLE,
     .p.id         = AV_CODEC_ID_ASS,
     .init         = ass_encode_init,
     FF_CODEC_ENCODE_SUB_CB(ass_encode_frame),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };
 #endif

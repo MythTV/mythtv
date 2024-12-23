@@ -26,6 +26,7 @@
 
 // MythTV
 #include "libmyth/audio/audiooutpututil.h"
+#include "libmyth/mythaverror.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "mythavutil.h"
@@ -44,14 +45,7 @@ extern "C" {
 
 MythAVFormatWriter::~MythAVFormatWriter()
 {
-    if (m_ctx)
-    {
-        av_write_trailer(m_ctx);
-        avio_closep(&m_ctx->pb);
-        for(uint i = 0; i < m_ctx->nb_streams; i++)
-            av_freep(reinterpret_cast<void*>(&m_ctx->streams[i]));
-        av_freep(reinterpret_cast<void*>(&m_ctx));
-    }
+    CloseFile();
 
     av_freep(reinterpret_cast<void*>(&m_audioInBuf));
     av_freep(reinterpret_cast<void*>(&m_audioInPBuf));
@@ -138,33 +132,42 @@ bool MythAVFormatWriter::Init(void)
 
 bool MythAVFormatWriter::OpenFile(void)
 {
-    if (!(m_fmt.flags & AVFMT_NOFILE))
+    bool success = openFileHelper();
+    if (!success)
     {
-        if (avio_open(&m_ctx->pb, m_filename.toLatin1().constData(), AVIO_FLAG_WRITE) < 0)
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): avio_open() failed");
-            return false;
-        }
+        Cleanup();
     }
+    return success;
+}
 
+bool MythAVFormatWriter::openFileHelper()
+{
+    delete m_buffer;
     m_buffer = MythMediaBuffer::Create(m_filename, true);
 
     if (!m_buffer || !m_buffer->GetLastError().isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + QString("OpenFile(): RingBuffer::Create() failed: '%1'")
             .arg(m_buffer ? m_buffer->GetLastError() : ""));
-        Cleanup();
         return false;
     }
 
-    m_avfBuffer    = new MythAVFormatBuffer(m_buffer);
-    auto *url      = reinterpret_cast<URLContext*>(m_ctx->pb->opaque);
-    url->prot      = MythAVFormatBuffer::GetURLProtocol();
-    url->priv_data = static_cast<void*>(m_avfBuffer);
+    delete m_avfBuffer;
+    m_avfBuffer = nullptr;
+    m_ctx->pb = nullptr;
+    if (!(m_fmt.flags & AVFMT_NOFILE))
+    {
+        m_avfBuffer = new MythAVFormatBuffer(m_buffer, true, true);
+        m_ctx->pb = m_avfBuffer->getAVIOContext();
+        if (m_ctx->pb == nullptr)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): failed to allocate AVIOContext");
+            return false;
+        }
+    }
 
     if (avformat_write_header(m_ctx, nullptr) < 0)
     {
-        Cleanup();
         return false;
     }
 
@@ -173,8 +176,6 @@ bool MythAVFormatWriter::OpenFile(void)
 
 void MythAVFormatWriter::Cleanup(void)
 {
-    if (m_ctx && m_ctx->pb)
-        avio_closep(&m_ctx->pb);
     delete m_avfBuffer;
     m_avfBuffer = nullptr;
     delete m_buffer;
@@ -186,7 +187,9 @@ bool MythAVFormatWriter::CloseFile(void)
     if (m_ctx)
     {
         av_write_trailer(m_ctx);
-        avio_close(m_ctx->pb);
+        delete m_avfBuffer;
+        m_avfBuffer = nullptr;
+        m_ctx->pb = nullptr;
         for(uint i = 0; i < m_ctx->nb_streams; i++)
             av_freep(reinterpret_cast<void*>(&m_ctx->streams[i]));
         av_freep(reinterpret_cast<void*>(&m_ctx));
@@ -597,13 +600,20 @@ AVStream* MythAVFormatWriter::AddAudioStream(void)
 
 bool MythAVFormatWriter::FindAudioFormat(AVCodecContext *Ctx, const AVCodec *Codec, AVSampleFormat Format)
 {
-    if (Codec->sample_fmts)
+    const AVSampleFormat *sample_fmts = nullptr;
+    int out_num_configs = 0;
+    int ret = avcodec_get_supported_config(nullptr, Codec, AV_CODEC_CONFIG_SAMPLE_FORMAT,
+                                           0, (const void **) &sample_fmts, &out_num_configs);
+    if (ret < 0)
+        return false;
+
+    if (sample_fmts)
     {
-        for (int i = 0; Codec->sample_fmts[i] != AV_SAMPLE_FMT_NONE; i++)
+        for (int i = 0; i < out_num_configs; i++)
         {
-            if (av_get_packed_sample_fmt(Codec->sample_fmts[i]) == Format)
+            if (av_get_packed_sample_fmt(sample_fmts[i]) == Format)
             {
-                Ctx->sample_fmt = Codec->sample_fmts[i];
+                Ctx->sample_fmt = sample_fmts[i];
                 return true;
             }
         }
@@ -692,28 +702,33 @@ AVRational MythAVFormatWriter::GetCodecTimeBase(void)
     result.den = static_cast<int>(floor(m_frameRate * 100));
     result.num = 100;
 
-    if (m_avVideoCodec && m_avVideoCodec->supported_framerates)
+    if (m_avVideoCodec)
     {
-        const AVRational *rates = m_avVideoCodec->supported_framerates;
-        AVRational req = { result.den, result.num };
-        const AVRational *best = nullptr;
-        AVRational best_error= { INT_MAX, 1 };
-        for (; rates->den != 0; rates++)
+        const AVRational *supported_framerates = nullptr;
+        int out_num_configs = 0;
+        int ret = avcodec_get_supported_config(nullptr, m_avVideoCodec, AV_CODEC_CONFIG_FRAME_RATE,
+                                               0, (const void **) &supported_framerates, &out_num_configs);
+        if (ret >= 0)
         {
-            AVRational error = av_sub_q(req, *rates);
-            if (error.num < 0)
-                error.num *= -1;
-            if (av_cmp_q(error, best_error) < 0)
+            const AVRational *best = nullptr;
+            AVRational best_error = { INT_MAX, 1 };
+            for (int i = 0; i < out_num_configs; i++)
             {
-                best_error = error;
-                best = rates;
+                AVRational error = av_sub_q(result, supported_framerates[i]);
+                if (error.num < 0)
+                    error.num *= -1;
+                if (av_cmp_q(error, best_error) < 0)
+                {
+                    best_error = error;
+                    best = supported_framerates + i;
+                }
             }
-        }
 
-        if (best && best->num && best->den)
-        {
-            result.den = best->num;
-            result.num = best->den;
+            if (best && best->num && best->den)
+            {
+                result.den = best->num;
+                result.num = best->den;
+            }
         }
     }
 

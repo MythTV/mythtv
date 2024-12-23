@@ -21,6 +21,7 @@
  * DNN common functions different backends.
  */
 
+#include "libavutil/mem.h"
 #include "dnn_backend_common.h"
 
 #define DNN_ASYNC_SUCCESS (void *)0
@@ -41,13 +42,6 @@ int ff_check_exec_params(void *ctx, DNNBackendType backend, DNNFunctionType func
     if (!exec_params->out_frame && func_type == DFT_PROCESS_FRAME) {
         av_log(ctx, AV_LOG_ERROR, "out frame is NULL when execute model.\n");
         return AVERROR(EINVAL);
-    }
-
-    if (exec_params->nb_output != 1 && backend != DNN_TF) {
-        // currently, the filter does not need multiple outputs,
-        // so we just pending the support until we really need it.
-        avpriv_report_missing_feature(ctx, "multiple outputs");
-        return AVERROR(ENOSYS);
     }
 
     return 0;

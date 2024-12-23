@@ -128,6 +128,7 @@
 #define STREAM_TYPE_METADATA        0x15
 #define STREAM_TYPE_VIDEO_H264      0x1b
 #define STREAM_TYPE_VIDEO_HEVC      0x24
+#define STREAM_TYPE_VIDEO_VVC       0x33
 #define STREAM_TYPE_VIDEO_CAVS      0x42
 #define STREAM_TYPE_VIDEO_AVS2      0xd2
 #define STREAM_TYPE_VIDEO_AVS3      0xd4
@@ -163,6 +164,17 @@
 #define FMC_DESCRIPTOR               0x1f
 #define METADATA_DESCRIPTOR          0x26
 #define METADATA_STD_DESCRIPTOR      0x27
+
+/* DVB descriptor tag values [0x40, 0x7F] from
+   ETSI EN 300 468 Table 12: Possible locations of descriptors */
+#define SERVICE_DESCRIPTOR           0x48
+#define STREAM_IDENTIFIER_DESCRIPTOR 0x52
+#define TELETEXT_DESCRIPTOR          0x56
+#define SUBTITLING_DESCRIPTOR        0x59
+#define AC3_DESCRIPTOR               0x6a /* AC-3_descriptor */
+#define ENHANCED_AC3_DESCRIPTOR      0x7a /* enhanced_AC-3_descriptor */
+#define DTS_DESCRIPTOR               0x7b
+#define EXTENSION_DESCRIPTOR         0x7f
 
 typedef struct MpegTSContext MpegTSContext;
 

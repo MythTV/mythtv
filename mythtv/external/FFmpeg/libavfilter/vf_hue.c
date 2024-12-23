@@ -28,12 +28,12 @@
 #include <float.h>
 #include "libavutil/eval.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
+#include "filters.h"
 #include "video.h"
 
 #define SAT_MIN_VAL -10
@@ -265,6 +265,7 @@ static const enum AVPixelFormat pix_fmts[] = {
 static int config_props(AVFilterLink *inlink)
 {
     HueContext *hue = inlink->dst->priv;
+    FilterLink   *l = ff_filter_link(inlink);
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
 
     hue->hsub = desc->log2_chroma_w;
@@ -272,8 +273,8 @@ static int config_props(AVFilterLink *inlink)
 
     hue->var_values[VAR_N]  = 0;
     hue->var_values[VAR_TB] = av_q2d(inlink->time_base);
-    hue->var_values[VAR_R]  = inlink->frame_rate.num == 0 || inlink->frame_rate.den == 0 ?
-        NAN : av_q2d(inlink->frame_rate);
+    hue->var_values[VAR_R]  = l->frame_rate.num == 0 || l->frame_rate.den == 0 ?
+        NAN : av_q2d(l->frame_rate);
 
     return 0;
 }
@@ -358,6 +359,7 @@ static void apply_lut10(HueContext *s,
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
 {
+    FilterLink *inl = ff_filter_link(inlink);
     HueContext *hue = inlink->dst->priv;
     AVFilterLink *outlink = inlink->dst->outputs[0];
     AVFrame *outpic;
@@ -379,7 +381,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpic)
         av_frame_copy_props(outpic, inpic);
     }
 
-    hue->var_values[VAR_N]   = inlink->frame_count_out;
+    hue->var_values[VAR_N]   = inl->frame_count_out;
     hue->var_values[VAR_T]   = TS2T(inpic->pts, inlink->time_base);
     hue->var_values[VAR_PTS] = TS2D(inpic->pts);
 
@@ -500,13 +502,6 @@ static const AVFilterPad hue_inputs[] = {
     },
 };
 
-static const AVFilterPad hue_outputs[] = {
-    {
-        .name = "default",
-        .type = AVMEDIA_TYPE_VIDEO,
-    },
-};
-
 const AVFilter ff_vf_hue = {
     .name            = "hue",
     .description     = NULL_IF_CONFIG_SMALL("Adjust the hue and saturation of the input video."),
@@ -515,7 +510,7 @@ const AVFilter ff_vf_hue = {
     .uninit          = uninit,
     .process_command = process_command,
     FILTER_INPUTS(hue_inputs),
-    FILTER_OUTPUTS(hue_outputs),
+    FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
     .priv_class      = &hue_class,
     .flags           = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,

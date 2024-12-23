@@ -21,19 +21,19 @@
 
 #include <math.h>
 #include <stddef.h>
-#include <stdio.h>
 
 #define BITSTREAM_READER_LE
 
 #include "libavutil/channel_layout.h"
+#include "libavutil/mem_internal.h"
 #include "libavutil/thread.h"
 #include "libavutil/tx.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 
 typedef struct QDMCTone {
     uint8_t mode;
@@ -172,9 +172,9 @@ static av_cold void qdmc_init_static_data(void)
         static VLCElem vlc_buffer[13698];
         vtable[i].table           = &vlc_buffer[offset];
         vtable[i].table_allocated = FF_ARRAY_ELEMS(vlc_buffer) - offset;
-        ff_init_vlc_from_lengths(&vtable[i], huff_bits[i], huff_sizes[i],
+        ff_vlc_init_from_lengths(&vtable[i], huff_bits[i], huff_sizes[i],
                                  &hufftab[0][1], 2, &hufftab[0][0], 2, 1, -1,
-                                 INIT_VLC_LE | INIT_VLC_STATIC_OVERLONG, NULL);
+                                 VLC_INIT_LE | VLC_INIT_STATIC_OVERLONG, NULL);
         hufftab += huff_sizes[i];
         offset  += vtable[i].table_size;
     }
@@ -730,7 +730,7 @@ static int qdmc_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
 const FFCodec ff_qdmc_decoder = {
     .p.name           = "qdmc",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("QDesign Music Codec 1"),
+    CODEC_LONG_NAME("QDesign Music Codec 1"),
     .p.type           = AVMEDIA_TYPE_AUDIO,
     .p.id             = AV_CODEC_ID_QDMC,
     .priv_data_size   = sizeof(QDMCContext),
@@ -739,5 +739,4 @@ const FFCodec ff_qdmc_decoder = {
     FF_CODEC_DECODE_CB(qdmc_decode_frame),
     .flush            = qdmc_flush,
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE,
 };

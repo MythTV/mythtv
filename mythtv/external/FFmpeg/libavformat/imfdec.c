@@ -70,8 +70,8 @@
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
-#include "mxf.h"
 #include <inttypes.h>
 #include <libxml/parser.h>
 
@@ -233,7 +233,12 @@ static int parse_imf_asset_map_from_xml_dom(AVFormatContext *s,
 
         asset = &(asset_map->assets[asset_map->asset_count]);
 
-        if (ff_imf_xml_read_uuid(ff_imf_xml_get_child_element_by_name(asset_element, "Id"), asset->uuid)) {
+        if (!(node = ff_imf_xml_get_child_element_by_name(asset_element, "Id"))) {
+            av_log(s, AV_LOG_ERROR, "Unable to parse asset map XML - missing Id node\n");
+            return AVERROR_INVALIDDATA;
+        }
+
+        if (ff_imf_xml_read_uuid(node, asset->uuid)) {
             av_log(s, AV_LOG_ERROR, "Could not parse UUID from asset in asset map.\n");
             return AVERROR_INVALIDDATA;
         }
@@ -374,7 +379,6 @@ static int open_track_resource_context(AVFormatContext *s,
         return AVERROR(ENOMEM);
 
     track_resource->ctx->io_open = s->io_open;
-    track_resource->ctx->io_close = s->io_close;
     track_resource->ctx->io_close2 = s->io_close2;
     track_resource->ctx->flags |= s->flags & ~AVFMT_FLAG_CUSTOM_IO;
 
@@ -573,18 +577,14 @@ static int set_context_streams_from_tracks(AVFormatContext *s)
         first_resource_stream = c->tracks[i]->resources[0].ctx->streams[0];
         av_log(s, AV_LOG_DEBUG, "Open the first resource of track %d\n", c->tracks[i]->index);
 
-        /* Copy stream information */
-        asset_stream = avformat_new_stream(s, NULL);
+        asset_stream = ff_stream_clone(s, first_resource_stream);
         if (!asset_stream) {
-            av_log(s, AV_LOG_ERROR, "Could not create stream\n");
+            av_log(s, AV_LOG_ERROR, "Could not clone stream\n");
             return AVERROR(ENOMEM);
         }
+
         asset_stream->id = i;
-        ret = avcodec_parameters_copy(asset_stream->codecpar, first_resource_stream->codecpar);
-        if (ret < 0) {
-            av_log(s, AV_LOG_ERROR, "Could not copy stream parameters\n");
-            return ret;
-        }
+        asset_stream->nb_frames = 0;
         avpriv_set_pts_info(asset_stream,
                             first_resource_stream->pts_wrap_bits,
                             first_resource_stream->time_base.num,
@@ -626,6 +626,8 @@ static int imf_read_header(AVFormatContext *s)
     IMFContext *c = s->priv_data;
     char *asset_map_path;
     char *tmp_str;
+    AVDictionaryEntry* tcr;
+    char tc_buf[AV_TIMECODE_STR_SIZE];
     int ret = 0;
 
     c->interrupt_callback = &s->interrupt_callback;
@@ -642,8 +644,17 @@ static int imf_read_header(AVFormatContext *s)
 
     av_log(s, AV_LOG_DEBUG, "start parsing IMF CPL: %s\n", s->url);
 
-    if ((ret = ff_imf_parse_cpl(s->pb, &c->cpl)) < 0)
+    if ((ret = ff_imf_parse_cpl(s, s->pb, &c->cpl)) < 0)
         return ret;
+
+    tcr = av_dict_get(s->metadata, "timecode", NULL, 0);
+    if (!tcr && c->cpl->tc) {
+        ret = av_dict_set(&s->metadata, "timecode",
+                          av_timecode_make_string(c->cpl->tc, tc_buf, 0), 0);
+        if (ret)
+            return ret;
+        av_log(s, AV_LOG_INFO, "Setting timecode to IMF CPL timecode %s\n", tc_buf);
+    }
 
     av_log(s,
            AV_LOG_DEBUG,
@@ -684,9 +695,9 @@ static int imf_read_header(AVFormatContext *s)
 static IMFVirtualTrackPlaybackCtx *get_next_track_with_minimum_timestamp(AVFormatContext *s)
 {
     IMFContext *c = s->priv_data;
-    IMFVirtualTrackPlaybackCtx *track;
-
+    IMFVirtualTrackPlaybackCtx *track = NULL;
     AVRational minimum_timestamp = av_make_q(INT32_MAX, 1);
+
     for (uint32_t i = c->track_count; i > 0; i--) {
         av_log(s, AV_LOG_TRACE, "Compare track %d timestamp " AVRATIONAL_FORMAT
                " to minimum " AVRATIONAL_FORMAT
@@ -701,8 +712,6 @@ static IMFVirtualTrackPlaybackCtx *get_next_track_with_minimum_timestamp(AVForma
         }
     }
 
-    av_log(s, AV_LOG_DEBUG, "Found next track to read: %d (timestamp: %lf / %lf)\n",
-           track->index, av_q2d(track->current_timestamp), av_q2d(minimum_timestamp));
     return track;
 }
 
@@ -764,6 +773,14 @@ static int imf_read_packet(AVFormatContext *s, AVPacket *pkt)
     AVRational next_timestamp;
 
     track = get_next_track_with_minimum_timestamp(s);
+
+    if (!track) {
+        av_log(s, AV_LOG_ERROR, "No track found for playback\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    av_log(s, AV_LOG_DEBUG, "Found track %d to read at timestamp %lf\n",
+           track->index, av_q2d(track->current_timestamp));
 
     ret = get_resource_context_for_timestamp(s, track, &resource);
     if (ret)
@@ -994,12 +1011,12 @@ static const AVClass imf_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-const AVInputFormat ff_imf_demuxer = {
-    .name           = "imf",
-    .long_name      = NULL_IF_CONFIG_SMALL("IMF (Interoperable Master Format)"),
-    .flags          = AVFMT_EXPERIMENTAL | AVFMT_NO_BYTE_SEEK,
-    .flags_internal = FF_FMT_INIT_CLEANUP,
-    .priv_class     = &imf_class,
+const FFInputFormat ff_imf_demuxer = {
+    .p.name         = "imf",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("IMF (Interoperable Master Format)"),
+    .p.flags        = AVFMT_NO_BYTE_SEEK,
+    .p.priv_class   = &imf_class,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .priv_data_size = sizeof(IMFContext),
     .read_probe     = imf_probe,
     .read_header    = imf_read_header,

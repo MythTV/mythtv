@@ -18,9 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <mfx/mfxvideo.h>
-#include <mfx/mfxplugin.h>
-#include <mfx/mfxjpeg.h>
+#include <mfxvideo.h>
+#include <mfxjpeg.h>
+#include <mfxvp8.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -30,15 +30,26 @@
 #include "libavutil/error.h"
 #include "libavutil/hwcontext.h"
 #include "libavutil/hwcontext_qsv.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "qsv_internal.h"
+#include "refstruct.h"
 
 #define MFX_IMPL_VIA_MASK(impl) (0x0f00 & (impl))
+#define QSV_HAVE_USER_PLUGIN    !QSV_ONEVPL
+#define QSV_HAVE_AUDIO          !QSV_ONEVPL
 
-#include "mfx/mfxvp8.h"
+#if QSV_HAVE_USER_PLUGIN
+#include <mfxplugin.h>
+#endif
+
+#if QSV_ONEVPL
+#include <mfxdispatcher.h>
+#else
+#define MFXUnload(a) do { } while(0)
+#endif
 
 int ff_qsv_codec_id_to_mfx(enum AVCodecID codec_id)
 {
@@ -62,6 +73,10 @@ int ff_qsv_codec_id_to_mfx(enum AVCodecID codec_id)
     case AV_CODEC_ID_AV1:
         return MFX_CODEC_AV1;
 #endif
+#if QSV_VERSION_ATLEAST(2, 11)
+    case AV_CODEC_ID_VVC:
+        return MFX_CODEC_VVC;
+#endif
 
     default:
         break;
@@ -76,10 +91,14 @@ static const struct {
 } qsv_iopatterns[] = {
     {MFX_IOPATTERN_IN_VIDEO_MEMORY,     "input is video memory surface"         },
     {MFX_IOPATTERN_IN_SYSTEM_MEMORY,    "input is system memory surface"        },
+#if QSV_HAVE_OPAQUE
     {MFX_IOPATTERN_IN_OPAQUE_MEMORY,    "input is opaque memory surface"        },
+#endif
     {MFX_IOPATTERN_OUT_VIDEO_MEMORY,    "output is video memory surface"        },
     {MFX_IOPATTERN_OUT_SYSTEM_MEMORY,   "output is system memory surface"       },
+#if QSV_HAVE_OPAQUE
     {MFX_IOPATTERN_OUT_OPAQUE_MEMORY,   "output is opaque memory surface"       },
+#endif
 };
 
 int ff_qsv_print_iopattern(void *log_ctx, int mfx_iopattern,
@@ -125,8 +144,12 @@ static const struct {
     { MFX_ERR_INVALID_VIDEO_PARAM,      AVERROR(EINVAL), "invalid video parameters"             },
     { MFX_ERR_UNDEFINED_BEHAVIOR,       AVERROR_BUG,     "undefined behavior"                   },
     { MFX_ERR_DEVICE_FAILED,            AVERROR(EIO),    "device failed"                        },
+#if QSV_HAVE_AUDIO
     { MFX_ERR_INCOMPATIBLE_AUDIO_PARAM, AVERROR(EINVAL), "incompatible audio parameters"        },
     { MFX_ERR_INVALID_AUDIO_PARAM,      AVERROR(EINVAL), "invalid audio parameters"             },
+#endif
+    { MFX_ERR_GPU_HANG,                 AVERROR(EIO),    "GPU Hang"                             },
+    { MFX_ERR_REALLOC_SURFACE,          AVERROR_UNKNOWN, "need bigger surface for output"       },
 
     { MFX_WRN_IN_EXECUTION,             0,               "operation in execution"               },
     { MFX_WRN_DEVICE_BUSY,              0,               "device busy"                          },
@@ -136,7 +159,13 @@ static const struct {
     { MFX_WRN_VALUE_NOT_CHANGED,        0,               "value is saturated"                   },
     { MFX_WRN_OUT_OF_RANGE,             0,               "value out of range"                   },
     { MFX_WRN_FILTER_SKIPPED,           0,               "filter skipped"                       },
+#if QSV_HAVE_AUDIO
     { MFX_WRN_INCOMPATIBLE_AUDIO_PARAM, 0,               "incompatible audio parameters"        },
+#endif
+
+#if QSV_VERSION_ATLEAST(1, 31)
+    { MFX_ERR_NONE_PARTIAL_OUTPUT,      0,               "partial output"                       },
+#endif
 };
 
 /**
@@ -183,41 +212,72 @@ enum AVPixelFormat ff_qsv_map_fourcc(uint32_t fourcc)
     case MFX_FOURCC_P8:   return AV_PIX_FMT_PAL8;
     case MFX_FOURCC_A2RGB10: return AV_PIX_FMT_X2RGB10;
     case MFX_FOURCC_RGB4: return AV_PIX_FMT_BGRA;
-#if CONFIG_VAAPI
     case MFX_FOURCC_YUY2: return AV_PIX_FMT_YUYV422;
     case MFX_FOURCC_Y210: return AV_PIX_FMT_Y210;
+    case MFX_FOURCC_AYUV: return AV_PIX_FMT_VUYX;
+    case MFX_FOURCC_Y410: return AV_PIX_FMT_XV30;
+#if QSV_VERSION_ATLEAST(1, 31)
+    case MFX_FOURCC_P016: return AV_PIX_FMT_P012;
+    case MFX_FOURCC_Y216: return AV_PIX_FMT_Y212;
+    case MFX_FOURCC_Y416: return AV_PIX_FMT_XV36;
 #endif
     }
     return AV_PIX_FMT_NONE;
 }
 
-int ff_qsv_map_pixfmt(enum AVPixelFormat format, uint32_t *fourcc)
+int ff_qsv_map_pixfmt(enum AVPixelFormat format, uint32_t *fourcc, uint16_t *shift)
 {
     switch (format) {
     case AV_PIX_FMT_YUV420P:
     case AV_PIX_FMT_YUVJ420P:
     case AV_PIX_FMT_NV12:
         *fourcc = MFX_FOURCC_NV12;
+        *shift = 0;
         return AV_PIX_FMT_NV12;
     case AV_PIX_FMT_YUV420P10:
     case AV_PIX_FMT_P010:
         *fourcc = MFX_FOURCC_P010;
+        *shift = 1;
         return AV_PIX_FMT_P010;
     case AV_PIX_FMT_X2RGB10:
         *fourcc = MFX_FOURCC_A2RGB10;
+        *shift = 1;
         return AV_PIX_FMT_X2RGB10;
     case AV_PIX_FMT_BGRA:
         *fourcc = MFX_FOURCC_RGB4;
+        *shift = 0;
         return AV_PIX_FMT_BGRA;
-#if CONFIG_VAAPI
     case AV_PIX_FMT_YUV422P:
     case AV_PIX_FMT_YUYV422:
         *fourcc = MFX_FOURCC_YUY2;
+        *shift = 0;
         return AV_PIX_FMT_YUYV422;
     case AV_PIX_FMT_YUV422P10:
     case AV_PIX_FMT_Y210:
         *fourcc = MFX_FOURCC_Y210;
+        *shift = 1;
         return AV_PIX_FMT_Y210;
+    case AV_PIX_FMT_VUYX:
+        *fourcc = MFX_FOURCC_AYUV;
+        *shift = 0;
+        return AV_PIX_FMT_VUYX;
+    case AV_PIX_FMT_XV30:
+        *fourcc = MFX_FOURCC_Y410;
+        *shift = 0;
+        return AV_PIX_FMT_XV30;
+#if QSV_VERSION_ATLEAST(1, 31)
+    case AV_PIX_FMT_P012:
+        *fourcc = MFX_FOURCC_P016;
+        *shift = 1;
+        return AV_PIX_FMT_P012;
+    case AV_PIX_FMT_Y212:
+        *fourcc = MFX_FOURCC_Y216;
+        *shift = 1;
+        return AV_PIX_FMT_Y212;
+    case AV_PIX_FMT_XV36:
+        *fourcc = MFX_FOURCC_Y416;
+        *shift = 1;
+        return AV_PIX_FMT_XV36;
 #endif
     default:
         return AVERROR(ENOSYS);
@@ -229,6 +289,7 @@ int ff_qsv_map_frame_to_surface(const AVFrame *frame, mfxFrameSurface1 *surface)
     switch (frame->format) {
     case AV_PIX_FMT_NV12:
     case AV_PIX_FMT_P010:
+    case AV_PIX_FMT_P012:
         surface->Data.Y  = frame->data[0];
         surface->Data.UV = frame->data[1];
         /* The SDK checks Data.V when using system memory for VP9 encoding */
@@ -248,10 +309,34 @@ int ff_qsv_map_frame_to_surface(const AVFrame *frame, mfxFrameSurface1 *surface)
         break;
 
     case AV_PIX_FMT_Y210:
+    case AV_PIX_FMT_Y212:
         surface->Data.Y16 = (mfxU16 *)frame->data[0];
         surface->Data.U16 = (mfxU16 *)frame->data[0] + 1;
         surface->Data.V16 = (mfxU16 *)frame->data[0] + 3;
         break;
+
+    case AV_PIX_FMT_VUYX:
+        surface->Data.V = frame->data[0];
+        surface->Data.U = frame->data[0] + 1;
+        surface->Data.Y = frame->data[0] + 2;
+        // Only set Data.A to a valid address, the SDK doesn't
+        // use the value from the frame.
+        surface->Data.A = frame->data[0] + 3;
+        break;
+
+    case AV_PIX_FMT_XV30:
+        surface->Data.U = frame->data[0];
+        break;
+
+    case AV_PIX_FMT_XV36:
+        surface->Data.U = frame->data[0];
+        surface->Data.Y = frame->data[0] + 2;
+        surface->Data.V = frame->data[0] + 4;
+        // Only set Data.A to a valid address, the SDK doesn't
+        // use the value from the frame.
+        surface->Data.A = frame->data[0] + 6;
+        break;
+
     default:
         return AVERROR(ENOSYS);
     }
@@ -323,6 +408,7 @@ enum AVPictureType ff_qsv_map_pictype(int mfx_pic_type)
 static int qsv_load_plugins(mfxSession session, const char *load_plugins,
                             void *logctx)
 {
+#if QSV_HAVE_USER_PLUGIN
     if (!load_plugins || !*load_plugins)
         return 0;
 
@@ -366,6 +452,7 @@ load_plugin_fail:
         if (err < 0)
             return err;
     }
+#endif
 
     return 0;
 
@@ -381,8 +468,8 @@ static int ff_qsv_set_display_handle(AVCodecContext *avctx, QSVSession *qs)
     AVVAAPIDeviceContext *hwctx;
     int ret;
 
-    av_dict_set(&child_device_opts, "kernel_driver", "i915", 0);
-    av_dict_set(&child_device_opts, "driver",        "iHD",  0);
+    av_dict_set(&child_device_opts, "vendor_id", "0x8086", 0);
+    av_dict_set(&child_device_opts, "driver",    "iHD",    0);
 
     ret = av_hwdevice_ctx_create(&qs->va_device_ref, AV_HWDEVICE_TYPE_VAAPI, NULL, child_device_opts, 0);
     av_dict_free(&child_device_opts);
@@ -404,27 +491,221 @@ static int ff_qsv_set_display_handle(AVCodecContext *avctx, QSVSession *qs)
 }
 #endif //AVCODEC_QSV_LINUX_SESSION_HANDLE
 
+#if QSV_ONEVPL
+static int qsv_new_mfx_loader(AVCodecContext *avctx,
+                              mfxIMPL implementation,
+                              mfxVersion *pver,
+                              void **ploader)
+{
+    mfxStatus sts;
+    mfxLoader loader = NULL;
+    mfxConfig cfg;
+    mfxVariant impl_value = {0};
+
+    loader = MFXLoad();
+    if (!loader) {
+        av_log(avctx, AV_LOG_ERROR, "Error creating a MFX loader\n");
+        goto fail;
+    }
+
+    /* Create configurations for implementation */
+    cfg = MFXCreateConfig(loader);
+    if (!cfg) {
+        av_log(avctx, AV_LOG_ERROR, "Error creating a MFX configurations\n");
+        goto fail;
+    }
+
+    impl_value.Type = MFX_VARIANT_TYPE_U32;
+    impl_value.Data.U32 = (implementation == MFX_IMPL_SOFTWARE) ?
+        MFX_IMPL_TYPE_SOFTWARE : MFX_IMPL_TYPE_HARDWARE;
+    sts = MFXSetConfigFilterProperty(cfg,
+                                     (const mfxU8 *)"mfxImplDescription.Impl", impl_value);
+    if (sts != MFX_ERR_NONE) {
+        av_log(avctx, AV_LOG_ERROR, "Error adding a MFX configuration "
+               "property: %d\n", sts);
+        goto fail;
+    }
+
+    impl_value.Type = MFX_VARIANT_TYPE_U32;
+    impl_value.Data.U32 = pver->Version;
+    sts = MFXSetConfigFilterProperty(cfg,
+                                     (const mfxU8 *)"mfxImplDescription.ApiVersion.Version",
+                                     impl_value);
+    if (sts != MFX_ERR_NONE) {
+        av_log(avctx, AV_LOG_ERROR, "Error adding a MFX configuration "
+               "property: %d\n", sts);
+        goto fail;
+    }
+
+    *ploader = loader;
+
+    return 0;
+
+fail:
+    if (loader)
+        MFXUnload(loader);
+
+    *ploader = NULL;
+    return AVERROR_UNKNOWN;
+}
+
+static int qsv_create_mfx_session_from_loader(void *ctx, mfxLoader loader, mfxSession *psession)
+{
+    mfxStatus sts;
+    mfxSession session = NULL;
+    uint32_t impl_idx = 0;
+
+    while (1) {
+        /* Enumerate all implementations */
+        mfxImplDescription *impl_desc;
+
+        sts = MFXEnumImplementations(loader, impl_idx,
+                                     MFX_IMPLCAPS_IMPLDESCSTRUCTURE,
+                                     (mfxHDL *)&impl_desc);
+        /* Failed to find an available implementation */
+        if (sts == MFX_ERR_NOT_FOUND)
+            break;
+        else if (sts != MFX_ERR_NONE) {
+            impl_idx++;
+            continue;
+        }
+
+        sts = MFXCreateSession(loader, impl_idx, &session);
+        MFXDispReleaseImplDescription(loader, impl_desc);
+        if (sts == MFX_ERR_NONE)
+            break;
+
+        impl_idx++;
+    }
+
+    if (sts != MFX_ERR_NONE) {
+        av_log(ctx, AV_LOG_ERROR, "Error creating a MFX session: %d.\n", sts);
+        goto fail;
+    }
+
+    *psession = session;
+
+    return 0;
+
+fail:
+    if (session)
+        MFXClose(session);
+
+    *psession = NULL;
+    return AVERROR_UNKNOWN;
+}
+
+static int qsv_create_mfx_session(AVCodecContext *avctx,
+                                  mfxIMPL implementation,
+                                  mfxVersion *pver,
+                                  int gpu_copy,
+                                  mfxSession *psession,
+                                  void **ploader)
+{
+    mfxLoader loader = NULL;
+
+    /* Don't create a new MFX loader if the input loader is valid */
+    if (*ploader == NULL) {
+        av_log(avctx, AV_LOG_VERBOSE,
+               "Use Intel(R) oneVPL to create MFX session, the required "
+               "implementation version is %d.%d\n",
+               pver->Major, pver->Minor);
+
+        if (qsv_new_mfx_loader(avctx, implementation, pver, (void **)&loader))
+            goto fail;
+
+        av_assert0(loader);
+    } else {
+        av_log(avctx, AV_LOG_VERBOSE,
+               "Use Intel(R) oneVPL to create MFX session with the specified MFX loader\n");
+
+        loader = *ploader;
+    }
+
+    if (qsv_create_mfx_session_from_loader(avctx, loader, psession))
+        goto fail;
+
+    if (!*ploader)
+        *ploader = loader;
+
+    return 0;
+
+fail:
+    if (!*ploader && loader)
+        MFXUnload(loader);
+
+    return AVERROR_UNKNOWN;
+}
+
+#else
+
+static int qsv_create_mfx_session(AVCodecContext *avctx,
+                                  mfxIMPL implementation,
+                                  mfxVersion *pver,
+                                  int gpu_copy,
+                                  mfxSession *psession,
+                                  void **ploader)
+{
+    mfxInitParam init_par = { MFX_IMPL_AUTO_ANY };
+    mfxSession session = NULL;
+    mfxStatus sts;
+
+    av_log(avctx, AV_LOG_VERBOSE,
+           "Use Intel(R) Media SDK to create MFX session, the required "
+           "implementation version is %d.%d\n",
+           pver->Major, pver->Minor);
+
+    *psession = NULL;
+    *ploader = NULL;
+
+    init_par.GPUCopy = gpu_copy;
+    init_par.Implementation = implementation;
+    init_par.Version = *pver;
+    sts = MFXInitEx(init_par, &session);
+    if (sts < 0)
+        return ff_qsv_print_error(avctx, sts,
+                                  "Error initializing a MFX session");
+    else if (sts > 0) {
+        ff_qsv_print_warning(avctx, sts,
+                             "Warning in MFX initialization");
+        return AVERROR_UNKNOWN;
+    }
+
+    *psession = session;
+
+    return 0;
+}
+
+#endif
+
 int ff_qsv_init_internal_session(AVCodecContext *avctx, QSVSession *qs,
                                  const char *load_plugins, int gpu_copy)
 {
+    mfxIMPL impls[] = {
 #if CONFIG_D3D11VA
-    mfxIMPL          impl = MFX_IMPL_AUTO_ANY | MFX_IMPL_VIA_D3D11;
-#else
-    mfxIMPL          impl = MFX_IMPL_AUTO_ANY;
+        MFX_IMPL_AUTO_ANY | MFX_IMPL_VIA_D3D11,
 #endif
+        MFX_IMPL_AUTO_ANY
+    };
+    mfxIMPL impl;
     mfxVersion        ver = { { QSV_VERSION_MINOR, QSV_VERSION_MAJOR } };
-    mfxInitParam init_par = { MFX_IMPL_AUTO_ANY };
 
     const char *desc;
     int ret;
 
-    init_par.GPUCopy        = gpu_copy;
-    init_par.Implementation = impl;
-    init_par.Version        = ver;
-    ret = MFXInitEx(init_par, &qs->session);
-    if (ret < 0)
-        return ff_qsv_print_error(avctx, ret,
-                                  "Error initializing an internal MFX session");
+    for (int i = 0; i < FF_ARRAY_ELEMS(impls); i++) {
+        ret = qsv_create_mfx_session(avctx, impls[i], &ver, gpu_copy, &qs->session,
+                                     &qs->loader);
+
+        if (ret == 0)
+            break;
+
+        if (i == FF_ARRAY_ELEMS(impls) - 1)
+            return ret;
+        else
+            av_log(avctx, AV_LOG_ERROR, "The current mfx implementation is not "
+                   "supported, try next mfx implementation.\n");
+    }
 
 #ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
     ret = ff_qsv_set_display_handle(avctx, qs);
@@ -464,20 +745,19 @@ int ff_qsv_init_internal_session(AVCodecContext *avctx, QSVSession *qs,
     return 0;
 }
 
-static void mids_buf_free(void *opaque, uint8_t *data)
+static void mids_buf_free(FFRefStructOpaque opaque, void *obj)
 {
-    AVBufferRef *hw_frames_ref = opaque;
+    AVBufferRef *hw_frames_ref = opaque.nc;
     av_buffer_unref(&hw_frames_ref);
-    av_freep(&data);
 }
 
-static AVBufferRef *qsv_create_mids(AVBufferRef *hw_frames_ref)
+static QSVMid *qsv_create_mids(AVBufferRef *hw_frames_ref)
 {
     AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)hw_frames_ref->data;
     AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
     int                  nb_surfaces = frames_hwctx->nb_surfaces;
 
-    AVBufferRef *mids_buf, *hw_frames_ref1;
+    AVBufferRef *hw_frames_ref1;
     QSVMid *mids;
     int i;
 
@@ -485,17 +765,10 @@ static AVBufferRef *qsv_create_mids(AVBufferRef *hw_frames_ref)
     if (!hw_frames_ref1)
         return NULL;
 
-    mids = av_calloc(nb_surfaces, sizeof(*mids));
+    mids = ff_refstruct_alloc_ext(nb_surfaces * sizeof(*mids), 0,
+                                  hw_frames_ref1, mids_buf_free);
     if (!mids) {
         av_buffer_unref(&hw_frames_ref1);
-        return NULL;
-    }
-
-    mids_buf = av_buffer_create((uint8_t*)mids, nb_surfaces * sizeof(*mids),
-                                mids_buf_free, hw_frames_ref1, 0);
-    if (!mids_buf) {
-        av_buffer_unref(&hw_frames_ref1);
-        av_freep(&mids);
         return NULL;
     }
 
@@ -505,15 +778,14 @@ static AVBufferRef *qsv_create_mids(AVBufferRef *hw_frames_ref)
         mid->hw_frames_ref = hw_frames_ref1;
     }
 
-    return mids_buf;
+    return mids;
 }
 
 static int qsv_setup_mids(mfxFrameAllocResponse *resp, AVBufferRef *hw_frames_ref,
-                          AVBufferRef *mids_buf)
+                          QSVMid *mids)
 {
     AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)hw_frames_ref->data;
     AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
-    QSVMid                     *mids = (QSVMid*)mids_buf->data;
     int                  nb_surfaces = frames_hwctx->nb_surfaces;
     int i;
 
@@ -534,12 +806,7 @@ static int qsv_setup_mids(mfxFrameAllocResponse *resp, AVBufferRef *hw_frames_re
         return AVERROR(ENOMEM);
     }
 
-    resp->mids[resp->NumFrameActual + 1] = av_buffer_ref(mids_buf);
-    if (!resp->mids[resp->NumFrameActual + 1]) {
-        av_buffer_unref((AVBufferRef**)&resp->mids[resp->NumFrameActual]);
-        av_freep(&resp->mids);
-        return AVERROR(ENOMEM);
-    }
+    resp->mids[resp->NumFrameActual + 1] = ff_refstruct_ref(mids);
 
     return 0;
 }
@@ -562,8 +829,16 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
         AVHWFramesContext *frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
         AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
         mfxFrameInfo      *i  = &req->Info;
-        mfxFrameInfo      *i1 = &frames_hwctx->surfaces[0].Info;
+        mfxFrameInfo      *i1;
 
+        if (!frames_hwctx->nb_surfaces) {
+            av_log(ctx->logctx, AV_LOG_DEBUG,
+                   "Dynamic frame pools, no frame is pre-allocated\n");
+
+            return MFX_ERR_NONE;
+        }
+
+        i1 = &frames_hwctx->surfaces[0].Info;
         if (i->Width  > i1->Width  || i->Height > i1->Height ||
             i->FourCC != i1->FourCC || i->ChromaFormat != i1->ChromaFormat) {
             av_log(ctx->logctx, AV_LOG_ERROR, "Mismatching surface properties in an "
@@ -573,7 +848,7 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
             return MFX_ERR_UNSUPPORTED;
         }
 
-        ret = qsv_setup_mids(resp, ctx->hw_frames_ctx, ctx->mids_buf);
+        ret = qsv_setup_mids(resp, ctx->hw_frames_ctx, ctx->mids);
         if (ret < 0) {
             av_log(ctx->logctx, AV_LOG_ERROR,
                    "Error filling an external frame allocation request\n");
@@ -582,11 +857,16 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
     } else if (req->Type & MFX_MEMTYPE_INTERNAL_FRAME) {
         /* internal frames -- allocate a new hw frames context */
         AVHWFramesContext *ext_frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
+        AVQSVFramesContext *ext_frames_hwctx = ext_frames_ctx->hwctx;
         mfxFrameInfo      *i  = &req->Info;
 
-        AVBufferRef *frames_ref, *mids_buf;
+        AVBufferRef *frames_ref;
+        QSVMid *mids;
         AVHWFramesContext *frames_ctx;
         AVQSVFramesContext *frames_hwctx;
+
+        if (!ext_frames_hwctx->nb_surfaces)
+            return MFX_ERR_UNSUPPORTED;
 
         frames_ref = av_hwframe_ctx_alloc(ext_frames_ctx->device_ref);
         if (!frames_ref)
@@ -612,14 +892,14 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
             return MFX_ERR_MEMORY_ALLOC;
         }
 
-        mids_buf = qsv_create_mids(frames_ref);
-        if (!mids_buf) {
+        mids = qsv_create_mids(frames_ref);
+        if (!mids) {
             av_buffer_unref(&frames_ref);
             return MFX_ERR_MEMORY_ALLOC;
         }
 
-        ret = qsv_setup_mids(resp, frames_ref, mids_buf);
-        av_buffer_unref(&mids_buf);
+        ret = qsv_setup_mids(resp, frames_ref, mids);
+        ff_refstruct_unref(&mids);
         av_buffer_unref(&frames_ref);
         if (ret < 0) {
             av_log(ctx->logctx, AV_LOG_ERROR,
@@ -635,19 +915,31 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
 
 static mfxStatus qsv_frame_free(mfxHDL pthis, mfxFrameAllocResponse *resp)
 {
+    if (!resp->mids)
+        return MFX_ERR_NONE;
+
     av_buffer_unref((AVBufferRef**)&resp->mids[resp->NumFrameActual]);
-    av_buffer_unref((AVBufferRef**)&resp->mids[resp->NumFrameActual + 1]);
+    ff_refstruct_unref(&resp->mids[resp->NumFrameActual + 1]);
     av_freep(&resp->mids);
     return MFX_ERR_NONE;
 }
 
 static mfxStatus qsv_frame_lock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
 {
-    QSVMid *qsv_mid = mid;
-    AVHWFramesContext *hw_frames_ctx = (AVHWFramesContext*)qsv_mid->hw_frames_ref->data;
-    AVQSVFramesContext *hw_frames_hwctx = hw_frames_ctx->hwctx;
+    QSVFramesContext *ctx = (QSVFramesContext *)pthis;
+    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
+    AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
+    QSVMid *qsv_mid;
+    AVHWFramesContext *hw_frames_ctx;
+    AVQSVFramesContext *hw_frames_hwctx;
     int ret;
 
+    if (!frames_hwctx->nb_surfaces)
+        return MFX_ERR_UNSUPPORTED;
+
+    qsv_mid = mid;
+    hw_frames_ctx = (AVHWFramesContext*)qsv_mid->hw_frames_ref->data;
+    hw_frames_hwctx = hw_frames_ctx->hwctx;
     if (qsv_mid->locked_frame)
         return MFX_ERR_UNDEFINED_BEHAVIOR;
 
@@ -700,8 +992,15 @@ fail:
 
 static mfxStatus qsv_frame_unlock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
 {
-    QSVMid *qsv_mid = mid;
+    QSVFramesContext *ctx = (QSVFramesContext *)pthis;
+    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
+    AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
+    QSVMid *qsv_mid;
 
+    if (!frames_hwctx->nb_surfaces)
+        return MFX_ERR_UNSUPPORTED;
+
+    qsv_mid = mid;
     av_frame_free(&qsv_mid->locked_frame);
     av_frame_free(&qsv_mid->hw_frame);
 
@@ -710,9 +1009,18 @@ static mfxStatus qsv_frame_unlock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
 
 static mfxStatus qsv_frame_get_hdl(mfxHDL pthis, mfxMemId mid, mfxHDL *hdl)
 {
-    QSVMid *qsv_mid = (QSVMid*)mid;
+    QSVFramesContext *ctx = (QSVFramesContext *)pthis;
+    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
+    AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
     mfxHDLPair *pair_dst = (mfxHDLPair*)hdl;
-    mfxHDLPair *pair_src = (mfxHDLPair*)qsv_mid->handle_pair;
+    mfxHDLPair *pair_src;
+
+    if (frames_hwctx->nb_surfaces) {
+        QSVMid *qsv_mid = (QSVMid*)mid;
+        pair_src = (mfxHDLPair*)qsv_mid->handle_pair;
+    } else {
+        pair_src = (mfxHDLPair*)mid;
+    }
 
     pair_dst->first = pair_src->first;
 
@@ -728,7 +1036,7 @@ int ff_qsv_init_session_device(AVCodecContext *avctx, mfxSession *psession,
     AVHWDeviceContext    *device_ctx = (AVHWDeviceContext*)device_ref->data;
     AVQSVDeviceContext *device_hwctx = device_ctx->hwctx;
     mfxSession        parent_session = device_hwctx->session;
-    mfxInitParam            init_par = { MFX_IMPL_AUTO_ANY };
+    void                     *loader = device_hwctx->loader;
     mfxHDL                    handle = NULL;
     int          hw_handle_supported = 0;
 
@@ -769,13 +1077,10 @@ int ff_qsv_init_session_device(AVCodecContext *avctx, mfxSession *psession,
                "from the session\n");
     }
 
-    init_par.GPUCopy        = gpu_copy;
-    init_par.Implementation = impl;
-    init_par.Version        = ver;
-    err = MFXInitEx(init_par, &session);
-    if (err != MFX_ERR_NONE)
-        return ff_qsv_print_error(avctx, err,
-                                  "Error initializing a child MFX session");
+    ret = qsv_create_mfx_session(avctx, impl, &ver, gpu_copy, &session,
+                                 &loader);
+    if (ret)
+        return ret;
 
     if (handle) {
         err = MFXVideoCORE_SetHandle(session, handle_type, handle);
@@ -829,14 +1134,17 @@ int ff_qsv_init_session_frames(AVCodecContext *avctx, mfxSession *psession,
 
     if (!opaque) {
         qsv_frames_ctx->logctx = avctx;
+        qsv_frames_ctx->mids = NULL;
+        qsv_frames_ctx->nb_mids = 0;
 
         /* allocate the memory ids for the external frames */
-        av_buffer_unref(&qsv_frames_ctx->mids_buf);
-        qsv_frames_ctx->mids_buf = qsv_create_mids(qsv_frames_ctx->hw_frames_ctx);
-        if (!qsv_frames_ctx->mids_buf)
-            return AVERROR(ENOMEM);
-        qsv_frames_ctx->mids    = (QSVMid*)qsv_frames_ctx->mids_buf->data;
-        qsv_frames_ctx->nb_mids = frames_hwctx->nb_surfaces;
+        if (frames_hwctx->nb_surfaces) {
+            ff_refstruct_unref(&qsv_frames_ctx->mids);
+            qsv_frames_ctx->mids = qsv_create_mids(qsv_frames_ctx->hw_frames_ctx);
+            if (!qsv_frames_ctx->mids)
+                return AVERROR(ENOMEM);
+            qsv_frames_ctx->nb_mids = frames_hwctx->nb_surfaces;
+        }
 
         err = MFXVideoCORE_SetFrameAllocator(session, &frame_allocator);
         if (err != MFX_ERR_NONE)
@@ -854,6 +1162,12 @@ int ff_qsv_close_internal_session(QSVSession *qs)
         MFXClose(qs->session);
         qs->session = NULL;
     }
+
+    if (qs->loader) {
+        MFXUnload(qs->loader);
+        qs->loader = NULL;
+    }
+
 #ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
     av_buffer_unref(&qs->va_device_ref);
 #endif

@@ -21,15 +21,14 @@
 
 #include <stdint.h>
 
-#include "libavutil/imgutils.h"
 #include "libavutil/intmath.h"
-#include "libavutil/opt.h"
+#include "libavutil/mem.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
 #include "codec_internal.h"
+#include "decode.h"
 #include "get_bits.h"
-#include "internal.h"
 #include "thread.h"
 #include "unary.h"
 
@@ -163,7 +162,7 @@ static int read_low_coeffs(AVCodecContext *avctx, int16_t *dst, int size,
             continue;
 
         nbits  = ((state + 8) >> 5) + (state ? ff_clz(state) : 32) - 24;
-        escape = av_mod_uintp2(16383, nbits);
+        escape = av_zero_extend(16383, nbits);
         cnt1   = get_unary(bc, 0, 8);
         if (cnt1 > 7) {
             rlen = get_bits(bc, 16);
@@ -232,8 +231,8 @@ static int read_high_coeffs(AVCodecContext *avctx, const uint8_t *src, int16_t *
         if (cnt1 >= length) {
             cnt1 = get_bits(bc, nbits);
         } else {
-            pfx = 14 + ((((uint64_t)(value - 14)) >> 32) & (value - 14));
-            if (pfx < 1 || pfx > 25)
+            pfx = FFMIN(value, 14);
+            if (pfx < 1)
                 return AVERROR_INVALIDDATA;
             cnt1 *= (1 << pfx) - 1;
             shbits = show_bits(bc, pfx);
@@ -270,7 +269,7 @@ static int read_high_coeffs(AVCodecContext *avctx, const uint8_t *src, int16_t *
             continue;
 
         pfx    = ((state + 8) >> 5) + (state ? ff_clz(state) : 32) - 24;
-        escape = av_mod_uintp2(16383, pfx);
+        escape = av_zero_extend(16383, pfx);
         cnt1   = get_unary(bc, 0, 8);
         if (cnt1 < 8) {
             if (pfx < 1 || pfx > 25)
@@ -668,8 +667,6 @@ static int pixlet_decode_frame(AVCodecContext *avctx, AVFrame *p,
 
     bytestream2_skip(&ctx->gb, 8);
 
-    p->pict_type = AV_PICTURE_TYPE_I;
-    p->key_frame = 1;
     p->color_range = AVCOL_RANGE_JPEG;
 
     ret = ff_thread_get_buffer(avctx, p, 0);
@@ -694,7 +691,7 @@ static int pixlet_decode_frame(AVCodecContext *avctx, AVFrame *p,
 
 const FFCodec ff_pixlet_decoder = {
     .p.name           = "pixlet",
-    .p.long_name      = NULL_IF_CONFIG_SMALL("Apple Pixlet"),
+    CODEC_LONG_NAME("Apple Pixlet"),
     .p.type           = AVMEDIA_TYPE_VIDEO,
     .p.id             = AV_CODEC_ID_PIXLET,
     .init             = pixlet_init,
@@ -703,6 +700,5 @@ const FFCodec ff_pixlet_decoder = {
     .priv_data_size   = sizeof(PixletContext),
     .p.capabilities   = AV_CODEC_CAP_DR1 |
                         AV_CODEC_CAP_FRAME_THREADS,
-    .caps_internal    = FF_CODEC_CAP_INIT_THREADSAFE |
-                        FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
 };

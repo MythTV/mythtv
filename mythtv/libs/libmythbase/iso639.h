@@ -2,6 +2,7 @@
 #ifndef ISO_639_2_H
 #define ISO_639_2_H
 
+#include <cctype>
 #include <vector>
 
 #include <QMap>

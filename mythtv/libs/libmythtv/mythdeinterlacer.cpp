@@ -445,7 +445,7 @@ void MythDeinterlacer::OneField(MythVideoFrame *Frame, FrameScanType Scan)
 
     // Fake the frame height and stride to simulate a single field
     m_frame->height = Frame->m_height >> 1;
-    m_frame->interlaced_frame = 0;
+    m_frame->flags &= ~AV_FRAME_FLAG_INTERLACED;
     uint nbplanes = MythVideoFrame::GetNumPlanes(m_inputType);
     for (uint i = 0; i < nbplanes; i++)
     {

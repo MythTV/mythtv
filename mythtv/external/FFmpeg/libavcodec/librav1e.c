@@ -22,15 +22,16 @@
 
 #include <rav1e.h>
 
+#include "libavutil/buffer.h"
 #include "libavutil/internal.h"
 #include "libavutil/avassert.h"
 #include "libavutil/base64.h"
 #include "libavutil/common.h"
 #include "libavutil/mathematics.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "avcodec.h"
-#include "bsf.h"
 #include "codec_internal.h"
 #include "encode.h"
 #include "internal.h"
@@ -41,7 +42,6 @@ typedef struct librav1eContext {
     RaContext *ctx;
     AVFrame *frame;
     RaFrame *rframe;
-    AVBSFContext *bsf;
 
     uint8_t *pass_data;
     size_t pass_pos;
@@ -54,6 +54,14 @@ typedef struct librav1eContext {
     int tile_rows;
     int tile_cols;
 } librav1eContext;
+
+typedef struct FrameData {
+    int64_t pts;
+    int64_t duration;
+
+    void        *frame_opaque;
+    AVBufferRef *frame_opaque_ref;
+} FrameData;
 
 static inline RaPixelRange range_map(enum AVPixelFormat pix_fmt, enum AVColorRange range)
 {
@@ -176,7 +184,6 @@ static av_cold int librav1e_encode_close(AVCodecContext *avctx)
     }
 
     av_frame_free(&ctx->frame);
-    av_bsf_free(&ctx->bsf);
     av_freep(&ctx->pass_data);
 
     return 0;
@@ -210,10 +217,15 @@ static av_cold int librav1e_encode_init(AVCodecContext *avctx)
                                    avctx->framerate.den, avctx->framerate.num
                                    });
     } else {
+FF_DISABLE_DEPRECATION_WARNINGS
         rav1e_config_set_time_base(cfg, (RaRational) {
-                                   avctx->time_base.num * avctx->ticks_per_frame,
-                                   avctx->time_base.den
+                                   avctx->time_base.num
+#if FF_API_TICKS_PER_FRAME
+                                   * avctx->ticks_per_frame
+#endif
+                                   , avctx->time_base.den
                                    });
+FF_ENABLE_DEPRECATION_WARNINGS
     }
 
     if ((avctx->flags & AV_CODEC_FLAG_PASS1 || avctx->flags & AV_CODEC_FLAG_PASS2) && !avctx->bit_rate) {
@@ -245,41 +257,10 @@ static av_cold int librav1e_encode_init(AVCodecContext *avctx)
         }
     }
 
-    if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {
-         const AVBitStreamFilter *filter = av_bsf_get_by_name("extract_extradata");
-         int bret;
-
-         if (!filter) {
-            av_log(avctx, AV_LOG_ERROR, "extract_extradata bitstream filter "
-                   "not found. This is a bug, please report it.\n");
-            ret = AVERROR_BUG;
-            goto end;
-         }
-
-         bret = av_bsf_alloc(filter, &ctx->bsf);
-         if (bret < 0) {
-             ret = bret;
-             goto end;
-         }
-
-         bret = avcodec_parameters_from_context(ctx->bsf->par_in, avctx);
-         if (bret < 0) {
-             ret = bret;
-             goto end;
-         }
-
-         bret = av_bsf_init(ctx->bsf);
-         if (bret < 0) {
-             ret = bret;
-             goto end;
-         }
-    }
-
     {
-        AVDictionaryEntry *en = NULL;
-        while ((en = av_dict_get(ctx->rav1e_opts, "", en, AV_DICT_IGNORE_SUFFIX))) {
-            int parse_ret = rav1e_config_parse(cfg, en->key, en->value);
-            if (parse_ret < 0)
+        const AVDictionaryEntry *en = NULL;
+        while ((en = av_dict_iterate(ctx->rav1e_opts, en))) {
+            if (rav1e_config_parse(cfg, en->key, en->value) < 0)
                 av_log(avctx, AV_LOG_WARNING, "Invalid value for %s: %s.\n", en->key, en->value);
         }
     }
@@ -297,6 +278,12 @@ static av_cold int librav1e_encode_init(AVCodecContext *avctx)
         ret = AVERROR_INVALIDDATA;
         goto end;
     }
+
+    if (avctx->sample_aspect_ratio.num > 0 && avctx->sample_aspect_ratio.den > 0)
+        rav1e_config_set_sample_aspect_ratio(cfg, (RaRational) {
+                                             avctx->sample_aspect_ratio.num,
+                                             avctx->sample_aspect_ratio.den
+                                             });
 
     rret = rav1e_config_parse_int(cfg, "threads", avctx->thread_count);
     if (rret < 0)
@@ -421,6 +408,23 @@ static av_cold int librav1e_encode_init(AVCodecContext *avctx)
         goto end;
     }
 
+    if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {
+        RaData *seq_hdr = rav1e_container_sequence_header(ctx->ctx);
+
+        if (seq_hdr)
+            avctx->extradata = av_mallocz(seq_hdr->len + AV_INPUT_BUFFER_PADDING_SIZE);
+        if (!seq_hdr || !avctx->extradata) {
+            rav1e_data_unref(seq_hdr);
+            av_log(avctx, AV_LOG_ERROR, "Failed to get extradata.\n");
+            ret = seq_hdr ? AVERROR(ENOMEM) : AVERROR_EXTERNAL;
+            goto end;
+        }
+
+        memcpy(avctx->extradata, seq_hdr->data, seq_hdr->len);
+        avctx->extradata_size = seq_hdr->len;
+        rav1e_data_unref(seq_hdr);
+    }
+
     ret = 0;
 
 end:
@@ -430,11 +434,23 @@ end:
     return ret;
 }
 
+static void frame_data_free(void *data)
+{
+    FrameData *fd = data;
+
+    if (!fd)
+        return;
+
+    av_buffer_unref(&fd->frame_opaque_ref);
+    av_free(data);
+}
+
 static int librav1e_receive_packet(AVCodecContext *avctx, AVPacket *pkt)
 {
     librav1eContext *ctx = avctx->priv_data;
     RaFrame *rframe = ctx->rframe;
     RaPacket *rpkt = NULL;
+    FrameData *fd;
     int ret;
 
     if (!rframe) {
@@ -447,18 +463,25 @@ static int librav1e_receive_packet(AVCodecContext *avctx, AVPacket *pkt)
         if (frame->buf[0]) {
             const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
 
-            int64_t *pts = av_malloc(sizeof(int64_t));
-            if (!pts) {
+            fd = av_mallocz(sizeof(*fd));
+            if (!fd) {
                 av_log(avctx, AV_LOG_ERROR, "Could not allocate PTS buffer.\n");
                 return AVERROR(ENOMEM);
             }
-            *pts = frame->pts;
+            fd->pts      = frame->pts;
+            fd->duration = frame->duration;
+
+            if (avctx->flags & AV_CODEC_FLAG_COPY_OPAQUE) {
+                fd->frame_opaque = frame->opaque;
+                fd->frame_opaque_ref = frame->opaque_ref;
+                frame->opaque_ref    = NULL;
+            }
 
             rframe = rav1e_frame_new(ctx->ctx);
             if (!rframe) {
                 av_log(avctx, AV_LOG_ERROR, "Could not allocate new rav1e frame.\n");
                 av_frame_unref(frame);
-                av_freep(&pts);
+                frame_data_free(fd);
                 return AVERROR(ENOMEM);
             }
 
@@ -470,7 +493,7 @@ static int librav1e_receive_packet(AVCodecContext *avctx, AVPacket *pkt)
                                        frame->linesize[i], bytes);
             }
             av_frame_unref(frame);
-            rav1e_frame_set_opaque(rframe, pts, av_free);
+            rav1e_frame_set_opaque(rframe, fd, frame_data_free);
         }
     }
 
@@ -546,25 +569,44 @@ retry:
     if (rpkt->frame_type == RA_FRAME_TYPE_KEY)
         pkt->flags |= AV_PKT_FLAG_KEY;
 
-    pkt->pts = pkt->dts = *((int64_t *) rpkt->opaque);
-    av_free(rpkt->opaque);
-    rav1e_packet_unref(rpkt);
+    fd = rpkt->opaque;
+    pkt->pts = pkt->dts = fd->pts;
+    pkt->duration = fd->duration;
 
-    if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {
-        int ret = av_bsf_send_packet(ctx->bsf, pkt);
+    if (avctx->flags & AV_CODEC_FLAG_COPY_OPAQUE) {
+        pkt->opaque          = fd->frame_opaque;
+        pkt->opaque_ref      = fd->frame_opaque_ref;
+        fd->frame_opaque_ref = NULL;
+    }
+
+    frame_data_free(fd);
+
+    if (avctx->flags & AV_CODEC_FLAG_RECON_FRAME) {
+        AVCodecInternal *avci = avctx->internal;
+        AVFrame *frame = avci->recon_frame;
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
+
+        av_frame_unref(frame);
+
+        frame->format = avctx->pix_fmt;
+        frame->width  = avctx->width;
+        frame->height = avctx->height;
+
+        ret = ff_encode_alloc_frame(avctx, frame);
         if (ret < 0) {
-            av_log(avctx, AV_LOG_ERROR, "extradata extraction send failed.\n");
-            av_packet_unref(pkt);
+            rav1e_packet_unref(rpkt);
             return ret;
         }
 
-        ret = av_bsf_receive_packet(ctx->bsf, pkt);
-        if (ret < 0) {
-            av_log(avctx, AV_LOG_ERROR, "extradata extraction receive failed.\n");
-            av_packet_unref(pkt);
-            return ret;
+        for (int i = 0; i < desc->nb_components; i++) {
+            int shift = i ? desc->log2_chroma_h : 0;
+            rav1e_frame_extract_plane(rpkt->rec, i, frame->data[i],
+                                      (frame->height >> shift) * frame->linesize[i],
+                                      frame->linesize[i], desc->comp[i].step);
         }
     }
+
+    rav1e_packet_unref(rpkt);
 
     return 0;
 }
@@ -616,7 +658,7 @@ static const AVClass class = {
 
 const FFCodec ff_librav1e_encoder = {
     .p.name         = "librav1e",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("librav1e AV1"),
+    CODEC_LONG_NAME("librav1e AV1"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_AV1,
     .init           = librav1e_encode_init,
@@ -626,8 +668,11 @@ const FFCodec ff_librav1e_encoder = {
     .p.priv_class   = &class,
     .defaults       = librav1e_defaults,
     .p.pix_fmts     = librav1e_pix_fmts,
+    .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS |
-                      AV_CODEC_CAP_DR1,
-    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_AUTO_THREADS,
+                      AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_RECON_FRAME |
+                      AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
+    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE |
+                      FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_AUTO_THREADS,
     .p.wrapper_name = "librav1e",
 };

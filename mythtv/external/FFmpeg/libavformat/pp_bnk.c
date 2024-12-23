@@ -20,11 +20,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "demux.h"
 #include "internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 #define PP_BNK_MAX_READ_SIZE    4096
 #define PP_BNK_FILE_HEADER_SIZE 20
@@ -315,11 +317,11 @@ static int pp_bnk_seek(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-const AVInputFormat ff_pp_bnk_demuxer = {
-    .name           = "pp_bnk",
-    .long_name      = NULL_IF_CONFIG_SMALL("Pro Pinball Series Soundbank"),
+const FFInputFormat ff_pp_bnk_demuxer = {
+    .p.name         = "pp_bnk",
+    .p.long_name    = NULL_IF_CONFIG_SMALL("Pro Pinball Series Soundbank"),
     .priv_data_size = sizeof(PPBnkCtx),
-    .flags_internal = FF_FMT_INIT_CLEANUP,
+    .flags_internal = FF_INFMT_FLAG_INIT_CLEANUP,
     .read_probe     = pp_bnk_probe,
     .read_header    = pp_bnk_read_header,
     .read_packet    = pp_bnk_read_packet,

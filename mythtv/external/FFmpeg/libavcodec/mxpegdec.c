@@ -25,8 +25,9 @@
  * MxPEG decoder
  */
 
+#include "libavutil/mem.h"
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "mjpeg.h"
 #include "mjpegdec.h"
 
@@ -286,11 +287,11 @@ static int mxpeg_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                                              AV_GET_BUFFER_FLAG_REF)) < 0)
                         return ret;
                     jpg->picture_ptr->pict_type = AV_PICTURE_TYPE_P;
-                    jpg->picture_ptr->key_frame = 0;
+                    jpg->picture_ptr->flags &= ~AV_FRAME_FLAG_KEY;
                     jpg->got_picture = 1;
                 } else {
                     jpg->picture_ptr->pict_type = AV_PICTURE_TYPE_I;
-                    jpg->picture_ptr->key_frame = 1;
+                    jpg->picture_ptr->flags |= AV_FRAME_FLAG_KEY;
                 }
 
                 if (s->got_mxm_bitmask) {
@@ -344,7 +345,7 @@ the_end:
 
 const FFCodec ff_mxpeg_decoder = {
     .p.name         = "mxpeg",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Mobotix MxPEG video"),
+    CODEC_LONG_NAME("Mobotix MxPEG video"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_MXPEG,
     .priv_data_size = sizeof(MXpegDecodeContext),
@@ -353,5 +354,5 @@ const FFCodec ff_mxpeg_decoder = {
     FF_CODEC_DECODE_CB(mxpeg_decode_frame),
     .p.capabilities = AV_CODEC_CAP_DR1,
     .p.max_lowres   = 3,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

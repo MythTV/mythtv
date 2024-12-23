@@ -44,10 +44,11 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/crc.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 
 #include "codec_internal.h"
-#include "internal.h"
+#include "decode.h"
 #include "avcodec.h"
 #include "mpegutils.h"
 #include "h264data.h"
@@ -64,8 +65,6 @@
 #if CONFIG_ZLIB
 #include <zlib.h>
 #endif
-
-#include "svq1.h"
 
 /**
  * @file
@@ -1039,15 +1038,16 @@ static int svq3_decode_slice_header(AVCodecContext *avctx)
         }
         memcpy(s->slice_buf, s->gb.buffer + s->gb.index / 8, slice_bytes);
 
+        if (length > 0) {
+            memmove(s->slice_buf, &s->slice_buf[slice_length], length - 1);
+        }
+
         if (s->watermark_key) {
             uint32_t header = AV_RL32(&s->slice_buf[1]);
             AV_WL32(&s->slice_buf[1], header ^ s->watermark_key);
         }
         init_get_bits(&s->gb_slice, s->slice_buf, slice_bits);
 
-        if (length > 0) {
-            memmove(s->slice_buf, &s->slice_buf[slice_length], length - 1);
-        }
         skip_bits_long(&s->gb, slice_bytes * 8);
     }
 
@@ -1400,6 +1400,9 @@ static int svq3_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     if (svq3_decode_slice_header(avctx))
         return -1;
 
+    if (avpkt->size < s->mb_width * s->mb_height / 8)
+        return AVERROR_INVALIDDATA;
+
     s->pict_type = s->slice_type;
 
     if (s->pict_type != AV_PICTURE_TYPE_B)
@@ -1409,7 +1412,10 @@ static int svq3_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
 
     /* for skipping the frame */
     s->cur_pic->f->pict_type = s->pict_type;
-    s->cur_pic->f->key_frame = (s->pict_type == AV_PICTURE_TYPE_I);
+    if (s->pict_type == AV_PICTURE_TYPE_I)
+        s->cur_pic->f->flags |= AV_FRAME_FLAG_KEY;
+    else
+        s->cur_pic->f->flags &= ~AV_FRAME_FLAG_KEY;
 
     ret = get_buffer(avctx, s->cur_pic);
     if (ret < 0)
@@ -1543,12 +1549,12 @@ static int svq3_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     left = buf_size*8 - get_bits_count(&s->gb_slice);
 
     if (s->mb_y != s->mb_height || s->mb_x != s->mb_width) {
-        av_log(avctx, AV_LOG_INFO, "frame num %d incomplete pic x %d y %d left %d\n", avctx->frame_number, s->mb_y, s->mb_x, left);
+        av_log(avctx, AV_LOG_INFO, "frame num %"PRId64" incomplete pic x %d y %d left %d\n", avctx->frame_num, s->mb_y, s->mb_x, left);
         //av_hex_dump(stderr, buf+buf_size-8, 8);
     }
 
     if (left < 0) {
-        av_log(avctx, AV_LOG_ERROR, "frame num %d left %d\n", avctx->frame_number, left);
+        av_log(avctx, AV_LOG_ERROR, "frame num %"PRId64" left %d\n", avctx->frame_num, left);
         return -1;
     }
 
@@ -1590,7 +1596,7 @@ static av_cold int svq3_decode_end(AVCodecContext *avctx)
 
 const FFCodec ff_svq3_decoder = {
     .p.name         = "svq3",
-    .p.long_name    = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3 / Sorenson Video 3 / SVQ3"),
+    CODEC_LONG_NAME("Sorenson Vector Quantizer 3 / Sorenson Video 3 / SVQ3"),
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_SVQ3,
     .priv_data_size = sizeof(SVQ3Context),
@@ -1600,7 +1606,5 @@ const FFCodec ff_svq3_decoder = {
     .p.capabilities = AV_CODEC_CAP_DRAW_HORIZ_BAND |
                       AV_CODEC_CAP_DR1             |
                       AV_CODEC_CAP_DELAY,
-    .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUVJ420P,
-                                                     AV_PIX_FMT_NONE},
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

@@ -292,7 +292,7 @@ static const int rv40_bias[4][4] = {
 
 #define RV40_CHROMA_MC(OPNAME, OP)\
 static void OPNAME ## rv40_chroma_mc4_c(uint8_t *dst /*align 8*/,\
-                                        uint8_t *src /*align 1*/,\
+                                        const uint8_t *src /*align 1*/,\
                                         ptrdiff_t stride, int h, int x, int y)\
 {\
     const int A = (8-x) * (8-y);\
@@ -328,7 +328,7 @@ static void OPNAME ## rv40_chroma_mc4_c(uint8_t *dst /*align 8*/,\
 }\
 \
 static void OPNAME ## rv40_chroma_mc8_c(uint8_t *dst/*align 8*/,\
-                                        uint8_t *src/*align 1*/,\
+                                        const uint8_t *src/*align 1*/,\
                                         ptrdiff_t stride, int h, int x, int y)\
 {\
     const int A = (8-x) * (8-y);\
@@ -709,6 +709,8 @@ av_cold void ff_rv40dsp_init(RV34DSPContext *c)
     ff_rv40dsp_init_aarch64(c);
 #elif ARCH_ARM
     ff_rv40dsp_init_arm(c);
+#elif ARCH_RISCV
+    ff_rv40dsp_init_riscv(c);
 #elif ARCH_X86
     ff_rv40dsp_init_x86(c);
 #endif

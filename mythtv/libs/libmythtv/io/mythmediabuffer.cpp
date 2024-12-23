@@ -1218,14 +1218,18 @@ int MythMediaBuffer::WaitForAvail(int Count, std::chrono::milliseconds  Timeout)
     if (available >= Count)
         return available;
 
-    Count = (m_ateof && available < Count) ? available : Count;
+    if (m_ateof)
+    {
+        m_wantToRead = 0;
+        return available;
+    }
 
-    if (m_liveTVChain && m_setSwitchToNext && (available < Count))
+    if (m_liveTVChain && m_setSwitchToNext)
         return available;
 
     // Make sure that if the read ahead thread is sleeping and
     // it should be reading that we start reading right away.
-    if ((available < Count) && !m_stopReads && !m_requestPause && !m_commsError && m_readAheadRunning)
+    if (!m_stopReads && !m_requestPause && !m_commsError && m_readAheadRunning)
         m_generalWait.wakeAll();
 
     MythTimer timer;
