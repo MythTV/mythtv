@@ -1505,6 +1505,41 @@ QString ProgramInfo::GetProgramFlagNames(void) const
     return propsValueToString("program", ProgramFlagNames, m_programFlags);
 }
 
+
+QString ProgramInfo::GetRecTypeStatus(bool showrerecord) const
+{
+    QString tmp_rec = ::toString(GetRecordingRuleType());
+    if (GetRecordingRuleType() != kNotRecording)
+    {
+        QDateTime timeNow = MythDate::current();
+        if (((m_recEndTs > timeNow) && (m_recStatus <= RecStatus::WillRecord)) ||
+            (m_recStatus == RecStatus::Conflict) || (m_recStatus == RecStatus::LaterShowing))
+        {
+            tmp_rec += QString(" %1%2").arg(m_recPriority > 0 ? "+" : "").arg(m_recPriority);
+            if (m_recPriority2)
+                tmp_rec += QString("/%1%2").arg(m_recPriority2 > 0 ? "+" : "").arg(m_recPriority2);
+            tmp_rec += " ";
+        }
+        else
+        {
+            tmp_rec += " -- ";
+        }
+        if (showrerecord && (GetRecordingStatus() == RecStatus::Recorded) &&
+            !IsDuplicate())
+        {
+            tmp_rec += QObject::tr("Re-Record");
+        }
+        else
+        {
+            tmp_rec += RecStatus::toString(GetRecordingStatus(), GetRecordingRuleType());
+        }
+    }
+    return tmp_rec;
+}
+
+
+
+
 QString ProgramInfo::GetSubtitleTypeNames(void) const
 {
     return propsValueToString("subtitle", SubtitlePropsNames,
@@ -1718,32 +1753,33 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     // constructor.
     progMap["rectypechar"] = toQChar(GetRecordingRuleType());
     progMap["rectype"] = ::toString(GetRecordingRuleType());
-    QString tmp_rec = progMap["rectype"];
-    if (GetRecordingRuleType() != kNotRecording)
-    {
-        if (((m_recEndTs > timeNow) && (m_recStatus <= RecStatus::WillRecord)) ||
-            (m_recStatus == RecStatus::Conflict) || (m_recStatus == RecStatus::LaterShowing))
-        {
-            tmp_rec += QString(" %1%2").arg(m_recPriority > 0 ? "+" : "").arg(m_recPriority);
-            if (m_recPriority2)
-                tmp_rec += QString("/%1%2").arg(m_recPriority2 > 0 ? "+" : "").arg(m_recPriority2);
-            tmp_rec += " ";
-        }
-        else
-        {
-            tmp_rec += " -- ";
-        }
-        if (showrerecord && (GetRecordingStatus() == RecStatus::Recorded) &&
-            !IsDuplicate())
-        {
-            tmp_rec += QObject::tr("Re-Record");
-        }
-        else
-        {
-            tmp_rec += RecStatus::toString(GetRecordingStatus(), GetRecordingRuleType());
-        }
-    }
-    progMap["rectypestatus"] = tmp_rec;
+    // QString tmp_rec = progMap["rectype"];
+    // if (GetRecordingRuleType() != kNotRecording)
+    // {
+    //     if (((m_recEndTs > timeNow) && (m_recStatus <= RecStatus::WillRecord)) ||
+    //         (m_recStatus == RecStatus::Conflict) || (m_recStatus == RecStatus::LaterShowing))
+    //     {
+    //         tmp_rec += QString(" %1%2").arg(m_recPriority > 0 ? "+" : "").arg(m_recPriority);
+    //         if (m_recPriority2)
+    //             tmp_rec += QString("/%1%2").arg(m_recPriority2 > 0 ? "+" : "").arg(m_recPriority2);
+    //         tmp_rec += " ";
+    //     }
+    //     else
+    //     {
+    //         tmp_rec += " -- ";
+    //     }
+    //     if (showrerecord && (GetRecordingStatus() == RecStatus::Recorded) &&
+    //         !IsDuplicate())
+    //     {
+    //         tmp_rec += QObject::tr("Re-Record");
+    //     }
+    //     else
+    //     {
+    //         tmp_rec += RecStatus::toString(GetRecordingStatus(), GetRecordingRuleType());
+    //     }
+    // }
+    progMap["rectypestatus"] = GetRecTypeStatus(showrerecord);
+    // progMap["rectypestatus"] = tmp_rec;
 
     progMap["card"] = RecStatus::toString(GetRecordingStatus(), m_inputId);
     progMap["input"] = RecStatus::toString(GetRecordingStatus(),

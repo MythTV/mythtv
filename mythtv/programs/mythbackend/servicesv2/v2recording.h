@@ -28,6 +28,7 @@ class V2RecordingInfo : public QObject
     SERVICE_PROPERTY2( uint                   , RecordedId  )
     SERVICE_PROPERTY2( int                    , Status      )
     SERVICE_PROPERTY2( RecStatus::Type        , StatusName  )
+    SERVICE_PROPERTY2( QString                , RecTypeStatus  )
     SERVICE_PROPERTY2( int                    , Priority    )
     SERVICE_PROPERTY2( QDateTime              , StartTs     )
     SERVICE_PROPERTY2( QDateTime              , EndTs       )

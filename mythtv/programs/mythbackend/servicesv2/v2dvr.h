@@ -45,6 +45,8 @@ class V2Dvr : public MythHTTPService
 {
     Q_OBJECT
     Q_CLASSINFO("Version",      "7.1")
+    Q_CLASSINFO("RemoveOldRecorded",  "methods=POST;name=bool")
+    Q_CLASSINFO("UpdateOldRecorded",  "methods=POST;name=bool")
     Q_CLASSINFO("AddRecordedCredits",  "methods=POST;name=bool")
     Q_CLASSINFO("AddRecordedProgram",  "methods=POST;name=int")
     Q_CLASSINFO("RemoveRecorded",      "methods=POST;name=bool")
@@ -118,9 +120,19 @@ class V2Dvr : public MythHTTPService
                                             const QDateTime &StartTime,
                                             const QDateTime &EndTime,
                                             const QString   &Title,
+                                            const QString   &TitleRegEx,
                                             const QString   &SeriesId,
                                             int              RecordId,
                                             const QString   &Sort);
+
+    bool       RemoveOldRecorded         ( int              ChanId,
+                                            const QDateTime &StartTime,
+                                            bool            Reschedule );
+
+    bool       UpdateOldRecorded         ( int              ChanId,
+                                            const QDateTime &StartTime,
+                                            bool            Duplicate,
+                                            bool            Reschedule );
 
     static V2Program* GetRecorded         ( int              RecordedId,
                                             int              ChanId,
