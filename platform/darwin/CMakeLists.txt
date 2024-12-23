@@ -197,27 +197,33 @@ endif()
 # Start with the mythtv/share directory into the Resource directory.
 #
 message(STATUS "Copying in MythTV support files")
+message(VERBOSE "  Copying 'share' directory")
 file(COPY ${MYTHTV_FULL_DATADIR} DESTINATION ${RSRC_DIR}/share)
 
 # Copy the perl support files into Resources/lib.
+message(VERBOSE "  Copying perl files")
 file(COPY ${MYTHTV_INSTALL_PREFIX}/lib/perl5 DESTINATION ${RSRC_DIR}/lib)
 
 ## Copy the python support files into Resources/lib.
 # If using a Virtual Environment, all of the necessary site-packages should
 # already have been into the install prefix as well
+message(VERBOSE "  Copying python files")
 file(COPY ${MYTHTV_INSTALL_PREFIX}/lib/${PYTHON_BASENAME} DESTINATION ${RSRC_DIR}/lib)
 
 # Copy the application icon into the Resources directory.
+message(VERBOSE "  Copying icons")
 file(COPY ${APP_NAME}.icns DESTINATION ${RSRC_DIR})
 
 # Copy the application startup script and mythsources into the Resources
 # directory. The mythsources files defines any necessary application
 # environmental variables and aliases.  Both need cmake to configure internal
 # variables.
+message(VERBOSE "  Copying startup script and python alias")
 configure_file("${CMAKE_SOURCE_DIR}/startup_script.zsh.in" "${MACOS_DIR}/${APP_NAME}.zsh" @ONLY)
 
 # Update the files in share (e.g. python shebang's) to point to internally to the App
 # Run theses as separate commands in case one fails
+message(VERBOSE "  Fixing python shebangs")
 # This first case should find the correct paths set by the myth build process
 execute_process(
   COMMAND zsh -c "LC_ALL=C find ${RSRC_DIR} -type f -exec sed -i '' \"s^${PYTHON_MYTHTV_SCRIPT_EXE}.*^${PYTHON_BASENAME}^g\" {} + ")
@@ -227,6 +233,7 @@ execute_process(
 execute_process(
   COMMAND zsh -c "LC_ALL=C find ${RSRC_DIR} -type f -exec sed -i '' \"s^${MYTHTV_INSTALL_PREFIX}^../Resources^g\" {} + ")
 
+message(VERBOSE "  Copying fonts")
 # Find and copy in the Dejavu and liberation fonts
 execute_process(
   COMMAND zsh -c "find ${FONT_PATH} -name \"Deja*.ttf\" -o -name \"Liberation*.ttf\""
