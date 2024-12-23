@@ -21,6 +21,11 @@ set(MYTH_DEFAULT_LIBS_PREFIX
     CACHE PATH
           "Default library install prefix if not specified on the command line."
 )
+set(MYTH_RUN_PREFIX
+    ""
+    CACHE PATH
+          "The prefix where MythTV is expected to be at runtime.  This may differ from MYTH_DEFAULT_PREFIX or CMAKE_INSTALL_PREFIX for packagers."
+)
 
 # Location for downloaded tarballs.
 #

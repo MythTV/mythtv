@@ -71,6 +71,9 @@ include(VersionInformation)
 #
 message(STATUS "Including user overrides ${MYTH_USER_OVERRIDES2}")
 include(${MYTH_USER_OVERRIDES2} OPTIONAL)
+if(NOT MYTH_RUN_PREFIX)
+  set(MYTH_RUN_PREFIX ${CMAKE_INSTALL_PREFIX})
+endif()
 
 #
 # Inject code from cmake provided modules
