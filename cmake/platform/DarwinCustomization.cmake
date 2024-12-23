@@ -17,15 +17,15 @@ check_language(OBJCXX)
 # MacPorts or Homebrew?
 execute_process(
   COMMAND which port
-  RESULT_VARIABLE DETECT_MACPORTS
+  RESULT_VARIABLE _DETECT_MACPORTS
   OUTPUT_VARIABLE MACPORTS_PREFIX
   ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(
   COMMAND brew --prefix
-  RESULT_VARIABLE DETECT_HOMEBREW
+  RESULT_VARIABLE _DETECT_HOMEBREW
   OUTPUT_VARIABLE HOMEBREW_PREFIX
   ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(DETECT_MACPORTS EQUAL 0)
+if(_DETECT_MACPORTS EQUAL 0)
   # The MACPORTS_PREFIX variable should contain a path name like
   # "/opt/local/bin/port". Go up two levels to find the "root" directory for
   # macports.
@@ -54,7 +54,7 @@ if(DETECT_MACPORTS EQUAL 0)
   # Informational in case needed elsewhere.
   message(STATUS "Detected MacPorts (${MACPORTS_PREFIX})")
   set(MACPORTS ON)
-elseif(DETECT_HOMEBREW EQUAL 0)
+elseif(_DETECT_HOMEBREW EQUAL 0)
   # Add homebrew specific include and lib directories.
   link_directories(AFTER "${HOMEBREW_PREFIX}/lib")
   include_directories(AFTER SYSTEM "${HOMEBREW_PREFIX}/include")
@@ -94,7 +94,7 @@ elseif(DETECT_HOMEBREW EQUAL 0)
   set(HOMEBREW ON)
 else()
   message(FATAL_ERROR "Not building with MacPorts or Homebrew.")
-endif(DETECT_MACPORTS EQUAL 0)
+endif(_DETECT_MACPORTS EQUAL 0)
 
 # Check to see if a python virtual environment is set, and if so
 # tell cmake to use those site-packages instead of the default

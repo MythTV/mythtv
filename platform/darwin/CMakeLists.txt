@@ -102,10 +102,10 @@ list(REMOVE_DUPLICATES CMAKE_FIND_ROOT_PATH)
 #
 # Set any package manger specific variables
 #
-if(DETECT_MACPORTS EQUAL 0)
+if(MACPORTS)
   set(PKGMGR_PREFIX "${MACPORTS_PREFIX}")
   set(FONT_PATH "${MACPORTS_PREFIX}/share/fonts")
-elseif(DETECT_HOMEBREW EQUAL 0)
+elseif(HOMEBREW)
   set(PKGMGR_PREFIX "${HOMEBREW_PREFIX}")
   set(FONT_PATH "$ENV{HOME}/Library/fonts")
 endif()
@@ -429,7 +429,7 @@ foreach(SO_NAME IN LISTS PYTHON_SOS_FOUND)
 endforeach()
 
 # Homebrew needs some extra help finding libraries located in the Cellar
-if(DETECT_HOMEBREW EQUAL 0)
+if(HOMEBREW)
   execute_process(
     COMMAND zsh -c "find ${HOMEBREW_PREFIX}/Cellar -name lib"
     OUTPUT_VARIABLE CELLAR_LIST
