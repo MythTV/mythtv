@@ -60,7 +60,7 @@ if(NOT "${quiet}" STREQUAL "yes")
   message_vrbl("Ccache                  " CCACHE_FOUND)
   message_vrbl("DistCC                  " DISTCC_FOUND)
   message("install prefix            ${CMAKE_INSTALL_PREFIX}")
-  message("runtime prefix            ${CMAKE_INSTALL_PREFIX}")
+  message("runtime prefix            ${MYTH_RUN_PREFIX}")
   message("")
   # ~~~
   # if( CPU_OVERRIDE AND test x"$cpu" != x"generic")
