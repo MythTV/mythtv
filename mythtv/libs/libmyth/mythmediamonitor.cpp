@@ -149,17 +149,17 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted,
     QList <MythMediaDevice *>::iterator it;
     QMutexLocker                        locker(&m_devicesLock);
 
-    for (it = m_devices.begin(); it != m_devices.end(); ++it)
+    for (MythMediaDevice *dev : std::as_const(m_devices))
     {
         // By default, we only list CD/DVD devices.
         // Caller can also request mounted drives to be listed (e.g. USB flash)
 
-        if (showUsable && !(*it)->isUsable())
+        if (showUsable && !dev->isUsable())
             continue;
 
-        if (QString(typeid(**it).name()).contains("MythCDROM") ||
-               (showMounted && (*it)->isMounted(false)))
-            drives.append(*it);
+        if (QString(typeid(*dev).name()).contains("MythCDROM") ||
+               (showMounted && dev->isMounted(false)))
+            drives.append(dev);
     }
 
     return drives;
