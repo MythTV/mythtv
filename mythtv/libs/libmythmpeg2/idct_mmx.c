@@ -410,10 +410,10 @@ static inline void idct_col (int16_t * const col, const int offset)
 #define T3 43790
 #define C4 23170
 
-    static const short kT1[] ATTR_ALIGN(8) = {T1,T1,T1,T1};
-    static const short kT2[] ATTR_ALIGN(8) = {T2,T2,T2,T2};
-    static const short kT3[] ATTR_ALIGN(8) = {T3,T3,T3,T3};
-    static const short kC4[] ATTR_ALIGN(8) = {C4,C4,C4,C4};
+    static const uint16_t kT1[] ATTR_ALIGN(8) = {T1,T1,T1,T1};
+    static const uint16_t kT2[] ATTR_ALIGN(8) = {T2,T2,T2,T2};
+    static const uint16_t kT3[] ATTR_ALIGN(8) = {T3,T3,T3,T3};
+    static const uint16_t kC4[] ATTR_ALIGN(8) = {C4,C4,C4,C4};
 
     /* column code adapted from peter gubanov */
     /* http://www.elecard.com/peter/idct.shtml */
