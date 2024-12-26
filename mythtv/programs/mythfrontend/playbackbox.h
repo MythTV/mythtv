@@ -105,7 +105,7 @@ class PlaybackBox : public ScheduleCommon
 
     enum DeleteFlags : std::uint8_t
     {
-        kNoFlags       = 0x00,
+        kNoDelFlags    = 0x00,
         kForgetHistory = 0x01,
         kForce         = 0x02,
         kIgnore        = 0x04,
@@ -194,7 +194,7 @@ class PlaybackBox : public ScheduleCommon
     void askDelete();
     void Undelete(void);
     void Delete(PlaybackBox::DeleteFlags flags);
-    void Delete() { Delete(kNoFlags); }
+    void Delete() { Delete(kNoDelFlags); }
     void DeleteForgetHistory(void)      { Delete(kForgetHistory); }
     void DeleteForce(void)              { Delete(kForce);         }
     void DeleteIgnore(void)             { Delete(kIgnore);        }
