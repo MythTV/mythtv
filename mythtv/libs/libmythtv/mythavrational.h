@@ -45,7 +45,7 @@ class MythAVRational
 
     [[nodiscard]] MythAVRational reduce(int64_t max) const
     {
-        bool ignore;
+        bool ignore {false};
         return reduce(max, ignore);
     }
     [[nodiscard]] MythAVRational reduce(int64_t max, bool& exact) const

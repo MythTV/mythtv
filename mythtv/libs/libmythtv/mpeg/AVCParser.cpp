@@ -1080,6 +1080,5 @@ MythAVRational AVCParser::getFrameRate() const
         return MythAVRational(0);
     else if (m_timeScale & 0x1)
         return MythAVRational(m_timeScale, m_unitsInTick * 2);
-    else
-        return MythAVRational(m_timeScale / 2, m_unitsInTick);
+    return MythAVRational(m_timeScale / 2, m_unitsInTick);
 }
