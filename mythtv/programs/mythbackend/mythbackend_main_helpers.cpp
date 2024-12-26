@@ -714,7 +714,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_INFO, "Main::Registering HttpStatus Extension");
         be_sd_notify("STATUS=Registering HttpStatus Extension");
 
-        httpStatus = new HttpStatus( &gTVList, sched, gExpirer, ismaster );
+        httpStatus = new HttpStatus( &gTVList, sched, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
 
