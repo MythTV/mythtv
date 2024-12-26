@@ -307,9 +307,9 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
 
 void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
 {
-  double r = NAN;
-  double g = NAN;
-  double b = NAN;
+  double r = __builtin_nan("");
+  double g = __builtin_nan("");
+  double b = __builtin_nan("");
 
   if (s == 0.0)
     s = 0.000001;

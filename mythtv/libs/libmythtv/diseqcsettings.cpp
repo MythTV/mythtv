@@ -456,7 +456,7 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     if (angle.length() < 2)
         return 0.0;
 
-    double pos = NAN;
+    double pos = __builtin_nan("");
     QChar postfix = angle.at(angle.length() - 1);
     if (postfix.isLetter())
     {

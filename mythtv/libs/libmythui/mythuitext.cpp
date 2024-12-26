@@ -675,7 +675,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
 bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
                                 const QTextOption & textoption, qreal & width)
 {
-    qreal    last_line_width = NAN;
+    qreal    last_line_width = __builtin_nan("");
     int      last_width = -1;
     int      num_lines = 0;
     Qt::TextElideMode cutdown = m_cutdown;
@@ -859,7 +859,7 @@ void MythUIText::FillCutMessage(void)
         for (int idx = m_layouts.size(); idx < paragraphs.size(); ++idx)
             m_layouts.push_back(new QTextLayout);
 
-        qreal width = NAN;
+        qreal width = __builtin_nan("");
         if (m_multiLine && m_shrinkNarrow &&
             m_minSize.isValid() && !m_cutMessage.isEmpty())
             GetNarrowWidth(paragraphs, textoption, width);
@@ -869,7 +869,7 @@ void MythUIText::FillCutMessage(void)
         qreal height = 0;
         m_leftBearing = m_rightBearing = 0;
         int   num_lines = 0;
-        qreal last_line_width = NAN;
+        qreal last_line_width = __builtin_nan("");
         LayoutParagraphs(paragraphs, textoption, width, height,
                          min_rect, last_line_width, num_lines, true);
 
