@@ -199,13 +199,13 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     QTransform shearTransform;
     if (axis == ReflectAxis::Vertical)
     {
-        shearTransform.scale(1,(float)scale/100);
-        shearTransform.shear((float)shear/100,0);
+        shearTransform.scale(1,static_cast<qreal>(scale)/100);
+        shearTransform.shear(static_cast<qreal>(shear)/100,0);
     }
     else if (axis == ReflectAxis::Horizontal)
     {
-        shearTransform.scale((float)scale/100,1);
-        shearTransform.shear(0,(float)shear/100);
+        shearTransform.scale(static_cast<qreal>(scale)/100,1);
+        shearTransform.shear(0,static_cast<qreal>(shear)/100);
     }
 
     mirrorImage = mirrorImage.transformed(shearTransform, Qt::SmoothTransformation);

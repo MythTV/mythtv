@@ -38,8 +38,8 @@ bool RecordingFile::Load()
         uint width = query.value(6).toUInt();
         uint height = query.value(7).toUInt();
         m_videoResolution = QSize(width, height);
-        m_videoAspectRatio = query.value(8).toFloat();
-        m_videoFrameRate = query.value(9).toFloat();
+        m_videoAspectRatio = query.value(8).toDouble();
+        m_videoFrameRate = query.value(9).toDouble();
 
         m_audioCodec = query.value(10).toString();
         m_audioChannels = query.value(11).toUInt();

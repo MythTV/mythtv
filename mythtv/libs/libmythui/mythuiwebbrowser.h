@@ -159,7 +159,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     bool IsInputToggled(void) const { return m_inputToggled; }
     void SetInputToggled(bool inputToggled) { m_inputToggled = inputToggled; }
 
-    void  SetZoom(float zoom);
+    void  SetZoom(double zoom);
     float GetZoom(void) const;
 
     bool CanGoForward(void);
@@ -231,7 +231,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     QElapsedTimer m_lastUpdateTime;
     int          m_updateInterval          { 0       };
 
-    float        m_zoom                    { 1.0     };
+    qreal        m_zoom                    { 1.0     };
     QColor       m_bgColor;
     QUrl         m_widgetUrl;
     QString      m_userCssFile;

@@ -1153,7 +1153,7 @@ void MythUIWebBrowser::SetActive(bool active)
  */
 void MythUIWebBrowser::ZoomIn(void)
 {
-    SetZoom(m_zoom + 0.1F);
+    SetZoom(m_zoom + 0.1);
 }
 
 /** \fn MythUIWebBrowser::ZoomOut(void)
@@ -1161,19 +1161,19 @@ void MythUIWebBrowser::ZoomIn(void)
  */
 void MythUIWebBrowser::ZoomOut(void)
 {
-    SetZoom(m_zoom - 0.1F);
+    SetZoom(m_zoom - 0.1);
 }
 
-/** \fn MythUIWebBrowser::SetZoom(float)
+/** \fn MythUIWebBrowser::SetZoom(double)
  *  \brief Set the text size to specific size
  *  \param zoom The size to use. Useful values are between 0.3 and 5.0
  */
-void MythUIWebBrowser::SetZoom(float zoom)
+void MythUIWebBrowser::SetZoom(double zoom)
 {
     if (!m_browser)
         return;
 
-    m_zoom = std::clamp(zoom, 0.3F, 5.0F);
+    m_zoom = std::clamp(zoom, 0.3, 5.0);
     m_browser->setZoomFactor(m_zoom);
     ResetScrollBars();
     UpdateBuffer();
@@ -1741,7 +1741,7 @@ bool MythUIWebBrowser::ParseElement(
     if (element.tagName() == "zoom")
     {
         QString zoom = getFirstText(element);
-        m_zoom = zoom.toFloat();
+        m_zoom = zoom.toDouble();
     }
     else if (element.tagName() == "url")
     {

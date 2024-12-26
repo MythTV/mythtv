@@ -239,7 +239,7 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
         QDomElement childElem = child.toElement();
         if (childElem.tagName() == "stop")
         {
-            float position = childElem.attribute("position", "0").toFloat();
+            double position = childElem.attribute("position", "0").toDouble();
             QString color = childElem.attribute("color", "");
             int alpha = childElem.attribute("alpha", "-1").toInt();
             if (alpha < 0)
@@ -263,9 +263,9 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
     {
         QRadialGradient gradient;
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        float x1 = 0.5;
-        float y1 = 0.5;
-        float radius = 0.5;
+        double x1 = 0.5;
+        double y1 = 0.5;
+        double radius = 0.5;
         gradient.setCenter(x1,y1);
         gradient.setFocalPoint(x1,y1);
         gradient.setRadius(radius);
@@ -276,10 +276,10 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
     {
         QLinearGradient gradient;
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        float x1 = 0.0;
-        float y1 = 0.0;
-        float x2 = 0.0;
-        float y2 = 0.0;
+        double x1 = 0.0;
+        double y1 = 0.0;
+        double x2 = 0.0;
+        double y2 = 0.0;
         if (direction == "vertical")
         {
             x1 = 0.5;
