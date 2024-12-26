@@ -74,7 +74,11 @@ class DTVConfParser
 {
   public:
     enum return_t : std::uint8_t { ERROR_CARDTYPE, ERROR_OPEN, ERROR_PARSE, OK };
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshadow"
+    // QPSK is defined in /usr/include/linux/dvb/frontend.h
     enum cardtype_t : std::uint8_t { ATSC, OFDM, QPSK, QAM, DVBS2, UNKNOWN };
+#pragma clang diagnostic pop
 
     DTVConfParser(enum cardtype_t type, uint sourceid, QString file)
         : m_type(type), m_sourceid(sourceid), m_filename(std::move(file)) {}

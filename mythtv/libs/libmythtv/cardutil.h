@@ -51,7 +51,11 @@ class MTV_PUBLIC CardUtil : public QObject
         ERROR_OPEN    = 0,
         ERROR_UNKNOWN = 1,
         ERROR_PROBE   = 2,
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshadow"
+        // QPSK is defined in /usr/include/linux/dvb/frontend.h
         QPSK      = 3,        DVBS      = 3,
+#pragma clang diagnostic pop
         QAM       = 4,        DVBC      = 4,
         OFDM      = 5,        DVBT      = 5,
         ATSC      = 6,

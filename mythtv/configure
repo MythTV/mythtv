@@ -5848,6 +5848,7 @@ check_cxxflags -Wall
 check_cxxflags -Wextra
 check_cxxflags -Wpointer-arith
 check_cxxflags -Wundef
+check_cxxflags -Wno-unknown-pragmas
 if disabled deprecation_warnings; then
     check_cxxflags -Wno-deprecated-declarations
 fi
