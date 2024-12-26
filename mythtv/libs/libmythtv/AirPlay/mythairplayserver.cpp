@@ -733,8 +733,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         GetNotificationCenter()->Queue(n);
     }
 
-    double position    = 0.0F;
-    double duration    = 0.0F;
+    double position    = 0.0;
+    double duration    = 0.0;
     float  playerspeed = 0.0F;
     bool   playing     = false;
     QString pathname;
@@ -910,7 +910,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     else if (req->GetURI() == "/play")
     {
         QByteArray file;
-        double start_pos = 0.0F;
+        double start_pos = 0.0;
         if (req->GetHeaders().contains("Content-Type") &&
             req->GetHeaders()["Content-Type"] == "application/x-apple-binary-plist")
         {
@@ -1136,8 +1136,8 @@ void MythAirplayServer::StopSession(const QByteArray &session)
         return;
     }
     cnx.m_stopped = true;
-    double position    = 0.0F;
-    double duration    = 0.0F;
+    double position    = 0.0;
+    double duration    = 0.0;
     float  playerspeed = 0.0F;
     bool   playing     = false;
     QString pathname;
