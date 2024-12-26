@@ -1776,7 +1776,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         QWriteLocker lock(&m_sockListLock);
         if (!m_controlSocketList.remove(socket))
             return; // socket was disconnected
-        auto *pbs = new PlaybackSock(this, socket, commands[2], eventsMode);
+        auto *pbs = new PlaybackSock(socket, commands[2], eventsMode);
         m_playbackList.push_back(pbs);
         lock.unlock();
 
@@ -1823,8 +1823,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         QWriteLocker lock(&m_sockListLock);
         if (!m_controlSocketList.remove(socket))
             return; // socket was disconnected
-        auto *pbs = new PlaybackSock(this, socket, commands[2],
-                                     kPBSEvents_Normal);
+        auto *pbs = new PlaybackSock(socket, commands[2], kPBSEvents_Normal);
         pbs->setAsMediaServer();
         pbs->setBlockShutdown(false);
         m_playbackList.push_back(pbs);
@@ -1848,8 +1847,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         QWriteLocker lock(&m_sockListLock);
         if (!m_controlSocketList.remove(socket))
             return; // socket was disconnected
-        auto *pbs = new PlaybackSock(this, socket, commands[2],
-                                     kPBSEvents_None);
+        auto *pbs = new PlaybackSock(socket, commands[2], kPBSEvents_None);
         m_playbackList.push_back(pbs);
         lock.unlock();
 
@@ -8262,7 +8260,7 @@ void MainServer::reconnectTimeout(void)
     }
     masterServerSock->SetReadyReadCallbackEnabled(true);
 
-    m_masterServer = new PlaybackSock(this, masterServerSock, server,
+    m_masterServer = new PlaybackSock(masterServerSock, server,
                                     kPBSEvents_Normal);
     m_sockListLock.lockForWrite();
     m_playbackList.push_back(m_masterServer);

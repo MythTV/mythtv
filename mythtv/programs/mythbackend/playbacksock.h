@@ -27,7 +27,7 @@ enum PlaybackSockEventsMode : std::uint8_t {
 class PlaybackSock : public ReferenceCounter
 {
   public:
-    PlaybackSock(MainServer *parent, MythSocket *lsock,
+    PlaybackSock(MythSocket *lsock,
                  QString lhostname, PlaybackSockEventsMode eventsMode);
 
     void SetDisconnected(void) { m_disconnected = true; }
@@ -128,8 +128,6 @@ class PlaybackSock : public ReferenceCounter
     QMutex                  m_sockLock;
 
     bool                    m_disconnected  {false};
-
-    MainServer             *m_parent        {nullptr};
 };
 
 #endif
