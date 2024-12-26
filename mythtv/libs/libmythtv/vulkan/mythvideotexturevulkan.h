@@ -41,11 +41,13 @@ class MythVideoTextureVulkan
                                VkCommandBuffer   CommandBuffer,
                                MythVideoTextureVulkan* Texture);
 
+#if 0
     bool           m_valid       { false };
     VideoFrameType m_frameType   { FMT_NONE };
     VideoFrameType m_frameFormat { FMT_NONE };
     uint           m_plane       { 0 };
     uint           m_planeCount  { 0 };
+#endif
 };
 
 #endif

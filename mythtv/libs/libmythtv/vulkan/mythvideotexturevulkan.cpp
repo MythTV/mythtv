@@ -20,10 +20,13 @@ MythVideoTextureVulkan::CreateTextures(MythVulkanObject* Vulkan,
     return CreateSoftwareTextures(Vulkan, CommandBuffer, Type, Format, Size);
 }
 
-MythVideoTextureVulkan::MythVideoTextureVulkan(VideoFrameType Type, VideoFrameType Format)
+MythVideoTextureVulkan::MythVideoTextureVulkan([[maybe_unused]] VideoFrameType Type,
+                                               [[maybe_unused]] VideoFrameType Format)
+#if 0
   : m_frameType(Type),
     m_frameFormat(Format),
     m_planeCount(MythVideoFrame::GetNumPlanes(Format))
+#endif
 {
 }
 
