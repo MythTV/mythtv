@@ -2290,52 +2290,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (!enc)
             enc = m_codecMap.GetCodecContext(m_ic->streams[strm]);
 
-        const AVCodec *codec = nullptr;
-        if (enc)
-            codec = enc->codec;
-        else
+        if (enc == nullptr)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Could not find decoder for codec (%1), ignoring.")
                     .arg(avcodec_get_name(par->codec_id)));
-
-            // Nigel's bogus codec-debug. Dump the list of codecs & decoders,
-            // and have one last attempt to find a decoder. This is usually
-            // only caused by build problems, where libavcodec needs a rebuild
-            if (VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY))
-            {
-                void *opaque = nullptr;
-                const AVCodec *p = av_codec_iterate(&opaque);
-                while (p)
-                {
-                    QString msg;
-
-                    if (p->name[0] != '\0')
-                        msg = QString("Codec %1:").arg(p->name);
-                    else
-                        msg = QString("Codec %1, null name,").arg(strm);
-
-                    LOG(VB_LIBAV, LOG_INFO, LOC + msg);
-
-                    if (p->id == par->codec_id)
-                    {
-                        codec = p;
-                        break;
-                    }
-
-                    LOG(VB_LIBAV, LOG_INFO, LOC +
-                        QString("Codec 0x%1 != 0x%2") .arg(p->id, 0, 16)
-                            .arg(par->codec_id, 0, 16));
-                    p = av_codec_iterate(&opaque);
-                }
-            }
-            if (codec)
-                enc = m_codecMap.GetCodecContext(m_ic->streams[strm], codec);
-            else
-                continue;
-        }
-        if (!enc)
+            LOG(VB_LIBAV, LOG_INFO, "For a list of all codecs, run `mythffmpeg -codecs`.");
             continue;
+        }
 
         if (enc->codec && par->codec_id != enc->codec_id)
         {
@@ -2346,7 +2308,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_codecMap.FreeCodecContext(m_ic->streams[strm]);
             enc = m_codecMap.GetCodecContext(m_ic->streams[strm]);
         }
-        if (!OpenAVCodec(enc, codec))
+        if (!OpenAVCodec(enc, enc->codec))
             continue;
         if (!enc)
             continue;
