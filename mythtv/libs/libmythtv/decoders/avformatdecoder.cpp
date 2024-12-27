@@ -4779,6 +4779,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         }
 
         enum AVMediaType codec_type = curstream->codecpar->codec_type;
+        const AVCodecID codec_id = curstream->codecpar->codec_id;
 
         if (storevideoframes && codec_type == AVMEDIA_TYPE_VIDEO)
         {
@@ -4804,7 +4805,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         }
 
         if (codec_type == AVMEDIA_TYPE_SUBTITLE &&
-            curstream->codecpar->codec_id == AV_CODEC_ID_TEXT)
+            codec_id == AV_CODEC_ID_TEXT)
         {
             ProcessRawTextPacket(pkt);
             av_packet_unref(pkt);
@@ -4812,7 +4813,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         }
 
         if (codec_type == AVMEDIA_TYPE_SUBTITLE &&
-            curstream->codecpar->codec_id == AV_CODEC_ID_DVB_TELETEXT)
+            codec_id == AV_CODEC_ID_DVB_TELETEXT)
         {
             ProcessDVBDataPacket(curstream, pkt);
             av_packet_unref(pkt);
@@ -4826,17 +4827,20 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             continue;
         }
 
-        AVCodecContext *ctx = m_codecMap.GetCodecContext(curstream);
-        if (!ctx)
+        // ensure there is an AVCodecContext for this stream
+        AVCodecContext *context = m_codecMap.GetCodecContext(curstream);
+        if (context == nullptr)
         {
             if (codec_type != AVMEDIA_TYPE_VIDEO)
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     QString("No codec for stream index %1, type(%2) id(%3:%4)")
-                        .arg(pkt->stream_index)
-                    .arg(AVMediaTypeToString(codec_type),
-                         avcodec_get_name(curstream->codecpar->codec_id))
-                        .arg(curstream->codecpar->codec_id));
+                        .arg(QString::number(pkt->stream_index),
+                             AVMediaTypeToString(codec_type),
+                             avcodec_get_name(codec_id),
+                             QString::number(codec_id)
+                            )
+                   );
                 // Process Stream Change in case we have no audio
                 if (codec_type == AVMEDIA_TYPE_AUDIO && !m_audio->HasAudioIn())
                     m_streamsChanged = true;
@@ -4894,8 +4898,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Decoding - id(%1) type(%2)")
-                        .arg(avcodec_get_name(ctx->codec_id),
-                             AVMediaTypeToString(ctx->codec_type)));
+                        .arg(avcodec_get_name(codec_id),
+                             AVMediaTypeToString(codec_type)));
                 have_err = true;
                 break;
             }
