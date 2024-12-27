@@ -4808,6 +4808,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 }
             }
             break;
+        case AVMEDIA_TYPE_AUDIO:
+            // FFmpeg does not currently have an AC-4 decoder
+            if (codec_id == AV_CODEC_ID_AC4)
+            {
+                av_packet_unref(pkt);
+                continue;
+            }
+            break;
         case AVMEDIA_TYPE_SUBTITLE:
             switch (codec_id)
             {
