@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
+import { MythService } from 'src/app/services/myth.service';
 
 @Component({
   selector: 'app-legend',
@@ -14,10 +15,12 @@ export class LegendComponent implements OnInit {
   catTypes: string[] = [];
   categories: string[] = [];
   regex = /[^a-z0-9]/g;
+  cssFile = '';
 
-  constructor() { }
+  constructor(private mythService: MythService) { }
 
   ngOnInit(): void {
+    this.loadfInfo();
     let setTypes = new Set();
     let setCats = new Set();
     if (this.programGuide != null) {
@@ -65,6 +68,12 @@ export class LegendComponent implements OnInit {
     this.catTypes.sort();
     this.catTypes.push("default")
     this.categories.sort();
+  }
+
+  loadfInfo() {
+    this.mythService.GetBackendInfo().subscribe(data => {
+      this.cssFile = data.BackendInfo.Env.HttpRootDir + '/assets/guidecolors.css';
+    });
   }
 
 }
