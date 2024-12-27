@@ -4734,7 +4734,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         const AVCodecID codec_id = curstream->codecpar->codec_id;
 
         // Handle AVCodecID values that don't have an AVCodec decoder and
-        // pre-process video packets
+        // store video packets
         switch (codec_type)
         {
         case AVMEDIA_TYPE_VIDEO:
@@ -4743,19 +4743,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 m_storedPackets.append(pkt);
                 pkt = nullptr;
                 continue;
-            }
-            if (pkt->stream_index == m_selectedTrack[kTrackTypeVideo].m_av_stream_index)
-            {
-                if (!PreProcessVideoPacket(curstream, pkt))
-                    continue;
-
-                // If the resolution changed in XXXPreProcessPkt, we may
-                // have a fatal error, so check for this before continuing.
-                if (m_parent->IsErrored())
-                {
-                    av_packet_free(&pkt);
-                    return false;
-                }
             }
             break;
         case AVMEDIA_TYPE_AUDIO:
@@ -4829,6 +4816,17 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 if (pkt->stream_index != m_selectedTrack[kTrackTypeVideo].m_av_stream_index)
                 {
                     break;
+                }
+
+                if (!PreProcessVideoPacket(curstream, pkt))
+                    continue;
+
+                // If the resolution changed in XXXPreProcessPkt, we may
+                // have a fatal error, so check for this before continuing.
+                if (m_parent->IsErrored())
+                {
+                    av_packet_free(&pkt);
+                    return false;
                 }
 
                 if (pkt->pts != AV_NOPTS_VALUE)
