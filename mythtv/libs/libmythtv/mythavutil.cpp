@@ -289,23 +289,20 @@ AVCodecContext *MythCodecMap::GetCodecContext(const AVStream* Stream,
                                               const AVCodec* Codec,
                                               bool NullCodec)
 {
+    if (Stream == nullptr || Stream->codecpar == nullptr)
+        return nullptr;
     QMutexLocker lock(&m_mapLock);
     AVCodecContext* avctx = m_streamMap.value(Stream, nullptr);
-    if (!avctx)
+    if (avctx == nullptr)
     {
-        if (Stream == nullptr || Stream->codecpar == nullptr)
-            return nullptr;
-
         if (NullCodec)
         {
             Codec = nullptr;
         }
-        else
+        else if (Codec == nullptr)
         {
-            if (!Codec)
-                Codec = avcodec_find_decoder(Stream->codecpar->codec_id);
-
-            if (!Codec)
+            Codec = avcodec_find_decoder(Stream->codecpar->codec_id);
+            if (Codec == nullptr)
             {
                 LOG(VB_GENERAL, LOG_WARNING, QString("avcodec_find_decoder fail for %1")
                     .arg(Stream->codecpar->codec_id));
@@ -313,10 +310,10 @@ AVCodecContext *MythCodecMap::GetCodecContext(const AVStream* Stream,
             }
         }
         avctx = avcodec_alloc_context3(Codec);
-        if (avcodec_parameters_to_context(avctx, Stream->codecpar) < 0)
+        if (avctx != nullptr && avcodec_parameters_to_context(avctx, Stream->codecpar) < 0)
             avcodec_free_context(&avctx);
 
-        if (avctx)
+        if (avctx != nullptr)
         {
             avctx->pkt_timebase = Stream->time_base;
             m_streamMap.insert(Stream, avctx);
