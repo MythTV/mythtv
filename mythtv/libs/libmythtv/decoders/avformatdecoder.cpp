@@ -714,12 +714,12 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "SeekReset() flushing");
         for (uint i = 0; i < m_ic->nb_streams; i++)
         {
-            AVCodecContext *enc = m_codecMap.FindCodecContext(m_ic->streams[i]);
+            AVCodecContext *codecContext = m_codecMap.FindCodecContext(m_ic->streams[i]);
             // note that contexts that have not been opened have
-            // enc->internal = nullptr and cause a segfault in
+            // codecContext->internal = nullptr and cause a segfault in
             // avcodec_flush_buffers
-            if (enc && enc->internal)
-                avcodec_flush_buffers(enc);
+            if (codecContext && codecContext->internal)
+                avcodec_flush_buffers(codecContext);
         }
 
         // Free up the stored up packets
@@ -1386,30 +1386,30 @@ int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
     }
 }
 
-void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
+void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *codecContext,
                                      bool selectedStream)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InitVideoCodec ID:%1 Type:%2 Size:%3x%4")
-            .arg(avcodec_get_name(enc->codec_id),
-                 AVMediaTypeToString(enc->codec_type))
-            .arg(enc->width).arg(enc->height));
+            .arg(avcodec_get_name(codecContext->codec_id),
+                 AVMediaTypeToString(codecContext->codec_type))
+            .arg(codecContext->width).arg(codecContext->height));
 
     if (m_ringBuffer && m_ringBuffer->IsDVD())
         m_directRendering = false;
 
-    enc->opaque = static_cast<void*>(this);
-    enc->get_buffer2 = get_avf_buffer;
-    enc->slice_flags = 0;
+    codecContext->opaque = static_cast<void*>(this);
+    codecContext->get_buffer2 = get_avf_buffer;
+    codecContext->slice_flags = 0;
 
-    enc->err_recognition = AV_EF_COMPLIANT;
-    enc->workaround_bugs = FF_BUG_AUTODETECT;
-    enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
-    enc->idct_algo = FF_IDCT_AUTO;
-    enc->debug = 0;
-    // enc->error_rate = 0;
+    codecContext->err_recognition = AV_EF_COMPLIANT;
+    codecContext->workaround_bugs = FF_BUG_AUTODETECT;
+    codecContext->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
+    codecContext->idct_algo = FF_IDCT_AUTO;
+    codecContext->debug = 0;
+    // codecContext->error_rate = 0;
 
-    const AVCodec *codec1 = enc->codec;
+    const AVCodec *codec1 = codecContext->codec;
 
     if (selectedStream)
         m_directRendering = true;
@@ -1433,8 +1433,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     delete m_mythCodecCtx;
     m_mythCodecCtx = MythCodecContext::CreateContext(this, m_videoCodecId);
-    m_mythCodecCtx->InitVideoCodec(enc, selectedStream, m_directRendering);
-    if (m_mythCodecCtx->HwDecoderInit(enc) < 0)
+    m_mythCodecCtx->InitVideoCodec(codecContext, selectedStream, m_directRendering);
+    if (m_mythCodecCtx->HwDecoderInit(codecContext) < 0)
     {
         // force it to switch to software decoding
         m_averrorCount = SEQ_PKT_ERR_MAX + 1;
@@ -1453,7 +1453,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
         // FIXME - need a better way to handle this
         bool doublerate = true;//m_parent->CanSupportDoubleRate();
-        m_mythCodecCtx->SetDeinterlacing(enc, &m_videoDisplayProfile, doublerate);
+        m_mythCodecCtx->SetDeinterlacing(codecContext, &m_videoDisplayProfile, doublerate);
     }
 
     if (codec1 && ((AV_CODEC_ID_MPEG2VIDEO == codec1->id) ||
@@ -1461,32 +1461,32 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         if (FlagIsSet(kDecodeFewBlocks))
         {
-            int total_blocks = (enc->height + 15) / 16;
-            enc->skip_top    = (total_blocks + 3) / 4;
-            enc->skip_bottom = (total_blocks + 3) / 4;
+            int total_blocks = (codecContext->height + 15) / 16;
+            codecContext->skip_top    = (total_blocks + 3) / 4;
+            codecContext->skip_bottom = (total_blocks + 3) / 4;
         }
 
         if (FlagIsSet(kDecodeLowRes))
-            enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
+            codecContext->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
     }
     else if (codec1 && (AV_CODEC_ID_H264 == codec1->id) && FlagIsSet(kDecodeNoLoopFilter))
     {
-        enc->flags &= ~AV_CODEC_FLAG_LOOP_FILTER;
-        enc->skip_loop_filter = AVDISCARD_ALL;
+        codecContext->flags &= ~AV_CODEC_FLAG_LOOP_FILTER;
+        codecContext->skip_loop_filter = AVDISCARD_ALL;
     }
 
     if (FlagIsSet(kDecodeNoDecode))
-        enc->skip_idct = AVDISCARD_ALL;
+        codecContext->skip_idct = AVDISCARD_ALL;
 
     if (selectedStream)
     {
         // m_fps is now set 'correctly' in ScanStreams so this additional call
         // to GetVideoFrameRate may now be redundant
-        m_fps = GetVideoFrameRate(stream, enc, true);
-        QSize dim    = get_video_dim(*enc);
+        m_fps = GetVideoFrameRate(stream, codecContext, true);
+        QSize dim    = get_video_dim(*codecContext);
         int   width  = m_currentWidth  = dim.width();
         int   height = m_currentHeight = dim.height();
-        m_currentAspect = get_aspect(*enc);
+        m_currentAspect = get_aspect(*codecContext);
 
         if (!width || !height)
         {
@@ -1499,18 +1499,18 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
 
         m_parent->SetKeyframeDistance(m_keyframeDist);
-        const AVCodec *codec2 = enc->codec;
+        const AVCodec *codec2 = codecContext->codec;
         QString codecName;
         if (codec2)
             codecName = codec2->name;
         m_parent->SetVideoParams(width, height, m_fps,
-                                 m_currentAspect, false, GetMaxReferenceFrames(enc),
+                                 m_currentAspect, false, GetMaxReferenceFrames(codecContext),
                                  kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format = VIDEO_MPG;
 
-            switch (enc->codec_id)
+            switch (codecContext->codec_id)
             {
                 case AV_CODEC_ID_H263:
                 case AV_CODEC_ID_MPEG4:
@@ -1906,55 +1906,55 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
     AVStream *stream = m_ic->streams[stream_index];
     if (m_averrorCount > SEQ_PKT_ERR_MAX)
         m_codecMap.FreeCodecContext(stream);
-    AVCodecContext *enc = m_codecMap.GetCodecContext(stream, codec);
+    AVCodecContext *codecContext = m_codecMap.GetCodecContext(stream, codec);
     StreamInfo si {stream_index, 0};
 
     m_tracks[kTrackTypeVideo].push_back(si);
     m_selectedTrack[kTrackTypeVideo] = si;
 
-    QString codectype(AVMediaTypeToString(enc->codec_type));
-    if (enc->codec_type == AVMEDIA_TYPE_VIDEO)
-        codectype += QString("(%1x%2)").arg(enc->width).arg(enc->height);
+    QString codectype(AVMediaTypeToString(codecContext->codec_type));
+    if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO)
+        codectype += QString("(%1x%2)").arg(codecContext->width).arg(codecContext->height);
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
             .arg(stream_index).arg(static_cast<uint64_t>(stream->id), 0, 16)
-            .arg(avcodec_get_name(enc->codec_id),
-                 avcodec_profile_name(enc->codec_id, enc->profile),
+            .arg(avcodec_get_name(codecContext->codec_id),
+                 avcodec_profile_name(codecContext->codec_id, codecContext->profile),
                  codectype,
-                 QString::number(enc->bit_rate)));
+                 QString::number(codecContext->bit_rate)));
 
     // If ScanStreams has been called on a stream change triggered by a
     // decoder error - because the decoder does not handle resolution
     // changes gracefully (NVDEC and maybe MediaCodec) - then the stream/codec
     // will still contain the old resolution but the AVCodecContext will
     // have been updated. This causes mayhem for a second or two.
-    if ((enc->width != stream->codecpar->width) || (enc->height != stream->codecpar->height))
+    if ((codecContext->width != stream->codecpar->width) || (codecContext->height != stream->codecpar->height))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString(
             "Video resolution mismatch: Context: %1x%2 Stream: %3x%4 Codec: %5 Stream change: %6")
-            .arg(enc->width).arg(enc->height)
+            .arg(codecContext->width).arg(codecContext->height)
             .arg(stream->codecpar->width).arg(stream->codecpar->height)
             .arg(get_decoder_name(m_videoCodecId)).arg(m_streamsChanged));
     }
 
     m_avcParser->Reset();
 
-    QSize dim = get_video_dim(*enc);
+    QSize dim = get_video_dim(*codecContext);
     int width  = std::max(dim.width(),  16);
     int height = std::max(dim.height(), 16);
     QString dec = "ffmpeg";
     uint thread_count = 1;
     QString codecName;
-    if (enc->codec)
-        codecName = enc->codec->name;
+    if (codecContext->codec)
+        codecName = codecContext->codec->name;
     // framerate appears to never be set - which is probably why
     // GetVideoFrameRate never uses it:)
     // So fallback to the GetVideoFrameRate call which should then ensure
     // the video display profile gets an accurate frame rate - instead of 0
-    if (enc->framerate.den && enc->framerate.num)
-        m_fps = float(enc->framerate.num) / float(enc->framerate.den);
+    if (codecContext->framerate.den && codecContext->framerate.num)
+        m_fps = float(codecContext->framerate.num) / float(codecContext->framerate.den);
     else
-        m_fps = GetVideoFrameRate(stream, enc, true);
+        m_fps = GetVideoFrameRate(stream, codecContext, true);
 
     bool foundgpudecoder = false;
     QStringList unavailabledecoders;
@@ -1989,11 +1989,11 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
             thread_count = m_videoDisplayProfile.GetMaxCPUs();
             bool skip_loop_filter = m_videoDisplayProfile.IsSkipLoopEnabled();
             if  (!skip_loop_filter)
-                enc->skip_loop_filter = AVDISCARD_NONKEY;
+                codecContext->skip_loop_filter = AVDISCARD_NONKEY;
         }
 
         m_videoCodecId = kCodec_NONE;
-        uint version = mpeg_version(enc->codec_id);
+        uint version = mpeg_version(codecContext->codec_id);
         if (version)
             m_videoCodecId = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
 
@@ -2001,12 +2001,12 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
         {
             // We need to set this so that MythyCodecContext can callback
             // to the player in use to check interop support.
-            enc->opaque = static_cast<void*>(this);
-            MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
+            codecContext->opaque = static_cast<void*>(this);
+            MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &codecContext, &codec);
             if (hwcodec != kCodec_NONE)
             {
                 // the context may have changed
-                enc->opaque = static_cast<void*>(this);
+                codecContext->opaque = static_cast<void*>(this);
                 m_videoCodecId = hwcodec;
                 foundgpudecoder = true;
             }
@@ -2042,18 +2042,18 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
                 .arg(HAVE_THREADS ? thread_count : 1));
-            enc->thread_count = static_cast<int>(thread_count);
+            codecContext->thread_count = static_cast<int>(thread_count);
         }
     }
 
-    InitVideoCodec(stream, enc, true);
+    InitVideoCodec(stream, codecContext, true);
 
     ScanATSCCaptionStreams(stream_index);
     UpdateATSCCaptionTracks();
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 for video decoding").arg(GetCodecDecoderName()));
-    m_mythCodecCtx->SetDecoderOptions(enc, codec);
-    if (!OpenAVCodec(enc, codec))
+    m_mythCodecCtx->SetDecoderOptions(codecContext, codec);
+    if (!OpenAVCodec(codecContext, codec))
     {
         scanerror = -1;
     }
@@ -2137,7 +2137,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     for (uint strm = 0; strm < m_ic->nb_streams; strm++)
     {
         AVCodecParameters *par = m_ic->streams[strm]->codecpar;
-        AVCodecContext *enc = nullptr;
 
         QString codectype(AVMediaTypeToString(par->codec_type));
         if (par->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -2276,10 +2275,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             continue;
         }
 
-        if (!enc)
-            enc = m_codecMap.GetCodecContext(m_ic->streams[strm]);
+        AVCodecContext* codecContext = m_codecMap.GetCodecContext(m_ic->streams[strm]);
 
-        if (enc == nullptr)
+        if (codecContext == nullptr)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Could not find decoder for codec (%1), ignoring.")
@@ -2288,18 +2286,18 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             continue;
         }
 
-        if (enc->codec && par->codec_id != enc->codec_id)
+        if (codecContext->codec && par->codec_id != codecContext->codec_id)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Already opened codec not matching (%1 vs %2). Reopening")
-                .arg(avcodec_get_name(enc->codec_id),
-                     avcodec_get_name(enc->codec->id)));
+                .arg(avcodec_get_name(codecContext->codec_id),
+                     avcodec_get_name(codecContext->codec->id)));
             m_codecMap.FreeCodecContext(m_ic->streams[strm]);
-            enc = m_codecMap.GetCodecContext(m_ic->streams[strm]);
+            codecContext = m_codecMap.GetCodecContext(m_ic->streams[strm]);
         }
-        if (!OpenAVCodec(enc, enc->codec))
+        if (!OpenAVCodec(codecContext, codecContext->codec))
             continue;
-        if (!enc)
+        if (!codecContext)
             continue;
 
         if (!IsValidStream(m_ic->streams[strm]->id))
@@ -2353,7 +2351,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_tracks[kTrackTypeAudio].emplace_back(
                 static_cast<int>(strm), stream_id, lang, lang_indx, type);
 
-            if (is_dual_mono(enc->ch_layout))
+            if (is_dual_mono(codecContext->ch_layout))
             {
                 lang_indx = lang_aud_cnt[lang]++;
                 m_tracks[kTrackTypeAudio].emplace_back(
@@ -2364,7 +2362,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 QString("Audio Track #%1, of type (%2) is A/V stream #%3 (id=0x%4) "
                         "and has %5 channels in the %6 language(%7).")
                     .arg(m_tracks[kTrackTypeAudio].size()).arg(toString(type))
-                    .arg(strm).arg(m_ic->streams[strm]->id,0,16).arg(enc->ch_layout.nb_channels)
+                    .arg(strm).arg(m_ic->streams[strm]->id,0,16).arg(codecContext->ch_layout.nb_channels)
                     .arg(iso639_key_toName(lang)).arg(lang));
         }
     }

@@ -175,7 +175,7 @@ class AvFormatDecoder : public DecoderBase
                               int flags);
 
     void DecodeCCx08(const uint8_t *buf, uint buf_size);
-    void InitVideoCodec(AVStream *stream, AVCodecContext *enc,
+    void InitVideoCodec(AVStream *stream, AVCodecContext *codecContext,
                         bool selectedStream = false);
 
     /// Preprocess a packet, setting the video parms if necessary.
