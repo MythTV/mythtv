@@ -176,6 +176,17 @@ export class SetupService {
             Value: this.m_HostAddressData.MasterServerName
         }).subscribe(this.HostAddressObs);
 
+        if (this.m_HostAddressData.MasterServerName == this.m_HostAddressData.thisHostName) {
+            // Update deprecated settings for apps that still use them
+            this.mythService.PutSetting({
+                HostName: "_GLOBAL_", Key: "MasterServerIP",
+                Value: this.m_HostAddressData.BackendServerAddr
+            }).subscribe(this.HostAddressObs);
+            this.mythService.PutSetting({
+                HostName: "_GLOBAL_", Key: "MasterServerPort",
+                Value: String(this.m_HostAddressData.BackendServerPort)
+            }).subscribe(this.HostAddressObs);
+        }
     }
 
     m_LocaleData!: Locale;
