@@ -208,7 +208,10 @@ export class ChannelEditorComponent implements OnInit {
 
   loadIcons(seticon?: string) {
     this.mythService.GetBackendInfo().subscribe(data => {
-      this.iconDir = data.BackendInfo.Env.MYTHCONFDIR + "/channels";
+      if (data.BackendInfo.Env.MYTHCONFDIR)
+        this.iconDir = data.BackendInfo.Env.MYTHCONFDIR + "/channels";
+      else
+        this.iconDir = data.BackendInfo.Env.HOME + "/.mythtv/channels";
       this.mythService.GetDirListing(this.iconDir, true).subscribe(data => {
         // filter out resized images
         this.icons = data.DirListing.filter((icon) => !icon.match(/\.[0-9]*x[0-9]*\./))
