@@ -4781,50 +4781,52 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         enum AVMediaType codec_type = curstream->codecpar->codec_type;
         const AVCodecID codec_id = curstream->codecpar->codec_id;
 
-        if (storevideoframes && codec_type == AVMEDIA_TYPE_VIDEO)
+        // Handle AVCodecID values that don't have an AVCodec decoder and
+        // pre-process video packets
+        switch (codec_type)
         {
-            // av_dup_packet(pkt);
-            m_storedPackets.append(pkt);
-            pkt = nullptr;
-            continue;
-        }
-
-        if (codec_type == AVMEDIA_TYPE_VIDEO &&
-            pkt->stream_index == m_selectedTrack[kTrackTypeVideo].m_av_stream_index)
-        {
-            if (!PreProcessVideoPacket(curstream, pkt))
-                continue;
-
-            // If the resolution changed in XXXPreProcessPkt, we may
-            // have a fatal error, so check for this before continuing.
-            if (m_parent->IsErrored())
+        case AVMEDIA_TYPE_VIDEO:
+            if (storevideoframes)
             {
-                av_packet_free(&pkt);
-                return false;
+                m_storedPackets.append(pkt);
+                pkt = nullptr;
+                continue;
             }
-        }
+            if (pkt->stream_index == m_selectedTrack[kTrackTypeVideo].m_av_stream_index)
+            {
+                if (!PreProcessVideoPacket(curstream, pkt))
+                    continue;
 
-        if (codec_type == AVMEDIA_TYPE_SUBTITLE &&
-            codec_id == AV_CODEC_ID_TEXT)
-        {
-            ProcessRawTextPacket(pkt);
-            av_packet_unref(pkt);
-            continue;
-        }
-
-        if (codec_type == AVMEDIA_TYPE_SUBTITLE &&
-            codec_id == AV_CODEC_ID_DVB_TELETEXT)
-        {
-            ProcessDVBDataPacket(curstream, pkt);
-            av_packet_unref(pkt);
-            continue;
-        }
-
-        if (codec_type == AVMEDIA_TYPE_DATA)
-        {
+                // If the resolution changed in XXXPreProcessPkt, we may
+                // have a fatal error, so check for this before continuing.
+                if (m_parent->IsErrored())
+                {
+                    av_packet_free(&pkt);
+                    return false;
+                }
+            }
+            break;
+        case AVMEDIA_TYPE_SUBTITLE:
+            switch (codec_id)
+            {
+            case AV_CODEC_ID_TEXT:
+                ProcessRawTextPacket(pkt);
+                av_packet_unref(pkt);
+                continue;
+            case AV_CODEC_ID_DVB_TELETEXT:
+                ProcessDVBDataPacket(curstream, pkt);
+                av_packet_unref(pkt);
+                continue;
+            default:
+                break;
+            }
+            break;
+        case AVMEDIA_TYPE_DATA:
             ProcessDataPacket(curstream, pkt, decodetype);
             av_packet_unref(pkt);
             continue;
+        default:
+            break;
         }
 
         // ensure there is an AVCodecContext for this stream
