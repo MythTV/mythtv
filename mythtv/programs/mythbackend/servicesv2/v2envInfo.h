@@ -25,6 +25,7 @@ class V2EnvInfo : public QObject
     SERVICE_PROPERTY2( QString, HOME        )
     SERVICE_PROPERTY2( QString, USER        )
     SERVICE_PROPERTY2( QString, MYTHCONFDIR );
+    SERVICE_PROPERTY2( QString, HttpRootDir );
     SERVICE_PROPERTY2( bool,    SchedulingEnabled );
     SERVICE_PROPERTY2( bool,    IsDatabaseIgnored );
     SERVICE_PROPERTY2( bool,    DBTimezoneSupport );
@@ -51,6 +52,7 @@ class V2EnvInfo : public QObject
             m_HOME        = src->m_HOME;
             m_USER        = src->m_USER;
             m_MYTHCONFDIR = src->m_MYTHCONFDIR;
+            m_HttpRootDir = src->m_HttpRootDir;
             m_SchedulingEnabled = src->m_SchedulingEnabled;
             m_WebOnlyStartup = src->m_WebOnlyStartup;
         }

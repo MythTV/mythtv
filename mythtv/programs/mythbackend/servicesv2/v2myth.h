@@ -169,7 +169,7 @@ class V2Myth : public MythHTTPService
 
     static QString      ProfileText         ( void );
 
-    static V2BackendInfo* GetBackendInfo     ( void );
+    V2BackendInfo*       GetBackendInfo     ( void );
 
     static bool         ManageDigestUser    ( const QString &Action,
                                               const QString &UserName,
