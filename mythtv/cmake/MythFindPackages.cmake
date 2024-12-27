@@ -24,8 +24,9 @@ find_package(PkgConfig REQUIRED)
 # Packages provided by MythTV.  These have no dependencies on MythTV and must
 # have already been compiled and installed by the super-package.
 #
-if(CMAKE_SYSTEM_NAME MATCHES "Linux|Windows" AND CMAKE_SYSTEM_PROCESSOR MATCHES
-                                                 "x86|aarch64")
+if(NOT CMAKE_CROSSCOMPILING
+   AND CMAKE_SYSTEM_NAME MATCHES "Linux|Windows"
+   AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86|aarch64")
   pkg_check_modules(FFNVCODEC ffnvcodec REQUIRED IMPORTED_TARGET)
   add_build_config(PkgConfig::FFNVCODEC "nvdec")
   if(TARGET PkgConfig::FFNVCODEC)
