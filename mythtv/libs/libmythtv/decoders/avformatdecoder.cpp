@@ -2207,16 +2207,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case AVMEDIA_TYPE_AUDIO:
             {
-                enc = m_codecMap.FindCodecContext(m_ic->streams[strm]);
-                if (enc && enc->internal)
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        QString("Warning, audio codec 0x%1 id(%2) "
-                                "type (%3) already open, leaving it alone.")
-                            .arg(reinterpret_cast<unsigned long long>(enc), 0, 16)
-                            .arg(avcodec_get_name(enc->codec_id),
-                                 AVMediaTypeToString(enc->codec_type)));
-                }
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("codec %1 has %2 channels")
                         .arg(avcodec_get_name(par->codec_id))
