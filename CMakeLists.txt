@@ -500,7 +500,7 @@ endif()
 #
 # Maybe build translations executable
 #
-if(MYTH_BUILD_THEMESTRING_TOOL)
+if(MYTH_BUILD_THEMESTRING_TOOL AND NOT CMAKE_CROSSCOMPILING)
   message(VERBOSE "Setting up a sub-project for the themestringtool directory.")
   ExternalProject_Add(
     ThemeStringTool
