@@ -1013,24 +1013,6 @@ int DecoderBase::NextTrack(uint Type)
     return next_track;
 }
 
-bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
-{
-    QMutexLocker locker(&m_trackLock);
-
-    if (std::any_of(m_tracks[Type].cbegin(), m_tracks[Type].cend(),
-                    [&](const StreamInfo& Si) { return Si.m_stream_id == Info.m_stream_id; } ))
-    {
-        return false;
-    }
-
-    m_tracks[Type].push_back(Info);
-
-    if (m_parent)
-        emit m_parent->SignalTracksChanged(Type);
-
-    return true;
-}
-
 /** \fn DecoderBase::BestTrack(uint, bool)
  *  \brief Determine the best track according to weights
  *
