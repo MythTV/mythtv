@@ -329,22 +329,12 @@ endif()
 # environment for the necessary commands if there isn't already a JDK_HOME
 # environment variable.
 #
-if(ANDROID)
-  foreach(DIR "jbr" "jre")
-    set(FILENAME "$ENV{HOME}/Android/android-studio/${DIR}")
-    if(EXISTS ${FILENAME})
-      message(STATUS "Defaulting MYTH_JAVA_HOME to ${FILENAME}")
-      set(MYTH_JAVA_HOME
-          ${FILENAME}
-          CACHE PATH "Path to JDK home directory")
-      break()
-    endif()
-  endforeach()
-else()
-  set(MYTH_JAVA_HOME
-      ""
-      CACHE PATH "Path to JDK home directory")
-endif()
+set(MYTH_JAVA_HOME
+    ""
+    CACHE
+      PATH
+      "Path to JDK home directory. This will be used if the JAVA_HOME environment variable isn't set."
+)
 
 #
 # Load any user overrides to these values.

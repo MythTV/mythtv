@@ -187,10 +187,9 @@ target_include_directories(
   PUBLIC src
   PRIVATE src/libbluray src/bdnav ${CMAKE_CURRENT_BINARY_DIR})
 
-if(MYTH_JAVA_HOME)
-  target_include_directories(
-    mythbluray PRIVATE ${MYTH_JAVA_HOME}/include
-                       ${MYTH_JAVA_HOME}/include/${JAVAOS})
+if(JAVA_HOME)
+  target_include_directories(mythbluray PRIVATE ${JAVA_HOME}/include
+                                                ${JAVA_HOME}/include/${JAVAOS})
 else()
   target_sources(mythbluray PRIVATE jni/jni.h jni/${JAVAOS}/jni_md.h)
   target_include_directories(mythbluray PRIVATE ./jni ./jni/${JAVAOS})

@@ -131,6 +131,22 @@ endif()
 if(NOT TARBALL_DIR)
   set(TARBALL_DIR "${PROJECT_SOURCE_DIR}/tarballs")
 endif()
+if(NOT JAVA_HOME)
+  # Java home hasn't already been set by one of the platform build system
+  # validations.
+  #
+  # (Have to put an environment variable in real variable to test it.)
+  set(_TMP_ENV $ENV{JAVA_HOME})
+  if(_TMP_ENV)
+    message(STATUS "Using java from environment: ${_TMP_ENV}")
+    set(JAVA_HOME ${_TMP_ENV})
+  elseif(MYTH_JAVA_HOME)
+    message(STATUS "Using java from options: ${MYTH_JAVA_HOME}")
+    set(JAVA_HOME ${MYTH_JAVA_HOME})
+  else()
+    message(STATUS "Using java from system path")
+  endif()
+endif()
 
 #
 # FFmpeg doesn't support compiling out-of-tree after compiling in-tree. Catch
