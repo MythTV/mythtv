@@ -1880,6 +1880,11 @@ void AvFormatDecoder::ScanDSMCCStreams(AVBufferRef* pmt_section)
 
 int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
 {
+    m_tracks[kTrackTypeVideo].clear();
+    m_selectedTrack[kTrackTypeVideo].m_av_stream_index = -1;
+    m_currentTrack[kTrackTypeVideo] = -1;
+    m_fps = 0;
+
     const AVCodec *codec = nullptr;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to select best video track");
 
@@ -1911,6 +1916,7 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
 
     m_tracks[kTrackTypeVideo].push_back(si);
     m_selectedTrack[kTrackTypeVideo] = si;
+    m_currentTrack[kTrackTypeVideo] = m_tracks[kTrackTypeVideo].size() - 1;
 
     QString codectype(AVMediaTypeToString(codecContext->codec_type));
     if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -2112,13 +2118,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     m_tracks[kTrackTypeTeletextCaptions].clear();
     m_tracks[kTrackTypeTeletextMenu].clear();
     m_tracks[kTrackTypeRawText].clear();
-    if (!novideo)
-    {
-        // we will rescan video streams
-        m_tracks[kTrackTypeVideo].clear();
-        m_selectedTrack[kTrackTypeVideo].m_av_stream_index = -1;
-        m_fps = 0;
-    }
+
     std::map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
     std::map<int,uint> lang_aud_cnt;
