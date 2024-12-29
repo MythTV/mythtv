@@ -4,6 +4,8 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
+# This is set up to be a separate sub-project, but is currently
+# included by the MythTV sub-project.
 project(
   DVDREAD
   VERSION 6.0.0
@@ -11,6 +13,17 @@ project(
 
 include(CheckIncludeFile)
 include(CheckSymbolExists)
+
+# Remove some of the compilation flags that were added to MythTV by
+# the -Wall flag.
+string(APPEND CMAKE_C_FLAGS " -Wno-maybe-uninitialized")
+string(APPEND CMAKE_C_FLAGS " -Wno-unneeded-internal-declaration") # clang
+string(APPEND CMAKE_C_FLAGS " -Wno-unused-but-set-variable")
+string(APPEND CMAKE_C_FLAGS " -Wno-unused-variable")
+# Remove some of the compilation flags that were added to MythTV by
+# the -Wextra flag.
+string(APPEND CMAKE_C_FLAGS " -Wno-implicit-fallthrough")
+string(APPEND CMAKE_C_FLAGS " -Wno-unused-parameter")
 
 #
 # Compile this library as a static library on Android because of the circular

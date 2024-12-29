@@ -32,106 +32,78 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 list(
   APPEND
   CFLAGS
+  -fdiagnostics-color=auto
   -fno-math-errno
   -fno-signed-zeros
+  -fno-tree-vectorize
+  -mstack-alignment=16
   -Wall
-  -Wcast-qual
-  -Wdeclaration-after-statement
   -Wextra
-  -Wno-pointer-to-int-cast
-  -Wpedantic
+  -Wduplicated-branches
+  -Wduplicated-cond
+  -Werror=format-security
+  -Werror=implicit-function-declaration
+  -Werror=return-type
+  -Werror=vla
+  -Wjump-misses-init
+  -Wlogical-op
+  -Wnull-dereference
   -Wpointer-arith
-  -Wredundant-decls
-  -Wredundant-decls
-  -Wstrict-prototypes
-  -Wundef
   -Wwrite-strings)
 
 list(
   APPEND
   CXXFLAGS
+  -faligned-new
+  -fdiagnostics-color=auto
   -fno-math-errno
   -fno-signed-zeros
+  -fno-tree-vectorize
+  -funit-at-a-time
+  -mstack-alignment=16
+  -Qunused-arguments
   -Wall
   -Wextra
+  # -Wdouble-promotion
+  -Wduplicated-cond
+  -Werror=format-security
+  -Werror=implicit-function-declaration
+  -Werror=return-type
+  -Werror=vla
+  -Wimplicit-fallthrough
+  -Wjump-misses-init
+  -Wlogical-op
+  -Wmissing-declarations
+  -Wnull-dereference
+  -Woverloaded-virtual
   -Wpointer-arith
-  -Wundef)
-
-if(ENABLE_LTO AND NOT CMAKE_CROSSCOMPILING)
-  list(APPEND CFLAGS -flto)
-  list(APPEND CXXFLAGS -flto)
-  list(APPEND LFLAGS -flto)
-endif()
-
+  -Wredundant-decls
+  -Wsuggest-override
+  -Wundef
+  # -Wall flags to disable
+  -Wno-unknown-pragmas # gcc doesn't recognize clang pragmas
+)
 if(NOT ANDROID)
   list(APPEND CXXFLAGS "-Wshadow")
-endif()
-
-if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  list(APPEND CFLAGS -Wmissing-prototypes -Werror=missing-prototypes)
 endif()
 
 #
 # Add compiler specific flags.
 #
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  list(
-    APPEND
-    CFLAGS
-    -fdiagnostics-color=auto
-    -fno-tree-vectorize
-    -Wdouble-promotion
-    -Wduplicated-cond
-    -Wduplicated-branches
-    -Werror=format-security
-    -Werror=implicit-function-declaration
-    -Werror=return-type
-    -Werror=vla
-    -Wjump-misses-init
-    -Wlogical-op
-    -Wnull-dereference)
-
-  list(
-    APPEND
-    CXXFLAGS
-    -faligned-new
-    -funit-at-a-time
-    -Wdouble-promotion
-    -Wduplicated-cond
-    -Wlogical-op
-    -Wmissing-declarations
-    -Wnull-dereference
-    -Woverloaded-virtual
-    -Wzero-as-null-pointer-constant)
+  list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
 
   # This warning flag isn't enabled yet because it will require a large number
   # of changes to the code to eliminate all the warnings.
-  # add_compile_options($<${gnu_cxx}:$<BUILD_INTERFACE:-Wold-style-cast>>)
+  #
+  # list(APPEND CXXFLAGS -Wold-style-cast)
 
   # This warning flag can't be enabled because the Qt5 moc compiler produces
   # files that contain "useless" casts.
-  # add_compile_options($<${gnu_cxx}:$<BUILD_INTERFACE:-Wuseless-cast>>)
-
-  # The Q_OBJECT macro gets included in every subclass that is based on QOBject,
-  # and has a couple of functions marked as "virtual" instead of "override".
-  # Apparently earlier version of GCC didn't warn about this because the errors
-  # were in the /usr/include directory. GCC11 does print these warnings. A ton
-  # of them. Disable this warning to make it easier to find real errors.
-  if(CXX_COMPILER_VERSION VERSION_LESS 11.0.0)
-    list(APPEND CXXFLAGS -Wsuggest-override)
-  endif()
+  #
+  # list(APPEND CXXFLAGS -Wuseless-cast)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-
-  list(
-    APPEND
-    CFLAGS
-    -mllvm
-    -mstack-alignment=16
-    -Qunused-arguments
-    -Werror=implicit-function-declaration
-    -Werror=return-type
-    -Wimplicit-fallthrough)
 
   # The constant-logical-operand only gives use false positives for constant
   # logical operands meant to be optimized away.
@@ -142,9 +114,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # lets rely on other compilers to report on unused values.
   list(APPEND CXXFLAGS -Wno-unused-value)
 
-  # clang complains about every unused -I unless you pass it this.
-  list(APPEND CXXFLAGS -Qunused-arguments)
-
   # Clang on FreeBSD doesn't ignore warnings in system headers. A trivial test
   # shows that Clang defaults /usr/local/include to a system directory, but
   # somehow this gets messed up in MythTV builds.
@@ -154,6 +123,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
   endif()
 
+endif()
+
+if(ENABLE_LTO AND NOT CMAKE_CROSSCOMPILING)
+  list(APPEND CFLAGS -flto)
+  list(APPEND CXXFLAGS -flto)
+  list(APPEND LFLAGS -flto=auto)
 endif()
 
 #

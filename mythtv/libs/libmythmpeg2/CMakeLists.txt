@@ -4,6 +4,10 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
+# Remove some of the compilation flags that were added to MythTV by
+# the -Wextra flag.
+string(APPEND CMAKE_C_FLAGS " -Wno-implicit-fallthrough")
+
 #
 # Declare the library
 #
