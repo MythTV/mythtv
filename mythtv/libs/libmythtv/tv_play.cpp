@@ -8404,9 +8404,9 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         FillOSDMenuCast();
         hide = false;
     }
-    else if (Action.startsWith("JUMPCAST-"))
+    else if (Action.startsWith("JUMPCAST|"))
     {
-        QStringList tokens = Action.split("-");
+        QStringList tokens = Action.split("|");
         if (tokens.size() == 3)
             FillOSDMenuActorShows(tokens[1], tokens[2].toInt());
         else if (tokens.size() == 4)
@@ -9643,7 +9643,7 @@ void TV::RetrieveCast(const ProgramInfo& ProgInfo)
             pid = query.value(3).toInt();
             pname = QString::fromUtf8(query.value(1)
                                       .toByteArray().constData()) +
-                    "-" + QString::number(pid);
+                    "|" + QString::number(pid);
             character = QString::fromUtf8(query.value(2)
                                           .toByteArray().constData());
 
@@ -9664,12 +9664,12 @@ void TV::FillOSDMenuCastButton(MythOSDDialogData & dialog,
     for (const auto & [actor, role] : std::as_const(people))
     {
         if (role.isEmpty())
-            dialog.m_buttons.push_back( {actor.split('-')[0],
-                    QString("JUMPCAST-%1").arg(actor), true} );
+            dialog.m_buttons.push_back( {actor.split('|')[0],
+                    QString("JUMPCAST|%1").arg(actor), true} );
         else
             dialog.m_buttons.push_back( {QString("%1 as %2")
-                    .arg(actor.split('-')[0], role),
-                    QString("JUMPCAST-%1").arg(actor), true} );
+                    .arg(actor.split('|')[0], role),
+                    QString("JUMPCAST|%1").arg(actor), true} );
     }
 }
 
@@ -9693,9 +9693,9 @@ void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
     if (category.isEmpty())
     {
         dialog.m_buttons.push_back( {"Recorded",
-                QString("JUMPCAST-%1-%2-Recorded").arg(actor).arg(person_id) } );
+                QString("JUMPCAST|%1|%2|Recorded").arg(actor).arg(person_id) } );
         dialog.m_buttons.push_back( {"Upcoming",
-                QString("JUMPCAST-%1-%2-Upcoming").arg(actor).arg(person_id) } );
+                QString("JUMPCAST|%1|%2|Upcoming").arg(actor).arg(person_id) } );
         emit ChangeOSDDialog(dialog);
         return;
     }
@@ -9707,8 +9707,8 @@ void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
     }
 
     /*
-      JUMPCAST-Amanda Burton-133897-Recorded
-      JUMPCAST-Amanda Burton-133897-Upcoming
+      JUMPCAST|Amanda Burton|133897|Recorded
+      JUMPCAST|Amanda Burton|133897|Upcoming
     */
     if (m_progLists.find(actor) == m_progLists.end())
     {
@@ -9824,7 +9824,8 @@ void TV::SetManualZoom(bool ZoomON, const QString& Desc)
 bool TV::HandleJumpToProgramAction(const QStringList &Actions)
 {
     TVState state = GetState();
-    if (IsActionable({ ACTION_JUMPPREV, "PREVCHAN" }, Actions) && !StateIsLiveTV(state))
+    if (IsActionable({ ACTION_JUMPPREV, "PREVCHAN" }, Actions) &&
+        !StateIsLiveTV(state))
     {
         PrepareToExitPlayer(__LINE__);
         m_jumpToProgram = true;
