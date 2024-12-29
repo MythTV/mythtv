@@ -256,7 +256,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
     void EditSchedule(int EditType = kScheduleProgramGuide,
-                      const QString arg = "");
+                      const QString& arg = "");
     bool IsTunablePriv(uint ChanId);
     static QVector<uint> IsTunableOn(PlayerContext* Context, uint ChanId);
     void ChangeChannel(const ChannelInfoList& Options);
@@ -491,7 +491,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Menu dialog
     void ShowOSDMenu(bool isCompact = false);
     void FillOSDMenuJumpRec(const QString &Category = "", int Level = 0, const QString &Selected = "");
-    void FillOSDMenuCastButton(MythOSDDialogData & dialog,
+    static void FillOSDMenuCastButton(MythOSDDialogData & dialog,
                                const QVector<string_pair> & people);
     void FillOSDMenuCast(void);
     void FillOSDMenuActorShows(const QString & actor, int person_id,

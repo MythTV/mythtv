@@ -92,7 +92,7 @@ ProgLister::ProgLister(MythScreenStack *parent, TV* player,
                        ProgListType pltype, const QString & extraArg) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
-    m_extraArg(std::move(extraArg)),
+    m_extraArg(extraArg),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),

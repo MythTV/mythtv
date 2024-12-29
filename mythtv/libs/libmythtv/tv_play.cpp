@@ -7026,7 +7026,7 @@ void TV::DoEditSchedule(int EditType, const QString & EditArg)
     }
 }
 
-void TV::EditSchedule(int EditType, const QString arg)
+void TV::EditSchedule(int EditType, const QString& arg)
 {
     // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1 %2").arg(EditType).arg(arg);
@@ -9616,11 +9616,9 @@ void TV::RetrieveCast(const ProgramInfo& ProgInfo)
     if (query.exec() && query.size() > 0)
     {
         QStringList plist;
-        QString rstr;
         QString role;
         QString pname;
         QString character;
-        int pid;
 
         while(query.next())
         {
@@ -9640,7 +9638,7 @@ void TV::RetrieveCast(const ProgramInfo& ProgInfo)
              * majority of other columns, or we'll have the same problem in
              * reverse.
              */
-            pid = query.value(3).toInt();
+            int pid = query.value(3).toInt();
             pname = QString::fromUtf8(query.value(1)
                                       .toByteArray().constData()) +
                     "|" + QString::number(pid);
@@ -9664,12 +9662,16 @@ void TV::FillOSDMenuCastButton(MythOSDDialogData & dialog,
     for (const auto & [actor, role] : std::as_const(people))
     {
         if (role.isEmpty())
+        {
             dialog.m_buttons.push_back( {actor.split('|')[0],
                     QString("JUMPCAST|%1").arg(actor), true} );
+        }
         else
+        {
             dialog.m_buttons.push_back( {QString("%1 as %2")
                     .arg(actor.split('|')[0], role),
                     QString("JUMPCAST|%1").arg(actor), true} );
+        }
     }
 }
 
@@ -9719,15 +9721,14 @@ void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
                               " ORDER BY starttime;").arg(table));
         query.bindValue(":PERSON", person_id);
 
-        int       chanid;
         QDateTime starttime;
         if (query.exec() && query.size() > 0)
         {
             while(query.next())
             {
-                chanid = query.value(0).toInt();
+                int chanid = query.value(0).toInt();
                 starttime = MythDate::fromString(query.value(1).toString());
-                ProgramInfo *pi = new ProgramInfo(chanid, starttime.toUTC());
+                auto *pi = new ProgramInfo(chanid, starttime.toUTC());
                 if (!pi->GetTitle().isEmpty() &&
                     pi->GetRecordingGroup() != "LiveTV" &&
                     pi->GetRecordingGroup() != "Deleted")
@@ -9747,9 +9748,11 @@ void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
         if (show.isEmpty())
             continue;
         if (!pi->GetSubtitle().isEmpty())
+        {
             show += QString(" %1x%2 %3").arg(pi->GetSeason())
                                          .arg(pi->GetEpisode())
                                          .arg(pi->GetSubtitle());
+        }
 
         dialog.m_buttons.push_back( {show,
                 QString("JUMPPROG %1 %2").arg(actor).arg(++idx) });
