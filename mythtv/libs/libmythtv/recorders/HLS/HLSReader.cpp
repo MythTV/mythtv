@@ -1079,7 +1079,10 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     /* bits/sec */
     bandwidth = 8ULL * 1000 * segment_len / downloadduration.count();
     hls->AverageBandwidth(bandwidth);
-    hls->SetCurrentByteRate(segment_len/segment.Duration().count());
+    if (segment.Duration() > 0s)
+    {
+        hls->SetCurrentByteRate(segment_len/segment.Duration().count());
+    }
 
     LOG(VB_RECORD, (m_debug ? LOG_INFO : LOG_DEBUG), LOC +
         QString("%1 took %2ms for %3 bytes: bandwidth:%4KiB/s byterate:%5KiB/s")
