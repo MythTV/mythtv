@@ -1101,8 +1101,6 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         return err;
     }
 
-    AutoSelectTracks(); // This is needed for transcoder
-
 #ifdef USING_MHEG
     {
         int initialAudio = -1;
@@ -1732,6 +1730,8 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
                 .arg(nsi.m_stream_id)
                 .arg(iso639_key_toName(nsi.m_language)));
     }
+    AutoSelectTrack(kTrackTypeCC608);
+    AutoSelectTrack(kTrackTypeCC708);
 }
 
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
@@ -2113,12 +2113,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     int scanerror = 0;
     m_bitrate     = 0;
 
-    m_tracks[kTrackTypeAttachment].clear();
-    m_tracks[kTrackTypeAudio].clear();
-    m_tracks[kTrackTypeSubtitle].clear();
-    m_tracks[kTrackTypeTeletextCaptions].clear();
-    m_tracks[kTrackTypeTeletextMenu].clear();
-    m_tracks[kTrackTypeRawText].clear();
+    constexpr std::array<TrackType, 6> types {
+        kTrackTypeAttachment,
+        kTrackTypeAudio,
+        kTrackTypeSubtitle,
+        kTrackTypeTeletextCaptions,
+        kTrackTypeTeletextMenu,
+        kTrackTypeRawText,
+        };
+    for (const auto type : types)
+    {
+        m_tracks[type].clear();
+        m_currentTrack[type] = -1;
+    }
 
     std::map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
@@ -2394,8 +2401,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     PostProcessTracks();
 
-    // Select a new track at the next opportunity.
-    ResetTracks();
+    for (const auto type : types)
+    {
+        AutoSelectTrack(type);
+    }
 
     // We have to do this here to avoid the NVP getting stuck
     // waiting on audio.
@@ -3604,6 +3613,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                     m_trackLock.lock();
                     m_tracks[kTrackTypeTeletextMenu].push_back(si);
                     m_trackLock.unlock();
+                    AutoSelectTrack(kTrackTypeTeletextMenu);
                 }
                 m_trackLock.unlock();
                 m_ttd->Decode(buf+1, VBI_IVTV);
@@ -4588,8 +4598,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
     m_allowedQuit = false;
     bool storevideoframes = false;
-
-    AutoSelectTracks();
 
     m_skipAudio = (m_lastVPts == 0ms);
 
