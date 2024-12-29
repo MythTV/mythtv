@@ -32,9 +32,10 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     std::chrono::milliseconds GetStreamMaxPos();
     InteractiveTV* GetInteractiveTV() override;
 
+    void tracksChanged(uint TrackType) override;
+
   protected slots:
     void InitialiseState() override;
-    void TracksChanged(uint TrackType);
     void SetAllowForcedSubtitles(bool Allow);
     void ToggleCaptions();
     void ToggleCaptionsByType(uint Type);

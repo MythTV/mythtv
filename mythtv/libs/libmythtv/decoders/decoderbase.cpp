@@ -1160,7 +1160,7 @@ int DecoderBase::AutoSelectTrack(uint Type)
             .arg(m_currentTrack[Type]+1).arg(Type).arg(iso639_key_toName(lang)).arg(lang));
 
     if (m_parent && (oldTrack != m_currentTrack[Type]))
-        emit m_parent->SignalTracksChanged(Type);
+        m_parent->tracksChanged(Type);
 
     return selTrack;
 }
