@@ -25,6 +25,11 @@ endif()
 # Always use position independent code.
 #
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+if(CMAKE_BUILD_TYPE MATCHES "([A-Za-z])(.*)")
+  string(TOUPPER ${CMAKE_MATCH_1} _INIT)
+  string(TOLOWER ${CMAKE_MATCH_2} _REST)
+  include(SetCompilerOptions${_INIT}${_REST} OPTIONAL)
+endif()
 
 #
 # Always used flags

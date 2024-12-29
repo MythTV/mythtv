@@ -201,6 +201,7 @@
      | Release        | -O3 -DNDEBUG     |
      | RelWithDebInfo | -O2 -g -DNDEBUG  |
      | MinSizeRel     | -Os -DNDEBUG     |
+     | Fedora         | <All Fedora build system options> |
 
   If no `CMAKE_BUILD_TYPE` value is supplied, the value of `Debug`
   will be used.
