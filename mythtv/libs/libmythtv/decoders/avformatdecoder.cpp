@@ -4162,6 +4162,9 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     int               &ctrack  = m_currentTrack[kTrackTypeAudio];
 
     uint numStreams = atracks.size();
+    int selTrack = -1;
+    if (numStreams > 0)
+    {
     if ((ctrack >= 0) && (ctrack < (int)numStreams))
         return ctrack; // audio already selected
 
@@ -4176,7 +4179,12 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             );
     }
 
-    int selTrack = (1 == numStreams) ? 0 : -1;
+    if (1 == numStreams)
+    {
+        selTrack = 0;
+    }
+    else
+    {
     int wlang    = wtrack.m_language;
 
     if ((selTrack < 0) && (wtrack.m_av_substream_index >= 0))
@@ -4197,7 +4205,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         }
     }
 
-    if ((selTrack < 0) && wlang >= -1 && numStreams)
+    if ((selTrack < 0) && wlang >= -1)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to reselect audio track");
         // Try to reselect user selected audio stream.
@@ -4216,7 +4224,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         }
     }
 
-    if (selTrack < 0 && numStreams)
+    if (selTrack < 0)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select audio track (w/lang)");
 
@@ -4338,6 +4346,8 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             if (selTrack < 0)
                 selTrack = filter_max_ch(m_ic, atracks, flang);
         }
+    }
+    }
     }
 
     if (selTrack < 0)
