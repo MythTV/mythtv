@@ -101,7 +101,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SeekingDone();
     void PauseChanged(bool Paused);
     void RequestResetCaptions();
-    void SignalTracksChanged(uint Type);
 
   public:
     explicit MythPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
@@ -203,6 +202,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     // forced on even if the user doesn't have them turned on.)
     // These two functions are not thread-safe (UI thread use only).
     bool GetAllowForcedSubtitles(void) const { return m_allowForcedSubtitles; }
+
+    virtual void tracksChanged([[maybe_unused]] uint TrackType) {}
 
     // LiveTV public stuff
     void CheckTVChain();
