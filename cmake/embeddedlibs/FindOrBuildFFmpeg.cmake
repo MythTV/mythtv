@@ -60,6 +60,10 @@ function(find_or_build_ffmpeg)
          --extra-ldflags=-L${LIBS_INSTALL_PREFIX}/lib64)
   endif()
 
+  if(ANDROID)
+    list(APPEND FF_ARGS --enable-mediacodec --enable-jni)
+  endif()
+
   #
   # Do the lame libraries already exist, or will they exist by the time FFmpeg
   # is compiled?
