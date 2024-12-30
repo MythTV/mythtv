@@ -170,6 +170,7 @@ class AvFormatDecoder : public DecoderBase
                        const std::vector<int>&fs,
                        enum AVCodecID         codecId = AV_CODEC_ID_NONE,
                        int                    profile = -1);
+    int selectBestAudioTrack(int lang_key, const std::vector<int> &ftype);
 
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic,
                               int flags);

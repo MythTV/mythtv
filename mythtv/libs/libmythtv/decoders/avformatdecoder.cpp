@@ -4106,6 +4106,48 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
     return selectedTrack;
 }
 
+int AvFormatDecoder::selectBestAudioTrack(int lang_key, const std::vector<int> &ftype)
+{
+    const sinfo_vec_t &atracks = m_tracks[kTrackTypeAudio];
+    int selTrack = -1;
+
+    std::vector<int> flang = filter_lang(atracks, lang_key, ftype);
+
+    if (m_audio->CanDTSHD())
+    {
+        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
+                                 FF_PROFILE_DTS_HD_MA);
+        if (selTrack >= 0)
+            return selTrack;
+    }
+    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_TRUEHD);
+    if (selTrack >= 0)
+        return selTrack;
+
+    if (m_audio->CanDTSHD())
+    {
+        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
+                                 FF_PROFILE_DTS_HD_HRA);
+        if (selTrack >= 0)
+            return selTrack;
+    }
+    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_EAC3);
+    if (selTrack >= 0)
+        return selTrack;
+
+    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS);
+    if (selTrack >= 0)
+        return selTrack;
+
+    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_AC3);
+    if (selTrack >= 0)
+        return selTrack;
+
+    selTrack = filter_max_ch(m_ic, atracks, flang);
+
+    return selTrack;
+}
+
 /** \fn AvFormatDecoder::AutoSelectAudioTrack(void)
  *  \brief Selects the best audio track.
  *
@@ -4244,28 +4286,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
                 uint language_key = iso639_str3_to_key(language_key_convert);
                 uint canonical_key = iso639_key_to_canonical_key(language_key);
 
-                std::vector<int> flang = filter_lang(atracks, canonical_key, ftype);
-
-                if (m_audio->CanDTSHD())
-                    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                             FF_PROFILE_DTS_HD_MA);
-                if (selTrack < 0)
-                    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_TRUEHD);
-
-                if (selTrack < 0 && m_audio->CanDTSHD())
-                    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                             FF_PROFILE_DTS_HD_HRA);
-                if (selTrack < 0)
-                    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_EAC3);
-
-                if (selTrack < 0)
-                    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS);
-
-                if (selTrack < 0)
-                    selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_AC3);
-
-                if (selTrack < 0)
-                    selTrack = filter_max_ch(m_ic, atracks, flang);
+                selTrack = selectBestAudioTrack(canonical_key, ftype);
 
                 // Try to get best track for most preferred language for audio.
                 // Set by the "Guide Data" "Audio Language" preference in Appearance.
@@ -4274,31 +4295,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
                     auto it = m_languagePreference.begin();
                     for (; it !=  m_languagePreference.end() && selTrack < 0; ++it)
                     {
-                        flang = filter_lang(atracks, *it, ftype);
-
-                        if (m_audio->CanDTSHD())
-                            selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                                     FF_PROFILE_DTS_HD_MA);
-                        if (selTrack < 0)
-                            selTrack = filter_max_ch(m_ic, atracks, flang,
-                                                     AV_CODEC_ID_TRUEHD);
-
-                        if (selTrack < 0 && m_audio->CanDTSHD())
-                            selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                                     FF_PROFILE_DTS_HD_HRA);
-
-                        if (selTrack < 0)
-                            selTrack = filter_max_ch(m_ic, atracks, flang,
-                                                     AV_CODEC_ID_EAC3);
-
-                        if (selTrack < 0)
-                            selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS);
-
-                        if (selTrack < 0)
-                            selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_AC3);
-
-                        if (selTrack < 0)
-                            selTrack = filter_max_ch(m_ic, atracks, flang);
+                        selTrack = selectBestAudioTrack(*it, ftype);
                     }
                 }
 
@@ -4322,29 +4319,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
                 {
                     LOG(VB_AUDIO, LOG_INFO, LOC +
                         "Trying to select audio track (wo/lang)");
-                    flang = filter_lang(atracks, -1, ftype);
-
-                    if (m_audio->CanDTSHD())
-                        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                                 FF_PROFILE_DTS_HD_MA);
-                    if (selTrack < 0)
-                        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_TRUEHD);
-
-                    if (selTrack < 0 && m_audio->CanDTSHD())
-                        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                                 FF_PROFILE_DTS_HD_HRA);
-
-                    if (selTrack < 0)
-                        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_EAC3);
-
-                    if (selTrack < 0)
-                        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS);
-
-                    if (selTrack < 0)
-                        selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_AC3);
-
-                    if (selTrack < 0)
-                        selTrack = filter_max_ch(m_ic, atracks, flang);
+                    selTrack = selectBestAudioTrack(-1, ftype);
                 }
             }
         }
