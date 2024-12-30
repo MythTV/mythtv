@@ -297,13 +297,28 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     m_channels.clear();
 
     DTVConfParser::cardtype_t type = DTVConfParser::UNKNOWN;
-    type = ((CardUtil::DVBT == cardtype) ||
-            (CardUtil::DVBT2 == cardtype)) ? DTVConfParser::OFDM : type;
-    type = (CardUtil::QPSK == cardtype) ? DTVConfParser::QPSK : type;
-    type = (CardUtil::DVBC == cardtype) ? DTVConfParser::QAM  : type;
-    type = (CardUtil::DVBS2 == cardtype) ? DTVConfParser::DVBS2 : type;
-    type = ((CardUtil::ATSC == cardtype) ||
-            (CardUtil::HDHOMERUN == cardtype)) ? DTVConfParser::ATSC : type;
+    switch (cardtype) {
+      case CardUtil::DVBT:
+      case CardUtil::DVBT2:
+        type = DTVConfParser::OFDM;
+        break;
+      case CardUtil::QPSK:
+        type = DTVConfParser::QPSK;
+        break;
+      case CardUtil::DVBC:
+        type = DTVConfParser::QAM;
+        break;
+      case CardUtil::DVBS2:
+        type = DTVConfParser::DVBS2;
+        break;
+      case CardUtil::ATSC:
+      case CardUtil::HDHOMERUN:
+        type = DTVConfParser::ATSC;
+        break;
+      default:
+        type = DTVConfParser::UNKNOWN;
+        break;
+    }
 
     DTVConfParser::return_t ret { DTVConfParser::OK };
     if (type == DTVConfParser::UNKNOWN)
