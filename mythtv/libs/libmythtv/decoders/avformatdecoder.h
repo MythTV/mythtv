@@ -180,14 +180,14 @@ class AvFormatDecoder : public DecoderBase
                         bool selectedStream = false);
 
     /// Preprocess a packet, setting the video parms if necessary.
-    void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
-    int  H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
-    bool PreProcessVideoPacket(AVStream *stream, AVPacket *pkt);
-    virtual bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt, bool &Retry);
-    virtual bool ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame);
-    bool ProcessAudioPacket(AVStream *stream, AVPacket *pkt,
+    void MpegPreProcessPkt(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
+    int  H264PreProcessPkt(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
+    bool PreProcessVideoPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
+    virtual bool ProcessVideoPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt, bool &Retry);
+    virtual bool ProcessVideoFrame(AVCodecContext* codecContext, AVStream *Stream, AVFrame *AvFrame);
+    bool ProcessAudioPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);
-    bool ProcessSubtitlePacket(AVStream *stream, AVPacket *pkt);
+    bool ProcessSubtitlePacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
     bool ProcessRawTextPacket(AVPacket* Packet);
     virtual bool ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
                                    DecodeType decodetype);
