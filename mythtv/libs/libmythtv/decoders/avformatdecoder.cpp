@@ -3000,9 +3000,8 @@ static constexpr uint32_t SLICE_MIN       { 0x00000101 };
 static constexpr uint32_t SLICE_MAX       { 0x000001af };
 //static constexpr uint32_t SEQ_END_CODE  { 0x000001b7 };
 
-void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
+void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext* context, AVStream *stream, AVPacket *pkt)
 {
-    AVCodecContext *context = m_codecMap.GetCodecContext(stream);
     const uint8_t *bufptr = pkt->data;
     const uint8_t *bufend = pkt->data + pkt->size;
 
@@ -3095,9 +3094,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 }
 
 // Returns the number of frame starts identified in the packet.
-int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
+int AvFormatDecoder::H264PreProcessPkt(AVCodecContext* context, AVStream *stream, AVPacket *pkt)
 {
-    AVCodecContext *context = m_codecMap.GetCodecContext(stream);
     const uint8_t  *buf     = pkt->data;
     const uint8_t  *buf_end = pkt->data + pkt->size;
     int num_frames = 0;
@@ -3198,18 +3196,17 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
     return num_frames;
 }
 
-bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
+bool AvFormatDecoder::PreProcessVideoPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt)
 {
-    AVCodecContext *context = m_codecMap.GetCodecContext(curstream);
     int num_frames = 1;
 
     if (CODEC_IS_MPEG(context->codec_id))
     {
-        MpegPreProcessPkt(curstream, pkt);
+        MpegPreProcessPkt(context, curstream, pkt);
     }
     else if (CODEC_IS_H264(context->codec_id))
     {
-        num_frames = H264PreProcessPkt(curstream, pkt);
+        num_frames = H264PreProcessPkt(context, curstream, pkt);
     }
     else
     {
@@ -3257,11 +3254,10 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
-bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, bool &Retry)
+bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt, bool &Retry)
 {
     int ret = 0;
     int gotpicture = 0;
-    AVCodecContext *context = m_codecMap.GetCodecContext(curstream);
     MythAVFrame mpa_pic;
     if (!mpa_pic)
         return false;
@@ -3358,7 +3354,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
                 .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->pts)
                 .arg(mpa_pic->pkt_dts));
 
-        ProcessVideoFrame(curstream, mpa_pic);
+        ProcessVideoFrame(context, curstream, mpa_pic);
     }
 
     if (!sentPacket)
@@ -3372,11 +3368,8 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     return true;
 }
 
-bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
+bool AvFormatDecoder::ProcessVideoFrame(AVCodecContext* context, AVStream *Stream, AVFrame *AvFrame)
 {
-
-    auto * context = m_codecMap.GetCodecContext(Stream);
-
     // look for A53 captions
     auto * side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
     if (side_data && (side_data->size > 0))
@@ -3742,7 +3735,7 @@ void AvFormatDecoder::ProcessDSMCCPacket([[maybe_unused]] const AVStream *str,
 #endif // USING_MHEG
 }
 
-bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
+bool AvFormatDecoder::ProcessSubtitlePacket(AVCodecContext* codecContext, AVStream *curstream, AVPacket *pkt)
 {
     if (!m_parent->GetSubReader(pkt->stream_index))
         return true;
@@ -3790,8 +3783,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
                                   || pkt->stream_index == forcedSubIdx)
     {
         m_avCodecLock.lock();
-        AVCodecContext *ctx = m_codecMap.GetCodecContext(curstream);
-        avcodec_decode_subtitle2(ctx, &subtitle, &gotSubtitles, pkt);
+        avcodec_decode_subtitle2(codecContext, &subtitle, &gotSubtitles, pkt);
         m_avCodecLock.unlock();
 
         subtitle.start_display_time += pts;
@@ -4372,10 +4364,9 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
     }
 }
 
-bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
+bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstream, AVPacket *pkt,
                                          DecodeType decodetype)
 {
-    AVCodecContext *ctx = m_codecMap.GetCodecContext(curstream);
     int ret             = 0;
     int data_size       = 0;
     bool firstloop      = true;
@@ -4795,7 +4786,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         {
             case AVMEDIA_TYPE_AUDIO:
             {
-                if (!ProcessAudioPacket(curstream, pkt, decodetype))
+                if (!ProcessAudioPacket(context, curstream, pkt, decodetype))
                     have_err = true;
                 else
                     GenerateDummyVideoFrames();
@@ -4809,7 +4800,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
-                if (!PreProcessVideoPacket(curstream, pkt))
+                if (!PreProcessVideoPacket(context, curstream, pkt))
                     continue;
 
                 // If the resolution changed in XXXPreProcessPkt, we may
@@ -4833,14 +4824,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
-                if (!ProcessVideoPacket(curstream, pkt, Retry))
+                if (!ProcessVideoPacket(context, curstream, pkt, Retry))
                     have_err = true;
                 break;
             }
 
             case AVMEDIA_TYPE_SUBTITLE:
             {
-                if (!ProcessSubtitlePacket(curstream, pkt))
+                if (!ProcessSubtitlePacket(context, curstream, pkt))
                     have_err = true;
                 break;
             }

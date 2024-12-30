@@ -269,7 +269,7 @@ void MythDVDDecoder::CheckContext(int64_t Pts)
 }
 
 
-bool MythDVDDecoder::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &Retry)
+bool MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVStream *Stream, AVPacket *Pkt, bool &Retry)
 {
     int64_t pts = Pkt->pts;
 
@@ -278,7 +278,7 @@ bool MythDVDDecoder::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &R
 
     CheckContext(pts);
 
-    bool ret = AvFormatDecoder::ProcessVideoPacket(Stream, Pkt, Retry);
+    bool ret = AvFormatDecoder::ProcessVideoPacket(codecContext, Stream, Pkt, Retry);
     if (Retry)
         return ret;
 
@@ -330,7 +330,7 @@ bool MythDVDDecoder::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &R
     return ret;
 }
 
-bool MythDVDDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *Frame)
+bool MythDVDDecoder::ProcessVideoFrame(AVCodecContext* codecContext, AVStream *Stream, AVFrame *Frame)
 {
     bool ret = true;
 
@@ -338,7 +338,7 @@ bool MythDVDDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *Frame)
     {
         // Only process video frames if we're not searching for
         // the previous video frame after seeking in a slideshow.
-        ret = AvFormatDecoder::ProcessVideoFrame(Stream, Frame);
+        ret = AvFormatDecoder::ProcessVideoFrame(codecContext, Stream, Frame);
     }
 
     return ret;
