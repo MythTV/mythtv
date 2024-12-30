@@ -11,8 +11,9 @@ if(NOT TARGET SQLite::SQLite3)
 endif()
 
 add_executable(
-  test_recordingextender ../../recordingextender.cpp dummyscheduler.cpp
-                         test_recordingextender.cpp test_recordingextender.h)
+  test_recordingextender
+  ../../recordingextender.cpp dummyscheduler.cpp dummyscheduler.h
+  test_recordingextender.cpp test_recordingextender.h)
 
 target_include_directories(test_recordingextender PRIVATE . ../..)
 

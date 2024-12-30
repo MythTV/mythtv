@@ -1,23 +1,43 @@
-#include "libmythbase/mthread.h"
-#include "libmythbase/mythscheduler.h"
-#include "libmythtv/recordinginfo.h"
+#include "dummyscheduler.h"
 
 QMap<uint,RecordingInfo*> gFakeRecordings;
 
-class Scheduler : public MThread, public MythScheduler
+// Dummy functions so we don't have to link against scheduler.o, which
+// pulls in a ton of other requirements.
+Scheduler::Scheduler([[maybe_unused]] bool runthread,
+                     [[maybe_unused]] QMap<int, EncoderLink *> *_tvList,
+                     [[maybe_unused]] const QString& tmptable,
+                     [[maybe_unused]] Scheduler *master_sched) :
+    MThread("Scheduler")
+{}
+Scheduler::~Scheduler()
 {
-    // These have to match the signatures of the real scheduler.
-    QMap<QString,ProgramInfo*> GetRecording(void) const override;
-    RecordingInfo* GetRecording(uint recordedid) const;
-};
-
+}
+void Scheduler::GetAllPending([[maybe_unused]] QStringList &strList) const
+{
+}
 QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
+{
+    return {};
+};
+RecordingInfo* Scheduler::GetRecording([[maybe_unused]] uint recordedid) const
+{
+    return nullptr;
+};
+void Scheduler::run(void)
+{
+}
+
+//
+// Our test functions.
+//
+QMap<QString,ProgramInfo*> TestScheduler::GetRecording(void) const
 {
     return {};
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-RecordingInfo* Scheduler::GetRecording(uint recordedid) const
+RecordingInfo* TestScheduler::GetRecording(uint recordedid) const
 {
     if (recordedid == 0)
         return nullptr;

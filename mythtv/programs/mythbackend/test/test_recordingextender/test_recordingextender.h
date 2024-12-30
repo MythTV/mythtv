@@ -27,6 +27,7 @@ class TestRecordingExtender : public RecordingExtender
     Q_OBJECT
 
   public:
+    TestRecordingExtender();
     QDateTime getNow() {return m_nowForTest; }
 
   private:

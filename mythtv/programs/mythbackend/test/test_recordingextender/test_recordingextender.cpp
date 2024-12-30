@@ -31,7 +31,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythtv/dbcheck.h"
-#include "scheduler.h"
+#include "dummyscheduler.h"
 #include "test_recordingextender.h"
 
 static constexpr char const * const TESTNAME = "test_recordingextender";
@@ -143,6 +143,11 @@ RecExtDataPage* TestRecExtMlbDataSource::newPage(const QJsonDocument& doc)
 }
 
 //////////////////////////////////////////////////
+
+TestRecordingExtender::TestRecordingExtender()
+{
+    m_scheduler = new TestScheduler;
+}
 
 // Before all test cases
 void TestRecordingExtender::initTestCase()

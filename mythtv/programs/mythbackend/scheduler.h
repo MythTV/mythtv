@@ -81,7 +81,7 @@ class Scheduler : public MThread, public MythScheduler
     bool GetAllPending(ProgramList &retList, int recRuleId = 0) const;
     void GetAllPending(QStringList &strList) const override; // MythScheduler
     QMap<QString,ProgramInfo*> GetRecording(void) const override; // MythScheduler
-    RecordingInfo* GetRecording(uint recordedid) const;
+    virtual RecordingInfo* GetRecording(uint recordedid) const;
 
     enum SchedSortColumn : std::uint8_t
                          { kSortTitle, kSortLastRecorded, kSortNextRecording,
