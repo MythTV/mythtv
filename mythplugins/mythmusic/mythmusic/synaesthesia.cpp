@@ -480,10 +480,10 @@ bool Synaesthesia::process(VisualNode *node)
         double y1 = y[m_bitReverse[i]];
         double x2 = x[m_bitReverse[NumSamples - i]];
         double y2 = y[m_bitReverse[NumSamples - i]];
-        double aa = NAN;
-        double bb = NAN;
-        a[i] = sqrt(aa = (x1 + x2) * (x1 + x2) + (y1 - y2) * (y1 - y2));
-        b[i] = sqrt(bb = (x1 - x2) * (x1 - x2) + (y2 + y2) * (y1 + y2));
+        double aa = ((x1 + x2) * (x1 + x2)) + ((y1 - y2) * (y1 - y2));
+        double bb = ((x1 - x2) * (x1 - x2)) + ((y2 + y2) * (y1 + y2));
+        a[i] = sqrt(aa);
+        b[i] = sqrt(bb);
         if (aa + bb != 0.0)
         {
             clarity[i] = (int)(((x1 + x2) * (x1 - x2) + (y1 + y2) * (y1 - y2)) /
