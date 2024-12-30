@@ -8,9 +8,9 @@
 #include <QList>
 #include <QDateTime>
 
-#include "libmyth/mythexp.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythmedia.h"
+#include "libmythui/mythuiexp.h"
 
 /// Stores details of media handlers
 
@@ -42,7 +42,7 @@ class MonitorThread : public MThread
     QDateTime m_lastCheckTime;
 };
 
-class MPUBLIC MediaMonitor : public QObject
+class MUI_PUBLIC MediaMonitor : public QObject
 {
     Q_OBJECT
     friend class MonitorThread;

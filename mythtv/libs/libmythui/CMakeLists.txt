@@ -65,7 +65,6 @@ set(HEADERS_TO_INSTALL
     mythuitype.h
     mythuiutils.h
     mythuivideo.h
-    mythuiwebbrowser.h
     mythvirtualkeyboard.h
     schemawizard.h
     standardsettings.h
@@ -203,6 +202,7 @@ if(TARGET Qt5::AndroidExtras)
 endif()
 
 if(TARGET Qt${QT_VERSION_MAJOR}::WebKit)
+  list(APPEND HEADERS_TO_INSTALL mythuiwebbrowser.h)
   target_sources(mythui PRIVATE mythuiwebbrowser.cpp mythuiwebbrowser.h)
   target_link_libraries(mythui PUBLIC Qt${QT_VERSION_MAJOR}::WebKit
                                       Qt${QT_VERSION_MAJOR}::WebKitWidgets)
