@@ -296,48 +296,48 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     m_sourceid = sourceid;
     m_channels.clear();
 
-    DTVConfParser::cardtype_t type = DTVConfParser::UNKNOWN;
+    DTVConfParser::cardtype_t type = DTVConfParser::cardtype_t::UNKNOWN;
     switch (cardtype) {
       case CardUtil::DVBT:
       case CardUtil::DVBT2:
-        type = DTVConfParser::OFDM;
+        type = DTVConfParser::cardtype_t::OFDM;
         break;
       case CardUtil::QPSK:
-        type = DTVConfParser::QPSK;
+        type = DTVConfParser::cardtype_t::QPSK;
         break;
       case CardUtil::DVBC:
-        type = DTVConfParser::QAM;
+        type = DTVConfParser::cardtype_t::QAM;
         break;
       case CardUtil::DVBS2:
-        type = DTVConfParser::DVBS2;
+        type = DTVConfParser::cardtype_t::DVBS2;
         break;
       case CardUtil::ATSC:
       case CardUtil::HDHOMERUN:
-        type = DTVConfParser::ATSC;
+        type = DTVConfParser::cardtype_t::ATSC;
         break;
       default:
-        type = DTVConfParser::UNKNOWN;
+        type = DTVConfParser::cardtype_t::UNKNOWN;
         break;
     }
 
-    DTVConfParser::return_t ret { DTVConfParser::OK };
-    if (type == DTVConfParser::UNKNOWN)
-        ret = DTVConfParser::ERROR_CARDTYPE;
+    DTVConfParser::return_t ret { DTVConfParser::return_t::OK };
+    if (type == DTVConfParser::cardtype_t::UNKNOWN)
+        ret = DTVConfParser::return_t::ERROR_CARDTYPE;
     else
     {
         DTVConfParser parser(type, sourceid, file);
 
         ret = parser.Parse();
-        if (DTVConfParser::OK == ret)
+        if (DTVConfParser::return_t::OK == ret)
             m_channels = parser.GetChannels();
     }
 
-    if (DTVConfParser::OK != ret)
+    if (DTVConfParser::return_t::OK != ret)
     {
         QString msg;
-        if (DTVConfParser::ERROR_PARSE == ret)
+        if (DTVConfParser::return_t::ERROR_PARSE == ret)
             msg = tr("Failed to parse '%1'").arg(file);
-        else if (DTVConfParser::ERROR_CARDTYPE == ret)
+        else if (DTVConfParser::return_t::ERROR_CARDTYPE == ret)
             msg = tr("Programmer Error : incorrect card type");
         else
             msg = tr("Failed to open '%1'").arg(file);
