@@ -360,6 +360,19 @@ public:
 
 static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 {
+
+    #ifdef Q_OS_DARWIN
+        QString path = QCoreApplication::applicationDirPath();
+        setenv("PYTHONPATH",
+               QString("%1/../Resources/lib/python3:%1/../Resources/lib/python3/site-packages:%1/../Resources/lib/python3/lib-dynload:%2")
+               .arg(path)
+               .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
+               .toUtf8().constData(), 1);
+            QString PYTHON_LOCAL_EXE = path + "python3";
+    #else
+        QString PYTHON_LOCAL_EXE = QString(PYTHON_EXE);
+    #endif
+
     // make sure our lyrics cache directory exists
     QString lyricsDir = GetConfDir() + "/MythMusic/Lyrics/";
     QDir dir(lyricsDir);
@@ -500,7 +513,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
     {
         QStringList args { scripts.at(x), "-v" };
         QProcess p;
-        p.start(PYTHON_EXE, args);
+        p.start(PYTHON_LOCAL_EXE, args);
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 
@@ -562,7 +575,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
                            QString("--album=%1").arg(album),
                            QString("--title=%1").arg(title),
                            QString("--filename=%1").arg(filename) };
-        p.start(PYTHON_EXE, args);
+        p.start(PYTHON_LOCAL_EXE, args);
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 
