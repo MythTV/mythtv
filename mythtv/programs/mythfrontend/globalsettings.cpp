@@ -2121,6 +2121,23 @@ static HostTextEditSetting *LircDaemonDevice()
     return ge;
 }
 
+static HostTextEditSetting *CECDevice()
+{
+    auto *ge = new HostTextEditSetting("libCECDevice");
+
+    ge->setLabel(MainGeneralSettings::tr("CEC Device"));
+
+    ge->setValue("/dev/cec0");
+
+    QString help = MainGeneralSettings::tr("CEC Device. Default is /dev/cec0 "
+                                           "if you have only 1 HDMI output "
+                                           "port.");
+    ge->setHelpText(help);
+
+    return ge;
+}
+
+
 static HostTextEditSetting *ScreenShotPath()
 {
     auto *ge = new HostTextEditSetting("ScreenShotPath");
@@ -4246,6 +4263,7 @@ MainGeneralSettings::MainGeneralSettings()
 #ifdef USING_LIBCEC
     HostCheckBoxSetting *cec = CECEnabled();
     remotecontrol->addChild(cec);
+    cec->addTargetedChild("1",CECDevice());
     m_cecPowerOnTVAllowed = CECPowerOnTVAllowed();
     m_cecPowerOffTVAllowed = CECPowerOffTVAllowed();
     m_cecPowerOnTVOnStart = CECPowerOnTVOnStart();
