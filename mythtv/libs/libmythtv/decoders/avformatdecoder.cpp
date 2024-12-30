@@ -306,8 +306,10 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             break;
         case AV_LOG_VERBOSE:
         case AV_LOG_DEBUG:
-        case AV_LOG_TRACE:
             verbose_level = LOG_DEBUG;
+            break;
+        case AV_LOG_TRACE:
+            verbose_level = LOG_TRACE;
             break;
         default:
             return;

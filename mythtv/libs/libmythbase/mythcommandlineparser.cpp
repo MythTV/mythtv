@@ -2651,7 +2651,7 @@ void MythCommandLineParser::addDVBv3(void)
 }
 
 /** \brief Canned argument definition for all logging options, including
- *  --verbose, --logpath, --quiet, --loglevel, --syslog
+ *  --verbose, --logpath, --quiet, --loglevel, --syslog, --loglong
   */
 void MythCommandLineParser::addLogging(
     const QString &defaultVerbosity, LogLevel_t defaultLogLevel)
@@ -2682,12 +2682,15 @@ void MythCommandLineParser::addLogging(
     add(QStringList{"-q", "--quiet"}, "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "")
                 ->SetGroup("Logging");
+    add("--loglong", "loglong", 0,
+        "Use long log format for the console, i.e. show file, line number, etc. in the console log.", "")
+                ->SetGroup("Logging");
     add("--loglevel", "loglevel", logLevelStr,
         QString(
             "Set the logging level.  All log messages at lower levels will be "
             "discarded.\n"
             "In descending order: emerg, alert, crit, err, warning, notice, "
-            "info, debug\ndefaults to ") + logLevelStr, "")
+            "info, debug, trace\ndefaults to ") + logLevelStr, "")
                 ->SetGroup("Logging");
     add("--syslog", "syslog", "none",
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
@@ -2891,6 +2894,8 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
         verboseArgParse("none");
     }
 
+    bool loglong = toBool("loglong");
+
     int facility = GetSyslogFacility();
 #if CONFIG_SYSTEMD_JOURNAL
     bool journal = toBool("systemd-journal");
@@ -2922,7 +2927,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
     if (toBool("daemon"))
         quiet = std::max(quiet, 1);
 
-    logStart(logfile, progress, quiet, facility, level, propagate);
+    logStart(logfile, progress, quiet, facility, level, propagate, loglong);
     qInstallMessageHandler([](QtMsgType /*unused*/, const QMessageLogContext& /*unused*/, const QString &Msg)
         { LOG(VB_GENERAL, LOG_INFO, "Qt: " + Msg); });
 

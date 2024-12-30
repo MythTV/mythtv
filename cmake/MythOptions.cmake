@@ -171,6 +171,10 @@ option(
   ENABLE_EXIV2_DOWNLOAD
   "Build latest exiv2 instead of embedded copy.  This only afects native builds. Android/Windows builds will always downloded exiv2."
   OFF)
+option(
+  CONFIG_FORCE_LOGLONG
+  "Use long loging format for the console (i.e. show file, line number, etc.)."
+  OFF)
 
 #
 # Miscellaneous compilation options
