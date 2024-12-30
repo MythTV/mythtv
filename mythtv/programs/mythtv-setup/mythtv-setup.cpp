@@ -13,9 +13,9 @@
 #include <QtGlobal>
 
 // MythTV
-#include "libmyth/langsettings.h"
+#include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
-#include "libmyth/storagegroupeditor.h"
+#include "libmythui/storagegroupeditor.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"

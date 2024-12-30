@@ -3,7 +3,7 @@
 
 #include <array>
 
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 #include "libmythbase/mythdbcon.h"
 #include "mythtvexp.h"
 

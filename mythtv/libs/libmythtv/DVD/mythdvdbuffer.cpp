@@ -9,12 +9,12 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmyth/mythmediamonitor.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/sizetliteral.h"
+#include "libmythui/mediamonitor.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuiactions.h"
 

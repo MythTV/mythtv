@@ -5,7 +5,7 @@
 #define FREQUENCY_TABLE_SETTING_H
 
 // MythTV headers
-#include "libmyth/standardsettings.h"
+#include "libmythui/standardsettings.h"
 
 class ScanFrequencyTable: public TransMythUIComboBoxSetting
 {

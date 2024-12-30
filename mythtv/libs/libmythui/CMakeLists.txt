@@ -13,6 +13,8 @@ endif()
 #
 
 set(HEADERS_TO_INSTALL
+    langsettings.h
+    mediamonitor.h
     mythcolourspace.h
     mythdialogbox.h
     mythfontproperties.h
@@ -29,6 +31,7 @@ set(HEADERS_TO_INSTALL
     mythrect.h
     mythscreenstack.h
     mythscreentype.h
+    mythterminal.h
     myththemebase.h
     myththemedmenu.h
     mythuiactions.h
@@ -64,135 +67,113 @@ set(HEADERS_TO_INSTALL
     mythuivideo.h
     mythuiwebbrowser.h
     mythvirtualkeyboard.h
+    schemawizard.h
+    standardsettings.h
+    storagegroupeditor.h
     themeinfo.h
     x11colors.h
     xmlparsebase.h)
 
+set(LIBMYTHUI_HEADERS_NOT_INSTALLED
+    devices/mythinputdevicehandler.h
+    guistartup.h
+    mythdisplay.h
+    mythdisplaymode.h
+    mythedid.h
+    mythfontmanager.h
+    mythmainwindowprivate.h
+    mythnotificationcenter_private.h
+    mythpaintergpu.h
+    mythpainterwindow.h
+    mythpainterwindowqt.h
+    mythrender_base.h
+    mythscreensaver.h
+    mythudplistener.h
+    mythuiprocedural.h
+    mythvrr.h
+    rawsettingseditor.h
+    )
 #
 # Declare the library
 #
 add_library(
   mythui
+  ${HEADERS_TO_INSTALL}
+  ${LIBMYTHUI_HEADERS_NOT_INSTALLED}
   devices/mythinputdevicehandler.cpp
-  devices/mythinputdevicehandler.h
+  guistartup.cpp
+  langsettings.cpp
+  mediamonitor.cpp
   mythcolourspace.cpp
-  mythcolourspace.h
   mythdialogbox.cpp
-  mythdialogbox.h
   mythdisplay.cpp
   mythdisplaymode.cpp
   mythedid.cpp
   mythfontmanager.cpp
   mythfontproperties.cpp
-  mythfontproperties.h
   mythgenerictree.cpp
-  mythgenerictree.h
   mythgesture.cpp
-  mythgesture.h
   mythhdr.cpp
-  mythhdr.h
   mythimage.cpp
-  mythimage.h
   mythmainwindow.cpp
-  mythmainwindow.h
   mythmainwindowprivate.cpp
   mythnotification.cpp
-  mythnotification.h
   mythnotificationcenter.cpp
-  mythnotificationcenter.h
-  mythnotificationcenter_private.h
   mythpainter.cpp
-  mythpainter.h
   mythpainter_qt.cpp
-  mythpainter_qt.h
   mythpaintergpu.cpp
   mythpainterwindow.cpp
   mythpainterwindowqt.cpp
   mythprogressdialog.cpp
-  mythprogressdialog.h
   mythrect.cpp
-  mythrect.h
   mythrender.cpp
   mythscreensaver.cpp
   mythscreenstack.cpp
-  mythscreenstack.h
   mythscreentype.cpp
-  mythscreentype.h
+  mythterminal.cpp
   myththemebase.cpp
-  myththemebase.h
   myththemedmenu.cpp
-  myththemedmenu.h
   mythudplistener.cpp
-  mythuiactions.h
   mythuianimation.cpp
-  mythuianimation.h
   mythuibutton.cpp
-  mythuibutton.h
   mythuibuttonlist.cpp
-  mythuibuttonlist.h
   mythuibuttontree.cpp
-  mythuibuttontree.h
   mythuicheckbox.cpp
-  mythuicheckbox.h
   mythuiclock.cpp
-  mythuiclock.h
   mythuicomposite.cpp
-  mythuicomposite.h
   mythuieditbar.cpp
-  mythuieditbar.h
-  mythuiexp.h
   mythuifilebrowser.cpp
-  mythuifilebrowser.h
   mythuigroup.cpp
-  mythuigroup.h
   mythuiguidegrid.cpp
-  mythuiguidegrid.h
   mythuihelper.cpp
-  mythuihelper.h
   mythuiimage.cpp
-  mythuiimage.h
   mythuilocation.cpp
-  mythuilocation.h
   mythuiprocedural.cpp
   mythuiprogressbar.cpp
-  mythuiprogressbar.h
   mythuiscreenbounds.cpp
-  mythuiscreenbounds.h
   mythuiscrollbar.cpp
-  mythuiscrollbar.h
   mythuishape.cpp
-  mythuishape.h
   mythuisimpletext.cpp
-  mythuisimpletext.h
   mythuispinbox.cpp
-  mythuispinbox.h
   mythuistatetracker.cpp
-  mythuistatetracker.h
   mythuistatetype.cpp
-  mythuistatetype.h
   mythuitext.cpp
-  mythuitext.h
   mythuitextedit.cpp
-  mythuitextedit.h
   mythuithemecache.cpp
-  mythuithemecache.h
   mythuithemehelper.cpp
-  mythuithemehelper.h
   mythuitype.cpp
-  mythuitype.h
   mythuiutils.cpp
-  mythuiutils.h
   mythuivideo.cpp
-  mythuivideo.h
   mythvirtualkeyboard.cpp
-  mythvirtualkeyboard.h
   mythvrr.cpp
+  rawsettingseditor.cpp
+  schemawizard.cpp
+  standardsettings.cpp
+  storagegroupeditor.cpp
   themeinfo.cpp
-  themeinfo.h
   x11colors.cpp
-  x11colors.h
   xmlparsebase.cpp
-  xmlparsebase.h)
+  )
 
 #
 # All remaining target information
@@ -371,14 +352,27 @@ if(ANDROID)
             platforms/mythscreensaverandroid.h)
 endif()
 
+if(UNIX)
+  target_sources(mythui PRIVATE mediamonitor-unix.cpp mediamonitor-unix.h)
+  if(NOT TARGET ${QT_PKG_NAME}::DBus)
+    set_source_files_properties(mediamonitor-unix.h PROPERTIES SKIP_AUTOMOC
+                                                               TRUE)
+  endif()
+endif()
+
 if(WIN32)
   target_sources(mythui PRIVATE mythpainter_d3d9.cpp mythrender_d3d9.cpp
+                                mediamonitor-windows.cpp mediamonitor-windows.h
                                 platforms/mythdisplaywindows.cpp)
   target_compile_definitions(mythui PRIVATE NODRAWTEXT)
   target_link_libraries(mythui PUBLIC user32 gdi32)
   if(HAVE_DXVA2)
     target_compile_definitions(mythui PRIVATE USING_DXVA2)
   endif()
+endif()
+
+if(MINGW OR win32-msvc)
+  target_sources(mythui PRIVATE mediamonitor-windows.cpp mediamonitor-windows.h)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -402,6 +396,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   target_compile_definitions(mythui PRIVATE USING_APPLEREMOTE)
   if(NOT ENABLE_LIRC)
     target_sources(mythui PRIVATE devices/lircevent.cpp devices/lircevent.h)
+  endif()
+  if(DARWIN_DA)
+    set_target_properties(mythui PROPERTIES COMPILE_DEFINITIONS USING_DARWIN_DA)
+    target_sources(mythui PRIVATE mediamonitor-darwin.cpp mediamonitor-darwin.h)
+    target_link_libraries(mythui PRIVATE ${APPLE_DISKARBITRATION_LIBRARY})
   endif()
 endif()
 

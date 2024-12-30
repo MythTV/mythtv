@@ -21,7 +21,7 @@
 
 // MythTV headers
 #include "libmyth/dbsettings.h"
-#include "libmyth/langsettings.h"
+#include "libmythui/langsettings.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"

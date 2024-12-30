@@ -7,7 +7,7 @@
 
 #include <QCoreApplication>
 
-#include <libmyth/standardsettings.h>
+#include <libmythui/standardsettings.h>
 
 class ZMSettings : public GroupSetting
 {

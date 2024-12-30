@@ -12,20 +12,14 @@ endif()
 # Enumerate all headers
 #
 set(LIBMYTH_HEADERS
-    langsettings.h
     mythaverror.h
     mythcontext.h
     mythexp.h
-    mythmediamonitor.h
-    mythterminal.h
     output.h
-    schemawizard.h
-    standardsettings.h
-    storagegroupeditor.h
-    visual.h)
+    visual.h
+    )
 
-set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h dbsettings.h guistartup.h
-                                  rawsettingseditor.h)
+set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h dbsettings.h)
 
 set(AUDIO_HEADERS
     audio/audioconvert.h
@@ -73,17 +67,10 @@ add_library(
   audio/volumebase.cpp
   backendselect.cpp
   dbsettings.cpp
-  guistartup.cpp
-  langsettings.cpp
   mythaverror.cpp
   mythcontext.cpp
-  mythmediamonitor.cpp
-  mythterminal.cpp
   output.cpp
-  rawsettingseditor.cpp
-  schemawizard.cpp
-  standardsettings.cpp
-  storagegroupeditor.cpp)
+  )
 
 #
 # Platform stuff
@@ -107,18 +94,11 @@ if(TARGET PkgConfig::PULSEAUDIO)
                                 audio/audiooutputpulse.h)
   endif()
 endif()
-if(UNIX)
-  target_sources(myth PRIVATE mediamonitor-unix.cpp mediamonitor-unix.h)
-  if(NOT TARGET ${QT_PKG_NAME}::DBus)
-    set_source_files_properties(mediamonitor-unix.h PROPERTIES SKIP_AUTOMOC
-                                                               TRUE)
-  endif()
-endif()
+
 if(WIN32)
   target_sources(
     myth
-    PRIVATE mediamonitor-windows.cpp mediamonitor-windows.h
-            audio/audiooutputwin.cpp audio/audiooutputdx.cpp
+    PRIVATE audio/audiooutputwin.cpp audio/audiooutputdx.cpp
             audio/audiooutputwin.h audio/audiooutputdx.h)
 elseif(ANDROID)
   target_sources(
@@ -127,7 +107,7 @@ elseif(ANDROID)
 endif()
 
 if(MINGW OR win32-msvc)
-  target_sources(myth PRIVATE mediamonitor-windows.cpp audio/audiooutputwin.cpp
+  target_sources(myth PRIVATE audio/audiooutputwin.cpp
                               audio/audiooutputdx.cpp)
   target_link_libraries(myth PRIVATE winmm ws2_32 user32 PkgConfig::SAMPLERATE
                                      PkgConfig::SoundTouch)
@@ -138,13 +118,7 @@ if(APPLE)
   target_link_libraries(
     myth
     PRIVATE ${APPLE_APPLICATIONSERVICES_LIBRARY} ${APPLE_AUDIOTOOLBOX_LIBRARY}
-            ${APPLE_AUDIOUNIT_LIBRARY} ${APPLE_COREAUDIO_LIBRARY}
-            ${APPLE_IOKIT_LIBRARY})
-  if(DARWIN_DA)
-    set_target_properties(myth PROPERTIES COMPILE_DEFINITIONS USING_DARWIN_DA)
-    target_sources(myth PRIVATE mediamonitor-darwin.cpp mediamonitor-darwin.h)
-    target_link_libraries(myth PRIVATE ${APPLE_DISKARBITRATION_LIBRARY})
-  endif()
+            ${APPLE_AUDIOUNIT_LIBRARY} ${APPLE_COREAUDIO_LIBRARY})
 endif()
 
 #
@@ -171,7 +145,6 @@ target_link_libraries(
           $<TARGET_NAME_IF_EXISTS:PkgConfig::ALSA>
           $<TARGET_NAME_IF_EXISTS:PkgConfig::JACK>
           $<TARGET_NAME_IF_EXISTS:PkgConfig::PULSEAUDIO>
-          $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::DBus>
           $<$<BOOL:${WIN32}>:winmm>
           $<$<BOOL:${WIN32}>:ws2_32>
           $<$<BOOL:${WIN32}>:user32>

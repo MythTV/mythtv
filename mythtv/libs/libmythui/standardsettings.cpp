@@ -4,6 +4,7 @@
 #include <QThread>
 #include <utility>
 
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
@@ -11,8 +12,6 @@
 #include "libmythui/mythuifilebrowser.h"
 #include "libmythui/mythuispinbox.h"
 #include "libmythui/mythuitext.h"
-
-#include "mythcontext.h"
 
 void MythUIButtonListItemSetting::ShouldUpdate(StandardSetting *setting)
 {

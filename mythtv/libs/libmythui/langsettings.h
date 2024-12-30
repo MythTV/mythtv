@@ -6,7 +6,7 @@
 #include <QTranslator>
 
 // MythDB headers
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 // MythUI headers
 #include "libmythui/mythscreentype.h"
@@ -18,7 +18,7 @@ class MythUIButton;
 class MythUIText;
 class MythScreenStack;
 
-class MPUBLIC LanguageSelection : public MythScreenType
+class MUI_PUBLIC LanguageSelection : public MythScreenType
 {
     Q_OBJECT
 

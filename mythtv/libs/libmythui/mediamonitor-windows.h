@@ -1,7 +1,7 @@
 #ifndef MYTH_MEDIA_MONITOR_WINDOWS_H
 #define MYTH_MEDIA_MONITOR_WINDOWS_H
 
-#include "mythmediamonitor.h"
+#include "mediamonitor.h"
 
 #define DEFAULT_DVD "e:"
 #define DEFAULT_CD  "e:"

@@ -1,3 +1,4 @@
+#include "mediamonitor.h"
 
 // Standard C headers
 #include <cstdio>
@@ -24,7 +25,6 @@
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 
-#include "mythmediamonitor.h"
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"
 #elif defined(Q_OS_WIN)

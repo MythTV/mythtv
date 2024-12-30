@@ -26,7 +26,6 @@
 #include <utility>
 
 // MythTV headers
-#include "libmyth/mythterminal.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythconfig.h"
@@ -36,6 +35,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythui/mythnotification.h"
+#include "libmythui/mythterminal.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
 
 #include "cardutil.h"
