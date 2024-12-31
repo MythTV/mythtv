@@ -1390,10 +1390,12 @@ void VideoDialog::fetchVideos()
     }
     else
     {
-        m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
+        if (m_d->m_videoList)
+            m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
                 m_d->m_parentalLevel.GetLevel(),
                 m_d->m_isFlatList, m_d->m_groupType);
-        m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
+        if(m_d->m_videoList)
+            m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
     }
 
     m_d->m_treeLoaded = true;
@@ -3089,7 +3091,10 @@ void VideoDialog::playVideo()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
-        PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
+    {
+        auto cache = m_d->m_videoList->getListCache();
+        PlayVideo(metadata->GetFilename(), cache);
+    }
 }
 
 /** \fn VideoDialog::playVideoAlt()
@@ -3100,8 +3105,10 @@ void VideoDialog::playVideoAlt()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
-        PlayVideo(metadata->GetFilename(),
-                  m_d->m_videoList->getListCache(), true);
+    {
+        auto cache = m_d->m_videoList->getListCache();
+        PlayVideo(metadata->GetFilename(), cache, true);
+    }
 }
 
 /** \fn VideoDialog::playFolder()
@@ -3139,8 +3146,8 @@ void VideoDialog::playFolder()
                 {
                     playing_time.start();
                     video_started = true;
-                    PlayVideo(metadata->GetFilename(),
-                              m_d->m_videoList->getListCache());
+                    auto cache = m_d->m_videoList->getListCache();
+                    PlayVideo(metadata->GetFilename(), cache);
                 }
             }
             i++;
@@ -3610,7 +3617,7 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
     if (!metadata)
         return;
 
-    if (m_d->m_videoList->Delete(metadata->GetID()))
+    if (m_d->m_videoList && m_d->m_videoList->Delete(metadata->GetID()))
     {
         if (m_videoButtonTree)
             m_videoButtonTree->RemoveItem(item, false); // FIXME Segfault when true
