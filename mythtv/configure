@@ -3585,7 +3585,9 @@ if test "$cpu" = host; then
         ;;
     esac
 
-    if test "${cpu:-host}" = host ; then
+    if test "${cpu:-host}" != host ; then
+        cpuflags_native="-march=native -mtune=native"
+    else
         enable proc_opt_old
         cpu="$arch"
     fi
@@ -4128,6 +4130,9 @@ elif enabled x86; then
 
 fi
 
+if [ -n "$cpuflags_native" ]; then
+    cpuflags="$cpuflags_native"
+fi
 
 # if architecture specific flags don't work blank them
 if test -n "$cpuflags"; then
@@ -6752,6 +6757,11 @@ ffmpeg_optenable() {
     done
 }
 
+if [ -n "$cpuflags_native" ]; then
+    cpu_detected="$cpu"
+    cpu="host"
+fi
+
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
@@ -6873,7 +6883,14 @@ echo "install prefix            $prefix"
 echo "runtime prefix            $runprefix"
 echo
 if enabled cpu_override && test x"$cpu" != x"generic"; then
-    echo "CPU override              $arch $subarch ($cpu)"
+    if [ -n "$cpuflags_native" ]; then
+        echo "CPU override              $arch $subarch (cpu=host (native) is $cpu_detected)"
+        if test x"$processor" != x"" ; then
+            echo "                          [$processor]"
+        fi
+    else
+        echo "CPU override              $arch $subarch ($cpu)"
+    fi
 elif test x"$processor" != x"" ; then
     echo "CPU                       $arch $subarch ($processor)"
 else
