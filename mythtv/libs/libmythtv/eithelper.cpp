@@ -417,7 +417,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             if (dish_event_description)
             {
                 DishEventDescriptionDescriptor dedd(dish_event_description);
-                if (dedd.HasDescription())
+                if (dedd.IsValid() && dedd.HasDescription())
                     description = dedd.Description(descCompression);
             }
         }
@@ -445,7 +445,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             if (mpaa_data)
             {
                 DishEventMPAADescriptor mpaa(mpaa_data);
-                stars = mpaa.stars();
+                if (mpaa.IsValid())
+                    stars = mpaa.stars();
 
                 if (stars != 0.0F) // Only movies for now
                 {
