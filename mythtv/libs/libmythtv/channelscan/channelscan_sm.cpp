@@ -384,7 +384,10 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
     LogLines(pat->toString());
 
     // Add pmts to list, so we can do MPEG scan properly.
-    ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
+    DTVSignalMonitor *monitor = GetDTVSignalMonitor();
+    if (nullptr == monitor)
+        return;
+    ScanStreamData *sd = monitor->GetScanStreamData();
     for (uint i = 0; i < pat->ProgramCount(); ++i)
     {
         sd->AddListeningPID(pat->ProgramPID(i));
@@ -470,24 +473,35 @@ void ChannelScanSM::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
         sdt->OriginalNetworkID() == OriginalNetworkID::SES2 ||
         sdt->OriginalNetworkID() == OriginalNetworkID::BBC))
     {
-        GetDTVSignalMonitor()->GetScanStreamData()->
-                               SetFreesatAdditionalSI(true);
-        m_setOtherTables = true;
-        // The whole BAT & SDTo group comes round in 10s
-        m_otherTableTimeout = 10s;
-        // Delay processing the SDT until we've seen BATs and SDTos
-        m_otherTableTime = std::chrono::milliseconds(m_timer.elapsed()) + m_otherTableTimeout;
+        DTVSignalMonitor *monitor = GetDTVSignalMonitor();
+        if (nullptr != monitor)
+        {
+            ScanStreamData *stream = monitor->GetScanStreamData();
+            if (nullptr != stream)
+            {
+                stream->SetFreesatAdditionalSI(true);
+                m_setOtherTables = true;
+                // The whole BAT & SDTo group comes round in 10s
+                m_otherTableTimeout = 10s;
+                // Delay processing the SDT until we've seen BATs and SDTos
+                m_otherTableTime = std::chrono::milliseconds(m_timer.elapsed()) + m_otherTableTimeout;
 
-        LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("SDT has OriginalNetworkID %1, look for "
-                    "additional Freesat SI").arg(sdt->OriginalNetworkID()));
+                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                    QString("SDT has OriginalNetworkID %1, look for "
+                            "additional Freesat SI").arg(sdt->OriginalNetworkID()));
+            }
+        }
     }
 
     if (!m_timer.hasExpired(m_otherTableTime.count()))
     {
         // Set the version for the SDT so we see it again.
-        GetDTVSignalMonitor()->GetDVBStreamData()->
-            SetVersionSDT(sdt->TSID(), -1, 0);
+        DTVSignalMonitor *monitor = GetDTVSignalMonitor();
+        if (nullptr != monitor)
+        {
+            monitor->GetDVBStreamData()->
+                SetVersionSDT(sdt->TSID(), -1, 0);
+        }
     }
 
     uint id = sdt->OriginalNetworkID() << 16 | sdt->TSID();
@@ -685,8 +699,12 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
                 GetDVBChannel()->SetPMT(pmt);
 #endif // USING_DVB
 
-            GetDTVSignalMonitor()->GetStreamData()->ResetDecryptionMonitoringState();
-            GetDTVSignalMonitor()->GetStreamData()->TestDecryption(pmt);
+            DTVSignalMonitor *monitor = GetDTVSignalMonitor();
+            if (nullptr != monitor)
+            {
+                monitor->GetStreamData()->ResetDecryptionMonitoringState();
+                monitor->GetStreamData()->TestDecryption(pmt);
+            }
 
             m_currentTestingDecryption = true;
             m_timer.start();
@@ -2024,7 +2042,8 @@ bool ChannelScanSM::HasTimedOut(void)
     DVBSignalMonitor *sigmon = GetDVBSignalMonitor();
     if (sigmon)
     {
-        const DiSEqCDevRotor *rotor = GetDVBChannel()->GetRotor();
+        const DiSEqCDevRotor *rotor =
+            GetDVBChannel() ? GetDVBChannel()->GetRotor() : nullptr;
         if (rotor)
         {
             bool was_moving = false;
