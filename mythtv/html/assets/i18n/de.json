@@ -981,6 +981,8 @@
             "none": "Keiner",
             "off": "Aus",
             "on": "An",
+            "other_text": "Öffnen Sie die andere Registerkarte und beenden Sie den Scan",
+            "other_title": "Die Suche nach einem anderen Eingang wird ausgeführt",
             "polarity": {
                 "horizontal": "Horizontal",
                 "left": "Linker Kreis",

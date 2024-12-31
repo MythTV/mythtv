@@ -981,6 +981,8 @@
             "none": "没有任何",
             "off": "离开",
             "on": "在",
+            "other_text": "打开另一个选项卡并完成扫描",
+            "other_title": "正在扫描另一个输入",
             "polarity": {
                 "horizontal": "水平的",
                 "left": "左环",

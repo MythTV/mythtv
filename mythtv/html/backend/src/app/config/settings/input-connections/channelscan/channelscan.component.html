@@ -580,7 +580,8 @@
                 <div style="display:flex; align-items:center;">
                     <p-button label="{{ 'settings.channelscan.stop_label' | translate }}" icon="pi pi-times-circle"
                         iconPos="left" styleClass="p-button-danger" (onClick)="stopScan()"
-                        [disabled]="scanStatus.Status != 'RUNNING' || scanStatus.DialogButtons.length > 0">
+                        [disabled]="scanStatus.Status != 'RUNNING' || scanStatus.DialogButtons.length > 0 
+                            || card.CardId != scanStatus.CardId">
                     </p-button>
                 </div>
                 <small class="block">

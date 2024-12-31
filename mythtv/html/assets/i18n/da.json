@@ -981,6 +981,8 @@
             "none": "Ingen",
             "off": "Af",
             "on": "På",
+            "other_text": "Åbn den anden fane, og afslut scanningen",
+            "other_title": "Scanning efter et andet input er i gang",
             "polarity": {
                 "horizontal": "Vandret",
                 "left": "Venstre Cirkulære",

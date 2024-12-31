@@ -981,6 +981,8 @@
             "none": "Noben",
             "off": "Izključeno",
             "on": "Vklopljeno",
+            "other_text": "Odprite drugi zavihek in dokončajte skeniranje",
+            "other_title": "Iskanje drugega vnosa je v teku",
             "polarity": {
                 "horizontal": "Vodoravno",
                 "left": "Leva krožnica",

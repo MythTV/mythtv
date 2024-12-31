@@ -981,6 +981,8 @@
             "none": "Nic",
             "off": "Wyłączony",
             "on": "NA",
+            "other_text": "Otwórz drugą kartę i zakończ skanowanie",
+            "other_title": "Trwa wyszukiwanie innego wejścia",
             "polarity": {
                 "horizontal": "Poziomy",
                 "left": "Lewy Okrągły",

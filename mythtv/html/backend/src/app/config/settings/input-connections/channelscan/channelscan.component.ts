@@ -248,6 +248,8 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
   nolockDesc = 'settings.channelscan.nolock_value';
   procDesc = 'processed';
   unprocDesc = 'unprocessed';
+  otherInputStatusTitle = 'settings.channelscan.other_title';
+  otherInputStatusText = 'settings.channelscan.other_text';
 
   satTuning: SatTuning = this.satTuningTable[0];
   scanLog = '';
@@ -341,7 +343,9 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
     translate.get(this.lockDesc).subscribe(data => this.lockDesc = data);
     translate.get(this.nolockDesc).subscribe(data => this.nolockDesc = data);
-  }
+    translate.get(this.otherInputStatusTitle).subscribe(data => this.otherInputStatusTitle = data);
+    translate.get(this.otherInputStatusText).subscribe(data => this.otherInputStatusText = data);
+      }
 
   tableTranslate(table: { label: string, value: string }[]) {
     table.forEach(
@@ -581,10 +585,22 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
   refreshStatus(doChannels: boolean ) {
     this.channelService.GetScanStatus().subscribe(data => {
-      this.scanStatus = data.ScanStatus;
-      // this.scanLog = data.ScanStatus.StatusLog.replaceAll('\n','<br>')
-      this.scanLog = data.ScanStatus.StatusLog.split('\n').join('<br>');
-      this.scrollpanel.scrollTop(100000);
+      // console.log(data.ScanStatus.CardId, this.card.CardId)
+      if (data.ScanStatus.CardId == this.card.CardId) {
+        this.scanStatus = data.ScanStatus;
+        this.scanLog = data.ScanStatus.StatusLog.split('\n').join('<br>');
+        this.scrollpanel.scrollTop(100000);
+      }
+      else {
+        this.scanStatus = Object.assign({}, this.emptyScanStatus);
+        this.scanStatus.Status = data.ScanStatus.Status;
+        this.scanStatus.CardId = data.ScanStatus.CardId;
+        this.scanLog = '';
+        if (this.scanStatus.Status == 'RUNNING') {
+          this.scanStatus.StatusTitle = this.otherInputStatusTitle;
+          this.scanStatus.StatusText = this.otherInputStatusText;
+        }
+      }
       if (this.scanStatus.Status == 'RUNNING')
         this.refreshCount = 5;
       else
@@ -595,6 +611,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
         if (doChannels)
           this.iconnection.loadChannels();
       }
+
     });
   }
 

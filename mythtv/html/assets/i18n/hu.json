@@ -981,6 +981,8 @@
             "none": "Egyik sem",
             "off": "Ki",
             "on": "Tovább",
+            "other_text": "Nyissa meg a másik lapot, és fejezze be a beolvasást",
+            "other_title": "Egy másik bemenet keresése folyamatban van",
             "polarity": {
                 "horizontal": "Vízszintes",
                 "left": "Bal körlevél",

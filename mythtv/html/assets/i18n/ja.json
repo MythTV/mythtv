@@ -981,6 +981,8 @@
             "none": "なし",
             "off": "オフ",
             "on": "の上",
+            "other_text": "他のタブを開いてスキャンを終了します",
+            "other_title": "別の入力のスキャンが進行中です",
             "polarity": {
                 "horizontal": "水平",
                 "left": "左円形",

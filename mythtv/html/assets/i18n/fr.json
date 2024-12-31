@@ -981,6 +981,8 @@
             "none": "Aucun",
             "off": "Désactivé",
             "on": "Sur",
+            "other_text": "Ouvrez l'autre onglet et terminez l'analyse",
+            "other_title": "La recherche d'une autre entrée est en cours",
             "polarity": {
                 "horizontal": "Horizontal",
                 "left": "Circulaire gauche",

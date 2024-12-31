@@ -981,6 +981,8 @@
             "none": "Hiçbiri",
             "off": "Kapalı",
             "on": "Açık",
+            "other_text": "Diğer sekmeyi açın ve taramayı tamamlayın",
+            "other_title": "Başka bir giriş için tarama sürüyor",
             "polarity": {
                 "horizontal": "Yatay",
                 "left": "Sol Dairesel",

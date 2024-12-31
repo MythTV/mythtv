@@ -981,6 +981,8 @@
             "none": "Ninguno",
             "off": "Apagado",
             "on": "En",
+            "other_text": "Abra la otra pestaña y finalice el escaneo.",
+            "other_title": "La búsqueda de otra entrada está en curso",
             "polarity": {
                 "horizontal": "Horizontal",
                 "left": "Circular Izquierda",

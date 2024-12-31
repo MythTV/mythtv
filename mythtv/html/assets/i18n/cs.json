@@ -981,6 +981,8 @@
             "none": "Žádný",
             "off": "Vypnuto",
             "on": "Na",
+            "other_text": "Otevřete druhou kartu a dokončete skenování",
+            "other_title": "Probíhá vyhledávání dalšího vstupu",
             "polarity": {
                 "horizontal": "Horizontální",
                 "left": "Levý kruhový",

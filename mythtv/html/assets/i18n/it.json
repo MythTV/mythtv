@@ -981,6 +981,8 @@
             "none": "Nessuno",
             "off": "Spento",
             "on": "SU",
+            "other_text": "Apri l'altra scheda e completa la scansione",
+            "other_title": "È in corso la scansione di un altro input",
             "polarity": {
                 "horizontal": "Orizzontale",
                 "left": "Circolare sinistra",

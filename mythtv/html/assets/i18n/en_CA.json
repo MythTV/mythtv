@@ -981,6 +981,8 @@
             "none": "None",
             "off": "Off",
             "on": "On",
+            "other_text": "Open the other tab and finish the scan",
+            "other_title": "Scan for another input is in progress",
             "polarity": {
                 "horizontal": "Horizontal",
                 "left": "Left Circular",

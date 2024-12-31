@@ -981,6 +981,8 @@
             "none": "Enginn",
             "off": "Af",
             "on": "Á",
+            "other_text": "Opnaðu hinn flipann og kláraðu skönnunina",
+            "other_title": "Leit að öðru inntaki er í gangi",
             "polarity": {
                 "horizontal": "Lárétt",
                 "left": "Vinstri hringbréf",

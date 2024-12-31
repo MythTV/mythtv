@@ -981,6 +981,8 @@
             "none": "Nijedan",
             "off": "isključeno",
             "on": "Na",
+            "other_text": "Otvorite drugu karticu i završite skeniranje",
+            "other_title": "U tijeku je traženje drugog unosa",
             "polarity": {
                 "horizontal": "Horizontalno",
                 "left": "Lijevo kružno",

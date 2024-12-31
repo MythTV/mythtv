@@ -981,6 +981,8 @@
             "none": "Mitte ühtegi",
             "off": "Väljas",
             "on": "Peal",
+            "other_text": "Avage teine ​​vahekaart ja lõpetage skannimine",
+            "other_title": "Teise sisendi otsimine on pooleli",
             "polarity": {
                 "horizontal": "Horisontaalne",
                 "left": "Vasak ringkiri",

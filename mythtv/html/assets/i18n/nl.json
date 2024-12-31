@@ -981,6 +981,8 @@
             "none": "Geen",
             "off": "Uit",
             "on": "Op",
+            "other_text": "Open het andere tabblad en voltooi de scan",
+            "other_title": "Er wordt gezocht naar een andere ingang",
             "polarity": {
                 "horizontal": "Horizontaal",
                 "left": "Linker Circulaire",

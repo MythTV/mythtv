@@ -981,6 +981,8 @@
             "none": "Nenhum",
             "off": "Desligado",
             "on": "Sobre",
+            "other_text": "Abra a outra guia e finalize a digitalização",
+            "other_title": "A busca por outra entrada está em andamento",
             "polarity": {
                 "horizontal": "Horizontal",
                 "left": "Circular Esquerda",

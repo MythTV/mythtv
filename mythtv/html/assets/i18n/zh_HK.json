@@ -981,6 +981,8 @@
             "none": "沒有任何",
             "off": "離開",
             "on": "在",
+            "other_text": "打開另一個選項卡並完成掃描",
+            "other_title": "正在掃描另一個輸入",
             "polarity": {
                 "horizontal": "水平的",
                 "left": "左環",

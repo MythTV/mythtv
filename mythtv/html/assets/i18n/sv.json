@@ -981,6 +981,8 @@
             "none": "Ingen",
             "off": "Av",
             "on": "På",
+            "other_text": "Öppna den andra fliken och avsluta skanningen",
+            "other_title": "Sökning efter en annan ingång pågår",
             "polarity": {
                 "horizontal": "Horisontell",
                 "left": "Vänster cirkulär",

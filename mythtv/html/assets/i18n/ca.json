@@ -981,6 +981,8 @@
             "none": "Cap",
             "off": "Apagat",
             "on": "Encès",
+            "other_text": "Obriu l'altra pestanya i finalitzeu l'escaneig",
+            "other_title": "La cerca d'una altra entrada està en curs",
             "polarity": {
                 "horizontal": "Horitzontal",
                 "left": "Circular esquerra",

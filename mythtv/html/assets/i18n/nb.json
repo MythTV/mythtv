@@ -981,6 +981,8 @@
             "none": "Ingen",
             "off": "Av",
             "on": "På",
+            "other_text": "Åpne den andre fanen og fullfør skanningen",
+            "other_title": "Skann etter en annen inngang pågår",
             "polarity": {
                 "horizontal": "Horisontal",
                 "left": "Venstre rundskriv",

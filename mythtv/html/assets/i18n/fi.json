@@ -981,6 +981,8 @@
             "none": "Ei mitään",
             "off": "Vinossa",
             "on": "Päällä",
+            "other_text": "Avaa toinen välilehti ja lopeta skannaus",
+            "other_title": "Toisen tulon haku on käynnissä",
             "polarity": {
                 "horizontal": "Vaakasuora",
                 "left": "Vasen kiertokirje",
