@@ -1101,9 +1101,10 @@ protected:
              */
             Lock();
             HLSStream *hls  = m_parent->GetStream(m_stream);
+            bool live = hls ? hls->Live() : false;
             int dnldsegment = m_segment;
             int playsegment = m_parent->m_playback->Segment();
-            if ((!hls->Live() && (playsegment < dnldsegment - m_buffer)) ||
+            if ((!live && (playsegment < dnldsegment - m_buffer)) ||
                 IsAtEnd())
             {
                 /* wait until
@@ -1297,8 +1298,10 @@ protected:
     {
         RunProlog();
 
+        HLSStream *hls = m_parent->GetCurrentStream();
+        bool live = hls ? hls->Live() : false;
         double wait = 0.5;
-        double factor = m_parent->GetCurrentStream()->Live() ? 1.0 : 2.0;
+        double factor = live ? 1.0 : 2.0;
 
         QWaitCondition mcond;
 
@@ -1361,7 +1364,6 @@ protected:
                 wait = 0.5;
             }
 
-            HLSStream *hls = m_parent->GetCurrentStream();
             if (hls == nullptr)
             {
                 // an irrevocable error has occured. exit
@@ -2658,6 +2660,8 @@ int64_t HLSRingBuffer::SizeMedia(void) const
         return -1;
 
     HLSStream *hls = GetCurrentStream();
+    if (nullptr == hls)
+        return -1;
     int64_t size = hls->Duration().count() * m_bitrate / 8;
 
     return size;
@@ -2669,7 +2673,8 @@ int64_t HLSRingBuffer::SizeMedia(void) const
  */
 void HLSRingBuffer::WaitUntilBuffered(void)
 {
-    bool live = GetCurrentStream()->Live();
+    HLSStream *hls = GetCurrentStream();
+    bool live = hls ? hls->Live() : false;
 
     // last seek was to end of media, we are just in seek mode so do not wait
     if (m_seektoend)
