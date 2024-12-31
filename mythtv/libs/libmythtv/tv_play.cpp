@@ -80,19 +80,6 @@
 
 #define LOC      QString("TV::%1(): ").arg(__func__)
 
-static int comp_originalAirDate(const ProgramInfo *a, const ProgramInfo *b)
-{
-    QDate dt1 = (a->GetOriginalAirDate().isValid()) ?
-        a->GetOriginalAirDate() : a->GetScheduledStartTime().date();
-    QDate dt2 = (b->GetOriginalAirDate().isValid()) ?
-        b->GetOriginalAirDate() : b->GetScheduledStartTime().date();
-
-    if (dt1 == dt2)
-        return (a->GetRecordingStartTime() <
-                b->GetRecordingStartTime() ? 1 : -1);
-    return (dt1 < dt2 ? 1 : -1);
-}
-
 static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
 {
     QDate dt1 = (a->GetOriginalAirDate().isValid()) ?
@@ -104,17 +91,6 @@ static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
         return (a->GetRecordingStartTime() >
                 b->GetRecordingStartTime() ? 1 : -1);
     return (dt1 > dt2 ? 1 : -1);
-}
-
-static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
-{
-    if (a->GetSeason() == 0 || b->GetSeason() == 0)
-        return comp_originalAirDate(a, b);
-    if (a->GetSeason() != b->GetSeason())
-        return (a->GetSeason() < b->GetSeason() ? 1 : -1);
-    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
-        return comp_originalAirDate(a, b);
-    return (a->GetEpisode() < b->GetEpisode() ? 1 : -1);
 }
 
 static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
