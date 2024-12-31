@@ -18,7 +18,6 @@
 
 class ProgramInfo;
 class EncoderLink;
-class FileSystemInfo;
 class MainServer;
 
 using pginfolist_t  = std::vector<ProgramInfo*>;
