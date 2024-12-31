@@ -9,6 +9,7 @@
 # files.
 #
 set(PATHFIX ${CMAKE_CURRENT_SOURCE_DIR}/python_pathfix.py)
+
 macro(fix_shebang_install_python NAME PYFILES)
   list(LENGTH PYFILES _count)
   message(DEBUG
@@ -19,8 +20,6 @@ macro(fix_shebang_install_python NAME PYFILES)
     add_custom_command(
       OUTPUT ${_FILE}
       MAIN_DEPENDENCY ${_FILE}
-      COMMAND ${CMAKE_COMMAND} -E echo
-              "Processing python path in ${NAME}/${_FILE}"
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${_FILE}
               ${_FILE}
       COMMAND ${Python3_EXECUTABLE} ${PATHFIX} ${_FILE})

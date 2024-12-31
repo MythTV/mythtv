@@ -43,7 +43,7 @@ endif()
 #
 # Variables used to build and install
 #
-set(PIP_OPTIONS --no-build-isolation --no-cache-dir --no-index
+set(PIP_OPTIONS -q --no-build-isolation --no-cache-dir --no-index
                 --disable-pip-version-check --no-deps)
 set(WHEEL_DIR dist)
 if(NOT MYTH_BINDINGS_INSTALL_ROOT STREQUAL "")
