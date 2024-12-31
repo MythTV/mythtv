@@ -277,7 +277,7 @@ V2CardSubType* V2Capture::GetCardSubType     ( int CardId     )
     CardUtil::INPUT_TYPES cardType = CardUtil::toInputType(subtype);
 
 #ifdef USING_SATIP
-    if (cardType == CardUtil::SATIP)
+    if (cardType == CardUtil::INPUT_TYPES::SATIP)
         cardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(CardId));
 #endif // USING_SATIP
 
@@ -285,7 +285,7 @@ V2CardSubType* V2Capture::GetCardSubType     ( int CardId     )
     bool HDHRdoesDVB = false;
 
 #ifdef USING_HDHOMERUN
-    if (cardType == CardUtil::HDHOMERUN)
+    if (cardType == CardUtil::INPUT_TYPES::HDHOMERUN)
     {
         QString device = CardUtil::GetVideoDevice(CardId);
         HDHRdoesDVBC = CardUtil::HDHRdoesDVBC(device);
@@ -299,7 +299,7 @@ V2CardSubType* V2Capture::GetCardSubType     ( int CardId     )
     // two names for the same value in a few cases. We choose
     // the name that starts with "DV" when this happens
     QMetaEnum meta = QMetaEnum::fromType<CardUtil::INPUT_TYPES>();
-    QString key = meta.valueToKeys(cardType);
+    QString key = meta.valueToKeys(static_cast<uint>(cardType));
     QStringList keyList = key.split("|");
     key = keyList[0];
     if (keyList.length() > 1 && keyList[1].startsWith("DV"))
@@ -672,39 +672,39 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
 
             switch (CardUtil::toInputType(subType))
             {
-                case CardUtil::ERROR_OPEN:
+                case CardUtil::INPUT_TYPES::ERROR_OPEN:
                     frontendName = err_open;
                     subType = strerror(errno);
                     break;
-                case CardUtil::ERROR_UNKNOWN:
+                case CardUtil::INPUT_TYPES::ERROR_UNKNOWN:
                     frontendName = err_other;
                     subType = "Unknown error";
                     break;
-                case CardUtil::ERROR_PROBE:
+                case CardUtil::INPUT_TYPES::ERROR_PROBE:
                     frontendName = err_other;
                     subType = strerror(errno);
                     break;
-                case CardUtil::QPSK:
+                case CardUtil::INPUT_TYPES::QPSK:
                     subType = "DVB-S";
                     signalTimeout = 7000;
                     channelTimeout = 10000;
                     break;
-                case CardUtil::DVBS2:
+                case CardUtil::INPUT_TYPES::DVBS2:
                     subType = "DVB-S2";
                     signalTimeout = 7000;
                     channelTimeout = 10000;
                     break;
-                case CardUtil::QAM:
+                case CardUtil::INPUT_TYPES::QAM:
                     subType = "DVB-C";
                     signalTimeout = 3000;
                     channelTimeout = 6000;
                     break;
-                case CardUtil::DVBT2:
+                case CardUtil::INPUT_TYPES::DVBT2:
                     subType = "DVB-T2";
                     signalTimeout = 3000;
                     channelTimeout = 6000;
                     break;
-                case CardUtil::OFDM:
+                case CardUtil::INPUT_TYPES::OFDM:
                 {
                     subType = "DVB-T";
                     signalTimeout = 3000;
@@ -724,7 +724,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
                     }
                     break;
                 }
-                case CardUtil::ATSC:
+                case CardUtil::INPUT_TYPES::ATSC:
                 {
                     QString short_name = remove_chaff(frontendName);
                     subType = "ATSC";

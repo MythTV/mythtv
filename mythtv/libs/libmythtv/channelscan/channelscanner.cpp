@@ -291,28 +291,28 @@ void ChannelScanner::Scan(
 }
 
 DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
-    uint sourceid, int cardtype, const QString &file)
+    uint sourceid, CardUtil::INPUT_TYPES cardtype, const QString &file)
 {
     m_sourceid = sourceid;
     m_channels.clear();
 
     DTVConfParser::cardtype_t type = DTVConfParser::cardtype_t::UNKNOWN;
     switch (cardtype) {
-      case CardUtil::DVBT:
-      case CardUtil::DVBT2:
+      case CardUtil::INPUT_TYPES::DVBT:
+      case CardUtil::INPUT_TYPES::DVBT2:
         type = DTVConfParser::cardtype_t::OFDM;
         break;
-      case CardUtil::QPSK:
+      case CardUtil::INPUT_TYPES::QPSK:
         type = DTVConfParser::cardtype_t::QPSK;
         break;
-      case CardUtil::DVBC:
+      case CardUtil::INPUT_TYPES::DVBC:
         type = DTVConfParser::cardtype_t::QAM;
         break;
-      case CardUtil::DVBS2:
+      case CardUtil::INPUT_TYPES::DVBS2:
         type = DTVConfParser::cardtype_t::DVBS2;
         break;
-      case CardUtil::ATSC:
-      case CardUtil::HDHOMERUN:
+      case CardUtil::INPUT_TYPES::ATSC:
+      case CardUtil::INPUT_TYPES::HDHOMERUN:
         type = DTVConfParser::cardtype_t::ATSC;
         break;
       default:

@@ -3812,43 +3812,43 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 
     switch (CardUtil::toInputType(subtype))
     {
-        case CardUtil::ERROR_OPEN:
+        case CardUtil::INPUT_TYPES::ERROR_OPEN:
             m_cardName->setValue(err_open);
             m_cardType->setValue(strerror(errno));
             break;
-        case CardUtil::ERROR_UNKNOWN:
+        case CardUtil::INPUT_TYPES::ERROR_UNKNOWN:
             m_cardName->setValue(err_other);
             m_cardType->setValue("Unknown error");
             break;
-        case CardUtil::ERROR_PROBE:
+        case CardUtil::INPUT_TYPES::ERROR_PROBE:
             m_cardName->setValue(err_other);
             m_cardType->setValue(strerror(errno));
             break;
-        case CardUtil::QPSK:
+        case CardUtil::INPUT_TYPES::QPSK:
             m_cardType->setValue("DVB-S");
             m_cardName->setValue(frontend_name);
             m_signalTimeout->setValueMs(7s);
             m_channelTimeout->setValueMs(10s);
             break;
-        case CardUtil::DVBS2:
+        case CardUtil::INPUT_TYPES::DVBS2:
             m_cardType->setValue("DVB-S2");
             m_cardName->setValue(frontend_name);
             m_signalTimeout->setValueMs(7s);
             m_channelTimeout->setValueMs(10s);
             break;
-        case CardUtil::QAM:
+        case CardUtil::INPUT_TYPES::QAM:
             m_cardType->setValue("DVB-C");
             m_cardName->setValue(frontend_name);
             m_signalTimeout->setValueMs(3s);
             m_channelTimeout->setValueMs(6s);
             break;
-        case CardUtil::DVBT2:
+        case CardUtil::INPUT_TYPES::DVBT2:
             m_cardType->setValue("DVB-T2");
             m_cardName->setValue(frontend_name);
             m_signalTimeout->setValueMs(3s);
             m_channelTimeout->setValueMs(6s);
             break;
-        case CardUtil::OFDM:
+        case CardUtil::INPUT_TYPES::OFDM:
         {
             m_cardType->setValue("DVB-T");
             m_cardName->setValue(frontend_name);
@@ -3880,7 +3880,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 #endif
         }
         break;
-        case CardUtil::ATSC:
+        case CardUtil::INPUT_TYPES::ATSC:
         {
             QString short_name = remove_chaff(frontend_name);
             m_cardType->setValue("ATSC");

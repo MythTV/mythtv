@@ -34,6 +34,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
+#include "libmythtv/cardutil.h"
 #include "libmythtv/dtvconfparser.h"
 #include "libmythtv/mythtvexp.h"
 
@@ -97,7 +98,7 @@ class MTV_PUBLIC ChannelScanner
               const QString &tbl_end   = QString());
 
     virtual DTVConfParser::return_t ImportDVBUtils(
-        uint sourceid, int cardtype, const QString &file);
+        uint sourceid, CardUtil::INPUT_TYPES cardtype, const QString &file);
 
     virtual bool ImportM3U(uint cardid, const QString &inputname,
                            uint sourceid, bool is_mpts);

@@ -171,31 +171,31 @@ CardUtil::INPUT_TYPES SatIP::toDVBInputType(const QString& deviceid)
     QStringList dev = deviceid.split(":");
     if (dev.length() < 3)
     {
-        return CardUtil::ERROR_UNKNOWN;
+        return CardUtil::INPUT_TYPES::ERROR_UNKNOWN;
     }
 
     QString type = dev.at(2).toUpper();
     if (type == "DVBC")
     {
-        return CardUtil::DVBC;
+        return CardUtil::INPUT_TYPES::DVBC;
     }
     if (type == "DVBC2")
     {
-        return CardUtil::DVBC; // DVB-C2 is not supported yet.
+        return CardUtil::INPUT_TYPES::DVBC; // DVB-C2 is not supported yet.
     }
     if (type == "DVBT")
     {
-        return CardUtil::DVBT;
+        return CardUtil::INPUT_TYPES::DVBT;
     }
     if (type == "DVBT2")
     {
-        return CardUtil::DVBT2;
+        return CardUtil::INPUT_TYPES::DVBT2;
     }
     if (type == "DVBS2")
     {
-        return CardUtil::DVBS2;
+        return CardUtil::INPUT_TYPES::DVBS2;
     }
-    return CardUtil::ERROR_UNKNOWN;
+    return CardUtil::INPUT_TYPES::ERROR_UNKNOWN;
 }
 
 int SatIP::toTunerType(const QString& deviceid)

@@ -87,7 +87,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("TransportWizard()", query);
-        return CardUtil::ERROR_PROBE;
+        return CardUtil::INPUT_TYPES::ERROR_PROBE;
     }
     while (query.next())
         cardids.push_back(query.value(0).toUInt());
@@ -98,37 +98,37 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
             "Sorry, the Transport Editor can only edit transports "
             "of a video source that is connected to a capture card."));
 
-        return CardUtil::ERROR_PROBE;
+        return CardUtil::INPUT_TYPES::ERROR_PROBE;
     }
 
     std::vector<CardUtil::INPUT_TYPES> cardtypes;
 
     for (uint cardid : cardids)
     {
-        CardUtil::INPUT_TYPES nType = CardUtil::ERROR_PROBE;
+        CardUtil::INPUT_TYPES nType = CardUtil::INPUT_TYPES::ERROR_PROBE;
         QString cardtype = CardUtil::GetRawInputType(cardid);
         if (cardtype == "DVB")
             cardtype = CardUtil::ProbeSubTypeName(cardid);
         nType = CardUtil::toInputType(cardtype);
 
-        if (nType == CardUtil::HDHOMERUN)
+        if (nType == CardUtil::INPUT_TYPES::HDHOMERUN)
         {
             if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
-                nType = CardUtil::DVBC;
+                nType = CardUtil::INPUT_TYPES::DVBC;
             else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
-                nType = CardUtil::DVBT2;
+                nType = CardUtil::INPUT_TYPES::DVBT2;
         }
 #ifdef USING_SATIP
-        if (nType == CardUtil::SATIP)
+        if (nType == CardUtil::INPUT_TYPES::SATIP)
         {
             QString deviceid = CardUtil::GetVideoDevice(cardid);
             nType = SatIP::toDVBInputType(deviceid);
         }
 #endif // USING_SATIP
 
-        if ((CardUtil::ERROR_OPEN    == nType) ||
-            (CardUtil::ERROR_UNKNOWN == nType) ||
-            (CardUtil::ERROR_PROBE   == nType))
+        if ((CardUtil::INPUT_TYPES::ERROR_OPEN    == nType) ||
+            (CardUtil::INPUT_TYPES::ERROR_UNKNOWN == nType) ||
+            (CardUtil::INPUT_TYPES::ERROR_PROBE   == nType))
         {
             ShowOkPopup(
                 QObject::tr(
@@ -136,7 +136,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
                     "transport's video source. Please make sure the "
                     "backend is not running."));
 
-            return CardUtil::ERROR_PROBE;
+            return CardUtil::INPUT_TYPES::ERROR_PROBE;
         }
 
         cardtypes.push_back(nType);
@@ -144,7 +144,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 
     // This should never happen... (unless DB has changed under us)
     if (cardtypes.empty())
-        return CardUtil::ERROR_PROBE;
+        return CardUtil::INPUT_TYPES::ERROR_PROBE;
 
     // If there are multiple cards connected to this video source
     // check if they are the same type or compatible.
@@ -154,14 +154,14 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         CardUtil::INPUT_TYPES typeB = cardtypes[i + 0];
 
         // MPEG devices are seen as V4L (historical)
-        typeA = (CardUtil::MPEG == typeA) ? CardUtil::V4L  : typeA;
-        typeB = (CardUtil::MPEG == typeB) ? CardUtil::V4L  : typeB;
+        typeA = (CardUtil::INPUT_TYPES::MPEG == typeA) ? CardUtil::INPUT_TYPES::V4L  : typeA;
+        typeB = (CardUtil::INPUT_TYPES::MPEG == typeB) ? CardUtil::INPUT_TYPES::V4L  : typeB;
 
         // HDHOMERUN devices can be DVBC, DVBT/T2, ATSC or a combination of those.
         // If there are other non-HDHR devices connected to this videosource that
         // have an explicit type then assume that the HDHOMERUN is also of that type.
-        typeA = (CardUtil::HDHOMERUN == typeA) ? typeB : typeA;
-        typeB = (CardUtil::HDHOMERUN == typeB) ? typeA : typeB;
+        typeA = (CardUtil::INPUT_TYPES::HDHOMERUN == typeA) ? typeB : typeA;
+        typeB = (CardUtil::INPUT_TYPES::HDHOMERUN == typeB) ? typeA : typeB;
 
         if (typeA == typeB)
             continue;
@@ -172,19 +172,19 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
                 "are incompatible. Please create separate video sources "
                 "per capture card type."));
 
-        return CardUtil::ERROR_PROBE;
+        return CardUtil::INPUT_TYPES::ERROR_PROBE;
     }
 
     // Look for tuner type to decide on transport editor list format
     CardUtil::INPUT_TYPES retval = cardtypes[0];
     for (size_t i = 1; i < cardtypes.size(); i++)
     {
-        if ((cardtypes[i] == CardUtil::DVBS ) ||
-            (cardtypes[i] == CardUtil::DVBC ) ||
-            (cardtypes[i] == CardUtil::DVBT ) ||
-            (cardtypes[i] == CardUtil::ATSC ) ||
-            (cardtypes[i] == CardUtil::DVBS2) ||
-            (cardtypes[i] == CardUtil::DVBT2)  )
+        if ((cardtypes[i] == CardUtil::INPUT_TYPES::DVBS ) ||
+            (cardtypes[i] == CardUtil::INPUT_TYPES::DVBC ) ||
+            (cardtypes[i] == CardUtil::INPUT_TYPES::DVBT ) ||
+            (cardtypes[i] == CardUtil::INPUT_TYPES::ATSC ) ||
+            (cardtypes[i] == CardUtil::INPUT_TYPES::DVBS2) ||
+            (cardtypes[i] == CardUtil::INPUT_TYPES::DVBT2)  )
         {
             retval = cardtypes[i];
         }
@@ -206,9 +206,9 @@ void TransportListEditor::SetSourceID(uint sourceid)
     else
     {
         m_cardtype = get_cardtype(sourceid);
-        m_sourceid = ((CardUtil::ERROR_OPEN    == m_cardtype) ||
-                      (CardUtil::ERROR_UNKNOWN == m_cardtype) ||
-                      (CardUtil::ERROR_PROBE   == m_cardtype)) ? 0 : sourceid;
+        m_sourceid = ((CardUtil::INPUT_TYPES::ERROR_OPEN    == m_cardtype) ||
+                      (CardUtil::INPUT_TYPES::ERROR_UNKNOWN == m_cardtype) ||
+                      (CardUtil::INPUT_TYPES::ERROR_PROBE   == m_cardtype)) ? 0 : sourceid;
     }
 }
 
@@ -269,8 +269,8 @@ void TransportListEditor::Load()
 
         while (query.next())
         {
-            QString rawmod = ((CardUtil::OFDM  == m_cardtype) ||
-                              (CardUtil::DVBT2 == m_cardtype)) ?
+            QString rawmod = ((CardUtil::INPUT_TYPES::OFDM  == m_cardtype) ||
+                              (CardUtil::INPUT_TYPES::DVBT2 == m_cardtype)) ?
                 query.value(6).toString() : query.value(1).toString();
 
             QString mod = pp_modulation(rawmod);
@@ -287,20 +287,20 @@ void TransportListEditor::Load()
                 QString("tid %1").arg(query.value(5).toUInt(), 5) : "";
 
             QString hz = "Hz";
-            if (CardUtil::QPSK == m_cardtype ||
-                CardUtil::DVBS2 == m_cardtype)
+            if (CardUtil::INPUT_TYPES::QPSK == m_cardtype ||
+                CardUtil::INPUT_TYPES::DVBS2 == m_cardtype)
                 hz = "kHz";
 
             QString type = "";
-            if (CardUtil::OFDM == m_cardtype)
+            if (CardUtil::INPUT_TYPES::OFDM == m_cardtype)
                 type = "(DVB-T)";
-            if (CardUtil::DVBT2 == m_cardtype)
+            if (CardUtil::INPUT_TYPES::DVBT2 == m_cardtype)
                 type = QString("(%1)").arg(query.value(7).toString());
-            if (CardUtil::QPSK == m_cardtype)
+            if (CardUtil::INPUT_TYPES::QPSK == m_cardtype)
                 type = "(DVB-S)";
-            if (CardUtil::QAM == m_cardtype)
+            if (CardUtil::INPUT_TYPES::QAM == m_cardtype)
                 type = "(DVB-C)";
-            if (CardUtil::DVBS2 == m_cardtype)
+            if (CardUtil::INPUT_TYPES::DVBS2 == m_cardtype)
                 type = "(DVB-S2)";
 
             QString txt = QString("%1 %2 %3 %4 %5 %6 %7")
@@ -541,32 +541,33 @@ class SignalPolarity : public MythUIComboBoxSetting, public MuxDBStorage
 class Modulation : public MythUIComboBoxSetting, public MuxDBStorage
 {
   public:
-    Modulation(const MultiplexID *id,  uint nType);
+    Modulation(const MultiplexID *id,  CardUtil::INPUT_TYPES nType);
 };
 
-Modulation::Modulation(const MultiplexID *id,  uint nType) :
+Modulation::Modulation(const MultiplexID *id,  CardUtil::INPUT_TYPES nType) :
     MythUIComboBoxSetting(this),
-    MuxDBStorage(this, id, ((CardUtil::OFDM == nType) ||
-                            (CardUtil::DVBT2 == nType)) ?
+    MuxDBStorage(this, id, ((CardUtil::INPUT_TYPES::OFDM == nType) ||
+                            (CardUtil::INPUT_TYPES::DVBT2 == nType)) ?
                  "constellation" : "modulation")
 {
     setLabel(QObject::tr("Modulation"));
     setHelpText(QObject::tr("Modulation, aka Constellation"));
 
-    if (CardUtil::QPSK == nType)
+    if (CardUtil::INPUT_TYPES::QPSK == nType)
     {
         // no modulation options
         setVisible(false);
     }
-    else if (CardUtil::DVBS2 == nType)
+    else if (CardUtil::INPUT_TYPES::DVBS2 == nType)
     {
         addSelection("QPSK",   "qpsk");
         addSelection("8PSK",   "8psk");
         addSelection("16APSK", "16apsk");
         addSelection("32APSK", "32apsk");
     }
-    else if ((CardUtil::QAM == nType) || (CardUtil::OFDM == nType) ||
-             (CardUtil::DVBT2 == nType))
+    else if ((CardUtil::INPUT_TYPES::QAM == nType) ||
+             (CardUtil::INPUT_TYPES::OFDM == nType) ||
+             (CardUtil::INPUT_TYPES::DVBT2 == nType))
     {
         addSelection(QObject::tr("QAM Auto"), "auto");
         addSelection("QAM-16",   "qam_16");
@@ -575,13 +576,14 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         addSelection("QAM-128",  "qam_128");
         addSelection("QAM-256",  "qam_256");
 
-        if ((CardUtil::OFDM == nType) || (CardUtil::DVBT2 == nType))
+        if ((CardUtil::INPUT_TYPES::OFDM == nType) ||
+            (CardUtil::INPUT_TYPES::DVBT2 == nType))
         {
             addSelection("QPSK", "qpsk");
         }
     }
-    else if ((CardUtil::ATSC      == nType) ||
-             (CardUtil::HDHOMERUN == nType))
+    else if ((CardUtil::INPUT_TYPES::ATSC      == nType) ||
+             (CardUtil::INPUT_TYPES::HDHOMERUN == nType))
     {
         addSelection("8-VSB",    "8vsb");
         addSelection("QAM-64",   "qam_64");
@@ -845,7 +847,7 @@ class RollOff : public MythUIComboBoxSetting, public MuxDBStorage
 };
 
 TransportSetting::TransportSetting(const QString &label, uint mplexid,
-                                   uint sourceid, uint cardtype)
+                                   uint sourceid, CardUtil::INPUT_TYPES cardtype)
     : m_mplexid(new MultiplexID())
 {
     setLabel(label);
@@ -855,7 +857,7 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
     addChild(m_mplexid);
     addChild(new VideoSourceID(m_mplexid, sourceid));
 
-    if (CardUtil::OFDM == cardtype)
+    if (CardUtil::INPUT_TYPES::OFDM == cardtype)
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid));
@@ -869,7 +871,7 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
         addChild(new DVBTGuardInterval(m_mplexid));
         addChild(new DVBTHierarchy(m_mplexid));
     }
-    else if (CardUtil::DVBT2 == cardtype)
+    else if (CardUtil::INPUT_TYPES::DVBT2 == cardtype)
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid));
@@ -884,8 +886,8 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
         addChild(new DVBT2GuardInterval(m_mplexid));
         addChild(new DVBTHierarchy(m_mplexid));
     }
-    else if (CardUtil::QPSK == cardtype ||
-             CardUtil::DVBS2 == cardtype)
+    else if (CardUtil::INPUT_TYPES::QPSK == cardtype ||
+             CardUtil::INPUT_TYPES::DVBS2 == cardtype)
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid, true));
@@ -896,10 +898,10 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
         addChild(new DVBForwardErrorCorrection(m_mplexid));
         addChild(new SignalPolarity(m_mplexid));
 
-        if (CardUtil::DVBS2 == cardtype)
+        if (CardUtil::INPUT_TYPES::DVBS2 == cardtype)
             addChild(new RollOff(m_mplexid));
     }
-    else if (CardUtil::QAM == cardtype)
+    else if (CardUtil::INPUT_TYPES::QAM == cardtype)
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid));
@@ -909,20 +911,20 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
         addChild(new DVBInversion(m_mplexid));
         addChild(new DVBForwardErrorCorrection(m_mplexid));
     }
-    else if (CardUtil::ATSC      == cardtype ||
-             CardUtil::HDHOMERUN == cardtype)
+    else if (CardUtil::INPUT_TYPES::ATSC      == cardtype ||
+             CardUtil::INPUT_TYPES::HDHOMERUN == cardtype)
     {
         addChild(new DTVStandard(m_mplexid, false, true));
         addChild(new Frequency(m_mplexid));
         addChild(new Modulation(m_mplexid, cardtype));
     }
-    else if ((CardUtil::FIREWIRE == cardtype) ||
-             (CardUtil::FREEBOX  == cardtype))
+    else if ((CardUtil::INPUT_TYPES::FIREWIRE == cardtype) ||
+             (CardUtil::INPUT_TYPES::FREEBOX  == cardtype))
     {
         addChild(new DTVStandard(m_mplexid, true, true));
     }
-    else if ((CardUtil::V4L  == cardtype) ||
-             (CardUtil::MPEG == cardtype))
+    else if ((CardUtil::INPUT_TYPES::V4L  == cardtype) ||
+             (CardUtil::INPUT_TYPES::MPEG == cardtype))
     {
         addChild(new Frequency(m_mplexid));
         addChild(new Modulation(m_mplexid, cardtype));

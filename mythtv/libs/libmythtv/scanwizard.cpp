@@ -216,7 +216,7 @@ void ScanWizard::SetInput(const QString &cardid_inputname)
     // We need to check against the last capture card so that we don't
     // try and probe a card which is already open by scan()
     if ((m_lastHWCardID != cardid) ||
-        (m_lastHWCardType == CardUtil::ERROR_OPEN))
+        (m_lastHWCardType == CardUtil::INPUT_TYPES::ERROR_OPEN))
     {
         m_lastHWCardID    = cardid;
         QString subtype = CardUtil::ProbeSubTypeName(cardid);

@@ -51,7 +51,7 @@ class TransportSetting : public GroupSetting
 
   public:
     TransportSetting(const QString &label, uint mplexid, uint sourceid,
-                     uint cardtype);
+                     CardUtil::INPUT_TYPES cardtype);
 
     bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
 
@@ -89,7 +89,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     VideoSourceShow *m_videosource {nullptr};
     QVector<StandardSetting*> m_list;
     uint m_sourceid  {0};
-    uint m_cardtype  {CardUtil::ERROR_PROBE};
+    CardUtil::INPUT_TYPES m_cardtype  {CardUtil::INPUT_TYPES::ERROR_PROBE};
     bool m_isLoading {false};
 };
 

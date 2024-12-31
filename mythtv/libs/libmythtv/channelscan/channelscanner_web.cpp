@@ -92,7 +92,7 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     CardUtil::INPUT_TYPES inputType = CardUtil::toInputType(subType);
 
 #ifdef USING_SATIP
-    if (inputType == CardUtil::SATIP)
+    if (inputType == CardUtil::INPUT_TYPES::SATIP)
     {
         inputType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(cardid));
     }
@@ -102,23 +102,23 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     if (ScanType == "FULL")
     {
         switch(inputType) {
-            case CardUtil::ATSC:
+            case CardUtil::INPUT_TYPES::ATSC:
                 nScanType = ScanTypeSetting::FullScan_ATSC;
                 break;
-            case CardUtil::DVBT:
+            case CardUtil::INPUT_TYPES::DVBT:
                 nScanType = ScanTypeSetting::FullScan_DVBT;
                 break;
-            case CardUtil::V4L:
-            case CardUtil::MPEG:
+            case CardUtil::INPUT_TYPES::V4L:
+            case CardUtil::INPUT_TYPES::MPEG:
                 nScanType = ScanTypeSetting::FullScan_Analog;
                 break;
-            case CardUtil::DVBT2:
+            case CardUtil::INPUT_TYPES::DVBT2:
                 nScanType = ScanTypeSetting::FullScan_DVBT2;
                 break;
-            case CardUtil::DVBC:
+            case CardUtil::INPUT_TYPES::DVBC:
                 nScanType = ScanTypeSetting::FullScan_DVBC;
                 break;
-            case  CardUtil::HDHOMERUN:
+            case  CardUtil::INPUT_TYPES::HDHOMERUN:
                 if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
                     nScanType = ScanTypeSetting::FullScan_DVBC;
                 else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
@@ -133,22 +133,22 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     else if (ScanType == "FULLTUNED")
     {
         switch(inputType) {
-            case CardUtil::DVBT:
+            case CardUtil::INPUT_TYPES::DVBT:
                 nScanType = ScanTypeSetting::NITAddScan_DVBT;
                 break;
-            case CardUtil::DVBT2:
+            case CardUtil::INPUT_TYPES::DVBT2:
                 nScanType = ScanTypeSetting::NITAddScan_DVBT2;
                 break;
-            case CardUtil::DVBS:
+            case CardUtil::INPUT_TYPES::DVBS:
                 nScanType = ScanTypeSetting::NITAddScan_DVBS;
                 break;
-            case CardUtil::DVBS2:
+            case CardUtil::INPUT_TYPES::DVBS2:
                 nScanType = ScanTypeSetting::NITAddScan_DVBS2;
                 break;
-            case CardUtil::DVBC:
+            case CardUtil::INPUT_TYPES::DVBC:
                 nScanType = ScanTypeSetting::NITAddScan_DVBC;
                 break;
-            case CardUtil::HDHOMERUN:
+            case CardUtil::INPUT_TYPES::HDHOMERUN:
                 if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
                     nScanType = ScanTypeSetting::NITAddScan_DVBC;
                 else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
