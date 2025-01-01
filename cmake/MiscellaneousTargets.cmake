@@ -37,6 +37,7 @@ configure_file(cmake/files/tags_tools.cmake.in tags_tools.cmake @ONLY)
 function(add_misc_runtime_target NAME)
   add_custom_target(${NAME})
   add_custom_command(
+    POST_BUILD
     TARGET ${NAME}
     COMMAND ${CMAKE_COMMAND} -P tags_tools.cmake ${NAME}
     VERBATIM USES_TERMINAL)
