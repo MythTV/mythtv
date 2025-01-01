@@ -254,7 +254,7 @@ class Scheduler : public MThread, public MythScheduler
     QDateTime m_schedTime;
     bool m_recListChanged              {false};
 
-    bool m_specSched;
+    bool m_specSched                   {false};
     bool m_schedulingEnabled           {true};
     QMap<int, bool> m_schedAfterStartMap;
 
@@ -263,7 +263,7 @@ class Scheduler : public MThread, public MythScheduler
 
     QSet<uint> m_schedOrderWarned;
 
-    bool m_doRun;
+    bool m_doRun                       {false};
 
     MainServer *m_mainServer           {nullptr};
 
