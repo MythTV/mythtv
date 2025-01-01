@@ -96,6 +96,15 @@ else()
   message(FATAL_ERROR "Not building with MacPorts or Homebrew.")
 endif(DETECT_MACPORTS EQUAL 0)
 
+# Check to see if a python virtual environment is set, and if so
+# tell cmake to use those site-packages instead of the default
+#  Macports or Homebrew python versions.
+if(DEFINED ENV{VIRTUAL_ENV})
+  #set (CMAKE_FIND_FRAMEWORK NEVER)
+  set (Python3_FIND_VIRTUALENV ONLY)
+  set(Python3_ROOT_DIR $ENV{VIRTUAL_ENV})
+endif()
+
 # Qt6 builds need a little help finding the libraries.
 list(APPEND CMAKE_FRAMEWORK_PATH "${_QT_BASE}")
 list(APPEND CMAKE_MODULE_PATH "${_QT_BASE}/lib/cmake")
