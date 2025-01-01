@@ -155,9 +155,26 @@ void IPTVChannelFetcher::run(void)
 
     if (!m_isMpts)
     {
-        fbox_chan_map_t::const_iterator it = m_channels.cbegin();
-        for (uint i = 1; it != m_channels.cend(); ++it, ++i)
+        // Sort channels in ascending channel number order
+        std::vector<fbox_chan_map_t::const_iterator> acno (m_channels.size());
         {
+            fbox_chan_map_t::const_iterator it = m_channels.cbegin();
+            for (uint i = 0; it != m_channels.cend(); ++it, ++i)
+            {
+                acno[i] = it;
+            }
+            std::sort(acno.begin(), acno.end(),
+                [] (fbox_chan_map_t::const_iterator s1, fbox_chan_map_t::const_iterator s2) -> bool
+                {
+                    return s1.key().toInt() < s2.key().toInt();
+                }
+            );
+        }
+
+        // Insert channels in ascending channel number order
+        for (uint i = 0; i < acno.size(); ++i)
+        {
+            fbox_chan_map_t::const_iterator it = acno[i];
             const QString& channum = it.key();
             QString name    = (*it).m_name;
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
