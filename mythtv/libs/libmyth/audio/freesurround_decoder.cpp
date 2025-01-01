@@ -76,7 +76,7 @@ public:
         // generate the window function (square root of hann, b/c it is applied before and after the transform)
         m_wnd.resize(m_n);
         for (unsigned k=0;k<m_n;k++)
-            m_wnd[k] = sqrt(0.5F*(1-std::cos(2*PI*k/m_n))/m_n);
+            m_wnd[k] = std::sqrt(0.5F*(1-std::cos(2*PI*k/m_n))/m_n);
         m_currentBuf = 0;
         m_inbufs.fill(nullptr);
         m_outbufs.fill(nullptr);
