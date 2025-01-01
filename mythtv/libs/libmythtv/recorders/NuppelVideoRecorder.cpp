@@ -42,9 +42,9 @@ extern "C" {
 
 #define bswap_dbl(x) bswap_64(x)
 
-#if HAVE_BYTESWAP_H
+#if __has_include(<byteswap.h>)
 #  include <byteswap.h> /* bswap_16|32|64 */
-#elif HAVE_SYS_ENDIAN_H
+#elif __has_include(<sys/endian.h>)
 #  include <sys/endian.h>
 #  if !defined(bswap_16) && defined(bswap16)
 #    define bswap_16(x) bswap16(x)
