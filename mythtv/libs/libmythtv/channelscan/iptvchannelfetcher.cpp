@@ -29,7 +29,8 @@ static bool parse_chan_info(const QString   &rawdata,
 
 static bool parse_extinf(const QString &line,
                          QString       &channum,
-                         QString       &name);
+                         QString       &name,
+                         QString       &logo);
 
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, QString inputname, uint sourceid,
@@ -160,6 +161,7 @@ void IPTVChannelFetcher::run(void)
             const QString& channum = it.key();
             QString name    = (*it).m_name;
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
+            QString logo    = (*it).m_logo;
             uint programnumber = (*it).m_programNumber;
             //: %1 is the channel number, %2 is the channel name
             QString msg = tr("Channel #%1 : %2").arg(channum, name);
@@ -241,7 +243,7 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url)
 {
     if (url.startsWith("file", Qt::CaseInsensitive))
     {
-        QString ret = "";
+        QString ret;
         QUrl qurl(url);
         QFile file(qurl.toLocalFile());
         if (!file.open(QIODevice::ReadOnly))
@@ -251,9 +253,11 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url)
             return ret;
         }
 
-        QTextStream stream(&file);
-        while (!stream.atEnd())
-            ret += stream.readLine() + "\n";
+        while (!file.atEnd())
+        {
+            QByteArray data = file.readLine();
+            ret += QString(data);
+        }
 
         file.close();
         return ret;
@@ -261,20 +265,19 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url)
 
     // Use MythDownloadManager for http URLs
     QByteArray data;
-    QString tmp;
+    QString ret;
 
-    if (!GetMythDownloadManager()->download(url, &data))
+    if (GetMythDownloadManager()->download(url, &data))
+    {
+        ret = QString(data);
+    }
+    else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("DownloadPlaylist failed to "
                     "download from %1").arg(url));
     }
-    else
-    {
-        tmp = QString(data);
-    }
-
-    return tmp.isNull() ? tmp : QString::fromUtf8(tmp.toLatin1().constData());
+    return ret;
 }
 
 static uint estimate_number_of_channels(const QString &rawdata)
@@ -470,6 +473,7 @@ static bool parse_chan_info(const QString   &rawdata,
     // rtsp://maiptv.iptv.fr/iptvtv/201 <-- url
 
     QString name;
+    QString logo;
     QMap<QString,QString> values;
 
     while (true)
@@ -485,7 +489,7 @@ static bool parse_chan_info(const QString   &rawdata,
         {
             if (line.startsWith("#EXTINF:"))
             {
-                parse_extinf(line.mid(line.indexOf(':')+1), channum, name);
+                parse_extinf(line.mid(line.indexOf(':')+1), channum, name, logo);
             }
             else if (line.startsWith("#EXTMYTHTV:"))
             {
@@ -515,6 +519,8 @@ static bool parse_chan_info(const QString   &rawdata,
             QString("parse_chan_info name='%2'").arg(name));
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
             QString("parse_chan_info channum='%2'").arg(channum));
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+            QString("parse_chan_info logo='%2'").arg(logo));
         for (auto it = values.cbegin(); it != values.cend(); ++it)
         {
             LOG(VB_CHANNEL, LOG_DEBUG, LOC +
@@ -522,7 +528,7 @@ static bool parse_chan_info(const QString   &rawdata,
                 .arg(it.key(), *it));
         }
         info = IPTVChannelInfo(
-            name, values["xmltvid"],
+            name, values["xmltvid"], logo,
             line, values["bitrate"].toUInt(),
             values["fectype"],
             values["fecurl0"], values["fecbitrate0"].toUInt(),
@@ -532,109 +538,146 @@ static bool parse_chan_info(const QString   &rawdata,
     }
 }
 
+// Search for channel name in last part of the EXTINF line
+static QString parse_extinf_name_trailing(const QString line)
+{
+    QString result;
+    static const QRegularExpression re_name { R"([^\,+],(.*)$)" };
+    auto match = re_name.match(line);
+    if (match.hasMatch())
+    {
+        result = match.captured(1).simplified();
+    }
+    return result;
+}
+
+// Search for field value, e.g. field="value", in EXTINF line
+static QString parse_extinf_field(QString line, QString field)
+{
+    QString result;
+    auto pos = line.indexOf(field, 0, Qt::CaseInsensitive);
+    if (pos > 0)
+    {
+        auto lastpart = line.remove(0, pos);
+
+        static const QRegularExpression re { R"(\"([^\"]+)\"(.*)$)" };
+        auto match = re.match(lastpart);
+        if (match.hasMatch())
+        {
+            result = match.captured(1).simplified();
+        }
+    }
+    return result;
+}
+
+// Search for channel number, channel name and channel logo in EXTINF line
 static bool parse_extinf(const QString &line,
                          QString       &channum,
-                         QString       &name)
+                         QString       &name,
+                         QString       &logo)
 {
-    // Parse extension portion, Freebox or SAT>IP format
-    static const QRegularExpression chanNumName1
-        { R"(^-?\d+,(\d+)(?:\.\s|\s-\s)(.*)$)" };
-    auto match = chanNumName1.match(line);
-    if (match.hasMatch())
-    {
-        channum = match.captured(1);
-        name = match.captured(2);
-        return true;
-    }
 
-    // Parse extension portion, A1 TV format
-    static const QRegularExpression chanNumName2
-        { "^-?\\d+\\s+[^,]*tvg-num=\"(\\d+)\"[^,]*,(.*)$" };
-    match = chanNumName2.match(line);
-    if (match.hasMatch())
-    {
-        channum = match.captured(1);
-        name = match.captured(2);
-        return true;
-    }
+    // Parse EXTINF line with TVG fields, Zatto style
+    // EG. #EXTINF:0001 tvg-id="ITV1London.uk" tvg-chno="90001" group-title="General Interest" tvg-logo="https://images.zattic.com/logos/ee3c9d2ac083eb2154b5/black/210x120.png", ITV 1 HD
 
-    // Parse extension portion, Moviestar TV number then name
-    static const QRegularExpression chanNumName3
-        { R"(^-?\d+,\[(\d+)\]\s+(.*)$)" };
-    match = chanNumName3.match(line);
-    if (match.hasMatch())
-    {
-        channum = match.captured(1);
-        name = match.captured(2);
-        return true;
-    }
-
-    // Parse extension portion, Moviestar TV name then number
-    static const QRegularExpression chanNumName4
-        { R"(^-?\d+,(.*)\s+\[(\d+)\]$)" };
-    match = chanNumName4.match(line);
-    if (match.hasMatch())
-    {
-        channum = match.captured(2);
-        name = match.captured(1);
-        return true;
-    }
-
-    // Parse extension portion, russion iptv plugin style
-    static const QRegularExpression chanNumName5
-        { R"(^(-?\d+)\s+[^,]*,\s*(.*)$)" };
-    match = chanNumName5.match(line);
-    if (match.hasMatch())
-    {
-        channum = match.captured(1).simplified();
-        name = match.captured(2).simplified();
-        bool ok = false;
-        int channel_number = channum.toInt (&ok);
-        if (ok && (channel_number > 0))
-        {
-            return true;
-        }
-    }
-
-    // Parse extension, HDHomeRun style
+    // Parse EXTINF line, HDHomeRun style
     // EG. #EXTINF:-1 channel-id="22" channel-number="22" tvg-name="Omroep Brabant",22 Omroep Brabant
     //     #EXTINF:-1 channel-id="2.1" channel-number="2.1" tvg-name="CBS2-HD",2.1 CBS2-HD
-    static const QRegularExpression chanNumName6
-        { R"(^-?\d+\s+channel-id=\"([^\"]+)\"\s+channel-number=\"([^\"]+)\"\s+tvg-name=\"([^\"]+)\".*$)" };
-    match = chanNumName6.match(line);
-    if (match.hasMatch())
+
+    // Parse EXTINF line, https://github.com/iptv-org/iptv/blob/master/channels/ style
+    // EG. #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/VejnhiB.png" group-title="News",BBC News
     {
-        channum = match.captured(2).simplified();
-        name = match.captured(3).simplified();
-        if (!channum.isEmpty() && !name.isEmpty())
+        channum = parse_extinf_field(line, "tvg-chno");
+        if (channum.isEmpty())
+        {
+            channum = parse_extinf_field(line, "channel-number");
+        }
+        logo = parse_extinf_field(line, "tvg-logo");
+        name = parse_extinf_field(line, "tvg-name");
+        if (name.isEmpty())
+        {
+            name = parse_extinf_name_trailing(line);
+        }
+
+        // If we only have the name then it might be another format
+        if (!name.isEmpty() && !channum.isEmpty())
         {
             return true;
         }
     }
 
-    // Parse extension portion, https://github.com/iptv-org/iptv/blob/master/channels/ style
-    // EG. #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/VejnhiB.png" group-title="News",BBC News
-    static const QRegularExpression chanNumName7
-        { "(^-?\\d+)\\s+[^,]*[^,]*,(.*)$" };
-    match = chanNumName7.match(line);
-    if (match.hasMatch())
+    // Freebox or SAT>IP format
     {
-        channum = match.captured(1).simplified();
-        name = match.captured(2).simplified();
-        return !name.isEmpty();
+        static const QRegularExpression re
+            { R"(^-?\d+,(\d+)(?:\.\s|\s-\s)(.*)$)" };
+        auto match = re.match(line);
+        if (match.hasMatch())
+        {
+            channum = match.captured(1);
+            name = match.captured(2);
+            if (!channum.isEmpty() && !name.isEmpty())
+            {
+                return true;
+            }
+        }
     }
 
-    // #EXTINF:0,Channel Title
+    // Moviestar TV number then name
     {
-        static const QRegularExpression chanNumName
-            { "^(\\d+),(.*)$" };
-        match = chanNumName.match(line);
+        static const QRegularExpression re
+            { R"(^-?\d+,\[(\d+)\]\s+(.*)$)" };
+        auto match = re.match(line);
+        if (match.hasMatch())
+        {
+            channum = match.captured(1);
+            name = match.captured(2);
+            if (!channum.isEmpty() && !name.isEmpty())
+            {
+                return true;
+            }
+        }
+    }
+
+    // Moviestar TV name then number
+    {
+        static const QRegularExpression re
+            { R"(^-?\d+,(.*)\s+\[(\d+)\]$)" };
+        auto match = re.match(line);
+        if (match.hasMatch())
+        {
+            channum = match.captured(2);
+            name = match.captured(1);
+            if (!channum.isEmpty() && !name.isEmpty())
+            {
+                return true;
+            }
+        }
+    }
+
+    // Parse russion iptv plugin style
+    {
+        static const QRegularExpression re
+            { R"(^(-?\d+)\s+[^,]*,\s*(.*)$)" };
+        auto match = re.match(line);
         if (match.hasMatch())
         {
             channum = match.captured(1).simplified();
             name = match.captured(2).simplified();
-            return !name.isEmpty();
+            bool ok = false;
+            int channel_number = channum.toInt (&ok);
+            if (ok && (channel_number > 0) && !name.isEmpty())
+            {
+                return true;
+            }
         }
+    }
+
+    // Almost a catchall: just get the name from the end of the line
+    // EG. #EXTINF:-1,Channel Title
+    name = parse_extinf_name_trailing(line);
+    if (!name.isEmpty())
+    {
+        return true;
     }
 
     // Not one of the formats we support
