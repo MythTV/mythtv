@@ -10,6 +10,8 @@ Scheduler::Scheduler([[maybe_unused]] bool runthread,
                      [[maybe_unused]] Scheduler *master_sched) :
     MThread("Scheduler")
 {}
+// This is not the real scheduler destructor, so we can't use the
+// =default notation.  NOLINTNEXTLINE(modernize-use-equals-default)
 Scheduler::~Scheduler()
 {
 }
