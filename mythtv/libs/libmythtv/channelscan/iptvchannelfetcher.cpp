@@ -556,7 +556,7 @@ static bool parse_chan_info(const QString   &rawdata,
 }
 
 // Search for channel name in last part of the EXTINF line
-static QString parse_extinf_name_trailing(const QString line)
+static QString parse_extinf_name_trailing(const QString& line)
 {
     QString result;
     static const QRegularExpression re_name { R"([^\,+],(.*)$)" };
@@ -569,7 +569,7 @@ static QString parse_extinf_name_trailing(const QString line)
 }
 
 // Search for field value, e.g. field="value", in EXTINF line
-static QString parse_extinf_field(QString line, QString field)
+static QString parse_extinf_field(QString line, const QString& field)
 {
     QString result;
     auto pos = line.indexOf(field, 0, Qt::CaseInsensitive);
