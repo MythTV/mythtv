@@ -1766,12 +1766,13 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
         {
             continue;
         }
+        //NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
         int language = iso639_str3_to_key(languages[i].data());
         uint8_t teletext_type = st->codecpar->extradata[i * 2] >> 3;
         uint8_t teletext_magazine_number = st->codecpar->extradata[i * 2] & 0x7;
         if (teletext_magazine_number == 0)
             teletext_magazine_number = 8;
-        uint8_t teletext_page_number = st->codecpar->extradata[i * 2 + 1];
+        uint8_t teletext_page_number = st->codecpar->extradata[(i * 2) + 1];
         if (teletext_type == 2 || teletext_type == 1)
         {
             TrackType track = (teletext_type == 2) ?
