@@ -12,9 +12,8 @@ extern "C" {
 #include "libmythbase/mythlogging.h"
 
 MythAVFormatBuffer::MythAVFormatBuffer(MythMediaBuffer *Buffer, bool write_flag, bool force_seek)
-  : m_buffer(Buffer)
+  : m_buffer(Buffer), m_avioContext(alloc_context(write_flag, force_seek))
 {
-    m_avioContext = alloc_context(write_flag, force_seek);
     if (m_avioContext == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, "MythAVFormatBuffer failed to allocate an AVIOContext.");
