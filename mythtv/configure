@@ -1047,16 +1047,6 @@ check_builtin(){
     check_code ld "$headers" "$builtin" "cc" "$@" && enable "$name"
 }
 
-check_compile_assert(){
-    log check_compile_assert "$@"
-    name=$1
-    headers=$2
-    condition=$3
-    shift 3
-    disable "$name"
-    check_code cc "$headers" "char c[2 * !!($condition) - 1]" "$@" && enable "$name"
-}
-
 require(){
     log require "$@"
     name_version="$1"
@@ -1651,61 +1641,17 @@ INTRINSICS_LIST="
     intrinsics_neon
 "
 
-SYSTEM_FUNCS="
-    access
-    arc4random
-    clock_gettime
-    closesocket
-    CommandLineToArgvW
-    CoTaskMemFree
-    CryptGenRandom
-    fcntl
-    flt_lim
-    fork
-    getaddrinfo
-    gethrtime
+SYSTEM_FUNCS_BLURAY="
     getmntent_r
-    getopt
-    GetProcessAffinityMask
-    GetProcessMemoryInfo
-    GetProcessTimes
-    getrusage
-    GetSystemTimeAsFileTime
+"
+
+SYSTEM_FUNCS_DVDNAV="
     gettimeofday
-    glob
-    glXGetProcAddress
-    gmtime_r
-    inet_aton
-    isatty
-    jack_port_get_latency_range
-    kbhit
-    LoadLibrary
-    localtime_r
-    lstat
-    lzo1x_999_compress
-    mach_absolute_time
-    MapViewOfFile
-    mkstemp
-    mmap
-    mprotect
-    nanosleep
-    PeekNamedPipe
-    pthread_cancel
-    sched_getaffinity
-    SetConsoleTextAttribute
-    SetConsoleCtrlHandler
-    setmode
-    setrlimit
-    Sleep
-    strerror_r
-    sysconf
-    sysctl
-    usleep
-    UTGetOSTypeFromString
-    VirtualAlloc
-    wglGetProcAddress
-    eglGetProcAddress
-    wl_surface_set_opaque_region
+"
+
+SYSTEM_FUNCS="
+    $SYSTEM_FUNCS_BLURAY
+    $SYSTEM_FUNCS_DVDNAV
 "
 
 TOOLCHAIN_FEATURES="
@@ -1735,21 +1681,6 @@ TOOLCHAIN_FEATURES="
 "
 
 TYPES_LIST="
-    CONDITION_VARIABLE_Ptr
-    kCMVideoCodecType_HEVC
-    socklen_t
-    struct_addrinfo
-    struct_group_source_req
-    struct_ip_mreq_source
-    struct_ipv6_mreq
-    struct_msghdr_msg_flags
-    struct_pollfd
-    struct_rusage_ru_maxrss
-    struct_sctp_event_subscribe
-    struct_sockaddr_in6
-    struct_sockaddr_sa_len
-    struct_sockaddr_storage
-    struct_stat_st_mtim_tv_nsec
     struct_hdr_metadata_infoframe
 "
 
@@ -4593,9 +4524,6 @@ case $libc_type in
         ;;
 esac
 
-check_compile_assert flt_lim "float.h limits.h" "DBL_MAX == (double)DBL_MAX" ||
-    add_cppflags '-I\$(SRC_PATH)/compat/float'
-
 esc(){
     echo "$*" | sed 's/%/%25/g;s/:/%3a/g'
 }
@@ -5058,46 +4986,6 @@ check_code cc arm_neon.h "int16x8_t test = vdupq_n_s16(0)" && enable intrinsics_
 check_ldflags -Wl,--as-needed
 check_ldflags -Wl,-z,noexecstack
 
-if ! disabled network; then
-    check_func getaddrinfo $network_extralibs
-    check_func inet_aton $network_extralibs
-
-    check_type netdb.h "struct addrinfo"
-    check_type netinet/in.h "struct group_source_req" -D_BSD_SOURCE
-    check_type netinet/in.h "struct ip_mreq_source" -D_BSD_SOURCE
-    check_type netinet/in.h "struct ipv6_mreq" -D_DARWIN_C_SOURCE
-    check_type poll.h "struct pollfd"
-    check_type netinet/sctp.h "struct sctp_event_subscribe"
-    check_struct "sys/socket.h" "struct msghdr" msg_flags
-    check_struct "sys/types.h sys/socket.h" "struct sockaddr" sa_len
-    check_type netinet/in.h "struct sockaddr_in6"
-    check_type "sys/types.h sys/socket.h" "struct sockaddr_storage"
-    check_type "sys/types.h sys/socket.h" socklen_t
-
-    # Prefer arpa/inet.h over winsock2
-    if check_header arpa/inet.h ; then
-        check_func closesocket
-    elif check_header winsock2.h ; then
-        check_func_headers winsock2.h closesocket -lws2 &&
-            network_extralibs="-lws2" ||
-        { check_func_headers winsock2.h closesocket -lws2_32 &&
-            network_extralibs="-lws2_32"; } || disable winsock2_h network
-        check_func_headers ws2tcpip.h getaddrinfo $network_extralibs
-
-        check_type ws2tcpip.h socklen_t
-        check_type ws2tcpip.h "struct addrinfo"
-        check_type ws2tcpip.h "struct group_source_req"
-        check_type ws2tcpip.h "struct ip_mreq_source"
-        check_type ws2tcpip.h "struct ipv6_mreq"
-        check_type winsock2.h "struct pollfd"
-        check_struct winsock2.h "struct sockaddr" sa_len
-        check_type ws2tcpip.h "struct sockaddr_in6"
-        check_type ws2tcpip.h "struct sockaddr_storage"
-    else
-        disable network
-    fi
-fi
-
 use_pkg_config sqlite3 sqlite3 "sqlite3.h" sqlite3_load_extension && enable sqlite3
 require_pkg_config samplerate samplerate samplerate.h src_get_version -lm
 
@@ -5149,8 +5037,6 @@ check_builtin MemoryBarrier windows.h "MemoryBarrier()"
 check_builtin sarestart signal.h "SA_RESTART"
 check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwait(s,0); sem_destroy(s)" -lpthread
 check_builtin sync_val_compare_and_swap "" "int *ptr; int oldval, newval; __sync_val_compare_and_swap(ptr, oldval, newval)"
-check_builtin gmtime_r time.h "time_t *time; struct tm *tm; gmtime_r(time, tm)"
-check_builtin localtime_r time.h "time_t *time; struct tm *tm; localtime_r(time, tm)"
 check_builtin x264_csp_bgr x264.h X264_CSP_BGR
 
 case "$custom_allocator" in
@@ -5164,50 +5050,7 @@ case "$custom_allocator" in
     ;;
 esac
 
-check_func  access
-check_func_headers stdlib.h arc4random
-check_func_headers time.h clock_gettime ||
-    { check_lib clock_gettime time.h clock_gettime -lrt && LIBRT="-lrt"; }
-check_func  fcntl
-check_func  fork
-check_func  gethrtime
-check_func  getopt
-check_func  getrusage
 check_func  gettimeofday
-check_func  isatty
-check_func  mach_absolute_time
-check_func  mkstemp
-check_func  mmap
-check_func  mprotect
-# Solaris has nanosleep in -lrt, OpenSolaris no longer needs that
-check_func_headers time.h nanosleep ||
-    { check_lib nanosleep time.h nanosleep -lrt && LIBRT="-lrt"; }
-check_func  sched_getaffinity
-check_func  setrlimit
-check_struct "sys/stat.h" "struct stat" st_mtim.tv_nsec -D_BSD_SOURCE
-check_func  strerror_r
-check_func  sysconf
-check_func  sysctl
-check_func  usleep
-
-check_func_headers conio.h kbhit
-check_func_headers io.h setmode
-check_func_headers lzo/lzo1x.h lzo1x_999_compress
-check_func_headers stdlib.h getenv
-check_func_headers sys/stat.h lstat
-
-check_func_headers windows.h GetProcessAffinityMask
-check_func_headers windows.h GetProcessTimes
-check_func_headers windows.h GetSystemTimeAsFileTime
-check_func_headers windows.h LoadLibrary
-check_func_headers windows.h MapViewOfFile
-check_func_headers windows.h PeekNamedPipe
-check_func_headers windows.h SetConsoleTextAttribute
-check_func_headers windows.h SetConsoleCtrlHandler
-check_func_headers windows.h Sleep
-check_func_headers windows.h VirtualAlloc
-check_struct windows.h "CONDITION_VARIABLE" Ptr
-check_func_headers glob.h glob
 
 check_header d3d11.h
 check_header direct.h
@@ -5249,11 +5092,6 @@ check_header linux/videodev2.h
 # so we also check that atomics actually work here
 check_builtin stdatomic_h stdatomic.h "atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0)"
 
-check_lib ole32    "windows.h"            CoTaskMemFree        -lole32
-check_lib shell32  "windows.h shellapi.h" CommandLineToArgvW   -lshell32
-check_lib wincrypt "windows.h wincrypt.h" CryptGenRandom       -ladvapi32
-check_lib psapi    "windows.h psapi.h"    GetProcessMemoryInfo -lpsapi
-
 #Myth check for MYTHTV_HAVE_LIST
 check_header byteswap.h
 check_header sys/endian.h
@@ -5266,8 +5104,6 @@ check_func_headers sys/timeb.h ftime
 check_func_headers "sys/types.h sys/socket.h ifaddrs.h" getifaddrs
 check_func_headers sys/time.h gettimeofday
 #End MythTV check
-
-check_struct "sys/time.h sys/resource.h" "struct rusage" ru_maxrss
 
 check_type "windows.h dxva.h" "DXVA_PicParams_HEVC" -DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP -D_CRT_BUILD_DESKTOP_APP=0
 check_type "windows.h dxva.h" "DXVA_PicParams_VP9" -DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP -D_CRT_BUILD_DESKTOP_APP=0
@@ -5322,11 +5158,6 @@ if ! disabled pthreads && ! enabled w32threads && ! enabled os2threads; then
         enable pthreads
     fi
     check_code cc "pthread.h" "static pthread_mutex_t atomic_lock = PTHREAD_MUTEX_INITIALIZER" || disable pthreads
-fi
-
-
-if enabled pthreads; then
-  check_func pthread_cancel
 fi
 
 enabled ffmpeg_pthreads && enable pthreads
@@ -7226,8 +7057,6 @@ if enabled cygwin ; then
   echo "}" >> $TMPH
   echo "#endif" >> $TMPH
 fi
-
-enabled getenv || echo "#define getenv(x) NULL" >> $TMPH
 
 print_config ARCH_   "$config_files" $ARCH_LIST
 print_config HAVE_   "$config_files" $HAVE_LIST
