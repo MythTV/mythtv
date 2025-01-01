@@ -233,7 +233,6 @@ class DecoderBase
     int          GetTrack(uint Type);
     StreamInfo   GetTrackInfo(uint Type, uint TrackNo);
     int          ChangeTrack(uint Type, int Dir);
-    virtual bool InsertTrack(uint Type, const StreamInfo &Info);
     int          NextTrack(uint Type);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }

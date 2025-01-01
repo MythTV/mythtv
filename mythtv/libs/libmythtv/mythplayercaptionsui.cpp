@@ -47,7 +47,6 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
 
     // Signalled from the decoder
     connect(this, &MythPlayerCaptionsUI::EnableSubtitles, this, [this](bool Enable) { this->SetCaptionsEnabled(Enable, false); });
-    connect(this, &MythPlayerCaptionsUI::SignalTracksChanged, this, &MythPlayerCaptionsUI::TracksChanged);
 
     // Signalled from the base class
     connect(this, &MythPlayerCaptionsUI::RequestResetCaptions, this, &MythPlayerCaptionsUI::ResetCaptions);
@@ -251,7 +250,7 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
 /*! \brief This tries to re-enable captions/subtitles if the user
  * wants them and one of the captions/subtitles tracks has changed.
  */
-void MythPlayerCaptionsUI::TracksChanged(uint TrackType)
+void MythPlayerCaptionsUI::tracksChanged(uint TrackType)
 {
     if (m_textDesired && (TrackType >= kTrackTypeSubtitle) && (TrackType <= kTrackTypeTeletextCaptions))
         SetCaptionsEnabled(true, false);

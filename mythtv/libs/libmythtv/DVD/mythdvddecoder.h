@@ -23,8 +23,8 @@ class MythDVDDecoder : public AvFormatDecoder
 
   protected:
     int  ReadPacket        (AVFormatContext *Ctx, AVPacket *Pkt, bool &StorePacket) override;
-    bool ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &Retry) override;
-    bool ProcessVideoFrame (AVStream *Stream, AVFrame *Frame) override;
+    bool ProcessVideoPacket(AVCodecContext* codecContext, AVStream *Stream, AVPacket *Pkt, bool &Retry) override;
+    bool ProcessVideoFrame (AVCodecContext* codecContext, AVStream *Stream, AVFrame *Frame) override;
     bool ProcessDataPacket (AVStream *Curstream, AVPacket *Pkt, DecodeType Decodetype) override;
 
   private:
