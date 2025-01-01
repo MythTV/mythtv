@@ -255,7 +255,7 @@ class Spectrogram : public VisualBase
     float*         m_dftL { nullptr }; // real in, complex out
     float*         m_dftR { nullptr };
     float*         m_rdftTmp { nullptr };
-    static constexpr float k_txScale { 1.0F };
+    static constexpr float kTxScale { 1.0F };
     AVTXContext*   m_rdftContext { nullptr };
     av_tx_fn       m_rdft        { nullptr };
 
@@ -305,7 +305,7 @@ class Spectrum : public VisualBase
     float*         m_dftL { nullptr }; // real in, complex out
     float*         m_dftR { nullptr };
     float*         m_rdftTmp { nullptr };
-    static constexpr float k_txScale { 1.0F };
+    static constexpr float kTxScale { 1.0F };
     AVTXContext*   m_rdftContext { nullptr };
     av_tx_fn       m_rdft        { nullptr };
 };

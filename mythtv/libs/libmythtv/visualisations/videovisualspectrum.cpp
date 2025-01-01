@@ -21,7 +21,7 @@ VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer* Audio, MythRender* Render)
 {
     // If av_tx_init() fails (returns < 0), the contexts will be nullptr and will crash later,
     // but av_malloc() is not checked to succeed either.
-    av_tx_init(&m_fftContext , &m_fft , AV_TX_FLOAT_FFT, 0, k_FFT_sample_length, &k_scale, AV_TX_INPLACE);
+    av_tx_init(&m_fftContext , &m_fft , AV_TX_FLOAT_FFT, 0, k_FFT_sample_length, &kScale, AV_TX_INPLACE);
 }
 
 VideoVisualSpectrum::~VideoVisualSpectrum()

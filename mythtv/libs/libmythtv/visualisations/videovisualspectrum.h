@@ -34,7 +34,7 @@ class VideoVisualSpectrum : public VideoVisual
 
     AVComplexFloat*    m_dftL        { nullptr };
     AVComplexFloat*    m_dftR        { nullptr };
-    static constexpr float k_scale   { 1.0F };
+    static constexpr float kScale    { 1.0F };
     AVTXContext       *m_fftContext  { nullptr };
     av_tx_fn           m_fft         { nullptr };
 

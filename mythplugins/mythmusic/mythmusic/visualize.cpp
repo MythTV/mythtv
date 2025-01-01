@@ -996,7 +996,7 @@ Spectrogram::Spectrogram(bool hist)
     m_rdftTmp = static_cast<float*>(av_malloc(sizeof(float) * (m_fftlen + 2)));
 
     // should probably check that this succeeds
-    av_tx_init(&m_rdftContext, &m_rdft, AV_TX_FLOAT_RDFT, 0, m_fftlen, &k_txScale, 0x0);
+    av_tx_init(&m_rdftContext, &m_rdft, AV_TX_FLOAT_RDFT, 0, m_fftlen, &kTxScale, 0x0);
 
     // hack!!! Should 44100 sample rate be queried or measured?
     // Likely close enough for most audio recordings...
@@ -1408,7 +1408,7 @@ Spectrum::Spectrum()
     m_rdftTmp = static_cast<float*>(av_malloc(sizeof(float) * (m_fftlen + 2)));
 
     // should probably check that this succeeds
-    av_tx_init(&m_rdftContext, &m_rdft, AV_TX_FLOAT_RDFT, 0, m_fftlen, &k_txScale, 0x0);
+    av_tx_init(&m_rdftContext, &m_rdft, AV_TX_FLOAT_RDFT, 0, m_fftlen, &kTxScale, 0x0);
 }
 
 Spectrum::~Spectrum()
