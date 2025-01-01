@@ -2698,7 +2698,8 @@ void AvFormatDecoder::RemoveAudioStreams()
                 );
             m_ic->nb_streams--;
             if ((m_ic->nb_streams - i) > 0) {
-                std::memmove(&m_ic->streams[i], &m_ic->streams[i + 1],
+                std::memmove(reinterpret_cast<void*>(&m_ic->streams[i]),
+                             reinterpret_cast<const void*>(&m_ic->streams[i + 1]),
                              (m_ic->nb_streams - i) * sizeof(AVFormatContext*));
             }
             else

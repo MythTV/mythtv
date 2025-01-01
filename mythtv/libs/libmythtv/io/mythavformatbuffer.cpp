@@ -26,7 +26,7 @@ MythAVFormatBuffer::~MythAVFormatBuffer()
     if (m_avioContext != nullptr)
     {
         avio_flush(m_avioContext);
-        av_freep(&(m_avioContext->buffer));
+        av_freep(reinterpret_cast<void*>(&m_avioContext->buffer));
         if (m_avioContext->write_flag)
         {
             LOG(VB_LIBAV, LOG_DEBUG, QString("AVIOContext (%1): %2 bytes written")
