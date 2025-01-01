@@ -35,12 +35,30 @@ function(sa_super)
       ALWAYS TRUE
       EXCLUDE_FROM_MAIN TRUE)
     ExternalProject_Add_StepTargets(${project} cppcheck)
-    ExternalProject_Get_Property(${project} BINARY_DIR)
-    set(${project}_BINARY_DIR
-        ${BINARY_DIR}
-        PARENT_SCOPE)
   endfunction()
 
+  # Get the binary directory locations for the mythtv and mythplugins
+  # sub-projects.
+  ExternalProject_Get_Property(MythTV BINARY_DIR)
+  set(MythTV_BINARY_DIR ${BINARY_DIR})
+  ExternalProject_Get_Property(MythPlugins BINARY_DIR)
+  set(MythPlugins_BINARY_DIR ${BINARY_DIR})
+
+  # CMake always builds a compile_commands.json file in the binary
+  # directory.  Add support for combining these into a single
+  # compile_commands.json file.
+  add_custom_target(
+    compdb
+    COMMENT "Installing compile_commands.json in ${PROJECT_SOURCE_DIR}"
+    COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/concatenate-compdb.sh
+            ${PROJECT_SOURCE_DIR}
+            ${MythTV_BINARY_DIR}
+            ${MythPlugins_BINARY_DIR}
+    BYPRODUCTS ${PROJECT_SOURCE_DIR}/compile_commands.json
+    USES_TERMINAL)
+
+  # Run the clang tidy program.  This forces the tidy program to be
+  # run in each of the sub-projects.
   if(CLANG_TIDY_EXECUTABLE AND RUN_CLANG_TIDY_EXECUTABLE)
     sa_add_step(MythTV clang-tidy)
     if(MYTH_BUILD_PLUGINS AND TARGET MythPlugins)
@@ -58,6 +76,9 @@ function(sa_super)
     endif()
   endif()
 
+  # Run the cppcheck program.  This forces the cppcheck program to be
+  # run in each of the sub-projects and then the results are combined
+  # together.
   if(CPPCHECK_EXECUTABLE)
     sa_add_cppcheck(MythTV)
     ExternalProject_Get_Property(MythTV BINARY_DIR)
