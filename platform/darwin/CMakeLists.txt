@@ -247,7 +247,7 @@ endforeach()
 
 # This function searches for the mythtv executable and library locations.
 # The output is divided into rpath'd files and hard-linked files.
-# These need different handling when copying into the app bundle
+# These need different handling when conotpying into the app bundle
 function(find_libraries_pathnames EXES_IN PATHS_OUT MISSING_OUT)
   # Possible locations for additional libraries.
   set(SRCHDIRS

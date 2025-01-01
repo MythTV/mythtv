@@ -110,6 +110,17 @@ else()
 endif()
 
 #
+# If a virtual environment has been created, copy its site-packages contents
+# into the install prefix so that the myth executables can find the correct packages
+# at run time
+#
+if(APPLE AND DEFINED ENV{VIRTUAL_ENV} AND NOT $ENV{VIRTUAL_ENV} STREQUAL "")
+  message(STATUS "Python Virtual Environment Libraries copied into install-prefix")
+  install(DIRECTORY $ENV{VIRTUAL_ENV}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
+          DESTINATION "${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+endif()
+
+#
 # Prevent namespace pollution
 #
 unset(PIP_OPTIONS)
