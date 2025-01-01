@@ -1230,7 +1230,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 // from here on the timecode is on the output time base
             frame.m_timecode -= timecodeOffset;
 
-            if (!((did_ff == 0) && copyvideo))
+            if ((did_ff != 0) || !copyvideo)
             {
                 if (video_aspect != new_aspect)
                 {
