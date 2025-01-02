@@ -131,8 +131,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 if(ENABLE_LTO AND NOT CMAKE_CROSSCOMPILING)
-  list(APPEND CFLAGS -flto)
-  list(APPEND CXXFLAGS -flto)
+  list(APPEND CFLAGS -flto=auto)
+  list(APPEND CXXFLAGS -flto=auto)
   list(APPEND LFLAGS -flto=auto)
 endif()
 
