@@ -9,7 +9,10 @@ if(NOT ENABLE_BACKEND)
 endif()
 
 target_link_libraries(mythtv PUBLIC PkgConfig::LZO2)
-target_compile_definitions(mythtv PRIVATE USING_BACKEND USING_IPTV)
+target_compile_definitions(
+  mythtv
+  PUBLIC USING_IPTV
+  PRIVATE USING_BACKEND)
 target_sources(
   mythtv
   PRIVATE # Channel stuff
