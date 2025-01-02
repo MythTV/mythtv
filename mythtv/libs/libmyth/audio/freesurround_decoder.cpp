@@ -239,7 +239,7 @@ private:
             float phaseDiff = phaseL - phaseR;
             if (phaseDiff < -PI) phaseDiff += 2*PI;
             if (phaseDiff > PI) phaseDiff -= 2*PI;
-            phaseDiff = abs(phaseDiff);
+            phaseDiff = std::abs(phaseDiff);
 
             if (m_linearSteering) {
                 // --- this is the fancy new linear mode ---
@@ -281,10 +281,10 @@ private:
                 // determine preliminary sound field y-position from phase difference
                 m_yFs[f] = 1 - (phaseDiff/PI)*2;
 
-                if (abs(m_xFs[f]) > m_surroundBalance) {
+                if (std::abs(m_xFs[f]) > m_surroundBalance) {
                     // blend linearly between the surrounds and the fronts if the balance exceeds the surround encoding balance
                     // this is necessary because the sound field is trapezoidal and will be stretched behind the listener
-                    float frontness = (abs(m_xFs[f]) - m_surroundBalance)/(1-m_surroundBalance);
+                    float frontness = (std::abs(m_xFs[f]) - m_surroundBalance)/(1-m_surroundBalance);
                     m_yFs[f]  = (1-frontness) * m_yFs[f] + frontness * 1;
                 }
 
