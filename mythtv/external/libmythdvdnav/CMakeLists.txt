@@ -16,14 +16,23 @@ include(CheckSymbolExists)
 
 # Remove some of the compilation flags that were added to MythTV by
 # the -Wall flag.
-string(APPEND CMAKE_C_FLAGS " -Wno-maybe-uninitialized")
-string(APPEND CMAKE_C_FLAGS " -Wno-unneeded-internal-declaration") # clang
-string(APPEND CMAKE_C_FLAGS " -Wno-unused-but-set-variable")
-string(APPEND CMAKE_C_FLAGS " -Wno-unused-variable")
+unset(CFLAGS)
+list(APPEND CFLAGS " -Wno-maybe-uninitialized")
+list(APPEND CFLAGS " -Wno-unneeded-internal-declaration") # clang
+list(APPEND CFLAGS " -Wno-unused-but-set-variable")
+list(APPEND CFLAGS " -Wno-unused-variable")
 # Remove some of the compilation flags that were added to MythTV by
 # the -Wextra flag.
-string(APPEND CMAKE_C_FLAGS " -Wno-implicit-fallthrough")
-string(APPEND CMAKE_C_FLAGS " -Wno-unused-parameter")
+list(APPEND CFLAGS " -Wno-implicit-fallthrough")
+list(APPEND CFLAGS " -Wno-unused-parameter")
+
+foreach(_FLAG IN LISTS CFLAGS)
+  string(SUBSTRING ${_FLAG} 1 -1 _NAME)
+  check_c_compiler_flag("${_FLAG}" HAVE_C_${_NAME})
+  if(HAVE_C_${_NAME})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_FLAG}")
+  endif()
+endforeach()
 
 #
 # Compile this library as a static library on Android because of the circular
