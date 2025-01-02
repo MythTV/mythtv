@@ -45,7 +45,7 @@ extern "C" {
 
 MythAVFormatWriter::~MythAVFormatWriter()
 {
-    CloseFile();
+    MythAVFormatWriter::CloseFile();
 
     av_freep(reinterpret_cast<void*>(&m_audioInBuf));
     av_freep(reinterpret_cast<void*>(&m_audioInPBuf));
