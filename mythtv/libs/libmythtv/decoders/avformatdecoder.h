@@ -21,7 +21,6 @@ extern "C" {
 
 #include "captions/vbilut.h"
 #include "decoderbase.h"
-#include "format.h"
 #include "io/mythavformatbuffer.h"
 #include "mpeg/AVCParser.h"
 #include "mythcodeccontext.h"
