@@ -12,7 +12,7 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner, Roland Ernst"
-__version__ = "0.3.11"
+__version__ = "0.3.12"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
@@ -32,6 +32,7 @@ __version__ = "0.3.11"
 # 0.3.9 Support TV lookup
 # 0.3.10 Use new API for release dates for movies
 # 0.3.11 Allow queries for specials in series in TV lookup
+# 0.3.12 `buildMovieList` searches now for movies with year
 
 # ~ from optparse import OptionParser
 import sys
@@ -189,10 +190,10 @@ def buildMovieList(query, opts):
     # as negative to all text that comes afterwards
     query = query.replace('-',' ')
 
-    from MythTV.tmdb3 import searchMovie
+    from MythTV.tmdb3 import searchMovieWithYear
     from MythTV import VideoMetadata
     from lxml import etree
-    results = iter(searchMovie(query))
+    results = iter(searchMovieWithYear(query))
     tree = etree.XML('<metadata></metadata>')
     mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
                ['releasedate',  'releasedate'], ['tagline',     'tagline'],
