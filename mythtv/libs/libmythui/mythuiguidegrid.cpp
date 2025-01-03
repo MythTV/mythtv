@@ -36,7 +36,9 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
 
 void MythUIGuideGrid::Finalize(void)
 {
-    m_rowCount = m_channelCount;
+    // Grid will probably never have more than 10,000 channels.  This
+    // number is to prevent a compiler warning, so change as needed.
+    m_rowCount = std::clamp(m_channelCount, 1, 10000);
 
     m_allData = new QList<UIGTCon *>[m_rowCount];
 
