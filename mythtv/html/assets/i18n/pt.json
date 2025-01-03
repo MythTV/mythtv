@@ -994,6 +994,8 @@
             "progress_label": "Progresso de digitalização",
             "removeduplicates_desc": "Se definido, selecione o multiplex de fluxo de transporte com o melhor sinal quando transportes idênticos forem recebidos em frequências diferentes. Esta opção é útil para DVB-T2 e ATSC/OTA quando um transporte às vezes pode ser recebido de diferentes transmissores.",
             "removeduplicates_label": "Remover Duplicatas",
+            "reopen_desc": "Se a placa de captura não puder ser aberta ou nenhuma opção de tipo de digitalização estiver disponível, clique aqui para tentar novamente. Se ainda falhar, use o botão \"Reiniciar back-end restrito\" na parte superior da página.",
+            "reopen_label": "Reabrir cartão de captura",
             "rolloff_desc": "Fator de roll-off (Padrão: 0,35)",
             "rolloff_label": "Cair fora",
             "sattuning_desc": "Selecione um satélite desta lista para os dados de ajuste do transponder de referência.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "Formato VBI"
         },
         "main": {
-            "enableupdates_desc": "A ativação das atualizações impedirá que qualquer gravação ocorra até que você reinicie",
+            "disabled": "As gravações ficam desativadas até você reiniciar",
+            "enableupdates_desc": "Habilite atualizações para salvar alterações na configuração. Isso impedirá que qualquer gravação ocorra até você reiniciar.",
             "enableupdates_label": "Ativar atualizações",
-            "mustenable": "As alterações não podem ser salvas a menos que você clique primeiro no botão Habilitar atualizações.",
+            "mustenable": "As alterações não podem ser salvas, a menos que você clique no botão Habilitar atualizações ou reinicie no Modo restrito.",
             "mustrestart": "Quando terminar as atualizações, reinicie o back-end.",
-            "restart_desc": "As gravações são desativadas até você reiniciar",
-            "restart_label": "Reiniciar back-end",
-            "restarting": "Reiniciando o back-end",
+            "restart_desc": "Reinicie o back-end e retome a operação normal.",
+            "restart_label": "Reinicie a operação completa do back-end",
+            "restart_webonly_desc": "Isso ativará atualizações e desativará todas as operações de back-end. Use isto se houver problemas ao configurar placas de captura.",
+            "restart_webonly_label": "Reiniciar back-end restrito",
+            "restarting": "Aguardando back-end",
             "shutdown_label": "Fechar back-end",
             "slave_enabled": "As atualizações são sempre habilitadas em um back-end escravo.",
             "slave_instructions": "Isso parece ser um back-end escravo. Se for destinado a um back-end escravo, desative o agendamento no back-end mestre enquanto executa a configuração do back-end escravo.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "O back-end não pode iniciar normalmente porque os fusos horários do banco de dados não estão configurados.",
                 "IPADDRESS": "O back-end não pode iniciar normalmente porque Geral, Endereço de host e Endereço IP primário não estão definidos.",
                 "SCHEMAUPDATE": "O back-end não pode ser iniciado normalmente porque a atualização do esquema do banco de dados falhou.",
-                "WEBONLYPARM": "O backend está em modo restrito devido ao parâmetro --webonly na linha de comando. Você terá que reiniciar manualmente."
+                "WEBONLYPARM": "O backend está em modo restrito devido a solicitação do usuário ou parâmetro webonly."
             }
         },
         "misc": {

@@ -234,6 +234,11 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     }
   }
 
+  keydown(event: KeyboardEvent ) {
+    if (event.key == "Enter")
+      this.titleSearch();
+  }
+
   onChannel(channel: Channel) {
     this.channel = channel;
     this.displayType = this.CHANNEL;

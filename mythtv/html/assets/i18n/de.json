@@ -994,6 +994,8 @@
             "progress_label": "Scan-Fortschritt",
             "removeduplicates_desc": "Wenn festgelegt, wählen Sie den Transportstrom-Multiplex mit dem besten Signal aus, wenn identische Transporte auf unterschiedlichen Frequenzen empfangen werden. Diese Option ist für DVB-T2 und ATSC/OTA nützlich, wenn ein Transport manchmal von verschiedenen Sendern empfangen werden kann.",
             "removeduplicates_label": "Duplikate entfernen",
+            "reopen_desc": "Wenn die Capture-Karte nicht geöffnet werden konnte oder keine Scantypoptionen verfügbar sind, klicken Sie hier, um es erneut zu versuchen. Wenn es immer noch fehlschlägt, verwenden Sie oben auf der Seite die Schaltfläche „Restart Backend Restricted“.",
+            "reopen_label": "Öffnen Sie die Capture Card erneut",
             "rolloff_desc": "Roll-Off-Faktor (Standard: 0,35)",
             "rolloff_label": "Abrollen",
             "sattuning_desc": "Wählen Sie aus dieser Liste einen Satelliten für die Tuning-Daten des Referenztransponders aus.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI-Format"
         },
         "main": {
-            "enableupdates_desc": "Durch die Aktivierung von Updates wird verhindert, dass Aufzeichnungen stattfinden, bis Sie neu starten",
+            "disabled": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
+            "enableupdates_desc": "Aktivieren Sie Updates, um Änderungen im Setup zu speichern. Dadurch wird verhindert, dass Aufzeichnungen stattfinden, bis Sie neu starten.",
             "enableupdates_label": "Aktivieren Sie Updates",
-            "mustenable": "Änderungen können nur gespeichert werden, wenn Sie zuerst auf die Schaltfläche „Aktualisierungen aktivieren“ klicken.",
+            "mustenable": "Änderungen können nur gespeichert werden, wenn Sie auf die Schaltfläche „Aktualisierungen aktivieren“ klicken oder im eingeschränkten Modus neu starten.",
             "mustrestart": "Wenn Sie mit den Updates fertig sind, starten Sie das Backend neu.",
-            "restart_desc": "Die Aufzeichnungen sind bis zum Neustart deaktiviert",
-            "restart_label": "Backend neu starten",
-            "restarting": "Backend neu starten",
+            "restart_desc": "Starten Sie das Backend neu und nehmen Sie den normalen Betrieb wieder auf.",
+            "restart_label": "Starten Sie den Backend-Vollbetrieb neu",
+            "restart_webonly_desc": "Dadurch werden Updates aktiviert und alle Backend-Vorgänge deaktiviert. Verwenden Sie diese Option, wenn beim Einrichten von Capture-Karten Probleme auftreten.",
+            "restart_webonly_label": "Neustart des Backends eingeschränkt",
+            "restarting": "Warten auf Backend",
             "shutdown_label": "Backend schließen",
             "slave_enabled": "Updates sind immer auf einem Slave-Backend aktiviert.",
             "slave_instructions": "Dies scheint ein Slave-Backend zu sein. Wenn es als Slave-Backend gedacht ist, deaktivieren Sie bitte die Planung auf dem Master-Backend, während Sie die Einrichtung des Slave-Backends ausführen.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Das Backend kann nicht normal starten, da die Datenbankzeitzonen nicht eingerichtet sind.",
                 "IPADDRESS": "Das Backend kann nicht normal starten, da „Allgemein“, „Hostadresse“ und „Primäre IP-Adresse“ nicht festgelegt sind.",
                 "SCHEMAUPDATE": "Das Backend kann nicht normal gestartet werden, da die Aktualisierung des Datenbankschemas fehlgeschlagen ist.",
-                "WEBONLYPARM": "Das Backend befindet sich aufgrund des Parameters --webonly in der Befehlszeile im eingeschränkten Modus. Sie müssen manuell neu starten."
+                "WEBONLYPARM": "Das Backend befindet sich aufgrund einer Benutzeranfrage oder eines Webonly-Parameters im eingeschränkten Modus."
             }
         },
         "misc": {

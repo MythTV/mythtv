@@ -994,6 +994,8 @@
             "progress_label": "Tarama İlerlemesi",
             "removeduplicates_desc": "Ayarlanmışsa, farklı frekanslarda aynı aktarımlar alındığında en iyi sinyale sahip aktarım akışı çoğullamasını seçin. Bu seçenek, bazen farklı vericilerden bir aktarım alınabildiğinde DVB-T2 ve ATSC/OTA için kullanışlıdır.",
             "removeduplicates_label": "Kopyaları Kaldır",
+            "reopen_desc": "Yakalama kartı açılamadıysa veya tarama türü seçeneği mevcut değilse, tekrar denemek için buna tıklayın. Hâlâ başarısız olursa sayfanın üst kısmındaki \"Arka Uç Kısıtlılığını Yeniden Başlat\" düğmesini kullanın.",
+            "reopen_label": "Yakalama Kartını Yeniden Açın",
             "rolloff_desc": "Düşürme faktörü (Varsayılan: 0,35)",
             "rolloff_label": "yuvarlanma",
             "sattuning_desc": "Referans transponderin ayarlama verileri için bu listeden bir uydu seçin.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI Biçimi"
         },
         "main": {
-            "enableupdates_desc": "Güncellemelerin etkinleştirilmesi, siz yeniden başlatana kadar herhangi bir kaydın yapılmasını engelleyecektir.",
+            "disabled": "Siz yeniden başlatana kadar kayıtlar devre dışı bırakılır",
+            "enableupdates_desc": "Kurulumdaki değişiklikleri kaydetmek için güncellemeleri etkinleştirin. Bu, siz yeniden başlatana kadar herhangi bir kaydın yapılmasını önleyecektir.",
             "enableupdates_label": "Güncellemeleri Etkinleştir",
-            "mustenable": "Önce Güncellemeleri Etkinleştir düğmesini tıklamadığınız sürece değişiklikler kaydedilemez.",
+            "mustenable": "Güncellemeleri Etkinleştir düğmesini tıklamadığınız veya Kısıtlı Mod'da yeniden başlatmadığınız sürece değişiklikler kaydedilemez.",
             "mustrestart": "Güncellemeleri tamamladığınızda arka ucu yeniden başlatın.",
-            "restart_desc": "Siz yeniden başlatana kadar kayıtlar devre dışı bırakılır",
-            "restart_label": "Arka Ucu Yeniden Başlat",
-            "restarting": "Arka Ucu Yeniden Başlatma",
+            "restart_desc": "Arka ucu yeniden başlatın ve normal çalışmaya devam edin.",
+            "restart_label": "Arka Uç Tam İşlemini Yeniden Başlatın",
+            "restart_webonly_desc": "Bu, güncellemeleri etkinleştirecek ve tüm arka uç işlemlerini devre dışı bırakacaktır. Yakalama kartlarını ayarlamada sorunlar varsa bunu kullanın.",
+            "restart_webonly_label": "Arka Ucu Yeniden Başlat Kısıtlı",
+            "restarting": "Arka uç bekleniyor",
             "shutdown_label": "Arka Ucu Kapat",
             "slave_enabled": "Güncellemeler, bağımlı bir arka uçta her zaman etkindir.",
             "slave_instructions": "Bu bir bağımlı arka uç gibi görünüyor. Bir bağımlı arka uç olarak amaçlanıyorsa, lütfen bağımlı arka uç kurulumunu çalıştırırken ana arka uçta planlamayı devre dışı bırakın.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Veritabanı Saat Dilimleri ayarlanmadığından arka uç normal şekilde başlatılamıyor.",
                 "IPADDRESS": "Genel, Ana Bilgisayar Adresi, Birincil IP Adresi ayarlanmadığından arka uç normal şekilde başlatılamıyor.",
                 "SCHEMAUPDATE": "Veritabanı Şeması Güncellemesi başarısız olduğundan arka uç normal şekilde başlatılamıyor.",
-                "WEBONLYPARM": "Komut satırındaki --webonly parametresi nedeniyle arka uç kısıtlı modda. Manuel olarak yeniden başlatmanız gerekecek."
+                "WEBONLYPARM": "Kullanıcı isteği veya webonly parametresi nedeniyle arka uç kısıtlı modda."
             }
         },
         "misc": {

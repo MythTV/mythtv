@@ -994,6 +994,8 @@
             "progress_label": "Napredek skeniranja",
             "removeduplicates_desc": "Če je nastavljeno, izberite multipleks transportnega toka z najboljšim signalom, ko so identični transporti sprejeti na različnih frekvencah. Ta možnost je uporabna za DVB-T2 in ATSC/OTA, ko je prenos včasih mogoče sprejeti z različnih oddajnikov.",
             "removeduplicates_label": "Odstrani dvojnike",
+            "reopen_desc": "Če kartice za zajem ni bilo mogoče odpreti ali ni na voljo nobenih možnosti vrste skeniranja, kliknite to, da poskusite znova. Če še vedno ne uspe, uporabite gumb »Restart Backend Restricted« na vrhu strani.",
+            "reopen_label": "Znova odprite Capture Card",
             "rolloff_desc": "Faktor padca (privzeto: 0,35)",
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Na tem seznamu izberite satelit za nastavitve referenčnega transponderja.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "Format VBI"
         },
         "main": {
-            "enableupdates_desc": "Če omogočite posodobitve, boste preprečili snemanje, dokler znova ne zaženete",
+            "disabled": "Posnetki so onemogočeni, dokler znova ne zaženete",
+            "enableupdates_desc": "Omogočite posodobitve, da shranite spremembe v nastavitvah. To bo preprečilo kakršno koli snemanje, dokler ne zaženete znova.",
             "enableupdates_label": "Omogoči posodobitve",
-            "mustenable": "Sprememb ni mogoče shraniti, razen če najprej kliknete gumb Omogoči posodobitve.",
+            "mustenable": "Sprememb ni mogoče shraniti, razen če kliknete gumb Omogoči posodobitve ali znova zaženete v omejenem načinu.",
             "mustrestart": "Ko končate s posodobitvami, znova zaženite zaledje.",
-            "restart_desc": "Posnetki so onemogočeni, dokler znova ne zaženete",
-            "restart_label": "Znova zaženite zaledje",
-            "restarting": "Ponovni zagon zaledja",
+            "restart_desc": "Znova zaženite zaledje in nadaljujte z običajnim delovanjem.",
+            "restart_label": "Znova zaženite polno delovanje zaledja",
+            "restart_webonly_desc": "To bo omogočilo posodobitve in onemogočilo vse zaledne operacije. Uporabite to, če imate težave pri nastavljanju kartic za zajemanje.",
+            "restart_webonly_label": "Znova zaženite zaledje Omejeno",
+            "restarting": "Čakanje na zaledje",
             "shutdown_label": "Zapri zaledje",
             "slave_enabled": "Posodobitve so vedno omogočene na podrejenem zaledju.",
             "slave_instructions": "Zdi se, da je to podrejeno zaledje. Če je mišljeno kot podrejeno zaledje, onemogočite razporejanje na glavnem zaledju med izvajanjem nastavitve podrejenega zaledja.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Zaledje se ne more normalno zagnati, ker časovni pasovi zbirke podatkov niso nastavljeni.",
                 "IPADDRESS": "Zaledje se ne more normalno zagnati, ker Splošno, Naslov gostitelja, Primarni naslov IP ni nastavljen.",
                 "SCHEMAUPDATE": "Zaledje se ne more normalno zagnati, ker posodobitev sheme baze podatkov ni uspela.",
-                "WEBONLYPARM": "Zaledje je v omejenem načinu zaradi parametra --webonly v ukazni vrstici. Ponovno boste morali zagnati ročno."
+                "WEBONLYPARM": "Zaledje je v omejenem načinu zaradi zahteve uporabnika ali parametra samo za splet."
             }
         },
         "misc": {

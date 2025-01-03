@@ -994,6 +994,8 @@
             "progress_label": "Průběh skenování",
             "removeduplicates_desc": "Je-li nastaveno, vyberte multiplex transportního toku s nejlepším signálem, když jsou identické transporty přijímány na různých frekvencích. Tato možnost je užitečná pro DVB-T2 a ATSC/OTA, kdy může být přenos někdy přijímán z různých vysílačů.",
             "removeduplicates_label": "Odstraňte duplikáty",
+            "reopen_desc": "Pokud snímací kartu nelze otevřít nebo nejsou k dispozici žádné možnosti typu skenování, klepněte na toto a zkuste to znovu. Pokud stále selže, použijte tlačítko \"Restartovat Backend Restricted\" v horní části stránky.",
+            "reopen_label": "Znovu otevřete kartu Capture Card",
             "rolloff_desc": "Rolovací faktor (výchozí: 0,35)",
             "rolloff_label": "Sjet",
             "sattuning_desc": "Vyberte satelit z tohoto seznamu pro data ladění referenčního transpondéru.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "Formát VBI"
         },
         "main": {
-            "enableupdates_desc": "Povolením aktualizací zabráníte nahrávání, dokud nerestartujete",
+            "disabled": "Záznamy jsou zakázány, dokud nerestartujete",
+            "enableupdates_desc": "Chcete-li uložit změny v nastavení, povolte aktualizace. Tím zabráníte nahrávání, dokud nerestartujete.",
             "enableupdates_label": "Povolit aktualizace",
-            "mustenable": "Změny nelze uložit, pokud nejprve neklepnete na tlačítko Povolit aktualizace.",
+            "mustenable": "Změny nelze uložit, pokud neklepnete na tlačítko Povolit aktualizace nebo restartujete v omezeném režimu.",
             "mustrestart": "Po dokončení aktualizací restartujte backend.",
-            "restart_desc": "Záznamy jsou zakázány, dokud nerestartujete",
-            "restart_label": "Restartujte backend",
-            "restarting": "Restartování backendu",
+            "restart_desc": "Restartujte backend a pokračujte v normálním provozu.",
+            "restart_label": "Restartujte Backend Full Operation",
+            "restart_webonly_desc": "Tím povolíte aktualizace a zakážete všechny operace backendu. Tuto možnost použijte, pokud se vyskytnou problémy s nastavením snímacích karet.",
+            "restart_webonly_label": "Restartovat Backend Restricted",
+            "restarting": "Čekání na Backend",
             "shutdown_label": "Zavřete Backend",
             "slave_enabled": "Aktualizace jsou vždy povoleny na podřízeném backendu.",
             "slave_instructions": "Zdá se, že jde o podřízený backend. Pokud je zamýšlen jako podřízený backend, vypněte plánování na hlavním backendu při spuštění nastavení podřízeného backendu.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Backend nelze normálně spustit, protože databázová časová pásma nejsou nastavena.",
                 "IPADDRESS": "Backend nelze normálně spustit, protože není nastavena Obecná, Adresa hostitele a Primární IP adresa.",
                 "SCHEMAUPDATE": "Backend nelze normálně spustit, protože se nezdařila aktualizace schématu databáze.",
-                "WEBONLYPARM": "Backend je v omezeném režimu kvůli parametru --webonly na příkazovém řádku. Budete muset restartovat ručně."
+                "WEBONLYPARM": "Backend je v omezeném režimu kvůli požadavku uživatele nebo parametru webonly."
             }
         },
         "misc": {

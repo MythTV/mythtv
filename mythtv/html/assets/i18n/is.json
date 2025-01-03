@@ -994,6 +994,8 @@
             "progress_label": "Skanna framfarir",
             "removeduplicates_desc": "Ef það er stillt skaltu velja flutningsstraumsfjölbreytileikann með besta merkinu þegar sams konar flutningar berast á mismunandi tíðni. Þessi valkostur er gagnlegur fyrir DVB-T2 og ATSC/OTA þegar stundum er hægt að taka á móti flutningi frá mismunandi sendum.",
             "removeduplicates_label": "Fjarlægðu afrit",
+            "reopen_desc": "Ef ekki var hægt að opna myndatökukortið eða engir valkostir fyrir skannagerð eru tiltækir, smelltu á þetta til að reyna aftur. Ef það mistekst enn, notaðu „Endurræstu bakenda takmarkað“ hnappinn efst á síðunni.",
+            "reopen_label": "Opnaðu Capture Card aftur",
             "rolloff_desc": "Rekstrarstuðull (sjálfgefið: 0,35)",
             "rolloff_label": "Rúlla af",
             "sattuning_desc": "Veldu gervihnött af þessum lista fyrir stillingargögn viðmiðunarsvarans.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI snið"
         },
         "main": {
-            "enableupdates_desc": "Að virkja uppfærslur kemur í veg fyrir að allar upptökur eigi sér stað fyrr en þú endurræsir",
+            "disabled": "Upptökur eru óvirkar þar til þú endurræsir",
+            "enableupdates_desc": "Virkjaðu uppfærslur til að vista breytingar í uppsetningu. Þetta kemur í veg fyrir að allar upptökur eigi sér stað fyrr en þú endurræsir.",
             "enableupdates_label": "Virkja uppfærslur",
-            "mustenable": "Ekki er hægt að vista breytingar nema þú smellir á hnappinn Virkja uppfærslur fyrst.",
+            "mustenable": "Ekki er hægt að vista breytingar nema þú smellir á Virkja uppfærslur hnappinn eða endurræsir í takmörkuðum ham.",
             "mustrestart": "Þegar þú ert búinn með uppfærslur skaltu endurræsa bakendann.",
-            "restart_desc": "Upptökur eru óvirkar þar til þú endurræsir",
-            "restart_label": "Endurræstu bakenda",
-            "restarting": "Endurræsir bakenda",
+            "restart_desc": "Endurræstu bakendann og haltu áfram eðlilegri notkun.",
+            "restart_label": "Endurræstu fulla aðgerð bakenda",
+            "restart_webonly_desc": "Þetta mun virkja uppfærslur og gera allar bakendaaðgerðir óvirkar. Notaðu þetta ef vandamál koma upp við að setja upp tökukort.",
+            "restart_webonly_label": "Endurræstu bakenda takmarkað",
+            "restarting": "Bíð eftir Backend",
             "shutdown_label": "Lokaðu bakenda",
             "slave_enabled": "Uppfærslur eru alltaf virkar á bakenda þræls.",
             "slave_instructions": "Þetta virðist vera þrælabakendi. Ef það er ætlað sem þrælabakendi, vinsamlegast slökktu á tímasetningu á aðalbakendanum meðan þú keyrir uppsetningu þrælabakendans.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Bakendi getur ekki ræst venjulega vegna þess að tímabelti gagnagrunns eru ekki sett upp.",
                 "IPADDRESS": "Backend getur ekki ræst venjulega vegna þess að General, Host Address, Primary IP Address er ekki stillt.",
                 "SCHEMAUPDATE": "Bakendi getur ekki ræst venjulega vegna þess að uppfærsla gagnagrunnskerfis mistókst.",
-                "WEBONLYPARM": "Bakendi er í takmörkuðum ham vegna --webonly færibreytu á skipanalínunni. Þú verður að endurræsa handvirkt."
+                "WEBONLYPARM": "Bakendi er í takmörkuðum ham vegna beiðni notenda eða færibreytu eingöngu á vefnum."
             }
         },
         "misc": {

@@ -91,6 +91,19 @@
     </small>
 </div>
 
+<div class="form-group field">
+    <div class="grid">
+        <div style="display:flex; align-items:center;">
+            <p-button label="{{ 'settings.channelscan.reopen_label' | translate }}" icon="pi pi-refresh" iconPos="left"
+                (onClick)="setupCard()" [disabled]="setupService.schedulingEnabled || scanStatus.Status == 'RUNNING'">
+            </p-button>
+        </div>
+    </div>
+    <small class="block">
+        {{ 'settings.channelscan.reopen_desc' | translate }}
+    </small>
+</div>
+
 <!-- Full Scan Panel -->
 <p-fieldset class="mb-4 w-full" legend="{{ 'settings.channelscan.type.full' | translate }}" [toggleable]="false"
     [collapsed]="false" *ngIf="scanRequest.ScanType == 'FULL'">
@@ -100,7 +113,7 @@
             }}</label>
         <p-dropdown [options]="freqTableSelect" [(ngModel)]="scanRequest.FreqTable" [editable]="false"
             optionLabel="label" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="FreqTable"
-            #FreqTable="ngModel" (onChange)="onFreqTableChange(false)">
+            #FreqTable="ngModel" (onChange)="onFreqTableChange(false)" appendTo="body">
         </p-dropdown>
         <small class="block">
             {{ 'settings.channelscan.freqtable_desc' | translate }}
@@ -111,7 +124,8 @@
         <label for="Country" class="label block">{{ 'settings.channelscan.country_label' | translate
             }}</label>
         <p-dropdown [options]="countryTable" [(ngModel)]="scanRequest.FreqTable" [editable]="false" optionLabel="label"
-            optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Country" #Country="ngModel">
+            optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Country" #Country="ngModel"
+            appendTo="body">
         </p-dropdown>
         <small class="block">
             {{ 'settings.channelscan.scantype_dvbt_desc' | translate }}
@@ -122,7 +136,8 @@
         <label for="Country" class="label block">{{ 'settings.channelscan.country_label' | translate
             }}</label>
         <p-dropdown [options]="networkTable" [(ngModel)]="scanRequest.FreqTable" [editable]="false" optionLabel="label"
-            optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Country" #Country="ngModel">
+            optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Country" #Country="ngModel"
+            appendTo="body">
         </p-dropdown>
         <small class="block">
         </small>
@@ -133,7 +148,7 @@
             }}</label>
         <p-dropdown [options]="atscModulationTable" [(ngModel)]="scanRequest.Modulation" [editable]="false"
             optionLabel="label" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="atscModulation"
-            #atscModulation="ngModel" (onChange)="onFreqTableChange(true)">
+            #atscModulation="ngModel" (onChange)="onFreqTableChange(true)" appendTo="body">
         </p-dropdown>
         <small class="block">
             {{ 'settings.channelscan.atscmodulation_desc' | translate }}
@@ -144,7 +159,7 @@
         <label for="FirstChan" class="label block">{{ 'settings.channelscan.firstchan_label' | translate
             }}</label>
         <p-dropdown [options]="channels" [(ngModel)]="scanRequest.FirstChan" [editable]="false" [maxlength]="0"
-            [style]="{'minWidth':'400px'}" name="FirstChan" #FirstChan="ngModel">
+            [style]="{'minWidth':'400px'}" name="FirstChan" #FirstChan="ngModel" appendTo="body">
         </p-dropdown>
         <small class="block">
             {{ 'settings.channelscan.firstchan_desc' | translate }}
@@ -158,7 +173,7 @@
         <label for="LastChan" class="label block">{{ 'settings.channelscan.lastchan_label' | translate
             }}</label>
         <p-dropdown [options]="channels" [(ngModel)]="scanRequest.LastChan" [editable]="false" [maxlength]="0"
-            [style]="{'minWidth':'400px'}" name="LastChan" #LastChan="ngModel">
+            [style]="{'minWidth':'400px'}" name="LastChan" #LastChan="ngModel" appendTo="body">
         </p-dropdown>
         <small class="block">
             {{ 'settings.channelscan.lastchan_desc' | translate }}
@@ -434,7 +449,8 @@
         <label for="ScanId" class="label block">{{ 'settings.channelscan.scanimport_label' | translate
             }}</label>
         <p-dropdown [options]="scans" [(ngModel)]="scanRequest.ScanId" [editable]="false" optionLabel="label"
-            optionValue="ScanId" [maxlength]="0" [style]="{'minWidth':'400px'}" name="ScanId" #ScanId="ngModel">
+            optionValue="ScanId" [maxlength]="0" [style]="{'minWidth':'400px'}" name="ScanId" #ScanId="ngModel"
+            appendTo="body">
         </p-dropdown>
         <small class="block">
         </small>
@@ -450,7 +466,8 @@
         <label for="MplexId" class="label block">{{ 'settings.channelscan.transport_label' | translate
             }}</label>
         <p-dropdown [options]="multiplex" [(ngModel)]="scanRequest.MplexId" [editable]="false" optionLabel="Description"
-            optionValue="MplexId" [maxlength]="0" [style]="{'minWidth':'400px'}" name="MplexId" #MplexId="ngModel">
+            optionValue="MplexId" [maxlength]="0" [style]="{'minWidth':'400px'}" name="MplexId" #MplexId="ngModel"
+            appendTo="body">
         </p-dropdown>
         <small class="block">
         </small>

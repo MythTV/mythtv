@@ -160,7 +160,7 @@ export class MythService {
     return this.httpClient.post<BoolResponse>('/Myth/ManageScheduler', request);
   }
 
-  public Shutdown(request: {Retcode?: number, Restart?: boolean}) : Observable<BoolResponse> {
+  public Shutdown(request: {Retcode?: number, Restart?: boolean, WebOnly?: boolean}) : Observable<BoolResponse> {
     return this.httpClient.post<BoolResponse>('/Myth/Shutdown', request);
   }
 

@@ -367,19 +367,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
     // subject.subscribe to allow DVB card to be ready. Otherwise it fails to open
     // because it is already open from the GetCaptureDeviceList call
     this.iconnection.deviceFree.subscribe((x) => {
-      this.captureCardService.GetCardSubType(this.card.CardId).subscribe(data => {
-        this.cardSubType = data.CardSubType;
-        this.buildScanTypeList();
-        this.onFreqTableChange(false);
-        if (this.cardSubType.InputType == 'DVBT2')
-          this.scanRequest.ModSys = 'DVB-T2';       // default value
-        if (this.cardSubType.InputType == 'DVBS2')
-          this.scanRequest.ModSys = 'DVB-S2';       // default value
-        if (this.cardSubType.InputType == 'DVBC')
-          this.scanRequest.SymbolRate = '6900000';       // default value
-        if (['DVBS', 'DVBS2'].includes(this.cardSubType.InputType))
-          this.scanRequest.SymbolRate = '27500000';       // default value
-      })
+      this.setupCard();
     });
     // In case this ran after capturedevices was already loaded (unlikely)
     if (this.iconnection.captureDeviceList.CaptureDeviceList.CaptureDevices.length > 0
@@ -388,11 +376,31 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
     }
   }
 
+  setupCard(): void {
+    if (this.setupService.schedulingEnabled)
+      return;
+    this.captureCardService.GetCardSubType(this.card.CardId).subscribe(data => {
+      this.cardSubType = data.CardSubType;
+      this.scanRequest.ScanType = '';
+      this.buildScanTypeList();
+      this.onFreqTableChange(false);
+      if (this.cardSubType.InputType == 'DVBT2')
+        this.scanRequest.ModSys = 'DVB-T2';       // default value
+      if (this.cardSubType.InputType == 'DVBS2')
+        this.scanRequest.ModSys = 'DVB-S2';       // default value
+      if (this.cardSubType.InputType == 'DVBC')
+        this.scanRequest.SymbolRate = '6900000';       // default value
+      if (['DVBS', 'DVBS2'].includes(this.cardSubType.InputType))
+        this.scanRequest.SymbolRate = '27500000';       // default value
+    });
+  }
+
 
   buildScanTypeList() {
     let transp = false;
     this.helpText = '';
     this.scanSubType = this.cardSubType.InputType;
+    this.scanTypes.length = 0;
     switch (this.cardSubType.InputType) {
       case 'V4L':
       case 'MPEG':
@@ -585,7 +593,6 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
 
   refreshStatus(doChannels: boolean ) {
     this.channelService.GetScanStatus().subscribe(data => {
-      // console.log(data.ScanStatus.CardId, this.card.CardId)
       if (data.ScanStatus.CardId == this.card.CardId) {
         this.scanStatus = data.ScanStatus;
         this.scanLog = data.ScanStatus.StatusLog.split('\n').join('<br>');

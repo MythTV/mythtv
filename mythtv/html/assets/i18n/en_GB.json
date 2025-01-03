@@ -994,6 +994,8 @@
             "progress_label": "Scan Progress",
             "removeduplicates_desc": "If set, select the transport stream multiplex with the best signal when identical transports are received on different frequencies. This option is useful for DVB-T2 and ATSC/OTA when a transport can sometimes be received from different transmitters.",
             "removeduplicates_label": "Remove Duplicates",
+            "reopen_desc": "If the capture card could not be opened or no scan type options are available, click this to try again. If it still fails, use the \"Restart Backend Restricted\" button at the top of the page.",
+            "reopen_label": "Re-open Capture Card",
             "rolloff_desc": "Roll-off factor (Default: 0.35)",
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Select a satellite from this list for the tuning data of the reference transponder.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI Format"
         },
         "main": {
-            "enableupdates_desc": "Enabling updates will prevent any recordings from taking place until you restart",
+            "disabled": "Recordings are disabled until you restart",
+            "enableupdates_desc": "Enable updates to save changes in setup. This will prevent any recordings from taking place until you restart.",
             "enableupdates_label": "Enable Updates",
-            "mustenable": "Changes cannot be saved unless you click the Enable Updates button first.",
+            "mustenable": "Changes cannot be saved unless you click the Enable Updates button or restart in Restricted Mode.",
             "mustrestart": "When you are finished with updates, restart the backend.",
-            "restart_desc": "Recordings are disabled until you restart",
-            "restart_label": "Restart Backend",
-            "restarting": "Restarting Backend",
+            "restart_desc": "Restart the backend and resume normal operation.",
+            "restart_label": "Restart Backend Full Operation",
+            "restart_webonly_desc": "This will enable updates and disable all backend operations. Use this if there are problems setting up capture cards.",
+            "restart_webonly_label": "Restart Backend Restricted",
+            "restarting": "Waiting for Backend",
             "shutdown_label": "Close Backend",
             "slave_enabled": "Updates are always enabled on a slave backend.",
             "slave_instructions": "This appears to be a slave backend. If it is intended as a slave backend, please disable scheduling on the master backend while running slave backend setup.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Backend cannot start normally because Database Timezones are not set up.",
                 "IPADDRESS": "Backend cannot start normally because General, Host Address, Primary IP Address is not set.",
                 "SCHEMAUPDATE": "Backend cannot start normally because Database Schema Update failed.",
-                "WEBONLYPARM": "Backend is in restricted mode due to --webonly parameter on the command line. You will have to restart manually."
+                "WEBONLYPARM": "Backend is in restricted mode due to user request or webonly parameter."
             }
         },
         "misc": {

@@ -994,6 +994,8 @@
             "progress_label": "Postęp skanowania",
             "removeduplicates_desc": "Jeśli jest ustawiona, wybierz multipleks strumienia transportowego z najlepszym sygnałem, gdy identyczne transporty są odbierane na różnych częstotliwościach. Ta opcja jest użyteczna dla DVB-T2 i ATSC/OTA, gdy transport może czasami być odbierany z różnych nadajników.",
             "removeduplicates_label": "Usuń duplikaty",
+            "reopen_desc": "Jeśli nie można otworzyć karty przechwytującej lub nie są dostępne żadne opcje typu skanowania, kliknij tę opcję, aby spróbować ponownie. Jeśli nadal się to nie powiedzie, użyj przycisku „Uruchom ponownie ograniczony backend” u góry strony.",
+            "reopen_label": "Otwórz ponownie kartę przechwytującą",
             "rolloff_desc": "Współczynnik roll-off (domyślnie: 0,35)",
             "rolloff_label": "Zwijanie",
             "sattuning_desc": "Wybierz satelitę z tej listy, aby uzyskać dane strojenia transpondera referencyjnego.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "formacie VBI"
         },
         "main": {
-            "enableupdates_desc": "Włączenie aktualizacji zapobiegnie nagrywaniu do momentu ponownego uruchomienia",
+            "disabled": "Nagrania są wyłączone do momentu ponownego uruchomienia",
+            "enableupdates_desc": "Włącz aktualizacje, aby zapisać zmiany w konfiguracji. Zapobiegnie to nagrywaniu do czasu ponownego uruchomienia.",
             "enableupdates_label": "Włącz aktualizacje",
-            "mustenable": "Zmiany nie mogą zostać zapisane, chyba że najpierw klikniesz przycisk Włącz aktualizacje.",
+            "mustenable": "Zmiany nie mogą zostać zapisane, chyba że klikniesz przycisk Włącz aktualizacje lub uruchomisz ponownie w trybie ograniczonego dostępu.",
             "mustrestart": "Po zakończeniu aktualizacji uruchom ponownie backend.",
-            "restart_desc": "Nagrania są wyłączone do ponownego uruchomienia",
-            "restart_label": "Uruchom ponownie zaplecze",
-            "restarting": "Ponowne uruchamianie backendu",
+            "restart_desc": "Uruchom ponownie backend i wznów normalne działanie.",
+            "restart_label": "Uruchom ponownie pełne działanie backendu",
+            "restart_webonly_desc": "Spowoduje to włączenie aktualizacji i wyłączenie wszystkich operacji zaplecza. Użyj tej opcji, jeśli występują problemy z konfiguracją kart przechwytujących.",
+            "restart_webonly_label": "Ograniczono ponowne uruchomienie backendu",
+            "restarting": "Czekam na Backend",
             "shutdown_label": "Zamknij zaplecze",
             "slave_enabled": "Aktualizacje są zawsze włączone na podrzędnym zapleczu.",
             "slave_instructions": "Wygląda na to, że jest to backend podrzędny. Jeśli ma służyć jako podrzędny backend, wyłącz planowanie na głównym backendzie podczas uruchamiania konfiguracji podrzędnego backendu.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Zaplecze nie może uruchomić się normalnie, ponieważ strefy czasowe bazy danych nie są skonfigurowane.",
                 "IPADDRESS": "Backend nie może uruchomić się normalnie, ponieważ nie ustawiono opcji Ogólne, Adres hosta i Podstawowy adres IP.",
                 "SCHEMAUPDATE": "Zaplecze nie może uruchomić się normalnie, ponieważ aktualizacja schematu bazy danych nie powiodła się.",
-                "WEBONLYPARM": "Backend jest w trybie ograniczonym z powodu parametru --webonly w wierszu poleceń. Będziesz musiał ponownie uruchomić ręcznie."
+                "WEBONLYPARM": "Backend jest w trybie ograniczonym z powodu żądania użytkownika lub parametru webonly."
             }
         },
         "misc": {

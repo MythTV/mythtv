@@ -994,6 +994,8 @@
             "progress_label": "扫描进度",
             "removeduplicates_desc": "如果设置，则当在不同频率上接收到相同传输时，选择具有最佳信号的传输流复用。当有时可以从不同的发射机接收传输时，此选项对于 DVB-T2 和 ATSC/OTA 非常有用。",
             "removeduplicates_label": "删除重复项",
+            "reopen_desc": "如果采集卡无法打开或没有可用的扫描类型选项，请单击此重试。如果仍然失败，请使用页面顶部的“重新启动后端受限”按钮。",
+            "reopen_label": "重新打开采集卡",
             "rolloff_desc": "滚降系数（默认值：0.35）",
             "rolloff_label": "滚下",
             "sattuning_desc": "从此列表中选择一颗卫星以获取参考转发器的调谐数据。",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI格式"
         },
         "main": {
-            "enableupdates_desc": "启用更新将阻止进行任何录制，直到您重新启动为止",
+            "disabled": "录音将被禁用，直到您重新启动为止",
+            "enableupdates_desc": "启用更新以保存设置中的更改。这将防止在您重新启动之前进行任何录制。",
             "enableupdates_label": "启用更新",
-            "mustenable": "除非您先单击“启用更新”按钮，否则无法保存更改。",
+            "mustenable": "除非单击启用更新按钮或在受限模式下重新启动，否则无法保存更改。",
             "mustrestart": "完成更新后，重新启动后端。",
-            "restart_desc": "录音将被禁用，直到您重新启动为止",
-            "restart_label": "重启后端",
-            "restarting": "重启后端",
+            "restart_desc": "重新启动后端并恢复正常运行。",
+            "restart_label": "重启后端全面运行",
+            "restart_webonly_desc": "这将启用更新并禁用所有后端操作。如果设置采集卡出现问题，请使用此选项。",
+            "restart_webonly_label": "重启后端受限",
+            "restarting": "等待后端",
             "shutdown_label": "关闭后端",
             "slave_enabled": "从属后端始终启用更新。",
             "slave_instructions": "这似乎是一个从属后端。如果它打算作为从后端，请在运行从后端设置时禁用主后端上的调度。",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "由于数据库时区未设置，后端无法正常启动。",
                 "IPADDRESS": "由于未设置常规、主机地址、主 IP 地址，后端无法正常启动。",
                 "SCHEMAUPDATE": "由于数据库架构更新失败，后端无法正常启动。",
-                "WEBONLYPARM": "由于命令行上的 --webonly 参数，后端处于受限模式。您必须手动重新启动。"
+                "WEBONLYPARM": "由于用户请求或 webonly 参数，后端处于受限模式。"
             }
         },
         "misc": {

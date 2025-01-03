@@ -994,6 +994,8 @@
             "progress_label": "Skanna framsteg",
             "removeduplicates_desc": "Om inställt, välj transportströmmultiplexet med den bästa signalen när identiska transporter tas emot på olika frekvenser. Detta alternativ är användbart för DVB-T2 och ATSC/OTA när en transport ibland kan tas emot från olika sändare.",
             "removeduplicates_label": "Ta bort dubbletter",
+            "reopen_desc": "Om fångstkortet inte kunde öppnas eller inga alternativ för skanningstyp är tillgängliga, klicka på detta för att försöka igen. Om det fortfarande misslyckas, använd knappen \"Starta om Backend Restricted\" högst upp på sidan.",
+            "reopen_label": "Öppna Capture Card igen",
             "rolloff_desc": "Roll-off faktor (standard: 0,35)",
             "rolloff_label": "Rulla av",
             "sattuning_desc": "Välj en satellit från denna lista för inställningsdata för referenstranspondern.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI-format"
         },
         "main": {
-            "enableupdates_desc": "Om du aktiverar uppdateringar förhindras alla inspelningar tills du startar om",
+            "disabled": "Inspelningar är inaktiverade tills du startar om",
+            "enableupdates_desc": "Aktivera uppdateringar för att spara ändringar i inställningarna. Detta kommer att förhindra att inspelningar görs tills du startar om.",
             "enableupdates_label": "Aktivera uppdateringar",
-            "mustenable": "Ändringar kan inte sparas om du inte klickar på knappen Aktivera uppdateringar först.",
+            "mustenable": "Ändringar kan inte sparas om du inte klickar på knappen Aktivera uppdateringar eller startar om i begränsat läge.",
             "mustrestart": "När du är klar med uppdateringarna, starta om backend.",
-            "restart_desc": "Inspelningar är inaktiverade tills du startar om",
-            "restart_label": "Starta om Backend",
-            "restarting": "Startar om backend",
+            "restart_desc": "Starta om backend och återuppta normal drift.",
+            "restart_label": "Starta om Backend Full Operation",
+            "restart_webonly_desc": "Detta kommer att aktivera uppdateringar och inaktivera alla backend-operationer. Använd detta om det finns problem med att ställa in fångstkort.",
+            "restart_webonly_label": "Starta om Backend Begränsad",
+            "restarting": "Väntar på Backend",
             "shutdown_label": "Stäng Backend",
             "slave_enabled": "Uppdateringar är alltid aktiverade på en slavbackend.",
             "slave_instructions": "Detta verkar vara en slavbackend. Om den är avsedd som en slavbackend, inaktivera schemaläggning på masterbackend medan du kör slavbackend-installation.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Backend kan inte starta normalt eftersom databastidszoner inte är inställda.",
                 "IPADDRESS": "Backend kan inte starta normalt eftersom Allmänt, Värdadress, Primär IP-adress inte är inställt.",
                 "SCHEMAUPDATE": "Backend kan inte starta normalt eftersom uppdatering av databasschema misslyckades.",
-                "WEBONLYPARM": "Backend är i begränsat läge på grund av parametern --webonly på kommandoraden. Du måste starta om manuellt."
+                "WEBONLYPARM": "Backend är i begränsat läge på grund av användarbegäran eller webonly-parameter."
             }
         },
         "misc": {

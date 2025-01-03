@@ -994,6 +994,8 @@
             "progress_label": "Scanningsfremskridt",
             "removeduplicates_desc": "Hvis den er indstillet, skal du vælge transportstrømmultipleksen med det bedste signal, når identiske transporter modtages på forskellige frekvenser. Denne mulighed er nyttig for DVB-T2 og ATSC/OTA, når en transport nogle gange kan modtages fra forskellige sendere.",
             "removeduplicates_label": "Fjern dubletter",
+            "reopen_desc": "Hvis optagelseskortet ikke kunne åbnes, eller der ikke er nogen tilgængelige scanningstyper, skal du klikke på dette for at prøve igen. Hvis det stadig mislykkes, skal du bruge knappen \"Genstart Backend Restricted\" øverst på siden.",
+            "reopen_label": "Genåbn Capture Card",
             "rolloff_desc": "Roll-off faktor (standard: 0,35)",
             "rolloff_label": "Afrulning",
             "sattuning_desc": "Vælg en satellit fra denne liste til indstillingsdata for referencetransponderen.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI format"
         },
         "main": {
-            "enableupdates_desc": "Aktivering af opdateringer forhindrer optagelser i at finde sted, indtil du genstarter",
+            "disabled": "Optagelser er deaktiveret, indtil du genstarter",
+            "enableupdates_desc": "Aktiver opdateringer for at gemme ændringer i opsætningen. Dette vil forhindre optagelser i at finde sted, indtil du genstarter.",
             "enableupdates_label": "Aktiver opdateringer",
-            "mustenable": "Ændringer kan ikke gemmes, medmindre du først klikker på knappen Aktiver opdateringer.",
+            "mustenable": "Ændringer kan ikke gemmes, medmindre du klikker på knappen Aktiver opdateringer eller genstarter i begrænset tilstand.",
             "mustrestart": "Når du er færdig med opdateringer, skal du genstarte backend.",
-            "restart_desc": "Optagelser er deaktiveret, indtil du genstarter",
-            "restart_label": "Genstart Backend",
-            "restarting": "Genstarter Backend",
+            "restart_desc": "Genstart backend og genoptag normal drift.",
+            "restart_label": "Genstart Backend fuld drift",
+            "restart_webonly_desc": "Dette vil aktivere opdateringer og deaktivere alle backend-operationer. Brug dette, hvis der er problemer med at konfigurere optagelseskort.",
+            "restart_webonly_label": "Genstart Backend Begrænset",
+            "restarting": "Venter på Backend",
             "shutdown_label": "Luk Backend",
             "slave_enabled": "Opdateringer er altid aktiveret på en slave-backend.",
             "slave_instructions": "Dette ser ud til at være en slave backend. Hvis det er beregnet som en slave-backend, skal du deaktivere planlægning på master-backend, mens du kører slave-backend-opsætning.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Backend kan ikke starte normalt, fordi databasetidszoner ikke er konfigureret.",
                 "IPADDRESS": "Backend kan ikke starte normalt, fordi Generelt, Værtsadresse, Primær IP-adresse ikke er indstillet.",
                 "SCHEMAUPDATE": "Backend kan ikke starte normalt, fordi opdatering af databaseskema mislykkedes.",
-                "WEBONLYPARM": "Backend er i begrænset tilstand på grund af --webonly parameter på kommandolinjen. Du bliver nødt til at genstarte manuelt."
+                "WEBONLYPARM": "Backend er i begrænset tilstand på grund af brugeranmodning eller webonly-parameter."
             }
         },
         "misc": {

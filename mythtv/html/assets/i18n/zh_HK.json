@@ -994,6 +994,8 @@
             "progress_label": "掃描進度",
             "removeduplicates_desc": "如果設置，則當在不同頻率上接收到相同傳輸時，選擇具有最佳信號的傳輸流復用。當有時可以從不同的發射機接收​​傳輸時，此選項對於 DVB-T2 和 ATSC/OTA 非常有用。",
             "removeduplicates_label": "刪除重複項",
+            "reopen_desc": "如果擷取卡無法開啟或沒有可用的掃描類型選項，請按一下此重試。如果仍然失敗，請使用頁面頂部的「重新啟動後端受限」按鈕。",
+            "reopen_label": "重新開啟擷取卡",
             "rolloff_desc": "滾降係數（默認值：0.35）",
             "rolloff_label": "滾下",
             "sattuning_desc": "從此列表中選擇一顆衛星以獲取參考轉發器的調諧數據。",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI格式"
         },
         "main": {
-            "enableupdates_desc": "啟用更新將阻止進行任何錄製，直到您重新啟動為止",
+            "disabled": "錄音將被停用，直到您重新啟動為止",
+            "enableupdates_desc": "啟用更新以儲存設定中的變更。這將防止在您重新啟動之前進行任何錄製。",
             "enableupdates_label": "啟用更新",
-            "mustenable": "除非您先按一下「啟用更新」按鈕，否則無法儲存變更。",
+            "mustenable": "除非按一下啟用更新按鈕或在受限模式下重新啟動，否則無法儲存變更。",
             "mustrestart": "完成更新後，重新啟動後端。",
-            "restart_desc": "錄音將被禁用，直到您重新啟動為止",
-            "restart_label": "重啟後端",
-            "restarting": "重啟後端",
+            "restart_desc": "重新啟動後端並恢復正常運作。",
+            "restart_label": "重啟後端全面運行",
+            "restart_webonly_desc": "這將啟用更新並停用所有後端操作。如果設定採集卡出現問題，請使用此選項。",
+            "restart_webonly_label": "重啟後端受限",
+            "restarting": "等待後端",
             "shutdown_label": "關閉後端",
             "slave_enabled": "從屬後端始終啟用更新。",
             "slave_instructions": "這似乎是一個從屬後端。如果它打算作為從後端，請在運行從後端設置時禁用主後端上的調度。",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "由於資料庫時區未設置，後端無法正常啟動。",
                 "IPADDRESS": "由於未設定常規、主機位址、主 IP 位址，後端無法正常啟動。",
                 "SCHEMAUPDATE": "由於資料庫架構更新失敗，後端無法正常啟動。",
-                "WEBONLYPARM": "由於命令列上的 --webonly 參數，後端處於受限模式。您必須手動重新啟動。"
+                "WEBONLYPARM": "由於使用者請求或 webonly 參數，後端處於受限模式。"
             }
         },
         "misc": {

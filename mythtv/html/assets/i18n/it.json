@@ -994,6 +994,8 @@
             "progress_label": "Avanzamento Scansione",
             "removeduplicates_desc": "Se impostato, nel caso in cui vengano ricevuti trasporti identici su frequenze diverse seleziona il multiplex del transport stream con il segnale migliore. Questa opzione è utile per DVB-T2 e ATSC/OTA quando a volte è possibile ricevere un trasporto da diversi trasmettitori.",
             "removeduplicates_label": "Rimuovi duplicati",
+            "reopen_desc": "Se non è possibile aprire la scheda di acquisizione o non sono disponibili opzioni per il tipo di scansione, fare clic qui per riprovare. Se il problema persiste, utilizza il pulsante \"Riavvia backend limitato\" nella parte superiore della pagina.",
+            "reopen_label": "Riapri la scheda di acquisizione",
             "rolloff_desc": "Fattore di roll-off (predefinito: 0,35)",
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Seleziona un satellite dall'elenco per avere i dati di sintonizzazione del transponder di riferimento.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "Formato VBI"
         },
         "main": {
-            "enableupdates_desc": "L'abilitazione degli aggiornamenti impedirà qualsiasi registrazione fino al riavvio",
+            "disabled": "Le registrazioni saranno disabilitate fino al riavvio",
+            "enableupdates_desc": "Abilita gli aggiornamenti per salvare le modifiche nella configurazione. Ciò impedirà l'esecuzione di qualsiasi registrazione fino al riavvio.",
             "enableupdates_label": "Abilita Aggiornamenti",
-            "mustenable": "Non è possibile salvare le modifiche se prima non si clicca sul pulsante Abilita aggiornamenti.",
+            "mustenable": "Le modifiche non possono essere salvate a meno che non si faccia clic sul pulsante Abilita aggiornamenti o si riavvii in Modalità limitata.",
             "mustrestart": "Una volta terminati gli aggiornamenti, riavviare il backend.",
-            "restart_desc": "Le registrazioni sono disabilitate fino al riavvio",
-            "restart_label": "Riavvia il back-end",
-            "restarting": "Riavvio del backend",
+            "restart_desc": "Riavviare il backend e riprendere il normale funzionamento.",
+            "restart_label": "Riavvia il funzionamento completo del backend",
+            "restart_webonly_desc": "Ciò abiliterà gli aggiornamenti e disabiliterà tutte le operazioni di backend. Usalo se ci sono problemi con la configurazione delle schede di acquisizione.",
+            "restart_webonly_label": "Riavvia il backend limitato",
+            "restarting": "In attesa del backend",
             "shutdown_label": "Chiudi il back-end",
             "slave_enabled": "Gli aggiornamenti sono sempre abilitati sul backend slave.",
             "slave_instructions": "Questo sembra essere un backend slave. Se è inteso come back-end slave, disabilita la pianificazione sul back-end principale durante l'esecuzione della configurazione del back-end slave.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Il backend non può avviarsi normalmente perché i fusi orari del database non sono impostati.",
                 "IPADDRESS": "Il backend non può avviarsi normalmente perché: Generale, Indirizzo host, Indirizzo IP primario non è impostato.",
                 "SCHEMAUPDATE": "Il backend non può essere avviato normalmente perché l'aggiornamento dello schema del database non è riuscito.",
-                "WEBONLYPARM": "Il backend è in modalità limitata a causa del parametro --webonly sulla riga di comando. Dovrai riavviare manualmente."
+                "WEBONLYPARM": "Il backend è in modalità limitata a causa della richiesta dell'utente o di un parametro solo web."
             }
         },
         "misc": {

@@ -994,6 +994,8 @@
             "progress_label": "Scan voortgang",
             "removeduplicates_desc": "Selecteer, indien ingesteld, de transportstroommultiplex met het beste signaal wanneer identieke transporten op verschillende frequenties worden ontvangen. Deze optie is handig voor DVB-T2 en ATSC/OTA wanneer een transport soms van verschillende zenders kan worden ontvangen.",
             "removeduplicates_label": "Duplicaten verwijderen",
+            "reopen_desc": "Als de capture-kaart niet kan worden geopend of als er geen opties voor het scantype beschikbaar zijn, klikt u hierop om het opnieuw te proberen. Als het nog steeds niet lukt, gebruikt u de knop 'Backend opnieuw opstarten beperkt' bovenaan de pagina.",
+            "reopen_label": "Open de Capture Card opnieuw",
             "rolloff_desc": "Roll-off-factor (Standaard: 0,35)",
             "rolloff_label": "Afrollen",
             "sattuning_desc": "Selecteer een satelliet uit deze lijst voor de afstemgegevens van de referentietransponder.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI-indeling"
         },
         "main": {
-            "enableupdates_desc": "Als u updates inschakelt, worden er geen opnames gemaakt totdat u opnieuw opstart",
+            "disabled": "Opnames zijn uitgeschakeld totdat u opnieuw opstart",
+            "enableupdates_desc": "Schakel updates in om wijzigingen in de instellingen op te slaan. Hierdoor worden er geen opnames gemaakt totdat u opnieuw opstart.",
             "enableupdates_label": "Updates inschakelen",
-            "mustenable": "Wijzigingen kunnen niet worden opgeslagen tenzij u eerst op de knop Updates inschakelen klikt.",
+            "mustenable": "Wijzigingen kunnen niet worden opgeslagen, tenzij u op de knop Updates inschakelen klikt of opnieuw opstart in de beperkte modus.",
             "mustrestart": "Wanneer u klaar bent met updates, start u de backend opnieuw op.",
-            "restart_desc": "Opnames zijn uitgeschakeld totdat u opnieuw opstart",
-            "restart_label": "Back-end opnieuw opstarten",
-            "restarting": "Backend opnieuw opstarten",
+            "restart_desc": "Start de backend opnieuw en hervat de normale werking.",
+            "restart_label": "Start de volledige werking van de backend opnieuw",
+            "restart_webonly_desc": "Hierdoor worden updates ingeschakeld en worden alle backend-bewerkingen uitgeschakeld. Gebruik dit als er problemen zijn bij het instellen van capture-kaarten.",
+            "restart_webonly_label": "Backend opnieuw starten Beperkt",
+            "restarting": "Wachten op backend",
             "shutdown_label": "Sluit de backend",
             "slave_enabled": "Updates zijn altijd ingeschakeld op een slave-backend.",
             "slave_instructions": "Dit lijkt een slave-backend te zijn. Als het bedoeld is als een slave-backend, schakelt u de planning op de master-backend uit terwijl u de slave-backend-installatie uitvoert.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Backend kan niet normaal starten omdat Database-tijdzones niet zijn ingesteld.",
                 "IPADDRESS": "Backend kan niet normaal starten omdat Algemeen, Hostadres en Primair IP-adres niet zijn ingesteld.",
                 "SCHEMAUPDATE": "Backend kan niet normaal starten omdat het bijwerken van het databaseschema is mislukt.",
-                "WEBONLYPARM": "Backend bevindt zich in de beperkte modus vanwege de parameter --webonly op de opdrachtregel. U zult handmatig opnieuw moeten opstarten."
+                "WEBONLYPARM": "Backend bevindt zich in de beperkte modus vanwege een gebruikersverzoek of een webonly-parameter."
             }
         },
         "misc": {

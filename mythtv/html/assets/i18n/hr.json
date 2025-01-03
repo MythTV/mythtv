@@ -994,6 +994,8 @@
             "progress_label": "Napredak skeniranja",
             "removeduplicates_desc": "Ako je postavljeno, odaberite multipleks prijenosnog toka s najboljim signalom kada se identični prijenosi primaju na različitim frekvencijama. Ova je opcija korisna za DVB-T2 i ATSC/OTA kada se prijenos ponekad može primiti s različitih odašiljača.",
             "removeduplicates_label": "Ukloni duplikate",
+            "reopen_desc": "Ako se kartica za snimanje ne može otvoriti ili nema dostupnih opcija vrste skeniranja, kliknite ovo za ponovni pokušaj. Ako i dalje ne uspije, upotrijebite gumb \"Restart Backend Restricted\" na vrhu stranice.",
+            "reopen_label": "Ponovno otvorite Capture Card",
             "rolloff_desc": "Faktor pada (zadano: 0,35)",
             "rolloff_label": "Odmotati",
             "sattuning_desc": "Odaberite satelit s ovog popisa za podatke ugađanja referentnog transpondera.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI format"
         },
         "main": {
-            "enableupdates_desc": "Omogućavanje ažuriranja spriječit će bilo kakvo snimanje dok ga ponovno ne pokrenete",
+            "disabled": "Snimke su onemogućene dok ponovno ne pokrenete",
+            "enableupdates_desc": "Omogućite ažuriranja za spremanje promjena u postavkama. Ovo će spriječiti bilo kakvo snimanje dok ponovno ne pokrenete.",
             "enableupdates_label": "Omogući ažuriranja",
-            "mustenable": "Promjene se ne mogu spremiti ako prvo ne kliknete gumb Omogući ažuriranja.",
+            "mustenable": "Promjene se ne mogu spremiti osim ako ne kliknete gumb Omogući ažuriranja ili ponovno pokrenete u Ograničenom načinu rada.",
             "mustrestart": "Kada završite s ažuriranjima, ponovno pokrenite pozadinu.",
-            "restart_desc": "Snimke su onemogućene dok ponovno ne pokrenete",
-            "restart_label": "Ponovo pokrenite pozadinu",
-            "restarting": "Ponovno pokretanje pozadine",
+            "restart_desc": "Ponovno pokrenite pozadinu i nastavite s normalnim radom.",
+            "restart_label": "Ponovno pokrenite potpunu operaciju pozadine",
+            "restart_webonly_desc": "Ovo će omogućiti ažuriranja i onemogućiti sve pozadinske operacije. Koristite ovo ako imate problema s postavljanjem kartica za snimanje.",
+            "restart_webonly_label": "Restart Backend Ograničeno",
+            "restarting": "Čeka se Backend",
             "shutdown_label": "Zatvori Backend",
             "slave_enabled": "Ažuriranja su uvijek omogućena na pomoćnoj pozadini.",
             "slave_instructions": "Čini se da je ovo pomoćna pozadina. Ako je namijenjen kao podređena pozadina, onemogućite zakazivanje na glavnoj pozadini dok izvodite postavljanje podređene pozadine.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Pozadina se ne može pokrenuti normalno jer vremenske zone baze podataka nisu postavljene.",
                 "IPADDRESS": "Pozadina se ne može pokrenuti normalno jer Općenito, Adresa glavnog računala, Primarna IP adresa nisu postavljeni.",
                 "SCHEMAUPDATE": "Pozadina se ne može pokrenuti normalno jer ažuriranje sheme baze podataka nije uspjelo.",
-                "WEBONLYPARM": "Pozadina je u ograničenom načinu rada zbog parametra --webonly u naredbenom retku. Morat ćete ponovno pokrenuti ručno."
+                "WEBONLYPARM": "Pozadina je u ograničenom načinu rada zbog korisničkog zahtjeva ili parametra samo za web."
             }
         },
         "misc": {

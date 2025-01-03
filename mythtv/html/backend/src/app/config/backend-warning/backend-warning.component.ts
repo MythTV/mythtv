@@ -132,19 +132,14 @@ export class BackendWarningComponent implements OnInit {
       });
   }
 
-  restart() {
-    let restart = this.setupService.WebOnlyStartup != 'WEBONLYPARM';
-    this.mythService.Shutdown({ Restart: restart })
+  restart(webOnly: boolean) {
+    this.mythService.Shutdown({ Restart: true, WebOnly: webOnly })
       .subscribe({
         next: data => {
-          // if (restart) {
           if (data.bool) {
             // each retry generates 2 errors
             // this retry count approximates to number of seconds
-            if (restart)
-              this.retryCount = 30;
-            else
-              this.retryCount = 9999;
+            this.retryCount = 30;
             this.getBackendInfo();
           }
           else
@@ -153,7 +148,6 @@ export class BackendWarningComponent implements OnInit {
         },
         error: () => this.errorCount++
       });
-    // if (restart)
     this.delay = 5000;
   }
 

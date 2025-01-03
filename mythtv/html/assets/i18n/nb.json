@@ -994,6 +994,8 @@
             "progress_label": "Skannefremdrift",
             "removeduplicates_desc": "Hvis innstilt, velg transportstrømmultipleksen med det beste signalet når identiske transporter mottas på forskjellige frekvenser. Dette alternativet er nyttig for DVB-T2 og ATSC/OTA når en transport noen ganger kan mottas fra forskjellige sendere.",
             "removeduplicates_label": "Fjern duplikater",
+            "reopen_desc": "Hvis fangstkortet ikke kunne åpnes eller ingen alternativer for skannetype er tilgjengelig, klikker du på dette for å prøve på nytt. Hvis det fortsatt mislykkes, bruk \"Restart Backend Restricted\"-knappen øverst på siden.",
+            "reopen_label": "Åpne Capture Card på nytt",
             "rolloff_desc": "Avtrekksfaktor (standard: 0,35)",
             "rolloff_label": "Avrulling",
             "sattuning_desc": "Velg en satellitt fra denne listen for innstillingsdata for referansetransponderen.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI-format"
         },
         "main": {
-            "enableupdates_desc": "Aktivering av oppdateringer vil forhindre at opptak finner sted før du starter på nytt",
+            "disabled": "Opptak er deaktivert til du starter på nytt",
+            "enableupdates_desc": "Aktiver oppdateringer for å lagre endringer i oppsettet. Dette vil forhindre at opptak finner sted før du starter på nytt.",
             "enableupdates_label": "Aktiver oppdateringer",
-            "mustenable": "Endringer kan ikke lagres med mindre du klikker på Aktiver oppdateringer-knappen først.",
+            "mustenable": "Endringer kan ikke lagres med mindre du klikker på Aktiver oppdateringer-knappen eller starter på nytt i begrenset modus.",
             "mustrestart": "Når du er ferdig med oppdateringer, start backend på nytt.",
-            "restart_desc": "Opptak er deaktivert til du starter på nytt",
-            "restart_label": "Start Backend på nytt",
-            "restarting": "Starter Backend på nytt",
+            "restart_desc": "Start bakenden på nytt og gjenoppta normal drift.",
+            "restart_label": "Start Backend Full Operation på nytt",
+            "restart_webonly_desc": "Dette vil aktivere oppdateringer og deaktivere alle backend-operasjoner. Bruk denne hvis det er problemer med å sette opp fangstkort.",
+            "restart_webonly_label": "Start Backend Restricted på nytt",
+            "restarting": "Venter på Backend",
             "shutdown_label": "Lukk Backend",
             "slave_enabled": "Oppdateringer er alltid aktivert på en slave-backend.",
             "slave_instructions": "Dette ser ut til å være en slave-backend. Hvis det er ment som en slave-backend, vennligst deaktiver planlegging på master-backend mens du kjører slave-backend-oppsett.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Backend kan ikke starte normalt fordi databasetidssoner ikke er satt opp.",
                 "IPADDRESS": "Backend kan ikke starte normalt fordi Generelt, Vertsadresse, Primær IP-adresse ikke er angitt.",
                 "SCHEMAUPDATE": "Backend kan ikke starte normalt fordi oppdatering av databaseskjema mislyktes.",
-                "WEBONLYPARM": "Backend er i begrenset modus på grunn av --webonly-parameteren på kommandolinjen. Du må starte på nytt manuelt."
+                "WEBONLYPARM": "Backend er i begrenset modus på grunn av brukerforespørsel eller webonly-parameter."
             }
         },
         "misc": {

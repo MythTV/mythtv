@@ -994,6 +994,8 @@
             "progress_label": "Vizsgálat folyamata",
             "removeduplicates_desc": "Ha be van állítva, válassza ki a legjobb jelű transport stream multiplexet, amikor azonos átvitelek érkeznek különböző frekvenciákon. Ez az opció hasznos DVB-T2 és ATSC/OTA esetén, amikor egy átvitel néha különböző adóktól fogható.",
             "removeduplicates_label": "Az ismétlődések eltávolítása",
+            "reopen_desc": "Ha a rögzítőkártya nem nyitható meg, vagy nem állnak rendelkezésre szkennelési típusok, kattintson erre az újrapróbálkozáshoz. Ha továbbra is sikertelen, használja a \"Restart Backend Restricted\" gombot az oldal tetején.",
+            "reopen_label": "Nyissa meg újra a Capture Card-ot",
             "rolloff_desc": "Roll-off tényező (alapértelmezett: 0,35)",
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Válasszon egy műholdat ebből a listából a referenciatranszponder hangolási adataihoz.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI formátum"
         },
         "main": {
-            "enableupdates_desc": "A frissítések engedélyezése megakadályozza a rögzítéseket az újraindításig",
+            "disabled": "A felvételek le vannak tiltva az újraindításig",
+            "enableupdates_desc": "Engedélyezze a frissítéseket a beállítások módosításainak mentéséhez. Ez megakadályozza, hogy bármilyen felvétel készüljön az újraindításig.",
             "enableupdates_label": "Frissítések engedélyezése",
-            "mustenable": "A módosítások csak akkor menthetők el, ha először a Frissítések engedélyezése gombra kattint.",
+            "mustenable": "A módosítások csak akkor menthetők el, ha rákattint a Frissítések engedélyezése gombra, vagy nem indítja újra Korlátozott módban.",
             "mustrestart": "Ha végzett a frissítésekkel, indítsa újra a háttérprogramot.",
-            "restart_desc": "A felvételek le vannak tiltva az újraindításig",
-            "restart_label": "Indítsa újra a Backendet",
-            "restarting": "Backend újraindítása",
+            "restart_desc": "Indítsa újra a háttérprogramot, és folytassa a normál működést.",
+            "restart_label": "Indítsa újra a Backend teljes működését",
+            "restart_webonly_desc": "Ez engedélyezi a frissítéseket és letiltja az összes háttérműveletet. Használja ezt, ha problémák vannak a rögzítőkártyák beállításakor.",
+            "restart_webonly_label": "Indítsa újra a Backend Restricted",
+            "restarting": "Várakozás a Backendre",
             "shutdown_label": "Háttér bezárása",
             "slave_enabled": "A frissítések mindig engedélyezve vannak a slave háttérrendszeren.",
             "slave_instructions": "Ez egy szolga háttérprogramnak tűnik. Ha szolga háttérprogramnak szánja, tiltsa le az ütemezést a mester háttérrendszeren a szolga háttérprogram telepítése közben.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "A háttérprogram nem indul el normálisan, mert az adatbázis időzónái nincsenek beállítva.",
                 "IPADDRESS": "A háttérprogram nem indul el normálisan, mert az Általános, a Gazdagép címe és az Elsődleges IP-cím nincs beállítva.",
                 "SCHEMAUPDATE": "A háttérprogram nem indul el rendesen, mert az adatbázisséma frissítése meghiúsult.",
-                "WEBONLYPARM": "A háttérprogram korlátozott módban van a parancssori --webonly paraméter miatt. Manuálisan újra kell indítania."
+                "WEBONLYPARM": "A háttérprogram korlátozott módban van a felhasználói kérés vagy a webonly paraméter miatt."
             }
         },
         "misc": {

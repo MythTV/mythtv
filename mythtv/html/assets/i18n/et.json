@@ -994,6 +994,8 @@
             "progress_label": "Skaneerimise edenemine",
             "removeduplicates_desc": "Kui see on määratud, valige parima signaaliga transpordivoo multipleks, kui erinevatel sagedustel võetakse vastu identseid ülekandeid. See suvand on kasulik DVB-T2 ja ATSC/OTA puhul, kui edastust saab mõnikord vastu võtta erinevatelt saatjatelt.",
             "removeduplicates_label": "Eemalda duplikaadid",
+            "reopen_desc": "Kui jäädvustamiskaarti ei õnnestunud avada või skannimistüübi valikud pole saadaval, klõpsake uuesti proovimiseks sellel. Kui see ikka ebaõnnestub, kasutage lehe ülaosas nuppu \"Restart Backend Restricted\".",
+            "reopen_label": "Avage Capture Card uuesti",
             "rolloff_desc": "Roll-off tegur (vaikimisi: 0,35)",
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Valige sellest loendist satelliit võrdlustranspondri häälestusandmete jaoks.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "VBI-vorming"
         },
         "main": {
-            "enableupdates_desc": "Värskenduste lubamine takistab salvestuste toimumist kuni taaskäivitamiseni",
+            "disabled": "Salvestus on keelatud kuni taaskäivitamiseni",
+            "enableupdates_desc": "Seadistuse muudatuste salvestamiseks lubage värskendused. See hoiab ära salvestuste toimumise kuni taaskäivitamiseni.",
             "enableupdates_label": "Luba värskendused",
-            "mustenable": "Muudatusi ei saa salvestada, kui te ei klõpsa esmalt nuppu Luba värskendused.",
+            "mustenable": "Muudatusi ei saa salvestada, kui te ei klõpsa nuppu Luba värskendused või taaskäivitage piiratud režiimis.",
             "mustrestart": "Kui olete värskendustega lõpetanud, taaskäivitage taustaprogramm.",
-            "restart_desc": "Salvestus on keelatud kuni taaskäivitamiseni",
-            "restart_label": "Taaskäivitage taustaprogramm",
-            "restarting": "Taustaprogrammi taaskäivitamine",
+            "restart_desc": "Taaskäivitage taustaprogramm ja jätkake tavapärast tööd.",
+            "restart_label": "Taaskäivitage taustaprogrammi täielik töö",
+            "restart_webonly_desc": "See lubab värskendused ja keelab kõik taustaprogrammi toimingud. Kasutage seda, kui pildistamiskaartide seadistamisel on probleeme.",
+            "restart_webonly_label": "Restart Backend Restricted",
+            "restarting": "Ootan taustaprogrammi",
             "shutdown_label": "Sule taustaprogramm",
             "slave_enabled": "Värskendused on alam-taustaprogrammis alati lubatud.",
             "slave_instructions": "See näib olevat ori taustaprogramm. Kui see on ette nähtud alam-taustaprogrammiks, keelake alam-taustaprogrammi seadistamise ajal põhitaustaprogrammi ajastamine.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasi ajavööndid pole seadistatud.",
                 "IPADDRESS": "Taustaprogramm ei saa normaalselt käivituda, kuna Üldine, Hostiaadress, Peamine IP-aadress pole määratud.",
                 "SCHEMAUPDATE": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasiskeemi värskendamine ebaõnnestus.",
-                "WEBONLYPARM": "Taustaprogramm on käsureal oleva parameetri --webonly tõttu piiratud režiimis. Peate käsitsi taaskäivitama."
+                "WEBONLYPARM": "Taustaprogramm on kasutaja taotluse või ainult veebiparameetri tõttu piiratud režiimis."
             }
         },
         "misc": {

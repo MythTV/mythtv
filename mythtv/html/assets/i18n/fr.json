@@ -994,6 +994,8 @@
             "progress_label": "Progression de l'analyse",
             "removeduplicates_desc": "S'il est défini, sélectionnez le multiplex de flux de transport avec le meilleur signal lorsque des transports identiques sont reçus sur différentes fréquences. Cette option est utile pour DVB-T2 et ATSC/OTA lorsqu'un transport peut parfois être reçu de différents émetteurs.",
             "removeduplicates_label": "Supprimer les doublons",
+            "reopen_desc": "Si la carte de capture n'a pas pu être ouverte ou si aucune option de type de numérisation n'est disponible, cliquez dessus pour réessayer. Si l'échec persiste, utilisez le bouton \"Redémarrer le backend restreint\" en haut de la page.",
+            "reopen_label": "Rouvrir la carte de capture",
             "rolloff_desc": "Facteur d'atténuation (par défaut : 0,35)",
             "rolloff_label": "Roll-off",
             "sattuning_desc": "Sélectionnez un satellite dans cette liste pour les données de syntonisation du transpondeur de référence.",
@@ -1218,13 +1220,16 @@
             "vbiformat_label": "Format VBI"
         },
         "main": {
-            "enableupdates_desc": "L'activation des mises à jour empêchera tout enregistrement d'avoir lieu jusqu'à ce que vous redémarriez",
+            "disabled": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
+            "enableupdates_desc": "Activez les mises à jour pour enregistrer les modifications dans la configuration. Cela empêchera tout enregistrement d’avoir lieu jusqu’à ce que vous redémarriez.",
             "enableupdates_label": "Activer les mises à jour",
-            "mustenable": "Les modifications ne peuvent être enregistrées que si vous cliquez d'abord sur le bouton Activer les mises à jour.",
+            "mustenable": "Les modifications ne peuvent pas être enregistrées sauf si vous cliquez sur le bouton Activer les mises à jour ou si vous redémarrez en mode restreint.",
             "mustrestart": "Lorsque vous avez terminé les mises à jour, redémarrez le backend.",
-            "restart_desc": "Les enregistrements sont désactivés jusqu'à ce que vous redémarriez",
-            "restart_label": "Redémarrer le backend",
-            "restarting": "Redémarrage du backend",
+            "restart_desc": "Redémarrez le backend et reprenez le fonctionnement normal.",
+            "restart_label": "Redémarrer le fonctionnement complet du backend",
+            "restart_webonly_desc": "Cela activera les mises à jour et désactivera toutes les opérations backend. Utilisez-le en cas de problèmes lors de la configuration des cartes de capture.",
+            "restart_webonly_label": "Redémarrer le backend restreint",
+            "restarting": "En attente du back-end",
             "shutdown_label": "Fermer le back-end",
             "slave_enabled": "Les mises à jour sont toujours activées sur un backend esclave.",
             "slave_instructions": "Cela semble être un backend esclave. S'il est conçu comme un backend esclave, veuillez désactiver la planification sur le backend maître lors de l'exécution de la configuration du backend esclave.",
@@ -1236,7 +1241,7 @@
                 "DBTIMEZONE": "Le backend ne peut pas démarrer normalement car les fuseaux horaires de la base de données ne sont pas configurés.",
                 "IPADDRESS": "Le backend ne peut pas démarrer normalement car Général, Adresse hôte et Adresse IP principale ne sont pas définis.",
                 "SCHEMAUPDATE": "Le backend ne peut pas démarrer normalement car la mise à jour du schéma de base de données a échoué.",
-                "WEBONLYPARM": "Le backend est en mode restreint en raison du paramètre --webonly sur la ligne de commande. Vous devrez redémarrer manuellement."
+                "WEBONLYPARM": "Le backend est en mode restreint en raison d'une demande de l'utilisateur ou d'un paramètre Webonly."
             }
         },
         "misc": {

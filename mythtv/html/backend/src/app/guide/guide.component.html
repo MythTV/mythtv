@@ -37,7 +37,7 @@
         <div class="flex align-items-center pl-5"
             *ngIf="[GRID,TITLESEARCH,PEOPLESEARCH,FULLSEARCH,CATSEARCH,ANYSEARCH].indexOf(displayType) > -1">
             <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue" class="text-xl"
-                placeholder="{{ 'common.search_placeholder' | translate }}" />
+                placeholder="{{ 'common.search_placeholder' | translate }}" (keydown)="keydown($event)" />
             <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="titleSearch()"
                 pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
             <button pButton pRipple icon="pi pi-user" class="p-button-text w-2rem" (click)="peopleSearch()"
