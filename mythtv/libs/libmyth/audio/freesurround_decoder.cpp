@@ -55,8 +55,8 @@ public:
     {
         // If av_tx_init() fails (returns < 0), the contexts will be nullptr and will crash later,
         // but av_malloc() is not checked to succeed either.
-        av_tx_init(&m_fftContext , &m_fft , AV_TX_FLOAT_FFT, 0, m_n, &k_scale, AV_TX_INPLACE);
-        av_tx_init(&m_ifftContext, &m_ifft, AV_TX_FLOAT_FFT, 1, m_n, &k_scale, AV_TX_INPLACE);
+        av_tx_init(&m_fftContext , &m_fft , AV_TX_FLOAT_FFT, 0, m_n, &kScale, AV_TX_INPLACE);
+        av_tx_init(&m_ifftContext, &m_ifft, AV_TX_FLOAT_FFT, 1, m_n, &kScale, AV_TX_INPLACE);
         // resize our own buffers
         m_frontR.resize(m_n);
         m_frontL.resize(m_n);
@@ -417,7 +417,7 @@ private:
 
     size_t m_n;                          // the block size
     size_t m_halfN;                      // half block size precalculated
-    static constexpr float k_scale {1.0F};
+    static constexpr float kScale {1.0F};
     AVTXContext *m_fftContext  {nullptr};
     av_tx_fn     m_fft         {nullptr};
     AVTXContext *m_ifftContext {nullptr};
