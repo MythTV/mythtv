@@ -12,6 +12,7 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
+#include "libmythbase/mythdirs.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 
@@ -87,6 +88,53 @@ void IPTVChannelFetcher::Scan(void)
     Stop();
     m_stopNow = false;
     m_thread->start();
+}
+
+// Download the IPTV channel logo and write to configured location.
+static bool download_logo(QString logoUrl, QString filename)
+{
+    bool ret = false;
+
+    if (!logoUrl.isEmpty())
+    {
+        QByteArray data;
+        if (GetMythDownloadManager()->download(logoUrl, &data))
+        {
+            QString iconDir = GetConfDir() + "/channels/";
+            QString filepath = iconDir + filename;
+            QFile file(filepath);
+            if (file.open(QIODevice::WriteOnly))
+            {
+                if (file.write(data) > 0)
+                {
+                    ret = true;
+                    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                        QString("DownloadLogo to file %1").arg(filepath));
+                }
+                else
+                {
+                    LOG(VB_CHANNEL, LOG_ERR, LOC +
+                        QString("DownloadLogo failed to write to file %1").arg(filepath));
+                }
+                file.close();
+            }
+            else
+            {
+                LOG(VB_CHANNEL, LOG_ERR, LOC +
+                    QString("DownloadLogo failed to open file %1").arg(filepath));
+            }
+        }
+        else
+        {
+            LOG(VB_CHANNEL, LOG_ERR, LOC +
+                QString("DownloadLogo failed to download %1").arg(logoUrl));
+        }
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DownloadLogo empty logoUrl");
+    }
+    return ret;
 }
 
 void IPTVChannelFetcher::run(void)
@@ -178,7 +226,19 @@ void IPTVChannelFetcher::run(void)
             const QString& channum = it.key();
             QString name    = (*it).m_name;
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
-            QString logo    = (*it).m_logo;
+            QString logoUrl = (*it).m_logo;
+            QString logo;
+
+            // Download channel icon (logo) when there is an logo URL in the EXTINF
+            if (!logoUrl.isEmpty())
+            {
+                QString filename = QString("IPTV_%1_%2_logo").arg(m_sourceId).arg(channum);
+                if (download_logo(logoUrl, filename))
+                {
+                    logo = filename;
+                }
+            }
+
             uint programnumber = (*it).m_programNumber;
             //: %1 is the channel number, %2 is the channel name
             QString msg = tr("Channel #%1 : %2").arg(channum, name);
@@ -441,7 +501,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         // No channel number found, use the default next one
         if (channum.isEmpty())
         {
-            LOG(VB_RECORD, LOG_INFO, QString("No channel number found, using next available: %1 for channel: %2")
+            LOG(VB_CHANNEL, LOG_INFO, QString("No channel number found, using next available: %1 for channel: %2")
                 .arg(nextChanNum).arg(info.m_name));
             channum = QString::number(nextChanNum);
             nextChanNum++;
@@ -575,15 +635,18 @@ static QString parse_extinf_field(QString line, const QString& field)
     auto pos = line.indexOf(field, 0, Qt::CaseInsensitive);
     if (pos > 0)
     {
-        auto lastpart = line.remove(0, pos);
-
-        static const QRegularExpression re { R"(\"([^\"]+)\"(.*)$)" };
-        auto match = re.match(lastpart);
+        line.remove(0, pos);
+        static const QRegularExpression re { R"(\"([^\"]*)\"(.*)$)" };
+        auto match = re.match(line);
         if (match.hasMatch())
         {
             result = match.captured(1).simplified();
         }
     }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("line:%1  field:%2  result:%3")
+        .arg(line, field, result));
+
     return result;
 }
 
