@@ -2090,7 +2090,11 @@ void GalleryThumbView::Move()
         // Nothing to clean up
         return;
     }
-    ImageList images = dirs + files;
+    ImageList images;
+    if (!dirs.isEmpty())
+        images += dirs;
+    if (!files.isEmpty())
+        images += files;
 
     // Determine parent from first dir or pic
     ImagePtr aChild = images[0];
