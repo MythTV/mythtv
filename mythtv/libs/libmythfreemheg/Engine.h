@@ -178,7 +178,10 @@ class MHEngine: public MHEG {
             return nullptr;
         return m_applicationStack.top();
     }
-    MHScene *CurrentScene() { return CurrentApp() == nullptr ? nullptr : CurrentApp()->m_pCurrentScene; }
+    MHScene *CurrentScene() {
+        MHApplication *app = CurrentApp();
+        return app ? app->m_pCurrentScene : nullptr;
+    }
 
     // Action stack.  Actions may generate synchronous events which fire links and add
     // new actions.  These new actions have to be processed before we continue with other
