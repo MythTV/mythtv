@@ -1219,6 +1219,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1383")
+    {
+        DBUpdates updates {
+            "ALTER TABLE iptv_channel MODIFY iptvid INT UNSIGNED AUTO_INCREMENT;"
+        } ;
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1384", dbver))
+            return false;
+    }
+
     return true;
 }
 
