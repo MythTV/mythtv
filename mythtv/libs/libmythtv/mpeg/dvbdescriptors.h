@@ -2652,6 +2652,8 @@ class FreesatLCNDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_lcn_table)
     {
         assert(m_data && PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
+        if (nullptr == m_data) // assert is disabled when NDEBUG is defined
+            return;
 
         const unsigned char *payload = &data[2];
 
@@ -2717,6 +2719,8 @@ class FreesatRegionDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_region_table)
     {
         assert(m_data && PrivateDescriptorID::freesat_region_table == DescriptorTag());
+        if (nullptr == m_data) // assert is disabled when NDEBUG is defined
+            return;
 
         const unsigned char *payload = &data[2];
 
