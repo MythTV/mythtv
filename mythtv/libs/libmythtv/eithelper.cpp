@@ -701,10 +701,15 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 category = QObject::tr("Sports");
             }
         }
-        else
+        else if (content.IsValid())
         {
             category_type = content.GetMythCategory(0);
             category      = content.GetDescription(0);
+        }
+        else
+        {
+            category_type = ProgramInfo::kCategoryNone;
+            category      = "Unknown";
         }
     }
 
