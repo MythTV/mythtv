@@ -1652,7 +1652,8 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
                    m_currentRow, m_currentCol, m_channelCount, m_timeCount,
                    m_verticalLayout, m_firstTime, m_lastTime);
     auto *updater = new GuideUpdateProgramRow(this, gs, proglists);
-    m_threadPool.start(new GuideHelper(this, updater), "GuideHelper");
+    if (updater)
+        m_threadPool.start(new GuideHelper(this, updater), "GuideHelper");
 }
 
 void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
