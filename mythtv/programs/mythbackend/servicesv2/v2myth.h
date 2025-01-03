@@ -183,7 +183,7 @@ class V2Myth : public MythHTTPService
     static bool         ManageScheduler    ( bool Enable,
                                               bool Disable );
 
-    static bool         Shutdown    ( int Retcode, bool Restart);
+    static bool         Shutdown    ( int Retcode, bool Restart, bool WebOnly);
 
     static QString      Proxy             ( const QString &Url);
 

@@ -179,11 +179,26 @@ int main(int argc, char **argv)
     retval = run_backend(cmdline);
     // Retcode 258 is a special value to signal to mythbackend to restart
     // This is used by the V2Myth/Shutdown?Restart=true API call
-    if (retval == 258) {
+    // Retcode 259 is a special value to signal to mythbackend to restart
+    // in webonly mode
+    if (retval == 258 || retval == 259)
+    {
+        char ** newargv = new char * [argc + 2];
+        char webonly[] = "--webonly";
+        int newargc = 0;
+        for (int ix = 0 ; ix < argc ; ++ix)
+        {
+            QString value(argv[ix]);
+            if (value != webonly)
+                newargv[newargc++] = argv[ix];
+        }
+        if (retval == 259)
+            newargv[newargc++] = webonly;
+        newargv[newargc] = nullptr;
         LOG(VB_GENERAL, LOG_INFO,
             QString("Restarting mythbackend"));
         usleep(50000);
-        int rc = execvp(argv[0], argv);
+        int rc = execvp(newargv[0], newargv);
         LOG(VB_GENERAL, LOG_ERR,
             QString("execvp failed prog %1 rc=%2 errno=%3").arg(argv[0]).arg(rc).arg(errno));
     }

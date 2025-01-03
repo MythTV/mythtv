@@ -1279,16 +1279,21 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
     return true;
 }
 
-bool V2Myth::Shutdown ( int Retcode, bool Restart )
+bool V2Myth::Shutdown ( int Retcode, bool Restart, bool WebOnly )
 {
     if (Retcode < 0 || Retcode > 255)
         return false;
     if (Restart)
     {
-        // Retcode 258 is a special value to signal to mythbackend to restart
-        // This is designed so that if the execvp fails it will give return code of 2,
-        // indicating failure and maybe causing the service module to restart.
-        Retcode = 258;
+        if (WebOnly)
+            // Retcode 259 is a special value to signal to mythbackend to restart
+            // in --webonly mode
+            Retcode = 259;
+        else
+            // Retcode 258 is a special value to signal to mythbackend to restart
+            // in normal mode
+            Retcode = 258;
+
     }
     QCoreApplication::exit(Retcode);
     return true;
