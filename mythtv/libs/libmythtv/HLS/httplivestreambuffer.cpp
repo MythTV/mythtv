@@ -1101,10 +1101,16 @@ protected:
              */
             Lock();
             HLSStream *hls  = m_parent->GetStream(m_stream);
-            bool live = hls ? hls->Live() : false;
+            if (hls == nullptr)
+            {
+                // an irrevocable error has occured. exit
+                Wakeup();
+                break;
+            }
+
             int dnldsegment = m_segment;
             int playsegment = m_parent->m_playback->Segment();
-            if ((!live && (playsegment < dnldsegment - m_buffer)) ||
+            if ((!hls->Live() && (playsegment < dnldsegment - m_buffer)) ||
                 IsAtEnd())
             {
                 /* wait until
