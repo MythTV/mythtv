@@ -100,8 +100,11 @@ void DecoderHandler::doStart(bool result)
     if (m_state == LOADING && result)
     {
         for (int ii = 0; ii < m_playlist.size(); ii++)
+        {
+            PlayListFileEntry* file = m_playlist.get(ii);
             LOG(VB_PLAYBACK, LOG_INFO, QString("Track %1 = %2")
-                .arg(ii) .arg(m_playlist.get(ii)->File()));
+                .arg(ii) .arg(file ? file->File() : "<invalid>"));
+        }
         next();
     }
     else
@@ -149,6 +152,8 @@ bool DecoderHandler::next(void)
     }
 
     PlayListFileEntry *entry = m_playlist.get(m_playlistPos);
+    if (nullptr == entry)
+        return false;
 
     if (QFileInfo(entry->File()).isAbsolute())
         m_url = QUrl::fromLocalFile(entry->File());

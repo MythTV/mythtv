@@ -2664,6 +2664,9 @@ void MusicCommon::doUpdatePlaylist(void)
     m_currentTrack = gPlayer->getCurrentTrackPos();
 
     updateUIPlaylist();
+    Playlist *playlist = gPlayer->getCurrentPlaylist();
+    if (nullptr == playlist)
+        return;
 
     // if (m_currentTrack == -1) // why? non-playing should also
     //     playFirstTrack();     // start playing per options -twitham
@@ -2694,7 +2697,7 @@ void MusicCommon::doUpdatePlaylist(void)
                     case PL_INSERTATEND:
                     {
                         pause();
-                        if (!gPlayer->setCurrentTrackPos(gPlayer->getCurrentPlaylist()->getTrackCount() - added))
+                        if (!gPlayer->setCurrentTrackPos(playlist->getTrackCount() - added))
                             playFirstTrack();
                         break;
                     }
@@ -2713,9 +2716,8 @@ void MusicCommon::doUpdatePlaylist(void)
         }
     }
 
-    if (gPlayer->getCurrentPlaylist())
-        gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                                 m_currentTrack, &m_playlistPlayedTime);
+    playlist->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                       m_currentTrack, &m_playlistPlayedTime);
     updatePlaylistStats();
     updateTrackInfo(gPlayer->getCurrentMetadata());
 }
@@ -2725,11 +2727,15 @@ bool MusicCommon::restorePosition(int trackID)
     // try to move to the current track
     bool foundTrack = false;
 
-    if (trackID != -1 && gPlayer->getCurrentPlaylist())
+    Playlist *playlist = gPlayer->getCurrentPlaylist();
+    if (nullptr == playlist)
+        return false;
+
+    if (trackID != -1)
     {
-        for (int x = 0; x < gPlayer->getCurrentPlaylist()->getTrackCount(); x++)
+        for (int x = 0; x < playlist->getTrackCount(); x++)
         {
-            MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongAt(x);
+            MusicMetadata *mdata = playlist->getSongAt(x);
             if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
             {
                 m_currentTrack = x;
