@@ -1391,9 +1391,11 @@ void VideoDialog::fetchVideos()
     else
     {
         if (m_d->m_videoList)
+        {
             m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
                 m_d->m_parentalLevel.GetLevel(),
                 m_d->m_isFlatList, m_d->m_groupType);
+        }
         if(m_d->m_videoList)
             m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
     }
