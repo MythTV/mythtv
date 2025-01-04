@@ -184,16 +184,15 @@ int main(int argc, char **argv)
     if (retval == 258 || retval == 259)
     {
         char ** newargv = new char * [argc + 2];
-        char webonly[] = "--webonly";
+        std::string webonly = "--webonly";
         int newargc = 0;
         for (int ix = 0 ; ix < argc ; ++ix)
         {
-            QString value(argv[ix]);
-            if (value != webonly)
+            if (webonly.compare(argv[ix]) != 0)
                 newargv[newargc++] = argv[ix];
         }
         if (retval == 259)
-            newargv[newargc++] = webonly;
+            newargv[newargc++] = webonly.data();
         newargv[newargc] = nullptr;
         LOG(VB_GENERAL, LOG_INFO,
             QString("Restarting mythbackend"));
@@ -201,6 +200,7 @@ int main(int argc, char **argv)
         int rc = execvp(newargv[0], newargv);
         LOG(VB_GENERAL, LOG_ERR,
             QString("execvp failed prog %1 rc=%2 errno=%3").arg(argv[0]).arg(rc).arg(errno));
+        delete newargv;
     }
     return retval;
 }
