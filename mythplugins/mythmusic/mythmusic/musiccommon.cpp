@@ -2286,12 +2286,6 @@ MythMenu* MusicCommon::createMainMenu(void)
     {
         menu->AddItem(tr("Switch To Tree View"));
     }
-    else if (m_currentView == MV_PLAYLIST)
-    {
-        // menu->AddItem(tr("Playlist Editor")); // v33-
-        // this might be easier for new users to find / understand:
-        menu->AddItem(tr("Browse Music Library")); // v34+
-    }
 
     QStringList screenList;
     MythScreenType *screen = this;
@@ -2301,14 +2295,19 @@ MythMenu* MusicCommon::createMainMenu(void)
         screen = qobject_cast<MusicCommon*>(screen)->m_parentScreen;
     }
 
-    if (!screenList.contains("searchview") && !screenList.contains("streamview"))
-        menu->AddItem(tr("Search for Music"));
-
     if (!screenList.contains("visualizerview"))
         menu->AddItem(tr("Fullscreen Visualizer"));
 
-    if (!screenList.contains("lyricsview"))
-        menu->AddItem(tr("Lyrics"));
+    if (m_currentView == MV_PLAYLIST)
+        menu->AddItem(tr("Browse Music Library")); // v33- was "Playlist Editor"
+
+    if (m_currentView != MV_VISUALIZER) {
+        if (!screenList.contains("searchview") && !screenList.contains("streamview"))
+            menu->AddItem(tr("Search for Music"));
+
+        if (!screenList.contains("lyricsview"))
+            menu->AddItem(tr("Lyrics"));
+    }
 
     menu->AddItem(tr("More Options"), nullptr, createSubMenu());
 
