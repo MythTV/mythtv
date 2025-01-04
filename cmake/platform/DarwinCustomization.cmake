@@ -63,8 +63,10 @@ elseif(DETECT_HOMEBREW EQUAL 0)
   list(APPEND FF_C_CXX_FLAGS "-I${HOMEBREW_PREFIX}/include")
   list(APPEND FF_LD_FLAGS "-L${HOMEBREW_PREFIX}/lib")
 
-  # Qt6 builds need a little help finding the libraries.
-  set(_QT_BASE "${HOMEBREW_PREFIX}/opt/${QT_PKG_NAME_LC}")
+  # Homebrew needs a little help finding the QT libraries due to the the HB
+  # naming convention which uses an @ symbol
+  set(QT_PKG_NAME_HB "qt@${QT_VERSION_MAJOR}")
+  set(_QT_BASE "${HOMEBREW_PREFIX}/opt/${QT_PKG_NAME_HB}")
 
   # Provide the default Homebrew location for Python3, if the the user hasn't
   # already specified a value in their options override file. This prevents
