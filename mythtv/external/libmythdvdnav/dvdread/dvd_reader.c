@@ -609,7 +609,7 @@ static dvd_reader_t *DVDOpenCommon( const char *ppath,
 
 DVDOpen_error:
   /* If it's none of the above, screw it. */
-  fprintf( stderr, "libdvdread: Could not open %s\n", path );
+  fprintf( stderr, "libdvdread: Could not open %s\n", path ? path : "NULL" );
   free( path );
   free( path_copy );
   if ( cdir >= 0 )
