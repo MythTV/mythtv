@@ -10,7 +10,6 @@
 #include "libmythtv/io/mythmediawriter.h"
 #include "libmythtv/mythavutil.h"
 
-#undef HAVE_AV_CONFIG_H
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"

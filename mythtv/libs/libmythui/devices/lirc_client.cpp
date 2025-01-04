@@ -12,11 +12,6 @@
  *
  * System wide LIRCRC support by Michal Svec <rebel@atrey.karlin.mff.cuni.cz>
  */ 
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <array>
 #include <cerrno>
 #include <climits>

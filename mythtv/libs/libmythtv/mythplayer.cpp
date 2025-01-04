@@ -1,7 +1,4 @@
 // -*- Mode: c++ -*-
-
-#undef HAVE_AV_CONFIG_H
-
 // C++ headers
 #include <algorithm>
 #include <cassert>
