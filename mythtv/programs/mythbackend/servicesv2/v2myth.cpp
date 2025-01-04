@@ -1286,13 +1286,17 @@ bool V2Myth::Shutdown ( int Retcode, bool Restart, bool WebOnly )
     if (Restart)
     {
         if (WebOnly)
+        {
             // Retcode 259 is a special value to signal to mythbackend to restart
             // in --webonly mode
             Retcode = 259;
+        }
         else
+        {
             // Retcode 258 is a special value to signal to mythbackend to restart
             // in normal mode
             Retcode = 258;
+        }
 
     }
     QCoreApplication::exit(Retcode);

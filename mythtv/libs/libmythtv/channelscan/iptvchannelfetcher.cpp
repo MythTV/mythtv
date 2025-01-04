@@ -91,7 +91,7 @@ void IPTVChannelFetcher::Scan(void)
 }
 
 // Download the IPTV channel logo and write to configured location.
-static bool download_logo(QString logoUrl, QString filename)
+static bool download_logo(const QString& logoUrl, const QString& filename)
 {
     bool ret = false;
 
