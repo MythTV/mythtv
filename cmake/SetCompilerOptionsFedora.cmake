@@ -3,7 +3,8 @@
 #
 # See the file LICENSE_FSF for licensing information.
 #
-if(NOT CMAKE_C_COMPILER_ID STREQUAL GNU)
+if((CMAKE_C_COMPILER_ID AND NOT CMAKE_C_COMPILER_ID STREQUAL GNU) OR
+   (CMAKE_CXX_COMPILER_ID AND NOT CMAKE_CXX_COMPILER_ID STREQUAL GNU))
   message(
     FATAL_ERROR "The Fedora build type requires the use of the gcc compiler.")
 endif()
