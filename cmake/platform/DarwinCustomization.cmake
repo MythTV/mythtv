@@ -36,8 +36,8 @@ if(DETECT_MACPORTS EQUAL 0)
   include_directories(AFTER SYSTEM "${MACPORTS_PREFIX}/include")
 
   # FFmpeg needs a little help in finding the mp3lame library.
-  list(APPEND FF_PLATFORM_ARGS "--extra-ldflags=-L${MACPORTS_PREFIX}/lib"
-       "--extra-cflags=-I${MACPORTS_PREFIX}/include")
+  list(APPEND FF_C_CXX_FLAGS "-I${MACPORTS_PREFIX}/include")
+  list(APPEND FF_LD_FLAGS "-L${MACPORTS_PREFIX}/lib")
 
   # Qt6 builds need a little help finding the libraries.
   set(_QT_BASE "${MACPORTS_PREFIX}/libexec/${QT_PKG_NAME_LC}")
@@ -60,8 +60,8 @@ elseif(DETECT_HOMEBREW EQUAL 0)
   include_directories(AFTER SYSTEM "${HOMEBREW_PREFIX}/include")
 
   # FFmpeg needs a little help in finding the mp3lame library.
-  list(APPEND FF_PLATFORM_ARGS "--extra-ldflags=-L${HOMEBREW_PREFIX}/lib"
-       "--extra-cflags=-I${HOMEBREW_PREFIX}/include")
+  list(APPEND FF_C_CXX_FLAGS "-I${HOMEBREW_PREFIX}/include")
+  list(APPEND FF_LD_FLAGS "-L${HOMEBREW_PREFIX}/lib")
 
   # Qt6 builds need a little help finding the libraries.
   set(_QT_BASE "${HOMEBREW_PREFIX}/opt/${QT_PKG_NAME_LC}")
@@ -108,18 +108,36 @@ list(APPEND CMAKE_MODULE_PATH "${_QT_BASE}/lib/cmake")
 # missing include files.  The include file warnings are solved by the
 # extra -I argument below.
 # ~~~
-if("${CMAKE_C_COMPILER}" MATCHES "Xcode")
+#
+# depending on if commandline tools are installed, the developer root
+# may be /Applications/Xcode or /Library/Developer/CommandLineTools
+# check for a compiler match in either, then use CMAKE_OSX_SYSROOT to path the
+# correct system indlude, sysroot, syslibroot, and library search paths
+if("${CMAKE_C_COMPILER}" MATCHES "Xcode" OR "${CMAKE_C_COMPILER}" MATCHES "CommandLineTools")
   if(${CMAKE_C_COMPILER_VERSION} VERSION_GREATER_EQUAL 13)
+    # depending on if commandline tools are installed, the developer root
+    # may be /Applications/Xcode or /Library/Developer/CommandLineTools
     message(STATUS "Adding Apple Clang '-lSystem' hack")
-    list(
-      APPEND
-      FF_PLATFORM_ARGS
-      "--extra-ldflags=-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
-    )
-    list(
-      APPEND
-      FF_PLATFORM_ARGS
-      "--extra-cflags=-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
-    )
+
+    list(APPEND FF_C_CXX_FLAGS "-I${CMAKE_OSX_SYSROOT}/usr/include"
+                               "-isysroot${CMAKE_OSX_SYSROOT}")
+
+    list(APPEND FF_LD_FLAGS    "-L${CMAKE_OSX_SYSROOT}/usr/lib"
+                               "-Wl,-syslibroot,${CMAKE_OSX_SYSROOT}")
   endif()
 endif()
+
+# Loop over the added C and CXX flags adding flags for both
+# extra and host for c and cxx/cpp inputs
+foreach(FLAG IN LISTS FF_C_CXX_FLAGS)
+  list(APPEND FF_PLATFORM_ARGS "--extra-cflags=${FLAG}"
+                               "--host-cflags=${FLAG}"
+                               "--extra-cxxflags=${FLAG}"
+                               "--host-cppflags=${FLAG}")
+endforeach()
+
+# Loop over the added LDFLAGS adding flags for both extra and host
+foreach(FLAG IN LISTS FF_LD_FLAGS)
+  list(APPEND FF_PLATFORM_ARGS "--extra-ldflags=${FLAG}"
+                               "--host-ldflags=${FLAG}")
+endforeach()
