@@ -2081,7 +2081,7 @@ void AvFormatDecoder::remove_tracks_not_in_same_AVProgram(int stream_index)
         LOG(VB_PLAYBACK, LOG_DEBUG,
             QString("Size before: %1").arg(QString::number(track_list.size())));
         track_list.erase(std::remove_if(track_list.begin(), track_list.end(),
-            [&](StreamInfo i)
+            [&](const StreamInfo& i)
             {
                 return std::find(begin, end, i.m_av_stream_index) == end;
             }), track_list.end());
