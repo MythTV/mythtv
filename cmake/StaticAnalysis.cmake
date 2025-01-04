@@ -41,8 +41,10 @@ function(sa_super)
   # sub-projects.
   ExternalProject_Get_Property(MythTV BINARY_DIR)
   set(MythTV_BINARY_DIR ${BINARY_DIR})
-  ExternalProject_Get_Property(MythPlugins BINARY_DIR)
-  set(MythPlugins_BINARY_DIR ${BINARY_DIR})
+  if(MYTH_BUILD_PLUGINS)
+    ExternalProject_Get_Property(MythPlugins BINARY_DIR)
+    set(MythPlugins_BINARY_DIR ${BINARY_DIR})
+  endif()
 
   # CMake always builds a compile_commands.json file in the binary
   # directory.  Add support for combining these into a single
