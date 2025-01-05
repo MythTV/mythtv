@@ -713,7 +713,7 @@ bool V2Dvr::ReactivateRecording(int RecordedId,
             MythDB::DBError("ReactivateRecording", query);
             return false;
         }
-        int recId;
+        int recId {0};
         if (query.next())
             recId = query.value(0).toInt();
         else
@@ -721,7 +721,9 @@ bool V2Dvr::ReactivateRecording(int RecordedId,
         ri = RecordingInfo(recId);
     }
     else
+    {
         throw QString("Recorded ID or Channel ID and StartTime or RecordId are invalid.");
+    }
     if (ri.GetChanID() && ri.HasPathname())
     {
         ri.ReactivateRecording();

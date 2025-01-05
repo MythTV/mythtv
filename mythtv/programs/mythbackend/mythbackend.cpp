@@ -185,10 +185,11 @@ int main(int argc, char **argv)
     {
         char ** newargv = new char * [argc + 2];
         std::string webonly = "--webonly";
-        int newargc = 0;
-        for (int ix = 0 ; ix < argc ; ++ix)
+        newargv[0] = argv[0];
+        int newargc = 1;
+        for (int ix = 1 ; ix < argc ; ++ix)
         {
-            if (webonly.compare(argv[ix]) != 0)
+            if (webonly != argv[ix])
                 newargv[newargc++] = argv[ix];
         }
         if (retval == 259)
