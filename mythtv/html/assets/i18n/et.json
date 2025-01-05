@@ -245,6 +245,7 @@
             "override_rule": "Alistusreegli lisamine või muutmine",
             "recgrp": "Rec Grp",
             "regex": "Selles otsingus saate kasutada regulaaravaldisi.",
+            "restart_recording": "Taaskäivitage salvestamine",
             "seas_ep": "Seas Ep",
             "season": "Hooaeg",
             "selrecgroup": "Valige Salvestusrühm",
@@ -398,6 +399,7 @@
             "encoder": "Kodeerija",
             "heading": "Tulemas",
             "recrule": "Salvestusreegel",
+            "restart_err": "VIGA: salvestamist ei saa uuesti alustada.",
             "showall": "Kõik olekuväärtused",
             "status": "Olek",
             "time": "Aeg"

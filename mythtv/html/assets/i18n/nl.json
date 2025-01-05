@@ -245,6 +245,7 @@
             "override_rule": "Negeerregel toevoegen of bewerken",
             "recgrp": "Rec Grp",
             "regex": "Bij deze zoekopdracht kunt u reguliere expressies gebruiken.",
+            "restart_recording": "Start de opname opnieuw",
             "seas_ep": "Zeeën Ep",
             "season": "Seizoen",
             "selrecgroup": "Selecteer Opnamegroep",
@@ -398,6 +399,7 @@
             "encoder": "Encoder",
             "heading": "Aanstaande",
             "recrule": "Opname regel",
+            "restart_err": "FOUT: Kan de opname niet opnieuw starten.",
             "showall": "Alle statuswaarden",
             "status": "Toestand",
             "time": "Tijd"

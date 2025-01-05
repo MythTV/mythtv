@@ -245,6 +245,7 @@
             "override_rule": "Adicionar ou editar regra de substituição",
             "recgrp": "Rec Grp",
             "regex": "Você pode usar expressões regulares nesta pesquisa.",
+            "restart_recording": "Reiniciar gravação",
             "seas_ep": "Seas Ep",
             "season": "Temporada",
             "selrecgroup": "Selecione o grupo de gravação",
@@ -398,6 +399,7 @@
             "encoder": "Codificador",
             "heading": "Por vir",
             "recrule": "regra de gravação",
+            "restart_err": "ERRO: Não é possível reiniciar a gravação.",
             "showall": "Todos os valores de status",
             "status": "Status",
             "time": "Tempo"

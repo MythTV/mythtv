@@ -249,6 +249,12 @@ export class DvrService {
     return this.httpClient.post<BoolResponse>('/Dvr/StopRecording', { RecordedId: recordedId });
   }
 
+  public ReactivateRecording( params:
+      {RecordedId?: number, ChanId?: number, StartTime?: Date, RecordId?: number }):
+      Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/ReactivateRecording', params);
+  }
+
   public GetPowerPriorityList(PriorityName?: string): Observable<{PowerPriorityList:PowerPriorityList}> {
     let params = new HttpParams();
     if (PriorityName)

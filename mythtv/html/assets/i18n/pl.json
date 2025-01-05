@@ -245,6 +245,7 @@
             "override_rule": "Dodaj lub edytuj regułę nadpisywania",
             "recgrp": "Grupa nagr",
             "regex": "W tym wyszukiwaniu możesz używać wyrażeń regularnych.",
+            "restart_recording": "Uruchom ponownie nagrywanie",
             "seas_ep": "Seas odc",
             "season": "Pora roku",
             "selrecgroup": "Wybierz grupę nagrań",
@@ -398,6 +399,7 @@
             "encoder": "Koder",
             "heading": "Nadchodzące",
             "recrule": "Zasada nagrywania",
+            "restart_err": "BŁĄD: Nie można ponownie rozpocząć nagrywania.",
             "showall": "Wszystkie wartości stanu",
             "status": "Status",
             "time": "Czas"

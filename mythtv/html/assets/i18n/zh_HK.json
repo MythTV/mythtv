@@ -245,6 +245,7 @@
             "override_rule": "添加或編輯覆蓋規則",
             "recgrp": "記錄組",
             "regex": "您可以在此搜尋中使用正規表示式。",
+            "restart_recording": "重新開始錄音",
             "seas_ep": "海洋EP",
             "season": "季節",
             "selrecgroup": "選擇錄音組",
@@ -398,6 +399,7 @@
             "encoder": "編碼器",
             "heading": "即將到來",
             "recrule": "錄音規則",
+            "restart_err": "錯誤：無法重新開始錄製。",
             "showall": "所有狀態值",
             "status": "地位",
             "time": "時間"

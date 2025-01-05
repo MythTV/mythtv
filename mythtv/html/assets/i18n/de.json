@@ -245,6 +245,7 @@
             "override_rule": "Außerkraftsetzungsregel hinzufügen oder bearbeiten",
             "recgrp": "Rec Grp",
             "regex": "Sie können bei dieser Suche reguläre Ausdrücke verwenden.",
+            "restart_recording": "Starten Sie die Aufnahme neu",
             "seas_ep": "Meere Ep",
             "season": "Jahreszeit",
             "selrecgroup": "Wählen Sie Aufnahmegruppe",
@@ -398,6 +399,7 @@
             "encoder": "Encoder",
             "heading": "Bevorstehende",
             "recrule": "Aufzeichnungsregel",
+            "restart_err": "FEHLER: Aufnahme kann nicht neu gestartet werden.",
             "showall": "Alle Statuswerte",
             "status": "Status",
             "time": "Zeit"

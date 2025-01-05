@@ -245,6 +245,7 @@
             "override_rule": "Afegeix o edita una regla de substitució",
             "recgrp": "Rec Grp",
             "regex": "Podeu utilitzar expressions regulars en aquesta cerca.",
+            "restart_recording": "Reinicieu la gravació",
             "seas_ep": "Mars Ep",
             "season": "Temporada",
             "selrecgroup": "Seleccioneu Grup de gravació",
@@ -398,6 +399,7 @@
             "encoder": "Codificador",
             "heading": "Properament",
             "recrule": "Regla de gravació",
+            "restart_err": "ERROR: no es pot reiniciar la gravació.",
             "showall": "Tots els valors d'estat",
             "status": "Estat",
             "time": "Temps"

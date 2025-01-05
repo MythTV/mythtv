@@ -245,6 +245,7 @@
             "override_rule": "Tilføj eller rediger tilsidesættelsesregel",
             "recgrp": "Rec Grp",
             "regex": "Du kan bruge regulære udtryk i denne søgning.",
+            "restart_recording": "Genstart optagelse",
             "seas_ep": "Seas Ep",
             "season": "Sæson",
             "selrecgroup": "Vælg Optagegruppe",
@@ -398,6 +399,7 @@
             "encoder": "Encoder",
             "heading": "Kommende",
             "recrule": "Optagelsesregel",
+            "restart_err": "FEJL: Kan ikke genstarte optagelsen.",
             "showall": "Alle statusværdier",
             "status": "Status",
             "time": "Tid"

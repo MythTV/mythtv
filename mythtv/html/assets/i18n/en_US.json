@@ -245,6 +245,7 @@
             "override_rule": "Add or Edit Override Rule",
             "recgrp": "Rec Grp",
             "regex": "You can use Regular Expressions in this search.",
+            "restart_recording": "Restart Recording",
             "seas_ep": "Seas Ep",
             "season": "Season",
             "selrecgroup": "Select Recording Group",
@@ -398,6 +399,7 @@
             "encoder": "Encoder",
             "heading": "Upcoming",
             "recrule": "Recording Rule",
+            "restart_err": "ERROR: Unable to Restart Recording.",
             "showall": "All Status Values",
             "status": "Status",
             "time": "Time"

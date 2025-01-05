@@ -245,6 +245,7 @@
             "override_rule": "Přidat nebo upravit pravidlo přepsání",
             "recgrp": "Rec Grp",
             "regex": "V tomto vyhledávání můžete použít regulární výrazy.",
+            "restart_recording": "Restartujte nahrávání",
             "seas_ep": "Seas Ep",
             "season": "Sezóna",
             "selrecgroup": "Vyberte skupinu záznamů",
@@ -398,6 +399,7 @@
             "encoder": "Kodér",
             "heading": "Nadcházející",
             "recrule": "Pravidlo nahrávání",
+            "restart_err": "CHYBA: Nelze restartovat nahrávání.",
             "showall": "Všechny hodnoty stavu",
             "status": "Postavení",
             "time": "Čas"

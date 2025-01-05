@@ -245,6 +245,7 @@
             "override_rule": "Agregar o editar regla de anulación",
             "recgrp": "Grupo rec.",
             "regex": "Puede utilizar expresiones regulares en esta búsqueda.",
+            "restart_recording": "Reiniciar grabación",
             "seas_ep": "mares ep",
             "season": "Estación",
             "selrecgroup": "Seleccionar grupo de grabación",
@@ -398,6 +399,7 @@
             "encoder": "codificador",
             "heading": "próximos",
             "recrule": "Regla de grabación",
+            "restart_err": "ERROR: No se puede reiniciar la grabación.",
             "showall": "Todos los valores de estado",
             "status": "Estado",
             "time": "Tiempo"

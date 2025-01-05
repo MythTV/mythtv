@@ -245,6 +245,7 @@
             "override_rule": "上書きルールの追加または編集",
             "recgrp": "レクグループ",
             "regex": "この検索で​​は正規表現を使用できます。",
+            "restart_recording": "録音を再開する",
             "seas_ep": "シーズEP",
             "season": "季節",
             "selrecgroup": "録音グループの選択",
@@ -398,6 +399,7 @@
             "encoder": "エンコーダ",
             "heading": "今後の予定",
             "recrule": "録音ルール",
+            "restart_err": "エラー: 記録を再開できません。",
             "showall": "すべてのステータス値",
             "status": "スターテス",
             "time": "時間"

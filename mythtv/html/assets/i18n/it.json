@@ -245,6 +245,7 @@
             "override_rule": "Aggiungi o modifica regola di esclusione",
             "recgrp": "Rec Grp",
             "regex": "Puoi utilizzare le espressioni regolari in questa ricerca.",
+            "restart_recording": "Riavvia la registrazione",
             "seas_ep": "Stag Ep",
             "season": "Stagione",
             "selrecgroup": "Seleziona Gruppo di registrazione",
@@ -398,6 +399,7 @@
             "encoder": "Encoder",
             "heading": "In arrivo",
             "recrule": "Regola di registrazione",
+            "restart_err": "ERRORE: impossibile riavviare la registrazione.",
             "showall": "Tutti i valori di stato",
             "status": "Stato",
             "time": "Ora"

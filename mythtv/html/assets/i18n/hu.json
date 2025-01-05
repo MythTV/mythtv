@@ -245,6 +245,7 @@
             "override_rule": "Felülbírálási szabály hozzáadása vagy szerkesztése",
             "recgrp": "Rec Grp",
             "regex": "Ebben a keresésben használhat reguláris kifejezéseket.",
+            "restart_recording": "Indítsa újra a Felvételt",
             "seas_ep": "Seas Ep",
             "season": "Évad",
             "selrecgroup": "Válassza a Felvételi csoport lehetőséget",
@@ -398,6 +399,7 @@
             "encoder": "Kódoló",
             "heading": "Közelgő",
             "recrule": "Felvételi szabály",
+            "restart_err": "HIBA: Nem lehet újraindítani a felvételt.",
             "showall": "Minden állapotérték",
             "status": "Állapot",
             "time": "Idő"

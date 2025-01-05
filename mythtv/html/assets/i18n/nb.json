@@ -245,6 +245,7 @@
             "override_rule": "Legg til eller rediger overstyringsregel",
             "recgrp": "Rec Grp",
             "regex": "Du kan bruke regulære uttrykk i dette søket.",
+            "restart_recording": "Start opptak på nytt",
             "seas_ep": "Seas Ep",
             "season": "Årstid",
             "selrecgroup": "Velg Opptaksgruppe",
@@ -398,6 +399,7 @@
             "encoder": "Enkoder",
             "heading": "Kommende",
             "recrule": "Opptaksregel",
+            "restart_err": "FEIL: Kan ikke starte opptaket på nytt.",
             "showall": "Alle statusverdier",
             "status": "Status",
             "time": "Tid"

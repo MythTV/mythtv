@@ -245,6 +245,7 @@
             "override_rule": "Ajouter ou modifier une règle de remplacement",
             "recgrp": "Groupe de réc.",
             "regex": "Vous pouvez utiliser des expressions régulières dans cette recherche.",
+            "restart_recording": "Redémarrer l'enregistrement",
             "seas_ep": "Épisode des mers",
             "season": "Saison",
             "selrecgroup": "Sélectionnez le groupe d'enregistrement",
@@ -398,6 +399,7 @@
             "encoder": "Encodeur",
             "heading": "A venir",
             "recrule": "Règle d'enregistrement",
+            "restart_err": "ERREUR : Impossible de redémarrer l'enregistrement.",
             "showall": "Toutes les valeurs d'état",
             "status": "Statut",
             "time": "Temps"

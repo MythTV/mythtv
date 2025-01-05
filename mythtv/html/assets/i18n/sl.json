@@ -245,6 +245,7 @@
             "override_rule": "Dodajanje ali urejanje pravila za preglasitev",
             "recgrp": "Rec Grp",
             "regex": "Pri tem iskanju lahko uporabite regularne izraze.",
+            "restart_recording": "Znova zaženite snemanje",
             "seas_ep": "morja ep",
             "season": "Sezona",
             "selrecgroup": "Izberite skupino za snemanje",
@@ -398,6 +399,7 @@
             "encoder": "Kodirnik",
             "heading": "Prihajajoče",
             "recrule": "Pravilo snemanja",
+            "restart_err": "NAPAKA: Snemanja ni mogoče znova začeti.",
             "showall": "Vse vrednosti stanja",
             "status": "Stanje",
             "time": "Čas"

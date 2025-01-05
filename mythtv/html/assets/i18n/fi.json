@@ -245,6 +245,7 @@
             "override_rule": "Lisää tai muokkaa ohitussääntöä",
             "recgrp": "Rec Grp",
             "regex": "Voit käyttää tässä haussa säännöllisiä lausekkeita.",
+            "restart_recording": "Aloita tallennus uudelleen",
             "seas_ep": "Seas Ep",
             "season": "Kausi",
             "selrecgroup": "Valitse Tallennusryhmä",
@@ -398,6 +399,7 @@
             "encoder": "Enkooderi",
             "heading": "Tuleva",
             "recrule": "Tallennussääntö",
+            "restart_err": "VIRHE: Tallennusta ei voi aloittaa uudelleen.",
             "showall": "Kaikki tilan arvot",
             "status": "Tila",
             "time": "Aika"

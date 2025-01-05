@@ -32,6 +32,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   allRecRules: RuleListEntry[] = [];
   activeRecRules: RuleListEntry[] = [];
   defaultRecRule: RuleListEntry = { Id: 0, Title: 'settings.chanedit.all' };
+  restartErrMsg = 'dashboard.upcoming.restart_err';
   editingProgram?: ScheduleOrProgram;
   displayUpdateDlg = false;
   refreshing = false;
@@ -52,6 +53,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     private translate: TranslateService, public dataService: DataService,
     private utility: UtilityService) {
     this.translate.get(this.defaultRecRule.Title).subscribe(data => this.defaultRecRule.Title = data);
+    this.translate.get(this.restartErrMsg).subscribe(data => this.restartErrMsg = data);
     this.loadRecRules();
   }
 
@@ -219,10 +221,50 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   }
 
   stopRequest(program: ScheduleOrProgram) {
-    if (program.Recording.RecordId) {
+    if (program.Recording.RecordedId) {
       this.program = program;
       this.displayStop = true;
     }
+  }
+
+  restartRequest(program: ScheduleOrProgram) {
+    if (program.Recording.RecordId) {
+      this.program = program;
+      this.errorCount = 0;
+      this.dvrService.ReactivateRecording({
+        ChanId: program.Channel.ChanId,
+        RecordId: program.Recording.RecordId
+      }).subscribe({
+        next: (x) => {
+          if (x.bool) {
+            setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
+          }
+          else {
+            this.errorCount++;
+            console.log("Error: dvrService.ReactivateRecording returned false");
+            this.sendMessage(this.restartErrMsg);
+          }
+        },
+        error: (err) => {
+          this.errorCount++;
+          console.log("Error: dvrService.ReactivateRecording returned http error");
+          this.sendMessage(this.restartErrMsg);
+        }
+      });
+    }
+    else {
+      console.log("Error: there is no RecordId for the entry");
+      this.sendMessage(this.restartErrMsg);
+    }
+  }
+
+  sendMessage(text: string) {
+    this.messageService.add({
+      severity: 'error', summary: this.program?.Title,
+      detail: text,
+      life: 5000,
+      sticky: true
+    });
   }
 
   stopRecording(program: ScheduleOrProgram) {

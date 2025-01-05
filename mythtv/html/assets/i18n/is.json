@@ -245,6 +245,7 @@
             "override_rule": "Bæta við eða breyta hnekkjareglu",
             "recgrp": "Rec Grp",
             "regex": "Þú getur notað regluleg tjáning í þessari leit.",
+            "restart_recording": "Endurræstu upptöku",
             "seas_ep": "Seas Ep",
             "season": "Tímabil",
             "selrecgroup": "Veldu Upptökuhópur",
@@ -398,6 +399,7 @@
             "encoder": "Kóðari",
             "heading": "Væntanlegt",
             "recrule": "Upptökuregla",
+            "restart_err": "VILLA: Ekki tókst að endurræsa upptöku.",
             "showall": "Öll stöðugildi",
             "status": "Staða",
             "time": "Tími"

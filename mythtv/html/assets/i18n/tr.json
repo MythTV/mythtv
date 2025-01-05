@@ -245,6 +245,7 @@
             "override_rule": "Geçersiz Kılma Kuralı Ekleme veya Düzenleme",
             "recgrp": "Kayıt Grubu",
             "regex": "Bu aramada Normal İfadeleri kullanabilirsiniz.",
+            "restart_recording": "Kaydı Yeniden Başlat",
             "seas_ep": "denizler",
             "season": "Mevsim",
             "selrecgroup": "Kayıt Grubunu Seçin",
@@ -398,6 +399,7 @@
             "encoder": "kodlayıcı",
             "heading": "Yaklaşan",
             "recrule": "Kayıt Kuralı",
+            "restart_err": "HATA: Kayıt Yeniden Başlatılamıyor.",
             "showall": "Tüm Durum Değerleri",
             "status": "Durum",
             "time": "Zaman"

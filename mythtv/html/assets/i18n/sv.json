@@ -245,6 +245,7 @@
             "override_rule": "Lägg till eller redigera åsidosättningsregel",
             "recgrp": "Rec Grp",
             "regex": "Du kan använda reguljära uttryck i den här sökningen.",
+            "restart_recording": "Starta om inspelningen",
             "seas_ep": "Seas Ep",
             "season": "Säsong",
             "selrecgroup": "Välj Inspelningsgrupp",
@@ -398,6 +399,7 @@
             "encoder": "Encoder",
             "heading": "Kommande",
             "recrule": "Inspelningsregel",
+            "restart_err": "FEL: Det gick inte att starta om inspelningen.",
             "showall": "Alla statusvärden",
             "status": "Status",
             "time": "Tid"

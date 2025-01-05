@@ -245,6 +245,7 @@
             "override_rule": "Dodajte ili uredite pravilo nadjačavanja",
             "recgrp": "Rec Grp",
             "regex": "U ovoj pretrazi možete koristiti regularne izraze.",
+            "restart_recording": "Ponovno pokrenite snimanje",
             "seas_ep": "mora ep",
             "season": "Sezona",
             "selrecgroup": "Odaberite grupu za snimanje",
@@ -398,6 +399,7 @@
             "encoder": "Koder",
             "heading": "Nadolazeće",
             "recrule": "Pravilo snimanja",
+            "restart_err": "POGREŠKA: Nije moguće ponovno pokrenuti snimanje.",
             "showall": "Sve vrijednosti statusa",
             "status": "Status",
             "time": "Vrijeme"
