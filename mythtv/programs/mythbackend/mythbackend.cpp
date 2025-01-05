@@ -200,7 +200,7 @@ int main(int argc, char **argv)
         int rc = execvp(newargv[0], newargv);
         LOG(VB_GENERAL, LOG_ERR,
             QString("execvp failed prog %1 rc=%2 errno=%3").arg(argv[0]).arg(rc).arg(errno));
-        delete newargv;
+        delete[] newargv;
     }
     return retval;
 }
