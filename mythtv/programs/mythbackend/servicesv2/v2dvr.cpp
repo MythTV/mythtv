@@ -683,22 +683,46 @@ bool V2Dvr::StopRecording(int RecordedId)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Supply one of the following
+// RecordedId
+// or
+// ChanId and StartTime
+// or
+// ChanId and RecordId
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::ReactivateRecording(int RecordedId,
-                              int chanid, const QDateTime &StartTime)
+                              int ChanId, const QDateTime &StartTime,
+                              int RecordId )
 {
-    if ((RecordedId <= 0) &&
-        (chanid <= 0 || !StartTime.isValid()))
-        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
-
     RecordingInfo ri;
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
+    else if (ChanId > 0 && StartTime.isValid())
+        ri = RecordingInfo(ChanId, StartTime.toUTC());
+    else if (ChanId > 0 && RecordId > 0)
+    {
+        // Find latest recording for that record id
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT recordedid FROM recorded "
+                      " WHERE recordid = :RECORDID and chanid = :CHANID "
+                      " ORDER BY starttime DESC LIMIT 1");
+        query.bindValue(":RECORDID", RecordId);
+        query.bindValue(":CHANID", ChanId);
+        if (!query.exec())
+        {
+            MythDB::DBError("ReactivateRecording", query);
+            return false;
+        }
+        int recId;
+        if (query.next())
+            recId = query.value(0).toInt();
+        else
+            return false;
+        ri = RecordingInfo(recId);
+    }
     else
-        ri = RecordingInfo(chanid, StartTime.toUTC());
-
+        throw QString("Recorded ID or Channel ID and StartTime or RecordId are invalid.");
     if (ri.GetChanID() && ri.HasPathname())
     {
         ri.ReactivateRecording();

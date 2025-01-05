@@ -151,7 +151,8 @@ class V2Dvr : public MythHTTPService
 
     static bool       ReactivateRecording ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &StartTime );
+                                            const QDateTime &StartTime,
+                                            int              RecordId );
 
     static bool       RescheduleRecordings( void );
 
