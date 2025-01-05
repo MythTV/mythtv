@@ -688,7 +688,7 @@ bool V2Dvr::StopRecording(int RecordedId)
 // or
 // ChanId and StartTime
 // or
-// ChanId and RecordId
+// RecordId
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::ReactivateRecording(int RecordedId,
@@ -700,15 +700,14 @@ bool V2Dvr::ReactivateRecording(int RecordedId,
         ri = RecordingInfo(RecordedId);
     else if (ChanId > 0 && StartTime.isValid())
         ri = RecordingInfo(ChanId, StartTime.toUTC());
-    else if (ChanId > 0 && RecordId > 0)
+    else if (RecordId > 0)
     {
         // Find latest recording for that record id
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT recordedid FROM recorded "
-                      " WHERE recordid = :RECORDID and chanid = :CHANID "
+                      " WHERE recordid = :RECORDID "
                       " ORDER BY starttime DESC LIMIT 1");
         query.bindValue(":RECORDID", RecordId);
-        query.bindValue(":CHANID", ChanId);
         if (!query.exec())
         {
             MythDB::DBError("ReactivateRecording", query);
