@@ -17,6 +17,7 @@
 #include "streamlisteners.h"
 #include "tablestatus.h"
 #include "tspacket.h"
+#include "mpegtables.h"
 
 class EITHelper;
 class PSIPTable;
@@ -115,6 +116,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
     virtual int  ProcessData(const unsigned char *buffer, int len);
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
+    virtual void DumpErrors() const;
 
     // Listening
     virtual void AddListeningPID(
@@ -376,9 +378,11 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool                      m_invalidPatSeen              {false};
     bool                      m_invalidPatWarning           {false};
     MythTimer                 m_invalidPatTimer;
-};
 
-#include "mpegtables.h"
+    // Parse error counts
+  protected:
+    std::array<uint32_t,PsipParseException::Max> m_parseErrors {0};
+};
 
 inline void MPEGStreamData::SetPATSingleProgram(ProgramAssociationTable* pat)
 {
