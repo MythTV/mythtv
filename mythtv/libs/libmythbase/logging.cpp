@@ -424,7 +424,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         }
     }
 
-    std::cout << line;
+    std::cout << line << std::flush;
 
 #else // Q_OS_ANDROID
 
