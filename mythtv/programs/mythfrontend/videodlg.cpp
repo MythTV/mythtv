@@ -3092,11 +3092,8 @@ void VideoDialog::ShowHomepage()
 void VideoDialog::playVideo()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
-    if (metadata)
-    {
-        auto cache = m_d->m_videoList->getListCache();
-        PlayVideo(metadata->GetFilename(), cache);
-    }
+    if (metadata && m_d->m_videoList)
+        PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
 }
 
 /** \fn VideoDialog::playVideoAlt()
@@ -3106,11 +3103,8 @@ void VideoDialog::playVideo()
 void VideoDialog::playVideoAlt()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
-    if (metadata)
-    {
-        auto cache = m_d->m_videoList->getListCache();
-        PlayVideo(metadata->GetFilename(), cache, true);
-    }
+    if (metadata && m_d->m_videoList)
+        PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache(), true);
 }
 
 /** \fn VideoDialog::playFolder()
@@ -3144,12 +3138,11 @@ void VideoDialog::playFolder()
             if (subnode)
             {
                 VideoMetadata *metadata = GetMetadataPtrFromNode(subnode);
-                if (metadata)
+                if (metadata && m_d->m_videoList)
                 {
+                    PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
                     playing_time.start();
                     video_started = true;
-                    auto cache = m_d->m_videoList->getListCache();
-                    PlayVideo(metadata->GetFilename(), cache);
                 }
             }
             i++;
