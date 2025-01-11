@@ -4366,7 +4366,7 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
     }
 }
 
-bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstream, AVPacket *pkt,
+bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt,
                                          DecodeType decodetype)
 {
     int ret             = 0;
@@ -4397,7 +4397,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
 
         // detect switches between stereo and dual languages
         bool wasDual = audSubIdx != -1;
-        bool isDual = is_dual_mono(ctx->ch_layout);
+        bool isDual = is_dual_mono(context->ch_layout);
         if ((wasDual && !isDual) || (!wasDual &&  isDual))
         {
             SetupAudioStreamSubIndexes(audIdx);
@@ -4407,10 +4407,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
         // detect channels on streams that need
         // to be decoded before we can know this
         bool already_decoded = false;
-        if (!ctx->ch_layout.nb_channels)
+        if (!context->ch_layout.nb_channels)
         {
             m_avCodecLock.lock();
-            if (DoPassThrough(curstream->codecpar, false) || !DecoderWillDownmix(ctx))
+            if (DoPassThrough(curstream->codecpar, false) || !DecoderWillDownmix(context))
             {
                 // for passthru or codecs for which the decoder won't downmix
                 // let the decoder set the number of channels. For other codecs
@@ -4421,16 +4421,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
             {
                 AVChannelLayout channel_layout;
                 av_channel_layout_default(&channel_layout, m_audio->GetMaxChannels());
-                av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
+                av_opt_set_chlayout(context->priv_data, "downmix", &channel_layout, 0);
 
-                if (ctx->codec_id == AV_CODEC_ID_AC3)
-                    ctx->ch_layout.nb_channels = m_audio->GetMaxChannels();
+                if (context->codec_id == AV_CODEC_ID_AC3)
+                    context->ch_layout.nb_channels = m_audio->GetMaxChannels();
             }
 
-            ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
+            ret = m_audio->DecodeAudio(context, m_audioSamples, data_size, tmp_pkt);
             decoded_size = data_size;
             already_decoded = true;
-            reselectAudioTrack |= ctx->ch_layout.nb_channels;
+            reselectAudioTrack |= context->ch_layout.nb_channels;
             m_avCodecLock.unlock();
         }
 
@@ -4456,16 +4456,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
         data_size = 0;
 
         // Check if the number of channels or sampling rate have changed
-        if (ctx->sample_rate != m_audioOut.m_sampleRate ||
-            ctx->ch_layout.nb_channels    != m_audioOut.m_channels ||
-            AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
-                                                        ctx->bits_per_raw_sample) != m_audioOut.format)
+        if (context->sample_rate != m_audioOut.m_sampleRate ||
+            context->ch_layout.nb_channels    != m_audioOut.m_channels ||
+            AudioOutputSettings::AVSampleFormatToFormat(context->sample_fmt,
+                                                        context->bits_per_raw_sample) != m_audioOut.format)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
-            if (ctx->ch_layout.nb_channels != m_audioOut.m_channels)
+            if (context->ch_layout.nb_channels != m_audioOut.m_channels)
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
-                    .arg(m_audioOut.m_channels).arg(ctx->ch_layout.nb_channels));
+                    .arg(m_audioOut.m_channels).arg(context->ch_layout.nb_channels));
             }
             QMutexLocker locker(&m_trackLock);
             m_currentTrack[kTrackTypeAudio] = -1;
@@ -4480,7 +4480,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
             {
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
+                    ret = m_audio->DecodeAudio(context, m_audioSamples, data_size, tmp_pkt);
                     decoded_size = data_size;
                 }
                 else
@@ -4497,14 +4497,14 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
         {
             if (!already_decoded)
             {
-                if (DecoderWillDownmix(ctx))
+                if (DecoderWillDownmix(context))
                 {
                     AVChannelLayout channel_layout;
                     av_channel_layout_default(&channel_layout, m_audio->GetMaxChannels());
-                    av_opt_set_chlayout(ctx->priv_data, "downmix", &channel_layout, 0);
+                    av_opt_set_chlayout(context->priv_data, "downmix", &channel_layout, 0);
                 }
 
-                ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
+                ret = m_audio->DecodeAudio(context, m_audioSamples, data_size, tmp_pkt);
                 decoded_size = data_size;
             }
         }
@@ -4531,8 +4531,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
                                  (char *)m_audioSamples, data_size);
 
         int samplesize = AudioOutputSettings::SampleSize(m_audio->GetFormat());
-        int frames = (ctx->ch_layout.nb_channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
-            decoded_size / (ctx->ch_layout.nb_channels * samplesize);
+        int frames = (context->ch_layout.nb_channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
+            decoded_size / (context->ch_layout.nb_channels * samplesize);
         m_audio->AddAudioData((char *)m_audioSamples, data_size, temppts, frames);
         if (m_audioOut.m_doPassthru && !m_audio->NeedDecodingBeforePassthrough())
         {
@@ -4541,7 +4541,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* ctx, AVStream *curstrea
         else
         {
             m_lastAPts += millisecondsFromFloat
-                ((double)(frames * 1000) / ctx->sample_rate);
+                ((double)(frames * 1000) / context->sample_rate);
         }
 
         LOG(VB_TIMESTAMP, LOG_INFO, LOC + QString("audio timecode %1 %2 %3 %4")
