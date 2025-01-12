@@ -529,7 +529,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             {
                 if (!M3U::ParseDiscontinuity(line, StreamURL()))
                     return false;
-                ResetSequence();
+                // Not handled yet
             }
             else if (line.startsWith(QLatin1String("#EXT-X-INDEPENDENT-SEGMENTS")))
             {
