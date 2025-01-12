@@ -306,23 +306,19 @@ jobs:
           - desc: 'macOS 13 (Ventura) x86_64'
             runner: 'macOS-13'
             arch: 'x86_64'
-            python_dot_version: '3.13'
-            qt_version: 'qt5'
-            database_version: 'mysql8'
+            qt_version: 'qt6'
+            database_version: 'mariadb'
             extrapkgs: ''
             configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
             linkerflags: '-Wl,-ld_classic'
-            cross_compile: false
           - desc: 'macOS 14 (Sonoma) arm64'
             runner: 'macOS-14'
             arch: 'arm64'
-            python_dot_version: '3.13'
-            qt_version: 'qt5'
-            database_version: 'mysql8'
+            qt_version: 'qt6'
+            database_version: 'mariadb'
             extrapkgs: ''
             configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
             linkerflags: '-Wl,-ld_classic'
-            cross_compile: false
 
         compiler:
           - desc: 'clang'
@@ -337,10 +333,10 @@ jobs:
       TZ: Etc/UTC
       MYTHTV_CONFIG_PREFIX: "${{ github.workspace }}/build/install"
       MYTHTV_CONFIG_EXTRA: "--cc=${{ matrix.compiler.cc }} --cxx=${{ matrix.compiler.cxx }} --compile-type=release --enable-debug=0 --disable-debug"
+      MYTHPLUGINS_EXTRA: "--disable-mytharchive --disable-mythnetvision --disable-mythzoneminder --disable-mythzmserver"
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
       CCACHE_MAXSIZE: 250M
-      ANSIBLE_CMD: "ansible-playbook-${{ matrix.os.python_dot_version }}"
       CONFIGURE_CMD: "./configure"
       MAKE_CMD: 'make'
       ANSIBLE_EXTRA: ''
@@ -353,33 +349,36 @@ jobs:
           key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
           restore-keys: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache
 
-      - name: Bootstrap Macports
-        env:
-          GH_URL: "https://raw.githubusercontent.com"
-          MP_URL: "GiovanniBussi/macports-ci/master/macports-ci"
+      - name: Update Homebrew Environment
         run: |
-          PKGMGR_PREFIX=/opt/local
+          brew update && brew upgrade
+          PKGMGR_PREFIX=$(brew --prefix)
           echo "PKGMGR_PREFIX=$PKGMGR_PREFIX" >> $GITHUB_ENV
-          curl -LJO "${GH_URL}/${MP_URL}"
-          arch -${{ matrix.os.arch }} bash -c "source ./macports-ci install"
-          export PATH=${PKGMGR_PREFIX}/bin:${PKGMGR_PREFIX}/libexec/${{ matrix.os.qt_version }}/bin:${PKGMGR_PREFIX}/sbin:$PATH
-          echo "PKGMGR_CMD=sudo $PKGMGR_PREFIX/bin/port" >> $GITHUB_ENV
 
-      - name: Remove Homebrew
-        env:
-          GH_URL: "https://raw.githubusercontent.com"
-          HB_URL: "Homebrew/install/HEAD/uninstall.sh"
+      - name: Fix Python install on Ventura
         run: |
-          /bin/bash -c "$(curl -fsSL ${GH_URL}/${HB_URL})" --force
-          sudo rm -Rf /usr/local/bin/brew
+          echo "Force remove currently installed python"
+          brew unlink python
+          brew unlink python3
+          brew remove --force --ignore-dependencies python3
+          echo "re-install requested python"
+          brew install --force --overwrite python3
+        if: matrix.os.runner == 'macOS-13'
 
-      - name: Setup cross-compile environment
+      - name: Install Ansible and missing Python necessities
         run: |
-          echo "PKGMGR_CMD=arch -${{ matrix.os.arch }} sudo ${PKGMGR_PREFIX}/bin/port" >> $GITHUB_ENV
-          echo "ANSIBLE_CMD=arch -${{ matrix.os.arch }} $ANSIBLE_CMD" >> $GITHUB_ENV
-          echo "CONFIGURE_CMD=arch -${{ matrix.os.arch }} $CONFIGURE_CMD" >> $GITHUB_ENV
-          echo "MAKE_CMD=arch -${{ matrix.os.arch }} $MAKE_CMD" >> $GITHUB_ENV
-        if: matrix.os.cross_compile
+          brew install ansible python-setuptools python-packaging
+
+      - name: Setup Python and Ansible Variables
+        run: |
+          PYTHON_EXE=$PKGMGR_PREFIX/bin/python3
+          PYTHON_VERSION=$(${PYTHON_EXE} -c "import sys; print(str(sys.version_info.major)+str(sys.version_info.minor))")
+          PYTHON_DOT_VERSION=$(${PYTHON_EXE} -c "import sys; print(str(sys.version_info.major)+'.'+str(sys.version_info.minor))")
+          ANSIBLE_EXTRA="ansible_python_interpreter=$PYTHON_EXE database_version=${{ matrix.os.database_version }}"
+          echo "PYTHON_EXE=$PYTHON_EXE" >> $GITHUB_ENV
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
+          echo "PYTHON_DOT_VERSION=$PYTHON_DOT_VERSION" >> $GITHUB_ENV
+          echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA" >> $GITHUB_ENV
 
       - name: Setup build envinomental variables
         run: |
@@ -388,18 +387,7 @@ jobs:
           echo "LDFLAGS=-L${PKGMGR_PREFIX}/lib ${{ matrix.os.linkerflags }}" >> $GITHUB_ENV
           echo "LIBRARY_PATH=${PKGMGR_PREFIX}/lib" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=${PKGMGR_PREFIX}/lib/pkgconfig" >> $GITHUB_ENV
-          echo "QMAKE_CMD=${PKGMGR_PREFIX}/libexec/${{ matrix.os.qt_version }}/bin/qmake" >> $GITHUB_ENV
-
-      - name: Install ansible, pip, and virtualenv
-        run: |
-          PYTHON_VERSION=${{ matrix.os.python_dot_version }}
-          PYTHON_VERSION=${PYTHON_VERSION//.}
-          ${PKGMGR_CMD} install py${PYTHON_VERSION}-ansible py${PYTHON_VERSION}-pip py${PYTHON_VERSION}-virtualenv
-          ${PKGMGR_CMD} select --set python python${PYTHON_VERSION}
-          ${PKGMGR_CMD} select --set python3 python${PYTHON_VERSION}
-          ${PKGMGR_CMD} select --set ansible py${PYTHON_VERSION}-ansible
-          ANSIBLE_EXTRA="ansible_python_interpreter=${PKGMGR_PREFIX}/bin/python${{ matrix.os.python_dot_version }} database_version=${{ matrix.os.database_version }}"
-          echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA" >> $GITHUB_ENV
+          echo "QMAKE_CMD=${PKGMGR_PREFIX}/opt/${{ matrix.os.qt_version }}/bin/qmake" >> $GITHUB_ENV
 
       - name: Setup qt6 variables
         run: echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA qt6=true" >> $GITHUB_ENV
@@ -413,11 +401,11 @@ jobs:
 
       - name: Run ansible to install build requirements
         working-directory: ansible
-        run: ${ANSIBLE_CMD} mythtv.yml --extra-vars="$ANSIBLE_EXTRA" --limit localhost
+        run: ansible-playbook mythtv.yml --extra-vars="$ANSIBLE_EXTRA" --limit localhost
 
       - name: Update MYSQL environmental variables
         run: |
-          PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${PKGMGR_PREFIX}/lib/${{ matrix.os.database_version }}/pkgconfig/
+          PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${PKGMGR_PREFIX}/opt/mysql-client/lib/pkgconfig/
           echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
           MYSQLCLIENT_LDFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --libs mysqlclient)"
           echo "MYSQLCLIENT_LDFLAGS=$MYSQLCLIENT_LDFLAGS" >> $GITHUB_ENV
@@ -426,9 +414,17 @@ jobs:
 
       - name: Source the virtual python environemnt
         run: |
-          PYTHON_VENV_PATH="$HOME/.mythtv/python-virtualenv"
+          PYTHON_VENV_PATH="$HOME/.mythtv/python-venv$PYTHON_VERSION"
           source "${PYTHON_VENV_PATH}/bin/activate"
           echo "PYTHON_CMD=${PYTHON_VENV_PATH}/bin/python3" >> $GITHUB_ENV
+
+      - name: Fix the HDHomeRun library on ARM64
+        run: ln -s $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun.dylib $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun_arm64.dylib
+        if: matrix.os.arch == 'arm64'
+
+      - name: Fix the HDHomeRun library on ARM64
+        run: ln -s $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun.dylib $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun_x64.dylib
+        if: matrix.os.arch == 'x86_64'
 
       - name: Checkout Mythtv/mythtv repository
         uses: actions/checkout@v4
@@ -456,7 +452,7 @@ jobs:
 
       - name: Configure plugins
         working-directory: mythtv/mythplugins
-        run: ${CONFIGURE_CMD} --prefix=${MYTHTV_CONFIG_PREFIX}
+        run: ${CONFIGURE_CMD} --prefix=${MYTHTV_CONFIG_PREFIX} ${MYTHPLUGINS_EXTRA}
 
       - name: Make plugins
         working-directory: mythtv/mythplugins
