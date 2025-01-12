@@ -113,9 +113,6 @@ MythRenderOpenGL* MythRenderOpenGL::Create(QWidget *Widget)
         format.setRenderableType(QSurfaceFormat::OpenGLES);
     }
 
-    // KdW test
-    format.setRenderableType(QSurfaceFormat::OpenGL);
-
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         format.setOption(QSurfaceFormat::DebugContext);
 
@@ -544,12 +541,12 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
         return;
     }
 
-// #ifdef Q_OS_ANDROID			// KdW test
+#ifdef Q_OS_ANDROID
     // Ensure surface type is always OpenGL
     m_window->setSurfaceType(QWindow::OpenGLSurface);
     if (native && native->windowHandle())
         native->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
-// #endif
+#endif
 
 #ifdef USING_QTWEBENGINE
     auto * globalcontext = QOpenGLContext::globalShareContext();
