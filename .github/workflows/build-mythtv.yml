@@ -319,6 +319,14 @@ jobs:
             extrapkgs: ''
             configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
             linkerflags: '-Wl,-ld_classic'
+          - desc: 'macOS 15 (Sequoia) arm64'
+            runner: 'macOS-15'
+            arch: 'arm64'
+            qt_version: 'qt6'
+            database_version: 'mariadb'
+            extrapkgs: ''
+            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
+            linkerflags: '-Wl,-ld_classic'
 
         compiler:
           - desc: 'clang'
