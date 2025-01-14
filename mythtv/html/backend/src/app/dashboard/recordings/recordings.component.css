@@ -2,6 +2,10 @@
     border: 2px solid;
 }
 
+:host ::ng-deep .p-menu {
+    border: 2px solid;
+}
+
 :host ::ng-deep .p-tieredmenu .p-submenu-list {
     border: 2px solid;
     left: 10%;
