@@ -114,7 +114,10 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
     new SatTuning("Hotbird   13.0E", 12015000, "h", "27500000", "8psk", "DVB-S2", "3/4"),
     new SatTuning("Astra-1   19.2E", 11229000, "v", "22000000", "8psk", "DVB-S2", "2/3"),
     new SatTuning("Astra-3   23.5E", 12031500, "h", "27500000", "qpsk", "DVB-S2", "auto"),
-    new SatTuning("Astra-2   28.2E", 10714000, "h", "22000000", "qpsk", "DVB-S", "5/6"),
+    new SatTuning("Astra-2   28.2E", 10773000, "h", "23000000", "8psk", "DVB-S2", "3/4"),
+    new SatTuning("Turksat-3A 42.0E", 12610000, "h", "20830000", "qpsk", "DVB-S", "3/4"),
+    new SatTuning("Turksat-4A 42.0E", 11916000, "v", "30000000", "qpsk", "DVB-S", "3/4"),
+    new SatTuning("Turksat-8K 42.0E", 12605000, "v", "34285000", "16apsk", "DVB-S2", "2/3"),
   ]
 
   atscModulationTable = [
@@ -153,6 +156,7 @@ export class ChannelscanComponent implements OnInit, AfterViewInit {
     new Sel('QAM-16', 'qam_16'),
     new Sel('16PSK', '16psk'),
     new Sel('32PSK', '32psk'),
+    new Sel('16APSK', '16apsk'),
   ];
 
   dvbtModSysTable = [
