@@ -155,6 +155,15 @@
             "titlematch_desc": "Legen Sie automatisch neue Aufnahmeregeln fest, um diese Gruppe zu verwenden, wenn der Titel mit diesem regulären Ausdruck übereinstimmt. Beispielsweise würde „(News|CNN)“ mit jedem Titel übereinstimmen, in dem „News“ oder „CNN“ vorkommt.",
             "titlematch_label": "Titelübereinstimmung (Regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Aktionen für {{ num }} ausgewählte vorherige Aufnahmen",
+            "deleteselected": "{{ num }} ausgewählte Einträge entfernen",
+            "deletewarning": "Dadurch wird die Sendung dauerhaft aus dem Verlauf gelöscht. Bist du sicher?",
+            "heading": "Zuvor aufgezeichnet",
+            "mnu_delete": "Aus der Liste entfernen",
+            "mnu_norec": "Nehmen Sie niemals auf",
+            "month_placeholder": "Monat auswählen"
+        },
         "priorities": {
             "audiodesc_desc": "Zusätzliche Priorität, wenn eine Vorführung als Audiobeschreibung gekennzeichnet ist.",
             "audiodesc_label": "Audiobeschriebene Priorität",

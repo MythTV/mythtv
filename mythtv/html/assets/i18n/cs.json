@@ -155,6 +155,15 @@
             "titlematch_desc": "Automaticky nastavit nová pravidla nahrávání pro použití této skupiny, pokud název odpovídá tomuto regulárnímu výrazu. Například „(News|CNN)“ by odpovídalo jakémukoli titulu, ve kterém se vyskytuje „News“ nebo „CNN“.",
             "titlematch_label": "Shoda názvu (regulární výraz)"
         },
+        "prevrecs": {
+            "actionsselected": "Akce s {{ num }} vybranými předchozími nahrávkami",
+            "deleteselected": "Odebrat {{ num }} vybrané položky",
+            "deletewarning": "Tím se pořad trvale smaže z historie. jsi si jistý?",
+            "heading": "Dříve nahrané",
+            "mnu_delete": "Odebrat ze seznamu",
+            "mnu_norec": "Nikdy nenahrávat",
+            "month_placeholder": "Vyberte měsíc"
+        },
         "priorities": {
             "audiodesc_desc": "Další priorita, když je pořad označen jako audio popisovaný.",
             "audiodesc_label": "Zvuk popsaná priorita",

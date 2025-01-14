@@ -155,6 +155,15 @@
             "titlematch_desc": "Définissez automatiquement de nouvelles règles d'enregistrement pour utiliser ce groupe si le titre correspond à cette expression régulière. Par exemple, \"(News|CNN)\" correspondra à n'importe quel titre dans lequel \"News\" ou \"CNN\" apparaît.",
             "titlematch_label": "Correspondance de titre (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Actions sur {{ num }} enregistrements précédents sélectionnés",
+            "deleteselected": "Supprimer {{ num }} entrées sélectionnées",
+            "deletewarning": "Cela supprimera définitivement l'émission de l'historique. Es-tu sûr?",
+            "heading": "Enregistré précédemment",
+            "mnu_delete": "Supprimer de la liste",
+            "mnu_norec": "Ne jamais enregistrer",
+            "month_placeholder": "Sélectionnez le mois"
+        },
         "priorities": {
             "audiodesc_desc": "Priorité supplémentaire lorsqu'une diffusion est marquée comme étant avec description audio.",
             "audiodesc_label": "Priorité avec description audio",

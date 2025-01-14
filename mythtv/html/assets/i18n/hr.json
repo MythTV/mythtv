@@ -155,6 +155,15 @@
             "titlematch_desc": "Automatski postavite nova pravila snimanja za korištenje ove grupe ako naslov odgovara ovom regularnom izrazu. Na primjer, \"(Vijesti|CNN)\" odgovara bilo kojem naslovu u kojem se pojavljuje \"Vijesti\" ili \"CNN\".",
             "titlematch_label": "Podudaranje naslova (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Radnje na {{ num }} odabranim prethodnim snimkama",
+            "deleteselected": "Ukloni {{ num }} odabranih unosa",
+            "deletewarning": "Ovo će trajno izbrisati emisiju iz povijesti. Jeste li sigurni?",
+            "heading": "Prethodno snimljeno",
+            "mnu_delete": "Ukloni s popisa",
+            "mnu_norec": "Nikad ne snimaj",
+            "month_placeholder": "Odaberite mjesec"
+        },
         "priorities": {
             "audiodesc_desc": "Dodatni prioritet kada je prikazivanje označeno kao zvučno opisano.",
             "audiodesc_label": "Audio opisani prioritet",

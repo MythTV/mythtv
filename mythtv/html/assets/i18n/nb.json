@@ -155,6 +155,15 @@
             "titlematch_desc": "Angi automatisk nye opptaksregler for å bruke denne gruppen hvis tittelen samsvarer med dette regulære uttrykket. For eksempel vil \"(News|CNN)\" samsvare med alle titler der \"News\" eller \"CNN\" vises.",
             "titlematch_label": "Tittelmatch (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Handlinger på {{ num }} valgte tidligere opptak",
+            "deleteselected": "Fjern {{ num }} valgte oppføringer",
+            "deletewarning": "Dette sletter programmet permanent fra loggen. Er du sikker?",
+            "heading": "Tidligere innspilt",
+            "mnu_delete": "Fjern fra listen",
+            "mnu_norec": "Ta aldri opp",
+            "month_placeholder": "Velg måned"
+        },
         "priorities": {
             "audiodesc_desc": "Ekstra prioritet når en visning er merket som lydbeskrevet.",
             "audiodesc_label": "Lyd beskrevet prioritet",

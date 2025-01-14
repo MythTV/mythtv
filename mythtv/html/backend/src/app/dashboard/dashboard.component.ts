@@ -17,6 +17,7 @@ export class DashboardComponent implements OnInit {
     { label: 'dashboard.channeleditor', routerLink: 'channel-editor' },
     { label: 'dashboard.programguide', routerLink: 'program-guide' },
     { label: 'dashboard.recordings.heading', routerLink: 'recordings' },
+    { label: 'dashboard.prevrecs.heading', routerLink: 'prev-recorded' },
     { label: 'dashboard.upcoming.heading', routerLink: 'upcoming' },
     { label: 'dashboard.recrules.heading', routerLink: 'recrules' },
     { label: 'dashboard.videos.heading', routerLink: 'videos' },

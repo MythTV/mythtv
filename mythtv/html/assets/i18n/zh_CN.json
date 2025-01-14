@@ -155,6 +155,15 @@
             "titlematch_desc": "如果标题与此正则表达式匹配，则自动设置新的记录规则以使用该组。例如，“(News|CNN)”将匹配出现“News”或“CNN”的任何标题。",
             "titlematch_label": "标题匹配（正则表达式）"
         },
+        "prevrecs": {
+            "actionsselected": "对 {{ num }} 个选定的先前录音执行操作",
+            "deleteselected": "删除 {{ num }} 个选定的条目",
+            "deletewarning": "这将从历史记录中永久删除该节目。你确定吗？",
+            "heading": "之前录制的",
+            "mnu_delete": "从列表中删除",
+            "mnu_norec": "从不记录",
+            "month_placeholder": "选择月份"
+        },
         "priorities": {
             "audiodesc_desc": "当放映被标记为音频描述时的额外优先级。",
             "audiodesc_label": "音频描述优先级",

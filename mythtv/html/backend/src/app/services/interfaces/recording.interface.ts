@@ -15,6 +15,7 @@ export interface Recording {
     RecType:        number;
     RecordId:       number;
     RecordedId:     number;
+    RecTypeStatus:  string;
     StartTs:        string;
     Status:         number;
     StatusName:     string;

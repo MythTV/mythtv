@@ -155,6 +155,15 @@
             "titlematch_desc": "タイトルがこの正規表現と一致する場合に、このグループを使用する新しい録画ルールを自動的に設定します。たとえば、「(News|CNN)」は、「News」または「CNN」が含まれるタイトルと一致します。",
             "titlematch_label": "タイトルマッチ（正規表現）"
         },
+        "prevrecs": {
+            "actionsselected": "{{ num }} 選択された以前の録画に対するアクション",
+            "deleteselected": "{{ num }} 個の選択したエントリを削除します",
+            "deletewarning": "これにより、番組が履歴から完全に削除されます。本気ですか？",
+            "heading": "以前に録音したもの",
+            "mnu_delete": "リストから削除",
+            "mnu_norec": "決して記録しないでください",
+            "month_placeholder": "月を選択してください"
+        },
         "priorities": {
             "audiodesc_desc": "上映が音声解説付きとしてマークされている場合の追加の優先順位。",
             "audiodesc_label": "音声説明の優先度",

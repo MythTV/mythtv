@@ -155,6 +155,15 @@
             "titlematch_desc": "Määrake selle rühma kasutamiseks automaatselt uued salvestusreeglid, kui pealkiri vastab sellele regulaaravaldisele. Näiteks \"(News|CNN)\" vastaks igale pealkirjale, milles \"News\" või \"CNN\" on.",
             "titlematch_label": "Pealkirja vaste (regulaarne väljend)"
         },
+        "prevrecs": {
+            "actionsselected": "Toimingud {{ num }} valitud eelmiste salvestiste puhul",
+            "deleteselected": "Eemalda {{ num }} valitud kirjed",
+            "deletewarning": "See kustutab saate ajaloost jäädavalt. Oled sa kindel?",
+            "heading": "Varem salvestatud",
+            "mnu_delete": "Eemalda loendist",
+            "mnu_norec": "Ära kunagi salvesta",
+            "month_placeholder": "Valige kuu"
+        },
         "priorities": {
             "audiodesc_desc": "Täiendav prioriteet, kui etendus on märgitud helikirjeldusega.",
             "audiodesc_label": "Heli kirjeldatud prioriteet",

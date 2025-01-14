@@ -155,6 +155,15 @@
             "titlematch_desc": "Samodejno nastavi nova pravila snemanja za uporabo te skupine, če se naslov ujema s tem regularnim izrazom. Na primer, \"(Novice|CNN)\" bi se ujemal s katerim koli naslovom, v katerem se pojavi \"Novice\" ali \"CNN\".",
             "titlematch_label": "Ujemanje naslova (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Dejanja na {{ num }} izbranih prejšnjih posnetkih",
+            "deleteselected": "Odstrani {{ num }} izbranih vnosov",
+            "deletewarning": "S tem boste oddajo trajno izbrisali iz zgodovine. Ste prepričani?",
+            "heading": "Prej posneto",
+            "mnu_delete": "Odstrani s seznama",
+            "mnu_norec": "Nikoli ne snemaj",
+            "month_placeholder": "Izberite mesec"
+        },
         "priorities": {
             "audiodesc_desc": "Dodatna prednost, ko je predvajanje označeno kot zvočno opisano.",
             "audiodesc_label": "Zvočno opisana prednost",

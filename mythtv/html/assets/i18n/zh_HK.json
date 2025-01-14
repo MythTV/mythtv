@@ -155,6 +155,15 @@
             "titlematch_desc": "如果標題與此正規表示式匹配，則自動設定新的記錄規則以使用該群組。例如，「(News|CNN)」將符合出現「News」或「CNN」的任何標題。",
             "titlematch_label": "標題匹配（正規表示式）"
         },
+        "prevrecs": {
+            "actionsselected": "對 {{ num }} 個選定的先前錄音執行操作",
+            "deleteselected": "刪除 {{ num }} 個選定的條目",
+            "deletewarning": "這將從歷史記錄中永久刪除該節目。你確定嗎？",
+            "heading": "之前錄製的",
+            "mnu_delete": "從清單中刪除",
+            "mnu_norec": "從不記錄",
+            "month_placeholder": "選擇月份"
+        },
         "priorities": {
             "audiodesc_desc": "當放映被標記為音頻描述時的額外優先順序。",
             "audiodesc_label": "音訊描述優先級",

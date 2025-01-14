@@ -96,15 +96,16 @@ export interface GetLastPlayPosRequest {
 }
 
 export interface GetOldRecordedListRequest {
-    Descending: boolean;
-    StartIndex: number;
-    Count: number;
-    StartTime: string; // dateTime
-    EndTime: string; // dateTime
-    Title: string;
-    SeriesId: string;
-    RecordId: number;
-    Sort: string;
+    Descending?: boolean;
+    StartIndex?: number;
+    Count?: number;
+    StartTime?: string; // dateTime
+    EndTime?: string; // dateTime
+    Title?: string;
+    TitleRegex?: string;
+    SeriesId?: string;
+    RecordId?: number;
+    Sort?: string;
 }
 
 export interface PlayGroupList {
@@ -222,4 +223,17 @@ export interface PowerPriority {
 
 export interface PowerPriorityList {
     PowerPriorities : PowerPriority []; 
+}
+
+export interface UpdateOldRecordedRequest {
+    Chanid:number;
+    StartTime:Date;
+    Duplicate:boolean;
+    Reschedule?:boolean
+}
+
+export interface RemoveOldRecordedRequest {
+    Chanid:number;
+    StartTime:Date;
+    Reschedule?:boolean
 }

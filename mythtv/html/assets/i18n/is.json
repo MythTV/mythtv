@@ -155,6 +155,15 @@
             "titlematch_desc": "Stilltu sjálfkrafa nýjar upptökureglur til að nota þennan hóp ef titillinn passar við þessa reglulegu tjáningu. Til dæmis, \"(News|CNN)\" myndi passa við hvaða titil sem \"News\" eða \"CNN\" birtist í.",
             "titlematch_label": "Titilsamsvörun (reglubundið)"
         },
+        "prevrecs": {
+            "actionsselected": "Aðgerðir á {{ num }} völdum fyrri upptökum",
+            "deleteselected": "Fjarlægðu {{ num }} valdar færslur",
+            "deletewarning": "Þetta mun eyða þættinum varanlega úr ferlinum. Ertu viss?",
+            "heading": "Áður tekið upp",
+            "mnu_delete": "Fjarlægja af listanum",
+            "mnu_norec": "Aldrei taka upp",
+            "month_placeholder": "Veldu mánuð"
+        },
         "priorities": {
             "audiodesc_desc": "Viðbótarforgangur þegar sýning er merkt sem hljóðlýsing.",
             "audiodesc_label": "Hljóð lýst forgangi",

@@ -155,6 +155,15 @@
             "titlematch_desc": "Új rögzítési szabályok automatikus beállítása ennek a csoportnak a használatához, ha a cím megegyezik ezzel a reguláris kifejezéssel. Például a \"(News|CNN)\" minden olyan címre egyezne, amelyben a \"Hírek\" vagy a \"CNN\" szerepel.",
             "titlematch_label": "Címegyezés (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Műveletek a {{ num }} kiválasztott korábbi felvételeken",
+            "deleteselected": "Távolítsa el a {{ num }} kiválasztott bejegyzést",
+            "deletewarning": "Ezzel véglegesen törli a műsort az előzményekből. Biztos vagy benne?",
+            "heading": "Korábban rögzített",
+            "mnu_delete": "Távolítsa el a listáról",
+            "mnu_norec": "Soha ne rögzítse",
+            "month_placeholder": "Válassza ki a hónapot"
+        },
         "priorities": {
             "audiodesc_desc": "További prioritás, ha egy műsort hangleírásként jelölnek meg.",
             "audiodesc_label": "Leírt hang prioritás",

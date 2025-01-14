@@ -155,6 +155,15 @@
             "titlematch_desc": "Indstil automatisk nye optagelsesregler for at bruge denne gruppe, hvis titlen matcher dette regulære udtryk. For eksempel ville \"(News|CNN)\" matche enhver titel, hvor \"News\" eller \"CNN\" vises.",
             "titlematch_label": "Titelmatch (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Handlinger på {{ num }} valgte tidligere optagelser",
+            "deleteselected": "Fjern {{ num }} valgte poster",
+            "deletewarning": "Dette sletter programmet permanent fra historikken. Er du sikker?",
+            "heading": "Tidligere optaget",
+            "mnu_delete": "Fjern fra listen",
+            "mnu_norec": "Optag aldrig",
+            "month_placeholder": "Vælg måned"
+        },
         "priorities": {
             "audiodesc_desc": "Yderligere prioritet, når en fremvisning er markeret som lydbeskrevet.",
             "audiodesc_label": "Lyd beskrevet prioritet",

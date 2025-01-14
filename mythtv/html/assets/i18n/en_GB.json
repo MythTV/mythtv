@@ -155,6 +155,15 @@
             "titlematch_desc": "Automatically set new recording rules to use this group if the title matches this regular expression. For example, \"(News|CNN)\" would match any title in which \"News\" or \"CNN\" appears.",
             "titlematch_label": "Title Match (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Actions on {{ num }} Selected Previous Recordings",
+            "deleteselected": "Remove {{ num }} Selected Entries",
+            "deletewarning": "This will permanently delete the show from history. Are you sure?",
+            "heading": "Previously Recorded",
+            "mnu_delete": "Remove from the list",
+            "mnu_norec": "Never Record",
+            "month_placeholder": "Select month"
+        },
         "priorities": {
             "audiodesc_desc": "Additional priority when a showing is marked as being Audio Described.",
             "audiodesc_label": "Audio described priority",

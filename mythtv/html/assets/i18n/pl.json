@@ -155,6 +155,15 @@
             "titlematch_desc": "Automatycznie ustaw nowe reguły nagrywania, aby używać tej grupy, jeśli tytuł pasuje do tego wyrażenia regularnego. Na przykład „(News|CNN)” będzie pasować do dowolnego tytułu, w którym pojawia się „Wiadomości” lub „CNN”.",
             "titlematch_label": "Dopasowanie tytułu (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Działania na {{ num }} wybranych poprzednich nagraniach",
+            "deleteselected": "Usuń {{ num }} wybrane wpisy",
+            "deletewarning": "Spowoduje to trwałe usunięcie programu z historii. Czy jesteś pewien?",
+            "heading": "Poprzednio nagrane",
+            "mnu_delete": "Usuń z listy",
+            "mnu_norec": "Nigdy nie nagrywaj",
+            "month_placeholder": "Wybierz miesiąc"
+        },
         "priorities": {
             "audiodesc_desc": "Dodatkowy priorytet, gdy pokaz jest oznaczony jako z opisem audio.",
             "audiodesc_label": "Priorytet opisany w dźwięku",

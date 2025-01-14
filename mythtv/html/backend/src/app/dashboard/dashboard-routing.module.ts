@@ -10,6 +10,7 @@ import { RecrulesComponent } from './recrules/recrules.component';
 import { VideosComponent } from './videos/videos.component';
 import { DashboardSettingsComponent } from './dashboard-settings/dashboard-settings.component';
 import { CanDeactivateGuardService } from '../can-deactivate-guard.service';
+import { PrevrecsComponent } from './prevrecs/prevrecs.component';
 
 @NgModule({
 	imports: [
@@ -20,6 +21,7 @@ import { CanDeactivateGuardService } from '../can-deactivate-guard.service';
 					{ path: 'channel-editor', component: ChannelEditorComponent },
 					{ path: 'program-guide', component: GuideComponent },
 					{ path: 'recordings', component: RecordingsComponent },
+					{ path: 'prev-recorded', component: PrevrecsComponent },
 					{ path: 'upcoming', component: UpcomingComponent },
 					{ path: 'recrules', component: RecrulesComponent },
 					{ path: 'videos', component: VideosComponent },

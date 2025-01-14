@@ -155,6 +155,15 @@
             "titlematch_desc": "Stel automatisch nieuwe opnameregels in om deze groep te gebruiken als de titel overeenkomt met deze reguliere expressie. '(Nieuws|CNN)' komt bijvoorbeeld overeen met elke titel waarin 'Nieuws' of 'CNN' voorkomt.",
             "titlematch_label": "Titelovereenkomst (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Acties op {{ num }} geselecteerde eerdere opnamen",
+            "deleteselected": "Verwijder {{ num }} geselecteerde vermeldingen",
+            "deletewarning": "Hiermee wordt de serie definitief uit de geschiedenis verwijderd. Weet je het zeker?",
+            "heading": "Eerder opgenomen",
+            "mnu_delete": "Verwijderen uit de lijst",
+            "mnu_norec": "Nooit opnemen",
+            "month_placeholder": "Selecteer maand"
+        },
         "priorities": {
             "audiodesc_desc": "Extra prioriteit wanneer een vertoning is gemarkeerd als Audio-beschreven.",
             "audiodesc_label": "Audio beschreven prioriteit",

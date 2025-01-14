@@ -25,7 +25,9 @@ import {
   ManageJobQueueRequest,
   PlayGroup,
   PowerPriorityList,
-  PowerPriority
+  PowerPriority,
+  UpdateOldRecordedRequest,
+  RemoveOldRecordedRequest
 } from './interfaces/dvr.interface';
 import { BoolResponse, StringResponse } from './interfaces/common.interface';
 import { ProgramList, ScheduleOrProgram } from './interfaces/program.interface';
@@ -144,18 +146,19 @@ export class DvrService {
     return this.httpClient.get<number>('/Dvr/GetLastPlayPos', { params });
   }
 
-  public GetOldRecordedList(request: GetOldRecordedListRequest): Observable<ProgramList> {
-    let params = new HttpParams()
-      .set("Descending", request.Descending)
-      .set("StartIndex", request.StartIndex)
-      .set("Count", request.Count)
-      .set("StartTime", request.StartTime)
-      .set("EndTime", request.EndTime)
-      .set("Title", request.Title)
-      .set("SeriesId", request.SeriesId)
-      .set("RecordId", request.RecordId)
-      .set("Sort", request.Sort);
-    return this.httpClient.get<ProgramList>('/Dvr/GetOldRecordedList', { params });
+  public GetOldRecordedList(request: GetOldRecordedListRequest): Observable<{ProgramList: ProgramList}> {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(request))
+      params = params.set(key, value);
+    return this.httpClient.get<{ProgramList: ProgramList}>('/Dvr/GetOldRecordedList', { params });
+  }
+
+  public UpdateOldRecorded(request: UpdateOldRecordedRequest): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/UpdateOldRecorded', request);
+  }
+
+  public RemoveOldRecorded(request: RemoveOldRecordedRequest): Observable<BoolResponse> {
+    return this.httpClient.post<BoolResponse>('/Dvr/RemoveOldRecorded', request);
   }
 
   public GetPlayGroupList(): Observable<PlayGroupList> {

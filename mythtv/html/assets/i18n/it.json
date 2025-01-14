@@ -155,6 +155,15 @@
             "titlematch_desc": "Imposta automaticamente nuove regole di registrazione per utilizzare questo gruppo se il titolo corrisponde a questa espressione regolare. Ad esempio, \"(News|CNN)\" corrisponderà a qualsiasi titolo in cui appare \"News\" o \"CNN\".",
             "titlematch_label": "Corrispondenza titolo (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Azioni su {{ num }} registrazioni precedenti selezionate",
+            "deleteselected": "Rimuovi {{ num }} voci selezionate",
+            "deletewarning": "Ciò eliminerà definitivamente lo spettacolo dalla cronologia. Sei sicuro?",
+            "heading": "Registrato in precedenza",
+            "mnu_delete": "Rimuovi dall'elenco",
+            "mnu_norec": "Non registrare mai",
+            "month_placeholder": "Seleziona il mese"
+        },
         "priorities": {
             "audiodesc_desc": "Priorità aggiuntiva quando una proiezione è contrassegnata come descrizione audio.",
             "audiodesc_label": "Priorità descritta dall'audio",

@@ -155,6 +155,15 @@
             "titlematch_desc": "Aseta automaattisesti uudet tallennussäännöt käyttämään tätä ryhmää, jos otsikko vastaa tätä säännöllistä lauseketta. Esimerkiksi \"(News|CNN)\" vastaa mitä tahansa otsikkoa, jossa \"News\" tai \"CNN\" esiintyy.",
             "titlematch_label": "Otsikkoosuma (säännöllinen lauseke)"
         },
+        "prevrecs": {
+            "actionsselected": "Toimenpiteet {{ num }} valituissa aiemmissa tallenteissa",
+            "deleteselected": "Poista {{ num }} valitut merkinnät",
+            "deletewarning": "Tämä poistaa ohjelman pysyvästi historiasta. Oletko varma?",
+            "heading": "Aiemmin tallennettu",
+            "mnu_delete": "Poista luettelosta",
+            "mnu_norec": "Älä koskaan tallenna",
+            "month_placeholder": "Valitse kuukausi"
+        },
         "priorities": {
             "audiodesc_desc": "Lisäprioriteetti, kun esitys on merkitty äänikuvaukseksi.",
             "audiodesc_label": "Ääni kuvattu prioriteetti",

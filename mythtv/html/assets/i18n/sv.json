@@ -155,6 +155,15 @@
             "titlematch_desc": "Ställ automatiskt in nya inspelningsregler för att använda den här gruppen om titeln matchar detta reguljära uttryck. Till exempel skulle \"(News|CNN)\" matcha vilken titel som helst där \"News\" eller \"CNN\" förekommer.",
             "titlematch_label": "Titelmatchning (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Åtgärder på {{ num }} valda tidigare inspelningar",
+            "deleteselected": "Ta bort {{ num }} markerade poster",
+            "deletewarning": "Detta kommer att radera programmet permanent från historiken. Är du säker?",
+            "heading": "Tidigare inspelad",
+            "mnu_delete": "Ta bort från listan",
+            "mnu_norec": "Spela aldrig in",
+            "month_placeholder": "Välj månad"
+        },
         "priorities": {
             "audiodesc_desc": "Ytterligare prioritet när en visning är markerad som Ljudbeskriven.",
             "audiodesc_label": "Ljudbeskriven prioritet",

@@ -155,6 +155,15 @@
             "titlematch_desc": "Defina automaticamente novas regras de gravação para usar este grupo se o título corresponder a esta expressão regular. Por exemplo, \"(Notícias|CNN)\" corresponderia a qualquer título em que \"Notícias\" ou \"CNN\" aparecesse.",
             "titlematch_label": "Correspondência de título (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Ações em {{ num }} gravações anteriores selecionadas",
+            "deleteselected": "Remover {{ num }} entradas selecionadas",
+            "deletewarning": "Isso excluirá permanentemente o programa do histórico. Tem certeza?",
+            "heading": "Gravado anteriormente",
+            "mnu_delete": "Remover da lista",
+            "mnu_norec": "Nunca grave",
+            "month_placeholder": "Selecione o mês"
+        },
         "priorities": {
             "audiodesc_desc": "Prioridade adicional quando uma exibição é marcada como Áudio Descrito.",
             "audiodesc_label": "Prioridade audiodescrita",

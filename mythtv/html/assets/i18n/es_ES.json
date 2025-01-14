@@ -155,6 +155,15 @@
             "titlematch_desc": "Establezca automáticamente nuevas reglas de grabación para usar este grupo si el título coincide con esta expresión regular. Por ejemplo, \"(Noticias|CNN)\" coincidiría con cualquier título en el que aparezca \"Noticias\" o \"CNN\".",
             "titlematch_label": "Coincidencia de título (expresión regular)"
         },
+        "prevrecs": {
+            "actionsselected": "Acciones en {{ num }} grabaciones anteriores seleccionadas",
+            "deleteselected": "Eliminar {{ num }} entradas seleccionadas",
+            "deletewarning": "Esto eliminará permanentemente el programa del historial. ¿Está seguro?",
+            "heading": "Grabado previamente",
+            "mnu_delete": "Eliminar de la lista",
+            "mnu_norec": "Nunca grabar",
+            "month_placeholder": "Seleccionar mes"
+        },
         "priorities": {
             "audiodesc_desc": "Prioridad adicional cuando una presentación está marcada como Audio Descripta.",
             "audiodesc_label": "Prioridad audio descrita",

@@ -91,6 +91,7 @@ import { RecQualityComponent } from './dashboard/dashboard-settings/rec-quality/
 import { RecPrioritiesComponent } from './dashboard/dashboard-settings/rec-priorities/rec-priorities.component';
 import { DataSourcesComponent } from './dashboard/dashboard-settings/data-sources/data-sources.component';
 import { CustomPrioritiesComponent } from './dashboard/dashboard-settings/custom-priorities/custom-priorities.component';
+import { PrevrecsComponent } from './dashboard/prevrecs/prevrecs.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -177,6 +178,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     RecPrioritiesComponent,
     DataSourcesComponent,
     CustomPrioritiesComponent,
+    PrevrecsComponent,
   ],
   imports: [
     BrowserModule,

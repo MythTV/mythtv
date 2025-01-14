@@ -155,6 +155,15 @@
             "titlematch_desc": "Başlık bu normal ifadeyle eşleşiyorsa, bu grubu kullanacak yeni kayıt kurallarını otomatik olarak ayarlayın. Örneğin, \"(Haberler|CNN)\", \"Haberler\" veya \"CNN\"in yer aldığı herhangi bir başlıkla eşleşir.",
             "titlematch_label": "Başlık Eşleşmesi (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "{{ num }} Seçilen Önceki Kayıtlarla İlgili İşlemler",
+            "deleteselected": "{{ num }} Seçilen Girişi Kaldır",
+            "deletewarning": "Bu, şovu geçmişten kalıcı olarak silecektir. Emin misin?",
+            "heading": "Daha Önce Kaydedilmiş",
+            "mnu_delete": "Listeden kaldır",
+            "mnu_norec": "Asla Kaydetme",
+            "month_placeholder": "Ay seçin"
+        },
         "priorities": {
             "audiodesc_desc": "Bir gösteri Sesli Açıklamalı olarak işaretlendiğinde ek öncelik.",
             "audiodesc_label": "Sesle tanımlanan öncelik",

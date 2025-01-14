@@ -155,6 +155,15 @@
             "titlematch_desc": "Establiu noves regles d'enregistrament automàticament per utilitzar aquest grup si el títol coincideix amb aquesta expressió regular. Per exemple, \"(Notícies|CNN)\" coincidiria amb qualsevol títol en què aparegui \"Notícies\" o \"CNN\".",
             "titlematch_label": "Coincidència de títol (regex)"
         },
+        "prevrecs": {
+            "actionsselected": "Accions a {{ num }} enregistraments anteriors seleccionats",
+            "deleteselected": "Elimina {{ num }} entrades seleccionades",
+            "deletewarning": "Això suprimirà permanentment el programa de l'historial. N'estàs segur?",
+            "heading": "Enregistrat prèviament",
+            "mnu_delete": "Eliminar de la llista",
+            "mnu_norec": "No enregistreu mai",
+            "month_placeholder": "Seleccioneu el mes"
+        },
         "priorities": {
             "audiodesc_desc": "Prioritat addicional quan una projecció es marca com a descripció d'àudio.",
             "audiodesc_label": "Prioritat de l'àudio descrit",

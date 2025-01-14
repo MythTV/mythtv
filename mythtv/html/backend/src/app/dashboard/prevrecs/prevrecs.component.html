@@ -1,0 +1,136 @@
+<div style="min-width: 960px;">
+    <div style="white-space: 'pre-line';">
+        <p-toast position="center"></p-toast>
+    </div>
+    <p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>
+    <h2>{{ 'dashboard.prevrecs.heading' | translate }}</h2>
+    <div class="block card w-full">
+        <div style="height: 90vh">
+
+            <p-menu #menu [popup]="true" [model]="menuToShow" class="font-bold">
+            </p-menu>
+
+            <!-- Menu, Refresh button and number of rows. -->
+            <div class="flex align-items-center p-1 font-bold">
+                <button pButton pRipple icon="pi pi-bars" class="p-button-text .p-button-success"
+                    (click)="showContextMenu(null, $event)" pTooltip="{{ 'common.selected_menu' | translate }}"
+                    tooltipPosition="top"></button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="flex align-items-center  pr-3" style="width:200px">
+                    <p-calendar [(ngModel)]="dateValue" [stepMinute]="30" [dateFormat]="'M yy'"
+                        (onClose)="onFilter()"
+                        [selectOtherMonths]="true" [showIcon]="true" [showOnFocus]="true" [showButtonBar]="true"
+                        [todayButtonStyleClass]="'hidden'" [readonlyInput]="true"
+                        [placeholder]="'dashboard.prevrecs.month_placeholder' | translate" view="month"
+                        [minDate]="minDate" [maxDate]="maxDate">
+                    </p-calendar>
+                </div>
+
+                <span class="p-input-icon-right">
+                    <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
+                    <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
+                        class="text-xl" placeholder="{{ 'dashboard.guide.title_search' | translate }}"
+                        pTooltip="{{ 'dashboard.recordings.regex' | translate }}" tooltipPosition="top"
+                        (keydown)="keydown($event)" />
+                </span>
+
+                <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
+                    pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
+                <!-- Refresh button and number of rows. -->
+                <div *ngIf="refreshing else refreshBn"><p-progressSpinner
+                        [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
+                <ng-template #refreshBn>
+                    <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
+                        (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                    &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
+                </ng-template>
+
+            </div>
+
+            <p-table #table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
+                [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm  p-datatable-striped"
+                [virtualScroll]="true" [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+                sortField="StartTime" selectionMode="multiple" [metaKeySelection]="true" [(selection)]="selection"
+                (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()">
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <!-- Column Headings -->
+                        <th style="width: 7%" class="p-1" pSortableColumn="StartTime">
+                            {{ 'dashboard.upcoming.date' | translate }}<p-sortIcon field="StartTime"></p-sortIcon>
+                        </th>
+                        <th style="width: 7%" class="justify-content-end p-1">
+                            {{ 'dashboard.upcoming.time' | translate }} </th>
+                        <th style="width: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
+                        <th style="width: 15%" class="p-1" pSortableColumn="Title">
+                            {{ 'dashboard.recordings.title' | translate }}<p-sortIcon field="Title"></p-sortIcon>
+                        </th>
+                        <th style="width: 17%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate }}</th>
+                        <th style="width: 4%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate }}</th>
+                        <th style="width: 9%" class="p-1">{{ 'dashboard.recordings.channel' | translate }} </th>
+                        <th style="width: 12%" class="p-1">
+                            {{ 'dashboard.upcoming.status' | translate }} </th>
+                        <th style="width: 5%; white-space: nowrap; background: var(--surface-card);" class="p-1">
+                            <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
+                                [disabled]="true"></button>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-program let-rowIndex="rowIndex">
+                    <tr #row [pSelectableRow]="program" [pSelectableRowIndex]="rowIndex"
+                        (contextmenu)="onContextMenu(program,$event)">
+                        <td class="p-1 overflow-hidden">
+                            <div class="mycell">
+                                <div class="mytext" [innerHTML]="formatStartDate(program, rowIndex)"></div>
+                            </div>
+                        </td>
+                        <td class="justify-content-end p-1 overflow-hidden">
+                            <div class="mycell">
+                                <div class="mytext">{{formatStartTime(program)}} </div>
+                            </div>
+                        </td>
+                        <td class="justify-content-end pl-1 pr-3 pt-1 pb-1 overflow-hidden">
+                            <div class="mycell">
+                                <div class="mytext">{{ getDuration(program) | number:'1.0-0' }} min</div>
+                            </div>
+                        </td>
+                        <td class="p-1 overflow-hidden">
+                            <div class="mycell">
+                                <div class="mytext">{{program.Title}}</div>
+                            </div>
+                        </td>
+                        <td class="p-1 overflow-hidden" pTooltip="{{program.Description}}" tooltipPosition="top">
+                            <div class="mycell">
+                                <div class="mytext">{{program.SubTitle.slice(0,50)}}</div>
+                            </div>
+                        </td>
+                        <td class="p-1">
+                            <div *ngIf="program.Season>0 || program.Episode>0">
+                                {{program.Season}}x{{program.Episode}}
+                            </div>
+                        </td>
+                        <td class="p-1">
+                            <div class="mycell">
+                                <div class="mytext">{{program.Channel.ChanNum}} {{program.Channel.CallSign}}</div>
+                            </div>
+                        </td>
+                        <td class="p-1">
+                            <div class="mycell">
+                                <div class="mytext" *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded', 'PreviousRecording'].indexOf(program.Recording.StatusName)>-1 ?
+                                'text-green-500' : 'text-pink-500'">
+                                    {{program.Recording.RecTypeStatus}}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="pt-1 pb-0" style="background: var(--surface-card); white-space: nowrap;">
+                            <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
+                                (click)="showContextMenu(program,$event)"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <app-schedule [inter]="inter"></app-schedule>
+        </div>
+
+    </div>
+</div>
