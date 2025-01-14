@@ -252,7 +252,8 @@ V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Note that you should not specify both Title and TitleRegEx, that is counter-
+// productive and would only work if the TitleRegEx matched the Title.
 /////////////////////////////////////////////////////////////////////////////
 
 V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
@@ -261,6 +262,7 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
                                            const QDateTime &sStartTime,
                                            const QDateTime &sEndTime,
                                            const QString   &sTitle,
+                                           const QString   &TitleRegEx,
                                            const QString   &sSeriesId,
                                            int              nRecordId,
                                            const QString   &sSort)
@@ -309,6 +311,12 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
     {
         clause << "title = :Title";
         bindings[":Title"] = sTitle;
+    }
+
+    if (!TitleRegEx.isEmpty())
+    {
+        clause << "title REGEXP :TitleRegEx";
+        bindings[":TitleRegEx"] = TitleRegEx;
     }
 
     if (!sSeriesId.isEmpty())
@@ -366,6 +374,61 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
 
     return pPrograms;
+}
+
+bool       V2Dvr::RemoveOldRecorded   ( int              ChanId,
+                                        const QDateTime &StartTime,
+                                        bool            Reschedule )
+{
+    if (!HAS_PARAMv2("ChanId") || !HAS_PARAMv2("StartTime"))
+        throw QString("Channel ID and StartTime appears invalid.");
+    QString sql("DELETE FROM oldrecorded "
+        " WHERE chanid = :ChanId AND starttime = :StartTime" );
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(sql);
+    query.bindValue(":ChanId", ChanId);
+    query.bindValue(":StartTime", StartTime);
+    if (!query.exec())
+    {
+        MythDB::DBError("RemoveOldRecorded", query);
+        return false;
+    }
+    if (query.numRowsAffected() <= 0)
+        return false;
+    if (!HAS_PARAMv2("Reschedule"))
+        Reschedule = true;
+    if (Reschedule)
+        RescheduleRecordings();
+    return true;
+}
+
+bool       V2Dvr::UpdateOldRecorded   ( int              ChanId,
+                                        const QDateTime &StartTime,
+                                        bool            Duplicate,
+                                        bool            Reschedule )
+{
+    if (!HAS_PARAMv2("ChanId") || !HAS_PARAMv2("StartTime"))
+        throw QString("Channel ID and StartTime appears invalid.");
+    if (!HAS_PARAMv2("Duplicate"))
+        throw QString("Error: Nothing to change.");
+    QString sql("UPDATE oldrecorded "
+        " SET Duplicate = :Duplicate "
+        " WHERE chanid = :ChanId AND starttime = :StartTime" );
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(sql);
+    query.bindValue(":Duplicate", Duplicate);
+    query.bindValue(":ChanId", ChanId);
+    query.bindValue(":StartTime", StartTime);
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateOldRecorded", query);
+        return false;
+    }
+    if (!HAS_PARAMv2("Reschedule"))
+        Reschedule = true;
+    if (Reschedule)
+        RescheduleRecordings();
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

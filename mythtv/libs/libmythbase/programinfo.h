@@ -476,6 +476,7 @@ class MBASE_PUBLIC ProgramInfo
     ProgramInfoType GetProgramInfoType(void) const
         { return (ProgramInfoType)((m_programFlags & FL_TYPEMASK) >> 20); }
     QDateTime GetBookmarkUpdate(void) const { return m_bookmarkUpdate; }
+    QString GetRecTypeStatus(bool showrerecord) const;
     bool IsGeneric(void) const;
     bool IsInUsePlaying(void)   const { return (m_programFlags & FL_INUSEPLAYING) != 0U;}
     bool IsCommercialFree(void) const { return (m_programFlags & FL_CHANCOMMFREE) != 0U;}

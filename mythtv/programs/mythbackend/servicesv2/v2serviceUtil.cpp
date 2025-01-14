@@ -126,6 +126,7 @@ void V2FillProgramInfo( V2Program *pProgram,
         pRecording->setRecordedId ( pRecInfo.GetRecordingID()     );
         pRecording->setStatus  ( pRecInfo.GetRecordingStatus()    );
         pRecording->setStatusName  ( pRecInfo.GetRecordingStatus()    );
+        pRecording->setRecTypeStatus  ( pRecInfo.GetRecTypeStatus(true)    );
         pRecording->setPriority( pRecInfo.GetRecordingPriority()  );
         pRecording->setStartTs ( pRecInfo.GetRecordingStartTime() );
         pRecording->setEndTs   ( pRecInfo.GetRecordingEndTime()   );
