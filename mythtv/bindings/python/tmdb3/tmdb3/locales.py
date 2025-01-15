@@ -7,6 +7,7 @@
 
 from .tmdb_exceptions import *
 import locale
+import sys
 
 syslocale = None
 
@@ -130,7 +131,10 @@ def set_locale(language=None, country=None, fallthrough=False):
     global syslocale
     LocaleBase.fallthrough = fallthrough
 
-    sysloc, sysenc = locale.getdefaultlocale()
+    if sys.version_info >= (3,11):
+        sysloc, sysenc = locale.getlocale()
+    else:
+        sysloc, sysenc = locale.getdefaultlocale()
 
     if (not language) or (not country):
         dat = None
@@ -154,7 +158,11 @@ def get_locale(language=-1, country=-1):
     global syslocale
     # pull existing stored values
     if syslocale is None:
-        loc = Locale(None, None, locale.getdefaultlocale()[1])
+        try:
+            # Python >= 3.11
+            loc = Locale(None, None, locale.getencoding())
+        except AttributeError:
+            loc = Locale(None, None, locale.getdefaultlocale()[1])
     else:
         loc = syslocale
 
