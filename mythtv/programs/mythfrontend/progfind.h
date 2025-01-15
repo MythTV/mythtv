@@ -81,6 +81,7 @@ class ProgFinder : public ScheduleCommon
     MythUIButtonList *m_timesList    {nullptr};
 
     MythUIText       *m_searchText   {nullptr};
+    MythUIText       *m_groupByText  {nullptr};
     MythUIText       *m_help1Text    {nullptr};
     MythUIText       *m_help2Text    {nullptr};
 };

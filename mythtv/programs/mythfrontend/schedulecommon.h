@@ -8,9 +8,10 @@
 // MythTV
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythscreentype.h"
+#include "libmythbase/programinfo.h"
 
-class ProgramInfo;
 class RecordingInfo;
+class MythMenu;
 
 class ScheduleCommon : public MythScreenType
 {
@@ -25,6 +26,9 @@ class ScheduleCommon : public MythScreenType
     static void EditScheduled(ProgramInfo *pginfo);
     static void EditScheduled(RecordingInfo *recinfo);
     static void MakeOverride(RecordingInfo *recinfo);
+
+    static ProgGroupBy::Type GetProgramListGroupBy(void);
+    virtual void AddGroupMenuItems(MythMenu *sortGroupMenu);
 
     void customEvent(QEvent *event) override; // MythUIType
     virtual ProgramInfo *GetCurrentProgram(void) const { return nullptr; };

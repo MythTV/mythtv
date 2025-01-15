@@ -863,6 +863,24 @@ class MBASE_PUBLIC ProgramInfo
     QDateTime       m_previewUpdate;
 };
 
+// Class for specifying the desired grouping behavior when querying
+// for program data.  Note that title and starttime are always used in
+// all cases but None and callsign is also used in the ChanNum case.
+class MBASE_PUBLIC ProgGroupBy : public QObject
+{
+    Q_OBJECT
+
+public:
+    enum Type {
+	None,			// Don't group programs
+	ChanNum,		// Group by number and callsign
+	CallSign,		// Group by call sign
+	ProgramId		// Group by program ID
+    };
+    static QString toString(ProgGroupBy::Type groupBy);
+    Q_ENUM(Type)
+};
+
 MBASE_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &where,
@@ -875,7 +893,8 @@ MBASE_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
-    const ProgramList  &schedList);
+    const ProgramList  &schedList,
+    ProgGroupBy::Type  groupBy = ProgGroupBy::None);
 
 MBASE_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
@@ -884,7 +903,8 @@ MBASE_PUBLIC bool LoadFromProgram(
     const ProgramList  &schedList,
     uint               start,
     uint               limit,
-    uint               &count);
+    uint               &count,
+    ProgGroupBy::Type  groupBy = ProgGroupBy::None);
 
 MBASE_PUBLIC ProgramInfo*  LoadProgramFromProgram(
         uint chanid, const QDateTime &starttime);

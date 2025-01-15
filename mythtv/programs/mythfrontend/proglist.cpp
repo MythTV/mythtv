@@ -167,6 +167,7 @@ bool ProgLister::Create(void)
     UIUtilW::Assign(this, m_schedText, "sched", &err);
     UIUtilW::Assign(this, m_messageText, "msg", &err);
     UIUtilW::Assign(this, m_positionText, "position", &err);
+    UIUtilW::Assign(this, m_groupByText, "groupby");
 
     if (err)
     {
@@ -333,10 +334,11 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
 
 void ProgLister::ShowMenu(void)
 {
-    auto *sortMenu = new MythMenu(tr("Sort Options"), this, "sortmenu");
-    sortMenu->AddItem(tr("Reverse Sort Order"));
-    sortMenu->AddItem(tr("Sort By Title"));
-    sortMenu->AddItem(tr("Sort By Time"));
+    auto *sortGroupMenu = new MythMenu(tr("Sort/Group Options"), this,
+                                       "sortgroupmenu");
+    sortGroupMenu->AddItem(tr("Reverse Sort Order"));
+    sortGroupMenu->AddItem(tr("Sort By Title"));
+    sortGroupMenu->AddItem(tr("Sort By Time"));
 
     auto *menu = new MythMenu(tr("Options"), this, "menu");
 
@@ -345,7 +347,14 @@ void ProgLister::ShowMenu(void)
         menu->AddItem(tr("Choose Search Phrase..."), &ProgLister::ShowChooseViewMenu);
     }
 
-    menu->AddItem(tr("Sort"), nullptr, sortMenu);
+    if (m_type != plChannel
+        && m_type != plTime
+        && m_type != plPreviouslyRecorded)
+    {
+        AddGroupMenuItems(sortGroupMenu);
+    }
+
+    menu->AddItem(tr("Sort/Group"), nullptr, sortGroupMenu);
 
     if (m_type != plPreviouslyRecorded)
         menu->AddItem(tr("Record"), &ProgLister::QuickRecord);
@@ -1121,6 +1130,10 @@ static bool plTimeSort(const ProgramInfo *a, const ProgramInfo *b)
 
 void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 {
+    ProgGroupBy::Type groupBy = GetProgramListGroupBy();
+    if (m_groupByText)
+	m_groupByText->SetText(ProgGroupBy::toString(groupBy));
+
     if (m_type == plPreviouslyRecorded && m_curviewText)
     {
         if (!m_titleSort)
@@ -1269,6 +1282,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plChannel) // list by channel
     {
+        groupBy = ProgGroupBy::None;
         where = "WHERE channel.deleted IS NULL "
             "  AND channel.visible > 0 "
             "  AND program.endtime > :PGILSTART "
@@ -1323,6 +1337,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plTime) // list by time
     {
+        groupBy = ProgGroupBy::ChanNum;
         QDateTime searchTime(m_searchTime);
         searchTime.setTime(QTime(searchTime.time().hour(), 0, 0));
         bindings[":PGILSEARCHTIME1"] = searchTime;
@@ -1410,7 +1425,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     else
     {
         LoadFromScheduler(m_schedList);
-        LoadFromProgram(m_itemList, where, bindings, m_schedList);
+        LoadFromProgram(m_itemList, where, bindings, m_schedList, groupBy);
     }
 
     if (m_type == plNewListings || m_titleSort)
@@ -1658,7 +1673,7 @@ void ProgLister::customEvent(QEvent *event)
 //      QString resulttext = dce->GetResultText();
         int     buttonnum  = dce->GetResult();
 
-        if (resultid == "sortmenu")
+        if (resultid == "sortgroupmenu")
         {
             switch (buttonnum)
             {
@@ -1675,6 +1690,9 @@ void ProgLister::customEvent(QEvent *event)
                     m_titleSort   = false;
                     m_reverseSort = (m_type == plPreviouslyRecorded);
                     needUpdate    = true;
+                    break;
+                default:
+                    ScheduleCommon::customEvent(event);
                     break;
             }
         }
@@ -1743,7 +1761,8 @@ void ProgLister::customEvent(QEvent *event)
 
         if (m_allowViewDialog && message == "CHOOSE_VIEW")
             ShowChooseViewMenu();
-        else if (message == "SCHEDULE_CHANGE")
+        else if (message == "SCHEDULE_CHANGE"
+                 || message == "GROUPBY_CHANGE")
             needUpdate = true;
     }
 

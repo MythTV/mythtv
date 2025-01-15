@@ -565,6 +565,21 @@ void ScheduleCommon::customEvent(QEvent *event)
                 recInfo.ApplyRecordStateChange(kNotRecording);
             }
         }
+        else if (resultid == "sortgroupmenu")
+        {
+            ProgGroupBy::Type groupBy = ProgGroupBy::None;
+            if (resulttext == tr("Group By Channel Number"))
+                groupBy = ProgGroupBy::ChanNum;
+            else if (resulttext == tr("Group By Call Sign"))
+                groupBy = ProgGroupBy::CallSign;
+            else if (resulttext == tr("Group By Program ID"))
+                groupBy = ProgGroupBy::ProgramId;
+            else if (resulttext == tr("Group By None"))
+                groupBy = ProgGroupBy::None;
+            gCoreContext->SaveSetting("ProgramListGroupBy", (int)groupBy);
+            MythEvent me("GROUPBY_CHANGE");
+            gCoreContext->dispatch(me);
+        }
     }
 }
 
@@ -578,3 +593,16 @@ bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo)
            recInfo.GetRecordingRuleType() == kWeeklyRecord;
 }
 
+ProgGroupBy::Type ScheduleCommon::GetProgramListGroupBy(void)
+{
+    return (ProgGroupBy::Type)gCoreContext->GetNumSetting(
+        "ProgramListGroupBy", (int)ProgGroupBy::ChanNum);
+}
+
+void ScheduleCommon::AddGroupMenuItems(MythMenu *sortGroupMenu)
+{
+    sortGroupMenu->AddItem(tr("Group By Channel Number"));
+    sortGroupMenu->AddItem(tr("Group By Call Sign"));
+    sortGroupMenu->AddItem(tr("Group By Program ID"));
+    sortGroupMenu->AddItem(tr("Group By None"));
+}

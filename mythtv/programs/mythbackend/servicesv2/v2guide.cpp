@@ -217,7 +217,8 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
                                         const QString   &sSort,
                                         bool             bDescending,
                                         bool             bWithInvisible,
-                                        const QString& sCatType)
+                                        const QString& sCatType,
+                                        const QString& sGroupBy)
 {
     if (!rawStartTime.isNull() && !rawStartTime.isValid())
         throw QString( "StartTime is invalid" );
@@ -230,6 +231,17 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
 
     if (!rawEndTime.isNull() && dtEndTime < dtStartTime)
         throw QString( "EndTime is before StartTime");
+
+    ProgGroupBy::Type nGroupBy = ProgGroupBy::ChanNum;
+    if (!sGroupBy.isEmpty())
+    {
+        // Handle ProgGroupBy enum name
+        auto meta = QMetaEnum::fromType<ProgGroupBy::Type>();
+        bool ok = false;
+        nGroupBy = ProgGroupBy::Type(meta.keyToValue(sGroupBy.toLocal8Bit(), &ok));
+        if (!ok)
+            throw QString( "GroupBy is invalid" );
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -352,7 +364,8 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
 
     uint nTotalAvailable = 0;
     LoadFromProgram( progList, sSQL, bindings, schedList,
-                     (uint)nStartIndex, (uint)nCount, nTotalAvailable);
+                     (uint)nStartIndex, (uint)nCount, nTotalAvailable,
+                     nGroupBy);
 
     // ----------------------------------------------------------------------
     // Build Response

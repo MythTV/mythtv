@@ -72,6 +72,7 @@ bool ProgFinder::Create()
     UIUtilW::Assign(this, m_help1Text, "help1text");
     UIUtilW::Assign(this, m_help2Text, "help2text");
     UIUtilW::Assign(this, m_searchText, "search");
+    UIUtilW::Assign(this, m_groupByText, "groupby");
 
     if (err)
     {
@@ -221,35 +222,36 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
 
 void ProgFinder::ShowMenu(void)
 {
-    QString label = tr("Options");
+    auto *menu = new MythMenu(tr("Options"), this, "menu");
+
+    if (!m_searchStr.isEmpty())
+        menu->AddItem(tr("Clear Search"));
+    menu->AddItem(tr("Edit Search"));
+    if (GetFocusWidget() == m_timesList && m_timesList->GetCount() > 0)
+    {
+        auto *sortGroupMenu = new MythMenu(tr("Sort/Group Options"), this,
+                                           "sortgroupmenu");
+        AddGroupMenuItems(sortGroupMenu);
+        menu->AddItem(tr("Sort/Group"), nullptr, sortGroupMenu);
+        menu->AddItem(tr("Toggle Record"));
+        menu->AddItem(tr("Program Details"));
+        menu->AddItem(tr("Upcoming"));
+        menu->AddItem(tr("Previously Recorded"));
+        menu->AddItem(tr("Custom Edit"));
+        menu->AddItem(tr("Program Guide"));
+        menu->AddItem(tr("Channel Search"));
+    }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    auto *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
 
-    if (menuPopup->Create())
-    {
-        menuPopup->SetReturnEvent(this, "menu");
-
-        if (!m_searchStr.isEmpty())
-            menuPopup->AddButton(tr("Clear Search"));
-        menuPopup->AddButton(tr("Edit Search"));
-        if (GetFocusWidget() == m_timesList && m_timesList->GetCount() > 0)
-        {
-            menuPopup->AddButton(tr("Toggle Record"));
-            menuPopup->AddButton(tr("Program Details"));
-            menuPopup->AddButton(tr("Upcoming"));
-            menuPopup->AddButton(tr("Previously Recorded"));
-            menuPopup->AddButton(tr("Custom Edit"));
-            menuPopup->AddButton(tr("Program Guide"));
-            menuPopup->AddButton(tr("Channel Search"));
-        }
-
-        popupStack->AddScreen(menuPopup);
-    }
-    else
+    if (!menuPopup->Create())
     {
         delete menuPopup;
+        return;
     }
+
+    popupStack->AddScreen(menuPopup);
 }
 
 void ProgFinder::customEvent(QEvent *event)
@@ -262,7 +264,8 @@ void ProgFinder::customEvent(QEvent *event)
 
         const QString& message = me->Message();
 
-        if (message == "SCHEDULE_CHANGE")
+        if (message == "SCHEDULE_CHANGE"
+            || message == "GROUPBY_CHANGE")
         {
             if (GetFocusWidget() == m_timesList)
             {
@@ -520,8 +523,10 @@ void ProgFinder::updateShowList()
 void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 {
     progTitle = m_showList->GetValue();
-
     QDateTime progStart = MythDate::current();
+    ProgGroupBy::Type groupBy = GetProgramListGroupBy();
+    if (m_groupByText)
+	m_groupByText->SetText(ProgGroupBy::toString(groupBy));
 
     MSqlBindings bindings;
     QString querystr = "WHERE program.title = :TITLE "
@@ -532,7 +537,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
     bindings[":ENDTIME"] = progStart.addSecs(50 - progStart.time().second());
 
     LoadFromScheduler(m_schedList);
-    LoadFromProgram(m_showData, querystr, bindings, m_schedList);
+    LoadFromProgram(m_showData, querystr, bindings, m_schedList, groupBy);
 
     updateTimesList();
 

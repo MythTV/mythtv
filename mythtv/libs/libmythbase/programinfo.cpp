@@ -5658,7 +5658,8 @@ QStringList ProgramInfo::LoadFromScheduler(
 //       results returned for any of it's users.
 static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
                              MSqlQuery &query, const uint start,
-                             const uint limit, uint &count)
+                             const uint limit, uint &count,
+                             ProgGroupBy::Type groupBy)
 {
     count = 0;
 
@@ -5677,15 +5678,43 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
         "program.season,          program.episode,         program.totalepisodes ");  // 29-31
 
     QString querystr = QString(
-        "SELECT %1 "
-        "FROM program "
-        "LEFT JOIN channel ON program.chanid = channel.chanid "
-        "LEFT JOIN oldrecorded AS oldrecstatus ON "
-        "    oldrecstatus.future = 0 AND "
-        "    program.title = oldrecstatus.title AND "
-        "    channel.callsign = oldrecstatus.station AND "
-        "    program.starttime = oldrecstatus.starttime "
-        ) + sql;
+	"SELECT %1 FROM ( "
+        "    SELECT %2 "
+        "    FROM program "
+        "    LEFT JOIN channel ON program.chanid = channel.chanid "
+        "    LEFT JOIN oldrecorded AS oldrecstatus ON "
+        "        oldrecstatus.future = 0 AND "
+        "        program.title = oldrecstatus.title AND "
+        "        channel.callsign = oldrecstatus.station AND "
+        "        program.starttime = oldrecstatus.starttime "
+        ) + sql +
+	") groupsq ";
+
+    // If a ProgGroupBy option is specified, wrap the query in an outer
+    // query using row_number() and select only rows with value 1.  We
+    // do this instead of relying on MySQL's liberal support for group
+    // by on non-aggregated columns because it is deterministic.
+    if (groupBy != ProgGroupBy::None)
+    {
+        columns +=
+            ", row_number() over ( "
+            "      partition by ";
+        if (groupBy == ProgGroupBy::ChanNum)
+            columns += "channel.channum, "
+		"       channel.callsign, ";
+        else if (groupBy == ProgGroupBy::CallSign)
+            columns += "channel.callsign, ";
+        else if (groupBy == ProgGroupBy::ProgramId)
+            columns += "program.programid, ";
+        columns +=
+            "           program.title,     "
+            "           program.starttime  "
+            "      order by channel.recpriority desc, "
+	    "               channel.sourceid, "
+            "               channel.channum+0 "
+	    ") grouprn ";
+        querystr += "WHERE grouprn = 1 ";
+    }
 
     // If a limit arg was given then append the LIMIT, otherwise set a hard
     // limit of 20000.
@@ -5713,7 +5742,8 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     //      Therefore two queries is 1.4 seconds faster than one query.
     if (start > 0 || limit > 0)
     {
-        QString countStr = querystr.arg("SQL_CALC_FOUND_ROWS program.chanid");
+        QString countStr = querystr
+	    .arg("SQL_CALC_FOUND_ROWS chanid", columns);
         query.prepare(countStr);
         for (it = bindings.begin(); it != bindings.end(); ++it)
         {
@@ -5734,7 +5764,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     if (start > 0)
         querystr += QString("OFFSET %1 ").arg(start);
 
-    querystr = querystr.arg(columns);
+    querystr = querystr.arg("*", columns);
     query.prepare(querystr);
     for (it = bindings.begin(); it != bindings.end(); ++it)
     {
@@ -5770,12 +5800,13 @@ bool LoadFromProgram(ProgramList &destination, const QString &where,
 
     // ------------------------------------------------------------------------
 
-    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0, count);
+    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0,
+                           count);
 }
 
 bool LoadFromProgram(ProgramList &destination,
                      const QString &sql, const MSqlBindings &bindings,
-                     const ProgramList &schedList)
+                     const ProgramList &schedList, ProgGroupBy::Type groupBy)
 {
     uint count = 0;
 
@@ -5796,16 +5827,6 @@ bool LoadFromProgram(ProgramList &destination,
     if (!queryStr.contains("WHERE"))
         queryStr += " WHERE deleted IS NULL AND visible > 0 ";
 
-    // NOTE: Any GROUP BY clause with a LIMIT is slow, adding at least
-    // a couple of seconds to the query execution time
-
-    // TODO: This one seems to be dealing with eliminating duplicate channels (same
-    // programming, different source), but using GROUP BY for that isn't very
-    // efficient so another approach is required
-    if (!queryStr.contains("GROUP BY"))
-        queryStr += " GROUP BY program.starttime, channel.channum, "
-                    "          channel.callsign, program.title ";
-
     if (!queryStr.contains("ORDER BY"))
     {
         queryStr += " ORDER BY program.starttime, ";
@@ -5819,13 +5840,15 @@ bool LoadFromProgram(ProgramList &destination,
 
     // ------------------------------------------------------------------------
 
-    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0, count);
+    return LoadFromProgram(destination, queryStr, bindings, schedList, 0, 0,
+                           count, groupBy);
 }
 
 bool LoadFromProgram( ProgramList &destination,
                       const QString &sql, const MSqlBindings &bindings,
                       const ProgramList &schedList,
-                      const uint start, const uint limit, uint &count)
+                      const uint start, const uint limit, uint &count,
+                      ProgGroupBy::Type groupBy)
 {
     destination.clear();
 
@@ -5845,7 +5868,7 @@ bool LoadFromProgram( ProgramList &destination,
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
-    if (!FromProgramQuery(sql, bindings, query, start, limit, count))
+    if (!FromProgramQuery(sql, bindings, query, start, limit, count, groupBy))
         return false;
 
     if (count == 0)
@@ -6568,6 +6591,23 @@ void ProgramInfo::CalculateProgress(uint64_t pos)
 {
     CalculateRecordedProgress();
     CalculateWatchedProgress(pos);
+}
+
+QString ProgGroupBy::toString(ProgGroupBy::Type groupBy)
+{
+    switch (groupBy)
+    {
+        case ProgGroupBy::None:
+	    return tr("None");
+        case ProgGroupBy::ChanNum:
+	    return tr("Channel Number");
+	case ProgGroupBy::CallSign:
+	    return tr("CallSign");
+	case ProgGroupBy::ProgramId:
+	    return tr("ProgramId");
+	default:
+	    return tr("Unknown");
+    }
 }
 
 
