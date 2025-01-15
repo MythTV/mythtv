@@ -1064,6 +1064,8 @@ static void init_fixup(FixupMap &fix)
     for (int i = 2102; i <= 2110; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2112LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2113LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2114LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2116LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2302LL << 32 | 2U << 16] = EITFixUp::kFixUK;
