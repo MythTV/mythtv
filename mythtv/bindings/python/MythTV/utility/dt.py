@@ -14,6 +14,9 @@ from collections import namedtuple
 import os
 import re
 import time
+import sys
+
+IS_PY312plus = (sys.version_info[:3] >= (3, 12, 0))
 
 HAVEZONEINFO = False
 try:
@@ -356,8 +359,11 @@ class datetime( _pydatetime ):
 
     @classmethod
     def utcnow(cls):
-        obj = super(datetime, cls).utcnow()
-        return obj.replace(tzinfo=cls.UTCTZ())
+        if IS_PY312plus:
+            return cls.now(tz=cls.UTCTZ())
+        else:
+            obj = super(datetime, cls).utcnow()
+            return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
     def fromtimestamp(cls, timestamp, tz=None):
@@ -368,8 +374,11 @@ class datetime( _pydatetime ):
 
     @classmethod
     def utcfromtimestamp(cls, timestamp):
-        obj = super(datetime, cls).utcfromtimestamp(float(timestamp))
-        return obj.replace(tzinfo=cls.UTCTZ())
+        if IS_PY312plus:
+            return cls.fromtimestamp(timestamp, tz=cls.UTCTZ())
+        else:
+            obj = super(datetime, cls).utcfromtimestamp(float(timestamp))
+            return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
     def strptime(cls, datestring, format, tzinfo=None):

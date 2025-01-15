@@ -144,8 +144,18 @@ def buildSingle(inetref, opts):
     # tmdb already sorts the posters by language
     # if no poster of given language was found,
     # try to sort by system language and then by language "en"
-    system_language = py_locale.getdefaultlocale()[0].split("_")[0]
-    system_country = py_locale.getdefaultlocale()[0].split("_")[1]
+    if sys.version_info >= (3,11):
+        s_locale = py_locale.getlocale()
+    else:
+        s_locale = py_locale.getdefaultlocale()
+
+    #  locale might be 'C.UTF-8'
+    if "_" in s_locale[0]:
+        system_language = s_locale[0].split("_")[0]
+        system_country = s_locale[0].split("_")[1]
+    else:
+        system_language = 'en'
+        system_country = 'US'
     locale_language = get_locale().language
     locale_country = get_locale().country
     if opts.debug:
