@@ -44,6 +44,7 @@ export interface GetProgramListRequest {
     Descending?:        boolean;
     WithInvisible?:     boolean;
     CatType?:           string;
+    GroupBy?:           string;
 }
 
 export interface GetStoredSearchesResponse {

@@ -1,11 +1,21 @@
 <h2>{{ 'dashboard.programguide' | translate }} </h2>
 <div *ngIf="loaded; else loading" style="min-width: 960px;">
+    <div class="block pt-3"></div>
     <div class="flex">
-
-        <div class="flex align-items-center pr-5" *ngIf="displayType == GRID">
+        <div class="flex align-items-center pr-3" *ngIf="displayType == GRID">
             <p-dropdown [(ngModel)]="channelGroup" [options]="channelGroups" name="channelGroup" (onChange)="refresh()"
                 optionLabel="Name" pTooltip="{{ 'dashboard.guide.channel_group' | translate }}" tooltipPosition="top">
             </p-dropdown>
+        </div>
+
+        <div class="flex align-items-center pr-3"
+            *ngIf="[TITLESEARCH,PEOPLESEARCH,FULLSEARCH,CATSEARCH,ANYSEARCH].indexOf(displayType) > -1">
+            <span class="p-float-label">
+                <p-dropdown [(ngModel)]="groupBy" [options]="groupByList" name="groupBy" (onChange)="refresh()"
+                    optionLabel="Name">
+                </p-dropdown>
+                <label for="float-label" class="white-space-nowrap">{{ 'dashboard.guide.group_by' | translate }}</label>
+            </span>
         </div>
 
         <div class="flex align-items-center">
@@ -17,20 +27,20 @@
             </p-calendar>
         </div>
 
-        <div class="flex align-items-center p-5" *ngIf="displayType == CHANNEL">
+        <div class="flex align-items-center p-3" *ngIf="displayType == CHANNEL">
             <b> {{ 'dashboard.guide.channel' | translate }} {{channel.ChanNum}} {{channel.CallSign}}
                 {{channel.ChannelName}}</b>
         </div>
-        <div class="flex align-items-center p-5" *ngIf="displayType == PEOPLESEARCH">
+        <div class="flex align-items-center p-3" *ngIf="displayType == PEOPLESEARCH">
             <b> {{ 'dashboard.guide.people_search' | translate }} </b>
         </div>
-        <div class="flex align-items-center p-5" *ngIf="displayType == TITLESEARCH">
+        <div class="flex align-items-center p-3" *ngIf="displayType == TITLESEARCH">
             <b> {{ 'dashboard.guide.title_search' | translate }} </b>
         </div>
-        <div class="flex align-items-center p-5" *ngIf="displayType == FULLSEARCH">
+        <div class="flex align-items-center p-3" *ngIf="displayType == FULLSEARCH">
             <b> {{ 'dashboard.guide.full_search' | translate }} </b>
         </div>
-        <div class="flex align-items-center p-5" *ngIf="displayType == CATSEARCH">
+        <div class="flex align-items-center p-3" *ngIf="displayType == CATSEARCH">
             <b> {{ 'dashboard.guide.cat_search' | translate }} </b>
         </div>
 

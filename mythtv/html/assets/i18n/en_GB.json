@@ -108,6 +108,13 @@
             "color_includes": "This list only includes colours for programs on the current page of the guide. The full list of colours is in the file mentioned below.",
             "colors": "Colours",
             "full_search": "Full Search",
+            "group_by": "Group By",
+            "groupby": {
+                "CallSign": "Call Sign",
+                "ChanNum": "Channel Number",
+                "None": "None",
+                "ProgramId": "Program Id"
+            },
             "movies": "Movies",
             "new": "New",
             "new_search": "New Titles",

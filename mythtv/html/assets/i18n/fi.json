@@ -108,6 +108,13 @@
             "color_includes": "Tämä luettelo sisältää vain oppaan nykyisen sivun ohjelmien värit. Täydellinen väriluettelo on alla mainitussa tiedostossa.",
             "colors": "värit",
             "full_search": "Täysi haku",
+            "group_by": "Ryhmäperuste",
+            "groupby": {
+                "CallSign": "Kutsumerkki",
+                "ChanNum": "Kanavan numero",
+                "None": "Ei mitään",
+                "ProgramId": "Ohjelman tunnus"
+            },
             "movies": "Elokuvat",
             "new": "Uusi",
             "new_search": "Uudet otsikot",

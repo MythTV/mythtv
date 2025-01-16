@@ -108,6 +108,13 @@
             "color_includes": "Tento seznam obsahuje pouze barvy pro programy na aktuální stránce průvodce. Úplný seznam barev je v souboru uvedeném níže.",
             "colors": "Barvy",
             "full_search": "Úplné vyhledávání",
+            "group_by": "Seskupit podle",
+            "groupby": {
+                "CallSign": "Volací znak",
+                "ChanNum": "Číslo kanálu",
+                "None": "Žádný",
+                "ProgramId": "ID programu"
+            },
             "movies": "Filmy",
             "new": "Nový",
             "new_search": "Nové tituly",

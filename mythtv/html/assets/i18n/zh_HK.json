@@ -108,6 +108,13 @@
             "color_includes": "此清單僅包含指南目前頁面上的程式的顏色。完整的顏色清單位於下面提到的文件中。",
             "colors": "顏色",
             "full_search": "完整搜尋",
+            "group_by": "分組依據",
+            "groupby": {
+                "CallSign": "呼號",
+                "ChanNum": "頻道數",
+                "None": "沒有任何",
+                "ProgramId": "節目編號"
+            },
             "movies": "電影",
             "new": "新的",
             "new_search": "新標題",

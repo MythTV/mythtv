@@ -56,14 +56,33 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   startGroup?: number;
   onlyNew = false;
   onlyMovies = false;
+  groupByList = [
+    { Value: 'None', Name: 'dashboard.guide.groupby.None' },
+    { Value: 'ChanNum', Name: 'dashboard.guide.groupby.ChanNum' },
+    { Value: 'CallSign', Name: 'dashboard.guide.groupby.CallSign' },
+    { Value: 'ProgramId', Name: 'dashboard.guide.groupby.ProgramId' },
+  ];
+  groupBy = this.groupByList[0];
+
 
   constructor(private guideService: GuideService, private route: ActivatedRoute,
     private translate: TranslateService) {
     this.translate.onLangChange.subscribe((event: TranslationChangeEvent) => {
       console.log("Event: language change, new language (" + event.lang + ")");
       this.switchLanguage(event.lang);
-      // this.fetchData();
-    })
+    });
+    this.groupByList.forEach(element => {
+      this.translate.get(element.Name).subscribe(data => {
+        element.Name = data;
+      });
+    });
+    let wantedId = localStorage.getItem("GuideGroupBy");
+    if (wantedId) {
+      let groupBy = this.groupByList.find( element => element.Value == wantedId );
+      if (groupBy)
+        this.groupBy = groupBy;
+    }
+    localStorage.setItem("GuideGroupBy", this.groupBy.Value);
   }
 
 
@@ -80,8 +99,6 @@ export class GuideComponent implements OnInit, SchedulerSummary {
       this.startTime = reqDate;
     else
       this.startTime = undefined;
-    // if (this.startChanid)
-    //   this.channelGroup = this.allGroup;
     this.startSchedule = this.route.snapshot.queryParams.Schedule;
     this.fetchData(this.startTime);
   }
@@ -151,7 +168,8 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     let startDate = new Date(millisecs + 1000);
     let request: GetProgramListRequest = {
       Details: true,
-      StartTime: startDate.toISOString()
+      StartTime: startDate.toISOString(),
+      GroupBy: this.groupBy.Value
     };
     if (this.searchValue == "") {
       if (this.onlyMovies || this.onlyNew)
@@ -215,6 +233,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
   refresh(): void {
     this.refreshing = true;
     localStorage.setItem("ChannelGroup", this.channelGroup.Name);
+    localStorage.setItem("GuideGroupBy", this.groupBy.Value);
     switch (this.displayType) {
       case this.GRID:
         if (this.m_startDate) {

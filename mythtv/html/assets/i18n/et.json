@@ -108,6 +108,13 @@
             "color_includes": "See loend sisaldab ainult juhendi praegusel lehel olevate programmide värve. Täielik värvide loend on allpool mainitud failis.",
             "colors": "Värvid",
             "full_search": "Täielik otsing",
+            "group_by": "Grupeeri",
+            "groupby": {
+                "CallSign": "Kutsung",
+                "ChanNum": "Kanali number",
+                "None": "Mitte ühtegi",
+                "ProgramId": "Programmi ID"
+            },
             "movies": "Filmid",
             "new": "Uus",
             "new_search": "Uued pealkirjad",

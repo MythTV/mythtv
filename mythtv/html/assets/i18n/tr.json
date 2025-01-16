@@ -108,6 +108,13 @@
             "color_includes": "Bu liste yalnızca kılavuzun geçerli sayfasındaki programların renklerini içerir. Renklerin tam listesi aşağıda belirtilen dosyada bulunmaktadır.",
             "colors": "Renkler",
             "full_search": "Tam arama",
+            "group_by": "Gruplandırma Ölçütü",
+            "groupby": {
+                "CallSign": "Çağrı İşareti",
+                "ChanNum": "Kanal Numarası",
+                "None": "Hiçbiri",
+                "ProgramId": "Program Kimliği"
+            },
             "movies": "Filmler",
             "new": "Yeni",
             "new_search": "Yeni Başlıklar",

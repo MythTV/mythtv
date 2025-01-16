@@ -108,6 +108,13 @@
             "color_includes": "Deze lijst bevat alleen kleuren voor programma's op de huidige pagina van de gids. De volledige lijst met kleuren staat in het onderstaande bestand.",
             "colors": "Kleuren",
             "full_search": "Volledige zoekopdracht",
+            "group_by": "Groepeer op",
+            "groupby": {
+                "CallSign": "Roepnaam",
+                "ChanNum": "Kanaalnummer",
+                "None": "Geen",
+                "ProgramId": "Programma-ID"
+            },
             "movies": "Films",
             "new": "Nieuw",
             "new_search": "Nieuwe titels",

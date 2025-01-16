@@ -108,6 +108,13 @@
             "color_includes": "Ez a lista csak az útmutató aktuális oldalán található programok színeit tartalmazza. A színek teljes listája az alábbi fájlban található.",
             "colors": "Színek",
             "full_search": "Teljes keresés",
+            "group_by": "Csoportosítás szerint",
+            "groupby": {
+                "CallSign": "Hívójel",
+                "ChanNum": "Csatorna száma",
+                "None": "Egyik sem",
+                "ProgramId": "Program Id"
+            },
             "movies": "Filmek",
             "new": "Új",
             "new_search": "Új címek",

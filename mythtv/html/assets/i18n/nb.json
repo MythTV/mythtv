@@ -108,6 +108,13 @@
             "color_includes": "Denne listen inkluderer kun farger for programmer på gjeldende side i veiledningen. Den fullstendige listen over farger er i filen nevnt nedenfor.",
             "colors": "Farger",
             "full_search": "Fullt søk",
+            "group_by": "Grupper etter",
+            "groupby": {
+                "CallSign": "Kallesignal",
+                "ChanNum": "Kanalnummer",
+                "None": "Ingen",
+                "ProgramId": "Program-ID"
+            },
             "movies": "Filmer",
             "new": "Ny",
             "new_search": "Nye titler",

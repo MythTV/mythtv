@@ -108,6 +108,13 @@
             "color_includes": "Diese Liste enthält nur Farben für Programme auf der aktuellen Seite des Handbuchs. Die vollständige Liste der Farben finden Sie in der unten genannten Datei.",
             "colors": "Farben",
             "full_search": "Volle Suche",
+            "group_by": "Gruppieren nach",
+            "groupby": {
+                "CallSign": "Rufzeichen",
+                "ChanNum": "Kanalnummer",
+                "None": "Keiner",
+                "ProgramId": "Programm-ID"
+            },
             "movies": "Filme",
             "new": "Neu",
             "new_search": "Neue Titel",

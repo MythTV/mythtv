@@ -108,6 +108,13 @@
             "color_includes": "Aquesta llista només inclou els colors dels programes de la pàgina actual de la guia. La llista completa de colors es troba al fitxer esmentat a continuació.",
             "colors": "Colors",
             "full_search": "Cerca completa",
+            "group_by": "Grup Per",
+            "groupby": {
+                "CallSign": "Indicatiu de trucada",
+                "ChanNum": "Número de canal",
+                "None": "Cap",
+                "ProgramId": "Id. del programa"
+            },
             "movies": "Pel·lícules",
             "new": "Nou",
             "new_search": "Nous Títols",

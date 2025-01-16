@@ -108,6 +108,13 @@
             "color_includes": "Ovaj popis uključuje samo boje za programe na trenutnoj stranici vodiča. Potpuni popis boja nalazi se u datoteci navedenoj u nastavku.",
             "colors": "Boje",
             "full_search": "Potpuna pretraga",
+            "group_by": "Grupiraj po",
+            "groupby": {
+                "CallSign": "Pozivni znak",
+                "ChanNum": "Broj kanala",
+                "None": "Nijedan",
+                "ProgramId": "ID programa"
+            },
             "movies": "Filmovi",
             "new": "Novi",
             "new_search": "Novi naslovi",

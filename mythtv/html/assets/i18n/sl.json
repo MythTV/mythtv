@@ -108,6 +108,13 @@
             "color_includes": "Ta seznam vključuje samo barve za programe na trenutni strani vodnika. Celoten seznam barv je v spodnji datoteki.",
             "colors": "Barve",
             "full_search": "Celotno iskanje",
+            "group_by": "Združi po",
+            "groupby": {
+                "CallSign": "Klicni znak",
+                "ChanNum": "Številka kanala",
+                "None": "Noben",
+                "ProgramId": "ID programa"
+            },
             "movies": "Filmi",
             "new": "Novo",
             "new_search": "Novi naslovi",

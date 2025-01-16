@@ -108,6 +108,13 @@
             "color_includes": "Ta lista zawiera tylko kolory programów znajdujących się na bieżącej stronie przewodnika. Pełna lista kolorów znajduje się w pliku wymienionym poniżej.",
             "colors": "Zabarwienie",
             "full_search": "Pełne wyszukiwanie",
+            "group_by": "Grupuj według",
+            "groupby": {
+                "CallSign": "Znak wywoławczy",
+                "ChanNum": "Numer kanału",
+                "None": "Nic",
+                "ProgramId": "Identyfikator programu"
+            },
             "movies": "Kino",
             "new": "Nowy",
             "new_search": "Nowe tytuły",

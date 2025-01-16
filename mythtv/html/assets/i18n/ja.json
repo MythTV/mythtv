@@ -108,6 +108,13 @@
             "color_includes": "このリストには、ガイドの現在のページにあるプログラムの色のみが含まれています。色の完全なリストは、以下のファイルにあります。",
             "colors": "色",
             "full_search": "全検索",
+            "group_by": "グループ化",
+            "groupby": {
+                "CallSign": "コールサイン",
+                "ChanNum": "チャンネル番号",
+                "None": "なし",
+                "ProgramId": "プログラムID"
+            },
             "movies": "映画",
             "new": "新しい",
             "new_search": "新しいタイトル",
