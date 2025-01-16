@@ -231,12 +231,15 @@ class ScanTransponder: public TransMythUIComboBoxSetting
         addSelection("(Select Satellite)", "Select", true);
 
         // Satellite tuning data
-        m_tdm["1 TH"] = { "1 TH", "Thor 5/6/7 0.8W", "10872000", "h", "25000000", "8PSK", "DVB-S2", "3/4" };
-        m_tdm["2 E7"] = { "2 E7", "Eutelsat   7.0E", "10721000", "h", "22000000", "QPSK", "DVB-S",  "3/4" };
-        m_tdm["3 HB"] = { "3 HB", "Hotbird   13.0E", "12015000", "h", "27500000", "8PSK", "DVB-S2", "3/4" };
-        m_tdm["4 A1"] = { "4 A1", "Astra-1   19.2E", "11229000", "v", "22000000", "8PSK", "DVB-S2", "2/3" };
-        m_tdm["5 A3"] = { "5 A3", "Astra-3   23.5E", "12031500", "h", "27500000", "QPSK", "DVB-S2", "auto"};
-        m_tdm["6 A2"] = { "6 A2", "Astra-2   28.2E", "10714000", "h", "22000000", "QPSK", "DVB-S",  "5/6" };
+        m_tdm["1 TH"] = { "1 TH", "Thor 5/6/7  0.8W", "10872000", "h", "25000000", "8PSK", "DVB-S2", "3/4" };
+        m_tdm["2 E7"] = { "2 E7", "Eutelsat    7.0E", "10721000", "h", "22000000", "QPSK", "DVB-S",  "3/4" };
+        m_tdm["3 HB"] = { "3 HB", "Hotbird    13.0E", "12015000", "h", "27500000", "8PSK", "DVB-S2", "3/4" };
+        m_tdm["4 A1"] = { "4 A1", "Astra-1    19.2E", "11229000", "v", "22000000", "8PSK", "DVB-S2", "2/3" };
+        m_tdm["5 A3"] = { "5 A3", "Astra-3    23.5E", "12031500", "h", "27500000", "QPSK", "DVB-S2", "auto"};
+        m_tdm["6 A2"] = { "6 A2", "Astra-2    28.2E", "10773000", "h", "23000000", "8PSK", "DVB-S2", "3/4" };
+        m_tdm["7 T3"] = { "7 T3", "Turksat-3A 42.0E", "12610000", "h", "20830000", "QPSK", "DVB-S",  "3/4" };
+        m_tdm["8 T4"] = { "8 T4", "Turksat-4A 42.0E", "11916000", "v", "30000000", "QPSK", "DVB-S",  "3/4" };
+        m_tdm["9 T8"] = { "9 T8", "Turksat-8K 42.0E", "12605000", "v", "34285000","16APSK","DVB-S2", "2/3" };
 
         for (auto &td: m_tdm)
         {
