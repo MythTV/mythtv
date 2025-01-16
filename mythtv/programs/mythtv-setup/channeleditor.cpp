@@ -883,14 +883,13 @@ void ChannelEditor::customEvent(QEvent *event)
             switch (buttonnum)
             {
                 case 0 : // Import all icons
-                    iconwizard = new ImportIconsWizard(mainStack, false);
+                    iconwizard = new ImportIconsWizard(mainStack, false, m_sourceFilter);
                     break;
                 case 1 : // Rescan for missing
-                    iconwizard = new ImportIconsWizard(mainStack, true);
+                    iconwizard = new ImportIconsWizard(mainStack, true, m_sourceFilter);
                     break;
                 case 2 : // Import a single channel icon
-                    iconwizard = new ImportIconsWizard(mainStack, true,
-                                                       channelname);
+                    iconwizard = new ImportIconsWizard(mainStack, true, 0, channelname);
                     break;
                 default:
                     return;

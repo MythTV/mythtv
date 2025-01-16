@@ -33,7 +33,7 @@ class ImportIconsWizard : public MythScreenType
 
   public:
     ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
-                      QString channelname = "");
+                      int sourceid = 0, QString channelname = "");
    ~ImportIconsWizard() override;
 
     bool Create(void) override; // MythScreenType
@@ -173,6 +173,7 @@ class ImportIconsWizard : public MythScreenType
     int m_nCount          {0};       //!< the current search point (0..m_nMaxCount)
     int m_missingMaxCount {0};       //!< the total number of missing icons
     int m_missingCount    {0};       //!< the current search point (0..m_missingCount)
+    int m_sourceId        {0};       //!< selected video source or 0 for all sources
 
                         //!< the default url
     const QString m_url {"http://services.mythtv.org/channel-icon/"}; 
