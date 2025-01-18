@@ -1057,22 +1057,13 @@ static void init_fixup(FixupMap &fix)
     for (int i = 2037; i <= 2057; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2059LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2063; i <= 2069; ++i)
+    for (int i = 2061; i <= 2069; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2071LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2076LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2081LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2089; i <= 2092; ++i)
+    for (int i = 2089; i <= 2116; ++i)
        fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2094; i <= 2099; ++i)
-       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    for (int i = 2102; i <= 2110; ++i)
-       fix[ (long long)i << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2112LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2113LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2114LL << 32 | 2U << 16] = EITFixUp::kFixUK;
-    fix[ 2116LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK | EITFixUp::kFixHTML;
     fix[ 2302LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2303LL << 32 | 2U << 16] = EITFixUp::kFixUK;
