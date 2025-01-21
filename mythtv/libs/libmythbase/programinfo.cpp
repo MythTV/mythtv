@@ -1761,9 +1761,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["rectype"] = ::toString(GetRecordingRuleType());
     progMap["rectypestatus"] = GetRecTypeStatus(showrerecord);
 
-    progMap["card"] = RecStatus::toString(GetRecordingStatus(), m_inputId);
-    progMap["input"] = RecStatus::toString(GetRecordingStatus(),
-                                           GetShortInputName());
+    progMap["card"] = RecStatus::toString(GetRecordingStatus(),
+					  GetShortInputName());
+    progMap["input"] = RecStatus::toString(GetRecordingStatus(), m_inputId);
     progMap["inputname"] = m_inputName;
     // Don't add bookmarkupdate to progMap, for now.
 
