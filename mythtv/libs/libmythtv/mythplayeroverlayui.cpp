@@ -17,7 +17,7 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
     // Register our state type for signalling
     qRegisterMetaType<MythOverlayState>();
 
-    m_positionUpdateTimer.setInterval(999ms);
+    m_positionUpdateTimer.setInterval(99ms);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
     connect(this, &MythPlayerOverlayUI::OverlayStateChanged, m_tv, &TV::OverlayStateChanged);
     connect(m_tv, &TV::ChangeOSDMessage, this, qOverload<const QString&>(&MythPlayerOverlayUI::UpdateOSDMessage));
