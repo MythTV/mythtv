@@ -12,6 +12,42 @@ if(NOT USING_BINDINGS_PYTHON)
 endif()
 
 #
+# Choose the install method
+#
+if(NOT "pip" IN_LIST Python3Modules_COMPONENTS_FOUND)
+  list(APPEND _pi_missing "pip")
+endif()
+if(NOT "wheel" IN_LIST Python3Modules_COMPONENTS_FOUND)
+  list(APPEND _pi_missing "wheel")
+endif()
+
+if(Python3_VERSION VERSION_GREATER_EQUAL 3.12)
+  # Requires pip install method
+  if(_pi_missing)
+    message(STATUS "Python pip install not available (missing module(s): ${_pi_missing})")
+    message(STATUS "Python 3.12+ requires pip install. Disabling python bindings.")
+    set(USING_BINDINGS_PYTHON OFF)
+    return()
+  endif()
+  set(USE_PYTHON_PIP TRUE)
+elseif(Python3_VERSION VERSION_GREATER_EQUAL 3.11)
+  # Allows pip or setup.py install method
+  if(_pi_missing)
+    message(STATUS "Python pip install not available (missing module(s): ${_pi_missing})")
+  else()
+    set(USE_PYTHON_PIP TRUE)
+  endif()
+else()
+  # Older python uses setup.py install method
+endif()
+
+if(USE_PYTHON_PIP)
+  message(STATUS "Using python pip install method")
+else()
+  message(STATUS "Using python setup.py install method")
+endif()
+
+#
 # Building out of tree.  Copy everything to the binary directory so that the
 # python install scripts will worlk properly.
 #
@@ -24,21 +60,6 @@ file(
        ttvdbv4
        tvmaze
   DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-
-if("pip" IN_LIST Python3Modules_COMPONENTS_FOUND
-   AND "wheel" IN_LIST Python3Modules_COMPONENTS_FOUND)
-  message(STATUS "Using python pip install method")
-  set(USE_PYTHON_PIP TRUE)
-else()
-  if(NOT "pip" IN_LIST Python3Modules_COMPONENTS_FOUND)
-    list(APPEND _pi_missing "pip")
-  endif()
-  if(NOT "wheel" IN_LIST Python3Modules_COMPONENTS_FOUND)
-    list(APPEND _pi_missing "wheel")
-  endif()
-  message(STATUS "Python pip install not available (missing module(s): ${_pi_missing})")
-  message(STATUS "Using python setup.py install method")
-endif()
 
 #
 # Variables used to build and install
