@@ -105,7 +105,7 @@ if(USE_PYTHON_PIP)
   #
   install(
     CODE "execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install ${ROOT_FLAGS}
-                                ${PREFIX_FLAGS} ${PIP_OPTIONS}
+                                ${PREFIX_FLAGS} ${PIP_OPTIONS} --ignore-installed
                                  --find-links ${PROJECT_BINARY_DIR}/${WHEEL_DIR} MythTV)"
   )
 else()
