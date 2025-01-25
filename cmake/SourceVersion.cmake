@@ -109,7 +109,7 @@ function(mythtv_find_source_version version version_major branch)
 
   # Next if git is installed, ask it for the version and branch info. This will
   # succeed if the compile is running from a git tree and fail otherwise.
-  if(NOT versionString AND GIT_EXECUTABLE)
+  if(NOT versionString AND DEFINED GIT_EXECUTABLE)
     message(STATUS "Checking for version info from git")
 
     # Version
@@ -156,7 +156,7 @@ function(mythtv_find_source_version version version_major branch)
   if(NOT versionString)
     set(filename "${mythtv_source_dir}/EXPORTED_VERSION")
     message(STATUS "Checking for version info in ${filename}")
-    source_version_from_file(${filename} versionString branchName)
+    source_version_from_file(${filename} versionString tempBranchName)
 
     # Fix up version
     if(versionString AND NOT versionString MATCHES "^v[0-9]")
@@ -167,7 +167,6 @@ function(mythtv_find_source_version version version_major branch)
         set(versionString "${prefix}-${versionString}")
       endif()
     endif()
-
     clean_branch_information(branchName)
     if(versionString)
       message(STATUS "  version:${versionString} branch:${branchName}")
@@ -179,9 +178,17 @@ function(mythtv_find_source_version version version_major branch)
     set(filename "${mythtv_source_dir}/SRC_VERSION")
     message(STATUS "Checking for version info in ${filename}")
     if(EXISTS ${filename})
-      source_version_from_file(${filename} versionString branchName)
+      source_version_from_file(${filename} versionString tempBranchName)
       message(STATUS "  version:${versionString}")
     endif()
+  endif()
+
+  # Prevent the source_version_from_file from stomping on any branch
+  # name discovered by git previously with NULL.
+  # This case is known to occur on a fork where the data used in
+  # git describe is stripped from the fork/branch.
+  if(tempBranchName)
+    set(branchName ${tempBranchName})
   endif()
 
   # All the options for retrieving data have been tried. Validate the format of
