@@ -247,6 +247,13 @@ class MTV_PUBLIC IPTVTuningData
     //
     bool CanReadHTTP(QByteArray &buffer) const
     {
+        // Check needed for use in the unit test
+        if (QCoreApplication::instance() == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("CanReadHTTP - No QCoreApplication!!"));
+            return false;
+        }
+
         QString url = m_dataUrl.toString();
         MythSingleDownload downloader;
         downloader.DownloadURL(url, &buffer, 5s, 0, 2000);
