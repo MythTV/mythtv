@@ -64,8 +64,11 @@ file(
 #
 # Variables used to build and install
 #
-set(PIP_OPTIONS -q --no-build-isolation --no-cache-dir --no-index
+set(PIP_OPTIONS --no-build-isolation --no-cache-dir --no-index
                 --disable-pip-version-check --no-deps)
+if(NOT CMAKE_VERBOSE_MAKEFILE)
+  list(APPEND PIP_OPTIONS -q)
+endif()
 set(WHEEL_DIR dist)
 if(NOT MYTH_BINDINGS_INSTALL_ROOT STREQUAL "")
   set(ROOT_FLAGS --root=${MYTH_BINDINGS_INSTALL_ROOT})
@@ -103,8 +106,11 @@ if(USE_PYTHON_PIP)
   #
   # Call the python installer to do the install.
   #
+  if(CMAKE_VERBOSE_MAKEFILE)
+    set(_ECHO_INSTALL "COMMAND_ECHO STDOUT ")
+  endif()
   install(
-    CODE "execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install ${ROOT_FLAGS}
+    CODE "execute_process(${_ECHO_INSTALL} COMMAND ${Python3_EXECUTABLE} -m pip install ${ROOT_FLAGS}
                                 ${PREFIX_FLAGS} ${PIP_OPTIONS} --ignore-installed
                                  --find-links ${PROJECT_BINARY_DIR}/${WHEEL_DIR} MythTV)"
   )
