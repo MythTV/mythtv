@@ -309,24 +309,18 @@ jobs:
             qt_version: 'qt6'
             database_version: 'mariadb'
             extrapkgs: ''
-            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
-            linkerflags: '-Wl,-ld_classic'
           - desc: 'macOS 14 (Sonoma) arm64'
             runner: 'macOS-14'
             arch: 'arm64'
             qt_version: 'qt6'
             database_version: 'mariadb'
             extrapkgs: ''
-            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
-            linkerflags: '-Wl,-ld_classic'
           - desc: 'macOS 15 (Sequoia) arm64'
             runner: 'macOS-15'
             arch: 'arm64'
             qt_version: 'qt6'
             database_version: 'mariadb'
             extrapkgs: ''
-            configureopts: '--disable-firewire  --enable-libmp3lame --enable-libvpx  --enable-libxvid --enable-libx264 --enable-libx265 --enable-bdjava'
-            linkerflags: '-Wl,-ld_classic'
 
         compiler:
           - desc: 'clang'
@@ -339,15 +333,12 @@ jobs:
 
     env:
       TZ: Etc/UTC
-      MYTHTV_CONFIG_PREFIX: "${{ github.workspace }}/build/install"
-      MYTHTV_CONFIG_EXTRA: "--cc=${{ matrix.compiler.cc }} --cxx=${{ matrix.compiler.cxx }} --compile-type=release --enable-debug=0 --disable-debug"
-      MYTHPLUGINS_EXTRA: "--disable-mytharchive --disable-mythnetvision --disable-mythzoneminder --disable-mythzmserver"
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
       CCACHE_MAXSIZE: 250M
-      CONFIGURE_CMD: "./configure"
-      MAKE_CMD: 'make'
-      ANSIBLE_EXTRA: ''
+      CONFIGURE_CMD: 'cmake --preset ${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release'
+      MAKE_CMD: 'cmake --build build-${{ matrix.os.qt_version }}'
+      TEST_CMD: 'cmake --build build-${{ matrix.os.qt_version }} -t MythTV-tests'
 
     steps:
       - name: Checkout ccache
@@ -390,10 +381,6 @@ jobs:
 
       - name: Setup build envinomental variables
         run: |
-          echo "C_INCLUDE_PATH=${PKGMGR_PREFIX}/include" >> $GITHUB_ENV
-          echo "CPLUS_INCLUDE_PATH=${PKGMGR_PREFIX}/include" >> $GITHUB_ENV
-          echo "LDFLAGS=-L${PKGMGR_PREFIX}/lib ${{ matrix.os.linkerflags }}" >> $GITHUB_ENV
-          echo "LIBRARY_PATH=${PKGMGR_PREFIX}/lib" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=${PKGMGR_PREFIX}/lib/pkgconfig" >> $GITHUB_ENV
           echo "QMAKE_CMD=${PKGMGR_PREFIX}/opt/${{ matrix.os.qt_version }}/bin/qmake" >> $GITHUB_ENV
 
@@ -430,7 +417,7 @@ jobs:
         run: ln -s $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun.dylib $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun_arm64.dylib
         if: matrix.os.arch == 'arm64'
 
-      - name: Fix the HDHomeRun library on ARM64
+      - name: Fix the HDHomeRun library on x86_64
         run: ln -s $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun.dylib $PKGMGR_PREFIX/opt/libhdhomerun/lib/libhdhomerun_x64.dylib
         if: matrix.os.arch == 'x86_64'
 
@@ -443,32 +430,16 @@ jobs:
         run: ccache -s
 
       - name: Configure core
-        working-directory: mythtv/mythtv
-        run: ${CONFIGURE_CMD} --prefix=${MYTHTV_CONFIG_PREFIX} ${MYTHTV_CONFIG_EXTRA} --qmake=${QMAKE_CMD} --python=${PYTHON_CMD} ${{ matrix.os.configureopts }}
+        working-directory: mythtv
+        run: ${CONFIGURE_CMD} -B build-${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install
 
       - name: Make core
-        working-directory: mythtv/mythtv
-        run: ${MAKE_CMD} -j4 all_no_test
-
-      - name: Install core
-        working-directory: mythtv/mythtv
-        run: ${MAKE_CMD} -j1 install
+        working-directory: mythtv
+        run: ${MAKE_CMD}
 
       - name: Test core
-        working-directory: mythtv/mythtv
-        run: ${MAKE_CMD} -j1 tests
-
-      - name: Configure plugins
-        working-directory: mythtv/mythplugins
-        run: ${CONFIGURE_CMD} --prefix=${MYTHTV_CONFIG_PREFIX} ${MYTHPLUGINS_EXTRA}
-
-      - name: Make plugins
-        working-directory: mythtv/mythplugins
-        run: ${MAKE_CMD} -j4
-
-      - name: Install plugins
-        working-directory: mythtv/mythplugins
-        run: ${MAKE_CMD} -j1 install
+        working-directory: mythtv
+        run: ${TEST_CMD}
 
       - name: ccache statistics [post]
         run: ccache -s
