@@ -195,7 +195,7 @@ jobs:
             core_configure_cmd: 'cmake --preset qt5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install'
             core_build_cmd: 'cmake --build build-qt5'
             core_install_cmd: ''
-            core_test_cmd: ''
+            core_test_cmd: 'cmake --build build-qt5 -t MythTV-tests'
             plugins_working_subdirectory: ''
             plugins_configure_cmd: ''
             plugins_build_cmd: ''
