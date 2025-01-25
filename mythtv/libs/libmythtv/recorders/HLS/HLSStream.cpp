@@ -22,13 +22,12 @@ HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, QString  m3u8_url, QString
 HLSRecStream::~HLSRecStream(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "dtor");
-
 #ifdef USING_LIBCRYPTO
     AESKeyMap::iterator Iaes;
 
     for (Iaes = m_aesKeys.begin(); Iaes != m_aesKeys.end(); ++Iaes)
         delete *Iaes;
-#endif
+#endif  // USING_LIBCRYPTO
 }
 
 QString HLSRecStream::toString(void) const
@@ -65,6 +64,9 @@ bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
     }
     AES_set_decrypt_key((const unsigned char*)key.constData(),
                         128, aeskey);
+
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Downloaded AES key");
+
     return true;
 }
 
@@ -72,6 +74,13 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
                               const QByteArray& IV, const QString& keypath,
                               QByteArray& data, int64_t sequence)
 {
+    LOG(VB_RECORD, LOG_DEBUG, QString("HLSRecStream::DecodeData ") +
+        QString(" %1").arg(!IV.isEmpty() ?
+            QString(" IV[%1]:%2").arg(IV.size()-1).arg(IV[IV.size()-1]) : QString(" IV isEmpty")) +
+        QString(" IV.size():%1").arg(IV.size()) +
+        QString(" keypath:%1..%2").arg(keypath.left(20)).arg(keypath.right(20)) +
+        QString(" sequence:%1").arg(sequence));
+
     AESKeyMap::iterator Ikey = m_aesKeys.find(keypath);
     if (Ikey == m_aesKeys.end())
     {
@@ -157,32 +166,3 @@ bool HLSRecStream::operator>(const HLSRecStream &b) const
 {
     return this->Bitrate() > b.Bitrate();
 }
-
-#ifdef USING_LIBCRYPTO
-bool HLSRecStream::SetAESIV(QString line)
-{
-    /*
-     * If the EXT-X-KEY tag has the IV attribute, implementations MUST use
-     * the attribute value as the IV when encrypting or decrypting with that
-     * key.  The value MUST be interpreted as a 128-bit hexadecimal number
-     * and MUST be prefixed with 0x or 0X.
-     */
-    if (!line.startsWith(QLatin1String("0x"), Qt::CaseInsensitive))
-        return false;
-    if (line.size() % 2)
-    {
-        // not even size, pad with front 0
-        line.insert(2, QLatin1String("0"));
-    }
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    int padding = std::max(0, AES_BLOCK_SIZE - (line.size() - 2));
-#else
-    int padding = std::max(0LL, AES_BLOCK_SIZE - (line.size() - 2));
-#endif
-    QByteArray ba = QByteArray(padding, 0x0);
-    ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
-    m_aesIV = ba;
-    m_ivLoaded = true;
-    return true;
-}
-#endif // USING_LIBCRYPTO

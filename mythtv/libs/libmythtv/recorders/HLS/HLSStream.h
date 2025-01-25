@@ -41,11 +41,14 @@ class HLSRecStream
     void SetCurrentByteRate(uint64_t byterate) { m_curByteRate = byterate; }
     bool Cache(void) const          { return m_cache; }
     void SetCache(bool x)           { m_cache = x; }
+    void SetDateTime(QDateTime &dt) { m_dateTime = dt; }
     bool Live(void) const           { return m_live; }
     void SetLive(bool x)            { m_live = x; }
     QString M3U8Url(void) const     { return m_m3u8Url; }
     QString SegmentBaseUrl(void) const { return m_segmentBaseUrl; }
     void SetSegmentBaseUrl(const QString &n) { m_segmentBaseUrl = n; }
+    QString MapUri(void) const       { return m_mapUri; }
+    void SetMapUri(const QString& x) { m_mapUri = x; }
 
     std::chrono::seconds Duration(void) const;
     uint NumCachedSegments(void) const;
@@ -67,11 +70,6 @@ class HLSRecStream
     bool DecodeData(MythSingleDownload& downloader,
 		    const QByteArray& IV, const QString& keypath,
 		    QByteArray& data, int64_t sequence);
-    bool SetAESIV(QString line);
-    bool IVLoaded(void) const { return m_ivLoaded; }
-
-    QByteArray AESIV(void) { return m_aesIV; }
-    void SetKeyPath(const QString& x) { m_keypath = x; }
 #endif // USING_LIBCRYPTO
 
   protected:
@@ -79,12 +77,12 @@ class HLSRecStream
 
   private:
     int         m_id;                     // program id
-    int         m_version        {1};     // protocol version should be 1
+    int         m_version;                // HLS protocol version
     std::chrono::seconds m_targetDuration {-1s}; // maximum duration per segment
     uint64_t    m_curByteRate    {0};
-    uint64_t    m_bitrate;                // bitrate of stream content (bits per second)
-    std::chrono::seconds m_duration {0s};   // duration of the stream
-    int         m_discontSeq     {0};     // Discontinuity sequence number
+    uint64_t    m_bitrate        {0};     // bitrate of stream content (bits per second)
+    std::chrono::seconds m_duration {0s}; // duration of the stream
+    int         m_discontSeq     {0};     // discontinuity sequence number
     bool        m_live           {true};
     int64_t     m_bandwidth      {0};     // measured average download bandwidth (bits/second)
     double      m_sumBandwidth   {0.0};
@@ -94,14 +92,14 @@ class HLSRecStream
     QString     m_segmentBaseUrl;         // uri to base for relative segments (m3u8 redirect target)
     mutable QMutex  m_lock;
     bool        m_cache          {false}; // allow caching
+    QDateTime   m_dateTime;               // #EXT-X-PROGRAM-DATE-TIME
     int         m_retries        {0};
+
+    QString     m_mapUri;                 // URI of Media Initialisation Sequence
 
 #ifdef USING_LIBCRYPTO
   private:
-    QString     m_keypath;              // URL path of the encrypted key
-    bool        m_ivLoaded       {false};
-    QByteArray  m_aesIV          {AES_BLOCK_SIZE,0};// IV used when decypher the block
-    AESKeyMap   m_aesKeys;       // AES-128 keys by path
+    AESKeyMap   m_aesKeys;                // AES-128 keys by path
 #endif // USING_LIBCRYPTO
 };
 

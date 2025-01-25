@@ -18,7 +18,7 @@ HLSRecSegment::HLSRecSegment(const HLSRecSegment& rhs)
     operator=(rhs);
 }
 
-HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration,
+HLSRecSegment::HLSRecSegment(int seq, std::chrono::milliseconds duration,
                        QString title, QUrl uri)
     : m_sequence(seq),
       m_duration(duration),
@@ -26,19 +26,6 @@ HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration,
       m_url(std::move(uri))
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
-}
-
-HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration, QString title,
-           QUrl uri, [[maybe_unused]] const QString& current_key_path)
-    : m_sequence(seq),
-      m_duration(duration),
-      m_title(std::move(title)),
-      m_url(std::move(uri))
-{
-    LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
-#ifdef USING_LIBCRYPTO
-    m_psz_key_path  = current_key_path;
-#endif
 }
 
 HLSRecSegment& HLSRecSegment::operator=(const HLSRecSegment& rhs)
@@ -51,7 +38,9 @@ HLSRecSegment& HLSRecSegment::operator=(const HLSRecSegment& rhs)
         m_title = rhs.m_title;
         m_url = rhs.m_url;
 #ifdef USING_LIBCRYPTO
-        m_psz_key_path  = rhs.m_psz_key_path;
+        m_keypath  = rhs.m_keypath;
+        m_ivLoaded = rhs.m_ivLoaded;
+        m_aesIV = rhs.m_aesIV;
 #endif
     }
     return *this;
@@ -67,3 +56,38 @@ QString HLSRecSegment::toString(void) const
     return QString("[%1] '%2' @ '%3' for %4")
         .arg(m_sequence).arg(m_title, m_url.toString(), QString::number(m_duration.count()));
 }
+
+#ifdef USING_LIBCRYPTO
+bool HLSRecSegment::SetAESIV(QString line)
+{
+    LOG(VB_RECORD, LOG_INFO, LOC + "SetAESIV line:"+ line);
+
+    /*
+     * If the EXT-X-KEY tag has the IV attribute, implementations MUST use
+     * the attribute value as the IV when encrypting or decrypting with that
+     * key.  The value MUST be interpreted as a 128-bit hexadecimal number
+     * and MUST be prefixed with 0x or 0X.
+     */
+    if (!line.startsWith(QLatin1String("0x"), Qt::CaseInsensitive))
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + "SetAESIV does not start with 0x");
+        return false;
+    }
+
+    if (line.size() % 2)
+    {
+        // not even size, pad with front 0
+        line.insert(2, QLatin1String("0"));
+    }
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    int padding = std::max(0, AES_BLOCK_SIZE - (line.size() - 2));
+#else
+    int padding = std::max(0LL, AES_BLOCK_SIZE - (line.size() - 2));
+#endif
+    QByteArray ba = QByteArray(padding, 0x0);
+    ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
+    m_aesIV = ba;
+    m_ivLoaded = true;
+    return true;
+}
+#endif // USING_LIBCRYPTO

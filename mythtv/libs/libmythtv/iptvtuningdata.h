@@ -205,6 +205,7 @@ class MTV_PUBLIC IPTVTuningData
         return (m_protocol == http_ts);
     }
 
+   // An http(s) URL is invalid if it cannot be downloaded
     void GuessProtocol(void)
     {
         if (!m_dataUrl.isValid())
@@ -215,10 +216,19 @@ class MTV_PUBLIC IPTVTuningData
             m_protocol = IPTVTuningData::rtp;
         else if (m_dataUrl.scheme() == "rtsp")
             m_protocol = IPTVTuningData::rtsp;
-        else if (((m_dataUrl.scheme() == "http") || (m_dataUrl.scheme() == "https")) && IsHLSPlaylist())
-            m_protocol = IPTVTuningData::http_hls;
         else if ((m_dataUrl.scheme() == "http") || (m_dataUrl.scheme() == "https"))
-            m_protocol = IPTVTuningData::http_ts;
+        {
+            QByteArray buffer;
+            if (CanReadHTTP(buffer))
+            {
+                if (IsHLSPlaylist(buffer))
+                    m_protocol = IPTVTuningData::http_hls;
+                else
+                    m_protocol = IPTVTuningData::http_ts;
+            }
+            else
+                m_protocol = IPTVTuningData::inValid;
+        }
         else
             m_protocol = IPTVTuningData::inValid;
     }
@@ -229,25 +239,28 @@ class MTV_PUBLIC IPTVTuningData
   }
 
   protected:
-    bool IsHLSPlaylist(void) const
-    {
-        if (QCoreApplication::instance() == nullptr)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - No QCoreApplication!!"));
-            return false;
-        }
 
-        MythSingleDownload downloader;
+    // Read first part of the http(s) URL.
+    // This is done to test if we can download from this URL
+    // and 2000 bytes is enough to determine in IsHLSPlaylist
+    // if the file is an HLS playlist or not.
+    //
+    bool CanReadHTTP(QByteArray &buffer) const
+    {
         QString url = m_dataUrl.toString();
-        QByteArray buffer;
-        downloader.DownloadURL(url, &buffer, 5s, 0, 10000);
+        MythSingleDownload downloader;
+        downloader.DownloadURL(url, &buffer, 5s, 0, 2000);
         if (buffer.isEmpty())
         {
-            LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - Open Failed:%1 url:%2")
+            LOG(VB_GENERAL, LOG_ERR, QString("CanReadHTTP - Failed, error:%1 url:%2")
                 .arg(downloader.ErrorString(), url));
             return false;
         }
+        return true;
+    }
 
+    bool IsHLSPlaylist(QByteArray &buffer) const
+    {
         QTextStream text(&buffer);
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         text.setCodec("UTF-8");

@@ -57,7 +57,6 @@ class MTV_PUBLIC  HLSReader
       { QMutexLocker lock(&m_streamLock); m_curstream = nullptr; }
     void ResetSequence(void) { m_curSeq = -1; }
 
-
     QString StreamURL(void) const
     { return QString("%1").arg(m_curstream ? m_curstream->M3U8Url() : ""); }
 
@@ -89,7 +88,7 @@ class MTV_PUBLIC  HLSReader
 
     // Downloading
     int DownloadSegmentData(MythSingleDownload& downloader, HLSRecStream* hls,
-			    const HLSRecSegment& segment, int playlist_size);
+			    HLSRecSegment& segment, int playlist_size);
 
     // Debug
     void EnableDebugging(void);

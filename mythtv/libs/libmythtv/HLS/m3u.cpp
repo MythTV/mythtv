@@ -1,11 +1,15 @@
+#include <QRegularExpression>
 #include <QStringList>
 #include <QUrl>
 
+#include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "HLS/m3u.h"
 
 namespace M3U
 {
+    static const QRegularExpression kQuotes{"^\"|\"$"};
+
     QString DecodedURI(const QString& uri)
     {
         QByteArray ba   = uri.toLatin1();
@@ -116,10 +120,15 @@ namespace M3U
         return true;
     }
 
+    // EXT-X-STREAM-INF
+    //
     bool ParseStreamInformation(const QString& line,
                                 const QString& url,
                                 const QString& loc,
-                                int& id, uint64_t& bandwidth)
+                                int& id,
+                                uint64_t& bandwidth,
+                                QString& audio,
+                                QString& video)
     {
         LOG(VB_RECORD, LOG_INFO, loc +
             QString("Parsing stream from %1").arg(url));
@@ -161,12 +170,64 @@ namespace M3U
             return false;
         }
 
+        //      AUDIO
+        //
+        //   The value is a quoted-string.  It MUST match the value of the
+        //   GROUP-ID attribute of an EXT-X-MEDIA tag elsewhere in the Master
+        //   Playlist whose TYPE attribute is AUDIO.  It indicates the set of
+        //   audio Renditions that SHOULD be used when playing the
+        //   presentation.  See Section 4.3.4.2.1.
+        //
+        //   The AUDIO attribute is OPTIONAL.
+        audio = ParseAttributes(line, "AUDIO");
+        if (!audio.isEmpty())
+        {
+            audio.replace(M3U::kQuotes, "");
+            LOG(VB_RECORD, LOG_INFO, loc +
+                QString("#EXT-X-STREAM-INF: attribute AUDIO=%1").arg(audio));
+        }
+
+        //   The VIDEO attribute is OPTIONAL.
+        video = ParseAttributes(line, "VIDEO");
+        if (!video.isEmpty())
+        {
+            video.replace(M3U::kQuotes, "");
+            LOG(VB_RECORD, LOG_INFO, loc +
+                QString("#EXT-X-STREAM-INF: attribute VIDEO=%1").arg(video));
+        }
+
+
         LOG(VB_RECORD, LOG_INFO, loc +
-            QString("bandwidth adaptation detected (program-id=%1, bandwidth=%2")
+            QString("bandwidth adaptation detected (program-id=%1, bandwidth=%2)")
             .arg(id).arg(bandwidth));
 
         return true;
     }
+
+    // EXT-X-MEDIA
+    //
+    bool ParseMedia(const QString& line,
+                    const QString& loc,
+                    QString& media_type,
+                    QString& group_id,
+                    QString& uri,
+                    QString& name)
+    {
+        LOG(VB_RECORD, LOG_INFO, loc + QString("Parsing EXT-X-MEDIA line"));
+
+        media_type = ParseAttributes(line, "TYPE");
+        group_id = ParseAttributes(line, "GROUP-ID");
+        uri = ParseAttributes(line, "URI");
+        name = ParseAttributes(line, "NAME");
+
+        // Remove string quotes
+        group_id.replace(M3U::kQuotes, "");
+        uri.replace(M3U::kQuotes, "");
+        name.replace(M3U::kQuotes, "");
+
+        return true;
+    }
+
 
     bool ParseTargetDuration(const QString& line, const QString& loc,
                              int& duration)
@@ -176,8 +237,6 @@ namespace M3U
          *
          * where s is an integer indicating the target duration in seconds.
          */
-        duration = -1;
-
         if (!ParseDecimalValue(line, duration))
         {
             LOG(VB_RECORD, LOG_ERR, loc + "expected #EXT-X-TARGETDURATION:<s>");
@@ -188,17 +247,22 @@ namespace M3U
     }
 
     bool ParseSegmentInformation(int version, const QString& line,
-                                 uint& duration, QString& title,
+                                 int& duration, QString& title,
                                  const QString& loc)
     {
         /*
          * #EXTINF:<duration>,<title>
          *
-         * "duration" is an integer that specifies the duration of the media
-         * file in seconds.  Durations SHOULD be rounded to the nearest integer.
-         * The remainder of the line following the comma is the title of the
-         * media file, which is an optional human-readable informative title of
-         * the media segment
+         * where duration is a decimal-floating-point or decimal-integer number
+         * (as described in Section 4.2) that specifies the duration of the
+         * Media Segment in seconds.  Durations SHOULD be decimal-floating-
+         * point, with enough accuracy to avoid perceptible error when segment
+         * durations are accumulated.  However, if the compatibility version
+         * number is less than 3, durations MUST be integers.  Durations that
+         * are reported as integers SHOULD be rounded to the nearest integer.
+         * The remainder of the line following the comma is an optional human-
+         * readable informative title of the Media Segment expressed as UTF-8
+         * text.
          */
         int p = line.indexOf(QLatin1String(":"));
         if (p < 0)
@@ -220,36 +284,35 @@ namespace M3U
             return false;
         }
 
+        // Duration in ms
+        bool ok = false;
         const QString& val = list[0];
-
         if (version < 3)
         {
-            bool ok = false;
-            duration = val.toInt(&ok);
-            if (!ok)
+            int duration_seconds = val.toInt(&ok);
+            if (ok)
             {
-                duration = -1;
-                LOG(VB_RECORD, LOG_ERR, loc +
-                    QString("ParseSegmentInformation: invalid duration in '%1'")
-                    .arg(line));
+                duration = duration_seconds * 1000;
             }
-        }
-        else
-        {
-            bool ok = false;
-            double d = val.toDouble(&ok);
-            if (!ok)
+            else
             {
-                duration = -1;
                 LOG(VB_RECORD, LOG_ERR, loc +
                     QString("ParseSegmentInformation: invalid duration in '%1'")
                     .arg(line));
                 return false;
             }
-            if ((d) - ((int)d) >= 0.5)
-                duration = ((int)d) + 1;
-            else
-                duration = ((int)d);
+        }
+        else
+        {
+            double d = val.toDouble(&ok);
+            if (!ok)
+            {
+                LOG(VB_RECORD, LOG_ERR, loc +
+                    QString("ParseSegmentInformation: invalid duration in '%1'")
+                    .arg(line));
+                return false;
+            }
+            duration = static_cast<int>(d * 1000);
         }
 
         if (list.size() >= 2)
@@ -276,7 +339,6 @@ namespace M3U
         if (!ParseDecimalValue(line, sequence_num))
         {
             LOG(VB_RECORD, LOG_ERR, loc + "expected #EXT-X-MEDIA-SEQUENCE:<s>");
-            sequence_num = 0;
             return false;
         }
 
@@ -307,7 +369,7 @@ namespace M3U
         if (attr.startsWith(QLatin1String("NONE")))
         {
             QString uri = ParseAttributes(line, "URI");
-            if (!uri.isNull())
+            if (!uri.isEmpty())
             {
                 LOG(VB_RECORD, LOG_ERR, loc + "#EXT-X-KEY: URI not expected");
                 return false;
@@ -315,8 +377,8 @@ namespace M3U
             /* IV is only supported in version 2 and above */
             if (version >= 2)
             {
-                iv = ParseAttributes(line, "IV");
-                if (!iv.isNull())
+                QString parsed_iv = ParseAttributes(line, "IV");
+                if (!parsed_iv.isEmpty())
                 {
                     LOG(VB_RECORD, LOG_ERR, loc + "#EXT-X-KEY: IV not expected");
                     return false;
@@ -344,6 +406,9 @@ namespace M3U
             /* Url is between quotes, remove them */
             path = DecodedURI(uri.remove(QChar(QLatin1Char('"'))));
             iv = ParseAttributes(line, "IV");
+
+            LOG(VB_RECORD, LOG_DEBUG, QString("M3U::ParseKey #EXT-X-KEY: %1").arg(line));
+            LOG(VB_RECORD, LOG_DEBUG, QString("M3U::ParseKey path:%1 IV:%2").arg(path).arg(iv));
         }
         else if (attr.startsWith(QLatin1String("SAMPLE-AES")))
         {
@@ -371,15 +436,54 @@ namespace M3U
         return true;
     }
 
+    bool ParseMap(const QString &line,
+                  const QString &loc,
+                  QString &uri)
+    {
+        /*
+         * #EXT-X-MAP:<attribute-list>
+         *
+         * The EXT-X-MAP tag specifies how to obtain the Media Initialization
+         * Section (Section 3) required to parse the applicable Media Segments.
+         * It applies to every Media Segment that appears after it in the
+         * Playlist until the next EXT-X-MAP tag or until the end of the
+         * Playlist.
+         *
+         * The following attributes are defined:
+         *
+         *  URI
+         * The value is a quoted-string containing a URI that identifies a
+         * resource that contains the Media Initialization Section.  This
+         * attribute is REQUIRED.
+         */
+        uri = ParseAttributes(line, "URI");
+        if (uri.isEmpty())
+        {
+            LOG(VB_RECORD, LOG_ERR, loc +
+                QString("Attribute URI not present in: #EXT-X-MAP %1")
+                .arg(line));
+            return false;
+        }
+        return true;
+    }
+
     bool ParseProgramDateTime(const QString& line, const QString& loc,
-                              QDateTime &/*date*/)
+                              QDateTime &dt)
     {
         /*
          * #EXT-X-PROGRAM-DATE-TIME:<YYYY-MM-DDThh:mm:ssZ>
          */
-        LOG(VB_RECORD, LOG_DEBUG, loc +
-            QString("tag not supported: #EXT-X-PROGRAM-DATE-TIME %1")
-            .arg(line));
+        int p = line.indexOf(QLatin1String(":"));
+        if (p < 0)
+        {
+            LOG(VB_RECORD, LOG_ERR, loc +
+                QString("ParseProgramDateTime: Missing ':' in '%1'")
+                .arg(line));
+            return false;
+        }
+
+        QString dt_string = line.mid(p+1);
+        dt = MythDate::fromString(dt_string);
         return true;
     }
 

@@ -38,7 +38,7 @@ void HLSPlaylistWorker::run(void)
     RunProlog();
 
     auto *downloader = new MythSingleDownload;
-
+    m_wokenup = true;           // Otherwise always false and then we start with 1 second delay
     while (!m_cancel)
     {
         m_lock.lock();

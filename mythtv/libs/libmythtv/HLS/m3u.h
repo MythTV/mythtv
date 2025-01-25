@@ -17,16 +17,28 @@ namespace M3U
     bool ParseStreamInformation(const QString& line,
 				const QString& url,
 				const QString& loc,
-				int& id, uint64_t& bandwidth);
+				int& id,
+                uint64_t& bandwidth,
+                QString& audio,
+                QString& video);
+    bool ParseMedia(const QString& line,
+                    const QString& loc,
+                    QString& media_type,
+                    QString& group_id,
+                    QString& uri,
+                    QString& name);
     bool ParseTargetDuration(const QString& line, const QString& loc,
 			     int& duration);
     bool ParseSegmentInformation(int version, const QString& line,
-				 uint& duration, QString& title,
+				 int& duration, QString& title,
 				 const QString& loc);
     bool ParseMediaSequence(int64_t & sequence_num, const QString& line,
 			    const QString& loc);
     bool ParseKey(int version, const QString& line, bool& aesmsg,
 		  const QString& loc, QString &path, QString &iv);
+    bool ParseMap(const QString &line,
+                  const QString &loc,
+                  QString &uri);
     bool ParseProgramDateTime(const QString& line, const QString& loc,
 			      QDateTime &date);
     bool ParseAllowCache(const QString& line, const QString& loc,
