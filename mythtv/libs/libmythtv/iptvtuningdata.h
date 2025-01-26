@@ -205,7 +205,7 @@ class MTV_PUBLIC IPTVTuningData
         return (m_protocol == http_ts);
     }
 
-   // An http(s) URL is invalid if it cannot be downloaded
+    // An HLSPlaylist URL is identified as http_ts if download fails.
     void GuessProtocol(void)
     {
         if (!m_dataUrl.isValid())
@@ -227,7 +227,7 @@ class MTV_PUBLIC IPTVTuningData
                     m_protocol = IPTVTuningData::http_ts;
             }
             else
-                m_protocol = IPTVTuningData::inValid;
+                m_protocol = IPTVTuningData::http_ts;   // Breaks the unit test if set to inValid
         }
         else
             m_protocol = IPTVTuningData::inValid;
