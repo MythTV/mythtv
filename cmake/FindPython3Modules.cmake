@@ -68,10 +68,10 @@ foreach(_module IN LISTS Python3Modules_FIND_COMPONENTS)
   if(NOT _result EQUAL 0)
     list(APPEND Python3Modules_COMPONENTS_MISSING ${_mod_name})
     if(Python3Modules_FIND_REQUIRED_${_mod_name})
-      list(APPEND Python3Modules_REQUIRED_MISSING ${_mod_name})
+      list(APPEND Python3Modules_COMPONENTS_REQUIRED_MISSING ${_mod_name})
       message(STATUS "Missing required python module ${_mod_name}")
     else()
-      list(APPEND Python3Modules_OPTIONAL_MISSING ${_mod_name})
+      list(APPEND Python3Modules_COMPONENTS_OPTIONAL_MISSING ${_mod_name})
       message(STATUS "Missing optional python module ${_mod_name}")
     endif()
     continue()
@@ -122,5 +122,5 @@ endif()
 
 mark_as_advanced(
   Python3Modules_FOUND Python3Modules_COMPONENTS_FOUND
-  Python3Modules_COMPONENTS_MISSING Python3Modules_REQUIRED_MISSING
-  Python3Modules_OPTIONAL_MISSING)
+  Python3Modules_COMPONENTS_MISSING Python3Modules_COMPONENTS_REQUIRED_MISSING
+  Python3Modules_COMPONENTS_OPTIONAL_MISSING)

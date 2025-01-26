@@ -78,10 +78,10 @@ foreach(_module IN LISTS PerlModules_FIND_COMPONENTS)
   else()
     list(APPEND PerlModules_COMPONENTS_MISSING _{module})
     if(PerlModules_FIND_REQUIRED_${_module})
-      list(APPEND PerlModules_REQUIRED_MISSING _{module})
+      list(APPEND PerlModules_COMPONENTS_REQUIRED_MISSING _{module})
       message(STATUS "Missing required perl module ${_module}")
     else()
-      list(APPEND PerlModules_OPTIONAL_MISSING _{module})
+      list(APPEND PerlModules_COMPONENTS_OPTIONAL_MISSING _{module})
       message(STATUS "Missing optional perl module ${_module}")
     endif()
   endif()
@@ -93,4 +93,5 @@ endif()
 
 mark_as_advanced(
   PerlModules_FOUND PerlModules_COMPONENTS_FOUND PerlModules_COMPONENTS_MISSING
-  PerlModules_REQUIRED_MISSING PerlModules_OPTIONAL_MISSING)
+  PerlModules_COMPONENTS_REQUIRED_MISSING
+  PerlModules_COMPONENTS_OPTIONAL_MISSING)

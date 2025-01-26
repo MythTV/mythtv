@@ -22,7 +22,7 @@ This module will set the following variables in your project:
   A list of of all the modules that were not found (required or optional)
 ``PHPModules_COMPONENTS_REQUIRED_MISSING``
   A list of of all the required modules that were not found
-``PHPModules_COMPONENTS_OPTIONSL_MISSING``
+``PHPModules_COMPONENTS_OPTIONAL_MISSING``
   A list of of all the optional modules that were not found
 
 #]=======================================================================]
@@ -51,10 +51,10 @@ foreach(_module IN LISTS PHPModules_FIND_COMPONENTS)
   else()
     list(APPEND PHPModules_COMPONENTS_MISSING _{module})
     if(PHPModules_FIND_REQUIRED_${_module})
-      list(APPEND PHPModules_REQUIRED_MISSING _{module})
+      list(APPEND PHPModules_COMPONENTS_REQUIRED_MISSING _{module})
       message(STATUS "Missing required php module ${_module}")
     else()
-      list(APPEND PHPModules_OPTIONAL_MISSING _{module})
+      list(APPEND PHPModules_COMPONENTS_OPTIONAL_MISSING _{module})
       message(STATUS "Missing optional php module ${_module}")
     endif()
   endif()
@@ -66,4 +66,4 @@ endif()
 
 mark_as_advanced(
   PHPModules_FOUND PHPModules_COMPONENTS_FOUND PHPModules_COMPONENTS_MISSING
-  PHPModules_REQUIRED_MISSING PHPModules_OPTIONAL_MISSING)
+  PHPModules_COMPONENTS_REQUIRED_MISSING PHPModules_COMPONENTS_OPTIONAL_MISSING)
