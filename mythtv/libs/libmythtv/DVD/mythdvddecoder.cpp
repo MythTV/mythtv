@@ -146,9 +146,8 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                             StorePacket = false;
                             // Return the first buffered packet
                             AVPacket *storedPkt = m_storedPackets.takeFirst();
-                            av_packet_ref(Pkt, storedPkt);
-                            av_packet_unref(storedPkt);
-                            delete storedPkt;
+                            av_packet_move_ref(Pkt, storedPkt);
+                            av_packet_free(&storedPkt);
                             return 0;
                         }
                         break;
