@@ -408,7 +408,7 @@ namespace M3U
             iv = ParseAttributes(line, "IV");
 
             LOG(VB_RECORD, LOG_DEBUG, QString("M3U::ParseKey #EXT-X-KEY: %1").arg(line));
-            LOG(VB_RECORD, LOG_DEBUG, QString("M3U::ParseKey path:%1 IV:%2").arg(path).arg(iv));
+            LOG(VB_RECORD, LOG_DEBUG, QString("M3U::ParseKey path:%1 IV:%2").arg(path, iv));
         }
         else if (attr.startsWith(QLatin1String("SAMPLE-AES")))
         {

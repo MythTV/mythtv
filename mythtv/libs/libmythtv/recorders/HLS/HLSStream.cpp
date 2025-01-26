@@ -78,7 +78,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
         QString(" %1").arg(!IV.isEmpty() ?
             QString(" IV[%1]:%2").arg(IV.size()-1).arg(IV[IV.size()-1]) : QString(" IV isEmpty")) +
         QString(" IV.size():%1").arg(IV.size()) +
-        QString(" keypath:%1..%2").arg(keypath.left(20)).arg(keypath.right(20)) +
+        QString(" keypath:%1..%2").arg(keypath.left(20), keypath.right(20)) +
         QString(" sequence:%1").arg(sequence));
 
     AESKeyMap::iterator Ikey = m_aesKeys.find(keypath);
