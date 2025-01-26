@@ -67,7 +67,7 @@ foreach(_module IN LISTS Python3Modules_FIND_COMPONENTS)
   message(DEBUG "_error is ${_error}")
   if(NOT _result EQUAL 0)
     list(APPEND Python3Modules_COMPONENTS_MISSING ${_mod_name})
-    if(Python3Modules_FIND_REQUIRED_${_mod_name})
+    if(Python3Modules_FIND_REQUIRED_${_module})
       list(APPEND Python3Modules_COMPONENTS_REQUIRED_MISSING ${_mod_name})
       message(STATUS "Missing required python module ${_mod_name}")
     else()
@@ -93,9 +93,20 @@ foreach(_module IN LISTS Python3Modules_FIND_COMPONENTS)
                                           ${_mod_ver}))
         # Empty body. Easier to write the test this way.
       else()
-        message(
-          STATUS "Ignoring python module ${_module} (version: ${CMAKE_MATCH_1})"
-        )
+        list(APPEND Python3Modules_COMPONENTS_MISSING ${_mod_name})
+        if(Python3Modules_FIND_REQUIRED_${_module})
+          list(APPEND Python3Modules_COMPONENTS_REQUIRED_MISSING ${_mod_name})
+          message(
+            STATUS
+              "Missing too old required python module ${_module} (version: ${CMAKE_MATCH_1})"
+          )
+        else()
+          list(APPEND Python3Modules_COMPONENTS_OPTIONAL_MISSING ${_mod_name})
+          message(
+            STATUS
+              "Ignoring too old optional python module ${_module} (version: ${CMAKE_MATCH_1})"
+          )
+        endif()
         continue()
       endif()
     endif()
