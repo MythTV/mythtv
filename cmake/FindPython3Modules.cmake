@@ -69,14 +69,20 @@ foreach(_module IN LISTS Python3Modules_FIND_COMPONENTS)
     list(APPEND Python3Modules_COMPONENTS_MISSING ${_mod_name})
     if(Python3Modules_FIND_REQUIRED_${_module})
       list(APPEND Python3Modules_COMPONENTS_REQUIRED_MISSING ${_mod_name})
-      message(STATUS "Missing required python module ${_mod_name}")
+      message(STATUS "  Missing required python module ${_mod_name}")
     else()
       list(APPEND Python3Modules_COMPONENTS_OPTIONAL_MISSING ${_mod_name})
-      message(STATUS "Missing optional python module ${_mod_name}")
+      message(STATUS "  Missing optional python module ${_mod_name}")
     endif()
     continue()
   endif()
 
+  set(_required ${Python3Modules_FIND_REQUIRED_${_module}})
+  if(_required)
+    set(_required_str "required")
+  else()
+    set(_required_str "optional")
+  endif()
   if(${_output} MATCHES "([0-9]+(\.[0-9]+(\.[0-9]+)?)?)")
     set(_version ${CMAKE_MATCH_1})
     if(_mod_ver)
@@ -94,34 +100,41 @@ foreach(_module IN LISTS Python3Modules_FIND_COMPONENTS)
         # Empty body. Easier to write the test this way.
       else()
         list(APPEND Python3Modules_COMPONENTS_MISSING ${_mod_name})
-        if(Python3Modules_FIND_REQUIRED_${_module})
+        if(_required)
           list(APPEND Python3Modules_COMPONENTS_REQUIRED_MISSING ${_mod_name})
           message(
             STATUS
-              "Missing too old required python module ${_module} (version: ${CMAKE_MATCH_1})"
+              "  Missing too old required python module ${_module} (version: ${CMAKE_MATCH_1})"
           )
         else()
           list(APPEND Python3Modules_COMPONENTS_OPTIONAL_MISSING ${_mod_name})
           message(
             STATUS
-              "Ignoring too old optional python module ${_module} (version: ${CMAKE_MATCH_1})"
+              "  Ignoring too old optional python module ${_module} (version: ${CMAKE_MATCH_1})"
           )
         endif()
         continue()
       endif()
     endif()
-    message(STATUS "Found python module ${_module} (version: ${CMAKE_MATCH_1})")
+    message(
+      STATUS
+        "  Found ${_required_str} python module ${_module} (version: ${CMAKE_MATCH_1})"
+    )
     set(Python3Modules_${_mod_name}_FOUND TRUE)
     list(APPEND Python3Modules_COMPONENTS_FOUND ${_mod_name})
     set(Python3Modules_${_mod_name}_VERSION ${CMAKE_MATCH_1})
     mark_as_advanced(Python3Modules_${_mod_name}_VERSION)
   elseif(NOT _mod_op STREQUAL "")
     message(
-      STATUS "Ignoring python module ${_module} (version: required but missing)"
+      STATUS
+        "  Ignoring ${_required_str} python module ${_module} (version: required but missing)"
     )
     continue()
   else()
-    message(STATUS "Found python module ${_module} (version: not parsed)")
+    message(
+      STATUS
+        "  Found ${_required_str} python module ${_module} (version: not parsed)"
+    )
     set(Python3Modules_${_mod_name}_FOUND TRUE)
     list(APPEND Python3Modules_COMPONENTS_FOUND ${_mod_name})
   endif()
