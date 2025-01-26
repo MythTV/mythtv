@@ -77,7 +77,7 @@ class HLSRecStream
 
   private:
     int         m_id;                     // program id
-    int         m_version;                // HLS protocol version
+    int         m_version        {1};     // HLS protocol version
     std::chrono::seconds m_targetDuration {-1s}; // maximum duration per segment
     uint64_t    m_curByteRate    {0};
     uint64_t    m_bitrate        {0};     // bitrate of stream content (bits per second)

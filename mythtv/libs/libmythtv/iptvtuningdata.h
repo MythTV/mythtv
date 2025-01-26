@@ -227,10 +227,14 @@ class MTV_PUBLIC IPTVTuningData
                     m_protocol = IPTVTuningData::http_ts;
             }
             else
+            {
                 m_protocol = IPTVTuningData::http_ts;   // Breaks the unit test if set to inValid
+            }
         }
         else
+        {
             m_protocol = IPTVTuningData::inValid;
+        }
     }
 
   IPTVProtocol GetProtocol(void) const
@@ -266,7 +270,7 @@ class MTV_PUBLIC IPTVTuningData
         return true;
     }
 
-    bool IsHLSPlaylist(QByteArray &buffer) const
+    static bool IsHLSPlaylist(QByteArray &buffer)
     {
         QTextStream text(&buffer);
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)

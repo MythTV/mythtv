@@ -40,7 +40,7 @@ namespace M3U
                   const QString &loc,
                   QString &uri);
     bool ParseProgramDateTime(const QString& line, const QString& loc,
-			      QDateTime &date);
+			      QDateTime &dt);
     bool ParseAllowCache(const QString& line, const QString& loc,
 			 bool& do_cache);
     bool ParseDiscontinuitySequence(const QString& line, const QString& loc,

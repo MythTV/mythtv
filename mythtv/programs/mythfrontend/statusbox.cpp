@@ -848,7 +848,7 @@ void StatusBox::doTunerStatus()
         }
     }
 
-    for (QString inputname : std::as_const(inputnames))
+    for (const QString& inputname : std::as_const(inputnames))
     {
         QStringList statuslist;
         if (info[inputname].m_errored)
