@@ -100,27 +100,30 @@ set(CONFIG_SQLITE3 ${SQLite3_FOUND})
 #
 if(ENABLE_BINDINGS_PYTHON)
   find_package(
-    Python3 3.6
+    Python3 3.8
     COMPONENTS Interpreter
     REQUIRED)
   if(TARGET Python3::Interpreter)
+    message(STATUS "Found python version ${Python3_VERSION}.")
     find_package(
       Python3Modules
-      OPTIONAL_COMPONENTS
+      COMPONENTS
         MySQLdb
         lxml
-        pip>=23.0.1
         requests
+      OPTIONAL_COMPONENTS
+        pip>=23.0.1
         wheel)
   endif()
 
   if(NOT TARGET Python3::Interpreter)
     message(STATUS "Missing python interpreter. Disabling python bindings.")
   elseif(Python3Modules_REQUIRED_MISSING)
-    message(STATUS "Missing some python modules. Disabling python bindings.")
+    message(
+      STATUS "Missing some required python modules. Disabling python bindings.")
   else()
     message(
-      STATUS "Python interperter and modules found. Enbling python bindings.")
+      STATUS "Python interperter and modules found. Enabling python bindings.")
     set(USING_BINDINGS_PYTHON TRUE)
     set(CONFIG_BINDINGS_PYTHON TRUE)
   endif()
@@ -135,9 +138,10 @@ endif()
 if(ENABLE_BINDINGS_PERL)
   find_package(Perl)
   if(PERL_FOUND)
+    message(STATUS "Found perl version ${PERL_VERSION_STRING}.")
     find_package(
       PerlModules
-      OPTIONAL_COMPONENTS
+      COMPONENTS
         Config
         DBD::mysql
         DBI
@@ -158,7 +162,8 @@ if(ENABLE_BINDINGS_PERL)
   elseif(PerlModules_REQUIRED_MISSING)
     message(STATUS "Missing some perl modules. Disabling perl bindings.")
   else()
-    message(STATUS "Perl interperter and modules found. Enbling perl bindings.")
+    message(
+      STATUS "Perl interperter and modules found. Enabling perl bindings.")
     set(USING_BINDINGS_PERL TRUE)
   endif()
   add_build_config(USING_BINDINGS_PERL "bindings_perl")
@@ -166,13 +171,22 @@ endif()
 
 if(ENABLE_BINDINGS_PHP)
   find_program(PHP_EXECUTABLE NAMES php)
-  # find_package(PHPModules OPTIONAL_COMPONENTS component1)
+  if(PHP_EXECUTABLE)
+    execute_process(COMMAND ${PHP_EXECUTABLE} --version OUTPUT_VARIABLE _output)
+    if("${_output}" MATCHES "PHP ([0-9\.]+).*")
+      set(PHP_VERSION ${CMAKE_MATCH_1})
+    endif()
+    message(STATUS "Found PHP version ${PHP_VERSION}.")
+    # There currently aren't any required PHP packages.
+    #
+    # find_package(PHPModules OPTIONAL_COMPONENTS mysqlnd geos sodium)
+  endif()
   if(NOT PHP_EXECUTABLE)
     message(STATUS "Missing php interpreter. Disabling php bindings.")
   elseif(PHPModules_REQUIRED_MISSING)
     message(STATUS "Missing some PHP modules. Disabling PHP bindings.")
   else()
-    message(STATUS "PHP interperter and modules found. Enbling php bindings.")
+    message(STATUS "PHP interperter and modules found. Enabling php bindings.")
     set(USING_BINDINGS_PHP TRUE)
   endif()
   add_build_config(USING_BINDINGS_PHP "bindings_php")
