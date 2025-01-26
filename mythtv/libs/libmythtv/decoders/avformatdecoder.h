@@ -249,6 +249,9 @@ class AvFormatDecoder : public DecoderBase
     int                m_seqCount                     {0};
 
     QList<AVPacket*>   m_storedPackets;
+    /// If not nullptr, a video packet that has been pre-processed,
+    /// but not sent to the decoder.
+    AVPacket*          m_preprocessedPacket           {nullptr};
 
     int                m_prevGopPos                   {0};
 

@@ -414,6 +414,7 @@ AvFormatDecoder::~AvFormatDecoder()
         AVPacket *pkt = m_storedPackets.takeFirst();
         av_packet_free(&pkt);
     }
+    av_packet_free(&m_preprocessedPacket);
 
     CloseContext();
     delete m_ccd608;
@@ -680,6 +681,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             AVPacket *pkt = m_storedPackets.takeFirst();
             av_packet_free(&pkt);
         }
+        av_packet_free(&m_preprocessedPacket);
 
         m_prevGopPos = 0;
         m_gopSet = false;
@@ -3325,9 +3327,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curs
     {
         // MythTV logic expects that only one frame is processed
         // Save the packet for later and return.
-        auto *newPkt = av_packet_clone(pkt);
-        if (newPkt)
-            m_storedPackets.prepend(newPkt);
+        m_preprocessedPacket = av_packet_clone(pkt);
     }
     return true;
 }
@@ -4611,7 +4611,16 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             }
         }
 
-        if (!storevideoframes && m_storedPackets.count() > 0)
+        bool already_preprocessed = false;
+        if (!storevideoframes && m_preprocessedPacket != nullptr)
+        {
+            if (pkt)
+                av_packet_free(&pkt);
+            pkt = m_preprocessedPacket;
+            m_preprocessedPacket = nullptr;
+            already_preprocessed = true;
+        }
+        else if (!storevideoframes && m_storedPackets.count() > 0)
         {
             if (pkt)
                 av_packet_free(&pkt);
@@ -4769,7 +4778,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
-                if (!PreProcessVideoPacket(context, curstream, pkt))
+                if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
                     continue;
 
                 // If the resolution changed in XXXPreProcessPkt, we may
