@@ -76,7 +76,7 @@ elseif(NOT USE_PYTHON_PIP)
   set(ROOT_FLAGS --root=/tmp)
 endif()
 
-if(NOT CMAKE_INSTALL_PREFIX MATCHES "(/usr|/usr/local)")
+if(NOT CMAKE_INSTALL_PREFIX MATCHES "^/usr")
   set(PREFIX_FLAGS --prefix=${CMAKE_INSTALL_PREFIX})
 endif()
 
