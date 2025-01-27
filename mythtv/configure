@@ -613,10 +613,6 @@ add_ldlibflags(){
     append LDLIBFLAGS $($ldflags_filter "$@")
 }
 
-add_stripflags(){
-    append ASMSTRIPFLAGS "$@"
-}
-
 add_extralibs(){
     prepend extralibs $($ldflags_filter "$@")
 }
@@ -837,20 +833,6 @@ check_ldflags(){
     test_ldflags "$@" && add_ldflags "$@"
 }
 
-test_stripflags(){
-    log test_stripflags "$@"
-    # call check_cc to get a fresh TMPO
-    check_cc <<EOF
-int main(void) { return 0; }
-EOF
-    check_cmd $strip $ASMSTRIPFLAGS "$@" $TMPO
-}
-
-check_stripflags(){
-    log check_stripflags "$@"
-    test_stripflags "$@" && add_stripflags "$@"
-}
-
 check_header(){
     log check_header "$@"
     header=$1
@@ -891,35 +873,6 @@ check_func(){
     check_ld "cc" "$@" <<EOF && enable $func
 extern int $func();
 int main(void){ $func(); }
-EOF
-}
-
-check_complexfunc(){
-    log check_complexfunc "$@"
-    func=$1
-    narg=$2
-    shift 2
-    test $narg = 2 && args="f, g" || args="f * I"
-    disable $func
-    check_ld "cc" "$@" <<EOF && enable $func
-#include <complex.h>
-#include <math.h>
-float foo(complex float f, complex float g) { return $func($args); }
-int main(void){ return (int) foo; }
-EOF
-}
-
-check_mathfunc(){
-    log check_mathfunc "$@"
-    func=$1
-    narg=$2
-    shift 2
-    test $narg = 2 && args="f, g" || args="f"
-    disable $func
-    check_ld "cc" "$@" <<EOF && enable $func
-#include <math.h>
-float foo(float f, float g) { return $func($args); }
-int main(void){ return (int) foo; }
 EOF
 }
 
@@ -1092,16 +1045,6 @@ check_builtin(){
     shift 3
     disable "$name"
     check_code ld "$headers" "$builtin" "cc" "$@" && enable "$name"
-}
-
-check_compile_assert(){
-    log check_compile_assert "$@"
-    name=$1
-    headers=$2
-    condition=$3
-    shift 3
-    disable "$name"
-    check_code cc "$headers" "char c[2 * !!($condition) - 1]" "$@" && enable "$name"
 }
 
 require(){
@@ -1641,156 +1584,60 @@ HAVE_LIST_PUB="
     fast_unaligned
 "
 
-HEADERS_LIST="
-    altivec_h
-    arpa_inet_h
-    asm_types_h
-    d3d11_h
-    dispatch_dispatch_h
-    dev_bktr_ioctl_bt848_h
-    dev_bktr_ioctl_meteor_h
-    dev_ic_bt8xx_h
-    dev_video_bktr_ioctl_bt848_h
-    dev_video_meteor_ioctl_meteor_h
-    direct_h
+HEADERS_LIST_BLURAY="
     dirent_h
     dlfcn_h
-    dxgidebug_h
-    dxva_h
-    ES2_gl_h
-    EGL_egl_h
-    GLES2_gl2_h
-    fcntl_h
-    gsm_h
-    io_h
-    linux_videodev_h
-    linux_videodev2_h
-    mach_mach_time_h
-    machine_ioctl_bt848_h
-    machine_ioctl_meteor_h
     mntent_h
-    opencv2_core_core_c_h
-    OpenGL_gl3_h
-    poll_h
     pthread_h
-    soundcard_h
-    stdatomic_h
     strings_h
     sys_dl_h
-    sys_mman_h
-    sys_param_h
-    sys_resource_h
-    sys_select_h
-    sys_soundcard_h
     sys_time_h
-    sys_un_h
-    termios_h
-    udplite_h
+"
+
+HEADERS_LIST_UDFREAD="
+    fcntl_h
+    pthread_h
     unistd_h
-    valgrind_valgrind_h
-    vulkan_vulkan_core_h
-    windows_h
-    winsock2_h
-    wayland_client_h
+"
+
+HEADERS_LIST_DVDNAV="
+    dlfcn_h
+    sys_param_h
+"
+
+HEADERS_LIST_LIBMPEG2="
+    altivec_h
+"
+
+HEADERS_LIST="
+    altivec_h
+    dirent_h
+    dlfcn_h
+    fcntl_h
+    mntent_h
+    pthread_h
+    strings_h
+    sys_dl_h
+    sys_param_h
+    sys_time_h
+    unistd_h
 "
 
 INTRINSICS_LIST="
     intrinsics_neon
 "
 
-# unfortunately necessary because of internal FFmpeg header use
-COMPLEX_FUNCS="
-    cabs
-    cexp
+SYSTEM_FUNCS_BLURAY="
+    getmntent_r
 "
 
-MATH_FUNCS="
-    atanf
-    atan2f
-    cbrt
-    cbrtf
-    copysign
-    cosf
-    erf
-    exp2
-    exp2f
-    expf
-    hypot
-    isfinite
-    isinf
-    isnan
-    ldexpf
-    llrint
-    llrintf
-    log2
-    log2f
-    log10f
-    lrint
-    lrintf
-    powf
-    rint
-    round
-    roundf
-    sinf
-    trunc
-    truncf
+SYSTEM_FUNCS_DVDNAV="
+    gettimeofday
 "
 
 SYSTEM_FUNCS="
-    access
-    arc4random
-    clock_gettime
-    closesocket
-    CommandLineToArgvW
-    CoTaskMemFree
-    CryptGenRandom
-    fcntl
-    flt_lim
-    fork
-    getaddrinfo
-    gethrtime
-    getmntent_r
-    getopt
-    GetProcessAffinityMask
-    GetProcessMemoryInfo
-    GetProcessTimes
-    getrusage
-    GetSystemTimeAsFileTime
-    gettimeofday
-    glob
-    glXGetProcAddress
-    gmtime_r
-    inet_aton
-    isatty
-    jack_port_get_latency_range
-    kbhit
-    LoadLibrary
-    localtime_r
-    lstat
-    lzo1x_999_compress
-    mach_absolute_time
-    MapViewOfFile
-    mkstemp
-    mmap
-    mprotect
-    nanosleep
-    PeekNamedPipe
-    pthread_cancel
-    sched_getaffinity
-    SetConsoleTextAttribute
-    SetConsoleCtrlHandler
-    setmode
-    setrlimit
-    Sleep
-    strerror_r
-    sysconf
-    sysctl
-    usleep
-    UTGetOSTypeFromString
-    VirtualAlloc
-    wglGetProcAddress
-    eglGetProcAddress
-    wl_surface_set_opaque_region
+    $SYSTEM_FUNCS_BLURAY
+    $SYSTEM_FUNCS_DVDNAV
 "
 
 TOOLCHAIN_FEATURES="
@@ -1820,21 +1667,6 @@ TOOLCHAIN_FEATURES="
 "
 
 TYPES_LIST="
-    CONDITION_VARIABLE_Ptr
-    kCMVideoCodecType_HEVC
-    socklen_t
-    struct_addrinfo
-    struct_group_source_req
-    struct_ip_mreq_source
-    struct_ipv6_mreq
-    struct_msghdr_msg_flags
-    struct_pollfd
-    struct_rusage_ru_maxrss
-    struct_sctp_event_subscribe
-    struct_sockaddr_in6
-    struct_sockaddr_sa_len
-    struct_sockaddr_storage
-    struct_stat_st_mtim_tv_nsec
     struct_hdr_metadata_infoframe
 "
 
@@ -1845,12 +1677,10 @@ HAVE_LIST="
     $ARCH_FEATURES
     $ATOMICS_LIST
     $BUILTIN_LIST
-    $COMPLEX_FUNCS
     $HAVE_LIST_CMDLINE
     $HAVE_LIST_PUB
     $HEADERS_LIST
     $INTRINSICS_LIST
-    $MATH_FUNCS
     $SYSTEM_FUNCS
     $THREADS_LIST
     $TOOLCHAIN_FEATURES
@@ -1925,7 +1755,6 @@ MYTHTV_CONFIG_LIST='
 '
 
 MYTHTV_HAVE_LIST='
-    byteswap_h
     bdj_j2me
     fe_can_2g_modulation
     ftime
@@ -1936,7 +1765,6 @@ MYTHTV_HAVE_LIST='
     stdint_h
     sync_file_range
     close_range
-    sys_endian_h
 '
 
 MYTHTV_LIST='
@@ -1995,7 +1823,6 @@ CMDLINE_SELECT="
     optimizations
     rpath
     set_cc_default
-    stripping
     $MYTHTV_LIST
     $MYTHTV_CONFIG_LIST
 "
@@ -2074,7 +1901,6 @@ CMDLINE_SET="
     random_seed
     ranlib
     samples
-    strip
     sws_max_filter_size
     sysinclude
     sysroot
@@ -2248,13 +2074,11 @@ ln_s_default="ln -s -f"
 nm_default="nm -g"
 pkg_config_default=pkg-config
 ranlib_default="ranlib"
-strip_default="strip"
 version_script='--version-script'
 x86asmexe_default="nasm"
 windres_default="windres"
 nvcc_default="nvcc"
 nvccflags_default="-gencode arch=compute_30,code=sm_30 -O2"
-striptype="direct"
 
 # MythTV toolchain
 ccache="yes"
@@ -2309,7 +2133,6 @@ host_os=$target_os_default
 # machine
 if test "$target_os_default" = aix; then
     arch_default=$(uname -p)
-    strip_default="strip -X32_64"
 else
     arch_default=$(uname -m)
 fi
@@ -2319,7 +2142,6 @@ intrinsics="none"
 # configurable options
 enable $PROGRAM_LIST
 enable $LIBRARY_LIST
-enable stripping
 
 enable asm
 enable debug
@@ -2930,12 +2752,11 @@ if ${cross_prefix}${ranlib_default} 2>&1 | grep -q "\-D "; then
 else
     ranlib_default="${cross_prefix}${ranlib_default}"
 fi
-strip_default="${cross_prefix}${strip_default}"
 windres_default="${cross_prefix}${windres_default}"
 
 sysinclude_default="${sysroot}/usr/include"
 
-set_default arch cc cxx doxygen pkg_config ranlib strip sysinclude \
+set_default arch cc cxx doxygen pkg_config ranlib sysinclude \
     target_exec target_os x86asmexe nvcc
 enabled cross_compile || host_cc_default=$cc
 set_default host_cc
@@ -3370,7 +3191,6 @@ probe_cc(){
         # -Qvec- -Qsimd- to prevent miscompilation, -GS, fp:precise for consistency
         # with MSVC which enables it by default.
         _cflags='-Qms0 -Qvec- -Qsimd- -GS -fp:precise'
-        disable stripping
     elif $_cc -? 2>/dev/null | grep -q 'LLVM.*Linker'; then
         # lld can emulate multiple different linkers; in ms link.exe mode,
         # the -? parameter gives the help output which contains an identifyable
@@ -3402,7 +3222,6 @@ probe_cc(){
         _ld_lib='lib%.a'
         _ld_path='-libpath:'
         _flags='-nologo'
-        disable stripping
     elif $_cc --version 2>/dev/null | grep -q ^cparser; then
         _type=cparser
         _ident=$($_cc --version | head -n1)
@@ -4317,7 +4136,6 @@ case $target_os in
         ;;
     bsd/os)
         add_extralibs -lpoll -lgnugetopt
-        strip="strip -d"
         ;;
     darwin)
         enable  appleremote
@@ -4341,7 +4159,6 @@ case $target_os in
         #Need to add @rpath in front of install name so test unit can use non-installed lib
         SHFLAGS='-headerpad_max_install_names -dynamiclib -Wl,-single_module -Wl,-install_name,@rpath/$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR)'
         enabled x86_32 && append SHFLAGS -Wl,-read_only_relocs,suppress
-        strip="${strip} -x"
         add_ldflags -Wl,-dynamic,-search_paths_first
         SLIBSUF=".dylib"
         SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME).$(LIBVERSION)$(SLIBSUF)'
@@ -4350,8 +4167,6 @@ case $target_os in
         enabled x86_64 && objformat="macho64" || objformat="macho32"
         enabled_any pic shared x86_64 ||
             { check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic; }
-        check_header dispatch/dispatch.h &&
-            add_cppflags '-I\$(SRC_PATH)/compat/dispatch_semaphore'
         version_script='-exported_symbols_list'
         VERSION_SCRIPT_POSTPROCESS_CMD='tr " " "\n" | sed -n /global:/,/local:/p | grep ";" | tr ";" "\n" | sed -E "s/(.+)/_\1/g" | sed -E "s/(.+[^*])$$$$/\1*/"'
         ;;
@@ -4497,8 +4312,6 @@ case $target_os in
         ranlib="echo ignoring ranlib"
         ;;
     os/2*)
-        strip="lxlite -CS"
-        striptype=""
         objformat="aout"
         add_ldflags -Zomf -Zbin-files -Zargs-wild -Zhigh-mem -Zmap
         SHFLAGS='$(SUBDIR)$(NAME).def -Zdll -Zomf'
@@ -4693,9 +4506,6 @@ case $libc_type in
         ;;
 esac
 
-check_compile_assert flt_lim "float.h limits.h" "DBL_MAX == (double)DBL_MAX" ||
-    add_cppflags '-I\$(SRC_PATH)/compat/float'
-
 esc(){
     echo "$*" | sed 's/%/%25/g;s/:/%3a/g'
 }
@@ -4716,22 +4526,47 @@ if test $target_os = android ; then
     append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
 fi
 
+enable debug
 append CCONFIG "$compile_type"
 if test x$compile_type = x"release" ; then
     add_cflags   -DNDEBUG
     add_cxxflags -DNDEBUG
     check_cxxflags -O2
-    enable debug
 elif test x$compile_type = x"profile" ; then
     add_cflags   -DNDEBUG
     add_cxxflags -DNDEBUG
     check_cxxflags -O2
-    enable debug
-    disable stripping
 elif test x$compile_type = x"debug"; then
-    enable debug
-    disable optimizations stripping
+    disable optimizations
 fi
+
+if [ -z "$optflags" ]; then
+    if enabled small; then
+        optflags=$cflags_size
+    elif enabled optimizations; then
+        optflags=$cflags_speed
+    else
+        optflags=$cflags_noopt
+    fi
+fi
+
+check_optflags(){
+    check_cflags "$@"
+    enabled lto && check_ldflags "$@"
+}
+
+check_optflags $optflags
+check_optflags -fno-math-errno
+check_optflags -fno-signed-zeros
+
+if enabled lto; then
+    test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
+    check_cflags  -flto
+    check_cxxflags -flto
+    check_ldflags -flto $cpuflags
+    disable inline_asm_direct_symbol_refs
+fi
+
 
 enabled silent_cc && append CCONFIG "silent"
 
@@ -5133,46 +4968,6 @@ check_code cc arm_neon.h "int16x8_t test = vdupq_n_s16(0)" && enable intrinsics_
 check_ldflags -Wl,--as-needed
 check_ldflags -Wl,-z,noexecstack
 
-if ! disabled network; then
-    check_func getaddrinfo $network_extralibs
-    check_func inet_aton $network_extralibs
-
-    check_type netdb.h "struct addrinfo"
-    check_type netinet/in.h "struct group_source_req" -D_BSD_SOURCE
-    check_type netinet/in.h "struct ip_mreq_source" -D_BSD_SOURCE
-    check_type netinet/in.h "struct ipv6_mreq" -D_DARWIN_C_SOURCE
-    check_type poll.h "struct pollfd"
-    check_type netinet/sctp.h "struct sctp_event_subscribe"
-    check_struct "sys/socket.h" "struct msghdr" msg_flags
-    check_struct "sys/types.h sys/socket.h" "struct sockaddr" sa_len
-    check_type netinet/in.h "struct sockaddr_in6"
-    check_type "sys/types.h sys/socket.h" "struct sockaddr_storage"
-    check_type "sys/types.h sys/socket.h" socklen_t
-
-    # Prefer arpa/inet.h over winsock2
-    if check_header arpa/inet.h ; then
-        check_func closesocket
-    elif check_header winsock2.h ; then
-        check_func_headers winsock2.h closesocket -lws2 &&
-            network_extralibs="-lws2" ||
-        { check_func_headers winsock2.h closesocket -lws2_32 &&
-            network_extralibs="-lws2_32"; } || disable winsock2_h network
-        check_func_headers ws2tcpip.h getaddrinfo $network_extralibs
-
-        check_type ws2tcpip.h socklen_t
-        check_type ws2tcpip.h "struct addrinfo"
-        check_type ws2tcpip.h "struct group_source_req"
-        check_type ws2tcpip.h "struct ip_mreq_source"
-        check_type ws2tcpip.h "struct ipv6_mreq"
-        check_type winsock2.h "struct pollfd"
-        check_struct winsock2.h "struct sockaddr" sa_len
-        check_type ws2tcpip.h "struct sockaddr_in6"
-        check_type ws2tcpip.h "struct sockaddr_storage"
-    else
-        disable network
-    fi
-fi
-
 use_pkg_config sqlite3 sqlite3 "sqlite3.h" sqlite3_load_extension && enable sqlite3
 require_pkg_config samplerate samplerate samplerate.h src_get_version -lm
 
@@ -5224,114 +5019,27 @@ check_builtin MemoryBarrier windows.h "MemoryBarrier()"
 check_builtin sarestart signal.h "SA_RESTART"
 check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwait(s,0); sem_destroy(s)" -lpthread
 check_builtin sync_val_compare_and_swap "" "int *ptr; int oldval, newval; __sync_val_compare_and_swap(ptr, oldval, newval)"
-check_builtin gmtime_r time.h "time_t *time; struct tm *tm; gmtime_r(time, tm)"
-check_builtin localtime_r time.h "time_t *time; struct tm *tm; localtime_r(time, tm)"
 check_builtin x264_csp_bgr x264.h X264_CSP_BGR
 
-case "$custom_allocator" in
-    jemalloc)
-        # jemalloc by default does not use a prefix
-        require libjemalloc jemalloc/jemalloc.h malloc -ljemalloc
-    ;;
-    tcmalloc)
-        require_pkg_config libtcmalloc libtcmalloc gperftools/tcmalloc.h tc_malloc
-        malloc_prefix=tc_
-    ;;
-esac
-
-check_func  access
-check_func_headers stdlib.h arc4random
-check_func_headers time.h clock_gettime ||
-    { check_lib clock_gettime time.h clock_gettime -lrt && LIBRT="-lrt"; }
-check_func  fcntl
-check_func  fork
-check_func  gethrtime
-check_func  getopt
-check_func  getrusage
 check_func  gettimeofday
-check_func  isatty
-check_func  mach_absolute_time
-check_func  mkstemp
-check_func  mmap
-check_func  mprotect
-# Solaris has nanosleep in -lrt, OpenSolaris no longer needs that
-check_func_headers time.h nanosleep ||
-    { check_lib nanosleep time.h nanosleep -lrt && LIBRT="-lrt"; }
-check_func  sched_getaffinity
-check_func  setrlimit
-check_struct "sys/stat.h" "struct stat" st_mtim.tv_nsec -D_BSD_SOURCE
-check_func  strerror_r
-check_func  sysconf
-check_func  sysctl
-check_func  usleep
 
-check_func_headers conio.h kbhit
-check_func_headers io.h setmode
-check_func_headers lzo/lzo1x.h lzo1x_999_compress
-check_func_headers stdlib.h getenv
-check_func_headers sys/stat.h lstat
-
-check_func_headers windows.h GetProcessAffinityMask
-check_func_headers windows.h GetProcessTimes
-check_func_headers windows.h GetSystemTimeAsFileTime
-check_func_headers windows.h LoadLibrary
-check_func_headers windows.h MapViewOfFile
-check_func_headers windows.h PeekNamedPipe
-check_func_headers windows.h SetConsoleTextAttribute
-check_func_headers windows.h SetConsoleCtrlHandler
-check_func_headers windows.h Sleep
-check_func_headers windows.h VirtualAlloc
-check_struct windows.h "CONDITION_VARIABLE" Ptr
-check_func_headers glob.h glob
-
-check_header d3d11.h
-check_header direct.h
 check_header dirent.h
 check_header dlfcn.h
-check_header dxgidebug.h
-check_header dxva.h
 check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_header fcntl.h
-check_header io.h
-check_header mach/mach_time.h
-check_header malloc.h
 check_header mntent.h
 check_func_headers mntent.h getmntent_r
-check_header net/udplite.h
-check_header poll.h
 check_header pthread.h
 check_header strings.h
 check_header sys/dl.h
-check_header sys/mman.h
 check_header sys/param.h
-check_header sys/resource.h
-check_header sys/select.h
 check_header sys/time.h
-check_header sys/un.h
-check_header termios.h
 check_header unistd.h
 check_header valgrind/valgrind.h
 check_header vulkan/vulkan_core.h
-check_func_headers VideoToolbox/VTCompressionSession.h VTCompressionSessionPrepareToEncodeFrames -framework VideoToolbox
-check_header windows.h
-check_header asm/types.h
-check_header linux/videodev.h
 check_header linux/videodev2.h
 
-
-# it seems there are versions of clang in some distros that try to use the
-# gcc headers, which explodes for stdatomic
-# so we also check that atomics actually work here
-check_builtin stdatomic_h stdatomic.h "atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0)"
-
-check_lib ole32    "windows.h"            CoTaskMemFree        -lole32
-check_lib shell32  "windows.h shellapi.h" CommandLineToArgvW   -lshell32
-check_lib wincrypt "windows.h wincrypt.h" CryptGenRandom       -ladvapi32
-check_lib psapi    "windows.h psapi.h"    GetProcessMemoryInfo -lpsapi
-
 #Myth check for MYTHTV_HAVE_LIST
-check_header byteswap.h
-check_header sys/endian.h
 check_header va/va.h
 check_header va/va_x11.h
 check_header va/va_glx.h
@@ -5342,12 +5050,6 @@ check_func_headers "sys/types.h sys/socket.h ifaddrs.h" getifaddrs
 check_func_headers sys/time.h gettimeofday
 #End MythTV check
 
-check_struct "sys/time.h sys/resource.h" "struct rusage" ru_maxrss
-
-check_type "windows.h dxva.h" "DXVA_PicParams_HEVC" -DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP -D_CRT_BUILD_DESKTOP_APP=0
-check_type "windows.h dxva.h" "DXVA_PicParams_VP9" -DWINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP -D_CRT_BUILD_DESKTOP_APP=0
-check_type "windows.h d3d11.h" "ID3D11VideoDecoder"
-check_type "windows.h d3d11.h" "ID3D11VideoContext"
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
 
 check_type "va/va.h va/va_dec_hevc.h" "VAPictureParameterBufferHEVC"
@@ -5397,11 +5099,6 @@ if ! disabled pthreads && ! enabled w32threads && ! enabled os2threads; then
         enable pthreads
     fi
     check_code cc "pthread.h" "static pthread_mutex_t atomic_lock = PTHREAD_MUTEX_INITIALIZER" || disable pthreads
-fi
-
-
-if enabled pthreads; then
-  check_func pthread_cancel
 fi
 
 enabled ffmpeg_pthreads && enable pthreads
@@ -5553,22 +5250,6 @@ require zip zip.h zip_open -lzip
 # On some systems dynamic loading requires no extra linker flags
 check_lib libdl dlfcn.h "dlopen dlsym" || check_lib libdl dlfcn.h "dlopen dlsym" -ldl
 
-check_lib libm math.h sin -lm && LIBM="-lm"
-
-atan2f_args=2
-copysign_args=2
-hypot_args=2
-ldexpf_args=2
-powf_args=2
-
-for func in $MATH_FUNCS; do
-    eval check_mathfunc $func \${${func}_args:-1} $LIBM
-done
-
-for func in $COMPLEX_FUNCS; do
-    eval check_complexfunc $func \${${func}_args:-1}
-done
-
 # these are off by default, so fail if requested and not available
 enabled jni               && { [ $target_os = "android" ] && check_header jni.h && enabled pthreads || die "ERROR: jni not found"; }
 enabled libiec61883       && require libiec61883 libiec61883/iec61883.h iec61883_cmp_connect -lraw1394 -lavc1394 -lrom1394 -liec61883
@@ -5699,15 +5380,6 @@ check_lib vfw32 "windows.h vfw.h" capCreateCaptureWindow -lvfw32
 check_cpp_condition vfw.h "WM_CAP_DRIVER_CONNECT > WM_USER" && enable vfwcap_defines
 
 check_type "dshow.h" IBaseFilter
-
-# check for ioctl_meteor.h, ioctl_bt848.h and alternatives
-{ check_header dev/bktr/ioctl_meteor.h &&
-  check_header dev/bktr/ioctl_bt848.h; } ||
-{ check_header machine/ioctl_meteor.h &&
-  check_header machine/ioctl_bt848.h; } ||
-{ check_header dev/video/meteor/ioctl_meteor.h &&
-  check_header dev/video/bktr/ioctl_bt848.h; } ||
-check_header dev/ic/bt8xx.h
 
 if check_struct sys/soundcard.h audio_buf_info bytes; then
     enable_safe sys/soundcard.h
@@ -5861,9 +5533,6 @@ enabled rpath && add_ldexeflags -Wl,-rpath,$libdir
 enabled rpath && add_ldlibflags -Wl,-rpath,$libdir
 test_ldflags -Wl,-Bsymbolic && append SHFLAGS -Wl,-Bsymbolic
 
-# add some strip flags
-check_stripflags -x
-
 enabled neon_clobber_test &&
     check_ldflags -Wl,--wrap,avcodec_open2              \
                   -Wl,--wrap,avcodec_decode_audio4      \
@@ -5916,16 +5585,6 @@ EOF
     fi
 fi
 
-if [ -z "$optflags" ]; then
-    if enabled small; then
-        optflags=$cflags_size
-    elif enabled optimizations; then
-        optflags=$cflags_speed
-    else
-        optflags=$cflags_noopt
-    fi
-fi
-
 if [ -z "$nvccflags" ]; then
     nvccflags=$nvccflags_default
 fi
@@ -5936,22 +5595,6 @@ else
     nvccflags="$nvccflags -m32"
 fi
 
-check_optflags(){
-    check_cflags "$@"
-    enabled lto && check_ldflags "$@"
-}
-
-check_optflags $optflags
-check_optflags -fno-math-errno
-check_optflags -fno-signed-zeros
-
-if enabled lto; then
-    test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
-    check_cflags  -flto
-    check_cxxflags -flto
-    check_ldflags -flto $cpuflags
-    disable inline_asm_direct_symbol_refs
-fi
 
 if enabled dvb; then
     [ -d "$dvb_path" ] || dvb_path="${sysroot}/usr/include"
@@ -6265,9 +5908,6 @@ if enabled libcec ; then
     else
         check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
-#include <iostream>
-using namespace std;
-using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
     #if (CEC_LIB_VERSION_MAJOR < 2)
@@ -6327,17 +5967,7 @@ if test $target_os = darwin; then
     fi
 fi
 
-if [ -n "$optflags" ]; then
-    add_cflags $optflags
-elif enabled small; then
-    add_cflags $cflags_size
-elif enabled optimizations; then
-    add_cflags $cflags_speed
-else
-    add_cflags $cflags_noopt
-fi
-check_cflags -fno-math-errno
-check_cflags -fno-signed-zeros
+
 check_cc -mno-red-zone <<EOF && noredzone_flags="-mno-red-zone"
 int x;
 EOF
@@ -6687,22 +6317,6 @@ for thread in $THREADS_LIST; do
     fi
 done
 
-if disabled stdatomic_h; then
-    if enabled atomics_gcc; then
-        add_cppflags '-I\$(SRC_PATH)/compat/atomics/gcc'
-    elif enabled atomics_win32; then
-        add_cppflags '-I\$(SRC_PATH)/compat/atomics/win32'
-    elif enabled atomics_suncc; then
-        add_cppflags '-I\$(SRC_PATH)/compat/atomics/suncc'
-    elif enabled pthreads; then
-        add_compat atomics/pthread/stdatomic.o
-        add_cppflags '-I\$(SRC_PATH)/compat/atomics/pthread'
-    else
-        enabled threads && die "Threading is enabled, but no atomics are available"
-        add_cppflags '-I\$(SRC_PATH)/compat/atomics/dummy'
-    fi
-fi
-
 # Check if requested libraries were found.
 for lib in $AUTODETECT_LIBS; do
     requested $lib && ! enabled $lib && die "ERROR: $lib requested but not found";
@@ -6752,6 +6366,16 @@ ffmpeg_optenable() {
     done
 }
 
+ffmpeg_optenableif() {
+    while test -n "$1" ; do
+        val=$(eval "echo \$$1")
+        if enabled "$1" ; then
+            ffopts="$ffopts --enable-"$(echo "$1" | sed 's/_/-/g')
+        fi
+        shift
+    done
+}
+
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
@@ -6771,34 +6395,13 @@ if test $target_os = "android"; then
 else
     disable mediacodec
 fi
-if enabled vaapi; then
-    ffopts="$ffopts --enable-vaapi"
-fi
 
-if enabled mmal; then
-    ffopts="$ffopts --enable-mmal"
-fi
+ffmpeg_optenableif vaapi mmal libaom libdav1d gnutls lto
 
 if enabled drm; then
     ffopts="$ffopts --enable-libdrm"
 fi
 
-if enabled libaom; then
-    ffopts="$ffopts --enable-libaom"
-fi
-
-
-if enabled libdav1d; then
-    ffopts="$ffopts --enable-libdav1d"
-fi
-
-if enabled gnutls; then
-    ffopts="$ffopts --enable-gnutls"
-fi
-
-if enabled lto; then
-    ffopts="$ffopts --enable-lto"
-fi
 
 if test "$ID" = "raspbian"; then
     case $cpu in
@@ -6982,9 +6585,6 @@ if enabled source_path_used; then
     map 'test -f "$source_path/$v" && $ln_s "$source_path/$v" $v' $FILES
 fi
 
-enabled stripping || strip="echo skipping strip"
-enabled stripping || striptype=""
-
 config_files="$TMPH $TMPMAK"
 
 if enabled backend; then
@@ -7166,8 +6766,6 @@ AR_O=$ar_o
 QMAKE_AR=$ar $arflags
 RANLIB=$ranlib
 QMAKE_RANLIB=$ranlib
-STRIP=$strip
-STRIPTYPE=$striptype
 NVCC=$nvcc
 CP=cp -p
 LN_S=$ln_s
@@ -7203,7 +6801,6 @@ DOXYGEN=$doxygen
 LDFLAGS=$LDFLAGS
 LDEXEFLAGS=$LDEXEFLAGS
 LDLIBFLAGS=$LDLIBFLAGS
-ASMSTRIPFLAGS=$ASMSTRIPFLAGS
 X86ASMFLAGS=$X86ASMFLAGS
 BUILDSUF=$build_suffix
 PROGSSUF=$progs_suffix
@@ -7360,9 +6957,6 @@ EOF
 test -n "$assert_level" &&
     echo "#define ASSERT_LEVEL $assert_level" >>$TMPH
 
-test -n "$malloc_prefix" &&
-    echo "#define MALLOC_PREFIX $malloc_prefix" >>$TMPH
-
 if enabled cygwin ; then
   echo "#ifndef llrint" >> $TMPH
   echo "#define llrint llrint  // make sure not to define twice" >> $TMPH
@@ -7376,8 +6970,6 @@ if enabled cygwin ; then
   echo "}" >> $TMPH
   echo "#endif" >> $TMPH
 fi
-
-enabled getenv || echo "#define getenv(x) NULL" >> $TMPH
 
 print_config ARCH_   "$config_files" $ARCH_LIST
 print_config HAVE_   "$config_files" $HAVE_LIST

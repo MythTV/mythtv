@@ -31,7 +31,6 @@
 #include "lzo/lzo1x.h"
 #include "v4lrecorder.h"
 
-#undef HAVE_AV_CONFIG_H
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
