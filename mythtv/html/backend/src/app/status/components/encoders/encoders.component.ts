@@ -4,13 +4,18 @@ import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/captu
 import { Encoder, TVState } from 'src/app/services/interfaces/encoder.interface';
 import { UtilityService } from 'src/app/services/utility.service';
 
+interface myEncoder extends Encoder {
+  ParentId?: number
+}
+
 @Component({
   selector: 'app-status-encoders',
   templateUrl: './encoders.component.html',
   styleUrls: ['./encoders.component.css', '../../status.component.css']
 })
+
 export class EncodersComponent implements OnInit {
-  @Input() encoders? : Encoder[];
+  @Input() encoders : myEncoder[] = [];
   m_Cards: CardAndInput[] = [];
   
   constructor(public utility: UtilityService,
@@ -19,6 +24,9 @@ export class EncodersComponent implements OnInit {
   ngOnInit(): void {
     this.captureCardService.GetCaptureCardList('', '').subscribe(data => {
       this.m_Cards = data.CaptureCardList.CaptureCards;
+      this.encoders?.forEach((entry) => {
+        entry.ParentId = this.m_Cards.find((card) => card.CardId == entry.Id)?.ParentId;
+      });
     })
   }
 
@@ -27,6 +35,23 @@ export class EncodersComponent implements OnInit {
     if (card)
       return card.CardType + ': ' + card.VideoDevice;
     return ' ';
+  }
+
+  encoderStatuses(id: number) {
+    let statuses = new Set();
+    this.encoders.forEach( (encoder) => {
+      if (encoder.Id == id || encoder.ParentId == id)
+        statuses.add(this.EncoderStatusText(encoder.State));
+    });
+    let i = statuses.values();
+    let v =i.next();
+    let result = '';
+    while (v.value) {
+      result += v.value + ', ';
+      v = i.next();
+    }
+    result = result.slice(0,result.length-2);
+    return result;
   }
 
   EncoderStatusText(state: number) : string {
