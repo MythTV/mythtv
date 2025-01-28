@@ -562,8 +562,6 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
     else
     {
         Widget->setAttribute(Qt::WA_PaintOnScreen);
-        if (native)
-            native->setAttribute(Qt::WA_PaintOnScreen);
     }
 }
 
