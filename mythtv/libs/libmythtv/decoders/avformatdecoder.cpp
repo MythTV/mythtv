@@ -3222,6 +3222,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVCodecContext* context, AVStream *c
 
 bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt, bool &Retry)
 {
+    Retry = false;
     int ret = 0;
     int gotpicture = 0;
     MythAVFrame mpa_pic;
@@ -4517,6 +4518,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* context, AVStream *curs
 // documented in decoderbase.h
 bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 {
+    Retry = false;
     AVPacket *pkt = nullptr;
     bool have_err = false;
 
