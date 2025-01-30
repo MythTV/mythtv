@@ -8,11 +8,8 @@
 #include "transcodedefs.h"
 
 class ProgramInfo;
-class NuppelVideoRecorder;
 class MythPlayer;
 class MythMediaBuffer;
-
-using KFATable = std::vector<struct kfatable_entry>;
 
 class Transcode : public QObject
 {
@@ -53,13 +50,9 @@ class Transcode : public QObject
     ProgramInfo         *m_proginfo            { nullptr };
     RecordingProfile    *m_recProfile          { nullptr };
     int                  m_keyframeDist        { 30 };
-#if CONFIG_LIBMP3LAME
-    NuppelVideoRecorder *m_nvr                 { nullptr };
-#endif
     PlayerContext       *m_ctx                 { nullptr };
     MythMediaBuffer     *m_outBuffer           { nullptr };
     MythFIFOWriter      *m_fifow               { nullptr };
-    KFATable            *m_kfaTable            { nullptr };
     bool                 m_showProgress        { false };
     QString              m_recorderOptions;
     bool                 m_avfMode             { false };

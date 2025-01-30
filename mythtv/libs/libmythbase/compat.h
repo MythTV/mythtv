@@ -197,19 +197,6 @@
 #    define WEXITSTATUS(w) (((w) >> 8) & 0xff)
 #    define WTERMSIG(w)    ((w) & 0x7f)
 
-
-#   ifdef LZO_COMPILE_TIME_ASSERT_HEADER
-#   undef LZO_COMPILE_TIME_ASSERT_HEADER
-#   endif
-
-#   define LZO_COMPILE_TIME_ASSERT_HEADER( a )
-
-#   ifdef LZO_COMPILE_TIME_ASSERT
-#   undef LZO_COMPILE_TIME_ASSERT
-#   endif
-
-#   define LZO_COMPILE_TIME_ASSERT( a )
-
 #endif // _WIN32
 
 

@@ -19,7 +19,7 @@ void MythTranscodePlayer::SetTranscoding(bool Transcoding)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No decoder yet - cannot set transcoding");
 }
 
-void MythTranscodePlayer::InitForTranscode(bool CopyAudio, bool CopyVideo)
+void MythTranscodePlayer::InitForTranscode()
 {
     // Are these really needed?
     SetPlaying(true);
@@ -35,8 +35,6 @@ void MythTranscodePlayer::InitForTranscode(bool CopyAudio, bool CopyVideo)
     m_framesPlayed = 0;
     ClearAfterSeek();
 
-    m_rawAudio = CopyAudio;
-    m_rawVideo = CopyVideo;
     if (m_decoder)
         m_decoder->SetSeekSnap(0);
 }

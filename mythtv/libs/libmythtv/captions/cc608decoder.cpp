@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 // Some of the XDS was inspired by code in TVTime. -- dtk 03/30/2006
+#include "captions/cc608decoder.h"
 
 #include <algorithm>
 #include <vector>
@@ -13,8 +14,6 @@
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythlogging.h"
 
-#include "format.h"
-#include "captions/cc608decoder.h"
 #include "vbilut.h"
 
 #define DEBUG_XDS 0

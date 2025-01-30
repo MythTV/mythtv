@@ -17,7 +17,6 @@ set(LIBMYTHBASE_HEADERS
     compat.h
     dbutil.h
     exitcodes.h
-    ffmpeg-mmx.h
     filesysteminfo.h
     hardwareprofile.h
     iso3166.h
