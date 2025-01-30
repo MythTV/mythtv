@@ -12,9 +12,9 @@
                     <ng-container *ngFor="let sub of encoders">
                         <ng-container *ngIf="sub.Recording && (sub.Id == encoder.Id || sub.ParentId == encoder.Id)">
                             <br>
-                            '{{ encoder.Recording.Title }}' on {{ encoder.Recording.Channel.CallSign }}.
+                            '{{ sub.Recording.Title }}' on {{ sub.Recording.Channel.CallSign }}.
                             {{ 'dashboard.status.endtime_text' |
-                            translate: { EndTime: utility.formatTime(encoder.Recording.EndTime) } }}
+                            translate: { EndTime: utility.formatTime(sub.Recording.EndTime) } }}
                         </ng-container>
                     </ng-container>
                 </li>

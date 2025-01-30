@@ -220,6 +220,12 @@ export class RecordingsComponent implements OnInit {
     });
   }
 
+  keydown(event: KeyboardEvent) {
+    if (event.key == "Enter")
+      this.onFilter();
+  }
+
+
   onFilter() {
     this.reload();
   }
