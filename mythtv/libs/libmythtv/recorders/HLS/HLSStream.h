@@ -1,16 +1,18 @@
 #ifndef HLS_STREAM_
 #define HLS_STREAM_
 
-#ifdef USING_LIBCRYPTO
-// encryption related stuff
-#include <openssl/aes.h>
-#endif // USING_LIBCRYPTO
-
 #include <QMap>
 #include <QQueue>
 
 #include "libmythbase/mythsingledownload.h"
 #include "HLSSegment.h"
+
+// 128-bit AES key for HLS segment decryption
+#define AES128_KEY_SIZE 16
+struct hls_aes_key_st {
+    unsigned char key[AES128_KEY_SIZE];
+};
+typedef struct hls_aes_key_st HLS_AES_KEY;
 
 class HLSRecStream
 {
@@ -18,8 +20,8 @@ class HLSRecStream
 
   public:
 #ifdef USING_LIBCRYPTO
-    using AESKeyMap = QMap<QString, AES_KEY* >;
-#endif
+    using AESKeyMap = QMap<QString, HLS_AES_KEY* >;
+#endif  // USING_LIBCRYPTO
 
     HLSRecStream(int seq, uint64_t bitrate, QString m3u8_url, QString segment_base_url);
     ~HLSRecStream(void);
@@ -65,8 +67,10 @@ class HLSRecStream
 
 #ifdef USING_LIBCRYPTO
   protected:
+    int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+                unsigned char *iv, unsigned char *plaintext);
     bool DownloadKey(MythSingleDownload& downloader,
-		     const QString& keypath, AES_KEY* aeskey);
+          const QString& keypath, HLS_AES_KEY* aeskey);
     bool DecodeData(MythSingleDownload& downloader,
 		    const QByteArray& IV, const QString& keypath,
 		    QByteArray& data, int64_t sequence);
