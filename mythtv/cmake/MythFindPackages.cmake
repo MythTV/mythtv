@@ -25,6 +25,7 @@ find_package(PkgConfig REQUIRED)
 # have already been compiled and installed by the super-package.
 #
 if(NOT CMAKE_CROSSCOMPILING
+   AND ENABLE_NVDEC
    AND CMAKE_SYSTEM_NAME MATCHES "Linux|Windows"
    AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86|aarch64")
   pkg_check_modules(FFNVCODEC ffnvcodec REQUIRED IMPORTED_TARGET)
