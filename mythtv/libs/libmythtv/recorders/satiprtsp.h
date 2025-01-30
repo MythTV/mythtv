@@ -27,7 +27,7 @@ class SatIPRTSP : public QObject
     Q_OBJECT
 
   public:
-    explicit SatIPRTSP(int m_inputId);
+    explicit SatIPRTSP(int inputId);
     ~SatIPRTSP() override;
 
     bool Setup(const QUrl& url, ushort clientPort1, ushort clientPort2);
