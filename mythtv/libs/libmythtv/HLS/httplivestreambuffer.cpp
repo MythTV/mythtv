@@ -50,7 +50,15 @@ extern "C" {
 #ifdef USING_LIBCRYPTO
 // encryption related stuff
 #include <openssl/aes.h>
+#include <openssl/evp.h>
 using aesiv_array = std::array<uint8_t,AES_BLOCK_SIZE>;
+
+// 128-bit AES key for HLS segment decryption
+#define AES128_KEY_SIZE 16
+struct hls_aes_key_st {
+    unsigned char key[AES128_KEY_SIZE];
+};
+typedef struct hls_aes_key_st HLS_AES_KEY;
 #endif
 
 #define LOC QString("HLSBuffer: ")
@@ -293,15 +301,76 @@ class HLSSegment
             }
             return RET_ERROR;
         }
-        AES_set_decrypt_key((const unsigned char*)key.constData(), 128, &m_aeskey);
+        memcpy(m_aeskey.key, key.constData(), AES128_KEY_SIZE);
         m_keyloaded = true;
         return RET_OK;
+    }
+
+    // AES decryption based on OpenSSL example found on
+    // https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption
+    //
+    int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+                unsigned char *iv, unsigned char *plaintext)
+    {
+        EVP_CIPHER_CTX *ctx;
+
+        int len = 0;
+
+        int plaintext_len = 0;
+
+        /* Create and initialise the context */
+        if(!(ctx = EVP_CIPHER_CTX_new()))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + "Failed to create and initialize cipher context");
+            return 0;
+        }
+
+        /*
+        * Initialise the decryption operation. IMPORTANT - ensure you use a key
+        * and IV size appropriate for your cipher
+        * In this example we are using 128 bit AES (i.e. a 128 bit key). The
+        * IV size for *most* modes is the same as the block size. For AES this
+        * is 128 bits
+        */
+        if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + "Failed to initialize decryption operation");
+            return 0;
+        }
+
+        /*
+        * Provide the message to be decrypted, and obtain the plaintext output.
+        * EVP_DecryptUpdate can be called multiple times if necessary.
+        */
+        if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + "Failed to decrypt");
+            return 0;
+        }
+        plaintext_len = len;
+
+        /*
+        * Finalise the decryption. Further plaintext bytes may be written at
+        * this stage.
+        */
+        if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + "Failed to finalize decryption" +
+                QString(" len:%1").arg(len) +
+                QString(" plaintext_len:%1").arg(plaintext_len) );
+            return 0;
+        }
+        plaintext_len += len;
+
+        /* Clean up */
+        EVP_CIPHER_CTX_free(ctx);
+
+        return plaintext_len;
     }
 
     int DecodeData(const aesiv_array IV, bool iv_valid)
     {
         /* Decrypt data using AES-128 */
-        int aeslen = m_data.size() & ~0xf;
         aesiv_array iv {};
         auto *decrypted_data = new uint8_t[m_data.size()];
         if (!iv_valid)
@@ -322,23 +391,23 @@ class HLSSegment
         {
             std::copy(IV.cbegin(), IV.cend(), iv.begin());
         }
-        AES_cbc_encrypt((unsigned char*)m_data.constData(),
-                        decrypted_data, aeslen,
-                        &m_aeskey, iv.data(), AES_DECRYPT);
-        memcpy(decrypted_data + aeslen, m_data.constData() + aeslen,
-               m_data.size() - aeslen);
 
-        // remove the PKCS#7 padding from the buffer
-        int pad = decrypted_data[m_data.size()-1];
-        if (pad <= 0 || pad > AES_BLOCK_SIZE)
+        int aeslen = m_data.size() & ~0xf;
+        if (aeslen != m_data.size())
         {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                QString("bad padding character (0x%1)").arg(pad, 0, 16, QLatin1Char('0')));
-            delete[] decrypted_data;
-            return RET_ERROR;
+            LOG(VB_RECORD, LOG_WARNING, LOC +
+                QString("Data size %1 not multiple of 16 bytes, rounding to %2")
+                    .arg(m_data.size()).arg(aeslen));
         }
-        aeslen = m_data.size() - pad;
-        m_data = QByteArray(reinterpret_cast<char*>(decrypted_data), aeslen);
+
+        int plaintext_len = Decrypt((unsigned char*)m_data.constData(), aeslen, m_aeskey.key,
+                                    iv.data(), decrypted_data);
+
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Segment data.size()):%1 plaintext_len:%2")
+                .arg(m_data.size()).arg(plaintext_len));
+
+        m_data = QByteArray(reinterpret_cast<char*>(decrypted_data), plaintext_len);
         delete[] decrypted_data;
 
         return RET_OK;
@@ -370,9 +439,9 @@ class HLSSegment
         m_keyloaded = segment.m_keyloaded;
     }
 private:
-    AES_KEY     m_aeskey    {}; // AES-128 key
+    HLS_AES_KEY m_aeskey    {};         // AES-128 key
     bool        m_keyloaded {false};
-    QString     m_pszKeyPath; // URL key path
+    QString     m_pszKeyPath;           // URL key path
 #endif
 
 private:
