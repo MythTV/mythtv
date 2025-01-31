@@ -178,8 +178,8 @@ endif()
 # Support for cable boxes that provide Firewire out
 if(ENABLE_FIREWIRE)
   target_link_libraries(
-    mythtv PRIVATE $<TARGET_NAME_IF_EXISTS:PkgConfig::LibAVC1394>
-                   $<TARGET_NAME_IF_EXISTS:PkgConfig::LibIEC61883>)
+    mythtv PUBLIC $<TARGET_NAME_IF_EXISTS:PkgConfig::LibAVC1394>
+                  $<TARGET_NAME_IF_EXISTS:PkgConfig::LibIEC61883>)
   target_sources(
     mythtv
     PRIVATE recorders/firewirechannel.h
