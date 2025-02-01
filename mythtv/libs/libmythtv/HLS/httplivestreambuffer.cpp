@@ -58,7 +58,7 @@ using aesiv_array = std::array<uint8_t,AES_BLOCK_SIZE>;
 struct hls_aes_key_st {
     unsigned char key[AES128_KEY_SIZE];
 };
-typedef struct hls_aes_key_st HLS_AES_KEY;
+using HLS_AES_KEY = struct hls_aes_key_st;
 #endif
 
 #define LOC QString("HLSBuffer: ")
