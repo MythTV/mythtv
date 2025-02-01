@@ -286,11 +286,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     player->GetAudio()->ReinitAudio();
-    QString encodingType = player->GetEncodingType();
 
     QString vidsetting = nullptr;
-    QString audsetting = nullptr;
-    QString vidfilters = nullptr;
 
     QSize buf_size = player->GetVideoBufferSize();
     int video_width = buf_size.width();
