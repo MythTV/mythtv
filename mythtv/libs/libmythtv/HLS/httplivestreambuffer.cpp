@@ -312,14 +312,13 @@ class HLSSegment
     static int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
                 unsigned char *iv, unsigned char *plaintext)
     {
-        EVP_CIPHER_CTX *ctx;
-
         int len = 0;
 
         int plaintext_len = 0;
 
         /* Create and initialise the context */
-        if(!(ctx = EVP_CIPHER_CTX_new()))
+        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+        if(!ctx)
         {
             LOG(VB_RECORD, LOG_ERR, LOC + "Failed to create and initialize cipher context");
             return 0;
