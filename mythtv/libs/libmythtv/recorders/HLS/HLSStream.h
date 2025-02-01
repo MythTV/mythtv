@@ -10,7 +10,7 @@
 // 128-bit AES key for HLS segment decryption
 #define AES128_KEY_SIZE 16
 struct hls_aes_key_st {
-    unsigned char key[AES128_KEY_SIZE];
+    std::array<uint8_t,AES128_KEY_SIZE> key;
 };
 using HLS_AES_KEY = struct hls_aes_key_st;
 

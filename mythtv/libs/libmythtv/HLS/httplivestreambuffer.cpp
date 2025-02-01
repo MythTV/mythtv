@@ -56,7 +56,7 @@ using aesiv_array = std::array<uint8_t,AES_BLOCK_SIZE>;
 // 128-bit AES key for HLS segment decryption
 #define AES128_KEY_SIZE 16
 struct hls_aes_key_st {
-    unsigned char key[AES128_KEY_SIZE];
+    std::array<uint8_t,AES128_KEY_SIZE> key;
 };
 using HLS_AES_KEY = struct hls_aes_key_st;
 #endif
@@ -301,7 +301,7 @@ class HLSSegment
             }
             return RET_ERROR;
         }
-        memcpy(m_aeskey.key, key.constData(), AES128_KEY_SIZE);
+        memcpy(m_aeskey.key.data(), key.constData(), AES128_KEY_SIZE);
         m_keyloaded = true;
         return RET_OK;
     }
@@ -399,7 +399,7 @@ class HLSSegment
                     .arg(m_data.size()).arg(aeslen));
         }
 
-        int plaintext_len = Decrypt((unsigned char*)m_data.constData(), aeslen, m_aeskey.key,
+        int plaintext_len = Decrypt((unsigned char*)m_data.constData(), aeslen, m_aeskey.key.data(),
                                     iv.data(), decrypted_data);
 
         LOG(VB_RECORD, LOG_INFO, LOC +

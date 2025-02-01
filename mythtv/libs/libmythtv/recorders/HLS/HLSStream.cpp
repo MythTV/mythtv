@@ -68,7 +68,7 @@ bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
         }
         return false;
     }
-    memcpy(aeskey->key, key.constData(), AES128_KEY_SIZE);
+    memcpy(aeskey->key.data(), key.constData(), AES128_KEY_SIZE);
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "Downloaded AES key");
 
@@ -190,7 +190,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
                 .arg(data.size()).arg(aeslen));
     }
 
-    int plaintext_len = Decrypt((unsigned char*)data.constData(), aeslen, (*Ikey)->key,
+    int plaintext_len = Decrypt((unsigned char*)data.constData(), aeslen, (*Ikey)->key.data(),
                                  iv.data(), decrypted_data);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
