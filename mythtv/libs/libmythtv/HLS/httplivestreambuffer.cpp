@@ -309,7 +309,7 @@ class HLSSegment
     // AES decryption based on OpenSSL example found on
     // https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption
     //
-    int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+    static int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
                 unsigned char *iv, unsigned char *plaintext)
     {
         EVP_CIPHER_CTX *ctx;
