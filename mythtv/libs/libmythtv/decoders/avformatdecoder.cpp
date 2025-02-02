@@ -3223,8 +3223,6 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVCodecContext* context, AVStream *c
 bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt, bool &Retry)
 {
     Retry = false;
-    int ret = 0;
-    int gotpicture = 0;
     MythAVFrame mpa_pic;
     if (!mpa_pic)
         return false;
@@ -3243,50 +3241,56 @@ bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curs
 
     // FilteredReceiveFrame will call avcodec_receive_frame and
     // apply any codec-dependent filtering
-    ret = m_mythCodecCtx->FilteredReceiveFrame(context, mpa_pic);
+    int ret = m_mythCodecCtx->FilteredReceiveFrame(context, mpa_pic);
+    m_avCodecLock.unlock();
 
-    if (ret == 0)
-        gotpicture = 1;
-    else
-        gotpicture = 0;
-    if (ret == AVERROR(EAGAIN))
-        ret = 0;
     // If we got a picture do not send the packet until we have
     // all available pictures
-    if (ret==0 && !gotpicture)
+    if (ret == 0)
     {
+        // averror_count counts sequential errors, so if you have a successful
+        // packet then reset it
+        m_averrorCount = 0;
+        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+            QString("video timecodes packet-pts:%1 frame-pts:%2 packet-dts: %3 frame-dts:%4")
+                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->pts)
+                .arg(mpa_pic->pkt_dts));
+
+        ProcessVideoFrame(context, curstream, mpa_pic);
+    }
+    else if (ret == AVERROR(EAGAIN))
+    {
+        ret = 0;
+        m_avCodecLock.lock();
         ret2 = avcodec_send_packet(context, pkt);
-        if (ret2 == AVERROR(EAGAIN))
+        if (ret2 == 0)
+        {
+            sentPacket = true;
+        }
+        else if (ret2 == AVERROR(EAGAIN))
         {
             Retry = true;
             ret2 = 0;
         }
         else
         {
-            sentPacket = true;
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("video avcodec_send_packet error: %1 (%2)")
+                .arg(QString::fromStdString(av_make_error_stdstring(ret2)), QString::number(ret2))
+                );
         }
+        m_avCodecLock.unlock();
     }
-    m_avCodecLock.unlock();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("video avcodec_receive_frame error: %1 (%2)")
+            .arg(QString::fromStdString(av_make_error_stdstring(ret)), QString::number(ret))
+            );
+    }
 
     if (ret < 0 || ret2 < 0)
     {
-        std::string error;
-        if (ret < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("video avcodec_receive_frame error: %1 (%2) gotpicture:%3")
-                .arg(av_make_error_stdstring(error, ret))
-                .arg(ret).arg(gotpicture));
-        }
-
-        if (ret2 < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
-                .arg(av_make_error_stdstring(error, ret2))
-                .arg(ret2).arg(gotpicture));
-        }
-
         if (++m_averrorCount > SEQ_PKT_ERR_MAX)
         {
             // If erroring on GPU assist, try switching to software decode
@@ -3314,15 +3318,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curs
     // averror_count counts sequential errors, so if you have a successful
     // packet then reset it
     m_averrorCount = 0;
-    if (gotpicture)
-    {
-        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("video timecodes packet-pts:%1 frame-pts:%2 packet-dts: %3 frame-dts:%4")
-                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->dts)
-                .arg(mpa_pic->pkt_dts));
-
-        ProcessVideoFrame(context, curstream, mpa_pic);
-    }
 
     if (!sentPacket)
     {
