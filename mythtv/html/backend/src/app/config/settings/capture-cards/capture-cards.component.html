@@ -7,7 +7,7 @@
         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
         <p>{{ 'settings.capture.select_type' | translate }}</p>
         <p-listbox [options]="cardTypes" [(ngModel)]="selectedCardType" optionLabel="Description"
-            (onDblClick)="newCard();" [listStyle]="{'height':'50vh'}" optionDisabled="Inactive"></p-listbox>
+            (onDblClick)="newCard();" [listStyle]="{'height':'50vh'}"></p-listbox>
         <ng-template pTemplate="footer">
             <p-button icon="pi pi-times-circle" (onClick)="displayModal=false" label="{{ 'common.cancel' | translate }}"
                 styleClass="p-button-plain">

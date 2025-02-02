@@ -9,10 +9,6 @@ import { CaptureCardList, CardAndInput, CardType, CardTypeList, DiseqcTreeList }
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 
-interface CardTypeExt extends CardType {
-  Inactive?: boolean;
-}
-
 @Component({
   selector: 'app-capture-cards',
   templateUrl: './capture-cards.component.html',
@@ -62,7 +58,7 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
   errorCount: number = 0;
   deleteAll: boolean = false;
 
-  cardTypes!: CardTypeExt[];
+  cardTypes: CardType[] = [];
 
   constructor(private mythService: MythService, public router: Router,
     private captureCardService: CaptureCardService, public setupService: SetupService,
@@ -78,13 +74,11 @@ export class CaptureCardsComponent implements OnInit, CanComponentDeactivate {
     translate.get(this.newText).subscribe(data => this.newText = data);
 
     this.captureCardService.GetCardTypeList().subscribe(data => {
-      this.cardTypes = data.CardTypeList.CardTypes
-      this.cardTypes.forEach(entry => {
-        if (CaptureCardsComponent.supportedCardTypes.indexOf(entry.CardType) < 0)
-          entry.Inactive = true;
-        else
-          entry.Inactive = false;
+      data.CardTypeList.CardTypes.forEach(entry => {
+        if (CaptureCardsComponent.supportedCardTypes.indexOf(entry.CardType) >= 0)
+          this.cardTypes.push(entry);
       });
+      this.cardTypes = [...this.cardTypes];
     });
   }
 
