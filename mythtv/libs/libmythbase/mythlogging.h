@@ -80,6 +80,14 @@ inline QString pointerToQString(const void *p)
                     sizeof(void*) * 2, 16, QChar('0'));
 }
 
+/**
+This is equivalent to QVariant(bool).toString()
+*/
+inline QString boolToQString(bool val)
+{
+    return (val) ? QStringLiteral("true") : QStringLiteral("false");
+}
+
 #endif
 
 /*
