@@ -65,7 +65,7 @@ case $STATUS in
       returnCode=0
     ;;
   *)
-    echo '\033[0;31m'"----- ${NOTA_FILE} Notarization Failud or Timeout"'\033[m'
+    echo '\033[0;31m'"----- ${NOTA_FILE} Notarization Failed or Timeout"'\033[m'
     echo $notaOutput
     returnCode=1
 esac
