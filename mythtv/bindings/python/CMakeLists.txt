@@ -83,7 +83,7 @@ endif()
 #
 # Install the MythTV version where the python bindings can find it.
 #
-set(MYTHTV_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+set(MYTHTV_INSTALL_PREFIX "${MYTH_RUN_PREFIX}")
 configure_file(setup.cfg.in setup.cfg @ONLY)
 configure_file(MythTV/_versions.py.in MythTV/_versions.py @ONLY)
 configure_file(MythTV/services_api/mythversions.py.in
