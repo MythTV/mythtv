@@ -9,6 +9,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/remoteutil.h"
+#include "libmythbase/storagegroup.h"
 #include "libmythbase/stringutil.h"
 #include "libmythmetadata/dbaccess.h"
 #include "libmythmetadata/globals.h"
@@ -431,7 +432,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetCoverFile().isEmpty() &&
             !m_workingMetadata->GetCoverFile().startsWith("/"))
         {
-            m_coverart->SetFilename(generate_file_url("Coverart",
+            m_coverart->SetFilename(StorageGroup::generate_file_url("Coverart",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetCoverFile()));
         }
@@ -449,7 +450,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetScreenshot().isEmpty() &&
             !m_workingMetadata->GetScreenshot().startsWith("/"))
         {
-            m_screenshot->SetFilename(generate_file_url("Screenshots",
+            m_screenshot->SetFilename(StorageGroup::generate_file_url("Screenshots",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetScreenshot()));
         }
@@ -467,7 +468,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetBanner().isEmpty() &&
             !m_workingMetadata->GetBanner().startsWith("/"))
         {
-            m_banner->SetFilename(generate_file_url("Banners",
+            m_banner->SetFilename(StorageGroup::generate_file_url("Banners",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetBanner()));
         }
@@ -485,7 +486,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetFanart().isEmpty() &&
             !m_workingMetadata->GetFanart().startsWith("/"))
         {
-            m_fanart->SetFilename(generate_file_url("Fanart",
+            m_fanart->SetFilename(StorageGroup::generate_file_url("Fanart",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetFanart()));
         }
@@ -635,7 +636,7 @@ void EditMetadataDialog::FindCoverArt()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = generate_file_url("Coverart",
+        QString url = StorageGroup::generate_file_url("Coverart",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url, "", *this, CEID_COVERARTFILE);
@@ -814,7 +815,7 @@ void EditMetadataDialog::FindBanner()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = generate_file_url("Banners",
+        QString url = StorageGroup::generate_file_url("Banners",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url, "", *this, CEID_BANNERFILE);
@@ -861,7 +862,7 @@ void EditMetadataDialog::FindFanart()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = generate_file_url("Fanart",
+        QString url = StorageGroup::generate_file_url("Fanart",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url, "", *this, CEID_FANARTFILE);
@@ -908,7 +909,7 @@ void EditMetadataDialog::FindScreenshot()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = generate_file_url("Screenshots",
+        QString url = StorageGroup::generate_file_url("Screenshots",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url, "", *this, CEID_SCREENSHOTFILE);
@@ -956,7 +957,7 @@ void EditMetadataDialog::FindTrailer()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = generate_file_url("Trailers",
+        QString url = StorageGroup::generate_file_url("Trailers",
                       m_workingMetadata->GetHost(),
                       "");
         FindVideoFilePopup(url, "", *this, CEID_TRAILERFILE);

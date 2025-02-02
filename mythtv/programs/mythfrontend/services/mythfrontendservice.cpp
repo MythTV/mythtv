@@ -12,8 +12,8 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
 #include "libmythmetadata/videometadatalistmanager.h"
-#include "libmythmetadata/videoutils.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/tv_actions.h"
 #include "libmythtv/tv_play.h"
@@ -346,7 +346,7 @@ bool MythFrontendService::PlayVideo(const QString& Id, bool UseBookmark)
         return false;
     }
 
-    QString mrl = generate_file_url("Videos", metadata->GetHost(), metadata->GetFilename());
+    QString mrl = StorageGroup::generate_file_url("Videos", metadata->GetHost(), metadata->GetFilename());
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("PlayVideo ID: %1 UseBookmark: %2 URL: '%3'")
         .arg(id).arg(UseBookmark).arg(mrl));
 

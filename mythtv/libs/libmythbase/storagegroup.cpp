@@ -892,4 +892,13 @@ QString StorageGroup::GetGroupToUse(
     return tmpGroup;
 }
 
+QString StorageGroup::generate_file_url(const QString &storage_group,
+                                        const QString &host,
+                                        const QString &path)
+{
+    return MythCoreContext::GenMythURL(host, gCoreContext->GetBackendServerPort(host),
+        path, StorageGroup::GetGroupToUse(host, storage_group));
+
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
