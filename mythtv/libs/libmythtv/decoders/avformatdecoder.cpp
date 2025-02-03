@@ -3220,66 +3220,57 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVCodecContext* context, AVStream *c
     return true;
 }
 
-bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt, bool &Retry)
+void AvFormatDecoder::incrementAVErrorCount(int error, AVCodecContext* codecContext)
 {
-    Retry = false;
-    MythAVFrame mpa_pic;
-    if (!mpa_pic)
-        return false;
+    m_averrorCount++;
+    if (m_averrorCount > SEQ_PKT_ERR_MAX)
+    {
+        // If erroring on GPU assist, try switching to software decode
+        if (codec_is_std(m_videoCodecId))
+            m_parent->SetErrored(QObject::tr("Video Decode Error"));
+        else
+            m_streamsChanged = true;
+    }
 
-    bool sentPacket = false;
-    int ret2 = 0;
+    if (m_mythCodecCtx->DecoderNeedsReset(codecContext))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Decoder needs reset");
+        m_resetHardwareDecoders = m_streamsChanged = true;
+    }
 
+    if (error == AVERROR_EXTERNAL)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "FFmpeg external library error - assuming streams changed");
+        m_streamsChanged = true;
+    }
+}
+
+int AvFormatDecoder::receiveVideoFrame(AVCodecContext* codecContext, AVStream *stream)
+{
+    MythAVFrame frame;
+    if (!frame)
+        return AVERROR(ENOMEM);
     m_avCodecLock.lock();
-
-    //  SUGGESTION
-    //  Now that avcodec_decode_video2 is deprecated and replaced
-    //  by 2 calls (receive frame and send packet), this could be optimized
-    //  into separate routines or separate threads.
-    //  Also now that it always consumes a whole buffer some code
-    //  in the caller may be able to be optimized.
-
     // FilteredReceiveFrame will call avcodec_receive_frame and
     // apply any codec-dependent filtering
-    int ret = m_mythCodecCtx->FilteredReceiveFrame(context, mpa_pic);
+    int ret = m_mythCodecCtx->FilteredReceiveFrame(codecContext, frame);
     m_avCodecLock.unlock();
 
-    // If we got a picture do not send the packet until we have
-    // all available pictures
     if (ret == 0)
     {
         // averror_count counts sequential errors, so if you have a successful
         // packet then reset it
         m_averrorCount = 0;
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("video timecodes packet-pts:%1 frame-pts:%2 packet-dts: %3 frame-dts:%4")
-                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->pts)
-                .arg(mpa_pic->pkt_dts));
+            QString("video timecodes frame-pts:%1 frame-dts:%2")
+                .arg(QString::number(frame->pts), QString::number(frame->pkt_dts))
+            );
 
-        ProcessVideoFrame(context, curstream, mpa_pic);
+        ProcessVideoFrame(codecContext, stream, frame);
     }
     else if (ret == AVERROR(EAGAIN))
     {
-        ret = 0;
-        m_avCodecLock.lock();
-        ret2 = avcodec_send_packet(context, pkt);
-        if (ret2 == 0)
-        {
-            sentPacket = true;
-        }
-        else if (ret2 == AVERROR(EAGAIN))
-        {
-            Retry = true;
-            ret2 = 0;
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("video avcodec_send_packet error: %1 (%2)")
-                .arg(QString::fromStdString(av_make_error_stdstring(ret2)), QString::number(ret2))
-                );
-        }
-        m_avCodecLock.unlock();
+        ;
     }
     else
     {
@@ -3287,45 +3278,36 @@ bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curs
             QString("video avcodec_receive_frame error: %1 (%2)")
             .arg(QString::fromStdString(av_make_error_stdstring(ret)), QString::number(ret))
             );
+        incrementAVErrorCount(ret, codecContext);
     }
+    return ret;
+}
 
-    if (ret < 0 || ret2 < 0)
+int AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVPacket *pkt)
+{
+    m_avCodecLock.lock();
+    int ret = avcodec_send_packet(context, pkt);
+    m_avCodecLock.unlock();
+    if (ret == 0 || ret == AVERROR(EAGAIN))
     {
-        if (++m_averrorCount > SEQ_PKT_ERR_MAX)
-        {
-            // If erroring on GPU assist, try switching to software decode
-            if (codec_is_std(m_videoCodecId))
-                m_parent->SetErrored(QObject::tr("Video Decode Error"));
-            else
-                m_streamsChanged = true;
-        }
-
-        if (m_mythCodecCtx->DecoderNeedsReset(context))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Decoder needs reset");
-            m_resetHardwareDecoders = m_streamsChanged = true;
-        }
-
-        if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "FFmpeg external library error - assuming streams changed");
-            m_streamsChanged = true;
-        }
-
-        return false;
+        // averror_count counts sequential errors, so if you have a successful
+        // packet then reset it
+        m_averrorCount = 0;
+        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+            QString("video timecodes packet-pts:%1 packet-dts:%2")
+                .arg(QString::number(pkt->pts), QString::number(pkt->dts))
+            );
     }
-
-    // averror_count counts sequential errors, so if you have a successful
-    // packet then reset it
-    m_averrorCount = 0;
-
-    if (!sentPacket)
+    else
     {
-        // MythTV logic expects that only one frame is processed
-        // Save the packet for later and return.
-        m_preprocessedPacket = av_packet_clone(pkt);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("video avcodec_send_packet error: %1 (%2)")
+            .arg(QString::fromStdString(av_make_error_stdstring(ret)), QString::number(ret))
+            );
+        incrementAVErrorCount(ret, context);
     }
-    return true;
+
+    return ret;
 }
 
 bool AvFormatDecoder::ProcessVideoFrame(AVCodecContext* context, AVStream *Stream, AVFrame *AvFrame)
@@ -4799,8 +4781,29 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
-                if (!ProcessVideoPacket(context, curstream, pkt, Retry))
+                int error = receiveVideoFrame(context, curstream);
+                if (error == 0)
+                {
+                    // save unsent packet for later
+                    m_preprocessedPacket = pkt;
+                    pkt = nullptr;
+                }
+                else if (error == AVERROR(EAGAIN))
+                {
+                    error = ProcessVideoPacket(context, pkt);
+                }
+
+                if (error == AVERROR(EAGAIN))
+                {
+                    Retry = true;
+                    // resend packet later
+                    m_preprocessedPacket = pkt;
+                    pkt = nullptr;
+                }
+                else if (error < 0)
+                {
                     have_err = true;
+                }
                 break;
             }
 
@@ -4824,7 +4827,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
         if (!have_err && !Retry)
             m_frameDecoded = 1;
-        av_packet_unref(pkt);
+        if (pkt)
+        {
+            av_packet_unref(pkt);
+        }
         if (Retry)
             break;
     }

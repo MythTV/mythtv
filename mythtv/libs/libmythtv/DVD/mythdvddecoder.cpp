@@ -272,9 +272,8 @@ void MythDVDDecoder::CheckContext(int64_t Pts)
 }
 
 
-bool MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVStream *Stream, AVPacket *Pkt, bool &Retry)
+int MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVPacket *Pkt)
 {
-    Retry = false;
     int64_t pts = Pkt->pts;
 
     if (pts == AV_NOPTS_VALUE)
@@ -282,8 +281,8 @@ bool MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVStream *
 
     CheckContext(pts);
 
-    bool ret = AvFormatDecoder::ProcessVideoPacket(codecContext, Stream, Pkt, Retry);
-    if (!Retry && ret && m_curContext && (pts != AV_NOPTS_VALUE) && (pts + Pkt->duration == m_curContext->GetSeqEndPTS()))
+    int ret = AvFormatDecoder::ProcessVideoPacket(codecContext, Pkt);
+    if ((ret == 0) && m_curContext && (pts != AV_NOPTS_VALUE) && (pts + Pkt->duration == m_curContext->GetSeqEndPTS()))
     {
         // If this video frame is the last in the sequence,
         // make a copy of it so we can 'generate' more
