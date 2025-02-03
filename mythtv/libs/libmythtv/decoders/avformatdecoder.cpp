@@ -4781,32 +4781,40 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
-                if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
-                    continue;
-
-                // If the resolution changed in XXXPreProcessPkt, we may
-                // have a fatal error, so check for this before continuing.
-                if (m_parent->IsErrored())
-                {
-                    av_packet_free(&pkt);
-                    return false;
-                }
-
-                if (pkt->pts != AV_NOPTS_VALUE)
-                {
-                    m_lastCcPtsu = microsecondsFromFloat
-                                 (av_q2d(curstream->time_base)*pkt->pts*1000000);
-                }
-
                 int error = receiveVideoFrame(context, curstream);
                 if (error == 0)
                 {
                     // save unsent packet for later
-                    m_preprocessedPacket = pkt;
-                    pkt = nullptr;
+                    if (already_preprocessed) // unlikely
+                    {
+                        m_preprocessedPacket = pkt;
+                        pkt = nullptr;
+                    }
+                    else
+                    {
+                        m_storedPackets.prepend(pkt);
+                        pkt = nullptr;
+                    }
                 }
                 else if (error == AVERROR(EAGAIN))
                 {
+                    if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
+                        continue;
+
+                    // If the resolution changed in XXXPreProcessPkt, we may
+                    // have a fatal error, so check for this before continuing.
+                    if (m_parent->IsErrored())
+                    {
+                        av_packet_free(&pkt);
+                        return false;
+                    }
+
+                    if (pkt->pts != AV_NOPTS_VALUE)
+                    {
+                        m_lastCcPtsu = microsecondsFromFloat
+                                     (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                    }
+
                     error = ProcessVideoPacket(context, pkt);
                 }
 
