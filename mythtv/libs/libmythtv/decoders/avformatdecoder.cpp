@@ -4757,6 +4757,30 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
+                if (!(decodetype & kDecodeVideo))
+                {
+                    if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
+                        continue;
+
+                    // If the resolution changed in XXXPreProcessPkt, we may
+                    // have a fatal error, so check for this before continuing.
+                    if (m_parent->IsErrored())
+                    {
+                        av_packet_free(&pkt);
+                        return false;
+                    }
+
+                    if (pkt->pts != AV_NOPTS_VALUE)
+                    {
+                        m_lastCcPtsu = microsecondsFromFloat
+                                     (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                    }
+
+                    m_framesPlayed++;
+                    m_gotVideoFrame = true;
+                    break;
+                }
+
                 if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
                     continue;
 
@@ -4772,13 +4796,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 {
                     m_lastCcPtsu = microsecondsFromFloat
                                  (av_q2d(curstream->time_base)*pkt->pts*1000000);
-                }
-
-                if (!(decodetype & kDecodeVideo))
-                {
-                    m_framesPlayed++;
-                    m_gotVideoFrame = true;
-                    break;
                 }
 
                 int error = receiveVideoFrame(context, curstream);
