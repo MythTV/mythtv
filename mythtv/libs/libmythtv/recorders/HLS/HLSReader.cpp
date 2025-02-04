@@ -375,7 +375,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                         if (!M3U::ParseStreamInformation(line, url, StreamURL(),
                                                          id, bandwidth, audio, video))
                             break;
-                        auto *hls = new HLSRecStream(id, bandwidth, url,
+                        auto *hls = new HLSRecStream(m_inputId, id, bandwidth, url,
                                                      m_segmentBase);
                         if (hls)
                         {
@@ -406,7 +406,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 m_streams.find(M3U::DecodedURI(m_m3u8));
             if (Istream == m_streams.end())
             {
-                hls = new HLSRecStream(0, 0, m_m3u8, m_segmentBase);
+                hls = new HLSRecStream(m_inputId, 0, 0, m_m3u8, m_segmentBase);
                 if (hls)
                 {
                     LOG(VB_RECORD, LOG_INFO, LOC +
@@ -566,7 +566,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 if (m_curSeq < 0 || sequence_num > m_curSeq)
                 {
                     HLSRecSegment segment =
-                        HLSRecSegment(sequence_num, segment_duration, title,
+                        HLSRecSegment(m_inputId, sequence_num, segment_duration, title,
                                       RelativeURI(hls->SegmentBaseUrl(), line));
 #ifdef USING_LIBCRYPTO
                     if (!aes_iv.isEmpty() || !aes_keypath.isEmpty())
@@ -887,7 +887,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
         return false;
     }
 
-    HLSRecSegment seg;
+    HLSRecSegment seg(m_inputId);
     for (;;)
     {
         m_seqLock.lock();

@@ -13,10 +13,11 @@
 #include "HLSReader.h"
 #include "HLSStream.h"
 
-#define LOC QString("HLSRecstream: ")
+#define LOC QString("HLSRecstream[%1]: ").arg(m_inputId)
 
-HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, QString  m3u8_url, QString segment_base_url)
-    : m_id(seq),
+HLSRecStream::HLSRecStream(int inputId, int seq, uint64_t bitrate, QString  m3u8_url, QString segment_base_url)
+    : m_inputId(inputId),
+      m_id(seq),
       m_bitrate(bitrate),
       m_m3u8Url(std::move(m3u8_url)),
       m_segmentBaseUrl(std::move(segment_base_url))

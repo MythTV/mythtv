@@ -23,7 +23,7 @@ class HLSRecStream
     using AESKeyMap = QMap<QString, HLS_AES_KEY* >;
 #endif  // USING_LIBCRYPTO
 
-    HLSRecStream(int seq, uint64_t bitrate, QString m3u8_url, QString segment_base_url);
+    HLSRecStream(int inputId, int seq, uint64_t bitrate, QString m3u8_url, QString segment_base_url);
     ~HLSRecStream(void);
 
     int Read(uint8_t* buffer, int len);
@@ -80,6 +80,7 @@ class HLSRecStream
     void AverageBandwidth(int64_t bandwidth);
 
   private:
+    int         m_inputId        {0};     // input card ID
     int         m_id;                     // program id
     int         m_version        {1};     // HLS protocol version
     std::chrono::seconds m_targetDuration {-1s}; // maximum duration per segment

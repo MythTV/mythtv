@@ -4,7 +4,6 @@
 #include <cstdint>
 
 #ifdef USING_LIBCRYPTO
-// encryption related stuff
 #include <openssl/aes.h>
 #endif // USING_LIBCRYPTO
 
@@ -19,10 +18,10 @@ class HLSRecSegment
   public:
     friend class HLSReader;
 
-    HLSRecSegment(void);
+    HLSRecSegment(int input);
     HLSRecSegment(const HLSRecSegment& rhs);
-    HLSRecSegment(int seq, std::chrono::milliseconds duration, QString title,
-		  QUrl uri);
+    HLSRecSegment(int input, int sequence, std::chrono::milliseconds duration,
+                  QString title, QUrl uri);
     ~HLSRecSegment();
 
     HLSRecSegment& operator=(const HLSRecSegment& rhs);
@@ -48,6 +47,7 @@ class HLSRecSegment
 #endif // USING_LIBCRYPTO
 
   protected:
+    int         m_inputId  {0};                 // input card ID
     int64_t     m_sequence {0};                 // unique sequence number
     std::chrono::milliseconds m_duration {0ms}; // segment duration
     uint64_t    m_bitrate  {0};                 // bitrate of segment's content (bits per second)

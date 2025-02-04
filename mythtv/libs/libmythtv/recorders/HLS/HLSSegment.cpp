@@ -1,26 +1,32 @@
-#include "HLSSegment.h"
-
 // C/C++
 #include <utility>
 
+#ifdef USING_LIBCRYPTO
+#include <openssl/aes.h>
+#endif // USING_LIBCRYPTO
+
+#include "HLSSegment.h"
 #include "HLSReader.h"
 
-#define LOC QString("HLSSegment: ")
+#define LOC QString("HLSSegment[%1]: ").arg(m_inputId)
 
-HLSRecSegment::HLSRecSegment(void)
+HLSRecSegment::HLSRecSegment(int inputId)
+    : m_inputId(inputId)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }
 
 HLSRecSegment::HLSRecSegment(const HLSRecSegment& rhs)
 {
-    LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
     operator=(rhs);
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }
 
-HLSRecSegment::HLSRecSegment(int seq, std::chrono::milliseconds duration,
-                       QString title, QUrl uri)
-    : m_sequence(seq),
+HLSRecSegment::HLSRecSegment(int inputId, int sequence,
+                             std::chrono::milliseconds duration,
+                             QString title, QUrl uri)
+    : m_inputId(inputId),
+      m_sequence(sequence),
       m_duration(duration),
       m_title(std::move(title)),
       m_url(std::move(uri))
@@ -32,6 +38,7 @@ HLSRecSegment& HLSRecSegment::operator=(const HLSRecSegment& rhs)
 {
     if (&rhs != this)
     {
+        m_inputId = rhs.m_inputId;
         m_sequence = rhs.m_sequence;
         m_duration = rhs.m_duration;
         m_bitrate = rhs.m_bitrate;
