@@ -67,9 +67,9 @@ class HLSRecStream
 
 #ifdef USING_LIBCRYPTO
   protected:
-    static int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+    int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
                 unsigned char *iv, unsigned char *plaintext);
-    static bool DownloadKey(MythSingleDownload& downloader,
+    bool DownloadKey(MythSingleDownload& downloader,
           const QString& keypath, HLS_AES_KEY* aeskey);
     bool DecodeData(MythSingleDownload& downloader,
 		    const QByteArray& IV, const QString& keypath,
