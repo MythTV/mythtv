@@ -31,6 +31,13 @@
 #include "v2versionInfo.h"
 #include "v2wolInfo.h"
 
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+static inline void api_sd_notify(const char *str) { sd_notify(0, str); };
+#else
+static inline void api_sd_notify(const char */*str*/) {};
+#endif
+
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
     (MYTH_HANDLE, V2Myth::staticMetaObject, &V2Myth::RegisterCustomTypes))
@@ -1261,13 +1268,16 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (scheduler == nullptr)
         throw QString("Scheduler is null");
-    // onle and only one of enable and disable must be supplied
+    // One and only one of enable and disable must be supplied
     if (Enable == Disable)
         return false;
     if (Enable)
         scheduler->EnableScheduling();
     else
+    {
         scheduler->DisableScheduling();
+        api_sd_notify("STATUS=Scheduling disabled via Services API/Web App.");
+    }
     // Stop EIT scanning
     QMapIterator<uint,TVRec*> iter(TVRec::s_inputs);
     while (iter.hasNext())
