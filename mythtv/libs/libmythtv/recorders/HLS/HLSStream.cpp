@@ -43,7 +43,7 @@ QString HLSRecStream::toString(void) const
 
 #ifdef USING_LIBCRYPTO
 bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
-                               const QString& keypath, HLS_AES_KEY* aeskey)
+                               const QString& keypath, HLS_AES_KEY* aeskey) const
 {
     QByteArray key;
 
@@ -79,7 +79,7 @@ bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
 // https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption
 //
 int HLSRecStream::Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-                          unsigned char *iv, unsigned char *plaintext)
+                          unsigned char *iv, unsigned char *plaintext) const
 {
     int len = 0;
 
