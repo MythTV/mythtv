@@ -117,7 +117,7 @@ bool AudioOutputOSS::OpenDevice()
         {
             if (errno == EBUSY)
             {
-                VBWARN(QString("Something is currently using: %1.")
+                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Something is currently using: %1.")
                       .arg(m_mainDevice));
                 return false;
             }
@@ -209,7 +209,7 @@ bool AudioOutputOSS::OpenDevice()
     if (ioctl(m_audioFd, SNDCTL_DSP_GETCAPS, &caps) == 0)
     {
         if (!(caps & DSP_CAP_REALTIME))
-            VBWARN("The audio device cannot report buffer state "
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "The audio device cannot report buffer state "
                    "accurately! audio/video sync will be bad, continuing...");
     }
     else

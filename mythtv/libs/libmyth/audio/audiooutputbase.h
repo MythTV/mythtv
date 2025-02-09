@@ -17,7 +17,6 @@
 #include "samplerate.h"
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define VBWARN(str)    LOG(VB_GENERAL, LOG_WARNING, LOC + (str))
 #define VBERRENO(str)  Error(LOC + (str) + ": " + ENO)
 #define VBERRNOCONST(str)   LOG(VB_GENERAL, LOG_ERR, LOC + (str) + ": " + ENO)
 // NOLINTEND(cppcoreguidelines-macro-usage)
