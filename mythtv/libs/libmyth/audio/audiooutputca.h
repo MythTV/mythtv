@@ -29,16 +29,6 @@ public:
     int  GetVolumeChannel(int channel) const override; // VolumeBase
     void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
-    // TODO: convert these to macros!
-    static void Debug(const QString& msg)
-    {   LOG(VB_AUDIO, LOG_INFO,     "AudioOutputCA::" + msg);   }
-
-    static void Error(const QString& msg)
-    {   LOG(VB_GENERAL, LOG_ERR, "AudioOutputCA Error: " + msg);   }
-
-    static void Warn(const QString& msg)
-    {   LOG(VB_GENERAL, LOG_WARNING, "AudioOutputCA Warning: " + msg);   }
-
 protected:
 
     // You need to implement the following functions

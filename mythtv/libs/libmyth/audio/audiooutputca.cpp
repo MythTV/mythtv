@@ -246,7 +246,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
         {
             if (channels[i-1])
             {
-                Debug(QString("Support %1 channels").arg(i));
+                LOG(VB_AUDIO, LOG_INFO, QString("AudioOutputCA::Support %1 channels").arg(i));
                 // In case 8 channels are supported but not 6, fake 6
                 if (i == 8 && !channels[6-1])
                     settings->AddSupportedChannels(6);
@@ -269,22 +269,22 @@ bool AudioOutputCA::OpenDevice()
     if (d->mWasDigital)
     {
     }
-    Debug("OpenDevice: Entering");
+    LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice: Entering");
     if (m_passthru || m_enc)
     {
-        Debug("OpenDevice() Trying Digital.");
+        LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice() Trying Digital.");
         if (!(deviceOpened = d->OpenSPDIF()))
             d->CloseSPDIF();
     }
 
     if (!deviceOpened)
     {
-        Debug("OpenDevice() Trying Analog.");
+        LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice() Trying Analog.");
         int result = -1;
         //for (int i=0; result < 0 && i < 10; i++)
         {
             result = d->OpenAnalog();
-            Debug(QString("OpenDevice: OpenAnalog = %1").arg(result));
+            LOG(VB_AUDIO, LOG_INFO, QString("AudioOutputCA::OpenDevice: OpenAnalog = %1").arg(result));
             if (result < 0)
             {
                 d->CloseAnalog();
@@ -296,7 +296,7 @@ bool AudioOutputCA::OpenDevice()
 
     if (!deviceOpened)
     {
-        Error("Couldn't open any audio device!");
+        LOG(VB_GENERAL, LOG_ERR, "AudioOutputCA Error: Couldn't open any audio device!");
         d->CloseAnalog();
         return false;
     }
