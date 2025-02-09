@@ -306,21 +306,21 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
             m_processing = false;
             delete m_pSoundStretch;
             m_pSoundStretch = nullptr;
-            VBGENERAL(QString("Cancelling time stretch"));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Cancelling time stretch"));
             m_bytesPerFrame = m_previousBpf;
             m_waud = m_raud = 0;
             m_resetActive.Ref();
         }
         else
         {
-            VBGENERAL(QString("Changing time stretch to %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Changing time stretch to %1")
                       .arg(m_stretchFactor));
             m_pSoundStretch->setTempo(m_stretchFactor);
         }
     }
     else if (willstretch)
     {
-        VBGENERAL(QString("Using time stretch %1").arg(m_stretchFactor));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using time stretch %1").arg(m_stretchFactor));
         m_pSoundStretch = new soundtouch::SoundTouch();
         m_pSoundStretch->setSampleRate(m_sampleRate);
         m_pSoundStretch->setChannels(channels);
@@ -689,7 +689,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     {
         m_sampleRate = dest_rate;
 
-        VBGENERAL(QString("Resampling from %1 kHz to %2 kHz with quality %3")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Resampling from %1 kHz to %2 kHz with quality %3")
                 .arg(settings.m_sampleRate/1000).arg(m_sampleRate/1000)
                 .arg(quality_string(m_srcQuality)));
 
@@ -782,7 +782,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     m_outputBytesPerFrame = m_channels *
                              AudioOutputSettings::SampleSize(m_outputFormat);
 
-    VBGENERAL(
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Opening audio device '%1' ch %2(%3) sr %4 sf %5 reenc %6")
         .arg(m_mainDevice).arg(m_channels).arg(m_sourceChannels).arg(m_sampleRate)
         .arg(m_outputSettings->FormatToString(m_outputFormat)).arg(m_reEnc));
@@ -799,7 +799,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (GetError().isEmpty())
             Error(QObject::tr("Aborting reconfigure"));
         else
-            VBGENERAL("Aborting reconfigure");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Aborting reconfigure");
         m_configureSucceeded = false;
         return;
     }

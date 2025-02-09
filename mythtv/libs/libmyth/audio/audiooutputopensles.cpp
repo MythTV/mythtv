@@ -348,7 +348,7 @@ AudioOutputSettings* AudioOutputOpenSLES::GetOutputSettings(bool /*digital*/)
     AudioOutputSettings *settings = new AudioOutputSettings();
 
     int32_t nativeRate = GetNativeOutputSampleRate(); // in Hz
-    VBGENERAL(QString("Native Rate %1").arg(nativeRate));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Native Rate %1").arg(nativeRate));
     //settings->AddSupportedRate(48000);
     settings->AddSupportedRate(nativeRate);
 
