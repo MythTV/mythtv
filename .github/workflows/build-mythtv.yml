@@ -348,21 +348,23 @@ jobs:
           key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
           restore-keys: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache
 
-      - name: Update Homebrew Environment
-        run: |
-          brew update && brew upgrade
-          PKGMGR_PREFIX=$(brew --prefix)
-          echo "PKGMGR_PREFIX=$PKGMGR_PREFIX" >> $GITHUB_ENV
-
       - name: Fix Python install on Ventura
         run: |
           echo "Force remove currently installed python"
           brew unlink python
           brew unlink python3
-          brew remove --force --ignore-dependencies python3
+          brew deps python3 | xargs brew remove --ignore-dependencies
+          brew list | grep python@|xargs brew remove --force --ignore-dependencies
           echo "re-install requested python"
+          brew update
           brew install --force --overwrite python3
         if: matrix.os.runner == 'macOS-13'
+
+      - name: Update Homebrew Environment
+        run: |
+          brew update && brew upgrade
+          PKGMGR_PREFIX=$(brew --prefix)
+          echo "PKGMGR_PREFIX=$PKGMGR_PREFIX" >> $GITHUB_ENV
 
       - name: Install Ansible and missing Python necessities
         run: |
