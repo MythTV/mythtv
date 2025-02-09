@@ -303,7 +303,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
             return;
         }
 
-        VBAUDIOTS(QString("play: %1 write: %2 wcursor: %3")
+        LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("play: %1 write: %2 wcursor: %3")
                   .arg(play_pos).arg(write_pos).arg(m_writeCursor));
 
         while ((m_writeCursor < write_pos &&

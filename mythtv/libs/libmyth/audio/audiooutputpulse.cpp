@@ -227,7 +227,7 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
     QString fn_log_tag = "WriteAudio, ";
     pa_stream_state_t sstate = pa_stream_get_state(m_pstream);
 
-    VBAUDIOTS(fn_log_tag + QString("writing %1 bytes").arg(size));
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + fn_log_tag + QString("writing %1 bytes").arg(size));
 
     /* NB This "if" check can be replaced with PA_STREAM_IS_GOOD() in
        PulseAudio API from 0.9.11. As 0.9.10 is still widely used

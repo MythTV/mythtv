@@ -1087,7 +1087,7 @@ std::chrono::milliseconds AudioOutputBase::GetAudiotime(void)
     if (m_audioTime < oldaudiotime)
         m_audioTime = oldaudiotime;
 
-    VBAUDIOTS(QString("GetAudiotime audt=%1 abtc=%2 mb=%3 sb=%4 tb=%5 "
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("GetAudiotime audt=%1 abtc=%2 mb=%3 sb=%4 tb=%5 "
                       "sr=%6 obpf=%7 bpf=%8 esf=%9 edsp=%10 sbr=%11")
               .arg(m_audioTime.count())                // 1
               .arg(m_audbufTimecode.count())           // 2
@@ -1142,7 +1142,7 @@ void AudioOutputBase::SetAudiotime(int frames, std::chrono::milliseconds timecod
     if (m_audbufTimecode < old_audbuf_timecode)
         m_audioTime = 0ms;
 
-    VBAUDIOTS(QString("SetAudiotime atc=%1 tc=%2 f=%3 pfu=%4 pfs=%5")
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("SetAudiotime atc=%1 tc=%2 f=%3 pfu=%4 pfs=%5")
               .arg(m_audbufTimecode.count())
               .arg(timecode.count())
               .arg(frames)
@@ -1388,7 +1388,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     m_lengthLastData = millisecondsFromFloat
         ((double)(len * 1000) / (m_sourceSampleRate * m_sourceBytesPerFrame));
 
-    VBAUDIOTS(QString("AddData frames=%1, bytes=%2, used=%3, free=%4, "
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("AddData frames=%1, bytes=%2, used=%3, free=%4, "
                       "timecode=%5 needsupmix=%6")
               .arg(frames).arg(len).arg(used).arg(afree).arg(timecode.count())
               .arg(m_needsUpmix));
@@ -1702,7 +1702,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         {
             if (ready > 0)  // only log if we're sending some audio
             {
-                VBAUDIOTS(QString("audio waiting for buffer to fill: "
+                LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("audio waiting for buffer to fill: "
                                   "have %1 want %2")
                           .arg(ready).arg(m_fragmentSize));
             }
@@ -1712,7 +1712,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         }
 
 #ifdef AUDIOTSTESTING
-        VBAUDIOTS("WriteAudio Start");
+        LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + "WriteAudio Start");
 #endif
         Status();
 
@@ -1731,7 +1731,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         }
 #ifdef AUDIOTSTESTING
         GetAudiotime();
-        VBAUDIOTS("WriteAudio Done");
+        LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + "WriteAudio Done");
 #endif
 
     }
