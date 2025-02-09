@@ -157,7 +157,7 @@ bool AudioOutputPulseAudio::OpenDevice()
     }
     std::string spec(PA_SAMPLE_SPEC_SNPRINT_MAX,'\0');
     pa_sample_spec_snprint(spec.data(), spec.size(), &m_sampleSpec);
-    VBAUDIO(fn_log_tag + "using sample spec " + spec.data());
+    LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag + "using sample spec " + spec.data());
 
     if(!pa_channel_map_init_auto(&m_channelMap, m_channels, PA_CHANNEL_MAP_WAVEEX))
     {
@@ -443,7 +443,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
         switch(state)
         {
             case PA_CONTEXT_READY:
-                VBAUDIO(fn_log_tag +"context connection ready");
+                LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag +"context connection ready");
                 connected = true;
                 continue;
 
@@ -455,7 +455,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
                 return false;
 
             default:
-                VBAUDIO(fn_log_tag + "waiting for context connection ready");
+                LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag + "waiting for context connection ready");
                 pa_threaded_mainloop_wait(m_mainloop);
                 break;
         }
@@ -489,7 +489,7 @@ QString AudioOutputPulseAudio::ChooseHost(void)
             pulse_host = env_pulse_host;
     }
 
-    VBAUDIO(fn_log_tag + QString("chosen PulseAudio server: %1")
+    LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag + QString("chosen PulseAudio server: %1")
                          .arg((pulse_host != nullptr) ? pulse_host : "default"));
 
     return pulse_host;
@@ -584,7 +584,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     m_fragmentSize = buf_attr->tlength >> 2;
     m_soundcardBufferSize = buf_attr->maxlength;
 
-    VBAUDIO(QString("fragment size %1, soundcard buffer size %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("fragment size %1, soundcard buffer size %2")
                 .arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
     return (connected && !failed);
@@ -665,7 +665,7 @@ void AudioOutputPulseAudio::ServerInfoCallback(
 {
     QString fn_log_tag = "ServerInfoCallback, ";
 
-    VBAUDIO(fn_log_tag +
+    LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag +
             QString("PulseAudio server info - host name: %1, server version: "
                     "%2, server name: %3, default sink: %4")
             .arg(inf->host_name, inf->server_version,

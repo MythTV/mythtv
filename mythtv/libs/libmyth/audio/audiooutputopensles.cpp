@@ -384,7 +384,7 @@ bool AudioOutputOpenSLES::OpenDevice(void)
     // OpenSLES buffer holds 10 fragments = 80ms worth of samples
     m_soundcardBufferSize = OPENSLES_BUFFERS * m_fragmentSize;
 
-    VBAUDIO(QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
             .arg(OPENSLES_BUFFERS).arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
     return true;
@@ -405,7 +405,7 @@ void AudioOutputOpenSLES::PlayedCallback(SLAndroidSimpleBufferQueueItf caller)
 {
     assert (caller == m_playerBufferQueue);
 
-    VBAUDIO(QString("Freed"));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Freed"));
 
     m_lock.lock();
     m_started = true;
@@ -420,13 +420,13 @@ int AudioOutputOpenSLES::GetNumberOfBuffersQueued() const
         VBERROR(QString("Could not query buffer queue state in %1 (%2)").arg(__func__).arg(res));
         return -1;
     }
-    VBAUDIO(QString("Num Queued %1").arg(st.count));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Num Queued %1").arg(st.count));
     return st.count;
 }
 
 void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
 {
-    VBAUDIO(QString("WriteAudio %1").arg(size));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("WriteAudio %1").arg(size));
     while (size > 0)
     {
         // check if there are any buffers available
@@ -455,7 +455,7 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
         }
 
         SLresult r = Enqueue(m_playerBufferQueue, &m_buf[m_bufWriteBase], m_fragmentSize);
-        VBAUDIO(QString("Enqueue %1").arg(m_bufWriteBase));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Enqueue %1").arg(m_bufWriteBase));
 
         if (r != SL_RESULT_SUCCESS)
         {
@@ -500,7 +500,7 @@ int AudioOutputOpenSLES::GetVolumeChannel(int channel) const
         {
             volume = lroundf(expf(mb / (3*2000.0F)) * 100);
         }
-        VBAUDIO(QString("GetVolume(%1) %2 (%3)")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetVolume(%1) %2 (%3)")
                         .arg(channel).arg(volume).arg(mb));
     }
     else
@@ -540,7 +540,7 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     SLresult r = SetVolumeLevel(m_volumeItf, mb);
     if (r == SL_RESULT_SUCCESS)
     {
-        VBAUDIO(QString("SetVolume(%1) %2(%3)")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("SetVolume(%1) %2(%3)")
                 .arg(channel).arg(volume).arg(mb));
     }
     else

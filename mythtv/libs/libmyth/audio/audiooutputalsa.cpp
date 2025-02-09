@@ -113,7 +113,7 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
     if (try_ac3)
     {
         dev_ba = m_passthruDevice.toLatin1();
-        VBAUDIO(QString("OpenDevice %1 for passthrough").arg(m_passthruDevice));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("OpenDevice %1 for passthrough").arg(m_passthruDevice));
         err = snd_pcm_open(&m_pcmHandle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
 
@@ -124,14 +124,14 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
 
         if (err < 0)
         {
-            VBAUDIO(QString("Auto setting passthrough failed (%1), defaulting "
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Auto setting passthrough failed (%1), defaulting "
                             "to main device").arg(snd_strerror(err)));
         }
     }
     if (!try_ac3 || err < 0)
     {
         // passthru open failed, retry default device
-        VBAUDIO(QString("OpenDevice %1").arg(m_mainDevice));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("OpenDevice %1").arg(m_mainDevice));
         dev_ba = m_mainDevice.toLatin1();
         err = snd_pcm_open(&m_pcmHandle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
@@ -215,7 +215,7 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     int size = ((int)(cur * (float)requested / (float)buffer_time)
                 / 64 + 1) * 64;
 
-    VBAUDIO(QString("Hardware audio buffer cur: %1 need: %2 max allowed: %3")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Hardware audio buffer cur: %1 need: %2 max allowed: %3")
             .arg(cur).arg(size).arg(max));
 
     if (cur == max)
@@ -260,7 +260,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
                             0);
     if (err < 0)
     {
-        VBAUDIO(QString("Control %1 open error: %2")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Control %1 open error: %2")
                 .arg(card)
                 .arg(snd_strerror(err)));
         return nullptr;
@@ -268,7 +268,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
     err = snd_hctl_load(hctl);
     if (err  < 0)
     {
-        VBAUDIO(QString("Control %1 load error: %2")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Control %1 load error: %2")
                 .arg(card)
                 .arg(snd_strerror(err)));
         /* frees automatically the control which cannot be added. */
@@ -280,7 +280,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
         err = snd_hctl_elem_info(elem, info);
         if (err < 0)
         {
-            VBAUDIO(QString("Control %1 snd_hctl_elem_info error: %2")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Control %1 snd_hctl_elem_info error: %2")
                     .arg(card)
                     .arg(snd_strerror(err)));
             snd_hctl_close(hctl);
@@ -290,7 +290,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
         snd_ctl_elem_type_t type = snd_ctl_elem_info_get_type(info);
         if (!snd_ctl_elem_info_is_readable(info))
         {
-            VBAUDIO(QString("Control %1 element info is not readable")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Control %1 element info is not readable")
                     .arg(card));
             snd_hctl_close(hctl);
             return nullptr;
@@ -298,7 +298,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
         err = snd_hctl_elem_read(elem, control);
         if (err < 0)
         {
-            VBAUDIO(QString("Control %1 element read error: %2")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Control %1 element read error: %2")
                     .arg(card)
                     .arg(snd_strerror(err)));
             snd_hctl_close(hctl);
@@ -306,7 +306,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
         }
         if (type != SND_CTL_ELEM_TYPE_BYTES)
         {
-            VBAUDIO(QString("Control %1 element is of the wrong type")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Control %1 element is of the wrong type")
                     .arg(card));
             snd_hctl_close(hctl);
             return nullptr;
@@ -400,14 +400,14 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
         QByteArray *eld = GetELD(card, device, subdevice);
         if (eld != nullptr)
         {
-            VBAUDIO(QString("Successfully retrieved ELD data"));
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Successfully retrieved ELD data"));
             settings->setELD(eld);
             delete eld;
        }
     }
     else
     {
-        VBAUDIO("Can't get card and device number");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Can't get card and device number");
     }
 
     snd_pcm_close(m_pcmHandle);
@@ -578,7 +578,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         if (lw >= 0)
         {
             if ((uint)lw < frames)
-                VBAUDIO(QString("WriteAudio: short write %1 bytes (ok)")
+                LOG(VB_AUDIO, LOG_INFO, LOC + QString("WriteAudio: short write %1 bytes (ok)")
                         .arg(lw * m_outputBytesPerFrame));
 
             frames -= lw;
@@ -593,7 +593,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             case -EPIPE:
                  if (snd_pcm_state(m_pcmHandle) == SND_PCM_STATE_XRUN)
                  {
-                    VBAUDIO("WriteAudio: buffer underrun");
+                    LOG(VB_AUDIO, LOG_INFO, LOC + "WriteAudio: buffer underrun");
                     err = snd_pcm_prepare(m_pcmHandle);
                     if (err  < 0)
                     {
@@ -605,7 +605,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 #if ESTRPIPE != EPIPE
             case -ESTRPIPE:
-                VBAUDIO("WriteAudio: device is suspended");
+                LOG(VB_AUDIO, LOG_INFO, LOC + "WriteAudio: device is suspended");
                 while ((err = snd_pcm_resume(m_pcmHandle)) == -EAGAIN)
                     usleep(200us);
 
@@ -675,7 +675,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     snd_pcm_uframes_t     buffer_size_min = 0;
     snd_pcm_uframes_t     buffer_size_max = 0;
 
-    VBAUDIO(QString("SetParameters(format=%1, channels=%2, rate=%3, "
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("SetParameters(format=%1, channels=%2, rate=%3, "
                     "buffer_time=%4, period_time=%5)")
             .arg(format).arg(channels).arg(rate).arg(buffer_time)
             .arg(period_time));
@@ -734,10 +734,10 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     (void) snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
     (void) snd_pcm_hw_params_get_period_size_min(params, &period_size_min, nullptr);
     (void) snd_pcm_hw_params_get_period_size_max(params, &period_size_max, nullptr);
-    VBAUDIO(QString("Buffer size range from %1 to %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Buffer size range from %1 to %2")
             .arg(buffer_size_min)
             .arg(buffer_size_max));
-    VBAUDIO(QString("Period size range from %1 to %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Period size range from %1 to %2")
             .arg(period_size_min)
             .arg(period_size_max));
 
@@ -791,13 +791,13 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
         }
     }
 
-    VBAUDIO(QString("Buffer time = %1 us").arg(buffer_time));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Buffer time = %1 us").arg(buffer_time));
 
     /* set the period time */
     err = snd_pcm_hw_params_set_periods_near(handle, params,
                                              &period_time, nullptr);
     CHECKERR(QString("Unable to set period time %1").arg(period_time));
-    VBAUDIO(QString("Period time = %1 periods").arg(period_time));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Period time = %1 periods").arg(period_time));
 
     /* write the parameters to device */
     err = snd_pcm_hw_params(handle, params);
@@ -805,7 +805,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     err = snd_pcm_get_params(handle, &buffer_size, &period_size);
     CHECKERR("Unable to get PCM params");
-    VBAUDIO(QString("Buffer size = %1 | Period size = %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Buffer size = %1 | Period size = %2")
             .arg(buffer_size).arg(period_size));
 
     /* set member variables */
@@ -861,7 +861,7 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
             : 0;
         retvol = std::max(retvol, 0);
         retvol = std::min(retvol, 100);
-        VBAUDIO(QString("get volume channel %1: %2")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("get volume channel %1: %2")
                 .arg(channel).arg(retvol));
     }
     return retvol;
@@ -884,7 +884,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     if (snd_mixer_selem_set_playback_volume(m_mixer.elem, chan, mixervol) < 0)
         VBERROR(QString("failed to set channel %1 volume").arg(channel));
     else
-        VBAUDIO(QString("channel %1 volume set %2 => %3")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("channel %1 volume set %2 => %3")
                 .arg(channel).arg(volume).arg(mixervol));
 }
 
@@ -949,7 +949,7 @@ bool AudioOutputALSA::OpenMixer(void)
             snd_mixer_selem_is_active(elx))
         {
             m_mixer.elem = elx;
-            VBAUDIO(QString("found playback control %1 on %2")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("found playback control %1 on %2")
                     .arg(m_mixer.control, mixer_device_tag));
             break;
         }
@@ -975,10 +975,10 @@ bool AudioOutputALSA::OpenMixer(void)
     }
 
     m_mixer.volrange = m_mixer.volmax - m_mixer.volmin;
-    VBAUDIO(QString("mixer volume range on %1/%2 - min %3, max %4, range %5")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("mixer volume range on %1/%2 - min %3, max %4, range %5")
             .arg(mixer_device_tag, m_mixer.control)
             .arg(m_mixer.volmin).arg(m_mixer.volmax).arg(m_mixer.volrange));
-    VBAUDIO(QString("%1/%2 set up successfully")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("%1/%2 set up successfully")
             .arg(mixer_device_tag, m_mixer.control));
 
     if (m_setInitialVol)

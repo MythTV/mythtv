@@ -17,7 +17,6 @@
 #include "samplerate.h"
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + (str))
 #define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + (str))
 #define VBGENERAL(str) LOG(VB_GENERAL, LOG_INFO, LOC + (str))
 #define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, LOC + (str))

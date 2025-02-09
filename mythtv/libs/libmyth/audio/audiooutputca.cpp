@@ -190,7 +190,7 @@ AudioOutputCA::AudioOutputCA(const AudioSettings &settings) :
 AudioOutputBase(settings)
 {
     m_mainDevice.remove(0, 10);
-    VBAUDIO(QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_mainDevice));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_mainDevice));
     d = new CoreAudioData(this, m_mainDevice);
 
     InitSettings(settings);
@@ -313,7 +313,7 @@ bool AudioOutputCA::OpenDevice()
 
 void AudioOutputCA::CloseDevice()
 {
-    VBAUDIO(QString("CloseDevice [%1]: Entering")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("CloseDevice [%1]: Entering")
             .arg(d->mDigitalInUse ? "SPDIF" : "Analog"));
     if (d->mDigitalInUse)
         d->CloseSPDIF();
@@ -1773,7 +1773,7 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
 						  0, nullptr, &size);
     if (err)
     {
-        VBAUDIO(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
                      "Error [%1]")
              .arg(err));
 	return devs;
@@ -1786,13 +1786,13 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
                                     0, nullptr, &size, devices.data());
     if (err)
     {
-        VBAUDIO(QString("AudioOutputCA::GetDevices: Unable to retrieve the list of "
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("AudioOutputCA::GetDevices: Unable to retrieve the list of "
                         "available devices. Error [%1]")
                 .arg(err));
     }
     else
     {
-        VBAUDIO(QString("GetDevices: Number of devices: %1").arg(deviceCount));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetDevices: Number of devices: %1").arg(deviceCount));
 
         for (const auto & dev : devices)
         {

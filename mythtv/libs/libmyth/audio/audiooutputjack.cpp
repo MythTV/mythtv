@@ -92,7 +92,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     while ((i < JACK_CHANNELS_MAX) && matching_ports[i])
     {
         settings->AddSupportedChannels(i+1);
-        VBAUDIO(QString("Adding channels: %1").arg(i+1));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Adding channels: %1").arg(i+1));
         i++;
     }
 
@@ -129,7 +129,7 @@ bool AudioOutputJACK::OpenDevice()
         return false;
     }
 
-    VBAUDIO( QString("Opening JACK audio device: '%1'.")
+    LOG(VB_AUDIO, LOG_INFO, LOC +  QString("Opening JACK audio device: '%1'.")
             .arg(m_mainDevice));
 
     // Setup volume control
@@ -231,7 +231,7 @@ void AudioOutputJACK::CloseDevice()
         m_auBuf = nullptr;
     }
 
-    VBAUDIO("Jack: Stop Event");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Jack: Stop Event");
     OutputEvent e(OutputEvent::kStopped);
     dispatch(e);
 }
@@ -387,7 +387,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     {
         if (!m_actuallyPaused)
         {
-            VBAUDIO("JackCallback: audio paused");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "JackCallback: audio paused");
             OutputEvent e(OutputEvent::kPaused);
             dispatch(e);
             m_wasPaused = true;
@@ -399,7 +399,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     {
         if (m_wasPaused)
         {
-            VBAUDIO("JackCallback: Play Event");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "JackCallback: Play Event");
             OutputEvent e(OutputEvent::kPlaying);
             dispatch(e);
             m_wasPaused = false;
@@ -487,7 +487,7 @@ int AudioOutputJACK::JackGraphOrderCallback(void)
     }
 
     m_jackLatency = max_latency;
-    VBAUDIO(QString("JACK graph reordered. Maximum latency=%1")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("JACK graph reordered. Maximum latency=%1")
                     .arg(m_jackLatency));
 
     return 0;

@@ -147,7 +147,7 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
     const int device_num    = context->m_device_num;
     const int device_count  = context->m_device_count;
 
-    VBAUDIO(QString("Device %1:" + enum_desc).arg(device_count));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Device %1:" + enum_desc).arg(device_count));
 
     if ((device_num == device_count ||
         (device_num == 0 && !cfg_desc.isEmpty() &&
@@ -208,7 +208,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     m_device_name = m_device_name.section(':', 1);
     m_device_num  = m_device_name.toInt(&ok, 10);
 
-    VBAUDIO(QString("Looking for device num:%1 or name:%2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Looking for device num:%1 or name:%2")
             .arg(m_device_num).arg(m_device_name));
 
     OurDirectSoundEnumerate =
@@ -224,7 +224,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
         m_device_name = "Primary Sound Driver";
     }
 
-    VBAUDIO(QString("Using device %1:%2").arg(m_device_num).arg(m_device_name));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Using device %1:%2").arg(m_device_num).arg(m_device_name));
 
     OurDirectSoundCreate =
         (LPFNDSC)GetProcAddress(m_dsound_dll, "DirectSoundCreate");
@@ -255,7 +255,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
                                                 DSSCL_EXCLUSIVE)))
         VBERROR("Cannot set DS cooperative level");
 
-    VBAUDIO("Initialised DirectSound");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Initialised DirectSound");
 
     return 0;
 
@@ -274,7 +274,7 @@ void AudioOutputDXPrivate::DestroyDSBuffer(void)
     if (!m_dsbuffer)
         return;
 
-    VBAUDIO("Destroying DirectSound buffer");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Destroying DirectSound buffer");
     IDirectSoundBuffer_Stop(m_dsbuffer);
     m_writeCursor = 0;
     IDirectSoundBuffer_SetCurrentPosition(m_dsbuffer, m_writeCursor);
@@ -400,7 +400,7 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(bool passthrough)
         return nullptr;
     }
 
-    VBAUDIO(QString("GetCaps sample rate min: %1 max: %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetCaps sample rate min: %1 max: %2")
             .arg(devcaps.dwMinSecondarySampleRate)
             .arg(devcaps.dwMaxSecondarySampleRate));
 
@@ -456,7 +456,7 @@ bool AudioOutputDX::OpenDevice(void)
     // DirectSound buffer holds 4 fragments = 200ms worth of samples
     m_soundcardBufferSize = m_fragmentSize << 2;
 
-    VBAUDIO(QString("DirectSound buffer size: %1").arg(m_soundcardBufferSize));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("DirectSound buffer size: %1").arg(m_soundcardBufferSize));
 
     wf.Format.nChannels            = m_channels;
     wf.Format.nSamplesPerSec       = m_sampleRate;
@@ -482,7 +482,7 @@ bool AudioOutputDX::OpenDevice(void)
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_PCM;
     }
 
-    VBAUDIO(QString("New format: %1bits %2ch %3Hz %4")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("New format: %1bits %2ch %3Hz %4")
             .arg(wf.Samples.wValidBitsPerSample).arg(m_channels)
             .arg(m_sampleRate).arg(m_UseSPDIF ? "data" : "PCM"));
 
@@ -526,9 +526,9 @@ bool AudioOutputDX::OpenDevice(void)
                       .arg((DWORD)dsresult, 0, 16));
             return false;
         }
-        VBAUDIO("Using software mixer");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Using software mixer");
     }
-    VBAUDIO("Created DirectSound buffer");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Created DirectSound buffer");
 
     return true;
 }
@@ -592,7 +592,7 @@ int AudioOutputDX::GetVolumeChannel([[maybe_unused]] int channel) const
         return volume;
     }
 
-    VBAUDIO(QString("Got volume %1").arg(volume));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Got volume %1").arg(volume));
     return volume;
 }
 
@@ -618,7 +618,7 @@ void AudioOutputDX::SetVolumeChannel([[maybe_unused]] int channel, int volume)
         return;
     }
 
-    VBAUDIO(QString("Set volume %1").arg(dxVolume));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Set volume %1").arg(dxVolume));
 }
 
 QMap<int, QString> *AudioOutputDX::GetDXDevices(void)

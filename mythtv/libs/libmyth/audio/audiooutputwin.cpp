@@ -179,7 +179,7 @@ bool AudioOutputWin::OpenDevice(void)
     // DirectSound buffer holds 4 fragments = 200ms worth of samples
     m_soundcardBufferSize = kPacketCnt * m_fragmentSize;
 
-    VBAUDIO(QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
             .arg(kPacketCnt).arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
     m_UseSPDIF = m_passthru || m_enc;
@@ -209,7 +209,7 @@ bool AudioOutputWin::OpenDevice(void)
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_PCM;
     }
 
-    VBAUDIO(QString("New format: %1bits %2ch %3Hz %4")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("New format: %1bits %2ch %3Hz %4")
             .arg(wf.Samples.wValidBitsPerSample).arg(m_channels)
             .arg(m_sampleRate).arg(m_UseSPDIF ? "data" : "PCM"));
 
@@ -321,7 +321,7 @@ void AudioOutputWin::SetVolumeChannel(int channel, int volume)
         dwVolume |= (dwVolume << 16);
     }
 
-    VBAUDIO(QString("SetVolume(%1) %2(%3)")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("SetVolume(%1) %2(%3)")
             .arg(channel).arg(volume).arg(dwVolume));
 
     waveOutSetVolume((HWAVEOUT)WAVE_MAPPER, dwVolume);

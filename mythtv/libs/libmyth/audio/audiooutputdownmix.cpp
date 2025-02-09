@@ -172,7 +172,7 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
     if (channels_in < channels_out)
         return -1;
 
-    //VBAUDIO(LOC + QString("Downmixing %1 frames (in:%2 out:%3)")
+    //LOG(VB_AUDIO, LOG_INFO, LOC + LOC + QString("Downmixing %1 frames (in:%2 out:%3)")
     //    .arg(frames).arg(channels_in).arg(channels_out));
     if (channels_out == 2)
     {

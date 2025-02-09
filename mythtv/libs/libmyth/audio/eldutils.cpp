@@ -184,7 +184,7 @@ void eld::update_sad(int index,
     switch (a->format)
     {
         case TYPE_REF_STREAM_HEADER:
-            VBAUDIO("audio coding type 0 not expected");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "audio coding type 0 not expected");
             break;
 
         case TYPE_LPCM:
@@ -218,7 +218,7 @@ void eld::update_sad(int index,
             if (a->format == XTYPE_HE_REF_CT ||
                 a->format >= XTYPE_FIRST_RESERVED)
             {
-                VBAUDIO(QString("audio coding xtype %1 not expected")
+                LOG(VB_AUDIO, LOG_INFO, LOC + QString("audio coding xtype %1 not expected")
                         .arg(a->format));
                 a->format = 0;
             }
@@ -238,7 +238,7 @@ int eld::update_eld(const char *buf, int size)
     if (m_e.eld_ver != ELD_VER_CEA_861D &&
         m_e.eld_ver != ELD_VER_PARTIAL)
     {
-        VBAUDIO(QString("Unknown ELD version %1").arg(m_e.eld_ver));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Unknown ELD version %1").arg(m_e.eld_ver));
         goto out_fail;
     }
 
@@ -263,7 +263,7 @@ int eld::update_eld(const char *buf, int size)
 
     if (ELD_FIXED_BYTES + mnl > size)
     {
-        VBAUDIO(QString("out of range MNL %1").arg(mnl));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("out of range MNL %1").arg(mnl));
         goto out_fail;
     }
     else
@@ -276,7 +276,7 @@ int eld::update_eld(const char *buf, int size)
     {
         if (ELD_FIXED_BYTES + mnl + 3 * (i + 1) > size)
         {
-            VBAUDIO(QString("out of range SAD %1").arg(i));
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("out of range SAD %1").arg(i));
             goto out_fail;
         }
         update_sad(i, buf + ELD_FIXED_BYTES + mnl + (3 * static_cast<ptrdiff_t>(i)));
@@ -416,23 +416,23 @@ void eld::show()
 {
     if (!isValid())
     {
-        VBAUDIO("Invalid ELD");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Invalid ELD");
         return;
     }
-    VBAUDIO(QString("Detected monitor %1 at connection type %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Detected monitor %1 at connection type %2")
             .arg(product_name().simplified(), connection_name()));
 
     if (m_e.spk_alloc)
     {
-        VBAUDIO(QString("available speakers:%1")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("available speakers:%1")
                 .arg(channel_allocation_desc()));
     }
-    VBAUDIO(QString("max LPCM channels = %1").arg(maxLPCMChannels()));
-    VBAUDIO(QString("max channels = %1").arg(maxChannels()));
-    VBAUDIO(QString("supported codecs = %1").arg(codecs_desc()));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("max LPCM channels = %1").arg(maxLPCMChannels()));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("max channels = %1").arg(maxChannels()));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("supported codecs = %1").arg(codecs_desc()));
     for (int i = 0; i < m_e.sad_count; i++)
     {
-        VBAUDIO(sad_desc(i));
+        LOG(VB_AUDIO, LOG_INFO, LOC + sad_desc(i));
     }
 }
 

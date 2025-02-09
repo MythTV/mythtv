@@ -107,7 +107,7 @@ bool AudioOutputOSS::OpenDevice()
     MythTimer timer;
     timer.start();
 
-    VBAUDIO(QString("Opening OSS audio device '%1'.").arg(m_mainDevice));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Opening OSS audio device '%1'.").arg(m_mainDevice));
 
     while (timer.elapsed() < 2s && m_audioFd == -1)
     {
