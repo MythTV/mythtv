@@ -789,7 +789,7 @@ static void playDisc()
 {
     // Check for Bluray
     LOG(VB_MEDIA, LOG_DEBUG, "Checking for BluRay medium");
-    QString bluray_mountpoint =
+    const QString bluray_mountpoint =
             gCoreContext->GetSetting("BluRayMountpoint", "/media/cdrom");
     QDir bdtest(bluray_mountpoint + "/BDMV");
     const bool isBD = (bdtest.exists() || MythCDROM::inspectImage(bluray_mountpoint) == MythCDROM::kBluray);
@@ -815,7 +815,10 @@ static void playDisc()
 
     // Check for DVD
     LOG(VB_MEDIA, LOG_DEBUG, "Checking for DVD medium");
-    if (!mediaMonitor->GetMedias(MEDIATYPE_DVD).isEmpty())
+    const bool isDVD = mediaMonitor->IsActive()
+                     ? !mediaMonitor->GetMedias(MEDIATYPE_DVD).isEmpty() 
+                     : MythCDROM::inspectImage(MediaMonitor::defaultDVDdevice()) == MythCDROM::kDVD;
+    if (isDVD)
     {
         QString dvd_device = MediaMonitor::defaultDVDdevice();
 
@@ -871,19 +874,21 @@ static void playDisc()
 
     // Check for Audio CD
     LOG(VB_MEDIA, LOG_DEBUG, "Checking for audio CD medium");
-    auto audioMedia = mediaMonitor->GetMedias(MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
-    if (!audioMedia.isEmpty())
+    if (mediaMonitor->IsActive())
     {
-        for (auto *medium : qAsConst(audioMedia))
+        auto audioMedia = mediaMonitor->GetMedias(MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
+        if (!audioMedia.isEmpty())
         {
-            if (medium->isUsable()) {
-                LOG(VB_MEDIA, LOG_DEBUG, QString("Found usable audio/mixed device %1").arg(medium->getDevicePath()));
-                mediaMonitor->JumpToMediaHandler(medium, true);
-                return;
+            for (auto *medium : qAsConst(audioMedia))
+            {
+                if (medium->isUsable()) {
+                    LOG(VB_MEDIA, LOG_DEBUG, QString("Found usable audio/mixed device %1").arg(medium->getDevicePath()));
+                    mediaMonitor->JumpToMediaHandler(medium, true);
+                    return;
+                }
             }
         }
     }
-
 }
 
 /////////////////////////////////////////////////
