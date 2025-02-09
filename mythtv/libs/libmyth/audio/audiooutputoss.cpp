@@ -44,7 +44,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
 
     if (m_audioFd < 0)
     {
-        VBERRENO(QString("Error opening audio device (%1)").arg(m_mainDevice));
+        Error(LOC + QString("Error opening audio device (%1").arg(m_mainDevice) + ": " + ENO);
         delete settings;
         return nullptr;
     }
@@ -59,7 +59,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
     }
 
     if(ioctl(m_audioFd, SNDCTL_DSP_GETFMTS, &formats) < 0)
-        VBERRENO("Error retrieving formats");
+        Error(LOC + "Error retrieving formats" + ": " + ENO);
     else
     {
         while (AudioFormat fmt = settings->GetNextFormat())
@@ -121,8 +121,8 @@ bool AudioOutputOSS::OpenDevice()
                       .arg(m_mainDevice));
                 return false;
             }
-            VBERRENO(QString("Error opening audio device (%1)")
-                         .arg(m_mainDevice));
+            Error(LOC + QString("Error opening audio device (%1)")
+                         .arg(m_mainDevice) + ": " + ENO);
             return false;
         }
         if (m_audioFd < 0)
@@ -132,13 +132,13 @@ bool AudioOutputOSS::OpenDevice()
     if (m_audioFd == -1)
     {
         Error(QObject::tr("Error opening audio device (%1)").arg(m_mainDevice));
-        VBERRENO(QString("Error opening audio device (%1)").arg(m_mainDevice));
+        Error(LOC + QString("Error opening audio device (%1)").arg(m_mainDevice) + ": " + ENO);
         return false;
     }
 
     if (fcntl(m_audioFd, F_SETFL, fcntl(m_audioFd, F_GETFL) & ~O_NONBLOCK) == -1)
     {
-        VBERRENO(QString("Error removing the O_NONBLOCK flag from audio device FD (%1)").arg(m_mainDevice));
+        Error(LOC + QString("Error removing the O_NONBLOCK flag from audio device FD (%1)").arg(m_mainDevice) + ": " + ENO);
     }
 
     bool err = false;
@@ -185,11 +185,11 @@ bool AudioOutputOSS::OpenDevice()
 
     if (err)
     {
-        VBERRENO(QString("Unable to set audio device (%1) to %2 kHz, %3 bits, "
+        Error(LOC + QString("Unable to set audio device (%1) to %2 kHz, %3 bits, "
                          "%4 channels")
                      .arg(m_mainDevice).arg(m_sampleRate)
                      .arg(AudioOutputSettings::FormatToBits(m_outputFormat))
-                     .arg(m_channels));
+                     .arg(m_channels) + ": " + ENO);
 
         close(m_audioFd);
         m_audioFd = -1;
@@ -198,7 +198,7 @@ bool AudioOutputOSS::OpenDevice()
 
     audio_buf_info info;
     if (ioctl(m_audioFd, SNDCTL_DSP_GETOSPACE, &info) < 0)
-        VBERRENO("Error retrieving card buffer size");
+        Error(LOC + "Error retrieving card buffer size" + ": " + ENO);
     // align by frame size
     m_fragmentSize = info.fragsize - (info.fragsize % m_outputBytesPerFrame);
 
@@ -214,7 +214,7 @@ bool AudioOutputOSS::OpenDevice()
     }
     else
     {
-        VBERRENO("Unable to get audio card capabilities");
+        Error(LOC + "Unable to get audio card capabilities" + ": " + ENO);
     }
 
     // Setup volume control
@@ -255,8 +255,8 @@ void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
 
     if (lw < 0)
     {
-        VBERRENO(QString("Error writing to audio device (%1)")
-                     .arg(m_mainDevice));
+        Error(LOC + QString("Error writing to audio device (%1)")
+                     .arg(m_mainDevice) + ": " + ENO);
         return;
     }
 }
@@ -268,7 +268,7 @@ int AudioOutputOSS::GetBufferedOnSoundcard(void) const
 //GREG This is needs to be fixed for sure!
 #ifdef SNDCTL_DSP_GETODELAY
     if(ioctl(m_audioFd, SNDCTL_DSP_GETODELAY, &soundcard_buffer) < 0) // bytes
-        VBERRNOCONST("Error retrieving buffering delay");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error retrieving buffering delay" + ": " + ENO);
 #endif
     return soundcard_buffer;
 }
