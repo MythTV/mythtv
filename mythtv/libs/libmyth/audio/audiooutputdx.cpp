@@ -198,7 +198,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     m_dsound_dll = LoadLibrary(TEXT("DSOUND.DLL"));
     if (m_dsound_dll == nullptr)
     {
-        VBERROR("Cannot open DSOUND.DLL");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot open DSOUND.DLL");
         goto error;
     }
 
@@ -216,7 +216,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 
     if(OurDirectSoundEnumerate)
         if(FAILED(OurDirectSoundEnumerate(DSEnumCallback, this) != DS_OK))
-            VBERROR("DirectSoundEnumerate FAILED");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "DirectSoundEnumerate FAILED");
 
     if (!m_chosenGUID)
     {
@@ -231,13 +231,13 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 
     if (OurDirectSoundCreate == nullptr)
     {
-        VBERROR("GetProcAddress FAILED");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetProcAddress FAILED");
         goto error;
     }
 
     if (FAILED(OurDirectSoundCreate(m_chosenGUID, &m_dsobject, nullptr)))
     {
-        VBERROR("Cannot create a direct sound device");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot create a direct sound device");
         goto error;
     }
 
@@ -253,7 +253,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
      * working */
     if (FAILED(IDirectSound_SetCooperativeLevel(m_dsobject, GetDesktopWindow(),
                                                 DSSCL_EXCLUSIVE)))
-        VBERROR("Cannot set DS cooperative level");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot set DS cooperative level");
 
     LOG(VB_AUDIO, LOG_INFO, LOC + "Initialised DirectSound");
 
@@ -299,7 +299,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
                                                          &play_pos, &write_pos);
         if (dsresult != DS_OK)
         {
-            VBERROR("Cannot get current buffer position");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot get current buffer position");
             return;
         }
 
@@ -311,7 +311,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
                     (m_writeCursor < play_pos  && write_pos <  play_pos))) ||
                (m_writeCursor >= play_pos && write_pos < play_pos))
         {
-            VBERROR("buffer underrun");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "buffer underrun");
             m_writeCursor += size;
             while (m_writeCursor >= (DWORD)m_parent->m_soundcardBufferSize)
                 m_writeCursor -= m_parent->m_soundcardBufferSize;
@@ -348,7 +348,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
 
     if (dsresult != DS_OK)
     {
-        VBERROR("Cannot lock buffer, audio dropped");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot lock buffer, audio dropped");
         return;
     }
 
@@ -377,7 +377,7 @@ bool AudioOutputDXPrivate::StartPlayback(void)
     }
     if (dsresult != DS_OK)
     {
-        VBERROR("Cannot start playing buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot start playing buffer");
         m_playStarted = false;
         return false;
     }
@@ -562,7 +562,7 @@ int AudioOutputDX::GetBufferedOnSoundcard(void) const
                                                      &play_pos, &write_pos);
     if (dsresult != DS_OK)
     {
-        VBERROR("Cannot get current buffer position");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot get current buffer position");
         return 0;
     }
 
@@ -588,7 +588,7 @@ int AudioOutputDX::GetVolumeChannel([[maybe_unused]] int channel) const
 
     if (dsresult != DS_OK)
     {
-        VBERROR(QString("Failed to get volume %1").arg(dxVolume));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to get volume %1").arg(dxVolume));
         return volume;
     }
 
@@ -614,7 +614,7 @@ void AudioOutputDX::SetVolumeChannel([[maybe_unused]] int channel, int volume)
 
     if (dsresult != DS_OK)
     {
-        VBERROR(QString("Failed to set volume %1").arg(dxVolume));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to set volume %1").arg(dxVolume));
         return;
     }
 

@@ -149,7 +149,7 @@ bool AudioOutputOSS::OpenDevice()
         case FORMAT_U8:  format = AFMT_U8;      break;
         case FORMAT_S16: format = AFMT_S16_NE;  break;
         default:
-            VBERROR(QString("Unknown sample format: %1").arg(m_outputFormat));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown sample format: %1").arg(m_outputFormat));
             close(m_audioFd);
             m_audioFd = -1;
             return false;
@@ -293,7 +293,7 @@ void AudioOutputOSS::VolumeInit()
 
     if (m_mixerFd < 0)
     {
-        VBERROR(QString("Unable to open mixer: '%1'").arg(device));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to open mixer: '%1'").arg(device));
         return;
     }
 
@@ -303,13 +303,13 @@ void AudioOutputOSS::VolumeInit()
         int tmpVol = (volume << 8) + volume;
         int ret = ioctl(m_mixerFd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)
-            VBERROR(QString("Error Setting initial Master Volume") + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error Setting initial Master Volume") + ENO);
 
         volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(m_mixerFd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
         if (ret < 0)
-            VBERROR(QString("Error setting initial PCM Volume") + ENO);
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error setting initial PCM Volume") + ENO);
     }
 }
 
@@ -333,7 +333,7 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
     int ret = ioctl(m_mixerFd, MIXER_READ(m_control), &tmpVol);
     if (ret < 0)
     {
-        VBERROR(QString("Error reading volume for channel %1").arg(channel));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error reading volume for channel %1").arg(channel));
         return 0;
     }
 
@@ -342,7 +342,7 @@ int AudioOutputOSS::GetVolumeChannel(int channel) const
     else if (channel == 1)
         volume = (tmpVol >> 8) & 0xff; // right
     else
-        VBERROR("Invalid channel. Only stereo volume supported");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid channel. Only stereo volume supported");
 
     return volume;
 }
@@ -352,7 +352,7 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
     if (channel > 1)
     {
         // Don't support more than two channels!
-        VBERROR(QString("Error setting channel %1. Only 2 ch volume supported")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error setting channel %1. Only 2 ch volume supported")
                 .arg(channel));
         return;
     }
@@ -369,6 +369,6 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
 
         int ret = ioctl(m_mixerFd, MIXER_WRITE(m_control), &tmpVol);
         if (ret < 0)
-            VBERROR(QString("Error setting volume on channel %1").arg(channel));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error setting volume on channel %1").arg(channel));
     }
 }

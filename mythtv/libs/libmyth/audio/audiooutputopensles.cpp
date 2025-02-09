@@ -28,7 +28,7 @@ static constexpr std::chrono::milliseconds OPENSLES_BUFLEN { 10ms };
 #define CHECK_OPENSL_ERROR(msg)                \
     if (result != SL_RESULT_SUCCESS) \
     {                                          \
-        VBERROR(QString("Open Error: (%1)").arg(result));    \
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Open Error: (%1)").arg(result));    \
         Close();                            \
         return false;   \
     }
@@ -36,7 +36,7 @@ static constexpr std::chrono::milliseconds OPENSLES_BUFLEN { 10ms };
 #define CHECK_OPENSL_START_ERROR(msg)                \
     if (result != SL_RESULT_SUCCESS) \
     {                                          \
-        VBERROR(QString("Start Error: (%1)").arg(result));    \
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Start Error: (%1)").arg(result));    \
         Stop();                            \
         return false;   \
     }
@@ -97,7 +97,7 @@ bool AudioOutputOpenSLES::CreateEngine()
     m_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
     if (m_so_handle == nullptr)
     {
-        VBERROR("Error: Failed to load libOpenSLES");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error: Failed to load libOpenSLES");
         Close();
         return false;
     }
@@ -105,7 +105,7 @@ bool AudioOutputOpenSLES::CreateEngine()
     m_slCreateEnginePtr = (slCreateEngine_t)dlsym(m_so_handle, "slCreateEngine");
     if (m_slCreateEnginePtr == nullptr)
     {
-        VBERROR("Error: Failed to load symbol slCreateEngine");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error: Failed to load symbol slCreateEngine");
         Close();
         return false;
     }
@@ -417,7 +417,7 @@ int AudioOutputOpenSLES::GetNumberOfBuffersQueued() const
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(m_playerBufferQueue, &st);
     if (res != SL_RESULT_SUCCESS) {
-        VBERROR(QString("Could not query buffer queue state in %1 (%2)").arg(__func__).arg(res));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not query buffer queue state in %1 (%2)").arg(__func__).arg(res));
         return -1;
     }
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Num Queued %1").arg(st.count));
@@ -460,7 +460,7 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
         if (r != SL_RESULT_SUCCESS)
         {
             // should never happen so show a log
-            VBERROR(QString("error %1 when writing %2 bytes %3")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("error %1 when writing %2 bytes %3")
                     .arg(r)
                     .arg(m_fragmentSize)
                     .arg((r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : ""));
@@ -505,7 +505,7 @@ int AudioOutputOpenSLES::GetVolumeChannel(int channel) const
     }
     else
     {
-        VBERROR(QString("GetVolume(%1) %2 (%3) : %4")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("GetVolume(%1) %2 (%3) : %4")
                         .arg(channel).arg(volume).arg(mb).arg(r));
     }
 
@@ -515,7 +515,7 @@ int AudioOutputOpenSLES::GetVolumeChannel(int channel) const
 void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
 {
     if (channel > 1)
-        VBERROR("Android volume only supports stereo!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Android volume only supports stereo!");
 
     // Volume is 0-100
     // android expects 0-1.0 before conversion
@@ -545,7 +545,7 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     }
     else
     {
-        VBERROR(QString("SetVolume(%1) %2(%3) : %4")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SetVolume(%1) %2(%3) : %4")
                 .arg(channel).arg(volume).arg(mb).arg(r));
     }
 

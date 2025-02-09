@@ -94,7 +94,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 AudioOutputBase::~AudioOutputBase()
 {
     if (!m_killAudio)
-        VBERROR("Programmer Error: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Programmer Error: "
                 "~AudioOutputBase called, but KillAudio has not been called!");
 
     // We got this from a subclass, delete it
@@ -1202,7 +1202,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
     if (len <= afree)
         return len;
 
-    VBERROR(QString("Audio buffer overflow, %1 frames lost!")
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Audio buffer overflow, %1 frames lost!")
             .arg(frames - (afree / bpf)));
 
     frames = afree / bpf;
@@ -1214,7 +1214,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
     int error = src_reset(m_srcCtx);
     if (error)
     {
-        VBERROR(QString("Error occurred while resetting resampler: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error occurred while resetting resampler: %1")
                 .arg(src_strerror(error)));
         m_srcCtx = nullptr;
     }
@@ -1293,7 +1293,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         {
             if ((org_waud % bpf) != 0)
             {
-                VBERROR(QString("Upmixing: org_waud = %1 (bpf = %2)")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Upmixing: org_waud = %1 (bpf = %2)")
                         .arg(org_waud)
                         .arg(bpf));
             }
@@ -1415,7 +1415,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         if (sampleSize <= 0)
         {
             // Would lead to division by zero (or unexpected results if negative)
-            VBERROR("Sample size is <= 0, AddData returning false");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Sample size is <= 0, AddData returning false");
             return false;
         }
 
@@ -1445,7 +1445,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     if (len > afree)
     {
-        VBERROR("Buffer is full, AddData returning false");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Buffer is full, AddData returning false");
         return false; // would overflow
     }
 
@@ -1480,7 +1480,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             if(AudioOutputDownmix::DownmixFrames(m_sourceChannels,
                                                  m_configuredChannels,
                                                  m_srcIn, m_srcIn, frames) < 0)
-                VBERROR("Error occurred while downmixing");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Error occurred while downmixing");
         }
 
         // Resample if necessary
@@ -1490,7 +1490,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             int error = src_process(m_srcCtx, &m_srcData);
 
             if (error)
-                VBERROR(QString("Error occurred while resampling audio: %1")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error occurred while resampling audio: %1")
                         .arg(src_strerror(error)));
 
             buffer = m_srcOut;
@@ -1518,13 +1518,13 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         int bdiff = kAudioRingBufferSize - m_waud;
         if ((len % bpf) != 0 && bdiff < len)
         {
-            VBERROR(QString("AddData: Corruption likely: len = %1 (bpf = %2)")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("AddData: Corruption likely: len = %1 (bpf = %2)")
                     .arg(len)
                     .arg(bpf));
         }
         if ((bdiff % bpf) != 0 && bdiff < len)
         {
-            VBERROR(QString("AddData: Corruption likely: bdiff = %1 (bpf = %2)")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("AddData: Corruption likely: bdiff = %1 (bpf = %2)")
                     .arg(bdiff)
                     .arg(bpf));
         }
@@ -1864,6 +1864,6 @@ void AudioOutputBase::run(void)
 
 int AudioOutputBase::readOutputData(unsigned char* /*read_buffer*/, size_t /*max_length*/)
 {
-    VBERROR("AudioOutputBase should not be getting asked to readOutputData()");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "AudioOutputBase should not be getting asked to readOutputData()");
     return 0;
 }

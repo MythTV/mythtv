@@ -370,7 +370,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     for (int i = 0; i < t_jack_xruns; i++)
     {
         bytes_read = GetAudioData(m_auBuf, m_fragmentSize, true);
-        VBERROR("Discarded one audio fragment to compensate for xrun");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Discarded one audio fragment to compensate for xrun");
     }
     m_jackXruns -= t_jack_xruns;
 
@@ -414,7 +414,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         memset(m_auBuf + bytes_read, 0, bytes_needed - bytes_read);
         if (!m_pauseAudio)
         {
-            VBERROR(QString("Having to insert silence because GetAudioData "
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Having to insert silence because GetAudioData "
                             "hasn't returned enough data. Wanted: %1 Got: %2")
                                     .arg(bytes_needed).arg(bytes_read));
         }
@@ -454,7 +454,7 @@ int AudioOutputJACK::JackXRunCallback(void)
     int fragments = (int)ceilf( ((delay / 1000000.0F) * m_sampleRate )
                             / ((float)m_fragmentSize / m_outputBytesPerFrame) );
     m_jackXruns += fragments; //should be at least 1...
-    VBERROR(QString("Jack XRun Callback: %1 usecs delayed, xruns now %2")
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Jack XRun Callback: %1 usecs delayed, xruns now %2")
                         .arg(delay).arg(m_jackXruns) );
 
     return 0;

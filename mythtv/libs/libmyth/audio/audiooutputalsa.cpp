@@ -24,7 +24,7 @@ static constexpr int OPEN_FLAGS
 static constexpr int FILTER_FLAGS { ~(SND_PCM_NO_AUTO_FORMAT) };
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define AERROR(str)   VBERROR((str) + QString(": %1").arg(snd_strerror(err)))
+#define AERROR(str)   LOG(VB_GENERAL, LOG_ERR, LOC + (str) + QString(": %1").arg(snd_strerror(err)))
 #define CHECKERR(str) { if (err < 0) { AERROR(str); return err; } }
 // NOLINTEND(cppcoreguidelines-macro-usage)
 
@@ -199,13 +199,13 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 
     if (!pfile.open(QIODevice::ReadOnly))
     {
-        VBERROR(QString("Error opening %1. Fix reading permissions.").arg(pf));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error opening %1. Fix reading permissions.").arg(pf));
         return false;
     }
 
     if (!mfile.open(QIODevice::ReadOnly))
     {
-        VBERROR(QString("Error opening %1").arg(pf + "_max"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error opening %1").arg(pf + "_max"));
         return false;
     }
 
@@ -498,7 +498,7 @@ bool AudioOutputALSA::OpenDevice()
     }
 
     if (m_internalVol && !OpenMixer())
-        VBERROR("Unable to open audio mixer. Volume control disabled");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to open audio mixer. Volume control disabled");
 
     // Device opened successfully
     return true;
@@ -611,7 +611,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
                 if (err < 0)
                 {
-                    VBERROR("WriteAudio: resume failed");
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "WriteAudio: resume failed");
                     err = snd_pcm_prepare(m_pcmHandle);
                     if (err < 0)
                     {
@@ -640,7 +640,7 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
     if (m_pcmHandle == nullptr)
     {
-        VBERROR("getBufferedOnSoundcard() called with pcm_handle == nullptr!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "getBufferedOnSoundcard() called with pcm_handle == nullptr!");
         return 0;
     }
 
@@ -718,7 +718,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
         if (rrate != rate)
         {
-            VBERROR(QString("Rate doesn't match (requested %1Hz, got %2Hz)")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Rate doesn't match (requested %1Hz, got %2Hz)")
                     .arg(rate).arg(err));
             return err;
         }
@@ -767,7 +767,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                 if ((buffer_time <= 100000) ||
                     (attempt > 0 && buffer_time == buftmp))
                 {
-                    VBERROR("Couldn't set buffer time, giving up");
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't set buffer time, giving up");
                     return err;
                 }
                 buffer_time -= 100000;
@@ -850,7 +850,7 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
                                                   &mixervol);
     if (chk < 0)
     {
-        VBERROR(QString("failed to get channel %1 volume, mixer %2/%3: %4")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("failed to get channel %1 volume, mixer %2/%3: %4")
                 .arg(QString::number(channel), m_mixer.device,
                      m_mixer.control, snd_strerror(chk)));
     }
@@ -882,7 +882,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
         snd_mixer_selem_set_playback_switch(m_mixer.elem, chan, static_cast<int>(volume > 0));
 
     if (snd_mixer_selem_set_playback_volume(m_mixer.elem, chan, mixervol) < 0)
-        VBERROR(QString("failed to set channel %1 volume").arg(channel));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("failed to set channel %1 volume").arg(channel));
     else
         LOG(VB_AUDIO, LOG_INFO, LOC + QString("channel %1 volume set %2 => %3")
                 .arg(channel).arg(volume).arg(mixervol));
@@ -892,7 +892,7 @@ bool AudioOutputALSA::OpenMixer(void)
 {
     if (!m_pcmHandle)
     {
-        VBERROR("mixer setup without a pcm");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "mixer setup without a pcm");
         return false;
     }
     m_mixer.device = gCoreContext->GetSetting("MixerDevice", "default");
@@ -907,7 +907,7 @@ bool AudioOutputALSA::OpenMixer(void)
     int chk = snd_mixer_open(&m_mixer.handle, 0);
     if (chk < 0)
     {
-        VBERROR(QString("failed to open mixer device %1: %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("failed to open mixer device %1: %2")
                 .arg(mixer_device_tag, snd_strerror(chk)));
         return false;
     }
@@ -921,7 +921,7 @@ bool AudioOutputALSA::OpenMixer(void)
     {
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
-        VBERROR(QString("failed to register %1: %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("failed to register %1: %2")
                 .arg(mixer_device_tag, snd_strerror(chk)));
         return false;
     }
@@ -931,7 +931,7 @@ bool AudioOutputALSA::OpenMixer(void)
     {
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
-        VBERROR(QString("failed to load %1: %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("failed to load %1: %2")
                 .arg(mixer_device_tag, snd_strerror(chk)));
         return false;
     }
@@ -959,7 +959,7 @@ bool AudioOutputALSA::OpenMixer(void)
     {
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
-        VBERROR(QString("no playback control %1 found on %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("no playback control %1 found on %2")
                 .arg(m_mixer.control, mixer_device_tag));
         return false;
     }
@@ -969,7 +969,7 @@ bool AudioOutputALSA::OpenMixer(void)
     {
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
-        VBERROR(QString("failed to get volume range on %1/%2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("failed to get volume range on %1/%2")
                 .arg(mixer_device_tag, m_mixer.control));
         return false;
     }

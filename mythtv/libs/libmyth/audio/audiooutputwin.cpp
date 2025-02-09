@@ -272,10 +272,10 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
 
     if (MMSYSERR_NOERROR != waveOutPrepareHeader(m_priv->m_hWaveOut, wh,
                                                  sizeof(WAVEHDR)))
-        VBERROR("WriteAudio: failed to prepare header");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "WriteAudio: failed to prepare header");
     else if (MMSYSERR_NOERROR != waveOutWrite(m_priv->m_hWaveOut, wh,
                                               sizeof(WAVEHDR)))
-        VBERROR("WriteAudio: failed to write packet");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "WriteAudio: failed to write packet");
 
     m_CurrentPkt++;
 }
@@ -305,7 +305,7 @@ int AudioOutputWin::GetVolumeChannel(int channel) const
 void AudioOutputWin::SetVolumeChannel(int channel, int volume)
 {
     if (channel > 1)
-        VBERROR("Windows volume only supports stereo!");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Windows volume only supports stereo!");
 
     DWORD dwVolume = 0xffffffff;
     if (MMSYSERR_NOERROR == waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, &dwVolume))
