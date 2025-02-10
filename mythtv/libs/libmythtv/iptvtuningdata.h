@@ -13,7 +13,6 @@
 #include <QUrl>
 
 // MythTV headers
-#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsingledownload.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recorders/HLS/HLSReader.h"
@@ -169,16 +168,7 @@ class MTV_PUBLIC IPTVTuningData
 
     static uint GetURLCount(void) { return 3; }
 
-    bool IsValid(void) const
-    {
-        bool ret = (m_dataUrl.isValid() && (IsUDP() || IsRTP() || IsRTSP() || IsHLS() || IsHTTPTS()));
-
-        LOG(VB_CHANNEL, LOG_DEBUG, QString("IPTVTuningdata (%1): IsValid = %2")
-            .arg(m_dataUrl.toString(),
-                 ret ? "true" : "false"));
-
-        return ret;
-    }
+    bool IsValid(void) const;
 
     bool IsUDP(void) const
     {
@@ -249,26 +239,7 @@ class MTV_PUBLIC IPTVTuningData
     // and 2000 bytes is enough to determine in IsHLSPlaylist
     // if the file is an HLS playlist or not.
     //
-    bool CanReadHTTP(QByteArray &buffer) const
-    {
-        // Check needed for use in the unit test
-        if (QCoreApplication::instance() == nullptr)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("CanReadHTTP - No QCoreApplication!!"));
-            return false;
-        }
-
-        QString url = m_dataUrl.toString();
-        MythSingleDownload downloader;
-        downloader.DownloadURL(url, &buffer, 5s, 0, 2000);
-        if (buffer.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("CanReadHTTP - Failed, error:%1 url:%2")
-                .arg(downloader.ErrorString(), url));
-            return false;
-        }
-        return true;
-    }
+    bool CanReadHTTP(QByteArray &buffer) const;
 
     static bool IsHLSPlaylist(QByteArray &buffer)
     {
