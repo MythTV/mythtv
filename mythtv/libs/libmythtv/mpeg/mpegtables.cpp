@@ -765,6 +765,27 @@ uint ProgramMapTable::FindUnusedPID(uint desired_pid) const
     return pid & 0x1fff;
 }
 
+void PSIPTable::InitPESPacket(TSPacket& tspacket)
+{
+    if (tspacket.PayloadStart())
+        m_psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");
+        m_psiOffset = tspacket.AFCOffset();
+    }
+    m_pesData = tspacket.data() + m_psiOffset + 1;
+
+    m_badPacket = true;
+    // first check if Length() will return something useful and
+    // then check if the packet ends in the first TSPacket
+    if ((m_pesData - tspacket.data()) <= (188-3) &&
+        (m_pesData + Length() - tspacket.data()) <= (188-3))
+    {
+        m_badPacket = !VerifyCRC();
+    }
+}
+
 QString PSIPTable::toString(void) const
 {
     QString str;

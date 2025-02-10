@@ -7,7 +7,6 @@
 #include <utility>
 
 // MythTV headers
-#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h" // for xml_indent
 #include "libmythtv/mpeg/mpegdescriptors.h"
 #include "libmythtv/mpeg/pespacket.h"
@@ -410,26 +409,7 @@ class MTV_PUBLIC TableID
 class MTV_PUBLIC PSIPTable : public PESPacket
 {
     /// Only handles single TS packet PES packets, for PMT/PAT tables basically
-    void InitPESPacket(TSPacket& tspacket)
-    {
-        if (tspacket.PayloadStart())
-            m_psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");
-            m_psiOffset = tspacket.AFCOffset();
-        }
-        m_pesData = tspacket.data() + m_psiOffset + 1;
-
-        m_badPacket = true;
-        // first check if Length() will return something useful and
-        // then check if the packet ends in the first TSPacket
-        if ((m_pesData - tspacket.data()) <= (188-3) &&
-            (m_pesData + Length() - tspacket.data()) <= (188-3))
-        {
-            m_badPacket = !VerifyCRC();
-        }
-    }
+    void InitPESPacket(TSPacket& tspacket);
 
   protected:
     // does not create it's own data
