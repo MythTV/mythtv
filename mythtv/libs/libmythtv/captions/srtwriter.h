@@ -2,27 +2,16 @@
 #ifndef SRTWRITER_H_
 #define SRTWRITER_H_
 
+#include <chrono>
+
 // Qt
-#include <QHash>
-#include <QImage>
-#include <QPoint>
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
-#include <QStringConverter>
-#endif
-#include <QStringList>
-#include <QTime>
-#include <QtXml/QDomDocument>
-#include <QtXml/QDomElement>
+#include <QFile>
+#include <QString>
+#include <QTextStream>
 
 // MythTV
-#include "libmythbase/mythlogging.h"
-
-#include "captions/teletextextractorreader.h"
-#include "decoders/avformatdecoder.h"
 #include "mythccextractorplayer.h"
-#include "mythplayer.h"
-
-class OneSubtitle;
+#include "mythtvexp.h"
 
 /**
  * Class to write SubRip files.
@@ -31,29 +20,7 @@ class OneSubtitle;
 class MTV_PUBLIC SRTWriter
 {
   public:
-    explicit SRTWriter(const QString &fileName) :
-        m_outFile(fileName), m_outStream(&m_outFile)
-    {
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-        m_outStream.setCodec("UTF-8");
-#else
-        m_outStream.setEncoding(QStringConverter::Utf8);
-#endif
-        if (!m_outFile.open(QFile::WriteOnly))
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to create '%1'")
-                .arg(fileName));
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Created '%1'")
-                .arg(fileName));                    
-        }
-    }
-    ~SRTWriter(void)
-    {
-        m_outFile.close();
-    }
+    explicit SRTWriter(const QString &fileName);
 
     void AddSubtitle(const OneSubtitle &sub, int number);
 
