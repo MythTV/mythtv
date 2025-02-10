@@ -11,7 +11,6 @@
 #include <QStringList>
 
 // MythTV headers
-#include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythscreentype.h"
 #include "libmythui/mythuitextedit.h"
@@ -513,39 +512,11 @@ template <class OBJ, typename FUNC>
 MythConfirmationDialog  *ShowOkPopup(const QString &message, const OBJ *parent,
                                      FUNC slot, bool showCancel = false)
 {
-    QString                  LOC = "ShowOkPopup('" + message + "') - ";
-    MythScreenStack         *stk = nullptr;
-
-    MythMainWindow *win = GetMythMainWindow();
-
-    if (win)
-        stk = win->GetStack("popup stack");
-    else
+    auto* pop = ShowOkPopup(message, showCancel);
+    if (pop != nullptr && parent != nullptr)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
-        return nullptr;
-    }
-
-    if (!stk)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
-                                       "Is there a MythThemeBase?");
-        return nullptr;
-    }
-
-    auto *pop = new MythConfirmationDialog(stk, message, showCancel);
-    if (pop->Create())
-    {
-        stk->AddScreen(pop);
-        if (parent)
-            QObject::connect(pop, &MythConfirmationDialog::haveResult, parent, slot,
-                             Qt::QueuedConnection);
-    }
-    else
-    {
-        delete pop;
-        pop = nullptr;
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't Create() Dialog");
+        QObject::connect(pop, &MythConfirmationDialog::haveResult, parent, slot,
+                         Qt::QueuedConnection);
     }
 
     return pop;
