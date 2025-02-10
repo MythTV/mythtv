@@ -1286,6 +1286,12 @@ MythCommandLineParser::MythCommandLineParser(QString appname)
 
 MythCommandLineParser::~MythCommandLineParser()
 {
+    QString pidfile = toString("pidfile");
+    if (!pidfile.isEmpty())
+    {
+        QFile::remove(pidfile);
+    }
+
     QMap<QString, CommandLineArg*>::iterator i;
 
     i = m_namedArgs.begin();
