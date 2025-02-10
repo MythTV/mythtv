@@ -12,7 +12,7 @@
 #include "libmythbase/mythmedia.h"
 #include "libmythui/mythuiexp.h"
 
-typedef void (*MediaCallback)(MythMediaDevice *mediadevice, bool forcePlayback);
+using MediaCallback = void (*)(MythMediaDevice *, bool);
 
 /// Stores details of media handlers
 
