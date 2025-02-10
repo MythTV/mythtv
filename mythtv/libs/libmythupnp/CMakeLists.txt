@@ -55,7 +55,6 @@ add_library(
   httprequest.h
   httpserver.cpp
   httpserver.h
-  mbroadcastsocketdevice.h
   mmembuf.cpp
   mmembuf.h
   mmulticastsocketdevice.cpp

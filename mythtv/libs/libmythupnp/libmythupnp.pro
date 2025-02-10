@@ -17,7 +17,7 @@ QMAKE_CLEAN += version.cpp
 
 # Input
 
-HEADERS += mmulticastsocketdevice.h     mbroadcastsocketdevice.h
+HEADERS += mmulticastsocketdevice.h
 HEADERS += msocketdevice.h
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
