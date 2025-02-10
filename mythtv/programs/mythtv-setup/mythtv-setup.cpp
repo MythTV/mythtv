@@ -56,7 +56,6 @@ ExitPrompter   *exitPrompt  = nullptr;
 StartPrompter  *startPrompt = nullptr;
 
 static MythThemedMenu *menu;
-static QString  logfile;
 
 static void cleanup()
 {

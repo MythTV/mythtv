@@ -41,19 +41,10 @@
 #define LOC_ERR  QString("MythJobQueue, Error: ")
 
 JobQueue *jobqueue = nullptr;
-QString   pidfile;
-QString   logfile;
-
 static void cleanup(void)
 {
     delete gContext;
     gContext = nullptr;
-
-    if (!pidfile.isEmpty())
-    {
-        unlink(pidfile.toLatin1().constData());
-        pidfile.clear();
-    }
 
     SignalHandler::Done();
 }
