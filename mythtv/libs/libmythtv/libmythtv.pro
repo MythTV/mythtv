@@ -894,6 +894,7 @@ using_backend {
     SOURCES *= recorders/streamhandler.cpp
 
     SOURCES += recorders/rtp/packetbuffer.cpp
+    SOURCES += recorders/rtp/rtpdatapacket.cpp
     SOURCES += recorders/rtp/rtppacketbuffer.cpp
 
     # Support for HTTP TS streams
