@@ -59,6 +59,8 @@ add_library(
   livetvchain.h
   metadataimagehelper.cpp
   metadataimagehelper.h
+  mythavbufferref.cpp
+  mythavbufferref.h
   mythavrational.h
   mythavutil.cpp
   mythavutil.h
