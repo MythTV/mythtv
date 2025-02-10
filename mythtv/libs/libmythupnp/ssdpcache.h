@@ -17,6 +17,8 @@
 #include <QObject>
 #include <QMutex>
 #include <QMap>
+#include <QString>
+#include <QTextStream>
 
 // MythTV headers
 #include "libmythbase/mythobservable.h"

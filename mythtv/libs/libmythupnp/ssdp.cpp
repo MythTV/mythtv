@@ -24,7 +24,6 @@
 
 #include "upnp.h"
 #include "upnptasksearch.h"
-#include "upnptaskcache.h"
 
 #include "mmulticastsocketdevice.h"
 #include "mbroadcastsocketdevice.h"
