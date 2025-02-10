@@ -192,7 +192,6 @@ add_library(
   loggingserver.cpp
   mthread.cpp
   mthreadpool.cpp
-  mythbaseutil.h
   mythbinaryplist.cpp
   mythcdrom.cpp
   mythcommandlineparser.cpp
