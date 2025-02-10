@@ -4,6 +4,10 @@
 // C++ headers
 #include <cstdint>
 
+extern "C" {
+#include <libavformat/avformat.h>
+}
+
 // QT headers
 #include <QObject>
 
@@ -13,7 +17,6 @@
 
 // Mythmusic Headers
 #include "decoder.h"
-#include "remoteavformatcontext.h"
 
 class QTimer;
 
@@ -52,7 +55,7 @@ class avfDecoder : public QObject, public Decoder
     QString m_devicename;
 
     const AVInputFormat *m_inputFormat    {nullptr};
-    RemoteAVFormatContext *m_inputContext {nullptr};
+    class RemoteAVFormatContext *m_inputContext {nullptr};
     AVCodecContext *m_audioDec            {nullptr};
     MythCodecMap m_codecMap;
 

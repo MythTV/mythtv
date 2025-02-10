@@ -46,6 +46,7 @@
 #include "avfdecoder.h"
 #include "decoderhandler.h"
 #include "musicplayer.h"
+#include "remoteavformatcontext.h"
 
 extern "C" {
     #include <libavformat/avio.h>
