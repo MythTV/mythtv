@@ -126,8 +126,6 @@ static constexpr int16_t kMaxVideoQueueSize = 220;
 static constexpr ssize_t kMaxVideoQueueSize = 220;
 #endif
 
-static bool silence_ffmpeg_logging = false;
-
 static QSize get_video_dim(const AVCodecContext &ctx)
 {
     return {ctx.width >> ctx.lowres, ctx.height >> ctx.lowres};
@@ -265,9 +263,6 @@ static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Strea
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
-    if (silence_ffmpeg_logging)
-        return;
-
     if (VERBOSE_LEVEL_NONE())
         return;
 
