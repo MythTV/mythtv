@@ -120,7 +120,6 @@ class AvFormatDecoder : public DecoderBase
     int SetTrack(uint Type, int TrackNo) override;
 
     int ScanStreams(bool novideo);
-    int FindStreamInfo(void);
 
     int  GetNumChapters() override; // DecoderBase
     void GetChapterTimes(QList<std::chrono::seconds> &times) override; // DecoderBase
