@@ -34,11 +34,6 @@ function(find_or_build_exiv2)
     endif()
   endif()
 
-  if(CMAKE_CROSSCOMPILING)
-    set(BUILD_XMP OFF)
-  else()
-    set(BUILD_XMP ON)
-  endif()
   if(LIBS_INSTALL_EXIV2)
     set(CMDLINE_ARGS_EXIV2 ${CMDLINE_ARGS_LIBS})
   else()
@@ -101,7 +96,7 @@ function(find_or_build_exiv2)
     CMAKE_ARGS --no-warn-unused-cli
                -DCMAKE_INSTALL_SO_NO_EXE=OFF
                -DBUILD_SHARED_LIBS:BOOL=ON
-               -DEXIV2_ENABLE_XMP:BOOL=${BUILD_XMP}
+               -DEXIV2_ENABLE_XMP:BOOL=OFF
                -DEXIV2_ENABLE_BMFF:BOOL=OFF # HEIC, HEIF, AVIF, CR3, JXL/bmff
                -DEXIV2_ENABLE_BROTLI:BOOL=OFF # Google algorithm
                -DEXIV2_ENABLE_INIH=OFF
