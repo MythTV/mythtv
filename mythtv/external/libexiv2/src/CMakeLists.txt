@@ -232,9 +232,9 @@ install(FILES
     ${CMAKE_BINARY_DIR}/exiv2lib_export.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/exiv2)
 
-install(EXPORT mythexiv2Config DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mythexiv2")
+#install(EXPORT mythexiv2Config DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mythexiv2")
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mythexiv2ConfigVersion.cmake DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mythexiv2")
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mythexiv2ConfigVersion.cmake DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/mythexiv2")
 
 # ******************************************************************************
 # exiv2 application
