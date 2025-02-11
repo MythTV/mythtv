@@ -68,7 +68,6 @@ void MythBDDecoder::StreamChangeCheck(void)
         QMutexLocker locker(&m_trackLock);
         Reset(true, false, false);
         CloseCodecs();
-        FindStreamInfo();
         ScanStreams(false);
         m_streamsChanged=false;
     }
