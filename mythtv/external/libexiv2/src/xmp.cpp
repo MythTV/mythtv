@@ -24,6 +24,7 @@
  */
 // *****************************************************************************
 // included header files
+#include "config.h"
 #include "xmp_exiv2.hpp"
 #include "types.hpp"
 #include "error.hpp"
