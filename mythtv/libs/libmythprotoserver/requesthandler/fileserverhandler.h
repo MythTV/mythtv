@@ -26,8 +26,8 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
 
     static bool DeleteFile(const QString& filename, const QString& storagegroup);
 
-    static QList<FileSystemInfo> QueryFileSystems(void);
-    QList<FileSystemInfo> QueryAllFileSystems(void);
+    static FileSystemInfoList QueryFileSystems(void);
+    FileSystemInfoList QueryAllFileSystems(void);
 
   private:
     static bool HandleQueryFreeSpace(SocketHandler *socket);
