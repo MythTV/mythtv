@@ -1,7 +1,7 @@
 /*
  * This copyright notice applies to this header file only:
  *
- * Copyright (c) 2010-2024 NVIDIA Corporation
+ * Copyright (c) 2010-2023 NVIDIA Corporation
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,7 +28,7 @@
 /********************************************************************************************************************/
 //! \file nvcuvid.h
 //!   NVDECODE API provides video decoding interface to NVIDIA GPU devices.
-//! \date 2015-2024
+//! \date 2015-2022
 //!  This file contains the interface constants, structure definitions and function prototypes.
 /********************************************************************************************************************/
 
@@ -81,10 +81,10 @@ typedef enum {
 
 /************************************************************************/
 //! \ingroup STRUCTS
-//! \struct TIMECODESET
-//! Used to store Time code set extracted from H264 and HEVC codecs
+//! \struct HEVCTIMECODESET
+//! Used to store Time code extracted from Time code SEI in HEVC codec
 /************************************************************************/
-typedef struct _TIMECODESET
+typedef struct _HEVCTIMECODESET
 {
     unsigned int time_offset_value;
     unsigned short n_frames;
@@ -102,70 +102,18 @@ typedef struct _TIMECODESET
     unsigned char hours_flag;
     unsigned char time_offset_length;
     unsigned char reserved;
-} TIMECODESET;
+} HEVCTIMECODESET;
 
 /************************************************************************/
 //! \ingroup STRUCTS
-//! \struct TIMECODE
-//! Used to extract Time code in H264 and HEVC codecs
+//! \struct HEVCSEITIMECODE
+//! Used to extract Time code SEI in HEVC codec
 /************************************************************************/
-typedef struct _TIMECODE
+typedef struct _HEVCSEITIMECODE
 {
-    TIMECODESET time_code_set[MAX_CLOCK_TS];
+    HEVCTIMECODESET time_code_set[MAX_CLOCK_TS];
     unsigned char num_clock_ts;
-} TIMECODE;
-
-/**********************************************************************************/
-//! \ingroup STRUCTS
-//! \struct SEIMASTERINGDISPLAYINFO
-//! Used to extract mastering display color volume SEI in H264 and HEVC codecs
-/**********************************************************************************/
-typedef struct _SEIMASTERINGDISPLAYINFO
-{
-    unsigned short display_primaries_x[3];
-    unsigned short display_primaries_y[3];
-    unsigned short white_point_x;
-    unsigned short white_point_y;
-    unsigned int max_display_mastering_luminance;
-    unsigned int min_display_mastering_luminance;
-} SEIMASTERINGDISPLAYINFO;
-
-/**********************************************************************************/
-//! \ingroup STRUCTS
-//! \struct SEICONTENTLIGHTLEVELINFO
-//! Used to extract content light level info SEI in H264 and HEVC codecs
-/**********************************************************************************/
-typedef struct _SEICONTENTLIGHTLEVELINFO
-{
-    unsigned short max_content_light_level;
-    unsigned short max_pic_average_light_level;
-    unsigned int reserved;
-} SEICONTENTLIGHTLEVELINFO;
-
-/**********************************************************************************/
-//! \ingroup STRUCTS
-//! \struct TIMECODEMPEG2
-//! Used to extract Time code in MPEG2 codec
-/**********************************************************************************/
-typedef struct _TIMECODEMPEG2
-{
-    unsigned char drop_frame_flag;
-    unsigned char time_code_hours;
-    unsigned char time_code_minutes;
-    unsigned char marker_bit;
-    unsigned char time_code_seconds;
-    unsigned char time_code_pictures;
-} TIMECODEMPEG2;
-
-/**********************************************************************************/
-//! \ingroup STRUCTS
-//! \struct SEIALTERNATIVETRANSFERCHARACTERISTICS
-//! Used to extract alternative transfer characteristics SEI in H264 and HEVC codecs
-/**********************************************************************************/
-typedef struct _SEIALTERNATIVETRANSFERCHARACTERISTICS
-{
-    unsigned char preferred_transfer_characteristics;
-} SEIALTERNATIVETRANSFERCHARACTERISTICS;
+} HEVCSEITIMECODE;
 
 /**********************************************************************************/
 //! \ingroup STRUCTS
