@@ -152,6 +152,6 @@ endif()
 #
 unset(PIP_OPTIONS)
 unset(WHEEL_DIR)
-unset(ROOT_FALGS)
+unset(ROOT_FLAGS)
 unset(PREFIX_FLAGS)
 unset(MYTHTV_INSTALL_PREFIX)
