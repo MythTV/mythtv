@@ -19,7 +19,7 @@
 #include <QString>
 #include <QVariant>
 
-#include "libmythservicecontracts/service.h"
+#include "servicecontracts/service.h"
 
 #include "libmythupnp/httprequest.h"
 #include "libmythupnp/httpserver.h"

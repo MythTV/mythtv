@@ -94,6 +94,12 @@ add_executable(
   schedulecommon.h
   scheduleeditor.cpp
   scheduleeditor.h
+  servicecontracts/datacontracthelper.h
+  servicecontracts/frontendActionList.h
+  servicecontracts/frontendServices.h
+  servicecontracts/frontendStatus.h
+  servicecontracts/service.cpp
+  servicecontracts/service.h
   serviceHosts/frontendServiceHost.h
   serviceHosts/servicehost.cpp
   serviceHosts/servicehost.h
@@ -171,7 +177,6 @@ target_link_libraries(
          mythtv
          mythbase
          mythmetadata
-         mythservicecontracts
          mythui
          mythupnp
          $<TARGET_NAME_IF_EXISTS:PkgConfig::LibCEC>

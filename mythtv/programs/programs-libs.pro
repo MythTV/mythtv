@@ -33,7 +33,6 @@ LIBS += -L../../libs/libmythbase
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
 LIBS += -L../../libs/libmythmetadata
-LIBS += -L../../libs/libmythservicecontracts
 LIBS += -L../../libs/libmythprotoserver
 
 # Insist that /usr/local/lib come after all the libraries provided
@@ -56,7 +55,6 @@ LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythmetadata-$$LIBVERSION
-LIBS += -lmythservicecontracts-$$LIBVERSION
 LIBS += -lmythprotoserver-$$LIBVERSION
 
 using_frontend: using_opengl: QT += opengl
@@ -89,7 +87,6 @@ win32 {
     POST_TARGETDEPS += ../../external/FFmpeg/libavfilter/$$avLibName(avfilter)
     POST_TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
-    POST_TARGETDEPS += ../../libs/libmythservicecontracts/libmythservicecontracts-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
 }
 
