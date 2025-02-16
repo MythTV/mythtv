@@ -9,12 +9,12 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "ssdpcache.h"
 
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/portchecker.h"
 
-#include "upnp.h"
 #include "upnptaskcache.h"
 
 SSDPCache* SSDPCache::g_pSSDPCache = nullptr;

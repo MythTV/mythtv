@@ -28,7 +28,9 @@
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythversion.h"
 
+#include "httpserver.h"
 #include "mmulticastsocketdevice.h"
+#include "ssdp.h"
 #include "upnp.h"
 
 /////////////////////////////////////////////////////////////////////////////

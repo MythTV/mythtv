@@ -13,11 +13,14 @@
 #ifndef UPNPTASKCACHE_H
 #define UPNPTASKCACHE_H
 
+#include <chrono>
+
 #include <QString>
 
 #include "libmythbase/mythlogging.h"
 
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/ssdpcache.h"
+#include "libmythupnp/taskqueue.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

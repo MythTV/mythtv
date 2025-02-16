@@ -21,8 +21,9 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythversion.h"
 #include "libmythupnp/htmlserver.h"
-#include "libmythupnp/upnpsubscription.h"
-#include "libmythupnp/upnputil.h"
+#include "libmythupnp/httpserver.h"
+#include "libmythupnp/ssdp.h"
+#include "libmythupnp/upnpdevice.h"
 
 // MythFrontend
 #include "mediarenderer.h"

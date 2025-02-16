@@ -14,6 +14,8 @@
 #include "libmythui/mythuibuttonlist.h"
 #include "libmythui/mythuistatetype.h"
 #include "libmythupnp/mythxmlclient.h"
+#include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
 
 BackendSelection::BackendSelection(
     MythScreenStack *parent,

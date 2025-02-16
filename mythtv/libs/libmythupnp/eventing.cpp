@@ -22,6 +22,7 @@
 
 #include "upnp.h"
 #include "eventing.h"
+#include "taskqueue.h"
 #include "upnptaskevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/configuration.h"

@@ -17,6 +17,8 @@
 
 // Qt headers
 #include <QDomDocument>
+#include <QList>
+#include <QString>
 #include <QUrl>
 #include <QUrlQuery>
 

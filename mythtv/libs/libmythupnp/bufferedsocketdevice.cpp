@@ -20,7 +20,6 @@
 #include "libmythbase/mythtimer.h"
 
 #include "bufferedsocketdevice.h"
-#include "upnputil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
