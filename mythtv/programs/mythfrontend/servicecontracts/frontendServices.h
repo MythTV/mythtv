@@ -1,12 +1,12 @@
 #ifndef FRONTENDSERVICES_H
 #define FRONTENDSERVICES_H
 
-#include "libmythservicecontracts/service.h"
+#include "service.h"
 
-#include "libmythservicecontracts/datacontracts/frontendActionList.h"
-#include "libmythservicecontracts/datacontracts/frontendStatus.h"
+#include "frontendActionList.h"
+#include "frontendStatus.h"
 
-class SERVICE_PUBLIC FrontendServices : public Service
+class FrontendServices : public Service
 {
     Q_OBJECT
     Q_CLASSINFO( "version", "2.1" );

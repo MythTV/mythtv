@@ -5,8 +5,8 @@
 #if CONFIG_QTSCRIPT
 #include <QScriptEngine>
 #endif
-#include "libmythservicecontracts/services/frontendServices.h"
-#include "libmythservicecontracts/service.h"
+#include "servicecontracts/frontendServices.h"
+#include "servicecontracts/service.h"
 
 class Frontend : public FrontendServices
 {

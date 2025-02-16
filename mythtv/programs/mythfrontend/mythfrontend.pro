@@ -85,6 +85,13 @@ SOURCES += galleryconfig.cpp            galleryviews.cpp
 SOURCES += galleryslide.cpp             gallerytransitions.cpp
 SOURCES += galleryinfo.cpp              prevreclist.cpp
 
+HEADERS += servicecontracts/datacontracthelper.h
+HEADERS += servicecontracts/frontendActionList.h
+HEADERS += servicecontracts/frontendServices.h
+HEADERS += servicecontracts/frontendStatus.h
+SOURCES += servicecontracts/service.cpp
+HEADERS += servicecontracts/service.h
+
 HEADERS += serviceHosts/frontendServiceHost.h
 SOURCES += serviceHosts/servicehost.cpp
 HEADERS += serviceHosts/servicehost.h

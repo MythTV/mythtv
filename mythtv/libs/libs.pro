@@ -4,8 +4,6 @@ TEMPLATE = subdirs
 
 # Libraries without dependencies
 SUBDIRS += libmythbase
-SUBDIRS += libmythservicecontracts
-libmythservicecontracts.depends = libmythbase
 
 using_mheg:SUBDIRS += libmythfreemheg
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
