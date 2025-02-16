@@ -21,9 +21,7 @@ INCLUDEPATH += ..
 HEADERS += serviceexp.h service.h datacontracthelper.h
 
 HEADERS += services/frontendServices.h
-HEADERS += services/rttiServices.h
 
-HEADERS += datacontracts/enum.h                  datacontracts/enumItem.h
 HEADERS += datacontracts/frontendActionList.h    datacontracts/frontendStatus.h
 
 SOURCES += service.cpp
@@ -32,10 +30,8 @@ inc.path = $${PREFIX}/include/mythtv/libmythservicecontracts/
 inc.files = serviceexp.h service.h datacontracthelper.h
 
 incServices.files += services/frontendServices.h
-incServices.files += services/rttiServices.h
 
 incDatacontracts.files += datacontracts/frontendStatus.h      datacontracts/frontendActionList.h
-incDatacontracts.files += datacontracts/enum.h                datacontracts/enumItem.h
 
 INSTALLS += inc incServices incDatacontracts
 
