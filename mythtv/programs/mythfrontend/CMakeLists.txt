@@ -95,6 +95,12 @@ add_executable(
   scheduleeditor.cpp
   scheduleeditor.h
   serviceHosts/frontendServiceHost.h
+  serviceHosts/servicehost.cpp
+  serviceHosts/servicehost.h
+  serviceHosts/wsdl.cpp
+  serviceHosts/wsdl.h
+  serviceHosts/xsd.cpp
+  serviceHosts/xsd.h
   services/frontend.cpp
   services/frontend.h
   services/mythfrontendservice.cpp
