@@ -1,9 +1,8 @@
+#include "websocket_mythevent.h"
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
-
-#include "websocket_mythevent.h"
 
 WebSocketMythEvent::WebSocketMythEvent()
 {

@@ -13,11 +13,14 @@
 #ifndef SSDPCLIENT_H
 #define SSDPCLIENT_H
 
+#include <chrono>
+
 // Qt headers
 #include <QObject>
 #include <QMutex>
 #include <QMap>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 
 // MythTV headers

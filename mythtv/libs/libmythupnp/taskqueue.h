@@ -13,19 +13,13 @@
 #ifndef TASKQUEUE_H
 #define TASKQUEUE_H
 
-// POSIX headers
-#include <sys/types.h>
-#ifndef _WIN32
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif // _WIN32
-
 // C++ headers
+#include <chrono>
 #include <map>
 
 // Qt headers
 #include <QMutex>
+#include <QString>
 
 // MythTV headers
 #include "libmythbase/mthread.h"
