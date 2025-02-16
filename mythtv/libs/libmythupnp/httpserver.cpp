@@ -24,9 +24,6 @@
 #endif
 
 // Qt headers
-#if CONFIG_QTSCRIPT
-#include <QScriptEngine>
-#endif
 #include <QSslConfiguration>
 #include <QSslSocket>
 #include <QSslCipher>
