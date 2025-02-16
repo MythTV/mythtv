@@ -11,15 +11,12 @@
 set(HEADERS serviceexp.h service.h datacontracthelper.h)
 
 set(DATACONTRACTS_HEADERS
-    datacontracts/enum.h
-    datacontracts/enumItem.h
     datacontracts/frontendActionList.h
     datacontracts/frontendStatus.h
    )
 
 set(SERVICES_HEADERS
     services/frontendServices.h
-    services/rttiServices.h
    )
 
 #
