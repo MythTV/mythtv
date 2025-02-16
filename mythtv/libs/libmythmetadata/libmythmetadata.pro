@@ -44,7 +44,6 @@ INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
-LIBS += -L../libmythservicecontracts -lmythservicecontracts-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil -lmythavutil
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
