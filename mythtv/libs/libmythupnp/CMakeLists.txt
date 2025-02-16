@@ -76,9 +76,6 @@ add_library(
   serializers/xmlSerializer.h
   servicehost.cpp
   servicehost.h
-  serviceHosts/rttiServiceHost.h
-  services/rtti.cpp
-  services/rtti.h
   soapclient.cpp
   soapclient.h
   ssdp.cpp
