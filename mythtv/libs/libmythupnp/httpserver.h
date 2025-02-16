@@ -40,7 +40,6 @@
 #include "libmythbase/serverpool.h"
 
 #include "httprequest.h"
-#include "upnputil.h"
 
 class HttpWorkerThread;
 #if CONFIG_QTSCRIPT

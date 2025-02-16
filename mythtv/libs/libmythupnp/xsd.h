@@ -14,13 +14,12 @@
 #define XSD_H
 
 #include <QMetaObject>
+#include <QMetaProperty>
 #include <QString>
-#include <QMap>
 #include <QDomDocument>
 
+#include "libmythupnp/httprequest.h"
 #include "libmythupnp/upnpexp.h"
-#include "libmythupnp/upnp.h"
-#include "libmythupnp/servicehost.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

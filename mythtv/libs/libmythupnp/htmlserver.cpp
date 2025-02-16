@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "htmlserver.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -18,7 +19,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"
 
-#include "htmlserver.h"
 #include "httprequest.h"
 
 #include "serviceHosts/rttiServiceHost.h"

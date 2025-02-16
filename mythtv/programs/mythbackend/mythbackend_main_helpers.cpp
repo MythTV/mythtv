@@ -44,6 +44,8 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include "libmythtv/previewgenerator.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/tv_rec.h"
+#include "libmythupnp/ssdp.h"
+#include "libmythupnp/taskqueue.h"
 
 // MythBackend
 #include "autoexpire.h"

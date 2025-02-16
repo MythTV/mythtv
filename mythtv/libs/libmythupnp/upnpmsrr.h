@@ -5,11 +5,9 @@
 #include <QDomDocument>
 #include <QString>
 
-#include "httpserver.h"
 #include "eventing.h"
-              
-class UPnpMSRR;
-                          
+#include "httprequest.h"
+
 enum UPnpMSRRMethod : std::uint8_t
 {
     MSRR_Unknown                = 0,

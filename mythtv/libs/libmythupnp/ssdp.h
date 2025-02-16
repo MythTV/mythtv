@@ -15,13 +15,16 @@
 
 #include <array>
 
-#include <QFile>
+#include <QHostAddress>
+#include <QObject>
+#include <QRegularExpression>
+#include <QString>
 
 #include "libmythbase/mthread.h"
 
 #include "upnpexp.h"
+#include "httprequest.h"
 #include "httpserver.h"
-#include "taskqueue.h"
 #include "msocketdevice.h"
 #include "ssdpcache.h"
 #include "upnptasknotify.h"

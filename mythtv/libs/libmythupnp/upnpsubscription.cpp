@@ -17,10 +17,16 @@ QObject::customEvent to receive event notifications for subscribed services.
 #endif
 #include <utility>
 
+#include <QHostAddress>
+#include <QString>
+#include <QUrl>
+#include <QDomDocument>
+
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"
 
 #include "bufferedsocketdevice.h"
+#include "upnp.h"
 
 // default requested time for subscription (actual is dictated by server)
 static constexpr uint16_t SUBSCRIPTION_TIME { 1800 };

@@ -13,14 +13,13 @@
 #ifndef WSDL_H
 #define WSDL_H
 
-#include <QMetaObject>
-#include <QMetaMethod>
-#include <QString>
-#include <QMap>
 #include <QDomDocument>
+#include <QDomElement>
+#include <QMap>
+#include <QMetaObject>
+#include <QString>
 
 #include "libmythupnp/upnpexp.h"
-#include "libmythupnp/upnp.h"
 #include "libmythupnp/servicehost.h"
 #include "libmythupnp/xsd.h"
 

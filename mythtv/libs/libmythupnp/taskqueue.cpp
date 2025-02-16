@@ -9,14 +9,9 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
-#include <iostream>
-
-#include <QDateTime>
+#include "taskqueue.h"
 
 #include "libmythbase/mythlogging.h"
-
-#include "taskqueue.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Define Global instance 

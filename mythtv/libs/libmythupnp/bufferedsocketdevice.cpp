@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "bufferedsocketdevice.h"
 
 #include <algorithm>
 #include <array>
@@ -18,9 +19,6 @@
 
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimer.h"
-
-#include "bufferedsocketdevice.h"
-#include "upnputil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
