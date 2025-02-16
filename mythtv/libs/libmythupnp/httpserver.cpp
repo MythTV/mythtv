@@ -28,6 +28,7 @@
 #include <QSslSocket>
 #include <QSslCipher>
 #include <QSslCertificate>
+#include <QThread>
 #include <QUuid>
 
 // MythTV headers
@@ -38,7 +39,6 @@
 #include "libmythbase/mythversion.h"
 
 #include "upnputil.h"
-#include "upnp.h" // only needed for Config... remove once config is moved.
 #include "htmlserver.h"
 
 #include "serviceHosts/rttiServiceHost.h"

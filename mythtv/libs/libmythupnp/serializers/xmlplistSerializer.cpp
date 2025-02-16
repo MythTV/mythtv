@@ -16,11 +16,10 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
+#include "xmlplistSerializer.h"
 
 #include <QMetaClassInfo>
 #include <QDateTime>
-
-#include "xmlplistSerializer.h"
 
 static constexpr const char* XMLPLIST_SERIALIZER_VERSION { "1.0" };
 

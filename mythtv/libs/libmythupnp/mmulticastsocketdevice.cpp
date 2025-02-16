@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "mmulticastsocketdevice.h"
 
 #include <cerrno>
 #include "libmythbase/mythconfig.h"
@@ -33,8 +34,6 @@
 // MythTV headers
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-
-#include "mmulticastsocketdevice.h"
 
 #define LOC      QString("MMulticastSocketDevice(%1:%2): ") \
                      .arg(m_address.toString()).arg(socket())

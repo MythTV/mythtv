@@ -16,6 +16,7 @@
 #include <utility>
 
 // Qt headers
+#include <QList>
 #include <QString>
 
 // MythTV headers

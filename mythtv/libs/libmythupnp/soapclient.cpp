@@ -9,13 +9,12 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "soapclient.h"
 
 #include <QBuffer>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
 #endif
-
-#include "soapclient.h"
 
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"

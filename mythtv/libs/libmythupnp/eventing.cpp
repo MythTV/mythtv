@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "eventing.h"
 
 #include <cmath>
 
@@ -21,7 +22,7 @@
 #include <QTextStream>
 
 #include "upnp.h"
-#include "eventing.h"
+#include "taskqueue.h"
 #include "upnptaskevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/configuration.h"

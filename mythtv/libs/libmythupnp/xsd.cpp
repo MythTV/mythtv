@@ -9,14 +9,13 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 /////////////////////////////////////////////////////////////////////////////
+#include "xsd.h"
 
 #include <QCoreApplication>
+#include <QMap>
 
 #include "libmythbase/mythlogging.h"
 
-#include "xsd.h"
-
-#include "servicehost.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

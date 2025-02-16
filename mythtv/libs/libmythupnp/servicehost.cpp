@@ -9,11 +9,11 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
-#include <QDomDocument>
+#include "servicehost.h"
 
 #include "libmythbase/mythlogging.h"
-#include "servicehost.h"
+
+#include "libmythupnp/upnp.h"
 #include "wsdl.h"
 #include "xsd.h"
 //#include "services/rtti.h"

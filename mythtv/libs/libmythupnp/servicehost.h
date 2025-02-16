@@ -16,12 +16,14 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QMap>
+#include <QString>
+#include <QVariant>
 
 #include "libmythservicecontracts/service.h"
 
+#include "libmythupnp/httprequest.h"
+#include "libmythupnp/httpserver.h"
 #include "libmythupnp/upnpexp.h"
-#include "libmythupnp/upnp.h"
-#include "libmythupnp/eventing.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

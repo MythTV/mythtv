@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "serverSideScripting.h"
 
 #include <QCoreApplication>
 #include <QFile>
@@ -20,7 +21,6 @@
 #include "libmythbase/mythsession.h"
 
 #include "httpserver.h"
-#include "serverSideScripting.h"
 
 QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter);
 
