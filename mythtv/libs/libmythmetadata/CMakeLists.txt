@@ -106,7 +106,6 @@ target_link_libraries(
          PkgConfig::LIBSWSCALE
          mythbase
          mythui
-         mythservicecontracts
          mythtv
          myth)
 

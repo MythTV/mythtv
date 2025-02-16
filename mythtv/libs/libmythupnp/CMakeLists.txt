@@ -130,7 +130,7 @@ target_link_libraries(
   mythupnp
   PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network
          Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Xml mythbase
-         mythservicecontracts)
+  )
 
 #
 # conditionally included code
