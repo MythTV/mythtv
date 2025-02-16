@@ -32,7 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 uint StateVariables::BuildNotifyBody(
-    QTextStream &ts, TaskTime ttLastNotified) const
+    QTextStream &ts, std::chrono::microseconds ttLastNotified) const
 {
     uint nCount = 0;
 

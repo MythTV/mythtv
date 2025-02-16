@@ -26,7 +26,6 @@
 #include "libmythbase/referencecounter.h"
 
 #include "upnpexp.h"
-#include "upnputil.h"
 
 class Task;
 class TaskQueue;
@@ -35,7 +34,7 @@ class TaskQueue;
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-using TaskMap = std::multimap< TaskTime, Task *>;
+using TaskMap = std::multimap<std::chrono::microseconds, Task *>;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -113,10 +112,10 @@ class UPNP_PUBLIC TaskQueue : public MThread
         void  AddTask            ( std::chrono::milliseconds msec , Task *pTask );
         void  AddTask            ( Task *pTask );
                                                           
-        Task *GetNextExpiredTask ( TaskTime tt, std::chrono::milliseconds nWithinMilliSecs = 50ms );
+        Task *GetNextExpiredTask ( std::chrono::microseconds tt, std::chrono::milliseconds nWithinMilliSecs = 50ms );
                                                                 
     private:
-        void  AddTaskAbsolute    ( TaskTime tt, Task *pTask );
+        void  AddTaskAbsolute    ( std::chrono::microseconds tt, Task *pTask );
 };
 
 #endif // TASKQUEUE_H
