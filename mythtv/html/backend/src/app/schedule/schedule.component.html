@@ -70,8 +70,8 @@
                 <br>
                 <a href="https://www.mythtv.org/wiki/Power_Search" target="_blank">Power Search</a>
             </div>
-            <!-- Manual Search Settings -->
-            <div *ngIf="recRule.SearchType == 'Manual Search'">
+            <!-- Manual Search Settings - Only display on new rule, backend cannot handle an update of starttime -->
+            <div *ngIf="recRule.SearchType == 'Manual Search' && !this.recRule.Id">
                 <p-divider></p-divider>
                 <div class="form-group field">
                     <label for="ChanId" class="label block">{{ 'dashboard.sched.channel_label' | translate
