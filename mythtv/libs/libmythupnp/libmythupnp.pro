@@ -28,9 +28,6 @@ HEADERS += upnpserviceimpl.h
 HEADERS += servicehost.h wsdl.h htmlserver.h xsd.h
 HEADERS += upnphelpers.h websocket.h
 
-HEADERS += services/rtti.h
-HEADERS += serviceHosts/rttiServiceHost.h
-
 HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
 HEADERS += serializers/jsonSerializer.h serializers/soapSerializer.h
 HEADERS += serializers/xmlplistSerializer.h
@@ -50,8 +47,6 @@ SOURCES += upnpserviceimpl.cpp
 SOURCES += htmlserver.cpp
 SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp xsd.cpp
 SOURCES += upnphelpers.cpp websocket.cpp
-
-SOURCES += services/rtti.cpp
 
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
 SOURCES += serializers/jsonSerializer.cpp 
@@ -89,9 +84,6 @@ inc.files += upnpimpl.h
 inc.files += soapclient.h mythxmlclient.h mmembuf.h upnpsubscription.h
 inc.files += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
 inc.files += xsd.h upnphelpers.h
-
-# inc.files += services/rtti.h
-# inc.files += serviceHosts/rttiServiceHost.h
 
 inc2.path = $${PREFIX}/include/mythtv/libmythupnp/serializers
 inc2.files += serializers/serializer.h     serializers/xmlSerializer.h

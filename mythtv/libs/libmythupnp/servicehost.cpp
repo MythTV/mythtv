@@ -16,7 +16,6 @@
 #include "libmythupnp/upnp.h"
 #include "wsdl.h"
 #include "xsd.h"
-//#include "services/rtti.h"
 
 static constexpr int MAX_PARAMS = 256;
 

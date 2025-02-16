@@ -8,7 +8,6 @@ import "/tv/js/tvutil.qjs"
     var myth = new Myth();
     var dvr = new Dvr();
     var guide = new Guide();
-    var rtti = new Rtti();
 
     var startTime = new Date();
     if (getArg("StartTime"))
@@ -200,7 +199,6 @@ import "/tv/js/tvutil.qjs"
                         showing = upcomingShowings[listIdx];
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(showing.Recording.Status);
-                        //var statusClass = rtti.GetEnum( "RecStatus::Type" ).EnumItems[ showing.Recording.Status ].Value;
                         var programIdentifier = showing.Channel.ChanId + "_" + showing.StartTime.toISOString();
                         var showingChannelIcon = "/tv/images/channel_icon.svg";
                         if (showing.Channel.IconURL)
