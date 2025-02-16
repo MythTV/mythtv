@@ -1,7 +1,7 @@
 #ifndef FRONTENDSERVICEHOST_H
 #define FRONTENDSERVICEHOST_H
 
-#include "libmythupnp/servicehost.h"
+#include "servicehost.h"
 #include "services/frontend.h"
 
 class FrontendServiceHost : public ServiceHost

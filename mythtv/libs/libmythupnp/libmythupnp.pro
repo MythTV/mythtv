@@ -25,7 +25,7 @@ HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpms
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
 HEADERS += upnpserviceimpl.h
-HEADERS += servicehost.h wsdl.h htmlserver.h xsd.h
+HEADERS += htmlserver.h
 HEADERS += upnphelpers.h websocket.h
 
 HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
@@ -45,7 +45,7 @@ SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cp
 SOURCES += soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 SOURCES += upnpserviceimpl.cpp
 SOURCES += htmlserver.cpp
-SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp xsd.cpp
+SOURCES += upnpsubscription.cpp
 SOURCES += upnphelpers.cpp websocket.cpp
 
 SOURCES += serializers/serializer.cpp     serializers/xmlSerializer.cpp
@@ -82,8 +82,8 @@ inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 inc.files += upnpimpl.h
 inc.files += soapclient.h mythxmlclient.h mmembuf.h upnpsubscription.h
-inc.files += servicehost.h wsdl.h htmlserver.h serverSideScripting.h
-inc.files += xsd.h upnphelpers.h
+inc.files += htmlserver.h serverSideScripting.h
+inc.files += upnphelpers.h
 
 inc2.path = $${PREFIX}/include/mythtv/libmythupnp/serializers
 inc2.files += serializers/serializer.h     serializers/xmlSerializer.h
