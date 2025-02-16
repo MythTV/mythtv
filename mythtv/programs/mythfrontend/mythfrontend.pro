@@ -86,6 +86,13 @@ SOURCES += galleryslide.cpp             gallerytransitions.cpp
 SOURCES += galleryinfo.cpp              prevreclist.cpp
 
 HEADERS += serviceHosts/frontendServiceHost.h
+SOURCES += serviceHosts/servicehost.cpp
+HEADERS += serviceHosts/servicehost.h
+SOURCES += serviceHosts/wsdl.cpp
+HEADERS += serviceHosts/wsdl.h
+SOURCES += serviceHosts/xsd.cpp
+HEADERS += serviceHosts/xsd.h
+
 HEADERS += services/frontend.h
 SOURCES += services/frontend.cpp
 
