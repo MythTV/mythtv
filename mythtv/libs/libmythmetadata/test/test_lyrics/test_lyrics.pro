@@ -16,7 +16,6 @@ LIBS += ../../$(OBJECTS_DIR)lyricsdata.o
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
-LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 LIBS += -L../../../libmythtv -lmythtv-$$LIBVERSION
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
 LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
@@ -48,7 +47,6 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythtv
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythmetadata
 
