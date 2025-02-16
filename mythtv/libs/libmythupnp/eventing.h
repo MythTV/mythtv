@@ -13,6 +13,7 @@
 #ifndef EVENTING_H_
 #define EVENTING_H_
 
+#include <chrono>
 #include <utility>
 
 #include <QMap>
@@ -20,7 +21,6 @@
 #include <QUuid>
 
 #include "upnpserviceimpl.h"
-#include "upnputil.h"
 #include "httpserver.h"
 
 class QTextStream;
@@ -60,8 +60,8 @@ class UPNP_PUBLIC SubscriberInfo
             return m_nKey;
         }
 
-        TaskTime            m_ttExpires      {};
-        TaskTime            m_ttLastNotified {};
+        std::chrono::microseconds m_ttExpires      {};
+        std::chrono::microseconds m_ttLastNotified {};
 
         QString             m_sUUID;
         QUrl                m_qURL;
@@ -92,7 +92,7 @@ class UPNP_PUBLIC  StateVariableBase
 
         bool        m_bNotify;
         QString     m_sName;
-        TaskTime    m_ttLastChanged {};
+        std::chrono::microseconds m_ttLastChanged {};
 
     public:
 
@@ -231,7 +231,7 @@ class UPNP_PUBLIC StateVariables
             return state_var_init(dummy);
         }
 
-        uint BuildNotifyBody(QTextStream &ts, TaskTime ttLastNotified) const;
+        uint BuildNotifyBody(QTextStream &ts, std::chrono::microseconds ttLastNotified) const;
 };
 
 //////////////////////////////////////////////////////////////////////////////
