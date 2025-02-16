@@ -100,6 +100,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
             {
                 QStringList caps = attrib.m_sValue.split(",");
 
+                int tuner_id = 0;
                 for (const auto& cap : std::as_const(caps))
                 {
                     QStringList tuner = cap.split("-");
@@ -114,9 +115,10 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
                                             .arg(id,
                                                  friendlyName.remove(" "),
                                                  ip,
-                                                 QString::number(i),
+                                                 QString::number(tuner_id),
                                                  tuner.at(0));
                         result << device;
+                        tuner_id++;
                         if (loginfo)
                         {
                             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1").arg(device));
