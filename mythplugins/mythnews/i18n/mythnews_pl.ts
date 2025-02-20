@@ -27,12 +27,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="342"/>
+        <location filename="../mythnews/mythnews.cpp" line="346"/>
         <source>Updated</source>
         <translation>Zaktualizowany</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="349"/>
+        <location filename="../mythnews/mythnews.cpp" line="354"/>
         <source>Unknown</source>
         <translation>Nieznany</translation>
     </message>
@@ -41,22 +41,22 @@
         <translation type="obsolete">Pobieram zawartość...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="604"/>
+        <location filename="../mythnews/mythnews.cpp" line="614"/>
         <source>Manage Feeds</source>
         <translation>Zarządzaj Kanałami</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="605"/>
+        <location filename="../mythnews/mythnews.cpp" line="615"/>
         <source>Add Feed</source>
         <translation>Dodaj Kanał</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="618"/>
         <source>Edit Feed</source>
         <translation>Edytuj Kanał</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="609"/>
+        <location filename="../mythnews/mythnews.cpp" line="619"/>
         <source>Delete Feed</source>
         <translation>Usuń Kanał</translation>
     </message>
@@ -77,7 +77,7 @@
         <translation type="obsolete">Usuń stronę wiadomości</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="591"/>
+        <location filename="../mythnews/mythnews.cpp" line="601"/>
         <source>Options</source>
         <translation>Opcje</translation>
     </message>
@@ -87,7 +87,7 @@
         <translation>W MythNews nie skonfigurowano żadnej kanału RSS.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="515"/>
+        <location filename="../mythnews/mythnews.cpp" line="521"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Nie podano polecenia przeglądarki! Należy zainstalować MythBrowser.</translation>
     </message>
@@ -146,34 +146,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
+        <location filename="../mythnews/newssite.cpp" line="229"/>
         <source>Retrieve Failed. </source>
         <translation>Aktualizacja się nie powiodła.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="240"/>
-        <location filename="../mythnews/newssite.cpp" line="249"/>
-        <location filename="../mythnews/newssite.cpp" line="258"/>
+        <location filename="../mythnews/newssite.cpp" line="236"/>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to retrieve news</source>
         <translation>Nie udało się zciągnąć kanału RSS</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="241"/>
+        <location filename="../mythnews/newssite.cpp" line="237"/>
         <source>No Cached News.</source>
         <translation>Brak Zachowanych Wiadomości.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="260"/>
+        <location filename="../mythnews/newssite.cpp" line="256"/>
         <source>Failed to read downloaded file.</source>
         <translation>Nie potrafię odczytać zciągniętego pliku.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="268"/>
+        <location filename="../mythnews/newssite.cpp" line="264"/>
         <source>Showing Cached News.</source>
         <translation>Pokaż Zachowane Wiadomości.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="288"/>
+        <location filename="../mythnews/newssite.cpp" line="284"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>Ten plik XML nie zawiera poprawnego formatu RSS</translation>
     </message>
