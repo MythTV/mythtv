@@ -22,7 +22,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="153"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="151"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -31,62 +31,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="255"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="253"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="270"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="268"/>
         <source>Set Homepage</source>
         <translation>Startseite setzen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="271"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="269"/>
         <source>Add Bookmark</source>
         <translation>Lesezeichen anlegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="275"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="273"/>
         <source>Edit Bookmark</source>
         <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="276"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="274"/>
         <source>Delete Bookmark</source>
         <translation>Lesezeichen löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="277"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="275"/>
         <source>Show Bookmark</source>
         <translation>Lesezeichen anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="280"/>
         <source>Delete Marked</source>
         <translation>Alle markierten löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="281"/>
         <source>Show Marked</source>
         <translation>Alle markierten anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="284"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="282"/>
         <source>Clear Marked</source>
         <translation>Markierungen löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="285"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="492"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="498"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Möchten Sie das gewählte Lesezeichen wirklich löschen?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="536"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="542"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Möchten Sie die markierten Lesezeichen wirklich löschen?</translation>
     </message>
@@ -106,32 +106,32 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
 <context>
     <name>BrowserConfig</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="35"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="36"/>
         <source>MythBrowser Settings</source>
         <translation>MythBrowser Einstellungen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="110"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="108"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation>Mit diesem Befehl wird der Webbrowser gestartet. Bei &quot;Internal&quot; wird der integrierte Browser verwendet. %ZOOM% und %URL% werden durch den Vergrößerungsfaktor und die URL-Liste ersetzt.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="116"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="114"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation>Dies bestimmt die Standardtextgrösse. Gültige Werte für den integrierten Browswer reichen von 0.3 bis 5.0. Dabei entspricht 1.0 einer normalen Grösse, kleinere Werte entsprechend kleiner und grössere Werte entsprechend grösser.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="123"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="121"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
         <translation>Wenn gesetzt werden für den internen Browser die Plugins aktiviert.</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="128"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="126"/>
         <source>Exit without saving settings</source>
         <translation>Beenden ohne zu speichern</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="132"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="130"/>
         <source>Save settings and Exit</source>
         <translation>Einstellungen speichern und Beenden</translation>
     </message>
@@ -197,27 +197,27 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/libmythbrowser.cpp" line="109"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="105"/>
         <source>Move to next browser tab</source>
         <translation>Zum nächsen Browser-Tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/libmythbrowser.cpp" line="111"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="107"/>
         <source>Move to previous browser tab</source>
         <translation>Zum vorherigen Browser-Tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/libmythbrowser.cpp" line="114"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="110"/>
         <source>Show the bookmark manager</source>
         <translation>Lesezeichenmanager zeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/libmythbrowser.cpp" line="116"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="112"/>
         <source>Show the webbrowser homepage</source>
         <translation>Startseite zeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/libmythbrowser.cpp" line="119"/>
+        <location filename="../mythbrowser/libmythbrowser.cpp" line="115"/>
         <source>Internal Web Browser</source>
         <translation>Interner Webbrowser</translation>
     </message>
@@ -543,7 +543,7 @@ Wenn Sie fertig sind, wählen Sie &quot;OK&quot; zum Speichern und Beenden oder 
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="122"/>
+        <location filename="../mythbrowser/webpage.cpp" line="119"/>
         <source>Loading...</source>
         <translation>Lade...</translation>
     </message>
