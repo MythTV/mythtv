@@ -120,7 +120,7 @@ typedef struct CuvidParsedFrame
 #define CUVID_MAX_DISPLAY_DELAY (4)
 
 // Actual pool size will be determined by parser.
-#define CUVID_DEFAULT_NUM_SURFACES (CUVID_MAX_DISPLAY_DELAY + 1)
+#define CUVID_DEFAULT_NUM_SURFACES ((2 * CUVID_MAX_DISPLAY_DELAY) + 1)
 
 static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* format)
 {
