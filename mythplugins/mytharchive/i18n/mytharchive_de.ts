@@ -1415,11 +1415,6 @@ Bitte warten...</translation>
         <location filename="themestrings.h" line="8"/>
         <source>%size% (%profile%)</source>
         <oldsource>%date% / %profile%</oldsource>
-        <translation type="unfinished">%date% / %profile%</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="8"/>
-        <source>%size% (%profile%)</source>
         <translation>%size% (%profile%)</translation>
     </message>
     <message>
@@ -1466,19 +1461,19 @@ Bitte warten...</translation>
         <location filename="themestrings.h" line="33"/>
         <source>Archive Item Details</source>
         <oldsource>Archive Callsign:</oldsource>
-        <translation type="unfinished">Archiv Kurzname:</translation>
+        <translation>Details Archivelemente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Archive Items</source>
         <oldsource>Archive Chan ID:</oldsource>
-        <translation type="unfinished">Archiv Sender-ID:</translation>
+        <translation>Archivelemente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Archive Items to DVD</source>
         <oldsource>Archive Chan No:</oldsource>
-        <translation type="unfinished">Archiv Sender-Nr:</translation>
+        <translation>Archiviere Elemente auf DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -1489,12 +1484,7 @@ Bitte warten...</translation>
         <location filename="themestrings.h" line="38"/>
         <source>Archived Channel</source>
         <oldsource>Archive Item:</oldsource>
-        <translation type="unfinished">Archivelement:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>Archive Items to DVD</source>
-        <translation>Archivierung auf DVD</translation>
+        <translation>Archivierter Kanal</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
@@ -1771,7 +1761,7 @@ Bitte warten...</translation>
         <location filename="themestrings.h" line="127"/>
         <source>Main Menu</source>
         <oldsource>Filename:</oldsource>
-        <translation type="unfinished">Dateiname:</translation>
+        <translation>Hauptmenü</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
@@ -2426,11 +2416,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Theme:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
-        <source>Main Menu</source>
-        <translation>Hauptmenü</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="61"/>
         <source>Chapter Menu</source>
         <translation>Kapitelmenü</translation>
@@ -2459,11 +2444,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="23"/>
         <source>Add File</source>
         <translation>Datei hinzufügen</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>Archive Item Details</source>
-        <translation>Archivobjekteigenschaften</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="215"/>
@@ -2516,11 +2496,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Altersfreigabe Stufe: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
-        <source>Archive Items</source>
-        <translation>Einträge archivieren</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="165"/>
         <source>Profile:</source>
         <translation>Profile:</translation>
@@ -2564,11 +2539,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="177"/>
         <source>Select Associated Channel</source>
         <translation>Zugeordneten Sender auswählen</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="38"/>
-        <source>Archived Channel</source>
-        <translation>Archivierter Sender</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>

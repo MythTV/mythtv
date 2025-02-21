@@ -2495,22 +2495,22 @@ Prüfen Sie, ob die Videodatei existiert</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2876"/>
         <source>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivieren (empfohlen), um vollen RGB-Ausgabebereich an Anzeigegerät zu liefern. Deaktivieren, um eingeschränkte RGB-Ausgabe zu verwenden. Diese Einstellung gilt sowohl für die GUI als auch für die Medienwiedergabe. Idealerweise sollte der Wert dieser Einstellung mit einer ähnlichen Einstellung an dem Anzeigegerät übereinstimmen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3236"/>
         <source>Menu Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Menü-Sprache</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3263"/>
         <source>Audio Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio-Sprache</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3284"/>
         <source>Preferred language for the audio track.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzugte Sprache für die Audio-Spur.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4729"/>
@@ -9983,7 +9983,7 @@ Fehler: %1</translation>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="407"/>
         <source>Downloading %1 (%2 of %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Herunterladen von %1 (%2 von %3)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="782"/>
@@ -10907,12 +10907,12 @@ Fehler: %1</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2128"/>
         <source>CEC Device</source>
-        <translation type="unfinished"></translation>
+        <translation>CEC Gerät</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2132"/>
         <source>CEC Device. Default is /dev/cec0 if you have only 1 HDMI output port.</source>
-        <translation type="unfinished"></translation>
+        <translation>CEC Gerät. Standard ist /dev/cec0 wenn nur eine HDMI-Ausgang vorhanden ist.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2145"/>
@@ -12516,7 +12516,7 @@ Fehler: %1</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="855"/>
         <source>Display list of cast members</source>
-        <translation type="unfinished"></translation>
+        <translation>Besetzungsliste anzeigen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="930"/>
@@ -17690,12 +17690,13 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="232"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung/Gruppierung</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="235"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Sortieren/Gruppieren</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="236"/>
@@ -17781,27 +17782,27 @@ name cannot be blank.</source>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6601"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6603"/>
         <source>Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendernummer</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6605"/>
         <source>CallSign</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurzname</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6607"/>
         <source>ProgramId</source>
-        <translation type="unfinished"></translation>
+        <translation>Programm-ID</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6609"/>
         <source>Unknown</source>
-        <translation type="unfinished">Unbekannt</translation>
+        <translation>Unbekannt</translation>
     </message>
 </context>
 <context>
@@ -17882,12 +17883,12 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="337"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung/Gruppierung</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="357"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortieren/Gruppieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="364"/>
@@ -30686,25 +30687,25 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="571"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="604"/>
         <source>Group By Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Über Sendernummer gruppieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="573"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="605"/>
         <source>Group By Call Sign</source>
-        <translation type="unfinished"></translation>
+        <translation>Über Kurzname gruppieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="575"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="606"/>
         <source>Group By Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Über Programm-ID gruppieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="577"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="607"/>
         <source>Group By None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht gruppieren</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -31487,7 +31488,7 @@ Keine weiteren Informationen</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="873"/>
         <source>Input %1: %2</source>
-        <translation type="unfinished">Eingang %1 %2: %2 {1:?}</translation>
+        <translation>Eingang %1: %2</translation>
     </message>
     <message>
         <source>on card</source>
@@ -32965,7 +32966,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="2503"/>
         <source>Last Program: &quot;%1&quot; Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Letzte Sendung: &quot;%1&quot; liegt nicht vor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="3642"/>
@@ -33198,7 +33199,7 @@ Möchten Sie weitersehen?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9432"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9656"/>
         <source>Cast</source>
-        <translation type="unfinished">Besetzung</translation>
+        <translation>Besetzung</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9397"/>
@@ -33214,12 +33215,12 @@ Möchten Sie weitersehen?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9433"/>
         <source>Recorded</source>
-        <translation type="unfinished">Aufgenommen</translation>
+        <translation>Aufgenommen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9434"/>
         <source>Upcoming</source>
-        <translation type="unfinished">Kommende</translation>
+        <translation>Kommende</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9438"/>
@@ -45654,7 +45655,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     <message>
         <location filename="../themes/themestrings.h" line="733"/>
         <source>Display :</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="783"/>
@@ -45664,12 +45665,12 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
     <message>
         <location filename="../themes/themestrings.h" line="922"/>
         <source>Group By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppieren über:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="923"/>
         <source>Group by: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppieren über: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1843"/>
