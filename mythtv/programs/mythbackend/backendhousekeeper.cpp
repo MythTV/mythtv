@@ -346,7 +346,7 @@ bool ThemeUpdateTask::DoRun(void)
 
     if (!parsed || devel)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Loading themes for trunk"));
+        LOG(VB_GENERAL, LOG_INFO, QString("Loading themes for devel"));
         result |= LoadVersion("trunk", LOG_ERR);
     }
     else

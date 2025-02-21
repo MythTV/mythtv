@@ -176,9 +176,9 @@ void ThemeChooser::Load(void)
     {
         if (!parsed)
             LOG(VB_GENERAL, LOG_ERR,
-                QString("Invalid MythTV version %1, will use themes from trunk")
+                QString("Invalid MythTV version %1, will use themes from devel")
                 .arg(GetMythSourceVersion()));
-        LOG(VB_GUI, LOG_INFO, QString("Loading themes for trunk"));
+        LOG(VB_GUI, LOG_INFO, QString("Loading themes for devel"));
         LoadVersion("trunk", themesSeen, true);
     }
     else
@@ -202,11 +202,10 @@ void ThemeChooser::Load(void)
         else
         {
 
-            LOG(VB_GENERAL, LOG_INFO, QString("Failed to load themes for %1, trying trunk").arg(MythVersion));
-            MythVersion = "trunk";
-            if (!LoadVersion(MythVersion, themesSeen, true))
+            LOG(VB_GENERAL, LOG_INFO, QString("Failed to load themes for %1, trying devel").arg(MythVersion));
+            if (!LoadVersion("trunk", themesSeen, true))
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to load themes for %1").arg(MythVersion));
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to load themes for devel"));
             }
         }
     }
