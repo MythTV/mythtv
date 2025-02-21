@@ -54,7 +54,8 @@ void TestThemeVersion::test_version(void)
     uint8_t a_major { 0 };
     uint8_t a_minor { 0 };
     bool    a_devel { false };
-    bool    result = ParseMythSourceVersion(version, a_devel, a_major, a_minor);
+    bool    result = ParseMythSourceVersion(a_devel, a_major, a_minor,
+                                            qPrintable(version));
 
     QCOMPARE(result, e_result);
     QCOMPARE(a_devel, e_devel);

@@ -23,11 +23,14 @@ const char *GetMythSourcePath()
 // Match 4: .point
 // Match 5: point
 // Match 6: -pre
-static const QRegularExpression themeparts
-    { "v([0-9]+)(\\.([0-9]+))?(\\.([0-9]+))?(-pre)?-*", QRegularExpression::CaseInsensitiveOption };
-
-bool ParseMythSourceVersion(const QString version, bool& devel, uint8_t& major, uint8_t &minor)
+bool ParseMythSourceVersion(bool& devel, uint8_t& major, uint8_t &minor, const char *version)
 {
+    static const QRegularExpression themeparts
+        { R"(\Av([0-9]+)(\.([0-9]+))?(\.([0-9]+))?(-pre)?)",
+          QRegularExpression::CaseInsensitiveOption };
+
+    if (nullptr == version)
+        version = MYTH_SOURCE_VERSION;
     auto match = themeparts.match(version);
     if (!match.isValid() || !match.hasMatch())
         return false;
@@ -35,10 +38,6 @@ bool ParseMythSourceVersion(const QString version, bool& devel, uint8_t& major, 
     major = match.captured(1).toUInt();
     minor = match.captured(3).toUInt();
     return true;
-}
-bool ParseMythSourceVersion(bool& devel, uint8_t& major, uint8_t &minor)
-{
-    return ParseMythSourceVersion(MYTH_SOURCE_VERSION, devel, major, minor);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
