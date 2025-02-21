@@ -338,11 +338,11 @@ bool ThemeUpdateTask::DoCheckRun(const QDateTime& now)
 
 bool ThemeUpdateTask::DoRun(void)
 {
-    uint8_t major { 0 };
-    uint8_t minor { 0 };
-    bool    devel { false };
-    bool    parsed = ParseMythSourceVersion(devel, major, minor);
-    bool    result = false;
+    uint major { 0 };
+    uint minor { 0 };
+    bool devel { false };
+    bool parsed = ParseMythSourceVersion(devel, major, minor);
+    bool result = false;
 
     if (!parsed || devel)
     {

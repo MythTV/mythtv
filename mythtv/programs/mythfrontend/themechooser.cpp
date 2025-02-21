@@ -167,10 +167,10 @@ void ThemeChooser::Load(void)
         }
     }
 
-    uint8_t major { 0 };
-    uint8_t minor { 0 };
-    bool    devel { false };
-    bool    parsed = ParseMythSourceVersion(devel, major, minor);
+    uint major { 0 };
+    uint minor { 0 };
+    bool devel { false };
+    bool parsed = ParseMythSourceVersion(devel, major, minor);
 
     if (!parsed || devel)
     {
@@ -990,10 +990,10 @@ bool ThemeChooser::removeThemeDir(const QString &dirname)
 
 ThemeUpdateChecker::ThemeUpdateChecker(void) : m_updateTimer(new QTimer(this))
 {
-    uint8_t major { 0 };
-    uint8_t minor { 0 };
-    bool    devel { false };
-    bool    parsed = ParseMythSourceVersion(devel, major, minor);
+    uint major { 0 };
+    uint minor { 0 };
+    bool devel { false };
+    bool parsed = ParseMythSourceVersion(devel, major, minor);
 
     if (!parsed || devel)
     {

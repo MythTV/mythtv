@@ -23,7 +23,7 @@ const char *GetMythSourcePath()
 // Match 4: .point
 // Match 5: point
 // Match 6: -pre
-bool ParseMythSourceVersion(bool& devel, uint8_t& major, uint8_t &minor, const char *version)
+bool ParseMythSourceVersion(bool& devel, uint& major, uint& minor, const char *version)
 {
     static const QRegularExpression themeparts
         { R"(\Av([0-9]+)(\.([0-9]+))?(\.([0-9]+))?(-pre)?)",

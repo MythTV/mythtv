@@ -31,6 +31,9 @@ void TestThemeVersion::test_version_data(void)
     QTest::newRow("v34")
         << "v34.0-32-gd309161e2b-dirty"
         << true << false << 34 << 0;
+    QTest::newRow("v1234")
+        << "v1234.0-32-gd309161e2b-dirty"
+        << true << false << 1234 << 0;
     QTest::newRow("point")
         << "v34.0.2-32-gd309161e2b-dirty"
         << true << false << 34 << 0;
@@ -51,11 +54,11 @@ void TestThemeVersion::test_version(void)
     QFETCH(int,  e_major);
     QFETCH(int,  e_minor);
 
-    uint8_t a_major { 0 };
-    uint8_t a_minor { 0 };
-    bool    a_devel { false };
-    bool    result = ParseMythSourceVersion(a_devel, a_major, a_minor,
-                                            qPrintable(version));
+    uint a_major { 0 };
+    uint a_minor { 0 };
+    bool a_devel { false };
+    bool result = ParseMythSourceVersion(a_devel, a_major, a_minor,
+                                         qPrintable(version));
 
     QCOMPARE(result, e_result);
     QCOMPARE(a_devel, e_devel);
