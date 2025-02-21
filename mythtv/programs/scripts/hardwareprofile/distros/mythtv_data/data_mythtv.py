@@ -19,8 +19,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-from __future__ import division
-from __future__ import print_function
 from builtins import range
 from builtins import object
 from past.utils import old_div
