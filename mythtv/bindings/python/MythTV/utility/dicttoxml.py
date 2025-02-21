@@ -8,8 +8,6 @@ Supports item (`int`, `float`, `long`, `decimal.Decimal`, `bool`, `str`, `unicod
 This module works with both Python 2 and 3.
 """
 
-from __future__ import unicode_literals
-
 __version__ = '1.7.4'
 version = __version__
 
