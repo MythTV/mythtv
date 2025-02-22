@@ -167,55 +167,32 @@ void ThemeChooser::Load(void)
         }
     }
 
-    // MYTH_SOURCE_VERSION - examples v29-pre-574-g92517f5, v29-Pre, v29.1-21-ge26a33c
-    QString MythVersion(GetMythSourceVersion());
-    static const QRegularExpression trunkver{"\\Av[0-9]+-pre.*\\z", QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression validver{
-        "\\Av[0-9]+.*\\z", QRegularExpression::CaseInsensitiveOption};
+    uint major { 0 };
+    uint minor { 0 };
+    bool devel { false };
+    bool parsed = ParseMythSourceVersion(devel, major, minor);
 
-    auto match = validver.match(MythVersion);
-    if (!match.hasMatch())
+    if (!parsed || devel)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Invalid MythTV version %1, will use themes from trunk").arg(MythVersion));
-        MythVersion = "trunk";
-    }
-    match = trunkver.match(MythVersion);
-    if (match.hasMatch())
-        MythVersion = "trunk";
-
-    if (MythVersion == "trunk")
-    {
-        LoadVersion(MythVersion, themesSeen, true);
-        LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
+        if (!parsed)
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid MythTV version %1, will use themes from devel")
+                .arg(GetMythSourceVersion()));
+        LOG(VB_GUI, LOG_INFO, QString("Loading themes for devel"));
+        LoadVersion("trunk", themesSeen, true);
     }
     else
     {
-        MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
-        // Remove the date part and the rest, eg 29.20161017-1 -> 29
-        MythVersion.remove(kVersionDateRE);
+        QString MythVersion { QString::number(major) };
         LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
         if (LoadVersion(MythVersion, themesSeen, true))
         {
-
-            // If a version of the theme for this tag exists, use it...
-            // MYTH_SOURCE_VERSION - examples v29-pre-574-g92517f5, v29-Pre, v29.1-21-ge26a33c
-            static const QRegularExpression subexp{"v[0-9]+\\.([0-9]+)-*", QRegularExpression::CaseInsensitiveOption};
-            // This captures the subversion, i.e. the number after a dot
-            match = subexp.match(GetMythSourceVersion());
-            if (match.hasMatch())
+            for (int idx = minor ; idx > 0; idx--)
             {
                 QString subversion;
-                LOG(VB_GUI, LOG_INFO, QString("Loading version %1").arg(match.capturedView(1).toInt()));
-                for (int idx = match.capturedView(1).toInt(); idx > 0; --idx)
-                {
-                    subversion = MythVersion + "." + QString::number(idx);
-                    LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
-                    LoadVersion(subversion, themesSeen, false);
-                }
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to match theme for %1").arg(GetMythSourceVersion()));
+                subversion = MythVersion + "." + QString::number(idx);
+                LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
+                LoadVersion(subversion, themesSeen, false);
             }
 
             ResetBusyPopup();
@@ -225,11 +202,10 @@ void ThemeChooser::Load(void)
         else
         {
 
-            LOG(VB_GENERAL, LOG_INFO, QString("Failed to load themes for %1, trying trunk").arg(MythVersion));
-            MythVersion = "trunk";
-            if (!LoadVersion(MythVersion, themesSeen, true))
+            LOG(VB_GENERAL, LOG_INFO, QString("Failed to load themes for %1, trying devel").arg(MythVersion));
+            if (!LoadVersion("trunk", themesSeen, true))
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to load themes for %1").arg(MythVersion));
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to load themes for devel"));
             }
         }
     }
@@ -1007,27 +983,20 @@ bool ThemeChooser::removeThemeDir(const QString &dirname)
 
 ThemeUpdateChecker::ThemeUpdateChecker(void) : m_updateTimer(new QTimer(this))
 {
-    QString version = GetMythSourcePath();
+    uint major { 0 };
+    uint minor { 0 };
+    bool devel { false };
+    bool parsed = ParseMythSourceVersion(devel, major, minor);
 
-    if (!version.isEmpty() && !version.startsWith("fixes/"))
+    if (!parsed || devel)
     {
-        // Treat devel branches as master
         m_mythVersions << "trunk";
     }
     else
     {
-        version = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
-        version.remove(kVersionDateRE);
-
-        // If a version of the theme for this tag exists, use it...
-        static const QRegularExpression subexp{"v[0-9]+\\.([0-9]+)-*", QRegularExpression::CaseInsensitiveOption};
-        auto match = subexp.match(GetMythSourceVersion());
-        if (match.hasMatch())
-        {
-            for (int idx = match.capturedView(1).toInt(); idx > 0; --idx)
-                m_mythVersions << version + "." + QString::number(idx);
-        }
-        m_mythVersions << version;
+        for (int i = minor ; i > 0; i--)
+            m_mythVersions << QString("%1.%2").arg(major).arg(i);
+        m_mythVersions << QString::number(major);
     }
 
     m_infoPackage = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
