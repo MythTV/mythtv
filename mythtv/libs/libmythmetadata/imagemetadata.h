@@ -70,7 +70,7 @@ public:
     //! Encode original & current orientation to a single Db field
     int Composite() const { return (m_current * 10) + m_file; }
     int Transform(int transform);
-    int GetCurrent();
+    int GetCurrent() const;
     QString Description() const;
 
     static int FromRotation(const QString &degrees);

@@ -33,7 +33,7 @@ int Orientation::Transform(int transform)
  * \brief Determines orientation required for an image
  * \return Exif orientation code to apply after the image has been loaded.
  */
-int Orientation::GetCurrent()
+int Orientation::GetCurrent() const
 {
     return m_current;
 }
