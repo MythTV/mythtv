@@ -27,8 +27,8 @@ MythPreviewPlayer::MythPreviewPlayer(PlayerContext* Context, PlayerFlags Flags)
  *  \param FrameHeight [out] Height of buffer returned
  *  \param AspectRatio [out] Aspect of buffer returned
  */
-char *MythPreviewPlayer::GetScreenGrab(std::chrono::seconds SecondsIn, int& BufferSize,
-                                       int& FrameWidth, int& FrameHeight, float& AspectRatio)
+uint8_t *MythPreviewPlayer::GetScreenGrab(std::chrono::seconds SecondsIn, int& BufferSize,
+                                          int& FrameWidth, int& FrameHeight, float& AspectRatio)
 {
     auto frameNum = static_cast<uint64_t>(SecondsIn.count() * m_videoFrameRate);
     return GetScreenGrabAtFrame(frameNum, false, BufferSize, FrameWidth, FrameHeight, AspectRatio);
@@ -49,8 +49,8 @@ char *MythPreviewPlayer::GetScreenGrab(std::chrono::seconds SecondsIn, int& Buff
  *  \param FrameHeight [out] Height of buffer returned
  *  \param AspectRatio [out] Aspect of buffer returned
  */
-char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, int& BufferSize,
-                                              int& FrameWidth, int& FrameHeight, float& AspectRatio)
+uint8_t *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, int& BufferSize,
+                                                 int& FrameWidth, int& FrameHeight, float& AspectRatio)
 {
     BufferSize = 0;
     FrameWidth = FrameHeight = 0;
@@ -94,7 +94,7 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
         FrameHeight = 480;
         AspectRatio = 4.0F / 3.0F;
         BufferSize = FrameWidth * FrameHeight * 4;
-        char* result = new char[static_cast<size_t>(BufferSize)];
+        auto *result = new uint8_t[static_cast<size_t>(BufferSize)];
         memset(result, 0x3f, static_cast<size_t>(BufferSize) * sizeof(char));
         return result;
     }
@@ -144,7 +144,7 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
     AspectRatio = frame->m_aspect;
 
     DiscardVideoFrame(frame);
-    return reinterpret_cast<char*>(result);
+    return result;
 }
 
 void MythPreviewPlayer::SeekForScreenGrab(uint64_t& Number, uint64_t FrameNum, bool Absolute)

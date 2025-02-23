@@ -692,9 +692,8 @@ bool PreviewGenerator::LocalPreviewRun(void)
     int width = 0;
     int height = 0;
     int sz = 0;
-    auto *data = (unsigned char*) GetScreenGrab(m_programInfo, m_pathname,
-                                                captime, capframe,
-                                                sz, width, height, aspect);
+    auto *data = GetScreenGrab(m_programInfo, m_pathname, captime, capframe,
+                               sz, width, height, aspect);
 
     QString outname = CreateAccessibleFilename(m_pathname, m_outFileName);
 
@@ -792,13 +791,13 @@ bool PreviewGenerator::IsLocal(void) const
  *  \return Buffer allocated with new containing frame in RGBA32 format if
  *          successful, nullptr otherwise.
  */
-char *PreviewGenerator::GetScreenGrab(
+uint8_t *PreviewGenerator::GetScreenGrab(
     const ProgramInfo &pginfo, const QString &filename,
     std::chrono::seconds seektime, long long seekframe,
     int &bufferlen,
     int &video_width, int &video_height, float &video_aspect)
 {
-    char *retbuf = nullptr;
+    uint8_t *retbuf = nullptr;
     bufferlen = 0;
 
     if (!MSqlQuery::testDBConnection())

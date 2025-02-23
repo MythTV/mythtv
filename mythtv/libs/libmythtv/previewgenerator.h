@@ -81,14 +81,14 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
     bool RunReal(void);
 
-    static char *GetScreenGrab(const ProgramInfo &pginfo,
-                               const QString     &filename,
-                               std::chrono::seconds seektime,
-                               long long          seekframe,
-                               int               &bufferlen,
-                               int               &video_width,
-                               int               &video_height,
-                               float             &video_aspect);
+    static uint8_t *GetScreenGrab(const ProgramInfo &pginfo,
+                                  const QString     &filename,
+                                  std::chrono::seconds seektime,
+                                  long long          seekframe,
+                                  int               &bufferlen,
+                                  int               &video_width,
+                                  int               &video_height,
+                                  float             &video_aspect);
 
     static bool SavePreview(const QString &filename,
                             const unsigned char *data,
