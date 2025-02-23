@@ -250,7 +250,7 @@ Checks: '-*,
         # unique warnings. ,
        -performance-enum-size,
 
-        # As of 2024-08-01, new filtering reduces this count to 35
+        # As of 2025-03-13, new filtering reduces this count to 7
         # unique warnings. ,
        -performance-no-int-to-ptr,
 

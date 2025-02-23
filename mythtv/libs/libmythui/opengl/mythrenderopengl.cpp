@@ -1064,6 +1064,7 @@ inline void MythRenderOpenGL::glVertexAttribPointerI(GLuint Index, GLint Size, G
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+    // NOLINTNEXTLINE(performance-no-int-to-ptr)
     glVertexAttribPointer(Index, Size, Type, Normalize, Stride, reinterpret_cast<const char *>(Value));
 #pragma GCC diagnostic pop
 }

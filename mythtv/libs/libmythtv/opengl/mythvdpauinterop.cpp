@@ -194,11 +194,13 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
             // This may fail if another interop is registered (but should not happen if
             // decoder creation is working properly). Subsequent surface
             // registration will then fail and we will try again on the next pass
+            // NOLINTBEGIN(performance-no-int-to-ptr)
             m_initNV(reinterpret_cast<void*>(static_cast<uintptr_t>(DeviceContext->device)),
                      reinterpret_cast<const void*>(DeviceContext->get_proc_address));
             GLuint texid = m_openglTextures[DUMMY_INTEROP_ID][0]->m_textureId;
             m_outputSurfaceReg = m_registerNV(reinterpret_cast<void*>(static_cast<uintptr_t>(m_outputSurface)),
                                               QOpenGLTexture::Target2D, 1, &texid);
+            // NOLINTEND(performance-no-int-to-ptr)
             // this happens if there is another interop registered to this OpenGL context
             if (!m_outputSurfaceReg)
             {
