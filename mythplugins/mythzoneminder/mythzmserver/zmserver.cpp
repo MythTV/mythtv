@@ -361,7 +361,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
         if (((unsigned long)m_sharedImages % 64) != 0)
         {
             // align images buffer to nearest 64 byte boundary
-            m_sharedImages = (unsigned char*)((unsigned long)m_sharedImages + (64 - ((unsigned long)m_sharedImages % 64)));
+            m_sharedImages += (64 - ((unsigned long)m_sharedImages % 64));
         }
     }
     else if (checkVersion(1, 32, 0))
@@ -378,7 +378,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
         if (((unsigned long)m_sharedImages % 64) != 0)
         {
             // align images buffer to nearest 64 byte boundary
-            m_sharedImages = (unsigned char*)((unsigned long)m_sharedImages + (64 - ((unsigned long)m_sharedImages % 64)));
+            m_sharedImages += (64 - ((unsigned long)m_sharedImages % 64));
         }
     }
     else if (checkVersion(1, 26, 0))
@@ -395,7 +395,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
         if (((unsigned long)m_sharedImages % 16) != 0)
         {
             // align images buffer to nearest 16 byte boundary
-            m_sharedImages = (unsigned char*)((unsigned long)m_sharedImages + (16 - ((unsigned long)m_sharedImages % 16)));
+            m_sharedImages += (16 - ((unsigned long)m_sharedImages % 16));
         }
     }
     else
