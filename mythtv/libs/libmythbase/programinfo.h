@@ -871,7 +871,7 @@ class MBASE_PUBLIC ProgGroupBy : public QObject
     Q_OBJECT
 
 public:
-    enum Type {
+    enum Type : uint8_t {
 	None,			// Don't group programs
 	ChanNum,		// Group by number and callsign
 	CallSign,		// Group by call sign
