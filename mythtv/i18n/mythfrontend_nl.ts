@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="nl_NL" sourcelanguage="en_US">
+<TS version="2.0" language="nl_NL" sourcelanguage="en_US">
 <context>
     <name>(Categories)</name>
     <message>
@@ -2129,70 +2129,70 @@ Controleer of de video bestaat</translation>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="288"/>
         <source>Building Head Start Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Opbouwen Head Start buffer</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="326"/>
         <source>Building Logo Detection Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>Opbouwen Logo detectie buffer</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="356"/>
         <source>Searching for Logo</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken naar het logo</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="534"/>
         <location filename="../programs/mythcommflag/CommDetector2.cpp" line="396"/>
         <location filename="../programs/mythcommflag/PrePostRollFlagger.cpp" line="324"/>
         <source>%1% Completed @ %2 fps.</source>
-        <translation type="unfinished">%1% Gereed @ %2 fps.</translation>
+        <translation>%1% Gereed @ %2 fps.</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/ClassicCommDetector.cpp" line="540"/>
         <location filename="../programs/mythcommflag/CommDetector2.cpp" line="401"/>
         <location filename="../programs/mythcommflag/PrePostRollFlagger.cpp" line="330"/>
         <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="unfinished">%1% Frames gereed @ %2 fps.</translation>
+        <translation>%1% Frames gereed @ %2 fps.</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/CommDetector2.cpp" line="528"/>
         <source>Performing Logo Identification</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met logo identificatie</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/PrePostRollFlagger.cpp" line="42"/>
         <source>Waiting to pass preroll + head start</source>
-        <translation type="unfinished"></translation>
+        <translation>Wachten op tijdstip preroll + head start</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/PrePostRollFlagger.cpp" line="155"/>
         <source>Waiting for recording to finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Wachten tot de opname klaar is</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/mythcommflag.cpp" line="278"/>
         <source>Paused</source>
         <comment>Job status</comment>
-        <translation type="unfinished">Gepauzeerd</translation>
+        <translation>Gepauzeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/mythcommflag.cpp" line="286"/>
         <source>Running</source>
         <comment>Job status</comment>
-        <translation type="unfinished">Bezig</translation>
+        <translation>Bezig</translation>
     </message>
     <message>
         <location filename="../programs/mythcommflag/mythcommflag.cpp" line="1059"/>
         <source>Failed with exit status %1</source>
         <comment>Job status</comment>
-        <translation type="unfinished">Mislukt met exit status %1</translation>
+        <translation>Mislukt met exit status %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythcommflag/mythcommflag.cpp" line="1066"/>
         <source>%n commercial break(s)</source>
         <comment>Job status</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n reclameblok</numerusform>
             <numerusform>%n reclameblokken</numerusform>
         </translation>
@@ -2575,16 +2575,16 @@ Controleer of de video bestaat</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2876"/>
         <source>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable (aanbevolen) om de volledige RGB range te gebruiken. Disable om een beperkte RGB range te gebruiken. Deze instelling wordt zowel voor de GUI als het afspelen gebruikt. Deze instelling zou idealiter overeen moeten komen met een soortgelijke instelling op TV of monitor.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3236"/>
         <source>Menu Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Taal voor menu</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="vanished">Taal</translation>
+        <translation>Taal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3254"/>
@@ -2594,12 +2594,12 @@ Controleer of de video bestaat</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3263"/>
         <source>Audio Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Taal voor audio</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3284"/>
         <source>Preferred language for the audio track.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorkeurstaal voor het geluidsspoor</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3320"/>
@@ -3888,71 +3888,71 @@ Apparaat ondersteunt tot %1</translation>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="350"/>
         <source>Found %n off-air channel(s).</source>
         <extracomment>%n is the number of channels</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n kanaal niet gevonden.</numerusform>
+            <numerusform>%n kanalen niet gevonden.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="429"/>
         <source>Found %n unused transport(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n ongebruikt transport gevonden</numerusform>
+            <numerusform>%n ongebruikte transporten gevonden</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="492"/>
         <source>Found %n old %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n bestaand %1 kanaal gevonden</numerusform>
+            <numerusform>%n bestaande %1 kanalen gevonden</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="501"/>
         <source>Found %n new %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n nieuw %1 kanaal gevonden</numerusform>
+            <numerusform>%n nieuwe %1 kanalen gevonden</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="529"/>
         <source>Found %n conflicting old %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n conflicterend oud %1 kanaal gevonden</numerusform>
+            <numerusform>%n conflicterende oude %1 kanalen gevonden</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="538"/>
         <source>Found %n new conflicting %1 channel(s).</source>
         <extracomment>%n is the number of channels, %1 is the type of channel</extracomment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n conflicterend nieuw %1 kanaal gevonden</numerusform>
+            <numerusform>%n conflicterende nieuwe %1 kanalen gevonden</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1747"/>
         <source>Channels: FTA Enc Dec
 </source>
-        <translation type="unfinished">Kanalen: FTA Enc Dec</translation>
+        <translation>Kanalen: FTA Enc Dec</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1766"/>
         <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </source>
-        <translation type="unfinished">Uniek: prog %1 atsc %2 atsc minor %3 channum %4</translation>
+        <translation>Uniek: prog %1 atsc %2 atsc minor %3 channum %4</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1769"/>
         <source>Max atsc major count: %1</source>
-        <translation type="unfinished">Max atsc major count: %1</translation>
+        <translation>Max atsc major count: %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1919"/>
@@ -4923,11 +4923,11 @@ Scannen uitgeschakeld</translation>
     </message>
     <message>
         <source>Ping test server?</source>
-        <translation type="vanished">Ping test server?</translation>
+        <translation>Ping test server?</translation>
     </message>
     <message>
         <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="vanished">Test basis connectiviteit met het ping commando. Zet dit uit als uw host of netwerk geen ping (ICMP ECHO) pakketten ondersteund</translation>
+        <translation>Test basis connectiviteit met het ping commando. Zet dit uit als uw host of netwerk geen ping (ICMP ECHO) pakketten ondersteund</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="44"/>
@@ -5845,7 +5845,7 @@ Geen afbeelding gevonden</translation>
     <message numerus="yes">
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="92"/>
         <source>Do you want to go back and fix this(these) problem(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Wilt u terug en dit probleem verhelpen?</numerusform>
             <numerusform></numerusform>
         </translation>
@@ -6057,149 +6057,149 @@ Gebruik het absolute pad of het pad relatief ten opzichte van de huidige map.</t
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="111"/>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="575"/>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="307"/>
         <source>Slideshow Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Diavoorstelling opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="311"/>
         <source>Play Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video afspelen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="314"/>
         <source>Stop</source>
-        <translation type="unfinished">Einde</translation>
+        <translation>Einde</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="316"/>
         <source>Start SlideShow</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin diavoorstelling</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="319"/>
         <source>Turn Repeat Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Herhaling uitzetten</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="321"/>
         <source>Turn Repeat On</source>
-        <translation type="unfinished"></translation>
+        <translation>Herhaling aanzetten</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="328"/>
         <source>Hide Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertitles verbergen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="330"/>
         <source>Show Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertitles laten zien</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="336"/>
         <source>More Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Meer details</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="337"/>
         <source>Less Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Minder details</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="339"/>
         <source>Show Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat details zien</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="344"/>
         <source>Hide Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg details</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="364"/>
         <source>Transform Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Transformatie opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="368"/>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai met de klok mee</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="369"/>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai tegen de klok in</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="370"/>
         <source>Flip Horizontal</source>
-        <translation type="unfinished"></translation>
+        <translation>Flip horizontaal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="371"/>
         <source>Flip Vertical</source>
-        <translation type="unfinished"></translation>
+        <translation>Flip verticaal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="372"/>
         <source>Reset to Exif</source>
-        <translation type="unfinished"></translation>
+        <translation>Terug naar EXIF instellingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="376"/>
         <source>Zoom In</source>
-        <translation type="unfinished">Inzoomen</translation>
+        <translation>Inzoomen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="379"/>
         <source>Zoom Out</source>
-        <translation type="unfinished">Uitzoomen</translation>
+        <translation>Uitzoomen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="381"/>
         <source>Transforms</source>
-        <translation type="unfinished"></translation>
+        <translation>Transformaties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="460"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestopt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="476"/>
         <source>Playing</source>
-        <translation type="unfinished">Bezig met afspelen</translation>
+        <translation>Bezig met afspelen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="598"/>
         <source>Loading</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het laden</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="698"/>
         <source>Video</source>
-        <translation type="unfinished">Video</translation>
+        <translation>Video</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="715"/>
         <source>Start</source>
         <extracomment>Cannot go back beyond first slide of slideshow</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="740"/>
         <source>End</source>
         <extracomment>Slideshow has reached last slide</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Einde</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/galleryslideview.cpp" line="814"/>
         <source>Failed to load %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan %1 niet laden</translation>
     </message>
 </context>
 <context>
@@ -6207,7 +6207,7 @@ Gebruik het absolute pad of het pad relatief ten opzichte van de huidige map.</t
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="498"/>
         <source>Invalid Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige naam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="654"/>
@@ -6223,47 +6223,47 @@ of plaats/koppel lokale media.
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="950"/>
         <source>%L1 of %L3</source>
-        <translation type="unfinished"></translation>
+        <translation>%L1 van %L3</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1010"/>
         <source>Hidden</source>
-        <translation type="unfinished"></translation>
+        <translation>Verborgen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1019"/>
         <source>Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbeeldingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1020"/>
         <source>Videos</source>
-        <translation type="unfinished">Videos</translation>
+        <translation>Videos</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1041"/>
         <source>Gallery Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Galerij opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1058"/>
         <source>Enable Edits</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzigingen toestaan</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1063"/>
         <source>Stop Scan</source>
-        <translation type="unfinished">Stop scan</translation>
+        <translation>Stop scan</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1065"/>
         <source>Scan Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Doorzoek opslaggroep</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1067"/>
         <source>Settings</source>
-        <translation type="unfinished">Instellingen</translation>
+        <translation>Instellingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1088"/>
@@ -6271,428 +6271,429 @@ of plaats/koppel lokale media.
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1168"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1207"/>
         <source>%L1 marked</source>
-        <translation type="unfinished"></translation>
+        <translation>%L1 gemarkeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1095"/>
         <source>Unmark File</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand demarkeren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1097"/>
         <source>Mark File</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeer bestand</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1104"/>
         <source>Unmark Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Map demarkeren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1106"/>
         <source>Mark Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Map markeren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1113"/>
         <source>Mark All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alles markeren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1118"/>
         <source>Unmark All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alles demarkeren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1119"/>
         <source>Invert Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkeren gemarkeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1126"/>
         <source>Mark</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1151"/>
         <source>Move Marked Into</source>
-        <translation type="unfinished"></translation>
+        <translation>Verplaats gemarkeerd naar</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1152"/>
         <source>Copy Marked Into</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopieer gemarkeerd naar</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1154"/>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>Plakken</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1172"/>
         <source>Rotate Marked CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Roteer gemarkeerd met de klok me</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1173"/>
         <source>Rotate Marked CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Roteer gemarkeerd tegen de klok in</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1174"/>
         <source>Flip Marked Horizontal</source>
-        <translation type="unfinished"></translation>
+        <translation>Flip gemarkeerd horizontaal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1175"/>
         <source>Flip Marked Vertical</source>
-        <translation type="unfinished"></translation>
+        <translation>Flip gemarkeerd verticaal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1176"/>
         <source>Reset Marked to Exif</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemarkeerd terugzetten naar EXIF data</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1178"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1190"/>
         <source>Transforms</source>
-        <translation type="unfinished"></translation>
+        <translation>Transformeren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1184"/>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai met de klok mee</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1185"/>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai tegen de klok in</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1186"/>
         <source>Flip Horizontal</source>
-        <translation type="unfinished"></translation>
+        <translation>Flip horizontaal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1187"/>
         <source>Flip Vertical</source>
-        <translation type="unfinished"></translation>
+        <translation>Flip verticaal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1188"/>
         <source>Reset to Exif</source>
-        <translation type="unfinished"></translation>
+        <translation>Terugzetten naar EXIF</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1213"/>
         <source>Hide Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg gemarkeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1215"/>
         <source>Unhide Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Zichtbaar maken gemarkeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1217"/>
         <source>Delete Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder gemarkeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1228"/>
         <source>Unhide</source>
-        <translation type="unfinished"></translation>
+        <translation>Zichtbaar maken</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1230"/>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbergen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1232"/>
         <source>Use as Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik als omslag</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1233"/>
         <source>Delete</source>
-        <translation type="unfinished">Verwijderen</translation>
+        <translation>Verwijder</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1234"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Hernoemen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1238"/>
         <source>Reset Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Omslag terugzetten</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1245"/>
         <source>Create Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Map maken</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1250"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1254"/>
         <source>Eject media</source>
-        <translation type="unfinished">Media uitwerpen</translation>
+        <translation>Media uitwerpen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1259"/>
         <source>Actions</source>
-        <translation type="unfinished">Acties</translation>
+        <translation>Acties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1274"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1301"/>
         <source>Shuffled</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschud</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1275"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1302"/>
         <source>Random</source>
-        <translation type="unfinished">Willekeurig</translation>
+        <translation>Willekeurig</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1276"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1303"/>
         <source>Seasonal</source>
-        <translation type="unfinished"></translation>
+        <translation>Seizoensgebonden</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1278"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1300"/>
         <source>Ordered</source>
-        <translation type="unfinished"></translation>
+        <translation>In volgorde</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1281"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1312"/>
         <source>Slideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Diavoorstelling</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1288"/>
         <source>Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Map</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1291"/>
         <source>Recursive</source>
-        <translation type="unfinished"></translation>
+        <translation>Recursief</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1295"/>
         <source>Current Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige map</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1298"/>
         <source>Slideshow Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Diavoorstelling volgorde</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1305"/>
         <source>Change Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Verander volgorde</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1308"/>
         <source>Turn Repeat Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Herhaling uitschakelen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1310"/>
         <source>Turn Repeat On</source>
-        <translation type="unfinished"></translation>
+        <translation>Herhaling inschakelen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1322"/>
         <source>Show Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1327"/>
         <source>Hide Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg afbeeldingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1328"/>
         <source>Hide Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg videos</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1332"/>
         <source>Show Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon videos</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1332"/>
         <source>Show Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon afbeeldingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1337"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1345"/>
         <source>Image Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Bijschriften bij afbeeldingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1340"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1350"/>
         <source>Name</source>
-        <translation type="unfinished">Naam</translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1341"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1351"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1342"/>
         <source>Comment</source>
-        <translation type="unfinished"></translation>
+        <translation>Commentaar</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1343"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1352"/>
         <source>None</source>
-        <translation type="unfinished">Geen</translation>
+        <translation>Geen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1348"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1354"/>
         <source>Directory Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Map onderschriften</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1359"/>
         <source>Hide Hidden Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg verborgen items</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1361"/>
         <source>Show Hidden Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon verborgen items</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1365"/>
         <source>Zoom Out</source>
-        <translation type="unfinished">Uitzoomen</translation>
+        <translation>Uitzoomen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1367"/>
         <source>Zoom In</source>
-        <translation type="unfinished">Inzoomen</translation>
+        <translation>Inzoomen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1370"/>
         <source>Show Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details weergeven</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1370"/>
         <source>Hide Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Verberg details</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1374"/>
         <source>Show</source>
-        <translation type="unfinished">Uitzending</translation>
+        <translation>Toon</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1637"/>
         <source>Do you want to delete
 %1 ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wilt u %1 verwijderen?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1647"/>
         <source>Do you want to delete all marked files ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wilt u alle gemarkeerde bestanden verwijderen?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1751"/>
         <source>Enter a new name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voor een nieuwe naam in:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1781"/>
         <source>Enter password:</source>
-        <translation type="unfinished">Voer wachtwoord in:</translation>
+        <translation>Voer wachtwoord in:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1895"/>
         <source>Enter name of new directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Voer de naam van een nieuwe map in:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1943"/>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2071"/>
         <source>No files specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen bestanden gespecificeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1955"/>
         <source>No images</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen afbeeldingen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1981"/>
         <source>Copying files</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopieer bestanden</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2000"/>
         <source>Failed to copy %L1/%Ln file(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kan %L1/%Ln bestand niet kopieeren</numerusform>
+            <numerusform>Kan %L1/%Ln bestanden niet kopieeren</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2089"/>
         <source>No images specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen afbeeldingen gespecificeerd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2120"/>
         <source>Moving files</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestanden verplaatsen</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2140"/>
         <source>Failed to move %L1/%Ln file(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kan %L1/%Ln bestand niet verplaatsen</numerusform>
+            <numerusform>Kan %L1/%Ln bestanden niet verplaatsen</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2169"/>
         <source>Failed to create temporary directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan geen tijdelijke map maken.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2179"/>
         <source>Running Import command.
 Please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met importeren. Wacht AUB....</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2189"/>
         <source>Import command failed.
 Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer commando mislukt.
+Fout: %1</translation>
     </message>
 </context>
 <context>
@@ -6700,37 +6701,37 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3046"/>
         <source>Avoid back to back recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermijd opeenvolgende opnames</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3050"/>
         <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schedule opnames niet op dezelfde input als hun einddtijd en starttijd hetzelfde is. Dat kan nog wel gebeuren om scheduling conflicten op te lossen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3057"/>
         <source>Never</source>
-        <translation type="unfinished">Nooit</translation>
+        <translation>Nooit</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3058"/>
         <source>Different Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschillende kanalen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3060"/>
         <source>Always</source>
-        <translation type="unfinished">Altijd</translation>
+        <translation>Altijd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3071"/>
         <source>Preferred input priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorkeursinvoerprioriteit</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3073"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
-        <translation type="unfinished">Toegevoegde prioriteit als een uitzending kan worden opgenomen op een voorkeurs ingang zoals aagegeven in de &apos;Programmeer opties&apos; sectie van de opname regel.</translation>
+        <translation>Toegevoegde prioriteit als een uitzending kan worden opgenomen op een voorkeurs ingang zoals aagegeven in de &apos;Programmeer opties&apos; sectie van de opname regel.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3088"/>
@@ -7864,7 +7865,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="51"/>
         <source>Hardware Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Hardware profiel</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="52"/>
@@ -7879,7 +7880,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="54"/>
         <source>Job Queue</source>
-        <translation type="unfinished">Taakrij</translation>
+        <translation>Taakrij</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="55"/>
@@ -7937,18 +7938,18 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="65"/>
         <source>Setup Wizard</source>
-        <translation type="unfinished">Instelassistent</translation>
+        <translation>Instelassistent</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="66"/>
         <location filename="../html/htmlstrings.h" line="108"/>
         <source>Storage Groups</source>
-        <translation type="unfinished">Opslag groepen</translation>
+        <translation>Opslaggroepen</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="67"/>
         <source>System Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Systeem gebeurtenissen</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="68"/>
@@ -8055,7 +8056,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="90"/>
         <source>Add Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Stream toevoegen</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="91"/>
@@ -8138,7 +8139,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="104"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Verversen</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="105"/>
@@ -8941,7 +8942,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="316"/>
         <source>TVDB or TMDB ID</source>
-        <translation type="unfinished"></translation>
+        <translation>TVDB of TMDB-ID</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="317"/>
@@ -8971,12 +8972,12 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="327"/>
         <source>Playing</source>
-        <translation type="unfinished">Bezig met afspelen</translation>
+        <translation>Bezig met afspelen</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="328"/>
         <source>Quality</source>
-        <translation type="unfinished">Kwaliteit</translation>
+        <translation>Kwaliteit</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="332"/>
@@ -8991,7 +8992,7 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="339"/>
         <source>Important</source>
-        <translation type="unfinished">Belangrijk</translation>
+        <translation>Belangrijk</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="340"/>
@@ -9006,12 +9007,12 @@ Error: %1</source>
     <message>
         <location filename="../html/htmlstrings.h" line="347"/>
         <source>There are no upcoming recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn geen opnames gepland.</translation>
     </message>
     <message>
         <location filename="../html/htmlstrings.h" line="349"/>
         <source>Upcoming Records</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplande opnames</translation>
     </message>
 </context>
 <context>
@@ -9180,7 +9181,8 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="407"/>
         <source>Downloading %1 (%2 of %3)</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Misschien te vertalen als &quot;Aan het downloaden&quot;</translatorcomment>
+        <translation>Downloaden %1 (%2 of %3)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="782"/>
@@ -9199,7 +9201,7 @@ Error: %1</source>
     <message>
         <source>Downloading %1 of %2</source>
         <extracomment>%1 is the current channel position, * %2 is the total number of channels,</extracomment>
-        <translation type="vanished">%1 van %2 downloaden</translation>
+        <translation>%1 van %2 downloaden</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythtv-setup/importicons.cpp" line="420"/>
@@ -9262,7 +9264,6 @@ Error: %1</source>
         <location filename="../programs/mythfrontend/galleryinfo.cpp" line="171"/>
         <source>%Ln directory(ies)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -10112,12 +10113,12 @@ Error: %1</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2128"/>
         <source>CEC Device</source>
-        <translation type="unfinished"></translation>
+        <translation>CEC apparaat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2132"/>
         <source>CEC Device. Default is /dev/cec0 if you have only 1 HDMI output port.</source>
-        <translation type="unfinished"></translation>
+        <translation>CEC apparaat. Default is /dev/cec0 als er maar 1 HDMI pport is.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2145"/>
@@ -11344,7 +11345,7 @@ Error: %1</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="855"/>
         <source>Display list of cast members</source>
-        <translation type="unfinished"></translation>
+        <translation>Lijst met castleden weergeven</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="930"/>
@@ -12951,7 +12952,7 @@ Error: %1</source>
     <message>
         <location filename="../libs/libmythtv/AirPlay/mythraopconnection.cpp" line="1626"/>
         <source>Key is not a RSA private key.</source>
-        <translation>Sleutel is geen RSA private sleutel</translation>
+        <translation>Sleutel is geen RSA privésleutel.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/AirPlay/mythraopconnection.cpp" line="1637"/>
@@ -14782,9 +14783,9 @@ Bent u zeker van het verwijderen van:</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4512"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4678"/>
         <source>%1 [%n item(s)]</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 [%n item]</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 [%n items]</numerusform>
         </translation>
     </message>
     <message>
@@ -15519,7 +15520,7 @@ mag niet leeg zijn.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1894"/>
         <source>If enabled, shows the watched percent progress bar even if the recording or video is marked as watched. Having a watched percent progress bar at all depends on the currently used theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingeschakeld, wordt de voortgangsbalk met het bekeken percentage weergegeven, zelfs als de opname of video is gemarkeerd als bekeken. Of deze voortgangsbalk er überhaupt is, hangt af van het thema dat op dat moment wordt gebruikt.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1906"/>
@@ -16468,12 +16469,12 @@ mag niet leeg zijn.</translation>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="232"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer/Groepeer opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="235"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer/Groepeer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="236"/>
@@ -16562,27 +16563,27 @@ mag niet leeg zijn.</translation>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6601"/>
         <source>None</source>
-        <translation type="unfinished">Geen</translation>
+        <translation>Geen</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6603"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Zendernummer</translation>
+        <translation>Zendernummer</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6605"/>
         <source>CallSign</source>
-        <translation type="unfinished"></translation>
+        <translation>Zendernaam</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6607"/>
         <source>ProgramId</source>
-        <translation type="unfinished"></translation>
+        <translation>Programma-ID</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6609"/>
         <source>Unknown</source>
-        <translation type="unfinished">Onbekend</translation>
+        <translation>Onbekend</translation>
     </message>
 </context>
 <context>
@@ -16656,12 +16657,12 @@ mag niet leeg zijn.</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="337"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer/Groepeer opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="357"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteer/Groepeer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="364"/>
@@ -16768,7 +16769,7 @@ mag niet leeg zijn.</translation>
     </message>
     <message>
         <source>Sort</source>
-        <translation type="vanished">Sorteer</translation>
+        <translation>Sorteer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="360"/>
@@ -16807,7 +16808,7 @@ mag niet leeg zijn.</translation>
     </message>
     <message>
         <source>Sort Options</source>
-        <translation type="vanished">Sorteer opties</translation>
+        <translation>Sorteer opties</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="339"/>
@@ -18605,7 +18606,8 @@ De meeste DVB-C transports hebben 6,9 of 6,875 miljoen symbolen per seconde.</tr
         <location filename="../libs/libmythtv/videosource.cpp" line="1183"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="2826"/>
         <source>Delivery system</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Moeilijk te  vertalen... bedoeld is hier DVB-C, DVB-S, DVB-S2, DVB-T2 etc. En dat is niet hetzelfde als de modulatiemethode als QAM64 etc.</translatorcomment>
+        <translation>Delivery systeem</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1185"/>
@@ -18708,17 +18710,17 @@ De meeste DVB-C transports hebben 6,9 of 6,875 miljoen symbolen per seconde.</tr
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2776"/>
         <source>DVEO ASI recorder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2779"/>
         <source>Import test recorder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2780"/>
         <source>Demo test recorder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -21669,7 +21671,7 @@ Controleer of de video bestaat</translation>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="813"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="826"/>
         <source>Modulation System</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="801"/>
@@ -21856,7 +21858,7 @@ De meeste DVB-S-transponders zenden 27,5 miljoen symbolen per seconde uit.</tran
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="491"/>
         <source>Logical Channel Number Offset</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="492"/>
@@ -21876,7 +21878,7 @@ De meeste DVB-S-transponders zenden 27,5 miljoen symbolen per seconde uit.</tran
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="709"/>
         <source>Video Source Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Source configuratie</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1059"/>
@@ -21891,7 +21893,7 @@ De meeste DVB-S-transponders zenden 27,5 miljoen symbolen per seconde uit.</tran
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1113"/>
         <source>DVB device</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB apparaat</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1243"/>
@@ -21941,22 +21943,22 @@ De meeste DVB-S-transponders zenden 27,5 miljoen symbolen per seconde uit.</tran
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2736"/>
         <source>HDHomeRun networked tuner</source>
-        <translation type="unfinished"></translation>
+        <translation>HDHomeRun netwerktuner</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2741"/>
         <source>Sat&gt;IP networked tuner</source>
-        <translation type="unfinished"></translation>
+        <translation>Sat&gt;IP netwerktuner</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2746"/>
         <source>V@Box TV Gateway networked tuner</source>
-        <translation type="unfinished"></translation>
+        <translation>V@Box TV Gateway netwerktuner</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2756"/>
         <source>Ceton Cablecard tuner</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceton Cablecard tuner</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2760"/>
@@ -21966,22 +21968,22 @@ De meeste DVB-S-transponders zenden 27,5 miljoen symbolen per seconde uit.</tran
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2765"/>
         <source>Analog to MPEG-2 encoder card (PVR-150/250/350, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoog naar MPEG-2 encodeerkaart (PVR-150/250/350, etc)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2767"/>
         <source>Analog to MJPEG encoder card (Matrox G200, DC10, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoog naar MJPEG encodeerkaart (Matrox G200, DC10, etc)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2769"/>
         <source>Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoog naar MPEG-4 encoder (Plextor ConvertX USB, etc)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2772"/>
         <source>Analog capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoge TV kaart</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2782"/>
@@ -21991,12 +21993,13 @@ De meeste DVB-S-transponders zenden 27,5 miljoen symbolen per seconde uit.</tran
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2793"/>
         <source>Input name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingangsnaam</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2827"/>
         <source>This shows the delivery system (modulation), for instance DVB-T2, that you have selected when you configured the capture card. This must be the same as the modulation used by the video source. </source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Delivery system is hier vertaald als leveringssysteem (volgens Google); is misschien wel goed maar wordt nooit gebruikt in het Nederlands.</translatorcomment>
+        <translation>Dit toont het leveringssysteem (modulatie), bijvoorbeeld DVB-T2, dat u hebt geselecteerd toen u de TV kaart configureerde. Dit moet hetzelfde zijn als de modulatie die door de videobron wordt gebruikt.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2842"/>
@@ -23332,17 +23335,17 @@ naam mag niet leeg zijn.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="318"/>
         <source>Balanced free space</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebalanceerde vrije ruimte</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="319"/>
         <source>Balanced percent free space</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebalanceerd percentage vrije ruimte</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="320"/>
         <source>Balanced disk I/O</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebalanceerde schijf I/O</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="323"/>
@@ -26239,22 +26242,22 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythtv/restoredata.cpp" line="78"/>
         <source>Restore Visible status</source>
-        <translation type="unfinished"></translation>
+        <translation>Herstel &quot;Visible&quot; status</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/restoredata.cpp" line="80"/>
         <source>If checked, copy the Visible status in field &quot;visible&quot; from a deleted channel in this video source.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is aangevinkt, kopieer dan de &quot;Visible&quot; status in het veld &apos;zichtbaar&apos; van een verwijderd kanaal in deze videobron.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/restoredata.cpp" line="92"/>
         <source>Restore Icon filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Herstel pictogrambestandsnaam</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/restoredata.cpp" line="94"/>
         <source>If checked, copy the Icon filename in field &quot;icon&quot; from a deleted channel or from a channel in another video source.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is aangevinkt, kopieer dan de bestandsnaam van het pictogram in het veld &apos;icon&apos; van een verwijderd kanaal of van een kanaal in een andere videobron.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/restoredata.cpp" line="137"/>
@@ -26269,7 +26272,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythui/mythdisplaymode.cpp" line="277"/>
         <source>%1x%2@%3Hz</source>
-        <translation type="unfinished">%1x%2@%3Hz</translation>
+        <translation>%1x%2@%3Hz</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythhdr.cpp" line="67"/>
@@ -26294,7 +26297,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythui/mythvrr.cpp" line="127"/>
         <source>GSync Compatible</source>
-        <translation type="unfinished"></translation>
+        <translation>GSync compatibel</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythvrr.cpp" line="137"/>
@@ -26304,7 +26307,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_web.cpp" line="200"/>
         <source>This scan type is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit scan type is niet ondersteund</translation>
     </message>
 </context>
 <context>
@@ -26591,7 +26594,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="334"/>
         <source>HDHomeRun Channel Import</source>
-        <translation type="unfinished"></translation>
+        <translation>HDHomeRun Zenders importeren</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="340"/>
@@ -26693,7 +26696,7 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="49"/>
         <source>Prime time</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="52"/>
@@ -26964,25 +26967,25 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="571"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="604"/>
         <source>Group By Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepeer op kanaalnummer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="573"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="605"/>
         <source>Group By Call Sign</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepeer op zendernaam</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="575"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="606"/>
         <source>Group By Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepeer op programma ID</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="577"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="607"/>
         <source>Group By None</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepeer niet</translation>
     </message>
 </context>
 <context>
@@ -27662,7 +27665,7 @@ Geen verdere details</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="873"/>
         <source>Input %1: %2</source>
-        <translation type="unfinished">Ingang %1 %2: %2 {1:?}</translation>
+        <translation>Ingang %1: %2</translation>
     </message>
     <message>
         <source>DataDirect Status: </source>
@@ -27932,7 +27935,7 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Input %1 %2: %3</source>
-        <translation type="vanished">Ingang %1 %2: %3</translation>
+        <translation>Ingang %1 %2: %3</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="874"/>
@@ -29050,7 +29053,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
-        <translation type="vanished">Laatste programma: %1 bestaat niet</translation>
+        <translation>Laatste programma: %1 bestaat niet</translation>
     </message>
     <message>
         <source>Delete this recording?</source>
@@ -29261,7 +29264,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="2503"/>
         <source>Last Program: &quot;%1&quot; Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatste programma: &quot;%1&quot; bestaat niet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="8770"/>
@@ -29358,7 +29361,7 @@ Selecteer een huidige opname</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9432"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9656"/>
         <source>Cast</source>
-        <translation type="unfinished">Acteurs</translation>
+        <translation>Acteurs</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9397"/>
@@ -29389,12 +29392,12 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9433"/>
         <source>Recorded</source>
-        <translation type="unfinished">Opgenomen</translation>
+        <translation>Opgenomen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9434"/>
         <source>Upcoming</source>
-        <translation type="unfinished">Toekomstige</translation>
+        <translation>Toekomstige</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10327"/>
@@ -30357,7 +30360,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Prioritize some shows over others</source>
-        <translation type="vanished">Prioritiseer sommige uitzendingen boven anderen</translation>
+        <translation>Prioritiseer sommige uitzendingen boven anderen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1764"/>
@@ -30872,7 +30875,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>% - |year%% - |length%</source>
-        <translation type="vanished">% - |jaar%% - |lengte%</translation>
+        <translation>% - |jaar%% - |lengte%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="8"/>
@@ -31402,14 +31405,12 @@ Selecteer een huidige opname</translation>
         <source>%n in current group</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="194"/>
         <source>%name%</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -31418,14 +31419,12 @@ Selecteer een huidige opname</translation>
         <source>%name% (%callsign%)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="196"/>
         <source>%name% / %callsign%  (Source: %sourcename%)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -31551,7 +31550,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="vanished">0</translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="260"/>
@@ -31560,11 +31559,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>0.0</source>
-        <translation type="vanished">0.0</translation>
+        <translation>0.0</translation>
     </message>
     <message>
         <source>0.5</source>
-        <translation type="vanished">0.5</translation>
+        <translation>0.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="265"/>
@@ -31573,11 +31572,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>1.0</source>
-        <translation type="vanished">1.0</translation>
+        <translation>1.0</translation>
     </message>
     <message>
         <source>1.5</source>
-        <translation type="vanished">1.5</translation>
+        <translation>1.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="268"/>
@@ -31596,11 +31595,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>2.0</source>
-        <translation type="vanished">2.0</translation>
+        <translation>2.0</translation>
     </message>
     <message>
         <source>2.5</source>
-        <translation type="vanished">2.5</translation>
+        <translation>2.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="277"/>
@@ -31609,11 +31608,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>3.0</source>
-        <translation type="vanished">3.0</translation>
+        <translation>3.0</translation>
     </message>
     <message>
         <source>3.5</source>
-        <translation type="vanished">3.5</translation>
+        <translation>3.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="280"/>
@@ -31622,11 +31621,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>4.0</source>
-        <translation type="vanished">4.0</translation>
+        <translation>4.0</translation>
     </message>
     <message>
         <source>4.5</source>
-        <translation type="vanished">4.5</translation>
+        <translation>4.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="282"/>
@@ -31635,7 +31634,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>5.0</source>
-        <translation type="vanished">5.0</translation>
+        <translation>5.0</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="284"/>
@@ -31789,11 +31788,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Article item:</source>
-        <translation type="vanished">Artikel:</translation>
+        <translation>Artikel:</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="vanished">Artiest:</translation>
+        <translation>Artiest:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="363"/>
@@ -33433,7 +33432,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>No listings found for this program search.</source>
-        <translation type="vanished">Niets gevonden in de gids voor dit zoekcommando.</translation>
+        <translation>Niets gevonden in de gids voor dit zoekcommando.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1186"/>
@@ -33447,7 +33446,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>No volume controls configured</source>
-        <translation type="vanished">Geen volumeregelaars geconfigureerd</translation>
+        <translation>Geen volumeregelaars geconfigureerd</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1199"/>
@@ -33456,11 +33455,11 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Not recorded yet</source>
-        <translation type="vanished">Nog niet opgenomen</translation>
+        <translation>Nog niet opgenomen</translation>
     </message>
     <message>
         <source>Not sure which screen this is:</source>
-        <translation type="vanished">Niet zeker welk scherm dit is:</translation>
+        <translation>Niet zeker welk scherm dit is:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1200"/>
@@ -33504,15 +33503,15 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Optional category:</source>
-        <translation type="vanished">Optionele categorie:</translation>
+        <translation>Optionele categorie:</translation>
     </message>
     <message>
         <source>Optional channel:</source>
-        <translation type="vanished">Optionele zender:</translation>
+        <translation>Optionele zender:</translation>
     </message>
     <message>
         <source>Optional genre:</source>
-        <translation type="vanished">Optioneel genre:</translation>
+        <translation>Optioneel genre:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1226"/>
@@ -33526,7 +33525,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>P</source>
-        <translation type="vanished">P</translation>
+        <translation>P</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1233"/>
@@ -33610,7 +33609,7 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Play group:</source>
-        <translation type="vanished">Afspelen van groep:</translation>
+        <translation>Afspelen van groep:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1299"/>
@@ -33760,7 +33759,6 @@ Selecteer een huidige opname</translation>
         <location filename="../themes/themestrings.h" line="1382"/>
         <source>Raise recording priority by %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -33932,7 +33930,6 @@ Selecteer een huidige opname</translation>
         <source>Reduce recording priority by %n</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -33943,7 +33940,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1440"/>
         <source>Resolution %RESOLUTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolutie %RESOLUTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1441"/>
@@ -33957,13 +33954,14 @@ Selecteer een huidige opname</translation>
     </message>
     <message>
         <source>Resolution: %1</source>
-        <translation type="vanished">Resolutie: %1</translation>
+        <translation>Resolutie: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1444"/>
         <source>Resolution: %resolution% - %aspect| 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolutie: %resolution% - %aspect| 
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1445"/>
@@ -34745,7 +34743,7 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1806"/>
         <source>There are no available programs under this search. Please select another search.</source>
-        <translation type="unfinished">Er werden geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
+        <translation>Er werden geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1814"/>
@@ -34755,17 +34753,17 @@ Selecteer een huidige opname</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1821"/>
         <source>Time to display each image during a slideshow (ms):</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd om elke afbeelding weer te geven tijdens een diavoorstelling (ms):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1822"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1832"/>
         <source>To give greater or lesser priority to a channel in your lineup, select it from the list.  To increase the channel&apos;s priority, press the right arrow.  To decrease its priority, press the left arrow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om een ​​kanaal in uw line-up een hogere of lagere prioriteit te geven, selecteert u het in de lijst. Om de prioriteit van het kanaal te verhogen, drukt u op de pijl naar rechts. Om de prioriteit te verlagen, drukt u op de pijl naar links.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1836"/>
@@ -34856,7 +34854,7 @@ Ga naar de &apos;Plan opnames&apos; en dan &apos;Programmagids&apos; of &apos;Pr
     <message>
         <location filename="../themes/themestrings.h" line="1872"/>
         <source>Update available</source>
-        <translation type="unfinished"></translation>
+        <translation>Update beschikbaar</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1874"/>
@@ -34866,7 +34864,7 @@ Ga naar de &apos;Plan opnames&apos; en dan &apos;Programmagids&apos; of &apos;Pr
     <message>
         <location filename="../themes/themestrings.h" line="1876"/>
         <source>UpdateAvailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Update beschikbaar</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1877"/>
@@ -35055,7 +35053,7 @@ Ga naar de &apos;Plan opnames&apos; en dan &apos;Programmagids&apos; of &apos;Pr
     <message>
         <location filename="../themes/themestrings.h" line="409"/>
         <source>Available Buffer :</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschikbare buffer:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="24"/>
@@ -36280,7 +36278,7 @@ Configureer de opname- en transcoderingskwaliteit (indien van toepassing)</trans
     </message>
     <message>
         <source>W</source>
-        <translation type="vanished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1989"/>
@@ -36395,7 +36393,7 @@ Configureer de opname- en transcoderingskwaliteit (indien van toepassing)</trans
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded!
 To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;.</source>
-        <translation type="vanished">Er zijn geen opnames gepland.
+        <translation>Er zijn geen opnames gepland.
 Ga naar de &apos;Plan opnames&apos; en dan &apos;Programmagids&apos; of &apos;Programmazoeker&apos; om een opname te plannen.</translation>
     </message>
     <message>
@@ -36417,7 +36415,6 @@ Ga naar de &apos;Plan opnames&apos; en dan &apos;Programmagids&apos; of &apos;Pr
         <location filename="../themes/themestrings.h" line="197"/>
         <source>%name%% (v.|version%)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -37337,7 +37334,6 @@ Ga naar de &apos;Plan opnames&apos; en dan &apos;Programmagids&apos; of
         <source>Play %n trailer(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -37781,7 +37777,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>no info available</source>
-        <translation type="vanished">geen informatie beschikbaar</translation>
+        <translation>geen informatie beschikbaar</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2093"/>
@@ -37795,7 +37791,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     </message>
     <message>
         <source>publisher:</source>
-        <translation type="vanished">uitgever:</translation>
+        <translation>uitgever:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2096"/>
@@ -38110,7 +38106,8 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <location filename="../themes/themestrings.h" line="1168"/>
         <source>News Feeds</source>
-        <translation>Nieuwsfeeds</translation>
+        <translatorcomment>Zo heet dat echt in het Nederlands....zie https://rss-feeds.startpagina.nl/ </translatorcomment>
+        <translation>RSS feeds</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2025"/>
