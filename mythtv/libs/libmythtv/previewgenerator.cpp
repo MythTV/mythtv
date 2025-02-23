@@ -574,8 +574,7 @@ bool PreviewGenerator::SavePreview(const QString &filename,
     if (!data || !width || !height)
         return false;
 
-    const QImage img((unsigned char*) data,
-                     width, height, QImage::Format_RGB32);
+    const QImage img(data, width, height, QImage::Format_RGB32);
 
     float ppw = std::max(desired_width, 0);
     float pph = std::max(desired_height, 0);
