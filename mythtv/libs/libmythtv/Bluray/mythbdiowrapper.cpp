@@ -63,6 +63,7 @@ static BD_DIR_H *MythBDDirOpen(const char* DirName)
     int dirID = MythDirOpen(DirName);
     if (dirID != 0)
     {
+        // NOLINTNEXTLINE(performance-no-int-to-ptr)
         dir->internal = reinterpret_cast<void*>(static_cast<intptr_t>(dirID));
         return dir;
     }
@@ -132,6 +133,7 @@ static BD_FILE_H *MythBDFileOpen(const char* FileName, const char *CMode)
     int fd = MythFileOpen(FileName, intMode);
     if (fd >= 0)
     {
+        // NOLINTNEXTLINE(performance-no-int-to-ptr)
         file->internal = reinterpret_cast<void*>(static_cast<intptr_t>(fd));
         return file;
     }
