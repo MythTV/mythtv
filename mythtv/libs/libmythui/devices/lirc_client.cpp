@@ -30,6 +30,8 @@
 #include "lirc_client.h"
 
 // clazy:excludeall=raw-environment-function
+// NOLINTBEGIN(performance-no-int-to-ptr)
+// This code uses -1 throughout as the equivalent of nullptr.
 
 /* internal defines */
 static constexpr int8_t MAX_INCLUDES     {  10 };
@@ -2127,3 +2129,4 @@ int lirc_identify(const struct lirc_state *state, int sockfd)
 	free(command);
 	return success;
 }
+// NOLINTEND(performance-no-int-to-ptr)
