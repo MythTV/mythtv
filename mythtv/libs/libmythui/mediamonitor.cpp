@@ -170,9 +170,11 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted,
  * prevent drawing a list if there is only one drive, et cetera
  */
 MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
+                                                 bool &canceled,
                                                  bool showMounted,
                                                  bool showUsable)
 {
+    canceled = false;
     QList <MythMediaDevice *> drives = GetRemovable(showMounted,
                                                     showUsable);
 
@@ -229,8 +231,12 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
     }
 
     // If the user cancelled, return a special value
-    return btnIndex < 0 || btnIndex >= drives.size() ? (MythMediaDevice *)-1
-                                                     : drives.at(btnIndex);
+    if (btnIndex < 0 || btnIndex >= drives.size())
+    {
+        canceled = true;
+        return nullptr;
+    }
+    return drives.at(btnIndex);
 }
 
 
@@ -244,11 +250,12 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
  */
 void MediaMonitor::ChooseAndEjectMedia(void)
 {
+    bool canceled { false };
     MythMediaDevice *selected =
-        selectDrivePopup(tr("Select removable media to eject or insert"), true);
+        selectDrivePopup(tr("Select removable media to eject or insert"), canceled, true);
 
     // If the user cancelled, no need to display or do anything more
-    if (selected == (MythMediaDevice *) -1)
+    if (canceled)
         return;
 
     if (!selected)
@@ -859,9 +866,10 @@ QString MediaMonitor::defaultDevice(const QString &dbSetting,
 
         if (s_monitor)
         {
-            MythMediaDevice *d = s_monitor->selectDrivePopup(label, false, true);
+            bool canceled { false };
+            MythMediaDevice *d = s_monitor->selectDrivePopup(label, canceled, false, true);
 
-            if (d == (MythMediaDevice *) -1)    // User cancelled
+            if (canceled)
             {
                 device.clear(); // If user has explicitly cancelled return empty string
                 d = nullptr;

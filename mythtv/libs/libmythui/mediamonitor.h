@@ -113,6 +113,7 @@ class MUI_PUBLIC MediaMonitor : public QObject
                                  const QString &label,
                                  const char *hardCodedDefault);
     MythMediaDevice *selectDrivePopup(const QString &label,
+                                      bool &canceled,
                                       bool showMounted = false,
                                       bool showUsable = false);
 
