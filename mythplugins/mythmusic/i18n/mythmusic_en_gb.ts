@@ -1920,10 +1920,6 @@ Do you want to permanently delete the existing file(s)?</translation>
         <translation>Prefer Add Tracks</translation>
     </message>
     <message>
-        <source>Add To Playlist And Play</source>
-        <translation type="vanished">Add To Playlist And Play</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/searchview.cpp" line="200"/>
         <location filename="../mythmusic/searchview.cpp" line="308"/>
         <source>Search List...</source>
@@ -3160,10 +3156,6 @@ Broadcaster: %1 - Channel: %2</translation>
         <translation>Year: %1</translation>
     </message>
     <message>
-        <source>Track Count:</source>
-        <translation type="vanished">Track Count:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="158"/>
         <source>Date added:</source>
         <translation>Date added:</translation>
@@ -3672,10 +3664,6 @@ Broadcaster: %1 - Channel: %2</translation>
         <location filename="themestrings.h" line="107"/>
         <source>Buffer:</source>
         <translation>Buffer:</translation>
-    </message>
-    <message>
-        <source>By the artist &quot;%ARTIST%&quot; from the album &quot;%ALBUM%&quot;</source>
-        <translation type="vanished">By the artist &quot;%ARTIST%&quot; from the album &quot;%ALBUM%&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
