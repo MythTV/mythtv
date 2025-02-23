@@ -67,7 +67,7 @@ static QString iconv_helper(int which, char *buf, size_t length)
 {
     QString codec = QString("iso-8859-%1").arg(which);
     iconv_t conv = iconv_open("utf-16", qPrintable(codec));
-    if (conv == (iconv_t) -1)
+    if (conv == (iconv_t) -1) // NOLINT(performance-no-int-to-ptr)
         return "";
 
     // Allocate room for the output, including space for the Byte
