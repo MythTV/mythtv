@@ -978,12 +978,7 @@ Please Wait...</translation>
         <location filename="themestrings.h" line="8"/>
         <source>%size% (%profile%)</source>
         <oldsource>%date% / %profile%</oldsource>
-        <translation type="unfinished">%date% / %profile%</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="8"/>
-        <source>%size% (%profile%)</source>
-        <translation>%size% (%profile%)</translation>
+        <translation>%date% (%profile%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
@@ -1034,19 +1029,19 @@ Please Wait...</translation>
         <location filename="themestrings.h" line="33"/>
         <source>Archive Item Details</source>
         <oldsource>Archive Callsign:</oldsource>
-        <translation type="unfinished">Archive Callsign:</translation>
+        <translation>Archive Item Details</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Archive Items</source>
         <oldsource>Archive Chan ID:</oldsource>
-        <translation type="unfinished">Archive Chan ID:</translation>
+        <translation>Archive Items</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Archive Items to DVD</source>
         <oldsource>Archive Chan No:</oldsource>
-        <translation type="unfinished">Archive Chan No:</translation>
+        <translation>Archive Items to DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -1057,12 +1052,7 @@ Please Wait...</translation>
         <location filename="themestrings.h" line="38"/>
         <source>Archived Channel</source>
         <oldsource>Archive Item:</oldsource>
-        <translation type="unfinished">Archive Item:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>Archive Items to DVD</source>
-        <translation>Archive Items to DVD</translation>
+        <translation>Archived Channel</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
@@ -1070,21 +1060,9 @@ Please Wait...</translation>
         <translation>Archive Log Viewer</translation>
     </message>
     <message>
-        <source>Archive Media</source>
-        <translation type="vanished">Archive Media</translation>
-    </message>
-    <message>
-        <source>Archive Name:</source>
-        <translation type="vanished">Archive Name:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="39"/>
         <source>Associate Channel</source>
         <translation>Associate Channel</translation>
-    </message>
-    <message>
-        <source>Associated Channel</source>
-        <translation type="vanished">Associated Channel</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
@@ -1112,10 +1090,6 @@ Please Wait...</translation>
         <translation>CUTLIST</translation>
     </message>
     <message>
-        <source>Callsign</source>
-        <translation type="vanished">Callsign</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="48"/>
         <source>Callsign:  %1</source>
         <translation>Callsign:  %1</translation>
@@ -1136,21 +1110,9 @@ Please Wait...</translation>
         <translation>Change</translation>
     </message>
     <message>
-        <source>Channel ID</source>
-        <translation type="vanished">Channel ID</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="57"/>
         <source>Channel ID:  %1</source>
         <translation>Channel ID:  %1</translation>
-    </message>
-    <message>
-        <source>Channel Name:</source>
-        <translation type="vanished">Channel Name:</translation>
-    </message>
-    <message>
-        <source>Channel No</source>
-        <translation type="vanished">Channel No</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
@@ -1161,10 +1123,6 @@ Please Wait...</translation>
         <location filename="themestrings.h" line="62"/>
         <source>Chapter Menu --&gt;</source>
         <translation>Chapter Menu --&gt;</translation>
-    </message>
-    <message>
-        <source>Chapter Menu:</source>
-        <translation type="vanished">Chapter Menu:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
@@ -1187,25 +1145,9 @@ Please Wait...</translation>
         <translation>Create a DVD of your videos</translation>
     </message>
     <message>
-        <source>Current Destination:</source>
-        <translation type="vanished">Current Destination:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="73"/>
         <source>Current Position:</source>
         <translation>Current Position:</translation>
-    </message>
-    <message>
-        <source>Current Size:</source>
-        <translation type="vanished">Current Size:</translation>
-    </message>
-    <message>
-        <source>Current selected item size: %1</source>
-        <translation type="vanished">Current selected item size: %1</translation>
-    </message>
-    <message>
-        <source>Current size: %1</source>
-        <translation type="vanished">Current size: %1</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="74"/>
@@ -1236,21 +1178,9 @@ Please Wait...</translation>
         <translation>Date (time)</translation>
     </message>
     <message>
-        <source>Destination</source>
-        <translation type="vanished">Destination</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="81"/>
         <source>Destination Free Space:</source>
         <translation>Destination Free Space:</translation>
-    </message>
-    <message>
-        <source>Details:</source>
-        <translation type="vanished">Details:</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="vanished">Done</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
@@ -1288,10 +1218,6 @@ Please Wait...</translation>
         <translation>Encoded Size:</translation>
     </message>
     <message>
-        <source>Encoder Profile:</source>
-        <translation type="vanished">Encoder Profile:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="93"/>
         <source>Encoding Profile</source>
         <translation>Encoding Profile</translation>
@@ -1327,10 +1253,6 @@ Please Wait...</translation>
         <translation>File Browser</translation>
     </message>
     <message>
-        <source>File browser</source>
-        <translation type="vanished">File browser</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="104"/>
         <source>File...</source>
         <translation>File...</translation>
@@ -1339,7 +1261,7 @@ Please Wait...</translation>
         <location filename="themestrings.h" line="127"/>
         <source>Main Menu</source>
         <oldsource>Filename:</oldsource>
-        <translation type="unfinished">Filename:</translation>
+        <translation>Main Menu</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
@@ -1360,10 +1282,6 @@ Please Wait...</translation>
         <location filename="themestrings.h" line="112"/>
         <source>Force Overwrite of DVD-RW Media</source>
         <translation>Force Overwrite of DVD-RW Media</translation>
-    </message>
-    <message>
-        <source>Force Overwrite of DVD-RW Media:</source>
-        <translation type="vanished">Force Overwrite of DVD-RW Media:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="116"/>
@@ -1391,33 +1309,9 @@ Please Wait...</translation>
         <translation>Intro --&gt;</translation>
     </message>
     <message>
-        <source>Intro:</source>
-        <translation type="vanished">Intro:</translation>
-    </message>
-    <message>
-        <source>Local Callsign:</source>
-        <translation type="vanished">Local Callsign:</translation>
-    </message>
-    <message>
-        <source>Local Chan ID:</source>
-        <translation type="vanished">Local Chan ID:</translation>
-    </message>
-    <message>
-        <source>Local Chan No:</source>
-        <translation type="vanished">Local Chan No:</translation>
-    </message>
-    <message>
-        <source>Local Name:</source>
-        <translation type="vanished">Local Name:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="124"/>
         <source>Log</source>
         <translation>Log</translation>
-    </message>
-    <message>
-        <source>Log viewer</source>
-        <translation type="vanished">Log viewer</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="126"/>
@@ -1425,10 +1319,6 @@ Please Wait...</translation>
 When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT jumps forward/backward by the seek amount, and SELECT chooses the current preview image for the selected thumb image.</source>
         <translation>MENU changes focus. Numbers 0-9 jump to that thumbnail image.
 When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT jumps forward/backward by the seek amount, and SELECT chooses the current preview image for the selected thumbnail image.</translation>
-    </message>
-    <message>
-        <source>Main Menu:</source>
-        <translation type="vanished">Main Menu:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="128"/>
@@ -1441,10 +1331,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Make ISO image</translation>
     </message>
     <message>
-        <source>Make ISO image:</source>
-        <translation type="vanished">Make ISO image:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="131"/>
         <source>Media</source>
         <translation>Media</translation>
@@ -1453,10 +1339,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="133"/>
         <source>Metadata</source>
         <translation>Metadata</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="vanished">Name</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="135"/>
@@ -1480,10 +1362,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="141"/>
         <source>No files are selected for DVD</source>
         <translation>No files are selected for DVD</translation>
-    </message>
-    <message>
-        <source>Not Applicable</source>
-        <translation type="vanished">Not Applicable</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="144"/>
@@ -1515,13 +1393,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <source>Parental Level:</source>
         <translation>Parental Level:</translation>
     </message>
-    <message numerus="yes">
-        <source>Parental Level: %n</source>
-        <translation type="vanished">
-            <numerusform>Parental Level: %n</numerusform>
-            <numerusform>Parental Level: %n</numerusform>
-        </translation>
-    </message>
     <message>
         <location filename="themestrings.h" line="159"/>
         <source>Play the last created archive DVD</source>
@@ -1543,18 +1414,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Preview</translation>
     </message>
     <message>
-        <source>Read video from data dvd or file</source>
-        <translation type="vanished">Read video from data DVD or file</translation>
-    </message>
-    <message>
-        <source>Recordings</source>
-        <translation type="vanished">Recordings</translation>
-    </message>
-    <message>
-        <source>Recordings group:</source>
-        <translation type="vanished">Recordings group:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="168"/>
         <source>Save recordings and videos to a native archive</source>
         <translation>Save recordings and videos to a native archive</translation>
@@ -1565,29 +1424,9 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Save recordings and videos to video DVD</translation>
     </message>
     <message>
-        <source>Search Chan ID</source>
-        <translation type="vanished">Search Chan ID</translation>
-    </message>
-    <message>
-        <source>Search Chan NO</source>
-        <translation type="vanished">Search Chan Num</translation>
-    </message>
-    <message>
-        <source>Search Local</source>
-        <translation type="vanished">Search Local</translation>
-    </message>
-    <message>
-        <source>Seek Amount:</source>
-        <translation type="vanished">Seek Amount:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="175"/>
         <source>Seek amount:</source>
         <translation>Seek amount:</translation>
-    </message>
-    <message>
-        <source>Select Channel</source>
-        <translation type="vanished">Select Channel</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="181"/>
@@ -1600,14 +1439,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Select Recordings</translation>
     </message>
     <message>
-        <source>Select Recordings for your archive or image</source>
-        <translation type="vanished">Select Recordings for your archive or image</translation>
-    </message>
-    <message>
-        <source>Select a destination for your archive or image</source>
-        <translation type="vanished">Select a destination for your archive or image</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="188"/>
         <source>Select thumb image:</source>
         <translation>Select thumbnail image:</translation>
@@ -1618,21 +1449,9 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Select your DVD menu theme</translation>
     </message>
     <message>
-        <source>Selected Items to be archived</source>
-        <translation type="vanished">Selected Items to be archived</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="190"/>
         <source>Selected Items to be burned</source>
         <translation>Selected Items to be burned</translation>
-    </message>
-    <message>
-        <source>Selected recording item size: %1</source>
-        <translation type="vanished">Selected recording item size: %1</translation>
-    </message>
-    <message>
-        <source>Selected video item size: %1</source>
-        <translation type="vanished">Selected video item size: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="191"/>
@@ -1773,17 +1592,9 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Video Category:</translation>
     </message>
     <message>
-        <source>Video category:</source>
-        <translation type="vanished">Video category:</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="226"/>
         <source>Videos</source>
         <translation>Videos</translation>
-    </message>
-    <message>
-        <source>View progress of your archive or image</source>
-        <translation type="vanished">View progress of your archive or image</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="227"/>
@@ -1796,25 +1607,9 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>XML File to Import</translation>
     </message>
     <message>
-        <source>decrease seek amount</source>
-        <translation type="vanished">decrease seek amount</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="230"/>
         <source>frame</source>
         <translation>frame</translation>
-    </message>
-    <message>
-        <source>increase seek amount</source>
-        <translation type="vanished">increase seek amount</translation>
-    </message>
-    <message>
-        <source>move left</source>
-        <translation type="vanished">move left</translation>
-    </message>
-    <message>
-        <source>move right</source>
-        <translation type="vanished">move right</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="231"/>
@@ -1900,11 +1695,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <translation>Intro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
-        <source>Main Menu</source>
-        <translation>Main Menu</translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="61"/>
         <source>Chapter Menu</source>
         <translation>Chapter Menu</translation>
@@ -1953,11 +1743,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="238"/>
         <source>xxxxx mb</source>
         <translation>xxxxx MB</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>Archive Item Details</source>
-        <translation>Archive Item Details</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="215"/>
@@ -2053,11 +1838,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="177"/>
         <source>Select Associated Channel</source>
         <translation>Select Associated Channel</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="38"/>
-        <source>Archived Channel</source>
-        <translation>Archived Channel</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
@@ -2173,11 +1953,6 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
         <location filename="themestrings.h" line="156"/>
         <source>Parental Level: %1</source>
         <translation>Parental Level: %1</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="34"/>
-        <source>Archive Items</source>
-        <translation>Archive Items</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="165"/>

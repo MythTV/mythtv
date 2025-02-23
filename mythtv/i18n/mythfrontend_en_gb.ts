@@ -2348,10 +2348,6 @@ Check if the video exists</translation>
         <translation>Enable (recommended) to supply full range RGB output to your display device. Disable to supply limited range RGB output. This setting applies to both the GUI and media playback. Ideally the value of this setting should match a similar setting on your TV or monitor.</translation>
     </message>
     <message>
-        <source>Language</source>
-        <translation type="vanished">Language</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3254"/>
         <source>Your preferred language for the user interface.</source>
         <translation>Your preferred language for the user interface.</translation>
@@ -4430,14 +4426,6 @@ Device supports up to %1</translation>
         <location filename="../libs/libmyth/dbsettings.cpp" line="36"/>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
         <translation>The hostname or IP address of the machine hosting the database. This information is required.</translation>
-    </message>
-    <message>
-        <source>Ping test server?</source>
-        <translation type="vanished">Ping test server?</translation>
-    </message>
-    <message>
-        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="vanished">Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="46"/>
@@ -8581,11 +8569,6 @@ Please wait...</translation>
         <translation>No matches found for &quot;%1&quot;</translation>
     </message>
     <message>
-        <source>Downloading %1 of %2</source>
-        <extracomment>%1 is the current channel position, * %2 is the total number of channels,</extracomment>
-        <translation type="vanished">Downloading %1 of %2</translation>
-    </message>
-    <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="481"/>
         <source>No matches found for %1</source>
         <translation>No matches found for %1</translation>
@@ -8613,7 +8596,7 @@ Please wait...</translation>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="407"/>
         <source>Downloading %1 (%2 of %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloading %1 (%2 of %3)</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythtv-setup/importicons.cpp" line="420"/>
@@ -9482,12 +9465,12 @@ Please wait...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2128"/>
         <source>CEC Device</source>
-        <translation type="unfinished"></translation>
+        <translation>CEC Device</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2132"/>
         <source>CEC Device. Default is /dev/cec0 if you have only 1 HDMI output port.</source>
-        <translation type="unfinished"></translation>
+        <translation>CEC Device. Default is /dev/cec0 if you have only 1 HDMI output port.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2145"/>
@@ -11065,7 +11048,7 @@ Please wait...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="855"/>
         <source>Display list of cast members</source>
-        <translation type="unfinished"></translation>
+        <translation>Display list of cast members</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="879"/>
@@ -15430,12 +15413,12 @@ name cannot be blank.</translation>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="232"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort/Group Options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="235"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort/Group</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="236"/>
@@ -15517,27 +15500,27 @@ name cannot be blank.</translation>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6601"/>
         <source>None</source>
-        <translation type="unfinished">None</translation>
+        <translation>None</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6603"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Channel Number</translation>
+        <translation>Channel Number</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6605"/>
         <source>CallSign</source>
-        <translation type="unfinished"></translation>
+        <translation>CallSign</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6607"/>
         <source>ProgramId</source>
-        <translation type="unfinished"></translation>
+        <translation>ProgramId</translation>
     </message>
     <message>
         <location filename="../libs/libmythbase/programinfo.cpp" line="6609"/>
         <source>Unknown</source>
-        <translation type="unfinished">Unknown</translation>
+        <translation>Unknown</translation>
     </message>
 </context>
 <context>
@@ -15618,7 +15601,7 @@ name cannot be blank.</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="337"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort/Group Options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="382"/>
@@ -15662,10 +15645,6 @@ name cannot be blank.</translation>
         <translation>Choose Search Phrase...</translation>
     </message>
     <message>
-        <source>Sort</source>
-        <translation type="vanished">Sort</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="360"/>
         <source>Record</source>
         <translation>Record</translation>
@@ -15701,10 +15680,6 @@ name cannot be blank.</translation>
         <translation>Cancel</translation>
     </message>
     <message>
-        <source>Sort Options</source>
-        <translation type="vanished">Sort Options</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="339"/>
         <source>Reverse Sort Order</source>
         <translation>Reverse Sort Order</translation>
@@ -15722,7 +15697,7 @@ name cannot be blank.</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="357"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort/Group</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="364"/>
@@ -21742,25 +21717,25 @@ Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connect
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="571"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="604"/>
         <source>Group By Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Group By Channel Number</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="573"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="605"/>
         <source>Group By Call Sign</source>
-        <translation type="unfinished"></translation>
+        <translation>Group By Call Sign</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="575"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="606"/>
         <source>Group By Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Group By Program ID</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="577"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="607"/>
         <source>Group By None</source>
-        <translation type="unfinished"></translation>
+        <translation>Group By None</translation>
     </message>
 </context>
 <context>
@@ -22280,7 +22255,7 @@ is located in %2</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="873"/>
         <source>Input %1: %2</source>
-        <translation type="unfinished">Input %1 %2: %2 {1:?}</translation>
+        <translation>Input %1: %2</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="888"/>
@@ -22569,10 +22544,6 @@ is located in %2</translation>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="865"/>
         <source>%1 available</source>
         <translation>%1 available</translation>
-    </message>
-    <message>
-        <source>Input %1 %2: %3</source>
-        <translation type="vanished">Input %1 %2: %3</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="874"/>
@@ -23026,7 +22997,7 @@ Directory From Storage Group?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="2503"/>
         <source>Last Program: &quot;%1&quot; Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Last Program: &quot;%1&quot; Doesn&apos;t Exist</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="7142"/>
@@ -23241,7 +23212,7 @@ Do you wish to continue watching?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9432"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9656"/>
         <source>Cast</source>
-        <translation type="unfinished">Cast</translation>
+        <translation>Cast</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9396"/>
@@ -23576,10 +23547,6 @@ Do you wish to continue watching?</translation>
         <translation>End Of Recording</translation>
     </message>
     <message>
-        <source>Last Program: %1 Doesn&apos;t Exist</source>
-        <translation type="vanished">Last Programme: %1 Doesn&apos;t Exist</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="6726"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="7033"/>
         <source>DVD</source>
@@ -23855,12 +23822,12 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9433"/>
         <source>Recorded</source>
-        <translation type="unfinished">Recorded</translation>
+        <translation>Recorded</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9434"/>
         <source>Upcoming</source>
-        <translation type="unfinished">Upcoming</translation>
+        <translation>Upcoming</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9438"/>
@@ -23983,17 +23950,17 @@ Do you wish to continue watching?</translation>
 <context>
     <name>ThemeChooser</name>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="521"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="497"/>
         <source>Theme Chooser Menu</source>
         <translation>Theme Chooser Menu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="543"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="519"/>
         <source>Hide Fullscreen Preview</source>
         <translation>Hide Fullscreen Preview</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="548"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="524"/>
         <source>Show Fullscreen Preview</source>
         <translation>Show Fullscreen Preview</translation>
     </message>
@@ -24003,113 +23970,113 @@ Do you wish to continue watching?</translation>
         <translation>Loading Installed Themes</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="285"/>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="297"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="261"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="273"/>
         <source>Unable to create &apos;%1&apos;</source>
         <translation>Unable to create &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="289"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="265"/>
         <source>Refreshing Downloadable Themes Information</source>
         <translation>Refreshing Downloadable Themes Information</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="294"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="270"/>
         <source>Unable to remove &apos;%1&apos;</source>
         <translation>Unable to remove &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="302"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="278"/>
         <source>Extracting Downloadable Themes Information</source>
         <translation>Extracting Downloadable Themes Information</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="316"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="292"/>
         <source>Failed to download &apos;%1&apos;</source>
         <translation>Failed to download &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="322"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="298"/>
         <source>Failed to unzip &apos;%1&apos; to &apos;%2&apos;</source>
         <translation>Failed to unzip &apos;%1&apos; to &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="337"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="313"/>
         <source>Loading Downloadable Themes</source>
         <translation>Loading Downloadable Themes</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="483"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="459"/>
         <source>Error creating test file, %1 themes directory is not writable.</source>
         <translation>Error creating test file, %1 themes directory is not writable.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="553"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="529"/>
         <source>Refresh Downloadable Themes</source>
         <translation>Refresh Downloadable Themes</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="563"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="539"/>
         <source>Select Theme</source>
         <translation>Select Theme</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="567"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="543"/>
         <source>Delete Theme</source>
         <translation>Delete Theme</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="574"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="550"/>
         <source>Disable Theme Update Notifications</source>
         <translation>Disable Theme Update Notifications</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="579"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="555"/>
         <source>Enable Theme Update Notifications</source>
         <translation>Enable Theme Update Notifications</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="699"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="675"/>
         <source>Unable to install theme, %1 themes directory is not writable.</source>
         <translation>Unable to install theme, %1 themes directory is not writable.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="726"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="702"/>
         <source>Downloading %1 Theme</source>
         <translation>Downloading %1 Theme</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="879"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="855"/>
         <source>Copying %1 Theme Package</source>
         <translation>Copying %1 Theme Package</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="888"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="864"/>
         <source>ERROR downloading theme package on master backend.</source>
         <translation>ERROR downloading theme package on master backend.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="911"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="887"/>
         <source>Installing %1 Theme</source>
         <translation>Installing %1 Theme</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="917"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="893"/>
         <source>ERROR downloading theme package from frontend.</source>
         <translation>ERROR downloading theme package from frontend.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="957"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="933"/>
         <source>Error, no theme selected.</source>
         <translation>Error, no theme selected.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="964"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="940"/>
         <source>Error, unable to find current theme.</source>
         <translation>Error, unable to find current theme.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="970"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="946"/>
         <source>%1 is not a user-installed theme and can not be deleted.</source>
         <translation>%1 is not a user-installed theme and can not be deleted.</translation>
     </message>
@@ -25415,10 +25382,6 @@ Do you wish to continue watching?</translation>
         <translation>%Director: |director%</translation>
     </message>
     <message>
-        <source>% - |year%% - |length%</source>
-        <translation type="vanished">% - |year%% - |length%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="8"/>
         <source>%(|USERRATING)%</source>
         <translation>%(|USERRATING)%</translation>
@@ -25797,10 +25760,6 @@ Do you wish to continue watching?</translation>
         <translation>%TITLE% %|(CATEGORY|)%</translation>
     </message>
     <message>
-        <source>%TITLE% - %ARTIST% %(|ALBUM|)%</source>
-        <translation type="vanished">%TITLE% - %ARTIST% %(|ALBUM|)%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="130"/>
         <source>%TITLE% - %SUBTITLE%</source>
         <translation>%TITLE% - %SUBTITLE%</translation>
@@ -25944,35 +25903,9 @@ Do you wish to continue watching?</translation>
 %%description%</translation>
     </message>
     <message>
-        <source>%album% %(|year|)%</source>
-        <translation type="vanished">%album% %(|year|)%</translation>
-    </message>
-    <message>
-        <source>%artist% - %title%</source>
-        <translation type="vanished">%artist% - %title%</translation>
-    </message>
-    <message>
-        <source>%buttontext%</source>
-        <translation type="vanished">%buttontext%</translation>
-    </message>
-    <message>
-        <source>%buttontext%
-%time%</source>
-        <translation type="vanished">%buttontext%
-%time%</translation>
-    </message>
-    <message>
-        <source>%callsign%  (Priority: %priority%)</source>
-        <translation type="vanished">%callsign%  (Priority: %priority%)</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="180"/>
         <source>%cast%</source>
         <translation>%cast%</translation>
-    </message>
-    <message>
-        <source>%channel%</source>
-        <translation type="vanished">%channel%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="182"/>
@@ -26000,25 +25933,9 @@ Do you wish to continue watching?</translation>
         <translation>%filesize_str% of %storagegroup% Storage</translation>
     </message>
     <message>
-        <source>%lastplayed% (played: %playcount% times)</source>
-        <translation type="vanished">%lastplayed% (played: %playcount% times)</translation>
-    </message>
-    <message>
-        <source>%lenmins%</source>
-        <translation type="vanished">%lenmins%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="189"/>
         <source>%longchannel%  |  %filesize_str% of %storagegroup% Storage</source>
         <translation>%longchannel%  |  %filesize_str% of %storagegroup% Storage</translation>
-    </message>
-    <message>
-        <source>%longchannel% - %timedate%</source>
-        <translation type="vanished">%longchannel% - %timedate%</translation>
-    </message>
-    <message>
-        <source>%longchannel% - %titlesubtitle%</source>
-        <translation type="vanished">%longchannel% - %titlesubtitle%</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="191"/>
@@ -26053,14 +25970,6 @@ Do you wish to continue watching?</translation>
         </translation>
     </message>
     <message>
-        <source>%playlistplayedtime% of %playlisttotaltime%</source>
-        <translation type="vanished">%playlistplayedtime% of %playlisttotaltime%</translation>
-    </message>
-    <message>
-        <source>%progpriority% / %finalpriority%</source>
-        <translation type="vanished">%progpriority% / %finalpriority%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="198"/>
         <source>%rating |USERRATING%</source>
         <translation>%rating |USERRATING%</translation>
@@ -26071,10 +25980,6 @@ Do you wish to continue watching?</translation>
         <translation>%recordedpercent%</translation>
     </message>
     <message>
-        <source>%rectypechar% - %titlesubtitle%</source>
-        <translation type="vanished">%rectypechar% - %titlesubtitle%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="200"/>
         <source>%rectypestatus% on card number %card%</source>
         <translation>%rectypestatus% on card number %card%</translation>
@@ -26083,20 +25988,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="201"/>
         <source>%rectypestatus%% on card number |card%</source>
         <translation>%rectypestatus%% on card number |card%</translation>
-    </message>
-    <message>
-        <source>%shortstarttimedate% | %titlesubtitle%</source>
-        <translation type="vanished">%shortstarttimedate% | %titlesubtitle%</translation>
-    </message>
-    <message>
-        <source>%shortstarttimedate% | %titlesubtitle% | %channel%</source>
-        <translation type="vanished">%shortstarttimedate% | %titlesubtitle% | %channel%</translation>
-    </message>
-    <message>
-        <source>%startdate%% - |00x00%
-%title%</source>
-        <translation type="vanished">%startdate%% - |00x00%
-%title%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="204"/>
@@ -26114,17 +26005,9 @@ Do you wish to continue watching?</translation>
         <translation>%startdate%, %starttime%</translation>
     </message>
     <message>
-        <source>%station% - %channel%</source>
-        <translation type="vanished">%station% - %channel%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="209"/>
         <source>%time%</source>
         <translation>%time%</translation>
-    </message>
-    <message>
-        <source>%timedate% (%channel%)</source>
-        <translation type="vanished">%timedate% (%channel%)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="210"/>
@@ -26137,25 +26020,9 @@ Do you wish to continue watching?</translation>
         <translation>%timedate% (%lenmins%) - %channel%</translation>
     </message>
     <message>
-        <source>%timedate% - %description%</source>
-        <translation type="vanished">%timedate% - %description%</translation>
-    </message>
-    <message>
-        <source>%title%</source>
-        <translation type="vanished">%title%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="213"/>
         <source>%title%  |  %timedate% on %channel%</source>
         <translation>%title%  |  %timedate% on %channel%</translation>
-    </message>
-    <message>
-        <source>%title%% - |artist%</source>
-        <translation type="vanished">%title%% - |artist%</translation>
-    </message>
-    <message>
-        <source>%title%% - |subtitle%</source>
-        <translation type="vanished">%title%% - |subtitle%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="216"/>
@@ -26163,26 +26030,14 @@ Do you wish to continue watching?</translation>
         <translation>%titlesubtitle%</translation>
     </message>
     <message>
-        <source>%titlesubtitle%  (Priority: %progpriority% / %finalpriority%)</source>
-        <translation type="vanished">%titlesubtitle%  (Priority: %progpriority% / %finalpriority%)</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="217"/>
         <source>%titlesubtitle%  |  %timedate% (%lenmins%)</source>
         <translation>%titlesubtitle%  |  %timedate% (%lenmins%)</translation>
     </message>
     <message>
-        <source>%userrating%</source>
-        <translation type="vanished">%userrating%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="218"/>
         <source>%userrating|/10%</source>
         <translation>%userrating|/10%</translation>
-    </message>
-    <message>
-        <source>%volume% %(|mute|)%</source>
-        <translation type="vanished">%volume% %(|mute|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="219"/>
@@ -26230,25 +26085,6 @@ Do you wish to continue watching?</translation>
         <translation>(%STARTTIME% - %ENDTIME%)  %LENMINS%</translation>
     </message>
     <message>
-        <source>(%card%)</source>
-        <translation type="vanished">(%card%)</translation>
-    </message>
-    <message numerus="yes">
-        <source>(%channum%) %name% - %sourcename%</source>
-        <translation type="vanished">
-            <numerusform>(%channum%) %name% - %sourcename%</numerusform>
-            <numerusform>(%channum%) %name% - %sourcename%</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>(%statusbefore%) -&gt; (%statusafter%)</source>
-        <translation type="vanished">(%statusbefore%) -&gt; (%statusafter%)</translation>
-    </message>
-    <message>
-        <source>(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% on %channel%</source>
-        <translation type="vanished">(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% on %channel%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="247"/>
         <source>(1) Channel    (2) Priority</source>
         <translation>(1) Channel    (2) Priority</translation>
@@ -26264,21 +26100,9 @@ Do you wish to continue watching?</translation>
         <translation>(4) Programme Guide   **(6) Programme Finder **</translation>
     </message>
     <message>
-        <source>0</source>
-        <translation type="vanished">0</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="260"/>
         <source>0 Stars</source>
         <translation>0 Stars</translation>
-    </message>
-    <message>
-        <source>0.0</source>
-        <translation type="vanished">0.0</translation>
-    </message>
-    <message>
-        <source>0.5</source>
-        <translation type="vanished">0.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="263"/>
@@ -26289,14 +26113,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="265"/>
         <source>1 Star</source>
         <translation>1 Star</translation>
-    </message>
-    <message>
-        <source>1.0</source>
-        <translation type="vanished">1.0</translation>
-    </message>
-    <message>
-        <source>1.5</source>
-        <translation type="vanished">1.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="268"/>
@@ -26314,25 +26130,9 @@ Do you wish to continue watching?</translation>
         <translation>2 Stars</translation>
     </message>
     <message>
-        <source>2.0</source>
-        <translation type="vanished">2.0</translation>
-    </message>
-    <message>
-        <source>2.5</source>
-        <translation type="vanished">2.5</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="277"/>
         <source>3 Stars</source>
         <translation>3 Stars</translation>
-    </message>
-    <message>
-        <source>3.0</source>
-        <translation type="vanished">3.0</translation>
-    </message>
-    <message>
-        <source>3.5</source>
-        <translation type="vanished">3.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="280"/>
@@ -26340,21 +26140,9 @@ Do you wish to continue watching?</translation>
         <translation>4 Stars</translation>
     </message>
     <message>
-        <source>4.0</source>
-        <translation type="vanished">4.0</translation>
-    </message>
-    <message>
-        <source>4.5</source>
-        <translation type="vanished">4.5</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="282"/>
         <source>5 Stars</source>
         <translation>5 Stars</translation>
-    </message>
-    <message>
-        <source>5.0</source>
-        <translation type="vanished">5.0</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="284"/>
@@ -26472,10 +26260,6 @@ Do you wish to continue watching?</translation>
         <translation>Aired:</translation>
     </message>
     <message>
-        <source>Album:</source>
-        <translation type="vanished">Album:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="344"/>
         <source>All programs alphabetically sorted</source>
         <translation>All programmes alphabetically sorted</translation>
@@ -26516,14 +26300,6 @@ Do you wish to continue watching?</translation>
         <translation>Archives</translation>
     </message>
     <message>
-        <source>Article item:</source>
-        <translation type="vanished">Article item:</translation>
-    </message>
-    <message>
-        <source>Artist:</source>
-        <translation type="vanished">Artist:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="363"/>
         <source>Artwork Results</source>
         <translation>Artwork Results</translation>
@@ -26552,10 +26328,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="371"/>
         <source>Aspect:</source>
         <translation>Aspect:</translation>
-    </message>
-    <message>
-        <source>Aspect: %1</source>
-        <translation type="vanished">Aspect: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="373"/>
@@ -26596,10 +26368,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="385"/>
         <source>Audio codec:</source>
         <translation>Audio codec:</translation>
-    </message>
-    <message>
-        <source>Audio volume:</source>
-        <translation type="vanished">Audio volume:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="386"/>
@@ -26695,14 +26463,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="404"/>
         <source>Auto Extend:</source>
         <translation>Auto Extend:</translation>
-    </message>
-    <message>
-        <source>Auto expire:</source>
-        <translation type="vanished">Auto expire:</translation>
-    </message>
-    <message>
-        <source>Automatically Extend:</source>
-        <translation type="vanished">Automatically Extend:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="410"/>
@@ -26895,10 +26655,6 @@ Do you wish to continue watching?</translation>
         <translation>Captions</translation>
     </message>
     <message>
-        <source>Card: %card%</source>
-        <translation type="vanished">Card: %card%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="499"/>
         <source>Cards</source>
         <translation>Cards</translation>
@@ -26942,14 +26698,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="526"/>
         <source>Change recording group password</source>
         <translation>Change recording group password</translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation type="vanished">Change:</translation>
-    </message>
-    <message>
-        <source>Channel Rec Priority</source>
-        <translation type="vanished">Channel Rec Priority</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="542"/>
@@ -27000,10 +26748,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="556"/>
         <source>Choose a Theme</source>
         <translation>Choose a Theme</translation>
-    </message>
-    <message>
-        <source>Choose a local theme or download new</source>
-        <translation type="vanished">Choose a local theme or download new</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="561"/>
@@ -27236,10 +26980,6 @@ Do you wish to continue watching?</translation>
         <translation>Context:</translation>
     </message>
     <message>
-        <source>Controls:</source>
-        <translation type="vanished">Controls:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="646"/>
         <source>Core Setup</source>
         <translation>Core Setup</translation>
@@ -27265,25 +27005,9 @@ Do you wish to continue watching?</translation>
         <translation>Coverfile:</translation>
     </message>
     <message>
-        <source>Create advanced recording rules</source>
-        <translation type="vanished">Create advanced recording rules</translation>
-    </message>
-    <message>
-        <source>Current Rule Phrase:</source>
-        <translation type="vanished">Current Rule Phrase:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="667"/>
         <source>Current View:</source>
         <translation>Current View:</translation>
-    </message>
-    <message>
-        <source>Current phrase to search for:</source>
-        <translation type="vanished">Current phrase to search for:</translation>
-    </message>
-    <message>
-        <source>Currently Playing:</source>
-        <translation type="vanished">Currently Playing:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="670"/>
@@ -27324,10 +27048,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="684"/>
         <source>Customize your grabber settings</source>
         <translation>Customise your grabber settings</translation>
-    </message>
-    <message>
-        <source>Customize your recording schedule</source>
-        <translation type="vanished">Customise your recording schedule</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="685"/>
@@ -27390,10 +27110,6 @@ Do you wish to continue watching?</translation>
         <translation>Delete Rule</translation>
     </message>
     <message>
-        <source>Delete system Profile</source>
-        <translation type="vanished">Delete system Profile</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="716"/>
         <source>Detailed information about your video</source>
         <translation>Detailed information about your video</translation>
@@ -27429,10 +27145,6 @@ Do you wish to continue watching?</translation>
         <translation>Director</translation>
     </message>
     <message>
-        <source>Director: %director% - %length%</source>
-        <translation type="vanished">Director: %director% - %length%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="728"/>
         <source>Directories</source>
         <translation>Directories</translation>
@@ -27448,14 +27160,6 @@ Do you wish to continue watching?</translation>
         <translation>Disks</translation>
     </message>
     <message>
-        <source>Download icons</source>
-        <translation type="vanished">Download icons</translation>
-    </message>
-    <message>
-        <source>Download status</source>
-        <translation type="vanished">Download status</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="738"/>
         <source>Downloadable</source>
         <translation>Downloadable</translation>
@@ -27469,14 +27173,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="744"/>
         <source>Duplicate Scope:</source>
         <translation>Duplicate Scope:</translation>
-    </message>
-    <message>
-        <source>Duplication Methode:</source>
-        <translation type="vanished">Duplicate Method:</translation>
-    </message>
-    <message>
-        <source>Duplication Scope:</source>
-        <translation type="vanished">Duplicate Scope:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="745"/>
@@ -27497,14 +27193,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="757"/>
         <source>Edit Metadata Information</source>
         <translation>Edit Metadata Information</translation>
-    </message>
-    <message>
-        <source>Edit Powersearch</source>
-        <translation type="vanished">Edit Power Search</translation>
-    </message>
-    <message>
-        <source>Edit System events</source>
-        <translation type="vanished">Edit System events</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="765"/>
@@ -27545,10 +27233,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="777"/>
         <source>Eject optical from drive</source>
         <translation>Eject optical from drive</translation>
-    </message>
-    <message>
-        <source>End late:</source>
-        <translation type="vanished">End late:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="791"/>
@@ -27666,14 +27350,6 @@ Do you wish to continue watching?</translation>
         <translation>File Size:</translation>
     </message>
     <message>
-        <source>File browser</source>
-        <translation type="vanished">File Browser</translation>
-    </message>
-    <message>
-        <source>File info:</source>
-        <translation type="vanished">File Info:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="836"/>
         <source>FileBrowser</source>
         <translation>File Browser</translation>
@@ -27702,10 +27378,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="849"/>
         <source>Filters</source>
         <translation>Filters</translation>
-    </message>
-    <message>
-        <source>Filters you can apply:</source>
-        <translation type="vanished">Filters you can apply:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="852"/>
@@ -27798,10 +27470,6 @@ Do you wish to continue watching?</translation>
         <translation>Group your favourite</translation>
     </message>
     <message>
-        <source>Grouplist item:</source>
-        <translation type="vanished">Grouplist item:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="927"/>
         <source>Groups</source>
         <translation>Groups</translation>
@@ -27845,14 +27513,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="941"/>
         <source>Hide Channels without channel number</source>
         <translation>Hide Channels without channel number</translation>
-    </message>
-    <message>
-        <source>Hide Channels without channel number:</source>
-        <translation type="vanished">Hide Channels without channel number:</translation>
-    </message>
-    <message>
-        <source>IMDB</source>
-        <translation type="vanished">IMDB</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="952"/>
@@ -28000,14 +27660,6 @@ Do you wish to continue watching?</translation>
         <translation>Keys</translation>
     </message>
     <message>
-        <source>Language:</source>
-        <translation type="vanished">Language:</translation>
-    </message>
-    <message>
-        <source>Last Played:</source>
-        <translation type="vanished">Last Played:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1025"/>
         <source>Last Recorded:</source>
         <translation>Last Recorded:</translation>
@@ -28023,21 +27675,9 @@ Do you wish to continue watching?</translation>
         <translation>Last: %statusbefore%</translation>
     </message>
     <message>
-        <source>Lenght</source>
-        <translation type="vanished">Lenght</translation>
-    </message>
-    <message>
-        <source>Level</source>
-        <translation type="vanished">Level</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1033"/>
         <source>List Overview</source>
         <translation>List Overview</translation>
-    </message>
-    <message>
-        <source>List item:</source>
-        <translation type="vanished">List item:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1034"/>
@@ -28102,10 +27742,6 @@ Do you wish to continue watching?</translation>
         <translation>Local Search</translation>
     </message>
     <message>
-        <source>Locally installed</source>
-        <translation type="vanished">Locally installed</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1055"/>
         <source>Location and sources for</source>
         <translation>Location and sources for</translation>
@@ -28136,10 +27772,6 @@ Do you wish to continue watching?</translation>
         <translation>Looks</translation>
     </message>
     <message>
-        <source>MANAGE RECORDING RULES</source>
-        <translation type="vanished">MANAGE RECORDING RULES</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1068"/>
         <source>MONO</source>
         <translation>MONO</translation>
@@ -28158,10 +27790,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1085"/>
         <source>Master backend failed to wake.</source>
         <translation>Master backend failed to wake.</translation>
-    </message>
-    <message>
-        <source>Max episodes:</source>
-        <translation type="vanished">Max episodes:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1088"/>
@@ -28204,17 +27832,9 @@ Do you wish to continue watching?</translation>
         <translation>Metadata Editor</translation>
     </message>
     <message>
-        <source>Metadata OPTIONS</source>
-        <translation type="vanished">Metadata OPTIONS</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1103"/>
         <source>Metadata settings</source>
         <translation>Metadata settings</translation>
-    </message>
-    <message>
-        <source>Minutes</source>
-        <translation type="vanished">Minutes</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1109"/>
@@ -28267,26 +27887,6 @@ Do you wish to continue watching?</translation>
         <translation>Mute</translation>
     </message>
     <message>
-        <source>My audio subsystem supports DTS-HD:</source>
-        <translation type="vanished">My audio subsystem supports DTS-HD:</translation>
-    </message>
-    <message>
-        <source>My audio subsystem supports DTS:</source>
-        <translation type="vanished">My audio subsystem supports DTS:</translation>
-    </message>
-    <message>
-        <source>My audio subsystem supports Dolby Digital:</source>
-        <translation type="vanished">My audio subsystem supports Dolby Digital:</translation>
-    </message>
-    <message>
-        <source>My audio subsystem supports E-AC-3:</source>
-        <translation type="vanished">My audio subsystem supports E-AC-3:</translation>
-    </message>
-    <message>
-        <source>My audio subsystem supports TrueHD:</source>
-        <translation type="vanished">My audio subsystem supports TrueHD:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1146"/>
         <source>MythTV Settings</source>
         <translation>MythTV Settings</translation>
@@ -28327,10 +27927,6 @@ Do you wish to continue watching?</translation>
         <translation>Navigation</translation>
     </message>
     <message>
-        <source>Navigation control:</source>
-        <translation type="vanished">Navigation control:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1162"/>
         <source>New Password</source>
         <translation>New Password</translation>
@@ -28344,10 +27940,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1167"/>
         <source>News</source>
         <translation>News</translation>
-    </message>
-    <message>
-        <source>Next Song:</source>
-        <translation type="vanished">Next Song:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1177"/>
@@ -28365,10 +27957,6 @@ Do you wish to continue watching?</translation>
         <translation>No extra info available</translation>
     </message>
     <message>
-        <source>No listings found for this program search.</source>
-        <translation type="vanished">No listings found for this programme search.</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1186"/>
         <source>No resolution specified</source>
         <translation>No resolution specified</translation>
@@ -28379,21 +27967,9 @@ Do you wish to continue watching?</translation>
         <translation>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Change.&quot;</translation>
     </message>
     <message>
-        <source>No volume controls configured</source>
-        <translation type="vanished">No volume controls configured</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1199"/>
         <source>Not applicable</source>
         <translation>Not applicable</translation>
-    </message>
-    <message>
-        <source>Not recorded yet</source>
-        <translation type="vanished">Not recorded yet</translation>
-    </message>
-    <message>
-        <source>Not sure which screen this is:</source>
-        <translation type="vanished">Not sure which screen this is:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1200"/>
@@ -28431,18 +28007,6 @@ Do you wish to continue watching?</translation>
         <translation>Online Fanart</translation>
     </message>
     <message>
-        <source>Optional category:</source>
-        <translation type="vanished">Optional category:</translation>
-    </message>
-    <message>
-        <source>Optional channel:</source>
-        <translation type="vanished">Optional channel:</translation>
-    </message>
-    <message>
-        <source>Optional genre:</source>
-        <translation type="vanished">Optional genre:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1226"/>
         <source>Options</source>
         <translation>Options</translation>
@@ -28453,33 +28017,9 @@ Do you wish to continue watching?</translation>
         <translation>Order By:</translation>
     </message>
     <message>
-        <source>P</source>
-        <translation type="vanished">P</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1233"/>
         <source>PLAYLIST</source>
         <translation>PLAYLIST</translation>
-    </message>
-    <message>
-        <source>POSTPROCESSING OPTIONS</source>
-        <translation type="vanished">POSTPROCESSING OPTIONS</translation>
-    </message>
-    <message>
-        <source>PROGRAM DETAILS</source>
-        <translation type="vanished">PROGRAMME DETAILS</translation>
-    </message>
-    <message>
-        <source>PROGRAM GUIDE</source>
-        <translation type="vanished">PROGRAMME GUIDE</translation>
-    </message>
-    <message>
-        <source>PROGRAM LIST</source>
-        <translation type="vanished">PROGRAMME LIST</translation>
-    </message>
-    <message>
-        <source>PROGRAM SEARCH</source>
-        <translation type="vanished">PROGRAMME SEARCH</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1234"/>
@@ -28495,10 +28035,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1252"/>
         <source>Pause</source>
         <translation>Pause</translation>
-    </message>
-    <message>
-        <source>Perform daily updates of recording artwork:</source>
-        <translation type="vanished">Perform daily updates of recording artwork:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1257"/>
@@ -28561,10 +28097,6 @@ Do you wish to continue watching?</translation>
         <translation>Play any of your recorded programmes</translation>
     </message>
     <message>
-        <source>Play group:</source>
-        <translation type="vanished">Playback group:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1299"/>
         <source>Play next</source>
         <translation>Play next</translation>
@@ -28593,22 +28125,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1319"/>
         <source>Player:</source>
         <translation>Player:</translation>
-    </message>
-    <message>
-        <source>Playlist duration:</source>
-        <translation type="vanished">Playlist duration:</translation>
-    </message>
-    <message>
-        <source>Playlist item:</source>
-        <translation type="vanished">Playlist item:</translation>
-    </message>
-    <message>
-        <source>Playlist position:</source>
-        <translation type="vanished">Playlist position:</translation>
-    </message>
-    <message>
-        <source>Playlist progress:</source>
-        <translation type="vanished">Playlist progress:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1320"/>
@@ -28641,10 +28157,6 @@ Do you wish to continue watching?</translation>
         <translation>Post Processing Options Editor</translation>
     </message>
     <message>
-        <source>Post processing</source>
-        <translation type="vanished">Post Processing</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1335"/>
         <source>Post-Processing Options</source>
         <translation>Post-Processing Options</translation>
@@ -28655,17 +28167,9 @@ Do you wish to continue watching?</translation>
         <translation>Power Search</translation>
     </message>
     <message>
-        <source>Powersearch</source>
-        <translation type="vanished">Power Search</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1337"/>
         <source>PreRecorded</source>
         <translation>Pre-Recorded</translation>
-    </message>
-    <message>
-        <source>Press &apos;up&apos;, &apos;down, &apos;left&apos; and &apos;right&apos; arrows to move through the files and folders. Press &apos;select&apos; or &apos;enter&apos; key to select the file or folder.</source>
-        <translation type="vanished">Press &apos;up&apos;, &apos;down, &apos;left&apos; and &apos;right&apos; arrows to move through the files and folders. Press &apos;select&apos; or &apos;enter&apos; key to select the file or folder.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1345"/>
@@ -28678,17 +28182,9 @@ Do you wish to continue watching?</translation>
         <translation>Priorities</translation>
     </message>
     <message>
-        <source>Prioritize some shows over others</source>
-        <translation type="vanished">Prioritise some shows over others</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1354"/>
         <source>Priority:  %1</source>
         <translation>Priority:  %1</translation>
-    </message>
-    <message>
-        <source>Priority: %finalpriority%</source>
-        <translation type="vanished">Priority: %finalpriority%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1355"/>
@@ -28699,10 +28195,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1357"/>
         <source>Profile</source>
         <translation>Profile</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation type="vanished">Profile:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1358"/>
@@ -28725,10 +28217,6 @@ Do you wish to continue watching?</translation>
         <translation>Programme Searches</translation>
     </message>
     <message>
-        <source>Programid</source>
-        <translation type="vanished">Programid</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1371"/>
         <source>Programme Finder</source>
         <translation>Programme Finder</translation>
@@ -28747,10 +28235,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1377"/>
         <source>Quality:</source>
         <translation>Quality:</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <translation type="vanished">R</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1378"/>
@@ -28826,10 +28310,6 @@ Do you wish to continue watching?</translation>
         <translation>Recording Type:</translation>
     </message>
     <message>
-        <source>Recording Group</source>
-        <translation type="vanished">Recording Group</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1409"/>
         <source>Recording Group: %1</source>
         <translation>Recording Group: %1</translation>
@@ -28838,10 +28318,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1410"/>
         <source>Recording Groups</source>
         <translation>Recording Groups</translation>
-    </message>
-    <message>
-        <source>Recording Priority</source>
-        <translation type="vanished">Recording Priority</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1413"/>
@@ -28854,21 +28330,9 @@ Do you wish to continue watching?</translation>
         <translation>Recording Rule Active:</translation>
     </message>
     <message>
-        <source>Recording Status</source>
-        <translation type="vanished">Recording Status</translation>
-    </message>
-    <message>
-        <source>Recording Type</source>
-        <translation type="vanished">Recording Type</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1418"/>
         <source>Recording details</source>
         <translation>Recording Details</translation>
-    </message>
-    <message>
-        <source>Recording group:</source>
-        <translation type="vanished">Recording Group:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1419"/>
@@ -28974,10 +28438,6 @@ Do you wish to continue watching?</translation>
         <translation>Resolution:</translation>
     </message>
     <message>
-        <source>Resolution: %1</source>
-        <translation type="vanished">Resolution: %1</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1444"/>
         <source>Resolution: %resolution% - %aspect| 
 %%DESCRIPTION%</source>
@@ -29020,29 +28480,9 @@ Do you wish to continue watching?</translation>
         <translation>Rule Overview</translation>
     </message>
     <message>
-        <source>Rule active:</source>
-        <translation type="vanished">Rule active:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1463"/>
         <source>Rules</source>
         <translation>Rules</translation>
-    </message>
-    <message>
-        <source>Run user job four</source>
-        <translation type="vanished">Run user job #4</translation>
-    </message>
-    <message>
-        <source>Run user job one</source>
-        <translation type="vanished">Run user job #1</translation>
-    </message>
-    <message>
-        <source>Run user job three</source>
-        <translation type="vanished">Run user job #3</translation>
-    </message>
-    <message>
-        <source>Run user job two</source>
-        <translation type="vanished">Run user job #2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1469"/>
@@ -29070,38 +28510,14 @@ Do you wish to continue watching?</translation>
         <translation>Runtime: %1</translation>
     </message>
     <message>
-        <source>S</source>
-        <translation type="vanished">S</translation>
-    </message>
-    <message>
-        <source>SCHEDULE EDITOR</source>
-        <translation type="vanished">SCHEDULE EDITOR</translation>
-    </message>
-    <message>
-        <source>SCHEDULE FILTERS</source>
-        <translation type="vanished">SCHEDULE FILTERS</translation>
-    </message>
-    <message>
-        <source>SCHEDULE OPTIONS</source>
-        <translation type="vanished">SCHEDULE OPTIONS</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1477"/>
         <source>SD</source>
         <translation>SD</translation>
     </message>
     <message>
-        <source>SEARCH</source>
-        <translation type="vanished">SEARCH</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1478"/>
         <source>STEREO</source>
         <translation>STEREO</translation>
-    </message>
-    <message>
-        <source>STORAGE OPTIONS</source>
-        <translation type="vanished">STORAGE OPTIONS</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1479"/>
@@ -29129,10 +28545,6 @@ Do you wish to continue watching?</translation>
         <translation>Sample rate: %samplerate%</translation>
     </message>
     <message>
-        <source>Scan</source>
-        <translation type="vanished">Scan</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1489"/>
         <source>Scan Progress</source>
         <translation>Scan Progress</translation>
@@ -29156,10 +28568,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1502"/>
         <source>Schedule Rule:</source>
         <translation>Schedule Rule:</translation>
-    </message>
-    <message>
-        <source>Schedule info</source>
-        <translation type="vanished">Schedule info</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1507"/>
@@ -29190,10 +28598,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1516"/>
         <source>Screenshot: %1</source>
         <translation>Screenshot: %1</translation>
-    </message>
-    <message>
-        <source>Search Field:</source>
-        <translation type="vanished">Search Field:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1525"/>
@@ -29246,10 +28650,6 @@ Do you wish to continue watching?</translation>
         <translation>Search files on your harddisk</translation>
     </message>
     <message>
-        <source>Search item:</source>
-        <translation type="vanished">Search item:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1542"/>
         <source>Search on</source>
         <translation>Search on</translation>
@@ -29298,10 +28698,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1554"/>
         <source>Searches</source>
         <translation>Searches</translation>
-    </message>
-    <message>
-        <source>Searchlist item:</source>
-        <translation type="vanished">Searchlist item:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1557"/>
@@ -29354,10 +28750,6 @@ Do you wish to continue watching?</translation>
         <translation>Select &apos;Schedule a Recording&apos; from the Main Menu</translation>
     </message>
     <message>
-        <source>Select Date:</source>
-        <translation type="vanished">Select Date:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1577"/>
         <source>Select Event:</source>
         <translation>Select Event:</translation>
@@ -29366,10 +28758,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1578"/>
         <source>Select Icons</source>
         <translation>Select Icons</translation>
-    </message>
-    <message>
-        <source>Select Time:</source>
-        <translation type="vanished">Select Time:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1588"/>
@@ -29402,17 +28790,9 @@ Do you wish to continue watching?</translation>
         <translation>Select an option below.</translation>
     </message>
     <message>
-        <source>Select country and language</source>
-        <translation type="vanished">Select country and language</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1598"/>
         <source>Select item to be searched for from the list:</source>
         <translation>Select item to be searched for from the list:</translation>
-    </message>
-    <message>
-        <source>Select recording rule:</source>
-        <translation type="vanished">Select recording rule:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1600"/>
@@ -29443,10 +28823,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1613"/>
         <source>Select:</source>
         <translation>Select:</translation>
-    </message>
-    <message>
-        <source>Selected Image</source>
-        <translation type="vanished">Selected Image</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1616"/>
@@ -29484,10 +28860,6 @@ Do you wish to continue watching?</translation>
         <translation>Settings for</translation>
     </message>
     <message>
-        <source>Setup Audio Configuration</source>
-        <translation type="vanished">Setup Audio Configuration</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1636"/>
         <source>Setup Custom Priorities rules</source>
         <translation>Setup Custom Priorities rules</translation>
@@ -29501,10 +28873,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1638"/>
         <source>Setup System event handlers</source>
         <translation>Setup System event handlers</translation>
-    </message>
-    <message>
-        <source>Setup Video Configuration</source>
-        <translation type="vanished">Setup Video Configuration</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1639"/>
@@ -29555,10 +28923,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1649"/>
         <source>Setup recordings profiles</source>
         <translation>Setup recordings profiles</translation>
-    </message>
-    <message>
-        <source>Setup the behavior of the system events</source>
-        <translation type="vanished">Setup the behaviour of the system events</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1650"/>
@@ -29621,10 +28985,6 @@ Do you wish to continue watching?</translation>
         <translation>Signal/Noise</translation>
     </message>
     <message>
-        <source>Site item:</source>
-        <translation type="vanished">Site item:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1678"/>
         <source>Skin</source>
         <translation>Skin</translation>
@@ -29638,10 +28998,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1681"/>
         <source>Sorry, No Recordings Available</source>
         <translation>Sorry, No Recordings Available</translation>
-    </message>
-    <message>
-        <source>Sort: (1) by Title, (2) by Priority, (4) by Type.</source>
-        <translation type="vanished">Sort: (1) by Title, (2) by Priority, (4) by Type.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1690"/>
@@ -29699,10 +29055,6 @@ Do you wish to continue watching?</translation>
         <translation>Stars:</translation>
     </message>
     <message>
-        <source>Start Date:</source>
-        <translation type="vanished">Start Date:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1707"/>
         <source>Start Hour:</source>
         <translation>Start Hour:</translation>
@@ -29711,10 +29063,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1708"/>
         <source>Start Minute:</source>
         <translation>Start Minute:</translation>
-    </message>
-    <message>
-        <source>Start early:</source>
-        <translation type="vanished">Start early:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1718"/>
@@ -29747,10 +29095,6 @@ Do you wish to continue watching?</translation>
         <translation>Status: %1</translation>
     </message>
     <message>
-        <source>Status: %rectypechar%</source>
-        <translation type="vanished">Status: %rectypechar%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1729"/>
         <source>Storage</source>
         <translation>Storage</translation>
@@ -29764,10 +29108,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1732"/>
         <source>Storage Group: %1</source>
         <translation>Storage Group: %1</translation>
-    </message>
-    <message>
-        <source>Storage group:</source>
-        <translation type="vanished">Storage Group:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1735"/>
@@ -29803,10 +29143,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1746"/>
         <source>Sub Title:</source>
         <translation>Sub Title:</translation>
-    </message>
-    <message>
-        <source>Submit system Profile</source>
-        <translation type="vanished">Submit System Profile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1752"/>
@@ -29879,10 +29215,6 @@ Do you wish to continue watching?</translation>
         <translation>Test Rule</translation>
     </message>
     <message>
-        <source>Test Speakers</source>
-        <translation type="vanished">Test Speakers</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1799"/>
         <source>The program is able to auto-expire</source>
         <translation>The programme is able to auto-expire</translation>
@@ -29923,10 +29255,6 @@ Do you wish to continue watching?</translation>
         <translation>Title 1 of 1</translation>
     </message>
     <message>
-        <source>To be determined</source>
-        <translation type="vanished">To be determined</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1832"/>
         <source>To give greater or lesser priority to a channel in your lineup, select it from the list.  To increase the channel&apos;s priority, press the right arrow.  To decrease its priority, press the left arrow.</source>
         <translation>To give greater or lesser priority to a channel in your lineup, select it from the list.  To increase the channel&apos;s priority, press the right arrow.  To decrease its priority, press the left arrow.</translation>
@@ -29945,10 +29273,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1838"/>
         <source>Tools for your music library</source>
         <translation>Tools for your music library</translation>
-    </message>
-    <message>
-        <source>Track: %time%</source>
-        <translation type="vanished">Track: %time%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1842"/>
@@ -30016,10 +29340,6 @@ Do you wish to continue watching?</translation>
         <translation>Unmute</translation>
     </message>
     <message>
-        <source>Up to date</source>
-        <translation type="vanished">Up to date</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1868"/>
         <source>UpToDate</source>
         <translation>Up to date</translation>
@@ -30080,10 +29400,6 @@ Do you wish to continue watching?</translation>
         <translation>Use the</translation>
     </message>
     <message>
-        <source>User</source>
-        <translation type="vanished">User</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1895"/>
         <source>UserRating:</source>
         <translation>UserRating:</translation>
@@ -30122,10 +29438,6 @@ Do you wish to continue watching?</translation>
         <location filename="../themes/themestrings.h" line="1907"/>
         <source>VIDEO MANAGER</source>
         <translation>VIDEO MANAGER</translation>
-    </message>
-    <message>
-        <source>VRC-Like recording scheduler</source>
-        <translation type="vanished">VRC-like recording scheduler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1908"/>
@@ -30263,17 +29575,9 @@ Do you wish to continue watching?</translation>
         <translation>Videolevel: 4</translation>
     </message>
     <message>
-        <source>upcoming recordings</source>
-        <translation type="vanished">upcoming recordings</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="2106"/>
         <source>widescreen</source>
         <translation>widescreen</translation>
-    </message>
-    <message>
-        <source>year</source>
-        <translation type="vanished">year</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2107"/>
@@ -31020,10 +30324,6 @@ Once you have completed your modifications, click the &quot;OK&quot; button.</tr
 %message_text%</translation>
     </message>
     <message>
-        <source>no info available</source>
-        <translation type="vanished">no info available</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="2093"/>
         <source>not recorded yet</source>
         <translation>not recorded yet</translation>
@@ -31032,10 +30332,6 @@ Once you have completed your modifications, click the &quot;OK&quot; button.</tr
         <location filename="../themes/themestrings.h" line="2094"/>
         <source>ok</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>publisher:</source>
-        <translation type="vanished">publisher:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2096"/>
@@ -31392,10 +30688,6 @@ Director: |DIRECTOR%</translation>
         <translation>View stored</translation>
     </message>
     <message>
-        <source>View system Profile</source>
-        <translation type="vanished">View System Profile</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1973"/>
         <source>View the</source>
         <translation>View the</translation>
@@ -31439,10 +30731,6 @@ Director: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="1984"/>
         <source>Visible</source>
         <translation>Visible</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <translation type="vanished">W</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1989"/>
@@ -31560,12 +30848,6 @@ Director: |DIRECTOR%</translation>
         <translation>XXXXXX %1</translation>
     </message>
     <message>
-        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded!
-To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;.</source>
-        <translation type="vanished">You Haven&apos;t Scheduled Any Programmes To Be Recorded!
-To schedule a recording, exit this screen and select &apos;Programme Guide&apos; or &apos;Programme Finder&apos;.</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="2051"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
@@ -31587,10 +30869,6 @@ Select &apos;Programme Guide&apos; or &apos;Programme Finder&apos;</translation>
         <location filename="../themes/themestrings.h" line="2055"/>
         <source>You haven&apos;t made any changes</source>
         <translation>You haven&apos;t made any changes</translation>
-    </message>
-    <message>
-        <source>You haven&apos;t made any changes in your Schedule.</source>
-        <translation type="vanished">You haven&apos;t made any changes in your Schedule.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2056"/>
@@ -32059,17 +31337,17 @@ Errata: %ERRATA%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="733"/>
         <source>Display :</source>
-        <translation type="unfinished"></translation>
+        <translation>Display :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="922"/>
         <source>Group By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Group By:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="923"/>
         <source>Group by: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Group by: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="953"/>
@@ -32162,10 +31440,6 @@ Errata: %ERRATA%</translation>
         <location filename="../themes/themestrings.h" line="2081"/>
         <source>dddd,  MMMM dd,  yyyy  |  hh:mm AP</source>
         <translation>dddd,  MMMM dd,  yyyy  |  hh:mm AP</translation>
-    </message>
-    <message>
-        <source>dddd, MMMM dd, yyyy  |</source>
-        <translation type="vanished">dddd, MMMM dd, yyyy  |</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2084"/>
@@ -35523,7 +34797,7 @@ dd MMM yyyy</translation>
 <context>
     <name>ThemeUpdateChecker</name>
     <message>
-        <location filename="../programs/mythfrontend/themechooser.cpp" line="1161"/>
+        <location filename="../programs/mythfrontend/themechooser.cpp" line="1130"/>
         <source>Version %1 of the %2 theme is now available in the Theme Chooser. The currently installed version is %3.</source>
         <translation>Version %1 of the %2 theme is now available in the Theme Chooser. The currently installed version is %3.</translation>
     </message>
