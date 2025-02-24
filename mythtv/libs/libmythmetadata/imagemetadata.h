@@ -70,7 +70,7 @@ public:
     //! Encode original & current orientation to a single Db field
     int Composite() const { return (m_current * 10) + m_file; }
     int Transform(int transform);
-    int GetCurrent(bool compensate);
+    int GetCurrent() const;
     QString Description() const;
 
     static int FromRotation(const QString &degrees);
@@ -79,14 +79,6 @@ private:
     static QString AsText(int orientation);
 
     int Apply(int transform) const;
-
-    using Matrix = QHash<int, QHash<int, int> >;
-
-    //! True when using Qt 5.4.1 with its deviant orientation behaviour
-    static const bool krunningQt541;
-    //! Orientation conversions for proper display on Qt 5.4.1
-    static const Matrix kQt541_orientation;
-    static Matrix InitOrientationMatrix();
 
     //! The orientation to use: the file orientation with user transformations applied.
     int m_current;
