@@ -9,7 +9,7 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythmetadata/videoutils.h"
+#include "libmythbase/storagegroup.h"
 #include "libmythui/mythprogressdialog.h"
 
 // MythFrontend
@@ -154,7 +154,7 @@ bool VideoSetupWizard::keyPressEvent(QKeyEvent *event)
 
 void VideoSetupWizard::testSDVideo(void)
 {
-    QString sdtestfile = generate_file_url("Temp",
+    QString sdtestfile = StorageGroup::generate_file_url("Temp",
                               gCoreContext->GetMasterHostName(),
                               VIDEO_SAMPLE_SD_FILENAME);
     QString desiredpbp =
@@ -177,7 +177,7 @@ void VideoSetupWizard::testSDVideo(void)
 
 void VideoSetupWizard::testHDVideo(void)
 {
-    QString hdtestfile = generate_file_url("Temp",
+    QString hdtestfile = StorageGroup::generate_file_url("Temp",
                               gCoreContext->GetMasterHostName(),
                               VIDEO_SAMPLE_HD_FILENAME);
     QString desiredpbp =

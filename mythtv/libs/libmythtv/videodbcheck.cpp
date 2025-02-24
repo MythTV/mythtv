@@ -12,7 +12,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/remotefile.h"
-#include "libmythmetadata/videoutils.h"
+#include "libmythbase/storagegroup.h"
 
 #include "videodbcheck.h"
 
@@ -58,7 +58,7 @@ static void UpdateHashes(void)
 
             if (!host.isEmpty())
             {
-                QString url = generate_file_url("Videos", host, filename);
+                QString url = StorageGroup::generate_file_url("Videos", host, filename);
                 hash =  RemoteFile::GetFileHash(url);
             }
             else

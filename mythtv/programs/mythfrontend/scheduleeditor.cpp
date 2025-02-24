@@ -14,7 +14,6 @@
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/mythuiimageresults.h"
 #include "libmythmetadata/mythuimetadataresults.h"
-#include "libmythmetadata/videoutils.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/metadataimagehelper.h"
 #include "libmythtv/playgroup.h"
@@ -1440,7 +1439,7 @@ void MetadataOptions::SelectLocalFanart()
     if (!CanSetArtwork())
         return;
 
-    QString url = generate_file_url("Fanart",
+    QString url = StorageGroup::generate_file_url("Fanart",
                   gCoreContext->GetMasterHostName(),
                   "");
     FindImagePopup(url,"",*this, "fanart");
@@ -1451,7 +1450,7 @@ void MetadataOptions::SelectLocalCoverart()
     if (!CanSetArtwork())
         return;
 
-    QString url = generate_file_url("Coverart",
+    QString url = StorageGroup::generate_file_url("Coverart",
                   gCoreContext->GetMasterHostName(),
                   "");
     FindImagePopup(url,"",*this, "coverart");
@@ -1462,7 +1461,7 @@ void MetadataOptions::SelectLocalBanner()
     if (!CanSetArtwork())
         return;
 
-    QString url = generate_file_url("Banners",
+    QString url = StorageGroup::generate_file_url("Banners",
                   gCoreContext->GetMasterHostName(),
                   "");
     FindImagePopup(url,"",*this, "banner");

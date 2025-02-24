@@ -7,9 +7,9 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remoteutil.h"
+#include "libmythbase/storagegroup.h"
 #include "libmythmetadata/dbaccess.h"
 #include "libmythmetadata/videometadata.h"
-#include "libmythmetadata/videoutils.h"
 #include "libmythui/mythmainwindow.h"
 
 // MythFrontend
@@ -209,7 +209,7 @@ class VideoPlayerCommandPrivate
 
             if (item->IsHostSet())
             {
-                filename = generate_file_url("Videos", item->GetHost(),
+                filename = StorageGroup::generate_file_url("Videos", item->GetHost(),
                         item->GetFilename());
             }
             else
@@ -242,7 +242,7 @@ class VideoPlayerCommandPrivate
 
             if (item->IsHostSet())
             {
-                filename = generate_file_url("Videos", item->GetHost(),
+                filename = StorageGroup::generate_file_url("Videos", item->GetHost(),
                         item->GetFilename());
             }
             else

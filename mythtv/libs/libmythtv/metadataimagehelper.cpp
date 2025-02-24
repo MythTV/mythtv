@@ -1,24 +1,11 @@
-
 #include "metadataimagehelper.h"
 
 #include <QUrl>
 
-#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/storagegroup.h"
-
-// a helper functions that is used only in this file
-namespace {
-    QString generate_myth_url(const QString &storage_group, const QString &host,
-                              const QString &path)
-    {
-        uint port = gCoreContext->GetBackendServerPort(host);
-
-        return MythCoreContext::GenMythURL(host, port, path,
-                                        StorageGroup::GetGroupToUse(host, storage_group));
-    }
-}
 
 ArtworkMap GetArtwork(const QString& inetref,
                       uint season,
@@ -70,21 +57,21 @@ ArtworkMap GetArtwork(const QString& inetref,
         if (!coverart.isEmpty())
         {
             ArtworkInfo coverartinfo;
-            coverartinfo.url = generate_myth_url("Coverart", host, coverart);
+            coverartinfo.url = StorageGroup::generate_file_url("Coverart", host, coverart);
             map.insert(kArtworkCoverart, coverartinfo);
         }
 
         if (!fanart.isEmpty())
         {
             ArtworkInfo fanartinfo;
-            fanartinfo.url = generate_myth_url("Fanart", host, fanart);
+            fanartinfo.url = StorageGroup::generate_file_url("Fanart", host, fanart);
             map.insert(kArtworkFanart, fanartinfo);
         }
 
         if (!banner.isEmpty())
         {
             ArtworkInfo bannerinfo;
-            bannerinfo.url = generate_myth_url("Banners", host, banner);
+            bannerinfo.url = StorageGroup::generate_file_url("Banners", host, banner);
             map.insert(kArtworkBanner, bannerinfo);
         }
     }
@@ -105,21 +92,21 @@ bool SetArtwork(const QString &inetref,
     if (!coverart.isEmpty())
     {
         ArtworkInfo coverartinfo;
-        coverartinfo.url = generate_myth_url("Coverart", host, coverart);
+        coverartinfo.url = StorageGroup::generate_file_url("Coverart", host, coverart);
         map.insert(kArtworkCoverart, coverartinfo);
     }
 
     if (!fanart.isEmpty())
     {
         ArtworkInfo fanartinfo;
-        fanartinfo.url = generate_myth_url("Fanart", host, fanart);
+        fanartinfo.url = StorageGroup::generate_file_url("Fanart", host, fanart);
         map.insert(kArtworkFanart, fanartinfo);
     }
 
     if (!banner.isEmpty())
     {
         ArtworkInfo bannerinfo;
-        bannerinfo.url = generate_myth_url("Banners", host, banner);
+        bannerinfo.url = StorageGroup::generate_file_url("Banners", host, banner);
         map.insert(kArtworkBanner, bannerinfo);
     }
 
