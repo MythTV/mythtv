@@ -1,7 +1,8 @@
 #include <QString>
 
-#include "libmythbase/mythcorecontext.h"
 #include "mythwelcome_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythWelcomeCommandLineParser::MythWelcomeCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHWELCOME)

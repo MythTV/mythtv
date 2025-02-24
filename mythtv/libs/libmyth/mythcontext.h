@@ -5,9 +5,7 @@
 #include <QString>
 
 #include "libmyth/mythexp.h"
-#include "libmythbase/mythcorecontext.h"
-#include "libmythbase/mythevent.h"
-#include "libmythbase/mythlogging.h"
+#include "libmythbase/mythdbparams.h"
 
 class MythContextPrivate;
 

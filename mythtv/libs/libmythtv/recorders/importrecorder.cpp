@@ -33,8 +33,10 @@
 #include <QDir>
 
 // MythTV
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 
 #include "importrecorder.h"
 #include "mythcommflagplayer.h"

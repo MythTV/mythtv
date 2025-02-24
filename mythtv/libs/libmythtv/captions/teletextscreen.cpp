@@ -3,6 +3,7 @@
 #include <QFontMetrics>
 #include <QPainter>
 
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythfontproperties.h"
 #include "libmythui/mythimage.h"

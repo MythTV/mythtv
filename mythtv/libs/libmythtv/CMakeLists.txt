@@ -59,6 +59,8 @@ add_library(
   livetvchain.h
   metadataimagehelper.cpp
   metadataimagehelper.h
+  mythavbufferref.cpp
+  mythavbufferref.h
   mythavrational.h
   mythavutil.cpp
   mythavutil.h
@@ -204,6 +206,7 @@ add_library(
   frequencies.h
   frequencytables.cpp
   frequencytables.h
+  iptvtuningdata.cpp
   iptvtuningdata.h
   # subtitles: srt
   captions/srtwriter.cpp

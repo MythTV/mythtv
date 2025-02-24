@@ -12,7 +12,6 @@
 
 // MythTV
 #include "libmythbase/filesysteminfo.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"

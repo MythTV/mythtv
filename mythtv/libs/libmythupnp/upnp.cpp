@@ -17,7 +17,6 @@
 #include "libmythbase/serverpool.h"
 
 #include "upnp.h"
-#include "upnptaskcache.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables

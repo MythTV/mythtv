@@ -147,7 +147,7 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
     const int device_num    = context->m_device_num;
     const int device_count  = context->m_device_count;
 
-    VBAUDIO(QString("Device %1:" + enum_desc).arg(device_count));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Device %1:" + enum_desc).arg(device_count));
 
     if ((device_num == device_count ||
         (device_num == 0 && !cfg_desc.isEmpty() &&
@@ -198,7 +198,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     m_dsound_dll = LoadLibrary(TEXT("DSOUND.DLL"));
     if (m_dsound_dll == nullptr)
     {
-        VBERROR("Cannot open DSOUND.DLL");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot open DSOUND.DLL");
         goto error;
     }
 
@@ -208,7 +208,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     m_device_name = m_device_name.section(':', 1);
     m_device_num  = m_device_name.toInt(&ok, 10);
 
-    VBAUDIO(QString("Looking for device num:%1 or name:%2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Looking for device num:%1 or name:%2")
             .arg(m_device_num).arg(m_device_name));
 
     OurDirectSoundEnumerate =
@@ -216,7 +216,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 
     if(OurDirectSoundEnumerate)
         if(FAILED(OurDirectSoundEnumerate(DSEnumCallback, this) != DS_OK))
-            VBERROR("DirectSoundEnumerate FAILED");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "DirectSoundEnumerate FAILED");
 
     if (!m_chosenGUID)
     {
@@ -224,20 +224,20 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
         m_device_name = "Primary Sound Driver";
     }
 
-    VBAUDIO(QString("Using device %1:%2").arg(m_device_num).arg(m_device_name));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Using device %1:%2").arg(m_device_num).arg(m_device_name));
 
     OurDirectSoundCreate =
         (LPFNDSC)GetProcAddress(m_dsound_dll, "DirectSoundCreate");
 
     if (OurDirectSoundCreate == nullptr)
     {
-        VBERROR("GetProcAddress FAILED");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "GetProcAddress FAILED");
         goto error;
     }
 
     if (FAILED(OurDirectSoundCreate(m_chosenGUID, &m_dsobject, nullptr)))
     {
-        VBERROR("Cannot create a direct sound device");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot create a direct sound device");
         goto error;
     }
 
@@ -253,9 +253,9 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
      * working */
     if (FAILED(IDirectSound_SetCooperativeLevel(m_dsobject, GetDesktopWindow(),
                                                 DSSCL_EXCLUSIVE)))
-        VBERROR("Cannot set DS cooperative level");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot set DS cooperative level");
 
-    VBAUDIO("Initialised DirectSound");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Initialised DirectSound");
 
     return 0;
 
@@ -274,7 +274,7 @@ void AudioOutputDXPrivate::DestroyDSBuffer(void)
     if (!m_dsbuffer)
         return;
 
-    VBAUDIO("Destroying DirectSound buffer");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Destroying DirectSound buffer");
     IDirectSoundBuffer_Stop(m_dsbuffer);
     m_writeCursor = 0;
     IDirectSoundBuffer_SetCurrentPosition(m_dsbuffer, m_writeCursor);
@@ -299,11 +299,11 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
                                                          &play_pos, &write_pos);
         if (dsresult != DS_OK)
         {
-            VBERROR("Cannot get current buffer position");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot get current buffer position");
             return;
         }
 
-        VBAUDIOTS(QString("play: %1 write: %2 wcursor: %3")
+        LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("play: %1 write: %2 wcursor: %3")
                   .arg(play_pos).arg(write_pos).arg(m_writeCursor));
 
         while ((m_writeCursor < write_pos &&
@@ -311,7 +311,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
                     (m_writeCursor < play_pos  && write_pos <  play_pos))) ||
                (m_writeCursor >= play_pos && write_pos < play_pos))
         {
-            VBERROR("buffer underrun");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "buffer underrun");
             m_writeCursor += size;
             while (m_writeCursor >= (DWORD)m_parent->m_soundcardBufferSize)
                 m_writeCursor -= m_parent->m_soundcardBufferSize;
@@ -348,7 +348,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
 
     if (dsresult != DS_OK)
     {
-        VBERROR("Cannot lock buffer, audio dropped");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot lock buffer, audio dropped");
         return;
     }
 
@@ -377,7 +377,7 @@ bool AudioOutputDXPrivate::StartPlayback(void)
     }
     if (dsresult != DS_OK)
     {
-        VBERROR("Cannot start playing buffer");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot start playing buffer");
         m_playStarted = false;
         return false;
     }
@@ -400,7 +400,7 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(bool passthrough)
         return nullptr;
     }
 
-    VBAUDIO(QString("GetCaps sample rate min: %1 max: %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetCaps sample rate min: %1 max: %2")
             .arg(devcaps.dwMinSecondarySampleRate)
             .arg(devcaps.dwMaxSecondarySampleRate));
 
@@ -456,7 +456,7 @@ bool AudioOutputDX::OpenDevice(void)
     // DirectSound buffer holds 4 fragments = 200ms worth of samples
     m_soundcardBufferSize = m_fragmentSize << 2;
 
-    VBAUDIO(QString("DirectSound buffer size: %1").arg(m_soundcardBufferSize));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("DirectSound buffer size: %1").arg(m_soundcardBufferSize));
 
     wf.Format.nChannels            = m_channels;
     wf.Format.nSamplesPerSec       = m_sampleRate;
@@ -482,7 +482,7 @@ bool AudioOutputDX::OpenDevice(void)
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_PCM;
     }
 
-    VBAUDIO(QString("New format: %1bits %2ch %3Hz %4")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("New format: %1bits %2ch %3Hz %4")
             .arg(wf.Samples.wValidBitsPerSample).arg(m_channels)
             .arg(m_sampleRate).arg(m_UseSPDIF ? "data" : "PCM"));
 
@@ -526,9 +526,9 @@ bool AudioOutputDX::OpenDevice(void)
                       .arg((DWORD)dsresult, 0, 16));
             return false;
         }
-        VBAUDIO("Using software mixer");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Using software mixer");
     }
-    VBAUDIO("Created DirectSound buffer");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Created DirectSound buffer");
 
     return true;
 }
@@ -562,7 +562,7 @@ int AudioOutputDX::GetBufferedOnSoundcard(void) const
                                                      &play_pos, &write_pos);
     if (dsresult != DS_OK)
     {
-        VBERROR("Cannot get current buffer position");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot get current buffer position");
         return 0;
     }
 
@@ -588,11 +588,11 @@ int AudioOutputDX::GetVolumeChannel([[maybe_unused]] int channel) const
 
     if (dsresult != DS_OK)
     {
-        VBERROR(QString("Failed to get volume %1").arg(dxVolume));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to get volume %1").arg(dxVolume));
         return volume;
     }
 
-    VBAUDIO(QString("Got volume %1").arg(volume));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Got volume %1").arg(volume));
     return volume;
 }
 
@@ -614,11 +614,11 @@ void AudioOutputDX::SetVolumeChannel([[maybe_unused]] int channel, int volume)
 
     if (dsresult != DS_OK)
     {
-        VBERROR(QString("Failed to set volume %1").arg(dxVolume));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to set volume %1").arg(dxVolume));
         return;
     }
 
-    VBAUDIO(QString("Set volume %1").arg(dxVolume));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Set volume %1").arg(dxVolume));
 }
 
 QMap<int, QString> *AudioOutputDX::GetDXDevices(void)

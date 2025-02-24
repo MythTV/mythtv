@@ -6,6 +6,7 @@
 
 // MythTV
 #include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythuitext.h>

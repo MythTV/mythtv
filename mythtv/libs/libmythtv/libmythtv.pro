@@ -122,6 +122,7 @@ HEADERS += io/mythstreamingbuffer.h
 HEADERS += io/mythinteractivebuffer.h
 HEADERS += io/mythopticalbuffer.h
 HEADERS += metadataimagehelper.h
+HEADERS += mythavbufferref.h
 HEADERS += mythavrational.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
@@ -165,6 +166,7 @@ SOURCES += io/mythinteractivebuffer.cpp
 SOURCES += io/mythopticalbuffer.cpp
 SOURCES += metadataimagehelper.cpp
 SOURCES += mythframe.cpp
+SOURCES += mythavbufferref.cpp
 SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
 SOURCES += mythhdrvideometadata.cpp
@@ -233,6 +235,7 @@ SOURCES += frequencies.cpp          frequencytables.cpp
 HEADERS += channelutil.h            channelinfo.h
 HEADERS += iptvtuningdata.h
 SOURCES += channelutil.cpp          channelinfo.cpp
+SOURCES += iptvtuningdata.cpp
 
 HEADERS += dtvmultiplex.h
 HEADERS += dtvconfparser.h          dtvconfparserhelpers.h
@@ -891,6 +894,7 @@ using_backend {
     SOURCES *= recorders/streamhandler.cpp
 
     SOURCES += recorders/rtp/packetbuffer.cpp
+    SOURCES += recorders/rtp/rtpdatapacket.cpp
     SOURCES += recorders/rtp/rtppacketbuffer.cpp
 
     # Support for HTTP TS streams

@@ -25,6 +25,9 @@
 // C++ headers
 #include <algorithm>
 
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
+
 #define LOC     QString("PulseAudio: ")
 
 static constexpr int8_t PULSE_MAX_CHANNELS { 8 };
@@ -61,7 +64,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     m_mainloop = pa_threaded_mainloop_new();
     if (!m_mainloop)
     {
-        VBERROR(fn_log_tag + "Failed to get new threaded mainloop");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "Failed to get new threaded mainloop");
         delete m_aoSettings;
         return nullptr;
     }
@@ -92,7 +95,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     }
     else
     {
-        VBERROR("Failed to determine default sink samplerate");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to determine default sink samplerate");
     }
 
     pa_threaded_mainloop_unlock(m_mainloop);
@@ -125,7 +128,7 @@ bool AudioOutputPulseAudio::OpenDevice()
     QString fn_log_tag = "OpenDevice, ";
     if (m_channels > PULSE_MAX_CHANNELS )
     {
-        VBERROR(fn_log_tag + QString("audio channel limit %1, but %2 requested")
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("audio channel limit %1, but %2 requested")
                              .arg(PULSE_MAX_CHANNELS).arg(m_channels));
         return false;
     }
@@ -143,30 +146,30 @@ bool AudioOutputPulseAudio::OpenDevice()
         case FORMAT_S32:    m_sampleSpec.format = PA_SAMPLE_S32NE;      break;
         case FORMAT_FLT:    m_sampleSpec.format = PA_SAMPLE_FLOAT32NE;  break;
         default:
-            VBERROR(fn_log_tag + QString("unsupported sample format %1")
+            LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("unsupported sample format %1")
                                  .arg(m_outputFormat));
             return false;
     }
 
     if (!pa_sample_spec_valid(&m_sampleSpec))
     {
-        VBERROR(fn_log_tag + "invalid sample spec");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "invalid sample spec");
         return false;
     }
     std::string spec(PA_SAMPLE_SPEC_SNPRINT_MAX,'\0');
     pa_sample_spec_snprint(spec.data(), spec.size(), &m_sampleSpec);
-    VBAUDIO(fn_log_tag + "using sample spec " + spec.data());
+    LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag + "using sample spec " + spec.data());
 
     if(!pa_channel_map_init_auto(&m_channelMap, m_channels, PA_CHANNEL_MAP_WAVEEX))
     {
-        VBERROR(fn_log_tag + "failed to init channel map");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "failed to init channel map");
         return false;
     }
 
     m_mainloop = pa_threaded_mainloop_new();
     if (!m_mainloop)
     {
-        VBERROR(fn_log_tag + "failed to get new threaded mainloop");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "failed to get new threaded mainloop");
         return false;
     }
 
@@ -225,7 +228,7 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
     QString fn_log_tag = "WriteAudio, ";
     pa_stream_state_t sstate = pa_stream_get_state(m_pstream);
 
-    VBAUDIOTS(fn_log_tag + QString("writing %1 bytes").arg(size));
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + fn_log_tag + QString("writing %1 bytes").arg(size));
 
     /* NB This "if" check can be replaced with PA_STREAM_IS_GOOD() in
        PulseAudio API from 0.9.11. As 0.9.10 is still widely used
@@ -265,19 +268,19 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
         {
             if (write_status != 0)
             {
-                VBERROR(fn_log_tag + QString("stream write failed: %1")
+                LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("stream write failed: %1")
                                      .arg(write_status == PA_ERR_BADSTATE
                                                 ? "PA_ERR_BADSTATE"
                                                 : "PA_ERR_INVALID"));
             }
 
-            VBERROR(fn_log_tag + QString("short write, %1 of %2")
+            LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("short write, %1 of %2")
                                  .arg(size - to_write).arg(size));
         }
     }
     else
     {
-        VBERROR(fn_log_tag + QString("stream state not good: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("stream state not good: %1")
                              .arg(sstate,0,16));
     }
 }
@@ -327,7 +330,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
 
     if (channel < 0 || channel > PULSE_MAX_CHANNELS || volume < 0)
     {
-        VBERROR(fn_log_tag + QString("bad volume params, channel %1, volume %2")
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("bad volume params, channel %1, volume %2")
                              .arg(channel).arg(volume));
         return;
     }
@@ -352,7 +355,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
             pa_operation_unref(op);
         else
         {
-            VBERROR(fn_log_tag +
+            LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag +
                     QString("set stream volume operation failed, stream %1, "
                             "error %2 ")
                     .arg(stream_index)
@@ -372,7 +375,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
             pa_operation_unref(op);
         else
         {
-            VBERROR(fn_log_tag +
+            LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag +
                     QString("set sink volume operation failed, sink %1, "
                             "error %2 ")
                     .arg(sink_index)
@@ -391,7 +394,7 @@ void AudioOutputPulseAudio::Drain(void)
     if (op)
         pa_operation_unref(op);
     else
-        VBERROR("Drain, stream drain failed");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Drain, stream drain failed");
 }
 
 bool AudioOutputPulseAudio::ContextConnect(void)
@@ -399,7 +402,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     QString fn_log_tag = "ContextConnect, ";
     if (m_pcontext)
     {
-        VBERROR(fn_log_tag + "context appears to exist, but shouldn't (yet)");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "context appears to exist, but shouldn't (yet)");
         pa_context_unref(m_pcontext);
         m_pcontext = nullptr;
         return false;
@@ -407,7 +410,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     pa_proplist *proplist = pa_proplist_new();
     if (!proplist)
     {
-        VBERROR(fn_log_tag + QString("failed to create new proplist"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("failed to create new proplist"));
         return false;
     }
     pa_proplist_sets(proplist, PA_PROP_APPLICATION_NAME, "MythTV");
@@ -418,7 +421,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
                                      "MythTV", proplist);
     if (!m_pcontext)
     {
-        VBERROR(fn_log_tag + "failed to acquire new context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "failed to acquire new context");
         return false;
     }
     pa_context_set_state_callback(m_pcontext, ContextStateCallback, this);
@@ -430,7 +433,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
 
     if (chk < 0)
     {
-        VBERROR(fn_log_tag + QString("context connect failed: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("context connect failed: %1")
                              .arg(pa_strerror(pa_context_errno(m_pcontext))));
         return false;
     }
@@ -441,19 +444,19 @@ bool AudioOutputPulseAudio::ContextConnect(void)
         switch(state)
         {
             case PA_CONTEXT_READY:
-                VBAUDIO(fn_log_tag +"context connection ready");
+                LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag +"context connection ready");
                 connected = true;
                 continue;
 
             case PA_CONTEXT_FAILED:
             case PA_CONTEXT_TERMINATED:
-                VBERROR(fn_log_tag +
+                LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag +
                         QString("context connection failed or terminated: %1")
                         .arg(pa_strerror(pa_context_errno(m_pcontext))));
                 return false;
 
             default:
-                VBAUDIO(fn_log_tag + "waiting for context connection ready");
+                LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag + "waiting for context connection ready");
                 pa_threaded_mainloop_wait(m_mainloop);
                 break;
         }
@@ -465,7 +468,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     if (op)
         pa_operation_unref(op);
     else
-        VBERROR(fn_log_tag + "failed to get PulseAudio server info");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "failed to get PulseAudio server info");
 
     return true;
 }
@@ -487,7 +490,7 @@ QString AudioOutputPulseAudio::ChooseHost(void)
             pulse_host = env_pulse_host;
     }
 
-    VBAUDIO(fn_log_tag + QString("chosen PulseAudio server: %1")
+    LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag + QString("chosen PulseAudio server: %1")
                          .arg((pulse_host != nullptr) ? pulse_host : "default"));
 
     return pulse_host;
@@ -499,7 +502,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     pa_proplist *proplist = pa_proplist_new();
     if (!proplist)
     {
-        VBERROR(fn_log_tag + QString("failed to create new proplist"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("failed to create new proplist"));
         return false;
     }
     pa_proplist_sets(proplist, PA_PROP_MEDIA_ROLE, "video");
@@ -508,7 +511,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                                     &m_channelMap, proplist);
     if (!m_pstream)
     {
-        VBERROR("failed to create new playback stream");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "failed to create new playback stream");
         return false;
     }
     pa_stream_set_state_callback(m_pstream, StreamStateCallback, this);
@@ -554,7 +557,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
         {
             case PA_CONTEXT_FAILED:
             case PA_CONTEXT_TERMINATED:
-                VBERROR(QString("context is stuffed, %1")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("context is stuffed, %1")
                             .arg(pa_strerror(pa_context_errno(m_pcontext))));
                 failed = true;
                 break;
@@ -566,7 +569,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                         break;
                     case PA_STREAM_FAILED:
                     case PA_STREAM_TERMINATED:
-                        VBERROR(QString("stream failed or was terminated, "
+                        LOG(VB_GENERAL, LOG_ERR, LOC + QString("stream failed or was terminated, "
                                         "context state %1, stream state %2")
                                     .arg(cstate).arg(sstate));
                         failed = true;
@@ -582,7 +585,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     m_fragmentSize = buf_attr->tlength >> 2;
     m_soundcardBufferSize = buf_attr->maxlength;
 
-    VBAUDIO(QString("fragment size %1, soundcard buffer size %2")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("fragment size %1, soundcard buffer size %2")
                 .arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
     return (connected && !failed);
@@ -597,7 +600,7 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
     if (op)
         pa_operation_unref(op);
     else
-        VBERROR(fn_log_tag + "stream flush operation failed ");
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "stream flush operation failed ");
 }
 
 void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
@@ -642,7 +645,7 @@ void AudioOutputPulseAudio::WriteCallback(pa_stream */*s*/, size_t /*size*/, voi
 
 void AudioOutputPulseAudio::BufferFlowCallback(pa_stream */*s*/, void *tag)
 {
-    VBERROR(QString("stream buffer %1 flow").arg((char*)tag));
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("stream buffer %1 flow").arg((char*)tag));
 }
 
 void AudioOutputPulseAudio::OpCompletionCallback(
@@ -652,7 +655,7 @@ void AudioOutputPulseAudio::OpCompletionCallback(
     auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     if (!ok)
     {
-        VBERROR(fn_log_tag + QString("bummer, an operation failed: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("bummer, an operation failed: %1")
                              .arg(pa_strerror(pa_context_errno(c))));
     }
     pa_threaded_mainloop_signal(audoutP->m_mainloop, 0);
@@ -663,7 +666,7 @@ void AudioOutputPulseAudio::ServerInfoCallback(
 {
     QString fn_log_tag = "ServerInfoCallback, ";
 
-    VBAUDIO(fn_log_tag +
+    LOG(VB_AUDIO, LOG_INFO, LOC + fn_log_tag +
             QString("PulseAudio server info - host name: %1, server version: "
                     "%2, server name: %3, default sink: %4")
             .arg(inf->host_name, inf->server_version,

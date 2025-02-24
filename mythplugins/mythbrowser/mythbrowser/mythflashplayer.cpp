@@ -6,7 +6,6 @@
 #include <QEvent>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythtv/playgroup.h>
 #include <libmythui/mythmainwindow.h>

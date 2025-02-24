@@ -1,6 +1,8 @@
 // MythTV
 #include "mythtranscodeplayer.h"
 
+#include "libmythbase/mythlogging.h"
+
 #define LOC QString("TranscodePlayer: ")
 
 MythTranscodePlayer::MythTranscodePlayer(PlayerContext *Context, PlayerFlags Flags)

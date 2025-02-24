@@ -4,7 +4,6 @@
 // MythTV headers
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"
-#include "libmythbase/mythlogging.h"
 
 #include "programinfoupdater.h"
 #include "remoteutil.h"

@@ -29,7 +29,6 @@ set(HEADERS_TO_INSTALL1
     upnpdevice.h
     upnphelpers.h
     upnpsubscription.h
-    upnptaskcache.h
     upnptaskevent.h
     upnptasknotify.h
     upnptasksearch.h
@@ -56,7 +55,6 @@ add_library(
   httprequest.h
   httpserver.cpp
   httpserver.h
-  mbroadcastsocketdevice.h
   mmembuf.cpp
   mmembuf.h
   mmulticastsocketdevice.cpp
@@ -106,7 +104,6 @@ add_library(
   upnpserviceimpl.h
   upnpsubscription.cpp
   upnpsubscription.h
-  upnptaskcache.h
   upnptaskevent.cpp
   upnptaskevent.h
   upnptasknotify.cpp

@@ -2,7 +2,7 @@
 #include <iostream>
 
 // MythTV
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythmetadata/musicmetadata.h>
 
 // MythMusic

@@ -1,5 +1,4 @@
 // MythTV
-#include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 
 //  MythFrontend

@@ -2,6 +2,7 @@
 #include <QPen>
 
 // MythTV
+#include "libmythbase/mythlogging.h"
 #include "videovisualcircles.h"
 
 #ifdef USING_VULKAN

@@ -20,6 +20,8 @@
 
 #include "test_metadatagrabber.h"
 
+#include "libmythbase/mythcorecontext.h"
+
 void TestMetadataGrabber::initTestCase()
 {
     gCoreContext = new MythCoreContext("test_mythmetadatagrabber_1.0", nullptr);

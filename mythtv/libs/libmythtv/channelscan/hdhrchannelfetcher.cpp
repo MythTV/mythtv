@@ -20,7 +20,6 @@
 #include "libmythbase/mythlogging.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "libmyth/mythcontext.h"
 #include "scanmonitor.h"
 #include "hdhrchannelfetcher.h"
 

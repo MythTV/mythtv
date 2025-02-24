@@ -17,7 +17,6 @@
 
 // MythTV
 #include "libmythbase/mthread.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythtypes.h"
 #include "libmythmetadata/mythmetaexp.h"
 
@@ -504,12 +503,7 @@ class AlbumArtScannerThread: public MThread
     explicit AlbumArtScannerThread(QStringList strList) :
             MThread("AlbumArtScanner"), m_strList(std::move(strList)) {}
 
-    void run() override // MThread
-    {
-        RunProlog();
-        gCoreContext->SendReceiveStringList(m_strList);
-        RunEpilog();
-    }
+    void run() override; // MThread
 
     QStringList getResult(void) { return m_strList; }
 

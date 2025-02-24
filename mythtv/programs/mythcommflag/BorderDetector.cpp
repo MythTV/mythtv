@@ -11,6 +11,7 @@ extern "C" {
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythcorecontext.h"    /* gContext */
+#include "libmythbase/mythlogging.h"
 
 // Commercial Flagging headers
 #include "BorderDetector.h"

@@ -29,6 +29,9 @@
 
 // MythTv headers
 #include "channelscanner_web.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "channelscan_sm.h"
 #include "channelimporter.h"
 #include "libmythtv/cardutil.h"

@@ -5,6 +5,8 @@
 #include <openssl/aes.h>
 #endif // USING_LIBCRYPTO
 
+#include "libmythbase/mythlogging.h"
+
 #include "HLSSegment.h"
 #include "HLSReader.h"
 

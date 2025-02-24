@@ -10,9 +10,10 @@
 
 // mythtv
 #include <libmyth/audio/audiooutput.h>
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mthreadpool.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythmetadata/metaio.h>
 #include <libmythmetadata/musicutils.h>
 #include <libmythui/mythdialogbox.h>

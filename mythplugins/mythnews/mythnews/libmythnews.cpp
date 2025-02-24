@@ -6,7 +6,8 @@
 #include <QApplication>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
+#include <libmythbase/mythcorecontext.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythplugin.h>
 #include <libmythbase/mythpluginapi.h>
 #include <libmythbase/mythversion.h>

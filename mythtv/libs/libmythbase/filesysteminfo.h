@@ -10,7 +10,6 @@ static constexpr int8_t NUMDISKINFOLINES { 8 };
 
 #include "mythbaseexp.h"
 #include "mythsocket.h"
-#include "mythcorecontext.h"
 
 class MBASE_PUBLIC FileSystemInfo
 {

@@ -10,6 +10,7 @@ extern "C" {
 
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythtv/mythcommflagplayer.h"
 
 // Commercial Flagging headers

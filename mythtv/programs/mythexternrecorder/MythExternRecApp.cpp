@@ -30,6 +30,7 @@
 
 // MythTV
 #include "libmythbase/mythchrono.h"
+#include "libmythbase/mythlogging.h"
 
 // MythExternRecorder
 #include "MythExternRecApp.h"

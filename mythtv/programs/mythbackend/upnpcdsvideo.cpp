@@ -15,6 +15,7 @@
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythupnp/httprequest.h"
 #include "libmythupnp/upnphelpers.h"

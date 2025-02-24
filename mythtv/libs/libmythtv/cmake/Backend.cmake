@@ -113,6 +113,7 @@ target_sources(
           recorders/iptvstreamhandler.cpp
           recorders/streamhandler.cpp
           recorders/rtp/packetbuffer.cpp
+          recorders/rtp/rtpdatapacket.cpp
           recorders/rtp/rtppacketbuffer.cpp
           # Support for HTTP TS streams
           recorders/httptsstreamhandler.h

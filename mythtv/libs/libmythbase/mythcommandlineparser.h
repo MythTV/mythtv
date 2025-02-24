@@ -12,8 +12,8 @@
 #include <QVariant>
 
 #include "mythbaseexp.h"
-#include "mythlogging.h"
 #include "referencecounter.h"
+#include "verbosedefs.h"
 
 class MythCommandLineParser;
 class TestCommandLineParser;

@@ -3,7 +3,6 @@
 
 #include <climits>
 
-#include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
 
 #include "sctedescriptors.h"

@@ -24,6 +24,7 @@
 #include <AvailabilityMacros.h>
 
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "audiooutputca.h"
 
 // kAudioObjectPropertyElementMaster was deprecated in OS_X 12
@@ -134,16 +135,6 @@ public:
     static int  AudioStreamChangeFormat(AudioStreamID s,
                                  AudioStreamBasicDescription format);
 
-    // TODO: Convert these to macros!
-    static void Debug(const QString& msg)
-    {   LOG(VB_AUDIO, LOG_INFO,      "CoreAudioData::" + msg);   }
-
-    static void Error(const QString& msg)
-    {    LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:" + msg);   }
-
-    static void Warn (const QString& msg)
-    {    LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:" + msg);   }
-
     AudioOutputCA  *mCA            {nullptr}; // We could subclass, but this ends up tidier
 
     // Analog output specific
@@ -190,7 +181,7 @@ AudioOutputCA::AudioOutputCA(const AudioSettings &settings) :
 AudioOutputBase(settings)
 {
     m_mainDevice.remove(0, 10);
-    VBAUDIO(QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_mainDevice));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_mainDevice));
     d = new CoreAudioData(this, m_mainDevice);
 
     InitSettings(settings);
@@ -246,7 +237,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
         {
             if (channels[i-1])
             {
-                Debug(QString("Support %1 channels").arg(i));
+                LOG(VB_AUDIO, LOG_INFO, QString("AudioOutputCA::Support %1 channels").arg(i));
                 // In case 8 channels are supported but not 6, fake 6
                 if (i == 8 && !channels[6-1])
                     settings->AddSupportedChannels(6);
@@ -269,22 +260,22 @@ bool AudioOutputCA::OpenDevice()
     if (d->mWasDigital)
     {
     }
-    Debug("OpenDevice: Entering");
+    LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice: Entering");
     if (m_passthru || m_enc)
     {
-        Debug("OpenDevice() Trying Digital.");
+        LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice() Trying Digital.");
         if (!(deviceOpened = d->OpenSPDIF()))
             d->CloseSPDIF();
     }
 
     if (!deviceOpened)
     {
-        Debug("OpenDevice() Trying Analog.");
+        LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice() Trying Analog.");
         int result = -1;
         //for (int i=0; result < 0 && i < 10; i++)
         {
             result = d->OpenAnalog();
-            Debug(QString("OpenDevice: OpenAnalog = %1").arg(result));
+            LOG(VB_AUDIO, LOG_INFO, QString("AudioOutputCA::OpenDevice: OpenAnalog = %1").arg(result));
             if (result < 0)
             {
                 d->CloseAnalog();
@@ -296,7 +287,7 @@ bool AudioOutputCA::OpenDevice()
 
     if (!deviceOpened)
     {
-        Error("Couldn't open any audio device!");
+        LOG(VB_GENERAL, LOG_ERR, "AudioOutputCA Error: Couldn't open any audio device!");
         d->CloseAnalog();
         return false;
     }
@@ -313,7 +304,7 @@ bool AudioOutputCA::OpenDevice()
 
 void AudioOutputCA::CloseDevice()
 {
-    VBAUDIO(QString("CloseDevice [%1]: Entering")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("CloseDevice [%1]: Entering")
             .arg(d->mDigitalInUse ? "SPDIF" : "Analog"));
     if (d->mDigitalInUse)
         d->CloseSPDIF();
@@ -524,11 +515,11 @@ CoreAudioData::CoreAudioData(AudioOutputCA *parent, QString deviceName) :
         mDeviceID = GetDefaultOutputDevice();
         if (deviceName != "Default Output Device")
         {
-            Warn(QString("CoreAudioData: \"%1\" not found, using default device %2.")
+            LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:CoreAudioData: \"%1\" not found, using default device %2.")
                  .arg(deviceName).arg(mDeviceID));
         }
     }
-    Debug(QString("CoreAudioData: device number is %1")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CoreAudioData: device number is %1")
           .arg(mDeviceID));
 }
 
@@ -547,7 +538,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
 						  0, nullptr, &size);
     if (err)
     {
-        Warn(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetPropertyDataSize: Unable to retrieve the property sizes. "
                      "Error [%1]")
              .arg(err));
 	return deviceID;
@@ -561,7 +552,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
                                     0, nullptr, &size, devices.data());
     if (err)
     {
-        Warn(QString("GetDeviceWithName: Unable to retrieve the list of available devices. "
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetDeviceWithName: Unable to retrieve the list of available devices. "
                      "Error [%1]")
              .arg(err));
     }
@@ -575,7 +566,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
             QString *name = device.GetName();
             if (name && *name == deviceName)
             {
-                Debug(QString("GetDeviceWithName: Found: %1").arg(*name));
+                LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetDeviceWithName: Found: %1").arg(*name));
                 deviceID = dev;
                 delete name;
             }
@@ -602,10 +593,10 @@ AudioDeviceID CoreAudioData::GetDefaultOutputDevice()
     OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
 					      0, nullptr, &paramSize, &deviceId);
     if (err == noErr)
-        Debug(QString("GetDefaultOutputDevice: default device ID = %1").arg(deviceId));
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetDefaultOutputDevice: default device ID = %1").arg(deviceId));
     else
     {
-        Warn(QString("GetDefaultOutputDevice: could not get default audio device: [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetDefaultOutputDevice: could not get default audio device: [%1]")
              .arg(OSS_STATUS(err)));
         deviceId = 0;
     }
@@ -629,7 +620,7 @@ int CoreAudioData::GetTotalOutputChannels()
 						  0, nullptr, &size);
     if (err)
     {
-        Warn(QString("GetTotalOutputChannels: Unable to get "
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetTotalOutputChannels: Unable to get "
                      "size of device output channels - id: %1 Error = [%2]")
              .arg(mDeviceID)
              .arg(err));
@@ -646,12 +637,12 @@ int CoreAudioData::GetTotalOutputChannels()
     }
     else
     {
-        Warn(QString("GetTotalOutputChannels: Unable to get "
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetTotalOutputChannels: Unable to get "
                      "total device output channels - id: %1 Error = [%2]")
              .arg(mDeviceID)
              .arg(err));
     }
-    Debug(QString("GetTotalOutputChannels: Found %1 channels in %2 buffers")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetTotalOutputChannels: Found %1 channels in %2 buffers")
           .arg(channels).arg(pList->mNumberBuffers));
     free(pList);
     return channels;
@@ -675,7 +666,7 @@ QString *CoreAudioData::GetName()
                                               0, nullptr, &propertySize, &name);
     if (err)
     {
-        Error(QString("AudioObjectGetPropertyData for kAudioObjectPropertyName error: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:AudioObjectGetPropertyData for kAudioObjectPropertyName error: [%1]")
               .arg(err));
         return nullptr;
     }
@@ -700,7 +691,7 @@ bool CoreAudioData::GetAutoHogMode()
     OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa, 0, nullptr, &size, &val);
     if (err)
     {
-        Warn(QString("GetAutoHogMode: Unable to get auto 'hog' mode. Error = [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetAutoHogMode: Unable to get auto 'hog' mode. Error = [%1]")
              .arg(err));
         return false;
     }
@@ -721,7 +712,7 @@ void CoreAudioData::SetAutoHogMode(bool enable)
 					      sizeof(val), &val);
     if (err)
     {
-        Warn(QString("SetAutoHogMode: Unable to set auto 'hog' mode. Error = [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:SetAutoHogMode: Unable to set auto 'hog' mode. Error = [%1]")
              .arg(err));
     }
 }
@@ -743,7 +734,7 @@ pid_t CoreAudioData::GetHogStatus()
     {
         // This is not a fatal error.
         // Some drivers simply don't support this property
-        Debug(QString("GetHogStatus: unable to check: [%1]")
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetHogStatus: unable to check: [%1]")
               .arg(err));
         return -1;
     }
@@ -769,17 +760,17 @@ bool CoreAudioData::SetHogStatus(bool hog)
     {
         if (mHog == -1) // Not already set
         {
-            Debug(QString("SetHogStatus: Setting 'hog' status on device %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::SetHogStatus: Setting 'hog' status on device %1")
                   .arg(mDeviceID));
 	    OSStatus err = AudioObjectSetPropertyData(mDeviceID, &pa, 0, nullptr,
 						      sizeof(mHog), &mHog);
             if (err || mHog != getpid())
             {
-                Warn(QString("SetHogStatus: Unable to set 'hog' status. Error = [%1]")
+                LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:SetHogStatus: Unable to set 'hog' status. Error = [%1]")
                      .arg(OSS_STATUS(err)));
                 return false;
             }
-            Debug(QString("SetHogStatus: Successfully set 'hog' status on device %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::SetHogStatus: Successfully set 'hog' status on device %1")
                   .arg(mDeviceID));
         }
     }
@@ -787,14 +778,14 @@ bool CoreAudioData::SetHogStatus(bool hog)
     {
         if (mHog > -1) // Currently Set
         {
-            Debug(QString("SetHogStatus: Releasing 'hog' status on device %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::SetHogStatus: Releasing 'hog' status on device %1")
                   .arg(mDeviceID));
             pid_t hogPid = -1;
 	    OSStatus err = AudioObjectSetPropertyData(mDeviceID, &pa, 0, nullptr,
 						      sizeof(hogPid), &hogPid);
             if (err || hogPid == getpid())
             {
-                Warn(QString("SetHogStatus: Unable to release 'hog' status. Error = [%1]")
+                LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:SetHogStatus: Unable to release 'hog' status. Error = [%1]")
                      .arg(OSS_STATUS(err)));
                 return false;
             }
@@ -812,7 +803,7 @@ bool CoreAudioData::SetMixingSupport(bool mix)
     if (mMixerRestore == -1) // This is our first change to this setting. Store the original setting for restore
         restore = (GetMixingSupport() ? 1 : 0);
     UInt32 mixEnable = mix ? 1 : 0;
-    Debug(QString("SetMixingSupport: %1abling mixing for device %2")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::SetMixingSupport: %1abling mixing for device %2")
           .arg(mix ? "En" : "Dis")
           .arg(mDeviceID));
 
@@ -826,7 +817,7 @@ bool CoreAudioData::SetMixingSupport(bool mix)
 					      sizeof(mixEnable), &mixEnable);
     if (err)
     {
-        Warn(QString("SetMixingSupport: Unable to set MixingSupport to %1. Error = [%2]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:SetMixingSupport: Unable to set MixingSupport to %1. Error = [%2]")
              .arg(mix ? "'On'" : "'Off'")
              .arg(OSS_STATUS(err)));
         return false;
@@ -875,7 +866,7 @@ AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
 					 0, nullptr, &listSize);
     if (err != noErr)
     {
-        Error(QString("StreamsList: could not get list size: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:StreamsList: could not get list size: [%1]")
               .arg(OSS_STATUS(err)));
         return {};
     }
@@ -887,7 +878,7 @@ AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
     }
     catch (...)
     {
-        Error("StreamsList(): out of memory?");
+        LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:StreamsList(): out of memory?");
         return {};
     }
 
@@ -895,7 +886,7 @@ AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
 				     0, nullptr, &listSize, vec.data());
     if (err != noErr)
     {
-        Error(QString("StreamsList: could not get list: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:StreamsList: could not get list: [%1]")
               .arg(OSS_STATUS(err)));
         return {};
     }
@@ -921,7 +912,7 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
     err = AudioObjectGetPropertyDataSize(s, &pa, 0, nullptr, &listSize);
     if (err != noErr)
     {
-        Warn(QString("FormatsList(): couldn't get list size: [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:FormatsList(): couldn't get list size: [%1]")
              .arg(OSS_STATUS(err)));
         return {};
     }
@@ -932,14 +923,14 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
     }
     catch (...)
     {
-        Error("FormatsList(): out of memory?");
+        LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:FormatsList(): out of memory?");
         return {};
     }
 
     err = AudioObjectGetPropertyData(s, &pa, 0, nullptr, &listSize, vec.data());
     if (err != noErr)
     {
-        Warn(QString("FormatsList: couldn't get list: [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:FormatsList: couldn't get list: [%1]")
              .arg(OSS_STATUS(err)));
         return {};
     }
@@ -983,7 +974,7 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
     err = AudioObjectGetPropertyDataSize(d, &pa, 0, nullptr, &listSize);
     if (err != noErr)
     {
-        Warn(QString("RatesList(): couldn't get data rate list size: [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:RatesList(): couldn't get data rate list size: [%1]")
              .arg(err));
         return {};
     }
@@ -995,14 +986,14 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
     }
     catch (...)
     {
-        Error("RatesList(): out of memory?");
+        LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:RatesList(): out of memory?");
         return {};
     }
 
     err = AudioObjectGetPropertyData(d, &pa, 0, nullptr, &listSize, ranges.data());
     if (err != noErr)
     {
-        Warn(QString("RatesList(): couldn't get list: [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:RatesList(): couldn't get list: [%1]")
              .arg(err));
         return {};
     }
@@ -1059,7 +1050,7 @@ bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr
             // Find a stream with a cac3 stream
             for (auto format : formats)
             {
-                Debug(QString("ChannelsList: (passthru) found format: %1")
+                LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::ChannelsList: (passthru) found format: %1")
                     .arg(StreamDescriptionToString(format.mFormat)));
                 // Add supported number of channels
                 if (format.mFormat.mChannelsPerFrame <= CHANNELS_MAX)
@@ -1087,7 +1078,7 @@ bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr
                 continue;
             for (auto format : formats)
             {
-                Debug(QString("ChannelsList: (!founddigital) found format: %1")
+                LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::ChannelsList: (!founddigital) found format: %1")
                     .arg(StreamDescriptionToString(format.mFormat)));
                 if (format.mFormat.mChannelsPerFrame <= CHANNELS_MAX)
                     chans[format.mFormat.mChannelsPerFrame-1] = true;
@@ -1111,7 +1102,7 @@ int CoreAudioData::OpenAnalog()
 	kMythAudioObjectPropertyElementMain
     };
 
-    Debug("OpenAnalog: Entering");
+    LOG(VB_AUDIO, LOG_INFO, "CoreAudioData::OpenAnalog: Entering");
 
     desc.componentType = kAudioUnitType_Output;
     if (defaultDevice == mDeviceID)
@@ -1130,14 +1121,14 @@ int CoreAudioData::OpenAnalog()
     AudioComponent comp = AudioComponentFindNext(nullptr, &desc);
     if (comp == nullptr)
     {
-        Error("OpenAnalog: AudioComponentFindNext failed");
+        LOG(VB_GENERAL, LOG_ERR, "CoreAudioData Error:OpenAnalog: AudioComponentFindNext failed");
         return false;
     }
 
     OSErr err = AudioComponentInstanceNew(comp, &mOutputUnit);
     if (err)
     {
-        Error(QString("OpenAnalog: AudioComponentInstanceNew returned %1")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenAnalog: AudioComponentInstanceNew returned %1")
               .arg(err));
         return false;
     }
@@ -1150,7 +1141,7 @@ int CoreAudioData::OpenAnalog()
                                kAudioUnitScope_Output,
                                0,
                                &hasIO, &size_hasIO);
-    Debug(QString("OpenAnalog: HasIO (output) = %1").arg(hasIO));
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: HasIO (output) = %1").arg(hasIO));
     if (!hasIO)
     {
         UInt32 enableIO = 1;
@@ -1161,7 +1152,7 @@ int CoreAudioData::OpenAnalog()
                                    &enableIO, sizeof(enableIO));
         if (err)
         {
-            Warn(QString("OpenAnalog: failed enabling IO: %1")
+            LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: failed enabling IO: %1")
                  .arg(err));
         }
         hasIO = 0;
@@ -1170,7 +1161,7 @@ int CoreAudioData::OpenAnalog()
                                    kAudioUnitScope_Output,
                                    0,
                                    &hasIO, &size_hasIO);
-        Debug(QString("HasIO = %1").arg(hasIO));
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::HasIO = %1").arg(hasIO));
     }
 
     /*
@@ -1186,7 +1177,7 @@ int CoreAudioData::OpenAnalog()
                                    &mDeviceID, sizeof(mDeviceID));
         if (err)
         {
-            Error(QString("OpenAnalog: Unable to set current device to %1. Error = %2")
+            LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenAnalog: Unable to set current device to %1. Error = %2")
                   .arg(mDeviceID)
                   .arg(err));
             return -1;
@@ -1203,12 +1194,12 @@ int CoreAudioData::OpenAnalog()
                                &param_size );
     if (err)
     {
-        Warn(QString("OpenAnalog: Unable to retrieve current stream format: [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: Unable to retrieve current stream format: [%1]")
               .arg(err));
     }
     else
     {
-        Debug(QString("OpenAnalog: current format is: %1")
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: current format is: %1")
               .arg(StreamDescriptionToString(DeviceFormat)));
     }
     /* Get the channel layout of the device side of the unit */
@@ -1232,7 +1223,7 @@ int CoreAudioData::OpenAnalog()
                                          &param_size,
                                          layout);
             if (err)
-                Warn("OpenAnalog: Can't retrieve current channel layout");
+                LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:OpenAnalog: Can't retrieve current channel layout");
         }
         else if(layout->mChannelLayoutTag != kAudioChannelLayoutTag_UseChannelDescriptions )
         {
@@ -1243,16 +1234,16 @@ int CoreAudioData::OpenAnalog()
                                          &param_size,
                                          layout);
             if (err)
-                Warn("OpenAnalog: Can't retrieve current channel layout");
+                LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:OpenAnalog: Can't retrieve current channel layout");
         }
 
-        Debug(QString("OpenAnalog: Layout of AUHAL has %1 channels")
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: Layout of AUHAL has %1 channels")
               .arg(layout->mNumberChannelDescriptions));
 
         int channels_found = 0;
         for(UInt32 i = 0; i < layout->mNumberChannelDescriptions; i++)
         {
-            Debug(QString("OpenAnalog: this is channel: %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: this is channel: %1")
                   .arg(layout->mChannelDescriptions[i].mChannelLabel));
 
             switch( layout->mChannelDescriptions[i].mChannelLabel)
@@ -1269,13 +1260,13 @@ int CoreAudioData::OpenAnalog()
                     channels_found++;
                     break;
                 default:
-                    Debug(QString("unrecognized channel form provided by driver: %1")
+                    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::unrecognized channel form provided by driver: %1")
                           .arg(layout->mChannelDescriptions[i].mChannelLabel));
             }
         }
         if(channels_found == 0)
         {
-            Warn("Audio device is not configured. "
+            LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:Audio device is not configured. "
                  "You should configure your speaker layout with "
                  "the \"Audio Midi Setup\" utility in /Applications/"
                  "Utilities.");
@@ -1284,7 +1275,7 @@ int CoreAudioData::OpenAnalog()
     }
     else
     {
-        Warn("this driver does not support kAudioDevicePropertyPreferredChannelLayout.");
+        LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:this driver does not support kAudioDevicePropertyPreferredChannelLayout.");
     }
 
     memset (&new_layout, 0, sizeof(new_layout));
@@ -1315,7 +1306,7 @@ int CoreAudioData::OpenAnalog()
                                &new_layout, sizeof(new_layout));
     if (err)
     {
-        Warn(QString("OpenAnalog: couldn't set channels layout [%1]")
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: couldn't set channels layout [%1]")
              .arg(err));
     }
 
@@ -1361,11 +1352,11 @@ int CoreAudioData::OpenAnalog()
                                sizeof(AudioStreamBasicDescription));
     if (err)
     {
-        Error(QString("OpenAnalog: AudioUnitSetProperty returned [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenAnalog: AudioUnitSetProperty returned [%1]")
               .arg(err));
         return false;
     }
-    Debug(QString("OpenAnalog: set format as %1")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: set format as %1")
           .arg(StreamDescriptionToString(conv_in_desc)));
     /* Retrieve actual format */
     err = AudioUnitGetProperty(mOutputUnit,
@@ -1375,7 +1366,7 @@ int CoreAudioData::OpenAnalog()
                                &DeviceFormat,
                                &param_size);
 
-    Debug(QString("OpenAnalog: the actual set AU format is %1")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: the actual set AU format is %1")
           .arg(StreamDescriptionToString(DeviceFormat)));
 
     // Attach callback to default output
@@ -1389,7 +1380,7 @@ int CoreAudioData::OpenAnalog()
                                0, &input, sizeof(input));
     if (err)
     {
-        Error(QString("OpenAnalog: AudioUnitSetProperty (callback) returned [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenAnalog: AudioUnitSetProperty (callback) returned [%1]")
               .arg(err));
         return false;
     }
@@ -1399,7 +1390,7 @@ int CoreAudioData::OpenAnalog()
     ComponentResult res = AudioUnitInitialize(mOutputUnit);
     if (res)
     {
-        Error(QString("OpenAnalog: AudioUnitInitialize error: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenAnalog: AudioUnitInitialize error: [%1]")
               .arg(res));
         return false;
     }
@@ -1408,7 +1399,7 @@ int CoreAudioData::OpenAnalog()
     err = AudioOutputUnitStart(mOutputUnit);
     if (err)
     {
-        Error(QString("OpenAnalog: AudioOutputUnitStart error: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenAnalog: AudioOutputUnitStart error: [%1]")
               .arg(err));
         return false;
     }
@@ -1420,24 +1411,24 @@ void CoreAudioData::CloseAnalog()
 {
     OSStatus err;
 
-    Debug(QString("CloseAnalog: Entering: %1")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseAnalog: Entering: %1")
           .arg((long)mOutputUnit));
     if (mOutputUnit)
     {
         if (mStarted)
         {
             err = AudioOutputUnitStop(mOutputUnit);
-            Debug(QString("CloseAnalog: AudioOutputUnitStop %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseAnalog: AudioOutputUnitStop %1")
                   .arg(err));
         }
         if (mInitialized)
         {
             err = AudioUnitUninitialize(mOutputUnit);
-            Debug(QString("CloseAnalog: AudioUnitUninitialize %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseAnalog: AudioUnitUninitialize %1")
                   .arg(err));
         }
         err = AudioComponentInstanceDispose(mOutputUnit);
-        Debug(QString("CloseAnalog: CloseComponent %1")
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseAnalog: CloseComponent %1")
               .arg(err));
         mOutputUnit = nullptr;
     }
@@ -1453,12 +1444,12 @@ bool CoreAudioData::OpenSPDIF()
     AudioStreamIDVec streams;
     AudioStreamBasicDescription outputFormat {};
 
-    Debug("OpenSPDIF: Entering");
+    LOG(VB_AUDIO, LOG_INFO, "CoreAudioData::OpenSPDIF: Entering");
 
     streams = StreamsList(mDeviceID);
     if (streams.empty())
     {
-        Warn("OpenSPDIF: Couldn't retrieve list of streams");
+        LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:OpenSPDIF: Couldn't retrieve list of streams");
         return false;
     }
 
@@ -1471,13 +1462,13 @@ bool CoreAudioData::OpenSPDIF()
         // Find a stream with a cac3 stream
         for (auto format : formats)
         {
-            Debug(QString("OpenSPDIF: Considering Physical Format: %1")
+            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenSPDIF: Considering Physical Format: %1")
                   .arg(StreamDescriptionToString(format.mFormat)));
             if ((format.mFormat.mFormatID == 'IAC3' ||
                  format.mFormat.mFormatID == kAudioFormat60958AC3) &&
                 format.mFormat.mSampleRate == mCA->m_sampleRate)
             {
-                Debug("OpenSPDIF: Found digital format");
+                LOG(VB_AUDIO, LOG_INFO, "CoreAudioData::OpenSPDIF: Found digital format");
                 mStreamIndex  = i;
                 mStreamID     = streams[i];
                 outputFormat  = format.mFormat;
@@ -1490,7 +1481,7 @@ bool CoreAudioData::OpenSPDIF()
 
     if (!outputFormat.mFormatID)
     {
-        Error(QString("OpenSPDIF: Couldn't find suitable output"));
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenSPDIF: Couldn't find suitable output"));
         return false;
     }
 
@@ -1510,7 +1501,7 @@ bool CoreAudioData::OpenSPDIF()
 					 &paramSize, &mFormatOrig);
         if (err != noErr)
         {
-            Warn(QString("OpenSPDIF - could not retrieve the original streamformat: [%1]")
+            LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenSPDIF - could not retrieve the original streamformat: [%1]")
                  .arg(OSS_STATUS(err)));
         }
         else
@@ -1544,7 +1535,7 @@ bool CoreAudioData::OpenSPDIF()
 				    (void *)this, &mIoProcID);
     if (err != noErr)
     {
-        Error(QString("OpenSPDIF: AudioDeviceCreateIOProcID failed: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenSPDIF: AudioDeviceCreateIOProcID failed: [%1]")
               .arg(OSS_STATUS(err)));
         return false;
     }
@@ -1554,7 +1545,7 @@ bool CoreAudioData::OpenSPDIF()
     err = AudioDeviceStart(mDeviceID, mIoProcID);
     if (err != noErr)
     {
-        Error(QString("OpenSPDIF: AudioDeviceStart failed: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:OpenSPDIF: AudioDeviceStart failed: [%1]")
               .arg(OSS_STATUS(err)));
         return false;
     }
@@ -1566,7 +1557,7 @@ void CoreAudioData::CloseSPDIF()
 {
     OSStatus  err;
 
-    Debug(QString("CloseSPDIF: Entering [%1]").arg(mDigitalInUse));;
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseSPDIF: Entering [%1]").arg(mDigitalInUse));;
     if (!mDigitalInUse)
         return;
 
@@ -1575,7 +1566,7 @@ void CoreAudioData::CloseSPDIF()
     {
         err = AudioDeviceStop(mDeviceID, mIoProcID);
         if (err != noErr)
-            Error(QString("CloseSPDIF: AudioDeviceStop failed: [%1]")
+            LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:CloseSPDIF: AudioDeviceStop failed: [%1]")
                   .arg(OSS_STATUS(err)));
         mStarted = false;
     }
@@ -1585,7 +1576,7 @@ void CoreAudioData::CloseSPDIF()
     {
         err = AudioDeviceDestroyIOProcID(mDeviceID, mIoProcID);
         if (err != noErr)
-            Error(QString("CloseSPDIF: AudioDeviceDestroyIOProcID failed: [%1]")
+            LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:CloseSPDIF: AudioDeviceDestroyIOProcID failed: [%1]")
                   .arg(OSS_STATUS(err)));
         mIoProc = false;
     }
@@ -1609,7 +1600,7 @@ void CoreAudioData::CloseSPDIF()
 int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
                                            AudioStreamBasicDescription format)
 {
-    Debug(QString("AudioStreamChangeFormat: %1 -> %2")
+    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::AudioStreamChangeFormat: %1 -> %2")
           .arg(s)
           .arg(StreamDescriptionToString(format)));
 
@@ -1623,7 +1614,7 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
 					      sizeof(format), &format);
     if (err != noErr)
     {
-        Error(QString("AudioStreamChangeFormat couldn't set stream format: [%1]")
+        LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:AudioStreamChangeFormat couldn't set stream format: [%1]")
               .arg(OSS_STATUS(err)));
         return false;
     }
@@ -1651,7 +1642,7 @@ bool CoreAudioData::FindAC3Stream()
             if (format.mFormat.mFormatID == 'IAC3' ||
                 format.mFormat.mFormatID == kAudioFormat60958AC3)
             {
-                Debug("FindAC3Stream: found digital format");
+                LOG(VB_AUDIO, LOG_INFO, "CoreAudioData::FindAC3Stream: found digital format");
                 return true;
             }
         }
@@ -1678,7 +1669,7 @@ void CoreAudioData::ResetAudioDevices()
 						  0, nullptr, &size);
     if (err)
     {
-        Warn(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetPropertyDataSize: Unable to retrieve the property sizes. "
                      "Error [%1]")
              .arg(err));
 	return;
@@ -1690,7 +1681,7 @@ void CoreAudioData::ResetAudioDevices()
 				     0, nullptr, &size, devices.data());
     if (err)
     {
-        Warn(QString("GetPropertyData: Unable to retrieve the list of available devices. "
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:GetPropertyData: Unable to retrieve the list of available devices. "
                      "Error [%1]")
              .arg(err));
 	return;
@@ -1739,12 +1730,12 @@ void CoreAudioData::ResetStream(AudioStreamID s)
         for (auto format : formats) {
             if (format.mFormat.mFormatID == kAudioFormatLinearPCM)
             {
-                Debug(QString("ResetStream: Resetting stream %1 to %2").arg(s).arg(StreamDescriptionToString(format.mFormat)));
+                LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::ResetStream: Resetting stream %1 to %2").arg(s).arg(StreamDescriptionToString(format.mFormat)));
                 err = AudioObjectSetPropertyData(s, &pa, 0, nullptr,
                                                  sizeof(format), &(format.mFormat));
                 if (err != noErr)
                 {
-                    Warn(QString("ResetStream: could not set physical format: [%1]")
+                    LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:ResetStream: could not set physical format: [%1]")
                          .arg(OSS_STATUS(err)));
                     continue;
                 }
@@ -1773,7 +1764,7 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
 						  0, nullptr, &size);
     if (err)
     {
-        VBAUDIO(QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetPropertyDataSize: Unable to retrieve the property sizes. "
                      "Error [%1]")
              .arg(err));
 	return devs;
@@ -1786,13 +1777,13 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
                                     0, nullptr, &size, devices.data());
     if (err)
     {
-        VBAUDIO(QString("AudioOutputCA::GetDevices: Unable to retrieve the list of "
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("AudioOutputCA::GetDevices: Unable to retrieve the list of "
                         "available devices. Error [%1]")
                 .arg(err));
     }
     else
     {
-        VBAUDIO(QString("GetDevices: Number of devices: %1").arg(deviceCount));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("GetDevices: Number of devices: %1").arg(deviceCount));
 
         for (const auto & dev : devices)
         {

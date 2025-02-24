@@ -6,6 +6,9 @@
 #include <algorithm>
 
 #include "atscstreamdata.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "atsctables.h"
 #include "sctetables.h"
 #include "eithelper.h"

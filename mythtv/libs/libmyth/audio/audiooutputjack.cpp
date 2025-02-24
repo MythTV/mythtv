@@ -30,6 +30,7 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
+#include "libmythbase/mythlogging.h"
 
 #include "audiooutputjack.h"
 
@@ -92,7 +93,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     while ((i < JACK_CHANNELS_MAX) && matching_ports[i])
     {
         settings->AddSupportedChannels(i+1);
-        VBAUDIO(QString("Adding channels: %1").arg(i+1));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Adding channels: %1").arg(i+1));
         i++;
     }
 
@@ -129,7 +130,7 @@ bool AudioOutputJACK::OpenDevice()
         return false;
     }
 
-    VBAUDIO( QString("Opening JACK audio device: '%1'.")
+    LOG(VB_AUDIO, LOG_INFO, LOC +  QString("Opening JACK audio device: '%1'.")
             .arg(m_mainDevice));
 
     // Setup volume control
@@ -231,7 +232,7 @@ void AudioOutputJACK::CloseDevice()
         m_auBuf = nullptr;
     }
 
-    VBAUDIO("Jack: Stop Event");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Jack: Stop Event");
     OutputEvent e(OutputEvent::kStopped);
     dispatch(e);
 }
@@ -370,7 +371,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     for (int i = 0; i < t_jack_xruns; i++)
     {
         bytes_read = GetAudioData(m_auBuf, m_fragmentSize, true);
-        VBERROR("Discarded one audio fragment to compensate for xrun");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Discarded one audio fragment to compensate for xrun");
     }
     m_jackXruns -= t_jack_xruns;
 
@@ -387,7 +388,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     {
         if (!m_actuallyPaused)
         {
-            VBAUDIO("JackCallback: audio paused");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "JackCallback: audio paused");
             OutputEvent e(OutputEvent::kPaused);
             dispatch(e);
             m_wasPaused = true;
@@ -399,7 +400,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     {
         if (m_wasPaused)
         {
-            VBAUDIO("JackCallback: Play Event");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "JackCallback: Play Event");
             OutputEvent e(OutputEvent::kPlaying);
             dispatch(e);
             m_wasPaused = false;
@@ -414,7 +415,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         memset(m_auBuf + bytes_read, 0, bytes_needed - bytes_read);
         if (!m_pauseAudio)
         {
-            VBERROR(QString("Having to insert silence because GetAudioData "
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Having to insert silence because GetAudioData "
                             "hasn't returned enough data. Wanted: %1 Got: %2")
                                     .arg(bytes_needed).arg(bytes_read));
         }
@@ -454,7 +455,7 @@ int AudioOutputJACK::JackXRunCallback(void)
     int fragments = (int)ceilf( ((delay / 1000000.0F) * m_sampleRate )
                             / ((float)m_fragmentSize / m_outputBytesPerFrame) );
     m_jackXruns += fragments; //should be at least 1...
-    VBERROR(QString("Jack XRun Callback: %1 usecs delayed, xruns now %2")
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Jack XRun Callback: %1 usecs delayed, xruns now %2")
                         .arg(delay).arg(m_jackXruns) );
 
     return 0;
@@ -487,7 +488,7 @@ int AudioOutputJACK::JackGraphOrderCallback(void)
     }
 
     m_jackLatency = max_latency;
-    VBAUDIO(QString("JACK graph reordered. Maximum latency=%1")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("JACK graph reordered. Maximum latency=%1")
                     .arg(m_jackLatency));
 
     return 0;

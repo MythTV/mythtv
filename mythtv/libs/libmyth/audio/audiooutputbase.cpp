@@ -21,6 +21,7 @@
 // MythTV headers
 #include "libmythbase/compat.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "audiooutputbase.h"
@@ -81,7 +82,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
         // Extra test to keep backward compatibility with earlier SRC setting
         m_srcQuality = std::min<int>(m_srcQuality, QUALITY_HIGH);
 
-        VBAUDIO(QString("SRC quality = %1").arg(quality_string(m_srcQuality)));
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("SRC quality = %1").arg(quality_string(m_srcQuality)));
     }
 }
 
@@ -93,7 +94,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 AudioOutputBase::~AudioOutputBase()
 {
     if (!m_killAudio)
-        VBERROR("Programmer Error: "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Programmer Error: "
                 "~AudioOutputBase called, but KillAudio has not been called!");
 
     // We got this from a subclass, delete it
@@ -305,21 +306,21 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
             m_processing = false;
             delete m_pSoundStretch;
             m_pSoundStretch = nullptr;
-            VBGENERAL(QString("Cancelling time stretch"));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Cancelling time stretch"));
             m_bytesPerFrame = m_previousBpf;
             m_waud = m_raud = 0;
             m_resetActive.Ref();
         }
         else
         {
-            VBGENERAL(QString("Changing time stretch to %1")
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Changing time stretch to %1")
                       .arg(m_stretchFactor));
             m_pSoundStretch->setTempo(m_stretchFactor);
         }
     }
     else if (willstretch)
     {
-        VBGENERAL(QString("Using time stretch %1").arg(m_stretchFactor));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using time stretch %1").arg(m_stretchFactor));
         m_pSoundStretch = new soundtouch::SoundTouch();
         m_pSoundStretch->setSampleRate(m_sampleRate);
         m_pSoundStretch->setChannels(channels);
@@ -423,7 +424,7 @@ bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
         codec, codec_profile,
         samplerate_tmp, channels_tmp,
         m_outputSettingsDigital->GetMaxHDRate() == 768000);
-    VBAUDIO("Setting " + log + " passthrough");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Setting " + log + " passthrough");
 
     delete m_spdifEnc;
 
@@ -548,14 +549,14 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (IS_VALID_UPMIX_CHANNEL(settings.m_channels) &&
             settings.m_channels < lconfigured_channels)
         {
-            VBAUDIO(QString("Needs upmix from %1 -> %2 channels")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Needs upmix from %1 -> %2 channels")
                     .arg(settings.m_channels).arg(lconfigured_channels));
             settings.m_channels = lconfigured_channels;
             lneeds_upmix = true;
         }
         else if (settings.m_channels > lconfigured_channels)
         {
-            VBAUDIO(QString("Needs downmix from %1 -> %2 channels")
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Needs downmix from %1 -> %2 channels")
                     .arg(settings.m_channels).arg(lconfigured_channels));
             settings.m_channels = lconfigured_channels;
             lneeds_downmix = true;
@@ -594,7 +595,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (general_deps && m_configureSucceeded)
     {
-        VBAUDIO("Reconfigure(): No change -> exiting");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Reconfigure(): No change -> exiting");
         // if passthrough, source channels may have changed
         m_sourceChannels = lsource_channels;
         return;
@@ -634,7 +635,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         return;
     }
 
-    VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Original codec was %1, %2, %3 kHz, %4 channels")
             .arg(avcodec_get_name(m_codec),
                  m_outputSettings->FormatToString(m_format))
             .arg(m_sampleRate/1000)
@@ -647,7 +648,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         return;
     }
 
-    VBAUDIO(QString("enc(%1), passthru(%2), features (%3) "
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("enc(%1), passthru(%2), features (%3) "
                     "configured_channels(%4), %5 channels supported(%6) "
                     "max_channels(%7)")
             .arg(m_enc)
@@ -666,7 +667,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
          gCoreContext->GetBoolSetting("Audio48kOverride", false)) ||
          (m_enc && (m_sampleRate > 48000)))
     {
-        VBAUDIO("Forcing resample to 48 kHz");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Forcing resample to 48 kHz");
         if (m_srcQuality < 0)
             m_srcQuality = QUALITY_MEDIUM;
         m_needResampler = true;
@@ -688,7 +689,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     {
         m_sampleRate = dest_rate;
 
-        VBGENERAL(QString("Resampling from %1 kHz to %2 kHz with quality %3")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Resampling from %1 kHz to %2 kHz with quality %3")
                 .arg(settings.m_sampleRate/1000).arg(m_sampleRate/1000)
                 .arg(quality_string(m_srcQuality)));
 
@@ -712,7 +713,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (m_kAudioSRCOutputSize < newsize)
         {
             m_kAudioSRCOutputSize = newsize;
-            VBAUDIO(QString("Resampler allocating %1").arg(newsize));
+            LOG(VB_AUDIO, LOG_INFO, LOC + QString("Resampler allocating %1").arg(newsize));
             delete[] m_srcOut;
             m_srcOut = new float[m_kAudioSRCOutputSize];
         }
@@ -724,9 +725,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (m_enc)
     {
         if (m_reEnc)
-            VBAUDIO("Reencoding decoded AC-3/DTS to AC-3");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "Reencoding decoded AC-3/DTS to AC-3");
 
-        VBAUDIO(QString("Creating AC-3 Encoder with sr = %1, ch = %2")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Creating AC-3 Encoder with sr = %1, ch = %2")
                 .arg(m_sampleRate).arg(m_configuredChannels));
 
         m_encoder = new AudioOutputDigitalEncoder();
@@ -763,7 +764,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         (m_enc && m_outputFormat != FORMAT_S16) ||
         !OutputSettings(m_enc || m_passthru)->IsSupportedFormat(m_outputFormat))
     {
-        VBAUDIO("Audio processing enabled");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Audio processing enabled");
         m_processing  = true;
         if (m_enc)
             m_outputFormat = FORMAT_S16;  // Output s16le for AC-3 encoder
@@ -781,7 +782,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     m_outputBytesPerFrame = m_channels *
                              AudioOutputSettings::SampleSize(m_outputFormat);
 
-    VBGENERAL(
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Opening audio device '%1' ch %2(%3) sr %4 sf %5 reenc %6")
         .arg(m_mainDevice).arg(m_channels).arg(m_sourceChannels).arg(m_sampleRate)
         .arg(m_outputSettings->FormatToString(m_outputFormat)).arg(m_reEnc));
@@ -798,17 +799,17 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (GetError().isEmpty())
             Error(QObject::tr("Aborting reconfigure"));
         else
-            VBGENERAL("Aborting reconfigure");
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Aborting reconfigure");
         m_configureSucceeded = false;
         return;
     }
 
-    VBAUDIO(QString("Audio fragment size: %1").arg(m_fragmentSize));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio fragment size: %1").arg(m_fragmentSize));
 
     // Only used for software volume
     if (m_setInitialVol && m_internalVol && SWVolume())
     {
-        VBAUDIO("Software volume enabled");
+        LOG(VB_AUDIO, LOG_INFO, LOC + "Software volume enabled");
         m_volumeControl  = gCoreContext->GetSetting("MixerControl", "PCM");
         m_volumeControl += "MixerVolume";
         m_volume = gCoreContext->GetNumSetting(m_volumeControl, 80);
@@ -823,11 +824,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         m_surroundMode = gCoreContext->GetNumSetting("AudioUpmixType", QUALITY_HIGH);
         m_upmixer = new FreeSurround(m_sampleRate, m_source == AUDIOOUTPUT_VIDEO,
                                    (FreeSurround::SurroundMode)m_surroundMode);
-        VBAUDIO(QString("Create %1 quality upmixer done")
+        LOG(VB_AUDIO, LOG_INFO, LOC + QString("Create %1 quality upmixer done")
                 .arg(quality_string(m_surroundMode)));
     }
 
-    VBAUDIO(QString("Audio Stretch Factor: %1").arg(m_stretchFactor));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio Stretch Factor: %1").arg(m_stretchFactor));
     SetStretchFactorLocked(m_oldStretchFactor);
 
     // Setup visualisations, zero the visualisations buffers
@@ -840,7 +841,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     StartOutputThread();
 
-    VBAUDIO("Ending Reconfigure()");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Ending Reconfigure()");
 }
 
 bool AudioOutputBase::StartOutputThread(void)
@@ -871,7 +872,7 @@ void AudioOutputBase::KillAudio()
 {
     m_killAudioLock.lock();
 
-    VBAUDIO("Killing AudioOutputDSP");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "Killing AudioOutputDSP");
     m_killAudio = true;
     StopOutputThread();
     QMutexLocker lock(&m_audioBufLock);
@@ -913,7 +914,7 @@ void AudioOutputBase::Pause(bool paused)
 {
     if (!paused && m_unpauseWhenReady)
         return;
-    VBAUDIO(QString("Pause %1").arg(paused));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("Pause %1").arg(paused));
     if (m_pauseAudio != paused)
         m_wasPaused = m_pauseAudio;
     m_pauseAudio = paused;
@@ -983,7 +984,7 @@ void AudioOutputBase::SetTimecode(std::chrono::milliseconds timecode)
  */
 void AudioOutputBase::SetEffDsp(int dsprate)
 {
-    VBAUDIO(QString("SetEffDsp: %1").arg(dsprate));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("SetEffDsp: %1").arg(dsprate));
     m_effDsp = dsprate;
 }
 
@@ -1086,7 +1087,7 @@ std::chrono::milliseconds AudioOutputBase::GetAudiotime(void)
     if (m_audioTime < oldaudiotime)
         m_audioTime = oldaudiotime;
 
-    VBAUDIOTS(QString("GetAudiotime audt=%1 abtc=%2 mb=%3 sb=%4 tb=%5 "
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("GetAudiotime audt=%1 abtc=%2 mb=%3 sb=%4 tb=%5 "
                       "sr=%6 obpf=%7 bpf=%8 esf=%9 edsp=%10 sbr=%11")
               .arg(m_audioTime.count())                // 1
               .arg(m_audbufTimecode.count())           // 2
@@ -1141,7 +1142,7 @@ void AudioOutputBase::SetAudiotime(int frames, std::chrono::milliseconds timecod
     if (m_audbufTimecode < old_audbuf_timecode)
         m_audioTime = 0ms;
 
-    VBAUDIOTS(QString("SetAudiotime atc=%1 tc=%2 f=%3 pfu=%4 pfs=%5")
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("SetAudiotime atc=%1 tc=%2 f=%3 pfu=%4 pfs=%5")
               .arg(m_audbufTimecode.count())
               .arg(timecode.count())
               .arg(frames)
@@ -1201,7 +1202,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
     if (len <= afree)
         return len;
 
-    VBERROR(QString("Audio buffer overflow, %1 frames lost!")
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Audio buffer overflow, %1 frames lost!")
             .arg(frames - (afree / bpf)));
 
     frames = afree / bpf;
@@ -1213,7 +1214,7 @@ int AudioOutputBase::CheckFreeSpace(int &frames)
     int error = src_reset(m_srcCtx);
     if (error)
     {
-        VBERROR(QString("Error occurred while resetting resampler: %1")
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error occurred while resetting resampler: %1")
                 .arg(src_strerror(error)));
         m_srcCtx = nullptr;
     }
@@ -1292,7 +1293,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         {
             if ((org_waud % bpf) != 0)
             {
-                VBERROR(QString("Upmixing: org_waud = %1 (bpf = %2)")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Upmixing: org_waud = %1 (bpf = %2)")
                         .arg(org_waud)
                         .arg(bpf));
             }
@@ -1387,7 +1388,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     m_lengthLastData = millisecondsFromFloat
         ((double)(len * 1000) / (m_sourceSampleRate * m_sourceBytesPerFrame));
 
-    VBAUDIOTS(QString("AddData frames=%1, bytes=%2, used=%3, free=%4, "
+    LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("AddData frames=%1, bytes=%2, used=%3, free=%4, "
                       "timecode=%5 needsupmix=%6")
               .arg(frames).arg(len).arg(used).arg(afree).arg(timecode.count())
               .arg(m_needsUpmix));
@@ -1414,7 +1415,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         if (sampleSize <= 0)
         {
             // Would lead to division by zero (or unexpected results if negative)
-            VBERROR("Sample size is <= 0, AddData returning false");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Sample size is <= 0, AddData returning false");
             return false;
         }
 
@@ -1444,7 +1445,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     if (len > afree)
     {
-        VBERROR("Buffer is full, AddData returning false");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Buffer is full, AddData returning false");
         return false; // would overflow
     }
 
@@ -1479,7 +1480,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             if(AudioOutputDownmix::DownmixFrames(m_sourceChannels,
                                                  m_configuredChannels,
                                                  m_srcIn, m_srcIn, frames) < 0)
-                VBERROR("Error occurred while downmixing");
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Error occurred while downmixing");
         }
 
         // Resample if necessary
@@ -1489,7 +1490,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             int error = src_process(m_srcCtx, &m_srcData);
 
             if (error)
-                VBERROR(QString("Error occurred while resampling audio: %1")
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error occurred while resampling audio: %1")
                         .arg(src_strerror(error)));
 
             buffer = m_srcOut;
@@ -1517,13 +1518,13 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         int bdiff = kAudioRingBufferSize - m_waud;
         if ((len % bpf) != 0 && bdiff < len)
         {
-            VBERROR(QString("AddData: Corruption likely: len = %1 (bpf = %2)")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("AddData: Corruption likely: len = %1 (bpf = %2)")
                     .arg(len)
                     .arg(bpf));
         }
         if ((bdiff % bpf) != 0 && bdiff < len)
         {
-            VBERROR(QString("AddData: Corruption likely: bdiff = %1 (bpf = %2)")
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("AddData: Corruption likely: bdiff = %1 (bpf = %2)")
                     .arg(bdiff)
                     .arg(bpf));
         }
@@ -1672,7 +1673,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         {
             if (!m_actuallyPaused)
             {
-                VBAUDIO("OutputAudioLoop: audio paused");
+                LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: audio paused");
                 OutputEvent e(OutputEvent::kPaused);
                 dispatch(e);
                 m_wasPaused = true;
@@ -1687,7 +1688,7 @@ void AudioOutputBase::OutputAudioLoop(void)
 
         if (m_wasPaused)
         {
-            VBAUDIO("OutputAudioLoop: Play Event");
+            LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: Play Event");
             OutputEvent e(OutputEvent::kPlaying);
             dispatch(e);
             m_wasPaused = false;
@@ -1701,7 +1702,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         {
             if (ready > 0)  // only log if we're sending some audio
             {
-                VBAUDIOTS(QString("audio waiting for buffer to fill: "
+                LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + QString("audio waiting for buffer to fill: "
                                   "have %1 want %2")
                           .arg(ready).arg(m_fragmentSize));
             }
@@ -1711,7 +1712,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         }
 
 #ifdef AUDIOTSTESTING
-        VBAUDIOTS("WriteAudio Start");
+        LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + "WriteAudio Start");
 #endif
         Status();
 
@@ -1730,14 +1731,14 @@ void AudioOutputBase::OutputAudioLoop(void)
         }
 #ifdef AUDIOTSTESTING
         GetAudiotime();
-        VBAUDIOTS("WriteAudio Done");
+        LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + "WriteAudio Done");
 #endif
 
     }
 
     delete[] zeros;
     delete[] fragment;
-    VBAUDIO("OutputAudioLoop: Stop Event");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: Stop Event");
     OutputEvent e(OutputEvent::kStopped);
     dispatch(e);
 }
@@ -1855,14 +1856,14 @@ void AudioOutputBase::Drain()
 void AudioOutputBase::run(void)
 {
     RunProlog();
-    VBAUDIO(QString("kickoffOutputAudioLoop: pid = %1").arg(getpid()));
+    LOG(VB_AUDIO, LOG_INFO, LOC + QString("kickoffOutputAudioLoop: pid = %1").arg(getpid()));
     OutputAudioLoop();
-    VBAUDIO("kickoffOutputAudioLoop exiting");
+    LOG(VB_AUDIO, LOG_INFO, LOC + "kickoffOutputAudioLoop exiting");
     RunEpilog();
 }
 
 int AudioOutputBase::readOutputData(unsigned char* /*read_buffer*/, size_t /*max_length*/)
 {
-    VBERROR("AudioOutputBase should not be getting asked to readOutputData()");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "AudioOutputBase should not be getting asked to readOutputData()");
     return 0;
 }

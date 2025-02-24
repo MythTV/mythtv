@@ -7,7 +7,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
 
 #include "fourcc.h"

@@ -1,8 +1,6 @@
-// libmyth* headers
-#include "libmythbase/mythcorecontext.h"
-
-// local headers
 #include "mythutil_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythUtilCommandLineParser::MythUtilCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHUTIL)

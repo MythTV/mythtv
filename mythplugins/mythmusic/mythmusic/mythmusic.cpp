@@ -10,11 +10,12 @@
 #include <QScopedPointer>
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythbase/compat.h>
 #include <libmythbase/lcddevice.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcon.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythplugin.h>
 #include <libmythbase/mythpluginapi.h>
 #include <libmythbase/mythversion.h>

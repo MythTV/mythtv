@@ -24,10 +24,12 @@
 #include <unistd.h>
 
 // MythTV
+#include "libmyth/mythcontext.h"
 #include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"

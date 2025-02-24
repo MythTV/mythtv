@@ -29,6 +29,8 @@
 
 #include <algorithm>
 
+#include "libmythbase/mythlogging.h"
+
 #include "cardutil.h"
 #include "channelscan_sm.h"
 #include "channelscanner.h"

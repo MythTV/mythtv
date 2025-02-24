@@ -102,6 +102,7 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "mpeg/dvbdescriptors.h"
 #include "mpeg/mpegtables.h"
 #include "bytereader.h"
+#include "mythavbufferref.h"
 #include "mythavutil.h"
 #include "mythframe.h"
 #include "mythhdrvideometadata.h"

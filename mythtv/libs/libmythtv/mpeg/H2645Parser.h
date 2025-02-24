@@ -29,7 +29,6 @@
 
 #include "libmythbase/compat.h" // for uint on Darwin, MinGW
 #include "libmythbase/mythconfig.h"
-#include "libmythbase/mythlogging.h"
 
 #include "libmythtv/mythavrational.h"
 #include "libmythtv/scantype.h"

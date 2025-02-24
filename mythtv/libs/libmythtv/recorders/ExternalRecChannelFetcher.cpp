@@ -26,6 +26,9 @@
 
 // MythTV includes
 #include "ExternalRecChannelFetcher.h"
+
+#include "libmythbase/mythlogging.h"
+
 #include "ExternalStreamHandler.h"
 
 #define LOC QString("ExternalRec[%1](%2): ").arg(m_cardid).arg(m_command)

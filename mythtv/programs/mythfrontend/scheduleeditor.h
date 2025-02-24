@@ -2,7 +2,6 @@
 #define SCHEDULERECORDING_H_
 
 // MythTV
-#include "libmyth/mythcontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythmetadata/metadatafactory.h"
 #include "libmythtv/recordinginfo.h"

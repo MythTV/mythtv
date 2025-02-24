@@ -14,6 +14,8 @@ static constexpr int k_FFT_sample_length { 512 };
 // Std
 #include <algorithm>
 
+#include "libmythbase/mythlogging.h"
+
 VideoVisualSpectrum::VideoVisualSpectrum(AudioPlayer* Audio, MythRender* Render)
   : VideoVisual(Audio, Render),
     m_dftL(static_cast<AVComplexFloat*>(av_malloc(sizeof(AVComplexFloat) * k_FFT_sample_length))),

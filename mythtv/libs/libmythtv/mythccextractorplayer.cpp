@@ -27,6 +27,7 @@
 #include <QPainter>
 
 #include "libmythbase/iso639.h"
+#include "libmythbase/mythlogging.h"
 
 #include "captions/srtwriter.h"
 #include "captions/subtitlescreen.h"

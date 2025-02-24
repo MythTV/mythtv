@@ -9,6 +9,8 @@
 
 // MythTV
 #include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remotefile.h"
 #include "libmythui/mythdialogbox.h"
@@ -2192,4 +2194,9 @@ void GalleryThumbView::Import()
     QString err = m_mgr.ScanImagesAction(true, true);
     if (!err.isEmpty())
         LOG(VB_GENERAL, LOG_ERR, LOC + err);
+}
+
+void GalleryThumbView::DoRepeat(int on)
+{
+    gCoreContext->SaveSetting("GalleryRepeat", on);
 }

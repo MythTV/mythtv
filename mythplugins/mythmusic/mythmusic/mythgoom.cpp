@@ -11,9 +11,8 @@
 #include <QPainter>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/compat.h>
-#include <libmythbase/mythlogging.h>
+#include <libmythbase/mythcorecontext.h>
 
 // Goom
 #include "libmythtv/visualisations/goom/goom_tools.h"

@@ -8,6 +8,7 @@
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"
 #include "libmythbase/programtypes.h"
 #include "libmythbase/recordingtypes.h"

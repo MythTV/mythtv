@@ -5,7 +5,6 @@
 #include <vector>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
 #include "libmythui/standardsettings.h"
 #include "libmythbase/mthread.h"
 
@@ -760,12 +759,7 @@ private:
     class Hostname : public StandardSetting
     {
       public:
-        explicit Hostname(const CaptureCard &parent) :
-            StandardSetting(new CaptureCardDBStorage(this, parent, "hostname"))
-        {
-            setVisible(false);
-            setValue(gCoreContext->GetHostName());
-        }
+        explicit Hostname(const CaptureCard &parent);
         void edit(MythScreenType */*screen*/) override {} // StandardSetting
         void resultEdit(DialogCompletionEvent */*dce*/) override {} // StandardSetting
     };

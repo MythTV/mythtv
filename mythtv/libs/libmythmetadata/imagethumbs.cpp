@@ -3,7 +3,7 @@
 #include <QDir>
 #include <QStringList>
 
-#include "libmythbase/mythcorecontext.h"  // for MYTH_APPNAME_MYTHPREVIEWGEN
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythdirs.h"         // for GetAppBinDir
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"

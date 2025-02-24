@@ -10,6 +10,7 @@
 // libmythbase
 #include "mythdirs.h"
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 
 using TransMap = QMap<QString, QTranslator*>;
 

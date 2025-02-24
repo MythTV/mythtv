@@ -23,7 +23,6 @@
 #ifndef MythXCode_hlsbuffer_h
 #define MythXCode_hlsbuffer_h
 
-#include "libmythbase/mythcorecontext.h"
 #include "libmythtv/io/mythmediabuffer.h"
 
 class MythDownloadManager;

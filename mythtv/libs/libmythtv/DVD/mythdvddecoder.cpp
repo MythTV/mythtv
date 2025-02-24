@@ -1,5 +1,7 @@
 // MythTV
 #include "libmythbase/iso639.h"
+#include "libmythbase/mythlogging.h"
+
 #include "mythdvdbuffer.h"
 #include "mythdvdplayer.h"
 #include "mythdvddecoder.h"

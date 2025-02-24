@@ -11,8 +11,8 @@
 #include <QUrl>
 
 // mythtv
-#include "libmyth/mythcontext.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remoteutil.h"

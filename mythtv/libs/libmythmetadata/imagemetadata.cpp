@@ -1,7 +1,10 @@
 #include "imagemetadata.h"
 
-#include "libmythbase/mythcorecontext.h"
+#include <QTextStream>
+
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythdirs.h"         // for GetAppBinDir
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h" // for ffprobe
 
 // libexiv2 for Exif metadata
@@ -33,6 +36,7 @@ int Orientation::Transform(int transform)
  * \brief Determines orientation required for an image
  * \return Exif orientation code to apply after the image has been loaded.
  */
+
 int Orientation::GetCurrent() const
 {
     return m_current;

@@ -8,6 +8,7 @@
 
 // MythTV headers
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 
 #include "cardutil.h"
@@ -15,6 +16,37 @@
 #include "channelutil.h"
 #include "mpeg/mpegtables.h"
 
+void ChannelID::Save()
+{
+    if (getValue().toInt() == 0) {
+        setValue(findHighest());
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        QString querystr = QString("SELECT %1 FROM %2 WHERE %3='%4'")
+                         .arg(m_field, m_table, m_field, getValue());
+        query.prepare(querystr);
+
+        if (!query.exec() && !query.isActive())
+            MythDB::DBError("ChannelID::save", query);
+
+        if (query.size())
+            return;
+
+        querystr = QString("INSERT INTO %1 (%2) VALUES ('%3')")
+                         .arg(m_table, m_field, getValue());
+        query.prepare(querystr);
+
+        if (!query.exec() || !query.isActive())
+            MythDB::DBError("ChannelID::save", query);
+
+        if (query.numRowsAffected() != 1)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("ChannelID, Error: ") +
+                    QString("Failed to insert into: %1").arg(m_table));
+        }
+    }
+}
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {

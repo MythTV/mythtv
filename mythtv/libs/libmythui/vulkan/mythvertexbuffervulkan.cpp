@@ -1,5 +1,4 @@
 // MythTV
-#include "libmythbase/mythlogging.h"
 #include "vulkan/mythvertexbuffervulkan.h"
 
 #define LOC QString("VulkanBuf: ")

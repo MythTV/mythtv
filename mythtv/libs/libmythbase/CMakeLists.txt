@@ -88,6 +88,7 @@ set(LIBMYTHBASE_HEADERS_NOT_INSTALLED
     housekeeper.h
     logging.h
     mconcurrent.h
+    mythappname.h
     mythhdd.h
     mythpower.h
     mythscheduler.h
@@ -191,7 +192,6 @@ add_library(
   loggingserver.cpp
   mthread.cpp
   mthreadpool.cpp
-  mythbaseutil.h
   mythbinaryplist.cpp
   mythcdrom.cpp
   mythcommandlineparser.cpp

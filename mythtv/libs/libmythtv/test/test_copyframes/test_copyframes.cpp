@@ -6,7 +6,6 @@ extern "C" {
 #include "libavutil/mem.h"
 }
 
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythrandom.h"
 #include "libmythtv/mythframe.h"
 

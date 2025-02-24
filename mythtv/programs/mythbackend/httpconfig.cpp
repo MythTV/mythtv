@@ -10,9 +10,11 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythdownloadmanager.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/unziputil.h"
 

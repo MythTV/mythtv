@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "libmythbase/mythlogging.h"
 #include "libmythui/mythrender_base.h"
 #include "mythplayer.h"
 #include "videovisual.h"

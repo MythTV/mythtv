@@ -32,7 +32,6 @@
 #include <mythconfig.h>
 #include <libmyth/audio/audiooutput.h>
 #include <libmyth/audio/audiooutpututil.h>
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythmetadata/metaio.h>
 #include <libmythmetadata/metaioavfcomment.h>
@@ -47,6 +46,7 @@
 #include "avfdecoder.h"
 #include "decoderhandler.h"
 #include "musicplayer.h"
+#include "remoteavformatcontext.h"
 
 extern "C" {
     #include <libavformat/avio.h>

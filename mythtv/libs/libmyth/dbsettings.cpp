@@ -4,6 +4,7 @@
 #include <QObject>
 
 // MythTV headers
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdbparams.h"
 

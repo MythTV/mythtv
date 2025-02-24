@@ -1,7 +1,8 @@
 #include <QString>
 
-#include "libmythbase/mythcorecontext.h"
 #include "mythexternrecorder_commandlineparser.h"
+
+#include "libmythbase/mythappname.h"
 
 MythExternRecorderCommandLineParser::MythExternRecorderCommandLineParser() :
     MythCommandLineParser(MYTH_APPNAME_MYTHEXTERNRECORDER)

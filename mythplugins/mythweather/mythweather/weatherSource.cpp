@@ -13,11 +13,12 @@
 #endif
 
 // MythTV headers
-#include <libmyth/mythcontext.h>
 #include <libmythbase/compat.h>
 #include <libmythbase/exitcodes.h>
+#include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdirs.h>
+#include <libmythbase/mythlogging.h>
 #include <libmythbase/mythsystemlegacy.h>
 
 // MythWeather headers

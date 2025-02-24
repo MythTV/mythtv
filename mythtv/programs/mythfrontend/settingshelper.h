@@ -3,6 +3,7 @@
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythui/mythuihelper.h"
 

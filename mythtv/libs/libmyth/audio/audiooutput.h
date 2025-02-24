@@ -15,7 +15,6 @@
 #include "libmyth/output.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
-#include "libmythbase/mythcorecontext.h"
 
 // forward declaration
 struct AVCodecContext;

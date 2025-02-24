@@ -32,6 +32,7 @@
 #include <thread>
 
 #include "mythcorecontext.h"
+#include "mythlogging.h"
 #include "mythtimer.h"
 #include "portchecker.h"
 

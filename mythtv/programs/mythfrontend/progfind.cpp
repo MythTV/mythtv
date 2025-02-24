@@ -10,6 +10,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/programtypes.h"       // for RecStatus
 #include "libmythtv/tv_actions.h"       // for ACTION_CHANNELSEARCH
 #include "libmythtv/tv_play.h"

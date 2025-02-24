@@ -6,7 +6,6 @@
 #include <unistd.h>
 
 // MythTV
-#include <libmyth/mythcontext.h>
 #include <libmythbase/mythdate.h>
 
 // mythzoneminder

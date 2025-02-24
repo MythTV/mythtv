@@ -4,7 +4,6 @@
 
 // MythTV
 #include "libmythbase/mythcorecontext.h"
-#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
 #include "libmythprotoserver/sockethandler.h"
 

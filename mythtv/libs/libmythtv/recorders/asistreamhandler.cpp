@@ -13,6 +13,8 @@
 #include <QFile>
 
 // MythTV headers
+#include "libmythbase/mythlogging.h"
+
 #include "asichannel.h"
 #include "asistreamhandler.h"
 #include "cardutil.h"

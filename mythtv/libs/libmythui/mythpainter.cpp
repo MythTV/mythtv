@@ -9,7 +9,6 @@
 
 // libmythbase headers
 #include "libmythbase/compat.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 // libmythui headers

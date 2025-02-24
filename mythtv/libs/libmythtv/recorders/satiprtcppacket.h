@@ -6,9 +6,6 @@
 #include <QIODevice>
 #include <QDataStream>
 
-// MythTV includes
-#include "libmythbase/mythlogging.h"
-
 static constexpr uint8_t RTCP_TYPE_APP { 204 };
 
 class SatIPRTCPPacket

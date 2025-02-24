@@ -33,7 +33,6 @@
 
 // MythTV headers
 #include "libmythbase/compat.h"
-#include "libmythbase/mythlogging.h"
 
 #include "msocketdevice.h"
 

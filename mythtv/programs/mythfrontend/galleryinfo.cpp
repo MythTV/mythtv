@@ -2,6 +2,7 @@
 #include <chrono>
 
 // MythTV
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdate.h"
 #include "libmythmetadata/imagemetadata.h"

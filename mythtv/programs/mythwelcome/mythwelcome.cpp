@@ -7,6 +7,7 @@
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/lcddevice.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"

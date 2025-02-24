@@ -16,7 +16,9 @@
 #include <QElapsedTimer>
 
 // MythTV headers
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythui/mythdialogbox.h"
 
 #include "channelimporter.h"

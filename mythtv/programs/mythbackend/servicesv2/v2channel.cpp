@@ -35,10 +35,11 @@
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/compat.h"
+#include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/programtypes.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythtv/channelutil.h"

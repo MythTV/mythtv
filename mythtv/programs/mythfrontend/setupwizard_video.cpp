@@ -4,9 +4,11 @@
 #include <QVariant>
 
 // MythTV
-#include "libmyth/mythcontext.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythcoreutil.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"

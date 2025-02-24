@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "libmythbase/mthreadpool.h"
+#include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythobservable.h"

@@ -15,7 +15,6 @@
 #include <QByteArray>
 #include <QtEndian>
 
-#include "libmythbase/mythlogging.h"
 #include "udppacket.h"
 
 #define RTP_VERSION 2

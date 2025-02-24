@@ -25,6 +25,7 @@
 // MythTV headers
 #include "config.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythlogging.h"
 
 #include "ExternalChannel.h"
 #include "ExternalStreamHandler.h"
