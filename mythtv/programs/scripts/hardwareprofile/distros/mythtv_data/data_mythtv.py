@@ -19,11 +19,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-from __future__ import division
-from __future__ import print_function
 from builtins import range
 from builtins import object
-from past.utils import old_div
 import os
 import re
 from i18n import _
@@ -377,8 +374,8 @@ class _Mythtv_data(object):
 
     def ProcessScheduler(self):
         def stddev(data):
-            avg = old_div(sum(data),len(data))
-            return avg, (old_div(sum([(d-avg)**2 for d in data]),len(data)))**.5
+            avg = sum(data)/len(data)
+            return avg, (sum([(d-avg)**2 for d in data])/len(data))**.5
 
         data = OrdDict()
         data.count = 0
@@ -411,7 +408,7 @@ class _Mythtv_data(object):
         match = [float(r[1]) for r in runs]
         place = [float(r[2]) for r in runs]
 
-        data.count = int(old_div(sum(count),len(count)))
+        data.count = int(sum(count)/len(count))
         data.match_avg, data.match_stddev = stddev(match)
         data.place_avg, data.place_stddev = stddev(place)
 
@@ -440,7 +437,7 @@ class _Mythtv_data(object):
 
         data = {'tuners':dict([(k,len(v)) for k,v in list(cardtypes.items())])}
         if virtual[0]:
-            data['vtpertuner'] = old_div(sum(virtual),float(virtual[0]))
+            data['vtpertuner'] = sum(virtual)/float(virtual[0])
         return data
 
     def ProcessSmoltInfo(self):
@@ -481,7 +478,7 @@ class _Mythtv_data(object):
                 counts[levels[level]] = count
                 total += count
         for k,v in list(counts.items()):
-            counts[k] = old_div(v,total)
+            counts[k] = v/total
         return {'logurgency':counts}
 
     def get_data(self,gate):

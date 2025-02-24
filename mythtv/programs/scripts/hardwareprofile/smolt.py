@@ -31,7 +31,6 @@
 # Find out what we're not getting
 #
 
-from __future__ import print_function
 #import dbus
 from i18n import _
 import platform

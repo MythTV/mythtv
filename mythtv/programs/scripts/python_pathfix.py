@@ -2,8 +2,6 @@
 # python_pathfix - adjust python shebang paths
 #
 
-from __future__ import print_function
-from __future__ import unicode_literals
 import sys
 import os
 from stat import ST_MODE

@@ -40,3 +40,4 @@ check_include_file_cxx( "sys/mman.h"    EXV_HAVE_SYS_MMAN_H )
 set(EXV_ENABLE_NLS ${EXIV2_ENABLE_NLS})
 
 configure_file(cmake/config.h.cmake ${CMAKE_BINARY_DIR}/exv_conf.h @ONLY)
+file(COPY include/exiv2/config.h DESTINATION ${CMAKE_BINARY_DIR})

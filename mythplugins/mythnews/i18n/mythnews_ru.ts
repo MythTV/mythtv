@@ -27,12 +27,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="342"/>
+        <location filename="../mythnews/mythnews.cpp" line="346"/>
         <source>Updated</source>
         <translation>Обновлено</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="349"/>
+        <location filename="../mythnews/mythnews.cpp" line="354"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
@@ -50,32 +50,32 @@
         <translation type="vanished">Загружаются медиа...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="515"/>
+        <location filename="../mythnews/mythnews.cpp" line="521"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Не задана команда браузера! MythNews требует чтобы был установлен плагин MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="604"/>
+        <location filename="../mythnews/mythnews.cpp" line="614"/>
         <source>Manage Feeds</source>
         <translation>Управление лентами</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="605"/>
+        <location filename="../mythnews/mythnews.cpp" line="615"/>
         <source>Add Feed</source>
         <translation>Добавить ленту</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="618"/>
         <source>Edit Feed</source>
         <translation>Изменить ленту</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="609"/>
+        <location filename="../mythnews/mythnews.cpp" line="619"/>
         <source>Delete Feed</source>
         <translation>Удалить ленту</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="591"/>
+        <location filename="../mythnews/mythnews.cpp" line="601"/>
         <source>Options</source>
         <translation>Параметры</translation>
     </message>
@@ -126,34 +126,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="240"/>
-        <location filename="../mythnews/newssite.cpp" line="249"/>
-        <location filename="../mythnews/newssite.cpp" line="258"/>
+        <location filename="../mythnews/newssite.cpp" line="236"/>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to retrieve news</source>
         <translation>Не удается загрузить новости</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="241"/>
+        <location filename="../mythnews/newssite.cpp" line="237"/>
         <source>No Cached News.</source>
         <translation>Нет новостей в кэше.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="260"/>
+        <location filename="../mythnews/newssite.cpp" line="256"/>
         <source>Failed to read downloaded file.</source>
         <translation>Не удалось прочитать загруженный файл.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="268"/>
+        <location filename="../mythnews/newssite.cpp" line="264"/>
         <source>Showing Cached News.</source>
         <translation>Показаны новости из кэша.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="288"/>
+        <location filename="../mythnews/newssite.cpp" line="284"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>Файл XML не является лентой RSS</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
+        <location filename="../mythnews/newssite.cpp" line="229"/>
         <source>Retrieve Failed. </source>
         <translation>Загрузка не удалась. </translation>
     </message>

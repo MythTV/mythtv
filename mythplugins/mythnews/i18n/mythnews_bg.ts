@@ -32,12 +32,12 @@
         <translation>Не сте конфигурирали новинарски сайтове за MythNews.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="342"/>
+        <location filename="../mythnews/mythnews.cpp" line="346"/>
         <source>Updated</source>
         <translation>Обновен</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="349"/>
+        <location filename="../mythnews/mythnews.cpp" line="354"/>
         <source>Unknown</source>
         <translation>Непознат</translation>
     </message>
@@ -46,32 +46,32 @@
         <translation type="obsolete">%1 от %2 (%3 процент)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="515"/>
+        <location filename="../mythnews/mythnews.cpp" line="521"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Не е зададена команда за търсене! MythNews изисква да бъде инсталиран MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="591"/>
+        <location filename="../mythnews/mythnews.cpp" line="601"/>
         <source>Options</source>
         <translation>Опции</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="604"/>
+        <location filename="../mythnews/mythnews.cpp" line="614"/>
         <source>Manage Feeds</source>
         <translation>Управление материали</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="605"/>
+        <location filename="../mythnews/mythnews.cpp" line="615"/>
         <source>Add Feed</source>
         <translation>Добавяне на материал</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="618"/>
         <source>Edit Feed</source>
         <translation>Редакция материал</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="609"/>
+        <location filename="../mythnews/mythnews.cpp" line="619"/>
         <source>Delete Feed</source>
         <translation>Изтриване материал</translation>
     </message>
@@ -122,34 +122,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
+        <location filename="../mythnews/newssite.cpp" line="229"/>
         <source>Retrieve Failed. </source>
         <translation>Неуспешна обработка.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="240"/>
-        <location filename="../mythnews/newssite.cpp" line="249"/>
-        <location filename="../mythnews/newssite.cpp" line="258"/>
+        <location filename="../mythnews/newssite.cpp" line="236"/>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to retrieve news</source>
         <translation>Неуспешно получаване на новините</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="241"/>
+        <location filename="../mythnews/newssite.cpp" line="237"/>
         <source>No Cached News.</source>
         <translation>Няма кеширани новини.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="260"/>
+        <location filename="../mythnews/newssite.cpp" line="256"/>
         <source>Failed to read downloaded file.</source>
         <translation>Неуспешно четене на сваленият файл.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="268"/>
+        <location filename="../mythnews/newssite.cpp" line="264"/>
         <source>Showing Cached News.</source>
         <translation>Показване на кеширани новини.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="288"/>
+        <location filename="../mythnews/newssite.cpp" line="284"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>XML-файла не е валиден RSS-материал</translation>
     </message>

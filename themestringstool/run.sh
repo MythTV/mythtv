@@ -131,6 +131,7 @@ Retro-wide \
 Steppes \
 Steppes-large \
 Steppes-narrow \
+Steppes-small \
 Terra \
 TintedGlass \
 TransBlue \

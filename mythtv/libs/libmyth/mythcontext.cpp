@@ -573,18 +573,18 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_dbParams.LoadDefaults();
 
     m_dbParams.m_localHostName  = config.GetValue("LocalHostName", "");
-    m_dbParams.m_dbHostPing     = config.GetValue(kDefaultDB + "PingHost", true);
-    m_dbParams.m_dbHostName     = config.GetValue(kDefaultDB + "Host", "");
-    m_dbParams.m_dbUserName     = config.GetValue(kDefaultDB + "UserName", "");
-    m_dbParams.m_dbPassword     = config.GetValue(kDefaultDB + "Password", "");
-    m_dbParams.m_dbName         = config.GetValue(kDefaultDB + "DatabaseName", "");
-    m_dbParams.m_dbPort         = config.GetValue(kDefaultDB + "Port", 0);
+    m_dbParams.m_dbHostPing     = config.GetValue(XmlConfiguration::kDefaultDB + "PingHost", true);
+    m_dbParams.m_dbHostName     = config.GetValue(XmlConfiguration::kDefaultDB + "Host", "");
+    m_dbParams.m_dbUserName     = config.GetValue(XmlConfiguration::kDefaultDB + "UserName", "");
+    m_dbParams.m_dbPassword     = config.GetValue(XmlConfiguration::kDefaultDB + "Password", "");
+    m_dbParams.m_dbName         = config.GetValue(XmlConfiguration::kDefaultDB + "DatabaseName", "");
+    m_dbParams.m_dbPort         = config.GetValue(XmlConfiguration::kDefaultDB + "Port", 0);
 
-    m_dbParams.m_wolEnabled     = config.GetValue(kDefaultWOL + "Enabled", false);
+    m_dbParams.m_wolEnabled     = config.GetValue(XmlConfiguration::kDefaultWOL + "Enabled", false);
     m_dbParams.m_wolReconnect   =
-        config.GetDuration<std::chrono::seconds>(kDefaultWOL + "SQLReconnectWaitTime", 0s);
-    m_dbParams.m_wolRetry       = config.GetValue(kDefaultWOL + "SQLConnectRetry", 5);
-    m_dbParams.m_wolCommand     = config.GetValue(kDefaultWOL + "Command", "");
+        config.GetDuration<std::chrono::seconds>(XmlConfiguration::kDefaultWOL + "SQLReconnectWaitTime", 0s);
+    m_dbParams.m_wolRetry       = config.GetValue(XmlConfiguration::kDefaultWOL + "SQLConnectRetry", 5);
+    m_dbParams.m_wolCommand     = config.GetValue(XmlConfiguration::kDefaultWOL + "Command", "");
 
     bool ok = m_dbParams.IsValid(XmlConfiguration::kDefaultFilename);
 
@@ -676,7 +676,7 @@ bool MythContextPrivate::SaveDatabaseParams(
 
         config.SetValue("LocalHostName", params.m_localHostName);
 
-        config.SetValue(kDefaultDB + "PingHost", params.m_dbHostPing);
+        config.SetValue(XmlConfiguration::kDefaultDB + "PingHost", params.m_dbHostPing);
 
         // If dbHostName is an IPV6 address with scope,
         // remove the scope. Unescaped % signs are an
@@ -688,17 +688,17 @@ bool MythContextPrivate::SaveDatabaseParams(
             addr.setScopeId(QString());
             dbHostName = addr.toString();
         }
-        config.SetValue(kDefaultDB + "Host",     dbHostName);
-        config.SetValue(kDefaultDB + "UserName", params.m_dbUserName);
-        config.SetValue(kDefaultDB + "Password", params.m_dbPassword);
-        config.SetValue(kDefaultDB + "DatabaseName", params.m_dbName);
-        config.SetValue(kDefaultDB + "Port",     params.m_dbPort);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Host",     dbHostName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "UserName", params.m_dbUserName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Password", params.m_dbPassword);
+        config.SetValue(XmlConfiguration::kDefaultDB + "DatabaseName", params.m_dbName);
+        config.SetValue(XmlConfiguration::kDefaultDB + "Port",     params.m_dbPort);
 
-        config.SetValue(kDefaultWOL + "Enabled", params.m_wolEnabled);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "Enabled", params.m_wolEnabled);
         config.SetDuration(
-            kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
-        config.SetValue(kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
-        config.SetValue(kDefaultWOL + "Command", params.m_wolCommand);
+            XmlConfiguration::kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
+        config.SetValue(XmlConfiguration::kDefaultWOL + "Command", params.m_wolCommand);
 
         // actually save the file
         success = config.Save();
@@ -1197,7 +1197,7 @@ int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSecond
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
         .arg(seconds.count()));
 
-    SSDP::Instance()->PerformSearch(kBackendURI, seconds);
+    SSDP::Instance()->PerformSearch(SSDP::kBackendURI, seconds);
 
     // Search for a total of 'milliSeconds' ms, sending new search packet
     // about every 250 ms until less than one second remains.
@@ -1212,12 +1212,12 @@ int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSecond
             auto ttlSeconds = duration_cast<std::chrono::seconds>(ttl);
             LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
                 .arg(ttlSeconds.count()));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
+            SSDP::Instance()->PerformSearch(SSDP::kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }
 
-    SSDPCacheEntries *backends = SSDP::Find(kBackendURI);
+    SSDPCacheEntries *backends = SSDP::Find(SSDP::kBackendURI);
 
     if (!backends)
     {
@@ -1271,8 +1271,8 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
     QString usn;
     {
         auto config = XmlConfiguration(); // read-only
-        pin = config.GetValue(kDefaultPIN, QString(""));
-        usn = config.GetValue(kDefaultUSN, QString(""));
+        pin = config.GetValue(XmlConfiguration::kDefaultPIN, QString(""));
+        usn = config.GetValue(XmlConfiguration::kDefaultUSN, QString(""));
     }
 
     if (usn.isEmpty())
@@ -1291,7 +1291,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
     auto timeout_s = duration_cast<std::chrono::seconds>(timeout_ms);
     LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
         .arg(timeout_s.count()));
-    SSDP::Instance()->PerformSearch(kBackendURI, timeout_s);
+    SSDP::Instance()->PerformSearch(SSDP::kBackendURI, timeout_s);
 
     // ----------------------------------------------------------------------
     // We need to give the server time to respond...
@@ -1304,7 +1304,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
     searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        devicelocation = SSDP::Find(kBackendURI, usn);
+        devicelocation = SSDP::Find(SSDP::kBackendURI, usn);
         if (devicelocation)
             break;
 
@@ -1316,7 +1316,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
             auto ttlSeconds = duration_cast<std::chrono::seconds>(ttl);
             LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
                 .arg(ttlSeconds.count()));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
+            SSDP::Instance()->PerformSearch(SSDP::kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }

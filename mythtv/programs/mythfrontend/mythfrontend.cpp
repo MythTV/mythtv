@@ -790,21 +790,12 @@ static void RunGallery()
 
 static void playDisc()
 {
-    //
-    //  Get the command string to play a DVD
-    //
-
-    bool isBD = false;
-
-    QString command_string =
-            gCoreContext->GetSetting("mythdvd.DVDPlayerCommand");
-    QString bluray_mountpoint =
+    // Check for Bluray
+    LOG(VB_MEDIA, LOG_DEBUG, "Checking for BluRay medium");
+    const QString bluray_mountpoint =
             gCoreContext->GetSetting("BluRayMountpoint", "/media/cdrom");
     QDir bdtest(bluray_mountpoint + "/BDMV");
-
-    if (bdtest.exists() || MythCDROM::inspectImage(bluray_mountpoint) == MythCDROM::kBluray)
-        isBD = true;
-
+    const bool isBD = (bdtest.exists() || MythCDROM::inspectImage(bluray_mountpoint) == MythCDROM::kBluray);
     if (isBD)
     {
         GetMythUI()->AddCurrentLocation("playdisc");
@@ -815,8 +806,22 @@ static void playDisc()
                                          0, 0, "", 0min, "", "", true);
 
         GetMythUI()->RemoveCurrentLocation();
+        return;
     }
-    else
+
+    MediaMonitor *mediaMonitor = MediaMonitor::GetMediaMonitor();
+    if (!mediaMonitor)
+    {
+        LOG(VB_MEDIA, LOG_ERR, "Could not access media monitor");
+        return;
+    }
+
+    // Check for DVD
+    LOG(VB_MEDIA, LOG_DEBUG, "Checking for DVD medium");
+    const bool isDVD = mediaMonitor->IsActive()
+                     ? !mediaMonitor->GetMedias(MEDIATYPE_DVD).isEmpty() 
+                     : MythCDROM::inspectImage(MediaMonitor::defaultDVDdevice()) == MythCDROM::kDVD;
+    if (isDVD)
     {
         QString dvd_device = MediaMonitor::defaultDVDdevice();
 
@@ -825,6 +830,9 @@ static void playDisc()
 
         GetMythUI()->AddCurrentLocation("playdisc");
 
+        //  Get the command string to play a DVD
+        QString command_string =
+                gCoreContext->GetSetting("mythdvd.DVDPlayerCommand");
         if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
             (command_string.length() < 1))
         {
@@ -864,13 +872,32 @@ static void playDisc()
             GetMythMainWindow()->activateWindow();
         }
         GetMythUI()->RemoveCurrentLocation();
+        return;
+    }
+
+    // Check for Audio CD
+    LOG(VB_MEDIA, LOG_DEBUG, "Checking for audio CD medium");
+    if (mediaMonitor->IsActive())
+    {
+        auto audioMedia = mediaMonitor->GetMedias(MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
+        if (!audioMedia.isEmpty())
+        {
+            for (auto *medium : qAsConst(audioMedia))
+            {
+                if (medium->isUsable()) {
+                    LOG(VB_MEDIA, LOG_DEBUG, QString("Found usable audio/mixed device %1").arg(medium->getDevicePath()));
+                    mediaMonitor->JumpToMediaHandler(medium, true);
+                    return;
+                }
+            }
+        }
     }
 }
 
 /////////////////////////////////////////////////
 //// Media handlers
 /////////////////////////////////////////////////
-static void handleDVDMedia(MythMediaDevice *dvd)
+static void handleDVDMedia(MythMediaDevice *dvd, bool /*forcePlayback*/)
 {
     if (!dvd)
         return;
@@ -892,7 +919,7 @@ static void handleDVDMedia(MythMediaDevice *dvd)
     }
 }
 
-static void handleGalleryMedia(MythMediaDevice *dev)
+static void handleGalleryMedia(MythMediaDevice *dev, bool forcePlayback)
 {
     // Only handle events for media that are newly mounted
     if (!dev || (dev->getStatus() != MEDIASTAT_MOUNTED
@@ -914,7 +941,7 @@ static void handleGalleryMedia(MythMediaDevice *dev)
         }
     }
 
-    if (gCoreContext->GetBoolSetting("GalleryAutoLoad", false))
+    if (forcePlayback || gCoreContext->GetBoolSetting("GalleryAutoLoad", false))
     {
         LOG(VB_GUI, LOG_INFO, "Main: Autostarting Gallery for new media");
         GetMythMainWindow()->JumpTo(JUMP_GALLERY_DEFAULT);

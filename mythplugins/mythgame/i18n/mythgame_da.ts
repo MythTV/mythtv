@@ -75,65 +75,65 @@
 <context>
     <name>GameHandler</name>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="163"/>
-        <location filename="../mythgame/gamehandler.cpp" line="432"/>
+        <location filename="../mythgame/gamehandler.cpp" line="158"/>
+        <location filename="../mythgame/gamehandler.cpp" line="431"/>
         <source>19xx</source>
         <comment>Default game year</comment>
         <translation>19xx</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="164"/>
-        <location filename="../mythgame/gamehandler.cpp" line="430"/>
+        <location filename="../mythgame/gamehandler.cpp" line="159"/>
+        <location filename="../mythgame/gamehandler.cpp" line="429"/>
         <source>Unknown</source>
         <comment>Unknown country</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="165"/>
-        <location filename="../mythgame/gamehandler.cpp" line="433"/>
-        <location filename="../mythgame/gamehandler.cpp" line="441"/>
+        <location filename="../mythgame/gamehandler.cpp" line="160"/>
+        <location filename="../mythgame/gamehandler.cpp" line="432"/>
+        <location filename="../mythgame/gamehandler.cpp" line="440"/>
         <source>Unknown</source>
         <comment>Unknown game name</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="166"/>
-        <location filename="../mythgame/gamehandler.cpp" line="194"/>
+        <location filename="../mythgame/gamehandler.cpp" line="161"/>
+        <location filename="../mythgame/gamehandler.cpp" line="189"/>
         <source>Unknown</source>
         <comment>Unknown genre</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="167"/>
-        <location filename="../mythgame/gamehandler.cpp" line="434"/>
+        <location filename="../mythgame/gamehandler.cpp" line="162"/>
+        <location filename="../mythgame/gamehandler.cpp" line="433"/>
         <source>Unknown</source>
         <comment>Unknown plot</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="168"/>
-        <location filename="../mythgame/gamehandler.cpp" line="435"/>
+        <location filename="../mythgame/gamehandler.cpp" line="163"/>
+        <location filename="../mythgame/gamehandler.cpp" line="434"/>
         <source>Unknown</source>
         <comment>Unknown publisher</comment>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="169"/>
-        <location filename="../mythgame/gamehandler.cpp" line="436"/>
+        <location filename="../mythgame/gamehandler.cpp" line="164"/>
+        <location filename="../mythgame/gamehandler.cpp" line="435"/>
         <source>0</source>
         <comment>Default game version</comment>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="195"/>
-        <location filename="../mythgame/gamehandler.cpp" line="429"/>
+        <location filename="../mythgame/gamehandler.cpp" line="190"/>
+        <location filename="../mythgame/gamehandler.cpp" line="428"/>
         <source>Unknown %1</source>
         <comment>Unknown genre</comment>
         <extracomment>%1 is the game type, when we don&apos;t know the genre we use the * game type</extracomment>
         <translation>Ukendt %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="236"/>
+        <location filename="../mythgame/gamehandler.cpp" line="231"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
         <extracomment>%1 is the file name</extracomment>
@@ -141,47 +141,47 @@ Remove it from the database?</source>
 Fjern den fra databasen?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="244"/>
-        <location filename="../mythgame/gamehandler.cpp" line="621"/>
+        <location filename="../mythgame/gamehandler.cpp" line="239"/>
+        <location filename="../mythgame/gamehandler.cpp" line="620"/>
         <source>No</source>
         <translation>Nej</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="245"/>
+        <location filename="../mythgame/gamehandler.cpp" line="240"/>
         <source>No to all</source>
         <translation>Nej til alle</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="246"/>
-        <location filename="../mythgame/gamehandler.cpp" line="622"/>
+        <location filename="../mythgame/gamehandler.cpp" line="241"/>
+        <location filename="../mythgame/gamehandler.cpp" line="621"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="247"/>
+        <location filename="../mythgame/gamehandler.cpp" line="242"/>
         <source>Yes to all</source>
         <translation>Ja til alle</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="391"/>
+        <location filename="../mythgame/gamehandler.cpp" line="390"/>
         <source>Updating %1 (%2) ROM database</source>
         <extracomment>%1 is the system name, %2 is the game type</extracomment>
         <translation>Opdaterer %1 (%2) ROM database</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="527"/>
+        <location filename="../mythgame/gamehandler.cpp" line="526"/>
         <source>Verifying %1 files...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Verificerer %1 filer...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="615"/>
+        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Dette vil slette alle spilmetadata fra databasen. Er du sikker på at du vil gøre dette?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="703"/>
-        <location filename="../mythgame/gamehandler.cpp" line="731"/>
+        <location filename="../mythgame/gamehandler.cpp" line="706"/>
+        <location filename="../mythgame/gamehandler.cpp" line="734"/>
         <source>Scanning for %1 games...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Scanner efter %1 spil...</translation>
@@ -233,43 +233,43 @@ Fjern den fra databasen?</translation>
 <context>
     <name>GameUI</name>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="151"/>
+        <location filename="../mythgame/gameui.cpp" line="152"/>
         <source>All Games</source>
         <translation>Alle spil</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="156"/>
+        <location filename="../mythgame/gameui.cpp" line="157"/>
         <source>-   By Genre</source>
         <translation>-   Efter genre</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="161"/>
+        <location filename="../mythgame/gameui.cpp" line="162"/>
         <source>-   By Year</source>
         <translation>-   Efter år</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="166"/>
+        <location filename="../mythgame/gameui.cpp" line="167"/>
         <source>-   By Name</source>
         <translation>-   Efter navn</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="171"/>
+        <location filename="../mythgame/gameui.cpp" line="172"/>
         <source>-   By Publisher</source>
         <translation>-   Efter udgiver</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="532"/>
+        <location filename="../mythgame/gameui.cpp" line="543"/>
         <source>Cancel</source>
         <translation>Annuller</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="431"/>
-        <location filename="../mythgame/gameui.cpp" line="512"/>
+        <location filename="../mythgame/gameui.cpp" line="438"/>
+        <location filename="../mythgame/gameui.cpp" line="523"/>
         <source>Scan For Changes</source>
         <translation>Scan efter ændringer</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="267"/>
+        <location filename="../mythgame/gameui.cpp" line="268"/>
         <source>Choose System for:
 %1</source>
         <extracomment>%1 is the game name</extracomment>
@@ -277,58 +277,58 @@ Fjern den fra databasen?</translation>
 %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="437"/>
-        <location filename="../mythgame/gameui.cpp" line="516"/>
+        <location filename="../mythgame/gameui.cpp" line="444"/>
+        <location filename="../mythgame/gameui.cpp" line="527"/>
         <source>Show Information</source>
         <translation>Vis information</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="439"/>
-        <location filename="../mythgame/gameui.cpp" line="521"/>
+        <location filename="../mythgame/gameui.cpp" line="446"/>
+        <location filename="../mythgame/gameui.cpp" line="532"/>
         <source>Remove Favorite</source>
         <translation>Fjern favorit</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="441"/>
-        <location filename="../mythgame/gameui.cpp" line="520"/>
+        <location filename="../mythgame/gameui.cpp" line="448"/>
+        <location filename="../mythgame/gameui.cpp" line="531"/>
         <source>Make Favorite</source>
         <translation>Opret favorit</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="442"/>
-        <location filename="../mythgame/gameui.cpp" line="525"/>
+        <location filename="../mythgame/gameui.cpp" line="449"/>
+        <location filename="../mythgame/gameui.cpp" line="536"/>
         <source>Retrieve Details</source>
         <translation>Hent detaljer</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="443"/>
-        <location filename="../mythgame/gameui.cpp" line="508"/>
+        <location filename="../mythgame/gameui.cpp" line="450"/>
+        <location filename="../mythgame/gameui.cpp" line="519"/>
         <source>Edit Details</source>
         <translation>Rediger detaljer</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="633"/>
+        <location filename="../mythgame/gameui.cpp" line="644"/>
         <source>Failed to retrieve image(s)</source>
         <translation>Fejl under hentning af billede(r)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="635"/>
+        <location filename="../mythgame/gameui.cpp" line="646"/>
         <source>Check logs</source>
         <translation>Kontroller logs</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="927"/>
+        <location filename="../mythgame/gameui.cpp" line="940"/>
         <source>Fetching details for %1</source>
         <extracomment>%1 is the game name</extracomment>
         <translation>Henter detaljer for %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="471"/>
+        <location filename="../mythgame/gameui.cpp" line="480"/>
         <source>Game Search</source>
         <translation>Spil søgning</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="137"/>
+        <location filename="../mythgame/gameui.cpp" line="138"/>
         <source>Favorites</source>
         <translation>Favoritter</translation>
     </message>

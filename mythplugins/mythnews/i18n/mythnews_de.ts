@@ -31,12 +31,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="342"/>
+        <location filename="../mythnews/mythnews.cpp" line="346"/>
         <source>Updated</source>
         <translation>Aktualisiert</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="349"/>
+        <location filename="../mythnews/mythnews.cpp" line="354"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
@@ -62,27 +62,27 @@
         <translation type="obsolete">Lade Medien...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="515"/>
+        <location filename="../mythnews/mythnews.cpp" line="521"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Es ist kein Webbrowser definiert! Für MythNews muss MythBrowser installiert sein.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="604"/>
+        <location filename="../mythnews/mythnews.cpp" line="614"/>
         <source>Manage Feeds</source>
         <translation>Feeds verwalten</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="605"/>
+        <location filename="../mythnews/mythnews.cpp" line="615"/>
         <source>Add Feed</source>
         <translation>Feed hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="618"/>
         <source>Edit Feed</source>
         <translation>Feed bearbeiten</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="609"/>
+        <location filename="../mythnews/mythnews.cpp" line="619"/>
         <source>Delete Feed</source>
         <translation>Feed löschen</translation>
     </message>
@@ -95,7 +95,7 @@
         <translation type="obsolete">Newsfeed löschen</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="591"/>
+        <location filename="../mythnews/mythnews.cpp" line="601"/>
         <source>Options</source>
         <translation>Optionen</translation>
     </message>
@@ -150,34 +150,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="240"/>
-        <location filename="../mythnews/newssite.cpp" line="249"/>
-        <location filename="../mythnews/newssite.cpp" line="258"/>
+        <location filename="../mythnews/newssite.cpp" line="236"/>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <location filename="../mythnews/newssite.cpp" line="254"/>
         <source>Failed to retrieve news</source>
         <translation>Fehler beim Abrufen der Nachrichten</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="241"/>
+        <location filename="../mythnews/newssite.cpp" line="237"/>
         <source>No Cached News.</source>
         <translation>Keine zwischengespeicherten Nachrichten.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="260"/>
+        <location filename="../mythnews/newssite.cpp" line="256"/>
         <source>Failed to read downloaded file.</source>
         <translation>Fehler beim Lesen der geladenen Datei.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="268"/>
+        <location filename="../mythnews/newssite.cpp" line="264"/>
         <source>Showing Cached News.</source>
         <translation>Zeige zwischengespeicherte Nachrichten.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="288"/>
+        <location filename="../mythnews/newssite.cpp" line="284"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>Die XML-Datei ist kein gültiger RSS-Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="233"/>
+        <location filename="../mythnews/newssite.cpp" line="229"/>
         <source>Retrieve Failed. </source>
         <translation>Empfang gescheitert. </translation>
     </message>

@@ -81,4 +81,8 @@ static constexpr const char* MYTH_DATABASE_VERSION { "1384" };
 MBASE_PUBLIC  const char *GetMythSourceVersion();
 MBASE_PUBLIC  const char *GetMythSourcePath();
 
+// The version argument exists only for the test code.  It should
+// never be used from production code.
+MBASE_PUBLIC  bool ParseMythSourceVersion(bool& devel, uint& major, uint& minor,
+                                          const char* version = nullptr);
 #endif

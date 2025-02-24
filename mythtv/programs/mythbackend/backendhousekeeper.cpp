@@ -339,43 +339,28 @@ bool ThemeUpdateTask::DoCheckRun(const QDateTime& now)
 
 bool ThemeUpdateTask::DoRun(void)
 {
-    bool    result = false;
-    QString MythVersion = GetMythSourcePath();
+    uint major { 0 };
+    uint minor { 0 };
+    bool devel { false };
+    bool parsed = ParseMythSourceVersion(devel, major, minor);
+    bool result = false;
 
-    // Treat devel branches as master
-    if (!MythVersion.isEmpty() && !MythVersion.startsWith("fixes/"))
+    if (!parsed || devel)
     {
-        // FIXME: For now, treat git master the same as svn trunk
-        MythVersion = "trunk";
-
-        result |= LoadVersion(MythVersion, LOG_ERR);
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("Loading themes for %1").arg(MythVersion));
+        LOG(VB_GENERAL, LOG_INFO, QString("Loading themes for devel"));
+        result |= LoadVersion("trunk", LOG_ERR);
     }
     else
     {
-        static const QRegularExpression kVersionDateRE { "\\.[0-9]{8,}.*" };
-        MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
-        MythVersion.remove(kVersionDateRE);
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("Loading themes for %1").arg(MythVersion));
-        result |= LoadVersion(MythVersion, LOG_ERR);
+        LOG(VB_GENERAL, LOG_INFO, QString("Loading themes for %1").arg(major));
+        result |= LoadVersion(QString::number(major), LOG_ERR);
 
-        // If a version of the theme for this tag exists, use it...
-        static const QRegularExpression subexp
-            { "v[0-9]+\\.([0-9]+)-*", QRegularExpression::CaseInsensitiveOption };
-        auto match = subexp.match(GetMythSourceVersion());
-        if (match.hasMatch())
+        for (int i = minor ; i > 0; i--)
         {
-            QString subversion;
-            int idx = match.capturedView(1).toInt();
-            for ( ; idx > 0; --idx)
-            {
-                subversion = MythVersion + "." + QString::number(idx);
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("Loading themes for %1").arg(subversion));
-                result |= LoadVersion(subversion, LOG_INFO);
-            }
+            QString majmin = QString("%1.%2").arg(major).arg(i);
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Loading themes for %1").arg(majmin));
+            result |= LoadVersion(majmin, LOG_INFO);
         }
     }
     return result;

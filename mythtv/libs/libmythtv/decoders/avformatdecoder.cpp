@@ -127,8 +127,6 @@ static constexpr int16_t kMaxVideoQueueSize = 220;
 static constexpr ssize_t kMaxVideoQueueSize = 220;
 #endif
 
-static bool silence_ffmpeg_logging = false;
-
 static QSize get_video_dim(const AVCodecContext &ctx)
 {
     return {ctx.width >> ctx.lowres, ctx.height >> ctx.lowres};
@@ -266,9 +264,6 @@ static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Strea
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
-    if (silence_ffmpeg_logging)
-        return;
-
     if (VERBOSE_LEVEL_NONE())
         return;
 
@@ -880,21 +875,6 @@ extern "C"
     }
 }
 
-int AvFormatDecoder::FindStreamInfo(void)
-{
-    m_avCodecLock.lock();
-    int retval = avformat_find_stream_info(m_ic, nullptr);
-    m_avCodecLock.unlock();
-    silence_ffmpeg_logging = false;
-    // ffmpeg 3.0 is returning -1 code when there is a channel
-    // change or some encoding error just after the start
-    // of the file, but is has found the correct stream info
-    // Set rc to 0 so that playing can continue.
-    if (retval == -1)
-        retval = 0;
-    return retval;
-}
-
 /**
  *  OpenFile opens a ringbuffer for playback.
  *
@@ -1043,7 +1023,9 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         m_ic->max_analyze_duration = 60LL * AV_TIME_BASE;
 
         m_avfRingBuffer->SetInInit(m_livetv);
-        err = FindStreamInfo();
+        m_avCodecLock.lock();
+        err = avformat_find_stream_info(m_ic, nullptr);
+        m_avCodecLock.unlock();
         if (err < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find codec parameters for '%1'").arg(filename));

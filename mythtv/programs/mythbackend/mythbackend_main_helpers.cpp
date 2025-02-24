@@ -83,7 +83,6 @@ static JobQueue               *gJobQueue        { nullptr };
 static MythSystemEventHandler *gSysEventHandler { nullptr };
 static MediaServer            *g_pUPnp          { nullptr };
 static MainServer             *mainServer       { nullptr };
-static QString gPidFile;
 
 bool setupTVs(bool ismaster, bool &error)
 {
@@ -322,12 +321,6 @@ void cleanup(void)
      delete gBackendContext;
      gBackendContext = nullptr;
 
-    if (!gPidFile.isEmpty())
-    {
-        QFile::remove(gPidFile);
-        gPidFile.clear();
-    }
-
     SignalHandler::Done();
 }
 
@@ -526,23 +519,6 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
-    gPidFile = cmdline.toString("pidfile");
-    if (!gPidFile.isEmpty())
-    {
-        QFile file(gPidFile);
-        if (file.open(QIODevice::WriteOnly))
-        {
-            qint64 pid = QCoreApplication::applicationPid();
-            file.write(qPrintable(QString("%1\n").arg(pid)));
-            file.close();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING,
-                QString(LOC + "Cannot open pidfile named %1").arg(gPidFile));
-        }
-    }
-
     gBackendContext = new BackendContext();
 
     if (gCoreContext->IsDatabaseIgnored())
