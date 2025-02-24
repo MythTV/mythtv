@@ -16,7 +16,6 @@ LIBS += -L../../../libmythtv -lmythtv-$$LIBVERSION
 # libmythui for MythUIProgressDialog
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
-LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
 LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
@@ -37,7 +36,6 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythtv
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
 

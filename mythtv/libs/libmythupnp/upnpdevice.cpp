@@ -25,7 +25,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"  // for MYTH_BINARY_VERSION
 
-#include "upnp.h"
 #include "upnpdevice.h"
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only

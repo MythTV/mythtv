@@ -9,12 +9,12 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "ssdpcache.h"
 
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/portchecker.h"
 
-#include "upnp.h"
 #include "upnptaskcache.h"
 
 SSDPCache* SSDPCache::g_pSSDPCache = nullptr;
@@ -140,7 +140,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 }
 
 /// Removes expired cache entries, returning the number removed.
-uint SSDPCacheEntries::RemoveStale(const TaskTime ttNow)
+uint SSDPCacheEntries::RemoveStale(const std::chrono::microseconds ttNow)
 {
     QMutexLocker locker(&m_mutex);
     uint nCount = 0;

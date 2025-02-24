@@ -17,7 +17,6 @@ set(HEADERS_TO_INSTALL1
     mmembuf.h
     mythxmlclient.h
     serverSideScripting.h
-    servicehost.h
     soapclient.h
     ssdp.h
     ssdpcache.h
@@ -34,8 +33,7 @@ set(HEADERS_TO_INSTALL1
     upnptasknotify.h
     upnptasksearch.h
     upnputil.h
-    wsdl.h
-    xsd.h)
+    )
 
 set(HEADERS_TO_INSTALL2
     serializers/jsonSerializer.h serializers/serializer.h
@@ -74,11 +72,6 @@ add_library(
   serializers/xmlplistSerializer.h
   serializers/xmlSerializer.cpp
   serializers/xmlSerializer.h
-  servicehost.cpp
-  servicehost.h
-  serviceHosts/rttiServiceHost.h
-  services/rtti.cpp
-  services/rtti.h
   soapclient.cpp
   soapclient.h
   ssdp.cpp
@@ -119,10 +112,7 @@ add_library(
   websocket.h
   websocket_extensions/websocket_mythevent.cpp
   websocket_extensions/websocket_mythevent.h
-  wsdl.cpp
-  wsdl.h
-  xsd.cpp
-  xsd.h)
+  )
 
 #
 # All remaining target information
@@ -140,7 +130,7 @@ target_link_libraries(
   mythupnp
   PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network
          Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Xml mythbase
-         mythservicecontracts)
+  )
 
 #
 # conditionally included code

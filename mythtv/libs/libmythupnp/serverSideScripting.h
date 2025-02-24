@@ -26,7 +26,6 @@
 
 // MythTV headers
 #include "upnpexp.h"
-#include "upnputil.h"
 #include "httprequest.h"
 
 #ifdef _WIN32

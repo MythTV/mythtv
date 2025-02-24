@@ -9,26 +9,26 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "upnptasksearch.h"
 
 #include <chrono> // for milliseconds
 #include <cstdlib>
 #include <thread> // for sleep_for
+#include <utility>
 
 #include <QDateTime>
 #include <QFile>
 #include <QStringList>
 #include <QNetworkInterface>
-#include <utility>
 
-#include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythversion.h"
 
-#include "upnp.h"
-#include "upnptasksearch.h"
+#include "libmythupnp/httpserver.h"
+#include "libmythupnp/upnp.h"
 
 static QPair<QHostAddress, int> kLinkLocal6 =
                             QHostAddress::parseSubnet("fe80::/10");

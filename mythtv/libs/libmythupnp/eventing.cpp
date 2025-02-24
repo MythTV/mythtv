@@ -22,6 +22,7 @@
 
 #include "upnp.h"
 #include "eventing.h"
+#include "taskqueue.h"
 #include "upnptaskevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/configuration.h"
@@ -31,7 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 uint StateVariables::BuildNotifyBody(
-    QTextStream &ts, TaskTime ttLastNotified) const
+    QTextStream &ts, std::chrono::microseconds ttLastNotified) const
 {
     uint nCount = 0;
 
