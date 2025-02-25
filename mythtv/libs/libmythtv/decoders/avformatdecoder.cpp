@@ -3336,7 +3336,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curs
     {
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
             QString("video timecodes packet-pts:%1 frame-pts:%2 packet-dts: %3 frame-dts:%4")
-                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->pts)
+                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->dts)
                 .arg(mpa_pic->pkt_dts));
 
         ProcessVideoFrame(context, curstream, mpa_pic);
