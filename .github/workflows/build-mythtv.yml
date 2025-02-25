@@ -355,6 +355,7 @@ jobs:
           brew unlink python3
           brew deps python3 | xargs brew remove --ignore-dependencies
           brew list | grep python@|xargs brew remove --force --ignore-dependencies
+          brew remove azure-cli
           echo "re-install requested python"
           brew update
           brew install --force --overwrite python3
