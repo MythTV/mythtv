@@ -15,7 +15,7 @@ bool RTPDataPacket::IsValid() const
         return false;
     }
 
-    int off = 12 + 4 * GetCSRCCount();
+    int off = 12 + (4 * GetCSRCCount());
     if (off > m_data.size())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("off %1 > sz %2")
