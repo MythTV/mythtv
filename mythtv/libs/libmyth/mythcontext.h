@@ -7,28 +7,6 @@
 #include "libmyth/mythexp.h"
 #include "libmythbase/mythdbparams.h"
 
-class MythContextPrivate;
-
-class MythContextSlotHandler : public QObject
-{
-    friend class MythContextPrivate;
-    Q_OBJECT
-
-  public:
-    explicit MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
-
-  private slots:
-    void VersionMismatchPopupClosed(void);
-
-  public slots:
-    void OnCloseDialog(void);
-
-  private:
-    ~MythContextSlotHandler() override = default;
-
-    MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
-};
-
 /** \class MythContext
  *  \brief Startup context for MythTV.
  *
@@ -49,32 +27,25 @@ class MPUBLIC MythContext
               bool disableAutoDiscovery = false,
               bool ignoreDB = false);
 
-    bool SaveDatabaseParams(const DatabaseParams &params, bool force = false);
-    bool saveSettingsCache(void);
+    using CleanupFunction = void (*)();
+    void setCleanup(CleanupFunction cleanup) { m_cleanup = cleanup; }
+
+    bool saveSettingsCache();
 
     void SetDisableEventPopup(bool check);
 
-    enum WebOnlyStartup : std::uint8_t {
-        kWebOnlyNone = 0,
-        kWebOnlyDBSetup = 1,
-        kWebOnlyDBTimezone = 2,
-        kWebOnlyWebOnlyParm = 3,
-        kWebOnlyIPAddress = 4,
-        kWebOnlySchemaUpdate = 5
-    };
-
-    void setWebOnly(WebOnlyStartup w) {m_webOnly = w;}
-    WebOnlyStartup getWebOnly(void) {return m_webOnly;}
-
   private:
     Q_DISABLE_COPY(MythContext)
-    MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
-    QString             m_appBinaryVersion;
-    WebOnlyStartup      m_webOnly {kWebOnlyNone};
-};
 
-/// This global variable contains the MythContext instance for the application
-extern MPUBLIC MythContext *gContext;
+    class Impl;
+    Impl   *m_impl {nullptr}; ///< PIMPL idiom
+    QString             m_appBinaryVersion;
+    /**
+    This is used to destroy global state before main() returns.  It is called
+    first before anything else is done in ~MythContext() if it is not nullptr.
+    */
+    CleanupFunction     m_cleanup {nullptr};
+};
 
 #endif
 

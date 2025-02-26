@@ -16,7 +16,6 @@
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmythui/storagegroupeditor.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
@@ -29,7 +28,6 @@
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/channelimporter.h"
 #include "libmythtv/channelscan/channelscanner_cli.h"
@@ -58,16 +56,6 @@ ExitPrompter   *exitPrompt  = nullptr;
 StartPrompter  *startPrompt = nullptr;
 
 static MythThemedMenu *menu;
-
-static void cleanup()
-{
-    DestroyMythMainWindow();
-
-    delete gContext;
-    gContext = nullptr;
-
-    SignalHandler::Done();
-}
 
 static void SetupMenuCallback(void* /* data */, QString& selection)
 {
@@ -181,7 +169,7 @@ static bool RunMenu(const QString& themedir, const QString& themename)
 
     if (menu->foundTheme())
     {
-        menu->setCallback(SetupMenuCallback, gContext);
+        menu->setCallback(SetupMenuCallback, nullptr);
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return true;
     }
@@ -291,7 +279,6 @@ int main(int argc, char *argv[])
     }
 
     std::unique_ptr<QCoreApplication> app {nullptr};
-    CleanupGuard callCleanup(cleanup);
 
     if (use_display)
     {
@@ -303,10 +290,6 @@ int main(int argc, char *argv[])
         app = std::make_unique<QCoreApplication>(argc, argv);
     }
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
 
     if (cmdline.toBool("geometry"))
         geometry = cmdline.toString("geometry");
@@ -375,10 +358,10 @@ int main(int argc, char *argv[])
     if (!geometry.isEmpty())
         MythMainWindow::ParseGeometryOverride(geometry);
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    MythContext context {MYTH_BINARY_VERSION};
 
     cmdline.ApplySettingsOverride();
-    if (!gContext->Init(use_display,false,true)) // No Upnp, Prompt for db
+    if (!context.Init(use_display,false,true)) // No Upnp, Prompt for db
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

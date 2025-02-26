@@ -9,7 +9,7 @@
 
 class MythBackend {
 
-// MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
+// MYTH_PROTO_VERSION is defined in libmythbase in mythtv/libs/libmythbase/mythversion.h
 // and should be the current MythTV protocol version.
     static $protocol_version        = '91';
     static $protocol_token          = 'BuzzOff';

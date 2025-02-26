@@ -11,7 +11,6 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythconfig.h"
@@ -23,7 +22,6 @@
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/remoteutil.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/mythsystemevent.h"
 #include "libmythtv/scheduledrecording.h"
@@ -32,16 +30,6 @@
 // filldata headers
 #include "filldata.h"
 #include "mythfilldatabase_commandlineparser.h"
-
-namespace
-{
-    void cleanup()
-    {
-        delete gContext;
-        gContext = nullptr;
-        SignalHandler::Done();
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -223,14 +211,8 @@ int main(int argc, char *argv[])
 
     mark_repeats = cmdline.toBool("markrepeats");
 
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

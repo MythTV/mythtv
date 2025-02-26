@@ -20,7 +20,6 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jitterometer.h"
 #include "libmythtv/mythplayerui.h"
@@ -216,8 +215,8 @@ int main(int argc, char *argv[])
     else if (!cmdline.GetArgs().empty())
         filename = cmdline.GetArgs().at(0);
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, true);
-    if (!gContext->Init())
+    MythContext context {MYTH_BINARY_VERSION, true};
+    if (!context.Init())
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
@@ -250,10 +249,6 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
 
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     if (cmdline.toBool("test"))
     {
         std::chrono::seconds seconds = 5s;
@@ -275,7 +270,6 @@ int main(int argc, char *argv[])
         if (!UpgradeTVDatabaseSchema(false))
         {
             LOG(VB_GENERAL, LOG_ERR, "Fatal Error: Incorrect database schema.");
-            delete gContext;
             return GENERIC_EXIT_DB_OUTOFDATE;
         }
 
@@ -289,11 +283,6 @@ int main(int argc, char *argv[])
             TV::StartTV(&pginfo, kStartTVNoFlags);
         }
     }
-    DestroyMythMainWindow();
-
-    delete gContext;
-
-    SignalHandler::Done();
 
     return GENERIC_EXIT_OK;
 }

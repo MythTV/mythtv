@@ -5,7 +5,6 @@
 
 // MythTV
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/stringutil.h"
 
 // FFmpeg
 extern "C" {
@@ -81,7 +80,7 @@ bool MythStreamingBuffer::OpenFile(const QString &Filename, std::chrono::millise
     m_allowSeeks = !m_streamed && avio_seek(m_context, 0, SEEK_SET) >= 0;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened %1 (allow seeks: %2")
-        .arg(m_filename, StringUtil::bool_to_string(m_allowSeeks)));
+        .arg(m_filename, boolToQString(m_allowSeeks)));
 
     m_rwLock.unlock();
     return true;

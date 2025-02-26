@@ -198,7 +198,7 @@ void DatabaseSettings::Save(void)
     params.m_wolRetry = m_wolRetry->intValue();
     params.m_wolCommand = m_wolCommand->getValue();
 
-    gContext->SaveDatabaseParams(params);
+    GetMythDB()->SaveDatabaseParams(params, false);
     //set all the children's m_haveChanged to false
     GroupSetting::Save();
 }

@@ -10,26 +10,15 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/mythccextractorplayer.h"
 
 // MythCCExtractor
 #include "mythccextractor_commandlineparser.h"
-
-namespace {
-    void cleanup()
-    {
-        delete gContext;
-        gContext = nullptr;
-        SignalHandler::Done();
-    }
-}
 
 static int RunCCExtract(ProgramInfo &program_info, const QString & destdir)
 {
@@ -131,14 +120,8 @@ int main(int argc, char *argv[])
 
     bool useDB = !QFile::exists(infile);
 
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(
             false/*use gui*/, false/*prompt for backend*/,
             false/*bypass auto discovery*/, !useDB/*ignoreDB*/))
     {

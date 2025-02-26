@@ -229,7 +229,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
                                       const int  minDBMSpoint)
 {
     bool     connections = false;   // Are (other) FE/BEs connected?
-    bool     gui = false;           // Was gContext Init'ed gui=true?
+    bool     gui = false;           // Do we have a GUI?
     bool     upgradable = false;    // Can/should we upgrade?
     bool     validDBMS = false;     // Do we measure up to minDBMS* ?
     QString  warnOldDBMS;

@@ -15,7 +15,6 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythconfig.h"
@@ -24,22 +23,11 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/jobqueue.h"
 
 // MythMetadataLookup
 #include "lookup.h"
 #include "mythmetadatalookup_commandlineparser.h"
-
-namespace
-{
-    void cleanup()
-    {
-        delete gContext;
-        gContext = nullptr;
-        SignalHandler::Done();
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -83,14 +71,8 @@ int main(int argc, char *argv[])
     // Don't listen to console input
     close(0);
 
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

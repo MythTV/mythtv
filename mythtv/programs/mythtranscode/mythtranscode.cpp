@@ -12,7 +12,6 @@
 
 // MythTV headers
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
@@ -24,7 +23,6 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/HLS/httplivestream.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/recordinginfo.h"
@@ -135,16 +133,6 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
         .arg(pginfo->GetChanID())
         .arg(pginfo->GetRecordingStartTime(MythDate::ISODate)));
     return GENERIC_EXIT_DB_ERROR;
-}
-
-namespace
-{
-    void cleanup()
-    {
-        delete gContext;
-        gContext = nullptr;
-        SignalHandler::Done();
-    }
 }
 
 int main(int argc, char *argv[])
@@ -375,15 +363,9 @@ int main(int argc, char *argv[])
     // Set if we want to delete the original file once conversion succeeded.
     bool deleteOriginal = cmdline.toBool("delete");
 
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

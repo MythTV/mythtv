@@ -12,7 +12,6 @@ class MBASE_PUBLIC DatabaseParams
   public:
     DatabaseParams() = default;
 
-    void LoadDefaults(void);
     bool IsValid(const QString &source = QString("Unknown")) const;
 
     bool operator==(const DatabaseParams &other) const;
@@ -36,8 +35,6 @@ class MBASE_PUBLIC DatabaseParams
     int     m_wolRetry      {5};            ///< times to retry to reconnect
     QString m_wolCommand    {"echo 'WOLsqlServerCommand not set'"};
                                           ///< command to use for wake-on-lan
-
-    bool    m_forceSave     {false};        ///< set to true to force a save of the settings file
 
     QString m_verVersion;         ///< git version string
     QString m_verBranch;          ///< git branch

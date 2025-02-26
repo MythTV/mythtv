@@ -25,7 +25,6 @@
 // MythTV
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
@@ -34,7 +33,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythtv/mythsystemevent.h"
 #include "libmythui/mythdisplay.h"
 #include "libmythui/mythmainwindow.h"
@@ -47,21 +45,6 @@
 #define LOC      QString("MythScreenWizard: ")
 #define LOC_WARN QString("MythScreenWizard, Warning: ")
 #define LOC_ERR  QString("MythScreenWizard, Error: ")
-
-namespace
-{
-    void cleanup()
-    {
-        DestroyMythMainWindow();
-
-        delete gContext;
-        gContext = nullptr;
-
-        ReferenceCounter::PrintDebug();
-
-        SignalHandler::Done();
-    }
-}
 
 // If the theme specified in the DB is somehow broken, try a standard one:
 //
@@ -130,19 +113,12 @@ int main(int argc, char **argv)
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
-
     retval = cmdline.ConfigureLogging();
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(true, false, true))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(true, false, true))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

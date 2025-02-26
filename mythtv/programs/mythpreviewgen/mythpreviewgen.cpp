@@ -25,7 +25,6 @@
 
 // MythTV
 #include "libmyth/mythcontext.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
@@ -33,7 +32,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/signalhandling.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/mythsystemevent.h"
@@ -52,16 +50,6 @@ static constexpr long UNUSED_FILENO { 5 };
 #else
 static constexpr long UNUSED_FILENO { 3 };
 #endif
-
-namespace
-{
-    void cleanup()
-    {
-        delete gContext;
-        gContext = nullptr;
-        SignalHandler::Done();
-    }
-}
 
 int preview_helper(uint chanid, QDateTime starttime,
                    long long previewFrameNumber, std::chrono::seconds previewSeconds,
@@ -181,18 +169,11 @@ int main(int argc, char **argv)
     // Don't listen to console input
     close(0);
 
-    CleanupGuard callCleanup(cleanup);
-
-#ifndef _WIN32
-    SignalHandler::Init();
-#endif
-
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to ignore SIGPIPE");
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;

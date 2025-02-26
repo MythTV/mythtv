@@ -35,7 +35,6 @@
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmythui/standardsettings.h"
-#include "libmythbase/cleanupguard.h"
 #include "libmythbase/compat.h"  // For SIG* on MinGW
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/hardwareprofile.h"
@@ -323,7 +322,6 @@ namespace
     void cleanup()
     {
         QCoreApplication::processEvents();
-        DestroyMythMainWindow();
 #ifdef USING_AIRPLAY
         MythRAOPDevice::Cleanup();
         MythAirplayServer::Cleanup();
@@ -350,13 +348,6 @@ namespace
             delete g_settingsHelper;
             g_settingsHelper = nullptr;
         }
-
-        delete gContext;
-        gContext = nullptr;
-
-        ReferenceCounter::PrintDebug();
-
-        SignalHandler::Done();
     }
 }
 
@@ -952,7 +943,7 @@ static void handleGalleryMedia(MythMediaDevice *dev, bool forcePlayback)
     }
 }
 
-static void TVMenuCallback([[maybe_unused]] void *data, QString &selection)
+static void TVMenuCallback(void * /* data */, QString &selection)
 {
     QString sel = selection.toLower();
 
@@ -1370,7 +1361,7 @@ static bool RunMenu(const QString& themedir, const QString& themename)
     {
         LOG(VB_GENERAL, LOG_NOTICE, QString("Found mainmenu.xml for theme '%1'")
                 .arg(themename));
-        g_menu->setCallback(TVMenuCallback, gContext);
+        g_menu->setCallback(TVMenuCallback, nullptr);
         GetMythMainWindow()->GetMainStack()->AddScreen(g_menu);
         return true;
     }
@@ -2016,7 +2007,6 @@ Q_DECL_EXPORT int main(int argc, char **argv)
     QApplication::setSetuidAllowed(true);
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
-    CleanupGuard callCleanup(cleanup);
 
 #ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
@@ -2026,12 +2016,6 @@ Q_DECL_EXPORT int main(int argc, char **argv)
            .arg(QFileInfo(PYTHON_EXE).fileName())
            .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
            .toUtf8().constData(), 1);
-#endif
-
-#ifndef _WIN32
-    SignalHandler::Init();
-    SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
-    SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
 #endif
 
 #if defined(Q_OS_ANDROID)
@@ -2058,16 +2042,20 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         MythMainWindow::ParseGeometryOverride(cmdline.toString("geometry"));
 
     fe_sd_notify("STATUS=Connecting to database.");
-    gContext = new MythContext(MYTH_BINARY_VERSION, true);
+    MythContext context {MYTH_BINARY_VERSION, true};
     gCoreContext->SetAsFrontend(true);
 
     cmdline.ApplySettingsOverride();
-    if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
+    if (!context.Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         gCoreContext->SetExiting(true);
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
+    context.setCleanup(cleanup);
+
+    SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
+    SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
 
     cmdline.ApplySettingsOverride();
 
@@ -2111,7 +2099,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         LOG(VB_GENERAL, LOG_NOTICE, "Appearance settings and language have "
                                     "been reset to defaults. You will need to "
                                     "restart the frontend.");
-        gContext-> saveSettingsCache();
+        context.saveSettingsCache();
         return GENERIC_EXIT_OK;
     }
 
@@ -2366,7 +2354,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 
     fe_sd_notify("STOPPING=1\nSTATUS=Exiting");
     if (ret==0)
-        gContext-> saveSettingsCache();
+        context.saveSettingsCache();
 
     DestroyMythUI();
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();

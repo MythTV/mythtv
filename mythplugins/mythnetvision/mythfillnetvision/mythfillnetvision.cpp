@@ -86,11 +86,10 @@ int main(int argc, char *argv[])
     // Don't listen to console input
     close(0);
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
+    MythContext context {MYTH_BINARY_VERSION};
+    if (!context.Init(false))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
-        delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -149,7 +148,6 @@ int main(int argc, char *argv[])
 
     delete gdt;
     delete rssMan;
-    delete gContext;
 
     LOG(VB_GENERAL, LOG_INFO, "MythFillNetvision run complete.");
 
