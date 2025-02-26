@@ -166,7 +166,6 @@ class MythContext::Impl : public QObject
     MythConfirmationDialog *m_mbeVersionPopup    {nullptr};
     int                     m_registration       {-1};
     QDateTime               m_lastCheck;
-    QTcpSocket             *m_socket             {nullptr};
 };
 
 static void exec_program_cb(const QString &cmd)
