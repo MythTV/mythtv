@@ -20,7 +20,7 @@ QObject::customEvent to receive event notifications for subscribed services.
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"
 
-#include "bufferedsocketdevice.h"
+#include "blockingtcpsocket.h"
 
 // default requested time for subscription (actual is dictated by server)
 static constexpr uint16_t SUBSCRIPTION_TIME { 1800 };
@@ -311,32 +311,16 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
 
     LOG(VB_UPNP, LOG_DEBUG, LOC + "\n\n" + sub);
 
-    auto *sockdev = new MSocketDevice(MSocketDevice::Stream);
-    auto *sock = new BufferedSocketDevice(sockdev);
-    sockdev->setBlocking(true);
-
-    if (sock->Connect(QHostAddress(host), port))
+    BlockingTcpSocket socket;
+    if (socket.connect(QHostAddress(host), port, MAX_WAIT))
     {
-        if (sock->WriteBlockDirect(sub.constData(), sub.size()) != -1)
+        if (socket.write(sub.constData(), sub.size(), MAX_WAIT) != -1)
         {
-            QString line = sock->ReadLine(MAX_WAIT);
+            QString line = socket.readLine(MAX_WAIT);
             success = !line.isEmpty();
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Socket write error for %1:%2") .arg(host).arg(port));
-        }
-        sock->Close();
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Failed to open socket for %1:%2") .arg(host).arg(port));
     }
 
-    delete sock;
-    delete sockdev;
     if (success)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unsubscribed to %1").arg(usn));
     else
@@ -385,20 +369,17 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
 
     LOG(VB_UPNP, LOG_DEBUG, LOC + "\n\n" + sub);
 
-    auto *sockdev = new MSocketDevice(MSocketDevice::Stream);
-    auto *sock = new BufferedSocketDevice(sockdev);
-    sockdev->setBlocking(true);
-
     QString uuid;
     QString timeout;
     std::chrono::seconds result = 0s;
 
-    if (sock->Connect(QHostAddress(host), port))
+    BlockingTcpSocket socket;
+    if (socket.connect(QHostAddress(host), port, MAX_WAIT))
     {
-        if (sock->WriteBlockDirect(sub.constData(), sub.size()) != -1)
+        if (socket.write(sub.constData(), sub.size(), MAX_WAIT) != -1)
         {
             bool ok = false;
-            QString line = sock->ReadLine(MAX_WAIT);
+            QString line = socket.readLine(MAX_WAIT);
             while (!line.isEmpty())
             {
                 LOG(VB_UPNP, LOG_DEBUG, LOC + line);
@@ -410,7 +391,7 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
                     timeout = line.mid(8).trimmed().mid(7).trimmed();
                 if (ok && !uuid.isEmpty() && !timeout.isEmpty())
                     break;
-                line = sock->ReadLine(MAX_WAIT);
+                line = socket.readLine(MAX_WAIT);
             }
 
             if (ok && !uuid.isEmpty() && !timeout.isEmpty())
@@ -424,20 +405,7 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
                     QString("Failed to subscribe to %1").arg(usn));
             }
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Socket write error for %1:%2") .arg(host).arg(port));
-        }
-        sock->Close();
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Failed to open socket for %1:%2") .arg(host).arg(port));
     }
 
-    delete sock;
-    delete sockdev;
     return result;
 }
