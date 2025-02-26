@@ -112,23 +112,23 @@ class MythContext::Impl : public QObject
 
     void TempMainWindow();
     void EndTempWindow();
-    void LanguagePrompt();
+    static void LanguagePrompt();
 
-    bool LoadDatabaseSettings();
+    static bool LoadDatabaseSettings();
 
     static QString setLocalHostName(QString hostname);
 
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors();
-    void    EnableDBerrors();
+    void    EnableDBerrors() const;
     static void ResetDatabase(const DatabaseParams& dbParams);
 
     BackendSelection::Decision
             ChooseBackend(const QString &error);
-    int     UPnPautoconf(std::chrono::milliseconds milliSeconds = 2s);
-    bool    DefaultUPnP(QString& Error);
-    bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
+    static int     UPnPautoconf(std::chrono::milliseconds milliSeconds = 2s);
+    static bool    DefaultUPnP(QString& Error);
+    static bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup();
     bool    checkPort(QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents();
@@ -142,7 +142,7 @@ class MythContext::Impl : public QObject
     void ShowVersionMismatchPopup(uint remote_version);
 
   public slots:
-    void OnCloseDialog();
+    void OnCloseDialog() const;
     void VersionMismatchPopupClosed();
 
   public:
@@ -656,7 +656,7 @@ QString MythContext::Impl::setLocalHostName(QString hostname)
 }
 
 
-void MythContext::Impl::OnCloseDialog()
+void MythContext::Impl::OnCloseDialog() const
 {
     if (m_loop && m_loop->isRunning())
     {
@@ -1077,7 +1077,7 @@ void MythContext::Impl::SilenceDBerrors()
     }
 }
 
-void MythContext::Impl::EnableDBerrors()
+void MythContext::Impl::EnableDBerrors() const
 {
     // Restore (possibly) blanked hostname
     DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
