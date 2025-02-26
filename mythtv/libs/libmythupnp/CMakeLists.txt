@@ -9,12 +9,10 @@
 #
 
 set(HEADERS_TO_INSTALL1
-    bufferedsocketdevice.h
     eventing.h
     htmlserver.h
     httprequest.h
     httpserver.h
-    mmembuf.h
     mythxmlclient.h
     serverSideScripting.h
     soapclient.h
@@ -43,8 +41,8 @@ set(HEADERS_TO_INSTALL2
 #
 add_library(
   mythupnp
-  bufferedsocketdevice.cpp
-  bufferedsocketdevice.h
+  blockingtcpsocket.cpp
+  blockingtcpsocket.h
   eventing.cpp
   eventing.h
   htmlserver.cpp
@@ -53,8 +51,6 @@ add_library(
   httprequest.h
   httpserver.cpp
   httpserver.h
-  mmembuf.cpp
-  mmembuf.h
   mmulticastsocketdevice.cpp
   mmulticastsocketdevice.h
   msocketdevice.cpp
