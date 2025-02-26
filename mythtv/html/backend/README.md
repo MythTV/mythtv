@@ -2,6 +2,10 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli).
 
+## Development
+
+There are detailed instructions for developers in the MythTV wiki at [Web Application Development](https://www.mythtv.org/wiki/Web_Application_Development).
+
 ## Development server
 
 - Startup a copy of mythbackend, as the local dev server will proxy api calls to it.
