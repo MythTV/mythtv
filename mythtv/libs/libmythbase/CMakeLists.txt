@@ -245,8 +245,7 @@ add_library(
   stringutil.cpp
   threadedfilewriter.cpp
   unzip2.cpp
-  unziputil.cpp
-  version.h.in)
+  unziputil.cpp)
 
 #
 # All remaining target information
@@ -264,8 +263,7 @@ set_source_files_properties(
   mythdirs.cpp
   PROPERTIES
     COMPILE_DEFINITIONS
-    "RUNPREFIX=\"${MYTH_RUN_PREFIX}\";LIBDIRNAME=\"${CMAKE_INSTALL_LIBDIR}\""
-)
+    "RUNPREFIX=\"${MYTH_RUN_PREFIX}\";LIBDIRNAME=\"${CMAKE_INSTALL_LIBDIR}\"")
 target_include_directories(
   mythbase
   PRIVATE .
@@ -334,12 +332,20 @@ endif()
 #
 # Generated files section
 #
-
-configure_file(version.h.in version.h @ONLY)
 configure_file(mythversion.h.in mythversion.h @ONLY)
 configure_file(mythconfig.h.in mythconfig.h @ONLY)
 file(CREATE_LINK ${CMAKE_CURRENT_BINARY_DIR}/mythconfig.h
      ${PROJECT_BINARY_DIR}/config.h SYMBOLIC)
+
+#
+# Regenerate version.h every compile
+#
+add_custom_target(
+  update_version_h ALL
+  COMMAND ${PROJECT_SOURCE_DIR}/version.sh $<IF:$<BOOL:${VERBOSE}>,,-q>
+  ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}
+  COMMENT "Update version.h"
+  BYPRODUCTS version.h)
 
 #
 # Installation section
