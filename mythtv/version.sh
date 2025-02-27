@@ -85,7 +85,8 @@ else
     esac
 fi
 
-if ! echo "${SOURCE_VERSION}" | grep -Ei "v[0-9]+.*"   ; then
+src_vn=`echo "${SOURCE_VERSION}" | grep -Ei "v[0-9]+.*"`
+if [ -z $src_vn ] ; then
     # Invalid version - use SRC_VERSION file
     echo "WARNING: Invalid source version ${SOURCE_VERSION}, must start with v and a number, will use SRC_VERSION file instead"
     . $GITTREEDIR/SRC_VERSION
