@@ -1,14 +1,19 @@
 #!/bin/sh
 #
 # small shell script to generate version.h
-# it expects one parameter
+# it expects one or two parameters
 # first parameter is the root of the source directory
-if test $# -ne 1; then
-    echo "Usage: version.sh GIT_TREE_DIR"
+# second parameter is the root of the build directory
+if [ $# -eq 2 ]; then
+    OUTPUTDIR=$2
+elif [ $# -eq 1 ]; then
+    OUTPUTDIR=$1
+else
+    echo "Usage: version.sh GIT_TREE_DIR <OUTPUT_DIR>"
     exit 1
 fi
 
-TESTFN=`mktemp $1/.test-write-XXXXXX` 2> /dev/null
+TESTFN=`mktemp ${OUTPUTDIR}/.test-write-XXXXXX` 2> /dev/null
 if test x$TESTFN != x"" ; then
     rm -f $TESTFN
 else
@@ -96,6 +101,8 @@ if ! test $src_vn -eq $bin_vn ; then
     echo "ERROR: High level of source version ${SOURCE_VERSION}, does not match high level of binary version $MYTH_BINARY_VERSION"
     exit 2
 fi
+
+cd ${OUTPUTDIR}
 
 cat > .vers.new <<EOF
 #ifndef MYTH_SOURCE_VERSION_H
