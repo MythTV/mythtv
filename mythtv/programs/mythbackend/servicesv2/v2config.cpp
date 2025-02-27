@@ -12,7 +12,6 @@
 #include "libmythbase/mythlocale.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/version.h"
 
 // MythBackend
 #include "v2config.h"
