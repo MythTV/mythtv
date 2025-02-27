@@ -18,7 +18,6 @@
 #include "libmythbase/mythtimezone.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/storagegroup.h"
-#include "libmythbase/version.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythtv/tv_rec.h"
 
@@ -137,8 +136,8 @@ V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
     pWOL->setRetry             ( params.m_wolRetry     );
     pWOL->setCommand           ( params.m_wolCommand   );
 
-    pVersion->setVersion       ( MYTH_SOURCE_VERSION   );
-    pVersion->setBranch        ( MYTH_SOURCE_PATH      );
+    pVersion->setVersion       ( GetMythSourceVersion());
+    pVersion->setBranch        ( GetMythSourcePath()   );
     pVersion->setProtocol      ( MYTH_PROTO_VERSION    );
     pVersion->setBinary        ( MYTH_BINARY_VERSION   );
     pVersion->setSchema        ( MYTH_DATABASE_VERSION );
@@ -1119,7 +1118,7 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     V2EnvInfo           *pEnv       = pInfo->Env();
     V2LogInfo           *pLog       = pInfo->Log();
 
-    pBuild->setVersion     ( MYTH_SOURCE_VERSION   );
+    pBuild->setVersion     ( GetMythSourceVersion());
     pBuild->setLibX264     ( CONFIG_LIBX264        );
     pBuild->setLibDNS_SD   ( CONFIG_LIBDNS_SD      );
     pEnv->setLANG          ( qEnvironmentVariable("LANG")        );
