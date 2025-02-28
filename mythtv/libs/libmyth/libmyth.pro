@@ -1,7 +1,6 @@
 include ( ../../settings.pro )
 
 QT += network xml sql widgets
-using_qtscript: QT += script
 android: QT += androidextras
 
 TEMPLATE = lib
