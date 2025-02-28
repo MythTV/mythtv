@@ -27,7 +27,9 @@
  #
  */
 
+#if __STDC_VERSION__ < 202311L // C23
 typedef enum { false = 0, true = 1 }	bool;
+#endif
 typedef unsigned char			bool8;
 
 
