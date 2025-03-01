@@ -59,6 +59,9 @@
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
 #include "libmythupnp/mythxmlclient.h"
+#include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
+#include "libmythupnp/taskqueue.h"
 #include "libmythupnp/upnp.h"
 
 #include "backendselect.h"

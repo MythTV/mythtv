@@ -9,35 +9,18 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
-// POSIX headers
-#include <sys/types.h>
-#include <sys/time.h>
-#include <cerrno>
+#include "upnputil.h"
 
 // Qt headers
 #include <QUuid>
 #include <QStringList>
 
 // MythTV headers
-#include "httprequest.h"
-#include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythlogging.h"
 
-#include "upnp.h"
+#include "httprequest.h"
 #include "upnphelpers.h"
-#include "upnputil.h"
-
-// POSIX headers 2, needs to be after compat.h for OS X
-#ifndef _WIN32
-#include <sys/ioctl.h>
-#endif // _WIN32
-
-
-#include <zlib.h>
-#undef Z_NULL
-#define Z_NULL nullptr
 
 /////////////////////////////////////////////////////////////////////////////
 //

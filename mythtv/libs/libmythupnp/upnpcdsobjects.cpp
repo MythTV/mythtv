@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "upnpcdsobjects.h"
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
@@ -20,8 +21,6 @@
 #include <QUrl>
 
 #include "libmythbase/mythlogging.h"
-
-#include "upnpcds.h"
 
 inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 

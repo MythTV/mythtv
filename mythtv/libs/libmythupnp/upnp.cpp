@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "upnp.h"
 
 #include <QNetworkInterface>
 
@@ -16,7 +17,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/serverpool.h"
 
-#include "upnp.h"
+#include "ssdp.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables

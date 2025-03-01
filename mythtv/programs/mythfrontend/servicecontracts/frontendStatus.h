@@ -1,12 +1,11 @@
 #ifndef FRONTENDSTATUS_H
 #define FRONTENDSTATUS_H
 
-#include "libmythservicecontracts/serviceexp.h"
-#include "libmythservicecontracts/datacontracthelper.h"
+#include "datacontracthelper.h"
 
 namespace DTC
 {
-    class SERVICE_PUBLIC FrontendStatus : public QObject
+    class FrontendStatus : public QObject
     {
         Q_OBJECT
         Q_CLASSINFO("version", "1.1");

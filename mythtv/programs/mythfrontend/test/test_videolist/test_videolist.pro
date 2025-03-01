@@ -15,7 +15,6 @@ LIBS += ../../obj/upnpscanner.o ../../obj/moc_upnpscanner.o
 
 # Add all the necessary libraries
 LIBS += -L../../../../libs/libmythbase -lmythbase-$$LIBVERSION
-LIBS += -L../../../../libs/libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 LIBS += -L../../../../libs/libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../../libs/libmythupnp -lmythupnp-$$LIBVERSION
 LIBS += -L../../../../libs/libmyth -lmyth-$$LIBVERSION
@@ -35,7 +34,6 @@ using_mheg:QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythfreemheg
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythmetadata
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythtv
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmyth
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythservicecontracts
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythupnp
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythbase
