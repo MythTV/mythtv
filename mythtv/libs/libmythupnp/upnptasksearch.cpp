@@ -29,9 +29,6 @@ using namespace std::chrono_literals;
 
 #include "upnp.h"
 
-static QPair<QHostAddress, int> kLinkLocal6 =
-                            QHostAddress::parseSubnet("fe80::/10");
-
 UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
                                 QHostAddress peerAddress,
                                 int          nPeerPort,  
