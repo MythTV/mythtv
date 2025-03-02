@@ -49,30 +49,26 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               const QString&  sST,
                               const QString&  sUDN )
 {
-    QString sUSN;
-
+    QString uniqueServiceName = sST;
     if (( sUDN.length() > 0) && ( sUDN != sST ))
-        sUSN = sUDN + "::" + sST;
-    else
-        sUSN = sST;
+        uniqueServiceName = sUDN + "::" + uniqueServiceName;
 
-    QString sDate = MythDate::current().toString( "d MMM yyyy hh:mm:ss" );
-
-    QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
+    QByteArray data = QString("CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"
                               "EXT:\r\n"
                               "Server: %3\r\n"
                               "ST: %4\r\n"
                               "USN: %5\r\n"
-                              "Content-Length: 0\r\n\r\n" )
-                              .arg( m_nMaxAge.count()    )
-                              .arg( sDate,
-                                    HttpServer::GetServerVersion(),
-                                    sST,
-                                    sUSN );
+                              "Content-Length: 0\r\n\r\n")
+                        .arg(QString::number(m_nMaxAge.count()),
+                             MythDate::current().toString("d MMM yyyy hh:mm:ss"),
+                             HttpServer::GetServerVersion(),
+                             sST,
+                             uniqueServiceName
+                             ).toUtf8();
 
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg ST: %1 USN: %2; m_peerAddress = %3 Port=%4")
-                        .arg(sST, sUSN, m_peerAddress.toString(), QString::number(m_nPeerPort))
+                        .arg(sST, uniqueServiceName, m_peerAddress.toString(), QString::number(m_nPeerPort))
         );
 
     // TODO: When we add dynamic handling of interfaces the information
@@ -105,22 +101,18 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                 else
                     ipaddress = ip.toString();
 
-                QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
-                                            "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
-                                    .arg( ipaddress )
-                                    .arg( m_nServicePort);
-
-                QString  sPacket  = sHeader + sData;
-                QByteArray scPacket = sPacket.toUtf8();
+                QByteArray datagram =
+                    QString("HTTP/1.1 200 OK\r\n"
+                            "LOCATION: http://%1:%2/getDeviceDesc\r\n")
+                        .arg(ipaddress, QString::number(m_nServicePort)).toUtf8()
+                    + data;
 
                 // Send Packet to UDP Socket (Send same packet twice)
-                pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
-                                    m_nPeerPort );
+                pSocket->writeBlock(datagram, datagram.length(), m_peerAddress, m_nPeerPort);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
 
-                pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
-                                    m_nPeerPort );
+                pSocket->writeBlock(datagram, datagram.length(), m_peerAddress, m_nPeerPort);
             }
         }
     }
