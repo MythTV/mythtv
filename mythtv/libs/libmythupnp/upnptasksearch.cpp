@@ -165,15 +165,12 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
     // ----------------------------------------------------------------------
     // Check to see if this is a rootdevice or all request.
     // ----------------------------------------------------------------------
-
-    UPnpDevice &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
-
     if ((m_sST == "upnp:rootdevice") || (m_sST == "ssdp:all" ))
     {
-        SendMsg( pSocket, "upnp:rootdevice", device.GetUDN() );
+        SendMsg(pSocket, "upnp:rootdevice", UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
         if (m_sST == "ssdp:all")
-            ProcessDevice( pSocket, &device );
+            ProcessDevice(pSocket, UPnp::g_UPnpDeviceDesc.m_rootDevice);
     }
     else
     {
@@ -192,8 +189,7 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpSearchTask::ProcessDevice(
-    MSocketDevice *pSocket, UPnpDevice *pDevice)
+void UPnpSearchTask::ProcessDevice(MSocketDevice *pSocket, const UPnpDevice& device)
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages
@@ -202,22 +198,25 @@ void UPnpSearchTask::ProcessDevice(
     //          Version 1 of a service.
     // ----------------------------------------------------------------------
 
-    SendMsg( pSocket, pDevice->GetUDN(), "" );
-    SendMsg( pSocket, pDevice->m_sDeviceType, pDevice->GetUDN() );
+    SendMsg(pSocket, device.GetUDN(), "");
+    SendMsg(pSocket, device.m_sDeviceType, device.GetUDN());
         
     // ------------------------------------------------------------------
     // Loop for each service in this device and send the 1 required message
     // ------------------------------------------------------------------
 
-    for (auto sit = pDevice->m_listServices.cbegin();
-         sit != pDevice->m_listServices.cend(); ++sit)
-        SendMsg(pSocket, (*sit)->m_sServiceType, pDevice->GetUDN());
+    for (const auto* service : std::as_const(device.m_listServices))
+    {
+        SendMsg(pSocket, service->m_sServiceType, device.GetUDN());
+    }
 
     // ----------------------------------------------------------------------
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    for (auto *device : std::as_const(pDevice->m_listDevices))
-        ProcessDevice( pSocket, device);
+    for (const auto* embedded_device : std::as_const(device.m_listDevices))
+    {
+        ProcessDevice(pSocket, *embedded_device);
+    }
 }
 
