@@ -30,9 +30,6 @@ using namespace std::chrono_literals;
 #include "libmythupnp/httpserver.h"
 #include "libmythupnp/upnp.h"
 
-static QPair<QHostAddress, int> kLinkLocal6 =
-                            QHostAddress::parseSubnet("fe80::/10");
-
 UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
                                 QHostAddress peerAddress,
                                 int          nPeerPort,  
