@@ -13,22 +13,16 @@
 #ifndef UPNPTASKSEARCH_H
 #define UPNPTASKSEARCH_H
 
-// POSIX headers
-#include <sys/types.h>
-#ifndef _WIN32
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif
+#include <chrono>
+using namespace std::chrono_literals;
 
 // Qt headers
-#include <QList>
 #include <QHostAddress>
-
-// MythTV headers
-#include "libmythbase/compat.h"
+#include <QString>
 
 #include "libmythupnp/msocketdevice.h"
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/taskqueue.h"
+#include "libmythupnp/upnpdevice.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
