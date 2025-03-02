@@ -12,20 +12,20 @@
 #include "upnptasksearch.h"
 
 #include <chrono> // for milliseconds
-#include <cstdlib>
+using namespace std::chrono_literals;
 #include <thread> // for sleep_for
 #include <utility>
 
-#include <QDateTime>
-#include <QFile>
-#include <QStringList>
+#include <QByteArray>
+#include <QNetworkAddressEntry>
 #include <QNetworkInterface>
+#include <QPair>
+#include <QString>
 
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-#include "libmythbase/mythversion.h"
 
 #include "libmythupnp/httpserver.h"
 #include "libmythupnp/upnp.h"
