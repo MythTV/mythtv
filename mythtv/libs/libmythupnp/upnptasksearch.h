@@ -50,7 +50,7 @@ class UPnpSearchTask : public Task
 
         ~UPnpSearchTask() override = default;
 
-        void     ProcessDevice ( MSocketDevice *pSocket, UPnpDevice *pDevice );
+        void     ProcessDevice ( MSocketDevice *pSocket, const UPnpDevice& device);
         void     SendMsg       ( MSocketDevice  *pSocket,
                                  const QString&  sST,
                                  const QString&  sUDN );
