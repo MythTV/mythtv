@@ -46,19 +46,19 @@ static QPair<QHostAddress, int> kLinkLocal6 =
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
-                                const QHostAddress& peerAddress,
+                                QHostAddress peerAddress,
                                 int          nPeerPort,  
                                 QString      sST, 
                                 QString      sUDN ) :
     Task("UPnpSearchTask"),
     m_nServicePort(nServicePort),
-    m_peerAddress(peerAddress),
+    m_nMaxAge(XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h)),
+    m_peerAddress(std::move(peerAddress)),
     m_nPeerPort(nPeerPort),
     m_sST(std::move(sST)),
     m_sUDN(std::move(sUDN))
 {
-    m_nMaxAge     = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
-} 
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
