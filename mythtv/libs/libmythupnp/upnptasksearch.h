@@ -13,9 +13,12 @@
 #ifndef UPNPTASKSEARCH_H
 #define UPNPTASKSEARCH_H
 
+#include <chrono>
+using namespace std::chrono_literals;
+
 // Qt headers
-#include <QList>
 #include <QHostAddress>
+#include <QString>
 
 #include "libmythupnp/msocketdevice.h"
 #include "libmythupnp/taskqueue.h"
