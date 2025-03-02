@@ -71,14 +71,9 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                                     sST,
                                     sUSN );
 
-#if 0
-    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
-                        .arg(sST) .arg(sUSN));
-
-    LOG(VB_UPNP, LOG_DEBUG,
-        QString("UPnpSearchTask::SendMsg    m_peerAddress = %1 Port=%2")
-                        .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
-#endif
+    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg ST: %1 USN: %2; m_peerAddress = %3 Port=%4")
+                        .arg(sST, sUSN, m_peerAddress.toString(), QString::number(m_nPeerPort))
+        );
 
     // TODO: When we add dynamic handling of interfaces the information
     // for each address on the system should be available from the
