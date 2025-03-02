@@ -31,9 +31,7 @@
 
 class UPnpSearchTask : public Task
 {
-    protected: 
-
-        QList<QHostAddress>     m_addressList;
+    protected:
         int                     m_nServicePort;
         std::chrono::seconds    m_nMaxAge      {1h};
 
