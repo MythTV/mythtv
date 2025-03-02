@@ -163,12 +163,6 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
     auto *pSocket = new MSocketDevice( MSocketDevice::Datagram );
 
     // ----------------------------------------------------------------------
-    // Refresh IP Address List in case of changes
-    // ----------------------------------------------------------------------
-
-    m_addressList = UPnp::g_IPAddrList;
-
-    // ----------------------------------------------------------------------
     // Check to see if this is a rootdevice or all request.
     // ----------------------------------------------------------------------
 
