@@ -9,7 +9,6 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
 #ifndef UPNPTASKSEARCH_H
 #define UPNPTASKSEARCH_H
 
@@ -24,14 +23,6 @@ using namespace std::chrono_literals;
 #include "libmythupnp/taskqueue.h"
 #include "libmythupnp/upnpdevice.h"
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpSearchTask Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
 class UPnpSearchTask : public Task
 {
     protected:
@@ -43,11 +34,7 @@ class UPnpSearchTask : public Task
         QString         m_sST; 
         QString         m_sUDN;
 
-
-    protected:
-
         // Destructor protected to force use of Release Method
-
         ~UPnpSearchTask() override = default;
 
         void     ProcessDevice ( MSocketDevice *pSocket, const UPnpDevice& device);
@@ -56,7 +43,6 @@ class UPnpSearchTask : public Task
                                  const QString&  sUDN );
 
     public:
-
         UPnpSearchTask( int          nServicePort,
                         QHostAddress peerAddress,
                         int          nPeerPort,  
@@ -65,8 +51,6 @@ class UPnpSearchTask : public Task
 
         QString Name() override { return( "Search" ); } // Task
         void Execute( TaskQueue *pQueue ) override; // Task
-
 };
-
 
 #endif // UPNPTASKSEARCH_H

@@ -33,18 +33,6 @@ using namespace std::chrono_literals;
 static QPair<QHostAddress, int> kLinkLocal6 =
                             QHostAddress::parseSubnet("fe80::/10");
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpSearchTask Implementation
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
                                 QHostAddress peerAddress,
                                 int          nPeerPort,  
@@ -59,10 +47,6 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sUDN(std::move(sUDN))
 {
 }
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
 
 void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               const QString&  sST,
@@ -134,14 +118,10 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                                     .arg( ipaddress )
                                     .arg( m_nServicePort);
 
-
                 QString  sPacket  = sHeader + sData;
                 QByteArray scPacket = sPacket.toUtf8();
 
-                // ------------------------------------------------------------------
                 // Send Packet to UDP Socket (Send same packet twice)
-                // ------------------------------------------------------------------
-
                 pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                                     m_nPeerPort );
 
@@ -154,17 +134,11 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 {
     auto *pSocket = new MSocketDevice( MSocketDevice::Datagram );
 
-    // ----------------------------------------------------------------------
     // Check to see if this is a rootdevice or all request.
-    // ----------------------------------------------------------------------
     if ((m_sST == "upnp:rootdevice") || (m_sST == "ssdp:all" ))
     {
         SendMsg(pSocket, "upnp:rootdevice", UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
@@ -174,10 +148,7 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
     }
     else
     {
-        // ------------------------------------------------------------------
         // Send Device/Service specific response.
-        // ------------------------------------------------------------------
-
         SendMsg( pSocket, m_sST, m_sUDN );
     }
 
@@ -185,38 +156,22 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
     pSocket = nullptr;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void UPnpSearchTask::ProcessDevice(MSocketDevice *pSocket, const UPnpDevice& device)
 {
-    // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages
-    //
     // -=>TODO: We need to add support to only notify 
     //          Version 1 of a service.
-    // ----------------------------------------------------------------------
-
     SendMsg(pSocket, device.GetUDN(), "");
     SendMsg(pSocket, device.m_sDeviceType, device.GetUDN());
-        
-    // ------------------------------------------------------------------
     // Loop for each service in this device and send the 1 required message
-    // ------------------------------------------------------------------
-
     for (const auto* service : std::as_const(device.m_listServices))
     {
         SendMsg(pSocket, service->m_sServiceType, device.GetUDN());
     }
 
-    // ----------------------------------------------------------------------
     // Process any Embedded Devices
-    // ----------------------------------------------------------------------
-
     for (const auto* embedded_device : std::as_const(device.m_listDevices))
     {
         ProcessDevice(pSocket, *embedded_device);
     }
 }
-
