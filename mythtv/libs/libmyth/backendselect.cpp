@@ -14,6 +14,8 @@
 #include "libmythui/mythuibuttonlist.h"
 #include "libmythui/mythuistatetype.h"
 #include "libmythupnp/mythxmlclient.h"
+#include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
 
 BackendSelection::BackendSelection(
     MythScreenStack *parent,
@@ -34,7 +36,7 @@ BackendSelection::BackendSelection(
 
 BackendSelection::~BackendSelection()
 {
-    SSDP::RemoveListener(this);
+    SSDPCache::Instance()->removeListener(this);
 
     ItemMap::iterator it;
     for (it = m_devices.begin(); it != m_devices.end(); ++it)
@@ -251,7 +253,7 @@ void BackendSelection::Cancel(void)
 
 void BackendSelection::Load(void)
 {
-    SSDP::AddListener(this);
+    SSDPCache::Instance()->addListener(this);
     SSDP::Instance()->PerformSearch(SSDP::kBackendURI);
 }
 
@@ -332,7 +334,7 @@ void BackendSelection::customEvent(QEvent *event)
         if (message.startsWith("SSDP_ADD") &&
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))
         {
-            DeviceLocation *devLoc = SSDP::Find(URI, URN);
+            DeviceLocation *devLoc = SSDPCache::Instance()->Find(URI, URN);
             if (devLoc)
             {
                 AddItem(devLoc);
