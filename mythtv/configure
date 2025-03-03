@@ -13,7 +13,7 @@
 MYTHTV_VERSION_MAJMIN="36.0"
 MYTHTV_LIBVERSION="36"
 # See mythtv/libs/libmythbase/mythversion.h.in
-MYTHTV_BINARY_VERSION="36.20220913-1"
+MYTHTV_BINARY_VERSION="36.20250212-1"
 # See bindings/python/MythTV/static.py.in
 MYTHTV_PYTHON_OWN_VERSION="(36,0,-1,0)"
 # See python/MythTV/services_api/send.py.in

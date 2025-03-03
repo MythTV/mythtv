@@ -17,7 +17,7 @@ endif()
 #
 
 # See mythtv/libs/libmythbase/mythversion.h.in
-set(MYTHTV_BINARY_CHANGED "20220913-1")
+set(MYTHTV_BINARY_CHANGED "20250212-1")
 set(MYTHTV_BINARY_VERSION "${PROJECT_VERSION_MAJOR}.${MYTHTV_BINARY_CHANGED}")
 
 # See mythtv/bindings/python/MythTV/static.py.in

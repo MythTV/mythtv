@@ -29,14 +29,6 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <QtGlobal>
-#if defined(Q_OS_DARWIN) or defined(__FreeBSD__)
-#include <sys/param.h>
-#include <sys/mount.h>
-#elif defined(__linux__)
-#include <sys/vfs.h>
-#endif
-
 // Qt headers
 #include <QApplication>
 #include <QDir>
@@ -53,8 +45,8 @@
 #include <libmyth/mythavframe.h>
 #include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>
+#include <libmythbase/filesysteminfo.h>
 #include <libmythbase/mythcommandlineparser.h>
-#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdb.h>
@@ -2228,21 +2220,8 @@ static int isRemote(const QString& filename)
     if (!QFile::exists(filename))
         return 0;
 
-// TODO replace with FileSystemInfo?
-#ifdef Q_OS_DARWIN
-    struct statfs statbuf {};
-    if ((statfs(qPrintable(filename), &statbuf) == 0) &&
-        ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
-            (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
-            (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
+    if (!FileSystemInfo(QString(), filename).isLocal())
         return 2;
-#elif defined(__linux__)
-    struct statfs statbuf {};
-    if ((statfs(qPrintable(filename), &statbuf) == 0) &&
-        ((statbuf.f_type == 0x6969) ||      // NFS
-            (statbuf.f_type == 0x517B)))    // SMB
-        return 2;
-#endif
 
     return 1;
 }
