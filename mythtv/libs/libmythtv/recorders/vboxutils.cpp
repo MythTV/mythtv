@@ -5,6 +5,7 @@
 #include <QString>
 #include <QStringList>
 #include <QDomDocument>
+#include <QRegularExpression>
 
 // MythTV headers
 #include "libmythbase/mythdownloadmanager.h"
