@@ -81,8 +81,6 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
             .arg(pSocket->address().toString(), QString::number(pSocket->port()),
                  sNT, sUSN));
 
-    QMutexLocker qml(&m_mutex); // for addressList
-
     // -------------------------------------------------------------------
     // Refresh IP Address List in case of changes
     // -------------------------------------------------------------------
