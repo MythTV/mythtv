@@ -12,14 +12,16 @@
 #include "ssdp.h"
 
 #include <algorithm>
-#include <cerrno>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
 #include <QByteArray>
 #include <QHostAddress>
+#include <QMap>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QNetworkDatagram>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QUdpSocket>
@@ -34,13 +36,6 @@
 #include "upnp.h"
 #include "upnptasknotify.h"
 #include "upnptasksearch.h"
-
-#include "mmulticastsocketdevice.h"
-#include "msocketdevice.h"
-
-#ifdef Q_OS_ANDROID
-#include <sys/select.h>
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -80,27 +75,9 @@ void SSDP::Shutdown()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDP::SSDP() :
-    MThread("SSDP")
+SSDP::SSDP()
 {
-    LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
-
-    {
-        auto config = XmlConfiguration();
-
-        m_nPort       = config.GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
-    }
-
-    m_socket = new MMulticastSocketDevice(SSDP_GROUP, m_nPort);
-    m_socket->setBlocking( false );
-
-    // ----------------------------------------------------------------------
-    // Create the SSDP (Upnp Discovery) Thread.
-    // ----------------------------------------------------------------------
-
-    start();
-
-    LOG(VB_UPNP, LOG_INFO, "SSDP Thread Starting soon" );
+    LOG(VB_UPNP, LOG_NOTICE, "SSDP instance created." );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -109,27 +86,16 @@ SSDP::SSDP() :
 
 SSDP::~SSDP()
 {
-    LOG(VB_UPNP, LOG_NOTICE, "Shutting Down SSDP Thread..." );
+    LOG(VB_UPNP, LOG_NOTICE, "Destroying SSDP instance." );
 
     DisableNotifications();
-
-    RequestTerminate();
-    wait();
-
     if (m_pNotifyTask != nullptr)
     {
         m_pNotifyTask->DecrRef();
         m_pNotifyTask = nullptr;
     }
 
-    delete m_socket;
-
-    LOG(VB_UPNP, LOG_INFO, "SSDP Thread Terminated." );
-}
-
-void SSDP::RequestTerminate(void)
-{
-    m_bTermRequested = true;
+    LOG(VB_UPNP, LOG_INFO, "SSDP instance destroyed." );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -223,216 +189,10 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void SSDP::run()
+static SSDPRequestType ProcessRequestLine(const QString &sLine)
 {
-    RunProlog();
-
-    fd_set          read_set;
-    struct timeval  timeout {};
-
-    LOG(VB_UPNP, LOG_INFO, "SSDP::Run - SSDP Thread Started." );
-
-    // ----------------------------------------------------------------------
-    // Listen for new Requests
-    // ----------------------------------------------------------------------
-
-    while ( ! m_bTermRequested )
-    {
-        int nMaxSocket = 0;
-
-        FD_ZERO( &read_set ); // NOLINT(readability-isolate-declaration)
-
-            if (m_socket != nullptr && m_socket->socket() >= 0)
-            {
-                FD_SET( m_socket->socket(), &read_set );
-                nMaxSocket = std::max( m_socket->socket(), nMaxSocket );
-
-#if 0
-                if (socket->bytesAvailable() > 0)
-                {
-                    LOG(VB_GENERAL, LOG_DEBUG,
-                        QString("Found Extra data before select: %1")
-                        .arg(nIdx));
-                    ProcessData( socket );
-                }
-#endif
-            }
-        
-        timeout.tv_sec  = 1;
-        timeout.tv_usec = 0;
-
-        if (select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout) == 1)
-        {
-#if 0
-                LOG(VB_GENERAL, LOG_DEBUG, QString("FD_ISSET( %1 )").arg(nIdx));
-#endif
-
-                ProcessData(m_socket);
-        }
-    }
-
-    RunEpilog();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void SSDP::ProcessData( MSocketDevice *pSocket )
-{
-    QByteArray buffer;
-    long nBytes = pSocket->bytesAvailable();
-    int retries = 0;
-    // Note: this function MUST do a read even if someone sends a zero byte UDP message
-    // Otherwise the select() will continue to signal data ready, so to prevent using 100%
-    // CPU, we need to call a recv function to make select() block again
-    bool didDoRead = false;
-
-    // UDP message of zero length? OK, "recv" it and move on
-    if (nBytes == 0)
-    {
-        LOG(VB_UPNP, LOG_WARNING, QString("SSDP: Received 0 byte UDP message"));
-    }
-
-    while (((nBytes = pSocket->bytesAvailable()) > 0 || (nBytes == 0 && !didDoRead)) && !m_bTermRequested)
-    {
-        buffer.resize(nBytes);
-
-        long nRead = 0;
-        while ((nRead < nBytes) || (nBytes == 0 && !didDoRead))
-        {
-            long ret = pSocket->readBlock( buffer.data() + nRead, nBytes - nRead );
-            didDoRead = true;
-            if (ret < 0)
-            {
-                if (errno == EAGAIN
-#if EAGAIN != EWOULDBLOCK
-                    || errno == EWOULDBLOCK
-#endif
-                    )
-                {
-                    if (retries == 3)
-                    {
-                        nBytes = nRead;
-                        buffer.resize(nBytes);
-                        break;
-                    }
-                    retries++;
-                    std::this_thread::sleep_for(10ms);
-                    continue;
-                }
-                LOG(VB_GENERAL, LOG_ERR, QString("Socket readBlock error %1")
-                    .arg(pSocket->error()));
-                buffer.clear();
-                break;
-            }
-            retries = 0;
-
-            nRead += ret;
-
-            if (0 == ret && nBytes != 0)
-            {
-                LOG(VB_SOCKET, LOG_WARNING,
-                    QString("%1 bytes reported available, "
-                            "but only %2 bytes read.")
-                    .arg(nBytes).arg(nRead));
-                nBytes = nRead;
-                buffer.resize(nBytes);
-                break;
-            }
-        }
-
-        if (buffer.isEmpty())
-            continue;
-
-        QHostAddress  peerAddress = pSocket->peerAddress();
-        quint16       peerPort    = pSocket->peerPort   ();
-        
-        // ------------------------------------------------------------------
-        QString     str          = QString(buffer.constData());
-        QStringList lines        = str.split("\r\n", Qt::SkipEmptyParts);
-        QString     sRequestLine = !lines.empty() ? lines[0] : "";
-
-        if (!lines.isEmpty())
-            lines.pop_front();
-
-        // ------------------------------------------------------------------
-        // Parse request Type
-        // ------------------------------------------------------------------
-
-        LOG(VB_UPNP, LOG_DEBUG, QString("SSDP::ProcessData - requestLine: %1")
-                .arg(sRequestLine));
-
-        SSDPRequestType eType = ProcessRequestLine( sRequestLine );
-
-        // ------------------------------------------------------------------
-        // Read Headers into map
-        // ------------------------------------------------------------------
-
-        QStringMap  headers;
-
-        for (const auto& sLine : std::as_const(lines))
-        {
-            QString sName  = sLine.section( ':', 0, 0 ).trimmed();
-            QString sValue = sLine.section( ':', 1 );
-
-            sValue.truncate( sValue.length() );  //-2
-
-            if ((sName.length() != 0) && (sValue.length() !=0))
-                headers.insert( sName.toLower(), sValue.trimmed() );
-        }
-
-#if 0
-        pSocket->SetDestAddress( peerAddress, peerPort );
-#endif
-
-        // --------------------------------------------------------------
-        // See if this is a valid request
-        // --------------------------------------------------------------
-
-        switch( eType )
-        {
-            case SSDP_MSearch:
-            {
-                // ----------------------------------------------------------
-                // If we haven't enabled notifications yet, then we don't 
-                // want to answer search requests.
-                // ----------------------------------------------------------
-
-                if (m_pNotifyTask != nullptr)
-                    ProcessSearchRequest( headers, peerAddress, peerPort ); 
-
-                break;
-            }
-
-            case SSDP_MSearchResp:
-                ProcessSearchResponse( headers); 
-                break;
-
-            case SSDP_Notify:
-                ProcessNotify( headers ); 
-                break;
-
-            case SSDP_Unknown:
-            default:
-                LOG(VB_UPNP, LOG_ERR,
-                    "SSPD::ProcessData - Unknown request Type.");
-                break;
-        }
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
-{
-    QStringList tokens = sLine.split(m_procReqLineExp, Qt::SkipEmptyParts);
+    static const QRegularExpression k_whitespace {"\\s+"};
+    QStringList tokens = sLine.split(k_whitespace, Qt::SkipEmptyParts);
 
     // ----------------------------------------------------------------------
     // if this is actually a response, then sLine's format will be:
@@ -453,14 +213,10 @@ SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
     return SSDP_Unknown;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString SSDP::GetHeaderValue( const QStringMap &headers,
+static QString GetHeaderValue(const QMap<QString, QString> &headers,
                               const QString    &sKey, const QString &sDefault )
 {
-    QStringMap::const_iterator it = headers.find( sKey.toLower() );
+    QMap<QString, QString>::const_iterator it = headers.find(sKey.toLower());
 
     if ( it == headers.end())
         return( sDefault );
@@ -468,14 +224,17 @@ QString SSDP::GetHeaderValue( const QStringMap &headers,
     return *it;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders, 
+static bool ProcessSearchRequest(const QMap<QString, QString> &sHeaders,
                                  const QHostAddress& peerAddress,
-                                 quint16           peerPort ) const
+                                 quint16 peerPort,
+                                 int servicePort)
 {
+    // Don't respond if notifications are not enabled.
+    if (servicePort == 0)
+    {
+        return true;
+    }
+
     QString sMAN = GetHeaderValue( sHeaders, "MAN", "" );
     QString sST  = GetHeaderValue( sHeaders, "ST" , "" );
     QString sMX  = GetHeaderValue( sHeaders, "MX" , "" );
@@ -513,7 +272,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     if ((sST == "ssdp:all") || (sST == "upnp:rootdevice"))
     {
-        auto *pTask = new UPnpSearchTask( m_nServicePort,
+        auto *pTask = new UPnpSearchTask(servicePort,
             peerAddress, peerPort, sST, 
             UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
@@ -539,7 +298,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     if (sUDN.length() > 0)
     {
-        auto *pTask = new UPnpSearchTask( m_nServicePort, peerAddress,
+        auto *pTask = new UPnpSearchTask(servicePort, peerAddress,
                                           peerPort, sST, sUDN );
 
         // Excute task now for fastest response, queue for time-delayed response
@@ -556,11 +315,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     return false;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool SSDP::ProcessSearchResponse( const QStringMap &headers )
+static bool ProcessSearchResponse(const QMap<QString, QString> &headers)
 {
     QString sDescURL = GetHeaderValue( headers, "LOCATION"      , "" );
     QString sST      = GetHeaderValue( headers, "ST"            , "" );
@@ -591,11 +346,7 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     return true;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool SSDP::ProcessNotify( const QStringMap &headers )
+static bool ProcessNotify(const QMap<QString, QString> &headers)
 {
     QString sDescURL = GetHeaderValue( headers, "LOCATION"      , "" );
     QString sNTS     = GetHeaderValue( headers, "NTS"           , "" );
@@ -639,4 +390,72 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
     }
 
     return false;
+}
+
+SSDPReceiver::SSDPReceiver() :
+    m_port(XmlConfiguration().GetValue("UPnP/SSDP/Port", SSDP_PORT))
+{
+    m_socket.bind(QHostAddress::AnyIPv4, m_port, QUdpSocket::ShareAddress);
+    m_socket.joinMulticastGroup(m_groupAddress);
+
+    connect(&m_socket, &QUdpSocket::readyRead, this, &SSDPReceiver::processPendingDatagrams);
+}
+
+void SSDPReceiver::processPendingDatagrams()
+{
+    while (m_socket.hasPendingDatagrams())
+    {
+        QNetworkDatagram datagram = m_socket.receiveDatagram();
+        QString     str          = QString::fromUtf8(datagram.data());
+        QStringList lines        = str.split("\r\n", Qt::SkipEmptyParts);
+        QString     sRequestLine = !lines.empty() ? lines[0] : "";
+
+        if (!lines.isEmpty())
+            lines.pop_front();
+
+        // Parse request Type
+        LOG(VB_UPNP, LOG_DEBUG, QString("SSDP::ProcessData - requestLine: %1")
+                .arg(sRequestLine));
+        SSDPRequestType eType = ProcessRequestLine( sRequestLine );
+
+        // Read Headers into map
+        QMap<QString, QString>  headers;
+        for (const auto& sLine : std::as_const(lines))
+        {
+            QString sName  = sLine.section(':', 0, 0).trimmed();
+            QString sValue = sLine.section(':', 1);
+
+            sValue.truncate(sValue.length());  //-2
+
+            if ((sName.length() != 0) && (sValue.length() != 0))
+            {
+                headers.insert(sName.toLower(), sValue.trimmed());
+            }
+        }
+
+        // See if this is a valid request
+        switch (eType)
+        {
+            case SSDP_MSearch:
+            {
+                ProcessSearchRequest(headers, datagram.senderAddress(),
+                    datagram.senderPort(), SSDP::Instance()->getNotificationPort());
+
+                break;
+            }
+
+            case SSDP_MSearchResp:
+                ProcessSearchResponse(headers);
+                break;
+
+            case SSDP_Notify:
+                ProcessNotify(headers);
+                break;
+
+            case SSDP_Unknown:
+            default:
+                LOG(VB_UPNP, LOG_ERR, "SSPD::ProcessData - Unknown request Type.");
+                break;
+        }
+    }
 }
