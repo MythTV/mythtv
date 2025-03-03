@@ -17,7 +17,6 @@
 
 #include <QHostAddress>
 #include <QMutex>
-#include <QObject>
 #include <QRegularExpression>
 #include <QString>
 #include <QStringList>
@@ -28,7 +27,6 @@
 #include "httprequest.h"
 #include "httpserver.h"
 #include "msocketdevice.h"
-#include "ssdpcache.h"
 
 static constexpr const char* SSDP_GROUP { "239.255.255.250" };
 static constexpr uint16_t SSDP_PORT       { 1900 };
@@ -120,19 +118,6 @@ class UPNP_PUBLIC SSDP : public MThread
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();
-
-        // ------------------------------------------------------------------
-
-        static void AddListener(QObject *listener)
-            { SSDPCache::Instance()->addListener(listener); }
-        static void RemoveListener(QObject *listener)
-            { SSDPCache::Instance()->removeListener(listener); }
-
-        static SSDPCacheEntries *Find(const QString &sURI)
-            { return SSDPCache::Instance()->Find(sURI); }
-        static DeviceLocation   *Find(const QString &sURI, 
-                                      const QString &sUSN)
-            { return SSDPCache::Instance()->Find( sURI, sUSN ); }
 };
 
 /////////////////////////////////////////////////////////////////////////////
