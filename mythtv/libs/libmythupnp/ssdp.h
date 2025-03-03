@@ -13,7 +13,6 @@
 #ifndef SSDP_H
 #define SSDP_H
 
-#include <array>
 #include <cstdint>
 
 #include <QHostAddress>
@@ -58,13 +57,6 @@ enum SSDPRequestType : std::uint8_t
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-enum SocketIdxType : std::uint8_t
-{
-    SocketIdx_Search     = 0,
-    SocketIdx_Multicast  = 1,
-    kNumberOfSockets
-};
-
 class UPNP_PUBLIC SSDP : public MThread
 {
     private:
@@ -72,7 +64,7 @@ class UPNP_PUBLIC SSDP : public MThread
         static SSDP*        g_pSSDP;  
 
         QRegularExpression  m_procReqLineExp        {"\\s+"};
-        std::array<MSocketDevice*,kNumberOfSockets> m_sockets {nullptr,nullptr};
+        MSocketDevice* m_socket                     {nullptr};
 
         int                 m_nPort                 {SSDP_PORT};
         int                 m_nSearchPort           {SSDP_SEARCHPORT};
