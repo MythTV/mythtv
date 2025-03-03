@@ -11,22 +11,19 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "upnptasknotify.h"
 
-// ANSI C headers
-#include <cstdlib>
-
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
 // Qt headers
-#include <QStringList>
-#include <QUuid> 
-#include <QFile>
+#include <QByteArray>
+#include <QHostAddress>
+#include <QList>
+#include <QString>
 
 // MythTV headers
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-#include "libmythbase/mythversion.h"
 
 #include "httpserver.h"
 #include "mmulticastsocketdevice.h"
