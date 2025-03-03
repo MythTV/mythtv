@@ -41,54 +41,6 @@
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// Broadcast Socket is used for XBox (original) since Multicast is not supported
-/////////////////////////////////////////////////////////////////////////////
-
-class MBroadcastSocketDevice : public MSocketDevice
-{
-  public:
-    MBroadcastSocketDevice(const QString& sAddress, quint16 nPort) :
-        MSocketDevice(MSocketDevice::Datagram),
-        m_address(sAddress), m_port(nPort)
-    {
-        m_address.setAddress( sAddress );
-
-        setProtocol(IPv4);
-        setSocket(createNewSocket(), MSocketDevice::Datagram);
-
-        int one = 1;
-        if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST,
-                       (const char *)&one, sizeof(one)) < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "setsockopt - SO_BROADCAST Error" + ENO);
-        }
-
-        setAddressReusable(true);
-
-        bind(m_address, m_port);
-    }
-
-    ~MBroadcastSocketDevice() override
-    {
-        int zero = 0;
-        if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST, (const char *)&zero,
-                       sizeof(zero)) < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "setsockopt - SO_BROADCAST Error" + ENO);
-        }
-    }
-
-    QHostAddress address() const override // MSocketDevice
-        { return m_address; }
-    quint16 port() const override // MSocketDevice
-        { return m_port; }
-
-  private:
-    QHostAddress    m_address;
-    quint16         m_port;
-};
-
-/////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
 // SSDP Class Implementation
@@ -142,12 +94,9 @@ SSDP::SSDP() :
         new MMulticastSocketDevice();
     m_sockets[ SocketIdx_Multicast ] =
         new MMulticastSocketDevice(SSDP_GROUP, m_nPort);
-    m_sockets[ SocketIdx_Broadcast ] =
-        new MBroadcastSocketDevice("255.255.255.255", m_nPort);
 
     m_sockets[ SocketIdx_Search    ]->setBlocking( false );
     m_sockets[ SocketIdx_Multicast ]->setBlocking( false );
-    m_sockets[ SocketIdx_Broadcast ]->setBlocking( false );
 
     // Setup SearchSocket
     QHostAddress ip4addr( QHostAddress::Any );
