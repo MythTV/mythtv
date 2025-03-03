@@ -30,28 +30,12 @@
 #include "ssdp.h"
 #include "upnp.h"
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpNotifyTask Implementation
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
     Task("UPnpNotifyTask"),
     m_nServicePort(nServicePort)
 {
     m_nMaxAge      = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
 } 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
 
 void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                                     const QString& sNT,
@@ -81,12 +65,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
             .arg(pSocket->address().toString(), QString::number(pSocket->port()),
                  sNT, sUSN));
 
-    // -------------------------------------------------------------------
-    // Refresh IP Address List in case of changes
-    // -------------------------------------------------------------------
-
     QList<QHostAddress> addressList = UPnp::g_IPAddrList;
-
     for (const auto & addr : std::as_const(addressList))
     {
         if (addr.toString().isEmpty())
@@ -117,10 +96,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         QString  sPacket  = sHeader + sData;
         QByteArray scPacket = sPacket.toUtf8();
 
-        // ---------------------------------------------------------------
         // Send Packet to Socket (Send same packet twice)
-        // ---------------------------------------------------------------
-
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
         if (m_eNTS != NTS_byebye)
@@ -133,33 +109,20 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
     MSocketDevice *pMulticast = new MMulticastSocketDevice(
         SSDP_GROUP, SSDP_PORT);
 
-    // ----------------------------------------------------------------------
     // Must send rootdevice Notification for first device.
-    // ----------------------------------------------------------------------
-
     UPnpDevice &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
 
     SendNotifyMsg( pMulticast, "upnp:rootdevice", device.GetUDN() );
 
-    // ----------------------------------------------------------------------
     // Process rest of notifications
-    // ----------------------------------------------------------------------
-
     ProcessDevice( pMulticast, &device );
 
-    // ----------------------------------------------------------------------
     // Clean up and reshedule task if needed (timeout = m_nMaxAge / 2).
-    // ----------------------------------------------------------------------
-
     delete pMulticast;
 
     pMulticast = nullptr;
@@ -170,37 +133,21 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
         pQueue->AddTask( (m_nMaxAge / 2), (Task *)this  );
 
     m_mutex.unlock();
-
 }
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
 
 void UPnpNotifyTask::ProcessDevice(
     MSocketDevice *pSocket, UPnpDevice *pDevice)
 {
-    // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages
-    //
     // -=>TODO: Need to add support to only notify 
     //          Version 1 of a service.
-    // ----------------------------------------------------------------------
-
     SendNotifyMsg( pSocket, pDevice->GetUDN(), "" );
     SendNotifyMsg( pSocket, pDevice->m_sDeviceType, pDevice->GetUDN() );
-        
-    // ------------------------------------------------------------------
     // Loop for each service in this device and send the 1 required message
-    // ------------------------------------------------------------------
-
     for (auto sit = pDevice->m_listServices.cbegin(); sit != pDevice->m_listServices.cend(); ++sit)
         SendNotifyMsg( pSocket, (*sit)->m_sServiceType, pDevice->GetUDN() );
 
-    // ----------------------------------------------------------------------
     // Process any Embedded Devices
-    // ----------------------------------------------------------------------
-
     for (const auto & dev : std::as_const(pDevice->m_listDevices))
         ProcessDevice( pSocket, dev);
 }
