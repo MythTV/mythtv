@@ -29,6 +29,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 
+#include "ssdpcache.h"
 #include "taskqueue.h"
 #include "upnp.h"
 #include "upnptasknotify.h"

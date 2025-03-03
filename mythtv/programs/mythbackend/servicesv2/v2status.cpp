@@ -39,7 +39,6 @@
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/tv_rec.h"
-#include "libmythupnp/ssdp.h"
 #include "libmythupnp/ssdpcache.h"
 #include "libmythupnp/upnp.h"
 
@@ -492,7 +491,7 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
     QDomElement frontends = pDoc->createElement("Frontends");
     root.appendChild(frontends);
 
-    SSDPCacheEntries *fes = SSDP::Find(
+    SSDPCacheEntries *fes = SSDPCache::Instance()->Find(
         "urn:schemas-mythtv-org:service:MythFrontend:1");
     if (fes)
     {
@@ -533,7 +532,7 @@ void V2Status::FillStatusXML( QDomDocument *pDoc )
         mbe.setAttribute("url" , masterip + ":" + QString::number(masterport));
     }
 
-    SSDPCacheEntries *sbes = SSDP::Find(
+    SSDPCacheEntries *sbes = SSDPCache::Instance()->Find(
         "urn:schemas-mythtv-org:device:SlaveMediaServer:1");
     if (sbes)
     {
