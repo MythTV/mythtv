@@ -62,7 +62,7 @@ enum SocketIdxType : std::uint8_t
 {
     SocketIdx_Search     = 0,
     SocketIdx_Multicast  = 1,
-    SocketIdx_Broadcast  = 2
+    kNumberOfSockets
 };
 
 class UPNP_PUBLIC SSDP : public MThread
@@ -72,8 +72,7 @@ class UPNP_PUBLIC SSDP : public MThread
         static SSDP*        g_pSSDP;  
 
         QRegularExpression  m_procReqLineExp        {"\\s+"};
-        constexpr static int kNumberOfSockets = 3;
-        std::array<MSocketDevice*,kNumberOfSockets> m_sockets {nullptr,nullptr,nullptr};
+        std::array<MSocketDevice*,kNumberOfSockets> m_sockets {nullptr,nullptr};
 
         int                 m_nPort                 {SSDP_PORT};
         int                 m_nSearchPort           {SSDP_SEARCHPORT};
