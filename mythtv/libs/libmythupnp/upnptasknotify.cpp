@@ -115,12 +115,10 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
         SSDP_GROUP, SSDP_PORT);
 
     // Must send rootdevice Notification for first device.
-    UPnpDevice &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
-
-    SendNotifyMsg( pMulticast, "upnp:rootdevice", device.GetUDN() );
+    SendNotifyMsg(pMulticast, "upnp:rootdevice", UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
     // Process rest of notifications
-    ProcessDevice( pMulticast, &device );
+    ProcessDevice(pMulticast, UPnp::g_UPnpDeviceDesc.m_rootDevice);
 
     // Clean up and reshedule task if needed (timeout = m_nMaxAge / 2).
     delete pMulticast;
@@ -135,19 +133,22 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
     m_mutex.unlock();
 }
 
-void UPnpNotifyTask::ProcessDevice(
-    MSocketDevice *pSocket, UPnpDevice *pDevice)
+void UPnpNotifyTask::ProcessDevice(MSocketDevice *pSocket, const UPnpDevice& device)
 {
     // Loop for each device and send the 2 required messages
     // -=>TODO: Need to add support to only notify 
     //          Version 1 of a service.
-    SendNotifyMsg( pSocket, pDevice->GetUDN(), "" );
-    SendNotifyMsg( pSocket, pDevice->m_sDeviceType, pDevice->GetUDN() );
+    SendNotifyMsg(pSocket, device.GetUDN(), "");
+    SendNotifyMsg(pSocket, device.m_sDeviceType, device.GetUDN());
     // Loop for each service in this device and send the 1 required message
-    for (auto sit = pDevice->m_listServices.cbegin(); sit != pDevice->m_listServices.cend(); ++sit)
-        SendNotifyMsg( pSocket, (*sit)->m_sServiceType, pDevice->GetUDN() );
+    for (const auto* service : std::as_const(device.m_listServices))
+    {
+        SendNotifyMsg(pSocket, service->m_sServiceType, device.GetUDN());
+    }
 
     // Process any Embedded Devices
-    for (const auto & dev : std::as_const(pDevice->m_listDevices))
-        ProcessDevice( pSocket, dev);
+    for (const auto* embedded_device : std::as_const(device.m_listDevices))
+    {
+        ProcessDevice(pSocket, *embedded_device);
+    }
 }
