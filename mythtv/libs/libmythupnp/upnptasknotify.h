@@ -44,7 +44,7 @@ class UPnpNotifyTask : public Task
         // Destructor protected to force use of Release Method
         ~UPnpNotifyTask() override = default;
 
-        void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
+        void ProcessDevice(MSocketDevice *pSocket, const UPnpDevice& device);
         void     SendNotifyMsg( MSocketDevice *pSocket, const QString& sNT, const QString& sUDN );
 
     public:
