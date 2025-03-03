@@ -21,9 +21,9 @@
 #include <QMutex>
 
 #include "taskqueue.h"
+#include "upnpdevice.h"
 
 class MSocketDevice;
-class UPnpDevice;
 
 /////////////////////////////////////////////////////////////////////////////
 // Typedefs
