@@ -90,19 +90,8 @@ SSDP::SSDP() :
         m_nSearchPort = config.GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);
     }
 
-    m_sockets[ SocketIdx_Search    ] =
-        new MMulticastSocketDevice();
-    m_sockets[ SocketIdx_Multicast ] =
-        new MMulticastSocketDevice(SSDP_GROUP, m_nPort);
-
-    m_sockets[ SocketIdx_Search    ]->setBlocking( false );
-    m_sockets[ SocketIdx_Multicast ]->setBlocking( false );
-
-    // Setup SearchSocket
-    QHostAddress ip4addr( QHostAddress::Any );
-
-    m_sockets[ SocketIdx_Search ]->bind( ip4addr          , m_nSearchPort );
-    m_sockets[ SocketIdx_Search ]->bind( QHostAddress::Any, m_nSearchPort );
+    m_socket = new MMulticastSocketDevice(SSDP_GROUP, m_nPort);
+    m_socket->setBlocking( false );
 
     // ----------------------------------------------------------------------
     // Create the SSDP (Upnp Discovery) Thread.
@@ -132,8 +121,7 @@ SSDP::~SSDP()
         m_pNotifyTask = nullptr;
     }
 
-    for (auto & socket : m_sockets)
-        delete socket;
+    delete m_socket;
 
     LOG(VB_UPNP, LOG_INFO, "SSDP Thread Terminated." );
 }
@@ -218,7 +206,9 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
 
     QByteArray sRequest = rRequest.toUtf8();
 
-    MSocketDevice *pSocket = m_sockets[ SocketIdx_Search ];
+    MSocketDevice *pSocket = new MMulticastSocketDevice();
+    pSocket->setBlocking( false );
+    pSocket->bind(QHostAddress::Any, m_nSearchPort);
     if ( !pSocket->isValid() )
     {
         pSocket->setProtocol(MSocketDevice::IPv4);
@@ -241,6 +231,8 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
                               sRequest.size(), address, SSDP_PORT ) != nSize)
         LOG(VB_GENERAL, LOG_INFO,
             "SSDP::PerformSearch - did not write entire buffer.");
+
+    delete pSocket;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -266,12 +258,10 @@ void SSDP::run()
 
         FD_ZERO( &read_set ); // NOLINT(readability-isolate-declaration)
 
-        for (auto & socket : m_sockets)
-        {
-            if (socket != nullptr && socket->socket() >= 0)
+            if (m_socket != nullptr && m_socket->socket() >= 0)
             {
-                FD_SET( socket->socket(), &read_set );
-                nMaxSocket = std::max( socket->socket(), nMaxSocket );
+                FD_SET( m_socket->socket(), &read_set );
+                nMaxSocket = std::max( m_socket->socket(), nMaxSocket );
 
 #if 0
                 if (socket->bytesAvailable() > 0)
@@ -283,28 +273,17 @@ void SSDP::run()
                 }
 #endif
             }
-        }
         
         timeout.tv_sec  = 1;
         timeout.tv_usec = 0;
 
-        int count = select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout);
-
-        for (int nIdx = 0; count && nIdx < kNumberOfSockets; nIdx++ )
+        if (select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout) == 1)
         {
-            bool cond1 = m_sockets[nIdx] != nullptr;
-            bool cond2 = cond1 && m_sockets[nIdx]->socket() >= 0;
-            bool cond3 = cond2 && FD_ISSET(m_sockets[nIdx]->socket(), &read_set);
-
-            if (cond3)
-            {
 #if 0
                 LOG(VB_GENERAL, LOG_DEBUG, QString("FD_ISSET( %1 )").arg(nIdx));
 #endif
 
-                ProcessData(m_sockets[nIdx]);
-                count--;
-            }
+                ProcessData(m_socket);
         }
     }
 
