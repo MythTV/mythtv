@@ -41,29 +41,29 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                                     const QString& sNT,
                                     const QString& sUDN )
 {
-    QString sUSN;
+    QString uniqueServiceName = sNT;
+    if (sUDN.length() > 0)
+        uniqueServiceName = sUDN + "::" + uniqueServiceName;
 
-    if ( sUDN.length() > 0)
-        sUSN = sUDN + "::" + sNT;
-    else
-        sUSN = sNT;
-
-    QString sData = QString ( "Server: %1\r\n"
+    QByteArray data = QString("Server: %1\r\n"
                               "NTS: %3\r\n"
                               "NT: %4\r\n"
                               "USN: %5\r\n"
                               "CACHE-CONTROL: max-age=%6\r\n"
-                              "Content-Length: 0\r\n\r\n" )
-                            .arg( HttpServer::GetServerVersion(),
-                                  GetNTSString(),
-                                  sNT,
-                                  sUSN,
-                                  QString::number(m_nMaxAge.count()));
+                              "Content-Length: 0\r\n\r\n")
+                        .arg(HttpServer::GetServerVersion(),
+                             GetNTSString(),
+                             sNT,
+                             uniqueServiceName,
+                             QString::number(m_nMaxAge.count())
+                             ).toUtf8();
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
             .arg(pSocket->address().toString(), QString::number(pSocket->port()),
-                 sNT, sUSN));
+                 sNT, uniqueServiceName
+                 )
+        );
 
     QList<QHostAddress> addressList = UPnp::g_IPAddrList;
     for (const auto & addr : std::as_const(addressList))
@@ -87,24 +87,22 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         if (ipaddress.contains(":"))
             ipaddress = "[" + ipaddress + "]";
 
-        QString sHeader = QString("NOTIFY * HTTP/1.1\r\n"
-                                  "HOST: %1:%2\r\n"    
-                                  "LOCATION: http://%3:%4/getDeviceDesc\r\n")
-                    .arg(pSocket->address().toString()) .arg(pSocket->port())
-                    .arg(ipaddress) .arg(m_nServicePort);
-
-        QString  sPacket  = sHeader + sData;
-        QByteArray scPacket = sPacket.toUtf8();
+        QByteArray datagram =
+            QString("NOTIFY * HTTP/1.1\r\n"
+                    "HOST: %1:%2\r\n"
+                    "LOCATION: http://%3:%4/getDeviceDesc\r\n")
+                .arg(pSocket->address().toString(), QString::number(pSocket->port()),
+                     ipaddress, QString::number(m_nServicePort)
+                     ).toUtf8()
+             + data;
 
         // Send Packet to Socket (Send same packet twice)
-        pSocket->writeBlock( scPacket, scPacket.length(),
-                             pSocket->address(), pSocket->port() );
+        pSocket->writeBlock(datagram, datagram.length(), pSocket->address(), pSocket->port());
         if (m_eNTS != NTS_byebye)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
 
-            pSocket->writeBlock( scPacket, scPacket.length(),
-                                pSocket->address(), pSocket->port() );
+            pSocket->writeBlock(datagram, datagram.length(), pSocket->address(), pSocket->port());
         }
     }
 }
