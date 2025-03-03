@@ -9,7 +9,6 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
 #ifndef UPNPTASKNOTIFY_H
 #define UPNPTASKNOTIFY_H
 
@@ -25,28 +24,15 @@
 
 class MSocketDevice;
 
-/////////////////////////////////////////////////////////////////////////////
-// Typedefs
-/////////////////////////////////////////////////////////////////////////////
-
 enum UPnpNotifyNTS : std::uint8_t
 {
     NTS_alive   = 0,
     NTS_byebye  = 1
 };
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpNotifyTask Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
 class UPnpNotifyTask : public Task
 {
     protected:
-
         QMutex          m_mutex;
 
         QString         m_sMasterIP;
@@ -55,23 +41,17 @@ class UPnpNotifyTask : public Task
 
         UPnpNotifyNTS   m_eNTS          {NTS_alive};
 
-    protected:
-
         // Destructor protected to force use of Release Method
-
         ~UPnpNotifyTask() override = default;
 
         void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendNotifyMsg( MSocketDevice *pSocket, const QString& sNT, const QString& sUDN );
 
     public:
-
         explicit UPnpNotifyTask( int nServicePort );
 
         QString Name() override { return( "Notify" ); } // Task
         void Execute( TaskQueue *pQueue ) override; // Task
-
-        // ------------------------------------------------------------------
 
         QString GetNTSString()
         {
@@ -87,8 +67,6 @@ class UPnpNotifyTask : public Task
             return( "unknown" );
         }
 
-        // ------------------------------------------------------------------
-
         UPnpNotifyNTS GetNTS()
         {
             m_mutex.lock();
@@ -98,16 +76,12 @@ class UPnpNotifyTask : public Task
             return( nts );
         }
 
-        // ------------------------------------------------------------------
-
         void SetNTS( UPnpNotifyNTS nts)
         {
             m_mutex.lock();
             m_eNTS = nts;
             m_mutex.unlock();
         }
-
 };
-
 
 #endif // UPNPTASKNOTIFY_H
