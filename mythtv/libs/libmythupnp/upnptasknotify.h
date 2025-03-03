@@ -18,11 +18,10 @@
 // Qt headers
 #include <QString>
 #include <QMutex>
+#include <QUdpSocket>
 
 #include "taskqueue.h"
 #include "upnpdevice.h"
-
-class MSocketDevice;
 
 enum UPnpNotifyNTS : std::uint8_t
 {
@@ -44,8 +43,8 @@ class UPnpNotifyTask : public Task
         // Destructor protected to force use of Release Method
         ~UPnpNotifyTask() override = default;
 
-        void ProcessDevice(MSocketDevice *pSocket, const UPnpDevice& device);
-        void     SendNotifyMsg( MSocketDevice *pSocket, const QString& sNT, const QString& sUDN );
+        void ProcessDevice(QUdpSocket& socket, const UPnpDevice& device);
+        void SendNotifyMsg(QUdpSocket& socket, const QString& sNT, const QString& sUDN);
 
     public:
         explicit UPnpNotifyTask( int nServicePort );
