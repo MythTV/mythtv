@@ -14,21 +14,27 @@
 #include <algorithm>
 #include <cerrno>
 #include <chrono> // for milliseconds
-#include <cstdlib>
 #include <thread> // for sleep_for
+
+#include <QByteArray>
+#include <QHostAddress>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QString>
+#include <QStringList>
 
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 
+#include "taskqueue.h"
 #include "upnp.h"
+#include "upnptasknotify.h"
 #include "upnptasksearch.h"
 
 #include "mmulticastsocketdevice.h"
 #include "msocketdevice.h"
-
-#include <QStringList>
 
 #ifdef Q_OS_ANDROID
 #include <sys/select.h>
