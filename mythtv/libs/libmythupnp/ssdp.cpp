@@ -22,6 +22,7 @@
 #include <QMutexLocker>
 #include <QString>
 #include <QStringList>
+#include <QUdpSocket>
 
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythchrono.h"
@@ -87,7 +88,6 @@ SSDP::SSDP() :
         auto config = XmlConfiguration();
 
         m_nPort       = config.GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
-        m_nSearchPort = config.GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);
     }
 
     m_socket = new MMulticastSocketDevice(SSDP_GROUP, m_nPort);
@@ -205,34 +205,21 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
     LOG(VB_UPNP, LOG_DEBUG, QString("\n\n%1\n").arg(rRequest));
 
     QByteArray sRequest = rRequest.toUtf8();
-
-    MSocketDevice *pSocket = new MMulticastSocketDevice();
-    pSocket->setBlocking( false );
-    pSocket->bind(QHostAddress::Any, m_nSearchPort);
-    if ( !pSocket->isValid() )
-    {
-        pSocket->setProtocol(MSocketDevice::IPv4);
-        pSocket->setSocket(pSocket->createNewSocket(), MSocketDevice::Datagram);
-    }
-
-    QHostAddress address;
-    address.setAddress( SSDP_GROUP );
-
     int nSize = sRequest.size();
 
-    if ( pSocket->writeBlock( sRequest.data(),
-                              sRequest.size(), address, SSDP_PORT ) != nSize)
-        LOG(VB_GENERAL, LOG_INFO,
-            "SSDP::PerformSearch - did not write entire buffer.");
+    QUdpSocket socket;
+    socket.bind(QHostAddress(QHostAddress::AnyIPv4), 0);
+    if (socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "SSDP::PerformSearch - did not write entire buffer.");
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
 
-    if ( pSocket->writeBlock( sRequest.data(),
-                              sRequest.size(), address, SSDP_PORT ) != nSize)
-        LOG(VB_GENERAL, LOG_INFO,
-            "SSDP::PerformSearch - did not write entire buffer.");
-
-    delete pSocket;
+    if (socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "SSDP::PerformSearch - did not write entire buffer.");
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
