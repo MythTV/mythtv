@@ -18,8 +18,8 @@ using namespace std::chrono_literals;
 // Qt headers
 #include <QHostAddress>
 #include <QString>
+#include <QUdpSocket>
 
-#include "libmythupnp/msocketdevice.h"
 #include "libmythupnp/taskqueue.h"
 #include "libmythupnp/upnpdevice.h"
 
@@ -37,10 +37,8 @@ class UPnpSearchTask : public Task
         // Destructor protected to force use of Release Method
         ~UPnpSearchTask() override = default;
 
-        void     ProcessDevice ( MSocketDevice *pSocket, const UPnpDevice& device);
-        void     SendMsg       ( MSocketDevice  *pSocket,
-                                 const QString&  sST,
-                                 const QString&  sUDN );
+        void ProcessDevice(QUdpSocket& socket, const UPnpDevice& device);
+        void SendMsg(QUdpSocket& socket, const QString& sST, const QString& sUDN);
 
     public:
         UPnpSearchTask( int          nServicePort,
