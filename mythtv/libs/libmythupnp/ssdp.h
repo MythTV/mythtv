@@ -14,11 +14,14 @@
 #define SSDP_H
 
 #include <array>
+#include <cstdint>
 
 #include <QHostAddress>
+#include <QMutex>
 #include <QObject>
 #include <QRegularExpression>
 #include <QString>
+#include <QStringList>
 
 #include "libmythbase/mthread.h"
 
@@ -27,7 +30,6 @@
 #include "httpserver.h"
 #include "msocketdevice.h"
 #include "ssdpcache.h"
-#include "upnptasknotify.h"
 
 static constexpr const char* SSDP_GROUP { "239.255.255.250" };
 static constexpr uint16_t SSDP_PORT       { 1900 };
@@ -77,7 +79,7 @@ class UPNP_PUBLIC SSDP : public MThread
         int                 m_nSearchPort           {SSDP_SEARCHPORT};
         int                 m_nServicePort          {0};
 
-        UPnpNotifyTask     *m_pNotifyTask           {nullptr};
+        class UPnpNotifyTask* m_pNotifyTask         {nullptr};
         bool                m_bAnnouncementsEnabled {false};
 
         bool                m_bTermRequested        {false};
