@@ -32,7 +32,6 @@
 
 static constexpr const char* SSDP_GROUP { "239.255.255.250" };
 static constexpr uint16_t SSDP_PORT       { 1900 };
-static constexpr uint16_t SSDP_SEARCHPORT { 6549 };
 
 enum SSDPMethod : std::uint8_t
 {
@@ -67,7 +66,6 @@ class UPNP_PUBLIC SSDP : public MThread
         MSocketDevice* m_socket                     {nullptr};
 
         int                 m_nPort                 {SSDP_PORT};
-        int                 m_nSearchPort           {SSDP_SEARCHPORT};
         int                 m_nServicePort          {0};
 
         class UPnpNotifyTask* m_pNotifyTask         {nullptr};
@@ -115,7 +113,10 @@ class UPNP_PUBLIC SSDP : public MThread
 
         void RequestTerminate(void);
 
-        void PerformSearch(const QString &sST, std::chrono::seconds timeout = 2s);
+        /** @brief Send a SSDP discover multicast datagram.
+        @note This needs an SSDP instance to process the replies and add to the SSDPCache.
+        */
+        static void PerformSearch(const QString &sST, std::chrono::seconds timeout = 2s);
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();
