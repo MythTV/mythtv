@@ -79,6 +79,8 @@ add_library(
   ssdp.h
   ssdpcache.cpp
   ssdpcache.h
+  ssdpextension.cpp
+  ssdpextension.h
   taskqueue.cpp
   taskqueue.h
   upnp.cpp
