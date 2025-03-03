@@ -19,24 +19,15 @@
 #include <QMutex>
 #include <QRegularExpression>
 #include <QString>
-#include <QStringList>
 
 #include "libmythbase/mthread.h"
 
 #include "upnpexp.h"
-#include "httprequest.h"
-#include "httpserver.h"
 #include "msocketdevice.h"
+#include "upnputil.h"
 
 static constexpr const char* SSDP_GROUP { "239.255.255.250" };
 static constexpr uint16_t SSDP_PORT       { 1900 };
-
-enum SSDPMethod : std::uint8_t
-{
-    SSDPM_Unknown         = 0,
-    SSDPM_GetDeviceDesc   = 1,
-    SSDPM_GetDeviceList   = 2
-};
 
 enum SSDPRequestType : std::uint8_t
 {
@@ -118,38 +109,6 @@ class UPNP_PUBLIC SSDP : public MThread
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();
-};
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// SSDPExtension Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-class SSDPExtension : public HttpServerExtension
-{
-    private:
-
-        QString     m_sUPnpDescPath;
-        int         m_nServicePort;
-
-    private:
-
-        static SSDPMethod GetMethod( const QString &sURI );
-
-        void       GetDeviceDesc( HTTPRequest *pRequest ) const;
-        void       GetFile      ( HTTPRequest *pRequest, const QString& sFileName );
-        static void       GetDeviceList( HTTPRequest *pRequest );
-
-    public:
-                 SSDPExtension( int nServicePort, const QString &sSharePath);
-        ~SSDPExtension( ) override = default;
-
-        QStringList GetBasePaths() override; // HttpServerExtension
-        
-        bool     ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 };
 
 #endif // SSDP_H
