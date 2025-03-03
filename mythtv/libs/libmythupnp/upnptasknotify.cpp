@@ -29,12 +29,12 @@
 #include "ssdp.h"
 #include "upnp.h"
 
-UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
+UPnpNotifyTask::UPnpNotifyTask(int nServicePort) :
     Task("UPnpNotifyTask"),
-    m_nServicePort(nServicePort)
+    m_nServicePort(nServicePort),
+    m_nMaxAge(XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge", 1h))
 {
-    m_nMaxAge      = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
-} 
+}
 
 void UPnpNotifyTask::SendNotifyMsg(QUdpSocket& socket, const QString& sNT, const QString& sUDN)
 {
