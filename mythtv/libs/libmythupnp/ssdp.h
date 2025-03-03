@@ -13,18 +13,16 @@
 #ifndef SSDP_H
 #define SSDP_H
 
+#include <chrono>
+using namespace std::chrono_literals;
 #include <cstdint>
 
 #include <QHostAddress>
 #include <QMutex>
-#include <QRegularExpression>
 #include <QString>
-
-#include "libmythbase/mthread.h"
+#include <QUdpSocket>
 
 #include "upnpexp.h"
-#include "msocketdevice.h"
-#include "upnputil.h"
 
 static constexpr const char* SSDP_GROUP { "239.255.255.250" };
 static constexpr uint16_t SSDP_PORT       { 1900 };
@@ -37,31 +35,36 @@ enum SSDPRequestType : std::uint8_t
     SSDP_Notify         = 3
 };
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// SSDPThread Class Definition  (Singleton)
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
+class SSDPReceiver : public QObject
+{
+    Q_OBJECT
 
-class UPNP_PUBLIC SSDP : public MThread
+  public:
+    SSDPReceiver();
+
+  private slots:
+    void processPendingDatagrams();
+
+  private:
+    QUdpSocket          m_socket;
+    const uint16_t      m_port          {SSDP_PORT};
+    const QHostAddress  m_groupAddress  {SSDP_GROUP};
+};
+
+class UPNP_PUBLIC SSDP
 {
     private:
         // Singleton instance used by all.
         static SSDP*        g_pSSDP;  
 
-        QRegularExpression  m_procReqLineExp        {"\\s+"};
-        MSocketDevice* m_socket                     {nullptr};
-
-        int                 m_nPort                 {SSDP_PORT};
         int                 m_nServicePort          {0};
 
         class UPnpNotifyTask* m_pNotifyTask         {nullptr};
         bool                m_bAnnouncementsEnabled {false};
 
-        bool                m_bTermRequested        {false};
         QMutex              m_lock;
+
+        SSDPReceiver m_receiver;
 
     private:
 
@@ -70,27 +73,7 @@ class UPNP_PUBLIC SSDP : public MThread
         // ------------------------------------------------------------------
 
         SSDP   ();
-        
-    protected:
 
-        bool    ProcessSearchRequest ( const QStringMap &sHeaders,
-                                       const QHostAddress&  peerAddress,
-                                       quint16       peerPort ) const;
-        static bool    ProcessSearchResponse( const QStringMap &sHeaders );
-        static bool    ProcessNotify        ( const QStringMap &sHeaders );
-
-        bool    IsTermRequested      ();
-
-        static QString GetHeaderValue    ( const QStringMap &headers,
-                                    const QString    &sKey,
-                                    const QString    &sDefault );
-
-        void    ProcessData       ( MSocketDevice *pSocket );
-
-        SSDPRequestType ProcessRequestLine( const QString &sLine );
-
-        void    run() override; // MThread
- 
     public:
 
         static inline const QString kBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
@@ -98,17 +81,23 @@ class UPNP_PUBLIC SSDP : public MThread
         static SSDP* Instance();
         static void Shutdown();
 
-            ~SSDP() override;
-
-        void RequestTerminate(void);
+        ~SSDP();
 
         /** @brief Send a SSDP discover multicast datagram.
-        @note This needs an SSDP instance to process the replies and add to the SSDPCache.
+        @note This needs an SSDPReceiver instance to process the replies and add to the SSDPCache.
         */
         static void PerformSearch(const QString &sST, std::chrono::seconds timeout = 2s);
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();
+        int getNotificationPort() const
+        {
+            if (m_pNotifyTask != nullptr)
+            {
+                return m_nServicePort;
+            }
+            return 0;
+        }
 };
 
 #endif // SSDP_H
