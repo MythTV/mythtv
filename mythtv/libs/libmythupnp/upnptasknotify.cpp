@@ -26,7 +26,6 @@
 #include "libmythbase/mythrandom.h"
 
 #include "httpserver.h"
-#include "mmulticastsocketdevice.h"
 #include "ssdp.h"
 #include "upnp.h"
 
@@ -37,9 +36,7 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
     m_nMaxAge      = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
 } 
 
-void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
-                                    const QString& sNT,
-                                    const QString& sUDN )
+void UPnpNotifyTask::SendNotifyMsg(QUdpSocket& socket, const QString& sNT, const QString& sUDN)
 {
     QString uniqueServiceName = sNT;
     if (sUDN.length() > 0)
@@ -60,7 +57,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
-            .arg(pSocket->address().toString(), QString::number(pSocket->port()),
+            .arg(SSDP_GROUP, QString::number(SSDP_PORT),
                  sNT, uniqueServiceName
                  )
         );
@@ -91,62 +88,57 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
             QString("NOTIFY * HTTP/1.1\r\n"
                     "HOST: %1:%2\r\n"
                     "LOCATION: http://%3:%4/getDeviceDesc\r\n")
-                .arg(pSocket->address().toString(), QString::number(pSocket->port()),
+                .arg(SSDP_GROUP, QString::number(SSDP_PORT),
                      ipaddress, QString::number(m_nServicePort)
                      ).toUtf8()
              + data;
 
         // Send Packet to Socket (Send same packet twice)
-        pSocket->writeBlock(datagram, datagram.length(), pSocket->address(), pSocket->port());
+        socket.writeDatagram(datagram, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT);
         if (m_eNTS != NTS_byebye)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
 
-            pSocket->writeBlock(datagram, datagram.length(), pSocket->address(), pSocket->port());
+            socket.writeDatagram(datagram, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT);
         }
     }
 }
 
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
-    MSocketDevice *pMulticast = new MMulticastSocketDevice(
-        SSDP_GROUP, SSDP_PORT);
+    QUdpSocket socket;
+    socket.bind(QHostAddress(QHostAddress::AnyIPv4), 0); // required for setSocketOption()
+    socket.setSocketOption(QAbstractSocket::MulticastTtlOption, 4);
 
     // Must send rootdevice Notification for first device.
-    SendNotifyMsg(pMulticast, "upnp:rootdevice", UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
-
+    SendNotifyMsg(socket, "upnp:rootdevice", UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
     // Process rest of notifications
-    ProcessDevice(pMulticast, UPnp::g_UPnpDeviceDesc.m_rootDevice);
+    ProcessDevice(socket, UPnp::g_UPnpDeviceDesc.m_rootDevice);
 
-    // Clean up and reshedule task if needed (timeout = m_nMaxAge / 2).
-    delete pMulticast;
-
-    pMulticast = nullptr;
-
+    // reshedule task if needed (timeout = m_nMaxAge / 2).
     m_mutex.lock();
-
     if (m_eNTS == NTS_alive) 
         pQueue->AddTask( (m_nMaxAge / 2), (Task *)this  );
 
     m_mutex.unlock();
 }
 
-void UPnpNotifyTask::ProcessDevice(MSocketDevice *pSocket, const UPnpDevice& device)
+void UPnpNotifyTask::ProcessDevice(QUdpSocket& socket, const UPnpDevice& device)
 {
     // Loop for each device and send the 2 required messages
     // -=>TODO: Need to add support to only notify 
     //          Version 1 of a service.
-    SendNotifyMsg(pSocket, device.GetUDN(), "");
-    SendNotifyMsg(pSocket, device.m_sDeviceType, device.GetUDN());
+    SendNotifyMsg(socket, device.GetUDN(), "");
+    SendNotifyMsg(socket, device.m_sDeviceType, device.GetUDN());
     // Loop for each service in this device and send the 1 required message
     for (const auto* service : std::as_const(device.m_listServices))
     {
-        SendNotifyMsg(pSocket, service->m_sServiceType, device.GetUDN());
+        SendNotifyMsg(socket, service->m_sServiceType, device.GetUDN());
     }
 
     // Process any Embedded Devices
     for (const auto* embedded_device : std::as_const(device.m_listDevices))
     {
-        ProcessDevice(pSocket, *embedded_device);
+        ProcessDevice(socket, *embedded_device);
     }
 }
