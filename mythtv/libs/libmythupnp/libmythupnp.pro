@@ -16,9 +16,6 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += version.cpp
 
 # Input
-
-HEADERS += mmulticastsocketdevice.h
-HEADERS += msocketdevice.h
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h upnpmsrr.h
@@ -36,10 +33,6 @@ HEADERS += serializers/xmlplistSerializer.h
 
 HEADERS += websocket_extensions/*.h
 
-SOURCES += mmulticastsocketdevice.cpp
-SOURCES += msocketdevice.cpp
-unix:SOURCES += msocketdevice_unix.cpp
-mingw | win32-msvc*:SOURCES += msocketdevice_win.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp
