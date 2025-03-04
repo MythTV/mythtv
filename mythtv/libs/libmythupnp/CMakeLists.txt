@@ -51,10 +51,6 @@ add_library(
   httprequest.h
   httpserver.cpp
   httpserver.h
-  mmulticastsocketdevice.cpp
-  mmulticastsocketdevice.h
-  msocketdevice.cpp
-  msocketdevice.h
   mythxmlclient.cpp
   mythxmlclient.h
   serializers/jsonSerializer.cpp
@@ -130,12 +126,6 @@ target_link_libraries(
 #
 # conditionally included code
 #
-if(UNIX)
-  target_sources(mythupnp PRIVATE msocketdevice_unix.cpp)
-elseif(WIN32)
-  target_sources(mythupnp PRIVATE msocketdevice_win.cpp)
-endif()
-
 if(TARGET Qt${QT_VERSION_MAJOR}::Script)
   target_link_libraries(mythupnp PUBLIC Qt${QT_VERSION_MAJOR}::Script
                                         Qt${QT_VERSION_MAJOR}::ScriptTools)
