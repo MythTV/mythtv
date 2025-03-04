@@ -18,7 +18,6 @@ using namespace std::chrono_literals;
 #include <cstdint>
 
 #include <QHostAddress>
-#include <QMutex>
 #include <QString>
 #include <QUdpSocket>
 
@@ -60,9 +59,6 @@ class UPNP_PUBLIC SSDP
         int                 m_nServicePort          {0};
 
         class UPnpNotifyTask* m_pNotifyTask         {nullptr};
-        bool                m_bAnnouncementsEnabled {false};
-
-        QMutex              m_lock;
 
         SSDPReceiver m_receiver;
 
