@@ -77,8 +77,11 @@
                     <div class="form-group field">
                         <p-checkbox inputId="DVBWaitForSeqStart" [(ngModel)]="card.DVBWaitForSeqStart"
                             name="DVBWaitForSeqStart" #DVBWaitForSeqStart="ngModel" class="label mb-2 w-full"
-                            [binary]="true" label="{{ 'settings.capture.dvb.wait_label' | translate }}">
+                            [binary]="true">
+                            <!-- label="{{ 'settings.capture.dvb.wait_label' | translate }}"> -->
                         </p-checkbox>
+                        <label for="DVBWaitForSeqStart" class="label block">{{ 'settings.capture.dvb.wait_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.capture.dvb.wait_desc' | translate }}
                         </small>
@@ -87,8 +90,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="DVBOnDemand" [(ngModel)]="card.DVBOnDemand" name="DVBOnDemand"
                             #DVBOnDemand="ngModel" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.capture.dvb.ondemand_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="DVBOnDemand" class="label block">{{ 'settings.capture.dvb.ondemand_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.capture.dvb.ondemand_desc' | translate }}
                         </small>
@@ -97,8 +102,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan" name="DVBEITScan"
                             #DVBEITScan="ngModel" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.capture.dvb.eitscan_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="DVBEITScan" class="label block">{{ 'settings.capture.dvb.eitscan_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.capture.dvb.eitscan_desc' | translate }}
                         </small>

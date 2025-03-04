@@ -24,8 +24,10 @@
                     &nbsp;&nbsp;&nbsp;
                     <p-checkbox inputId="showAllVideos" [(ngModel)]="showAllVideos" name="showAllVideos"
                         #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
-                        label="{{ 'dashboard.videos.showall' | translate }} ">
+                        >
                     </p-checkbox>
+                    <label for="showAllVideos" class="label block">{{ 'dashboard.videos.showall' |
+                        translate }}</label>
 
                     <div *ngIf="refreshing else refreshBn">
                         <p-progressSpinner [style]="{width: '30px', height: '30px'}"></p-progressSpinner>

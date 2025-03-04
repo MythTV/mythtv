@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { PrimeNGConfig } from 'primeng/api';
+import { PrimeNG } from 'primeng/config';
+// import { PrimeNGConfig } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,8 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent {
   title = 'MythTV Backend';
 
-  constructor(private config: PrimeNGConfig, public translate: TranslateService) {
+    constructor(private config: PrimeNG, public translate: TranslateService) {
+    // private config: PrimeNGConfig,
     // this language will be used as a fallback when a translation isn't found in the current language
     translate.setDefaultLang('en_US');
 
@@ -20,6 +22,6 @@ export class AppComponent {
     // load the primeng translations
     translate.get('primeng').subscribe(res => this.config.setTranslation(res));
 
-    this.config.ripple = true;
+    // this.config.ripple = true;
   }
 }

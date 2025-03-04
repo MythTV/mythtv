@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -10,10 +10,10 @@ describe('TestbedComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TestbedComponent ],
-      imports:      [ HttpClientModule,
-                      TranslateModule.forRoot() ]
-    })
+    declarations: [TestbedComponent],
+    imports: [TranslateModule.forRoot()],
+    providers: [provideHttpClient(withInterceptorsFromDi())]
+})
     .compileComponents();
   });
 

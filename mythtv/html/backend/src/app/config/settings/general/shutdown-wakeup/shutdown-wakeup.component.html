@@ -23,8 +23,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="blockSDWUwithoutClient" [(ngModel)]="blockSDWUwithoutClient"
                             name="blockSDWUwithoutClient" class="mb-2 w-full label" [binary]="true"
-                            label="{{ 'settings.shutwake.block_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="blockSDWUwithoutClient" class="label block">{{ 'settings.shutwake.block_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.shutwake.block_desc' | translate }}
                         </small>

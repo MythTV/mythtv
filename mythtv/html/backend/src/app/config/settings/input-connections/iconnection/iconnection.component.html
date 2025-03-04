@@ -141,8 +141,10 @@
                     <div class="form-group field" *ngIf="card.CardType == 'DVB'">
                         <p-checkbox inputId="DishnetEIT" [(ngModel)]="card.DishnetEIT" name="DishnetEIT"
                             #DishnetEIT="ngModel" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.iconnection.dishneteit_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="DishnetEIT" class="label block">{{ 'settings.iconnection.dishneteit_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.iconnection.dishneteit_desc' | translate }}
                         </small>
@@ -216,8 +218,10 @@
                         <div class="form-group field">
                             <p-checkbox inputId="SchedGroup" [(ngModel)]="card.SchedGroup" name="SchedGroup"
                                 #DVBWaitForSeqStart="ngModel" class="label mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.iconnection.schedgrp_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="SchedGroup" class="label block">{{ 'settings.iconnection.schedgrp_label' |
+                                translate }}</label>
                             <small class="block">
                                 {{ 'settings.iconnection.schedgrp_desc' | translate }}
                             </small>

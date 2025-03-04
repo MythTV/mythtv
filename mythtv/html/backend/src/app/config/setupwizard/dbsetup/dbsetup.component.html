@@ -67,10 +67,12 @@
                 </div>
 
                 <div class="field col-12">
-                    <p-checkbox [(ngModel)]="database.LocalEnabled" name="LocalEnabled"
+                    <p-checkbox inputId="LocalEnabled" [(ngModel)]="database.LocalEnabled" name="LocalEnabled"
                         class="mb-2 w-full label block" [binary]="true"
-                        label="{{ 'setupwizard.LocalEnabled_label' | translate }}">
+                        >
                     </p-checkbox>
+                    <label for="LocalEnabled" class="label block">{{ 'setupwizard.LocalEnabled_label' |
+                        translate }}</label>
                     <small class="block">
                         {{ 'setupwizard.LocalEnabled_desc' | translate }}
                     </small>
@@ -86,10 +88,12 @@
                 </div>
 
                 <div class="field col-12">
-                    <p-checkbox [(ngModel)]="database.WOLEnabled" name="WOLEnabled"
+                    <p-checkbox inputId="WOLEnabled" [(ngModel)]="database.WOLEnabled" name="WOLEnabled"
                         class="mb-2 w-full label block" [binary]="true"
-                        label="{{ 'setupwizard.WOLEnabled_label' | translate }}">
+                        >
                     </p-checkbox>
+                    <label for="WOLEnabled" class="label block">{{ 'setupwizard.WOLEnabled_label' |
+                        translate }}</label>
                     <small class="block">
                         {{ 'setupwizard.WOLEnabled_desc' | translate }}
                     </small>

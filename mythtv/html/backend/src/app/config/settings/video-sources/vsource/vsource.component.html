@@ -65,8 +65,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="UseEIT" [(ngModel)]="videoSource.UseEIT" name="UseEIT" #UseEIT="ngModel"
                             class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.vsource.eit_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="UseEIT" class="label block">{{ 'settings.vsource.eit_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.vsource.eit_desc' | translate }}
                         </small>

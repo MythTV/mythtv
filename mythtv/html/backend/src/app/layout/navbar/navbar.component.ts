@@ -4,7 +4,7 @@ import { Theme } from 'src/app/services/interfaces/theme.interface';
 import { ThemeService } from '../../services/theme.service';
 import { ConfigService } from '../../services/config.service';
 import { TranslateService } from '@ngx-translate/core';
-import { PrimeNGConfig } from 'primeng/api';
+import { PrimeNG } from 'primeng/config';
 import { DataService } from 'src/app/services/data.service';
 import { MythService } from 'src/app/services/myth.service';
 import { Router } from '@angular/router';
@@ -30,7 +30,7 @@ export class NavbarComponent implements OnInit {
     constructor(private themeService: ThemeService,
         private configService: ConfigService,
         private translateService: TranslateService,
-        private primeconfigService: PrimeNGConfig,
+        private primeconfigService: PrimeNG,
         private dataService: DataService,
         private mythService: MythService,
         private router: Router) {

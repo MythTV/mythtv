@@ -12,8 +12,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="MythFillEnabled" [(ngModel)]="MythFillEnabled"
                             name="MythFillEnabled" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.epgdownload.enabled_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="MythFillEnabled" class="label block">{{ 'settings.epgdownload.enabled_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.epgdownload.enabled_desc' | translate }}
                         </small>

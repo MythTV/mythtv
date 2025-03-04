@@ -229,8 +229,10 @@
 
         <div class="form-group field">
             <p-checkbox inputId="UseEIT" [(ngModel)]="channel.UseEIT" name="UseEIT" #UseEIT="ngModel"
-                class="label mb-2 w-full" [binary]="true" label="{{ 'settings.chanedit.eit_label' | translate }}">
+                class="label mb-2 w-full" [binary]="true" >
             </p-checkbox>
+            <label for="UseEIT" class="label block">{{ 'settings.chanedit.eit_label' |
+                translate }}</label>
             <small class="block">
                 {{ 'settings.chanedit.eit_desc' | translate }}
             </small>
@@ -386,8 +388,10 @@
 
         <div class="form-group field">
             <p-checkbox inputId="resXMLTV" [(ngModel)]="resXMLTV" name="resXMLTV" class="label mb-2 w-full"
-                [binary]="true" label="{{ 'settings.chanedit.res_xmltv_label' | translate }}">
+                [binary]="true" >
             </p-checkbox>
+            <label for="resXMLTV" class="label block">{{ 'settings.chanedit.res_xmltv_label' |
+                translate }}</label>
             <small class="block">
                 {{ 'settings.chanedit.res_xmltv_desc' | translate }}
             </small>
@@ -395,8 +399,10 @@
 
         <div class="form-group field">
             <p-checkbox inputId="resVisible" [(ngModel)]="resVisible" name="resVisible" class="label mb-2 w-full"
-                [binary]="true" label="{{ 'settings.chanedit.res_visible_label' | translate }}">
+                [binary]="true" >
             </p-checkbox>
+            <label for="resVisible" class="label block">{{ 'settings.chanedit.res_visible_label' |
+                translate }}</label>
             <small class="block">
                 {{ 'settings.chanedit.res_visible_desc' | translate }}
             </small>
@@ -404,8 +410,10 @@
 
         <div class="form-group field">
             <p-checkbox inputId="resIcon" [(ngModel)]="resIcon" name="resIcon" class="label mb-2 w-full" [binary]="true"
-                label="{{ 'settings.chanedit.res_icon_label' | translate }}">
+                >
             </p-checkbox>
+            <label for="resIcon" class="label block">{{ 'settings.chanedit.res_icon_label' |
+                translate }}</label>
             <small class="block">
                 {{ 'settings.chanedit.res_icon_desc' | translate }}
             </small>

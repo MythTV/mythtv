@@ -68,8 +68,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="AllowConnFromAll" [(ngModel)]="m_HostAddressData.AllowConnFromAll"
                             name="AllowConnFromAll" #AllowConnFromAll="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.hostaddress.allowconn_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="AllowConnFromAll" class="label block">{{ 'settings.hostaddress.allowconn_label' |
+                            translate }}</label>
                         <small class="block" id="securitypin-help">
                             <div [innerHTML]="'settings.hostaddress.allowconn_desc' | translate"></div>
                         </small>
@@ -80,8 +82,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="ListenOnAllIps" [(ngModel)]="m_HostAddressData.ListenOnAllIps"
                             name="ListenOnAllIps" #ListenOnAllIps="ngModel" class="mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.hostaddress.listenall_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="ListenOnAllIps" class="label block">{{ 'settings.hostaddress.listenall_label' |
+                            translate }}</label>
                         <small class="block" id="ListenOnAllIps-help">
                             {{ 'settings.hostaddress.listenall_desc' | translate }}
                         </small>
@@ -125,8 +129,10 @@
                         <div class="form-group field">
                             <p-checkbox inputId="AllowLinkLocal" [(ngModel)]="m_HostAddressData.AllowLinkLocal"
                                 name="AllowLinkLocal" #AllowLinkLocal="ngModel" class="mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.hostaddress.listenlinklocal_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="AllowLinkLocal" class="label block">{{ 'settings.hostaddress.listenlinklocal_label' |
+                                translate }}</label>
                             <small class="block" id="AllowLinkLocal-help">
                                 {{ 'settings.hostaddress.listenlinklocal_desc' | translate }}
                             </small>
@@ -158,8 +164,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="IsMasterBackend" [(ngModel)]="m_HostAddressData.IsMasterBackend"
                             name="IsMasterBackend" #IsMasterBackend="ngModel" class="mb-2 w-full" [binary]="true"
-                            (onChange)="setMaster();" label="{{ 'settings.hostaddress.ismaster_label' | translate }}">
+                            (onChange)="setMaster();" >
                         </p-checkbox>
+                        <label for="IsMasterBackend" class="label block">{{ 'settings.hostaddress.ismaster_label' |
+                            translate }}</label>
                         <small class="block" id="IsMasterBackend-help">
                             {{ 'settings.hostaddress.ismaster_desc' | translate }}
                         </small>

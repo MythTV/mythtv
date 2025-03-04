@@ -63,15 +63,19 @@
                 *ngIf="displayType == GRID" pTooltip="{{ 'dashboard.guide.movies' | translate }}"
                 tooltipPosition="top"></button>
             <p-checkbox inputId="OnlyNew" [(ngModel)]="onlyNew" name="OnlyNew" #OnlyNew="ngModel" class="mx-1"
-                *ngIf="displayType != GRID" [binary]="true" label="{{ 'dashboard.guide.new' | translate }}"
+                *ngIf="displayType != GRID" [binary]="true" 
                 checkboxIcon="pi pi-check" (onChange)="newSearch()"
                 pTooltip="{{ 'dashboard.guide.new_search' | translate }}" tooltipPosition="top">
             </p-checkbox>
+            <label for="OnlyNew" class="label block">{{ 'dashboard.guide.new' |
+                translate }}</label>
             <p-checkbox inputId="Movies" [(ngModel)]="onlyMovies" name="OnlyMovies" #OnlyMovies="ngModel" class="mx-1"
-                *ngIf="displayType != GRID" [binary]="true" label="{{ 'dashboard.guide.movies' | translate }}"
+                *ngIf="displayType != GRID" [binary]="true" 
                 checkboxIcon="pi pi-check" (onChange)="newSearch()"
                 pTooltip="{{ 'dashboard.guide.movies' | translate }}" tooltipPosition="top">
             </p-checkbox>
+            <label for="Movies" class="label block">{{ 'dashboard.guide.movies' |
+                translate }}</label>
         </div>
 
         <div class="flex align-items-center"

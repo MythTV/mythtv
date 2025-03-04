@@ -73,7 +73,7 @@
                     <td>{{ channel.CallSign }}</td>
                     <td>{{ channel.ChannelName }}</td>
                     <td class="pt-1 pb-0" style="white-space: nowrap;">
-                        <p-checkbox [(ngModel)]="channel.selected" [binary]="true"
+                        <p-checkbox inputId="Selected" [(ngModel)]="channel.selected" [binary]="true"
                             [name]="'selected'+channel.ChanId" [disabled]="!group.canUpdate"></p-checkbox>
                     </td>
                 </tr>

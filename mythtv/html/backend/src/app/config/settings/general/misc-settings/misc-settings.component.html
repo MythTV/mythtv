@@ -13,27 +13,33 @@
                     [toggleable]="true" [collapsed]="true">
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="MasterBackendOverride" name="MasterBackendOverride" class="mb-2 w-full label"
-                            [binary]="true" label="{{ 'settings.misc.mbo_label' | translate }}">
+                        <p-checkbox inputId="MasterBackendOverride" [(ngModel)]="MasterBackendOverride" name="MasterBackendOverride" class="mb-2 w-full label"
+                            [binary]="true" >
                         </p-checkbox>
+                        <label for="MasterBackendOverride" class="label block">{{ 'settings.misc.mbo_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.misc.mbo_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="DeletesFollowLinks" name="DeletesFollowLinks" class="mb-2 w-full label"
-                            [binary]="true" label="{{ 'settings.misc.follow_label' | translate }}">
+                        <p-checkbox inputId="DeletesFollowLinks" [(ngModel)]="DeletesFollowLinks" name="DeletesFollowLinks" class="mb-2 w-full label"
+                            [binary]="true" >
                         </p-checkbox>
+                        <label for="DeletesFollowLinks" class="label block">{{ 'settings.misc.follow_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.misc.follow_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="TruncateDeletesSlowly" name="TruncateDeletesSlowly" class="mb-2 w-full label"
-                            [binary]="true" label="{{ 'settings.misc.slowly_label' | translate }}">
+                        <p-checkbox inputId="TruncateDeletesSlowly" [(ngModel)]="TruncateDeletesSlowly" name="TruncateDeletesSlowly" class="mb-2 w-full label"
+                            [binary]="true" >
                         </p-checkbox>
+                        <label for="TruncateDeletesSlowly" class="label block">{{ 'settings.misc.slowly_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.misc.slowly_desc' | translate }}
                         </small>
@@ -88,18 +94,22 @@
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="DisableAutomaticBackup" name="DisableAutomaticBackup"
-                            class="mb-2 w-full label" [binary]="true" label="{{ 'settings.misc.disback_label' | translate }}">
+                        <p-checkbox inputId="DisableAutomaticBackup" [(ngModel)]="DisableAutomaticBackup" name="DisableAutomaticBackup"
+                            class="mb-2 w-full label" [binary]="true" >
                         </p-checkbox>
+                        <label for="DisableAutomaticBackup" class="label block">{{ 'settings.misc.disback_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.misc.disback_desc' | translate }}
                         </small>
                     </div>
 
                     <div class="form-group field">
-                        <p-checkbox [(ngModel)]="DisableFirewireReset" name="DisableFirewireReset" class="mb-2 w-full label"
-                            [binary]="true" label="{{ 'settings.misc.disfwr_label' | translate }}">
+                        <p-checkbox inputId="DisableFirewireReset" [(ngModel)]="DisableFirewireReset" name="DisableFirewireReset" class="mb-2 w-full label"
+                            [binary]="true" >
                         </p-checkbox>
+                        <label for="DisableFirewireReset" class="label block">{{ 'settings.misc.disfwr_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.misc.disfwr_desc' | translate }}
                         </small>

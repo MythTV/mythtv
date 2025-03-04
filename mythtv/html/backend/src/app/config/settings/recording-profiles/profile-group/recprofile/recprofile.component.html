@@ -13,8 +13,10 @@
                         <p-checkbox inputId="autotranscode"
                             [(ngModel)]="profile.RecProfParams[findIx('autotranscode',false)].Value"
                             name="autotranscode" #autotranscode="ngModel" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.rprofiles.autotranscode_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="autotranscode" class="label block">{{ 'settings.rprofiles.autotranscode_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.rprofiles.autotranscode_desc' | translate }}
                         </small>
@@ -55,8 +57,10 @@
                         <p-checkbox inputId="recordmpts"
                             [(ngModel)]="profile.RecProfParams[findIx('recordmpts', false)].Value" name="recordmpts"
                             #recordmpts="ngModel" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.rprofiles.recordmpts_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="recordmpts" class="label block">{{ 'settings.rprofiles.recordmpts_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.rprofiles.recordmpts_desc' | translate }}
                         </small>
@@ -341,8 +345,10 @@
                             <p-checkbox inputId="scalebitrate"
                                 [(ngModel)]="profile.RecProfParams[findIx('scalebitrate',true)].Value"
                                 name="scalebitrate" #scalebitrate="ngModel" class="label mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.rprofiles.scalebitrate_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="scalebitrate" class="label block">{{ 'settings.rprofiles.scalebitrate_label' |
+                                translate }}</label>
                             <small class="block">
                                 {{ 'settings.rprofiles.scalebitrate_desc' | translate }}
                             </small>
@@ -352,8 +358,10 @@
                             <p-checkbox inputId="mpeg4optionvhq"
                                 [(ngModel)]="profile.RecProfParams[findIx('mpeg4optionvhq',false)].Value"
                                 name="mpeg4optionvhq" #mpeg4optionvhq="ngModel" class="label mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.rprofiles.mpeg4optionvhq_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="mpeg4optionvhq" class="label block">{{ 'settings.rprofiles.mpeg4optionvhq_label' |
+                                translate }}</label>
                             <small class="block">
                                 {{ 'settings.rprofiles.mpeg4optionvhq_desc' | translate }}
                             </small>
@@ -363,8 +371,10 @@
                             <p-checkbox inputId="mpeg4option4mv"
                                 [(ngModel)]="profile.RecProfParams[findIx('mpeg4option4mv',false)].Value"
                                 name="mpeg4option4mv" #mpeg4option4mv="ngModel" class="label mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.rprofiles.mpeg4option4mv_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="mpeg4option4mv" class="label block">{{ 'settings.rprofiles.mpeg4option4mv_label' |
+                                translate }}</label>
                             <small class="block">
                                 {{ 'settings.rprofiles.mpeg4option4mv_desc' | translate }}
                             </small>
@@ -374,8 +384,10 @@
                             <p-checkbox inputId="mpeg4optionidct"
                                 [(ngModel)]="profile.RecProfParams[findIx('mpeg4optionidct',false)].Value"
                                 name="mpeg4optionidct" #mpeg4optionidct="ngModel" class="label mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.rprofiles.mpeg4optionidct_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="mpeg4optionidct" class="label block">{{ 'settings.rprofiles.mpeg4optionidct_label' |
+                                translate }}</label>
                             <small class="block">
                                 {{ 'settings.rprofiles.mpeg4optionidct_desc' | translate }}
                             </small>
@@ -385,8 +397,10 @@
                             <p-checkbox inputId="mpeg4optionime"
                                 [(ngModel)]="profile.RecProfParams[findIx('mpeg4optionime',false)].Value"
                                 name="mpeg4optionime" #mpeg4optionime="ngModel" class="label mb-2 w-full" [binary]="true"
-                                label="{{ 'settings.rprofiles.mpeg4optionime_label' | translate }}">
+                                >
                             </p-checkbox>
+                            <label for="mpeg4optionime" class="label block">{{ 'settings.rprofiles.mpeg4optionime_label' |
+                                translate }}</label>
                             <small class="block">
                                 {{ 'settings.rprofiles.mpeg4optionime_desc' | translate }}
                             </small>

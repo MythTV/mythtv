@@ -95,8 +95,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="DVBEITScan" [(ngModel)]="card.DVBEITScan" name="DVBEITScan"
                             #DVBEITScan="ngModel" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.capture.dvb.eitscan_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="DVBEITScan" class="label block">{{ 'settings.capture.dvb.eitscan_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.capture.dvb.eitscan_desc' | translate }}
                         </small>

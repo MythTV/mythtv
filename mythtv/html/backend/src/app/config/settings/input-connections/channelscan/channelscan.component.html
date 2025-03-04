@@ -13,8 +13,10 @@
 <div class="form-group field">
     <p-checkbox inputId="FreeToAirOnly" [(ngModel)]="scanRequest.FreeToAirOnly" name="FreeToAirOnly"
         #FreeToAirOnly="ngModel" class="label mb-2 w-full" [binary]="true"
-        label="{{ 'settings.channelscan.ftaonly_label' | translate }}">
+        >
     </p-checkbox>
+    <label for="FreeToAirOnly" class="label block">{{ 'settings.channelscan.ftaonly_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.ftaonly_desc' | translate }}
     </small>
@@ -23,8 +25,10 @@
 <div class="form-group field">
     <p-checkbox inputId="ChannelNumbersOnly" [(ngModel)]="scanRequest.ChannelNumbersOnly" name="ChannelNumbersOnly"
         #ChannelNumbersOnly="ngModel" class="label mb-2 w-full" [binary]="true"
-        label="{{ 'settings.channelscan.channelnumbersonly_label' | translate }}">
+        >
     </p-checkbox>
+    <label for="ChannelNumbersOnly" class="label block">{{ 'settings.channelscan.channelnumbersonly_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.channelnumbersonly_desc' | translate }}
     </small>
@@ -33,8 +37,10 @@
 <div class="form-group field">
     <p-checkbox inputId="CompleteChannelsOnly" [(ngModel)]="scanRequest.CompleteChannelsOnly"
         name="CompleteChannelsOnly" #CompleteChannelsOnly="ngModel" class="label mb-2 w-full" [binary]="true"
-        label="{{ 'settings.channelscan.completeonly_label' | translate }}">
+        >
     </p-checkbox>
+    <label for="CompleteChannelsOnly" class="label block">{{ 'settings.channelscan.completeonly_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.completeonly_desc' | translate }}
     </small>
@@ -43,8 +49,10 @@
 <div class="form-group field">
     <p-checkbox inputId="FullChannelSearch" [(ngModel)]="scanRequest.FullChannelSearch" name="FullChannelSearch"
         #FullChannelSearch="ngModel" class="label mb-2 w-full" [binary]="true"
-        label="{{ 'settings.channelscan.fullsearch_label' | translate }}">
+        >
     </p-checkbox>
+    <label for="FullChannelSearch" class="label block">{{ 'settings.channelscan.fullsearch_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.fullsearch_desc' | translate }}
     </small>
@@ -53,8 +61,10 @@
 <div class="form-group field">
     <p-checkbox inputId="RemoveDuplicates" [(ngModel)]="scanRequest.RemoveDuplicates" name="RemoveDuplicates"
         #RemoveDuplicates="ngModel" class="label mb-2 w-full" [binary]="true"
-        label="{{ 'settings.channelscan.removeduplicates_label' | translate }}">
+        >
     </p-checkbox>
+    <label for="RemoveDuplicates" class="label block">{{ 'settings.channelscan.removeduplicates_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.removeduplicates_desc' | translate }}
     </small>
@@ -62,8 +72,10 @@
 
 <div class="form-group field">
     <p-checkbox inputId="AddFullTS" [(ngModel)]="scanRequest.AddFullTS" name="AddFullTS" #AddFullTS="ngModel"
-        class="label mb-2 w-full" [binary]="true" label="{{ 'settings.channelscan.addfullts_label' | translate }}">
+        class="label mb-2 w-full" [binary]="true" >
     </p-checkbox>
+    <label for="AddFullTS" class="label block">{{ 'settings.channelscan.addfullts_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.addfullts_desc' | translate }}
     </small>
@@ -72,8 +84,10 @@
 <div class="form-group field">
     <p-checkbox inputId="TestDecryptable" [(ngModel)]="scanRequest.TestDecryptable" name="TestDecryptable"
         #TestDecryptable="ngModel" class="label mb-2 w-full" [binary]="true"
-        label="{{ 'settings.channelscan.testdecryptable_label' | translate }}">
+        >
     </p-checkbox>
+    <label for="TestDecryptable" class="label block">{{ 'settings.channelscan.testdecryptable_label' |
+        translate }}</label>
     <small class="block">
         {{ 'settings.channelscan.testdecryptable_desc' | translate }}
     </small>
@@ -476,8 +490,10 @@
     <div class="form-group field">
         <p-checkbox inputId="IgnoreSignalTimeout" [(ngModel)]="scanRequest.IgnoreSignalTimeout"
             name="IgnoreSignalTimeout" #IgnoreSignalTimeout="ngModel" class="label mb-2 w-full" [binary]="true"
-            label="{{ 'settings.channelscan.ignoresignaltimeout_label' | translate }}">
+            >
         </p-checkbox>
+        <label for="IgnoreSignalTimeout" class="label block">{{ 'settings.channelscan.ignoresignaltimeout_label' |
+            translate }}</label>
         <small class="block">
             {{ 'settings.channelscan.ignoresignaltimeout_desc' | translate }}
         </small>
@@ -486,8 +502,10 @@
     <div class="form-group field">
         <p-checkbox inputId="FollowNITSetting" [(ngModel)]="scanRequest.FollowNITSetting" name="FollowNITSetting"
             #FollowNITSetting="ngModel" class="label mb-2 w-full" [binary]="true"
-            label="{{ 'settings.channelscan.follownitsetting_label' | translate }}">
+            >
         </p-checkbox>
+        <label for="FollowNITSetting" class="label block">{{ 'settings.channelscan.follownitsetting_label' |
+            translate }}</label>
         <small class="block">
             {{ 'settings.channelscan.follownitsetting_desc' | translate }}
         </small>

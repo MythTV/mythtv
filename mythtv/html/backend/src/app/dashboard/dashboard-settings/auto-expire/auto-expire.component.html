@@ -25,8 +25,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="RerecordWatched" [(ngModel)]="RerecordWatched" name="RerecordWatched"
                             class="mb-2 w-full label" [binary]="true"
-                            label="{{ 'dashboard.autoexpire.rerecord_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="RerecordWatched" class="label block">{{ 'dashboard.autoexpire.rerecord_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'dashboard.autoexpire.rerecord_desc' | translate }}
                         </small>
@@ -35,8 +37,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="AutoExpireWatchedPriority" [(ngModel)]="AutoExpireWatchedPriority"
                             name="AutoExpireWatchedPriority" class="mb-2 w-full label" [binary]="true"
-                            label="{{ 'dashboard.autoexpire.watched_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="AutoExpireWatchedPriority" class="label block">{{ 'dashboard.autoexpire.watched_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'dashboard.autoexpire.watched_desc' | translate }}
                         </small>

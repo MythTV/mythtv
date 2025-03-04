@@ -120,9 +120,11 @@
 
             <div class="form-group field">
                 <p-checkbox inputId="Active" [(ngModel)]="recRule.Inactive" name="Active" #Active="ngModel"
-                    class="label mb-2 w-full" [binary]="true" label="{{ 'dashboard.sched.active_label' | translate }}"
+                    class="label mb-2 w-full" [binary]="true" 
                     [trueValue]="false" [falseValue]="true" [disabled]="override">
                 </p-checkbox>
+                <label for="Active" class="label block">{{ 'dashboard.sched.active_label' |
+                    translate }}</label>
             </div>
 
             <div class="form-group field">
@@ -149,8 +151,10 @@
 
             <div class="form-group field">
                 <p-checkbox inputId="NewEpisOnly" [(ngModel)]="recRule.NewEpisOnly" name="NewEpisOnly" #UseEIT="ngModel"
-                    class="label mb-2 w-full" [binary]="true" label="{{ 'dashboard.sched.newepis_label' | translate }}">
+                    class="label mb-2 w-full" [binary]="true" >
                 </p-checkbox>
+                <label for="NewEpisOnly" class="label block">{{ 'dashboard.sched.newepis_label' |
+                    translate }}</label>
             </div>
 
             <div class="form-group field">
@@ -230,8 +234,10 @@
             <div class="form-group field">
                 <p-checkbox inputId="MaxNewest" [(ngModel)]="recRule.MaxNewest" name="MaxNewest" #MaxNewest="ngModel"
                     class="label mb-2 w-full" [binary]="true"
-                    label="{{ 'dashboard.sched.maxnewest_label' | translate }}">
+                    >
                 </p-checkbox>
+                <label for="MaxNewest" class="label block">{{ 'dashboard.sched.maxnewest_label' |
+                    translate }}</label>
                 <small class="block">
                     {{ 'dashboard.sched.maxnewest_desc' | translate }}
                 </small>
@@ -240,8 +246,10 @@
             <div class="form-group field">
                 <p-checkbox inputId="AutoExpire" [(ngModel)]="recRule.AutoExpire" name="AutoExpire"
                     #AutoExpire="ngModel" class="label mb-2 w-full" [binary]="true"
-                    label="{{ 'dashboard.sched.autoexpire_label' | translate }}">
+                    >
                 </p-checkbox>
+                <label for="AutoExpire" class="label block">{{ 'dashboard.sched.autoexpire_label' |
+                    translate }}</label>
             </div>
 
             <div class="form-group field">

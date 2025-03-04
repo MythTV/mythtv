@@ -12,8 +12,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="JobsRunOnRecordHost" [(ngModel)]="JobsRunOnRecordHost"
                             name="JobsRunOnRecordHost" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqglobal.runonrechost_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="JobsRunOnRecordHost" class="label block">{{ 'settings.jobqglobal.runonrechost_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.jobqglobal.runonrechost_desc' | translate }}
                         </small>
@@ -22,8 +24,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="AutoCommflagWhileRecording" [(ngModel)]="AutoCommflagWhileRecording"
                             name="AutoCommflagWhileRecording" class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqglobal.startcomm_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="AutoCommflagWhileRecording" class="label block">{{ 'settings.jobqglobal.startcomm_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.jobqglobal.startcomm_desc' | translate }}
                         </small>
@@ -53,8 +57,10 @@
                         <p-checkbox inputId="AutoTranscodeBeforeAutoCommflag"
                             [(ngModel)]="AutoTranscodeBeforeAutoCommflag" name="AutoTranscodeBeforeAutoCommflag"
                             class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqglobal.transfirst_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="AutoTranscodeBeforeAutoCommflag" class="label block">{{ 'settings.jobqglobal.transfirst_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.jobqglobal.transfirst_desc' | translate }}
                         </small>
@@ -63,8 +69,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="SaveTranscoding" [(ngModel)]="SaveTranscoding" name="SaveTranscoding"
                             class="label mb-2 w-full" [binary]="true"
-                            label="{{ 'settings.jobqglobal.transsave_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="SaveTranscoding" class="label block">{{ 'settings.jobqglobal.transsave_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'settings.jobqglobal.transsave_desc' | translate }}
                         </small>

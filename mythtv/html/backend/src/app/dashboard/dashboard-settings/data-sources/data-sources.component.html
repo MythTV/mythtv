@@ -37,8 +37,10 @@
                     <div class="form-group field">
                         <p-checkbox inputId="RerecordWatched" [(ngModel)]="DailyArtworkUpdates"
                             name="DailyArtworkUpdates" class="mb-2 w-full label" [binary]="true"
-                            label="{{ 'dashboard.datasources.daily_label' | translate }}">
+                            >
                         </p-checkbox>
+                        <label for="RerecordWatched" class="label block">{{ 'dashboard.datasources.daily_label' |
+                            translate }}</label>
                         <small class="block">
                             {{ 'dashboard.datasources.daily_desc' | translate }}
                         </small>
