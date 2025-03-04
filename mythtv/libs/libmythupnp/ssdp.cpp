@@ -120,8 +120,6 @@ void SSDP::EnableNotifications( int nServicePort )
             "SSDP::EnableNotifications() - sending NTS_byebye");
         m_pNotifyTask->SetNTS( NTS_byebye );
         m_pNotifyTask->Execute( nullptr );
-
-        m_bAnnouncementsEnabled = true;
     }
 
     // ------------------------------------------------------------------
@@ -144,8 +142,6 @@ void SSDP::EnableNotifications( int nServicePort )
 
 void SSDP::DisableNotifications()
 {
-    m_bAnnouncementsEnabled = false;
-
     if (m_pNotifyTask != nullptr)
     {
         // Send Announcement that we are leaving.
