@@ -4,13 +4,25 @@ import { RecRule, RecRuleFilter } from '../services/interfaces/recording.interfa
 import { DvrService } from '../services/dvr.service';
 import { InputList } from '../services/interfaces/input.interface';
 import { Channel } from '../services/interfaces/channel.interface';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MythService } from '../services/myth.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { RecordScheduleRequest } from '../services/interfaces/dvr.interface';
 import { Observable, of } from 'rxjs';
 import { UtilityService } from '../services/utility.service';
 import { ChannelService } from '../services/channel.service';
+import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { Dialog } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { Divider } from 'primeng/divider';
+import { Calendar } from 'primeng/calendar';
+import { InputNumber } from 'primeng/inputnumber';
+import { Checkbox } from 'primeng/checkbox';
+import { MultiSelect } from 'primeng/multiselect';
+import { RadioButton } from 'primeng/radiobutton';
+import { PrimeTemplate } from 'primeng/api';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
 
 export interface SchedulerSummary {
   refresh(): void;
@@ -36,9 +48,11 @@ interface MyChannel extends Channel {
 }
 
 @Component({
-  selector: 'app-schedule',
-  templateUrl: './schedule.component.html',
-  styleUrls: ['./schedule.component.css']
+    selector: 'app-schedule',
+    templateUrl: './schedule.component.html',
+    styleUrls: ['./schedule.component.css'],
+    standalone: true,
+    imports: [FormsModule, NgIf, Dialog, DropdownModule, NgSwitch, NgSwitchCase, NgSwitchDefault, Divider, Calendar, InputNumber, Checkbox, MultiSelect, RadioButton, PrimeTemplate, Message, Button, TranslatePipe]
 })
 export class ScheduleComponent implements OnInit {
   @Input() inter!: ScheduleLink;

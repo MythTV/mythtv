@@ -1,14 +1,23 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { NgIf } from '@angular/common';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputNumber } from 'primeng/inputnumber';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
 
 @Component({
-  selector: 'app-firewire',
-  templateUrl: './firewire.component.html',
-  styleUrls: ['./firewire.component.css']
+    selector: 'app-firewire',
+    templateUrl: './firewire.component.html',
+    styleUrls: ['./firewire.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, NgIf, DropdownModule, InputNumber, Message, Button, TranslatePipe]
 })
 export class FirewireComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;

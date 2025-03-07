@@ -8,8 +8,8 @@ describe('EitScannerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EitScannerComponent ]
-    })
+    imports: [EitScannerComponent]
+})
     .compileComponents();
   });
 

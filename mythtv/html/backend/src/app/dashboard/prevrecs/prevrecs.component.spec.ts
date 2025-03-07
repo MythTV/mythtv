@@ -8,8 +8,8 @@ describe('PrevrecsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PrevrecsComponent]
-    });
+    imports: [PrevrecsComponent]
+});
     fixture = TestBed.createComponent(PrevrecsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

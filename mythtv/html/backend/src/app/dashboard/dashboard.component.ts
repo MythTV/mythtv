@@ -1,12 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { SetupService } from '../services/setup.service';
+import { NgIf } from '@angular/common';
+import { ButtonDirective } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { TabMenu } from 'primeng/tabmenu';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.css'],
+    standalone: true,
+    imports: [NgIf, ButtonDirective, Ripple, Tooltip, TabMenu, RouterOutlet, TranslatePipe]
 })
 export class DashboardComponent implements OnInit {
 

@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { ChannelService } from 'src/app/services/channel.service';
@@ -9,12 +9,30 @@ import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/captu
 import { VideoSource, VideoSourceList } from 'src/app/services/interfaces/videosource.interface';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { Accordion, AccordionTab } from 'primeng/accordion';
+import { NgFor, NgIf } from '@angular/common';
+import { PrimeTemplate } from 'primeng/api';
+import { IconnectionComponent } from './iconnection/iconnection.component';
+import { Button } from 'primeng/button';
 
 @Component({
-  selector: 'app-input-connections',
-  templateUrl: './input-connections.component.html',
-  styleUrls: ['./input-connections.component.css'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-input-connections',
+    templateUrl: './input-connections.component.html',
+    styleUrls: ['./input-connections.component.css'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [
+        Card,
+        Accordion,
+        NgFor,
+        AccordionTab,
+        PrimeTemplate,
+        NgIf,
+        IconnectionComponent,
+        Button,
+        TranslatePipe,
+    ],
 })
 export class InputConnectionsComponent implements OnInit {
 

@@ -10,8 +10,7 @@ describe('SelectlanguageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [SelectLanguageComponent],
-    imports: [RouterTestingModule],
+    imports: [RouterTestingModule, SelectLanguageComponent],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
     .compileComponents();

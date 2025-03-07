@@ -8,8 +8,8 @@ describe('ChannelEditorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChannelEditorComponent ]
-    })
+    imports: [ChannelEditorComponent]
+})
     .compileComponents();
   });
 

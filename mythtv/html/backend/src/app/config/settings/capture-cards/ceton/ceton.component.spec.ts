@@ -8,8 +8,8 @@ describe('CetonComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CetonComponent ]
-    })
+    imports: [CetonComponent]
+})
     .compileComponents();
   });
 

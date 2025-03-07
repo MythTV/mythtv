@@ -8,8 +8,8 @@ describe('SgroupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SgroupComponent ]
-    })
+    imports: [SgroupComponent]
+})
     .compileComponents();
   });
 

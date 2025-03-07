@@ -1,17 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { DvrService } from 'src/app/services/dvr.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 import { SetupWizardService } from 'src/app/services/setupwizard.service';
+import { Card } from 'primeng/card';
+import { NgIf } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
+import { ProgressSpinner } from 'primeng/progressspinner';
 
 @Component({
-  selector: 'app-backend-warning',
-  templateUrl: './backend-warning.component.html',
-  styleUrls: ['./backend-warning.component.css'],
-  providers: [MessageService]
+    selector: 'app-backend-warning',
+    templateUrl: './backend-warning.component.html',
+    styleUrls: ['./backend-warning.component.css'],
+    providers: [MessageService],
+    standalone: true,
+    imports: [Card, NgIf, Message, Button, ProgressSpinner, TranslatePipe]
 })
 export class BackendWarningComponent implements OnInit {
 

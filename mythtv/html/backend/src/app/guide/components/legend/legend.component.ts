@@ -2,11 +2,17 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
 import { MythService } from 'src/app/services/myth.service';
+import { DataView } from 'primeng/dataview';
+import { PrimeTemplate } from 'primeng/api';
+import { NgClass } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-legend',
-  templateUrl: './legend.component.html',
-  styleUrls: ['./legend.component.css']
+    selector: 'app-legend',
+    templateUrl: './legend.component.html',
+    styleUrls: ['./legend.component.css'],
+    standalone: true,
+    imports: [DataView, PrimeTemplate, NgClass, TranslatePipe]
 })
 export class LegendComponent implements OnInit {
   @Input() programGuide!: ProgramGuide | null;

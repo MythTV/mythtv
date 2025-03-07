@@ -1,17 +1,35 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { PartialObserver } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CaptureDevice, CaptureDeviceList, CardAndInput, DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { CaptureCardsComponent } from '../capture-cards.component';
 import { DiseqcSettingBase } from './diseqc-setting-base';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { NgIf } from '@angular/common';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputNumber } from 'primeng/inputnumber';
+import { Checkbox } from 'primeng/checkbox';
+import { Fieldset } from 'primeng/fieldset';
+import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { Listbox } from 'primeng/listbox';
+import { Tooltip } from 'primeng/tooltip';
+import { Message } from 'primeng/message';
+import { LnbComponent } from './lnb/lnb.component';
+import { RotorComponent } from './rotor/rotor.component';
+import { SwitchComponent } from './switch/switch.component';
+import { UnicableComponent } from './unicable/unicable.component';
 
 @Component({
-  selector: 'app-dvb',
-  templateUrl: './dvb.component.html',
-  styleUrls: ['./dvb.component.css']
+    selector: 'app-dvb',
+    templateUrl: './dvb.component.html',
+    styleUrls: ['./dvb.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, NgIf, DropdownModule, InputNumber, Checkbox, Fieldset, Button, Dialog, Listbox, Tooltip, Message, LnbComponent, RotorComponent, SwitchComponent, UnicableComponent, TranslatePipe]
 })
 export class DvbComponent implements OnInit, AfterViewInit {
 

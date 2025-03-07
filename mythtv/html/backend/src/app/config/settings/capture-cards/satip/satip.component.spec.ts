@@ -8,8 +8,8 @@ describe('SatipComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SatipComponent ]
-    })
+    imports: [SatipComponent]
+})
     .compileComponents();
   });
 

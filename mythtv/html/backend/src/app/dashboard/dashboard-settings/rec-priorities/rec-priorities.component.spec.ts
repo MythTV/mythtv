@@ -8,8 +8,8 @@ describe('RecPrioritiesComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [RecPrioritiesComponent]
-    });
+    imports: [RecPrioritiesComponent]
+});
     fixture = TestBed.createComponent(RecPrioritiesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

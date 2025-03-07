@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
 import { GuideService } from 'src/app/services/guide.service';
@@ -8,6 +8,15 @@ import { Channel } from 'src/app/services/interfaces/channel.interface';
 import { ChannelGroup } from 'src/app/services/interfaces/channelgroup.interface';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { NgIf } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { PrimeTemplate } from 'primeng/api';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { Checkbox } from 'primeng/checkbox';
+import { Message } from 'primeng/message';
 
 
 interface MyChannel extends Channel {
@@ -23,9 +32,11 @@ interface MyChannelGroup extends ChannelGroup {
 }
 
 @Component({
-  selector: 'app-channel-groups',
-  templateUrl: './channel-groups.component.html',
-  styleUrls: ['./channel-groups.component.css']
+    selector: 'app-channel-groups',
+    templateUrl: './channel-groups.component.html',
+    styleUrls: ['./channel-groups.component.css'],
+    standalone: true,
+    imports: [NgIf, TableModule, PrimeTemplate, ButtonDirective, Ripple, Tooltip, FormsModule, Dialog, Checkbox, Message, Button, TranslatePipe]
 })
 export class ChannelGroupsComponent implements OnInit, AfterViewInit {
 

@@ -1,18 +1,40 @@
 import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
 import { ChannelService } from 'src/app/services/channel.service';
 import { VideoSource, VideoSourceList } from 'src/app/services/interfaces/videosource.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { PrimeTemplate } from 'primeng/api';
+import { NgIf, NgFor } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Accordion, AccordionTab } from 'primeng/accordion';
+import { VsourceComponent } from './vsource/vsource.component';
 
 @Component({
-  selector: 'app-video-sources',
-  templateUrl: './video-sources.component.html',
-  styleUrls: ['./video-sources.component.css'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-video-sources',
+    templateUrl: './video-sources.component.html',
+    styleUrls: ['./video-sources.component.css'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [
+        Card,
+        Button,
+        Dialog,
+        PrimeTemplate,
+        NgIf,
+        Message,
+        Accordion,
+        NgFor,
+        AccordionTab,
+        VsourceComponent,
+        TranslatePipe,
+    ],
 })
 export class VideoSourcesComponent implements OnInit, CanComponentDeactivate {
 

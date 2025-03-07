@@ -8,8 +8,8 @@ describe('VsourceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ VsourceComponent ]
-    })
+    imports: [VsourceComponent]
+})
     .compileComponents();
   });
 

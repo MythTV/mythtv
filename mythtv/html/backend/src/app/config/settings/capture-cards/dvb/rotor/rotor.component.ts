@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, Observer, PartialObserver } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
@@ -8,6 +8,19 @@ import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
 import { DiseqcSettingBase } from '../diseqc-setting-base';
 import { DvbComponent } from '../dvb.component';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { InputNumber } from 'primeng/inputnumber';
+import { DropdownModule } from 'primeng/dropdown';
+import { NgIf } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { Fieldset } from 'primeng/fieldset';
+import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { Listbox } from 'primeng/listbox';
+import { LnbComponent } from '../lnb/lnb.component';
+import { SwitchComponent } from '../switch/switch.component';
+import { UnicableComponent } from '../unicable/unicable.component';
 
 interface RotorType {
   Name: string;
@@ -25,9 +38,11 @@ interface Fields {
 }
 
 @Component({
-  selector: 'app-rotor',
-  templateUrl: './rotor.component.html',
-  styleUrls: ['./rotor.component.css']
+    selector: 'app-rotor',
+    templateUrl: './rotor.component.html',
+    styleUrls: ['./rotor.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, InputNumber, DropdownModule, NgIf, TableModule, Fieldset, Button, Dialog, Listbox, LnbComponent, SwitchComponent, UnicableComponent, TranslatePipe]
 })
 export class RotorComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
 

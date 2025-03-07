@@ -9,9 +9,8 @@ describe('SidenavComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SidenavComponent ],
-      imports:      [ TranslateModule.forRoot() ]
-    })
+    imports: [TranslateModule.forRoot(), SidenavComponent]
+})
     .compileComponents();
   });
 

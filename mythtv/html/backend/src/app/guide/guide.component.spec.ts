@@ -9,8 +9,7 @@ describe('GuideComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [GuideComponent],
-    imports: [],
+    imports: [GuideComponent],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
     .compileComponents();

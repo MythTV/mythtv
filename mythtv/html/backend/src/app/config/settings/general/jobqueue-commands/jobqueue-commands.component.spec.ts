@@ -8,8 +8,8 @@ describe('JobqueueCommandsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ JobqueueCommandsComponent ]
-    })
+    imports: [JobqueueCommandsComponent]
+})
     .compileComponents();
   });
 

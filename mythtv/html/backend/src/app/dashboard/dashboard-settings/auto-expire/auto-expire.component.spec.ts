@@ -8,8 +8,8 @@ describe('AutoExpireComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AutoExpireComponent]
-    });
+    imports: [AutoExpireComponent]
+});
     fixture = TestBed.createComponent(AutoExpireComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

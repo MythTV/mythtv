@@ -3,16 +3,25 @@ import { Language, MythLanguageList } from "src/app/services/interfaces/language
 import { Theme } from 'src/app/services/interfaces/theme.interface';
 import { ThemeService } from '../../services/theme.service';
 import { ConfigService } from '../../services/config.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { PrimeNG } from 'primeng/config';
 import { DataService } from 'src/app/services/data.service';
 import { MythService } from 'src/app/services/myth.service';
 import { Router } from '@angular/router';
+import { NgIf } from '@angular/common';
+import { Ripple } from 'primeng/ripple';
+import { ButtonDirective } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PrimeTemplate } from 'primeng/api';
+import { TableModule } from 'primeng/table';
 
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.css']
+    styleUrls: ['./navbar.component.css'],
+    standalone: true,
+    imports: [NgIf, Ripple, ButtonDirective, Tooltip, OverlayPanelModule, PrimeTemplate, TableModule, TranslatePipe]
 })
 export class NavbarComponent implements OnInit {
 

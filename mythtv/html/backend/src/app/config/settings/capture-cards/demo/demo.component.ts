@@ -1,13 +1,21 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { NgIf } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-demo',
-  templateUrl: './demo.component.html',
-  styleUrls: ['./demo.component.css']
+    selector: 'app-demo',
+    templateUrl: './demo.component.html',
+    styleUrls: ['./demo.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, NgIf, Message, Button, TranslatePipe]
 })
 export class DemoComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;

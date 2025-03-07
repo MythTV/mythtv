@@ -3,17 +3,36 @@ import { Observable } from 'rxjs';
 import { GuideService } from 'src/app/services/guide.service';
 import { Channel } from '../services/interfaces/channel.interface';
 import { ProgramGuide } from 'src/app/services/interfaces/programguide.interface';
-import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
-import { ScheduleLink, SchedulerSummary } from '../schedule/schedule.component';
+import { TranslateService, TranslationChangeEvent, TranslatePipe } from '@ngx-translate/core';
+import { ScheduleLink, SchedulerSummary, ScheduleComponent } from '../schedule/schedule.component';
 import { ScheduleOrProgram } from '../services/interfaces/program.interface';
 import { GetProgramListRequest } from '../services/interfaces/guide.interface';
 import { ChannelGroup } from '../services/interfaces/channelgroup.interface';
 import { ActivatedRoute } from '@angular/router';
+import { NgIf, NgFor } from '@angular/common';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { Tooltip } from 'primeng/tooltip';
+import { Calendar } from 'primeng/calendar';
+import { ButtonDirective } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Checkbox } from 'primeng/checkbox';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { DataView } from 'primeng/dataview';
+import { PrimeTemplate } from 'primeng/api';
+import { TimebarComponent } from './components/timebar/timebar.component';
+import { ChannelIconComponent } from './components/channelicon/channelicon.component';
+import { ProgramEntryComponent } from './components/programentry/programentry.component';
+import { ProgramsComponent } from '../dashboard/programs/programs.component';
+import { Dialog } from 'primeng/dialog';
+import { LegendComponent } from './components/legend/legend.component';
 
 @Component({
-  selector: 'app-guide',
-  templateUrl: './guide.component.html',
-  styleUrls: ['./guide.component.css']
+    selector: 'app-guide',
+    templateUrl: './guide.component.html',
+    styleUrls: ['./guide.component.css'],
+    standalone: true,
+    imports: [NgIf, DropdownModule, FormsModule, Tooltip, Calendar, ButtonDirective, Ripple, Checkbox, ProgressSpinner, DataView, PrimeTemplate, NgFor, TimebarComponent, ChannelIconComponent, ProgramEntryComponent, ProgramsComponent, ScheduleComponent, Dialog, LegendComponent, TranslatePipe]
 })
 export class GuideComponent implements OnInit, SchedulerSummary {
 

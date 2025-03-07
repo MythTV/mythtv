@@ -8,8 +8,8 @@ describe('BackendWakeupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BackendWakeupComponent ]
-    })
+    imports: [BackendWakeupComponent]
+})
     .compileComponents();
   });
 

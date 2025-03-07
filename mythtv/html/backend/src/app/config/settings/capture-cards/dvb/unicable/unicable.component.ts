@@ -1,15 +1,29 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { Observable, Observer, PartialObserver } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { DiseqcSettingBase } from '../diseqc-setting-base';
 import { DvbComponent } from '../dvb.component';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { InputNumber } from 'primeng/inputnumber';
+import { Fieldset } from 'primeng/fieldset';
+import { NgIf } from '@angular/common';
+import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { Listbox } from 'primeng/listbox';
+import { LnbComponent } from '../lnb/lnb.component';
+import { RotorComponent } from '../rotor/rotor.component';
+import { SwitchComponent } from '../switch/switch.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-unicable',
-  templateUrl: './unicable.component.html',
-  styleUrls: ['./unicable.component.css']
+    selector: 'app-unicable',
+    templateUrl: './unicable.component.html',
+    styleUrls: ['./unicable.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, InputNumber, Fieldset, NgIf, Button, Dialog, Listbox, LnbComponent, RotorComponent, SwitchComponent, TranslatePipe]
 })
 export class UnicableComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
 

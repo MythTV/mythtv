@@ -1,9 +1,9 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
-import { FilterMatchMode, MenuItem, MessageService, SelectItem } from 'primeng/api';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { FilterMatchMode, MenuItem, MessageService, SelectItem, PrimeTemplate } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Table, TableLazyLoadEvent } from 'primeng/table';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
 import { GetRecordedListRequest, UpdateRecordedMetadataRequest } from 'src/app/services/interfaces/dvr.interface';
@@ -11,12 +11,25 @@ import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface
 import { JobQCommands } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { UtilityService } from 'src/app/services/utility.service';
+import { Toast } from 'primeng/toast';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { NgIf, NgClass, DecimalPipe } from '@angular/common';
+import { DropdownModule } from 'primeng/dropdown';
+import { Dialog } from 'primeng/dialog';
+import { InputNumber } from 'primeng/inputnumber';
+import { Calendar } from 'primeng/calendar';
+import { Message } from 'primeng/message';
+import { Listbox } from 'primeng/listbox';
 
 @Component({
-  selector: 'app-recordings',
-  templateUrl: './recordings.component.html',
-  styleUrls: ['./recordings.component.css'],
-  providers: [MessageService]
+    selector: 'app-recordings',
+    templateUrl: './recordings.component.html',
+    styleUrls: ['./recordings.component.css'],
+    providers: [MessageService],
+    standalone: true,
+    imports: [FormsModule, Toast, Menu, ButtonDirective, Ripple, Tooltip, NgIf, DropdownModule, TableModule, PrimeTemplate, NgClass, Dialog, InputNumber, Calendar, Message, Button, Listbox, DecimalPipe, TranslatePipe]
 })
 export class RecordingsComponent implements OnInit {
 

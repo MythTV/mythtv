@@ -8,8 +8,8 @@ describe('CustomPrioritiesComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CustomPrioritiesComponent]
-    });
+    imports: [CustomPrioritiesComponent]
+});
     fixture = TestBed.createComponent(CustomPrioritiesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

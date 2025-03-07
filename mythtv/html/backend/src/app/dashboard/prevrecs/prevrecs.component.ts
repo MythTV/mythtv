@@ -1,20 +1,32 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { ConfirmationService, MenuItem, MessageService, PrimeTemplate } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Table, TableLazyLoadEvent } from 'primeng/table';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { timeout } from 'rxjs';
 import { ScheduleLink } from 'src/app/schedule/schedule.component';
 import { DvrService } from 'src/app/services/dvr.service';
 import { GetOldRecordedListRequest, RemoveOldRecordedRequest, UpdateOldRecordedRequest } from 'src/app/services/interfaces/dvr.interface';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { UtilityService } from 'src/app/services/utility.service';
+import { Toast } from 'primeng/toast';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ButtonDirective } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { Calendar } from 'primeng/calendar';
+import { FormsModule } from '@angular/forms';
+import { NgIf, NgClass, DecimalPipe } from '@angular/common';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { ScheduleComponent } from '../../schedule/schedule.component';
 
 @Component({
-  selector: 'app-prevrecs',
-  templateUrl: './prevrecs.component.html',
-  styleUrls: ['./prevrecs.component.css'],
-  providers: [ConfirmationService, MessageService]
+    selector: 'app-prevrecs',
+    templateUrl: './prevrecs.component.html',
+    styleUrls: ['./prevrecs.component.css'],
+    providers: [ConfirmationService, MessageService],
+    standalone: true,
+    imports: [Toast, ConfirmDialog, Menu, ButtonDirective, Ripple, Tooltip, Calendar, FormsModule, NgIf, ProgressSpinner, TableModule, PrimeTemplate, NgClass, ScheduleComponent, DecimalPipe, TranslatePipe]
 })
 
 export class PrevrecsComponent implements OnInit {

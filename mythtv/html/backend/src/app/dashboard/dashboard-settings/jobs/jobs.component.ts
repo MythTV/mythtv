@@ -1,13 +1,23 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { DropdownModule } from 'primeng/dropdown';
+import { Checkbox } from 'primeng/checkbox';
+import { InputNumber } from 'primeng/inputnumber';
+import { NgIf } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
 
 @Component({
-  selector: 'app-jobs',
-  templateUrl: './jobs.component.html',
-  styleUrls: ['./jobs.component.css']
+    selector: 'app-jobs',
+    templateUrl: './jobs.component.html',
+    styleUrls: ['./jobs.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, DropdownModule, Checkbox, InputNumber, NgIf, Message, Button, TranslatePipe]
 })
 export class JobsComponent implements OnInit, AfterViewInit {
 

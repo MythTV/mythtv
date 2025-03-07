@@ -8,8 +8,8 @@ describe('WizChanneleditComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WizChanneleditComponent ]
-    })
+    imports: [WizChanneleditComponent]
+})
     .compileComponents();
   });
 

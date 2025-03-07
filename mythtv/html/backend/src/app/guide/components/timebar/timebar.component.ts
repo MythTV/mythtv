@@ -4,9 +4,10 @@ import { GuideComponent } from '../../guide.component';
 import { GuideService } from 'src/app/services/guide.service';
 
 @Component({
-  selector: 'app-guide-timebar',
-  templateUrl: './timebar.component.html',
-  styleUrls: ['./timebar.component.css']
+    selector: 'app-guide-timebar',
+    templateUrl: './timebar.component.html',
+    styleUrls: ['./timebar.component.css'],
+    standalone: true
 })
 export class TimebarComponent implements OnInit {
   @Input() guide!: GuideComponent;

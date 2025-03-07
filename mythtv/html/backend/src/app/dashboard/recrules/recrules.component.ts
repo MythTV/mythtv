@@ -3,11 +3,24 @@ import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.compon
 import { DvrService } from 'src/app/services/dvr.service';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
 import { UtilityService } from 'src/app/services/utility.service';
+import { NgIf } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { PrimeTemplate } from 'primeng/api';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { Message } from 'primeng/message';
+import { ScheduleComponent } from '../../schedule/schedule.component';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-recrules',
-  templateUrl: './recrules.component.html',
-  styleUrls: ['./recrules.component.css']
+    selector: 'app-recrules',
+    templateUrl: './recrules.component.html',
+    styleUrls: ['./recrules.component.css'],
+    standalone: true,
+    imports: [NgIf, TableModule, PrimeTemplate, ButtonDirective, Ripple, Tooltip, Dialog, Message, Button, ScheduleComponent, ProgressSpinner, TranslatePipe]
 })
 export class RecrulesComponent implements OnInit, SchedulerSummary {
 

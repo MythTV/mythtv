@@ -1,19 +1,32 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, MessageService } from 'primeng/api';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { MenuItem, MessageService, PrimeTemplate } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Table, TableLazyLoadEvent } from 'primeng/table';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
 import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
 import { UtilityService } from 'src/app/services/utility.service';
 import { VideoService } from 'src/app/services/video.service';
+import { Toast } from 'primeng/toast';
+import { NgIf, NgFor } from '@angular/common';
+import { Button, ButtonDirective } from 'primeng/button';
+import { Checkbox } from 'primeng/checkbox';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { InputNumber } from 'primeng/inputnumber';
+import { Calendar } from 'primeng/calendar';
+import { Message } from 'primeng/message';
 
 @Component({
-  selector: 'app-videos',
-  templateUrl: './videos.component.html',
-  styleUrls: ['./videos.component.css'],
-  providers: [MessageService]
+    selector: 'app-videos',
+    templateUrl: './videos.component.html',
+    styleUrls: ['./videos.component.css'],
+    providers: [MessageService],
+    standalone: true,
+    imports: [Toast, Menu, NgIf, TableModule, PrimeTemplate, Button, NgFor, Checkbox, FormsModule, ProgressSpinner, ButtonDirective, Ripple, Tooltip, Dialog, InputNumber, Calendar, Message, TranslatePipe]
 })
 export class VideosComponent implements OnInit {
 

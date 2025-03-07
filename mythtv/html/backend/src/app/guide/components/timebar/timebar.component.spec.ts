@@ -8,8 +8,8 @@ describe('TimebarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TimebarComponent ]
-    })
+    imports: [TimebarComponent]
+})
     .compileComponents();
   });
 

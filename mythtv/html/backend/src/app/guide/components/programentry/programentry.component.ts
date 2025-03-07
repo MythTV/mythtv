@@ -3,11 +3,15 @@ import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface
 import { GuideComponent } from '../../guide.component';
 import { DataService } from 'src/app/services/data.service';
 import { Channel } from 'src/app/services/interfaces/channel.interface';
+import { NgClass, NgIf } from '@angular/common';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
-  selector: 'app-guide-programentry',
-  templateUrl: './programentry.component.html',
-  styleUrls: ['./programentry.component.css']
+    selector: 'app-guide-programentry',
+    templateUrl: './programentry.component.html',
+    styleUrls: ['./programentry.component.css'],
+    standalone: true,
+    imports: [NgClass, Tooltip, NgIf]
 })
 export class ProgramEntryComponent implements OnInit {
   @Input() program!: ScheduleOrProgram;

@@ -8,8 +8,8 @@ describe('MiscSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MiscSettingsComponent ]
-    })
+    imports: [MiscSettingsComponent]
+})
     .compileComponents();
   });
 

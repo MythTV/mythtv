@@ -5,11 +5,22 @@ import { DvrService } from 'src/app/services/dvr.service';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
 import { UtilityService } from 'src/app/services/utility.service';
+import { TableModule } from 'primeng/table';
+import { PrimeTemplate } from 'primeng/api';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { NgClass, NgIf, DecimalPipe } from '@angular/common';
+import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { Message } from 'primeng/message';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-programs',
-  templateUrl: './programs.component.html',
-  styleUrls: ['./programs.component.css']
+    selector: 'app-programs',
+    templateUrl: './programs.component.html',
+    styleUrls: ['./programs.component.css'],
+    standalone: true,
+    imports: [TableModule, PrimeTemplate, ButtonDirective, Ripple, NgClass, Tooltip, NgIf, Dialog, Message, Button, DecimalPipe, TranslatePipe]
 })
 export class ProgramsComponent implements OnInit {
   @Input() programs: ScheduleOrProgram[] = [];

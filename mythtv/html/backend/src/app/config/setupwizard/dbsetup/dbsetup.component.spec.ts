@@ -11,9 +11,8 @@ describe('DbsetupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [DbsetupComponent],
     imports: [FormsModule,
-        RouterTestingModule],
+        RouterTestingModule, DbsetupComponent],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
     .compileComponents();

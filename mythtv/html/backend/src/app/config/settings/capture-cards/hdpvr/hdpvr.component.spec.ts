@@ -8,8 +8,8 @@ describe('HdpvrComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HdpvrComponent ]
-    })
+    imports: [HdpvrComponent]
+})
     .compileComponents();
   });
 

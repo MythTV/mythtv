@@ -11,9 +11,8 @@ describe('SetupWizardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [SetupWizardComponent],
     imports: [RouterTestingModule,
-        TranslateModule.forRoot()],
+        TranslateModule.forRoot(), SetupWizardComponent],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
     .compileComponents();

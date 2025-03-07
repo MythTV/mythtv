@@ -3,15 +3,19 @@ import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { Encoder, TVState } from 'src/app/services/interfaces/encoder.interface';
 import { UtilityService } from 'src/app/services/utility.service';
+import { NgIf, NgFor } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface myEncoder extends Encoder {
   ParentId?: number
 }
 
 @Component({
-  selector: 'app-status-encoders',
-  templateUrl: './encoders.component.html',
-  styleUrls: ['./encoders.component.css', '../../status.component.css']
+    selector: 'app-status-encoders',
+    templateUrl: './encoders.component.html',
+    styleUrls: ['./encoders.component.css', '../../status.component.css'],
+    standalone: true,
+    imports: [NgIf, NgFor, TranslatePipe]
 })
 
 export class EncodersComponent implements OnInit {

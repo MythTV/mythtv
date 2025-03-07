@@ -9,8 +9,7 @@ describe('StatusComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [StatusComponent],
-    imports: [],
+    imports: [StatusComponent],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
     .compileComponents();

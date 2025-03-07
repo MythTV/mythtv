@@ -8,8 +8,8 @@ describe('FirewireComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FirewireComponent ]
-    })
+    imports: [FirewireComponent]
+})
     .compileComponents();
   });
 

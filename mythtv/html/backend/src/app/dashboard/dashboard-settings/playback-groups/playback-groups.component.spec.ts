@@ -8,8 +8,8 @@ describe('PlaybackGroupsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PlaybackGroupsComponent]
-    });
+    imports: [PlaybackGroupsComponent]
+});
     fixture = TestBed.createComponent(PlaybackGroupsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

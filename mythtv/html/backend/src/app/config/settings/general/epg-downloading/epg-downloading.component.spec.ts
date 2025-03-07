@@ -8,8 +8,8 @@ describe('EpgDownloadingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EpgDownloadingComponent ]
-    })
+    imports: [EpgDownloadingComponent]
+})
     .compileComponents();
   });
 

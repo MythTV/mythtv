@@ -1,14 +1,25 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { ConfigService } from 'src/app/services/config.service';
 
 import { HostAddress } from 'src/app/services/interfaces/setup.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { Fieldset } from 'primeng/fieldset';
+import { NgClass, NgIf } from '@angular/common';
+import { Checkbox } from 'primeng/checkbox';
+import { DropdownModule } from 'primeng/dropdown';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-host-address',
     templateUrl: './host-address.component.html',
-    styleUrls: ['./host-address.component.css']
+    styleUrls: ['./host-address.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, Fieldset, NgClass, NgIf, Checkbox, DropdownModule, Message, Button, TranslatePipe]
 })
 export class HostAddressComponent implements OnInit, AfterViewInit {
     m_HostAddressData!: HostAddress;

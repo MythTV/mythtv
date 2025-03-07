@@ -1,15 +1,28 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CanComponentDeactivate } from 'src/app/can-deactivate-guard.service';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { Accordion, AccordionTab } from 'primeng/accordion';
+import { PrimeTemplate } from 'primeng/api';
+import { AutoExpireComponent } from './auto-expire/auto-expire.component';
+import { JobsComponent } from './jobs/jobs.component';
+import { RecQualityComponent } from './rec-quality/rec-quality.component';
+import { RecPrioritiesComponent } from './rec-priorities/rec-priorities.component';
+import { CustomPrioritiesComponent } from './custom-priorities/custom-priorities.component';
+import { ChannelGroupsComponent } from './channel-groups/channel-groups.component';
+import { PlaybackGroupsComponent } from './playback-groups/playback-groups.component';
+import { DataSourcesComponent } from './data-sources/data-sources.component';
 
 @Component({
-  selector: 'app-dashboard-settings',
-  templateUrl: './dashboard-settings.component.html',
-  styleUrls: ['./dashboard-settings.component.css']
+    selector: 'app-dashboard-settings',
+    templateUrl: './dashboard-settings.component.html',
+    styleUrls: ['./dashboard-settings.component.css'],
+    standalone: true,
+    imports: [Card, Accordion, AccordionTab, PrimeTemplate, AutoExpireComponent, JobsComponent, RecQualityComponent, RecPrioritiesComponent, CustomPrioritiesComponent, ChannelGroupsComponent, PlaybackGroupsComponent, DataSourcesComponent, TranslatePipe]
 })
 export class DashboardSettingsComponent implements OnInit, CanComponentDeactivate {
 

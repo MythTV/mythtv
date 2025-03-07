@@ -10,8 +10,7 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [NavbarComponent],
-    imports: [TranslateModule.forRoot()],
+    imports: [TranslateModule.forRoot(), NavbarComponent],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
     .compileComponents();

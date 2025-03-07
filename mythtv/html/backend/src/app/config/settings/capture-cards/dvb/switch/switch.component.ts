@@ -1,11 +1,23 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, Observer } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { DiseqcParm, DiseqcTree, DiseqcTreeList } from 'src/app/services/interfaces/capture-card.interface';
 import { DiseqcSettingBase } from '../diseqc-setting-base';
 import { DvbComponent } from '../dvb.component';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { InputNumber } from 'primeng/inputnumber';
+import { DropdownModule } from 'primeng/dropdown';
+import { NgIf, NgFor } from '@angular/common';
+import { Fieldset } from 'primeng/fieldset';
+import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { LnbComponent } from '../lnb/lnb.component';
+import { RotorComponent } from '../rotor/rotor.component';
+import { UnicableComponent } from '../unicable/unicable.component';
+import { Listbox } from 'primeng/listbox';
 
 interface SwitchType {
   Name: string;
@@ -13,9 +25,11 @@ interface SwitchType {
 }
 
 @Component({
-  selector: 'app-switch',
-  templateUrl: './switch.component.html',
-  styleUrls: ['./switch.component.css']
+    selector: 'app-switch',
+    templateUrl: './switch.component.html',
+    styleUrls: ['./switch.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, InputNumber, DropdownModule, NgIf, NgFor, Fieldset, Button, Dialog, LnbComponent, RotorComponent, UnicableComponent, Listbox, TranslatePipe]
 })
 export class SwitchComponent implements OnInit, AfterViewInit, DiseqcSettingBase {
 

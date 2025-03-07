@@ -8,8 +8,8 @@ describe('DiseqcComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LnbComponent ]
-    })
+    imports: [LnbComponent]
+})
     .compileComponents();
   });
 

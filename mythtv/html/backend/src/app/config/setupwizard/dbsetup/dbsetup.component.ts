@@ -4,13 +4,23 @@ import { ConfigService } from '../../../services/config.service';
 import { MythService } from '../../../services/myth.service';
 import { WizardData } from '../../../services/interfaces/wizarddata.interface';
 import { SetupWizardService } from '../../../services/setupwizard.service';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeTemplate } from 'primeng/api';
 import { Database, TestDBSettingsRequest } from 'src/app/services/interfaces/myth.interface';
-import { TranslateService } from '@ngx-translate/core';
-import { NgForm } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { SetupService } from 'src/app/services/setup.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { Toast } from 'primeng/toast';
+import { Card } from 'primeng/card';
+import { NgClass, NgIf } from '@angular/common';
+import { Checkbox } from 'primeng/checkbox';
+import { InputNumber } from 'primeng/inputnumber';
+import { Button, ButtonDirective } from 'primeng/button';
+import { Message } from 'primeng/message';
+import { RadioButton } from 'primeng/radiobutton';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-dbsetup',
@@ -18,6 +28,24 @@ import { Clipboard } from '@angular/cdk/clipboard';
     styleUrls: ['./dbsetup.component.css'],
     providers: [MessageService],
     encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [
+        Toast,
+        FormsModule,
+        Card,
+        PrimeTemplate,
+        NgClass,
+        NgIf,
+        Checkbox,
+        InputNumber,
+        Button,
+        Message,
+        RadioButton,
+        ButtonDirective,
+        Ripple,
+        Tooltip,
+        TranslatePipe,
+    ],
 })
 export class DbsetupComponent implements OnInit {
 

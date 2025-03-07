@@ -8,8 +8,8 @@ describe('IptvComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ IptvComponent ]
-    })
+    imports: [IptvComponent]
+})
     .compileComponents();
   });
 

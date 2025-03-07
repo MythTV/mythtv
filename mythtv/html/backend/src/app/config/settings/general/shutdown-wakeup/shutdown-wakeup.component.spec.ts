@@ -8,8 +8,8 @@ describe('ShutdownWakupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ShutdownWakeupComponent ]
-    })
+    imports: [ShutdownWakeupComponent]
+})
     .compileComponents();
   });
 

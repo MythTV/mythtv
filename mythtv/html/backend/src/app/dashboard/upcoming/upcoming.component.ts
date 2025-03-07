@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { MessageService } from 'primeng/api';
-import { Table, TableLazyLoadEvent } from 'primeng/table';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { MessageService, PrimeTemplate } from 'primeng/api';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
 import { DataService } from 'src/app/services/data.service';
 import { DvrService } from 'src/app/services/dvr.service';
@@ -9,6 +9,17 @@ import { GetUpcomingRequest } from 'src/app/services/interfaces/dvr.interface';
 import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
 import { UtilityService } from 'src/app/services/utility.service';
+import { Toast } from 'primeng/toast';
+import { NgIf, NgClass, DecimalPipe } from '@angular/common';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { Message } from 'primeng/message';
+import { ScheduleComponent } from '../../schedule/schedule.component';
 
 interface RuleListEntry {
   Id: number;
@@ -17,10 +28,12 @@ interface RuleListEntry {
 
 
 @Component({
-  selector: 'app-upcoming',
-  templateUrl: './upcoming.component.html',
-  styleUrls: ['./upcoming.component.css'],
-  providers: [MessageService]
+    selector: 'app-upcoming',
+    templateUrl: './upcoming.component.html',
+    styleUrls: ['./upcoming.component.css'],
+    providers: [MessageService],
+    standalone: true,
+    imports: [Toast, NgIf, TableModule, PrimeTemplate, DropdownModule, FormsModule, ProgressSpinner, ButtonDirective, Ripple, Tooltip, NgClass, Dialog, Message, Button, ScheduleComponent, DecimalPipe, TranslatePipe]
 })
 export class UpcomingComponent implements OnInit, SchedulerSummary {
 

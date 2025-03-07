@@ -8,8 +8,8 @@ describe('HostAddressComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HostAddressComponent ]
-    })
+    imports: [HostAddressComponent]
+})
     .compileComponents();
   });
 

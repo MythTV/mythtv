@@ -8,8 +8,8 @@ describe('SwitchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SwitchComponent ]
-    })
+    imports: [SwitchComponent]
+})
     .compileComponents();
   });
 

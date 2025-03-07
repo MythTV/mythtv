@@ -1,15 +1,26 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { DvrService } from 'src/app/services/dvr.service';
 import { PowerPriority } from 'src/app/services/interfaces/dvr.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { NgIf } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { PrimeTemplate } from 'primeng/api';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { InputNumber } from 'primeng/inputnumber';
+import { Message } from 'primeng/message';
 
 @Component({
-  selector: 'app-custom-priorities',
-  templateUrl: './custom-priorities.component.html',
-  styleUrls: ['./custom-priorities.component.css']
+    selector: 'app-custom-priorities',
+    templateUrl: './custom-priorities.component.html',
+    styleUrls: ['./custom-priorities.component.css'],
+    standalone: true,
+    imports: [NgIf, TableModule, PrimeTemplate, ButtonDirective, Ripple, Tooltip, FormsModule, Dialog, InputNumber, Message, Button, TranslatePipe]
 })
 export class CustomPrioritiesComponent implements OnInit {
 

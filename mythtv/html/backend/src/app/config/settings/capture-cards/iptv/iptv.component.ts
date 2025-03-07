@@ -1,14 +1,23 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { CaptureCardList, CardAndInput } from 'src/app/services/interfaces/capture-card.interface';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { InputNumber } from 'primeng/inputnumber';
+import { NgIf } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-iptv',
-  templateUrl: './iptv.component.html',
-  styleUrls: ['./iptv.component.css']
+    selector: 'app-iptv',
+    templateUrl: './iptv.component.html',
+    styleUrls: ['./iptv.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, InputNumber, NgIf, Message, Button, TranslatePipe]
 })
 export class IptvComponent implements OnInit, AfterViewInit {
   @Input() card!: CardAndInput;

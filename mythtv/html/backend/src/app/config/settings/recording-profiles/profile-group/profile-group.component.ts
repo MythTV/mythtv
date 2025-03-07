@@ -1,16 +1,25 @@
 import { Component, HostListener, Input, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { RecProfileGroup } from 'src/app/services/interfaces/recprofile.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { RecordingProfilesComponent } from '../recording-profiles.component';
+import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { PrimeTemplate } from 'primeng/api';
+import { NgIf, NgFor } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Accordion, AccordionTab } from 'primeng/accordion';
+import { RecprofileComponent } from './recprofile/recprofile.component';
 
 @Component({
-  selector: 'app-profile-group',
-  templateUrl: './profile-group.component.html',
-  styleUrls: ['./profile-group.component.css']
+    selector: 'app-profile-group',
+    templateUrl: './profile-group.component.html',
+    styleUrls: ['./profile-group.component.css'],
+    standalone: true,
+    imports: [Button, Dialog, FormsModule, PrimeTemplate, NgIf, Message, Accordion, NgFor, AccordionTab, RecprofileComponent, TranslatePipe]
 })
 export class ProfileGroupComponent implements OnInit {
 

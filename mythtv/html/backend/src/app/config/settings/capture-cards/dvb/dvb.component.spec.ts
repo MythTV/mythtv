@@ -8,8 +8,8 @@ describe('DvbComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DvbComponent ]
-    })
+    imports: [DvbComponent]
+})
     .compileComponents();
   });
 

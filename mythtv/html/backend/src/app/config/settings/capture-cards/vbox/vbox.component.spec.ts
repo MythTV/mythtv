@@ -8,8 +8,8 @@ describe('VboxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ VboxComponent ]
-    })
+    imports: [VboxComponent]
+})
     .compileComponents();
   });
 

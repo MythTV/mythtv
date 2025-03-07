@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { Fieldset } from 'primeng/fieldset';
 import { ScrollPanel } from 'primeng/scrollpanel';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
@@ -10,6 +10,13 @@ import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface'
 import { SetupService } from 'src/app/services/setup.service';
 import { IconnectionComponent } from '../iconnection/iconnection.component';
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { Checkbox } from 'primeng/checkbox';
+import { Button } from 'primeng/button';
+import { NgIf } from '@angular/common';
+import { InputNumber } from 'primeng/inputnumber';
+import { ProgressBar } from 'primeng/progressbar';
 
 
 interface ScanExt extends Scan {
@@ -49,9 +56,11 @@ class SatTuning {
 }
 
 @Component({
-  selector: 'app-channelscan',
-  templateUrl: './channelscan.component.html',
-  styleUrls: ['./channelscan.component.css']
+    selector: 'app-channelscan',
+    templateUrl: './channelscan.component.html',
+    styleUrls: ['./channelscan.component.css'],
+    standalone: true,
+    imports: [DropdownModule, FormsModule, Checkbox, Button, NgIf, Fieldset, InputNumber, TranslateDirective, ProgressBar, ScrollPanel, TranslatePipe]
 })
 export class ChannelscanComponent implements OnInit, AfterViewInit {
 

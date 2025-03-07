@@ -1,13 +1,23 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { NgForm, FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { Fieldset } from 'primeng/fieldset';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputNumber } from 'primeng/inputnumber';
+import { NgIf } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
 
 @Component({
-  selector: 'app-rec-priorities',
-  templateUrl: './rec-priorities.component.html',
-  styleUrls: ['./rec-priorities.component.css']
+    selector: 'app-rec-priorities',
+    templateUrl: './rec-priorities.component.html',
+    styleUrls: ['./rec-priorities.component.css'],
+    standalone: true,
+    imports: [FormsModule, Card, PrimeTemplate, Fieldset, DropdownModule, InputNumber, NgIf, Message, Button, TranslatePipe]
 })
 export class RecPrioritiesComponent implements OnInit, AfterViewInit {
 

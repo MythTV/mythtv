@@ -5,17 +5,34 @@ import { MythLanguageList, Language } from "../../../services/interfaces/languag
 import { ConfigService } from '../../../services/config.service';
 import { WizardData } from '../../../services/interfaces/wizarddata.interface';
 import { SetupWizardService } from 'src/app/services/setupwizard.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { SetupService } from 'src/app/services/setup.service';
 import { Observable, of } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { MythService } from 'src/app/services/myth.service';
+import { Card } from 'primeng/card';
+import { PrimeTemplate } from 'primeng/api';
+import { Listbox } from 'primeng/listbox';
+import { NgIf } from '@angular/common';
+import { Message } from 'primeng/message';
+import { Button } from 'primeng/button';
 
 @Component({
     selector: 'app-selectlanguage',
     templateUrl: './selectlanguage.component.html',
     styleUrls: ['./selectlanguage.component.css'],
     encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [
+        FormsModule,
+        Card,
+        PrimeTemplate,
+        Listbox,
+        NgIf,
+        Message,
+        Button,
+        TranslatePipe,
+    ],
 })
 
 export class SelectLanguageComponent implements OnInit, AfterViewInit {

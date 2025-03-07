@@ -8,8 +8,8 @@ describe('EncodersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EncodersComponent ]
-    })
+    imports: [EncodersComponent]
+})
     .compileComponents();
   });
 

@@ -8,8 +8,8 @@ describe('BackendWarningComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BackendWarningComponent ]
-    })
+    imports: [BackendWarningComponent]
+})
     .compileComponents();
   });
 

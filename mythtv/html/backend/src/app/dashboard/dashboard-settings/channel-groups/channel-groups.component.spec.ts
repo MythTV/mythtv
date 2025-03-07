@@ -8,8 +8,8 @@ describe('ChannelGroupsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ChannelGroupsComponent]
-    });
+    imports: [ChannelGroupsComponent]
+});
     fixture = TestBed.createComponent(ChannelGroupsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

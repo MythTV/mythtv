@@ -8,8 +8,8 @@ describe('ChannelIconComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ChannelIconComponent ]
-    })
+    imports: [ChannelIconComponent]
+})
     .compileComponents();
   });
 

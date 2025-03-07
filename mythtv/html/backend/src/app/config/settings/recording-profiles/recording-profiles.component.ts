@@ -1,18 +1,35 @@
 import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { CaptureCardService } from 'src/app/services/capture-card.service';
 import { RecProfile, RecProfileGroup } from 'src/app/services/interfaces/recprofile.interface';
 import { SetupService } from 'src/app/services/setup.service';
 import { ProfileGroupComponent } from './profile-group/profile-group.component';
 import { Router } from '@angular/router';
+import { Card } from 'primeng/card';
+import { Accordion, AccordionTab } from 'primeng/accordion';
+import { NgFor, NgIf } from '@angular/common';
+import { PrimeTemplate } from 'primeng/api';
+import { Button } from 'primeng/button';
 
 @Component({
-  selector: 'app-recording-profiles',
-  templateUrl: './recording-profiles.component.html',
-  styleUrls: ['./recording-profiles.component.css'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-recording-profiles',
+    templateUrl: './recording-profiles.component.html',
+    styleUrls: ['./recording-profiles.component.css'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [
+        Card,
+        Accordion,
+        NgFor,
+        AccordionTab,
+        PrimeTemplate,
+        NgIf,
+        ProfileGroupComponent,
+        Button,
+        TranslatePipe,
+    ],
 })
 export class RecordingProfilesComponent implements OnInit {
 

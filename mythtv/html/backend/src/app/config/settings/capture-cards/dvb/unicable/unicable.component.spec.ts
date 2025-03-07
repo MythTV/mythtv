@@ -8,8 +8,8 @@ describe('UnicableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UnicableComponent ]
-    })
+    imports: [UnicableComponent]
+})
     .compileComponents();
   });
 

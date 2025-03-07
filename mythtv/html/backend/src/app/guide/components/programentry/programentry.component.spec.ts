@@ -8,8 +8,8 @@ describe('ProgramEntryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProgramEntryComponent ]
-    })
+    imports: [ProgramEntryComponent]
+})
     .compileComponents();
   });
 

@@ -8,8 +8,8 @@ describe('RotorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RotorComponent ]
-    })
+    imports: [RotorComponent]
+})
     .compileComponents();
   });
 

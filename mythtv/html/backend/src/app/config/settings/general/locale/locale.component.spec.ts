@@ -8,8 +8,8 @@ describe('LocaleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LocaleComponent ]
-    })
+    imports: [LocaleComponent]
+})
     .compileComponents();
   });
 
