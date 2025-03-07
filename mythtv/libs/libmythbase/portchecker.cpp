@@ -119,64 +119,64 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
 // Windows does not need the scope on the ip address so we can skip
 // some processing
 #ifndef _WIN32
-            int iCardsEnd = 0;
-            if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
+        int iCardsEnd = 0;
+        if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
+        {
+            addr.setScopeId(QString());
+            while (addr.scopeId().isEmpty() && iCardsEnd<2)
             {
-                addr.setScopeId(QString());
-                while (addr.scopeId().isEmpty() && iCardsEnd<2)
+                // search for the next available IPV6 interface.
+                if (iCard.hasNext())
                 {
-                    // search for the next available IPV6 interface.
-                    if (iCard.hasNext())
+                    QNetworkInterface card = iCard.next();
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
+                    unsigned int flags = card.flags();
+                    if ((flags & QNetworkInterface::IsLoopBack)
+                     || !(flags & QNetworkInterface::IsRunning))
+                        continue;
+                    // check that IPv6 is enabled on that interface
+                    QList<QNetworkAddressEntry> addresses = card.addressEntries();
+                    bool foundv6 = false;
+                    for (const auto& ae : std::as_const(addresses))
                     {
-                        QNetworkInterface card = iCard.next();
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
-                        unsigned int flags = card.flags();
-                        if ((flags & QNetworkInterface::IsLoopBack)
-                         || !(flags & QNetworkInterface::IsRunning))
-                            continue;
-                        // check that IPv6 is enabled on that interface
-                        QList<QNetworkAddressEntry> addresses = card.addressEntries();
-                        bool foundv6 = false;
-                        for (const auto& ae : std::as_const(addresses))
+                        if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
                         {
-                            if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                            {
-                                foundv6 = true;
-                                break;
-                            }
-                        }
-                        if (foundv6)
-                        {
-                            scope = card.name();
-                            addr.setScopeId(scope);
+                            foundv6 = true;
                             break;
                         }
                     }
-                    else
+                    if (foundv6)
                     {
-                        // Get a new list in case a new interface
-                        // has been added.
-                        cards = QNetworkInterface::allInterfaces();
-                        iCard = cards;
-                        iCard.toFront();
-                        testedAll=true;
-                        iCardsEnd++;
+                        scope = card.name();
+                        addr.setScopeId(scope);
+                        break;
                     }
                 }
+                else
+                {
+                    // Get a new list in case a new interface
+                    // has been added.
+                    cards = QNetworkInterface::allInterfaces();
+                    iCard = cards;
+                    iCard.toFront();
+                    testedAll=true;
+                    iCardsEnd++;
+                }
             }
-            if (iCardsEnd > 1)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("There is no IPV6 compatible interface for %1")
-                  .arg(host));
-                break;
-            }
+        }
+        if (iCardsEnd > 1)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("There is no IPV6 compatible interface for %1")
+              .arg(host));
+            break;
+        }
 #endif
-            QString dest;
-            if (isIPAddress)
-                dest=addr.toString();
-            else
-                dest=host;
-            socket.connectToHost(dest, port);
+        QString dest;
+        if (isIPAddress)
+            dest=addr.toString();
+        else
+            dest=host;
+        socket.connectToHost(dest, port);
 
         MythTimer attempt_time {MythTimer::kStartRunning};
         static constexpr std::chrono::milliseconds k_poll_interval {1ms};
