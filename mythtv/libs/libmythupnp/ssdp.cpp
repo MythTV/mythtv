@@ -171,7 +171,7 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
     int nSize = sRequest.size();
 
     QUdpSocket socket;
-    socket.bind(QHostAddress(QHostAddress::AnyIPv4), 0);
+    socket.bind(QHostAddress(QHostAddress::AnyIPv4), SSDP_PORT, QUdpSocket::ShareAddress);
     if (socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
     {
         LOG(VB_GENERAL, LOG_INFO, "SSDP::PerformSearch - did not write entire buffer.");
