@@ -41,6 +41,8 @@ class SSDPReceiver : public QObject
   public:
     SSDPReceiver();
 
+    void performSearch(const QString &sST, std::chrono::seconds timeout = 2s);
+
   private slots:
     void processPendingDatagrams();
 
@@ -80,9 +82,8 @@ class UPNP_PUBLIC SSDP
         ~SSDP();
 
         /** @brief Send a SSDP discover multicast datagram.
-        @note This needs an SSDPReceiver instance to process the replies and add to the SSDPCache.
         */
-        static void PerformSearch(const QString &sST, std::chrono::seconds timeout = 2s);
+        void PerformSearch(const QString &sST, std::chrono::seconds timeout = 2s);
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();

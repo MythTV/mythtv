@@ -151,10 +151,12 @@ void SSDP::DisableNotifications()
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
 void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
+{
+    m_receiver.performSearch(sST, timeout);
+}
+
+void SSDPReceiver::performSearch(const QString &sST, std::chrono::seconds timeout)
 {
     timeout = std::clamp(timeout, 1s, 5s);
     QString rRequest = QString("M-SEARCH * HTTP/1.1\r\n"
@@ -170,16 +172,14 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
     QByteArray sRequest = rRequest.toUtf8();
     int nSize = sRequest.size();
 
-    QUdpSocket socket;
-    socket.bind(QHostAddress(QHostAddress::AnyIPv4), SSDP_PORT, QUdpSocket::ShareAddress);
-    if (socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
+    if (m_socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
     {
         LOG(VB_GENERAL, LOG_INFO, "SSDP::PerformSearch - did not write entire buffer.");
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
 
-    if (socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
+    if (m_socket.writeDatagram(sRequest, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT) != nSize)
     {
         LOG(VB_GENERAL, LOG_INFO, "SSDP::PerformSearch - did not write entire buffer.");
     }
