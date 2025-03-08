@@ -27,6 +27,7 @@
             <ul class="toolbar list-none p-0 m-0 md:flex md:align-items-center select-none md:flex-row surface-section border-1
              md:border-none surface-border right-0 top-100 z-2 shadow-2 md:shadow-none absolute md:static"
                 [hidden]="m_showNavbar">
+                <!-- 
                 <li class="toolbar" style="height: 80px;">
                     <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.switchTheme' | translate }}"
                         (click)="themePanel.toggle($event)"
@@ -40,6 +41,7 @@
                         <span class="p-ink"></span>
                     </a>
                 </li>
+ -->
                 <li class="toolbar" style="height: 80px;">
                     <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.changeLanguage' | translate }}"
                         (click)="languagePanel.toggle($event)"
@@ -66,7 +68,8 @@
 
 </div>
 
-<p-overlayPanel #themePanel [showCloseIcon]="true" [style]="{width: '350px'}">
+<!-- 
+<p-popover #themePanel [showCloseIcon]="true" [style]="{width: '350px'}">
     <ng-template pTemplate>
         <p-table [value]="m_themes$" selectionMode="single" [paginator]="false" sortField="Name" sortMode="single"
             [scrollable]="true" scrollHeight="500px" rowGroupMode="subheader" groupRowsBy="Category"
@@ -87,21 +90,20 @@
             </ng-template>
         </p-table>
     </ng-template>
-</p-overlayPanel>
+</p-popover>
+ -->
 
-<p-overlayPanel #languagePanel [showCloseIcon]="true" [style]="{width: '450px'}">
-    <ng-template pTemplate>
-        <p-table [value]="m_languages" selectionMode="single" [paginator]="false" sortField="NativeLanguage"
-            sortMode="single" [scrollable]="true" scrollHeight="500px" responsiveLayout="scroll">
-            <ng-template pTemplate="body" let-rowData let-language>
-                <tr [pSelectableRow]="rowData" (click)="languagePanel.hide(); changeLanguage(language)">
-                    <td style="max-width:80px"><img src="images/locale/{{language.Image}}" [alt]="language.image"
-                            class="theme-image" /></td>
-                    <td>
-                        <pre><span class="font-bold">{{language.Language}}</span><br>{{language.NativeLanguage}} </pre>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
-    </ng-template>
-</p-overlayPanel>
+<p-popover #languagePanel [showCloseIcon]="true" [style]="{width: '450px', height: '1000px'}">
+   <p-table [value]="m_languages" selectionMode="single" [paginator]="false" sortField="NativeLanguage"
+        sortMode="single" [scrollable]="true" scrollHeight="500px" responsiveLayout="scroll">
+        <ng-template pTemplate="body" let-rowData let-language>
+            <tr [pSelectableRow]="rowData" (click)="languagePanel.hide(); changeLanguage(language)">
+                <td style="max-width:80px"><img src="images/locale/{{language.Image}}" [alt]="language.image"
+                        class="theme-image" /></td>
+                <td>
+                    <pre><span class="font-bold">{{language.Language}}</span><br>{{language.NativeLanguage}} </pre>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-popover>

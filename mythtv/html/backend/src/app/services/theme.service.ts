@@ -11,11 +11,11 @@ export class ThemeService {
     constructor(private http: HttpClient, @Inject(DOCUMENT) private document: Document) { }
 
     switchTheme(theme: string) {
-        let themeLink = this.document.getElementById('app-theme') as HTMLLinkElement;
+        // let themeLink = this.document.getElementById('app-theme') as HTMLLinkElement;
 
-        if (themeLink) {
-            themeLink.href = "assets/themes/" + theme;
-        }
+        // if (themeLink) {
+        //     themeLink.href = "assets/themes/" + theme;
+        // }
     }
 
     getThemes() {

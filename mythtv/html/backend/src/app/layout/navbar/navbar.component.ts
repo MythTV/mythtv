@@ -12,7 +12,7 @@ import { NgIf } from '@angular/common';
 import { Ripple } from 'primeng/ripple';
 import { ButtonDirective } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
 import { PrimeTemplate } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 
@@ -21,7 +21,7 @@ import { TableModule } from 'primeng/table';
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.css'],
     standalone: true,
-    imports: [NgIf, Ripple, ButtonDirective, Tooltip, OverlayPanelModule, PrimeTemplate, TableModule, TranslatePipe]
+    imports: [NgIf, Ripple, ButtonDirective, Tooltip, PopoverModule, PrimeTemplate, TableModule, TranslatePipe]
 })
 export class NavbarComponent implements OnInit {
 

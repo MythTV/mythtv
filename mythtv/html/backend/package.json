@@ -25,7 +25,7 @@
     "cookie": "^0.7.0",
     "cross-spawn": "^7.0.6",
     "esbuild": "^0.25.0",
-    "primeflex": "^3.1.2",
+    "primeflex": "^4.0.0",
     "primeng": "^18.0.2",
     "rxjs": "^7.8.1",
     "tslib": "^2.1.0",
