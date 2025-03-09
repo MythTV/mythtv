@@ -518,11 +518,15 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
         if (!manualSelect)
         {
             // If this is a backend, No longer prompt for database.
-            // Instaed allow the web server to start so that the
+            // Instead allow the web server to start so that the
             // database can be set up there
             if (gCoreContext->IsBackend()
                 || !PromptForDatabaseParams(failure))
                 goto NoDBfound;
+            // The database params have changed!  Re-read our local copy.
+            dbParams = GetMythDB()->GetDatabaseParams();
+            setLocalHostName(dbParams.m_localHostName);
+            dbParamsFromFile = dbParams;
         }
         failure = TestDBconnection();
         if (!failure.isEmpty())
