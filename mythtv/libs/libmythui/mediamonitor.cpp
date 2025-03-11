@@ -146,7 +146,6 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted,
                                                    bool showUsable)
 {
     QList <MythMediaDevice *>           drives;
-    QList <MythMediaDevice *>::iterator it;
     QMutexLocker                        locker(&m_devicesLock);
 
     for (MythMediaDevice *dev : std::as_const(m_devices))
