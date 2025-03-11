@@ -59,10 +59,10 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
                               quint16 /*SenderPort*/)
 {
     QString errormsg;
-    int line = 0;
-    int column = 0;
     QDomDocument doc;
 #if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+    int line = 0;
+    int column = 0;
     if (!doc.setContent(Buffer, false, &errormsg, &line, &column))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error parsing xml: Line: %1 Column: %2 Error: %3")
