@@ -1504,7 +1504,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         uint evDescLen = std::max(event.m_description.length(), 1);
 #else
-        uint evDescLen = std::max(event.m_description.length(), 1LL);
+        uint evDescLen = std::max(event.m_description.length(), static_cast<qsizetype>(1));
 #endif
 
         if ((matchLen < lSUBTITLE_MAX_LEN) &&
@@ -1722,7 +1722,7 @@ void EITFixUp::FixRTL(DBEventEIT &event)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             uint evDescLen = std::max(event.m_description.length(), 1);
 #else
-            uint evDescLen = std::max(event.m_description.length(), 1LL);
+            uint evDescLen = std::max(event.m_description.length(), static_cast<qsizetype>(1));
 #endif
 
             if ((matchLen < lSUBTITLE_MAX_LEN) &&

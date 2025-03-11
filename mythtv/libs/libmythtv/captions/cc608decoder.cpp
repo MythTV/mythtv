@@ -677,7 +677,7 @@ void CC608Decoder::BufferCC(size_t mode, int len, int clr)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         len = std::min(tmpbuf.length(), 255);
 #else
-        len = std::min(tmpbuf.length(), 255LL);
+        len = std::min(tmpbuf.length(), static_cast<qsizetype>(255));
 #endif
     }
 

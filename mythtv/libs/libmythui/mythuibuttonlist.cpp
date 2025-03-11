@@ -860,7 +860,7 @@ bool MythUIButtonList::DistributeButtons(void)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             start_button = std::max(m_buttonList.size() / 2, 0);
 #else
-            start_button = std::max(m_buttonList.size() / 2, 0LL);
+            start_button = std::max(m_buttonList.size() / 2, static_cast<qsizetype>(0));
 #endif
             start_button = (start_button / std::max(m_columns, 1)) * m_columns;
 

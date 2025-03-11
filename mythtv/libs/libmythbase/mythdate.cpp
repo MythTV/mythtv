@@ -282,7 +282,7 @@ QString formatTime(std::chrono::milliseconds msecs, QString fmt)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         int width = std::min(3, match.capturedLength());
 #else
-        int width = std::min(3LL, match.capturedLength());
+        int width = std::min(static_cast<qsizetype>(3), match.capturedLength());
 #endif
         int value = (msecs % 1s).count() / divisor[width];
         QString text = StringUtil::intToPaddedString(value, width);
