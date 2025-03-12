@@ -7,7 +7,7 @@
 # Check for -q "quiet" flag.
 #
 VERBOSE=true
-if [ "x$1" == "x-q" ]; then
+if [ "x$1" = "x-q" ]; then
     VERBOSE=false
     shift;
 fi
