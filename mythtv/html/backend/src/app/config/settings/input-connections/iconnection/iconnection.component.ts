@@ -64,6 +64,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     isEncoder: false,
     isUnscanable: false,
     hasTuner: false,
+    isTunerSharable: false,
     showPresetTuner: false,
     // For input group
     inputGroupName: "",
@@ -108,6 +109,11 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
 
   hasTunerTypes = [
     "DVB", "HDHOMERUN", "FREEBOX", "CETON", "VBOX", "SATIP"
+  ];
+
+  tunerSharableTypes = [
+    "DVB", "HDHOMERUN", "ASI", "FREEBOX", "CETON", "EXTERNAL",
+    "VBOX", "V4L2ENC", "SATIP"
   ];
 
   quickTuneValues = [
@@ -171,6 +177,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     this.work.isEncoder = (this.preEncodedTypes.indexOf(this.card.CardType) < 0);
     this.work.isUnscanable = (this.unscanableTypes.indexOf(this.card.CardType) >= 0);
     this.work.hasTuner = (this.hasTunerTypes.indexOf(this.card.CardType) >= 0);
+    this.work.isTunerSharable = (this.tunerSharableTypes.indexOf(this.card.CardType) >= 0);
     if (this.work.isEncoder || this.work.isUnscanable)
       if (this.work.hasTuner || this.card.CardType == "EXTERNAL")
         this.work.showPresetTuner = true;
@@ -179,6 +186,10 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
     }
     if (!this.card.DisplayName)
       this.card.DisplayName = "Input " + this.card.CardId;
+    if (!this.work.isTunerSharable) {
+      this.card.SchedGroup = false;
+      this.card.RecLimit = 1;
+    }
     this.captureCardService.GetCaptureDeviceList(this.card.CardType)
       .subscribe({
         next: data => {

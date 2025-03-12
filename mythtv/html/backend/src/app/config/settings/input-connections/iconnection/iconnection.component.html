@@ -207,6 +207,7 @@
                             <label for="RecLimit" class="label block">{{ 'settings.iconnection.maxrec_label' | translate
                                 }}</label>
                             <p-inputNumber [(ngModel)]="card.RecLimit" name="RecLimit" id="RecLimit"
+                                [disabled]="!work.isTunerSharable"
                                 [showButtons]="true" [min]="1" [max]="10" [step]="1"></p-inputNumber>
                             <small class="block">
                                 {{ 'settings.iconnection.maxrec_desc' | translate }}
@@ -216,6 +217,7 @@
                         <div class="form-group field">
                             <p-checkbox inputId="SchedGroup" [(ngModel)]="card.SchedGroup" name="SchedGroup"
                                 #DVBWaitForSeqStart="ngModel" class="label mb-2 w-full" [binary]="true"
+                                [disabled]="!work.isTunerSharable"
                                 label="{{ 'settings.iconnection.schedgrp_label' | translate }}">
                             </p-checkbox>
                             <small class="block">
