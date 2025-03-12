@@ -6290,7 +6290,7 @@ bool LoadFromRecorded(
             flags |= inUseMap[key];
 
         if (((flags & FL_COMMPROCESSING) != 0U) &&
-            (isJobRunning.find(key) == isJobRunning.end()))
+            (!isJobRunning.contains(key)))
         {
             flags &= ~FL_COMMPROCESSING;
             save_not_commflagged = true;

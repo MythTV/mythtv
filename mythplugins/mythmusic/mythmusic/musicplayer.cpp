@@ -1653,7 +1653,7 @@ StreamList  *MusicPlayer::getStreamList(void)
 
 int MusicPlayer::getNotificationID (const QString& hostname)
 {
-    if (m_notificationMap.find(hostname) == m_notificationMap.end())
+    if (!m_notificationMap.contains(hostname))
         m_notificationMap.insert(hostname, GetNotificationCenter()->Register(this));
 
     return m_notificationMap[hostname];

@@ -5559,7 +5559,7 @@ void TV::SwitchSource(uint Direction)
     for (auto & input : inputs)
     {
         // prefer the current card's input in sources list
-        if ((sources.find(input.m_sourceId) == sources.end()) ||
+        if ((!sources.contains(input.m_sourceId)) ||
             ((cardid == input.m_inputId) && (cardid != sources[input.m_sourceId].m_inputId)))
         {
             sources[input.m_sourceId] = input;
@@ -9688,7 +9688,7 @@ void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
       JUMPCAST|Amanda Burton|133897|Recorded
       JUMPCAST|Amanda Burton|133897|Upcoming
     */
-    if (m_progLists.find(actor) == m_progLists.end())
+    if (!m_progLists.contains(actor))
     {
         QString table = "recordedcredits";
         MSqlQuery query(MSqlQuery::InitCon());

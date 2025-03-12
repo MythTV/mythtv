@@ -1145,7 +1145,7 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
 
     QStringList localActions;
     auto * keycontext = m_priv->m_keyContexts.value(Context);
-    if (AllowJumps && (m_priv->m_jumpMap.count(keynum) > 0) &&
+    if (AllowJumps && (m_priv->m_jumpMap.contains(keynum)) &&
         (!m_priv->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
         keycontext && (keycontext->GetMapping(keynum, localActions)))
     {
@@ -1153,7 +1153,7 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
             AllowJumps = false;
     }
 
-    if (AllowJumps && m_priv->m_jumpMap.count(keynum) > 0 &&
+    if (AllowJumps && m_priv->m_jumpMap.contains(keynum) &&
             !m_priv->m_jumpMap[keynum]->m_exittomain && m_priv->m_exitMenuCallback == nullptr)
     {
         void (*callback)(void) = m_priv->m_jumpMap[keynum]->m_callback;
@@ -1162,7 +1162,7 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
     }
 
     if (AllowJumps &&
-        m_priv->m_jumpMap.count(keynum) > 0 && m_priv->m_exitMenuCallback == nullptr)
+        m_priv->m_jumpMap.contains(keynum) && m_priv->m_exitMenuCallback == nullptr)
     {
         m_priv->m_exitingtomain = true;
         m_priv->m_exitMenuCallback = m_priv->m_jumpMap[keynum]->m_callback;
@@ -1387,7 +1387,7 @@ void MythMainWindow::BindJump(const QString& Destination, const QString& Key)
         int keynum = keyseq[i].toCombined();
 #endif
 
-        if (m_priv->m_jumpMap.count(keynum) == 0)
+        if (!m_priv->m_jumpMap.contains(keynum))
         {
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, QString("Binding: %1 to JumpPoint: %2")
@@ -1456,7 +1456,7 @@ void MythMainWindow::ClearAllJumps()
 
 void MythMainWindow::JumpTo(const QString& Destination, bool Pop)
 {
-    if (m_priv->m_destinationMap.count(Destination) > 0 && m_priv->m_exitMenuCallback == nullptr)
+    if (m_priv->m_destinationMap.contains(Destination) && m_priv->m_exitMenuCallback == nullptr)
     {
         m_priv->m_exitingtomain = true;
         m_priv->m_popwindows = Pop;
@@ -1469,7 +1469,7 @@ void MythMainWindow::JumpTo(const QString& Destination, bool Pop)
 
 bool MythMainWindow::DestinationExists(const QString& Destination) const
 {
-    return m_priv->m_destinationMap.count(Destination) > 0;
+    return m_priv->m_destinationMap.contains(Destination);
 }
 
 QStringList MythMainWindow::EnumerateDestinations() const
@@ -1480,7 +1480,7 @@ QStringList MythMainWindow::EnumerateDestinations() const
 void MythMainWindow::RegisterMediaPlugin(const QString& Name, const QString& Desc,
                                          MediaPlayCallback Func)
 {
-    if (m_priv->m_mediaPluginMap.count(Name) == 0)
+    if (!m_priv->m_mediaPluginMap.contains(Name))
     {
         LOG(VB_GENERAL, LOG_NOTICE, QString("Registering %1 as a media playback plugin.")
             .arg(Name));

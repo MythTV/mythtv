@@ -314,7 +314,7 @@ void ScreenSetup::loadData()
         TypeListInfo ti(dataitem, location,
                         m_sourceManager->getSourceByName(src));
 
-        if (active_screens.find(draworder) == active_screens.end())
+        if (!active_screens.contains(draworder))
         {
             auto *si = new ScreenListInfo(screenListMap[name]);
             // Clear types first as we will re-insert the values from the database

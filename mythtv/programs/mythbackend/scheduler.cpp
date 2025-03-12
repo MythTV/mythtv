@@ -4748,8 +4748,7 @@ void Scheduler::AddNewRecords(void)
         {
             newrecstatus = RecStatus::Offline;
             if (p->m_schedOrder == 0 &&
-                m_schedOrderWarned.find(p->GetInputID()) ==
-                                            m_schedOrderWarned.end())
+                !m_schedOrderWarned.contains(p->GetInputID()))
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Channel %1, Title %2 %3 cardinput.schedorder = %4, "

@@ -204,7 +204,7 @@ bool ActionSet::AddAction(const ActionID &id,
     ContextMap::iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
         cit = m_contexts.insert(id.GetContext(), ActionContext());
-    else if ((*cit).find(id.GetAction()) != (*cit).end())
+    else if ((*cit).contains(id.GetAction()))
         return false;
 
     auto *a = new Action(description, keys);

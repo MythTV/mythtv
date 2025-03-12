@@ -624,7 +624,7 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     float dfl       = (qctrl.default_value - qctrl.minimum) / new_range;
     int   norm_dfl  = (0x10000 + (int)(dfl * old_range) - 32768) & 0xFFFF;
 
-    if (m_pictAttrDefault.find(db_col_name) == m_pictAttrDefault.end())
+    if (!m_pictAttrDefault.contains(db_col_name))
     {
         if (m_deviceName == "pcHDTV HD3000 HDTV")
         {
@@ -682,7 +682,7 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
         db_col_name, m_inputId);
     int dfield = 0;
 
-    if (m_pictAttrDefault.find(db_col_name) != m_pictAttrDefault.end())
+    if (m_pictAttrDefault.contains(db_col_name))
         dfield = m_pictAttrDefault[db_col_name];
 
     int val = (cfield + sfield + dfield) & 0xFFFF;

@@ -643,7 +643,7 @@ bool DVBStreamData::HasCachedAllNIT(bool current) const
         return true;
 
     for (uint i = 0; i <= last_section; i++)
-        if (m_cachedNit.find(i) == m_cachedNit.end())
+        if (!m_cachedNit.contains(i))
             return false;
 
     return true;
@@ -658,7 +658,7 @@ bool DVBStreamData::HasCachedAnyBAT(uint batid, bool current) const
             "Currently we ignore \'current\' param");
 
     for (uint i = 0; i <= 255; i++)
-        if (m_cachedBats.find((batid << 8) | i) != m_cachedBats.end())
+        if (m_cachedBats.contains((batid << 8) | i))
             return true;
 
     return false;
@@ -741,7 +741,7 @@ bool DVBStreamData::HasCachedAnySDT(uint tsid, bool current) const
             "Currently we ignore \'current\' param");
 
     for (uint i = 0; i <= 255; i++)
-        if (m_cachedSdts.find((tsid << 8) | i) != m_cachedSdts.end())
+        if (m_cachedSdts.contains((tsid << 8) | i))
             return true;
 
     return false;

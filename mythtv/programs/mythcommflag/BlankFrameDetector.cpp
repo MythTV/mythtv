@@ -277,7 +277,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                                 .arg(brkb).arg(brke - 1));
                         break;
                     }
-                    if (breakMap->find(newbrkb) == breakMap->end())
+                    if (!breakMap->contains(newbrkb))
                     {
                         breakMap->insert(newbrkb, brke - newbrkb);
                         inserted = true;

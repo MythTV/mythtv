@@ -535,7 +535,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
         d->m_settingsCacheLock.lockForWrite();
         // another thread may have inserted a value into the cache
         // while we did not have the lock, check first then save
-        if (d->m_settingsCache.find(key) == d->m_settingsCache.end())
+        if (!d->m_settingsCache.contains(key))
             d->m_settingsCache[key] = value;
         d->m_settingsCacheLock.unlock();
     }
@@ -650,7 +650,7 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
 
             // another thread may have inserted a value into the cache
             // while we did not have the lock, check first then save
-            if (d->m_settingsCache.find(key) == d->m_settingsCache.end())
+            if (!d->m_settingsCache.contains(key))
             {
                 key.squeeze();
                 value.squeeze();
@@ -778,7 +778,7 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
         myKey.squeeze();
         value.squeeze();
         d->m_settingsCacheLock.lockForWrite();
-        if (d->m_settingsCache.find(myKey) == d->m_settingsCache.end())
+        if (!d->m_settingsCache.contains(myKey))
             d->m_settingsCache[myKey] = value;
         d->m_settingsCacheLock.unlock();
     }

@@ -1587,14 +1587,14 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                 else
                 {
                     elements = doc.toVariant().toMap();
-                    if (elements.find("serial") == elements.end())
+                    if (!elements.contains("serial"))
                         continue;
 
                     serial = elements["serial"].toInt();
                     if (serial >= m_serialNo)
                         break;
 
-                    if (elements.find("status") != elements.end() &&
+                    if (elements.contains("status") &&
                         elements["status"] != "OK")
                     {
                         LOG(VB_RECORD, LOG_WARNING, LOC + QString("%1: %2")
@@ -1622,7 +1622,7 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                 .arg(serial)
                 .arg(QString(cmdbuf)));
         }
-        else if (elements.find("status") == elements.end())
+        else if (!elements.contains("status"))
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("ProcessJson: ExternalRecorder 'status' not found in %1")
@@ -1716,7 +1716,7 @@ bool ExternalStreamHandler::CheckForError(void)
                 else
                 {
                     elements = doc.toVariant().toMap();
-                    if (elements.find("command") != elements.end() &&
+                    if (elements.contains("command") &&
                         elements["command"] == "STATUS")
                     {
                         LogLevel_t level { LOG_INFO };

@@ -1240,7 +1240,7 @@ bool MPEGStreamData::HasCachedAnyPAT(uint tsid) const
     QMutexLocker locker(&m_cacheLock);
 
     for (uint i = 0; i <= 255; i++)
-        if (m_cachedPats.find((tsid << 8) | i) != m_cachedPats.end())
+        if (m_cachedPats.contains((tsid << 8) | i))
             return true;
 
     return false;
@@ -1276,7 +1276,7 @@ bool MPEGStreamData::HasCachedAnyCAT(uint tsid) const
     QMutexLocker locker(&m_cacheLock);
 
     for (uint i = 0; i <= 255; i++)
-        if (m_cachedCats.find((tsid << 8) | i) != m_cachedCats.end())
+        if (m_cachedCats.contains((tsid << 8) | i))
             return true;
 
     return false;
@@ -1312,7 +1312,7 @@ bool MPEGStreamData::HasCachedAnyPMT(uint pnum) const
     QMutexLocker locker(&m_cacheLock);
 
     for (uint i = 0; i <= 255; i++)
-        if (m_cachedPmts.find((pnum << 8) | i) != m_cachedPmts.end())
+        if (m_cachedPmts.contains((pnum << 8) | i))
             return true;
 
     return false;

@@ -309,7 +309,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         // PIDs that need to be added..
         for (auto lit = pids.constBegin(); lit != pids.constEnd(); ++lit)
         {
-            if ((*lit != 0U) && (m_pidInfo.find(lit.key()) == m_pidInfo.end()))
+            if ((*lit != 0U) && (!m_pidInfo.contains(lit.key())))
             {
                 add_pids[lit.key()] = CreatePIDInfo(
                     lit.key(), StreamID::PrivSec, 0);
@@ -319,7 +319,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         // PIDs that need to be removed..
         for (auto fit = m_pidInfo.cbegin(); fit != m_pidInfo.cend(); ++fit)
         {
-            bool in_pids = pids.find(fit.key()) != pids.end();
+            bool in_pids = pids.contains(fit.key());
             if (!in_pids)
                 del_pids.push_back(fit.key());
         }

@@ -416,7 +416,7 @@ bool Commands::ProcessCommand(const QString & query)
     }
     else if (cmd == "BlockSize")
     {
-        if (elements.find("value") == elements.end())
+        if (!elements.contains("value"))
             SendStatus(cmd, "ERR", serial, "Missing block size value");
         else
             SetBlockSize(serial, elements["value"].toUInt());

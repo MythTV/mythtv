@@ -149,7 +149,7 @@ void BackendSelection::AddItem(DeviceLocation *dev)
     m_mutex.lock();
 
     // The devices' USN should be unique. Don't add if it is already there:
-    if (m_devices.find(usn) == m_devices.end())
+    if (!m_devices.contains(usn))
     {
         dev->IncrRef();
         m_devices.insert(usn, dev);

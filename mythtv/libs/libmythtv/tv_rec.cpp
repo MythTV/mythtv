@@ -1452,8 +1452,7 @@ void TVRec::run(void)
             bool enable_ui  = true;
 
             m_pendingRecLock.lock();
-            bool rec_soon   =
-                m_pendingRecordings.find(m_inputId) != m_pendingRecordings.end();
+            bool rec_soon   = m_pendingRecordings.contains(m_inputId);
             m_pendingRecLock.unlock();
 
             if (has_rec && (has_finish || (now > m_recordEndTime)))

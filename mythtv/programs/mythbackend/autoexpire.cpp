@@ -1112,7 +1112,7 @@ bool AutoExpire::IsInDontExpireSet(
     QString key = QString("%1_%2")
         .arg(chanid).arg(recstartts.toString(Qt::ISODate));
 
-    return (m_dontExpireSet.find(key) != m_dontExpireSet.end());
+    return (m_dontExpireSet.contains(key));
 }
 
 bool AutoExpire::IsInExpireList(
