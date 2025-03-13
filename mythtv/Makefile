@@ -101,20 +101,21 @@ test: libs/libmythbase/version.h subdirs
 	cd libs ; $(MAKE) test
 	cd programs ; $(MAKE) test
 
+SOURCES:=mythtv mythplugins platform themestringstool
 ctags tags:
 	@echo "Making tags..."
 	@cd .. ; rm -f tags
-	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs -r ctags -a
+	@cd .. ; find $(SOURCES) -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs -r ctags -a
 
 etags TAGS:
 	@echo "Making TAGS..."
 	@cd .. ; rm -f TAGS
-	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs -r etags -a
+	@cd .. ; find ${SOURCES} -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs -r etags -a
 
 global GPATH GRTAGS GTAGS:
 	@echo "Making global tags..."
 	@cd .. ; rm -f GPATH GRTAGS GTAGS
-	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | gtags -f -
+	@cd .. ; find ${SOURCES} -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | gtags -f -
 
 cleanall: clean
 	@echo "Removing old moc and .o files missed by 'clean'..."
