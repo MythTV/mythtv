@@ -116,15 +116,17 @@ MythVideoDRMBuffer::MythVideoDRMBuffer(MythDRMPtr Device, AVDRMFrameDescriptor* 
     }
 
     // add the video frame FB
-    if (auto ret = drmModeAddFB2WithModifiers(m_device->GetFD(), static_cast<uint32_t>(Size.width()),
+    auto ret = drmModeAddFB2WithModifiers(m_device->GetFD(), static_cast<uint32_t>(Size.width()),
                                    static_cast<uint32_t>(Size.height()), format,
                                    handles.data(), pitches.data(), offsets.data(),
-                                   modifiers.data(), &m_fb, flags); ret < 0)
+                                   modifiers.data(), &m_fb, flags);
+    if (ret < 0)
     {
         // Try without modifiers
-        if (ret = drmModeAddFB2(m_device->GetFD(), static_cast<uint32_t>(Size.width()),
+        ret = drmModeAddFB2(m_device->GetFD(), static_cast<uint32_t>(Size.width()),
                                 static_cast<uint32_t>(Size.height()), format,
-                                handles.data(), pitches.data(), offsets.data(), &m_fb, flags); ret < 0)
+                                handles.data(), pitches.data(), offsets.data(), &m_fb, flags);
+        if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create framebuffer (error: %1)").arg(ret));
             return;
