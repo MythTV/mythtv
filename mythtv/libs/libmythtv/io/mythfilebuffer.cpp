@@ -211,7 +211,8 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
             openAttempts++;
 
             m_fd2 = open(m_filename.toLocal8Bit().constData(),
-                       O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
+                         // NOLINTNEXTLINE(misc-redundant-expression)
+                         O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
 
             if (m_fd2 < 0)
             {
