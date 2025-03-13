@@ -123,6 +123,9 @@ Checks: '-*,
        -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
        -clang-analyzer-security.insecureAPI.strcpy,
 
+        # Disable these warnings until they can be analyzed. ,
+       -clang-analyzer-optin.cplusplus.VirtualCall,
+
     cppcoreguidelines-*,
 
         # Skip tests that are redirects to other tests. ,
