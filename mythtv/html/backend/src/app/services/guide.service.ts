@@ -71,11 +71,11 @@ export class GuideService {
     return this.httpClient.get<string>('/Guide/GetChannelIcon', { params });
   }
 
-  public GetProgramDetails(request: GetProgramDetailsRequest): Observable<ScheduleOrProgram> {
+  public GetProgramDetails(request: GetProgramDetailsRequest): Observable<{Program: ScheduleOrProgram}> {
     let params = new HttpParams()
       .set("ChanId", request.ChanId)
       .set("StartTime", request.StartTime);
-    return this.httpClient.get<ScheduleOrProgram>('/Guide/GetProgramDetails', { params });
+    return this.httpClient.get<{Program: ScheduleOrProgram}>('/Guide/GetProgramDetails', { params });
   }
 
   public GetProgramGuide(reqDate?: Date, ChannelGroupId?: number): Observable<ProgramGuide> {

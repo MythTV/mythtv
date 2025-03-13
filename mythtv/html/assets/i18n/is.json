@@ -287,6 +287,7 @@
             "add_tables_label": "Viðbótartöflur",
             "autoexpire_label": "Rennur sjálfkrafa út",
             "autoextend_label": "Sjálfvirk framlenging",
+            "cast": "Leikarar",
             "channel_label": "Rás",
             "description_label": "Lýsing",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Fjöldi aukamínúta til að taka upp í lok",
             "extend_none": "Enginn",
             "filters_label": "Síuvalkostir",
+            "fulldetails": "Upplýsingar",
             "heading": "Skipuleggðu upptöku",
             "inetref_desc": "Notaðu TheTVDB, TVmaze eða TMDB til að fletta upp upptökulýsigögnum. Veldu valhnapp fyrir ofan og notaðu hlekkinn til að leita á vefsíðunni. Þegar þú hefur fundið réttu röðina á vefsíðunni skaltu velja hana og afrita tölulega auðkennið af vefslóðinni, eða af vefsíðunni ef um er að ræða thetvdb.com. Sláðu það inn í inntaksreitinn strax á eftir forskeytinu xxxx.py_",
             "inetref_label": "Auðkenni lýsigagnaleitar (InetRef)",

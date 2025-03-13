@@ -287,6 +287,7 @@
             "add_tables_label": "Ytterligare tabeller",
             "autoexpire_label": "Utgår automatiskt",
             "autoextend_label": "Automatisk förlängning",
+            "cast": "KASTA",
             "channel_label": "Kanal",
             "description_label": "Beskrivning",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Antal extra minuter att spela in vid slutet",
             "extend_none": "Ingen",
             "filters_label": "Filteralternativ",
+            "fulldetails": "Information",
             "heading": "Schemalägg inspelning",
             "inetref_desc": "Använd TheTVDB, TVmaze eller TMDB för att slå upp inspelningsmetadata. Välj en alternativknapp ovan och använd länken för att söka på webbplatsen. När du har hittat rätt serie på webbsidan, välj den och kopiera det numeriska ID:t från URL:en eller från webbsidan när det gäller thetvdb.com. Ange det i inmatningsrutan omedelbart efter prefixet xxxx.py_",
             "inetref_label": "Metadata Lookup Id (InetRef)",

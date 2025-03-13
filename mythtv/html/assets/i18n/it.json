@@ -287,6 +287,7 @@
             "add_tables_label": "Tabelle aggiuntive",
             "autoexpire_label": "Scadenza automatica",
             "autoextend_label": "Estendi automaticamente",
+            "cast": "LANCIO",
             "channel_label": "Canale",
             "description_label": "Descrizione",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Numero di minuti extra da registrare alla fine",
             "extend_none": "Nessuno",
             "filters_label": "Opzioni filtro",
+            "fulldetails": "Dettagli",
             "heading": "Pianifica la registrazione",
             "inetref_desc": "Usa TheTVDB, TVmaze o TMDB per cercare i metadati delle registrazioni. Seleziona un pulsante di opzione in alto e utilizza il collegamento per la ricerca nel sito web. Una volta trovata la serie corretta nella pagina web, selezionala e copia l'id numerico dall'URL, o dalla pagina web nel caso di thetvdb.com. Inseriscilo quindi nella campo subito dopo il prefisso xxxx.py_",
             "inetref_label": "ID ricerca metadati (InetRef)",

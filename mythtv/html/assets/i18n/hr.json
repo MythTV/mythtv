@@ -287,6 +287,7 @@
             "add_tables_label": "Dodatne tablice",
             "autoexpire_label": "Automatski istek",
             "autoextend_label": "Automatsko proširenje",
+            "cast": "Bacanje",
             "channel_label": "Kanal",
             "description_label": "Opis",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Broj dodatnih minuta za snimanje na kraju",
             "extend_none": "Nijedan",
             "filters_label": "Opcije filtra",
+            "fulldetails": "Detalji",
             "heading": "Zakažite snimanje",
             "inetref_desc": "Koristite TheTVDB, TVmaze ili TMDB za traženje metapodataka snimanja. Odaberite radio gumb iznad i upotrijebite vezu za pretraživanje web stranice. Nakon što pronađete ispravnu seriju na web stranici, odaberite je i kopirajte numerički ID s URL-a ili s web stranice u slučaju thetvdb.com. Unesite to u okvir za unos odmah nakon prefiksa xxxx.py_",
             "inetref_label": "ID traženja metapodataka (InetRef)",

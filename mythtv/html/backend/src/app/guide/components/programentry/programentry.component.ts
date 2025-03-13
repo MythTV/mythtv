@@ -3,6 +3,8 @@ import { ScheduleOrProgram } from 'src/app/services/interfaces/program.interface
 import { GuideComponent } from '../../guide.component';
 import { DataService } from 'src/app/services/data.service';
 import { Channel } from 'src/app/services/interfaces/channel.interface';
+import { UtilityService } from 'src/app/services/utility.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-guide-programentry',
@@ -21,7 +23,8 @@ export class ProgramEntryComponent implements OnInit {
   catclass = ''
   regex = /[^a-z0-9]/g;
 
-  constructor(public dataService: DataService) {
+  constructor(public dataService: DataService, private utility: UtilityService,
+    private translate: TranslateService) {
   }
 
   ngOnInit(): void {
@@ -49,4 +52,19 @@ export class ProgramEntryComponent implements OnInit {
     if (this.guideComponent.inter.sched)
       this.guideComponent.inter.sched.open(this.program, this.channel);
   }
+
+  formatAirDate(): string {
+    if (!this.program.Airdate)
+      return '';
+    let date = this.program.Airdate + ' 00:00';
+    return this.utility.formatDate(date, false);
+  }
+
+  getToolTip() {
+    let ret = '';
+    if (this.program.Airdate)
+      ret = this.translate.instant('dashboard.recordings.orig_airdate') + ' ' + this.formatAirDate() + '\n';
+    return ret + this.program.Description;
+  }
+
 }

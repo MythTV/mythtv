@@ -287,6 +287,7 @@
             "add_tables_label": "Tableaux supplémentaires",
             "autoexpire_label": "Expiration automatique",
             "autoextend_label": "Extension automatique",
+            "cast": "CASTING",
             "channel_label": "Canaliser",
             "description_label": "Description",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Nombre de minutes supplémentaires à enregistrer à la fin",
             "extend_none": "Aucun",
             "filters_label": "Options de filtrage",
+            "fulldetails": "Détails",
             "heading": "Planifier l'enregistrement",
             "inetref_desc": "Utilisez TheTVDB, TVmaze ou TMDB pour rechercher les métadonnées d'enregistrement. Sélectionnez un bouton radio ci-dessus et utilisez le lien pour effectuer une recherche sur le site Web. Une fois que vous avez trouvé la série correcte sur la page Web, sélectionnez-la et copiez l'identifiant numérique à partir de l'URL ou de la page Web dans le cas de thetvdb.com. Entrez cela dans la zone de saisie immédiatement après le préfixe xxxx.py_",
             "inetref_label": "ID de recherche de métadonnées (InetRef)",

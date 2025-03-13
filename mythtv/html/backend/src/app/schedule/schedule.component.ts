@@ -11,6 +11,8 @@ import { RecordScheduleRequest } from '../services/interfaces/dvr.interface';
 import { Observable, of } from 'rxjs';
 import { UtilityService } from '../services/utility.service';
 import { ChannelService } from '../services/channel.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { GuideService } from '../services/guide.service';
 
 export interface SchedulerSummary {
   refresh(): void;
@@ -43,6 +45,7 @@ interface MyChannel extends Channel {
 export class ScheduleComponent implements OnInit {
   @Input() inter!: ScheduleLink;
   @ViewChild("schedform") currentForm!: NgForm;
+  @ViewChild("overlay") overlay!: OverlayPanel;
 
   displayDlg = false;
   displayUnsaved = false;
@@ -83,6 +86,7 @@ export class ScheduleComponent implements OnInit {
   templates: RecRule[] = [];
   typeList: ListEntry[] = [];
   allChannels: MyChannel[] = [];
+  fullDetails : string = '';
 
   srchTypeList: ListEntry[] = [
     { prompt: this.translate.instant('recrule.srch_None'), value: 'None' },
@@ -134,7 +138,8 @@ export class ScheduleComponent implements OnInit {
 
 
   constructor(private dvrService: DvrService, private translate: TranslateService,
-    private mythService: MythService, public utility: UtilityService, private channelService: ChannelService) {
+    private mythService: MythService, public utility: UtilityService, private channelService: ChannelService,
+    private guideService: GuideService) {
   }
 
   ngOnInit(): void {
@@ -737,6 +742,39 @@ export class ScheduleComponent implements OnInit {
       this.currentForm.form.markAsDirty();
     },
   };
+
+  detailsreq(event: any) {
+    this.fullDetails = '';
+    if (!this.recRule)
+      return;
+    this.guideService.GetProgramDetails({
+      ChanId: this.recRule.ChanId,
+      StartTime: this.recRule.StartTime
+    }).subscribe((prog) => {
+      let combo: any = {};
+      let parms = [];
+      if (this.program)
+        combo = this.program;
+      combo = { ...combo, ...this.recRule };
+      for (const [key, value] of Object.entries(combo)) {
+        if (value != null && typeof value != 'object')
+          parms.push(`${key}: ${value}`);
+      }
+      parms.sort();
+      if (prog.Program.Cast.CastMembers
+        && prog.Program.Cast.CastMembers.length > 0) {
+        parms.push('');
+        parms.push(this.translate.instant('dashboard.sched.cast'));
+        prog.Program.Cast.CastMembers.forEach((member) => {
+          let chName = member.CharacterName ? member.CharacterName : member.TranslatedRole;
+          parms.push(chName + ': ' + member.Name)
+        });
+      }
+      this.fullDetails = parms.join('<br>');
+      this.overlay.show(event);
+    });
+  }
+
 
   save() {
     this.errortext = '';

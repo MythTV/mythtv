@@ -287,6 +287,7 @@
             "add_tables_label": "Tabelas Adicionais",
             "autoexpire_label": "Expiração Automática",
             "autoextend_label": "Estender automaticamente",
+            "cast": "ELENCO",
             "channel_label": "Canal",
             "description_label": "Descrição",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Número de minutos extras a serem registrados no final",
             "extend_none": "Nenhum",
             "filters_label": "Opções de filtro",
+            "fulldetails": "Detalhes",
             "heading": "Agendar gravação",
             "inetref_desc": "Use TheTVDB, TVmaze ou TMDB para procurar metadados de gravação. Selecione um botão de opção acima e use o link para pesquisar no site. Depois de encontrar a série correta na página da web, selecione-a e copie o id numérico da URL ou da página da web no caso de thetvdb.com. Digite isso na caixa de entrada imediatamente após o prefixo xxxx.py_",
             "inetref_label": "ID de pesquisa de metadados (InetRef)",

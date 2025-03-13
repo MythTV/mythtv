@@ -287,6 +287,7 @@
             "add_tables_label": "Additional Tables",
             "autoexpire_label": "Auto Expire",
             "autoextend_label": "Auto Extend",
+            "cast": "CAST",
             "channel_label": "Channel",
             "description_label": "Description",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Number of Extra Minutes to Record at End",
             "extend_none": "None",
             "filters_label": "Filter Options",
+            "fulldetails": "Details",
             "heading": "Schedule recording",
             "inetref_desc": "Use TheTVDB, TVmaze or TMDB to look up recording metadata. Select a radio button above and use the link to search the web site. Once you find the correct series on the web page, select it and copy the numeric id from the URL, or from the web page in the case of thetvdb.com. Enter that in the input box immediately after the prefix xxxx.py_",
             "inetref_label": "Metadata Lookup Id (InetRef)",

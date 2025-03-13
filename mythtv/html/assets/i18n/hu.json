@@ -287,6 +287,7 @@
             "add_tables_label": "További táblázatok",
             "autoexpire_label": "Automatikus lejárat",
             "autoextend_label": "Automatikus kiterjesztés",
+            "cast": "ÖNTVÉNY",
             "channel_label": "Csatorna",
             "description_label": "Leírás",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "A végén rögzítendő többletpercek száma",
             "extend_none": "Egyik sem",
             "filters_label": "Szűrési beállítások",
+            "fulldetails": "Részletek",
             "heading": "Felvétel ütemezése",
             "inetref_desc": "A felvétel metaadatainak megkereséséhez használja a TheTVDB, TVmaze vagy TMDB alkalmazást. Válassza ki a fenti rádiógombot, és használja a hivatkozást a webhelyen való kereséshez. Ha megtalálta a megfelelő sorozatot a weboldalon, válassza ki azt, és másolja ki a numerikus azonosítót az URL-ből, vagy a thetvdb.com esetében a weboldalról. Írja be ezt a beviteli mezőbe közvetlenül az xxxx.py_ előtag után",
             "inetref_label": "Metaadat-keresési azonosító (InetRef)",

@@ -287,6 +287,7 @@
             "add_tables_label": "Ytterligere tabeller",
             "autoexpire_label": "Utløper automatisk",
             "autoextend_label": "Autoutvid",
+            "cast": "Støpe",
             "channel_label": "Kanal",
             "description_label": "Beskrivelse",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Antall ekstra minutter å registrere ved slutten",
             "extend_none": "Ingen",
             "filters_label": "Filteralternativer",
+            "fulldetails": "Detaljer",
             "heading": "Planlegg opptak",
             "inetref_desc": "Bruk TheTVDB, TVmaze eller TMDB for å slå opp opptaksmetadata. Velg en alternativknapp ovenfor og bruk lenken for å søke på nettstedet. Når du finner den riktige serien på nettsiden, velg den og kopier den numeriske ID-en fra URL-en, eller fra nettsiden i tilfellet thetvdb.com. Skriv inn det i inndataboksen umiddelbart etter prefikset xxxx.py_",
             "inetref_label": "Metadataoppslags-ID (InetRef)",

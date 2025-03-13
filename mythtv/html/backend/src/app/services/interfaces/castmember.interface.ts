@@ -1,6 +1,9 @@
 
 export interface CastMember {
-    CastMember: string; // No proper info
+    Name:           string;
+    CharacterName:  string;
+    Role:           string;
+    TranslatedRole: string;
 }
 
 export interface CastMemberList {

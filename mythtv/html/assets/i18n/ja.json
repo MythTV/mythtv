@@ -287,6 +287,7 @@
             "add_tables_label": "追加のテーブル",
             "autoexpire_label": "自動期限切れ",
             "autoextend_label": "自動延長",
+            "cast": "キャスト",
             "channel_label": "チャネル",
             "description_label": "説明",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "終了時に追加で録画する分数",
             "extend_none": "なし",
             "filters_label": "フィルターオプション",
+            "fulldetails": "詳細",
             "heading": "スケジュール録画",
             "inetref_desc": "TheTVDB、TVmaze、または TMDB を使用して録画メタデータを検索します。上のラジオ ボタンを選択し、リンクを使用して Web サイトを検索します。 Web ページで正しいシリーズを見つけたら、それを選択し、URL から、または thetvdb.com の場合は Web ページから数値 ID をコピーします。プレフィックス xxxx.py_ の直後に入力ボックスにそれを入力します。",
             "inetref_label": "メタデータ ルックアップ ID (InetRef)",

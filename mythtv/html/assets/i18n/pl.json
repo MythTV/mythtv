@@ -287,6 +287,7 @@
             "add_tables_label": "Dodatkowe tabele",
             "autoexpire_label": "Automatyczne wygasanie",
             "autoextend_label": "Automatyczne rozszerzenie",
+            "cast": "RZUCAĆ",
             "channel_label": "Kanał",
             "description_label": "Opis",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Liczba dodatkowych minut do nagrania na końcu",
             "extend_none": "Nic",
             "filters_label": "Opcje filtra",
+            "fulldetails": "Bliższe dane",
             "heading": "Zaplanuj nagrywanie",
             "inetref_desc": "Użyj TheTVDB, TVmaze lub TMDB, aby wyszukać metadane nagrania. Wybierz przycisk radiowy powyżej i użyj łącza, aby przeszukać witrynę internetową. Po znalezieniu odpowiedniego serialu na stronie internetowej wybierz go i skopiuj numeryczny identyfikator z adresu URL lub ze strony internetowej w przypadku thetvdb.com. Wpisz to w polu wejściowym bezpośrednio po prefiksie xxxx.py_",
             "inetref_label": "Identyfikator wyszukiwania metadanych (InetRef)",

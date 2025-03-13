@@ -287,6 +287,7 @@
             "add_tables_label": "Taules addicionals",
             "autoexpire_label": "Caducitat automàtica",
             "autoextend_label": "Extensió automàtica",
+            "cast": "Fondre",
             "channel_label": "Canal",
             "description_label": "Descripció",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Nombre de minuts addicionals per gravar al final",
             "extend_none": "Cap",
             "filters_label": "Opcions de filtre",
+            "fulldetails": "Detalls",
             "heading": "Programa la gravació",
             "inetref_desc": "Utilitzeu TheTVDB, TVmaze o TMDB per cercar metadades de gravació. Seleccioneu un botó d'opció a dalt i utilitzeu l'enllaç per cercar al lloc web. Un cop trobeu la sèrie correcta a la pàgina web, seleccioneu-la i copieu l'identificador numèric de l'URL o de la pàgina web en el cas de thetvdb.com. Introduïu-ho al quadre d'entrada immediatament després del prefix xxxx.py_",
             "inetref_label": "Identificador de cerca de metadades (InetRef)",

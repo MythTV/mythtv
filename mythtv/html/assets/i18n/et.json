@@ -287,6 +287,7 @@
             "add_tables_label": "Täiendavad tabelid",
             "autoexpire_label": "Automaatne aegumine",
             "autoextend_label": "Automaatne pikendamine",
+            "cast": "Valatud",
             "channel_label": "Kanal",
             "description_label": "Kirjeldus",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Lõpus salvestatavate lisaminutite arv",
             "extend_none": "Mitte ühtegi",
             "filters_label": "Filtri valikud",
+            "fulldetails": "Detailid",
             "heading": "Salvestamise ajakava",
             "inetref_desc": "Salvestamise metaandmete otsimiseks kasutage rakendust TheTVDB, TVmaze või TMDB. Valige ülaltoodud raadionupp ja kasutage veebisaidilt otsimiseks linki. Kui leiate veebilehelt õige seeria, valige see ja kopeerige numbriline ID URL-ist või veebisaidilt thetvdb.com veebilehelt. Sisestage see sisestuskasti kohe pärast eesliidet xxxx.py_",
             "inetref_label": "Metaandmete otsingu ID (InetRef)",

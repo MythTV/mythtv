@@ -287,6 +287,7 @@
             "add_tables_label": "Dodatne tabele",
             "autoexpire_label": "Samodejni potek",
             "autoextend_label": "Samodejno podaljšanje",
+            "cast": "Igralska zasedba",
             "channel_label": "Kanal",
             "description_label": "Opis",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Število dodatnih minut za snemanje ob koncu",
             "extend_none": "Noben",
             "filters_label": "Možnosti filtra",
+            "fulldetails": "Podrobnosti",
             "heading": "Načrtujte snemanje",
             "inetref_desc": "Za iskanje metapodatkov o snemanju uporabite TheTVDB, TVmaze ali TMDB. Izberite izbirni gumb zgoraj in uporabite povezavo za iskanje po spletnem mestu. Ko najdete pravilno serijo na spletni strani, jo izberite in kopirajte številčni ID iz URL-ja ali s spletne strani v primeru thetvdb.com. To vnesite v vnosno polje takoj za predpono xxxx.py_",
             "inetref_label": "ID iskanja metapodatkov (InetRef)",

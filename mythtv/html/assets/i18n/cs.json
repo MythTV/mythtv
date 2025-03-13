@@ -287,6 +287,7 @@
             "add_tables_label": "Doplňkové tabulky",
             "autoexpire_label": "Automatické vypršení platnosti",
             "autoextend_label": "Automatické prodloužení",
+            "cast": "OBSAZENÍ",
             "channel_label": "Kanál",
             "description_label": "Popis",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Počet minut navíc k záznamu na konci",
             "extend_none": "Žádný",
             "filters_label": "Možnosti filtru",
+            "fulldetails": "Podrobnosti",
             "heading": "Naplánujte nahrávání",
             "inetref_desc": "K vyhledání metadat nahrávky použijte TheTVDB, TVmaze nebo TMDB. Vyberte přepínač výše a použijte odkaz k vyhledávání na webu. Jakmile na webové stránce najdete správnou sérii, vyberte ji a zkopírujte číselné ID z adresy URL nebo z webové stránky v případě thetvdb.com. Zadejte to do vstupního pole bezprostředně za předponou xxxx.py_",
             "inetref_label": "ID vyhledávání metadat (InetRef)",

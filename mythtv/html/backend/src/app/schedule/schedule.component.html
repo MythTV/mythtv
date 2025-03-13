@@ -1,5 +1,5 @@
 <form class="ml-3 mr-3" name="schedform" #schedform="ngForm">
-    <div *ngIf="recRule">
+    <div #dlg *ngIf="recRule">
         <p-dialog header="{{ 'dashboard.sched.heading' | translate }}" [(visible)]="displayDlg" [modal]="true"
             [style]="{height: '90vw', width: '700px'}" [closable]="false" [closeOnEscape]="false">
             <p> {{ recRule.CallSign }}</p>
@@ -216,7 +216,8 @@
                 <label for="StorageGroup" class="label block">{{ 'dashboard.sched.sgroup_label' | translate
                     }}</label>
                 <p-dropdown [options]="recStorageGroups" [(ngModel)]="recRule.StorageGroup" [editable]="false"
-                    [maxlength]="0" [style]="{'minWidth':'400px'}" name="StorageGroup" #StorageGroup="ngModel">
+                    [maxlength]="0" [style]="{'minWidth':'400px'}" name="StorageGroup" #StorageGroup="ngModel"
+                    appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -299,10 +300,6 @@
                 </small>
             </div>
 
-            <!-- Blank space here is so that the dropdown box can fit, otherwise there can be an impossible
-                 situation with the scroll bars and the dropdown box-->
-            <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-
             <ng-template pTemplate="footer">
                 <div class="col-12" style="text-align: left;">
                     <p-message *ngIf="successCount > 0 && errorCount == 0 && !schedform.dirty" severity="success"
@@ -310,6 +307,15 @@
                     <p-message *ngIf="errorCount > 0" severity="error"
                         text="{{ 'common.backenderror' | translate }}:  {{errortext}}"></p-message>
                 </div>
+                <p-overlayPanel #overlay >
+                    <p-scrollPanel [style]="{ width: '650px', height: '70vh' }"  [step]="100">
+                        <div [innerHTML]='fullDetails'></div>
+                    </p-scrollPanel>
+                </p-overlayPanel>
+                <p-button icon="pi pi-list" (onClick)="detailsreq($event)"
+                    *ngIf="recRule.Type != 'Recording Template'"
+                    label="{{ 'dashboard.sched.fulldetails' | translate }}">
+                </p-button>
                 <p-button icon="pi pi-times-circle" (onClick)="close()" label="{{ 'common.close' | translate }}"
                     styleClass="p-button-warning">
                 </p-button>

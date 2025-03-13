@@ -287,6 +287,7 @@
             "add_tables_label": "Lisätaulukot",
             "autoexpire_label": "Automaattinen vanheneminen",
             "autoextend_label": "Automaattinen laajennus",
+            "cast": "HEITTÄÄ",
             "channel_label": "kanava",
             "description_label": "Kuvaus",
             "dupin": {
@@ -307,6 +308,7 @@
             "endoffset_label": "Tallennettavien lisäminuuttien määrä lopussa",
             "extend_none": "Ei mitään",
             "filters_label": "Suodatinvalinnat",
+            "fulldetails": "Yksityiskohdat",
             "heading": "Aikatauluta tallennus",
             "inetref_desc": "Käytä TheTVDB:tä, TVmazea tai TMDB:tä etsiäksesi tallennuksen metatietoja. Valitse yllä oleva valintanappi ja hae Web-sivustosta linkin avulla. Kun löydät oikean sarjan verkkosivulta, valitse se ja kopioi numeerinen tunnus URL-osoitteesta tai verkkosivulta, jos kyseessä on thetvdb.com. Kirjoita se syöttöruutuun heti etuliite xxxx.py_ jälkeen",
             "inetref_label": "Metatietojen hakutunnus (InetRef)",
