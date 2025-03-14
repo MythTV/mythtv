@@ -415,6 +415,7 @@
             "date": "Kuupäev",
             "encoder": "Kodeerija",
             "heading": "Tulemas",
+            "length": "Pikkus",
             "recrule": "Salvestusreegel",
             "restart_err": "VIGA: salvestamist ei saa uuesti alustada.",
             "showall": "Kõik olekuväärtused",

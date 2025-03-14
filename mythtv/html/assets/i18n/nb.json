@@ -415,6 +415,7 @@
             "date": "Dato",
             "encoder": "Enkoder",
             "heading": "Kommende",
+            "length": "Lengde",
             "recrule": "Opptaksregel",
             "restart_err": "FEIL: Kan ikke starte opptaket på nytt.",
             "showall": "Alle statusverdier",

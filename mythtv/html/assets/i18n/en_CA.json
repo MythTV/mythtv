@@ -415,6 +415,7 @@
             "date": "Date",
             "encoder": "Encoder",
             "heading": "Upcoming",
+            "length": "Length",
             "recrule": "Recording Rule",
             "restart_err": "ERROR: Unable to Restart Recording.",
             "showall": "All Status Values",

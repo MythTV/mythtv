@@ -415,6 +415,7 @@
             "date": "Fecha",
             "encoder": "codificador",
             "heading": "próximos",
+            "length": "Longitud",
             "recrule": "Regla de grabación",
             "restart_err": "ERROR: No se puede reiniciar la grabación.",
             "showall": "Todos los valores de estado",

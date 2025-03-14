@@ -415,6 +415,7 @@
             "date": "Datum",
             "encoder": "Encoder",
             "heading": "Kommande",
+            "length": "Längd",
             "recrule": "Inspelningsregel",
             "restart_err": "FEL: Det gick inte att starta om inspelningen.",
             "showall": "Alla statusvärden",

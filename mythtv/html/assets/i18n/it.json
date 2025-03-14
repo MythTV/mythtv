@@ -415,6 +415,7 @@
             "date": "Data",
             "encoder": "Encoder",
             "heading": "In arrivo",
+            "length": "Lunghezza",
             "recrule": "Regola di registrazione",
             "restart_err": "ERRORE: impossibile riavviare la registrazione.",
             "showall": "Tutti i valori di stato",

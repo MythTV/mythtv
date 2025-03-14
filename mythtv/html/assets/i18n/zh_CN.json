@@ -415,6 +415,7 @@
             "date": "日期",
             "encoder": "编码器",
             "heading": "即将推出",
+            "length": "长度",
             "recrule": "录音规则",
             "restart_err": "错误：无法重新开始录制。",
             "showall": "所有状态值",

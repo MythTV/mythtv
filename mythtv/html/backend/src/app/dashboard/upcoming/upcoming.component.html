@@ -26,6 +26,12 @@
                             placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" class="'px-3">
                         </p-dropdown>
 
+                        &nbsp;&nbsp;&nbsp; {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp;
+
+                        <p-dropdown [(ngModel)]="selectedRecGroup" [options]="recGroups" name="filter" (onChange)="onFilter()"
+                            placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" class="'px-3">
+                        </p-dropdown>
+
                         <!-- Refresh button and number of rows. -->
                         <div *ngIf="refreshing else refreshBn"><p-progressSpinner
                                 [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
@@ -45,7 +51,9 @@
                         </th>
                         <th style="width: 7%" class="justify-content-end p-1">
                             {{ 'dashboard.upcoming.time' | translate }} </th>
-                        <th style="width: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
+                        <th style="width: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1" pSortableColumn="Length">
+                            {{ 'dashboard.upcoming.length' | translate }}<p-sortIcon field="Length"></p-sortIcon>
+                        </th>
                         <th style="width: 8%" class="p-1">{{ 'dashboard.upcoming.encoder' |
                             translate }} </th>
                         <th style="width: 11%" class="p-1" pSortableColumn="Title">
@@ -63,8 +71,8 @@
                             }} <p-sortIcon field="Channel.ChanNum"></p-sortIcon></th>
                         <th style="width: 8%" class="p-1">
                             {{ 'dashboard.recordings.recgrp' | translate }} </th>
-                        <th style="width: 7%" class="p-1">
-                            {{ 'dashboard.upcoming.status' | translate }} </th>
+                        <th style="width: 7%" class="p-1" pSortableColumn="StatusName">
+                            {{ 'dashboard.upcoming.status' | translate }} <p-sortIcon field="StatusName"></p-sortIcon></th>
                         <th style="width: 4%" class="p-1" style="white-space: nowrap;">
                             <button pButton pRipple icon="pi pi-paperclip" [disabled]="true"
                                 class="p-button-text p-button-primary"></button>

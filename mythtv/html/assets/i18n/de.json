@@ -415,6 +415,7 @@
             "date": "Datum",
             "encoder": "Encoder",
             "heading": "Bevorstehende",
+            "length": "Länge",
             "recrule": "Aufzeichnungsregel",
             "restart_err": "FEHLER: Aufnahme kann nicht neu gestartet werden.",
             "showall": "Alle Statuswerte",

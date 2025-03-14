@@ -415,6 +415,7 @@
             "date": "Data",
             "encoder": "Koder",
             "heading": "Nadchodzące",
+            "length": "Długość",
             "recrule": "Zasada nagrywania",
             "restart_err": "BŁĄD: Nie można ponownie rozpocząć nagrywania.",
             "showall": "Wszystkie wartości stanu",

@@ -32,6 +32,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   allRecRules: RuleListEntry[] = [];
   activeRecRules: RuleListEntry[] = [];
   defaultRecRule: RuleListEntry = { Id: 0, Title: 'settings.chanedit.all' };
+  recGroups: string[] = [];
   restartErrMsg = 'dashboard.upcoming.restart_err';
   editingProgram?: ScheduleOrProgram;
   displayUpdateDlg = false;
@@ -48,6 +49,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   virtualScrollItemSize = 0;
   selectedRule: RuleListEntry | null = null;
   selectedStatus = '';
+  selectedRecGroup: string | null = null;
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService, public dataService: DataService,
@@ -55,6 +57,11 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.translate.get(this.defaultRecRule.Title).subscribe(data => this.defaultRecRule.Title = data);
     this.translate.get(this.restartErrMsg).subscribe(data => this.restartErrMsg = data);
     this.loadRecRules();
+
+    this.dvrService.GetRecGroupList('schedule')
+      .subscribe((data) => {
+        this.recGroups = data.RecGroupList;
+      });
   }
 
   ngOnInit(): void {
@@ -134,8 +141,11 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       request.RecStatus = this.selectedStatus;
     if (this.selectedRule != null && this.selectedRule.Id != 0)
       request.RecordId = this.selectedRule.Id;
+    if (this.selectedRecGroup)
+      request.RecGroup = this.selectedRecGroup
+
     this.recRules.length = 0;
-    if (request.ShowAll)
+    if (this.selectedStatus && this.selectedStatus != 'Default')
       this.recRules.push(...this.allRecRules)
     else
       this.recRules.push(...this.activeRecRules)

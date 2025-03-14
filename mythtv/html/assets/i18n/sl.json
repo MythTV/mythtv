@@ -415,6 +415,7 @@
             "date": "Datum",
             "encoder": "Kodirnik",
             "heading": "Prihajajoče",
+            "length": "Dolžina",
             "recrule": "Pravilo snemanja",
             "restart_err": "NAPAKA: Snemanja ni mogoče znova začeti.",
             "showall": "Vse vrednosti stanja",

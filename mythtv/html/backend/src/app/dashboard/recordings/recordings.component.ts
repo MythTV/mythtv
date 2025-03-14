@@ -112,10 +112,9 @@ export class RecordingsComponent implements OnInit {
     public utility: UtilityService) {
     this.JobQCmds = this.setupService.getJobQCommands();
 
-    this.dvrService.GetRecGroupList()
+    this.dvrService.GetRecGroupList('recorded')
       .subscribe((data) => {
         this.recGroups = data.RecGroupList;
-        this.recGroups.push('Deleted');
       });
     // translations
     for (const [key, value] of Object.entries(this.msg)) {

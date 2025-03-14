@@ -415,6 +415,7 @@
             "date": "Dátum",
             "encoder": "Kódoló",
             "heading": "Közelgő",
+            "length": "Hossz",
             "recrule": "Felvételi szabály",
             "restart_err": "HIBA: Nem lehet újraindítani a felvételt.",
             "showall": "Minden állapotérték",

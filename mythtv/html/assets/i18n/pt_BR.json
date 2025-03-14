@@ -415,6 +415,7 @@
             "date": "Data",
             "encoder": "Codificador",
             "heading": "Por vir",
+            "length": "Comprimento",
             "recrule": "regra de gravação",
             "restart_err": "ERRO: Não é possível reiniciar a gravação.",
             "showall": "Todos os valores de status",

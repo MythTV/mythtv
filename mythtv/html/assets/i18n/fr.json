@@ -415,6 +415,7 @@
             "date": "Date",
             "encoder": "Encodeur",
             "heading": "A venir",
+            "length": "Longueur",
             "recrule": "Règle d'enregistrement",
             "restart_err": "ERREUR : Impossible de redémarrer l'enregistrement.",
             "showall": "Toutes les valeurs d'état",

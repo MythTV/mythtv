@@ -415,6 +415,7 @@
             "date": "Data",
             "encoder": "Codificador",
             "heading": "Properament",
+            "length": "Llargada",
             "recrule": "Regla de gravació",
             "restart_err": "ERROR: no es pot reiniciar la gravació.",
             "showall": "Tots els valors d'estat",

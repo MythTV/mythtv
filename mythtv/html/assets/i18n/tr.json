@@ -415,6 +415,7 @@
             "date": "Tarih",
             "encoder": "kodlayıcı",
             "heading": "Yaklaşan",
+            "length": "Uzunluk",
             "recrule": "Kayıt Kuralı",
             "restart_err": "HATA: Kayıt Yeniden Başlatılamıyor.",
             "showall": "Tüm Durum Değerleri",

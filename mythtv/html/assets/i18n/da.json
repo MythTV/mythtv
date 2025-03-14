@@ -415,6 +415,7 @@
             "date": "Dato",
             "encoder": "Encoder",
             "heading": "Kommende",
+            "length": "Længde",
             "recrule": "Optagelsesregel",
             "restart_err": "FEJL: Kan ikke genstarte optagelsen.",
             "showall": "Alle statusværdier",

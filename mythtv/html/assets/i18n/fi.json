@@ -415,6 +415,7 @@
             "date": "Päivämäärä",
             "encoder": "Enkooderi",
             "heading": "Tuleva",
+            "length": "Pituus",
             "recrule": "Tallennussääntö",
             "restart_err": "VIRHE: Tallennusta ei voi aloittaa uudelleen.",
             "showall": "Kaikki tilan arvot",

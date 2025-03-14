@@ -189,8 +189,13 @@ export class DvrService {
     return this.httpClient.get<ProgramCategories>('/Dvr/GetProgramCategories', { params })
   }
 
-  public GetRecGroupList(): Observable<RecGroupList> {
-    return this.httpClient.get<RecGroupList>('/Dvr/GetRecGroupList');
+  // UsedBy parameter can be undefined, 'recorded' or 'schedule'
+  public GetRecGroupList(usedBy?: string): Observable<RecGroupList> {
+    let params = new HttpParams();
+    if (usedBy)
+      params = params.set("UsedBy", usedBy)
+    console.log(params)
+    return this.httpClient.get<RecGroupList>('/Dvr/GetRecGroupList', { params });
   }
 
   public GetRecRuleFilterList(): Observable<{ RecRuleFilterList: RecRuleFilterList }> {

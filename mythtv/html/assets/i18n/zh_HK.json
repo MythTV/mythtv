@@ -415,6 +415,7 @@
             "date": "日期",
             "encoder": "編碼器",
             "heading": "即將到來",
+            "length": "長度",
             "recrule": "錄音規則",
             "restart_err": "錯誤：無法重新開始錄製。",
             "showall": "所有狀態值",

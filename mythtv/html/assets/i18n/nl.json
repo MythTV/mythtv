@@ -415,6 +415,7 @@
             "date": "Datum",
             "encoder": "Encoder",
             "heading": "Aanstaande",
+            "length": "Lengte",
             "recrule": "Opname regel",
             "restart_err": "FOUT: Kan de opname niet opnieuw starten.",
             "showall": "Alle statuswaarden",

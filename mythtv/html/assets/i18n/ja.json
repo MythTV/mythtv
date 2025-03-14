@@ -415,6 +415,7 @@
             "date": "日にち",
             "encoder": "エンコーダ",
             "heading": "今後の予定",
+            "length": "長さ",
             "recrule": "録音ルール",
             "restart_err": "エラー: 記録を再開できません。",
             "showall": "すべてのステータス値",

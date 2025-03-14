@@ -415,6 +415,7 @@
             "date": "Datum",
             "encoder": "Koder",
             "heading": "Nadolazeće",
+            "length": "Dužina",
             "recrule": "Pravilo snimanja",
             "restart_err": "POGREŠKA: Nije moguće ponovno pokrenuti snimanje.",
             "showall": "Sve vrijednosti statusa",

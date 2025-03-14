@@ -415,6 +415,7 @@
             "date": "Dagsetning",
             "encoder": "Kóðari",
             "heading": "Væntanlegt",
+            "length": "Lengd",
             "recrule": "Upptökuregla",
             "restart_err": "VILLA: Ekki tókst að endurræsa upptöku.",
             "showall": "Öll stöðugildi",

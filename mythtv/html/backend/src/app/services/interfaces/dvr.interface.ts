@@ -131,6 +131,7 @@ export interface GetUpcomingRequest {
     RecordId?:   number;
     RecStatus?:  string;
     Sort?:       string;
+    RecGroup?:   string;
 }
 
 export interface UpcomingList {
