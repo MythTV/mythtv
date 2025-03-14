@@ -1280,10 +1280,17 @@ V2InputList* V2Dvr::GetInputList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList V2Dvr::GetRecGroupList()
+QStringList V2Dvr::GetRecGroupList( const QString &UsedBy)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT recgroup FROM recgroups WHERE recgroup <> 'Deleted' "
+    if (UsedBy.compare("recorded",Qt::CaseInsensitive) == 0)
+        query.prepare("SELECT DISTINCT recgroup FROM recorded "
+            "ORDER BY recgroup");
+    else if (UsedBy.compare("schedule",Qt::CaseInsensitive) == 0)
+        query.prepare("SELECT DISTINCT recgroup FROM record "
+            "ORDER BY recgroup");
+    else
+        query.prepare("SELECT recgroup FROM recgroups WHERE recgroup <> 'Deleted' "
                   "ORDER BY recgroup");
 
     QStringList result;
@@ -1606,8 +1613,9 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll,
                                         int  nRecordId,
-                                        const QString & RecStatus,
-                                        const QString  &Sort )
+                                        const QString &RecStatus,
+                                        const QString &Sort,
+                                        const QString &RecGroup )
 {
     int nRecStatus = 0;
     if (!RecStatus.isEmpty())
@@ -1630,7 +1638,8 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                          bShowAll,
                                          nRecordId,
                                          nRecStatus,
-                                         Sort );
+                                         Sort,
+                                         RecGroup );
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );

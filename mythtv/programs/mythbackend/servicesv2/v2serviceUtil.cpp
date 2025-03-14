@@ -836,7 +836,8 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
                                         bool bShowAll,
                                         int  nRecordId,
                                         int  nRecStatus,
-                                        const QString  &Sort )
+                                        const QString &Sort,
+                                        const QString &RecGroup )
 {
     RecordingList  recordingList; // Auto-delete deque
     RecList  tmpList; // Standard deque, objects must be deleted
@@ -868,6 +869,16 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
             continue;
         }
 
+        if (!RecGroup.isEmpty())
+        {
+            if ( (*it)-> GetRecordingGroup() != RecGroup )
+            {
+                delete *it;
+                *it = nullptr;
+                continue;
+            }
+        }
+
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
                            ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
                           ((*it)->GetRecordingStatus() == RecStatus::Offline) ||
@@ -891,8 +902,12 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
     int sortType = 0;
     if (Sort.startsWith("channum", Qt::CaseInsensitive))
         sortType = 10;
-    else if (Sort.startsWith("title", Qt::CaseInsensitive))
+        else if (Sort.startsWith("title", Qt::CaseInsensitive))
         sortType = 20;
+    else if (Sort.startsWith("length", Qt::CaseInsensitive))
+        sortType = 30;
+    else if (Sort.startsWith("status", Qt::CaseInsensitive))
+        sortType = 40;
     if (Sort.endsWith("desc", Qt::CaseInsensitive))
         sortType += 1;
 
@@ -916,6 +931,22 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
                 return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) < 0 ;
             case 21:
                 return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) > 0 ;
+            case 30:
+            {
+                qint64 time1 = First->GetScheduledStartTime().msecsTo( First->GetScheduledEndTime());
+                qint64 time2 = Second->GetScheduledStartTime().msecsTo( Second->GetScheduledEndTime());
+                return time1 < time2 ;
+            }
+            case 31:
+            {
+                qint64 time1 = First->GetScheduledStartTime().msecsTo( First->GetScheduledEndTime());
+                qint64 time2 = Second->GetScheduledStartTime().msecsTo( Second->GetScheduledEndTime());
+                return time1 > time2 ;
+            }
+            case 40:
+                return QString::compare(QString(First->GetRecordingStatus()), QString(Second->GetRecordingStatus()), Qt::CaseInsensitive) < 0 ;
+            case 41:
+            return QString::compare(QString(First->GetRecordingStatus()), QString(Second->GetRecordingStatus()), Qt::CaseInsensitive) > 0 ;
         }
         return false;
     };

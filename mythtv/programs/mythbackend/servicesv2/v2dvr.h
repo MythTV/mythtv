@@ -231,13 +231,14 @@ class V2Dvr : public MythHTTPService
                                             bool             ShowAll,
                                             int              RecordId,
                                             const QString &  RecStatus,
-                                            const QString   &Sort);
+                                            const QString   &Sort,
+                                            const QString &  RecGroup);
 
     static V2EncoderList*    GetEncoderList      ( );
 
     static V2InputList*      GetInputList        ( );
 
-    static QStringList       GetRecGroupList     ( );
+    static QStringList       GetRecGroupList     ( const QString   &UsedBy );
 
     static QStringList       GetProgramCategories   ( bool OnlyRecorded );
 

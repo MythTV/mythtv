@@ -94,7 +94,8 @@ int FillUpcomingList(QVariantList& list, QObject* parent,
                                         bool bShowAll,
                                         int  nRecordId,
                                         int  nRecStatus,
-                                        const QString  &Sort = QString());
+                                        const QString  &Sort = QString(),
+                                        const QString &  RecGroup = QString());
 
 void FillFrontendList(QVariantList &list, QObject* parent, bool OnLine);
 
