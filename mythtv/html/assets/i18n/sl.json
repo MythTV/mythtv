@@ -272,6 +272,7 @@
             "watched": "Gledal"
         },
         "recrule": {
+            "active": "Aktivno",
             "type": "Vrsta"
         },
         "recrules": {

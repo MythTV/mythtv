@@ -272,6 +272,7 @@
             "watched": "Смотрели"
         },
         "recrule": {
+            "active": "Активный",
             "type": "Тип"
         },
         "recrules": {

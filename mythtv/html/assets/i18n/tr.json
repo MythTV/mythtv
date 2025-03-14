@@ -272,6 +272,7 @@
             "watched": "izlendi"
         },
         "recrule": {
+            "active": "Aktif",
             "type": "Tip"
         },
         "recrules": {

@@ -272,6 +272,7 @@
             "watched": "Betraktade"
         },
         "recrule": {
+            "active": "Aktiv",
             "type": "Typ"
         },
         "recrules": {

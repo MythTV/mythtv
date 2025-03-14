@@ -272,6 +272,7 @@
             "watched": "Watched"
         },
         "recrule": {
+            "active": "Active",
             "type": "Type"
         },
         "recrules": {
