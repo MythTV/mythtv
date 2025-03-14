@@ -207,8 +207,10 @@ file(COPY ${MYTHTV_INSTALL_PREFIX}/lib/perl5 DESTINATION ${RSRC_DIR}/lib)
 ## Copy the python support files into Resources/lib.
 # If using a Virtual Environment, all of the necessary site-packages should
 # already have been into the install prefix as well
-message(VERBOSE "  Copying python files")
-file(COPY ${MYTHTV_INSTALL_PREFIX}/lib/${PYTHON_BASENAME} DESTINATION ${RSRC_DIR}/lib)
+if(EXISTS ${MYTHTV_INSTALL_PREFIX}/lib/${PYTHON_BASENAME})
+  message(VERBOSE "  Copying python files")
+  file(COPY ${MYTHTV_INSTALL_PREFIX}/lib/${PYTHON_BASENAME} DESTINATION ${RSRC_DIR}/lib)
+endif()
 
 # Copy the application icon into the Resources directory.
 message(VERBOSE "  Copying icons")

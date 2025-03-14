@@ -50,7 +50,7 @@ file(COPY "${Python3_STDLIB}/" DESTINATION ${PYTHON_RSRC_LIB_DIR}
 # already have been copied into the install prefix when the MythTV bindings
 # were installed.  Otherwise all site-packages from the Macports or Homebrew
 # python frameworks must be copied into the app bundle
-if( NOT DEFINED ENV{VIRTUAL_ENV} OR $ENV{VIRTUAL_ENV} STREQUAL "")
+if( NOT DEFINED ENV{VIRTUAL_ENV} OR "$ENV{VIRTUAL_ENV}" STREQUAL "")
   message(VERBOSE "  Adding Embedded Python site-packages into Resources")
   # not all python files are required in the app bundle.  This list is meant to
   # prune known unnecessary files to keep the app bundle size down.
