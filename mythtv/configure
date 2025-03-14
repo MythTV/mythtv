@@ -1736,7 +1736,6 @@ MYTHTV_CONFIG_LIST='
     mmal
     opengl
     egl
-    qtwebkit
     qtscript
     qtdbus
     sqlite3
@@ -2212,8 +2211,6 @@ enable system_libexiv2
 enable system_libbluray
 enable system_libudfread
 enable waylandextras
-# Enable by default so that we can explicitly disable using --disable-qtwebkit
-enable qtwebkit
 enable qtscript
 
 # mythtv paths
@@ -5829,18 +5826,8 @@ esac
 # qtwebkit and qtscript are enabled by default.
 # if either is disabled om the command line we will
 # not enable it here.
+# QtWebkit is no longer packaged by some distros.
 if [ $qt_version -lt $(version2num "6.0.0") ]; then
-    if enabled qtwebkit ; then
-        if ! pkg-config --exists Qt5WebKit && ! pkg-config --exists QtWebKit ; then
-            check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF || disable qtwebkit
-#include <QtWebKit/QtWebKit>
-int main(void){ return 0; }
-EOF
-        fi
-    fi
-
-    enabled qtwebkit || warn "QtWebkit disabled."
-
     if enabled qtscript ; then
         if ! pkg-config --exists Qt5Script && ! pkg-config --exists QtScript ; then
             check_ecxx ${qt_inc} <<EOF || disable qtscript
@@ -5853,7 +5840,6 @@ EOF
     enabled qtscript || warn "QtScript disabled."
 else
     # Disable for QT6 and above
-    disable qtwebkit
     disable qtscript
 fi
 

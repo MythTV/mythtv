@@ -15,7 +15,7 @@ message(STATUS "Checking for ${QT_PKG_NAME} libraries")
 if(NOT CMAKE_CROSSCOMPILING)
   set(_OTHER_REQUIRED DBus)
   if(${QT_VERSION_MAJOR} EQUAL 5)
-    set(_OPTIONAL_COMPONENTS Script ScriptTools WebKit WebKitWidgets)
+    set(_OPTIONAL_COMPONENTS Script ScriptTools)
   endif()
 elseif(ANDROID)
   if(${QT_VERSION_MAJOR} EQUAL 5)
@@ -72,7 +72,6 @@ endif(ANDROID)
 add_build_config(${QT_PKG_NAME}::DBus "qtdbus")
 add_build_config(${QT_PKG_NAME}::GuiPrivate "qtprivateheaders")
 add_build_config(${QT_PKG_NAME}::Script "qtscript")
-add_build_config(${QT_PKG_NAME}::Webkit "qtwebkit")
 
 #
 # Set properties
@@ -119,11 +118,6 @@ endif()
 if(TARGET ${QT_PKG_NAME}::Script)
   target_compile_definitions(${QT_PKG_NAME}::Script INTERFACE USING_QTSCRIPT)
   set(CONFIG_QTSCRIPT ON)
-endif()
-
-if(TARGET ${QT_PKG_NAME}::WebKit)
-  set(CONFIG_QTWEBKIT ON)
-  set(USING_QTWEBKIT ON)
 endif()
 
 #

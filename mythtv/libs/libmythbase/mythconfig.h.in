@@ -35,7 +35,6 @@
 #cmakedefine01 CONFIG_LIBX264
 #cmakedefine01 CONFIG_QTDBUS
 #cmakedefine01 CONFIG_QTSCRIPT
-#cmakedefine01 CONFIG_QTWEBKIT
 #cmakedefine01 CONFIG_SQLITE3
 #cmakedefine01 CONFIG_SYSTEMD_JOURNAL
 #cmakedefine01 CONFIG_SYSTEMD_NOTIFY
