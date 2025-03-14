@@ -902,7 +902,7 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
     int sortType = 0;
     if (Sort.startsWith("channum", Qt::CaseInsensitive))
         sortType = 10;
-        else if (Sort.startsWith("title", Qt::CaseInsensitive))
+    else if (Sort.startsWith("title", Qt::CaseInsensitive))
         sortType = 20;
     else if (Sort.startsWith("length", Qt::CaseInsensitive))
         sortType = 30;
