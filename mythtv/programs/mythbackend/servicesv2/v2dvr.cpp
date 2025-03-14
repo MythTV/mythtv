@@ -2338,9 +2338,9 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
     if (!gCoreContext->GetBoolSettingOnHost(QString("JobAllow%1").arg(sJobName),
                                             sRemoteHost, false))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been allowed on host %2.")
-                                         .arg(sJobName, sRemoteHost));
-        return nReturn;
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Note: %1 hasn't been allowed on host %2.")
+                                            .arg(sJobName, sRemoteHost));
+        // return nReturn;
     }
 
     if (!JobStartTime.isValid())
