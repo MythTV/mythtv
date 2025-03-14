@@ -10,7 +10,11 @@
 using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
 using MYTH_EGLCREATEIMAGE  = void* (*)(void*, void*, unsigned int, void*, const int32_t *);
 using MYTH_EGLDESTROYIMAGE = void  (*)(void*, void*);
+#ifdef Q_OS_DARWIN
+using MYTH_EGLGETPLATFORMDISPLAY = void* (*)(GLenum, int, const intptr_t*);
+#else
 using MYTH_EGLGETPLATFORMDISPLAY = void* (*)(GLenum, void*, const intptr_t*);
+#endif
 
 class MythRenderOpenGL;
 
