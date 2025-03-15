@@ -13,11 +13,14 @@
 #ifndef SSDPCLIENT_H
 #define SSDPCLIENT_H
 
+#include <chrono>
+
 // Qt headers
 #include <QObject>
 #include <QMutex>
 #include <QMap>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 
 // MythTV headers
@@ -48,7 +51,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
         { QMutexLocker locker(&m_mutex); return m_mapEntries.size(); }
     void Insert(const QString &sUSN, DeviceLocation *pEntry);
     void Remove(const QString &sUSN);
-    uint RemoveStale(TaskTime ttNow);
+    uint RemoveStale(std::chrono::microseconds ttNow);
 
     DeviceLocation *Find(const QString &sUSN);
 

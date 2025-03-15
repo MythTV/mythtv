@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "upnpcds.h"
 
 #include <algorithm>
 #include <cmath>
@@ -19,7 +20,6 @@
 #include "libmythbase/mythversion.h"
 
 #include "upnp.h"
-#include "upnpcds.h"
 #include "upnputil.h"
 
 static constexpr const char* DIDL_LITE_BEGIN { R"(<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">)" };
