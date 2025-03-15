@@ -873,7 +873,7 @@ static void playDisc()
         auto audioMedia = mediaMonitor->GetMedias(MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
         if (!audioMedia.isEmpty())
         {
-            for (auto *medium : qAsConst(audioMedia))
+            for (auto *medium : std::as_const(audioMedia))
             {
                 if (medium->isUsable()) {
                     LOG(VB_MEDIA, LOG_DEBUG, QString("Found usable audio/mixed device %1").arg(medium->getDevicePath()));
