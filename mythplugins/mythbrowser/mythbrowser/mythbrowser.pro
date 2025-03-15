@@ -4,7 +4,7 @@ include (../../programs-libs.pro )
 
 LIBS += -lmythtv-$$LIBVERSION
 
-QT += network xml sql opengl widgets
+QT += network xml sql opengl widgets webkitwidgets
 
 TEMPLATE = lib
 CONFIG += thread opengl plugin warn_on

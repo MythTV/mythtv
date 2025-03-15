@@ -608,6 +608,7 @@ ECXXFLAGS=$(cat mythconfig.mak | grep -e "^ECXXFLAGS=")
 ECXXFLAGS=${ECXXFLAGS#ECXXFLAGS=}
 CXXPPFLAGS=$(cat mythconfig.mak | grep -e "^CXXPPFLAGS=")
 CXXPPFLAGS=${CXXPPFLAGS#CXXPPFLAGS=}
+WEBKIT=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBKIT=yes")
 
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
@@ -641,7 +642,10 @@ if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
 fi
 
 if enabled browser; then
-    echo "MythBrowser requires QtWebkit (which is no  longer supported)."
+    if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
+        disable browser
+        echo "MythBrowser requires QtWebkit."
+    fi
 fi
 
 if enabled netvision; then
@@ -810,7 +814,12 @@ else
   echo "        MythArchive    plugin will not be built"
 fi
 
-echo "        MythBrowser    plugin will not be built"
+if enabled browser ; then
+  echo "        MythBrowser    plugin will be built"
+  echo "SUBDIRS += mythbrowser" >> ./config.pro
+else
+  echo "        MythBrowser    plugin will not be built"
+fi
 
 if enabled game ; then
   echo "        MythGame       plugin will be built"

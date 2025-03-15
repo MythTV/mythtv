@@ -201,6 +201,13 @@ if(TARGET Qt5::AndroidExtras)
   target_link_libraries(mythui PUBLIC Qt5::AndroidExtras)
 endif()
 
+if(TARGET Qt${QT_VERSION_MAJOR}::WebKit)
+  list(APPEND HEADERS_TO_INSTALL mythuiwebbrowser.h)
+  target_sources(mythui PRIVATE mythuiwebbrowser.cpp mythuiwebbrowser.h)
+  target_link_libraries(mythui PUBLIC Qt${QT_VERSION_MAJOR}::WebKit
+                                      Qt${QT_VERSION_MAJOR}::WebKitWidgets)
+endif()
+
 if(TARGET X11::X11)
   target_link_libraries(mythui PRIVATE X11::X11 X11::Xrandr X11::Xrender)
   if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")

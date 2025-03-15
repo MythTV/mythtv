@@ -2,6 +2,9 @@ include ( ../../settings.pro )
 
 QT += xml sql network widgets
 using_opengl: QT += opengl
+using_qtwebkit: contains(QT_MAJOR_VERSION, 5): {
+    QT += webkitwidgets
+}
 android: QT += androidextras
 
 TEMPLATE = lib
@@ -101,6 +104,11 @@ SOURCES += schemawizard.cpp
 SOURCES += standardsettings.cpp
 SOURCES += storagegroupeditor.cpp
 
+using_qtwebkit {
+HEADERS += mythuiwebbrowser.h
+SOURCES += mythuiwebbrowser.cpp
+}
+
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
 inc.files  = mythrect.h mythmainwindow.h mythpainter.h mythimage.h
@@ -113,7 +121,7 @@ inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
 inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
 inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
-inc.files += mythuiprogressbar.h mythuiutils.h
+inc.files += mythuiprogressbar.h mythuiwebbrowser.h mythuiutils.h
 inc.files += x11colors.h mythgenerictree.h mythuibuttontree.h
 inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
@@ -346,6 +354,7 @@ using_opengl {
     mingw|win32-msvc*:LIBS += -lopengl32
 }
 
+DEFINES += USING_QTWEBKIT
 DEFINES += MUI_API
 
 use_hidesyms {

@@ -42,6 +42,9 @@
 #include "libmythui/mythuispinbox.h"
 #include "libmythui/mythuitextedit.h"
 #include "libmythui/mythuivideo.h"
+#if CONFIG_QTWEBKIT
+#include "libmythui/mythuiwebbrowser.h"
+#endif
 
 // MythFrontend
 #include "networkcontrol.h"
@@ -1180,6 +1183,10 @@ QString NetworkControl::getWidgetType(MythUIType* type)
         return "MythUIImage";
     if (dynamic_cast<MythUISpinBox *>(type))
         return "MythUISpinBox";
+#if CONFIG_QTWEBKIT
+    if (dynamic_cast<MythUIWebBrowser *>(type))
+        return "MythUIWebBrowser";
+#endif
     if (dynamic_cast<MythUIClock *>(type))
         return "MythUIClock";
     if (dynamic_cast<MythUIStateType *>(type))

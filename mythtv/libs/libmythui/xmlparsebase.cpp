@@ -36,6 +36,10 @@
 #include "mythuiscrollbar.h"
 #include "mythuigroup.h"
 
+#if CONFIG_QTWEBKIT
+#include "mythuiwebbrowser.h"
+#endif
+
 #include "mythuiguidegrid.h"
 #include "mythuishape.h"
 #include "mythuibuttontree.h"
@@ -503,6 +507,10 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythUIProgressBar(parent, name);
     else if (type == "scrollbar") {
         uitype = new MythUIScrollBar(parent, name);
+#if CONFIG_QTWEBKIT
+    } else if (type == "webbrowser") {
+        uitype = new MythUIWebBrowser(parent, name);
+#endif
     } else if (type == "guidegrid") {
         uitype = new MythUIGuideGrid(parent, name);
     } else if (type == "shape") {

@@ -165,6 +165,7 @@ add_compile_definitions(MPLUGIN_API)
 # Include all the plugin specific directories.
 #
 add_subdirectory(mytharchive)
+add_subdirectory(mythbrowser)
 add_subdirectory(mythgame)
 add_subdirectory(mythmusic)
 if(ENABLE_NETVISION)

@@ -8,6 +8,9 @@ mingw | win32-msvc* {
    # script debugger currently only enabled for WIN32 builds
    QT += scripttools
 }
+using_qtwebkit {
+    QT += webkitwidgets
+}
 android: QT += androidextras
 using_qtdbus: QT += dbus
 
