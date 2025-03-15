@@ -944,9 +944,9 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
                 return time1 > time2 ;
             }
             case 40:
-                return QString::compare(QString(First->GetRecordingStatus()), QString(Second->GetRecordingStatus()), Qt::CaseInsensitive) < 0 ;
+                return First->GetRecordingStatus() < Second->GetRecordingStatus();
             case 41:
-            return QString::compare(QString(First->GetRecordingStatus()), QString(Second->GetRecordingStatus()), Qt::CaseInsensitive) > 0 ;
+                return First->GetRecordingStatus() > Second->GetRecordingStatus();
         }
         return false;
     };
