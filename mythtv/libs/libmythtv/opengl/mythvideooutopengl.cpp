@@ -100,10 +100,10 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 MythVideoOutputOpenGL::MythVideoOutputOpenGL(MythMainWindow* MainWindow,
                                              MythRenderOpenGL* Render,
                                              MythOpenGLPainter* Painter,
-                                             MythDisplay *Display,
+                                             MythDisplay *MDisplay,
                                              const MythVideoProfilePtr& VideoProfile,
                                              QString &Profile)
-  : MythVideoOutputGPU(MainWindow, Render, Painter, Display, VideoProfile, Profile),
+  : MythVideoOutputGPU(MainWindow, Render, Painter, MDisplay, VideoProfile, Profile),
     m_openglRender(Render)
 {
     // Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X

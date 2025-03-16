@@ -37,7 +37,7 @@ void MythVideoOutputGPU::GetRenderOptions(RenderOptions& Options, MythRender* Re
 }
 
 MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythRender* Render,
-                                               MythPainter* Painter, MythDisplay* Display,
+                                               MythPainter* Painter, MythDisplay* MDisplay,
                                                const QString& Decoder,
                                                MythCodecID CodecID,       const QSize VideoDim,
                                                const QSize VideoDispDim,  float VideoAspect,
@@ -45,7 +45,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
                                                const QString& Codec,      int ReferenceFrames,
                                                const VideoFrameTypes*& RenderFormats)
 {
-    if (!(MainWindow && Render && Painter && Display))
+    if (!(MainWindow && Render && Painter && MDisplay))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
         return nullptr;
@@ -142,7 +142,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 #ifdef _WIN32
 //        if (renderer == "direct3d")
 //            video = new VideoOutputD3D(MainWindow, d3drender,
-//                                       d3dpainter, Display,
+//                                       d3dpainter, MDisplay,
 //                                       videoprofile, renderer);
 #endif
 #ifdef USING_OPENGL
@@ -150,7 +150,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
         if (!video && renderer.contains("opengl") && openglrender)
         {
             video = new MythVideoOutputOpenGL(MainWindow, openglrender,
-                                              openglpainter, Display,
+                                              openglpainter, MDisplay,
                                               videoprofile, renderer);
         }
 #endif
@@ -158,7 +158,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
         if (!video && renderer.contains(VULKAN_RENDERER))
         {
             video = new MythVideoOutputVulkan(MainWindow, vulkanrender,
-                                              vulkanpainter, Display,
+                                              vulkanpainter, MDisplay,
                                               videoprofile, renderer);
         }
 #endif
@@ -208,14 +208,14 @@ VideoFrameType MythVideoOutputGPU::FrameTypeForCodec(MythCodecID CodecId)
  * \sa MythVideoOutputVulkan
  */
 MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* Render,
-                                       MythPainterGPU* Painter, MythDisplay* Display,
+                                       MythPainterGPU* Painter, MythDisplay* MDisplay,
                                        MythVideoProfilePtr VideoProfile, QString& Profile)
   : m_mainWindow(MainWindow),
     m_render(Render),
     m_painter(Painter),
     m_profile(std::move(Profile))
 {
-    if (!(m_mainWindow && m_render && m_painter && Display))
+    if (!(m_mainWindow && m_render && m_painter && MDisplay))
     {
         LOG(VB_GENERAL, LOG_ERR, "Fatal error");
         return;
@@ -223,7 +223,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
 
     m_videoProfile = std::move(VideoProfile);
     m_render->IncrRef();
-    SetDisplay(Display);
+    SetDisplay(MDisplay);
     m_painter->SetViewControl(MythPainterGPU::None);
 
     // If our rendering context is overlaid on top of a video plane, we need transparency
@@ -235,7 +235,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
         m_needFullClear = true;
     }
 
-    m_hdrTracker = MythHDRTracker::Create(Display);
+    m_hdrTracker = MythHDRTracker::Create(MDisplay);
 
     connect(this, &MythVideoOutputGPU::RefreshState,   this, &MythVideoOutputGPU::DoRefreshState);
     connect(this, &MythVideoOutputGPU::DoRefreshState, this, &MythVideoOutputGPU::RefreshVideoBoundsState);
