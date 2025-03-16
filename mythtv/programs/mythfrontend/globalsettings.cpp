@@ -2121,6 +2121,7 @@ static HostTextEditSetting *LircDaemonDevice()
     return ge;
 }
 
+#ifdef USING_LIBCEC
 static HostTextEditSetting *CECDevice()
 {
     auto *ge = new HostTextEditSetting("libCECDevice");
@@ -2136,6 +2137,7 @@ static HostTextEditSetting *CECDevice()
 
     return ge;
 }
+#endif
 
 
 static HostTextEditSetting *ScreenShotPath()
