@@ -13,9 +13,6 @@
 // Qt
 #include <QNetworkInterface>
 #include <QNetworkProxy>
-#if CONFIG_QTSCRIPT
-#include <QScriptEngine>
-#endif
 
 // MythTV
 #ifdef USING_LIBDNS_SD
