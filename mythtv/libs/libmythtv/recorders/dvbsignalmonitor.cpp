@@ -193,7 +193,7 @@ void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
 
     QMutexLocker locker(&m_statusLock);
     was_moving = m_rotorPosition.GetValue() < 100;
-    int pos    = (int)truncf(rotor->GetProgress() * 100);
+    int pos    = (int)std::trunc(rotor->GetProgress() * 100);
     m_rotorPosition.SetValue(pos);
     is_moving  = m_rotorPosition.GetValue() < 100;
 }

@@ -1226,9 +1226,9 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         // linear magnitude:           sqrt(sq(real) + sq(im));
         // left = sqrt(left);
         // right = sqrt(right);
-        // power spectrum (dBm): 10 * log10(sq(real) + sq(im));
-        left = 10 * log10(left);
-        right = 10 * log10(right);
+        // power spectrum (dBm): 10 * std::log10(sq(real) + sq(im));
+        left = 10 * std::log10(left);
+        right = 10 * std::log10(right);
 
         // float bw = 1. / (16384. / 44100.);
         // float freq = bw * index;
@@ -1534,8 +1534,8 @@ bool Spectrum::processUndisplayed(VisualNode *node)
             tmp = sq(m_dftR[2 * j]) + sq(m_dftR[(2 * j) + 1]);
             magR = tmp > magR ? tmp : magR;
         }
-        magL = 10 * log10(magL) * m_scaleFactor;
-        magR = 10 * log10(magR) * m_scaleFactor;
+        magL = 10 * std::log10(magL) * m_scaleFactor;
+        magR = 10 * std::log10(magR) * m_scaleFactor;
 
         magL = std::min(magL, adjHeight);
         if (magL < magnitudesp[i])

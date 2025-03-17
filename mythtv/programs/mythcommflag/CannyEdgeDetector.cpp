@@ -30,7 +30,7 @@ CannyEdgeDetector::CannyEdgeDetector(void)
     const double    TWO_SIGMA2 = 2 * sigma * sigma;
 
     /* The SGM computations require that mask_radius >= 2. */
-    m_maskRadius = std::max(2, (int)roundf(TRUNCATION * sigma));
+    m_maskRadius = std::max(2, (int)std::round(TRUNCATION * sigma));
     int mask_width = (2 * m_maskRadius) + 1;
 
     /* Compute Gaussian mask. */
