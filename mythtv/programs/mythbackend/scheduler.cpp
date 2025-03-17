@@ -4671,7 +4671,7 @@ void Scheduler::AddNewRecords(void)
             MythDate::as_utc(result.value(18).toDateTime()),//recstartts
             MythDate::as_utc(result.value(19).toDateTime()),//recendts
 
-            result.value(31).toDouble(),//stars
+            result.value(31).toFloat(),//stars
             (result.value(32).isNull()) ? QDate() :
             QDate::fromString(result.value(32).toString(), Qt::ISODate),
             //originalAirDate

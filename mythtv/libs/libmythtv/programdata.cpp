@@ -479,7 +479,7 @@ uint DBEvent::GetOverlappingPrograms(
             query.value(7).toUInt(),
             query.value(8).toUInt(),
             query.value(9).toUInt(),
-            query.value(19).toDouble(),
+            query.value(19).toFloat(),
             query.value(10).toString(),
             query.value(11).toString(),
             query.value(18).toUInt(),
