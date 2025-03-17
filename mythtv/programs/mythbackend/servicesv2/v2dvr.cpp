@@ -2550,7 +2550,7 @@ bool V2Dvr::UpdateRecordedMetadata ( uint             RecordedId,
             LOG(VB_GENERAL, LOG_ERR, "Recording stars can be 0 to 10.");
             return false;
         }
-        ri.ApplyStarsChange(Stars * 0.1);
+        ri.ApplyStarsChange(Stars * 0.1F);
     }
 
     if (HAS_PARAMv2("Watched"))

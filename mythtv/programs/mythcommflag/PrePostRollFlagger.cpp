@@ -290,7 +290,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             ((m_showProgress || m_stillRecording) &&
              ((currentFrameNumber % 100) == 0)))
         {
-            float elapsed = flagTime.elapsed() / 1000.0;
+            float elapsed = flagTime.elapsed() / 1000.0F;
 
             float flagFPS = 0.0F;
             if (elapsed != 0.0F)

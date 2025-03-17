@@ -173,7 +173,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     /* try setting y to both maxes */
     *yo = HEIGHT/2;
     *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
-    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI/180.0)));
+    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI_F/180.0F)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
         *xd = (*xo>0)?-1:1;
@@ -183,7 +183,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     *yo = -*yo;
     *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
-    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI/180.0)));
+    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI_F/180.0F)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
         *xd = (*xo>0)?-1:1;
@@ -194,7 +194,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     /* try setting x to both maxes */
     *xo = WIDTH/2;
     *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/(M_PI_F/180.0F));
-    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI/180.0)));
+    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI_F/180.0F)));
 
     if (*yo >= -hd2 && *yo <= hd2) {
         *yd = (*yo>0)?-1:1;
@@ -204,7 +204,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     *xo = -*xo;
     *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/(M_PI_F/180.0F));
-    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI/180.0)));
+    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI_F/180.0F)));
 
     /* if this isn't right, it's out of our range and we don't care */
     *yd = (*yo>0)?-1:1;
@@ -396,8 +396,8 @@ bool BumpScope::draw(QPainter *p, [[maybe_unused]] const QColor &back)
             m_wasMoving = 1;
         }
 
-        m_ilx = (int)((m_width / 2.0F) + (cosf(m_iangle * (M_PI / 180.0)) * m_ixo));
-        m_ily = (int)((m_height / 2.0F) + (sinf(m_iangle * (M_PI / 180.0)) * m_iyo));
+        m_ilx = (int)((m_width / 2.0F) + (cosf(m_iangle * (M_PI_F / 180.0F)) * m_ixo));
+        m_ily = (int)((m_height / 2.0F) + (sinf(m_iangle * (M_PI_F / 180.0F)) * m_iyo));
 
         m_iangle += 2;
         if (m_iangle >= 360)

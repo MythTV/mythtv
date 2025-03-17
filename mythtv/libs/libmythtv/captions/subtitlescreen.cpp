@@ -263,7 +263,7 @@ SubtitleFormat::GetFont(const QString &family,
                         int pixelSize, int zoom, int stretch)
 {
     int origPixelSize = pixelSize;
-    float scale = zoom / 100.0;
+    float scale = zoom / 100.0F;
     if ((attr.m_penSize & 0x3) == k708AttrSizeSmall)
         scale = scale * 32 / 42;
     else if ((attr.m_penSize & 0x3) == k708AttrSizeLarge)

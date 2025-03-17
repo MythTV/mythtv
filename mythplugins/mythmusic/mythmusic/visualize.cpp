@@ -1166,9 +1166,9 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         }
         for (int k = 0; k < i; k++) // append current samples
         {
-            m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
+            m_sigL[start + k] = node->m_left[k] / 32768.0F; // +/- 1 peak-to-peak
             if (node->m_right)
-                m_sigR[start + k] = node->m_right[k] / 32768.;
+                m_sigR[start + k] = node->m_right[k] / 32768.0F;
         }
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
@@ -1455,7 +1455,7 @@ void Spectrum::resize(const QSize &newsize)
         m_magnitudes[os] = 0.0;
     }
 
-    m_scaleFactor = m_size.height() / 2. / 42.;
+    m_scaleFactor = m_size.height() / 2.0F / 42.0F;
 }
 
 // this moved up to Spectrogram so both can use it
@@ -1488,9 +1488,9 @@ bool Spectrum::processUndisplayed(VisualNode *node)
         }
         for (int k = 0; k < i; k++) // append current samples
         {
-            m_sigL[start + k] = node->m_left[k] / 32768.; // +/- 1 peak-to-peak
+            m_sigL[start + k] = node->m_left[k] / 32768.0F; // +/- 1 peak-to-peak
             if (node->m_right)
-                m_sigR[start + k] = node->m_right[k] / 32768.;
+                m_sigR[start + k] = node->m_right[k] / 32768.0F;
         }
         int end = m_fftlen / 40; // ramp window ends down to zero crossing
         for (int k = 0; k < m_fftlen; k++)
@@ -1520,7 +1520,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
 
     int index = 1;              // frequency index of this pixel
     int prev = 0;               // frequency index of previous pixel
-    float adjHeight = m_size.height() / 2.0;
+    float adjHeight = m_size.height() / 2.0F;
 
     for (int i = 0; i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
     {

@@ -876,7 +876,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 			*param2 = 0.22F * c_resoly;
 		}
 		else {
-			*param1 = *param2 = c_resoly * 0.35;
+			*param1 = *param2 = c_resoly * 0.35F;
 		}
 		break;
 	case GML_HLINE:

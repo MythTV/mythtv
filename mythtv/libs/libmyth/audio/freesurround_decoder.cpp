@@ -35,7 +35,7 @@ using OutputBufs = std::array<float*,6>;
 
 static const float PI = 3.141592654;
 static const float epsilon = 0.000001;
-static const float center_level = 0.5*sqrt(0.5);
+static const float center_level = 0.5F*sqrtf(0.5F);
 
 template <class T>
 T sqr(T x) { return x*x; }

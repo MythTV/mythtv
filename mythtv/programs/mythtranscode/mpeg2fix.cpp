@@ -1455,7 +1455,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         if ((m_showProgress || m_updateStatus) &&
             MythDate::current() > m_statusTime)
         {
-            float percent_done = 100.0 * pkt->pos / m_fileSize;
+            float percent_done = 100.0F * pkt->pos / m_fileSize;
             if (m_updateStatus)
                 m_updateStatus(percent_done);
             if (m_showProgress)

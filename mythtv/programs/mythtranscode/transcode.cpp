@@ -1028,7 +1028,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
 
                 float flagFPS = 0.0;
-                float elapsed = flagTime.elapsed() / 1000.0;
+                float elapsed = flagTime.elapsed() / 1000.0F;
                 if (elapsed != 0.0F)
                     flagFPS = curFrameNum / elapsed;
 

@@ -123,7 +123,7 @@ void FreeSurround::SetParams()
         m_decoder->steering_mode(m_params.steering != 0);
         m_decoder->phase_mode(m_params.phasemode);
         m_decoder->surround_coefficients(m_params.coeff_a, m_params.coeff_b);
-        m_decoder->separation(m_params.front_sep/100.0,m_params.rear_sep/100.0);
+        m_decoder->separation(m_params.front_sep/100.0F,m_params.rear_sep/100.0F);
     }
 }
 
@@ -391,7 +391,7 @@ void FreeSurround::process_block()
     {
         if (m_decoder)
         {
-            m_decoder->decode(m_params.center_width/100.0,m_params.dimension/100.0);
+            m_decoder->decode(m_params.center_width/100.0F,m_params.dimension/100.0F);
         }
     }
     catch(...)

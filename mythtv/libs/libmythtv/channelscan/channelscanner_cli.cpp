@@ -90,7 +90,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     }
     else if (scanEvent->type() == ScannerEvent::kSetStatusSignalToNoise)
     {
-        m_statusSnr = scanEvent->intValue() / 65535.0;
+        m_statusSnr = scanEvent->intValue() / 65535.0F;
 }
 #if 0 // THESE_ARE_CURRENTLY_IGNORED
     else if (scanEvent->type() == ScannerEvent::kSetStatusTitleText)

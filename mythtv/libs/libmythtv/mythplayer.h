@@ -270,7 +270,7 @@ class MTV_PUBLIC MythPlayer : public QObject
         return m_deleteMap.TranslatePositionRelToAbs(position);
     }
     float ComputeSecs(uint64_t position, bool use_cutlist) const {
-        return TranslatePositionFrameToMs(position, use_cutlist).count() / 1000.0;
+        return TranslatePositionFrameToMs(position, use_cutlist).count() / 1000.0F;
     }
     uint64_t FindFrame(float offset, bool use_cutlist) const;
 

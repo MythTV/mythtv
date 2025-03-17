@@ -717,7 +717,7 @@ static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
         return -1;
     }
 
-    float mult = 65535.0 / (qctrl.maximum - qctrl.minimum);
+    float mult = 65535.0F / (qctrl.maximum - qctrl.minimum);
     return std::clamp((int)(mult * (ctrl.value - qctrl.minimum)), 0, 65525);
 }
 
@@ -734,7 +734,7 @@ static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
         return -1;
     }
 
-    float mult = (qctrl.maximum - qctrl.minimum) / 65535.0;
+    float mult = (qctrl.maximum - qctrl.minimum) / 65535.0F;
     ctrl.value = (int)((mult * newvalue) + qctrl.minimum);
     ctrl.value = std::min(ctrl.value, qctrl.maximum);
     ctrl.value = std::max(ctrl.value, qctrl.minimum);

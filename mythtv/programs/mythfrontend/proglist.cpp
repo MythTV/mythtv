@@ -999,7 +999,7 @@ void ProgLister::FillViewList(const QString &view)
         m_viewTextList.push_back(tr("%n star(s)", "", 10));
         for (int i = 9; i > 0; i--)
         {
-            float stars = ((i - 0.5 ) / 10.0) - 0.001;
+            float stars = ((i - 0.5F ) / 10.0F) - 0.001F;
             m_viewList.push_back(QString(">= %1").arg(stars));
             m_viewTextList.push_back(tr("%n star(s) and above", "", i));
         }
