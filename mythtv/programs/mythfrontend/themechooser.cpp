@@ -33,10 +33,6 @@
 // Theme Chooser headers
 #include "themechooser.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 2)
-#define capturedView capturedRef
-#endif
-
 #define LOC QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")
 #define LOC_ERR QString("ThemeChooser, Error: ")
@@ -685,15 +681,9 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
         if (!gCoreContext->GetSetting("ThemeDownloadURL").isEmpty())
         {
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-            QStringList tokens =
-                gCoreContext->GetSetting("ThemeDownloadURL")
-                    .split(";", QString::SkipEmptyParts);
-#else
             QStringList tokens =
                 gCoreContext->GetSetting("ThemeDownloadURL")
                     .split(";", Qt::SkipEmptyParts);
-#endif
             QString origURL = downloadURL;
             downloadURL.replace(tokens[0], tokens[1]);
             LOG(VB_FILE, LOG_WARNING, LOC + QString("Theme download URL overridden from %1 to %2.").arg(origURL, downloadURL));
@@ -798,12 +788,7 @@ void ThemeChooser::customEvent(QEvent *e)
         if (me == nullptr)
             return;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
-#else
         QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
-#endif
-
         if (tokens.isEmpty())
             return;
 
