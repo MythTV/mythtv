@@ -67,28 +67,38 @@ function(find_or_build_qt)
       FATAL_ERROR "You must install the qt6 qtdeclarative development package.")
   endif()
 
-  # Known versions of Qt6
+  # Known versions of Qt6 (as of 2025-003-11)
 
-  # None: Debian 11, Ubuntu 20.04
+  # None: Debian 11, RHEL8, Ubuntu 20.04
 
   # Ubuntu 22.04
   set(QT_6.2.4_SHA256
       "cfe41905b6bde3712c65b102ea3d46fc80a44c9d1487669f14e4a6ee82ebb8fd")
-  # Debian 12, Ubuntu 23.10, SuSe 15
+  # Debian 12, Ubuntu 24.04
   set(QT_6.4.2_SHA256
       "689f53e6652da82fccf7c2ab58066787487339f28d1ec66a8765ad357f4976be")
-  # Gentoo
   set(QT_6.5.2_SHA256
       "cde57be663d0f875759797298bdc37a936d517c39f2013e4e6ece5e12edeed12")
-  # Fedora 38/39
+  # Fedora 38
   set(QT_6.6.0_SHA256
       "652538fcb5d175d8f8176c84c847b79177c87847b7273dccaec1897d80b50002")
-  # Arch, Rawhide, SuSe Tumbleweed
   set(QT_6.6.1_SHA256
       "dd3668f65645fe270bc615d748bd4dc048bd17b9dc297025106e6ecc419ab95d")
-  # Fedora 40/41
+  # Centos 9, Fedora 39, RHEL9, Ubuntu 24.10
+  set(QT_6.6.2_SHA256
+      "3c1e42b3073ade1f7adbf06863c01e2c59521b7cc2349df2f74ecd7ebfcb922d")
+  # SuSe 15
+  set(QT_6.6.3_SHA256
+      "69d0348fef415da98aa890a34651e9cfb232f1bffcee289b7b4e21386bf36104")
   set(QT_6.7.2_SHA256
       "0aaea247db870193c260e8453ae692ca12abc1bd841faa1a6e6c99459968ca8a")
+  # Centos 10
+  set(QT_6.8.1_SHA256
+      "45e3a9f6d33c92ffe65a1fde1a8eba5b228112df675f7f9026eaa332b2e2edff")
+  # Arch, Debian Unstable, Fedora 40/41/42/Rawhide, Gentoo Suse
+  # Tumbleweed, Ubuntu Rolling Rhino
+  set(QT_6.8.2_SHA256
+      "659d8bb5931afac9ed5d89a78e868e6bd00465a58ab566e2123db02d674be559")
 
   # Qt6 requires that the version of the host tools match the version being
   # built.  What are the fallback target versions to build if there isn't an
@@ -99,6 +109,7 @@ function(find_or_build_qt)
   set(QT_MAP_6.5 "6.5.2")
   set(QT_MAP_6.6 "6.6.1")
   set(QT_MAP_6.7 "6.7.2")
+  set(QT_MAP_6.8 "6.8.1")
 
   # Grab the host version directly. so as not to pollute our cross-build setup.
   file(STRINGS

@@ -24,6 +24,17 @@
             }
         },
         {
+            "name": "ci-android",
+            "hidden": true,
+            "cacheVariables": {
+                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
+                "CMAKE_ANDROID_NDK": {
+                    "type": "PATH",
+                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
+                }
+            }
+        },
+        {
             "name": "ci-qt6",
             "hidden": true,
             "cacheVariables": {
@@ -31,6 +42,17 @@
                     "type": "STRING",
                     "value": "6"
                 }
+            }
+        },
+        {
+            "name": "ci-qt6-android",
+            "hidden": true,
+            "cacheVariables": {
+                "QT_VERSION_MAJOR": {
+                    "type": "STRING",
+                    "value": "6"
+                },
+                "ANDROID_PLATFORM": "android-34"
             }
         },
 
@@ -47,7 +69,7 @@
 
         {
             "name": "android-v7-qt5",
-            "inherits": [ "ci-base", "ci-sibling-build" ],
+            "inherits": [ "ci-base", "ci-sibling-build", "ci-android" ],
             "displayName": "Android armeabi-v7a qt5 (separate lib install)",
             "cacheVariables": {
                 "CMAKE_ANDROID_ARCH_ABI": {
@@ -58,13 +80,13 @@
         },
         {
             "name": "android-v7-qt6",
-            "inherits": [ "android-v7-qt5", "ci-sibling-build", "ci-qt6" ],
+            "inherits": [ "android-v7-qt5", "ci-sibling-build", "ci-qt6-android" ],
             "displayName": "Android armeabi-v7a qt6 (separate lib install)"
         },
 
         {
             "name": "android-v8-qt5",
-            "inherits": [ "ci-base", "ci-sibling-build" ],
+            "inherits": [ "ci-base", "ci-sibling-build", "ci-android" ],
             "displayName": "Android arm64-v8a qt5 (separate lib install)",
             "cacheVariables": {
                 "CMAKE_ANDROID_ARCH_ABI": {
@@ -75,13 +97,13 @@
         },
         {
             "name": "android-v8-qt6",
-            "inherits": [ "android-v8-qt5", "ci-sibling-build", "ci-qt6" ],
+            "inherits": [ "android-v8-qt5", "ci-sibling-build", "ci-qt6-android" ],
             "displayName": "Android arm64-v8a qt6 (separate lib install)"
         },
 
         {
             "name": "android-x86-qt5",
-            "inherits": [ "ci-base", "ci-sibling-build" ],
+            "inherits": [ "ci-base", "ci-sibling-build", "ci-android" ],
             "displayName": "Android x86 qt5 (separate lib install)",
             "cacheVariables": {
                 "CMAKE_ANDROID_ARCH_ABI": {
@@ -92,13 +114,13 @@
         },
         {
             "name": "android-x86-qt6",
-            "inherits": [ "android-x86-qt5", "ci-sibling-build", "ci-qt6" ],
+            "inherits": [ "android-x86-qt5", "ci-sibling-build", "ci-qt6-android" ],
             "displayName": "Android x86 qt6 (separate lib install)"
         },
 
         {
             "name": "android-x86_64-qt5",
-            "inherits": [ "ci-base", "ci-sibling-build" ],
+            "inherits": [ "ci-base", "ci-sibling-build", "ci-android" ],
             "displayName": "Android x86_64 qt5 (separate lib install)",
             "cacheVariables": {
                 "CMAKE_ANDROID_ARCH_ABI": {
@@ -109,54 +131,87 @@
         },
         {
             "name": "android-x86_64-qt6",
-            "inherits": [ "android-x86_64-qt5", "ci-sibling-build", "ci-qt6" ],
+            "inherits": [ "android-x86_64-qt5", "ci-sibling-build", "ci-qt6-android" ],
             "displayName": "Android x86_64 qt6 (separate lib install)"
         },
 
 
         {
+            "vendor": {
+                "company": "Amazon",
+                "name": "Fire Stick 4K 1st Generation",
+                "osver": "Fire OS 6",
+                "androidver": "7.1",
+                "androidapilevel": "25"
+            },
             "name": "fire-stick-4k",
             "inherits": [ "android-v7-qt5", "ci-sibling-build" ],
             "displayName": "Fire Stick 4K qt5 (separate lib install)",
             "cacheVariables": {
-                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
-                "CMAKE_ANDROID_NDK": {
-                    "type": "PATH",
-                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
-                },
                 "ANDROID_MIN_SDK_VERSION": "25",
                 "ANDROID_TARGET_SDK_VERSION": "25",
                 "ANDROID_PLATFORM": "android-25"
             }
         },
         {
+            "name": "fire-stick-4k-qt6",
+            "inherits": [ "android-v7-qt6", "ci-sibling-build" ],
+            "displayName": "Fire Stick 4K qt6 (separate lib install)",
+            "cacheVariables": {
+                "ANDROID_MIN_SDK_VERSION": "25",
+                "ANDROID_TARGET_SDK_VERSION": "25"
+            }
+        },
+        {
+            "vendor": {
+                "company": "Amazon",
+                "name": "Fire Stick 4K Max 1st Generation",
+                "osver": "Fire OS 7",
+                "androidver": "9",
+                "androidapilevel": "28"
+            },
             "name": "fire-stick-4k-max",
             "inherits": [ "android-v7-qt5", "ci-sibling-build" ],
             "displayName": "Fire Stick 4K Max qt5 (separate lib install)",
             "cacheVariables": {
-                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
-                "CMAKE_ANDROID_NDK": {
-                    "type": "PATH",
-                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
-                },
                 "ANDROID_MIN_SDK_VERSION": "25",
                 "ANDROID_TARGET_SDK_VERSION": "28",
                 "ANDROID_PLATFORM": "android-28"
             }
         },
         {
+            "name": "fire-stick-4k-max-qt6",
+            "inherits": [ "android-v7-qt6", "ci-sibling-build" ],
+            "displayName": "Fire Stick 4K Max qt6 (separate lib install)",
+            "cacheVariables": {
+                "ANDROID_MIN_SDK_VERSION": "25",
+                "ANDROID_TARGET_SDK_VERSION": "28"
+            }
+        },
+        {
+            "vendor": {
+                "company": "Nvidia",
+                "name": "Shield Android TV",
+                "osver": "9.1.1(33.2.0.157)",
+                "androidver": "11",
+                "androidapilevel": "30"
+            },
             "name": "nvidia-shield",
             "inherits": [ "android-v8-qt5", "ci-sibling-build" ],
             "displayName": "Nvidia Shield qt5 (separate lib install)",
             "cacheVariables": {
-                "ANDROID_SDK_BUILD_TOOLS_REVISION": "34.0.0",
-                "CMAKE_ANDROID_NDK": {
-                    "type": "PATH",
-                    "value": "$env{HOME}/Android/Sdk/ndk/26.1.10909125"
-                },
                 "ANDROID_MIN_SDK_VERSION": "25",
                 "ANDROID_TARGET_SDK_VERSION": "29",
                 "ANDROID_PLATFORM": "android-29"
+            }
+        },
+        {
+            "name": "nvidia-shield-qt6",
+            "inherits": [ "android-v8-qt6", "ci-sibling-build" ],
+            "displayName": "Nvidia Shield qt6 (separate lib install)",
+            "cacheVariables": {
+                "ANDROID_MIN_SDK_VERSION": "25",
+                "ANDROID_TARGET_SDK_VERSION": "29"
             }
         },
 
