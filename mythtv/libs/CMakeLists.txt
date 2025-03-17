@@ -1,5 +1,4 @@
 add_subdirectory(libmythbase)
-add_subdirectory(libmythservicecontracts)
 if(TARGET mythtv_mheg)
   add_subdirectory(libmythfreemheg)
 endif()

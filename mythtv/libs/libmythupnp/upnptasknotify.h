@@ -13,19 +13,12 @@
 #ifndef UPNPTASKNOTIFY_H
 #define UPNPTASKNOTIFY_H
 
-// POSIX headers
-#include <sys/types.h>
-#ifndef _WIN32
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif
+#include <chrono>
+#include <cstdint>
 
 // Qt headers
 #include <QString>
 #include <QMutex>
-
-// MythTV headers
-#include "libmythbase/compat.h"
 
 #include "taskqueue.h"
 
