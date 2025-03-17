@@ -12,6 +12,15 @@ if(NOT USING_BINDINGS_PERL)
 endif()
 
 #
+# Hide non-error output unless doing a verbose build.
+#
+if(NOT CMAKE_VERBOSE_MAKEFILE)
+  # This is a list which, when referenced below, will be joined by
+  # spaces and inserted before the command is parsed.
+  set(HIDE_OUTPUT ">;/dev/null")
+endif()
+
+#
 # Building out of tree.  Copy everything to the binary directory so that the
 # perl install scripts will worlk properly.
 #
@@ -28,9 +37,10 @@ configure_file(Makefile.PL.in Makefile.PL @ONLY)
 #
 add_custom_command(
   OUTPUT perl-bindings.stamp
-  COMMAND ${PERL_EXECUTABLE} Makefile.PL MAKEFILE=Makefile.perl
-          PREFIX="${CMAKE_INSTALL_PREFIX}" ${MYTH_PERL_CONFIG_OPTS}
-  COMMAND ${MAKE_EXECUTABLE} -f Makefile.perl
+  COMMAND
+    ${PERL_EXECUTABLE} Makefile.PL MAKEFILE=Makefile.perl
+    PREFIX="${CMAKE_INSTALL_PREFIX}" ${MYTH_PERL_CONFIG_OPTS} ${HIDE_OUTPUT}
+  COMMAND ${MAKE_EXECUTABLE} -f Makefile.perl ${HIDE_OUTPUT}
   COMMAND touch perl-bindings.stamp
   DEPENDS Makefile.PL)
 add_custom_target(perl_bindings DEPENDS perl-bindings.stamp)
