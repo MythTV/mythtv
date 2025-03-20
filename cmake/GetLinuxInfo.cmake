@@ -23,6 +23,8 @@ function(get_lsb_info)
   endforeach()
 
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(VERBOSE "LSB_RELEASE_ID: ${LSB_RELEASE_ID}")
+    message(VERBOSE "LSB_RELEASE_VERSION_ID: ${LSB_RELEASE_VERSION_ID}")
     set(LSB_RELEASE_ID
         ${HOST_LSB_RELEASE_ID}
         PARENT_SCOPE)
@@ -30,6 +32,8 @@ function(get_lsb_info)
         ${HOST_LSB_RELEASE_VERSION_ID}
         PARENT_SCOPE)
   endif()
+  message(VERBOSE "HOST_LSB_RELEASE_ID: ${HOST_LSB_RELEASE_ID}")
+  message(VERBOSE "HOST_LSB_RELEASE_VERSION_ID: ${HOST_LSB_RELEASE_VERSION_ID}")
   set(HOST_LSB_RELEASE_ID
       ${HOST_LSB_RELEASE_ID}
       PARENT_SCOPE)
