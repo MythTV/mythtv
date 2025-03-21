@@ -102,6 +102,8 @@
     //   long    f_namelen;  /* maximum length of filenames */
     //   long    f_spare[6]; /* spare for later */
     };
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
     inline int statfs(const char* path, struct statfs* buffer)
     {
         DWORD spc = 0, bps = 0, fc = 0, c = 0;
@@ -116,6 +118,7 @@
 
         return -1;
     }
+#pragma GCC diagnostic pop
 #   endif
 
 #define lstat stat
