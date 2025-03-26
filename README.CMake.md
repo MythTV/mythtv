@@ -26,7 +26,7 @@
 
   You will need to install the following programs:
 
-  - cmake
+  - cmake (verson 3.20 or later)
   - patch
   - ninja-build (ninja on freebsd and osx)
 
