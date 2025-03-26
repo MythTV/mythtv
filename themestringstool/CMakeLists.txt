@@ -5,10 +5,17 @@
 #
 
 #
-# Can use cmake features introduced in 3.16.  Super-project has already
+# Catch running cmake in the wrong directory.
+#
+if(NOT SUPER_VERSION)
+  message(FATAL_ERROR "You must run cmake from the parent of this directory.")
+endif()
+
+#
+# Can use cmake features introduced in 3.20.  Super-project has already
 # validated the higher version required for android.
 #
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
 #
 # Validate parameters
