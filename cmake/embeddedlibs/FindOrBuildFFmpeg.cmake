@@ -99,7 +99,9 @@ function(find_or_build_ffmpeg)
   # properly pass multiple arguments to FFmpeg's configure (instead of passing
   # them all as a single argument).
   #
-  string(REPLACE " " ";" FF_USER_OPTS ${FF_USER_OPTS})
+  if(FF_USER_OPTS)
+    string(REPLACE " " ";" FF_USER_OPTS ${FF_USER_OPTS})
+  endif()
 
   #
   # Create the project to build FFmpeg
