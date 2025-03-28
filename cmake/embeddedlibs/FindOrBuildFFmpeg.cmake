@@ -94,6 +94,14 @@ function(find_or_build_ffmpeg)
   endif()
 
   #
+  # Handle extra arguments passed from the user on the command line. Converting
+  # the user's string to a list allows the ExternalProject_Add command below to
+  # properly pass multiple arguments to FFmpeg's configure (instead of passing
+  # them all as a single argument).
+  #
+  string(REPLACE " " ";" FF_USER_OPTS ${FF_USER_OPTS})
+
+  #
   # Create the project to build FFmpeg
   #
   ExternalProject_Add(
@@ -122,6 +130,7 @@ function(find_or_build_ffmpeg)
       $<IF:$<TARGET_EXISTS:PkgConfig::VDPAU>,--enable-vdpau,--disable-vdpau>
       $<IF:$<TARGET_EXISTS:Vulkan::Vulkan>,--enable-vulkan,--disable-vulkan>
     # $<IF:$<TARGET_EXISTS:PkgConfig::SDL2>,--enable-sdl2,--disable-sdl2>
+      ${FF_USER_OPTS}
     BUILD_COMMAND ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
     BUILD_ALWAYS ${LIBS_ALWAYS_REBUILD}
     INSTALL_COMMAND ${MAKE_EXECUTABLE} install
