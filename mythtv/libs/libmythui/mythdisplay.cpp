@@ -7,7 +7,10 @@
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QWindow>
+
+#ifdef USING_QTWEBENGINE
 #include <QQuickWindow>
+#endif
 
 // MythTV
 #include "libmythbase/compat.h"

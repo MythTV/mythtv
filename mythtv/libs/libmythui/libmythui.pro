@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 
 QT += xml sql network widgets
 using_opengl: QT += opengl
-using_qtwebengine: QT += webenginewidgets
+using_qtwebengine: QT += webenginewidgets quick
 android: QT += androidextras
 
 TEMPLATE = lib
