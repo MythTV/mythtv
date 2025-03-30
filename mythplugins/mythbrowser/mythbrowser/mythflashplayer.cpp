@@ -64,9 +64,10 @@ bool MythFlashPlayer::Create(void)
     return true;
 }
 
-QVariant MythFlashPlayer::evaluateJavaScript(const QString& source)
+void MythFlashPlayer::runJavaScript(const QString& source)
 {
-    return (m_browser ? m_browser->evaluateJavaScript(source) : QVariant());
+    if (m_browser)
+        m_browser->RunJavaScript(source);
 }
 
 bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
@@ -80,21 +81,21 @@ bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "PAUSE")
-            evaluateJavaScript("play();");
+            runJavaScript("play();");
         else if (action == "INFO")
-            evaluateJavaScript("info();");
+            runJavaScript("info();");
         else if (action == "SEEKFFWD")
-            evaluateJavaScript(QString("seek(%1);").arg(m_fftime));
+            runJavaScript(QString("seek(%1);").arg(m_fftime));
         else if (action == "SEEKRWND")
-            evaluateJavaScript(QString("seek(-%1);").arg(m_rewtime));
+            runJavaScript(QString("seek(-%1);").arg(m_rewtime));
         else if (action == "CHANNELUP")
-            evaluateJavaScript(QString("seek(%1);").arg(m_jumptime * 60));
+            runJavaScript(QString("seek(%1);").arg(m_jumptime * 60));
         else if (action == "CHANNELDOWN")
-            evaluateJavaScript(QString("seek(-%1);").arg(m_jumptime * 60));
+            runJavaScript(QString("seek(-%1);").arg(m_jumptime * 60));
         else if (action == "VOLUMEUP")
-            evaluateJavaScript("adjustVolume(2);");
+            runJavaScript("adjustVolume(2);");
         else if (action == "VOLUMEDOWN")
-            evaluateJavaScript("adjustVolume(-2);");
+            runJavaScript("adjustVolume(-2);");
         else
             handled = false;
 

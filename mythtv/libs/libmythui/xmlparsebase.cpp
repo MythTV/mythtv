@@ -36,7 +36,7 @@
 #include "mythuiscrollbar.h"
 #include "mythuigroup.h"
 
-#if CONFIG_QTWEBKIT
+#if CONFIG_QTWEBENGINE
 #include "mythuiwebbrowser.h"
 #endif
 
@@ -507,7 +507,7 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythUIProgressBar(parent, name);
     else if (type == "scrollbar") {
         uitype = new MythUIScrollBar(parent, name);
-#if CONFIG_QTWEBKIT
+#if CONFIG_QTWEBENGINE
     } else if (type == "webbrowser") {
         uitype = new MythUIWebBrowser(parent, name);
 #endif

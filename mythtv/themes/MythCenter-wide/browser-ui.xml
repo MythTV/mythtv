@@ -136,7 +136,7 @@
             </statetype>
         </button>
 
-        <webbrowser name="webbrowser">
+        <webbrowser name="webbrowser" from="basewebbrowser">
             <area>20,55,1240,600</area>
             <zoom>1.4</zoom>
         </webbrowser>

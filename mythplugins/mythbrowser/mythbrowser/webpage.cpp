@@ -22,16 +22,12 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
     m_browser->SetArea(MythRect(area));
     m_browser->Init();
 
-    connect(m_browser, &MythUIWebBrowser::loadStarted,
-            this, &WebPage::slotLoadStarted);
-    connect(m_browser, &MythUIWebBrowser::loadFinished,
-            this, &WebPage::slotLoadFinished);
-    connect(m_browser, &MythUIWebBrowser::loadProgress,
-            this, &WebPage::slotLoadProgress);
-    connect(m_browser, &MythUIWebBrowser::statusBarMessage,
-            this, &WebPage::slotStatusBarMessage);
-    connect(m_browser, &MythUIWebBrowser::titleChanged,
-            this, &WebPage::slotTitleChanged);
+    connect(m_browser, &MythUIWebBrowser::loadStarted, this, &WebPage::slotLoadStarted);
+    connect(m_browser, &MythUIWebBrowser::loadFinished, this, &WebPage::slotLoadFinished);
+    connect(m_browser, &MythUIWebBrowser::loadProgress, this, &WebPage::slotLoadProgress);
+    connect(m_browser, &MythUIWebBrowser::statusBarMessage, this, &WebPage::slotStatusBarMessage);
+    connect(m_browser, &MythUIWebBrowser::titleChanged, this, &WebPage::slotTitleChanged);
+    connect(m_browser, &MythUIWebBrowser::iconChanged, this, &WebPage::slotIconChanged);
 }
 
 WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
@@ -40,16 +36,12 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
 {
     m_listItem = new MythUIButtonListItem(parent->m_pageList, "");
 
-    connect(m_browser, &MythUIWebBrowser::loadStarted,
-            this, &WebPage::slotLoadStarted);
-    connect(m_browser, &MythUIWebBrowser::loadFinished,
-            this, &WebPage::slotLoadFinished);
-    connect(m_browser, &MythUIWebBrowser::titleChanged,
-            this, &WebPage::slotTitleChanged);
-    connect(m_browser, &MythUIWebBrowser::loadProgress,
-            this, &WebPage::slotLoadProgress);
-    connect(m_browser, &MythUIWebBrowser::statusBarMessage,
-            this, &WebPage::slotStatusBarMessage);
+    connect(m_browser, &MythUIWebBrowser::loadStarted, this, &WebPage::slotLoadStarted);
+    connect(m_browser, &MythUIWebBrowser::loadFinished, this, &WebPage::slotLoadFinished);
+    connect(m_browser, &MythUIWebBrowser::titleChanged, this, &WebPage::slotTitleChanged);
+    connect(m_browser, &MythUIWebBrowser::loadProgress, this, &WebPage::slotLoadProgress);
+    connect(m_browser, &MythUIWebBrowser::statusBarMessage, this, &WebPage::slotStatusBarMessage);
+    connect(m_browser, &MythUIWebBrowser::iconChanged, this, &WebPage::slotIconChanged);
 }
 
 WebPage::~WebPage()
@@ -84,12 +76,10 @@ void WebPage::SetActive(bool active)
     m_active = active;
 }
 
-void WebPage::slotIconChanged(void)
+void WebPage::slotIconChanged(const QIcon &icon)
 {
     if (!m_listItem)
         return;
-
-    QIcon icon = m_browser->GetIcon();
 
     if (icon.isNull())
     {
@@ -126,8 +116,6 @@ void WebPage::slotLoadStarted(void)
 void WebPage::slotLoadFinished(bool OK)
 {
     m_listItem->DisplayState("off", "loadingstate");
-
-    slotIconChanged();
 
     m_listItem->SetText(m_browser->GetTitle());
 

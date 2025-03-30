@@ -2003,6 +2003,10 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+#ifdef USING_QTWEBENGINE
+    QtWebEngine::initialize();
+#endif
+
     MythDisplay::ConfigureQtGUI(1, cmdline);
     QApplication::setSetuidAllowed(true);
     QApplication a(argc, argv);

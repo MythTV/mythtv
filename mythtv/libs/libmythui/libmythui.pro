@@ -2,9 +2,7 @@ include ( ../../settings.pro )
 
 QT += xml sql network widgets
 using_opengl: QT += opengl
-using_qtwebkit: contains(QT_MAJOR_VERSION, 5): {
-    QT += webkitwidgets
-}
+using_qtwebengine: QT += webenginewidgets
 android: QT += androidextras
 
 TEMPLATE = lib
@@ -104,7 +102,7 @@ SOURCES += schemawizard.cpp
 SOURCES += standardsettings.cpp
 SOURCES += storagegroupeditor.cpp
 
-using_qtwebkit {
+using_qtwebengine {
 HEADERS += mythuiwebbrowser.h
 SOURCES += mythuiwebbrowser.cpp
 }
@@ -354,7 +352,7 @@ using_opengl {
     mingw|win32-msvc*:LIBS += -lopengl32
 }
 
-DEFINES += USING_QTWEBKIT
+DEFINES += USING_QTWEBENGINE
 DEFINES += MUI_API
 
 use_hidesyms {

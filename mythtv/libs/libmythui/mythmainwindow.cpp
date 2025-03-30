@@ -902,6 +902,10 @@ void MythMainWindow::InitKeys()
         "Zoom out on browser window"),          ",,<,Ctrl+B,Media Rewind");
     RegisterKey("Browser", "TOGGLEINPUT",     QT_TRANSLATE_NOOP("MythControls",
         "Toggle where keyboard input goes to"),  "F1");
+    RegisterKey("Browser", "RELOAD"     ,     QT_TRANSLATE_NOOP("MythControls",
+        "Reload the current webpage"),           "F2");
+    RegisterKey("Browser", "FULLRELOAD",      QT_TRANSLATE_NOOP("MythControls",
+        "Reload the current webpage bypassing the cache"),  "F3");
 
     RegisterKey("Browser", "MOUSEUP",         QT_TRANSLATE_NOOP("MythControls",
         "Move mouse pointer up"),                 "2");

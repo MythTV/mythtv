@@ -371,7 +371,10 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "ESCAPE")
         {
-            GetScreenStack()->PopScreen();
+            if (activeBrowser()->CanGoBack())
+                activeBrowser()->Back();
+            else
+                GetScreenStack()->PopScreen();
         }
         else if (action == "PREVTAB")
         {

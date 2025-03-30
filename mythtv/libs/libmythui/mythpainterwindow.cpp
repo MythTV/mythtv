@@ -118,7 +118,7 @@ QString MythPainterWindow::CreatePainters(MythMainWindow *MainWin,
     };
 
     // N.B. this won't be selectable as a painter in the UI but can be forced
-    // from the command line again (-O ThemePainter=Qt)
+    // from the command line again (-O PaintEngine=Qt)
     if (painter.contains(MYTH_PAINTER_QT, Qt::CaseInsensitive))
         painterstotry.prepend(TryQt);
     else

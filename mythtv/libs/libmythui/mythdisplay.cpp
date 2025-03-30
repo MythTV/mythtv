@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QWindow>
+#include <QQuickWindow>
 
 // MythTV
 #include "libmythbase/compat.h"
@@ -1163,6 +1164,8 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 
 #ifdef USING_QTWEBENGINE
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QQuickWindow::setSceneGraphBackend("software");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Using shared OpenGL Contexts");
 #endif
 
     // Set the default surface format. Explicitly required on some platforms.

@@ -39,7 +39,7 @@ class WebPage : public QObject
     void slotLoadProgress(int progress);
     void slotTitleChanged(const QString &title);
     void slotStatusBarMessage(const QString &text);
-    void slotIconChanged(void);
+    void slotIconChanged(const QIcon &icon);
 
   protected:
 

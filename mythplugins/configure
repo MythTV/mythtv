@@ -608,7 +608,7 @@ ECXXFLAGS=$(cat mythconfig.mak | grep -e "^ECXXFLAGS=")
 ECXXFLAGS=${ECXXFLAGS#ECXXFLAGS=}
 CXXPPFLAGS=$(cat mythconfig.mak | grep -e "^CXXPPFLAGS=")
 CXXPPFLAGS=${CXXPPFLAGS#CXXPPFLAGS=}
-WEBKIT=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBKIT=yes")
+WEBENGINE=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBENGINE=yes")
 
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
@@ -642,9 +642,9 @@ if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
 fi
 
 if enabled browser; then
-    if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
+    if test "$WEBENGINE" != "CONFIG_QTWEBENGINE=yes"; then
         disable browser
-        echo "MythBrowser requires QtWebkit."
+        echo "MythBrowser requires QtWebEngine."
     fi
 fi
 
