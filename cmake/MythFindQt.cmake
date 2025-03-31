@@ -12,14 +12,23 @@ set(QT_DEFAULT_MAJOR_VERSION ${QT_VERSION_MAJOR})
 #
 message(STATUS "Checking for ${QT_PKG_NAME} libraries")
 
+set(_REQUIRED_COMPONENTS
+    Core
+    Gui
+    Network
+    OpenGL
+    Sql
+    Test
+    Widgets
+    Xml)
 if(NOT CMAKE_CROSSCOMPILING)
-  set(_OTHER_REQUIRED DBus)
+  list(APPEND _REQUIRED_COMPONENTS DBus)
   if(${QT_VERSION_MAJOR} EQUAL 5)
     set(_OPTIONAL_COMPONENTS Script ScriptTools WebKit WebKitWidgets)
   endif()
 elseif(ANDROID)
   if(${QT_VERSION_MAJOR} EQUAL 5)
-    set(_OTHER_REQUIRED AndroidExtras)
+    list(APPEND _REQUIRED_COMPONENTS AndroidExtras)
   endif()
 endif()
 
@@ -38,17 +47,24 @@ endif(CMAKE_CROSSCOMPILING)
 #
 find_package(
   ${QT_PKG_NAME} ${QT_MIN_VERSION_STR} NO_MODULE
-  COMPONENTS Core
-             Gui
-             Network
-             OpenGL
-             Sql
-             Test
-             Widgets
-             Xml
-             ${_OTHER_REQUIRED}
+  COMPONENTS ${_REQUIRED_COMPONENTS}
   OPTIONAL_COMPONENTS ${_OPTIONAL_COMPONENTS})
+foreach(component ${_REQUIRED_COMPONENTS} ${_OPTIONAL_COMPONENTS})
+  if(${${QT_PKG_NAME}${component}_FOUND})
+    list(APPEND _components_found ${component})
+  else()
+    list(APPEND _components_missing ${component})
+  endif()
+endforeach()
+list(JOIN _components_found " " _components_found_str)
+if(_components_missing)
+  list(JOIN _components_missing " " _components_missing_str)
+else()
+  set(_components_missing_str "(none)")
+endif()
 message(STATUS "  Found ${QT_PKG_NAME}, version ${${QT_PKG_NAME}_VERSION}")
+message(STATUS "  Found components: ${_components_found_str}")
+message(STATUS "  Missing components: ${_components_missing_str}")
 
 #
 # End: prevent finding system androiddeployqt
