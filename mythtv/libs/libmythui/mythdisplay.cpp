@@ -8,7 +8,9 @@
 #include <QElapsedTimer>
 #include <QWindow>
 
-#ifdef USING_QTWEBENGINE
+#include "config.h"
+
+#if CONFIG_QTWEBENGINE
 #include <QQuickWindow>
 #endif
 
@@ -1165,7 +1167,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     bool gsyncchanged = false;
     bool freesyncchanged = false;
 
-#ifdef USING_QTWEBENGINE
+#if CONFIG_QTWEBENGINE
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QQuickWindow::setSceneGraphBackend("software");
     LOG(VB_GENERAL, LOG_INFO, LOC + "Using shared OpenGL Contexts");

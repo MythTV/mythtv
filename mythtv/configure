@@ -158,6 +158,7 @@ Advanced options (experts only):
   --disable-libass         disable libass SSA/ASS subtitle support
   --disable-systemd_notify disable systemd notify support
   --disable-systemd_journal disable systemd journal support
+  --disable-qtwebengine    disable webengine support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
@@ -1807,6 +1808,7 @@ USING_LIST='
     videotoolbox
     waylandextras
     qtprivateheaders
+    qtwebengine
 '
 
 CMDLINE_SELECT="
@@ -2213,6 +2215,7 @@ enable system_libbluray
 enable system_libudfread
 enable waylandextras
 enable qtscript
+enable qtwebengine
 
 # mythtv paths
 dvb_path_default="${sysinclude:-$sysroot/usr/include}"
@@ -5823,21 +5826,26 @@ case $target_os in
         ;;
 esac
 
+# qtwebengine is enabled by default.
+# if it is disabled on the command line we will
+# not enable it here.
+if enabled qtwebengine ; then
+    if ! $(pkg-config --exists Qt5WebEngine) && ! $(pkg-config --exists QtWebEngine) ; then
+        check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF || disable qtwebengine
+#include <QtWebEngine/QtWebEngine>
+int main(void){ return 0; }
+EOF
+    fi
+
+    enabled qtwebengine || warn "QtWebEngine headers not found. Plugins may fail."
+else
+    warn "QtWebEngine support is disabled on commandline. Plugins may fail."
+fi
+
 # Omit Qt5 modules that aren't in Qt6.
 # qtscript is enabled by default.
 # if it is disabled on the command line we will
 # not enable it here.
-if $(pkg-config --exists Qt5WebEngine) || $(pkg-config --exists QtWebEngine) ; then
-    enable qtwebengine
-else
-    check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebengine
-#include <QtWebEngine/QtWebEngine>
-int main(void){ return 0; }
-EOF
-fi
-
-enabled qtwebengine || warn "QtWebEngine headers not found. Plugins may fail."
-
 if [ $qt_version -lt $(version2num "6.0.0") ]; then
     if enabled qtscript ; then
         if ! pkg-config --exists Qt5Script && ! pkg-config --exists QtScript ; then
@@ -6633,6 +6641,7 @@ if enabled frontend; then
   echo "Vulkan                    ${vulkan-no} (libglslang ${libglslang-no})"
   echo "MHEG support              ${mheg}"
   echo "libass subtitle support   ${libass-no}"
+  echo "QtWebEngine support       ${qtwebengine-no}"
   echo
 fi
 

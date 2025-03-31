@@ -15,10 +15,7 @@
 #include <QStringList>
 #include <QTextStream>
 
-
-#ifdef USING_QTWEBENGINE
-#include "libmythui/mythuiwebbrowser.h"
-#endif
+#include "config.h"
 
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
@@ -46,7 +43,11 @@
 #include "libmythui/mythuispinbox.h"
 #include "libmythui/mythuitextedit.h"
 #include "libmythui/mythuivideo.h"
+
+#if CONFIG_QTWEBENGINE
 #include "libmythui/mythuiwebbrowser.h"
+#endif
+
 
 // MythFrontend
 #include "networkcontrol.h"
@@ -1185,7 +1186,7 @@ QString NetworkControl::getWidgetType(MythUIType* type)
         return "MythUIImage";
     if (dynamic_cast<MythUISpinBox *>(type))
         return "MythUISpinBox";
-#ifdef USING_QTWEBENGINE
+#if CONFIG_QTWEBENGINE
     if (dynamic_cast<MythUIWebBrowser *>(type))
         return "MythUIWebBrowser";
 #endif
