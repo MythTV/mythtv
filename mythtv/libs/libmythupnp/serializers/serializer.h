@@ -70,7 +70,10 @@ class UPNP_PUBLIC Serializer
         inline Serializer();
 };
 
+// This is also defined in /usr/include/qt5/QtQml/qqmlcontext.h
+#ifndef QQMLCONTEXT_H
 Q_DECLARE_METATYPE( QList<QObject*> )
+#endif
 
 inline Serializer::Serializer() :
     m_hash(QCryptographicHash::Sha1)

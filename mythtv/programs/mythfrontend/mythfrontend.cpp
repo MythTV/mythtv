@@ -29,6 +29,9 @@
 #include <QProcessEnvironment>
 #endif
 #include <QTimer>
+#ifdef USING_QTWEBENGINE
+#include <QtWebEngine>
+#endif
 
 // MythTV
 #include "libmyth/audio/audiooutput.h"
