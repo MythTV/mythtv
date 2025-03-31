@@ -352,7 +352,6 @@ using_opengl {
     mingw|win32-msvc*:LIBS += -lopengl32
 }
 
-DEFINES += USING_QTWEBENGINE
 DEFINES += MUI_API
 
 use_hidesyms {

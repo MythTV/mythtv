@@ -10,6 +10,7 @@
 #include <QGuiApplication>
 
 // MythTV
+#include <libmythbase/mythconfig.h>
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
@@ -548,7 +549,7 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
         native->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
 #endif
 
-#ifdef USING_QTWEBENGINE
+#ifdef CONFIG_QTWEBENGINE
     auto * globalcontext = QOpenGLContext::globalShareContext();
     if (globalcontext)
     {

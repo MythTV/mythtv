@@ -147,7 +147,6 @@ if(TARGET ${QT_PKG_NAME}::Script)
 endif()
 
 if(TARGET ${QT_PKG_NAME}::WebEngineWidgets)
-  target_compile_definitions(${QT_PKG_NAME}::WebEngineWidgets INTERFACE USING_QTWEBENGINE)
   set(CONFIG_QTWEBENGINE ON)
 endif()
 

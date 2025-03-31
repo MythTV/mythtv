@@ -1,3 +1,5 @@
+#include "libmythbase/mythconfig.h"
+
 // C/C++
 #include <cerrno>
 #include <csignal>
@@ -29,7 +31,7 @@
 #include <QProcessEnvironment>
 #endif
 #include <QTimer>
-#ifdef USING_QTWEBENGINE
+#ifdef CONFIG_QTWEBENGINE
 #include <QtWebEngine>
 #endif
 
@@ -44,7 +46,6 @@
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythcdrom.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
@@ -2006,7 +2007,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-#ifdef USING_QTWEBENGINE
+#ifdef CONFIG_QTWEBENGINE
     QtWebEngine::initialize();
 #endif
 
