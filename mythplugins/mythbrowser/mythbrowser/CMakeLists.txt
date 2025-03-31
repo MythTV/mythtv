@@ -4,9 +4,9 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
-if(NOT TARGET Qt${QT_VERSION_MAJOR}::WebKitWidgets)
+if(NOT TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
   message(
-    STATUS "Disabling MythBrowser due to missing QtWebKitWidgets library.")
+    STATUS "Disabling MythBrowser due to missing QtWebEngineWidgets library.")
   return()
 endif()
 
@@ -44,7 +44,7 @@ target_link_libraries(
           Qt${QT_VERSION_MAJOR}::Widgets
           Qt${QT_VERSION_MAJOR}::Xml
           Qt${QT_VERSION_MAJOR}::Widgets
-          Qt${QT_VERSION_MAJOR}::WebKitWidgets
+          Qt${QT_VERSION_MAJOR}::WebEngineWidgets
           ${BASE_MYTHTV_LIBS}
           # This don't seem to flow through on OSX.
           $<$<BOOL:${APPLE}>:${MYTHTV}>)

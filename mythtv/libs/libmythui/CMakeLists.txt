@@ -201,11 +201,11 @@ if(TARGET Qt5::AndroidExtras)
   target_link_libraries(mythui PUBLIC Qt5::AndroidExtras)
 endif()
 
-if(TARGET Qt${QT_VERSION_MAJOR}::WebKit)
+if(TARGET Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
   list(APPEND HEADERS_TO_INSTALL mythuiwebbrowser.h)
   target_sources(mythui PRIVATE mythuiwebbrowser.cpp mythuiwebbrowser.h)
-  target_link_libraries(mythui PUBLIC Qt${QT_VERSION_MAJOR}::WebKit
-                                      Qt${QT_VERSION_MAJOR}::WebKitWidgets)
+  target_link_libraries(mythui PUBLIC Qt${QT_VERSION_MAJOR}::Quick
+                                      Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
 endif()
 
 if(TARGET X11::X11)

@@ -145,10 +145,10 @@ target_compile_definitions(
 list(
   APPEND
   EXTRA_PACKAGES
-  $<$<BOOL:${USING_QTDBUS}>:Qt${QT_VERSION_MAJOR}::DBus>
-  $<$<BOOL:${USING_QTSCRIPT}>:Qt${QT_VERSION_MAJOR}::Script>
-  $<$<BOOL:${USING_QTSCRIPT}>:Qt${QT_VERSION_MAJOR}::ScriptTools>
-  $<$<BOOL:${USING_QTWEBKIT}>:Qt${QT_VERSION_MAJOR}::WebKitWidgets>
+  $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::DBus>
+  $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::Script>
+  $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::ScriptTools>
+  $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::WebEngine>
   # AndroidExtras only exists for Qt5
   $<TARGET_NAME_IF_EXISTS:Qt5::AndroidExtras>)
 
