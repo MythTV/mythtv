@@ -31,7 +31,7 @@
 #include <QProcessEnvironment>
 #endif
 #include <QTimer>
-#ifdef CONFIG_QTWEBENGINE
+#if CONFIG_QTWEBENGINE
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QtWebEngineQuick>
 #else
@@ -2011,7 +2011,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-#ifdef CONFIG_QTWEBENGINE
+#if CONFIG_QTWEBENGINE
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     QtWebEngineQuick::initialize();
 #else
