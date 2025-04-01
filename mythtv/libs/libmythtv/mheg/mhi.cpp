@@ -1299,7 +1299,7 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
         if (glyphIndex == 0)
         {
             LOG(VB_MHEG, LOG_INFO, QString("[mhi] Unknown glyph 0x%1")
-                .arg(ch.unicode(),0,16));
+                .arg(static_cast<short>(ch.unicode()),0,16));
             previous = 0;
             continue;
         }
