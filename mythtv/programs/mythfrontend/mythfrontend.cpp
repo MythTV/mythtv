@@ -32,7 +32,11 @@
 #endif
 #include <QTimer>
 #ifdef CONFIG_QTWEBENGINE
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtWebEngineQuick>
+#else
 #include <QtWebEngine>
+#endif
 #endif
 
 // MythTV
@@ -2008,7 +2012,11 @@ Q_DECL_EXPORT int main(int argc, char **argv)
     }
 
 #ifdef CONFIG_QTWEBENGINE
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    QtWebEngineQuick::initialize();
+#else
     QtWebEngine::initialize();
+#endif
 #endif
 
     MythDisplay::ConfigureQtGUI(1, cmdline);

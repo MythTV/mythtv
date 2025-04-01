@@ -148,7 +148,8 @@ list(
   $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::DBus>
   $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::Script>
   $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::ScriptTools>
-  $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::WebEngine>
+  $<TARGET_NAME_IF_EXISTS:Qt5::WebEngine>
+  $<TARGET_NAME_IF_EXISTS:Qt6::WebEngineQuick>
   # AndroidExtras only exists for Qt5
   $<TARGET_NAME_IF_EXISTS:Qt5::AndroidExtras>)
 

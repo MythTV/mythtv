@@ -9,6 +9,11 @@ mingw | win32-msvc* {
    QT += scripttools
 }
 using_qtwebengine {
+    equals(QT_MAJOR_VERSION, 6) {
+        QT += webenginequick
+    } else {
+        QT += webengine
+    }
     QT += webenginewidgets
 }
 android: QT += androidextras
