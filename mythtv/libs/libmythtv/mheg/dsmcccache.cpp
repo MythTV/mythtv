@@ -54,7 +54,7 @@ QString DSMCCCacheKey::toString() const
 {
     QString result;
     for (int i = 0; i < 4 && i < size(); i++)
-        result += QString("%1").arg(at(i), 2, 16, QChar('0'));
+        result += QString("%1").arg(static_cast<uint>(at(i)), 2, 16, QChar('0'));
     return result;
 }
 

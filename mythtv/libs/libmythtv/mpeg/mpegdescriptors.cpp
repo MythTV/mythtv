@@ -840,7 +840,7 @@ void RegistrationDescriptor::InitializeDescriptionMap(void)
 
     for (uint i = 0; i <= 99; i++)
     {
-        description_map[QString("US%1").arg(i, 2, QLatin1Char('0'))] =
+        description_map[QString("US%1").arg(i, 2, 16, QLatin1Char('0'))] =
             "NIMA, Unspecified military application";
     }
 

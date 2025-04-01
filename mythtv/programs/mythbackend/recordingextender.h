@@ -28,6 +28,7 @@
 
 #include <QMutex>
 #include <QJsonDocument>
+#include <QUrl>
 
 #include "libmythbase/mthread.h"
 #include "libmythtv/recordingrule.h"
