@@ -259,7 +259,6 @@ set_target_properties(
   mythmetadata
   mythmpeg2
   mythprotoserver
-  mythservicecontracts
   mythtv
   mythui
   mythupnp

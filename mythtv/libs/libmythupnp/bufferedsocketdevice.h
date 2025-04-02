@@ -14,6 +14,7 @@
 #define BUFFEREDSOCKETDEVICE_H
 
 // C++ headers
+#include <chrono>
 #include <deque>
 
 // Qt headers

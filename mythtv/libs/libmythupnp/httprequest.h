@@ -24,6 +24,7 @@
 #include <QTextStream>
 
 // MythTV headers
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/mythsession.h"
 
 #include "upnpexp.h"

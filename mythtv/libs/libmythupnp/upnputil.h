@@ -19,16 +19,12 @@
 #include <QMap>
 #include <QStringList>
 
-// MythTV headers
-#include "libmythbase/mythchrono.h"
-
 #include "upnpexp.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Typedefs
 //////////////////////////////////////////////////////////////////////////////
 
-using TaskTime   = std::chrono::microseconds;
 using QStringMap = QMap< QString, QString >;
 using QStringMultiMap = QMultiMap< QString, QString >;
 

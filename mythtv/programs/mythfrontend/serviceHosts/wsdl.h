@@ -13,16 +13,14 @@
 #ifndef WSDL_H
 #define WSDL_H
 
-#include <QMetaObject>
-#include <QMetaMethod>
-#include <QString>
-#include <QMap>
 #include <QDomDocument>
+#include <QDomElement>
+#include <QMap>
+#include <QMetaObject>
+#include <QString>
 
-#include "libmythupnp/upnpexp.h"
-#include "libmythupnp/upnp.h"
-#include "libmythupnp/servicehost.h"
-#include "libmythupnp/xsd.h"
+#include "servicehost.h"
+#include "xsd.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -32,7 +30,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC Wsdl : public QDomDocument
+class Wsdl : public QDomDocument
 {
     protected:
         ServiceHost             *m_pServiceHost {nullptr};
