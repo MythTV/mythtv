@@ -103,12 +103,9 @@ using MPoolQueues = QMap<int, MPoolQueue>;
 class MPoolThread : public MThread
 {
   public:
-    MPoolThread(MThreadPool &pool, std::chrono::milliseconds timeout) :
-        MThread("PT"), m_pool(pool), m_expiryTimeout(timeout)
+    MPoolThread(QString objectName, MThreadPool &pool, std::chrono::milliseconds timeout) :
+        MThread(std::move(objectName)), m_pool(pool), m_expiryTimeout(timeout)
     {
-        QMutexLocker locker(&s_lock);
-        setObjectName(QString("PT%1").arg(s_thread_num));
-        s_thread_num++;
     }
 
     void run(void) override // MThread
@@ -201,12 +198,7 @@ class MPoolThread : public MThread
     bool            m_doRun          {true};
     QString         m_runnableName;
     bool            m_reserved       {false};
-
-    static QMutex s_lock;
-    static uint s_thread_num;
 };
-QMutex MPoolThread::s_lock;
-uint MPoolThread::s_thread_num = 0;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -228,6 +220,7 @@ class MThreadPoolPrivate
     std::chrono::milliseconds m_expiryTimeout {2min};
     int  m_maxThreadCount   {QThread::idealThreadCount()};
     int  m_reserveThread    {0};
+    int  m_threadsCreated   {0};
 
     MPoolQueues         m_runQueues;
     QSet<MPoolThread*>  m_availThreads;
@@ -424,7 +417,9 @@ bool MThreadPool::TryStartInternal(
     {
         if (reserved)
             m_priv->m_reserveThread++;
-        auto *thread = new MPoolThread(*this, m_priv->m_expiryTimeout);
+        QString name {QString("%1%2").arg(m_priv->m_name, QString::number(m_priv->m_threadsCreated))};
+        m_priv->m_threadsCreated++;
+        auto *thread = new MPoolThread(name, *this, m_priv->m_expiryTimeout);
         m_priv->m_runningThreads.insert(thread);
         thread->SetRunnable(runnable, debugName, reserved);
         thread->start();
