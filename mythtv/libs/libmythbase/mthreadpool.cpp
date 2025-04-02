@@ -112,8 +112,6 @@ class MPoolThread : public MThread
     {
         RunProlog();
 
-        MythTimer t;
-        t.start();
         QMutexLocker locker(&m_lock);
         if (m_doRun && m_runnable == nullptr)
         {
@@ -139,8 +137,6 @@ class MPoolThread : public MThread
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
             qApp->processEvents();
             qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
-
-            t.start();
 
             if (m_doRun)
             {
