@@ -115,21 +115,12 @@ class MPoolThread : public MThread
         MythTimer t;
         t.start();
         QMutexLocker locker(&m_lock);
-        while (true)
+        if (m_doRun && m_runnable == nullptr)
         {
-            if (m_doRun && !m_runnable)
-                m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
-
-            if (!m_runnable)
-            {
-                m_doRun = false;
-
-                locker.unlock();
-                m_pool.NotifyDone(this);
-                locker.relock();
-                break;
-            }
-
+            m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
+        }
+        while (m_runnable != nullptr)
+        {
             if (!m_runnableName.isEmpty())
                 loggingRegisterThread(m_runnableName);
 
@@ -157,14 +148,17 @@ class MPoolThread : public MThread
                 m_pool.NotifyAvailable(this);
                 locker.relock();
             }
-            else
+            if (m_doRun && m_runnable == nullptr)
             {
-                locker.unlock();
-                m_pool.NotifyDone(this);
-                locker.relock();
-                break;
+                m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
             }
         }
+
+        m_doRun = false;
+
+        locker.unlock();
+        m_pool.NotifyDone(this);
+        locker.relock();
 
         RunEpilog();
     }
