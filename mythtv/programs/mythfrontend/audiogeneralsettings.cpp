@@ -38,9 +38,9 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     setLabel(tr("Audio output device"));
 #ifdef Q_OS_ANDROID
     QString dflt = "OpenSLES:";
-#elif USING_ALSA
+#elif CONFIG_AUDIO_ALSA
     QString dflt = "ALSA:default";
-#elif USING_PULSEOUTPUT
+#elif CONFIG_AUDIO_PULSEOUTPUT
     QString dflt = "PulseAudio:default";
 #elif defined(Q_OS_DARWIN)
     QString dflt = "CoreAudio:";
@@ -159,7 +159,7 @@ AudioConfigSettings::AudioConfigSettings()
     addChild(srcqualityoverride);
 
     advancedSettings->addChild(Audio48kOverride());
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
     advancedSettings->addChild(SPDIFRateOverride());
 #endif
 
@@ -572,7 +572,7 @@ bool AudioConfigSettings::CheckPassthrough()
     return ok;
 }
 
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
 static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
                                   const QDir& dir, bool absPath = true)
 
@@ -1109,7 +1109,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
     auto *gc = new HostComboBoxSetting("MixerDevice", true);
     gc->setLabel(tr("Mixer device"));
 
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
     QDir dev("/dev", "mixer*", QDir::Name, QDir::System);
     fillSelectionsFromDir(gc, dev);
 
@@ -1119,7 +1119,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
         fillSelectionsFromDir(gc, dev);
     }
 #endif
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
     gc->addSelection("ALSA:default", "ALSA:default");
 #endif
 #ifdef _WIN32

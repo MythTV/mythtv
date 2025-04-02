@@ -127,11 +127,6 @@ using_vdpau:DEFINES += USING_VDPAU
 using_vaapi:using_opengl:DEFINES += USING_VAAPI
 using_mmal:DEFINES += USING_MMAL
 
-using_pulse:DEFINES += USING_PULSE
-using_pulseoutput: DEFINES += USING_PULSEOUTPUT
-using_alsa:DEFINES += USING_ALSA
-using_jack:DEFINES += USING_JACK
-using_oss: DEFINES += USING_OSS
 using_libcec: DEFINES += USING_LIBCEC
 macx:      DEFINES += USING_COREAUDIO
 using_libdns_sd {

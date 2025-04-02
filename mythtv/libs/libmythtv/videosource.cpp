@@ -1006,13 +1006,13 @@ class AudioDevice : public CaptureCardComboBoxSetting
                                    "audiodevice")
     {
         setLabel(QObject::tr("Audio device"));
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
 #endif
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
         addSelection("ALSA:default", "ALSA:default");
 #endif
         addSelection(QObject::tr("(None)"), "NULL");

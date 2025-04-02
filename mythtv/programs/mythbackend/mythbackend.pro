@@ -101,8 +101,6 @@ SOURCES += servicesv2/v2music.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
 SOURCES += servicesv2/v2config.cpp
 
-using_oss:DEFINES += USING_OSS
-
 DEFINES +=    USING_IPTV
 
 using_dvb        : DEFINES +=    USING_DVB

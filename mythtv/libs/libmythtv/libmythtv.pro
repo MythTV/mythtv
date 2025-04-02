@@ -806,12 +806,10 @@ using_backend {
     using_alsa {
         HEADERS += recorders/audioinputalsa.h
         SOURCES += recorders/audioinputalsa.cpp
-        DEFINES += USING_ALSA
     }
     using_oss {
         HEADERS += recorders/audioinputoss.h
         SOURCES += recorders/audioinputoss.cpp
-        DEFINES += USING_OSS
     }
 
     # Support for Video4Linux devices

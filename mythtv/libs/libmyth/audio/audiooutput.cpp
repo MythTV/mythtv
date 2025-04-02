@@ -1,3 +1,5 @@
+#include "libmythbase/mythconfig.h"
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -17,22 +19,22 @@
 #include "audiooutputdx.h"
 #include "audiooutputwin.h"
 #endif
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
 #include "audiooutputoss.h"
 #endif
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
 #include "audiooutputalsa.h"
 #endif
 #ifdef Q_OS_DARWIN
 #include "audiooutputca.h"
 #endif
-#ifdef USING_JACK
+#if CONFIG_AUDIO_JACK
 #include "audiooutputjack.h"
 #endif
-#ifdef USING_PULSEOUTPUT
+#if CONFIG_AUDIO_PULSEOUTPUT
 #include "audiooutputpulse.h"
 #endif
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
 #include "audiopulsehandler.h"
 #endif
 #ifdef Q_OS_ANDROID
@@ -50,7 +52,7 @@ extern "C" {
 
 void AudioOutput::Cleanup(void)
 {
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     PulseHandler::Suspend(PulseHandler::kPulseCleanup);
 #endif
 }
@@ -87,7 +89,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     if (settings.m_format == FORMAT_NONE || settings.m_channels <= 0)
         willsuspendpa = false;
 
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     bool pulsestatus = false;
 #else
     {
@@ -99,30 +101,30 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                 "WARNING: ***Pulse Audio is running***");
         }
     }
-#endif // USING_PULSE
+#endif // CONFIG_AUDIO_PULSE
 
     settings.FixPassThrough();
 
     if (main_device.startsWith("PulseAudio:"))
     {
-#ifdef USING_PULSEOUTPUT
+#if CONFIG_AUDIO_PULSEOUTPUT
         return new AudioOutputPulseAudio(settings);
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to PulseAudio "
                                  "but PulseAudio support is not compiled in!");
         return nullptr;
-#endif // USING_PULSEOUTPUT
+#endif // CONFIG_AUDIO_PULSEOUTPUT
     }
     if (main_device.startsWith("NULL"))
     {
         return new AudioOutputNULL(settings);
     }
 
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     if (willsuspendpa)
     {
         bool ispulse = false;
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
         // Check if using ALSA, that the device doesn't contain the word
         // "pulse" in its hint
         if (main_device.startsWith("ALSA:"))
@@ -142,7 +144,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             }
             delete alsadevs;
         }
-#endif // USING_ALSA
+#endif // CONFIF_AUDIO_ALSA
         if (main_device.contains("pulse", Qt::CaseInsensitive))
         {
             ispulse = true;
@@ -152,11 +154,11 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
         }
     }
-#endif // USING_PULSE
+#endif // CONFIG_AUDIO_PULSE
 
     if (main_device.startsWith("ALSA:"))
     {
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
         settings.TrimDeviceType();
         ret = new AudioOutputALSA(settings);
 #else
@@ -166,7 +168,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
     else if (main_device.startsWith("JACK:"))
     {
-#ifdef USING_JACK
+#if CONFIG_AUDIO_JACK
         settings.TrimDeviceType();
         ret = new AudioOutputJACK(settings);
 #else
@@ -213,7 +215,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                                  "in!");
 #endif
     }
-#if defined(USING_OSS)
+#if CONFIG_AUDIO_OSS
     else
     {
         ret = new AudioOutputOSS(settings);
@@ -230,13 +232,13 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         LOG(VB_GENERAL, LOG_CRIT, "No useable audio output driver found.");
         LOG(VB_GENERAL, LOG_ERR, "Don't disable OSS support unless you're "
                                  "not running on Linux.");
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
         if (pulsestatus)
             PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
         return nullptr;
     }
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     ret->m_pulseWasSuspended = pulsestatus;
 #endif
     return ret;
@@ -244,7 +246,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 
 AudioOutput::~AudioOutput()
 {
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     if (m_pulseWasSuspended)
         PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
@@ -395,7 +397,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     return adc;
 }
 
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
 static void fillSelectionsFromDir(const QDir &dir,
                                   AudioOutput::ADCVect *list)
 {
@@ -418,11 +420,11 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 {
     auto *list = new ADCVect;
 
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     bool pasuspended = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
 #endif
 
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
     QMap<QString, QString> *alsadevs = AudioOutputALSA::GetDevices("pcm");
 
     if (!alsadevs->empty())
@@ -442,7 +444,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     }
     delete alsadevs;
 #endif
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
     {
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev, list);
@@ -459,7 +461,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
     }
 #endif
-#ifdef USING_JACK
+#if CONFIG_AUDIO_JACK
     {
         QString name = "JACK:";
         QString desc = tr("Use JACK default sound server.");
@@ -534,12 +536,12 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     }
 #endif
 
-#ifdef USING_PULSE
+#if CONFIG_AUDIO_PULSE
     if (pasuspended)
         PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
 
-#ifdef USING_PULSEOUTPUT
+#if CONFIG_AUDIO_PULSEOUTPUT
     {
         QString name = "PulseAudio:default";
         QString desc =  tr("PulseAudio default sound server.");
