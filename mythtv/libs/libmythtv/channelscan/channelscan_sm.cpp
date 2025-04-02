@@ -42,6 +42,7 @@
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 // MythTV includes - General
@@ -1980,7 +1981,7 @@ const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 
 V4LChannel *ChannelScanSM::GetV4LChannel(void)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     return dynamic_cast<V4LChannel*>(m_channel);
 #else
     return nullptr;

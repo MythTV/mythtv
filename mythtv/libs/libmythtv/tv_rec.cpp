@@ -1267,11 +1267,11 @@ DTVChannel *TVRec::GetDTVChannel(void)
 
 V4LChannel *TVRec::GetV4LChannel(void)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     return dynamic_cast<V4LChannel*>(m_channel);
 #else
     return nullptr;
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 }
 
 // Check if EIT is enabled for the video source connected to this input

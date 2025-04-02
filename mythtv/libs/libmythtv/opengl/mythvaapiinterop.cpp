@@ -56,7 +56,7 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
         vaapitypes.emplace_back(DRM_DRMPRIME);
 #endif
 
-#ifdef USING_EGL
+#if CONFIG_EGL
     // zero copy
     if (egl && MythVAAPIInteropDRM::IsSupported(Context))
         vaapitypes.emplace_back(GL_VAAPIEGLDRM);
@@ -82,7 +82,7 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythPlayerUI *Player, MythRender
     {
         for (auto type : vaapi->second)
         {
-#ifdef USING_EGL
+#if CONFIG_EGL
             if ((type == GL_VAAPIEGLDRM) || (type == DRM_DRMPRIME))
                 return new MythVAAPIInteropDRM(Player, Context, type);
 #endif

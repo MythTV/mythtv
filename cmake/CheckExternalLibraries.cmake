@@ -75,6 +75,7 @@ if(ENABLE_XVID AND LibX2vid_VERSION)
 endif()
 
 # vpx: fedora:libvpx-devel debian:libvpx-dev
+# Not used by MythTV code, only by FFmpeg.
 if(ENABLE_VPX)
   pkg_check_modules(LIBVPX "vpx" IMPORTED_TARGET)
   add_build_config(PkgConfig::LIBVPX "vpx")
@@ -98,9 +99,7 @@ if(ENABLE_VDPAU)
   # vdp_device_create_x11
   pkg_check_modules(VDPAU "vdpau>=0.2" IMPORTED_TARGET)
   add_build_config(PkgConfig::VDPAU "vdpau")
-  if(TARGET PkgConfig::VDPAU)
-    target_compile_definitions(PkgConfig::VDPAU INTERFACE USING_VDPAU)
-  endif()
+  set(CONFIG_VDPAU ${VDPAU_FOUND})
 endif()
 
 # vaapi: fedora:libva-devel debian:libva-dev
@@ -116,7 +115,7 @@ if(ENABLE_VAAPI)
   pkg_check_modules(VAAPI "libva>=1.2" IMPORTED_TARGET)
   add_build_config(PkgConfig::VDPAU "vaapi")
   if(TARGET PkgConfig::VAAPI)
-    target_compile_definitions(PkgConfig::VAAPI INTERFACE USING_VAAPI)
+    set(CONFIG_VAAPI TRUE)
     pkg_check_modules(VA-DRM "libva-drm" REQUIRED IMPORTED_TARGET)
     pkg_check_modules(VA-GLX "libva-glx" REQUIRED IMPORTED_TARGET)
     pkg_check_modules(VA-X11 "libva-x11" REQUIRED IMPORTED_TARGET)

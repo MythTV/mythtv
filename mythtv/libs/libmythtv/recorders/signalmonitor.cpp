@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
@@ -25,7 +26,7 @@ extern "C" {
 #   include "dvbchannel.h"
 #endif
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
 // Old
 #   include "analogsignalmonitor.h"
 // New
@@ -110,7 +111,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     else if ((cardtype.toUpper() == "HDPVR"))
     {
         auto *chan = dynamic_cast<V4LChannel*>(channel);

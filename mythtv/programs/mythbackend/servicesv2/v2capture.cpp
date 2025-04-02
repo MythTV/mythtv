@@ -453,12 +453,12 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
         QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
 #endif // USING_DVB
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     pCardTypeList->AddCardType(
         QObject::tr("V4L2 encoder"), "V4L2ENC");
     pCardTypeList->AddCardType(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #ifdef USING_HDHOMERUN
     pCardTypeList->AddCardType(
@@ -489,7 +489,7 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
     pCardTypeList->AddCardType(QObject::tr("IPTV recorder"), "FREEBOX");
 #endif // USING_IPTV
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     pCardTypeList->AddCardType(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
     pCardTypeList->AddCardType(
@@ -499,7 +499,7 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
         "GO7007");
     pCardTypeList->AddCardType(
         QObject::tr("Analog capture card"), "V4L");
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #ifdef USING_ASI
     pCardTypeList->AddCardType(QObject::tr("DVEO ASI recorder"), "ASI");

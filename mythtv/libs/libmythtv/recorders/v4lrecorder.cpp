@@ -1,8 +1,10 @@
 // -*- Mode: c++ -*-
 
-#ifdef USING_V4L2
+#include "libmythbase/mythconfig.h"
+
+#if CONFIG_V4L2
 #include <linux/videodev2.h>
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #include <sys/ioctl.h>      // for ioctl
 #include <sys/time.h>       // for gettimeofday
@@ -93,7 +95,7 @@ int V4LRecorder::OpenVBIDevice(void)
 
     if (VBIMode::NTSC_CC == m_vbiMode)
     {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
         struct v4l2_format fmt {};
         fmt.type = V4L2_BUF_TYPE_VBI_CAPTURE;
         if (0 != ioctl(fd, VIDIOC_G_FMT, &fmt))
@@ -136,7 +138,7 @@ int V4LRecorder::OpenVBIDevice(void)
             close(fd);
             return -1;
         }
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
     }
 
     if (VBIMode::NTSC_CC == m_vbiMode)

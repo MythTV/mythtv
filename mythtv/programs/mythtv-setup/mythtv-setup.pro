@@ -37,5 +37,3 @@ macx {
     }
 }
 
-using_x11:DEFINES += USING_X11
-

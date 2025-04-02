@@ -58,40 +58,40 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
     Options.renderers->append("opengl-yv12");
     Options.priorities->insert("opengl-yv12", 65);
 
-#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL) || defined (USING_V4L2PRIME) || defined (USING_EGL)
+#if CONFIG_VAAPI || CONFIG_VIDEOTOOLBOX || CONFIG_MEDIACODEC || CONFIG_VDPAU || CONFIG_NVDEC || CONFIG_MMAL || CONFIG_V4L2PRIME || CONFIG_EGL
     Options.renderers->append("opengl-hw");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
     Options.priorities->insert("opengl-hw", 110);
 #endif
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
     if (Options.decoders->contains("vaapi"))
         (*Options.safe_renderers)["vaapi"].append("opengl-hw");
 #endif
-#ifdef USING_VTB
+#if CONFIG_VIDEOTOOLBOX
     if (Options.decoders->contains("vtb"))
         (*Options.safe_renderers)["vtb"].append("opengl-hw");
 #endif
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
     if (Options.decoders->contains("mediacodec"))
         (*Options.safe_renderers)["mediacodec"].append("opengl-hw");
 #endif
-#ifdef USING_VDPAU
+#if CONFIG_VDPAU
     if (Options.decoders->contains("vdpau"))
         (*Options.safe_renderers)["vdpau"].append("opengl-hw");
 #endif
-#ifdef USING_NVDEC
+#if CONFIG_NVDEC
     if (Options.decoders->contains("nvdec"))
         (*Options.safe_renderers)["nvdec"].append("opengl-hw");
 #endif
-#ifdef USING_MMAL
+#if CONFIG_MMAL
     if (Options.decoders->contains("mmal"))
         (*Options.safe_renderers)["mmal"].append("opengl-hw");
 #endif
-#ifdef USING_V4L2PRIME
+#if CONFIG_V4L2PRIME
     if (Options.decoders->contains("v4l2"))
         (*Options.safe_renderers)["v4l2"].append("opengl-hw");
 #endif
-#ifdef USING_EGL
+#if CONFIG_EGL
     if (Options.decoders->contains("drmprime"))
         (*Options.safe_renderers)["drmprime"].append("opengl-hw");
 #endif

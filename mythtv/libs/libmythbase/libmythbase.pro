@@ -259,8 +259,6 @@ using_libdns_sd {
     !macx: LIBS += -ldns_sd
 }
 
-using_x11:DEFINES += USING_X11
-
 mingw:LIBS += -lws2_32 -lz
 
 win32-msvc* {

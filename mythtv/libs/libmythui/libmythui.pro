@@ -142,7 +142,6 @@ INSTALLS += inc
 #
 
 using_x11 {
-    DEFINES += USING_X11
     HEADERS += platforms/mythxdisplay.h
     HEADERS += platforms/mythdisplayx11.h
     HEADERS += platforms/mythscreensaverx11.h
@@ -206,7 +205,6 @@ using_qtprivateheaders {
 
 # Use MMAL as a proxy for Raspberry Pi support
 using_mmal {
-    DEFINES += USING_MMAL
     HEADERS += platforms/mythdisplayrpi.h
     SOURCES += platforms/mythdisplayrpi.cpp
     LIBS    += -L/opt/vc/lib -lvchostif -lvchiq_arm
@@ -303,7 +301,6 @@ mingw | win32-msvc*{
 }
 
 using_vulkan {
-    DEFINES += USING_VULKAN
     HEADERS += vulkan/mythpainterwindowvulkan.h
     HEADERS += vulkan/mythpaintervulkan.h
     HEADERS += vulkan/mythrendervulkan.h
@@ -325,11 +322,9 @@ using_vulkan {
     SOURCES += vulkan/mythcombobuffervulkan.cpp
     SOURCES += vulkan/mythdebugvulkan.cpp
     SOURCES += vulkan/mythvertexbuffervulkan.cpp
-    using_libglslang: DEFINES += USING_GLSLANG
 }
 
 using_opengl {
-    DEFINES += USING_OPENGL
     HEADERS += opengl/mythpainterwindowopengl.h
     HEADERS += opengl/mythpainteropengl.h
     HEADERS += opengl/mythrenderopengl.h
@@ -345,7 +340,6 @@ using_opengl {
 
     using_egl {
         LIBS    += -lEGL
-        DEFINES += USING_EGL
     }
 
     mingw|win32-msvc*:LIBS += -lopengl32

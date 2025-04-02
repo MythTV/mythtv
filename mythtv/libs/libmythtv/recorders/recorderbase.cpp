@@ -1,6 +1,7 @@
 #include <algorithm> // for min
 #include <cstdint>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
@@ -883,7 +884,7 @@ RecorderBase *RecorderBase::CreateRecorder(
         if (dynamic_cast<ExternalChannel*>(channel))
             recorder = new ExternalRecorder(tvrec, dynamic_cast<ExternalChannel*>(channel));
     }
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     else if ((genOpt.m_inputType == "MPEG") ||
 	     (genOpt.m_inputType == "HDPVR") ||
 	     (genOpt.m_inputType == "DEMO"))
@@ -900,7 +901,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     {
         recorder = new ImportRecorder(tvrec);
     }
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 #ifdef USING_FIREWIRE
     else if (genOpt.m_inputType == "FIREWIRE")
     {

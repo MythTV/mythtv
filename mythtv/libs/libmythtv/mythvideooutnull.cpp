@@ -18,31 +18,31 @@ void MythVideoOutputNull::GetRenderOptions(RenderOptions& Options)
     (*Options.safe_renderers)["dummy"].append("null");
     if (Options.decoders->contains("ffmpeg"))
         (*Options.safe_renderers)["ffmpeg"].append("null");
-#ifdef USING_VTB
+#if CONFIG_VIDEOTOOLBOX
     if (Options.decoders->contains("vtb-dec"))
         (*Options.safe_renderers)["vtb-dec"].append("null");
 #endif
-#ifdef USING_VDPAU
+#if CONFIG_VDPAU
     if (Options.decoders->contains("vdpau-dec"))
         (*Options.safe_renderers)["vdpau-dec"].append("null");
 #endif
-#ifdef USING_NVDEC
+#if CONFIG_NVDEC
     if (Options.decoders->contains("nvdec-dec"))
         (*Options.safe_renderers)["nvdec-dec"].append("null");
 #endif
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
     if (Options.decoders->contains("vaapi-dec"))
         (*Options.safe_renderers)["vaapi-dec"].append("null");
 #endif
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
     if (Options.decoders->contains("mediacodec-dec"))
         (*Options.safe_renderers)["mediacodec-dec"].append("null");
 #endif
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     if (Options.decoders->contains("v4l2-dec"))
         (*Options.safe_renderers)["v4l2-dec"].append("null");
 #endif
-#ifdef USING_MMAL
+#if CONFIG_MMAL
     if (Options.decoders->contains("mmal-dec"))
         (*Options.safe_renderers)["mmal-dec"].append("null");
 #endif

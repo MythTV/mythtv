@@ -18,6 +18,7 @@
 // MythTV headers
 #include "libmythbase/compat.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
@@ -770,7 +771,7 @@ ChannelBase *ChannelBase::CreateChannel(
 #endif
     else if (genOpt.m_inputType == "V4L2ENC")
     {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
         channel = new V4LChannel(tvrec, genOpt.m_videoDev);
 #endif
         if (genOpt.m_inputType == "MPEG")
@@ -778,7 +779,7 @@ ChannelBase *ChannelBase::CreateChannel(
     }
     else if (CardUtil::IsV4L(genOpt.m_inputType))
     {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
         channel = new V4LChannel(tvrec, genOpt.m_videoDev);
 #endif
         if (genOpt.m_inputType != "HDPVR")

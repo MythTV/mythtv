@@ -50,7 +50,6 @@ macx {
     LIBS += -framework IOKit
 
     using_videotoolbox {
-        DEFINES += USING_VTB
         LIBS += -framework CoreVideo
         LIBS += -framework VideoToolbox
         LIBS += -framework IOSurface
@@ -488,17 +487,11 @@ using_frontend {
         HEADERS += decoders/mythmmalcontext.h
         SOURCES += decoders/mythmmalcontext.cpp
         LIBS    += -L/opt/vc/lib -lmmal -lvcsm
-        DEFINES += USING_MMAL
         # Raspbian
         QMAKE_CXXFLAGS += -isystem /opt/vc/include
     }
 
-    using_v4l2prime {
-        DEFINES += USING_V4L2PRIME
-    }
-
     using_vdpau:using_x11 {
-        DEFINES += USING_VDPAU
         HEADERS += decoders/mythvdpaucontext.h   decoders/mythvdpauhelper.h
         SOURCES += decoders/mythvdpaucontext.cpp decoders/mythvdpauhelper.cpp
         LIBS += -lvdpau
@@ -519,21 +512,18 @@ using_frontend {
     }
 
     using_vaapi {
-        DEFINES += USING_VAAPI
         HEADERS += decoders/mythvaapicontext.h
         SOURCES += decoders/mythvaapicontext.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lva-drm
     }
 
     using_nvdec {
-        DEFINES += USING_NVDEC
         HEADERS += decoders/mythnvdeccontext.h
         SOURCES += decoders/mythnvdeccontext.cpp
         INCLUDEPATH += ../../external/nv-codec-headers/include
     }
 
     using_mediacodec {
-        DEFINES += USING_MEDIACODEC
         HEADERS += decoders/mythmediacodeccontext.h
         SOURCES += decoders/mythmediacodeccontext.cpp
     }
@@ -542,7 +532,6 @@ using_frontend {
     SOURCES += decoders/mythdrmprimecontext.cpp
 
     using_vulkan {
-        DEFINES += USING_VULKAN
         HEADERS += vulkan/mythvideovulkan.h
         HEADERS += vulkan/mythvideooutputvulkan.h
         HEADERS += vulkan/mythvideotexturevulkan.h
@@ -550,7 +539,6 @@ using_frontend {
         SOURCES += vulkan/mythvideovulkan.cpp
         SOURCES += vulkan/mythvideooutputvulkan.cpp
         SOURCES += vulkan/mythvideotexturevulkan.cpp
-        using_libglslang: DEFINES += USING_GLSLANG
     }
 
     using_vulkan|using_opengl {
@@ -573,7 +561,6 @@ using_frontend {
     }
 
     using_opengl {
-        DEFINES += USING_OPENGL
         HEADERS += opengl/mythopenglvideo.h
         HEADERS += opengl/mythvideooutopengl.h
         HEADERS += opengl/mythopenglvideoshaders.h
@@ -617,7 +604,6 @@ using_frontend {
         }
 
         using_egl {
-            DEFINES += USING_EGL
             HEADERS += opengl/mythegldefs.h
             HEADERS += opengl/mythegldmabuf.h
             HEADERS += opengl/mythdrmprimeinterop.h
@@ -711,7 +697,6 @@ using_frontend {
 if(using_backend|using_frontend):using_v4l2 {
     HEADERS += v4l2util.h
     SOURCES += v4l2util.cpp
-    DEFINES += USING_V4L2
 }
 
 using_backend {

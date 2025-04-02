@@ -42,13 +42,13 @@
 #include "libmythui/mythpainterwindow.h"
 #include "libmythui/mythuihelper.h"
 #include "libmythui/themeinfo.h"
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
 #include "libmythui/opengl/mythrenderopengl.h"
 #endif
 #ifdef USING_AIRPLAY
 #include "libmythtv/AirPlay/mythraopconnection.h"
 #endif
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
 #include "libmythtv/decoders/mythvaapicontext.h"
 #endif
 
@@ -103,7 +103,7 @@ static HostCheckBoxSetting *ChromaUpsampling()
     return gc;
 }
 
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
 static HostTextEditSetting *VAAPIDevice()
 {
     auto *ge = new HostTextEditSetting("VAAPIDevice");
@@ -4499,7 +4499,7 @@ void PlaybackSettings::Load(void)
     advanced->addChild(AudioReadAhead());
     advanced->addChild(ColourPrimaries());
     advanced->addChild(ChromaUpsampling());
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
     advanced->addChild(VAAPIDevice());
 #endif
 

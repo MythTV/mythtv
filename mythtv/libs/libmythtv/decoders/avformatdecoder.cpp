@@ -26,7 +26,7 @@ extern "C" {
 #include "libavutil/display.h"
 }
 
-#ifdef USING_MEDIACODEC // Android
+#if CONFIG_MEDIACODEC // Android
 extern "C" {
 #include "libavcodec/jni.h"
 }
@@ -2433,7 +2433,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 {
     m_avCodecLock.lock();
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
     if (QString("mediacodec") == codec->wrapper_name)
         av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), nullptr);
 #endif

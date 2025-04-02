@@ -1,6 +1,8 @@
 #ifndef MYTH_OPENGLVIDEOSHADERS_H
 #define MYTH_OPENGLVIDEOSHADERS_H
 
+#include "libmythbase/mythconfig.h"
+
 #include <QString>
 
 static const QString DefaultVertexShader =
@@ -23,7 +25,7 @@ static const QString RGBFragmentShader =
 "    gl_FragColor = vec4(color.rgb, 1.0);\n"
 "}\n";
 
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
 static const QString MediaCodecVertexShader =
 "attribute highp vec2 a_position;\n"
 "attribute highp vec2 a_texcoord0;\n"

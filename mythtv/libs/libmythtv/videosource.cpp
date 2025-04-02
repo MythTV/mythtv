@@ -2462,7 +2462,7 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
 
 void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     QString    card_name = tr("Failed to open");
     QString    card_info = card_name;
     V4L2util   v4l2(device_name);
@@ -2511,7 +2511,7 @@ void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
         m_device->addTargetedChild(m_driverName,
                                    new ChannelTimeout(m_parent, 15s, 2s));
     }
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 }
 
 CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
@@ -2526,10 +2526,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new DVBConfigurationGroup(parent, *cardtype));
 #endif // USING_DVB
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     cardtype->addTargetedChild("HDPVR",
                                new HDPVRConfigurationGroup(parent, *cardtype));
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #ifdef USING_HDHOMERUN
     cardtype->addTargetedChild("HDHOMERUN",
@@ -2558,7 +2558,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
     IPTVConfigurationGroup(parent, *cardtype);
 #endif // USING_IPTV
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     cardtype->addTargetedChild("V4L2ENC", new V4L2encGroup(parent, *cardtype));
     cardtype->addTargetedChild("V4L",
                                new V4LConfigurationGroup(parent, *cardtype, "V4L"));
@@ -2568,7 +2568,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new V4LConfigurationGroup(parent, *cardtype, "GO7007"));
     cardtype->addTargetedChild("MPEG",
                                new MPEGConfigurationGroup(parent, *cardtype));
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #ifdef USING_ASI
     cardtype->addTargetedChild("ASI",
@@ -2724,12 +2724,12 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
         QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
 #endif // USING_DVB
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     setting->addSelection(
         QObject::tr("V4L2 encoder"), "V4L2ENC");
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #ifdef USING_HDHOMERUN
     setting->addSelection(
@@ -2760,7 +2760,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
     setting->addSelection(QObject::tr("IPTV recorder"), "FREEBOX");
 #endif // USING_IPTV
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     setting->addSelection(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
     setting->addSelection(
@@ -2770,7 +2770,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
         "GO7007");
     setting->addSelection(
         QObject::tr("Analog capture card"), "V4L");
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
 #ifdef USING_ASI
     setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");

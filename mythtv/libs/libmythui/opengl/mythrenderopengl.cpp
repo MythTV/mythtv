@@ -18,7 +18,7 @@
 #include "mythrenderopengl.h"
 #include "mythrenderopenglshaders.h"
 #include "mythuitype.h"
-#ifdef USING_X11
+#if CONFIG_X11
 #include "platforms/mythxdisplay.h"
 #endif
 
@@ -84,7 +84,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(QWidget *Widget)
     if (!Widget)
         return nullptr;
 
-#ifdef USING_X11
+#if CONFIG_X11
     if (MythXDisplay::DisplayIsRemote())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is disabled for Remote X Session");
@@ -421,7 +421,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(QGuiApplication::platformName()));
-#ifdef USING_EGL
+#if CONFIG_EGL
     bool eglfuncs = IsEGL();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("EGL display          : %1").arg(GLYesNo(GetEGLDisplay() != nullptr)));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EGL images           : %1").arg(GLYesNo(eglfuncs)));

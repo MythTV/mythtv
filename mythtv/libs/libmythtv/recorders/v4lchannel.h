@@ -6,10 +6,11 @@
 #include <utility>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "dtvchannel.h"
 #include "frequencies.h"
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
 #include <linux/videodev2.h>
 #endif
 

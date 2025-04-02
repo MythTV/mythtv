@@ -1,8 +1,10 @@
 #ifndef MYTHDRMPRIMECONTEXT_H
 #define MYTHDRMPRIMECONTEXT_H
 
+#include "libmythbase/mythconfig.h"
+
 // MythTV
-#ifdef USING_EGL
+#if CONFIG_EGL
 #include "opengl/mythdrmprimeinterop.h"
 #else
 #include "opengl/mythopenglinterop.h"

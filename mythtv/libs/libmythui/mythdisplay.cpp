@@ -35,7 +35,7 @@
 #ifdef Q_OS_DARWIN
 #include "platforms/mythdisplayosx.h"
 #endif
-#ifdef USING_X11
+#if CONFIG_X11
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
@@ -46,7 +46,7 @@
 #if defined(Q_OS_WIN)
 #include "platforms/mythdisplaywindows.h"
 #endif
-#ifdef USING_MMAL
+#if CONFIG_MMAL
 #include "platforms/mythdisplayrpi.h"
 #endif
 
@@ -89,7 +89,7 @@
 MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 {
     MythDisplay* result = nullptr;
-#ifdef USING_X11
+#if CONFIG_X11
     if (MythDisplayX11::IsAvailable())
         result = new MythDisplayX11();
 #endif
@@ -109,7 +109,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
     {
         result = new MythDisplayDRM(MainWindow);
         // On the Pi, use MythDisplayRPI if mode switching is not available via DRM
-#ifdef USING_MMAL
+#if CONFIG_MMAL
         if (!result->VideoModesAvailable())
         {
             delete result;
@@ -118,7 +118,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 #endif
     }
 #endif
-#ifdef USING_MMAL
+#if CONFIG_MMAL
     if (!result)
         result = new MythDisplayRPI();
 #endif
@@ -1202,7 +1202,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 
 #if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
     // Avoid trying to setup DRM if we are definitely not going to use it.
-#ifdef USING_X11
+#if CONFIG_X11
     if (!MythDisplayX11::IsAvailable())
 #endif
     {
@@ -1217,7 +1217,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     }
 #endif
 
-#if defined (Q_OS_LINUX) && defined (USING_EGL) && defined (USING_X11)
+#if defined (Q_OS_LINUX) && CONFIG_EGL && CONFIG_X11
     // We want to use EGL for VAAPI/MMAL/DRMPRIME rendering to ensure we
     // can use zero copy video buffers for the best performance.
     // To force Qt to use EGL we must set 'QT_XCB_GL_INTEGRATION' to 'xcb_egl'
@@ -1254,7 +1254,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 
-#ifdef USING_X11
+#if CONFIG_X11
     if (auto display = CmdLine.toString("display"); !display.isEmpty())
         MythXDisplay::SetQtX11Display(display);
     // GSync support via libXNVCtrl

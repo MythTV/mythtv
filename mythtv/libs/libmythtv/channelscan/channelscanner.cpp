@@ -29,6 +29,7 @@
 
 #include <algorithm>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"
@@ -501,7 +502,7 @@ void ChannelScanner::PreScanCommon(
     }
 #endif
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     if (("V4L" == card_type) || ("MPEG" == card_type))
         m_channel = new V4LChannel(nullptr, device);
 #endif

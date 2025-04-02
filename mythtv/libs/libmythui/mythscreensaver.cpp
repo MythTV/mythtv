@@ -28,7 +28,7 @@
 #include "platforms/mythscreensaverwayland.h"
 #endif
 
-#ifdef USING_X11
+#if CONFIG_X11
 #include "platforms/mythscreensaverx11.h"
 #include "platforms/mythxdisplay.h"
 #endif
@@ -45,7 +45,7 @@ MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* 
 #if CONFIG_QTDBUS
     m_screenSavers.push_back(new MythScreenSaverDBus(this));
 #endif
-#if defined(USING_X11)
+#if CONFIG_X11
     MythXDisplay* display = MythXDisplay::OpenMythXDisplay(false);
     if (display)
     {
