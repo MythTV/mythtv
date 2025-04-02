@@ -255,7 +255,6 @@ use_hidesyms {
 }
 
 using_libdns_sd {
-    DEFINES += USING_LIBDNS_SD
     HEADERS += bonjourregister.h
     SOURCES += bonjourregister.cpp
     !macx: LIBS += -ldns_sd

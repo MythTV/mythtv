@@ -130,7 +130,7 @@
 #include "libmythtv/AirPlay/mythraopdevice.h"
 #endif
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
 #include <QScopedPointer>
 #include "libmythbase/bonjourregister.h"
 #endif
@@ -2141,7 +2141,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         return GENERIC_EXIT_NOT_OK;
     }
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
     // this needs to come after gCoreContext has been initialised
     // (for hostname) - hence it is not in MediaRenderer
     QScopedPointer<BonjourRegister> bonjour(new BonjourRegister());

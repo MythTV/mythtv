@@ -135,7 +135,6 @@ using_oss: DEFINES += USING_OSS
 using_libcec: DEFINES += USING_LIBCEC
 macx:      DEFINES += USING_COREAUDIO
 using_libdns_sd {
-    DEFINES += USING_LIBDNS_SD
     using_libcrypto: DEFINES += USING_AIRPLAY
 }
 
