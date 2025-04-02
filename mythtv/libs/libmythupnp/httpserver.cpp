@@ -470,10 +470,8 @@ HttpWorker::HttpWorker(HttpServer &httpServer, qintptr sock,
 
 void HttpWorker::run(void)
 {
-#if 0
     LOG(VB_HTTP, LOG_DEBUG,
         QString("HttpWorker::run() socket=%1 -- begin").arg(m_socket));
-#endif
 
     bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
@@ -694,9 +692,7 @@ void HttpWorker::run(void)
     delete pSocket;
     pSocket = nullptr;
 
-#if 0
-    LOG(VB_HTTP, LOG_DEBUG, "HttpWorkerThread::run() -- end");
-#endif
+    LOG(VB_HTTP, LOG_DEBUG, QString("HttpWorker::run() socket=%1 -- end").arg(m_socket));
 }
 
 
