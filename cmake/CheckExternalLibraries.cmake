@@ -12,6 +12,7 @@
 # include(CMakePrintHelpers)
 # ~~~
 include(BuildConfigString)
+include(SetIfTargetExists)
 
 #
 # This module needs pkg-config functionality

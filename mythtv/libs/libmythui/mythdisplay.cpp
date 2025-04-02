@@ -23,7 +23,7 @@
 #include "opengl/mythegl.h"
 #include "mythmainwindow.h"
 
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
 #include "platforms/mythdisplaymutter.h"
 #endif
 #ifdef USING_WAYLANDEXTRAS
@@ -93,7 +93,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
     if (MythDisplayX11::IsAvailable())
         result = new MythDisplayX11();
 #endif
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
     // Disabled for now as org.gnome.Mutter.DisplayConfig.ApplyConfiguration does
     // not seem to be actually implemented by anyone.
 #ifdef USING_WAYLANDEXTRAS

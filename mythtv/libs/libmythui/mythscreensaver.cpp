@@ -3,6 +3,8 @@
 #include <QGuiApplication>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
+
 #include "mythmainwindow.h"
 #include "mythscreensaver.h"
 
@@ -10,7 +12,7 @@
 #include "platforms/mythscreensaverdrm.h"
 #endif
 
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
 #include "platforms/mythscreensaverdbus.h"
 #endif
 
@@ -40,7 +42,7 @@
 MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* MainWin,
                                                [[maybe_unused]] MythDisplay* mDisplay)
 {
-#if defined(USING_DBUS)
+#if CONFIG_QTDBUS
     m_screenSavers.push_back(new MythScreenSaverDBus(this));
 #endif
 #if defined(USING_X11)

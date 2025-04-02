@@ -215,7 +215,6 @@ using_mmal {
 
 using_qtdbus {
     QT      += dbus
-    DEFINES += USING_DBUS
     HEADERS += platforms/mythscreensaverdbus.h
     SOURCES += platforms/mythscreensaverdbus.cpp
     HEADERS += platforms/mythdisplaymutter.h

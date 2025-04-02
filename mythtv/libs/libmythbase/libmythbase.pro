@@ -162,7 +162,6 @@ SOURCES += http/serialisers/mythcborserialiser.cpp
 
 using_qtdbus {
     QT      += dbus
-    DEFINES += USING_DBUS
     HEADERS += platforms/mythpowerdbus.h
     SOURCES += platforms/mythpowerdbus.cpp
 }
