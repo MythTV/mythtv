@@ -92,33 +92,6 @@ except Exception as e:
     sys.stderr.write('\n! Error - Importing the "lxml" python library failed on error(%s)\n' % e)
     sys.exit(1)
 
-# Check that the lxml library is current enough
-# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
-# "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
-# Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
-# >>> from lxml import etree
-# >>> print "lxml.etree:", etree.LXML_VERSION
-# lxml.etree: (2, 1, 5, 0)
-# >>> print "libxml used:", etree.LIBXML_VERSION
-# libxml used: (2, 7, 5)
-# >>> print "libxml compiled:", etree.LIBXML_COMPILED_VERSION
-# libxml compiled: (2, 6, 32)
-# >>> print "libxslt used:", etree.LIBXSLT_VERSION
-# libxslt used: (1, 1, 24)
-# >>> print "libxslt compiled:", etree.LIBXSLT_COMPILED_VERSION
-# libxslt compiled: (1, 1, 24)
-
-version = ''
-for digit in etree.LIBXML_VERSION:
-    version+=str(digit)+'.'
-version = version[:-1]
-if version < '2.7.2':
-    sys.stderr.write('''
-! Error - The installed version of the "lxml" python library "libxml" version is too old.
-          At least "libxml" version 2.7.2 must be installed. Your version is (%s).
-''' % version)
-    sys.exit(1)
-
 
 ###########################################################################################################
 #
