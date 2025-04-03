@@ -281,7 +281,6 @@ using_lirc {
 }
 
 using_libcec {
-    DEFINES += USING_LIBCEC
     HEADERS += devices/mythcecadapter.h
     SOURCES += devices/mythcecadapter.cpp
 }

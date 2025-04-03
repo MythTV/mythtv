@@ -9,6 +9,7 @@
 #include <QStringList>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythui/standardsettings.h"
 #include "libmythtv/mythvideoprofile.h"
 
@@ -189,7 +190,7 @@ class MainGeneralSettings : public GroupSetting
     MainGeneralSettings();
     void applyChange() override; // GroupSetting
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
   public slots:
     void cecChanged(bool setting);
   protected:
@@ -197,7 +198,7 @@ class MainGeneralSettings : public GroupSetting
     HostCheckBoxSetting *m_cecPowerOffTVAllowed {nullptr};
     HostCheckBoxSetting *m_cecPowerOnTVOnStart  {nullptr};
     HostCheckBoxSetting *m_cecPowerOffTVOnExit  {nullptr};
-#endif  // USING_LIBCEC
+#endif  // CONFIG_LIBCEC
 };
 
 class GeneralRecPrioritiesSettings : public GroupSetting

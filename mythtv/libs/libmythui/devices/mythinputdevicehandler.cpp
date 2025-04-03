@@ -116,7 +116,7 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Stopping");
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     if (Finishing)
         m_cecAdapter.Close();
 #endif
@@ -178,7 +178,7 @@ void MythInputDeviceHandler::Event(QEvent *Event) const
 
 void MythInputDeviceHandler::Action([[maybe_unused]] const QString &Action)
 {
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     m_cecAdapter.Action(Action);
 #endif
 }
@@ -190,14 +190,14 @@ void MythInputDeviceHandler::IgnoreKeys(bool Ignore)
     else
         LOG(VB_GENERAL, LOG_INFO, LOC + "Unlocking input devices");
     m_ignoreKeys = Ignore;
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     m_cecAdapter.IgnoreKeys(Ignore);
 #endif
 }
 
 void MythInputDeviceHandler::MainWindowReady(void)
 {
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     // Open any adapter after the window has been created to ensure we capture
     // the EDID if available - and hence get a more accurate Physical Address.
     // This will close any existing adapter in the event that the window has been re-init'ed.

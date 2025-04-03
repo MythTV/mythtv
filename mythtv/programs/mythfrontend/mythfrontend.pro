@@ -121,8 +121,6 @@ win32 : !debug {
     DEFINES += WINDOWS_CLOSE_CONSOLE
 }
 
-using_libcec: DEFINES += USING_LIBCEC
-
 android {
     message( myth android lib include $$(ANDROID_QT_DEPENDENCY_INCLUDE) )
     include ( $$(ANDROID_QT_DEPENDENCY_INCLUDE) )

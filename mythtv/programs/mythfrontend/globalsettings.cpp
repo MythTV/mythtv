@@ -2121,7 +2121,7 @@ static HostTextEditSetting *LircDaemonDevice()
     return ge;
 }
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 static HostTextEditSetting *CECDevice()
 {
     auto *ge = new HostTextEditSetting("libCECDevice");
@@ -3377,7 +3377,7 @@ static HostTextEditSetting *UDPNotifyPort()
     return ge;
 }
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 static HostCheckBoxSetting *CECEnabled()
 {
     auto *gc = new HostCheckBoxSetting("libCECEnabled");
@@ -3436,7 +3436,7 @@ static HostCheckBoxSetting *CECPowerOffTVOnExit()
     return gc;
 }
 
-#endif //USING_LIBCEC
+#endif // CONFIG_LIBCEC
 
 #if CONFIG_AIRPLAY
 // AirPlay Settings
@@ -4262,7 +4262,7 @@ MainGeneralSettings::MainGeneralSettings()
     remotecontrol->addChild(NetworkControlEnabled());
     remotecontrol->addChild(NetworkControlPort());
     remotecontrol->addChild(UDPNotifyPort());
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     HostCheckBoxSetting *cec = CECEnabled();
     remotecontrol->addChild(cec);
     cec->addTargetedChild("1",CECDevice());
@@ -4278,7 +4278,7 @@ MainGeneralSettings::MainGeneralSettings()
             this, &MainGeneralSettings::cecChanged);
     connect(m_cecPowerOffTVAllowed, &MythUICheckBoxSetting::valueChanged,
             this, &MainGeneralSettings::cecChanged);
-#endif // USING_LIBCEC
+#endif // CONFIG_LIBCEC
     addChild(remotecontrol);
 
 #if CONFIG_AIRPLAY
@@ -4294,7 +4294,7 @@ MainGeneralSettings::MainGeneralSettings()
 #endif
 }
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_cecPowerOnTVAllowed->boolValue())
@@ -4313,7 +4313,7 @@ void MainGeneralSettings::cecChanged(bool /*setting*/)
         m_cecPowerOffTVOnExit->setValue(false);
     }
 }
-#endif  // USING_LIBCEC
+#endif  // CONFIG_LIBCEC
 
 void MainGeneralSettings::applyChange()
 {

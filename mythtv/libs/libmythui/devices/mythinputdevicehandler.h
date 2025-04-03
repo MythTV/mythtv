@@ -7,7 +7,7 @@
 #include <QObject>
 
 // MythTV
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 #include "devices/mythcecadapter.h"
 #endif
 
@@ -46,7 +46,7 @@ class MythInputDeviceHandler : public QObject
     LIRC           *m_lircThread { nullptr };
 #endif
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     MythCECAdapter  m_cecAdapter;
 #endif
 
