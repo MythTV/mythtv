@@ -497,9 +497,6 @@ using_frontend {
     }
 
     using_drm:using_qtprivateheaders {
-        DEFINES += USING_DRM
-        DEFINES += USING_DRM_VIDEO
-        DEFINES += USING_QTPRIVATEHEADERS
         QT += gui-private
         QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
         HEADERS += drm/mythvideodrm.h

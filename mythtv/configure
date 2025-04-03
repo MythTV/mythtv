@@ -5826,6 +5826,7 @@ check_ecxx $qt_private_headers_incpath <<EOF || disable qtprivateheaders
 int x;
 EOF
 fi
+enabled drm && enabled qtprivateheaders && enable drm_video
 
 # Check for Wayland support
 enabled waylandextras && enabled qtprivateheaders || disable waylandextras

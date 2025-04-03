@@ -4,7 +4,7 @@
 
 // libmythui
 #include "mythvrr.h"
-#ifdef USING_DRM
+#if CONFIG_DRM
 #include "platforms/mythdisplaydrm.h"
 #include "platforms/drm/mythdrmvrr.h"
 #endif
@@ -61,7 +61,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* MDisplay)
 
     MythVRRPtr result = nullptr;
 
-#if CONFIG_X11 || defined (USING_DRM)
+#if CONFIG_X11 || CONFIG_DRM
     const auto range = MDisplay->GetEDID().GetVRRRange();
 
 #if CONFIG_X11
@@ -71,7 +71,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* MDisplay)
             result = gsync;
 #endif
 
-#ifdef USING_DRM
+#if CONFIG_DRM
     // FreeSync is only currently *controllable* via DRM with an AMD GPU/APU and Display Port
     if (!result)
     {

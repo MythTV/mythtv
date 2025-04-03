@@ -154,7 +154,6 @@ using_x11 {
 }
 
 using_drm {
-    DEFINES += USING_DRM
     HEADERS += platforms/mythdisplaydrm.h
     HEADERS += platforms/mythscreensaverdrm.h
     HEADERS += platforms/mythdrmdevice.h
@@ -189,10 +188,8 @@ using_drm {
 
 using_qtprivateheaders {
     QT += gui-private
-    DEFINES += USING_QTPRIVATEHEADERS
 
     using_waylandextras {
-        DEFINES += USING_WAYLANDEXTRAS
         HEADERS += platforms/mythscreensaverwayland.h
         HEADERS += platforms/mythwaylandextras.h
         HEADERS += platforms/waylandprotocols/idle_inhibit_unstable_v1.h

@@ -139,9 +139,9 @@ include(StaticAnalysis)
 include(CompilerCaching)
 include(SetCompilerOptions)
 include(MythCheckIncludes)
-include(CheckExternalLibraries)
 include(MythFindFFmpeg)
 include(MythFindQt)
+include(CheckExternalLibraries)
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX})
 
 # Debian policy requires that shared libraries be installed without executable

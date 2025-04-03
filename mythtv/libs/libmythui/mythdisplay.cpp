@@ -26,7 +26,7 @@
 #if CONFIG_QTDBUS
 #include "platforms/mythdisplaymutter.h"
 #endif
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
 #include "platforms/mythwaylandextras.h"
 #endif
 #ifdef Q_OS_ANDROID
@@ -39,7 +39,7 @@
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
-#ifdef USING_DRM
+#if CONFIG_DRM
 #include "platforms/mythdisplaydrm.h"
 #include "platforms/drm/mythdrmvrr.h"
 #endif
@@ -96,7 +96,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 #if CONFIG_QTDBUS
     // Disabled for now as org.gnome.Mutter.DisplayConfig.ApplyConfiguration does
     // not seem to be actually implemented by anyone.
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     //if (MythWaylandDevice::IsAvailable())
 #endif
     //{
@@ -104,7 +104,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
     //        result = MythDisplayMutter::Create();
     //}
 #endif
-#ifdef USING_DRM
+#if CONFIG_DRM
     if (!result)
     {
         result = new MythDisplayDRM(MainWindow);
@@ -1200,13 +1200,13 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     QApplication::setDesktopSettingsAware(false);
 #endif
 
-#if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
+#if CONFIG_DRM && CONFIG_QTPRIVATEHEADERS
     // Avoid trying to setup DRM if we are definitely not going to use it.
 #if CONFIG_X11
     if (!MythDisplayX11::IsAvailable())
 #endif
     {
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
         // When vt switching this still detects wayland servers, so disabled for now
         //if (!MythWaylandDevice::IsAvailable())
 #endif

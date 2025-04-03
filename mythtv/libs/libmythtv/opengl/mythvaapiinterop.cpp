@@ -1,8 +1,9 @@
 ﻿// MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmyth/mythavframe.h"
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
 #include "libmythui/platforms/mythdisplaydrm.h"
 #endif
 
@@ -51,7 +52,7 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
     // best first
     MythInteropGPU::InteropTypes vaapitypes;
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     if (MythDisplayDRM::DirectRenderingAvailable())
         vaapitypes.emplace_back(DRM_DRMPRIME);
 #endif

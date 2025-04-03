@@ -9,7 +9,7 @@
 
 void MythDisplayDRM::MainWindowReady()
 {
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     if (m_device)
         m_device->MainWindowReady();
 #endif
@@ -17,7 +17,7 @@ void MythDisplayDRM::MainWindowReady()
 
 bool MythDisplayDRM::DirectRenderingAvailable()
 {
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     if (!HasMythMainWindow())
         return false;
 
@@ -40,7 +40,7 @@ MythDisplayDRM::MythDisplayDRM([[maybe_unused]] MythMainWindow* MainWindow)
 {
     m_device = MythDRMDevice::Create(m_screen);
     Initialise();
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     if (MainWindow && m_device && m_device->GetVideoPlane())
         connect(MainWindow, &MythMainWindow::SignalWindowReady, this, &MythDisplayDRM::MainWindowReady);
 #endif
@@ -78,7 +78,7 @@ bool MythDisplayDRM::VideoModesAvailable()
 
 bool MythDisplayDRM::IsPlanar()
 {
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     return m_device && m_device->Authenticated() && m_device->Atomic() &&
            m_device->GetVideoPlane() && m_device->GetVideoPlane()->m_id;
 #else

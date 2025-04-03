@@ -2,10 +2,11 @@
 #define MYTHDRMPRIMEINTEROP_H
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "mythegldmabuf.h"
 #include "mythopenglinterop.h"
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
 #include "drm/mythvideodrm.h"
 #endif
 
@@ -31,7 +32,7 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
     bool m_deinterlacing { false };
     bool m_composable    { true  };
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     bool HandleDRMVideo(MythVideoColourSpace* ColourSpace, MythVideoFrame* Frame,
                         AVDRMFrameDescriptor* DRMDesc);
     MythVideoDRM* m_drm { nullptr };

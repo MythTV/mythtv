@@ -2,10 +2,11 @@
 #define MYTHVAAPIDRMINTEROP_H
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "opengl/mythegldmabuf.h"
 #include "opengl/mythvaapiinterop.h"
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
 #include "drm/mythvideodrm.h"
 #endif
 
@@ -51,7 +52,7 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
     bool                      m_usePrime { false };
     QHash<unsigned long long, AVDRMFrameDescriptor*> m_drmFrames;
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     bool HandleDRMVideo(MythVideoColourSpace* ColourSpace, VASurfaceID Id, MythVideoFrame* Frame);
     MythVideoDRM* m_drm { nullptr };
     bool          m_drmTriedAndFailed { false };

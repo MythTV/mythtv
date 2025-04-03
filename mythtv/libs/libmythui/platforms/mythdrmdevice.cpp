@@ -1,3 +1,5 @@
+#include "libmythbase/mythconfig.h"
+
 // Qt
 #include <QDir>
 #include <QMutex>
@@ -5,7 +7,7 @@
 #include <QScreen>
 #include <QGuiApplication>
 
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
 #include <qpa/qplatformnativeinterface.h>
 #endif
 
@@ -113,7 +115,7 @@ extern "C" {
  * \note This is called immediately after application startup; all we have for
  * reference is the MythCommandLineParsers instance and any environment variables.
 */
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
 MythDRMPtr MythDRMDevice::FindDevice(bool NeedPlanes)
 {
     // Retrieve possible devices and analyse them.
@@ -317,7 +319,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device,
                                  [[maybe_unused]] bool NeedPlanes)
 {
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
     if (qScreen && app && QGuiApplication::platformName().contains("eglfs", Qt::CaseInsensitive))
     {
@@ -362,7 +364,7 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device,
         return nullptr;
     }
 
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device, NeedPlanes)); result && result->m_valid)
         return result;
 #endif
@@ -416,7 +418,7 @@ MythDRMDevice::MythDRMDevice(QScreen* qScreen, const QString& Device)
     Authenticate();
 }
 
-#if defined (USING_QTPRIVATEHEADERS)
+#if CONFIG_QTPRIVATEHEADERS
 /*! \brief Constructor used when we have retrieved Qt's relevant DRM handles.
  *
  * If we have Qt private headers available and Qt is using eglfs, then we will
@@ -660,7 +662,7 @@ bool MythDRMDevice::SwitchMode(int ModeIndex)
         return false;
 
     bool result = false;
-#ifdef USING_QTPRIVATEHEADERS
+#if CONFIG_QTPRIVATEHEADERS
     auto crtcid = MythDRMProperty::GetProperty("crtc_id", m_connector->m_properties);
     auto modeid = MythDRMProperty::GetProperty("mode_id", m_crtc->m_properties);
     if (crtcid.get() && modeid.get())
@@ -880,7 +882,7 @@ DRMConn MythDRMDevice::GetConnector() const
     return m_connector;
 }
 
-#if defined (USING_QTPRIVATEHEADERS)
+#if CONFIG_QTPRIVATEHEADERS
 void MythDRMDevice::MainWindowReady()
 {
     // This is causing issues - disabled for now

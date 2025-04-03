@@ -50,7 +50,7 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythPlayerUI *Player, MythRenderOpenGL*
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     delete m_drm;
 #endif
     OpenGLLocker locker(m_openglContext);
@@ -254,7 +254,7 @@ MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* Context,
     }
     m_discontinuityCounter = Frame->m_frameCounter;
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     if (!m_drmTriedAndFailed)
         if (HandleDRMVideo(ColourSpace, id, Frame))
             return result;
@@ -516,7 +516,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
 #endif
 }
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
 bool MythVAAPIInteropDRM::HandleDRMVideo(MythVideoColourSpace* ColourSpace, VASurfaceID Id, MythVideoFrame* Frame)
 {
     if (!((m_type == DRM_DRMPRIME) && m_usePrime && Id && Frame && ColourSpace))

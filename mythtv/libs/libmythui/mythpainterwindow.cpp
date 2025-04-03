@@ -22,7 +22,7 @@
 #include "vulkan/mythpaintervulkan.h"
 #endif
 
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
 #include "platforms/mythwaylandextras.h"
 #endif
 
@@ -143,7 +143,7 @@ void MythPainterWindow::DestroyPainters(MythPainterWindow *&PaintWin, MythPainte
 MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
   : QWidget(MainWin)
 {
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     if (QGuiApplication::platformName().toLower().contains("wayland"))
         m_waylandDev = new MythWaylandDevice(MainWin);
 #endif
@@ -152,7 +152,7 @@ MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
 // NOLINTNEXTLINE(modernize-use-equals-default)
 MythPainterWindow::~MythPainterWindow()
 {
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     delete m_waylandDev;
 #endif
 }
@@ -177,7 +177,7 @@ bool MythPainterWindow::event(QEvent *Event)
 
 void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
 {
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     if (m_waylandDev)
         m_waylandDev->SetOpaqueRegion(rect());
 #endif

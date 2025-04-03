@@ -311,10 +311,7 @@ endif()
 if(ENABLE_WAYLAND AND TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
   pkg_check_modules(WAYLAND_CLIENT wayland-client IMPORTED_TARGET)
   add_build_config(PkgConfig::WAYLAND_CLIENT "waylandextras")
-  if(TARGET PkgConfig::WAYLAND_CLIENT)
-    target_compile_definitions(PkgConfig::WAYLAND_CLIENT
-                               INTERFACE USING_WAYLANDEXTRAS)
-  endif()
+  set(CONFIG_WAYLANDEXTRAS ${WAYLAND_CLIENT_FOUND})
 endif()
 
 if(NOT TARGET Vulkan::Vulkan AND NOT TARGET any_opengl)
