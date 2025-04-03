@@ -4,6 +4,8 @@
 // Qt
 #include <QRect>
 
+#include "libmythbase/mythconfig.h"
+
 class InteractiveScreen;
 class MythPainter;
 class MHIContext;
@@ -14,7 +16,7 @@ class MythPlayerCaptionsUI;
  */
 class InteractiveTV
 {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
   public:
     // Interface to Myth
     explicit InteractiveTV(MythPlayerCaptionsUI* Player);

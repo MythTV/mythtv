@@ -1084,7 +1084,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         return err;
     }
 
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     {
         int initialAudio = -1;
         int initialVideo = -1;
@@ -1097,7 +1097,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         if (initialVideo >= 0)
             SetVideoByComponentTag(initialVideo);
     }
-#endif // USING_MHEG
+#endif // CONFIG_MHEG
 
     // Try to get a position map from the recorder if we don't have one yet.
     if (!m_recordingHasPositionMap && !m_isDbIgnored)
@@ -1837,7 +1837,7 @@ void AvFormatDecoder::ScanDSMCCStreams(AVBufferRef* pmt_section)
                 [[maybe_unused]] uint appTypeCode = desc[0]<<8 | desc[1];
                 desc += 3; // Skip app type code and boot priority hint
                 uint appSpecDataLen = *desc++;
-#ifdef USING_MHEG
+#if CONFIG_MHEG
                 LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams AppTypeCode %1").arg(QString::number(appTypeCode)));
                 if (appTypeCode == 0x101) // UK MHEG profile
                 {
@@ -1853,7 +1853,7 @@ void AvFormatDecoder::ScanDSMCCStreams(AVBufferRef* pmt_section)
                     }
                 }
                 else
-#endif // USING_MHEG
+#endif // CONFIG_MHEG
                 {
                     desc += appSpecDataLen;
                 }
@@ -3685,7 +3685,7 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 void AvFormatDecoder::ProcessDSMCCPacket([[maybe_unused]] const AVStream *str,
                                          [[maybe_unused]] const AVPacket *pkt)
 {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     if (m_itv == nullptr)
         m_itv = m_parent->GetInteractiveTV();
     if (m_itv == nullptr)
@@ -3717,7 +3717,7 @@ void AvFormatDecoder::ProcessDSMCCPacket([[maybe_unused]] const AVStream *str,
         length -= sectionLen;
         data += sectionLen;
     }
-#endif // USING_MHEG
+#endif // CONFIG_MHEG
 }
 
 bool AvFormatDecoder::ProcessSubtitlePacket(AVCodecContext* codecContext, AVStream *curstream, AVPacket *pkt)
@@ -3843,10 +3843,10 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
             GenerateDummyVideoFrames();
             // Have to return regularly to ensure that the OSD is updated.
             // This applies both to MHEG and also channel browsing.
-#ifdef USING_MHEG
+#if CONFIG_MHEG
             if (!(decodetype & kDecodeVideo))
                 m_allowedQuit |= (m_itv && m_itv->ImageHasChanged());
-#endif // USING_MHEG:
+#endif // CONFIG_MHEG:
             break;
         }
         default:

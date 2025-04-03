@@ -605,7 +605,7 @@ if(ENABLE_MHEG)
   message(STATUS "Adding mheg support")
   add_library(mythtv_mheg INTERFACE)
   add_build_config(TRUE "mheg")
-  target_compile_definitions(mythtv_mheg INTERFACE USING_MHEG)
+  set(CONFIG_MHEG TRUE)
 endif()
 
 if(ENABLE_FIREWIRE)

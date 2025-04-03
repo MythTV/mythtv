@@ -678,7 +678,6 @@ using_frontend {
         # MHEG/MHI stuff
         HEADERS += mheg/interactivetv.h     mheg/mhi.h
         SOURCES += mheg/interactivetv.cpp   mheg/mhi.cpp
-        DEFINES += USING_MHEG
     }
 
     using_v4l2 {
