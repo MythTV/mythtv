@@ -127,7 +127,11 @@ class MPoolThread : public MThread
             if (autodelete)
                 delete m_runnable;
             if (m_reserved)
+            {
+                locker.unlock();
                 m_pool.ReleaseThread();
+                locker.relock();
+            }
             m_reserved = false;
             m_runnable = nullptr;
 
