@@ -17,6 +17,7 @@
 
 // ANSI C headers
 #include <cmath>
+#include <thread>
 
 // POSIX headers
 #ifndef _WIN32
@@ -36,6 +37,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/mythtimer.h"
 #include "libmythbase/mythversion.h"
 
 #include "upnputil.h"
@@ -459,11 +461,12 @@ void HttpWorker::run(void)
     LOG(VB_HTTP, LOG_DEBUG,
         QString("HttpWorker::run() socket=%1 -- begin").arg(m_socket));
 
-    bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
     HTTPRequest            *pRequest   = nullptr;
     QTcpSocket             *pSocket    = nullptr;
     bool                    bEncrypted = false;
+    MythTimer attempt_time;
+    static constexpr std::chrono::milliseconds k_poll_interval {1ms};
 
     if (m_connectionType == kSSLServer)
     {
@@ -475,7 +478,12 @@ void HttpWorker::run(void)
         {
             pSslSocket->setSslConfiguration(m_sslConfig);
             pSslSocket->startServerEncryption();
-            if (pSslSocket->waitForEncrypted(5000))
+            attempt_time.start();
+            while (m_httpServer.IsRunning() && attempt_time.elapsed() < 5s && !pSslSocket->isEncrypted())
+            {
+                pSslSocket->waitForEncrypted(k_poll_interval.count());
+            }
+            if (pSslSocket->isEncrypted())
             {
                 LOG(VB_HTTP, LOG_INFO, "SSL Handshake occurred, connection encrypted");
                 LOG(VB_HTTP, LOG_INFO, QString("Using %1 cipher").arg(pSslSocket->sessionCipher().name()));
@@ -527,16 +535,19 @@ void HttpWorker::run(void)
             // new clients from connecting - Default at time of writing was
             // 5 seconds for initial connection, then up to 10 seconds of idle
             // time between each subsequent request on the same connection
-            bTimeout = !(pSocket->waitForReadyRead(m_socketTimeout.count()));
+            attempt_time.start();
+            while (m_httpServer.IsRunning() && pSocket->isValid()
+                   && pSocket->state() == QAbstractSocket::ConnectedState
+                   && pSocket->bytesAvailable() <= 0
+                   && attempt_time.elapsed() < m_socketTimeout
+                   )
+            {
+                pSocket->waitForReadyRead(k_poll_interval.count());
+            }
 
-            if (bTimeout) // Either client closed the socket or we timed out waiting for new data
+            if (!m_httpServer.IsRunning() || pSocket->bytesAvailable() <= 0)
                 break;
 
-            int64_t nBytes = pSocket->bytesAvailable();
-            if (!m_httpServer.IsRunning())
-                break;
-
-            if ( nBytes > 0)
             {
                 // ----------------------------------------------------------
                 // See if this is a valid request
@@ -604,10 +615,6 @@ void HttpWorker::run(void)
                     bKeepAlive = false;
                 }
             }
-            else
-            {
-                bKeepAlive = false;
-            }
         }
     }
     catch(...)
@@ -629,17 +636,21 @@ void HttpWorker::run(void)
 
     std::chrono::milliseconds writeTimeout = 5s;
     // Make sure any data in the buffer is flushed before the socket is closed
+    if (pSocket->bytesToWrite() > 0)
+    {
+        LOG(VB_HTTP, LOG_DEBUG,
+            QString("HttpWorker(%1): Waiting for %2 bytes to be written before closing the connection.")
+                .arg(m_socket).arg(pSocket->bytesToWrite())
+            );
+    }
+    attempt_time.start();
     while (m_httpServer.IsRunning() &&
            pSocket->isValid() &&
            pSocket->state() == QAbstractSocket::ConnectedState &&
-           pSocket->bytesToWrite() > 0)
+           pSocket->bytesToWrite() > 0 &&
+           attempt_time.elapsed() < writeTimeout
+           )
     {
-        LOG(VB_HTTP, LOG_DEBUG, QString("HttpWorker(%1): "
-                                        "Waiting for %2 bytes to be written "
-                                        "before closing the connection.")
-                                            .arg(m_socket)
-                                            .arg(pSocket->bytesToWrite()));
-
         // If the client stops reading for longer than 'writeTimeout' then
         // stop waiting for them. We can't afford to leave the socket
         // connected indefinately, it could be used by another client.
@@ -648,15 +659,7 @@ void HttpWorker::run(void)
         // streaming. We should create a new server extension or adjust the
         // timeout according to the User-Agent, instead of increasing the
         // standard timeout. However we should ALWAYS have a timeout.
-        if (!pSocket->waitForBytesWritten(writeTimeout.count()))
-        {
-            LOG(VB_GENERAL, LOG_WARNING, QString("HttpWorker(%1): "
-                                         "Timed out waiting to write bytes to "
-                                         "the socket, waited %2 seconds")
-                                            .arg(m_socket)
-                                            .arg(writeTimeout.count() / 1000));
-            break;
-        }
+        pSocket->waitForBytesWritten(k_poll_interval.count());
     }
 
     if (pSocket->bytesToWrite() > 0)
