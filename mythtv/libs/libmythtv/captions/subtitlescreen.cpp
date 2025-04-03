@@ -1420,7 +1420,7 @@ SubtitleScreen::~SubtitleScreen(void)
 {
     ClearAllSubtitles();
     delete m_format;
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
     CleanupAssLibrary();
 #endif
 }
@@ -1496,7 +1496,7 @@ void SubtitleScreen::ClearAllSubtitles(void)
 {
     ClearNonDisplayedSubtitles();
     ClearDisplayedSubtitles();
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
     if (m_assTrack)
         ass_flush_events(m_assTrack);
 #endif
@@ -2084,7 +2084,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                                              displayuntil, late);
                 }
             }
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
             else if (displaysub && rect->type == SUBTITLE_ASS)
             {
                 InitialiseAssTrack(m_player->GetDecoder()->GetTrack(kTrackTypeSubtitle));
@@ -2094,7 +2094,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         }
         SubtitleReader::FreeAVSubtitle(subtitle);
     }
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
     RenderAssTrack(currentFrame->m_timecode, assForceNext);
 #endif
 }
@@ -2398,7 +2398,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
 static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*/)
 {
     uint64_t verbose_mask = VB_GENERAL;
@@ -2653,4 +2653,4 @@ void SubtitleScreen::RenderAssTrack(std::chrono::milliseconds timecode, bool for
         count++;
     }
 }
-#endif // USING_LIBASS
+#endif // CONFIG_LIBASS

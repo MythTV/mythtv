@@ -129,9 +129,7 @@ endif()
 if(ENABLE_LIBASS)
   pkg_check_modules(LIBASS "libass>=0.9.10" IMPORTED_TARGET)
   add_build_config(PkgConfig::LIBASS "libass")
-  if(TARGET PkgConfig::LIBASS)
-    target_compile_definitions(PkgConfig::LIBASS INTERFACE USING_LIBASS)
-  endif()
+  set(CONFIG_LIBASS ${LIBASS_FOUND})
 endif()
 
 # udev: fedora:libdav1d-devel debian:libdav1d-dev

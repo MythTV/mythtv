@@ -424,10 +424,7 @@ using_frontend {
     SOURCES += decoders/mythcodeccontext.cpp
     SOURCES += decoders/mythdecoderthread.cpp
 
-    using_libass {
-        DEFINES += USING_LIBASS
-        LIBS    += -lass
-    }
+    using_libass: LIBS += -lass
 
     # On screen display (video output overlay)
     HEADERS += osd.h
