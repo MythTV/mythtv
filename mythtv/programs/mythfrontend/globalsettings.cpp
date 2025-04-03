@@ -45,7 +45,7 @@
 #if CONFIG_OPENGL
 #include "libmythui/opengl/mythrenderopengl.h"
 #endif
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
 #include "libmythtv/AirPlay/mythraopconnection.h"
 #endif
 #if CONFIG_VAAPI
@@ -3438,7 +3438,7 @@ static HostCheckBoxSetting *CECPowerOffTVOnExit()
 
 #endif //USING_LIBCEC
 
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
 // AirPlay Settings
 static HostCheckBoxSetting *AirPlayEnabled()
 {
@@ -4281,7 +4281,7 @@ MainGeneralSettings::MainGeneralSettings()
 #endif // USING_LIBCEC
     addChild(remotecontrol);
 
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
     auto *airplay = new GroupSetting();
     airplay->setLabel(tr("AirPlay Settings"));
     airplay->addChild(AirPlayEnabled());
@@ -4819,7 +4819,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(SmoothTransitions());
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
     screen->addChild(AirPlayFullScreen());
 #endif
 

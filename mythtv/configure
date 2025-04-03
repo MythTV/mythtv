@@ -5946,6 +5946,7 @@ fi
 
 if test $target_os != darwin ; then
     enabled libdns_sd && check_lib dns_sd dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
+    enabled libdns_sd && enabled libcrypto && enable airplay
 fi
 
 if enabled libxml2 ; then

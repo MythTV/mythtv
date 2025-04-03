@@ -378,12 +378,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
             devices/AppleRemote.h
             devices/AppleRemoteListener.cpp
             devices/AppleRemoteListener.h)
-  target_compile_definitions(mythui PRIVATE USING_APPLEREMOTE)
   if(NOT ENABLE_LIRC)
     target_sources(mythui PRIVATE devices/lircevent.cpp devices/lircevent.h)
   endif()
-  if(DARWIN_DA)
-    set_target_properties(mythui PROPERTIES COMPILE_DEFINITIONS USING_DARWIN_DA)
+  if(APPLE_DISKARBITRATION_LIBRARY)
     target_sources(mythui PRIVATE mediamonitor-darwin.cpp mediamonitor-darwin.h)
     target_link_libraries(mythui PRIVATE ${APPLE_DISKARBITRATION_LIBRARY})
   endif()

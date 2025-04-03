@@ -25,7 +25,7 @@
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 
-#ifdef USING_DARWIN_DA
+#if CONFIG_DARWIN_DA
 #include "mediamonitor-darwin.h"
 #elif defined(Q_OS_WIN)
 #include "mediamonitor-windows.h"
@@ -77,7 +77,7 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
     if (s_monitor)
         return s_monitor;
 
-#ifdef USING_DARWIN_DA
+#if CONFIG_DARWIN_DA
     s_monitor = new MediaMonitorDarwin(nullptr, MONITOR_INTERVAL, true);
 #elif defined(Q_OS_WIN)
     s_monitor = new MediaMonitorWindows(nullptr, MONITOR_INTERVAL, true);

@@ -257,7 +257,6 @@ macx {
         HEADERS -= mediamonitor-unix.h
         HEADERS += mediamonitor-darwin.h
         SOURCES += mediamonitor-darwin.cpp
-        DEFINES += USING_DARWIN_DA
         LIBS += -framework DiskArbitration
     }
 }

@@ -17,7 +17,7 @@
 #include "devices/jsmenuevent.h"
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
 #include "devices/AppleRemoteListener.h"
 #endif
 
@@ -25,7 +25,7 @@
 #include "devices/lirc.h"
 #endif
 
-#if defined (USE_LIRC) || defined (USING_APPLEREMOTE)
+#if defined (USE_LIRC) || CONFIG_APPLEREMOTE
 #include "devices/lircevent.h"
 #endif
 
@@ -88,7 +88,7 @@ void MythInputDeviceHandler::Start(void)
     }
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     if (!m_appleRemoteListener)
     {
         m_appleRemoteListener = new AppleRemoteListener(this);
@@ -121,7 +121,7 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
         m_cecAdapter.Close();
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     if (Finishing)
     {
         delete m_appleRemote;
@@ -165,7 +165,7 @@ void MythInputDeviceHandler::Event(QEvent *Event) const
     if (!Event)
         return;
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     if (m_appleRemote)
     {
         if (Event->type() == QEvent::WindowActivate)
@@ -234,7 +234,7 @@ void MythInputDeviceHandler::customEvent([[maybe_unused]] QEvent* Event)
     }
 #endif
 
-#if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
+#if defined(USE_LIRC) || CONFIG_APPLEREMOTE
     if (Event->type() == LircKeycodeEvent::kEventType)
     {
         auto *lke = dynamic_cast<LircKeycodeEvent *>(Event);

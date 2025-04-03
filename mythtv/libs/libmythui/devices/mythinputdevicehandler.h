@@ -1,6 +1,8 @@
 #ifndef MYTHINPUTDEVICEHANDLER_H
 #define MYTHINPUTDEVICEHANDLER_H
 
+#include "libmythbase/mythconfig.h"
+
 // Qt
 #include <QObject>
 
@@ -52,7 +54,7 @@ class MythInputDeviceHandler : public QObject
     JoystickMenuThread  *m_joystickThread { nullptr };
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     AppleRemoteListener *m_appleRemoteListener  { nullptr };
     AppleRemote         *m_appleRemote          { nullptr };
 #endif

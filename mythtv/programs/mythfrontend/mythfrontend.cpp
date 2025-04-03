@@ -125,7 +125,7 @@
 #include "libmythtv/DVD/mythdvdbuffer.h"
 
 // AirPlay
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
 #include "libmythtv/AirPlay/mythairplayserver.h"
 #include "libmythtv/AirPlay/mythraopdevice.h"
 #endif
@@ -330,7 +330,7 @@ namespace
     void cleanup()
     {
         QCoreApplication::processEvents();
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
         MythRAOPDevice::Cleanup();
         MythAirplayServer::Cleanup();
 #endif
@@ -2201,7 +2201,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
                                                "MythTV Frontend",
                                                "Main window title"));
 
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
     if (gCoreContext->GetBoolSetting("AirPlayEnabled", true))
     {
         fe_sd_notify("STATUS=Initializing AirPlay");

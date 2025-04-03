@@ -22,5 +22,3 @@ macx {
         QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythavtest
     }
 }
-
-macx:      DEFINES += USING_COREAUDIO

@@ -664,7 +664,6 @@ using_frontend {
             SOURCES += AirPlay/mythairplayserver.cpp
             HEADERS += AirPlay/mythraopdevice.h   AirPlay/mythraopconnection.h
             SOURCES += AirPlay/mythraopdevice.cpp AirPlay/mythraopconnection.cpp
-            DEFINES += USING_AIRPLAY
         }
     }
 

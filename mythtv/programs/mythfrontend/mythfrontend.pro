@@ -122,10 +122,6 @@ win32 : !debug {
 }
 
 using_libcec: DEFINES += USING_LIBCEC
-macx:      DEFINES += USING_COREAUDIO
-using_libdns_sd {
-    using_libcrypto: DEFINES += USING_AIRPLAY
-}
 
 android {
     message( myth android lib include $$(ANDROID_QT_DEPENDENCY_INCLUDE) )
