@@ -1,13 +1,14 @@
+#include "HLSSegment.h"
+
 // C/C++
 #include <utility>
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
 #include <openssl/aes.h>
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO
 
 #include "libmythbase/mythlogging.h"
 
-#include "HLSSegment.h"
 #include "HLSReader.h"
 
 #define LOC QString("HLSSegment[%1]: ").arg(m_inputId)
@@ -46,7 +47,7 @@ HLSRecSegment& HLSRecSegment::operator=(const HLSRecSegment& rhs)
         m_bitrate = rhs.m_bitrate;
         m_title = rhs.m_title;
         m_url = rhs.m_url;
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         m_keypath  = rhs.m_keypath;
         m_ivLoaded = rhs.m_ivLoaded;
         m_aesIV = rhs.m_aesIV;
@@ -66,7 +67,7 @@ QString HLSRecSegment::toString(void) const
         .arg(m_sequence).arg(m_title, m_url.toString(), QString::number(m_duration.count()));
 }
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
 bool HLSRecSegment::SetAESIV(QString line)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "SetAESIV line:"+ line);
@@ -99,4 +100,4 @@ bool HLSRecSegment::SetAESIV(QString line)
     m_ivLoaded = true;
     return true;
 }
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO

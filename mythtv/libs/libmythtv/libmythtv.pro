@@ -346,7 +346,6 @@ HEADERS += HLS/httplivestreambuffer.h
 SOURCES += HLS/httplivestreambuffer.cpp
 HEADERS += HLS/m3u.h
 SOURCES += HLS/m3u.cpp
-using_libcrypto:DEFINES += USING_LIBCRYPTO
 using_libcrypto:LIBS    += -lcrypto
 
 using_frontend {

@@ -382,9 +382,7 @@ endif()
 if(ENABLE_LIBCRYPTO)
   pkg_check_modules(LIBCRYPTO "libcrypto" IMPORTED_TARGET)
   add_build_config(PkgConfig::LIBCRYPTO "libcrypto")
-  if(LIBCRYPTO_FOUND)
-    target_compile_definitions(PkgConfig::LIBCRYPTO INTERFACE USING_LIBCRYPTO)
-  endif()
+  set(CONFIG_LIBCRYPTO ${LIBCRYPTO_FOUND})
 endif()
 
 # ~~~

@@ -1,9 +1,11 @@
+#include "HLSStream.h"
+
 #include <unistd.h>
 
 #include <array>
 #include <utility>
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #endif
@@ -11,7 +13,6 @@
 #include "libmythbase/mythlogging.h"
 
 #include "HLSReader.h"
-#include "HLSStream.h"
 
 #define LOC QString("HLSRecstream[%1]: ").arg(m_inputId)
 
@@ -28,12 +29,12 @@ HLSRecStream::HLSRecStream(int inputId, int seq, uint64_t bitrate, QString  m3u8
 HLSRecStream::~HLSRecStream(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "dtor");
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
     AESKeyMap::iterator Iaes;
 
     for (Iaes = m_aesKeys.begin(); Iaes != m_aesKeys.end(); ++Iaes)
         delete *Iaes;
-#endif  // USING_LIBCRYPTO
+#endif  // CONFIG_LIBCRYPTO
 }
 
 QString HLSRecStream::toString(void) const
@@ -41,7 +42,7 @@ QString HLSRecStream::toString(void) const
     return QString("%1 bitrate %2").arg(Id()).arg(Bitrate());
 }
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
 bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
                                const QString& keypath, HLS_AES_KEY* aeskey) const
 {
@@ -202,7 +203,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
 
     return true;
 }
-#endif  // USING_LIBCRYPTO
+#endif  // CONFIG_LIBCRYPTO
 
 void HLSRecStream::AverageBandwidth(int64_t bandwidth)
 {
