@@ -5895,6 +5895,9 @@ if enabled firewire; then
     fwlibs=""
     check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire
 
+    if enabled firewire && test $target_os = linux; then
+        firewire_linux="yes"
+    fi
     if test $target_os = darwin; then
         if [ -n "$firewiresdk_path" ] ; then
             mac_avc="$firewiresdk_path"
@@ -5908,6 +5911,7 @@ if enabled firewire; then
         fi
         if test -d "$mac_avc" ; then
             firewire="yes"
+            firewire_osx="yes"
         else
             echo Firewire being disabled. FireWire SDK missing
         fi

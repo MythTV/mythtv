@@ -475,10 +475,10 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
         QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
 #endif // USING_VBOX
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     pCardTypeList->AddCardType(
         QObject::tr("FireWire cable box"), "FIREWIRE");
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 
 #ifdef USING_CETON
     pCardTypeList->AddCardType(

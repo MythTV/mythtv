@@ -107,7 +107,6 @@ using_dvb        : DEFINES +=    USING_DVB
 using_hdhomerun  : DEFINES +=    USING_HDHOMERUN
 using_satip      : DEFINES +=    USING_SATIP
 using_vbox       : DEFINES +=    USING_VBOX
-using_firewire   : DEFINES +=    USING_FIREWIRE
 using_ceton      : DEFINES +=    USING_CETON
 using_asi        : DEFINES +=    USING_ASI
 

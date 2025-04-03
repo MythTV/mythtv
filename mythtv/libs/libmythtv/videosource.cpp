@@ -1269,7 +1269,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
         CaptureCardComboBoxSetting(parent, false, "videodevice")
     {
         setLabel(QObject::tr("GUID"));
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
         std::vector<AVCInfo> list = FirewireDevice::GetSTBList();
         for (auto & i : list)
         {
@@ -1277,7 +1277,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
             m_guidToAvcInfo[guid] = i;
             addSelection(guid);
         }
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
     }
 
     AVCInfo GetAVCInfo(const QString &guid) const
@@ -1319,25 +1319,25 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
 
 void FirewireModel::SetGUID([[maybe_unused]] const QString &_guid)
 {
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     AVCInfo info = m_guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
     setValue(std::max(getValueIndex(model), 0));
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 }
 
 void FirewireDesc::SetGUID([[maybe_unused]] const QString &_guid)
 {
     setLabel(tr("Description"));
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     QString name = m_guid->GetAVCInfo(_guid).m_product_name;
     name.replace("Scientific-Atlanta", "SA");
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
     name = name.simplified();
     setValue((name.isEmpty()) ? "" : name);
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 }
 
 class FirewireConnection : public MythUIComboBoxSetting
@@ -1368,7 +1368,7 @@ class FirewireSpeed : public MythUIComboBoxSetting
     }
 };
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
 static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 {
     auto *dev(new FirewireGUID(parent));
@@ -1380,10 +1380,10 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
     cardtype.addTargetedChild("FIREWIRE", desc);
     cardtype.addTargetedChild("FIREWIRE", model);
 
-#ifdef USING_LINUX_FIREWIRE
+#if CONFIG_FIREWIRE_LINUX
     cardtype.addTargetedChild("FIREWIRE", new FirewireConnection(parent));
     cardtype.addTargetedChild("FIREWIRE", new FirewireSpeed(parent));
-#endif // USING_LINUX_FIREWIRE
+#endif // CONFIG_FIREWIRE_LINUX
 
     cardtype.addTargetedChild("FIREWIRE", new SignalTimeout(parent, 2s, 1s));
     cardtype.addTargetedChild("FIREWIRE", new ChannelTimeout(parent, 9s, 1.75s));
@@ -2546,9 +2546,9 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new SatIPConfigurationGroup(parent, *cardtype));
 #endif // USING_SATIP
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     FirewireConfigurationGroup(parent, *cardtype);
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 
 #ifdef USING_CETON
     CetonSetting::CetonConfigurationGroup(parent, *cardtype);
@@ -2746,10 +2746,10 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
         QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
 #endif // USING_VBOX
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 
 #ifdef USING_CETON
     setting->addSelection(

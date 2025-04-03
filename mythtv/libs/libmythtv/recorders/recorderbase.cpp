@@ -902,13 +902,13 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder = new ImportRecorder(tvrec);
     }
 #endif // CONFIG_V4L2
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     else if (genOpt.m_inputType == "FIREWIRE")
     {
         if (dynamic_cast<FirewireChannel*>(channel))
             recorder = new FirewireRecorder(tvrec, dynamic_cast<FirewireChannel*>(channel));
     }
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 #ifdef USING_HDHOMERUN
     else if (genOpt.m_inputType == "HDHOMERUN")
     {

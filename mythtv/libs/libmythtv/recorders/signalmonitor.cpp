@@ -49,7 +49,7 @@ extern "C" {
 #   include "iptvchannel.h"
 #endif
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
 #   include "firewiresignalmonitor.h"
 #   include "firewirechannel.h"
 #endif
@@ -177,7 +177,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     else if (cardtype.toUpper() == "FIREWIRE")
     {
         auto *fc = dynamic_cast<FirewireChannel*>(channel);

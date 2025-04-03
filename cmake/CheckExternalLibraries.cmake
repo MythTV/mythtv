@@ -152,21 +152,6 @@ if(ENABLE_GNUTLS)
   add_build_config(PkgConfig::GNUTLS "gnutls")
 endif()
 
-# ~~~
-# udev: fedora:libiec61883-devel debian:libiec61883-dev
-# udev: fedora:libavc1394-devel debian:libavc1394-dev
-# ~~~
-if(ENABLE_FIREWIRE)
-  pkg_check_modules(LIBIEC61883 "libiec61883" IMPORTED_TARGET)
-  add_build_config(PkgConfig::LIBIEC61883 "iec61883")
-  pkg_check_modules(LIBAVC1394 "libavc1394" IMPORTED_TARGET)
-  add_build_config(PkgConfig::LIBAVC1394 "avc1394")
-  if(TARGET PkgConfig::LIBIEC61883 AND TARGET PkgConfig::LIBAVC1394)
-    target_link_libraries(PkgConfig::LIBIEC61883
-                          INTERFACE PkgConfig::LIBAVC1394)
-  endif()
-endif()
-
 # sdl2: fedora:SDL2-devel debian:libsdl2-dev
 if(ENABLE_SDL2)
   pkg_check_modules(SDL2 "sdl2" IMPORTED_TARGET)

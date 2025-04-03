@@ -22,10 +22,10 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
-#ifdef USING_OSX_FIREWIRE
+#if CONFIG_FIREWIRE_OSX
 #include "darwinfirewiredevice.h"
 #endif
-#ifdef USING_LINUX_FIREWIRE
+#if CONFIG_FIREWIRE_LINUX
 #include "linuxfirewiredevice.h"
 #endif
 #include "firewirechannel.h"
@@ -369,7 +369,7 @@ void ChannelBase::HandleScript(const QString &freqid)
 bool ChannelBase::ChangeInternalChannel([[maybe_unused]] const QString &freqid,
                                         [[maybe_unused]] uint inputid) const
 {
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     FirewireDevice *device = nullptr;
     QString fwnode = CardUtil::GetFirewireChangerNode(inputid);
     uint64_t guid = string_to_guid(fwnode);
@@ -379,14 +379,13 @@ bool ChannelBase::ChangeInternalChannel([[maybe_unused]] const QString &freqid,
             "on inputid %2, GUID %3 (%4)").arg(freqid).arg(inputid)
             .arg(fwnode, fwmodel));
 
-#ifdef USING_LINUX_FIREWIRE
-    device = new LinuxFirewireDevice(
-        guid, 0, 100, true);
-#endif // USING_LINUX_FIREWIRE
+#if CONFIG_FIREWIRE_LINUX
+    device = new LinuxFirewireDevice(guid, 0, 100, true);
+#endif // CONFIG_FIREWIRE_LINUX
 
-#ifdef USING_OSX_FIREWIRE
+#if CONFIG_FIREWIRE_OSX
     device = new DarwinFirewireDevice(guid, 0, 100);
-#endif // USING_OSX_FIREWIRE
+#endif // CONFIG_FIREWIRE_OSX
 
     if (!device)
         return false;
@@ -726,7 +725,7 @@ ChannelBase *ChannelBase::CreateChannel(
     }
     else if (genOpt.m_inputType == "FIREWIRE")
     {
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
         channel = new FirewireChannel(tvrec, genOpt.m_videoDev, fwOpt);
 #endif
     }

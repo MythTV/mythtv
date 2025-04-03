@@ -834,7 +834,6 @@ using_backend {
             HEADERS += recorders/darwinavcinfo.h
             SOURCES += recorders/darwinfirewiredevice.cpp
             SOURCES += recorders/darwinavcinfo.cpp
-            DEFINES += USING_OSX_FIREWIRE
         }
 
         !macx {
@@ -842,10 +841,7 @@ using_backend {
             HEADERS += recorders/linuxavcinfo.h
             SOURCES += recorders/linuxfirewiredevice.cpp
             SOURCES += recorders/linuxavcinfo.cpp
-            DEFINES += USING_LINUX_FIREWIRE
         }
-
-        DEFINES += USING_FIREWIRE
     }
 
     # Support for RTP/UDP streams
