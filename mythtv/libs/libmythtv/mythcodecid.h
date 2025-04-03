@@ -401,7 +401,7 @@ static inline bool CODEC_IS_VAAPI(const struct AVCodec */*codec*/, const AVCodec
     { return false; };
 #endif
 
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
 static inline bool CODEC_IS_DXVA2(const struct AVCodec *codec, const AVCodecContext *enc)
     { return (codec  != nullptr) && (enc->pix_fmt == AV_PIX_FMT_DXVA2_VLD); };
 #else

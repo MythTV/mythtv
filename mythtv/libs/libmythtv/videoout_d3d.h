@@ -3,12 +3,14 @@
 #ifndef VIDEOOUT_D3D_H_
 #define VIDEOOUT_D3D_H_
 
+#include "libmythbase/mythconfig.h"
+
 // MythTV headers
 #include "mythvideooutgpu.h"
 #include "libmythui/mythrender_d3d9.h"
 #include "libmythui/mythpainter_d3d9.h"
 
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
 #include "dxva2decoder.h"
 #endif
 
@@ -62,7 +64,7 @@ class VideoOutputD3D : public MythVideoOutputGPU
 
     bool CreateDecoder(void);
     void DeleteDecoder(void);
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     DXVA2Decoder *m_decoder      {nullptr};
 #endif
     void         *m_pauseSurface {nullptr};

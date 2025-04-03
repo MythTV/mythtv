@@ -1055,7 +1055,6 @@ mingw || win32-msvc* {
     #HEADERS += videoout_d3d.h
     #SOURCES += videoout_d3d.cpp
 
-    using_dxva2: DEFINES += USING_DXVA2
     using_dxva2: HEADERS += dxva2decoder.h
     using_dxva2: SOURCES += dxva2decoder.cpp
 

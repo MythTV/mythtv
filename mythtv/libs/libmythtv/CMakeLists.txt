@@ -242,9 +242,6 @@ endif()
 if(WIN32)
   set_source_files_properties(cardutil.cpp PROPERTIES COMPILE_DEFINITIONS
                                                       O_NONBLOCK=0)
-  if(HAVE_DXVA2)
-    target_compile_definitions(mythtv PRIVATE USING_DXVA2)
-  endif()
 endif(WIN32)
 
 target_compile_definitions(mythtv PRIVATE MTV_API)

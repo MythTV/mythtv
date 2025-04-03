@@ -2722,7 +2722,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     return 0;
 }
 
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
 int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);

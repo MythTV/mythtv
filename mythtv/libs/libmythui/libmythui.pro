@@ -297,7 +297,6 @@ mingw | win32-msvc*{
     SOURCES += platforms/mythdisplaywindows.cpp
     DEFINES += NODRAWTEXT
     LIBS    += -luser32  -lgdi32
-    using_dxva2: DEFINES += USING_DXVA2
 }
 
 using_vulkan {

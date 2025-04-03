@@ -55,7 +55,7 @@
 #if CONFIG_EGL
 #include "mythdrmprimecontext.h"
 #endif
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
 #include "videoout_d3d.h"
 #endif
 #include "mythcodeccontext.h"
@@ -171,7 +171,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts, bool Reinit /*=false*/)
         (*Opts.equiv_decoders)["vdpau-dec"].append("dummy");
     }
 #endif
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     Opts.decoders->append("dxva2");
     (*Opts.equiv_decoders)["dxva2"].append("dummy");
 #endif
@@ -270,7 +270,7 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder,
     if (codec_is_vtb(result) || codec_is_vtb_dec(result))
         return result;
 #endif
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     result = VideoOutputD3D::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_dxva2(result))
         return result;
