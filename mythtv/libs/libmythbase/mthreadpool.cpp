@@ -123,7 +123,9 @@ class MPoolThread : public MThread
                 loggingRegisterThread(m_runnableName);
 
             bool autodelete = m_runnable->autoDelete();
+            locker.unlock();
             m_runnable->run();
+            locker.relock();
             if (autodelete)
                 delete m_runnable;
             if (m_reserved)
