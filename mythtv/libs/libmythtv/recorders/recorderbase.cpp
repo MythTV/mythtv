@@ -909,7 +909,7 @@ RecorderBase *RecorderBase::CreateRecorder(
             recorder = new FirewireRecorder(tvrec, dynamic_cast<FirewireChannel*>(channel));
     }
 #endif // CONFIG_FIREWIRE
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     else if (genOpt.m_inputType == "HDHOMERUN")
     {
         if (dynamic_cast<HDHRChannel*>(channel))
@@ -918,8 +918,8 @@ RecorderBase *RecorderBase::CreateRecorder(
             recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
     }
-#endif // USING_HDHOMERUN
-#ifdef USING_CETON
+#endif // CONFIG_HDHOMERUN
+#if CONFIG_CETON
     else if (genOpt.m_inputType == "CETON")
     {
         if (dynamic_cast<CetonChannel*>(channel))
@@ -928,8 +928,8 @@ RecorderBase *RecorderBase::CreateRecorder(
             recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
     }
-#endif // USING_CETON
-#ifdef USING_DVB
+#endif // CONFIG_CETON
+#if CONFIG_DVB
     else if (genOpt.m_inputType == "DVB")
     {
         if (dynamic_cast<DVBChannel*>(channel))
@@ -938,8 +938,8 @@ RecorderBase *RecorderBase::CreateRecorder(
             recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
     }
-#endif // USING_DVB
-#ifdef USING_IPTV
+#endif // CONFIG_DVB
+#if CONFIG_IPTV
     else if (genOpt.m_inputType == "FREEBOX")
     {
         if (dynamic_cast<IPTVChannel*>(channel))
@@ -948,22 +948,22 @@ RecorderBase *RecorderBase::CreateRecorder(
             recorder->SetOption("mrl", genOpt.m_videoDev);
         }
     }
-#endif // USING_IPTV
-#ifdef USING_VBOX
+#endif // CONFIG_IPTV
+#if CONFIG_VBOX
     else if (genOpt.m_inputType == "VBOX")
     {
         if (dynamic_cast<IPTVChannel*>(channel))
             recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
     }
-#endif // USING_VBOX
-#ifdef USING_SATIP
+#endif // CONFIG_VBOX
+#if CONFIG_SATIP
     else if (genOpt.m_inputType == "SATIP")
     {
         if (dynamic_cast<SatIPChannel*>(channel))
             recorder = new SatIPRecorder(tvrec, dynamic_cast<SatIPChannel*>(channel));
     }
-#endif // USING_SATIP
-#ifdef USING_ASI
+#endif // CONFIG_SATIP
+#if CONFIG_ASI
     else if (genOpt.m_inputType == "ASI")
     {
         if (dynamic_cast<ASIChannel*>(channel))
@@ -972,7 +972,7 @@ RecorderBase *RecorderBase::CreateRecorder(
             recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
     }
-#endif // USING_ASI
+#endif // CONFIG_ASI
 
     if (recorder)
     {

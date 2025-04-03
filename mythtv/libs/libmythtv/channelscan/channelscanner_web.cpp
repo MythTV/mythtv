@@ -30,15 +30,16 @@
 // MythTv headers
 #include "channelscanner_web.h"
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "channelscan_sm.h"
 #include "channelimporter.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/scanwizardconfig.h"
-#ifdef USING_SATIP
+#if CONFIG_SATIP
 #include "recorders/satiputils.h"
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
 #define LOC QString("ChScanWeb: ")
 
@@ -94,12 +95,12 @@ bool  ChannelScannerWeb::StartScan (uint cardid,
     QString subType = CardUtil::ProbeSubTypeName(cardid);
     CardUtil::INPUT_TYPES inputType = CardUtil::toInputType(subType);
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     if (inputType == CardUtil::INPUT_TYPES::SATIP)
     {
         inputType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(cardid));
     }
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
     int nScanType = -99;
     if (ScanType == "FULL")
@@ -482,13 +483,13 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
         }
 
         bool success = (m_iptvScanner != nullptr);
-#ifdef USING_VBOX
+#if CONFIG_VBOX
         success |= (m_vboxScanner != nullptr);
 #endif
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
         success |= (m_externRecScanner != nullptr);
 #endif
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
         success |= (m_hdhrScanner != nullptr);
 #endif
         Teardown();

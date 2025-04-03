@@ -21,7 +21,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 #   include "dvbsignalmonitor.h"
 #   include "dvbchannel.h"
 #endif
@@ -34,17 +34,17 @@ extern "C" {
 #   include "v4lchannel.h"
 #endif
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
 #   include "hdhrsignalmonitor.h"
 #   include "hdhrchannel.h"
 #endif
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
 #   include "satipsignalmonitor.h"
 #   include "satipchannel.h"
 #endif
 
-#ifdef USING_IPTV
+#if CONFIG_IPTV
 #   include "iptvsignalmonitor.h"
 #   include "iptvchannel.h"
 #endif
@@ -54,12 +54,12 @@ extern "C" {
 #   include "firewirechannel.h"
 #endif
 
-#ifdef USING_ASI
+#if CONFIG_ASI
 #   include "asisignalmonitor.h"
 #   include "asichannel.h"
 #endif
 
-#ifdef USING_CETON
+#if CONFIG_CETON
 #   include "cetonsignalmonitor.h"
 #   include "cetonchannel.h"
 #endif
@@ -101,7 +101,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
         // This lets all the conditionally compiled tests be set up as
         // 'else if' statements
     }
-#ifdef USING_DVB
+#if CONFIG_DVB
     else if (CardUtil::IsDVBInputType(cardtype))
     {
         auto *dvbc = dynamic_cast<DVBChannel*>(channel);
@@ -128,7 +128,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     else if (cardtype.toUpper() == "HDHOMERUN")
     {
         auto *hdhrc = dynamic_cast<HDHRChannel*>(channel);
@@ -138,7 +138,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     else if (cardtype.toUpper() == "SATIP")
     {
         auto *satipchan = dynamic_cast<SatIPChannel*>(channel);
@@ -147,7 +147,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_CETON
+#if CONFIG_CETON
     else if (cardtype.toUpper() == "CETON")
     {
         auto *cetonchan = dynamic_cast<CetonChannel*>(channel);
@@ -157,7 +157,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_IPTV
+#if CONFIG_IPTV
     else if (cardtype.toUpper() == "FREEBOX")
     {
         auto *fbc = dynamic_cast<IPTVChannel*>(channel);
@@ -167,7 +167,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     else if (cardtype.toUpper() == "VBOX")
     {
         auto *fbc = dynamic_cast<IPTVChannel*>(channel);
@@ -187,7 +187,7 @@ SignalMonitor *SignalMonitor::Init([[maybe_unused]] const QString& cardtype,
     }
 #endif
 
-#ifdef USING_ASI
+#if CONFIG_ASI
     else if (cardtype.toUpper() == "ASI")
     {
         auto *fc = dynamic_cast<ASIChannel*>(channel);

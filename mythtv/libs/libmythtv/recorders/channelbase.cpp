@@ -716,7 +716,7 @@ ChannelBase *ChannelBase::CreateChannel(
     ChannelBase *channel = nullptr;
     if (genOpt.m_inputType == "DVB")
     {
-#ifdef USING_DVB
+#if CONFIG_DVB
         channel = new DVBChannel(genOpt.m_videoDev, tvrec);
         auto *dvbchannel = dynamic_cast<DVBChannel*>(channel);
         if (dvbchannel != nullptr)
@@ -729,13 +729,13 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new FirewireChannel(tvrec, genOpt.m_videoDev, fwOpt);
 #endif
     }
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     else if (genOpt.m_inputType == "HDHOMERUN")
     {
         channel = new HDHRChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     else if (genOpt.m_inputType == "SATIP")
     {
         channel = new SatIPChannel(tvrec, genOpt.m_videoDev);
@@ -749,20 +749,20 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new DummyChannel(tvrec);
         rbFileExt = "mpg";
     }
-#if defined(USING_IPTV) || defined(USING_VBOX)
+#if CONFIG_IPTV || CONFIG_VBOX
     else if ((genOpt.m_inputType == "FREEBOX") || // IPTV
              (genOpt.m_inputType == "VBOX"))
     {
         channel = new IPTVChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
-#ifdef USING_ASI
+#if CONFIG_ASI
     else if (genOpt.m_inputType == "ASI")
     {
         channel = new ASIChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
-#ifdef USING_CETON
+#if CONFIG_CETON
     else if (genOpt.m_inputType == "CETON")
     {
         channel = new CetonChannel(tvrec, genOpt.m_videoDev);

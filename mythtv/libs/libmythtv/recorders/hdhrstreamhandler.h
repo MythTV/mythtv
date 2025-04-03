@@ -23,7 +23,7 @@ class HDHRChannel;
 class DeviceReadBuffer;
 
 // HDHomeRun headers
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
 #include HDHOMERUN_HEADERFILE
 #else
 struct hdhomerun_device_t { int dummy; };

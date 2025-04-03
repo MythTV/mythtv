@@ -24,7 +24,7 @@
 #include "diseqc.h"
 #include "dtvmultiplex.h"
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 #   include "recorders/dvbtypes.h"
 #else
 static constexpr uint8_t SEC_VOLTAGE_13  { 0 };
@@ -38,7 +38,7 @@ static constexpr useconds_t DISEQC_LONG_WAIT      { 100 * 1000 };
 static constexpr useconds_t DISEQC_POWER_ON_WAIT  { 500 * 1000 };
 static constexpr useconds_t DISEQC_POWER_OFF_WAIT { (1000 * 1000) - 1 };
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 // Number of times to retry ioctls after receiving ETIMEDOUT before giving up
 static constexpr uint8_t    TIMEOUT_RETRIES       { 10 };
 static constexpr useconds_t TIMEOUT_WAIT          { 250 * 1000 };
@@ -483,7 +483,7 @@ bool DiSEqCDevTree::SetTone([[maybe_unused]] bool on) const
 {
     bool success = false;
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
     {
         if (ioctl(m_fdFrontend, FE_SET_TONE,
@@ -492,7 +492,7 @@ bool DiSEqCDevTree::SetTone([[maybe_unused]] bool on) const
         else
             usleep(TIMEOUT_WAIT);
     }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     if (!success)
         LOG(VB_GENERAL, LOG_ERR, LOC + "FE_SET_TONE failed" + ENO);
@@ -638,7 +638,7 @@ void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
     delete old_root;
 }
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
 {
     bool success = false;
@@ -659,7 +659,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
 
     return success;
 }
-#endif //USING_DVB
+#endif // CONFIG_DVB
 
 /** \fn DiSEqCDevTree::SendCommand(uint,uint,uint,uint,cmd_vec_t &)
  *  \brief Sends a DiSEqC command.
@@ -681,11 +681,11 @@ bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
         return false;
     }
 
-#ifndef USING_DVB
+#if !CONFIG_DVB
 
     return false;
 
-#else // if USING_DVB
+#else // if CONFIG_DVB
 
     bool resend_cmd = false;
 
@@ -729,7 +729,7 @@ bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
 
     return true;
 
-#endif // USING_DVB
+#endif // CONFIG_DVB
 }
 
 /**
@@ -811,7 +811,7 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
 
     bool success = false;
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     for (uint retry = 0; !success && retry < TIMEOUT_RETRIES; retry++)
     {
         if (ioctl(m_fdFrontend, FE_SET_VOLTAGE, voltage) == 0)
@@ -819,7 +819,7 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
         else
             usleep(TIMEOUT_WAIT);
     }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     if (!success)
     {
@@ -1363,7 +1363,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy([[maybe_unused]] const DiSEqCDevSettings &se
                                     [[maybe_unused]] const DTVMultiplex &tuning,
                                     [[maybe_unused]] uint pos)
 {
-#if defined(USING_DVB) && defined(FE_DISHNETWORK_SEND_LEGACY_CMD)
+#if CONFIG_DVB && defined(FE_DISHNETWORK_SEND_LEGACY_CMD)
     static const cmd_vec_t kSw21Cmds  { 0x34, 0x65, };
     static const cmd_vec_t kSw42Cmds  { 0x46, 0x17, };
     static const cmd_vec_t kSw64VCmds { 0x39, 0x4b, 0x0d, };
@@ -1425,7 +1425,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy([[maybe_unused]] const DiSEqCDevSettings &se
 #endif // !FE_DISHNETWORK_SEND_LEGACY_CMD
 }
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 static bool set_tone(int fd, fe_sec_tone_mode tone)
 {
     bool success = false;
@@ -1445,9 +1445,9 @@ static bool set_tone(int fd, fe_sec_tone_mode tone)
 
     return success;
 }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 static bool set_voltage(int fd, fe_sec_voltage volt)
 {
     bool success = false;
@@ -1467,9 +1467,9 @@ static bool set_voltage(int fd, fe_sec_voltage volt)
 
     return success;
 }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 {
     bool success = false;
@@ -1490,7 +1490,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 
     return success;
 }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
 bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
                                   const DTVMultiplex &/*tuning*/,
@@ -1499,10 +1499,10 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to Tone switch port " +
             QString("%1/2").arg(pos + 1));
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     if (set_tone(m_tree.GetFD(), (0 == pos) ? SEC_TONE_OFF : SEC_TONE_ON))
         return true;
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Setting Tone Switch failed." + ENO);
     return false;
@@ -1515,13 +1515,13 @@ bool DiSEqCDevSwitch::ExecuteVoltage([[maybe_unused]] const DiSEqCDevSettings &s
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to Voltage Switch port " +
             QString("%1/2").arg(pos + 1));
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     if (set_voltage(m_tree.GetFD(),
                     (0 == pos) ? SEC_VOLTAGE_13 : SEC_VOLTAGE_18))
     {
         return true;
     }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Setting Voltage Switch failed." + ENO);
 
@@ -1535,10 +1535,10 @@ bool DiSEqCDevSwitch::ExecuteMiniDiSEqC([[maybe_unused]] const DiSEqCDevSettings
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Changing to MiniDiSEqC Switch port " +
             QString("%1/2").arg(pos + 1));
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     if (mini_diseqc(m_tree.GetFD(), (0 == pos) ? SEC_MINI_A : SEC_MINI_B))
         return true;
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Setting Mini DiSEqC Switch failed." + ENO);
 

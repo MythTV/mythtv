@@ -10,7 +10,6 @@ endif()
 
 target_compile_definitions(
   mythtv
-  PUBLIC USING_IPTV
   PRIVATE USING_BACKEND)
 target_sources(
   mythtv

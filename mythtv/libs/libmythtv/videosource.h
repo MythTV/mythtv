@@ -5,6 +5,7 @@
 #include <vector>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythui/standardsettings.h"
 #include "libmythbase/mthread.h"
 
@@ -329,7 +330,7 @@ public:
     static void fillSelections(MythUIComboBoxSetting* setting);
 };
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
 
 class UseHDHomeRunDevice;
 class HDHomeRunDevice
@@ -377,9 +378,9 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
   private:
     HDHomeRunConfigurationGroup &m_group;
 };
-#endif  // USING_HDHOMERUN
+#endif  // CONFIG_HDHOMERUN
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
 
 class SatIPDevice
 {
@@ -474,7 +475,7 @@ class SatIPDeviceAttribute : public GroupSetting
     SatIPDeviceAttribute(const QString& label,
                          const QString& helpText);
 };
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
 class VBoxDevice
 {
@@ -1027,7 +1028,7 @@ class VBoxDeviceID : public MythUITextEditSetting
     QString m_overrideDeviceId;
 };
 
-#ifdef USING_CETON
+#if CONFIG_CETON
 class CetonSetting : public TransTextEditSetting
 {
     Q_OBJECT
@@ -1069,6 +1070,6 @@ class CetonDeviceID : public MythUITextEditSetting
     QString m_tuner;
     const CaptureCard &m_parent;
 };
-#endif // USING_CETON
+#endif // CONFIG_CETON
 
 #endif

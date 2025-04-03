@@ -82,13 +82,13 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         }
 
         bool success = (m_iptvScanner != nullptr);
-#ifdef USING_VBOX
+#if CONFIG_VBOX
         success |= (m_vboxScanner != nullptr);
 #endif
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
         success |= (m_externRecScanner != nullptr);
 #endif
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
         success |= (m_hdhrScanner != nullptr);
 #endif
 

@@ -15,6 +15,3 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += mythpreviewgen_commandlineparser.h
 
 SOURCES += mythpreviewgen.cpp mythpreviewgen_commandlineparser.cpp
-
-using_dvb:DEFINES += USING_DVB
-

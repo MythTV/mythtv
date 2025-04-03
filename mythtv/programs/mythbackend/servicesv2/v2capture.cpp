@@ -29,6 +29,8 @@
 #include <QMutex>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
+
 #include "libmythui/standardsettings.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
@@ -277,22 +279,22 @@ V2CardSubType* V2Capture::GetCardSubType     ( int CardId     )
     QString subtype = CardUtil::ProbeSubTypeName(CardId);
     CardUtil::INPUT_TYPES cardType = CardUtil::toInputType(subtype);
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     if (cardType == CardUtil::INPUT_TYPES::SATIP)
         cardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(CardId));
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
     bool HDHRdoesDVBC = false;
     bool HDHRdoesDVB = false;
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     if (cardType == CardUtil::INPUT_TYPES::HDHOMERUN)
     {
         QString device = CardUtil::GetVideoDevice(CardId);
         HDHRdoesDVBC = CardUtil::HDHRdoesDVBC(device);
         HDHRdoesDVB = CardUtil::HDHRdoesDVB(device);
     }
-#endif // USING_HDHOMERUN
+#endif // CONFIG_HDHOMERUN
 
     pCardType->setCardId(CardId);
     pCardType->setSubType (subtype);
@@ -448,10 +450,10 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
 {
     auto* pCardTypeList = new V2CardTypeList();
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     pCardTypeList->AddCardType(
         QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
 #if CONFIG_V4L2
     pCardTypeList->AddCardType(
@@ -460,34 +462,34 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
 #endif // CONFIG_V4L2
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     pCardTypeList->AddCardType(
         QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
-#endif // USING_HDHOMERUN
+#endif // CONFIG_HDHOMERUN
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     pCardTypeList->AddCardType(
         QObject::tr("Sat>IP networked tuner"), "SATIP");
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     pCardTypeList->AddCardType(
         QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
-#endif // USING_VBOX
+#endif // CONFIG_VBOX
 
 #if CONFIG_FIREWIRE
     pCardTypeList->AddCardType(
         QObject::tr("FireWire cable box"), "FIREWIRE");
 #endif // CONFIG_FIREWIRE
 
-#ifdef USING_CETON
+#if CONFIG_CETON
     pCardTypeList->AddCardType(
         QObject::tr("Ceton Cablecard tuner"), "CETON");
-#endif // USING_CETON
+#endif // CONFIG_CETON
 
-#ifdef USING_IPTV
+#if CONFIG_IPTV
     pCardTypeList->AddCardType(QObject::tr("IPTV recorder"), "FREEBOX");
-#endif // USING_IPTV
+#endif // CONFIG_IPTV
 
 #if CONFIG_V4L2
     pCardTypeList->AddCardType(
@@ -501,7 +503,7 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
         QObject::tr("Analog capture card"), "V4L");
 #endif // CONFIG_V4L2
 
-#ifdef USING_ASI
+#if CONFIG_ASI
     pCardTypeList->AddCardType(QObject::tr("DVEO ASI recorder"), "ASI");
 #endif
 
@@ -588,7 +590,7 @@ bool V2Capture::SetInputMaxRecordings( const uint InputId,
 }
 
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 static QString remove_chaff(const QString &name)
 {
     // Trim off some of the chaff.
@@ -629,7 +631,7 @@ static QString remove_chaff(const QString &name)
 
     return short_name;
 }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
 
 
@@ -657,7 +659,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
         auto* pDev = pList->AddCaptureDevice();
         pDev->setCardType (CardType);
         pDev->setVideoDevice (it);
-#ifdef USING_DVB
+#if CONFIG_DVB
         // From DVBConfigurationGroup::probeCard in Videosource.cpp
         if (CardType == "DVB")
         {
@@ -752,13 +754,13 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
             pDev->setChannelTimeout ( channelTimeout );
             pDev->setTuningDelay ( tuningDelay );
         } // endif (CardType == "DVB")
-#endif // USING_DVB
+#endif // CONFIG_DVB
         if (CardType == "HDHOMERUN")
         {
             pDev->setSignalTimeout ( 3000 );
             pDev->setChannelTimeout ( 6000 );
         }
-#ifdef USING_SATIP
+#if CONFIG_SATIP
         if (CardType == "SATIP")
         {
             pDev->setSignalTimeout ( 7000 );
@@ -776,8 +778,8 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
                 pDev->setTunerNumber(word[3].toUInt());
             }
         }
-#endif // USING_SATIP
-#ifdef USING_VBOX
+#endif // CONFIG_SATIP
+#if CONFIG_VBOX
         if (CardType == "VBOX")
         {
             pDev->setSignalTimeout ( 7000 );
@@ -796,7 +798,7 @@ V2CaptureDeviceList* V2Capture::GetCaptureDeviceList  ( const QString  &CardType
                 pDev->setTunerNumber(word[2].toUInt());
             }
         }
-#endif // USING_VBOX
+#endif // CONFIG_VBOX
     } // endfor (const auto & it : std::as_const(sdevs))
     return pList;
 }

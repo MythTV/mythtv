@@ -4379,6 +4379,8 @@ case $target_os in
         ;;
 esac
 
+enabled backend && enable iptv
+
 # test if creating links works
 link_dest=$(mktemp -u $TMPDIR/dest_XXXXXXXX)
 link_name=$(mktemp -u $TMPDIR/name_XXXXXXXX)

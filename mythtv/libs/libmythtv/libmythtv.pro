@@ -884,8 +884,6 @@ using_backend {
     SOURCES += recorders/HLS/HLSStream.cpp
     SOURCES += recorders/HLS/HLSStreamWorker.cpp
 
-    DEFINES += USING_IPTV
-
 
     # Support for HDHomeRun box
     using_hdhomerun {
@@ -908,7 +906,6 @@ using_backend {
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
 
-        DEFINES += USING_HDHOMERUN
         DEFINES += HDHOMERUN_HEADERFILE=\\\"$${HDHOMERUN_PREFIX}hdhomerun.h\\\"
         DEFINES += HDHOMERUN_VERSION=$${HDHOMERUN_VERSION}
     }
@@ -930,8 +927,6 @@ using_backend {
         SOURCES += recorders/satiprtsp.cpp
         SOURCES += recorders/satiprecorder.cpp
         SOURCES += recorders/satiprtcppacket.cpp
-
-        DEFINES += USING_SATIP
     }
 
     # Support for VBox
@@ -941,8 +936,6 @@ using_backend {
 
         SOURCES += recorders/vboxutils.cpp
         SOURCES += channelscan/vboxchannelfetcher.cpp
-
-        DEFINES += USING_VBOX
     }
 
     # Support for Ceton
@@ -960,8 +953,6 @@ using_backend {
 
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
-
-        DEFINES += USING_CETON
     }
 
     # External recorder
@@ -1002,8 +993,6 @@ using_backend {
         # Misc
         HEADERS += recorders/dvbdev/dvbci.h
         SOURCES += recorders/dvbdev/dvbci.cpp
-
-        DEFINES += USING_DVB
     }
 
     using_asi {
@@ -1021,8 +1010,6 @@ using_backend {
 
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
-
-        DEFINES += USING_ASI
     }
 
     DEFINES += USING_BACKEND
