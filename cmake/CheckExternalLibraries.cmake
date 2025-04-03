@@ -182,3 +182,9 @@ if(SYSTEM_LIBBLURAY_FOUND)
   target_compile_definitions(PkgConfig::SYSTEM_LIBBLURAY
                              INTERFACE HAVE_LIBBLURAY)
 endif()
+
+# valgrind - needs valgrind-tools-devel
+if(ENABLE_VALGRIND)
+  pkg_check_modules(VALGRIND "valgrind" IMPORTED_TARGET)
+  set(CONFIG_VALGRIND ${VALGRIND_FOUND})
+endif()

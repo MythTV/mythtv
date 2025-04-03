@@ -18,5 +18,3 @@ SOURCES += mythpreviewgen.cpp mythpreviewgen_commandlineparser.cpp
 
 using_dvb:DEFINES += USING_DVB
 
-using_valgrind:DEFINES += USING_VALGRIND
-

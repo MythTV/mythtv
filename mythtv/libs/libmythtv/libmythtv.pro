@@ -73,9 +73,6 @@ macx {
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
 cygwin:DEFINES += _WIN32
 
-# Enable Valgrind, i.e. disable some timeouts
-using_valgrind:DEFINES += USING_VALGRIND
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 ##########################################################################
