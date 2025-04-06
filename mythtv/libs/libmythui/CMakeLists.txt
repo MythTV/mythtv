@@ -260,13 +260,13 @@ if(TARGET PkgConfig::DRM)
             platforms/drm/mythdrmvrr.cpp
             platforms/drm/mythdrmvrr.h)
 
-  if(TARGET Qt5::GuiPrivate) # Not completed for Qt6 yet.
+  if(TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
     target_sources(mythui PRIVATE platforms/drm/mythdrmhdr.cpp
                                   platforms/drm/mythdrmhdr.h)
   endif()
 endif()
 
-if(TARGET Qt5::GuiPrivate) # Not completed for Qt6 yet.
+if(TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
   target_link_libraries(mythui PRIVATE Qt${QT_VERSION_MAJOR}::GuiPrivate)
   if(TARGET PkgConfig::WAYLAND_CLIENT)
     target_link_libraries(mythui PRIVATE PkgConfig::WAYLAND_CLIENT)
