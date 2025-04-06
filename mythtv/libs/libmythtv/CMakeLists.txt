@@ -314,9 +314,12 @@ if(ENABLE_FRONTEND OR ENABLE_BACKEND)
     target_link_libraries(mythtv PRIVATE PkgConfig::V4L2)
     target_sources(mythtv PRIVATE v4l2util.cpp v4l2util.h)
   endif()
-
-  include(cmake/Frontend.cmake)
-  include(cmake/Backend.cmake)
+  if(ENABLE_FRONTEND)
+    include(cmake/Frontend.cmake)
+  endif()
+  if(ENABLE_BACKEND)
+    include(cmake/Backend.cmake)
+  endif()
 endif()
 
 #

@@ -3375,7 +3375,7 @@ void CardInput::channelScanner(void)
     uint crdid = m_id->getValue().toUInt();
     QString in = m_inputName->getValue();
 
-#ifdef USING_BACKEND
+#if CONFIG_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
     Save(); // save info for scanner.

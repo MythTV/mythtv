@@ -8,9 +8,6 @@ if(NOT ENABLE_BACKEND)
   return()
 endif()
 
-target_compile_definitions(
-  mythtv
-  PRIVATE USING_BACKEND)
 target_sources(
   mythtv
   PRIVATE # Channel stuff

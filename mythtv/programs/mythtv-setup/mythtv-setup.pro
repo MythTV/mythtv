@@ -18,10 +18,6 @@ INSTALLS += menu
 
 QMAKE_CLEAN += $(TARGET)
 
-using_backend {
-    DEFINES += USING_BACKEND
-}
-
 # Input
 HEADERS += backendsettings.h   channeleditor.h   checksetup.h
 HEADERS += exitprompt.h        importicons.h     startprompt.h

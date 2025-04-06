@@ -678,8 +678,6 @@ using_frontend {
         HEADERS += decoders/mythv4l2m2mcontext.h
         SOURCES += decoders/mythv4l2m2mcontext.cpp
     }
-
-    DEFINES += USING_FRONTEND
 }
 
 if(using_backend|using_frontend):using_v4l2 {
@@ -1011,8 +1009,6 @@ using_backend {
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
     }
-
-    DEFINES += USING_BACKEND
 }
 
 use_hidesyms {

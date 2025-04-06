@@ -8,7 +8,6 @@ if(NOT ENABLE_FRONTEND)
   return()
 endif()
 
-target_compile_definitions(mythtv PRIVATE USING_FRONTEND)
 target_sources(
   mythtv
   PRIVATE # DVD
