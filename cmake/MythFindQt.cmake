@@ -109,33 +109,6 @@ if(TARGET ${QT_PKG_NAME}::DBus)
   set(CONFIG_QTDBUS ON)
 endif()
 
-# Not all of the Qt6 include directories squirrel the private headers away into
-# a sub-directory.  Look for paths like /usr/include/qt6/QtGui/6.4.3 and
-# /usr/include/qt6/QtGui/6.4.3/QtGui and rewrite these up to point to the top
-# include directory for that component.
-function(clean_qt6_includes target)
-  if(NOT TARGET ${target})
-    return()
-  endif()
-
-  get_target_property(_DIRS ${target} INTERFACE_INCLUDE_DIRECTORIES)
-  foreach(_DIR IN LISTS _DIRS)
-    if(EXISTS ${_DIR})
-      continue()
-    endif()
-    if(_DIR MATCHES "(.*)\/[0-9.]+(\/.*)?")
-      set(_DIR ${CMAKE_MATCH_1})
-    endif()
-    list(APPEND _DIRS2 ${_DIR})
-  endforeach()
-
-  set_target_properties(${target} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-                                             "${_DIRS2}")
-endfunction()
-
-clean_qt6_includes(Qt6::CorePrivate)
-clean_qt6_includes(Qt6::GuiPrivate)
-
 if(TARGET ${QT_PKG_NAME}::GuiPrivate)
   target_compile_definitions(${QT_PKG_NAME}::GuiPrivate
                              INTERFACE USING_QTPRIVATEHEADERS)
