@@ -112,7 +112,13 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::ShortcutOverride) 
     {
         // intercept all key presses
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
+        if (keyEvent == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ALERT,
+                     "MythWebEngineView::eventFilter() couldn't cast event");
+            return true;
+        }
 
         bool res = handleKeyPress(keyEvent);
         if (!res)
