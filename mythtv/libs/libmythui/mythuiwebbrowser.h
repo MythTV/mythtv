@@ -152,8 +152,8 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotStatusBarMessage(const QString &text);
     void slotIconChanged(const QIcon &icon);
     void slotIconUrlChanged(const QUrl &url);
-    void slotScrollPositionChanged(const QPointF & position);
-    void slotContentsSizeChanged(const QSizeF &size);
+    void slotScrollPositionChanged(QPointF position);
+    void slotContentsSizeChanged(QSizeF size);
     void slotLinkClicked(const QUrl &url);
     void slotTopScreenChanged(MythScreenType *screen);
     void slotScrollBarShowing(void);
