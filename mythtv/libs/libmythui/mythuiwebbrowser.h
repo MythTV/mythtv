@@ -42,7 +42,7 @@ class MythWebEngineView : public QWebEngineView
     QWebEngineView *createWindow(QWebEnginePage::WebWindowType type) override; // QWebEngineView
 
   private:
-    void sendKeyPress(QKeyEvent *event);
+    void sendKeyPress(int key, Qt::KeyboardModifiers modifiers, const QString &text = QString());
     bool handleKeyPress(QKeyEvent *event);
     void showDownloadMenu(void);
     void openBusyPopup(const QString &message);

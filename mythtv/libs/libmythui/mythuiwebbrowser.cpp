@@ -133,11 +133,16 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
     return QWebEngineView::eventFilter(obj, event);
 }
 
-void MythWebEngineView::sendKeyPress(QKeyEvent *event)
+void MythWebEngineView::sendKeyPress(int key, Qt::KeyboardModifiers modifiers, const QString &text)
 {
     Q_FOREACH(QObject* obj, children())
+    {
         if (qobject_cast<QWidget*>(obj))
+        {
+            auto *event = new QKeyEvent(QEvent::KeyPress, key, modifiers, text, false, 1);
             QCoreApplication::postEvent(obj, event);
+        }
+    }
 }
 
 bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
@@ -165,8 +170,7 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         {
             if (event->key() != Qt::Key_Tab)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier, QString('\t'), false, 1);
-                sendKeyPress(key);
+                sendKeyPress(Qt::Key_Tab, Qt::NoModifier, QString('\t'));
                 return true;
             }
 
@@ -176,8 +180,7 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         {
             if (event->key() != Qt::Key_Tab)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::ShiftModifier, QString('\t'), false, 1);
-                sendKeyPress(key);
+                sendKeyPress(Qt::Key_Tab, Qt::ShiftModifier, QString('\t'));
                 return true;
             }
 
@@ -187,8 +190,7 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         {
             if (event->key() != Qt::Key_Return)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier, QString('\r'), false, 1);
-                sendKeyPress(key);
+                sendKeyPress(Qt::Key_Return, Qt::NoModifier, QString('\r'));
                 return true;
             }
 
