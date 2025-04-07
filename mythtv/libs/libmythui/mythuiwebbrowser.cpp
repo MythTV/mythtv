@@ -120,7 +120,7 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
         else
             keyEvent->ignore();
 
-        return false;
+        return false; // clazy:exclude=base-class-event
     }
 
     // standard event processing
@@ -759,7 +759,7 @@ void MythUIWebBrowser::LoadUserStyleSheet(const QUrl& url, const QString &name)
                                     "    css.id = '%1';"\
                                     "    document.head.appendChild(css);"\
                                     "    css.innerText = '%2';"\
-                                    "})()").arg(name).arg(QString(download).simplified());
+                                    "})()").arg(name, QString(download).simplified());
 
     m_webEngine->page()->runJavaScript(s, QWebEngineScript::ApplicationWorld);
 
@@ -782,7 +782,7 @@ void MythUIWebBrowser::RemoveUserStyleSheet(const QString &name)
     QList<QWebEngineScript> scripts = m_webEngine->page()->scripts().findScripts(name);
 #endif
 
-    if (scripts.count())
+    if (!scripts.isEmpty())
     {
         m_webEngine->page()->scripts().remove(scripts[0]);
 

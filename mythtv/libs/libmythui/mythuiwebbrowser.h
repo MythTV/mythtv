@@ -161,7 +161,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotLosingFocus();
     void slotTakingFocus();
     void slotRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus terminationStatus, int exitCode);
-    void slotFullScreenRequested(QWebEngineFullScreenRequest fullScreenRequest);
+    static void slotFullScreenRequested(QWebEngineFullScreenRequest fullScreenRequest);
     void slotWindowCloseRequested(void);
 
   protected:
