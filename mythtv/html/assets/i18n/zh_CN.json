@@ -833,6 +833,7 @@
             "channum_desc": "MythTV 已知该频道的编号",
             "col_callsign": "呼号",
             "col_channum": "陈南",
+            "col_commfree": "没有广告",
             "col_freqid": "频率 ID",
             "col_icon": "图标",
             "col_name": "姓名",

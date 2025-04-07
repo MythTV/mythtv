@@ -833,6 +833,7 @@
             "channum_desc": "Номер, под которым канал известен MythTV",
             "col_callsign": "Позывной",
             "col_channum": "Чан Нам",
+            "col_commfree": "Нет рекламы",
             "col_freqid": "Идентификатор частоты",
             "col_icon": "Икона",
             "col_name": "Имя",

@@ -833,6 +833,7 @@
             "channum_desc": "המספר לפיו הערוץ מוכר ל-MythTV",
             "col_callsign": "אות קריאה",
             "col_channum": "צ'אן מספר",
+            "col_commfree": "אין מודעות",
             "col_freqid": "זיהוי תדירות",
             "col_icon": "סמל",
             "col_name": "שֵׁם",

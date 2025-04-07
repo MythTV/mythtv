@@ -833,6 +833,7 @@
             "channum_desc": "Az a szám, amelyről a csatornát a MythTV ismeri",
             "col_callsign": "Hívójel",
             "col_channum": "Chan Num",
+            "col_commfree": "Nincsenek hirdetések",
             "col_freqid": "Freq Id",
             "col_icon": "Ikon",
             "col_name": "Név",

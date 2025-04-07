@@ -33,6 +33,7 @@ export class ChannelEditorComponent implements OnInit {
   resSources: VideoSource[] = [];
   icons: String[] = [];
   iconDir = "";
+  COMM_DETECT_COMMFREE  = -2;
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },

@@ -833,6 +833,7 @@
             "channum_desc": "Le numéro par lequel la chaîne est connue de MythTV",
             "col_callsign": "Signe d'appel",
             "col_channum": "ChanNum",
+            "col_commfree": "Pas de publicités",
             "col_freqid": "ID de fréquence",
             "col_icon": "Icône",
             "col_name": "Nom",

@@ -833,6 +833,7 @@
             "channum_desc": "Numero, jolla MythTV tuntee kanavan",
             "col_callsign": "Kutsumerkki",
             "col_channum": "Chan Num",
+            "col_commfree": "Ei mainoksia",
             "col_freqid": "Freq Id",
             "col_icon": "Kuvake",
             "col_name": "Nimi",

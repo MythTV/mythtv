@@ -833,6 +833,7 @@
             "channum_desc": "Номерът, с който каналът е известен на MythTV",
             "col_callsign": "Позивна",
             "col_channum": "Chan Num",
+            "col_commfree": "Без реклами",
             "col_freqid": "Freq Id",
             "col_icon": "Икона",
             "col_name": "Име",

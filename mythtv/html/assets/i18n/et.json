@@ -833,6 +833,7 @@
             "channum_desc": "Number, mille järgi kanal on MythTV-le teada",
             "col_callsign": "Kutsung",
             "col_channum": "Chan Num",
+            "col_commfree": "Reklaame pole",
             "col_freqid": "Freq Id",
             "col_icon": "Ikoon",
             "col_name": "Nimi",

@@ -833,6 +833,7 @@
             "channum_desc": "Kanalın MythTV tarafından bilindiği sayı",
             "col_callsign": "çağrı işareti",
             "col_channum": "Chan Num",
+            "col_commfree": "Reklam Yok",
             "col_freqid": "Sıklık Kimliği",
             "col_icon": "Simge",
             "col_name": "İsim",

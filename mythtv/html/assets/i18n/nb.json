@@ -833,6 +833,7 @@
             "channum_desc": "Nummeret som kanalen er kjent for MythTV",
             "col_callsign": "Kallesignal",
             "col_channum": "Chan Num",
+            "col_commfree": "Ingen annonser",
             "col_freqid": "Frekv.-ID",
             "col_icon": "Ikon",
             "col_name": "Navn",

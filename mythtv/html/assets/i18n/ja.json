@@ -833,6 +833,7 @@
             "channum_desc": "MythTV がチャンネルを認識する番号",
             "col_callsign": "コールサイン",
             "col_channum": "チャンヌム",
+            "col_commfree": "広告なし",
             "col_freqid": "周波数ID",
             "col_icon": "アイコン",
             "col_name": "名前",

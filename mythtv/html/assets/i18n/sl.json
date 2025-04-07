@@ -833,6 +833,7 @@
             "channum_desc": "Številka, po kateri je kanal znan MythTV",
             "col_callsign": "Klicni znak",
             "col_channum": "Chan Num",
+            "col_commfree": "Brez oglasov",
             "col_freqid": "ID frekvence",
             "col_icon": "Ikona",
             "col_name": "Ime",

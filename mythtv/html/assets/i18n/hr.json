@@ -833,6 +833,7 @@
             "channum_desc": "Broj po kojem je kanal poznat MythTV-u",
             "col_callsign": "Pozivni znak",
             "col_channum": "Chan Num",
+            "col_commfree": "Nema oglasa",
             "col_freqid": "ID frekvencije",
             "col_icon": "Ikona",
             "col_name": "Ime",

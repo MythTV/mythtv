@@ -833,6 +833,7 @@
             "channum_desc": "Númerið sem MythTV er þekkt fyrir rásina",
             "col_callsign": "Kallmerki",
             "col_channum": "Chan Númer",
+            "col_commfree": "Engar auglýsingar",
             "col_freqid": "Tíðni auðkenni",
             "col_icon": "Táknmynd",
             "col_name": "Nafn",

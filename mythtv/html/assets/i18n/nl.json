@@ -833,6 +833,7 @@
             "channum_desc": "Het nummer waaronder het kanaal bekend is bij MythTV",
             "col_callsign": "Roepnaam",
             "col_channum": "Chan Num",
+            "col_commfree": "Geen advertenties",
             "col_freqid": "Freq-ID",
             "col_icon": "Icoon",
             "col_name": "Naam",

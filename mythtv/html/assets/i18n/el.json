@@ -833,6 +833,7 @@
             "channum_desc": "Ο αριθμός με τον οποίο είναι γνωστό το κανάλι στο MythTV",
             "col_callsign": "Σημάδι κλήσης",
             "col_channum": "Chan Αρ",
+            "col_commfree": "Χωρίς διαφημίσεις",
             "col_freqid": "Αναγν. συχνότητας",
             "col_icon": "Εικόνισμα",
             "col_name": "Ονομα",

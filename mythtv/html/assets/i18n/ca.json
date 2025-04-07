@@ -833,6 +833,7 @@
             "channum_desc": "El número pel qual MythTV coneix el canal",
             "col_callsign": "Senyal de trucada",
             "col_channum": "Chan Núm",
+            "col_commfree": "Sense anuncis",
             "col_freqid": "Freq Id",
             "col_icon": "Icona",
             "col_name": "Nom",

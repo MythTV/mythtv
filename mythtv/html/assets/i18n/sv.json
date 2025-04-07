@@ -833,6 +833,7 @@
             "channum_desc": "Det nummer som kanalen är känd för MythTV",
             "col_callsign": "Anropssignal",
             "col_channum": "Chan Num",
+            "col_commfree": "Inga annonser",
             "col_freqid": "Frekvens ID",
             "col_icon": "Ikon",
             "col_name": "namn",
