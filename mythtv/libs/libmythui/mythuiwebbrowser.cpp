@@ -124,11 +124,9 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
 
         return false;
     }
-    else
-    {
-        // standard event processing
-        return QWebEngineView::eventFilter(obj, event);
-    }
+
+    // standard event processing
+    return QWebEngineView::eventFilter(obj, event);
 }
 
 void MythWebEngineView::sendKeyPress(QKeyEvent *event)
@@ -206,13 +204,21 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
             }
         }
         else if (action == "ZOOMIN")
+        {
             m_parentBrowser->ZoomIn();
+        }
         else if (action == "ZOOMOUT")
+        {
             m_parentBrowser->ZoomOut();
+        }
         else if (action == "RELOAD")
+        {
             m_parentBrowser->Reload(true);
+        }
         else if (action == "FULLRELOAD")
+        {
             m_parentBrowser->Reload(false);
+        }
         else if (action == "MOUSEUP" || action == "MOUSEDOWN" ||
                 action == "MOUSELEFT" || action == "MOUSERIGHT" ||
                 action == "MOUSELEFTBUTTON")
@@ -228,7 +234,9 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
             m_parentBrowser->Forward();
         }
         else
+        {
             handled = false;
+        }
     }
 
     return handled;
