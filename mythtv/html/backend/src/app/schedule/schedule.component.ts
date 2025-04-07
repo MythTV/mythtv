@@ -71,6 +71,7 @@ export class ScheduleComponent implements OnInit {
   templateId = 0;
   neverRecord = false;
   schedTypeDisabled = false;
+  newRuleType: string|undefined ;
 
   htmlRegex = new RegExp("<TITLE>|</TITLE>");
 
@@ -233,8 +234,14 @@ export class ScheduleComponent implements OnInit {
     if (this.loadCount == 11) {
       this.loadCount = 0;
       this.setupData();
-      this.displayDlg = true;
       this.currentForm.form.markAsPristine();
+      if (this.recRule && this.newRuleType) {
+        this.recRule.Type = this.newRuleType;
+        this.recRule.Inactive = false;
+        this.save();
+      }
+      else
+        this.displayDlg = true;
     }
   }
 
@@ -242,11 +249,12 @@ export class ScheduleComponent implements OnInit {
     this.errorCount++;
   }
 
-  open(program?: ScheduleOrProgram, channel?: Channel, recRule?: RecRule) {
+  open(program?: ScheduleOrProgram, channel?: Channel, recRule?: RecRule, newRuleType?: string) {
     this.templateId = 0;
     this.reqProgram = program;
     this.reqChannel = channel;
     this.reqRecRule = recRule;
+    this.newRuleType = newRuleType;
     this.titleRows = 1;
     this.neverRecord = false;
     this.successCount = 0;
@@ -708,7 +716,7 @@ export class ScheduleComponent implements OnInit {
           // After setting never record, disable further changes
           if (this.recRule.Type == 'Never Record' || this.neverRecord)
             this.schedTypeDisabled = true;
-          setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
+          setTimeout(() => this.inter.summaryComponent.refresh(), 1000);
           // after a deletion clear out the id so the next save
           // would add a new one.
           if (this.recRule.Type == 'Not Recording')
@@ -717,11 +725,12 @@ export class ScheduleComponent implements OnInit {
         else if (!this.recRule.Id && x.uint) {
           this.successCount++;
           this.currentForm.form.markAsPristine();
-          setTimeout(() => this.inter.summaryComponent.refresh(), 3000);
+          setTimeout(() => this.inter.summaryComponent.refresh(), 1000);
           this.recRule.Id = x.uint;
         }
         else {
           this.errorCount++;
+          this.displayDlg = true;
           this.currentForm.form.markAsDirty();
         }
       }
@@ -729,6 +738,7 @@ export class ScheduleComponent implements OnInit {
         // Should not happen
         console.log("ERROR: recRule is undefined")
         this.errorCount++;
+        this.displayDlg = true;
       }
     },
     error: (err: any) => {
@@ -739,6 +749,7 @@ export class ScheduleComponent implements OnInit {
           this.errortext = parts[1];
       }
       this.errorCount++;
+      this.displayDlg = true;
       this.currentForm.form.markAsDirty();
     },
   };

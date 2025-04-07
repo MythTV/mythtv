@@ -12,7 +12,8 @@
                     }}</label>
                 <p-dropdown [options]="templates" [(ngModel)]="templateId" [editable]="false" optionLabel="Title"
                     optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Template" #Template="ngModel"
-                    class="pr-2" (onClick)="templateChange(recRule)" (onChange)="templateChange(recRule)">
+                    class="pr-2" (onClick)="templateChange(recRule)" (onChange)="templateChange(recRule)"
+                    appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -22,7 +23,7 @@
                 <p-dropdown [options]="srchTypeList" [(ngModel)]="recRule.SearchType" [editable]="false"
                     optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
                     name="SearchType" #SearchType="ngModel" optionDisabled="inactive" [disabled]="srchTypeDisabled"
-                    (onChange)="onSearchTypeChange()">
+                    (onChange)="onSearchTypeChange()" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -78,7 +79,7 @@
                         }}</label>
                     <p-dropdown [options]="allChannels" [(ngModel)]="channel" [editable]="false"
                         optionLabel="Description" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Channel"
-                        (onChange)="onChannelChange()">
+                        (onChange)="onChannelChange()" appendTo="body">
                     </p-dropdown>
                 </div>
                 <div class="form-group field">
@@ -106,7 +107,7 @@
                     }}</label>
                 <p-dropdown [options]="typeList" [(ngModel)]="recRule.Type" [editable]="false" optionLabel="prompt"
                     optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="Type" #Type="ngModel"
-                    [disabled]="schedTypeDisabled">
+                    [disabled]="schedTypeDisabled" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -114,7 +115,7 @@
                 <label for="RecGroup" class="label block">{{ 'dashboard.sched.recgroup_label' | translate
                     }}</label>
                 <p-dropdown [options]="recGroups" [(ngModel)]="recRule.RecGroup" [editable]="true" [maxlength]="64"
-                    [style]="{'minWidth':'400px'}" name="RecGroup" #RecGroup="ngModel">
+                    [style]="{'minWidth':'400px'}" name="RecGroup" #RecGroup="ngModel" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -129,7 +130,8 @@
                 <label for="PlayGroup" class="label block">{{ 'dashboard.sched.playgroup_label' | translate
                     }}</label>
                 <p-dropdown [options]="playGroups" [(ngModel)]="recRule.PlayGroup" [editable]="false" [maxlength]="0"
-                    [style]="{'minWidth':'400px'}" PlayGroup="Type" #PlayGroup="ngModel" name="PlayGroup">
+                    [style]="{'minWidth':'400px'}" PlayGroup="Type" #PlayGroup="ngModel" name="PlayGroup"
+                    appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -165,7 +167,7 @@
                     }}</label>
                 <p-dropdown [options]="inputList.Inputs" [(ngModel)]="recRule.PreferredInput" [editable]="false"
                     optionLabel="DisplayName" optionValue="Id" [maxlength]="0" [style]="{'minWidth':'400px'}"
-                    name="PreferredInput" #PreferredInput="ngModel">
+                    name="PreferredInput" #PreferredInput="ngModel" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -174,7 +176,7 @@
                     }}</label>
                 <p-dropdown [options]="dupMethodList" [(ngModel)]="recRule.DupMethod" [editable]="false"
                     optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
-                    name="DupMethod" #DupMethod="ngModel">
+                    name="DupMethod" #DupMethod="ngModel" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -182,7 +184,8 @@
                 <label for="DupIn" class="label block">{{ 'dashboard.sched.dupin_label' | translate
                     }}</label>
                 <p-dropdown [options]="dupInList" [(ngModel)]="recRule.DupIn" [editable]="false" optionLabel="prompt"
-                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="DupIn" #DupIn="ngModel">
+                    optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}" name="DupIn" #DupIn="ngModel"
+                    appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -191,7 +194,7 @@
                     }}</label>
                 <p-dropdown [options]="autoExtendList" [(ngModel)]="recRule.AutoExtend" [editable]="false"
                     optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
-                    name="AutoExtend" #AutoExtend="ngModel">
+                    name="AutoExtend" #AutoExtend="ngModel" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -208,7 +211,7 @@
                     }}</label>
                 <p-dropdown [options]="recProfileList" [(ngModel)]="recRule.RecProfile" [editable]="false"
                     optionLabel="prompt" optionValue="value" [maxlength]="0" [style]="{'minWidth':'400px'}"
-                    name="RecProfile" #RecProfile="ngModel">
+                    name="RecProfile" #RecProfile="ngModel" appendTo="body">
                 </p-dropdown>
             </div>
 
@@ -307,13 +310,12 @@
                     <p-message *ngIf="errorCount > 0" severity="error"
                         text="{{ 'common.backenderror' | translate }}:  {{errortext}}"></p-message>
                 </div>
-                <p-overlayPanel #overlay >
-                    <p-scrollPanel [style]="{ width: '650px', height: '70vh' }"  [step]="100">
+                <p-overlayPanel #overlay>
+                    <p-scrollPanel [style]="{ width: '650px', height: '70vh' }" [step]="100">
                         <div [innerHTML]='fullDetails'></div>
                     </p-scrollPanel>
                 </p-overlayPanel>
-                <p-button icon="pi pi-list" (onClick)="detailsreq($event)"
-                    *ngIf="recRule.Type != 'Recording Template'"
+                <p-button icon="pi pi-list" (onClick)="detailsreq($event)" *ngIf="recRule.Type != 'Recording Template'"
                     label="{{ 'dashboard.sched.fulldetails' | translate }}">
                 </p-button>
                 <p-button icon="pi pi-times-circle" (onClick)="close()" label="{{ 'common.close' | translate }}"

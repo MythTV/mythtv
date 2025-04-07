@@ -71,7 +71,9 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   refresh() {
     this.refreshing = true;
-    this.showTable = false;
+    // This was to ensure that if the table got larger the extra lines would show.
+    // However, now removed to improve response on the new bottons on each line
+    // this.showTable = false;
     this.loadRecRules();
     this.loadLazy(this.lazyLoadEvent);
   }
@@ -220,13 +222,13 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       this.inter.sched.open(program);
   }
 
-  override(program: ScheduleOrProgram) {
+  override(program: ScheduleOrProgram, newRuleType?: string) {
     if (this.inter.sched) {
-      if (program.Recording.RecType == 7 || program.Recording.RecType == 8
-        || program.Recording.StatusName == 'NeverRecord') // If already an override
-        this.inter.sched.open(program);
+      if (program.Recording.RecType == 7 || program.Recording.RecType == 8)
+        // If already an override
+        this.inter.sched.open(program, undefined, undefined, newRuleType);
       else
-        this.inter.sched.open(program, undefined, <RecRule>{ Type: 'Override Recording' });
+        this.inter.sched.open(program, undefined, <RecRule>{ Type: 'Override Recording' }, newRuleType);
     }
   }
 
