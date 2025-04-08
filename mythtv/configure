@@ -1709,6 +1709,8 @@ CONFIG_EXTRA="
 "
 
 MYTHTV_CONFIG_LIST='
+    airplay
+    appleremote
     backend
     bdjava
     bindings_perl
@@ -1716,11 +1718,15 @@ MYTHTV_CONFIG_LIST='
     bindings_php
     cygwin
     darwin
+    darwin_da
     disable_mmx_for_debugging
     dvb
     firewire
+    firewire_linux
+    firewire_osx
     frontend
     hdhomerun
+    iptv
     satip
     vbox
     ceton
@@ -1730,6 +1736,7 @@ MYTHTV_CONFIG_LIST='
     libcrypto
     gnutls
     libdns_sd
+    libglslang
     libmpeg2external
     libxml2
     lirc
@@ -1737,6 +1744,7 @@ MYTHTV_CONFIG_LIST='
     mmal
     opengl
     egl
+    qtprivateheaders
     qtwebengine
     qtscript
     qtdbus
@@ -1745,6 +1753,9 @@ MYTHTV_CONFIG_LIST='
     v4l2
     v4l2prime
     valgrind
+    videotoolbox
+    vulkan
+    waylandextras
     x11
     system_libexiv2
     system_libbluray
@@ -1752,6 +1763,7 @@ MYTHTV_CONFIG_LIST='
     systemd_notify
     systemd_journal
     drm
+    drm_video
     force_loglong
 '
 
