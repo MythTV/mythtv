@@ -427,6 +427,7 @@
             "time": "Tími"
         },
         "videos": {
+            "adddate": "Dagsetning bætt við",
             "download": "Sækja myndbandið",
             "heading": "Myndbönd",
             "releasedate": "Útgáfudagur",

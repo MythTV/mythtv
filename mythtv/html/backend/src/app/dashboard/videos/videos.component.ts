@@ -32,7 +32,7 @@ export class VideosComponent implements OnInit {
   displayMetadataDlg = false;
   displayUnsaved = false;
   showAllVideos = false;
-  lazyLoadEvent : TableLazyLoadEvent = {};
+  lazyLoadEvent: TableLazyLoadEvent = {};
   totalRecords = 0;
   showTable = false;
   virtualScrollItemSize = 0;
@@ -104,7 +104,10 @@ export class VideosComponent implements OnInit {
       if (event.sortOrder)
         request.Descending = (event.sortOrder < 0);
     }
-    request.Sort += ',title,releasedate,season,episode'
+    if (request.Sort == 'SeasEp')
+      request.Sort = `season,episode,title,releasedate`;
+    else
+      request.Sort += ',title,releasedate,season,episode'
 
     this.videoService.GetVideoList(request).subscribe(data => {
       let newList = data.VideoMetadataInfoList;

@@ -427,6 +427,7 @@
             "time": "Czas"
         },
         "videos": {
+            "adddate": "Dodano datę",
             "download": "Ściągnij wideo",
             "heading": "Filmy",
             "releasedate": "Data wydania",

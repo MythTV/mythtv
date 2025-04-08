@@ -427,6 +427,7 @@
             "time": "Tid"
         },
         "videos": {
+            "adddate": "Dato tilføjet",
             "download": "Download video",
             "heading": "Videoer",
             "releasedate": "Udgivelses dato",

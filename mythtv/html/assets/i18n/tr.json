@@ -427,6 +427,7 @@
             "time": "Zaman"
         },
         "videos": {
+            "adddate": "Tarih eklendi",
             "download": "Video indir",
             "heading": "videolar",
             "releasedate": "Yayın tarihi",

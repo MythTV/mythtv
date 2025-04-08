@@ -427,6 +427,7 @@
             "time": "Zeit"
         },
         "videos": {
+            "adddate": "Datum hinzugefügt",
             "download": "Video herunterladen",
             "heading": "Videos",
             "releasedate": "Veröffentlichungsdatum",

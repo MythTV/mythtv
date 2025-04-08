@@ -427,6 +427,7 @@
             "time": "Čas"
         },
         "videos": {
+            "adddate": "Datum přidáno",
             "download": "Stáhnout video",
             "heading": "videa",
             "releasedate": "Datum vydání",

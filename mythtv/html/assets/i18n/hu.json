@@ -427,6 +427,7 @@
             "time": "Idő"
         },
         "videos": {
+            "adddate": "Dátum hozzáadva",
             "download": "Videó letöltése",
             "heading": "Videók",
             "releasedate": "Kiadási dátum",

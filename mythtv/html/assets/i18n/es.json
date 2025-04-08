@@ -427,6 +427,7 @@
             "time": "Tiempo"
         },
         "videos": {
+            "adddate": "Fecha agregada",
             "download": "Descargar video",
             "heading": "Vídeos",
             "releasedate": "Fecha de lanzamiento",

@@ -427,6 +427,7 @@
             "time": "Temps"
         },
         "videos": {
+            "adddate": "Data afegida",
             "download": "Descarrega el vídeo",
             "heading": "Vídeos",
             "releasedate": "Data de publicació",

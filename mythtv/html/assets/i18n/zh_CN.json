@@ -427,6 +427,7 @@
             "time": "时间"
         },
         "videos": {
+            "adddate": "添加日期",
             "download": "下载视频",
             "heading": "视频",
             "releasedate": "发布日期",

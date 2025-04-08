@@ -427,6 +427,7 @@
             "time": "時間"
         },
         "videos": {
+            "adddate": "追加された日付",
             "download": "ビデオをダウンロードする",
             "heading": "動画",
             "releasedate": "発売日",

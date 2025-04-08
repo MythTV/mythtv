@@ -427,6 +427,7 @@
             "time": "Время"
         },
         "videos": {
+            "adddate": "Дата добавлена",
             "download": "Скачать видео",
             "heading": "Видео",
             "releasedate": "Дата выпуска",

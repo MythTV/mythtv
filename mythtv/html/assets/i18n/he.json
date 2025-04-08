@@ -427,6 +427,7 @@
             "time": "זְמַן"
         },
         "videos": {
+            "adddate": "תאריך נוסף",
             "download": "הורד סרטון",
             "heading": "סרטונים",
             "releasedate": "תאריך הוצאה",

@@ -41,18 +41,21 @@
             <ng-template pTemplate="header">
                 <tr>
                     <!-- Column Headings -->
-                    <th style="width: 31%" class="p-1" pSortableColumn="Title">
-                        {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
+                    <th style="width: 28%" class="p-1" pSortableColumn="Title">
+                        {{ 'dashboard.recordings.title' | translate }}<p-sortIcon field="Title"></p-sortIcon></th>
                     <th style="width: 3%" class="p-1"></th>
-                    <th style="width: 31%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
-                        }}</th>
-                    <th style="width: 6%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
-                        }}</th>
+                    <th style="width: 25%" class="p-1" pSortableColumn="subtitle">{{ 'dashboard.recordings.subtitle' |
+                        translate }}<p-sortIcon field="subtitle"></p-sortIcon></th>
+                    <th style="width: 10%" class="p-1" pSortableColumn="SeasEp">{{ 'dashboard.recordings.seas_ep' |
+                        translate }}<p-sortIcon field="SeasEp"></p-sortIcon></th>
                     <th style="width: 13%" class="justify-content-end p-1" pSortableColumn="ReleaseDate">
-                        {{ 'dashboard.videos.releasedate' | translate }} <p-sortIcon field="ReleaseDate"></p-sortIcon>
+                        {{ 'dashboard.videos.releasedate' | translate }}<p-sortIcon field="ReleaseDate"></p-sortIcon>
                     </th>
-                    <th style="width: 10%" class="justify-content-end p-1">
-                        {{ 'dashboard.recordings.duration' | translate }}
+                    <th style="width: 13%" class="justify-content-end p-1" pSortableColumn="insertdate">
+                        {{ 'dashboard.videos.adddate' | translate }}<p-sortIcon field="insertdate"></p-sortIcon>
+                    </th>
+                    <th style="width: 13%" class="justify-content-end p-1" pSortableColumn="length">
+                        {{ 'dashboard.recordings.duration' | translate }}<p-sortIcon field="length"></p-sortIcon>
                     </th>
                     <th style="width: 6%; white-space: nowrap;" class="pt-1 pb-0">
                         <a target="_blank">
@@ -93,6 +96,11 @@
                     <td class="justify-content-end p-1">
                         <div class="mycell">
                             <div class="mytext" [innerHTML]="utility.formatDate(video.ReleaseDate,true)"></div>
+                        </div>
+                    </td>
+                    <td class="justify-content-end p-1">
+                        <div class="mycell">
+                            <div class="mytext" [innerHTML]="utility.formatDate(video.AddDate,true)"></div>
                         </div>
                     </td>
                     <td class="justify-content-end p-1">

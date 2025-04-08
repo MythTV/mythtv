@@ -427,6 +427,7 @@
             "time": "Vrijeme"
         },
         "videos": {
+            "adddate": "Datum dodan",
             "download": "Download Video",
             "heading": "Video zapisi",
             "releasedate": "Datum izlaska",

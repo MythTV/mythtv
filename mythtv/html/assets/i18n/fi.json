@@ -427,6 +427,7 @@
             "time": "Aika"
         },
         "videos": {
+            "adddate": "Päivämäärä lisätty",
             "download": "Lataa video",
             "heading": "Videot",
             "releasedate": "Julkaisupäivä",

@@ -427,6 +427,7 @@
             "time": "Tijd"
         },
         "videos": {
+            "adddate": "Datum toegevoegd",
             "download": "Download video",
             "heading": "Videos",
             "releasedate": "Datum van publicatie",

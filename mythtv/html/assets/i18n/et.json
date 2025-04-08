@@ -427,6 +427,7 @@
             "time": "Aeg"
         },
         "videos": {
+            "adddate": "Lisatud kuupäev",
             "download": "Laadige video alla",
             "heading": "Videod",
             "releasedate": "Väljalaske kuupäev",
