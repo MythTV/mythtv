@@ -21,8 +21,8 @@
                 <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
                 <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
                     class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}"
-                    pTooltip="{{ 'dashboard.recordings.regex' | translate }}"
-                    tooltipPosition="top"  (keydown)="keydown($event)"/>
+                    pTooltip="{{ 'dashboard.recordings.regex' | translate }}" tooltipPosition="top"
+                    (keydown)="keydown($event)" />
             </span>
 
             <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
@@ -52,28 +52,29 @@
                 <tr>
                     <!-- Column Headings. -->
                     <th style="width: 14%" class="p-1" pSortableColumn="Title">
-                        {{ 'dashboard.recordings.title' | translate }} <p-sortIcon field="Title"></p-sortIcon></th>
+                        {{ 'dashboard.recordings.title' | translate }}<p-sortIcon field="Title"></p-sortIcon></th>
                     <th style="width: 2%" class="p-1"></th>
-                    <th style="width: 20%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate
-                        }}</th>
-                    <th style="width: 5%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate
-                        }}</th>
-                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="Airdate">
-                        {{ 'dashboard.recordings.orig_airdate' | translate }} <p-sortIcon field="Airdate"></p-sortIcon>
+                    <th style="width: 20%" class="p-1" pSortableColumn="subtitle">{{ 'dashboard.recordings.subtitle' |
+                        translate
+                        }}<p-sortIcon field="subtitle"></p-sortIcon></th>
+                    <th style="width: 8%" class="p-1" pSortableColumn="SeasEp">{{ 'dashboard.recordings.seas_ep' |
+                        translate }}<p-sortIcon field="SeasEp"></p-sortIcon></th>
+                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="originalairdate">
+                        {{ 'dashboard.recordings.orig_airdate' | translate }}<p-sortIcon
+                            field="originalairdate"></p-sortIcon>
                     </th>
                     <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="StartTime">
-                        {{ 'dashboard.recordings.airdate' | translate }} <p-sortIcon field="StartTime"></p-sortIcon>
+                        {{ 'dashboard.recordings.airdate' | translate }}<p-sortIcon field="StartTime"></p-sortIcon>
                     </th>
-                    <th style="width: 11%" class="p-1">{{ 'dashboard.recordings.channel' | translate
-                        }}</th>
-                    <th style="width: 9%" class="p-1" pSortableColumn="Recording.RecGroup">
-                        {{ 'dashboard.recordings.recgrp' | translate }} <p-sortIcon
-                            field="Recording.RecGroup"></p-sortIcon> </th>
-                    <th style="width: 7%" class="justify-content-end p-1">
-                        {{ 'dashboard.recordings.duration' | translate }}
+                    <th style="width: 11%" class="p-1" pSortableColumn="ChanNum">{{ 'dashboard.recordings.channel' |
+                        translate }}<p-sortIcon field="ChanNum"></p-sortIcon></th>
+                    <th style="width: 9%" class="p-1" pSortableColumn="RecGroup">
+                        {{ 'dashboard.recordings.recgrp' | translate }}<p-sortIcon field="RecGroup"></p-sortIcon> </th>
+                    <th style="width: 7%" class="justify-content-end p-1" pSortableColumn="duration">
+                        {{ 'dashboard.recordings.duration' | translate }}<p-sortIcon field="duration"></p-sortIcon>
                     </th>
-                    <th style="width: 9%" class="justify-content-end p-1">{{
-                        'dashboard.recordings.file_size' | translate }}</th>
+                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="filesize">{{
+                        'dashboard.recordings.file_size' | translate }}<p-sortIcon field="filesize"></p-sortIcon></th>
                     <th style="width: 5%; white-space: nowrap; background: var(--surface-card);" class="p-1">
                         <a target="_blank">
                             <i class="pi pi-download"></i></a>

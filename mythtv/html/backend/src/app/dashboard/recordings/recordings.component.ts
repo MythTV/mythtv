@@ -167,17 +167,16 @@ export class RecordingsComponent implements OnInit {
     if (!sortField)
       sortField = 'Title';
     request.Sort = sortField;
-    if (sortField == 'Airdate')
-      request.Sort = 'originalairdate';
-    else if (sortField == 'Recording.RecGroup')
-      request.Sort = 'recgroup';
-    else
-      request.Sort = sortField;
     let sortOrder = ' asc';
     if (event.sortOrder && event.sortOrder < 0)
       sortOrder = ' desc';
-    request.Sort = request.Sort + sortOrder;
-    request.Sort += `,title${sortOrder},originalairdate${sortOrder},season${sortOrder},episode${sortOrder}`;
+    if (request.Sort == 'SeasEp') {
+      request.Sort = `season${sortOrder},episode${sortOrder},title${sortOrder},originalairdate${sortOrder}`;
+    }
+    else {
+      request.Sort = request.Sort + sortOrder;
+      request.Sort += `,title${sortOrder},originalairdate${sortOrder},season${sortOrder},episode${sortOrder}`;
+    }
 
     this.searchValue = this.searchValue.trim();
     if (this.searchValue)

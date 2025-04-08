@@ -194,7 +194,6 @@ export class DvrService {
     let params = new HttpParams();
     if (usedBy)
       params = params.set("UsedBy", usedBy)
-    console.log(params)
     return this.httpClient.get<RecGroupList>('/Dvr/GetRecGroupList', { params });
   }
 

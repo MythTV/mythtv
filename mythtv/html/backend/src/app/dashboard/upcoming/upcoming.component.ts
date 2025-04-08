@@ -69,11 +69,14 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.loadLazy({ first: 0, rows: 1 });
   }
 
+  fullrefresh() {
+    // This is to ensure that if the table get larger the extra lines will show.
+    this.showTable = false;
+    this.refresh();
+  }
+
   refresh() {
     this.refreshing = true;
-    // This was to ensure that if the table got larger the extra lines would show.
-    // However, now removed to improve response on the new bottons on each line
-    // this.showTable = false;
     this.loadRecRules();
     this.loadLazy(this.lazyLoadEvent);
   }
@@ -108,7 +111,6 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   loadLazy(event: TableLazyLoadEvent) {
     this.lazyLoadEvent = event;
-
     let request: GetUpcomingRequest = {
       StartIndex: 0,
       Count: 1,

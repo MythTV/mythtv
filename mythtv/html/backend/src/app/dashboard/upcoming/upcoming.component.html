@@ -38,7 +38,7 @@
                                 [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
                         <ng-template #refreshBn>
                             <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                                (click)="refresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                                (click)="fullrefresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
                             &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
                         </ng-template>
                     </div>
