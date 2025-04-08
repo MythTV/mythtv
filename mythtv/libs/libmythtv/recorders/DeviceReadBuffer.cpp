@@ -68,7 +68,7 @@ DeviceReadBuffer::DeviceReadBuffer(
       m_usingPoll(use_poll),
       m_pollTimeoutIsError(error_exit_on_poll_timeout)
 {
-#ifdef USING_MINGW
+#ifdef __MINGW32__
 #warning mingw DeviceReadBuffer::Poll
     if (m_usingPoll)
     {

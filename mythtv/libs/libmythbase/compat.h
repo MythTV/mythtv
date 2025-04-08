@@ -29,7 +29,7 @@
 #   endif
 #endif
 
-#if defined(USING_MINGW)
+#ifdef __MINGW32__
 #include <time.h>
 #endif
 

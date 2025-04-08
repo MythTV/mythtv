@@ -486,7 +486,7 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
 #if CONFIG_VBOX
         success |= (m_vboxScanner != nullptr);
 #endif
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
         success |= (m_externRecScanner != nullptr);
 #endif
 #if CONFIG_HDHOMERUN

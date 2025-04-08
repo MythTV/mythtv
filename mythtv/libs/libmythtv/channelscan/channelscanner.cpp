@@ -93,7 +93,7 @@ void ChannelScanner::Teardown(void)
     }
 #endif
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if (m_externRecScanner)
     {
         m_externRecScanner->Stop();
@@ -404,7 +404,7 @@ bool ChannelScanner::ImportExternRecorder([[maybe_unused]] uint cardid,
                                           uint sourceid)
 {
     m_sourceid = sourceid;
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if (!m_scanMonitor)
         m_scanMonitor = new ScanMonitor(this);
 
@@ -543,7 +543,7 @@ void ChannelScanner::PreScanCommon(
     }
 #endif
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if ("EXTERNAL" == card_type)
     {
         m_channel = new ExternalChannel(nullptr, device);

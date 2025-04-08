@@ -637,7 +637,7 @@ class DemoConfigurationGroup: public GroupSetting
     GroupSetting *m_size {nullptr};
 };
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
 class ExternalConfigurationGroup: public GroupSetting
 {
    Q_OBJECT

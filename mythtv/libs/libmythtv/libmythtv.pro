@@ -740,7 +740,7 @@ using_backend {
     SOURCES += channelscan/scanmonitor.cpp
     SOURCES += channelscan/scanwizardconfig.cpp
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     HEADERS += channelscan/externrecscanner.h
     SOURCES += channelscan/externrecscanner.cpp
 #endif
@@ -1014,8 +1014,6 @@ using_backend {
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
-
-mingw:DEFINES += USING_MINGW
 
 mingw || win32-msvc* {
 

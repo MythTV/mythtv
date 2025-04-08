@@ -5,7 +5,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
-#if !defined(USING_MINGW) && !defined(_WIN32)
+#if !defined(_WIN32)
 #include <sys/select.h>
 #endif
 

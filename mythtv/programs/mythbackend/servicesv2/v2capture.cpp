@@ -509,7 +509,7 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
 
     pCardTypeList->AddCardType(QObject::tr("Import test recorder"), "IMPORT");
     pCardTypeList->AddCardType(QObject::tr("Demo test recorder"),   "DEMO");
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     pCardTypeList->AddCardType(QObject::tr("External (black box) recorder"),
                           "EXTERNAL");
 #endif

@@ -283,7 +283,6 @@ using_libcec {
 }
 
 cygwin:DEFINES += _WIN32
-mingw :DEFINES += USING_MINGW
 
 mingw | win32-msvc*{
 #   HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h

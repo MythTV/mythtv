@@ -96,7 +96,7 @@ QString CardUtil::GetScanableInputTypes(void)
     inputTypes += "'CETON'";
 #endif // CONFIG_CETON
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     inputTypes += "'EXTERNAL'";
 #endif
 

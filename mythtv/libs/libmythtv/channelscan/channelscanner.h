@@ -48,7 +48,7 @@
 #include "vboxchannelfetcher.h"
 #endif
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
 #include "externrecscanner.h"
 #endif
 
@@ -142,7 +142,7 @@ class MTV_PUBLIC ChannelScanner
 #if CONFIG_VBOX
     VBoxChannelFetcher      *m_vboxScanner         {nullptr};
 #endif
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     ExternRecChannelScanner *m_externRecScanner    {nullptr};
 #endif
     // HDHomeRun channel list import

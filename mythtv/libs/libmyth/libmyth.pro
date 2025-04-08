@@ -127,8 +127,6 @@ cygwin {
     DEFINES += _WIN32
 }
 
-mingw:DEFINES += USING_MINGW
-
 mingw | win32-msvc* {
     
     SOURCES += audio/audiooutputwin.cpp
