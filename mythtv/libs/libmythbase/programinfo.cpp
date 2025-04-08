@@ -6178,8 +6178,7 @@ bool LoadFromRecorded(
         QStringList sortByFields;
         sortByFields << "starttime" <<  "title" <<  "subtitle" << "season" << "episode" << "category"
                      <<  "watched" << "stars" << "originalairdate" << "recgroup" << "storagegroup"
-                     <<  "channum" << "callsign" << "name";
-
+                     <<  "channum" << "callsign" << "name" << "filesize" << "duration";
         // sanity check the fields are one of the above fields
         QString sSortBy;
         QStringList fields = sortBy.split(",");
@@ -6209,14 +6208,23 @@ bool LoadFromRecorded(
             {
                 QString table;
                 if (field == "channum" || field == "callsign" || field == "name")
-                    table = "c";
+                    table = "c.";
                 else
-                    table = "r";
+                    table = "r.";
 
+                if (field == "channum")
+                    // this is to sort numerically rather than alphabetically
+                    field = "channum*1000-ifnull(regexp_substr(c.channum,'-.*'),0)";
+
+                if (field == "duration")
+                {
+                    field = "timestampdiff(second,r.starttime,r.endtime)";
+                    table = "";
+                }
                 if (sSortBy.isEmpty())
-                    sSortBy = QString("%1.%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
+                    sSortBy = QString("%1%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
                 else
-                    sSortBy += QString(",%1.%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
+                    sSortBy += QString(",%1%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
             }
             else
             {
