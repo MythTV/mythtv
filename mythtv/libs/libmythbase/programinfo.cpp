@@ -6216,11 +6216,24 @@ bool LoadFromRecorded(
                     // this is to sort numerically rather than alphabetically
                     field = "channum*1000-ifnull(regexp_substr(c.channum,'-.*'),0)";
 
-                if (field == "duration")
+                else if (field == "duration")
                 {
                     field = "timestampdiff(second,r.starttime,r.endtime)";
                     table = "";
                 }
+
+                else if (field == "season")
+                {
+                    field = "if(r.season,r.season,p.season)";
+                    table = "";
+                }
+
+                else if (field == "episode")
+                {
+                    field = "if(r.episode,r.episode,p.episode)";
+                    table = "";
+                }
+
                 if (sSortBy.isEmpty())
                     sSortBy = QString("%1%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
                 else
