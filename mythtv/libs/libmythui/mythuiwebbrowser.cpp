@@ -88,10 +88,8 @@ static const std::vector<MimeType> SupportedMimeTypes
  * \note allows us to intercept keypresses
  */
 MythWebEngineView::MythWebEngineView(QWidget *parent, MythUIWebBrowser *parentBrowser)
-            : QWebEngineView(parent)
+            : QWebEngineView(parent), m_parentBrowser(parentBrowser)
 {
-    m_parentBrowser = parentBrowser;
-
     m_profile = new QWebEngineProfile("MythTV", this);
     //m_profile->setHttpUserAgent("Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 NativeTVAds Safari/538.1");
     m_profile->setPersistentCookiesPolicy(QWebEngineProfile::AllowPersistentCookies);
@@ -114,7 +112,13 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::ShortcutOverride) 
     {
         // intercept all key presses
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
+        if (keyEvent == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ALERT,
+                     "MythWebEngineView::eventFilter() couldn't cast event");
+            return true;
+        }
 
         bool res = handleKeyPress(keyEvent);
         if (!res)
@@ -122,20 +126,23 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
         else
             keyEvent->ignore();
 
-        return false;
+        return false; // clazy:exclude=base-class-event
     }
-    else
-    {
-        // standard event processing
-        return QWebEngineView::eventFilter(obj, event);
-    }
+
+    // standard event processing
+    return QWebEngineView::eventFilter(obj, event);
 }
 
-void MythWebEngineView::sendKeyPress(QKeyEvent *event)
+void MythWebEngineView::sendKeyPress(int key, Qt::KeyboardModifiers modifiers, const QString &text)
 {
     Q_FOREACH(QObject* obj, children())
+    {
         if (qobject_cast<QWidget*>(obj))
+        {
+            auto *event = new QKeyEvent(QEvent::KeyPress, key, modifiers, text, false, 1);
             QCoreApplication::postEvent(obj, event);
+        }
+    }
 }
 
 bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
@@ -163,8 +170,7 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         {
             if (event->key() != Qt::Key_Tab)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier, QString('\t'), false, 1);
-                sendKeyPress(key);
+                sendKeyPress(Qt::Key_Tab, Qt::NoModifier, QString('\t'));
                 return true;
             }
 
@@ -174,8 +180,7 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         {
             if (event->key() != Qt::Key_Tab)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::ShiftModifier, QString('\t'), false, 1);
-                sendKeyPress(key);
+                sendKeyPress(Qt::Key_Tab, Qt::ShiftModifier, QString('\t'));
                 return true;
             }
 
@@ -185,8 +190,7 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         {
             if (event->key() != Qt::Key_Return)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier, QString('\r'), false, 1);
-                sendKeyPress(key);
+                sendKeyPress(Qt::Key_Return, Qt::NoModifier, QString('\r'));
                 return true;
             }
 
@@ -206,13 +210,21 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
             }
         }
         else if (action == "ZOOMIN")
+        {
             m_parentBrowser->ZoomIn();
+        }
         else if (action == "ZOOMOUT")
+        {
             m_parentBrowser->ZoomOut();
+        }
         else if (action == "RELOAD")
+        {
             m_parentBrowser->Reload(true);
+        }
         else if (action == "FULLRELOAD")
+        {
             m_parentBrowser->Reload(false);
+        }
         else if (action == "MOUSEUP" || action == "MOUSEDOWN" ||
                 action == "MOUSELEFT" || action == "MOUSERIGHT" ||
                 action == "MOUSELEFTBUTTON")
@@ -228,7 +240,9 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
             m_parentBrowser->Forward();
         }
         else
+        {
             handled = false;
+        }
     }
 
     return handled;
@@ -495,13 +509,9 @@ QWebEngineView *MythWebEngineView::createWindow(QWebEnginePage::WebWindowType /*
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
                  : MythUIType(parent, name),
-      m_parentScreen(nullptr), m_webEngine(nullptr),
-      m_image(nullptr), m_active(false), m_wasActive(false),
-      m_initialized(false), m_updateInterval(500), m_zoom(1.0),
-      m_bgColor("Red"),  m_userCssFile(""),
+      m_updateInterval(500), m_bgColor("Red"),  m_userCssFile(""),
       m_defaultSaveDir(GetConfDir() + "/MythBrowser/"),
-      m_defaultSaveFilename(""),
-      m_lastMouseAction("")
+      m_defaultSaveFilename(""), m_lastMouseAction("")
 {
     SetCanTakeFocus(true);
     m_lastUpdateTime.start();
@@ -757,7 +767,7 @@ void MythUIWebBrowser::LoadUserStyleSheet(const QUrl& url, const QString &name)
                                     "    css.id = '%1';"\
                                     "    document.head.appendChild(css);"\
                                     "    css.innerText = '%2';"\
-                                    "})()").arg(name).arg(QString(download).simplified());
+                                    "})()").arg(name, QString(download).simplified());
 
     m_webEngine->page()->runJavaScript(s, QWebEngineScript::ApplicationWorld);
 
@@ -780,7 +790,7 @@ void MythUIWebBrowser::RemoveUserStyleSheet(const QString &name)
     QList<QWebEngineScript> scripts = m_webEngine->page()->scripts().findScripts(name);
 #endif
 
-    if (scripts.count())
+    if (!scripts.isEmpty())
     {
         m_webEngine->page()->scripts().remove(scripts[0]);
 
@@ -1129,12 +1139,12 @@ void MythUIWebBrowser::slotIconUrlChanged(const QUrl &url)
     emit iconUrlChanged(url);
 }
 
-void MythUIWebBrowser::slotScrollPositionChanged(const QPointF & position)
+void MythUIWebBrowser::slotScrollPositionChanged(const QPointF  /*position*/)
 {
     UpdateScrollBars();
 }
 
-void MythUIWebBrowser::slotContentsSizeChanged(const QSizeF &size)
+void MythUIWebBrowser::slotContentsSizeChanged(const QSizeF /*size*/)
 {
     UpdateScrollBars();
 }

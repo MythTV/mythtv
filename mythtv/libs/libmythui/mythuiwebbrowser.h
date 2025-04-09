@@ -42,7 +42,7 @@ class MythWebEngineView : public QWebEngineView
     QWebEngineView *createWindow(QWebEnginePage::WebWindowType type) override; // QWebEngineView
 
   private:
-    void sendKeyPress(QKeyEvent *event);
+    void sendKeyPress(int key, Qt::KeyboardModifiers modifiers, const QString &text = QString());
     bool handleKeyPress(QKeyEvent *event);
     void showDownloadMenu(void);
     void openBusyPopup(const QString &message);
@@ -152,8 +152,8 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotStatusBarMessage(const QString &text);
     void slotIconChanged(const QIcon &icon);
     void slotIconUrlChanged(const QUrl &url);
-    void slotScrollPositionChanged(const QPointF & position);
-    void slotContentsSizeChanged(const QSizeF &size);
+    void slotScrollPositionChanged(QPointF position);
+    void slotContentsSizeChanged(QSizeF size);
     void slotLinkClicked(const QUrl &url);
     void slotTopScreenChanged(MythScreenType *screen);
     void slotScrollBarShowing(void);
@@ -161,7 +161,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotLosingFocus();
     void slotTakingFocus();
     void slotRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus terminationStatus, int exitCode);
-    void slotFullScreenRequested(QWebEngineFullScreenRequest fullScreenRequest);
+    static void slotFullScreenRequested(QWebEngineFullScreenRequest fullScreenRequest);
     void slotWindowCloseRequested(void);
 
   protected:
