@@ -6213,8 +6213,10 @@ bool LoadFromRecorded(
                     table = "r.";
 
                 if (field == "channum")
+                {
                     // this is to sort numerically rather than alphabetically
                     field = "channum*1000-ifnull(regexp_substr(c.channum,'-.*'),0)";
+                }
 
                 else if (field == "duration")
                 {
