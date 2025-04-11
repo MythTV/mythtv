@@ -378,7 +378,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
             devices/AppleRemote.h
             devices/AppleRemoteListener.cpp
             devices/AppleRemoteListener.h)
-  if(NOT ENABLE_LIRC)
+  if(NOT TARGET lirc)
     target_sources(mythui PRIVATE devices/lircevent.cpp devices/lircevent.h)
   endif()
   if(APPLE_DISKARBITRATION_LIBRARY)
@@ -393,12 +393,12 @@ if(TARGET joystick)
   target_link_libraries(mythui PUBLIC joystick)
 endif()
 
-if(ENABLE_LIRC AND NOT WIN32)
+if(TARGET lirc)
+  target_link_libraries(mythui PRIVATE lirc)
   target_sources(
     mythui
     PRIVATE devices/lirc.cpp devices/lirc.h devices/lirc_client.cpp
             devices/lirc_client.h devices/lircevent.cpp devices/lircevent.h)
-  target_compile_definitions(mythui PRIVATE USE_LIRC)
 endif()
 
 if(TARGET mythtv_mmal)

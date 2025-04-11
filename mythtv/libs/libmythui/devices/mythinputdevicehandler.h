@@ -42,7 +42,7 @@ class MythInputDeviceHandler : public QObject
     MythMainWindow* m_parent     { nullptr };
     bool            m_ignoreKeys { false   };
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
     LIRC           *m_lircThread { nullptr };
 #endif
 

@@ -21,11 +21,11 @@
 #include "devices/AppleRemoteListener.h"
 #endif
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
 #include "devices/lirc.h"
 #endif
 
-#if defined (USE_LIRC) || CONFIG_APPLEREMOTE
+#if defined CONFIG_LIRC || CONFIG_APPLEREMOTE
 #include "devices/lircevent.h"
 #endif
 
@@ -53,7 +53,7 @@ void MythInputDeviceHandler::Start(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Starting");
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
     if (!m_lircThread)
     {
         QString config = GetConfDir() + "/lircrc";
@@ -144,7 +144,7 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
     }
 #endif
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
     if (m_lircThread)
     {
         m_lircThread->deleteLater();
@@ -234,7 +234,7 @@ void MythInputDeviceHandler::customEvent([[maybe_unused]] QEvent* Event)
     }
 #endif
 
-#if defined(USE_LIRC) || CONFIG_APPLEREMOTE
+#if CONFIG_LIRC || CONFIG_APPLEREMOTE
     if (Event->type() == LircKeycodeEvent::kEventType)
     {
         auto *lke = dynamic_cast<LircKeycodeEvent *>(Event);

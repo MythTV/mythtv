@@ -271,7 +271,6 @@ using_joystick_menu {
 }
 
 using_lirc {
-    DEFINES += USE_LIRC
     HEADERS += devices/lirc.h   devices/lircevent.h   devices/lirc_client.h
     SOURCES += devices/lirc.cpp devices/lircevent.cpp devices/lirc_client.cpp
 }

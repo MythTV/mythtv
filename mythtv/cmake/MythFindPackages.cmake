@@ -560,12 +560,12 @@ if(ENABLE_JOYSTICK_MENU)
   endif()
 endif()
 
-if(ENABLE_LIRC)
+if(ENABLE_LIRC AND NOT WIN32)
   # This uses the socket interface. No libs necessary
   message(STATUS "Adding lirc support")
   add_library(lirc INTERFACE)
   add_build_config(TRUE "lirc")
-  target_compile_definitions(lirc INTERFACE USING_LIRC)
+  set(CONFIG_LIRC TRUE)
 endif()
 
 # Use MMAL as a proxy for Raspberry Pi support.  Notes: MMAL didn't work well on
