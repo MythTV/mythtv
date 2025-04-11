@@ -172,7 +172,7 @@ endif()
 
 if(TARGET PkgConfig::DRM)
   target_link_libraries(mythtv PUBLIC PkgConfig::DRM)
-  if(TARGET Qt5::GuiPrivate) # Not completed for Qt6 yet.
+  if(TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
     target_link_libraries(mythtv PUBLIC Qt${QT_VERSION_MAJOR}::GuiPrivate)
     target_sources(
       mythtv
