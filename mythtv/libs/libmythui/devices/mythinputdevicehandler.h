@@ -50,7 +50,7 @@ class MythInputDeviceHandler : public QObject
     MythCECAdapter  m_cecAdapter;
 #endif
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     JoystickMenuThread  *m_joystickThread { nullptr };
 #endif
 

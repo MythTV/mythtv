@@ -49,6 +49,7 @@
 #cmakedefine01 CONFIG_FRONTEND
 #cmakedefine01 CONFIG_HDHOMERUN
 #cmakedefine01 CONFIG_IPTV
+#cmakedefine01 CONFIG_JOYSTICK_MENU
 #cmakedefine01 CONFIG_LIBASS
 #cmakedefine01 CONFIG_LIBCEC
 #cmakedefine01 CONFIG_LIBCRYPTO

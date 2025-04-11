@@ -12,7 +12,7 @@
 #include "mythmainwindow.h"
 #include "mythinputdevicehandler.h"
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
 #include "devices/jsmenu.h"
 #include "devices/jsmenuevent.h"
 #endif
@@ -78,7 +78,7 @@ void MythInputDeviceHandler::Start(void)
     }
 #endif
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if (!m_joystickThread)
     {
         QString config = GetConfDir() + "/joystickmenurc";
@@ -131,7 +131,7 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
     }
 #endif
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if (m_joystickThread && Finishing)
     {
         if (m_joystickThread->isRunning())
@@ -214,7 +214,7 @@ void MythInputDeviceHandler::customEvent([[maybe_unused]] QEvent* Event)
     QObject* target = nullptr;
     QString error;
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if (Event->type() == JoystickKeycodeEvent::kEventType)
     {
         auto *jke = dynamic_cast<JoystickKeycodeEvent *>(Event);

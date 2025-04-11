@@ -266,7 +266,6 @@ android {
 }
 
 using_joystick_menu {
-    DEFINES += USE_JOYSTICK_MENU
     HEADERS += devices/jsmenu.h devices/jsmenuevent.h
     SOURCES += devices/jsmenu.cpp devices/jsmenuevent.cpp
 }
