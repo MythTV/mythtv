@@ -43,6 +43,7 @@ class V2VideoMetadataInfo : public QObject
     SERVICE_PROPERTY2( QString    , Banner         )
     SERVICE_PROPERTY2( QString    , Screenshot     )
     SERVICE_PROPERTY2( QString    , Trailer        )
+    SERVICE_PROPERTY2( int        , Category       )
     Q_PROPERTY( QObject*        Artwork         READ Artwork     USER true)
     Q_PROPERTY( QObject*        Cast            READ Cast        USER true)
     Q_PROPERTY( QObject*        Genres          READ Genres      USER true)
@@ -79,5 +80,65 @@ class V2VideoMetadataInfo : public QObject
 };
 
 Q_DECLARE_METATYPE(V2VideoMetadataInfo*)
+
+/////////////////////////////////////////////////////////////////////////////
+
+class V2VideoCategory : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "version"    , "1.0" );
+
+    SERVICE_PROPERTY2( int        , Id      )
+    SERVICE_PROPERTY2( QString    , Name    )
+
+    public:
+
+        Q_INVOKABLE V2VideoCategory(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+    private:
+        Q_DISABLE_COPY(V2VideoCategory);
+};
+
+Q_DECLARE_METATYPE(V2VideoCategory*)
+
+class V2VideoCategoryList : public QObject
+{
+    Q_OBJECT
+    Q_CLASSINFO( "version", "1.0" );
+
+    // Q_CLASSINFO Used to augment Metadata for properties.
+    // See datacontracthelper.h for details
+
+    Q_CLASSINFO( "VideoCategories", "type=V2VideoCategory");
+
+    SERVICE_PROPERTY2( QVariantList, VideoCategories );
+
+    public:
+
+        Q_INVOKABLE V2VideoCategoryList(QObject *parent = nullptr)
+            : QObject( parent )
+        {
+        }
+
+        V2VideoCategory *AddNewCategory()
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            auto *pObject = new V2VideoCategory( this );
+            m_VideoCategories.append( QVariant::fromValue<QObject *>( pObject ));
+
+            return pObject;
+        }
+
+    private:
+        Q_DISABLE_COPY(V2VideoCategoryList);
+};
+
+Q_DECLARE_METATYPE(V2VideoCategoryList*)
+
 
 #endif // V2VIDEOMETADATAINFO_H_

@@ -127,7 +127,7 @@ VideoMetadataListManager::loadOneFromDatabase(uint id)
 ///
 void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
                                                    const QString &sql,
-                                                   const QString &bindValue)
+                                                   const QStringList &bindValues)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);
@@ -143,8 +143,11 @@ void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
         BaseMetadataQuery.append(sql);
 
     query.prepare(BaseMetadataQuery);
-    if (!bindValue.isEmpty())
-        query.bindValue(":BINDVALUE", bindValue);
+
+    for (int ix = 0 ; ix < bindValues.size() ; ix++)
+    {
+        query.bindValue(QString(":BIND") + QString::number(ix), bindValues.at(ix));
+    }
 
     if (query.exec() && query.isActive())
     {

@@ -45,6 +45,8 @@ void V2Video::RegisterCustomTypes()
     qRegisterMetaType<V2ArtworkItem*>("V2ArtworkItem");
     qRegisterMetaType<V2CutList*>("V2CutList");
     qRegisterMetaType<V2Cutting*>("V2Cutting");
+    qRegisterMetaType<V2VideoCategory*>("V2VideoCategory");
+    qRegisterMetaType<V2VideoCategoryList*>("V2VideoCategoryList");
 }
 
 V2Video::V2Video()
@@ -201,6 +203,8 @@ long V2Video::GetLastPlayPos( int  Id )
 
 V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
                                                  const QString &Sort,
+                                                 const QString &TitleRegEx,
+                                                 int Category,
                                                  bool bDescending,
                                                  int nStartIndex,
                                                  int nCount,
@@ -218,15 +222,42 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
 
     QString sql = "";
     QString folder;
-    QString bindValue;
+    QStringList bindValues;
+
     if (!Folder.isEmpty())
     {
         if (Folder.endsWith('/'))
             folder = Folder;
         else
             folder = Folder + "/";
-        bindValue = folder + "%";
-        sql.append(" WHERE filename LIKE :BINDVALUE ");
+        sql.append(" WHERE filename LIKE :BIND0 ");
+        bindValues.append(folder + "%");
+    }
+    if (!TitleRegEx.isEmpty())
+    {
+        if (bindValues.size() == 0 )
+        {
+            sql.append(" WHERE ");
+        }
+        else
+        {
+            sql.append(" AND ");
+        }
+        sql.append(" title REGEXP :BIND" + QString::number(bindValues.size()) + " ");
+        bindValues.append(TitleRegEx);
+    }
+    if (HAS_PARAMv2("Category") && Category != -1)
+    {
+        if (bindValues.size() == 0 )
+        {
+            sql.append(" WHERE ");
+        }
+        else
+        {
+            sql.append(" AND ");
+        }
+        sql.append(" category = :BIND" + QString::number(bindValues.size()) + " ");
+        bindValues.append( QString::number(Category) );
     }
     sql.append(" ORDER BY ");
     QString defSeq = " ASC";
@@ -265,7 +296,7 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         sql.append(defSeq);
     }
 
-    VideoMetadataListManager::loadAllFromDatabase(videolist, sql, bindValue);
+    VideoMetadataListManager::loadAllFromDatabase(videolist, sql, bindValues);
     std::vector<VideoMetadataListManager::VideoMetadataPtr> videos(videolist.begin(), videolist.end());
 
     // ----------------------------------------------------------------------
@@ -1226,4 +1257,28 @@ V2CutList* V2Video::GetVideoCommBreak ( int Id,
     V2FillCommBreak(pCutList, &pi, marktype, includeFps);
 
     return pCutList;
+}
+
+V2VideoCategoryList*  V2Video::GetCategoryList (  )
+{
+    auto* pCatList = new V2VideoCategoryList();
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT intid,category "
+                  "FROM videocategory ");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Video::GetCategoryList", query);
+        throw QString("Database Error.");
+    }
+
+    while (query.next())
+    {
+        auto *cat = pCatList->AddNewCategory();
+        cat->setId(query.value(0).toInt());
+        cat->setName(query.value(1).toString());
+    }
+
+    return pCatList;
 }

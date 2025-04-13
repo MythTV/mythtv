@@ -17,7 +17,7 @@ class META_PUBLIC VideoMetadataListManager
     static VideoMetadataPtr loadOneFromDatabase(uint id);
     static void loadAllFromDatabase(metadata_list &items,
                                     const QString &sql = "",
-                                    const QString &bindValue = "");
+                                    const QStringList &bindValues = QStringList());
 
   public:
     VideoMetadataListManager();

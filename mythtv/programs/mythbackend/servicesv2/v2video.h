@@ -37,8 +37,10 @@ class V2Video : public MythHTTPService
     static V2VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
     static long                   GetSavedBookmark (int Id );
     static long                   GetLastPlayPos (int Id );
-    static V2VideoMetadataInfoList*  GetVideoList    ( const QString  &Folder,
+    V2VideoMetadataInfoList*      GetVideoList    ( const QString  &Folder,
                                                        const QString  &Sort,
+                                                       const QString   &TitleRegEx,
+                                                       int            Category,
                                                        bool           Descending,
                                                        int            StartIndex,
                                                        int            Count,
@@ -114,6 +116,8 @@ class V2Video : public MythHTTPService
     static V2CutList* GetVideoCommBreak   ( int              Id,
                                             const QString   &OffsetType,
                                             bool IncludeFps );
+
+    static V2VideoCategoryList*  GetCategoryList     (  );
 
   private:
     Q_DISABLE_COPY(V2Video)

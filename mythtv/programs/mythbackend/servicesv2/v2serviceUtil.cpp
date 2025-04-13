@@ -450,6 +450,7 @@ void V2FillVideoMetadataInfo (
     pVideoMetadataInfo->setBanner(pMetadata->GetBanner());
     pVideoMetadataInfo->setScreenshot(pMetadata->GetScreenshot());
     pVideoMetadataInfo->setTrailer(pMetadata->GetTrailer());
+    pVideoMetadataInfo->setCategory(pMetadata->GetCategoryID());
 
     if (bDetails)
     {
