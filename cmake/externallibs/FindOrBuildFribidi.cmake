@@ -40,6 +40,9 @@ function(find_or_build_fribidi)
   ExternalProject_Add(
     fribidi
     DOWNLOAD_DIR ${TARBALL_DIR}
+    # Eventually the next line will go away and the line following that can be
+    # uncommented.
+    ${DOWNLOAD_EXTRACT_TIMESTAMP_CMP0135}
     # DOWNLOAD_EXTRACT_TIMESTAMP ON
     URL https://github.com/fribidi/fribidi/releases/download/v${FRIBIDI_VERSION}/${FRIBIDI_PREFIX}.tar.xz
     URL_HASH SHA256=${FRIBIDI_${FRIBIDI_VERSION}_SHA256}

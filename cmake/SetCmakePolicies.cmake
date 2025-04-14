@@ -24,11 +24,13 @@ endif()
 # OLD: Use timestamps from downloaded file.
 # NEW: Set timestamps of extracted content to current time.
 #
-# This messes up the projects that are based on autotools: fribidi,
-# libass, and libsamplerate. Once cmake 3.24 becomes the minimum,
-# uncomment the "DOWNLOAD_EXTRACT_TIMESTAMP ON" line in their External
-# Project declaration, then this setting won't matter any more.
+# This messes up the projects that are based on autotools: fribidi, libass, and
+# libsamplerate. The extra variable here is a temporary workaround until cmake
+# 3.24 becomes the minimum required version of cmake. At that time, uncomment
+# the "DOWNLOAD_EXTRACT_TIMESTAMP ON" line in these three External Project
+# declarations, and then delete the variable below.
 # ~~~
 if(POLICY CMP0135)
-  cmake_policy(SET CMP0135 OLD)
+  cmake_policy(SET CMP0135 NEW)
+  set(DOWNLOAD_EXTRACT_TIMESTAMP_CMP0135 DOWNLOAD_EXTRACT_TIMESTAMP ON)
 endif()

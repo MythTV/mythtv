@@ -39,6 +39,9 @@ function(find_or_build_samplerate)
   ExternalProject_Add(
     samplerate
     DOWNLOAD_DIR ${TARBALL_DIR}
+    # Eventually the next line will go away and the line following that can be
+    # uncommented.
+    ${DOWNLOAD_EXTRACT_TIMESTAMP_CMP0135}
     # DOWNLOAD_EXTRACT_TIMESTAMP ON
     URL http://www.mega-nerd.com/SRC/${SAMPLERATE_PREFIX}.tar.gz
     URL_HASH SHA256=${SAMPLERATE_${SAMPLERATE_VERSION}_SHA256}

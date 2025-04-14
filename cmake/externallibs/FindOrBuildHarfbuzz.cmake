@@ -39,6 +39,9 @@ function(find_or_build_harfbuzz)
   ExternalProject_Add(
     harfbuzz
     DOWNLOAD_DIR ${TARBALL_DIR}
+    # Eventually the next line will go away and the line following that can be
+    # uncommented.
+    ${DOWNLOAD_EXTRACT_TIMESTAMP_CMP0135}
     # DOWNLOAD_EXTRACT_TIMESTAMP ON
     URL https://github.com/harfbuzz/harfbuzz/releases/download/${HARFBUZZ_VERSION}/${HARFBUZZ_PREFIX}.tar.xz
     URL_HASH SHA256=${HARFBUZZ_${HARFBUZZ_VERSION}_SHA256}
