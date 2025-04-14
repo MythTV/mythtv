@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql
+QT += network xml sql widgets
 
 TEMPLATE = app
 CONFIG += thread

@@ -20,7 +20,7 @@ class MythMimeDatabase
     static MythMimeType  MimeTypeForFileNameAndData(const QString& FileName, QIODevice* Device);
 
   private:
-    MythMimeDatabasePriv* m_priv;
+    MythMimeDatabasePriv* m_priv; // NOLINT(modernize-use-default-member-init)
 };
 
 #endif

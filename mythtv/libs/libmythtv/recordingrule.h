@@ -14,6 +14,7 @@
 #include "libmythbase/recordingtypes.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/recordinginfo.h"
+#include "libmythtv/recordingprofile.h"
 
 /** \class RecordingRule
  *  \brief Internal representation of a recording rule, mirrors the record
@@ -127,7 +128,7 @@ class MTV_PUBLIC RecordingRule
     bool                   m_maxNewest          {false};
 
     // Post Processing Options
-    int                    m_transcoder;
+    int                    m_transcoder{RecordingProfile::kTranscoderAutodetect};
     bool                   m_autoCommFlag       {true};
     bool                   m_autoTranscode      {false};
     bool                   m_autoUserJob1       {false};
