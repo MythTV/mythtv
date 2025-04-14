@@ -511,7 +511,7 @@ MPEG2_MC_EXTERN (mmx)
 
 #define pavg_r2r(src,dest)		\
 do {					\
-    if (cpu == CPU_MMXEXT)		\
+    if (cpu == CPU_MMXEXT) /*NOLINT(bugprone-branch-clone)*/ \
 	pavgb_r2r (src, dest);		\
     else				\
 	pavgusb_r2r (src, dest);	\
@@ -519,7 +519,7 @@ do {					\
 
 #define pavg_m2r(src,dest)		\
 do {					\
-    if (cpu == CPU_MMXEXT)		\
+    if (cpu == CPU_MMXEXT) /*NOLINT(bugprone-branch-clone)*/ \
 	pavgb_m2r (src, dest);		\
     else				\
 	pavgusb_m2r (src, dest);	\
