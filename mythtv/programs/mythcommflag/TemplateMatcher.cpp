@@ -211,6 +211,12 @@ unsigned int range_area(const unsigned short *freq, unsigned short start,
 unsigned short pick_mintmpledges(const unsigned short *matches,
                                  long long nframes)
 {
+    // Validate arguments.  If nframes is equal to zero there's no
+    // work to do.  This check also prevents "sorted[nframes - 1]"
+    // below from referencing memory before the start of the array.
+    if (nframes <= 0)
+        return 0;
+
     /*
      * Most frames either match the template very well, or don't match
      * very well at all. This allows us to assume a bimodal

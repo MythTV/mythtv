@@ -83,7 +83,7 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
             nblanks++;
     }
 
-    if (!nblanks)
+    if (nblanks <= 0)
     {
         /* No monochromatic frames. */
         LOG(VB_COMMFLAG, LOG_INFO,
@@ -109,6 +109,14 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
 
     qsort(blankmedian, nblanks, sizeof(*blankmedian), sort_ascending_uchar);
     blankno = std::min(nblanks - 1, (long long)roundf(nblanks * MEDIANPCTILE));
+    if (blankno <= 0)
+    {
+        delete []blankmedian;
+        delete []blankstddev;
+        LOG(VB_COMMFLAG, LOG_INFO,
+            "BlankFrameDetector::computeBlankMap: No blank frames. (2)");
+        return;
+    }
     uchar maxmedian = blankmedian[blankno];
 
     qsort(blankstddev, nblanks, sizeof(*blankstddev), sort_ascending_float);

@@ -612,6 +612,11 @@ static void getpixelline(eu8 ** data, int width, Png4File * picfile)
 static void makebitmap(eu8 * data, int w, int h, int top, int bot,
                        char * filename, eu8 palette[4][3])
 {
+    if (top < 0 || bot < 0)
+    {
+        printf("ERROR: invalid arguments to makebitmap");
+        return;
+    }
     eu8 * top_ibuf = data + top;
     eu8 * bot_ibuf = data + bot;
     Png4File picfile;

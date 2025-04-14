@@ -156,6 +156,15 @@ void CC708Window::DefineWindow(int _priority,         bool _visible,
 // end, row_count and column_count are NOT updated.
 void CC708Window::Resize(uint new_rows, uint new_columns)
 {
+    // Validate arguments.
+    if (new_rows == 0 || new_columns == 0)
+    {
+      LOG(VB_VBI,
+          LOG_DEBUG,
+          QString("Invalid arguments to Resize: %1 rows x %2 columns")
+          .arg(new_rows).arg(new_columns));
+      return;
+    }
 
     if (!GetExists() || m_text == nullptr)
     {
