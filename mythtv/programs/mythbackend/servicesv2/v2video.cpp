@@ -235,7 +235,7 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     }
     if (!TitleRegEx.isEmpty())
     {
-        if (bindValues.size() == 0 )
+        if (bindValues.empty())
         {
             sql.append(" WHERE ");
         }
@@ -248,7 +248,7 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
     }
     if (HAS_PARAMv2("Category") && Category != -1)
     {
-        if (bindValues.size() == 0 )
+        if (bindValues.empty())
         {
             sql.append(" WHERE ");
         }
