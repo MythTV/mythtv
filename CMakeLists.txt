@@ -320,6 +320,17 @@ if(CMAKE_CROSSCOMPILING)
   message(VERBOSE "Found meson: ${MESON_EXECUTABLE}")
   find_program(MESON_EXECUTABLE NAMES gperf REQUIRED)
   message(VERBOSE "Found gperf: ${GPERF_EXECUTABLE}")
+  find_program(AUTOMAKE_EXECUTABLE NAMES automake)
+  if(AUTOMAKE_EXECUTABLE)
+    execute_process(
+      COMMAND ${AUTOMAKE_EXECUTABLE} --version
+      OUTPUT_VARIABLE _OUTPUT
+      ERROR_QUIET)
+    if(_OUTPUT MATCHES "([0-9]+\.[0-9]+)")
+      set(AUTOMAKE_VERSION ${CMAKE_MATCH_1})
+    endif()
+  endif()
+  message(VERBOSE "Found automake: ${AUTOMAKE_EXECUTABLE}, version ${AUTOMAKE_VERSION}")
 endif()
 
 #

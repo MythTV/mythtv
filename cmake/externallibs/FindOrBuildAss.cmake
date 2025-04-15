@@ -46,6 +46,14 @@ function(find_or_build_libass)
       --srcdir=<SOURCE_DIR>
     BUILD_COMMAND ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
     DEPENDS fontconfig freetype fribidi harfbuzz libxml2 ${after_libs})
+  if(NOT AUTOMAKE_VERSION VERSION_EQUAL 1.16)
+    ExternalProject_Add_Step(
+      libass pre-configure
+      DEPENDEES patch
+      DEPENDERS configure
+      COMMAND autoreconf
+      WORKING_DIRECTORY <SOURCE_DIR>)
+  endif()
 
   add_dependencies(external_libs libass)
 

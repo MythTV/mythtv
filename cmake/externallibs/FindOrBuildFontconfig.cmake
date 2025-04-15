@@ -48,6 +48,14 @@ function(find_or_build_fontconfig)
       --srcdir=<SOURCE_DIR>
     BUILD_COMMAND ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
     DEPENDS freetype libxml2 ${after_libs})
+  if(NOT AUTOMAKE_VERSION VERSION_EQUAL 1.16)
+    ExternalProject_Add_Step(
+      fontconfig pre-configure
+      DEPENDEES patch
+      DEPENDERS configure
+      COMMAND autoreconf
+      WORKING_DIRECTORY <SOURCE_DIR>)
+  endif()
   ExternalProject_Add_Step(
     fontconfig post-install
     DEPENDEES install
