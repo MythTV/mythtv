@@ -130,10 +130,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 endif()
 
-if(ENABLE_LTO AND NOT CMAKE_CROSSCOMPILING)
-  list(APPEND CFLAGS -flto=auto)
-  list(APPEND CXXFLAGS -flto=auto)
-  list(APPEND LFLAGS -flto=auto)
+#
+# Check for Interprocedural Optimization, aka Link Time Optimization.
+#
+include(CheckIPOSupported)
+check_ipo_supported(RESULT has_ipo)
+if(ENABLE_LTO AND has_ipo AND NOT CMAKE_CROSSCOMPILING)
+  message(STATUS "Enabling link-time optimization.")
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
 #
