@@ -5,7 +5,7 @@
 #if defined(Q_OS_DARWIN) || defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
-#elif __linux__
+#elif defined(__linux__)
 #include <sys/vfs.h>
 #endif
 

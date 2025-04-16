@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QQueue>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythsingledownload.h"
 #include "HLSSegment.h"
 
@@ -19,9 +20,9 @@ class HLSRecStream
     friend class HLSReader;
 
   public:
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
     using AESKeyMap = QMap<QString, HLS_AES_KEY* >;
-#endif  // USING_LIBCRYPTO
+#endif  // CONFIG_LIBCRYPTO
 
     HLSRecStream(int inputId, int seq, uint64_t bitrate, QString m3u8_url, QString segment_base_url);
     ~HLSRecStream(void);
@@ -65,7 +66,7 @@ class HLSRecStream
     bool operator<(const HLSRecStream &b) const;
     bool operator>(const HLSRecStream &b) const;
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
   protected:
     int Decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
                 unsigned char *iv, unsigned char *plaintext) const;
@@ -74,7 +75,7 @@ class HLSRecStream
     bool DecodeData(MythSingleDownload& downloader,
 		    const QByteArray& IV, const QString& keypath,
 		    QByteArray& data, int64_t sequence);
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO
 
   protected:
     void AverageBandwidth(int64_t bandwidth);
@@ -102,10 +103,10 @@ class HLSRecStream
 
     QString     m_mapUri;                 // URI of Media Initialisation Sequence
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
   private:
     AESKeyMap   m_aesKeys;                // AES-128 keys by path
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO
 };
 
 #endif // HLS_STREAM_H

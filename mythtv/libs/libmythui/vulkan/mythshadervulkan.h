@@ -2,6 +2,7 @@
 #define MYTHSHADERVULKAN_H
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythui/vulkan/mythrendervulkan.h"
 
 using MythShaderMap   = std::map<int, std::pair<QString, std::vector<uint32_t>>>;
@@ -34,7 +35,7 @@ class MUI_PUBLIC MythShaderVulkan : protected MythVulkanObject
     const std::vector<VkDescriptorPoolSize>& GetPoolSizes(size_t Set) const;
     VkDescriptorSetLayout GetDescSetLayout(size_t Set) const;
 
-#ifdef USING_GLSLANG
+#if CONFIG_LIBGLSLANG
     static bool  InitGLSLang(bool Release = false);
 #endif
 
@@ -46,7 +47,7 @@ class MUI_PUBLIC MythShaderVulkan : protected MythVulkanObject
 
   private:
     Q_DISABLE_COPY(MythShaderVulkan)
-#ifdef USING_GLSLANG
+#if CONFIG_LIBGLSLANG
     bool CreateShaderFromGLSL  (const std::vector<MythGLSLStage> &Stages);
 #endif
     bool CreateShaderFromSPIRV (const std::vector<MythSPIRVStage> &Stages);

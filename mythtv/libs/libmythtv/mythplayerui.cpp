@@ -239,7 +239,7 @@ void MythPlayerUI::EventLoop()
     EofState eof = GetEof();
     if (HasReachedEof())
     {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
         if (m_interactiveTV && m_interactiveTV->StreamStarted(false))
         {
             Pause();
@@ -378,7 +378,7 @@ void MythPlayerUI::EventLoop()
 
 void MythPlayerUI::PreProcessNormalFrame()
 {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     // handle Interactive TV
     if (GetInteractiveTV())
     {
@@ -393,7 +393,7 @@ void MythPlayerUI::PreProcessNormalFrame()
         m_itvLock.unlock();
         m_osdLock.unlock();
     }
-#endif // USING_MHEG
+#endif // CONFIG_MHEG
 }
 
 void MythPlayerUI::ChangeSpeed()
@@ -431,13 +431,13 @@ void MythPlayerUI::VideoStart()
     m_captionsOverlay.Init(visible, aspect);
     m_captionsOverlay.EnableSubtitles(kDisplayNone);
 
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     if (GetInteractiveTV())
     {
         QMutexLocker locker(&m_itvLock);
         m_interactiveTV->Reinit(total, visible, aspect);
     }
-#endif // USING_MHEG
+#endif // CONFIG_MHEG
 
     // If there is a forced text subtitle track (which is possible
     // in e.g. a .mkv container), and forced subtitles are
@@ -1003,7 +1003,7 @@ void MythPlayerUI::JumpToStream(const QString &stream)
     ChangeSpeed();
 
     m_playerCtx->SetPlayerChangingBuffers(false);
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     if (m_interactiveTV) m_interactiveTV->StreamStarted();
 #endif
 

@@ -42,13 +42,13 @@
 #include "libmythui/mythpainterwindow.h"
 #include "libmythui/mythuihelper.h"
 #include "libmythui/themeinfo.h"
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
 #include "libmythui/opengl/mythrenderopengl.h"
 #endif
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
 #include "libmythtv/AirPlay/mythraopconnection.h"
 #endif
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
 #include "libmythtv/decoders/mythvaapicontext.h"
 #endif
 
@@ -103,7 +103,7 @@ static HostCheckBoxSetting *ChromaUpsampling()
     return gc;
 }
 
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
 static HostTextEditSetting *VAAPIDevice()
 {
     auto *ge = new HostTextEditSetting("VAAPIDevice");
@@ -2121,7 +2121,7 @@ static HostTextEditSetting *LircDaemonDevice()
     return ge;
 }
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 static HostTextEditSetting *CECDevice()
 {
     auto *ge = new HostTextEditSetting("libCECDevice");
@@ -3377,7 +3377,7 @@ static HostTextEditSetting *UDPNotifyPort()
     return ge;
 }
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 static HostCheckBoxSetting *CECEnabled()
 {
     auto *gc = new HostCheckBoxSetting("libCECEnabled");
@@ -3436,9 +3436,9 @@ static HostCheckBoxSetting *CECPowerOffTVOnExit()
     return gc;
 }
 
-#endif //USING_LIBCEC
+#endif // CONFIG_LIBCEC
 
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
 // AirPlay Settings
 static HostCheckBoxSetting *AirPlayEnabled()
 {
@@ -4262,7 +4262,7 @@ MainGeneralSettings::MainGeneralSettings()
     remotecontrol->addChild(NetworkControlEnabled());
     remotecontrol->addChild(NetworkControlPort());
     remotecontrol->addChild(UDPNotifyPort());
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     HostCheckBoxSetting *cec = CECEnabled();
     remotecontrol->addChild(cec);
     cec->addTargetedChild("1",CECDevice());
@@ -4278,10 +4278,10 @@ MainGeneralSettings::MainGeneralSettings()
             this, &MainGeneralSettings::cecChanged);
     connect(m_cecPowerOffTVAllowed, &MythUICheckBoxSetting::valueChanged,
             this, &MainGeneralSettings::cecChanged);
-#endif // USING_LIBCEC
+#endif // CONFIG_LIBCEC
     addChild(remotecontrol);
 
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
     auto *airplay = new GroupSetting();
     airplay->setLabel(tr("AirPlay Settings"));
     airplay->addChild(AirPlayEnabled());
@@ -4294,7 +4294,7 @@ MainGeneralSettings::MainGeneralSettings()
 #endif
 }
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
 void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_cecPowerOnTVAllowed->boolValue())
@@ -4313,7 +4313,7 @@ void MainGeneralSettings::cecChanged(bool /*setting*/)
         m_cecPowerOffTVOnExit->setValue(false);
     }
 }
-#endif  // USING_LIBCEC
+#endif  // CONFIG_LIBCEC
 
 void MainGeneralSettings::applyChange()
 {
@@ -4499,7 +4499,7 @@ void PlaybackSettings::Load(void)
     advanced->addChild(AudioReadAhead());
     advanced->addChild(ColourPrimaries());
     advanced->addChild(ChromaUpsampling());
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
     advanced->addChild(VAAPIDevice());
 #endif
 
@@ -4819,7 +4819,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(SmoothTransitions());
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
     screen->addChild(AirPlayFullScreen());
 #endif
 

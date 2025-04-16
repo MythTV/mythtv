@@ -8,10 +8,11 @@
 // C/C++ includes
 #include <utility>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"
-#ifdef USING_OSX_FIREWIRE
+#if CONFIG_FIREWIRE_OSX
 #include "darwinfirewiredevice.h"
 #endif
 #include "firewirechannel.h"
@@ -27,15 +28,15 @@ FirewireChannel::FirewireChannel(TVRec *parent, QString _videodevice,
     uint64_t guid = string_to_guid(m_videodevice);
     uint subunitid = 0; // we only support first tuner on STB...
 
-#ifdef USING_LINUX_FIREWIRE
+#if CONFIG_FIREWIRE_LINUX
     m_device = new LinuxFirewireDevice(
         guid, subunitid, m_fwOpts.m_speed,
         LinuxFirewireDevice::kConnectionP2P == (uint) m_fwOpts.m_connection);
-#endif // USING_LINUX_FIREWIRE
+#endif // CONFIG_FIREWIRE_LINUX
 
-#ifdef USING_OSX_FIREWIRE
+#if CONFIG_FIREWIRE_OSX
     m_device = new DarwinFirewireDevice(guid, subunitid, m_fwOpts.m_speed);
-#endif // USING_OSX_FIREWIRE
+#endif // CONFIG_FIREWIRE_OSX
 }
 
 FirewireChannel::~FirewireChannel()

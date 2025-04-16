@@ -3,14 +3,16 @@
 #include <QGuiApplication>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
+
 #include "mythmainwindow.h"
 #include "mythscreensaver.h"
 
-#ifdef USING_DRM
+#if CONFIG_DRM
 #include "platforms/mythscreensaverdrm.h"
 #endif
 
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
 #include "platforms/mythscreensaverdbus.h"
 #endif
 
@@ -22,11 +24,11 @@
 #include "platforms/mythscreensaverandroid.h"
 #endif
 
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
 #include "platforms/mythscreensaverwayland.h"
 #endif
 
-#ifdef USING_X11
+#if CONFIG_X11
 #include "platforms/mythscreensaverx11.h"
 #include "platforms/mythxdisplay.h"
 #endif
@@ -40,10 +42,10 @@
 MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* MainWin,
                                                [[maybe_unused]] MythDisplay* mDisplay)
 {
-#if defined(USING_DBUS)
+#if CONFIG_QTDBUS
     m_screenSavers.push_back(new MythScreenSaverDBus(this));
 #endif
-#if defined(USING_X11)
+#if CONFIG_X11
     MythXDisplay* display = MythXDisplay::OpenMythXDisplay(false);
     if (display)
     {
@@ -56,12 +58,12 @@ MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* 
 #if defined(ANDROID)
     m_screenSavers.push_back(new MythScreenSaverAndroid(this));
 #endif
-#ifdef USING_DRM
+#if CONFIG_DRM
     MythScreenSaverDRM* drmsaver = MythScreenSaverDRM::Create(this, mDisplay);
     if (drmsaver)
         m_screenSavers.push_back(drmsaver);
 #endif
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     if (QGuiApplication::platformName().toLower().contains("wayland"))
         m_screenSavers.push_back(new MythScreenSaverWayland(this, MainWin));
 #endif

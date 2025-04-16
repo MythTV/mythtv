@@ -244,9 +244,9 @@ bool TV::StartPlaying(std::chrono::milliseconds MaxWait)
         return false;
     }
     MaxWait = (MaxWait <= 0ms) ? 20s : MaxWait;
-#ifdef USING_VALGRIND
+#if CONFIG_VALGRIND
     MaxWait = std::chrono::milliseconds::max();
-#endif // USING_VALGRIND
+#endif // CONFIG_VALGRIND
     MythTimer t;
     t.start();
 

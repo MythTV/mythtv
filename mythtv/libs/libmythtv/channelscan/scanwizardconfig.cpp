@@ -23,7 +23,7 @@
 #include "paneexistingscanimport.h"
 #include "panesingle.h"
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
 #include "recorders/satiputils.h"
 #endif
 
@@ -234,12 +234,12 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     QString subtype = CardUtil::ProbeSubTypeName(m_hwCardId);
     CardUtil::INPUT_TYPES nCardType   = CardUtil::toInputType(subtype);
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     if (nCardType == CardUtil::INPUT_TYPES::SATIP)
     {
         nCardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(cardid));
     }
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
     const QString fullScanHelpTextDVBT2 = QObject::tr(
         "For DVB-T/T2 and scan type 'Full Scan' select a country to get the correct set of frequencies.");

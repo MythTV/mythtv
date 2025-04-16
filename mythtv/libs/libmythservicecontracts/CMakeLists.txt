@@ -42,7 +42,7 @@ target_include_directories(
 target_link_libraries(
   mythservicecontracts
   PUBLIC Qt${QT_VERSION_MAJOR}::Core
-         $<$<BOOL:${USING_QTSCRIPT}>:Qt${QT_VERSION_MAJOR}::Script> mythbase)
+         $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::Script> mythbase)
 
 #
 # Installation section

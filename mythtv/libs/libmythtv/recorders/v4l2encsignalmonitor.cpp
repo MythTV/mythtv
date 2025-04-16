@@ -5,7 +5,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
-#ifndef USING_MINGW
+#ifndef __MINGW32__
 #include <sys/select.h>
 #endif
 

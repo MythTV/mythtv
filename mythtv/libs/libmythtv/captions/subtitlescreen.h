@@ -3,8 +3,10 @@
 #ifndef SUBTITLESCREEN_H
 #define SUBTITLESCREEN_H
 
+#include "libmythbase/mythconfig.h"
+
 #include <utility>
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
 extern "C" {
 #include <ass/ass.h>
 }
@@ -260,7 +262,7 @@ private:
     QList<FormattedTextSubtitle *> m_qInited;
     class SubtitleFormat *m_format        {nullptr};
 
-#ifdef USING_LIBASS
+#if CONFIG_LIBASS
     bool InitialiseAssLibrary(void);
     void LoadAssFonts(void);
     void CleanupAssLibrary(void);
@@ -275,7 +277,7 @@ private:
     int             m_assTrackNum         {-1};
     ASS_Track      *m_assTrack            {nullptr};
     uint            m_assFontCount        {0};
-#endif // USING_LIBASS
+#endif // CONFIG_LIBASS
 };
 
 #endif // SUBTITLESCREEN_H

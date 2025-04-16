@@ -1,9 +1,10 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "platforms/mythdisplaymutter.h"
 
-#ifdef USING_DRM
+#if CONFIG_DRM
 extern "C" {
 #include <xf86drmMode.h>
 }

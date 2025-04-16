@@ -45,7 +45,7 @@ JobQueue::JobQueue(bool master) :
 {
     m_jobQueueCPU = gCoreContext->GetNumSetting("JobQueueCPU", 0);
 
-#ifndef USING_VALGRIND
+#if !CONFIG_VALGRIND
     QMutexLocker locker(&m_queueThreadCondLock);
     //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_processQueue = true;
@@ -54,7 +54,7 @@ JobQueue::JobQueue(bool master) :
     LOG(VB_GENERAL, LOG_ERR, LOC +
         "The JobQueue has been disabled because "
         "you compiled with the --enable-valgrind option.");
-#endif // USING_VALGRIND
+#endif // CONFIG_VALGRIND
 
     gCoreContext->addListener(this);
 }

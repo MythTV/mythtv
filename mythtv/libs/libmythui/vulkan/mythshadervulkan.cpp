@@ -9,7 +9,7 @@
 #define LOC QString("VulkanShader: ")
 
 // libglslang
-#ifdef USING_GLSLANG
+#if CONFIG_LIBGLSLANG
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
 
@@ -383,7 +383,7 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
     if (!m_pipelineLayout)
         return;
 
-#ifdef USING_GLSLANG
+#if CONFIG_LIBGLSLANG
     static bool useglsl = qEnvironmentVariableIsSet("MYTHTV_GLSLANG");
     if (useglsl)
     {

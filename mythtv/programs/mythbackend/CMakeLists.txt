@@ -150,9 +150,6 @@ add_executable(
 
 target_include_directories(mythbackend PRIVATE .)
 
-target_compile_definitions(mythbackend
-                           PRIVATE $<$<BOOL:${USING_VALGRIND}>:USING_VALGRIND>)
-
 target_link_libraries(
   mythbackend
   PUBLIC myth
@@ -162,6 +159,7 @@ target_link_libraries(
          mythprotoserver
          mythservicecontracts
          mythupnp
+         $<TARGET_NAME_IF_EXISTS:PkgConfig::VALGRIND>
          $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::DBus>)
 
 install(TARGETS mythbackend RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

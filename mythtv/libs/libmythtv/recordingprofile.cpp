@@ -437,7 +437,7 @@ class AudioCompressionSettings : public GroupSetting
         m_codecName->addTargetedChild("AAC Hardware Encoder",
                                       new GroupSetting());
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
         if (v4l2)
         {
             // Dynamically create user options based on the
@@ -518,7 +518,7 @@ class AudioCompressionSettings : public GroupSetting
                 }
             }
         }
-#endif //  USING_V4L2
+#endif //  CONFIG_V4L2
     }
 
     void selectCodecs(const QString & groupType)
@@ -977,7 +977,7 @@ class VideoCompressionSettings : public GroupSetting
                                          1100, 20200, 20200, 500));
         m_codecName->addTargetedChild(label, h2);
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
         if (v4l2)
         {
             DriverOption::Options options;
@@ -1134,7 +1134,7 @@ class VideoCompressionSettings : public GroupSetting
                 }
             }
         }
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
     }
 
     void selectCodecs(const QString& groupType)
@@ -1429,7 +1429,7 @@ RecordingProfile::RecordingProfile(const QString& profName)
 
 RecordingProfile::~RecordingProfile(void)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     delete m_v4l2util;
     m_v4l2util = nullptr;
 #endif
@@ -1499,7 +1499,7 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
     QString cardtype = card;
     uint profileId = 0;
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     if (cardtype == "V4L2ENC")
     {
         m_v4l2util = new V4L2util(videodev);
@@ -1587,7 +1587,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
 
     if (m_isEncoder)
     {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
         if (type.startsWith("V4L2:"))
         {
             QStringList devices = CardUtil::GetVideoDevices("V4L2ENC");
@@ -1611,7 +1611,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
         // TODO: When mpegrecorder is removed, don't check for "HDPVR' anymore...
         if (type != "HDPVR" &&
             (!m_v4l2util
-#ifdef USING_V4L2
+#if CONFIG_V4L2
              || m_v4l2util->UserAdjustableResolution()
 #endif
             ))

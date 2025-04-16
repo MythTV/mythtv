@@ -1,6 +1,8 @@
 #ifndef MYTH_CODEC_ID_H
 #define MYTH_CODEC_ID_H
 
+#include "libmythbase/mythconfig.h"
+
 #include <cstdint>
 #include <QString>
 extern "C"
@@ -383,7 +385,7 @@ static inline bool CODEC_IS_H264(AVCodecID id)
     { return mpeg_version(id) == 5; };
 static inline bool CODEC_IS_MPEG(AVCodecID id)
     { return (mpeg_version(id) != 0) && (mpeg_version(id) <= 2); };
-#ifdef USING_VDPAU
+#if CONFIG_VDPAU
 static inline bool CODEC_IS_VDPAU(const struct AVCodec *codec, const AVCodecContext *enc)
     { return (codec != nullptr) && (enc->pix_fmt == AV_PIX_FMT_VDPAU); };
 #else
@@ -391,7 +393,7 @@ static inline bool CODEC_IS_VDPAU(const struct AVCodec */*codec*/)
     { return false; };
 #endif
 
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
 static inline bool CODEC_IS_VAAPI(const struct AVCodec *codec, const AVCodecContext *enc)
     { return (codec != nullptr) && (enc->pix_fmt == AV_PIX_FMT_VAAPI); };
 #else
@@ -399,7 +401,7 @@ static inline bool CODEC_IS_VAAPI(const struct AVCodec */*codec*/, const AVCodec
     { return false; };
 #endif
 
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
 static inline bool CODEC_IS_DXVA2(const struct AVCodec *codec, const AVCodecContext *enc)
     { return (codec  != nullptr) && (enc->pix_fmt == AV_PIX_FMT_DXVA2_VLD); };
 #else
@@ -407,7 +409,7 @@ static inline bool CODEC_IS_DXVA2(const struct AVCodec */*codec*/, const AVCodec
     { return false; };
 #endif
 
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
 static inline bool CODEC_IS_MEDIACODEC(const struct AVCodec *codec)
     { return (codec != nullptr) && (QString("mediacodec") == codec->wrapper_name); };
 #else

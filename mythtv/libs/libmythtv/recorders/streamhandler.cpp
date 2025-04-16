@@ -362,7 +362,7 @@ void StreamHandler::WriteMPTS(const unsigned char * buffer, uint len)
 
 bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
 {
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     QMutexLocker lk(&m_mptsLock);
 
     m_mptsFiles.insert(file);
@@ -398,13 +398,13 @@ bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
                 .arg(m_mptsBaseFile, fn));
         }
     }
-#endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )
+#endif //  !defined( _WIN32 )
     return true;
 }
 
 void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
 {
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     QMutexLocker lk(&m_mptsLock);
 
     QSet<QString>::iterator it = m_mptsFiles.find(file);
@@ -417,5 +417,5 @@ void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
             m_mptsTfw = nullptr;
         }
     }
-#endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )
+#endif //  !defined( _WIN32 )
 }

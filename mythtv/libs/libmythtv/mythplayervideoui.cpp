@@ -208,7 +208,7 @@ void MythPlayerVideoUI::ReinitOSD()
 
         m_reinitOsd = false;
 
-#ifdef USING_MHEG
+#if CONFIG_MHEG
         if (GetInteractiveTV())
         {
             QMutexLocker locker(&m_itvLock);

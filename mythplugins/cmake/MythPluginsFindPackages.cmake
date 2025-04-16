@@ -48,9 +48,6 @@ pkg_check_modules(TagLib "taglib" IMPORTED_TARGET)
 
 if(ENABLE_MP3LAME)
   find_package(Lame 3.98.3)
-  if(TARGET Lame::Lame)
-    target_compile_definitions(Lame::Lame INTERFACE USING_LIBMP3LAME)
-  endif()
 endif()
 
 find_package(

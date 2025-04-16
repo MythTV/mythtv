@@ -1,6 +1,8 @@
 #ifndef MYTHHTTPSERVER_H
 #define MYTHHTTPSERVER_H
 
+#include "libmythbase/mythconfig.h"
+
 // Qt
 #include <QHostInfo>
 #include <QQueue>
@@ -70,7 +72,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     static bool ReservedPath(const QString& Path);
     static QStringList BuildAddressList(QHostInfo& Info);
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
     class BonjourRegister* m_bonjour    { nullptr };
     BonjourRegister*       m_bonjourSSL { nullptr };
 #endif

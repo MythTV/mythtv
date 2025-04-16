@@ -18,10 +18,6 @@ INSTALLS += menu
 
 QMAKE_CLEAN += $(TARGET)
 
-using_backend {
-    DEFINES += USING_BACKEND
-}
-
 # Input
 HEADERS += backendsettings.h   channeleditor.h   checksetup.h
 HEADERS += exitprompt.h        importicons.h     startprompt.h
@@ -36,6 +32,4 @@ macx {
         QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythtv-setup
     }
 }
-
-using_x11:DEFINES += USING_X11
 

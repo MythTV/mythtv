@@ -23,10 +23,10 @@
 #include "opengl/mythegl.h"
 #include "mythmainwindow.h"
 
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
 #include "platforms/mythdisplaymutter.h"
 #endif
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
 #include "platforms/mythwaylandextras.h"
 #endif
 #ifdef Q_OS_ANDROID
@@ -35,18 +35,18 @@
 #ifdef Q_OS_DARWIN
 #include "platforms/mythdisplayosx.h"
 #endif
-#ifdef USING_X11
+#if CONFIG_X11
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
-#ifdef USING_DRM
+#if CONFIG_DRM
 #include "platforms/mythdisplaydrm.h"
 #include "platforms/drm/mythdrmvrr.h"
 #endif
 #if defined(Q_OS_WIN)
 #include "platforms/mythdisplaywindows.h"
 #endif
-#ifdef USING_MMAL
+#if CONFIG_MMAL
 #include "platforms/mythdisplayrpi.h"
 #endif
 
@@ -89,14 +89,14 @@
 MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 {
     MythDisplay* result = nullptr;
-#ifdef USING_X11
+#if CONFIG_X11
     if (MythDisplayX11::IsAvailable())
         result = new MythDisplayX11();
 #endif
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
     // Disabled for now as org.gnome.Mutter.DisplayConfig.ApplyConfiguration does
     // not seem to be actually implemented by anyone.
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     //if (MythWaylandDevice::IsAvailable())
 #endif
     //{
@@ -104,12 +104,12 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
     //        result = MythDisplayMutter::Create();
     //}
 #endif
-#ifdef USING_DRM
+#if CONFIG_DRM
     if (!result)
     {
         result = new MythDisplayDRM(MainWindow);
         // On the Pi, use MythDisplayRPI if mode switching is not available via DRM
-#ifdef USING_MMAL
+#if CONFIG_MMAL
         if (!result->VideoModesAvailable())
         {
             delete result;
@@ -118,7 +118,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
 #endif
     }
 #endif
-#ifdef USING_MMAL
+#if CONFIG_MMAL
     if (!result)
         result = new MythDisplayRPI();
 #endif
@@ -1200,13 +1200,13 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     QApplication::setDesktopSettingsAware(false);
 #endif
 
-#if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
+#if CONFIG_DRM && CONFIG_QTPRIVATEHEADERS
     // Avoid trying to setup DRM if we are definitely not going to use it.
-#ifdef USING_X11
+#if CONFIG_X11
     if (!MythDisplayX11::IsAvailable())
 #endif
     {
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
         // When vt switching this still detects wayland servers, so disabled for now
         //if (!MythWaylandDevice::IsAvailable())
 #endif
@@ -1217,7 +1217,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     }
 #endif
 
-#if defined (Q_OS_LINUX) && defined (USING_EGL) && defined (USING_X11)
+#if defined (Q_OS_LINUX) && CONFIG_EGL && CONFIG_X11
     // We want to use EGL for VAAPI/MMAL/DRMPRIME rendering to ensure we
     // can use zero copy video buffers for the best performance.
     // To force Qt to use EGL we must set 'QT_XCB_GL_INTEGRATION' to 'xcb_egl'
@@ -1254,7 +1254,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 
-#ifdef USING_X11
+#if CONFIG_X11
     if (auto display = CmdLine.toString("display"); !display.isEmpty())
         MythXDisplay::SetQtX11Display(display);
     // GSync support via libXNVCtrl

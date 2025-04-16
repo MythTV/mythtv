@@ -6,10 +6,11 @@
 #include <QWidget>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "mythuiexp.h"
 #include "mythrender_base.h"
 
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
 class MythWaylandDevice;
 #endif
 
@@ -61,7 +62,7 @@ class MythPainterWindow : public QWidget
     Q_DISABLE_COPY(MythPainterWindow)
 
 
-#ifdef USING_WAYLANDEXTRAS
+#if CONFIG_WAYLANDEXTRAS
     MythWaylandDevice* m_waylandDev { nullptr };
 #endif
 };

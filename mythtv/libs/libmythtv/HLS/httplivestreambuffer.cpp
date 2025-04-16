@@ -47,7 +47,7 @@ extern "C" {
 #include "libavformat/avio.h"
 }
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
 // encryption related stuff
 #include <openssl/aes.h>
 #include <openssl/evp.h>
@@ -136,7 +136,7 @@ class HLSSegment
         m_title(std::move(title)),
         m_url(std::move(uri))
     {
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
         m_pszKeyPath = std::move(current_key_path);
 #endif
@@ -161,7 +161,7 @@ class HLSSegment
         // m_data       = m_data;
         // m_played     = m_played;
         m_title         = rhs.m_title;
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         m_pszKeyPath    = rhs.m_pszKeyPath;
         memcpy(&m_aeskey, &(rhs.m_aeskey), sizeof(m_aeskey));
         m_keyloaded     = rhs.m_keyloaded;
@@ -279,7 +279,7 @@ class HLSSegment
         return m_data.constData();
     }
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
     int DownloadKey(void)
     {
         // must own lock
@@ -466,7 +466,7 @@ class HLSStream
         m_bitrate(bitrate),
         m_url(std::move(uri))
     {
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         m_aesIv.fill(0);
 #endif
     }
@@ -505,7 +505,7 @@ class HLSStream
         m_live          = rhs.m_live;
         m_url           = rhs.m_url;
         m_cache         = rhs.m_cache;
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         m_keypath       = rhs.m_keypath;
         m_ivloaded      = rhs.m_ivloaded;
         m_aesIv         = rhs.m_aesIv;
@@ -619,7 +619,7 @@ class HLSStream
         QMutexLocker lock(&m_lock);
         QString psz_uri = relative_URI(m_url, uri);
         int id = NumSegments() + m_startsequence;
-#ifndef USING_LIBCRYPTO
+#if !CONFIG_LIBCRYPTO
         QString m_keypath;
 #endif
         auto *segment = new HLSSegment(duration, id, title, psz_uri, m_keypath);
@@ -727,7 +727,7 @@ class HLSStream
                                    ((double)segment->Duration().count()));
         }
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         /* If the segment is encrypted, decode it */
         if (segment->HasKeyPath())
         {
@@ -842,7 +842,7 @@ class HLSStream
         }
     }
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
     /**
      * Will download all required segment AES-128 keys
      * Will try to re-use already downloaded keys if possible
@@ -2043,7 +2043,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
             }
         }
     }
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
     else if (attr.startsWith(QLatin1String("AES-128")))
     {
         QString uri;
@@ -2078,7 +2078,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
 #ifndef _MSC_VER
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "invalid encryption type, only NONE "
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
             "and AES-128 are supported"
 #else
             "is supported."

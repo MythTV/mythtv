@@ -1147,7 +1147,7 @@ V2CaptureDeviceList* getFirewireList ([[maybe_unused]] const QString & cardType)
 {
     auto* pList = new V2CaptureDeviceList();
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     std::vector<AVCInfo> list = FirewireDevice::GetSTBList();
     for (auto & info : list)
     {
@@ -1161,6 +1161,6 @@ V2CaptureDeviceList* getFirewireList ([[maybe_unused]] const QString & cardType)
         pDev->setSignalTimeout ( 2000 );
         pDev->setChannelTimeout ( 9000 );
     }
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
     return pList;
 }

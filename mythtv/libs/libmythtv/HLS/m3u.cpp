@@ -2,6 +2,7 @@
 #include <QStringList>
 #include <QUrl>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "HLS/m3u.h"
@@ -385,7 +386,7 @@ namespace M3U
                 }
             }
         }
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         else if (attr.startsWith(QLatin1String("AES-128")))
         {
             QString uri;
@@ -421,7 +422,7 @@ namespace M3U
 #ifndef _MSC_VER
             LOG(VB_RECORD, LOG_ERR, loc +
                 "invalid encryption type, only NONE "
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
                 "and AES-128 are supported"
 #else
                 "is supported."

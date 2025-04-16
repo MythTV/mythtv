@@ -21,14 +21,16 @@
 #ifndef AUDIOINPUTALSA_H
 #define AUDIOINPUTALSA_H
 
+#include "libmythbase/mythconfig.h"
+
 #include "audioinput.h"
 
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
 #include <alsa/asoundlib.h>
 #else
 using snd_pcm_t = int;
 using snd_pcm_uframes_t = int;
-#endif // USING_ALSA
+#endif // CONFIG_AUDIO_ALSA
 
 class AudioInputALSA : public AudioInput
 {

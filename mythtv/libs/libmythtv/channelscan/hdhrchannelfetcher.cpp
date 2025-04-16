@@ -1,3 +1,5 @@
+#include "libmythbase/mythconfig.h"
+
 // Std C headers
 #include <cmath>
 #include <unistd.h>
@@ -11,7 +13,7 @@
 #include <QStringList>
 #include <QDomDocument>
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
 #include HDHOMERUN_HEADERFILE
 #endif
 
@@ -170,7 +172,7 @@ hdhr_chan_map_t *getChannels(const QString& ip)
 
 QString HDHRIPv4Address([[maybe_unused]] const QString &device)
 {
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     hdhomerun_device_t *hdhr =
         hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
     if (!hdhr)

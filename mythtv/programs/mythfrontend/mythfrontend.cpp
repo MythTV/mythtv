@@ -125,12 +125,12 @@
 #include "libmythtv/DVD/mythdvdbuffer.h"
 
 // AirPlay
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
 #include "libmythtv/AirPlay/mythairplayserver.h"
 #include "libmythtv/AirPlay/mythraopdevice.h"
 #endif
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
 #include <QScopedPointer>
 #include "libmythbase/bonjourregister.h"
 #endif
@@ -330,7 +330,7 @@ namespace
     void cleanup()
     {
         QCoreApplication::processEvents();
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
         MythRAOPDevice::Cleanup();
         MythAirplayServer::Cleanup();
 #endif
@@ -2141,7 +2141,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         return GENERIC_EXIT_NOT_OK;
     }
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
     // this needs to come after gCoreContext has been initialised
     // (for hostname) - hence it is not in MediaRenderer
     QScopedPointer<BonjourRegister> bonjour(new BonjourRegister());
@@ -2201,7 +2201,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
                                                "MythTV Frontend",
                                                "Main window title"));
 
-#ifdef USING_AIRPLAY
+#if CONFIG_AIRPLAY
     if (gCoreContext->GetBoolSetting("AirPlayEnabled", true))
     {
         fe_sd_notify("STATUS=Initializing AirPlay");

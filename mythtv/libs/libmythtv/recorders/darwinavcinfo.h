@@ -1,7 +1,9 @@
 #ifndef _DARWIN_AVC_INFO_H_
 #define _DARWIN_AVC_INFO_H_
 
-#ifdef USING_OSX_FIREWIRE
+#include "libmythbase/mythconfig.h"
+
+#if CONFIG_FIREWIRE_OSX
 
 // C++ headers
 #include <vector>
@@ -63,6 +65,6 @@ class DarwinAVCInfo : public AVCInfo
 };
 using avcinfo_list_t = QMap<uint64_t,DarwinAVCInfo*>;
 
-#endif // USING_OSX_FIREWIRE
+#endif // CONFIG_FIREWIRE_OSX
 
 #endif // _DARWIN_AVC_INFO_H_

@@ -3,6 +3,7 @@
 
 #include <QMap>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/compat.h"
 #include <d3d9.h>
 
@@ -10,7 +11,7 @@
 #include "mythuiexp.h"
 #include "mythrender_base.h"
 
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
 #if defined (_WIN32)
 #define CINTERFACE
 #define COBJMACROS

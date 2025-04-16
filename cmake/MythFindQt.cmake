@@ -4,6 +4,7 @@
 # See the file LICENSE_FSF for licensing information.
 #
 include(BuildConfigString)
+include(SetIfTargetExists)
 
 set(QT_DEFAULT_MAJOR_VERSION ${QT_VERSION_MAJOR})
 
@@ -104,24 +105,10 @@ add_build_config(${QT_PKG_NAME}::WebEngineWidgets "qtwebenginewidgets")
 #
 get_target_property(QMAKE_EXECUTABLE ${QT_PKG_NAME}::qmake IMPORTED_LOCATION)
 
-if(TARGET ${QT_PKG_NAME}::DBus)
-  target_compile_definitions(${QT_PKG_NAME}::DBus INTERFACE USING_DBUS)
-  set(CONFIG_QTDBUS ON)
-endif()
-
-if(TARGET ${QT_PKG_NAME}::GuiPrivate)
-  target_compile_definitions(${QT_PKG_NAME}::GuiPrivate
-                             INTERFACE USING_QTPRIVATEHEADERS)
-endif()
-
-if(TARGET ${QT_PKG_NAME}::Script)
-  target_compile_definitions(${QT_PKG_NAME}::Script INTERFACE USING_QTSCRIPT)
-  set(CONFIG_QTSCRIPT ON)
-endif()
-
-if(TARGET ${QT_PKG_NAME}::WebEngineWidgets)
-  set(CONFIG_QTWEBENGINE ON)
-endif()
+set_if_target_exists(CONFIG_QTDBUS ${QT_PKG_NAME}::DBus)
+set_if_target_exists(CONFIG_QTPRIVATEHEADERS ${QT_PKG_NAME}::GuiPrivate)
+set_if_target_exists(CONFIG_QTSCRIPT ${QT_PKG_NAME}::Script)
+set_if_target_exists(CONFIG_QTWEBENGINE ${QT_PKG_NAME}::WebEngineWidgets)
 
 #
 # Figure out if Qt was build with GLES enabled.

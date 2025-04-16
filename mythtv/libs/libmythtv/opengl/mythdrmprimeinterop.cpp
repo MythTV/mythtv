@@ -5,7 +5,7 @@
 #include "mythvideocolourspace.h"
 #include "mythdrmprimeinterop.h"
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/platforms/mythdisplaydrm.h"
 #endif
@@ -26,7 +26,7 @@ MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL* Context, MythPlayerUI
 
 MythDRMPRIMEInterop::~MythDRMPRIMEInterop()
 {
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     delete m_drm;
 #endif
     MythDRMPRIMEInterop::DeleteTextures();
@@ -81,7 +81,7 @@ void MythDRMPRIMEInterop::GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::
 {
     MythInteropGPU::InteropTypes drmtypes;
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     if (MythDisplayDRM::DirectRenderingAvailable())
         drmtypes.emplace_back(DRM_DRMPRIME);
 #endif
@@ -140,7 +140,7 @@ MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
     if (!drmdesc)
         return result;
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
     if (HandleDRMVideo(ColourSpace, Frame, drmdesc))
         return result;
 #endif
@@ -245,7 +245,7 @@ MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
     return result;
 }
 
-#ifdef USING_DRM_VIDEO
+#if CONFIG_DRM_VIDEO
 bool MythDRMPRIMEInterop::HandleDRMVideo(MythVideoColourSpace* ColourSpace, MythVideoFrame* Frame,
                                          AVDRMFrameDescriptor* DRMDesc)
 {

@@ -1,4 +1,5 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "avformatdecoder.h"
@@ -112,7 +113,7 @@ int MythDRMPRIMEContext::HwDecoderInit(AVCodecContext *Context)
     if (Context->pix_fmt != AV_PIX_FMT_DRM_PRIME)
         return -1;
 
-#ifdef USING_EGL
+#if CONFIG_EGL
     if (auto * player = GetPlayerUI(Context); player != nullptr)
         if (FrameTypeIsSupported(Context, FMT_DRMPRIME))
             m_interop = MythDRMPRIMEInterop::CreateDRM(dynamic_cast<MythRenderOpenGL*>(player->GetRender()), player);

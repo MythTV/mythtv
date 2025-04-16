@@ -13,10 +13,11 @@
 #include <QMap>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "linuxfirewiredevice.h"
-#ifdef USING_OSX_FIREWIRE
+#if CONFIG_FIREWIRE_OSX
 #include "darwinfirewiredevice.h"
 #endif
 #include "mpeg/mpegtables.h"
@@ -364,9 +365,9 @@ std::vector<AVCInfo> FirewireDevice::GetSTBList(void)
 {
     std::vector<AVCInfo> list;
 
-#ifdef USING_LINUX_FIREWIRE
+#if CONFIG_FIREWIRE_LINUX
     list = LinuxFirewireDevice::GetSTBList();
-#elif defined(USING_OSX_FIREWIRE)
+#elif CONFIG_FIREWIRE_OSX
     list = DarwinFirewireDevice::GetSTBList();
 #endif
 

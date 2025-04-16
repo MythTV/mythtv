@@ -1,7 +1,8 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
 #include "libmythui/opengl/mythrenderopengl.h"
 #endif
 #include "videovisualgoom.h"
@@ -27,7 +28,7 @@ VideoVisualGoom::VideoVisualGoom(AudioPlayer* Audio, MythRender* Render, bool HD
 
 VideoVisualGoom::~VideoVisualGoom()
 {
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
     if (m_glSurface && m_render && (m_render->Type() == kRenderOpenGL))
     {
         auto * glrender = dynamic_cast<MythRenderOpenGL*>(m_render);
@@ -64,7 +65,7 @@ void VideoVisualGoom::Draw(const QRect Area, MythPainter* /*Painter*/, QPaintDev
         m_buffer = goom_update(data, 0);
     }
 
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
     if ((m_render->Type() == kRenderOpenGL))
     {
         auto * glrender = dynamic_cast<MythRenderOpenGL*>(m_render);

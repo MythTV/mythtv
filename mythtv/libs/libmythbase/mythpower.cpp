@@ -1,9 +1,11 @@
 // MythTV
+#include "mythconfig.h"
+
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythpower.h"
 
-#ifdef USING_DBUS
+#if CONFIG_QTDBUS
 #include "platforms/mythpowerdbus.h"
 #endif
 
@@ -87,7 +89,7 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, std::chrono:
 #ifdef Q_OS_DARWIN
             // NB OSX may have DBUS but it won't help here
             s_instance = new MythPowerOSX();
-#elif defined(USING_DBUS)
+#elif CONFIG_QTDBUS
             if (MythPowerDBus::IsAvailable())
                 s_instance = new MythPowerDBus();
 #endif

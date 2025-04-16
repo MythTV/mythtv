@@ -8,10 +8,6 @@ if(NOT ENABLE_BACKEND)
   return()
 endif()
 
-target_compile_definitions(
-  mythtv
-  PUBLIC USING_IPTV
-  PRIVATE USING_BACKEND)
 target_sources(
   mythtv
   PRIVATE # Channel stuff
@@ -177,10 +173,8 @@ if(TARGET PkgConfig::V4L2)
 endif()
 
 # Support for cable boxes that provide Firewire out
-if(ENABLE_FIREWIRE)
-  target_link_libraries(
-    mythtv PUBLIC $<TARGET_NAME_IF_EXISTS:PkgConfig::LibAVC1394>
-                  $<TARGET_NAME_IF_EXISTS:PkgConfig::LibIEC61883>)
+if(TARGET firewire)
+  target_link_libraries(mythtv PUBLIC firewire)
   target_sources(
     mythtv
     PRIVATE recorders/firewirechannel.h
@@ -195,16 +189,11 @@ if(ENABLE_FIREWIRE)
             recorders/firewiresignalmonitor.cpp)
 
   if(APPLE)
-    target_compile_definitions(mythtv PRIVATE USING_FIREWIRE USING_OSX_FIREWIRE)
-    target_compile_options(mythtv PRIVATE -iframework
-                                          ${APPLE_AVCVIDEOSERVICES_HEADERS})
     target_sources(
       mythtv
       PRIVATE recorders/darwinfirewiredevice.h recorders/darwinavcinfo.h
               recorders/darwinavcinfo.cpp recorders/darwinfirewiredevice.cpp)
-    target_link_libraries(mythtv PUBLIC ${APPLE_AVCVIDEOSERVICES_LIBRARY})
   else()
-    target_compile_definitions(mythtv PRIVATE USING_LINUX_FIREWIRE)
     target_sources(
       mythtv
       PRIVATE recorders/linuxfirewiredevice.h recorders/linuxavcinfo.h

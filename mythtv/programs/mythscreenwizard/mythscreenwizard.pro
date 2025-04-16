@@ -16,5 +16,3 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += mythscreenwizard_commandlineparser.h screenwizard.h
 
 SOURCES += mythscreenwizard.cpp mythscreenwizard_commandlineparser.cpp screenwizard.cpp
-
-using_x11:DEFINES += USING_X11

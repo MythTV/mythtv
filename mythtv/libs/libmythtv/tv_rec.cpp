@@ -110,7 +110,7 @@ bool TVRec::CreateChannel(const QString &startchannel,
         this, m_genOpt, m_dvbOpt, m_fwOpt,
         startchannel, enter_power_save_mode, m_rbFileExt, setchan);
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     if (m_genOpt.m_inputType == "VBOX")
     {
         if (!CardUtil::IsVBoxPresent(m_inputId))
@@ -125,7 +125,7 @@ bool TVRec::CreateChannel(const QString &startchannel,
     }
 #endif
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     if (m_genOpt.m_inputType == "SATIP")
     {
         if (!CardUtil::IsSatIPPresent(m_inputId))
@@ -1267,11 +1267,11 @@ DTVChannel *TVRec::GetDTVChannel(void)
 
 V4LChannel *TVRec::GetV4LChannel(void)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     return dynamic_cast<V4LChannel*>(m_channel);
 #else
     return nullptr;
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 }
 
 // Check if EIT is enabled for the video source connected to this input
@@ -4936,7 +4936,7 @@ QString TuningRequest::toString(void) const
              TVRec::FlagToString(m_flags));
 }
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 #include "recorders/dvbchannel.h"
 static void apply_broken_dvb_driver_crc_hack(ChannelBase *c, MPEGStreamData *s)
 {
@@ -4949,6 +4949,6 @@ static void apply_broken_dvb_driver_crc_hack(ChannelBase *c, MPEGStreamData *s)
 }
 #else
 static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*) {}
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

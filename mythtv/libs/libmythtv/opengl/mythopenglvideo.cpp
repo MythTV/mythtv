@@ -321,7 +321,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
         fragment = glsldefines + YUVFragmentExtensions + ((BicubicUpsize == Type) ? BicubicShader : RGBFragmentShader);
 
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
         if (FMT_MEDIACODEC == m_inputType)
             vertex = MediaCodecVertexShader;
 #endif
@@ -362,7 +362,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
             defines << "YUY2";
         }
 
-#ifdef USING_VTB
+#if CONFIG_VIDEOTOOLBOX
         // N.B. Rectangular texture support is only currently used for VideoToolBox
         // video frames which are NV12. Do not use rectangular textures for the 'default'
         // shaders as it breaks video resizing and would require changes to our
@@ -722,7 +722,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
                 SetupFrameFormat(newsourcetype, newtargettype, newsize, newtargettexture);
             }
 
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
             // Set the texture transform for mediacodec
             if (FMT_MEDIACODEC == m_inputType)
             {

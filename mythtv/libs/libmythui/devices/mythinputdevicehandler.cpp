@@ -12,20 +12,20 @@
 #include "mythmainwindow.h"
 #include "mythinputdevicehandler.h"
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
 #include "devices/jsmenu.h"
 #include "devices/jsmenuevent.h"
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
 #include "devices/AppleRemoteListener.h"
 #endif
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
 #include "devices/lirc.h"
 #endif
 
-#if defined (USE_LIRC) || defined (USING_APPLEREMOTE)
+#if defined CONFIG_LIRC || CONFIG_APPLEREMOTE
 #include "devices/lircevent.h"
 #endif
 
@@ -53,7 +53,7 @@ void MythInputDeviceHandler::Start(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Starting");
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
     if (!m_lircThread)
     {
         QString config = GetConfDir() + "/lircrc";
@@ -78,7 +78,7 @@ void MythInputDeviceHandler::Start(void)
     }
 #endif
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if (!m_joystickThread)
     {
         QString config = GetConfDir() + "/joystickmenurc";
@@ -88,7 +88,7 @@ void MythInputDeviceHandler::Start(void)
     }
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     if (!m_appleRemoteListener)
     {
         m_appleRemoteListener = new AppleRemoteListener(this);
@@ -116,12 +116,12 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Stopping");
 
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     if (Finishing)
         m_cecAdapter.Close();
 #endif
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     if (Finishing)
     {
         delete m_appleRemote;
@@ -131,7 +131,7 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
     }
 #endif
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if (m_joystickThread && Finishing)
     {
         if (m_joystickThread->isRunning())
@@ -144,7 +144,7 @@ void MythInputDeviceHandler::Stop([[maybe_unused]] bool Finishing /* = true */)
     }
 #endif
 
-#ifdef USE_LIRC
+#if CONFIG_LIRC
     if (m_lircThread)
     {
         m_lircThread->deleteLater();
@@ -165,7 +165,7 @@ void MythInputDeviceHandler::Event(QEvent *Event) const
     if (!Event)
         return;
 
-#ifdef USING_APPLEREMOTE
+#if CONFIG_APPLEREMOTE
     if (m_appleRemote)
     {
         if (Event->type() == QEvent::WindowActivate)
@@ -178,7 +178,7 @@ void MythInputDeviceHandler::Event(QEvent *Event) const
 
 void MythInputDeviceHandler::Action([[maybe_unused]] const QString &Action)
 {
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     m_cecAdapter.Action(Action);
 #endif
 }
@@ -190,14 +190,14 @@ void MythInputDeviceHandler::IgnoreKeys(bool Ignore)
     else
         LOG(VB_GENERAL, LOG_INFO, LOC + "Unlocking input devices");
     m_ignoreKeys = Ignore;
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     m_cecAdapter.IgnoreKeys(Ignore);
 #endif
 }
 
 void MythInputDeviceHandler::MainWindowReady(void)
 {
-#ifdef USING_LIBCEC
+#if CONFIG_LIBCEC
     // Open any adapter after the window has been created to ensure we capture
     // the EDID if available - and hence get a more accurate Physical Address.
     // This will close any existing adapter in the event that the window has been re-init'ed.
@@ -214,7 +214,7 @@ void MythInputDeviceHandler::customEvent([[maybe_unused]] QEvent* Event)
     QObject* target = nullptr;
     QString error;
 
-#ifdef USE_JOYSTICK_MENU
+#if CONFIG_JOYSTICK_MENU
     if (Event->type() == JoystickKeycodeEvent::kEventType)
     {
         auto *jke = dynamic_cast<JoystickKeycodeEvent *>(Event);
@@ -234,7 +234,7 @@ void MythInputDeviceHandler::customEvent([[maybe_unused]] QEvent* Event)
     }
 #endif
 
-#if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
+#if CONFIG_LIRC || CONFIG_APPLEREMOTE
     if (Event->type() == LircKeycodeEvent::kEventType)
     {
         auto *lke = dynamic_cast<LircKeycodeEvent *>(Event);

@@ -1,7 +1,9 @@
 #ifndef V4L2_UTIL_H
 #define V4L2_UTIL_H
 
-#ifdef USING_V4L2
+#include "libmythbase/mythconfig.h"
+
+#if CONFIG_V4L2
 #include <linux/videodev2.h>
 #endif
 

@@ -224,10 +224,10 @@ class MTV_PUBLIC CardUtil : public QObject
         return !(rawtype == "FREEBOX" || rawtype == "VBOX");
     }
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     static bool         IsVBoxPresent(uint inputid);
 #endif
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     static bool         IsSatIPPresent(uint inputid);
 #endif
 

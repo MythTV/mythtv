@@ -49,15 +49,15 @@
 #include "v4l2util.h"
 #include "videosource.h"
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 #include "recorders/dvbtypes.h"
 #endif
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
 #include "recorders/vboxutils.h"
 #endif
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
 #include HDHOMERUN_HEADERFILE
 #endif
 
@@ -1006,13 +1006,13 @@ class AudioDevice : public CaptureCardComboBoxSetting
                                    "audiodevice")
     {
         setLabel(QObject::tr("Audio device"));
-#ifdef USING_OSS
+#if CONFIG_AUDIO_OSS
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
 #endif
-#ifdef USING_ALSA
+#if CONFIG_AUDIO_ALSA
         addSelection("ALSA:default", "ALSA:default");
 #endif
         addSelection(QObject::tr("(None)"), "NULL");
@@ -1269,7 +1269,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
         CaptureCardComboBoxSetting(parent, false, "videodevice")
     {
         setLabel(QObject::tr("GUID"));
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
         std::vector<AVCInfo> list = FirewireDevice::GetSTBList();
         for (auto & i : list)
         {
@@ -1277,7 +1277,7 @@ class FirewireGUID : public CaptureCardComboBoxSetting
             m_guidToAvcInfo[guid] = i;
             addSelection(guid);
         }
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
     }
 
     AVCInfo GetAVCInfo(const QString &guid) const
@@ -1319,25 +1319,25 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
 
 void FirewireModel::SetGUID([[maybe_unused]] const QString &_guid)
 {
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     AVCInfo info = m_guid->GetAVCInfo(_guid);
     QString model = FirewireDevice::GetModelName(info.m_vendorid, info.m_modelid);
     setValue(std::max(getValueIndex(model), 0));
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 }
 
 void FirewireDesc::SetGUID([[maybe_unused]] const QString &_guid)
 {
     setLabel(tr("Description"));
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     QString name = m_guid->GetAVCInfo(_guid).m_product_name;
     name.replace("Scientific-Atlanta", "SA");
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
     name = name.simplified();
     setValue((name.isEmpty()) ? "" : name);
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 }
 
 class FirewireConnection : public MythUIComboBoxSetting
@@ -1368,7 +1368,7 @@ class FirewireSpeed : public MythUIComboBoxSetting
     }
 };
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
 static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 {
     auto *dev(new FirewireGUID(parent));
@@ -1380,10 +1380,10 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
     cardtype.addTargetedChild("FIREWIRE", desc);
     cardtype.addTargetedChild("FIREWIRE", model);
 
-#ifdef USING_LINUX_FIREWIRE
+#if CONFIG_FIREWIRE_LINUX
     cardtype.addTargetedChild("FIREWIRE", new FirewireConnection(parent));
     cardtype.addTargetedChild("FIREWIRE", new FirewireSpeed(parent));
-#endif // USING_LINUX_FIREWIRE
+#endif // CONFIG_FIREWIRE_LINUX
 
     cardtype.addTargetedChild("FIREWIRE", new SignalTimeout(parent, 2s, 1s));
     cardtype.addTargetedChild("FIREWIRE", new ChannelTimeout(parent, 9s, 1.75s));
@@ -1397,7 +1397,7 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 }
 #endif
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
 
 // -----------------------
 // HDHomeRun Configuration
@@ -1897,7 +1897,7 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent,
 
 void ASIConfigurationGroup::probeCard([[maybe_unused]] const QString &device)
 {
-#ifdef USING_ASI
+#if CONFIG_ASI
     if (device.isEmpty())
     {
         m_cardInfo->setValue("");
@@ -2066,7 +2066,7 @@ void VBoxConfigurationGroup::FillDeviceList(void)
 // -----------------------
 // Ceton Configuration
 // -----------------------
-#ifdef USING_CETON
+#if CONFIG_CETON
 CetonSetting::CetonSetting(QString label, const QString& helptext)
 {
     setLabel(std::move(label));
@@ -2329,7 +2329,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
     m_size->setValue(cs);
 }
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
                                                        CardType &a_cardtype) :
     m_parent(a_parent),
@@ -2382,7 +2382,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     m_info->setValue(ci);
     m_info->setHelpText(ci);
 }
-#endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
+#endif // !defined( _WIN32 )
 
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
@@ -2462,7 +2462,7 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
 
 void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     QString    card_name = tr("Failed to open");
     QString    card_info = card_name;
     V4L2util   v4l2(device_name);
@@ -2511,7 +2511,7 @@ void V4L2encGroup::probeCard([[maybe_unused]] const QString &device_name)
         m_device->addTargetedChild(m_driverName,
                                    new ChannelTimeout(m_parent, 15s, 2s));
     }
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 }
 
 CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
@@ -2521,44 +2521,44 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
     auto* cardtype = new CardType(parent);
     parent.addChild(cardtype);
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     cardtype->addTargetedChild("DVB",
                                new DVBConfigurationGroup(parent, *cardtype));
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     cardtype->addTargetedChild("HDPVR",
                                new HDPVRConfigurationGroup(parent, *cardtype));
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     cardtype->addTargetedChild("HDHOMERUN",
                                new HDHomeRunConfigurationGroup(parent, *cardtype));
-#endif // USING_HDHOMERUN
+#endif // CONFIG_HDHOMERUN
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     cardtype->addTargetedChild("VBOX",
                                new VBoxConfigurationGroup(parent, *cardtype));
-#endif // USING_VBOX
+#endif // CONFIG_VBOX
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     cardtype->addTargetedChild("SATIP",
                                new SatIPConfigurationGroup(parent, *cardtype));
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     FirewireConfigurationGroup(parent, *cardtype);
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 
-#ifdef USING_CETON
+#if CONFIG_CETON
     CetonSetting::CetonConfigurationGroup(parent, *cardtype);
-#endif // USING_CETON
+#endif // CONFIG_CETON
 
-#ifdef USING_IPTV
+#if CONFIG_IPTV
     IPTVConfigurationGroup(parent, *cardtype);
-#endif // USING_IPTV
+#endif // CONFIG_IPTV
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     cardtype->addTargetedChild("V4L2ENC", new V4L2encGroup(parent, *cardtype));
     cardtype->addTargetedChild("V4L",
                                new V4LConfigurationGroup(parent, *cardtype, "V4L"));
@@ -2568,19 +2568,19 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new V4LConfigurationGroup(parent, *cardtype, "GO7007"));
     cardtype->addTargetedChild("MPEG",
                                new MPEGConfigurationGroup(parent, *cardtype));
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
-#ifdef USING_ASI
+#if CONFIG_ASI
     cardtype->addTargetedChild("ASI",
                                new ASIConfigurationGroup(parent, *cardtype));
-#endif // USING_ASI
+#endif // CONFIG_ASI
 
     // for testing without any actual tuner hardware:
     cardtype->addTargetedChild("IMPORT",
                                new ImportConfigurationGroup(parent, *cardtype));
     cardtype->addTargetedChild("DEMO",
                                new DemoConfigurationGroup(parent, *cardtype));
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     cardtype->addTargetedChild("EXTERNAL",
                                new ExternalConfigurationGroup(parent,
                                                               *cardtype));
@@ -2719,48 +2719,48 @@ CardType::CardType(const CaptureCard &parent) :
 
 void CardType::fillSelections(MythUIComboBoxSetting* setting)
 {
-#ifdef USING_DVB
+#if CONFIG_DVB
     setting->addSelection(
         QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     setting->addSelection(
         QObject::tr("V4L2 encoder"), "V4L2ENC");
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     setting->addSelection(
         QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
-#endif // USING_HDHOMERUN
+#endif // CONFIG_HDHOMERUN
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     setting->addSelection(
         QObject::tr("Sat>IP networked tuner"), "SATIP");
-#endif // USING_SATIP
+#endif // CONFIG_SATIP
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     setting->addSelection(
         QObject::tr("V@Box TV Gateway networked tuner"), "VBOX");
-#endif // USING_VBOX
+#endif // CONFIG_VBOX
 
-#ifdef USING_FIREWIRE
+#if CONFIG_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
-#endif // USING_FIREWIRE
+#endif // CONFIG_FIREWIRE
 
-#ifdef USING_CETON
+#if CONFIG_CETON
     setting->addSelection(
         QObject::tr("Ceton Cablecard tuner"), "CETON");
-#endif // USING_CETON
+#endif // CONFIG_CETON
 
-#ifdef USING_IPTV
+#if CONFIG_IPTV
     setting->addSelection(QObject::tr("IPTV recorder"), "FREEBOX");
-#endif // USING_IPTV
+#endif // CONFIG_IPTV
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     setting->addSelection(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
     setting->addSelection(
@@ -2770,15 +2770,15 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
         "GO7007");
     setting->addSelection(
         QObject::tr("Analog capture card"), "V4L");
-#endif // USING_V4L2
+#endif // CONFIG_V4L2
 
-#ifdef USING_ASI
+#if CONFIG_ASI
     setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
 #endif
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     setting->addSelection(QObject::tr("External (black box) recorder"),
                           "EXTERNAL");
 #endif
@@ -3375,7 +3375,7 @@ void CardInput::channelScanner(void)
     uint crdid = m_id->getValue().toUInt();
     QString in = m_inputName->getValue();
 
-#ifdef USING_BACKEND
+#if CONFIG_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
     Save(); // save info for scanner.
@@ -3734,7 +3734,7 @@ void CardInputEditor::Load(void)
     GroupSetting::Load();
 }
 
-#ifdef USING_DVB
+#if CONFIG_DVB
 static QString remove_chaff(const QString &name)
 {
     // Trim off some of the chaff.
@@ -3775,7 +3775,7 @@ static QString remove_chaff(const QString &name)
 
     return short_name;
 }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
 void DVBConfigurationGroup::reloadDiseqcTree(const QString &videodevice)
 {
@@ -3810,7 +3810,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         return;
     }
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     QString frontend_name = CardUtil::ProbeDVBFrontendName(videodevice);
     QString subtype = CardUtil::ProbeDVBType(videodevice);
 
@@ -4053,7 +4053,7 @@ void DVBConfigurationGroup::Save(void)
 // -----------------------
 // SAT>IP configuration
 // -----------------------
-#ifdef USING_SATIP
+#if CONFIG_SATIP
 
 class DiSEqCPosition : public MythUISpinBoxSetting
 {
@@ -4254,4 +4254,4 @@ SatIPDeviceAttribute::SatIPDeviceAttribute(const QString& label, const QString& 
     setLabel(label);
     setHelpText(helptext);
 };
-#endif // USING_SATIP
+#endif // CONFIG_SATIP

@@ -50,7 +50,6 @@ macx {
     LIBS += -framework IOKit
 
     using_videotoolbox {
-        DEFINES += USING_VTB
         LIBS += -framework CoreVideo
         LIBS += -framework VideoToolbox
         LIBS += -framework IOSurface
@@ -73,9 +72,6 @@ macx {
 
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
 cygwin:DEFINES += _WIN32
-
-# Enable Valgrind, i.e. disable some timeouts
-using_valgrind:DEFINES += USING_VALGRIND
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -347,7 +343,6 @@ HEADERS += HLS/httplivestreambuffer.h
 SOURCES += HLS/httplivestreambuffer.cpp
 HEADERS += HLS/m3u.h
 SOURCES += HLS/m3u.cpp
-using_libcrypto:DEFINES += USING_LIBCRYPTO
 using_libcrypto:LIBS    += -lcrypto
 
 using_frontend {
@@ -426,10 +421,7 @@ using_frontend {
     SOURCES += decoders/mythcodeccontext.cpp
     SOURCES += decoders/mythdecoderthread.cpp
 
-    using_libass {
-        DEFINES += USING_LIBASS
-        LIBS    += -lass
-    }
+    using_libass: LIBS += -lass
 
     # On screen display (video output overlay)
     HEADERS += osd.h
@@ -488,26 +480,17 @@ using_frontend {
         HEADERS += decoders/mythmmalcontext.h
         SOURCES += decoders/mythmmalcontext.cpp
         LIBS    += -L/opt/vc/lib -lmmal -lvcsm
-        DEFINES += USING_MMAL
         # Raspbian
         QMAKE_CXXFLAGS += -isystem /opt/vc/include
     }
 
-    using_v4l2prime {
-        DEFINES += USING_V4L2PRIME
-    }
-
     using_vdpau:using_x11 {
-        DEFINES += USING_VDPAU
         HEADERS += decoders/mythvdpaucontext.h   decoders/mythvdpauhelper.h
         SOURCES += decoders/mythvdpaucontext.cpp decoders/mythvdpauhelper.cpp
         LIBS += -lvdpau
     }
 
     using_drm:using_qtprivateheaders {
-        DEFINES += USING_DRM
-        DEFINES += USING_DRM_VIDEO
-        DEFINES += USING_QTPRIVATEHEADERS
         QT += gui-private
         QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
         HEADERS += drm/mythvideodrm.h
@@ -519,21 +502,18 @@ using_frontend {
     }
 
     using_vaapi {
-        DEFINES += USING_VAAPI
         HEADERS += decoders/mythvaapicontext.h
         SOURCES += decoders/mythvaapicontext.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lva-drm
     }
 
     using_nvdec {
-        DEFINES += USING_NVDEC
         HEADERS += decoders/mythnvdeccontext.h
         SOURCES += decoders/mythnvdeccontext.cpp
         INCLUDEPATH += ../../external/nv-codec-headers/include
     }
 
     using_mediacodec {
-        DEFINES += USING_MEDIACODEC
         HEADERS += decoders/mythmediacodeccontext.h
         SOURCES += decoders/mythmediacodeccontext.cpp
     }
@@ -542,7 +522,6 @@ using_frontend {
     SOURCES += decoders/mythdrmprimecontext.cpp
 
     using_vulkan {
-        DEFINES += USING_VULKAN
         HEADERS += vulkan/mythvideovulkan.h
         HEADERS += vulkan/mythvideooutputvulkan.h
         HEADERS += vulkan/mythvideotexturevulkan.h
@@ -550,7 +529,6 @@ using_frontend {
         SOURCES += vulkan/mythvideovulkan.cpp
         SOURCES += vulkan/mythvideooutputvulkan.cpp
         SOURCES += vulkan/mythvideotexturevulkan.cpp
-        using_libglslang: DEFINES += USING_GLSLANG
     }
 
     using_vulkan|using_opengl {
@@ -573,7 +551,6 @@ using_frontend {
     }
 
     using_opengl {
-        DEFINES += USING_OPENGL
         HEADERS += opengl/mythopenglvideo.h
         HEADERS += opengl/mythvideooutopengl.h
         HEADERS += opengl/mythopenglvideoshaders.h
@@ -617,7 +594,6 @@ using_frontend {
         }
 
         using_egl {
-            DEFINES += USING_EGL
             HEADERS += opengl/mythegldefs.h
             HEADERS += opengl/mythegldmabuf.h
             HEADERS += opengl/mythdrmprimeinterop.h
@@ -678,7 +654,6 @@ using_frontend {
             SOURCES += AirPlay/mythairplayserver.cpp
             HEADERS += AirPlay/mythraopdevice.h   AirPlay/mythraopconnection.h
             SOURCES += AirPlay/mythraopdevice.cpp AirPlay/mythraopconnection.cpp
-            DEFINES += USING_AIRPLAY
         }
     }
 
@@ -697,21 +672,17 @@ using_frontend {
         # MHEG/MHI stuff
         HEADERS += mheg/interactivetv.h     mheg/mhi.h
         SOURCES += mheg/interactivetv.cpp   mheg/mhi.cpp
-        DEFINES += USING_MHEG
     }
 
     using_v4l2 {
         HEADERS += decoders/mythv4l2m2mcontext.h
         SOURCES += decoders/mythv4l2m2mcontext.cpp
     }
-
-    DEFINES += USING_FRONTEND
 }
 
 if(using_backend|using_frontend):using_v4l2 {
     HEADERS += v4l2util.h
     SOURCES += v4l2util.cpp
-    DEFINES += USING_V4L2
 }
 
 using_backend {
@@ -769,7 +740,7 @@ using_backend {
     SOURCES += channelscan/scanmonitor.cpp
     SOURCES += channelscan/scanwizardconfig.cpp
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     HEADERS += channelscan/externrecscanner.h
     SOURCES += channelscan/externrecscanner.cpp
 #endif
@@ -806,12 +777,10 @@ using_backend {
     using_alsa {
         HEADERS += recorders/audioinputalsa.h
         SOURCES += recorders/audioinputalsa.cpp
-        DEFINES += USING_ALSA
     }
     using_oss {
         HEADERS += recorders/audioinputoss.h
         SOURCES += recorders/audioinputoss.cpp
-        DEFINES += USING_OSS
     }
 
     # Support for Video4Linux devices
@@ -856,7 +825,6 @@ using_backend {
             HEADERS += recorders/darwinavcinfo.h
             SOURCES += recorders/darwinfirewiredevice.cpp
             SOURCES += recorders/darwinavcinfo.cpp
-            DEFINES += USING_OSX_FIREWIRE
         }
 
         !macx {
@@ -864,10 +832,7 @@ using_backend {
             HEADERS += recorders/linuxavcinfo.h
             SOURCES += recorders/linuxfirewiredevice.cpp
             SOURCES += recorders/linuxavcinfo.cpp
-            DEFINES += USING_LINUX_FIREWIRE
         }
-
-        DEFINES += USING_FIREWIRE
     }
 
     # Support for RTP/UDP streams
@@ -917,8 +882,6 @@ using_backend {
     SOURCES += recorders/HLS/HLSStream.cpp
     SOURCES += recorders/HLS/HLSStreamWorker.cpp
 
-    DEFINES += USING_IPTV
-
 
     # Support for HDHomeRun box
     using_hdhomerun {
@@ -941,7 +904,6 @@ using_backend {
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
 
-        DEFINES += USING_HDHOMERUN
         DEFINES += HDHOMERUN_HEADERFILE=\\\"$${HDHOMERUN_PREFIX}hdhomerun.h\\\"
         DEFINES += HDHOMERUN_VERSION=$${HDHOMERUN_VERSION}
     }
@@ -963,8 +925,6 @@ using_backend {
         SOURCES += recorders/satiprtsp.cpp
         SOURCES += recorders/satiprecorder.cpp
         SOURCES += recorders/satiprtcppacket.cpp
-
-        DEFINES += USING_SATIP
     }
 
     # Support for VBox
@@ -974,8 +934,6 @@ using_backend {
 
         SOURCES += recorders/vboxutils.cpp
         SOURCES += channelscan/vboxchannelfetcher.cpp
-
-        DEFINES += USING_VBOX
     }
 
     # Support for Ceton
@@ -993,8 +951,6 @@ using_backend {
 
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
-
-        DEFINES += USING_CETON
     }
 
     # External recorder
@@ -1035,8 +991,6 @@ using_backend {
         # Misc
         HEADERS += recorders/dvbdev/dvbci.h
         SOURCES += recorders/dvbdev/dvbci.cpp
-
-        DEFINES += USING_DVB
     }
 
     using_asi {
@@ -1054,25 +1008,18 @@ using_backend {
 
         HEADERS *= recorders/streamhandler.h
         SOURCES *= recorders/streamhandler.cpp
-
-        DEFINES += USING_ASI
     }
-
-    DEFINES += USING_BACKEND
 }
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-mingw:DEFINES += USING_MINGW
-
 mingw || win32-msvc* {
 
     #HEADERS += videoout_d3d.h
     #SOURCES += videoout_d3d.cpp
 
-    using_dxva2: DEFINES += USING_DXVA2
     using_dxva2: HEADERS += dxva2decoder.h
     using_dxva2: SOURCES += dxva2decoder.cpp
 

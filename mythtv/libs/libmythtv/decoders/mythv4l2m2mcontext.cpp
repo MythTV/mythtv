@@ -5,6 +5,7 @@
 #include <QDir>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/opengl/mythrenderopengl.h"
@@ -14,12 +15,12 @@
 #include "mythplayerui.h"
 #include "v4l2util.h"
 
-#ifdef USING_EGL
+#if CONFIG_EGL
 #include "opengl/mythdrmprimeinterop.h"
 #endif
 #include "decoders/mythv4l2m2mcontext.h"
 
-#ifdef USING_MMAL
+#if CONFIG_MMAL
 #include "decoders/mythmmalcontext.h"
 #endif
 
@@ -94,7 +95,7 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
         request = true;
     }
 
-#ifdef USING_MMAL
+#if CONFIG_MMAL
     // If MMAL is available, assume this is a Raspberry Pi and check the supported
     // video sizes
     if (!MythMMALContext::CheckCodecSize((*Context)->width, (*Context)->height, mythprofile))

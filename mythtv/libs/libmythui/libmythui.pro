@@ -142,7 +142,6 @@ INSTALLS += inc
 #
 
 using_x11 {
-    DEFINES += USING_X11
     HEADERS += platforms/mythxdisplay.h
     HEADERS += platforms/mythdisplayx11.h
     HEADERS += platforms/mythscreensaverx11.h
@@ -155,7 +154,6 @@ using_x11 {
 }
 
 using_drm {
-    DEFINES += USING_DRM
     HEADERS += platforms/mythdisplaydrm.h
     HEADERS += platforms/mythscreensaverdrm.h
     HEADERS += platforms/mythdrmdevice.h
@@ -190,10 +188,8 @@ using_drm {
 
 using_qtprivateheaders {
     QT += gui-private
-    DEFINES += USING_QTPRIVATEHEADERS
 
     using_waylandextras {
-        DEFINES += USING_WAYLANDEXTRAS
         HEADERS += platforms/mythscreensaverwayland.h
         HEADERS += platforms/mythwaylandextras.h
         HEADERS += platforms/waylandprotocols/idle_inhibit_unstable_v1.h
@@ -206,7 +202,6 @@ using_qtprivateheaders {
 
 # Use MMAL as a proxy for Raspberry Pi support
 using_mmal {
-    DEFINES += USING_MMAL
     HEADERS += platforms/mythdisplayrpi.h
     SOURCES += platforms/mythdisplayrpi.cpp
     LIBS    += -L/opt/vc/lib -lvchostif -lvchiq_arm
@@ -215,7 +210,6 @@ using_mmal {
 
 using_qtdbus {
     QT      += dbus
-    DEFINES += USING_DBUS
     HEADERS += platforms/mythscreensaverdbus.h
     SOURCES += platforms/mythscreensaverdbus.cpp
     HEADERS += platforms/mythdisplaymutter.h
@@ -260,7 +254,6 @@ macx {
         HEADERS -= mediamonitor-unix.h
         HEADERS += mediamonitor-darwin.h
         SOURCES += mediamonitor-darwin.cpp
-        DEFINES += USING_DARWIN_DA
         LIBS += -framework DiskArbitration
     }
 }
@@ -273,25 +266,21 @@ android {
 }
 
 using_joystick_menu {
-    DEFINES += USE_JOYSTICK_MENU
     HEADERS += devices/jsmenu.h devices/jsmenuevent.h
     SOURCES += devices/jsmenu.cpp devices/jsmenuevent.cpp
 }
 
 using_lirc {
-    DEFINES += USE_LIRC
     HEADERS += devices/lirc.h   devices/lircevent.h   devices/lirc_client.h
     SOURCES += devices/lirc.cpp devices/lircevent.cpp devices/lirc_client.cpp
 }
 
 using_libcec {
-    DEFINES += USING_LIBCEC
     HEADERS += devices/mythcecadapter.h
     SOURCES += devices/mythcecadapter.cpp
 }
 
 cygwin:DEFINES += _WIN32
-mingw :DEFINES += USING_MINGW
 
 mingw | win32-msvc*{
 #   HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
@@ -300,11 +289,9 @@ mingw | win32-msvc*{
     SOURCES += platforms/mythdisplaywindows.cpp
     DEFINES += NODRAWTEXT
     LIBS    += -luser32  -lgdi32
-    using_dxva2: DEFINES += USING_DXVA2
 }
 
 using_vulkan {
-    DEFINES += USING_VULKAN
     HEADERS += vulkan/mythpainterwindowvulkan.h
     HEADERS += vulkan/mythpaintervulkan.h
     HEADERS += vulkan/mythrendervulkan.h
@@ -326,11 +313,9 @@ using_vulkan {
     SOURCES += vulkan/mythcombobuffervulkan.cpp
     SOURCES += vulkan/mythdebugvulkan.cpp
     SOURCES += vulkan/mythvertexbuffervulkan.cpp
-    using_libglslang: DEFINES += USING_GLSLANG
 }
 
 using_opengl {
-    DEFINES += USING_OPENGL
     HEADERS += opengl/mythpainterwindowopengl.h
     HEADERS += opengl/mythpainteropengl.h
     HEADERS += opengl/mythrenderopengl.h
@@ -346,7 +331,6 @@ using_opengl {
 
     using_egl {
         LIBS    += -lEGL
-        DEFINES += USING_EGL
     }
 
     mingw|win32-msvc*:LIBS += -lopengl32

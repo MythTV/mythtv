@@ -1709,6 +1709,8 @@ CONFIG_EXTRA="
 "
 
 MYTHTV_CONFIG_LIST='
+    airplay
+    appleremote
     backend
     bdjava
     bindings_perl
@@ -1716,11 +1718,15 @@ MYTHTV_CONFIG_LIST='
     bindings_php
     cygwin
     darwin
+    darwin_da
     disable_mmx_for_debugging
     dvb
     firewire
+    firewire_linux
+    firewire_osx
     frontend
     hdhomerun
+    iptv
     satip
     vbox
     ceton
@@ -1730,6 +1736,7 @@ MYTHTV_CONFIG_LIST='
     libcrypto
     gnutls
     libdns_sd
+    libglslang
     libmpeg2external
     libxml2
     lirc
@@ -1737,6 +1744,7 @@ MYTHTV_CONFIG_LIST='
     mmal
     opengl
     egl
+    qtprivateheaders
     qtwebengine
     qtscript
     qtdbus
@@ -1745,6 +1753,9 @@ MYTHTV_CONFIG_LIST='
     v4l2
     v4l2prime
     valgrind
+    videotoolbox
+    vulkan
+    waylandextras
     x11
     system_libexiv2
     system_libbluray
@@ -1752,6 +1763,7 @@ MYTHTV_CONFIG_LIST='
     systemd_notify
     systemd_journal
     drm
+    drm_video
     force_loglong
 '
 
@@ -4367,6 +4379,8 @@ case $target_os in
         ;;
 esac
 
+enabled backend && enable iptv
+
 # test if creating links works
 link_dest=$(mktemp -u $TMPDIR/dest_XXXXXXXX)
 link_name=$(mktemp -u $TMPDIR/name_XXXXXXXX)
@@ -5814,6 +5828,7 @@ check_ecxx $qt_private_headers_incpath <<EOF || disable qtprivateheaders
 int x;
 EOF
 fi
+enabled drm && enabled qtprivateheaders && enable drm_video
 
 # Check for Wayland support
 enabled waylandextras && enabled qtprivateheaders || disable waylandextras
@@ -5882,6 +5897,9 @@ if enabled firewire; then
     fwlibs=""
     check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire
 
+    if enabled firewire && test $target_os = linux; then
+        firewire_linux="yes"
+    fi
     if test $target_os = darwin; then
         if [ -n "$firewiresdk_path" ] ; then
             mac_avc="$firewiresdk_path"
@@ -5895,6 +5913,7 @@ if enabled firewire; then
         fi
         if test -d "$mac_avc" ; then
             firewire="yes"
+            firewire_osx="yes"
         else
             echo Firewire being disabled. FireWire SDK missing
         fi
@@ -5934,6 +5953,7 @@ fi
 
 if test $target_os != darwin ; then
     enabled libdns_sd && check_lib dns_sd dns_sd.h DNSServiceRegister -ldns_sd || disable libdns_sd
+    enabled libdns_sd && enabled libcrypto && enable airplay
 fi
 
 if enabled libxml2 ; then

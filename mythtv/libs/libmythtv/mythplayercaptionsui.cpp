@@ -526,7 +526,7 @@ void MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action, bool &Han
 
 InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
 {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     bool update = false;
     {
         QMutexLocker lock1(&m_osdLock);
@@ -554,7 +554,7 @@ InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
 void MythPlayerCaptionsUI::ITVHandleAction([[maybe_unused]] const QString &Action,
                                            [[maybe_unused]] bool& Handled)
 {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     if (!GetInteractiveTV())
     {
         Handled = false;
@@ -571,7 +571,7 @@ void MythPlayerCaptionsUI::ITVRestart([[maybe_unused]] uint Chanid,
                                       [[maybe_unused]] uint Cardid,
                                       [[maybe_unused]] bool IsLiveTV)
 {
-#ifdef USING_MHEG
+#if CONFIG_MHEG
     if (!GetInteractiveTV())
         return;
 

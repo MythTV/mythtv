@@ -1,13 +1,14 @@
 // libmythbase
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 // libmythui
 #include "mythvrr.h"
-#ifdef USING_DRM
+#if CONFIG_DRM
 #include "platforms/mythdisplaydrm.h"
 #include "platforms/drm/mythdrmvrr.h"
 #endif
-#ifdef USING_X11
+#if CONFIG_X11
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
@@ -60,17 +61,17 @@ MythVRRPtr MythVRR::Create(MythDisplay* MDisplay)
 
     MythVRRPtr result = nullptr;
 
-#if defined (USING_X11) || defined (USING_DRM)
+#if CONFIG_X11 || CONFIG_DRM
     const auto range = MDisplay->GetEDID().GetVRRRange();
 
-#ifdef USING_X11
+#if CONFIG_X11
     // GSync is only available with X11 over Display Port
     if (auto nvcontrol = MythNVControl::Create(); nvcontrol)
         if (auto gsync = MythGSync::CreateGSync(nvcontrol, range); gsync)
             result = gsync;
 #endif
 
-#ifdef USING_DRM
+#if CONFIG_DRM
     // FreeSync is only currently *controllable* via DRM with an AMD GPU/APU and Display Port
     if (!result)
     {

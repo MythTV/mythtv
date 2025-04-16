@@ -1,7 +1,9 @@
 #ifndef LINUX_AVC_INFO_H
 #define LINUX_AVC_INFO_H
 
-#ifdef USING_LINUX_FIREWIRE
+#include "libmythbase/mythconfig.h"
+
+#if CONFIG_FIREWIRE_LINUX
 
 // Linux headers
 #include <libraw1394/raw1394.h>
@@ -45,6 +47,6 @@ class LinuxAVCInfo : public AVCInfo
 };
 using avcinfo_list_t = QMap<uint64_t,LinuxAVCInfo*>;
 
-#endif // USING_LINUX_FIREWIRE
+#endif // CONFIG_FIREWIRE_LINUX
 
 #endif // LINUX_AVC_INFO_H

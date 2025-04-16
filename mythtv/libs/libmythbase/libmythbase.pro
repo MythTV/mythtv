@@ -162,7 +162,6 @@ SOURCES += http/serialisers/mythcborserialiser.cpp
 
 using_qtdbus {
     QT      += dbus
-    DEFINES += USING_DBUS
     HEADERS += platforms/mythpowerdbus.h
     SOURCES += platforms/mythpowerdbus.cpp
 }
@@ -255,13 +254,10 @@ use_hidesyms {
 }
 
 using_libdns_sd {
-    DEFINES += USING_LIBDNS_SD
     HEADERS += bonjourregister.h
     SOURCES += bonjourregister.cpp
     !macx: LIBS += -ldns_sd
 }
-
-using_x11:DEFINES += USING_X11
 
 mingw:LIBS += -lws2_32 -lz
 

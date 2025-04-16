@@ -102,17 +102,14 @@ inc2.files += audio/audioconvert.h
 inc2.files += audio/volumebase.h audio/eldutils.h
 
 using_oss {
-    DEFINES += USING_OSS
     SOURCES += audio/audiooutputoss.cpp
     HEADERS += audio/audiooutputoss.h
 }
 
 using_pulse {
-    DEFINES += USING_PULSE
     HEADERS += audio/audiopulsehandler.h
     SOURCES += audio/audiopulsehandler.cpp
     using_pulseoutput {
-        DEFINES += USING_PULSEOUTPUT
         HEADERS += audio/audiooutputpulse.h
         SOURCES += audio/audiooutputpulse.cpp
     }
@@ -129,8 +126,6 @@ cygwin {
     QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
     DEFINES += _WIN32
 }
-
-mingw:DEFINES += USING_MINGW
 
 mingw | win32-msvc* {
     
@@ -155,13 +150,11 @@ macx {
 INSTALLS += inc inc2
 
 using_alsa {
-    DEFINES += USING_ALSA
     HEADERS += audio/audiooutputalsa.h
     SOURCES += audio/audiooutputalsa.cpp
 }
 
 using_jack {
-    DEFINES += USING_JACK
     HEADERS += audio/audiooutputjack.h
     SOURCES += audio/audiooutputjack.cpp
 }

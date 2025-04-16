@@ -75,6 +75,7 @@ find_package_handle_standard_args(
 
 # Traditional variables
 if(HDHomerun_FOUND)
+  set(CONFIG_HDHOMERUN TRUE)
   set(HDHomerun_LIBRARIES ${HDHomerun_LIBRARY})
   set(HDHomerun_INCLUDE_DIRS ${HDHomerun_INCLUDE_DIR})
 endif()
@@ -88,7 +89,7 @@ if(HDHomerun_FOUND AND NOT TARGET HDHomerun::HDHomerun)
       IMPORTED_LOCATION "${HDHomerun_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES "${HDHomerun_INCLUDE_DIR}"
       INTERFACE_COMPILE_DEFINITIONS
-      "USING_HDHOMERUN;HDHOMERUN_VERSION=${HDHOMERUN_VERSION};HDHOMERUN_HEADERFILE=\"${HDHomerun_H_FILE}\""
+      "HDHOMERUN_VERSION=${HDHOMERUN_VERSION};HDHOMERUN_HEADERFILE=\"${HDHomerun_H_FILE}\""
   )
 endif()
 

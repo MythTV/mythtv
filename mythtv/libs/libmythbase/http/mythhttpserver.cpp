@@ -12,7 +12,7 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "libmythbase/configuration.h"
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
 #include "bonjourregister.h"
 #endif
 #include "http/mythhttpsocket.h"
@@ -190,7 +190,7 @@ void MythHTTPServer::Init()
 void MythHTTPServer::Started([[maybe_unused]] bool Tcp,
                              [[maybe_unused]] bool Ssl)
 {
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
     // Advertise our webserver
     delete m_bonjour;
     delete m_bonjourSSL;
@@ -229,7 +229,7 @@ void MythHTTPServer::Stopped()
     m_config.m_hosts.clear();
     m_config.m_allowedOrigins.clear();
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
     // Stop advertising
     delete m_bonjour;
     delete m_bonjourSSL;

@@ -1,9 +1,10 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythui/mythrender_base.h"
 #include "mythinteropgpu.h"
 
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
 #include "opengl/mythopenglinterop.h"
 #endif
 
@@ -13,7 +14,7 @@ MythInteropGPU::InteropMap MythInteropGPU::GetTypes(MythRender* Render)
     if (!gCoreContext->IsUIThread())
         return result;
 
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
     MythOpenGLInterop::GetTypes(Render, result);
 #endif
     return result;

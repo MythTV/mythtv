@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <algorithm>
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
 #include <poll.h>
 #include <sys/ioctl.h>
 #endif
@@ -80,7 +80,7 @@ bool ExternIO::Ready([[maybe_unused]] int fd,
                      [[maybe_unused]] std::chrono::milliseconds timeout,
                      [[maybe_unused]] const QString & what)
 {
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     std::array<struct pollfd,2> m_poll {};
 
     m_poll[0].fd = fd;
@@ -106,7 +106,7 @@ bool ExternIO::Ready([[maybe_unused]] int fd,
             m_error = "poll overflow";
         return false;
     }
-#endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
+#endif // !defined( _WIN32 )
     return false;
 }
 
@@ -250,9 +250,7 @@ bool ExternIO::KillIfRunning([[maybe_unused]] const QString & cmd)
 {
 #if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
     return false;
-#elif defined USING_MINGW
-    return false;
-#elif defined( _MSC_VER )
+#elif defined( _WIN32 )
     return false;
 #else
     QString grp = QString("pgrep -x -f -- \"%1\" 2>&1 > /dev/null").arg(cmd);
@@ -300,7 +298,7 @@ bool ExternIO::KillIfRunning([[maybe_unused]] const QString & cmd)
 
 void ExternIO::Fork(void)
 {
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if (Error())
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternIO in bad state: '%1'")
@@ -451,7 +449,7 @@ void ExternIO::Fork(void)
                   << strerror(errno) << std::endl;
     }
 
-#endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
+#endif // !defined( _WIN32 )
 
     /* Failed to exec */
     _exit(GENERIC_EXIT_DAEMONIZING_ERROR); // this exit is ok

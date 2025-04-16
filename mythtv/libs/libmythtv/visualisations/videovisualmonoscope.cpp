@@ -1,13 +1,14 @@
 #include <algorithm>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythchrono.h"
 #include "videovisualmonoscope.h"
 
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
 #include "visualisations/opengl/mythvisualmonoscopeopengl.h"
 #endif
-#ifdef USING_VULKAN
+#if CONFIG_VULKAN
 #include "visualisations/vulkan/mythvisualmonoscopevulkan.h"
 #endif
 
@@ -93,12 +94,12 @@ static class VideoVisualMonoScopeFactory : public VideoVisualFactory
 
     VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
     {
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
         auto * render1 = dynamic_cast<MythRenderOpenGL*>(Render);
         if (render1)
             return new MythVisualMonoScopeOpenGL(Audio, Render, true);
 #endif
-#ifdef USING_VULKAN
+#if CONFIG_VULKAN
         auto * render2 = dynamic_cast<MythRenderVulkan*>(Render);
         if (render2)
             return new MythVisualMonoScopeVulkan(Audio, Render, true);
@@ -125,12 +126,12 @@ static class VideoVisualSimpleScopeFactory : public VideoVisualFactory
 
     VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
     {
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
         auto * render1 = dynamic_cast<MythRenderOpenGL*>(Render);
         if (render1)
             return new MythVisualMonoScopeOpenGL(Audio, Render, false);
 #endif
-#ifdef USING_VULKAN
+#if CONFIG_VULKAN
         auto * render2 = dynamic_cast<MythRenderVulkan*>(Render);
         if (render2)
             return new MythVisualMonoScopeVulkan(Audio, Render, false);

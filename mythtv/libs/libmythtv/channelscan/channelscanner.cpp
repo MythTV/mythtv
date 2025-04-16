@@ -29,6 +29,7 @@
 
 #include <algorithm>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "cardutil.h"
@@ -38,7 +39,7 @@
 #include "recorders/ExternalChannel.h"
 #include "recorders/analogsignalmonitor.h"
 #include "recorders/asichannel.h"
-#ifdef USING_DVB        // for bug in gcc 8.3
+#if CONFIG_DVB          // for bug in gcc 8.3
 #include "recorders/dvbchannel.h"
 #endif
 #include "recorders/dvbsignalmonitor.h"
@@ -83,7 +84,7 @@ void ChannelScanner::Teardown(void)
         m_iptvScanner = nullptr;
     }
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     if (m_vboxScanner)
     {
         m_vboxScanner->Stop();
@@ -92,7 +93,7 @@ void ChannelScanner::Teardown(void)
     }
 #endif
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if (m_externRecScanner)
     {
         m_externRecScanner->Stop();
@@ -381,7 +382,7 @@ bool ChannelScanner::ImportVBox([[maybe_unused]] uint cardid,
                                 [[maybe_unused]] ServiceRequirements serviceType)
 {
     m_sourceid = sourceid;
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     if (!m_scanMonitor)
         m_scanMonitor = new ScanMonitor(this);
 
@@ -403,7 +404,7 @@ bool ChannelScanner::ImportExternRecorder([[maybe_unused]] uint cardid,
                                           uint sourceid)
 {
     m_sourceid = sourceid;
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if (!m_scanMonitor)
         m_scanMonitor = new ScanMonitor(this);
 
@@ -429,7 +430,7 @@ bool ChannelScanner::ImportHDHR([[maybe_unused]] uint cardid,
                                 [[maybe_unused]] ServiceRequirements serviceType)
 {
     m_sourceid = sourceid;
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     if (!m_scanMonitor)
         m_scanMonitor = new ScanMonitor(this);
 
@@ -472,7 +473,7 @@ void ChannelScanner::PreScanCommon(
 
     QString card_type = CardUtil::GetRawInputType(cardid);
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     if ("DVB" == card_type)
     {
         QString sub_type = CardUtil::ProbeDVBType(device).toUpper();
@@ -501,48 +502,48 @@ void ChannelScanner::PreScanCommon(
     }
 #endif
 
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     if (("V4L" == card_type) || ("MPEG" == card_type))
         m_channel = new V4LChannel(nullptr, device);
 #endif
 
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     if ("HDHOMERUN" == card_type)
     {
         m_channel = new HDHRChannel(nullptr, device);
         monitor_snr = true;
     }
-#endif // USING_HDHOMERUN
+#endif // CONFIG_HDHOMERUN
 
-#ifdef USING_SATIP
+#if CONFIG_SATIP
     if ("SATIP" == card_type)
     {
         m_channel = new SatIPChannel(nullptr, device);
     }
 #endif
 
-#ifdef USING_ASI
+#if CONFIG_ASI
     if ("ASI" == card_type)
     {
         m_channel = new ASIChannel(nullptr, device);
     }
-#endif // USING_ASI
+#endif // CONFIG_ASI
 
-#ifdef USING_IPTV
+#if CONFIG_IPTV
     if ("FREEBOX" == card_type)
     {
         m_channel = new IPTVChannel(nullptr, device);
     }
 #endif
 
-#ifdef USING_VBOX
+#if CONFIG_VBOX
     if ("VBOX" == card_type)
     {
         m_channel = new IPTVChannel(nullptr, device);
     }
 #endif
 
-#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#if !defined( _WIN32 )
     if ("EXTERNAL" == card_type)
     {
         m_channel = new ExternalChannel(nullptr, device);
@@ -616,14 +617,14 @@ void ChannelScanner::PreScanCommon(
 
     bool using_rotor = false;
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     DVBSignalMonitor *dvbm = m_sigmonScanner->GetDVBSignalMonitor();
     if (dvbm && mon)
     {
         monitor_snr = true;
         using_rotor = mon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos);
     }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     bool monitor_lock = mon != nullptr;
     bool monitor_strength = mon != nullptr;

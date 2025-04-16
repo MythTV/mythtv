@@ -40,7 +40,7 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
         (*Options.safe_renderers)["ffmpeg"].append("direct3d");
     Options.priorities->insert("direct3d", 70);
 
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     if (Options.decoders->contains("dxva2"))
         (*Options.safe_renderers)["dxva2"].append("direct3d");
 #endif
@@ -226,7 +226,7 @@ bool VideoOutputD3D::CreateBuffers(void)
 
 bool VideoOutputD3D::InitBuffers(void)
 {
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     if ((codec_is_dxva2(m_videoCodecID)) && m_decoder)
     {
         QMutexLocker locker(&m_lock);
@@ -445,7 +445,7 @@ MythCodecID VideoOutputD3D::GetSupportedCodec(
     AVCodecContext **Context, const AVCodec ** Codec,
     const QString &decoder, uint stream_type)
 {
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
     bool use_cpu = !codec_is_dxva2_hw(test_cid);
     if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
@@ -456,7 +456,7 @@ MythCodecID VideoOutputD3D::GetSupportedCodec(
 
 bool VideoOutputD3D::CreateDecoder(void)
 {
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     QMutexLocker locker(&m_lock);
     if (m_decoder)
         DeleteDecoder();
@@ -471,7 +471,7 @@ bool VideoOutputD3D::CreateDecoder(void)
 
 void VideoOutputD3D::DeleteDecoder(void)
 {
-#ifdef USING_DXVA2
+#if CONFIG_DXVA2
     QMutexLocker locker(&m_lock);
     delete m_decoder;
     m_decoder = nullptr;

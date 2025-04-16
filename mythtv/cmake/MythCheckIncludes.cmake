@@ -78,6 +78,7 @@ if(ENABLE_DXVA2 AND HAVE_D3D9_H)
       }
     "
     HAVE_DXVA2)
+  set(CONFIG_DXVA2 ${HAVE_DXVA2})
 endif()
 
 check_c_source_compiles(

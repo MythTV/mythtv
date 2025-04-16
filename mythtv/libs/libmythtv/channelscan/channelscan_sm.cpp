@@ -42,6 +42,7 @@
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 // MythTV includes - General
@@ -206,7 +207,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *scan_monitor,
                             SignalMonitor::kDTVSigMon_WaitForNIT |
                             SignalMonitor::kDTVSigMon_WaitForSDT);
 
-#ifdef USING_DVB
+#if CONFIG_DVB
         auto *dvbchannel = dynamic_cast<DVBChannel*>(m_channel);
         if (dvbchannel && dvbchannel->GetRotor())
             dtvSigMon->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
@@ -694,10 +695,10 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             m_scanMonitor->ScanAppendTextToLog(msg_tr);
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
 
-#ifdef USING_DVB
+#if CONFIG_DVB
             if (GetDVBChannel())
                 GetDVBChannel()->SetPMT(pmt);
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
             DTVSignalMonitor *monitor = GetDTVSignalMonitor();
             if (nullptr != monitor)
@@ -1934,7 +1935,7 @@ DTVSignalMonitor* ChannelScanSM::GetDTVSignalMonitor(void)
 
 DVBSignalMonitor* ChannelScanSM::GetDVBSignalMonitor(void)
 {
-#ifdef USING_DVB
+#if CONFIG_DVB
     return dynamic_cast<DVBSignalMonitor*>(m_signalMonitor);
 #else
     return nullptr;
@@ -1953,7 +1954,7 @@ const DTVChannel *ChannelScanSM::GetDTVChannel(void) const
 
 HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
 {
-#ifdef USING_HDHOMERUN
+#if CONFIG_HDHOMERUN
     return dynamic_cast<HDHRChannel*>(m_channel);
 #else
     return nullptr;
@@ -1962,7 +1963,7 @@ HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
 
 DVBChannel *ChannelScanSM::GetDVBChannel(void)
 {
-#ifdef USING_DVB
+#if CONFIG_DVB
     return dynamic_cast<DVBChannel*>(m_channel);
 #else
     return nullptr;
@@ -1971,7 +1972,7 @@ DVBChannel *ChannelScanSM::GetDVBChannel(void)
 
 const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 {
-#ifdef USING_DVB
+#if CONFIG_DVB
     return dynamic_cast<const DVBChannel*>(m_channel);
 #else
     return nullptr;
@@ -1980,7 +1981,7 @@ const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 
 V4LChannel *ChannelScanSM::GetV4LChannel(void)
 {
-#ifdef USING_V4L2
+#if CONFIG_V4L2
     return dynamic_cast<V4LChannel*>(m_channel);
 #else
     return nullptr;
@@ -2037,7 +2038,7 @@ bool ChannelScanSM::HasTimedOut(void)
     if (!m_waitingForTables)
         return true;
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     // If the rotor is still moving, reset the timer and keep waiting
     DVBSignalMonitor *sigmon = GetDVBSignalMonitor();
     if (sigmon)
@@ -2056,7 +2057,7 @@ bool ChannelScanSM::HasTimedOut(void)
             }
         }
     }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     // have the tables have timed out?
     if (m_timer.hasExpired(m_channelTimeout.count()))
@@ -2186,7 +2187,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
 {
     const TransportScanItem &item = *transport;
 
-#ifdef USING_DVB
+#if CONFIG_DVB
     DVBSignalMonitor *monitor = GetDVBSignalMonitor();
     if (monitor)
     {
@@ -2194,7 +2195,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
         monitor->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
         monitor->SetRotorTarget(1.0F);
     }
-#endif // USING_DVB
+#endif // CONFIG_DVB
 
     DTVChannel *channel = GetDTVChannel();
     if (!channel)

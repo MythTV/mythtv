@@ -2,10 +2,11 @@
 #include <QPen>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "videovisualcircles.h"
 
-#ifdef USING_VULKAN
+#if CONFIG_VULKAN
 #include "visualisations/vulkan/mythvisualcirclesvulkan.h"
 #endif
 
@@ -67,7 +68,7 @@ static class VideoVisualCirclesFactory : public VideoVisualFactory
 
     VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
     {
-#ifdef USING_VULKAN
+#if CONFIG_VULKAN
         auto * vulkan = dynamic_cast<MythRenderVulkan*>(Render);
         if (vulkan)
             return new MythVisualCirclesVulkan(Audio, vulkan);

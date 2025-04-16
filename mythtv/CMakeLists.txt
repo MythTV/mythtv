@@ -139,9 +139,9 @@ include(StaticAnalysis)
 include(CompilerCaching)
 include(SetCompilerOptions)
 include(MythCheckIncludes)
-include(CheckExternalLibraries)
 include(MythFindFFmpeg)
 include(MythFindQt)
+include(CheckExternalLibraries)
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX})
 
 # Debian policy requires that shared libraries be installed without executable
@@ -224,6 +224,29 @@ else()
   set(base $ORIGIN)
 endif()
 set(CMAKE_INSTALL_RPATH ${base} ${base}/../lib ${base}/../lib64)
+
+#
+# Check the ENABLE_FRONTEND/BACKEND options.
+#
+if(ENABLE_FRONTEND)
+  set(CONFIG_FRONTEND TRUE)
+else()
+  message(
+    WARNING
+      "Disabling the frontend is only intended to aid porting.  THIS WILL BREAK THINGS.  You are on your own now."
+  )
+endif()
+
+if(ENABLE_BACKEND)
+  set(CONFIG_BACKEND TRUE)
+  # The CONFIG_IPTV flag should always be set when building a backend.
+  set(CONFIG_IPTV TRUE)
+else()
+  message(
+    WARNING
+      "Disabling the backend is only intended to aid porting.  THIS WILL BREAK THINGS.  You are on your own now."
+  )
+endif()
 
 #
 # Need to build libmythmpeg2 on all platforms.  The original "configure" build

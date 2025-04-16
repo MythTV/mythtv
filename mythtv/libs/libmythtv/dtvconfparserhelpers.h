@@ -32,9 +32,11 @@
 #ifndef DTVCONFPARSERHELPERS_H
 #define DTVCONFPARSERHELPERS_H
 
+#include "libmythbase/mythconfig.h"
+
 #include <vector>
 #include <QString>
-#ifdef USING_DVB
+#if CONFIG_DVB
 #include <linux/dvb/frontend.h>
 #endif
 
@@ -174,7 +176,7 @@ class DTVInversion : public DTVParamHelper
         kInversionOn,
         kInversionAuto,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kInversionOff  == (Types)INVERSION_OFF ) &&
                   (kInversionOn   == (Types)INVERSION_ON  ) &&
                   (kInversionAuto == (Types)INVERSION_AUTO),
@@ -185,7 +187,7 @@ class DTVInversion : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVInversion& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVInversion& operator=(const fe_spectral_inversion_t type)
         { m_value = type; return *this; }
 #endif
@@ -233,7 +235,7 @@ class DTVBandwidth : public DTVParamHelper
         kBandwidth10MHz,
         kBandwidth1712kHz,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kBandwidth8MHz    == (Types)BANDWIDTH_8_MHZ    ) &&
                   (kBandwidth7MHz    == (Types)BANDWIDTH_7_MHZ    ) &&
                   (kBandwidth6MHz    == (Types)BANDWIDTH_6_MHZ    ) &&
@@ -248,7 +250,7 @@ class DTVBandwidth : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVBandwidth& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVBandwidth& operator=(const fe_bandwidth_t bwidth)
         { m_value = bwidth; return *this; }
 #endif
@@ -301,7 +303,7 @@ class DTVCodeRate : public DTVParamHelper
         kFEC_3_5,
         kFEC_9_10,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kFECNone  == (Types)FEC_NONE) &&
                   (kFEC_1_2  == (Types)FEC_1_2 ) &&
                   (kFEC_2_3  == (Types)FEC_2_3 ) &&
@@ -321,7 +323,7 @@ class DTVCodeRate : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVCodeRate& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVCodeRate& operator=(const fe_code_rate_t rate)
         { m_value = rate; return *this; }
 #endif
@@ -371,7 +373,7 @@ class DTVModulation : public DTVParamHelper
         kModulationInvalid = 0x100, /* for removed modulations */
         kModulationAnalog  = 0x200, /* for analog channel scanner */
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kModulationQPSK    == (Types)QPSK    ) &&
                   (kModulationQAM16   == (Types)QAM_16  ) &&
                   (kModulationQAM32   == (Types)QAM_32  ) &&
@@ -392,7 +394,7 @@ class DTVModulation : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVModulation& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVModulation& operator=(const fe_modulation_t modulation)
         { m_value = modulation; return *this; }
 #endif
@@ -440,7 +442,7 @@ class DTVTransmitMode : public DTVParamHelper
         kTransmissionMode16K,
         kTransmissionMode32K,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kTransmissionMode2K   == (Types)TRANSMISSION_MODE_2K  ) &&
                   (kTransmissionMode8K   == (Types)TRANSMISSION_MODE_8K  ) &&
                   (kTransmissionModeAuto == (Types)TRANSMISSION_MODE_AUTO) &&
@@ -455,7 +457,7 @@ class DTVTransmitMode : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVTransmitMode& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVTransmitMode& operator=(const fe_transmit_mode_t mode)
         { m_value = mode; return *this; }
 #endif
@@ -504,7 +506,7 @@ class DTVGuardInterval : public DTVParamHelper
         kGuardInterval_19_128,
         kGuardInterval_19_256,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kGuardInterval_1_32   == (Types)GUARD_INTERVAL_1_32  ) &&
                   (kGuardInterval_1_16   == (Types)GUARD_INTERVAL_1_16  ) &&
                   (kGuardInterval_1_8    == (Types)GUARD_INTERVAL_1_8   ) &&
@@ -520,7 +522,7 @@ class DTVGuardInterval : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVGuardInterval& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVGuardInterval& operator=(const fe_guard_interval_t interval)
         { m_value = interval; return *this; }
 #endif
@@ -560,7 +562,7 @@ class DTVHierarchy : public DTVParamHelper
         kHierarchy4,
         kHierarchyAuto,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kHierarchyNone == (Types)HIERARCHY_NONE) &&
                   (kHierarchy1    == (Types)HIERARCHY_1   ) &&
                   (kHierarchy2    == (Types)HIERARCHY_2   ) &&
@@ -573,7 +575,7 @@ class DTVHierarchy : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVHierarchy& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVHierarchy& operator=(const fe_hierarchy_t hierarchy)
         { m_value = hierarchy; return *this; }
 #endif
@@ -673,7 +675,7 @@ class DTVModulationSystem : public DTVParamHelper
         kModulationSystem_TURBO,
         kModulationSystem_DVBC_ANNEX_C
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kModulationSystem_UNDEFINED    == (Types)SYS_UNDEFINED   ) &&
                   (kModulationSystem_DVBC_ANNEX_A == (Types)SYS_DVBC_ANNEX_A) &&
                   (kModulationSystem_DVBC_ANNEX_B == (Types)SYS_DVBC_ANNEX_B) &&
@@ -738,7 +740,7 @@ class DTVRollOff : public DTVParamHelper
         kRollOff_25,
         kRollOff_Auto,
     };
-#ifdef USING_DVB
+#if CONFIG_DVB
     static_assert((kRollOff_35 == (Types)ROLLOFF_35)
                   && (kRollOff_Auto == (Types)ROLLOFF_AUTO),
                   "Rolloff types don't match DVB includes.");
@@ -748,7 +750,7 @@ class DTVRollOff : public DTVParamHelper
         : DTVParamHelper(_default) { }
     DTVRollOff& operator=(const Types _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
+#if CONFIG_DVB
     DTVRollOff& operator=(fe_rolloff_t type)
         { m_value = type; return *this; }
 #endif

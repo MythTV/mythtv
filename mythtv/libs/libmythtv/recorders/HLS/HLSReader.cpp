@@ -7,6 +7,7 @@
 #include <QStringConverter>
 #endif
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "HLSReader.h"
@@ -450,7 +451,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         int64_t first_sequence   = -1;                  // Sequence number of first segment to be recorded
         int64_t sequence_num     = 0;                   // Sequence number of next segment to be read
         int     skipped = 0;                            // Segments skipped, sequence number at or below current
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
         QString aes_keypath;                            // AES key path
         QString aes_iv;                                 // AES IV value
 #endif
@@ -495,7 +496,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-KEY")))
             {
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
                 QString path;
                 QString iv;
                 if (!M3U::ParseKey(hls->Version(), line, m_aesMsg,  LOC,
@@ -504,10 +505,10 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
 
                 aes_keypath = path;
                 aes_iv = iv;
-#else   // USING_LIBCRYPTO
+#else   // CONFIG_LIBCRYPTO
                 LOG(VB_RECORD, LOG_ERR, LOC + "#EXT-X-KEY needs libcrypto");
                 return false;
-#endif  // USING_LIBCRYPTO
+#endif  // CONFIG_LIBCRYPTO
             }
             else if (line.startsWith(QLatin1String("#EXT-X-MAP")))
             {
@@ -570,7 +571,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                     HLSRecSegment segment =
                         HLSRecSegment(m_inputId, sequence_num, segment_duration, title,
                                       RelativeURI(hls->SegmentBaseUrl(), line));
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
                     if (!aes_iv.isEmpty() || !aes_keypath.isEmpty())
                     {
                         LOG(VB_RECORD, LOG_DEBUG, LOC + " aes_iv:" + aes_iv + " aes_keypath:" + aes_keypath);
@@ -584,7 +585,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
 
                     aes_keypath.clear();
                     aes_iv.clear();
-#endif  // USING_LIBCRYPTO
+#endif  // CONFIG_LIBCRYPTO
                     new_segments.push_back(segment);
                 }
                 else
@@ -1059,7 +1060,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Downloaded segment %1 %2").arg(segment.Sequence()).arg(segment.Url().toString()));
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
     /* If the segment is encrypted, decode it */
     if (segment.HasKeyPath())
     {
@@ -1073,7 +1074,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         LOG(VB_RECORD, LOG_DEBUG, LOC +
             QString("Decoded segment sequence %1").arg(segment.Sequence()));
     }
-#endif  // USING_LIBCRYPTO
+#endif  // CONFIG_LIBCRYPTO
     int64_t segment_len = buffer.size();
 
     m_bufLock.lock();

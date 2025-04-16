@@ -157,3 +157,6 @@ endforeach()
 if (DARWIN_GENERATE_DISTRIBUTION AND NOT DARWIN_FRONTEND_BUNDLE)
   message(FATAL_ERROR "Error: Generating a Drag And Drop Installer requires at least one App Bundle to be made.")
 endif()
+
+# Miscellaneous defines
+set(CONFIG_APPLEREMOTE TRUE)

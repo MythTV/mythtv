@@ -1,11 +1,13 @@
 #ifndef HLS_SEGMENT_H
 #define HLS_SEGMENT_H
 
+#include "libmythbase/mythconfig.h"
+
 #include <cstdint>
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
 #include <openssl/aes.h>
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO
 
 #include <QString>
 #include <QUrl>
@@ -35,7 +37,7 @@ class HLSRecSegment
 
     QString toString(void) const;
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
   public:
     bool SetAESIV(QString line);
     bool IVLoaded(void) const { return m_ivLoaded; }
@@ -44,7 +46,7 @@ class HLSRecSegment
     bool HasKeyPath(void) const { return !m_keypath.isEmpty(); }
     QString KeyPath(void) const { return m_keypath; }
     void SetKeyPath(const QString& x) { m_keypath = x; }
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO
 
   protected:
     int         m_inputId  {0};                 // input card ID
@@ -54,12 +56,12 @@ class HLSRecSegment
     QString     m_title;                        // human-readable informative title of the media segment
     QUrl        m_url;
 
-#ifdef USING_LIBCRYPTO
+#if CONFIG_LIBCRYPTO
   private:
     QString     m_keypath;                      // URL path of the encrypted key
     bool        m_ivLoaded  {false};
     QByteArray  m_aesIV     {AES_BLOCK_SIZE,0}; // IV used when decypher the block
-#endif // USING_LIBCRYPTO
+#endif // CONFIG_LIBCRYPTO
 
 };
 

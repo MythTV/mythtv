@@ -242,9 +242,6 @@ endif()
 if(WIN32)
   set_source_files_properties(cardutil.cpp PROPERTIES COMPILE_DEFINITIONS
                                                       O_NONBLOCK=0)
-  if(HAVE_DXVA2)
-    target_compile_definitions(mythtv PRIVATE USING_DXVA2)
-  endif()
 endif(WIN32)
 
 target_compile_definitions(mythtv PRIVATE MTV_API)
@@ -317,9 +314,12 @@ if(ENABLE_FRONTEND OR ENABLE_BACKEND)
     target_link_libraries(mythtv PRIVATE PkgConfig::V4L2)
     target_sources(mythtv PRIVATE v4l2util.cpp v4l2util.h)
   endif()
-
-  include(cmake/Frontend.cmake)
-  include(cmake/Backend.cmake)
+  if(ENABLE_FRONTEND)
+    include(cmake/Frontend.cmake)
+  endif()
+  if(ENABLE_BACKEND)
+    include(cmake/Backend.cmake)
+  endif()
 endif()
 
 #

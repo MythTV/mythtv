@@ -1084,7 +1084,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 {
     QStringList profiles = GetProfiles(HostName);
 
-#ifdef USING_OPENGL
+#if CONFIG_OPENGL
     if (!profiles.contains("OpenGL High Quality"))
     {
         (void)tr("OpenGL High Quality",
@@ -1114,7 +1114,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#ifdef USING_VAAPI
+#if CONFIG_VAAPI
     if (!profiles.contains("VAAPI Normal"))
     {
         (void)tr("VAAPI Normal", "Sample: VAAPI average quality");
@@ -1128,7 +1128,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#ifdef USING_VDPAU
+#if CONFIG_VDPAU
     if (!profiles.contains("VDPAU Normal"))
     {
         (void)tr("VDPAU Normal", "Sample: VDPAU medium quality");
@@ -1142,7 +1142,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#ifdef USING_MEDIACODEC
+#if CONFIG_MEDIACODEC
     if (!profiles.contains("MediaCodec Normal"))
     {
         (void)tr("MediaCodec Normal",
@@ -1158,7 +1158,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#if defined(USING_NVDEC) && defined(USING_OPENGL)
+#if CONFIG_NVDEC && CONFIG_OPENGL
     if (!profiles.contains("NVDEC Normal"))
     {
         (void)tr("NVDEC Normal", "Sample: NVDEC Normal");
@@ -1172,7 +1172,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#if defined(USING_VTB) && defined(USING_OPENGL)
+#if CONFIG_VIDEOTOOLBOX && CONFIG_OPENGL
     if (!profiles.contains("VideoToolBox Normal")) {
         (void)tr("VideoToolBox Normal", "Sample: VideoToolBox Normal");
         uint groupid = CreateProfileGroup("VideoToolBox Normal", HostName);
@@ -1185,7 +1185,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#if defined(USING_MMAL) && defined(USING_OPENGL)
+#if CONFIG_MMAL && CONFIG_OPENGL
     if (!profiles.contains("MMAL"))
     {
         (void)tr("MMAL", "Sample: MMAL");
@@ -1199,7 +1199,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#if defined(USING_V4L2)
+#if CONFIG_V4L2
     if (!profiles.contains("V4L2 Codecs"))
     {
         (void)tr("V4L2 Codecs", "Sample: V4L2");

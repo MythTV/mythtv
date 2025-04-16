@@ -12,6 +12,7 @@
 # include(CMakePrintHelpers)
 # ~~~
 include(BuildConfigString)
+include(SetIfTargetExists)
 
 #
 # This module needs pkg-config functionality
@@ -74,6 +75,7 @@ if(ENABLE_XVID AND LibX2vid_VERSION)
 endif()
 
 # vpx: fedora:libvpx-devel debian:libvpx-dev
+# Not used by MythTV code, only by FFmpeg.
 if(ENABLE_VPX)
   pkg_check_modules(LIBVPX "vpx" IMPORTED_TARGET)
   add_build_config(PkgConfig::LIBVPX "vpx")
@@ -86,7 +88,6 @@ if(ENABLE_MP3LAME AND (NOT MINGW AND NOT MSVC))
     message(STATUS "LAME VERSION IS UNKNOWN.")
   endif()
   add_build_config(Lame::Lame "libmp3lame")
-  target_compile_definitions(Lame::Lame INTERFACE USING_LIBMP3LAME)
   add_library(lame ALIAS Lame::Lame)
   set(CONFIG_LIBMP3LAME TRUE)
 endif()
@@ -97,9 +98,7 @@ if(ENABLE_VDPAU)
   # vdp_device_create_x11
   pkg_check_modules(VDPAU "vdpau>=0.2" IMPORTED_TARGET)
   add_build_config(PkgConfig::VDPAU "vdpau")
-  if(TARGET PkgConfig::VDPAU)
-    target_compile_definitions(PkgConfig::VDPAU INTERFACE USING_VDPAU)
-  endif()
+  set(CONFIG_VDPAU ${VDPAU_FOUND})
 endif()
 
 # vaapi: fedora:libva-devel debian:libva-dev
@@ -115,7 +114,7 @@ if(ENABLE_VAAPI)
   pkg_check_modules(VAAPI "libva>=1.2" IMPORTED_TARGET)
   add_build_config(PkgConfig::VDPAU "vaapi")
   if(TARGET PkgConfig::VAAPI)
-    target_compile_definitions(PkgConfig::VAAPI INTERFACE USING_VAAPI)
+    set(CONFIG_VAAPI TRUE)
     pkg_check_modules(VA-DRM "libva-drm" REQUIRED IMPORTED_TARGET)
     pkg_check_modules(VA-GLX "libva-glx" REQUIRED IMPORTED_TARGET)
     pkg_check_modules(VA-X11 "libva-x11" REQUIRED IMPORTED_TARGET)
@@ -129,9 +128,7 @@ endif()
 if(ENABLE_LIBASS)
   pkg_check_modules(LIBASS "libass>=0.9.10" IMPORTED_TARGET)
   add_build_config(PkgConfig::LIBASS "libass")
-  if(TARGET PkgConfig::LIBASS)
-    target_compile_definitions(PkgConfig::LIBASS INTERFACE USING_LIBASS)
-  endif()
+  set(CONFIG_LIBASS ${LIBASS_FOUND})
 endif()
 
 # udev: fedora:libdav1d-devel debian:libdav1d-dev
@@ -152,21 +149,6 @@ if(ENABLE_GNUTLS)
   add_build_config(PkgConfig::GNUTLS "gnutls")
 endif()
 
-# ~~~
-# udev: fedora:libiec61883-devel debian:libiec61883-dev
-# udev: fedora:libavc1394-devel debian:libavc1394-dev
-# ~~~
-if(ENABLE_FIREWIRE)
-  pkg_check_modules(LIBIEC61883 "libiec61883" IMPORTED_TARGET)
-  add_build_config(PkgConfig::LIBIEC61883 "iec61883")
-  pkg_check_modules(LIBAVC1394 "libavc1394" IMPORTED_TARGET)
-  add_build_config(PkgConfig::LIBAVC1394 "avc1394")
-  if(TARGET PkgConfig::LIBIEC61883 AND TARGET PkgConfig::LIBAVC1394)
-    target_link_libraries(PkgConfig::LIBIEC61883
-                          INTERFACE PkgConfig::LIBAVC1394)
-  endif()
-endif()
-
 # sdl2: fedora:SDL2-devel debian:libsdl2-dev
 if(ENABLE_SDL2)
   pkg_check_modules(SDL2 "sdl2" IMPORTED_TARGET)
@@ -183,10 +165,8 @@ if(ENABLE_DRM)
   pkg_check_modules(DRM "libdrm>=2.4.104" IMPORTED_TARGET)
   add_build_config(PkgConfig::DRM "drm")
   if(DRM_FOUND)
-    target_compile_definitions(PkgConfig::DRM INTERFACE USING_DRM)
-    if(TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
-      target_compile_definitions(PkgConfig::DRM INTERFACE USING_DRM_VIDEO)
-    endif()
+    set(CONFIG_DRM TRUE)
+    set_if_target_exists(CONFIG_DRM_VIDEO Qt${QT_VERSION_MAJOR}::GuiPrivate)
     set(HAVE_STRUCT_HDR_METADATA_INFOFRAME TRUE)
   endif()
 endif()
@@ -200,4 +180,10 @@ add_build_config(PkgConfig::SYSTEM_LIBBLURAY "system_libbluray")
 if(SYSTEM_LIBBLURAY_FOUND)
   target_compile_definitions(PkgConfig::SYSTEM_LIBBLURAY
                              INTERFACE HAVE_LIBBLURAY)
+endif()
+
+# valgrind - needs valgrind-tools-devel
+if(ENABLE_VALGRIND)
+  pkg_check_modules(VALGRIND "valgrind" IMPORTED_TARGET)
+  set(CONFIG_VALGRIND ${VALGRIND_FOUND})
 endif()

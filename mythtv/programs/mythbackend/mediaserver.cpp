@@ -18,7 +18,7 @@
 #endif
 
 // MythTV
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
 #include "libmythbase/bonjourregister.h"
 #endif
 #include "libmythbase/mythcorecontext.h"
@@ -219,7 +219,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
         Start();
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
         // advertise using Bonjour
         if (gCoreContext)
         {
@@ -253,7 +253,7 @@ MediaServer::~MediaServer()
     delete m_webSocketServer;
     delete m_pHttpServer;
 
-#ifdef USING_LIBDNS_SD
+#if CONFIG_LIBDNS_SD
     delete m_bonjour;
 #endif
 }

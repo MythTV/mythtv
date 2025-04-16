@@ -16,6 +16,7 @@
 #include <QString>
 
 // MythTV includes
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythtv/mpeg/mpegtables.h" // for GPS_LEAP_SECONDS
@@ -111,19 +112,19 @@ class EITHelper
     void SetSourceID(uint sourceid);
     void RescheduleRecordings(void);
 
-#ifdef USING_BACKEND
+#if CONFIG_BACKEND
     void AddEIT(uint atsc_major, uint atsc_minor,
                 const EventInformationTable *eit);
     void AddETT(uint atsc_major, uint atsc_minor,
                 const ExtendedTextTable     *ett);
     void AddEIT(const DVBEventInformationTable *eit);
     void AddEIT(const PremiereContentInformationTable *cit);
-#else // if !USING_BACKEND
+#else // !CONFIG_BACKEND
     void AddEIT(uint /*atsc_major*/, uint /*atsc_minor*/, const EventInformationTable */*eit*/) {}
     void AddETT(uint /*atsc_major*/, uint /*atsc_minor*/, const ExtendedTextTable */*ett*/) {}
     void AddEIT(const DVBEventInformationTable */*eit*/) {}
     void AddEIT(const PremiereContentInformationTable */*cit*/) {}
-#endif // !USING_BACKEND
+#endif // !CONFIG_BACKEND
 
     // EIT cache handling
     static void PruneEITCache(uint timestamp);

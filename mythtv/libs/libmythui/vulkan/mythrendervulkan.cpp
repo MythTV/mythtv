@@ -102,7 +102,7 @@ MythRenderVulkan* MythRenderVulkan::GetVulkanRender(void)
 MythRenderVulkan::MythRenderVulkan()
   : MythRender(kRenderVulkan)
 {
-#ifdef USING_GLSLANG
+#if CONFIG_LIBGLSLANG
     // take a top level 'reference' to libglslang to ensure it is persistent
     if (!MythShaderVulkan::InitGLSLang())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise GLSLang");
@@ -112,7 +112,7 @@ MythRenderVulkan::MythRenderVulkan()
 
 MythRenderVulkan::~MythRenderVulkan()
 {
-#ifdef USING_GLSLANG
+#if CONFIG_LIBGLSLANG
     MythShaderVulkan::InitGLSLang(true);
 #endif
     LOG(VB_GENERAL, LOG_INFO, LOC + "Destroyed");
