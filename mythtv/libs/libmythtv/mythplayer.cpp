@@ -793,6 +793,12 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             LOG(VB_GENERAL, LOG_NOTICE, LOC + "Resetting audio buffer");
             m_audio.Reset();
         }
+
+        if (m_renderOneFrame)
+        {
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Forcibly clearing render one");
+            m_renderOneFrame = false;
+        }
     }
 
     std::chrono::milliseconds msecs { 500ms };
