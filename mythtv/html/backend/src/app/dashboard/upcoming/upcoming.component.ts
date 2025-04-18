@@ -39,7 +39,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   refreshing = false;
   loaded = false;
   inter: ScheduleLink = { summaryComponent: this };
-  lazyLoadEvent!: TableLazyLoadEvent;
+  lazyLoadEvent?: TableLazyLoadEvent;
 
   displayStop = false;
   errorCount = 0;
@@ -50,6 +50,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   selectedRule: RuleListEntry | null = null;
   selectedStatus = '';
   selectedRecGroup: string | null = null;
+  loadLast = 0;
 
   constructor(private dvrService: DvrService, private messageService: MessageService,
     private translate: TranslateService, public dataService: DataService,
@@ -78,7 +79,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   refresh() {
     this.refreshing = true;
     this.loadRecRules();
-    this.loadLazy(this.lazyLoadEvent);
+    this.loadLazy(this.lazyLoadEvent!, true);
   }
 
   loadRecRules() {
@@ -109,7 +110,9 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     });
   }
 
-  loadLazy(event: TableLazyLoadEvent) {
+  loadLazy(event: TableLazyLoadEvent, doRefresh?: boolean) {
+    if (event.sortField != this.lazyLoadEvent?.sortField)
+      this.loadLast = 0;
     this.lazyLoadEvent = event;
     let request: GetUpcomingRequest = {
       StartIndex: 0,
@@ -120,9 +123,20 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       request.StartIndex = event.first;
       if (event.last)
         request.Count = event.last - event.first;
-      else if (event.rows)
+      else if (event.rows) {
         request.Count = event.rows;
+        event.last = event.first + event.rows;
+      }
     }
+
+    if (event.last! > this.loadLast)
+      this.loadLast = event.last!;
+
+    if (doRefresh) {
+      request.StartIndex = 0;
+      request.Count = this.loadLast;
+    }
+
     let sortField = '';
     if (Array.isArray(event.sortField))
       sortField = event.sortField[0];
@@ -167,12 +181,14 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       this.programs = [...this.programs]
       this.refreshing = false;
       this.showTable = true;
-      let row = this.rows.get(0);
-      if (row && row.nativeElement.offsetHeight)
-        this.virtualScrollItemSize = row.nativeElement.offsetHeight;
-      if (this.table) {
-        this.table.totalRecords = this.totalRecords;
-        this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+      if (!this.virtualScrollItemSize) {
+        let row = this.rows.get(0);
+        if (row && row.nativeElement.offsetHeight)
+          this.virtualScrollItemSize = row.nativeElement.offsetHeight;
+        if (this.table) {
+          this.table.totalRecords = this.totalRecords;
+          this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+        }
       }
     });
 
@@ -186,6 +202,8 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.showTable = false;
     this.programs.length = 0;
     this.refreshing = true;
+    this.lazyLoadEvent = undefined;
+    this.loadLast = 0;
     this.loadLazy(({ first: 0, rows: 1 }));
   }
 

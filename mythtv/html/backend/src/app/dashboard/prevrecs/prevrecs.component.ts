@@ -27,7 +27,7 @@ export class PrevrecsComponent implements OnInit {
   programs: ScheduleOrProgram[] = [];
   selection: ScheduleOrProgram[] = [];
   actionList: ScheduleOrProgram[] = [];
-  lazyLoadEvent!: TableLazyLoadEvent;
+  lazyLoadEvent?: TableLazyLoadEvent;
 
   showTable = false;
   refreshing = false;
@@ -39,6 +39,7 @@ export class PrevrecsComponent implements OnInit {
   minSet = false;
   maxDate: Date = new Date();
   dateValue?: Date | null;
+  loadLast = 0;
 
 
   msg = {
@@ -85,19 +86,24 @@ export class PrevrecsComponent implements OnInit {
   reload() {
     this.showTable = false;
     this.programs.length = 0;
+    this.totalRecords = 0;
     this.refreshing = true;
+    this.lazyLoadEvent = undefined;
+    this.loadLast = 0;
     this.loadLazy(({ first: 0, rows: 1 }));
   }
 
   refresh() {
+    this.selection = [];
+    this.menu.hide();
     this.refreshing = true;
-    // this.showTable = false;
-    this.loadLazy(this.lazyLoadEvent);
+    this.loadLazy(this.lazyLoadEvent!, true);
   }
 
-  loadLazy(event: TableLazyLoadEvent) {
+  loadLazy(event: TableLazyLoadEvent, doRefresh?: boolean) {
+    if (event.sortField != this.lazyLoadEvent?.sortField)
+      this.loadLast = 0;
     this.lazyLoadEvent = event;
-
     let request: GetOldRecordedListRequest = {
       StartIndex: 0,
       Count: 1
@@ -106,9 +112,19 @@ export class PrevrecsComponent implements OnInit {
       request.StartIndex = event.first;
       if (event.last)
         request.Count = event.last - event.first;
-      else if (event.rows)
+      else if (event.rows) {
         request.Count = event.rows;
+        event.last = event.first + event.rows;
+      }
     }
+    if (event.last! > this.loadLast)
+      this.loadLast = event.last!;
+
+    if (doRefresh) {
+      request.StartIndex = 0;
+      request.Count = this.loadLast;
+    }
+
     if (this.dateValue) {
       let startTime = this.dateValue;
       // Add 1 second to start time so that programs that
@@ -128,17 +144,16 @@ export class PrevrecsComponent implements OnInit {
       sortField = event.sortField[0];
     else if (event.sortField)
       sortField = event.sortField;
-    // Default sort is starttime
-    if (sortField == 'Title')
-      request.Sort = 'title';
+    request.Sort = sortField;
     if (event.sortOrder && event.sortOrder < 0)
       request.Descending = true;
 
     this.dvrService.GetOldRecordedList(request).subscribe(data => {
       let recordings = data.ProgramList;
-      if (data.ProgramList.TotalAvailable)
+      if (data.ProgramList.TotalAvailable) {
         this.totalRecords = data.ProgramList.TotalAvailable;
-      this.programs.length = this.totalRecords;
+        this.programs.length = this.totalRecords;
+      }
       if (!this.minSet) {
         this.minDate = new Date(recordings.Programs[0].StartTime);
         this.minSet = true;
@@ -153,12 +168,14 @@ export class PrevrecsComponent implements OnInit {
       this.programs = [...this.programs]
       this.refreshing = false;
       this.showTable = true;
-      let row = this.rows.get(0);
-      if (row && row.nativeElement.offsetHeight)
-        this.virtualScrollItemSize = row.nativeElement.offsetHeight;
-      if (this.table) {
-        this.table.totalRecords = this.totalRecords;
-        this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+      if (!this.virtualScrollItemSize) {
+        let row = this.rows.get(0);
+        if (row && row.nativeElement.offsetHeight)
+          this.virtualScrollItemSize = row.nativeElement.offsetHeight;
+        if (this.table) {
+          this.table.totalRecords = this.totalRecords;
+          this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+        }
       }
     });
 

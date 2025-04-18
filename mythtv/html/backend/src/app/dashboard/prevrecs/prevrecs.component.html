@@ -50,7 +50,7 @@
                 [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm  p-datatable-striped"
                 [virtualScroll]="true" [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
                 sortField="StartTime" selectionMode="multiple" [metaKeySelection]="true" [(selection)]="selection"
-                (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()">
+                (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()" (onSort)="refresh()">
 
                 <ng-template pTemplate="header">
                     <tr>
@@ -60,15 +60,19 @@
                         </th>
                         <th style="width: 7%" class="justify-content-end p-1">
                             {{ 'dashboard.upcoming.time' | translate }} </th>
-                        <th style="width: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1"></th>
+                        <th style="width: 7%" class="justify-content-end pl-1 pr-3 pt-1 pb-1"  pSortableColumn="Duration">
+                            {{ 'dashboard.upcoming.length' | translate }}<p-sortIcon field="Duration"></p-sortIcon></th>
                         <th style="width: 15%" class="p-1" pSortableColumn="Title">
                             {{ 'dashboard.recordings.title' | translate }}<p-sortIcon field="Title"></p-sortIcon>
                         </th>
-                        <th style="width: 17%" class="p-1">{{ 'dashboard.recordings.subtitle' | translate }}</th>
-                        <th style="width: 4%" class="p-1">{{ 'dashboard.recordings.seas_ep' | translate }}</th>
-                        <th style="width: 9%" class="p-1">{{ 'dashboard.recordings.channel' | translate }} </th>
-                        <th style="width: 12%" class="p-1">
-                            {{ 'dashboard.upcoming.status' | translate }} </th>
+                        <th style="width: 17%" class="p-1" pSortableColumn="Subtitle">
+                            {{ 'dashboard.recordings.subtitle' | translate }}<p-sortIcon field="Subtitle"></p-sortIcon></th>
+                        <th style="width: 6%" class="p-1" pSortableColumn="season,episode">
+                            {{ 'dashboard.recordings.seas_ep' | translate }}<p-sortIcon field="season,episode"></p-sortIcon></th>
+                        <th style="width: 9%" class="p-1" pSortableColumn="ChanNum">
+                            {{ 'dashboard.recordings.channel' | translate }}<p-sortIcon field="ChanNum"></p-sortIcon></th>
+                        <th style="width: 12%" class="p-1" pSortableColumn="recstatus">
+                            {{ 'dashboard.upcoming.status' | translate }}<p-sortIcon field="recstatus"></p-sortIcon></th>
                         <th style="width: 5%; white-space: nowrap; background: var(--surface-card);" class="p-1">
                             <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                                 [disabled]="true"></button>
