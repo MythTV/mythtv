@@ -331,17 +331,44 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
         sSQL += QString(" AND (%1) ").arg(clause.join(" OR "));
     }
 
-    if (sSort == "starttime")
-        sSQL += "ORDER BY starttime ";    // NOLINT(bugprone-branch-clone)
-    else if (sSort == "title")
-        sSQL += "ORDER BY title ";
-    else
-        sSQL += "ORDER BY starttime ";
-
-    if (bDescending)
-        sSQL += "DESC ";
-    else
-        sSQL += "ASC ";
+    QStringList sortByFields;
+    sortByFields << "starttime" <<  "title" <<  "subtitle" << "season" << "episode" << "category"
+                                  <<  "channum" << "rectype" << "recstatus" << "duration" ;
+    QString sSortBy;
+    QStringList fields = sSort.split(",");
+    // Add starttime as last or only sort.
+        fields << "starttime";
+    sSQL += " ORDER BY ";
+    bool first = true;
+    for (const QString& oneField : std::as_const(fields))
+    {
+        QString field = oneField.simplified().toLower();
+        if (field.isEmpty())
+            continue;
+        if (sortByFields.contains(field))
+        {
+            if (first)
+                first = false;
+            else
+                sSQL += ", ";
+            if (field == "channum")
+            {
+                // this is to sort numerically rather than alphabetically
+                field = "channum*1000-ifnull(regexp_substr(channum,'-.*'),0)";
+            }
+            else if (field == "duration")
+            {
+                field = "timestampdiff(second,starttime,endtime)";
+            }
+            sSQL += field;
+            if (bDescending)
+                sSQL += " DESC ";
+            else
+                sSQL += " ASC ";
+        }
+        else
+            LOG(VB_GENERAL, LOG_WARNING, QString("V2Dvr::GetOldRecordedList() got an unknown sort field '%1' - ignoring").arg(oneField));
+    }
 
     uint nTotalAvailable = (nStartIndex == 0) ? 1 : 0;
     LoadFromOldRecorded( progList, sSQL, bindings,
