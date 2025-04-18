@@ -5987,7 +5987,7 @@ fi
 
 if test $target_os = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework
-    if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
+    if test -d /System/Library/Frameworks/DiskArbitration.framework ; then
         darwin_da="yes"
     fi
 fi

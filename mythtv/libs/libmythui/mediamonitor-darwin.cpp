@@ -12,8 +12,8 @@
 #include "libmythbase/mythhdd.h"
 #include "libmythbase/mythlogging.h"
 
-#include "mediamonitor-darwin.h"
 #include "mediamonitor.h"
+#include "mediamonitor-darwin.h"
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOMedia.h>
