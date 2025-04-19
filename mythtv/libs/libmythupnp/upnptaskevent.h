@@ -13,8 +13,10 @@
 #ifndef UPNPTASKEVENT_H
 #define UPNPTASKEVENT_H
 
-#include "libmythupnp/upnp.h"
-#include "libmythupnp/bufferedsocketdevice.h"
+#include <QByteArray>
+#include <QHostAddress>
+
+#include "libmythupnp/taskqueue.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

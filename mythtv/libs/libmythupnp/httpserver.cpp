@@ -28,6 +28,7 @@
 #include <QSslSocket>
 #include <QSslCipher>
 #include <QSslCertificate>
+#include <QThread>
 #include <QUuid>
 
 // MythTV headers
@@ -38,10 +39,7 @@
 #include "libmythbase/mythversion.h"
 
 #include "upnputil.h"
-#include "upnp.h" // only needed for Config... remove once config is moved.
 #include "htmlserver.h"
-
-#include "serviceHosts/rttiServiceHost.h"
 
 /**
  * \brief Handle an OPTIONS request
@@ -147,15 +145,6 @@ HttpServer::HttpServer() :
 
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions
-
-    // ----------------------------------------------------------------------
-    // Enable Rtti Service for all instances of HttpServer
-    // and register with QtScript Engine.
-    // Rtti service is an alternative to using the xsd uri
-    // it returns xml/json/etc... definitions of types/enums 
-    // ----------------------------------------------------------------------
-
-    RegisterExtension( new RttiServiceHost( m_sSharePath ));
 
     LoadSSLConfig();
 }

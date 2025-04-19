@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "upnpdevice.h"
 
 #include <unistd.h> // for gethostname
 
@@ -23,9 +24,6 @@
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"  // for MYTH_BINARY_VERSION
-
-#include "upnp.h"
-#include "upnpdevice.h"
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 

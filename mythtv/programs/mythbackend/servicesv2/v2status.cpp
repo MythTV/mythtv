@@ -39,6 +39,8 @@
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/tv_rec.h"
+#include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
 #include "libmythupnp/upnp.h"
 
 // MythBackend

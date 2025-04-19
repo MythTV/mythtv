@@ -17,11 +17,14 @@
 
 // Qt headers
 #include <QDomDocument>
+#include <QList>
+#include <QString>
 #include <QUrl>
 #include <QUrlQuery>
 
 // MythTV headers
 #include "libmythbase/compat.h"
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/mythtypes.h"
 #include "libmythbase/referencecounter.h"
 
@@ -234,7 +237,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         QString     m_sURI;           // Service Type URI
         QString     m_sUSN;           // Unique Service Name
         QString     m_sLocation;      // URL to Device Description
-        TaskTime    m_ttExpires;
+        std::chrono::microseconds    m_ttExpires;
         QString     m_sSecurityPin;   // Use for MythXML methods needed pin
 
     public:
@@ -244,7 +247,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         DeviceLocation( QString sURI,
                         QString sUSN,
                         QString sLocation,
-                        TaskTime       ttExpires ) : ReferenceCounter(
+                        std::chrono::microseconds ttExpires ) : ReferenceCounter(
                                                          "DeviceLocation"     ),
                                                      m_sURI       (std::move( sURI      )),
                                                      m_sUSN       (std::move( sUSN      )),
