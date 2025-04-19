@@ -334,7 +334,6 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
     QStringList sortByFields;
     sortByFields << "starttime" <<  "title" <<  "subtitle" << "season" << "episode" << "category"
                                   <<  "channum" << "rectype" << "recstatus" << "duration" ;
-    QString sSortBy;
     QStringList fields = sSort.split(",");
     // Add starttime as last or only sort.
         fields << "starttime";
@@ -367,7 +366,9 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
                 sSQL += " ASC ";
         }
         else
+        {
             LOG(VB_GENERAL, LOG_WARNING, QString("V2Dvr::GetOldRecordedList() got an unknown sort field '%1' - ignoring").arg(oneField));
+        }
     }
 
     uint nTotalAvailable = (nStartIndex == 0) ? 1 : 0;
