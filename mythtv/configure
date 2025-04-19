@@ -5845,16 +5845,19 @@ esac
 # if it is disabled on the command line we will
 # not enable it here.
 if enabled qtwebengine ; then
-    if ! $(pkg-config --exists Qt5WebEngine) && ! $(pkg-config --exists QtWebEngine) ; then
-        check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF || disable qtwebengine
-#include <QtWebEngine/QtWebEngine>
-int main(void){ return 0; }
-EOF
-    fi
+    case $qt_version_str in
+        6*) $(pkg-config --exists Qt6WebEngineQuick) || disable qtwebengine
+            ;;
+        5*) $(pkg-config --exists Qt5WebEngine) || disable qtwebengine
+            ;;
+        *)  warn "Unknown Qt version. Disabling QtWebEngine support."
+            disable qtwebengine
+            ;;
+    esac
 
-    enabled qtwebengine || warn "QtWebEngine headers not found. Plugins may fail."
+    enabled qtwebengine || warn "QtWebEngine headers not found. MythBrowser won't build."
 else
-    warn "QtWebEngine support is disabled on commandline. Plugins may fail."
+    warn "QtWebEngine support is disabled on commandline. MythBrowser won't build."
 fi
 
 # Omit Qt5 modules that aren't in Qt6.
