@@ -238,6 +238,10 @@ add_library(
   HLS/m3u.h)
 if(APPLE)
   target_sources(mythtv PRIVATE util-osx.h util-osx.mm)
+  if(APPLE_VIDEOTOOLBOX_LIBRARY)
+    target_sources(mythtv PRIVATE decoders/mythvtbcontext.cpp
+                                  decoders/mythvtbcontext.h)
+  endif()
 endif()
 if(WIN32)
   set_source_files_properties(cardutil.cpp PROPERTIES COMPILE_DEFINITIONS

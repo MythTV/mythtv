@@ -504,7 +504,21 @@ if(APPLE)
     set(ENABLE_FIREWIRE OFF)
   endif()
 
-  set(CONFIG_DARWIN_DA ${APPLE_DISKARBITRATION_LIBRARY})
+  message(VERBOSE "Frameworks found:")
+  message(VERBOSE "  APPLE_APPLICATIONSERVICES_LIBRARY: ${APPLE_APPLICATIONSERVICES_LIBRARY}")
+  message(VERBOSE "  APPLE_AUDIOTOOLBOX_LIBRARY: ${APPLE_AUDIOTOOLBOX_LIBRARY}")
+  message(VERBOSE "  APPLE_AUDIOUNIT_LIBRARY: ${APPLE_AUDIOUNIT_LIBRARY}")
+  message(VERBOSE "  APPLE_AVCVIDEOSERVICES_LIBRARY: ${APPLE_AVCVIDEOSERVICES_LIBRARY}")
+  message(VERBOSE "  APPLE_COCOA_LIBRARY: ${APPLE_COCOA_LIBRARY}")
+  message(VERBOSE "  APPLE_COREAUDIO_LIBRARY: ${APPLE_COREAUDIO_LIBRARY}")
+  message(VERBOSE "  APPLE_COREFOUNDATION_LIBRARY: ${APPLE_COREFOUNDATION_LIBRARY}")
+  message(VERBOSE "  APPLE_CORESERVICES_LIBRARY: ${APPLE_CORESERVICES_LIBRARY}")
+  message(VERBOSE "  APPLE_COREVIDEO_LIBRARY: ${APPLE_COREVIDEO_LIBRARY}")
+  message(VERBOSE "  APPLE_DISKARBITRATION_LIBRARY: ${APPLE_DISKARBITRATION_LIBRARY}")
+  message(VERBOSE "  APPLE_IOKIT_LIBRARY: ${APPLE_IOKIT_LIBRARY}")
+  message(VERBOSE "  APPLE_IOSURFACE_LIBRARY: ${APPLE_IOSURFACE_LIBRARY}")
+  message(VERBOSE "  APPLE_OPENGL_LIBRARY: ${APPLE_OPENGL_LIBRARY}")
+  message(VERBOSE "  APPLE_VIDEOTOOLBOX_LIBRARY: ${APPLE_VIDEOTOOLBOX_LIBRARY}")
 
   #
   # Check for symbols in darwin include files
@@ -514,7 +528,7 @@ if(APPLE)
   check_symbol_exists(IOMainPort "IOKit/IOKitLib.h" HAVE_IOMAINPORT)
   cmake_pop_check_state()
 
-  # Take our cue on videotolbox from ffmpeg
+  # If ffmpeg disabled videotoolbox then disable it
   find_program(_ffmpeg mythffmpeg)
   find_library(_avcodec mythavdevice)
   cmake_path(GET _avcodec PARENT_PATH _avcodec_path)
@@ -526,14 +540,19 @@ if(APPLE)
   endif()
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${_avcodec_path}
-            ${_ffmpeg} -decoders
+            ${_ffmpeg} -encoders
     OUTPUT_VARIABLE _output
     ERROR_QUIET)
-  message(STATUS "Looking for videotoolbox: ${_output}")
+  message(VERBOSE "ffmpeg -encoders output: ${_output}")
   string(FIND ${_output} videotoolbox VIDEOTOOLBOX_OFFSET)
   if(VIDEOTOOLBOX_OFFSET EQUAL -1)
+    message(STATUS "disabling videotoolbox support (not present in ffmpeg)")
     unset(APPLE_VIDEOTOOLBOX_LIBRARY)
   endif()
+
+  # Set config variable based on library presence
+  set(CONFIG_DARWIN_DA ${APPLE_DISKARBITRATION_LIBRARY})
+  set(CONFIG_VIDEOTOOLBOX ${APPLE_VIDEOTOOLBOX_LIBRARY})
 
   mark_as_advanced(
     APPLE_APPLICATIONSERVICES_LIBRARY

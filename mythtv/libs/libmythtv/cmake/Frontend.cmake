@@ -262,7 +262,7 @@ if(TARGET any_opengl)
     target_sources(mythtv PRIVATE opengl/mythnvdecinterop.cpp
                                   opengl/mythnvdecinterop.h)
   endif()
-  if(TARGET APPLE_VIDEOTOOLBOX_LIBRARY)
+  if(APPLE_VIDEOTOOLBOX_LIBRARY)
     target_sources(mythtv PRIVATE opengl/mythvtbinterop.cpp
                                   opengl/mythvtbinterop.h)
   endif()
