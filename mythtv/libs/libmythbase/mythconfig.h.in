@@ -96,6 +96,7 @@
 #cmakedefine01 HAVE_GETOPT_H
 #cmakedefine01 HAVE_GETTIMEOFDAY
 #cmakedefine01 HAVE_INTRINSICS_NEON
+#cmakedefine01 HAVE_IOMAINPORT
 #cmakedefine01 HAVE_LIBUDEV
 #cmakedefine01 HAVE_MALLOC_H
 #cmakedefine01 HAVE_POSIX_FADVISE

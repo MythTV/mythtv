@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QMetaType>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcdrom.h"
 #include "libmythbase/mythhdd.h"
 #include "libmythbase/mythlogging.h"
@@ -24,6 +25,9 @@
 #include <IOKit/storage/IOStorageProtocolCharacteristics.h>
 #include <DiskArbitration/DiskArbitration.h>
 
+#if !HAVE_IOMAINPORT
+#define IOMainPort IOMasterPort
+#endif
 
 // These aren't external, they are defined in this file.
 // The 'extern "C"' forces them in the C namespace, not the C++
@@ -375,7 +379,7 @@ void MonitorThreadDarwin::run(void)
     CFDictionaryRef match     = kDADiskDescriptionMatchVolumeMountable;
     DASessionRef    daSession = DASessionCreate(kCFAllocatorDefault);
 
-    IOMasterPort(MACH_PORT_NULL, &sMasterPort);
+    IOMainPort(MACH_PORT_NULL, &sMasterPort);
 
     DARegisterDiskAppearedCallback(daSession, match,
                                    diskAppearedCallback, this);

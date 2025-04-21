@@ -491,7 +491,6 @@ if(APPLE)
   find_library(APPLE_COREFOUNDATION_LIBRARY CoreFoundation)
   find_library(APPLE_CORESERVICES_LIBRARY CoreServices)
   find_library(APPLE_COREVIDEO_LIBRARY CoreVideo)
-  # So far, only OS X 10.4 has this as a non-private framework
   find_library(APPLE_DISKARBITRATION_LIBRARY DiskArbitration)
   find_library(APPLE_IOKIT_LIBRARY IOKit)
   find_library(APPLE_IOSURFACE_LIBRARY IOSurface)
@@ -506,6 +505,14 @@ if(APPLE)
   endif()
 
   set(CONFIG_DARWIN_DA ${APPLE_DISKARBITRATION_LIBRARY})
+
+  #
+  # Check for symbols in darwin include files
+  #
+  cmake_push_check_state()
+  set(CMAKE_REQUIRED_LIBRARIES ${APPLE_IOKIT_LIBRARY})
+  check_symbol_exists(IOMainPort "IOKit/IOKitLib.h" HAVE_IOMAINPORT)
+  cmake_pop_check_state()
 
   # Take our cue on videotolbox from ffmpeg
   find_program(_ffmpeg mythffmpeg)

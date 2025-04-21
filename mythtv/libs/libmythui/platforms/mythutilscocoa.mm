@@ -1,4 +1,5 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "mythutilscocoa.h"
 
 // OSX
@@ -6,9 +7,9 @@
 #import <IOKit/graphics/IOGraphicsLib.h>
 #include <AvailabilityMacros.h>
 
-// kIOMasterPortDefault was deprecated in OS_X 12
-// kIOMainPortDefault defaults to a main/master port value of 0
-static constexpr int8_t kMythIOMainPortDefault { 0 };
+#if !HAVE_IOMAINPORT
+#define kIOMainPortDefault kIOMasterPortDefault
+#endif
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* View)
 {
@@ -44,7 +45,7 @@ QByteArray GetOSXEDID(CGDirectDisplayID Display)
     CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
 
     io_iterator_t iter;
-    if (IOServiceGetMatchingServices(kMythIOMainPortDefault, matching, &iter))
+    if (IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter))
       return result;
 
     io_service_t service = 0;

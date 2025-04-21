@@ -1778,6 +1778,7 @@ MYTHTV_HAVE_LIST='
     stdint_h
     sync_file_range
     close_range
+    iomainport
 '
 
 MYTHTV_LIST='
@@ -5989,10 +5990,10 @@ if enabled x11; then
 fi
 
 if test $target_os = darwin; then
-    # So far, only OS X 10.4 has this as a non-private framework
     if test -d /System/Library/Frameworks/DiskArbitration.framework ; then
         darwin_da="yes"
     fi
+    check_lib iomainport IOKit/IOKitLib.h IOMainPort "-Wl,-framework,IOKit" && enable iomainport
 fi
 
 

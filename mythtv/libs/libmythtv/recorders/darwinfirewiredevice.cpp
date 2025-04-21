@@ -25,6 +25,7 @@
 
 // MythTV headers
 #include "libmythbase/mthread.h"
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimer.h"
 #include "darwinavcinfo.h"
@@ -34,6 +35,10 @@
 #include <AVCVideoServices/StringLogger.h>
 #include <AVCVideoServices/AVSShared.h>
 #include <AVCVideoServices/MPEG2Receiver.h>
+
+#if !HAVE_IOMAINPORT
+#define IOMainPort IOMasterPort
+#endif
 
 // header not used because it also requires MPEG2Transmitter.h
 //#include <AVCVideoServices/FireWireMPEG.h>
@@ -143,7 +148,7 @@ void DarwinFirewireDevice::RunController(void)
 
     // Set up IEEE-1394 bus change notification
     mach_port_t master_port;
-    int ret = IOMasterPort(bootstrap_port, &master_port);
+    int ret = IOMainPort(bootstrap_port, &master_port);
     if (kIOReturnSuccess == ret)
     {
         m_priv->m_notify_port   = IONotificationPortCreate(master_port);

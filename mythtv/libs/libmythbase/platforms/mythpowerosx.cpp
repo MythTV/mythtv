@@ -1,4 +1,5 @@
 // MythTV
+#include "mythconfig.h"
 #include "platforms/mythcocoautils.h"
 #include "mythlogging.h"
 #include "mythpowerosx.h"
@@ -8,9 +9,9 @@
 #include <IOKit/ps/IOPSKeys.h>
 #include <AvailabilityMacros.h>
 
-// kIOMasterPortDefault was deprecated in OS_X 12
-// kIOMainPortDefault defaults to a main/master port value of 0
-static constexpr int8_t kMythIOMainPortDefault { 0 };
+#if !HAVE_IOMAINPORT
+#define kIOMainPortDefault kIOMasterPortDefault
+#endif
 
 #define LOC QString("PowerOSX: ")
 
@@ -65,7 +66,7 @@ void MythPowerOSX::Init(void)
 
     // Is there a battery?
     CFArrayRef batteryinfo = NULL;
-    if (IOPMCopyBatteryInfo(kMythIOMainPortDefault, &batteryinfo) == kIOReturnSuccess)
+    if (IOPMCopyBatteryInfo(kIOMainPortDefault, &batteryinfo) == kIOReturnSuccess)
     {
         CFRelease(batteryinfo);
 
