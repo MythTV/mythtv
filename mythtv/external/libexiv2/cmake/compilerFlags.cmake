@@ -53,7 +53,8 @@ if ( MINGW OR UNIX OR MSYS ) # MINGW, Linux, APPLE, CYGWIN
         endif()
 
         add_compile_options(-Wall -Wcast-align -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Woverloaded-virtual -W)
-        add_compile_options(-Wno-deprecated-copy -Wno-dangling-pointer)
+        check_cxx_compiler_flag("-Wno-dangling-pointer" HAVE_CXX_no-dangling-pointer)
+        check_cxx_compiler_flag("-Wno-deprecated-copy" HAVE_CXX_no-deprecated-copy)
 
         # This seems to be causing issues in the Fedora_MinGW GitLab job
         #add_compile_options(-fasynchronous-unwind-tables)
