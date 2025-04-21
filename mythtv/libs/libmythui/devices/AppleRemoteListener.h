@@ -10,7 +10,7 @@ public:
         : mainWindow(mainWindow_) {}
 
     // virtual
-    void appleRemoteButton(AppleRemote::Event button, bool pressedDown);
+    void appleRemoteButton(AppleRemote::Event button, bool pressedDown) override;
 
 private:
     QObject *mainWindow;
