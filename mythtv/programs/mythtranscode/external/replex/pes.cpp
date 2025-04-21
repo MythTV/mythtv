@@ -314,7 +314,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					}
 				}
 
-				if ( (p->flag2 & PTS_ONLY) &&  p->found < 14){
+				if ( (p->flag2 & PTS_ONLY) &&  p->found >= 9 && p->found < 14){
 					while (c < count && p->found < 14){
 						p->pts[p->found-9] = buf[c];
 						if (p->withbuf)
@@ -327,7 +327,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					if (c == count) return;
 				}
 
-				if (((p->flag2 & PTS_DTS) == 0xC0) && p->found < 19){
+				if (((p->flag2 & PTS_DTS) == 0xC0) && p->found >= 14 && p->found < 19){
 					while (c < count && p->found < 19){
 						p->dts[p->found-14] = buf[c];
 						if (p->withbuf)
@@ -566,6 +566,9 @@ static int write_ps_header(uint8_t *buf,
 				     (video_lock << 6)|0x20|video_bound);
 		p.reserved = (uint8_t)(0xFF >> 1);
 
+                // The above setl_ps call causes a 0x12 byte data area
+                // to be allocated.
+                // NOLINTBEGIN(clang-analyzer-security.ArrayBound)
 		p.data[0] = 0xB9;  
 		p.data[1] = 0xE0;  
 		p.data[2] = 0xE8;  
@@ -578,6 +581,7 @@ static int write_ps_header(uint8_t *buf,
 		p.data[9] = 0xBF;  
 		p.data[10] = 0xE0;  
 		p.data[11] = 0x02;  
+                // NOLINTEND(clang-analyzer-security.ArrayBound)
 
 		cwrite_ps(buf, &p, PS_HEADER_L2);
 		kill_ps(&p);
