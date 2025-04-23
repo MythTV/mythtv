@@ -54,7 +54,7 @@ extern "C" {
 using aesiv_array = std::array<uint8_t,AES_BLOCK_SIZE>;
 
 // 128-bit AES key for HLS segment decryption
-#define AES128_KEY_SIZE 16
+static constexpr uint8_t AES128_KEY_SIZE { 16 };
 struct hls_aes_key_st {
     std::array<uint8_t,AES128_KEY_SIZE> key;
 };
