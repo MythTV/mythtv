@@ -742,7 +742,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                     while (1) 
                     {
                         eu8 * p = 0;
-                        eu8 cmd = boundstr_read(&bs, 1)[0];
+                        eu8 cmd = boundstr_read(&bs, 1)[0];//NOLINT(clang-analyzer-security.ArrayBound)
                         int xpalette = 0;
                         int colcon_length = 0;
                         switch (cmd) 
