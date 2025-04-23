@@ -387,10 +387,6 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     return str;
 }
 
-#define SET_STRING(DESC_NAME) do { \
-    if (IsValid()) { DESC_NAME d(m_data, DescriptorLength()+2); \
-    if (d.IsValid()) str = d.toString(); } } while (false)
-
 QString MPEGDescriptor::descrDump(const QString &name) const
 {
     QString str;
@@ -421,184 +417,184 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     }
     else if (DescriptorID::video_stream == DescriptorTag())
     {
-        SET_STRING(VideoStreamDescriptor);
+        str = descrToString<VideoStreamDescriptor>();
     }
     else if (DescriptorID::audio_stream == DescriptorTag())
     {
-        SET_STRING(AudioStreamDescriptor);
+        str = descrToString<AudioStreamDescriptor>();
     }
     else if (DescriptorID::registration == DescriptorTag())
     {
-        SET_STRING(RegistrationDescriptor);
+        str = descrToString<RegistrationDescriptor>();
     }
     else if (DescriptorID::data_stream_alignment == DescriptorTag())
     {
-        SET_STRING(DataStreamAlignmentDescriptor);
+        str = descrToString<DataStreamAlignmentDescriptor>();
     }
     else if (DescriptorID::conditional_access == DescriptorTag())
     {
-        SET_STRING(ConditionalAccessDescriptor);
+        str = descrToString<ConditionalAccessDescriptor>();
     }
     else if (DescriptorID::iso_639_language == DescriptorTag())
     {
-        SET_STRING(ISO639LanguageDescriptor);
+        str = descrToString<ISO639LanguageDescriptor>();
     }
     else if (DescriptorID::system_clock == DescriptorTag())
     {
-        SET_STRING(SystemClockDescriptor);
+        str = descrToString<SystemClockDescriptor>();
     }
     else if (DescriptorID::maximum_bitrate == DescriptorTag())
     {
-        SET_STRING(MaximumBitrateDescriptor);
+        str = descrToString<MaximumBitrateDescriptor>();
     }
     else if (DescriptorID::smoothing_buffer == DescriptorTag())
     {
-        SET_STRING(SmoothingBufferDescriptor);
+        str = descrToString<SmoothingBufferDescriptor>();
     }
     else if (DescriptorID::avc_video == DescriptorTag())
     {
-        SET_STRING(AVCVideoDescriptor);
+        str = descrToString<AVCVideoDescriptor>();
     }
     else if (DescriptorID::hevc_video == DescriptorTag())
     {
-        SET_STRING(HEVCVideoDescriptor);
+        str = descrToString<HEVCVideoDescriptor>();
     }
     else if (DescriptorID::network_name == DescriptorTag())
     {
-        SET_STRING(NetworkNameDescriptor);
+        str = descrToString<NetworkNameDescriptor>();
     }
     else if (DescriptorID::service_list == DescriptorTag())
     {
-        SET_STRING(ServiceListDescriptor);
+        str = descrToString<ServiceListDescriptor>();
     }
     else if (DescriptorID::satellite_delivery_system == DescriptorTag())
     {
-        SET_STRING(SatelliteDeliverySystemDescriptor);
+        str = descrToString<SatelliteDeliverySystemDescriptor>();
     }
     else if (DescriptorID::cable_delivery_system == DescriptorTag())
     {
-        SET_STRING(CableDeliverySystemDescriptor);
+        str = descrToString<CableDeliverySystemDescriptor>();
     }
     else if (DescriptorID::bouquet_name == DescriptorTag())
     {
-        SET_STRING(BouquetNameDescriptor);
+        str = descrToString<BouquetNameDescriptor>();
     }
     else if (DescriptorID::service == DescriptorTag())
     {
-        SET_STRING(ServiceDescriptor);
+        str = descrToString<ServiceDescriptor>();
     }
     else if (DescriptorID::country_availability == DescriptorTag())
     {
-        SET_STRING(CountryAvailabilityDescriptor);
+        str = descrToString<CountryAvailabilityDescriptor>();
     }
     //else if (DescriptorID::linkage == DescriptorTag())
     //{
-    //    SET_STRING(LinkageDescriptor);
+    //    str = descrToString<LinkageDescriptor>();
     //}
     else if (DescriptorID::stream_identifier == DescriptorTag())
     {
-        SET_STRING(StreamIdentifierDescriptor);
+        str = descrToString<StreamIdentifierDescriptor>();
     }
     else if (DescriptorID::teletext == DescriptorTag())
     {
-        SET_STRING(TeletextDescriptor);
+        str = descrToString<TeletextDescriptor>();
     }
     else if (DescriptorID::subtitling == DescriptorTag())
     {
-        SET_STRING(SubtitlingDescriptor);
+        str = descrToString<SubtitlingDescriptor>();
     }
     else if (DescriptorID::terrestrial_delivery_system == DescriptorTag())
     {
-        SET_STRING(TerrestrialDeliverySystemDescriptor);
+        str = descrToString<TerrestrialDeliverySystemDescriptor>();
     }
     else if (DescriptorID::frequency_list == DescriptorTag())
     {
-        SET_STRING(FrequencyListDescriptor);
+        str = descrToString<FrequencyListDescriptor>();
     }
     else if (DescriptorID::scrambling == DescriptorTag())
     {
-        SET_STRING(ScramblingDescriptor);
+        str = descrToString<ScramblingDescriptor>();
     }
     else if (DescriptorID::ac3 == DescriptorTag())
     {
-        SET_STRING(AC3Descriptor);
+        str = descrToString<AC3Descriptor>();
     }
     //else if (DescriptorID::ancillary_data == DescriptorTag())
     //{
-    //    SET_STRING(AncillaryDataDescriptor);
+    //    str = descrToString<AncillaryDataDescriptor>();
     //}
     else if (DescriptorID::application_signalling == DescriptorTag())
     {
-        SET_STRING(ApplicationSignallingDescriptor);
+        str = descrToString<ApplicationSignallingDescriptor>();
     }
     else if (DescriptorID::adaptation_field_data == DescriptorTag())
     {
-        SET_STRING(AdaptationFieldDataDescriptor);
+        str = descrToString<AdaptationFieldDataDescriptor>();
     }
     else if (DescriptorID::default_authority == DescriptorTag())
     {
-        SET_STRING(DefaultAuthorityDescriptor);
+        str = descrToString<DefaultAuthorityDescriptor>();
     }
     else if (DescriptorID::s2_satellite_delivery_system == DescriptorTag())
     {
-        SET_STRING(S2SatelliteDeliverySystemDescriptor);
+        str = descrToString<S2SatelliteDeliverySystemDescriptor>();
     }
     //
     // Extension descriptors for extension 0x7F
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::image_icon)
     {
-        SET_STRING(ImageIconDescriptor);
+        str = descrToString<ImageIconDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::t2_delivery_system)
     {
-        SET_STRING(T2DeliverySystemDescriptor);
+        str = descrToString<T2DeliverySystemDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::sh_delivery_system)
     {
-        SET_STRING(SHDeliverySystemDescriptor);
+        str = descrToString<SHDeliverySystemDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::supplementary_audio)
     {
-        SET_STRING(SupplementaryAudioDescriptor);
+        str = descrToString<SupplementaryAudioDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::network_change_notify)
     {
-        SET_STRING(NetworkChangeNotifyDescriptor);
+        str = descrToString<NetworkChangeNotifyDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::message)
     {
-        SET_STRING(MessageDescriptor);
+        str = descrToString<MessageDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::target_region)
     {
-        SET_STRING(TargetRegionDescriptor);
+        str = descrToString<TargetRegionDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::target_region_name)
     {
-        SET_STRING(TargetRegionNameDescriptor);
+        str = descrToString<TargetRegionNameDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::service_relocated)
     {
-        SET_STRING(ServiceRelocatedDescriptor);
+        str = descrToString<ServiceRelocatedDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::c2_delivery_system)
     {
-        SET_STRING(C2DeliverySystemDescriptor);
+        str = descrToString<C2DeliverySystemDescriptor>();
     }
     else if (DescriptorTag() == DescriptorID::extension &&
              DescriptorTagExtension() == DescriptorID::s2x_satellite_delivery_system)
     {
-        SET_STRING(S2XSatelliteDeliverySystemDescriptor);
+        str = descrToString<S2XSatelliteDeliverySystemDescriptor>();
     }
     //
     // User Defined DVB descriptors, range 0x80-0xFE
@@ -615,22 +611,22 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     else if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
              PrivateDescriptorID::sky_lcn_table == DescriptorTag())
     {
-        SET_STRING(SkyLCNDescriptor);
+        str = descrToString<SkyLCNDescriptor>();
     }
     else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
              PrivateDescriptorID::freesat_region_table == DescriptorTag())
     {
-        SET_STRING(FreesatRegionDescriptor);
+        str = descrToString<FreesatRegionDescriptor>();
     }
     else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
              PrivateDescriptorID::freesat_lcn_table == DescriptorTag())
     {
-        SET_STRING(FreesatLCNDescriptor);
+        str = descrToString<FreesatLCNDescriptor>();
     }
     else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
              PrivateDescriptorID::freesat_callsign == DescriptorTag())
     {
-        SET_STRING(FreesatCallsignDescriptor);
+        str = descrToString<FreesatCallsignDescriptor>();
     }
     else if (priv_dsid == PrivateDataSpecifierID::CASEMA &&
              PrivateDescriptorID::casema_video_on_demand == DescriptorTag())
@@ -647,14 +643,14 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
               priv_dsid == PrivateDataSpecifierID::ITC     ) &&
              PrivateDescriptorID::dvb_simulcast_channel_descriptor == DescriptorTag())
     {
-        SET_STRING(DVBSimulcastChannelDescriptor);
+        str = descrToString<DVBSimulcastChannelDescriptor>();
     }
     else if ((priv_dsid == PrivateDataSpecifierID::EACEM  ||
               priv_dsid == PrivateDataSpecifierID::NORDIG ||
               priv_dsid == PrivateDataSpecifierID::ITC    ) &&
              PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
     {
-        SET_STRING(DVBLogicalChannelDescriptor);
+        str = descrToString<DVBLogicalChannelDescriptor>();
     }
     else if (priv_dsid == PrivateDataSpecifierID::CIPLUS &&
              PrivateDescriptorID::ci_protection_descriptor == DescriptorTag())
@@ -671,28 +667,28 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     // ATSC/SCTE descriptors, range 0x80-0xFE
     else if (DescriptorID::ac3_audio_stream == DescriptorTag())
     {
-        SET_STRING(AC3AudioStreamDescriptor);
+        str = descrToString<AC3AudioStreamDescriptor>();
     }
     else if (DescriptorID::caption_service == DescriptorTag())
     {
-        SET_STRING(CaptionServiceDescriptor);
+        str = descrToString<CaptionServiceDescriptor>();
     }
     else if (DescriptorID::scte_cue_identifier == DescriptorTag())
     {
-        SET_STRING(CueIdentifierDescriptor);
+        str = descrToString<CueIdentifierDescriptor>();
     }
     else if (DescriptorID::scte_revision_detection == DescriptorTag())
     {
-        SET_STRING(RevisionDetectionDescriptor);
+        str = descrToString<RevisionDetectionDescriptor>();
     }
     else if (DescriptorID::extended_channel_name == DescriptorTag())
     {
-        SET_STRING(ExtendedChannelNameDescriptor);
+        str = descrToString<ExtendedChannelNameDescriptor>();
     }
     else if (priv_dsid == 0 &&
              DescriptorID::component_name == DescriptorTag())
     {
-        SET_STRING(ComponentNameDescriptor);
+        str = descrToString<ComponentNameDescriptor>();
     }
     // POSSIBLY UNSAFE ! -- end
     else

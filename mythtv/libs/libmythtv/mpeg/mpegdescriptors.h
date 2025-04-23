@@ -351,6 +351,17 @@ class MTV_PUBLIC MPEGDescriptor
     virtual QString toStringPD(uint priv_dsid) const;
     virtual QString toStringXML(uint indent_level) const;
     
+    template <typename DESC_NAME>
+    QString descrToString() const
+    {
+        if (!IsValid())
+            return {};
+        DESC_NAME d(m_data, DescriptorLength()+2);
+        if (!d.IsValid())
+            return {};
+        return d.toString();
+    }
+
     static desc_list_t Parse(const unsigned char *data, uint len);
     static desc_list_t ParseAndExclude(const unsigned char *data, uint len,
                                        int excluded_descid);
