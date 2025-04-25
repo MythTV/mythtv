@@ -11,6 +11,13 @@
 #include "libmythbase/http/mythhttpthreadpool.h"
 #include "libmythbase/http/mythhttptypes.h"
 
+class MythTcpQueueEntry
+{
+  public:
+    qintptr         m_socketFD {0};
+    bool            m_ssl {false};
+};
+
 class MythHTTPServer : public MythHTTPThreadPool
 {
     Q_OBJECT
@@ -82,7 +89,8 @@ class MythHTTPServer : public MythHTTPThreadPool
     int               m_masterStatusPort { 0 };
     int               m_masterSSLPort    { 0 };
     QString           m_masterIPAddress;
-    QQueue<qintptr>   m_connectionQueue;
+    QQueue<MythTcpQueueEntry>
+                      m_connectionQueue;
     int               m_threadNum { 0 };
 };
 

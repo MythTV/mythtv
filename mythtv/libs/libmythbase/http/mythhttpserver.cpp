@@ -250,12 +250,10 @@ void MythHTTPServer::ProcessTCPQueueHandler()
 {
     if (AvailableThreads() > 0)
     {
-        auto Socket = m_connectionQueue.dequeue();
-        auto * server = qobject_cast<PrivTcpServer*>(QObject::sender());
-        auto ssl = server ? server->GetServerType() == kSSLServer : false;
+        auto entry = m_connectionQueue.dequeue();
         m_threadNum = m_threadNum % MaxThreads();
-        auto name = QString("HTTP%1%2").arg(ssl ? "S" : "").arg(m_threadNum++);
-        auto * newthread = new MythHTTPThread(this, m_config, name, Socket, ssl);
+        auto name = QString("HTTP%1%2").arg(entry.m_ssl ? "S" : "").arg(m_threadNum++);
+        auto * newthread = new MythHTTPThread(this, m_config, name, entry.m_socketFD, entry.m_ssl);
         AddThread(newthread);
         connect(newthread->qthread(), &QThread::finished, this, &MythHTTPThreadPool::ThreadFinished);
         connect(newthread->qthread(), &QThread::finished, this, &MythHTTPServer::ThreadFinished);
@@ -268,8 +266,11 @@ void MythHTTPServer::newTcpConnection(qintptr Socket)
 {
     if (!Socket)
         return;
-
-    m_connectionQueue.enqueue(Socket);
+    auto * server = qobject_cast<PrivTcpServer*>(QObject::sender());
+    MythTcpQueueEntry entry;
+    entry.m_socketFD = Socket;
+    entry.m_ssl = (server->GetServerType() == kSSLServer);
+    m_connectionQueue.enqueue(entry);
     emit ProcessTCPQueue();
 }
 
