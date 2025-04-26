@@ -987,20 +987,17 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     curRec->FinishedRecording(!is_good || (recgrp == "LiveTV"));
 
     // send out UPDATE_RECORDING_STATUS message
-    if (recgrp != "LiveTV")
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("FinishedRecording -- UPDATE_RECORDING_STATUS: %1")
-            .arg(RecStatus::toString(is_good ? curRec->GetRecordingStatus()
-                          : RecStatus::Failed, kSingleRecord)));
-        MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                     .arg(curRec->GetInputID())
-                     .arg(curRec->GetChanID())
-                     .arg(curRec->GetScheduledStartTime(MythDate::ISODate))
-                     .arg(is_good ? curRec->GetRecordingStatus() : RecStatus::Failed)
-                     .arg(curRec->GetRecordingEndTime(MythDate::ISODate)));
-        gCoreContext->dispatch(me);
-    }
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("FinishedRecording -- UPDATE_RECORDING_STATUS: %1")
+        .arg(RecStatus::toString(is_good ? curRec->GetRecordingStatus()
+                      : RecStatus::Failed, kSingleRecord)));
+    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                 .arg(curRec->GetInputID())
+                 .arg(curRec->GetChanID())
+                 .arg(curRec->GetScheduledStartTime(MythDate::ISODate))
+                 .arg(is_good ? curRec->GetRecordingStatus() : RecStatus::Failed)
+                 .arg(curRec->GetRecordingEndTime(MythDate::ISODate)));
+    gCoreContext->dispatch(me);
 
     // send out REC_FINISHED message
     SendMythSystemRecEvent("REC_FINISHED", curRec);
@@ -1009,8 +1006,8 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     auto secsSince = MythDate::secsInPast(curRec->GetRecordingStartTime());
     QString message = QString("DONE_RECORDING %1 %2 %3")
         .arg(m_inputId).arg(secsSince.count()).arg(GetFramesWritten());
-    MythEvent me(message);
-    gCoreContext->dispatch(me);
+    MythEvent me2(message);
+    gCoreContext->dispatch(me2);
 
     // Handle JobQueue
     QHash<QString,int>::iterator autoJob =
