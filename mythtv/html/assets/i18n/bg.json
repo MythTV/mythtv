@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Добавена дата",
+            "allCategories": "Всички категории",
+            "category": "Kатегория",
             "download": "Изтегляне на видео",
             "heading": "Видеоклипове",
             "releasedate": "Дата на излизане",

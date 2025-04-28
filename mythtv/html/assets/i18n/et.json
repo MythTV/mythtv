@@ -414,7 +414,7 @@
             "schedule_text": "Järgmised {{ length }} saade(d), mis on salvestamiseks kavandatud.",
             "schedule_title": "Ajakava"
         },
-        "undefselection": "Mõnda valitud rida pole laaditud. Sirvige loendit ja valige read uuesti.",
+        "undefselection": "Mõnda valitud rida pole laaditud. SirVige loendit ja valige read uuesti.",
         "upcoming": {
             "date": "Kuupäev",
             "encoder": "Kodeerija",
@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Lisatud kuupäev",
+            "allCategories": "Kõik kategooriad",
+            "category": "Kategooria",
             "download": "Laadige video alla",
             "heading": "Videod",
             "releasedate": "Väljalaske kuupäev",

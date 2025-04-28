@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Dodan datum",
+            "allCategories": "Vse kategorije",
+            "category": "Kategorija",
             "download": "Prenesi video",
             "heading": "Videoposnetki",
             "releasedate": "Datum izdaje",

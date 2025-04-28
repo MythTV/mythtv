@@ -26,6 +26,23 @@
                         #showAll="ngModel" [binary]="true" (onChange)="showAllChange()"
                         label="{{ 'dashboard.videos.showall' | translate }} ">
                     </p-checkbox>
+                    &nbsp;&nbsp;&nbsp;
+                    <span class="p-input-icon-right">
+                      <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
+                      <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
+                        class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}"
+                        pTooltip="{{ 'dashboard.videos.regex' | translate }}" tooltipPosition="top"
+                        (keydown)="keydown($event)" />
+                    </span>
+
+                    <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
+                      pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
+
+                    &nbsp;&nbsp;&nbsp; {{ 'dashboard.videos.category' | translate }}: &nbsp;
+
+                 <p-dropdown [(ngModel)]="selectedCategory" [options]="catGroups" name="filter" (onChange)="onFilter()"
+                 placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" optionLabel="Name" optionValue="Id" class="'px-3">
+                 </p-dropdown>
 
                     <div *ngIf="refreshing else refreshBn">
                         <p-progressSpinner [style]="{width: '30px', height: '30px'}"></p-progressSpinner>

@@ -5,7 +5,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
-import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
+import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoCategories, VideoCategoryList, VideoMetadataInfo } from 'src/app/services/interfaces/video.interface';
 import { UtilityService } from 'src/app/services/utility.service';
 import { VideoService } from 'src/app/services/video.service';
 
@@ -27,6 +27,7 @@ export class VideosComponent implements OnInit {
   successCount = 0;
   errorCount = 0;
   directory: string[] = [];
+  catGroups: VideoCategories[] = [];
   video: VideoMetadataInfo = <VideoMetadataInfo>{ Title: '' };
   editingVideo?: VideoMetadataInfo;
   displayMetadataDlg = false;
@@ -35,6 +36,9 @@ export class VideosComponent implements OnInit {
   lazyLoadEvent: TableLazyLoadEvent = {};
   totalRecords = 0;
   showTable = false;
+  searchValue = '';
+  selectedCategory: number | null = null;
+  priorRequest: GetVideoListRequest = {};
   virtualScrollItemSize = 0;
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
@@ -52,6 +56,18 @@ export class VideosComponent implements OnInit {
 
   constructor(private videoService: VideoService, private translate: TranslateService,
     private messageService: MessageService, public utility: UtilityService) {
+
+    this.videoService.GetCategoryList()
+      .subscribe((data: VideoCategoryList) => {
+        this.catGroups = data.VideoCategoryList.VideoCategories;
+        this.catGroups.sort((a, b) => {
+          return a.Name?.localeCompare(b.Name || '') || 0
+        });
+        this.translate.get('dashboard.videos.allCategories').subscribe(translated =>{
+          this.catGroups.unshift({ Id: -1, Name: translated});
+        });
+      });
+
     // translations
     for (const [key, value] of Object.entries(this.msg)) {
       this.translate.get(value).subscribe(data => {
@@ -107,8 +123,19 @@ export class VideosComponent implements OnInit {
     if (request.Sort == 'SeasEp')
       request.Sort = `season,episode,title,releasedate`;
     else
-      request.Sort += ',title,releasedate,season,episode'
+      request.Sort += ',title,releasedate,season,episode';
+    this.searchValue = this.searchValue.trim();
+    if (this.searchValue)
+      request.TitleRegEx = this.searchValue;
+    if (this.selectedCategory != null)
+      request.Category = this.selectedCategory;
 
+    if (request.TitleRegEx != this.priorRequest.TitleRegEx
+      || request.Category != this.priorRequest.Category) {
+      this.menu.hide();
+      this.priorRequest = request;
+      this.showTable = false;
+    }
     this.videoService.GetVideoList(request).subscribe(data => {
       let newList = data.VideoMetadataInfoList;
       this.totalRecords = data.VideoMetadataInfoList.TotalAvailable;
@@ -139,8 +166,22 @@ export class VideosComponent implements OnInit {
     this.loadLazy(({ first: 0, rows: 1 }));
   }
 
+  onFilter() {
+    this.reLoadVideos();
+  }
+
   showAllChange() {
     setTimeout(() => this.reLoadVideos(), 100);
+  }
+
+  resetSearch() {
+    this.searchValue = '';
+    this.reLoadVideos();
+  }
+
+  keydown(event: KeyboardEvent) {
+    if (event.key == "Enter")
+      this.onFilter();
   }
 
   URLencode(x: string): string {

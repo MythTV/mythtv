@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Data afegida",
+            "allCategories": "Totes les categories",
+            "category": "Categoria",
             "download": "Descarrega el vídeo",
             "heading": "Vídeos",
             "releasedate": "Data de publicació",

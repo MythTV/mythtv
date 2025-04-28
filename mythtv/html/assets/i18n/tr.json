@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Tarih eklendi",
+            "allCategories": "Tüm kategoriler",
+            "category": "Kategori",
             "download": "Video indir",
             "heading": "videolar",
             "releasedate": "Yayın tarihi",
