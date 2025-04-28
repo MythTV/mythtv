@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "תאריך נוסף",
+            "allCategories": "כל הקטגוריות",
+            "category": "קטגוריה",
             "download": "הורד סרטון",
             "heading": "סרטונים",
             "releasedate": "תאריך הוצאה",

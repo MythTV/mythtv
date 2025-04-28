@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Dato lagt til",
+            "allCategories": "Alle kategorier",
+            "category": "Kategori",
             "download": "Last ned video",
             "heading": "Videoer",
             "releasedate": "Utgivelsesdato",

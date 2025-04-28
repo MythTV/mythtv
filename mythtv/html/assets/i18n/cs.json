@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Datum přidáno",
+            "allCategories": "Všechny kategorie",
+            "category": "Kategorie",
             "download": "Stáhnout video",
             "heading": "videa",
             "releasedate": "Datum vydání",

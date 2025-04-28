@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Dagsetning bætt við",
+            "allCategories": "Allir flokkar",
+            "category": "Flokkur",
             "download": "Sækja myndbandið",
             "heading": "Myndbönd",
             "releasedate": "Útgáfudagur",

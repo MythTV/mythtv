@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoMetadataInfoList } from './interfaces/video.interface';
+import { GetVideoListRequest, UpdateVideoMetadataRequest, VideoMetadataInfoList, VideoCategoryList } from './interfaces/video.interface';
 import { Observable } from 'rxjs';
 import { BoolResponse } from './interfaces/common.interface';
 
@@ -19,6 +19,10 @@ export class VideoService {
       params = params.set(key, value);
     return this.httpClient.get<{ VideoMetadataInfoList: VideoMetadataInfoList }>
       ('/Video/GetVideoList', { params });
+  }
+
+  public GetCategoryList(): Observable<VideoCategoryList> {
+    return this.httpClient.get<VideoCategoryList>('/Video/GetCategoryList');
   }
 
   public UpdateVideoWatchedStatus(id: number, watched: boolean) : Observable<BoolResponse> {

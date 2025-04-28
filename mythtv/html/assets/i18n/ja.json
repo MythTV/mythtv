@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "追加された日付",
+            "allCategories": "すべてのカテゴリ",
+            "category": "カテゴリ",
             "download": "ビデオをダウンロードする",
             "heading": "動画",
             "releasedate": "発売日",

@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Päivämäärä lisätty",
+            "allCategories": "Kaikki luokat",
+            "category": "Luokka",
             "download": "Lataa video",
             "heading": "Videot",
             "releasedate": "Julkaisupäivä",

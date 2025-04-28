@@ -414,7 +414,7 @@
             "schedule_text": "A következő felvételre ütemezett {{ length }} műsor(ok).",
             "schedule_title": "Menetrend"
         },
-        "undefselection": "Néhány kiválasztott sor nem lett betöltve. Kérjük, görgessen végig a listán, és jelölje ki újra a sorokat.",
+        "undefselection": "Néhány kiválasztott sor nem lett betöltve. KÉrjük, görgessen végig a listán, és jelölje ki újra a sorokat.",
         "upcoming": {
             "date": "Dátum",
             "encoder": "Kódoló",
@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Dátum hozzáadva",
+            "allCategories": "Minden kategória",
+            "category": "Kategória",
             "download": "Videó letöltése",
             "heading": "Videók",
             "releasedate": "Kiadási dátum",

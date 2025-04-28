@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Dodano datę",
+            "allCategories": "Wszystkie kategorie",
+            "category": "Kategoria",
             "download": "Ściągnij wideo",
             "heading": "Filmy",
             "releasedate": "Data wydania",

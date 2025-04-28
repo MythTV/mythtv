@@ -55,9 +55,22 @@ export interface VideoMetadataInfoList {
     VideoMetadataInfos: VideoMetadataInfo[];
 }
 
+export interface VideoCategoryList {
+  VideoCategoryList: {
+  VideoCategories: VideoCategories[];
+  };
+}
+
+export interface VideoCategories {
+  Id?: number;
+  Name?: string;
+}
+
 export interface GetVideoListRequest {
     Folder?: string;
     Sort?: string;
+    TitleRegEx?: string;
+    Category?: number;
     Descending?: boolean;
     StartIndex?: number;
     Count?: number;

@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "Datum toegevoegd",
+            "allCategories": "Alle categorieën",
+            "category": "Categorie",
             "download": "Download video",
             "heading": "Videos",
             "releasedate": "Datum van publicatie",

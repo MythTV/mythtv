@@ -428,6 +428,8 @@
         },
         "videos": {
             "adddate": "添加日期",
+            "allCategories": "所有类别",
+            "category": "类别",
             "download": "下载视频",
             "heading": "视频",
             "releasedate": "发布日期",
