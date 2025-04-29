@@ -31,7 +31,7 @@
                       <i class="pi pi-times" (click)="resetSearch()" *ngIf="searchValue"></i>
                       <input type="text" pInputText id="searchValue" [(ngModel)]="searchValue" name="searchValue"
                         class="text-xl" placeholder="{{ 'common.search_placeholder' | translate }}"
-                        pTooltip="{{ 'dashboard.videos.regex' | translate }}" tooltipPosition="top"
+                        pTooltip="{{ 'dashboard.recordings.regex' | translate }}" tooltipPosition="top"
                         (keydown)="keydown($event)" />
                     </span>
 
