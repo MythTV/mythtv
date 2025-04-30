@@ -440,9 +440,8 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
 
     // 1. Either load XmlConfiguration::k_default_filename or use sensible "localhost" defaults:
     bool loaded = LoadDatabaseSettings();
-    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
-    setLocalHostName(dbParams.m_localHostName);
-    DatabaseParams dbParamsFromFile = dbParams;
+    const DatabaseParams dbParamsFromFile = GetMythDB()->GetDatabaseParams();
+    setLocalHostName(dbParamsFromFile.m_localHostName);
 
     // In addition to the UI chooser, we can also try to autoSelect later,
     // but only if we're not doing manualSelect and there was no
@@ -511,7 +510,10 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
                     manualSelect = false;
                     break;
                 case BackendSelection::kCancelConfigure:
-                    goto NoDBfound;
+                {
+                    LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - failed");
+                    return false;
+                }
             }
         }
 
@@ -522,11 +524,10 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
             // database can be set up there
             if (gCoreContext->IsBackend()
                 || !PromptForDatabaseParams(failure))
-                goto NoDBfound;
-            // The database params have changed!  Re-read our local copy.
-            dbParams = GetMythDB()->GetDatabaseParams();
-            setLocalHostName(dbParams.m_localHostName);
-            dbParamsFromFile = dbParams;
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - failed");
+                return false;
+            }
         }
         failure = TestDBconnection();
         if (!failure.isEmpty())
@@ -544,6 +545,7 @@ DBfound:
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
     // If we got the database from UPNP then the wakeup settings are lost.
     // Restore them.
+    DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
     dbParams.m_wolEnabled = dbParamsFromFile.m_wolEnabled;
     dbParams.m_wolReconnect = dbParamsFromFile.m_wolReconnect;
     dbParams.m_wolRetry = dbParamsFromFile.m_wolRetry;
@@ -553,10 +555,6 @@ DBfound:
     EnableDBerrors();
     ResetDatabase(dbParams);
     return true;
-
-NoDBfound:
-    LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - failed");
-    return false;
 }
 
 /** Load database and host settings from XmlConfiguration::k_default_filename, or set some defaults.
