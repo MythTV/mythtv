@@ -20,7 +20,6 @@
 // libmythbase
 #include "compat.h"
 #include "mythcorecontext.h"
-#include "mythcoreutil.h"
 #include "mthreadpool.h"
 #include "mythdirs.h"
 #include "mythevent.h"
