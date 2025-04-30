@@ -157,7 +157,6 @@ target_link_libraries(
          mythbase
          mythmetadata
          mythprotoserver
-         mythservicecontracts
          mythupnp
          $<TARGET_NAME_IF_EXISTS:PkgConfig::VALGRIND>
          $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::DBus>)

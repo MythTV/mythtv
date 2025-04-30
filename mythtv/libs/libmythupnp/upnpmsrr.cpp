@@ -4,14 +4,13 @@
 // Purpose - uPnp Microsoft Media Receiver Registrar "fake" Service 
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
-
-#include <cmath>
+#include "upnpmsrr.h"
 
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythlogging.h"
 
 #include "upnp.h"
-#include "upnpmsrr.h"
+#include "upnputil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

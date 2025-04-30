@@ -19,6 +19,7 @@
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <Qt>
+#include <QUrl>
 
 #include <cerrno>
 #include <cstdlib>
@@ -33,8 +34,6 @@
 #include <netinet/tcp.h>
 #endif
 
-#include "upnp.h"
-
 #include "libmythbase/compat.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythcorecontext.h"
@@ -48,6 +47,8 @@
 #include "serializers/soapSerializer.h"
 #include "serializers/jsonSerializer.h"
 #include "serializers/xmlplistSerializer.h"
+
+#include "httpserver.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

@@ -9,13 +9,12 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "mythxmlclient.h"
 
 #include <QObject>
 
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-
-#include "mythxmlclient.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

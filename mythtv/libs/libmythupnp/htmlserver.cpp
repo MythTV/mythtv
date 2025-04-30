@@ -9,6 +9,7 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
+#include "htmlserver.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -18,10 +19,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"
 
-#include "htmlserver.h"
 #include "httprequest.h"
-
-#include "serviceHosts/rttiServiceHost.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -36,15 +34,6 @@ HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
     LOG(VB_HTTP, LOG_INFO, QString("HtmlServerExtension() - SharePath = %1")
             .arg(m_sSharePath));
     m_scripting.SetResourceRootPath( m_sSharePath );
-    
-    // ----------------------------------------------------------------------
-    // Register Rtti with QtScript Engine.
-    // Rtti exposes internal enums complete with translations for use in scripts
-    // ----------------------------------------------------------------------
-
-    QScriptEngine *pEngine = ScriptEngine();
-    pEngine->globalObject().setProperty("Rtti",
-         pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
 #endif
 }
 

@@ -1,12 +1,11 @@
 #ifndef FRONTENDACTIONLIST_H
 #define FRONTENDACTIONLIST_H
 
-#include "libmythservicecontracts/serviceexp.h"
-#include "libmythservicecontracts/datacontracthelper.h"
+#include "datacontracthelper.h"
 
 namespace DTC
 {
-    class SERVICE_PUBLIC FrontendActionList : public QObject
+    class FrontendActionList : public QObject
     {
         Q_OBJECT
         Q_CLASSINFO("version", "1.0");

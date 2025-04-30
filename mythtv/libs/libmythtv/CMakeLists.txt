@@ -277,7 +277,6 @@ target_link_libraries(
          PkgConfig::SoundTouch
          mythbluray
          myth
-         mythservicecontracts
          mythbase
          mythui
          mythupnp
