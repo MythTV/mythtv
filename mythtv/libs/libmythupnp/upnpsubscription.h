@@ -1,9 +1,18 @@
 #ifndef UPNPSUBSCRIPTION_H
 #define UPNPSUBSCRIPTION_H
 
-#include "libmythbase/mythevent.h"
+#include <chrono>
 
-#include "libmythupnp/upnp.h"
+#include <QHash>
+#include <QRecursiveMutex>
+#include <QString>
+#include <QStringList>
+#include <QUrl>
+
+#include "libmythbase/mythevent.h"
+#include "libmythbase/mythobservable.h"
+
+#include "libmythupnp/httpserver.h"
 
 class Subscription;
 

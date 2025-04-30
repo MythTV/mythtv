@@ -10,6 +10,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimer.h"
 #include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
 
 #include "cardutil.h"
 #include "satiputils.h"
@@ -55,7 +56,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
 {
     QStringList result;
 
-    SSDPCacheEntries *satipservers = SSDP::Find(SATIP_URI);
+    SSDPCacheEntries *satipservers = SSDPCache::Instance()->Find(SATIP_URI);
 
     if (!satipservers)
     {
@@ -73,7 +74,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No UPnP Sat>IP servers found, but SSDP::Find() != NULL");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No UPnP Sat>IP servers found, but SSDPCache::Instance()->Find() != NULL");
     }
 
     EntryMap map;
@@ -139,7 +140,7 @@ QStringList SatIP::doUPNPsearch(bool loginfo)
 QStringList SatIP::findServers(void)
 {
     QStringList devs;
-    SSDPCacheEntries *satipservers = SSDP::Find(SATIP_URI);
+    SSDPCacheEntries *satipservers = SSDPCache::Instance()->Find(SATIP_URI);
     if (satipservers && satipservers->Count() > 0)
     {
         devs = SatIP::doUPNPsearch(false);
