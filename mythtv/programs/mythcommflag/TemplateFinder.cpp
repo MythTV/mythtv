@@ -918,74 +918,78 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     m_nextFrame = frameno + m_frameInterval;
     *pNextFrame = std::min(m_endFrame, m_nextFrame);
 
-    const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
-    if (pgm == nullptr)
-        goto error;
-
-    if (!m_borderDetector->getDimensions(pgm, pgmheight, frameno,
-                &croprow, &cropcol, &cropwidth, &cropheight))
     {
-        /* Not a blank frame. */
-
-        auto start = nowAsDuration<std::chrono::microseconds>();
-
-        m_minContentRow = std::min(croprow, m_minContentRow);
-        m_minContentCol = std::min(cropcol, m_minContentCol);
-        m_maxContentCol1 = std::max(cropcol + cropwidth, m_maxContentCol1);
-        m_maxContentRow1 = std::max(croprow + cropheight, m_maxContentRow1);
-
-        if (resetBuffers(cropwidth, cropheight))
+        const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
+        if (pgm == nullptr)
             goto error;
 
-        if (pgm_crop(&m_cropped, pgm, pgmheight, croprow, cropcol,
-                    cropwidth, cropheight))
-            goto error;
-
-        /*
-         * Translate the excluded area of the screen into "cropped"
-         * coordinates.
-         */
-        int excludewidth  = (int)(pgmwidth * kExcludeWidth);
-        int excludeheight = (int)(pgmheight * kExcludeHeight);
-        int excluderow = ((pgmheight - excludeheight) / 2) - croprow;
-        int excludecol = ((pgmwidth - excludewidth) / 2) - cropcol;
-        (void)m_edgeDetector->setExcludeArea(excluderow, excludecol,
-                excludewidth, excludeheight);
-
-        const AVFrame *edges =
-            m_edgeDetector->detectEdges(&m_cropped, cropheight, FRAMESGMPCTILE);
-        if (edges == nullptr)
-            goto error;
-
-        if (pgm_scorepixels(m_scores, pgmwidth, croprow, cropcol,
-                    edges, cropheight))
-            goto error;
-
-        if (m_debugLevel >= 2)
+        if (!m_borderDetector->getDimensions(pgm, pgmheight, frameno,
+                    &croprow, &cropcol, &cropwidth, &cropheight))
         {
-            if (!analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
-                        cropheight, croprow, cropcol, m_debugFrames, m_debugDir))
+            /* Not a blank frame. */
+
+            auto start = nowAsDuration<std::chrono::microseconds>();
+
+            m_minContentRow = std::min(croprow, m_minContentRow);
+            m_minContentCol = std::min(cropcol, m_minContentCol);
+            m_maxContentCol1 = std::max(cropcol + cropwidth, m_maxContentCol1);
+            m_maxContentRow1 = std::max(croprow + cropheight, m_maxContentRow1);
+
+            if (resetBuffers(cropwidth, cropheight))
                 goto error;
+
+            if (pgm_crop(&m_cropped, pgm, pgmheight, croprow, cropcol,
+                        cropwidth, cropheight))
+                goto error;
+
+            /*
+             * Translate the excluded area of the screen into "cropped"
+             * coordinates.
+             */
+            int excludewidth  = (int)(pgmwidth * kExcludeWidth);
+            int excludeheight = (int)(pgmheight * kExcludeHeight);
+            int excluderow = ((pgmheight - excludeheight) / 2) - croprow;
+            int excludecol = ((pgmwidth - excludewidth) / 2) - cropcol;
+            (void)m_edgeDetector->setExcludeArea(excluderow, excludecol,
+                    excludewidth, excludeheight);
+
+            const AVFrame *edges =
+                m_edgeDetector->detectEdges(&m_cropped, cropheight, FRAMESGMPCTILE);
+            if (edges == nullptr)
+                goto error;
+
+            if (pgm_scorepixels(m_scores, pgmwidth, croprow, cropcol,
+                        edges, cropheight))
+                goto error;
+
+            if (m_debugLevel >= 2)
+            {
+                if (!analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
+                            cropheight, croprow, cropcol, m_debugFrames, m_debugDir))
+                    goto error;
+            }
+
+            auto end = nowAsDuration<std::chrono::microseconds>();
+            m_analyzeTime += (end - start);
         }
 
-        auto end = nowAsDuration<std::chrono::microseconds>();
-        m_analyzeTime += (end - start);
+        if (m_nextFrame > m_endFrame)
+            return ANALYZE_FINISHED;
+
+        return ANALYZE_OK;
     }
 
-    if (m_nextFrame > m_endFrame)
-        return ANALYZE_FINISHED;
-
-    return ANALYZE_OK;
-
 error:
-    LOG(VB_COMMFLAG, LOG_ERR,
-        QString("TemplateFinder::analyzeFrame error at frame %1")
-            .arg(frameno));
+    {
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("TemplateFinder::analyzeFrame error at frame %1")
+                .arg(frameno));
 
-    if (m_nextFrame > m_endFrame)
-        return ANALYZE_FINISHED;
+        if (m_nextFrame > m_endFrame)
+            return ANALYZE_FINISHED;
 
-    return ANALYZE_ERROR;
+        return ANALYZE_ERROR;
+    }
 }
 
 int

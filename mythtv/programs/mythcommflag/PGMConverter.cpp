@@ -76,30 +76,32 @@ PGMConverter::getImage(const MythVideoFrame *frame, long long _frameno,
     if (m_frameNo == _frameno)
         goto out;
 
-    if (!frame->m_buffer)
     {
-        LOG(VB_COMMFLAG, LOG_ERR, "PGMConverter::getImage no buf");
-        goto error;
-    }
+        if (!frame->m_buffer)
+        {
+            LOG(VB_COMMFLAG, LOG_ERR, "PGMConverter::getImage no buf");
+            goto error;
+        }
 
 #ifdef PGM_CONVERT_GREYSCALE
-    start = nowAsDuration<std::chrono::microseconds>();
-    if (m_copy->Copy(&m_pgm, frame, m_pgm.data[0], AV_PIX_FMT_GRAY8) < 0)
-        goto error;
-    end = nowAsDuration<std::chrono::microseconds>();
-    m_convertTime += (end - start);
+        start = nowAsDuration<std::chrono::microseconds>();
+        if (m_copy->Copy(&m_pgm, frame, m_pgm.data[0], AV_PIX_FMT_GRAY8) < 0)
+            goto error;
+        end = nowAsDuration<std::chrono::microseconds>();
+        m_convertTime += (end - start);
 #else  /* !PGM_CONVERT_GREYSCALE */
-    if (av_image_fill_arrays(m_pgm.data, m_pgm.linesize,
-        frame->m_buffer, AV_PIX_FMT_GRAY8, m_width, m_height,IMAGE_ALIGN) < 0)
-    {
-        LOG(VB_COMMFLAG, LOG_ERR,
-            QString("PGMConverter::getImage error at frame %1 (%2x%3)")
-                .arg(_frameno).arg(m_width).arg(m_height));
-        goto error;
-    }
+        if (av_image_fill_arrays(m_pgm.data, m_pgm.linesize,
+            frame->m_buffer, AV_PIX_FMT_GRAY8, m_width, m_height,IMAGE_ALIGN) < 0)
+        {
+            LOG(VB_COMMFLAG, LOG_ERR,
+                QString("PGMConverter::getImage error at frame %1 (%2x%3)")
+                    .arg(_frameno).arg(m_width).arg(m_height));
+            goto error;
+        }
 #endif /* !PGM_CONVERT_GREYSCALE */
 
-    m_frameNo = _frameno;
+        m_frameNo = _frameno;
+    }
 
 out:
     *pwidth = m_width;
