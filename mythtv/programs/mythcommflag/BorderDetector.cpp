@@ -54,9 +54,9 @@ BorderDetector::setLogoState(TemplateFinder *finder)
         .arg(m_logoWidth).arg(m_logoHeight).arg(m_logoCol).arg(m_logoRow));
 }
 
-int
-BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
-        long long _frameno, int *prow, int *pcol, int *pwidth, int *pheight)
+void
+BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
+        long long _frameno)
 {
     /*
      * The basic algorithm is to look for pixels of the same color along all
@@ -132,11 +132,6 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     int newheight = maxrow1 + 1 - minrow;
     bool top    = false;
     bool bottom = false;
-
-    auto start = nowAsDuration<std::chrono::microseconds>();
-
-    if (_frameno != kUncached && _frameno == m_frameNo)
-        goto done;
 
     {
         for (;;)
@@ -348,7 +343,7 @@ found_bottom:
     m_width = newwidth;
     m_height = newheight;
     m_isMonochromatic = false;
-    goto done;
+    return;
 
 monochromatic_frame:
     m_frameNo = _frameno;
@@ -357,8 +352,17 @@ monochromatic_frame:
     m_width = newwidth;
     m_height = newheight;
     m_isMonochromatic = true;
+}
 
-done:
+int
+BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
+        long long _frameno, int *prow, int *pcol, int *pwidth, int *pheight)
+{
+    auto start = nowAsDuration<std::chrono::microseconds>();
+
+    if (_frameno == kUncached || _frameno != m_frameNo)
+        getDimensionsReal(pgm, pgmheight, _frameno);
+
     *prow = m_row;
     *pcol = m_col;
     *pwidth = m_width;
