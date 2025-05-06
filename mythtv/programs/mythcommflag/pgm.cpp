@@ -41,6 +41,9 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
                 .arg(filename, strerror(errno)));
         return -1;
     }
+    // Automatically close file at function exit
+    auto close_fp = [](FILE *fp2) { fclose(fp2); };
+    std::unique_ptr<FILE,decltype(close_fp)> cleanup { fp, close_fp };
 
     int fwidth = 0;
     int fheight = 0;
@@ -50,7 +53,7 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fscanf %1 failed: %2")
                 .arg(filename, strerror(errno)));
-        goto error;
+        return -1;
     }
 
     if (fwidth != width || fheight != height || maxgray != UCHAR_MAX)
@@ -59,7 +62,7 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
             QString("pgm_read header (%1x%2,%3) != (%4x%5,%6)")
                 .arg(fwidth).arg(fheight).arg(maxgray)
                 .arg(width).arg(height).arg(UCHAR_MAX));
-        goto error;
+        return -1;
     }
 
     for (ptrdiff_t rr = 0; rr < height; rr++)
@@ -68,16 +71,10 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
         {
             LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fread %1 failed: %2")
                     .arg(filename, strerror(errno)));
-            goto error;
+            return -1;
         }
     }
-
-    (void)fclose(fp);
     return 0;
-
-error:
-    (void)fclose(fp);
-    return -1;
 }
 
 int pgm_write(const unsigned char *buf, int width, int height,
@@ -92,6 +89,9 @@ int pgm_write(const unsigned char *buf, int width, int height,
                 .arg(filename, strerror(errno)));
         return -1;
     }
+    // Automatically close file at function exit
+    auto close_fp = [](FILE *fp2) { fclose(fp2); };
+    std::unique_ptr<FILE,decltype(close_fp)> cleanup { fp, close_fp };
 
     (void)fprintf(fp, "P5\n%d %d\n%d\n", width, height, UCHAR_MAX);
     for (ptrdiff_t rr = 0; rr < height; rr++)
@@ -100,16 +100,10 @@ int pgm_write(const unsigned char *buf, int width, int height,
         {
             LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_write fwrite %1 failed: %2")
                     .arg(filename, strerror(errno)));
-            goto error;
+            return -1;
         }
     }
-
-    (void)fclose(fp);
     return 0;
-
-error:
-    (void)fclose(fp);
-    return -1;
 }
 
 static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,

@@ -132,7 +132,9 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
     int newheight = maxrow1 + 1 - minrow;
     bool top    = false;
     bool bottom = false;
+    bool monochromatic = false;
 
+    try
     {
         for (;;)
         {
@@ -142,7 +144,8 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
             uchar maxval = 0;
             int lines = 0;
             int saved = mincol;
-            for (int cc = mincol; cc < maxcol1; cc++)
+            bool found = false;
+            for (int cc = mincol; !found && cc < maxcol1; cc++)
             {
                 int outliers = 0;
                 bool inrange = true;
@@ -159,9 +162,9 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
                         if (outliers++ < MAXOUTLIERS)
                             continue;   /* Next row. */
                         inrange = false;
-                        if (lines++ < kMaxLines)
-                            break;  /* Next column. */
-                        goto found_left;
+                        if (lines++ >= kMaxLines)
+                            found = true;
+                        break;  /* Next column. */
                     }
                     minval = std::min(val, minval);
                     maxval = std::max(val, maxval);
@@ -172,7 +175,6 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
                     lines = 0;
                 }
             }
-found_left:
             if (newcol != saved + 1 + HORIZSLOP)
             {
                 newcol = std::min(maxcol1, saved + 1 + HORIZSLOP);
@@ -181,7 +183,7 @@ found_left:
             }
 
             if (!newwidth)
-                goto monochromatic_frame;
+                throw "monochromatic";
 
             mincol = newcol;
 
@@ -192,7 +194,8 @@ found_left:
             bool right = false;
             lines = 0;
             saved = maxcol1 - 1;
-            for (int cc = maxcol1 - 1; cc >= mincol; cc--)
+            found = false;
+            for (int cc = maxcol1 - 1; !found && cc >= mincol; cc--)
             {
                 int outliers = 0;
                 bool inrange = true;
@@ -209,9 +212,9 @@ found_left:
                         if (outliers++ < MAXOUTLIERS)
                             continue;   /* Next row. */
                         inrange = false;
-                        if (lines++ < kMaxLines)
-                            break;  /* Next column. */
-                        goto found_right;
+                        if (lines++ >= kMaxLines)
+                            found = true;
+                        break;  /* Next column. */
                     }
                     minval = std::min(val, minval);
                     maxval = std::max(val, maxval);
@@ -222,7 +225,6 @@ found_left:
                     lines = 0;
                 }
             }
-found_right:
             if (newwidth != saved - mincol - HORIZSLOP)
             {
                 newwidth = std::max(0, saved - mincol - HORIZSLOP);
@@ -230,7 +232,7 @@ found_right:
             }
 
             if (!newwidth)
-                goto monochromatic_frame;
+                throw "monochromatic";
 
             if (top || bottom)
                 break;  /* Do not repeat letterboxing check. */
@@ -243,7 +245,8 @@ found_right:
             maxval = 0;
             lines = 0;
             saved = minrow;
-            for (int rr = minrow; rr < maxrow1; rr++)
+            found = false;
+            for (int rr = minrow; !found && rr < maxrow1; rr++)
             {
                 int outliers = 0;
                 bool inrange = true;
@@ -260,9 +263,9 @@ found_right:
                         if (outliers++ < MAXOUTLIERS)
                             continue;   /* Next column. */
                         inrange = false;
-                        if (lines++ < kMaxLines)
-                            break;  /* Next row. */
-                        goto found_top;
+                        if (lines++ >= kMaxLines)
+                            found = true;
+                        break;  /* Next row. */
                     }
                     minval = std::min(val, minval);
                     maxval = std::max(val, maxval);
@@ -273,7 +276,6 @@ found_right:
                     lines = 0;
                 }
             }
-found_top:
             if (newrow != saved + 1 + VERTSLOP)
             {
                 newrow = std::min(maxrow1, saved + 1 + VERTSLOP);
@@ -282,7 +284,7 @@ found_top:
             }
 
             if (!newheight)
-                goto monochromatic_frame;
+                throw "monochromatic";
 
             minrow = newrow;
 
@@ -290,7 +292,8 @@ found_top:
             bottom = false;
             lines = 0;
             saved = maxrow1 - 1;
-            for (int rr = maxrow1 - 1; rr >= minrow; rr--)
+            found = true;
+            for (int rr = maxrow1 - 1; !found && rr >= minrow; rr--)
             {
                 int outliers = 0;
                 bool inrange = true;
@@ -307,9 +310,9 @@ found_top:
                         if (outliers++ < MAXOUTLIERS)
                             continue;   /* Next column. */
                         inrange = false;
-                        if (lines++ < kMaxLines)
-                            break;  /* Next row. */
-                        goto found_bottom;
+                        if (lines++ >= kMaxLines)
+                            found = true;
+                        break;  /* Next row. */
                     }
                     minval = std::min(val, minval);
                     maxval = std::max(val, maxval);
@@ -320,7 +323,6 @@ found_top:
                     lines = 0;
                 }
             }
-found_bottom:
             if (newheight != saved - minrow - VERTSLOP)
             {
                 newheight = std::max(0, saved - minrow - VERTSLOP);
@@ -328,7 +330,7 @@ found_bottom:
             }
 
             if (!newheight)
-                goto monochromatic_frame;
+                throw "monochromatic";
 
             if (left || right)
                 break;  /* Do not repeat pillarboxing check. */
@@ -336,22 +338,17 @@ found_bottom:
             maxrow1 = minrow + newheight;
         }
     }
+    catch (char const* e)
+    {
+        monochromatic = true;
+    }
 
     m_frameNo = _frameno;
     m_row = newrow;
     m_col = newcol;
     m_width = newwidth;
     m_height = newheight;
-    m_isMonochromatic = false;
-    return;
-
-monochromatic_frame:
-    m_frameNo = _frameno;
-    m_row = newrow;
-    m_col = newcol;
-    m_width = newwidth;
-    m_height = newheight;
-    m_isMonochromatic = true;
+    m_isMonochromatic = monochromatic;
 }
 
 int
