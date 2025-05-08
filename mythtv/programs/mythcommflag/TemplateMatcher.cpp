@@ -44,6 +44,25 @@ int pgm_set(const AVFrame *pict, int height)
     return score;
 }
 
+int pgm_match_inner_loop (const AVFrame *test, int rr, int cc, int radius, int height, int width)
+{
+    int r2min = std::max(0, rr - radius);
+    int r2max = std::min(height, rr + radius);
+
+    int c2min = std::max(0, cc - radius);
+    int c2max = std::min(width, cc + radius);
+
+    for (int r2 = r2min; r2 <= r2max; r2++)
+    {
+        for (int c2 = c2min; c2 <= c2max; c2++)
+        {
+            if (test->data[0][(r2 * width) + c2])
+                return 1;
+        }
+    }
+    return 0;
+}
+
 int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
               int radius, unsigned short *pscore)
 {
@@ -65,26 +84,7 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
         {
             if (!tmpl->data[0][(rr * width) + cc])
                 continue;
-
-            int r2min = std::max(0, rr - radius);
-            int r2max = std::min(height, rr + radius);
-
-            int c2min = std::max(0, cc - radius);
-            int c2max = std::min(width, cc + radius);
-
-            for (int r2 = r2min; r2 <= r2max; r2++)
-            {
-                for (int c2 = c2min; c2 <= c2max; c2++)
-                {
-                    if (test->data[0][(r2 * width) + c2])
-                    {
-                        score++;
-                        goto next_pixel;
-                    }
-                }
-            }
-next_pixel:
-            ;
+            score += pgm_match_inner_loop(test, rr, cc, radius, height, width);
         }
     }
 
