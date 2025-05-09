@@ -30,6 +30,8 @@ class MBASE_PUBLIC MythTranslation
     static bool LanguageChanged(void);
 
   protected:
+    static void load_real(const QString &module_name);
+
     static class MythTranslationPrivate d;
 };
 

@@ -19,16 +19,6 @@ class MythTranslationPrivate
   public:
     MythTranslationPrivate() = default;
 
-    void Init(void)
-    {
-        if (!m_loaded)
-        {
-            m_loaded = true;
-            m_language = gCoreContext->GetSetting("Language");
-        }
-    };
-
-    bool m_loaded {false};
     QString m_language;
     TransMap m_translators;
 };
@@ -37,8 +27,18 @@ MythTranslationPrivate MythTranslation::d;
 
 void MythTranslation::load(const QString &module_name)
 {
-    d.Init();
+    // update m_language via LanguageChanged() and load the new translation
+    // if one was already loaded and the language has changed
+    reload();
 
+    if (!d.m_translators.contains(module_name))
+    {
+        load_real(module_name);
+    }
+}
+
+void MythTranslation::load_real(const QString &module_name)
+{
     // unload any previous version
     unload(module_name);
 
@@ -97,9 +97,6 @@ bool MythTranslation::LanguageChanged(void)
 
 void MythTranslation::reload()
 {
-//    if (!d.m_loaded)
-//        return;
-
     // Update our translators if necessary.
     // We need two loops, as the QMap wasn't happy with
     // me changing its contents during my iteration.
@@ -112,7 +109,7 @@ void MythTranslation::reload()
             keys.append(it.key());
 
         for (const auto& key : std::as_const(keys))
-            load(key);
+            load_real(key);
     }
 }
 
