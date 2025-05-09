@@ -518,19 +518,19 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
     }
 
   skip:
-    for (mode = field*4; mode < (field*4 + 4); mode++)
+    for (size_t mode2 = field*4; mode2 < (field*4 + 4); mode2++)
     {
-        len = m_ccBuf[mode].length();
-        if ((m_ignoreTimeCode || ((tc - m_timeCode[mode]) > 100ms)) &&
-             (m_style[mode] != CC_STYLE_POPUP) && len)
+        size_t len2 = m_ccBuf[mode2].length();
+        if ((m_ignoreTimeCode || ((tc - m_timeCode[mode2]) > 100ms)) &&
+             (m_style[mode2] != CC_STYLE_POPUP) && len2)
         {
             // flush unfinished line if waiting too long
             // in paint-on or scroll-up mode
-            m_timeCode[mode] = tc;
-            BufferCC(mode, len, 0);
-            m_ccBuf[mode] = "";
-            m_row[mode] = m_lastRow[mode];
-            m_lineCont[mode] = 1;
+            m_timeCode[mode2] = tc;
+            BufferCC(mode2, len2, 0);
+            m_ccBuf[mode2] = "";
+            m_row[mode2] = m_lastRow[mode2];
+            m_lineCont[mode2] = 1;
         }
     }
 
