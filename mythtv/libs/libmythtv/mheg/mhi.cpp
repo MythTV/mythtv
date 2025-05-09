@@ -1880,14 +1880,22 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     if (!picture)
         return;
 
+    // Automatically clean up memory allocation at function exit
+    auto cleanup_fn = [&](MHIBitmap */*x*/) {
+        pkt.data = buff;
+        av_packet_unref(&pkt);
+        avcodec_free_context(&c);
+    };
+    std::unique_ptr<MHIBitmap,decltype(cleanup_fn)> cleanup { this, cleanup_fn };
+
     c = avcodec_alloc_context3(nullptr);
 
     if (avcodec_open2(c, codec, nullptr) < 0)
-        goto Close;
+        return;
 
     // Copy the data into AVPacket
     if (av_new_packet(&pkt, length) < 0)
-        goto Close;
+        return;
 
     memcpy(pkt.data, data, length);
     buff = pkt.data;
@@ -1912,13 +1920,11 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
                 QString("[mhi] video decode error: %1 (%2)")
                 .arg(av_make_error_stdstring(error, len))
                 .arg(gotPicture));
-            goto Close;
+            return;
         }
-        else
-        {
-            pkt.data = nullptr;
-            pkt.size = 0;
-        }
+
+        pkt.data = nullptr;
+        pkt.size = 0;
     }
 
     if (gotPicture)
@@ -1958,11 +1964,6 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         }
         av_freep(reinterpret_cast<void*>(&outputbuf));
     }
-
-Close:
-    pkt.data = buff;
-    av_packet_unref(&pkt);
-    avcodec_free_context(&c);
 }
 
 // Scale the bitmap.  Only used for image derived from MPEG I-frames.
