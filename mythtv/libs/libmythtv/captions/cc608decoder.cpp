@@ -96,6 +96,352 @@ static const std::array<const QChar,32> extendedchar3 =
     QChar(0x250C),     QChar(0x2510),     QChar(0x2514),     QChar(0x2518)      // ┌┐└┘
 };
 
+void CC608Decoder::FormatTextCode(std::chrono::milliseconds tc, size_t field, size_t mode, size_t len, int b1, int b2)
+{
+    if (mode == std::numeric_limits<std::size_t>::max())
+        return;
+
+    m_lastCodeTc[field] += 33ms;
+    m_timeCode[mode] = tc;
+
+    // commit row number only when first text code
+    // comes in
+    if (m_newRow[mode])
+        NewRowCC(mode, len);
+
+    m_ccBuf[mode] += CharCC(b1);
+    m_col[mode]++;
+    if (b2 & 0x60)
+    {
+        m_ccBuf[mode] += CharCC(b2);
+        m_col[mode]++;
+    }
+}
+
+void CC608Decoder::FormatControlCode(std::chrono::milliseconds tc, size_t field, int b1, int b2)
+{
+    m_lastCodeTc[field] += 67ms;
+
+    int newccmode = (b1 >> 3) & 1;
+    int newtxtmode = m_txtMode[(field*2) + newccmode];
+    if ((b1 & 0x06) == 0x04)
+    {
+        switch (b2)
+        {
+        case 0x29:
+        case 0x2C:
+        case 0x20:
+        case 0x2F:
+        case 0x25:
+        case 0x26:
+        case 0x27:
+            // CC1,2
+            newtxtmode = 0;
+            break;
+        case 0x2A:
+        case 0x2B:
+            // TXT1,2
+            newtxtmode = 1;
+            break;
+        }
+    }
+    m_ccMode[field] = newccmode;
+    m_txtMode[(field*2) + newccmode] = newtxtmode;
+    size_t mode = (field << 2) | (newtxtmode << 1) | m_ccMode[field];
+
+    m_timeCode[mode] = tc;
+    size_t len = m_ccBuf[mode].length();
+
+    if (b2 & 0x40)           //preamble address code (row & indent)
+    {
+        if (newtxtmode)
+            // no address codes in TXT mode?
+            return;
+
+        m_newRow[mode] = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
+        if (m_newRow[mode] == -1)
+            // bogus code?
+            m_newRow[mode] = m_lastRow[mode] + 1;
+
+        if (b2 & 0x10)        //row contains indent flag
+        {
+            m_newCol[mode] = (b2 & 0x0E) << 1;
+            // Encode as 0x7020 or 0x7021 depending on the
+            // underline flag.
+            m_newAttr[mode] = (b2 & 0x1) + 0x20;
+            LOG(VB_VBI, LOG_INFO,
+                QString("cc608 preamble indent, b2=%1")
+                .arg(b2, 2, 16));
+        }
+        else
+        {
+            m_newCol[mode] = 0;
+            m_newAttr[mode] = (b2 & 0xf) + 0x10;
+            // Encode as 0x7010 through 0x702f for the 16 possible
+            // values of b2.
+            LOG(VB_VBI, LOG_INFO,
+                QString("cc608 preamble color change, b2=%1")
+                .arg(b2, 2, 16));
+        }
+
+        // row, indent, attribute settings are not final
+        // until text code arrives
+        return;
+    }
+
+    switch (b1 & 0x07)
+    {
+    case 0x00:          //attribute
+#if 0
+        LOG(VB_VBI, LOG_DEBUG,
+            QString("<ATTRIBUTE %1 %2>").arg(b1).arg(b2));
+#endif
+        break;
+    case 0x01:          //midrow or char
+        if (m_newRow[mode])
+            NewRowCC(mode, len);
+
+        switch (b2 & 0x70)
+        {
+        case 0x20:      //midrow attribute change
+            LOG(VB_VBI, LOG_INFO,
+                QString("cc608 mid-row color change, b2=%1")
+                .arg(b2, 2, 16));
+            // Encode as 0x7000 through 0x700f for the
+            // 16 possible values of b2.
+            m_ccBuf[mode] += ' ';
+            m_ccBuf[mode] += QChar(0x7000 + (b2 & 0xf));
+            m_col[mode]++;
+            break;
+        case 0x30:      //special character..
+            m_ccBuf[mode] += specialchar[b2 & 0x0f];
+            m_col[mode]++;
+            break;
+        }
+        break;
+    case 0x02:          //extended char
+        // extended char is preceded by alternate char
+        // - if there's no alternate, it could be noise
+        if (!len)
+            break;
+
+        if (b2 & 0x30)
+        {
+            m_ccBuf[mode].remove(len - 1, 1);
+            m_ccBuf[mode] += extendedchar2[b2 - 0x20];
+            break;
+        }
+        break;
+    case 0x03:          //extended char
+        // extended char is preceded by alternate char
+        // - if there's no alternate, it could be noise
+        if (!len)
+            break;
+
+        if (b2 & 0x30)
+        {
+            m_ccBuf[mode].remove(len - 1, 1);
+            m_ccBuf[mode] += extendedchar3[b2 - 0x20];
+            break;
+        }
+        break;
+    case 0x04:          //misc
+    case 0x05:          //misc + F
+#if 0
+        LOG(VB_VBI, LOG_DEBUG,
+            QString("ccmode %1 cmd %2").arg(m_ccMode)
+            .arg(b2, 2, 16, '0'));
+#endif
+        switch (b2)
+        {
+        case 0x21:      //backspace
+            // add backspace if line has been encoded already
+            if (m_newRow[mode])
+                len = NewRowCC(mode, len);
+
+            if (len == 0 ||
+                m_ccBuf[mode].startsWith("\b"))
+            {
+                m_ccBuf[mode] += '\b';
+                m_col[mode]--;
+            }
+            else
+            {
+                m_ccBuf[mode].remove(len - 1, 1);
+                m_col[mode]--;
+            }
+            break;
+        case 0x25:      //2 row caption
+        case 0x26:      //3 row caption
+        case 0x27:      //4 row caption
+            if (m_style[mode] == CC_STYLE_PAINT && len)
+            {
+                // flush
+                BufferCC(mode, len, 0);
+                m_ccBuf[mode] = "";
+                m_row[mode] = 0;
+                m_col[mode] = 0;
+            }
+            else if (m_style[mode] == CC_STYLE_POPUP)
+            {
+                ResetCC(mode);
+            }
+
+            m_rowCount[mode] = b2 - 0x25 + 2;
+            m_style[mode] = CC_STYLE_ROLLUP;
+            break;
+        case 0x2D:      //carriage return
+            if (m_style[mode] != CC_STYLE_ROLLUP)
+                break;
+
+            if (m_newRow[mode])
+                m_row[mode] = m_newRow[mode];
+
+            // flush if there is text or need to scroll
+            // TODO:  decode ITV (WebTV) link in TXT2
+            if (len || (m_row[mode] != 0 && !m_lineCont[mode] &&
+                        (!newtxtmode || m_row[mode] >= 16)))
+            {
+                BufferCC(mode, len, 0);
+            }
+
+            if (newtxtmode)
+            {
+                if (m_row[mode] < 16)
+                    m_newRow[mode] = m_row[mode] + 1;
+                else
+                    // scroll up previous lines
+                    m_newRow[mode] = 16;
+            }
+
+            m_ccBuf[mode] = "";
+            m_col[mode] = 0;
+            m_lineCont[mode] = 0;
+            break;
+
+        case 0x29:
+            // resume direct caption (paint-on style)
+            if (m_style[mode] == CC_STYLE_ROLLUP && len)
+            {
+                // flush
+                BufferCC(mode, len, 0);
+                m_ccBuf[mode] = "";
+                m_row[mode] = 0;
+                m_col[mode] = 0;
+            }
+            else if (m_style[mode] == CC_STYLE_POPUP)
+            {
+                ResetCC(mode);
+            }
+
+            m_style[mode] = CC_STYLE_PAINT;
+            m_rowCount[mode] = 0;
+            m_lineCont[mode] = 0;
+            break;
+
+        case 0x2B:      //resume text display
+            m_resumeText[mode] = 1;
+            if (m_row[mode] == 0)
+            {
+                m_newRow[mode] = 1;
+                m_newCol[mode] = 0;
+                m_newAttr[mode] = 0;
+            }
+            m_style[mode] = CC_STYLE_ROLLUP;
+            break;
+        case 0x2C:      //erase displayed memory
+            if (m_ignoreTimeCode ||
+                (tc - m_lastClr[mode]) > 5s ||
+                m_lastClr[mode] == 0ms)
+            {
+                // don't overflow the frontend with
+                // too many redundant erase codes
+                BufferCC(mode, 0, 1);
+            }
+            if (m_style[mode] != CC_STYLE_POPUP)
+            {
+                m_row[mode] = 0;
+                m_col[mode] = 0;
+            }
+            m_lineCont[mode] = 0;
+            break;
+
+        case 0x20:      //resume caption (pop-up style)
+            if (m_style[mode] != CC_STYLE_POPUP)
+            {
+                if (len)
+                    // flush
+                    BufferCC(mode, len, 0);
+                m_ccBuf[mode] = "";
+                m_row[mode] = 0;
+                m_col[mode] = 0;
+            }
+            m_style[mode] = CC_STYLE_POPUP;
+            m_rowCount[mode] = 0;
+            m_lineCont[mode] = 0;
+            break;
+        case 0x2F:      //end caption + swap memory
+            if (m_style[mode] != CC_STYLE_POPUP)
+            {
+                if (len)
+                    // flush
+                    BufferCC(mode, len, 0);
+            }
+            else if (m_ignoreTimeCode ||
+                     (tc - m_lastClr[mode]) > 5s ||
+                     m_lastClr[mode] == 0ms)
+            {
+                // clear and flush
+                BufferCC(mode, len, 1);
+            }
+            else if (len)
+            {
+                // flush
+                BufferCC(mode, len, 0);
+            }
+            m_ccBuf[mode] = "";
+            m_row[mode] = 0;
+            m_col[mode] = 0;
+            m_style[mode] = CC_STYLE_POPUP;
+            m_rowCount[mode] = 0;
+            m_lineCont[mode] = 0;
+            break;
+
+        case 0x2A:      //text restart
+            // clear display
+            BufferCC(mode, 0, 1);
+            ResetCC(mode);
+            // TXT starts at row 1
+            m_newRow[mode] = 1;
+            m_newCol[mode] = 0;
+            m_newAttr[mode] = 0;
+            m_style[mode] = CC_STYLE_ROLLUP;
+            break;
+
+        case 0x2E:      //erase non-displayed memory
+            ResetCC(mode);
+            break;
+        }
+        break;
+    case 0x07:          //misc (TAB)
+        if (m_newRow[mode])
+        {
+            m_newCol[mode] += (b2 & 0x03);
+            NewRowCC(mode, len);
+        }
+        else
+        {
+            // illegal?
+            for (int x = 0; x < (b2 & 0x03); x++)
+            {
+                m_ccBuf[mode] += ' ';
+                m_col[mode]++;
+            }
+        }
+        break;
+    }
+}
+
 void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int data)
 {
     size_t len = 0;
@@ -160,364 +506,24 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
     {
         if (m_ignoreTimeCode)
             return;
-        goto skip;
     }
-
-    if (XDSDecode(field, b1, b2))
+    else if (XDSDecode(field, b1, b2))
+    {
         return;
-
-    if (b1 & 0x60)
+    }
+    else if (b1 & 0x60)
+    {
         // 0x20 <= b1 <= 0x7F
         // text codes
-    {
-        if (mode != std::numeric_limits<std::size_t>::max())
-        {
-            m_lastCodeTc[field] += 33ms;
-            m_timeCode[mode] = tc;
-
-            // commit row number only when first text code
-            // comes in
-            if (m_newRow[mode])
-                NewRowCC(mode, len);
-
-            m_ccBuf[mode] += CharCC(b1);
-            m_col[mode]++;
-            if (b2 & 0x60)
-            {
-                m_ccBuf[mode] += CharCC(b2);
-                m_col[mode]++;
-            }
-        }
+        FormatTextCode(tc, field, mode, len, b1, b2);
     }
-
     else if ((b1 & 0x10) && (b2 > 0x1F))
+    {
         // 0x10 <= b1 <= 0x1F
         // control codes
-    {
-        m_lastCodeTc[field] += 67ms;
-
-        int newccmode = (b1 >> 3) & 1;
-        int newtxtmode = m_txtMode[(field*2) + newccmode];
-        if ((b1 & 0x06) == 0x04)
-        {
-            switch (b2)
-            {
-                case 0x29:
-                case 0x2C:
-                case 0x20:
-                case 0x2F:
-                case 0x25:
-                case 0x26:
-                case 0x27:
-                    // CC1,2
-                    newtxtmode = 0;
-                    break;
-                case 0x2A:
-                case 0x2B:
-                    // TXT1,2
-                    newtxtmode = 1;
-                    break;
-            }
-        }
-        m_ccMode[field] = newccmode;
-        m_txtMode[(field*2) + newccmode] = newtxtmode;
-        mode = (field << 2) | (newtxtmode << 1) | m_ccMode[field];
-
-        m_timeCode[mode] = tc;
-        len = m_ccBuf[mode].length();
-
-        if (b2 & 0x40)           //preamble address code (row & indent)
-        {
-            if (newtxtmode)
-                // no address codes in TXT mode?
-                goto skip;
-
-            m_newRow[mode] = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
-            if (m_newRow[mode] == -1)
-                // bogus code?
-                m_newRow[mode] = m_lastRow[mode] + 1;
-
-            if (b2 & 0x10)        //row contains indent flag
-            {
-                m_newCol[mode] = (b2 & 0x0E) << 1;
-                // Encode as 0x7020 or 0x7021 depending on the
-                // underline flag.
-                m_newAttr[mode] = (b2 & 0x1) + 0x20;
-                LOG(VB_VBI, LOG_INFO,
-                        QString("cc608 preamble indent, b2=%1")
-                        .arg(b2, 2, 16));
-            }
-            else
-            {
-                m_newCol[mode] = 0;
-                m_newAttr[mode] = (b2 & 0xf) + 0x10;
-                // Encode as 0x7010 through 0x702f for the 16 possible
-                // values of b2.
-                LOG(VB_VBI, LOG_INFO,
-                        QString("cc608 preamble color change, b2=%1")
-                        .arg(b2, 2, 16));
-            }
-
-            // row, indent, attribute settings are not final
-            // until text code arrives
-        }
-        else
-        {
-            switch (b1 & 0x07)
-            {
-                case 0x00:          //attribute
-#if 0
-                    LOG(VB_VBI, LOG_DEBUG,
-                        QString("<ATTRIBUTE %1 %2>").arg(b1).arg(b2));
-#endif
-                    break;
-                case 0x01:          //midrow or char
-                    if (m_newRow[mode])
-                        NewRowCC(mode, len);
-
-                    switch (b2 & 0x70)
-                    {
-                        case 0x20:      //midrow attribute change
-                            LOG(VB_VBI, LOG_INFO,
-                                    QString("cc608 mid-row color change, b2=%1")
-                                    .arg(b2, 2, 16));
-                            // Encode as 0x7000 through 0x700f for the
-                            // 16 possible values of b2.
-                            m_ccBuf[mode] += ' ';
-                            m_ccBuf[mode] += QChar(0x7000 + (b2 & 0xf));
-                            m_col[mode]++;
-                            break;
-                        case 0x30:      //special character..
-                            m_ccBuf[mode] += specialchar[b2 & 0x0f];
-                            m_col[mode]++;
-                            break;
-                    }
-                    break;
-                case 0x02:          //extended char
-                    // extended char is preceded by alternate char
-                    // - if there's no alternate, it could be noise
-                    if (!len)
-                        break;
-
-                    if (b2 & 0x30)
-                    {
-                        m_ccBuf[mode].remove(len - 1, 1);
-                        m_ccBuf[mode] += extendedchar2[b2 - 0x20];
-                        break;
-                    }
-                    break;
-                case 0x03:          //extended char
-                    // extended char is preceded by alternate char
-                    // - if there's no alternate, it could be noise
-                    if (!len)
-                        break;
-
-                    if (b2 & 0x30)
-                    {
-                        m_ccBuf[mode].remove(len - 1, 1);
-                        m_ccBuf[mode] += extendedchar3[b2 - 0x20];
-                        break;
-                    }
-                    break;
-                case 0x04:          //misc
-                case 0x05:          //misc + F
-#if 0
-                    LOG(VB_VBI, LOG_DEBUG,
-                        QString("ccmode %1 cmd %2").arg(m_ccMode)
-                            .arg(b2, 2, 16, '0'));
-#endif
-                    switch (b2)
-                    {
-                        case 0x21:      //backspace
-                            // add backspace if line has been encoded already
-                            if (m_newRow[mode])
-                                len = NewRowCC(mode, len);
-
-                            if (len == 0 ||
-                                m_ccBuf[mode].startsWith("\b"))
-                            {
-                                m_ccBuf[mode] += '\b';
-                                m_col[mode]--;
-                            }
-                            else
-                            {
-                                m_ccBuf[mode].remove(len - 1, 1);
-                                m_col[mode]--;
-                            }
-                            break;
-                        case 0x25:      //2 row caption
-                        case 0x26:      //3 row caption
-                        case 0x27:      //4 row caption
-                            if (m_style[mode] == CC_STYLE_PAINT && len)
-                            {
-                                // flush
-                                BufferCC(mode, len, 0);
-                                m_ccBuf[mode] = "";
-                                m_row[mode] = 0;
-                                m_col[mode] = 0;
-                            }
-                            else if (m_style[mode] == CC_STYLE_POPUP)
-                            {
-                                ResetCC(mode);
-                            }
-
-                            m_rowCount[mode] = b2 - 0x25 + 2;
-                            m_style[mode] = CC_STYLE_ROLLUP;
-                            break;
-                        case 0x2D:      //carriage return
-                            if (m_style[mode] != CC_STYLE_ROLLUP)
-                                break;
-
-                            if (m_newRow[mode])
-                                m_row[mode] = m_newRow[mode];
-
-                            // flush if there is text or need to scroll
-                            // TODO:  decode ITV (WebTV) link in TXT2
-                            if (len || (m_row[mode] != 0 && !m_lineCont[mode] &&
-                                        (!newtxtmode || m_row[mode] >= 16)))
-                            {
-                                BufferCC(mode, len, 0);
-                            }
-
-                            if (newtxtmode)
-                            {
-                                if (m_row[mode] < 16)
-                                    m_newRow[mode] = m_row[mode] + 1;
-                                else
-                                    // scroll up previous lines
-                                    m_newRow[mode] = 16;
-                            }
-
-                            m_ccBuf[mode] = "";
-                            m_col[mode] = 0;
-                            m_lineCont[mode] = 0;
-                            break;
-
-                        case 0x29:
-                            // resume direct caption (paint-on style)
-                            if (m_style[mode] == CC_STYLE_ROLLUP && len)
-                            {
-                                // flush
-                                BufferCC(mode, len, 0);
-                                m_ccBuf[mode] = "";
-                                m_row[mode] = 0;
-                                m_col[mode] = 0;
-                            }
-                            else if (m_style[mode] == CC_STYLE_POPUP)
-                            {
-                                ResetCC(mode);
-                            }
-
-                            m_style[mode] = CC_STYLE_PAINT;
-                            m_rowCount[mode] = 0;
-                            m_lineCont[mode] = 0;
-                            break;
-
-                        case 0x2B:      //resume text display
-                            m_resumeText[mode] = 1;
-                            if (m_row[mode] == 0)
-                            {
-                                m_newRow[mode] = 1;
-                                m_newCol[mode] = 0;
-                                m_newAttr[mode] = 0;
-                            }
-                            m_style[mode] = CC_STYLE_ROLLUP;
-                            break;
-                        case 0x2C:      //erase displayed memory
-                            if (m_ignoreTimeCode ||
-                                (tc - m_lastClr[mode]) > 5s ||
-                                m_lastClr[mode] == 0ms)
-                            {
-                                // don't overflow the frontend with
-                                // too many redundant erase codes
-                                BufferCC(mode, 0, 1);
-                            }
-                            if (m_style[mode] != CC_STYLE_POPUP)
-                            {
-                                m_row[mode] = 0;
-                                m_col[mode] = 0;
-                            }
-                            m_lineCont[mode] = 0;
-                            break;
-
-                        case 0x20:      //resume caption (pop-up style)
-                            if (m_style[mode] != CC_STYLE_POPUP)
-                            {
-                                if (len)
-                                    // flush
-                                    BufferCC(mode, len, 0);
-                                m_ccBuf[mode] = "";
-                                m_row[mode] = 0;
-                                m_col[mode] = 0;
-                            }
-                            m_style[mode] = CC_STYLE_POPUP;
-                            m_rowCount[mode] = 0;
-                            m_lineCont[mode] = 0;
-                            break;
-                        case 0x2F:      //end caption + swap memory
-                            if (m_style[mode] != CC_STYLE_POPUP)
-                            {
-                                if (len)
-                                    // flush
-                                    BufferCC(mode, len, 0);
-                            }
-                            else if (m_ignoreTimeCode ||
-                                     (tc - m_lastClr[mode]) > 5s ||
-                                     m_lastClr[mode] == 0ms)
-                            {
-                                // clear and flush
-                                BufferCC(mode, len, 1);
-                            }
-                            else if (len)
-                            {
-                                // flush
-                                BufferCC(mode, len, 0);
-                            }
-                            m_ccBuf[mode] = "";
-                            m_row[mode] = 0;
-                            m_col[mode] = 0;
-                            m_style[mode] = CC_STYLE_POPUP;
-                            m_rowCount[mode] = 0;
-                            m_lineCont[mode] = 0;
-                            break;
-
-                        case 0x2A:      //text restart
-                            // clear display
-                            BufferCC(mode, 0, 1);
-                            ResetCC(mode);
-                            // TXT starts at row 1
-                            m_newRow[mode] = 1;
-                            m_newCol[mode] = 0;
-                            m_newAttr[mode] = 0;
-                            m_style[mode] = CC_STYLE_ROLLUP;
-                            break;
-
-                        case 0x2E:      //erase non-displayed memory
-                            ResetCC(mode);
-                            break;
-                    }
-                    break;
-                case 0x07:          //misc (TAB)
-                    if (m_newRow[mode])
-                    {
-                        m_newCol[mode] += (b2 & 0x03);
-                        NewRowCC(mode, len);
-                    }
-                    else
-                    {
-                        // illegal?
-                        for (int x = 0; x < (b2 & 0x03); x++)
-                        {
-                            m_ccBuf[mode] += ' ';
-                            m_col[mode]++;
-                        }
-                    }
-                    break;
-            }
-        }
+        FormatControlCode(tc, field, b1, b2);
     }
 
-  skip:
     for (size_t mode2 = field*4; mode2 < (field*4 + 4); mode2++)
     {
         size_t len2 = m_ccBuf[mode2].length();

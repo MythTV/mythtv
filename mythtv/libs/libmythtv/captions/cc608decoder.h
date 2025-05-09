@@ -121,6 +121,8 @@ class CC608Decoder
     void BufferCC(size_t mode, int len, int clr);
     int NewRowCC(size_t mode, int len);
 
+    void FormatTextCode(std::chrono::milliseconds tc, size_t field, size_t mode, size_t len, int b1, int b2);
+    void FormatControlCode(std::chrono::milliseconds tc, size_t field, int b1, int b2);
     QString XDSDecodeString(const std::vector<unsigned char>&buf,
                             uint start, uint end) const;
     bool XDSDecode(int field, int b1, int b2);
