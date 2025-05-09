@@ -854,19 +854,20 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 
 }
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define DONE_WITH_PSIP_PACKET() { delete psip; \
-    if (morePSIPTables) goto HAS_ANOTHER_PSIP; else return; }
-
 /** \fn MPEGStreamData::HandleTSTables(const TSPacket*)
  *  \brief Assembles PSIP packets and processes them.
  */
 void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 {
-    bool morePSIPTables = false;
-  HAS_ANOTHER_PSIP:
+    PSIPTable *psip = nullptr;
+    bool morePSIPTables = true;
+    while (morePSIPTables)
+    {
+        // Delete PSIP from previous iteration.
+        delete psip;
+
         // Assemble PSIP
-        PSIPTable *psip = AssemblePSIP(tspacket, morePSIPTables);
+        psip = AssemblePSIP(tspacket, morePSIPTables);
         if (!psip)
            return;
 
@@ -875,14 +876,14 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
             (TableID::STUFFING == psip->TableID()))
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC + "Dropping Stuffing table");
-            DONE_WITH_PSIP_PACKET();
+            continue;
         }
 
         // Don't do validation on tables without CRC
         if (!psip->HasCRC())
         {
             HandleTables(tspacket->PID(), *psip);
-            DONE_WITH_PSIP_PACKET();
+            continue;
         }
 
         // Validate PSIP
@@ -895,7 +896,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("PSIP packet failed CRC check. pid(0x%1) type(0x%2)")
                     .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
-            DONE_WITH_PSIP_PACKET();
+            continue;
         }
 
         if (TableID::MGT <= psip->TableID() && psip->TableID() <= TableID::STT &&
@@ -903,21 +904,21 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         { // we don't cache the next table, for now
             LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Table not current 0x%1")
                 .arg(psip->TableID(),2,16,QChar('0')));
-            DONE_WITH_PSIP_PACKET();
+            continue;
         }
 
         if (tspacket->Scrambled())
         { // scrambled! ATSC, DVB require tables not to be scrambled
             LOG(VB_RECORD, LOG_ERR, LOC +
                 "PSIP packet is scrambled, not ATSC/DVB compliant");
-            DONE_WITH_PSIP_PACKET();
+            continue;
         }
 
         if (!psip->VerifyPSIP(!m_haveCrcBug))
         {
             LOG(VB_RECORD, LOG_ERR, LOC + QString("PSIP table 0x%1 is invalid")
                 .arg(psip->TableID(),2,16,QChar('0')));
-            DONE_WITH_PSIP_PACKET();
+            continue;
         }
 
         // Don't decode redundant packets,
@@ -939,14 +940,15 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
                 for (auto & listener : m_mpegSpListeners)
                     listener->HandleSingleProgramPMT(pmt_sp, false);
             }
-            DONE_WITH_PSIP_PACKET(); // already parsed this table, toss it.
+            continue; // already parsed this table, toss it.
         }
 
         HandleTables(tspacket->PID(), *psip);
+    }
 
-        DONE_WITH_PSIP_PACKET();
+    // Delete PSIP from final iteration.
+    delete psip;
 }
-#undef DONE_WITH_PSIP_PACKET
 
 int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
 {
