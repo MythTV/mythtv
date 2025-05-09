@@ -226,11 +226,22 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     AVFilterInOut *inputs  = avfilter_inout_alloc();
     AVBufferSrcParameters* params = nullptr;
 
+    // Automatically clean up memory allocation at function exit
+    auto cleanup_fn = [&](int */*x*/) {
+        if (ret < 0) {
+            avfilter_graph_free(&Graph);
+            Graph = nullptr;
+        }
+        avfilter_inout_free(&inputs);
+        avfilter_inout_free(&outputs);
+    };
+    std::unique_ptr<int,decltype(cleanup_fn)> cleanup { &ret, cleanup_fn };
+
     Graph = avfilter_graph_alloc();
     if (!outputs || !inputs || !Graph)
     {
         ret = AVERROR(ENOMEM);
-        goto end;
+        return false;
     }
 
     /* buffer video source: the decoded frames from the decoder will be inserted here. */
@@ -242,7 +253,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer source");
-        goto end;
+        return false;
     }
 
     params = av_buffersrc_parameters_alloc();
@@ -252,7 +263,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "av_buffersrc_parameters_set failed");
-        goto end;
+        return false;
     }
     av_freep(reinterpret_cast<void*>(&params));
 
@@ -262,7 +273,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer sink");
-        goto end;
+        return false;
     }
 
     /*
@@ -298,7 +309,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("avfilter_graph_parse_ptr failed for %1")
             .arg(filters));
-        goto end;
+        return false;
     }
 
     ret = avfilter_graph_config(Graph, nullptr);
@@ -306,21 +317,13 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("VAAPI deinterlacer config failed - '%1' unsupported?").arg(deinterlacer));
-        goto end;
+        return false;
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created deinterlacer '%1'")
         .arg(MythVideoFrame::DeinterlacerName(Deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VAAPI)));
 
-end:
-    if (ret < 0)
-    {
-        avfilter_graph_free(&Graph);
-        Graph = nullptr;
-    }
-    avfilter_inout_free(&inputs);
-    avfilter_inout_free(&outputs);
-    return ret >= 0;
+    return true;
 }
 
 VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Current, FrameScanType Scan)
