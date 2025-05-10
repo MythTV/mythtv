@@ -1075,8 +1075,18 @@
             "title": "EIT-skanneralternativ"
         },
         "epgdownload": {
+            "args_desc": "Alla argument du vill ha överföras till Guide Data -programmet.",
+            "args_label": "Guide Data Arguments",
             "enabled_desc": "Om det är aktiverat kommer guidedataprogrammet att köras automatiskt.",
             "enabled_label": "Uppdatera programlistor automatiskt",
+            "maxhr_desc": "Den här inställningen och föregående definierar en tidsperiod när Guide Data -programmet får köras. Till exempel, inställning av start på 11 och slut på 13 skulle innebära att programmet bara skulle gå mellan 11:00 och 13:59.",
+            "maxhr_label": "Guide Data Program Execution End",
+            "minhr_desc": "Den här inställningen och följande definierar en tidsperiod när Guide Data -programmet får köras. Till exempel, inställning av start på 11 och slut på 13 skulle innebära att programmet bara skulle gå mellan 11:00 och 13:59.",
+            "minhr_label": "Guide Data Program Execution Start",
+            "path_desc": "Använd 'MythfillDatabase' eller namnet på ett anpassat skript som kommer att fylla programhandbokinformationen för alla dina videokällor.",
+            "path_label": "Guide Data Program",
+            "suggest_desc": "Om du är aktiverad, låt en guide -dataleverantör ange nästa nedladdningstid för att distribuera belastning på sina servrar. Guide Data Program Execution Start/End Times ignoreras också.",
+            "suggest_label": "Run Guide Data Program vid tidpunkten som föreslås av Grabber",
             "title": "Nedladdningsalternativ för programschema"
         },
         "general": {

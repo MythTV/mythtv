@@ -1075,8 +1075,18 @@
             "title": "EIT skanneri valikud"
         },
         "epgdownload": {
+            "args_desc": "Kõik argumendid, mida soovite juhendi andmete programmile üle anda.",
+            "args_label": "Andmete argumendid juhendage",
             "enabled_desc": "Kui see on lubatud, käivitub juhendandmete programm automaatselt.",
             "enabled_label": "Programmide loendi automaatne värskendamine",
+            "maxhr_desc": "See säte ja eelnev üks määratlevad ajavahemiku, mil juhendi andmeprogrammil lastakse käivitada. Näiteks tähendaks seadistamine alguse 11 ja 13 lõppu, et programm kestab alles vahemikus 11.00–13.59.",
+            "maxhr_label": "Juhendi andmeprogrammi täitmise lõpp",
+            "minhr_desc": "See säte ja järgmine määratlevad ajavahemiku, mil juhendi andmeprogrammil lastakse käivitada. Näiteks tähendaks seadistamine alguse 11 ja 13 lõppu, et programm kestab alles vahemikus 11.00–13.59.",
+            "minhr_label": "Juhendi andmeprogrammi täitmise algus",
+            "path_desc": "Kasutage kõigi oma videoallikate jaoks programmijuhenditeavet „MythFillDatabase” või kohandatud skripti nime.",
+            "path_label": "Juhendiprogramm",
+            "suggest_desc": "Kui see on lubatud, lubage juhendi andmete pakkujal täpsustada järgmine allalaadimisaeg, et levitada nende serverites koormust. Samuti eiratakse juhendi andmete programmi täitmist/lõpuaega.",
+            "suggest_label": "Käivitage juhendi andmete programm ajahetkel, mida soovitas haaraja",
             "title": "Programmi ajakava allalaadimise valikud"
         },
         "general": {

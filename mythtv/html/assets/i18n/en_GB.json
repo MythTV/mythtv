@@ -1075,8 +1075,18 @@
             "title": "EIT Scanner Options"
         },
         "epgdownload": {
+            "args_desc": "Any arguments you want passed to the guide data program.",
+            "args_label": "Guide data arguments",
             "enabled_desc": "If enabled, the guide data programme will be run automatically.",
             "enabled_label": "Automatically update programme listings",
+            "maxhr_desc": "This setting and the preceding one define a time period when the guide data program is allowed to run. For example, setting start to 11 and end to 13 would mean that the program would only run between 11:00 AM and 1:59 PM.",
+            "maxhr_label": "Guide data program execution end",
+            "minhr_desc": "This setting and the following one define a time period when the guide data program is allowed to run. For example, setting start to 11 and end to 13 would mean that the program would only run between 11:00 AM and 1:59 PM.",
+            "minhr_label": "Guide data program execution start",
+            "path_desc": "Use 'mythfilldatabase' or the name of a custom script that will populate the program guide info for all your video sources.",
+            "path_label": "Guide data program",
+            "suggest_desc": "If enabled, allow a guide data provider to specify the next download time in order to distribute load on their servers. Guide data program execution start/end times are also ignored.",
+            "suggest_label": "Run guide data program at time suggested by the grabber",
             "title": "Programme Listings Downloading Options"
         },
         "general": {

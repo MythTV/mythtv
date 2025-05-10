@@ -1075,8 +1075,18 @@
             "title": "Opcje skanera EIT"
         },
         "epgdownload": {
+            "args_desc": "Wszelkie argumenty, które chcesz przekazać do programu danych przewodnika.",
+            "args_label": "Przewodnik argumentów danych",
             "enabled_desc": "Jeśli ta opcja jest włączona, program danych przewodnika zostanie uruchomiony automatycznie.",
             "enabled_label": "Automatycznie aktualizuj listy programów",
+            "maxhr_desc": "To ustawienie i poprzednie określają okres, w którym program danych przewodnika może uruchomić. Na przykład ustawienie początkowe do 11 i zakończenie do 13 oznaczałoby, że program trwa tylko od 11:00 a 13:59.",
+            "maxhr_label": "Przewodnik programu danych Wykonanie",
+            "minhr_desc": "To ustawienie i następujące określają okres, w którym program danych przewodnika może uruchomić. Na przykład ustawienie początkowe do 11 i zakończenie do 13 oznaczałoby, że program trwa tylko od 11:00 a 13:59.",
+            "minhr_label": "Przewodnik program programu danych Start",
+            "path_desc": "Użyj „MythfillDatabase” lub nazwy niestandardowego skryptu, który wypełni informacje o przewodniku programu dla wszystkich źródeł wideo.",
+            "path_label": "Program danych przewodnika",
+            "suggest_desc": "Jeśli jest włączony, zezwól na dostawcę danych przewodnika na określony czas pobierania w celu rozpowszechniania obciążenia na ich serwerach. Przewodnik programu danych Wykonywanie czasów rozpoczęcia/zakończenia są również ignorowane.",
+            "suggest_label": "Uruchom program danych przewodnika w czasie sugerowanym przez Grabbera",
             "title": "Opcje pobierania harmonogramu programów"
         },
         "general": {

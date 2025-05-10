@@ -1075,8 +1075,18 @@
             "title": "Možnosti skeneru EIT"
         },
         "epgdownload": {
+            "args_desc": "Jakékoli argumenty, které chcete předat do programu Guide Data.",
+            "args_label": "Průvodce argumenty dat",
             "enabled_desc": "Pokud je povoleno, automaticky se spustí datový program průvodce.",
             "enabled_label": "Automaticky aktualizovat výpisy programů",
+            "maxhr_desc": "Toto nastavení a předchozí část definují časové období, kdy může spustit program průvodce. Například nastavení spuštění na 11 a končící na 13 by znamenalo, že program bude probíhat pouze mezi 11:00 a 13:59.",
+            "maxhr_label": "Konec provádění datového programu průvodce",
+            "minhr_desc": "Toto nastavení a následující definují časové období, kdy se může spustit program průvodce. Například nastavení spuštění na 11 a končící na 13 by znamenalo, že program bude probíhat pouze mezi 11:00 a 13:59.",
+            "minhr_label": "Spuštění průvodce datového programu Spuštění",
+            "path_desc": "Použijte „MYTHFILLDatabase“ nebo název vlastního skriptu, který naplní informace o průvodci programem pro všechny vaše zdroje videa.",
+            "path_label": "Program průvodce dat",
+            "suggest_desc": "Pokud je povoleno, povolte poskytovateli dat průvodce zadat další čas stahování, aby se distribuoval zatížení na svých serverech. Počáteční/koncové časy průvodce datovým programem jsou také ignorovány.",
+            "suggest_label": "Spusťte průvodce datový program v čase navržený Grabber",
             "title": "Možnosti stahování programového plánu"
         },
         "general": {

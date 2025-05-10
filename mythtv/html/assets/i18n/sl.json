@@ -1075,8 +1075,18 @@
             "title": "Možnosti skeniranja EIT"
         },
         "epgdownload": {
+            "args_desc": "Vse argumente, ki jih želite prenesti v podatkovni program Guide.",
+            "args_label": "Vodite podatkovni argumenti",
             "enabled_desc": "Če je omogočeno, se program vodniških podatkov zažene samodejno.",
             "enabled_label": "Samodejno posodobi sezname programov",
+            "maxhr_desc": "Ta nastavitev in predhodno določata časovno obdobje, ko je dovoljen za vodenje podatkovnega programa. Na primer, nastavitev se začne na 11 in konec do 13 bi pomenila, da bi program potekal le med 11:00 in 13:59.",
+            "maxhr_label": "Vodnik podatkovnega programa Izvedba programa",
+            "minhr_desc": "Ta nastavitev in naslednja določita časovno obdobje, ko se lahko zažene podatkovni program Guide. Na primer, nastavitev se začne na 11 in konec do 13 bi pomenila, da bi program potekal le med 11:00 in 13:59.",
+            "minhr_label": "Vodnik za izvajanje podatkovnega programa Začetek",
+            "path_desc": "Uporabite 'MythfillDatabase' ali ime skripta po meri, ki bo napolnila informacije o vodniku programa za vse vaše video vire.",
+            "path_label": "Vodnik podatkovnega programa",
+            "suggest_desc": "Če je omogočeno, dovolite ponudniku podatkov, da določi naslednji čas prenosa, da lahko razdeli obremenitev na svojih strežnikih. Vodnik za izvajanje podatkovnega programa Začetek/končni čas se ne upošteva.",
+            "suggest_label": "Zaženite podatkovni program v času, ki ga je predlagal Grabber",
             "title": "Možnosti prenosa urnika programa"
         },
         "general": {

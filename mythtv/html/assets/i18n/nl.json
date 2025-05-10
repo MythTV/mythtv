@@ -1075,8 +1075,18 @@
             "title": "EIT-scanneropties"
         },
         "epgdownload": {
+            "args_desc": "Alle argumenten die u wilt doorgeven aan het Guide Data Program.",
+            "args_label": "Begeleiden gegevensargumenten",
             "enabled_desc": "Indien ingeschakeld, wordt het gidsgegevensprogramma automatisch uitgevoerd.",
             "enabled_label": "Programmalijsten automatisch bijwerken",
+            "maxhr_desc": "Deze instelling en de voorgaande definiëren een tijdsperiode waarin het Guide Data -programma mag worden uitgevoerd. Het instellen van starten tot 11 en eindigen tot 13 zou betekenen dat het programma slechts tussen 11:00 en 13:59 zou lopen.",
+            "maxhr_label": "Uitvoering van het gegevensprogramma -uitvoering van het gegevensprogramma",
+            "minhr_desc": "Deze instelling en de volgende definiëren een tijdsperiode waarin het Guide Data -programma mag worden uitgevoerd. Het instellen van starten tot 11 en eindigen tot 13 zou betekenen dat het programma slechts tussen 11:00 en 13:59 zou lopen.",
+            "minhr_label": "Guide Data Program Uitvoering Start",
+            "path_desc": "Gebruik 'mythfillDatabase' of de naam van een aangepast script dat de info van de programmagids voor al uw video -bronnen zal vullen.",
+            "path_label": "Gids data -programma",
+            "suggest_desc": "Indien ingeschakeld, sta een gidsgegevensprovider toe om de volgende downloadtijd op te geven om de load over hun servers te verspreiden. Guide Data Program Uitvoering Start/eindtijden worden ook genegeerd.",
+            "suggest_label": "Voer Guide Data Program op tijdstip voorgesteld door de Grabber",
             "title": "Programmaschema Downloadopties"
         },
         "general": {

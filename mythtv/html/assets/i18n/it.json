@@ -1075,8 +1075,18 @@
             "title": "Opzioni dello scanner EIT"
         },
         "epgdownload": {
+            "args_desc": "Eventuali argomenti che desideri passare al programma di dati guida.",
+            "args_label": "Guidare gli argomenti dei dati",
             "enabled_desc": "Se abilitato, il programma di scaricamento della guida TV verrà eseguito automaticamente.",
             "enabled_label": "Aggiorna automaticamente i palinsesti dei programmi",
+            "maxhr_desc": "Questa impostazione e quella precedente definiscono un periodo di tempo in cui il programma di dati di guida può essere eseguito. Ad esempio, l'impostazione di inizio 11 e fine a 13 significherebbe che il programma sarebbe andato solo tra le 11:00 e le 13:59.",
+            "maxhr_label": "GUIDA IL PROGRAMMA DATI EFFETTUZIONE",
+            "minhr_desc": "Questa impostazione e quella seguente definiscono un periodo di tempo in cui il programma di dati di guida può essere eseguito. Ad esempio, l'impostazione di inizio 11 e fine a 13 significherebbe che il programma sarebbe andato solo tra le 11:00 e le 13:59.",
+            "minhr_label": "GUIDA INIZIO DEL PROGRAMMA DATI INIZIA",
+            "path_desc": "Usa \"MythFillDatabase\" o il nome di uno script personalizzato che popolerà le informazioni sulla guida del programma per tutte le tue fonti video.",
+            "path_label": "Programma di dati guida",
+            "suggest_desc": "Se abilitato, consentire a un provider di dati di guida di specificare l'ora di download successiva per distribuire il carico sui loro server. I tempi di avvio/fine del programma di dati guida vengono anche ignorati.",
+            "suggest_label": "Esegui il programma di dati di guida al tempo suggerito da The Grabber",
             "title": "Opzioni di download della pianificazione programmi"
         },
         "general": {

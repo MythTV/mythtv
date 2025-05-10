@@ -10,14 +10,74 @@
                 <div class="mb-4 w-full">
 
                     <div class="form-group field">
-                        <p-checkbox inputId="MythFillEnabled" [(ngModel)]="MythFillEnabled"
-                            name="MythFillEnabled" class="label mb-2 w-full" [binary]="true"
+                        <p-checkbox inputId="MythFillEnabled" [(ngModel)]="MythFillEnabled" name="MythFillEnabled"
+                            class="label mb-2 w-full" [binary]="true"
                             label="{{ 'settings.epgdownload.enabled_label' | translate }}">
                         </p-checkbox>
                         <small class="block">
                             {{ 'settings.epgdownload.enabled_desc' | translate }}
                         </small>
                     </div>
+
+                    <div *ngIf="MythFillEnabled">
+
+                        <div class="form-group field">
+                            <label for="MythFillDatabasePath" class="label block">{{ 'settings.epgdownload.path_label' |
+                                translate
+                                }}</label>
+                            <input pInputText id="MythFillDatabasePath" [(ngModel)]="MythFillDatabasePath"
+                                name="MythFillDatabasePath" class="mb-2 form-control w-full" />
+                            <small class="block">
+                                {{ 'settings.epgdownload.path_desc' | translate }}
+                            </small>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="MythFillDatabaseArgs" class="label block">{{ 'settings.epgdownload.args_label' |
+                                translate
+                                }}</label>
+                            <input pInputText id="MythFillDatabaseArgs" [(ngModel)]="MythFillDatabaseArgs"
+                                name="MythFillDatabaseArgs" class="mb-2 form-control w-full" />
+                            <small class="block">
+                                {{ 'settings.epgdownload.args_desc' | translate }}
+                            </small>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="MythFillMinHour" class="label block">{{ 'settings.epgdownload.minhr_label' |
+                                translate
+                                }}</label>
+                            <p-inputNumber [(ngModel)]="MythFillMinHour" name="MythFillMinHour" id="MythFillMinHour"
+                                [showButtons]="true" [min]="0" [max]="23" [step]="1"></p-inputNumber>
+                            <small class="block">
+                                {{ 'settings.epgdownload.minhr_desc' | translate }}
+                            </small>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="MythFillMaxHour" class="label block">{{ 'settings.epgdownload.maxhr_label' |
+                                translate
+                                }}</label>
+                            <p-inputNumber [(ngModel)]="MythFillMaxHour" name="MythFillMaxHour" id="MythFillMaxHour"
+                                [showButtons]="true" [min]="0" [max]="23" [step]="1"></p-inputNumber>
+                            <small class="block">
+                                {{ 'settings.epgdownload.maxhr_desc' | translate }}
+                            </small>
+                        </div>
+
+                        <div class="form-group field">
+                            <p-checkbox inputId="MythFillGrabberSuggestsTime" [(ngModel)]="MythFillGrabberSuggestsTime"
+                                name="MythFillGrabberSuggestsTime" class="label mb-2 w-full" [binary]="true"
+                                label="{{ 'settings.epgdownload.suggest_label' | translate }}">
+                            </p-checkbox>
+                            <small class="block">
+                                {{ 'settings.epgdownload.suggest_desc' | translate }}
+                            </small>
+                        </div>
+
+
+                    </div>
+
 
                 </div>
 
@@ -27,8 +87,7 @@
         <ng-template pTemplate="footer">
             <div class="grid nogutter">
                 <div class="col-12">
-                    <p-message
-                        *ngIf="this.successCount > 0 && this.errorCount == 0 && !epgdownload.dirty"
+                    <p-message *ngIf="this.successCount > 0 && this.errorCount == 0 && !epgdownload.dirty"
                         severity="success" text="{{ 'common.savesuccess' | translate }}"></p-message>
                     <p-message *ngIf="this.errorCount > 0" severity="error"
                         text="{{ 'common.networkfail' | translate }}"></p-message>

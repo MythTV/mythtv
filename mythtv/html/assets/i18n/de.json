@@ -1075,8 +1075,18 @@
             "title": "EIT-Scanner-Optionen"
         },
         "epgdownload": {
+            "args_desc": "Alle Argumente, die Sie an das Leitfadendatenprogramm übergeben haben.",
+            "args_label": "Datenargumente leiten",
             "enabled_desc": "Wenn aktiviert, wird das Leitdatenprogramm automatisch ausgeführt.",
             "enabled_label": "Programmlisten automatisch aktualisieren",
+            "maxhr_desc": "Diese Einstellung und die vorhergehende definieren einen Zeitraum, in dem das Leitfadendatenprogramm ausgeführt werden kann. Zum Beispiel würde das Setzen von Start auf 11 und Ende bis 13 bedeuten, dass das Programm nur zwischen 11:00 und 13:59 Uhr läuft.",
+            "maxhr_label": "Leitfaden für die Ausführung der Datenprogramme",
+            "minhr_desc": "Diese Einstellung und die folgende definieren einen Zeitraum, in dem das Leitfadendatenprogramm ausgeführt werden darf. Zum Beispiel würde das Setzen von Start auf 11 und Ende bis 13 bedeuten, dass das Programm nur zwischen 11:00 und 13:59 Uhr läuft.",
+            "minhr_label": "Leitfaden für Datenprogrammausführung Start",
+            "path_desc": "Verwenden Sie 'MythFillDatabase' oder den Namen eines benutzerdefinierten Skripts, mit dem die Programminformationen für die Programmhandbuch für alle Ihre Videoquellen gefüllt sind.",
+            "path_label": "Leitfadendatenprogramm",
+            "suggest_desc": "Wenn dies aktiviert ist, können Sie einem Handbuch -Datenanbieter die nächste Download -Zeit angeben, um die Last auf seinen Servern zu verteilen. Die Ausführung von Anleitung für Datenprogramme wird ebenfalls ignoriert.",
+            "suggest_label": "Führen Sie das Leitfaden -Datenprogramm zur Zeit aus, die der Grabber vorgeschlagen hat",
             "title": "Optionen zum Herunterladen von Programmplänen"
         },
         "general": {

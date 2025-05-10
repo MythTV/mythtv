@@ -1075,8 +1075,18 @@
             "title": "EIT skannivalkostir"
         },
         "epgdownload": {
+            "args_desc": "Öll rök sem þú vilt fara í leiðarvísagagnaforritið.",
+            "args_label": "Leiðbeina gögnum rökum",
             "enabled_desc": "Ef það er virkt mun leiðargagnaforritið keyra sjálfkrafa.",
             "enabled_label": "Uppfærðu forritaskráningar sjálfkrafa",
+            "maxhr_desc": "Þessi stilling og sú fyrri skilgreina tímabil þar sem leiðbeiningargagnaforritinu er leyft að keyra. Til dæmis, að setja byrjun á 11 og enda á 13 myndi þýða að forritið myndi aðeins keyra á milli klukkan 11:00 og 13:59.",
+            "maxhr_label": "Leiðbeiningar um framkvæmd forrits",
+            "minhr_desc": "Þessi stilling og eftirfarandi skilgreina tímabil þar sem leiðbeiningargagnaforritinu er leyft að keyra. Til dæmis, að setja byrjun á 11 og enda á 13 myndi þýða að forritið myndi aðeins keyra á milli klukkan 11:00 og 13:59.",
+            "minhr_label": "Leiðbeina framkvæmd gagnaáætlunar",
+            "path_desc": "Notaðu 'MythFillDatabase' eða nafn sérsniðinna handrits sem byggir upplýsingar um forritaleiðbeiningarnar fyrir allar myndbandsgjafar þínar.",
+            "path_label": "Leiðbeiningar um gagnaáætlun",
+            "suggest_desc": "Ef það er virkt, leyfðu leiðbeiningargagnaaðila að tilgreina næsta niðurhalstíma til að dreifa álagi á netþjónum sínum. Einnig er hunsað leiðsögn um framkvæmd gagnaáætlunar.",
+            "suggest_label": "Keyrðu leiðbeiningargagnaforritið á þeim tíma sem Grabber lagði til",
             "title": "Valkostir til að hlaða niður forritaáætlun"
         },
         "general": {

@@ -1075,8 +1075,18 @@
             "title": "Options du scanneur EIT"
         },
         "epgdownload": {
+            "args_desc": "Tout argument que vous souhaitez transmettre au programme de données Guide.",
+            "args_label": "Guider les arguments de données",
             "enabled_desc": "S'il est activé, le programme de données de guidage sera exécuté automatiquement.",
             "enabled_label": "Mettre à jour automatiquement les listes de programmes",
+            "maxhr_desc": "Ce paramètre et celui précédent définissent une période de temps où le programme de données de guide est autorisé à s'exécuter. Par exemple, la définition du début à 11 et la fin à 13 signifierait que le programme ne fonctionnerait que de 11h00 et 13h59.",
+            "maxhr_label": "Guide Fin d'exécution du programme de données",
+            "minhr_desc": "Ce paramètre et celui suivant définissent une période de temps où le programme de données de guide est autorisé à s'exécuter. Par exemple, la définition du début à 11 et la fin à 13 signifierait que le programme ne fonctionnerait que de 11h00 et 13h59.",
+            "minhr_label": "Guide Exécution du programme de données",
+            "path_desc": "Utilisez «MythFillDatabase» ou le nom d'un script personnalisé qui remplira les informations de guide du programme pour toutes vos sources vidéo.",
+            "path_label": "Guide du programme de données",
+            "suggest_desc": "Si vous êtes activé, permettez à un fournisseur de données de guide de spécifier le temps de téléchargement suivant afin de distribuer un chargement sur leurs serveurs. Exécution du programme de données Guide Le début / fin des temps est également ignoré.",
+            "suggest_label": "Exécutez le programme de données de guide au temps suggéré par le Grabber",
             "title": "Options de téléchargement du programme"
         },
         "general": {

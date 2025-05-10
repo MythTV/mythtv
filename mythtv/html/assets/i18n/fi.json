@@ -1075,8 +1075,18 @@
             "title": "EIT-skanneriasetukset"
         },
         "epgdownload": {
+            "args_desc": "Kaikki argumentit, jotka haluat välittää opastieto -ohjelmaan.",
+            "args_label": "Opastietoväitteet",
             "enabled_desc": "Jos tämä on käytössä, opastietoohjelma suoritetaan automaattisesti.",
             "enabled_label": "Päivitä ohjelmaluettelot automaattisesti",
+            "maxhr_desc": "Tämä asetus ja edeltävä määrittelevät ajanjakson, jolloin opastieto -ohjelman sallitaan suorittaa. Esimerkiksi aloittamisen asettaminen 11: een ja päättyy 13: een tarkoittaisi, että ohjelma olisi vain klo 11.00–13.59.",
+            "maxhr_label": "Guide Data -ohjelman suorittaminen loppu",
+            "minhr_desc": "Tämä asetus ja seuraava määrittelevät ajanjakson, jolloin opastieto -ohjelman sallitaan suorittaa. Esimerkiksi aloittamisen asettaminen 11: een ja päättyy 13: een tarkoittaisi, että ohjelma olisi vain klo 11.00–13.59.",
+            "minhr_label": "Guide Data Program Suorituskäyttö",
+            "path_desc": "Käytä 'MythfillDatabase' tai mukautetun komentosarjan nimeä, joka asuu kaikkien videolähteidesi ohjelma -opastiedot.",
+            "path_label": "Opastieto -ohjelma",
+            "suggest_desc": "Jos otetaan käyttöön, anna opastietojen tarjoajan määrittää seuraava latausaika, jotta ne voidaan jakaa palvelimiinsa. Opas data -ohjelman suorituksen aloitus-/päätysajat jätetään myös huomiotta.",
+            "suggest_label": "Suorita opastieto -ohjelma Grabberin ehdottamassa ajankohtana",
             "title": "Ohjelman aikataulun latausasetukset"
         },
         "general": {

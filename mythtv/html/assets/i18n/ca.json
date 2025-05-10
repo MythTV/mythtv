@@ -1075,8 +1075,18 @@
             "title": "Opcions de l'EIT Scanner"
         },
         "epgdownload": {
+            "args_desc": "Qualsevol argument que vulgueu passar al programa de dades de la guia.",
+            "args_label": "Guia els arguments de dades",
             "enabled_desc": "Si està activat, el programa de dades de guia s'executarà automàticament.",
             "enabled_label": "Actualitza automàticament les llistes de programes",
+            "maxhr_desc": "Aquesta configuració i la precedent es defineixen un període de temps en què es permet executar el programa de dades de guia. Per exemple, la configuració d’inici d’11 i final a 13 significaria que el programa només funcionaria entre les 11:00 i les 13:59.",
+            "maxhr_label": "Guia el programa de dades final",
+            "minhr_desc": "Aquesta configuració i la següent es defineixen un període de temps en què es pot executar el programa de dades de la guia. Per exemple, la configuració d’inici d’11 i final a 13 significaria que el programa només funcionaria entre les 11:00 i les 13:59.",
+            "minhr_label": "Guia Inici de l'execució del programa de dades",
+            "path_desc": "Utilitzeu \"MythfillDatabase\" o el nom d'un script personalitzat que poblarà la informació de la guia del programa per a totes les vostres fonts de vídeo.",
+            "path_label": "Programa de dades de guies",
+            "suggest_desc": "Si està activat, permeteu a un proveïdor de dades de la guia especificar el següent temps de descàrrega per distribuir la càrrega als seus servidors. També s’ignoren els temps d’inici/finalització del programa de dades.",
+            "suggest_label": "Executeu el programa de dades de la guia en el moment suggerit pel Grabber",
             "title": "Opcions de descàrrega de programació del programa"
         },
         "general": {

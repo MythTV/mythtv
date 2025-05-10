@@ -18,6 +18,11 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
   successCount= 0;
   errorCount = 0;
   MythFillEnabled = true;
+  MythFillDatabasePath = 'mythfilldatabase';
+  MythFillDatabaseArgs = '';
+  MythFillMinHour = 0;
+  MythFillMaxHour = 23;
+  MythFillGrabberSuggestsTime = true;
 
   constructor(public setupService: SetupService, private mythService: MythService) {
     this.getEpgDownload();
@@ -38,7 +43,32 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
         next: data => this.MythFillEnabled = (data.String == '1'),
         error: () => this.errorCount++
       });
-  }
+      this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillDatabasePath", Default: "mythfilldatabase" })
+      .subscribe({
+        next: data => this.MythFillDatabasePath = data.String,
+        error: () => this.errorCount++
+      });
+      this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillDatabaseArgs", Default: "" })
+      .subscribe({
+        next: data => this.MythFillDatabaseArgs = data.String,
+        error: () => this.errorCount++
+      });
+      this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillMinHour", Default: "0" })
+      .subscribe({
+        next: data => this.MythFillMinHour = Number(data.String),
+        error: () => this.errorCount++
+      });
+      this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillMaxHour", Default: "23" })
+      .subscribe({
+        next: data => this.MythFillMaxHour = Number(data.String),
+        error: () => this.errorCount++
+      });
+      this.mythService.GetSetting({ HostName: '_GLOBAL_', Key: "MythFillGrabberSuggestsTime", Default: "1" })
+      .subscribe({
+        next: data => this.MythFillGrabberSuggestsTime = (data.String == '1'),
+        error: () => this.errorCount++
+      });
+}
 
   EpgDownloadObs = {
     next: (x: any) => {
@@ -59,12 +89,31 @@ export class EpgDownloadingComponent implements OnInit, AfterViewInit {
   };
 
   saveForm() {
-    console.log("save form clicked");
     this.successCount = 0;
     this.errorCount = 0;
     this.mythService.PutSetting({
       HostName: '_GLOBAL_', Key: "MythFillEnabled",
       Value: this.MythFillEnabled ? "1" : "0"
+    }).subscribe(this.EpgDownloadObs);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "MythFillDatabasePath",
+      Value: this.MythFillDatabasePath
+    }).subscribe(this.EpgDownloadObs);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "MythFillDatabaseArgs",
+      Value: this.MythFillDatabaseArgs
+    }).subscribe(this.EpgDownloadObs);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "MythFillMinHour",
+      Value: String(this.MythFillMinHour)
+    }).subscribe(this.EpgDownloadObs);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "MythFillMaxHour",
+      Value: String(this.MythFillMaxHour)
+    }).subscribe(this.EpgDownloadObs);
+    this.mythService.PutSetting({
+      HostName: '_GLOBAL_', Key: "MythFillGrabberSuggestsTime",
+      Value: this.MythFillGrabberSuggestsTime ? "1" : "0"
     }).subscribe(this.EpgDownloadObs);
   }
 

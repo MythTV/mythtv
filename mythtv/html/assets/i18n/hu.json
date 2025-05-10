@@ -1075,8 +1075,18 @@
             "title": "EIT szkenner opciók"
         },
         "epgdownload": {
+            "args_desc": "Bármely érv, amelyet el szeretne adni, átadja a Guide Data Programnak.",
+            "args_label": "Iránymutatás -érvek",
             "enabled_desc": "Ha engedélyezve van, a segédprogram automatikusan lefut.",
             "enabled_label": "Programlista automatikus frissítése",
+            "maxhr_desc": "Ez a beállítás és az előző egy olyan időszakot határoz meg, amikor a vezető adatprogram futtatható. Például, ha az indulás 11 -re és a 13 -ra való beállítást jelent, azt jelentené, hogy a program csak 11:00 és 13:59 között fog futni.",
+            "maxhr_label": "Útmutató adatprogram végrehajtás vége",
+            "minhr_desc": "Ez a beállítás és a következő meghatározza azt az időszakot, amikor a Guide Data Program futtatható. Például, ha az indulás 11 -re és a 13 -ra való beállítást jelent, azt jelentené, hogy a program csak 11:00 és 13:59 között fog futni.",
+            "minhr_label": "Útmutató adatprogram végrehajtás kezdete",
+            "path_desc": "Használja a 'MythFillDatabase' -t vagy egy olyan egyedi szkript nevét, amely feltölti a program útmutató információt az összes videóforráshoz.",
+            "path_label": "Útmutató adatprogram",
+            "suggest_desc": "Ha engedélyezve van, hagyja, hogy az útmutató -szolgáltató megadja a következő letöltési időt a terhelés kiszolgálóin történő elosztása érdekében. A Guide Data Program végrehajtásának indítási/végső időpontjait szintén figyelmen kívül hagyjuk.",
+            "suggest_label": "Futtassa a Guide Data Program -ot a fogó által javasolt időpontban",
             "title": "Program ütemezési letöltési lehetőségek"
         },
         "general": {

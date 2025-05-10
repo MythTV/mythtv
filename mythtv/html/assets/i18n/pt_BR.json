@@ -1075,8 +1075,18 @@
             "title": "Opções do scanner EIT"
         },
         "epgdownload": {
+            "args_desc": "Quaisquer argumentos que você desejar passou para o programa de dados do guia.",
+            "args_label": "Orientar argumentos de dados",
             "enabled_desc": "Se ativado, o programa de dados do guia será executado automaticamente.",
             "enabled_label": "Atualize automaticamente as listas de programas",
+            "maxhr_desc": "Essa configuração e o anterior definem um período de tempo em que o programa de dados do guia é autorizado a ser executado. Por exemplo, a configuração do início das 11 e do final para 13 significaria que o programa só funcionaria entre 11:00 e 13:59.",
+            "maxhr_label": "Guia de execução do programa de dados final",
+            "minhr_desc": "Essa configuração e a seguinte definem um período em que o programa de dados do guia é permitido executar. Por exemplo, a configuração do início das 11 e do final para 13 significaria que o programa só funcionaria entre 11:00 e 13:59.",
+            "minhr_label": "Guide Data Program Execution Start",
+            "path_desc": "Use 'mythfilldatabase' ou o nome de um script personalizado que preencherá as informações do guia do programa para todas as suas fontes de vídeo.",
+            "path_label": "Guide Data Program",
+            "suggest_desc": "Se ativado, permita que um provedor de dados do guia especifique o próximo tempo de download para distribuir o carregamento em seus servidores. Guia de execução do programa de dados Os horários de partida/final também são ignorados.",
+            "suggest_label": "Executar o programa de dados do guia no momento sugerido pelo Grabber",
             "title": "Opções de download do cronograma do programa"
         },
         "general": {

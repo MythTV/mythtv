@@ -1075,8 +1075,18 @@
             "title": "Opcije EIT skenera"
         },
         "epgdownload": {
+            "args_desc": "Svi argumenti koje želite proslijediti programu podataka o vodiču.",
+            "args_label": "Vodi argumenti podataka",
             "enabled_desc": "Ako je omogućeno, program podataka vodiča pokrenut će se automatski.",
             "enabled_label": "Automatski ažurirajte popise programa",
+            "maxhr_desc": "Ova postavka i prethodni definiraju vremensko razdoblje kada se dozvoli da se pokrene program Vodiča. Na primjer, postavljanje početka na 11, a na kraju 13 značilo bi da bi program trajao samo između 11:00 i 13:59.",
+            "maxhr_label": "Kraj izvršenja programa vodiča",
+            "minhr_desc": "Ova postavka i sljedeća definiraju vremensko razdoblje kada se dozvoli pokrenuti program vodiča. Na primjer, postavljanje početka na 11, a na kraju 13 značilo bi da bi program trajao samo između 11:00 i 13:59.",
+            "minhr_label": "Vodič pokretanja programa podataka",
+            "path_desc": "Upotrijebite 'MythFillDataBase' ili naziv prilagođene skripte koja će popuniti informacije o vodiču za sve vaše video izvore.",
+            "path_label": "Vodič podataka",
+            "suggest_desc": "Ako je omogućeno, dopustite davatelja podataka vodiča da odredi sljedeće vrijeme preuzimanja kako bi distribuirao opterećenje na svojim poslužiteljima. Zanemarivaju se i izvođenje programa za pokretanje programa podataka o podacima.",
+            "suggest_label": "Pokrenite program podataka o vodiču u vrijeme koji je predložio grabber",
             "title": "Mogućnosti preuzimanja rasporeda programa"
         },
         "general": {

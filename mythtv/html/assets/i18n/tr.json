@@ -1075,8 +1075,18 @@
             "title": "EIT Tarayıcı Seçenekleri"
         },
         "epgdownload": {
+            "args_desc": "İstediğiniz argümanlar Rehber veri programına geçti.",
+            "args_label": "Veri argümanlarına rehberlik edin",
             "enabled_desc": "Etkinleştirilirse, rehber veri programı otomatik olarak çalıştırılacaktır.",
             "enabled_label": "Program listelerini otomatik olarak güncelle",
+            "maxhr_desc": "Bu ayar ve bir önceki ayar, Kılavuz Veri Programının çalışmasına izin verildiği bir zaman periyodu tanımlar. Örneğin, başlama 11'e başlama ve 13'e kadar biter, programın sadece 11:00 ile 13:59 arasında çalışacağı anlamına gelir.",
+            "maxhr_label": "Kılavuz Veri Programı Yürütme Sonu",
+            "minhr_desc": "Bu ayar ve aşağıdakiler, Kılavuz Veri Programının çalışmasına izin verildiği bir zaman periyodu tanımlar. Örneğin, başlama 11'e başlama ve 13'e kadar biter, programın sadece 11:00 ile 13:59 arasında çalışacağı anlamına gelir.",
+            "minhr_label": "Kılavuz Veri Programı Yürütme Başlangıç",
+            "path_desc": "'MythFillDatabase' veya tüm video kaynaklarınız için program kılavuzu bilgilerini dolduracak özel bir komut dosyasının adını kullanın.",
+            "path_label": "Kılavuz Veri Programı",
+            "suggest_desc": "Etkinleştirilirse, bir kılavuz veri sağlayıcısının sunucularına yükü dağıtmak için bir sonraki indirme süresini belirtmesine izin verin. Kılavuz Veri Programı Yürütme Başlangıç/Bitiş süreleri de göz ardı edilir.",
+            "suggest_label": "Grabber tarafından önerilen zamanda Kılavuz Veri Programını Çalıştırın",
             "title": "Program Takvimi İndirme Seçenekleri"
         },
         "general": {
