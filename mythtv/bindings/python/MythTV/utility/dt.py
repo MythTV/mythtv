@@ -343,11 +343,12 @@ class datetime( _pydatetime ):
         return cls._utctz
 
     @classmethod
-    def fromDatetime(cls, dt, tzinfo=None):
+    def fromDatetime(cls, dt, tzinfo=None, fold=None):
         if tzinfo is None:
             tzinfo = dt.tzinfo
+            fold = dt.fold
         return cls(dt.year, dt.month, dt.day, dt.hour, dt.minute,
-                   dt.second, dt.microsecond, tzinfo)
+                   dt.second, dt.microsecond, tzinfo, fold)
 
 # override existing classmethods to enforce use of timezone
     @classmethod
@@ -506,7 +507,7 @@ class datetime( _pydatetime ):
         raise TypeError("time data '%s' does not match supported formats"%t)
 
     def __new__(cls, year, month, day, hour=None, minute=None, second=None,
-                      microsecond=None, tzinfo=None):
+                      microsecond=None, tzinfo=None, fold=None):
 
         if tzinfo is None:
             kwargs = {'tzinfo':cls.localTZ()}
@@ -520,6 +521,8 @@ class datetime( _pydatetime ):
             kwargs['second'] = second
         if microsecond is not None:
             kwargs['microsecond'] = microsecond
+        if fold is not None:
+            kwargs['fold'] = fold
         return _pydatetime.__new__(cls, year, month, day, **kwargs)
 
     def mythformat(self):
