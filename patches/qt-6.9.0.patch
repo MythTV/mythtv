@@ -1,0 +1,23 @@
+diff --git a/qtbase/src/corelib/Qt6AndroidMacros.cmake b/qtbase/src/corelib/Qt6AndroidMacros.cmake
+index c8d50d2..88bb2b9 100644
+--- a/qtbase/src/corelib/Qt6AndroidMacros.cmake
++++ b/qtbase/src/corelib/Qt6AndroidMacros.cmake
+@@ -364,7 +364,7 @@ function(qt6_android_generate_deployment_settings target)
+ 
+     # base location of stdlibc++, will be suffixed by androiddeploy qt
+     # Sysroot is set by Android toolchain file and is composed of ANDROID_TOOLCHAIN_ROOT.
+-    set(android_ndk_stdlib_base_path "${CMAKE_SYSROOT}/usr/lib/")
++    set(android_ndk_stdlib_base_path "${CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED}/sysroot/usr/lib/")
+     string(APPEND file_contents
+         "   \"stdcpp-path\": \"${android_ndk_stdlib_base_path}\"\n")
+ 
+@@ -586,6 +586,9 @@ function(qt6_android_add_apk_target target)
+     if(QT_ENABLE_VERBOSE_DEPLOYMENT)
+         list(APPEND extra_args "--verbose")
+     endif()
++    if(QT_ANDROID_PLATFORM)
++        list(APPEND extra_args "--android-platform" ${QT_ANDROID_PLATFORM})
++    endif()
+ 
+     if(QT_ANDROID_DEPLOY_RELEASE)
+         message(WARNING "QT_ANDROID_DEPLOY_RELEASE is not a valid Qt variable."

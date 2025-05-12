@@ -106,10 +106,13 @@ function(find_or_build_qt)
   # Centos 10
   set(QT_6.8.1_SHA256
       "45e3a9f6d33c92ffe65a1fde1a8eba5b228112df675f7f9026eaa332b2e2edff")
-  # Arch, Debian Unstable, Fedora 40/41/42/Rawhide, Gentoo Suse Tumbleweed,
+  # Arch, Debian Unstable, Fedora 40/41/42, Gentoo Suse Tumbleweed,
   # Ubuntu Rolling Rhino
   set(QT_6.8.2_SHA256
       "659d8bb5931afac9ed5d89a78e868e6bd00465a58ab566e2123db02d674be559")
+  # Fedora Rawhide
+  set(QT_6.9.0_SHA256
+      "4f61e50551d0004a513fefbdb0a410595d94812a48600646fb7341ea0d17e1cb")
 
   # Qt6 requires that the version of the host tools match the version being
   # built.  What are the fallback target versions to build if there isn't an
