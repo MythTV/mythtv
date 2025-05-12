@@ -5223,7 +5223,7 @@ fi
 
 antbin=""
 java_code_version=""
-if enabled bdjava; then
+if enabled bdjava && ! enabled system_libbluray; then
     enabled x86_64 && java_arch=amd64
     enabled x86_32 && java_arch=i386
     enabled arm    && java_arch=arm
