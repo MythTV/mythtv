@@ -45,7 +45,7 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
 
 #ifdef PGM_CONVERT_GREYSCALE
     if (av_image_alloc(m_pgm.data, m_pgm.linesize,
-        m_width, m_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        m_width, m_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("PGMConverter::MythPlayerInited "
                                           "av_image_alloc m_pgm (%1x%2) failed")
