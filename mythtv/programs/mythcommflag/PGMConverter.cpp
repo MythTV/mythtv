@@ -90,7 +90,7 @@ PGMConverter::getImage(const MythVideoFrame *frame, long long _frameno,
     m_convertTime += (end - start);
 #else  /* !PGM_CONVERT_GREYSCALE */
     if (av_image_fill_arrays(m_pgm.data, m_pgm.linesize,
-        frame->buf, AV_PIX_FMT_GRAY8, m_width, m_height,IMAGE_ALIGN) < 0)
+        frame->m_buffer, AV_PIX_FMT_GRAY8, m_width, m_height,IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("PGMConverter::getImage error at frame %1 (%2x%3)")
