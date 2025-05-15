@@ -11,6 +11,7 @@ interface AssociativeArray {
 export class DataService {
 
     m_showSidebar = true;
+    loggedInUser: string | null = '';
 
     // This associative array will hold translations for each status
     recStatusText: AssociativeArray = {

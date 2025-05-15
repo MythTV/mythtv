@@ -79,7 +79,7 @@
         <ng-template pTemplate="body" let-channel>
             <tr [ngClass]="{'line-through' : channel.ChanId < 0}">
                 <td class="pt-1 pb-0">
-                    <img src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon}}" height="32" width="42"
+                    <img src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon + authorization}}" height="32" width="42"
                         *ngIf="channel.Icon; else nullIcon" style="background-color:#000000" onerror="this.height='0'">
                     <ng-template #nullIcon><img height="32" width="42"></ng-template>
                 </td>
@@ -164,7 +164,7 @@
                 <ng-template pTemplate="selectedItem">
                     <div *ngIf="channel.Icon">
                         <img *ngIf="!channel.Icon.endsWith('\t')"
-                            src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon}}"
+                            src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon + authorization }}"
                             class="vertical-align-middle h-2rem" />
                         &nbsp;&nbsp;{{channel.Icon}}
                     </div>
@@ -172,7 +172,7 @@
                 <ng-template let-icon pTemplate="item">
                     <div>
                         <!-- Name ending with tab character is code for "no icon". -->
-                        <img *ngIf="!icon.endsWith('\t')" src="{{'/Guide/GetChannelIcon?Filename=' + icon}}"
+                        <img *ngIf="!icon.endsWith('\t')" src="{{'/Guide/GetChannelIcon?Filename=' + icon + authorization }}"
                             class="vertical-align-middle h-2rem" />
                         &nbsp;&nbsp;{{icon}}
                     </div>

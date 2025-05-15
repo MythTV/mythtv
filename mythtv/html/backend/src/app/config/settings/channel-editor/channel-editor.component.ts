@@ -34,6 +34,7 @@ export class ChannelEditorComponent implements OnInit {
   icons: String[] = [];
   iconDir = "";
   COMM_DETECT_COMMFREE  = -2;
+  authorization = '';
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -183,6 +184,11 @@ export class ChannelEditorComponent implements OnInit {
   }
 
   loadLists() {
+    let accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken == null)
+      this.authorization = ''
+    else
+      this.authorization = '&authorization=' + accessToken;
     this.channelService.GetChannelInfoList({ Details: true }).subscribe(data => {
       this.allChannels = data.ChannelInfoList.ChannelInfos;
       // this.allChannels.forEach((entry,index) => entry.ChanSeq = index);

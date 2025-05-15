@@ -1,0 +1,133 @@
+<div class="block card w-full" *ngIf="loaded">
+
+    <div class="form-group field">
+        <h3>{{ 'dashboard.users.auth_title' | translate }}</h3>
+
+        <div class="field-radiobutton">
+            <p-radioButton name="APIAuthReqd" value="NONE" [(ngModel)]="apiAuthReqd" inputId="authNone"
+                [disabled]="dataService.loggedInUser!='admin'" (onClick)="saveapiAuthReqd()"></p-radioButton>
+            <label for="authNone" class="label block">{{ 'dashboard.users.auth_none_desc' | translate }}</label>
+        </div>
+        <div class="field-radiobutton">
+            <p-radioButton name="APIAuthReqd" value="REMOTE" [(ngModel)]="apiAuthReqd" inputId="authRemote"
+                [disabled]="dataService.loggedInUser!='admin'||!AllowConnFromAll"
+                (onClick)="saveapiAuthReqd()"></p-radioButton>
+            <label for="authRemote" class="label block">{{ 'dashboard.users.auth_remote_desc' | translate }}</label>
+        </div>
+        <div class="field-radiobutton">
+            <p-radioButton name="APIAuthReqd" value="ALL" [(ngModel)]="apiAuthReqd" inputId="authAll"
+                [disabled]="dataService.loggedInUser!='admin'" (onClick)="saveapiAuthReqd()"></p-radioButton>
+            <label for="authAll" class="label block">{{ 'dashboard.users.auth_all_desc' | translate }}</label>
+        </div>
+        <small class="block">
+            {{ 'dashboard.users.auth_desc' | translate }}
+        </small>
+        <p-message *ngIf="authReqFail > 0" severity="error"
+            text="{{ 'dashboard.users.authreq_fail' | translate }}"></p-message>
+
+    </div>
+
+    <p-table [value]="users" scrollHeight="flex" [scrollable]="true" sortField="Name"
+        styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template pTemplate="caption">
+            <button pButton pRipple label="{{ 'dashboard.users.new' | translate }}" icon="pi pi-plus"
+                class="p-button-success mr-2" (click)="openNew()"
+                [disabled]="dataService.loggedInUser && dataService.loggedInUser!='admin'"></button>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>{{ 'dashboard.users.name_label' | translate }}</th>
+                <th style="width:  7%; white-space: nowrap;">
+                    <!-- These are disabled buttons to ensure the spacing of the heading
+                     matches the spacing of the rows -->
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                        disabled="true"></button>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+            <tr>
+                <td>{{ user.Name }}</td>
+                <td class="pt-1 pb-0" style="white-space: nowrap;">
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-text" (click)="editUser(user)"
+                        pTooltip="{{ 'dashboard.users.edit_label' | translate }}" tooltipPosition="left"
+                        [disabled]="!user.canUpdate"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"
+                        (click)="deleteRequest(user)" pTooltip="{{ 'dashboard.users.delete_label' | translate }}"
+                        tooltipPosition="left" [disabled]="!user.canDelete"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<form class="ml-3 mr-3" name="userform" #userform="ngForm">
+
+    <p-dialog header="{{ dialogHeader }}" [(visible)]="displayUserDlg" [modal]="true" [style]="{width: '50vw'}"
+        [closable]="false" [closeOnEscape]="false">
+
+        <div class="form-group field">
+            <label for="UserName" class="label block">{{ 'dashboard.users.name_label' | translate }}</label>
+            <input pInputText id="UserName" [(ngModel)]="user.Name" name="UserName" #UserName="ngModel"
+                class="mb-2 form-control w-full" [disabled]="!user.newUser" (change)="checkName()" />
+        </div>
+
+        <div *ngIf="dataService.loggedInUser && dataService.loggedInUser!='admin' && !user.newUser"
+            class="form-group field">
+            <label for="OldPassword" class="label block">{{ 'navbar.users.old_password' | translate }}</label>
+            <p-password id="OldPassword" [(ngModel)]="user.oldPassword" name="OldPassword" #UserName="ngModel"
+                class="mb-2 form-control w-full" [feedback]="false" [toggleMask]="true"></p-password>
+        </div>
+
+        <div class="form-group field">
+            <label for="NewPassword" class="label block">{{ 'navbar.users.new_password' | translate }}</label>
+            <p-password id="NewPassword" [(ngModel)]="user.newPassword" name="NewPassword" #UserName="ngModel"
+                class="mb-2 form-control w-full" [feedback]="false" [toggleMask]="true"></p-password>
+        </div>
+
+        <div class="form-group field">
+            <label for="NewPassword2" class="label block">{{ 'navbar.users.new_password2' | translate }}</label>
+            <p-password id="NewPassword2" [(ngModel)]="user.newPassword2" name="NewPassword2" #UserName="ngModel"
+                class="mb-2 form-control w-full" [feedback]="false" [toggleMask]="true"></p-password>
+        </div>
+
+
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="successCount > 0 && errorCount == 0 && !userform.dirty" severity="success"
+                    text="{{ 'common.savesuccess' | translate }}"></p-message>
+                <p-message *ngIf="errorCount > 0" severity="error"
+                    text="{{ 'common.networkfail' | translate }}"></p-message>
+                <p-message *ngIf="errorMsg" severity="error" text="{{ errorMsg }}"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="closeDialog()" label="{{ 'common.close' | translate }}"
+                styleClass="p-button-warning">
+            </p-button>
+            <p-button icon="pi pi-save" (onClick)="saveReq();" label="{{ 'common.save' | translate }}"
+                styleClass="p-button-success" [disabled]="!userform.dirty || !user.Name || dupName
+                    || !user.newPassword! || !user.newPassword2! ">
+            </p-button>
+        </ng-template>
+
+    </p-dialog>
+
+    <p-dialog header="{{ 'dashboard.users.delete_label' | translate }}" [(visible)]="displayDelete" [modal]="true"
+        [draggable]="false" [resizable]="false" [style]="{width: '25vw'}">
+        <h2>{{ 'settings.common.ru_sure' | translate }}</h2>
+        <p>{{ 'dashboard.users.delete_details' |
+            translate: {Name: user.Name} }}</p>
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="errorCount > 0" severity="error"
+                    text="{{ 'common.networkfail' | translate }}"></p-message>
+            </div>
+            <p-button icon="pi pi-times-circle" (onClick)="displayDelete=false; userform.form.markAsPristine();"
+                label="{{ 'common.close' | translate }}" styleClass="p-button-warning">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (onClick)="deleteUser()" label="{{ 'common.delete' | translate }}"
+                styleClass="p-button-danger"></p-button>
+        </ng-template>
+    </p-dialog>
+
+</form>
