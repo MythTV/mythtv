@@ -1294,9 +1294,14 @@ bool MythCoreContext::CheckSubnet(const QAbstractSocket *socket)
 
 bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 {
-    static const QHostAddress kLinkLocal("fe80::");
     if (GetBoolSetting("AllowConnFromAll",false))
         return true;
+    return IsLocalSubnet(peer);
+}
+
+bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer)
+{
+    static const QHostAddress kLinkLocal("fe80::");
     if (d->m_approvedIps.contains(peer))
         return true;
     if (d->m_deniedIps.contains(peer))
@@ -2081,8 +2086,12 @@ bool MythCoreContext::InWantingPlayback(void)
 MythSessionManager* MythCoreContext::GetSessionManager(void)
 {
     if (!d->m_sessionManager)
-        d->m_sessionManager = new MythSessionManager();
-
+    {
+        MythSessionManager::LockSessions();
+        if (!d->m_sessionManager)
+            d->m_sessionManager = new MythSessionManager();
+        MythSessionManager::UnlockSessions();
+    }
     return d->m_sessionManager;
 }
 

@@ -44,6 +44,8 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "ProfileUpdated",        "methods=GET"                 )
     Q_CLASSINFO( "ProfileText",           "methods=GET"                 )
     Q_CLASSINFO( "ManageDigestUser",      "methods=POST"                )
+    Q_CLASSINFO( "LoginUser",             "methods=POST"                )
+    Q_CLASSINFO( "GetUsers",              "methods=GET;name=StringList" )
     Q_CLASSINFO( "ManageUrlProtection",   "methods=POST"                )
     Q_CLASSINFO( "SetConnectionInfo",     "methods=POST"                )
     Q_CLASSINFO("ManageScheduler",        "methods=POST")
@@ -129,7 +131,7 @@ class V2Myth : public MythHTTPService
                                               const QString   &Default );
     static V2SettingList* GetSettingList    ( const QString   &HostName );
 
-    static bool           PutSetting        ( const QString   &HostName,
+    bool                  PutSetting        ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Value   );
 
@@ -181,11 +183,15 @@ class V2Myth : public MythHTTPService
 
     V2BackendInfo*       GetBackendInfo     ( void );
 
-    static bool         ManageDigestUser    ( const QString &Action,
+    bool         ManageDigestUser           ( const QString &Action,
                                               const QString &UserName,
                                               const QString &Password,
-                                              const QString &NewPassword,
-                                              const QString &AdminPassword );
+                                              const QString &NewPassword);
+
+    static QString      LoginUser         (  const QString &UserName,
+                                             const QString &Password );
+
+    static QStringList GetUsers             ( void );
 
     static bool         ManageUrlProtection ( const QString &Services,
                                               const QString &AdminPassword );

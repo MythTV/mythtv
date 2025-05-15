@@ -10,6 +10,8 @@
 #include "http/serialisers/mythserialiser.h"
 #include "http/mythhttpencoding.h"
 #include "http/mythhttpmetaservice.h"
+#include "libmythbase/mythcorecontext.h"
+#include "libmythbase/mythsession.h"
 
 #define LOC QString("HTTPService: ")
 
@@ -73,10 +75,40 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
         return nullptr;
     }
 
-    // Authentication required
+    // Authentication required per method is not implemented
     if (handler->m_protected)
     {
         LOG(VB_HTTP, LOG_INFO, LOC + "Authentication required for this call");
+    }
+
+    // Ensure that a valid login has been done if "authentication required" is enabled
+    // Myth/LoginUser is exempt from this requirement
+    QString authReqOption = gCoreContext->GetSetting("APIAuthReqd","NONE");
+    bool authReq = false;
+    if (authReqOption == "REMOTE") {
+        if (!gCoreContext->IsLocalSubnet(Request->m_peerAddress))
+            authReq = true;
+    }
+    else if (authReqOption == "ALL")
+        authReq = true;
+    QString authorization = MythHTTP::GetHeader(Request->m_headers, "authorization").trimmed();
+    if (authorization.isEmpty())
+            authorization = Request->m_queries.value("authorization",{});
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+    // methods /Myth/LoginUser and /Myth/GetConnectionInfo do not require authentication
+    if ( ! (Request->m_path == "/Myth/"
+            && (method == "LoginUser" || method == "GetConnectionInfo")) )
+    {
+        if (!authorization.isEmpty() || authReq)
+        {
+            if (!sessionManager->IsValidSession(authorization))
+            {
+                QString error(" Invalid authorization token");
+                LOG(VB_HTTP, LOG_ERR, LOC + error);
+                Request->m_status = HTTPUnauthorized;
+                return MythHTTPResponse::ErrorResponse(Request, error);
+            }
+        }
     }
 
     // Sanity check type count (handler should have the return type at least)
@@ -149,7 +181,10 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
         }
         catch( QString &msg ) {
             LOG(VB_GENERAL, LOG_ERR, "Service Exception: " + msg);
-            Request->m_status = HTTPBadRequest;
+            if (msg.startsWith("Forbidden:"))
+                Request->m_status = HTTPForbidden;
+            else
+                Request->m_status = HTTPBadRequest;
             result = MythHTTPResponse::ErrorResponse(Request, msg);
         }
         catch (V2HttpRedirectException &ex) {

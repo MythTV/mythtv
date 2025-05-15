@@ -113,6 +113,9 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
         m_headers->insert("host", QString("%1:%2").arg(MythHTTP::AddressToString(host)).arg(Socket->localPort()));
     }
 
+    if (Socket)
+        m_peerAddress = Socket->peerAddress();
+
     // Need a valid URL
     if (!m_url.isValid())
     {

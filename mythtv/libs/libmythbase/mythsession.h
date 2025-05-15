@@ -8,6 +8,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QMap>
+#include <QMutex>
 
 enum DigestUserActions : std::uint8_t {
     DIGEST_USER_ADD,
@@ -175,11 +176,12 @@ class MBASE_PUBLIC MythSessionManager
      * \param newPassword if action=DIGEST_USER_CHANGE_PW
      * \param adminPassword if action=DIGEST_USER_ADD
      */
-    static bool ManageDigestUser(DigestUserActions action,
+    bool ManageDigestUser(DigestUserActions action,
                                  const QString    &username,
                                  const QString    &password,
-                                 const QString    &newPassword,
-                                 const QString    &adminPassword);
+                                 const QString    &newPassword);
+    static void LockSessions();
+    static void UnlockSessions();
 
   private:
     /**
@@ -212,18 +214,20 @@ class MBASE_PUBLIC MythSessionManager
      */
     void DestroyUserSession(const QString &sessionToken);
 
+    void DestroyUserAllSessions(const QString &username);
+
     static bool AddDigestUser(const QString &username,
-                              const QString &password,
-                              const QString &adminPassword);
+                              const QString &password);
 
-    static bool RemoveDigestUser(const QString &username,
-                                 const QString &password);
+    bool RemoveDigestUser(const QString &username);
 
-    static bool ChangeDigestUserPassword(const QString &username,
+    bool ChangeDigestUserPassword(const QString &username,
                                          const QString &oldPassword,
                                          const QString &newPassword);
 
     QMap<QString, MythUserSession> m_sessionList;
+
+    static QMutex mutex;
 };
 
 #endif // MYTHSESSION_H
