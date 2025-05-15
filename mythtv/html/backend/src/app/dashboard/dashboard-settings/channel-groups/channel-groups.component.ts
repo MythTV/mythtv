@@ -59,6 +59,7 @@ export class ChannelGroupsComponent implements OnInit, AfterViewInit {
   errorCount = 0;
   chanResponses = 0;
   dupName = false;
+  authorization = '';
 
   group: MyChannelGroup = this.resetGroup();
 
@@ -119,6 +120,11 @@ export class ChannelGroupsComponent implements OnInit, AfterViewInit {
   }
 
   loadAllChannels() {
+    let accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken == null)
+      this.authorization = ''
+    else
+      this.authorization = '&authorization=' + accessToken;
     this.channelService.GetChannelInfoList(
       { OnlyVisible: true }).subscribe((data) => {
         this.allChannels = data.ChannelInfoList.ChannelInfos;

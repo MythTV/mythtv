@@ -64,8 +64,10 @@
             <ng-template pTemplate="body" let-channel>
                 <tr>
                     <td class="pt-1 pb-0">
-                        <img src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon}}" height="32" width="42"
-                            *ngIf="channel.Icon; else nullIcon" style="background-color:#000000"
+                        <img src="{{'/Guide/GetChannelIcon?Filename=' + channel.Icon
+                            + authorization }}" height="32" width="42"
+                            *ngIf="channel.Icon; else nullIcon"
+                            style="background-color:#000000"
                             onerror="this.height='0'">
                         <ng-template #nullIcon><img height="32" width="42"></ng-template>
                     </td>

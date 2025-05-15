@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Time"
         },
+        "users": {
+            "auth_all_desc": "Authentication Required for All IP Addresses",
+            "auth_desc": "This controls whether a user who has not signed in can access the API calls and web app pages. This can only be set while you are logged in as admin. The option for Remote IP Addresses can only be selected if the option 'Allow Connections from all Subnets' is selected in Backend setup because without that option in backend setup, remote users cannot access the system. The selection is updated immediately, no save is required. Note that even if no authentication is required, a user can still log in and be authenticated if he chooses.",
+            "auth_label": "API Authentication Required",
+            "auth_none_desc": "No Authentication Required",
+            "auth_remote_desc": "Authentication Required for Remote IP Addresses",
+            "auth_title": "Enable or Disable Authentication",
+            "authreq_fail": "Error: Unable to set this value.",
+            "delete_details": "This will delete user {{ Name }}.",
+            "delete_label": "Delete User",
+            "edit_label": "Update User",
+            "heading": "Users",
+            "name_label": "User Name",
+            "new": "New User",
+            "oldpwwrong": "Current Password is Incorrect.",
+            "pwdiffer": "Passwords Differ"
+        },
         "videos": {
             "adddate": "Date Added",
             "allCategories": "All Categories",
@@ -473,13 +490,23 @@
         "changeLanguage": "Change Language",
         "dashboard": "Dashboard",
         "hide": "Hide top Banner",
+        "keeplogin": "Stay Logged In on this Computer.",
         "login": "Log In",
+        "loginfail": "Login Failed",
+        "logout": "Log Out",
         "mainheading": "MythTV Backend",
         "show": "Show top Banner",
         "switchServer": "Switch Server",
         "switchTheme": "Switch Theme",
         "testbed": "Testbed",
-        "tvGuide": "TV Guide"
+        "tvGuide": "TV Guide",
+        "username": "User Name",
+        "userpassword": "Password",
+        "users": {
+            "new_password": "New Password",
+            "new_password2": "New Password Again",
+            "old_password": "Current Password"
+        }
     },
     "primeng": {
         "accept": "Yes",

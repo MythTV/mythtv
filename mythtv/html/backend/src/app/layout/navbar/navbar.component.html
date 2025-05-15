@@ -28,6 +28,20 @@
              md:border-none surface-border right-0 top-100 z-2 shadow-2 md:shadow-none absolute md:static"
                 [hidden]="m_showNavbar">
                 <li class="toolbar" style="height: 80px;">
+                    <div class="text-primary mt-5 font-light">
+                        {{ dataService.loggedInUser }} &nbsp;&nbsp;&nbsp;
+                    </div>
+                </li>
+                <li *ngIf="!dataService.loggedInUser" class="toolbar" style="height: 80px;">
+                    <button pButton label="{{ 'navbar.login' | translate }}" class="p-button-text p-button-primary mt-4"
+                        (click)="showLogin();"></button>
+                </li>
+                <li *ngIf="dataService.loggedInUser" class="toolbar" style="height: 80px;">
+                    <button pButton label="{{ 'navbar.logout' | translate }}"
+                        class="p-button-text p-button-primary mt-4" (click)="logout()"></button>
+                </li>
+
+                <li class="toolbar" style="height: 80px;">
                     <a pRipple tooltipPosition="bottom" pTooltip="{{ 'navbar.switchTheme' | translate }}"
                         (click)="themePanel.toggle($event)"
                         class="p-ripple p-element my-3 mx-1 flex align-items-center cursor-pointer p-2 lg:justify-content-center
@@ -105,3 +119,44 @@
         </p-table>
     </ng-template>
 </p-overlayPanel>
+
+<form class="ml-3 mr-3" name="loginform" #loginform="ngForm" autocomplete="on">
+
+    <p-dialog header="{{ 'navbar.login' | translate }}" [(visible)]="displayLogin" [modal]="true"
+        [style]="{width: '360px'}" [draggable]="false" [resizable]="false" [closable]="false">
+
+        <div class="form-group field">
+            <label for="UserName" class="label block">{{ 'navbar.username' | translate }}</label>
+            <input pInputText id="UserName" [(ngModel)]="userName" name="UserName" #UserName="ngModel"
+                class="mb-2 form-control w-full" autocomplete="username" />
+        </div>
+
+        <div class="form-group field">
+            <label for="UserPassword" class="label block">{{ 'navbar.userpassword' | translate }}</label>
+            <p-password id="UserPassword" [(ngModel)]="userPassword" name="UserPassword" #UserName="ngModel"
+                class="mb-2 form-control w-full" [feedback]="false" (keydown.enter)="login()"
+                autocomplete="current-password" [toggleMask]="true"></p-password>
+        </div>
+
+        <div class="form-group field">
+            <p-checkbox inputId="KeepLogin" [(ngModel)]="keepLogin" name="KeepLogin"
+                class="mb-2 w-full label" [binary]="true"
+                label="{{ 'navbar.keeplogin' | translate }}">
+            </p-checkbox>
+        </div>
+
+
+        <ng-template pTemplate="footer">
+            <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="errorCount > 0" severity="error"
+                    text="{{ 'navbar.loginfail' | translate }}"></p-message>
+            </div>
+
+            <p-button *ngIf="!APIAuthReqd" icon="pi pi-times-circle" (click)="closeLogin()"
+                label="{{ 'common.cancel' | translate }}" styleClass="p-button-plain">
+            </p-button>
+            <p-button icon="pi pi-check-circle" (click)="login()" label="{{ 'common.ok' | translate }}"
+                styleClass="p-button-plain" [disabled]="!userName || !userPassword"></p-button>
+        </ng-template>
+    </p-dialog>
+</form>

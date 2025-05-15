@@ -34,6 +34,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import {InputTextareaModule} from 'primeng/inputtextarea';
 import {TieredMenuModule} from 'primeng/tieredmenu';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PasswordModule } from 'primeng/password';
 
 @NgModule({
     exports: [
@@ -70,7 +71,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
         MultiSelectModule,
         InputTextareaModule,
         TieredMenuModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        PasswordModule
     ]
 })
 

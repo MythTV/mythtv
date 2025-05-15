@@ -26,12 +26,18 @@ export class NavbarComponent implements OnInit {
     showTopBar = true;
     m_devMode: boolean = isDevMode();
     m_haveDatabase: boolean = true;
+    userName: string | null = '';
+    userPassword: string | null = '';
+    displayLogin = false;
+    errorCount = 0;
+    APIAuthReqd = false;
+    keepLogin = false;
 
     constructor(private themeService: ThemeService,
         private configService: ConfigService,
         private translateService: TranslateService,
         private primeconfigService: PrimeNGConfig,
-        private dataService: DataService,
+        public dataService: DataService,
         private mythService: MythService,
         private router: Router) {
         this.themeService.getThemes().then((themes: Theme[]) => {
@@ -43,6 +49,11 @@ export class NavbarComponent implements OnInit {
         this.configService.GetLanguages().subscribe((data: MythLanguageList) => {
             this.m_languages = data.LanguageList.Languages;
             this.m_selectedLanguage = this.findLanguageByCode(localStorage.getItem('Language') || 'en_US');
+            // if this was successful without being logged in, reset Auth Reqd
+            if (!sessionStorage.getItem('loggedInUser')) {
+                sessionStorage.removeItem('APIAuthReqd')
+                this.closeLogin();
+            }
         })
 
         this.mythService.GetBackendInfo()
@@ -59,6 +70,20 @@ export class NavbarComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.dataService.loggedInUser = sessionStorage.getItem('loggedInUser');
+        this.APIAuthReqd = (sessionStorage.getItem('APIAuthReqd') != null);
+        if (!this.dataService.loggedInUser) {
+            this.userName = localStorage.getItem('userName');
+            this.userPassword = localStorage.getItem('userPassword');
+            if (this.userName && this.userPassword) {
+                this.login();
+                return;
+            }
+            if (this.APIAuthReqd) {
+                this.displayLogin = true;
+                return;
+            }
+        }
     }
 
     findThemeByName(name: string): Theme {
@@ -101,5 +126,50 @@ export class NavbarComponent implements OnInit {
 
     toggleShowSidebar() {
         this.dataService.toggleShowSidebar();
+    }
+
+    showLogin() {
+        this.APIAuthReqd = (sessionStorage.getItem('APIAuthReqd') != null);
+        this.displayLogin = true;
+    }
+
+    login() {
+        // login process
+        this.errorCount = 0;
+        this.mythService.LoginUser(this.userName!, this.userPassword!).subscribe(
+            {
+                next: (data: any) => {
+                    if (data.String) {
+                        sessionStorage.setItem('accessToken', data.String);
+                        sessionStorage.setItem('loggedInUser', this.userName!);
+                        if (this.keepLogin) {
+                            localStorage.setItem('userName', this.userName!)
+                            localStorage.setItem('userPassword', this.userPassword!)
+                        }
+                        location.reload();
+                    }
+                    else {
+                        this.displayLogin = true;
+                        this.errorCount++;
+                    }
+                },
+                error: (err: any) => {
+                    console.log("Login error", err);
+                    this.errorCount++;
+                }
+            });
+    }
+
+    closeLogin() {
+        this.displayLogin = false;
+    }
+
+    logout() {
+        this.dataService.loggedInUser = '';
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('loggedInUser');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userPassword');
+        location.reload();
     }
 }

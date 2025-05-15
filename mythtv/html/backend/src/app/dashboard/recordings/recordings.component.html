@@ -46,8 +46,6 @@
             dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
             sortField="Title" [virtualScroll]="true" scrollHeight="flex" [scrollable]="true" (onSort)="refresh()">
 
-            <ng-template pTemplate="caption">
-            </ng-template>
             <ng-template pTemplate="header">
                 <tr>
                     <!-- Column Headings. -->
@@ -147,7 +145,7 @@
                     </td>
                     <td class="pt-1 pb-0" style="background: var(--surface-card); white-space: nowrap;">
                         <a href="{{URLencode('/Content/GetRecording?RecordedId=' + program.Recording.RecordedId)
-                         + '&Download=' + getDownload(program)}}"
+                         + '&Download=' + getDownload(program) + authorization}}"
                             pTooltip="{{ 'dashboard.recordings.download' | translate }}" tooltipPosition="left">
                             <i class="pi pi-download text-primary" [id]="'download_'+ rowIndex"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"

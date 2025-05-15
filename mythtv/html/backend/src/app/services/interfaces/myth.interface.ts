@@ -53,7 +53,7 @@ export interface MythConnectionInfo {
 }
 
 export interface GetSettingRequest {
-    HostName:   string;
+    HostName?:   string;
     Key:        string;
     Default?:   string;
 }
@@ -101,9 +101,8 @@ export interface SettingList {
 export interface ManageDigestUserRequest {
     Action:         string; // Must be: Add, Remove, or ChangePassword
     UserName:       string;
-    Password:       string;
+    Password?:      string;
     NewPassword?:   string; // Required on ChangePassword
-    AdminPassword?: string; // Required on Add
 }
 
 export interface ManageUrlProtectionRequest {

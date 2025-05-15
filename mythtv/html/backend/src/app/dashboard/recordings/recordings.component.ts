@@ -48,6 +48,7 @@ export class RecordingsComponent implements OnInit {
   searchValue = '';
   selectedRecGroup: string | null = null;
   loadLast = 0;
+  authorization = '';
 
   msg = {
     Success: 'common.success',
@@ -143,6 +144,11 @@ export class RecordingsComponent implements OnInit {
   }
 
   loadLazy(event: TableLazyLoadEvent, doRefresh?: boolean) {
+    let accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken == null)
+      this.authorization = ''
+    else
+      this.authorization = '&authorization=' + accessToken;
     if (event.sortField != this.lazyLoadEvent?.sortField)
       this.loadLast = 0;
     this.lazyLoadEvent = event;

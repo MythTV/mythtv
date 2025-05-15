@@ -49,5 +49,11 @@
                 <app-data-sources></app-data-sources>
             </ng-template>
         </p-accordionTab>
+        <p-accordionTab header="{{ 'dashboard.users.heading' | translate }}">
+            <ng-template pTemplate="header"><b>&nbsp;{{ dirtyMessages[8] }}</b></ng-template>
+            <ng-template pTemplate="content">
+                <app-users></app-users>
+            </ng-template>
+        </p-accordionTab>
     </p-accordion>
 </p-card>
