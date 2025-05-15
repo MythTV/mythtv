@@ -40,6 +40,7 @@ export class VideosComponent implements OnInit {
   selectedCategory: number | null = null;
   priorRequest: GetVideoListRequest = {};
   virtualScrollItemSize = 0;
+  authorization = '';
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -91,6 +92,11 @@ export class VideosComponent implements OnInit {
   }
 
   loadLazy(event: TableLazyLoadEvent) {
+    let accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken == null)
+      this.authorization = ''
+    else
+      this.authorization = '&authorization=' + accessToken;
     this.lazyLoadEvent = event;
     let request: GetVideoListRequest = {
       Sort: "title",

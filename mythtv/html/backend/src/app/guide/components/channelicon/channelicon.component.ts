@@ -11,9 +11,16 @@ export class ChannelIconComponent implements OnInit {
   @Input() channel!: Channel;
   @Input() guideComponent!: GuideComponent;
 
+  authorization = '';
+
   constructor() { }
 
   ngOnInit(): void {
+    let accessToken = sessionStorage.getItem('accessToken');
+    if (accessToken == null)
+      this.authorization = ''
+    else
+      this.authorization = '&authorization=' + accessToken;
   }
 
 }

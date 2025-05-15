@@ -1294,16 +1294,30 @@ bool MythCoreContext::CheckSubnet(const QAbstractSocket *socket)
 
 bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 {
-    static const QHostAddress kLinkLocal("fe80::");
     if (GetBoolSetting("AllowConnFromAll",false))
         return true;
+    return IsLocalSubnet(peer, true);
+}
+
+/**
+ * Check if peer is on local subnet.
+ *
+ * \param peer in Host Address to check.
+ * \param log whether to log an error if not.
+ * \return true if on local subnet, false if not.
+*/
+
+bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer, bool log)
+{
+    static const QHostAddress kLinkLocal("fe80::");
     if (d->m_approvedIps.contains(peer))
         return true;
     if (d->m_deniedIps.contains(peer))
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-          QString("Repeat denied connection from ip address: %1")
-          .arg(peer.toString()));
+        if (log)
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+              QString("Repeat denied connection from ip address: %1")
+              .arg(peer.toString()));
         return false;
     }
 
@@ -1337,9 +1351,10 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
         }
     }
     d->m_deniedIps.append(peer);
-    LOG(VB_GENERAL, LOG_WARNING, LOC +
-        QString("Denied connection from ip address: %1")
-        .arg(peer.toString()));
+    if (log)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Denied connection from ip address: %1")
+            .arg(peer.toString()));
     return false;
 }
 
@@ -2081,8 +2096,12 @@ bool MythCoreContext::InWantingPlayback(void)
 MythSessionManager* MythCoreContext::GetSessionManager(void)
 {
     if (!d->m_sessionManager)
-        d->m_sessionManager = new MythSessionManager();
-
+    {
+        MythSessionManager::LockSessions();
+        if (!d->m_sessionManager)
+            d->m_sessionManager = new MythSessionManager();
+        MythSessionManager::UnlockSessions();
+    }
     return d->m_sessionManager;
 }
 

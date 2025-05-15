@@ -197,6 +197,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                                   bool keepscope = false) ;
     bool CheckSubnet(const QAbstractSocket *socket);
     bool CheckSubnet(const QHostAddress &peer);
+    bool IsLocalSubnet(const QHostAddress &peer, bool log);
 
     void ClearSettingsCache(const QString &myKey = QString(""));
     void ActivateSettingsCache(bool activate = true);

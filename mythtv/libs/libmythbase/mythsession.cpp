@@ -9,24 +9,39 @@
 #include <QCryptographicHash>
 #include <QUuid>
 
+QMutex MythSessionManager::mutex;
+
 /**
  * \public
  */
 bool MythUserSession::IsValid(void) const
 {
     if (m_userId == 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("IsValid: Invalid session "
+            "m_userId %1").arg(m_userId));
         return false;
-
+    }
     if (m_sessionToken.isEmpty() || m_sessionToken.length() != 40)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("IsValid: Invalid session "
+            "m_sessionToken %1").arg(m_sessionToken));
         return false;
+    }
 
     if (m_sessionCreated > MythDate::current())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("IsValid: Invalid session "
+            "m_sessionCreated %1").arg(m_sessionCreated.toString()));
         return false;
+    }
 
     if (m_sessionExpires < MythDate::current())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("IsValid: Expired session "
+            "m_sessionExpires %1").arg(m_sessionExpires.toString()));
         return false;
-
-    // NOTE: Check client string as well?
+    }
 
     return true;
 }
@@ -37,12 +52,6 @@ bool MythUserSession::IsValid(void) const
 bool MythUserSession::CheckPermission(const QString &/*context*/,
                                       uint /*permission*/)
 {
-    if (!gCoreContext->IsMasterBackend())
-    {
-        // TODO: Connect to master and do checking there
-        return false;
-    }
-
     Update();
 
     // TODO: Implement perms checking here
@@ -100,9 +109,15 @@ bool MythUserSession::Save(void)
  */
 bool MythUserSession::Update(void)
 {
-    m_sessionLastActive = MythDate::current();
-    m_sessionExpires = MythDate::current().addDays(1);
-    return Save();
+    // Only update once per 5 minutes (300 seconds) at the most
+    QDateTime current = MythDate::current();
+    if (!m_sessionLastActive.isValid() || (m_sessionLastActive.addSecs(300) < current))
+    {
+        m_sessionLastActive = current;
+        m_sessionExpires = current.addDays(1);
+        return Save();
+    }
+    return true;
 }
 
 /**
@@ -110,7 +125,6 @@ bool MythUserSession::Update(void)
  */
 MythSessionManager::MythSessionManager()
 {
-    if (gCoreContext->IsMasterBackend())
         LoadSessions();
 }
 
@@ -124,7 +138,8 @@ void MythSessionManager::LoadSessions(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT s.sessiontoken, s.created, s.lastactive, s.expires, "
                   "       s.client, u.userid, u.username "
-                  "FROM user_sessions s, users u");
+                  "FROM user_sessions s, users u "
+                  "WHERE s.userid = u.userid ");
 
     if (!query.exec())
         MythDB::DBError("Error loading user sessions from database", query);
@@ -134,9 +149,9 @@ void MythSessionManager::LoadSessions(void)
         MythUserSession session;
 
         session.m_sessionToken = query.value(0).toString();
-        session.m_sessionCreated = query.value(1).toDateTime();
-        session.m_sessionLastActive = query.value(2).toDateTime();
-        session.m_sessionExpires = query.value(3).toDateTime();
+        session.m_sessionCreated =  MythDate::as_utc(query.value(1).toDateTime());
+        session.m_sessionLastActive = MythDate::as_utc(query.value(2).toDateTime());
+        session.m_sessionExpires = MythDate::as_utc(query.value(3).toDateTime());
         session.m_sessionClient = query.value(4).toString();
         session.m_userId = query.value(5).toUInt();
         session.m_name = query.value(6).toString();
@@ -153,12 +168,6 @@ bool MythSessionManager::IsValidUser(const QString& username)
     if (username.isEmpty())
         return false;
 
-    if (!gCoreContext->IsMasterBackend())
-    {
-        // TODO: Connect to master and do checking there
-        return false;
-    }
-
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT userid FROM users WHERE username = :USERNAME");
     query.bindValue(":USERNAME", username);
@@ -174,12 +183,6 @@ bool MythSessionManager::IsValidUser(const QString& username)
  */
 MythUserSession MythSessionManager::GetSession(const QString& sessionToken)
 {
-    if (!gCoreContext->IsMasterBackend())
-    {
-        // TODO: Connect to master and do checking there
-        return {};
-    }
-
     if (IsValidSession(sessionToken))
         return m_sessionList[sessionToken];
 
@@ -192,12 +195,6 @@ MythUserSession MythSessionManager::GetSession(const QString& sessionToken)
 MythUserSession MythSessionManager::GetSession(const QString &username,
                                                const QString &client)
 {
-    if (!gCoreContext->IsMasterBackend())
-    {
-        // TODO: Connect to master and do checking there
-        return {};
-    }
-
     QMap<QString, MythUserSession>::iterator it;
     for (it = m_sessionList.begin(); it != m_sessionList.end(); ++it)
     {
@@ -241,12 +238,6 @@ QString MythSessionManager::GetPasswordDigest(const QString& username)
  */
 bool MythSessionManager::IsValidSession(const QString& sessionToken)
 {
-    if (!gCoreContext->IsMasterBackend())
-    {
-        // TODO: Connect to master and do checking there
-        return false;
-    }
-
     if (m_sessionList.contains(sessionToken))
     {
         MythUserSession session = m_sessionList[sessionToken];
@@ -286,12 +277,6 @@ MythUserSession MythSessionManager::LoginUser(const QString &username,
     if (username.isEmpty() || digest.isEmpty() || digest.length() < 32 ||
         digest.length() > 32)
         return {};
-
-    if (!gCoreContext->IsMasterBackend())
-    {
-        // TODO: Connect to master and do checking there
-        return {};
-    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT userid, username FROM users WHERE "
@@ -404,30 +389,38 @@ void MythSessionManager::DestroyUserSession(const QString &sessionToken)
         m_sessionList.remove(sessionToken);
 }
 
+void MythSessionManager::DestroyUserAllSessions(const QString &username)
+{
+    if (username.isEmpty())
+        return;
+
+    QMap<QString, MythUserSession>::iterator it;
+    while (it != m_sessionList.end())
+    {
+        for (it = m_sessionList.begin(); it != m_sessionList.end(); ++it)
+        {
+            if (((*it).m_name == username))
+            {
+                DestroyUserSession((*it).m_sessionToken);
+                // Restart since list is now changed
+                // Not the most efficient way to do it, but we do not expect
+                // more than one or two sessions anyway.
+                break;
+            }
+        }
+    }
+}
+
 /**
  * \private
  */
 bool MythSessionManager::AddDigestUser(const QString& username,
-                                       const QString& password,
-                                       const QString& adminPassword)
+                                       const QString& password)
 {
-    if (adminPassword.isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Admin password is missing."));
-        return false;
-    }
-
     if (IsValidUser(username))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Tried to add an existing user: %1.")
                                          .arg(username));
-        return false;
-    }
-
-    if (CreateDigest("admin", adminPassword) != GetPasswordDigest("admin"))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1.")
-                                         .arg("admin"));
         return false;
     }
 
@@ -448,8 +441,7 @@ bool MythSessionManager::AddDigestUser(const QString& username,
 /**
  * \private
  */
-bool MythSessionManager::RemoveDigestUser(const QString& username,
-                                          const QString& password)
+bool MythSessionManager::RemoveDigestUser(const QString& username)
 {
     if (!IsValidUser(username))
     {
@@ -465,19 +457,14 @@ bool MythSessionManager::RemoveDigestUser(const QString& username,
         return false;
     }
 
-    if (CreateDigest(username, password) != GetPasswordDigest(username))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1.")
-                                         .arg(username));
-        return false;
-    }
-
     MSqlQuery deleteQuery(MSqlQuery::InitCon());
     deleteQuery.prepare("DELETE FROM users WHERE " "username = :USER_NAME ");
     deleteQuery.bindValue(":USER_NAME", username);
 
     bool bResult = deleteQuery.exec();
-    if (!bResult)
+    if (bResult)
+        DestroyUserAllSessions(username);
+    else
         MythDB::DBError("Error removing digest user from database",
                         deleteQuery);
 
@@ -504,28 +491,33 @@ bool MythSessionManager::ChangeDigestUserPassword(const QString& username,
         return false;
     }
 
-    QByteArray oldPasswordDigest = CreateDigest(username, oldPassword);
-
-    if (oldPasswordDigest != GetPasswordDigest(username))
+    // Allow for empty old password so that admin can change a forgotten password
+    if (!oldPassword.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Incorrect old password for "
-                                         "user: %1.").arg(username));
-        return false;
+        QByteArray oldPasswordDigest = CreateDigest(username, oldPassword);
+
+        if (oldPasswordDigest != GetPasswordDigest(username))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Incorrect old password for "
+                                             "user: %1.").arg(username));
+            return false;
+        }
     }
 
     MSqlQuery update(MSqlQuery::InitCon());
     update.prepare("UPDATE users SET "
                       "password_digest = :NEW_PASSWORD_DIGEST WHERE "
-                      "username = :USER_NAME AND "
-                      "password_digest = :OLD_PASSWORD_DIGEST");
+                      "username = :USER_NAME");
     update.bindValue(":NEW_PASSWORD_DIGEST", CreateDigest(username,
                                                           newPassword));
     update.bindValue(":USER_NAME", username);
-    update.bindValue(":OLD_PASSWORD_DIGEST", oldPasswordDigest);
 
     bool bResult = update.exec();
-    if (!bResult)
+    if (bResult)
+        DestroyUserAllSessions(username);
+    else
         MythDB::DBError("Error updating digest user in database", update);
+
 
     return bResult;
 }
@@ -550,21 +542,27 @@ QByteArray MythSessionManager::CreateDigest(const QString &username,
 bool MythSessionManager::ManageDigestUser(DigestUserActions action,
                                           const QString&    username,
                                           const QString&    password,
-                                          const QString&    newPassword,
-                                          const QString&    adminPassword)
+                                          const QString&    newPassword)
 {
     bool returnCode = false;
 
-    if (username.isEmpty() || password.isEmpty())
-        LOG(VB_GENERAL, LOG_ERR, QString("Username and password required."));
-    else if (action == DIGEST_USER_ADD)
-        returnCode = AddDigestUser(username, password, adminPassword);
+    if (action == DIGEST_USER_ADD)
+        returnCode = AddDigestUser(username, password); //, adminPassword);
     else if (action == DIGEST_USER_REMOVE)
-        returnCode = RemoveDigestUser(username, password);
+        returnCode = RemoveDigestUser(username);
     else if (action == DIGEST_USER_CHANGE_PW)
         returnCode = ChangeDigestUserPassword(username, password, newPassword);
     else
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown action."));
 
     return returnCode;
+}
+
+void MythSessionManager::LockSessions()
+{
+    mutex.lock();
+}
+void MythSessionManager::UnlockSessions()
+{
+    mutex.unlock();
 }

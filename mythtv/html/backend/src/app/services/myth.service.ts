@@ -65,8 +65,8 @@ export class MythService {
     return this.httpClient.get<MythHostName>('/Myth/GetHostName');
   }
 
-  public GetHosts() : Observable<String[]> {
-    return this.httpClient.get<String[]>('/Myth/GetHosts');
+  public GetHosts() : Observable<{StringList:string[]}> {
+    return this.httpClient.get<{StringList:string[]}>('/Myth/GetHosts');
   }
 
   public GetKeys() : Observable<String[]> {
@@ -75,7 +75,7 @@ export class MythService {
 
   public GetSetting(setting : GetSettingRequest) : Observable<GetSettingResponse> {
     let params = new HttpParams()
-      .set("HostName", setting.HostName)
+      .set("HostName", (setting.HostName) ? setting.HostName : "")
       .set("Key", setting.Key)
       .set("Default", (setting.Default) ? setting.Default : "");
     return this.httpClient.get<GetSettingResponse>('/Myth/GetSetting', {params})
@@ -166,6 +166,14 @@ export class MythService {
 
   public Proxy(url: String) : Observable<StringResponse> {
     return this.httpClient.post<StringResponse>('/Myth/Proxy', {Url: url});
+  }
+
+  public LoginUser(UserName: string, Password: string) : Observable<StringResponse> {
+    return this.httpClient.post<StringResponse>('Myth/LoginUser', {UserName: UserName, Password: Password});
+  }
+
+  public GetUsers() : Observable<{StringList:string[]}> {
+    return this.httpClient.get<{StringList:string[]}>('/Myth/GetUsers');
   }
 
 }
