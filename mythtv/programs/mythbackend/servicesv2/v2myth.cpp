@@ -775,6 +775,17 @@ bool V2Myth::PutSetting( const QString &sHostName,
 {
     QString hostName = sHostName;
 
+    if (sKey.toLower() == "apiauthreqd")
+    {
+        QString authorization = MythHTTP::GetHeader(m_request->m_headers,
+            "authorization").trimmed();
+        if (authorization.isEmpty())
+            authorization = m_request->m_queries.value("authorization",{});
+        MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+        if (sessionManager->GetSession(authorization).GetUserName() != "admin")
+            throw  QString ("Forbidden: PutSetting " + sKey);
+    }
+
     if (hostName == "_GLOBAL_")
         hostName = "";
 
@@ -1174,18 +1185,35 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
 bool V2Myth::ManageDigestUser( const QString &sAction,
                                const QString &sUserName,
                                const QString &sPassword,
-                               const QString &sNewPassword,
-                               const QString &sAdminPassword )
+                               const QString &sNewPassword)
 {
 
     DigestUserActions sessionAction = DIGEST_USER_ADD;
+    QString loggedInUser;
+
+    QString authorization = MythHTTP::GetHeader(m_request->m_headers,
+        "authorization").trimmed();
+    if (authorization.isEmpty())
+        authorization = m_request->m_queries.value("authorization",{});
+
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+
+    // if (!authorization.isEmpty())
+    loggedInUser = sessionManager->GetSession(authorization).GetUserName();
 
     if (sAction == "Add")
         sessionAction = DIGEST_USER_ADD;
     else if (sAction == "Remove")
         sessionAction = DIGEST_USER_REMOVE;
     else if (sAction == "ChangePassword")
+    {
         sessionAction = DIGEST_USER_CHANGE_PW;
+        if (sPassword.isEmpty() && loggedInUser != "admin" && !loggedInUser.isEmpty())
+        {
+            throw  QString ("Forbidden: ManageDigestUser "
+                + loggedInUser + " Old Password required");
+        }
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Action must be Add, Remove or "
@@ -1194,9 +1222,64 @@ bool V2Myth::ManageDigestUser( const QString &sAction,
         return false;
     }
 
-    return MythSessionManager::ManageDigestUser(sessionAction, sUserName,
-                                                sPassword, sNewPassword,
-                                                sAdminPassword);
+    if (!loggedInUser.isEmpty()
+        && loggedInUser != "admin" && loggedInUser != sUserName)
+    {
+        throw  QString ("Forbidden: ManageDigestUser " + sessionManager->GetSession(authorization).GetUserName());
+    }
+
+    return sessionManager->ManageDigestUser(sessionAction, sUserName,
+                                                sPassword, sNewPassword);
+                                                // sAdminPassword);
+}
+
+// Login a user to the API Services. Return a session token if
+// valid, empty string if not
+
+QString  V2Myth::LoginUser         (  const QString &UserName,
+                                      const QString &Password )
+{
+    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
+    QString client("webapi_" + gCoreContext->GetHostName());
+
+    MythUserSession session = sessionManager->LoginUser(UserName, Password, client);
+
+    QString result = session.GetSessionToken();
+    // Make sure in case of error that the return is an empty string
+    // not the word "null"
+    if (result.isEmpty())
+        result = "";
+    return result;
+}
+
+QStringList V2Myth::GetUsers()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.isConnected())
+        throw( QString( "Database not open while trying to load list of users" ));
+
+    query.prepare(
+        "SELECT username "
+        "FROM users ");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("V2Myth::GetUsers()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    // ----------------------------------------------------------------------
+    // return the results of the query
+    // ----------------------------------------------------------------------
+
+    QStringList oList;
+
+    while (query.next())
+        oList.append( query.value(0).toString() );
+
+    return oList;
 }
 
 /////////////////////////////////////////////////////////////////////////////

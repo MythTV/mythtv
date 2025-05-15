@@ -31,6 +31,7 @@ class MBASE_PUBLIC MythHTTPRequest
     MythHTTPConnection  m_connection { HTTPConnectionClose };
     std::chrono::milliseconds m_timeout { HTTP_SOCKET_TIMEOUT_MS };
     int                 m_allowed    { HTTP_DEFAULT_ALLOWED };
+    QHostAddress        m_peerAddress;
 
   private:
     Q_DISABLE_COPY(MythHTTPRequest)
