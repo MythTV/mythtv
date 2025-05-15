@@ -641,9 +641,16 @@ bool readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, in
         return true;
     }
 
+    // Read template size information from file.
     QTextStream stream(&dfile);
     stream >> *prow >> *pcol >> *pwidth >> *pheight;
     dfile.close();
+
+    if (*pwidth < 0 || *pheight < 0)
+    {
+        LOG(VB_COMMFLAG, LOG_ERR, QString("readTemplate no saved template"));
+        return false;
+    }
 
     if (av_image_alloc(tmpl->data, tmpl->linesize,
         *pwidth, *pheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
