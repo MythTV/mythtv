@@ -395,15 +395,18 @@ void MythSessionManager::DestroyUserAllSessions(const QString &username)
         return;
 
     QMap<QString, MythUserSession>::iterator it;
-    for (it = m_sessionList.begin(); it != m_sessionList.end(); ++it)
+    while (it != m_sessionList.end())
     {
-        if (((*it).m_name == username))
+        for (it = m_sessionList.begin(); it != m_sessionList.end(); ++it)
         {
-            DestroyUserSession((*it).m_sessionToken);
-            // Restart since list is now changed
-            // Not the most efficient way to do it, but we do not expect
-            // more than one or two sessions anyway.
-            it = m_sessionList.begin();
+            if (((*it).m_name == username))
+            {
+                DestroyUserSession((*it).m_sessionToken);
+                // Restart since list is now changed
+                // Not the most efficient way to do it, but we do not expect
+                // more than one or two sessions anyway.
+                break;
+            }
         }
     }
 }
