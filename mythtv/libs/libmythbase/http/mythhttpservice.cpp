@@ -86,7 +86,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
     QString authReqOption = gCoreContext->GetSetting("APIAuthReqd","NONE");
     bool authReq = false;
     if (authReqOption == "REMOTE") {
-        if (!gCoreContext->IsLocalSubnet(Request->m_peerAddress))
+        if (!gCoreContext->IsLocalSubnet(Request->m_peerAddress, false))
             authReq = true;
     }
     else if (authReqOption == "ALL")

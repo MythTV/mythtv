@@ -1296,19 +1296,28 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 {
     if (GetBoolSetting("AllowConnFromAll",false))
         return true;
-    return IsLocalSubnet(peer);
+    return IsLocalSubnet(peer, true);
 }
 
-bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer)
+/**
+ * Check if peer is on local subnet.
+ *
+ * \param peer in Host Address to check.
+ * \param log whether to log an error if not.
+ * \return true if on local subnet, false if not.
+*/
+
+bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer, bool log)
 {
     static const QHostAddress kLinkLocal("fe80::");
     if (d->m_approvedIps.contains(peer))
         return true;
     if (d->m_deniedIps.contains(peer))
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-          QString("Repeat denied connection from ip address: %1")
-          .arg(peer.toString()));
+        if (log)
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+              QString("Repeat denied connection from ip address: %1")
+              .arg(peer.toString()));
         return false;
     }
 
@@ -1342,9 +1351,10 @@ bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer)
         }
     }
     d->m_deniedIps.append(peer);
-    LOG(VB_GENERAL, LOG_WARNING, LOC +
-        QString("Denied connection from ip address: %1")
-        .arg(peer.toString()));
+    if (log)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("Denied connection from ip address: %1")
+            .arg(peer.toString()));
     return false;
 }
 
