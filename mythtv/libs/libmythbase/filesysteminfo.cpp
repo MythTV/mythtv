@@ -1,103 +1,21 @@
-#include <unistd.h>
-#include <cstdlib>
-#include "compat.h"
+#include "filesysteminfo.h"
 
 #include <QtGlobal>
 
-#ifdef __linux__
-#include <sys/vfs.h>
-#include <sys/sysinfo.h>
-#endif
+#include <algorithm>
 
-#ifdef Q_OS_DARWIN
-#include <mach/mach.h>
-#endif
-
-#ifdef BSD
-#include <sys/param.h>
-#include <sys/mount.h>  // for struct statfs
-#endif
-
-#include <QList>
+#include <QByteArray>
+#include <QStorageInfo>
 #include <QString>
 #include <QStringList>
-#include <utility>
 
-#include "filesysteminfo.h"
 #include "mythcorecontext.h"
-#include "mythcoreutil.h"
 #include "mythlogging.h"
 
-// for deserialization
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define NEXT_STR()        do { if (it == listend)                    \
-                               {                                     \
-                                   LOG(VB_GENERAL, LOG_ALERT, listerror); \
-                                   clear();                          \
-                                   return false;                     \
-                               }                                     \
-                               ts = *it++; } while (false)
-
-FileSystemInfo::FileSystemInfo(const FileSystemInfo &other)
+QStringList FileSystemInfo::ToStringList() const
 {
-    FileSystemInfo::clone(other);
-}
-
-FileSystemInfo::FileSystemInfo(QString hostname, QString path, bool local,
-        int fsid, int groupid, int blksize, int64_t total, int64_t used) :
-    m_hostname(std::move(hostname)), m_path(std::move(path)), m_local(local), m_fsid(fsid),
-    m_grpid(groupid), m_blksize(blksize), m_total(total), m_used(used)
-{
-}
-
-FileSystemInfo::FileSystemInfo(QStringList::const_iterator &it,
-                   const QStringList::const_iterator& end)
-{
-    FromStringList(it, end);
-}
-
-FileSystemInfo::FileSystemInfo(const QStringList &slist)
-{
-    FromStringList(slist);
-}
-
-void FileSystemInfo::clone(const FileSystemInfo &other)
-{
-    m_hostname = other.m_hostname;
-    m_path = other.m_path;
-    m_local = other.m_local;
-    m_fsid = other.m_fsid;
-    m_grpid = other.m_grpid;
-    m_blksize = other.m_blksize;
-    m_total = other.m_total;
-    m_used = other.m_used;
-    m_weight = other.m_weight;
-}
-
-FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
-{
-    if (this == &other)
-        return *this;
-
-    clone(other);
-    return *this;
-}
-
-void FileSystemInfo::clear(void)
-{
-    m_hostname  = "";
-    m_path      = "";
-    m_local     = false;
-    m_fsid      = -1;
-    m_grpid     = -1;
-    m_blksize   = 4096;
-    m_total     = 0;
-    m_used      = 0;
-    m_weight    = 0;
-}
-
-bool FileSystemInfo::ToStringList(QStringList &list) const
-{
+    QStringList list;
+    list.reserve(k_lines);
     list << m_hostname;
     list << m_path;
     list << QString::number(m_local);
@@ -107,73 +25,116 @@ bool FileSystemInfo::ToStringList(QStringList &list) const
     list << QString::number(m_total);
     list << QString::number(m_used);
 
+    return list;
+}
+
+bool FileSystemInfo::ToStringList(QStringList &list) const
+{
+    list << ToStringList();
+
     return true;
 }
 
 bool FileSystemInfo::FromStringList(const QStringList &slist)
 {
-    QStringList::const_iterator it = slist.constBegin();
-    return FromStringList(it, slist.constEnd());
+    QStringList::const_iterator it = slist.cbegin();
+    return FromStringList(it, slist.cend());
 }
 
+/**
+@brief Deserialize a FileSystemInfo.
+The FileSystemInfo will be in a default state if deserialization fails.
+@param [in,out] it iterator to the beginning of the FileSystemInfo to deserialize.
+                   It is incremented so this function can be called repeatedly in
+                   a while loop.  it will be set to listend when there aren't enough
+                   strings to deserialize a FileSystemInfo.
+@param [in] listend end of the string list referenced by both iterators
+@return Boolean, true if deserialized
+*/
 bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
-                             const QStringList::const_iterator& listend)
+                                    const QStringList::const_iterator& listend)
 {
-    QString listerror = "FileSystemInfo: FromStringList, not enough items in list.";
-    QString ts;
+    if (std::distance(it, listend) < k_lines)
+    {
+        LOG(VB_GENERAL, LOG_ALERT, QStringLiteral("FileSystemInfo::FromStringList, not enough items in list."));
+        clear();
+        it = listend;
+        return false;
+    }
 
-    NEXT_STR(); m_hostname = ts;
-    NEXT_STR(); m_path     = ts;
-    NEXT_STR(); m_local    = ts.toLongLong();
-    NEXT_STR(); m_fsid     = ts.toLongLong();
-    NEXT_STR(); m_grpid    = ts.toLongLong();
-    NEXT_STR(); m_blksize  = ts.toLongLong();
-    NEXT_STR(); m_total    = ts.toLongLong();
-    NEXT_STR(); m_used     = ts.toLongLong();
+    m_hostname  = *it; it++;
+    m_path      = *it; it++;
+    m_local     = (*it).toLongLong(); it++;
+    m_fsid      = (*it).toLongLong(); it++;
+    m_grpid     = (*it).toLongLong(); it++;
+    m_blksize   = (*it).toLongLong(); it++;
+    m_total     = (*it).toLongLong(); it++;
+    m_used      = (*it).toLongLong(); it++;
 
     m_weight = 0;
 
     return true;
 }
 
-QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
+bool FileSystemInfo::refresh()
 {
-    FileSystemInfo fsInfo;
-    QList<FileSystemInfo> fsInfos;
-    QStringList strlist(QString("QUERY_FREE_SPACE_LIST"));
+    QStorageInfo info {m_path};
 
-    bool sent = false;
-
-    if (sock)
-        sent = sock->SendReceiveStringList(strlist);
-    else
-        sent = gCoreContext->SendReceiveStringList(strlist);
-
-    if (sent)
+    if (info.isValid() && info.isReady())
     {
-        int numdisks = strlist.size()/NUMDISKINFOLINES;
+        m_total   = info.bytesTotal();
+        m_used    = info.bytesTotal() - info.bytesAvailable();
+        m_blksize = info.blockSize();
 
-        QStringList::const_iterator it = strlist.cbegin();
-        for (int i = 0; i < numdisks; i++)
-        {
-            fsInfo.FromStringList(it, strlist.cend());
-            fsInfos.append(fsInfo);
-        }
+        // TODO keep as B not KiB
+        m_total >>= 10;
+        m_used  >>= 10;
+
+#ifdef Q_OS_WIN
+        QByteArray device = info.device();
+        m_local = (device.startsWith(R"(\\?\)") && !device.startsWith(R"(\\?\UNC\)")) ||
+                  (device.startsWith(R"(\\.\)") && !device.startsWith(R"(\\.\UNC\)"));
+#else // Unix-like
+        m_local = info.device().startsWith("/dev/");
+#endif
+        return true;
+    }
+    return false;
+}
+
+// default: sock = nullptr
+FileSystemInfoList FileSystemInfoManager::GetInfoList(MythSocket *sock)
+{
+    FileSystemInfoList fsInfos;
+    QStringList strlist(QStringLiteral("QUERY_FREE_SPACE_LIST"));
+
+    if ((sock != nullptr)
+        ? sock->SendReceiveStringList(strlist)
+        : gCoreContext->SendReceiveStringList(strlist)
+       )
+    {
+        fsInfos = FileSystemInfoManager::FromStringList(strlist);
     }
 
     return fsInfos;
 }
 
-void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
-                                 bool merge, int64_t fuzz)
+// O(n^2)
+void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
+                                        bool merge, int64_t fuzz,
+                                        QString total_name)
 {
     int newid = 0;
+    int64_t total_total = 0;
+    int64_t total_used  = 0;
 
     for (auto it1 = disks.begin(); it1 != disks.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
         {
             it1->setFSysID(newid++);
+            total_total += it1->getTotalSpace();
+            total_used  += it1->getUsedSpace();
             if (merge)
                 it1->setPath(it1->getHostname().section(".", 0, 0)
                                 + ":" + it1->getPath());
@@ -184,15 +145,11 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
             if (it2->getFSysID() != -1) // disk has already been matched
                 continue;
 
-            int bSize = std::max(32, std::max(it1->getBlockSize(), it2->getBlockSize())
-                                        / 1024);
-            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
-
-            if (diffSize < 0)
-                diffSize = 0 - diffSize;
-            if (diffUsed < 0)
-                diffUsed = 0 - diffUsed;
+            // almost certainly guaranteed to be 32 KiB
+            int bSize = std::max( {32 << 10, it1->getBlockSize(), it2->getBlockSize()} );
+            bSize >>= 10;
+            int64_t diffSize = std::abs(it1->getTotalSpace() - it2->getTotalSpace());
+            int64_t diffUsed = std::abs(it1->getUsedSpace()  - it2->getUsedSpace());
 
             if ((diffSize <= bSize) && (diffUsed <= fuzz))
             {
@@ -212,36 +169,33 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
             }
         }
     }
-}
-
-void FileSystemInfo::PopulateDiskSpace(void)
-{
-    int64_t total = -1;
-    int64_t used = -1;
-    getDiskSpace(getPath().toLatin1().constData(), total, used);
-    setTotalSpace(total);
-    setUsedSpace(used);
-}
-
-void FileSystemInfo::PopulateFSProp(void)
-{
-    struct statfs statbuf {};
-
-    if (statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0)
+    if (!total_name.isEmpty())
     {
-#ifdef Q_OS_DARWIN
-        char *fstypename = statbuf.f_fstypename;
-        if ((!strcmp(fstypename, "nfs")) ||     // NFS|FTP
-            (!strcmp(fstypename, "afpfs")) ||   // AppleShare
-            (!strcmp(fstypename, "smbfs")))     // SMB
-                setLocal(false);
-#elif defined(__linux__)
-        long fstype = statbuf.f_type;
-        if ((fstype == 0x6969)  ||              // NFS
-            (fstype == 0x517B)  ||              // SMB
-            (fstype == (long)0xFF534D42))       // CIFS
-                setLocal(false);
-#endif
-        setBlockSize(statbuf.f_bsize);
+        disks.append(FileSystemInfo(total_name, "TotalDiskSpace", false, -2, -2,
+                                    0, total_total, total_used));
     }
+}
+
+FileSystemInfoList FileSystemInfoManager::FromStringList(const QStringList& list)
+{
+    FileSystemInfoList fsInfos;
+    fsInfos.reserve(list.size() / FileSystemInfo::k_lines + 1);
+
+    QStringList::const_iterator it = list.cbegin();
+    while (it < list.cend())
+    {
+        fsInfos.push_back(FileSystemInfo(it, list.cend()));
+    }
+
+    return fsInfos;
+}
+
+QStringList FileSystemInfoManager::ToStringList(const FileSystemInfoList& fsInfos)
+{
+    QStringList strlist;
+    for (const auto & fsInfo : fsInfos)
+    {
+        strlist << fsInfo.ToStringList();
+    }
+    return strlist;
 }

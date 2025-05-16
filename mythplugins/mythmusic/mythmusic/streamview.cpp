@@ -9,7 +9,6 @@
 #include <QThread>
 
 // MythTV
-#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
