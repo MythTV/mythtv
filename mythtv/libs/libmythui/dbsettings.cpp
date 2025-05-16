@@ -1,3 +1,5 @@
+#include "dbsettings.h"
+
 // Qt headers
 #include <QFile>
 #include <QDir>
@@ -7,9 +9,6 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdbparams.h"
-
-#include "dbsettings.h"
-#include "mythcontext.h"
 
 DatabaseSettings::DatabaseSettings(QString DBhostOverride) :
     m_dbHostOverride(std::move(DBhostOverride))
