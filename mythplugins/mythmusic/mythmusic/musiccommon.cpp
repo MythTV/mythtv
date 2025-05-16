@@ -1043,12 +1043,11 @@ void MusicCommon::cycleVisualizer(void)
     {
         if (m_randomVisualizer)
         {
-            unsigned int next_visualizer = 0;
+            unsigned int next_visualizer = m_currentVisual;
 
             //Find a visual thats not like the previous visual
-            do
+            while (next_visualizer == m_currentVisual)
                 next_visualizer = MythRandom(0, m_visualModes.count() - 1);
-            while (next_visualizer == m_currentVisual);
             m_currentVisual = next_visualizer;
         }
         else
