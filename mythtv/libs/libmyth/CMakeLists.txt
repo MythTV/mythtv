@@ -20,7 +20,7 @@ set(LIBMYTH_HEADERS
     visual.h
     )
 
-set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h dbsettings.h)
+set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h)
 
 set(AUDIO_HEADERS
     audio/audioconvert.h
@@ -71,7 +71,6 @@ add_library(
   audio/spdifencoder.cpp
   audio/volumebase.cpp
   backendselect.cpp
-  dbsettings.cpp
   mythaverror.cpp
   mythcontext.cpp
   output.cpp
