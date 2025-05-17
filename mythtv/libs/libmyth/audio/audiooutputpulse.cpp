@@ -73,6 +73,8 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     {
         pa_threaded_mainloop_unlock(m_mainloop);
         pa_threaded_mainloop_stop(m_mainloop);
+        pa_threaded_mainloop_free(m_mainloop);
+        m_mainloop = nullptr;
         delete m_aoSettings;
         return nullptr;
     }
@@ -113,6 +115,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     pa_context_unref(m_pcontext);
     m_pcontext = nullptr;
     pa_threaded_mainloop_stop(m_mainloop);
+    pa_threaded_mainloop_free(m_mainloop);
     m_mainloop = nullptr;
 
     return m_aoSettings;
@@ -175,6 +178,8 @@ bool AudioOutputPulseAudio::OpenDevice()
     {
         pa_threaded_mainloop_unlock(m_mainloop);
         pa_threaded_mainloop_stop(m_mainloop);
+        pa_threaded_mainloop_free(m_mainloop);
+        m_mainloop = nullptr;
         return false;
     }
 
@@ -182,6 +187,8 @@ bool AudioOutputPulseAudio::OpenDevice()
     {
         pa_threaded_mainloop_unlock(m_mainloop);
         pa_threaded_mainloop_stop(m_mainloop);
+        pa_threaded_mainloop_free(m_mainloop);
+        m_mainloop = nullptr;
         return false;
     }
 
@@ -214,6 +221,7 @@ void AudioOutputPulseAudio::CloseDevice()
     {
         pa_threaded_mainloop_unlock(m_mainloop);
         pa_threaded_mainloop_stop(m_mainloop);
+        pa_threaded_mainloop_free(m_mainloop);
         m_mainloop = nullptr;
     }
 }
