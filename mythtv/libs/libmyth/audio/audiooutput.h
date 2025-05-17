@@ -2,6 +2,7 @@
 #define AUDIOOUTPUT
 
 #include <chrono>
+using namespace std::chrono_literals;
 #include <utility>
 
 // Qt headers
@@ -13,10 +14,10 @@
 #include "libmyth/audio/audiooutputsettings.h"
 #include "libmyth/audio/audiosettings.h"
 #include "libmyth/audio/volumebase.h"
-#include "libmyth/output.h"
 #include "libmyth/visual.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
+#include "libmythbase/mythevent.h"
 #include "libmythbase/mythobservable.h"
 
 // forward declaration
@@ -46,6 +47,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
         AudioDeviceConfig &operator= (const AudioDeviceConfig &) = default;
         AudioDeviceConfig &operator= (AudioDeviceConfig &&) = default;
     };
+
+    class Event;
 
     using ADCVect = QVector<AudioDeviceConfig>;
 
@@ -218,6 +221,74 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};
     std::vector<MythTV::Visual*> m_visuals;
+};
+
+class MPUBLIC AudioOutput::Event : public MythEvent
+{
+  public:
+    explicit Event(Type type) : MythEvent(type) {}
+    Event(std::chrono::seconds s, unsigned long w, int b, int f, int p, int c) :
+        MythEvent(kInfo), m_elaspedSeconds(s), m_writtenBytes(w),
+        m_brate(b), m_freq(f), m_prec(p), m_chan(c) {}
+    explicit Event(const QString &e) :
+        MythEvent(kError)
+    {
+        QByteArray tmp = e.toUtf8();
+        m_errorMsg = new QString(tmp.constData());
+    }
+
+    ~Event() override
+    {
+        delete m_errorMsg;
+    }
+
+    const QString *errorMessage() const { return m_errorMsg; }
+
+    const std::chrono::seconds &elapsedSeconds() const { return m_elaspedSeconds; }
+    const unsigned long &writtenBytes() const { return m_writtenBytes; }
+    const int &bitrate() const { return m_brate; }
+    const int &frequency() const { return m_freq; }
+    const int &precision() const { return m_prec; }
+    const int &channels() const { return m_chan; }
+
+    MythEvent *clone(void) const override // MythEvent
+        { return new Event(*this); }
+
+    static const inline QEvent::Type kPlaying    {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kBuffering  {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kInfo       {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kPaused     {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kStopped    {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kError      {static_cast<QEvent::Type>(QEvent::registerEventType())};
+
+  private:
+    Event(const Event &o) : MythEvent(o),
+        m_elaspedSeconds(o.m_elaspedSeconds),
+        m_writtenBytes(o.m_writtenBytes),
+        m_brate(o.m_brate), m_freq(o.m_freq),
+        m_prec(o.m_prec), m_chan(o.m_chan)
+    {
+        if (o.m_errorMsg)
+        {
+            m_errorMsg = new QString(*o.m_errorMsg);
+        }
+    }
+
+  // No implicit copying.
+  public:
+    Event &operator=(const Event &other) = delete;
+    Event(Event &&) = delete;
+    Event &operator=(Event &&) = delete;
+
+  private:
+    QString       *m_errorMsg        {nullptr};
+
+    std::chrono::seconds m_elaspedSeconds {0s};
+    unsigned long  m_writtenBytes    {0};
+    int            m_brate           {0};
+    int            m_freq            {0};
+    int            m_prec            {0};
+    int            m_chan            {0};
 };
 
 #endif

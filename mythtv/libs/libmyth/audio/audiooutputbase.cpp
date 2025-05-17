@@ -270,7 +270,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
 }
 
 /**
- * Set the bitrate of the source material, reported in periodic OutputEvents
+ * Set the bitrate of the source material, reported in periodic AudioOutput::Events
  */
 void AudioOutputBase::SetSourceBitrate(int rate)
 {
@@ -1620,7 +1620,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 }
 
 /**
- * Report status via an OutputEvent
+ * Report status via an AudioOutput::Event
  */
 void AudioOutputBase::Status()
 {
@@ -1636,7 +1636,7 @@ void AudioOutputBase::Status()
     if (duration_cast<std::chrono::seconds>(ct) != m_currentSeconds)
     {
         m_currentSeconds = duration_cast<std::chrono::seconds>(ct);
-        OutputEvent e(m_currentSeconds, ct.count(), m_sourceBitRate, m_sourceSampleRate,
+        Event e(m_currentSeconds, ct.count(), m_sourceBitRate, m_sourceSampleRate,
                       AudioOutputSettings::FormatToBits(m_format), m_sourceChannels);
         dispatch(e);
     }
@@ -1674,7 +1674,7 @@ void AudioOutputBase::OutputAudioLoop(void)
             if (!m_actuallyPaused)
             {
                 LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: audio paused");
-                OutputEvent e(OutputEvent::kPaused);
+                Event e(Event::kPaused);
                 dispatch(e);
                 m_wasPaused = true;
             }
@@ -1689,7 +1689,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (m_wasPaused)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: Play Event");
-            OutputEvent e(OutputEvent::kPlaying);
+            Event e(Event::kPlaying);
             dispatch(e);
             m_wasPaused = false;
         }
@@ -1739,7 +1739,7 @@ void AudioOutputBase::OutputAudioLoop(void)
     ::operator delete[] (zeros, std::align_val_t(16));
     ::operator delete[] (fragment, std::align_val_t(16));
     LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: Stop Event");
-    OutputEvent e(OutputEvent::kStopped);
+    Event e(Event::kStopped);
     dispatch(e);
 }
 
