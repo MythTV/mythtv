@@ -11,7 +11,7 @@
     \brief This class is used as a container for messages.
 
     Any subclass of this that adds data to the event should override
-    the clone method. As example, see OutputEvent in output.h.
+    the clone method. For an example, see AudioOutput::Event in audiooutput.h.
  */
 class MBASE_PUBLIC MythEvent : public QEvent
 {

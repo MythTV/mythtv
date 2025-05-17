@@ -16,7 +16,6 @@ set(LIBMYTH_HEADERS
     mythavframe.h
     mythcontext.h
     mythexp.h
-    output.h
     visual.h
     )
 

@@ -706,7 +706,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
 
 void AudioOutput::error(const QString &e)
 {
-    OutputEvent event(e);
+    Event event(e);
     dispatch(event);
 }
 

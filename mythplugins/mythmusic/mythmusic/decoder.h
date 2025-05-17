@@ -21,7 +21,6 @@ class DecoderFactory;
 
 class QObject;
 class QIODevice;
-class OutputEvent;
 
 class Buffer;
 class AudioOutput;
