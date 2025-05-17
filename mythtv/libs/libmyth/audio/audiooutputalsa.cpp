@@ -355,7 +355,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
             delete settings;
             return nullptr;
         }
-        Warn("Supported audio format detection will be inacurrate "
+        LOG(VB_GENERAL, LOG_WARNING, "Supported audio format detection will be inacurrate "
              "(using plugin?)");
     }
 
