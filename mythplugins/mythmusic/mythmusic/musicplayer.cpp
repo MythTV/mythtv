@@ -821,9 +821,9 @@ void MusicPlayer::customEvent(QEvent *event)
         if (!aoe)
             return;
 
-        LOG(VB_GENERAL, LOG_ERR, QString("Audio Output Error: %1").arg(*aoe->errorMessage()));
+        LOG(VB_GENERAL, LOG_ERR, QString("Audio Output Error: %1").arg(aoe->errorMessage()));
 
-        MythErrorNotification n(tr("Audio Output Error"), tr("MythMusic"), *aoe->errorMessage());
+        MythErrorNotification n(tr("Audio Output Error"), tr("MythMusic"), aoe->errorMessage());
         GetNotificationCenter()->Queue(n);
 
         m_errorCount++;
