@@ -410,8 +410,6 @@ bool MusicPlayer::openOutputDevice(void)
         return false;
     }
 
-    m_output->setBufferSize(256 * 1024);
-
     m_output->addListener(this);
 
     // add any visuals to the audio output
