@@ -42,7 +42,6 @@ HEADERS += mythaverror.h
 HEADERS += mythavframe.h
 HEADERS += mythcontext.h
 HEADERS += mythexp.h
-HEADERS += output.h
 HEADERS += visual.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
@@ -89,7 +88,7 @@ inc.files += mythwidgets.h remotefile.h volumecontrol.h
 inc.files += inetcomms.h
 inc.files += mythaverror.h
 inc.files += mythavframe.h
-inc.files += visual.h output.h
+inc.files += visual.h
 inc.files += mythexp.h
 
 inc2.path = $${PREFIX}/include/mythtv/libmyth/audio

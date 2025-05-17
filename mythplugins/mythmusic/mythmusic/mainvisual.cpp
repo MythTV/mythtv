@@ -266,17 +266,17 @@ void MainVisual::resize(const QSize size)
 
 void MainVisual::customEvent(QEvent *event)
 {
-    if ((event->type() == OutputEvent::kPlaying)   ||
-        (event->type() == OutputEvent::kInfo)      ||
-        (event->type() == OutputEvent::kBuffering) ||
-        (event->type() == OutputEvent::kPaused))
+    if ((event->type() == AudioOutput::Event::kPlaying)   ||
+        (event->type() == AudioOutput::Event::kInfo)      ||
+        (event->type() == AudioOutput::Event::kBuffering) ||
+        (event->type() == AudioOutput::Event::kPaused))
     {
         m_playing = true;
         if (!m_updateTimer->isActive())
             m_updateTimer->start();
     }
-    else if ((event->type() == OutputEvent::kStopped) ||
-             (event->type() == OutputEvent::kError))
+    else if ((event->type() == AudioOutput::Event::kStopped) ||
+             (event->type() == AudioOutput::Event::kError))
     {
         m_playing = false;
     }

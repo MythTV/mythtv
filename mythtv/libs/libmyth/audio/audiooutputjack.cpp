@@ -217,7 +217,7 @@ void AudioOutputJACK::CloseDevice()
     }
 
     LOG(VB_AUDIO, LOG_INFO, LOC + "Jack: Stop Event");
-    OutputEvent e(OutputEvent::kStopped);
+    Event e(Event::kStopped);
     dispatch(e);
 }
 
@@ -373,7 +373,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         if (!m_actuallyPaused)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "JackCallback: audio paused");
-            OutputEvent e(OutputEvent::kPaused);
+            Event e(Event::kPaused);
             dispatch(e);
             m_wasPaused = true;
         }
@@ -385,7 +385,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         if (m_wasPaused)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "JackCallback: Play Event");
-            OutputEvent e(OutputEvent::kPlaying);
+            Event e(Event::kPlaying);
             dispatch(e);
             m_wasPaused = false;
         }

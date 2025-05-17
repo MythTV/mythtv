@@ -288,7 +288,7 @@ void MusicPlayer::stop(bool stopAll)
 
     // because we don't actually stop the audio output we have to fake a Stopped
     // event so any listeners can act on it
-    OutputEvent oe(OutputEvent::kStopped);
+    AudioOutput::Event oe(AudioOutput::Event::kStopped);
     dispatch(oe);
 
     gCoreContext->emitTVPlaybackStopped();
@@ -814,9 +814,9 @@ void MusicPlayer::customEvent(QEvent *event)
         }
     }
 
-    if (event->type() == OutputEvent::kError)
+    if (event->type() == AudioOutput::Event::kError)
     {
-        auto *aoe = dynamic_cast<OutputEvent *>(event);
+        auto *aoe = dynamic_cast<AudioOutput::Event *>(event);
 
         if (!aoe)
             return;
@@ -880,9 +880,9 @@ void MusicPlayer::customEvent(QEvent *event)
             stop(true);
         }
     }
-    else if (event->type() == OutputEvent::kInfo)
+    else if (event->type() == AudioOutput::Event::kInfo)
     {
-        auto *oe = dynamic_cast<OutputEvent*>(event);
+        auto *oe = dynamic_cast<AudioOutput::Event*>(event);
 
         if (!oe)
             return;
