@@ -73,7 +73,6 @@ add_library(
   backendselect.cpp
   mythaverror.cpp
   mythcontext.cpp
-  output.cpp
   )
 
 #
