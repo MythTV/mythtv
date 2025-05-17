@@ -290,20 +290,9 @@ void AudioOutput::SilentError(const QString &msg)
     m_lastError = msg;
 }
 
-void AudioOutput::Warn(const QString &msg)
-{
-    m_lastWarn = msg;
-    LOG(VB_GENERAL, LOG_WARNING, "AudioOutput Warning: " + m_lastWarn);
-}
-
 void AudioOutput::ClearError(void)
 {
     m_lastError.clear();
-}
-
-void AudioOutput::ClearWarning(void)
-{
-    m_lastWarn.clear();
 }
 
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
