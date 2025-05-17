@@ -6,12 +6,12 @@
 
 // MythTV
 #include "libmyth/mythexp.h"
-#include "libmyth/visual.h"
+#include "libmyth/audio/visualization.h"
 
 class MythImage;
 class MythPainter;
 
-class MPUBLIC AudioOutputGraph : public MythTV::Visual
+class MPUBLIC AudioOutputGraph : public Visualization
 {
   public:
     AudioOutputGraph();

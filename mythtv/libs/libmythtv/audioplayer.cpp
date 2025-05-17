@@ -25,7 +25,7 @@ AudioPlayer::~AudioPlayer()
     m_visuals.clear();
 }
 
-void AudioPlayer::addVisual(MythTV::Visual *vis)
+void AudioPlayer::addVisual(Visualization *vis)
 {
     if (!m_audioOutput)
         return;
@@ -39,7 +39,7 @@ void AudioPlayer::addVisual(MythTV::Visual *vis)
     }
 }
 
-void AudioPlayer::removeVisual(MythTV::Visual *vis)
+void AudioPlayer::removeVisual(Visualization *vis)
 {
     if (!m_audioOutput)
         return;

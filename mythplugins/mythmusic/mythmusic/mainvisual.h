@@ -23,7 +23,7 @@
 #include <QWidget>
 
 // MythTV headers
-#include <libmyth/visual.h>
+#include <libmyth/audio/visualization.h>
 
 // MythMusic
 #include "visualize.h"
@@ -31,7 +31,7 @@
 class MythUIVideo;
 
 // base class to handle things like frame rate...
-class MainVisual :  public QObject, public MythTV::Visual
+class MainVisual :  public QObject, public Visualization
 {
     Q_OBJECT
 

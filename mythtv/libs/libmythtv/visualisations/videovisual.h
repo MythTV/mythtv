@@ -7,7 +7,7 @@
 #include <QList>
 #include <QDateTime>
 
-#include "libmyth/visual.h"
+#include "libmyth/audio/visualization.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythui/mythpainter.h"
 #include "libmythui/mythrender_base.h"
@@ -39,7 +39,7 @@ class VisualNode
     std::chrono::milliseconds m_offset;
 };
 
-class MTV_PUBLIC VideoVisual : public MythTV::Visual
+class MTV_PUBLIC VideoVisual : public Visualization
 {
   public:
     static VideoVisual* Create(const QString &name,
