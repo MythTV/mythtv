@@ -96,8 +96,6 @@ class MPUBLIC OutputEvent : public MythEvent
     int            m_chan            {0};
 };
 
-using Visuals = std::vector<MythTV::Visual*>;
-
 class MPUBLIC OutputListeners : public MythObservable
 {
 public:
@@ -117,7 +115,7 @@ protected:
 private:
     Q_DISABLE_COPY(OutputListeners)
 
-    Visuals      m_visuals;
+    std::vector<MythTV::Visual*> m_visuals;
 };
 
 
