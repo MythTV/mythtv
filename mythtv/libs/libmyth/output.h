@@ -108,9 +108,6 @@ public:
     void addVisual(MythTV::Visual *v);
     void removeVisual(MythTV::Visual *v);
 
-    void setBufferSize(unsigned int sz) { m_bufsize = sz; }
-    unsigned int bufferSize() const { return m_bufsize; }
-
 protected:
     void error(const QString &e);
     void dispatchVisual(uchar *b, unsigned long b_len,
@@ -121,8 +118,6 @@ private:
     Q_DISABLE_COPY(OutputListeners)
 
     Visuals      m_visuals;
-
-    unsigned int m_bufsize {0};
 };
 
 
