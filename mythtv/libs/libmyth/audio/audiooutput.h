@@ -230,19 +230,15 @@ class MPUBLIC AudioOutput::Event : public MythEvent
     Event(std::chrono::seconds s, unsigned long w, int b, int f, int p, int c) :
         MythEvent(kInfo), m_elaspedSeconds(s), m_writtenBytes(w),
         m_brate(b), m_freq(f), m_prec(p), m_chan(c) {}
-    explicit Event(const QString &e) :
-        MythEvent(kError)
+    explicit Event(QString e) :
+        MythEvent(kError),
+        m_errorMsg(std::move(e))
     {
-        QByteArray tmp = e.toUtf8();
-        m_errorMsg = new QString(tmp.constData());
     }
 
-    ~Event() override
-    {
-        delete m_errorMsg;
-    }
+    ~Event() override = default;
 
-    const QString *errorMessage() const { return m_errorMsg; }
+    QString errorMessage() const { return m_errorMsg; }
 
     const std::chrono::seconds &elapsedSeconds() const { return m_elaspedSeconds; }
     const unsigned long &writtenBytes() const { return m_writtenBytes; }
@@ -263,15 +259,12 @@ class MPUBLIC AudioOutput::Event : public MythEvent
 
   private:
     Event(const Event &o) : MythEvent(o),
+        m_errorMsg(o.m_errorMsg),
         m_elaspedSeconds(o.m_elaspedSeconds),
         m_writtenBytes(o.m_writtenBytes),
         m_brate(o.m_brate), m_freq(o.m_freq),
         m_prec(o.m_prec), m_chan(o.m_chan)
     {
-        if (o.m_errorMsg)
-        {
-            m_errorMsg = new QString(*o.m_errorMsg);
-        }
     }
 
   // No implicit copying.
@@ -281,7 +274,7 @@ class MPUBLIC AudioOutput::Event : public MythEvent
     Event &operator=(Event &&) = delete;
 
   private:
-    QString       *m_errorMsg        {nullptr};
+    QString        m_errorMsg;
 
     std::chrono::seconds m_elaspedSeconds {0s};
     unsigned long  m_writtenBytes    {0};
