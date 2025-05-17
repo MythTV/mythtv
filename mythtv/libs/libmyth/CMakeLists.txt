@@ -16,7 +16,6 @@ set(LIBMYTH_HEADERS
     mythavframe.h
     mythcontext.h
     mythexp.h
-    visual.h
     )
 
 set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h)
@@ -28,6 +27,7 @@ set(AUDIO_HEADERS
     audio/audiooutpututil.h
     audio/audiosettings.h
     audio/eldutils.h
+    audio/visualization.h
     audio/volumebase.h)
 
 set(AUDIO_HEADERS_NOT_INSTALLED

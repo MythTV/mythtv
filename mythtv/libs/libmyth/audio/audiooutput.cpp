@@ -710,14 +710,14 @@ void AudioOutput::error(const QString &e)
     dispatch(event);
 }
 
-void AudioOutput::addVisual(MythTV::Visual *v)
+void AudioOutput::addVisual(Visualization *v)
 {
     auto it = std::find(m_visuals.begin(), m_visuals.end(), v);
     if (it == m_visuals.end())
         m_visuals.push_back(v);
 }
 
-void AudioOutput::removeVisual(MythTV::Visual *v)
+void AudioOutput::removeVisual(Visualization *v)
 {
     auto it = std::find(m_visuals.begin(), m_visuals.end(), v);
     if (it != m_visuals.end())

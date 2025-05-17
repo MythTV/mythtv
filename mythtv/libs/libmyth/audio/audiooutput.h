@@ -13,8 +13,8 @@ using namespace std::chrono_literals;
 // MythTV headers
 #include "libmyth/audio/audiooutputsettings.h"
 #include "libmyth/audio/audiosettings.h"
+#include "libmyth/audio/visualization.h"
 #include "libmyth/audio/volumebase.h"
-#include "libmyth/visual.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythevent.h"
@@ -201,8 +201,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     static const int kMaxSizeBuffer = 384000;
 
     bool hasVisual(void) { return !m_visuals.empty(); }
-    void addVisual(MythTV::Visual *v);
-    void removeVisual(MythTV::Visual *v);
+    void addVisual(Visualization *v);
+    void removeVisual(Visualization *v);
 
   protected:
     void error(const QString &e);
@@ -220,7 +220,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     QString m_lastWarn;
     bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};
-    std::vector<MythTV::Visual*> m_visuals;
+    std::vector<Visualization*> m_visuals;
 };
 
 class MPUBLIC AudioOutput::Event : public MythEvent

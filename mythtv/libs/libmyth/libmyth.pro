@@ -37,12 +37,12 @@ HEADERS += audio/volumebase.h audio/eldutils.h
 HEADERS += audio/audiooutputgraph.h
 HEADERS += audio/freesurround.h
 HEADERS += audio/freesurround_decoder.h
+HEADERS += audio/visualization.h
 HEADERS += backendselect.h
 HEADERS += mythaverror.h
 HEADERS += mythavframe.h
 HEADERS += mythcontext.h
 HEADERS += mythexp.h
-HEADERS += visual.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
@@ -88,7 +88,6 @@ inc.files += mythwidgets.h remotefile.h volumecontrol.h
 inc.files += inetcomms.h
 inc.files += mythaverror.h
 inc.files += mythavframe.h
-inc.files += visual.h
 inc.files += mythexp.h
 
 inc2.path = $${PREFIX}/include/mythtv/libmyth/audio
@@ -96,6 +95,7 @@ inc2.files += audio/audiooutput.h audio/audiosettings.h
 inc2.files += audio/audiooutputsettings.h audio/audiooutpututil.h
 inc2.files += audio/audioconvert.h
 inc2.files += audio/volumebase.h audio/eldutils.h
+inc2.files += audio/visualization.h
 
 using_oss {
     SOURCES += audio/audiooutputoss.cpp

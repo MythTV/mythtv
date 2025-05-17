@@ -4,20 +4,18 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef VISUAL_H
-#define VISUAL_H
+#ifndef LIBMYTH_AUDIO_VISUALIZATION_H
+#define LIBMYTH_AUDIO_VISUALIZATION_H
+
+#include <chrono>
 
 #include <QMutex>
 
-class Decoder;
-class AudioOutput;
-namespace MythTV
+class Visualization
 {
-class Visual
-{
-public:
-    Visual() { ; }
-    virtual ~Visual() { ; }
+  public:
+    Visualization() = default;
+    virtual ~Visualization() = default;
 
     virtual void add(const void *b, unsigned long b_len,
                      std::chrono::milliseconds timecode, int c, int p) = 0;
@@ -25,10 +23,8 @@ public:
 
     QMutex *mutex() { return &m_mtx; }
 
-
-private:
+  private:
     QMutex m_mtx;
 };
-};
 
-#endif // VISUAL_H
+#endif // LIBMYTH_AUDIO_VISUALIZATION_H

@@ -4,9 +4,6 @@
 // C++
 #include <array>
 
-// MythTV
-#include <libmyth/visual.h>
-
 // MythMusic
 #include "mainvisual.h"
 #include "polygon.h"
