@@ -1,15 +1,17 @@
 #ifndef SPDIFENCODER_H_
 #define SPDIFENCODER_H_
 
-#include <QString>
+#include <cstddef>
+#include <cstdint>
 
-#include "libmyth/output.h"
-#include "libmyth/audio/audiooutput.h"
+#include <QString>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }
+
+#include "libmyth/mythexp.h"
 
 class MPUBLIC SPDIFEncoder
 {
