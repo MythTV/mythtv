@@ -74,7 +74,6 @@ add_library(
   dbsettings.cpp
   mythaverror.cpp
   mythcontext.cpp
-  output.cpp
   )
 
 #

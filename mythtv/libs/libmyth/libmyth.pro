@@ -57,7 +57,6 @@ SOURCES += audio/freesurround.cpp
 SOURCES += audio/freesurround_decoder.cpp
 SOURCES += backendselect.cpp dbsettings.cpp
 SOURCES += mythaverror.cpp mythcontext.cpp
-SOURCES += output.cpp
 
 INCLUDEPATH += ..
 INCLUDEPATH += ../../external/FFmpeg
