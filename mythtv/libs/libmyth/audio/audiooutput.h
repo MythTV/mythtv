@@ -150,7 +150,6 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     virtual void SetSourceBitrate(int /*rate*/ ) { }
 
     QString GetError(void)   const { return m_lastError; }
-    QString GetWarning(void) const { return m_lastWarn; }
 
     virtual void GetBufferStatus(uint &fill, uint &total)
         { fill = total = 0; }
@@ -212,12 +211,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
 
     void Error(const QString &msg);
     void SilentError(const QString &msg);
-    void Warn(const QString &msg);
     void ClearError(void);
-    void ClearWarning(void);
 
     QString m_lastError;
-    QString m_lastWarn;
     bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};
     std::vector<Visualization*> m_visuals;
