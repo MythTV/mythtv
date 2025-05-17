@@ -13,7 +13,6 @@ class OutputEvent;
 
 #include <vector>
 
-#include <QMutex>
 #include <QList>
 
 #include "libmyth/mythexp.h"
@@ -109,8 +108,6 @@ public:
     void addVisual(MythTV::Visual *v);
     void removeVisual(MythTV::Visual *v);
 
-    QMutex *mutex() { return &m_mtx; }
-
     void setBufferSize(unsigned int sz) { m_bufsize = sz; }
     unsigned int bufferSize() const { return m_bufsize; }
 
@@ -123,7 +120,6 @@ protected:
 private:
     Q_DISABLE_COPY(OutputListeners)
 
-    QMutex       m_mtx;
     Visuals      m_visuals;
 
     unsigned int m_bufsize {0};

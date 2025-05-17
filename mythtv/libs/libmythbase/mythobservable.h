@@ -1,12 +1,13 @@
 #ifndef MYTHOBSERVABLE_H_
 #define MYTHOBSERVABLE_H_
 
+#include <QMutex>
 #include <QSet>
+
 #include "mythevent.h"
 #include "mythbaseexp.h"
 
 class QObject;
-class QMutex;
 
 class MBASE_PUBLIC MythObservable
 {
