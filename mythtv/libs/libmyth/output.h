@@ -8,24 +8,14 @@
 #ifndef   OUTPUT_H
 #define   OUTPUT_H
 
-class OutputListeners;
-class OutputEvent;
+#include <chrono>
 
-#include <vector>
-
-#include <QList>
+#include "libmythbase/mythevent.h"
 
 #include "libmyth/mythexp.h"
-#include "libmythbase/mythobservable.h"
 
 using namespace std::chrono_literals;
 
-class QObject;
-class Buffer;
-
-namespace MythTV {
-class Visual;
-}
 
 class MPUBLIC OutputEvent : public MythEvent
 {
@@ -95,28 +85,5 @@ class MPUBLIC OutputEvent : public MythEvent
     int            m_prec            {0};
     int            m_chan            {0};
 };
-
-class MPUBLIC OutputListeners : public MythObservable
-{
-public:
-    OutputListeners() = default;
-    ~OutputListeners() override = default;
-
-    bool hasVisual(void) { return !m_visuals.empty(); }
-    void addVisual(MythTV::Visual *v);
-    void removeVisual(MythTV::Visual *v);
-
-protected:
-    void error(const QString &e);
-    void dispatchVisual(uchar *b, unsigned long b_len,
-                        std::chrono::milliseconds timecode, int chan, int prec);
-    void prepareVisuals();
-
-private:
-    Q_DISABLE_COPY(OutputListeners)
-
-    std::vector<MythTV::Visual*> m_visuals;
-};
-
 
 #endif // OUTPUT_H
