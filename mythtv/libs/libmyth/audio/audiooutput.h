@@ -1,6 +1,7 @@
 #ifndef AUDIOOUTPUT
 #define AUDIOOUTPUT
 
+#include <chrono>
 #include <utility>
 
 // Qt headers
@@ -13,15 +14,17 @@
 #include "libmyth/audio/audiosettings.h"
 #include "libmyth/audio/volumebase.h"
 #include "libmyth/output.h"
+#include "libmyth/visual.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
+#include "libmythbase/mythobservable.h"
 
 // forward declaration
 struct AVCodecContext;
 struct AVPacket;
 struct AVFrame;
 
-class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
+class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
 {
     Q_DECLARE_TR_FUNCTIONS(AudioOutput);
 
@@ -194,7 +197,16 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
      */
     static const int kMaxSizeBuffer = 384000;
 
+    bool hasVisual(void) { return !m_visuals.empty(); }
+    void addVisual(MythTV::Visual *v);
+    void removeVisual(MythTV::Visual *v);
+
   protected:
+    void error(const QString &e);
+    void dispatchVisual(uchar *b, unsigned long b_len,
+                        std::chrono::milliseconds timecode, int chan, int prec);
+    void prepareVisuals();
+
     void Error(const QString &msg);
     void SilentError(const QString &msg);
     void Warn(const QString &msg);
@@ -205,6 +217,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     QString m_lastWarn;
     bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};
+    std::vector<MythTV::Visual*> m_visuals;
 };
 
 #endif

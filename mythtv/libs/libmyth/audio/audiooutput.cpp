@@ -1,5 +1,6 @@
 #include "libmythbase/mythconfig.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 
@@ -8,6 +9,7 @@
 #include <QFile>
 #include <QDateTime>
 #include <QDir>
+#include <QMutexLocker>
 
 #include "libmythbase/compat.h"
 #include "libmythbase/mythlogging.h"
@@ -700,4 +702,47 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
         av_free(transit);
     }
     return ret;
+}
+
+void AudioOutput::error(const QString &e)
+{
+    OutputEvent event(e);
+    dispatch(event);
+}
+
+void AudioOutput::addVisual(MythTV::Visual *v)
+{
+    auto it = std::find(m_visuals.begin(), m_visuals.end(), v);
+    if (it == m_visuals.end())
+        m_visuals.push_back(v);
+}
+
+void AudioOutput::removeVisual(MythTV::Visual *v)
+{
+    auto it = std::find(m_visuals.begin(), m_visuals.end(), v);
+    if (it != m_visuals.end())
+        m_visuals.erase(it);
+}
+
+void AudioOutput::dispatchVisual(uchar *buffer, unsigned long b_len,
+                                     std::chrono::milliseconds timecode,
+                                     int chan, int prec)
+{
+    if (! buffer)
+       return;
+
+    for (auto & visual : m_visuals)
+    {
+        QMutexLocker locker(visual->mutex());
+        visual->add(buffer, b_len, timecode, chan, prec);
+    }
+}
+
+void AudioOutput::prepareVisuals()
+{
+    for (auto & visual : m_visuals)
+    {
+        QMutexLocker locker(visual->mutex());
+        visual->prepare();
+    }
 }
