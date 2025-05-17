@@ -1,12 +1,15 @@
-#include "libmythbase/compat.h"
-#include "libmythbase/mythlogging.h"
-
 #include "spdifencoder.h"
+
+#include <cstring>
 
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavutil/opt.h"
 }
+
+#include "libmythbase/mythlogging.h"
+
+#include "audiooutput.h"
 
 #define LOC QString("SPDIFEncoder: ")
 
