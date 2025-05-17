@@ -49,12 +49,12 @@ class MPUBLIC OutputEvent : public MythEvent
     MythEvent *clone(void) const override // MythEvent
         { return new OutputEvent(*this); }
 
-    static const Type kPlaying;
-    static const Type kBuffering;
-    static const Type kInfo;
-    static const Type kPaused;
-    static const Type kStopped;
-    static const Type kError;
+    static const inline QEvent::Type kPlaying    {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kBuffering  {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kInfo       {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kPaused     {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kStopped    {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const inline QEvent::Type kError      {static_cast<QEvent::Type>(QEvent::registerEventType())};
 
   private:
     OutputEvent(const OutputEvent &o) : MythEvent(o),
