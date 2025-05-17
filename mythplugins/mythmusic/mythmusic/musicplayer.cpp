@@ -415,7 +415,7 @@ bool MusicPlayer::openOutputDevice(void)
     // add any visuals to the audio output
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
-        m_output->addVisual((MythTV::Visual*)(*it));
+        m_output->addVisual((Visualization*)(*it));
 
     // add any listeners to the audio output
     QMutexLocker locker(m_lock);
@@ -1577,7 +1577,7 @@ void MusicPlayer::decoderHandlerReady(void)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
     {
-        //m_output->addVisual((MythTV::Visual*)(*it));
+        //m_output->addVisual((Visualization*)(*it));
         //(*it)->setDecoder(decoder);
         //m_visual->setOutput(m_output);
     }
