@@ -173,7 +173,7 @@ void StreamView::customEvent(QEvent *event)
 
         updateTrackInfo(gPlayer->getCurrentMetadata());
     }
-    else if (event->type() == OutputEvent::kPlaying)
+    else if (event->type() == AudioOutput::Event::kPlaying)
     {
         if (gPlayer->isPlaying())
         {
@@ -191,7 +191,7 @@ void StreamView::customEvent(QEvent *event)
         // pass it on to the default handler in MusicCommon
         handled = false;
     }
-    else if (event->type() == OutputEvent::kStopped)
+    else if (event->type() == AudioOutput::Event::kStopped)
     {
         if (m_streamList)
         {
@@ -206,7 +206,7 @@ void StreamView::customEvent(QEvent *event)
         // pass it on to the default handler in MusicCommon
         handled = false;
     }
-    else if (event->type() == OutputEvent::kBuffering)
+    else if (event->type() == AudioOutput::Event::kBuffering)
     {
     }
     else if (event->type() == MythEvent::kMythEventMessage)
