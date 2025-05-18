@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Czas"
         },
+        "users": {
+            "auth_all_desc": "Uwierzytelnianie wymagane dla wszystkich adresów IP",
+            "auth_desc": "Kontroluje to, czy użytkownik, który nie zalogował się, może uzyskać dostęp do połączeń API i stron internetowych. Można to ustawić tylko podczas zalogowania się jako admin. Opcję zdalnych adresów IP można wybrać tylko wtedy, gdy opcja „Zezwalaj na połączenia ze wszystkich podsieci” jest wybrana w konfiguracji zaplecza, ponieważ bez tej opcji w konfiguracji zaplecza zdalnego użytkowników nie mogą uzyskać dostępu do systemu. Wybór jest aktualizowany natychmiast, nie jest wymagane zapisywanie. Pamiętaj, że nawet jeśli nie jest wymagane uwierzytelnianie, użytkownik może nadal logować się i być uwierzytelniony, jeśli wybierze.",
+            "auth_label": "Wymagane uwierzytelnianie API",
+            "auth_none_desc": "Bez uwierzytelnienia",
+            "auth_remote_desc": "Uwierzytelnianie wymagane dla zdalnych adresów IP",
+            "auth_title": "Włącz lub wyłącz uwierzytelnianie",
+            "authreq_fail": "Błąd: Nie można ustawić tej wartości.",
+            "delete_details": "To usunie użytkownika {{ Name }}.",
+            "delete_label": "Usuń użytkownika",
+            "edit_label": "Zaktualizuj użytkownika",
+            "heading": "Użytkownicy",
+            "name_label": "Nazwa użytkownika",
+            "new": "Nowy użytkownik",
+            "oldpwwrong": "Obecne hasło jest nieprawidłowe.",
+            "pwdiffer": "Hasła różnią się"
+        },
         "videos": {
             "adddate": "Dodano datę",
             "allCategories": "Wszystkie kategorie",
@@ -473,13 +490,23 @@
         "changeLanguage": "Zmień język",
         "dashboard": "Panel",
         "hide": "Ukryj górny baner",
+        "keeplogin": "Pozostań zalogowany na tym komputerze.",
         "login": "Zaloguj sie",
+        "loginfail": "Logowanie nie powiodło się",
+        "logout": "Wyloguj się",
         "mainheading": "Zaplecze MythTV",
         "show": "Pokaż górny baner",
         "switchServer": "Zmień serwer",
         "switchTheme": "Przełącz motyw",
         "testbed": "Stanowisko testowe",
-        "tvGuide": "program telewizyjny"
+        "tvGuide": "program telewizyjny",
+        "username": "Nazwa użytkownika",
+        "userpassword": "Hasło",
+        "users": {
+            "new_password": "Nowe hasło",
+            "new_password2": "Znowu nowe hasło",
+            "old_password": "Bieżące hasło"
+        }
     },
     "primeng": {
         "accept": "Tak",

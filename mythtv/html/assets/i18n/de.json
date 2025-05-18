@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Zeit"
         },
+        "users": {
+            "auth_all_desc": "Authentifizierung für alle IP -Adressen erforderlich",
+            "auth_desc": "Dies steuert, ob ein Benutzer, der sich nicht angemeldet hat, auf API -Anrufe und Web -App -Seiten zugreifen kann. Dies kann nur eingestellt werden, wenn Sie als Administrator angemeldet sind. Die Option für Remote -IP -Adressen kann nur ausgewählt werden, wenn die Option \"Verbindungen aus allen Subnetzen zuzulassen\" im Backend -Setup ausgewählt ist, da ohne diese Option im Backend -Setup keine Remote -Benutzer nicht auf das System zugreifen können. Die Auswahl wird sofort aktualisiert, es ist kein Speichern erforderlich. Beachten Sie, dass sich ein Benutzer trotzdem anmelden und authentifiziert werden kann, wenn er dies wünscht.",
+            "auth_label": "API -Authentifizierung erforderlich",
+            "auth_none_desc": "Keine Authentifizierung erforderlich",
+            "auth_remote_desc": "Authentifizierung für Remote -IP -Adressen erforderlich",
+            "auth_title": "Authentifizierung aktivieren oder deaktivieren",
+            "authreq_fail": "Fehler: diesen Wert kann nicht festgelegt werden.",
+            "delete_details": "Dadurch wird der Benutzer {{ Name }} gelöscht.",
+            "delete_label": "Benutzer löschen",
+            "edit_label": "Benutzer aktualisieren",
+            "heading": "Benutzer",
+            "name_label": "Benutzername",
+            "new": "Neuer Benutzer",
+            "oldpwwrong": "Das aktuelle Passwort ist falsch.",
+            "pwdiffer": "Passwörter unterscheiden sich"
+        },
         "videos": {
             "adddate": "Datum hinzugefügt",
             "allCategories": "Alle Kategorien",
@@ -473,13 +490,23 @@
         "changeLanguage": "Sprache ändern",
         "dashboard": "Instrumententafel",
         "hide": "Oberes Banner ausblenden",
+        "keeplogin": "Bleiben Sie auf diesem Computer angemeldet.",
         "login": "Einloggen",
+        "loginfail": "Fehler bei der Anmeldung",
+        "logout": "Melden Sie sich aus",
         "mainheading": "MythTV-Backend",
         "show": "Top-Banner anzeigen",
         "switchServer": "Server wechseln",
         "switchTheme": "Thema wechseln",
         "testbed": "Prüfstand",
-        "tvGuide": "Fernsehprogramm"
+        "tvGuide": "Fernsehprogramm",
+        "username": "Benutzername",
+        "userpassword": "Passwort",
+        "users": {
+            "new_password": "Neues Passwort",
+            "new_password2": "Neues Passwort erneut",
+            "old_password": "Aktuelles Passwort"
+        }
     },
     "primeng": {
         "accept": "Ja",

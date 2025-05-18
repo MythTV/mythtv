@@ -426,6 +426,23 @@
             "status": "Durum",
             "time": "Zaman"
         },
+        "users": {
+            "auth_all_desc": "Tüm IP adresleri için gerekli kimlik doğrulama",
+            "auth_desc": "Bu, oturum açmayan bir kullanıcının API çağrılarına ve web uygulama sayfalarına erişip erişemeyeceğini denetler. Bu yalnızca yönetici olarak oturum açarken ayarlanabilir. Uzak IP adresleri seçeneği yalnızca 'Tüm Alt Ağlardan Bağlantılara İzin Ver' seçeneği arka uç kurulumunda seçilirse seçilebilir, çünkü arka uç kurulumunda bu seçenek olmadan uzak kullanıcılar sisteme erişemez. Seçim derhal güncellenir, kaydetme gerekmez. Kimlik doğrulaması gerekmese bile, bir kullanıcının yine de giriş yapabileceğini ve seçmesi durumunda kimlik doğrulaması yapabileceğini unutmayın.",
+            "auth_label": "API kimlik doğrulaması gerekli",
+            "auth_none_desc": "Kimlik doğrulama gerekmez",
+            "auth_remote_desc": "Uzak IP adresleri için gerekli kimlik doğrulama",
+            "auth_title": "Kimlik Doğrulamayı Etkinleştir veya Devre Dışı Bırak",
+            "authreq_fail": "Hata: Bu değeri ayarlanamıyor.",
+            "delete_details": "Bu {{ Name }} kullanıcısını silecektir.",
+            "delete_label": "Kullanıcıyı sil",
+            "edit_label": "Kullanıcıyı güncelle",
+            "heading": "Kullanıcılar",
+            "name_label": "Kullanıcı adı",
+            "new": "Yeni Kullanıcı",
+            "oldpwwrong": "Mevcut şifre yanlış.",
+            "pwdiffer": "Şifreler farklı"
+        },
         "videos": {
             "adddate": "Tarih eklendi",
             "allCategories": "Tüm kategoriler",
@@ -473,13 +490,23 @@
         "changeLanguage": "Dili değiştir",
         "dashboard": "Gösterge Paneli",
         "hide": "Üst Banner'ı gizle",
+        "keeplogin": "Bu bilgisayarda oturum açın.",
         "login": "Giriş yapmak",
+        "loginfail": "Giriş başarısız oldu",
+        "logout": "Çıkış yapmak",
         "mainheading": "MythTV Arka Ucu",
         "show": "Üst Banner'ı göster",
         "switchServer": "Sunucu Değiştir",
         "switchTheme": "Temayı Değiştir",
         "testbed": "Test ortamı",
-        "tvGuide": "TV Rehberi"
+        "tvGuide": "TV Rehberi",
+        "username": "Kullanıcı adı",
+        "userpassword": "Şifre",
+        "users": {
+            "new_password": "Yeni Şifre",
+            "new_password2": "Yine yeni şifre",
+            "old_password": "Mevcut Şifre"
+        }
     },
     "primeng": {
         "accept": "Evet",

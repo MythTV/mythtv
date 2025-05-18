@@ -426,6 +426,23 @@
             "status": "Állapot",
             "time": "Idő"
         },
+        "users": {
+            "auth_all_desc": "Az összes IP -címhez szükséges hitelesítés",
+            "auth_desc": "Ez ellenőrzi, hogy egy olyan felhasználó, aki még nem jelentkezett be, hozzáférhet -e az API hívásokhoz és a webes alkalmazásoldalakhoz. Ezt csak akkor lehet beállítani, amikor adminisztrátorként jelentkezik be. A távoli IP -címek opcióját csak akkor lehet kiválasztani, ha a „Betelepítések engedélyezése az összes alhálózatból” opció a háttérbeállításban van kiválasztva, mivel a háttérbeállítási beállításban a távoli felhasználók nem férhetnek hozzá a rendszerhez. A választást azonnal frissítik, nincs szükség mentésre. Vegye figyelembe, hogy még ha nincs szükség hitelesítésre is, a felhasználó továbbra is bejelentkezhet és hitelesíthető, ha választja.",
+            "auth_label": "API hitelesítés szükséges",
+            "auth_none_desc": "Nincs szükség hitelesítésre",
+            "auth_remote_desc": "A távoli IP -címekhez szükséges hitelesítés",
+            "auth_title": "A hitelesítés engedélyezése vagy letiltása",
+            "authreq_fail": "HIBA: Nem tudja beállítani ezt az értéket.",
+            "delete_details": "Ez törli a {{ Name }} felhasználót.",
+            "delete_label": "A felhasználó törlése",
+            "edit_label": "Frissítse a felhasználót",
+            "heading": "Felhasználók",
+            "name_label": "Felhasználónév",
+            "new": "Új felhasználó",
+            "oldpwwrong": "Az aktuális jelszó helytelen.",
+            "pwdiffer": "A jelszavak különböznek"
+        },
         "videos": {
             "adddate": "Dátum hozzáadva",
             "allCategories": "Minden kategória",
@@ -473,13 +490,23 @@
         "changeLanguage": "Válts nyelvet",
         "dashboard": "Irányítópult",
         "hide": "Felső szalaghirdetés elrejtése",
+        "keeplogin": "Maradjon bejelentkezve ezen a számítógépen.",
         "login": "Belépés",
+        "loginfail": "A bejelentkezés sikertelen",
+        "logout": "Kijelentkezik ki",
         "mainheading": "MythTV Backend",
         "show": "A felső szalaghirdetés megjelenítése",
         "switchServer": "Szerver váltása",
         "switchTheme": "Váltás a témára",
         "testbed": "Tesztágy",
-        "tvGuide": "műsorújság"
+        "tvGuide": "műsorújság",
+        "username": "Felhasználónév",
+        "userpassword": "Jelszó",
+        "users": {
+            "new_password": "Új jelszó",
+            "new_password2": "Új jelszó megint",
+            "old_password": "Jelenlegi jelszó"
+        }
     },
     "primeng": {
         "accept": "Igen",

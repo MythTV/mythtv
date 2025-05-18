@@ -426,6 +426,23 @@
             "status": "Estado",
             "time": "Tiempo"
         },
+        "users": {
+            "auth_all_desc": "Autenticación requerida para todas las direcciones IP",
+            "auth_desc": "Esto controla si un usuario que no ha iniciado sesión puede acceder a las llamadas API y las páginas de aplicaciones web. Esto solo se puede configurar mientras se registra como administrador. La opción para direcciones IP remotas solo se puede seleccionar si la opción 'Permitir conexiones de todas las subredes' se selecciona en la configuración de backend porque sin esa opción en la configuración de backend, los usuarios remotos no pueden acceder al sistema. La selección se actualiza de inmediato, no se requiere guardar. Tenga en cuenta que incluso si no se requiere autenticación, un usuario aún puede iniciar sesión y ser autenticado si lo desea.",
+            "auth_label": "Se requiere autenticación de API",
+            "auth_none_desc": "No se requiere autenticación",
+            "auth_remote_desc": "Autenticación requerida para direcciones IP remotas",
+            "auth_title": "Habilitar o deshabilitar la autenticación",
+            "authreq_fail": "Error: no se puede establecer este valor.",
+            "delete_details": "Esto eliminará el usuario {{ Name }}.",
+            "delete_label": "Eliminar usuario",
+            "edit_label": "Actualizar el usuario",
+            "heading": "Usuarios",
+            "name_label": "Nombre de usuario",
+            "new": "Nuevo usuario",
+            "oldpwwrong": "La contraseña actual es incorrecta.",
+            "pwdiffer": "Las contraseñas difieren"
+        },
         "videos": {
             "adddate": "Fecha agregada",
             "allCategories": "Todas las categorías",
@@ -473,13 +490,23 @@
         "changeLanguage": "Cambiar idioma",
         "dashboard": "Panel",
         "hide": "Ocultar banner superior",
+        "keeplogin": "Manténgase iniciado sesión en esta computadora.",
         "login": "Acceso",
+        "loginfail": "Error de inicio de sesion",
+        "logout": "Finalizar la sesión",
         "mainheading": "Servidor de MythTV",
         "show": "Mostrar banner superior",
         "switchServer": "Cambiar servidor",
         "switchTheme": "Cambiar tema",
         "testbed": "banco de pruebas",
-        "tvGuide": "guía de televisión"
+        "tvGuide": "guía de televisión",
+        "username": "Nombre de usuario",
+        "userpassword": "Contraseña",
+        "users": {
+            "new_password": "Nueva contraseña",
+            "new_password2": "Nueva contraseña nuevamente",
+            "old_password": "Contraseña actual"
+        }
     },
     "primeng": {
         "accept": "Sí",

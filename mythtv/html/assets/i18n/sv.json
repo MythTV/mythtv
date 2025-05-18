@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Tid"
         },
+        "users": {
+            "auth_all_desc": "Autentisering krävs för alla IP -adresser",
+            "auth_desc": "Detta styr huruvida en användare som inte har loggat in kan komma åt API -samtal och webbappsidor. Detta kan endast ställas in medan du är inloggad som administratör. Alternativet för fjärr -IP -adresser kan endast väljas om alternativet \"Tillåter anslutningar från alla subnät\" väljs i backend -installation eftersom utan det alternativet i backend -installation kan fjärranvändare inte komma åt systemet. Valet uppdateras omedelbart, ingen sparning krävs. Observera att även om ingen autentisering krävs kan en användare fortfarande logga in och autentiseras om han väljer.",
+            "auth_label": "API -autentisering krävs",
+            "auth_none_desc": "Ingen autentisering krävs",
+            "auth_remote_desc": "Autentisering krävs för fjärr -IP -adresser",
+            "auth_title": "Aktivera eller inaktivera autentisering",
+            "authreq_fail": "Fel: Det går inte att ställa in detta värde.",
+            "delete_details": "Detta kommer att ta bort användaren {{ Name }}.",
+            "delete_label": "Ta bort användaren",
+            "edit_label": "Uppdatera användaren",
+            "heading": "Användare",
+            "name_label": "Användarnamn",
+            "new": "Nyanvändare",
+            "oldpwwrong": "Nuvarande lösenord är felaktigt.",
+            "pwdiffer": "Lösenord skiljer sig åt"
+        },
         "videos": {
             "adddate": "Datum tillagd",
             "allCategories": "Alla kategorier",
@@ -473,13 +490,23 @@
         "changeLanguage": "Ändra språk",
         "dashboard": "instrumentbräda",
         "hide": "Dölj översta banner",
+        "keeplogin": "Håll dig inloggad på den här datorn.",
         "login": "Logga in",
+        "loginfail": "Inloggning misslyckades",
+        "logout": "Utplåna",
         "mainheading": "MythTV Backend",
         "show": "Visa toppbanner",
         "switchServer": "Byt server",
         "switchTheme": "Byt tema",
         "testbed": "Testbädd",
-        "tvGuide": "TV Guide"
+        "tvGuide": "TV Guide",
+        "username": "Användarnamn",
+        "userpassword": "Lösenord",
+        "users": {
+            "new_password": "Nytt lösenord",
+            "new_password2": "Nytt lösenord igen",
+            "old_password": "Aktuellt lösenord"
+        }
     },
     "primeng": {
         "accept": "Ja",

@@ -426,6 +426,23 @@
             "status": "Postavení",
             "time": "Čas"
         },
+        "users": {
+            "auth_all_desc": "Ověřování potřebné pro všechny adresy IP",
+            "auth_desc": "To řídí, zda uživatel, který se nepřihlásil, má přístup k volání API a stránky webových aplikací. To lze nastavit, pouze když jste přihlášeni jako admin. Možnost pro vzdálené adresy IP lze vybrat pouze tehdy, pokud je možnost „Povolit připojení ze všech podsítí“ vybrána v nastavení backend, protože bez této možnosti v nastavení backendu nemohou vzdálení uživatelé přistupovat k systému. Výběr je okamžitě aktualizován, není nutné uložit. Všimněte si, že i když není nutná žádná ověřování, uživatel se může přihlásit a být ověřen, pokud se rozhodne.",
+            "auth_label": "Požaduje se autentizace API",
+            "auth_none_desc": "Není nutné ověřování",
+            "auth_remote_desc": "Ověřování potřebné pro vzdálené IP adresy",
+            "auth_title": "Povolit nebo zakázat ověřování",
+            "authreq_fail": "Chyba: Nelze tuto hodnotu nastavit.",
+            "delete_details": "Tím se odstraní uživatele {{ Name }}.",
+            "delete_label": "Odstranit uživatele",
+            "edit_label": "Aktualizovat uživatele",
+            "heading": "Uživatelé",
+            "name_label": "Uživatelské jméno",
+            "new": "Nový uživatel",
+            "oldpwwrong": "Aktuální heslo je nesprávné.",
+            "pwdiffer": "Hesla se liší"
+        },
         "videos": {
             "adddate": "Datum přidáno",
             "allCategories": "Všechny kategorie",
@@ -473,13 +490,23 @@
         "changeLanguage": "Změnit jazyk",
         "dashboard": "Přístrojová deska",
         "hide": "Skrýt horní banner",
+        "keeplogin": "Zůstaňte přihlášeni k tomuto počítači.",
         "login": "Přihlásit se",
+        "loginfail": "Přihlášení selhalo",
+        "logout": "Odhlaste",
         "mainheading": "Backend MythTV",
         "show": "Zobrazit horní banner",
         "switchServer": "Přepnout server",
         "switchTheme": "Přepnout téma",
         "testbed": "Testbed",
-        "tvGuide": "TV průvodce"
+        "tvGuide": "TV průvodce",
+        "username": "Uživatelské jméno",
+        "userpassword": "Heslo",
+        "users": {
+            "new_password": "Nové heslo",
+            "new_password2": "Nové heslo znovu",
+            "old_password": "Aktuální heslo"
+        }
     },
     "primeng": {
         "accept": "Ano",

@@ -426,6 +426,23 @@
             "status": "地位",
             "time": "时间"
         },
+        "users": {
+            "auth_all_desc": "所有IP地址所需的身份验证",
+            "auth_desc": "这控制了未登录的用户是否可以访问API呼叫和Web应用程序页面。仅当您登录为管理员时，才能设置。仅当在后端设置中选择“允许从所有子网中允许连接”选项“允许从所有子网中允许连接”的选项，因为在后端设置中没有该选项，远程用户将无法访问系统。选择会立即更新，无需保存。请注意，即使不需要身份验证，用户仍然可以登录并通过选择身份验证。",
+            "auth_label": "需要API认证",
+            "auth_none_desc": "无需认证",
+            "auth_remote_desc": "远程IP地址所需的身份验证",
+            "auth_title": "启用或禁用身份验证",
+            "authreq_fail": "错误：无法设置此值。",
+            "delete_details": "这将删除用户{{ Name }}。",
+            "delete_label": "删除用户",
+            "edit_label": "更新用户",
+            "heading": "用户",
+            "name_label": "用户名",
+            "new": "新用户",
+            "oldpwwrong": "当前密码不正确。",
+            "pwdiffer": "密码不同"
+        },
         "videos": {
             "adddate": "添加日期",
             "allCategories": "所有类别",
@@ -473,13 +490,23 @@
         "changeLanguage": "改变语言",
         "dashboard": "仪表板",
         "hide": "隐藏顶部横幅",
+        "keeplogin": "在这台计算机上登录。",
         "login": "登录",
+        "loginfail": "登录失败",
+        "logout": "注销",
         "mainheading": "神话电视后端",
         "show": "显示顶部横幅",
         "switchServer": "切换服务器",
         "switchTheme": "切换主题",
         "testbed": "试验台",
-        "tvGuide": "节目表"
+        "tvGuide": "节目表",
+        "username": "用户名",
+        "userpassword": "密码",
+        "users": {
+            "new_password": "新密码",
+            "new_password2": "再次新密码",
+            "old_password": "当前密码"
+        }
     },
     "primeng": {
         "accept": "是的",

@@ -426,6 +426,23 @@
             "status": "Statut",
             "time": "Temps"
         },
+        "users": {
+            "auth_all_desc": "Authentification requise pour toutes les adresses IP",
+            "auth_desc": "Cela contrôle si un utilisateur qui n'a pas signé peut accéder aux appels API et aux pages d'applications Web. Cela ne peut être défini que pendant que vous êtes connecté en tant qu'administrateur. L'option pour les adresses IP distantes ne peut être sélectionnée que si l'option «Autoriser les connexions de tous les sous-réseaux» est sélectionnée dans la configuration du backend car sans cette option de configuration de backend, les utilisateurs distants ne peuvent pas accéder au système. La sélection est mise à jour immédiatement, aucune sauvegarde n'est requise. Notez que même si aucune authentification n'est requise, un utilisateur peut toujours se connecter et être authentifié s'il choisit.",
+            "auth_label": "Authentification de l'API requise",
+            "auth_none_desc": "Aucune authentification requise",
+            "auth_remote_desc": "Authentification requise pour les adresses IP distantes",
+            "auth_title": "Activer ou désactiver l'authentification",
+            "authreq_fail": "Erreur: Impossible de définir cette valeur.",
+            "delete_details": "Cela supprimera l'utilisateur {{ Name }}.",
+            "delete_label": "Supprimer l'utilisateur",
+            "edit_label": "Mettre à jour l'utilisateur",
+            "heading": "Utilisateurs",
+            "name_label": "Nom d'utilisateur",
+            "new": "Nouvel utilisateur",
+            "oldpwwrong": "Le mot de passe actuel est incorrect.",
+            "pwdiffer": "Les mots de passe diffèrent"
+        },
         "videos": {
             "adddate": "Date ajoutée",
             "allCategories": "Toutes les catégories",
@@ -473,13 +490,23 @@
         "changeLanguage": "Changer de langue",
         "dashboard": "Tableau de bord",
         "hide": "Masquer la bannière supérieure",
+        "keeplogin": "Restez connecté sur cet ordinateur.",
         "login": "S'identifier",
+        "loginfail": "La connexion a échoué",
+        "logout": "Déconnecter",
         "mainheading": "Backend de MythTV",
         "show": "Afficher la bannière supérieure",
         "switchServer": "Changer de serveur",
         "switchTheme": "Changer de thème",
         "testbed": "Banc d'essai",
-        "tvGuide": "guide télévisé"
+        "tvGuide": "guide télévisé",
+        "username": "Nom d'utilisateur",
+        "userpassword": "Mot de passe",
+        "users": {
+            "new_password": "Nouveau mot de passe",
+            "new_password2": "Nouveau mot de passe à nouveau",
+            "old_password": "Mot de passe actuel"
+        }
     },
     "primeng": {
         "accept": "Oui",

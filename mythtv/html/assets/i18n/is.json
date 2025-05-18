@@ -426,6 +426,23 @@
             "status": "Staða",
             "time": "Tími"
         },
+        "users": {
+            "auth_all_desc": "Sannvottun sem krafist er fyrir öll IP -tölur",
+            "auth_desc": "Þetta stjórnar því hvort notandi sem hefur ekki skráð sig inn geti fengið aðgang að API símtölunum og vefsíðum. Þetta er aðeins hægt að stilla á meðan þú ert skráður inn sem admin. Aðeins er hægt að velja valkosturinn fyrir ytri IP -tölur ef valkosturinn „leyfa tengingar frá öllum undirnetum“ er valinn í uppsetningu backend því án þess að valkosturinn sé í uppsetningu backends geta ytri notendur ekki fengið aðgang að kerfinu. Valið er uppfært strax, ekki er krafist neins vistunar. Athugaðu að jafnvel þó að ekki sé krafist auðkenningar getur notandi samt skráð sig inn og verið staðfestur ef hann velur.",
+            "auth_label": "API sannvottun krafist",
+            "auth_none_desc": "Engin staðfesting krafist",
+            "auth_remote_desc": "Sannvottun sem krafist er fyrir ytri IP -tölur",
+            "auth_title": "Virkja eða slökkva á sannvottun",
+            "authreq_fail": "Villa: Ekki er hægt að stilla þetta gildi.",
+            "delete_details": "Þetta mun eyða notanda {{ Name }}.",
+            "delete_label": "Eyða notanda",
+            "edit_label": "Uppfærðu notanda",
+            "heading": "Notendur",
+            "name_label": "Notandanafn",
+            "new": "Nýr notandi",
+            "oldpwwrong": "Núverandi lykilorð er rangt.",
+            "pwdiffer": "Lykilorð eru mismunandi"
+        },
         "videos": {
             "adddate": "Dagsetning bætt við",
             "allCategories": "Allir flokkar",
@@ -473,13 +490,23 @@
         "changeLanguage": "Cambia lingua",
         "dashboard": "Cruscotto",
         "hide": "Fela efsta borðann",
+        "keeplogin": "Vertu skráður inn á þessa tölvu.",
         "login": "Accesso",
+        "loginfail": "Innskráning mistókst",
+        "logout": "Skráðu þig út",
         "mainheading": "MythTV Backend",
         "show": "Sýna efsta borðann",
         "switchServer": "Cambia server",
         "switchTheme": "Cambia tema",
         "testbed": "Banco di prova",
-        "tvGuide": "guida tv"
+        "tvGuide": "guida tv",
+        "username": "Notandanafn",
+        "userpassword": "Lykilorð",
+        "users": {
+            "new_password": "Nýtt lykilorð",
+            "new_password2": "Nýtt lykilorð aftur",
+            "old_password": "Núverandi lykilorð"
+        }
     },
     "primeng": {
         "accept": "Já",

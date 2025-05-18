@@ -426,6 +426,23 @@
             "status": "Tila",
             "time": "Aika"
         },
+        "users": {
+            "auth_all_desc": "Kaikille IP -osoitteille vaaditaan todennus",
+            "auth_desc": "Tämä hallitsee, voivatko käyttäjä, joka ei ole allekirjoittanut API -puheluita ja verkkosovellussivuja. Tämä voidaan asettaa vain, kun olet kirjautunut sisään järjestelmänvalvojana. Etä -IP -osoitteiden vaihtoehto voidaan valita vain, jos vaihtoehto 'Salli yhteydet kaikista aliverkoista' valitaan taustaohjelmassa, koska ilman tätä vaihtoehtoa taustaohjelmassa etäkäyttäjät eivät pääse järjestelmään. Valinta päivitetään heti, tallennusta ei tarvita. Huomaa, että vaikka todennusta ei vaadita, käyttäjä voi silti kirjautua sisään ja todentaa, jos hän valitsee.",
+            "auth_label": "API -todennus vaaditaan",
+            "auth_none_desc": "Todennusta ei vaadita",
+            "auth_remote_desc": "Etä -IP -osoitteisiin vaaditaan todennus",
+            "auth_title": "Ota todennus käyttöön tai poista käytöstä",
+            "authreq_fail": "Virhe: Tätä arvoa ei voi asettaa.",
+            "delete_details": "Tämä poistaa käyttäjän {{ Name }}.",
+            "delete_label": "Poista käyttäjä",
+            "edit_label": "Päivitä käyttäjä",
+            "heading": "Käyttäjät",
+            "name_label": "Käyttäjänimi",
+            "new": "Uusi käyttäjä",
+            "oldpwwrong": "Nykyinen salasana on väärä.",
+            "pwdiffer": "Salasanat eroavat toisistaan"
+        },
         "videos": {
             "adddate": "Päivämäärä lisätty",
             "allCategories": "Kaikki luokat",
@@ -473,13 +490,23 @@
         "changeLanguage": "Vaihda kieltä",
         "dashboard": "kojelauta",
         "hide": "Piilota ylin banneri",
+        "keeplogin": "Pysy kirjautuneena tähän tietokoneeseen.",
         "login": "kirjaudu sisään",
+        "loginfail": "Kirjautuminen epäonnistui",
+        "logout": "Kirjautua sisään",
         "mainheading": "MythTV taustaohjelma",
         "show": "Näytä ylin banneri",
         "switchServer": "Vaihda palvelinta",
         "switchTheme": "Vaihda teemaa",
         "testbed": "Testbed",
-        "tvGuide": "tv-opas"
+        "tvGuide": "tv-opas",
+        "username": "Käyttäjänimi",
+        "userpassword": "Salasana",
+        "users": {
+            "new_password": "Uusi salasana",
+            "new_password2": "Uusi salasana uudelleen",
+            "old_password": "Nykyinen salasana"
+        }
     },
     "primeng": {
         "accept": "Joo",

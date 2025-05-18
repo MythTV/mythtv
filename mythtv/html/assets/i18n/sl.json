@@ -426,6 +426,23 @@
             "status": "Stanje",
             "time": "Čas"
         },
+        "users": {
+            "auth_all_desc": "Prijavnost, potrebna za vse IP naslove",
+            "auth_desc": "To nadzoruje, ali lahko uporabnik, ki se ni prijavil, dostopa do klicev API -ja in strani spletnih aplikacij. To je mogoče nastaviti le, ko ste prijavljeni kot skrbnik. Možnost za oddaljene IP naslove je mogoče izbrati le, če je v nastavitvi zaledkov izbrana možnost \"Dovoli povezave iz vseh podomrež\", ker brez te možnosti v nastavitvi zaledja, oddaljeni uporabniki ne morejo dostopati do sistema. Izbor se takoj posodablja, shranjevanje ni potrebno. Upoštevajte, da tudi, če ni potrebna overjanje, se lahko uporabnik še vedno prijavi in ​​overjen, če se izbere.",
+            "auth_label": "Potrebna je preverjanje pristnosti API -ja",
+            "auth_none_desc": "Ni potrebna preverjanje pristnosti",
+            "auth_remote_desc": "Preverjanje pristnosti, potrebne za oddaljene IP naslove",
+            "auth_title": "Omogoči ali onemogoči overjanje",
+            "authreq_fail": "Napaka: Te vrednosti ni mogoče nastaviti.",
+            "delete_details": "To bo izbrisalo uporabnika {{ Name }}.",
+            "delete_label": "Izbriši uporabnika",
+            "edit_label": "Posodobi uporabnika",
+            "heading": "Uporabniki",
+            "name_label": "Uporabniško ime",
+            "new": "Nov uporabnik",
+            "oldpwwrong": "Trenutno geslo je napačno.",
+            "pwdiffer": "Gesla se razlikujejo"
+        },
         "videos": {
             "adddate": "Dodan datum",
             "allCategories": "Vse kategorije",
@@ -473,13 +490,23 @@
         "changeLanguage": "Spremeni jezik",
         "dashboard": "Nadzorna plošča",
         "hide": "Skrij zgornjo pasico",
+        "keeplogin": "Ostanite prijavljeni v tem računalniku.",
         "login": "Vpiši se",
+        "loginfail": "Prijava ni uspela",
+        "logout": "Odjava se",
         "mainheading": "Zaledje MythTV",
         "show": "Prikaži zgornjo pasico",
         "switchServer": "Switch Server",
         "switchTheme": "Preklopi temo",
         "testbed": "Preizkušena",
-        "tvGuide": "TV vodnik"
+        "tvGuide": "TV vodnik",
+        "username": "Uporabniško ime",
+        "userpassword": "Geslo",
+        "users": {
+            "new_password": "Novo geslo",
+            "new_password2": "Spet novo geslo",
+            "old_password": "Trenutno geslo"
+        }
     },
     "primeng": {
         "accept": "ja",

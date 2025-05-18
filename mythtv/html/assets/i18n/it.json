@@ -426,6 +426,23 @@
             "status": "Stato",
             "time": "Ora"
         },
+        "users": {
+            "auth_all_desc": "Autenticazione richiesta per tutti gli indirizzi IP",
+            "auth_desc": "Ciò controlla se un utente che non ha effettuato l'accesso può accedere alle chiamate API e alle pagine delle app Web. Questo può essere impostato solo mentre sei effettuato come amministratore. L'opzione per gli indirizzi IP remoto può essere selezionata solo se l'opzione \"consentire connessioni da tutte le sottoreti\" è selezionata nella configurazione del back -end perché senza tale opzione nella configurazione del backend, gli utenti remoti non possono accedere al sistema. La selezione viene aggiornata immediatamente, non è richiesto alcun salvataggio. Si noti che anche se non è richiesta l'autenticazione, un utente può comunque accedere ed essere autenticato se lo sceglie.",
+            "auth_label": "Autenticazione API richiesta",
+            "auth_none_desc": "Nessuna autenticazione richiesta",
+            "auth_remote_desc": "Autenticazione richiesta per gli indirizzi IP remoti",
+            "auth_title": "Abilita o disabilita l'autenticazione",
+            "authreq_fail": "Errore: impossibile impostare questo valore.",
+            "delete_details": "Questo eliminerà l'utente {{ Name }}.",
+            "delete_label": "Elimina l'utente",
+            "edit_label": "Aggiorna l'utente",
+            "heading": "Utenti",
+            "name_label": "Nome utente",
+            "new": "Nuovo utente",
+            "oldpwwrong": "La password corrente non è corretta.",
+            "pwdiffer": "Le password differiscono"
+        },
         "videos": {
             "adddate": "Data aggiunta",
             "allCategories": "Tutte le categorie",
@@ -473,13 +490,23 @@
         "changeLanguage": "Cambia lingua",
         "dashboard": "Cruscotto",
         "hide": "Nascondi banner superiore",
+        "keeplogin": "Resta a effettuare l'accesso a questo computer.",
         "login": "Accesso",
+        "loginfail": "Accesso non riuscito",
+        "logout": "Disconnettersi",
         "mainheading": "Back-end MythTV",
         "show": "Mostra banner superiore",
         "switchServer": "Cambia server",
         "switchTheme": "Cambia tema",
         "testbed": "Banco di prova",
-        "tvGuide": "Guida tv"
+        "tvGuide": "Guida tv",
+        "username": "Nome utente",
+        "userpassword": "Password",
+        "users": {
+            "new_password": "Nuova password",
+            "new_password2": "Nuova password di nuovo",
+            "old_password": "password attuale"
+        }
     },
     "primeng": {
         "accept": "Sì",

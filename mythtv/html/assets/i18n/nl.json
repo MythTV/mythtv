@@ -426,6 +426,23 @@
             "status": "Toestand",
             "time": "Tijd"
         },
+        "users": {
+            "auth_all_desc": "Verificatie vereist voor alle IP -adressen",
+            "auth_desc": "Dit bepaalt of een gebruiker die zich niet heeft aangemeld, toegang heeft tot de API -oproepen en web -app -pagina's. Dit kan alleen worden ingesteld terwijl u wordt aangemeld als admin. De optie voor externe IP -adressen kan alleen worden geselecteerd als de optie 'Verbindingen toestaan ​​van alle subnetten' is geselecteerd in backend -installatie, omdat zonder die optie in de backend -installatie geen externe gebruikers geen toegang hebben tot het systeem. De selectie wordt onmiddellijk bijgewerkt, er is geen opslag vereist. Merk op dat zelfs als er geen authenticatie vereist is, een gebruiker nog steeds kan inloggen en worden geverifieerd als hij kiest.",
+            "auth_label": "API -authenticatie vereist",
+            "auth_none_desc": "Geen authenticatie vereist",
+            "auth_remote_desc": "Verificatie vereist voor externe IP -adressen",
+            "auth_title": "Authenticatie inschakelen of uitschakelen",
+            "authreq_fail": "Fout: kan deze waarde niet instellen.",
+            "delete_details": "Hiermee worden de gebruiker {{ Name }} verwijderd.",
+            "delete_label": "Verwijder de gebruiker",
+            "edit_label": "Update User",
+            "heading": "Gebruikers",
+            "name_label": "Gebruikersnaam",
+            "new": "Nieuwe gebruiker",
+            "oldpwwrong": "Het huidige wachtwoord is onjuist.",
+            "pwdiffer": "Wachtwoorden verschillen"
+        },
         "videos": {
             "adddate": "Datum toegevoegd",
             "allCategories": "Alle categorieën",
@@ -473,13 +490,23 @@
         "changeLanguage": "Taal wijzigen",
         "dashboard": "Dashboard",
         "hide": "Verberg de bovenste banner",
+        "keeplogin": "Blijf ingelogd op deze computer.",
         "login": "Log in",
+        "loginfail": "Inloggen mislukt",
+        "logout": "Uitloggen",
         "mainheading": "MythTV-backend",
         "show": "Topbanner weergeven",
         "switchServer": "Wissel van server",
         "switchTheme": "Wissel van thema",
         "testbed": "Proefbank",
-        "tvGuide": "tv-gids"
+        "tvGuide": "tv-gids",
+        "username": "Gebruikersnaam",
+        "userpassword": "Wachtwoord",
+        "users": {
+            "new_password": "Nieuw wachtwoord",
+            "new_password2": "Nieuw wachtwoord opnieuw",
+            "old_password": "Huidig ​​wachtwoord"
+        }
     },
     "primeng": {
         "accept": "Ja",

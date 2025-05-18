@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Tid"
         },
+        "users": {
+            "auth_all_desc": "Godkendelse krævet til alle IP -adresser",
+            "auth_desc": "Dette styrer, om en bruger, der ikke har logget ind, kan få adgang til API -opkald og webappsider. Dette kan kun indstilles, mens du er logget ind som admin. Valgmuligheden for eksterne IP -adresser kan kun vælges, hvis indstillingen 'tillader forbindelser fra alle undernet' er valgt i backend -opsætning, fordi uden denne mulighed i backend -opsætning kan eksterne brugere ikke få adgang til systemet. Valget opdateres med det samme, der kræves ingen gemte. Bemærk, at selvom der ikke kræves nogen godkendelse, kan en bruger stadig logge ind og godkendes, hvis han vælger det.",
+            "auth_label": "API -godkendelse kræves",
+            "auth_none_desc": "Ingen godkendelse kræves",
+            "auth_remote_desc": "Autentificering krævet til fjernt IP -adresser",
+            "auth_title": "Aktivér eller deaktiver godkendelse",
+            "authreq_fail": "Fejl: Kan ikke indstille denne værdi.",
+            "delete_details": "Dette sletter bruger {{ Name }}.",
+            "delete_label": "Slet bruger",
+            "edit_label": "Opdater bruger",
+            "heading": "Brugere",
+            "name_label": "Brugernavn",
+            "new": "Ny bruger",
+            "oldpwwrong": "Nuværende adgangskode er forkert.",
+            "pwdiffer": "Adgangskoder er forskellige"
+        },
         "videos": {
             "adddate": "Dato tilføjet",
             "allCategories": "Alle kategorier",
@@ -473,13 +490,23 @@
         "changeLanguage": "Skift sprog",
         "dashboard": "instrumentbræt",
         "hide": "Skjul øverste banner",
+        "keeplogin": "Bliv logget ind på denne computer.",
         "login": "Log på",
+        "loginfail": "Login mislykkedes",
+        "logout": "Log ud",
         "mainheading": "MythTV Backend",
         "show": "Vis øverste banner",
         "switchServer": "Skift server",
         "switchTheme": "Skift tema",
         "testbed": "Testbed",
-        "tvGuide": "TV Guide"
+        "tvGuide": "TV Guide",
+        "username": "Brugernavn",
+        "userpassword": "Adgangskode",
+        "users": {
+            "new_password": "Ny adgangskode",
+            "new_password2": "Ny adgangskode igen",
+            "old_password": "Nuværende adgangskode"
+        }
     },
     "primeng": {
         "accept": "Ja",

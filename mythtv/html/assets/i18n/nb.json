@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Tid"
         },
+        "users": {
+            "auth_all_desc": "Autentisering som kreves for alle IP -adresser",
+            "auth_desc": "Dette kontrollerer om en bruker som ikke har logget på, kan få tilgang til API -anropene og webapp -sider. Dette kan bare settes mens du er logget inn som admin. Alternativet for eksterne IP -adresser kan bare velges hvis alternativet 'Tillat tilkoblinger fra alle undernett' er valgt i backend -oppsett fordi uten det alternativet i backend -oppsett, kan eksterne brukere ikke få tilgang til systemet. Utvalget oppdateres umiddelbart, ingen lagring er nødvendig. Merk at selv om ingen autentisering er nødvendig, kan en bruker fremdeles logge inn og bli autentisert hvis han velger.",
+            "auth_label": "API -autentisering kreves",
+            "auth_none_desc": "Ingen autentisering kreves",
+            "auth_remote_desc": "Autentisering som kreves for eksterne IP -adresser",
+            "auth_title": "Aktiver eller deaktiver autentisering",
+            "authreq_fail": "Feil: Kan ikke angi denne verdien.",
+            "delete_details": "Dette vil slette brukeren {{ Name }}.",
+            "delete_label": "Slett bruker",
+            "edit_label": "Oppdater bruker",
+            "heading": "Brukere",
+            "name_label": "Brukernavn",
+            "new": "Ny bruker",
+            "oldpwwrong": "Nåværende passord er feil.",
+            "pwdiffer": "Passordet er forskjellige"
+        },
         "videos": {
             "adddate": "Dato lagt til",
             "allCategories": "Alle kategorier",
@@ -473,13 +490,23 @@
         "changeLanguage": "Skifte språk",
         "dashboard": "dashbord",
         "hide": "Skjul toppbanner",
+        "keeplogin": "Hold deg innlogget på denne datamaskinen.",
         "login": "Logg inn",
+        "loginfail": "Innlogging mislyktes",
+        "logout": "Logg ut",
         "mainheading": "MythTV Backend",
         "show": "Vis toppbanner",
         "switchServer": "Bytt server",
         "switchTheme": "Bytt tema",
         "testbed": "Prøveseng",
-        "tvGuide": "TV-guide"
+        "tvGuide": "TV-guide",
+        "username": "Brukernavn",
+        "userpassword": "Passord",
+        "users": {
+            "new_password": "Nytt passord",
+            "new_password2": "Nytt passord igjen",
+            "old_password": "Gjeldende passord"
+        }
     },
     "primeng": {
         "accept": "Ja",

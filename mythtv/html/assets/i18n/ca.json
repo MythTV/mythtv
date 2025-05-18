@@ -426,6 +426,23 @@
             "status": "Estat",
             "time": "Temps"
         },
+        "users": {
+            "auth_all_desc": "Autenticació necessària per a totes les adreces IP",
+            "auth_desc": "Això controla si un usuari que no ha signat pot accedir a les trucades API i a les pàgines d'aplicacions web. Això només es pot configurar mentre es connecta com a administrador. L'opció per a adreces IP remotes només es pot seleccionar si l'opció \"Permet connexions de totes les subxarxes\" està seleccionada en la configuració de backend, ja que sense aquesta opció en la configuració de backend, els usuaris remots no poden accedir al sistema. La selecció s’actualitza immediatament, no cal desar. Tingueu en compte que, fins i tot si no es requereix autenticació, un usuari encara pot iniciar la sessió i es pot autenticar si decideix.",
+            "auth_label": "Autenticació API necessària",
+            "auth_none_desc": "No cal autenticació",
+            "auth_remote_desc": "Autenticació necessària per a adreces IP remotes",
+            "auth_title": "Activa o desactiva l'autenticació",
+            "authreq_fail": "Error: no es pot definir aquest valor.",
+            "delete_details": "Això eliminarà l'usuari {{ Name }}.",
+            "delete_label": "Suprimeix l'usuari",
+            "edit_label": "Actualitzeu l'usuari",
+            "heading": "Usuaris",
+            "name_label": "Nom d'usuari",
+            "new": "Usuari nou",
+            "oldpwwrong": "La contrasenya actual és incorrecta.",
+            "pwdiffer": "Les contrasenyes difereixen"
+        },
         "videos": {
             "adddate": "Data afegida",
             "allCategories": "Totes les categories",
@@ -473,13 +490,23 @@
         "changeLanguage": "Canviar d'idioma",
         "dashboard": "panell",
         "hide": "Amaga el bàner superior",
+        "keeplogin": "Mantingueu la sessió en aquest ordinador.",
         "login": "Iniciar Sessió",
+        "loginfail": "Inici de sessió ha fallat",
+        "logout": "Tancar la sessió",
         "mainheading": "Backend de MythTV",
         "show": "Mostra el bàner superior",
         "switchServer": "Canvia de servidor",
         "switchTheme": "Canvia el tema",
         "testbed": "Banc de proves",
-        "tvGuide": "Guia televisiva"
+        "tvGuide": "Guia televisiva",
+        "username": "Nom d'usuari",
+        "userpassword": "Contrasenya",
+        "users": {
+            "new_password": "Nova contrasenya",
+            "new_password2": "Una nova contrasenya de nou",
+            "old_password": "Contrasenya actual"
+        }
     },
     "primeng": {
         "accept": "Sí",

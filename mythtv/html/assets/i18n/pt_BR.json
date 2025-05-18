@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Tempo"
         },
+        "users": {
+            "auth_all_desc": "Autenticação necessária para todos os endereços IP",
+            "auth_desc": "Isso controla se um usuário que não se inscreveu pode acessar as chamadas da API e as páginas do aplicativo da Web. Isso só pode ser definido enquanto você está conectado como admin. A opção para endereços IP remotos só pode ser selecionada se a opção 'Permitir conexões de todas as sub -redes' for selecionada na configuração de back -end porque, sem essa opção na configuração de back -end, os usuários remotos não podem acessar o sistema. A seleção é atualizada imediatamente, não é necessário salvar. Observe que, mesmo que nenhuma autenticação seja necessária, um usuário ainda poderá fazer login e ser autenticado se escolher.",
+            "auth_label": "Autenticação da API necessária",
+            "auth_none_desc": "Nenhuma autenticação é necessária",
+            "auth_remote_desc": "Autenticação necessária para endereços IP remotos",
+            "auth_title": "Ativar ou desativar a autenticação",
+            "authreq_fail": "ERRO: Não é possível definir esse valor.",
+            "delete_details": "Isso excluirá o usuário {{ Name }}.",
+            "delete_label": "Excluir usuário",
+            "edit_label": "Atualize o usuário",
+            "heading": "Usuários",
+            "name_label": "Nome de usuário",
+            "new": "Novo usuário",
+            "oldpwwrong": "A senha atual está incorreta.",
+            "pwdiffer": "As senhas diferem"
+        },
         "videos": {
             "adddate": "Data adicionada",
             "allCategories": "Todas as categorias",
@@ -473,13 +490,23 @@
         "changeLanguage": "Mudar idioma",
         "dashboard": "Painel",
         "hide": "Ocultar banner superior",
+        "keeplogin": "Fique conectado neste computador.",
         "login": "Conecte-se",
+        "loginfail": "Falha no login",
+        "logout": "Log Out",
         "mainheading": "Back-end MythTV",
         "show": "Mostrar banner principal",
         "switchServer": "Alternar Servidor",
         "switchTheme": "Troque de Tema",
         "testbed": "Testbed",
-        "tvGuide": "guia de TV"
+        "tvGuide": "guia de TV",
+        "username": "Nome de usuário",
+        "userpassword": "Senha",
+        "users": {
+            "new_password": "Nova Senha",
+            "new_password2": "Nova senha novamente",
+            "old_password": "Senha atual"
+        }
     },
     "primeng": {
         "accept": "Sim",

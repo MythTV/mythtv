@@ -426,6 +426,23 @@
             "status": "Olek",
             "time": "Aeg"
         },
+        "users": {
+            "auth_all_desc": "Kõigi IP -aadresside jaoks vajalik autentimine",
+            "auth_desc": "See kontrollib, kas kasutaja, kes pole sisse loginud, pääseb API -kõnedele ja veebirakenduste lehtedele. Seda saab seada ainult siis, kui olete sisse logitud administraatoriga. Kaug -IP -aadresside valikut saab valida ainult siis, kui suvand „Kõigi alamvõrkude ühendused lubavad” on valitud taustaprogrammi seadistuses, kuna ilma selle suvandita taustal seadistamisel ei pääse kaugkasutajad süsteemile juurde. Valikut värskendatakse kohe, salvestamist pole vaja. Pange tähele, et isegi kui autentimist pole vaja, saab kasutaja ikkagi sisse logida ja autentida, kui ta valib.",
+            "auth_label": "Vajalik API autentimine",
+            "auth_none_desc": "Autentimist pole vaja",
+            "auth_remote_desc": "IP -kaugjuhtimiseks vajalik autentimine",
+            "auth_title": "Luba või keelake autentimine",
+            "authreq_fail": "Viga: seda väärtust ei saa seada.",
+            "delete_details": "See kustutab kasutaja {{ Name }}.",
+            "delete_label": "Kustuta kasutaja",
+            "edit_label": "Uuendage kasutaja",
+            "heading": "Kasutajad",
+            "name_label": "Kasutajanimi",
+            "new": "Uus kasutaja",
+            "oldpwwrong": "Praegune parool on vale.",
+            "pwdiffer": "Paroolid erinevad"
+        },
         "videos": {
             "adddate": "Lisatud kuupäev",
             "allCategories": "Kõik kategooriad",
@@ -473,13 +490,23 @@
         "changeLanguage": "Keele vahetamine",
         "dashboard": "Armatuurlaud",
         "hide": "Peida ülemine bänner",
+        "keeplogin": "Olge selles arvutis sisse logitud.",
         "login": "Logi sisse",
+        "loginfail": "Sisselogimine ebaõnnestus",
+        "logout": "Välja logima",
         "mainheading": "MythTV taustaprogramm",
         "show": "Kuva ülemine bänner",
         "switchServer": "Vaheta serverit",
         "switchTheme": "Vaheta teemat",
         "testbed": "Katsealus",
-        "tvGuide": "Telekava"
+        "tvGuide": "Telekava",
+        "username": "Kasutajanimi",
+        "userpassword": "Parool",
+        "users": {
+            "new_password": "Uus parool",
+            "new_password2": "Uus parool jälle",
+            "old_password": "Praegune parool"
+        }
     },
     "primeng": {
         "accept": "Jah",

@@ -426,6 +426,23 @@
             "status": "Status",
             "time": "Vrijeme"
         },
+        "users": {
+            "auth_all_desc": "Autentifikacija potrebna za sve IP adrese",
+            "auth_desc": "To kontrolira može li korisnik koji nije prijavio pristupiti API pozivima i stranicama web aplikacija. To se može postaviti samo dok ste prijavljeni kao administrator. Opcija za udaljene IP adrese može se odabrati samo ako se opcija 'Dopuštaju veze iz svih podmreža' odabrana u sigurnosnom postavljanju, jer bez te opcije u postavljanju sigurnosnih uređaja, udaljeni korisnici ne mogu pristupiti sustavu. Odabir se odmah ažurira, nije potreban za spremanje. Imajte na umu da čak i ako nije potrebna provjera autentičnosti, korisnik se i dalje može prijaviti i biti ovjeren ako odabere.",
+            "auth_label": "Potrebna je autentifikacija API -ja",
+            "auth_none_desc": "Nije potrebna provjera autentičnosti",
+            "auth_remote_desc": "Autentifikacija potrebna za udaljene IP adrese",
+            "auth_title": "Omogući ili onemogućite provjeru autentičnosti",
+            "authreq_fail": "Pogreška: Nije moguće postaviti ovu vrijednost.",
+            "delete_details": "Ovo će izbrisati korisnika {{ Name }}.",
+            "delete_label": "Izbriši korisnika",
+            "edit_label": "Ažuriraj korisnik",
+            "heading": "Korisnika",
+            "name_label": "Korisničko ime",
+            "new": "Novi korisnik",
+            "oldpwwrong": "Trenutna lozinka je netočna.",
+            "pwdiffer": "Lozinke se razlikuju"
+        },
         "videos": {
             "adddate": "Datum dodan",
             "allCategories": "Sve kategorije",
@@ -473,13 +490,23 @@
         "changeLanguage": "Promijeni jezik",
         "dashboard": "kontrolna ploča",
         "hide": "Sakrij gornji natpis",
+        "keeplogin": "Ostanite prijavljeni na ovom računalu.",
         "login": "Prijaviti se",
+        "loginfail": "Prijava nije uspjela",
+        "logout": "Odjaviti",
         "mainheading": "MythTV pozadina",
         "show": "Prikaži gornji natpis",
         "switchServer": "Promijeni poslužitelj",
         "switchTheme": "Promijenite temu",
         "testbed": "Testna ploča",
-        "tvGuide": "TV vodič"
+        "tvGuide": "TV vodič",
+        "username": "Korisničko ime",
+        "userpassword": "Lozinka",
+        "users": {
+            "new_password": "Nova lozinka",
+            "new_password2": "Opet nova lozinka",
+            "old_password": "Trenutna lozinka"
+        }
     },
     "primeng": {
         "accept": "Da",
