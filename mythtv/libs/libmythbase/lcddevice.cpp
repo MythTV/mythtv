@@ -144,32 +144,32 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     for (int count = 1; count <= 10 && !m_connected; count++)
     {
-            LOG(VB_GENERAL, LOG_INFO, QString("Connecting to lcd server: "
-                    "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
-                                           .arg(count));
+        LOG(VB_GENERAL, LOG_INFO, QString("Connecting to lcd server: "
+                "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
+                                       .arg(count));
 
-            delete m_socket;
-            m_socket = new QTcpSocket();
+        delete m_socket;
+        m_socket = new QTcpSocket();
 
-            QObject::connect(m_socket, &QIODevice::readyRead,
-                             this, &LCD::ReadyRead);
-            QObject::connect(m_socket, &QAbstractSocket::disconnected,
-                             this, &LCD::Disconnected);
+        QObject::connect(m_socket, &QIODevice::readyRead,
+                         this, &LCD::ReadyRead);
+        QObject::connect(m_socket, &QAbstractSocket::disconnected,
+                         this, &LCD::Disconnected);
 
-            m_socket->connectToHost(m_hostname, m_port);
-            if (m_socket->waitForConnected())
-            {
-                m_lcdReady = false;
-                m_connected = true;
-                QTextStream os(m_socket);
-                os << "HELLO\n";
-                os.flush();
+        m_socket->connectToHost(m_hostname, m_port);
+        if (m_socket->waitForConnected())
+        {
+            m_lcdReady = false;
+            m_connected = true;
+            QTextStream os(m_socket);
+            os << "HELLO\n";
+            os.flush();
 
-                break;
-            }
-            m_socket->close();
+            break;
+        }
+        m_socket->close();
 
-            usleep(500000);
+        usleep(500000);
     }
 
     if (!m_connected)
