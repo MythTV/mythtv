@@ -167,10 +167,11 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 {
 	unsigned short *pl = nullptr;
-	bool done = true;
+	bool done = false;
 
 	std::array<uint8_t,3> headr { 0x00, 0x00, 0x01} ;
-	do {
+	while (!done)
+	{
 		int c=0;
 		done = true;
 		while (c < count && (!p->mpeg ||
@@ -394,7 +395,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				}
 			}
 		} 
-	} while(!done);
+	}
 }
 
 

@@ -448,7 +448,8 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 	int ex=0;
 	uint32_t dsize=0;
 
-	do {
+	while (ex == 0)
+	{
 		if (ring_peek(&dbuf->time_index,(uint8_t *) &rtime, 
 			      sizeof(uint64_t), 0)<0){
 			if (dsize) break;
@@ -463,7 +464,7 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 		} else {
 			ex = 1;
 		}
-	} while (ex == 0);
+	}
 #if 0
 	LOG(VB_GENERAL, LOG_INFO, QString("delete %1 ").arg(dummy_space(dbuf)));
 #endif
