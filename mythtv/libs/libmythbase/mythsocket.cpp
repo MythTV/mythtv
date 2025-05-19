@@ -978,24 +978,20 @@ void MythSocket::ReadReal(char *data, int size, std::chrono::milliseconds max_wa
 
 void MythSocket::ResetReal(void)
 {
+    uint avail {0};
     std::vector<char> trash;
 
     m_tcpSocket->waitForReadyRead(30);
-    do
+    while ((avail = m_tcpSocket->bytesAvailable()) > 0)
     {
-        uint avail = m_tcpSocket->bytesAvailable();
-        if (avail)
-        {
-            trash.resize(std::max((uint)trash.size(),avail));
-            m_tcpSocket->read(trash.data(), avail);
-        }
+        trash.resize(std::max((uint)trash.size(),avail));
+        m_tcpSocket->read(trash.data(), avail);
 
         LOG(VB_NETWORK, LOG_INFO, LOC() + "Reset() " +
             QString("%1 bytes available").arg(avail));
 
         m_tcpSocket->waitForReadyRead(30);
     }
-    while (m_tcpSocket->bytesAvailable() > 0);
 
     m_dataAvailable.fetchAndStoreOrdered(0);
 }

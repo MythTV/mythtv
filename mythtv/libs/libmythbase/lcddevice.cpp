@@ -142,13 +142,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         usleep(500000);
     }
 
-    if (!m_connected)
+    for (int count = 1; count <= 10 && !m_connected; count++)
     {
-        int count = 0;
-        do
-        {
-            ++count;
-
             LOG(VB_GENERAL, LOG_INFO, QString("Connecting to lcd server: "
                     "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
                                            .arg(count));
@@ -175,8 +170,6 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
             m_socket->close();
 
             usleep(500000);
-        }
-        while (count < 10 && !m_connected);
     }
 
     if (!m_connected)

@@ -558,9 +558,8 @@ bool StorageGroup::FindDirs(const QString &group, const QString &hostname,
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("StorageGroup::StorageGroup()", query);
-    else if (query.next())
     {
-        do
+        while (query.next())
         {
             /* The storagegroup.dirname column uses utf8_bin collation, so Qt
              * uses QString::fromLatin1() for toString(). Explicitly convert the
@@ -571,13 +570,11 @@ bool StorageGroup::FindDirs(const QString &group, const QString &hostname,
             if (dirname.endsWith("/"))
                 dirname.remove(dirname.length() - 1, 1);
 
-            if (dirlist)
-                (*dirlist) << dirname;
-            else
+            if (nullptr == dirlist)
                 return true;
+            (*dirlist) << dirname;
+            found = true;
         }
-        while (query.next());
-        found = true;
     }
 
     if (m_builtinGroups.contains(group))

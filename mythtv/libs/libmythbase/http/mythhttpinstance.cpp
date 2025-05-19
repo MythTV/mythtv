@@ -25,7 +25,11 @@ MythHTTPInstance::MythHTTPInstance()
 
     m_httpServer->moveToThread(m_httpServerThread->qthread());
     m_httpServerThread->start();
-    do { QThread::usleep(50); } while (!m_httpServerThread->qthread()->isRunning());
+    QThread::usleep(50);
+    while (!m_httpServerThread->qthread()->isRunning())
+    {
+        QThread::usleep(50);
+    }
 }
 
 MythHTTPInstance::~MythHTTPInstance()
