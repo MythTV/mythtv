@@ -99,14 +99,17 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
     {
         bool gotPacket = false;
 
-        do
+        while (!gotPacket)
         {
             gotPacket = true;
 
-            do
+            m_avCodecLock.lock();
+            result = av_read_frame(Ctx, Pkt);
+            m_avCodecLock.unlock();
+            std::this_thread::yield();
+
+            while (m_ringBuffer->DVD()->IsReadingBlocked())
             {
-                if (m_ringBuffer->DVD()->IsReadingBlocked())
-                {
                     int32_t lastEvent = m_ringBuffer->DVD()->GetLastEvent();
                     switch(lastEvent)
                     {
@@ -162,7 +165,6 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                     }
 
                     m_ringBuffer->DVD()->UnblockReading();
-                }
 
                 m_avCodecLock.lock();
                 result = av_read_frame(Ctx, Pkt);
@@ -173,7 +175,7 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                 // but calling up the OSD menu in a still frame without
                 // this still causes a deadlock.
                 std::this_thread::yield();
-            } while (m_ringBuffer->DVD()->IsReadingBlocked());
+            }
 
             if (result >= 0)
             {
@@ -197,7 +199,7 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                     }
                 }
             }
-        } while(!gotPacket);
+        }
     }
 
     return result;
