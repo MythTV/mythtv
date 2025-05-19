@@ -381,7 +381,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         buffer.resize(nBytes);
 
         long nRead = 0;
-        do
+        while ((nRead < nBytes) || (nBytes == 0 && !didDoRead))
         {
             long ret = pSocket->readBlock( buffer.data() + nRead, nBytes - nRead );
             didDoRead = true;
@@ -423,7 +423,6 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
                 break;
             }
         }
-        while (nRead < nBytes);
 
         if (buffer.isEmpty())
             continue;
