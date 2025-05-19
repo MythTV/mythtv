@@ -344,7 +344,7 @@ void WelcomeDialog::updateScreen(void)
         {
             TunerStatus tuner = m_tunerList[m_screenTunerNo];
 
-            do
+            while (!tuner.isRecording)
             {
                 if (m_screenTunerNo < m_tunerList.size() - 1)
                     m_screenTunerNo++;
@@ -352,7 +352,6 @@ void WelcomeDialog::updateScreen(void)
                     m_screenTunerNo = 0;
               tuner = m_tunerList[m_screenTunerNo];
             }
-            while (!tuner.isRecording);
 
             status = tr("Tuner %1 is recording:").arg(tuner.id);
             status += "\n";
