@@ -37,9 +37,14 @@ T quick_select(T *arr, int nelems, int select)
         /* Nibble from each end towards middle, swapping items when stuck */
         int ll = low + 1;
         int hh = high;
-        for (;;) {
-            do ll++; while (arr[low] > arr[ll]);
-            do hh--; while (arr[hh]  > arr[low]);
+        while (hh >= ll) {
+            ll++;
+            while (arr[low] > arr[ll])
+                ll++;
+
+            hh--;
+            while (arr[hh] > arr[low])
+                hh--;
 
             if (hh < ll)
                 break;
