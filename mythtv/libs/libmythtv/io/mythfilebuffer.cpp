@@ -206,7 +206,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
         openTimer.start();
 
         uint openAttempts = 0;
-        do
+        while ((openTimer.elapsed() < Retry) || (openAttempts == 0))
         {
             openAttempts++;
 
@@ -269,7 +269,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
                     m_fd2 = -1;
                 }
             }
-        } while (openTimer.elapsed() < Retry);
+        }
 
         switch (lasterror)
         {
