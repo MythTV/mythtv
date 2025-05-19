@@ -126,12 +126,12 @@ bool setupTVs(bool ismaster, bool &error)
         records_without_station.prepare("SELECT record.chanid,"
                 " channel.callsign FROM record LEFT JOIN channel"
                 " ON record.chanid = channel.chanid WHERE record.station='';");
-        if (records_without_station.exec() && records_without_station.next())
+        if (records_without_station.exec())
         {
             MSqlQuery update_record(MSqlQuery::InitCon());
             update_record.prepare("UPDATE record SET station = :CALLSIGN"
                     " WHERE chanid = :CHANID;");
-            do
+            while (records_without_station.next())
             {
                 update_record.bindValue(":CALLSIGN",
                         records_without_station.value(1));
@@ -141,7 +141,7 @@ bool setupTVs(bool ismaster, bool &error)
                 {
                     MythDB::DBError("Updating record station", update_record);
                 }
-            } while (records_without_station.next());
+            }
         }
     }
 
