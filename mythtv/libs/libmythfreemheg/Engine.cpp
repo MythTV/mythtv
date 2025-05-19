@@ -128,8 +128,11 @@ std::chrono::milliseconds MHEngine::RunAll()
 
     std::chrono::milliseconds nNextTime = 0ms;
 
-    do
+    bool at_least_once {true} ;
+    while (!m_eventQueue.isEmpty() || ! m_actionStack.isEmpty() || at_least_once)
     {
+        at_least_once = false;
+
         // Check to see if we need to close.
         if (m_context->CheckStop())
         {
@@ -179,7 +182,6 @@ std::chrono::milliseconds MHEngine::RunAll()
             delete pEvent;
         }
     }
-    while (! m_eventQueue.isEmpty() || ! m_actionStack.isEmpty());
 
     // Redraw the display if necessary.
     if (! m_redrawRegion.isEmpty())

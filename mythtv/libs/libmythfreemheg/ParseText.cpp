@@ -410,11 +410,10 @@ void MHParseText::NextSym()
                     Error("Malformed comment");
                 }
 
-                do
+                while (m_ch != '\n' && m_ch != '\f' && m_ch != '\r')
                 {
                     GetNextChar();
                 }
-                while (m_ch != '\n' && m_ch != '\f' && m_ch != '\r');
 
                 continue; // Next symbol
             }
@@ -425,17 +424,13 @@ void MHParseText::NextSym()
                 QString buff {};
                 buff.reserve(MAX_TAG_LENGTH);
 
-                do
+                buff += m_ch;
+                GetNextChar();
+                while (isalpha(m_ch) && (buff.size() < MAX_TAG_LENGTH))
                 {
                     buff += m_ch;
                     GetNextChar();
-
-                    if (buff.size() == MAX_TAG_LENGTH)
-                    {
-                        break;
-                    }
                 }
-                while ((m_ch >= 'a' && m_ch <= 'z') || (m_ch >= 'A' && m_ch <= 'Z'));
 
                 // Look it up and return it if it's found.
                 m_nTag = FindTag(buff);
@@ -712,17 +707,14 @@ void MHParseText::NextSym()
                 QString buff;
                 buff.reserve(MAX_ENUM);
 
-                do
+                buff += m_ch;
+                GetNextChar();
+                while ((isalpha(m_ch) || m_ch == '-')
+                       && (buff.size() < MAX_ENUM))
                 {
                     buff += m_ch;
                     GetNextChar();
-
-                    if (buff.size() == MAX_ENUM)
-                    {
-                        break;
-                    }
                 }
-                while ((m_ch >= 'a' && m_ch <= 'z') || (m_ch >= 'A' && m_ch <= 'Z') || m_ch == '-');
 
                 if (buff.compare("NULL", Qt::CaseInsensitive) == 0)
                 {
