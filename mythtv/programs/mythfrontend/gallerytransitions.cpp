@@ -31,9 +31,8 @@ Transition &TransitionRegistry::Select(int setting)
     // If chosen transition isn't viable for painter then use previous ones.
     // First transition must always be useable by all painters
     Transition *result = nullptr;
-    do
+    while (value >= kNoTransition && !result)
         result = m_map.value(value--, nullptr);
-    while (value >= kNoTransition && !result);
 
     if (result)
         return *result;

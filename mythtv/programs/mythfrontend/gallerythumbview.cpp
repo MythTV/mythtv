@@ -218,18 +218,16 @@ bool GalleryThumbView::Create()
     // Determine zoom levels supported by theme
     // images0 must exist; images1, images2 etc. are optional and enable zoom
     int               zoom = 0;
-    MythUIButtonList *widget = nullptr;
-    do
+    QString name = QString("images%1").arg(zoom++);
+    auto *widget = dynamic_cast<MythUIButtonList *>(this->GetChild(name));
+    while (widget)
     {
-        QString name = QString("images%1").arg(zoom++);
+        m_zoomWidgets.append(widget);
+        widget->SetVisible(false);
+
+        name = QString("images%1").arg(zoom++);
         widget = dynamic_cast<MythUIButtonList *>(this->GetChild(name));
-        if (widget)
-        {
-            m_zoomWidgets.append(widget);
-            widget->SetVisible(false);
-        }
     }
-    while (widget);
 
     if (m_zoomWidgets.isEmpty())
     {

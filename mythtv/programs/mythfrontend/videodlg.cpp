@@ -279,7 +279,7 @@ namespace
 
         QElapsedTimer playing_time;
 
-        do
+        while (item)
         {
             playing_time.start();
 
@@ -288,12 +288,13 @@ namespace
             else
                 VideoPlayerCommand::PlayerFor(item.get()).Play();
 
-            if (item->GetChildID() > 0 && video_list.byID(item->GetChildID()))
-                    item = video_list.byID(item->GetChildID());
-            else
-                break;
+            if (!playing_time.hasExpired(WATCHED_WATERMARK))
+                return;
+
+            item = (item->GetChildID() > 0)
+                ? video_list.byID(item->GetChildID())
+                : nullptr;
         }
-        while (item && playing_time.hasExpired(WATCHED_WATERMARK));
     }
 
     class FanartLoader: public QObject
