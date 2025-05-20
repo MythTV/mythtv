@@ -62,8 +62,8 @@ void TestThemeVersion::test_version(void)
 
     QCOMPARE(result, e_result);
     QCOMPARE(a_devel, e_devel);
-    QCOMPARE(a_major, e_major);
-    QCOMPARE(a_minor, e_minor);
+    QCOMPARE(a_major, static_cast<uint>(e_major));
+    QCOMPARE(a_minor, static_cast<uint>(e_minor));
 }
 
 QTEST_APPLESS_MAIN(TestThemeVersion)
