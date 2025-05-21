@@ -210,8 +210,6 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     void prepareVisuals();
 
     void Error(const QString &msg);
-    void SilentError(const QString &msg);
-    void ClearError(void);
 
     QString m_lastError;
     bool    m_pulseWasSuspended {false};

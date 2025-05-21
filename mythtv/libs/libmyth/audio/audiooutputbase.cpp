@@ -563,7 +563,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
     }
 
-    ClearError();
+    m_lastError.clear();
 
     bool general_deps = true;
 
@@ -629,9 +629,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // initialized yet (e.g. rubbish was provided)
     if (m_sourceChannels <= 0 || m_format <= 0 || m_sampleRate <= 0)
     {
-        SilentError(QString("Aborting Audio Reconfigure. ") +
-                    QString("Invalid audio parameters ch %1 fmt %2 @ %3Hz")
-                    .arg(m_sourceChannels).arg(m_format).arg(m_sampleRate));
+        m_lastError = QString("Aborting Audio Reconfigure. Invalid audio parameters ch %1 fmt %2 @ %3Hz")
+                        .arg(QString::number(m_sourceChannels),
+                             QString::number(m_format),
+                             QString::number(m_sampleRate)
+                             );
         return;
     }
 
