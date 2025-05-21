@@ -285,16 +285,6 @@ void AudioOutput::Error(const QString &msg)
     LOG(VB_GENERAL, LOG_ERR, "AudioOutput Error: " + m_lastError);
 }
 
-void AudioOutput::SilentError(const QString &msg)
-{
-    m_lastError = msg;
-}
-
-void AudioOutput::ClearError(void)
-{
-    m_lastError.clear();
-}
-
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     QString &name, const QString &desc, bool willsuspendpa)
 {
