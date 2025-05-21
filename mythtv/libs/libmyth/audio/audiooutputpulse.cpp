@@ -52,6 +52,16 @@ AudioOutputPulseAudio::~AudioOutputPulseAudio()
         pa_context_unref(m_pcontext);
         m_pcontext = nullptr;
     }
+    if (m_ctproplist)
+    {
+        pa_proplist_free(m_ctproplist);
+        m_ctproplist = nullptr;
+    }
+    if (m_stproplist)
+    {
+        pa_proplist_free(m_stproplist);
+        m_stproplist = nullptr;
+    }
 }
 
 AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
@@ -78,6 +88,16 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
         pa_threaded_mainloop_stop(m_mainloop);
         pa_threaded_mainloop_free(m_mainloop);
         m_mainloop = nullptr;
+        if (m_ctproplist)
+        {
+            pa_proplist_free(m_ctproplist);
+            m_ctproplist = nullptr;
+        }
+        if (m_stproplist)
+        {
+            pa_proplist_free(m_stproplist);
+            m_stproplist = nullptr;
+        }
         delete m_aoSettings;
         return nullptr;
     }
@@ -122,6 +142,16 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     pa_threaded_mainloop_stop(m_mainloop);
     pa_threaded_mainloop_free(m_mainloop);
     m_mainloop = nullptr;
+    if (m_ctproplist)
+    {
+        pa_proplist_free(m_ctproplist);
+        m_ctproplist = nullptr;
+    }
+    if (m_stproplist)
+    {
+        pa_proplist_free(m_stproplist);
+        m_stproplist = nullptr;
+    }
 
     return m_aoSettings;
 }
@@ -185,6 +215,16 @@ bool AudioOutputPulseAudio::OpenDevice()
         pa_threaded_mainloop_stop(m_mainloop);
         pa_threaded_mainloop_free(m_mainloop);
         m_mainloop = nullptr;
+        if (m_ctproplist)
+        {
+            pa_proplist_free(m_ctproplist);
+            m_ctproplist = nullptr;
+        }
+        if (m_stproplist)
+        {
+            pa_proplist_free(m_stproplist);
+            m_stproplist = nullptr;
+        }
         return false;
     }
 
@@ -194,6 +234,16 @@ bool AudioOutputPulseAudio::OpenDevice()
         pa_threaded_mainloop_stop(m_mainloop);
         pa_threaded_mainloop_free(m_mainloop);
         m_mainloop = nullptr;
+        if (m_ctproplist)
+        {
+            pa_proplist_free(m_ctproplist);
+            m_ctproplist = nullptr;
+        }
+        if (m_stproplist)
+        {
+            pa_proplist_free(m_stproplist);
+            m_stproplist = nullptr;
+        }
         return false;
     }
 
@@ -216,9 +266,16 @@ void AudioOutputPulseAudio::CloseDevice()
 
     if (m_pcontext)
     {
-        pa_context_drain(m_pcontext, nullptr, nullptr);
-        pa_context_disconnect(m_pcontext);
-        pa_context_unref(m_pcontext);
+        pa_operation *op;
+        if ((op = pa_context_drain(m_pcontext, ContextDrainCallback, nullptr)))
+        {
+            pa_operation_unref(op);
+        }
+        else
+        {
+            pa_context_disconnect(m_pcontext);
+            pa_context_unref(m_pcontext);
+        }
         m_pcontext = nullptr;
     }
 
@@ -228,6 +285,17 @@ void AudioOutputPulseAudio::CloseDevice()
         pa_threaded_mainloop_stop(m_mainloop);
         pa_threaded_mainloop_free(m_mainloop);
         m_mainloop = nullptr;
+    }
+
+    if (m_ctproplist)
+    {
+        pa_proplist_free(m_ctproplist);
+        m_ctproplist = nullptr;
+    }
+    if (m_stproplist)
+    {
+        pa_proplist_free(m_stproplist);
+        m_stproplist = nullptr;
     }
 }
 
@@ -415,21 +483,23 @@ bool AudioOutputPulseAudio::ContextConnect(void)
         m_pcontext = nullptr;
         return false;
     }
-    pa_proplist *proplist = pa_proplist_new();
-    if (!proplist)
+    m_ctproplist = pa_proplist_new();
+    if (!m_ctproplist)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("failed to create new proplist"));
         return false;
     }
-    pa_proplist_sets(proplist, PA_PROP_APPLICATION_NAME, "MythTV");
-    pa_proplist_sets(proplist, PA_PROP_APPLICATION_ICON_NAME, "mythtv");
-    pa_proplist_sets(proplist, PA_PROP_MEDIA_ROLE, "video");
+    pa_proplist_sets(m_ctproplist, PA_PROP_APPLICATION_NAME, "MythTV");
+    pa_proplist_sets(m_ctproplist, PA_PROP_APPLICATION_ICON_NAME, "mythtv");
+    pa_proplist_sets(m_ctproplist, PA_PROP_MEDIA_ROLE, "video");
     m_pcontext =
         pa_context_new_with_proplist(pa_threaded_mainloop_get_api(m_mainloop),
-                                     "MythTV", proplist);
+                                     "MythTV", m_ctproplist);
     if (!m_pcontext)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "failed to acquire new context");
+        pa_proplist_free(m_ctproplist);
+        m_ctproplist = nullptr;
         return false;
     }
     pa_context_set_state_callback(m_pcontext, ContextStateCallback, this);
@@ -443,6 +513,8 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("context connect failed: %1")
                              .arg(pa_strerror(pa_context_errno(m_pcontext))));
+        pa_proplist_free(m_ctproplist);
+        m_ctproplist = nullptr;
         return false;
     }
     bool connected = false;
@@ -461,6 +533,8 @@ bool AudioOutputPulseAudio::ContextConnect(void)
                 LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag +
                         QString("context connection failed or terminated: %1")
                         .arg(pa_strerror(pa_context_errno(m_pcontext))));
+                pa_proplist_free(m_ctproplist);
+                m_ctproplist = nullptr;
                 return false;
 
             default:
@@ -507,19 +581,21 @@ QString AudioOutputPulseAudio::ChooseHost(void)
 bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
 {
     QString fn_log_tag = "ConnectPlaybackStream, ";
-    pa_proplist *proplist = pa_proplist_new();
-    if (!proplist)
+    m_stproplist = pa_proplist_new();
+    if (!m_stproplist)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + QString("failed to create new proplist"));
         return false;
     }
-    pa_proplist_sets(proplist, PA_PROP_MEDIA_ROLE, "video");
+    pa_proplist_sets(m_stproplist, PA_PROP_MEDIA_ROLE, "video");
     m_pstream =
         pa_stream_new_with_proplist(m_pcontext, "MythTV playback", &m_sampleSpec,
-                                    &m_channelMap, proplist);
+                                    &m_channelMap, m_stproplist);
     if (!m_pstream)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "failed to create new playback stream");
+        pa_proplist_free(m_stproplist);
+        m_stproplist = nullptr;
         return false;
     }
     pa_stream_set_state_callback(m_pstream, StreamStateCallback, this);
@@ -567,6 +643,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
             case PA_CONTEXT_TERMINATED:
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("context is stuffed, %1")
                             .arg(pa_strerror(pa_context_errno(m_pcontext))));
+                pa_proplist_free(m_stproplist);
+                m_stproplist = nullptr;
                 failed = true;
                 break;
             default:
@@ -580,6 +658,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                         LOG(VB_GENERAL, LOG_ERR, LOC + QString("stream failed or was terminated, "
                                         "context state %1, stream state %2")
                                     .arg(cstate).arg(sstate));
+                        pa_proplist_free(m_stproplist);
+                        m_stproplist = nullptr;
                         failed = true;
                         break;
                     default:
@@ -609,6 +689,12 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
         pa_operation_unref(op);
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "stream flush operation failed ");
+}
+
+void AudioOutputPulseAudio::ContextDrainCallback(pa_context *c, void */*arg*/)
+{
+    pa_context_disconnect(c);
+    pa_context_unref(c);
 }
 
 void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
