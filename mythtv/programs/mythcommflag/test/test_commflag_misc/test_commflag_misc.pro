@@ -54,7 +54,6 @@ DEFINES += TEST_SOURCE_DIR='\'"$${PWD}"'\'
 # Input
 HEADERS += test_commflag_misc.h
 SOURCES += test_commflag_misc.cpp
-SOURCES += ../../quickselect.cpp
 
 QMAKE_CLEAN += $(TARGET)
 QMAKE_CLEAN += ; ( cd $(OBJECTS_DIR) && rm -f *.gcov *.gcda *.gcno )

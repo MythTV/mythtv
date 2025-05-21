@@ -38,10 +38,10 @@ void TestCommFlagMisc::test_quick_select_size_one(void)
 {
     std::vector<uint8_t> data = { 8 };
 
-    uint8_t res = quick_select_median(data.data(), data.size());
+    auto res = quick_select_median<uint8_t>(data.data(), data.size());
     QCOMPARE(res, 8);
 
-    res = quick_select(data.data(), data.size(), 0);
+    res = quick_select<uint8_t>(data.data(), data.size(), 0);
     QCOMPARE(res, 8);
 }
 
@@ -49,12 +49,12 @@ void TestCommFlagMisc::test_quick_select_size_two(void)
 {
     std::vector<uint8_t> data = { 42, 8 };
 
-    uint8_t res = quick_select_median(data.data(), data.size());
+    auto res = quick_select_median<uint8_t>(data.data(), data.size());
     QCOMPARE(res, 8);
 
-    res = quick_select(data.data(), data.size(), 0);
+    res = quick_select<uint8_t>(data.data(), data.size(), 0);
     QCOMPARE(res, 8);
-    res = quick_select(data.data(), data.size(), 1);
+    res = quick_select<uint8_t>(data.data(), data.size(), 1);
     QCOMPARE(res, 42);
 }
 
@@ -63,12 +63,12 @@ void TestCommFlagMisc::test_quick_select_size_even(void)
     std::vector<uint8_t> data
         { 8, 138, 108, 168, 118, 117, 115, 56 };
 
-    uint8_t res = quick_select_median(data.data(), data.size());
+    auto res = quick_select_median<uint8_t>(data.data(), data.size());
     QCOMPARE(res, 115);
 
-    res = quick_select(data.data(), data.size(), 1);
+    res = quick_select<uint8_t>(data.data(), data.size(), 1);
     QCOMPARE(res, 56);
-    res = quick_select(data.data(), data.size(), 6);
+    res = quick_select<uint8_t>(data.data(), data.size(), 6);
     QCOMPARE(res, 138);
 }
 
@@ -77,12 +77,12 @@ void TestCommFlagMisc::test_quick_select_size_odd(void)
     std::vector<uint8_t> data
         { 8, 138, 108, 168, 118, 117, 115 };
 
-    uint8_t res = quick_select_median(data.data(), data.size());
+    auto res = quick_select_median<uint8_t>(data.data(), data.size());
     QCOMPARE(res, 117);
 
-    res = quick_select(data.data(), data.size(), 1);
+    res = quick_select<uint8_t>(data.data(), data.size(), 1);
     QCOMPARE(res, 108);
-    res = quick_select(data.data(), data.size(), 6);
+    res = quick_select<uint8_t>(data.data(), data.size(), 6);
     QCOMPARE(res, 168);
 }
 
@@ -93,16 +93,16 @@ void TestCommFlagMisc::test_quick_select_dups(void)
           8, 138, 117, 168, 118, 8, 117,
     };
 
-    uint8_t res = quick_select_median(data.data(), data.size());
+    auto res = quick_select_median<uint8_t>(data.data(), data.size());
     QCOMPARE(117, res);
 
-    res = quick_select(data.data(), data.size(), 1);
+    res = quick_select<uint8_t>(data.data(), data.size(), 1);
     QCOMPARE(8, res);
-    res = quick_select(data.data(), data.size(), 2);
+    res = quick_select<uint8_t>(data.data(), data.size(), 2);
     QCOMPARE(117, res);
-    res = quick_select(data.data(), data.size(), 3);
+    res = quick_select<uint8_t>(data.data(), data.size(), 3);
     QCOMPARE(117, res);
-    res = quick_select(data.data(), data.size(), 4);
+    res = quick_select<uint8_t>(data.data(), data.size(), 4);
     QCOMPARE(118, res);
 }
 
@@ -139,12 +139,12 @@ void TestCommFlagMisc::test_quick_select8(void)
 
     if (select == -1)
     {
-        auto res = quick_select_median(data.data(), data.size());
+        auto res = quick_select_median<uint8_t>(data.data(), data.size());
         QCOMPARE(res, expected);
         return;
     }
 
-    auto res = quick_select(data.data(), data.size(), select);
+    auto res = quick_select<uint8_t>(data.data(), data.size(), select);
     QCOMPARE(res, expected);
 }
 
@@ -180,12 +180,12 @@ void TestCommFlagMisc::test_quick_select16(void)
 
     if (select == -1)
     {
-        auto res = quick_select_median_ushort(data.data(), data.size());
+        auto res = quick_select_median<uint16_t>(data.data(), data.size());
         QCOMPARE(res, expected);
         return;
     }
 
-    auto res = quick_select_ushort(data.data(), data.size(), select);
+    auto res = quick_select<uint16_t>(data.data(), data.size(), select);
     QCOMPARE(res, expected);
 }
 
@@ -223,12 +223,12 @@ void TestCommFlagMisc::test_quick_selectf(void)
 
     if (select == -1)
     {
-        auto res = quick_select_median_float(data.data(), data.size());
+        auto res = quick_select_median<float>(data.data(), data.size());
         QCOMPARE(expectedf, res);
         return;
     }
 
-    auto res = quick_select_float(data.data(), data.size(), select);
+    auto res = quick_select<float>(data.data(), data.size(), select);
     QCOMPARE(expectedf, res);
 }
 

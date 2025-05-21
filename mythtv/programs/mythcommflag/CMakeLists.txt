@@ -41,7 +41,6 @@ add_executable(
   PGMConverter.h
   PrePostRollFlagger.cpp
   PrePostRollFlagger.h
-  quickselect.cpp
   quickselect.h
   SceneChangeDetector.cpp
   SceneChangeDetector.h

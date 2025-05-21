@@ -5,7 +5,7 @@
 #
 
 add_executable(
-  test_commflag_misc ../../quickselect.cpp
+  test_commflag_misc
   test_commflag_misc.cpp test_commflag_misc.h)
 
 target_include_directories(test_commflag_misc PRIVATE . ../..)
