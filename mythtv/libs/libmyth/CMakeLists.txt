@@ -34,7 +34,6 @@ set(AUDIO_HEADERS_NOT_INSTALLED
     audio/audiooutputbase.h
     audio/audiooutputbase.h
     audio/audiooutputdigitalencoder.h
-    audio/audiooutputdownmix.h
     audio/audiooutputgraph.h
     audio/audiooutputnull.h
     audio/freesurround.h
@@ -57,7 +56,6 @@ add_library(
   audio/audiooutput.cpp
   audio/audiooutputbase.cpp
   audio/audiooutputdigitalencoder.cpp
-  audio/audiooutputdownmix.cpp
   audio/audiooutputgraph.cpp
   audio/audiooutputnull.cpp
   audio/audiooutputsettings.cpp
