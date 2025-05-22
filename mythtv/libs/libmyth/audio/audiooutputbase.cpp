@@ -799,7 +799,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // Actually do the device specific open call
     if (!OpenDevice())
     {
-        if (GetError().isEmpty())
+        if (m_lastError.isEmpty())
             Error(QObject::tr("Aborting reconfigure"));
         else
             LOG(VB_GENERAL, LOG_INFO, LOC + "Aborting reconfigure");
