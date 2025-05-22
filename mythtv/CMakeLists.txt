@@ -87,6 +87,7 @@ endif()
 #
 include(CMakePushCheckState)
 include(CTest)
+list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 include(CheckTypeSize)
 include(GNUInstallDirs)
 
