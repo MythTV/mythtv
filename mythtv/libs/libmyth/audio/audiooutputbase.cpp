@@ -292,7 +292,7 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
 
     int channels = m_needsUpmix || m_needsDownmix ?
         m_configuredChannels : m_sourceChannels;
-    if (channels < 1 || channels > 8 || !m_configureSucceeded)
+    if (channels < 1 || channels > 8 || !m_isConfigured)
         return;
 
     bool willstretch = m_stretchFactor < 0.99F || m_stretchFactor > 1.01F;
@@ -593,7 +593,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         lneeds_upmix == m_needsUpmix && lreenc == m_reEnc &&
         lneeds_downmix == m_needsDownmix;
 
-    if (general_deps && m_configureSucceeded)
+    if (general_deps && m_isConfigured)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "Reconfigure(): No change -> exiting");
         // if passthrough, source channels may have changed
@@ -601,6 +601,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         return;
     }
 
+    m_isConfigured = false;
     KillAudio();
 
     QMutexLocker lock(&m_audioBufLock);
@@ -802,7 +803,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             Error(QObject::tr("Aborting reconfigure"));
         else
             LOG(VB_GENERAL, LOG_INFO, LOC + "Aborting reconfigure");
-        m_configureSucceeded = false;
         return;
     }
 
@@ -839,7 +839,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (m_unpauseWhenReady)
         m_pauseAudio = m_actuallyPaused = true;
 
-    m_configureSucceeded = true;
+    m_isConfigured = true;
 
     StartOutputThread();
 
@@ -1030,7 +1030,7 @@ int AudioOutputBase::audioready() const
  */
 std::chrono::milliseconds AudioOutputBase::GetAudiotime(void)
 {
-    if (m_audbufTimecode == 0ms || !m_configureSucceeded)
+    if (m_audbufTimecode == 0ms || !m_isConfigured)
         return 0ms;
 
     // output bits per 10 frames
@@ -1116,7 +1116,7 @@ void AudioOutputBase::SetAudiotime(int frames, std::chrono::milliseconds timecod
     int64_t processframes_unstretched = 0;
     std::chrono::milliseconds old_audbuf_timecode = m_audbufTimecode;
 
-    if (!m_configureSucceeded)
+    if (!m_isConfigured)
         return;
 
     if (m_needsUpmix && m_upmixer)
@@ -1337,7 +1337,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     int len      = in_len;
     bool music   = false;
 
-    if (!m_configureSucceeded)
+    if (!m_isConfigured)
     {
         LOG(VB_GENERAL, LOG_ERR, "AddData called with audio framework not "
                                  "initialised");

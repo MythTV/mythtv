@@ -389,20 +389,10 @@ bool MusicPlayer::openOutputDevice(void)
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
 
-    if (!m_output)
+    if (m_output == nullptr || !m_output->isConfigured())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
-
-        return false;
-    }
-
-    if (!m_output->GetError().isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Error was: %1").arg(m_output->GetError()));
 
         delete m_output;
         m_output = nullptr;

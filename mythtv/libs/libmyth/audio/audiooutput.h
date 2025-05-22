@@ -75,6 +75,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
+    bool isConfigured() { return m_isConfigured; };
 
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0F; }
@@ -212,6 +213,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     void Error(const QString &msg);
 
     QString m_lastError;
+    bool    m_isConfigured      {false};
     bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};
     std::vector<Visualization*> m_visuals;
