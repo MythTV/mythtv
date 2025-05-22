@@ -447,7 +447,9 @@ bool AudioOutputDX::OpenDevice(void)
     m_priv->InitDirectSound(m_UseSPDIF);
     if (!m_priv->m_dsobject || !m_priv->m_dsound_dll)
     {
-        Error(QObject::tr("DirectSound initialization failed"));
+        QString message {QCoreApplication::translate("AudioOutputDX", "DirectSound initialization failed")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 
@@ -519,11 +521,20 @@ bool AudioOutputDX::OpenDevice(void)
         if (FAILED(dsresult))
         {
             if (dsresult == DSERR_UNSUPPORTED)
-                Error(QObject::tr("Unsupported format for device %1:%2")
-                      .arg(m_priv->m_device_num).arg(m_priv->m_device_name));
+            {
+                QString message {
+                    QCoreApplication::translate("AudioOutputDX", "Unsupported format for device %1:%2")
+                    .arg(m_priv->m_device_num).arg(m_priv->m_device_name)};
+                dispatchError(message);
+                LOG(VB_GENERAL, LOG_ERR, message);
+            {
             else
-                Error(QObject::tr("Failed to create DS buffer 0x%1")
-                      .arg((DWORD)dsresult, 0, 16));
+            {
+                QString message {QCoreApplication::translate("AudioOutputDX", "Failed to create DS buffer 0x%1")
+                      .arg((DWORD)dsresult, 0, 16)};
+                dispatchError(message);
+                LOG(VB_GENERAL, LOG_ERR, message);
+            }
             return false;
         }
         LOG(VB_AUDIO, LOG_INFO, LOC + "Using software mixer");

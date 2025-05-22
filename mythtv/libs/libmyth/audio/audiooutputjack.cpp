@@ -62,8 +62,9 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     m_client = JackClientOpen();
     if (!m_client)
     {
-        Error(LOC + tr("Cannot start/connect to jack server "
-               "(to check supported rate/channels)"));
+        QString message {LOC + tr("Cannot start/connect to jack server (to check supported rate/channels)")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return nullptr;
     }
 
@@ -72,7 +73,9 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 
     if (!rate)
     {
-        Error(LOC + tr("Unable to retrieve jack server sample rate"));
+        QString message {LOC + tr("Unable to retrieve jack server sample rate")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return nullptr;
     }
     settings->AddSupportedRate(rate);
@@ -85,7 +88,9 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
         matching_ports { JackGetPorts(), &jack_free };
     if (!matching_ports || !matching_ports.get()[0])
     {
-        Error(LOC + tr("No ports available to connect to"));
+        QString message {LOC + tr("No ports available to connect to")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return nullptr;
     }
     // Count matching ports from 2nd port upwards
@@ -117,8 +122,10 @@ bool AudioOutputJACK::OpenDevice()
     // We have a hard coded channel limit - check we haven't exceeded it
     if (m_channels > JACK_CHANNELS_MAX)
     {
-        Error(LOC + tr("Requested more channels: (%1), than the maximum: %2")
-                   .arg(m_channels).arg(JACK_CHANNELS_MAX));
+        QString message {LOC + tr("Requested more channels: (%1), than the maximum: %2")
+                   .arg(m_channels).arg(JACK_CHANNELS_MAX)};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 
@@ -133,7 +140,9 @@ bool AudioOutputJACK::OpenDevice()
     m_client = JackClientOpen();
     if (!m_client)
     {
-        Error(LOC + tr("Cannot start/connect to jack server"));
+        QString message {LOC + tr("Cannot start/connect to jack server")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 
@@ -142,7 +151,9 @@ bool AudioOutputJACK::OpenDevice()
         matching_ports { JackGetPorts(), &jack_free };
     if (!matching_ports || !matching_ports.get()[0])
     {
-        Error(LOC + tr("No ports available to connect to"));
+        QString message {LOC + tr("No ports available to connect to")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 
@@ -153,7 +164,9 @@ bool AudioOutputJACK::OpenDevice()
     // ensure enough ports to satisfy request
     if (m_channels > i)
     {
-        Error(LOC + tr("Not enough ports available to connect to"));
+        QString message {LOC + tr("Not enough ports available to connect to")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 
@@ -166,7 +179,9 @@ bool AudioOutputJACK::OpenDevice()
                                       JackPortIsOutput, 0);
         if (!m_ports[i])
         {
-            Error(LOC + tr("Error while registering new jack port: %1").arg(i));
+            QString message {LOC + tr("Error while registering new jack port: %1").arg(i)};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
             return false;
         }
     }
@@ -185,16 +200,30 @@ bool AudioOutputJACK::OpenDevice()
     // These will actually get called after jack_activate()!
     // ...Possibly even before this OpenDevice sub returns...
     if (jack_set_process_callback(m_client, JackCallbackHelper, this))
-        Error(LOC + tr("Error. Unable to set process callback?!"));
+    {
+        QString message {LOC + tr("Error. Unable to set process callback?!")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
+    }
     if (jack_set_xrun_callback(m_client, JackXRunCallbackHelper, this))
-        Error(LOC + tr("Error. Unable to set xrun callback?!"));
+    {
+        QString message {LOC + tr("Error. Unable to set xrun callback?!")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
+    }
     if (jack_set_graph_order_callback(m_client, JackGraphOrderCallbackHelper, this))
-        Error(LOC + tr("Error. Unable to set graph order change callback?!"));
+    {
+        QString message {LOC + tr("Error. Unable to set graph order change callback?!")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
+    }
 
     // Activate! Everything comes into life after here. Beware races
     if (jack_activate(m_client))
     {
-        Error(LOC + tr("Calling jack_activate failed"));
+        QString message {LOC + tr("Calling jack_activate failed")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 
@@ -597,7 +626,9 @@ bool AudioOutputJACK::JackConnectPorts(const char** matching_ports)
     {
         if (jack_connect(m_client, jack_port_name(m_ports[i]), matching_ports[i]))
         {
-            Error(LOC + tr("Calling jack_connect failed on port: %1\n").arg(i));
+            QString message {LOC + tr("Calling jack_connect failed on port: %1\n").arg(i)};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
             return false;
         }
     }
@@ -611,8 +642,12 @@ void AudioOutputJACK::JackClientClose(jack_client_t **client)
     {
         int err = jack_client_close(*client);
         if (err != 0)
-            Error(LOC + tr("Error closing Jack output device. Error: %1")
-                       .arg(err));
+        {
+            QString message {LOC + tr("Error closing Jack output device. Error: %1")
+                       .arg(err)};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
+        }
         *client = nullptr;
     }
 }
