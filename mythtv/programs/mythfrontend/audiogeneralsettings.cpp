@@ -168,6 +168,7 @@ AudioConfigSettings::AudioConfigSettings()
     advancedSettings->addChild(m_mpcm = MPCM());
 
     addChild(m_audioTest = new AudioTest());
+    UpdateAudioTest();
 
         // Set slots
     connect(m_maxAudioChannels, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
