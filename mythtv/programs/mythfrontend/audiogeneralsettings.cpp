@@ -624,7 +624,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                            AV_CODEC_ID_NONE, m_samplerate,
                                            AUDIOOUTPUT_VIDEO,
                                            true, false, 0, &settings);
-    if (result().isEmpty())
+    if (isOutputOpen())
     {
         m_audioOutput->Pause(true);
     }
@@ -643,16 +643,6 @@ AudioTestThread::~AudioTestThread()
 void AudioTestThread::cancel()
 {
     m_interrupted = true;
-}
-
-QString AudioTestThread::result()
-{
-    QString errMsg;
-    if (!m_audioOutput)
-        errMsg = tr("Unable to create AudioOutput.");
-    else
-        errMsg = m_audioOutput->GetError();
-    return errMsg;
 }
 
 void AudioTestThread::setChannel(int channel)
@@ -994,7 +984,7 @@ void AudioTest::prepareTest()
 
     m_at = new AudioTestThread(this, m_main, m_passthrough, m_channels,
                                m_settings, m_quality);
-    if (!m_at->result().isEmpty())
+    if (!m_at->isOutputOpen())
     {
         QString msg = tr("Audio device is invalid or not useable.");
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
