@@ -154,7 +154,7 @@ class AudioTestThread : public MThread
     ~AudioTestThread() override;
 
     void cancel();
-    QString result();
+    bool isOutputOpen() { return m_audioOutput != nullptr && m_audioOutput->GetError().isEmpty(); };
     void setChannel(int channel);
 
   protected:

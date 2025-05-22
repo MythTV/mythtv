@@ -406,7 +406,7 @@ void AudioSetupWizard::toggleSpeakers(void)
 
     m_testThread =
         new AudioTestThread(this, out, out, channels, settings, false);
-    if (!m_testThread->result().isEmpty())
+    if (!m_testThread->isOutputOpen())
     {
         QString msg = QObject::tr("Audio device is invalid or not useable.");
         ShowOkPopup(msg);
