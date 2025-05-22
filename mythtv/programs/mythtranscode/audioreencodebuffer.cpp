@@ -86,6 +86,7 @@ void AudioReencodeBuffer::Reconfigure(const AudioSettings &settings)
     m_bytes_per_frame = m_channels *
         AudioOutputSettings::SampleSize(settings.m_format);
     m_eff_audiorate   = settings.m_sampleRate;
+    m_isConfigured    = true;
 }
 
 /**

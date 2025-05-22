@@ -285,7 +285,6 @@ class AudioOutputBase : public AudioOutput, public MThread
      */
     std::array<uchar,kAudioRingBufferSize> m_audioBuffer  {0};
     [[maybe_unused]] uint m_memoryCorruptionTest3         {0xdeadbeef};;
-    bool              m_configureSucceeded                {false};
     std::chrono::milliseconds m_lengthLastData            {0ms};
 
     // SPDIF Encoder for digital passthrough
