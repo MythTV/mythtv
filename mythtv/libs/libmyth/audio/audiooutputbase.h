@@ -4,6 +4,8 @@
 // POSIX headers
 #include <sys/time.h> // for struct timeval
 
+#include <samplerate.h> // libsamplerate
+
 // Qt headers
 #include <QString>
 #include <QMutex>
@@ -13,7 +15,6 @@
 #include "libmythbase/mthread.h"
 
 #include "audiooutput.h"
-#include "samplerate.h"
 
 namespace soundtouch {
 class SoundTouch;
