@@ -182,8 +182,13 @@ bool AudioOutputOpenSLES::StartPlayer()
         // case FORMAT_FLT:    format_pcm.bitsPerSample    = SL_PCMSAMPLEFORMAT_FIXED_32; break;
 #endif
         default:
-            Error(QObject::tr("Unknown sample format: %1").arg(m_outputFormat));
+        {
+            QString message {QCoreApplication::translate("AudioOutputOpenSLES", "Unknown sample format: %1")
+                .arg(m_outputFormat)};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
             return false;
+        }
     }
     format_pcm.containerSize    = format_pcm.bitsPerSample;
     format_pcm.channelMask      = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;

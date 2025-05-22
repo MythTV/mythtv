@@ -563,8 +563,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         }
     }
 
-    m_lastError.clear();
-
     bool general_deps = true;
 
     /* Set samplerate_tmp and channels_tmp to appropriate values
@@ -630,11 +628,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // initialized yet (e.g. rubbish was provided)
     if (m_sourceChannels <= 0 || m_format <= 0 || m_sampleRate <= 0)
     {
-        m_lastError = QString("Aborting Audio Reconfigure. Invalid audio parameters ch %1 fmt %2 @ %3Hz")
-                        .arg(QString::number(m_sourceChannels),
-                             QString::number(m_format),
-                             QString::number(m_sampleRate)
-                             );
         return;
     }
 
@@ -646,8 +639,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (m_needsDownmix && m_sourceChannels > 8)
     {
-        Error(QObject::tr("Aborting Audio Reconfigure. "
-              "Can't handle audio with more than 8 channels."));
+        QString message {QCoreApplication::translate("AudioOutputBase",
+            "Aborting Audio Reconfigure. Can't handle audio with more than 8 channels.")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return;
     }
 
@@ -702,8 +697,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         m_srcCtx = src_new(2-m_srcQuality, chans, &error);
         if (error)
         {
-            Error(QObject::tr("Error creating resampler: %1")
-                  .arg(src_strerror(error)));
+            QString message {QCoreApplication::translate("AudioOutputBase", "Error creating resampler: %1")
+                .arg(src_strerror(error))};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
             m_srcCtx = nullptr;
             return;
         }
@@ -737,7 +734,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (!m_encoder->Init(AV_CODEC_ID_AC3, 448000, m_sampleRate,
                            m_configuredChannels))
         {
-            Error(QObject::tr("AC-3 encoder initialization failed"));
+            QString message {QCoreApplication::translate("AudioOutputBase", "AC-3 encoder initialization failed")};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
             delete m_encoder;
             m_encoder = nullptr;
             m_enc = false;
@@ -799,10 +798,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // Actually do the device specific open call
     if (!OpenDevice())
     {
-        if (m_lastError.isEmpty())
-            Error(QObject::tr("Aborting reconfigure"));
-        else
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Aborting reconfigure");
+        QString message {QCoreApplication::translate("AudioOutputBase", "Aborting reconfigure")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_INFO, LOC + message);
         return;
     }
 
