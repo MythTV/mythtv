@@ -230,8 +230,10 @@ bool AudioOutputWin::OpenDevice(void)
 
     if (mmr == WAVERR_BADFORMAT)
     {
-        Error(QString("Unable to set audio output parameters %1")
-              .arg(wf.Format.nSamplesPerSec));
+        QString message{QString("Unable to set audio output parameters %1")
+              .arg(wf.Format.nSamplesPerSec)};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return false;
     }
 

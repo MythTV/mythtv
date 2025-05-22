@@ -277,14 +277,6 @@ bool AudioOutput::CanPassthrough(int /*samplerate*/,
     return false;
 }
 
-// TODO: get rid of this if possible...  need to see what uses GetError() and
-//       GetWarning() and why.  These would give more useful logs as macros
-void AudioOutput::Error(const QString &msg)
-{
-    m_lastError = msg;
-    LOG(VB_GENERAL, LOG_ERR, "AudioOutput Error: " + m_lastError);
-}
-
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     QString &name, const QString &desc, bool willsuspendpa)
 {
@@ -683,7 +675,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
     return ret;
 }
 
-void AudioOutput::error(const QString &e)
+void AudioOutput::dispatchError(const QString &e)
 {
     Event event(e);
     dispatch(event);

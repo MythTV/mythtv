@@ -203,14 +203,11 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     void removeVisual(Visualization *v);
 
   protected:
-    void error(const QString &e);
+    void dispatchError(const QString &e);
     void dispatchVisual(uchar *b, unsigned long b_len,
                         std::chrono::milliseconds timecode, int chan, int prec);
     void prepareVisuals();
 
-    void Error(const QString &msg);
-
-    QString m_lastError;
     bool    m_isConfigured      {false};
     bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};

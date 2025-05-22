@@ -473,8 +473,13 @@ bool AudioOutputALSA::OpenDevice()
         case FORMAT_S32:    format = SND_PCM_FORMAT_S32;   break;
         case FORMAT_FLT:    format = SND_PCM_FORMAT_FLOAT; break;
         default:
-            Error(QObject::tr("Unknown sample format: %1").arg(m_outputFormat));
+        {
+            QString message {QCoreApplication::translate("AudioOutputALSA", "Unknown sample format: %1")
+                .arg(m_outputFormat)};
+            dispatchError(message);
+            LOG(VB_GENERAL, LOG_ERR, message);
             return false;
+        }
     }
 
     // buffer 0.5s worth of samples
@@ -551,7 +556,9 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
     if (m_pcmHandle == nullptr)
     {
-        Error("WriteAudio() called with pcm_handle == nullptr!");
+        QString message {"WriteAudio() called with pcm_handle == nullptr!"};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return;
     }
 
@@ -617,10 +624,13 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 #endif
 
             case -EBADFD:
-                Error(
-                    QString("WriteAudio: device is in a bad state (state = %1)")
-                    .arg(snd_pcm_state(m_pcmHandle)));
+            {
+                QString message {QString("WriteAudio: device is in a bad state (state = %1)")
+                    .arg(snd_pcm_state(m_pcmHandle))};
+                dispatchError(message);
+                LOG(VB_GENERAL, LOG_ERR, message);
                 return;
+            }
 
             default:
                 AERROR(QString("WriteAudio: Write failed, state: %1, err")
@@ -676,7 +686,10 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     if (handle == nullptr)
     {
-        Error(QObject::tr("SetParameters() called with handle == nullptr!"));
+        QString message {QCoreApplication::translate("AudioOutputALSA",
+            "SetParameters() called with handle == nullptr!")};
+        dispatchError(message);
+        LOG(VB_GENERAL, LOG_ERR, message);
         return -1;
     }
 
