@@ -127,13 +127,9 @@ QString AudioPlayer::ReinitAudio(void)
             aos.m_init = false;
 
         m_audioOutput = AudioOutput::OpenAudio(aos);
-        if (!m_audioOutput)
+        if (m_audioOutput == nullptr || !m_audioOutput->isConfigured())
         {
             errMsg = tr("Unable to create AudioOutput.");
-        }
-        else
-        {
-            errMsg = m_audioOutput->GetError();
         }
         AddVisuals();
     }
@@ -143,7 +139,10 @@ QString AudioPlayer::ReinitAudio(void)
                                      m_state.m_sampleRate, m_state.m_passthru, 0,
                                      m_state.m_codecProfile);
         m_audioOutput->Reconfigure(settings);
-        errMsg = m_audioOutput->GetError();
+        if (!m_audioOutput->isConfigured())
+        {
+            errMsg = tr("AudioOutput has not been successfully configured.");
+        }
         SetStretchFactor(m_stretchFactor);
     }
 

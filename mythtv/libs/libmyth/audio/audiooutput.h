@@ -150,8 +150,6 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
 
     virtual void SetSourceBitrate(int /*rate*/ ) { }
 
-    QString GetError(void)   const { return m_lastError; }
-
     virtual void GetBufferStatus(uint &fill, uint &total)
         { fill = total = 0; }
 
