@@ -25,7 +25,6 @@ class TestCopyFrames : public QObject
     Q_OBJECT
 
   private slots:
-    void initTestCase();
     static void TestInvalidFrames();
     static void TestInvalidFormats();
     static void TestInvalidSizes();
