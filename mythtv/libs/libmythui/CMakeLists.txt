@@ -75,6 +75,7 @@ set(HEADERS_TO_INSTALL
 
 set(LIBMYTHUI_HEADERS_NOT_INSTALLED
     devices/mythinputdevicehandler.h
+    dbsettings.h
     guistartup.h
     mythdisplay.h
     mythdisplaymode.h
@@ -100,6 +101,7 @@ add_library(
   ${HEADERS_TO_INSTALL}
   ${LIBMYTHUI_HEADERS_NOT_INSTALLED}
   devices/mythinputdevicehandler.cpp
+  dbsettings.cpp
   guistartup.cpp
   langsettings.cpp
   mediamonitor.cpp

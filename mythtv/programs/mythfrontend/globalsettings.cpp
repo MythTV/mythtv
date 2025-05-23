@@ -20,7 +20,7 @@
 #include <QtGlobal>
 
 // MythTV headers
-#include "libmyth/dbsettings.h"
+#include "libmythui/dbsettings.h"
 #include "libmythui/langsettings.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythconfig.h"
