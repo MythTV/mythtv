@@ -9,10 +9,6 @@ extern "C" {
 #include "libmythbase/mythrandom.h"
 #include "libmythtv/mythframe.h"
 
-void TestCopyFrames::initTestCase(void)
-{
-}
-
 void TestCopyFrames::TestInvalidFrames()
 {
     MythVideoFrame dummy;
