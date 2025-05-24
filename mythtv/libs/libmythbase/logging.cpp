@@ -688,6 +688,10 @@ void logStop(void)
     {
         logThread->stop();
         logThread->wait();
+        qDeleteAll(verboseMap);  // delete VerboseDef memory in map values
+        verboseMap.clear();
+        qDeleteAll(loglevelMap); // delete LoglevelDef memory in map values
+        loglevelMap.clear();
         delete logThread;
         logThread = nullptr;
     }
@@ -843,7 +847,9 @@ void verboseInit(void)
 {
     QMutexLocker locker(&verboseMapMutex);
     QMutexLocker locker2(&loglevelMapMutex);
+    qDeleteAll(verboseMap);  // delete VerboseDef memory in map values
     verboseMap.clear();
+    qDeleteAll(loglevelMap); // delete LoglevelDef memory in map values
     loglevelMap.clear();
 
     // This looks funky, so I'll put some explanation here.  The verbosedefs.h
