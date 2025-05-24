@@ -30,7 +30,7 @@
 
             &nbsp;&nbsp;&nbsp; {{ 'dashboard.recordings.recgrp' | translate }}: &nbsp;
 
-            <p-dropdown [(ngModel)]="selectedRecGroup" [options]="recGroups" name="filter" (onChange)="onFilter()"
+            <p-dropdown [(ngModel)]="selectedRecGroup" [options]="usedRecGroups" name="filter" (onChange)="onFilter()"
                 placeholder="{{ 'settings.chanedit.all' | translate }}" [showClear]="true" class="'px-3">
             </p-dropdown>
 
@@ -209,7 +209,7 @@
             <div class="form-group field">
                 <label for="RecGroup" class="label block">{{ 'dashboard.sched.recgroup_label' | translate
                     }}</label>
-                <p-dropdown appendTo="body" [options]="recGroups" [(ngModel)]="program.Recording.RecGroup"
+                <p-dropdown appendTo="body" [options]="allRecGroups" [(ngModel)]="program.Recording.RecGroup"
                     [editable]="true" [maxlength]="64" [style]="{'minWidth':'400px'}" name="RecGroup"
                     #RecGroup="ngModel">
                 </p-dropdown>
@@ -246,7 +246,7 @@
                 <input pInputText id="newrecgroup" [(ngModel)]="newRecGroup" name="newrecgroup" #newrecgroup="ngModel"
                     class="mb-2 form-control w-full" />
             </div>
-            <p-listbox [options]="recGroups" [(ngModel)]="newRecGroup" name="recgrplist" #recgrplist="ngModel">
+            <p-listbox [options]="allRecGroups" [(ngModel)]="newRecGroup" name="recgrplist" #recgrplist="ngModel">
             </p-listbox>
             <ng-template pTemplate="footer">
                 <p-button icon="pi pi-times-circle" (onClick)="displayRecGrpDlg=false"

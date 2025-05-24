@@ -28,7 +28,8 @@ export class RecordingsComponent implements OnInit {
   programs: ScheduleOrProgram[] = [];
   selection: ScheduleOrProgram[] = [];
   actionList: ScheduleOrProgram[] = [];
-  recGroups: string[] = [];
+  allRecGroups: string[] = [];
+  usedRecGroups: string[] = [];
   newRecGroup = '';
   lazyLoadEvent?: TableLazyLoadEvent;
   JobQCmds!: JobQCommands;
@@ -114,9 +115,13 @@ export class RecordingsComponent implements OnInit {
     public utility: UtilityService) {
     this.JobQCmds = this.setupService.getJobQCommands();
 
+    this.dvrService.GetRecGroupList()
+      .subscribe((data) => {
+        this.allRecGroups = data.RecGroupList;
+      });
     this.dvrService.GetRecGroupList('recorded')
       .subscribe((data) => {
-        this.recGroups = data.RecGroupList;
+        this.usedRecGroups = data.RecGroupList;
       });
     // translations
     for (const [key, value] of Object.entries(this.msg)) {
