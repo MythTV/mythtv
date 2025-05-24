@@ -217,5 +217,7 @@ int MythNVControl::GetDisplayID() const
             .arg((size - 4) / 4));
     }
 
-    return static_cast<int>(data[1]);
+    int dispId = static_cast<int>(data[1]);
+    free(data);
+    return dispId;
 }
