@@ -319,6 +319,10 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
         {
             if (actualtype == XA_INTEGER && actualformat == 8)
                 m_edid = MythEDID(reinterpret_cast<const char*>(data), static_cast<int>(nitems));
+            if (data)
+            {
+                XFree(data);
+            }
         }
         break;
     }
