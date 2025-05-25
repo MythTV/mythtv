@@ -122,6 +122,9 @@ SignalHandler::~SignalHandler()
     }
 
     m_sigMap.clear();
+
+    delete [] m_sigStack;
+    m_sigStack = nullptr;
 #endif
 }
 
