@@ -1501,13 +1501,14 @@ enum CPCI_IDS : std::uint8_t {
 };
 
 cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
-  : m_infoLengthPos(m_length)
 {
   m_capmt[m_length++] = cplm; // ca_pmt_list_management
   m_capmt[m_length++] = (ProgramNumber >> 8) & 0xFF;
   m_capmt[m_length++] =  ProgramNumber       & 0xFF;
   m_capmt[m_length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
 
+  // program_info_length
+  m_infoLengthPos = m_length;
   m_capmt[m_length++] = 0x00;
   m_capmt[m_length++] = 0x00;
 }
