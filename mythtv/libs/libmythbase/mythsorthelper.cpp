@@ -130,8 +130,7 @@ static std::shared_ptr<MythSortHelper> singleton = nullptr;
 std::shared_ptr<MythSortHelper> getMythSortHelper(void)
 {
     if (singleton == nullptr)
-        // coverity[resource_leak]
-        singleton = std::make_shared<MythSortHelper>(new MythSortHelper());
+        singleton = std::make_shared<MythSortHelper>();
     return singleton;
 }
 
