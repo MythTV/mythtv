@@ -2,18 +2,16 @@
 
 """API Client."""
 
-from os import fdopen
-
-from lxml import html
-from xml.etree import ElementTree
+import json
 import re
 import sys
 import tempfile
 import logging
+from os import fdopen
+from lxml import etree,html
 
 try:
     import requests
-    from requests.auth import HTTPDigestAuth
 except ImportError:
     sys.exit('Install python-requests or python3-requests')
 
@@ -21,7 +19,9 @@ from ._version import __version__
 from .mythversions import MYTHTV_VERSION_LIST
 
 
-class Send(object):
+
+# pylint: disable=too-many-instance-attributes
+class Send():
     """Services API."""
 
     def __init__(self, host, port=6544):
@@ -43,8 +43,10 @@ class Send(object):
         self.host = host
         self.port = port
         self.endpoint = None
+        self.jsondata = None
         self.postdata = None
         self.rest = None
+        self.session_token = None
         self.opts = None
         self.session = None
         self.server_version = 'Set to MythTV version after calls to send()'
@@ -52,7 +54,9 @@ class Send(object):
 
         logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-    def send(self, endpoint='', postdata=None, jsondata=None, rest='', opts=None):
+    # pylint: disable=too-many-arguments,too-many-statements
+    def send(self, endpoint='', postdata=None, jsondata=None, rest='',
+             opts=None):
         """
         Form a URL and send it to the back/frontend.  Parameter/option checking
         and session creation (if required) is done here. Error handling is done
@@ -124,8 +128,8 @@ class Send(object):
                          this socket. Long downloads are not affected by this
                          option. Defaults to 10 seconds.
 
-        opts['user']:    Digest authentication. Usually not turned on in the
-        opts['pass']:    backend.
+        opts['user']:    Authentication. Optionally turned on via the Web App.
+        opts['pass']:    Available in v36-Pre. [Was for digest authentication]
 
         opts['usexml']:  For testing only! If True, causes the backend to send
                          its response in XML rather than JSON. Defaults to
@@ -218,13 +222,6 @@ class Send(object):
         if self.postdata:
             self._validate_postdata()
 
-        exceptions = (requests.exceptions.HTTPError,
-                      requests.exceptions.URLRequired,
-                      requests.exceptions.Timeout,
-                      requests.exceptions.ConnectionError,
-                      requests.exceptions.InvalidURL,
-                      KeyboardInterrupt)
-
         ##############################################################
         # Actually try to get the data and handle errors.            #
         ##############################################################
@@ -236,29 +233,25 @@ class Send(object):
                                              timeout=self.opts['timeout'])
             else:
                 response = self.session.get(url, timeout=self.opts['timeout'])
-        except exceptions:
-            raise RuntimeError('Connection problem/Keyboard Interrupt, URL={}'
-                               .format(url))
+        except SessionException().errors as session_errors:
+            raise RuntimeError(f'Connection problem/Keyboard Interrupt, '
+                               f'URL={url}') from session_errors
 
         if response.status_code == 401:
-            raise RuntimeError('Unauthorized (401). Need valid user/password.')
+            raise RuntimeError('Unauthorized (401). Set valid user/pass opts.')
 
         # TODO: Should handle redirects here (mostly for remote backends.)
         if response.status_code > 299:
             self.logger.debug('%s', response.text)
             try:
-                reason = (ElementTree.fromstring(response.text)
-                          .find('errorDescription').text)
-            except ElementTree.ParseError:
-                try:
-                    doc = html.fromstring(response.text)
-                    reason = doc.text_content()
-                except:
-                    reason = 'N/A'
-            raise RuntimeError('Unexpected status returned: {}: Reason: "{}" '
-                               'URL was: {}'
-                               .format(response.status_code,
-                                       reason, url))
+                doc = html.fromstring(response.text)
+            except etree.ParserError:
+                reason = 'N/A'
+            else:
+                reason = doc.findtext('.//h1')
+            raise RuntimeError(f'Unexpected status code: '
+                               f'{response.status_code}, Reason: "{reason}", '
+                               f'URL: {url}')
 
         self._validate_header(response.headers['Server'])
 
@@ -285,13 +278,13 @@ class Send(object):
             with fdopen(handle, 'wb') as f_obj:
                 for chunk in response.iter_content(chunk_size=8192):
                     f_obj.write(chunk)
-            raise RuntimeWarning('Image file = "{}"'.format(filename))
-        else:
-            try:
-                self.logger.debug('1st 60 bytes of response: %s',
-                                  response.text[:60])
-            except UnicodeEncodeError:
-                pass
+            raise RuntimeWarning(f'Image file = "{filename}"')
+
+        try:
+            self.logger.debug('1st 60 bytes of response: %s',
+                              response.text[:60])
+        except UnicodeEncodeError:
+            pass
 
         if self.opts['usexml']:
             return response.text
@@ -302,8 +295,8 @@ class Send(object):
         try:
             return response.json()
         except ValueError as err:
-            raise RuntimeError('Set loglevel=DEBUG to see JSON parse error: {}'
-                               .format(err))
+            raise RuntimeError(f'Set loglevel=DEBUG to see JSON parse error: '
+                               f'{err}') from err
 
     def close_session(self):
         """
@@ -336,10 +329,8 @@ class Send(object):
 
         self.logger.debug('opts=%s', self.opts)
 
-        return
-
     def _form_url(self):
-        """Do basic sanity checks and then form the URL."""
+        """ Do basic sanity checks and then form the URL. """
 
         if self.host == '':
             raise RuntimeError('No host name.')
@@ -358,8 +349,7 @@ class Send(object):
         else:
             self.rest = '?' + self.rest
 
-        return 'http://{}:{}/{}{}'.format(self.host, self.port, self.endpoint,
-                                          self.rest)
+        return f'http://{self.host}:{self.port}/{self.endpoint}{self.rest}'
 
     def _validate_postdata(self):
         """
@@ -387,8 +377,13 @@ class Send(object):
         """
 
         self.session = requests.Session()
-        self.session.headers.update({'User-Agent': 'Python Services API v{}'
-                                                   .format(__version__)})
+        self.session.headers.update({'User-Agent': 'Python Services API '
+                                     f'v{__version__}'})
+        self.session.headers.update({'Accept': 'application/json'})
+
+        self._get_api_session_token()
+        if self.session_token:
+            self.session.headers.update({'authorization': self.session_token})
 
         if self.opts['noetag']:
             self.session.headers.update({'Cache-Control': 'no-store'})
@@ -401,32 +396,36 @@ class Send(object):
 
         if self.opts['usexml'] or self.opts['rawxml']:
             self.session.headers.update({'Accept': ''})
-        else:
-            self.session.headers.update({'Accept': 'application/json'})
 
         self.logger.debug('New session')
 
-        # TODO: Problem with the BE not accepting postdata in the initial
-        # authorized query, Send a GET first as a workaround.
+    def _get_api_session_token(self):
+        """ v36+ replaces original digest authentication.  """
 
         try:
-            if self.opts['user'] and self.opts['pass']:
-                self.session.auth = HTTPDigestAuth(self.opts['user'],
-                                                   self.opts['pass'])
-                if self.postdata:
-                    saved_endpoint = self.endpoint
-                    saved_postdata = self.postdata
-                    saved_opts = self.opts
-                    self.send(endpoint='{}/version'.format(
-                        self.endpoint[:self.endpoint.find('/')],
-                        opts=self.opts))
-                    self.endpoint = saved_endpoint
-                    self.postdata = saved_postdata
-                    self.opts = saved_opts
-
+            login_postdata = {}
+            login_postdata['UserName'] = self.opts['user']
+            login_postdata['Password'] = self.opts['pass']
         except KeyError:
-            # Proceed without authentication.
-            pass
+            self.session_token = None
+            return
+
+        url = f'http://{self.host}:{self.port}/Myth/LoginUser'
+
+        try:
+            response =  self.session.post(url, data=login_postdata,
+                                          timeout=self.opts['timeout'])
+        except SessionException().errors as session_errors:
+            raise RuntimeError(f'Connection problem/Keyboard Interrupt, '
+                               f'URL={url}') from session_errors
+
+        if response.status_code > 399:
+            raise RuntimeError(f'Authorization Failed. Need valid user/pass. '
+                               f'Got Status Code={response.status_code}')
+
+        token = json.loads(response.text)
+
+        self.session_token = token["String"]
 
     def _validate_header(self, header):
         """
@@ -442,8 +441,8 @@ class Send(object):
         """
 
         if not header:
-            raise RuntimeError('No HTTP Server header returned from host {}.'
-                               .format(self.host))
+            raise RuntimeError(f'No HTTP Server header returned from host '
+                               f'{self.host}.')
 
         self.logger.debug('Received Server: %s', header)
 
@@ -452,8 +451,7 @@ class Send(object):
                 self.server_version = version
                 return
 
-        raise RuntimeError('Tested on {}, not: {}.'
-                           .format(MYTHTV_VERSION_LIST, header))
+        raise RuntimeError(f'Tested on {MYTHTV_VERSION_LIST}, not: {header}.')
 
     @property
     def get_server_version(self):
@@ -465,9 +463,7 @@ class Send(object):
 
     @property
     def get_opts(self):
-        """
-        Returns all opts{}, whether set manually or automatically.
-        """
+        """ Returns all opts{}, whether set manually or automatically. """
         return self.opts
 
     def get_headers(self, header=None):
@@ -484,5 +480,17 @@ class Send(object):
             return self.session.headers
 
         return self.session.headers[header]
+
+
+class SessionException():
+    """ Things that can go wrong with POSTs or GETS used here. """
+
+    def __init__(self):
+        self.errors = (requests.exceptions.HTTPError,
+                       requests.exceptions.URLRequired,
+                       requests.exceptions.Timeout,
+                       requests.exceptions.ConnectionError,
+                       requests.exceptions.InvalidURL,
+                       KeyboardInterrupt)
 
 # vim: set expandtab tabstop=4 shiftwidth=4 smartindent noai colorcolumn=80:

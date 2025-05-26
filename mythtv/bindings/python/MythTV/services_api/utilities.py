@@ -10,7 +10,7 @@ from ._version import __version__
 # pylint: disable=no-name-in-module, import-error
 try:
     from urllib.parse import quote
-except:
+except ImportError:
     sys.exit('Unable to import urllib')
 # pylint: enable=no-name-in-module, import-error
 
@@ -175,7 +175,7 @@ def rec_status_to_string(backend=None, rec_status=0, opts=None):
             return REC_STATUS_CACHE[rec_status]
         except (KeyError, NameError, ValueError):
             endpoint = 'Dvr/RecStatusToString'
-            rest = 'RecStatus={}'.format(rec_status)
+            rest = f'RecStatus={rec_status}'
 
             resp_dict = backend.send(endpoint=endpoint, rest=rest, opts=opts)
 
@@ -205,7 +205,7 @@ def rec_type_to_string(backend=None, rec_type=0, opts=None):
             return REC_TYPE_CACHE[rec_type]
         except (KeyError, NameError, ValueError):
             endpoint = 'Dvr/RecTypeToString'
-            rest = 'RecType={}'.format(rec_type)
+            rest = f'RecType={rec_type}'
 
             resp_dict = backend.send(endpoint=endpoint, rest=rest, opts=opts)
 
@@ -235,7 +235,7 @@ def dup_method_to_string(backend=None, dup_method=0, opts=None):
             return DUP_METHOD_CACHE[dup_method]
         except (KeyError, NameError, ValueError):
             endpoint = 'Dvr/DupMethodToString'
-            rest = 'DupMethod={}'.format(dup_method)
+            rest = f'DupMethod={dup_method}'
 
             resp_dict = backend.send(endpoint=endpoint, rest=rest, opts=opts)
 
