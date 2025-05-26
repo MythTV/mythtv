@@ -152,7 +152,31 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     AudioOutput    *m_audio               {nullptr};
     const AVCodec  *m_codec               {nullptr};
     AVCodecContext *m_codecContext        {nullptr};
+
     QList<int>      m_audioFormat;
+    //< For Apple Lossless streams, this data is passed as a series of
+    //  12 integers.  Note: this is the format of the stream between
+    //  sender and receiver, not the format of the file being played.
+    //  An MP3 file is sent as an ALAC stream.
+    //
+    //   0: stream number (matches a=rtpmap:XX)
+    //   1: frameLength - default frames per packet
+    //   2: compatibleVersion  (must be 0)
+    //   3: bitDepth           (max 32)
+    //   4: pb                 (should be 40)
+    //   5: mb                 (should be 10)
+    //   6: kb                 (should be 14)
+    //   7: numChannels
+    //   8: maxRun             (unused, set to 255)
+    //   9: maxFrameBytes      (0 is unknown)
+    //  10: avgBitRate         (0 is unknown)
+    //  11: sampleRate
+    //
+    //  Example:
+    //  a=fmtp:96 352 0 16 40 10 14 2 255 0 0 44100
+    //
+    //  See https://github.com/macosforge/alac/blob/c38887c5c5e64a4b31108733bd79ca9b2496d987/ALACMagicCookieDescription.txt#L48
+
     int             m_channels            {2};
     int             m_sampleSize          {16};
     int             m_frameRate           {44100};

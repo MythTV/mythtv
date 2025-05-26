@@ -1776,6 +1776,7 @@ bool MythRAOPConnection::CreateDecoder(void)
             return false;
         }
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Opened ALAC decoder.");
+        m_codecContext->sample_rate = m_audioFormat[11]; // sampleRate
     }
 
     return true;
