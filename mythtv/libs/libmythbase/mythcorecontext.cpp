@@ -120,6 +120,7 @@ class MythCoreContextPrivate : public QObject
 
     QList<QHostAddress> m_approvedIps;
     QList<QHostAddress> m_deniedIps;
+    QMutex m_listMutex;
 
     MythPower *m_power { nullptr };
 };
@@ -1310,6 +1311,8 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer, bool log)
 {
     static const QHostAddress kLinkLocal("fe80::");
+    // Ensure m_approvedIps and m_deniedIps are single threaded
+    QMutexLocker lock(&d->m_listMutex);
     if (d->m_approvedIps.contains(peer))
         return true;
     if (d->m_deniedIps.contains(peer))
