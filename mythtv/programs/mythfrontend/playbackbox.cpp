@@ -1217,9 +1217,9 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
+    haveIcon = false;
     if (pginfo && iconState)
     {
-        haveIcon = false;
         uint props = pginfo->GetVideoProperties();
 
         iconMap.clear();
@@ -1249,11 +1249,10 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
                 }
             }
         }
-
-        if (!haveIcon)
-            iconState->Reset();
     }
 
+    if (iconState && !haveIcon)
+        iconState->Reset();
     iconMap.clear();
     iconMap["damaged"] = VID_DAMAGED;
 
