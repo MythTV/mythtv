@@ -207,6 +207,8 @@ void CDRipperThread::run(void)
     m_totalSectorsDone = 0;
     for (int trackno = 0; trackno < m_tracks->size(); trackno++)
     {
+        if (!m_tracks->at(trackno)->active)
+            continue;
         m_totalSectors += getSectorCount(m_cdDevice, trackno + 1);
     }
 
@@ -292,7 +294,9 @@ void CDRipperThread::run(void)
                 new RipStatusEvent(RipStatusEvent::kTrackPercentEvent, 0));
 
             // do we need to start a new file?
-            if (m_tracks->at(trackno)->active)
+            if (!m_tracks->at(trackno)->active)
+                continue;
+
             {
                 titleTrack = track;
                 titleTrack->setLength(m_tracks->at(trackno)->length);
@@ -353,7 +357,6 @@ void CDRipperThread::run(void)
                 return;
             }
 
-            if (m_tracks->at(trackno)->active)
             {
                 QString ext = QFileInfo(outfile).suffix();
                 QString destFile = filenameFromMetadata(titleTrack) + '.' + ext;
@@ -763,7 +766,8 @@ void Ripper::ScanFinished()
         m_genreName.clear();
         m_year.clear();
 
-        for (int trackno = 0; trackno < m_decoder->getNumTracks(); trackno++)
+        int max_tracks = m_decoder->getNumTracks();
+        for (int trackno = 0; trackno < max_tracks; trackno++)
         {
             auto *ripTrack = new RipTrack;
 
@@ -911,7 +915,7 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
 
         // delete file
         // FIXME: RemoteFile::DeleteFile will only work with files on the master BE
-        if (!RemoteFile::DeleteFile(filename))
+        if (RemoteFile::Exists(filename) && !RemoteFile::DeleteFile(filename))
         {
             LOG(VB_GENERAL, LOG_NOTICE, QString("Ripper::deleteExistingTrack() "
                                                 "Could not delete %1")
