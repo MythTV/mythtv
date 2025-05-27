@@ -26,7 +26,7 @@
                 </th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-program >
+        <ng-template pTemplate="body" let-program>
             <tr [ngClass]="getClasses(program)">
                 <td style="flex-basis: 8%" class="justify-content-end p-1 overflow-hidden">
                     <div [innerHTML]="formatStartDate(program)"></div>
@@ -48,9 +48,10 @@
                 <td style="flex-basis: 10%" class="p-1">
                     {{program.Channel.ChanNum}} {{program.Channel.CallSign}}</td>
                 <td style="flex-basis: 7%" class="p-1">
-                    <div *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1?
+                    <!-- Recorded = -3, Recording = -2, WillRecord = -1, -->
+                    <div *ngIf="program.Recording" [ngClass]="[-3,-2,-1].indexOf(program.Recording.Status)>-1?
                         'bg-green-500' : 'bg-pink-500'" class="text-white">
-                        <b>{{dataService.recStatusText[program.Recording.StatusName]}}</b>
+                        <b>{{program.Recording.StatusName}}</b>
                     </div>
                 </td>
                 <td style="flex-basis: 2%; background: var(--surface-card);" class="p-1">

@@ -140,7 +140,8 @@
                         <td class="p-1">{{program.Recording.RecGroup}}</td>
                         <td class="p-1">
                             <div class="mycell">
-                                <div class="mytext" *ngIf="program.Recording" [ngClass]="['WillRecord','Recording','Recorded'].indexOf(program.Recording.StatusName)>-1 ?
+                                <!-- Recorded = -3, Recording = -2, WillRecord = -1, -->
+                                <div class="mytext" *ngIf="program.Recording" [ngClass]="[-3,-2,-1].indexOf(program.Recording.Status)>-1 ?
                                 'text-green-500' : 'text-pink-500'">
                                     {{ program.Recording.StatusName }}
                                 </div>

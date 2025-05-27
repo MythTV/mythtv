@@ -4,9 +4,10 @@
     <div class="programBody">
         <div class="programCatType">{{ program.Category }}</div>
         <div *ngIf="program.Recording">
-            <div class="programCatType" [ngClass]="['WillRecord','Recording'].indexOf(program.Recording.StatusName)>-1?
+            <!-- Recorded = -3, Recording = -2, WillRecord = -1, -->
+            <div class="programCatType" [ngClass]="[-3,-2,-1].indexOf(program.Recording.Status)>-1?
                 'bg-green-500' : 'bg-pink-400'">
-                {{ dataService.recStatusText[program.Recording.StatusName] }}</div>
+                {{ program.Recording.StatusName }}</div>
         </div>
         <div class="programSubtitle">{{(program.Season ? 'S' + program.Season + 'E' + program.Episode : '') + ' ' +
             program.SubTitle }}</div>
