@@ -266,16 +266,18 @@ void AudioOutputPulseAudio::CloseDevice()
 
     if (m_pcontext)
     {
-        pa_operation *op;
-        if ((op = pa_context_drain(m_pcontext, ContextDrainCallback, nullptr)))
+        pa_operation *op = pa_context_drain(m_pcontext, ContextDrainCallback, m_mainloop);
+        if (op)
         {
+            // Wait for the asynchronous draining to complete
+            while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            {
+                pa_threaded_mainloop_wait(m_mainloop);
+            }
             pa_operation_unref(op);
         }
-        else
-        {
-            pa_context_disconnect(m_pcontext);
-            pa_context_unref(m_pcontext);
-        }
+        pa_context_disconnect(m_pcontext);
+        pa_context_unref(m_pcontext);
         m_pcontext = nullptr;
     }
 
@@ -691,10 +693,10 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
         LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag + "stream flush operation failed ");
 }
 
-void AudioOutputPulseAudio::ContextDrainCallback(pa_context *c, void */*arg*/)
+void AudioOutputPulseAudio::ContextDrainCallback(pa_context */*c*/, void *arg)
 {
-    pa_context_disconnect(c);
-    pa_context_unref(c);
+    pa_threaded_mainloop *mloop = (pa_threaded_mainloop *)arg;
+    pa_threaded_mainloop_signal(mloop, 0);
 }
 
 void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
