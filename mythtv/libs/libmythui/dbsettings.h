@@ -6,10 +6,9 @@
 
 // MythTV headers
 #include "libmythui/standardsettings.h"
+#include "mythuiexp.h"
 
-#include "mythexp.h"
-
-class MPUBLIC DatabaseSettings : public GroupSetting
+class MUI_PUBLIC DatabaseSettings : public GroupSetting
 {
     Q_OBJECT
 

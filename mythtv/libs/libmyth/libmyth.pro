@@ -37,7 +37,7 @@ HEADERS += audio/volumebase.h audio/eldutils.h
 HEADERS += audio/audiooutputgraph.h
 HEADERS += audio/freesurround.h
 HEADERS += audio/freesurround_decoder.h
-HEADERS += backendselect.h dbsettings.h
+HEADERS += backendselect.h
 HEADERS += mythaverror.h
 HEADERS += mythavframe.h
 HEADERS += mythcontext.h
@@ -55,7 +55,7 @@ SOURCES += audio/volumebase.cpp audio/eldutils.cpp
 SOURCES += audio/audiooutputgraph.cpp
 SOURCES += audio/freesurround.cpp
 SOURCES += audio/freesurround_decoder.cpp
-SOURCES += backendselect.cpp dbsettings.cpp
+SOURCES += backendselect.cpp
 SOURCES += mythaverror.cpp mythcontext.cpp
 SOURCES += output.cpp
 
