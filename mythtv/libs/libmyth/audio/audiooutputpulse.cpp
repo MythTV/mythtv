@@ -266,15 +266,18 @@ void AudioOutputPulseAudio::CloseDevice()
 
     if (m_pcontext)
     {
-        pa_operation *op = pa_context_drain(m_pcontext, ContextDrainCallback, m_mainloop);
-        if (op)
+        if (m_mainloop)
         {
-            // Wait for the asynchronous draining to complete
-            while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            pa_operation *op = pa_context_drain(m_pcontext, ContextDrainCallback, m_mainloop);
+            if (op)
             {
-                pa_threaded_mainloop_wait(m_mainloop);
+                // Wait for the asynchronous draining to complete
+                while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+                {
+                    pa_threaded_mainloop_wait(m_mainloop);
+                }
+                pa_operation_unref(op);
             }
-            pa_operation_unref(op);
         }
         pa_context_disconnect(m_pcontext);
         pa_context_unref(m_pcontext);
