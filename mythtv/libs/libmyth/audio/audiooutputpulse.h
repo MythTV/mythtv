@@ -48,6 +48,7 @@ class AudioOutputPulseAudio : public AudioOutputBase
     bool ConnectPlaybackStream(void);
     void FlushStream(const char *caller);
 
+    static void ContextDrainCallback(pa_context *c, void *arg);
     static void ContextStateCallback(pa_context *c, void *arg);
     static void StreamStateCallback(pa_stream *s, void *arg);
     static void OpCompletionCallback(pa_context *c, int ok, void *arg);
@@ -58,6 +59,8 @@ class AudioOutputPulseAudio : public AudioOutputBase
     static void SinkInfoCallback(pa_context *c, const pa_sink_info *info,
                                  int eol, void *arg);
 
+    pa_proplist            *m_ctproplist {nullptr};
+    pa_proplist            *m_stproplist {nullptr};
     pa_context             *m_pcontext   {nullptr};
     pa_stream              *m_pstream    {nullptr};
     pa_threaded_mainloop   *m_mainloop   {nullptr};
