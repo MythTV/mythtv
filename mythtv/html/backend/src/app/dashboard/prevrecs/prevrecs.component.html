@@ -49,8 +49,9 @@
             <p-table #table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
                 [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm  p-datatable-striped"
                 [virtualScroll]="true" [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-                sortField="StartTime" selectionMode="multiple" [metaKeySelection]="true" [(selection)]="selection"
-                (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()" (onSort)="refresh()">
+                [sortField]="sortField" [sortOrder]="sortOrder" selectionMode="multiple" [metaKeySelection]="true"
+                [(selection)]="selection" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
+                (onSort)="onSort($event)">
 
                 <ng-template pTemplate="header">
                     <tr>

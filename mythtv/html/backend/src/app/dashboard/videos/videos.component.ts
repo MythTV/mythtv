@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem, MessageService, SortMeta } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
@@ -41,6 +41,8 @@ export class VideosComponent implements OnInit {
   priorRequest: GetVideoListRequest = {};
   virtualScrollItemSize = 0;
   authorization = '';
+  sortField = 'Title';
+  sortOrder = 1;
 
   mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
   mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -84,11 +86,25 @@ export class VideosComponent implements OnInit {
         );
     });
 
+    let sortField = this.utility.sortStorage.getItem('videos.sortField');
+    if (sortField)
+      this.sortField = sortField;
+
+    let sortOrder = this.utility.sortStorage.getItem('videos.sortOrder');
+    if (sortOrder)
+      this.sortOrder = Number(sortOrder);
   }
 
   ngOnInit(): void {
     // Initial Load
     this.loadLazy({ first: 0, rows: 1 });
+  }
+
+  onSort(sortMeta: SortMeta) {
+    this.sortField = sortMeta.field;
+    this.sortOrder = sortMeta.order;
+    this.utility.sortStorage.setItem("videos.sortField", sortMeta.field);
+    this.utility.sortStorage.setItem('videos.sortOrder', sortMeta.order.toString());
   }
 
   loadLazy(event: TableLazyLoadEvent) {
@@ -114,18 +130,14 @@ export class VideosComponent implements OnInit {
         request.Count = event.rows;
     }
 
-    let sortField = '';
+    let sortField = this.sortField;
     if (Array.isArray(event.sortField))
       sortField = event.sortField[0];
     else if (event.sortField)
       sortField = event.sortField;
-    if (!sortField)
-      sortField = 'title';
-    if (sortField) {
-      request.Sort = sortField;
-      if (event.sortOrder)
-        request.Descending = (event.sortOrder < 0);
-    }
+    request.Sort = sortField;
+    if (event.sortOrder)
+      request.Descending = (event.sortOrder < 0);
     if (request.Sort == 'SeasEp')
       request.Sort = `season,episode,title,releasedate`;
     else

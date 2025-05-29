@@ -2,7 +2,7 @@
 <div class="block card w-full" style="height: 90vh" *ngIf="(chansLoaded && transDone >= numTranslations) else loading">
     <p-table [value]="allChannels" scrollHeight="flex" [scrollable]="true"
         styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" (onFilter)="onFilter($event)"
-        responsiveLayout="scroll" sortField="ChanSeq">
+        responsiveLayout="scroll" [sortField]="sortField" [sortOrder]="sortOrder"  (onSort)="onSort($event)">
         <ng-template pTemplate="caption">
             <button pButton pRipple label="{{ 'settings.chanedit.new_channel' | translate }}" icon="pi pi-plus"
                 class="p-button-success mr-2" (click)="openNew()"

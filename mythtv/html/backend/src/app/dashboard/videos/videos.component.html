@@ -8,7 +8,7 @@
         <p-table *ngIf="showTable" #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true"
             styleClass="p-datatable-striped p-datatable-sm" [virtualScroll]="true" [rows]="100" [lazy]="true"
             [totalRecords]="totalRecords" (onLazyLoad)="loadLazy($event)" [rowHover]="true" responsiveLayout="scroll"
-            sortField="Title" [scrollable]="true">
+             [sortField]="sortField" [sortOrder]="sortOrder" [scrollable]="true"  (onSort)="onSort($event)">
             <ng-template pTemplate="caption">
                 <!-- Top Buttons -->
                 <div class="flex align-items-center">

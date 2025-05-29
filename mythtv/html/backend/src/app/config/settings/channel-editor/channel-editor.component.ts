@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { SortMeta } from 'primeng/api';
 import { Observable, of, PartialObserver } from 'rxjs';
 import { ChannelService } from 'src/app/services/channel.service';
 import { Channel, ChannelRestoreData, CommMethod, DBChannelRequest } from 'src/app/services/interfaces/channel.interface';
@@ -9,6 +10,7 @@ import { VideoMultiplex } from 'src/app/services/interfaces/multiplex.interface'
 import { VideoSource } from 'src/app/services/interfaces/videosource.interface';
 import { MythService } from 'src/app/services/myth.service';
 import { SetupService } from 'src/app/services/setup.service';
+import { UtilityService } from 'src/app/services/utility.service';
 
 
 interface MyChannel extends Channel {
@@ -35,6 +37,8 @@ export class ChannelEditorComponent implements OnInit {
   iconDir = "";
   COMM_DETECT_COMMFREE  = -2;
   authorization = '';
+  sortField = 'ChanSeq';
+  sortOrder = 1;
 
   tvFormats = [
     { value: "Default", prompt: "common.default" },
@@ -132,7 +136,8 @@ export class ChannelEditorComponent implements OnInit {
   channelOperation = 0;
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
-    public setupService: SetupService, public router: Router, private mythService: MythService) {
+  public setupService: SetupService, public router: Router, private mythService: MythService,
+  private utility: UtilityService,) {
 
     this.translate.get(this.unassignedText).subscribe(data => {
       // this translation has to be done before loading lists
@@ -142,6 +147,14 @@ export class ChannelEditorComponent implements OnInit {
     });
 
     this.loadTranslations();
+
+    let sortField = this.utility.sortStorage.getItem('channel-editor.sortField');
+    if (sortField)
+      this.sortField = sortField;
+
+    let sortOrder = this.utility.sortStorage.getItem('channel-editor.sortOrder');
+    if (sortOrder)
+      this.sortOrder = Number(sortOrder);
   }
 
   ngOnInit(): void {
@@ -269,6 +282,13 @@ export class ChannelEditorComponent implements OnInit {
       this.noneSelected = data
       this.transDone++
     });
+  }
+
+  onSort(sortMeta: SortMeta) {
+    this.sortField = sortMeta.field;
+    this.sortOrder = sortMeta.order;
+    this.utility.sortStorage.setItem("channel-editor.sortField", sortMeta.field);
+    this.utility.sortStorage.setItem('channel-editor.sortOrder', sortMeta.order.toString());
   }
 
   getSource(channel: MyChannel): string {

@@ -27,6 +27,9 @@ export class UtilityService {
 
   dayFormatter: Intl.DateTimeFormat  = new Intl.DateTimeFormat(undefined, {weekday: "short"});
 
+  // sessionStorage or localStorage
+  sortStorage: Storage = sessionStorage;
+
   constructor(private translate: TranslateService) {
     // translations
     for (const [key, value] of Object.entries(this.recTypeTrans)) {
@@ -35,6 +38,11 @@ export class UtilityService {
         Object.defineProperty(this.recTypeTrans, key, { value: data });
       });
     }
+    let persistSort = localStorage.getItem('RememberSort');
+    if (persistSort && persistSort == 'Y')
+      this.sortStorage = localStorage;
+    else
+      localStorage.setItem('RememberSort','N')
   }
 
   formatDate(dateStr: string, innerHtml?: boolean, withDay?:boolean): string {

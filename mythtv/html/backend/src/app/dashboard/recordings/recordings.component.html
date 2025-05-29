@@ -44,7 +44,8 @@
             styleClass="p-datatable-sm p-datatable-striped" (onLazyLoad)="loadLazy($event)" [rows]="100" [lazy]="true"
             [rowHover]="true" selectionMode="multiple" [(selection)]="selection" [metaKeySelection]="true"
             dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
-            sortField="Title" [virtualScroll]="true" scrollHeight="flex" [scrollable]="true" (onSort)="refresh()">
+            [sortField]="sortField" [sortOrder]="sortOrder" (onSort)="onSort($event)" [virtualScroll]="true"
+            scrollHeight="flex" [scrollable]="true">
 
             <ng-template pTemplate="header">
                 <tr>

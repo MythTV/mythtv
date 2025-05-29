@@ -1,9 +1,8 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, SortMeta } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
-import { timeout } from 'rxjs';
 import { ScheduleLink } from 'src/app/schedule/schedule.component';
 import { DvrService } from 'src/app/services/dvr.service';
 import { GetOldRecordedListRequest, RemoveOldRecordedRequest, UpdateOldRecordedRequest } from 'src/app/services/interfaces/dvr.interface';
@@ -40,7 +39,8 @@ export class PrevrecsComponent implements OnInit {
   maxDate: Date = new Date();
   dateValue?: Date | null;
   loadLast = 0;
-
+  sortField = 'StartTime';
+  sortOrder = 1;
 
   msg = {
     Success: 'common.success',
@@ -69,6 +69,7 @@ export class PrevrecsComponent implements OnInit {
         Object.defineProperty(this.msg, key, { value: data });
       });
     }
+
     const mnu_entries = [this.mnu_delete, this.mnu_rerec, this.mnu_norec];
     mnu_entries.forEach(entry => {
       if (entry.label)
@@ -76,12 +77,28 @@ export class PrevrecsComponent implements OnInit {
           entry.label = data
         );
     });
+
+    let sortField = this.utility.sortStorage.getItem('prevrecs.sortField');
+    if (sortField)
+      this.sortField = sortField;
+
+    let sortOrder = this.utility.sortStorage.getItem('prevrecs.sortOrder');
+    if (sortOrder)
+      this.sortOrder = Number(sortOrder);
   }
 
   ngOnInit(): void {
     // Initial Load
     this.loadLazy({ first: 0, rows: 1 });
   }
+
+  onSort(sortMeta: SortMeta) {
+    this.sortField = sortMeta.field;
+    this.sortOrder = sortMeta.order;
+    this.utility.sortStorage.setItem("prevrecs.sortField", sortMeta.field);
+    this.utility.sortStorage.setItem('prevrecs.sortOrder', sortMeta.order.toString());
+  }
+
 
   reload() {
     this.showTable = false;
@@ -139,7 +156,8 @@ export class PrevrecsComponent implements OnInit {
       request.EndTime = endTime.toISOString();
     }
     request.TitleRegex = this.searchValue;
-    let sortField = '';
+
+    let sortField = this.sortField;
     if (Array.isArray(event.sortField))
       sortField = event.sortField[0];
     else if (event.sortField)

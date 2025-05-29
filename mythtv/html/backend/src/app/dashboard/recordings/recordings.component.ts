@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { FilterMatchMode, MenuItem, MessageService, SelectItem } from 'primeng/api';
+import { FilterMatchMode, MenuItem, MessageService, SelectItem, SortMeta } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
@@ -50,6 +50,8 @@ export class RecordingsComponent implements OnInit {
   selectedRecGroup: string | null = null;
   loadLast = 0;
   authorization = '';
+  sortField = 'Title';
+  sortOrder = 1;
 
   msg = {
     Success: 'common.success',
@@ -141,11 +143,26 @@ export class RecordingsComponent implements OnInit {
           entry.label = data
         );
     });
+
+    let sortField = this.utility.sortStorage.getItem('recordings.sortField');
+    if (sortField)
+      this.sortField = sortField;
+
+    let sortOrder = this.utility.sortStorage.getItem('recordings.sortOrder');
+    if (sortOrder)
+      this.sortOrder = Number(sortOrder);
   }
 
   ngOnInit(): void {
     // Initial Load
     this.loadLazy({ first: 0, rows: 1 });
+  }
+
+  onSort(sortMeta: SortMeta) {
+    this.sortField = sortMeta.field;
+    this.sortOrder = sortMeta.order;
+    this.utility.sortStorage.setItem("recordings.sortField", sortMeta.field);
+    this.utility.sortStorage.setItem('recordings.sortOrder', sortMeta.order.toString());
   }
 
   loadLazy(event: TableLazyLoadEvent, doRefresh?: boolean) {
@@ -179,13 +196,11 @@ export class RecordingsComponent implements OnInit {
       request.Count = this.loadLast;
     }
 
-    let sortField = '';
+    let sortField = this.sortField;
     if (Array.isArray(event.sortField))
       sortField = event.sortField[0];
     else if (event.sortField)
       sortField = event.sortField;
-    if (!sortField)
-      sortField = 'Title';
     request.Sort = sortField;
     let sortOrder = ' asc';
     if (event.sortOrder && event.sortOrder < 0)

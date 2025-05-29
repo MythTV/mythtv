@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SortMeta } from 'primeng/api';
 import { ScheduleLink, SchedulerSummary } from 'src/app/schedule/schedule.component';
 import { DvrService } from 'src/app/services/dvr.service';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
@@ -23,9 +24,19 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
   errorCount = 0;
   successCount = 0;
   displayDelete = false;
+  sortField = 'Title';
+  sortOrder = 1;
 
   constructor(private dvrService: DvrService,
     public utility: UtilityService) {
+
+    let sortField = this.utility.sortStorage.getItem('recrules.sortField');
+    if (sortField)
+      this.sortField = sortField;
+
+    let sortOrder = this.utility.sortStorage.getItem('recrules.sortOrder');
+    if (sortOrder)
+      this.sortOrder = Number(sortOrder);
   }
 
   refresh(): void {
@@ -50,6 +61,13 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
       }
     });
 
+  }
+
+  onSort(sortMeta: SortMeta) {
+    this.sortField = sortMeta.field;
+    this.sortOrder = sortMeta.order;
+    this.utility.sortStorage.setItem("recrules.sortField", sortMeta.field);
+    this.utility.sortStorage.setItem('recrules.sortOrder', sortMeta.order.toString());
   }
 
   newRecRule() {
@@ -109,7 +127,7 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
 
   deleteRule(recRule: RecRule) {
     this.dvrService.RemoveRecordSchedule(recRule.Id)
-    .subscribe(this.saveObserver);
+      .subscribe(this.saveObserver);
   }
 
 
