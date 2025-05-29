@@ -490,6 +490,7 @@
         "changeLanguage": "Válts nyelvet",
         "dashboard": "Irányítópult",
         "hide": "Felső szalaghirdetés elrejtése",
+        "keep_pwd_warn": "FIGYELMEZTETÉS: A \"Maradj naplózás\" a jelszót tiszta szövegben tárolja a böngésző helyi tárolójában.",
         "keeplogin": "Maradjon bejelentkezve ezen a számítógépen.",
         "login": "Belépés",
         "loginfail": "A bejelentkezés sikertelen",

@@ -490,6 +490,7 @@
         "changeLanguage": "Promijeni jezik",
         "dashboard": "kontrolna ploča",
         "hide": "Sakrij gornji natpis",
+        "keep_pwd_warn": "UPOZORENJE: \"Ostanite prijavljeni\" pohranjivat će lozinku u jasan tekst u lokalnu pohranu preglednika.",
         "keeplogin": "Ostanite prijavljeni na ovom računalu.",
         "login": "Prijaviti se",
         "loginfail": "Prijava nije uspjela",

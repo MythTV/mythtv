@@ -490,6 +490,7 @@
         "changeLanguage": "Změnit jazyk",
         "dashboard": "Přístrojová deska",
         "hide": "Skrýt horní banner",
+        "keep_pwd_warn": "VAROVÁNÍ: „Zůstaňte přihlášeni“ uloží heslo v jasném textu v místním úložišti prohlížeče.",
         "keeplogin": "Zůstaňte přihlášeni k tomuto počítači.",
         "login": "Přihlásit se",
         "loginfail": "Přihlášení selhalo",

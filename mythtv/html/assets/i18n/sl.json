@@ -490,6 +490,7 @@
         "changeLanguage": "Spremeni jezik",
         "dashboard": "Nadzorna plošča",
         "hide": "Skrij zgornjo pasico",
+        "keep_pwd_warn": "OPOZORILO: \"Ostani v prijavi\" bo geslo shranil v jasno besedilo v lokalnem pomnilniku brskalnika.",
         "keeplogin": "Ostanite prijavljeni v tem računalniku.",
         "login": "Vpiši se",
         "loginfail": "Prijava ni uspela",

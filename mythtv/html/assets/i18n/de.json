@@ -490,6 +490,7 @@
         "changeLanguage": "Sprache ändern",
         "dashboard": "Instrumententafel",
         "hide": "Oberes Banner ausblenden",
+        "keep_pwd_warn": "WARNUNG: \"Bleiben Sie angemeldet in\", speichert das Passwort im Löschen von Text im lokalen Speicher in Browser.",
         "keeplogin": "Bleiben Sie auf diesem Computer angemeldet.",
         "login": "Einloggen",
         "loginfail": "Fehler bei der Anmeldung",

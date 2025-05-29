@@ -490,6 +490,7 @@
         "changeLanguage": "Cambia lingua",
         "dashboard": "Cruscotto",
         "hide": "Nascondi banner superiore",
+        "keep_pwd_warn": "ATTENZIONE: \"Rimani loggato\" memorizzerà la password in un testo chiaro nell'archiviazione locale del browser.",
         "keeplogin": "Resta a effettuare l'accesso a questo computer.",
         "login": "Accesso",
         "loginfail": "Accesso non riuscito",

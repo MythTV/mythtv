@@ -490,6 +490,7 @@
         "changeLanguage": "Mudar idioma",
         "dashboard": "Painel",
         "hide": "Ocultar banner superior",
+        "keep_pwd_warn": "Aviso: \"Stay conectado\" armazenará a senha em texto claro no armazenamento local do navegador.",
         "keeplogin": "Fique conectado neste computador.",
         "login": "Conecte-se",
         "loginfail": "Falha no login",

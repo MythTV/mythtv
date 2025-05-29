@@ -490,6 +490,7 @@
         "changeLanguage": "Skift sprog",
         "dashboard": "instrumentbræt",
         "hide": "Skjul øverste banner",
+        "keep_pwd_warn": "ADVARSEL: \"Bliv logget ind\" vil gemme adgangskoden i klar tekst i browserens lokale lager.",
         "keeplogin": "Bliv logget ind på denne computer.",
         "login": "Log på",
         "loginfail": "Login mislykkedes",

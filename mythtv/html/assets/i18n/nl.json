@@ -490,6 +490,7 @@
         "changeLanguage": "Taal wijzigen",
         "dashboard": "Dashboard",
         "hide": "Verberg de bovenste banner",
+        "keep_pwd_warn": "WAARSCHUWING: \"Blijf ingelogd\" zal het wachtwoord opslaan in duidelijke tekst in de lokale opslag van de browser.",
         "keeplogin": "Blijf ingelogd op deze computer.",
         "login": "Log in",
         "loginfail": "Inloggen mislukt",

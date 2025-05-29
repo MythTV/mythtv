@@ -490,6 +490,7 @@
         "changeLanguage": "Cambia lingua",
         "dashboard": "Cruscotto",
         "hide": "Fela efsta borðann",
+        "keep_pwd_warn": "Viðvörun: „Vertu skráður inn“ mun geyma lykilorðið í skýrum texta í geymslu vafrans.",
         "keeplogin": "Vertu skráður inn á þessa tölvu.",
         "login": "Accesso",
         "loginfail": "Innskráning mistókst",

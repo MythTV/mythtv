@@ -490,6 +490,7 @@
         "changeLanguage": "言語を変えてください",
         "dashboard": "ダッシュボード",
         "hide": "トップバナーを非表示にする",
+        "keep_pwd_warn": "警告：「Stay Logged In」は、パスワードをブラウザローカルストレージにクリアテキストに保存します。",
         "keeplogin": "このコンピューターにログインしてください。",
         "login": "ログイン",
         "loginfail": "ログインに失敗しました",

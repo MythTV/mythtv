@@ -490,6 +490,7 @@
         "changeLanguage": "Cambiar idioma",
         "dashboard": "Tablero",
         "hide": "Ocultar banner superior",
+        "keep_pwd_warn": "ADVERTENCIA: \"Permanecer iniciado sesión\" almacenará la contraseña en texto transparente en el almacenamiento local del navegador.",
         "keeplogin": "Manténgase iniciado sesión en esta computadora.",
         "login": "Iniciar sesión",
         "loginfail": "Error de inicio de sesion",

@@ -490,6 +490,7 @@
         "changeLanguage": "Canviar d'idioma",
         "dashboard": "panell",
         "hide": "Amaga el bàner superior",
+        "keep_pwd_warn": "ADVERTIMENT: \"Quedeu -vos iniciant la sessió\" emmagatzemarà la contrasenya amb un text clar a l'emmagatzematge local del navegador.",
         "keeplogin": "Mantingueu la sessió en aquest ordinador.",
         "login": "Iniciar Sessió",
         "loginfail": "Inici de sessió ha fallat",

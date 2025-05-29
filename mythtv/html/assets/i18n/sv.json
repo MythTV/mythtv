@@ -490,6 +490,7 @@
         "changeLanguage": "Ändra språk",
         "dashboard": "instrumentbräda",
         "hide": "Dölj översta banner",
+        "keep_pwd_warn": "VARNING: \"Håll dig inloggad\" kommer att lagra lösenordet i tydlig text i webbläsaren lokal lagring.",
         "keeplogin": "Håll dig inloggad på den här datorn.",
         "login": "Logga in",
         "loginfail": "Inloggning misslyckades",

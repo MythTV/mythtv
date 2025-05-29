@@ -490,6 +490,7 @@
         "changeLanguage": "Vaihda kieltä",
         "dashboard": "kojelauta",
         "hide": "Piilota ylin banneri",
+        "keep_pwd_warn": "VAROITUS: \"Pysy kirjautuneena\" tallentaa salasanan selkeään tekstiin selaimen paikallisessa tallennustilassa.",
         "keeplogin": "Pysy kirjautuneena tähän tietokoneeseen.",
         "login": "kirjaudu sisään",
         "loginfail": "Kirjautuminen epäonnistui",

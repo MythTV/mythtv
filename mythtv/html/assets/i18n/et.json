@@ -490,6 +490,7 @@
         "changeLanguage": "Keele vahetamine",
         "dashboard": "Armatuurlaud",
         "hide": "Peida ülemine bänner",
+        "keep_pwd_warn": "HOIATUS: \"Olge sisse logitud\" salvestab parooli brauseri kohalikus salvestusruumis selges tekstis.",
         "keeplogin": "Olge selles arvutis sisse logitud.",
         "login": "Logi sisse",
         "loginfail": "Sisselogimine ebaõnnestus",

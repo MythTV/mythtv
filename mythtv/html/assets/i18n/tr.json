@@ -490,6 +490,7 @@
         "changeLanguage": "Dili değiştir",
         "dashboard": "Gösterge Paneli",
         "hide": "Üst Banner'ı gizle",
+        "keep_pwd_warn": "UYARI: \"Oturum Açılmış Kalın\" Şifreyi Tarayıcı Yerel Deposunda Temizle Metin'de saklayacaktır.",
         "keeplogin": "Bu bilgisayarda oturum açın.",
         "login": "Giriş yapmak",
         "loginfail": "Giriş başarısız oldu",

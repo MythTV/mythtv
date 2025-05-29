@@ -490,6 +490,7 @@
         "changeLanguage": "Changer de langue",
         "dashboard": "Tableau de bord",
         "hide": "Masquer la bannière supérieure",
+        "keep_pwd_warn": "AVERTISSEMENT: \"Restez connecté\" stockera le mot de passe en texte clair dans le stockage local du navigateur.",
         "keeplogin": "Restez connecté sur cet ordinateur.",
         "login": "S'identifier",
         "loginfail": "La connexion a échoué",

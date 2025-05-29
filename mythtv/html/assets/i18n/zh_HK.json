@@ -490,6 +490,7 @@
         "changeLanguage": "改變語言",
         "dashboard": "儀表板",
         "hide": "隱藏頂部橫幅",
+        "keep_pwd_warn": "警告：“留下來登錄”將在瀏覽器本地存儲中將密碼存儲在清晰的文本中。",
         "keeplogin": "在這台計算機上登錄。",
         "login": "登錄",
         "loginfail": "登錄失敗",

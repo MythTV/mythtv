@@ -148,6 +148,11 @@
 
         <ng-template pTemplate="footer">
             <div class="col-12" style="text-align: left;">
+                <p-message *ngIf="keepLogin" severity="error"
+                    text="{{ 'navbar.keep_pwd_warn' | translate }}"></p-message>
+            </div>
+
+            <div class="col-12" style="text-align: left;">
                 <p-message *ngIf="errorCount > 0" severity="error"
                     text="{{ 'navbar.loginfail' | translate }}"></p-message>
             </div>

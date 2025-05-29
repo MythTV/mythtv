@@ -490,6 +490,7 @@
         "changeLanguage": "Zmień język",
         "dashboard": "Panel",
         "hide": "Ukryj górny baner",
+        "keep_pwd_warn": "OSTRZEŻENIE: „Pozostań zalogowany” będzie przechowywać hasło w wyraźnym tekście w lokalnej pamięci przeglądarki.",
         "keeplogin": "Pozostań zalogowany na tym komputerze.",
         "login": "Zaloguj sie",
         "loginfail": "Logowanie nie powiodło się",

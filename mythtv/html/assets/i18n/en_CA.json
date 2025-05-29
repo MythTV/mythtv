@@ -490,6 +490,7 @@
         "changeLanguage": "Change Language",
         "dashboard": "Dashboard",
         "hide": "Hide top Banner",
+        "keep_pwd_warn": "Warning: \"Stay Logged In\" will store the password in Clear Text in the browser local storage.",
         "keeplogin": "Stay Logged In on this Computer.",
         "login": "Log In",
         "loginfail": "Login Failed",

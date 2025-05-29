@@ -490,6 +490,7 @@
         "changeLanguage": "改变语言",
         "dashboard": "仪表板",
         "hide": "隐藏顶部横幅",
+        "keep_pwd_warn": "警告：“留下来登录”将在浏览器本地存储中将密码存储在清晰的文本中。",
         "keeplogin": "在这台计算机上登录。",
         "login": "登录",
         "loginfail": "登录失败",
