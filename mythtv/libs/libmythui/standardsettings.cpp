@@ -32,6 +32,11 @@ StandardSetting::~StandardSetting()
             delete *i;
     }
     m_targets.clear();
+    if (m_storage)
+    {
+        delete m_storage;
+        m_storage = nullptr;
+    }
 }
 
 MythUIButtonListItem * StandardSetting::createButton(MythUIButtonList * list)
