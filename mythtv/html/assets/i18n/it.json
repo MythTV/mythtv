@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Database connesso '{{Name}}'",
             "havenotdb": "Non hai il database '{{Name}}'",
-            "schemaver": "Versione schema del database {{SchemaVersion}}"
+            "schemaver": "Versione schema del database {{SchemaVersion}}",
+            "servertype_head": "Tipo di server SQL:"
         },
         "done": "Fatto",
         "enterDBLoginDetails": "Immettere i parametri di accesso al database",

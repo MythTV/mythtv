@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "拥有“{{Name}}”数据库",
             "havenotdb": "没有“{{Name}}”数据库",
-            "schemaver": "数据库架构版本是 {{SchemaVersion}}"
+            "schemaver": "数据库架构版本是 {{SchemaVersion}}",
+            "servertype_head": "SQL Server类型："
         },
         "done": "完毕",
         "enterDBLoginDetails": "输入数据库登录详细信息",

@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Have '{{Name}}' database",
             "havenotdb": "Do not have '{{Name}}' database",
-            "schemaver": "Database schema version is {{SchemaVersion}}"
+            "schemaver": "Database schema version is {{SchemaVersion}}",
+            "servertype_head": "Sql Server Type:"
         },
         "done": "Done",
         "enterDBLoginDetails": "Enter the database login details",

@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Διαθέτετε βάση δεδομένων '{{Name}}'",
             "havenotdb": "Δεν υπάρχει βάση δεδομένων '{{Name}}'",
-            "schemaver": "Η έκδοση του σχήματος βάσης δεδομένων είναι {{SchemaVersion}}"
+            "schemaver": "Η έκδοση του σχήματος βάσης δεδομένων είναι {{SchemaVersion}}",
+            "servertype_head": "Τύπος SQL Server:"
         },
         "done": "Εγινε",
         "enterDBLoginDetails": "Εισαγάγετε τα στοιχεία σύνδεσης στη βάση δεδομένων",

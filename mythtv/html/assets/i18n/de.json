@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Verfügen über die Datenbank „{{Name}}“.",
             "havenotdb": "Die Datenbank „{{Name}}“ ist nicht vorhanden",
-            "schemaver": "Datenbankschemaversion ist {{SchemaVersion}}"
+            "schemaver": "Datenbankschemaversion ist {{SchemaVersion}}",
+            "servertype_head": "SQL Servertyp:"
         },
         "done": "Erledigt",
         "enterDBLoginDetails": "Geben Sie die Anmeldedaten für die Datenbank ein",

@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Sinulla on tietokanta '{{Name}}'",
             "havenotdb": "Sinulla ei ole '{{Name}}'-tietokantaa",
-            "schemaver": "Tietokantaskeeman versio on {{SchemaVersion}}"
+            "schemaver": "Tietokantaskeeman versio on {{SchemaVersion}}",
+            "servertype_head": "SQL -palvelintyyppi:"
         },
         "done": "Tehty",
         "enterDBLoginDetails": "Anna tietokantaan kirjautumistiedot",

@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Teniu la base de dades \"{{Name}}\".",
             "havenotdb": "No teniu una base de dades \"{{Name}}\".",
-            "schemaver": "La versió de l'esquema de la base de dades és {{SchemaVersion}}"
+            "schemaver": "La versió de l'esquema de la base de dades és {{SchemaVersion}}",
+            "servertype_head": "Tipus de servidor SQL:"
         },
         "done": "Fet",
         "enterDBLoginDetails": "Introduïu les dades d'inici de sessió de la base de dades",

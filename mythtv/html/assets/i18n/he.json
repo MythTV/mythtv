@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "יש לך מסד נתונים של '{{Name}}'",
             "havenotdb": "אין לך מסד נתונים '{{Name}}'",
-            "schemaver": "גרסת סכימת מסד הנתונים היא {{SchemaVersion}}"
+            "schemaver": "גרסת סכימת מסד הנתונים היא {{SchemaVersion}}",
+            "servertype_head": "סוג שרת SQL:"
         },
         "done": "בוצע",
         "enterDBLoginDetails": "הזן את פרטי הכניסה למסד הנתונים",

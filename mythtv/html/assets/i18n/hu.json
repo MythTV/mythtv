@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Rendelkezik „{{Name}}” adatbázissal",
             "havenotdb": "Nincs '{{Name}}' adatbázisa",
-            "schemaver": "Az adatbázisséma verziója: {{SchemaVersion}}"
+            "schemaver": "Az adatbázisséma verziója: {{SchemaVersion}}",
+            "servertype_head": "SQL szerver típus:"
         },
         "done": "Kesz",
         "enterDBLoginDetails": "Adja meg az adatbázis bejelentkezési adatait",

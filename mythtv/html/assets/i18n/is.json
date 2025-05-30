@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Hafa '{{Name}}' gagnagrunn",
             "havenotdb": "Ertu ekki með '{{Name}}' gagnagrunn",
-            "schemaver": "Útgáfa gagnagrunnsskema er {{SchemaVersion}}"
+            "schemaver": "Útgáfa gagnagrunnsskema er {{SchemaVersion}}",
+            "servertype_head": "SQL Server Type:"
         },
         "done": "Fatto",
         "enterDBLoginDetails": "Immettere i dettagli di accesso al database",

@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "擁有“{{Name}}”數據庫",
             "havenotdb": "沒有“{{Name}}”數據庫",
-            "schemaver": "數據庫架構版本是 {{SchemaVersion}}"
+            "schemaver": "數據庫架構版本是 {{SchemaVersion}}",
+            "servertype_head": "SQL Server類型："
         },
         "done": "完畢",
         "enterDBLoginDetails": "輸入數據庫登錄詳細信息",

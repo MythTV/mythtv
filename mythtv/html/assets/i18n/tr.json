@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "'{{Name}}' veritabanına sahip olun",
             "havenotdb": "'{{Name}}' veritabanına sahip değil",
-            "schemaver": "Veritabanı şeması sürümü: {{SchemaVersion}}"
+            "schemaver": "Veritabanı şeması sürümü: {{SchemaVersion}}",
+            "servertype_head": "SQL Server Türü:"
         },
         "done": "Tamamlamak",
         "enterDBLoginDetails": "Veritabanı oturum açma ayrıntılarını girin",

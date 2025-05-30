@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Имате база данни „{{Name}}“.",
             "havenotdb": "Нямате база данни „{{Name}}“.",
-            "schemaver": "Версията на схемата на базата данни е {{SchemaVersion}}"
+            "schemaver": "Версията на схемата на базата данни е {{SchemaVersion}}",
+            "servertype_head": "Тип SQL сървър:"
         },
         "done": "свършен",
         "enterDBLoginDetails": "Въведете данните за вход в базата данни",

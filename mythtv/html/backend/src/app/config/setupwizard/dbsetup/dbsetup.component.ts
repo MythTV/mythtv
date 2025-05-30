@@ -25,7 +25,6 @@ export class DbsetupComponent implements OnInit {
 
     m_wizardData!: WizardData;
     database!: Database;
-    // testDbName = '';
 
     successCount = 0;
     errorCount = 0;
@@ -33,8 +32,10 @@ export class DbsetupComponent implements OnInit {
     connectionFail = false;
     commandlist = '';
     mySqlCommand = 'sudo mysql -u root < setup.sql'
-    tzCommand = 'mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql -u root mysql'
-    dbtype = "MySQL";
+    mySqlTzCommand = 'mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql -u root mysql'
+    mariaDBtzCommand = 'mariadb-tzinfo-to-sql /usr/share/zoneinfo | sudo mysql -u root mysql'
+    tzCommand = ''
+    dbtype = 'MySQL';
 
     msg_testconnection = 'setupwizard.testConnection';
     msg_connectionsuccess = 'setupwizard.connectionsuccess';
@@ -69,6 +70,7 @@ export class DbsetupComponent implements OnInit {
         },
             () => this.errorCount++,
         )
+        this.setCommandList();
     }
 
     copyToclipboard(value: string): void {
@@ -106,10 +108,9 @@ export class DbsetupComponent implements OnInit {
             DBName: this.database.Name,
             dbPort: this.database.Port
         }
-        // this.testDbName = this.database.Name;
-        this.commandlist = '';
         this.mythService.TestDBSettings(params).subscribe(result => {
             if (result.bool) {
+                this.m_wizardData.DatabaseStatus.DatabaseStatus.Connected = true;
                 if (doSave) {
                     this.configService.SetDatabaseCredentials(this.database)
                         .subscribe(this.saveObserver);
@@ -127,15 +128,19 @@ export class DbsetupComponent implements OnInit {
 
     setCommandList() {
         let pwType = '';
-        if (this.dbtype == 'MySQL')
-            pwType = 'WITH mysql_native_password';
+        if (this.dbtype == 'MySQL') {
+            // pwType = 'WITH mysql_native_password';
+            this.tzCommand = this.mySqlTzCommand;
+        }
+        else
+            this.tzCommand = this.mariaDBtzCommand;
         this.commandlist =
-            `CREATE DATABASE IF NOT EXISTS ${this.database.Name};\n` +
-            `CREATE USER IF NOT EXISTS '${this.database.UserName}'@'localhost' IDENTIFIED ${pwType} by '${this.database.Password}';\n` +
-            `CREATE USER IF NOT EXISTS '${this.database.UserName}'@'%' IDENTIFIED ${pwType} by '${this.database.Password}';\n` +
-            `GRANT ALL ON ${this.database.Name}.* TO '${this.database.UserName}'@'localhost';\n` +
+            `CREATE DATABASE IF NOT EXISTS ${this.database.Name};<br>` +
+            `CREATE USER IF NOT EXISTS '${this.database.UserName}'@'localhost' IDENTIFIED ${pwType} by '${this.database.Password}';<br>` +
+            `CREATE USER IF NOT EXISTS '${this.database.UserName}'@'%' IDENTIFIED ${pwType} by '${this.database.Password}';<br>` +
+            `GRANT ALL ON ${this.database.Name}.* TO '${this.database.UserName}'@'localhost';<br>` +
             `GRANT ALL ON ${this.database.Name}.* TO '${this.database.UserName}'@'%';`
-    }
+   }
 
     confirm(message?: string): Observable<boolean> {
         const confirmation = window.confirm(message);

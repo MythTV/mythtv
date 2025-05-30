@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Heb '{{Name}}'-database",
             "havenotdb": "Heb geen '{{Name}}'-database",
-            "schemaver": "Databaseschemaversie is {{SchemaVersion}}"
+            "schemaver": "Databaseschemaversie is {{SchemaVersion}}",
+            "servertype_head": "SQL Server Type:"
         },
         "done": "Klaar",
         "enterDBLoginDetails": "Voer de inloggegevens van de database in",

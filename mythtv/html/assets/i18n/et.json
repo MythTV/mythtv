@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Kas teil on andmebaas „{{Name}}”.",
             "havenotdb": "Teil pole andmebaasi „{{Name}}”.",
-            "schemaver": "Andmebaasi skeemi versioon on {{SchemaVersion}}"
+            "schemaver": "Andmebaasi skeemi versioon on {{SchemaVersion}}",
+            "servertype_head": "SQL Serveri tüüp:"
         },
         "done": "Valmis",
         "enterDBLoginDetails": "Sisestage andmebaasi sisselogimisandmed",

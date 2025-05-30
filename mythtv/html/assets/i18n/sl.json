@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Imeti bazo podatkov '{{Name}}'",
             "havenotdb": "Nima podatkovne zbirke '{{Name}}'",
-            "schemaver": "Različica sheme baze podatkov je {{SchemaVersion}}"
+            "schemaver": "Različica sheme baze podatkov je {{SchemaVersion}}",
+            "servertype_head": "Vrsta strežnika SQL:"
         },
         "done": "Končano",
         "enterDBLoginDetails": "Vnesite podatke za prijavo v bazo podatkov",

@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Har '{{Name}}' database",
             "havenotdb": "Har ikke '{{Name}}'-database",
-            "schemaver": "Databaseskemaversionen er {{SchemaVersion}}"
+            "schemaver": "Databaseskemaversionen er {{SchemaVersion}}",
+            "servertype_head": "SQL Server Type:"
         },
         "done": "Færdig",
         "enterDBLoginDetails": "Indtast databasens loginoplysninger",

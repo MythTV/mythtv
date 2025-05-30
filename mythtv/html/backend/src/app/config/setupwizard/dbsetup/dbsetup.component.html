@@ -13,9 +13,8 @@
                 <div class="field col-12 md:col-6">
                     <label for="ipaddress" class="label block">{{ 'setupwizard.MySQLServerIP' | translate }}</label>
                     <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help"
-                        [(ngModel)]="database.Host" name="hostname" #host="ngModel"
-                        class="mb-2 form-control w-full" [ngClass]="{'is-invalid': host.invalid }"
-                        placeholder="Ex. 127.0.0.1 or localhost" required />
+                        [(ngModel)]="database.Host" name="hostname" #host="ngModel" class="mb-2 form-control w-full"
+                        [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required />
                     <small id="ipaddress-help">{{ 'setupwizard.ipaddress_help' | translate }}</small>
                     <div *ngIf="host.invalid && (host.dirty || host.touched)">
                         <small id="address-help" class="p-error block">{{ 'setupwizard.IPorAddressRequired' | translate
@@ -25,9 +24,9 @@
 
                 <div class="field col-12 md:col-6">
                     <label for="port" class="label block">{{ 'setupwizard.MySQLServerPort' | translate }}</label>
-                    <input pInputText id="port" type="number" aria-describedby="port-help"
-                        [(ngModel)]="database.Port" name="port" #port="ngModel"
-                        class=" mb-2 form-control w-full" placeholder="Ex. 3306" min="0" max="65536" />
+                    <input pInputText id="port" type="number" aria-describedby="port-help" [(ngModel)]="database.Port"
+                        name="port" #port="ngModel" class=" mb-2 form-control w-full" placeholder="Ex. 3306" min="0"
+                        max="65536" />
                     <small id="port-help">{{ 'setupwizard.port_help' | translate }}</small>
                     <div *ngIf="port.invalid && (port.dirty || port.touched)">
                         <small class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
@@ -36,9 +35,9 @@
 
                 <div class="field col-12 md:col-6">
                     <label for="user" class="label block">{{ 'setupwizard.MySQLUser' | translate }}</label>
-                    <input pInputText id="user" type="text" aria-describedby="user-help"
-                        [(ngModel)]="database.UserName" name="user" #user="ngModel"
-                        class="mb-2 form-control w-full" placeholder="Ex. mythtv" required />
+                    <input pInputText id="user" type="text" aria-describedby="user-help" [(ngModel)]="database.UserName"
+                        name="user" #user="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythtv"
+                        required />
                     <small id="user-help">{{ 'setupwizard.user_help' | translate }}</small>
                     <div *ngIf="user.invalid && (user.dirty || user.touched)">
                         <small class="p-error block">{{ 'setupwizard.userRequired' | translate }}</small>
@@ -57,9 +56,9 @@
 
                 <div class="field col-12 md:col-6">
                     <label for="dbname" class="label block">{{ 'setupwizard.MySQLDatabaseName' | translate }}</label>
-                    <input pInputText id="dbname" type="text" aria-describedby="dbname-help"
-                        [(ngModel)]="database.Name" name="dbname" #dbname="ngModel"
-                        class="mb-2 form-control w-full" placeholder="Ex. mythconverg" required />
+                    <input pInputText id="dbname" type="text" aria-describedby="dbname-help" [(ngModel)]="database.Name"
+                        name="dbname" #dbname="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythconverg"
+                        required />
                     <small id="dbname-help">{{ 'setupwizard.dbname_help' | translate }}</small>
                     <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
                         <small class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>
@@ -67,9 +66,8 @@
                 </div>
 
                 <div class="field col-12">
-                    <p-checkbox [(ngModel)]="database.LocalEnabled" name="LocalEnabled"
-                        class="mb-2 w-full label block" [binary]="true"
-                        label="{{ 'setupwizard.LocalEnabled_label' | translate }}">
+                    <p-checkbox [(ngModel)]="database.LocalEnabled" name="LocalEnabled" class="mb-2 w-full label block"
+                        [binary]="true" label="{{ 'setupwizard.LocalEnabled_label' | translate }}">
                     </p-checkbox>
                     <small class="block">
                         {{ 'setupwizard.LocalEnabled_desc' | translate }}
@@ -86,9 +84,8 @@
                 </div>
 
                 <div class="field col-12">
-                    <p-checkbox [(ngModel)]="database.WOLEnabled" name="WOLEnabled"
-                        class="mb-2 w-full label block" [binary]="true"
-                        label="{{ 'setupwizard.WOLEnabled_label' | translate }}">
+                    <p-checkbox [(ngModel)]="database.WOLEnabled" name="WOLEnabled" class="mb-2 w-full label block"
+                        [binary]="true" label="{{ 'setupwizard.WOLEnabled_label' | translate }}">
                     </p-checkbox>
                     <small class="block">
                         {{ 'setupwizard.WOLEnabled_desc' | translate }}
@@ -99,8 +96,8 @@
                     <label for="WOLReconnect" class="label block">
                         {{ 'settings.vsource.WOLReconnect_label' | translate }}
                     </label>
-                    <p-inputNumber [(ngModel)]="database.WOLReconnect" name="WOLReconnect"
-                        id="WOLReconnect" [min]="0" [max]="60" [step]="1" [useGrouping]="false" [showButtons]="true">
+                    <p-inputNumber [(ngModel)]="database.WOLReconnect" name="WOLReconnect" id="WOLReconnect" [min]="0"
+                        [max]="60" [step]="1" [useGrouping]="false" [showButtons]="true">
                     </p-inputNumber>
                     <small class="block">
                         {{ 'settings.vsource.WOLReconnect_desc' | translate }}
@@ -111,8 +108,8 @@
                     <label for="WOLRetry" class="label block">
                         {{ 'settings.vsource.WOLRetry_label' | translate }}
                     </label>
-                    <p-inputNumber [(ngModel)]="database.WOLRetry" name="WOLRetry" id="WOLRetry" [min]="1"
-                        [max]="10" [step]="1" [useGrouping]="false" [showButtons]="true">
+                    <p-inputNumber [(ngModel)]="database.WOLRetry" name="WOLRetry" id="WOLRetry" [min]="1" [max]="10"
+                        [step]="1" [useGrouping]="false" [showButtons]="true">
                     </p-inputNumber>
                     <small class="block">
                         {{ 'settings.vsource.WOLRetry_desc' | translate }}
@@ -148,22 +145,9 @@
                     </div>
                 </ng-template>
 
-                <!-- have database -->
-                <div *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else nodatabase">
-                    <p-message class="pr-2" severity="success"
-                        text="{{ 'setupwizard.dbsetup.havedb' | translate : {Name: m_wizardData.Database.Name} }}"></p-message>
-                </div>
-
-                <ng-template #nodatabase>
-                    <div #nodatabase class="pr-2 nodatabase">
-                        <p-message severity="error"
-                            text="{{ 'setupwizard.dbsetup.havenotdb' | translate: {Name: m_wizardData.Database.Name} }}"></p-message>
-                    </div>
-                </ng-template>
-
                 <!-- schema version -->
                 <div
-                    *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected && m_wizardData.DatabaseStatus.DatabaseStatus.HaveDatabase else noschema">
+                    *ngIf="m_wizardData.DatabaseStatus.DatabaseStatus.Connected && m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion else noschema">
                     <p-message class="pr-2" severity="info"
                         text="{{ 'setupwizard.dbsetup.schemaver'
                         | translate: {SchemaVersion: m_wizardData.DatabaseStatus.DatabaseStatus.SchemaVersion} }}"></p-message>
@@ -178,30 +162,30 @@
             </div>
             <div *ngIf="setupService.isDatabaseIgnored">
                 <h2>{{ 'common.instructions' | translate }}</h2>
-                <div *ngIf="connectionFail">
+                <div class="flex pb-3">
+                    <div class="flex-none flex align-items-center label block pr-5">
+                        {{ 'setupwizard.dbsetup.servertype_head' | translate }}
+                    </div>
+                    <div class="flex-none flex align-items-center pr-5">
+                        <p-radioButton name="dbtype" value="MySQL" [(ngModel)]="dbtype" inputId="mysql"
+                            (ngModelChange)="setCommandList()"></p-radioButton>
+                        <label for="mysql">MySql</label>
+                    </div>
+                    <div class="flex-none flex align-items-center">
+                        <p-radioButton name="dbtype" value="MariaDB" [(ngModel)]="dbtype" inputId="mariadb"
+                            (ngModelChange)="setCommandList()"></p-radioButton>
+                        <label for="mariadb">MariaDB</label>
+                    </div>
+                </div>
+                <div *ngIf="connectionFail || !m_wizardData.DatabaseStatus.DatabaseStatus.Connected">
                     <p>
                         {{ 'setupwizard.sqlinstructions' | translate }}
                     </p>
-                    <div class="flex pb-3">
-                        <div class="flex-none flex align-items-center label block pr-5">
-                            Sql Server Type:
-                        </div>
-                        <div class="flex-none flex align-items-center pr-5">
-                            <p-radioButton name="dbtype" value="MySQL" [(ngModel)]="dbtype"
-                                inputId="mysql" (ngModelChange)="setCommandList()"></p-radioButton>
-                            <label for="mysql">MySql</label>
-                        </div>
-                        <div class="flex-none flex align-items-center">
-                            <p-radioButton name="dbtype" value="MariaDB" [(ngModel)]="dbtype"
-                                inputId="mariadb" (ngModelChange)="setCommandList()"></p-radioButton>
-                            <label for="mariadb">MariaDB</label>
-                        </div>
-                    </div>
 
                     <table style="white-space: 'pre-line'">
                         <tr>
                             <td class="align-items-center bg-blue-100 text-gray-900" style="font-family: monospace;">
-                                {{ commandlist }}
+                                <div [innerHTML]="commandlist"></div>
                             </td>
                             <td class="align-items-center">
                                 <button pButton pRipple type="button" icon="pi pi-copy"

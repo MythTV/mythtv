@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Mít databázi '{{Name}}'",
             "havenotdb": "Nemáte databázi '{{Name}}'",
-            "schemaver": "Verze schématu databáze je {{SchemaVersion}}"
+            "schemaver": "Verze schématu databáze je {{SchemaVersion}}",
+            "servertype_head": "Typ serveru SQL:"
         },
         "done": "Hotovo",
         "enterDBLoginDetails": "Zadejte přihlašovací údaje do databáze",

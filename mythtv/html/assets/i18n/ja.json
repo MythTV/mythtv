@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "「{{Name}}」データベースがある",
             "havenotdb": "「{{Name}}」データベースがありません",
-            "schemaver": "データベース スキーマのバージョンは {{SchemaVersion}} です"
+            "schemaver": "データベース スキーマのバージョンは {{SchemaVersion}} です",
+            "servertype_head": "SQLサーバータイプ："
         },
         "done": "完了",
         "enterDBLoginDetails": "データベースログインの詳細を入力します",

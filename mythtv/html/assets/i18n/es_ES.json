@@ -1532,7 +1532,8 @@
         "dbsetup": {
             "havedb": "Tener la base de datos '{{Name}}'",
             "havenotdb": "No tengo la base de datos '{{Name}}'",
-            "schemaver": "La versión del esquema de la base de datos es {{SchemaVersion}}"
+            "schemaver": "La versión del esquema de la base de datos es {{SchemaVersion}}",
+            "servertype_head": "Tipo de servidor SQL:"
         },
         "done": "Hecho",
         "enterDBLoginDetails": "Ingrese los datos de inicio de sesión de la base de datos",
