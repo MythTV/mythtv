@@ -50,17 +50,17 @@ export class GuideService {
   }
 
   public AddToChannelGroup(request: ChannelGroupRequest): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Guide/AddToChannelGroup', request);
+    return this.httpClient.post<BoolResponse>('./Guide/AddToChannelGroup', request);
   }
 
   public GetCategoryList(): Observable<GetCategoryListResponse> {
-    return this.httpClient.get<GetCategoryListResponse>('/Guide/GetCategoryList');
+    return this.httpClient.get<GetCategoryListResponse>('./Guide/GetCategoryList');
   }
 
   public GetChannelGroupList(IncludeEmpty: boolean): Observable<ChannelGroupList> {
     let params = new HttpParams()
       .set("IncludeEmpty", IncludeEmpty);
-    return this.httpClient.get<ChannelGroupList>('/Guide/GetChannelGroupList', { params });
+    return this.httpClient.get<ChannelGroupList>('./Guide/GetChannelGroupList', { params });
   }
 
   public GetChannelIcon(request: GetChannelIconRequest): Observable<string> {
@@ -68,14 +68,14 @@ export class GuideService {
       .set("ChanId", request.ChanId)
       .set("Width", request.Width)
       .set("Height", request.Height)
-    return this.httpClient.get<string>('/Guide/GetChannelIcon', { params });
+    return this.httpClient.get<string>('./Guide/GetChannelIcon', { params });
   }
 
   public GetProgramDetails(request: GetProgramDetailsRequest): Observable<{Program: ScheduleOrProgram}> {
     let params = new HttpParams()
       .set("ChanId", request.ChanId)
       .set("StartTime", request.StartTime);
-    return this.httpClient.get<{Program: ScheduleOrProgram}>('/Guide/GetProgramDetails', { params });
+    return this.httpClient.get<{Program: ScheduleOrProgram}>('./Guide/GetProgramDetails', { params });
   }
 
   public GetProgramGuide(reqDate?: Date, ChannelGroupId?: number): Observable<ProgramGuide> {
@@ -89,36 +89,36 @@ export class GuideService {
       "Details": true,
       "ChannelGroupId" : ChannelGroupId
     };
-    return this.httpClient.post<ProgramGuide>('/Guide/GetProgramGuide', params);
+    return this.httpClient.post<ProgramGuide>('./Guide/GetProgramGuide', params);
   }
 
   public GetProgramList(request: GetProgramListRequest): Observable<{ ProgramList: ProgramList }> {
     let params = new HttpParams()
     for (const [key, value] of Object.entries(request))
       params = params.set(key, value);
-    return this.httpClient.get<{ ProgramList: ProgramList }>('/Guide/GetProgramList', { params });
+    return this.httpClient.get<{ ProgramList: ProgramList }>('./Guide/GetProgramList', { params });
   }
 
   public GetStoredSearches(searchType: string): Observable<GetStoredSearchesResponse> {
     let params = new HttpParams()
       .set("Type", searchType);
-    return this.httpClient.get<GetStoredSearchesResponse>('/Guide/GetStoredSearches', { params });
+    return this.httpClient.get<GetStoredSearchesResponse>('./Guide/GetStoredSearches', { params });
   }
 
   public RemoveFromChannelGroup(request: ChannelGroupRequest): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Guide/RemoveFromChannelGroup', request);
+    return this.httpClient.post<BoolResponse>('./Guide/RemoveFromChannelGroup', request);
   }
 
   public AddChannelGroup(Name: string): Observable<number> {
-    return this.httpClient.post<number>('/Guide/AddChannelGroup', {Name: Name});
+    return this.httpClient.post<number>('./Guide/AddChannelGroup', {Name: Name});
   }
 
   public UpdateChannelGroup(oldName: string, newName: string): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Guide/UpdateChannelGroup', {OldName: oldName, newName: newName});
+    return this.httpClient.post<BoolResponse>('./Guide/UpdateChannelGroup', {OldName: oldName, newName: newName});
   }
 
   public RemoveChannelGroup(Name: string): Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Guide/RemoveChannelGroup', {Name: Name});
+    return this.httpClient.post<BoolResponse>('./Guide/RemoveChannelGroup', {Name: Name});
   }
 
 }

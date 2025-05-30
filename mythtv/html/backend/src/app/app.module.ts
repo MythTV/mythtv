@@ -98,7 +98,7 @@ import { UsersComponent } from './dashboard/dashboard-settings/users/users.compo
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http);
+  return new TranslateHttpLoader(http,'./assets/i18n/');
 }
 
 @NgModule({

@@ -18,19 +18,19 @@ export class VideoService {
     for (const [key, value] of Object.entries(request))
       params = params.set(key, value);
     return this.httpClient.get<{ VideoMetadataInfoList: VideoMetadataInfoList }>
-      ('/Video/GetVideoList', { params });
+      ('./Video/GetVideoList', { params });
   }
 
   public GetCategoryList(): Observable<VideoCategoryList> {
-    return this.httpClient.get<VideoCategoryList>('/Video/GetCategoryList');
+    return this.httpClient.get<VideoCategoryList>('./Video/GetCategoryList');
   }
 
   public UpdateVideoWatchedStatus(id: number, watched: boolean) : Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Video/UpdateVideoWatchedStatus', {Id: id, Watched: watched});
+    return this.httpClient.post<BoolResponse>('./Video/UpdateVideoWatchedStatus', {Id: id, Watched: watched});
   }
 
   public UpdateVideoMetadata(request: UpdateVideoMetadataRequest) : Observable<BoolResponse> {
-    return this.httpClient.post<BoolResponse>('/Video/UpdateVideoMetadata', request);
+    return this.httpClient.post<BoolResponse>('./Video/UpdateVideoMetadata', request);
   }
 
 }

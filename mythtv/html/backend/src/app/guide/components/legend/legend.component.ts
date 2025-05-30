@@ -72,7 +72,7 @@ export class LegendComponent implements OnInit {
 
   loadfInfo() {
     this.mythService.GetBackendInfo().subscribe(data => {
-      this.cssFile = data.BackendInfo.Env.HttpRootDir + '/assets/guidecolors.css';
+      this.cssFile = data.BackendInfo.Env.HttpRootDir + './assets/guidecolors.css';
     });
   }
 

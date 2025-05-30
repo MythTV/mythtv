@@ -11,7 +11,7 @@ export class WebsocketService {
 
   constructor() {
     if (isDevMode()) {
-      this.ws_url = "ws://localhost:6744";
+      this.ws_url = "ws://localhost:6544";
     } else {
       this.ws_url = "ws://" + document.location.host;
     }
