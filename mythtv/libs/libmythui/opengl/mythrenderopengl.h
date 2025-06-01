@@ -57,7 +57,7 @@ class MUI_PUBLIC MythGLTexture
   public:
     explicit MythGLTexture(QOpenGLTexture *Texture);
     explicit MythGLTexture(GLuint Texture);
-   ~MythGLTexture() = default;
+    virtual ~MythGLTexture() = default;
 
     unsigned char  *m_data                    { nullptr };
     int             m_bufferSize              { 0 } ;
