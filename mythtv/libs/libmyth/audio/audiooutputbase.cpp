@@ -1736,8 +1736,8 @@ void AudioOutputBase::OutputAudioLoop(void)
 
     }
 
-    delete[] zeros;
-    delete[] fragment;
+    ::operator delete[] (zeros, std::align_val_t(16));
+    ::operator delete[] (fragment, std::align_val_t(16));
     LOG(VB_AUDIO, LOG_INFO, LOC + "OutputAudioLoop: Stop Event");
     OutputEvent e(OutputEvent::kStopped);
     dispatch(e);

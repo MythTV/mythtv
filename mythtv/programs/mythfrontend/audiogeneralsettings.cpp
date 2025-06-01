@@ -767,7 +767,7 @@ void AudioTestThread::run()
         }
         m_audioOutput->Pause(true);
 
-        delete[] frames;
+        ::operator delete[] (frames, std::align_val_t(16));
     }
     RunEpilog();
 }
