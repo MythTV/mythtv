@@ -1091,6 +1091,10 @@ void MPEG2fixup::WriteYUV(const QString& filename, const mpeg2_info_t *info)
         return;
     }
 
+    // Automatically close file at function exit
+    auto close_fh = [](const int *fh2) { close(*fh2); };
+    std::unique_ptr<int,decltype(close_fh)> cleanup { &fh, close_fh };
+
     ssize_t ret = write(fh, info->display_fbuf->buf[0],
 		       static_cast<size_t>(info->sequence->width) *
 		       static_cast<size_t>(info->sequence->height));
@@ -1098,7 +1102,7 @@ void MPEG2fixup::WriteYUV(const QString& filename, const mpeg2_info_t *info)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("write failed %1: ").arg(filename) +
                 ENO);
-        goto closefd;
+        return;
     }
     ret = write(fh, info->display_fbuf->buf[1],
                 static_cast<size_t>(info->sequence->chroma_width) *
@@ -1107,7 +1111,7 @@ void MPEG2fixup::WriteYUV(const QString& filename, const mpeg2_info_t *info)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("write failed %1: ").arg(filename) +
                 ENO);
-        goto closefd;
+        return;
     }
     ret = write(fh, info->display_fbuf->buf[2],
                 static_cast<size_t>(info->sequence->chroma_width) *
@@ -1116,10 +1120,8 @@ void MPEG2fixup::WriteYUV(const QString& filename, const mpeg2_info_t *info)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("write failed %1: ").arg(filename) +
                 ENO);
-        goto closefd;
+        return;
     }
-closefd:
-    close(fh);
 }
 
 void MPEG2fixup::WriteData(const QString& filename, uint8_t *data, int size)
