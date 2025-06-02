@@ -58,35 +58,6 @@ bool AudioOutputUtil::has_optimized_SIMD()
 #endif
 }
 
-/**
- * Convert integer samples to floats
- *
- * Consumes 'bytes' bytes from in and returns the numer of bytes written to out
- */
-int AudioOutputUtil::toFloat(AudioFormat format, void *out, const void *in,
-                             int bytes)
-{
-    return AudioConvert::toFloat(format, out, in, bytes);
-}
-
-/**
- * Convert float samples to integers
- *
- * Consumes 'bytes' bytes from in and returns the numer of bytes written to out
- */
-int AudioOutputUtil::fromFloat(AudioFormat format, void *out, const void *in,
-                               int bytes)
-{
-    return AudioConvert::fromFloat(format, out, in, bytes);
-}
-
-/**
- * Convert a mono stream to stereo by copying and interleaving samples
- */
-void AudioOutputUtil::MonoToStereo(void *dst, const void *src, int samples)
-{
-    AudioConvert::MonoToStereo(dst, src, samples);
-}
 
 /**
  * Adjust the volume of samples
@@ -284,7 +255,8 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 
     if (av_sample_fmt_is_planar(format))
     {
-        InterleaveSamples(AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample),
+        AudioConvert::InterleaveSamples(
+            AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample),
                           frame->ch_layout.nb_channels, buffer, (const uint8_t **)frame->extended_data,
                           data_size);
     }
@@ -295,38 +267,4 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     }
 
     return ret;
-}
-
-/**
- * Deinterleave input samples
- * Deinterleave audio samples and compact them
- */
-void AudioOutputUtil::DeinterleaveSamples(AudioFormat format, int channels,
-                                          uint8_t *output, const uint8_t *input,
-                                          int data_size)
-{
-    AudioConvert::DeinterleaveSamples(format, channels, output, input, data_size);
-}
-
-/**
- * Interleave input samples
- * Planar audio is contained in array of pointers
- * Interleave audio samples (convert from planar format)
- */
-void AudioOutputUtil::InterleaveSamples(AudioFormat format, int channels,
-                                        uint8_t *output, const uint8_t * const *input,
-                                        int data_size)
-{
-    AudioConvert::InterleaveSamples(format, channels, output, input, data_size);
-}
-
-/**
- * Interleave input samples
- * Interleave audio samples (convert from planar format)
- */
-void AudioOutputUtil::InterleaveSamples(AudioFormat format, int channels,
-                                        uint8_t *output, const uint8_t *input,
-                                        int data_size)
-{
-    AudioConvert::InterleaveSamples(format, channels, output, input, data_size);
 }

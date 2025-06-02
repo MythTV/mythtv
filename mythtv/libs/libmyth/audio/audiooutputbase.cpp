@@ -25,6 +25,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
+#include "audioconvert.h"
 #include "audiooutputbase.h"
 #include "audiooutputdigitalencoder.h"
 #include "audiooutpututil.h"
@@ -1449,13 +1450,13 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         int bdFrames = bdiff / bpf;
         if (bdFrames <= frames)
         {
-            AudioOutputUtil::MonoToStereo(WPOS, buffer, bdFrames);
+            AudioConvert::MonoToStereo(WPOS, buffer, bdFrames);
             frames -= bdFrames;
             off = bdFrames * sizeof(float); // 1 channel of floats
             org_waud = 0;
         }
         if (frames > 0)
-            AudioOutputUtil::MonoToStereo(WPOS, buffer + off, frames);
+            AudioConvert::MonoToStereo(WPOS, buffer + off, frames);
 
         org_waud = (org_waud + frames * bpf) % kAudioRingBufferSize;
         return len;
@@ -1658,7 +1659,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                 offset += len;
             }
             // Convert to floats
-            AudioOutputUtil::toFloat(m_format, m_srcIn, buffer, len);
+            AudioConvert::toFloat(m_format, m_srcIn, buffer, len);
         }
 
         frames_remaining -= frames;
@@ -1982,7 +1983,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     {
         if (fromFloats)
         {
-            off = AudioOutputUtil::fromFloat(m_outputFormat, buffer,
+            off = AudioConvert::fromFloat(m_outputFormat, buffer,
                                              LRPOS, bdiff);
         }
         else
@@ -1998,7 +1999,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     {
         if (fromFloats)
         {
-            AudioOutputUtil::fromFloat(m_outputFormat, buffer + off,
+            AudioConvert::fromFloat(m_outputFormat, buffer + off,
                                        LRPOS, frag_size);
         }
         else
