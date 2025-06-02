@@ -54,7 +54,7 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
         m_partialPacket.data[1] = data2;
         m_partialPacket.size    = 2;
     }
-    else if (DTVCC_PACKET_DATA == cc_type)
+    else if (DTVCC_PACKET_DATA == cc_type && m_partialPacket.size > 0)
     {
 #if DEBUG_CC_DECODE
         LOG(VB_VBI, LOG_DEBUG, LOC + QString("CC Ex data(0x%1 0x%2)")
@@ -65,13 +65,18 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
         m_partialPacket.data[m_partialPacket.size + 1] = data2;
         m_partialPacket.size += 2;
     }
-}
 
-void CC708Decoder::decode_cc_null(void)
-{
-    if (m_partialPacket.size && m_reader)
+    uint8_t packet_size_code = m_partialPacket.data[0] & 0b11'1111;
+    uint8_t total_packet_size = packet_size_code * 2;
+    if (packet_size_code == 0)
+    {
+        total_packet_size = 128;
+    }
+    if (m_reader != nullptr && m_partialPacket.size == total_packet_size)
+    {
         parse_cc_packet(m_reader, &m_partialPacket, m_lastSeen);
-    m_partialPacket.size = 0;
+        m_partialPacket.size = 0;
+    }
 }
 
 void CC708Decoder::services(std::chrono::seconds seconds, cc708_seen_flags & seen) const
