@@ -46,10 +46,6 @@ Checks: '-*,
         # As of 2022-12-19, there are 1014 unique warnings. ,
        -bugprone-easily-swappable-parameters,
 
-        # As of 2023-09-19, there are 7 unique warnings. 1 is in
-        # libmythfreesurround and the others are in libmythmheg. ,
-       -bugprone-empty-catch,
-
         # As of 2023-05-22, there are 97 unique warnings. ,
        -bugprone-implicit-widening-of-multiplication-result,
 
@@ -156,9 +152,6 @@ Checks: '-*,
         # As of 2024-08-01, there are 12256 unique warnings. ,
        -cppcoreguidelines-avoid-do-while,
 
-        # As of 2024-08-03, there are 135 unique warnings. ,
-       -cppcoreguidelines-avoid-goto,
-
         # As of 2023-05-22, there are 1257 unique warnings. ,
        -cppcoreguidelines-avoid-non-const-global-variables,
 
@@ -191,6 +184,9 @@ Checks: '-*,
 
         # As of 2024-08-02, there are 1547 unique warnings. ,
        -cppcoreguidelines-special-member-functions,
+
+        # As of 2025-06-28, there are 959 unique warnings. ,
+       -cppcoreguidelines-use-enum-class,
 
         # As of 2024-08-01, there are 207 unique warnings. ,
        -cppcoreguidelines-virtual-class-destructor,
@@ -279,14 +275,21 @@ Checks: '-*,
         # Doesn''t understand Qt signals/slots. ,
        -readability-redundant-access-specifiers,
 
+        # Wants to rewrite every use of 127/255 as a reference to
+        # std::numeric_limits. ,
+       -readability-use-numeric-limits,
+
 '
 
 CheckOptions:
+  - { key: bugprone-narrowing-conversions.PedanticMode, value: 0 }
   - { key: bugprone-suspicious-string-compare.WarnOnLogicalNotComparison, value: 1 }
   - { key: bugprone-pointer-arithmetic-on-polymorphic-object.IgnoreInheritedVirtualFunctions, value: 1 }
+  - { key: bugprone-unused-return-value.AllowCastToVoid, value: 1 }
 
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros, value: 1 }
+  - { key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage, value: 1 }
   - { key: cppcoreguidelines-pro-type-member-init.IgnoreArrays, value: 1 }
-  - { key: cppcoreguidelines-narrowing-conversions.PedanticMode, value: 0 } # test 1 at some point
 
   - { key: misc-header-include-cycle.IgnoredFilesList, value: 'qglobal.h;mem.h;common.h' }
 
