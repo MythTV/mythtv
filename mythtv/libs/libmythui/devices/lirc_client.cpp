@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -1906,6 +1907,12 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 	fd_set fds;
 	struct timeval tv {};
 	
+        auto cleanup_fn = [&](int */*x*/) {
+		s_head=s_tail=0;
+		s_buffer[0]=0;
+        };
+        std::unique_ptr<int,decltype(cleanup_fn)> cleanup { &ret, cleanup_fn };
+
 	if(s_head>0)
 	{
 		memmove(s_buffer.data(),s_buffer.data()+s_head,s_tail-s_head+1);
@@ -1920,7 +1927,7 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 	if(strlen(s_buffer.data())!=s_tail)
 	{
 		lirc_printf(state, "%s: protocol error\n", state->lirc_prog);
-		goto lirc_read_string_error;
+		return nullptr;
 	}
 	
 	while(end==nullptr)
@@ -1928,7 +1935,7 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 		if(LIRC_PACKET_SIZE<=s_tail)
 		{
 			lirc_printf(state, "%s: bad packet\n", state->lirc_prog);
-			goto lirc_read_string_error;
+			return nullptr;
 		}
 		
 		FD_ZERO(&fds); // NOLINT(readability-isolate-declaration)
@@ -1944,12 +1951,12 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 		{
 			lirc_printf(state, "%s: select() failed\n", state->lirc_prog);
 			lirc_perror(state, state->lirc_prog);
-			goto lirc_read_string_error;
+			return nullptr;
 		}
-		else if(ret==0)
+		if(ret==0)
 		{
 			lirc_printf(state, "%s: timeout\n", state->lirc_prog);
-			goto lirc_read_string_error;
+			return nullptr;
 		}
 		
 		n=read(fd, s_buffer.data()+s_tail, LIRC_PACKET_SIZE-s_tail);
@@ -1957,7 +1964,7 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 		{
 			lirc_printf(state, "%s: read() failed\n", state->lirc_prog);
 			lirc_perror(state, state->lirc_prog);			
-			goto lirc_read_string_error;
+			return nullptr;
 		}
 		s_buffer[s_tail+n]=0;
 		s_tail+=n;
@@ -1966,12 +1973,8 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 	
 	end[0]=0;
 	s_head=strlen(s_buffer.data())+1;
+	(void)cleanup.release();
 	return(s_buffer.data());
-
- lirc_read_string_error:
-	s_head=s_tail=0;
-	s_buffer[0]=0;
-	return nullptr;
 }
 
 int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *command, char *buf, size_t *buf_len, int *ret_status)
@@ -2008,8 +2011,10 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 	/* get response */
 	int status=LIRC_RET_SUCCESS;
 	enum packet_state state=P_BEGIN;
+	bool good_packet = false;
+	bool bad_packet = false;
 	n=0;
-	while(true)
+	while(!good_packet && !bad_packet)
 	{
 		const char *string=lirc_read_string(lstate, sockfd);
 		if(string==nullptr) return(-1);
@@ -2041,7 +2046,8 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 			else if(strcasecmp(string,"END")==0)
 			{
 				status=LIRC_RET_SUCCESS;
-				goto good_packet;
+				good_packet = true;
+				break;
 			}
 			else if(strcasecmp(string,"ERROR")==0)
 			{
@@ -2051,27 +2057,31 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 			}
 			else
 			{
-				goto bad_packet;
+				bad_packet = true;
+				break;
 			}
 			state=P_DATA;
 			break;
 		case P_DATA:
 			if(strcasecmp(string,"END")==0)
 			{
-				goto good_packet;
+				good_packet = true;
+				break;
 			}
 			else if(strcasecmp(string,"DATA")==0)
 			{
 				state=P_N;
 				break;
 			}
-			goto bad_packet;
+			bad_packet = true;
+			break;
 		case P_N:
 			errno=0;
 			data_n=strtoul(string,&endptr,0);
 			if(!*string || *endptr)
 			{
-				goto bad_packet;
+				bad_packet = true;
+				break;
 			}
 			if(data_n==0)
 			{
@@ -2095,20 +2105,20 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 		case P_END:
 			if(strcasecmp(string,"END")==0)
 			{
-				goto good_packet;
+				good_packet = true;
+				break;
 			}
-			goto bad_packet;
+			bad_packet = true;
 			break;
 		}
 	}
-	
-	/* never reached */
-	
- bad_packet:
-	lirc_printf(lstate, "%s: bad return packet\n", lstate->lirc_prog);
-	return(-1);
-	
- good_packet:
+
+	if (bad_packet)
+	{
+		lirc_printf(lstate, "%s: bad return packet\n", lstate->lirc_prog);
+		return(-1);
+	}
+
 	if(ret_status!=nullptr)
 	{
 		*ret_status=status;
