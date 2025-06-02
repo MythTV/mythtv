@@ -2,8 +2,8 @@
 
 #include <QtGlobal> // before taglib includes
 
-#include <apetag.h>
-#include <apeitem.h>
+#include <taglib/apetag.h>
+#include <taglib/apeitem.h>
 
 // libmythmetadata
 #include "metaiowavpack.h"

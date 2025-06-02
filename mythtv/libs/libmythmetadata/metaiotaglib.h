@@ -6,7 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <tfile.h>
+#include <taglib/tfile.h>
 
 using TagLib::File;
 using TagLib::Tag;

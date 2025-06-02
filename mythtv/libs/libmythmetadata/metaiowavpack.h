@@ -6,7 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <wavpackfile.h>
+#include <taglib/wavpackfile.h>
 
 using TagLib::Tag;
 using TagLib::String;

@@ -6,8 +6,8 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <id3v1tag.h>
-#include <id3v2tag.h>
+#include <taglib/id3v1tag.h>
+#include <taglib/id3v2tag.h>
 #ifdef Q_OS_WIN
 // The above indirectly includes winuser.h, which unconditionally
 // redefines the string SendMessage to SendMessageA.

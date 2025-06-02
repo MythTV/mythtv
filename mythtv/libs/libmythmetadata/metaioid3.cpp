@@ -11,8 +11,8 @@
 #include "libmythbase/mythcorecontext.h"
 
 // Taglib
-#include <flacfile.h>
-#include <mpegfile.h>
+#include <taglib/flacfile.h>
+#include <taglib/mpegfile.h>
 
 // libmythmetadata
 #include "metaioid3.h"

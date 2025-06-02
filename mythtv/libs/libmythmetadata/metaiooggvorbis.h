@@ -6,7 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <vorbisfile.h>
+#include <taglib/vorbisfile.h>
 
 using TagLib::Tag;
 using TagLib::String;

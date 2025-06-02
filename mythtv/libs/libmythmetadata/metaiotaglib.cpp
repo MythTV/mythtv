@@ -5,10 +5,10 @@
 #include "libmythbase/mythlogging.h"
 
 // Taglib
-#include <audioproperties.h>
-#include <tag.h>
-#include <tstring.h>
-#include <fileref.h>
+#include <taglib/audioproperties.h>
+#include <taglib/tag.h>
+#include <taglib/tstring.h>
+#include <taglib/fileref.h>
 
 // libmythmetadata
 #include "metaiotaglib.h"

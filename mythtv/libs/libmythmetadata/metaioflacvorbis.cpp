@@ -7,7 +7,7 @@
 #include <QBuffer>
 
 // Taglib
-#include <xiphcomment.h>
+#include <taglib/xiphcomment.h>
 
 // libmythmetadata
 #include "metaioflacvorbis.h"

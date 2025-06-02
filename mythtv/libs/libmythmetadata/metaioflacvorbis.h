@@ -6,7 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <flacfile.h>
+#include <taglib/flacfile.h>
 
 using TagLib::Tag;
 using TagLib::String;
