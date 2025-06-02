@@ -22,20 +22,6 @@ class MPUBLIC AudioOutputUtil
     static int DecodeAudio(AVCodecContext *ctx,
                            uint8_t *buffer, int &data_size,
                            const AVPacket *pkt);
-
-    // Actually now in AudioConvert class, kept here for compatibility
-    static int  toFloat(AudioFormat format, void *out, const void *in, int bytes);
-    static int  fromFloat(AudioFormat format, void *out, const void *in, int bytes);
-    static void MonoToStereo(void *dst, const void *src, int samples);
-    static void DeinterleaveSamples(AudioFormat format, int channels,
-                                    uint8_t *output, const uint8_t *input,
-                                    int data_size);
-    static void InterleaveSamples(AudioFormat format, int channels,
-                                  uint8_t *output, const uint8_t * const *input,
-                                  int data_size);
-    static void InterleaveSamples(AudioFormat format, int channels,
-                                  uint8_t *output, const uint8_t *input,
-                                  int data_size);
 };
 
 #endif

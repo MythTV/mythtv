@@ -14,7 +14,7 @@ extern "C" {
 #include "libmythbase/mythlogging.h"
 
 #include "audiooutputdigitalencoder.h"
-#include "audiooutpututil.h"
+#include "audioconvert.h"
 #include "mythaverror.h"
 
 #define LOC QString("DEnc: ")
@@ -205,7 +205,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
     else if (format == FORMAT_FLT)
     {
         // The input format is float but ffmpeg wants something else so convert it
-        m_inlen += AudioOutputUtil::fromFloat(MYTH_SAMPLE_FORMAT, m_inbuf + m_inlen,
+        m_inlen += AudioConvert::fromFloat(MYTH_SAMPLE_FORMAT, m_inbuf + m_inlen,
                                             input, len);
     }
 #endif
@@ -263,7 +263,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
         }
         bool got_packet   = false;
 
-        AudioOutputUtil::DeinterleaveSamples(
+        AudioConvert::DeinterleaveSamples(
             MYTH_SAMPLE_FORMAT, channels,
             m_framebuf,
             m_inbuf + (static_cast<ptrdiff_t>(i) * size_channel * channels),
