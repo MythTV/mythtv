@@ -2774,8 +2774,6 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size)
 
         if (!cc_valid)
         {
-            if (cc_type >= 0x2)
-                m_ccd708->decode_cc_null();
             continue;
         }
 
