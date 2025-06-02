@@ -8,9 +8,6 @@
 // Taglib
 #include <taglib/vorbisfile.h>
 
-using TagLib::Tag;
-using TagLib::String;
-
 /*!
 * \class MetaIOOggVorbis
 *

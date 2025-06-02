@@ -8,9 +8,6 @@
 // Taglib
 #include <taglib/wavpackfile.h>
 
-using TagLib::Tag;
-using TagLib::String;
-
 /*!
 * \class MetaIOWavPack
 *

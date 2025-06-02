@@ -8,9 +8,6 @@
 // Taglib
 #include <taglib/flacfile.h>
 
-using TagLib::Tag;
-using TagLib::String;
-
 /*!
 * \class MetaIOFLACVorbis
 *

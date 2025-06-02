@@ -8,10 +8,6 @@
 // Taglib
 #include <taglib/tfile.h>
 
-using TagLib::File;
-using TagLib::Tag;
-using TagLib::String;
-
 /*!
  * \class MetaIOTagLib
  *
