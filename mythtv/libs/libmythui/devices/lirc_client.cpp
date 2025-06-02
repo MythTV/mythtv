@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <string>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -95,8 +96,8 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
                                          const char *file,
                                          struct lirc_config **config,
                                          int (check)(char *s),
-                                         char **full_name,
-                                         char **sha_bang);
+                                         std::string& full_name,
+                                         std::string& sha_bang);
 static char *lirc_startupmode(const struct lirc_state *state,
 							  struct lirc_config_entry *first);
 static void lirc_freeconfigentries(struct lirc_config_entry *first);
@@ -842,42 +843,36 @@ int lirc_readconfig(const struct lirc_state *state,
 {
 	struct sockaddr_un addr {};
 	int sockfd = -1;
-	const char *sha_bang2 = nullptr;
-	char *command = nullptr;
 	unsigned int ret = 0;
 
-	char *filename = nullptr;
-	char *sha_bang = nullptr;
-	if(lirc_readconfig_only_internal(state,file,config,check,&filename,&sha_bang)==-1)
+	std::string filename;
+	std::string sha_bang;
+	if(lirc_readconfig_only_internal(state,file,config,check,filename,sha_bang)==-1)
 	{
 		return -1;
 	}
 	
-	if(sha_bang == nullptr)
-	{
-		goto lirc_readconfig_compat;
-	}
+	if(sha_bang.empty())
+		return 0;
 	
 	/* connect to lircrcd */
 
 	addr.sun_family=AF_UNIX;
-	if(lirc_getsocketname(filename, addr.sun_path, sizeof(addr.sun_path))>sizeof(addr.sun_path))
+	if(lirc_getsocketname(filename.data(), addr.sun_path, sizeof(addr.sun_path))>sizeof(addr.sun_path))
 	{
 		lirc_printf(state, "%s: WARNING: file name too long\n", state->lirc_prog);
-		goto lirc_readconfig_compat;
+		return 0;
 	}
 	sockfd=socket(AF_UNIX,SOCK_STREAM,0);
 	if(sockfd==-1)
 	{
 		lirc_printf(state, "%s: WARNING: could not open socket\n",state->lirc_prog);
 		lirc_perror(state, state->lirc_prog);
-		goto lirc_readconfig_compat;
+		return 0;
 	}
 	if(connect(sockfd, (struct sockaddr *)&addr, sizeof(addr))!=-1)
 	{
-		if(sha_bang!=nullptr) free(sha_bang);
 		(*config)->sockfd=sockfd;
-		free(filename);
 		
 		/* tell daemon state->lirc_prog */
 		if(lirc_identify(state, sockfd) == LIRC_RET_SUCCESS)
@@ -889,37 +884,21 @@ int lirc_readconfig(const struct lirc_state *state,
 		lirc_freeconfig(*config);
 		return -1;
 	}
-    close(sockfd);
+	close(sockfd);
 	
 	/* launch lircrcd */
-    sha_bang2=sha_bang;
-	
-	command=static_cast<char*>(malloc(strlen(sha_bang2)+1+strlen(filename)+1));
-	if(command==nullptr)
-	{
-		goto lirc_readconfig_compat;
-	}
-	strcpy(command, sha_bang2);
-	strcat(command, " ");
-	strcat(command, filename);
-	
-	ret = system(command);
-	free(command);
+	std::string command = sha_bang + " " + filename;
+	ret = system(command.data());
 	
 	if(ret!=EXIT_SUCCESS)
-	{
-		goto lirc_readconfig_compat;
-	}
-	
-	if(sha_bang!=nullptr) { free(sha_bang); sha_bang = nullptr; }
-	free(filename); filename = nullptr;
+		return 0;
 	
 	sockfd=socket(AF_UNIX,SOCK_STREAM,0);
 	if(sockfd==-1)
 	{
 		lirc_printf(state, "%s: WARNING: could not open socket\n",state->lirc_prog);
 		lirc_perror(state, state->lirc_prog);
-		goto lirc_readconfig_compat;
+		return 0;
 	}
 	if(connect(sockfd, (struct sockaddr *)&addr, sizeof(addr))!=-1)
 	{
@@ -932,12 +911,6 @@ int lirc_readconfig(const struct lirc_state *state,
 	close(sockfd);
 	lirc_freeconfig(*config);
 	return -1;
-	
- lirc_readconfig_compat:
-    /* compat fallback */
-	if(sha_bang!=nullptr) free(sha_bang);
-	free(filename);
-	return 0;
 }
 
 int lirc_readconfig_only(const struct lirc_state *state,
@@ -945,19 +918,20 @@ int lirc_readconfig_only(const struct lirc_state *state,
                          struct lirc_config **config,
                          int (check)(char *s))
 {
-	return lirc_readconfig_only_internal(state, file, config, check, nullptr, nullptr);
+	std::string filename;
+	std::string sha_bang;
+	return lirc_readconfig_only_internal(state, file, config, check, filename, sha_bang);
 }
 
 static int lirc_readconfig_only_internal(const struct lirc_state *state,
                                          const char *file,
                                          struct lirc_config **config,
                                          int (check)(char *s),
-                                         char **full_name,
-                                         char **sha_bang)
+                                         std::string& full_name,
+                                         std::string& sha_bang)
 {
 	int ret=0;
 	int firstline=1;
-	char *save_full_name = nullptr;
 	
 	struct filestack_t *filestack = stack_push(state, nullptr);
 	if (filestack == nullptr)
@@ -985,30 +959,21 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		if(ret==-1 || string==nullptr)
 		{
 			fclose(filestack->m_file);
-			if(open_files == 1 && full_name != nullptr)
+			if(open_files == 1)
 			{
-				save_full_name = filestack->m_name;
-				filestack->m_name = nullptr;
+				full_name = filestack->m_name;
 			}
 			filestack = stack_pop(filestack);
 			open_files--;
 			continue;
 		}
 		/* check for sha-bang */
-		if(firstline && sha_bang)
+		if(firstline)
 		{
 			firstline = 0;
 			if(strncmp(string, "#!", 2)==0)
 			{
-				*sha_bang=strdup(string+2);
-				if(*sha_bang==nullptr)
-				{
-					lirc_printf(state, "%s: out of memory\n",
-						    state->lirc_prog);
-					ret=-1;
-					free(string);
-					break;
-				}
+				sha_bang=string+2;
 			}
 		}
 		filestack->m_line++;
@@ -1319,29 +1284,16 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		char *startupmode = lirc_startupmode(state, (*config)->first);
 		(*config)->current_mode=startupmode ? strdup(startupmode):nullptr;
 		(*config)->sockfd=-1;
-		if(full_name != nullptr)
-		{
-			*full_name = save_full_name;
-			save_full_name = nullptr;
-		}
 	}
 	else
 	{
 		*config=nullptr;
 		lirc_freeconfigentries(first);
-		if(sha_bang && *sha_bang!=nullptr)
-		{
-			free(*sha_bang);
-			*sha_bang=nullptr;
-		}
+		sha_bang.clear();
 	}
 	if(filestack)
 	{
 		stack_free(filestack);
-	}
-	if(save_full_name)
-	{
-		free(save_full_name);
 	}
 	return(ret);
 }
