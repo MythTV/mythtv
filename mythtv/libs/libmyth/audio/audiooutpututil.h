@@ -17,8 +17,6 @@ class MPUBLIC AudioOutputUtil
                              bool music, bool upmix);
     static void MuteChannel(int obits, int channels, int ch,
                             void *buffer, int bytes);
-    static char *GeneratePinkFrames(char *frames, int channels,
-                                    int channel, int count, int bits = 16);
     static int DecodeAudio(AVCodecContext *ctx,
                            uint8_t *buffer, int &data_size,
                            const AVPacket *pkt);

@@ -4,7 +4,6 @@
 #include <limits> // workaround QTBUG-90395
 
 #include <QtGlobal>
-#include <QtEndian>
 
 #include "libmythbase/mythlogging.h"
 
@@ -15,7 +14,6 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-#include "pink.h"
 
 #define LOC QString("AOUtil: ")
 
@@ -154,43 +152,6 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
         tMuteChannel((short *)buffer, channels, ch, frames);
     else
         tMuteChannel((int *)buffer, channels, ch, frames);
-}
-
-char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
-                                          int channel, int count, int bits)
-{
-    pink_noise_t pink{};
-
-    initialize_pink_noise(&pink);
-
-    auto *samp16 = (int16_t*) frames;
-    auto *samp32 = (int32_t*) frames;
-
-    while (count-- > 0)
-    {
-        for(int chn = 0 ; chn < channels; chn++)
-        {
-            if (chn==channel)
-            {
-                /* Don't use MAX volume */
-                double res = generate_pink_noise_sample(&pink) *
-                    static_cast<float>(0x03fffffff);
-                int32_t ires = res;
-                if (bits == 16)
-                    *samp16++ = qToLittleEndian<qint16>(ires >> 16);
-                else
-                    *samp32++ = qToLittleEndian<qint32>(ires);
-            }
-            else
-            {
-                if (bits == 16)
-                    *samp16++ = 0;
-                else
-                    *samp32++ = 0;
-            }
-        }
-    }
-    return frames;
 }
 
 /**
