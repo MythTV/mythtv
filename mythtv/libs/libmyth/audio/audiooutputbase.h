@@ -115,6 +115,8 @@ class AudioOutputBase : public AudioOutput, public MThread
     // In other words, divisible by 96.
     static const uint kAudioRingBufferSize   = 10239936U;
 
+    bool has_optimized_SIMD() override; // AudioOutput
+
  protected:
     // Following function must be called from subclass constructor
     void InitSettings(const AudioSettings &settings);
