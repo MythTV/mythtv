@@ -28,7 +28,6 @@
 #include "audioconvert.h"
 #include "audiooutputbase.h"
 #include "audiooutputdigitalencoder.h"
-#include "audiooutpututil.h"
 #include "freesurround.h"
 #include "spdifencoder.h"
 
@@ -239,6 +238,142 @@ static int DownmixFrames(int channels_in, int  channels_out,
     }
 
     return frames;
+}
+
+#ifdef Q_PROCESSOR_X86
+// Check cpuid for SSE2 support on x86 / x86_64
+static inline bool sse2_check()
+{
+#ifdef Q_PROCESSOR_X86_64
+    return true;
+#else
+    static int has_sse2 = -1;
+    if (has_sse2 != -1)
+        return (bool)has_sse2;
+    __asm__(
+        // -fPIC - we may not clobber ebx/rbx
+        "push       %%ebx               \n\t"
+        "mov        $1, %%eax           \n\t"
+        "cpuid                          \n\t"
+        "and        $0x4000000, %%edx   \n\t"
+        "shr        $26, %%edx          \n\t"
+        "pop        %%ebx               \n\t"
+        :"=d"(has_sse2)
+        ::"%eax","%ecx"
+    );
+    return (bool)has_sse2;
+#endif
+}
+#endif //Q_PROCESSOR_X86
+
+/**
+ * Returns true if the processor supports MythTV's optimized SIMD for AudioConvert.
+ * Currently, only SSE2 is implemented.
+ */
+bool AudioOutputBase::has_optimized_SIMD()
+{
+#ifdef Q_PROCESSOR_X86
+    return sse2_check();
+#else
+    return false;
+#endif
+}
+
+/**
+ * Adjust the volume of samples
+ *
+ * Makes a crude attempt to normalise the relative volumes of
+ * PCM from mythmusic, PCM from video and upmixed AC-3
+ */
+static void adjustVolume(void *buf, int len, int volume,
+                                   bool music, bool upmix)
+{
+    float g     = volume / 100.0F;
+    auto *fptr  = (float *)buf;
+    int samples = len >> 2;
+    int i       = 0;
+
+    // Should be exponential - this'll do
+    g *= g;
+
+    // Try to ~ match stereo volume when upmixing
+    if (upmix)
+        g *= 1.5F;
+
+    // Music is relatively loud
+    if (music)
+        g *= 0.4F;
+
+    if (g == 1.0F)
+        return;
+
+#ifdef Q_PROCESSOR_X86
+    if (sse2_check() && samples >= 16)
+    {
+        int loops = samples >> 4;
+        i = loops << 4;
+
+        __asm__ volatile (
+            "movss      %2, %%xmm0          \n\t"
+            "punpckldq  %%xmm0, %%xmm0      \n\t"
+            "punpckldq  %%xmm0, %%xmm0      \n\t"
+            "1:                             \n\t"
+            "movups     (%0), %%xmm1        \n\t"
+            "movups     16(%0), %%xmm2      \n\t"
+            "mulps      %%xmm0, %%xmm1      \n\t"
+            "movups     32(%0), %%xmm3      \n\t"
+            "mulps      %%xmm0, %%xmm2      \n\t"
+            "movups     48(%0), %%xmm4      \n\t"
+            "mulps      %%xmm0, %%xmm3      \n\t"
+            "movups     %%xmm1, (%0)        \n\t"
+            "mulps      %%xmm0, %%xmm4      \n\t"
+            "movups     %%xmm2, 16(%0)      \n\t"
+            "movups     %%xmm3, 32(%0)      \n\t"
+            "movups     %%xmm4, 48(%0)      \n\t"
+            "add        $64,    %0          \n\t"
+            "sub        $1, %%ecx           \n\t"
+            "jnz        1b                  \n\t"
+            :"+r"(fptr)
+            :"c"(loops),"m"(g)
+            :"xmm0","xmm1","xmm2","xmm3","xmm4"
+        );
+    }
+#endif //Q_PROCESSOR_X86
+    for (; i < samples; i++)
+        *fptr++ *= g;
+}
+
+template <class AudioDataType>
+static void tMuteChannel(AudioDataType *buffer, int channels, int ch, int frames)
+{
+    AudioDataType *s1 = buffer + ch;
+    AudioDataType *s2 = buffer - ch + 1;
+
+    for (int i = 0; i < frames; i++)
+    {
+        *s1 = *s2;
+        s1 += channels;
+        s2 += channels;
+    }
+}
+
+/**
+ * Mute individual channels through mono->stereo duplication
+ *
+ * Mute given channel (left or right) by copying right or left
+ * channel over.
+ */
+static void muteChannel(int obits, int channels, int ch,
+                                  void *buffer, int bytes)
+{
+    int frames = bytes / ((obits >> 3) * channels);
+
+    if (obits == 8)
+        tMuteChannel((uint8_t *)buffer, channels, ch, frames);
+    else if (obits == 16)
+        tMuteChannel((short *)buffer, channels, ch, frames);
+    else
+        tMuteChannel((int *)buffer, channels, ch, frames);
 }
 
 const char *AudioOutputBase::quality_string(int q)
@@ -1761,14 +1896,12 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
             if (bdiff <= num)
             {
-                AudioOutputUtil::AdjustVolume(WPOS, bdiff, m_volume,
-                                              music, m_needsUpmix && m_upmixer);
+                adjustVolume(WPOS, bdiff, m_volume, music, m_needsUpmix && m_upmixer);
                 num -= bdiff;
                 org_waud = 0;
             }
             if (num > 0)
-                AudioOutputUtil::AdjustVolume(WPOS, num, m_volume,
-                                              music, m_needsUpmix && m_upmixer);
+                adjustVolume(WPOS, num, m_volume, music, m_needsUpmix && m_upmixer);
             org_waud = (org_waud + num) % kAudioRingBufferSize;
         }
 
@@ -2016,7 +2149,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
         written_size && m_configuredChannels > 1 &&
         (mute_state == kMuteLeft || mute_state == kMuteRight))
     {
-        AudioOutputUtil::MuteChannel(obytes << 3, m_configuredChannels,
+        muteChannel(obytes << 3, m_configuredChannels,
                                      mute_state == kMuteLeft ? 0 : 1,
                                      buffer, written_size);
     }
