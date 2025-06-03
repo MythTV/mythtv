@@ -9,4 +9,4 @@ if(CMAKE_CROSSCOMPILING)
 endif()
 
 add_subdirectory(test_audioconvert)
-add_subdirectory(test_audioutils)
+add_subdirectory(test_pink_noise)

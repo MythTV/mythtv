@@ -19,13 +19,12 @@
  */
 
 #include <array>
-#include <cstring>
 
 #include <QTest>
 
 #include "libmyth/audio/pink.h"
 
-class TestAudioUtils: public QObject
+class TestPinkNoise: public QObject
 {
     Q_OBJECT
 
