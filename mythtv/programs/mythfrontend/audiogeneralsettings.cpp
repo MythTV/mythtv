@@ -16,7 +16,8 @@
 #include <utility>
 
 // MythTV headers
-#include "libmyth/audio/audiooutpututil.h"
+#include "libmyth/audio/audiooutput.h"
+#include "libmyth/audio/audiooutputsettings.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
@@ -738,10 +739,9 @@ void AudioTestThread::run()
                 int top = m_samplerate / 1000 * 3;
                 for (int j = 0; j < top && !m_interrupted; j++)
                 {
-                    AudioOutputUtil::GeneratePinkFrames(frames, m_channels,
+                    if (!m_audioOutput->playPinkNoise(frames, m_channels,
                                                         current, 1000,
-                                                        m_hd ? 32 : 16);
-                    if (!m_audioOutput->AddFrames(frames, 1000 , -1ms))
+                                                        m_hd ? 32 : 16))
                     {
                         LOG(VB_AUDIO, LOG_ERR, "AddData() Audio buffer "
                                                "overflow, audio data lost!");
