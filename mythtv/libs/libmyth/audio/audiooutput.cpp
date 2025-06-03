@@ -6,6 +6,7 @@
 
 // Qt utils: to parse audio list
 #include <QtGlobal>
+#include <QtEndian>
 #include <QFile>
 #include <QDateTime>
 #include <QDir>
@@ -49,6 +50,7 @@ extern "C" {
 }
 #include "audioconvert.h"
 #include "mythaverror.h"
+#include "pink.h"
 
 #define LOC QString("AO: ")
 
@@ -716,4 +718,46 @@ void AudioOutput::prepareVisuals()
         QMutexLocker locker(visual->mutex());
         visual->prepare();
     }
+}
+
+static char* generatePinkFrames(char* frames, int channels, int channel, int count, int bits)
+{
+    pink_noise_t pink{};
+
+    initialize_pink_noise(&pink);
+
+    auto *samp16 = (int16_t*) frames;
+    auto *samp32 = (int32_t*) frames;
+
+    while (count-- > 0)
+    {
+        for(int chn = 0 ; chn < channels; chn++)
+        {
+            if (chn==channel)
+            {
+                /* Don't use MAX volume */
+                double res = generate_pink_noise_sample(&pink) *
+                    static_cast<float>(0x03fffffff);
+                int32_t ires = res;
+                if (bits == 16)
+                    *samp16++ = qToLittleEndian<qint16>(ires >> 16);
+                else
+                    *samp32++ = qToLittleEndian<qint32>(ires);
+            }
+            else
+            {
+                if (bits == 16)
+                    *samp16++ = 0;
+                else
+                    *samp32++ = 0;
+            }
+        }
+    }
+    return frames;
+}
+
+bool AudioOutput::playPinkNoise(char *frames, int channels, int channel, int count, int bits)
+{
+    generatePinkFrames(frames, channels, channel, count, bits);
+    return AddFrames(frames, count, -1ms);
 }

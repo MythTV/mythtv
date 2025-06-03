@@ -202,6 +202,17 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     void addVisual(Visualization *v);
     void removeVisual(Visualization *v);
 
+    /** Generates and plays pink noise from a speaker for testing.
+    @param frames   The buffer where the noise will be generated.  This is a parameter
+                    to allow reusing the same buffer without reallocating memory between calls.
+    @param channels The total number of channels in the output.
+    @param channel  The channel index of the speaker to test.
+    @param count    The number of frames to generate.
+    @param bits     16 or 32; the number of bits per sample in the output.
+    @return The return value of AddFrames(), which plays the noise.
+    */
+    bool playPinkNoise(char* frames, int channels, int channel, int count, int bits);
+
   protected:
     void dispatchError(const QString &e);
     void dispatchVisual(uchar *b, unsigned long b_len,
