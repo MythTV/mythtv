@@ -5,7 +5,7 @@ QT += xml sql network testlib
 using_opengl: QT += opengl
 
 TEMPLATE = app
-TARGET = test_audioutils
+TARGET = test_pink_noise
 INCLUDEPATH += ../../.. ../../../../external/FFmpeg
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
@@ -26,8 +26,8 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
 
 # Input
-HEADERS += test_audioutils.h
-SOURCES += test_audioutils.cpp
+HEADERS += test_pink_noise.h
+SOURCES += test_pink_noise.cpp
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += ; ( cd $(OBJECTS_DIR) && rm -f *.gcov *.gcda *.gcno )
