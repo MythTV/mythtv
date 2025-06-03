@@ -213,6 +213,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     */
     bool playPinkNoise(char* frames, int channels, int channel, int count, int bits);
 
+    virtual bool has_optimized_SIMD() { return false; }
+
   protected:
     void dispatchError(const QString &e);
     void dispatchVisual(uchar *b, unsigned long b_len,

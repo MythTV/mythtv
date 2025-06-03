@@ -12,11 +12,6 @@
 class MPUBLIC AudioOutputUtil
 {
  public:
-    static bool has_optimized_SIMD();
-    static void AdjustVolume(void *buffer, int len, int volume,
-                             bool music, bool upmix);
-    static void MuteChannel(int obits, int channels, int ch,
-                            void *buffer, int bytes);
     static int DecodeAudio(AVCodecContext *ctx,
                            uint8_t *buffer, int &data_size,
                            const AVPacket *pkt);
