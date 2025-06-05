@@ -313,7 +313,6 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
             EnableCaptions(mode, UpdateOSD);
         }
     }
-    ResetCaptions();
 }
 
 QStringList MythPlayerCaptionsUI::GetTracks(uint Type)
