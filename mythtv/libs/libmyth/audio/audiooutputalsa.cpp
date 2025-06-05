@@ -751,24 +751,24 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                                      &buffer_time, &dir);
         while (err < 0)
         {
-                    /*
-                     * with some drivers, snd_pcm_hw_params_set_buffer_time_near
-                     * only works once, if that's the case no point trying with
-                     * different values
-                     */
-                if ((buffer_time <= 100000) ||
-                    (attempt > 0 && buffer_time == buftmp))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't set buffer time, giving up");
-                    return err;
-                }
-                AERROR(QString("Unable to set buffer time to %1us, retrying")
-                       .arg(buffer_time));
-                buffer_time -= 100000;
-                canincrease  = false;
-                attempt++;
-                err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
-                                                             &buffer_time, &dir);
+            /*
+             * with some drivers, snd_pcm_hw_params_set_buffer_time_near
+             * only works once, if that's the case no point trying with
+             * different values
+             */
+            if ((buffer_time <= 100000) ||
+                (attempt > 0 && buffer_time == buftmp))
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't set buffer time, giving up");
+                return err;
+            }
+            AERROR(QString("Unable to set buffer time to %1us, retrying")
+                   .arg(buffer_time));
+            buffer_time -= 100000;
+            canincrease  = false;
+            attempt++;
+            err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
+                                                         &buffer_time, &dir);
         }
     }
 
