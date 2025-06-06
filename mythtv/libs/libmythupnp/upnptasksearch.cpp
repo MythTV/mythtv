@@ -12,92 +12,63 @@
 #include "upnptasksearch.h"
 
 #include <chrono> // for milliseconds
-#include <cstdlib>
+using namespace std::chrono_literals;
 #include <thread> // for sleep_for
 #include <utility>
 
-#include <QDateTime>
-#include <QFile>
-#include <QStringList>
+#include <QByteArray>
+#include <QNetworkAddressEntry>
 #include <QNetworkInterface>
+#include <QPair>
+#include <QString>
+#include <QUdpSocket>
 
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-#include "libmythbase/mythversion.h"
 
 #include "libmythupnp/httpserver.h"
 #include "libmythupnp/upnp.h"
 
-static QPair<QHostAddress, int> kLinkLocal6 =
-                            QHostAddress::parseSubnet("fe80::/10");
-
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpSearchTask Implementation
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
-                                const QHostAddress& peerAddress,
+                                QHostAddress peerAddress,
                                 int          nPeerPort,  
                                 QString      sST, 
                                 QString      sUDN ) :
     Task("UPnpSearchTask"),
     m_nServicePort(nServicePort),
-    m_peerAddress(peerAddress),
+    m_nMaxAge(XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h)),
+    m_peerAddress(std::move(peerAddress)),
     m_nPeerPort(nPeerPort),
     m_sST(std::move(sST)),
     m_sUDN(std::move(sUDN))
 {
-    m_nMaxAge     = XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h);
-} 
+}
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
-                              const QString&  sST,
-                              const QString&  sUDN )
+void UPnpSearchTask::SendMsg(QUdpSocket& socket, const QString& sST, const QString& sUDN)
 {
-    QString sUSN;
-
+    QString uniqueServiceName = sST;
     if (( sUDN.length() > 0) && ( sUDN != sST ))
-        sUSN = sUDN + "::" + sST;
-    else
-        sUSN = sST;
+        uniqueServiceName = sUDN + "::" + uniqueServiceName;
 
-    QString sDate = MythDate::current().toString( "d MMM yyyy hh:mm:ss" );
-
-    QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
+    QByteArray data = QString("CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"
                               "EXT:\r\n"
                               "Server: %3\r\n"
                               "ST: %4\r\n"
                               "USN: %5\r\n"
-                              "Content-Length: 0\r\n\r\n" )
-                              .arg( m_nMaxAge.count()    )
-                              .arg( sDate,
-                                    HttpServer::GetServerVersion(),
-                                    sST,
-                                    sUSN );
+                              "Content-Length: 0\r\n\r\n")
+                        .arg(QString::number(m_nMaxAge.count()),
+                             MythDate::current().toString("d MMM yyyy hh:mm:ss"),
+                             HttpServer::GetServerVersion(),
+                             sST,
+                             uniqueServiceName
+                             ).toUtf8();
 
-#if 0
-    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
-                        .arg(sST) .arg(sUSN));
-
-    LOG(VB_UPNP, LOG_DEBUG,
-        QString("UPnpSearchTask::SendMsg    m_peerAddress = %1 Port=%2")
-                        .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
-#endif
+    LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg ST: %1 USN: %2; m_peerAddress = %3 Port=%4")
+                        .arg(sST, uniqueServiceName, m_peerAddress.toString(), QString::number(m_nPeerPort))
+        );
 
     // TODO: When we add dynamic handling of interfaces the information
     // for each address on the system should be available from the
@@ -129,101 +100,58 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                 else
                     ipaddress = ip.toString();
 
-                QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
-                                            "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
-                                    .arg( ipaddress )
-                                    .arg( m_nServicePort);
+                QByteArray datagram =
+                    QString("HTTP/1.1 200 OK\r\n"
+                            "LOCATION: http://%1:%2/getDeviceDesc\r\n")
+                        .arg(ipaddress, QString::number(m_nServicePort)).toUtf8()
+                    + data;
 
-
-                QString  sPacket  = sHeader + sData;
-                QByteArray scPacket = sPacket.toUtf8();
-
-                // ------------------------------------------------------------------
                 // Send Packet to UDP Socket (Send same packet twice)
-                // ------------------------------------------------------------------
-
-                pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
-                                    m_nPeerPort );
+                socket.writeDatagram(datagram, m_peerAddress, m_nPeerPort);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
 
-                pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
-                                    m_nPeerPort );
+                socket.writeDatagram(datagram, m_peerAddress, m_nPeerPort);
             }
         }
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 {
-    auto *pSocket = new MSocketDevice( MSocketDevice::Datagram );
+    QUdpSocket socket;
 
-    // ----------------------------------------------------------------------
-    // Refresh IP Address List in case of changes
-    // ----------------------------------------------------------------------
-
-    m_addressList = UPnp::g_IPAddrList;
-
-    // ----------------------------------------------------------------------
     // Check to see if this is a rootdevice or all request.
-    // ----------------------------------------------------------------------
-
-    UPnpDevice &device = UPnp::g_UPnpDeviceDesc.m_rootDevice;
-
     if ((m_sST == "upnp:rootdevice") || (m_sST == "ssdp:all" ))
     {
-        SendMsg( pSocket, "upnp:rootdevice", device.GetUDN() );
+        SendMsg(socket, "upnp:rootdevice", UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
         if (m_sST == "ssdp:all")
-            ProcessDevice( pSocket, &device );
+            ProcessDevice(socket, UPnp::g_UPnpDeviceDesc.m_rootDevice);
     }
     else
     {
-        // ------------------------------------------------------------------
         // Send Device/Service specific response.
-        // ------------------------------------------------------------------
-
-        SendMsg( pSocket, m_sST, m_sUDN );
+        SendMsg(socket, m_sST, m_sUDN);
     }
-
-    delete pSocket;
-    pSocket = nullptr;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void UPnpSearchTask::ProcessDevice(
-    MSocketDevice *pSocket, UPnpDevice *pDevice)
+void UPnpSearchTask::ProcessDevice(QUdpSocket& socket, const UPnpDevice& device)
 {
-    // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages
-    //
     // -=>TODO: We need to add support to only notify 
     //          Version 1 of a service.
-    // ----------------------------------------------------------------------
-
-    SendMsg( pSocket, pDevice->GetUDN(), "" );
-    SendMsg( pSocket, pDevice->m_sDeviceType, pDevice->GetUDN() );
-        
-    // ------------------------------------------------------------------
+    SendMsg(socket, device.GetUDN(), "");
+    SendMsg(socket, device.m_sDeviceType, device.GetUDN());
     // Loop for each service in this device and send the 1 required message
-    // ------------------------------------------------------------------
+    for (const auto* service : std::as_const(device.m_listServices))
+    {
+        SendMsg(socket, service->m_sServiceType, device.GetUDN());
+    }
 
-    for (auto sit = pDevice->m_listServices.cbegin();
-         sit != pDevice->m_listServices.cend(); ++sit)
-        SendMsg(pSocket, (*sit)->m_sServiceType, pDevice->GetUDN());
-
-    // ----------------------------------------------------------------------
     // Process any Embedded Devices
-    // ----------------------------------------------------------------------
-
-    for (auto *device : std::as_const(pDevice->m_listDevices))
-        ProcessDevice( pSocket, device);
+    for (const auto* embedded_device : std::as_const(device.m_listDevices))
+    {
+        ProcessDevice(socket, *embedded_device);
+    }
 }
-
