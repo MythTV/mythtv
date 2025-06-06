@@ -2963,17 +2963,16 @@ void MythCommandLineParser::ApplySettingsOverride(void)
     }
 }
 
-static bool writePidfile(const QString &pidfile)
+static bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
 {
     if (!pidfile.isEmpty())
     {
-        std::ofstream pidfs {pidfile.toLocal8Bit().constData()};
+        pidfs.open(pidfile.toLatin1().constData());
         if (!pidfs)
         {
             std::cerr << "Could not open pid file: " << ENO_STR << std::endl;
             return false;
         }
-        pidfs << getpid() << std::endl;
     }
     return true;
 }
@@ -3053,7 +3052,8 @@ static bool setUser(const QString &username)
  */
 int MythCommandLineParser::Daemonize(void) const
 {
-    if (!writePidfile(toString("pidfile")))
+    std::ofstream pidfs;
+    if (!openPidfile(pidfs, toString("pidfile")))
         return GENERIC_EXIT_PERMISSIONS_ERROR;
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -3076,6 +3076,12 @@ int MythCommandLineParser::Daemonize(void) const
     QString username = toString("username");
     if (!username.isEmpty() && !setUser(username))
         return GENERIC_EXIT_PERMISSIONS_ERROR;
+
+    if (pidfs)
+    {
+        pidfs << getpid() << std::endl;
+        pidfs.close();
+    }
 
     return GENERIC_EXIT_OK;
 }
