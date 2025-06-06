@@ -50,17 +50,20 @@ AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
 
 AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 {
+    // Set up to automatically close client at function exit
+    auto cleanup_fn = [&](AudioOutputJACK* /*p*/) {
+        if (m_client) JackClientClose(&m_client);
+    };
+    std::unique_ptr<AudioOutputJACK, decltype(cleanup_fn)> cleanup { this, cleanup_fn };
+
     int rate = 0;
-    int i = 0;
-    const char **matching_ports = nullptr;
-    auto *settings = new AudioOutputSettings();
+    auto settings = std::make_unique<AudioOutputSettings>();
 
     m_client = JackClientOpen();
     if (!m_client)
     {
         Error(LOC + tr("Cannot start/connect to jack server "
                "(to check supported rate/channels)"));
-        delete settings;
         return nullptr;
     }
 
@@ -70,44 +73,30 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     if (!rate)
     {
         Error(LOC + tr("Unable to retrieve jack server sample rate"));
-        goto err_out;
+        return nullptr;
     }
-    else
-    {
-        settings->AddSupportedRate(rate);
-    }
+    settings->AddSupportedRate(rate);
 
     // Jack only wants float format samples (de-interleaved for preference)
     settings->AddSupportedFormat(FORMAT_FLT);
 
-    // Find some Jack ports to connect to
-    matching_ports = JackGetPorts();
-
-    if (!matching_ports || !matching_ports[0])
+    // Find some Jack ports to connect to. Release at function exit.
+    std::unique_ptr<const char *, decltype(&jack_free)>
+        matching_ports { JackGetPorts(), &jack_free };
+    if (!matching_ports || !matching_ports.get()[0])
     {
         Error(LOC + tr("No ports available to connect to"));
-        goto err_out;
+        return nullptr;
     }
     // Count matching ports from 2nd port upwards
-    i = 1;
-    while ((i < JACK_CHANNELS_MAX) && matching_ports[i])
+    for (int i=1; (i < JACK_CHANNELS_MAX) && matching_ports.get()[i]; i++)
     {
         settings->AddSupportedChannels(i+1);
         LOG(VB_AUDIO, LOG_INFO, LOC + QString("Adding channels: %1").arg(i+1));
-        i++;
     }
 
-    // Currently this looks very similar to error code - duplicated for safety
-    jack_free(reinterpret_cast<void*>(matching_ports));
-    JackClientClose(&m_client);
-    return settings;
-
-err_out:
-    // Our abstracted exit point in case of error
-    jack_free(reinterpret_cast<void*>(matching_ports));
-    JackClientClose(&m_client);
-    delete settings;
-    return nullptr;
+    // Return settings instead of deleting it
+    return settings.release();
 }
 
 
@@ -119,8 +108,11 @@ AudioOutputJACK::~AudioOutputJACK()
 
 bool AudioOutputJACK::OpenDevice()
 {
-    const char **matching_ports = nullptr;
-    int i = 0;
+    // Set up to automatically close client at function exit
+    auto cleanup_fn = [](AudioOutputJACK *p)
+        { if (p->m_client) p->JackClientClose(&p->m_client); };
+    std::unique_ptr<AudioOutputJACK, decltype(cleanup_fn)>
+        cleanup { this, cleanup_fn };
 
     // We have a hard coded channel limit - check we haven't exceeded it
     if (m_channels > JACK_CHANNELS_MAX)
@@ -142,26 +134,27 @@ bool AudioOutputJACK::OpenDevice()
     if (!m_client)
     {
         Error(LOC + tr("Cannot start/connect to jack server"));
-        goto err_out;
+        return false;
     }
 
-    // Find some Jack ports to connect to
-    matching_ports = JackGetPorts();
-    if (!matching_ports || !matching_ports[0])
+    // Find some Jack ports to connect to. Release at function exit.
+    std::unique_ptr<const char *, decltype(&jack_free)>
+        matching_ports { JackGetPorts(), &jack_free };
+    if (!matching_ports || !matching_ports.get()[0])
     {
         Error(LOC + tr("No ports available to connect to"));
-        goto err_out;
+        return false;
     }
 
     // Count matching ports
-    i = 1;
-    while (matching_ports[i])
+    int i = 1;
+    while (matching_ports.get()[i])
         i++;
     // ensure enough ports to satisfy request
     if (m_channels > i)
     {
         Error(LOC + tr("Not enough ports available to connect to"));
-        goto err_out;
+        return false;
     }
 
     // Create our output ports
@@ -174,7 +167,7 @@ bool AudioOutputJACK::OpenDevice()
         if (!m_ports[i])
         {
             Error(LOC + tr("Error while registering new jack port: %1").arg(i));
-            goto err_out;
+            return false;
         }
     }
 
@@ -202,24 +195,16 @@ bool AudioOutputJACK::OpenDevice()
     if (jack_activate(m_client))
     {
         Error(LOC + tr("Calling jack_activate failed"));
-        goto err_out;
+        return false;
     }
 
     // Connect our output ports
-    if (! JackConnectPorts(matching_ports))
-        goto err_out;
+    if (! JackConnectPorts(matching_ports.get()))
+        return false;
 
-    // Free up some stuff
-    jack_free(reinterpret_cast<void*>(matching_ports));
-
-    // Device opened successfully
+    // Device opened successfully. Skip client cleanup function.
+    cleanup.release();
     return true;
-
-err_out:
-    // Our abstracted exit point in case of error
-    jack_free(reinterpret_cast<void*>(matching_ports));
-    JackClientClose(&m_client);
-    return false;
 }
 
 void AudioOutputJACK::CloseDevice()
