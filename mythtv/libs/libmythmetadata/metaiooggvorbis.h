@@ -6,10 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <vorbisfile.h>
-
-using TagLib::Tag;
-using TagLib::String;
+#include <taglib/vorbisfile.h>
 
 /*!
 * \class MetaIOOggVorbis

@@ -6,10 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <flacfile.h>
-
-using TagLib::Tag;
-using TagLib::String;
+#include <taglib/flacfile.h>
 
 /*!
 * \class MetaIOFLACVorbis

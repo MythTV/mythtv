@@ -6,11 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <tfile.h>
-
-using TagLib::File;
-using TagLib::Tag;
-using TagLib::String;
+#include <taglib/tfile.h>
 
 /*!
  * \class MetaIOTagLib

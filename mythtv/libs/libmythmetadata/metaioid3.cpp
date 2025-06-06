@@ -11,15 +11,15 @@
 #include "libmythbase/mythcorecontext.h"
 
 // Taglib
-#include <flacfile.h>
-#include <mpegfile.h>
+#include <taglib/flacfile.h>
+#include <taglib/mpegfile.h>
 
 // libmythmetadata
 #include "metaioid3.h"
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-const String email = "music@mythtv.org";  // TODO username/ip/hostname?
+const TagLib::String email = "music@mythtv.org";  // TODO username/ip/hostname?
 
 /*!
 * \brief Open the file to read the tag
@@ -171,7 +171,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
     writeLastPlay(tag, mdata->LastPlay());
 
     // MusicBrainz ID
-    UserTextIdentificationFrame *musicbrainz = nullptr;
+    TagLib::ID3v2::UserTextIdentificationFrame *musicbrainz = nullptr;
     musicbrainz = find(tag, "MusicBrainz Album Artist Id");
 
     if (mdata->Compilation())
@@ -179,7 +179,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
 
         if (!musicbrainz)
         {
-            musicbrainz = new UserTextIdentificationFrame(TagLib::String::UTF8);
+            musicbrainz = new TagLib::ID3v2::UserTextIdentificationFrame(TagLib::String::UTF8);
             tag->addFrame(musicbrainz);
             musicbrainz->setDescription("MusicBrainz Album Artist Id");
         }
@@ -194,28 +194,28 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
     // Compilation Artist Frame (TPE4/2)
     if (!mdata->CompilationArtist().isEmpty())
     {
-        TextIdentificationFrame *tpe4frame = nullptr;
+        TagLib::ID3v2::TextIdentificationFrame *tpe4frame = nullptr;
         TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
         if (!tpelist.isEmpty())
-            tpe4frame = dynamic_cast<TextIdentificationFrame *>(tpelist.front());
+            tpe4frame = dynamic_cast<TagLib::ID3v2::TextIdentificationFrame *>(tpelist.front());
 
         if (!tpe4frame)
         {
-            tpe4frame = new TextIdentificationFrame(TagLib::ByteVector("TPE4"),
+            tpe4frame = new TagLib::ID3v2::TextIdentificationFrame(TagLib::ByteVector("TPE4"),
                                                     TagLib::String::UTF8);
             tag->addFrame(tpe4frame);
         }
         tpe4frame->setText(QStringToTString(mdata->CompilationArtist()));
 
 
-        TextIdentificationFrame *tpe2frame = nullptr;
+        TagLib::ID3v2::TextIdentificationFrame *tpe2frame = nullptr;
         tpelist = tag->frameListMap()["TPE2"];
         if (!tpelist.isEmpty())
-            tpe2frame = dynamic_cast<TextIdentificationFrame *>(tpelist.front());
+            tpe2frame = dynamic_cast<TagLib::ID3v2::TextIdentificationFrame *>(tpelist.front());
 
         if (!tpe2frame)
         {
-            tpe2frame = new TextIdentificationFrame(TagLib::ByteVector("TPE2"),
+            tpe2frame = new TagLib::ID3v2::TextIdentificationFrame(TagLib::ByteVector("TPE2"),
                                                     TagLib::String::UTF8);
             tag->addFrame(tpe2frame);
         }
@@ -265,12 +265,12 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     // N.B. The existance of a either frame is NOT an indication that this
     // is a compilation, but if it is then one of them will probably hold
     // the compilation artist.
-    TextIdentificationFrame *tpeframe = nullptr;
+    TagLib::ID3v2::TextIdentificationFrame *tpeframe = nullptr;
     TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
     if (tpelist.isEmpty() || tpelist.front()->toString().isEmpty())
         tpelist = tag->frameListMap()["TPE2"];
     if (!tpelist.isEmpty())
-        tpeframe = dynamic_cast<TextIdentificationFrame *>(tpelist.front());
+        tpeframe = dynamic_cast<TagLib::ID3v2::TextIdentificationFrame *>(tpelist.front());
 
     if (tpeframe && !tpeframe->toString().isEmpty())
     {
@@ -280,7 +280,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     }
 
     // Rating and playcount, stored in POPM frame
-    PopularimeterFrame *popm = findPOPM(tag, ""); // Global (all apps) tag
+    TagLib::ID3v2::PopularimeterFrame *popm = findPOPM(tag, ""); // Global (all apps) tag
 
     // If no 'global' tag exists, look for the MythTV specific one
     if (!popm)
@@ -292,7 +292,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     if (!popm)
     {
         if (!tag->frameListMap()["POPM"].isEmpty())
-            popm = dynamic_cast<PopularimeterFrame *>
+            popm = dynamic_cast<TagLib::ID3v2::PopularimeterFrame *>
                                         (tag->frameListMap()["POPM"].front());
     }
 
@@ -305,7 +305,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     }
 
     // Look for MusicBrainz Album+Artist ID in TXXX Frame
-    UserTextIdentificationFrame *musicbrainz = find(tag,
+    TagLib::ID3v2::UserTextIdentificationFrame *musicbrainz = find(tag,
                                             "MusicBrainz Album Artist Id");
 
     if (musicbrainz)
@@ -359,7 +359,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         .arg(filename).arg(metadata->Length().count()));
 
     // Look for MythTVLastPlayed in TXXX Frame
-    UserTextIdentificationFrame *lastplayed = find(tag, "MythTVLastPlayed");
+    TagLib::ID3v2::UserTextIdentificationFrame *lastplayed = find(tag, "MythTVLastPlayed");
     if (lastplayed)
     {
         QString lastPlayStr = TStringToQString(lastplayed->toString());
@@ -395,28 +395,28 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 {
     auto *picture = new QImage();
 
-    AttachedPictureFrame::Type apicType
-        = AttachedPictureFrame::FrontCover;
+    TagLib::ID3v2::AttachedPictureFrame::Type apicType
+        = TagLib::ID3v2::AttachedPictureFrame::FrontCover;
 
     switch (type)
     {
         case IT_UNKNOWN :
-            apicType = AttachedPictureFrame::Other;
+            apicType = TagLib::ID3v2::AttachedPictureFrame::Other;
             break;
         case IT_FRONTCOVER :
-            apicType = AttachedPictureFrame::FrontCover;
+            apicType = TagLib::ID3v2::AttachedPictureFrame::FrontCover;
             break;
         case IT_BACKCOVER :
-            apicType = AttachedPictureFrame::BackCover;
+            apicType = TagLib::ID3v2::AttachedPictureFrame::BackCover;
             break;
         case IT_CD :
-            apicType = AttachedPictureFrame::Media;
+            apicType = TagLib::ID3v2::AttachedPictureFrame::Media;
             break;
         case IT_INLAY :
-            apicType = AttachedPictureFrame::LeafletPage;
+            apicType = TagLib::ID3v2::AttachedPictureFrame::LeafletPage;
             break;
         case IT_ARTIST :
-            apicType = AttachedPictureFrame::Artist;
+            apicType = TagLib::ID3v2::AttachedPictureFrame::Artist;
             break;
         default:
             return picture;
@@ -431,7 +431,7 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 
             for (auto & apicframe : apicframes)
             {
-                auto *frame = dynamic_cast<AttachedPictureFrame *>(apicframe);
+                auto *frame = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame *>(apicframe);
                 if (frame && frame->type() == apicType)
                 {
                     picture->loadFromData((const uchar *)frame->picture().data(),
@@ -486,7 +486,7 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
 
         for (auto & apicframe : apicframes)
         {
-            auto *frame = dynamic_cast<AttachedPictureFrame *>(apicframe);
+            auto *frame = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame *>(apicframe);
             if (frame == nullptr)
             {
                 LOG(VB_GENERAL, LOG_DEBUG,
@@ -519,27 +519,27 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
 
             switch (frame->type())
             {
-                case AttachedPictureFrame::FrontCover :
+                case TagLib::ID3v2::AttachedPictureFrame::FrontCover :
                     art->m_imageType = IT_FRONTCOVER;
                     art->m_filename = QString("front") + ext;
                     break;
-                case AttachedPictureFrame::BackCover :
+                case TagLib::ID3v2::AttachedPictureFrame::BackCover :
                     art->m_imageType = IT_BACKCOVER;
                     art->m_filename = QString("back") + ext;
                     break;
-                case AttachedPictureFrame::Media :
+                case TagLib::ID3v2::AttachedPictureFrame::Media :
                     art->m_imageType = IT_CD;
                     art->m_filename = QString("cd") + ext;
                     break;
-                case AttachedPictureFrame::LeafletPage :
+                case TagLib::ID3v2::AttachedPictureFrame::LeafletPage :
                     art->m_imageType = IT_INLAY;
                     art->m_filename = QString("inlay") + ext;
                     break;
-                case AttachedPictureFrame::Artist :
+                case TagLib::ID3v2::AttachedPictureFrame::Artist :
                     art->m_imageType = IT_ARTIST;
                     art->m_filename = QString("artist") + ext;
                     break;
-                case AttachedPictureFrame::Other :
+                case TagLib::ID3v2::AttachedPictureFrame::Other :
                     art->m_imageType = IT_UNKNOWN;
                     art->m_filename = QString("unknown") + ext;
                     break;
@@ -582,14 +582,14 @@ QString MetaIOID3::getExtFromMimeType(const QString &mimeType)
  * \param description Description of picture to search for (optional)
  * \returns Pointer to frame
  */
-AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
-                                        AttachedPictureFrame::Type type,
-                                        const String &description)
+TagLib::ID3v2::AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
+                                        TagLib::ID3v2::AttachedPictureFrame::Type type,
+                                        const TagLib::String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("APIC");
   for (auto & frame : l)
   {
-    auto *f = dynamic_cast<AttachedPictureFrame *>(frame);
+    auto *f = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame *>(frame);
     if (f && f->type() == type &&
         (description.isEmpty() || f->description() == description))
       return f;
@@ -619,26 +619,26 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
     buffer.open(QIODevice::WriteOnly);
     image.save(&buffer, "JPEG");
 
-    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    TagLib::ID3v2::AttachedPictureFrame::Type type = TagLib::ID3v2::AttachedPictureFrame::Other;
     switch (albumart->m_imageType)
     {
         case IT_FRONTCOVER:
-            type = AttachedPictureFrame::FrontCover;
+            type = TagLib::ID3v2::AttachedPictureFrame::FrontCover;
             break;
         case IT_BACKCOVER:
-            type = AttachedPictureFrame::BackCover;
+            type = TagLib::ID3v2::AttachedPictureFrame::BackCover;
             break;
         case IT_CD:
-            type = AttachedPictureFrame::Media;
+            type = TagLib::ID3v2::AttachedPictureFrame::Media;
             break;
         case IT_INLAY:
-            type = AttachedPictureFrame::LeafletPage;
+            type = TagLib::ID3v2::AttachedPictureFrame::LeafletPage;
             break;
         case IT_ARTIST:
-            type = AttachedPictureFrame::Artist;
+            type = TagLib::ID3v2::AttachedPictureFrame::Artist;
             break;
         default:
-            type = AttachedPictureFrame::Other;
+            type = TagLib::ID3v2::AttachedPictureFrame::Other;
             break;
     }
 
@@ -650,12 +650,12 @@ bool MetaIOID3::writeAlbumArt(const QString &filename,
     if (!tag)
         return false;
 
-    AttachedPictureFrame *apic = findAPIC(tag, type,
+    TagLib::ID3v2::AttachedPictureFrame *apic = findAPIC(tag, type,
                                     QStringToTString(albumart->m_description));
 
     if (!apic)
     {
-        apic = new AttachedPictureFrame();
+        apic = new TagLib::ID3v2::AttachedPictureFrame();
         tag->addFrame(apic);
         apic->setType(type);
     }
@@ -685,26 +685,26 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
     if (filename.isEmpty() || !albumart)
         return false;
 
-    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    TagLib::ID3v2::AttachedPictureFrame::Type type = TagLib::ID3v2::AttachedPictureFrame::Other;
     switch (albumart->m_imageType)
     {
         case IT_FRONTCOVER:
-            type = AttachedPictureFrame::FrontCover;
+            type = TagLib::ID3v2::AttachedPictureFrame::FrontCover;
             break;
         case IT_BACKCOVER:
-            type = AttachedPictureFrame::BackCover;
+            type = TagLib::ID3v2::AttachedPictureFrame::BackCover;
             break;
         case IT_CD:
-            type = AttachedPictureFrame::Media;
+            type = TagLib::ID3v2::AttachedPictureFrame::Media;
             break;
         case IT_INLAY:
-            type = AttachedPictureFrame::LeafletPage;
+            type = TagLib::ID3v2::AttachedPictureFrame::LeafletPage;
             break;
         case IT_ARTIST:
-            type = AttachedPictureFrame::Artist;
+            type = TagLib::ID3v2::AttachedPictureFrame::Artist;
             break;
         default:
-            type = AttachedPictureFrame::Other;
+            type = TagLib::ID3v2::AttachedPictureFrame::Other;
             break;
     }
 
@@ -716,7 +716,7 @@ bool MetaIOID3::removeAlbumArt(const QString &filename,
     if (!tag)
         return false;
 
-    AttachedPictureFrame *apic = findAPIC(tag, type,
+    TagLib::ID3v2::AttachedPictureFrame *apic = findAPIC(tag, type,
                                     QStringToTString(albumart->m_description));
     if (!apic)
         return false;
@@ -736,26 +736,26 @@ bool MetaIOID3::changeImageType(const QString &filename,
     if (albumart->m_imageType == newType)
         return true;
 
-    AttachedPictureFrame::Type type = AttachedPictureFrame::Other;
+    TagLib::ID3v2::AttachedPictureFrame::Type type = TagLib::ID3v2::AttachedPictureFrame::Other;
     switch (albumart->m_imageType)
     {
         case IT_FRONTCOVER:
-            type = AttachedPictureFrame::FrontCover;
+            type = TagLib::ID3v2::AttachedPictureFrame::FrontCover;
             break;
         case IT_BACKCOVER:
-            type = AttachedPictureFrame::BackCover;
+            type = TagLib::ID3v2::AttachedPictureFrame::BackCover;
             break;
         case IT_CD:
-            type = AttachedPictureFrame::Media;
+            type = TagLib::ID3v2::AttachedPictureFrame::Media;
             break;
         case IT_INLAY:
-            type = AttachedPictureFrame::LeafletPage;
+            type = TagLib::ID3v2::AttachedPictureFrame::LeafletPage;
             break;
         case IT_ARTIST:
-            type = AttachedPictureFrame::Artist;
+            type = TagLib::ID3v2::AttachedPictureFrame::Artist;
             break;
         default:
-            type = AttachedPictureFrame::Other;
+            type = TagLib::ID3v2::AttachedPictureFrame::Other;
             break;
     }
 
@@ -767,7 +767,7 @@ bool MetaIOID3::changeImageType(const QString &filename,
     if (!tag)
         return false;
 
-    AttachedPictureFrame *apic = findAPIC(tag, type,
+    TagLib::ID3v2::AttachedPictureFrame *apic = findAPIC(tag, type,
                                     QStringToTString(albumart->m_description));
     if (!apic)
         return false;
@@ -776,22 +776,22 @@ bool MetaIOID3::changeImageType(const QString &filename,
     switch (newType)
     {
         case IT_FRONTCOVER:
-            apic->setType(AttachedPictureFrame::FrontCover);
+            apic->setType(TagLib::ID3v2::AttachedPictureFrame::FrontCover);
             break;
         case IT_BACKCOVER:
-            apic->setType(AttachedPictureFrame::BackCover);
+            apic->setType(TagLib::ID3v2::AttachedPictureFrame::BackCover);
             break;
         case IT_CD:
-            apic->setType(AttachedPictureFrame::Media);
+            apic->setType(TagLib::ID3v2::AttachedPictureFrame::Media);
             break;
         case IT_INLAY:
-            apic->setType(AttachedPictureFrame::LeafletPage);
+            apic->setType(TagLib::ID3v2::AttachedPictureFrame::LeafletPage);
             break;
         case IT_ARTIST:
-            apic->setType(AttachedPictureFrame::Artist);
+            apic->setType(TagLib::ID3v2::AttachedPictureFrame::Artist);
             break;
         default:
-            apic->setType(AttachedPictureFrame::Other);
+            apic->setType(TagLib::ID3v2::AttachedPictureFrame::Other);
             break;
     }
 
@@ -808,13 +808,13 @@ bool MetaIOID3::changeImageType(const QString &filename,
  * \param description Description of tag to search for
  * \returns Pointer to frame
  */
-UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
-                                                const String &description)
+TagLib::ID3v2::UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
+                                                const TagLib::String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("TXXX");
   for (auto & frame : l)
   {
-    auto *f = dynamic_cast<UserTextIdentificationFrame *>(frame);
+    auto *f = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame *>(frame);
     if (f && f->description() == description)
       return f;
   }
@@ -828,13 +828,13 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
  * \param email Email address associated with this POPM frame
  * \returns Pointer to frame
  */
-PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
-                                        const String &_email)
+TagLib::ID3v2::PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
+                                        const TagLib::String &_email)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("POPM");
   for (auto & frame : l)
   {
-    auto *f = dynamic_cast<PopularimeterFrame *>(frame);
+    auto *f = dynamic_cast<TagLib::ID3v2::PopularimeterFrame *>(frame);
     if (f && f->email() == _email)
       return f;
   }
@@ -847,11 +847,11 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
         return false;
 
     // MythTV Specific playcount Tag
-    PopularimeterFrame *popm = findPOPM(tag, email);
+    TagLib::ID3v2::PopularimeterFrame *popm = findPOPM(tag, email);
 
     if (!popm)
     {
-        popm = new PopularimeterFrame();
+        popm = new TagLib::ID3v2::PopularimeterFrame();
         tag->addFrame(popm);
         popm->setEmail(email);
     }
@@ -864,10 +864,10 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
         popm->setCounter(playcount);
 
         // Global playcount Tag - Updated by all apps/hardware that support it
-        PopularimeterFrame *gpopm = findPOPM(tag, "");
+        TagLib::ID3v2::PopularimeterFrame *gpopm = findPOPM(tag, "");
         if (!gpopm)
         {
-            gpopm = new PopularimeterFrame();
+            gpopm = new TagLib::ID3v2::PopularimeterFrame();
             tag->addFrame(gpopm);
             gpopm->setEmail("");
         }
@@ -911,21 +911,21 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
     int popmrating = lroundf(static_cast<float>(rating) / 10.0F * 255.0F);
 
     // MythTV Specific Rating Tag
-    PopularimeterFrame *popm = findPOPM(tag, email);
+    TagLib::ID3v2::PopularimeterFrame *popm = findPOPM(tag, email);
 
     if (!popm)
     {
-        popm = new PopularimeterFrame();
+        popm = new TagLib::ID3v2::PopularimeterFrame();
         tag->addFrame(popm);
         popm->setEmail(email);
     }
     popm->setRating(popmrating);
 
     // Global Rating Tag
-    PopularimeterFrame *gpopm = findPOPM(tag, "");
+    TagLib::ID3v2::PopularimeterFrame *gpopm = findPOPM(tag, "");
     if (!gpopm)
     {
-        gpopm = new PopularimeterFrame();
+        gpopm = new TagLib::ID3v2::PopularimeterFrame();
         tag->addFrame(gpopm);
         gpopm->setEmail("");
     }
@@ -940,11 +940,11 @@ bool MetaIOID3::writeLastPlay(TagLib::ID3v2::Tag *tag, QDateTime lastPlay)
         return false;
 
     // MythTV Specific Rating Tag
-    UserTextIdentificationFrame *txxx = find(tag, "MythTVLastPlayed");
+    TagLib::ID3v2::UserTextIdentificationFrame *txxx = find(tag, "MythTVLastPlayed");
 
     if (!txxx)
     {
-        txxx = new UserTextIdentificationFrame();
+        txxx = new TagLib::ID3v2::UserTextIdentificationFrame();
         tag->addFrame(txxx);
         txxx->setDescription("MythTVLastPlayed");
     }

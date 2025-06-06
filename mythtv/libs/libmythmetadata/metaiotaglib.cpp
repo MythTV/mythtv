@@ -5,10 +5,10 @@
 #include "libmythbase/mythlogging.h"
 
 // Taglib
-#include <audioproperties.h>
-#include <tag.h>
-#include <tstring.h>
-#include <fileref.h>
+#include <taglib/audioproperties.h>
+#include <taglib/tag.h>
+#include <taglib/tstring.h>
+#include <taglib/fileref.h>
 
 // libmythmetadata
 #include "metaiotaglib.h"
@@ -21,7 +21,7 @@
 * \param tag A pointer to the tag
 * \param metadata Pointer to the MusicMetadata
 */
-void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const MusicMetadata *metadata)
+void MetaIOTagLib::WriteGenericMetadata(TagLib::Tag *tag,  const MusicMetadata *metadata)
 {
     if (!tag || !metadata)
         return;
@@ -51,7 +51,7 @@ void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const MusicMetadata *metadata
 * \param tag A pointer to the tag
 * \param metadata Pointer to the MusicMetadata
 */
-void MetaIOTagLib::ReadGenericMetadata(Tag *tag, MusicMetadata *metadata)
+void MetaIOTagLib::ReadGenericMetadata(TagLib::Tag *tag, MusicMetadata *metadata)
 {
     if (!tag || ! metadata)
         return;

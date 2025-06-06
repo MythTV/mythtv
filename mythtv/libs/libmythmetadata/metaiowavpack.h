@@ -6,10 +6,7 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <wavpackfile.h>
-
-using TagLib::Tag;
-using TagLib::String;
+#include <taglib/wavpackfile.h>
 
 /*!
 * \class MetaIOWavPack

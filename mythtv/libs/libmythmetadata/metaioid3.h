@@ -6,8 +6,8 @@
 #include "musicmetadata.h"
 
 // Taglib
-#include <id3v1tag.h>
-#include <id3v2tag.h>
+#include <taglib/id3v1tag.h>
+#include <taglib/id3v2tag.h>
 #ifdef Q_OS_WIN
 // The above indirectly includes winuser.h, which unconditionally
 // redefines the string SendMessage to SendMessageA.
@@ -20,11 +20,6 @@
 
 // QT
 #include <QList>
-
-using TagLib::ID3v2::UserTextIdentificationFrame;
-using TagLib::ID3v2::TextIdentificationFrame;
-using TagLib::ID3v2::PopularimeterFrame;
-using TagLib::ID3v2::AttachedPictureFrame;
 
 /*!
 * \class MetaIOID3
@@ -71,12 +66,12 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
     static bool writeLastPlay(TagLib::ID3v2::Tag *tag, QDateTime lastPlay);
 
     static AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
-    static UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag,
-                                      const String &description);
-    static PopularimeterFrame* findPOPM(TagLib::ID3v2::Tag *tag, const String &email);
-    static AttachedPictureFrame* findAPIC(TagLib::ID3v2::Tag *tag,
-                                   AttachedPictureFrame::Type type,
-                                   const String &description = String());
+    static TagLib::ID3v2::UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag,
+                                      const TagLib::String &description);
+    static TagLib::ID3v2::PopularimeterFrame* findPOPM(TagLib::ID3v2::Tag *tag, const TagLib::String &email);
+    static TagLib::ID3v2::AttachedPictureFrame* findAPIC(TagLib::ID3v2::Tag *tag,
+                                   TagLib::ID3v2::AttachedPictureFrame::Type type,
+                                   const TagLib::String &description = TagLib::String());
     static QString getExtFromMimeType(const QString &mimeType);
 
     TagLib::File *m_file {nullptr};

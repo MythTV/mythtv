@@ -7,7 +7,7 @@
 #include <QBuffer>
 
 // Taglib
-#include <xiphcomment.h>
+#include <taglib/xiphcomment.h>
 
 // libmythmetadata
 #include "metaioflacvorbis.h"
@@ -215,16 +215,14 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
                                         TagLib::FLAC::File *flacfile,
                                         ImageType type)
 {
-    using TagLib::FLAC::Picture;
-
-    Picture *pic = nullptr;
+    TagLib::FLAC::Picture *pic = nullptr;
 
     if (flacfile)
     {
-        Picture::Type artType = PictureTypeFromImageType(type);
+        TagLib::FLAC::Picture::Type artType = PictureTypeFromImageType(type);
 
         // From what I can tell, FLAC::File maintains ownership of the Picture pointers, so no need to delete
-        const TagLib::List<Picture *>& picList = flacfile->pictureList();
+        const TagLib::List<TagLib::FLAC::Picture *>& picList = flacfile->pictureList();
 
         for (auto *entry : picList)
         {
@@ -242,30 +240,29 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
 
 TagLib::FLAC::Picture::Type MetaIOFLACVorbis::PictureTypeFromImageType(
                                                 ImageType itype) {
-    using TagLib::FLAC::Picture;
-    Picture::Type artType = Picture::Other;
+    TagLib::FLAC::Picture::Type artType = TagLib::FLAC::Picture::Other;
     switch (itype)
     {
         case IT_UNKNOWN :
-            artType = Picture::Other;
+            artType = TagLib::FLAC::Picture::Other;
             break;
         case IT_FRONTCOVER :
-            artType = Picture::FrontCover;
+            artType = TagLib::FLAC::Picture::FrontCover;
             break;
         case IT_BACKCOVER :
-            artType = Picture::BackCover;
+            artType = TagLib::FLAC::Picture::BackCover;
             break;
         case IT_CD :
-            artType = Picture::Media;
+            artType = TagLib::FLAC::Picture::Media;
             break;
         case IT_INLAY :
-            artType = Picture::LeafletPage;
+            artType = TagLib::FLAC::Picture::LeafletPage;
             break;
         case IT_ARTIST :
-            artType = Picture::Artist;
+            artType = TagLib::FLAC::Picture::Artist;
             break;
         default:
-            return Picture::Other;
+            return TagLib::FLAC::Picture::Other;
     }
 
     return artType;
@@ -278,13 +275,12 @@ TagLib::FLAC::Picture::Type MetaIOFLACVorbis::PictureTypeFromImageType(
  */
 AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
 {
-    using TagLib::FLAC::Picture;
     AlbumArtList artlist;
     TagLib::FLAC::File * flacfile = OpenFile(filename);
 
     if (flacfile)
     {
-        const TagLib::List<Picture *>& picList = flacfile->pictureList();
+        const TagLib::List<TagLib::FLAC::Picture *>& picList = flacfile->pictureList();
 
         for (auto *pic : picList)
         {
@@ -313,27 +309,27 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
 
             switch (pic->type())
             {
-                case Picture::FrontCover :
+                case TagLib::FLAC::Picture::FrontCover :
                     art->m_imageType = IT_FRONTCOVER;
                     art->m_filename = QString("front") + ext;
                     break;
-                case Picture::BackCover :
+                case TagLib::FLAC::Picture::BackCover :
                     art->m_imageType = IT_BACKCOVER;
                     art->m_filename = QString("back") + ext;
                     break;
-                case Picture::Media :
+                case TagLib::FLAC::Picture::Media :
                     art->m_imageType = IT_CD;
                     art->m_filename = QString("cd") + ext;
                     break;
-                case Picture::LeafletPage :
+                case TagLib::FLAC::Picture::LeafletPage :
                     art->m_imageType = IT_INLAY;
                     art->m_filename = QString("inlay") + ext;
                     break;
-                case Picture::Artist :
+                case TagLib::FLAC::Picture::Artist :
                     art->m_imageType = IT_ARTIST;
                     art->m_filename = QString("artist") + ext;
                     break;
-                case Picture::Other :
+                case TagLib::FLAC::Picture::Other :
                     art->m_imageType = IT_UNKNOWN;
                     art->m_filename = QString("unknown") + ext;
                     break;
@@ -365,7 +361,6 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
                               const AlbumArtImage *albumart)
 {
 #if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION >= 8
-    using TagLib::FLAC::Picture;
     if (filename.isEmpty() || !albumart)
         return false;
 
@@ -387,7 +382,7 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
     if (flacfile)
     {
         // Now see if the art is in the FLAC file
-        Picture *pic = getPictureFromFile(flacfile, albumart->m_imageType);
+        TagLib::FLAC::Picture *pic = getPictureFromFile(flacfile, albumart->m_imageType);
 
         if (pic)
         {
@@ -397,7 +392,7 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
         else
         {
             // Create a new image of the correct type
-            pic = new Picture();
+            pic = new TagLib::FLAC::Picture();
             pic->setType(PictureTypeFromImageType(albumart->m_imageType));
         }
 
