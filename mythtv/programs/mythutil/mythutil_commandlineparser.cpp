@@ -95,6 +95,15 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "immediately, however the scheduler run may take several "
                 "seconds to a minute or longer to complete.")
                 ->SetGroup("Backend")
+        << add("--scanimages", "scanimages", false,
+                "Trigger a rescan of media content in Images.",
+                "This command will connect to the master backend and trigger "
+                "a run of the image scanner. The call will return "
+                "immediately, however the scanner may take several seconds "
+                "to tens of minutes, depending on how much new or moved "
+                "content it has to hash, and how quickly the scanner can "
+                "access those files to do so..")
+                ->SetGroup("Backend")
         << add("--scanvideos", "scanvideos", false,
                 "Trigger a rescan of media content in MythVideo.",
                 "This command will connect to the master backend and trigger "

@@ -70,6 +70,19 @@ static int Reschedule(const MythUtilCommandLineParser &/*cmdline*/)
     return GENERIC_EXIT_CONNECT_ERROR;
 }
 
+static int ScanImages(const MythUtilCommandLineParser &/*cmdline*/)
+{
+    if (gCoreContext->ConnectToMasterServer(false, false))
+    {
+        gCoreContext->SendReceiveStringList(QStringList() << "IMAGE_SCAN");
+        LOG(VB_GENERAL, LOG_INFO, "Requested image scan");
+        return GENERIC_EXIT_OK;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master for iamge scan");
+    return GENERIC_EXIT_CONNECT_ERROR;
+}
+
 static int ScanVideos(const MythUtilCommandLineParser &/*cmdline*/)
 {
     if (gCoreContext->ConnectToMasterServer(false, false))
@@ -103,6 +116,7 @@ void registerBackendUtils(UtilMap &utilMap)
     utilMap["clearcache"]           = &ClearSettingsCache;
     utilMap["event"]                = &SendEvent;
     utilMap["resched"]              = &Reschedule;
+    utilMap["scanimages"]           = &ScanImages;
     utilMap["scanvideos"]           = &ScanVideos;
     utilMap["systemevent"]          = &SendSystemEvent;
     utilMap["parsevideo"]           = &ParseVideoFilename;
