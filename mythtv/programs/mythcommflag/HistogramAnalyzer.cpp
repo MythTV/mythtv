@@ -215,6 +215,13 @@ HistogramAnalyzer::MythPlayerInited(MythPlayer *player, long long nframes)
     if (m_borderDetector->MythPlayerInited(player))
         return FrameAnalyzer::ANALYZE_FATAL;
 
+    // processFrame() sometimes returns frame numbers higher than
+    // m_player->GetTotalFrameCount().  Add extra space at the end
+    // of the arrays to handle this case.
+    LOG(VB_COMMFLAG, LOG_INFO,
+        QString("HistogramAnalyzer::MythPlayerInited nframes %1, allocating %2")
+            .arg(nframes).arg(nframes+128));
+    nframes += 128;
     m_mean = new float[nframes];
     m_median = new unsigned char[nframes];
     m_stddev = new float[nframes];
