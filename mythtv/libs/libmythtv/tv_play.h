@@ -25,6 +25,7 @@
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythtimer.h"
 #include "libmythbase/referencecounter.h"
+#include "libmythbase/mthreadpool.h"
 
 #include "channelgroup.h"
 #include "channelinfo.h"
@@ -170,6 +171,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     static int  ConfiguredTunerCards();
     static bool IsTunable(uint ChanId);
     void        ReloadKeys();
+    MThreadPool* GetPosThreadPool();
 
     bool IsSameProgram(const ProgramInfo* ProgInfo) const;
 
@@ -515,6 +517,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void RetrieveCast(const ProgramInfo& ProgInfo);
 
     MythMainWindow*   m_mainWindow { nullptr };
+    MThreadPool*      m_posThreadPool { nullptr };
 
     // Configuration variables from database
     QString           m_dbChannelFormat {"<num> <sign>"};
@@ -768,6 +771,22 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 #else
     static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 5s;
 #endif
+};
+
+class SavePositionThread : public QRunnable
+{
+    public:
+        SavePositionThread(ProgramInfo *progInfoPtr, uint64_t framesPos):
+            m_progInfo(progInfoPtr),
+            m_framesPlayed(framesPos)
+        {
+        }
+
+        void run() override; // QRunnable
+
+    private:
+        ProgramInfo *m_progInfo {nullptr};
+        uint64_t     m_framesPlayed {0};
 };
 
 #endif

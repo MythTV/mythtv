@@ -1008,7 +1008,8 @@ const std::vector<TV::SleepTimerInfo> TV::s_sleepTimes =
 TV::TV(MythMainWindow* MainWindow)
   : ReferenceCounter("TV"),
     TVBrowseHelper(this),
-    m_mainWindow(MainWindow)
+    m_mainWindow(MainWindow),
+    m_posThreadPool(new MThreadPool("PosSaverPool"))
 
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
@@ -1282,6 +1283,14 @@ TV::~TV()
         lcd->setFunctionLEDs(FUNC_TV, false);
         lcd->setFunctionLEDs(FUNC_MOVIE, false);
         lcd->switchToTime();
+    }
+
+    if (m_posThreadPool)
+    {
+        // Wait for "PositionSaver" to complete before proceeding
+        GetPosThreadPool()->waitForDone();
+        delete m_posThreadPool;
+        m_posThreadPool = nullptr;
     }
 
     m_playerLock.lockForWrite();
@@ -10391,8 +10400,9 @@ void TV::HandleSaveLastPlayPosEvent()
     if (playing)
     {
         uint64_t framesPlayed = m_player->GetFramesPlayed();
-        MConcurrent::run("PositionSaver", m_playerContext.m_playingInfo,
-                         &ProgramInfo::SaveLastPlayPos, framesPlayed);
+        auto *savPosThread = new SavePositionThread(m_playerContext.m_playingInfo,
+                                                    framesPlayed);
+        GetPosThreadPool()->start(savPosThread, "PositionSaver");
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock();
@@ -10510,5 +10520,25 @@ void TV::onApplicationStateChange(Qt::ApplicationState State)
         }
         default:
             break;
+    }
+}
+
+MThreadPool* TV::GetPosThreadPool()
+{
+    return m_posThreadPool;
+}
+
+void SavePositionThread::run()
+{
+    if (m_progInfo)
+    {
+        try
+        {
+            m_progInfo->SaveLastPlayPos(m_framesPlayed);
+        }
+        catch (...)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "An exception occurred");
+        }
     }
 }
