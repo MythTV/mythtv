@@ -42,6 +42,7 @@ bool ManualSchedule::Create(void)
     m_durationSpin = dynamic_cast<MythUISpinBox *>(GetChild("duration"));
 
     m_titleEdit = dynamic_cast<MythUITextEdit *>(GetChild("title"));
+    m_subtitleEdit = dynamic_cast<MythUITextEdit *>(GetChild("subtitle"));
 
     m_recordButton = dynamic_cast<MythUIButton *>(GetChild("next"));
     m_cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
@@ -126,6 +127,10 @@ bool ManualSchedule::Create(void)
     connect(m_cancelButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     m_titleEdit->SetMaxLength(128);
+    if (m_subtitleEdit)
+    {
+        m_subtitleEdit->SetMaxLength(128);
+    }
 
     BuildFocusList();
 
@@ -244,6 +249,7 @@ void ManualSchedule::recordClicked(void)
     }
 
     ProgramInfo p(m_titleEdit->GetText().trimmed(),
+                  m_subtitleEdit ? m_subtitleEdit->GetText().trimmed() : QString(),
                   m_chanids[m_channelList->GetCurrentPos()],
                   m_startDateTime, endts);
 
