@@ -629,6 +629,11 @@ bool MythFillDatabaseTask::DoCheckRun(const QDateTime& now)
         LOG(VB_GENERAL, LOG_DEBUG,
                 QString("MythFillDatabase scheduled to run at %1.")
                     .arg(nextRun.toString()));
+
+        // Delete the cached value immediately.  Necessary because the
+        // value is written/read by different applications.
+        GetMythDB()->ClearSettingsCache("MythFillSuggestedRunTime");
+
         // is it yet time
         return nextRun <= now;
     }
