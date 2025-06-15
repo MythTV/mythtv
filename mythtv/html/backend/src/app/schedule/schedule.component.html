@@ -69,6 +69,7 @@
             <div *ngIf="recRule.SearchType == 'Power Search'">
                 {{ 'dashboard.sched.powersearch_desc' | translate }}
                 <br>
+                <!-- Leave Power Search untranslated because the wiki article linked is only in Engliush -->
                 <a href="https://www.mythtv.org/wiki/Power_Search" target="_blank">Power Search</a>
             </div>
             <!-- Manual Search Settings - Only display on new rule, backend cannot handle an update of starttime -->
@@ -96,7 +97,7 @@
                     <label for="Duration" class="label block">{{ 'dashboard.sched.duration_label' | translate
                         }}</label>
                     <p-inputNumber [(ngModel)]="reqDuration" name="Duration" id="Duration" [showButtons]="true"
-                        [min]="5" [max]="360" [step]="5" (ngModelChange)="onDurationChange()"></p-inputNumber>
+                        [min]="5" [max]="1440" [step]="5" (ngModelChange)="onDurationChange()"></p-inputNumber>
                 </div>
             </div>
 
