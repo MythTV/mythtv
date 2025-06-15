@@ -118,7 +118,7 @@ bool ManualSchedule::Create(void)
         gCoreContext->GetNumSetting("ManualScheduleMinuteIncrement", 5);
     m_startminuteSpin->SetRange(0, 60-minute_increment, minute_increment);
     m_startminuteSpin->SetValue((thisTime.minute()/5)*5);
-    m_durationSpin->SetRange(5,360,5);
+    m_durationSpin->SetRange(5,1440,5);
     m_durationSpin->SetValue(60);
 
     connectSignals();

@@ -992,7 +992,7 @@ bool RecordingRule::IsValid(QString &msg) const
         qint64 secsto = QDateTime(m_startdate, m_starttime, utc)
             .secsTo(QDateTime(m_enddate, m_endtime, utc));
 #endif
-        if (secsto <= 0 || secsto > (8 * 3600))
+        if (secsto <= 0 || secsto > (24 * 3600))
         {
             msg = QString("Invalid duration.");
             return false;
