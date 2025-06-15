@@ -63,14 +63,13 @@ CannyEdgeDetector::~CannyEdgeDetector(void)
 int
 CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
 {
-    if (m_ewidth == newwidth && m_eheight == newheight)
-        return 0;
-
     if (m_sgm) {
         /*
          * Sentinel value to determine whether or not stuff has already been
          * allocated.
          */
+        if (m_ewidth == newwidth && m_eheight == newheight)
+            return 0;
         av_freep(reinterpret_cast<void*>(&m_s1.data[0]));
         av_freep(reinterpret_cast<void*>(&m_s2.data[0]));
         av_freep(reinterpret_cast<void*>(&m_convolved.data[0]));
