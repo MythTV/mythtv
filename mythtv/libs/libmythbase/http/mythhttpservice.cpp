@@ -89,8 +89,9 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
         if (!gCoreContext->IsLocalSubnet(Request->m_peerAddress, false))
             authReq = true;
     }
-    else if (authReqOption == "ALL")
+    else if (authReqOption == "ALL") {
         authReq = true;
+    }
     QString authorization = MythHTTP::GetHeader(Request->m_headers, "authorization").trimmed();
     if (authorization.isEmpty())
             authorization = Request->m_queries.value("authorization",{});

@@ -698,7 +698,7 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
 
 void AudioOutputPulseAudio::ContextDrainCallback(pa_context */*c*/, void *arg)
 {
-    pa_threaded_mainloop *mloop = (pa_threaded_mainloop *)arg;
+    auto *mloop = (pa_threaded_mainloop *)arg;
     pa_threaded_mainloop_signal(mloop, 0);
 }
 

@@ -1508,7 +1508,7 @@ cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
   m_capmt[m_length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
 
   // program_info_length
-  m_infoLengthPos = m_length;
+  m_infoLengthPos = m_length;// NOLINT(cppcoreguidelines-prefer-member-initializer)
   m_capmt[m_length++] = 0x00;
   m_capmt[m_length++] = 0x00;
 }

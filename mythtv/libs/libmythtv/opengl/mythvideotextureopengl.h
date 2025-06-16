@@ -44,7 +44,7 @@ class MythVideoTextureOpenGL : public MythGLTexture
                                                  QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     static VideoFramebuffer CreateVideoFrameBuffer(MythRenderOpenGL* Context, VideoFrameType OutputType,
                                                    QSize Size, bool HighPrecision = true);
-   ~MythVideoTextureOpenGL() = default;
+   ~MythVideoTextureOpenGL() override = default;
 
   public:
     bool           m_valid          { false };
