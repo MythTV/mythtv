@@ -103,6 +103,7 @@ export interface GetOldRecordedListRequest {
     EndTime?: string; // dateTime
     Title?: string;
     TitleRegex?: string;
+    SubtitleRegex?: string;
     SeriesId?: string;
     RecordId?: number;
     Sort?: string;

@@ -34,6 +34,7 @@ export class PrevrecsComponent implements OnInit {
   virtualScrollItemSize = 0;
   inter: ScheduleLink = { summaryComponent: this };
   searchValue = '';
+  subSearchValue = '';
   minDate: Date = new Date();
   minSet = false;
   maxDate: Date = new Date();
@@ -114,7 +115,12 @@ export class PrevrecsComponent implements OnInit {
     this.selection = [];
     this.menu.hide();
     this.refreshing = true;
-    this.loadLazy(this.lazyLoadEvent!, true);
+    if (this.lazyLoadEvent!.last! > 15)
+      this.loadLazy(this.lazyLoadEvent!, true);
+    else
+    // If there are only a few rows do a full reload because the size
+    // may have changed and the loadlazy will not increase the size.
+      this.reload();
   }
 
   loadLazy(event: TableLazyLoadEvent, doRefresh?: boolean) {
@@ -156,6 +162,7 @@ export class PrevrecsComponent implements OnInit {
       request.EndTime = endTime.toISOString();
     }
     request.TitleRegex = this.searchValue;
+    request.SubtitleRegex = this.subSearchValue;
 
     let sortField = this.sortField;
     if (Array.isArray(event.sortField))
@@ -177,11 +184,11 @@ export class PrevrecsComponent implements OnInit {
         this.minSet = true;
       }
       // populate page of virtual programs
-      // note that Count is returned as the count requested, even
-      // if less items are returned because you hit the end.
-      // Maybe we should use recordings.Programs.length
-      this.programs.splice(recordings.StartIndex, recordings.Count,
-        ...recordings.Programs);
+      if (recordings.Count == 0 && recordings.StartIndex == 0)
+        this.programs = [];
+      else
+        this.programs.splice(recordings.StartIndex, recordings.Count,
+          ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
       this.refreshing = false;
@@ -257,6 +264,11 @@ export class PrevrecsComponent implements OnInit {
     this.reload();
   }
 
+  resetSubSearch() {
+    this.subSearchValue = '';
+    this.reload();
+  }
+
   onFilter() {
     this.reload();
   }
@@ -303,10 +315,10 @@ export class PrevrecsComponent implements OnInit {
   }
 
   deleteRequest(event: any) {
-    let header : string;
+    let header: string;
     if (this.actionList.length > 1)
       header = this.msg.DeleteSelected.replace(/{{ *num *}}/, this.actionList.length.toString());
-    else if (this.actionList.length == 1){
+    else if (this.actionList.length == 1) {
       let program = this.actionList[0];
       header = program.Title + ': ' + program.SubTitle;
     }
@@ -329,7 +341,7 @@ export class PrevrecsComponent implements OnInit {
     if (program) {
       let param: RemoveOldRecordedRequest = {
         Chanid: program.Channel.ChanId,
-        StartTime:  new Date(program.StartTime),
+        StartTime: new Date(program.StartTime),
         Reschedule: this.actionList.length == 0
       };
       this.dvrService.RemoveOldRecorded(param).subscribe({
@@ -347,7 +359,7 @@ export class PrevrecsComponent implements OnInit {
       });
     }
     else {
-      setTimeout( () => this.refresh(), 1000 );
+      setTimeout(() => this.refresh(), 1000);
     }
   }
 
@@ -356,8 +368,8 @@ export class PrevrecsComponent implements OnInit {
     if (program) {
       let param: UpdateOldRecordedRequest = {
         Chanid: program.Channel.ChanId,
-        StartTime:  new Date(program.StartTime),
-        Duplicate: ! enable,
+        StartTime: new Date(program.StartTime),
+        Duplicate: !enable,
         Reschedule: this.actionList.length == 0
       };
       this.dvrService.UpdateOldRecorded(param).subscribe({
@@ -375,7 +387,7 @@ export class PrevrecsComponent implements OnInit {
       });
     }
     else {
-      setTimeout( () => this.refresh(), 1000 );
+      setTimeout(() => this.refresh(), 1000);
     }
   }
 

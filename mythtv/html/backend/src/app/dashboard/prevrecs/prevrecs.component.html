@@ -32,6 +32,14 @@
                         pTooltip="{{ 'dashboard.recordings.regex' | translate }}" tooltipPosition="top"
                         (keydown)="keydown($event)" />
                 </span>
+                &nbsp;&nbsp;
+                <span class="p-input-icon-right">
+                    <i class="pi pi-times" (click)="resetSubSearch()" *ngIf="subSearchValue"></i>
+                    <input type="text" pInputText id="subSearchValue" [(ngModel)]="subSearchValue" name="subSearchValue"
+                        class="text-xl" placeholder="{{ 'dashboard.guide.subtitle_search' | translate }}"
+                        pTooltip="{{ 'dashboard.recordings.regex' | translate }}" tooltipPosition="top"
+                        (keydown)="keydown($event)" />
+                </span>
 
                 <button pButton pRipple icon="pi pi-search" class="p-button-text w-2rem" (click)="onFilter()"
                     pTooltip="{{ 'dashboard.guide.title_search' | translate }}" tooltipPosition="top"></button>
