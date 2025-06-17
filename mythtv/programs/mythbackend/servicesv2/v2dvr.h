@@ -121,6 +121,7 @@ class V2Dvr : public MythHTTPService
                                             const QDateTime &EndTime,
                                             const QString   &Title,
                                             const QString   &TitleRegEx,
+                                            const QString   &SubtitleRegEx,
                                             const QString   &SeriesId,
                                             int              RecordId,
                                             const QString   &Sort);

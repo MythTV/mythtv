@@ -264,6 +264,7 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
                                            const QDateTime &sEndTime,
                                            const QString   &sTitle,
                                            const QString   &TitleRegEx,
+                                           const QString   &SubtitleRegEx,
                                            const QString   &sSeriesId,
                                            int              nRecordId,
                                            const QString   &sSort)
@@ -320,6 +321,12 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
         bindings[":TitleRegEx"] = TitleRegEx;
     }
 
+    if (!SubtitleRegEx.isEmpty())
+    {
+        clause << "subtitle REGEXP :SubtitleRegEx";
+        bindings[":SubtitleRegEx"] = SubtitleRegEx;
+    }
+
     if (!sSeriesId.isEmpty())
     {
         clause << "seriesid = :SeriesId";
@@ -328,7 +335,7 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
 
     if (!clause.isEmpty())
     {
-        sSQL += QString(" AND (%1) ").arg(clause.join(" OR "));
+        sSQL += QString(" AND (%1) ").arg(clause.join(" AND "));
     }
 
     QStringList sortByFields;
