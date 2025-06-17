@@ -120,6 +120,7 @@
             "new_search": "Nýir titlar",
             "people_search": "Fólksleit",
             "retgrid": "Fara aftur í Grid Display",
+            "subtitle_search": "Texti leit",
             "title_search": "Titilleit",
             "typecolors": "Flokkur Tegund Litir"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Uppfærðu lýsigögn",
             "mnu_updaterecgrp": "Skiptu um upptökuhóp",
             "mnu_updaterecrule": "Uppfærðu skráningarreglu",
+            "never_rec": "Aldrei skrá",
             "nonrerec": "Til að leyfa endurupptöku á skemmda forritinu skaltu nota Leyfa endurupptöku.",
             "normal_rec": "Venjulegt met",
             "orig_airdate": "Upprunaleg flugdagsetning",

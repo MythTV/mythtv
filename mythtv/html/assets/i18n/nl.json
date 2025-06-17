@@ -120,6 +120,7 @@
             "new_search": "Nieuwe titels",
             "people_search": "Mensen zoeken",
             "retgrid": "Keer terug naar rasterweergave",
+            "subtitle_search": "Ondertitel zoeken",
             "title_search": "Titel zoeken",
             "typecolors": "Categorie Type Kleuren"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Metagegevens bijwerken",
             "mnu_updaterecgrp": "Wijzig de opnamegroep",
             "mnu_updaterecrule": "Recordregel bijwerken",
+            "never_rec": "Nooit opnemen",
             "nonrerec": "Om het opnieuw opnemen van het beschadigde programma mogelijk te maken, gebruikt u Toestaan ​​opnieuw opnemen.",
             "normal_rec": "Normale opname",
             "orig_airdate": "Originele uitzenddatum",

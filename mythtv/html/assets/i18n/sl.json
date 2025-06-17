@@ -120,6 +120,7 @@
             "new_search": "Novi naslovi",
             "people_search": "Iskanje ljudi",
             "retgrid": "Nazaj na prikaz mreže",
+            "subtitle_search": "Iskanje podnapisov",
             "title_search": "Iskanje po naslovu",
             "typecolors": "Vrsta kategorije Barve"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Posodobi metapodatke",
             "mnu_updaterecgrp": "Spremeni snemalno skupino",
             "mnu_updaterecrule": "Posodobi pravilo zapisa",
+            "never_rec": "Nikoli ne snema",
             "nonrerec": "Če želite omogočiti ponovno snemanje poškodovanega programa, uporabite možnost Dovoli ponovno snemanje.",
             "normal_rec": "Običajni zapis",
             "orig_airdate": "Prvotni datum predvajanja",

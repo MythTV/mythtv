@@ -120,6 +120,7 @@
             "new_search": "כותרות חדשות",
             "people_search": "חיפוש אנשים",
             "retgrid": "חזור לתצוגת רשת",
+            "subtitle_search": "חיפוש כתוביות",
             "title_search": "חיפוש כותרת",
             "typecolors": "סוג קטגוריה צבעים"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "עדכן מטא נתונים",
             "mnu_updaterecgrp": "שנה קבוצת הקלטה",
             "mnu_updaterecrule": "עדכון כלל הרשומה",
+            "never_rec": "לעולם אל תקליטו",
             "nonrerec": "כדי לאפשר הקלטה חוזרת של התוכנית הפגומה, אנא השתמש באפשר הקלטה מחדש.",
             "normal_rec": "תיעוד רגיל",
             "orig_airdate": "תאריך שידור מקורי",

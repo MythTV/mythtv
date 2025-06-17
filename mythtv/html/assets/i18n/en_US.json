@@ -120,6 +120,7 @@
             "new_search": "New Titles",
             "people_search": "People Search",
             "retgrid": "Return to Grid Display",
+            "subtitle_search": "Subtitle Search",
             "title_search": "Title Search",
             "typecolors": "Category Type Colors"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Update Metadata",
             "mnu_updaterecgrp": "Change Recording Group",
             "mnu_updaterecrule": "Update Record Rule",
+            "never_rec": "Never Record",
             "nonrerec": "To allow rerecord of the damaged program, please use Allow Rerecord.",
             "normal_rec": "Normal Record",
             "orig_airdate": "Orig Airdate",

@@ -120,6 +120,7 @@
             "new_search": "Nye titler",
             "people_search": "People Search",
             "retgrid": "Gå tilbake til rutenettvisning",
+            "subtitle_search": "Undertittelsøk",
             "title_search": "Tittelsøk",
             "typecolors": "Kategori Type Farger"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Oppdater metadata",
             "mnu_updaterecgrp": "Endre opptaksgruppe",
             "mnu_updaterecrule": "Oppdater postregel",
+            "never_rec": "Aldri ta opp",
             "nonrerec": "For å tillate ny opptak av det skadede programmet, vennligst bruk Tillat ny opptak.",
             "normal_rec": "Normal post",
             "orig_airdate": "Original luftdato",

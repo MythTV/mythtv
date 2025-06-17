@@ -120,6 +120,7 @@
             "new_search": "新しいタイトル",
             "people_search": "人物検索",
             "retgrid": "グリッド表示に戻る",
+            "subtitle_search": "字幕検索",
             "title_search": "タイトル検索",
             "typecolors": "カテゴリタイプの色"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "メタデータの更新",
             "mnu_updaterecgrp": "記録グループの変更",
             "mnu_updaterecrule": "レコード更新ルール",
+            "never_rec": "記録しないでください",
             "nonrerec": "破損したプログラムの再録画を許可するには、「再録画を許可」を使用してください。",
             "normal_rec": "通常のレコード",
             "orig_airdate": "元の放送日",

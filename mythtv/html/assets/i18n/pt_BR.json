@@ -120,6 +120,7 @@
             "new_search": "Novos títulos",
             "people_search": "Pesquisa de pessoas",
             "retgrid": "Retornar à Exibição da Grade",
+            "subtitle_search": "Pesquisa de legenda",
             "title_search": "Pesquisa de título",
             "typecolors": "Categoria Tipo Cores"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Atualizar metadados",
             "mnu_updaterecgrp": "Alterar grupo de gravação",
             "mnu_updaterecrule": "Atualizar regra de registro",
+            "never_rec": "Nunca grave",
             "nonrerec": "Para permitir a regravação do programa danificado, use Permitir nova gravação.",
             "normal_rec": "Registro normal",
             "orig_airdate": "Data Original de Transmissão",

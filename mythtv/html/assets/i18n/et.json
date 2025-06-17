@@ -120,6 +120,7 @@
             "new_search": "Uued pealkirjad",
             "people_search": "Inimeste otsing",
             "retgrid": "Naaske ruudustiku kuvale",
+            "subtitle_search": "Subtiitrite otsing",
             "title_search": "Pealkirja otsing",
             "typecolors": "Kategooria Tüüp Värvid"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Värskenda metaandmeid",
             "mnu_updaterecgrp": "Salvestusrühma muutmine",
             "mnu_updaterecrule": "Värskendage salvestusreeglit",
+            "never_rec": "Ärge kunagi salvestage",
             "nonrerec": "Kahjustatud programmi uuesti salvestamise lubamiseks kasutage käsku Luba uuesti salvestada.",
             "normal_rec": "Normaalne rekord",
             "orig_airdate": "Algne eetri kuupäev",

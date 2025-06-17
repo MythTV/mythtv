@@ -120,6 +120,7 @@
             "new_search": "Nouveaux titres",
             "people_search": "Recherche de personnes",
             "retgrid": "Revenir à l'affichage de la grille",
+            "subtitle_search": "Recherche de sous-titre",
             "title_search": "Recherche de titre",
             "typecolors": "Catégorie Type Couleurs"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Mettre à jour les métadonnées",
             "mnu_updaterecgrp": "Changer le groupe d'enregistrement",
             "mnu_updaterecrule": "Mettre à jour la règle d'enregistrement",
+            "never_rec": "Ne jamais enregistrer",
             "nonrerec": "Pour autoriser le réenregistrement du programme endommagé, veuillez utiliser Autoriser le réenregistrement.",
             "normal_rec": "Dossier normal",
             "orig_airdate": "Date de diffusion originale",

@@ -120,6 +120,7 @@
             "new_search": "Nya titlar",
             "people_search": "People Search",
             "retgrid": "Återgå till Grid Display",
+            "subtitle_search": "Undertextsökning",
             "title_search": "Titelsökning",
             "typecolors": "Kategori Typ Färger"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Uppdatera metadata",
             "mnu_updaterecgrp": "Byt inspelningsgrupp",
             "mnu_updaterecrule": "Uppdatera postregel",
+            "never_rec": "Aldrig spela in",
             "nonrerec": "För att tillåta återinspelning av det skadade programmet, använd Tillåt återinspelning.",
             "normal_rec": "Normalregistrering",
             "orig_airdate": "Original Air Date",

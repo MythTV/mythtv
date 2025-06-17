@@ -120,6 +120,7 @@
             "new_search": "新標題",
             "people_search": "人物搜索",
             "retgrid": "返回網格顯示",
+            "subtitle_search": "字幕搜索",
             "title_search": "標題搜索",
             "typecolors": "類別 類型 顏色"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "更新元數據",
             "mnu_updaterecgrp": "更改錄音組",
             "mnu_updaterecrule": "更新記錄規則",
+            "never_rec": "永不記錄",
             "nonrerec": "若要允許重新錄製損壞的程序，請使用“允許重新錄製”。",
             "normal_rec": "正常記錄",
             "orig_airdate": "原始播出日期",

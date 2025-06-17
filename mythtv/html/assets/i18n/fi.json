@@ -120,6 +120,7 @@
             "new_search": "Uudet otsikot",
             "people_search": "Ihmiset haku",
             "retgrid": "Palaa ruudukkonäyttöön",
+            "subtitle_search": "Tekstityshaku",
             "title_search": "Otsikkohaku",
             "typecolors": "Luokka Tyyppi Värit"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Päivitä metatiedot",
             "mnu_updaterecgrp": "Muuta tallennusryhmää",
             "mnu_updaterecrule": "Päivitä tallennussääntö",
+            "never_rec": "Älä koskaan nauhoita",
             "nonrerec": "Jos haluat sallia vaurioituneen ohjelman uudelleentallentamisen, käytä Salli nauhoitus uudelleen.",
             "normal_rec": "Normaali ennätys",
             "orig_airdate": "Alkuperäinen lentopäivämäärä",

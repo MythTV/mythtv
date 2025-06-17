@@ -120,6 +120,7 @@
             "new_search": "Nuovi titoli",
             "people_search": "Cerca Persone",
             "retgrid": "Ritorna alla visualizzazione della griglia",
+            "subtitle_search": "Ricerca sottotitoli",
             "title_search": "Ricerca del titolo",
             "typecolors": "Colori Tipo Categoria"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Aggiorna metadati",
             "mnu_updaterecgrp": "Cambia gruppo di registrazione",
             "mnu_updaterecrule": "Aggiorna regola registrazione",
+            "never_rec": "Non registrare mai",
             "nonrerec": "Per consentire la nuova registrazione del programma danneggiato, utilizzare Consenti nuova registrazione.",
             "normal_rec": "Record normale",
             "orig_airdate": "Data messa in onda originale",

@@ -120,6 +120,7 @@
             "new_search": "新标题",
             "people_search": "人物搜索",
             "retgrid": "返回网格显示",
+            "subtitle_search": "字幕搜索",
             "title_search": "标题搜索",
             "typecolors": "类别 类型 颜色"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "更新元数据",
             "mnu_updaterecgrp": "更改录音组",
             "mnu_updaterecrule": "更新记录规则",
+            "never_rec": "永不记录",
             "nonrerec": "要允许重新录制损坏的程序，请使用“允许重新录制”。",
             "normal_rec": "正常记录",
             "orig_airdate": "原始播出日期",

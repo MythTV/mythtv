@@ -120,6 +120,7 @@
             "new_search": "Neue Titel",
             "people_search": "Personensuche",
             "retgrid": "Zurück zur Rasteranzeige",
+            "subtitle_search": "Untertitelsuche",
             "title_search": "Titelsuche",
             "typecolors": "Kategorietypfarben"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Metadaten aktualisieren",
             "mnu_updaterecgrp": "Aufnahmegruppe ändern",
             "mnu_updaterecrule": "Datensatzregel aktualisieren",
+            "never_rec": "Niemals aufnehmen",
             "nonrerec": "Um das erneute Aufzeichnen des beschädigten Programms zu ermöglichen, verwenden Sie bitte „Erneutes Aufzeichnen zulassen“.",
             "normal_rec": "Normale Aufzeichnung",
             "orig_airdate": "Ursprüngliches Sendedatum",

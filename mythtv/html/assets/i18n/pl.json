@@ -120,6 +120,7 @@
             "new_search": "Nowe tytuły",
             "people_search": "Ludzie szukają",
             "retgrid": "Powrót do wyświetlania siatki",
+            "subtitle_search": "Wyszukiwanie napisów",
             "title_search": "Wyszukiwanie tytułów",
             "typecolors": "Kategoria Typ Kolory"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Zaktualizuj metadane",
             "mnu_updaterecgrp": "Zmień grupę nagrań",
             "mnu_updaterecrule": "Zaktualizuj regułę rekordu",
+            "never_rec": "Nigdy nie rejestruj",
             "nonrerec": "Aby zezwolić na ponowne nagranie uszkodzonego programu, użyj opcji Zezwól na ponowne nagranie.",
             "normal_rec": "Normalny rekord",
             "orig_airdate": "Oryginalna data emisji",

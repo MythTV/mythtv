@@ -120,6 +120,7 @@
             "new_search": "Nové tituly",
             "people_search": "Vyhledávání lidí",
             "retgrid": "Návrat k zobrazení mřížky",
+            "subtitle_search": "Vyhledávání podtitul",
             "title_search": "Vyhledávání titulů",
             "typecolors": "Kategorie Typ Barvy"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Aktualizujte metadata",
             "mnu_updaterecgrp": "Změnit záznamovou skupinu",
             "mnu_updaterecrule": "Aktualizovat pravidlo záznamu",
+            "never_rec": "Nikdy nezaznamenejte",
             "nonrerec": "Chcete-li povolit opětovné nahrání poškozeného programu, použijte možnost Povolit opětovné nahrání.",
             "normal_rec": "Normální záznam",
             "orig_airdate": "Původní datum vysílání",

@@ -120,6 +120,7 @@
             "new_search": "Yeni Başlıklar",
             "people_search": "İnsan arama",
             "retgrid": "Izgara Görünümüne Dön",
+            "subtitle_search": "Altyazılı arama",
             "title_search": "Başlık arama",
             "typecolors": "Kategori Tip Renkler"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Meta Verileri Güncelle",
             "mnu_updaterecgrp": "Kayıt Grubunu Değiştir",
             "mnu_updaterecrule": "Kayıt Kuralını Güncelle",
+            "never_rec": "Asla Kayıt",
             "nonrerec": "Hasarlı programın yeniden kaydedilmesine izin vermek için lütfen Yeniden Kayda İzin Ver seçeneğini kullanın.",
             "normal_rec": "Normal kayıt",
             "orig_airdate": "Orijinal Yayın Tarihi",

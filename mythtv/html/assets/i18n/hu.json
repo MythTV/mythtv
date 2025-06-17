@@ -120,6 +120,7 @@
             "new_search": "Új címek",
             "people_search": "Emberek keresése",
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
+            "subtitle_search": "Feliratkeresés",
             "title_search": "Cím keresése",
             "typecolors": "Kategória Típus Színek"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Frissítse a metaadatokat",
             "mnu_updaterecgrp": "Felvételi csoport módosítása",
             "mnu_updaterecrule": "Frissítse a rögzítési szabályt",
+            "never_rec": "Soha ne rögzítsen",
             "nonrerec": "A sérült program újbóli rögzítésének engedélyezéséhez használja az Újrarögzítés engedélyezése lehetőséget.",
             "normal_rec": "Normál nyilvántartás",
             "orig_airdate": "Eredeti sugárzási dátum",

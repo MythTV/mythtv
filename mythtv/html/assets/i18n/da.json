@@ -120,6 +120,7 @@
             "new_search": "Nye titler",
             "people_search": "People Search",
             "retgrid": "Vend tilbage til gittervisning",
+            "subtitle_search": "Undertekstsøgning",
             "title_search": "Titelsøgning",
             "typecolors": "Kategori Type Farver"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Opdater metadata",
             "mnu_updaterecgrp": "Skift optagegruppe",
             "mnu_updaterecrule": "Opdater registreringsregel",
+            "never_rec": "Registrer aldrig",
             "nonrerec": "For at tillade genoptagelse af det beskadigede program, brug venligst Tillad genoptagelse.",
             "normal_rec": "Normal rekord",
             "orig_airdate": "Original luftdato",

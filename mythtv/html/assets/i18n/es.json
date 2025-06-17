@@ -120,6 +120,7 @@
             "new_search": "Nuevos títulos",
             "people_search": "Búsqueda de personas",
             "retgrid": "Regresar a la pantalla de cuadrícula",
+            "subtitle_search": "Búsqueda de subtítulos",
             "title_search": "Buscar título",
             "typecolors": "Categoría Tipo Colores"
         },
@@ -258,6 +259,7 @@
             "mnu_updatemeta": "Actualizar metadatos",
             "mnu_updaterecgrp": "Cambiar grupo de grabación",
             "mnu_updaterecrule": "Actualizar regla de registro",
+            "never_rec": "Nunca registrar",
             "nonrerec": "Para permitir volver a grabar el programa dañado, utilice Permitir volver a grabar.",
             "normal_rec": "Registro normal",
             "orig_airdate": "Fecha de emisión original",
