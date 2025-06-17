@@ -7,8 +7,8 @@
         <div style="height: 90vh">
             <p-table #table *ngIf="showTable" [value]="programs" scrollHeight="flex" [scrollable]="true"
                 [totalRecords]="totalRecords" styleClass="p-datatable-gridlines p-datatable-sm" [virtualScroll]="true"
-                [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
-                [sortField]="sortField" [sortOrder]="sortOrder" (onSort)="onSort($event)">
+                [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true" [sortField]="sortField"
+                [sortOrder]="sortOrder" (onSort)="onSort($event)">
 
                 <ng-template pTemplate="caption">
                     <!-- Top Buttons -->
@@ -77,16 +77,24 @@
                             {{ 'dashboard.upcoming.status' | translate }} <p-sortIcon field="StatusName"></p-sortIcon>
                         </th>
                         <th style="width: 4%" class="p-1" style="white-space: nowrap;">
-                            <button pButton pRipple icon="pi pi-paperclip" [disabled]="true"
-                                class="p-button-text p-button-primary"></button>
-                            <button pButton pRipple icon="pi pi-pencil" [disabled]="true"
-                                class="p-button-text p-button-primary"></button>
-                            <button pButton pRipple icon="pi pi-thumbs-down" [disabled]="true"
-                                class="p-button-text p-button-primary"></button>
-                            <button pButton pRipple icon="pi pi-thumbs-up" [disabled]="true"
-                                class="p-button-text p-button-primary"></button>
-                            <button pButton pRipple icon="pi pi-times" [disabled]="true"
-                                class="p-button-text p-button-primary"></button>
+                            <i pButton icon="pi pi-paperclip" class="p-button-text p-button-primary"
+                                pTooltip="{{ 'dashboard.recordings.override_rule' | translate }}"
+                                tooltipPosition="left"></i>
+                            <i pButton icon="pi pi-pencil" class="p-button-text p-button-primary"
+                                pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
+                                tooltipPosition="left"></i>
+                            <i pButton icon="pi pi-thumbs-down" class="p-button-text p-button-primary"
+                                pTooltip="{{ 'dashboard.recordings.dont_rec' | translate }}"
+                                tooltipPosition="left"></i>
+                            <i pButton icon="pi pi-thumbs-down-fill" class="p-button-text p-button-primary"
+                                pTooltip="{{ 'dashboard.recordings.never_rec' | translate }}"
+                                tooltipPosition="left"></i>
+                            <i pButton icon="pi pi-thumbs-up" class="p-button-text p-button-primary"
+                                pTooltip="{{ 'dashboard.recordings.enable_rec' | translate }}"
+                                tooltipPosition="left"></i>
+                            <i pButton icon="pi pi-check" class="p-button-text p-button-primary"
+                                pTooltip="{{ 'dashboard.recordings.normal_rec' | translate }}"
+                                tooltipPosition="left"></i>
                         </th>
                     </tr>
                 </ng-template>
@@ -174,15 +182,21 @@
                             <button pButton pRipple icon="pi pi-thumbs-down" class="p-button-text p-button-primary"
                                 (click)="override(program, 'Do not Record')"
                                 pTooltip="{{ 'dashboard.recordings.dont_rec' | translate }}" tooltipPosition="left"
-                                [disabled]="program.Recording && program.Recording.RecType == 8"></button>
+                                [disabled]="program.Recording && [1,7,8].indexOf(program.Recording.RecType) > -1"></button>
+                            <button pButton pRipple icon="pi pi-thumbs-down-fill" class="p-button-text p-button-primary"
+                                (click)="override(program, 'Never Record')"
+                                pTooltip="{{ 'dashboard.recordings.never_rec' | translate }}" tooltipPosition="left"
+                                [disabled]="program.Recording && [1,7,8].indexOf(program.Recording.RecType) > -1
+                                    || program.Recording.Status == 11"></button>
                             <button pButton pRipple icon="pi pi-thumbs-up" class="p-button-text p-button-primary"
                                 (click)="override(program,'Override Recording')"
                                 pTooltip="{{ 'dashboard.recordings.enable_rec' | translate }}" tooltipPosition="left"
-                                [disabled]="program.Recording && program.Recording.RecType == 7"></button>
-                            <button pButton pRipple icon="pi pi-times" class="p-button-text p-button-primary"
+                                [disabled]="program.Recording && (program.Recording.RecType == 7
+                                    || [-2,-1].indexOf(program.Recording.Status) >= 0)"></button>
+                            <button pButton pRipple icon="pi pi-check" class="p-button-text p-button-primary"
                                 (click)="override(program, 'Not Recording')"
                                 pTooltip="{{ 'dashboard.recordings.normal_rec' | translate }}" tooltipPosition="left"
-                                [disabled]="program.Recording && (program.Recording.RecType != 7 && program.Recording.RecType != 8)"></button>
+                                [disabled]="program.Recording && [7,8].indexOf(program.Recording.RecType) == -1"></button>
                         </td>
                     </tr>
                 </ng-template>

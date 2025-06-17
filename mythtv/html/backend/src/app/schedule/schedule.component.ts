@@ -71,7 +71,7 @@ export class ScheduleComponent implements OnInit {
   templateId = 0;
   neverRecord = false;
   schedTypeDisabled = false;
-  newRuleType: string|undefined ;
+  newRuleType: string | undefined;
 
   htmlRegex = new RegExp("<TITLE>|</TITLE>");
 
@@ -87,7 +87,7 @@ export class ScheduleComponent implements OnInit {
   templates: RecRule[] = [];
   typeList: ListEntry[] = [];
   allChannels: MyChannel[] = [];
-  fullDetails : string = '';
+  fullDetails: string = '';
 
   srchTypeList: ListEntry[] = [
     { prompt: this.translate.instant('recrule.srch_None'), value: 'None' },
@@ -250,6 +250,9 @@ export class ScheduleComponent implements OnInit {
   }
 
   open(program?: ScheduleOrProgram, channel?: Channel, recRule?: RecRule, newRuleType?: string) {
+    this.program = undefined;
+    this.channel = undefined;
+    this.recRule = undefined;
     this.templateId = 0;
     this.reqProgram = program;
     this.reqChannel = channel;
@@ -368,13 +371,15 @@ export class ScheduleComponent implements OnInit {
     if (this.override)
       this.recRule.Inactive = false;
 
-    setTimeout(() => {
-      if (newOverride)
-        ruleType = 'Not Recording';
-      if (this.recRule)
-        this.recRule.Type = ruleType;
-      this.currentForm.form.markAsPristine();
-    }, 10);
+    if (!this.newRuleType) {
+      setTimeout(() => {
+        if (newOverride)
+          ruleType = 'Not Recording';
+        if (this.recRule)
+          this.recRule.Type = ruleType;
+        this.currentForm.form.markAsPristine();
+      }, 10);
+    }
   }
 
   setupTypeList(recRule: RecRule) {
@@ -729,6 +734,7 @@ export class ScheduleComponent implements OnInit {
           this.recRule.Id = x.uint;
         }
         else {
+          console.log("Unexpected response:", x, "this.recRule.Type:", this.recRule.Type);
           this.errorCount++;
           this.displayDlg = true;
           this.currentForm.form.markAsDirty();
