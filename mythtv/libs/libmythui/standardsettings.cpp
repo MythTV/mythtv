@@ -32,8 +32,10 @@ StandardSetting::~StandardSetting()
             delete *i;
     }
     m_targets.clear();
-    if (m_storage)
+
+    if (m_storage && m_newdStorage)
     {
+        // Storage memory was allocated with a 'new'
         delete m_storage;
         m_storage = nullptr;
     }

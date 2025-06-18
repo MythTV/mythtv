@@ -217,6 +217,7 @@ class VideoSource : public GroupSetting {
         explicit Name(const VideoSource &parent) :
             MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "name"))
         {
+            m_newdStorage = true;
             setLabel(QObject::tr("Video source name"));
         }
     };
@@ -254,6 +255,7 @@ class CaptureCardComboBoxSetting : public MythUIComboBoxSetting
         MythUIComboBoxSetting(new CaptureCardDBStorage(this, parent, setting),
                               rw)
     {
+        m_newdStorage = true;
     }
 };
 
@@ -281,6 +283,7 @@ class EmptyAudioDevice : public MythUITextEditSetting
         MythUITextEditSetting(new CaptureCardDBStorage(this, parent,
                                                        "audiodevice"))
     {
+        m_newdStorage = true;
         setVisible(false);
     }
 
@@ -306,6 +309,7 @@ class EmptyVBIDevice : public MythUITextEditSetting
     explicit EmptyVBIDevice(const CaptureCard &parent) :
         MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "vbidevice"))
     {
+        m_newdStorage = true;
         setVisible(false);
     };
 
@@ -877,6 +881,7 @@ class StartingChannel : public MythUIComboBoxSetting
         MythUIComboBoxSetting(new CardInputDBStorage(this, parent, "startchan"),
                               false)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Starting channel"));
         setHelpText(QObject::tr("This channel is shown when 'Watch TV' is selected on the main menu. "
                                 "It is updated on every Live TV channel change. "

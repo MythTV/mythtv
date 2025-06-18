@@ -106,6 +106,7 @@ class Name : public MythUITextEditSetting
     explicit Name(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "name"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Channel Name"));
     }
 };
@@ -116,6 +117,7 @@ class Channum : public MythUITextEditSetting
     explicit Channum(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "channum"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Channel Number"));
         setHelpText(QCoreApplication::translate("(Common)",
         "This is the number by which the channel is known to MythTV."));
@@ -129,6 +131,7 @@ class Source : public MythUIComboBoxSetting
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "sourceid")),
         m_defaultSourceId(_default_sourceid)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Video Source"));
         setHelpText(QCoreApplication::translate("(Common)",
         "It is NOT a good idea to change this value as it only changes "
@@ -187,6 +190,7 @@ class Callsign : public MythUITextEditSetting
     explicit Callsign(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "callsign"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Callsign"));
     }
 };
@@ -194,6 +198,7 @@ class Callsign : public MythUITextEditSetting
 ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
     MythUIComboBoxSetting(new ChannelDBStorage(this, id, "tvformat"))
 {
+    m_newdStorage = true;
     setLabel(QCoreApplication::translate("(ChannelSettings)", "TV Format"));
     setHelpText(QCoreApplication::translate("(ChannelSettings)",
         "If this channel uses a format other than TV Format in the General "
@@ -235,6 +240,7 @@ class TimeOffset : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "tmoffset"),
                              -1440, 1440, 1)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "DataDirect Time Offset"));
 
@@ -252,6 +258,7 @@ class Priority : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "recpriority"),
                              -99, 99, 1)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Priority"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -268,6 +275,7 @@ class Icon : public MythUITextEditSetting
     explicit Icon(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "icon"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Icon"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -282,6 +290,7 @@ class VideoFilters : public MythUITextEditSetting
     explicit VideoFilters(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "videofilters"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Video filters"));
 
@@ -299,6 +308,7 @@ class OutputFilters : public MythUITextEditSetting
     explicit OutputFilters(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "outputfilters"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                     "Playback filters"));
 
@@ -315,6 +325,7 @@ class XmltvID : public MythUIComboBoxSetting
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "xmltvid"), true),
         m_sourceName(std::move(_sourceName))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -373,6 +384,7 @@ class ServiceID : public MythUISpinBoxSetting
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
                                -1, UINT16_MAX, 1, 1, "NULL")
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Service ID"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -428,6 +440,7 @@ class CommMethod : public MythUIComboBoxSetting
     explicit CommMethod(const ChannelID &id) :
        MythUIComboBoxSetting(new ChannelDBStorage(this, id, "commmethod"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Commercial Detection Method"));
 
@@ -451,6 +464,7 @@ class Visible : public MythUIComboBoxSetting
     explicit Visible(const ChannelID &id) :
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "visible"))
     {
+        m_newdStorage = true;
         setValue(kChannelVisible);
 
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Visible"));
@@ -478,6 +492,7 @@ class OnAirGuide : public MythUICheckBoxSetting
     explicit OnAirGuide(const ChannelID &id) :
         MythUICheckBoxSetting(new ChannelDBStorage(this, id, "useonairguide"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Use on air guide"));
 
@@ -496,6 +511,7 @@ class ChannelURL : public MythUITextEditSetting
     explicit ChannelURL(const ChannelID &id) :
         MythUITextEditSetting(new IPTVChannelDBStorage(this, id, "url"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)", "URL"));
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "URL for streaming of this channel. Used by the IPTV "
@@ -514,6 +530,7 @@ class Freqid : public MythUITextEditSetting
     explicit Freqid(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "freqid"))
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Freq/Channel"));
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -531,6 +548,7 @@ class Finetune : public MythUISpinBoxSetting
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "finetune"),
                                -300, 300, 1)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Finetune (kHz)"));
 
@@ -549,6 +567,7 @@ class Contrast : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "contrast"),
                              0, 65535, 655)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Contrast"));
     }
 };
@@ -560,6 +579,7 @@ class Brightness : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "brightness"),
                              0, 65535, 655)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Brightness"));
     }
 };
@@ -571,6 +591,7 @@ class Colour : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "colour"),
                              0, 65535, 655)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Color"));
     }
 };
@@ -582,6 +603,7 @@ class Hue : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "hue"),
                              0, 65535, 655)
     {
+        m_newdStorage = true;
         setLabel(QCoreApplication::translate("(Common)", "Hue"));
     }
 };

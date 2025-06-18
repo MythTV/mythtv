@@ -115,7 +115,8 @@ class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
     QString m_helptext;
     QString m_name;
     bool    m_visible         {true};
-
+    bool    m_newdStorage     {false}; // Set true if 'new' was used to
+                                       // allocate memory put into storage
   private:
     bool    m_haveChanged     {false};
     Storage *m_storage        {nullptr};
@@ -169,14 +170,16 @@ class MUI_PUBLIC HostTextEditSetting: public MythUITextEditSetting
 {
   public:
     explicit HostTextEditSetting(const QString &name) :
-        MythUITextEditSetting(new HostDBStorage(this, name)) { }
+        MythUITextEditSetting(new HostDBStorage(this, name))
+    { m_newdStorage = true; }
 };
 
 class MUI_PUBLIC GlobalTextEditSetting: public MythUITextEditSetting
 {
   public:
     explicit GlobalTextEditSetting(const QString &name) :
-        MythUITextEditSetting(new GlobalDBStorage(this, name)) { }
+        MythUITextEditSetting(new GlobalDBStorage(this, name))
+    { m_newdStorage = true; }
 };
 
 /*******************************************************************************
@@ -207,7 +210,8 @@ class MUI_PUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
 {
   public:
     explicit HostFileBrowserSetting(const QString &name) :
-        MythUIFileBrowserSetting(new HostDBStorage(this, name)) { }
+        MythUIFileBrowserSetting(new HostDBStorage(this, name))
+    { m_newdStorage = true; }
 };
 
 
@@ -258,7 +262,8 @@ class MUI_PUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit HostComboBoxSetting(const QString &name, bool rw = false) :
-        MythUIComboBoxSetting(new HostDBStorage(this, name), rw) { }
+        MythUIComboBoxSetting(new HostDBStorage(this, name), rw)
+    { m_newdStorage = true; }
 };
 
 
@@ -266,7 +271,8 @@ class MUI_PUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
-        MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
+        MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw)
+    { m_newdStorage = true; }
 };
 
 class MUI_PUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
@@ -369,7 +375,7 @@ class MUI_PUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
                        const QString &special_value_text = QString()) :
         MythUISpinBoxSetting(new HostDBStorage(this, name), min, max, step,
                              pageMultiple, special_value_text)
-    { }
+    { m_newdStorage = true; }
 };
 
 class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
@@ -380,7 +386,7 @@ class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
                          const QString &special_value_text = QString()) :
         MythUISpinBoxSetting(new GlobalDBStorage(this, name), min, max, step,
                              pageMultiple, special_value_text)
-    { }
+    { m_newdStorage = true; }
 };
 
 /*******************************************************************************
@@ -418,14 +424,16 @@ class MUI_PUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     explicit HostCheckBoxSetting(const QString &name) :
-        MythUICheckBoxSetting(new HostDBStorage(this, name)) { }
+        MythUICheckBoxSetting(new HostDBStorage(this, name))
+    { m_newdStorage = true; }
 };
 
 class MUI_PUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     explicit GlobalCheckBoxSetting(const QString &name) :
-        MythUICheckBoxSetting(new GlobalDBStorage(this, name)) { }
+        MythUICheckBoxSetting(new GlobalDBStorage(this, name))
+    { m_newdStorage = true; }
 };
 
 /*******************************************************************************

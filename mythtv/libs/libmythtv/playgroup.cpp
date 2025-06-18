@@ -39,6 +39,7 @@ class TitleMatch : public MythUITextEditSetting
     explicit TitleMatch(const PlayGroupConfig& _parent):
         MythUITextEditSetting(new PlayGroupDBStorage(this, _parent, "titlematch"))
     {
+        m_newdStorage = true;
         setLabel(PlayGroupConfig::tr("Title match (regex)"));
         setHelpText(PlayGroupConfig::tr("Automatically set new recording rules "
                                          "to use this group if the title "
@@ -57,6 +58,7 @@ class SkipAhead : public MythUISpinBoxSetting
                              0, 600, 5, 1, PlayGroupConfig::tr("(default)"))
 
     {
+        m_newdStorage = true;
         setLabel(PlayGroupConfig::tr("Skip ahead (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip forward on "
                                         "a fast forward."));
@@ -70,6 +72,7 @@ class SkipBack : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipback"),
                              0, 600, 5, 1, PlayGroupConfig::tr("(default)"))
     {
+        m_newdStorage = true;
         setLabel(PlayGroupConfig::tr("Skip back (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip backward on "
                                         "a rewind."));
@@ -83,6 +86,7 @@ class JumpMinutes : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "jump"),
                              0, 30, 10, 1, PlayGroupConfig::tr("(default)"))
     {
+        m_newdStorage = true;
         setLabel(PlayGroupConfig::tr("Jump amount (minutes)"));
         setHelpText(PlayGroupConfig::tr("How many minutes to jump forward or "
                                         "backward when the jump keys are "
@@ -97,6 +101,7 @@ class TimeStretch : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "timestretch"),
                              50, 200, 5, 1)
     {
+        m_newdStorage = true;
         setValue(100);
         setLabel(PlayGroupConfig::tr("Time stretch (speed x 100)"));
         setHelpText(PlayGroupConfig::tr("Initial playback speed with adjusted "

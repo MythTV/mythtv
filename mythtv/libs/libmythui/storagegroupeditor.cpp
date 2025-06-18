@@ -176,6 +176,7 @@ StorageGroupDirSetting::StorageGroupDirSetting(int id, const QString &group) :
     MythUIFileBrowserSetting(new StorageGroupDirStorage(this, id, group)),
     m_id(id), m_group(group)
 {
+    m_newdStorage = true;
     SetTypeFilter(QDir::AllDirs | QDir::Drives);
 }
 

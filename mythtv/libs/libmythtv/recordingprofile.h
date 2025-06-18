@@ -57,6 +57,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
             MythUITextEditSetting(
                 new RecordingProfileStorage(this, parent, "name"))
         {
+            m_newdStorage = true;
             setReadOnly(true);
             setLabel(QObject::tr("Profile name"));
             setName("name");

@@ -175,6 +175,7 @@ class InstanceCount : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "reclimit"),
                              1, 10, 1)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Max recordings"));
         setValue(1);
         setHelpText(
@@ -194,6 +195,7 @@ class SchedGroup : public MythUICheckBoxSetting
     explicit SchedGroup(const CardInput &parent) :
         MythUICheckBoxSetting(new CardInputDBStorage(this, parent, "schedgroup"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Schedule as group"));
         setValue(true);
         setHelpText(
@@ -265,6 +267,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
                                                        "xmltvgrabber")),
         m_parent(parent)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Listings grabber"));
     };
 
@@ -396,6 +399,7 @@ class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new CaptureCardDBStorage(this, parent, setting),
                              min_val.count(), max_val.count(), step.count())
     {
+        m_newdStorage = true;
     }
     // Handles integer milliseconds (compiler converts seconds to milliseconds)
     void setValueMs (std::chrono::milliseconds newValue)
@@ -413,6 +417,7 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
                                const QString &setting) :
         MythUITextEditSetting(new CaptureCardDBStorage(this, parent, setting))
     {
+        m_newdStorage = true;
     }
 };
 
@@ -422,6 +427,7 @@ class ScanFrequencyStart : public MythUITextEditSetting
     explicit ScanFrequencyStart(const VideoSource &parent) :
         MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "scanfrequency"))
     {
+       m_newdStorage = true;
        setLabel(QObject::tr("Scan Frequency"));
        setHelpText(QObject::tr("The frequency to start scanning this video source. "
                                "This is then default for 'Full Scan (Tuned)' channel scanning. "
@@ -437,6 +443,7 @@ class DVBNetID : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "dvb_nit_id"),
                              min_val, 0xffff, 1)
     {
+       m_newdStorage = true;
        setLabel(QObject::tr("Network ID"));
        //: Network_ID is the name of an identifier in the DVB's Service
        //: Information standard specification.
@@ -454,6 +461,7 @@ class BouquetID : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "bouquet_id"),
                              min_val, 0xffff, 1)
     {
+       m_newdStorage = true;
        setLabel(QObject::tr("Bouquet ID"));
        setHelpText(QObject::tr("Bouquet ID for Freesat or Sky on satellite Astra-2 28.2E. "
                                "Leave this at 0 if you do not receive this satellite. "
@@ -471,6 +479,7 @@ class RegionID : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "region_id"),
                              min_val, 100, 1)
     {
+       m_newdStorage = true;
        setLabel(QObject::tr("Region ID"));
        setHelpText(QObject::tr("Region ID for Freesat or Sky on satellite Astra-2 28.2E. "
                                "Leave this at 0 you do not receive this satellite.  "
@@ -488,6 +497,7 @@ class LCNOffset : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "lcnoffset"),
                              min_val, 20000, 100)
     {
+       m_newdStorage = true;
        setLabel(QObject::tr("Logical Channel Number Offset"));
        setHelpText(QObject::tr("The offset is added to each logical channel number found "
                                "during a scan of a DVB video source. This makes it possible "
@@ -501,6 +511,7 @@ class LCNOffset : public MythUISpinBoxSetting
 FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     MythUIComboBoxSetting(new VideoSourceDBStorage(this, parent, "freqtable"))
 {
+    m_newdStorage = true;
     setLabel(QObject::tr("Channel frequency table"));
     addSelection("default");
 
@@ -597,6 +608,7 @@ class UseEIT : public MythUICheckBoxSetting
     explicit UseEIT(const VideoSource &parent) :
         MythUICheckBoxSetting(new VideoSourceDBStorage(this, parent, "useeit"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Perform EIT scan"));
         setHelpText(QObject::tr(
                         "If enabled, program guide data for channels on this "
@@ -979,6 +991,7 @@ class CommandPath : public MythUITextEditSetting
         MythUITextEditSetting(new CaptureCardDBStorage(this, parent,
                                                        "videodevice"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr(""));
         setValue("");
         setHelpText(QObject::tr("Specify the command to run, with any "
@@ -994,6 +1007,7 @@ class FileDevice : public MythUIFileBrowserSetting
             new CaptureCardDBStorage(this, parent, "videodevice")
             /* mustexist, false */)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("File path"));
     };
 };
@@ -1096,12 +1110,13 @@ class SkipBtAudio : public MythUICheckBoxSetting
         MythUICheckBoxSetting(new CaptureCardDBStorage(this, parent,
                                                        "skipbtaudio"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Do not adjust volume"));
         setHelpText(
             QObject::tr("Enable this option for budget BT878 based "
                         "DVB-T cards such as the AverTV DVB-T which "
                         "require the audio volume to be left alone."));
-   };
+    };
 };
 
 class DVBCardNum : public CaptureCardComboBoxSetting
@@ -1207,6 +1222,7 @@ class DVBNoSeqStart : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_wait_for_seqstart"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Wait for SEQ start header"));
         setValue(true);
         setHelpText(
@@ -1222,6 +1238,7 @@ class DVBOnDemand : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_on_demand"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Open DVB card on demand"));
         setValue(true);
         setHelpText(
@@ -1237,6 +1254,7 @@ class DVBEITScan : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_eitscan"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Use DVB card for active EIT scan"));
         setValue(true);
         setHelpText(
@@ -1347,6 +1365,7 @@ class FirewireConnection : public MythUIComboBoxSetting
         MythUIComboBoxSetting(new CaptureCardDBStorage(this, parent,
                                                        "firewire_connection"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Connection Type"));
         addSelection(QObject::tr("Point to Point"),"0");
         addSelection(QObject::tr("Broadcast"),"1");
@@ -1360,6 +1379,7 @@ class FirewireSpeed : public MythUIComboBoxSetting
         MythUIComboBoxSetting(new CaptureCardDBStorage(this, parent,
                                                        "firewire_speed"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Speed"));
         addSelection(QObject::tr("100Mbps"),"0");
         addSelection(QObject::tr("200Mbps"),"1");
@@ -1409,6 +1429,7 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent,
         new CaptureCardDBStorage(this, parent, "videodevice")),
     m_group(_group)
 {
+    m_newdStorage = true;
     setVisible(false);
 };
 
@@ -1431,6 +1452,7 @@ class HDHomeRunEITScan : public MythUICheckBoxSetting
         MythUICheckBoxSetting(
             new CaptureCardDBStorage(this, parent, "dvb_eitscan"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Use HDHomeRun for active EIT scan"));
         setValue(true);
         setHelpText(
@@ -1631,6 +1653,7 @@ void VBoxTunerIndex::UpdateDevices(const QString &v)
 VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
     MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice"))
 {
+    m_newdStorage = true;
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of VBox device"));
     setReadOnly(true);
@@ -2090,6 +2113,7 @@ CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
     MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice")),
     m_parent(parent)
 {
+    m_newdStorage = true;
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of Ceton device"));
 }
@@ -2171,9 +2195,10 @@ class SchedGroupFalse : public MythUICheckBoxSetting
         MythUICheckBoxSetting(new CaptureCardDBStorage(this, parent,
                                                        "schedgroup"))
     {
+        m_newdStorage = true;
         setValue(false);
         setVisible(false);
-   };
+    };
 };
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
@@ -2787,6 +2812,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 CaptureCard::Hostname::Hostname(const CaptureCard &parent) :
     StandardSetting(new CaptureCardDBStorage(this, parent, "hostname"))
 {
+    m_newdStorage = true;
     setVisible(false);
     setValue(gCoreContext->GetHostName());
 }
@@ -2797,6 +2823,7 @@ class InputName : public MythUIComboBoxSetting
     explicit InputName(const CardInput &parent) :
         MythUIComboBoxSetting(new CardInputDBStorage(this, parent, "inputname"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Input name"));
     };
 
@@ -2846,6 +2873,7 @@ class InputDisplayName : public MythUITextEditSetting
     explicit InputDisplayName(const CardInput &parent) :
         MythUITextEditSetting(new CardInputDBStorage(this, parent, "displayname")), m_parent(parent)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Display name"));
         setHelpText(QObject::tr(
                         "This name is displayed on screen when Live TV begins "
@@ -2868,6 +2896,7 @@ class CardInputComboBoxSetting : public MythUIComboBoxSetting
     CardInputComboBoxSetting(const CardInput &parent, const QString &setting) :
         MythUIComboBoxSetting(new CardInputDBStorage(this, parent, setting))
     {
+        m_newdStorage = true;
     }
 };
 
@@ -3045,6 +3074,7 @@ class ExternalChannelCommand : public MythUITextEditSetting
     explicit ExternalChannelCommand(const CardInput &parent) :
         MythUITextEditSetting(new CardInputDBStorage(this, parent, "externalcommand"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("External channel change command"));
         setValue("");
         setHelpText(QObject::tr("If specified, this command will be run to "
@@ -3060,6 +3090,7 @@ class PresetTuner : public MythUITextEditSetting
     explicit PresetTuner(const CardInput &parent) :
         MythUITextEditSetting(new CardInputDBStorage(this, parent, "tunechan"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Preset tuner to channel"));
         setValue("");
         setHelpText(QObject::tr("Leave this blank unless you have an external "
@@ -3117,6 +3148,7 @@ class InputPriority : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "recpriority"),
                              -99, 99, 1)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Input priority"));
         setValue(0);
         setHelpText(QObject::tr("If the input priority is not equal for "
@@ -3133,6 +3165,7 @@ class ScheduleOrder : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "schedorder"),
                              0, 99, 1)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Schedule order"));
         setValue(_value);
         setHelpText(QObject::tr("If priorities and other factors are equal "
@@ -3150,6 +3183,7 @@ class LiveTVOrder : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "livetvorder"),
                              0, 99, 1)
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Live TV order"));
         setValue(_value);
         setHelpText(QObject::tr("When entering Live TV, the available, local "
@@ -3169,6 +3203,7 @@ class DishNetEIT : public MythUICheckBoxSetting
         MythUICheckBoxSetting(new CardInputDBStorage(this, parent,
                                                      "dishnet_eit"))
     {
+        m_newdStorage = true;
         setLabel(QObject::tr("Use DishNet long-term EIT data"));
         setValue(false);
         setHelpText(
@@ -4062,6 +4097,7 @@ class DiSEqCPosition : public MythUISpinBoxSetting
         MythUISpinBoxSetting(new CaptureCardDBStorage(this, parent, "dvb_diseqc_type"),
                              min_val, 0xff, 1)
     {
+       m_newdStorage = true;
        setLabel(QObject::tr("DiSEqC position"));
        setHelpText(QObject::tr("Position of the LNB on the DiSEqC switch. "
                                "Leave at 1 if there is no DiSEqC switch "
@@ -4233,6 +4269,7 @@ SatIPDeviceID::SatIPDeviceID(const CaptureCard &parent) :
     MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice")),
     m_parent(parent)
 {
+    m_newdStorage = true;
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of the Sat>IP tuner"));
     setEnabled(true);
