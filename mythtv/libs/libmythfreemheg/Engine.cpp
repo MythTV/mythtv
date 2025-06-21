@@ -628,8 +628,13 @@ void MHEngine::RunActions()
 
             pAction->Perform(this);
         }
-        catch (...)
+        catch(const std::exception& ex)
         {
+            MHLOG(MHLogDetail, QString("Action - threw %1").arg(ex.what()));
+        }
+        catch(...)
+        {
+            MHLOG(MHLogDetail, QString("Action - threw unknown"));
         }
     }
 }
@@ -1019,8 +1024,14 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
                     reinterpret_cast< const unsigned char * >(text.constData()),
                     text.size(), this);
             }
-            catch (...)
-            {}
+            catch(const std::exception& ex)
+            {
+                MHLOG(MHLogDetail, QString("ExternalContent - threw %1").arg(ex.what()));
+            }
+            catch(...)
+            {
+                MHLOG(MHLogDetail, QString("ExternalContent - threw unknown"));
+            }
         }
         else
         {
@@ -1090,8 +1101,14 @@ void MHEngine::CheckContentRequests()
                         reinterpret_cast< const unsigned char * >(text.constData()),
                         text.size(), this);
                 }
-                catch (...)
-                {}
+                catch(const std::exception& ex)
+                {
+                    MHLOG(MHLogDetail, QString("ContentRequest - threw %1").arg(ex.what()));
+                }
+                catch(...)
+                {
+                    MHLOG(MHLogDetail, QString("ContentRequest - threw unknown"));
+                }
             }
             else
             {

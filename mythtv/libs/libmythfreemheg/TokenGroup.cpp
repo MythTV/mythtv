@@ -255,8 +255,19 @@ void MHTokenGroup::Activation(MHEngine *engine)
             {
                 engine->FindObject(m_tokenGrpItems.GetAt(i)->m_Object)->Activation(engine);
             }
-            catch (...)
+            catch(const std::exception& ex)
             {
+                MHLOG(MHLogDetail, QString("MHTokenGroup::Activation - threw %1").arg(ex.what()));
+            }
+            catch(char const *e)
+            {
+                // Ignore null objects
+                if (strcmp(e, "FindObject failed") != 0)
+                    MHLOG(MHLogDetail, QString("MHTokenGroup::Activation - threw '%1'").arg(e));
+            }
+            catch(...)
+            {
+                MHLOG(MHLogDetail, QString("MHTokenGroup::Activation - threw unknown"));
             }
         }
     }
@@ -423,8 +434,19 @@ void MHListGroup::Preparation(MHEngine *engine)
                 m_itemList.append(new MHListItem(pItem));
             }
         }
-        catch (...)  // Ignore invalid or null objects.
+        catch(const std::exception& ex)
         {
+            MHLOG(MHLogDetail, QString("MHListGroup::Preparation - threw %1").arg(ex.what()));
+        }
+        catch(char const *e)
+        {
+            // Ignore null objects
+            if (strcmp(e, "FindObject failed") != 0)
+                MHLOG(MHLogDetail, QString("MHListGroup::Preparation - threw '%1'").arg(e));
+        }
+        catch(...)
+        {
+            MHLOG(MHLogDetail, QString("MHListGroup::Preparation - threw unknown"));
         }
     }
 }
@@ -498,7 +520,14 @@ void MHListGroup::Update(MHEngine *engine)
                 {
                     pVis->SetPosition(m_positions.GetAt(i - m_nFirstItem + 1).x(), m_positions.GetAt(i - m_nFirstItem + 1).y(), engine);
                 }
-                catch (...) {}
+                catch(const std::exception& ex)
+                {
+                    MHLOG(MHLogDetail, QString("MHListGroup::Update - threw %1").arg(ex.what()));
+                }
+                catch(...)
+                {
+                    MHLOG(MHLogDetail, QString("MHListGroup::Update - threw unknown"));
+                }
 
                 if (! pVis->GetRunningStatus())
                 {

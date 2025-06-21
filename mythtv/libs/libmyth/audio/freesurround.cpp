@@ -394,8 +394,15 @@ void FreeSurround::process_block()
             m_decoder->decode(m_params.center_width/100.0F,m_params.dimension/100.0F);
         }
     }
+    catch(const std::exception& ex)
+    {
+        LOG(VB_AUDIO, LOG_DEBUG,
+            QString("FreeSurround::process_block exception: %1").arg(ex.what()));
+    }
     catch(...)
     {
+        LOG(VB_AUDIO, LOG_DEBUG,
+            QString("FreeSurround::process_block exception: unknown"));
     }
 }
 
