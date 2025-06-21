@@ -38,6 +38,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 
 // External creation function.
 MHEG *MHCreateEngine(MHContext *context)
@@ -204,49 +205,35 @@ MHGroup *MHEngine::ParseProgram(QByteArray &text)
     // or curly bracket.
     // This is only there for testing: all downloaded objects will be in ASN1
     unsigned char ch = text[0];
-    MHParseBase *parser = nullptr;
-    MHParseNode *pTree = nullptr;
-    MHGroup *pRes = nullptr;
+    std::unique_ptr<MHParseBase> parser;
+    std::unique_ptr<MHGroup> pRes;
 
     if (ch >= 128)
     {
-        parser = new MHParseBinary(text);
+        parser = std::make_unique<MHParseBinary>(text);
     }
     else
     {
-        parser = new MHParseText(text);
+        parser = std::make_unique<MHParseText>(text);
     }
 
-    try
+    // Parse the binary or text.
+    std::unique_ptr<MHParseNode> pTree ( parser->Parse() );
+
+    switch (pTree->GetTagNo())   // The parse node should be a tagged item.
     {
-        // Parse the binary or text.
-        pTree = parser->Parse();
-
-        switch (pTree->GetTagNo())   // The parse node should be a tagged item.
-        {
-            case C_APPLICATION:
-                pRes = new MHApplication;
-                break;
-            case C_SCENE:
-                pRes = new MHScene;
-                break;
-            default:
-                MHParseNode::Failure("Expected Application or Scene"); // throws exception.
-        }
-
-        pRes->Initialise(pTree, this); // Convert the parse tree.
-        delete(pTree);
-        delete(parser);
-    }
-    catch (...)
-    {
-        delete(parser);
-        delete(pTree);
-        delete(pRes);
-        throw;
+        case C_APPLICATION:
+            pRes = std::make_unique<MHApplication>();
+            break;
+        case C_SCENE:
+            pRes = std::make_unique<MHScene>();
+            break;
+        default:
+            MHParseNode::Failure("Expected Application or Scene"); // throws exception.
     }
 
-    return pRes;
+    pRes->Initialise(pTree.get(), this); // Convert the parse tree.
+    return pRes.release();
 }
 
 // Determine protocol for a file
