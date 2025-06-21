@@ -920,11 +920,12 @@ bool RecordingRule::IsValid(QString &msg) const
         return false;
     }
 
-    if ((isNormal && (m_type == kDailyRecord || m_type == kWeeklyRecord)) ||
+    if (!isOverride &&
+        ((isNormal && (m_type == kDailyRecord || m_type == kWeeklyRecord)) ||
         (isSearch && (m_type != kDailyRecord && m_type != kWeeklyRecord &&
                       m_type != kOneRecord && m_type != kAllRecord)) ||
         (isManual && (m_type != kDailyRecord && m_type != kWeeklyRecord &&
-                      m_type != kSingleRecord && m_type != kAllRecord)))
+                      m_type != kSingleRecord && m_type != kAllRecord))))
     {
         msg = QString("Invalid recording type/search type.");
         return false;
