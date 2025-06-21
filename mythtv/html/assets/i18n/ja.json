@@ -319,6 +319,7 @@
             "inetref_desc": "TheTVDB、TVmaze、または TMDB を使用して録画メタデータを検索します。上のラジオ ボタンを選択し、リンクを使用して Web サイトを検索します。 Web ページで正しいシリーズを見つけたら、それを選択し、URL から、または thetvdb.com の場合は Web ページから数値 ID をコピーします。プレフィックス xxxx.py_ の直後に入力ボックスにそれを入力します。",
             "inetref_label": "メタデータ ルックアップ ID (InetRef)",
             "input_any": "任意の入力",
+            "invalid_never": "ここでは記録は無効ではありません",
             "isearch": "検索",
             "maxeps_label": "保持するエピソードの最大数",
             "maxnewest_desc": "チェックを外した場合、最大エピソードに達したときに録画を停止します。",

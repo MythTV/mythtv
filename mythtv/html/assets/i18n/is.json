@@ -319,6 +319,7 @@
             "inetref_desc": "Notaðu TheTVDB, TVmaze eða TMDB til að fletta upp upptökulýsigögnum. Veldu valhnapp fyrir ofan og notaðu hlekkinn til að leita á vefsíðunni. Þegar þú hefur fundið réttu röðina á vefsíðunni skaltu velja hana og afrita tölulega auðkennið af vefslóðinni, eða af vefsíðunni ef um er að ræða thetvdb.com. Sláðu það inn í inntaksreitinn strax á eftir forskeytinu xxxx.py_",
             "inetref_label": "Auðkenni lýsigagnaleitar (InetRef)",
             "input_any": "Hvaða inntak sem er",
+            "invalid_never": "Aldrei skrá er ekki gild hér",
             "isearch": "Leita",
             "maxeps_label": "Hámarksfjöldi þátta til að geyma",
             "maxnewest_desc": "Ef ekki hakað við skaltu hætta að taka upp þegar hámarksþáttum er náð.",

@@ -319,6 +319,7 @@
             "inetref_desc": "Kayıt meta verilerini aramak için TheTVDB, TVmaze veya TMDB'yi kullanın. Yukarıda bir radyo düğmesi seçin ve web sitesinde arama yapmak için bağlantıyı kullanın. Web sayfasında doğru diziyi bulduğunuzda, onu seçin ve URL'den veya thetvdb.com olması durumunda web sayfasından sayısal kimliği kopyalayın. Bunu xxxx.py_ önekinden hemen sonra giriş kutusuna girin.",
             "inetref_label": "Meta Veri Arama Kimliği (InetRef)",
             "input_any": "Herhangi Bir Giriş",
+            "invalid_never": "Asla kayıt burada geçerli değil",
             "isearch": "Aramak",
             "maxeps_label": "Saklanacak Maksimum Bölüm Sayısı",
             "maxnewest_desc": "İşaretlenmemişse, maksimum bölüme ulaşıldığında kaydı durdurun.",

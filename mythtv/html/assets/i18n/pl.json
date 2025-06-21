@@ -319,6 +319,7 @@
             "inetref_desc": "Użyj TheTVDB, TVmaze lub TMDB, aby wyszukać metadane nagrania. Wybierz przycisk radiowy powyżej i użyj łącza, aby przeszukać witrynę internetową. Po znalezieniu odpowiedniego serialu na stronie internetowej wybierz go i skopiuj numeryczny identyfikator z adresu URL lub ze strony internetowej w przypadku thetvdb.com. Wpisz to w polu wejściowym bezpośrednio po prefiksie xxxx.py_",
             "inetref_label": "Identyfikator wyszukiwania metadanych (InetRef)",
             "input_any": "Dowolne dane wejściowe",
+            "invalid_never": "Nigdy nie jest tutaj nieprawidłowe",
             "isearch": "Szukaj",
             "maxeps_label": "Maksymalna liczba odcinków do zachowania",
             "maxnewest_desc": "Jeśli to pole nie jest zaznaczone, zatrzymaj nagrywanie po osiągnięciu maksymalnej liczby odcinków.",

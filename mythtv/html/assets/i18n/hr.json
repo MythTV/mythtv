@@ -319,6 +319,7 @@
             "inetref_desc": "Koristite TheTVDB, TVmaze ili TMDB za traženje metapodataka snimanja. Odaberite radio gumb iznad i upotrijebite vezu za pretraživanje web stranice. Nakon što pronađete ispravnu seriju na web stranici, odaberite je i kopirajte numerički ID s URL-a ili s web stranice u slučaju thetvdb.com. Unesite to u okvir za unos odmah nakon prefiksa xxxx.py_",
             "inetref_label": "ID traženja metapodataka (InetRef)",
             "input_any": "Bilo koji unos",
+            "invalid_never": "Nikada ovdje nije valjan",
             "isearch": "traži",
             "maxeps_label": "Maksimalan broj epizoda za čuvanje",
             "maxnewest_desc": "Ako nije označeno, zaustavite snimanje kada se dosegne najveći broj epizoda.",

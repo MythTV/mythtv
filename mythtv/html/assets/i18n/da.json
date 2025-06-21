@@ -319,6 +319,7 @@
             "inetref_desc": "Brug TheTVDB, TVmaze eller TMDB til at slå optagelsesmetadata op. Vælg en alternativknap ovenfor, og brug linket til at søge på webstedet. Når du har fundet den rigtige serie på websiden, skal du vælge den og kopiere det numeriske id fra URL'en eller fra websiden i tilfælde af thetvdb.com. Indtast det i indtastningsfeltet umiddelbart efter præfikset xxxx.py_",
             "inetref_label": "Metadata-opslags-id (InetRef)",
             "input_any": "Enhver input",
+            "invalid_never": "Registrer aldrig er gyldig her",
             "isearch": "Søg",
             "maxeps_label": "Maksimalt antal episoder at beholde",
             "maxnewest_desc": "Hvis det ikke er markeret, skal du stoppe optagelsen, når det maksimale antal episoder er nået.",

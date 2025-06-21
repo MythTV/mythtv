@@ -319,6 +319,7 @@
             "inetref_desc": "K vyhledání metadat nahrávky použijte TheTVDB, TVmaze nebo TMDB. Vyberte přepínač výše a použijte odkaz k vyhledávání na webu. Jakmile na webové stránce najdete správnou sérii, vyberte ji a zkopírujte číselné ID z adresy URL nebo z webové stránky v případě thetvdb.com. Zadejte to do vstupního pole bezprostředně za předponou xxxx.py_",
             "inetref_label": "ID vyhledávání metadat (InetRef)",
             "input_any": "Libovolný vstup",
+            "invalid_never": "Nikdy zde záznam není platný",
             "isearch": "Vyhledávání",
             "maxeps_label": "Maximální počet epizod k uchování",
             "maxnewest_desc": "Pokud není zaškrtnuto, zastavte nahrávání po dosažení maximálního počtu epizod.",

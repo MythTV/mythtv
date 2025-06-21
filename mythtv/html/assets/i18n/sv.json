@@ -319,6 +319,7 @@
             "inetref_desc": "Använd TheTVDB, TVmaze eller TMDB för att slå upp inspelningsmetadata. Välj en alternativknapp ovan och använd länken för att söka på webbplatsen. När du har hittat rätt serie på webbsidan, välj den och kopiera det numeriska ID:t från URL:en eller från webbsidan när det gäller thetvdb.com. Ange det i inmatningsrutan omedelbart efter prefixet xxxx.py_",
             "inetref_label": "Metadata Lookup Id (InetRef)",
             "input_any": "Valfri ingång",
+            "invalid_never": "Never Record är inte giltig här",
             "isearch": "Sök",
             "maxeps_label": "Maximalt antal avsnitt att behålla",
             "maxnewest_desc": "Om avmarkerat, stoppa inspelningen när maximalt antal avsnitt har uppnåtts.",

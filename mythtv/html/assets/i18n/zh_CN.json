@@ -319,6 +319,7 @@
             "inetref_desc": "使用 TheTVDB、TVmaze 或 TMDB 查找录制元数据。选择上面的单选按钮并使用链接搜索网站。在网页上找到正确的系列后，选择它并从 URL 复制数字 ID，如果是 thetvdb.com，则从网页复制数字 ID。在前缀 xxxx.py_ 之后的输入框中输入",
             "inetref_label": "元数据查找 ID (InetRef)",
             "input_any": "任意输入",
+            "invalid_never": "从不记录在这里无效",
             "isearch": "搜索",
             "maxeps_label": "保留的最大集数",
             "maxnewest_desc": "如果未选中，则在达到最大集数时停止录制。",

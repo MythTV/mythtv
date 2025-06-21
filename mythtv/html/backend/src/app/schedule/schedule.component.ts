@@ -236,6 +236,12 @@ export class ScheduleComponent implements OnInit {
       this.setupData();
       this.currentForm.form.markAsPristine();
       if (this.recRule && this.newRuleType) {
+        if (this.newRuleType == 'Never Record' && this.recRule.SearchType == 'Manual Search') {
+          this.errortext = this.translate.instant('dashboard.sched.invalid_never');
+          this.errorCount = 1;
+          this.displayDlg = true;
+          return;
+        }
         this.recRule.Type = this.newRuleType;
         this.recRule.Inactive = false;
         this.save();
@@ -325,7 +331,8 @@ export class ScheduleComponent implements OnInit {
       this.recRule = Object.assign({}, this.recRule);
       this.recRule.ParentId = this.recRule.Id;
       this.recRule.Id = 0;
-      this.recRule.SearchType = 'None';
+      if (this.recRule.SearchType != 'Manual Search')
+        this.recRule.SearchType = 'None';
       ruleType = "Override Recording";
     }
     if (!this.recRule) {
@@ -341,7 +348,7 @@ export class ScheduleComponent implements OnInit {
     if (!this.recRule.SearchType)
       this.recRule.SearchType = 'None';
 
-    if (this.program && this.channel && this.recRule.SearchType == 'None')
+    if (this.program && this.channel)
       this.mergeProgram(this.recRule, this.program, this.channel);
 
     if (this.reqProgram?.Recording?.StatusName == 'NeverRecord') {
@@ -427,12 +434,13 @@ export class ScheduleComponent implements OnInit {
             prompt: this.translate.instant('dashboard.sched.type.dont_rec_override'),
             value: 'Do not Record'
           });
-      this.typeList.push(
-        {
-          prompt: this.translate.instant('dashboard.sched.type.never_rec_override'),
-          value: 'Never Record'
-        }
-      );
+      if (this.recRule?.SearchType != 'Manual Search')
+        this.typeList.push(
+          {
+            prompt: this.translate.instant('dashboard.sched.type.never_rec_override'),
+            value: 'Never Record'
+          }
+        );
 
       if (this.reqProgram?.Recording?.StatusName == 'CurrentRecording'
         || this.reqProgram?.Recording?.StatusName == 'PreviousRecording')

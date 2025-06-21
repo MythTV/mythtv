@@ -319,6 +319,7 @@
             "inetref_desc": "Usa TheTVDB, TVmaze o TMDB per cercare i metadati delle registrazioni. Seleziona un pulsante di opzione in alto e utilizza il collegamento per la ricerca nel sito web. Una volta trovata la serie corretta nella pagina web, selezionala e copia l'id numerico dall'URL, o dalla pagina web nel caso di thetvdb.com. Inseriscilo quindi nella campo subito dopo il prefisso xxxx.py_",
             "inetref_label": "ID ricerca metadati (InetRef)",
             "input_any": "Qualsiasi input",
+            "invalid_never": "Never Record non è valido qui",
             "isearch": "Cerca",
             "maxeps_label": "Numero massimo di episodi da conservare",
             "maxnewest_desc": "Se deselezionato, interrompe la registrazione quando viene raggiunto il numero massimo di episodi.",

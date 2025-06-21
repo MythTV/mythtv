@@ -319,6 +319,7 @@
             "inetref_desc": "Salvestamise metaandmete otsimiseks kasutage rakendust TheTVDB, TVmaze või TMDB. Valige ülaltoodud raadionupp ja kasutage veebisaidilt otsimiseks linki. Kui leiate veebilehelt õige seeria, valige see ja kopeerige numbriline ID URL-ist või veebisaidilt thetvdb.com veebilehelt. Sisestage see sisestuskasti kohe pärast eesliidet xxxx.py_",
             "inetref_label": "Metaandmete otsingu ID (InetRef)",
             "input_any": "Igasugune sisend",
+            "invalid_never": "Kunagi kirje ei kehti siin",
             "isearch": "Otsing",
             "maxeps_label": "Maksimaalne säilitatavate jagude arv",
             "maxnewest_desc": "Kui see on märkimata, lõpetage salvestamine, kui episoodide arv on täis.",

@@ -319,6 +319,7 @@
             "inetref_desc": "Käytä TheTVDB:tä, TVmazea tai TMDB:tä etsiäksesi tallennuksen metatietoja. Valitse yllä oleva valintanappi ja hae Web-sivustosta linkin avulla. Kun löydät oikean sarjan verkkosivulta, valitse se ja kopioi numeerinen tunnus URL-osoitteesta tai verkkosivulta, jos kyseessä on thetvdb.com. Kirjoita se syöttöruutuun heti etuliite xxxx.py_ jälkeen",
             "inetref_label": "Metatietojen hakutunnus (InetRef)",
             "input_any": "Mikä tahansa syöttö",
+            "invalid_never": "Koskaan nauhoitus ei ole voimassa täällä",
             "isearch": "Hae",
             "maxeps_label": "Säilytettävien jaksojen enimmäismäärä",
             "maxnewest_desc": "Jos tätä ei ole valittu, lopeta tallennus, kun jaksojen enimmäismäärä on saavutettu.",

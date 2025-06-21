@@ -319,6 +319,7 @@
             "inetref_desc": "Utilitzeu TheTVDB, TVmaze o TMDB per cercar metadades de gravació. Seleccioneu un botó d'opció a dalt i utilitzeu l'enllaç per cercar al lloc web. Un cop trobeu la sèrie correcta a la pàgina web, seleccioneu-la i copieu l'identificador numèric de l'URL o de la pàgina web en el cas de thetvdb.com. Introduïu-ho al quadre d'entrada immediatament després del prefix xxxx.py_",
             "inetref_label": "Identificador de cerca de metadades (InetRef)",
             "input_any": "Qualsevol entrada",
+            "invalid_never": "Mai el registre no és vàlid aquí",
             "isearch": "Cerca",
             "maxeps_label": "Nombre màxim d'episodis per conservar",
             "maxnewest_desc": "Si no està marcat, atura la gravació quan s'arribi al màxim d'episodis.",

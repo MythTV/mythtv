@@ -319,6 +319,7 @@
             "inetref_desc": "Gebruik TheTVDB, TVmaze of TMDB om opnamemetadata op te zoeken. Selecteer hierboven een keuzerondje en gebruik de link om op de website te zoeken. Zodra u de juiste serie op de webpagina hebt gevonden, selecteert u deze en kopieert u de numerieke id van de URL, of van de webpagina in het geval van thetvdb.com. Voer dat in het invoervak ​​in direct na het voorvoegsel xxxx.py_",
             "inetref_label": "Id voor opzoeken van metagegevens (InetRef)",
             "input_any": "Elke invoer",
+            "invalid_never": "Never Record is hier niet geldig",
             "isearch": "Zoekopdracht",
             "maxeps_label": "Maximaal aantal te behouden afleveringen",
             "maxnewest_desc": "Indien niet aangevinkt, stop dan met opnemen wanneer het maximale aantal afleveringen is bereikt.",

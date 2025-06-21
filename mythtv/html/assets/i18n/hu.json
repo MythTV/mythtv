@@ -319,6 +319,7 @@
             "inetref_desc": "A felvétel metaadatainak megkereséséhez használja a TheTVDB, TVmaze vagy TMDB alkalmazást. Válassza ki a fenti rádiógombot, és használja a hivatkozást a webhelyen való kereséshez. Ha megtalálta a megfelelő sorozatot a weboldalon, válassza ki azt, és másolja ki a numerikus azonosítót az URL-ből, vagy a thetvdb.com esetében a weboldalról. Írja be ezt a beviteli mezőbe közvetlenül az xxxx.py_ előtag után",
             "inetref_label": "Metaadat-keresési azonosító (InetRef)",
             "input_any": "Bármilyen bemenet",
+            "invalid_never": "Soha ne rögzítse a felvétel, hogy itt nem érvényes",
             "isearch": "Keresés",
             "maxeps_label": "A megtartandó epizódok maximális száma",
             "maxnewest_desc": "Ha nincs bejelölve, állítsa le a felvételt, amikor elérte a maximális epizódszámot.",
