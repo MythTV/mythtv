@@ -872,6 +872,9 @@ void MHEngine::PutBehind(const MHRoot *p, const MHRoot *pRef)
 // transparency of items since items higher up the stack may be semi-transparent.
 void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 {
+    MHApplication *pApp = CurrentApp();
+    if (nullptr == pApp)
+        return;
     if (toDraw.isEmpty())
     {
         return;    // Nothing left to draw.
@@ -879,7 +882,7 @@ void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 
     while (nStackPos >= 0)
     {
-        MHVisible *pItem = CurrentApp()->m_displayStack.GetAt(nStackPos);
+        MHVisible *pItem = pApp->m_displayStack.GetAt(nStackPos);
         // Work out how much of the area we want to draw is included in this visible.
         // The visible area will be empty if the item is transparent or not active.
         QRegion drawArea = pItem->GetVisibleArea() & toDraw;
