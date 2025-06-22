@@ -151,12 +151,6 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
 
         LOG(VB_COMMFLAG, LOG_INFO, "Analyzing edge data");
 
-#ifdef SHOW_DEBUG_WIN
-        unsigned char *fakeFrame;
-        fakeFrame = new unsigned char[m_width * m_height * 3 / 2];
-        memset(fakeFrame, 0, m_width * m_height * 3 / 2);
-#endif
-
         for (uint y = 0; y < m_height; y++)
         {
             if ((y > (m_height/4)) && (y < (m_height * 3 / 4)))
@@ -173,10 +167,6 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
                 {
                     m_edgeMask[pos].m_isEdge = 1;
                     pixelsInMask++;
-#ifdef SHOW_DEBUG_WIN
-                    fakeFrame[pos] = 0xff;
-#endif
-
                 }
 
                 if (edgeCounts[pos].m_horiz > (maxLoops * 0.66))
@@ -223,28 +213,6 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
                 .arg(m_logoMinX).arg(m_logoMinY)
                 .arg(m_logoMaxX).arg(m_logoMaxY));
 
-#ifdef SHOW_DEBUG_WIN
-        for (uint x = m_logoMinX; x < m_logoMaxX; x++)
-        {
-            uint pos = m_logoMinY * m_width + x;
-            fakeFrame[pos] = 0x7f;
-            pos = m_logoMaxY * m_width + x;
-            fakeFrame[pos] = 0x7f;
-        }
-        for (uint y = m_logoMinY; y < m_logoMaxY; y++)
-        {
-            uint pos = y * m_width + m_logoMinX;
-            fakeFrame[pos] = 0x7f;
-            pos = y * m_width + m_logoMaxX;
-            fakeFrame[pos] = 0x7f;
-        }
-
-        comm_debug_show(fakeFrame);
-        delete [] fakeFrame;
-
-        cerr << "Hit ENTER to continue" << endl;
-        getchar();
-#endif
         if (((m_logoMaxX - m_logoMinX) < (m_width  / m_commDetectLogoWidthRatio)) &&
             ((m_logoMaxY - m_logoMinY) < (m_height / m_commDetectLogoHeightRatio)) &&
             (pixelsInMask > minPixelsInMask))

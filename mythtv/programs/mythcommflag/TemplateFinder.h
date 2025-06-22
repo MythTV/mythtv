@@ -78,8 +78,8 @@ private:
 
     int             m_minContentRow    {INT_MAX}; /* limits of content area of images */
     int             m_minContentCol    {INT_MAX};
-    int             m_maxContentRow1   {INT_MAX}; /* minrow + height ("maxrow + 1") */
-    int             m_maxContentCol1   {INT_MAX}; /* mincol + width ("maxcol + 1") */
+    int             m_maxContentRow1   {INT_MIN}; /* minrow + height ("maxrow + 1") */
+    int             m_maxContentCol1   {INT_MIN}; /* mincol + width ("maxcol + 1") */
 
     AVFrame         m_tmpl             {};        /* logo-matching template */
     int             m_tmplRow          {-1};

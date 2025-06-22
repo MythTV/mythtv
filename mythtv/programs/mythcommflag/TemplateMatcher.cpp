@@ -359,7 +359,7 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     }
 
     if (av_image_alloc(m_cropped.data, m_cropped.linesize,
-        m_tmplWidth, m_tmplHeight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        m_tmplWidth, m_tmplHeight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited "

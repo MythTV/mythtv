@@ -465,7 +465,7 @@ template_alloc(const unsigned int *scores, int width, int height,
     AVFrame      thresh;
 
     if (av_image_alloc(thresh.data, thresh.linesize,
-        width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("template_alloc av_image_alloc thresh (%1x%2) failed")
@@ -512,7 +512,7 @@ template_alloc(const unsigned int *scores, int width, int height,
         /* Scores, rescaled to [0..UCHAR_MAX]. */
         AVFrame scored;
         if (av_image_alloc(scored.data, scored.linesize,
-            width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+            width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
         {
             LOG(VB_COMMFLAG, LOG_ERR,
                 QString("template_alloc av_image_alloc scored (%1x%2) failed")
@@ -549,7 +549,7 @@ template_alloc(const unsigned int *scores, int width, int height,
     }
 
     if (av_image_alloc(tmpl->data, tmpl->linesize,
-        *ptmplwidth, *ptmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        *ptmplwidth, *ptmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("template_alloc av_image_alloc tmpl (%1x%2) failed")
@@ -641,12 +641,19 @@ bool readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, in
         return true;
     }
 
+    // Read template size information from file.
     QTextStream stream(&dfile);
     stream >> *prow >> *pcol >> *pwidth >> *pheight;
     dfile.close();
 
+    if (*pwidth < 0 || *pheight < 0)
+    {
+        LOG(VB_COMMFLAG, LOG_ERR, QString("readTemplate no saved template"));
+        return false;
+    }
+
     if (av_image_alloc(tmpl->data, tmpl->linesize,
-        *pwidth, *pheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        *pwidth, *pheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("readTemplate av_image_alloc %1 (%2x%3) failed")
@@ -847,7 +854,7 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
     av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
 
     if (av_image_alloc(m_cropped.data, m_cropped.linesize,
-        newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateFinder::resetBuffers "

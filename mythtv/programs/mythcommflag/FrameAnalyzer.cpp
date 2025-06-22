@@ -121,7 +121,7 @@ removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
         FrameAnalyzer::FrameMap::Iterator bbNext = bb;
         ++bbNext;
         if (bbNext == breakMap->end())
-            continue;
+            break;
 
         if (verbose)
         {
