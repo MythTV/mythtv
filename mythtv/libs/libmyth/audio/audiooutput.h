@@ -190,7 +190,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
      * \param[out] data_size The number of bytes copied.
      * \param[in] pkt The source data packet
      */
-    virtual int DecodeAudio(AVCodecContext *ctx,
+    int DecodeAudio(AVCodecContext *ctx,
                     uint8_t *buffer, int &data_size,
                     const AVPacket *pkt);
     /**
