@@ -18,7 +18,6 @@
 #include "libmythbase/serverpool.h"
 
 #include "libmyth/audio/audiooutput.h"
-#include "libmyth/audio/audiooutpututil.h"
 
 #include "mythraopdevice.h"
 #include "mythraopconnection.h"
@@ -714,8 +713,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     while (tmp_pkt->size > 0)
     {
         int data_size = 0;
-        int ret = AudioOutputUtil::DecodeAudio(ctx, samples,
-                                               data_size, tmp_pkt);
+        int ret = m_audio->DecodeAudio(ctx, samples, data_size, tmp_pkt);
         if (ret < 0)
         {
             av_free(samples);
