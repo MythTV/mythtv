@@ -563,13 +563,6 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     return list;
 }
 
-/**
- * DecodeAudio
- * Decode an audio packet, and compact it if data is planar
- * Return negative error code if an error occurred during decoding
- * or the number of bytes consumed from the input AVPacket
- * data_size contains the size of decoded data copied into buffer
- */
 int AudioOutput::DecodeAudio(AVCodecContext *ctx,
                              uint8_t *buffer, int &data_size,
                              const AVPacket *pkt)
