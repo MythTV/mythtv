@@ -24,7 +24,6 @@ set(AUDIO_HEADERS
     audio/audioconvert.h
     audio/audiooutput.h
     audio/audiooutputsettings.h
-    audio/audiooutpututil.h
     audio/audiosettings.h
     audio/eldutils.h
     audio/visualization.h
@@ -59,7 +58,6 @@ add_library(
   audio/audiooutputgraph.cpp
   audio/audiooutputnull.cpp
   audio/audiooutputsettings.cpp
-  audio/audiooutpututil.cpp
   audio/audiosettings.cpp
   audio/eldutils.cpp
   audio/freesurround.cpp

@@ -31,7 +31,7 @@
 // MythTV headers
 #include <mythconfig.h>
 #include <libmyth/audio/audiooutput.h>
-#include <libmyth/audio/audiooutpututil.h>
+#include <libmyth/audio/audiooutputsettings.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythmetadata/metaio.h>
 #include <libmythmetadata/metaioavfcomment.h>

@@ -29,7 +29,6 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 
 # Input
 HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
-HEADERS += audio/audiooutpututil.h
 HEADERS += audio/audioconvert.h
 HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
@@ -47,7 +46,6 @@ HEADERS += mythexp.h
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
 SOURCES += audio/audiooutputnull.cpp
-SOURCES += audio/audiooutpututil.cpp
 SOURCES += audio/audioconvert.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.cpp
 SOURCES += audio/volumebase.cpp audio/eldutils.cpp
@@ -92,7 +90,7 @@ inc.files += mythexp.h
 
 inc2.path = $${PREFIX}/include/mythtv/libmyth/audio
 inc2.files += audio/audiooutput.h audio/audiosettings.h
-inc2.files += audio/audiooutputsettings.h audio/audiooutpututil.h
+inc2.files += audio/audiooutputsettings.h
 inc2.files += audio/audioconvert.h
 inc2.files += audio/volumebase.h audio/eldutils.h
 inc2.files += audio/visualization.h
