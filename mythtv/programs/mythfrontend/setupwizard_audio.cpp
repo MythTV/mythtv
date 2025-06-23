@@ -6,7 +6,8 @@
 #include <QVariant>
 
 // MythTV
-#include "libmyth/audio/audiooutpututil.h"
+#include "libmyth/audio/audiooutput.h"
+#include "libmyth/audio/audiooutputsettings.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
