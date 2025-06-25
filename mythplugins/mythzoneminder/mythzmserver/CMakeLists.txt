@@ -5,7 +5,7 @@
 #
 
 find_file(MYSQL_H mysql/mysql.h)
-if(NOT MYSQL_H_FOUND)
+if(NOT MYSQL_H)
   message(STATUS "Disabling mythzmserver. Missing mysql header file.")
   return()
 endif()
