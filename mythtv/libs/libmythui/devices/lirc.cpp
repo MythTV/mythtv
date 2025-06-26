@@ -291,7 +291,8 @@ bool LIRC::Init(void)
         }
     }
 
-    d->m_lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", nullptr, 0);
+    d->m_lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", nullptr,
+                               VERBOSE_LEVEL_CHECK(VB_LIRC,LOG_DEBUG));
     if (!d->m_lircState)
     {
         close(lircd_socket);

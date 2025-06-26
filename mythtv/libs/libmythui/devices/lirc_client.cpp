@@ -1989,6 +1989,8 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 	}
 	int todo=strlen(command);
 	const char *data=command;
+	lirc_printf(lstate, "%s: sending command: %s",
+		    lstate->lirc_prog, command);
 	while(todo>0)
 	{
 		int done=write(sockfd,(const void *) data,todo);
@@ -2011,6 +2013,8 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 	{
 		const char *string=lirc_read_string(lstate, sockfd);
 		if(string==nullptr) return(-1);
+		lirc_printf(lstate, "%s: read response: %s\n",
+			    lstate->lirc_prog, string);
 		switch(state)
 		{
 		case P_BEGIN:
