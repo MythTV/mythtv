@@ -32,13 +32,6 @@ StandardSetting::~StandardSetting()
             delete *i;
     }
     m_targets.clear();
-
-    if (m_storage && m_newdStorage)
-    {
-        // Storage memory was allocated with a 'new'
-        delete m_storage;
-        m_storage = nullptr;
-    }
 }
 
 MythUIButtonListItem * StandardSetting::createButton(MythUIButtonList * list)
@@ -221,6 +214,8 @@ void StandardSetting::Load(void)
 {
     if (m_storage)
         m_storage->Load();
+    else if (m_storage_ptr)
+        m_storage_ptr.get()->Load();
 
     m_haveChanged = false;
 
@@ -240,6 +235,8 @@ void StandardSetting::Save(void)
 {
     if (m_storage)
         m_storage->Save();
+    else if (m_storage_ptr)
+        m_storage_ptr.get()->Save();
 
     //we save only the relevant children
     QList<StandardSetting *> *children = getSubSettings();
@@ -290,6 +287,18 @@ void StandardSetting::MoveToThread(QThread *thread)
     {
         for (i = (*iMap).constBegin(); i != (*iMap).constEnd(); ++i)
             (*i)->MoveToThread(thread);
+    }
+}
+
+Storage * StandardSetting::GetStorage(void) const
+{
+    if (m_storage_ptr)
+    {
+        return m_storage_ptr.get();
+    }
+    else
+    {
+        return m_storage;
     }
 }
 
@@ -676,6 +685,40 @@ MythUISpinBoxSetting::MythUISpinBoxSetting(Storage *_storage, int min, int max,
     }
 }
 
+MythUISpinBoxSetting::MythUISpinBoxSetting(std::shared_ptr<Storage> _storage_ptr,
+                                           int min, int max, int step, int pageMultiple,
+                                           QString special_value_text)
+    : StandardSetting(_storage_ptr),
+      m_min(min),
+      m_max(max),
+      m_step(step),
+      m_pageMultiple(pageMultiple),
+      m_specialValueText(std::move(special_value_text))
+{
+    // We default to 0 unless 0 is out of range.
+    if (m_min > 0 || m_max < 0)
+        m_settingValue = QString::number(m_min);
+
+    // The settings pages were coded to assume a parameter true/false
+    // meaning allow_single_step. Many pages use this but it was not
+    // implemented. It is difficult to implement using the current
+    // UI widget design. So I have changed it so you can specify
+    // the size of pageup / pagedown increments as an integer instead.
+    // For compatibility with callers still using true to indicate
+    // allowing single step, the code will set the step size as 1 and
+    // the pageup / pagedown as the requested step.
+
+    if (m_pageMultiple == 1)
+    {
+        m_pageMultiple = step;
+        m_step = 1;
+    }
+    if (m_pageMultiple == 0)
+    {
+        m_pageMultiple = 5;
+    }
+}
+
 void MythUISpinBoxSetting::updateButton(MythUIButtonListItem *item)
 {
     item->DisplayState("spinbox", "widgettype");
@@ -733,6 +776,11 @@ void MythUISpinBoxSetting::resultEdit(DialogCompletionEvent *dce)
 
 MythUICheckBoxSetting::MythUICheckBoxSetting(Storage *_storage):
     StandardSetting(_storage)
+{
+}
+
+MythUICheckBoxSetting::MythUICheckBoxSetting(std::shared_ptr<Storage> _storage_ptr):
+    StandardSetting(_storage_ptr)
 {
 }
 

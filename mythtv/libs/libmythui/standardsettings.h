@@ -76,7 +76,7 @@ class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
     virtual void Open(void) {}
     virtual void Close(void) {}
 
-    Storage *GetStorage(void) const { return m_storage; }
+    Storage *GetStorage(void) const;
 
     void addTargetedChild(const QString &value, StandardSetting *setting);
     void addTargetedChildren(const QString &value,
@@ -106,6 +106,8 @@ class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
   protected:
     explicit StandardSetting(Storage *_storage = nullptr)
         : m_storage(_storage) {}
+    explicit StandardSetting(std::shared_ptr<Storage> _sh_storage)
+        : m_storage_ptr(_sh_storage) {}
     ~StandardSetting() override;
     void setParent(StandardSetting *parent);
     QString m_settingValue;
@@ -115,11 +117,11 @@ class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
     QString m_helptext;
     QString m_name;
     bool    m_visible         {true};
-    bool    m_newdStorage     {false}; // Set true if 'new' was used to
-                                       // allocate memory put into storage
+
   private:
     bool    m_haveChanged     {false};
     Storage *m_storage        {nullptr};
+    std::shared_ptr<Storage> m_storage_ptr {nullptr};
     StandardSetting *m_parent {nullptr};
     QList<StandardSetting *> m_children;
     QMap<QString, QList<StandardSetting *> > m_targets;
@@ -155,6 +157,8 @@ class MUI_PUBLIC MythUITextEditSetting : public StandardSetting
   protected:
     explicit MythUITextEditSetting(Storage *_storage = nullptr)
         : StandardSetting(_storage) {}
+    explicit MythUITextEditSetting(std::shared_ptr<Storage> _storage_ptr)
+        : StandardSetting(_storage_ptr) {}
     bool m_passwordEcho {false};
 };
 
@@ -170,16 +174,14 @@ class MUI_PUBLIC HostTextEditSetting: public MythUITextEditSetting
 {
   public:
     explicit HostTextEditSetting(const QString &name) :
-        MythUITextEditSetting(new HostDBStorage(this, name))
-    { m_newdStorage = true; }
+        MythUITextEditSetting(std::make_shared<HostDBStorage>(this, name)) { }
 };
 
 class MUI_PUBLIC GlobalTextEditSetting: public MythUITextEditSetting
 {
   public:
     explicit GlobalTextEditSetting(const QString &name) :
-        MythUITextEditSetting(new GlobalDBStorage(this, name))
-    { m_newdStorage = true; }
+        MythUITextEditSetting(std::make_shared<GlobalDBStorage>(this, name)) { }
 };
 
 /*******************************************************************************
@@ -199,6 +201,8 @@ class MUI_PUBLIC MythUIFileBrowserSetting : public StandardSetting
   protected:
     explicit MythUIFileBrowserSetting(Storage *_storage)
         : StandardSetting(_storage) {}
+    explicit MythUIFileBrowserSetting(std::shared_ptr<Storage> _storage_ptr)
+        : StandardSetting(_storage_ptr) {}
     QDir::Filters      m_typeFilter {QDir::AllDirs  | QDir::Drives |
                                      QDir::Files    | QDir::Readable |
                                      QDir::Writable | QDir::Executable};
@@ -210,8 +214,7 @@ class MUI_PUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
 {
   public:
     explicit HostFileBrowserSetting(const QString &name) :
-        MythUIFileBrowserSetting(new HostDBStorage(this, name))
-    { m_newdStorage = true; }
+        MythUIFileBrowserSetting(std::make_shared<HostDBStorage>(this, name)) { }
 };
 
 
@@ -248,6 +251,8 @@ class MUI_PUBLIC MythUIComboBoxSetting : public StandardSetting
      */
     explicit MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
         : StandardSetting(_storage), m_rewrite(rw) {}
+    explicit MythUIComboBoxSetting(std::shared_ptr<Storage> _storage_ptr, bool rw = false)
+        : StandardSetting(_storage_ptr), m_rewrite(rw) {}
     ~MythUIComboBoxSetting() override;
     QVector<QString> m_labels;
     QVector<QString> m_values;
@@ -262,8 +267,7 @@ class MUI_PUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit HostComboBoxSetting(const QString &name, bool rw = false) :
-        MythUIComboBoxSetting(new HostDBStorage(this, name), rw)
-    { m_newdStorage = true; }
+        MythUIComboBoxSetting(std::make_shared<HostDBStorage>(this, name), rw) { }
 };
 
 
@@ -271,8 +275,7 @@ class MUI_PUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
-        MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw)
-    { m_newdStorage = true; }
+        MythUIComboBoxSetting(std::make_shared<GlobalDBStorage>(this, name), rw) { }
 };
 
 class MUI_PUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
@@ -348,6 +351,9 @@ class MUI_PUBLIC MythUISpinBoxSetting : public StandardSetting
     MythUISpinBoxSetting(Storage *_storage, int min, int max, int step,
                          int pageMultiple = 8,
                          QString special_value_text = QString());
+    MythUISpinBoxSetting(std::shared_ptr<Storage> _storage_ptr, int min, int max, int step,
+                         int pageMultiple = 8,
+                         QString special_value_text = QString());
   private:
     int m_min;
     int m_max;
@@ -373,9 +379,9 @@ class MUI_PUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
     HostSpinBoxSetting(const QString &name, int min, int max, int step,
                        int pageMultiple = 8,
                        const QString &special_value_text = QString()) :
-        MythUISpinBoxSetting(new HostDBStorage(this, name), min, max, step,
+        MythUISpinBoxSetting(std::make_shared<HostDBStorage>(this, name), min, max, step,
                              pageMultiple, special_value_text)
-    { m_newdStorage = true; }
+    { }
 };
 
 class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
@@ -384,9 +390,9 @@ class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
     GlobalSpinBoxSetting(const QString &name, int min, int max, int step,
                          int pageMultiple = 8,
                          const QString &special_value_text = QString()) :
-        MythUISpinBoxSetting(new GlobalDBStorage(this, name), min, max, step,
+        MythUISpinBoxSetting(std::make_shared<GlobalDBStorage>(this, name), min, max, step,
                              pageMultiple, special_value_text)
-    { m_newdStorage = true; }
+    { }
 };
 
 /*******************************************************************************
@@ -411,6 +417,7 @@ class MUI_PUBLIC MythUICheckBoxSetting : public StandardSetting
 
   protected:
     explicit MythUICheckBoxSetting(Storage *_storage = nullptr);
+    explicit MythUICheckBoxSetting(std::shared_ptr<Storage> _storage_ptr);
 
 };
 
@@ -424,16 +431,14 @@ class MUI_PUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     explicit HostCheckBoxSetting(const QString &name) :
-        MythUICheckBoxSetting(new HostDBStorage(this, name))
-    { m_newdStorage = true; }
+        MythUICheckBoxSetting(std::make_shared<HostDBStorage>(this, name)) { }
 };
 
 class MUI_PUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
     explicit GlobalCheckBoxSetting(const QString &name) :
-        MythUICheckBoxSetting(new GlobalDBStorage(this, name))
-    { m_newdStorage = true; }
+        MythUICheckBoxSetting(std::make_shared<GlobalDBStorage>(this, name)) { }
 };
 
 /*******************************************************************************

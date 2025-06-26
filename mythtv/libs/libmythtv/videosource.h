@@ -215,9 +215,8 @@ class VideoSource : public GroupSetting {
     {
       public:
         explicit Name(const VideoSource &parent) :
-            MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "name"))
+            MythUITextEditSetting(std::make_shared<VideoSourceDBStorage>(this, parent, "name"))
         {
-            m_newdStorage = true;
             setLabel(QObject::tr("Video source name"));
         }
     };
@@ -252,10 +251,9 @@ class CaptureCardComboBoxSetting : public MythUIComboBoxSetting
     CaptureCardComboBoxSetting(const CaptureCard &parent,
                                bool rw,
                                const QString &setting) :
-        MythUIComboBoxSetting(new CaptureCardDBStorage(this, parent, setting),
+        MythUIComboBoxSetting(std::make_shared<CaptureCardDBStorage>(this, parent, setting),
                               rw)
     {
-        m_newdStorage = true;
     }
 };
 
@@ -280,10 +278,9 @@ class EmptyAudioDevice : public MythUITextEditSetting
     Q_OBJECT
   public:
     explicit EmptyAudioDevice(const CaptureCard &parent) :
-        MythUITextEditSetting(new CaptureCardDBStorage(this, parent,
+        MythUITextEditSetting(std::make_shared<CaptureCardDBStorage>(this, parent,
                                                        "audiodevice"))
     {
-        m_newdStorage = true;
         setVisible(false);
     }
 
@@ -307,9 +304,8 @@ class EmptyVBIDevice : public MythUITextEditSetting
 
   public:
     explicit EmptyVBIDevice(const CaptureCard &parent) :
-        MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "vbidevice"))
+        MythUITextEditSetting(std::make_shared<CaptureCardDBStorage>(this, parent, "vbidevice"))
     {
-        m_newdStorage = true;
         setVisible(false);
     };
 
@@ -878,10 +874,9 @@ class StartingChannel : public MythUIComboBoxSetting
     Q_OBJECT
   public:
     explicit StartingChannel(const CardInput &parent) :
-        MythUIComboBoxSetting(new CardInputDBStorage(this, parent, "startchan"),
+        MythUIComboBoxSetting(std::make_shared<CardInputDBStorage>(this, parent, "startchan"),
                               false)
     {
-        m_newdStorage = true;
         setLabel(QObject::tr("Starting channel"));
         setHelpText(QObject::tr("This channel is shown when 'Watch TV' is selected on the main menu. "
                                 "It is updated on every Live TV channel change. "

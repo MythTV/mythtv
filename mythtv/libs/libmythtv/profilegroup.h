@@ -45,9 +45,8 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit Is_default(const ProfileGroup &parent) :
-            StandardSetting(new ProfileGroupStorage(this, parent, "is_default"))
+            StandardSetting(std::make_shared<ProfileGroupStorage>(this, parent, "is_default"))
         {
-            m_newdStorage = true;
             setVisible(false);
         }
 
@@ -59,9 +58,8 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit Name(const ProfileGroup &parent) :
-            MythUITextEditSetting(new ProfileGroupStorage(this, parent, "name"))
+            MythUITextEditSetting(std::make_shared<ProfileGroupStorage>(this, parent, "name"))
         {
-            m_newdStorage = true;
             setLabel(QObject::tr("Profile Group Name"));
         }
     };
@@ -70,10 +68,9 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit HostName(const ProfileGroup &parent) :
-            MythUIComboBoxSetting(new ProfileGroupStorage(this, parent,
+            MythUIComboBoxSetting(std::make_shared<ProfileGroupStorage>(this, parent,
                                                           "hostname"))
         {
-            m_newdStorage = true;
             setLabel(QObject::tr("Hostname"));
         }
         void fillSelections();
@@ -83,10 +80,9 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit CardInfo(const ProfileGroup &parent) :
-            MythUIComboBoxSetting(new ProfileGroupStorage(this, parent,
+            MythUIComboBoxSetting(std::make_shared<ProfileGroupStorage>(this, parent,
                                                           "cardtype"))
         {
-            m_newdStorage = true;
             setLabel(QObject::tr("Card-Type"));
         }
     };
