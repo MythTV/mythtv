@@ -168,6 +168,13 @@ void ProgramInfoCache::Refresh(void)
             if (!it->GetChanID())
                 continue;
 
+            if (m_cache.contains(it->GetRecordingID()))
+            {
+                // An entry using that key already exists in hash.
+                // Free allocated memory for the entry to be replaced.
+                delete m_cache[it->GetRecordingID()];
+            }
+
             m_cache[it->GetRecordingID()] = it;
         }
         delete m_nextCache;
