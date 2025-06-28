@@ -8,8 +8,6 @@
 # Enumerate all headers
 #
 set(LIBMYTH_HEADERS
-    mythaverror.h
-    mythavframe.h
     mythcontext.h
     mythexp.h
     )
@@ -27,7 +25,6 @@ add_library(
   ${LIBMYTH_HEADERS}
   backendselect.cpp
   dbsettings.cpp
-  mythaverror.cpp
   mythcontext.cpp
   )
 
@@ -52,11 +49,7 @@ target_link_libraries(
   PUBLIC mythbase
          mythui
          mythupnp
-         mythbluray
-         PkgConfig::LIBAVCODEC
-         PkgConfig::LIBAVFORMAT
-         PkgConfig::LIBAVUTIL
-         PkgConfig::LIBSWRESAMPLE)
+         )
 
 #
 # Installation section
