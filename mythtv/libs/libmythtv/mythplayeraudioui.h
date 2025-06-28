@@ -2,7 +2,7 @@
 #define MYTHPLAYERAUDIOUI_H
 
 // MythTV
-#include "libmythtv/audio/audiooutputgraph.h"
+#include "visualisations/audiooutputgraph.h"
 #include "mythplayeroverlayui.h"
 
 class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
