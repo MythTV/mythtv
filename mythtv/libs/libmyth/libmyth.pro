@@ -28,30 +28,12 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 }
 
 # Input
-HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
-HEADERS += audio/audioconvert.h
-HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
-HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
-HEADERS += audio/volumebase.h audio/eldutils.h
-HEADERS += audio/audiooutputgraph.h
-HEADERS += audio/freesurround.h
-HEADERS += audio/freesurround_decoder.h
-HEADERS += audio/visualization.h
 HEADERS += backendselect.h
 HEADERS += mythaverror.h
 HEADERS += mythavframe.h
 HEADERS += mythcontext.h
 HEADERS += mythexp.h
 
-SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
-SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
-SOURCES += audio/audiooutputnull.cpp
-SOURCES += audio/audioconvert.cpp
-SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.cpp
-SOURCES += audio/volumebase.cpp audio/eldutils.cpp
-SOURCES += audio/audiooutputgraph.cpp
-SOURCES += audio/freesurround.cpp
-SOURCES += audio/freesurround_decoder.cpp
 SOURCES += backendselect.cpp
 SOURCES += mythaverror.cpp mythcontext.cpp
 
@@ -88,70 +70,7 @@ inc.files += mythaverror.h
 inc.files += mythavframe.h
 inc.files += mythexp.h
 
-inc2.path = $${PREFIX}/include/mythtv/libmyth/audio
-inc2.files += audio/audiooutput.h audio/audiosettings.h
-inc2.files += audio/audiooutputsettings.h
-inc2.files += audio/audioconvert.h
-inc2.files += audio/volumebase.h audio/eldutils.h
-inc2.files += audio/visualization.h
-
-using_oss {
-    SOURCES += audio/audiooutputoss.cpp
-    HEADERS += audio/audiooutputoss.h
-}
-
-using_pulse {
-    HEADERS += audio/audiopulsehandler.h
-    SOURCES += audio/audiopulsehandler.cpp
-    using_pulseoutput {
-        HEADERS += audio/audiooutputpulse.h
-        SOURCES += audio/audiooutputpulse.cpp
-    }
-}
-
-android {
-SOURCES += audio/audiooutputopensles.cpp
-SOURCES += audio/audiooutputaudiotrack.cpp
-HEADERS += audio/audiooutputopensles.h
-HEADERS += audio/audiooutputaudiotrack.h
-}
-
-cygwin {
-    QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
-    DEFINES += _WIN32
-}
-
-mingw | win32-msvc* {
-    
-    SOURCES += audio/audiooutputwin.cpp
-    SOURCES += audio/audiooutputdx.cpp
-    HEADERS += audio/audiooutputwin.h
-    HEADERS += audio/audiooutputdx.h
-    LIBS += -lwinmm -lws2_32 -luser32 -lsamplerate -lSoundTouch
-}
-
-macx {
-    HEADERS += audio/audiooutputca.h
-    SOURCES += audio/audiooutputca.cpp
-
-    # Mac OS X Frameworks
-    LIBS += -framework ApplicationServices
-    LIBS += -framework AudioUnit
-    LIBS += -framework AudioToolbox
-    LIBS += -framework CoreAudio
-}
-
-INSTALLS += inc inc2
-
-using_alsa {
-    HEADERS += audio/audiooutputalsa.h
-    SOURCES += audio/audiooutputalsa.cpp
-}
-
-using_jack {
-    HEADERS += audio/audiooutputjack.h
-    SOURCES += audio/audiooutputjack.cpp
-}
+INSTALLS += inc
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

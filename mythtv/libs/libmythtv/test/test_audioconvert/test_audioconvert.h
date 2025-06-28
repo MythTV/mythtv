@@ -21,7 +21,7 @@
 #include <QTest>
 
 #include "libmythbase/mythcorecontext.h"
-#include "libmyth/audio/audioconvert.h"
+#include "libmythtv/audio/audioconvert.h"
 
 #define SSEALIGN 16     // for 16 bytes memory alignment
 

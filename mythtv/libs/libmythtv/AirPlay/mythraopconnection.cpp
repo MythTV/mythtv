@@ -17,7 +17,7 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/serverpool.h"
 
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 
 #include "mythraopdevice.h"
 #include "mythraopconnection.h"

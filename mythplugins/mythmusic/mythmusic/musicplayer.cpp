@@ -9,7 +9,7 @@
 #include <QWidget>
 
 // mythtv
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/mthreadpool.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>

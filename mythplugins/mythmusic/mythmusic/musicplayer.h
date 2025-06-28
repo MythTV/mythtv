@@ -2,7 +2,7 @@
 #define MUSICPLAYER_H_
 
 // MythTV
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/mythobservable.h>
 #include <libmythbase/mythpluginexport.h>
 #include <libmythmetadata/musicmetadata.h>

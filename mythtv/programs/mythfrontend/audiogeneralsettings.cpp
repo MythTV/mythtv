@@ -16,8 +16,8 @@
 #include <utility>
 
 // MythTV headers
-#include "libmyth/audio/audiooutput.h"
-#include "libmyth/audio/audiooutputsettings.h"
+#include "libmythtv/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutputsettings.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"

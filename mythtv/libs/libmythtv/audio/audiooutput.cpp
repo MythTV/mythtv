@@ -49,7 +49,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"  // to get codec id
 }
 #include "audioconvert.h"
-#include "mythaverror.h"
+#include "libmyth/mythaverror.h"
 #include "pink.h"
 
 #define LOC QString("AO: ")
