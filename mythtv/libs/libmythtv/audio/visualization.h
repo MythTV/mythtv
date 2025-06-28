@@ -4,8 +4,8 @@
 // warranty, or liability of any kind.
 //
 
-#ifndef LIBMYTH_AUDIO_VISUALIZATION_H
-#define LIBMYTH_AUDIO_VISUALIZATION_H
+#ifndef LIBMYTHTV_AUDIO_VISUALIZATION_H
+#define LIBMYTHTV_AUDIO_VISUALIZATION_H
 
 #include <chrono>
 
@@ -27,4 +27,4 @@ class Visualization
     QMutex m_mtx;
 };
 
-#endif // LIBMYTH_AUDIO_VISUALIZATION_H
+#endif // LIBMYTHTV_AUDIO_VISUALIZATION_H

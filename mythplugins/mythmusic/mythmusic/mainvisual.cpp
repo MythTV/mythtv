@@ -141,8 +141,8 @@ void MainVisual::prepare()
         delete m_nodes.takeLast();
 }
 
-// This is called via : mythtv/libs/libmyth/audio/audiooutput.cpp :: AudioOutput::dispatchVisual
-//    from : mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
+// This is called via : mythtv/libs/libmythtv/audio/audiooutput.cpp :: AudioOutput::dispatchVisual
+//    from : mythtv/libs/libmythtv/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
 // Caller holds mutex() lock
 void MainVisual::add(const void *buffer, unsigned long b_len,
                      std::chrono::milliseconds timecode,

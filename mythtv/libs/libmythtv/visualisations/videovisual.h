@@ -7,7 +7,7 @@
 #include <QList>
 #include <QDateTime>
 
-#include "libmyth/audio/visualization.h"
+#include "libmythtv/audio/visualization.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythui/mythpainter.h"
 #include "libmythui/mythrender_base.h"

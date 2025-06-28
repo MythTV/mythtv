@@ -1,5 +1,5 @@
 // MythTV
-#include "libmyth/audio/volumebase.h"
+#include "libmythtv/audio/volumebase.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"

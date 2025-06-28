@@ -36,7 +36,7 @@ extern "C" {
 
 #include "libmythbase/mythlogging.h"
 
-#include "mythaverror.h"
+#include "libmyth/mythaverror.h"
 
 #define LOC QString("AudioConvert: ")
 

@@ -23,7 +23,7 @@
 #include <QWidget>
 
 // MythTV headers
-#include <libmyth/audio/visualization.h>
+#include <libmythtv/audio/visualization.h>
 
 // MythMusic
 #include "visualize.h"

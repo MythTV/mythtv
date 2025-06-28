@@ -1,8 +1,8 @@
 #ifndef AUDIOPLAYER_H
 #define AUDIOPLAYER_H
 
-#include "libmyth/audio/volumebase.h"
-#include "libmyth/audio/visualization.h"
+#include "libmythtv/audio/volumebase.h"
+#include "libmythtv/audio/visualization.h"
 
 #include "mythplayerstate.h"
 

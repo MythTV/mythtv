@@ -15,8 +15,8 @@
 #include <QString>
 
 // MythTV headers
-#include "libmyth/mythexp.h"
-#include "libmyth/audio/audiooutputsettings.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/audio/audiooutputsettings.h"
 
 enum AudioOutputSource : std::uint8_t {
     AUDIOOUTPUT_UNKNOWN,
@@ -25,7 +25,7 @@ enum AudioOutputSource : std::uint8_t {
     AUDIOOUTPUT_TELEPHONY,
 };
 
-class MPUBLIC AudioSettings
+class MTV_PUBLIC AudioSettings
 {
   public:
     AudioSettings() = default;

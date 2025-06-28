@@ -29,12 +29,6 @@ libmythmetadata.depends = $$LIBMYTHTVDEPS libmythtv
 SUBDIRS += libmythprotoserver
 libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv
 
-# unit tests libmyth
-libmyth-test.depends = sub-libmyth
-libmyth-test.target = buildtestmyth
-libmyth-test.commands = cd libmyth/test && $(QMAKE) && $(MAKE)
-unix:QMAKE_EXTRA_TARGETS += libmyth-test
-
 # unit tests libmythbase
 libmythbase-test.depends = sub-libmythbase
 libmythbase-test.target = buildtestmythbase
@@ -59,7 +53,7 @@ libmythmetadata-test.target = buildtestmythmetadata
 libmythmetadata-test.commands = cd libmythmetadata/test && $(QMAKE) && $(MAKE)
 unix:QMAKE_EXTRA_TARGETS += libmythmetadata-test
 
-unittest.depends = libmyth-test libmythbase-test libmythui-test libmythtv-test libmythmetadata-test
+unittest.depends = libmythbase-test libmythui-test libmythtv-test libmythmetadata-test
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest

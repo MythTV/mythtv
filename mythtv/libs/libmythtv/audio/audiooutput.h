@@ -11,21 +11,23 @@ using namespace std::chrono_literals;
 #include <QVector>
 
 // MythTV headers
-#include "libmyth/audio/audiooutputsettings.h"
-#include "libmyth/audio/audiosettings.h"
-#include "libmyth/audio/visualization.h"
-#include "libmyth/audio/volumebase.h"
+#include "libmythtv/audio/audiooutputsettings.h"
+#include "libmythtv/audio/audiosettings.h"
+#include "libmythtv/audio/visualization.h"
+#include "libmythtv/audio/volumebase.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythobservable.h"
+
+#include "libmythtv/mythtvexp.h"
 
 // forward declaration
 struct AVCodecContext;
 struct AVPacket;
 struct AVFrame;
 
-class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
+class MTV_PUBLIC AudioOutput : public VolumeBase, public MythObservable
 {
     Q_DECLARE_TR_FUNCTIONS(AudioOutput);
 
@@ -227,7 +229,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public MythObservable
     std::vector<Visualization*> m_visuals;
 };
 
-class MPUBLIC AudioOutput::Event : public MythEvent
+class MTV_PUBLIC AudioOutput::Event : public MythEvent
 {
   public:
     explicit Event(Type type) : MythEvent(type) {}

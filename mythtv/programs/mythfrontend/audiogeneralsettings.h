@@ -9,7 +9,7 @@
 #include <QStringList>
 
 // MythTV headers
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 #include "libmythui/standardsettings.h"
 #include "libmythbase/mthread.h"
 #include "libmythui/mythdialogbox.h"
