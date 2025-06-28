@@ -20,7 +20,6 @@
 #include <QWaitCondition>
 
 // MythTV
-#include "libmyth/audio/volumebase.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtypes.h"
