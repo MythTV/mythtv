@@ -6,7 +6,7 @@
 #include "libmythui/mythuibuttonlist.h"
 #include "libmythui/mythscreentype.h"
 #include "libmythui/mythdialogbox.h"
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 
 class AudioTestThread;
 

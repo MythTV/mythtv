@@ -5,13 +5,12 @@
 #include <QMutex>
 
 // MythTV
-#include "libmyth/mythexp.h"
-#include "libmyth/audio/visualization.h"
+#include "libmythtv/audio/visualization.h"
 
 class MythImage;
 class MythPainter;
 
-class MPUBLIC AudioOutputGraph : public Visualization
+class AudioOutputGraph : public Visualization
 {
   public:
     AudioOutputGraph();

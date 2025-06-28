@@ -15,7 +15,7 @@ extern "C" {
 
 #include "audiooutputdigitalencoder.h"
 #include "audioconvert.h"
-#include "mythaverror.h"
+#include "libmyth/mythaverror.h"
 
 #define LOC QString("DEnc: ")
 

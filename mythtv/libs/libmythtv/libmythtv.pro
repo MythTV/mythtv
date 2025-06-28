@@ -247,6 +247,94 @@ SOURCES += channelscan/iptvchannelfetcher.cpp
 HEADERS += captions/srtwriter.h
 SOURCES += captions/srtwriter.cpp
 
+# audio
+HEADERS += audio/audioconvert.h
+HEADERS += audio/audiooutput.h
+HEADERS += audio/audiooutputbase.h
+HEADERS += audio/audiooutputdigitalencoder.h
+HEADERS += audio/audiooutputnull.h
+HEADERS += audio/audiooutputsettings.h
+HEADERS += audio/audiosettings.h
+HEADERS += audio/eldutils.h
+HEADERS += audio/audiooutputgraph.h
+HEADERS += audio/freesurround.h
+HEADERS += audio/freesurround_decoder.h
+HEADERS += audio/pink.h
+HEADERS += audio/spdifencoder.h
+HEADERS += audio/visualization.h
+HEADERS += audio/volumebase.h
+
+SOURCES += audio/audioconvert.cpp
+SOURCES += audio/audiooutput.cpp
+SOURCES += audio/audiooutputbase.cpp
+SOURCES += audio/audiooutputdigitalencoder.cpp
+SOURCES += audio/audiooutputnull.cpp
+SOURCES += audio/audiooutputsettings.cpp
+SOURCES += audio/audiosettings.cpp
+SOURCES += audio/audiooutputgraph.cpp
+SOURCES += audio/eldutils.cpp
+SOURCES += audio/freesurround.cpp
+SOURCES += audio/freesurround_decoder.cpp
+SOURCES += audio/pink.cpp
+SOURCES += audio/spdifencoder.cpp
+SOURCES += audio/volumebase.cpp
+
+using_oss {
+    SOURCES += audio/audiooutputoss.cpp
+    HEADERS += audio/audiooutputoss.h
+}
+
+using_pulse {
+    HEADERS += audio/audiopulsehandler.h
+    SOURCES += audio/audiopulsehandler.cpp
+    using_pulseoutput {
+        HEADERS += audio/audiooutputpulse.h
+        SOURCES += audio/audiooutputpulse.cpp
+    }
+}
+
+android {
+SOURCES += audio/audiooutputopensles.cpp
+SOURCES += audio/audiooutputaudiotrack.cpp
+HEADERS += audio/audiooutputopensles.h
+HEADERS += audio/audiooutputaudiotrack.h
+}
+
+cygwin {
+    QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
+    DEFINES += _WIN32
+}
+
+mingw | win32-msvc* {
+
+    SOURCES += audio/audiooutputwin.cpp
+    SOURCES += audio/audiooutputdx.cpp
+    HEADERS += audio/audiooutputwin.h
+    HEADERS += audio/audiooutputdx.h
+    LIBS += -lwinmm -lws2_32 -luser32 -lsamplerate -lSoundTouch
+}
+
+macx {
+    HEADERS += audio/audiooutputca.h
+    SOURCES += audio/audiooutputca.cpp
+
+    # Mac OS X Frameworks
+    LIBS += -framework ApplicationServices
+    LIBS += -framework AudioUnit
+    LIBS += -framework AudioToolbox
+    LIBS += -framework CoreAudio
+}
+
+using_alsa {
+    HEADERS += audio/audiooutputalsa.h
+    SOURCES += audio/audiooutputalsa.cpp
+}
+
+using_jack {
+    HEADERS += audio/audiooutputjack.h
+    SOURCES += audio/audiooutputjack.cpp
+}
+
 inc.path = $${PREFIX}/include/mythtv/libmythtv
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
@@ -269,6 +357,17 @@ inc2.files += visualisations/goom/tentacle3d.h
 inc2.files += visualisations/goom/v3d.h
 
 INSTALLS += inc2
+
+inc3.path = $${PREFIX}/include/mythtv/libmythtv/audio
+#inc3.files += audio/audioconvert.h
+inc3.files += audio/audiooutput.h
+inc3.files += audio/audiooutputsettings.h
+inc3.files += audio/audiosettings.h
+inc3.files += audio/eldutils.h
+inc3.files += audio/volumebase.h
+inc3.files += audio/visualization.h
+
+INSTALLS += inc3
 
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/

@@ -12,7 +12,7 @@
 #include <array>
 #include <vector>
 
-#include "libmyth/mythexp.h"
+#include "libmythtv/mythtvexp.h"
 
 #include <QString>
 
@@ -45,7 +45,7 @@ enum DigitalFeature : std::uint8_t {
 using rate_array = std::array<const int,12>;
 using format_array = std::array<const AudioFormat,6>;
 
-class MPUBLIC AudioOutputSettings
+class MTV_PUBLIC AudioOutputSettings
 {
     public:
         explicit AudioOutputSettings(bool invalid = false);

@@ -2,7 +2,7 @@
 #define AUDIOPINK
 
 #include <array>
-#include "libmyth/mythexp.h"
+#include "libmythtv/mythtvexp.h"
 
 static constexpr int8_t PINK_DEFAULT_ROWS    { 12 };
 static constexpr int8_t PINK_MAX_RANDOM_ROWS { 32 };
@@ -18,7 +18,7 @@ struct pink_noise_t
   float     pink_scalar;       /* Used to scale within range of -1.0 to +1.0 */
 };
 
-MPUBLIC void initialize_pink_noise( pink_noise_t *pink, int num_rows = PINK_DEFAULT_ROWS);
-MPUBLIC float generate_pink_noise_sample( pink_noise_t *pink );
+MTV_PUBLIC void initialize_pink_noise( pink_noise_t *pink, int num_rows = PINK_DEFAULT_ROWS);
+MTV_PUBLIC float generate_pink_noise_sample( pink_noise_t *pink );
 
 #endif
