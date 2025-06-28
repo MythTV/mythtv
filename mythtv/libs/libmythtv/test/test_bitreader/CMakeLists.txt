@@ -10,4 +10,4 @@ target_include_directories(test_bitreader PRIVATE . ../..)
 
 target_link_libraries(test_bitreader PUBLIC mythtv Qt${QT_VERSION_MAJOR}::Test)
 
-add_test(NAME AVCInfo COMMAND test_bitreader)
+add_test(NAME BitReader COMMAND test_bitreader)
