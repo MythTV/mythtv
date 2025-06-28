@@ -29,45 +29,22 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 
 # Input
 HEADERS += backendselect.h
-HEADERS += mythaverror.h
-HEADERS += mythavframe.h
 HEADERS += mythcontext.h
 HEADERS += mythexp.h
 
 SOURCES += backendselect.cpp
-SOURCES += mythaverror.cpp mythcontext.cpp
+SOURCES += mythcontext.cpp
 
 INCLUDEPATH += ..
-INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $${POSTINC}
 
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
-LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
-LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
-LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
-LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
-!using_system_libbluray {
-    #INCLUDEPATH += ../../external/libmythbluray/src
-    DEPENDPATH += ../../external/libmythbluray
-    #LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
-}
-
-!win32-msvc* {
-    !using_system_libbluray:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-    POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
-    POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-    POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-}
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/libmyth
-inc.files  = dialogbox.h mythcontext.h
-inc.files += mythwidgets.h remotefile.h volumecontrol.h
-inc.files += inetcomms.h
-inc.files += mythaverror.h
-inc.files += mythavframe.h
+inc.files  = mythcontext.h
 inc.files += mythexp.h
 
 INSTALLS += inc
