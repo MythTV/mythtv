@@ -29,12 +29,15 @@ SOURCES += requesthandler/messagehandler.cpp
 
 INCLUDEPATH += .. ../../external/FFmpeg
 
-LIBS += -L../libmythbase -L../libmyth -L../libmythtv -L../libmythui
+LIBS += -L../libmythbase
+LIBS += -L../libmythtv
+LIBS += -L../libmythui
 LIBS += -L../libmythupnp
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat -L../../external/FFmpeg/libswscale
-LIBS += -lmythbase-$$LIBVERSION -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
+LIBS += -lmythbase-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION
 LIBS += -lmythtv-$$LIBVERSION -lmythupnp-$$LIBVERSION
 LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD

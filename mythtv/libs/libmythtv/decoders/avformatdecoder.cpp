@@ -75,8 +75,8 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 // MythTV headers
 #include "libmythtv/audio/audiooutput.h"
 #include "libmythtv/audio/audiooutputsettings.h"
-#include "libmyth/mythaverror.h"
-#include "libmyth/mythavframe.h"
+#include "libmythtv/mythaverror.h"
+#include "libmythtv/mythavframe.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythchrono.h"

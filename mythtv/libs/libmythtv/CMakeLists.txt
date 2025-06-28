@@ -97,6 +97,9 @@ add_library(
   metadataimagehelper.h
   mythavbufferref.cpp
   mythavbufferref.h
+  mythaverror.cpp
+  mythaverror.h
+  mythavframe.h
   mythavrational.h
   mythavutil.cpp
   mythavutil.h
@@ -370,7 +373,6 @@ target_link_libraries(
          PkgConfig::LIBCRYPTO
          PkgConfig::SoundTouch
          mythbluray
-         myth
          mythbase
          mythui
          mythupnp
@@ -423,8 +425,15 @@ endif()
 # Installation section
 #
 
-set(HEADERS_TO_INSTALL1 metadataimagehelper.h mythavutil.h mythframe.h
-                        mythtvexp.h playgroup.h)
+set(HEADERS_TO_INSTALL1
+    metadataimagehelper.h
+    mythaverror.h
+    mythavframe.h
+    mythavutil.h
+    mythframe.h
+    mythtvexp.h
+    playgroup.h
+    )
 
 set(HEADERS_TO_INSTALL2
     visualisations/goom/drawmethods.h

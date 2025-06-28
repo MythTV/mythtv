@@ -10,8 +10,7 @@ INCLUDEPATH += ../../..
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION
-# libmyth and libmythtv for ProgramInfo and RecordingInfo
-LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
+# libmythtv for ProgramInfo and RecordingInfo
 LIBS += -L../../../libmythtv -lmythtv-$$LIBVERSION
 # libmythui for MythUIProgressDialog
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
@@ -33,7 +32,6 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavcodec
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libpostproc
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythtv

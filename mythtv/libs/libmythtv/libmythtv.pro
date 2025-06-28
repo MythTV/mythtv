@@ -119,6 +119,8 @@ HEADERS += io/mythinteractivebuffer.h
 HEADERS += io/mythopticalbuffer.h
 HEADERS += metadataimagehelper.h
 HEADERS += mythavbufferref.h
+HEADERS += mythaverror.h
+HEADERS += mythavframe.h
 HEADERS += mythavrational.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
@@ -163,6 +165,7 @@ SOURCES += io/mythopticalbuffer.cpp
 SOURCES += metadataimagehelper.cpp
 SOURCES += mythframe.cpp
 SOURCES += mythavbufferref.cpp
+SOURCES += mythaverror.cpp
 SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
 SOURCES += mythhdrvideometadata.cpp
@@ -337,6 +340,8 @@ inc.path = $${PREFIX}/include/mythtv/libmythtv
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
 inc.files += mythavutil.h           mythframe.h
+inc.files += mythaverror.h
+inc.files += mythavframe.h
 
 INSTALLS += inc
 
@@ -1145,7 +1150,6 @@ win32-msvc* {
 # Dependencies and required libraries
 # Have them at the end in order to properly resolve on mingw platform
 # where the order is of significance
-LIBS += -L../libmyth
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil
 LIBS += -L../../external/FFmpeg/libavcodec
@@ -1155,7 +1159,6 @@ LIBS += -L../../external/FFmpeg/libpostproc
 LIBS += -L../../external/FFmpeg/libavfilter
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythbase
-LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
@@ -1169,7 +1172,6 @@ using_hdhomerun: LIBS += -lhdhomerun
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 !mingw || win32-msvc* {
-    POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)

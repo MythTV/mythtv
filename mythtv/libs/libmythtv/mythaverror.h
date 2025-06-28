@@ -20,19 +20,19 @@
 #define MYTHAVERROR_H
 
 #include <string>
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 extern "C" {
 #include "libavutil/error.h"
 }
 
-MPUBLIC int av_strerror_stdstring (int errnum, std::string &errbuf);
-MPUBLIC char *av_make_error_stdstring(std::string &errbuf, int errnum);
+MTV_PUBLIC int av_strerror_stdstring (int errnum, std::string &errbuf);
+MTV_PUBLIC char *av_make_error_stdstring(std::string &errbuf, int errnum);
 /**
 A C++ equivalent to av_make_error_string() which does not need an input buffer,
 similar to FFmpeg's av_err2str() macro.
 */
-MPUBLIC inline std::string av_make_error_stdstring(int errnum)
+MTV_PUBLIC inline std::string av_make_error_stdstring(int errnum)
 {
     auto errbuf = std::string(AV_ERROR_MAX_STRING_SIZE, '\0'); // must use () to select correct constructor
     av_strerror(errnum, errbuf.data(), errbuf.size());
@@ -44,7 +44,7 @@ MPUBLIC inline std::string av_make_error_stdstring(int errnum)
         "UNKNOWN" instead of av_str_error()'s generic message which indicates
         the input errnum.
 */
-MPUBLIC inline std::string av_make_error_stdstring_unknown(int errnum)
+MTV_PUBLIC inline std::string av_make_error_stdstring_unknown(int errnum)
 {
     using namespace std::string_literals;
     auto errbuf = std::string(AV_ERROR_MAX_STRING_SIZE, '\0'); // must use () to select correct constructor

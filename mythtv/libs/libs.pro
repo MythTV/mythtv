@@ -9,13 +9,13 @@ using_mheg:SUBDIRS += libmythfreemheg
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
 # Libraries with dependencies
-SUBDIRS += libmythui libmythupnp libmyth
+SUBDIRS += libmythui libmythupnp
+LIBMYTHTVDEPS = $$SUBDIRS
 
 libmythui.depends = libmythbase
 libmythupnp.depends = libmythbase
 libmyth.depends =  libmythbase libmythui libmythupnp
-
-LIBMYTHTVDEPS = $$SUBDIRS
+SUBDIRS += libmyth
 
 # libmythtv
 libmythtv.depends = $$LIBMYTHTVDEPS

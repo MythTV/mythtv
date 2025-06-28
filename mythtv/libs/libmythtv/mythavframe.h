@@ -1,7 +1,7 @@
 #ifndef MYTHAVFRAME_H
 #define MYTHAVFRAME_H
 
-#include "mythexp.h"
+#include "mythtvexp.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -23,7 +23,7 @@ extern "C" {
  *   AVFrame *src = frame;
  * }
  */
-class MPUBLIC MythAVFrame
+class MTV_PUBLIC MythAVFrame
 {
   public:
     MythAVFrame(void) : m_frame(av_frame_alloc()) {}

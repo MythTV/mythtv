@@ -107,7 +107,7 @@ target_link_libraries(
          mythbase
          mythui
          mythtv
-         myth)
+         )
 
 install(TARGETS mythmetadata LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
