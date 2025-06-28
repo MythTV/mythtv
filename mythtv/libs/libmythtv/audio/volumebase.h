@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "libmyth/mythexp.h"
+#include "libmythtv/mythtvexp.h"
 
 enum MuteState : std::uint8_t {
     kMuteOff = 0,
@@ -12,7 +12,7 @@ enum MuteState : std::uint8_t {
     kMuteAll,
 };
 
-class MPUBLIC VolumeBase
+class MTV_PUBLIC VolumeBase
 {
   public:
     VolumeBase();

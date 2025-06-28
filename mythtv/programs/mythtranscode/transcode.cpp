@@ -18,7 +18,7 @@
 // MythTV
 #include "libmythbase/mythconfig.h"
 
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"

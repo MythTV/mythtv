@@ -11,9 +11,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-#include "libmyth/mythexp.h"
-
-class MPUBLIC SPDIFEncoder
+class SPDIFEncoder
 {
   public:
     SPDIFEncoder(const QString& muxer, AVCodecID codec_id);

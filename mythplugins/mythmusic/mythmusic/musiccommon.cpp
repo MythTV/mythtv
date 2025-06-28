@@ -7,7 +7,7 @@
 #include <QLocale>
 
 // mythtv
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>

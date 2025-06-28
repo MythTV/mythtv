@@ -25,7 +25,8 @@
 
 #include <cstdint>
 #include <QString>
-#include "libmyth/mythexp.h"
+
+#include "libmythtv/mythtvexp.h"
 
 static constexpr uint8_t ELD_FIXED_BYTES    { 20 };
 static constexpr size_t  ELD_MAX_SAD        { 16 };
@@ -34,7 +35,7 @@ static constexpr uint8_t PRINT_RATES_ADVISED_BUFSIZE              { 80 };
 static constexpr uint8_t PRINT_BITS_ADVISED_BUFSIZE               { 16 };
 static constexpr uint8_t PRINT_CHANNEL_ALLOCATION_ADVISED_BUFSIZE { 80 };
 
-class MPUBLIC eld
+class MTV_PUBLIC eld
 {
   public:
     eld(const char *buf, int size);
@@ -125,4 +126,4 @@ class MPUBLIC eld
     eld_data m_e;
 };
 
-#endif /* ELDUTILSL_H */
+#endif /* ELDUTILS_H */

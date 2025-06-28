@@ -22,7 +22,7 @@
 
 #include <QTest>
 
-#include "libmyth/audio/pink.h"
+#include "libmythtv/audio/pink.h"
 
 class TestPinkNoise: public QObject
 {

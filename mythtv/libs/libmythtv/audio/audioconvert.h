@@ -24,12 +24,12 @@
 #ifndef MythXCode_audioconvert
 #define MythXCode_audioconvert
 
-#include "libmyth/mythexp.h"
-#include "libmyth/audio/audiooutputsettings.h"
+#include "libmythtv/mythtvexp.h"
+#include "libmythtv/audio/audiooutputsettings.h"
 
 class AudioConvertInternal;
 
-class MPUBLIC AudioConvert
+class MTV_PUBLIC AudioConvert
 {
 public:
 
