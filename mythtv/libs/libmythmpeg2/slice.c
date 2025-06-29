@@ -709,7 +709,7 @@ static void get_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
 	    int val = SBITS (bit_buf, 8);
 	    if (! (val & 0x7f)) {
 		DUMPBITS (bit_buf, bits, 8);
-		val = UBITS (bit_buf, 8) + 2 * val;
+		val = UBITS (bit_buf, 8) + (2 * val);
 	    }
 	    val = (val * quant_matrix[j]) / 16;
 
@@ -832,9 +832,9 @@ static int get_mpeg1_non_intra_block (mpeg2_decoder_t * const decoder)
 	    int val = SBITS (bit_buf, 8);
 	    if (! (val & 0x7f)) {
 		DUMPBITS (bit_buf, bits, 8);
-		val = UBITS (bit_buf, 8) + 2 * val;
+		val = UBITS (bit_buf, 8) + (2 * val);
 	    }
-	    val = 2 * (val + SBITS (val, 1)) + 1;
+	    val = (2 * (val + SBITS (val, 1))) + 1;
 	    val = (val * quant_matrix[j]) / 32;
 
 	    /* oddification */
@@ -1603,9 +1603,9 @@ void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
     decoder->slice_stride = 16 * stride;
     decoder->slice_uv_stride =
 	decoder->slice_stride >> (2 - decoder->chroma_format);
-    decoder->limit_x = 2 * decoder->width - 32;
-    decoder->limit_y_16 = 2 * height - 32;
-    decoder->limit_y_8 = 2 * height - 16;
+    decoder->limit_x = (2 * decoder->width) - 32;
+    decoder->limit_y_16 = (2 * height) - 32;
+    decoder->limit_y_8 = (2 * height) - 16;
     decoder->limit_y = height - 16;
 
     if (decoder->mpeg1) {

@@ -636,7 +636,7 @@ void MHParseText::NextSym()
 
                 while (m_ch >= '0' && m_ch <= '9')
                 {
-                    m_nInt = m_nInt * 10 + m_ch - '0';
+                    m_nInt = (m_nInt * 10) + m_ch - '0';
                     // TODO: What about overflow?
                     GetNextChar();
                 }

@@ -260,13 +260,13 @@ QString MythGesture::Translate(bool Timeout)
 
     if (delta_x > m_scaleRatio * delta_y)
     {
-        bound_y_1 = (m_maxY + m_minY - delta_x) / 2 + (delta_x / 3);
-        bound_y_2 = (m_maxY + m_minY - delta_x) / 2 + 2 * (delta_x / 3);
+        bound_y_1 = ((m_maxY + m_minY - delta_x) / 2) + (delta_x / 3);
+        bound_y_2 = ((m_maxY + m_minY - delta_x) / 2) + (2 * (delta_x / 3));
     }
     else if (delta_y > m_scaleRatio * delta_x)
     {
-        bound_x_1 = (m_maxX + m_minX - delta_y) / 2 + (delta_y / 3);
-        bound_x_2 = (m_maxX + m_minX - delta_y) / 2 + 2 * (delta_y / 3);
+        bound_x_1 = ((m_maxX + m_minX - delta_y) / 2) + (delta_y / 3);
+        bound_x_2 = ((m_maxX + m_minX - delta_y) / 2) + (2 * (delta_y / 3));
     }
 
     /* build string by placing points in bins, collapsing bins and

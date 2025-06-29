@@ -743,7 +743,7 @@ TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
     const float fps = player->GetFrameRate();
 
     m_frameInterval = (int)roundf(m_sampleTime.count() * fps / samplesNeeded);
-    m_endFrame = 0 + (long long)m_frameInterval * samplesNeeded - 1;
+    m_endFrame = 0 + ((long long)m_frameInterval * samplesNeeded) - 1;
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateFinder: sampleTime=%1s, samplesNeeded=%2, endFrame=%3")

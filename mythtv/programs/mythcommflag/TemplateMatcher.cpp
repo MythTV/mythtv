@@ -266,7 +266,7 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
     int local_minimum = matchstart;
     uint maxdelta = 0;
     for (int matchcnt = matchstart + leftwidth + (middlewidth / 2);
-            matchcnt < matchend - rightwidth - middlewidth / 2;
+            matchcnt < matchend - rightwidth - (middlewidth / 2);
             matchcnt++)
     {
         ushort p0 = matchcnt - leftwidth - (middlewidth / 2);

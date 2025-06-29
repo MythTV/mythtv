@@ -255,7 +255,7 @@ void AutoExpire::CalcParams()
     QMap<int, uint64_t>::iterator it = fsMap.begin();
     while (it != fsMap.end())
     {
-        m_desiredSpace[it.key()] = (*it + *it/3) * expireFreq + extraKB;
+        m_desiredSpace[it.key()] = ((*it + *it/3) * expireFreq) + extraKB;
         ++it;
     }
     m_instanceLock.unlock();

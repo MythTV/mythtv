@@ -247,12 +247,12 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     if (playcountMax == playcountMin)
                         playcountValue = 0;
                     else
-                        playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1);
+                        playcountValue = (((playcountMin - (double)playcount) / (playcountMax - playcountMin)) + 1);
 
                     if (lastplayMax == lastplayMin)
                         lastplayValue = 0;
                     else
-                        lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1);
+                        lastplayValue = (((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin)) + 1);
 
                     double weight = (RatingWeight * ratingValue +
                                         PlayCountWeight * playcountValue +

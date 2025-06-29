@@ -468,11 +468,11 @@ void TeletextReader::AddTeletextData(int magazine, int row,
                         break;
                     case VBI_DVB:
                     case VBI_DVB_SUBTITLE:
-                        b1 = hamm84(buf+2+(6*i), &err) * 16 +
+                        b1 = (hamm84(buf+2+(6*i), &err) * 16) +
                         hamm84(buf+1+(6*i), &err);
-                        b2 = hamm84(buf+4+(6*i), &err) * 16 +
+                        b2 = (hamm84(buf+4+(6*i), &err) * 16) +
                         hamm84(buf+3+(6*i), &err);
-                        b3 = hamm84(buf+6+(6*i), &err) * 16 +
+                        b3 = (hamm84(buf+6+(6*i), &err) * 16) +
                         hamm84(buf+5+(6*i), &err);
                         if (err == 1)
                             return;
@@ -483,7 +483,7 @@ void TeletextReader::AddTeletextData(int magazine, int row,
 
                 int x = (b2 >> 7) | ((b3 >> 5) & 0x06);
                 int nTmp = (magazine ^ x);
-                ttpage->floflink[i] = ( nTmp ? nTmp : 8) * 256 + b1;
+                ttpage->floflink[i] = (( nTmp ? nTmp : 8) * 256) + b1;
                 ttpage->flof = 1;
             }
             break;

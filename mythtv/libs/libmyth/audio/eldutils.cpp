@@ -275,7 +275,7 @@ int eld::update_eld(const char *buf, int size)
 
     for (int i = 0; i < m_e.sad_count; i++)
     {
-        if (ELD_FIXED_BYTES + mnl + 3 * (i + 1) > size)
+        if (ELD_FIXED_BYTES + mnl + (3 * (i + 1)) > size)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + QString("out of range SAD %1").arg(i));
             return -1;

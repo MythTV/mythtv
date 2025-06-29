@@ -121,10 +121,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 
                 case VBI_DVB:
                 case VBI_DVB_SUBTITLE:
-                    b1 = hamm84(buf+1, &err)*16+hamm84(buf, &err);
-                    b2 = hamm84(buf+3, &err)*16+hamm84(buf+2, &err);
-                    b3 = hamm84(buf+5, &err)*16+hamm84(buf+4, &err);
-                    b4 = hamm84(buf+7, &err)*16+hamm84(buf+6, &err);
+                    b1 = (hamm84(buf+1, &err)*16)+hamm84(buf, &err);
+                    b2 = (hamm84(buf+3, &err)*16)+hamm84(buf+2, &err);
+                    b3 = (hamm84(buf+5, &err)*16)+hamm84(buf+4, &err);
+                    b4 = (hamm84(buf+7, &err)*16)+hamm84(buf+6, &err);
                     if (err == 1)
                         return;
 
@@ -135,7 +135,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             }
 
             subpagenum= (b2 + b3 * 256) & 0x3f7f;
-            pagenum = (magazine ? magazine : 8)*256 + b1;
+            pagenum = ((magazine ? magazine : 8)*256) + b1;
 
             lang = "\0\4\2\6\1\5\3\7"[b4 >> 5] + (latin1 ? 0 : 8);
             flags = b4 & 0x1F;

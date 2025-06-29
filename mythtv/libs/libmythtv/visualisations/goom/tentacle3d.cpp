@@ -103,14 +103,14 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 	float tmp = s_happens?8.0F:0;
 	*dist2 = s_distT2 = (tmp + 15.0F*s_distT2)/16.0F;
 
-	tmp = 30+D-90.0F*(1.0F+sinf(lcycle*19/20));
+	tmp = 30+D-(90.0F*(1.0F+sinf(lcycle*19/20)));
 	if (s_happens)
 		tmp *= 0.6F;
 
 	*dist = s_distT = (tmp + 3.0F*s_distT)/4.0F;
 
 	if (!s_happens){
-		tmp = M_PI_F*sinf(lcycle)/32+3*M_PI_F/2;
+		tmp = (M_PI_F*sinf(lcycle)/32)+(3*M_PI_F/2);
 	}
 	else {
 		static int s_rotation {0};
@@ -119,7 +119,7 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 			lcycle *= 2.0F*M_PI_F;
 		else
 			lcycle *= -1.0F*M_PI_F;
-		tmp = lcycle - (M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F));
+		tmp = lcycle - ((M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F)));
 	}
 	
 	if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot+2.0F*M_PI_F))) {
@@ -178,7 +178,7 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
 		lightencolor(&color,(s_lig * 2.0F) + 2.0F);
 		lightencolor(&colorlow,(s_lig/3.0F)+0.67F);
 
-		rapport = 1.0F + 2.0F * (rapport - 1.0F);
+		rapport = 1.0F + (2.0F * (rapport - 1.0F));
                 rapport *= 1.2F;
 		rapport = std::min(rapport, 1.12F);
 		

@@ -639,7 +639,7 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext* Context, AVFrame* Fra
             {
                 if (m_filterPriorPTS[0] && m_filterPTSUsed == m_filterPriorPTS[1])
                 {
-                    Frame->pts = m_filterPriorPTS[1] + (m_filterPriorPTS[1] - m_filterPriorPTS[0]) / 2;
+                    Frame->pts = m_filterPriorPTS[1] + ((m_filterPriorPTS[1] - m_filterPriorPTS[0]) / 2);
                     av_frame_remove_side_data(Frame, AV_FRAME_DATA_A53_CC);
                 }
                 else

@@ -35,7 +35,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 	if (s_cycle < 40)
 		cycle10 = s_cycle / 10;
 	else
-		cycle10 = 7 - s_cycle / 10;
+		cycle10 = 7 - (s_cycle / 10);
 
 	{
 		auto *tmp = (unsigned char *) &couleursl;

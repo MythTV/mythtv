@@ -57,8 +57,8 @@ uint64_t add_pts_audio(uint64_t pts, audio_frame_t *aframe, uint64_t frames)
 {
 	int64_t newpts=0;
 
-	newpts = (pts + (frames *samples [3-aframe->layer] * 27000000ULL) 
-		  / aframe->frequency);
+	newpts = (pts + ((frames *samples [3-aframe->layer] * 27000000ULL) 
+		  / aframe->frequency));
 	return newpts>0 ? newpts%MAX_PTS2: MAX_PTS2+newpts;
 }
 
@@ -81,8 +81,8 @@ uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64
 
 	
 	if ( s->pulldown == NOPULLDOWN ) {
-		newdts = ( (fcount-1) * SEC_PER + *pts);
-		newpts = ((fnum ) * SEC_PER + *pts);
+		newdts = ( ((fcount-1) * SEC_PER) + *pts);
+		newpts = (((fnum ) * SEC_PER) + *pts);
 	} else {
 		uint64_t extra_time = 0;
 #if 0
@@ -95,16 +95,16 @@ uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64
 		else 
 			extra_time = 3*SEC_PER/2;
 
-		newdts = (fcount - 1) * 5ULL * SEC_PER / 4ULL + 
-			((fcount - 1)%2)*extra_time + 
+		newdts = ((fcount - 1) * 5ULL * SEC_PER / 4ULL) + 
+			(((fcount - 1)%2)*extra_time) + 
 			*pts;
 
 		if ((s->pulldown == PULLDOWN23) && (fcount-1))
 			newdts -= SEC_PER/2;
 
 		newpts = SEC_PER +
-			(fnum -1) * 5ULL * SEC_PER / 4ULL + 
-			((fnum - 1)%2)*extra_time + 
+			((fnum -1) * 5ULL * SEC_PER / 4ULL) + 
+			(((fnum - 1)%2)*extra_time) + 
 			*pts;
 		
 	}
@@ -144,7 +144,7 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 	else fr = (int)pframe;
 	if (!dsig) fr -= (int)dframe;
 	else fr += (int)dframe;
-	*frame = *frame + fr/2;
+	*frame = *frame + (fr/2);
 	if (fr/2)
 		LOG(VB_GENERAL, LOG_INFO,
 			QString("fixed video frame %1").arg(fr/2));

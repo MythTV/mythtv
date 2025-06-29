@@ -270,7 +270,7 @@ private:
 
                 // adapt the prior filter
                 for (unsigned c=0;c<5;c++)
-                    m_filter[c][f] = (1-adaption_rate)*m_filter[c][f] + adaption_rate*volume[c];
+                    m_filter[c][f] = ((1-adaption_rate)*m_filter[c][f]) + (adaption_rate*volume[c]);
 
             } else {
                 // --- this is the old & simple steering mode ---
@@ -279,13 +279,13 @@ private:
                 m_xFs[f] = ampDiff;
 
                 // determine preliminary sound field y-position from phase difference
-                m_yFs[f] = 1 - (phaseDiff/PI)*2;
+                m_yFs[f] = 1 - ((phaseDiff/PI)*2);
 
                 if (std::abs(m_xFs[f]) > m_surroundBalance) {
                     // blend linearly between the surrounds and the fronts if the balance exceeds the surround encoding balance
                     // this is necessary because the sound field is trapezoidal and will be stretched behind the listener
                     float frontness = (std::abs(m_xFs[f]) - m_surroundBalance)/(1-m_surroundBalance);
-                    m_yFs[f]  = (1-frontness) * m_yFs[f] + frontness * 1;
+                    m_yFs[f]  = ((1-frontness) * m_yFs[f]) + (frontness * 1);
                 }
 
                 // add dimension control
@@ -311,7 +311,7 @@ private:
 
                 // adapt the prior filter
                 for (unsigned c=0;c<5;c++)
-                    m_filter[c][f] = (1-adaption_rate)*m_filter[c][f] + adaption_rate*volume[c];
+                    m_filter[c][f] = ((1-adaption_rate)*m_filter[c][f]) + (adaption_rate*volume[c]);
             }
 
             // ... and build the signal which we want to position

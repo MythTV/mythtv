@@ -865,7 +865,7 @@ void LCDProcClient::outputCenteredText(const QString& theScreen, QString theText
     QString aString;
     unsigned int x = 0;
 
-    x = ( m_lcdWidth - theText.length()) / 2 + 1;
+    x = (( m_lcdWidth - theText.length()) / 2) + 1;
 
     if (x > m_lcdWidth )
         x = 1;
@@ -1882,7 +1882,7 @@ void LCDProcClient::dostdclock()
         y = (int) std::rint( m_lcdHeight / 2) + 1;
 
     QString time = QTime::currentTime().toString( m_timeFormat );
-    x = ( m_lcdWidth - time.length()) / 2 + 1;
+    x = (( m_lcdWidth - time.length()) / 2) + 1;
     aString = "widget_set Time timeWidget ";
     aString += QString::number(x);
     aString += " ";

@@ -130,7 +130,7 @@ void BumpScope::generate_phongdat(void)
             double i2 = ((double)y / ((double)m_phongRad)) - 1;
 
             //if (m_diamond)
-               i = 1 - pow(i*i2,.75) - i*i - i2*i2;
+               i = 1 - pow(i*i2,.75) - (i*i) - (i2*i2);
             //else
             //   i = 1 - i*i - i2*i2;
 
@@ -296,8 +296,8 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
       double delta = max - min;
 
       if (r == max) *h = (g - b) / delta;
-      else if (g == max) *h = 2.0 + (b - r) / delta;
-      else if (b == max) *h = 4.0 + (r - g) / delta;
+      else if (g == max) *h = 2.0 + ((b - r) / delta);
+      else if (b == max) *h = 4.0 + ((r - g) / delta);
 
       *h = *h * 60.0;
 
@@ -361,8 +361,8 @@ bool BumpScope::process(VisualNode *node)
     for (uint i = 0; i < m_width; i++)
     {
         int y = (i * numSamps) / (m_width - 1);
-        y = (int)m_height / 2 +
-            ((int)node->m_left[y] * (int)m_height) / 0x10000;
+        y = ((int)m_height / 2) +
+            (((int)node->m_left[y] * (int)m_height) / 0x10000);
 
         y = std::max(y, 0);
         if (y >= (int)m_height)

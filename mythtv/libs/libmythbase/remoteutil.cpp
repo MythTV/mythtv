@@ -184,7 +184,7 @@ uint RemoteGetRecordingList(
     if (numrecordings <= 0)
         return 0;
 
-    if (numrecordings * NUMPROGRAMLINES + 1 > strList.size())
+    if ((numrecordings * NUMPROGRAMLINES) + 1 > strList.size())
     {
         LOG(VB_GENERAL, LOG_ERR,
                  "RemoteGetRecordingList() list size appears to be incorrect.");

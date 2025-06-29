@@ -129,7 +129,7 @@ static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
         memcpy(dst->data[0] + (rr * newwidth) + extraleft, srcdata, srcwidth);
 
     /* Pad the bottom. */
-    srcdata = src->data[0] + static_cast<ptrdiff_t>(srcheight - 1) * srcwidth;
+    srcdata = src->data[0] + (static_cast<ptrdiff_t>(srcheight - 1) * srcwidth);
     for (ptrdiff_t rr = extratop + srcheight; rr < newheight; rr++)
         memcpy(dst->data[0] + (rr * newwidth) + extraleft, srcdata, srcwidth);
 

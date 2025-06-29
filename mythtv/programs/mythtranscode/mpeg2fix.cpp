@@ -2242,7 +2242,7 @@ int MPEG2fixup::Start()
                 MPEG2frame *markedFrame = nullptr;
                 MPEG2frame *markedFrameP = nullptr;
 
-                if (expectedvPTS != expectedDTS + m_ptsIncrement * 300)
+                if (expectedvPTS != expectedDTS + (m_ptsIncrement * 300))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("expectedPTS != expectedDTS + ptsIncrement"));

@@ -375,7 +375,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
     }
 
     // Validity check, reject events with endtime over 7 weeks in the future
-    if (endtime > m_lastPruneTime + 50 * 86400)
+    if (endtime > m_lastPruneTime + (50 * 86400))
     {
         m_futureHitCnt++;
         return false;

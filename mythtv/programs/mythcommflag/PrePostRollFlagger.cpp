@@ -107,7 +107,7 @@ bool PrePostRollFlagger::go()
         framesToProcess += stopFrame;
     if(m_postRoll)
         //guess two minutes before
-        framesToProcess += m_myTotalFrames - m_postRoll + m_fps * 120;
+        framesToProcess += m_myTotalFrames - m_postRoll + (m_fps * 120);
 
 
     long long framesProcessed = 0;

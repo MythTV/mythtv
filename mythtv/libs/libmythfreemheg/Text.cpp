@@ -408,7 +408,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
         size = attrs.GetAt(1);
         lineSpace = attrs.GetAt(2);
         // Is this big-endian or little-endian?  Assume big.
-        letterSpace = attrs.GetAt(3) * 256 + attrs.GetAt(4);
+        letterSpace = (attrs.GetAt(3) * 256) + attrs.GetAt(4);
 
         if (letterSpace > 32767)
         {
@@ -531,7 +531,7 @@ static inline int Tabs(int nXpos, int nTabCount)
     int nNextTab = nXpos;
     if (nTabCount-- > 0)
     {
-        nNextTab += TABSTOP - nXpos % TABSTOP;
+        nNextTab += TABSTOP - (nXpos % TABSTOP);
         nNextTab += nTabCount * TABSTOP;
     }
     return nNextTab; 

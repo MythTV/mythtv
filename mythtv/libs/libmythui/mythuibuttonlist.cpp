@@ -161,7 +161,7 @@ int MythUIButtonList::minButtonWidth(const MythRect &area)
          * Assume if an overlap is allowed on the left, the same overlap
          * is on the right
          */
-        width += (area.x() * 2 - 1); // x is negative
+        width += ((area.x() * 2) - 1); // x is negative
 
         while (width < 0)
             width -= area.x(); // Oops
@@ -191,7 +191,7 @@ int MythUIButtonList::minButtonHeight(const MythRect &area)
          * Assume if an overlap is allowed on the top, the same overlap
          * is on the bottom
          */
-        height += (area.y() * 2 - 1);
+        height += ((area.y() * 2) - 1);
 
         while (height < 0)
             height -= area.y(); // Oops
@@ -1793,7 +1793,7 @@ int MythUIButtonList::PageUp(void)
             }
 
             if (total + m_itemHorizSpacing +
-                buttonstate->GetArea().width() / 2 >= max_width)
+                (buttonstate->GetArea().width() / 2) >= max_width)
                 return pos + 1;
 
             buttonItem->SetToRealButton(realButton, false);
@@ -1846,7 +1846,7 @@ int MythUIButtonList::PageUp(void)
         }
 
         if (total + m_itemHorizSpacing +
-            buttonstate->GetArea().height() / 2 >= max_height)
+            (buttonstate->GetArea().height() / 2) >= max_height)
             return pos + dec;
 
         buttonItem->SetToRealButton(realButton, false);
@@ -1899,7 +1899,7 @@ int MythUIButtonList::PageDown(void)
             }
 
             if (total + m_itemHorizSpacing +
-                buttonstate->GetArea().width() / 2 >= max_width)
+                (buttonstate->GetArea().width() / 2) >= max_width)
                 return pos - 1;
 
             buttonItem->SetToRealButton(realButton, false);
@@ -1952,7 +1952,7 @@ int MythUIButtonList::PageDown(void)
         }
 
         if (total + m_itemHorizSpacing +
-            buttonstate->GetArea().height() / 2 >= max_height)
+            (buttonstate->GetArea().height() / 2) >= max_height)
             return pos - inc;
 
         buttonItem->SetToRealButton(realButton, false);
@@ -2026,8 +2026,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             }
             else if (m_wrapStyle > WrapNone)
             {
-                m_selPosition = ((m_itemList.size() - 1) / m_columns) *
-                                m_columns + pos;
+                m_selPosition = (((m_itemList.size() - 1) / m_columns) *
+                                m_columns) + pos;
 
                 if ((m_selPosition / m_columns)
                     < ((m_itemList.size() - 1) / m_columns))

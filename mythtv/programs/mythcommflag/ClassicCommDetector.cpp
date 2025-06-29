@@ -1933,7 +1933,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     // of show unless followed by another
     if ((commercials > 1) &&
         (c_end[0] < (33 * m_fps)) &&
-        (c_start[1] > (c_end[0] + 40 * m_fps)))
+        (c_start[1] > (c_end[0] + (40 * m_fps))))
         i = 1;
 
     // eliminate any blank frames at end of commercials

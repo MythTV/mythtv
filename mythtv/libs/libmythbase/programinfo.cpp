@@ -1462,7 +1462,7 @@ QString propsValueToString (const QString& name, QMap<T,QString> propNames,
         return propNames[0];
 
     QStringList result;
-    for (uint i = 0; i < sizeof(T)*8 - 1; ++i)
+    for (uint i = 0; i < (sizeof(T)*8) - 1; ++i)
     {
         uint bit = 1<<i;
         if ((props & bit) == 0)

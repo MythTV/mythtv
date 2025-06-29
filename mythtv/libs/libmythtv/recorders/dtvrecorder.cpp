@@ -746,8 +746,8 @@ void DTVRecorder::UpdateFramesWritten(void)
     if (m_tdTickFramerate.isNonzero())
     {
         // not 1000 since m_tdTickCount needs to be divided by 2 to get an equivalent frame count
-        m_totalDuration = m_tdBase + (int64_t) 500 * m_tdTickCount *
-            m_tdTickFramerate.invert().toDouble();
+        m_totalDuration = m_tdBase + ((int64_t) 500 * m_tdTickCount *
+            m_tdTickFramerate.invert().toDouble());
     }
 
     if (m_framesWrittenCount < 2000 || m_framesWrittenCount % 1000 == 0)

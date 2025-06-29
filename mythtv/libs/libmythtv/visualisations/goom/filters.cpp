@@ -215,12 +215,12 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		*py = (y << 4) + 132 - ((vitesse < 131) ? vitesse : 130);
 
 		// NOLINTNEXTLINE(misc-redundant-expression)
-		s_wavesp += RAND () % 3 - RAND () % 3;
+		s_wavesp += (RAND () % 3) - (RAND () % 3);
 		if (s_wave < -10)
 			s_wavesp += 2;
 		if (s_wave > 10)
 			s_wavesp -= 2;
-		s_wave += (s_wavesp / 10) + RAND () % 3 - RAND () % 3;
+		s_wave += (s_wavesp / 10) + (RAND () % 3) - (RAND () % 3);
 		if (s_wavesp > 100)
 			s_wavesp = (s_wavesp * 9) / 10;
 	}
@@ -230,9 +230,9 @@ calculatePXandPY (int x, int y, int *px, int *py)
 
 		if (noisify) {
                         // NOLINTNEXTLINE(misc-redundant-expression)
-			x += RAND () % noisify - RAND () % noisify;
+			x += (RAND () % noisify) - (RAND () % noisify);
                         // NOLINTNEXTLINE(misc-redundant-expression)
-			y += RAND () % noisify - RAND () % noisify;
+			y += (RAND () % noisify) - (RAND () % noisify);
 		}
 		int vx = (x - middleX) << 9;
 		int vy = (y - middleY) << 9;
@@ -259,7 +259,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 
 		int vx9 = ShiftRight (vx, 9);
 		int vy9 = ShiftRight (vy, 9);
-		dist = vx9 * vx9 + vy9 * vy9;
+		dist = (vx9 * vx9) + (vy9 * vy9);
 
 		switch (theMode) {
 		case WAVE_MODE:
@@ -448,17 +448,17 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 		int c4 = (c1 & 0xff000000) >> 24;
 		c1 = c1 & 0xff;
 
-		couleur.r = col1.r * c1 + col2.r * c2 + col3.r * c3 + col4.r * c4;
+		couleur.r = (col1.r * c1) + (col2.r * c2) + (col3.r * c3) + (col4.r * c4);
 		if (couleur.r > 5)
 			couleur.r -= 5;
 		couleur.r >>= 8;
 
-		couleur.v = col1.v * c1 + col2.v * c2 + col3.v * c3 + col4.v * c4;
+		couleur.v = (col1.v * c1) + (col2.v * c2) + (col3.v * c3) + (col4.v * c4);
 		if (couleur.v > 5)
 			couleur.v -= 5;
 		couleur.v >>= 8;
 
-		couleur.b = col1.b * c1 + col2.b * c2 + col3.b * c3 + col4.b * c4;
+		couleur.b = (col1.b * c1) + (col2.b * c2) + (col3.b * c3) + (col4.b * c4);
 		if (couleur.b > 5)
 			couleur.b -= 5;
 		couleur.b >>= 8;
@@ -600,7 +600,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 					firedec[loopv] = s_decc;
 					s_decc += s_spdc / 10;
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					s_spdc += RAND () % 3 - RAND () % 3;
+					s_spdc += (RAND () % 3) - (RAND () % 3);
 
 					if (s_decc > 4)
 						s_spdc -= 1;
@@ -608,21 +608,21 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 						s_spdc += 1;
 
 					if (s_spdc > 30)
-						s_spdc = s_spdc - RAND () % 3 + s_accel / 10;
+						s_spdc = s_spdc - (RAND () % 3) + (s_accel / 10);
 					if (s_spdc < -30)
-						s_spdc = s_spdc + RAND () % 3 + s_accel / 10;
+						s_spdc = s_spdc + (RAND () % 3) + (s_accel / 10);
 
 					if (s_decc > 8 && s_spdc > 1)
-						s_spdc -= RAND () % 3 - 2;
+						s_spdc -= (RAND () % 3) - 2;
 
 					if (s_decc < -8 && s_spdc < -1)
-						s_spdc += RAND () % 3 + 2;
+						s_spdc += (RAND () % 3) + 2;
 
 					if (s_decc > 8 || s_decc < -8)
 						s_decc = s_decc * 8 / 9;
 
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					s_accel += RAND () % 2 - RAND () % 2;
+					s_accel += (RAND () % 2) - (RAND () % 2);
 					if (s_accel > 20)
 						s_accel -= 2;
 					if (s_accel < -20)

@@ -103,7 +103,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     if (FMT_YV12 == m_type)
     {
         m_offsets[1] = alignedwidth * alignedheight;
-        m_offsets[2] = m_offsets[1] + ((alignedwidth + 1) >> 1) * ((alignedheight+1) >> 1);
+        m_offsets[2] = m_offsets[1] + (((alignedwidth + 1) >> 1) * ((alignedheight+1) >> 1));
     }
     else if (FormatIs420(m_type))
     {
@@ -113,7 +113,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     else if (FMT_YUV422P == m_type)
     {
         m_offsets[1] = alignedwidth * alignedheight;
-        m_offsets[2] = m_offsets[1] + ((alignedwidth + 1) >> 1) * alignedheight;
+        m_offsets[2] = m_offsets[1] + (((alignedwidth + 1) >> 1) * alignedheight);
     }
     else if (FormatIs422(m_type))
     {

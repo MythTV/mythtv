@@ -207,7 +207,7 @@ int MythDVDStream::SafeRead(void *Buffer, uint Size)
             return ret * DVD_VIDEO_LB_LEN;
 
         Buffer = static_cast<unsigned char*>(Buffer) +
-            static_cast<ptrdiff_t>(ret) * DVD_VIDEO_LB_LEN;
+            (static_cast<ptrdiff_t>(ret) * DVD_VIDEO_LB_LEN);
     }
 
     b = it->End() - m_pos;
@@ -234,7 +234,7 @@ int MythDVDStream::SafeRead(void *Buffer, uint Size)
     ret += ret2;
     block -= static_cast<uint>(ret2);
     Buffer = static_cast<unsigned char*>(Buffer) +
-        static_cast<ptrdiff_t>(ret2) * DVD_VIDEO_LB_LEN;
+        (static_cast<ptrdiff_t>(ret2) * DVD_VIDEO_LB_LEN);
 
     if (block > 0 && m_start == 0)
     {

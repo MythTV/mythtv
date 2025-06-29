@@ -244,7 +244,7 @@ void MHIntegerVar::SetVariableValue(const MHUnion &value)
                 break;
             }
 
-            v = v * 10 + ch - '0';
+            v = (v * 10) + ch - '0';
         }
 
         if (fNegative)

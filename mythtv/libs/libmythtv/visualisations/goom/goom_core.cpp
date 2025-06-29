@@ -75,7 +75,7 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 	buffsize = resx * resy;
 
 	c_offset = c_black_height * resx;
-	c_resoly = resy - c_black_height * 2;
+	c_resoly = resy - (c_black_height * 2);
 
 	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
 	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
@@ -111,7 +111,7 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 		c_black_height = 0;
 
 	c_offset = c_black_height * resx;
-	c_resoly = resy - c_black_height * 2;
+	c_resoly = resy - (c_black_height * 2);
 
 	resolx = resx;
 	resoly = resy;
@@ -187,7 +187,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	i = s_accelVar - i;
 	if (i<0) i=-i;
 
-	s_speedVar += (s_speedVar + i/2);
+	s_speedVar += (s_speedVar + (i/2));
 	s_speedVar /= 2;
 	if ((s_speedVar) && (cycle%9==0)) {
 		s_speedVar -= 1;
@@ -225,7 +225,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	if (curGState->m_drawPoints) {
 		for (i = 1; i * 15 <= s_speedVar + 15; i++) {
 			static int s_loopVar = 0; // mouvement des points
-			s_loopVar += s_speedVar*2/3 + 1;
+			s_loopVar += (s_speedVar*2/3) + 1;
 
 			pointFilter (p1 + c_offset, YELLOW,
                                      (((pointWidth - 6.0F) * largfactor) + 5.0F),
@@ -279,7 +279,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		s_aBigGoom = 0;
 
 	if ((!s_aBigGoom) && (s_speedVar > 4) && (s_goomLimit > 4) &&
-			((s_accelVar > s_goomLimit*9/8+7)||(s_accelVar < -s_goomLimit*9/8-7))) {
+			((s_accelVar > (s_goomLimit*9/8)+7)||(s_accelVar < (-s_goomLimit*9/8)-7))) {
 		static int s_couleur =
 			 (0xc0<<(ROUGE*8))
 			|(0xc0<<(VERT*8))

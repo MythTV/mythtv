@@ -172,7 +172,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
           (((kCommSkipOn != m_autocommercialskip) ||
             (framesPlayed < m_commBreakIter.key())) &&
            ((kCommSkipNotify != m_autocommercialskip) ||
-            (framesPlayed + m_commnotifyamount.count() * video_frame_rate <
+            (framesPlayed + (m_commnotifyamount.count() * video_frame_rate) <
              m_commBreakIter.key()))))
     {
         return false;

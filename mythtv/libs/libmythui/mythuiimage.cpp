@@ -1262,10 +1262,10 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         QRect visibleImage = m_effects.GetExtent(currentImageArea.size());
 
         if (area.width() > visibleImage.width())
-            x = area.width() / 2 + visibleImage.topLeft().x();
+            x = (area.width() / 2) + visibleImage.topLeft().x();
 
         if (area.height() > visibleImage.height())
-            y = area.height() / 2 + visibleImage.topLeft().y();
+            y = (area.height() / 2) + visibleImage.topLeft().y();
 
         if ((x > 0 || y > 0))
             area.translate(x, y);

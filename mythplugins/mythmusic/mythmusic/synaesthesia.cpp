@@ -157,7 +157,7 @@ int Synaesthesia::bitReverser(int i)
     int sum = 0;
     for (size_t j = 0; j < LogSize; j++)
     {
-        sum = (i & 1) + sum * 2;
+        sum = (i & 1) + (sum * 2);
         i >>= 1;
     }
     
@@ -182,8 +182,8 @@ void Synaesthesia::fft(double *x, double *y)
                 x[i] = (x[i] + x[l]);
                 double yt = y[i] - y[l];
                 y[i] = (y[i] + y[l]);
-                x[l] = xt * c - yt * s;
-                y[l] = xt * s + yt * c;
+                x[l] = (xt * c) - (yt * s);
+                y[l] = (xt * s) + (yt * c);
             }
         }
     }
@@ -505,7 +505,7 @@ bool Synaesthesia::process(VisualNode *node)
     double brightFactor2 = (brightFactor / 65536.0 / NumSamples) *
                            sqrt(m_outHeight * m_outWidth / (320.0 * 200.0));
 
-    m_energyAvg = m_energyAvg * 0.95 + energy * 0.05;
+    m_energyAvg = (m_energyAvg * 0.95) + (energy * 0.05);
     if (m_energyAvg > 0.0)
         brightFactor2 *= 80.0 / (m_energyAvg + 5.0);
 

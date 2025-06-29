@@ -705,7 +705,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
             // Too narrow?  How many lines didn't fit?
             qreal lines = round((height - m_drawRect.height()) / line_height);
-            lines -= (1.0 - last_line_width / width);
+            lines -= (1.0 - (last_line_width / width));
             width += (lines * width) /
                 ((double)m_drawRect.height() / line_height);
 

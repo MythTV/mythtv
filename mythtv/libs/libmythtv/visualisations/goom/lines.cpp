@@ -64,7 +64,7 @@ genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 			float cosa = param * cosf (l[i].angle);
 			float sina = param * sinf (l[i].angle);
 			l[i].x = ((float) rx / 2.0F) + cosa;
-			l[i].y = (float) ry / 2.0F + sina;
+			l[i].y = ((float) ry / 2.0F) + sina;
 		}
 		return;
 	}

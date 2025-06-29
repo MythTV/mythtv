@@ -452,7 +452,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
         // TODO:  flush reader buffer
         if (m_ccMode[field] != -1)
         {
-            for (mode = field*4; mode < (field*4 + 4); mode++)
+            for (mode = field*4; mode < ((field*4) + 4); mode++)
                 ResetCC(mode);
             m_xds[field] = 0;
             m_badVbi[field] = 0;
@@ -524,7 +524,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
         FormatControlCode(tc, field, b1, b2);
     }
 
-    for (size_t mode2 = field*4; mode2 < (field*4 + 4); mode2++)
+    for (size_t mode2 = field*4; mode2 < ((field*4) + 4); mode2++)
     {
         size_t len2 = m_ccBuf[mode2].length();
         if ((m_ignoreTimeCode || ((tc - m_timeCode[mode2]) > 100ms)) &&

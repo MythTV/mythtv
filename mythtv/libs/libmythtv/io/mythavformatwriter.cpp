@@ -320,7 +320,7 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
 
         // init AVFrame for planar data (input is interleaved)
         for (int j = 0, jj = 0; j < m_audioChannels; j++, jj += m_audioFrameSize)
-            m_audPicture->data[j] = m_audioInPBuf + static_cast<ptrdiff_t>(jj) * sampleSizeOut;
+            m_audPicture->data[j] = m_audioInPBuf + (static_cast<ptrdiff_t>(jj) * sampleSizeOut);
     }
     else
     {

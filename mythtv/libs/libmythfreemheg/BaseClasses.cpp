@@ -444,7 +444,7 @@ int MHGenericInteger::GetValue(MHEngine *engine) const
                 break;
             }
 
-            v = v * 10 + ch - '0';
+            v = (v * 10) + ch - '0';
         }
 
         if (fNegative)

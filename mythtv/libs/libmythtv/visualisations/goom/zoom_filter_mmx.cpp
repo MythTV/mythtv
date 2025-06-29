@@ -60,7 +60,7 @@ void zoom_filter_mmx (int prevX, int prevY,
             pos=coeffs=0;
         }
         else {
-            pos = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC));
+            pos = ((px >> PERTEDEC) + (prevX * (py >> PERTEDEC)));
             /* coef en modulo 15 */
             coeffs = precalCoef [px & PERTEMASK][py & PERTEMASK];
         }

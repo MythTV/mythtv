@@ -40,8 +40,8 @@ struct v2d {
  */
 #define Y_ROTATE_V3D(vi,vf,sina,cosa)\
 {\
- (vf).x = (vi).x * (cosa) - (vi).z * (sina);\
- (vf).z = (vi).x * (sina) + (vi).z * (cosa);\
+ (vf).x = ((vi).x * (cosa)) - ((vi).z * (sina));\
+ (vf).z = ((vi).x * (sina)) + ((vi).z * (cosa));\
  (vf).y = (vi).y;\
 }
 

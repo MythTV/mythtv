@@ -352,10 +352,10 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
     rr3 = ROUNDUP(pgmheight, kRInc);
     cc3 = ROUNDUP(pgmwidth, kCInc);
 
-    borderpixels = (rr1 / kRInc) * (cc3 / kCInc) +        /* top */
-        ((rr2 - rr1) / kRInc) * (cc1 / kCInc) +           /* left */
-        ((rr2 - rr1) / kRInc) * ((cc3 - cc2) / kCInc) +   /* right */
-        ((rr3 - rr2) / kRInc) * (cc3 / kCInc);            /* bottom */
+    borderpixels = ((rr1 / kRInc) * (cc3 / kCInc)) +        /* top */
+        (((rr2 - rr1) / kRInc) * (cc1 / kCInc)) +           /* left */
+        (((rr2 - rr1) / kRInc) * ((cc3 - cc2) / kCInc)) +   /* right */
+        (((rr3 - rr2) / kRInc) * (cc3 / kCInc));            /* bottom */
 
     pp = &m_buf[borderpixels];
     m_histVal.fill(0);

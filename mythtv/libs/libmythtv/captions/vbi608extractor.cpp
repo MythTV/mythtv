@@ -230,7 +230,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     // based on the rate and location of all maximas
     m_start = m_maximas[0];
     for (uint i = 1; i < uint(m_maximas.size()); i++)
-        m_start += m_maximas[i] - i * m_rate;
+        m_start += m_maximas[i] - (i * m_rate);
     m_start /= m_maximas.size();
     // then move it back by a third to make each sample
     // more or less in the center of each encoded byte.
@@ -271,7 +271,7 @@ bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
         if (FindClocks(y, ywidth))
         {
             uint maxv = 0;
-            for (uint j = 0; j < m_start + 8 * m_rate; j++)
+            for (uint j = 0; j < m_start + (8 * m_rate); j++)
                 maxv = std::max(uint((y+(i * static_cast<ptrdiff_t>(ypitch)))[j]), maxv);
             uint avgv = maxv / 2;
 
@@ -323,7 +323,7 @@ bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)
     if (FindClocks(buf, width))
     {
         uint maxv = 0;
-        for (uint j = 0; j < m_start + 8 * m_rate; j++)
+        for (uint j = 0; j < m_start + (8 * m_rate); j++)
             maxv = std::max(uint(buf[j]), maxv);
         uint avgv = maxv / 2;
 
@@ -353,7 +353,7 @@ bool VBI608Extractor::ExtractCC34(const unsigned char *buf, uint width)
     if (FindClocks(buf, width))
     {
         uint maxv = 0;
-        for (uint j = 0; j < m_start + 8 * m_rate; j++)
+        for (uint j = 0; j < m_start + (8 * m_rate); j++)
             maxv = std::max(uint(buf[j]), maxv);
         uint avgv = maxv / 2;
 

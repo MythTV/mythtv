@@ -432,12 +432,12 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	SIMI *S4 = &F->m_components[4 * F->m_nbSimi];
 
 	for (int i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
-		S->m_dCx = u0 * S1->m_dCx + u1 * S2->m_dCx + u2 * S3->m_dCx + u3 * S4->m_dCx;
-		S->m_dCy = u0 * S1->m_dCy + u1 * S2->m_dCy + u2 * S3->m_dCy + u3 * S4->m_dCy;
-		S->m_dR  = u0 * S1->m_dR  + u1 * S2->m_dR  + u2 * S3->m_dR  + u3 * S4->m_dR;
-		S->m_dR2 = u0 * S1->m_dR2 + u1 * S2->m_dR2 + u2 * S3->m_dR2 + u3 * S4->m_dR2;
-		S->m_dA  = u0 * S1->m_dA  + u1 * S2->m_dA  + u2 * S3->m_dA  + u3 * S4->m_dA;
-		S->m_dA2 = u0 * S1->m_dA2 + u1 * S2->m_dA2 + u2 * S3->m_dA2 + u3 * S4->m_dA2;
+		S->m_dCx = (u0 * S1->m_dCx) + (u1 * S2->m_dCx) + (u2 * S3->m_dCx) + (u3 * S4->m_dCx);
+		S->m_dCy = (u0 * S1->m_dCy) + (u1 * S2->m_dCy) + (u2 * S3->m_dCy) + (u3 * S4->m_dCy);
+		S->m_dR  = (u0 * S1->m_dR)  + (u1 * S2->m_dR)  + (u2 * S3->m_dR)  + (u3 * S4->m_dR);
+		S->m_dR2 = (u0 * S1->m_dR2) + (u1 * S2->m_dR2) + (u2 * S3->m_dR2) + (u3 * S4->m_dR2);
+		S->m_dA  = (u0 * S1->m_dA)  + (u1 * S2->m_dA)  + (u2 * S3->m_dA)  + (u3 * S4->m_dA);
+		S->m_dA2 = (u0 * S1->m_dA2) + (u1 * S2->m_dA2) + (u2 * S3->m_dA2) + (u3 * S4->m_dA2);
 	}
 
 	// MI_IS_DRAWN(mi) = True;
@@ -452,12 +452,12 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 		S4 = &F->m_components[4 * F->m_nbSimi];
 
 		for (int i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
-			S2->m_dCx = 2.0 * S4->m_dCx - S3->m_dCx;
-			S2->m_dCy = 2.0 * S4->m_dCy - S3->m_dCy;
-			S2->m_dR  = 2.0 * S4->m_dR  - S3->m_dR;
-			S2->m_dR2 = 2.0 * S4->m_dR2 - S3->m_dR2;
-			S2->m_dA  = 2.0 * S4->m_dA  - S3->m_dA;
-			S2->m_dA2 = 2.0 * S4->m_dA2 - S3->m_dA2;
+			S2->m_dCx = (2.0 * S4->m_dCx) - S3->m_dCx;
+			S2->m_dCy = (2.0 * S4->m_dCy) - S3->m_dCy;
+			S2->m_dR  = (2.0 * S4->m_dR)  - S3->m_dR;
+			S2->m_dR2 = (2.0 * S4->m_dR2) - S3->m_dR2;
+			S2->m_dA  = (2.0 * S4->m_dA)  - S3->m_dA;
+			S2->m_dA2 = (2.0 * S4->m_dA2) - S3->m_dA2;
 
 			*S1 = *S4;
 		}

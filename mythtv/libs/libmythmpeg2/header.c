@@ -328,7 +328,7 @@ static inline void finalize_sequence (mpeg2_sequence_t * sequence)
 	case 12: /* BT.601 525 lines 4:3 */
 	    sequence->pixel_width = 10;	sequence->pixel_height = 11;	return;
 	default:
-	    height = 88 * sequence->pixel_width + 1171;
+	    height = (88 * sequence->pixel_width) + 1171;
 	    width = 2000;
 	}
     }

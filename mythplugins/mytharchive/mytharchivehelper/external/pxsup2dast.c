@@ -806,7 +806,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 {
                     if (lastendpts < endpts)
                     {
-                        pts = lastendpts + 2 * (1000 / 30) * 90;/*??? */
+                        pts = lastendpts + (2 * (1000 / 30) * 90);/*??? */
                         tmppts = pts;
                         if (delay_ms)
                             tmppts += delay_ms * 90;

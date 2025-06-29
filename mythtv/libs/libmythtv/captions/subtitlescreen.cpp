@@ -1240,7 +1240,7 @@ void FormattedTextSubtitle608::Layout(void)
         prevY = firstY;
         for (int i = 0; i < m_lines.size(); i++)
         {
-            m_lines[i].m_yIndent = prevY + spaceBefore[i] * shrink;
+            m_lines[i].m_yIndent = prevY + (spaceBefore[i] * shrink);
             prevY = m_lines[i].m_yIndent + heights[i];
         }
     }
@@ -1302,7 +1302,7 @@ void FormattedTextSubtitle608::Init(const std::vector<CC608Text*> &buffers)
         if (xmid)
         {
             // center horizontally
-            x = xmid + (orig_x - xscale / 2) * fontwidth;
+            x = xmid + ((orig_x - xscale / 2) * fontwidth);
         }
         else
         {
