@@ -44,6 +44,25 @@ int pgm_set(const AVFrame *pict, int height)
     return score;
 }
 
+int pgm_match_inner_loop (const AVFrame *test, int rr, int cc, int radius, int height, int width)
+{
+    int r2min = std::max(0, rr - radius);
+    int r2max = std::min(height, rr + radius);
+
+    int c2min = std::max(0, cc - radius);
+    int c2max = std::min(width, cc + radius);
+
+    for (int r2 = r2min; r2 <= r2max; r2++)
+    {
+        for (int c2 = c2min; c2 <= c2max; c2++)
+        {
+            if (test->data[0][(r2 * width) + c2])
+                return 1;
+        }
+    }
+    return 0;
+}
+
 int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
               int radius, unsigned short *pscore)
 {
@@ -65,26 +84,7 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
         {
             if (!tmpl->data[0][(rr * width) + cc])
                 continue;
-
-            int r2min = std::max(0, rr - radius);
-            int r2max = std::min(height, rr + radius);
-
-            int c2min = std::max(0, cc - radius);
-            int c2max = std::min(width, cc + radius);
-
-            for (int r2 = r2min; r2 <= r2max; r2++)
-            {
-                for (int c2 = c2min; c2 <= c2max; c2++)
-                {
-                    if (test->data[0][(r2 * width) + c2])
-                    {
-                        score++;
-                        goto next_pixel;
-                    }
-                }
-            }
-next_pixel:
-            ;
+            score += pgm_match_inner_loop(test, rr, cc, radius, height, width);
         }
     }
 
@@ -98,6 +98,14 @@ bool readMatches(const QString& filename, unsigned short *matches, long long nfr
     FILE *fp = fopen(fname.constData(), "r");
     if (fp == nullptr)
         return false;
+    // Automatically close file at function exit
+    auto close_fp = [&](FILE *fp2) {
+        if (fclose(fp2) == 0)
+            return;
+        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
+            .arg(filename, strerror(errno)));
+    };
+    std::unique_ptr<FILE,decltype(close_fp)> cleanup { fp, close_fp };
 
     for (long long frameno = 0; frameno < nframes; frameno++)
     {
@@ -107,20 +115,10 @@ bool readMatches(const QString& filename, unsigned short *matches, long long nfr
             LOG(VB_COMMFLAG, LOG_ERR,
                 QString("Not enough data in %1: frame %2")
                     .arg(filename).arg(frameno));
-            goto error;
+            return false;
         }
     }
-
-    if (fclose(fp))
-        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename, strerror(errno)));
     return true;
-
-error:
-    if (fclose(fp))
-        LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename, strerror(errno)));
-    return false;
 }
 
 bool writeMatches(const QString& filename, unsigned short *matches, long long nframes)
@@ -369,7 +367,10 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     }
 
     if (m_pgmConverter->MythPlayerInited(m_player))
-        goto free_cropped;
+    {
+        av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
+        return ANALYZE_FATAL;
+    }
 
     m_matches = new unsigned short[nframes];
     memset(m_matches, 0, nframes * sizeof(*m_matches));
@@ -391,10 +392,6 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
         return ANALYZE_FINISHED;
 
     return ANALYZE_OK;
-
-free_cropped:
-    av_freep(reinterpret_cast<void*>(&m_cropped.data[0]));
-    return ANALYZE_FATAL;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -444,33 +441,37 @@ TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
 
     *pNextFrame = kNextFrame;
 
-    const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
-    if (pgm == nullptr)
-        goto error;
+    try
+    {
+        const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
+        if (pgm == nullptr)
+            throw 1;
 
-    start = nowAsDuration<std::chrono::microseconds>();
+        start = nowAsDuration<std::chrono::microseconds>();
 
-    if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplRow, m_tmplCol,
-                m_tmplWidth, m_tmplHeight))
-        goto error;
+        if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplRow, m_tmplCol,
+                    m_tmplWidth, m_tmplHeight))
+            throw 2;
 
-    edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplHeight, FRAMESGMPCTILE);
-    if (edges == nullptr)
-        goto error;
+        edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplHeight, FRAMESGMPCTILE);
+        if (edges == nullptr)
+            throw 3;
 
-    if (pgm_match(m_tmpl, edges, m_tmplHeight, JITTER_RADIUS, &m_matches[frameno]))
-        goto error;
+        if (pgm_match(m_tmpl, edges, m_tmplHeight, JITTER_RADIUS, &m_matches[frameno]))
+            throw 4;
 
-    end = nowAsDuration<std::chrono::microseconds>();
-    m_analyzeTime += (end - start);
+        end = nowAsDuration<std::chrono::microseconds>();
+        m_analyzeTime += (end - start);
 
-    return ANALYZE_OK;
-
-error:
-    LOG(VB_COMMFLAG, LOG_ERR,
-        QString("TemplateMatcher::analyzeFrame error at frame %1 of %2")
-            .arg(frameno));
-    return ANALYZE_ERROR;
+        return ANALYZE_OK;
+    }
+    catch (int e)
+    {
+        LOG(VB_COMMFLAG, LOG_ERR,
+            QString("TemplateMatcher::analyzeFrame error at frame %1, step %2")
+            .arg(frameno).arg(e));
+        return ANALYZE_ERROR;
+    }
 }
 
 int
@@ -517,7 +518,7 @@ TemplateMatcher::finished(long long nframes, bool final)
     if (m_debugLevel >= 2)
     {
         if (final && finishedDebug(nframes, m_matches, m_match))
-            goto error;
+            return -1;
     }
 
     /*
@@ -567,9 +568,6 @@ TemplateMatcher::finished(long long nframes, bool final)
     frameAnalyzerReportMap(&m_breakMap, m_fps, "TM Break");
 
     return 0;
-
-error:
-    return -1;
 }
 
 int

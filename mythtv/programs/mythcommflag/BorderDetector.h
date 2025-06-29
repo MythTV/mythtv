@@ -32,6 +32,7 @@ public:
     int reportTime(void);
 
 private:
+    void getDimensionsReal(const AVFrame *pgm, int pgmheight, long long frameno);
     TemplateFinder         *m_logoFinder      {nullptr};
     const struct AVFrame   *m_logo            {nullptr};
     int                     m_logoRow         {-1};

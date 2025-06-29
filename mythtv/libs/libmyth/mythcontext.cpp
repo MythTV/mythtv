@@ -112,6 +112,7 @@ class MythContext::Impl : public QObject
                       bool disableAutoDiscovery,
                       bool ignoreDB);
     bool FindDatabase(bool prompt, bool noAutodetect);
+    bool FindDatabaseChoose(bool loaded, bool manualSelect, bool autoSelect);
 
     void TempMainWindow();
     void EndTempWindow();
@@ -423,33 +424,13 @@ bool MythContext::Impl::Init(const bool gui,
 }
 
 /**
- * Get database connection settings and test connectivity.
+ * Helper function for getting database connection settings and test connectivity.
  *
- * Can use UPnP AutoDiscovery to locate backends, and get their DB settings.
- * The user can force the AutoDiscovery chooser with the --prompt argument,
- * and disable it by using the --disable-autodiscovery argument.
- * There is also an autoconfigure function, which counts the backends,
- * and if there is exactly one, uses it as above.
- *
- * Despite its name, the disable argument currently only disables the chooser.
- * If set, autoconfigure will still be attempted in some situations.
+ * Return true if a database connection was found, false otherwise
  */
-bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
+bool MythContext::Impl::FindDatabaseChoose(bool loaded, bool manualSelect, bool autoSelect)
 {
-    // We can only prompt if autodiscovery is enabled..
-    bool manualSelect = prompt && !noAutodetect;
-
     QString failure;
-
-    // 1. Either load XmlConfiguration::k_default_filename or use sensible "localhost" defaults:
-    bool loaded = LoadDatabaseSettings();
-    const DatabaseParams dbParamsFromFile = GetMythDB()->GetDatabaseParams();
-    setLocalHostName(dbParamsFromFile.m_localHostName);
-
-    // In addition to the UI chooser, we can also try to autoSelect later,
-    // but only if we're not doing manualSelect and there was no
-    // valid XmlConfiguration::k_default_filename
-    bool autoSelect = !manualSelect && !loaded && !noAutodetect;
 
     // 2. If the user isn't forcing up the chooser UI, look for a default
     //    backend in XmlConfiguration::k_default_filename, then test DB settings we've got so far:
@@ -466,7 +447,7 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
 
         failure = TestDBconnection(loaded);
         if (failure.isEmpty())
-            goto DBfound;
+            return true;
         if (m_guiStartup && m_guiStartup->m_Exit)
             return false;
         if (m_guiStartup && m_guiStartup->m_Search)
@@ -485,7 +466,7 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
         {
             failure = TestDBconnection();
             if (failure.isEmpty())
-                goto DBfound;
+                return true;
             if (m_guiStartup && m_guiStartup->m_Exit)
                 return false;
         }
@@ -544,7 +525,39 @@ bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
     }
     while (!failure.isEmpty());
 
-DBfound:
+    return true;
+}
+
+/**
+ * Get database connection settings and test connectivity.
+ *
+ * Can use UPnP AutoDiscovery to locate backends, and get their DB settings.
+ * The user can force the AutoDiscovery chooser with the --prompt argument,
+ * and disable it by using the --disable-autodiscovery argument.
+ * There is also an autoconfigure function, which counts the backends,
+ * and if there is exactly one, uses it as above.
+ *
+ * Despite its name, the disable argument currently only disables the chooser.
+ * If set, autoconfigure will still be attempted in some situations.
+ */
+bool MythContext::Impl::FindDatabase(bool prompt, bool noAutodetect)
+{
+    // We can only prompt if autodiscovery is enabled..
+    bool manualSelect = prompt && !noAutodetect;
+
+    // 1. Either load XmlConfiguration::k_default_filename or use sensible "localhost" defaults:
+    bool loaded = LoadDatabaseSettings();
+    const DatabaseParams dbParamsFromFile = GetMythDB()->GetDatabaseParams();
+    setLocalHostName(dbParamsFromFile.m_localHostName);
+
+    // In addition to the UI chooser, we can also try to autoSelect later,
+    // but only if we're not doing manualSelect and there was no
+    // valid XmlConfiguration::k_default_filename
+    bool autoSelect = !manualSelect && !loaded && !noAutodetect;
+
+    if (!FindDatabaseChoose(loaded, manualSelect, autoSelect))
+        return false;
+
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
     // If we got the database from UPNP then the wakeup settings are lost.
     // Restore them.

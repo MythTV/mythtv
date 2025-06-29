@@ -63,3 +63,12 @@ unittest.depends = libmyth-test libmythbase-test libmythui-test libmythtv-test l
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest
+
+using_mheg {
+    # unit tests libmythfreemheg
+    libmythfreemheg-test.depends = sub-libmythfreemheg
+    libmythfreemheg-test.target = buildtestmythfreemheg
+    libmythfreemheg-test.commands = cd libmythfreemheg/test && $(QMAKE) && $(MAKE)
+    unix:QMAKE_EXTRA_TARGETS += libmythfreemheg-test
+    unittest.depends += libmythfreemheg-test
+}

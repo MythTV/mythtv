@@ -854,99 +854,101 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 
 }
 
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define DONE_WITH_PSIP_PACKET() { delete psip; \
-    if (morePSIPTables) goto HAS_ANOTHER_PSIP; else return; }
-
 /** \fn MPEGStreamData::HandleTSTables(const TSPacket*)
  *  \brief Assembles PSIP packets and processes them.
  */
 void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 {
-    bool morePSIPTables = false;
-  HAS_ANOTHER_PSIP:
-    // Assemble PSIP
-    PSIPTable *psip = AssemblePSIP(tspacket, morePSIPTables);
-    if (!psip)
-       return;
-
-    // drop stuffing packets
-    if ((TableID::ST       == psip->TableID()) ||
-        (TableID::STUFFING == psip->TableID()))
+    PSIPTable *psip = nullptr;
+    bool morePSIPTables = true;
+    while (morePSIPTables)
     {
-        LOG(VB_RECORD, LOG_DEBUG, LOC + "Dropping Stuffing table");
-        DONE_WITH_PSIP_PACKET();
-    }
+        // Delete PSIP from previous iteration.
+        delete psip;
 
-    // Don't do validation on tables without CRC
-    if (!psip->HasCRC())
-    {
+        // Assemble PSIP
+        psip = AssemblePSIP(tspacket, morePSIPTables);
+        if (!psip)
+           return;
+
+        // drop stuffing packets
+        if ((TableID::ST       == psip->TableID()) ||
+            (TableID::STUFFING == psip->TableID()))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC + "Dropping Stuffing table");
+            continue;
+        }
+
+        // Don't do validation on tables without CRC
+        if (!psip->HasCRC())
+        {
+            HandleTables(tspacket->PID(), *psip);
+            continue;
+        }
+
+        // Validate PSIP
+        // but don't validate PMT/PAT if our driver has the PMT/PAT CRC bug.
+        bool buggy = m_haveCrcBug &&
+            ((TableID::PMT == psip->TableID()) ||
+             (TableID::PAT == psip->TableID()));
+        if (!buggy && !psip->IsGood())
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("PSIP packet failed CRC check. pid(0x%1) type(0x%2)")
+                    .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
+            continue;
+        }
+
+        if (TableID::MGT <= psip->TableID() && psip->TableID() <= TableID::STT &&
+            !psip->IsCurrent())
+        { // we don't cache the next table, for now
+            LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Table not current 0x%1")
+                .arg(psip->TableID(),2,16,QChar('0')));
+            continue;
+        }
+
+        if (tspacket->Scrambled())
+        { // scrambled! ATSC, DVB require tables not to be scrambled
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                "PSIP packet is scrambled, not ATSC/DVB compliant");
+            continue;
+        }
+
+        if (!psip->VerifyPSIP(!m_haveCrcBug))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC + QString("PSIP table 0x%1 is invalid")
+                .arg(psip->TableID(),2,16,QChar('0')));
+            continue;
+        }
+
+        // Don't decode redundant packets,
+        // but if it is a desired PAT or PMT emit a "heartbeat" signal.
+        if (MPEGStreamData::IsRedundant(tspacket->PID(), *psip))
+        {
+            if (TableID::PAT == psip->TableID())
+            {
+                QMutexLocker locker(&m_listenerLock);
+                ProgramAssociationTable *pat_sp = PATSingleProgram();
+                for (auto & listener : m_mpegSpListeners)
+                    listener->HandleSingleProgramPAT(pat_sp, false);
+            }
+            if (TableID::PMT == psip->TableID() &&
+                tspacket->PID() == m_pidPmtSingleProgram)
+            {
+                QMutexLocker locker(&m_listenerLock);
+                ProgramMapTable *pmt_sp = PMTSingleProgram();
+                for (auto & listener : m_mpegSpListeners)
+                    listener->HandleSingleProgramPMT(pmt_sp, false);
+            }
+            continue; // already parsed this table, toss it.
+        }
+
         HandleTables(tspacket->PID(), *psip);
-        DONE_WITH_PSIP_PACKET();
     }
 
-    // Validate PSIP
-    // but don't validate PMT/PAT if our driver has the PMT/PAT CRC bug.
-    bool buggy = m_haveCrcBug &&
-        ((TableID::PMT == psip->TableID()) ||
-         (TableID::PAT == psip->TableID()));
-    if (!buggy && !psip->IsGood())
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("PSIP packet failed CRC check. pid(0x%1) type(0x%2)")
-                .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
-        DONE_WITH_PSIP_PACKET();
-    }
-
-    if (TableID::MGT <= psip->TableID() && psip->TableID() <= TableID::STT &&
-        !psip->IsCurrent())
-    { // we don't cache the next table, for now
-        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Table not current 0x%1")
-            .arg(psip->TableID(),2,16,QChar('0')));
-        DONE_WITH_PSIP_PACKET();
-    }
-
-    if (tspacket->Scrambled())
-    { // scrambled! ATSC, DVB require tables not to be scrambled
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            "PSIP packet is scrambled, not ATSC/DVB compliant");
-        DONE_WITH_PSIP_PACKET();
-    }
-
-    if (!psip->VerifyPSIP(!m_haveCrcBug))
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC + QString("PSIP table 0x%1 is invalid")
-            .arg(psip->TableID(),2,16,QChar('0')));
-        DONE_WITH_PSIP_PACKET();
-    }
-
-    // Don't decode redundant packets,
-    // but if it is a desired PAT or PMT emit a "heartbeat" signal.
-    if (MPEGStreamData::IsRedundant(tspacket->PID(), *psip))
-    {
-        if (TableID::PAT == psip->TableID())
-        {
-            QMutexLocker locker(&m_listenerLock);
-            ProgramAssociationTable *pat_sp = PATSingleProgram();
-            for (auto & listener : m_mpegSpListeners)
-                listener->HandleSingleProgramPAT(pat_sp, false);
-        }
-        if (TableID::PMT == psip->TableID() &&
-            tspacket->PID() == m_pidPmtSingleProgram)
-        {
-            QMutexLocker locker(&m_listenerLock);
-            ProgramMapTable *pmt_sp = PMTSingleProgram();
-            for (auto & listener : m_mpegSpListeners)
-                listener->HandleSingleProgramPMT(pmt_sp, false);
-        }
-        DONE_WITH_PSIP_PACKET(); // already parsed this table, toss it.
-    }
-
-    HandleTables(tspacket->PID(), *psip);
-
-    DONE_WITH_PSIP_PACKET();
+    // Delete PSIP from final iteration.
+    delete psip;
 }
-#undef DONE_WITH_PSIP_PACKET
 
 int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
 {

@@ -1,3 +1,17 @@
+#
+# Copyright (C) 2022-2023 David Hampton
+#
+# See the file LICENSE_FSF for licensing information.
+#
+
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
+
+#
+# Define the library
+#
+
 add_library(
   mythfreemheg
   Actions.cpp

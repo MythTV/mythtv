@@ -82,6 +82,17 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     const int   padded_width = newwidth + (2 * m_maskRadius);
     const int   padded_height = newheight + (2 * m_maskRadius);
 
+    // Automatically clean up allocations at function exit
+    auto cleanup_fn = [&](CannyEdgeDetector * /*x*/) {
+        if (m_convolved.data[0])
+            av_freep(reinterpret_cast<void*>(&m_convolved.data[0]));
+        if (m_s2.data[0])
+            av_freep(reinterpret_cast<void*>(&m_s2.data[0]));
+        if (m_s1.data[0])
+            av_freep(reinterpret_cast<void*>(&m_s1.data[0]));
+    };
+    std::unique_ptr<CannyEdgeDetector, decltype(cleanup_fn)> cleanup { this, cleanup_fn };
+
     if (av_image_alloc(m_s1.data, m_s1.linesize,
         padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN) < 0)
     {
@@ -95,7 +106,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "av_image_alloc s2 failed");
-        goto free_s1;
+        return -1;
     }
 
     if (av_image_alloc(m_convolved.data, m_convolved.linesize,
@@ -103,7 +114,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "av_image_alloc convolved failed");
-        goto free_s2;
+        return -1;
     }
 
     if (av_image_alloc(m_edges.data, m_edges.linesize,
@@ -111,7 +122,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
                                   "av_image_alloc edges failed");
-        goto free_convolved;
+        return -1;
     }
 
     m_sgm = new unsigned int[1_UZ * padded_width * padded_height];
@@ -120,15 +131,8 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     m_ewidth = newwidth;
     m_eheight = newheight;
 
+    (void)cleanup.release(); // Don't release allocated memory.
     return 0;
-
-free_convolved:
-    av_freep(reinterpret_cast<void*>(&m_convolved.data[0]));
-free_s2:
-    av_freep(reinterpret_cast<void*>(&m_s2.data[0]));
-free_s1:
-    av_freep(reinterpret_cast<void*>(&m_s1.data[0]));
-    return -1;
 }
 
 int

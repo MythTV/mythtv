@@ -54,9 +54,9 @@ BorderDetector::setLogoState(TemplateFinder *finder)
         .arg(m_logoWidth).arg(m_logoHeight).arg(m_logoCol).arg(m_logoRow));
 }
 
-int
-BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
-        long long _frameno, int *prow, int *pcol, int *pwidth, int *pheight)
+void
+BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
+        long long _frameno)
 {
     /*
      * The basic algorithm is to look for pixels of the same color along all
@@ -132,212 +132,215 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     int newheight = maxrow1 + 1 - minrow;
     bool top    = false;
     bool bottom = false;
+    bool monochromatic = false;
 
-    auto start = nowAsDuration<std::chrono::microseconds>();
-
-    if (_frameno != kUncached && _frameno == m_frameNo)
-        goto done;
-
-    for (;;)
+    try
     {
-        /* Find left edge. */
-        bool left = false;
-        uchar minval = UCHAR_MAX;
-        uchar maxval = 0;
-        int lines = 0;
-        int saved = mincol;
-        for (int cc = mincol; cc < maxcol1; cc++)
+        for (;;)
         {
-            int outliers = 0;
-            bool inrange = true;
-            for (int rr = minrow; rr < maxrow1; rr++)
+            /* Find left edge. */
+            bool left = false;
+            uchar minval = UCHAR_MAX;
+            uchar maxval = 0;
+            int lines = 0;
+            int saved = mincol;
+            bool found = false;
+            for (int cc = mincol; !found && cc < maxcol1; cc++)
             {
-                if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
-                            m_logoWidth, m_logoHeight))
-                    continue;   /* Exclude logo area from analysis. */
-
-                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
-                int range = std::max(maxval, val) - std::min(minval, val) + 1;
-                if (range > kMaxRange)
+                int outliers = 0;
+                bool inrange = true;
+                for (int rr = minrow; rr < maxrow1; rr++)
                 {
-                    if (outliers++ < MAXOUTLIERS)
-                        continue;   /* Next row. */
-                    inrange = false;
-                    if (lines++ < kMaxLines)
+                    if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
+                                m_logoWidth, m_logoHeight))
+                        continue;   /* Exclude logo area from analysis. */
+
+                    uchar val = pgm->data[0][(rr * pgmwidth) + cc];
+                    int range = std::max(maxval, val) - std::min(minval, val) + 1;
+                    if (range > kMaxRange)
+                    {
+                        if (outliers++ < MAXOUTLIERS)
+                            continue;   /* Next row. */
+                        inrange = false;
+                        if (lines++ >= kMaxLines)
+                            found = true;
                         break;  /* Next column. */
-                    goto found_left;
+                    }
+                    minval = std::min(val, minval);
+                    maxval = std::max(val, maxval);
                 }
-                minval = std::min(val, minval);
-                maxval = std::max(val, maxval);
-            }
-            if (inrange)
-            {
-                saved = cc;
-                lines = 0;
-            }
-        }
-found_left:
-        if (newcol != saved + 1 + HORIZSLOP)
-        {
-            newcol = std::min(maxcol1, saved + 1 + HORIZSLOP);
-            newwidth = std::max(0, maxcol1 - newcol);
-            left = true;
-        }
-
-        if (!newwidth)
-            goto monochromatic_frame;
-
-        mincol = newcol;
-
-        /*
-         * Find right edge. Keep same minval/maxval (pillarboxing colors) as
-         * left edge.
-         */
-        bool right = false;
-        lines = 0;
-        saved = maxcol1 - 1;
-        for (int cc = maxcol1 - 1; cc >= mincol; cc--)
-        {
-            int outliers = 0;
-            bool inrange = true;
-            for (int rr = minrow; rr < maxrow1; rr++)
-            {
-                if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
-                            m_logoWidth, m_logoHeight))
-                    continue;   /* Exclude logo area from analysis. */
-
-                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
-                int range = std::max(maxval, val) - std::min(minval, val) + 1;
-                if (range > kMaxRange)
+                if (inrange)
                 {
-                    if (outliers++ < MAXOUTLIERS)
-                        continue;   /* Next row. */
-                    inrange = false;
-                    if (lines++ < kMaxLines)
+                    saved = cc;
+                    lines = 0;
+                }
+            }
+            if (newcol != saved + 1 + HORIZSLOP)
+            {
+                newcol = std::min(maxcol1, saved + 1 + HORIZSLOP);
+                newwidth = std::max(0, maxcol1 - newcol);
+                left = true;
+            }
+
+            if (!newwidth)
+                throw "monochromatic";
+
+            mincol = newcol;
+
+            /*
+             * Find right edge. Keep same minval/maxval (pillarboxing colors) as
+             * left edge.
+             */
+            bool right = false;
+            lines = 0;
+            saved = maxcol1 - 1;
+            found = false;
+            for (int cc = maxcol1 - 1; !found && cc >= mincol; cc--)
+            {
+                int outliers = 0;
+                bool inrange = true;
+                for (int rr = minrow; rr < maxrow1; rr++)
+                {
+                    if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
+                                m_logoWidth, m_logoHeight))
+                        continue;   /* Exclude logo area from analysis. */
+
+                    uchar val = pgm->data[0][(rr * pgmwidth) + cc];
+                    int range = std::max(maxval, val) - std::min(minval, val) + 1;
+                    if (range > kMaxRange)
+                    {
+                        if (outliers++ < MAXOUTLIERS)
+                            continue;   /* Next row. */
+                        inrange = false;
+                        if (lines++ >= kMaxLines)
+                            found = true;
                         break;  /* Next column. */
-                    goto found_right;
+                    }
+                    minval = std::min(val, minval);
+                    maxval = std::max(val, maxval);
                 }
-                minval = std::min(val, minval);
-                maxval = std::max(val, maxval);
-            }
-            if (inrange)
-            {
-                saved = cc;
-                lines = 0;
-            }
-        }
-found_right:
-        if (newwidth != saved - mincol - HORIZSLOP)
-        {
-            newwidth = std::max(0, saved - mincol - HORIZSLOP);
-            right = true;
-        }
-
-        if (!newwidth)
-            goto monochromatic_frame;
-
-        if (top || bottom)
-            break;  /* Do not repeat letterboxing check. */
-
-        maxcol1 = mincol + newwidth;
-
-        /* Find top edge. */
-        top = false;
-        minval = UCHAR_MAX;
-        maxval = 0;
-        lines = 0;
-        saved = minrow;
-        for (int rr = minrow; rr < maxrow1; rr++)
-        {
-            int outliers = 0;
-            bool inrange = true;
-            for (int cc = mincol; cc < maxcol1; cc++)
-            {
-                if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
-                            m_logoWidth, m_logoHeight))
-                    continue;   /* Exclude logo area from analysis. */
-
-                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
-                int range = std::max(maxval, val) - std::min(minval, val) + 1;
-                if (range > kMaxRange)
+                if (inrange)
                 {
-                    if (outliers++ < MAXOUTLIERS)
-                        continue;   /* Next column. */
-                    inrange = false;
-                    if (lines++ < kMaxLines)
-                        break;  /* Next row. */
-                    goto found_top;
+                    saved = cc;
+                    lines = 0;
                 }
-                minval = std::min(val, minval);
-                maxval = std::max(val, maxval);
             }
-            if (inrange)
+            if (newwidth != saved - mincol - HORIZSLOP)
             {
-                saved = rr;
-                lines = 0;
+                newwidth = std::max(0, saved - mincol - HORIZSLOP);
+                right = true;
             }
-        }
-found_top:
-        if (newrow != saved + 1 + VERTSLOP)
-        {
-            newrow = std::min(maxrow1, saved + 1 + VERTSLOP);
-            newheight = std::max(0, maxrow1 - newrow);
-            top = true;
-        }
 
-        if (!newheight)
-            goto monochromatic_frame;
+            if (!newwidth)
+                throw "monochromatic";
 
-        minrow = newrow;
+            if (top || bottom)
+                break;  /* Do not repeat letterboxing check. */
 
-        /* Find bottom edge. Keep same minval/maxval as top edge. */
-        bottom = false;
-        lines = 0;
-        saved = maxrow1 - 1;
-        for (int rr = maxrow1 - 1; rr >= minrow; rr--)
-        {
-            int outliers = 0;
-            bool inrange = true;
-            for (int cc = mincol; cc < maxcol1; cc++)
+            maxcol1 = mincol + newwidth;
+
+            /* Find top edge. */
+            top = false;
+            minval = UCHAR_MAX;
+            maxval = 0;
+            lines = 0;
+            saved = minrow;
+            found = false;
+            for (int rr = minrow; !found && rr < maxrow1; rr++)
             {
-                if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
-                            m_logoWidth, m_logoHeight))
-                    continue;   /* Exclude logo area from analysis. */
-
-                uchar val = pgm->data[0][(rr * pgmwidth) + cc];
-                int range = std::max(maxval, val) - std::min(minval, val) + 1;
-                if (range > kMaxRange)
+                int outliers = 0;
+                bool inrange = true;
+                for (int cc = mincol; cc < maxcol1; cc++)
                 {
-                    if (outliers++ < MAXOUTLIERS)
-                        continue;   /* Next column. */
-                    inrange = false;
-                    if (lines++ < kMaxLines)
+                    if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
+                                m_logoWidth, m_logoHeight))
+                        continue;   /* Exclude logo area from analysis. */
+
+                    uchar val = pgm->data[0][(rr * pgmwidth) + cc];
+                    int range = std::max(maxval, val) - std::min(minval, val) + 1;
+                    if (range > kMaxRange)
+                    {
+                        if (outliers++ < MAXOUTLIERS)
+                            continue;   /* Next column. */
+                        inrange = false;
+                        if (lines++ >= kMaxLines)
+                            found = true;
                         break;  /* Next row. */
-                    goto found_bottom;
+                    }
+                    minval = std::min(val, minval);
+                    maxval = std::max(val, maxval);
                 }
-                minval = std::min(val, minval);
-                maxval = std::max(val, maxval);
+                if (inrange)
+                {
+                    saved = rr;
+                    lines = 0;
+                }
             }
-            if (inrange)
+            if (newrow != saved + 1 + VERTSLOP)
             {
-                saved = rr;
-                lines = 0;
+                newrow = std::min(maxrow1, saved + 1 + VERTSLOP);
+                newheight = std::max(0, maxrow1 - newrow);
+                top = true;
             }
+
+            if (!newheight)
+                throw "monochromatic";
+
+            minrow = newrow;
+
+            /* Find bottom edge. Keep same minval/maxval as top edge. */
+            bottom = false;
+            lines = 0;
+            saved = maxrow1 - 1;
+            found = true;
+            for (int rr = maxrow1 - 1; !found && rr >= minrow; rr--)
+            {
+                int outliers = 0;
+                bool inrange = true;
+                for (int cc = mincol; cc < maxcol1; cc++)
+                {
+                    if (m_logo && rrccinrect(rr, cc, m_logoRow, m_logoCol,
+                                m_logoWidth, m_logoHeight))
+                        continue;   /* Exclude logo area from analysis. */
+
+                    uchar val = pgm->data[0][(rr * pgmwidth) + cc];
+                    int range = std::max(maxval, val) - std::min(minval, val) + 1;
+                    if (range > kMaxRange)
+                    {
+                        if (outliers++ < MAXOUTLIERS)
+                            continue;   /* Next column. */
+                        inrange = false;
+                        if (lines++ >= kMaxLines)
+                            found = true;
+                        break;  /* Next row. */
+                    }
+                    minval = std::min(val, minval);
+                    maxval = std::max(val, maxval);
+                }
+                if (inrange)
+                {
+                    saved = rr;
+                    lines = 0;
+                }
+            }
+            if (newheight != saved - minrow - VERTSLOP)
+            {
+                newheight = std::max(0, saved - minrow - VERTSLOP);
+                bottom = true;
+            }
+
+            if (!newheight)
+                throw "monochromatic";
+
+            if (left || right)
+                break;  /* Do not repeat pillarboxing check. */
+
+            maxrow1 = minrow + newheight;
         }
-found_bottom:
-        if (newheight != saved - minrow - VERTSLOP)
-        {
-            newheight = std::max(0, saved - minrow - VERTSLOP);
-            bottom = true;
-        }
-
-        if (!newheight)
-            goto monochromatic_frame;
-
-        if (left || right)
-            break;  /* Do not repeat pillarboxing check. */
-
-        maxrow1 = minrow + newheight;
+    }
+    catch (char const* e)
+    {
+        monochromatic = true;
     }
 
     m_frameNo = _frameno;
@@ -345,18 +348,18 @@ found_bottom:
     m_col = newcol;
     m_width = newwidth;
     m_height = newheight;
-    m_isMonochromatic = false;
-    goto done;
+    m_isMonochromatic = monochromatic;
+}
 
-monochromatic_frame:
-    m_frameNo = _frameno;
-    m_row = newrow;
-    m_col = newcol;
-    m_width = newwidth;
-    m_height = newheight;
-    m_isMonochromatic = true;
+int
+BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
+        long long _frameno, int *prow, int *pcol, int *pwidth, int *pheight)
+{
+    auto start = nowAsDuration<std::chrono::microseconds>();
 
-done:
+    if (_frameno == kUncached || _frameno != m_frameNo)
+        getDimensionsReal(pgm, pgmheight, _frameno);
+
     *prow = m_row;
     *pcol = m_col;
     *pwidth = m_width;
