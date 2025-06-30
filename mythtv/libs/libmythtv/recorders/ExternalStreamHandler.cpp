@@ -1695,78 +1695,78 @@ bool ExternalStreamHandler::CheckForError(void)
     response = m_io->GetStatus(0ms);
     while (!response.isEmpty())
     {
-            if (m_apiVersion > 2)
+        if (m_apiVersion > 2)
+        {
+            QJsonParseError parseError {};
+            QJsonDocument doc;
+            QVariantMap   elements;
+
+            doc = QJsonDocument::fromJson(response, &parseError);
+
+            if (parseError.error != QJsonParseError::NoError)
             {
-                QJsonParseError parseError {};
-                QJsonDocument doc;
-                QVariantMap   elements;
-
-                doc = QJsonDocument::fromJson(response, &parseError);
-
-                if (parseError.error != QJsonParseError::NoError)
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("ExternalRecorder returned invalid JSON message: %1: %2\n%3\n")
+                    .arg(parseError.offset)
+                    .arg(parseError.errorString(), QString(response)));
+            }
+            else
+            {
+                elements = doc.toVariant().toMap();
+                if (elements.contains("command") &&
+                    elements["command"] == "STATUS")
                 {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("ExternalRecorder returned invalid JSON message: %1: %2\n%3\n")
-                        .arg(parseError.offset)
-                        .arg(parseError.errorString(), QString(response)));
-                }
-                else
-                {
-                    elements = doc.toVariant().toMap();
-                    if (elements.contains("command") &&
-                        elements["command"] == "STATUS")
+                    LogLevel_t level { LOG_INFO };
+                    QString status = elements["status"].toString();
+                    if (status.startsWith("err", Qt::CaseInsensitive))
                     {
-                        LogLevel_t level { LOG_INFO };
-                        QString status = elements["status"].toString();
-                        if (status.startsWith("err", Qt::CaseInsensitive))
-                        {
-                            level = LOG_ERR;
-                            err |= true;
-                        }
-                        else if (status.startsWith("warn",
-                                                   Qt::CaseInsensitive))
-                        {
-                            level = LOG_WARNING;
-                        }
-                        else if (status.startsWith("damage",
-                                                   Qt::CaseInsensitive))
-                        {
-                            level = LOG_WARNING;
-                            m_damaged |= true;
-                        }
-                        LOG(VB_RECORD, level,
-                            LOC + elements["message"].toString());
+                        level = LOG_ERR;
+                        err |= true;
                     }
+                    else if (status.startsWith("warn",
+                                               Qt::CaseInsensitive))
+                    {
+                        level = LOG_WARNING;
+                    }
+                    else if (status.startsWith("damage",
+                                               Qt::CaseInsensitive))
+                    {
+                        level = LOG_WARNING;
+                        m_damaged |= true;
+                    }
+                    LOG(VB_RECORD, level,
+                        LOC + elements["message"].toString());
+                }
+            }
+        }
+        else
+        {
+            QString res = QString(response);
+            if (m_apiVersion == 2)
+            {
+                QStringList tokens = res.split(':', Qt::SkipEmptyParts);
+                tokens.removeFirst();
+                res = tokens.join(':');
+                for (int idx = 1; idx < tokens.size(); ++idx)
+                {
+                    err |= tokens[idx].startsWith("ERR",
+                                                  Qt::CaseInsensitive);
+                    m_damaged |= tokens[idx].startsWith("damage",
+                                                       Qt::CaseInsensitive);
                 }
             }
             else
             {
-                QString res = QString(response);
-                if (m_apiVersion == 2)
-                {
-                    QStringList tokens = res.split(':', Qt::SkipEmptyParts);
-                    tokens.removeFirst();
-                    res = tokens.join(':');
-                    for (int idx = 1; idx < tokens.size(); ++idx)
-                    {
-                        err |= tokens[idx].startsWith("ERR",
-                                                      Qt::CaseInsensitive);
-                        m_damaged |= tokens[idx].startsWith("damage",
-                                                           Qt::CaseInsensitive);
-                    }
-                }
-                else
-                {
-                    err |= res.startsWith("STATUS:ERR",
-                                          Qt::CaseInsensitive);
-                    m_damaged |= res.startsWith("STATUS:DAMAGE",
-                                               Qt::CaseInsensitive);
-                }
-
-                LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + res);
+                err |= res.startsWith("STATUS:ERR",
+                                      Qt::CaseInsensitive);
+                m_damaged |= res.startsWith("STATUS:DAMAGE",
+                                           Qt::CaseInsensitive);
             }
 
-            response = m_io->GetStatus(0ms);
+            LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + res);
+        }
+
+        response = m_io->GetStatus(0ms);
     }
 
     return err;
