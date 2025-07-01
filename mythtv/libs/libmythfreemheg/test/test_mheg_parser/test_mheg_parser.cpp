@@ -5932,6 +5932,7 @@ R"({:Application  ( '/a' 0 )
 // Before all test cases
 void TestMhegParser::initTestCase()
 {
+    MHSetLogging(stdout, MHLogError | MHLogWarning );
 }
 
 // After all test cases
@@ -5951,6 +5952,11 @@ void TestMhegParser::cleanup()
 
 void TestMhegParser::test_parser_asn1(void)
 {
+#ifndef __x86_64__
+    QSKIP("This test requires a lot of memory.");
+    return;
+#endif
+
     auto data = QByteArray::fromRawData((char*)data_asn1.data(), data_asn1.size());
     std::unique_ptr<MHParseBase> parser;
     parser = std::make_unique<MHParseBinary>(data);
@@ -5963,6 +5969,11 @@ void TestMhegParser::test_parser_asn1(void)
 
 void TestMhegParser::test_parser_text(void)
 {
+#ifndef __x86_64__
+    QSKIP("This test requires a lot of memory.");
+    return;
+#endif
+
     std::unique_ptr<MHParseBase> parser;
     parser = std::make_unique<MHParseText>(data_text);
     QVERIFY(parser != nullptr);
