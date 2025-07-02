@@ -67,7 +67,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
 
     m_bConnected = false;
     int count = 0;
-    do
+    while (count < 2 && !m_bConnected)
     {
         ++count;
 
@@ -94,8 +94,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         }
 
         usleep(999999);
-
-    } while (count < 2 && !m_bConnected);
+    }
 
     if (!m_bConnected)
     {

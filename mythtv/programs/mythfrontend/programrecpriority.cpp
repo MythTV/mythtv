@@ -1076,54 +1076,52 @@ void ProgramRecPriority::FillList(void)
     {
         MythDB::DBError("Get program recording priorities query", result);
     }
-    else if (result.next())
-    {
-        countMatches();
-        do {
-            uint recordid = result.value(0).toUInt();
-//          QString title = result.value(1).toString();
-//          QString chanid = result.value(2).toString();
-//          QString tempTime = result.value(3).toString();
-//          QString tempDate = result.value(4).toString();
-            RecordingType recType = (RecordingType)result.value(5).toInt();
-            int inactive = result.value(6).toInt();
-            QDateTime lastrec = MythDate::as_utc(result.value(7).toDateTime());
-            int avgd = result.value(8).toInt();
-            QString profile = result.value(9).toString();
-            QString recordingGroup = result.value(10).toString();
-            QString storageGroup = result.value(11).toString();
 
-            // find matching program in m_programData and set
-            // recType
-            QMap<int, ProgramRecPriorityInfo>::Iterator it;
-            it = m_programData.find(recordid);
-            if (it != m_programData.end())
-            {
-                ProgramRecPriorityInfo *progInfo = &(*it);
+    countMatches();
+    while (result.next()) {
+        uint recordid = result.value(0).toUInt();
+//      QString title = result.value(1).toString();
+//      QString chanid = result.value(2).toString();
+//      QString tempTime = result.value(3).toString();
+//      QString tempDate = result.value(4).toString();
+        RecordingType recType = (RecordingType)result.value(5).toInt();
+        int inactive = result.value(6).toInt();
+        QDateTime lastrec = MythDate::as_utc(result.value(7).toDateTime());
+        int avgd = result.value(8).toInt();
+        QString profile = result.value(9).toString();
+        QString recordingGroup = result.value(10).toString();
+        QString storageGroup = result.value(11).toString();
 
-                progInfo->m_recType = recType;
-                progInfo->m_matchCount =
-                    m_listMatch[progInfo->GetRecordingRuleID()];
-                progInfo->m_recCount =
-                    m_recMatch[progInfo->GetRecordingRuleID()];
-                progInfo->m_last_record = lastrec;
-                progInfo->m_avg_delay = avgd;
-                progInfo->m_profile = profile;
-                progInfo->m_recordingGroup  = recordingGroup;
-                progInfo->m_storageGroup = storageGroup;
+        // find matching program in m_programData and set
+        // recType
+        QMap<int, ProgramRecPriorityInfo>::Iterator it;
+        it = m_programData.find(recordid);
+        if (it != m_programData.end())
+        {
+            ProgramRecPriorityInfo *progInfo = &(*it);
 
-                if (inactive)
-                    progInfo->m_recStatus = RecStatus::Inactive;
-                else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->m_recStatus = RecStatus::Conflict;
-                else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->m_recStatus = RecStatus::Recording;
-                else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->m_recStatus = RecStatus::WillRecord;
-                else
-                    progInfo->m_recStatus = RecStatus::Unknown;
-            }
-        } while (result.next());
+            progInfo->m_recType = recType;
+            progInfo->m_matchCount =
+                m_listMatch[progInfo->GetRecordingRuleID()];
+            progInfo->m_recCount =
+                m_recMatch[progInfo->GetRecordingRuleID()];
+            progInfo->m_last_record = lastrec;
+            progInfo->m_avg_delay = avgd;
+            progInfo->m_profile = profile;
+            progInfo->m_recordingGroup  = recordingGroup;
+            progInfo->m_storageGroup = storageGroup;
+
+            if (inactive)
+                progInfo->m_recStatus = RecStatus::Inactive;
+            else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
+                progInfo->m_recStatus = RecStatus::Conflict;
+            else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
+                progInfo->m_recStatus = RecStatus::Recording;
+            else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0)
+                progInfo->m_recStatus = RecStatus::WillRecord;
+            else
+                progInfo->m_recStatus = RecStatus::Unknown;
+        }
     }
 }
 

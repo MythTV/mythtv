@@ -642,7 +642,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
         return false;
     }
 
-    do
+    while (true)
     {
         uint pnum = 0;
         QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.cbegin();
@@ -716,7 +716,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             QString("Can't monitor decryption of program %1 -- no pmt")
                 .arg(pnum));
 
-    } while (true);
+    }
 
     m_currentTestingDecryption = false;
     return false;

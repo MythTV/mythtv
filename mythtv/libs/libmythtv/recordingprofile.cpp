@@ -1765,45 +1765,24 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
         MythDB::DBError("RecordingProfile::fillSelections 1", result);
         return;
     }
-    if (!result.next())
-    {
-        return;
-    }
 
-    if (group == RecordingProfile::TranscoderGroup && foldautodetect)
+    while (result.next())
     {
-        auto *profile = new GroupSetting();
-        profile->setLabel(QObject::tr("Autodetect"));
-        setting->addChild(profile);
-    }
+        if ((result.at() == 0) && foldautodetect &&
+            (group == RecordingProfile::TranscoderGroup))
+        {
+            auto *autodetect = new GroupSetting();
+            autodetect->setLabel(QObject::tr("Autodetect"));
+            setting->addChild(autodetect);
+        }
 
-    do
-    {
         QString name = result.value(0).toString();
         QString id   = result.value(1).toString();
 
-        if (group == RecordingProfile::TranscoderGroup)
-        {
-            if (name == "RTjpeg/MPEG4" || name == "MPEG2")
-            {
-                if (!foldautodetect)
-                {
-                    auto *profile =
-                        new RecordingProfile(QObject::tr("Autodetect from %1")
-                                             .arg(name));
-                    profile->loadByID(id.toInt());
-                    profile->setCodecTypes();
-                    setting->addChild(profile);
-                }
-            }
-            else
-            {
-                auto *profile = new RecordingProfile(name);
-                profile->loadByID(id.toInt());
-                profile->setCodecTypes();
-                setting->addChild(profile);
-            }
-            continue;
+        if ((group == RecordingProfile::TranscoderGroup) &&
+            (name == "RTjpeg/MPEG4" || name == "MPEG2") &&
+            !foldautodetect) {
+            name = QObject::tr("Autodetect from %1").arg(name);
         }
 
         auto *profile = new RecordingProfile(name);
@@ -1811,7 +1790,6 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
         profile->setCodecTypes();
         setting->addChild(profile);
     }
-    while (result.next());
 }
 
 QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
@@ -1838,22 +1816,15 @@ QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
         MythDB::DBError("RecordingProfile::GetProfileMap()", query);
         return profiles;
     }
-    if (!query.next())
-    {
-        LOG(VB_GENERAL, LOG_WARNING,
-            "RecordingProfile::fillselections, Warning: "
-            "Failed to locate recording id for recording group.");
-        return profiles;
-    }
 
-    if (group == RecordingProfile::TranscoderGroup)
+    while (query.next())
     {
-        int id = RecordingProfile::kTranscoderAutodetect;
-        profiles[id] = QObject::tr("Transcode using Autodetect");
-    }
+        if ((query.at() == 0) && (group == RecordingProfile::TranscoderGroup))
+        {
+            int id = RecordingProfile::kTranscoderAutodetect;
+            profiles[id] = QObject::tr("Transcode using Autodetect");
+        }
 
-    do
-    {
         QString name = query.value(0).toString();
         int id = query.value(1).toInt();
 
@@ -1870,7 +1841,14 @@ QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
 
         QString lbl = QObject::tr("Record using the \"%1\" profile").arg(name);
         profiles[id] = lbl;
-    } while (query.next());
+    }
+
+    if (query.at() == QSql::BeforeFirstRow)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            "RecordingProfile::fillselections, Warning: "
+            "Failed to locate recording id for recording group.");
+    }
 
     return profiles;
 }

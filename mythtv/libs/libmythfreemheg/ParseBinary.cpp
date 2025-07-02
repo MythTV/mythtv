@@ -140,14 +140,13 @@ MHParseNode *MHParseBinary::DoParse()
 
     if (tagNumber == 0x1f)   // Except that if it is 0x1F then the tag is encoded in the following bytes.
     {
-        tagNumber = 0;
-
-        do
+        ch = GetNextChar();
+        tagNumber = ch & 0x7f;
+        while ((ch & 0x80) != 0)   // Top bit set means there's more to come.
         {
             ch = GetNextChar();
             tagNumber = (tagNumber << 7) | (ch & 0x7f);
         }
-        while ((ch & 0x80) != 0);   // Top bit set means there's more to come.
     }
 
     // Next byte is the length.  If it is less than 128 it is the actual length, otherwise it

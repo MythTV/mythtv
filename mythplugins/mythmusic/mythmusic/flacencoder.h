@@ -20,6 +20,7 @@ class FlacEncoder : public Encoder
     FlacEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
    ~FlacEncoder() override;
     int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
+    int processSamples();
 
   private:
     FLAC__StreamEncoder *m_encoder {nullptr};

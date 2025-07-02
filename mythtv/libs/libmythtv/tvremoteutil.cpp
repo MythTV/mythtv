@@ -211,11 +211,11 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         // Try to find the next input with a different name.  If one
         // doesn't exist, just return the current one.
         size_t j = i;
-        do
+        i = (i + 1) % inputs.size();
+        while (i != j && inputs[i].m_displayName == inputs[j].m_displayName)
         {
             i = (i + 1) % inputs.size();
         }
-        while (i != j && inputs[i].m_displayName == inputs[j].m_displayName);
     }
 
     LOG(VB_CHANNEL, LOG_INFO,

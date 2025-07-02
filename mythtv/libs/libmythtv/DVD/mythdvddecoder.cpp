@@ -99,70 +99,72 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
     {
         bool gotPacket = false;
 
-        do
+        while (!gotPacket)
         {
             gotPacket = true;
 
-            do
+            m_avCodecLock.lock();
+            result = av_read_frame(Ctx, Pkt);
+            m_avCodecLock.unlock();
+            std::this_thread::yield();
+
+            while (m_ringBuffer->DVD()->IsReadingBlocked())
             {
-                if (m_ringBuffer->DVD()->IsReadingBlocked())
+                int32_t lastEvent = m_ringBuffer->DVD()->GetLastEvent();
+                switch(lastEvent)
                 {
-                    int32_t lastEvent = m_ringBuffer->DVD()->GetLastEvent();
-                    switch(lastEvent)
-                    {
-                        case DVDNAV_HOP_CHANNEL:
-                            // Non-seamless jump - clear all buffers
-                            m_framesReq = 0;
-                            ReleaseContext(m_curContext);
-                            while (!m_contextList.empty())
-                                m_contextList.takeFirst()->DecrRef();
-                            Reset(true, false, false);
-                            m_audio->Reset();
-                            m_parent->DiscardVideoFrames(false, false);
-                            // During a seek, the Reset call above resets the frames played
-                            // to zero - so we need to re-establish our position. Playback
-                            // appears unaffected by removing the Reset call - but better
-                            // safe than sorry when it comes to DVD so just update
-                            // the frames played.
-                            UpdateFramesPlayed();
-                            break;
+                    case DVDNAV_HOP_CHANNEL:
+                        // Non-seamless jump - clear all buffers
+                        m_framesReq = 0;
+                        ReleaseContext(m_curContext);
+                        while (!m_contextList.empty())
+                            m_contextList.takeFirst()->DecrRef();
+                        Reset(true, false, false);
+                        m_audio->Reset();
+                        m_parent->DiscardVideoFrames(false, false);
+                        // During a seek, the Reset call above resets the frames played
+                        // to zero - so we need to re-establish our position. Playback
+                        // appears unaffected by removing the Reset call - but better
+                        // safe than sorry when it comes to DVD so just update
+                        // the frames played.
+                        UpdateFramesPlayed();
+                        break;
 
-                        case DVDNAV_WAIT:
-                        case DVDNAV_STILL_FRAME:
-                            if (m_storedPackets.count() > 0)
-                            {
-                                // Ringbuffer is waiting for the player
-                                // to empty its buffers but we have one or
-                                // more frames in our buffer that have not
-                                // yet been sent to the player.
-                                // Make sure no more frames will be buffered
-                                // for the time being and start emptying our
-                                // buffer.
+                    case DVDNAV_WAIT:
+                    case DVDNAV_STILL_FRAME:
+                        if (m_storedPackets.count() > 0)
+                        {
+                            // Ringbuffer is waiting for the player
+                            // to empty its buffers but we have one or
+                            // more frames in our buffer that have not
+                            // yet been sent to the player.
+                            // Make sure no more frames will be buffered
+                            // for the time being and start emptying our
+                            // buffer.
 
-                                // Force AvFormatDecoder to stop buffering frames
-                                StorePacket = false;
-                                // Return the first buffered packet
-                                AVPacket *storedPkt = m_storedPackets.takeFirst();
-                                av_packet_ref(Pkt, storedPkt);
-                                av_packet_unref(storedPkt);
-                                delete storedPkt;
-                                return 0;
-                            }
-                            break;
+                            // Force AvFormatDecoder to stop buffering frames
+                            StorePacket = false;
+                            // Return the first buffered packet
+                            AVPacket *storedPkt = m_storedPackets.takeFirst();
+                            av_packet_ref(Pkt, storedPkt);
+                            av_packet_unref(storedPkt);
+                            delete storedPkt;
+                            return 0;
+                        }
+                        break;
 
-                        case DVDNAV_NAV_PACKET:
-                            // Don't need to do anything here.  There was a timecode discontinuity
-                            // and the ringbuffer returned to make sure that any packets still in
-                            // ffmpeg's buffers were flushed.
-                            break;
-                        default:
-                            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unexpected DVD event - %1")
-                                .arg(lastEvent));
-                            break;
-                    }
-
-                    m_ringBuffer->DVD()->UnblockReading();
+                    case DVDNAV_NAV_PACKET:
+                        // Don't need to do anything here.  There was a timecode discontinuity
+                        // and the ringbuffer returned to make sure that any packets still in
+                        // ffmpeg's buffers were flushed.
+                        break;
+                    default:
+                        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unexpected DVD event - %1")
+                            .arg(lastEvent));
+                        break;
                 }
+
+                m_ringBuffer->DVD()->UnblockReading();
 
                 m_avCodecLock.lock();
                 result = av_read_frame(Ctx, Pkt);
@@ -173,7 +175,7 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                 // but calling up the OSD menu in a still frame without
                 // this still causes a deadlock.
                 std::this_thread::yield();
-            } while (m_ringBuffer->DVD()->IsReadingBlocked());
+            }
 
             if (result >= 0)
             {
@@ -197,7 +199,7 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                     }
                 }
             }
-        } while(!gotPacket);
+        }
     }
 
     return result;

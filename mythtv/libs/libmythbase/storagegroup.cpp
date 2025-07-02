@@ -558,25 +558,21 @@ bool StorageGroup::FindDirs(const QString &group, const QString &hostname,
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("StorageGroup::StorageGroup()", query);
-    else if (query.next())
-    {
-        do
-        {
-            /* The storagegroup.dirname column uses utf8_bin collation, so Qt
-             * uses QString::fromLatin1() for toString(). Explicitly convert the
-             * value using QString::fromUtf8() to prevent corruption. */
-            dirname = QString::fromUtf8(query.value(0)
-                                        .toByteArray().constData());
-            dirname = dirname.trimmed();
-            if (dirname.endsWith("/"))
-                dirname.remove(dirname.length() - 1, 1);
 
-            if (dirlist)
-                (*dirlist) << dirname;
-            else
-                return true;
-        }
-        while (query.next());
+    while (query.next())
+    {
+        /* The storagegroup.dirname column uses utf8_bin collation, so Qt
+         * uses QString::fromLatin1() for toString(). Explicitly convert the
+         * value using QString::fromUtf8() to prevent corruption. */
+        dirname = QString::fromUtf8(query.value(0)
+                                    .toByteArray().constData());
+        dirname = dirname.trimmed();
+        if (dirname.endsWith("/"))
+            dirname.remove(dirname.length() - 1, 1);
+
+        if (nullptr == dirlist)
+            return true;
+        (*dirlist) << dirname;
         found = true;
     }
 

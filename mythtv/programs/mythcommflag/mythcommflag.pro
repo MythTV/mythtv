@@ -38,7 +38,6 @@ SOURCES += ClassicLogoDetector.cpp
 SOURCES += ClassicSceneChangeDetector.cpp
 SOURCES += ClassicCommDetector.cpp
 SOURCES += Histogram.cpp
-SOURCES += quickselect.cpp
 SOURCES += CommDetector2.cpp
 SOURCES += pgm.cpp
 SOURCES += EdgeDetector.cpp CannyEdgeDetector.cpp

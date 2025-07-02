@@ -184,8 +184,8 @@ SceneChangeDetector::finished(long long nframes, bool final)
 
     /* Identify all scene-change frames (changeMap). */
     std::vector<uint16_t> scdiffsort = m_scDiff;
-    uint16_t mindiff = quick_select_ushort(scdiffsort.data(), nframes,
-                                                 (int)(0.979472 * nframes));
+    auto mindiff = quick_select<uint16_t>(scdiffsort.data(), nframes,
+                                          (int)(0.979472 * nframes));
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("SceneChangeDetector::finished applying threshold value %1")
             .arg(mindiff));

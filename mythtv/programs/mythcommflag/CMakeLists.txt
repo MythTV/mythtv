@@ -1,3 +1,7 @@
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
+
 add_executable(
   mythcommflag
   BlankFrameDetector.cpp
@@ -37,7 +41,6 @@ add_executable(
   PGMConverter.h
   PrePostRollFlagger.cpp
   PrePostRollFlagger.h
-  quickselect.cpp
   quickselect.h
   SceneChangeDetector.cpp
   SceneChangeDetector.h

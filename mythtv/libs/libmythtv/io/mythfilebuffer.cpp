@@ -206,7 +206,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
         openTimer.start();
 
         uint openAttempts = 0;
-        do
+        while ((openTimer.elapsed() < Retry) || (openAttempts == 0))
         {
             openAttempts++;
 
@@ -224,52 +224,50 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
 
                 lasterror = 1;
                 usleep(10ms);
+                continue;
             }
-            else
-            {
-                ssize_t ret = read(m_fd2, buf.data(), buf.size());
-                if (ret != kReadTestSize)
-                {
-                    lasterror = 2;
-                    close(m_fd2);
-                    m_fd2 = -1;
-                    if (ret == 0 && openAttempts > 5 && !gCoreContext->IsRegisteredFileForWrite(m_filename))
-                    {
-                        // file won't grow, abort early
-                        break;
-                    }
 
-                    if (m_oldfile)
-                        break; // if it's an old file it won't grow..
-                    usleep(10ms);
-                }
-                else
+            ssize_t ret = read(m_fd2, buf.data(), buf.size());
+            if (ret != kReadTestSize)
+            {
+                lasterror = 2;
+                close(m_fd2);
+                m_fd2 = -1;
+                if (ret == 0 && openAttempts > 5 && !gCoreContext->IsRegisteredFileForWrite(m_filename))
                 {
-                    if (0 == lseek(m_fd2, 0, SEEK_SET))
-                    {
-#ifndef _MSC_VER
-                        if (posix_fadvise(m_fd2, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
-                        {
-                            LOG(VB_FILE, LOG_DEBUG, LOC +
-                                QString("OpenFile(): fadvise sequential "
-                                        "failed: ") + ENO);
-                        }
-                        if (posix_fadvise(m_fd2, 0, static_cast<off_t>(128)*1024, POSIX_FADV_WILLNEED) != 0)
-                        {
-                            LOG(VB_FILE, LOG_DEBUG, LOC +
-                                QString("OpenFile(): fadvise willneed "
-                                        "failed: ") + ENO);
-                        }
-#endif
-                        lasterror = 0;
-                        break;
-                    }
-                    lasterror = 4;
-                    close(m_fd2);
-                    m_fd2 = -1;
+                    // file won't grow, abort early
+                    break;
                 }
+
+                if (m_oldfile)
+                    break; // if it's an old file it won't grow..
+                usleep(10ms);
+                continue;
             }
-        } while (openTimer.elapsed() < Retry);
+
+            if (0 == lseek(m_fd2, 0, SEEK_SET))
+            {
+#ifndef _MSC_VER
+                if (posix_fadvise(m_fd2, 0, 0, POSIX_FADV_SEQUENTIAL) != 0)
+                {
+                    LOG(VB_FILE, LOG_DEBUG, LOC +
+                        QString("OpenFile(): fadvise sequential "
+                                "failed: ") + ENO);
+                }
+                if (posix_fadvise(m_fd2, 0, static_cast<off_t>(128)*1024, POSIX_FADV_WILLNEED) != 0)
+                {
+                    LOG(VB_FILE, LOG_DEBUG, LOC +
+                        QString("OpenFile(): fadvise willneed "
+                                "failed: ") + ENO);
+                }
+#endif
+                lasterror = 0;
+                break;
+            }
+            lasterror = 4;
+            close(m_fd2);
+            m_fd2 = -1;
+        }
 
         switch (lasterror)
         {

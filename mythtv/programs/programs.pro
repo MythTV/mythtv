@@ -2,6 +2,12 @@ include ( ../settings.pro )
 
 TEMPLATE = subdirs
 
+# unit tests mythcommflag
+mythcommflag-test.depends = sub-mythcommflag
+mythcommflag-test.target = buildtestmythcommflag
+mythcommflag-test.commands = cd mythcommflag/test && $(QMAKE) && $(MAKE)
+unix:QMAKE_EXTRA_TARGETS += mythcommflag-test
+
 # Directories
 using_frontend {
     SUBDIRS += mythavtest mythfrontend mythcommflag
@@ -36,7 +42,7 @@ using_backend {
 
 using_mythtranscode: SUBDIRS += mythtranscode
 
-unittest.depends = mythfrontend-test mythbackend-test
+unittest.depends = mythfrontend-test mythbackend-test mythcommflag-test
 unittest.target = test
 unittest.commands = scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest

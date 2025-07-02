@@ -401,7 +401,7 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
     memset(m_buf, bordercolor, borderpixels * sizeof(*m_buf));
     m_monochromatic[frameno] = ismonochromatic ? 1 : 0;
     m_mean[frameno] = (float)sumval / npixels;
-    m_median[frameno] = quick_select_median(m_buf, npixels);
+    m_median[frameno] = quick_select_median<uint8_t>(m_buf, npixels);
     m_stddev[frameno] = npixels > 1 ?
         sqrt((sumsquares - (float)sumval * sumval / npixels) / (npixels - 1)) :
             0;

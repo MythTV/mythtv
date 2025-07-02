@@ -917,12 +917,9 @@ void MythRAOPConnection::readClient(void)
         m_incomingSize = 0;
 
         QTextStream stream(data);
-        QString line;
-        do
+        QString line = stream.readLine();
+        while (!line.isEmpty())
         {
-            line = stream.readLine();
-            if (line.size() == 0)
-                break;
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Header(%1) = %2")
                 .arg(m_socket->peerAddress().toString(), line));
             m_incomingHeaders.append(line);
@@ -930,8 +927,8 @@ void MythRAOPConnection::readClient(void)
             {
                 m_incomingSize = line.mid(line.indexOf(" ") + 1).toInt();
             }
+            line = stream.readLine();
         }
-        while (!line.isNull());
 
         if (m_incomingHeaders.empty())
             return;
@@ -1662,16 +1659,12 @@ QStringList MythRAOPConnection::splitLines(const QByteArray &lines)
     QStringList list;
     QTextStream stream(lines);
 
-    QString line;
-    do
+    QString line = stream.readLine();
+    while (!line.isEmpty())
     {
+        list.append(line);
         line = stream.readLine();
-        if (!line.isNull())
-        {
-            list.append(line);
-        }
     }
-    while (!line.isNull());
 
     return list;
 }

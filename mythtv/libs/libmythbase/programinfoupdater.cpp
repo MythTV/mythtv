@@ -45,9 +45,10 @@ void ProgramInfoUpdater::insert(
 
 void ProgramInfoUpdater::run(void)
 {
-    bool workDone = false;
+    bool workDone = true;
 
-    do {
+    while( workDone )
+    {
         workDone = false;
 
         // we don't need instant updates allow a few to queue up
@@ -100,7 +101,7 @@ void ProgramInfoUpdater::run(void)
             m_moreWork.wait(&m_lock, 1000);
 
         m_lock.unlock();
-    } while( workDone );
+    }
 
     m_isRunning = false;
 }

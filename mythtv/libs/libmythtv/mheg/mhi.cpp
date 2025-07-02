@@ -246,8 +246,8 @@ void MHIContext::run(void)
     {
         std::chrono::milliseconds toWait = 0ms;
         // Dequeue and process any key presses.
-        int key = 0;
-        do
+        int key = -1;
+        while (key != 0)
         {
             NetworkBootRequested();
             ProcessDSMCCQueue();
@@ -263,7 +263,7 @@ void MHIContext::run(void)
             toWait = m_engine->RunAll();
             if (toWait < 0ms)
                 return;
-        } while (key != 0);
+        }
 
         toWait = (toWait > 1s || toWait <= 0ms) ? 1s : toWait;
 
@@ -892,7 +892,7 @@ int MHIContext::GetChannelIndex(const QString &str)
 {
     int nResult = -1;
 
-    do
+    for (int i = 0; i < 1 ; i++) // do once
     {
         if (str.startsWith("dvb://"))
         {
@@ -924,7 +924,7 @@ int MHIContext::GetChannelIndex(const QString &str)
                 nResult = Cid(it);
             else
             {
-                do
+                for ( ; it != m_channelCache.constEnd() ; it++)
                 {
                     if (Tid(it) == transportID)
                     {
@@ -932,7 +932,6 @@ int MHIContext::GetChannelIndex(const QString &str)
                         break;
                     }
                 }
-                while (++it != m_channelCache.constEnd());
             }
         }
         else if (str.startsWith("rec://svc/lcn/"))
@@ -968,7 +967,6 @@ int MHIContext::GetChannelIndex(const QString &str)
                 .arg(str));
         }
     }
-    while (false);
 
     LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetChannelIndex %1 => %2")
         .arg(str).arg(nResult));

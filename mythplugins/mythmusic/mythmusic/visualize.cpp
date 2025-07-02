@@ -2197,24 +2197,26 @@ void AlbumArt::findFrontCover(void)
     }
 }
 
+static int nextType (int type)
+{
+    type++;
+    return (type != IT_LAST) ? type : IT_UNKNOWN;
+}
+
 bool AlbumArt::cycleImage(void)
 {
     if (!gPlayer->getCurrentMetadata())
         return false;
 
     AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
-    int newType = m_currImageType;
 
     // If we only have one image there is nothing to cycle
-    if (albumArt->getImageCount() > 1)
-    {
-        do
-        {
-            newType++;
-            if (newType == IT_LAST)
-                newType = IT_UNKNOWN;
-        } while (!albumArt->getImage((ImageType) newType));
-    }
+    if (albumArt->getImageCount() < 2)
+        return false;
+
+    int newType = nextType(m_currImageType);
+    while (!albumArt->getImage((ImageType) newType))
+        newType = nextType(newType);
 
     if (newType != m_currImageType)
     {

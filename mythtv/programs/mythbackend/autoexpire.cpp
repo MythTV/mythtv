@@ -1079,14 +1079,14 @@ void AutoExpire::UpdateDontExpireSet(void)
         "SELECT chanid, starttime, lastupdatetime, recusage, hostname "
         "FROM inuseprograms");
 
-    if (!query.exec() || !query.next())
+    if (!query.exec())
         return;
 
-    LOG(VB_FILE, LOG_INFO, LOC + "Adding Programs to 'Do Not Expire' List");
     QDateTime curTime = MythDate::current();
-
-    do
+    while (query.next())
     {
+        if (query.at() == 0)
+           LOG(VB_FILE, LOG_INFO, LOC + "Adding Programs to 'Do Not Expire' List");
         uint chanid = query.value(0).toUInt();
         QDateTime recstartts = MythDate::as_utc(query.value(1).toDateTime());
         QDateTime lastupdate = MythDate::as_utc(query.value(2).toDateTime());
@@ -1103,7 +1103,6 @@ void AutoExpire::UpdateDontExpireSet(void)
                          query.value(4).toString()));
         }
     }
-    while (query.next());
 }
 
 bool AutoExpire::IsInDontExpireSet(

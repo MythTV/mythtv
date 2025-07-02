@@ -425,7 +425,11 @@ void MusicFileScanner::cleanDB()
     }
 
     // delete unused directory_ids from music_directories
-    // get a list of directory_ids not referenced in music_songs
+    //
+    // Get a list of directory_ids not referenced in music_songs.
+    // This list will contain any directory that is only used for
+    // organization.  I.E. If your songs are organized by artist and
+    // then by album, this will contain all of the artist directories.
     if (!query.exec("SELECT d.directory_id, d.parent_id FROM music_directories d "
                     "LEFT JOIN music_songs s ON d.directory_id=s.directory_id "
                     "WHERE s.directory_id IS NULL ORDER BY directory_id DESC;"))
@@ -437,45 +441,57 @@ void MusicFileScanner::cleanDB()
     parentquery.prepare("SELECT COUNT(*) FROM music_directories "
                         "WHERE parent_id=:DIRECTORYID ");
 
-    int deletedCount = 0;
+    MSqlQuery dirnamequery(MSqlQuery::InitCon());
+    dirnamequery.prepare("SELECT path FROM music_directories "
+                         "WHERE directory_id=:DIRECTORYID ");
 
-    do
+    int deletedCount = 1;
+
+    while (deletedCount > 0)
     {
         deletedCount = 0;
-
-        if (!query.first())
-            break;
+        query.seek(-1);
 
         // loop through the list of unused directory_ids deleting any which
         // aren't referenced by any other directories parent_id
-        do
+        while (query.next())
         {
             int directoryid = query.value(0).toInt();
 
             // have we still got references to this directory_id from other directories
             parentquery.bindValue(":DIRECTORYID", directoryid);
             if (!parentquery.exec())
+            {
                 MythDB::DBError("MusicFileScanner::cleanDB - get parent directory count",
                                 parentquery);
-
-            if (parentquery.next())
+                continue;
+            }
+            if (!parentquery.next())
+                continue;
+            int parentCount = parentquery.value(0).toInt();
+            if (parentCount != 0)
+                // Still has child directories
+                continue;
+            if(VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_DEBUG))
             {
-                int parentCount = parentquery.value(0).toInt();
-
-                if (parentCount == 0)
+                dirnamequery.bindValue(":DIRECTORYID", directoryid);
+                if (dirnamequery.exec() && dirnamequery.next())
                 {
-                    deletequery.bindValue(":DIRECTORYID", directoryid);
-                    if (!deletequery.exec())
-                        MythDB::DBError("MusicFileScanner::cleanDB - delete music_directories",
-                                        deletequery);
-
-                    deletedCount += deletequery.numRowsAffected();
+                    LOG(VB_GENERAL, LOG_DEBUG,
+                        QString("MusicFileScanner deleted directory %1  %2")
+                        .arg(directoryid,5).arg(dirnamequery.value(0).toString()));
                 }
             }
-
-        } while (query.next());
-
-    } while (deletedCount > 0);
+            deletequery.bindValue(":DIRECTORYID", directoryid);
+            if (!deletequery.exec())
+                MythDB::DBError("MusicFileScanner::cleanDB - delete music_directories",
+                                deletequery);
+            deletedCount += deletequery.numRowsAffected();
+        }
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("MusicFileScanner deleted %1 directory entries")
+                .arg(deletedCount));
+    }
 
     // delete unused albumart_ids from music_albumart (embedded images)
     if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
