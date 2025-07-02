@@ -124,6 +124,7 @@ function(find_or_build_qt)
   set(QT_MAP_6.6 "6.6.1")
   set(QT_MAP_6.7 "6.7.2")
   set(QT_MAP_6.8 "6.8.1")
+  set(QT_MAP_6.9 "6.9.0")
 
   # Grab the host version directly. so as not to pollute our cross-build setup.
   file(STRINGS
