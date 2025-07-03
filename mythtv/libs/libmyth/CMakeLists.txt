@@ -12,7 +12,10 @@ set(LIBMYTH_HEADERS
     mythexp.h
     )
 
-set(LIBMYTH_HEADERS_NOT_INSTALLED backendselect.h)
+set(LIBMYTH_HEADERS_NOT_INSTALLED
+    backendselect.h
+    guistartup.h
+    )
 
 #
 # Declare the library
@@ -24,6 +27,7 @@ add_library(
   ${LIBMYTH_HEADERS_NOT_INSTALLED}
   ${LIBMYTH_HEADERS}
   backendselect.cpp
+  guistartup.cpp
   mythcontext.cpp
   )
 

@@ -29,10 +29,12 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 
 # Input
 HEADERS += backendselect.h
+HEADERS += guistartup.h
 HEADERS += mythcontext.h
 HEADERS += mythexp.h
 
 SOURCES += backendselect.cpp
+SOURCES += guistartup.cpp
 SOURCES += mythcontext.cpp
 
 INCLUDEPATH += ..
