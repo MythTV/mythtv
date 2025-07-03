@@ -51,6 +51,8 @@ MTV_PUBLIC bool RemoteIsBusy(uint inputid, InputInfo &busy_input);
 MTV_PUBLIC bool RemoteGetRecordingStatus(
     std::vector<TunerStatus> *tunerList = nullptr, bool list_inactive = false);
 
+MTV_PUBLIC int RemoteGetRecordingMask(void);
+
 #endif // TV_REMOTE_UTIL_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

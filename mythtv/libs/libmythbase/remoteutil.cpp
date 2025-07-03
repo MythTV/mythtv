@@ -338,43 +338,6 @@ QStringList RemoteRecordings(void)
     return strlist;
 }
 
-int RemoteGetRecordingMask(void)
-{
-    int mask = 0;
-
-    QString cmd = "QUERY_ISRECORDING";
-
-    QStringList strlist( cmd );
-
-    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty())
-        return mask;
-
-    int recCount = strlist[0].toInt();
-
-    for (int i = 0, j = 0; j < recCount; i++)
-    {
-        cmd = QString("QUERY_RECORDER %1").arg(i + 1);
-
-        strlist = QStringList( cmd );
-        strlist << "IS_RECORDING";
-
-        if (gCoreContext->SendReceiveStringList(strlist) && !strlist.isEmpty())
-        {
-            if (strlist[0].toInt())
-            {
-                mask |= 1<<i;
-                j++;       // count active recorder
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    return mask;
-}
-
 /**
  * Get recorder for a programme.
  *
