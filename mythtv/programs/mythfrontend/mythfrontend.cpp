@@ -62,7 +62,6 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/referencecounter.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythmetadata/cleanup.h"
 #include "libmythmetadata/globals.h"
