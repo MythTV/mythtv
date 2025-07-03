@@ -31,9 +31,6 @@
 #include <QEventLoop>
 #include <QTimer>
 
-// MythDB headers
-#include "mythuiexp.h"
-
 // MythBase headers
 #include "libmythbase/mythchrono.h"
 
@@ -48,7 +45,7 @@ class MythUIStateType;
 class MythUIProgressBar;
 class MythTimer;
 
-class MUI_PUBLIC GUIStartup : public MythScreenType
+class GUIStartup : public MythScreenType
 {
     Q_OBJECT
 

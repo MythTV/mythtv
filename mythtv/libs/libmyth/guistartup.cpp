@@ -22,9 +22,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
-#include "langsettings.h"
-
 // C++
 #include <chrono>
 
@@ -44,6 +41,7 @@
 #include "libmythbase/mythtranslation.h"
 
 // libmythui
+#include "libmythui/langsettings.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythscreenstack.h"
