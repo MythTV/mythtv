@@ -15,7 +15,6 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programtypes.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/unziputil.h" // for extractZIP
 #include "libmythtv/mythsystemevent.h"
