@@ -375,58 +375,6 @@ int RemoteGetRecordingMask(void)
     return mask;
 }
 
-bool RemoteGetFileList(const QString& host, const QString& path, QStringList* list,
-                       QString sgroup, bool fileNamesOnly)
-{
-
-    // Make sure the list is empty when we get started
-    list->clear();
-
-    if (sgroup.isEmpty())
-        sgroup = "Videos";
-
-    *list << "QUERY_SG_GETFILELIST";
-    *list << host;
-    *list << StorageGroup::GetGroupToUse(host, sgroup);
-    *list << path;
-    *list << QString::number(static_cast<int>(fileNamesOnly));
-
-    bool ok = false;
-
-    if (gCoreContext->IsMasterBackend())
-    {
-        // since the master backend cannot connect back around to
-        // itself, and the libraries do not have access to the list
-        // of connected slave backends to query an existing connection
-        // start up a new temporary connection directly to the slave
-        // backend to query the file list
-        QString ann = QString("ANN Playback %1 0")
-                        .arg(gCoreContext->GetHostName());
-        QString addr = gCoreContext->GetBackendServerIP(host);
-        int port = gCoreContext->GetBackendServerPort(host);
-        bool mismatch = false;
-
-        MythSocket *sock = gCoreContext->ConnectCommandSocket(
-                                            addr, port, ann, &mismatch);
-        if (sock)
-        {
-            ok = sock->SendReceiveStringList(*list);
-            sock->DecrRef();
-        }
-        else
-        {
-            list->clear();
-        }
-    }
-    else
-    {
-        ok = gCoreContext->SendReceiveStringList(*list);
-    }
-
-// Should the SLAVE UNREACH test be here ?
-    return ok;
-}
-
 /**
  * Get recorder for a programme.
  *

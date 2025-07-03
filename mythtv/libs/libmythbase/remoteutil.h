@@ -42,8 +42,6 @@ MBASE_PUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrec
                                      int underrecsecs);
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
-MBASE_PUBLIC bool RemoteGetFileList(const QString& host, const QString& path, QStringList* list,
-                       QString sgroup, bool fileNamesOnly = false);
 MBASE_PUBLIC bool RemoteGetActiveBackends(QStringList *list);
 
 #endif // REMOTEUTIL_H_
