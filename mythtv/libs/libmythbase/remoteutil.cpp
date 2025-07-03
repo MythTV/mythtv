@@ -324,20 +324,6 @@ bool RemoteFillProgramInfo(ProgramInfo &pginfo, const QString &playbackhost)
     return false;
 }
 
-QStringList RemoteRecordings(void)
-{
-    QStringList strlist("QUERY_ISRECORDING");
-
-    if (!gCoreContext->SendReceiveStringList(strlist, false, false))
-    {
-        QStringList empty;
-        empty << "0" << "0";
-        return empty;
-    }
-
-    return strlist;
-}
-
 /**
  * Get recorder for a programme.
  *
