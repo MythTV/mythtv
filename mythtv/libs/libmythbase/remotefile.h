@@ -100,4 +100,11 @@ class MBASE_PUBLIC RemoteFile
     ThreadedFileWriter *m_fileWriter   {nullptr};
 };
 
+MBASE_PUBLIC QString RemoteDownloadFile(const QString &url,
+                                   const QString &storageGroup,
+                                   const QString &filename = "");
+MBASE_PUBLIC QString RemoteDownloadFileNow(const QString &url,
+                                      const QString &storageGroup,
+                                      const QString &filename = "");
+
 #endif
