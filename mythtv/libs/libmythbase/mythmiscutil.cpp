@@ -175,6 +175,57 @@ loadArray getLoadAvgs (void)
     return {-1, -1, -1};
 }
 
+bool RemoteGetLoad(loadArray& load)
+{
+    QStringList strlist(QString("QUERY_LOAD"));
+
+    if (gCoreContext->SendReceiveStringList(strlist) && strlist.size() >= 3)
+    {
+        load[0] = strlist[0].toDouble();
+        load[1] = strlist[1].toDouble();
+        load[2] = strlist[2].toDouble();
+        return true;
+    }
+
+    return false;
+}
+
+bool RemoteGetUptime(std::chrono::seconds &uptime)
+{
+    QStringList strlist(QString("QUERY_UPTIME"));
+
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty())
+        return false;
+
+    if (strlist[0].isEmpty() || !strlist[0].at(0).isNumber())
+        return false;
+
+    if (sizeof(std::chrono::seconds::rep) == sizeof(long long))
+        uptime = std::chrono::seconds(strlist[0].toLongLong());
+    else if (sizeof(std::chrono::seconds::rep) == sizeof(long))
+        uptime = std::chrono::seconds(strlist[0].toLong());
+    else if (sizeof(std::chrono::seconds::rep) == sizeof(int))
+        uptime = std::chrono::seconds(strlist[0].toInt());
+
+    return true;
+}
+
+bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
+{
+    QStringList strlist(QString("QUERY_MEMSTATS"));
+
+    if (gCoreContext->SendReceiveStringList(strlist) && strlist.size() >= 4)
+    {
+        totalMB = strlist[0].toInt();
+        freeMB  = strlist[1].toInt();
+        totalVM = strlist[2].toInt();
+        freeVM  = strlist[3].toInt();
+        return true;
+    }
+
+    return false;
+}
+
 /**
  * \brief Can we ping host within timeout seconds?
  *

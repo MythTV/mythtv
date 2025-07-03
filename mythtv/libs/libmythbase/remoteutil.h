@@ -15,13 +15,7 @@
 class ProgramInfo;
 class MythEvent;
 
-using system_load_array = std::array<double,3>;
-
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
-MBASE_PUBLIC bool RemoteGetLoad(system_load_array &load);
-MBASE_PUBLIC bool RemoteGetUptime(std::chrono::seconds &uptime);
-MBASE_PUBLIC
-bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 MBASE_PUBLIC bool RemoteCheckFile(
     ProgramInfo *pginfo, bool checkSlaves = true);
 MBASE_PUBLIC bool RemoteDeleteRecording( uint recordingID, bool forceMetadataDelete,
