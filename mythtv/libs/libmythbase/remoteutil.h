@@ -40,8 +40,6 @@ MBASE_PUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrec
                                      int underrecsecs);
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
-MBASE_PUBLIC bool RemoteGetActiveBackends(QStringList *list);
-
 #endif // REMOTEUTIL_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
