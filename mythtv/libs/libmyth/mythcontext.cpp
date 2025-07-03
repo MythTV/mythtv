@@ -51,6 +51,7 @@
 #include "libmythbase/referencecounter.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/signalhandling.h"
+#include "libmythui/dbsettings.h"
 #include "libmythui/guistartup.h"
 #include "libmythui/langsettings.h"
 #include "libmythui/mediamonitor.h"
@@ -65,7 +66,6 @@
 #include "libmythupnp/upnp.h"
 
 #include "backendselect.h"
-#include "dbsettings.h"
 
 #define LOC      QString("MythContext: ")
 static const QString sLocation = "MythContext";
