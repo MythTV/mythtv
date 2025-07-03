@@ -9,13 +9,13 @@ using_mheg:SUBDIRS += libmythfreemheg
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
 # Libraries with dependencies
-SUBDIRS += libmythui libmythupnp libmyth
+SUBDIRS += libmythui libmythupnp
+LIBMYTHTVDEPS = $$SUBDIRS
 
 libmythui.depends = libmythbase
 libmythupnp.depends = libmythbase
 libmyth.depends =  libmythbase libmythui libmythupnp
-
-LIBMYTHTVDEPS = $$SUBDIRS
+SUBDIRS += libmyth
 
 # libmythtv
 libmythtv.depends = $$LIBMYTHTVDEPS
@@ -28,12 +28,6 @@ libmythmetadata.depends = $$LIBMYTHTVDEPS libmythtv
 #libmythmediaserver
 SUBDIRS += libmythprotoserver
 libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv
-
-# unit tests libmyth
-libmyth-test.depends = sub-libmyth
-libmyth-test.target = buildtestmyth
-libmyth-test.commands = cd libmyth/test && $(QMAKE) && $(MAKE)
-unix:QMAKE_EXTRA_TARGETS += libmyth-test
 
 # unit tests libmythbase
 libmythbase-test.depends = sub-libmythbase
@@ -59,7 +53,7 @@ libmythmetadata-test.target = buildtestmythmetadata
 libmythmetadata-test.commands = cd libmythmetadata/test && $(QMAKE) && $(MAKE)
 unix:QMAKE_EXTRA_TARGETS += libmythmetadata-test
 
-unittest.depends = libmyth-test libmythbase-test libmythui-test libmythtv-test libmythmetadata-test
+unittest.depends = libmythbase-test libmythui-test libmythtv-test libmythmetadata-test
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest
