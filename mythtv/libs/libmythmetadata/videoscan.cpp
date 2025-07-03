@@ -11,7 +11,6 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythprogressdialog.h"
@@ -482,4 +481,17 @@ void VideoScanner::finishedScan()
     emit finished(m_scanThread->getDataChanged());
 }
 
-////////////////////////////////////////////////////////////////////////
+/**
+ * \brief return list of backends currently connected to the master
+ */
+bool RemoteGetActiveBackends(QStringList *list)
+{
+    list->clear();
+    *list << "QUERY_ACTIVE_BACKENDS";
+
+    if (!gCoreContext->SendReceiveStringList(*list))
+        return false;
+
+    list->removeFirst();
+    return true;
+}
