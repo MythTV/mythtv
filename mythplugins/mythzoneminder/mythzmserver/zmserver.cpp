@@ -43,7 +43,7 @@
 #  endif // !__CYGWIN__
 #endif
 
-#ifdef __APPLE__
+#ifndef MSG_NOSIGNAL
 static constexpr int MSG_NOSIGNAL { 0 };  // Apple also has SO_NOSIGPIPE?
 #endif
 
