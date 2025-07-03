@@ -56,6 +56,11 @@ class MBASE_PUBLIC StorageGroup
                                      const QString &host,
                                      const QString &path);
 
+    static bool remoteGetFileList(const QString& host,
+                                  const QString& path,
+                                  QStringList* list,
+                                  QString sgroup,
+                                  bool fileNamesOnly = false);
   private:
     static void    StaticInit(void);
     static bool    m_staticInitDone;
