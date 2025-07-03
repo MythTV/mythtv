@@ -34,7 +34,6 @@ MBASE_PUBLIC QDateTime RemoteGetPreviewIfModified(
     const ProgramInfo &pginfo, const QString &cachefile);
 MBASE_PUBLIC bool RemoteFillProgramInfo(
     ProgramInfo &pginfo, const QString &playbackhostname);
-MBASE_PUBLIC QStringList RemoteRecordings(void);
 
 MBASE_PUBLIC int RemoteCheckForRecording(const ProgramInfo *pginfo);
 MBASE_PUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrecsecs,
