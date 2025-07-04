@@ -2,8 +2,7 @@
 #include <vorbis/vorbisfile.h>
 
 // C++
-#include <cstdlib>
-#include <ctime>
+#include <cstdio>
 #include <iostream>
 
 // Qt
