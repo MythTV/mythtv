@@ -11,8 +11,8 @@
 #include <QElapsedTimer>
 
 // MythTV headers
-#include "libmythbase/programinfo.h"
 #include "libmythtv/mythframe.h"
+#include "libmythtv/programtypes.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
