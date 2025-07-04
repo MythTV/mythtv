@@ -35,6 +35,7 @@
 #endif
 
 class QUrl;
+class MythEvent;
 class MythServer;
 class QTimer;
 class MetadataFactory;
