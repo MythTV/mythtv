@@ -18,8 +18,6 @@ MTV_PUBLIC bool RemoteUndeleteRecording(uint recordingID);
 MTV_PUBLIC std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
 MTV_PUBLIC void RemoteGetAllScheduledRecordings(std::vector<ProgramInfo *> &scheduledlist);
 MTV_PUBLIC void RemoteGetAllExpiringRecordings(std::vector<ProgramInfo *> &expiringlist);
-MTV_PUBLIC uint RemoteGetRecordingList(std::vector<ProgramInfo *> &reclist,
-                                    QStringList &strList);
 MTV_PUBLIC std::vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
 
 MTV_PUBLIC QDateTime RemoteGetPreviewIfModified(const ProgramInfo &pginfo,
