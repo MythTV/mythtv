@@ -138,23 +138,6 @@ std::vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
     return retlist;
 }
 
-QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
-{
-    QStringList strlist( "QUERY_PIXMAP_LASTMODIFIED" );
-    pginfo->ToStringList(strlist);
-
-    if (!gCoreContext->SendReceiveStringList(strlist))
-        return {};
-
-    if (!strlist.isEmpty() && !strlist[0].isEmpty() && (strlist[0] != "BAD"))
-    {
-        qint64 timet = strlist[0].toLongLong();
-        return MythDate::fromSecsSinceEpoch(timet);
-    }
-
-    return {};
-}
-
 /// Download preview & get timestamp if newer than cachefile's
 /// last modified time, otherwise just get the timestamp
 QDateTime RemoteGetPreviewIfModified(
@@ -278,66 +261,6 @@ QDateTime RemoteGetPreviewIfModified(
     file.close();
 
     return retdatetime;
-}
-
-bool RemoteFillProgramInfo(ProgramInfo &pginfo, const QString &playbackhost)
-{
-    QStringList strlist( "FILL_PROGRAM_INFO" );
-    strlist << playbackhost;
-    pginfo.ToStringList(strlist);
-
-    if (gCoreContext->SendReceiveStringList(strlist))
-    {
-        ProgramInfo tmp(strlist);
-        if (tmp.HasPathname() || tmp.GetChanID())
-        {
-            pginfo = tmp;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * \brief return list of currently recording shows
- */
-std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
-{
-    QString str = "QUERY_RECORDINGS ";
-    str += "Recording";
-    QStringList strlist( str );
-
-    auto *reclist = new std::vector<ProgramInfo *>;
-    auto *info = new std::vector<ProgramInfo *>;
-    if (!RemoteGetRecordingList(*info, strlist))
-    {
-        delete info;
-        return reclist;
-    }
-
-    // make sure whatever RemoteGetRecordingList() returned
-    // only has RecStatus::Recording shows
-    for (auto & p : *info)
-    {
-        if (p->GetRecordingStatus() == RecStatus::Recording ||
-            p->GetRecordingStatus() == RecStatus::Tuning ||
-            p->GetRecordingStatus() == RecStatus::Failing ||
-            (p->GetRecordingStatus() == RecStatus::Recorded &&
-             p->GetRecordingGroup() == "LiveTV"))
-        {
-            reclist->push_back(new ProgramInfo(*p));
-        }
-    }
-
-    while (!info->empty())
-    {
-        delete info->back();
-        info->pop_back();
-    }
-    delete info;
-
-    return reclist;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -22,13 +22,8 @@ MTV_PUBLIC uint RemoteGetRecordingList(std::vector<ProgramInfo *> &reclist,
                                     QStringList &strList);
 MTV_PUBLIC std::vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
 
-MTV_PUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
 MTV_PUBLIC QDateTime RemoteGetPreviewIfModified(const ProgramInfo &pginfo,
                                                 const QString &cachefile);
-
-MTV_PUBLIC bool RemoteFillProgramInfo(ProgramInfo &pginfo, const QString &playbackhostname);
-
-MTV_PUBLIC std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
 #endif // PROGRAMINFO_REMOTEUTIL_H
 
