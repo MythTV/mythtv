@@ -6,7 +6,6 @@
 // MythTV headers
 #include "dishdescriptors.h"
 #include "atsc_huffman.h"
-#include "libmythbase/programinfo.h" // for subtitle types and audio and video properties
 #include "dvbtables.h"
 
 QString DishEventNameDescriptor::Name(uint compression_type) const

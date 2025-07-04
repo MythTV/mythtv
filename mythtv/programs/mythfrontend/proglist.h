@@ -6,7 +6,7 @@
 #include <QString>
 
 // MythTV headers
-#include "libmythbase/programinfo.h" // for ProgramList
+#include "libmythtv/programinfo.h" // for ProgramList
 
 // MythFrontend
 #include "proglist_helpers.h"

@@ -9,9 +9,9 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/referencecounter.h"
 #include "libmythtv/inputinfo.h"
+#include "libmythtv/programinfo.h"
 
 // MythBackend
 #include "mainserver.h"

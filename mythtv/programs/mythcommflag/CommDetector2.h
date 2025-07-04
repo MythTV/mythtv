@@ -8,7 +8,7 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programtypes.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"

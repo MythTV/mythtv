@@ -13,7 +13,7 @@
 #include <QHash>
 
 // Myth
-#include "mythbaseexp.h"
+#include "mythtvexp.h"
 
 enum PIAction : std::uint8_t {
     kPIAdd,
@@ -22,7 +22,7 @@ enum PIAction : std::uint8_t {
     kPIUpdateFileSize,
 };
 
-class MBASE_PUBLIC PIKeyAction
+class MTV_PUBLIC PIKeyAction
 {
   public:
     PIKeyAction(uint recordedid, PIAction a) :
@@ -37,7 +37,7 @@ class MBASE_PUBLIC PIKeyAction
     }
 };
 
-class MBASE_PUBLIC PIKeyData
+class MTV_PUBLIC PIKeyData
 {
   public:
     PIKeyData(PIAction a, uint64_t f) : m_action(a), m_filesize(f) { }
@@ -45,7 +45,7 @@ class MBASE_PUBLIC PIKeyData
     uint64_t m_filesize;
 };
 
-class MBASE_PUBLIC ProgramInfoUpdater : public QRunnable
+class MTV_PUBLIC ProgramInfoUpdater : public QRunnable
 {
   public:
     ProgramInfoUpdater() { setAutoDelete(false); }
