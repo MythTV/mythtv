@@ -19,7 +19,6 @@
 #include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"       // for RecStatus, etc
 #include "libmythbase/recordingtypes.h"     // for toString, etc
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/channelutil.h"

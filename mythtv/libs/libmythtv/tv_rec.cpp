@@ -17,7 +17,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 
 #include "cardutil.h"

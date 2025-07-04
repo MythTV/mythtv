@@ -9,7 +9,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programtypes.h"      // for RecStatus, etc
 #include "libmythbase/recordingtypes.h"    // for toString
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/recordingrule.h"
 #include "libmythtv/tv_actions.h"          // for ACTION_CHANNELSEARCH
