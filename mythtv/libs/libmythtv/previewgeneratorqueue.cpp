@@ -13,7 +13,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
+#include "libmythbase/programinforemoteutil.h"
 
 // libmythtv
 #include "previewgenerator.h"
