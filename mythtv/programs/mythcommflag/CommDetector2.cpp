@@ -14,9 +14,9 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/mythcommflagplayer.h"
+#include "libmythtv/programinfo.h"
 
 // Commercial Flagging headers
 #include "BlankFrameDetector.h"

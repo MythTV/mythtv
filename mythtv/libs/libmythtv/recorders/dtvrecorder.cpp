@@ -20,7 +20,6 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/sizetliteral.h"
 
 #include "bytereader.h"
@@ -33,6 +32,7 @@
 #include "mpeg/mpegstreamdata.h"
 #include "mpeg/mpegtables.h"
 #include "mythsystemevent.h"
+#include "programinfo.h"
 #include "tv_rec.h"
 
 #define LOC ((m_tvrec) ? \

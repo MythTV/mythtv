@@ -20,9 +20,9 @@
 
 #include <QTest>
 
-#include "libmythbase/programinfo.h"
 #include "libmythmetadata/metadatafactory.h"
 #include "libmythmetadata/videometadata.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/recordinginfo.h"
 
 class Testvideometadata: public QObject

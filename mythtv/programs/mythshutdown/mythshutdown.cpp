@@ -21,8 +21,8 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programinfo.h"
 #include "libmythtv/jobqueue.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/tvremoteutil.h"
 

@@ -11,8 +11,8 @@
 #include "libmythbase/mythlocale.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/rssparse.h"
+#include "libmythtv/programinfo.h"
 
 #include "metadatacommon.h"
 

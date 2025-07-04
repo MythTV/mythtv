@@ -36,6 +36,7 @@
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/channelgroup.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/programinfo.h"
 
 // MythBackend
 #include "autoexpire.h"

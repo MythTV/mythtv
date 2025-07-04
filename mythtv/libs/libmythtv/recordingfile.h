@@ -1,13 +1,12 @@
 #ifndef RECORDING_FILE_H
 #define RECORDING_FILE_H
 
+#include <cstdint>
+
 #include <QString>
 #include <QSize>
 
-#include "libmythbase/programinfo.h"
 #include "libmythtv/mythtvexp.h"
-
-class RecordingRule;
 
 enum AVContainer : std::uint8_t
 {

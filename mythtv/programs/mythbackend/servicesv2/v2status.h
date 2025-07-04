@@ -20,7 +20,7 @@
 #include "libmythbase/http/mythhttpdata.h"
 #include "libmythbase/http/mythhttpservice.h"
 #include "libmythbase/http/mythmimedatabase.h"
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programinfo.h"
 
 // MythBackend
 #include "preformat.h"

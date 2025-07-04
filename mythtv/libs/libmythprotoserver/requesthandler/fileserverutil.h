@@ -8,8 +8,9 @@
 #include <QDateTime>
 #include <QString>
 
-#include "libmythbase/programinfo.h"
 #include "libmythbase/referencecounter.h"
+#include "libmythtv/programinfo.h"
+
 #include "libmythprotoserver/mythprotoserverexp.h"
 
 class DeleteThread;

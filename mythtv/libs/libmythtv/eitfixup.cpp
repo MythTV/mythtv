@@ -7,11 +7,11 @@
 
 // MythTV headers
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h" // for CategoryType, subtitle types and audio and video properties
 
 #include "channelutil.h" // for GetDefaultAuthority()
 #include "eitfixup.h"
 #include "mpeg/dishdescriptors.h" // for dish_theme_type_to_string
+#include "programinfo.h" // for CategoryType, subtitle types and audio and video properties
 
 /*------------------------------------------------------------------------
  * Event Fix Up Scripts - Turned on by entry in dtv_privatetype table

@@ -9,12 +9,12 @@
 // MythTV headers
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 
 #include "cardutil.h"
 #include "channelsettings.h"
 #include "channelutil.h"
 #include "mpeg/mpegtables.h"
+#include "programtypes.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 
 void ChannelID::Save()
 {

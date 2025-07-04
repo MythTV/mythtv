@@ -17,8 +17,8 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programinforemoteutil.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programinforemoteutil.h"
 
 // MythFrontend
 #include "programinfocache.h"

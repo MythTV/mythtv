@@ -61,12 +61,6 @@ set(LIBMYTHBASE_HEADERS
     mythtypes.h
     netgrabbermanager.h
     netutils.h
-    programinfo.h
-    programinforemoteutil.h
-    programtypes.h
-    programtypeflags.h
-    recordingstatus.h
-    recordingtypes.h
     referencecounter.h
     referencecounterlist.h
     remotefile.h
@@ -93,7 +87,6 @@ set(LIBMYTHBASE_HEADERS_NOT_INSTALLED
     mythsystemprivate.h
     mythtimezone.h
     portchecker.h
-    programinfoupdater.h
     unzip2.h
     unziputil.h)
 
@@ -225,12 +218,6 @@ add_library(
   netgrabbermanager.cpp
   netutils.cpp
   portchecker.cpp
-  programinfo.cpp
-  programinforemoteutil.cpp
-  programinfoupdater.cpp
-  programtypes.cpp
-  recordingstatus.cpp
-  recordingtypes.cpp
   referencecounter.cpp
   remotefile.cpp
   rssparse.cpp

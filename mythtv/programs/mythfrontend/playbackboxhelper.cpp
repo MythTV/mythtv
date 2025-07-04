@@ -16,11 +16,11 @@
 #include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programinforemoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/metadataimagehelper.h"
 #include "libmythtv/previewgeneratorqueue.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programinforemoteutil.h"
 #include "libmythtv/tvremoteutil.h"
 
 //  MythFrontend

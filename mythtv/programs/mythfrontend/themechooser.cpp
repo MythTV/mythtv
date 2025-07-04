@@ -13,7 +13,6 @@
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programtypes.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/unziputil.h" // for extractZIP

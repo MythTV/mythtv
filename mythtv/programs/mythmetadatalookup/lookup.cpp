@@ -7,10 +7,10 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programinforemoteutil.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/metadataimagehelper.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programinforemoteutil.h"
 #include "libmythtv/recordingrule.h"
 
 // MythMetadataLookup

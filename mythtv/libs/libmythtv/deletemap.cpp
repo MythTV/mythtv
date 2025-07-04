@@ -8,11 +8,11 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"       // for InfoMap
-#include "libmythbase/programinfo.h"
 #include "libmythui/mythuiactions.h"     // for ACTION_DOWN, ACTION_UP
 #include "mythplayer.h"
 #include "osd.h"
 #include "playercontext.h"               // for PlayerContext
+#include "programinfo.h"
 #include "tv_actions.h"                  // for ACTION_CLEARMAP, etc
 
 #define LOC     QString("DelMap: ")

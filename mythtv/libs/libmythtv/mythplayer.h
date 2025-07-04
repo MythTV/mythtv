@@ -23,7 +23,6 @@
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtypes.h"
-#include "libmythbase/programtypes.h"
 #include "libmythtv/audioplayer.h"
 #include "libmythtv/captions/cc608reader.h"
 #include "libmythtv/captions/cc708reader.h"
@@ -38,6 +37,7 @@
 #include "libmythtv/mythvideoout.h"
 #include "libmythtv/osd.h"
 #include "libmythtv/playercontext.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/videoouttypes.h"
 

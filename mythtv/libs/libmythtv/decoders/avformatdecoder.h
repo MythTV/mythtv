@@ -14,15 +14,14 @@ extern "C" {
 #include <QMap>
 #include <QString>
 
-#include "libmythtv/audio/audiooutputsettings.h"
-#include "libmythbase/programinfo.h"
-
+#include "audio/audiooutputsettings.h"
 #include "captions/vbilut.h"
 #include "decoderbase.h"
 #include "io/mythavformatbuffer.h"
 #include "mpeg/AVCParser.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
+#include "programinfo.h"
 
 class TeletextDecoder;
 class CC608Decoder;

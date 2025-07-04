@@ -12,9 +12,9 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythsystem.h"
-#include "libmythbase/programinforemoteutil.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/stringutil.h"
+#include "libmythtv/programinforemoteutil.h"
 
 // Local includes
 #include "recordingutils.h"

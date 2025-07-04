@@ -9,8 +9,8 @@
 
 // MythTV
 #include "libmythbase/mthread.h"
-#include "libmythbase/programtypes.h"
 #include "channelinfo.h"
+#include "programtypes.h"
 #include "tv.h"
 
 // Std
