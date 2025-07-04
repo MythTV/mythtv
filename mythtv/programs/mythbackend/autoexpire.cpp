@@ -29,9 +29,9 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythprotoserver/requesthandler/fileserverutil.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/remoteencoder.h"
 #include "libmythtv/tv_rec.h"
 

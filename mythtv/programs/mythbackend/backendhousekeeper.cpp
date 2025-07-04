@@ -22,12 +22,12 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programtypes.h"
-#include "libmythbase/recordingstatus.h"
-#include "libmythbase/recordingtypes.h"
 #include "libmythbase/unziputil.h"
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythtv/jobqueue.h"
+#include "libmythtv/programtypes.h"
+#include "libmythtv/recordingstatus.h"
+#include "libmythtv/recordingtypes.h"
 
 // MythBackend
 #include "backendhousekeeper.h"

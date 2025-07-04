@@ -3,10 +3,10 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 
 #include "cardutil.h"
 #include "inputinfo.h"
+#include "programinfo.h"
 #include "remoteencoder.h"
 #include "tv_rec.h"
 #include "tvremoteutil.h"

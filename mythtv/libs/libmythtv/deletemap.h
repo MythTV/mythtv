@@ -8,8 +8,8 @@
 #include <QVector>
 
 // MythTV headers
-#include "libmythbase/programtypes.h"   // for frm_dir_map_t, MarkTypes
 #include "libmythtv/mythtvexp.h"
+#include "libmythtv/programtypes.h"   // for frm_dir_map_t, MarkTypes
 
 class OSD;
 class PlayerContext;
