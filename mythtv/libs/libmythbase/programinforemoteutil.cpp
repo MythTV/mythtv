@@ -300,57 +300,6 @@ bool RemoteFillProgramInfo(ProgramInfo &pginfo, const QString &playbackhost)
 }
 
 /**
- * Get recorder for a programme.
- *
- * \return recordernum if pginfo recording in progress, else 0
- */
-int RemoteCheckForRecording(const ProgramInfo *pginfo)
-{
-    QStringList strlist( QString("CHECK_RECORDING") );
-    pginfo->ToStringList(strlist);
-
-    if (gCoreContext->SendReceiveStringList(strlist) && !strlist.isEmpty())
-        return strlist[0].toInt();
-
-    return 0;
-}
-
-/**
- * Get status of an individual programme (with pre-post roll?).
- *
- * \retval  0  Not Recording
- * \retval  1  Recording
- * \retval  2  Under-Record
- * \retval  3  Over-Record
- */
-int RemoteGetRecordingStatus(
-    const ProgramInfo *pginfo, int overrecsecs, int underrecsecs)
-{
-    QDateTime curtime = MythDate::current();
-
-    int retval = 0;
-
-    if (pginfo)
-    {
-        if (curtime >= pginfo->GetScheduledStartTime().addSecs(-underrecsecs) &&
-            curtime < pginfo->GetScheduledEndTime().addSecs(overrecsecs))
-        {
-            if (curtime >= pginfo->GetScheduledStartTime() &&
-                curtime < pginfo->GetScheduledEndTime())
-                retval = 1;
-            else if (curtime < pginfo->GetScheduledStartTime() &&
-                     RemoteCheckForRecording(pginfo) > 0)
-                retval = 2;
-            else if (curtime > pginfo->GetScheduledEndTime() &&
-                     RemoteCheckForRecording(pginfo) > 0)
-                retval = 3;
-        }
-    }
-
-    return retval;
-}
-
-/**
  * \brief return list of currently recording shows
  */
 std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)

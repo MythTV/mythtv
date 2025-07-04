@@ -29,9 +29,6 @@ MBASE_PUBLIC QDateTime RemoteGetPreviewIfModified(
 MBASE_PUBLIC bool RemoteFillProgramInfo(
     ProgramInfo &pginfo, const QString &playbackhostname);
 
-MBASE_PUBLIC int RemoteCheckForRecording(const ProgramInfo *pginfo);
-MBASE_PUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrecsecs,
-                                     int underrecsecs);
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
 #endif // PROGRAMINFO_REMOTEUTIL_H
