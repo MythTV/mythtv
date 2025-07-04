@@ -1001,6 +1001,8 @@ MBASE_PUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QStrin
 Q_DECLARE_METATYPE(ProgramInfo*)
 Q_DECLARE_METATYPE(ProgramInfo::CategoryType)
 
+MBASE_PUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
+
 #endif // MYTHPROGRAM_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
