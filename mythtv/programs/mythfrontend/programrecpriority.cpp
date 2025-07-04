@@ -8,7 +8,7 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
+#include "libmythbase/programinforemoteutil.h"
 #include "libmythbase/stringutil.h"
 #include "libmythbase/ternarycompare.h"
 #include "libmythtv/recordingrule.h"

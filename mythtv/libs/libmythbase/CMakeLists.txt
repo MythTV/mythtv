@@ -62,6 +62,7 @@ set(LIBMYTHBASE_HEADERS
     netgrabbermanager.h
     netutils.h
     programinfo.h
+    programinforemoteutil.h
     programtypes.h
     programtypeflags.h
     recordingstatus.h
@@ -69,7 +70,6 @@ set(LIBMYTHBASE_HEADERS
     referencecounter.h
     referencecounterlist.h
     remotefile.h
-    remoteutil.h
     rssparse.h
     rssmanager.h
     serverpool.h
@@ -226,13 +226,13 @@ add_library(
   netutils.cpp
   portchecker.cpp
   programinfo.cpp
+  programinforemoteutil.cpp
   programinfoupdater.cpp
   programtypes.cpp
   recordingstatus.cpp
   recordingtypes.cpp
   referencecounter.cpp
   remotefile.cpp
-  remoteutil.cpp
   rssparse.cpp
   rssmanager.cpp
   serverpool.cpp
