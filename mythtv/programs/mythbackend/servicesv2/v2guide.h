@@ -31,7 +31,6 @@
 
 // MythTV
 #include "libmythbase/http/mythhttpservice.h"
-#include "libmythbase/programinfo.h"
 
 // MythBackend
 #include "v2channelGroupList.h"

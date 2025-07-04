@@ -24,11 +24,11 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 
 #include "cardutil.h"
 #include "io/mythmediabuffer.h"
 #include "mpegrecorder.h"
+#include "programinfo.h"
 #include "recordingprofile.h"
 #include "tv_rec.h"
 
