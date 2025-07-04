@@ -4,9 +4,9 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programinforemoteutil.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programinforemoteutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/tvremoteutil.h"
 #include "libmythui/mythdialogbox.h"

@@ -40,7 +40,6 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programtypes.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/channelscan/scanwizardconfig.h"
@@ -52,6 +51,7 @@
 #include "libmythbase/mythdate.h"
 #include "libmythtv/frequencies.h"
 #include "libmythbase/mythsystemlegacy.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/restoredata.h"
 #include "libmythtv/scheduledrecording.h"
 
