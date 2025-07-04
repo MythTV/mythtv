@@ -10,7 +10,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/remoteutil.h"
 
 #include "cardutil.h"
 #include "mythsystemevent.h"

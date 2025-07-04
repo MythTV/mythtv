@@ -28,8 +28,8 @@
 #include "libmythbase/stringutil.h"
 
 #include "programinfo.h"
+#include "programinforemoteutil.h"
 #include "programinfoupdater.h"
-#include "remoteutil.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 

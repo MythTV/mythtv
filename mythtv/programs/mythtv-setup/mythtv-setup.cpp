@@ -27,7 +27,6 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelscan/channelimporter.h"
 #include "libmythtv/channelscan/channelscanner_cli.h"

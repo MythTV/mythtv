@@ -35,8 +35,8 @@
 #include "libmythbase/mythmedia.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/programinfo.h"
+#include "libmythbase/programinforemoteutil.h"
 #include "libmythbase/programtypes.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/signalhandling.h"
 #include "libmythbase/stringutil.h"
 

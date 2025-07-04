@@ -28,8 +28,6 @@
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythsocket.h"
 #include "libmythbase/mythsystemlegacy.h"
-#include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 
 #include "io/mythmediabuffer.h"

@@ -1,18 +1,13 @@
-#include "remoteutil.h"
+#include "programinforemoteutil.h"
 
 #include <unistd.h>
 
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
-#include <QList>
 
-#include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
-#include "libmythbase/mythevent.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/mythsocket.h"
-#include "libmythbase/storagegroup.h"
 
 #include "programinfo.h"
 

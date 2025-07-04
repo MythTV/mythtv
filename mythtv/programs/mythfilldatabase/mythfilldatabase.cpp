@@ -21,7 +21,6 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/mythsystemevent.h"
 #include "libmythtv/scheduledrecording.h"

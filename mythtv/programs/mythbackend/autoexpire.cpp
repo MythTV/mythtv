@@ -30,7 +30,6 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythprotoserver/requesthandler/fileserverutil.h"
 #include "libmythtv/remoteencoder.h"

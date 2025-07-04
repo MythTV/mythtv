@@ -37,7 +37,6 @@
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"

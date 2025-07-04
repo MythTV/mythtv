@@ -18,7 +18,6 @@
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythscheduler.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/scheduledrecording.h"
 

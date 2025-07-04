@@ -12,8 +12,8 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythsystem.h"
+#include "libmythbase/programinforemoteutil.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/stringutil.h"
 
 // Local includes

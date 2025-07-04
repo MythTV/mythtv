@@ -36,7 +36,6 @@
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/mythcommflagplayer.h"
