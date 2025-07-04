@@ -1,7 +1,6 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/scheduledrecording.h"

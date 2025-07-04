@@ -1,19 +1,15 @@
-#ifndef REMOTEUTIL_H_
-#define REMOTEUTIL_H_
+#ifndef PROGRAMINFO_REMOTEUTIL_H
+#define PROGRAMINFO_REMOTEUTIL_H
 
-#include <array>
 #include <vector>
 
 #include <QDateTime>
 #include <QString>
 #include <QStringList>
 
-#include "libmythbase/mythchrono.h"
-
 #include "mythbaseexp.h"
 
 class ProgramInfo;
-class MythEvent;
 
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
 MBASE_PUBLIC bool RemoteCheckFile(
@@ -40,6 +36,6 @@ MBASE_PUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrec
                                      int underrecsecs);
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
-#endif // REMOTEUTIL_H_
+#endif // PROGRAMINFO_REMOTEUTIL_H
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
