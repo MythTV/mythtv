@@ -13,8 +13,8 @@ extern "C" {
 
 // mythtv
 #include <libmyth/mythavframe.h>
-#include <libmythbase/programtypes.h>
 #include <libmythtv/mythavutil.h>
+#include <libmythtv/programtypes.h>
 #include <libmythui/mythscreentype.h>
 
 // mytharchive

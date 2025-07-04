@@ -30,8 +30,8 @@ extern "C"
 #include <QDateTime>
 
 // MythTV
-#include "libmythbase/programtypes.h"
 #include "libmythtv/mythavutil.h"
+#include "libmythtv/programtypes.h"
 
 // MythTranscode
 #include "transcodedefs.h"
