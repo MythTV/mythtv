@@ -11,6 +11,33 @@
 
 #include "programinfo.h"
 
+static uint RemoteGetRecordingList(std::vector<ProgramInfo *> &reclist, QStringList &strList)
+{
+    if (!gCoreContext->SendReceiveStringList(strList) || strList.isEmpty())
+        return 0;
+
+    int numrecordings = strList[0].toInt();
+    if (numrecordings <= 0)
+        return 0;
+
+    if ((numrecordings * NUMPROGRAMLINES) + 1 > strList.size())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+                 "RemoteGetRecordingList() list size appears to be incorrect.");
+        return 0;
+    }
+
+    uint reclist_initial_size = (uint) reclist.size();
+    QStringList::const_iterator it = strList.cbegin() + 1;
+    for (int i = 0; i < numrecordings; i++)
+    {
+        auto *pginfo = new ProgramInfo(it, strList.cend());
+        reclist.push_back(pginfo);
+    }
+
+    return ((uint) reclist.size()) - reclist_initial_size;
+}
+
 std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 {
     QString str = "QUERY_RECORDINGS ";
@@ -96,34 +123,6 @@ void RemoteGetAllExpiringRecordings(std::vector<ProgramInfo *> &expiringlist)
 {
     QStringList strList(QString("QUERY_GETEXPIRING"));
     RemoteGetRecordingList(expiringlist, strList);
-}
-
-uint RemoteGetRecordingList(
-    std::vector<ProgramInfo *> &reclist, QStringList &strList)
-{
-    if (!gCoreContext->SendReceiveStringList(strList) || strList.isEmpty())
-        return 0;
-
-    int numrecordings = strList[0].toInt();
-    if (numrecordings <= 0)
-        return 0;
-
-    if ((numrecordings * NUMPROGRAMLINES) + 1 > strList.size())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-                 "RemoteGetRecordingList() list size appears to be incorrect.");
-        return 0;
-    }
-
-    uint reclist_initial_size = (uint) reclist.size();
-    QStringList::const_iterator it = strList.cbegin() + 1;
-    for (int i = 0; i < numrecordings; i++)
-    {
-        auto *pginfo = new ProgramInfo(it, strList.cend());
-        reclist.push_back(pginfo);
-    }
-
-    return ((uint) reclist.size()) - reclist_initial_size;
 }
 
 std::vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
