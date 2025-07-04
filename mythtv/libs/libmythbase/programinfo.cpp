@@ -28,7 +28,6 @@
 #include "libmythbase/stringutil.h"
 
 #include "programinfo.h"
-#include "programinforemoteutil.h"
 #include "programinfoupdater.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
@@ -6679,5 +6678,24 @@ QString ProgGroupBy::toString(ProgGroupBy::Type groupBy)
     }
 }
 
+bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
+{
+    QStringList strlist("QUERY_CHECKFILE");
+    strlist << QString::number((int)checkSlaves);
+    pginfo->ToStringList(strlist);
+
+    if (!gCoreContext->SendReceiveStringList(strlist) ||
+        (strlist.size() < 2) || !strlist[0].toInt())
+        return false;
+
+    // Only modify the pathname if the recording file is available locally on
+    // this host
+    QString localpath = strlist[1];
+    QFile checkFile(localpath);
+    if (checkFile.exists())
+        pginfo->SetPathname(localpath);
+
+    return true;
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

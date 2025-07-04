@@ -12,8 +12,6 @@
 class ProgramInfo;
 
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
-MBASE_PUBLIC bool RemoteCheckFile(
-    ProgramInfo *pginfo, bool checkSlaves = true);
 MBASE_PUBLIC bool RemoteDeleteRecording( uint recordingID, bool forceMetadataDelete,
                                     bool forgetHistory);
 MBASE_PUBLIC

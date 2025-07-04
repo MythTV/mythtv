@@ -34,26 +34,6 @@ std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
     return info;
 }
 
-bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
-{
-    QStringList strlist("QUERY_CHECKFILE");
-    strlist << QString::number((int)checkSlaves);
-    pginfo->ToStringList(strlist);
-
-    if (!gCoreContext->SendReceiveStringList(strlist) ||
-        (strlist.size() < 2) || !strlist[0].toInt())
-        return false;
-
-    // Only modify the pathname if the recording file is available locally on
-    // this host
-    QString localpath = strlist[1];
-    QFile checkFile(localpath);
-    if (checkFile.exists())
-        pginfo->SetPathname(localpath);
-
-    return true;
-}
-
 bool RemoteDeleteRecording(uint recordingID, bool forceMetadataDelete,
     bool forgetHistory)
 {
