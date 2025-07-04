@@ -1,10 +1,9 @@
 #ifndef DUMMYDECODER_H_
 #define DUMMYDECODER_H_
 
-#include "libmythbase/programinfo.h"
-
 #include "decoders/decoderbase.h"
 #include "mythframe.h"
+#include "programinfo.h"
 
 class DummyDecoder : public DecoderBase
 {

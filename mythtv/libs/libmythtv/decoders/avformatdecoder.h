@@ -17,7 +17,6 @@ extern "C" {
 #include "libmyth/audio/audiooutputsettings.h"
 #include "libmyth/audio/audiooutpututil.h"
 #include "libmyth/audio/spdifencoder.h"
-#include "libmythbase/programinfo.h"
 
 #include "captions/vbilut.h"
 #include "decoderbase.h"
@@ -25,6 +24,7 @@ extern "C" {
 #include "mpeg/AVCParser.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
+#include "programinfo.h"
 
 class TeletextDecoder;
 class CC608Decoder;

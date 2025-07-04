@@ -46,7 +46,7 @@ static constexpr uint    kInvalidDateTime  { UINT_MAX  };
 static constexpr int64_t kLastUpdateOffset { 61LL * 60 };
 
 #define DEFINE_FLAGS_NAMES
-#include "libmythbase/programtypeflags.h"
+#include "programtypeflags.h"
 #undef DEFINE_FLAGS_NAMES
 
 const QString ProgramInfo::kFromRecordedQuery =

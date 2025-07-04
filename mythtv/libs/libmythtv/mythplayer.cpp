@@ -24,7 +24,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtimer.h"
-#include "libmythbase/programinfo.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuiactions.h"
 
@@ -41,6 +40,7 @@
 #include "mythavutil.h"
 #include "mythplayer.h"
 #include "mythvideooutnull.h"
+#include "programinfo.h"
 #include "remoteencoder.h"
 #include "tv_actions.h"
 #include "tv_play.h"

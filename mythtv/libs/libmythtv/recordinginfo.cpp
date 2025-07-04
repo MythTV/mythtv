@@ -13,9 +13,9 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfoupdater.h"
 
 #include "jobqueue.h"
+#include "programinfoupdater.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "scheduledrecording.h"

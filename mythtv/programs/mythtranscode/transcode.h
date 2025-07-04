@@ -1,7 +1,7 @@
 // MythTV
-#include "libmythbase/programtypes.h"
 #include "libmythtv/io/mythfifowriter.h"
 #include "libmythtv/playercontext.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/recordingprofile.h"
 
 // MythTranscode

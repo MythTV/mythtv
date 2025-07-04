@@ -6,7 +6,7 @@
 #include <vector>
 
 // MythTV
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programinfo.h"
 #include "libmythui/mythscreentype.h"
 
 class ProgramStruct
