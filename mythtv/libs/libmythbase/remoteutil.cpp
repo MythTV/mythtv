@@ -64,12 +64,12 @@ bool RemoteGetUptime(std::chrono::seconds &uptime)
     if (strlist[0].isEmpty() || !strlist[0].at(0).isNumber())
         return false;
 
-    if (sizeof(time_t) == sizeof(int))
-        uptime = std::chrono::seconds(strlist[0].toUInt());
-    else if (sizeof(time_t) == sizeof(long))
-        uptime = std::chrono::seconds(strlist[0].toULong());
-    else if (sizeof(time_t) == sizeof(long long))
-        uptime = std::chrono::seconds(strlist[0].toULongLong());
+    if (sizeof(std::chrono::seconds::rep) == sizeof(long long))
+        uptime = std::chrono::seconds(strlist[0].toLongLong());
+    else if (sizeof(std::chrono::seconds::rep) == sizeof(long))
+        uptime = std::chrono::seconds(strlist[0].toLong());
+    else if (sizeof(std::chrono::seconds::rep) == sizeof(int))
+        uptime = std::chrono::seconds(strlist[0].toInt());
 
     return true;
 }
