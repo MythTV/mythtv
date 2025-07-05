@@ -35,7 +35,7 @@ class Player
 {
   public:
     Player(void) = default;
-    ~Player(void);
+    ~Player(void) = default;
 
     void updateFrame(const uchar* buffer);
     void updateStatus(void);
@@ -51,8 +51,6 @@ class Player
     MythUIImage *m_frameImage {nullptr};
     MythUIText  *m_statusText {nullptr};
     MythUIText  *m_cameraText {nullptr};
-
-    uchar       *m_rgba       {nullptr};
 
     Monitor      m_monitor;
 };

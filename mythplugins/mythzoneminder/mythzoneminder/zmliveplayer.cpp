@@ -465,20 +465,9 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-Player::~Player()
-{
-    if (m_rgba)
-        free(m_rgba);
-}
-
 void Player::setMonitor(const Monitor *mon)
 {
     m_monitor = *mon;
-
-    if (m_rgba)
-        free(m_rgba);
-
-    m_rgba = (uchar *) malloc(4_UZ * m_monitor.width * m_monitor.height);
 }
 
 void Player::setWidgets(MythUIImage *image, MythUIText *status, MythUIText  *camera)
