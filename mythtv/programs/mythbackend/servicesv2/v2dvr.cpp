@@ -33,13 +33,13 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythscheduler.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/playgroup.h"
 #include "libmythtv/programdata.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/tv_rec.h"
 
 // MythBackend

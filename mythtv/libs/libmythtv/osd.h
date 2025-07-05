@@ -3,10 +3,10 @@
 
 // MythTV
 #include "libmythbase/mythtypes.h"
-#include "libmythbase/programtypes.h"
 #include "libmythtv/mythmediaoverlay.h"
 #include "libmythtv/mythplayerstate.h"
 #include "libmythui/mythscreentype.h"
+#include "libmythtv/programtypes.h"
 
 // Screen names are prepended with alphanumerics to force the correct ordering
 // when displayed. This is slightly complicated by the default windows

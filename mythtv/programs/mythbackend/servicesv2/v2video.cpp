@@ -6,13 +6,13 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/bluraymetadata.h"
 #include "libmythmetadata/globals.h"
 #include "libmythmetadata/metadatafactory.h"
 #include "libmythmetadata/videometadata.h"
 #include "libmythtv/mythavutil.h"
+#include "libmythtv/programinfo.h"
 
 // MythBackend
 #include "v2artworkInfoList.h"

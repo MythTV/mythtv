@@ -9,8 +9,8 @@
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythtv/mythcommflagplayer.h"
+#include "libmythtv/programinfo.h"
 
 PrePostRollFlagger::PrePostRollFlagger(SkipType commDetectMethod,
                             bool showProgress, bool fullSpeed,

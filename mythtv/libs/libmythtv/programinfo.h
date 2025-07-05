@@ -17,9 +17,9 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythtypes.h"
-#include "libmythbase/programtypes.h"
-#include "libmythbase/recordingstatus.h"
-#include "libmythbase/recordingtypes.h"
+#include "programtypes.h"
+#include "recordingstatus.h"
+#include "recordingtypes.h"
 
 /* If NUMPROGRAMLINES gets updated, then MYTH_PROTO_VERSION and MYTH_PROTO_TOKEN
    in mythversion.h need to be bumped, and also follow the instructions in
@@ -64,7 +64,7 @@ class MSqlQuery;
 class ProgramInfoUpdater;
 class PMapDBReplacement;
 
-class MBASE_PUBLIC ProgramInfo
+class MTV_PUBLIC ProgramInfo
 {
     friend int pginfo_init_statics(void);
     friend class TestRecordingExtender;
@@ -866,7 +866,7 @@ class MBASE_PUBLIC ProgramInfo
 // Class for specifying the desired grouping behavior when querying
 // for program data.  Note that title and starttime are always used in
 // all cases but None and callsign is also used in the ChanNum case.
-class MBASE_PUBLIC ProgGroupBy : public QObject
+class MTV_PUBLIC ProgGroupBy : public QObject
 {
     Q_OBJECT
 
@@ -881,7 +881,7 @@ public:
     Q_ENUM(Type)
 };
 
-MBASE_PUBLIC bool LoadFromProgram(
+MTV_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &where,
     const QString      &groupBy,
@@ -889,14 +889,14 @@ MBASE_PUBLIC bool LoadFromProgram(
     const MSqlBindings &bindings,
     const ProgramList  &schedList);
 
-MBASE_PUBLIC bool LoadFromProgram(
+MTV_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
     const ProgramList  &schedList,
     ProgGroupBy::Type  groupBy = ProgGroupBy::None);
 
-MBASE_PUBLIC bool LoadFromProgram(
+MTV_PUBLIC bool LoadFromProgram(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
@@ -906,15 +906,15 @@ MBASE_PUBLIC bool LoadFromProgram(
     uint               &count,
     ProgGroupBy::Type  groupBy = ProgGroupBy::None);
 
-MBASE_PUBLIC ProgramInfo*  LoadProgramFromProgram(
+MTV_PUBLIC ProgramInfo*  LoadProgramFromProgram(
         uint chanid, const QDateTime &starttime);
 
-MBASE_PUBLIC bool LoadFromOldRecorded(
+MTV_PUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings);
 
-MBASE_PUBLIC bool LoadFromOldRecorded(
+MTV_PUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
@@ -922,7 +922,7 @@ MBASE_PUBLIC bool LoadFromOldRecorded(
     uint               limit,
     uint               &count);
 
-MBASE_PUBLIC bool LoadFromRecorded(
+MTV_PUBLIC bool LoadFromRecorded(
     ProgramList        &destination,
     bool                possiblyInProgressRecordingsOnly,
     const QMap<QString,uint32_t> &inUseMap,
@@ -981,12 +981,12 @@ bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
 
 // Moved from programdetails.cpp/h, used by MythWelcome/MythShutdown
 // could be factored out
-MBASE_PUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
+MTV_PUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
                                   bool *hasConflicts = nullptr,
                                   std::vector<ProgramInfo> *list = nullptr);
 
 class QMutex;
-class MBASE_PUBLIC PMapDBReplacement
+class MTV_PUBLIC PMapDBReplacement
 {
   public:
     PMapDBReplacement();
@@ -995,11 +995,13 @@ class MBASE_PUBLIC PMapDBReplacement
     QMap<MarkTypes,frm_pos_map_t> map;
 };
 
-MBASE_PUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_type);
-MBASE_PUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
+MTV_PUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_type);
+MTV_PUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
 
 Q_DECLARE_METATYPE(ProgramInfo*)
 Q_DECLARE_METATYPE(ProgramInfo::CategoryType)
+
+MTV_PUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
 
 #endif // MYTHPROGRAM_H_
 

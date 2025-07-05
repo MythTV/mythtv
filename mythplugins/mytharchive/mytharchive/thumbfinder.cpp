@@ -46,7 +46,7 @@
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/mythmiscutil.h> // for MythFile::copy
-#include <libmythbase/programinfo.h>
+#include <libmythtv/programinfo.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythimage.h>
 #include <libmythui/mythmainwindow.h>

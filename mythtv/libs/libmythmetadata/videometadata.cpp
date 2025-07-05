@@ -13,7 +13,6 @@
 #include "libmythbase/mythmiscutil.h"// for FileHash
 #include "libmythbase/mythsorthelper.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/stringutil.h"
 #include "libmythbase/ternarycompare.h"
