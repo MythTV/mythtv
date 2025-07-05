@@ -8,7 +8,6 @@
 #include <array>
 #include <cerrno>
 #include <cstdlib>
-#include <ctime>
 #include <iostream>
 
 // POSIX
@@ -59,7 +58,7 @@
 #include "mythsystemlegacy.h"
 
 
-/** \fn getUptime(time_t&)
+/**
  *  \brief Returns uptime statistics.
  *  \return true if successful, false otherwise.
  */

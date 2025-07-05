@@ -2,7 +2,6 @@
 #define REMOTEUTIL_H_
 
 #include <array>
-#include <ctime>
 #include <vector>
 
 #include <QDateTime>
