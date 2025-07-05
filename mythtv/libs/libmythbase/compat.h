@@ -284,40 +284,6 @@
 #   define SIGTRAP    SIGBREAK
 #   define STDERR_FILENO (int)GetStdHandle( STD_ERROR_HANDLE )
 
-
-#   if !defined(gmtime_r)
-// FFmpeg libs already have a workaround, use it if the headers are included,
-// use this otherwise.
-static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
-{
-    // this is safe on windows, where gmtime uses a thread local variable.
-    // using _gmtime_s() would be better, but needs to be tested on windows.
-    struct tm *tmp = gmtime(timep);
-    if (tmp)
-    {
-        *result = *tmp;
-        return result;
-    }
-    return nullptr;
-}
-#   endif
-
-#   if !defined(localtime_r)
-// FFmpeg libs already have a workaround, use it if the headers are included,
-// use this otherwise.
-static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
-{
-    // this is safe, windows uses a thread local variable for localtime().
-    if (timep && result)
-    {
-        struct tm *win_tmp = localtime(timep);
-        memcpy(result, win_tmp, sizeof(struct tm));
-        return result;
-    }
-    return nullptr;
-}
-#   endif
-
 #include <sys/stat.h>   // S_IREAD/WRITE on MinGW
 #  define S_IRUSR _S_IREAD
 #  ifndef lseek64
