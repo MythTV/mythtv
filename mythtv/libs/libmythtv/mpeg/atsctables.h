@@ -6,7 +6,10 @@
 #include "libmythbase/mythconfig.h"
 
 #include <cstdint>  // uint32_t
+#include <ctime>
 #include <limits> // workaround QTBUG-90395
+
+using uint = unsigned int;
 
 #include <QString>
 #include <QtEndian>

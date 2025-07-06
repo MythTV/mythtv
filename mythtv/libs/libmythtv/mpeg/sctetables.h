@@ -23,6 +23,10 @@
 #define SCTE_TABLES_H
 
 #include <cassert>
+#include <cstdint>
+#include <ctime>
+
+using uint = unsigned int;
 
 #include <QDateTime>
 #include <QString>
