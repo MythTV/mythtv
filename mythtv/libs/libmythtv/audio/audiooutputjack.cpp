@@ -231,7 +231,7 @@ bool AudioOutputJACK::OpenDevice()
         return false;
 
     // Device opened successfully. Skip client cleanup function.
-    cleanup.release();
+    (void)cleanup.release();
     return true;
 }
 
