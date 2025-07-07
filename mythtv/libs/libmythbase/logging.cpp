@@ -410,7 +410,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     else
     {
 #if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
-        if (true)
+        if (true) // NOLINT(readability-simplify-boolean-expr)
 #else
         if (m_loglong)
 #endif
