@@ -173,10 +173,15 @@ QString StorageGroupDirStorage::GetWhereClause(MSqlBindings &bindings) const
 }
 
 StorageGroupDirSetting::StorageGroupDirSetting(int id, const QString &group) :
-    MythUIFileBrowserSetting(std::make_shared<StorageGroupDirStorage>(this, id, group)),
+    MythUIFileBrowserSetting(new StorageGroupDirStorage(this, id, group)),
     m_id(id), m_group(group)
 {
     SetTypeFilter(QDir::AllDirs | QDir::Drives);
+}
+
+StorageGroupDirSetting::~StorageGroupDirSetting()
+{
+    delete GetStorage();
 }
 
 bool StorageGroupDirSetting::keyPressEvent(QKeyEvent *event)

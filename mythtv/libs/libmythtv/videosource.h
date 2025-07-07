@@ -94,6 +94,7 @@ class FreqTableSelector :
     Q_OBJECT
 public:
     explicit FreqTableSelector(const VideoSource& parent);
+    ~FreqTableSelector();
 protected:
     QString m_freq;
 };
@@ -215,9 +216,14 @@ class VideoSource : public GroupSetting {
     {
       public:
         explicit Name(const VideoSource &parent) :
-            MythUITextEditSetting(std::make_shared<VideoSourceDBStorage>(this, parent, "name"))
+            MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "name"))
         {
             setLabel(QObject::tr("Video source name"));
+        }
+
+        ~Name()
+        {
+            delete GetStorage();
         }
     };
 
@@ -251,9 +257,14 @@ class CaptureCardComboBoxSetting : public MythUIComboBoxSetting
     CaptureCardComboBoxSetting(const CaptureCard &parent,
                                bool rw,
                                const QString &setting) :
-        MythUIComboBoxSetting(std::make_shared<CaptureCardDBStorage>(this, parent, setting),
+        MythUIComboBoxSetting(new CaptureCardDBStorage(this, parent, setting),
                               rw)
     {
+    }
+
+    ~CaptureCardComboBoxSetting()
+    {
+        delete GetStorage();
     }
 };
 
@@ -278,10 +289,15 @@ class EmptyAudioDevice : public MythUITextEditSetting
     Q_OBJECT
   public:
     explicit EmptyAudioDevice(const CaptureCard &parent) :
-        MythUITextEditSetting(std::make_shared<CaptureCardDBStorage>(this, parent,
+        MythUITextEditSetting(new CaptureCardDBStorage(this, parent,
                                                        "audiodevice"))
     {
         setVisible(false);
+    }
+
+    ~EmptyAudioDevice()
+    {
+        delete GetStorage();
     }
 
     void Save(void) override // StandardSetting
@@ -304,10 +320,15 @@ class EmptyVBIDevice : public MythUITextEditSetting
 
   public:
     explicit EmptyVBIDevice(const CaptureCard &parent) :
-        MythUITextEditSetting(std::make_shared<CaptureCardDBStorage>(this, parent, "vbidevice"))
+        MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "vbidevice"))
     {
         setVisible(false);
     };
+
+    ~EmptyVBIDevice()
+    {
+        delete GetStorage();
+    }
 
     void Save(void) override // StandardSetting
     {
@@ -372,6 +393,7 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
   public:
     HDHomeRunDeviceID(const CaptureCard &parent,
                       HDHomeRunConfigurationGroup &_group);
+    ~HDHomeRunDeviceID();
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
 
@@ -457,6 +479,7 @@ class SatIPDeviceID : public MythUITextEditSetting
 
   public:
     explicit SatIPDeviceID(const CaptureCard &parent);
+    ~SatIPDeviceID();
 
     void Load(void) override; // StandardSetting
 
@@ -761,6 +784,7 @@ private:
     {
       public:
         explicit Hostname(const CaptureCard &parent);
+        ~Hostname();
         void edit(MythScreenType */*screen*/) override {} // StandardSetting
         void resultEdit(DialogCompletionEvent */*dce*/) override {} // StandardSetting
     };
@@ -874,13 +898,18 @@ class StartingChannel : public MythUIComboBoxSetting
     Q_OBJECT
   public:
     explicit StartingChannel(const CardInput &parent) :
-        MythUIComboBoxSetting(std::make_shared<CardInputDBStorage>(this, parent, "startchan"),
+        MythUIComboBoxSetting(new CardInputDBStorage(this, parent, "startchan"),
                               false)
     {
         setLabel(QObject::tr("Starting channel"));
         setHelpText(QObject::tr("This channel is shown when 'Watch TV' is selected on the main menu. "
                                 "It is updated on every Live TV channel change. "
                                 "When the value is not valid a suitable default will be chosen."));
+    }
+
+    ~StartingChannel()
+    {
+        delete GetStorage();
     }
     static void fillSelections(void) {;}
   public slots:
@@ -1014,6 +1043,7 @@ class VBoxDeviceID : public MythUITextEditSetting
 
   public:
     explicit VBoxDeviceID(const CaptureCard &parent);
+    ~VBoxDeviceID();
 
     void Load(void) override; // StandardSetting
 
@@ -1051,6 +1081,7 @@ class CetonDeviceID : public MythUITextEditSetting
 
   public:
     explicit CetonDeviceID(const CaptureCard &parent);
+    ~CetonDeviceID();
 
     void Load(void) override; // StandardSetting
     void UpdateValues();

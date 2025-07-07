@@ -45,9 +45,14 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit Is_default(const ProfileGroup &parent) :
-            StandardSetting(std::make_shared<ProfileGroupStorage>(this, parent, "is_default"))
+            StandardSetting(new ProfileGroupStorage(this, parent, "is_default"))
         {
             setVisible(false);
+        }
+
+        ~Is_default()
+        {
+            delete GetStorage();
         }
 
         void edit(MythScreenType * /*screen*/) override { } // StandardSetting
@@ -58,9 +63,14 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit Name(const ProfileGroup &parent) :
-            MythUITextEditSetting(std::make_shared<ProfileGroupStorage>(this, parent, "name"))
+            MythUITextEditSetting(new ProfileGroupStorage(this, parent, "name"))
         {
             setLabel(QObject::tr("Profile Group Name"));
+        }
+
+        ~Name()
+        {
+            delete GetStorage();
         }
     };
 
@@ -68,10 +78,15 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit HostName(const ProfileGroup &parent) :
-            MythUIComboBoxSetting(std::make_shared<ProfileGroupStorage>(this, parent,
+            MythUIComboBoxSetting(new ProfileGroupStorage(this, parent,
                                                           "hostname"))
         {
             setLabel(QObject::tr("Hostname"));
+        }
+
+        ~HostName()
+        {
+            delete GetStorage();
         }
         void fillSelections();
     };
@@ -80,10 +95,15 @@ class ProfileGroup : public GroupSetting
     {
       public:
         explicit CardInfo(const ProfileGroup &parent) :
-            MythUIComboBoxSetting(std::make_shared<ProfileGroupStorage>(this, parent,
+            MythUIComboBoxSetting(new ProfileGroupStorage(this, parent,
                                                           "cardtype"))
         {
             setLabel(QObject::tr("Card-Type"));
+        }
+
+        ~CardInfo()
+        {
+            delete GetStorage();
         }
     };
 

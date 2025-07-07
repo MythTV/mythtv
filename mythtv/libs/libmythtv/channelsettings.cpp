@@ -104,9 +104,14 @@ class Name : public MythUITextEditSetting
 {
   public:
     explicit Name(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "name"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "name"))
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Name"));
+    }
+
+    ~Name()
+    {
+        delete GetStorage();
     }
 };
 
@@ -114,11 +119,16 @@ class Channum : public MythUITextEditSetting
 {
   public:
     explicit Channum(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "channum"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "channum"))
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Number"));
         setHelpText(QCoreApplication::translate("(Common)",
         "This is the number by which the channel is known to MythTV."));
+    }
+
+    ~Channum()
+    {
+        delete GetStorage();
     }
 };
 
@@ -126,7 +136,7 @@ class Source : public MythUIComboBoxSetting
 {
   public:
     Source(const ChannelID &id, uint _default_sourceid) :
-        MythUIComboBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "sourceid")),
+        MythUIComboBoxSetting(new ChannelDBStorage(this, id, "sourceid")),
         m_defaultSourceId(_default_sourceid)
     {
         setLabel(QCoreApplication::translate("(Common)", "Video Source"));
@@ -134,6 +144,11 @@ class Source : public MythUIComboBoxSetting
         "It is NOT a good idea to change this value as it only changes "
         "the sourceid in table channel but not in dtv_multiplex. "
         "The sourceid in dtv_multiplex cannot and should not be changed."));
+    }
+
+    ~Source()
+    {
+        delete GetStorage();
     }
 
     void Load(void) override // StandardSetting
@@ -185,14 +200,19 @@ class Callsign : public MythUITextEditSetting
 {
   public:
     explicit Callsign(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "callsign"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "callsign"))
     {
         setLabel(QCoreApplication::translate("(Common)", "Callsign"));
+    }
+
+    ~Callsign()
+    {
+        delete GetStorage();
     }
 };
 
 ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
-    MythUIComboBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "tvformat"))
+    MythUIComboBoxSetting(new ChannelDBStorage(this, id, "tvformat"))
 {
     setLabel(QCoreApplication::translate("(ChannelSettings)", "TV Format"));
     setHelpText(QCoreApplication::translate("(ChannelSettings)",
@@ -204,6 +224,11 @@ ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
     QStringList list = GetFormats();
     for (const QString& format : std::as_const(list))
         addSelection(format);
+}
+
+ChannelTVFormat::~ChannelTVFormat()
+{
+    delete GetStorage();
 }
 
 QStringList ChannelTVFormat::GetFormats(void)
@@ -232,7 +257,7 @@ class TimeOffset : public MythUISpinBoxSetting
 {
   public:
     explicit TimeOffset(const ChannelID &id) :
-        MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "tmoffset"),
+        MythUISpinBoxSetting(new ChannelDBStorage(this, id, "tmoffset"),
                              -1440, 1440, 1)
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -243,13 +268,18 @@ class TimeOffset : public MythUISpinBoxSetting
             "import.  This can be used when the listings for a particular "
             "channel are in a different time zone."));
     }
+
+    ~TimeOffset()
+    {
+        delete GetStorage();
+    }
 };
 
 class Priority : public MythUISpinBoxSetting
 {
   public:
     explicit Priority(const ChannelID &id) :
-        MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "recpriority"),
+        MythUISpinBoxSetting(new ChannelDBStorage(this, id, "recpriority"),
                              -99, 99, 1)
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Priority"));
@@ -260,13 +290,18 @@ class Priority : public MythUISpinBoxSetting
             "if you want this to be a preferred channel, a negative one to "
             "depreciate this channel."));
     }
+
+    ~Priority()
+    {
+        delete GetStorage();
+    }
 };
 
 class Icon : public MythUITextEditSetting
 {
   public:
     explicit Icon(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "icon"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "icon"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Icon"));
 
@@ -274,13 +309,18 @@ class Icon : public MythUITextEditSetting
             "Image file to use as the icon for this channel on various MythTV "
             "displays."));
     }
+
+    ~Icon()
+    {
+        delete GetStorage();
+    }
 };
 
 class VideoFilters : public MythUITextEditSetting
 {
   public:
     explicit VideoFilters(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "videofilters"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "videofilters"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Video filters"));
@@ -290,6 +330,11 @@ class VideoFilters : public MythUITextEditSetting
             "with hardware encoding cards."));
 
     }
+
+    ~VideoFilters()
+    {
+        delete GetStorage();
+    }
 };
 
 
@@ -297,7 +342,7 @@ class OutputFilters : public MythUITextEditSetting
 {
   public:
     explicit OutputFilters(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "outputfilters"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "outputfilters"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                     "Playback filters"));
@@ -306,13 +351,18 @@ class OutputFilters : public MythUITextEditSetting
             "Filters to be used when recordings from this channel are viewed. "
             "Start with a plus to append to the global playback filters."));
     }
+
+    ~OutputFilters()
+    {
+        delete GetStorage();
+    }
 };
 
 class XmltvID : public MythUIComboBoxSetting
 {
   public:
     XmltvID(const ChannelID &id, QString _sourceName) :
-        MythUIComboBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "xmltvid"), true),
+        MythUIComboBoxSetting(new ChannelDBStorage(this, id, "xmltvid"), true),
         m_sourceName(std::move(_sourceName))
     {
         setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
@@ -322,6 +372,11 @@ class XmltvID : public MythUIComboBoxSetting
             "between a channel in your line-up and a channel in their "
             "database. Normally this is set automatically when "
             "'mythfilldatabase' is run."));
+    }
+
+    ~XmltvID()
+    {
+        delete GetStorage();
     }
 
     void Load(void) override // StandardSetting
@@ -370,7 +425,7 @@ class ServiceID : public MythUISpinBoxSetting
 {
   public:
     explicit ServiceID(const ChannelID &id)
-        : MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "serviceid"),
+        : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
                                -1, UINT16_MAX, 1, 1, "NULL")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Service ID"));
@@ -378,6 +433,11 @@ class ServiceID : public MythUISpinBoxSetting
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
                 "Service ID (Program Number) of desired channel within the transport stream. "
                 "If there is only one channel, then setting this to anything will still find it."));
+    }
+
+    ~ServiceID()
+    {
+        delete GetStorage();
     }
 
     void Load(void) override // StandardSetting
@@ -426,7 +486,7 @@ class CommMethod : public MythUIComboBoxSetting
 {
   public:
     explicit CommMethod(const ChannelID &id) :
-       MythUIComboBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "commmethod"))
+       MythUIComboBoxSetting(new ChannelDBStorage(this, id, "commmethod"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Commercial Detection Method"));
@@ -443,13 +503,18 @@ class CommMethod : public MythUIComboBoxSetting
         for (int pref : tmp)
             addSelection(SkipTypeToString(pref), QString::number(pref));
     }
+
+    ~CommMethod()
+    {
+        delete GetStorage();
+    }
 };
 
 class Visible : public MythUIComboBoxSetting
 {
   public:
     explicit Visible(const ChannelID &id) :
-        MythUIComboBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "visible"))
+        MythUIComboBoxSetting(new ChannelDBStorage(this, id, "visible"))
     {
         setValue(kChannelVisible);
 
@@ -470,13 +535,18 @@ class Visible : public MythUIComboBoxSetting
         addSelection(QCoreApplication::translate("(Common)", "Never Visible"),
                      QString::number(kChannelNeverVisible));
     }
+
+    ~Visible()
+    {
+        delete GetStorage();
+    }
 };
 
 class OnAirGuide : public MythUICheckBoxSetting
 {
   public:
     explicit OnAirGuide(const ChannelID &id) :
-        MythUICheckBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "useonairguide"))
+        MythUICheckBoxSetting(new ChannelDBStorage(this, id, "useonairguide"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Use on air guide"));
@@ -484,6 +554,11 @@ class OnAirGuide : public MythUICheckBoxSetting
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "If enabled, guide information for this channel will be updated "
             "using 'Over-the-Air' program listings."));
+    }
+
+    ~OnAirGuide()
+    {
+        delete GetStorage();
     }
 };
 
@@ -494,13 +569,18 @@ class ChannelURL : public MythUITextEditSetting
 {
   public:
     explicit ChannelURL(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<IPTVChannelDBStorage>(this, id, "url"))
+        MythUITextEditSetting(new IPTVChannelDBStorage(this, id, "url"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "URL"));
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
             "URL for streaming of this channel. Used by the IPTV "
             "capture card and obtained with an \"M3U Import\" or "
             "with a \"HDHomeRun Channel Import\" loading of an XML file."));
+    }
+
+    ~ChannelURL()
+    {
+        delete GetStorage();
     }
 };
 
@@ -512,7 +592,7 @@ class Freqid : public MythUITextEditSetting
 {
   public:
     explicit Freqid(const ChannelID &id) :
-        MythUITextEditSetting(std::make_shared<ChannelDBStorage>(this, id, "freqid"))
+        MythUITextEditSetting(new ChannelDBStorage(this, id, "freqid"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Freq/Channel"));
@@ -522,13 +602,18 @@ class Freqid : public MythUITextEditSetting
             "frequency (in kHz) or a valid channel "
             "number that will be understood by your tuners."));
     }
+
+    ~Freqid()
+    {
+        delete GetStorage();
+    }
 };
 
 class Finetune : public MythUISpinBoxSetting
 {
   public:
     explicit Finetune(const ChannelID& id)
-        : MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "finetune"),
+        : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "finetune"),
                                -300, 300, 1)
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -540,16 +625,26 @@ class Finetune : public MythUISpinBoxSetting
 
         setValue("0");
     }
+
+    ~Finetune()
+    {
+        delete GetStorage();
+    }
 };
 
 class Contrast : public MythUISpinBoxSetting
 {
   public:
     explicit Contrast(const ChannelID &id) :
-        MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "contrast"),
+        MythUISpinBoxSetting(new ChannelDBStorage(this, id, "contrast"),
                              0, 65535, 655)
     {
         setLabel(QCoreApplication::translate("(Common)", "Contrast"));
+    }
+
+    ~Contrast()
+    {
+        delete GetStorage();
     }
 };
 
@@ -557,10 +652,15 @@ class Brightness : public MythUISpinBoxSetting
 {
   public:
     explicit Brightness(const ChannelID &id) :
-        MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "brightness"),
+        MythUISpinBoxSetting(new ChannelDBStorage(this, id, "brightness"),
                              0, 65535, 655)
     {
         setLabel(QCoreApplication::translate("(Common)", "Brightness"));
+    }
+
+    ~Brightness()
+    {
+        delete GetStorage();
     }
 };
 
@@ -568,10 +668,15 @@ class Colour : public MythUISpinBoxSetting
 {
   public:
     explicit Colour(const ChannelID &id) :
-        MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "colour"),
+        MythUISpinBoxSetting(new ChannelDBStorage(this, id, "colour"),
                              0, 65535, 655)
     {
         setLabel(QCoreApplication::translate("(Common)", "Color"));
+    }
+
+    ~Colour()
+    {
+        delete GetStorage();
     }
 };
 
@@ -579,10 +684,15 @@ class Hue : public MythUISpinBoxSetting
 {
   public:
     explicit Hue(const ChannelID &id) :
-        MythUISpinBoxSetting(std::make_shared<ChannelDBStorage>(this, id, "hue"),
+        MythUISpinBoxSetting(new ChannelDBStorage(this, id, "hue"),
                              0, 65535, 655)
     {
         setLabel(QCoreApplication::translate("(Common)", "Hue"));
+    }
+
+    ~Hue()
+    {
+        delete GetStorage();
     }
 };
 

@@ -37,7 +37,7 @@ class TitleMatch : public MythUITextEditSetting
 {
   public:
     explicit TitleMatch(const PlayGroupConfig& _parent):
-        MythUITextEditSetting(std::make_shared<PlayGroupDBStorage>(this, _parent, "titlematch"))
+        MythUITextEditSetting(new PlayGroupDBStorage(this, _parent, "titlematch"))
     {
         setLabel(PlayGroupConfig::tr("Title match (regex)"));
         setHelpText(PlayGroupConfig::tr("Automatically set new recording rules "
@@ -47,13 +47,18 @@ class TitleMatch : public MythUITextEditSetting
                                          "match any title in which \"News\" or "
                                          "\"CNN\" appears."));
     };
+
+    ~TitleMatch()
+    {
+        delete GetStorage();
+    }
 };
 
 class SkipAhead : public MythUISpinBoxSetting
 {
   public:
     explicit SkipAhead(const PlayGroupConfig& _parent):
-        MythUISpinBoxSetting(std::make_shared<PlayGroupDBStorage>(this, _parent, "skipahead"),
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipahead"),
                              0, 600, 5, 1, PlayGroupConfig::tr("(default)"))
 
     {
@@ -61,26 +66,36 @@ class SkipAhead : public MythUISpinBoxSetting
         setHelpText(PlayGroupConfig::tr("How many seconds to skip forward on "
                                         "a fast forward."));
     };
+
+    ~SkipAhead()
+    {
+        delete GetStorage();
+    }
 };
 
 class SkipBack : public MythUISpinBoxSetting
 {
   public:
     explicit SkipBack(const PlayGroupConfig& _parent):
-        MythUISpinBoxSetting(std::make_shared<PlayGroupDBStorage>(this, _parent, "skipback"),
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipback"),
                              0, 600, 5, 1, PlayGroupConfig::tr("(default)"))
     {
         setLabel(PlayGroupConfig::tr("Skip back (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip backward on "
                                         "a rewind."));
     };
+
+    ~SkipBack()
+    {
+        delete GetStorage();
+    }
 };
 
 class JumpMinutes : public MythUISpinBoxSetting
 {
   public:
     explicit JumpMinutes(const PlayGroupConfig& _parent):
-        MythUISpinBoxSetting(std::make_shared<PlayGroupDBStorage>(this, _parent, "jump"),
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "jump"),
                              0, 30, 10, 1, PlayGroupConfig::tr("(default)"))
     {
         setLabel(PlayGroupConfig::tr("Jump amount (minutes)"));
@@ -88,13 +103,18 @@ class JumpMinutes : public MythUISpinBoxSetting
                                         "backward when the jump keys are "
                                         "pressed."));
     };
+
+    ~JumpMinutes()
+    {
+        delete GetStorage();
+    }
 };
 
 class TimeStretch : public MythUISpinBoxSetting
 {
   public:
     explicit TimeStretch(const PlayGroupConfig& _parent):
-        MythUISpinBoxSetting(std::make_shared<PlayGroupDBStorage>(this, _parent, "timestretch"),
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "timestretch"),
                              50, 200, 5, 1)
     {
         setValue(100);
@@ -104,6 +124,11 @@ class TimeStretch : public MythUISpinBoxSetting
                                         "for half speed and 200 for double "
                                         "speed."));
     };
+
+    ~TimeStretch()
+    {
+        delete GetStorage();
+    }
 
     void Load(void) override // StandardSetting
     {

@@ -55,11 +55,16 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
       public:
         explicit Name(const RecordingProfile &parent):
             MythUITextEditSetting(
-                std::make_shared<RecordingProfileStorage>(this, parent, "name"))
+                new RecordingProfileStorage(this, parent, "name"))
         {
             setReadOnly(true);
             setLabel(QObject::tr("Profile name"));
             setName("name");
+        }
+
+        ~Name()
+        {
+            delete GetStorage();
         }
 
       // -=>TODO: Qt4 can't have nested classes with slots/signals

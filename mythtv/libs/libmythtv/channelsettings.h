@@ -153,6 +153,7 @@ class MTV_PUBLIC ChannelTVFormat :
 {
   public:
     explicit ChannelTVFormat(const ChannelID &id);
+    ~ChannelTVFormat();
 
     static QStringList GetFormats(void);
 };
