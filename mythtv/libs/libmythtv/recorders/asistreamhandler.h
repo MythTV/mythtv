@@ -17,7 +17,7 @@ class DTVSignalMonitor;
 class ASIChannel;
 class DeviceReadBuffer;
 
-enum ASIClockSource
+enum ASIClockSource : uint8_t
 {
     kASIInternalClock         = 0,
     kASIExternalClock         = 1,
@@ -25,7 +25,7 @@ enum ASIClockSource
     kASIExternalClock2        = 1,
 };
 
-enum ASIRXMode
+enum ASIRXMode : uint8_t
 {
     kASIRXRawMode                  = 0,
     kASIRXSyncOn188                = 1,
