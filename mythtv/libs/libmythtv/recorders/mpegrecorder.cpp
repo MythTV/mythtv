@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <chrono> // for milliseconds
 #include <cinttypes>
-#include <ctime>
 #include <fcntl.h>
 #include <thread> // for sleep_for
 #include <unistd.h>

@@ -8,7 +8,6 @@
 #include <QElapsedTimer>
 
 #include <cstdint>
-#include <ctime>
 #include <fstream>
 #include <unistd.h>
 

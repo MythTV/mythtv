@@ -4,7 +4,6 @@
 // C++ headers
 #include <algorithm>
 #include <cstdlib>
-#include <ctime>
 #include <fstream>
 
 // Qt headers
