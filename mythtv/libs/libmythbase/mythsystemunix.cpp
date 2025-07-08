@@ -12,11 +12,11 @@
 #include <csignal>  // for kill()
 #include <cstdlib>
 #include <cstring> // for strerror()
-#include <ctime>
 #include <fcntl.h>
 #include <iostream> // for cerr()
 #include <sys/select.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 
 // QT headers
@@ -30,14 +30,12 @@
 #include "mythevent.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
+#include "mythchrono.h"
 
-#if !defined(__syscall_slong_t)
-using __syscall_slong_t = long int;
-#endif
 // Run the IO handler ~100x per second (every 10ms), for ~3MBps throughput
-static constexpr __syscall_slong_t kIOHandlerInterval {static_cast<__syscall_slong_t>(10)*1000*1000};
+static constexpr std::chrono::milliseconds kIOHandlerInterval {10ms};
 // Run the Signal handler ~20x per second (every 50ms).
-static constexpr __syscall_slong_t kSignalHandlerInterval {static_cast<__syscall_slong_t>(50)*1000*1000};
+static constexpr std::chrono::milliseconds kSignalHandlerInterval {50ms};
 
 struct FDType_t
 {
@@ -103,8 +101,7 @@ void MythSystemLegacyIOHandler::run(void)
 
         while( run_system )
         {
-            struct timespec ts { 0, kIOHandlerInterval };
-            nanosleep(&ts, nullptr);
+            std::this_thread::sleep_for(kIOHandlerInterval);
             m_pLock.lock();
             if( m_pMap.isEmpty() )
             {
@@ -503,8 +500,7 @@ void MythSystemLegacySignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while (run_system)
     {
-        struct timespec ts {0, kSignalHandlerInterval};
-        nanosleep(&ts, nullptr);
+        std::this_thread::sleep_for(kSignalHandlerInterval);
 
         while (run_system)
         {
