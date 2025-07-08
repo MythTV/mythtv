@@ -43,9 +43,9 @@
 // C headers
 #include <array>
 #include <cstdint>
-#include <ctime>
 
 #include "exitcodes.h"  // included for GENERIC_EXIT_OK
+#include "mythchrono.h"
 #include "mythsystem.h" // included for MythSystemFlag and MythSignal
 
 #include <QStringList>

@@ -29,10 +29,6 @@
 #   endif
 #endif
 
-#ifdef __MINGW32__
-#include <time.h>
-#endif
-
 #ifndef _WIN32
 #    include <sys/time.h>     // Mac OS X needs this before sys/resource
 #    include <sys/resource.h> // for setpriority
@@ -205,7 +201,6 @@
 
 #ifdef _MSC_VER
     #include <cstdlib>       // for rand()
-    #include <ctime>
     #include <sys/time.h>
 
     // Turn off the visual studio warnings (identifier was truncated)
