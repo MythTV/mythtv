@@ -86,7 +86,7 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
         next_vobu = admap->vobu_start_sectors[address];
 
         if (next_vobu == seekto_block) {
-		  vobu_start = next_vobu;
+          vobu_start = next_vobu;
           found = 1;
         } else if (vobu_start < seekto_block && next_vobu > seekto_block) {
           found = 1;
@@ -130,7 +130,7 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
 }
 
 dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
-				   uint64_t time, uint search_to_nearest_cell) {
+                                            uint64_t time, uint search_to_nearest_cell) {
 
   uint64_t target = time;
   uint64_t length = 0;
@@ -704,7 +704,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
     printerr("Passed a NULL pointer.");
     return DVDNAV_STATUS_ERR;
   }
-  
+
   pthread_mutex_lock(&this->vm_lock);
   length = relative_time;
   state = &(this->vm->state);
