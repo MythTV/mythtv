@@ -3,8 +3,8 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdint>
-#include <ctime>
 
 #include <QString>
 #include <QDir>

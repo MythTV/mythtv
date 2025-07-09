@@ -5,7 +5,6 @@
 #define CC708DECODER_H_
 
 #include <cstdint>
-#include <ctime>
 
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"

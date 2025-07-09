@@ -3,7 +3,6 @@
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <fcntl.h>
 #include <fstream>
 #include <iostream>

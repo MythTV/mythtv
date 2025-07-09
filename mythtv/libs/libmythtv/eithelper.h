@@ -5,7 +5,6 @@
 
 // C+ headers
 #include <cstdint>
-#include <ctime>
 #include <utility>
 
 // Qt includes

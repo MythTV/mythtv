@@ -4,7 +4,6 @@
 #define CCDECODER_H_
 
 #include <cstdint>
-#include <ctime>
 
 #include <array>
 #include <vector>
