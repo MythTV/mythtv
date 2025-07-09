@@ -62,6 +62,11 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
             setName("name");
         }
 
+        ~Name()
+        {
+            delete GetStorage();
+        }
+
       // -=>TODO: Qt4 can't have nested classes with slots/signals
       //          Is this slot even used????
       //public slots:

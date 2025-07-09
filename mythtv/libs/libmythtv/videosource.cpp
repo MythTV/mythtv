@@ -186,6 +186,11 @@ class InstanceCount : public MythUISpinBoxSetting
                 "program on a single channel."
                 ));
     };
+
+    ~InstanceCount()
+    {
+        delete GetStorage();
+    }
 };
 
 class SchedGroup : public MythUICheckBoxSetting
@@ -205,6 +210,11 @@ class SchedGroup : public MythUICheckBoxSetting
                 "load."
                 ));
     };
+
+    ~SchedGroup()
+    {
+        delete GetStorage();
+    }
 };
 
 QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
@@ -267,6 +277,11 @@ class XMLTVGrabber : public MythUIComboBoxSetting
     {
         setLabel(QObject::tr("Listings grabber"));
     };
+
+    ~XMLTVGrabber()
+    {
+        delete GetStorage();
+    }
 
     void Load(void) override // StandardSetting
     {
@@ -397,6 +412,11 @@ class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
                              min_val.count(), max_val.count(), step.count())
     {
     }
+
+    ~CaptureCardSpinBoxSetting()
+    {
+        delete GetStorage();
+    }
     // Handles integer milliseconds (compiler converts seconds to milliseconds)
     void setValueMs (std::chrono::milliseconds newValue)
         { setValue(newValue.count()); }
@@ -414,6 +434,11 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
         MythUITextEditSetting(new CaptureCardDBStorage(this, parent, setting))
     {
     }
+
+    ~CaptureCardTextEditSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 class ScanFrequencyStart : public MythUITextEditSetting
@@ -428,6 +453,11 @@ class ScanFrequencyStart : public MythUITextEditSetting
                                "Frequency value in Hz for DVB-T/T2/C, in kHz for DVB-S/S2. "
                                "Leave at 0 if not known. "));
     };
+
+    ~ScanFrequencyStart()
+    {
+        delete GetStorage();
+    }
 };
 
 class DVBNetID : public MythUISpinBoxSetting
@@ -445,6 +475,11 @@ class DVBNetID : public MythUISpinBoxSetting
                                "enter it here. Leave it at -1 otherwise."));
        setValue(value);
     };
+
+    ~DVBNetID()
+    {
+        delete GetStorage();
+    }
 };
 
 class BouquetID : public MythUISpinBoxSetting
@@ -462,6 +497,11 @@ class BouquetID : public MythUISpinBoxSetting
                                "See the MythTV Wiki https://www.mythtv.org/wiki/DVB_UK."));
        setValue(value);
     };
+
+    ~BouquetID()
+    {
+        delete GetStorage();
+    }
 };
 
 class RegionID : public MythUISpinBoxSetting
@@ -479,6 +519,11 @@ class RegionID : public MythUISpinBoxSetting
                                "See the MythTV Wiki https://www.mythtv.org/wiki/DVB_UK."));
        setValue(value);
     };
+
+    ~RegionID()
+    {
+        delete GetStorage();
+    }
 };
 
 class LCNOffset : public MythUISpinBoxSetting
@@ -496,6 +541,11 @@ class LCNOffset : public MythUISpinBoxSetting
                                "or if the video sources do not have DVB logical channel numbers."));
        setValue(value);
     };
+
+    ~LCNOffset()
+    {
+        delete GetStorage();
+    }
 };
 
 FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
@@ -510,6 +560,11 @@ FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     setHelpText(QObject::tr("Use default unless this source uses a "
                 "different frequency table than the system wide table "
                 "defined in the General settings."));
+}
+
+FreqTableSelector::~FreqTableSelector()
+{
+    delete GetStorage();
 }
 
 TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
@@ -602,6 +657,11 @@ class UseEIT : public MythUICheckBoxSetting
                         "If enabled, program guide data for channels on this "
                         "source will be updated with data provided by the "
                         "channels themselves 'Over-the-Air'."));
+    }
+
+    ~UseEIT()
+    {
+        delete GetStorage();
     }
 };
 
@@ -984,6 +1044,11 @@ class CommandPath : public MythUITextEditSetting
         setHelpText(QObject::tr("Specify the command to run, with any "
                                 "needed arguments."));
     };
+
+    ~CommandPath()
+    {
+        delete GetStorage();
+    }
 };
 
 class FileDevice : public MythUIFileBrowserSetting
@@ -996,6 +1061,11 @@ class FileDevice : public MythUIFileBrowserSetting
     {
         setLabel(QObject::tr("File path"));
     };
+
+    ~FileDevice()
+    {
+        delete GetStorage();
+    }
 };
 
 class AudioDevice : public CaptureCardComboBoxSetting
@@ -1101,7 +1171,12 @@ class SkipBtAudio : public MythUICheckBoxSetting
             QObject::tr("Enable this option for budget BT878 based "
                         "DVB-T cards such as the AverTV DVB-T which "
                         "require the audio volume to be left alone."));
-   };
+    };
+
+    ~SkipBtAudio()
+    {
+        delete GetStorage();
+    }
 };
 
 class DVBCardNum : public CaptureCardComboBoxSetting
@@ -1213,6 +1288,11 @@ class DVBNoSeqStart : public MythUICheckBoxSetting
             QObject::tr("If enabled, drop packets from the start of a DVB "
                         "recording until a sequence start header is seen."));
     };
+
+    ~DVBNoSeqStart()
+    {
+        delete GetStorage();
+    }
 };
 
 class DVBOnDemand : public MythUICheckBoxSetting
@@ -1228,6 +1308,11 @@ class DVBOnDemand : public MythUICheckBoxSetting
             QObject::tr("If enabled, only open the DVB card when required, "
                         "leaving it free for other programs at other times."));
     };
+
+    ~DVBOnDemand()
+    {
+        delete GetStorage();
+    }
 };
 
 class DVBEITScan : public MythUICheckBoxSetting
@@ -1244,6 +1329,11 @@ class DVBEITScan : public MythUICheckBoxSetting
                         "program data (EIT). When this option is enabled "
                         "the DVB card is constantly in use."));
     };
+
+    ~DVBEITScan()
+    {
+        delete GetStorage();
+    }
 };
 
 class DVBTuningDelay : public CaptureCardSpinBoxSetting
@@ -1351,6 +1441,11 @@ class FirewireConnection : public MythUIComboBoxSetting
         addSelection(QObject::tr("Point to Point"),"0");
         addSelection(QObject::tr("Broadcast"),"1");
     }
+
+    ~FirewireConnection()
+    {
+        delete GetStorage();
+    }
 };
 
 class FirewireSpeed : public MythUIComboBoxSetting
@@ -1365,6 +1460,11 @@ class FirewireSpeed : public MythUIComboBoxSetting
         addSelection(QObject::tr("200Mbps"),"1");
         addSelection(QObject::tr("400Mbps"),"2");
         addSelection(QObject::tr("800Mbps"),"3");
+    }
+
+    ~FirewireSpeed()
+    {
+        delete GetStorage();
     }
 };
 
@@ -1412,6 +1512,11 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent,
     setVisible(false);
 };
 
+HDHomeRunDeviceID::~HDHomeRunDeviceID()
+{
+    delete GetStorage();
+}
+
 void HDHomeRunDeviceID::Load(void)
 {
     MythUITextEditSetting::Load();
@@ -1438,6 +1543,11 @@ class HDHomeRunEITScan : public MythUICheckBoxSetting
                         "program data (EIT). When this option is enabled "
                         "the HDHomeRun is constantly in use."));
     };
+
+    ~HDHomeRunEITScan()
+    {
+        delete GetStorage();
+    }
 };
 
 
@@ -1634,6 +1744,11 @@ VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of VBox device"));
     setReadOnly(true);
+}
+
+VBoxDeviceID::~VBoxDeviceID()
+{
+    delete GetStorage();
 }
 
 void VBoxDeviceID::SetIP(const QString &ip)
@@ -2094,6 +2209,11 @@ CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
     setHelpText(tr("Device ID of Ceton device"));
 }
 
+CetonDeviceID::~CetonDeviceID()
+{
+    delete GetStorage();
+}
+
 void CetonDeviceID::SetIP(const QString &ip)
 {
     static const QRegularExpression ipV4Regex
@@ -2173,7 +2293,12 @@ class SchedGroupFalse : public MythUICheckBoxSetting
     {
         setValue(false);
         setVisible(false);
-   };
+    };
+
+    ~SchedGroupFalse()
+    {
+        delete GetStorage();
+    }
 };
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
@@ -2791,6 +2916,11 @@ CaptureCard::Hostname::Hostname(const CaptureCard &parent) :
     setValue(gCoreContext->GetHostName());
 }
 
+CaptureCard::Hostname::~Hostname()
+{
+    delete GetStorage();
+}
+
 class InputName : public MythUIComboBoxSetting
 {
   public:
@@ -2799,6 +2929,11 @@ class InputName : public MythUIComboBoxSetting
     {
         setLabel(QObject::tr("Input name"));
     };
+
+    ~InputName()
+    {
+        delete GetStorage();
+    }
 
     void Load(void) override // StandardSetting
     {
@@ -2853,6 +2988,11 @@ class InputDisplayName : public MythUITextEditSetting
                         "characters are unique for each input or use a "
                         "slash ('/') to designate the unique portion."));
     };
+
+    ~InputDisplayName()
+    {
+        delete GetStorage();
+    }
     void Load(void) override {
         MythUITextEditSetting::Load();
         if (getValue().isEmpty())
@@ -2868,6 +3008,11 @@ class CardInputComboBoxSetting : public MythUIComboBoxSetting
     CardInputComboBoxSetting(const CardInput &parent, const QString &setting) :
         MythUIComboBoxSetting(new CardInputDBStorage(this, parent, setting))
     {
+    }
+
+    ~CardInputComboBoxSetting()
+    {
+        delete GetStorage();
     }
 };
 
@@ -3052,6 +3197,11 @@ class ExternalChannelCommand : public MythUITextEditSetting
                     "tuner device such as a cable box. The first argument "
                     "will be the channel number."));
     };
+
+    ~ExternalChannelCommand()
+    {
+        delete GetStorage();
+    }
 };
 
 class PresetTuner : public MythUITextEditSetting
@@ -3067,6 +3217,11 @@ class PresetTuner : public MythUITextEditSetting
                     "If so, you will need to specify the preset channel for "
                     "the signal (normally 3 or 4)."));
     };
+
+    ~PresetTuner()
+    {
+        delete GetStorage();
+    }
 };
 
 void StartingChannel::SetSourceID(const QString &sourceid)
@@ -3124,6 +3279,11 @@ class InputPriority : public MythUISpinBoxSetting
                     "at a later time so that it can record on an input with "
                     "a higher value."));
     };
+
+    ~InputPriority()
+    {
+        delete GetStorage();
+    }
 };
 
 class ScheduleOrder : public MythUISpinBoxSetting
@@ -3141,6 +3301,11 @@ class ScheduleOrder : public MythUISpinBoxSetting
                                 "Setting this value to zero will make the "
                                 "input unavailable to the scheduler."));
     };
+
+    ~ScheduleOrder()
+    {
+        delete GetStorage();
+    }
 };
 
 class LiveTVOrder : public MythUISpinBoxSetting
@@ -3160,6 +3325,11 @@ class LiveTVOrder : public MythUISpinBoxSetting
                                 "Setting this value to zero will make the "
                                 "input unavailable to live TV."));
     };
+
+    ~LiveTVOrder()
+    {
+        delete GetStorage();
+    }
 };
 
 class DishNetEIT : public MythUICheckBoxSetting
@@ -3177,6 +3347,11 @@ class DishNetEIT : public MythUICheckBoxSetting
                 "you may wish to enable this feature. For best results, "
                 "enable general EIT collection as well."));
     };
+
+    ~DishNetEIT()
+    {
+        delete GetStorage();
+    }
 };
 
 CardInput::CardInput(const QString & cardtype, const QString & device,
@@ -4070,6 +4245,11 @@ class DiSEqCPosition : public MythUISpinBoxSetting
                                "the SatIP tune command."));
        setValue(value);
     };
+
+    ~DiSEqCPosition()
+    {
+        delete GetStorage();
+    }
 };
 
 SatIPConfigurationGroup::SatIPConfigurationGroup
@@ -4238,6 +4418,11 @@ SatIPDeviceID::SatIPDeviceID(const CaptureCard &parent) :
     setEnabled(true);
     setReadOnly(true);
 };
+
+SatIPDeviceID::~SatIPDeviceID()
+{
+    delete GetStorage();
+}
 
 void SatIPDeviceID::Load(void)
 {

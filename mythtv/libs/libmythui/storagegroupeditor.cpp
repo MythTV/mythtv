@@ -179,6 +179,11 @@ StorageGroupDirSetting::StorageGroupDirSetting(int id, const QString &group) :
     SetTypeFilter(QDir::AllDirs | QDir::Drives);
 }
 
+StorageGroupDirSetting::~StorageGroupDirSetting()
+{
+    delete GetStorage();
+}
+
 bool StorageGroupDirSetting::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;

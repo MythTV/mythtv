@@ -47,6 +47,11 @@ class TitleMatch : public MythUITextEditSetting
                                          "match any title in which \"News\" or "
                                          "\"CNN\" appears."));
     };
+
+    ~TitleMatch()
+    {
+        delete GetStorage();
+    }
 };
 
 class SkipAhead : public MythUISpinBoxSetting
@@ -61,6 +66,11 @@ class SkipAhead : public MythUISpinBoxSetting
         setHelpText(PlayGroupConfig::tr("How many seconds to skip forward on "
                                         "a fast forward."));
     };
+
+    ~SkipAhead()
+    {
+        delete GetStorage();
+    }
 };
 
 class SkipBack : public MythUISpinBoxSetting
@@ -74,6 +84,11 @@ class SkipBack : public MythUISpinBoxSetting
         setHelpText(PlayGroupConfig::tr("How many seconds to skip backward on "
                                         "a rewind."));
     };
+
+    ~SkipBack()
+    {
+        delete GetStorage();
+    }
 };
 
 class JumpMinutes : public MythUISpinBoxSetting
@@ -88,6 +103,11 @@ class JumpMinutes : public MythUISpinBoxSetting
                                         "backward when the jump keys are "
                                         "pressed."));
     };
+
+    ~JumpMinutes()
+    {
+        delete GetStorage();
+    }
 };
 
 class TimeStretch : public MythUISpinBoxSetting
@@ -104,6 +124,11 @@ class TimeStretch : public MythUISpinBoxSetting
                                         "for half speed and 200 for double "
                                         "speed."));
     };
+
+    ~TimeStretch()
+    {
+        delete GetStorage();
+    }
 
     void Load(void) override // StandardSetting
     {

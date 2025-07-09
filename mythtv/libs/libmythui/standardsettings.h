@@ -170,6 +170,11 @@ class MUI_PUBLIC HostTextEditSetting: public MythUITextEditSetting
   public:
     explicit HostTextEditSetting(const QString &name) :
         MythUITextEditSetting(new HostDBStorage(this, name)) { }
+
+    ~HostTextEditSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 class MUI_PUBLIC GlobalTextEditSetting: public MythUITextEditSetting
@@ -177,6 +182,11 @@ class MUI_PUBLIC GlobalTextEditSetting: public MythUITextEditSetting
   public:
     explicit GlobalTextEditSetting(const QString &name) :
         MythUITextEditSetting(new GlobalDBStorage(this, name)) { }
+
+    ~GlobalTextEditSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 /*******************************************************************************
@@ -208,6 +218,11 @@ class MUI_PUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
   public:
     explicit HostFileBrowserSetting(const QString &name) :
         MythUIFileBrowserSetting(new HostDBStorage(this, name)) { }
+
+    ~HostFileBrowserSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 
@@ -259,6 +274,11 @@ class MUI_PUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
   public:
     explicit HostComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new HostDBStorage(this, name), rw) { }
+
+    ~HostComboBoxSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 
@@ -267,6 +287,11 @@ class MUI_PUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
   public:
     explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
+
+    ~GlobalComboBoxSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 class MUI_PUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
@@ -370,6 +395,11 @@ class MUI_PUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
         MythUISpinBoxSetting(new HostDBStorage(this, name), min, max, step,
                              pageMultiple, special_value_text)
     { }
+
+    ~HostSpinBoxSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
@@ -381,6 +411,11 @@ class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
         MythUISpinBoxSetting(new GlobalDBStorage(this, name), min, max, step,
                              pageMultiple, special_value_text)
     { }
+
+    ~GlobalSpinBoxSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 /*******************************************************************************
@@ -419,6 +454,11 @@ class MUI_PUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
   public:
     explicit HostCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new HostDBStorage(this, name)) { }
+
+    ~HostCheckBoxSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 class MUI_PUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
@@ -426,6 +466,11 @@ class MUI_PUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
   public:
     explicit GlobalCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new GlobalDBStorage(this, name)) { }
+
+    ~GlobalCheckBoxSetting()
+    {
+        delete GetStorage();
+    }
 };
 
 /*******************************************************************************
