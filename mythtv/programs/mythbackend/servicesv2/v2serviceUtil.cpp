@@ -1127,7 +1127,7 @@ uint fillSelectionsFromDir(const QDir& dir,
                     QStringList inputs;
                     CardUtil::GetDeviceInputNames(filepath, cardType, inputs);
                     pDev->setInputNames(inputs);
-                    inputs = CardUtil::ProbeAudioInputs(filepath);
+                    inputs = CardUtil::ProbeAudioInputs(filepath, cardType);
                     pDev->setAudioDevices(inputs);
                     if (cardType == "HDPVR")
                         pDev->setChannelTimeout ( 15000 );
