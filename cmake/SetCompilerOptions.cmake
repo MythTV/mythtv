@@ -90,6 +90,7 @@ list(
 )
 if(NOT ANDROID)
   list(APPEND CXXFLAGS "-Wshadow")
+  list(APPEND CFLAGS "-Wshadow")
 endif()
 
 #

@@ -305,14 +305,14 @@ int dvdinput_setup(const char *path)
         "%s/Contents/Plugins/%s", // to be compatible with old bundler
         NULL
     };
-    char         path[FILENAME_MAX];
+    char         pathname[FILENAME_MAX];
     for (int i = 0; paths[i] != NULL && dvdcss_library == NULL; i++)
     {
-        snprintf(path, FILENAME_MAX-1, paths[i],
+        snprintf(pathname, FILENAME_MAX-1, paths[i],
                  CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding()),
                  CSS_LIB);
-        fprintf(stderr, "Trying %s\n", path);
-        dvdcss_library = dlopen(path, RTLD_LAZY);
+        fprintf(stderr, "Trying %s\n", pathname);
+        dvdcss_library = dlopen(pathname, RTLD_LAZY);
     }
     CFRelease(appUrlRef);
     CFRelease(macPath);

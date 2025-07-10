@@ -723,38 +723,38 @@ static int findDirFile( const char *path, const char *file, char *filename )
 #else
 static int findDirFile( const char *path, const char *file, char *filename )
 {
-	HANDLE           dir;
-	WIN32_FIND_DATAA ent;
+  HANDLE           dir;
+  WIN32_FIND_DATAA ent;
 
-	if (!strncmp(path, "myth://", 7) && mythfile_exists(path, file))
-	{
-		sprintf(filename, "%s%s%s", path,
-			((path[strlen(path) - 1] == '/') ? "" : "/"),
-			file);
-		return 0;
-	}
+  if (!strncmp(path, "myth://", 7) && mythfile_exists(path, file))
+  {
+    sprintf(filename, "%s%s%s", path,
+      ((path[strlen(path) - 1] == '/') ? "" : "/"),
+      file);
+    return 0;
+  }
 
-	dir = FindFirstFileA(path, &ent);
+  dir = FindFirstFileA(path, &ent);
 
-	if (dir == INVALID_HANDLE_VALUE)
-		return -2;
+  if (dir == INVALID_HANDLE_VALUE)
+    return -2;
 
-	while (dir != INVALID_HANDLE_VALUE)
-	{
-		if (!strcasecmp(ent.cFileName, file)) {
-			sprintf(filename, "%s%s%s", path,
-				((path[strlen(path) - 1] == '/') ? "" : "/"),
-				ent.cFileName);
-			FindClose(dir);
-			return 0;
-		}
-		if (FindNextFileA(dir, &ent) == FALSE)
-		{
-			FindClose(dir);
-			dir = INVALID_HANDLE_VALUE;
-		}
-	}
-	return -1;
+  while (dir != INVALID_HANDLE_VALUE)
+  {
+    if (!strcasecmp(ent.cFileName, file)) {
+      sprintf(filename, "%s%s%s", path,
+        ((path[strlen(path) - 1] == '/') ? "" : "/"),
+        ent.cFileName);
+      FindClose(dir);
+      return 0;
+    }
+    if (FindNextFileA(dir, &ent) == FALSE)
+    {
+      FindClose(dir);
+      dir = INVALID_HANDLE_VALUE;
+    }
+  }
+  return -1;
 }
 #endif
 

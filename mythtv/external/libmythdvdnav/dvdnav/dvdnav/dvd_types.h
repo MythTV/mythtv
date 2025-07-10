@@ -80,7 +80,7 @@ typedef enum {
 
 /*
  * Button groups to identify the correct highlight areas
- * (see dvdnav_get_highlight_area_with_group())
+ * (see dvdnav_get_highlight_area_from_group())
  */
 typedef enum {
     DVD_BTN_GRP_Normal    = 0x00,

@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 
 TEMPLATE = lib
 TARGET = mythdvdnav-$$LIBVERSION
-CONFIG += thread staticlib warn_off
+CONFIG += thread staticlib
 CONFIG -= qt
 target.path = $${LIBDIR}
 
