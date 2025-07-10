@@ -33,7 +33,7 @@ export interface CardInput {
     ChangerDevice:         string;
     ChangerModel:          string;
     HostName:              string;
-    TuneChan:              string;
+    TuneChannel:           string;
     StartChannel:          string;
     DisplayName:           string;
     DishnetEIT:            boolean;

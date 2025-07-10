@@ -61,7 +61,7 @@ export class NavbarComponent implements OnInit {
                 data => {
                     var url = this.router.url;
                     if (data.BackendInfo.Env.IsDatabaseIgnored
-                        || (!data.BackendInfo.Env.SchedulingEnabled && !url.startsWith('./setupwizard/')))
+                        || (!data.BackendInfo.Env.SchedulingEnabled && !url.startsWith('/setupwizard/')))
                         router.navigate(['setupwizard/dbsetup']);
                     else if (url == '/')
                         router.navigate(['dashboard/status']);

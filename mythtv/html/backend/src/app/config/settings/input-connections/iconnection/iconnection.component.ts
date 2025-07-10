@@ -435,6 +435,12 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
         this.captureCardService.UpdateCaptureCard(entry.CardId, 'dishnet_eit',
           (entry.DishnetEIT = this.card.DishnetEIT) ? '1' : '0')
           .subscribe(this.saveObserver);
+        this.captureCardService.UpdateCaptureCard(entry.CardId, 'externalcommand',
+          entry.ExternalCommand = this.card.ExternalCommand)
+          .subscribe(this.saveObserver);
+        this.captureCardService.UpdateCaptureCard(entry.CardId, 'tunechan',
+          entry.TuneChannel = this.card.TuneChannel)
+          .subscribe(this.saveObserver);
         if (this.card.StartChannel) {
           this.captureCardService.UpdateCaptureCard(entry.CardId, 'startchan',
             entry.StartChannel = this.card.StartChannel)
@@ -468,7 +474,7 @@ export class IconnectionComponent implements OnInit, AfterViewInit {
           String(entry.SchedOrder))
           .subscribe(this.saveObserver);
 
-        this.work.expectedCount += 10;
+        this.work.expectedCount += 12;
 
         if (inputGroupId != 0) {
           this.orgInputGroupIds.forEach(x => {
