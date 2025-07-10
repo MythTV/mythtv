@@ -66,6 +66,7 @@ Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
 
 void V2Content::RegisterCustomTypes()
 {
+    qRegisterMetaType< QFileInfo >();
     qRegisterMetaType<V2ArtworkInfoList*>("V2ArtworkInfoList");
     qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
     // qRegisterMetaType<V2LiveStreamInfo*>("V2LiveStreamInfo");

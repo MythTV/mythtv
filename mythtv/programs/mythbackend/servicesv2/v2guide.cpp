@@ -65,6 +65,7 @@ Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
 
 void V2Guide::RegisterCustomTypes()
 {
+    qRegisterMetaType< QFileInfo >();
     qRegisterMetaType<V2ProgramGuide*>("V2ProgramGuide");
     qRegisterMetaType<V2ProgramList*>("V2ProgramList");
     qRegisterMetaType<V2Program*>("V2Program");
