@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(
   libudfread
-  VERSION 1.1.1
+  VERSION 1.2.0
   LANGUAGES C)
 set(BUILD_SHARED_LIBS YES)
 
@@ -22,8 +22,16 @@ check_include_file(unistd.h HAVE_UNISTD_H)
 
 set(HEADERS blockinput.h udfread.h udfread-version.h)
 
-add_library(udfread ${HEADERS} default_blockinput.c ecma167.c udfread-version.c
-                    udfread.c)
+add_library(udfread
+  ${HEADERS}
+  attributes.h
+  default_blockinput.c
+  default_blockinput.h
+  ecma167.c
+  ecma167.h
+  udfread-version.c
+  udfread.c
+  )
 
 # Create stripped down config.h with only the symbols that are used in this
 # directory.
@@ -34,6 +42,8 @@ set_target_properties(
   PROPERTIES COMPILE_DEFINITIONS "HAVE_CONFIG_H"
              VERSION ${libudfread_VERSION}
              SOVERSION ${libudfread_VERSION_MAJOR})
+
+target_compile_definitions(udfread PRIVATE UDFREAD_API_EXPORT)
 
 target_include_directories(
   udfread

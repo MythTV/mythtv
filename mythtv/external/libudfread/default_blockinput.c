@@ -164,6 +164,30 @@ static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32
     return got / UDF_BLOCK_SIZE;
 }
 
+#ifdef _WIN32
+static int _open_win32(const char *path, int flags)
+{
+    wchar_t *wpath;
+    int      wlen, fd;
+
+    wlen = MultiByteToWideChar (CP_UTF8, 0, path, -1, NULL, 0);
+    if (wlen < 1) {
+        return -1;
+    }
+    wpath = (wchar_t*)malloc(sizeof(wchar_t) * wlen);
+    if (!wpath) {
+        return -1;
+    }
+    if (!MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, wlen)) {
+        free(wpath);
+        return -1;
+    }
+    fd = _wopen(wpath, flags);
+    free(wpath);
+    return fd;
+}
+#endif
+
 udfread_block_input *block_input_new(const char *path)
 {
     default_block_input *p = (default_block_input*)calloc(1, sizeof(default_block_input));
@@ -172,7 +196,7 @@ udfread_block_input *block_input_new(const char *path)
     }
 
 #ifdef _WIN32
-    p->fd = open(path, O_RDONLY | O_BINARY);
+    p->fd = _open_win32(path, O_RDONLY | O_BINARY);
 #else
     p->fd = open(path, O_RDONLY);
 #endif
