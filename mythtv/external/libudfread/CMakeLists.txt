@@ -58,6 +58,6 @@ set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix ${CMAKE_INSTALL_FULL_BINDIR})
 set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
 set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
-configure_file(udfread.pc.in libudfread.pc @ONLY)
+configure_file(libudfread.pc.in libudfread.pc @ONLY)
 install(FILES ${PROJECT_BINARY_DIR}/libudfread.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
