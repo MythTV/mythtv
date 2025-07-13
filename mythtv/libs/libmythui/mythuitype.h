@@ -113,6 +113,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool CanTakeFocus(void) const;
     void SetCanTakeFocus(bool set = true);
     void SetFocusOrder(int order);
+    void SetFocusedName(const QString & widgetname);
+    QString GetFocusedName(void) const { return m_focusedName; }
 
     bool IsEnabled(void) const { return m_enabled; }
     void SetEnabled(bool enable);
@@ -206,9 +208,9 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void customEvent(QEvent *event) override; // QObject
 
   public slots:
-    void LoseFocus();
-    bool TakeFocus();
-    void Activate();
+    void LoseFocus(void);
+    bool TakeFocus(void);
+    void Activate(void);
     void Hide(void);
     void Show(void);
     void Refresh(void);
@@ -216,17 +218,17 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void UpdateDependState(MythUIType *dependee, bool isDefault);
 
   signals:
-    void RequestUpdate();
+    void RequestUpdate(void);
     void RequestRegionUpdate(const QRect &);
-    void TakingFocus();
-    void LosingFocus();
+    void TakingFocus(void);
+    void LosingFocus(void);
     void VisibilityChanged(bool Visible);
-    void Showing();
-    void Hiding();
-    void Enabling();
-    void Disabling();
-    void FinishedMoving();
-    void FinishedFading();
+    void Showing(void);
+    void Hiding(void);
+    void Enabling(void);
+    void Disabling(void);
+    void FinishedMoving(void);
+    void FinishedFading(void);
     void DependChanged(bool isDefault);
 
   protected:
@@ -269,6 +271,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool         m_isDependDefault {false};
     QMap<MythUIType *, bool> m_reverseDepend;
 
+    QString      m_focusedName;
     int          m_focusOrder      {0};
 
     MythRect     m_area            {0,0,0,0};

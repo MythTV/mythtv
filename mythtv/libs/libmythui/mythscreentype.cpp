@@ -137,6 +137,11 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
     if (helpText)
         helpText->Reset();
 
+    // Let each 'buttonlist' know the name of the currently active buttonlist
+    QString name = widget->GetXMLName();
+    for (auto *w : std::as_const(m_focusWidgetList))
+        w->SetFocusedName(name);
+
     if (m_currentFocusWidget)
         m_currentFocusWidget->LoseFocus();
     m_currentFocusWidget = widget;

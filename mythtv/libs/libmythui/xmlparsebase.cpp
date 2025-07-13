@@ -479,6 +479,8 @@ MythUIType *XMLParseBase::ParseUIType(
         }
     }
 
+    QString shadow = element.attribute("shadow", "");
+
     if (type == "imagetype")
         uitype = new MythUIImage(parent, name);
     else if (type == "procedural")
@@ -492,7 +494,7 @@ MythUIType *XMLParseBase::ParseUIType(
     else if (type == "button")
         uitype = new MythUIButton(parent, name);
     else if (type == "buttonlist2" || type == "buttonlist")
-        uitype = new MythUIButtonList(parent, name);
+        uitype = new MythUIButtonList(parent, name, shadow);
     else if (type == "buttontree")
         uitype = new MythUIButtonTree(parent, name);
     else if (type == "spinbox")

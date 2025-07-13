@@ -1044,6 +1044,12 @@ bool MythUIType::TakeFocus(void)
     return true;
 }
 
+void MythUIType::SetFocusedName(const QString & widgetname)
+{
+    m_focusedName = widgetname;
+    emit RequestUpdate();
+}
+
 void MythUIType::Activate(void)
 {
 }

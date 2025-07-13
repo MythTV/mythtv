@@ -473,7 +473,7 @@ void MythUIButtonTree::SwitchList(bool right)
             m_activeListID++;
         else if (m_currentNode && m_currentNode->visibleChildCount() > 0)
         {
-            m_currentDepth++;
+            ++m_currentDepth;
             doUpdate = true;
         }
         else
@@ -484,10 +484,10 @@ void MythUIButtonTree::SwitchList(bool right)
     else if (!right)
     {
         if (m_activeListID > 0)
-            m_activeListID--;
+            --m_activeListID;
         else if (m_currentDepth > 0)
         {
-            m_currentDepth--;
+            --m_currentDepth;
             doUpdate = true;
         }
         else
@@ -532,8 +532,7 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
     m_activeListID = name.section(' ', 2, 2).toInt();
     m_activeList = list;
 
-
-        auto *node = item->GetData().value<MythGenericTree *> ();
+    auto *node = item->GetData().value<MythGenericTree *> ();
     DoSetCurrentNode(node);
     SetTreeState();
 }
