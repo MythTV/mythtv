@@ -8,6 +8,7 @@
 #include <QMutex>
 #include <QSize>
 
+#include "libmythbase/filesysteminfo.h"
 #include "libmythbase/programinfo.h"  // ProgramInfo
 #include "libmythbase/programtypes.h" // RecStatus::Type
 #include "libmythbase/referencecounter.h"
@@ -60,7 +61,7 @@ class PlaybackSock : public ReferenceCounter
     QString getIP(void) const { return m_ip; }
 
     bool GoToSleep(void);
-    void GetDiskSpace(QStringList &o_strlist);
+    FileSystemInfoList GetDiskSpace();
     int DeleteFile(const QString &filename, const QString &sgroup);
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);

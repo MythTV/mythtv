@@ -1,5 +1,5 @@
-#ifndef FILETRANSFER_H_
-#define FILETRANSFER_H_
+#ifndef MYTHBACKEND_FILETRANSFER_H_
+#define MYTHBACKEND_FILETRANSFER_H_
 
 // C++ headers
 #include <cstdint>
@@ -64,4 +64,4 @@ class BEFileTransfer : public ReferenceCounter
     bool            m_writemode         {false};
 };
 
-#endif
+#endif // MYTHBACKEND_FILETRANSFER_H_

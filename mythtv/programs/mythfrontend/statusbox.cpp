@@ -1366,7 +1366,7 @@ void StatusBox::doMachineStatus()
     // get free disk space
     QString hostnames;
 
-    QList<FileSystemInfo> fsInfos = FileSystemInfo::RemoteGetInfo();
+    FileSystemInfoList fsInfos = FileSystemInfoManager::GetInfoList();
     for (int i = 0; i < fsInfos.size(); ++i)
     {
         // For a single-directory installation just display the totals

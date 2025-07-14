@@ -19,7 +19,6 @@
 
 // mythtv
 #include <libmythbase/mythcorecontext.h>
-#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/mythplugin.h>
 #include <libmythbase/mythpluginapi.h>

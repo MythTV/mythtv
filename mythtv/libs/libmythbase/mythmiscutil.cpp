@@ -55,7 +55,7 @@
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "mythsocket.h"
-#include "mythcoreutil.h"
+#include "filesysteminfo.h"
 #include "mythsystemlegacy.h"
 
 
@@ -104,6 +104,7 @@ bool getUptime(std::chrono::seconds &uptime)
  *  \brief Returns memory statistics in megabytes.
  *
  *  \todo Memory Statistics are not supported (by MythTV) on NT or DOS.
+ *  \todo keep values as B not MiB, int64_t (or size_t?)
  *  \return true if it succeeds, false otherwise.
  */
 bool getMemStats([[maybe_unused]] int &totalMB,
@@ -156,10 +157,11 @@ bool getMemStats([[maybe_unused]] int &totalMB,
     // This is a real hack. I have not found a way to ask the kernel how much
     // swap it is using, and the dynamic_pager daemon doesn't even seem to be
     // able to report what filesystem it is using for the swapfiles. So, we do:
-    int64_t total, used, free;
-    free = getDiskSpace("/private/var/vm", total, used);
-    totalVM = (int)(total >> 10);
-    freeVM = (int)(free >> 10);
+    {
+    auto fsInfo = FileSystemInfo(QString(), "/private/var/vm");
+    totalVM = (int)(fsInfo.getTotalSpace() >> 10);
+    freeVM  = (int)(fsInfo.getFreeSpace()  >> 10);
+    }
     return true;
 #else
     return false;

@@ -1,7 +1,6 @@
 #include <QDir>
 
 #include <libmythbase/mythcorecontext.h>
-#include <libmythbase/mythcoreutil.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdirs.h>
 #include <libmythbase/mythlogging.h>
