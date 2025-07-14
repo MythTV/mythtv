@@ -110,7 +110,7 @@ MBASE_PUBLIC QStringList ToStringList(const FileSystemInfoList& fsInfos);
 MBASE_PUBLIC FileSystemInfoList GetInfoList(MythSocket *sock = nullptr);
 
 MBASE_PUBLIC
-void Consolidate(FileSystemInfoList &disks, bool merge, int64_t fuzz, QString total_name = {});
+void Consolidate(FileSystemInfoList &disks, bool merge, int64_t fuzz, const QString& total_name = {});
 } // namespace FileSystemInfoManager
 
 #endif

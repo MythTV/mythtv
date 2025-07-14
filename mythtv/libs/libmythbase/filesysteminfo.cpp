@@ -122,13 +122,13 @@ FileSystemInfoList FileSystemInfoManager::GetInfoList(MythSocket *sock)
 // O(n^2)
 void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
                                         bool merge, int64_t fuzz,
-                                        QString total_name)
+                                        const QString& total_name)
 {
     int newid = 0;
     int64_t total_total = 0;
     int64_t total_used  = 0;
 
-    for (auto it1 = disks.begin(); it1 != disks.end(); ++it1)
+    for (auto* it1 = disks.begin(); it1 != disks.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
         {
@@ -140,7 +140,7 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
                                 + ":" + it1->getPath());
         }
 
-        for (auto it2 = it1+1; it2 != disks.end(); ++it2)
+        for (auto* it2 = it1+1; it2 != disks.end(); ++it2)
         {
             if (it2->getFSysID() != -1) // disk has already been matched
                 continue;
@@ -179,7 +179,7 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
 FileSystemInfoList FileSystemInfoManager::FromStringList(const QStringList& list)
 {
     FileSystemInfoList fsInfos;
-    fsInfos.reserve(list.size() / FileSystemInfo::k_lines + 1);
+    fsInfos.reserve((list.size() / FileSystemInfo::k_lines) + 1);
 
     QStringList::const_iterator it = list.cbegin();
     while (it < list.cend())
