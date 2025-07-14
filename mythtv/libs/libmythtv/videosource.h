@@ -94,7 +94,7 @@ class FreqTableSelector :
     Q_OBJECT
 public:
     explicit FreqTableSelector(const VideoSource& parent);
-    ~FreqTableSelector();
+    ~FreqTableSelector() override;
 protected:
     QString m_freq;
 };
@@ -221,7 +221,7 @@ class VideoSource : public GroupSetting {
             setLabel(QObject::tr("Video source name"));
         }
 
-        ~Name()
+        ~Name() override
         {
             delete GetStorage();
         }
@@ -262,7 +262,7 @@ class CaptureCardComboBoxSetting : public MythUIComboBoxSetting
     {
     }
 
-    ~CaptureCardComboBoxSetting()
+    ~CaptureCardComboBoxSetting() override
     {
         delete GetStorage();
     }
@@ -295,7 +295,7 @@ class EmptyAudioDevice : public MythUITextEditSetting
         setVisible(false);
     }
 
-    ~EmptyAudioDevice()
+    ~EmptyAudioDevice() override
     {
         delete GetStorage();
     }
@@ -325,7 +325,7 @@ class EmptyVBIDevice : public MythUITextEditSetting
         setVisible(false);
     };
 
-    ~EmptyVBIDevice()
+    ~EmptyVBIDevice() override
     {
         delete GetStorage();
     }
@@ -393,7 +393,7 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
   public:
     HDHomeRunDeviceID(const CaptureCard &parent,
                       HDHomeRunConfigurationGroup &_group);
-    ~HDHomeRunDeviceID();
+    ~HDHomeRunDeviceID() override;
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
 
@@ -479,7 +479,7 @@ class SatIPDeviceID : public MythUITextEditSetting
 
   public:
     explicit SatIPDeviceID(const CaptureCard &parent);
-    ~SatIPDeviceID();
+    ~SatIPDeviceID() override;
 
     void Load(void) override; // StandardSetting
 
@@ -784,7 +784,7 @@ private:
     {
       public:
         explicit Hostname(const CaptureCard &parent);
-        ~Hostname();
+        ~Hostname() override;
         void edit(MythScreenType */*screen*/) override {} // StandardSetting
         void resultEdit(DialogCompletionEvent */*dce*/) override {} // StandardSetting
     };
@@ -907,7 +907,7 @@ class StartingChannel : public MythUIComboBoxSetting
                                 "When the value is not valid a suitable default will be chosen."));
     }
 
-    ~StartingChannel()
+    ~StartingChannel() override
     {
         delete GetStorage();
     }
@@ -1043,7 +1043,7 @@ class VBoxDeviceID : public MythUITextEditSetting
 
   public:
     explicit VBoxDeviceID(const CaptureCard &parent);
-    ~VBoxDeviceID();
+    ~VBoxDeviceID() override;
 
     void Load(void) override; // StandardSetting
 
@@ -1081,7 +1081,7 @@ class CetonDeviceID : public MythUITextEditSetting
 
   public:
     explicit CetonDeviceID(const CaptureCard &parent);
-    ~CetonDeviceID();
+    ~CetonDeviceID() override;
 
     void Load(void) override; // StandardSetting
     void UpdateValues();

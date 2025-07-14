@@ -187,7 +187,7 @@ class InstanceCount : public MythUISpinBoxSetting
                 ));
     };
 
-    ~InstanceCount()
+    ~InstanceCount() override
     {
         delete GetStorage();
     }
@@ -211,7 +211,7 @@ class SchedGroup : public MythUICheckBoxSetting
                 ));
     };
 
-    ~SchedGroup()
+    ~SchedGroup() override
     {
         delete GetStorage();
     }
@@ -278,7 +278,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
         setLabel(QObject::tr("Listings grabber"));
     };
 
-    ~XMLTVGrabber()
+    ~XMLTVGrabber() override
     {
         delete GetStorage();
     }
@@ -413,7 +413,7 @@ class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
     {
     }
 
-    ~CaptureCardSpinBoxSetting()
+    ~CaptureCardSpinBoxSetting() override
     {
         delete GetStorage();
     }
@@ -435,7 +435,7 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
     {
     }
 
-    ~CaptureCardTextEditSetting()
+    ~CaptureCardTextEditSetting() override
     {
         delete GetStorage();
     }
@@ -454,7 +454,7 @@ class ScanFrequencyStart : public MythUITextEditSetting
                                "Leave at 0 if not known. "));
     };
 
-    ~ScanFrequencyStart()
+    ~ScanFrequencyStart() override
     {
         delete GetStorage();
     }
@@ -476,7 +476,7 @@ class DVBNetID : public MythUISpinBoxSetting
        setValue(value);
     };
 
-    ~DVBNetID()
+    ~DVBNetID() override
     {
         delete GetStorage();
     }
@@ -498,7 +498,7 @@ class BouquetID : public MythUISpinBoxSetting
        setValue(value);
     };
 
-    ~BouquetID()
+    ~BouquetID() override
     {
         delete GetStorage();
     }
@@ -520,7 +520,7 @@ class RegionID : public MythUISpinBoxSetting
        setValue(value);
     };
 
-    ~RegionID()
+    ~RegionID() override
     {
         delete GetStorage();
     }
@@ -542,7 +542,7 @@ class LCNOffset : public MythUISpinBoxSetting
        setValue(value);
     };
 
-    ~LCNOffset()
+    ~LCNOffset() override
     {
         delete GetStorage();
     }
@@ -659,7 +659,7 @@ class UseEIT : public MythUICheckBoxSetting
                         "channels themselves 'Over-the-Air'."));
     }
 
-    ~UseEIT()
+    ~UseEIT() override
     {
         delete GetStorage();
     }
@@ -1045,7 +1045,7 @@ class CommandPath : public MythUITextEditSetting
                                 "needed arguments."));
     };
 
-    ~CommandPath()
+    ~CommandPath() override
     {
         delete GetStorage();
     }
@@ -1062,7 +1062,7 @@ class FileDevice : public MythUIFileBrowserSetting
         setLabel(QObject::tr("File path"));
     };
 
-    ~FileDevice()
+    ~FileDevice() override
     {
         delete GetStorage();
     }
@@ -1173,7 +1173,7 @@ class SkipBtAudio : public MythUICheckBoxSetting
                         "require the audio volume to be left alone."));
     };
 
-    ~SkipBtAudio()
+    ~SkipBtAudio() override
     {
         delete GetStorage();
     }
@@ -1289,7 +1289,7 @@ class DVBNoSeqStart : public MythUICheckBoxSetting
                         "recording until a sequence start header is seen."));
     };
 
-    ~DVBNoSeqStart()
+    ~DVBNoSeqStart() override
     {
         delete GetStorage();
     }
@@ -1309,7 +1309,7 @@ class DVBOnDemand : public MythUICheckBoxSetting
                         "leaving it free for other programs at other times."));
     };
 
-    ~DVBOnDemand()
+    ~DVBOnDemand() override
     {
         delete GetStorage();
     }
@@ -1330,7 +1330,7 @@ class DVBEITScan : public MythUICheckBoxSetting
                         "the DVB card is constantly in use."));
     };
 
-    ~DVBEITScan()
+    ~DVBEITScan() override
     {
         delete GetStorage();
     }
@@ -1442,7 +1442,7 @@ class FirewireConnection : public MythUIComboBoxSetting
         addSelection(QObject::tr("Broadcast"),"1");
     }
 
-    ~FirewireConnection()
+    ~FirewireConnection() override
     {
         delete GetStorage();
     }
@@ -1462,7 +1462,7 @@ class FirewireSpeed : public MythUIComboBoxSetting
         addSelection(QObject::tr("800Mbps"),"3");
     }
 
-    ~FirewireSpeed()
+    ~FirewireSpeed() override
     {
         delete GetStorage();
     }
@@ -1544,7 +1544,7 @@ class HDHomeRunEITScan : public MythUICheckBoxSetting
                         "the HDHomeRun is constantly in use."));
     };
 
-    ~HDHomeRunEITScan()
+    ~HDHomeRunEITScan() override
     {
         delete GetStorage();
     }
@@ -2295,7 +2295,7 @@ class SchedGroupFalse : public MythUICheckBoxSetting
         setVisible(false);
     };
 
-    ~SchedGroupFalse()
+    ~SchedGroupFalse() override
     {
         delete GetStorage();
     }
@@ -2930,7 +2930,7 @@ class InputName : public MythUIComboBoxSetting
         setLabel(QObject::tr("Input name"));
     };
 
-    ~InputName()
+    ~InputName() override
     {
         delete GetStorage();
     }
@@ -2989,7 +2989,7 @@ class InputDisplayName : public MythUITextEditSetting
                         "slash ('/') to designate the unique portion."));
     };
 
-    ~InputDisplayName()
+    ~InputDisplayName() override
     {
         delete GetStorage();
     }
@@ -3010,7 +3010,7 @@ class CardInputComboBoxSetting : public MythUIComboBoxSetting
     {
     }
 
-    ~CardInputComboBoxSetting()
+    ~CardInputComboBoxSetting() override
     {
         delete GetStorage();
     }
@@ -3198,7 +3198,7 @@ class ExternalChannelCommand : public MythUITextEditSetting
                     "will be the channel number."));
     };
 
-    ~ExternalChannelCommand()
+    ~ExternalChannelCommand() override
     {
         delete GetStorage();
     }
@@ -3218,7 +3218,7 @@ class PresetTuner : public MythUITextEditSetting
                     "the signal (normally 3 or 4)."));
     };
 
-    ~PresetTuner()
+    ~PresetTuner() override
     {
         delete GetStorage();
     }
@@ -3280,7 +3280,7 @@ class InputPriority : public MythUISpinBoxSetting
                     "a higher value."));
     };
 
-    ~InputPriority()
+    ~InputPriority() override
     {
         delete GetStorage();
     }
@@ -3302,7 +3302,7 @@ class ScheduleOrder : public MythUISpinBoxSetting
                                 "input unavailable to the scheduler."));
     };
 
-    ~ScheduleOrder()
+    ~ScheduleOrder() override
     {
         delete GetStorage();
     }
@@ -3326,7 +3326,7 @@ class LiveTVOrder : public MythUISpinBoxSetting
                                 "input unavailable to live TV."));
     };
 
-    ~LiveTVOrder()
+    ~LiveTVOrder() override
     {
         delete GetStorage();
     }
@@ -3348,7 +3348,7 @@ class DishNetEIT : public MythUICheckBoxSetting
                 "enable general EIT collection as well."));
     };
 
-    ~DishNetEIT()
+    ~DishNetEIT() override
     {
         delete GetStorage();
     }
@@ -4246,7 +4246,7 @@ class DiSEqCPosition : public MythUISpinBoxSetting
        setValue(value);
     };
 
-    ~DiSEqCPosition()
+    ~DiSEqCPosition() override
     {
         delete GetStorage();
     }

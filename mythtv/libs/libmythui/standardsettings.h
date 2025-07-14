@@ -171,7 +171,7 @@ class MUI_PUBLIC HostTextEditSetting: public MythUITextEditSetting
     explicit HostTextEditSetting(const QString &name) :
         MythUITextEditSetting(new HostDBStorage(this, name)) { }
 
-    ~HostTextEditSetting()
+    ~HostTextEditSetting() override
     {
         delete GetStorage();
     }
@@ -183,7 +183,7 @@ class MUI_PUBLIC GlobalTextEditSetting: public MythUITextEditSetting
     explicit GlobalTextEditSetting(const QString &name) :
         MythUITextEditSetting(new GlobalDBStorage(this, name)) { }
 
-    ~GlobalTextEditSetting()
+    ~GlobalTextEditSetting() override
     {
         delete GetStorage();
     }
@@ -219,7 +219,7 @@ class MUI_PUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
     explicit HostFileBrowserSetting(const QString &name) :
         MythUIFileBrowserSetting(new HostDBStorage(this, name)) { }
 
-    ~HostFileBrowserSetting()
+    ~HostFileBrowserSetting() override
     {
         delete GetStorage();
     }
@@ -275,7 +275,7 @@ class MUI_PUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
     explicit HostComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new HostDBStorage(this, name), rw) { }
 
-    ~HostComboBoxSetting()
+    ~HostComboBoxSetting() override
     {
         delete GetStorage();
     }
@@ -288,7 +288,7 @@ class MUI_PUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
     explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
 
-    ~GlobalComboBoxSetting()
+    ~GlobalComboBoxSetting() override
     {
         delete GetStorage();
     }
@@ -396,7 +396,7 @@ class MUI_PUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
                              pageMultiple, special_value_text)
     { }
 
-    ~HostSpinBoxSetting()
+    ~HostSpinBoxSetting() override
     {
         delete GetStorage();
     }
@@ -412,7 +412,7 @@ class MUI_PUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
                              pageMultiple, special_value_text)
     { }
 
-    ~GlobalSpinBoxSetting()
+    ~GlobalSpinBoxSetting() override
     {
         delete GetStorage();
     }
@@ -455,7 +455,7 @@ class MUI_PUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
     explicit HostCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new HostDBStorage(this, name)) { }
 
-    ~HostCheckBoxSetting()
+    ~HostCheckBoxSetting() override
     {
         delete GetStorage();
     }
@@ -467,7 +467,7 @@ class MUI_PUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
     explicit GlobalCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new GlobalDBStorage(this, name)) { }
 
-    ~GlobalCheckBoxSetting()
+    ~GlobalCheckBoxSetting() override
     {
         delete GetStorage();
     }

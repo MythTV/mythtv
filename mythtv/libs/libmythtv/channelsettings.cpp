@@ -109,7 +109,7 @@ class Name : public MythUITextEditSetting
         setLabel(QCoreApplication::translate("(Common)", "Channel Name"));
     }
 
-    ~Name()
+    ~Name() override
     {
         delete GetStorage();
     }
@@ -126,7 +126,7 @@ class Channum : public MythUITextEditSetting
         "This is the number by which the channel is known to MythTV."));
     }
 
-    ~Channum()
+    ~Channum() override
     {
         delete GetStorage();
     }
@@ -146,7 +146,7 @@ class Source : public MythUIComboBoxSetting
         "The sourceid in dtv_multiplex cannot and should not be changed."));
     }
 
-    ~Source()
+    ~Source() override
     {
         delete GetStorage();
     }
@@ -205,7 +205,7 @@ class Callsign : public MythUITextEditSetting
         setLabel(QCoreApplication::translate("(Common)", "Callsign"));
     }
 
-    ~Callsign()
+    ~Callsign() override
     {
         delete GetStorage();
     }
@@ -269,7 +269,7 @@ class TimeOffset : public MythUISpinBoxSetting
             "channel are in a different time zone."));
     }
 
-    ~TimeOffset()
+    ~TimeOffset() override
     {
         delete GetStorage();
     }
@@ -291,7 +291,7 @@ class Priority : public MythUISpinBoxSetting
             "depreciate this channel."));
     }
 
-    ~Priority()
+    ~Priority() override
     {
         delete GetStorage();
     }
@@ -310,7 +310,7 @@ class Icon : public MythUITextEditSetting
             "displays."));
     }
 
-    ~Icon()
+    ~Icon() override
     {
         delete GetStorage();
     }
@@ -331,7 +331,7 @@ class VideoFilters : public MythUITextEditSetting
 
     }
 
-    ~VideoFilters()
+    ~VideoFilters() override
     {
         delete GetStorage();
     }
@@ -352,7 +352,7 @@ class OutputFilters : public MythUITextEditSetting
             "Start with a plus to append to the global playback filters."));
     }
 
-    ~OutputFilters()
+    ~OutputFilters() override
     {
         delete GetStorage();
     }
@@ -374,7 +374,7 @@ class XmltvID : public MythUIComboBoxSetting
             "'mythfilldatabase' is run."));
     }
 
-    ~XmltvID()
+    ~XmltvID() override
     {
         delete GetStorage();
     }
@@ -435,7 +435,7 @@ class ServiceID : public MythUISpinBoxSetting
                 "If there is only one channel, then setting this to anything will still find it."));
     }
 
-    ~ServiceID()
+    ~ServiceID() override
     {
         delete GetStorage();
     }
@@ -504,7 +504,7 @@ class CommMethod : public MythUIComboBoxSetting
             addSelection(SkipTypeToString(pref), QString::number(pref));
     }
 
-    ~CommMethod()
+    ~CommMethod() override
     {
         delete GetStorage();
     }
@@ -536,7 +536,7 @@ class Visible : public MythUIComboBoxSetting
                      QString::number(kChannelNeverVisible));
     }
 
-    ~Visible()
+    ~Visible() override
     {
         delete GetStorage();
     }
@@ -556,7 +556,7 @@ class OnAirGuide : public MythUICheckBoxSetting
             "using 'Over-the-Air' program listings."));
     }
 
-    ~OnAirGuide()
+    ~OnAirGuide() override
     {
         delete GetStorage();
     }
@@ -578,7 +578,7 @@ class ChannelURL : public MythUITextEditSetting
             "with a \"HDHomeRun Channel Import\" loading of an XML file."));
     }
 
-    ~ChannelURL()
+    ~ChannelURL() override
     {
         delete GetStorage();
     }
@@ -603,7 +603,7 @@ class Freqid : public MythUITextEditSetting
             "number that will be understood by your tuners."));
     }
 
-    ~Freqid()
+    ~Freqid() override
     {
         delete GetStorage();
     }
@@ -626,7 +626,7 @@ class Finetune : public MythUISpinBoxSetting
         setValue("0");
     }
 
-    ~Finetune()
+    ~Finetune() override
     {
         delete GetStorage();
     }
@@ -642,7 +642,7 @@ class Contrast : public MythUISpinBoxSetting
         setLabel(QCoreApplication::translate("(Common)", "Contrast"));
     }
 
-    ~Contrast()
+    ~Contrast() override
     {
         delete GetStorage();
     }
@@ -658,7 +658,7 @@ class Brightness : public MythUISpinBoxSetting
         setLabel(QCoreApplication::translate("(Common)", "Brightness"));
     }
 
-    ~Brightness()
+    ~Brightness() override
     {
         delete GetStorage();
     }
@@ -674,7 +674,7 @@ class Colour : public MythUISpinBoxSetting
         setLabel(QCoreApplication::translate("(Common)", "Color"));
     }
 
-    ~Colour()
+    ~Colour() override
     {
         delete GetStorage();
     }
@@ -690,7 +690,7 @@ class Hue : public MythUISpinBoxSetting
         setLabel(QCoreApplication::translate("(Common)", "Hue"));
     }
 
-    ~Hue()
+    ~Hue() override
     {
         delete GetStorage();
     }

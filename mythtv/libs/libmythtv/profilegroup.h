@@ -50,7 +50,7 @@ class ProfileGroup : public GroupSetting
             setVisible(false);
         }
 
-        ~Is_default()
+        ~Is_default() override
         {
             delete GetStorage();
         }
@@ -68,7 +68,7 @@ class ProfileGroup : public GroupSetting
             setLabel(QObject::tr("Profile Group Name"));
         }
 
-        ~Name()
+        ~Name() override
         {
             delete GetStorage();
         }
@@ -84,7 +84,7 @@ class ProfileGroup : public GroupSetting
             setLabel(QObject::tr("Hostname"));
         }
 
-        ~HostName()
+        ~HostName() override
         {
             delete GetStorage();
         }
@@ -101,7 +101,7 @@ class ProfileGroup : public GroupSetting
             setLabel(QObject::tr("Card-Type"));
         }
 
-        ~CardInfo()
+        ~CardInfo() override
         {
             delete GetStorage();
         }

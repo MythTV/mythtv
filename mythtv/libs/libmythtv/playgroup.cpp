@@ -48,7 +48,7 @@ class TitleMatch : public MythUITextEditSetting
                                          "\"CNN\" appears."));
     };
 
-    ~TitleMatch()
+    ~TitleMatch() override
     {
         delete GetStorage();
     }
@@ -67,7 +67,7 @@ class SkipAhead : public MythUISpinBoxSetting
                                         "a fast forward."));
     };
 
-    ~SkipAhead()
+    ~SkipAhead() override
     {
         delete GetStorage();
     }
@@ -85,7 +85,7 @@ class SkipBack : public MythUISpinBoxSetting
                                         "a rewind."));
     };
 
-    ~SkipBack()
+    ~SkipBack() override
     {
         delete GetStorage();
     }
@@ -104,7 +104,7 @@ class JumpMinutes : public MythUISpinBoxSetting
                                         "pressed."));
     };
 
-    ~JumpMinutes()
+    ~JumpMinutes() override
     {
         delete GetStorage();
     }
@@ -125,7 +125,7 @@ class TimeStretch : public MythUISpinBoxSetting
                                         "speed."));
     };
 
-    ~TimeStretch()
+    ~TimeStretch() override
     {
         delete GetStorage();
     }

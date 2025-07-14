@@ -62,7 +62,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
             setName("name");
         }
 
-        ~Name()
+        ~Name() override
         {
             delete GetStorage();
         }

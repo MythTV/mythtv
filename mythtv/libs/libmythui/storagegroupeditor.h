@@ -60,7 +60,7 @@ class StorageGroupDirSetting : public MythUIFileBrowserSetting
 
   public:
       StorageGroupDirSetting(int id, const QString &group);
-      ~StorageGroupDirSetting();
+      ~StorageGroupDirSetting() override;
 
     bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
 
