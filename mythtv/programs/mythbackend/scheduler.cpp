@@ -5699,11 +5699,10 @@ void Scheduler::FillDirectoryInfoCache(void)
         m_mainServer->GetFilesystemInfos(fsInfos, true);
 
     QMap <int, bool> fsMap;
-    FileSystemInfoList::iterator it1;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
+    for (const auto& fs1 : std::as_const(fsInfos))
     {
-        fsMap[it1->getFSysID()] = true;
-        m_fsInfoCache[it1->getHostname() + ":" + it1->getPath()] = *it1;
+        fsMap[fs1.getFSysID()] = true;
+        m_fsInfoCache[fs1.getHostname() + ":" + fs1.getPath()] = fs1;
     }
 
     LOG(VB_FILE, LOG_INFO, LOC +

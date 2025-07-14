@@ -5207,38 +5207,37 @@ void MainServer::GetFilesystemInfos(FileSystemInfoList &fsInfos,
 
     FileSystemInfoManager::Consolidate(fsInfos, false, maxWriteFiveSec);
 
-    FileSystemInfoList::iterator it1;
     if (VERBOSE_LEVEL_CHECK(VB_FILE | VB_SCHEDULE, LOG_INFO))
     {
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
             "--- GetFilesystemInfos directory list start ---");
-        for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
+        for (const auto& fs1 : std::as_const(fsInfos))
         {
             QString msg =
                 QString("Dir: %1:%2")
-                    .arg(it1->getHostname(), it1->getPath());
+                    .arg(fs1.getHostname(), fs1.getPath());
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC + msg) ;
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     Location: %1")
-                .arg(it1->isLocal() ? "Local" : "Remote"));
+                .arg(fs1.isLocal() ? "Local" : "Remote"));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     fsID    : %1")
-                .arg(it1->getFSysID()));
+                .arg(fs1.getFSysID()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     dirID   : %1")
-                .arg(it1->getGroupID()));
+                .arg(fs1.getGroupID()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     BlkSize : %1")
-                .arg(it1->getBlockSize()));
+                .arg(fs1.getBlockSize()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     TotalKB : %1")
-                .arg(it1->getTotalSpace()));
+                .arg(fs1.getTotalSpace()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     UsedKB  : %1")
-                .arg(it1->getUsedSpace()));
+                .arg(fs1.getUsedSpace()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
                 QString("     FreeKB  : %1")
-                .arg(it1->getFreeSpace()));
+                .arg(fs1.getFreeSpace()));
         }
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
             "--- GetFilesystemInfos directory list end ---");
