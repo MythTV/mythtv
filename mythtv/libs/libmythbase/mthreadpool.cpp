@@ -103,45 +103,37 @@ using MPoolQueues = QMap<int, MPoolQueue>;
 class MPoolThread : public MThread
 {
   public:
-    MPoolThread(MThreadPool &pool, std::chrono::milliseconds timeout) :
-        MThread("PT"), m_pool(pool), m_expiryTimeout(timeout)
+    MPoolThread(QString objectName, MThreadPool &pool, std::chrono::milliseconds timeout) :
+        MThread(std::move(objectName)), m_pool(pool), m_expiryTimeout(timeout)
     {
-        QMutexLocker locker(&s_lock);
-        setObjectName(QString("PT%1").arg(s_thread_num));
-        s_thread_num++;
     }
 
     void run(void) override // MThread
     {
         RunProlog();
 
-        MythTimer t;
-        t.start();
         QMutexLocker locker(&m_lock);
-        while (true)
+        if (m_doRun && m_runnable == nullptr)
         {
-            if (m_doRun && !m_runnable)
-                m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
-
-            if (!m_runnable)
-            {
-                m_doRun = false;
-
-                locker.unlock();
-                m_pool.NotifyDone(this);
-                locker.relock();
-                break;
-            }
-
+            m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
+        }
+        while (m_runnable != nullptr)
+        {
             if (!m_runnableName.isEmpty())
                 loggingRegisterThread(m_runnableName);
 
             bool autodelete = m_runnable->autoDelete();
+            locker.unlock();
             m_runnable->run();
+            locker.relock();
             if (autodelete)
                 delete m_runnable;
             if (m_reserved)
+            {
+                locker.unlock();
                 m_pool.ReleaseThread();
+                locker.relock();
+            }
             m_reserved = false;
             m_runnable = nullptr;
 
@@ -152,22 +144,23 @@ class MPoolThread : public MThread
             qApp->processEvents();
             qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
 
-            t.start();
-
             if (m_doRun)
             {
                 locker.unlock();
                 m_pool.NotifyAvailable(this);
                 locker.relock();
             }
-            else
+            if (m_doRun && m_runnable == nullptr)
             {
-                locker.unlock();
-                m_pool.NotifyDone(this);
-                locker.relock();
-                break;
+                m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
             }
         }
+
+        m_doRun = false;
+
+        locker.unlock();
+        m_pool.NotifyDone(this);
+        locker.relock();
 
         RunEpilog();
     }
@@ -201,12 +194,7 @@ class MPoolThread : public MThread
     bool            m_doRun          {true};
     QString         m_runnableName;
     bool            m_reserved       {false};
-
-    static QMutex s_lock;
-    static uint s_thread_num;
 };
-QMutex MPoolThread::s_lock;
-uint MPoolThread::s_thread_num = 0;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -228,6 +216,7 @@ class MThreadPoolPrivate
     std::chrono::milliseconds m_expiryTimeout {2min};
     int  m_maxThreadCount   {QThread::idealThreadCount()};
     int  m_reserveThread    {0};
+    int  m_threadsCreated   {0};
 
     MPoolQueues         m_runQueues;
     QSet<MPoolThread*>  m_availThreads;
@@ -424,7 +413,9 @@ bool MThreadPool::TryStartInternal(
     {
         if (reserved)
             m_priv->m_reserveThread++;
-        auto *thread = new MPoolThread(*this, m_priv->m_expiryTimeout);
+        QString name {QString("%1%2").arg(m_priv->m_name, QString::number(m_priv->m_threadsCreated))};
+        m_priv->m_threadsCreated++;
+        auto *thread = new MPoolThread(name, *this, m_priv->m_expiryTimeout);
         m_priv->m_runningThreads.insert(thread);
         thread->SetRunnable(runnable, debugName, reserved);
         thread->start();
