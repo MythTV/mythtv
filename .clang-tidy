@@ -122,6 +122,12 @@ Checks: '-*,
         # Disable these warnings until they can be analyzed. ,
        -clang-analyzer-optin.cplusplus.VirtualCall,
 
+        # Disable new WebKit warnings.  They should only apply to code
+        # specifically related to WebKit (which MythTV only accesses
+        # via QtWebEngine), but they are currently applied
+        # everywhere. ,
+       -clang-analyzer-webkit.*,
+
     cppcoreguidelines-*,
 
         # Skip tests that are redirects to other tests. ,
