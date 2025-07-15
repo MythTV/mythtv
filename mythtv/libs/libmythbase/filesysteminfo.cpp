@@ -128,7 +128,13 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
     int64_t total_total = 0;
     int64_t total_used  = 0;
 
-    for (auto* it1 = disks.begin(); it1 != disks.end(); ++it1)
+    for (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto* it1 = disks.begin();
+#else
+        auto it1 = disks.begin();
+#endif
+        it1 != disks.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
         {
@@ -140,7 +146,13 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
                                 + ":" + it1->getPath());
         }
 
-        for (auto* it2 = it1+1; it2 != disks.end(); ++it2)
+        for (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+           auto* it2 = it1+1;
+#else
+           auto it2 = it1+1;
+#endif
+           it2 != disks.end(); ++it2)
         {
             if (it2->getFSysID() != -1) // disk has already been matched
                 continue;
