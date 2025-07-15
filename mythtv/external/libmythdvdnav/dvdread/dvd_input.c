@@ -299,7 +299,7 @@ int dvdinput_setup(const char *path)
     CFURLRef     appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
     CFStringRef  macPath   = CFURLCopyFileSystemPath(appUrlRef,
                                                     kCFURLPOSIXPathStyle);
-    static char *paths[]   = {
+    static char const * const paths[]   = {
         "%s/Contents/Frameworks/%s",
         "%s/Contents/PlugIns/%s", // proper spelling, important on case sensitive fs
         "%s/Contents/Plugins/%s", // to be compatible with old bundler
