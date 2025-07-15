@@ -6,7 +6,7 @@
 #include <QString>
 
 // libmyth* includes
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programinfo.h"
 
 // Local includes
 #include "mythutil_commandlineparser.h"
