@@ -474,7 +474,7 @@ dsi_t* dvdnav_get_current_nav_dsi(dvdnav_t *self);
  * Get the area associated with a certain button.
  */
 dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32_t mode,
-					  dvdnav_highlight_area_t *highlight);
+                                          dvdnav_highlight_area_t *highlight);
 
 /*
  * Get the area associated with a certain button in the given

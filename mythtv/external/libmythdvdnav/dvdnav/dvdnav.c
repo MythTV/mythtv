@@ -996,7 +996,7 @@ uint8_t dvdnav_get_video_format(dvdnav_t *this) {
    printerr("Virtual DVD machine not started.");
    return -1;
   }
-  
+
   pthread_mutex_lock(&this->vm_lock);
   retval = (uint8_t)vm_get_video_format(this->vm);
   pthread_mutex_unlock(&this->vm_lock);
