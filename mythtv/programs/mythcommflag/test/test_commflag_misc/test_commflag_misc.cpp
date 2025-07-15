@@ -9,9 +9,6 @@
 #include "test_commflag_misc.h"
 #include "quickselect.h"
 
-static constexpr char const * const TESTNAME = "test_commflag_misc";
-static constexpr char const * const TESTVERSION = "test_commflag_misc_1.0";
-
 //////////////////////////////////////////////////
 
 // Before all test cases
