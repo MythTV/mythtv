@@ -14,7 +14,7 @@
 class MBASE_PUBLIC FileSystemInfo
 {
   public:
-    static constexpr int k_lines = 8; ///< number of strings in the serialized stringlist
+    static constexpr int kLines = 8; ///< number of strings in the serialized stringlist
 
     FileSystemInfo() = default;
     FileSystemInfo(QString hostname,

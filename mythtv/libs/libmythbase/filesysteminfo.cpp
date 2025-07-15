@@ -15,7 +15,7 @@
 QStringList FileSystemInfo::ToStringList() const
 {
     QStringList list;
-    list.reserve(k_lines);
+    list.reserve(kLines);
     list << m_hostname;
     list << m_path;
     list << QString::number(m_local);
@@ -54,7 +54,7 @@ The FileSystemInfo will be in a default state if deserialization fails.
 bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
                                     const QStringList::const_iterator& listend)
 {
-    if (std::distance(it, listend) < k_lines)
+    if (std::distance(it, listend) < kLines)
     {
         LOG(VB_GENERAL, LOG_ALERT, QStringLiteral("FileSystemInfo::FromStringList, not enough items in list."));
         clear();
@@ -191,7 +191,7 @@ void FileSystemInfoManager::Consolidate(FileSystemInfoList &disks,
 FileSystemInfoList FileSystemInfoManager::FromStringList(const QStringList& list)
 {
     FileSystemInfoList fsInfos;
-    fsInfos.reserve((list.size() / FileSystemInfo::k_lines) + 1);
+    fsInfos.reserve((list.size() / FileSystemInfo::kLines) + 1);
 
     QStringList::const_iterator it = list.cbegin();
     while (it < list.cend())

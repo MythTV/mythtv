@@ -144,7 +144,7 @@ FileSystemInfoList PlaybackSock::GetDiskSpace()
 {
     QStringList strlist(QString("QUERY_FREE_SPACE"));
 
-    if (SendReceiveStringList(strlist, FileSystemInfo::k_lines))
+    if (SendReceiveStringList(strlist, FileSystemInfo::kLines))
     {
         return FileSystemInfoManager::FromStringList(strlist);
     }

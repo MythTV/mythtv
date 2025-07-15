@@ -103,8 +103,8 @@ using MPoolQueues = QMap<int, MPoolQueue>;
 class MPoolThread : public MThread
 {
   public:
-    MPoolThread(QString objectName, MThreadPool &pool, std::chrono::milliseconds timeout) :
-        MThread(std::move(objectName)), m_pool(pool), m_expiryTimeout(timeout)
+    MPoolThread(const QString& objectName, MThreadPool &pool, std::chrono::milliseconds timeout) :
+        MThread(objectName), m_pool(pool), m_expiryTimeout(timeout)
     {
     }
 

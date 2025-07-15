@@ -457,7 +457,13 @@ void AutoExpire::ExpireRecordings(void)
     }
 
     QMap <int, bool> fsMap;
-    for (auto fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
+    for (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto* fsit = fsInfos.begin();
+#else
+        auto fsit = fsInfos.begin();
+#endif
+fsit != fsInfos.end(); ++fsit)
     {
         if (fsMap.contains(fsit->getFSysID()))
             continue;
@@ -479,7 +485,13 @@ void AutoExpire::ExpireRecordings(void)
                     .arg(fsit->getFSysID()));
             LOG(VB_FILE, LOG_INFO, QString("Directories on filesystem ID %1:")
                     .arg(fsit->getFSysID()));
-            for (auto fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); ++fsit2)
+            for (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                auto* fsit2 = fsInfos.begin();
+#else
+                auto fsit2 = fsInfos.begin();
+#endif
+                fsit2 != fsInfos.end(); ++fsit2)
             {
                 if (fsit2->getFSysID() == fsit->getFSysID())
                 {
