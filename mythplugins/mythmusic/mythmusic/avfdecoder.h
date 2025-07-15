@@ -12,7 +12,7 @@ extern "C" {
 #include <QObject>
 
 // MythTV headers
-#include <libmyth/audio/audiooutputsettings.h>
+#include <libmythtv/audio/audiooutputsettings.h>
 #include <libmythtv/mythavutil.h>
 
 // Mythmusic Headers

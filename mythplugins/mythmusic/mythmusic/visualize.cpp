@@ -1889,7 +1889,7 @@ unsigned long Piano::getDesiredSamples(void)
     // We want all the data! (within reason)
     //   typical observed values are 882 -
     //   12.5 chunks of data per second from 44100Hz signal : Sampled at 50Hz, lots of 4, see :
-    //   mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
+    //   mythtv/libs/libmythtv/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
     //   See : mythtv/mythplugins/mythmusic/mythmusic/avfdecoder.cpp "20ms worth"
     return (unsigned long) kPianoAudioSize;  // Maximum we can be given
 }
