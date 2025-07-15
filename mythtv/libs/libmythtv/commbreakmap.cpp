@@ -27,7 +27,7 @@ CommSkipMode CommBreakMap::GetAutoCommercialSkip(void) const
 
 void CommBreakMap::ResetLastSkip(void)
 {
-    m_lastSkipTime = time(nullptr);
+    m_lastSkipTime = SystemClock::now();
 }
 
 void CommBreakMap::SetAutoCommercialSkip(CommSkipMode autoskip, uint64_t framesplayed)
@@ -152,8 +152,8 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
     if (!m_hascommbreaktable)
         return false;
 
-    if (((time(nullptr) - m_lastSkipTime) <= 3) ||
-        ((time(nullptr) - m_lastCommSkipTime) <= 3))
+    if ((SystemClock::now() <= m_lastSkipTime + kAutoSkipDeadZone) ||
+        (SystemClock::now() <= m_lastCommSkipTime + kAutoSkipDeadZone))
     {
         SetTracker(framesPlayed);
         return false;
@@ -238,7 +238,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
 
         m_lastCommSkipDirection = 1;
         m_lastCommSkipStart = framesPlayed;
-        m_lastCommSkipTime = time(nullptr);
+        m_lastCommSkipTime = SystemClock::now();
 
         jumpToFrame = m_commBreakIter.key() - framediff;
         return true;
@@ -254,20 +254,20 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
 {
     QMutexLocker locker(&m_commBreakMapLock);
     if ((m_skipcommercials == (0 - m_lastCommSkipDirection)) &&
-        ((time(nullptr) - m_lastCommSkipTime) <= 5))
+        (SystemClock::now() <= m_lastCommSkipTime + kSkipBackWindow))
     {
         comm_msg = tr("Skipping Back.");
 
         if (m_lastCommSkipStart > (2.0 * video_frame_rate))
             m_lastCommSkipStart -= (long long) (2.0 * video_frame_rate);
         m_lastCommSkipDirection = 0;
-        m_lastCommSkipTime = time(nullptr);
+        m_lastCommSkipTime = SystemClock::now();
         jumpToFrame = m_lastCommSkipStart;
         return true;
     }
     m_lastCommSkipDirection = m_skipcommercials;
     m_lastCommSkipStart     = framesPlayed;
-    m_lastCommSkipTime      = time(nullptr);
+    m_lastCommSkipTime      = SystemClock::now();
 
     SetTracker(framesPlayed);
 

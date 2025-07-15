@@ -3,8 +3,13 @@
 #ifndef DVB_TABLES_H
 #define DVB_TABLES_H
 
-#include <QString>
 #include <cstdint>  // uint32_t
+#include <ctime>
+
+using uint = unsigned int;
+
+#include <QDateTime>
+#include <QString>
 
 #include "libmythtv/mpeg/dvbdescriptors.h"
 #include "libmythtv/mpeg/mpegtables.h"

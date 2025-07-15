@@ -10,7 +10,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "libmythbase/compat.h"
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/programtypes.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/playercontext.h"
@@ -53,9 +53,18 @@ class CommBreakMap
     std::chrono::seconds    m_commrewindamount      {0s};
     std::chrono::seconds    m_commnotifyamount      {0s};
     int                     m_lastCommSkipDirection {0};
-    time_t                  m_lastCommSkipTime      {0/*1970*/};
+    SystemTime              m_lastCommSkipTime;
+    /** Time after a commercial skip that skipping back will skip to
+    the start of the just skipped commercial break.
+    */
+    static constexpr std::chrono::seconds kSkipBackWindow {5s};
     uint64_t                m_lastCommSkipStart     {0};
-    time_t                  m_lastSkipTime          {0 /*1970*/};
+    /** This is separate from m_lastCommSkipTime so a manual seek does not trigger
+    the kSkipBackWindow code.
+    */
+    SystemTime              m_lastSkipTime;
+    /// Time after any seek that an automatic commercial skip will not occur.
+    static constexpr std::chrono::seconds kAutoSkipDeadZone {3s};
     bool                    m_hascommbreaktable     {false};
     QDateTime               m_lastIgnoredManualSkip;
     std::chrono::seconds    m_maxskip               {1h};

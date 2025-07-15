@@ -1,8 +1,10 @@
 #include "mythtimezone.h"
 
-#include <cstdlib> // for malloc, getenv
-#include <ctime>
-
+#if __has_include(<QtEnvironmentVariables>) // Qt 6
+#include <QtEnvironmentVariables>
+#else
+#include <QtGlobal>
+#endif
 #include <QDataStream>
 #include <QTextStream>
 #include <QDateTime>

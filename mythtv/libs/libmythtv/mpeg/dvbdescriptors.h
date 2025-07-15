@@ -4,7 +4,12 @@
 #define DVB_DESCRIPTORS_H
 
 #include <cassert>
+#include <cstdint>
+#include <ctime>
 
+using uint = unsigned int;
+
+#include <QDateTime>
 #include <QMutex>
 #include <QString>
 
