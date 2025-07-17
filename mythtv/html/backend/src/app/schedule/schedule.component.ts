@@ -442,8 +442,8 @@ export class ScheduleComponent implements OnInit {
           }
         );
 
-      if (this.reqProgram?.Recording?.StatusName == 'CurrentRecording'
-        || this.reqProgram?.Recording?.StatusName == 'PreviousRecording')
+        // current recording = 3, prev recording = 2, never rec = 11
+      if ( this.reqProgram?.Recording?.Status && [2, 3, 11].indexOf(this.reqProgram?.Recording?.Status) != -1)
         this.typeList.push(
           {
             prompt: this.translate.instant('dashboard.sched.type.forget_history'),
@@ -502,9 +502,13 @@ export class ScheduleComponent implements OnInit {
 
 
   mergeProgram(recRule: RecRule, program: ScheduleOrProgram, channel: Channel) {
-    recRule.Title = program.Title;
-    recRule.SubTitle = program.SubTitle;
-    recRule.Description = program.Description;
+    // In searches, these fields contain search and additional tables
+    // so do not fill in the subtitle and description
+    if (recRule.SearchType == 'None') {
+      recRule.Title = program.Title;
+      recRule.SubTitle = program.SubTitle;
+      recRule.Description = program.Description;
+    }
     recRule.Category = program.Category;
     recRule.StartTime = program.StartTime;
     recRule.EndTime = program.EndTime;

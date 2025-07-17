@@ -281,7 +281,8 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
       this.program = program;
       this.errorCount = 0;
       this.dvrService.ReactivateRecording({
-        ChanId: program.Channel.ChanId,
+        // Do not include chanid and starttime because the start time may not
+        // match the MythTV database if the recording started early or late
         RecordId: program.Recording.RecordId
       }).subscribe({
         next: (x) => {
