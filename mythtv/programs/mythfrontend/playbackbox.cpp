@@ -499,6 +499,7 @@ bool PlaybackBox::Create()
         return false;
 
     m_recgroupList  = dynamic_cast<MythUIButtonList *> (GetChild("recgroups"));
+    m_groupAlphaList = dynamic_cast<MythUIButtonList *> (GetChild("groupsAlphabet"));
     m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
     m_recordingList = dynamic_cast<MythUIButtonList *> (GetChild("recordings"));
 
@@ -522,13 +523,19 @@ bool PlaybackBox::Create()
     {
         if (gCoreContext->GetBoolSetting("RecGroupsFocusable", false))
         {
-        connect(m_recgroupList, &MythUIButtonList::itemSelected,
-            this, &PlaybackBox::updateRecGroup);
+            connect(m_recgroupList, &MythUIButtonList::itemSelected,
+                    this, &PlaybackBox::updateRecGroup);
         }
         else
         {
             m_recgroupList->SetCanTakeFocus(false);
         }
+    }
+
+    if (m_groupAlphaList)
+    {
+        connect(m_groupAlphaList, &MythUIButtonList::itemSelected,
+                this, &PlaybackBox::selectUIGroupsAlphabet);
     }
 
     connect(m_groupList, &MythUIButtonList::itemSelected,
@@ -550,6 +557,7 @@ bool PlaybackBox::Create()
     connect(m_artTimer[kArtworkCoverart], &QTimer::timeout, this, &PlaybackBox::coverartLoad);
 
     BuildFocusList();
+    SetFocusWidget(m_groupList);
     m_programInfoCache.ScheduleLoad(false);
     LoadInBackground();
 
@@ -595,7 +603,8 @@ void PlaybackBox::SwitchList()
 {
     if (GetFocusWidget() == m_groupList)
         SetFocusWidget(m_recordingList);
-    else if (GetFocusWidget() == m_recordingList)
+    else if (GetFocusWidget() == m_recordingList ||
+             GetFocusWidget() == m_groupAlphaList)
         SetFocusWidget(m_groupList);
 }
 
@@ -1403,18 +1412,21 @@ void PlaybackBox::UpdateUIRecGroupList(void)
 void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 {
     m_groupList->Reset();
+    if (m_groupAlphaList)
+        m_groupAlphaList->Reset();
 
     if (!m_titleList.isEmpty())
     {
         int best_pref = INT_MAX;
         int sel_idx = 0;
+
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
             const QString& groupname = (*it);
 
             auto *item = new MythUIButtonListItem(m_groupList, "",
-                                         QVariant::fromValue(groupname.toLower()));
+                                     QVariant::fromValue(groupname.toLower()));
 
             int pref = groupPreferences.indexOf(groupname.toLower());
             if ((pref >= 0) && (pref < best_pref))
@@ -1449,6 +1461,17 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
         // to be called with m_needUpdate set.
         if (!sel_idx)
             updateRecList(m_groupList->GetItemCurrent());
+
+        if (m_groupAlphaList)
+        {
+            for (auto Iqs = m_groupAlphabet.keyValueBegin();
+                 Iqs != m_groupAlphabet.keyValueEnd(); ++Iqs)
+            {
+                auto *item = new MythUIButtonListItem(m_groupAlphaList, "",
+                                               QVariant::fromValue(Iqs->first));
+                item->SetText(Iqs->first);
+            }
+        }
     }
 }
 
@@ -1483,7 +1506,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     QString grouplabel = sel_item->GetText();
 
     updateGroupInfo(groupname, grouplabel);
-
     if (((m_currentGroup == groupname) && !m_needUpdate) ||
         m_playingSomething)
         return;
@@ -1523,6 +1545,33 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             m_noRecordingsText->SetText(txt);
             m_noRecordingsText->SetVisible(true);
         }
+    }
+
+    if (m_groupAlphaList)
+    {
+        if (grouplabel.startsWith("Watch List") ||
+            grouplabel.startsWith("All Programs"))
+        {
+            m_currentLetter = "All";
+        }
+        else
+        {
+            ProgramInfo *pginfo = GetCurrentProgram();
+            m_currentLetter = pginfo->GetSortTitle().at(0).toUpper();
+            m_groupAlphaList->MoveToNamedPosition(m_currentLetter);
+        }
+    }
+}
+
+void PlaybackBox::selectUIGroupsAlphabet(MythUIButtonListItem *item)
+{
+    if (!item  || (m_currentLetter == item->GetText()) )
+        return;
+
+    if (!item->GetText().isEmpty())
+    {
+        m_currentLetter = item->GetText();
+        m_groupList->MoveToNamedPosition(m_groupAlphabet[m_currentLetter]);
     }
 }
 
@@ -2075,6 +2124,16 @@ bool PlaybackBox::UpdateUILists(void)
             m_recGroupIdx = m_recGroups.indexOf(m_recGroup);
             m_recGroupIdx = std::max(m_recGroupIdx, 0);
         }
+    }
+
+    QChar first;
+    m_groupAlphabet.clear();
+    for (auto it = sortedList.keyValueBegin();
+         it != sortedList.keyValueEnd(); ++it)
+    {
+        first = (*it).first.at(0).toUpper();
+        if (!m_groupAlphabet.contains(first))
+            m_groupAlphabet[first] = (*it).second;
     }
 
     UpdateUIRecGroupList();

@@ -53,6 +53,44 @@
             </statetype>
         </buttonlist>
 
+        <buttonlist name="groupsAlphabet">
+            <area>317,197,38,38</area>
+            <buttonarea>0,0,100%,100%</buttonarea>
+            <spacing>0</spacing>
+            <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,100%,100%</area>
+                <state name="active">
+                    <area>0,0,100%,100%</area>
+                    <shape name="basebackground">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#FFFF00" alpha="64" />
+                        <line color="#D0D6DF" alpha="250" width="2" />
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>1,1,-1,-1</area>
+                        <font>basemedium</font>
+                        <align>center</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active" />
+
+                <state name="inactive">
+                    <area>0,0,0,0</area>
+                </state>
+                <state name="selectedinactive">
+                    <area>0,0,0,0</area>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <area>0,0,0,0</area>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <area>0,0,0,0</area>
+            </statetype>
+        </buttonlist>
+
         <buttonlist name="groups">
             <area>45,98,300,300</area>
             <buttonarea>0,0,250,250</buttonarea>

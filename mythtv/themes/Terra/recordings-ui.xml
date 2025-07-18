@@ -16,6 +16,46 @@
             <filename>recordings/groupframe.png</filename>
         </imagetype>
 
+        <buttonlist name="groupsAlphabet">
+            <area>50%-420,98,840,40</area>
+            <spacing>0</spacing>
+            <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <layout>horizontal</layout>
+            <buttonarea>0,0,100%,100%</buttonarea>
+
+            <statetype name="buttonitem">
+                <area>0,0,100%,100%</area>
+
+                <state name="active">
+                    <area>0,0,40,40</area>
+                    <shape name="basebackground">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#686855" />
+                        <line color="#A7AC93" alpha="255" width="1" />
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>1,1,-1,-1</area>
+                        <font>basemedium</font>
+                        <align>center</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="basebackground">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#868872" />
+                    </shape>
+                </state>
+
+                <state name="inactive">
+                    <area>0,0,0,0</area>
+                </state>
+                <state name="selectedinactive">
+                    <area>0,0,0,0</area>
+                </state>
+            </statetype>
+        </buttonlist>
+
         <buttonlist name="groups">
             <area>0,58,1280,38</area>
             <spacing>15</spacing>
@@ -26,6 +66,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,40</area>
+
                     <textarea name="name" from="basetextarea">
                         <area>4,3,232,36</area>
                         <align>allcenter</align>

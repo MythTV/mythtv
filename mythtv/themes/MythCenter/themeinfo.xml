@@ -22,7 +22,7 @@
     <author>
         <!-- Your name -->
         <name>Jeroen Brosens</name>
-    
+
         <!-- Your Email Address -->
         <email>jeroen@fotoniq.nl</email>
     </author>
@@ -34,7 +34,7 @@
         <major>1</major>
 
         <!-- Minor version changes are backwards compatible -->
-        <minor>6</minor>
+        <minor>7</minor>
     </version>
 
     <!-- Theme Details (Required) -->

@@ -134,6 +134,46 @@
 
         </buttonlist>
 
+        <buttonlist name="groupsAlphabet" from="basebuttonlist">
+            <area>300,85,45,45</area>
+            <buttonarea>0,0,100%,100%</buttonarea>
+            <spacing>0</spacing>
+            <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,100%,100%</area>
+                <state name="active">
+                    <area>0,0,100%,100%</area>
+                    <shape name="basebackground">
+                        <area>0,0,100%,100%</area>
+                    </shape>
+                    <shape name="selectbar">
+                        <area>0,0,100%,100%</area>
+                        <line color="#FFFF00" alpha="250" width="2" />
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>1,1,-1,-1</area>
+                        <font>basemedium_selected_button</font>
+                        <align>center</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active" />
+
+                <state name="inactive">
+                    <area>0,0,0,0</area>
+                </state>
+                <state name="selectedinactive">
+                    <area>0,0,0,0</area>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <area>0,0,0,0</area>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <area>0,0,0,0</area>
+            </statetype>
+        </buttonlist>
+
         <buttonlist name="groups" from="basebuttonlist2">
             <area>25,54,315,350</area>
             <buttonarea>0,36,255,270</buttonarea>
@@ -181,7 +221,6 @@
             <statetype name="downscrollarrow">
                 <position>270,310</position>
             </statetype>
-
         </buttonlist>
 
         <buttonlist name="recordings" from="basebuttonlist2">

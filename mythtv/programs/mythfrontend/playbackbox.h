@@ -140,6 +140,7 @@ class PlaybackBox : public ScheduleCommon
 
   protected slots:
     void updateRecList(MythUIButtonListItem *sel_item);
+    void selectUIGroupsAlphabet(MythUIButtonListItem *item);
     void ItemSelected(MythUIButtonListItem *item)
         { UpdateUIListItem(item, true); }
     void ItemVisible(MythUIButtonListItem *item);
@@ -355,6 +356,7 @@ class PlaybackBox : public ScheduleCommon
 
 
     MythUIButtonList *m_recgroupList          {nullptr};
+    MythUIButtonList *m_groupAlphaList       {nullptr};
     MythUIButtonList *m_groupList             {nullptr};
     MythUIButtonList *m_recordingList         {nullptr};
 
@@ -391,6 +393,10 @@ class PlaybackBox : public ScheduleCommon
     int                 m_allOrder;
     /// listOrder controls the ordering of the recordings in the list
     int                 m_listOrder           {1};
+
+    // Group alphabet support
+    QString              m_currentLetter;
+    QMap<QString, QString> m_groupAlphabet;
 
     // Recording Group settings
     QString             m_groupDisplayName;
