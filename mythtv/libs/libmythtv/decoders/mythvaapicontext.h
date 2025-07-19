@@ -5,7 +5,7 @@
 #include "libmythtv/decoders/mythcodeccontext.h"
 
 // VAAPI
-#include "va/va.h"
+#include <va/va.h>
 
 // FFmpeg
 extern "C" {
