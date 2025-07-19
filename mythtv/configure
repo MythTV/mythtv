@@ -5441,10 +5441,9 @@ enabled libdav1d && use_pkg_config libdav1d "dav1d >= 0.4.0" "dav1d/dav1d.h" dav
 
 enabled vaapi && enabled opengl &&
     check_header GL/glx.h &&
-    check_lib vaapi va/va.h vaInitialize -lva
-
-enabled vaapi &&
-    check_code cc "va/va.h" "vaCreateSurfaces(0, 0, 0, 0, 0, 0, 0, 0)" ||
+    check_lib vaapi va/va.h vaInitialize -lva &&
+    $(pkg-config --atleast-version=1.2 libva) &&
+    enable  vaapi ||
     disable vaapi
 
 enabled vaapi &&
@@ -5452,10 +5451,6 @@ enabled vaapi &&
 
 enabled vaapi &&
     check_lib vaapi_x11 "va/va.h va/va_x11.h" vaGetDisplay -lva -lva-x11 -lX11
-
-enabled vaapi &&
-    check_cpp_condition "va/va.h" "VA_CHECK_VERSION(1, 0, 0)" &&
-    enable vaapi_1
 
 enabled vdpau &&
     check_cpp_condition vdpau/vdpau.h "defined VDP_DECODER_PROFILE_MPEG4_PART2_ASP" ||

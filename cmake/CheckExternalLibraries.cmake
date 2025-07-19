@@ -103,14 +103,6 @@ endif()
 
 # vaapi: fedora:libva-devel debian:libva-dev
 if(ENABLE_VAAPI)
-  # No need to check for the individual features below.  Libva 1.2 was released
-  # in 2013 and contains all these features. Just require libva >= 1.2.
-  # ~~~
-  # 1.2.0 vaCreateSurfaces(0, 0, 0, 0, 0, 0, 0, 0)
-  # 1.1.0 vaGetDisplayDRM
-  # 1.1.0 vaGetDisplay
-  # 1.0.0 "VA_CHECK_VERSION(1, 0, 0)
-  # ~~~
   pkg_check_modules(VAAPI "libva>=1.2" IMPORTED_TARGET)
   add_build_config(PkgConfig::VAAPI "vaapi")
   if(TARGET PkgConfig::VAAPI)
