@@ -12,10 +12,6 @@ struct AVFilterContext;
 
 // VAAPI
 #include <va/va.h>
-#include <va/va_version.h>
-#if VA_CHECK_VERSION(0,34,0)
-#include <va/va_compat.h>
-#endif
 #define Cursor XCursor // Prevent conflicts with Qt6.
 #define pointer Xpointer // Prevent conflicts with Qt6.
 #if defined(_X11_XLIB_H_) && !defined(Bool)
