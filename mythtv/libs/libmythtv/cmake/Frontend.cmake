@@ -245,9 +245,13 @@ if(TARGET any_opengl)
             visualisations/opengl/mythvisualmonoscopeopengl.cpp
             visualisations/opengl/mythvisualmonoscopeopengl.h)
   if(TARGET PkgConfig::VAAPI)
-    target_sources(
-      mythtv PRIVATE opengl/mythvaapiinterop.h opengl/mythvaapiglxinterop.h
-                     opengl/mythvaapiinterop.cpp opengl/mythvaapiglxinterop.cpp)
+    target_sources(mythtv PRIVATE opengl/mythvaapiinterop.h
+                                  opengl/mythvaapiinterop.cpp)
+    if(TARGET PkgConfig::VAAPI-GLX)
+      target_sources(mythtv PRIVATE opengl/mythvaapiglxinterop.h
+                                    opengl/mythvaapiglxinterop.cpp)
+    endif()
+
     if(TARGET PkgConfig::VDPAU AND TARGET X11::X11)
       target_sources(mythtv PRIVATE opengl/mythvdpauinterop.h
                                     opengl/mythvdpauinterop.cpp)
@@ -276,7 +280,7 @@ if(TARGET any_opengl)
       target_sources(mythtv PRIVATE opengl/mythmmalinterop.cpp
                                     opengl/mythmmalinterop.h)
     endif()
-    if(TARGET PkgConfig::VAAPI)
+    if(TARGET PkgConfig::VAAPI-DRM)
       target_sources(mythtv PRIVATE opengl/mythvaapidrminterop.cpp
                                     opengl/mythvaapidrminterop.h)
     endif()

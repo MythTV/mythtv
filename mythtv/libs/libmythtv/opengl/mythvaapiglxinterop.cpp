@@ -1,5 +1,6 @@
 #include "opengl/mythvaapiglxinterop.h"
 
+#if CONFIG_VAAPI_X11
 #define Cursor XCursor // Prevent conflicts with Qt6.
 #define pointer Xpointer // Prevent conflicts with Qt6.
 #if defined(_X11_XLIB_H_) && !defined(Bool)
@@ -10,6 +11,8 @@
 #undef Cursor
 #undef pointer
 #undef Bool            // Interferes with cmake moc file compilation
+#endif // CONFIG_VAAPI_X11
+
 #include <va/va_glx.h>
 
 // MythTV
@@ -322,6 +325,7 @@ MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL* Context,
     return result;
 }
 
+#if CONFIG_VAAPI_X11
 MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythPlayerUI* Player, MythRenderOpenGL* Context)
   : MythVAAPIInteropGLX(Player, Context, GL_VAAPIGLXPIX)
 {
@@ -504,3 +508,4 @@ bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL* Context)
     QByteArray extensions(glXQueryExtensionsString(display, screen));
     return extensions.contains("GLX_EXT_texture_from_pixmap");
 }
+#endif // CONFIG_VAAPI_X11
