@@ -669,7 +669,7 @@ QString StorageGroup::FindNextDirMostFree(void)
     if (m_allowFallback)
         nextDir = kDefaultStorageDir;
 
-    for (const auto & dir : m_dirlist)
+    for (const auto & dir : std::as_const(m_dirlist))
     {
         if (!QDir(dir).exists())
         {
