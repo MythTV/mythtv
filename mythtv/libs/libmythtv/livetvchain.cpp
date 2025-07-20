@@ -4,10 +4,10 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
-#include "libmythbase/programinfo.h"
 
 #include "livetvchain.h"
 #include "cardutil.h"
+#include "programinfo.h"
 
 #define LOC QString("LiveTVChain(%1): ").arg(m_id)
 

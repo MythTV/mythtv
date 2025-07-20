@@ -21,10 +21,10 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythtranslation.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
 #include "libmythtv/HLS/httplivestream.h"
 #include "libmythtv/jobqueue.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/recordinginfo.h"
 
 // MythTranscode

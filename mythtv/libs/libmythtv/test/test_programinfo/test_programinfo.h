@@ -23,8 +23,8 @@
 #include <QTest>
 
 #include "libmythbase/mythcorecontext.h"
-#include "libmythbase/programtypes.h"
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programtypes.h"
+#include "libmythtv/programinfo.h"
 
 #define DEBUG 0
 

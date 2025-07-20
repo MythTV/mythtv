@@ -6,9 +6,9 @@
 #include <QEvent>
 
 // MythTV
+#include "libmythtv/programinfo.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythscreentype.h"
-#include "libmythbase/programinfo.h"
 
 class RecordingInfo;
 class MythMenu;

@@ -25,10 +25,10 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"
-#include "libmythbase/programinfo.h"
 
 #include "jobqueue.h"
 #include "previewgenerator.h"
+#include "programinfo.h"
 #include "recordinginfo.h"
 #include "recordingprofile.h"
 

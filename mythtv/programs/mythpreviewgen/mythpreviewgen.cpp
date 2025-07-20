@@ -31,11 +31,11 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/mythsystemevent.h"
 #include "libmythtv/previewgenerator.h"
+#include "libmythtv/programinfo.h"
 
 //MythPreviewGen
 #include "mythpreviewgen_commandlineparser.h"
