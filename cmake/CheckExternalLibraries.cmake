@@ -112,7 +112,7 @@ if(ENABLE_VAAPI)
   # 1.0.0 "VA_CHECK_VERSION(1, 0, 0)
   # ~~~
   pkg_check_modules(VAAPI "libva>=1.2" IMPORTED_TARGET)
-  add_build_config(PkgConfig::VDPAU "vaapi")
+  add_build_config(PkgConfig::VAAPI "vaapi")
   if(TARGET PkgConfig::VAAPI)
     set(CONFIG_VAAPI TRUE)
     pkg_check_modules(VA-DRM "libva-drm" REQUIRED IMPORTED_TARGET)
