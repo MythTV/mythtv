@@ -251,13 +251,12 @@ if(TARGET any_opengl)
       target_sources(mythtv PRIVATE opengl/mythvaapiglxinterop.h
                                     opengl/mythvaapiglxinterop.cpp)
     endif()
-
-    if(TARGET PkgConfig::VDPAU AND TARGET X11::X11)
-      target_sources(mythtv PRIVATE opengl/mythvdpauinterop.h
-                                    opengl/mythvdpauinterop.cpp)
-    endif()
   endif()
 
+  if(TARGET PkgConfig::VDPAU AND TARGET X11::X11)
+    target_sources(mythtv PRIVATE opengl/mythvdpauinterop.h
+                                  opengl/mythvdpauinterop.cpp)
+  endif()
   if(TARGET mediacodec)
     target_sources(mythtv PRIVATE opengl/mythmediacodecinterop.cpp
                                   opengl/mythmediacodecinterop.h)
