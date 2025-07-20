@@ -1699,6 +1699,7 @@ HAVE_LIST="
     threads
     uwp
     vaapi_drm
+    vaapi_glx
     vaapi_x11
     vdpau_x11
     winrt
@@ -1750,6 +1751,9 @@ MYTHTV_CONFIG_LIST='
     qtdbus
     sqlite3
     taglib
+    vaapi_drm
+    vaapi_glx
+    vaapi_x11
     v4l2
     v4l2prime
     valgrind
@@ -5451,7 +5455,6 @@ enabled libaom   && use_pkg_config libaom "aom >= 2.0.0" aom/aom_codec.h aom_cod
 enabled libdav1d && use_pkg_config libdav1d "dav1d >= 0.4.0" "dav1d/dav1d.h" dav1d_version || disable libdav1d
 
 enabled vaapi && enabled opengl &&
-    check_header GL/glx.h &&
     check_lib vaapi va/va.h vaInitialize -lva &&
     $(pkg-config --atleast-version=1.2 libva) &&
     enable  vaapi ||
@@ -5459,6 +5462,9 @@ enabled vaapi && enabled opengl &&
 
 enabled vaapi &&
     check_lib vaapi_drm "va/va.h va/va_drm.h" vaGetDisplayDRM -lva -lva-drm
+
+enabled vaapi &&
+    check_lib vaapi_glx "va/va.h va/va_glx.h" vaGetDisplayGLX -lva -lva-glx
 
 enabled vaapi &&
     check_lib vaapi_x11 "va/va.h va/va_x11.h" vaGetDisplay -lva -lva-x11 -lX11
@@ -6656,7 +6662,7 @@ if enabled frontend; then
   if test x"$target_os" = x"darwin" ; then
     echo "VideoToolBox support      ${videotoolbox-no}"
   fi
-  echo "VAAPI support             ${vaapi-no}"
+  echo "VAAPI support             ${vaapi-no} (DRM ${vaapi_drm-no}, GLX ${vaapi_glx-no}, X11 ${vaapi_x11-no})"
   echo "DRM support               ${drm-no}"
   if enabled drm; then
     echo "DRM Qt integration        ${qtprivateheaders-no}"
