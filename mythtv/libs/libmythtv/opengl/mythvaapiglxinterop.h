@@ -2,6 +2,8 @@
 #define MYTHVAAPIGLXNTEROP_H
 
 // MythTV
+#include "libmythbase/mythconfig.h"
+
 #include "libmythui/opengl/mythrenderopengl.h"
 
 #include "libmythtv/mythframe.h"
@@ -47,6 +49,7 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
     void* m_glxSurface { nullptr };
 };
 
+#if CONFIG_VAAPI_X11
 #define Cursor XCursor // Prevent conflicts with Qt6.
 #define pointer Xpointer // Prevent conflicts with Qt6.
 #if defined(_X11_XLIB_H_) && !defined(Bool)
@@ -58,6 +61,7 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
 #undef Cursor
 #undef pointer
 #undef Bool            // Interferes with cmake moc file compilation
+
 using MYTH_GLXBINDTEXIMAGEEXT = void (*)(Display*, GLXDrawable, int, int*);
 using MYTH_GLXRELEASETEXIMAGEEXT = void (*)(Display*, GLXDrawable, int);
 
@@ -82,6 +86,6 @@ class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
     MYTH_GLXBINDTEXIMAGEEXT    m_glxBindTexImageEXT    { nullptr };
     MYTH_GLXRELEASETEXIMAGEEXT m_glxReleaseTexImageEXT { nullptr };
 };
-
+#endif // CONFIG_VAAPI_X11
 
 #endif // MYTHVAAPIGLXNTEROP_H

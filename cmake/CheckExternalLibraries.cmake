@@ -107,12 +107,27 @@ if(ENABLE_VAAPI)
   add_build_config(PkgConfig::VAAPI "vaapi")
   if(TARGET PkgConfig::VAAPI)
     set(CONFIG_VAAPI TRUE)
-    pkg_check_modules(VA-DRM "libva-drm" REQUIRED IMPORTED_TARGET)
-    pkg_check_modules(VA-GLX "libva-glx" REQUIRED IMPORTED_TARGET)
-    pkg_check_modules(VA-X11 "libva-x11" REQUIRED IMPORTED_TARGET)
-    target_link_libraries(
-      PkgConfig::VAAPI INTERFACE PkgConfig::VA-X11 PkgConfig::VA-GLX
-                                 PkgConfig::VA-DRM)
+
+    pkg_check_modules(VAAPI-DRM "libva-drm" IMPORTED_TARGET)
+    add_build_config(PkgConfig::VAAPI-DRM "vaapi_drm")
+    if(TARGET PkgConfig::VAAPI-DRM)
+      set(CONFIG_VAAPI_DRM TRUE)
+      target_link_libraries(PkgConfig::VAAPI INTERFACE PkgConfig::VAAPI-DRM)
+    endif()
+
+    pkg_check_modules(VAAPI-GLX "libva-glx" IMPORTED_TARGET)
+    add_build_config(PkgConfig::VAAPI-GLX "vaapi_glx")
+    if(TARGET PkgConfig::VAAPI-GLX)
+      set(CONFIG_VAAPI_GLX TRUE)
+      target_link_libraries(PkgConfig::VAAPI INTERFACE PkgConfig::VAAPI-GLX)
+    endif()
+
+    pkg_check_modules(VAAPI-X11 "libva-x11" IMPORTED_TARGET)
+    add_build_config(PkgConfig::VAAPI-X11 "vaapi_x11")
+    if(TARGET PkgConfig::VAAPI-X11)
+      set(CONFIG_VAAPI_X11 TRUE)
+      target_link_libraries(PkgConfig::VAAPI INTERFACE PkgConfig::VAAPI-X11)
+    endif()
   endif()
 endif()
 

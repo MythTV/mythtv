@@ -13,8 +13,12 @@
 #include "mythplayerui.h"
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
+#if CONFIG_VAAPI_DRM
 #include "mythvaapidrminterop.h"
+#endif
+#if CONFIG_VAAPI_GLX
 #include "mythvaapiglxinterop.h"
+#endif
 
 extern "C" {
 #include "libavfilter/buffersrc.h"
@@ -46,9 +50,9 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
         return;
 
     OpenGLLocker locker(Context);
-    bool egl = Context->IsEGL();
-    bool opengles = Context->isOpenGLES();
-    bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
+    [[maybe_unused]] bool egl = Context->IsEGL();
+    [[maybe_unused]] bool opengles = Context->isOpenGLES();
+    [[maybe_unused]] bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
 
     // best first
     MythInteropGPU::InteropTypes vaapitypes;
@@ -58,17 +62,21 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
         vaapitypes.emplace_back(DRM_DRMPRIME);
 #endif
 
-#if CONFIG_EGL
+#if CONFIG_VAAPI_DRM && CONFIG_EGL
     // zero copy
     if (egl && MythVAAPIInteropDRM::IsSupported(Context))
         vaapitypes.emplace_back(GL_VAAPIEGLDRM);
 #endif
+#if CONFIG_VAAPI_GLX
+#   if CONFIG_VAAPI_X11
     // 1x copy
     if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context))
         vaapitypes.emplace_back(GL_VAAPIGLXPIX);
+#   endif
     // 2x copy
     if (!egl && !opengles && !wayland)
         vaapitypes.emplace_back(GL_VAAPIGLXCOPY);
+#endif
 
     if (!vaapitypes.empty())
         Types[FMT_VAAPI] = vaapitypes;
@@ -82,16 +90,20 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythPlayerUI *Player, MythRender
     const auto & types = Player->GetInteropTypes();
     if (const auto & vaapi = types.find(FMT_VAAPI); vaapi != types.cend())
     {
-        for (auto type : vaapi->second)
+        for ([[maybe_unused]] auto type : vaapi->second)
         {
-#if CONFIG_EGL
+#if CONFIG_VAAPI_DRM && CONFIG_EGL
             if ((type == GL_VAAPIEGLDRM) || (type == DRM_DRMPRIME))
                 return new MythVAAPIInteropDRM(Player, Context, type);
 #endif
+#if CONFIG_VAAPI_GLX
+#   if CONFIG_VAAPI_X11
             if (type == GL_VAAPIGLXPIX)
                 return new MythVAAPIInteropGLXPixmap(Player, Context);
+#   endif
             if (type == GL_VAAPIGLXCOPY)
                 return new MythVAAPIInteropGLXCopy(Player, Context);
+#endif
         }
     }
     return nullptr;
