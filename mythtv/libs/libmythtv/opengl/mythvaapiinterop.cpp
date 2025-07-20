@@ -1,4 +1,6 @@
-﻿// MythTV
+﻿#include "mythvaapiinterop.h"
+
+// MythTV
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmyth/mythavframe.h"
@@ -11,7 +13,6 @@
 #include "mythplayerui.h"
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
-#include "mythvaapiinterop.h"
 #include "mythvaapidrminterop.h"
 #include "mythvaapiglxinterop.h"
 

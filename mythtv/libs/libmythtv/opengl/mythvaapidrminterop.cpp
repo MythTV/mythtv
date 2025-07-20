@@ -1,10 +1,14 @@
+#include "opengl/mythvaapidrminterop.h"
+
+#include <va/va_drm.h>
+#include <va/va_drmcommon.h>
+
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
-#include "opengl/mythvaapidrminterop.h"
 
 // FFmpeg
 extern "C" {

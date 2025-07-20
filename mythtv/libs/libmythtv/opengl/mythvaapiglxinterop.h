@@ -2,6 +2,12 @@
 #define MYTHVAAPIGLXNTEROP_H
 
 // MythTV
+#include "libmythui/opengl/mythrenderopengl.h"
+
+#include "libmythtv/mythframe.h"
+#include "libmythtv/mythplayerui.h"
+#include "libmythtv/videoouttypes.h"
+
 #include "mythvaapiinterop.h"
 
 class MythVAAPIInteropGLX : public MythVAAPIInterop
