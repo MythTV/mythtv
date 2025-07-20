@@ -194,7 +194,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     Q_OBJECT
   public:
     MythUIButtonList(MythUIType *parent, const QString &name,
-                     const QString &shadow = "");
+                     QString shadow = "");
     MythUIButtonList(MythUIType *parent, const QString &name,
                    QRect area, bool showArrow = true,
                    bool showScrollBar = false);

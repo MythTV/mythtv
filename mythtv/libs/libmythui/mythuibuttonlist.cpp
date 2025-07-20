@@ -29,9 +29,9 @@
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
-                                   const QString &shadow)
+                                   QString shadow)
     : MythUIType(parent, name)
-    , m_shadowListName(shadow)
+    , m_shadowListName(std::move(shadow))
 {
     // Parent members
     connect(this, &MythUIType::Enabling, this, &MythUIButtonList::ToggleEnabled);
@@ -2981,7 +2981,7 @@ bool MythUIButtonList::ParseElement(
         m_shadowDrawFromBottom = parseBool(element);
 
         if (*m_shadowDrawFromBottom)
-            m_shadowAlignment = *m_shadowAlignment | Qt::AlignBottom;
+            m_shadowAlignment = m_shadowAlignment.value_or(0) | Qt::AlignBottom;
     }
     else if (element.tagName() == "searchposition")
     {
