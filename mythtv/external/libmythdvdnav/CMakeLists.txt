@@ -25,6 +25,8 @@ list(APPEND CFLAGS " -Wno-unused-variable")
 # the -Wextra flag.
 list(APPEND CFLAGS " -Wno-implicit-fallthrough")
 list(APPEND CFLAGS " -Wno-unused-parameter")
+# libdvdread uses packed structs
+list(APPEND CFLAGS " -Wno-address-of-packed-member")
 
 foreach(_FLAG IN LISTS CFLAGS)
   string(SUBSTRING ${_FLAG} 1 -1 _NAME)
@@ -116,6 +118,22 @@ endif()
 configure_file(config.h.in config.h @ONLY)
 configure_file(mythconfig.h.in mythconfig.h @ONLY)
 
+# libdvdnav
+target_compile_definitions(mythdvdnav PRIVATE
+  HAVE_CONFIG_H
+  )
+
+# libdvdread
+target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
+if(HAVE_DVDCSS_DVDCSS_H)
+  target_link_libraries(mythdvdnav PRIVATE dvdcss)
+endif()
+
+# Required for customization to dvdread/dvd_input.c
+if(APPLE)
+  target_link_libraries(mythdvdnav PRIVATE ${APPLE_CORE_FOUNDATION})
+endif()
+
 # Instead of creating a circular dependency by adding an include path into
 # external/libmythdvdnav that points over to libs/libmythxxx, just copy in the
 # files that are needed.
@@ -140,14 +158,6 @@ add_custom_command(
     ${CMAKE_COMMAND} -E copy_if_different
     ${MythTV_SOURCE_DIR}/libs/libmythtv/io/mythiowrapper.h include/libmythtv/io)
 
-target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
-if(APPLE)
-  target_link_libraries(mythdvdnav PRIVATE ${APPLE_CORE_FOUNDATION})
-endif()
-if(HAVE_DVDCSS_DVDCSS_H)
-  target_link_libraries(mythdvdnav PRIVATE dvdcss)
-endif()
-
 #
 # The MythTV customization to dvdnav adds references to the MythFile* functions,
 # which are defined in libs/libmythtv. to allow these symbols to remain
@@ -168,12 +178,6 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   # opposite has just been removed), but it couldn't hurt.
   target_link_options(mythdvdnav PRIVATE -undefined dynamic_lookup)
 endif()
-
-# These defines don't appear to be used anywhere in the sources, but they were
-# set up by the libmythdvdnav.pro file... so here they are.
-set_target_properties(
-  mythdvdnav PROPERTIES COMPILE_OPTIONS "-Wno-address-of-packed-member"
-                        COMPILE_DEFINITIONS "HAVE_CONFIG_H")
 
 #
 # Compile PIC code on android.  The default for PIC code is ON for shared
