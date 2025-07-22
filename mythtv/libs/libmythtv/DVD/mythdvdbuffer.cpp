@@ -304,7 +304,7 @@ bool MythDVDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds 
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + "The selected title is a still frame. "
             "Playback is likely to fail - please raise a bug report at "
-            "http://code.mythtv.org/trac");
+            "https://github.com/MythTV/mythtv/issues");
     }
 
     MythDVDInfo::GetNameAndSerialNum(m_dvdnav, m_discName, m_discSerialNumber, Filename, LOC);
