@@ -44,8 +44,19 @@ if(NOT CMAKE_CROSSCOMPILING
     execute_process(
       COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${_avcodec_path}
               ${_ffmpeg} -decoders
+      RESULT_VARIABLE _result
       OUTPUT_VARIABLE _output
-      ERROR_QUIET)
+      ERROR_VARIABLE _errors)
+    if((NOT _result EQUAL 0) OR ("${_output}" EQUAL ""))
+      message(STATUS "mythffmpeg failed. Cannot determine support for NVDEC.")
+      message(STATUS "This indicates a problem with your FFmpeg build for MythTV.")
+      list(APPEND CMAKE_MESSAGE_INDENT "  ")
+      message(STATUS "Command: LD_LIBRARY_PATH=${_avcodec_path} ${_ffmpeg} -decoders")
+      message(STATUS "Return status: ${_result}")
+      message(STATUS "Normal output:\n${_output}")
+      message(STATUS "Error output:\n${_errors}")
+      message(FATAL_ERROR "Please fix the problem running mythffmpeg.")
+    endif()
     string(FIND ${_output} cuvid CUVID_OFFSET)
     if(NOT CUVID_OFFSET EQUAL -1)
       message(STATUS "FFmpeg supports NVDEC.  Enabling support in MythTV.")
