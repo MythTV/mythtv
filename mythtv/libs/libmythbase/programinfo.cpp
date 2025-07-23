@@ -6236,6 +6236,22 @@ bool LoadFromRecorded(
                     table = "";
                 }
 
+                else if (field == "title")
+                {
+                    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                    QString prefixes = sh->getPrefixes();
+                    field = "REGEXP_REPLACE(r.title,'" + prefixes + "','')";
+                    table = "";
+                }
+
+                else if (field == "subtitle")
+                {
+                    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                    QString prefixes = sh->getPrefixes();
+                    field = "REGEXP_REPLACE(r.subtitle,'" + prefixes + "','')";
+                    table = "";
+                }
+
                 if (sSortBy.isEmpty())
                     sSortBy = QString("%1%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
                 else

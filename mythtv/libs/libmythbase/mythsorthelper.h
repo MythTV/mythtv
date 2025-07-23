@@ -46,6 +46,8 @@ class MBASE_PUBLIC MythSortHelper
      */
     bool hasPrefixes(void) { return not m_prefixes.isEmpty(); }
 
+    QString getPrefixes(void) { return m_prefixes; }
+
   private:
     void MythSortHelperCommon(void);
 

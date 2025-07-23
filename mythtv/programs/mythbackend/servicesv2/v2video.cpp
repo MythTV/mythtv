@@ -5,6 +5,7 @@
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsorthelper.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
@@ -280,6 +281,18 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         {
             if (next)
                 sql.append(",");
+            if (sort == "title")
+            {
+                std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                QString prefixes = sh->getPrefixes();
+                sort = "REGEXP_REPLACE(title,'" + prefixes + "','')";
+            }
+            else if (sort == "subtitle")
+            {
+                std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                QString prefixes = sh->getPrefixes();
+                sort = "REGEXP_REPLACE(subtitle,'" + prefixes + "','')";
+            }
             sql.append(sort);
             if (partList.length() > 1 && partList[1].compare("DESC",Qt::CaseInsensitive) == 0)
                 sql.append(" DESC");
@@ -324,12 +337,11 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
             if (slashPos >= 0)
             {
                 dir = fnPart.mid(0, slashPos);
-                if (!map.contains(dir))
-                {
-                    // use toLower here so that lower case are sorted in with
-                    // upper case rather than separately at the end.
-                    map.insert(dir.toLower(), dir);
-                }
+                QString key = dir.toLower();
+                std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                key = sh->doTitle(key);
+                if (!map.contains(key))
+                    map.insert(key, dir);
             }
         }
         // Insert directory entries at the front of the list, ordered ascending

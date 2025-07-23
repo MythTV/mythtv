@@ -32,6 +32,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythscheduler.h"
+#include "libmythbase/mythsorthelper.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
@@ -365,6 +366,18 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
             else if (field == "duration")
             {
                 field = "timestampdiff(second,starttime,endtime)";
+            }
+            else if (field == "title")
+            {
+                std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                QString prefixes = sh->getPrefixes();
+                field = "REGEXP_REPLACE(title,'" + prefixes + "','')";
+            }
+            else if (field == "subtitle")
+            {
+                std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+                QString prefixes = sh->getPrefixes();
+                field = "REGEXP_REPLACE(subtitle,'" + prefixes + "','')";
             }
             sSQL += field;
             if (bDescending)

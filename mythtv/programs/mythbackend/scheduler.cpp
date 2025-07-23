@@ -34,6 +34,7 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
+#include "libmythbase/mythsorthelper.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
@@ -4962,7 +4963,11 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
     switch (sortBy)
     {
         case kSortTitle:
-            sortColumn = "record.title";
+        {
+            std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+            QString prefixes = sh->getPrefixes();
+            sortColumn = "REGEXP_REPLACE(record.title,'" + prefixes + "','')";
+        }
             break;
         case kSortPriority:
             sortColumn = "record.recpriority";

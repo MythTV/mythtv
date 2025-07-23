@@ -19,6 +19,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythscheduler.h"
+// #include "libmythbase/mythsorthelper.h"
 #include "libmythbase/programinfo.h"
 #include "libmythbase/programtypes.h"
 #include "libmythbase/recordingtypes.h"
@@ -929,9 +930,9 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
                 return First->GetChanNum().replace(regex,".").toDouble()
                      > Second->GetChanNum().replace(regex,".").toDouble();
             case 20:
-                return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) < 0 ;
+                return QString::compare(First->GetSortTitle(), Second->GetSortTitle(), Qt::CaseInsensitive) < 0 ;
             case 21:
-                return QString::compare(First->GetTitle(), Second->GetTitle(), Qt::CaseInsensitive) > 0 ;
+                return QString::compare(First->GetSortTitle(), Second->GetSortTitle(), Qt::CaseInsensitive) > 0 ;
             case 30:
             {
                 qint64 time1 = First->GetScheduledStartTime().msecsTo( First->GetScheduledEndTime());
