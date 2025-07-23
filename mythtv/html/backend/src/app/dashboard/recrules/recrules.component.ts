@@ -5,6 +5,10 @@ import { DvrService } from 'src/app/services/dvr.service';
 import { RecRule } from 'src/app/services/interfaces/recording.interface';
 import { UtilityService } from 'src/app/services/utility.service';
 
+interface MyRecRule extends RecRule {
+  TitleSort?: number;
+}
+
 @Component({
   selector: 'app-recrules',
   templateUrl: './recrules.component.html',
@@ -12,8 +16,8 @@ import { UtilityService } from 'src/app/services/utility.service';
 })
 export class RecrulesComponent implements OnInit, SchedulerSummary {
 
-  recRules: RecRule[] = [];
-  recRule?: RecRule;
+  recRules: MyRecRule[] = [];
+  recRule?: MyRecRule;
 
   inter: ScheduleLink = { summaryComponent: this };
 
@@ -24,7 +28,7 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
   errorCount = 0;
   successCount = 0;
   displayDelete = false;
-  sortField = 'Title';
+  sortField = 'TitleSort';
   sortOrder = 1;
 
   constructor(private dvrService: DvrService,
@@ -33,7 +37,6 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
     let sortField = this.utility.sortStorage.getItem('recrules.sortField');
     if (sortField)
       this.sortField = sortField;
-
     let sortOrder = this.utility.sortStorage.getItem('recrules.sortOrder');
     if (sortOrder)
       this.sortOrder = Number(sortOrder);
@@ -54,6 +57,9 @@ export class RecrulesComponent implements OnInit, SchedulerSummary {
     this.dvrService.GetRecordScheduleList({}).subscribe({
       next: (data) => {
         this.recRules = data.RecRuleList.RecRules;
+        this.recRules.forEach((entry,ix)=> {
+          entry.TitleSort = ix;
+        });
         this.rulesLoaded = true;
       },
       error: (err: any) => {
