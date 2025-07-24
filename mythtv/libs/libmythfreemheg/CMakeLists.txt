@@ -59,6 +59,9 @@ add_library(
   Visible.h
   )
 
+# Mark appropriate symbols as EXPORT
+target_compile_definitions(mythfreemheg PRIVATE MHEG_API)
+
 target_include_directories(
   mythfreemheg
   PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> # For config.h

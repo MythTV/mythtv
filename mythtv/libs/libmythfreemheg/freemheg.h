@@ -34,6 +34,12 @@
 #include <cstdlib>
 #include <vector>
 
+#ifdef MHEG_API
+#  define MHEG_PUBLIC Q_DECL_EXPORT
+#else
+#  define MHEG_PUBLIC Q_DECL_IMPORT
+#endif
+
 using namespace std::chrono_literals;
 
 using MHPointVec = std::vector<int>; // Duplicated in BaseClasses.h
@@ -46,9 +52,9 @@ class MHEG;
 class MHStream;
 
 // Called to create a new instance of the module.
-extern Q_DECL_EXPORT MHEG *MHCreateEngine(MHContext *context);
+extern MHEG_PUBLIC MHEG *MHCreateEngine(MHContext *context);
 // Set the logging stream and options.
-extern Q_DECL_EXPORT void MHSetLogging(FILE *logStream, unsigned int logLevel);
+extern MHEG_PUBLIC void MHSetLogging(FILE *logStream, unsigned int logLevel);
 
 // This abstract class is implemented by the MHEG Engine.
 class MHEG

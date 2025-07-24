@@ -2,6 +2,9 @@ include ( ../../settings.pro )
 
 INCLUDEPATH += ../.. ..
 
+# Mark appropriate symbols as EXPORT
+DEFINES += MHEG_API
+
 TEMPLATE = lib
 TARGET = mythfreemheg-$$LIBVERSION
 CONFIG += thread dll
