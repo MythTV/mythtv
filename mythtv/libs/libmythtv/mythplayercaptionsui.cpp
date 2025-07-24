@@ -267,7 +267,9 @@ void MythPlayerCaptionsUI::SetAllowForcedSubtitles(bool Allow)
 
 void MythPlayerCaptionsUI::ToggleCaptions()
 {
-    SetCaptionsEnabled(!(static_cast<bool>(m_captionsState.m_textDisplayMode)));
+    bool togval = !(static_cast<bool>(m_captionsState.m_textDisplayMode));
+    SetCaptionsEnabled(togval);
+    gCoreContext->SaveSetting("LastCaptions", togval);
 }
 
 void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
