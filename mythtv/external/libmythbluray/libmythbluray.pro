@@ -55,14 +55,7 @@ equals(HAVE_SYS_TIME_H,  "yes") : DEFINES += HAVE_SYS_TIME_H
 equals(HAVE_BDJ_J2ME,    "yes") : DEFINES += HAVE_BDJ_J2ME
 
 win32-msvc* {
-    CONFIG += qt # probably not needed?
-    INCLUDEPATH += ../../libs/libmythbase # for compat.h, also unnecessary?
-
-    # needed for vcxproj
-    QMAKE_CXXFLAGS += /TP "/FI compat.h"
-
-    # needed for nmake
-    QMAKE_CFLAGS   += /TP "/FI compat.h"
+    DEFINES += strncasecmp=_strnicmp
 }
 
 # bdnav
