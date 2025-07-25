@@ -223,18 +223,6 @@
     // Check for execute, only checking existance in MSVC
     #define X_OK    0
 
-    #if (_MSC_VER < 1800)
-        #define rint( x )               floor(x + 0.5)
-        #define round( x )              floor(x + 0.5)
-
-        #if ( _MSC_VER < 1700)
-            #define signbit( x )        ( x < 0 )
-        #endif
-
-        #undef M_PI
-        #define M_PI 3.14159265358979323846
-    #endif
-
     #define getpid()                _getpid()
     #define ftruncate( fd, fsize )  _chsize( fd, fsize )
 
