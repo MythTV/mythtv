@@ -14,13 +14,11 @@ equals(HAVE_UNISTD_H,  "yes") : DEFINES += HAVE_UNISTD_H
 equals(HAVE_FCNTL_H,   "yes") : DEFINES += HAVE_FCNTL_H
 
 win32-msvc* {
-    config += qt # should not be necessary, since this is C not C++
-    INCLUDEPATH += ../../libs/libmythbase # for compat.h
-    # needed for vcxproj
-    QMAKE_CXXFLAGS += /TP "/FI compat.h" "/FI fcntl.h"
-
-    # needed for nmake
-    QMAKE_CFLAGS   += /TP "/FI compat.h" "/FI fcntl.h"
+    !contains(QMAKE_TARGET.arch, x86_64) {
+        DEFINES += ssize_t=int
+    } else {
+        DEFINES += ssize_t=__int64
+    }
 }
 
 QMAKE_CLEAN += $(TARGET)
