@@ -206,10 +206,6 @@
     // Turn off the visual studio warnings (identifier was truncated)
     #pragma warning(disable:4786)
 
-    #ifdef restrict
-    #undef restrict
-    #endif
-
     #include <cinttypes>
     #include <direct.h>
     #include <process.h>
@@ -267,14 +263,6 @@
     #endif
 
     using mode_t = uint32_t;
-
-    #if !defined(__cplusplus) && !defined( inline )
-    #   define inline __inline
-    #endif
-
-    #if !defined(__func__) // C99 & C++11
-    #   define __func__ __FUNCTION__
-    #endif
 
 #   define SIGTRAP    SIGBREAK
 #   define STDERR_FILENO (int)GetStdHandle( STD_ERROR_HANDLE )
