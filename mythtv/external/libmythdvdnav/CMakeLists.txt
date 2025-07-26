@@ -48,13 +48,29 @@ else()
   set(LIBRARY_TYPE SHARED)
 endif()
 
-add_library(
-  mythdvdnav
-  ${LIBRARY_TYPE}
-  dvdnav/dvdnav.c
+set(LIBDVDNAV_HEADERS
   dvdnav/dvdnav/dvd_types.h
   dvdnav/dvdnav/dvdnav.h
   dvdnav/dvdnav/dvdnav_events.h
+  )
+
+set(LIBDVDREAD_HEADERS
+  dvdread/dvdread/bitreader.h
+  dvdread/dvdread/dvd_reader.h
+  dvdread/dvdread/dvd_udf.h
+  dvdread/dvdread/ifo_print.h
+  dvdread/dvdread/ifo_read.h
+  dvdread/dvdread/ifo_types.h
+  dvdread/dvdread/nav_print.h
+  dvdread/dvdread/nav_read.h
+  dvdread/dvdread/nav_types.h
+  )
+
+add_library(
+  mythdvdnav
+  ${LIBRARY_TYPE}
+  ${LIBDVDNAV_HEADERS}
+  dvdnav/dvdnav.c
   dvdnav/dvdnav_internal.h
   dvdnav/highlight.c
   dvdnav/navigation.c
@@ -75,21 +91,13 @@ add_library(
   dvdnav/vm/vmcmd.c
   dvdnav/vm/vmcmd.h
   dvdnav/vm/vmget.c
+  ${LIBDVDREAD_HEADERS}
   dvdread/bitreader.c
   dvdread/bswap.h
   dvdread/dvd_input.c
   dvdread/dvd_input.h
   dvdread/dvd_reader.c
   dvdread/dvd_udf.c
-  dvdread/dvdread/bitreader.h
-  dvdread/dvdread/dvd_reader.h
-  dvdread/dvdread/dvd_udf.h
-  dvdread/dvdread/ifo_print.h
-  dvdread/dvdread/ifo_read.h
-  dvdread/dvdread/ifo_types.h
-  dvdread/dvdread/nav_print.h
-  dvdread/dvdread/nav_read.h
-  dvdread/dvdread/nav_types.h
   dvdread/dvdread_internal.h
   dvdread/ifo_print.c
   dvdread/ifo_read.c
@@ -200,3 +208,13 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(FILES
+  ${LIBDVDNAV_HEADERS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/dvdnav
+  )
+
+install(FILES
+  ${LIBDVDREAD_HEADERS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/dvdread
+  )
