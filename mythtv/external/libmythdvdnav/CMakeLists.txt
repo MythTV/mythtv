@@ -111,7 +111,6 @@ add_library(
   dvdread/mythdvdreadexp.h
   dvdread/nav_print.c
   dvdread/nav_read.c
-  include/libmythbase/compat.h
   include/libmythtv/mythtvexp.h
   include/libmythtv/io/mythiowrapper.h)
 
@@ -135,7 +134,6 @@ endif()
 # Create stripped down config.h with only the symbols that are used in this
 # directory.
 configure_file(config.h.in config.h @ONLY)
-configure_file(mythconfig.h.in mythconfig.h @ONLY)
 
 configure_file(dvdread/dvdread/version.h.in dvdread/dvdread/version.h @ONLY)
 configure_file(dvdnav/dvdnav/version.h.in dvdnav/dvdnav/version.h @ONLY)
@@ -160,14 +158,9 @@ endif()
 # external/libmythdvdnav that points over to libs/libmythxxx, just copy in the
 # files that are needed.
 add_custom_command(
-  OUTPUT include/libmythbase include/libmythtv include/libmythtv/io
-  COMMAND ${CMAKE_COMMAND} -E make_directory include/libmythbase
+  OUTPUT include/libmythtv include/libmythtv/io
+  COMMAND ${CMAKE_COMMAND} -E make_directory
           include/libmythtv/io)
-add_custom_command(
-  OUTPUT include/libmythbase/compat.h
-  DEPENDS include/libmythbase
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-          ${MythTV_SOURCE_DIR}/libs/libmythbase/compat.h include/libmythbase)
 add_custom_command(
   OUTPUT include/libmythtv/mythtvexp.h
   DEPENDS include/libmythtv
