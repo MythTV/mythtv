@@ -122,9 +122,19 @@ endif()
 # Don't allow the hidden visibility flag for this target.
 set_property(TARGET mythdvdnav PROPERTY C_VISIBILITY_PRESET)
 
-check_include_file(dlfcn.h HAVE_DLFCN_H)
-check_include_file(dvdcss/dvdcss.h HAVE_DVDCSS_DVDCSS_H)
+# libdvdread
+pkg_check_modules(DVDCSS "libdvdcss>=1.2" IMPORTED_TARGET)
+if(TARGET PkgConfig::DVDCSS)
+  target_link_libraries(mythdvdnav PRIVATE PkgConfig::DVDCSS)
+  set(HAVE_DVDCSS_DVDCSS_H 1)
+else()
+  check_include_file(dlfcn.h HAVE_DLFCN_H)
+  target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
+endif()
+
 check_include_file(sys/param.h HAVE_SYS_PARAM_H)
+
+# libdvdnav and libdvdread
 check_symbol_exists(gettimeofday "sys/time.h" HAVE_GETTIMEOFDAY)
 if(CMAKE_CXX_BYTE_ORDER STREQUAL "BIG_ENDIAN")
   set(WORDS_BIGENDIAN 1)
@@ -141,12 +151,6 @@ configure_file(dvdnav/dvdnav/version.h.in dvdnav/dvdnav/version.h @ONLY)
 target_compile_definitions(mythdvdnav PRIVATE
   HAVE_CONFIG_H
   )
-
-# libdvdread
-target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
-if(HAVE_DVDCSS_DVDCSS_H)
-  target_link_libraries(mythdvdnav PRIVATE dvdcss)
-endif()
 
 # Required for customization to dvdread/dvd_input.c
 if(APPLE)
