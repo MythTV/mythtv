@@ -91,6 +91,10 @@ SOURCES += dvdread/md5.c
 SOURCES += dvdread/nav_print.c
 SOURCES += dvdread/nav_read.c
 
+win32 {
+    HEADERS += dvdread/win32_dlfcn.h
+}
+
 inc_dvdnav.path = $${PREFIX}/include/mythtv/dvdnav
 inc_dvdnav.files += dvdnav/dvdnav/dvdnav.h
 inc_dvdnav.files += dvdnav/dvdnav/dvdnav_events.h
