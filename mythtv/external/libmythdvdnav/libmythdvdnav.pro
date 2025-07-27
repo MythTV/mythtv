@@ -6,7 +6,7 @@ CONFIG += thread staticlib warn_off
 CONFIG -= qt
 target.path = $${LIBDIR}
 
-INCLUDEPATH += . ../../
+INCLUDEPATH += .
 INCLUDEPATH += ./dvdnav ./dvdread
 INCLUDEPATH += ../../libs
 
@@ -29,6 +29,14 @@ INCLUDEPATH += $$POSTINC
 
 # for -ldl
 LIBS += $$EXTRA_LIBS
+
+# libdvdnav
+DEFINES += HAVE_CONFIG_H
+
+using_dvdcss_dvdcss_h {
+    QMAKE_CFLAGS += $$LIBDVDCSS_CFLAGS
+    LIBS         += $$LIBDVDCSS_LIBS
+}
 
 # DEFINES += LOG_DEBUG TRACE
 
@@ -79,7 +87,6 @@ HEADERS += dvdread/dvd_input.h
 HEADERS += dvdread/dvd_udf.h
 HEADERS += dvdread/dvdread_internal.h
 HEADERS += dvdread/md5.h
-HEADERS += dvdread/mythdvdreadexp.h
 
 SOURCES += dvdread/bitreader.c
 SOURCES += dvdread/dvd_input.c
