@@ -2,11 +2,20 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#cmakedefine   HAVE_DLFCN_H
-#cmakedefine01 HAVE_GETTIMEOFDAY
-#cmakedefine01 HAVE_BIGENDIAN
-#cmakedefine01 HAVE_SYS_PARAM_H
-#cmakedefine   HAVE_DVDCSS_DVDCSS_H
+// Both libdvdnav and libdvdread
+#cmakedefine HAVE_GETTIMEOFDAY
+#cmakedefine WORDS_BIGENDIAN
+
+// libdvdread
+#cmakedefine HAVE_DLFCN_H
+#cmakedefine HAVE_SYS_PARAM_H
+#cmakedefine HAVE_DVDCSS_DVDCSS_H
+
+#if defined(__GNUC__)
+# define UNUSED     __attribute__((unused))
+#else
+# define UNUSED
+#endif
 
 #ifdef _MSC_VER
 #define ssize_t __int64

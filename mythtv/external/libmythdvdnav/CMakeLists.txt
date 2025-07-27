@@ -108,7 +108,6 @@ add_library(
   dvdread/ifo_read.c
   dvdread/md5.c
   dvdread/md5.h
-  dvdread/mythdvdreadexp.h
   dvdread/nav_print.c
   dvdread/nav_read.c
   include/libmythtv/mythtvexp.h
@@ -128,7 +127,7 @@ check_include_file(dvdcss/dvdcss.h HAVE_DVDCSS_DVDCSS_H)
 check_include_file(sys/param.h HAVE_SYS_PARAM_H)
 check_symbol_exists(gettimeofday "sys/time.h" HAVE_GETTIMEOFDAY)
 if(CMAKE_CXX_BYTE_ORDER STREQUAL "BIG_ENDIAN")
-  set(HAVE_BIGENDIAN 1)
+  set(WORDS_BIGENDIAN 1)
 endif()
 
 # Create stripped down config.h with only the symbols that are used in this
