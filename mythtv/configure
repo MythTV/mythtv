@@ -7242,6 +7242,29 @@ if ! enabled system_libexiv2; then
            ${qmakeconf} -o Makefile)
 fi
 echo "Configuring libmythdvdnav..."
+
+DVDREAD_VERSION_MAJOR=6
+DVDREAD_VERSION_MINOR=0
+DVDREAD_VERSION_MICRO=0
+
+echo "Creating external/libmythdvdnav/dvdread/dvdread/version.h"
+sed -e "s/@DVDREAD_VERSION_MAJOR@/${DVDREAD_VERSION_MAJOR}/g" \
+    -e "s/@DVDREAD_VERSION_MINOR@/${DVDREAD_VERSION_MINOR}/g" \
+    -e "s/@DVDREAD_VERSION_MICRO@/${DVDREAD_VERSION_MICRO}/g" \
+    external/libmythdvdnav/dvdread/dvdread/version.h.in > $TMPH
+cp_if_changed $TMPH external/libmythdvdnav/dvdread/dvdread/version.h
+
+DVDNAV_VERSION_MAJOR=6
+DVDNAV_VERSION_MINOR=0
+DVDNAV_VERSION_MICRO=0
+
+echo "Creating external/libmythdvdnav/dvdnav/dvdnav/version.h"
+sed -e "s/@DVDNAV_MAJOR@/${DVDNAV_VERSION_MAJOR}/g" \
+    -e "s/@DVDNAV_MINOR@/${DVDNAV_VERSION_MINOR}/g" \
+    -e "s/@DVDNAV_SUB@/${DVDNAV_VERSION_MICRO}/g" \
+    external/libmythdvdnav/dvdnav/dvdnav/version.h.in > $TMPH
+cp_if_changed $TMPH external/libmythdvdnav/dvdnav/dvdnav/version.h
+
 (cd external/libmythdvdnav ; \
        ${qmakeconf} -o Makefile)
 
