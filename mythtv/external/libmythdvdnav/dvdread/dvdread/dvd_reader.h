@@ -43,7 +43,7 @@
 /**
  * The current version.
  */
-/* MythTV - version defines are in the .pro file //#include "version.h" */
+#include "version.h"
 
 /**
  * The length of one Logical Block of a DVD.
