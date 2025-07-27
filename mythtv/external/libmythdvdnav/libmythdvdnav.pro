@@ -30,18 +30,6 @@ INCLUDEPATH += $$POSTINC
 # for -ldl
 LIBS += $$EXTRA_LIBS
 
-# The version numbers here should match the ones defined in libdvdread's 'configure.ac'
-dvdread_major = 6
-dvdread_minor = 0
-dvdread_micro = 0
-dvdread_version = $$dvdread_major"."$$dvdread_minor"."$$dvdread_micro
-
-DEFINES += DVDREAD_VERSION_MAJOR=$$dvdread_major
-DEFINES += DVDREAD_VERSION_MINOR=$$dvdread_minor
-DEFINES += DVDREAD_VERSION_MICRO=$$dvdread_micro
-DEFINES += DVDREAD_VERSION=$$dvdread_version
-DEFINES += DVDREAD_VERSION_STRING=\\\"$$dvdread_version\\\"
-
 # DEFINES += LOG_DEBUG TRACE
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -50,6 +38,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 HEADERS += dvdnav/dvdnav/dvd_types.h
 HEADERS += dvdnav/dvdnav/dvdnav.h
 HEADERS += dvdnav/dvdnav/dvdnav_events.h
+HEADERS += dvdnav/dvdnav/version.h
 HEADERS += dvdnav/vm/decoder.h
 HEADERS += dvdnav/vm/getset.h
 HEADERS += dvdnav/vm/play.h
@@ -83,6 +72,7 @@ HEADERS += dvdread/dvdread/ifo_types.h
 HEADERS += dvdread/dvdread/nav_print.h
 HEADERS += dvdread/dvdread/nav_read.h
 HEADERS += dvdread/dvdread/nav_types.h
+HEADERS += dvdread/dvdread/version.h
 HEADERS += dvdread/bitreader.h
 HEADERS += dvdread/bswap.h
 HEADERS += dvdread/dvd_input.h
@@ -105,6 +95,7 @@ inc_dvdnav.path = $${PREFIX}/include/mythtv/dvdnav
 inc_dvdnav.files += dvdnav/dvdnav/dvdnav.h
 inc_dvdnav.files += dvdnav/dvdnav/dvdnav_events.h
 inc_dvdnav.files += dvdnav/dvdnav/dvd_types.h
+inc_dvdnav.files += dvdnav/dvdnav/version.h
 
 inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
 inc_dvdread.files += dvdread/dvdread/bitreader.h
@@ -116,6 +107,7 @@ inc_dvdread.files += dvdread/dvdread/ifo_types.h
 inc_dvdread.files += dvdread/dvdread/nav_print.h
 inc_dvdread.files += dvdread/dvdread/nav_read.h
 inc_dvdread.files += dvdread/dvdread/nav_types.h
+inc_dvdread.files += dvdread/dvdread/version.h
 
 INSTALLS += inc_dvdnav inc_dvdread
 

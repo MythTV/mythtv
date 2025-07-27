@@ -10,6 +10,11 @@ project(
   DVDREAD
   VERSION 6.0.0
   LANGUAGES C)
+set(DVDREAD_VERSION_MICRO ${DVDREAD_VERSION_PATCH})
+
+set(DVDNAV_MAJOR 6)
+set(DVDNAV_MINOR 0)
+set(DVDNAV_SUB 0)
 
 include(CheckIncludeFile)
 include(CheckSymbolExists)
@@ -126,6 +131,9 @@ endif()
 configure_file(config.h.in config.h @ONLY)
 configure_file(mythconfig.h.in mythconfig.h @ONLY)
 
+configure_file(dvdread/dvdread/version.h.in dvdread/dvdread/version.h @ONLY)
+configure_file(dvdnav/dvdnav/version.h.in dvdnav/dvdnav/version.h @ONLY)
+
 # libdvdnav
 target_compile_definitions(mythdvdnav PRIVATE
   HAVE_CONFIG_H
@@ -201,7 +209,12 @@ endif()
 target_include_directories(
   mythdvdnav
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/dvdnav ${CMAKE_CURRENT_SOURCE_DIR}/dvdread
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include)
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include
+  # for libdvdnav version.h
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/dvdnav
+  # for libdvdread version.h
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdread/dvdread
+  )
 
 install(
   TARGETS mythdvdnav
@@ -211,10 +224,12 @@ install(
 
 install(FILES
   ${LIBDVDNAV_HEADERS}
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/dvdnav/version.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/dvdnav
   )
 
 install(FILES
   ${LIBDVDREAD_HEADERS}
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdread/dvdread/version.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/dvdread
   )
