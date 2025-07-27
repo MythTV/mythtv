@@ -389,7 +389,7 @@ int64_t dvdnav_get_current_time(dvdnav_t *self);
  * Otherwise tries to guess the nearest VOBU by calculating an offset.
  */
 dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *self,
-                                   uint64_t time, uint search_to_nearest_cell);
+                                   uint64_t time, uint8_t search_to_nearest_cell);
 
 int dvdnav_relative_time_search(dvdnav_t *self,
                    int relative_time);
