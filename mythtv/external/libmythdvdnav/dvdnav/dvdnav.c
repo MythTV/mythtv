@@ -153,7 +153,7 @@ static dvdnav_status_t dvdnav_open_common(dvdnav_t** dest, const char *path,
   struct timeval time;
 
   /* Create a new structure */
-  fprintf(MSG_OUT, "libdvdnav: Using dvdnav version %s - commit %s\n", DVDNAV_VERSION, DVDNAV_VERSION_GIT);
+  fprintf(MSG_OUT, "libdvdnav: Using dvdnav version %s\n", DVDNAV_VERSION_STRING);
 
   (*dest) = NULL;
   this = (dvdnav_t*)calloc(1, sizeof(dvdnav_t));
