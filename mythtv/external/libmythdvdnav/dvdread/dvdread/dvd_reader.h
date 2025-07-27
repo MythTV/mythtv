@@ -24,7 +24,7 @@
 #define LIBDVDREAD_DVD_READER_H
 
 #ifdef _MSC_VER
-#include <compat.h>
+#include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
