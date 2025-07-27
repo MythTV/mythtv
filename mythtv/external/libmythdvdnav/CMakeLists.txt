@@ -115,6 +115,12 @@ add_library(
   include/libmythtv/mythtvexp.h
   include/libmythtv/io/mythiowrapper.h)
 
+if(WIN32)
+  target_sources(mythdvdnav PRIVATE
+    dvdread/win32_dlfcn.h
+    )
+endif()
+
 # Don't allow the hidden visibility flag for this target.
 set_property(TARGET mythdvdnav PROPERTY C_VISIBILITY_PRESET)
 
