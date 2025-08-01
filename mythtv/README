@@ -20,8 +20,11 @@ The following is a list of some of the prerequisites you will need installed:
    QT - Version 5.7 or greater is required.  You will need the MySQL bindings.
         https://www.qt.io
 
-   MySQL - You need this setup and working.  Version 5.0.15 or higher is
-           required.  http://www.mysql.com
+   MySQL - You need this setup and working.  Version 8.0 or higher is required.
+           http://www.mysql.com
+           While not officially supported, Version 10.2 or higher is believed
+           to work as an alternative to MySQL.
+           https://mariadb.com
 
    XMLTV - It's always advised to install the latest version available.  This
            will do the work  of actually grabbing the program information. Get
