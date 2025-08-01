@@ -1349,8 +1349,6 @@ EXTERNAL_LIBRARY_LIST="
     libxml2
     mediacodec
     opengl
-    sdl
-    sdl2
     vaapi
     nvdec
 "
@@ -1383,12 +1381,6 @@ LIBRARY_LIST="
     swscale
 "
 
-PROGRAM_LIST="
-    ffprobe
-    ffmpeg
-    ffplay
-"
-
 SUBSYSTEM_LIST="
 "
 
@@ -1397,7 +1389,6 @@ CONFIG_LIST="
     $EXTERNAL_LIBRARY_LIST
     $HWACCEL_LIBRARY_LIST
     $FEATURE_LIST
-    $PROGRAM_LIST
     $SUBSYSTEM_LIST
     autodetect
     fontconfig
@@ -2135,7 +2126,6 @@ cpu="generic"
 intrinsics="none"
 
 # configurable options
-enable $PROGRAM_LIST
 enable $LIBRARY_LIST
 
 enable asm
@@ -2149,9 +2139,6 @@ sws_max_filter_size_default=256
 set_default sws_max_filter_size
 
 # mythtv settings
-disable sdl2
-disable sdl
-disable ffplay
 
 CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
@@ -2458,9 +2445,6 @@ for opt do
         --enable-debug=*)
             debuglevel="$optval"
         ;;
-        --disable-programs)
-            disable $PROGRAM_LIST
-        ;;
         --disable-everything)
             map 'eval unset \${$(toupper ${v%s})_LIST}' $COMPONENT_LIST
         ;;
@@ -2536,11 +2520,6 @@ for opt do
         ;;
     esac
 done
-
-if enabled sdl ; then
-    enable sdl2
-    enable ffplay
-fi
 
 #setting default runtime prefix and libdir
 if test -n "${prefix}"; then
@@ -6373,7 +6352,6 @@ ffmpeg_optset ar nm ranlib
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
-ffmpeg_optenable sdl2 ffplay
 
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
