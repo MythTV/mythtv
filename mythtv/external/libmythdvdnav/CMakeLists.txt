@@ -152,11 +152,6 @@ target_compile_definitions(mythdvdnav PRIVATE
   HAVE_CONFIG_H
   )
 
-# Required for customization to dvdread/dvd_input.c
-if(APPLE)
-  target_link_libraries(mythdvdnav PRIVATE ${APPLE_CORE_FOUNDATION})
-endif()
-
 # Instead of creating a circular dependency by adding an include path into
 # external/libmythdvdnav that points over to libs/libmythxxx, just copy in the
 # files that are needed.
