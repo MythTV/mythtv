@@ -1333,21 +1333,9 @@ EXTERNAL_LIBRARY_GPL_LIST="
     libxvid
 "
 
-EXTERNAL_LIBRARY_NONFREE_LIST="
-"
-
-EXTERNAL_LIBRARY_VERSION3_LIST="
-"
-
-EXTERNAL_LIBRARY_GPLV3_LIST="
-"
-
 EXTERNAL_LIBRARY_LIST="
     $EXTERNAL_AUTODETECT_LIBRARY_LIST
     $EXTERNAL_LIBRARY_GPL_LIST
-    $EXTERNAL_LIBRARY_NONFREE_LIST
-    $EXTERNAL_LIBRARY_VERSION3_LIST
-    $EXTERNAL_LIBRARY_GPLV3_LIST
     jni
     libaom
     libass
@@ -1372,12 +1360,8 @@ HWACCEL_AUTODETECT_LIBRARY_LIST="
     vdpau
 "
 
-HWACCEL_LIBRARY_NONFREE_LIST="
-"
-
 HWACCEL_LIBRARY_LIST="
     $HWACCEL_AUTODETECT_LIBRARY_LIST
-    $HWACCEL_LIBRARY_NONFREE_LIST
 "
 
 FEATURE_LIST="
@@ -1399,12 +1383,6 @@ LIBRARY_LIST="
     swscale
 "
 
-LICENSE_LIST="
-    gpl
-    nonfree
-    version3
-"
-
 PROGRAM_LIST="
     ffprobe
     ffmpeg
@@ -1419,7 +1397,6 @@ CONFIG_LIST="
     $EXTERNAL_LIBRARY_LIST
     $HWACCEL_LIBRARY_LIST
     $FEATURE_LIST
-    $LICENSE_LIST
     $PROGRAM_LIST
     $SUBSYSTEM_LIST
     autodetect
@@ -2172,7 +2149,6 @@ sws_max_filter_size_default=256
 set_default sws_max_filter_size
 
 # mythtv settings
-enable gpl
 disable sdl2
 disable sdl
 disable ffplay
@@ -2602,22 +2578,6 @@ enable_weak $EXTERNAL_AUTODETECT_LIBRARY_LIST
 enable_weak $HWACCEL_AUTODETECT_LIBRARY_LIST
 
 disabled logging && logfile=/dev/null
-
-die_license_disabled() {
-    enabled $1 || { enabled $v && die "$v is $1 and --enable-$1 is not specified."; }
-}
-
-die_license_disabled_gpl() {
-    enabled $1 || { enabled $v && die "$v is incompatible with the gpl and --enable-$1 is not specified."; }
-}
-
-map "die_license_disabled gpl"      $EXTERNAL_LIBRARY_GPL_LIST $EXTERNAL_LIBRARY_GPLV3_LIST
-map "die_license_disabled version3" $EXTERNAL_LIBRARY_VERSION3_LIST $EXTERNAL_LIBRARY_GPLV3_LIST
-
-enabled gpl && map "die_license_disabled_gpl nonfree" $EXTERNAL_LIBRARY_NONFREE_LIST
-map "die_license_disabled nonfree" $HWACCEL_LIBRARY_NONFREE_LIST
-
-enabled version3 && { enabled gpl && enable gplv3 || enable lgplv3; }
 
 # Disable all the library-specific components if the library itself
 # is disabled, see AVCODEC_LIST and following _LIST variables.
@@ -6368,17 +6328,6 @@ done
 enabled zlib && add_cppflags -DZLIB_CONST
 
 enabled asm || { arch=c; disable $ARCH_LIST $ARCH_EXT_LIST; }
-
-license="LGPL version 2.1 or later"
-if enabled nonfree; then
-    license="nonfree and unredistributable"
-elif enabled gplv3; then
-    license="GPL version 3 or later"
-elif enabled lgplv3; then
-    license="LGPL version 3 or later"
-elif enabled gpl; then
-    license="GPL version 2 or later"
-fi
 
 # Set up FFmpeg configure options that are derived from
 # MythTV configure options
