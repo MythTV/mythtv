@@ -6807,12 +6807,10 @@ cat > $TMPH <<EOF
 #define QT_MIN_VERSION_HEX $QT_MIN_VERSION_HEX
 #define QT_MIN_VERSION $QT_MIN_VERSION
 #define COMPILE_TYPE "$compile_type"
-#define av_restrict $_restrict
 #define EXTERN_PREFIX "${extern_prefix}"
 #define EXTERN_ASM ${extern_prefix}
 #define BUILDSUF "$build_suffix"
 #define SLIBSUF "$SLIBSUF"
-#define HAVE_MMX2 HAVE_MMXEXT
 #define JDK_HOME "$JDK_HOME"
 #define JAVA_ARCH "$java_arch"
 #define IMAGE_ALIGN $image_align
