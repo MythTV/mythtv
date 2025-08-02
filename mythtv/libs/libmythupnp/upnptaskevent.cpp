@@ -11,12 +11,13 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "upnptaskevent.h"
 
-#include <utility>
+#include <chrono>
+
+#include <QString>
 
 #include "libmythbase/mythlogging.h"
 
-#include "libmythupnp/bufferedsocketdevice.h"
-#include "libmythupnp/msocketdevice.h"
+#include "blockingtcpsocket.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -44,25 +45,25 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
     if (m_pPayload == nullptr)
         return;
 
-    MSocketDevice        sockDev( MSocketDevice::Stream );
-    BufferedSocketDevice sock   ( &sockDev );
+    LOG(VB_UPNP, LOG_INFO, QString("UPnpEventTask::Execute - NOTIFY to %1:%2.")
+        .arg(m_peerAddress.toString(), QString::number(m_nPeerPort))
+        );
 
-    sockDev.setBlocking( true );
-
-    if (sock.Connect( m_peerAddress, m_nPeerPort ))
+    const std::chrono::milliseconds timeout {3s};
+    BlockingTcpSocket socket;
+    if (socket.connect(m_peerAddress, m_nPeerPort, timeout))
     {
         // ------------------------------------------------------------------
         // Send NOTIFY message
         // ------------------------------------------------------------------
 
-        if (sock.WriteBlockDirect( m_pPayload->data(),
-                                     m_pPayload->size() ) != -1) 
+        if (socket.write(m_pPayload->data(), m_pPayload->size(), timeout) != -1)
         {
             // --------------------------------------------------------------
             // Read first line to determine success/Fail
             // --------------------------------------------------------------
 
-            QString sResponseLine = sock.ReadLine( 3s );
+            QString sResponseLine = socket.readLine(timeout);
 
             if ( sResponseLine.length() > 0)
             {
@@ -79,28 +80,6 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
                 }
 #endif
             }
-            else
-            {
-                LOG(VB_UPNP, LOG_ERR,
-                    QString("UPnpEventTask::Execute - Timeout reading first "
-                            "line of reply from %1:%2.")
-                        .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
-            }
         }
-        else
-        {
-            LOG(VB_UPNP, LOG_ERR,
-                QString("UPnpEventTask::Execute - Error sending to %1:%2.")
-                    .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
-        }
-
-        sock.Close();
-    }
-    else
-    {
-        LOG(VB_UPNP, LOG_ERR,
-            QString("UPnpEventTask::Execute - Error sending to %1:%2.")
-                .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
     }
 }
-

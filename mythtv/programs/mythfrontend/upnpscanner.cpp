@@ -14,7 +14,7 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
 
 // MythFrontend
 #include "upnpscanner.h"
@@ -422,7 +422,7 @@ void UPNPScanner::Start()
             this, &UPNPScanner::replyFinished);
 
     // listen for SSDP updates
-    SSDP::AddListener(this);
+    SSDPCache::Instance()->addListener(this);
 
     // listen for subscriptions and events
     if (m_subscription)
@@ -455,7 +455,7 @@ void UPNPScanner::Stop(void)
     m_lock.lock();
 
     // stop listening
-    SSDP::RemoveListener(this);
+    SSDPCache::Instance()->removeListener(this);
     if (m_subscription)
         m_subscription->removeListener(this);
 
@@ -568,7 +568,7 @@ void UPNPScanner::CheckStatus(void)
     {
         it.next();
         // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
-        if (!SSDP::Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
+        if (!SSDPCache::Instance()->Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
         {
             LOG(VB_UPNP, LOG_INFO, LOC + QString("%1 no longer in SSDP cache. Removing")
                 .arg(it.value()->m_serverURL.toString()));
