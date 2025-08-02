@@ -1301,25 +1301,6 @@ is_x86_mmx() {
 # CONFIG_LIST contains configurable options, while HAVE_LIST is for
 # system-dependent things.
 
-AVCODEC_COMPONENTS="
-"
-
-AVDEVICE_COMPONENTS="
-"
-
-AVFILTER_COMPONENTS="
-"
-
-AVFORMAT_COMPONENTS="
-"
-
-AVRESAMPLE_COMPONENTS=""
-
-AVUTIL_COMPONENTS=""
-
-COMPONENT_LIST="
-"
-
 EXTERNAL_AUTODETECT_LIBRARY_LIST="
     alsa
     jack
@@ -1384,7 +1365,6 @@ LIBRARY_LIST="
 SUBSYSTEM_LIST="
 "
 
-# COMPONENT_LIST needs to come last to ensure correct dependency checking
 CONFIG_LIST="
     $EXTERNAL_LIBRARY_LIST
     $HWACCEL_LIBRARY_LIST
@@ -1401,7 +1381,6 @@ CONFIG_LIST="
     thumb
     valgrind_backtrace
     xmm_clobber_test
-    $COMPONENT_LIST
 "
 
 THREADS_LIST="
@@ -1884,7 +1863,6 @@ CMDLINE_SET="
     pkg_config
     pkg_config_flags
     progs_suffix
-    random_seed
     ranlib
     samples
     sws_max_filter_size
@@ -2273,26 +2251,6 @@ for v in "$@"; do
     MYTHTV_CONFIGURATION="${MYTHTV_CONFIGURATION# } ${v}"
 done
 
-find_things(){
-    thing=$1
-    pattern=$2
-    file=$source_path/$3
-    sed -n "s/^[^#]*$pattern.*([^,]*, *\([^,]*\)\(,.*\)*).*/\1_$thing/p" "$file"
-}
-
-find_things_extern(){
-    thing=$1
-    pattern=$2
-    file=$source_path/$3
-    sed -n "s/^[^#]*extern.*$pattern *ff_\([^ ]*\)_$thing;/\1_$thing/p" "$file"
-}
-
-for n in $COMPONENT_LIST; do
-    v=$(toupper ${n%s})_LIST
-    eval enable \$$v
-    eval ${n}_if_any="\$$v"
-done
-
 enable $ARCH_EXT_LIST
 
 die_unknown(){
@@ -2311,27 +2269,6 @@ show_list() {
     shift
     echo $* | sed s/$suffix//g | print_in_columns
     exit 0
-}
-
-rand_list(){
-    IFS=', '
-    set -- $*
-    unset IFS
-    for thing; do
-        comp=${thing%:*}
-        prob=${thing#$comp}
-        prob=${prob#:}
-        is_in ${comp} $COMPONENT_LIST && eval comp=\$$(toupper ${comp%s})_LIST
-        echo "prob ${prob:-0.5}"
-        printf '%s\n' $comp
-    done
-}
-
-do_random(){
-    action=$1
-    shift
-    random_seed=$(awk "BEGIN { srand($random_seed); print srand() }")
-    $action $(rand_list "$@" | awk "BEGIN { srand($random_seed) } \$1 == \"prob\" { prob = \$2; next } rand() < prob { print }")
 }
 
 if [ -e config.log ] ; then
@@ -2445,31 +2382,6 @@ for opt do
         --enable-debug=*)
             debuglevel="$optval"
         ;;
-        --disable-everything)
-            map 'eval unset \${$(toupper ${v%s})_LIST}' $COMPONENT_LIST
-        ;;
-        --disable-all)
-            map 'eval unset \${$(toupper ${v%s})_LIST}' $COMPONENT_LIST
-            disable $LIBRARY_LIST $PROGRAM_LIST doc
-            enable avutil
-        ;;
-        --enable-random|--disable-random)
-            action=${opt%%-random}
-            do_random ${action#--} $COMPONENT_LIST
-        ;;
-        --enable-random=*|--disable-random=*)
-            action=${opt%%-random=*}
-            do_random ${action#--} $optval
-        ;;
-        --enable-*=*|--disable-*=*)
-            eval $(echo "${opt%%=*}" | sed 's/--/action=/;s/-/ thing=/')
-            is_in "${thing}s" $COMPONENT_LIST || die_unknown "$opt"
-            eval list=\$$(toupper $thing)_LIST
-            name=$(echo "${optval}" | sed "s/,/_${thing}|/g")_${thing}
-            list=$(filter "$name" $list)
-            [ "$list" = "" ] && warn "Option $opt did not match anything"
-            $action $list
-        ;;
         --enable-yasm|--disable-yasm)
             warn "The ${opt} option is only provided for compatibility and will be\n"\
                  "removed in the future. Use --enable-x86asm / --disable-x86asm instead."
@@ -2482,20 +2394,11 @@ for opt do
         ;;
         --enable-?*|--disable-?*)
             eval $(echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g')
-            if is_in $option $COMPONENT_LIST; then
-                test $action = disable && action=unset
-                eval $action \$$(toupper ${option%s})_LIST
-            elif is_in $option $CMDLINE_SELECT; then
+            if is_in $option $CMDLINE_SELECT; then
                 $action $option
             else
                 die_unknown $opt
             fi
-        ;;
-        --list-*)
-            NAME="${opt#--list-}"
-            is_in $NAME $COMPONENT_LIST || die_unknown $opt
-            NAME=${NAME%s}
-            eval show_list $NAME \$$(toupper $NAME)_LIST
         ;;
         --help|-h) show_help
         ;;
@@ -2557,18 +2460,6 @@ enable_weak $EXTERNAL_AUTODETECT_LIBRARY_LIST
 enable_weak $HWACCEL_AUTODETECT_LIBRARY_LIST
 
 disabled logging && logfile=/dev/null
-
-# Disable all the library-specific components if the library itself
-# is disabled, see AVCODEC_LIST and following _LIST variables.
-
-disable_components(){
-    disabled ${1} && disable $(
-        eval components="\$$(toupper ${1})_COMPONENTS"
-        map 'eval echo \${$(toupper ${v%s})_LIST}' $components
-    )
-}
-
-map 'disable_components $v' $LIBRARY_LIST
 
 echo "# $0 $MYTHTV_CONFIGURATION" > $logfile
 set >> $logfile
