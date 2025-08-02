@@ -1831,7 +1831,6 @@ CMDLINE_SET="
     ar
     arch
     as
-    assert_level
     build_suffix
     cc
     objcc
@@ -6819,9 +6818,6 @@ cat > $TMPH <<EOF
 #define IMAGE_ALIGN $image_align
 #define PYTHON_EXE "${python}"
 EOF
-
-test -n "$assert_level" &&
-    echo "#define ASSERT_LEVEL $assert_level" >>$TMPH
 
 if enabled cygwin ; then
   echo "#ifndef llrint" >> $TMPH
