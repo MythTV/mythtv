@@ -1523,7 +1523,6 @@ BUILTIN_LIST="
 "
 HAVE_LIST_CMDLINE="
     inline_asm
-    symver
     x86asm
 "
 
@@ -1587,32 +1586,6 @@ SYSTEM_FUNCS="
     $SYSTEM_FUNCS_BLURAY
 "
 
-TOOLCHAIN_FEATURES="
-    as_dn_directive
-    as_fpu_directive
-    as_func
-    as_object_arch
-    asm_mod_q
-    attribute_may_alias
-    attribute_packed
-    blocks_extension
-    ebp_available
-    ebx_available
-    gnu_as
-    gnu_windres
-    ibm_asm
-    inline_asm_direct_symbol_refs
-    inline_asm_labels
-    inline_asm_nonlocal_labels
-    pragma_deprecated
-    rsync_contimeout
-    symver_asm_label
-    symver_gnu_asm
-    vfp_args
-    xform_asm
-    xmm_clobbers
-"
-
 TYPES_LIST="
     struct_hdr_metadata_infoframe
 "
@@ -1630,7 +1603,6 @@ HAVE_LIST="
     $INTRINSICS_LIST
     $SYSTEM_FUNCS
     $THREADS_LIST
-    $TOOLCHAIN_FEATURES
     $TYPES_LIST
     atomics_native
     dos_paths
@@ -1964,7 +1936,6 @@ simd_align_16_if_any="altivec neon sse"
 simd_align_32_if_any="avx"
 
 # system capabilities
-symver_if_any="symver_asm_label symver_gnu_asm"
 valgrind_backtrace_conflict="optimizations"
 valgrind_backtrace_deps="valgrind_valgrind_h"
 
@@ -3921,7 +3892,6 @@ case $target_os in
         enabled shared && add_ldflags -Wl,-brtl
         ;;
     android)
-        disable symver
         enable section_data_rel_ro
         disable qtdbus
         SLIB_INSTALL_NAME='$(SLIBNAME)'
@@ -3954,13 +3924,11 @@ case $target_os in
         VERSION_SCRIPT_POSTPROCESS_CMD='perl $(SRC_PATH)/compat/solaris/make_sunver.pl - $(OBJS)'
         ;;
     netbsd)
-        disable symver
         oss_indev_extralibs="-lossaudio"
         oss_outdev_extralibs="-lossaudio"
         enabled gcc || check_ldflags -Wl,-zmuldefs
         ;;
     openbsd|bitrig)
-        disable symver
         SHFLAGS='-shared'
         SLIB_INSTALL_NAME='$(SLIBNAME).$(LIBMAJOR).$(LIBMINOR)'
         SLIB_INSTALL_LINKS=
@@ -3968,7 +3936,6 @@ case $target_os in
         oss_outdev_extralibs="-lossaudio"
         ;;
     dragonfly)
-        disable symver
         ;;
     freebsd)
         append CCONFIG "freebsd"
@@ -4032,7 +3999,6 @@ case $target_os in
         if enabled wince; then
             disable protocols
         fi
-        disable symver
         disable v4l2
         disable v4l2prime
         enable  windows
@@ -4050,7 +4016,6 @@ case $target_os in
         elif enabled arm; then
             LIBTARGET=arm-wince
         fi
-        enabled shared && ! enabled small && check_cmd $windres --version && enable gnu_windres
         enabled x86_32 && check_ldflags -Wl,--large-address-aware
         shlibdir_default="$bindir_default"
         SLIBPREF="libmyth"
@@ -4091,7 +4056,6 @@ case $target_os in
         ECXXFLAGS=`echo $ECXXFLAGS | sed 's/-std=c++98//'`
         ;;
     win32|win64)
-        disable symver
         if enabled shared; then
             # Link to the import library instead of the normal static library
             # for shared libs.
@@ -4130,7 +4094,6 @@ case $target_os in
         SHFLAGS='-shared -Wl,--out-implib,$(SUBDIR)lib$(FULLNAME).dll.a'
         enabled x86_64 && objformat="win64" || objformat="win32"
         enable dos_paths
-        enabled shared && ! enabled small && check_cmd $windres --version && enable gnu_windres
         ;;
     *-dos|freedos|opendos)
         network_extralibs="-lsocket"
@@ -4411,7 +4374,6 @@ if enabled lto; then
     check_cflags  -flto
     check_cxxflags -flto
     check_ldflags -flto $cpuflags
-    disable inline_asm_direct_symbol_refs
 fi
 
 
@@ -4515,18 +4477,6 @@ void foo(char * $restrict_keyword p);
 EOF
 done
 
-check_cc <<EOF && enable pragma_deprecated
-void foo(void) { _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") }
-EOF
-
-check_cc <<EOF && enable attribute_packed
-struct { int x; } __attribute__((packed)) x;
-EOF
-
-check_cc <<EOF && enable attribute_may_alias
-union { int x; } __attribute__((may_alias)) x;
-EOF
-
 check_cc <<EOF || die "endian test failed"
 unsigned int endian = 'B' << 24 | 'I' << 16 | 'G' << 8 | 'E';
 EOF
@@ -4540,57 +4490,6 @@ EOF
 if ! enabled ppc64 || enabled bigendian; then
     disable vsx
 fi
-
-check_gas() {
-    log "check_gas using '$as' as AS"
-    # :vararg is used on aarch64, arm and ppc altivec
-    check_as <<EOF || return 1
-.macro m n, y:vararg=0
-\n: .int \y
-.endm
-m x
-EOF
-    # .altmacro is only used in arm asm
-    ! enabled arm || check_as <<EOF || return 1
-.altmacro
-EOF
-    enable gnu_as
-    return 0
-}
-
-if enabled_any arm aarch64 || enabled_all ppc altivec && enabled asm; then
-    nogas=:
-    enabled_any arm aarch64 && nogas=die
-    enabled_all ppc altivec && [ $target_os_default != aix ] && nogas=warn
-    as_noop=-v
-
-    case $as_type in
-        arm*) gaspp_as_type=armasm; as_noop=-h ;;
-        gcc)  gaspp_as_type=gas ;;
-        *)    gaspp_as_type=$as_type ;;
-    esac
-
-    [ $target_os = "darwin" ] && gaspp_as_type="apple-$gaspp_as_type"
-
-    test "${as#*gas-preprocessor.pl}" != "$as" ||
-    check_cmd gas-preprocessor.pl -arch $arch -as-type $gaspp_as_type -- ${as:=$cc} $as_noop &&
-        gas="${gas:=gas-preprocessor.pl} -arch $arch -as-type $gaspp_as_type -- ${as:=$cc}"
-
-    if ! check_gas ; then
-        as=${gas:=$as}
-        check_gas || \
-            $nogas "GNU assembler not found, install/update gas-preprocessor"
-    fi
-
-    check_as <<EOF && enable as_func
-.func test
-.endfunc
-EOF
-fi
-
-check_inline_asm inline_asm_labels '"1:\n"'
-
-check_inline_asm inline_asm_nonlocal_labels '"Label:\n"'
 
 if enabled aarch64; then
     enabled armv8 && check_insn armv8 'prfm   pldl1strm, [x0]'
@@ -4614,21 +4513,6 @@ EOF
 
     enabled thumb && check_cflags -mthumb || check_cflags -marm
 
-    if     check_cpp_condition stddef.h "defined __ARM_PCS_VFP"; then
-        enable vfp_args
-    elif check_cpp_condition stddef.h "defined _M_ARM_FP && _M_ARM_FP >= 30"; then
-        enable vfp_args
-    elif ! check_cpp_condition stddef.h "defined __ARM_PCS || defined __SOFTFP__" && [ $target_os != darwin ]; then
-        case "${cross_prefix:-$cc}" in
-            *hardfloat*)         enable vfp_args;   fpabi=vfp ;;
-            *) check_ld "cc" <<EOF && enable vfp_args && fpabi=vfp || fpabi=soft ;;
-__asm__ (".eabi_attribute 28, 1");
-int main(void) { return 0; }
-EOF
-        esac
-        warn "Compiler does not indicate floating-point ABI, guessing $fpabi."
-    fi
-
     enabled armv5te && check_insn armv5te 'qadd r0, r0, r0'
     enabled armv6   && check_insn armv6   'sadd16 r0, r0, r0'
     enabled armv6t2 && check_insn armv6t2 'movt r0, #0'
@@ -4640,22 +4524,6 @@ EOF
     [ $target_os = linux ] || [ $target_os = android ] ||
         map 'enabled_any ${v}_external ${v}_inline || disable $v' \
             $ARCH_EXT_LIST_ARM
-
-    check_inline_asm asm_mod_q '"add r0, %Q0, %R0" :: "r"((long long)0)'
-
-    check_as <<EOF && enable as_dn_directive
-ra .dn d0.i16
-.unreq ra
-EOF
-    check_as <<EOF && enable as_fpu_directive
-.fpu neon
-EOF
-
-    # llvm's integrated assembler supports .object_arch from llvm 3.5
-    [ "$objformat" = elf32 ] || [ "$objformat" = elf64 ] &&
-        check_as <<EOF && enable as_object_arch
-.object_arch armv4
-EOF
 
     [ $target_os != win32 ] && enabled_all armv6t2 shared !pic && enable_weak_pic
 
@@ -4700,9 +4568,7 @@ elif enabled ppc; then
     enable local_aligned_8 local_aligned_16 local_aligned_32
 
     check_inline_asm dcbzl     '"dcbzl 0, %0" :: "r"(0)'
-    check_inline_asm ibm_asm   '"add 0, 0, 0"'
     check_inline_asm ppc4xx    '"maclhw r10, r11, r12"'
-    check_inline_asm xform_asm '"lwzx %1, %y0" :: "Z"(*(int*)0), "r"(0)'
 
     # AltiVec flags: The FSF version of GCC differs from the Apple version
     if enabled altivec; then
@@ -4742,26 +4608,6 @@ elif enabled x86; then
     check_builtin mm_empty mmintrin.h "_mm_empty()"
 
     enable local_aligned_8 local_aligned_16 local_aligned_32
-
-    # check whether EBP is available on x86
-    # As 'i' is stored on the stack, this program will crash
-    # if the base pointer is used to access it because the
-    # base pointer is cleared in the inline assembly code.
-    check_exec_crash <<EOF && enable ebp_available
-volatile int i=0;
-__asm__ volatile ("xorl %%ebp, %%ebp" ::: "%ebp");
-return i;
-EOF
-
-    # check whether EBX is available on x86
-    check_inline_asm ebx_available '""::"b"(0)' &&
-        check_inline_asm ebx_available '"":::"%ebx"'
-
-    # check whether xmm clobbers are supported
-    check_inline_asm xmm_clobbers '"":::"%xmm0"'
-
-    check_inline_asm inline_asm_direct_symbol_refs '"movl '$extern_prefix'test, %eax"' ||
-        check_inline_asm inline_asm_direct_symbol_refs '"movl '$extern_prefix'test(%rip), %eax"'
 
     # check whether binutils is new enough to compile SSSE3/MMXEXT
     enabled ssse3  && check_inline_asm ssse3_inline  '"pabsw %xmm0, %xmm0"'
@@ -5232,7 +5078,6 @@ enabled makeinfo \
 disabled makeinfo_html && texi2html --help 2> /dev/null | grep -q 'init-file' && enable texi2html || disable texi2html
 perl -v            > /dev/null 2>&1 && enable perl      || disable perl
 pod2man --help     > /dev/null 2>&1 && enable pod2man   || disable pod2man
-rsync --help 2> /dev/null | grep -q 'contimeout' && enable rsync_contimeout || disable rsync_contimeout
 
 check_lib user32 "windows.h winuser.h" GetShellWindow -luser32
 check_lib vfw32 "windows.h vfw.h" capCreateCaptureWindow -lvfw32
@@ -5370,10 +5215,6 @@ check_disable_warning_headers(){
 check_disable_warning_headers -Wno-deprecated-declarations
 check_disable_warning_headers -Wno-unused-variable
 
-check_cc <<EOF && enable blocks_extension
-void (^block)(void);
-EOF
-
 # C++ Flags
 check_cxxflags -Wall
 check_cxxflags -Wextra
@@ -5421,27 +5262,6 @@ enabled xmm_clobber_test &&
                   -Wl,--wrap,swr_convert                \
                   -Wl,--wrap,sws_scale ||
     disable xmm_clobber_test
-
-check_ld "cc" <<EOF && enable proper_dce
-extern const int array[512];
-static inline int func(void) { return array[0]; }
-int main(void) { return 0; }
-EOF
-
-if enabled proper_dce; then
-    echo "X { local: *; };" > $TMPV
-    if test_ldflags -Wl,${version_script},$TMPV; then
-        append SHFLAGS '-Wl,${version_script},\$(SUBDIR)lib\$(NAME).ver'
-        check_cc <<EOF && enable symver_asm_label
-void ff_foo(void) __asm__ ("av_foo@VERSION");
-void ff_foo(void) { ${inline_asm+__asm__($quotes);} }
-EOF
-        check_cc <<EOF && enable symver_gnu_asm
-__asm__(".symver ff_foo,av_foo@VERSION");
-void ff_foo(void) {}
-EOF
-    fi
-fi
 
 if [ -z "$nvccflags" ]; then
     nvccflags=$nvccflags_default
@@ -5872,10 +5692,6 @@ if enabled icc; then
     # -wd: Disable the following warnings for MythTV
     # 10159: ignore invalid argument for option '-m'
     check_ldflags -wd10159
-    # icc 11.0 and 11.1 work with ebp_available, but don't pass the test
-    enable ebp_available
-    # The test above does not test linking
-    enabled lto && disable symver_asm_label
     if enabled x86_32; then
         icc_version=$($cc -dumpversion)
         test ${icc_version%%.*} -ge 11 &&
@@ -5937,17 +5753,11 @@ elif enabled_any msvc icl; then
     enabled x86_32 && disable aligned_stack
     enabled_all x86_32 debug && add_cflags -Oy-
     enabled debug && add_ldflags -debug
-    enable pragma_deprecated
     if enabled icl; then
         # -Qansi-alias is basically -fstrict-aliasing, but does not work
         # (correctly) on icl 13.x.
         check_cpp_condition "windows.h" "__ICL < 1300 || __ICL >= 1400" &&
             add_cflags -Qansi-alias
-        # Some inline asm is not compilable in debug
-        if enabled debug; then
-            disable ebp_available
-            disable ebx_available
-        fi
     fi
     # msvcrt10 x64 incorrectly enables log2, only msvcrt12 (MSVC 2013) onwards actually has log2.
     check_cpp_condition crtversion.h "_VC_CRT_MAJOR_VERSION >= 12" || disable log2
