@@ -1605,22 +1605,11 @@ HAVE_LIST="
     $THREADS_LIST
     $TYPES_LIST
     atomics_native
-    dos_paths
-    libc_msvcrt
-    makeinfo
-    makeinfo_html
-    MMAL_PARAMETER_VIDEO_MAX_NUM_CALLBACKS
-    perl
-    pod2man
-    section_data_rel_ro
-    texi2html
     threads
-    uwp
     vaapi_drm
     vaapi_glx
     vaapi_x11
     vdpau_x11
-    winrt
 "
 
 # options emitted with CONFIG_ prefix but not available on the command line
@@ -3892,7 +3881,6 @@ case $target_os in
         enabled shared && add_ldflags -Wl,-brtl
         ;;
     android)
-        enable section_data_rel_ro
         disable qtdbus
         SLIB_INSTALL_NAME='$(SLIBNAME)'
         SLIB_INSTALL_LINKS=
@@ -4035,7 +4023,6 @@ case $target_os in
         SLIB_UNINSTALL_EXTRA_CMD='rm -f "$(SHLIBDIR)/$(SLIBNAME:$(SLIBSUF)=.lib)"'
         SHFLAGS='-shared -Wl,--output-def,$$(@:$(SLIBSUF)=.orig.def) -Wl,--out-implib,$(SUBDIR)lib$(SLIBNAME:$(SLIBSUF)=.dll.a) -Wl,--enable-runtime-pseudo-reloc -Wl,--enable-auto-image-base'
         ranlib=:
-        enable dos_paths
         check_ldflags -Wl,--nxcompat,--dynamicbase
         # Lets work around some stupidity in binutils.
         # ld will strip relocations from executables even though we need them
@@ -4077,7 +4064,6 @@ case $target_os in
         SHFLAGS='-dll -def:$$(@:$(SLIBSUF)=.def) -implib:$(SUBDIR)$(SLIBNAME:$(SLIBSUF)=.lib)'
         enabled x86_64 && objformat="win64" || objformat="win32"
         ranlib=:
-        enable dos_paths
         ;;
     cygwin*)
         enable cygwin
@@ -4093,16 +4079,13 @@ case $target_os in
         SLIB_INSTALL_EXTRA_LIB='lib$(FULLNAME).dll.a'
         SHFLAGS='-shared -Wl,--out-implib,$(SUBDIR)lib$(FULLNAME).dll.a'
         enabled x86_64 && objformat="win64" || objformat="win32"
-        enable dos_paths
         ;;
     *-dos|freedos|opendos)
         network_extralibs="-lsocket"
         objformat="coff"
-        enable dos_paths
         add_cppflags -U__STRICT_ANSI__
         ;;
     linux)
-        enable section_data_rel_ro
         enabled_any arm aarch64 && enable_weak linux_perf
         append CCONFIG "linux"
         enable backend
@@ -4138,7 +4121,6 @@ case $target_os in
         SLIB_INSTALL_NAME='$(SLIBNAME_WITH_MAJOR)'
         SLIB_INSTALL_LINKS=
         SLIB_INSTALL_EXTRA_LIB='$(LIBPREF)$(FULLNAME)_dll.a $(LIBPREF)$(FULLNAME)_dll.lib'
-        enable dos_paths
         enable_weak os2threads
         ;;
     gnu/kfreebsd)
@@ -4152,7 +4134,6 @@ case $target_os in
         ;;
     symbian)
         SLIBSUF=".dll"
-        enable dos_paths
         add_cflags --include=$sysinclude/gcce/gcce.h -fvisibility=default
         add_cppflags -D__GCCE__ -D__SYMBIAN32__ -DSYMBIAN_OE_POSIX_SIGNALS
         add_ldflags -Wl,--target1-abs,--no-undefined \
@@ -4757,12 +4738,10 @@ check_type "va/va.h va/va_enc_vp9.h"  "VAEncPictureParameterBufferVP9"
 
 check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
-check_cpp_condition windows.h "!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)" && enable winrt || disable winrt
-
 if ! disabled w32threads && ! enabled pthreads; then
     check_func_headers "windows.h process.h" _beginthreadex &&
         enable w32threads || disable w32threads
-    if ! enabled w32threads && enabled winrt; then
+    if ! enabled w32threads && check_cpp_condition windows.h "!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)"; then
         check_func_headers "windows.h" CreateThread &&
             enable w32threads || disable w32threads
     fi
@@ -5070,14 +5049,6 @@ enabled freetype2 ||
 
 
 ##########################################
-
-makeinfo --version > /dev/null 2>&1 && enable makeinfo  || disable makeinfo
-enabled makeinfo \
-    && [ 0$(makeinfo --version | grep "texinfo" | sed 's/.*texinfo[^0-9]*\([0-9]*\)\..*/\1/') -ge 5 ] \
-    && enable makeinfo_html || disable makeinfo_html
-disabled makeinfo_html && texi2html --help 2> /dev/null | grep -q 'init-file' && enable texi2html || disable texi2html
-perl -v            > /dev/null 2>&1 && enable perl      || disable perl
-pod2man --help     > /dev/null 2>&1 && enable pod2man   || disable pod2man
 
 check_lib user32 "windows.h winuser.h" GetShellWindow -luser32
 check_lib vfw32 "windows.h vfw.h" capCreateCaptureWindow -lvfw32
