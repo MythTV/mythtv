@@ -1275,29 +1275,6 @@ non_standard_header(){
     test x"$1" != "x/usr/include" -a  x"$1" != "x/usr/local/include"
 }
 
-x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
-x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott"
-x86_mmx_cpus="$x86_mmx_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,athlon-mp,"
-x86_mmx_cpus="$x86_mmx_cpus,c3,c3-2,k6,k6-2,k6-3"
-
-x86_cpus="i386,i486,i586,i686,pentium,pentiumpro,${x86_mmx_cpus}"
-
-x86_64_cpus="x86-64,athlon64,k8,opteron,athlon64-sse3,k8-sse3,opteron-sse3"
-x86_64_cpus="$x86_64_cpus,barcelona,athlon-fx,nocona,core2"
-
-is_x86_cpu() {
-    expr ",${x86_cpus}," : ".*,$1," > /dev/null
-}
-
-is_x86_64_cpu() {
-    expr ",${x86_64_cpus}," : ".*,$1," > /dev/null
-}
-
-is_x86_mmx() {
-    expr ",${x86_mmx_cpus}," : ".*,$1," > /dev/null || is_x86_64_cpu "$1"
-}
-
-
 # CONFIG_LIST contains configurable options, while HAVE_LIST is for
 # system-dependent things.
 
