@@ -109,7 +109,6 @@
 #cmakedefine01 HAVE_STRUCT_HDR_METADATA_INFOFRAME
 #cmakedefine01 HAVE_SYS_DL_H
 #cmakedefine01 HAVE_SYS_ENDIAN_H
-#cmakedefine01 HAVE_THREADS
 #cmakedefine01 HAVE_VALGRIND_VALGRIND_H
 
 /* For libudfread */

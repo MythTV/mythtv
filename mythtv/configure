@@ -1790,7 +1790,6 @@ MYTHTV_LIST='
     audio_alsa
     audio_jack
     audio_oss
-    ffmpeg_pthreads
     mac_bundle
     proc_opt
     silent_cc
@@ -2192,7 +2191,6 @@ enable bindings_perl
 enable bindings_python
 enable bindings_php
 enable dvb
-enable ffmpeg_pthreads
 enable firewire
 enable frontend
 enable hdhomerun
@@ -5120,8 +5118,6 @@ if ! disabled pthreads && ! enabled w32threads && ! enabled os2threads; then
     fi
     check_code cc "pthread.h" "static pthread_mutex_t atomic_lock = PTHREAD_MUTEX_INITIALIZER" || disable pthreads
 fi
-
-enabled ffmpeg_pthreads && enable pthreads
 
 # Check for taglib for libmythmetadata. MSYS2 uses taglib-config.cmd
 TAGLIB_CONFIG=""
