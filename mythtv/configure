@@ -1360,22 +1360,9 @@ CONFIG_LIST="
     xmm_clobber_test
 "
 
-THREADS_LIST="
-    pthreads
-    os2threads
-    w32threads
-"
-
-ATOMICS_LIST="
-    atomics_gcc
-    atomics_suncc
-    atomics_win32
-"
-
 AUTODETECT_LIBS="
     $EXTERNAL_AUTODETECT_LIBRARY_LIST
     $HWACCEL_AUTODETECT_LIBRARY_LIST
-    $THREADS_LIST
 "
 
 ARCH_LIST="
@@ -1489,14 +1476,9 @@ ARCH_FEATURES="
 "
 
 BUILTIN_LIST="
-    atomic_cas_ptr
-    machine_rw_barrier
-    MemoryBarrier
     mm_empty
     rdtsc
     sarestart
-    sem_timedwait
-    sync_val_compare_and_swap
 "
 HAVE_LIST_CMDLINE="
     inline_asm
@@ -1572,17 +1554,13 @@ HAVE_LIST="
     $(add_suffix _external $ARCH_EXT_LIST)
     $(add_suffix _inline   $ARCH_EXT_LIST)
     $ARCH_FEATURES
-    $ATOMICS_LIST
     $BUILTIN_LIST
     $HAVE_LIST_CMDLINE
     $HAVE_LIST_PUB
     $HEADERS_LIST
     $INTRINSICS_LIST
     $SYSTEM_FUNCS
-    $THREADS_LIST
     $TYPES_LIST
-    atomics_native
-    threads
     vaapi_drm
     vaapi_glx
     vaapi_x11
@@ -1716,7 +1694,6 @@ CMDLINE_SELECT="
     $ARCH_EXT_LIST
     $CONFIG_LIST
     $HAVE_LIST_CMDLINE
-    $THREADS_LIST
     asm
     cross_compile
     debug
@@ -1904,14 +1881,6 @@ simd_align_32_if_any="avx"
 # system capabilities
 valgrind_backtrace_conflict="optimizations"
 valgrind_backtrace_deps="valgrind_valgrind_h"
-
-# threading support
-atomics_gcc_if="sync_val_compare_and_swap"
-atomics_suncc_if="atomic_cas_ptr machine_rw_barrier"
-atomics_win32_if="MemoryBarrier"
-atomics_native_if_any="$ATOMICS_LIST"
-w32threads_deps="atomics_native"
-threads_if_any="$THREADS_LIST"
 
 # hardware accelerators
 dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32"
@@ -2383,17 +2352,14 @@ for e in $env; do
 done
 
 if disabled autodetect; then
-
-    disable_weak $EXTERNAL_AUTODETECT_LIBRARY_LIST
-    disable_weak $HWACCEL_AUTODETECT_LIBRARY_LIST
+    disable_weak $AUTODETECT_LIBS
 fi
 # Mark specifically enabled, but normally autodetected libraries as requested.
 for lib in $AUTODETECT_LIBS; do
     enabled $lib && request $lib
 done
-#TODO: switch to $AUTODETECT_LIBS when $THREADS_LIST is supported the same way
-enable_weak $EXTERNAL_AUTODETECT_LIBRARY_LIST
-enable_weak $HWACCEL_AUTODETECT_LIBRARY_LIST
+
+enable_weak $AUTODETECT_LIBS
 
 disabled logging && logfile=/dev/null
 
@@ -4073,7 +4039,6 @@ case $target_os in
         SLIB_INSTALL_NAME='$(SLIBNAME_WITH_MAJOR)'
         SLIB_INSTALL_LINKS=
         SLIB_INSTALL_EXTRA_LIB='$(LIBPREF)$(FULLNAME)_dll.a $(LIBPREF)$(FULLNAME)_dll.lib'
-        enable_weak os2threads
         ;;
     gnu/kfreebsd)
         add_cppflags -D_BSD_SOURCE
@@ -4627,12 +4592,7 @@ else
     fi
 fi
 
-check_builtin atomic_cas_ptr atomic.h "void **ptr; void *oldval, *newval; atomic_cas_ptr(ptr, oldval, newval)"
-check_builtin machine_rw_barrier mbarrier.h "__machine_rw_barrier()"
-check_builtin MemoryBarrier windows.h "MemoryBarrier()"
 check_builtin sarestart signal.h "SA_RESTART"
-check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwait(s,0); sem_destroy(s)" -lpthread
-check_builtin sync_val_compare_and_swap "" "int *ptr; int oldval, newval; __sync_val_compare_and_swap(ptr, oldval, newval)"
 check_builtin x264_csp_bgr x264.h X264_CSP_BGR
 
 check_func  gettimeofday
@@ -4678,18 +4638,9 @@ check_type "va/va.h va/va_enc_vp9.h"  "VAEncPictureParameterBufferVP9"
 
 check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
-if ! disabled w32threads && ! enabled pthreads; then
-    check_func_headers "windows.h process.h" _beginthreadex &&
-        enable w32threads || disable w32threads
-    if ! enabled w32threads && check_cpp_condition windows.h "!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)"; then
-        check_func_headers "windows.h" CreateThread &&
-            enable w32threads || disable w32threads
-    fi
-fi
-
+enable pthreads
 # check for some common methods of building with pthread support
 # do this before the optional library checks as some of them require pthreads
-if ! disabled pthreads && ! enabled w32threads && ! enabled os2threads; then
     if check_lib pthreads pthread.h pthread_join   -pthread &&
        check_lib pthreads pthread.h pthread_create -pthread; then
         add_cflags -pthread
@@ -4711,7 +4662,8 @@ if ! disabled pthreads && ! enabled w32threads && ! enabled os2threads; then
         enable pthreads
     fi
     check_code cc "pthread.h" "static pthread_mutex_t atomic_lock = PTHREAD_MUTEX_INITIALIZER" || disable pthreads
-fi
+
+enabled pthreads || die "libmythtv and mythtranscode require pthreads"
 
 # Check for taglib for libmythmetadata. MSYS2 uses taglib-config.cmd
 TAGLIB_CONFIG=""
@@ -4856,9 +4808,6 @@ if enabled bdjava && ! enabled system_libbluray; then
         echo "${javac_version}" | grep -E -q '^javac (2.*)' && java_code_version=1.7
     fi
 fi
-
-enabled pthreads &&
-    check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwait(s,0); sem_destroy(s)"
 
 require zlib zlib.h zlibVersion -lz
 require zip zip.h zip_open -lzip
@@ -5836,8 +5785,6 @@ else
 fi
 cd "$here"
 
-enable frame_thread_encoder
-
 enabled asm || { arch=c; disable $ARCH_LIST $ARCH_EXT_LIST; }
 
 check_deps $CONFIG_LIST       \
@@ -5847,8 +5794,6 @@ check_deps $CONFIG_LIST       \
            $MYTHTV_CONFIG_LIST \
            $MYTHTV_HAVE_LIST  \
            $USING_LIST        \
-
-enabled threads && ! enabled pthreads && ! enabled atomics_native && die "non pthread threading without atomics not supported, try adding --enable-pthreads or --cpu=i486 or higher if you are on x86"
 
 # add_dep lib dep
 # -> enable ${lib}_deps_${dep}
@@ -5876,14 +5821,6 @@ merge_deps() {
 }
 
 map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
-
-for thread in $THREADS_LIST; do
-    if enabled $thread; then
-        test -n "$thread_type" &&
-            die "ERROR: Only one thread type must be selected." ||
-            thread_type="$thread"
-    fi
-done
 
 # Check if requested libraries were found.
 for lib in $AUTODETECT_LIBS; do
@@ -6199,7 +6136,6 @@ echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "Qt private headers        ${qtprivateheaders-no}"
 echo "Wayland extras            ${waylandextras-no}"
-echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
 fi
@@ -6539,8 +6475,6 @@ print_config CONFIG_ "$config_files" $CONFIG_LIST       \
 for opt in $MYTHTV_CONFIG_LIST $USING_LIST; do
     enabled $opt && append CCONFIG "using_$opt"
 done
-
-enabled threads && append CCONFIG "using_ffmpeg_threads"
 
 if disabled frontend; then
     echo
