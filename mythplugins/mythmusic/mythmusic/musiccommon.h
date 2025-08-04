@@ -6,7 +6,7 @@
 #include <QObject>
 
 // mythtv
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/mythpluginexport.h>
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythui/mythscreentype.h>

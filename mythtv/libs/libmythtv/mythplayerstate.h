@@ -7,8 +7,8 @@ extern "C" {
 }
 
 // MythTV
-#include "libmyth/audio/audiooutputsettings.h"
-#include "libmyth/audio/volumebase.h"
+#include "libmythtv/audio/audiooutputsettings.h"
+#include "libmythtv/audio/volumebase.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/videoouttypes.h"
