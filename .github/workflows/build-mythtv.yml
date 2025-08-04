@@ -336,7 +336,7 @@ jobs:
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
       CCACHE_MAXSIZE: 250M
-      CONFIGURE_CMD: 'cmake --preset ${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release'
+      CONFIGURE_CMD: 'cmake --preset ${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_LTO=OFF'
       MAKE_CMD: 'cmake --build build-${{ matrix.os.qt_version }}'
       TEST_CMD: 'cmake --build build-${{ matrix.os.qt_version }} -t MythTV-tests'
 
