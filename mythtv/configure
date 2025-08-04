@@ -1719,7 +1719,6 @@ MYTHTV_CONFIG_LIST='
     cygwin
     darwin
     darwin_da
-    disable_mmx_for_debugging
     dvb
     firewire
     firewire_linux
@@ -6372,10 +6371,6 @@ done
 
 enabled zlib && add_cppflags -DZLIB_CONST
 
-if enabled x86 && (disabled mmx && ! enabled disable_mmx_for_debugging); then
-    die "ERROR: MMX disabled on x86, MythTV will be very slow.\n\tDisable this check with --enable-disable-mmx-for-debugging"
-fi
-
 enabled asm || { arch=c; disable $ARCH_LIST $ARCH_EXT_LIST; }
 
 license="LGPL version 2.1 or later"
@@ -7068,13 +7063,6 @@ if enabled cpu_override; then
 fi
 
 echo # add a newline after any warnings.
-
-if enabled mmx; then
-  CONFIG_DEFINES="$CONFIG_DEFINES MMX"
-  if enabled x86_32 ; then
-    CONFIG_DEFINES="$CONFIG_DEFINES i386"
-  fi
-fi
 
 if enabled firewire; then
   if test $target_os = darwin; then

@@ -23,8 +23,9 @@
 #include "goom_tools.h"
 #include "graphic.h"
 #include "visualisations/goom/zoom_filters.h"
+#include "libmythbase/mythconfig.h"
 
-#ifdef MMX
+#if HAVE_MMX
 #define USE_ASM
 #endif
 #ifdef POWERPC
@@ -42,7 +43,7 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 /* Prototype to keep gcc from spewing warnings */
 static void select_zoom_filter (void);
 
-#ifdef MMX
+#if HAVE_MMX
 
 static int zf_use_xmmx = 0;
 static int zf_use_mmx = 0;
@@ -65,7 +66,7 @@ static void select_zoom_filter (void) {
 	}
 }
 
-#else /* MMX */
+#else /* !HAVE_MMX */
 
 static void select_zoom_filter (void) {
 	static int firsttime = 1;
@@ -75,7 +76,7 @@ static void select_zoom_filter (void) {
 	}
 }
 
-#endif /* MMX */
+#endif /* HAVE_MMX */
 
 
 guint32 mmx_zoom_size;
@@ -697,7 +698,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	mmx_zoom_size = prevX * prevY;
 
 #ifdef USE_ASM
-#ifdef MMX
+#if HAVE_MMX
 	if (zf_use_xmmx) {
             zoom_filter_xmmx (prevX, prevY,expix1, expix2,
                               brutS, brutD, buffratio, precalCoef);
