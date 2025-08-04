@@ -848,7 +848,7 @@ void Scheduler::SlaveConnected(const RecordingList &slavelist)
                                        Qt::CaseInsensitive) == 0)
             {
                 if (sp->GetInputID() == rp->GetInputID() ||
-                    m_sinputInfoMap[sp->GetInputID()].m_sgroupId ==
+                    m_sinputInfoMap.value(sp->GetInputID()).m_sgroupId ==
                     rp->GetInputID())
                 {
                     found = true;
@@ -891,7 +891,7 @@ void Scheduler::SlaveConnected(const RecordingList &slavelist)
         if (sp->GetInputID() && !found)
         {
             sp->m_mplexId = sp->QueryMplexID();
-            sp->m_sgroupId = m_sinputInfoMap[sp->GetInputID()].m_sgroupId;
+            sp->m_sgroupId = m_sinputInfoMap.value(sp->GetInputID()).m_sgroupId;
             m_recList.push_back(new RecordingInfo(*sp));
             m_recListChanged = true;
             sp->AddHistory(false);

@@ -673,7 +673,7 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
         if (m_fsMap.contains(hostname))
         {
             // looking for file on connected host, query from it
-            if (m_fsMap[hostname]->SendReceiveStringList(slist))
+            if (m_fsMap.value(hostname)->SendReceiveStringList(slist))
                 hash = slist[0];
         }
         // I deleted the incorrect SQL select that was supposed to get
@@ -817,7 +817,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
             QReadLocker rlock(&m_fsLock);
             if (m_fsMap.contains(wantHost))
             {
-                remsock = m_fsMap[wantHost];
+                remsock = m_fsMap.value(wantHost);
                 remsock->IncrRef();
             }
         }
@@ -881,7 +881,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
             QReadLocker rlock(&m_fsLock);
             if (m_fsMap.contains(wantHost))
             {
-                remsock = m_fsMap[wantHost];
+                remsock = m_fsMap.value(wantHost);
                 remsock->IncrRef();
             }
         }
@@ -933,7 +933,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
             return true;
         }
 
-        ft = m_ftMap[recnum];
+        ft = m_ftMap.value(recnum);
         ft->IncrRef();
     }
 

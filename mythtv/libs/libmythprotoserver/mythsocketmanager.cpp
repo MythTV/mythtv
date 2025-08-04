@@ -140,7 +140,7 @@ SocketHandler *MythSocketManager::GetConnectionBySocket(MythSocket *sock)
     if (!m_socketMap.contains(sock))
         return nullptr;
 
-    SocketHandler *handler = m_socketMap[sock];
+    SocketHandler *handler = m_socketMap.value(sock);
     handler->IncrRef();
     return handler;
 }
