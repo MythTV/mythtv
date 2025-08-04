@@ -25,13 +25,6 @@
 #include "visualisations/goom/zoom_filters.h"
 #include "libmythbase/mythconfig.h"
 
-#if HAVE_MMX
-#define USE_ASM
-#endif
-#ifdef POWERPC
-#define USE_ASM
-#endif
-
 static constexpr int8_t EFFECT_DISTORS    { 4 };
 static constexpr int8_t EFFECT_DISTORS_SL { 2 };
 
@@ -80,21 +73,6 @@ static void select_zoom_filter (void) {
 
 
 guint32 mmx_zoom_size;
-
-#ifdef USE_ASM
-
-#ifdef POWERPC
-#include "altivec.h"
-extern unsigned int useAltivec;
-extern const void ppc_zoom (unsigned int *frompixmap, unsigned int *topixmap,
-                            unsigned int sizex, unsigned int sizey,
-                            unsigned int *brutS, unsigned int *brutD,
-                            unsigned int buffratio, GoomCoefficients &precalCoef);
-
-#endif /* PowerPC */
-
-#endif /* ASM */
-
 
 unsigned int *coeffs = nullptr, *freecoeffs = nullptr;
 
@@ -468,24 +446,6 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 	}
 }
 
-#ifdef USE_ASM
-void setAsmUse (int useIt);
-int getAsmUse (void);
-
-static int use_asm = 1;
-void
-setAsmUse (int useIt)
-{
-	use_asm = useIt;
-}
-
-int
-getAsmUse ()
-{
-	return use_asm;
-}
-#endif
-
 /*===============================================================*/
 void
 zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
@@ -697,7 +657,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	zoom_width = prevX;
 	mmx_zoom_size = prevX * prevY;
 
-#ifdef USE_ASM
 #if HAVE_MMX
 	if (zf_use_xmmx) {
             zoom_filter_xmmx (prevX, prevY,expix1, expix2,
@@ -708,11 +667,6 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	} else {
             c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
         }
-#endif
-
-#ifdef POWERPC
-	ppc_zoom (expix1, expix2, prevX, prevY, brutS, brutD, buffratio,precalCoef);
-#endif
 #else
 	c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
 #endif
