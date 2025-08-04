@@ -75,7 +75,7 @@ void ExitPrompter::handleExit()
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         int limit = std::min(4, allproblems.size());
 #else
-        int limit = std::min(4LL, allproblems.size());
+        int limit = std::min(static_cast<qsizetype>(4), allproblems.size());
 #endif
         for (int i = 0; i < limit; ++i)
         {
