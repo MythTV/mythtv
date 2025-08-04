@@ -294,7 +294,7 @@ void AutoExpire::RunExpirer(void)
             {
                 UpdateEntry ue = m_updateQueue.dequeue();
                 if (ue.m_encoder > 0)
-                    m_usedEncoders[ue.m_encoder] = ue.m_fsID;
+                    m_usedEncoders[ue.m_encoder] = ue.m_fsID; // clazy:exclude=readlock-detaching
             }
             m_updateLock.unlock();
 
