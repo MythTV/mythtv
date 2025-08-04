@@ -504,7 +504,7 @@ using_frontend {
     using_vaapi {
         HEADERS += decoders/mythvaapicontext.h
         SOURCES += decoders/mythvaapicontext.cpp
-        LIBS    += -lva -lva-x11 -lva-glx -lva-drm
+        LIBS    += -lva
     }
 
     using_nvdec {
@@ -568,8 +568,17 @@ using_frontend {
 
 
         using_vaapi {
-            HEADERS += opengl/mythvaapiinterop.h   opengl/mythvaapiglxinterop.h
-            SOURCES += opengl/mythvaapiinterop.cpp opengl/mythvaapiglxinterop.cpp
+            HEADERS += opengl/mythvaapiinterop.h
+            SOURCES += opengl/mythvaapiinterop.cpp
+            LIBS    += -lva
+            using_vaapi_glx {
+                HEADERS += opengl/mythvaapiglxinterop.h
+                SOURCES += opengl/mythvaapiglxinterop.cpp
+                LIBS    += -lva-glx
+                using_vaapi_x11 {
+                    LIBS    += -lva-x11
+                }
+            }
         }
 
         using_vdpau:using_x11 {
@@ -605,9 +614,10 @@ using_frontend {
                 SOURCES += opengl/mythmmalinterop.cpp
             }
 
-            using_vaapi {
+            using_vaapi_drm {
                 HEADERS += opengl/mythvaapidrminterop.h
                 SOURCES += opengl/mythvaapidrminterop.cpp
+                LIBS    += -lva-drm
             }
         }
 
