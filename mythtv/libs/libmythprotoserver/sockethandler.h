@@ -24,10 +24,10 @@ class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
     bool GetsStandardEvents(void) const { return m_standardEvents; }
     bool GetsSystemEvents(void) const   { return m_systemEvents; }
 
-    QString GetHostname(void)           { return m_hostname; }
+    QString GetHostname(void) const     { return m_hostname; }
 
-    MythSocket *GetSocket(void)         { return m_socket; }
-    MythSocketManager *GetParent(void)  { return m_parent; }
+    MythSocket *GetSocket(void) const   { return m_socket; }
+    MythSocketManager *GetParent(void) const { return m_parent; }
 
     bool WriteStringList(const QStringList &strlist);
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length=0);

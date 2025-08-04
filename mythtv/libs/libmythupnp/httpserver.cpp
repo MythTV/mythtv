@@ -381,16 +381,16 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
         }
     }
 
-    HttpServerExtensionList::iterator it = m_extensions.begin();
-
-    for (; (it != m_extensions.end()) && !bProcessed; ++it)
+    for (const auto& ext : std::as_const(m_extensions))
     {
+        if (bProcessed)
+            break;
         try
         {
             if (pRequest->m_eType == RequestTypeOptions)
-                bProcessed = (*it)->ProcessOptions(pRequest);
+                bProcessed = ext->ProcessOptions(pRequest);
             else
-                bProcessed = (*it)->ProcessRequest(pRequest);
+                bProcessed = ext->ProcessRequest(pRequest);
         }
         catch(...)
         {

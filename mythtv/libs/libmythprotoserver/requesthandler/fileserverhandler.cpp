@@ -507,10 +507,10 @@ FileSystemInfoList FileServerHandler::QueryAllFileSystems(void)
 
     {
         QReadLocker rlock(&m_fsLock);
-
-        QMap<QString, SocketHandler*>::iterator i;
-        for (i = m_fsMap.begin(); i != m_fsMap.end(); ++i)
-            disks << FileSystemInfoManager::GetInfoList((*i)->GetSocket());
+        for (const auto* fs : std::as_const(m_fsMap))
+        {
+            disks << FileSystemInfoManager::GetInfoList(fs->GetSocket());
+        }
     }
 
     return disks;
