@@ -1,6 +1,7 @@
 #include "goomconfig.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <random>
@@ -15,16 +16,16 @@
 
 //#define VERBOSE
 
-static constexpr gint32  STOP_SPEED   { 128 };
+static constexpr int32_t STOP_SPEED   { 128 };
 static constexpr int16_t TIME_BTW_CHG { 300 };
 
 /**-----------------------------------------------------**
  **  SHARED DATA                                        **
  **-----------------------------------------------------**/
-static guint32 *pixel;
-static guint32 *back;
-static guint32 *p1, *p2, *tmp;
-static guint32 cycle;
+static uint32_t *pixel;
+static uint32_t *back;
+static uint32_t *p1, *p2, *tmp;
+static uint32_t cycle;
 
 struct GoomState {
 	int m_drawIfs;
@@ -53,7 +54,7 @@ const std::array<const GoomState,STATES_NB> kStates {{
 
 const GoomState *curGState = &kStates[4];
 
-guint32 resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
+uint32_t resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
 
 // effet de ligne..
 static GMLine *gmline1 = nullptr;
@@ -61,7 +62,7 @@ static GMLine *gmline2 = nullptr;
 
 void    choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far);
 
-void goom_init (guint32 resx, guint32 resy, int cinemascope) {
+void goom_init (uint32_t resx, uint32_t resy, int cinemascope) {
 #ifdef VERBOSE
 	printf ("GOOM: init (%d, %d);\n", resx, resy);
 #endif
@@ -77,8 +78,8 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 	c_offset = c_black_height * resx;
 	c_resoly = resy - (c_black_height * 2);
 
-	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
+	pixel = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+	back  = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
 	//RAND_INIT ();
 	srand ((uintptr_t) pixel);
 	if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
@@ -88,8 +89,8 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
                 
 	cycle = 0;
 
-	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
-	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
+	p1 = (uint32_t *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
+	p2 = (uint32_t *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
 	init_ifs (resx, c_resoly);
 	gmline1 = goom_lines_init (resx, c_resoly, GML_HLINE, c_resoly, GML_BLACK, GML_CIRCLE, 0.4F * (float) c_resoly, GML_VERT);
@@ -101,7 +102,7 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 }
 
 
-void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
+void goom_set_resolution (uint32_t resx, uint32_t resy, int cinemascope) {
 	free (pixel);
 	free (back);
 
@@ -117,12 +118,12 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 	resoly = resy;
 	buffsize = resx * resy;
 
-	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	memset (pixel, 0, (buffsize * sizeof (guint32)) + 128);
-	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	memset (back, 0,  (buffsize * sizeof (guint32)) + 128);
-	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
-	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
+	pixel = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+	memset (pixel, 0, (buffsize * sizeof (uint32_t)) + 128);
+	back = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+	memset (back, 0,  (buffsize * sizeof (uint32_t)) + 128);
+	p1 = (uint32_t *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
+	p2 = (uint32_t *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
 	init_ifs (resx, c_resoly);
 	goom_lines_set_res (gmline1, resx, c_resoly);
@@ -130,7 +131,7 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 }
 
 
-guint32 * goom_update (GoomDualData& data, int forceMode) {
+uint32_t * goom_update (GoomDualData& data, int forceMode) {
 	static int s_lockVar = 0;		// pour empecher de nouveaux changements
 	static int s_totalGoom = 0;		// nombre de gooms par seconds
 	static int s_aGoom = 0;			// un goom a eu lieu..
@@ -164,8 +165,8 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	ZoomFilterData *pzfd = nullptr;
 
 	/* test if the config has changed, update it if so */
-	guint32 pointWidth = (resolx * 2) / 5;
-	guint32 pointHeight = ((c_resoly) * 2) / 5;
+	uint32_t pointWidth = (resolx * 2) / 5;
+	uint32_t pointHeight = ((c_resoly) * 2) / 5;
 
 	/* ! etude du signal ... */
 	int incvar = 0;				// volume du son
@@ -429,7 +430,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			// if (goomvar % 1 == 0)
 			{
 				s_lockVar = 50;
-				guint32 newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
+				uint32_t newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
 				// retablir le zoom avant..
                                 // Pseudo-random is good enough. Don't need a true random.
                                 // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
@@ -476,7 +477,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 					s_zfd.middleY = c_resoly / 2;
 				}
 
-				guint32 vtmp = iRAND (15);
+				uint32_t vtmp = iRAND (15);
 				switch (vtmp) {
 				case 0:
                                     
@@ -542,7 +543,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 					s_zfd.hPlaneEffect = iRAND (2) ? 0 : s_zfd.hPlaneEffect;
 				}
 
-				if (newvit < (guint32)s_zfd.vitesse)	// on accelere
+				if (newvit < (uint32_t)s_zfd.vitesse)	// on accelere
 				{
 					pzfd = &s_zfd;
 					if (((newvit < STOP_SPEED - 7) &&
@@ -664,9 +665,9 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	 */
 
 	if (s_goomLimit!=0)
-        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data, (float)s_accelVar/s_goomLimit, curGState->m_drawTentacle);
+        tentacle_update((int32_t*)(p2 + c_offset), (int32_t*)(p1 + c_offset), resolx, c_resoly, data, (float)s_accelVar/s_goomLimit, curGState->m_drawTentacle);
 	else
-        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data,0.0F, curGState->m_drawTentacle);
+        tentacle_update((int32_t*)(p2 + c_offset), (int32_t*)(p1 + c_offset), resolx, c_resoly, data,0.0F, curGState->m_drawTentacle);
 
 /*
 	{
@@ -814,7 +815,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		}
 	}
 
-	guint32 *return_val = p1;
+	uint32_t *return_val = p1;
 	tmp = p1;
 	p1 = p2;
 	p2 = tmp;
@@ -969,7 +970,7 @@ void update_message (char *message) {
 }
 */
 
-guint32 goom_rand (void)
+uint32_t goom_rand (void)
 {
     static std::random_device rd;
     static std::mt19937 mt(rd());

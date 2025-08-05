@@ -1,6 +1,6 @@
 #include "surface.h"
-#include <stdlib.h>
-#include <inttypes.h>	// added for amd64 support
+#include <cstdlib>
+#include <cstdint> // for uintptr_t
 
 Surface * surface_new (int w, int h) {
   Surface * s = (Surface*)malloc(sizeof(Surface));

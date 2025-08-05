@@ -1,4 +1,5 @@
 #include <array>
+#include <cstdint>
 
 #include "ifs.h"
 #include "goomconfig.h"
@@ -11,7 +12,7 @@
 #include "goom_tools.h"
 
 /* NOLINTNEXTLINE(readability-non-const-parameter) */
-void ifs_update (guint32 * data, const guint32 * back, int width, int height,
+void ifs_update (uint32_t * data, const uint32_t * back, int width, int height,
 						int increment)
 {
 	static int s_couleur = 0xc0c0c0c0;

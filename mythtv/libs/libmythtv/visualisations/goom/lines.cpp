@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 
@@ -11,6 +12,7 @@
 #include "drawmethods.h"
 #include "goom_core.h"
 #include "goom_tools.h"
+#include "goomconfig.h"
 
 extern unsigned int resolx, c_resoly;
 
@@ -70,7 +72,7 @@ genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 	}
 }
 
-static guint32 getcouleur (int mode)
+static uint32_t getcouleur (int mode)
 {
 	switch (mode) {
 	case GML_RED:
@@ -200,7 +202,7 @@ void
 goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 {
 	if (line != nullptr) {
-		guint32 color = line->color;
+		uint32_t color = line->color;
 		GMUnitPointer *pt = &(line->points[0]);
 
 		float   cosa = cosf (pt->angle) / 1000.0F;

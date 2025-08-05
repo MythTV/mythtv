@@ -22,7 +22,7 @@ VideoVisualGoom::VideoVisualGoom(AudioPlayer* Audio, MythRender* Render, bool HD
     int width  = (sz.width() > max_width)   ? max_width  : sz.width();
     int height = (sz.height() > max_height) ? max_height : sz.height();
     m_area = QRect(0, 0, width, height);
-    goom_init(static_cast<guint32>(width), static_cast<guint32>(height), 0);
+    goom_init(static_cast<uint32_t>(width), static_cast<uint32_t>(height), 0);
     LOG(VB_GENERAL, LOG_INFO, QString("Initialised Goom (%1x%2)").arg(width).arg(height));
 }
 

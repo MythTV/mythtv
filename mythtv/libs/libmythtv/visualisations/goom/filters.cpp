@@ -14,13 +14,14 @@
 
 #include <algorithm>
 #include <array>
-#include <cinttypes>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 
 #include "filters.h"
 #include "goom_tools.h"
+#include "goomconfig.h"
 #include "graphic.h"
 #include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
@@ -28,8 +29,8 @@
 static constexpr int8_t EFFECT_DISTORS    { 4 };
 static constexpr int8_t EFFECT_DISTORS_SL { 2 };
 
-extern volatile guint32 resolx;
-extern volatile guint32 c_resoly;
+extern volatile uint32_t resolx;
+extern volatile uint32_t c_resoly;
 
 void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, const signed int *brutS, const signed int *brutD);
 
@@ -72,7 +73,7 @@ static void select_zoom_filter (void) {
 #endif /* HAVE_MMX */
 
 
-guint32 mmx_zoom_size;
+uint32_t mmx_zoom_size;
 
 unsigned int *coeffs = nullptr, *freecoeffs = nullptr;
 
@@ -81,11 +82,11 @@ signed int *brutD = nullptr, *freebrutD = nullptr;	// dest
 signed int *brutT = nullptr, *freebrutT = nullptr;	// temp (en cours de génération)
 
 // TODO : virer
-guint32 *expix1 = nullptr;				// pointeur exporte vers p1
-guint32 *expix2 = nullptr;				// pointeur exporte vers p2
+uint32_t *expix1 = nullptr;				// pointeur exporte vers p1
+uint32_t *expix2 = nullptr;				// pointeur exporte vers p2
 // fin TODO
 
-guint32 zoom_width;
+uint32_t zoom_width;
 
 unsigned int     prevX = 0, prevY = 0;
 

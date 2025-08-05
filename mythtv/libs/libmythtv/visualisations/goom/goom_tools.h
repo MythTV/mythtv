@@ -38,7 +38,7 @@ static inline void RAND_CLOSE()
     rand_tab = nullptr;
 }
 
-//#define iRAND(i) ((guint32)((float)i * RAND()/RAND_MAX))
+//#define iRAND(i) ((uint32_t)((float)i * RAND()/RAND_MAX))
 static inline unsigned int iRAND(int i)
     { return static_cast<unsigned int>(RAND()) % i; }
 
