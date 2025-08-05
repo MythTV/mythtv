@@ -1088,19 +1088,128 @@ bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr
     return true;
 }
 
+// Structure to hold channel label arrays
+typedef struct {
+    AudioChannelLabel* labels;
+    UInt32 count;
+} ChannelLabels;
+
+// Function to extract channel labels from layout
+OSStatus ExtractChannelLabels(const AudioChannelLayout* layout, ChannelLabels* outLabels) {
+    if (layout->mNumberChannelDescriptions > 0) {
+        // Layout uses explicit channel descriptions
+        outLabels->count = layout->mNumberChannelDescriptions;
+        outLabels->labels = (AudioChannelLabel *)malloc(outLabels->count * sizeof(AudioChannelLabel));
+
+        if (!outLabels->labels) return kAudio_MemFullError;
+
+        for (UInt32 i = 0; i < outLabels->count; i++) {
+            outLabels->labels[i] = layout->mChannelDescriptions[i].mChannelLabel;
+        }
+    } else {
+        // Expand standard layout tag to get channel descriptions
+        UInt32 propertySize = 0;
+        OSStatus status = AudioFormatGetPropertyInfo(
+            kAudioFormatProperty_ChannelLayoutForTag,
+            sizeof(layout->mChannelLayoutTag),
+            &layout->mChannelLayoutTag,
+            &propertySize
+        );
+
+        if (status != noErr) return status;
+
+        AudioChannelLayout* expanded = (AudioChannelLayout*)malloc(propertySize);
+        if (!expanded) return kAudio_MemFullError;
+
+        status = AudioFormatGetProperty(
+            kAudioFormatProperty_ChannelLayoutForTag,
+            sizeof(layout->mChannelLayoutTag),
+            &layout->mChannelLayoutTag,
+            &propertySize,
+            expanded
+        );
+
+        if (status != noErr) {
+            free(expanded);
+            return status;
+        }
+
+        if (expanded->mNumberChannelDescriptions > 0) {
+            outLabels->count = expanded->mNumberChannelDescriptions;
+            outLabels->labels = (AudioChannelLabel*) malloc(outLabels->count * sizeof(AudioChannelLabel));
+
+            if (!outLabels->labels) {
+                free(expanded);
+                return kAudio_MemFullError;
+            }
+
+            for (UInt32 i = 0; i < expanded->mNumberChannelDescriptions; i++) {
+                outLabels->labels[i] = expanded->mChannelDescriptions[i].mChannelLabel;
+            }
+        } else {
+            // Fallback for layouts with no descriptions
+            outLabels->count = 0;
+        }
+
+        free(expanded);
+    }
+
+    return noErr;
+}
+
+// Generate channel map by comparing layouts
+OSStatus CreateChannelMap(const AudioChannelLayout* standard,
+                          const AudioChannelLayout* custom,
+                          SInt32** outMap,
+                          UInt32* outCount) {
+    ChannelLabels stdLabels, customLabels;
+
+    // Extract labels from both layouts
+    OSStatus status;
+    if ((status = ExtractChannelLabels(standard, &stdLabels)) != noErr) return status;
+    if ((status = ExtractChannelLabels(custom, &customLabels)) != noErr) {
+        free(stdLabels.labels);
+        return status;
+    }
+
+    // Create channel map array
+    *outCount = customLabels.count;
+    *outMap = (SInt32*)malloc(customLabels.count * sizeof(SInt32));
+
+    if (!*outMap) {
+        free(stdLabels.labels);
+        free(customLabels.labels);
+        return kAudio_MemFullError;
+    }
+
+    // Initialize with silence (-1)
+    for (UInt32 i = 0; i < customLabels.count; i++) {
+        (*outMap)[i] = -1;
+    }
+
+    // Find matching channels
+    for (UInt32 customIdx = 0; customIdx < customLabels.count; customIdx++) {
+        for (UInt32 stdIdx = 0; stdIdx < stdLabels.count; stdIdx++) {
+            if (customLabels.labels[customIdx] == stdLabels.labels[stdIdx]) {
+                (*outMap)[customIdx] = (SInt32)stdIdx;
+                break;  // Use first match
+            }
+        }
+    }
+
+    // Cleanup
+    free(stdLabels.labels);
+    free(customLabels.labels);
+
+    return noErr;
+}
+
 int CoreAudioData::OpenAnalog()
 {
     AudioComponentDescription    desc;
     AudioStreamBasicDescription  DeviceFormat;
     AudioChannelLayout          *layout;
-    AudioChannelLayout           new_layout;
     AudioDeviceID                defaultDevice = GetDefaultOutputDevice();
-    AudioObjectPropertyAddress pa
-    {
-	kAudioHardwarePropertyDevices,
-	kAudioObjectPropertyScopeGlobal,
-	kMythAudioObjectPropertyElementMain
-    };
 
     LOG(VB_AUDIO, LOG_INFO, "CoreAudioData::OpenAnalog: Entering");
 
@@ -1203,16 +1312,24 @@ int CoreAudioData::OpenAnalog()
               .arg(StreamDescriptionToString(DeviceFormat)));
     }
     /* Get the channel layout of the device side of the unit */
-    pa.mSelector = kAudioDevicePropertyPreferredChannelLayout;
-    err = AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &pa,
-					 0, nullptr, &param_size);
-
-    if(!err)
+    Boolean bWritable;
+    Boolean bLayoutSetUsingChannelMap = false;
+    err = AudioUnitGetPropertyInfo(mOutputUnit,
+                           kAudioUnitProperty_AudioChannelLayout,
+                           kAudioUnitScope_Output,
+                           0,
+                           &param_size,
+                           &bWritable);
+    if (err == noErr)
     {
         layout = (AudioChannelLayout *) malloc(param_size);
 
-	err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
-					 0, nullptr, &param_size, layout);
+	    err = AudioUnitGetProperty(mOutputUnit,
+                            kAudioUnitProperty_AudioChannelLayout,
+                            kAudioUnitScope_Output,
+                            0,
+                            layout,
+                            &param_size);
 
         /* We need to "fill out" the ChannelLayout, because there are multiple ways that it can be set */
         if(layout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
@@ -1223,9 +1340,10 @@ int CoreAudioData::OpenAnalog()
                                          &param_size,
                                          layout);
             if (err)
-                LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:OpenAnalog: Can't retrieve current channel layout");
+                LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: Can't retrieve bitmap channel layout Error = %1")
+                .arg(err));
         }
-        else if(layout->mChannelLayoutTag != kAudioChannelLayoutTag_UseChannelDescriptions )
+        if(layout->mChannelLayoutTag != kAudioChannelLayoutTag_UseChannelDescriptions )
         {
             /* layouttags defined channellayout */
             err = AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForTag,
@@ -1234,36 +1352,77 @@ int CoreAudioData::OpenAnalog()
                                          &param_size,
                                          layout);
             if (err)
-                LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:OpenAnalog: Can't retrieve current channel layout");
+                LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: Can't retrieve bitmap channel layout Error = %1")
+                .arg(err));
         }
 
+        // layout->mChannelLayoutTag should now be kAudioChannelLayoutTag_UseChannelDescriptions
         LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: Layout of AUHAL has %1 channels")
               .arg(layout->mNumberChannelDescriptions));
+
+        QString channelMapDescription; // String representation of channelMap
 
         int channels_found = 0;
         for(UInt32 i = 0; i < layout->mNumberChannelDescriptions; i++)
         {
-            LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: this is channel: %1")
-                  .arg(layout->mChannelDescriptions[i].mChannelLabel));
 
             switch( layout->mChannelDescriptions[i].mChannelLabel)
             {
                 case kAudioChannelLabel_Left:
+                    channelMapDescription.append("L");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_Right:
+                    channelMapDescription.append("R");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_Center:
+                    channelMapDescription.append("C");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_LFEScreen:
+                    channelMapDescription.append("LFE");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_LeftSurround:
+                    channelMapDescription.append("Ls");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_RightSurround:
+                    channelMapDescription.append("Rs");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_RearSurroundLeft:
+                    channelMapDescription.append("Rls");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_RearSurroundRight:
+                    channelMapDescription.append("Rrs");
+                    channels_found++;
+                    break;
                 case kAudioChannelLabel_CenterSurround:
+                    channelMapDescription.append("Cs");
+                    channels_found++;
+                    break;
+                case kAudioChannelLabel_LeftCenter:
+                    channelMapDescription.append("Lc");
+                    channels_found++;
+                    break;
+                case kAudioChannelLabel_RightCenter:
+                    channelMapDescription.append("Rc");
                     channels_found++;
                     break;
                 default:
+                    // There are many more channels but right now we seem to only cater for up to 7.1
+                    channelMapDescription.append("?");
                     LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::unrecognized channel form provided by driver: %1")
-                          .arg(layout->mChannelDescriptions[i].mChannelLabel));
+                        .arg(layout->mChannelDescriptions[i].mChannelLabel));
+            }
+            if (i < layout->mNumberChannelDescriptions - 1) {
+                channelMapDescription.append(" "); // for readability
             }
         }
+        LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::OpenAnalog: Channel map found: ").append(channelMapDescription));
         if(channels_found == 0)
         {
             LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:Audio device is not configured. "
@@ -1271,47 +1430,112 @@ int CoreAudioData::OpenAnalog()
                  "the \"Audio Midi Setup\" utility in /Applications/"
                  "Utilities.");
         }
+        else
+        {
+            // Set the channelMap directly. In certain circumstances the channel order may not be expressible
+            // with a kAudioChannelLayoutTag (eg. HDMI can swap the C and LFE channel order in 5.1 due to ambiguous standards)
+            // so we need to cross check against the standard channel order
+
+            AudioChannelLayout* standardLayout = (AudioChannelLayout*) calloc(1, sizeof(AudioChannelLayout));
+            switch(layout->mNumberChannelDescriptions)
+            {
+                case 1:
+                    standardLayout->mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+                    break;
+                case 2:
+                    standardLayout->mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+                    break;
+                case 6:
+                    // L   R   C    LFE  LS   RS
+                    standardLayout->mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1;
+                    break;
+                case 8:
+                    // L R C LFE Ls Rs Lc Rc
+                    standardLayout->mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A;
+                    break;
+            }
+
+            SInt32* channelMap = nullptr;
+            UInt32 mapCount = 0;
+
+            err = CreateChannelMap(standardLayout, layout, &channelMap, &mapCount);
+
+            if (err != noErr)
+            {
+                LOG(VB_AUDIO, LOG_WARNING, "CoreAudioData Warning:Audio device cannot be configured using a channel map.");
+            }
+            else
+            {
+                for (UInt32 i=0; i<mapCount; i++) {
+                    LOG(VB_AUDIO, LOG_DEBUG, QString("ChannelMap[%1] %2").arg(i).arg(channelMap[i]));
+                }
+                err = AudioUnitSetProperty( mOutputUnit,
+                                        kAudioOutputUnitProperty_ChannelMap,
+                                        kAudioUnitScope_Input,
+                                        0,
+                                        channelMap,
+                                        mapCount * sizeof(SInt32));
+                if (err)
+                {
+                    LOG(VB_AUDIO, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: couldn't set channels layout using kAudioOutputUnitProperty_ChannelMap [%1]")
+                        .arg(err));
+                }
+                else {
+                    LOG(VB_GENERAL, LOG_INFO, "CoreAudioData::OpenAnalog: channels layout was set using kAudioOutputUnitProperty_ChannelMap");
+                    bLayoutSetUsingChannelMap = true;
+                }
+            }
+            free(standardLayout);
+            free(channelMap);
+        }
         free(layout);
     }
     else
     {
-        LOG(VB_GENERAL, LOG_WARNING, "CoreAudioData Warning:this driver does not support kAudioDevicePropertyPreferredChannelLayout.");
+        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:this driver does not support kAudioUnitProperty_AudioChannelLayout Error = %1")
+        .arg(err));
     }
 
-    memset (&new_layout, 0, sizeof(new_layout));
-    switch(mCA->m_channels)
-    {
-        case 1:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
-            break;
-        case 2:
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
-            break;
-        case 6:
-            //  3F2-LFE        L   R   C    LFE  LS   RS
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1;
-            break;
-        case 8:
-            // We need
-            // 3F4-LFE        L   R   C    LFE  Rls  Rrs  LS   RS
-            // but doesn't exist, so we'll swap channels later
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
-            break;
+    // Use standard layout if unable to acquire layout to set the channel map directly
+    if (!bLayoutSetUsingChannelMap)  {
+        param_size = sizeof(AudioChannelLayout);
+        AudioChannelLayout *p_new_layout = (AudioChannelLayout*) calloc (1, param_size);
+        switch(mCA->m_channels)
+        {
+            case 1:
+                p_new_layout->mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+                break;
+            case 2:
+                p_new_layout->mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+                break;
+            case 6:
+                //  3F2-LFE        L   R   C    LFE  LS   RS
+                p_new_layout->mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1;
+                break;
+            case 8:
+                // We need
+                // 3F4-LFE        L   R   C    LFE  Rls  Rrs  LS   RS
+                // but doesn't exist, so we'll swap channels later
+                p_new_layout->mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+                break;
+        }
+        // Set p_new_layout as the layout */
+        err = AudioUnitSetProperty(mOutputUnit,
+                                kAudioUnitProperty_AudioChannelLayout,
+                                kAudioUnitScope_Input,
+                                0,
+                                p_new_layout, param_size);
+        if (err)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: couldn't set channels layout [%1]")
+                .arg(err));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, "CoreAudioData::OpenAnalog: channels layout was set using kAudioUnitProperty_AudioChannelLayout");
+        }
+        free(p_new_layout);
     }
-    /* Set new_layout as the layout */
-    err = AudioUnitSetProperty(mOutputUnit,
-                               kAudioUnitProperty_AudioChannelLayout,
-                               kAudioUnitScope_Input,
-                               0,
-                               &new_layout, sizeof(new_layout));
-    if (err)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, QString("CoreAudioData Warning:OpenAnalog: couldn't set channels layout [%1]")
-             .arg(err));
-    }
-
-    if(new_layout.mNumberChannelDescriptions > 0)
-        free(new_layout.mChannelDescriptions);
 
     // Set up the audio output unit
     int formatFlags;
