@@ -22,7 +22,7 @@
 #include "filters.h"
 #include "goom_tools.h"
 #include "graphic.h"
-#include "visualisations/goom/zoom_filters.h"
+#include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
 
 static constexpr int8_t EFFECT_DISTORS    { 4 };

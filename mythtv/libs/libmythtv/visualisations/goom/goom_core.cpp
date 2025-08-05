@@ -1,4 +1,4 @@
-#include "../config.h"
+#include "goomconfig.h"
 
 #include <algorithm>
 #include <cstdio>

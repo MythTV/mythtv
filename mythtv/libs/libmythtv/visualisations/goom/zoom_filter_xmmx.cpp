@@ -1,4 +1,4 @@
-#include "visualisations/goom/zoom_filters.h"
+#include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
 
 #if HAVE_MMX && !(defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64))
