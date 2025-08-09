@@ -110,6 +110,33 @@ installLibs(){
   done <<< "$pathDepList"
 }
 
+fixMissingQt(){
+  # occasionally macdeployqt misses some linked Qt frameworks that are rpathd in a non-standard way
+  # We need to find the missing frameworks, copy them into the app bundle, and link them appropriately
+
+  # find all @rpath Qt Frameworks
+  QT_FMWKS=$(otool -L $APP_FMWK_DIR/Qt*.framework/Versions/Current/Qt*|grep "@rpath"|grep "Qt.*framework"|sort -u|sed 's^.*@rpath/^^'  | sed 's^\.framework.*^.framework^')
+  while read qtFMWK; do
+    if [ ! -d $APP_FMWK_DIR/$qtFMWK ]; then
+      echo '\033[0;34m'"      +++ installLibs: Installing $qtFMWK into app"'\033[m'
+      # copy in the Qt* framework and set variables
+      sourcePath=$(find "$PKGMGR_PREFIX" -name "$qtFMWK" -print -quit)
+      cp -RHn "$sourcePath" "$APP_FMWK_DIR/"
+      libName=${qtFMWK%".framework"}
+      # update the framework's library file ID to point to its new position in the app bundle
+      # install name tool needs the real file, so use greadlink to get the final path from the symlink
+      libFile=$(greadlink -f $APP_FMWK_DIR/$qtFMWK/$libName)
+      newID="@executable_path/../Frameworks/$qtFMWK/Versions/Current/$libName"
+      NAME_TOOL_CMD="install_name_tool -id $newID $libFile"
+      eval "${NAME_TOOL_CMD}"
+      # update links to (and copy in missing) any linked libraries required by the framework
+      installLibs $libFile
+    fi
+  done <<< "$QT_FMWKS"
+}
+
+# Fix any Qt Frameworks missed by macdeployqt
+fixMissingQt
 # Look over all dylibs in the APP Bundle and correct any dylib path's that macdeployqt misses.
 for fileName in $APP_CONTENTS_DIR/**/*(.); do
   if [[ -d $fileName || -L $fileName ]]; then continue; fi
