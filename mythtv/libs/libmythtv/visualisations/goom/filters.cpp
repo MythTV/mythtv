@@ -25,6 +25,7 @@
 #include "graphic.h"
 #include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythrandom.h"
 
 static constexpr int8_t EFFECT_DISTORS    { 4 };
 static constexpr int8_t EFFECT_DISTORS_SL { 2 };
@@ -97,7 +98,7 @@ static bool waveEffect = false;
 static bool hypercosEffect = false;
 static int vPlaneEffect = 0;
 static int hPlaneEffect = 0;
-static char noisify = 2;
+static char noisify = 1;
 static int middleX, middleY;
 
 //static unsigned char sqrtperte = 16 ;
@@ -186,7 +187,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		static int s_wave = 0;
 		static int s_wavesp = 0;
 
-		int yy = y + (RAND () % 4) - (RAND () % 4) + (s_wave / 10);
+		int yy = y + MythRandomTriangularInt(3) + (s_wave / 10);
 		yy = std::max(yy, 0);
 		if (yy >= (int)c_resoly)
 			yy = c_resoly - 1;
@@ -194,13 +195,12 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		*px = (x << 4) + firedec[yy] + (s_wave / 10);
 		*py = (y << 4) + 132 - ((vitesse < 131) ? vitesse : 130);
 
-		// NOLINTNEXTLINE(misc-redundant-expression)
-		s_wavesp += (RAND () % 3) - (RAND () % 3);
+		s_wavesp += MythRandomTriangularInt(2);
 		if (s_wave < -10)
 			s_wavesp += 2;
 		if (s_wave > 10)
 			s_wavesp -= 2;
-		s_wave += (s_wavesp / 10) + (RAND () % 3) - (RAND () % 3);
+		s_wave += (s_wavesp / 10) + MythRandomTriangularInt(2);
 		if (s_wavesp > 100)
 			s_wavesp = (s_wavesp * 9) / 10;
 	}
@@ -208,11 +208,9 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		int     dist = 0;
 		int     fvitesse = vitesse << 4;
 
-		if (noisify) {
-                        // NOLINTNEXTLINE(misc-redundant-expression)
-			x += (RAND () % noisify) - (RAND () % noisify);
-                        // NOLINTNEXTLINE(misc-redundant-expression)
-			y += (RAND () % noisify) - (RAND () % noisify);
+		if (noisify != 0) {
+			x += MythRandomTriangularInt(noisify);
+			y += MythRandomTriangularInt(noisify);
 		}
 		int vx = (x - middleX) << 9;
 		int vy = (y - middleY) << 9;
@@ -561,8 +559,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 					loopv--;
 					firedec[loopv] = s_decc;
 					s_decc += s_spdc / 10;
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_spdc += (RAND () % 3) - (RAND () % 3);
+					s_spdc += MythRandomTriangularInt(2);
 
 					if (s_decc > 4)
 						s_spdc -= 1;
@@ -570,21 +567,20 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 						s_spdc += 1;
 
 					if (s_spdc > 30)
-						s_spdc = s_spdc - (RAND () % 3) + (s_accel / 10);
+						s_spdc = s_spdc - MythRandomInt(0, 2) + (s_accel / 10);
 					if (s_spdc < -30)
-						s_spdc = s_spdc + (RAND () % 3) + (s_accel / 10);
+						s_spdc = s_spdc + MythRandomInt(0, 2) + (s_accel / 10);
 
 					if (s_decc > 8 && s_spdc > 1)
-						s_spdc -= (RAND () % 3) - 2;
+						s_spdc -= MythRandomInt(-2, 0);
 
 					if (s_decc < -8 && s_spdc < -1)
-						s_spdc += (RAND () % 3) + 2;
+						s_spdc += MythRandomInt(2, 4);
 
 					if (s_decc > 8 || s_decc < -8)
 						s_decc = s_decc * 8 / 9;
 
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_accel += (RAND () % 2) - (RAND () % 2);
+					s_accel += MythRandomTriangularInt(1);
 					if (s_accel > 20)
 						s_accel -= 2;
 					if (s_accel < -20)

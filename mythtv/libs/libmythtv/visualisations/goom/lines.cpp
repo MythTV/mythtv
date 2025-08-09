@@ -14,6 +14,8 @@
 #include "goom_tools.h"
 #include "goomconfig.h"
 
+#include "libmythbase/mythrandom.h"
+
 extern unsigned int resolx, c_resoly;
 
 static inline unsigned char
@@ -130,11 +132,11 @@ goom_lines_move (GMLine * l)
 	l->power += l->powinc;
 	if (l->power < 1.1F) {
 		l->power = 1.1F;
-		l->powinc = (float) (iRAND (20) + 10) / 300.0F;
+		l->powinc = (float) MythRandomInt(10, 29) / 300.0F;
 	}
 	if (l->power > 17.5F) {
 		l->power = 17.5F;
-		l->powinc = -(float) (iRAND (20) + 10) / 300.0F;
+		l->powinc = -(float) MythRandomInt(10, 29) / 300.0F;
 	}
 
 	l->amplitude = (99.0F * l->amplitude + l->amplitudeF) / 100.0F;

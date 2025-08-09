@@ -64,6 +64,17 @@ inline int MythRandomInt(int min, int max)
 }
 
 /**
+@brief Generate a random signed int over a symmetric triangular distribution with
+a minimum of -x, a mean of 0, and a maximum of x.
+
+The behavior is undefined if \f$x < 0\f$.
+*/
+inline int MythRandomTriangularInt(int x)
+{
+    return MythRandomInt(-x, 0) + MythRandomInt(0, x);
+}
+
+/**
 @brief return a random bool with P(true) = 1/chance
 
 An input less than 2 always returns true:
