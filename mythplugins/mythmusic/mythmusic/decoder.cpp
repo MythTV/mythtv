@@ -8,8 +8,6 @@
 #include <QDir>
 
 // MythTV
-#include <libmyth/output.h>
-#include <libmyth/visual.h>
 #include <libmythmetadata/metaio.h>
 #include <libmythmetadata/musicmetadata.h>
 
