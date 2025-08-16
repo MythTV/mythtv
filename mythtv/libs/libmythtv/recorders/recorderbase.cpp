@@ -5,7 +5,6 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 
 #include "firewirerecorder.h"
 #include "recordingprofile.h"
@@ -32,6 +31,7 @@
 #include "ExternalChannel.h"
 #include "io/mythmediabuffer.h"
 #include "cardutil.h"
+#include "programinfo.h"
 #include "tv_rec.h"
 #if CONFIG_V4L2
 #include "v4l2encrecorder.h"

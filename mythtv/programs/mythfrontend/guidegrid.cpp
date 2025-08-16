@@ -16,14 +16,13 @@
 #include "libmythbase/mythevent.h"          // for MythEvent, etc
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtypes.h"          // for InfoMap
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programtypes.h"       // for RecStatus, etc
-#include "libmythbase/recordingtypes.h"     // for toString, etc
-#include "libmythbase/remoteutil.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/recordingrule.h"
+#include "libmythtv/recordingtypes.h"
 #include "libmythtv/tv.h"                   // for ::kState_WatchingLiveTV
 #include "libmythtv/tv_actions.h"           // for ACTION_CHANNELSEARCH, etc
 #include "libmythtv/tv_play.h"

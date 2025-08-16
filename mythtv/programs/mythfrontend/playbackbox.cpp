@@ -23,15 +23,15 @@
 #include "libmythbase/mythevent.h"              // for MythEvent, etc
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programtypes.h"           // for AudioProps, SubtitleTypes, etc
-#include "libmythbase/recordingtypes.h"
 #include "libmythbase/stringutil.h"
 #include "libmythmetadata/mythuimetadataresults.h"
 #include "libmythtv/playgroup.h"
 #include "libmythtv/previewgeneratorqueue.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/recordingrule.h"
+#include "libmythtv/recordingtypes.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/tv_actions.h"               // for ACTION_LISTRECORDEDEPISODES, etc
 #include "libmythui/mythdialogbox.h"

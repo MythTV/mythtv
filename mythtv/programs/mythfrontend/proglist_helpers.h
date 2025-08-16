@@ -7,7 +7,7 @@
 #include <QDateTime>
 
 // MythTV headers
-#include "libmythbase/recordingtypes.h"
+#include "libmythtv/recordingtypes.h"
 #include "libmythui/mythscreentype.h"
 
 class MythUIText;
