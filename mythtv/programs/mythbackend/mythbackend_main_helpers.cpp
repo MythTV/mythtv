@@ -293,12 +293,6 @@ void cleanup(void)
     delete g_pUPnp;
     g_pUPnp = nullptr;
 
-    if (SSDP::Instance())
-    {
-        SSDP::Instance()->RequestTerminate();
-        SSDP::Instance()->wait();
-    }
-
     if (TaskQueue::Instance())
     {
         TaskQueue::Instance()->RequestTerminate();
