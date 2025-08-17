@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_MYTHSYSTEM_H
+#define LIBMYTHBASE_TEST_MYTHSYSTEM_H
 
 #include <unistd.h> // for usleep()
 
@@ -284,3 +286,5 @@ class TestMythSystem: public QObject
         QVERIFY(cmd->GetExitCode() == -2);
     }
 };
+
+#endif // LIBMYTHBASE_TEST_MYTHSYSTEM_H

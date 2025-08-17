@@ -1,3 +1,6 @@
+#ifndef MYTHBACKEND_TEST_DUMMYSCHEDULER_H
+#define MYTHBACKEND_TEST_DUMMYSCHEDULER_H
+
 #include "libmythbase/mthread.h"
 #include "../../scheduler.h"
 #include "libmythtv/recordinginfo.h"
@@ -11,3 +14,5 @@ public:
     QMap<QString,ProgramInfo*> GetRecording(void) const override;
     RecordingInfo* GetRecording(uint recordedid) const override;
 };
+
+#endif // MYTHBACKEND_TEST_DUMMYSCHEDULER_H
