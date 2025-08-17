@@ -5,6 +5,8 @@
  *
  *  See the file LICENSE_FSF for licensing information.
  */
+#ifndef LIBMYTHFREEMHEG_TEST_MHEG_PARSER_H
+#define LIBMYTHFREEMHEG_TEST_MHEG_PARSER_H
 
 #include <QTest>
 #include <iostream>
@@ -26,3 +28,5 @@ class TestMhegParser : public QObject
     static void test_parser_asn1(void);
     static void test_parser_text(void);
 };
+
+#endif // LIBMYTHFREEMHEG_TEST_MHEG_PARSER_H

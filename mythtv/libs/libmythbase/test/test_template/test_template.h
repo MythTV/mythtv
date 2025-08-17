@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_TEMPLATE_H
+#define LIBMYTHBASE_TEST_TEMPLATE_H
 
 #include <QTest>
 
@@ -39,3 +41,5 @@ class TestTemplate: public QObject
     static void example_repeated_test_data(void);
     static void example_repeated_test(void);
 };
+
+#endif // LIBMYTHBASE_TEST_TEMPLATE_H

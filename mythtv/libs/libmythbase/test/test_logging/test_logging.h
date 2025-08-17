@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_LOGGING_H
+#define LIBMYTHBASE_TEST_LOGGING_H
 
 #include <QObject>
 
@@ -42,3 +44,5 @@ private slots:
     static void test_logPropagateCalc_data(void);
     static void test_logPropagateCalc(void);
 };
+
+#endif // LIBMYTHBASE_TEST_LOGGING_H

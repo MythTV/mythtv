@@ -19,6 +19,8 @@
  * License along with MythTV; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_BITREADER_H
+#define LIBMYTHTV_TEST_BITREADER_H
 
 #include <QTest>
 
@@ -38,3 +40,5 @@ class TestBitReader : public QObject
     static void get_se_golomb1();
     static void get_se_golomb2();
 };
+
+#endif // LIBMYTHTV_TEST_BITREADER_H

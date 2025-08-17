@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef MYTHBACKEND_TEST_RECORDINGEXTENDER_H
+#define MYTHBACKEND_TEST_RECORDINGEXTENDER_H
 
 #include <QTest>
 #include <iostream>
@@ -103,3 +105,5 @@ class TestRecExtMlbDataPage : public RecExtMlbDataPage
     QDateTime getNow() override
         {return static_cast<TestRecExtMlbDataSource*>(parent())->getNow(); }
 };
+
+#endif // MYTHBACKEND_TEST_RECORDINGEXTENDER_H

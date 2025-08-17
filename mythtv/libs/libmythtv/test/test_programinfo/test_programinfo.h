@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_PROGRAMINFO_H
+#define LIBMYTHTV_TEST_PROGRAMINFO_H
 
 #include <array>
 #include <iostream>
@@ -646,3 +648,5 @@ class TestProgramInfo : public QObject
         checkMap(progMap, m_supergirl23Map);
     }
 };
+
+#endif // LIBMYTHTV_TEST_PROGRAMINFO_H

@@ -1,4 +1,6 @@
-// MythTV
+#ifndef MYTHFRONTEND_EXITPROMPT_H
+#define MYTHFRONTEND_EXITPROMPT_H
+
 #include "libmythbase/mythpower.h"
 
 class MythDialogBox;
@@ -37,3 +39,5 @@ class ExitPrompter : public QObject
     QString    m_suspendCommand;
     MythDialogBox* m_dialog { nullptr };
 };
+
+#endif // MYTHFRONTEND_EXITPROMPT_H

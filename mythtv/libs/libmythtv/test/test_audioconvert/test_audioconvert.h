@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_AUDIOCONVERT_H
+#define LIBMYTHTV_TEST_AUDIOCONVERT_H
 
 #include <QTest>
 
@@ -1440,3 +1442,5 @@ class TestAudioConvert: public QObject
         av_free(arrayf3);
     }
 };
+
+#endif // LIBMYTHTV_TEST_AUDIOCONVERT_H
