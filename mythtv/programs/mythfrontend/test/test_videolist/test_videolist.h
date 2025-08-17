@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef MYTHFRONTEND_TEST_VIDEOLIST_H
+#define MYTHFRONTEND_TEST_VIDEOLIST_H
 
 #include <QTest>
 #include <iostream>
@@ -33,3 +35,5 @@ private slots:
 
     static void testGenericTree ();
 };
+
+#endif // MYTHFRONTEND_TEST_VIDEOLIST_H
