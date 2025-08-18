@@ -4,7 +4,6 @@
 // Qt
 #include <QString>
 #include <QRecursiveMutex>
-#include <QSize>
 
 // MythTV
 #include "libmythui/mythuiexp.h"
@@ -23,14 +22,11 @@ class MUI_PUBLIC MythXDisplay
     MythXDisplay() = default;
     ~MythXDisplay();
     Display* GetDisplay()          { return m_disp;        }
-    QString  GetDisplayName() const{ return m_displayName; }
     int      GetScreen() const     { return m_screenNum;   }
     void     Lock()                { m_lock.lock();        }
     void     Unlock()              { m_lock.unlock();      }
-    int      GetDepth() const      { return m_depth;       }
     Window   GetRoot() const       { return m_root;        }
     bool     Open();
-    QSize    GetDisplayDimensions();
     void     Sync(bool Flush = false);
 
   private:
@@ -38,11 +34,8 @@ class MUI_PUBLIC MythXDisplay
 
     Display* m_disp        { nullptr };
     int      m_screenNum   { 0 };
-    Screen*  m_screen      { nullptr };
-    int      m_depth       { 0 };
     Window   m_root        { 0 };
     QRecursiveMutex  m_lock;
-    QString  m_displayName;
 };
 
 #endif
