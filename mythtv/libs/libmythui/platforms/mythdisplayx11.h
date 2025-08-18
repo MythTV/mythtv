@@ -6,12 +6,7 @@
 
 // MythTV
 #include "mythdisplay.h"
-#include "mythxdisplay.h"
-
-// X11 - always last
-#define pointer Xpointer // Prevent conflicts with Qt6.
-#include <X11/extensions/Xrandr.h>
-#undef pointer
+class MythXDisplay;
 
 class MythDisplayX11 : public MythDisplay
 {
@@ -27,8 +22,6 @@ class MythDisplayX11 : public MythDisplay
     const MythDisplayModes& GetVideoModes() override;
 
   private:
-    static XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
-                                    QScreen* qScreen, RROutput* Output = nullptr);
     void GetEDID(MythXDisplay* mDisplay);
 
     QMap<uint64_t, unsigned long> m_modeMap;

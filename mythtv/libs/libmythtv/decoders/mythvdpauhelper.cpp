@@ -2,6 +2,23 @@
 #include "libmythbase/mythlogging.h"
 #include "mythvideocolourspace.h"
 #include "mythvdpauhelper.h"
+
+extern "C" {
+#define Cursor XCursor // Prevent conflicts with Qt6.
+#define pointer Xpointer // Prevent conflicts with Qt6.
+#if defined(_X11_XLIB_H_) && !defined(Bool)
+#define Bool int
+#endif
+#include "vdpau/vdpau_x11.h"
+#undef None            // X11/X.h defines this. Causes compile failure in Qt6.
+#undef Cursor
+#undef pointer
+#undef Bool            // Interferes with cmake moc file compilation
+#undef True            // Interferes with cmake moc file compilation
+#undef False           // Interferes with cmake moc file compilation
+#undef Always          // X11/X.h defines this. Causes compile failure in Qt6.
+}
+
 #include "libmythui/platforms/mythxdisplay.h" // always last
 
 // Std

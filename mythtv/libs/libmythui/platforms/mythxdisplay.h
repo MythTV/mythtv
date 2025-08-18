@@ -45,8 +45,4 @@ class MUI_PUBLIC MythXDisplay
     QString  m_displayName;
 };
 
-// These X11 defines conflict with the QT key event enum values
-#undef KeyPress
-#undef KeyRelease
-
 #endif
