@@ -38,8 +38,4 @@ class MUI_PUBLIC MythXDisplay
     QRecursiveMutex  m_lock;
 };
 
-// These X11 defines conflict with the QT key event enum values
-#undef KeyPress
-#undef KeyRelease
-
 #endif

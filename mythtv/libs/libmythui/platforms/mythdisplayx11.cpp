@@ -2,11 +2,18 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "mythdisplayx11.h"
+#include "mythxdisplay.h"
 
 // X11
 #include <X11/Xatom.h>
+#define pointer Xpointer // Prevent conflicts with Qt6.
+#include <X11/extensions/Xrandr.h>
+#undef pointer
 
 #define LOC QString("DisplayX11: ")
+
+static XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
+                                QScreen* qScreen, RROutput* Output = nullptr);
 
 MythDisplayX11::MythDisplayX11()
 {
@@ -230,7 +237,7 @@ bool MythDisplayX11::SwitchToVideoMode(QSize Size, double DesiredRate)
     return RRSetConfigSuccess == status;
 }
 
-XRROutputInfo* MythDisplayX11::GetOutput(XRRScreenResources* Resources,
+static XRROutputInfo* GetOutput(XRRScreenResources* Resources,
                                          MythXDisplay* mDisplay,
                                          QScreen* qScreen, RROutput* Output)
 {
