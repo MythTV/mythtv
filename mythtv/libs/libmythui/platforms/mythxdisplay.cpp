@@ -87,34 +87,18 @@ bool MythXDisplay::Open(void)
 {
     MythXLocker locker(this);
 
-    m_displayName = s_QtX11Display;
     const char *dispCStr = nullptr;
-    if (!m_displayName.isEmpty())
-        dispCStr = m_displayName.toLatin1().constData();
+    if (!s_QtX11Display.isEmpty())
+        dispCStr = s_QtX11Display.toLatin1().constData();
 
     m_disp = XOpenDisplay(dispCStr);
     if (!m_disp)
         return false;
 
     m_screenNum = DefaultScreen(m_disp);
-    m_screen    = DefaultScreenOfDisplay(m_disp);
-    m_depth     = DefaultDepthOfScreen(m_screen);
     m_root      = DefaultRootWindow(m_disp);
 
     return true;
-}
-
-/**
- * Return the size of the X Display in millimeters.  This corresponds
- * to the size of the desktop, not necessarily to the size of single
- * screen.
- */
-QSize MythXDisplay::GetDisplayDimensions(void)
-{
-    MythXLocker locker(this);
-    int displayWidthMM  = DisplayWidthMM( m_disp, m_screenNum);
-    int displayHeightMM = DisplayHeightMM(m_disp, m_screenNum);
-    return { displayWidthMM, displayHeightMM };
 }
 
 void MythXDisplay::Sync(bool Flush)
