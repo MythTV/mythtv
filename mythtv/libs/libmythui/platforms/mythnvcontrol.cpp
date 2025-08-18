@@ -1,6 +1,14 @@
-// MythTV
 #include "mythnvcontrol.h"
+
+#include <QLibrary>
+#include <QString>
+#include <QStringList>
+
 #include "libmythbase/mythlogging.h"
+
+#include "platforms/mythxdisplay.h"
+
+#include <X11/Xlib.h>
 
 #define LOC QString("NVCtrl: ")
 
@@ -18,6 +26,31 @@ enum NV_CTRL_DISPLAY_VRR_MODES : std::uint8_t {
 static constexpr uint NV_CTRL_DISPLAY_VRR_ENABLED                     { 431 };
 static constexpr uint NV_CTRL_DISPLAY_VRR_MIN_REFRESH_RATE            { 430 };
 
+using QueryTargetBinary  = bool(*)(Display*,int,int,unsigned int,unsigned int, unsigned char**,int*);
+using QueryScreenAttrib  = bool(*)(Display*,int,unsigned int,unsigned int,int*);
+using QueryTargetAttrib  = bool(*)(Display*,int,int,unsigned int,unsigned int,int*);
+using SetAttribute       = void(*)(Display*,int,unsigned int,unsigned int,int);
+
+class MythNVControl
+{
+  public:
+    static NVControl Create();
+   ~MythNVControl();
+
+    int GetDisplayID() const;
+
+  protected:
+    MythNVControl(const QString& Path, MythXDisplay* MDisplay);
+    QLibrary m_lib;
+
+  public:
+    MythXDisplay*     m_display     { nullptr };
+    QueryTargetBinary m_queryBinary { nullptr };
+    QueryScreenAttrib m_queryScreen { nullptr };
+    QueryTargetAttrib m_queryTarget { nullptr };
+    SetAttribute      m_setAttrib   { nullptr };
+};
+
 /*! \brief Enable or disable GSync *before* the main window is created.
  *
  * If the state has been changed, s_gsyncResetOnExit will be set to true and
@@ -26,9 +59,8 @@ static constexpr uint NV_CTRL_DISPLAY_VRR_MIN_REFRESH_RATE            { 430 };
 */
 void MythGSync::ForceGSync(bool Enable)
 {
-    if (auto nvcontrol = MythNVControl::Create(); nvcontrol)
     {
-        auto gsync = CreateGSync(nvcontrol, {0,0,false});
+        auto gsync = CreateGSync({0, 0, false});
         if (!gsync)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "No GSync support detected - cannot force");
@@ -51,8 +83,9 @@ void MythGSync::ForceGSync(bool Enable)
     }
 }
 
-MythVRRPtr MythGSync::CreateGSync(const NVControl& Device, MythVRRRange Range)
+MythVRRPtr MythGSync::CreateGSync(MythVRRRange Range)
 {
+    auto Device = MythNVControl::Create();
     if (!Device)
         return nullptr;
 
