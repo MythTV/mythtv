@@ -9,7 +9,6 @@
 #include "platforms/drm/mythdrmvrr.h"
 #endif
 #if CONFIG_X11
-#include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
 #include "mythdisplay.h"
@@ -66,9 +65,8 @@ MythVRRPtr MythVRR::Create(MythDisplay* MDisplay)
 
 #if CONFIG_X11
     // GSync is only available with X11 over Display Port
-    if (auto nvcontrol = MythNVControl::Create(); nvcontrol)
-        if (auto gsync = MythGSync::CreateGSync(nvcontrol, range); gsync)
-            result = gsync;
+    if (result == nullptr)
+        result = MythGSync::CreateGSync(range);
 #endif
 
 #if CONFIG_DRM
