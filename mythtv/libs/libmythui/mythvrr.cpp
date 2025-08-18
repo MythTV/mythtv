@@ -9,7 +9,6 @@
 #include "platforms/drm/mythdrmvrr.h"
 #endif
 #if CONFIG_X11
-#include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
 #include "mythdisplay.h"
