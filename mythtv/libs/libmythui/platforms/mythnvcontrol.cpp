@@ -59,28 +59,26 @@ class MythNVControl
 */
 void MythGSync::ForceGSync(bool Enable)
 {
+    auto gsync = CreateGSync({0, 0, false});
+    if (!gsync)
     {
-        auto gsync = CreateGSync({0, 0, false});
-        if (!gsync)
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "No GSync support detected - cannot force");
-            return;
-        }
-
-        if (gsync->Enabled() == Enable)
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("GSync already %1abled")
-                .arg(Enable ? "en" : "dis"));
-            return;
-        }
-
-        gsync->SetEnabled(Enable);
-        // Release GSync to ensure the state is not reset when it is deleted
-        gsync = nullptr;
-        s_gsyncDefaultValue = !Enable;
-        s_gsyncResetOnExit  = true;
-        LOG(VB_GENERAL, LOG_INFO, LOC + (Enable ? "Enabled" : "Disabled"));
+        LOG(VB_GENERAL, LOG_INFO, LOC + "No GSync support detected - cannot force");
+        return;
     }
+
+    if (gsync->Enabled() == Enable)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("GSync already %1")
+            .arg(Enable ? "enabled" : "disabled"));
+        return;
+    }
+
+    gsync->SetEnabled(Enable);
+    // Release GSync to ensure the state is not reset when it is deleted
+    gsync = nullptr;
+    s_gsyncDefaultValue = !Enable;
+    s_gsyncResetOnExit  = true;
+    LOG(VB_GENERAL, LOG_INFO, LOC + (Enable ? "Enabled" : "Disabled"));
 }
 
 MythVRRPtr MythGSync::CreateGSync(MythVRRRange Range)
