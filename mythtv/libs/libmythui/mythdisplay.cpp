@@ -38,6 +38,7 @@
 #if CONFIG_X11
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
+#include "platforms/mythxdisplay.h"
 #endif
 #if CONFIG_DRM
 #include "platforms/mythdisplaydrm.h"
