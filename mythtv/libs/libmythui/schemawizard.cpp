@@ -485,3 +485,5 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
     return MYTH_SCHEMA_UPGRADE;
 }
+
+#include "moc_schemawizard.cpp"

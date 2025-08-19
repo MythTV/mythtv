@@ -694,3 +694,5 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
     
     return bInCode;
 }
+
+#include "moc_serverSideScripting.cpp"

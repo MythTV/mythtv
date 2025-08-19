@@ -2456,4 +2456,5 @@ void LCDProcClient::updateRecordingList(void)
     if (m_activeScreen == "Time" || m_activeScreen == "RecStatus")
         startTime();
 }
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+
+#include "moc_lcdprocclient.cpp"

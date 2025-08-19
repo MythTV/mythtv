@@ -731,3 +731,5 @@ bool TeletextScreen::InitialiseFont()
         .arg(font));
     return true;
 }
+
+#include "moc_teletextscreen.cpp"

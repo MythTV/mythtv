@@ -649,3 +649,5 @@ void ImportNative::gotCallsign(const QString& value)
         m_localCallsignText->SetText(query.value(3).toString());
     }
 }
+
+#include "moc_importnative.cpp"

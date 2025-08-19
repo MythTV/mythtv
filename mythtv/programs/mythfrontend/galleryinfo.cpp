@@ -302,3 +302,5 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
             m_screen.SetFocusWidget(m_btnList);
     }
 }
+
+#include "moc_galleryinfo.cpp"

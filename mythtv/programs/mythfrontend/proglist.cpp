@@ -1770,3 +1770,5 @@ void ProgLister::customEvent(QEvent *event)
     if (needUpdate)
         FillItemList(true);
 }
+
+#include "moc_proglist.cpp"

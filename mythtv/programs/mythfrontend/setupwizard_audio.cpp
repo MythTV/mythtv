@@ -420,3 +420,5 @@ void AudioSetupWizard::toggleSpeakers(void)
         m_testSpeakerButton->SetText(tr("Stop Speaker Test"));
     }
 }
+
+#include "moc_setupwizard_audio.cpp"

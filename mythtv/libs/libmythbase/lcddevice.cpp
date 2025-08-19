@@ -743,3 +743,5 @@ bool LCD::startLCDServer(void)
     uint retval = myth_system(command, flags);
     return( retval == GENERIC_EXIT_RUNNING );
 }
+
+#include "moc_lcddevice.cpp"

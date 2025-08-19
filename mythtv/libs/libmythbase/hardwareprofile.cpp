@@ -287,3 +287,5 @@ bool HardwareProfileTask::DoRun(void)
     HardwareProfile hp;
     return hp.SubmitProfile(false);
 }
+
+#include "moc_hardwareprofile.cpp"

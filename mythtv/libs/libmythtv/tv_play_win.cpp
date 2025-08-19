@@ -96,3 +96,5 @@ bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
 #endif
     return handled;
 }
+
+#include "moc_tv_play_win.cpp"

@@ -530,6 +530,4 @@ uint myth_system(const QString &Command, const QStringList& Args, uint Flags,
     return result;
 }
 
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
+#include "moc_mythsystemlegacy.cpp"

@@ -1255,3 +1255,5 @@ void MythPlayerUI::JumpToProgram()
     m_playerCtx->SetPlayerChangingBuffers(false);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");
 }
+
+#include "moc_mythplayerui.cpp"

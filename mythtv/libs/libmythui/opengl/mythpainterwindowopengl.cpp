@@ -50,3 +50,5 @@ void MythPainterWindowOpenGL::paintEvent(QPaintEvent* /*PaintEvent*/)
 {
     m_parent->drawScreen();
 }
+
+#include "moc_mythpainterwindowopengl.cpp"

@@ -5644,4 +5644,4 @@ bool PlaybackBox::PbbJobQueue::IsJobQueuedOrRunning(int jobType, uint chanid,
         IsJobRunning(jobType, chanid, recstartts);
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_playbackbox.cpp"
