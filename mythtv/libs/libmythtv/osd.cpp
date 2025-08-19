@@ -839,3 +839,5 @@ void OSD::DialogGetText(InfoMap &Map)
     if (edit)
         edit->GetText(Map);
 }
+
+#include "moc_osd.cpp"

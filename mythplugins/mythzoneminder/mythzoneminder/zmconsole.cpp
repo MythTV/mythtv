@@ -291,3 +291,5 @@ void ZMConsole::functionChanged(bool changed)
     if (changed)
         updateStatus();
 }
+
+#include "moc_zmconsole.cpp"
