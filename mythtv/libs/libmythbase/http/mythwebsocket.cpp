@@ -686,3 +686,4 @@ void MythWebSocket::SendPing()
         SendFrame(WSOpPing, { payload });
 }
 
+#include "moc_mythwebsocket.cpp"

@@ -433,3 +433,5 @@ void TextSubtitleParser::SeekFrame(int64_t ts, int flags)
             .arg(ts).arg(flags));
     }
 }
+
+#include "moc_textsubtitleparser.cpp"

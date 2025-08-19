@@ -505,3 +505,5 @@ void CetonRTSP::timerEvent(QTimerEvent* /*event*/)
         ProcessRequest("OPTIONS", nullptr, false, false, "*");
     }
 }
+
+#include "moc_cetonrtsp.cpp"
