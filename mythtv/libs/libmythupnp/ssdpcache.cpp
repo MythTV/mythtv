@@ -660,3 +660,5 @@ void SSDPCache::Dump(void)
     LOG(VB_UPNP, LOG_DEBUG, "========================================"
                             "=======================================" );
 }
+
+#include "moc_ssdpcache.cpp"

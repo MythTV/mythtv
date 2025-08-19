@@ -3701,3 +3701,5 @@ void TestEITFixups::testGreekCategories()
 
 
 QTEST_APPLESS_MAIN(TestEITFixups)
+
+#include "moc_test_eitfixups.cpp"

@@ -391,3 +391,5 @@ void AppleRemote::_handleEventWithCookieString(const std::string& cookieString,
             _listener->appleRemoteButton(buttonid, sumOfValues>0);
     }
 }
+
+#include "moc_AppleRemote.cpp"

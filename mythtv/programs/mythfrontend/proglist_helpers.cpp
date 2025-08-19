@@ -554,3 +554,5 @@ void EditPowerSearchPopup::initLists(void)
             m_channelList->SetItemCurrent(m_channelList->GetCount() - 1);
     }
 }
+
+#include "moc_proglist_helpers.cpp"

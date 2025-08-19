@@ -1014,3 +1014,5 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
 
     Close();
 }
+
+#include "moc_weatherSetup.cpp"

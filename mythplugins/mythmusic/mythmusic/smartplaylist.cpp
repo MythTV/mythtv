@@ -2207,3 +2207,4 @@ void SmartPLDateDialog::valueChanged(void)
     m_okButton->SetEnabled(bValidDate);
 }
 
+#include "moc_smartplaylist.cpp"

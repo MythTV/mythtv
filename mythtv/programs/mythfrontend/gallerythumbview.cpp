@@ -2221,3 +2221,5 @@ void GalleryThumbView::DoRepeat(int on)
 {
     gCoreContext->SaveSetting("GalleryRepeat", on);
 }
+
+#include "moc_gallerythumbview.cpp"

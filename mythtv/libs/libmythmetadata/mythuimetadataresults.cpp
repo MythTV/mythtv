@@ -166,3 +166,5 @@ void MetadataResultsDialog::sendResult(MythUIButtonListItem* item)
     emit haveResult(lookup);
     Close();
 }
+
+#include "moc_mythuimetadataresults.cpp"

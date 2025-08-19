@@ -992,3 +992,5 @@ void MythThemedMenu::mediaEvent(MythMediaEvent* event)
             return;
     }
 }
+
+#include "moc_myththemedmenu.cpp"

@@ -27,3 +27,5 @@ bool MythScreenSaverOSX::Asleep()
 {
     return false;
 }
+
+#include "moc_mythscreensaverosx.cpp"

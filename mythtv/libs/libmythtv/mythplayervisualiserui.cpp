@@ -148,3 +148,5 @@ void MythPlayerVisualiserUI::RenderVisualiser()
         return;
     m_visual->Draw(m_visualiserState.m_embedding ? m_embedRect : m_uiScreenRect, m_painter, nullptr);
 }
+
+#include "moc_mythplayervisualiserui.cpp"

@@ -6725,4 +6725,4 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
     return true;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_programinfo.cpp"

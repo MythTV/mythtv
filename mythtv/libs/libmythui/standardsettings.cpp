@@ -1143,3 +1143,5 @@ void StandardSettingDialog::deleteEntryConfirmed(bool ok)
     }
 
 }
+
+#include "moc_standardsettings.cpp"

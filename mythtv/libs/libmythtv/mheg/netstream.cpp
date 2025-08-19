@@ -1016,4 +1016,4 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     return lastMod;
 }
 
-/* End of file */
+#include "moc_netstream.cpp"

@@ -238,3 +238,4 @@ void GUIStartup::Setup(void)
         m_loop->exit();
 }
 
+#include "moc_guistartup.cpp"

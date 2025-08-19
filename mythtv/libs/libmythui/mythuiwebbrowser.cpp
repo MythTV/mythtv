@@ -1439,3 +1439,5 @@ void MythUIWebBrowser::CreateCopy(MythUIType *parent)
     auto *browser = new MythUIWebBrowser(parent, objectName());
     browser->CopyFrom(this);
 }
+
+#include "moc_mythuiwebbrowser.cpp"

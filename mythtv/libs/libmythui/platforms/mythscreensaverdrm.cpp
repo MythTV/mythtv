@@ -44,3 +44,5 @@ bool MythScreenSaverDRM::Asleep()
 {
     return false;
 }
+
+#include "moc_mythscreensaverdrm.cpp"

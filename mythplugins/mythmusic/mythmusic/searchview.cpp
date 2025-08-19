@@ -497,3 +497,5 @@ void SearchView::trackVisible(MythUIButtonListItem *item)
         }
     }
 }
+
+#include "moc_searchview.cpp"

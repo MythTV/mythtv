@@ -158,3 +158,4 @@ void ImageSearchResultsDialog::sendResult(MythUIButtonListItem* item)
     Close();
 }
 
+#include "moc_mythuiimageresults.cpp"

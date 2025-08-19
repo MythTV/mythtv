@@ -1005,3 +1005,5 @@ void ZMClient::showMiniPlayer(int monitorID) const
     if (miniPlayer->Create())
         popupStack->AddScreen(miniPlayer);
 }
+
+#include "moc_zmclient.cpp"

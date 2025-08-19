@@ -2733,3 +2733,5 @@ void GuideGrid::ShowJumpToTime(void)
         delete timedlg;
     }
 }
+
+#include "moc_guidegrid.cpp"

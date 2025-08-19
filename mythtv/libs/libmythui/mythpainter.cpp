@@ -611,3 +611,5 @@ void MythPainter::SetMaximumCacheSizes(int hardware, int software)
         .arg(m_maxHardwareCacheSize / kOneMeg)
         .arg(m_maxSoftwareCacheSize / kOneMeg));
 }
+
+#include "moc_mythpainter.cpp"

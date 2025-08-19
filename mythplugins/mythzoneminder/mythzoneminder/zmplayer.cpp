@@ -399,3 +399,5 @@ void ZMPlayer::getFrame(void)
         }
     }
 }
+
+#include "moc_zmplayer.cpp"

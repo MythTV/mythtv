@@ -1456,3 +1456,5 @@ int Playlist::CreateCDAudio(void)
     return -1;
 }
 #endif
+
+#include "moc_playlist.cpp"

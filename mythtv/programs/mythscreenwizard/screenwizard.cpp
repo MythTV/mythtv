@@ -379,3 +379,5 @@ void ScreenWizard::customEvent(QEvent *event)
     }
 
 }
+
+#include "moc_screenwizard.cpp"

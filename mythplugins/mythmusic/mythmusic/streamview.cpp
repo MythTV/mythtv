@@ -1163,3 +1163,5 @@ void SearchStream::doUpdateStreams(void)
 
     m_updating = false;
 }
+
+#include "moc_streamview.cpp"

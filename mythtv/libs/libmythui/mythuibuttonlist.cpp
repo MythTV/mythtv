@@ -4112,3 +4112,5 @@ void MythUIButtonList::SetScrollBarPosition()
     m_scrollBar->SetSliderPosition(m_selPosition);
     m_scrollBar->MoveToTop();
 }
+
+#include "moc_mythuibuttonlist.cpp"

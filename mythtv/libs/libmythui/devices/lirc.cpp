@@ -547,3 +547,5 @@ QList<QByteArray> LIRC::GetCodes(void)
     m_bufOffset = m_buf.size();
     return ret;
 }
+
+#include "moc_lirc.cpp"

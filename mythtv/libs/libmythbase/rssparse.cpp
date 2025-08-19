@@ -1181,3 +1181,5 @@ QString Parse::UnescapeHTML(const QString& escaped)
 
     return result;
 }
+
+#include "moc_rssparse.cpp"

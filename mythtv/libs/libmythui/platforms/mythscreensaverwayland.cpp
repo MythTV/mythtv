@@ -84,3 +84,5 @@ bool MythScreenSaverWayland::Asleep()
 {
     return false;
 }
+
+#include "moc_mythscreensaverwayland.cpp"
