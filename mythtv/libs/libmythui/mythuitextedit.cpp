@@ -647,3 +647,5 @@ void MythUITextEdit::CreateCopy(MythUIType *parent)
     auto *textedit = new MythUITextEdit(parent, objectName());
     textedit->CopyFrom(this);
 }
+
+#include "moc_mythuitextedit.cpp"

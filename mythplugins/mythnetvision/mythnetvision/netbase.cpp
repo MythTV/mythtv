@@ -326,3 +326,5 @@ void NetBase::DoPlayVideo(void)
 
     DoPlayVideo(filename);
 }
+
+#include "moc_netbase.cpp"

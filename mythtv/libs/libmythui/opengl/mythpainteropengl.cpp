@@ -358,3 +358,5 @@ void MythOpenGLPainter::PopTransformation(void)
     if (m_render)
         m_render->PopTransformation();
 }
+
+#include "moc_mythpainteropengl.cpp"

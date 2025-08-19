@@ -870,3 +870,5 @@ void ImportIconsWizard::Close()
 {
     MythScreenType::Close();
 }
+
+#include "moc_importicons.cpp"

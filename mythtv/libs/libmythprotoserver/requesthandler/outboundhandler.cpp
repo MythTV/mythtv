@@ -84,3 +84,5 @@ void OutboundRequestHandler::connectionClosed(MythSocket *socket)
     if (socket == m_socket)
         ConnectToMaster();
 }
+
+#include "moc_outboundhandler.cpp"

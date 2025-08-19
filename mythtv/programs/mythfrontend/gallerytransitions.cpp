@@ -424,4 +424,4 @@ void TransitionRandom::Finished()
     emit finished();
 }
 
-
+#include "moc_gallerytransitions.cpp"
