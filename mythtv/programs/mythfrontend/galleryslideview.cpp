@@ -826,3 +826,5 @@ void GallerySlideView::RepeatOn(int on)
 {
     gCoreContext->SaveSetting("GalleryRepeat", on);
 }
+
+#include "moc_galleryslideview.cpp"

@@ -251,3 +251,5 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
 
     return imageType;
 }
+
+#include "moc_mythcdrom.cpp"

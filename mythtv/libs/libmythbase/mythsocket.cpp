@@ -995,3 +995,5 @@ void MythSocket::ResetReal(void)
 
     m_dataAvailable.fetchAndStoreOrdered(0);
 }
+
+#include "moc_mythsocket.cpp"

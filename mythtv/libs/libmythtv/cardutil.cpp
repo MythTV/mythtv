@@ -3525,3 +3525,5 @@ bool CardUtil::IsSatIPPresent(uint inputid)
     return false;
 }
 #endif
+
+#include "moc_cardutil.cpp"

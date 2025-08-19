@@ -274,3 +274,5 @@ bool MythDisplayRPI::SwitchToVideoMode(QSize Size, double Framerate)
 
     return ret == 0;
 }
+
+#include "moc_mythdisplayrpi.cpp"

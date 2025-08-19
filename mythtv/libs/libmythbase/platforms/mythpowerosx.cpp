@@ -236,3 +236,5 @@ OSStatus SendAppleEventToSystemProcess(AEEventID EventToSend)
     AEDisposeDesc(&eventReply);
     return error;
 }
+
+#include "moc_mythpowerosx.cpp"

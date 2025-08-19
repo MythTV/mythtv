@@ -139,3 +139,5 @@ void WebPage::slotTitleChanged(const QString &title)
     m_listItem->SetText(title);
     m_parent->m_pageList->Update();
 }
+
+#include "moc_webpage.cpp"

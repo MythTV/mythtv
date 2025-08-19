@@ -1414,3 +1414,5 @@ bool V2Capture::UpdateRecProfileParam ( uint ProfileId, const QString  &Name, co
     }
     return true;
 }
+
+#include "moc_v2capture.cpp"
