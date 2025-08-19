@@ -398,3 +398,5 @@ void BackendSelection::CloseWithDecision(Decision d)
     else
         MythScreenType::Close();
 }
+
+#include "moc_backendselect.cpp"

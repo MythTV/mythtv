@@ -63,3 +63,5 @@ void TestAvcInfo::cleanupTestCase(void)
 }
 
 QTEST_APPLESS_MAIN(TestAvcInfo)
+
+#include "moc_test_avcinfo.cpp"

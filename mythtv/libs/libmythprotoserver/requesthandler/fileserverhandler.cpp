@@ -1099,3 +1099,4 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
     return true;
 }
 
+#include "moc_fileserverhandler.cpp"
