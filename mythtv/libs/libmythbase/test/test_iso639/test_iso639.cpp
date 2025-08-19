@@ -159,3 +159,5 @@ void TestISO639::test_key_to_cankey(void)
 
 
 QTEST_APPLESS_MAIN(TestISO639)
+
+#include "moc_test_iso639.cpp"

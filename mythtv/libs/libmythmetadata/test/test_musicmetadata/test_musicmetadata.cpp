@@ -165,3 +165,5 @@ void TestMusicMetadata::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestMusicMetadata)
+
+#include "moc_test_musicmetadata.cpp"

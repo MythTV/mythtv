@@ -54,3 +54,5 @@ void TestMythIOWrapper::cleanupTestCase(void)
 }
 
 QTEST_APPLESS_MAIN(TestMythIOWrapper)
+
+#include "moc_test_mythiowrapper.cpp"

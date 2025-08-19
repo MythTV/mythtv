@@ -260,3 +260,5 @@ void RSSSite::process(void)
 
     emit finished(this);
 }
+
+#include "moc_rssmanager.cpp"

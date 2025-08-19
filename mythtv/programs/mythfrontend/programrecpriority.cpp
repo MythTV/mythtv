@@ -1485,4 +1485,4 @@ ProgramInfo *ProgramRecPriority::GetCurrentProgram(void) const
     return item ? item->GetData().value<ProgramRecPriorityInfo*>() : nullptr;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_programrecpriority.cpp"

@@ -169,3 +169,5 @@ void ChannelScannerGUIScanPane::SetScanProgress(double value)
     if (m_progressBar)
         m_progressBar->SetUsed(static_cast<uint>(value * 65535));
 }
+
+#include "moc_channelscanner_gui_scan_pane.cpp"

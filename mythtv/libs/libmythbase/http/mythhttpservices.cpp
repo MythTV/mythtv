@@ -22,3 +22,5 @@ QStringList MythHTTPServices::GetServiceList()
 {
     return m_serviceList;
 }
+
+#include "moc_mythhttpservices.cpp"

@@ -134,3 +134,5 @@ void MythVideoGPU::SetViewportRect(QRect DisplayVisibleRect)
 {
     SetMasterViewport(DisplayVisibleRect.size());
 }
+
+#include "moc_mythvideogpu.cpp"

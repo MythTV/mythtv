@@ -26,3 +26,5 @@ bool TreeEditor::Matches(bool /*search*/, bool tree)
 {
     return tree;
 }
+
+#include "moc_treeeditor.cpp"

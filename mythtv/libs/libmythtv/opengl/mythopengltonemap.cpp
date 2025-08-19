@@ -181,3 +181,5 @@ bool MythOpenGLTonemap::CreateTexture(QSize Size)
     m_render->SetTextureFilters(m_texture, QOpenGLTexture::Linear);
     return true;
 }
+
+#include "moc_mythopengltonemap.cpp"

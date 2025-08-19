@@ -247,3 +247,5 @@ void HTTPReader::Cancel(void)
         m_reply->abort();
     }
 }
+
+#include "moc_httptsstreamhandler.cpp"

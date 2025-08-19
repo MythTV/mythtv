@@ -213,3 +213,5 @@ void TestBitReader::get_se_golomb2()
 }
 
 QTEST_APPLESS_MAIN(TestBitReader)
+
+#include "moc_test_bitreader.cpp"

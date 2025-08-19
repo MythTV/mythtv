@@ -239,3 +239,5 @@ void MythUIProgressDialog::UpdateProgress()
     if (m_progressText)
         m_progressText->SetText(QString("%1%").arg(percentage));
 }
+
+#include "moc_mythprogressdialog.cpp"

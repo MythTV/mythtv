@@ -684,4 +684,4 @@ void HttpWorker::run(void)
     LOG(VB_HTTP, LOG_DEBUG, QString("HttpWorker::run() socket=%1 -- end").arg(m_socket));
 }
 
-
+#include "moc_httpserver.cpp"

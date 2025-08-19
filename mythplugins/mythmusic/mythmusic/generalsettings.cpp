@@ -170,3 +170,5 @@ void GeneralSettings::slotSave(void)
 
     Close();
 }
+
+#include "moc_generalsettings.cpp"

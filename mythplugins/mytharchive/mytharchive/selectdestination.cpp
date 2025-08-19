@@ -322,3 +322,5 @@ void SelectDestination::filenameEditLostFocus()
         m_freeSpace = 0;
     }
 }
+
+#include "moc_selectdestination.cpp"

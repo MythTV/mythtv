@@ -111,3 +111,5 @@ bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_mythflashplayer.cpp"

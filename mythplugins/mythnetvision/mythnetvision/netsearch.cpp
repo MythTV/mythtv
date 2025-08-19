@@ -585,3 +585,5 @@ void NetSearch::customEvent(QEvent *event)
         NetBase::customEvent(event);
     }
 }
+
+#include "moc_netsearch.cpp"

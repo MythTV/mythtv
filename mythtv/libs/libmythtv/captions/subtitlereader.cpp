@@ -208,3 +208,5 @@ void SubtitleReader::ClearRawTextSubtitles(void)
     QMutexLocker lock(&m_rawTextSubtitles.m_lock);
     m_rawTextSubtitles.m_buffers.clear();
 }
+
+#include "moc_subtitlereader.cpp"

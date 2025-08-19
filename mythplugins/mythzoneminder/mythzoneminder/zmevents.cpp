@@ -493,3 +493,5 @@ void ZMEvents::doDeleteAll(bool doDelete)
         getEventList();
     }
 }
+
+#include "moc_zmevents.cpp"

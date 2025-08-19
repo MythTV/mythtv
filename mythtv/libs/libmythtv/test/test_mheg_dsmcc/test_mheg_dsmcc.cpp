@@ -88,3 +88,5 @@ void TestMhegDsmcc::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestMhegDsmcc)
+
+#include "moc_test_mheg_dsmcc.cpp"

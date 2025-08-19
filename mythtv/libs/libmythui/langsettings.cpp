@@ -240,3 +240,5 @@ void LanguageSelection::Close(void)
     else
         MythScreenType::Close();
 }
+
+#include "moc_langsettings.cpp"

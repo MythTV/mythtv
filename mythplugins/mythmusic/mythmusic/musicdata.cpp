@@ -142,3 +142,5 @@ void MusicData::loadMusic(void) const
     if (busy)
         busy->Close();
 }
+
+#include "moc_musicdata.cpp"

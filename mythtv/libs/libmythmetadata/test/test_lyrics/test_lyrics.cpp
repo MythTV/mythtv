@@ -176,3 +176,5 @@ void TestLyrics::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestLyrics)
+
+#include "moc_test_lyrics.cpp"

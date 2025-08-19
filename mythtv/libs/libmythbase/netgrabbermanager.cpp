@@ -415,3 +415,5 @@ void Search::SetData(QByteArray data)
     m_document.setContent(m_data, QDomDocument::ParseOption::UseNamespaceProcessing);
 #endif
 }
+
+#include "moc_netgrabbermanager.cpp"

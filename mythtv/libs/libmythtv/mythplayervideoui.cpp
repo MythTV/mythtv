@@ -239,3 +239,4 @@ void MythPlayerVideoUI::CheckAspectRatio(MythVideoFrame* Frame)
     }
 }
 
+#include "moc_mythplayervideoui.cpp"

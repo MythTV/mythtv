@@ -2195,4 +2195,4 @@ bool MythCoreContext::IsRegisteredFileForWrite(const QString& file)
     return d->m_fileswritten.contains(file);
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythcorecontext.cpp"

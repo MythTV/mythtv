@@ -133,3 +133,5 @@ void MythVideoOutputVulkan::EndFrame()
     if (m_video)
         m_video->EndFrame();
 }
+
+#include "moc_mythvideooutputvulkan.cpp"

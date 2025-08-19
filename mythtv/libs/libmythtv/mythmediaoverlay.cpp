@@ -167,3 +167,5 @@ void MythMediaOverlay::RevertUIScale()
     }
     m_uiScaleOverride = false;
 }
+
+#include "moc_mythmediaoverlay.cpp"

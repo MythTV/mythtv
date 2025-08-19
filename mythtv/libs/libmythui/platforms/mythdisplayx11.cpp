@@ -5,6 +5,9 @@
 #include "mythxdisplay.h"
 
 // X11
+#if defined(_X11_XLIB_H_) && !defined(Bool)
+#define Bool int
+#endif
 #include <X11/Xatom.h>
 #define pointer Xpointer // Prevent conflicts with Qt6.
 #include <X11/extensions/Xrandr.h>

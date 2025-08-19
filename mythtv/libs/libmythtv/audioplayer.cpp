@@ -551,3 +551,5 @@ int AudioPlayer::DecodeAudio(AVCodecContext *ctx,
     }
     return m_audioOutput->DecodeAudio(ctx, buffer, data_size, pkt);
 }
+
+#include "moc_audioplayer.cpp"

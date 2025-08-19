@@ -556,3 +556,5 @@ void VideoSelector::parentalLevelChanged(bool passwordValid, ParentalLevel::Leve
     }
 }
 
+
+#include "moc_videoselector.cpp"

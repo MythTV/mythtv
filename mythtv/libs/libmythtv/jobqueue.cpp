@@ -2523,4 +2523,4 @@ int JobQueue::UserJobTypeToIndex(int jobType)
     return JOB_NONE;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_jobqueue.cpp"

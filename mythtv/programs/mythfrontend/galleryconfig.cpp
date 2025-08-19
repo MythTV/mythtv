@@ -314,3 +314,5 @@ GallerySettings::GallerySettings(bool enable)
     addChild(Password(enable));
     addChild(ClearDb(enable));
 }
+
+#include "moc_galleryconfig.cpp"

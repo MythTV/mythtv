@@ -235,3 +235,5 @@ void MythCaptionsOverlay::DisplayBDOverlay(MythBDOverlay* Overlay)
             bd->DisplayBDOverlay(Overlay);
     }
 }
+
+#include "moc_mythcaptionsoverlay.cpp"

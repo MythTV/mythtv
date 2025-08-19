@@ -1444,3 +1444,5 @@ void DTVDeviceConfigGroup::AddChild(
     else
         group->addChild(setting);
 }
+
+#include "moc_diseqcsettings.cpp"

@@ -166,3 +166,5 @@ void ExitPrompter::quit()
 
     qApp->exit(GENERIC_EXIT_OK);
 }
+
+#include "moc_exitprompt.cpp"

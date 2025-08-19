@@ -149,3 +149,5 @@ void BookmarkEditor::slotCategoryFound(const QString& category)
 {
     m_categoryEdit->SetText(category);
 }
+
+#include "moc_bookmarkeditor.cpp"

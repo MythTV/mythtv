@@ -537,3 +537,5 @@ void MythPainterVulkan::DeleteTextures()
         m_texturesToDelete.pop_front();
     }
 }
+
+#include "moc_mythpaintervulkan.cpp"

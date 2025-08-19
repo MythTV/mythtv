@@ -5990,3 +5990,5 @@ void TestMhegParser::test_parser_text(void)
 }
 
 QTEST_GUILESS_MAIN(TestMhegParser)
+
+#include "moc_test_mheg_parser.cpp"

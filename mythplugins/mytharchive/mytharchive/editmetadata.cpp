@@ -75,3 +75,5 @@ void EditMetadataDialog::cancelPressed(void)
     emit haveResult(false, m_sourceMetadata);
     Close();
 }
+
+#include "moc_editmetadata.cpp"
