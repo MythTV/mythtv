@@ -2278,7 +2278,7 @@ void VideoDialog::UpdateVisible(MythUIButtonListItem *item)
  */
 void VideoDialog::UpdateText(MythUIButtonListItem *item)
 {
-    if (!item || !item->isVisible())
+    if (!item)
         return;
 
     MythUIButtonList *currentList = item->parent();
