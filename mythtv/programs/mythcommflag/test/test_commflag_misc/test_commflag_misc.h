@@ -5,6 +5,8 @@
  *
  *  See the file LICENSE_FSF for licensing information.
  */
+#ifndef MYTHCOMMFLAG_TEST_COMMFLAG_MISC_H
+#define MYTHCOMMFLAG_TEST_COMMFLAG_MISC_H
 
 #include <QTest>
 #include <iostream>
@@ -45,3 +47,5 @@ class TestCommFlagMisc : public QObject
     static void test_quick_selectf_data(void);
     static void test_quick_selectf(void);
 };
+
+#endif // MYTHCOMMFLAG_TEST_COMMFLAG_MISC_H

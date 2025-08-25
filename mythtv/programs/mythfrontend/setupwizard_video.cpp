@@ -289,3 +289,5 @@ void VideoSetupWizard::customEvent(QEvent *e)
         }
     }
 }
+
+#include "moc_setupwizard_video.cpp"

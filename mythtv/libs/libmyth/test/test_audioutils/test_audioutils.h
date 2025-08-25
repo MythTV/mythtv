@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_PINK_NOISE_H
+#define LIBMYTHTV_TEST_PINK_NOISE_H
 
 #include <array>
 #include <cstring>
@@ -951,3 +953,5 @@ class TestAudioUtils: public QObject
         QCOMPARE(output[1023], expected_end[15]);
     }
 };
+
+#endif // LIBMYTHTV_TEST_PINK_NOISE_H

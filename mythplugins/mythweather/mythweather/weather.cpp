@@ -385,6 +385,4 @@ void Weather::nextpage_timeout()
     m_nextPageTimer->start(m_nextpageInterval);
 }
 
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
+#include "moc_weather.cpp"

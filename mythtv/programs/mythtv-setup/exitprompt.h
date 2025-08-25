@@ -1,3 +1,6 @@
+#ifndef MYTHTV_SETUP_EXITPROMPT_H
+#define MYTHTV_SETUP_EXITPROMPT_H
+
 #include <QObject>
 
 enum exit_actions : std::uint8_t {
@@ -28,3 +31,5 @@ class ExitPrompter : public QObject
   private:
     struct ExitPrompterPrivate *m_d {nullptr};
 };
+
+#endif // MYTHTV_SETUP_EXITPROMPT_H

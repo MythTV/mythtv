@@ -84,3 +84,5 @@ QStringList MythHDR::TypesToString() const
 {
     return MythHDR::TypesToString(m_supportedTypes);
 }
+
+#include "moc_mythhdr.cpp"

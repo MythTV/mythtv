@@ -767,3 +767,5 @@ void VideoFilterDialog::setTextFilter()
     m_settings.setTextFilter(m_textFilter->GetText());
     update_numvideo();
 }
+
+#include "moc_videofilter.cpp"
