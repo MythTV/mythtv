@@ -13,8 +13,8 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythsystem.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/stringutil.h"
+#include "libmythtv/programinforemoteutil.h"
 
 // Local includes
 #include "recordingutils.h"

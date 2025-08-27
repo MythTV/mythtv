@@ -9,7 +9,6 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/stringutil.h"
 #include "libmythmetadata/dbaccess.h"

@@ -12,9 +12,9 @@
 
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdate.h"
-#include "libmythbase/programinfo.h"
 
 #include "mythtvexp.h"
+#include "programinfo.h"
 
 class PreviewGenerator;
 class QByteArray;
