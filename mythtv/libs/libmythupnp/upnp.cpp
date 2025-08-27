@@ -18,6 +18,7 @@
 #include "libmythbase/serverpool.h"
 
 #include "ssdp.h"
+#include "ssdpextension.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Global/Class Static variables
