@@ -130,7 +130,7 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
 }
 
 dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
-                                            uint64_t time, uint search_to_nearest_cell) {
+                                            uint64_t time, uint8_t search_to_nearest_cell) {
 
   uint64_t target = time;
   uint64_t length = 0;
