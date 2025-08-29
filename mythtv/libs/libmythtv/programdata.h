@@ -91,7 +91,7 @@ class MTV_PUBLIC DBEvent
             QDateTime _start,     QDateTime _end,
             unsigned char    _subtitleType,
             unsigned char    _audioProps,
-            unsigned char    _videoProps,
+            uint             _videoProps,
             float            _stars,
             QString          _seriesId,  QString _programId,
             uint32_t         _listingsource,
@@ -159,7 +159,7 @@ class MTV_PUBLIC DBEvent
     QString                   m_syndicatedepisodenumber;
     unsigned char             m_subtitleType    {0};
     unsigned char             m_audioProps      {0};
-    unsigned char             m_videoProps      {0};
+    uint                      m_videoProps      {0};
     float                     m_stars           {0.0};
     ProgramInfo::CategoryType m_categoryType    {ProgramInfo::kCategoryNone};
     QString                   m_seriesId;
@@ -185,7 +185,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                FixupValue       _fixup,
                unsigned char    _subtitleType,
                unsigned char    _audioProps,
-               unsigned char    _videoProps,
+               uint             _videoProps,
                float            _stars,
                const QString   &_seriesId,  const QString   &_programId,
                uint _season,                uint _episode,
