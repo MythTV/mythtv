@@ -329,7 +329,9 @@ bool MusicMetadata::updateStreamList(void)
     QByteArray uncompressedData;
 
     // check if the streamlist has been updated since we last checked
-    QDateTime lastModified = GetMythDownloadManager()->GetLastModified(QString(STREAMUPDATEURL));
+    QString streamupdateurl = gCoreContext->GetSetting("ServicesRepositoryURL",
+                                   "https://services.mythtv.org") + "/music/data/?data=streams";
+    QDateTime lastModified = GetMythDownloadManager()->GetLastModified(streamupdateurl);
 
     QDateTime lastUpdate = QDateTime::fromString(gCoreContext->GetSetting("MusicStreamListModified"), Qt::ISODate);
 
@@ -344,7 +346,7 @@ bool MusicMetadata::updateStreamList(void)
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
     // download compressed stream file
-    if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData, false))
+    if (!GetMythDownloadManager()->download(streamupdateurl, &compressedData, false))
     {
         LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
         gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
@@ -367,7 +369,7 @@ bool MusicMetadata::updateStreamList(void)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "MusicMetadata: Could not read content of streams.xml" +
-                QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
+                QString("\n\t\t\tError parsing %1").arg(streamupdateurl) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
         gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
@@ -379,7 +381,7 @@ bool MusicMetadata::updateStreamList(void)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "MusicMetadata: Could not read content of streams.xml" +
-                QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
+                QString("\n\t\t\tError parsing %1").arg(streamupdateurl) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(parseResult.errorLine).arg(parseResult.errorColumn)
                 .arg(parseResult.errorMessage));

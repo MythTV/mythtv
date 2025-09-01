@@ -19,9 +19,9 @@
 #include "setupwizard_video.h"
 
 const QString VIDEO_SAMPLE_HD_LOCATION =
-                QString("http://services.mythtv.org/samples/video/?sample=HD");
+                QString("/samples/video/?sample=HD");
 const QString VIDEO_SAMPLE_SD_LOCATION =
-                QString("http://services.mythtv.org/samples/video/?sample=SD");
+                QString("/samples/video/?sample=SD");
 const QString VIDEO_SAMPLE_HD_FILENAME =
                 QString("mythtv_video_test_HD_19000Kbps_H264.mkv");
 const QString VIDEO_SAMPLE_SD_FILENAME =
@@ -168,7 +168,9 @@ void VideoSetupWizard::testSDVideo(void)
     if (!RemoteFile::Exists(sdtestfile))
     {
         m_testType = ttStandardDefinition;
-        DownloadSample(VIDEO_SAMPLE_SD_LOCATION, VIDEO_SAMPLE_SD_FILENAME);
+        QString url = gCoreContext->GetSetting("ServicesRepositoryURL",
+                                               "https://services.mythtv.org");
+        DownloadSample(url+VIDEO_SAMPLE_SD_LOCATION, VIDEO_SAMPLE_SD_FILENAME);
     }
     else
     {
@@ -191,7 +193,9 @@ void VideoSetupWizard::testHDVideo(void)
     if (!RemoteFile::Exists(hdtestfile))
     {
         m_testType = ttHighDefinition;
-        DownloadSample(VIDEO_SAMPLE_HD_LOCATION, VIDEO_SAMPLE_HD_FILENAME);
+        QString url = gCoreContext->GetSetting("ServicesRepositoryURL",
+                                               "https://services.mythtv.org");
+        DownloadSample(url+VIDEO_SAMPLE_HD_LOCATION, VIDEO_SAMPLE_HD_FILENAME);
     }
     else
     {

@@ -72,7 +72,6 @@ static constexpr uint32_t ID_TO_REPO(uint32_t x) { return x >> METADATA_REPO_SHI
 
 static constexpr const char* METADATA_INVALID_FILENAME { "**NOT FOUND**" };
 
-static constexpr const char* STREAMUPDATEURL { "https://services.mythtv.org/music/data/?data=streams" };
 static constexpr size_t STREAMURLCOUNT { 5 };
 
 using UrlList = std::array<QString,STREAMURLCOUNT>;

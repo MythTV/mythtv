@@ -6,6 +6,7 @@
 #include <QRegularExpression>
 
 // MythTV
+#include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
@@ -26,7 +27,10 @@
 ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
                                      int sourceid, QString channelname)
                   :MythScreenType(parent, "ChannelIconImporter"),
-    m_strChannelname(std::move(channelname)), m_fRefresh(fRefresh), m_sourceId(sourceid)
+    m_strChannelname(std::move(channelname)), m_fRefresh(fRefresh), m_sourceId(sourceid),
+    m_url(gCoreContext->GetSetting("ServicesRepositoryURL",
+                                   "https://services.mythtv.org") + "/channel-icon")
+
 {
     if (!m_strChannelname.isEmpty())
     {

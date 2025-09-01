@@ -176,7 +176,7 @@ class ImportIconsWizard : public MythScreenType
     int m_sourceId        {0};       //!< selected video source or 0 for all sources
 
                         //!< the default url
-    const QString m_url {"http://services.mythtv.org/channel-icon/"}; 
+    const QString m_url;
     QDir m_tmpDir;
 
     void startDialog();
