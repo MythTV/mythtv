@@ -9,7 +9,6 @@ import lxml.html
 import os
 import stat
 
-from builtins import input
 
 BASEURL = 'https://www.mythtv.org/wiki'
 

@@ -18,7 +18,6 @@ import datetime as _pydt
 import time as _pyt
 import weakref
 import os
-from builtins import int, str
 
 
 class DBData( DictData, MythSchema ):
