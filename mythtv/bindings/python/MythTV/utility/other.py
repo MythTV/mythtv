@@ -330,7 +330,7 @@ class deadlinesocket( socket.socket ):
             p = buff.tell()
             try:
                 buff.write(self.recv(bufsize-buff.tell(), flags))
-            except socket.error as e:
+            except OSError as e:
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                # no data read from a 'ready' socket, connection terminated
@@ -362,7 +362,7 @@ class deadlinesocket( socket.socket ):
             p = buff.tell()
             try:
                 buff.write(self.recv(100, flags))
-            except socket.error as e:
+            except OSError as e:
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                 # no data read from a 'ready' socket, connection terminated
@@ -393,7 +393,7 @@ class deadlinesocket( socket.socket ):
             length = b'%-8d' % len(data)
             data = b"".join([length, data])
             self.send(data, flags)
-        except socket.error as e:
+        except OSError as e:
             raise MythError(MythError.SOCKET, e.args)
 
 class MARKUPLIST:
@@ -568,7 +568,7 @@ def check_ipv6(n):
     try:
         socket.inet_pton(socket.AF_INET6, n)
         return True
-    except socket.error:
+    except OSError:
         return False
 
 def resolve_ip(host, port):

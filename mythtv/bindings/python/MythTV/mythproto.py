@@ -17,7 +17,6 @@ from datetime import date
 from time import sleep
 from _thread import allocate_lock
 from random import randint
-import socket
 import weakref
 import re
 import os
