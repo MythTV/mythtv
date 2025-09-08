@@ -249,7 +249,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         # abuse the __new__ constructor to set some immutable class attributes
         # before the class is instantiated
         cls._initlogger()
-        return super(MythLog, cls).__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, module='pythonbindings', db=None):
         self.module = module

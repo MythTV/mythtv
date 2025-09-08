@@ -424,7 +424,7 @@ class BEEventMonitor( BECache ):
     def __init__(self, backend=None, blockshutdown=False,
                        systemevents=False, db=None):
         self.systemevents = systemevents
-        super(BEEventMonitor, self).__init__(backend, blockshutdown, True, db)
+        super().__init__(backend, blockshutdown, True, db)
 
     def _listhandlers(self):
         return [self.eventMonitor]
@@ -505,7 +505,7 @@ class MythSystemEvent( BECache ):
 
     def __init__(self, backend=None, blockshutdown=False, db=None,
                        enablehandler=True):
-        super(MythSystemEvent, self).__init__(backend, blockshutdown, True, db)
+        super().__init__(backend, blockshutdown, True, db)
 
         if enablehandler:
             self._events.append(self._generic_handler)

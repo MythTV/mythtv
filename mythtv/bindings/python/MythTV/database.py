@@ -272,7 +272,7 @@ class DBDataWrite( DBData ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(DBDataWrite, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         if cls._defaults is None:
             cls._defaults = {}
         create = cls._create_normal

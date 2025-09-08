@@ -24,7 +24,7 @@ try:
                            args=(), kwargs={}):
             self.inputqueue = Queue()
             self.idletime = time()
-            super(_PollingThread, self).__init__(group,
+            super().__init__(group,
                         target, name, args, kwargs)
         def add_pipe(self, buff, pipe, mode):
             self.inputqueue.put((buff, pipe, mode))
@@ -96,7 +96,7 @@ except ImportError:
                            args=(), kwargs={}):
             self.inputqueue = Queue()
             self.idletime = time()
-            super(_PollingThread, self).__init__(group,
+            super().__init__(group,
                         target, name, args, kwargs)
         def add_pipe(self, buff, pipe, mode):
             self.inputqueue.put((buff, pipe, mode))
