@@ -19,7 +19,7 @@ class MSearch:
                              socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listening = False
-        while listening == False:
+        while not listening:
             try:
                 self.sock.bind(('', port))
                 self.addr = (addr, port)

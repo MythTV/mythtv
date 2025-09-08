@@ -728,7 +728,7 @@ class MythDB( DBCache ):
             return ('people.name', 'recordedcredits', 4, 1)
 
         if key == 'livetv':
-            if (value is None) or (value == False):
+            if (value is None) or (value is False):
                 return ('recorded.recgroup!=?', 'LiveTV', 0)
             return ()
 

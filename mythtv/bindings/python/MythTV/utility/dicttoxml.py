@@ -330,7 +330,7 @@ def convert_kv(key, val, attr_type, attr={}, cdata=False):
     attrstring = make_attrstring(attr)
     return '<%s%s>%s</%s>' % (
         key, attrstring,
-        wrap_cdata(val) if cdata == True else escape_xml(val),
+        wrap_cdata(val) if cdata else escape_xml(val),
         key
     )
 
@@ -382,7 +382,7 @@ def dicttoxml(obj, root=True, custom_root='root', ids=False, attr_type=True,
     LOG.info('Inside dicttoxml(): type(obj) is: "%s", obj="%s"' % (type(obj).__name__, unicode_me(obj)))
     output = []
     addline = output.append
-    if root == True:
+    if root:
         addline('<?xml version="1.0" encoding="UTF-8" ?>')
         addline('<%s>%s</%s>' % (
         custom_root,
