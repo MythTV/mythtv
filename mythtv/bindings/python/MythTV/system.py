@@ -41,7 +41,7 @@ class System( DBCache ):
             return self._fd.poll()
 
         def wait(self):
-            res = self._fd.wait()
+            self._fd.wait()
             while True:
                 # wait until pipes have been closed
                 if self.stdout._closed and self.stderr._closed:

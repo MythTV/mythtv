@@ -208,7 +208,6 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
         r'myth://((?P<group>.*)@)?(?P<host>[\[\]a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
-    reip = re.compile(r'(?:\d{1,3}\.){3}\d{1,3}')
 
     if mode not in ('r','w'):
         raise TypeError("File I/O must be of type 'r' or 'w'")
@@ -785,7 +784,6 @@ class FileOps( BECache ):
         def run(self, *args, **kwargs):
             pgfieldcount = len(Program._field_order)
             pgrecstatus = Program._field_order.index('recstatus')
-            pgrecordid = Program._field_order.index('recordid')
 
             res = self.inst.backendCommand(self.query).split(BACKEND_SEP)
             for i in range(self.header_length):
