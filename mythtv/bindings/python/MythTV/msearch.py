@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides tools for UPNP searches"""
 
 from MythTV.exceptions import MythError

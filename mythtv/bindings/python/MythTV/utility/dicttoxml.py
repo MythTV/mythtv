@@ -1,4 +1,3 @@
-# coding: utf-8
 
 """
 Converts a Python dictionary or other native data type into a valid XML string.

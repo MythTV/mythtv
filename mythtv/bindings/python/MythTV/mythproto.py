@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides connection cache and data handlers for accessing the backend.

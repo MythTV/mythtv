@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides basic connection classes."""
 
 from MythTV.static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
