@@ -597,7 +597,7 @@ class Recorded( CMPRecord, DBDataWrite ):
             name = pitem.name
             if pitem.roleid:
                 character = self._InverseRole(pitem.roleid, self._db).name
-            role = ' '.join([word.capitalize() for word in pitem.role.split('_')])
+            role = ' '.join(word.capitalize() for word in pitem.role.split('_'))
             if role == 'Writer': role = 'Author'
             if character:
                 metadata.people.append(OrdDict((('name', name), ('job', role),
@@ -1543,7 +1543,7 @@ class MusicPlaylist( MusicSchema, DBDataWrite ):
     def _pl_tostr(self):
         try:
             self.playlist_songs = \
-                    ','.join(['%d' % id for id in self.playlist_songs])
+                    ','.join('%d' % id for id in self.playlist_songs)
         except: pass
 
     def _pull(self):

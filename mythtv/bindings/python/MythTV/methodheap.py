@@ -627,7 +627,7 @@ class Frontend( FEConnection ):
 
     def getLoad(self):
         """Returns tuple of 1/5/15 load averages."""
-        return tuple([float(l) for l in self.sendQuery('load').split()])
+        return tuple(float(l) for l in self.sendQuery('load').split())
 
     def getUptime(self):
         """Returns timedelta of uptime."""
@@ -1016,7 +1016,7 @@ class MythDB( DBCache ):
         """
         obj.scanVideo() --> list of new, moved, and deleted Videos
         """
-        startvids = dict([(vid.intid, vid) for vid in Video.getAllEntries(db=self)])
+        startvids = {vid.intid: vid for vid in Video.getAllEntries(db=self)}
 
         be = MythBE(db=self)
         r = re.compile(re.escape(BACKEND_SEP).\
