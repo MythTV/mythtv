@@ -13,7 +13,6 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale
-import xml.etree.ElementTree as etree
 from collections import UserString
 from datetime import date, time
 

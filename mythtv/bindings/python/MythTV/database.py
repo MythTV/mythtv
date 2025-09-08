@@ -6,13 +6,12 @@ Provides connection cache and data handlers for accessing the database.
 from MythTV.static import MythSchema
 from MythTV.altdict import OrdDict, DictData
 from MythTV.logging import MythLog
-from MythTV.msearch import MSearch
 from MythTV.utility import datetime, dt, _donothing, QuickProperty
 from MythTV.exceptions import MythError, MythDBError, MythTZError
 from MythTV.connections import DBConnection, LoggedCursor, XMLConnection
 
 from socket import gethostname
-from uuid import UUID, uuid1, uuid4
+from uuid import UUID, uuid1
 from lxml import etree
 import datetime as _pydt
 import time as _pyt

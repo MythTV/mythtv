@@ -3,7 +3,7 @@
 Provides connection cache and data handlers for accessing the backend.
 """
 
-from MythTV.static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
+from MythTV.static import BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
                           VIDEO_PROPS, SUBTITLE_TYPES
 from MythTV.exceptions import MythError, MythDBError, MythBEError, MythFileError
 from MythTV.logging import MythLog
@@ -11,10 +11,9 @@ from MythTV.altdict import DictData
 from MythTV.connections import BEConnection, BEEventConnection
 from MythTV.database import DBCache
 from MythTV.utility import CMPRecord, datetime, ParseEnum, \
-                           CopyData, CopyData2, check_ipv6, resolve_ip
+                           CopyData, CopyData2, resolve_ip
 
 from datetime import date
-from time import sleep
 from _thread import allocate_lock
 from random import randint
 import weakref
