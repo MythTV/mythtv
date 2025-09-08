@@ -131,7 +131,7 @@ class System( DBCache ):
         """
         if self.path == '':
             return ''
-        cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
+        cmd = '%s %s' % (self.path, ' '.join('%s' % a for a in args))
         return self._runcmd(cmd)
 
     def _runcmd(self, cmd):
@@ -160,12 +160,12 @@ class System( DBCache ):
         Permenantly appends one or more strings to the command
             path, separated by spaces.
         """
-        self.path += ' '+' '.join(['%s' % a for a in args])
+        self.path += ' '+' '.join('%s' % a for a in args)
 
     def _runasync(self, *args):
         if self.path == '':
             return ''
-        cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
+        cmd = '%s %s' % (self.path, ' '.join('%s' % a for a in args))
         return self.Process(cmd, self.useshell, self.log)
 
 class Metadata( DictData ):

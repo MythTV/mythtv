@@ -110,7 +110,7 @@ def escape_xml(s):
 
 def make_attrstring(attr):
     """Returns an attribute string in the form key="val" """
-    attrstring = ' '.join(['%s="%s"' % (k, v) for k, v in attr.items()])
+    attrstring = ' '.join('%s="%s"' % (k, v) for k, v in attr.items())
     return '%s%s' % (' ' if attrstring != '' else '', attrstring)
 
 
