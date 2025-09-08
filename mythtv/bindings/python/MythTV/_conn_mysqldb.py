@@ -6,7 +6,8 @@ from weakref import ref
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
-    import MySQLdb, MySQLdb.cursors
+    import MySQLdb
+    import MySQLdb.cursors
 if MySQLdb.version_info < (1,2,3):
     raise ImportError('MySQLdb is too old for this version of Python')
 
