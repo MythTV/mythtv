@@ -24,7 +24,7 @@ class MSearch:
                 self.sock.bind(('', port))
                 self.addr = (addr, port)
                 listening = True
-            except socket.error as e:
+            except OSError as e:
                 if port < 1910:
                     port += 1
                 else:
@@ -64,7 +64,7 @@ class MSearch:
         while (time()<atime) and self._runsearch:
             try:
                 sdata, saddr = sock.recvfrom(2048)
-            except socket.error:
+            except OSError:
                 continue #no data, continue
             sdata = sdata.decode('utf-8')
 

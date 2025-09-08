@@ -195,7 +195,7 @@ class BEConnection:
 
         try:
             self.connect()
-        except socket.error as e:
+        except OSError as e:
             self.log.logTB(MythLog.SOCKET)
             self.connected = False
             self.log(MythLog.GENERAL, MythLog.CRIT,
@@ -543,7 +543,7 @@ class FEConnection:
         prompt = re.compile(b'([\r\n.]*)\r\n# ')
         try:
             res = self.socket.dlexpect(prompt, deadline=deadline)
-        except socket.error:
+        except OSError:
             raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
         except KeyboardInterrupt:
             raise
