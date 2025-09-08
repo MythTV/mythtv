@@ -443,7 +443,7 @@ def levenshtein(s1, s2):
 class ParseEnum:
     _static = None
     def __str__(self):
-        return str(k for k,v in self.iteritems() if v==True)
+        return str(k for k,v in self.iteritems() if v)
     def __repr__(self): return str(self)
     def __init__(self, parent, field_name, enum, editable=True):
         self._parent = weakref.proxy(parent)
