@@ -10,7 +10,6 @@ from MythTV.utility import levenshtein, DequeBuffer
 from MythTV.database import DBCache
 
 from subprocess import Popen
-from select import select
 from lxml import etree
 from time import sleep
 import shlex

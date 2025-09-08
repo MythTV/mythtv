@@ -12,7 +12,7 @@ try:
 except ImportError:
     # bail only when '--systemd-journal' is selected
     journal = None
-from sys import version_info, stdout, argv
+from sys import stdout, argv
 from datetime import datetime
 from _thread import allocate_lock
 from io import StringIO
