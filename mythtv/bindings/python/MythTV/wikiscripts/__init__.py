@@ -5,7 +5,8 @@ from .wikiscripts import *
 if __name__ == '__main__':
     import code
     try:
-        import readline, rlcompleter
+        import readline
+        import rlcompleter  # noqa: F401
     except:
         pass
     else:
