@@ -1069,7 +1069,7 @@ class EventLock( BECache ):
         self.regex = regex
         self._lock = allocate_lock()
         self._lock.acquire()
-        super(EventLock, self).__init__(backend, False, True, db)
+        super().__init__(backend, False, True, db)
 
     def _listhandlers(self):
         return [self._unlock]

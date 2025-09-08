@@ -338,13 +338,13 @@ class BEEventConnection( BEConnection ):
         self.threadrunning = False
         self.eventqueue = queue.Queue()
 
-        super(BEEventConnection, self).__init__(backend, port, localname,
+        super().__init__(backend, port, localname,
                                                 False, deadline)
 
     def connect(self):
         if self.connected:
             return
-        super(BEEventConnection, self).connect()
+        super().connect()
         if len(self._regevents) and (not self.threadrunning):
             start_new_thread(self.eventloop, ())
 
@@ -433,7 +433,7 @@ class BEEventConnection( BEConnection ):
     def backendCommand(self, data, deadline=None):
         if self._announced:
             return ""
-        return super(BEEventConnection, self).backendCommand(data, deadline)
+        return super().backendCommand(data, deadline)
 
 class FEConnection:
     """
