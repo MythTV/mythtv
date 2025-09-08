@@ -443,7 +443,7 @@ def levenshtein(s1, s2):
 class ParseEnum:
     _static = None
     def __str__(self):
-        return str([k for k,v in self.iteritems() if v==True])
+        return str(k for k,v in self.iteritems() if v==True)
     def __repr__(self): return str(self)
     def __init__(self, parent, field_name, enum, editable=True):
         self._parent = weakref.proxy(parent)
@@ -506,8 +506,8 @@ class ParseSet( ParseEnum ):
         if field[:4] != 'set(':
             raise MythDBError("ParseSet error. "+\
                         "Field '%s' not of type 'set()'" % self._field)
-        self._enum = dict([(t,2**i) for i,t in enumerate([type.strip("'")\
-                                for type in field[4:-1].split(',')])])
+        self._enum = {t: 2**i for i,t in enumerate(type.strip("'")
+                                for type in field[4:-1].split(','))}
         self._static = not editable
 
     def __getattr__(self, name):

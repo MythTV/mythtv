@@ -90,7 +90,7 @@ class DBData( DictData, MythSchema ):
                                                      key=lambda x: x[3])]
                 log(log.DATABASE, log.DEBUG,
                     'set _key to %s' % str(cls._key))
-            gen = lambda j,s,l: j.join([s % k for k in l])
+            gen = lambda j,s,l: j.join(s % k for k in l)
             cls._where = gen(' AND ', '%s=?', cls._key)
             cls._setwheredat = gen('', 'self.%s,', cls._key)
             log(log.DATABASE, log.DEBUG,
@@ -213,7 +213,7 @@ class DBData( DictData, MythSchema ):
                         (self.__class__.__name__, hex(id(self)))
         return "<%s %s at %s>" % \
                 (self.__class__.__name__, \
-                 ','.join(["'%s'" % str(v) for v in self._wheredat]), \
+                 ','.join("'%s'" % str(v) for v in self._wheredat), \
                  hex(id(self)))
 
     def __repr__(self):
@@ -349,7 +349,7 @@ class DBDataWrite( DBData ):
             elif isinstance(val, datetime):
                 data[key] = val.asnaiveutc()
         fields = ', '.join(data.keys())
-        format_string = ', '.join(['?' for d in data.values()])
+        format_string = ', '.join('?' for d in data.values())
         cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
                     % (self._table, fields, format_string), data.values())
 
@@ -398,7 +398,7 @@ class DBDataWrite( DBData ):
         if len(data) == 0:
             # no updates
             return
-        format_string = ', '.join(['%s = ?' % d for d in data])
+        format_string = ', '.join('%s = ?' % d for d in data)
         sql_values = list(data.values())
         sql_values.extend(self._getwheredat())
         with self._db.cursor(self._log) as cursor:
@@ -547,9 +547,9 @@ class DBDataRef( list ):
         if data is None:
             with self._db as cursor:
                 cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
-                            (','.join(['`%s`' %x for x in self._datfields]),
+                            (','.join('`%s`' %x for x in self._datfields),
                              self._table,
-                             ' AND '.join(['`%s`=?' % f for f in self._ref])),
+                             ' AND '.join('`%s`=?' % f for f in self._ref)),
                          self._refdat)
                 for row in cursor:
                     list.append(self, self.SubData(zip(self._datfields, row)))
@@ -618,8 +618,8 @@ class DBDataRef( list ):
             if len(data) > 0:
                 cursor.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
                                     (self._table,
-                                     ','.join(['`%s`' %x for x in fields]),
-                                     ','.join(['?' for a in fields])), data)
+                                     ','.join('`%s`' %x for x in fields),
+                                     ','.join('?' for a in fields)), data)
         self._origdata = self.deepcopy()
 
     def append(self, *data):
@@ -706,14 +706,15 @@ class DBDataCRef( DBDataRef ):
 
         if data is None:
             with self._db as cursor:
-                cursor.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
-                          (','.join(['`%s`' %x for x in datfields]+[reffield]),
+                cursor.execute("""SELECT %s,%s FROM %s JOIN %s ON %s WHERE %s""" % \
+                          (','.join('`%s`' %x for x in datfields),
+                             reffield,
                              self._table[0],
                              self._table[1],
                              '`%s`.`%s`=`%s`.`%s`' % \
                                     (self._table[0], self._cref[0],
                                      self._table[1], self._cref[-1]),
-                             ' AND '.join(['`%s`=?' % f for f in self._ref])),
+                             ' AND '.join('`%s`=?' % f for f in self._ref)),
                         self._refdat)
 
                 for row in cursor:
@@ -745,7 +746,7 @@ class DBDataCRef( DBDataRef ):
                 fields = self._crdatfields
                 cursor.execute("""SELECT %s FROM %s WHERE %s""" % \
                             (self._cref[-1], self._table[1],
-                             ' AND '.join(['`%s`=?' % f for f in fields])),
+                             ' AND '.join('`%s`=?' % f for f in fields)),
                         data)
                 res = cursor.fetchone()
                 if res is not None:
@@ -755,8 +756,8 @@ class DBDataCRef( DBDataRef ):
                 else:
                     cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                             (self._table[1],
-                             ','.join(['`%s`' %x for x in self._crdatfields]),
-                             ','.join(['?' for a in data])),
+                             ','.join('`%s`' %x for x in self._crdatfields),
+                             ','.join('?' for a in data)),
                         data)
                     d._cref = cursor.lastrowid
             # add new references
@@ -765,8 +766,8 @@ class DBDataCRef( DBDataRef ):
                 fields = self._rdatfields+self._cref[:1]+self._ref
                 cursor.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
                         (self._table[0],
-                         ','.join(['`%s`' %x for x in fields]),
-                         ','.join(['?' for a in data])),
+                         ','.join('`%s`' %x for x in fields),
+                         ','.join('?' for a in data)),
                     data)
 
             # remove old references
@@ -777,7 +778,7 @@ class DBDataCRef( DBDataRef ):
                 fields = self._rdatfields+self._cref[:1]+self._ref
                 cursor.execute("""DELETE FROM %s WHERE %s""" % \
                         (self._table[0],
-                         ' AND '.join(['`%s`=?' % f for f in fields])),
+                         ' AND '.join('`%s`=?' % f for f in fields)),
                     data)
             # remove unused cross-references
             for cr in crefs:

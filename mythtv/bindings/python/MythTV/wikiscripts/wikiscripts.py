@@ -17,7 +17,7 @@ def getScripts():
 
 def getPage(**kwargs):
     url = "{0}?{1}".format(BASEURL,
-            '&'.join(['{0}={1}'.format(k,v) for k,v in list(kwargs.items())]))
+            '&'.join('{0}={1}'.format(k,v) for k,v in list(kwargs.items())))
     return lxml.html.parse(urlopen(url)).getroot()
 
 def getWhatLinksHere(page):
@@ -122,7 +122,7 @@ class Script:
         for i in reversed(list(range(len(text)))):
             if '=' not in text[i]:
                 text[i-1] += text.pop(i)
-        self.info = OrdDict([a.split('=') for a in text])
+        self.info = OrdDict(a.split('=') for a in text)
         if self.info.webpage == 'none':
             self.info.webpage = self.url
 
