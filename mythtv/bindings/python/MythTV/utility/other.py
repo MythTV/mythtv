@@ -8,8 +8,6 @@ from select import select
 from time import time
 import weakref
 import socket
-import re
-import sys
 
 def _donothing(*args, **kwargs):
     pass

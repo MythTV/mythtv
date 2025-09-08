@@ -84,7 +84,7 @@ try:
                     self.idletime = time()
 except ImportError:
     from select import kqueue, kevent, KQ_FILTER_READ, KQ_FILTER_WRITE, \
-                         KQ_EV_ADD, KQ_EV_DELETE, KQ_EV_EOF
+                         KQ_EV_ADD, KQ_EV_EOF
     class _PollingThread( Thread ):
         """
         This polling thread listens on selected pipes, and automatically reads

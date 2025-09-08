@@ -7,7 +7,7 @@ from MythTV.static import *
 from MythTV.exceptions import *
 from MythTV.logging import MythLog
 from MythTV.connections import FEConnection, XMLConnection, BEEventConnection
-from MythTV.utility import databaseSearch, datetime, check_ipv6, _donothing, resolve_ip
+from MythTV.utility import databaseSearch, datetime, _donothing, resolve_ip
 from MythTV.database import DBCache, DBData
 from MythTV.system import SystemEvent
 from MythTV.mythproto import BECache, FileOps, Program, FreeSpace, EventLock

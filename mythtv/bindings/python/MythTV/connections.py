@@ -1,10 +1,9 @@
 """Provides basic connection classes."""
 
-from MythTV.static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
+from MythTV.static import PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
 from MythTV.msearch import MSearch
 from MythTV.logging import MythLog
 from MythTV.exceptions import *
-from MythTV.altdict import OrdDict
 from MythTV.utility import deadlinesocket
 
 from time import sleep, time

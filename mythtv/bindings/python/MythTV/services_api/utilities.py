@@ -4,7 +4,6 @@
 from datetime import datetime, timedelta
 import logging
 import sys
-from ._version import __version__
 
 # pylint: disable=no-name-in-module, import-error
 try:

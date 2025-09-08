@@ -5,7 +5,7 @@
 #              timestamp formats
 #------------------------------
 
-from MythTV.exceptions import MythError, MythTZError
+from MythTV.exceptions import MythTZError
 
 from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
