@@ -796,8 +796,8 @@ class DBDataCRef( DBDataRef ):
         self._populate()
         return [a.values()+[a._cref] for a in self.copy()]
 
-class DatabaseConfig( object ):
-    class _WakeOnLanConfig( object ):
+class DatabaseConfig:
+    class _WakeOnLanConfig:
         def __init__(self):
             self.enabled = False
             self.waittime = 0

@@ -29,7 +29,7 @@ def getWhatLinksHere(page):
         links.append('_'.join(link.find('a').text.split(' ')))
     return links
 
-class Script( object ):
+class Script:
     _cache   = None
     _queue   = Queue.Queue()
     _pool    = []

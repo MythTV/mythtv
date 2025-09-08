@@ -439,7 +439,7 @@ class BEEventMonitor( BECache ):
         self.log(MythLog.ALL, MythLog.INFO, event)
 
 class MythSystemEvent( BECache ):
-    class systemeventhandler( object ):
+    class systemeventhandler:
         # decorator class for system events
         bs = BACKEND_SEP.replace('[',r'\[').replace(']',r'\]')
         re_process = re.compile(bs.join([
@@ -520,7 +520,7 @@ class MythSystemEvent( BECache ):
 
 class Frontend( FEConnection ):
     _db = None
-    class _Jump( object ):
+    class _Jump:
         def __str__(self):  return str(self.list())
         def __repr__(self): return str(self)
 
@@ -553,7 +553,7 @@ class Frontend( FEConnection ):
             self._populate()
             return self._points.items()
 
-    class _Key( object ):
+    class _Key:
         _keymap = { 9:'tab',        10:'enter',     27:'escape',
                     32:'space',     92:'backslash', 127:'backspace',
                     258:'down',     259:'up',       260:'left',

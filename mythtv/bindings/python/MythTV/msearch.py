@@ -6,7 +6,7 @@ from MythTV.logging import MythLog
 from time import time
 import socket
 
-class MSearch( object ):
+class MSearch:
     """
     Opens a socket for performing UPNP searches.
     """

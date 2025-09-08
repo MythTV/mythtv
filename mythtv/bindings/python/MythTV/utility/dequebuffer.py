@@ -158,14 +158,14 @@ except ImportError:
                 else:
                     self.idletime = time()
 
-class DequeBuffer( object ):
+class DequeBuffer:
     """
     This is a chunked buffer, storing a sequence of buffer objects in a
     deque, allowing for FIFO operations outside the limited 64K system
     buffer, and the efficient freeing of memory without needing to rewrite
     a large contiguous buffer object.
     """
-    class _Buffer( object ):
+    class _Buffer:
         """
         This subclass contains a buffer object and a read/write lock, as
         well as independent read and write positions.

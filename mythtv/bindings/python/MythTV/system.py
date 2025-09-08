@@ -25,7 +25,7 @@ class System( DBCache ):
     """
     logmodule = 'Python system call handler'
 
-    class Process( object ):
+    class Process:
         def __init__(self, cmd, useshell, log):
             self.cmd = cmd
             self.log = log
