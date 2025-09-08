@@ -6,12 +6,10 @@ from .dt import datetime
 from io import BytesIO
 from select import select
 from time import time
-from builtins import map
 import weakref
 import socket
 import re
 import sys
-from builtins import range
 
 def _donothing(*args, **kwargs):
     pass

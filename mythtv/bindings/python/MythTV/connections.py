@@ -17,7 +17,6 @@ import socket
 import queue
 import json
 import re
-from builtins import str
 
 # Note: Support for oursql was removed in MythTV v32
 try:
