@@ -193,7 +193,7 @@ class BEConnection:
 
         try:
             self.connect()
-        except OSError as e:
+        except OSError:
             self.log.logTB(MythLog.SOCKET)
             self.connected = False
             self.log(MythLog.GENERAL, MythLog.CRIT,
@@ -477,7 +477,7 @@ class FEConnection:
             try:
                 t = time()
                 fe._test(t + 2.0)
-            except MythError as e:
+            except MythError:
                 continue
             yield fe
 
@@ -612,7 +612,6 @@ class XMLConnection:
 
     def getConnectionInfo(self, pin=0):
         """Return dbconn dict from backend connection info."""
-        dbconn = {'SecurityPin':pin}
         try:
             dat = self._request('Myth/GetConnectionInfo', \
                                         Pin='{0:0>4}'.format(pin)).readJSON()

@@ -1341,7 +1341,7 @@ class InetrefGrabber( Grabber ):
         self.grabber = inetref.split('_')[0]
         try:
             self.iref = inetref.split('_')[1]
-        except IndexError as e:
+        except IndexError:
             raise MythError("MythTV interef error: '%s' !" % inetref)
 
         self.season = season
