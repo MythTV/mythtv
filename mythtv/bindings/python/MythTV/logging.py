@@ -21,13 +21,17 @@ from traceback import format_exc
 def _donothing(*args, **kwargs):
     pass
 
-class DummyLogger( LOGLEVEL, LOGMASK, LOGFACILITY ):
+class DummyLogger:
+    locals().update(LOGLEVEL.__members__)
+    locals().update(LOGMASK.__members__)
+    locals().update(LOGFACILITY.__members__)
+
     def __init__(self, module=None, db=None): pass
     def logTB(self, mask): pass
     def log(self, mask, level, message, detail=None): pass
     def __call__(self, mask, level, message, detail=None): pass
 
-class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
+class MythLog:
     """
     MythLog(module='pythonbindings', lstr=None, lbit=None, \
                     db=None) -> logging object
@@ -41,6 +45,9 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     The filter level is global values, shared between all logging instances.
     The logging object is callable, and implements the MythLog.log() method.
     """
+    locals().update(LOGLEVEL.__members__)
+    locals().update(LOGMASK.__members__)
+    locals().update(LOGFACILITY.__members__)
 
     helptext = """Verbose debug levels.
  Accepts any combination (separated by comma) of:

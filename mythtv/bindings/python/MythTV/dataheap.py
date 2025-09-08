@@ -119,10 +119,11 @@ class Artwork( UserString ):
     def open(self, mode='r'):
         return ftopen((self.hostname, self.imagetype, str(self)), mode)
 
-class Record( CMPRecord, DBDataWrite, RECTYPE ):
+class Record( CMPRecord, DBDataWrite ):
     """
     Record(id=None, db=None) -> Record object
     """
+    locals().update(RECTYPE.__members__)
 
     @classmethod
     def _setClassDefs(cls, db=None):
@@ -318,11 +319,15 @@ class Recorded( CMPRecord, DBDataWrite ):
         _table = 'roles'
         _key = ['roleid']
 
-    class _Seek( DBDataRef, MARKUP ):
+    class _Seek( DBDataRef ):
+        locals().update(MARKUP.__members__)
+
         _table = 'recordedseek'
         _ref = ['chanid','starttime']
 
-    class _Markup( DBDataRef, MARKUP, MARKUPLIST ):
+    class _Markup( DBDataRef, MARKUPLIST ):
+        locals().update(MARKUP.__members__)
+
         _table = 'recordedmarkup'
         _ref = ['chanid','starttime']
         def getskiplist(self):
@@ -708,11 +713,12 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
     def fromRecorded(cls, recorded):
         return cls((recorded.chanid, recorded.progstart), recorded._db)
 
-class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
+class OldRecorded( CMPRecord, DBDataWrite ):
     """
     OldRecorded(data=None, db=None) -> OldRecorded object
             'data' is a tuple containing (chanid, starttime)
     """
+    locals().update(RECSTATUS.__members__)
 
     _key   = ['chanid','starttime']
     _defaults = {'title':'',     'subtitle':'',
@@ -779,10 +785,15 @@ class RecordedArtwork( DBDataWrite ):
     fanart   = Artwork('fanart')
     banner   = Artwork('banner')
 
-class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
+class Job( DBDataWrite ):
     """
     Job(id=None, db=None) -> Job object
     """
+    locals().update(JOBTYPE.__members__)
+    locals().update(JOBCMD.__members__)
+    locals().update(JOBFLAG.__members__)
+    locals().update(JOBSTATUS.__members__)
+
     _table = 'jobqueue'
     _logmodule = 'Python Jobqueue'
     _defaults = {'id':None,     'inserttime':datetime.now(),
@@ -1073,7 +1084,9 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         _ref = ['idvideo']
         _cref = ['idcountry','intid']
 
-    class _Markup( DBDataRef, MARKUP ):
+    class _Markup( DBDataRef ):
+        locals().update(MARKUP.__members__)
+
         _table = 'filemarkup'
         _ref = ['filename',]
 

@@ -4,9 +4,11 @@ Contains static and global variables for MythTV Python Bindings.
 Version information is placed in '_versions.py'.
 """
 
+from enum import IntEnum, IntFlag
+
 from MythTV._versions import *
 
-class MARKUP( object ):
+class MARKUP(IntEnum):
     MARK_UNSET            = -10
     MARK_TMP_CUT_END      = -5
     MARK_TMP_CUT_START    = -4
@@ -36,7 +38,7 @@ class MARKUP( object ):
     MARK_UTIL_PROGSTART   = 40
     MARK_UTIL_LASTPLAYPOS = 41
 
-class RECTYPE( object ):
+class RECTYPE(IntEnum):
     kNotRecording       = 0
     kSingleRecord       = 1
     kDailyRecord        = 2
@@ -50,7 +52,7 @@ class RECTYPE( object ):
     #kFindWeeklyRecord   = 10 (Obsolete)
     kTemplateRecord     = 11
 
-class RECSEARCHTYPE( object ):
+class RECSEARCHTYPE(IntEnum):
     kNoSearch           = 0
     kPowerSearch        = 1
     kTitleSearch        = 2
@@ -58,7 +60,7 @@ class RECSEARCHTYPE( object ):
     kPeopleSearch       = 4
     kManualSearch       = 5
 
-class RECSTATUS( object ):
+class RECSTATUS(IntEnum):
     rsPending           = -15
     rsFailing           = -14
     rsTuning            = -10
@@ -85,7 +87,7 @@ class RECSTATUS( object ):
     rsNeverRecord       = 11
     rsOffline           = 12
 
-class AUDIO_PROPS( object ):
+class AUDIO_PROPS(IntFlag):
     AUD_UNKNOWN         = 0x00
     AUD_STEREO          = 0x01
     AUD_MONO            = 0x02
@@ -94,7 +96,7 @@ class AUDIO_PROPS( object ):
     AUD_HARDHEAR        = 0x10
     AUD_VISUALIMPAIR    = 0x20
 
-class VIDEO_PROPS( object ):
+class VIDEO_PROPS(IntFlag):
     VID_UNKNOWN         = 0x0000
     VID_WIDESCREEN      = 0x0001
     VID_HDTV            = 0x0002
@@ -108,14 +110,14 @@ class VIDEO_PROPS( object ):
     VID_PROGRESSIVE     = 0x0200
     VID_DAMAGED         = 0x0400
 
-class SUBTITLE_TYPES( object ):
+class SUBTITLE_TYPES(IntFlag):
     SUB_UNKNOWN         = 0x00
     SUB_HARDHEAR        = 0x01
     SUB_NORMAL          = 0x02
     SUB_ONSCREEN        = 0x04
     SUB_SIGNED          = 0x08
 
-class CAST_ROLES( object ):
+class CAST_ROLES(IntFlag):
     UNKNOWN            = 0x0000
     ACTOR              = 0x0001
     DIRECTOR           = 0x0002
@@ -129,7 +131,7 @@ class CAST_ROLES( object ):
     COMMENTATOR        = 0x0200
     GUEST              = 0x0400
 
-class JOBTYPE( object ):
+class JOBTYPE(IntFlag):
     NONE         = 0x0000
     SYSTEMJOB    = 0x00ff
     TRANSCODE    = 0x0001
@@ -142,21 +144,21 @@ class JOBTYPE( object ):
     USERJOB3     = 0x0400
     USERJOB4     = 0x0800
 
-class JOBCMD( object ):
+class JOBCMD(IntFlag):
     RUN          = 0x0000
     PAUSE        = 0x0001
     RESUME       = 0x0002
     STOP         = 0x0004
     RESTART      = 0x0008
 
-class JOBFLAG( object ):
+class JOBFLAG(IntFlag):
     NO_FLAGS     = 0x0000
     USE_CUTLIST  = 0x0001
     LIVE_REC     = 0x0002
     EXTERNAL     = 0x0004
     REBUILD      = 0x0008
 
-class JOBSTATUS( object ):
+class JOBSTATUS(IntEnum):
     UNKNOWN      = 0x0000
     QUEUED       = 0x0001
     PENDING      = 0x0002
@@ -173,7 +175,7 @@ class JOBSTATUS( object ):
     ERRORED      = 0x0130
     CANCELLED    = 0x0140
 
-class LOGMASK( object ):
+class LOGMASK(IntFlag):
     ALL         = 0b111111111111111111111111111
     MOST        = 0b011111111110111111111111111
     NONE        = 0b000000000000000000000000000
@@ -206,7 +208,7 @@ class LOGMASK( object ):
     SYSTEM      = 0b010000000000000000000000000
     TIMESTAMP   = 0b100000000000000000000000000
 
-class LOGLEVEL( object ):
+class LOGLEVEL(IntEnum):
     ANY         = -1
     EMERG       = 0
     ALERT       = 1
@@ -218,7 +220,7 @@ class LOGLEVEL( object ):
     DEBUG       = 7
     UNKNOWN     = 8
 
-class LOGFACILITY( object ):
+class LOGFACILITY(IntEnum):
     KERN        = 1
     USER        = 2
     MAIL        = 3
@@ -237,7 +239,7 @@ class LOGFACILITY( object ):
     LOCAL6      = 16
     LOCAL7      = 17
 
-class ERRCODES( object ):
+class ERRCODES(IntEnum):
     GENERIC                 = 0
     SYSTEM                  = 1
     SOCKET                  = 2

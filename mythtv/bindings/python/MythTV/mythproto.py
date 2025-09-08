@@ -827,9 +827,12 @@ class FreeSpace( DictData ):
         DictData.__init__(self, raw)
         self.freespace = self.totalspace - self.usedspace
 
-class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
-                         VIDEO_PROPS, SUBTITLE_TYPES ):
+class Program( CMPRecord, DictData ):
     """Represents a program with all detail returned by the backend."""
+    locals().update(RECSTATUS.__members__)
+    locals().update(AUDIO_PROPS.__members__)
+    locals().update(VIDEO_PROPS.__members__)
+    locals().update(SUBTITLE_TYPES.__members__)
 
     _field_order = [ 'title',        'subtitle',     'description',
                      'season',       'episode',      'totalepisodes',
