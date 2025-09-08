@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides data access classes for accessing and managing MythTV data

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides base classes for accessing MythTV

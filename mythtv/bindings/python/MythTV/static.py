@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Contains static and global variables for MythTV Python Bindings.

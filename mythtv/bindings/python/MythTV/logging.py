@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides managed logging."""
 
 from MythTV.static import LOGLEVEL, LOGMASK, LOGFACILITY

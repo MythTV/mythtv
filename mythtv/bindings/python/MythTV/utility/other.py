@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides decorator classes for assorted functions"""
 
 from MythTV.logging import MythLog
