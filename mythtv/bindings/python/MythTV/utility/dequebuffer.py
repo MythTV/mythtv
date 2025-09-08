@@ -31,7 +31,6 @@ try:
         def run(self):
             poller = poll()
             fds = {}
-            events = []
             while True:
                 while not self.inputqueue.empty():
                     # loop though the queue and add new pipes to the

@@ -44,7 +44,7 @@ class SchemaUpdate:
                 schema = newschema
                 self.db.settings.NULL[self._schema_name] = schema
 
-        except AttributeError as e:
+        except AttributeError:
             self.log(MythLog.GENERAL, MythLog.CRIT,
                      'failed at %d' % schema, 'no handler method')
             raise MythDBError('Schema update failed, '
