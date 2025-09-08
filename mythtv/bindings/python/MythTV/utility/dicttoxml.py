@@ -11,10 +11,7 @@ __version__ = '1.7.4'
 version = __version__
 
 from random import randint
-try:
-    from collections.abc import Iterable
-except ImportError:
-    from collections import Iterable
+from collections.abc import Iterable
 import numbers
 import logging
 from xml.dom.minidom import parseString
