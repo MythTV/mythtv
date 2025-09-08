@@ -4,7 +4,7 @@
 # Description: Provides mixin's for assorted methods
 #------------------------------
 
-class CMPVideo( object ):
+class CMPVideo:
     """
     Utility class providing comparison operators between data objects
         containing video metadata.  

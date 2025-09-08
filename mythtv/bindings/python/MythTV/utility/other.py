@@ -16,7 +16,7 @@ from builtins import range
 def _donothing(*args, **kwargs):
     pass
 
-class SchemaUpdate( object ):
+class SchemaUpdate:
     # TODO: do locking and lock checking
     #       if interactive terminal, ask for update permission
     #       perform database backup (partial?)
@@ -66,7 +66,7 @@ class SchemaUpdate( object ):
     def create(self):
         raise MythDBError('Schema creation failed, method not defined.')
 
-class databaseSearch( object ):
+class databaseSearch:
     # decorator class for database searches
     """
     Decorator class
@@ -112,7 +112,7 @@ class databaseSearch( object ):
                 4-field  -- Special response consisting of:
                     (see example in methodheap.py:MythDB.searchRecorded)
     """
-    class Join( object ):
+    class Join:
         def __init__(self, table=None, tableto=None, fields=None, \
                            fieldsto=None, fieldsfrom=None):
             if (table is None) or (tableto is None) or \
@@ -396,7 +396,7 @@ class deadlinesocket( socket.socket ):
         except socket.error as e:
             raise MythError(MythError.SOCKET, e.args)
 
-class MARKUPLIST( object ):
+class MARKUPLIST:
     """
     Utility class for building seek/cutlists from video markup data.
     """
@@ -444,7 +444,7 @@ def levenshtein(s1, s2):
 
     return previous_row[-1]
 
-class ParseEnum( object ):
+class ParseEnum:
     _static = None
     def __str__(self):
         return str([k for k,v in self.iteritems() if v==True])
@@ -588,7 +588,7 @@ def py3_str(value, ignore_errors=False):
     except TypeError:  # Wasn't a bytes object, no need to decode
         return str(value)
 
-class QuickProperty( object ):
+class QuickProperty:
     def __init__(self, maskedvar, default=None, handler=None):
         self.varname = maskedvar
         self.default = default

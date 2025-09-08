@@ -26,7 +26,7 @@ try:
 except:
     raise MythError("No viable database module found.")
 
-class _Connection_Pool( object ):
+class _Connection_Pool:
     """
     Provides a scaling connection pool to access a shared resource.
     """
@@ -170,7 +170,7 @@ class DBConnection( _Connection_Pool ):
             cursor.commit()
         cursor.close()
 
-class BEConnection( object ):
+class BEConnection:
     """
     This is the basic backend connection object.
     You probably don't want to use this directly.
@@ -436,7 +436,7 @@ class BEEventConnection( BEConnection ):
             return ""
         return super(BEEventConnection, self).backendCommand(data, deadline)
 
-class FEConnection( object ):
+class FEConnection:
     """
     This is the basic frontend connection object.
     You probably dont want to use this directly.
@@ -549,7 +549,7 @@ class FEConnection( object ):
             raise
         return prompt.split(res)[0].decode('utf-8')
 
-class XMLConnection( object ):
+class XMLConnection:
     """
     XMLConnection(backend=None, db=None, port=None) -> Backend status object
 

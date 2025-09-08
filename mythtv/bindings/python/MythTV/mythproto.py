@@ -23,7 +23,7 @@ import re
 import os
 
 
-class BECache( object ):
+class BECache:
     """
     BECache(backend=None, noshutdown=False, db=None)
                                             -> MythBackend connection object
@@ -43,7 +43,7 @@ class BECache( object ):
                               and returns the response.
     """
 
-    class _ConnHolder( object ):
+    class _ConnHolder:
         blockshutdown = 0
         command = None
         event = None
@@ -745,7 +745,7 @@ class FileOps( BECache ):
             regex = re.compile(regex)
         return EventLock(regex, self.hostname, self.db)
 
-    class _ProgramQuery( object ):
+    class _ProgramQuery:
         def __init__(self, query, header_length=0, sorted=False,
                      recstatus=None, handler=None):
             self.query = query
