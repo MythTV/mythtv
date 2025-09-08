@@ -1,23 +1,9 @@
-try:
-    from urllib import urlopen
-except ImportError:
-    from urllib.request import urlopen
-from time import time
-try:
-    from thread import start_new_thread, allocate_lock
-except ImportError:
-    from _thread import start_new_thread, allocate_lock
+from urllib.request import urlopen
 from time import sleep, time
 import threading
-try:
-    import cPickle as pickle
-except:
-    import pickle
+import pickle
 from MythTV import OrdDict
-try:
-    import Queue
-except ImportError:
-    import queue as Queue
+import queue as Queue
 import lxml
 import lxml.html
 import os
