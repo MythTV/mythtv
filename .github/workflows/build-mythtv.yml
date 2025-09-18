@@ -399,7 +399,7 @@ jobs:
 
       - name: Run ansible to install build requirements
         working-directory: ansible
-        run: ansible-playbook mythtv.yml --extra-vars="$ANSIBLE_EXTRA" --limit localhost
+        run: ANSIBLE_BECOME=false ANSIBLE_BECOME_ASK_PASS=False ansible-playbook mythtv.yml --extra-vars="$ANSIBLE_EXTRA" --limit localhost
 
       - name: Update MYSQL environmental variables
         run: |
