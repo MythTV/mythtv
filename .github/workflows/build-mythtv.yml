@@ -302,13 +302,6 @@ jobs:
     strategy:
       matrix:
         os:
-          # macOS group
-          - desc: 'macOS 13 (Ventura) x86_64'
-            runner: 'macOS-13'
-            arch: 'x86_64'
-            qt_version: 'qt6'
-            database_version: 'mariadb'
-            extrapkgs: ''
           - desc: 'macOS 14 (Sonoma) arm64'
             runner: 'macOS-14'
             arch: 'arm64'
@@ -321,6 +314,12 @@ jobs:
             qt_version: 'qt6'
             database_version: 'mariadb'
             extrapkgs: ''
+          #- desc: 'macOS 26 (Tahoe) arm64'
+          #  runner: 'macOS-26'
+          #  arch: 'arm64'
+          #  qt_version: 'qt6'
+          #  database_version: 'mariadb'
+          #  extrapkgs: ''
 
         compiler:
           - desc: 'clang'
@@ -347,19 +346,6 @@ jobs:
           path: ~/.ccache
           key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
           restore-keys: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache
-
-      - name: Fix Python install on Ventura
-        run: |
-          echo "Force remove currently installed python"
-          brew unlink python
-          brew unlink python3
-          brew deps python3 | xargs brew remove --ignore-dependencies
-          brew list | grep python@|xargs brew remove --force --ignore-dependencies
-          brew remove azure-cli
-          echo "re-install requested python"
-          brew update
-          brew install --force --overwrite python3
-        if: matrix.os.runner == 'macOS-13'
 
       - name: Update Homebrew Environment
         run: |
@@ -403,11 +389,19 @@ jobs:
 
       - name: Update MYSQL environmental variables
         run: |
-          PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${PKGMGR_PREFIX}/opt/mysql-client/lib/pkgconfig/
+          PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${PKGMGR_PREFIX}/opt/${{ matrix.os.database_version }}/lib/pkgconfig/
           echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          MYSQLCLIENT_LDFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --libs mysqlclient)"
+          case ${{ matrix.os.database_version }} in
+            mariadb)
+              MYSQLCLIENT_LDFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --libs libmariadb)"
+              MYSQLCLIENT_CFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --cflags libmariadb)"
+            ;;
+            *)
+              MYSQLCLIENT_LDFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --libs mysqlclient)"
+              MYSQLCLIENT_CFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --cflags mysqlclient)"
+            ;;
+          esac
           echo "MYSQLCLIENT_LDFLAGS=$MYSQLCLIENT_LDFLAGS" >> $GITHUB_ENV
-          MYSQLCLIENT_CFLAGS="$(${PKGMGR_PREFIX}/bin/pkg-config --cflags mysqlclient)"
           echo "MYSQLCLIENT_CFLAGS=$MYSQLCLIENT_CFLAGS" >> $GITHUB_ENV
 
       - name: Source the virtual python environemnt
@@ -434,7 +428,7 @@ jobs:
 
       - name: Configure core
         working-directory: mythtv
-        run: ${CONFIGURE_CMD} -B build-${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install
+        run: ${CONFIGURE_CMD} -B build-${{ matrix.os.qt_version }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install
 
       - name: Make core
         working-directory: mythtv
