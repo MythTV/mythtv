@@ -412,7 +412,7 @@ jobs:
 
       - name: Source the virtual python environemnt
         run: |
-          PYTHON_VENV_PATH="$HOME/.mythtv/python-venv$PYTHON_VERSION"
+          PYTHON_VENV_PATH="$HOME/.virtualenvs/mythtv/python-venv$PYTHON_VERSION"
           source "${PYTHON_VENV_PATH}/bin/activate"
           echo "PYTHON_CMD=${PYTHON_VENV_PATH}/bin/python3" >> $GITHUB_ENV
 
