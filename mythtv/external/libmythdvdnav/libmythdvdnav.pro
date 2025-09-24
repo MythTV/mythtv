@@ -6,7 +6,7 @@ CONFIG += thread staticlib warn_off
 CONFIG -= qt
 target.path = $${LIBDIR}
 
-INCLUDEPATH += . ../../
+INCLUDEPATH += .
 INCLUDEPATH += ./dvdnav ./dvdread
 INCLUDEPATH += ../../libs
 
@@ -30,55 +30,95 @@ INCLUDEPATH += $$POSTINC
 # for -ldl
 LIBS += $$EXTRA_LIBS
 
-# The version numbers here should match the ones defined in libdvdread's 'configure.ac'
-dvdread_major = 6
-dvdread_minor = 0
-dvdread_micro = 0
-dvdread_version = $$dvdread_major"."$$dvdread_minor"."$$dvdread_micro
+# libdvdnav
+DEFINES += HAVE_CONFIG_H
 
-DEFINES += DVDREAD_VERSION_MAJOR=$$dvdread_major
-DEFINES += DVDREAD_VERSION_MINOR=$$dvdread_minor
-DEFINES += DVDREAD_VERSION_MICRO=$$dvdread_micro
-DEFINES += DVDREAD_VERSION=$$dvdread_version
-DEFINES += DVDREAD_VERSION_STRING=\\\"$$dvdread_version\\\"
+using_dvdcss_dvdcss_h {
+    QMAKE_CFLAGS += $$LIBDVDCSS_CFLAGS
+    LIBS         += $$LIBDVDCSS_LIBS
+}
 
 # DEFINES += LOG_DEBUG TRACE
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # dvdnav
-HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h \
-    dvdnav/vm/vm_serialize.h
-HEADERS += dvdnav/dvdnav/dvd_types.h dvdnav/dvdnav/dvdnav.h \
-    dvdnav/dvdnav/dvdnav_events.h
-HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h \
-    dvdnav/vm/getset.h dvdnav/vm/play.h
+HEADERS += dvdnav/dvdnav/dvd_types.h
+HEADERS += dvdnav/dvdnav/dvdnav.h
+HEADERS += dvdnav/dvdnav/dvdnav_events.h
+HEADERS += dvdnav/dvdnav/version.h
+HEADERS += dvdnav/vm/decoder.h
+HEADERS += dvdnav/vm/getset.h
+HEADERS += dvdnav/vm/play.h
+HEADERS += dvdnav/vm/vm.h
+HEADERS += dvdnav/vm/vm_serialize.h
+HEADERS += dvdnav/vm/vmcmd.h
+HEADERS += dvdnav/dvdnav_internal.h
+HEADERS += dvdnav/read_cache.h
 
-SOURCES += dvdnav/dvdnav.c dvdnav/read_cache.c dvdnav/navigation.c \
-    dvdnav/vm/vm_serialize.c dvdnav/vm/getset.c dvdnav/vm/play.c \
-    dvdnav/vm/vmget.c
-SOURCES += dvdnav/highlight.c dvdnav/searching.c dvdnav/settings.c
-SOURCES += dvdnav/vm/decoder.c dvdnav/vm/vm.c dvdnav/vm/vmcmd.c
+SOURCES += dvdnav/vm/decoder.c
+SOURCES += dvdnav/vm/getset.c
+SOURCES += dvdnav/vm/play.c
+SOURCES += dvdnav/vm/vm.c
+SOURCES += dvdnav/vm/vm_serialize.c
+SOURCES += dvdnav/vm/vmcmd.c
+SOURCES += dvdnav/vm/vmget.c
+SOURCES += dvdnav/dvdnav.c
+SOURCES += dvdnav/highlight.c
+SOURCES += dvdnav/navigation.c
+SOURCES += dvdnav/read_cache.c
+SOURCES += dvdnav/searching.c
+SOURCES += dvdnav/settings.c
 
 # dvdread
-HEADERS += dvdread/bswap.h dvdread/dvd_input.h dvdread/dvdread_internal.h
-HEADERS += dvdread/dvd_udf.h dvdread/md5.h
-HEADERS += dvdread/bitreader.h dvdread/mythdvdreadexp.h
-HEADERS += dvdread/dvdread/bitreader.h dvdread/dvdread/dvd_reader.h
-HEADERS += dvdread/dvdread/dvd_udf.h dvdread/dvdread/ifo_print.h
-HEADERS += dvdread/dvdread/ifo_read.h dvdread/dvdread/ifo_types.h
-HEADERS += dvdread/dvdread/nav_print.h dvdread/dvdread/nav_read.h
+HEADERS += dvdread/dvdread/bitreader.h
+HEADERS += dvdread/dvdread/dvd_reader.h
+HEADERS += dvdread/dvdread/dvd_udf.h
+HEADERS += dvdread/dvdread/ifo_print.h
+HEADERS += dvdread/dvdread/ifo_read.h
+HEADERS += dvdread/dvdread/ifo_types.h
+HEADERS += dvdread/dvdread/nav_print.h
+HEADERS += dvdread/dvdread/nav_read.h
 HEADERS += dvdread/dvdread/nav_types.h
+HEADERS += dvdread/dvdread/version.h
+HEADERS += dvdread/bitreader.h
+HEADERS += dvdread/bswap.h
+HEADERS += dvdread/dvd_input.h
+HEADERS += dvdread/dvd_udf.h
+HEADERS += dvdread/dvdread_internal.h
+HEADERS += dvdread/md5.h
 
-SOURCES += dvdread/dvd_reader.c dvdread/nav_read.c dvdread/ifo_read.c
-SOURCES += dvdread/dvd_input.c dvdread/dvd_udf.c dvdread/md5.c
-SOURCES += dvdread/nav_print.c dvdread/ifo_print.c dvdread/bitreader.c
+SOURCES += dvdread/bitreader.c
+SOURCES += dvdread/dvd_input.c
+SOURCES += dvdread/dvd_reader.c
+SOURCES += dvdread/dvd_udf.c
+SOURCES += dvdread/ifo_print.c
+SOURCES += dvdread/ifo_read.c
+SOURCES += dvdread/md5.c
+SOURCES += dvdread/nav_print.c
+SOURCES += dvdread/nav_read.c
+
+win32 {
+    HEADERS += dvdread/win32_dlfcn.h
+}
 
 inc_dvdnav.path = $${PREFIX}/include/mythtv/dvdnav
-inc_dvdnav.files = dvdnav/dvdnav/dvdnav.h dvdnav/dvdnav/dvdnav_events.h dvdnav/dvdnav/dvd_types.h
+inc_dvdnav.files += dvdnav/dvdnav/dvdnav.h
+inc_dvdnav.files += dvdnav/dvdnav/dvdnav_events.h
+inc_dvdnav.files += dvdnav/dvdnav/dvd_types.h
+inc_dvdnav.files += dvdnav/dvdnav/version.h
+
 inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
-inc_dvdread.files = dvdread/dvdread/dvd_reader.h dvdread/dvdread/nav_types.h dvdread/dvdread/ifo_types.h
-inc_dvdread.files += dvdread/dvdread/nav_read.h dvdread/dvdread/ifo_read.h
+inc_dvdread.files += dvdread/dvdread/bitreader.h
+inc_dvdread.files += dvdread/dvdread/dvd_reader.h
+inc_dvdread.files += dvdread/dvdread/dvd_udf.h
+inc_dvdread.files += dvdread/dvdread/ifo_print.h
+inc_dvdread.files += dvdread/dvdread/ifo_read.h
+inc_dvdread.files += dvdread/dvdread/ifo_types.h
+inc_dvdread.files += dvdread/dvdread/nav_print.h
+inc_dvdread.files += dvdread/dvdread/nav_read.h
+inc_dvdread.files += dvdread/dvdread/nav_types.h
+inc_dvdread.files += dvdread/dvdread/version.h
 
 INSTALLS += inc_dvdnav inc_dvdread
 
