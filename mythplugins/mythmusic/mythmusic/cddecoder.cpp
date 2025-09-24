@@ -17,7 +17,7 @@
 #include <cdio/logging.h>
 
 // MythTV
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythmetadata/musicmetadata.h>
 

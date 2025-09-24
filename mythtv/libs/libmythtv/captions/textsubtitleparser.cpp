@@ -28,7 +28,7 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/remotefile.h"
 #include "libmythtv/io/mythmediabuffer.h"
-#include "libmyth/mythaverror.h"
+#include "libmythtv/mythaverror.h"
 
 #include "captions/textsubtitleparser.h"
 #include "captions/subtitlereader.h"

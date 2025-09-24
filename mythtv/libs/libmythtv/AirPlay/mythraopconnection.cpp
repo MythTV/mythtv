@@ -17,8 +17,7 @@
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/serverpool.h"
 
-#include "libmyth/audio/audiooutput.h"
-#include "libmyth/audio/audiooutpututil.h"
+#include "libmythtv/audio/audiooutput.h"
 
 #include "mythraopdevice.h"
 #include "mythraopconnection.h"
@@ -714,8 +713,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     while (tmp_pkt->size > 0)
     {
         int data_size = 0;
-        int ret = AudioOutputUtil::DecodeAudio(ctx, samples,
-                                               data_size, tmp_pkt);
+        int ret = m_audio->DecodeAudio(ctx, samples, data_size, tmp_pkt);
         if (ret < 0)
         {
             av_free(samples);
@@ -1795,21 +1793,10 @@ bool MythRAOPConnection::OpenAudioDevice(void)
     m_audio = AudioOutput::OpenAudio(device, passthru, FORMAT_S16, m_channels,
                                      AV_CODEC_ID_NONE, m_frameRate, AUDIOOUTPUT_MUSIC,
                                      m_allowVolumeControl, false);
-    if (!m_audio)
+    if (m_audio == nullptr || !m_audio->isConfigured())
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "Failed to open audio device. Going silent...");
-        CloseAudioDevice();
-        StartAudioTimer();
-        return false;
-    }
-
-    QString error = m_audio->GetError();
-    if (!error.isEmpty())
-    {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            QString("Audio not initialised. Message was '%1'")
-            .arg(error));
         CloseAudioDevice();
         StartAudioTimer();
         return false;

@@ -7,7 +7,7 @@
 #include <QLocale>
 
 // mythtv
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/lcddevice.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
@@ -1232,7 +1232,7 @@ void MusicCommon::customEvent(QEvent *event)
 {
     QString statusString;
 
-    if (event->type() == OutputEvent::kPlaying)
+    if (event->type() == AudioOutput::Event::kPlaying)
     {
         MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
         if (curMeta)
@@ -1265,11 +1265,11 @@ void MusicCommon::customEvent(QEvent *event)
             updateVolume();
         }
     }
-    else if (event->type() == OutputEvent::kBuffering)
+    else if (event->type() == AudioOutput::Event::kBuffering)
     {
         statusString = tr("Buffering stream.");
     }
-    else if (event->type() == OutputEvent::kPaused)
+    else if (event->type() == AudioOutput::Event::kPaused)
     {
         statusString = tr("Stream paused.");
 
@@ -1292,10 +1292,10 @@ void MusicCommon::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == OutputEvent::kInfo)
+    else if (event->type() == AudioOutput::Event::kInfo)
     {
 
-        auto *oe = dynamic_cast<OutputEvent *>(event);
+        auto *oe = dynamic_cast<AudioOutput::Event *>(event);
 
         if (!oe)
             return;
@@ -1364,7 +1364,7 @@ void MusicCommon::customEvent(QEvent *event)
         // TODO only need to update the playlist times here
         updatePlaylistStats();
     }
-    else if (event->type() == OutputEvent::kStopped)
+    else if (event->type() == AudioOutput::Event::kStopped)
     {
         statusString = tr("Stream stopped.");
         if (m_stopButton)
