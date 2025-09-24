@@ -122,7 +122,8 @@
             "retgrid": "Ritorna alla visualizzazione della griglia",
             "subtitle_search": "Ricerca sottotitoli",
             "title_search": "Ricerca del titolo",
-            "typecolors": "Colori Tipo Categoria"
+            "typecolors": "Colori Tipo Categoria",
+            "unknown": "Sconosciuto"
         },
         "jobs": {
             "deferral_desc": "Se diverso da zero, i processi di transcodifica automatica verranno pianificati per l'esecuzione tanti giorni dopo il completamento di una registrazione anziché immediatamente dopo.",

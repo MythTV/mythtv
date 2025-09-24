@@ -122,7 +122,8 @@
             "retgrid": "返回网格显示",
             "subtitle_search": "字幕搜索",
             "title_search": "标题搜索",
-            "typecolors": "类别 类型 颜色"
+            "typecolors": "类别 类型 颜色",
+            "unknown": "未知"
         },
         "jobs": {
             "deferral_desc": "如果非零，自动转码作业将安排在录制完成后几天运行，而不是在录制完成后立即运行。",

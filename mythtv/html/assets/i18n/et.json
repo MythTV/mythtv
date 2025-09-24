@@ -122,7 +122,8 @@
             "retgrid": "Naaske ruudustiku kuvale",
             "subtitle_search": "Subtiitrite otsing",
             "title_search": "Pealkirja otsing",
-            "typecolors": "Kategooria Tüüp Värvid"
+            "typecolors": "Kategooria Tüüp Värvid",
+            "unknown": "Teadmata"
         },
         "jobs": {
             "deferral_desc": "Kui see ei ole null, siis ajastatakse automaatsed ümberkodeerimistööd nii mitu päeva pärast salvestamise lõppu, mitte kohe pärast seda.",

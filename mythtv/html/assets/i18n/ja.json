@@ -122,7 +122,8 @@
             "retgrid": "グリッド表示に戻る",
             "subtitle_search": "字幕検索",
             "title_search": "タイトル検索",
-            "typecolors": "カテゴリタイプの色"
+            "typecolors": "カテゴリタイプの色",
+            "unknown": "未知"
         },
         "jobs": {
             "deferral_desc": "0 以外の場合、自動トランスコード ジョブは、記録の完了直後ではなく、この日数後に実行されるようにスケジュールされます。",

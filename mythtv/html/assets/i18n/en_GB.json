@@ -122,7 +122,8 @@
             "retgrid": "Return to Grid Display",
             "subtitle_search": "Subtitle Search",
             "title_search": "Title Search",
-            "typecolors": "Category Type Colours"
+            "typecolors": "Category Type Colours",
+            "unknown": "Unknown"
         },
         "jobs": {
             "deferral_desc": "If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.",

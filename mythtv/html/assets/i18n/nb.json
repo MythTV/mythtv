@@ -122,7 +122,8 @@
             "retgrid": "Gå tilbake til rutenettvisning",
             "subtitle_search": "Undertittelsøk",
             "title_search": "Tittelsøk",
-            "typecolors": "Kategori Type Farger"
+            "typecolors": "Kategori Type Farger",
+            "unknown": "Ukjent"
         },
         "jobs": {
             "deferral_desc": "Hvis ikke-null, vil automatiske transkodejobber bli planlagt å kjøre så mange dager etter at et opptak er fullført i stedet for umiddelbart etterpå.",

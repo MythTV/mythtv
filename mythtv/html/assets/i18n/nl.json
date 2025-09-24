@@ -122,7 +122,8 @@
             "retgrid": "Keer terug naar rasterweergave",
             "subtitle_search": "Ondertitel zoeken",
             "title_search": "Titel zoeken",
-            "typecolors": "Categorie Type Kleuren"
+            "typecolors": "Categorie Type Kleuren",
+            "unknown": "Onbekend"
         },
         "jobs": {
             "deferral_desc": "Als er geen nul is, worden automatische transcoderingstaken gepland voor zoveel dagen nadat een opname is voltooid, in plaats van onmiddellijk daarna.",

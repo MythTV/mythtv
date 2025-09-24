@@ -122,7 +122,8 @@
             "retgrid": "Povratak na prikaz mreže",
             "subtitle_search": "Pretraživanje podnaslova",
             "title_search": "Pretraživanje naslova",
-            "typecolors": "Vrsta kategorije Boje"
+            "typecolors": "Vrsta kategorije Boje",
+            "unknown": "Nepoznat"
         },
         "jobs": {
             "deferral_desc": "Ako nije nula, poslovi automatskog transkodiranja bit će zakazani za izvođenje toliko dana nakon završetka snimanja umjesto odmah nakon toga.",

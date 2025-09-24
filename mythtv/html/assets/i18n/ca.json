@@ -122,7 +122,8 @@
             "retgrid": "Torna a la pantalla de quadrícula",
             "subtitle_search": "Cerca de subtítols",
             "title_search": "Cerca de títols",
-            "typecolors": "Categoria Tipus Colors"
+            "typecolors": "Categoria Tipus Colors",
+            "unknown": "Desconeguda"
         },
         "jobs": {
             "deferral_desc": "Si són diferents de zero, les tasques de transcodificació automàtica es programaran per executar-se molts dies després que s'hagi completat una gravació en lloc de immediatament després.",

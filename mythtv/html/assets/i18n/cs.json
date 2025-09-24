@@ -122,7 +122,8 @@
             "retgrid": "Návrat k zobrazení mřížky",
             "subtitle_search": "Vyhledávání podtitul",
             "title_search": "Vyhledávání titulů",
-            "typecolors": "Kategorie Typ Barvy"
+            "typecolors": "Kategorie Typ Barvy",
+            "unknown": "Neznámý"
         },
         "jobs": {
             "deferral_desc": "Pokud není nula, automatické úlohy překódování budou naplánovány tak, aby se spouštěly tolik dní po dokončení záznamu, nikoli bezprostředně poté.",

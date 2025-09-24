@@ -122,7 +122,8 @@
             "retgrid": "Återgå till Grid Display",
             "subtitle_search": "Undertextsökning",
             "title_search": "Titelsökning",
-            "typecolors": "Kategori Typ Färger"
+            "typecolors": "Kategori Typ Färger",
+            "unknown": "Okänd"
         },
         "jobs": {
             "deferral_desc": "Om de inte är noll kommer automatiska omkodningsjobb att schemaläggas att köras så många dagar efter att en inspelning slutförts istället för omedelbart efteråt.",

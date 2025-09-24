@@ -122,7 +122,8 @@
             "retgrid": "Retornar à Exibição da Grade",
             "subtitle_search": "Pesquisa de legenda",
             "title_search": "Pesquisa de título",
-            "typecolors": "Categoria Tipo Cores"
+            "typecolors": "Categoria Tipo Cores",
+            "unknown": "Desconhecido"
         },
         "jobs": {
             "deferral_desc": "Se for diferente de zero, os trabalhos de transcodificação automática serão agendados para execução tantos dias após a conclusão da gravação, em vez de imediatamente depois.",

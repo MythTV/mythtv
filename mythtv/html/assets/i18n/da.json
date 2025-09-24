@@ -122,7 +122,8 @@
             "retgrid": "Vend tilbage til gittervisning",
             "subtitle_search": "Undertekstsøgning",
             "title_search": "Titelsøgning",
-            "typecolors": "Kategori Type Farver"
+            "typecolors": "Kategori Type Farver",
+            "unknown": "Ukendt"
         },
         "jobs": {
             "deferral_desc": "Hvis ikke-nul, vil automatiske omkodningsopgaver blive planlagt til at køre så mange dage efter en optagelse er fuldført i stedet for umiddelbart derefter.",

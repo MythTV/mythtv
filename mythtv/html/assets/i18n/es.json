@@ -122,7 +122,8 @@
             "retgrid": "Regresar a la pantalla de cuadrícula",
             "subtitle_search": "Búsqueda de subtítulos",
             "title_search": "Buscar título",
-            "typecolors": "Categoría Tipo Colores"
+            "typecolors": "Categoría Tipo Colores",
+            "unknown": "Desconocido"
         },
         "jobs": {
             "deferral_desc": "Si no es cero, los trabajos de transcodificación automática se programarán para ejecutarse tantos días después de que se complete la grabación en lugar de hacerlo inmediatamente después.",

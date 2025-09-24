@@ -122,7 +122,8 @@
             "retgrid": "Visszatérés a Rács megjelenítéséhez",
             "subtitle_search": "Feliratkeresés",
             "title_search": "Cím keresése",
-            "typecolors": "Kategória Típus Színek"
+            "typecolors": "Kategória Típus Színek",
+            "unknown": "Ismeretlen"
         },
         "jobs": {
             "deferral_desc": "Ha nem nulla, az automatikus átkódolási feladatok a rögzítés befejezése után ennyi napon belül futnak, nem pedig közvetlenül utána.",

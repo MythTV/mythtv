@@ -122,7 +122,8 @@
             "retgrid": "Revenir à l'affichage de la grille",
             "subtitle_search": "Recherche de sous-titre",
             "title_search": "Recherche de titre",
-            "typecolors": "Catégorie Type Couleurs"
+            "typecolors": "Catégorie Type Couleurs",
+            "unknown": "Inconnu"
         },
         "jobs": {
             "deferral_desc": "Si la valeur est différente de zéro, les tâches de transcodage automatique seront planifiées pour s'exécuter autant de jours après la fin d'un enregistrement au lieu d'immédiatement après.",

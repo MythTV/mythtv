@@ -122,7 +122,8 @@
             "retgrid": "返回網格顯示",
             "subtitle_search": "字幕搜索",
             "title_search": "標題搜索",
-            "typecolors": "類別 類型 顏色"
+            "typecolors": "類別 類型 顏色",
+            "unknown": "未知"
         },
         "jobs": {
             "deferral_desc": "如果非零，自動轉碼作業將安排在錄製完成後幾天運行，而不是在錄製完成後立即運行。",

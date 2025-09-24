@@ -122,7 +122,8 @@
             "retgrid": "Zurück zur Rasteranzeige",
             "subtitle_search": "Untertitelsuche",
             "title_search": "Titelsuche",
-            "typecolors": "Kategorietypfarben"
+            "typecolors": "Kategorietypfarben",
+            "unknown": "Unbekannt"
         },
         "jobs": {
             "deferral_desc": "Bei einem Wert ungleich Null werden automatische Transkodierungsaufträge so geplant, dass sie so viele Tage nach Abschluss einer Aufzeichnung ausgeführt werden, und nicht unmittelbar danach.",

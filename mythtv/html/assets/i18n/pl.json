@@ -122,7 +122,8 @@
             "retgrid": "Powrót do wyświetlania siatki",
             "subtitle_search": "Wyszukiwanie napisów",
             "title_search": "Wyszukiwanie tytułów",
-            "typecolors": "Kategoria Typ Kolory"
+            "typecolors": "Kategoria Typ Kolory",
+            "unknown": "Nieznany"
         },
         "jobs": {
             "deferral_desc": "Jeśli wartość jest różna od zera, automatyczne zadania transkodowania zostaną zaplanowane na tyle dni po zakończeniu nagrywania, a nie bezpośrednio po nim.",

@@ -122,7 +122,8 @@
             "retgrid": "Izgara Görünümüne Dön",
             "subtitle_search": "Altyazılı arama",
             "title_search": "Başlık arama",
-            "typecolors": "Kategori Tip Renkler"
+            "typecolors": "Kategori Tip Renkler",
+            "unknown": "Bilinmeyen"
         },
         "jobs": {
             "deferral_desc": "Sıfır değilse, otomatik kod dönüştürme işleri, kayıt tamamlandıktan hemen sonra değil, birkaç gün sonra çalışacak şekilde planlanacaktır.",

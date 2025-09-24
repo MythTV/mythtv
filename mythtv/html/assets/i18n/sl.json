@@ -122,7 +122,8 @@
             "retgrid": "Nazaj na prikaz mreže",
             "subtitle_search": "Iskanje podnapisov",
             "title_search": "Iskanje po naslovu",
-            "typecolors": "Vrsta kategorije Barve"
+            "typecolors": "Vrsta kategorije Barve",
+            "unknown": "Neznano"
         },
         "jobs": {
             "deferral_desc": "Če ni nič, bodo opravila samodejnega prekodiranja načrtovana za izvajanje toliko dni po zaključku snemanja namesto takoj zatem.",

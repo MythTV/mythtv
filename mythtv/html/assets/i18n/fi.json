@@ -122,7 +122,8 @@
             "retgrid": "Palaa ruudukkonäyttöön",
             "subtitle_search": "Tekstityshaku",
             "title_search": "Otsikkohaku",
-            "typecolors": "Luokka Tyyppi Värit"
+            "typecolors": "Luokka Tyyppi Värit",
+            "unknown": "Tuntematon"
         },
         "jobs": {
             "deferral_desc": "Jos arvo ei ole nolla, automaattiset transkoodaustyöt ajoitetaan suoritettavaksi näin monta päivää tallennuksen päättymisen jälkeen sen sijaan, että se olisi suoritettu välittömästi.",

@@ -122,7 +122,8 @@
             "retgrid": "Fara aftur í Grid Display",
             "subtitle_search": "Texti leit",
             "title_search": "Titilleit",
-            "typecolors": "Flokkur Tegund Litir"
+            "typecolors": "Flokkur Tegund Litir",
+            "unknown": "Óþekkt"
         },
         "jobs": {
             "deferral_desc": "Ef það er ekki núll, munu sjálfvirkar umskráningarvinnur vera áætlaðar að keyra marga daga eftir að upptöku lýkur í stað þess að vera strax á eftir.",
