@@ -206,10 +206,6 @@
     // Turn off the visual studio warnings (identifier was truncated)
     #pragma warning(disable:4786)
 
-    #ifdef restrict
-    #undef restrict
-    #endif
-
     #include <cinttypes>
     #include <direct.h>
     #include <process.h>
@@ -226,18 +222,6 @@
 
     // Check for execute, only checking existance in MSVC
     #define X_OK    0
-
-    #if (_MSC_VER < 1800)
-        #define rint( x )               floor(x + 0.5)
-        #define round( x )              floor(x + 0.5)
-
-        #if ( _MSC_VER < 1700)
-            #define signbit( x )        ( x < 0 )
-        #endif
-
-        #undef M_PI
-        #define M_PI 3.14159265358979323846
-    #endif
 
     #define getpid()                _getpid()
     #define ftruncate( fd, fsize )  _chsize( fd, fsize )
@@ -267,14 +251,6 @@
     #endif
 
     using mode_t = uint32_t;
-
-    #if !defined(__cplusplus) && !defined( inline )
-    #   define inline __inline
-    #endif
-
-    #if !defined(__func__) // C99 & C++11
-    #   define __func__ __FUNCTION__
-    #endif
 
 #   define SIGTRAP    SIGBREAK
 #   define STDERR_FILENO (int)GetStdHandle( STD_ERROR_HANDLE )
