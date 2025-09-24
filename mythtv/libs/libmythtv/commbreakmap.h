@@ -11,9 +11,9 @@
 
 // MythTV headers
 #include "libmythbase/mythchrono.h"
-#include "libmythbase/programtypes.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/playercontext.h"
+#include "libmythtv/programtypes.h"
 
 class CommBreakMap
 {

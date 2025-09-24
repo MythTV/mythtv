@@ -23,10 +23,10 @@
 
 #include "test_eitfixups.h"
 
-#include "libmythbase/programinfo.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/eitfixup.h"
 #include "libmythtv/mpeg/dishdescriptors.h"
+#include "libmythtv/programinfo.h"
 
 
 // Make this non-zero to enable dumping event details to stdout
