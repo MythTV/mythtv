@@ -1709,3 +1709,5 @@ void MythUIImage::FindRandomImage(void)
 
     m_origFilename = m_imageProperties.m_filename = randFile;
 }
+
+#include "moc_mythuiimage.cpp"

@@ -8247,4 +8247,4 @@ void MainServer::UpdateSystemdStatus (void)
 #endif
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mainserver.cpp"

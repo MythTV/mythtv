@@ -1698,3 +1698,5 @@ void RecordingExtender::run()
     RunEpilog();
     quit();
 }
+
+#include "moc_recordingextender.cpp"

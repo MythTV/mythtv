@@ -435,3 +435,5 @@ void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*Flushed*/)
 {
     m_videoBuffers.DiscardFrames(KeyFrame);
 }
+
+#include "moc_mythvideoout.cpp"

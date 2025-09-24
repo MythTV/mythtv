@@ -382,3 +382,5 @@ void LyricsData::setLyrics(const QStringList &lyrics)
         m_lyricsMap.insert(line->m_time, line);
     }
 }
+
+#include "moc_lyricsdata.cpp"

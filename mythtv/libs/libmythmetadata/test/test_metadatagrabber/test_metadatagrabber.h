@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHMETADATA_TEST_METADATAGRABBER_H
+#define LIBMYTHMETADATA_TEST_METADATAGRABBER_H
 
 #include <QTest>
 #include <iostream>
@@ -35,3 +37,5 @@ private slots:
     static void test_fromInetref(void);
     static void cleanupTestCase();
 };
+
+#endif // LIBMYTHMETADATA_TEST_METADATAGRABBER_H
