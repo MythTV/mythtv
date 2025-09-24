@@ -63,7 +63,7 @@ export class GuideComponent implements OnInit, SchedulerSummary {
     { Value: 'ProgramId', Name: 'dashboard.guide.groupby.ProgramId' },
   ];
   groupBy = this.groupByList[0];
-
+  runningTime: Date = new Date(0);
 
   constructor(private guideService: GuideService, private route: ActivatedRoute,
     private translate: TranslateService) {

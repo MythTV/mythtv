@@ -1,5 +1,15 @@
+<!-- Dummy Entry for when there is a gap in the schedule -->
+<div *ngIf="dummyProgram" class="programBox" [ngClass]="'guide_type_default'"
+    [style.width.%]=durationToWidth(dummyProgram)>
+    <div class="programTitle">{{ dummyProgram.Title }}</div>
+    <div class="programBody">
+        <div class="programCatType">{{ dummyProgram.Category }}</div>
+        <div class="programSubtitle"></div>
+    </div>
+</div>
+
 <div class="programBox cursor-pointer" [ngClass]="[typeclass, catclass, 'guide_type_default']"
-    [style.width.%]=durationToWidth() (click)="openDialog()" pTooltip="{{ getToolTip() }}" tooltipPosition="top">
+    [style.width.%]=durationToWidth(program) (click)="openDialog()" pTooltip="{{ getToolTip() }}" tooltipPosition="top">
     <div class="programTitle">{{ program.Title }}</div>
     <div class="programBody">
         <div class="programCatType">{{ program.Category }}</div>

@@ -17,6 +17,9 @@ export class ProgramEntryComponent implements OnInit {
   @Input() guideStartTime!: string;
   @Input() guideEndTime!: string;
   @Input() guideComponent!: GuideComponent;
+  @Input() runningTime!: Date;
+
+  dummyProgram?: ScheduleOrProgram;
 
   editSchedule: boolean = false;
   typeclass = '';
@@ -31,11 +34,21 @@ export class ProgramEntryComponent implements OnInit {
     this.typeclass = 'guide_type_' + this.program.CatType;
     this.catclass = 'guide_cat_'
       + this.program.Category.toLowerCase().replace(this.regex, '_');
-  }
 
-  durationToWidth(): number {
-    let p_start = new Date(this.program.StartTime);
-    let p_end = new Date(this.program.EndTime);
+    let guideStart = new Date(this.guideStartTime);
+    let progStart = new Date(this.program.StartTime);
+    if (this.runningTime.getTime() == 0 || this.runningTime > progStart)
+      this.runningTime.setTime(guideStart.getTime());
+    // If there is a gap in the guide create a dummy entry
+    if (this.runningTime < progStart)
+      this.dummyProgram = this.getDummyProgram(this.runningTime, progStart);
+    let progEnd = new Date(this.program.EndTime)
+    this.runningTime.setTime(progEnd.getTime());
+}
+
+  durationToWidth(program:ScheduleOrProgram ): number {
+    let p_start = new Date(program.StartTime);
+    let p_end = new Date(program.EndTime);
     let w_start = new Date(this.guideStartTime);
     let w_end = new Date(this.guideEndTime);
     let beginsBefore = p_start < w_start;
@@ -46,6 +59,17 @@ export class ProgramEntryComponent implements OnInit {
     let programWindow = endPoint.getTime() - startPoint.getTime();
     let program_width = ((programWindow / timeWindow) * 100);
     return program_width;
+  }
+
+  getDummyProgram(startTime: Date, endTime: Date): ScheduleOrProgram {
+    let dummy = <ScheduleOrProgram> <unknown> {
+      CatType: 'default',
+      Category: this.translate.instant('dashboard.guide.unknown'),
+      Title: this.translate.instant('dashboard.guide.unknown'),
+      StartTime: startTime.toISOString(),
+      EndTime: endTime.toISOString()
+    };
+    return dummy;
   }
 
   openDialog() {
