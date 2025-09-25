@@ -13,6 +13,8 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include "mythconfig.h"
+
 #include <utility>
 
 #include <QDomDocument>
@@ -116,14 +118,22 @@ class MBASE_PUBLIC XmlConfiguration
     void    ClearValue(const QString &setting);
 
     template <typename T>
+#if HAVE_IS_DURATION_V
+    typename std::enable_if_t<std::chrono::__is_duration_v<T>, T>
+#else
     typename std::enable_if_t<std::chrono::__is_duration<T>::value, T>
+#endif
     GetDuration(const QString &setting, T defaultValue = T::zero())
     {
         return T(GetValue(setting, static_cast<int>(defaultValue.count())));
     }
 
     template <typename T>
+#if HAVE_IS_DURATION_V
+    typename std::enable_if_t<std::chrono::__is_duration_v<T>>
+#else
     typename std::enable_if_t<std::chrono::__is_duration<T>::value>
+#endif
     SetDuration(const QString &setting, T value)
     {
         SetValue(setting, static_cast<int>(value.count()));

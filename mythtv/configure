@@ -1773,6 +1773,7 @@ MYTHTV_HAVE_LIST='
     ftime
     getifaddrs
     gettimeofday
+    is_duration_v
     posix_fadvise
     libudev
     stdint_h
@@ -5350,6 +5351,16 @@ check_ld "cc" <<EOF && enable close_range
 
 int main(int argc, char **argv){
     close_range(0,0,0);
+    return 0;
+}
+EOF
+
+# test for std::chrono:__is_duration_v<T>
+check_ld "cxx" <<EOF && enable is_duration_v
+#include <chrono>
+
+int main(int argc, char **argv){
+    bool value = std::chrono::__is_duration_v<int>;
     return 0;
 }
 EOF
