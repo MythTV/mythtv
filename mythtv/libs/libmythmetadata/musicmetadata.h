@@ -1,6 +1,12 @@
 #ifndef MUSICMETADATA_H_
 #define MUSICMETADATA_H_
 
+#if __has_include("libmythbase/mythconfig.h")
+#include "libmythbase/mythconfig.h"
+#else
+#include "mythconfig.h"
+#endif
+
 // C/C++
 #include <array>
 #include <cstdint>
@@ -203,7 +209,11 @@ class META_PUBLIC MusicMetadata
     void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
 
     std::chrono::milliseconds Length() const { return m_length; }
+#if HAVE_IS_DURATION_V
+    template <typename T, std::enable_if_t<std::chrono::__is_duration_v<T>, bool> = true>
+#else
     template <typename T, std::enable_if_t<std::chrono::__is_duration<T>::value, bool> = true>
+#endif
     void setLength(T llength) { m_length = llength; }
 
     int DiscNumber() const {return m_discNum;}

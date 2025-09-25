@@ -1,6 +1,12 @@
 #ifndef MYTHUISPINBOX_H_
 #define MYTHUISPINBOX_H_
 
+#if __has_include("libmythbase/mythconfig.h")
+#include "libmythbase/mythconfig.h"
+#else
+#include "mythconfig.h"
+#endif
+
 #include "mythuibuttonlist.h"
 
 /** \class MythUISpinBox
@@ -35,11 +41,19 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     bool keyPressEvent(QKeyEvent *event) override; // MythUIButtonList
 
     template <typename T>
+#if HAVE_IS_DURATION_V
+        std::enable_if_t<std::chrono::__is_duration_v<T>, T>
+#else
         std::enable_if_t<std::chrono::__is_duration<T>::value, T>
+#endif
         GetDuration()
     { return T(GetDataValue().toInt()); }
     template <typename T>
+#if HAVE_IS_DURATION_V
+        std::enable_if_t<std::chrono::__is_duration_v<T>, void>
+#else
         std::enable_if_t<std::chrono::__is_duration<T>::value, void>
+#endif
         SetDuration(T val)
     { SetValueByData(static_cast<int>(val.count())); }
 
