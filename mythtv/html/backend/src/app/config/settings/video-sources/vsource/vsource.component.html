@@ -39,7 +39,7 @@
                         </small>
                     </div>
 
-                    <div class="form-group field" *ngIf="configCommand.length>0">
+                    <div class="form-group field" *ngIf="configCommand2.length>0">
                         <label for="configure" class="label block">
                             {{ 'settings.vsource.grabberconfig_label' | translate }}
                         </label>
@@ -51,11 +51,22 @@
                             <tr>
                                 <td class="align-items-center bg-blue-100 text-gray-900"
                                     style="font-family: monospace;">
-                                    {{ configCommand }}
+                                    {{ configCommand1 }}
                                 </td>
                                 <td class="align-items-center">
                                     <button pButton pRipple type="button" icon="pi pi-copy"
-                                        class="p-button-rounded p-button-text" (click)="copyConfigure()"
+                                        class="p-button-rounded p-button-text" (click)="copyConfigure1()"
+                                        pTooltip="{{ 'settings.common.clipboard_tooltip' | translate }}"></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-items-center bg-blue-100 text-gray-900"
+                                    style="font-family: monospace;">
+                                    {{ configCommand2 }}
+                                </td>
+                                <td class="align-items-center">
+                                    <button pButton pRipple type="button" icon="pi pi-copy"
+                                        class="p-button-rounded p-button-text" (click)="copyConfigure2()"
                                         pTooltip="{{ 'settings.common.clipboard_tooltip' | translate }}"></button>
                                 </td>
                             </tr>

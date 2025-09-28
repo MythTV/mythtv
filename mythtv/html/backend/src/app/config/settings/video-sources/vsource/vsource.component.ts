@@ -47,7 +47,8 @@ export class VsourceComponent implements OnInit, AfterViewInit {
     nameRequired: "settings.vsource.nameRequired",
   }
 
-  configCommand = '';
+  configCommand1 = '';
+  configCommand2 = '';
 
   constructor(private channelService: ChannelService, private translate: TranslateService,
     public setupService: SetupService, private clipboard: Clipboard, private mythService: MythService) {
@@ -76,8 +77,12 @@ export class VsourceComponent implements OnInit, AfterViewInit {
     this.topElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  copyConfigure(): void {
-    let ret = this.clipboard.copy(this.configCommand);
+  copyConfigure1(): void {
+    let ret = this.clipboard.copy(this.configCommand1);
+  }
+
+  copyConfigure2(): void {
+    let ret = this.clipboard.copy(this.configCommand2);
   }
 
 
@@ -105,13 +110,18 @@ export class VsourceComponent implements OnInit, AfterViewInit {
   setupConf(): void {
     if (this.videoSource.Grabber == 'eitonly' || this.videoSource.Grabber == '/bin/true'
       || this.videoSource.Grabber == '' || this.videoSource.SourceName == ''
-      || this.work.validateError)
-      this.configCommand = '';
+      || this.work.validateError) {
+      this.configCommand1 = '';
+      this.configCommand2 = '';
+    }
     else {
       let confDir = this.backendInfo.BackendInfo.Env.MYTHCONFDIR;
       if (!confDir)
         confDir = this.backendInfo.BackendInfo.Env.HOME + "/.mythtv";
-      this.configCommand = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
+      this.configCommand1 = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
+        + this.videoSource.Grabber + ' --manage-lineups --config-file "'
+        + confDir + '/' + this.videoSource.SourceName + '.xmltv"';
+      this.configCommand2 = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
         + this.videoSource.Grabber + ' --configure --config-file "'
         + confDir + '/' + this.videoSource.SourceName + '.xmltv"';
     }
