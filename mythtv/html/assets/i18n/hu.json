@@ -1490,7 +1490,7 @@
             "freqtable_label": "Csatorna frekvencia táblázat",
             "grabber_desc": "Válassza ki a listák forrását. Egyes forrásokhoz előfizetés szükséges.",
             "grabber_label": "Listákat markoló",
-            "grabberconfig_desc": "Állítsa be a grabber-t a parancs futtatásával az ssh vagy a háttérrendszerbe bejelentkezett terminál használatával. Lásd a MythTV wikit:",
+            "grabberconfig_desc": "Konfigurálja a fogót ezen parancsok futtatásával az SSH vagy a háttérbe naplózott terminál használatával. Lásd a Mythtv Wiki -t:",
             "grabberconfig_label": "Grabber konfigurálása",
             "item_title": "Videó forrása",
             "lcnoffset_desc": "Az eltolás hozzáadódik minden egyes logikai csatornaszámhoz, amelyet a DVB videoforrás pásztázása során találtak. Ez lehetővé teszi, hogy a különböző videoforrásoknak egy nem átfedő csatornaszám-tartományt adjunk. Ha csak egy videoforrással rendelkezik, vagy ha a videoforrások nem rendelkeznek DVB logikai csatornaszámmal, hagyja a 0 értéket.",

@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanalfrekvenstabel",
             "grabber_desc": "Vælg fortegnelseskilden. Nogle kilder kræver, at du har et abonnement.",
             "grabber_label": "Fortegnelser grabber",
-            "grabberconfig_desc": "Konfigurer grabberen ved at køre denne kommando ved hjælp af ssh eller terminal logget på backend. Se MythTV-wikien:",
+            "grabberconfig_desc": "Konfigurer grabberen ved at køre disse kommandoer ved hjælp af SSH eller terminal logget ind i backend. Se Mythtv Wiki:",
             "grabberconfig_label": "Konfigurer Grabber",
             "item_title": "Videokilde",
             "lcnoffset_desc": "Forskydningen tilføjes til hvert logisk kanalnummer, der findes under en scanning af en DVB-videokilde. Dette gør det muligt at give forskellige videokilder et ikke-overlappende område af kanalnumre. Lad være ved 0, hvis du kun har én videokilde, eller hvis videokilderne ikke har logiske DVB-kanalnumre.",

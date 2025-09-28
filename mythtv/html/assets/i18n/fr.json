@@ -1490,7 +1490,7 @@
             "freqtable_label": "Tableau des fréquences des canaux",
             "grabber_desc": "Sélectionnez la source des listes. Certaines sources nécessitent que vous ayez un abonnement.",
             "grabber_label": "Saisie d'annonces",
-            "grabberconfig_desc": "Configurez le grabber en exécutant cette commande en utilisant ssh ou un terminal connecté au backend. Voir le wiki MythTV :",
+            "grabberconfig_desc": "Configurez le Grabber en exécutant ces commandes à l'aide de SSH ou de terminal connecté dans le backend. Voir le wiki mythtv:",
             "grabberconfig_label": "Configurer la pince",
             "item_title": "Source vidéo",
             "lcnoffset_desc": "Le décalage est ajouté à chaque numéro de canal logique trouvé lors d'un balayage d'une source vidéo DVB. Cela permet de donner à différentes sources vidéo une plage de numéros de canaux sans chevauchement. Laissez à 0 si vous n'avez qu'une seule source vidéo ou si les sources vidéo n'ont pas de numéros de canaux logiques DVB.",

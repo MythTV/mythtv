@@ -1490,7 +1490,7 @@
             "freqtable_label": "频道频率表",
             "grabber_desc": "选择列表来源。有些来源需要您订阅。",
             "grabber_label": "列表抓取器",
-            "grabberconfig_desc": "使用 ssh 或登录到后端的终端运行此命令来配置抓取器。请参阅 MythTV 维基：",
+            "grabberconfig_desc": "通过使用SSH或终端登录到后端来配置Grabber。请参阅Mythtv Wiki：",
             "grabberconfig_label": "配置抓取器",
             "item_title": "视频源",
             "lcnoffset_desc": "该偏移量被添加到 DVB 视频源扫描期间找到的每个逻辑通道号。这使得可以为不同的视频源提供不重叠的频道编号范围。如果您只有一个视频源或者视频源没有 DVB 逻辑通道号，请保留为 0。",

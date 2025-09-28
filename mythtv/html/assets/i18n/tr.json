@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanal Frekans Tablosu",
             "grabber_desc": "Listeleme kaynağını seçin. Bazı kaynaklar abone olmanızı gerektirir.",
             "grabber_label": "Liste kapmak",
-            "grabberconfig_desc": "Bu komutu ssh veya arka uçta oturum açmış terminali kullanarak çalıştırarak yakalayıcıyı yapılandırın. MythTV wiki'sine bakın:",
+            "grabberconfig_desc": "SSH veya Terminal Oturum Terminali kullanarak bu komutları çalıştırarak Grabber'ı yapılandırın. Mythtv Wiki'ye bakın:",
             "grabberconfig_label": "Grabber'ı Yapılandır",
             "item_title": "Video kaynağı",
             "lcnoffset_desc": "Ofset, bir DVB video kaynağının taranması sırasında bulunan her bir mantıksal kanal numarasına eklenir. Bu, farklı video kaynaklarına örtüşmeyen bir kanal numarası aralığı vermeyi mümkün kılar. Yalnızca bir video kaynağınız varsa veya video kaynaklarında DVB mantıksal kanal numaraları yoksa 0'da bırakın.",

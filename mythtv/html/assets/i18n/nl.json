@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanaalfrequentietabel",
             "grabber_desc": "Selecteer de vermeldingsbron. Voor sommige bronnen heb je een abonnement nodig.",
             "grabber_label": "Aanbiedingen grijper",
-            "grabberconfig_desc": "Configureer de grabber door deze opdracht uit te voeren met behulp van ssh of terminal ingelogd op de backend. Zie de MythTV-wiki:",
+            "grabberconfig_desc": "Configureer de grijper door deze opdrachten uit te voeren met behulp van SSH of terminal ingelogd in de backend. Zie de mythtv wiki:",
             "grabberconfig_label": "Configureer Grabber",
             "item_title": "Video bron",
             "lcnoffset_desc": "De offset wordt toegevoegd aan elk logisch kanaalnummer dat wordt gevonden tijdens een scan van een DVB-videobron. Dit maakt het mogelijk om verschillende videobronnen een niet-overlappend bereik van kanaalnummers te geven. Laat op 0 staan ​​als u slechts één videobron heeft of als de videobronnen geen logische DVB-kanaalnummers hebben.",

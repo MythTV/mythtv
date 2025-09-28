@@ -1490,7 +1490,7 @@
             "freqtable_label": "Tabla de frecuencias de canales",
             "grabber_desc": "Seleccione la fuente de listados. Algunas fuentes requieren que tengas una suscripción.",
             "grabber_label": "capturador de listados",
-            "grabberconfig_desc": "Configure el capturador ejecutando este comando usando ssh o terminal conectado al backend. Vea la wiki de MythTV:",
+            "grabberconfig_desc": "Configure el Grabber ejecutando estos comandos usando SSH o terminal registrado en el backend. Vea la wiki mythtv:",
             "grabberconfig_label": "Configurar capturador",
             "item_title": "Fuente de vídeo",
             "lcnoffset_desc": "El desplazamiento se agrega a cada número de canal lógico encontrado durante un escaneo de una fuente de video DVB. Esto hace posible dar a diferentes fuentes de video un rango de números de canales que no se superponen. Déjelo en 0 si solo tiene una fuente de video o si las fuentes de video no tienen números de canales lógicos DVB.",

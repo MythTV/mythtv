@@ -1490,7 +1490,7 @@
             "freqtable_label": "Tabela częstotliwości kanałów",
             "grabber_desc": "Wybierz źródło aukcji. Niektóre źródła wymagają posiadania subskrypcji.",
             "grabber_label": "Chwytak ofert",
-            "grabberconfig_desc": "Skonfiguruj grabber, uruchamiając to polecenie przy użyciu protokołu ssh lub terminala zalogowanego do zaplecza. Zobacz wiki MythTV:",
+            "grabberconfig_desc": "Skonfiguruj chwytak, uruchamiając te polecenia za pomocą SSH lub terminal zalogowane do backenda. Zobacz Wiki Mythtv:",
             "grabberconfig_label": "Skonfiguruj Grabbera",
             "item_title": "Źródło wideo",
             "lcnoffset_desc": "Przesunięcie jest dodawane do każdego logicznego numeru kanału znalezionego podczas skanowania źródła wideo DVB. Dzięki temu możliwe jest nadanie różnym źródłom wideo nienakładającego się zakresu numerów kanałów. Pozostaw 0, jeśli masz tylko jedno źródło wideo lub jeśli źródła wideo nie mają logicznych numerów kanałów DVB.",

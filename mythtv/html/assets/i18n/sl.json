@@ -1490,7 +1490,7 @@
             "freqtable_label": "Frekvenčna tabela kanalov",
             "grabber_desc": "Izberite vir seznamov. Nekateri viri zahtevajo, da imate naročnino.",
             "grabber_label": "Zajemalka oglasov",
-            "grabberconfig_desc": "Konfigurirajte grabber tako, da zaženete ta ukaz z uporabo ssh ali terminala, prijavljenega v ozadju. Oglejte si wiki MythTV:",
+            "grabberconfig_desc": "Konfigurirajte Grabber tako, da te ukaze zaženete s SSH ali terminalom, prijavljenim v zaledje. Oglejte si wiki MythTV:",
             "grabberconfig_label": "Konfigurirajte Grabber",
             "item_title": "Video vir",
             "lcnoffset_desc": "Odmik se doda vsaki številki logičnega kanala, najdeni med skeniranjem video vira DVB. To omogoča, da različnim video virom dodelite neprekrivajoče se območje številk kanalov. Pustite na 0, če imate samo en video vir ali če video viri nimajo številk logičnih kanalov DVB.",

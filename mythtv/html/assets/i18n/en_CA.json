@@ -1490,7 +1490,7 @@
             "freqtable_label": "Channel Frequency Table",
             "grabber_desc": "Select the listings source. Some sources require you to have a subscription.",
             "grabber_label": "Listings grabber",
-            "grabberconfig_desc": "Configure the grabber by running this command using ssh or terminal logged into the backend. See the MythTV wiki:",
+            "grabberconfig_desc": "Configure the grabber by running these commands using ssh or terminal logged into the backend. See the MythTV wiki:",
             "grabberconfig_label": "Configure Grabber",
             "item_title": "Video Source",
             "lcnoffset_desc": "The offset is added to each logical channel number found during a scan of a DVB video source. This makes it possible to give different video sources a non-overlapping range of channel numbers. Leave at 0 if you have only one video source or if the video sources do not have DVB logical channel numbers.",

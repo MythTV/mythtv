@@ -1490,7 +1490,7 @@
             "freqtable_label": "Tabulka frekvence kanálů",
             "grabber_desc": "Vyberte zdroj výpisů. Některé zdroje vyžadují, abyste měli předplatné.",
             "grabber_label": "Sběratel výpisů",
-            "grabberconfig_desc": "Nakonfigurujte grabber spuštěním tohoto příkazu pomocí ssh nebo terminálu přihlášeného do backendu. Podívejte se na wiki MythTV:",
+            "grabberconfig_desc": "Nakonfigurujte Grabber spuštěním těchto příkazů pomocí SSH nebo terminálu přihlášeného do backendu. Viz mythtv wiki:",
             "grabberconfig_label": "Nakonfigurujte Grabber",
             "item_title": "Zdroj videa",
             "lcnoffset_desc": "Posun je přidán ke každému logickému číslu kanálu nalezenému během vyhledávání zdroje DVB videa. To umožňuje přidělit různým zdrojům videa nepřekrývající se rozsah čísel kanálů. Ponechte hodnotu 0, pokud máte pouze jeden zdroj videa nebo pokud zdroje videa nemají logická čísla kanálů DVB.",

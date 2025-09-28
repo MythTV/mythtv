@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanali sagedustabel",
             "grabber_desc": "Valige kirje allikas. Mõned allikad nõuavad tellimust.",
             "grabber_label": "Nimekirjade haaraja",
-            "grabberconfig_desc": "Seadistage haarats, käivitades selle käsu ssh-i või taustaprogrammi sisse logitud terminali abil. Vaadake MythTV vikit:",
+            "grabberconfig_desc": "Seadistage haaraja, käivitades need käsud SSH või Terminali abil, mis on sisse loginud taustaprogrammi. Vaadake Mythtv wiki:",
             "grabberconfig_label": "Grabberi seadistamine",
             "item_title": "Video allikas",
             "lcnoffset_desc": "Nihe lisatakse igale DVB-videoallika skannimise käigus leitud loogilisele kanalinumbrile. See võimaldab anda erinevatele videoallikatele kanalite numbrite mittekattuvat vahemikku. Jätke 0, kui teil on ainult üks videoallikas või kui videoallikatel pole DVB loogilisi kanalinumbreid.",

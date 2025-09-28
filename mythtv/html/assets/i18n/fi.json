@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanavan taajuustaulukko",
             "grabber_desc": "Valitse listauksen lähde. Jotkut lähteet edellyttävät tilausta.",
             "grabber_label": "Listausten sieppaaja",
-            "grabberconfig_desc": "Määritä grabber suorittamalla tämä komento käyttämällä ssh-komentoa tai päätettä, joka on kirjautunut taustajärjestelmään. Katso MythTV-wiki:",
+            "grabberconfig_desc": "Määritä Grabber suorittamalla nämä komennot käyttämällä SSH: ta tai päätettä kirjautuneena taustaan. Katso Mythtv Wiki:",
             "grabberconfig_label": "Määritä Grabber",
             "item_title": "Videon lähde",
             "lcnoffset_desc": "Poikkeama lisätään jokaiseen loogiseen kanavanumeroon, joka löydetään DVB-videolähteen selauksen aikana. Tämä mahdollistaa sen, että eri videolähteille voidaan antaa ei-päällekkäinen kanavanumeroalue. Jätä arvoksi 0, jos sinulla on vain yksi videolähde tai jos videolähteillä ei ole loogisia DVB-kanavanumeroita.",

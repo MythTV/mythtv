@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanalfrequenztabelle",
             "grabber_desc": "Wählen Sie die Quelle der Einträge aus. Für einige Quellen ist ein Abonnement erforderlich.",
             "grabber_label": "Listings Grabber",
-            "grabberconfig_desc": "Konfigurieren Sie den Grabber, indem Sie diesen Befehl über SSH oder ein im Backend angemeldetes Terminal ausführen. Siehe das MythTV-Wiki:",
+            "grabberconfig_desc": "Konfigurieren Sie den Grabber, indem Sie diese Befehle mit SSH oder Terminal ausführen, die im Backend angemeldet sind. Sehen Sie das Mythtv Wiki:",
             "grabberconfig_label": "Grabber konfigurieren",
             "item_title": "Videoquelle",
             "lcnoffset_desc": "Der Offset wird zu jeder logischen Kanalnummer hinzugefügt, die während eines Scans einer DVB-Videoquelle gefunden wird. Dadurch ist es möglich, verschiedenen Videoquellen einen überlappungsfreien Kanalnummernbereich zu geben. Belassen Sie den Wert bei 0, wenn Sie nur eine Videoquelle haben oder wenn die Videoquellen keine logischen DVB-Kanalnummern haben.",

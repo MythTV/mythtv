@@ -1490,7 +1490,7 @@
             "freqtable_label": "Tabella delle frequenze dei canali",
             "grabber_desc": "Seleziona la fonte dei palinsesti. Alcune fonti richiedono un abbonamento.",
             "grabber_label": "Cattura annunci",
-            "grabberconfig_desc": "Configura il grabber eseguendo questo comando utilizzando ssh o il terminale connesso al backend. Vedi la wiki di MythTV:",
+            "grabberconfig_desc": "Configurare Grabber eseguendo questi comandi utilizzando SSH o Terminal effettuato l'accesso al backend. Vedi il wiki Mythtv:",
             "grabberconfig_label": "Configura Grabber",
             "item_title": "Sorgente video",
             "lcnoffset_desc": "L'offset viene aggiunto a ciascun numero di canale logico trovato durante una scansione di una sorgente video DVB. Ciò consente di assegnare a diverse sorgenti video un intervallo di numeri di canale non sovrapposti. Lasciare a 0 se si dispone di una sola sorgente video o se le sorgenti video non hanno numeri di canale logici DVB.",

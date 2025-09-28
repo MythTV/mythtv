@@ -1490,7 +1490,7 @@
             "freqtable_label": "Kanalfrekvenstabell",
             "grabber_desc": "Velg oppføringskilden. Noen kilder krever at du har et abonnement.",
             "grabber_label": "Oppføringsfanger",
-            "grabberconfig_desc": "Konfigurer grabberen ved å kjøre denne kommandoen ved å bruke ssh eller terminal logget på backend. Se MythTV-wikien:",
+            "grabberconfig_desc": "Konfigurer grabberen ved å kjøre disse kommandoene ved å bruke SSH eller terminal logget inn i backend. Se MythTV Wiki:",
             "grabberconfig_label": "Konfigurer Grabber",
             "item_title": "Videokilde",
             "lcnoffset_desc": "Forskyvningen legges til hvert logisk kanalnummer som finnes under en skanning av en DVB-videokilde. Dette gjør det mulig å gi forskjellige videokilder et ikke-overlappende område av kanalnumre. La stå på 0 hvis du bare har én videokilde eller hvis videokildene ikke har logiske DVB-kanalnumre.",

@@ -1490,7 +1490,7 @@
             "freqtable_label": "Tablica frekvencija kanala",
             "grabber_desc": "Odaberite izvor unosa. Neki izvori zahtijevaju da imate pretplatu.",
             "grabber_label": "Grabber popisa",
-            "grabberconfig_desc": "Konfigurirajte grabber pokretanjem ove naredbe pomoću ssh-a ili terminala prijavljenog u pozadini. Pogledajte MythTV wiki:",
+            "grabberconfig_desc": "Konfigurirajte grabber pokretanjem ovih naredbi pomoću SSH ili terminala prijavljenih u pozadinu. Pogledajte Mythtv wiki:",
             "grabberconfig_label": "Konfigurirajte Grabber",
             "item_title": "Video izvor",
             "lcnoffset_desc": "Pomak se dodaje svakom logičkom broju kanala pronađenom tijekom skeniranja DVB video izvora. Ovo omogućuje različitim videoizvorima davanje raspona brojeva kanala koji se ne preklapaju. Ostavite na 0 ako imate samo jedan video izvor ili ako video izvori nemaju DVB logičke brojeve kanala.",

@@ -1490,7 +1490,7 @@
             "freqtable_label": "Rás tíðni tafla",
             "grabber_desc": "Veldu uppruna skráningar. Sumar heimildir krefjast þess að þú sért með áskrift.",
             "grabber_label": "Skráningargrípur",
-            "grabberconfig_desc": "Stilltu grabberinn með því að keyra þessa skipun með því að nota ssh eða flugstöð sem er skráður inn á bakenda. Sjá MythTV wiki:",
+            "grabberconfig_desc": "Stilltu gripinn með því að keyra þessar skipanir með SSH eða flugstöðinni skráðu inn í stuðninginn. Sjáðu Mythtv Wiki:",
             "grabberconfig_label": "Stilla Grabber",
             "item_title": "Uppspretta myndbands",
             "lcnoffset_desc": "Jöfnuninni er bætt við hvert rökrétt rásnúmer sem finnst við skönnun á DVB myndbandsuppsprettu. Þetta gerir það mögulegt að gefa mismunandi mynduppsprettum rásnúmerasvið sem ekki skarast. Skildu eftir 0 ef þú ert aðeins með einn myndbandsuppsprettu eða ef myndbandsuppspretturnar eru ekki með rökrétt DVB rásnúmer.",

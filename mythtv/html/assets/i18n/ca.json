@@ -1490,7 +1490,7 @@
             "freqtable_label": "Taula de freqüències de canals",
             "grabber_desc": "Seleccioneu la font de llistes. Algunes fonts requereixen que tingueu una subscripció.",
             "grabber_label": "Captador de llistats",
-            "grabberconfig_desc": "Configureu el capturador executant aquesta ordre mitjançant ssh o terminal connectat al backend. Vegeu la wiki de MythTV:",
+            "grabberconfig_desc": "Configureu el Grabber executant aquestes ordres mitjançant SSH o Terminal registrat al backend. Vegeu el wiki de Mythtv:",
             "grabberconfig_label": "Configura Grabber",
             "item_title": "Font del vídeo",
             "lcnoffset_desc": "El desplaçament s'afegeix a cada número de canal lògic trobat durant l'exploració d'una font de vídeo DVB. Això fa possible que les diferents fonts de vídeo tinguin un rang de números de canal no superposats. Deixeu 0 si només teniu una font de vídeo o si les fonts de vídeo no tenen números de canal lògic DVB.",
