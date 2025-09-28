@@ -123,7 +123,7 @@ export class VsourceComponent implements OnInit, AfterViewInit {
       if (x.bool) {
         this.work.successCount++;
       }
-      else if (!this.videoSource.Id && x.int) {
+      else if (!this.videoSource.Id && x.int && x.int > 0) {
         this.work.successCount++;
         if (!this.videoSource.Id) {
           this.videoSource.Id = x.int;
