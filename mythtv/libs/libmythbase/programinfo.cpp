@@ -6252,6 +6252,12 @@ bool LoadFromRecorded(
                     table = "";
                 }
 
+                else if (field == "originalairdate")
+                {
+                    field = "COALESCE(r.originalairdate, STR_TO_DATE(CONCAT(p.airdate,',01,01'),'%Y,%m,%d'))";
+                    table = "";
+                }
+
                 if (sSortBy.isEmpty())
                     sSortBy = QString("%1%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
                 else
