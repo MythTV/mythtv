@@ -13,8 +13,8 @@
 // MythTV headers
 #include "libmythbase/mythtimer.h"
 #include "libmythbase/mythtypes.h"
-#include "libmythbase/programtypes.h"
 #include "libmythtv/mythtvexp.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/tv.h"
 #include "libmythtv/videoouttypes.h"
 

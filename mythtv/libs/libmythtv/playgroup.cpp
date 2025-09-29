@@ -4,8 +4,9 @@
 // MythTV headers
 #include "libmythui/standardsettings.h"
 #include "libmythbase/mythdb.h"
-#include "libmythbase/programinfo.h"
+
 #include "playgroup.h"
+#include "programinfo.h"
 
 // A parameter associated with the profile itself
 class PlayGroupDBStorage : public SimpleDBStorage

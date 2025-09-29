@@ -2,8 +2,8 @@
 #define CUTTER_H
 
 #include <cstdint>                      // for int64_t
-#include "libmythbase/programtypes.h"   // for frm_dir_map_t
 #include "libmythtv/deletemap.h"        // for DeleteMap
+#include "libmythtv/programtypes.h"     // for frm_dir_map_t
 
 // Cutter object is used in performing clean cutting. The
 // act of cutting is shared between the player and the
