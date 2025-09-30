@@ -83,13 +83,7 @@ void V2FillProgramInfo( V2Program *pProgram,
 
         if (pInfo->GetOriginalAirDate().isValid())
             pProgram->setAirdate( pInfo->GetOriginalAirDate() );
-        else if (pInfo->GetYearOfInitialRelease() > 0)
-        {
-            QDate year;
-            year.setDate(pInfo->GetYearOfInitialRelease(), 1, 1);
-            pProgram->setAirdate( year );
-        }
-
+        pProgram->setReleaseYear( pInfo->GetYearOfInitialRelease());
         pProgram->setDescription( pInfo->GetDescription() );
         pProgram->setInetref    ( pInfo->GetInetRef()     );
         pProgram->setSeason     ( pInfo->GetSeason()      );
