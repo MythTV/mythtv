@@ -113,8 +113,13 @@
                     </td>
                     <td class="justify-content-end p-1 overflow-hidden">
                         <div class="mycell">
-                            <div class="mytext" [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}"
+                            <div *ngIf="program.Airdate" class="mytext"
+                                [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}"
                                 [innerHTML]="utility.formatDate(program.Airdate,true)"></div>
+                            <div *ngIf="program.ReleaseYear && !program.Airdate" class="mytext"
+                                [ngClass]="{'line-through' : program.Recording.RecGroup == 'Deleted'}">
+                                {{program.ReleaseYear}}
+                            </div>
                         </div>
                     </td>
                     <td class="justify-content-end p-1 overflow-hidden">

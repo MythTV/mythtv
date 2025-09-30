@@ -25,6 +25,7 @@ export interface ScheduleOrProgram {
     ProgramFlags:       number;
     ProgramId:          string;
     Recording:          Recording;
+    ReleaseYear:        number;
     Repeat:             boolean;
     Season:             number;
     SeriesId:           string;
