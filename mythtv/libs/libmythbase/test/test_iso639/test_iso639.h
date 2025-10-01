@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_ISO639_H
+#define LIBMYTHBASE_TEST_ISO639_H
 
 #include <QTest>
 #include <iostream>
@@ -41,3 +43,5 @@ private slots:
     static void test_key_to_cankey_data(void);
     static void test_key_to_cankey(void);
 };
+
+#endif // LIBMYTHBASE_TEST_ISO639_H

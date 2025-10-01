@@ -355,6 +355,4 @@ void SignalHandler::handleSignal(void)
 #endif // _WIN32
 }
 
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
+#include "moc_signalhandling.cpp"

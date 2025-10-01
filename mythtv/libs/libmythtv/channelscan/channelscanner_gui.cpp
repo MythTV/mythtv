@@ -178,3 +178,5 @@ void ChannelScannerGUI::MonitorProgress(bool lock, bool strength,
         m_scanStage = nullptr;
     }
 }
+
+#include "moc_channelscanner_gui.cpp"

@@ -482,4 +482,4 @@ void VideoScanner::finishedScan()
     emit finished(m_scanThread->getDataChanged());
 }
 
-////////////////////////////////////////////////////////////////////////
+#include "moc_videoscan.cpp"

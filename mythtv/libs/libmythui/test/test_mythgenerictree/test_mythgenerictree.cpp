@@ -179,3 +179,5 @@ void TestMythGenericTree::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestMythGenericTree)
+
+#include "moc_test_mythgenerictree.cpp"

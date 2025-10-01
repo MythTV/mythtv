@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_AVCINFO_H
+#define LIBMYTHTV_TEST_AVCINFO_H
 
 #include <QTest>
 
@@ -29,3 +31,5 @@ class TestAvcInfo : public QObject
     static void test_guids(void);
     void cleanupTestCase();
 };
+
+#endif // LIBMYTHTV_TEST_AVCINFO_H

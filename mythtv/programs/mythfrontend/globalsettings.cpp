@@ -5138,4 +5138,4 @@ void ChannelGroupsSetting::CreateNewGroup(const QString& name)
     emit settingsChanged(this);
 }
 
-// vim:set sw=4 ts=4 expandtab:
+#include "moc_globalsettings.cpp"

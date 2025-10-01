@@ -1258,3 +1258,5 @@ bool V2Channel::CopyIconToBackend(const QString& Url, const QString& ChanId)
 
     return fRet;
 }
+
+#include "moc_v2channel.cpp"

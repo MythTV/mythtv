@@ -557,3 +557,5 @@ void RSSEditor::ListChanged()
     m_changed = true;
     LoadData();
 }
+
+#include "moc_rsseditor.cpp"

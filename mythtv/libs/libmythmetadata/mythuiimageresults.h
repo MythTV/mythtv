@@ -1,3 +1,6 @@
+#ifndef LIBMYTHMETADATA_MYTHUIIMAGERESULTS_H
+#define LIBMYTHMETADATA_MYTHUIIMAGERESULTS_H
+
 #include <QObject>
 
 #include "libmythtv/metadataimagehelper.h"
@@ -35,3 +38,4 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
     void sendResult(MythUIButtonListItem* item);
 };
 
+#endif // LIBMYTHMETADATA_MYTHUIIMAGERESULTS_H
