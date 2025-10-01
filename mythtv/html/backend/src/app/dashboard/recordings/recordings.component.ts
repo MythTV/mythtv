@@ -151,6 +151,12 @@ export class RecordingsComponent implements OnInit {
     let sortOrder = this.utility.sortStorage.getItem('recordings.sortOrder');
     if (sortOrder)
       this.sortOrder = Number(sortOrder);
+    let searchValue = sessionStorage.getItem('recordings.searchValue');
+    if (searchValue)
+      this.searchValue = searchValue;
+    let selectedRecGroup = sessionStorage.getItem('recordings.selectedRecGroup');
+    if (selectedRecGroup)
+      this.selectedRecGroup = selectedRecGroup;
   }
 
   ngOnInit(): void {
@@ -224,7 +230,8 @@ export class RecordingsComponent implements OnInit {
       // Do not set this.programs = []; This causes the body to have zero height
       // After a search
       this.selection = [];
-      this.menu.hide();
+      if (this.menu)
+        this.menu.hide();
       this.priorRequest = request;
       this.showTable = false;
     }
@@ -267,12 +274,12 @@ export class RecordingsComponent implements OnInit {
   }
 
   reload() {
-    this.showTable = false;
-    this.programs.length = 0;
-    this.refreshing = true;
-    this.lazyLoadEvent = undefined;
-    this.loadLast = 0;
-    this.loadLazy(({ first: 0, rows: 1 }));
+    sessionStorage.setItem('recordings.searchValue',this.searchValue);
+    if (this.selectedRecGroup)
+      sessionStorage.setItem('recordings.selectedRecGroup',this.selectedRecGroup);
+    else
+      sessionStorage.removeItem('recordings.selectedRecGroup');
+    location.reload();
   }
 
 

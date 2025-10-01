@@ -86,6 +86,16 @@ export class PrevrecsComponent implements OnInit {
     let sortOrder = this.utility.sortStorage.getItem('prevrecs.sortOrder');
     if (sortOrder)
       this.sortOrder = Number(sortOrder);
+    
+    let dateValue = sessionStorage.getItem('prevrecs.dateValue');
+    if (dateValue)
+      this.dateValue = new Date(dateValue);
+    let searchValue = sessionStorage.getItem('prevrecs.searchValue');
+    if (searchValue)
+      this.searchValue = searchValue;
+    let subSearchValue = sessionStorage.getItem('prevrecs.subSearchValue');
+    if (subSearchValue)
+      this.subSearchValue = subSearchValue;
   }
 
   ngOnInit(): void {
@@ -102,13 +112,13 @@ export class PrevrecsComponent implements OnInit {
 
 
   reload() {
-    this.showTable = false;
-    this.programs.length = 0;
-    this.totalRecords = 0;
-    this.refreshing = true;
-    this.lazyLoadEvent = undefined;
-    this.loadLast = 0;
-    this.loadLazy(({ first: 0, rows: 1 }));
+    if (this.dateValue)
+      sessionStorage.setItem('prevrecs.dateValue',this.dateValue.toISOString());
+    else
+      sessionStorage.removeItem('prevrecs.dateValue');
+    sessionStorage.setItem('prevrecs.searchValue',this.searchValue);
+    sessionStorage.setItem('prevrecs.subSearchValue',this.subSearchValue);
+    location.reload();
   }
 
   refresh() {
@@ -187,7 +197,7 @@ export class PrevrecsComponent implements OnInit {
       if (recordings.Count == 0 && recordings.StartIndex == 0)
         this.programs = [];
       else
-        this.programs.splice(recordings.StartIndex, recordings.Count,
+        this.programs.splice(recordings.StartIndex, recordings.Programs.length,
           ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]

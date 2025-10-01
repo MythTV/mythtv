@@ -29,8 +29,6 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
 
   programs: ScheduleOrProgram[] = [];
   recRules: RuleListEntry[] = [];
-  allRecRules: RuleListEntry[] = [];
-  activeRecRules: RuleListEntry[] = [];
   defaultRecRule: RuleListEntry = { Id: 0, Title: 'settings.chanedit.all' };
   recGroups: string[] = [];
   restartErrMsg = 'dashboard.upcoming.restart_err';
@@ -59,7 +57,6 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     private utility: UtilityService) {
     this.translate.get(this.defaultRecRule.Title).subscribe(data => this.defaultRecRule.Title = data);
     this.translate.get(this.restartErrMsg).subscribe(data => this.restartErrMsg = data);
-    this.loadRecRules();
 
     this.dvrService.GetRecGroupList('schedule')
       .subscribe((data) => {
@@ -73,11 +70,17 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     let sortOrder = this.utility.sortStorage.getItem('upcoming.sortOrder');
     if (sortOrder)
       this.sortOrder = Number(sortOrder);
+
+    let selectedStatus = sessionStorage.getItem('upcoming.selectedStatus');
+    if (selectedStatus)
+      this.selectedStatus = selectedStatus;
+
+    this.selectedRecGroup = sessionStorage.getItem('upcoming.selectedRecGroup');
   }
 
   ngOnInit(): void {
     // Initial Load
-    this.loadLazy({ first: 0, rows: 1 });
+    this.loadRecRules();
   }
 
     onSort(sortMeta: SortMeta) {
@@ -102,27 +105,28 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   loadRecRules() {
     this.dvrService.GetRecordScheduleList({}).subscribe({
       next: (data) => {
-        this.allRecRules.length = 0;
-        this.allRecRules.push(this.defaultRecRule);
-        this.activeRecRules.length = 0;
-        this.activeRecRules.push(this.defaultRecRule);
+        this.recRules.length = 0;
+        this.recRules.push(this.defaultRecRule);
         data.RecRuleList.RecRules.forEach((entry) => {
           if (entry.Type != 'Recording Template') {
             let recRule = {
               Id: entry.Id,
               Title: entry.Title.substring(0, 30) + ' [' + this.utility.recTypeTrans[entry.Type] + ']'
             };
-            this.allRecRules.push(recRule);
-            if (entry.NextRecording) {
-              this.activeRecRules.push(recRule);
-            };
+            this.recRules.push(recRule);
           }
         });
-        this.recRules.length = 0;
-        if (this.selectedStatus == 'All')
-          this.recRules.push(...this.allRecRules)
-        else
-          this.recRules.push(...this.activeRecRules)
+        let selectedIdStr = sessionStorage.getItem('upcoming.selectedRule.Id');
+        if (selectedIdStr) {
+          let selectedId = Number.parseInt(selectedIdStr);
+          let selectedRule = this.recRules.find((element) => element.Id == selectedId);
+          if (selectedRule) {
+            this.selectedRule = selectedRule;
+          }
+        }
+        // initial load
+        if (this.programs.length == 0)
+          this.loadLazy({ first: 0, rows: 1 });
       },
     });
   }
@@ -179,20 +183,12 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     if (this.selectedRecGroup)
       request.RecGroup = this.selectedRecGroup
 
-    this.recRules.length = 0;
-    if (this.selectedStatus && this.selectedStatus != 'Default')
-      this.recRules.push(...this.allRecRules)
-    else
-      this.recRules.push(...this.activeRecRules)
     this.dvrService.GetUpcomingList(request).subscribe(data => {
       let recordings = data.ProgramList;
       this.totalRecords = data.ProgramList.TotalAvailable;
       this.programs.length = this.totalRecords;
       // populate page of virtual programs
-      // note that Count is returned as the count requested, even
-      // if less items are returned because you hit the end.
-      // Maybe we should use recordings.Programs.length
-      this.programs.splice(recordings.StartIndex, recordings.Count,
+      this.programs.splice(recordings.StartIndex, recordings.Programs.length,
         ...recordings.Programs);
       // notify of change
       this.programs = [...this.programs]
@@ -216,12 +212,16 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   }
 
   reload() {
-    this.showTable = false;
-    this.programs.length = 0;
-    this.refreshing = true;
-    this.lazyLoadEvent = undefined;
-    this.loadLast = 0;
-    this.loadLazy(({ first: 0, rows: 1 }));
+    sessionStorage.setItem('upcoming.selectedStatus',this.selectedStatus);
+    if (this.selectedRule && this.selectedRule.Id != 0)
+      sessionStorage.setItem('upcoming.selectedRule.Id',(this.selectedRule.Id).toString());
+    else
+      sessionStorage.removeItem('upcoming.selectedRule.Id');
+    if (this.selectedRecGroup)
+      sessionStorage.setItem('upcoming.selectedRecGroup',this.selectedRecGroup);
+    else
+      sessionStorage.removeItem('upcoming.selectedRecGroup');
+    location.reload();
   }
 
   formatStartDate(program: ScheduleOrProgram, rowIndex: number): string {
