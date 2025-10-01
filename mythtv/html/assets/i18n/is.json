@@ -264,6 +264,7 @@
             "nonrerec": "Til að leyfa endurupptöku á skemmda forritinu skaltu nota Leyfa endurupptöku.",
             "normal_rec": "Venjulegt met",
             "orig_airdate": "Upprunaleg flugdagsetning",
+            "orig_airdate_desc": "Fyrir losunarár í leikhúsútgáfum birtist",
             "override_rule": "Bæta við eða breyta hnekkjareglu",
             "recgrp": "Rec Grp",
             "regex": "Þú getur notað regluleg tjáning í þessari leit.",

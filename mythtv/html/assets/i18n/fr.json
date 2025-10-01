@@ -264,6 +264,7 @@
             "nonrerec": "Pour autoriser le réenregistrement du programme endommagé, veuillez utiliser Autoriser le réenregistrement.",
             "normal_rec": "Dossier normal",
             "orig_airdate": "Date de diffusion originale",
+            "orig_airdate_desc": "Pour les versions théâtrales, l'année de sortie est affichée",
             "override_rule": "Ajouter ou modifier une règle de remplacement",
             "recgrp": "Groupe de réc.",
             "regex": "Vous pouvez utiliser des expressions régulières dans cette recherche.",

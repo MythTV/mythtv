@@ -264,6 +264,7 @@
             "nonrerec": "Kahjustatud programmi uuesti salvestamise lubamiseks kasutage käsku Luba uuesti salvestada.",
             "normal_rec": "Normaalne rekord",
             "orig_airdate": "Algne eetri kuupäev",
+            "orig_airdate_desc": "Kuvatakse teatrietenduste jaoks vabastamise aasta",
             "override_rule": "Alistusreegli lisamine või muutmine",
             "recgrp": "Rec Grp",
             "regex": "Selles otsingus saate kasutada regulaaravaldisi.",

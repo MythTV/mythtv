@@ -264,6 +264,7 @@
             "nonrerec": "Jos haluat sallia vaurioituneen ohjelman uudelleentallentamisen, käytä Salli nauhoitus uudelleen.",
             "normal_rec": "Normaali ennätys",
             "orig_airdate": "Alkuperäinen lentopäivämäärä",
+            "orig_airdate_desc": "Teatterijulkaisujen julkaisuvuosi näytetään",
             "override_rule": "Lisää tai muokkaa ohitussääntöä",
             "recgrp": "Rec Grp",
             "regex": "Voit käyttää tässä haussa säännöllisiä lausekkeita.",

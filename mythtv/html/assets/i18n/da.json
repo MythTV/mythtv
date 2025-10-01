@@ -264,6 +264,7 @@
             "nonrerec": "For at tillade genoptagelse af det beskadigede program, brug venligst Tillad genoptagelse.",
             "normal_rec": "Normal rekord",
             "orig_airdate": "Original luftdato",
+            "orig_airdate_desc": "For teaterudgivelser vises frigivelsesåret",
             "override_rule": "Tilføj eller rediger tilsidesættelsesregel",
             "recgrp": "Rec Grp",
             "regex": "Du kan bruge regulære udtryk i denne søgning.",

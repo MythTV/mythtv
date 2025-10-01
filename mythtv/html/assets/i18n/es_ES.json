@@ -264,6 +264,7 @@
             "nonrerec": "Para permitir volver a grabar el programa dañado, utilice Permitir volver a grabar.",
             "normal_rec": "Registro normal",
             "orig_airdate": "Fecha de emisión original",
+            "orig_airdate_desc": "Para los lanzamientos teatrales, se muestra el año de lanzamiento",
             "override_rule": "Agregar o editar regla de anulación",
             "recgrp": "Grupo rec.",
             "regex": "Puede utilizar expresiones regulares en esta búsqueda.",

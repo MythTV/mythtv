@@ -264,6 +264,7 @@
             "nonrerec": "Hasarlı programın yeniden kaydedilmesine izin vermek için lütfen Yeniden Kayda İzin Ver seçeneğini kullanın.",
             "normal_rec": "Normal kayıt",
             "orig_airdate": "Orijinal Yayın Tarihi",
+            "orig_airdate_desc": "Tiyatro sürümleri için sürüm yılı görüntülenir",
             "override_rule": "Geçersiz Kılma Kuralı Ekleme veya Düzenleme",
             "recgrp": "Kayıt Grubu",
             "regex": "Bu aramada Normal İfadeleri kullanabilirsiniz.",

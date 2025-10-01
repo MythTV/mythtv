@@ -264,6 +264,7 @@
             "nonrerec": "A sérült program újbóli rögzítésének engedélyezéséhez használja az Újrarögzítés engedélyezése lehetőséget.",
             "normal_rec": "Normál nyilvántartás",
             "orig_airdate": "Eredeti sugárzási dátum",
+            "orig_airdate_desc": "A színházi kiadások kiadásának éve megjelenik",
             "override_rule": "Felülbírálási szabály hozzáadása vagy szerkesztése",
             "recgrp": "Rec Grp",
             "regex": "Ebben a keresésben használhat reguláris kifejezéseket.",

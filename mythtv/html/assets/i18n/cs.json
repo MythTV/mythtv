@@ -264,6 +264,7 @@
             "nonrerec": "Chcete-li povolit opětovné nahrání poškozeného programu, použijte možnost Povolit opětovné nahrání.",
             "normal_rec": "Normální záznam",
             "orig_airdate": "Původní datum vysílání",
+            "orig_airdate_desc": "Pro divadelní vydání se zobrazí rok vydání",
             "override_rule": "Přidat nebo upravit pravidlo přepsání",
             "recgrp": "Rec Grp",
             "regex": "V tomto vyhledávání můžete použít regulární výrazy.",

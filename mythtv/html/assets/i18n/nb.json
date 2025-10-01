@@ -264,6 +264,7 @@
             "nonrerec": "For å tillate ny opptak av det skadede programmet, vennligst bruk Tillat ny opptak.",
             "normal_rec": "Normal post",
             "orig_airdate": "Original luftdato",
+            "orig_airdate_desc": "For teaterutgivelsesutgivelsesår vises",
             "override_rule": "Legg til eller rediger overstyringsregel",
             "recgrp": "Rec Grp",
             "regex": "Du kan bruke regulære uttrykk i dette søket.",

@@ -264,6 +264,7 @@
             "nonrerec": "Per consentire la nuova registrazione del programma danneggiato, utilizzare Consenti nuova registrazione.",
             "normal_rec": "Record normale",
             "orig_airdate": "Data messa in onda originale",
+            "orig_airdate_desc": "Per le versioni teatrali viene visualizzato l'anno di rilascio",
             "override_rule": "Aggiungi o modifica regola di esclusione",
             "recgrp": "Rec Grp",
             "regex": "Puoi utilizzare le espressioni regolari in questa ricerca.",

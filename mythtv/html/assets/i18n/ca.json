@@ -264,6 +264,7 @@
             "nonrerec": "Per permetre tornar a enregistrar el programa danyat, utilitzeu Permet tornar a gravar.",
             "normal_rec": "Registre normal",
             "orig_airdate": "Data d'emissió original",
+            "orig_airdate_desc": "Per a la publicació de llançaments teatrals es mostra l'any",
             "override_rule": "Afegeix o edita una regla de substitució",
             "recgrp": "Rec Grp",
             "regex": "Podeu utilitzar expressions regulars en aquesta cerca.",

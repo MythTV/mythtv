@@ -264,6 +264,7 @@
             "nonrerec": "Um das erneute Aufzeichnen des beschädigten Programms zu ermöglichen, verwenden Sie bitte „Erneutes Aufzeichnen zulassen“.",
             "normal_rec": "Normale Aufzeichnung",
             "orig_airdate": "Ursprüngliches Sendedatum",
+            "orig_airdate_desc": "Für Theaterveröffentlichungen wird das Veröffentlichungsjahr angezeigt",
             "override_rule": "Außerkraftsetzungsregel hinzufügen oder bearbeiten",
             "recgrp": "Rec Grp",
             "regex": "Sie können bei dieser Suche reguläre Ausdrücke verwenden.",

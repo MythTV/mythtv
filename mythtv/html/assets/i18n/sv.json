@@ -264,6 +264,7 @@
             "nonrerec": "För att tillåta återinspelning av det skadade programmet, använd Tillåt återinspelning.",
             "normal_rec": "Normalregistrering",
             "orig_airdate": "Original Air Date",
+            "orig_airdate_desc": "För teaterutgivningar visas släppåret",
             "override_rule": "Lägg till eller redigera åsidosättningsregel",
             "recgrp": "Rec Grp",
             "regex": "Du kan använda reguljära uttryck i den här sökningen.",

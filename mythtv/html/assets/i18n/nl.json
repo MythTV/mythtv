@@ -264,6 +264,7 @@
             "nonrerec": "Om het opnieuw opnemen van het beschadigde programma mogelijk te maken, gebruikt u Toestaan ​​opnieuw opnemen.",
             "normal_rec": "Normale opname",
             "orig_airdate": "Originele uitzenddatum",
+            "orig_airdate_desc": "Voor theatrale releases wordt het releaseerjaar weergegeven",
             "override_rule": "Negeerregel toevoegen of bewerken",
             "recgrp": "Rec Grp",
             "regex": "Bij deze zoekopdracht kunt u reguliere expressies gebruiken.",

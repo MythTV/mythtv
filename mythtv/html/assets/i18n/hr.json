@@ -264,6 +264,7 @@
             "nonrerec": "Kako biste dopustili ponovno snimanje oštećenog programa, koristite Dopusti ponovno snimanje.",
             "normal_rec": "Normalan zapisnik",
             "orig_airdate": "Izvorni datum emitiranja",
+            "orig_airdate_desc": "Za kazališna izdanja prikazana je godina izlaska",
             "override_rule": "Dodajte ili uredite pravilo nadjačavanja",
             "recgrp": "Rec Grp",
             "regex": "U ovoj pretrazi možete koristiti regularne izraze.",

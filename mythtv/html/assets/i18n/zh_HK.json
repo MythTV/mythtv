@@ -264,6 +264,7 @@
             "nonrerec": "若要允許重新錄製損壞的程序，請使用“允許重新錄製”。",
             "normal_rec": "正常記錄",
             "orig_airdate": "原始播出日期",
+            "orig_airdate_desc": "顯示戲劇版本發布年度",
             "override_rule": "添加或編輯覆蓋規則",
             "recgrp": "記錄組",
             "regex": "您可以在此搜尋中使用正規表示式。",

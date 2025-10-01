@@ -264,6 +264,7 @@
             "nonrerec": "Aby zezwolić na ponowne nagranie uszkodzonego programu, użyj opcji Zezwól na ponowne nagranie.",
             "normal_rec": "Normalny rekord",
             "orig_airdate": "Oryginalna data emisji",
+            "orig_airdate_desc": "Wyświetlany jest rok wydania teatralnych",
             "override_rule": "Dodaj lub edytuj regułę nadpisywania",
             "recgrp": "Grupa nagr",
             "regex": "W tym wyszukiwaniu możesz używać wyrażeń regularnych.",
