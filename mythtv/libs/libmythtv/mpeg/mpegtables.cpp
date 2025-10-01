@@ -394,13 +394,13 @@ ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
     {
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(len_for_alloc[0]);
-        pmt = new ProgramMapTable(psip);
+        pmt = new ProgramMapTable(psip, false);
     }
     else
     {
         PSIPTable psip(*tspacket);
         psip.SetLength(len_for_alloc[1]);
-        pmt = new ProgramMapTable(psip);
+        pmt = new ProgramMapTable(psip, false);
     }
 
     pmt->SetTotalLength(DEFAULT_PMT_HEADER.size());
@@ -470,15 +470,45 @@ ProgramMapTable* ProgramMapTable::Create(
     return pmt;
 }
 
-void ProgramMapTable::Parse() const
+/*
+ * @brief Validate the data in a PMT table.
+ *
+ * @param validate Should normally be set to true. There is some code
+ * in MythTV that takes a received PMT table and generates a new PMT
+ * table that contains only a single entry.  This code ends up calling
+ * Parse on a partially created table (the lengths are bad) so the
+ * validation code can't be used.
+ */
+void ProgramMapTable::Parse(bool validate) const
 {
+    if (validate && (SectionLength() > TSSizeInBuffer()))
+        throw MpegParseException(PsipParseException::PmtLength);
+
+    // Assume minimim of one stream with no stream descriptors. What
+    // is the maxium possible size of the program info descriptors.
+    uint maxProgramInfoLength  =
+        SectionLength() - kPMTHeaderSize - kPMTMinTrailerSize - kPMTTableEntrySize;
+    uint programInfoLength = ProgramInfoLength();
+    if (validate && (programInfoLength > maxProgramInfoLength))
+        throw MpegParseException(PsipParseException::PmtProgramDescriptors);
+
+    // Assuming no stream descriptors, what is the maximum possible
+    // number of stream entries?
+    uint maxStreamsPossible =
+        (SectionLength() - kPMTHeaderSize - programInfoLength - kPMTMinTrailerSize) / kPMTTableEntrySize;
+
+    // Pre-allocate the entire vector
     m_ptrs.clear();
-    const unsigned char *cpos = psipdata() + kPmtHeaderMinOffset + ProgramInfoLength();
+    m_ptrs.reserve(maxStreamsPossible);
+
+    // Process tables
+    const unsigned char *cpos = psipdata() + kPmtHeaderMinOffset + programInfoLength;
+    const uint8_t *limit = pesdata() + SectionLength() - kPMTMinTrailerSize;
     auto *pos = const_cast<unsigned char*>(cpos);
-    for (uint i = 0; pos < psipdata() + Length() - 9; i++)
+    for (uint i = 0 ; (i < maxStreamsPossible) && (pos < limit); i++)
     {
         m_ptrs.push_back(pos);
-        pos += 5 + StreamInfoLength(i);
+        pos += kPMTTableEntrySize + StreamInfoLength(i);
 #if 0
         LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsing PMT(0x%1) i(%2) len(%3)")
                 .arg((uint64_t)this, 0, 16) .arg(i) .arg(StreamInfoLength(i)));
@@ -489,6 +519,9 @@ void ProgramMapTable::Parse() const
     LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsed PMT(0x%1)\n%2")
             .arg((uint64_t)this, 0, 16) .arg(toString()));
 #endif
+
+    if (validate && (pos > limit))
+        throw MpegParseException(PsipParseException::PmtStreamDescriptors);
 }
 
 void ProgramMapTable::AppendStream(
@@ -1236,6 +1269,28 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
     return str;
 }
 
+QString BreakDurationView::toString() const
+{
+    uint64_t durationInPTS = PTSTime();
+    QTime duration = QTime(0,0,0,0).addMSecs(durationInPTS/90);
+
+    return QString("break_duration(pts=%1 abs=%2, return=%3)")
+        .arg(QString::number(durationInPTS),
+             duration.toString("hh:mm:ss.zzz"),
+             IsAutoReturn() ? "true" : "false");
+}
+
+QString BreakDurationView::toStringXML(uint indent_level) const
+{
+    QString indent = StringUtil::indentSpaces(indent_level);
+    uint64_t durationInPTS = PTSTime();
+    QTime duration = QTime(0,0,0,0).addMSecs(durationInPTS/90);
+
+    return QString(R"(%1<BreakDuration pts="%2" abs="%3" return="%4"/>)")
+        .arg(indent,QString::number(durationInPTS),duration.toString("hh:mm:ss.zzz"),
+             IsAutoReturn() ? "true" : "false");
+}
+
 QString SpliceTimeView::toString(int64_t first, int64_t last) const
 {
     if (!IsTimeSpecified())
@@ -1305,6 +1360,11 @@ SpliceInformationTable *SpliceInformationTable::GetDecrypted(
 
 bool SpliceInformationTable::Parse(void)
 {
+    if (SectionLength() > TSSizeInBuffer())
+        throw MpegParseException(PsipParseException::SitLength);
+
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+
     m_epilog = nullptr;
     m_ptrs0.clear();
     m_ptrs1.clear();
@@ -1322,14 +1382,20 @@ bool SpliceInformationTable::Parse(void)
     if (kSCTNull == type || kSCTBandwidthReservation == type)
     {
         m_epilog = pesdata() + 14;
+        if (m_epilog > limit)
+            throw MpegParseException(PsipParseException::SitBandwidth);
     }
     else if (kSCTTimeSignal == type)
     {
         m_epilog = pesdata() + 14 + TimeSignal().size();
+        if (m_epilog > limit)
+            throw MpegParseException(PsipParseException::SitTimeSignal);
     }
     else if (kSCTSpliceSchedule == type)
     {
         uint splice_count = pesdata()[14];
+        m_ptrs0.reserve(splice_count);
+        m_ptrs1.reserve(splice_count);
         const unsigned char *cur = pesdata() + 15;
         for (uint i = 0; i < splice_count; i++)
         {
@@ -1339,29 +1405,31 @@ bool SpliceInformationTable::Parse(void)
             {
                 m_ptrs1.push_back(nullptr);
                 cur += 5;
+                if (cur > limit)
+                    throw MpegParseException(PsipParseException::SitSpliceSchedInfo1);
                 continue;
             }
             bool program_slice = (cur[5] & 0x40) != 0;
             uint component_count = cur[6];
-            m_ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
-        }
-        if (splice_count)
-        {
+            cur += program_slice ? 10 : 7 + 5 * component_count;
+            m_ptrs1.push_back(cur);
             bool duration = (m_ptrs0.back()[5] & 0x2) != 0;
-            m_epilog = m_ptrs1.back() + ((duration) ? 9 : 4);
+            cur += (duration) ? 9 : 4;
+            if (cur > limit)
+                throw MpegParseException(PsipParseException::SitSpliceSchedInfo2);
         }
-        else
-        {
-            m_epilog = cur;
-        }
+        m_epilog = cur;
     }
     else if (kSCTSpliceInsert == type)
     {
+        m_ptrs1.reserve(3);
         m_ptrs1.push_back(pesdata() + 14);
         bool splice_cancel = (pesdata()[18] & 0x80) != 0;
         if (splice_cancel)
         {
             m_epilog = pesdata() + 19;
+            if (m_epilog > limit)
+                throw MpegParseException(PsipParseException::SitSpliceInsertInfo1);
         }
         else
         {
@@ -1372,20 +1440,28 @@ bool SpliceInformationTable::Parse(void)
             if (program_splice && !splice_immediate)
             {
                 cur += SpliceTimeView(cur).size();
+                if (cur > limit)
+                    throw MpegParseException(PsipParseException::SitSpliceInsertInfo2);
             }
             else if (!program_splice)
             {
                 uint component_count = pesdata()[20];
+                m_ptrs0.reserve(component_count);
                 cur = pesdata() + 21;
                 for (uint i = 0; i < component_count; i++)
                 {
                     m_ptrs0.push_back(cur);
                     cur += (splice_immediate) ?
                         1 : 1 + SpliceTimeView(cur).size();
+                    if (cur > limit)
+                        throw MpegParseException(PsipParseException::SitSpliceInsertInfo3);
                 }
             }
-            m_ptrs1.push_back(cur);
-            m_ptrs1.push_back(cur + (duration ? 5 : 0));
+            m_ptrs1.push_back(cur);                      // Duration (if present)
+            m_ptrs1.push_back(cur + (duration ? 5 : 0)); // Unique and avails
+            m_epilog = m_ptrs1.back() + 4;
+            if (m_epilog > limit)
+                throw MpegParseException(PsipParseException::SitSpliceInsertInfo4);
         }
     }
     else
