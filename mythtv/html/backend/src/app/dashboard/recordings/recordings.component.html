@@ -58,7 +58,8 @@
                         }}<p-sortIcon field="subtitle"></p-sortIcon></th>
                     <th style="width: 8%" class="p-1" pSortableColumn="SeasEp">{{ 'dashboard.recordings.seas_ep' |
                         translate }}<p-sortIcon field="SeasEp"></p-sortIcon></th>
-                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="originalairdate">
+                    <th style="width: 9%" class="justify-content-end p-1" pSortableColumn="originalairdate"
+                        pTooltip="{{ 'dashboard.recordings.orig_airdate_desc' | translate }}" tooltipPosition="top">
                         {{ 'dashboard.recordings.orig_airdate' | translate }}<p-sortIcon
                             field="originalairdate"></p-sortIcon>
                     </th>

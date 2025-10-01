@@ -264,6 +264,7 @@
             "nonrerec": "To allow rerecord of the damaged program, please use Allow Rerecord.",
             "normal_rec": "Normal Record",
             "orig_airdate": "Orig Airdate",
+            "orig_airdate_desc": "For theatrical releases Release Year is displayed",
             "override_rule": "Add or Edit Override Rule",
             "recgrp": "Rec Grp",
             "regex": "You can use Regular Expressions in this search.",
