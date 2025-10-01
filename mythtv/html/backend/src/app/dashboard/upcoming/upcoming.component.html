@@ -39,7 +39,7 @@
                                 [style]="{width: '2rem', height: '2rem'}"></p-progressSpinner></div>
                         <ng-template #refreshBn>
                             <button pButton pRipple icon="pi pi-refresh" class="p-button-text .p-button-success"
-                                (click)="fullrefresh()" pTooltip="{{ 'common.refresh' | translate }}"></button>
+                                (click)="reload()" pTooltip="{{ 'common.refresh' | translate }}"></button>
                             &nbsp;&nbsp;&nbsp;{{ programs.length }} {{ 'common.rows' | translate }}
                         </ng-template>
                     </div>
@@ -84,8 +84,7 @@
                                 pTooltip="{{ 'dashboard.recordings.edit_rule' | translate }}"
                                 tooltipPosition="left"></i>
                             <i pButton icon="pi pi-thumbs-down" class="p-button-text p-button-primary"
-                                pTooltip="{{ 'dashboard.recordings.dont_rec' | translate }}"
-                                tooltipPosition="left"></i>
+                                pTooltip="{{ 'dashboard.recordings.dont_rec' | translate }}" tooltipPosition="left"></i>
                             <i pButton icon="pi pi-thumbs-down-fill" class="p-button-text p-button-primary"
                                 pTooltip="{{ 'dashboard.recordings.never_rec' | translate }}"
                                 tooltipPosition="left"></i>

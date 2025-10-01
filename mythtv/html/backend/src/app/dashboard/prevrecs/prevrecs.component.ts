@@ -108,6 +108,7 @@ export class PrevrecsComponent implements OnInit {
     this.sortOrder = sortMeta.order;
     this.utility.sortStorage.setItem("prevrecs.sortField", sortMeta.field);
     this.utility.sortStorage.setItem('prevrecs.sortOrder', sortMeta.order.toString());
+    this.reload();
   }
 
 

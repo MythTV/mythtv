@@ -88,12 +88,7 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
     this.sortOrder = sortMeta.order;
     this.utility.sortStorage.setItem("upcoming.sortField", sortMeta.field);
     this.utility.sortStorage.setItem('upcoming.sortOrder', sortMeta.order.toString());
-  }
-
-  fullrefresh() {
-    // This is to ensure that if the table get larger the extra lines will show.
-    this.showTable = false;
-    this.refresh();
+    this.reload();
   }
 
   refresh() {
@@ -212,7 +207,11 @@ export class UpcomingComponent implements OnInit, SchedulerSummary {
   }
 
   reload() {
-    sessionStorage.setItem('upcoming.selectedStatus',this.selectedStatus);
+    if (this.selectedStatus)
+      sessionStorage.setItem('upcoming.selectedStatus',this.selectedStatus);
+    else
+      sessionStorage.removeItem('upcoming.selectedStatus');
+
     if (this.selectedRule && this.selectedRule.Id != 0)
       sessionStorage.setItem('upcoming.selectedRule.Id',(this.selectedRule.Id).toString());
     else

@@ -169,6 +169,7 @@ export class RecordingsComponent implements OnInit {
     this.sortOrder = sortMeta.order;
     this.utility.sortStorage.setItem("recordings.sortField", sortMeta.field);
     this.utility.sortStorage.setItem('recordings.sortOrder', sortMeta.order.toString());
+    this.reload();
   }
 
   loadLazy(event: TableLazyLoadEvent, doRefresh?: boolean) {
