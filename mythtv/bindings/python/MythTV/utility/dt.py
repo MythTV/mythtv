@@ -17,6 +17,7 @@ import time
 import sys
 
 IS_PY312plus = (sys.version_info[:3] >= (3, 12, 0))
+IS_PY313plus = (sys.version_info[:3] >= (3, 13, 0))
 
 HAVEZONEINFO = False
 try:
@@ -343,12 +344,16 @@ class datetime( _pydatetime ):
         return cls._utctz
 
     @classmethod
-    def fromDatetime(cls, dt, tzinfo=None, fold=None):
+    def fromDatetime(cls, dt, tzinfo=None, fold=0):
         if tzinfo is None:
             tzinfo = dt.tzinfo
             fold = dt.fold
+            if IS_PY313plus and tzinfo is None:
+                # in case dt is naive, i.e.: no tzinfo available
+                tzinfo = cls.localTZ()
+                fold = 0
         return cls(dt.year, dt.month, dt.day, dt.hour, dt.minute,
-                   dt.second, dt.microsecond, tzinfo, fold)
+                   dt.second, dt.microsecond, tzinfo=tzinfo, fold=fold)
 
 # override existing classmethods to enforce use of timezone
     @classmethod
@@ -509,7 +514,7 @@ class datetime( _pydatetime ):
     def __new__(cls, year, month, day, hour=None, minute=None, second=None,
                       microsecond=None, tzinfo=None, fold=None):
 
-        if tzinfo is None:
+        if not IS_PY313plus and tzinfo is None:
             kwargs = {'tzinfo':cls.localTZ()}
         else:
             kwargs = {'tzinfo':tzinfo}
