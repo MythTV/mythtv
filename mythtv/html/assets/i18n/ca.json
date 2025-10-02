@@ -1298,6 +1298,7 @@
             "mustrestart": "Quan hàgiu acabat amb les actualitzacions, reinicieu el backend.",
             "restart_desc": "Reinicieu el backend i reinicieu el funcionament normal.",
             "restart_label": "Reinicieu el funcionament complet del backend",
+            "restart_label_short": "Reinici de backend",
             "restart_webonly_desc": "Això habilitarà les actualitzacions i desactivarà totes les operacions de backend. Utilitzeu-ho si hi ha problemes per configurar les targetes de captura.",
             "restart_webonly_label": "Reiniciar el backend restringit",
             "restarting": "Esperant el backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Cal l'adreça IP o el nom d'amfitrió",
-        "LocalEnabled_desc": "Si el nom d'amfitrió d'aquesta interfície canvia sovint, marqueu aquesta casella i proporcioneu un nom únic per a la xarxa per identificar-lo. Si no està marcat, el nom d'amfitrió local de la màquina frontal s'utilitzarà per desar les preferències a la base de dades.",
-        "LocalEnabled_label": "Utilitzeu un identificador personalitzat per a les preferències de la interfície",
+        "LocalEnabled_desc": "Si el nom d'amfitrió d'aquest sistema canvia sovint, comproveu aquesta casella i proporcioneu un nom de xarxa per identificar-lo. Si no es marca, el nom d'amfitrió local de la màquina s'utilitzarà per estalviar preferències a la base de dades.",
+        "LocalEnabled_label": "Utilitzeu identificador personalitzat per a aquest sistema",
         "LocalHostName_desc": "Un identificador que s'ha d'utilitzar mentre deseu la configuració d'aquest backend o frontend a la mateixa màquina.",
         "LocalHostName_label": "Identificador personalitzat",
         "MySQLDatabaseName": "Nom de la base de dades MySQL",

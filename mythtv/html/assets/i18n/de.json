@@ -1298,6 +1298,7 @@
             "mustrestart": "Wenn Sie mit den Updates fertig sind, starten Sie das Backend neu.",
             "restart_desc": "Starten Sie das Backend neu und nehmen Sie den normalen Betrieb wieder auf.",
             "restart_label": "Starten Sie den Backend-Vollbetrieb neu",
+            "restart_label_short": "Backend neu starten",
             "restart_webonly_desc": "Dadurch werden Updates aktiviert und alle Backend-Vorgänge deaktiviert. Verwenden Sie diese Option, wenn beim Einrichten von Capture-Karten Probleme auftreten.",
             "restart_webonly_label": "Neustart des Backends eingeschränkt",
             "restarting": "Warten auf Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP-Adresse oder Hostname ist erforderlich",
-        "LocalEnabled_desc": "Wenn sich der Hostname dieses Frontends häufig ändert, aktivieren Sie dieses Kontrollkästchen und geben Sie einen netzwerkeindeutigen Namen zur Identifizierung ein. Wenn diese Option deaktiviert ist, wird der lokale Hostname des Frontend-Computers zum Speichern von Einstellungen in der Datenbank verwendet.",
-        "LocalEnabled_label": "Verwenden Sie eine benutzerdefinierte Kennung für Frontend-Einstellungen",
+        "LocalEnabled_desc": "Wenn sich der Hostname dieses Systems häufig ändert, überprüfen Sie dieses Kontrollkästchen und geben Sie einen netzwerkübergreifenden Namen an, um ihn zu identifizieren. Bei deaktiviertem Unterschied wird der lokale Hostname der Maschine verwendet, um Einstellungen in der Datenbank zu speichern.",
+        "LocalEnabled_label": "Verwenden Sie die benutzerdefinierte Kennung für dieses System",
         "LocalHostName_desc": "Eine Kennung, die beim Speichern der Einstellungen für dieses Backend oder Frontend auf demselben Computer verwendet werden soll.",
         "LocalHostName_label": "Benutzerdefinierter Bezeichner",
         "MySQLDatabaseName": "Name der MySQL-Datenbank",

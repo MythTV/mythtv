@@ -1298,6 +1298,7 @@
             "mustrestart": "Kui olete värskendustega lõpetanud, taaskäivitage taustaprogramm.",
             "restart_desc": "Taaskäivitage taustaprogramm ja jätkake tavapärast tööd.",
             "restart_label": "Taaskäivitage taustaprogrammi täielik töö",
+            "restart_label_short": "Taaskäivitage taustprogramm",
             "restart_webonly_desc": "See lubab värskendused ja keelab kõik taustaprogrammi toimingud. Kasutage seda, kui pildistamiskaartide seadistamisel on probleeme.",
             "restart_webonly_label": "Restart Backend Restricted",
             "restarting": "Ootan taustaprogrammi",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Nõutav on IP-aadress või hostinimi",
-        "LocalEnabled_desc": "Kui selle kasutajaliidese hostinimi muutub sageli, märkige see ruut ja sisestage selle tuvastamiseks võrgu kordumatu nimi. Kui see on märkimata, kasutatakse eelistuste andmebaasi salvestamiseks kasutajaliidese masina kohalikku hostinime.",
-        "LocalEnabled_label": "Kasutage kasutajaliidese eelistuste jaoks kohandatud identifikaatorit",
+        "LocalEnabled_desc": "Kui selle süsteemi hostinimi muutub sageli, kontrollige seda kasti ja esitage selle tuvastamiseks võrgu-unikaalne nimi. Kui kontrollimata on, kasutatakse andmebaasis eelistuste salvestamiseks masina kohalikku hostinimi.",
+        "LocalEnabled_label": "Kasutage selle süsteemi jaoks kohandatud identifikaatorit",
         "LocalHostName_desc": "Identifikaator, mida kasutatakse selle tausta- või kasutajaliidese seadete salvestamisel samasse masinasse.",
         "LocalHostName_label": "Kohandatud identifikaator",
         "MySQLDatabaseName": "MySQL andmebaasi nimi",

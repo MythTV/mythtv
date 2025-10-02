@@ -1298,6 +1298,7 @@
             "mustrestart": "Ko končate s posodobitvami, znova zaženite zaledje.",
             "restart_desc": "Znova zaženite zaledje in nadaljujte z običajnim delovanjem.",
             "restart_label": "Znova zaženite polno delovanje zaledja",
+            "restart_label_short": "Ponovni zagon zaostanka",
             "restart_webonly_desc": "To bo omogočilo posodobitve in onemogočilo vse zaledne operacije. Uporabite to, če imate težave pri nastavljanju kartic za zajemanje.",
             "restart_webonly_label": "Znova zaženite zaledje Omejeno",
             "restarting": "Čakanje na zaledje",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Potreben je naslov IP ali ime gostitelja",
-        "LocalEnabled_desc": "Če se ime gostitelja tega vmesnika pogosto spreminja, potrdite to polje in navedite edinstveno ime omrežja, da ga prepoznate. Če ni označeno, bo ime lokalnega gostitelja sprednjega računalnika uporabljeno za shranjevanje nastavitev v zbirko podatkov.",
-        "LocalEnabled_label": "Za nastavitve sprednjega dela uporabite identifikator po meri",
+        "LocalEnabled_desc": "Če se ime gostitelja v tem sistemu pogosto spreminja, preverite to polje in navedite omrežno enotno ime, da ga prepoznate. Če je nenadzorovano, bo lokalno ime gostitelja naprave uporabljeno za shranjevanje nastavitev v bazi podatkov.",
+        "LocalEnabled_label": "Za ta sistem uporabite identifikator po meri",
         "LocalHostName_desc": "Identifikator za uporabo med shranjevanjem nastavitev za to zaledje ali sprednji del na isti napravi.",
         "LocalHostName_label": "Identifikator po meri",
         "MySQLDatabaseName": "Ime baze podatkov MySQL",

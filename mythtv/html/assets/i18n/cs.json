@@ -1298,6 +1298,7 @@
             "mustrestart": "Po dokončení aktualizací restartujte backend.",
             "restart_desc": "Restartujte backend a pokračujte v normálním provozu.",
             "restart_label": "Restartujte Backend Full Operation",
+            "restart_label_short": "Restartujte backend",
             "restart_webonly_desc": "Tím povolíte aktualizace a zakážete všechny operace backendu. Tuto možnost použijte, pokud se vyskytnou problémy s nastavením snímacích karet.",
             "restart_webonly_label": "Restartovat Backend Restricted",
             "restarting": "Čekání na Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Je vyžadována IP adresa nebo název hostitele",
-        "LocalEnabled_desc": "Pokud se název hostitele tohoto frontendu často mění, zaškrtněte toto políčko a zadejte jedinečný název sítě, který jej identifikuje. Pokud není zaškrtnuto, bude k uložení preferencí do databáze použit místní název hostitele frontendového počítače.",
-        "LocalEnabled_label": "Použijte vlastní identifikátor pro předvolby frontendu",
+        "LocalEnabled_desc": "Pokud se název hostitele tohoto systému často změní, zaškrtněte toto políčko a zadejte název sítí a pro jeho identifikaci. Pokud není zaškrtnuto zaškrtnuto, bude místní název hostitele stroje použito k uložení preferencí v databázi.",
+        "LocalEnabled_label": "Pro tento systém použijte vlastní identifikátor",
         "LocalHostName_desc": "Identifikátor, který se má použít při ukládání nastavení pro tento backend nebo frontend na stejném počítači.",
         "LocalHostName_label": "Vlastní identifikátor",
         "MySQLDatabaseName": "Název databáze MySQL",

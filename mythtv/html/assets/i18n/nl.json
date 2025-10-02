@@ -1298,6 +1298,7 @@
             "mustrestart": "Wanneer u klaar bent met updates, start u de backend opnieuw op.",
             "restart_desc": "Start de backend opnieuw en hervat de normale werking.",
             "restart_label": "Start de volledige werking van de backend opnieuw",
+            "restart_label_short": "Start de backend opnieuw op",
             "restart_webonly_desc": "Hierdoor worden updates ingeschakeld en worden alle backend-bewerkingen uitgeschakeld. Gebruik dit als er problemen zijn bij het instellen van capture-kaarten.",
             "restart_webonly_label": "Backend opnieuw starten Beperkt",
             "restarting": "Wachten op backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP-adres of hostnaam is vereist",
-        "LocalEnabled_desc": "Als de hostnaam van deze frontend vaak verandert, vink dan dit vakje aan en geef een netwerk-unieke naam op om het te identificeren. Indien uitgeschakeld, wordt de lokale hostnaam van de frontend-machine gebruikt om voorkeuren in de database op te slaan.",
-        "LocalEnabled_label": "Gebruik aangepaste identificatie voor frontend-voorkeuren",
+        "LocalEnabled_desc": "Als de hostnaam van dit systeem vaak verandert, vink dan dit vakje aan en geef een netwerk-unieke naam om dit te identificeren. Indien ongecontroleerd, wordt de lokale hostnaam van de machine gebruikt om voorkeuren in de database op te slaan.",
+        "LocalEnabled_label": "Gebruik een aangepaste identificatie voor dit systeem",
         "LocalHostName_desc": "Een identifier die moet worden gebruikt bij het opslaan van de instellingen voor deze backend of frontend op dezelfde machine.",
         "LocalHostName_label": "Aangepaste identificatie",
         "MySQLDatabaseName": "MySQL-databasenaam",

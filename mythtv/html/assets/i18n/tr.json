@@ -1298,6 +1298,7 @@
             "mustrestart": "Güncellemeleri tamamladığınızda arka ucu yeniden başlatın.",
             "restart_desc": "Arka ucu yeniden başlatın ve normal çalışmaya devam edin.",
             "restart_label": "Arka Uç Tam İşlemini Yeniden Başlatın",
+            "restart_label_short": "Arka uçtan yeniden başlat",
             "restart_webonly_desc": "Bu, güncellemeleri etkinleştirecek ve tüm arka uç işlemlerini devre dışı bırakacaktır. Yakalama kartlarını ayarlamada sorunlar varsa bunu kullanın.",
             "restart_webonly_label": "Arka Ucu Yeniden Başlat Kısıtlı",
             "restarting": "Arka uç bekleniyor",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP Adresi veya Ana Bilgisayar adı gerekli",
-        "LocalEnabled_desc": "Bu ön ucun ana bilgisayar adı sık sık değişiyorsa, bu kutuyu işaretleyin ve onu tanımlamak için ağa özgü bir ad sağlayın. İşaretlenmezse, veritabanındaki tercihleri ​​kaydetmek için ön uç makinenin yerel ana bilgisayar adı kullanılacaktır.",
-        "LocalEnabled_label": "Ön uç tercihleri ​​için özel tanımlayıcı kullanın",
+        "LocalEnabled_desc": "Bu sistemin ana bilgisayar adı sık sık değişirse, bu kutuyu kontrol edin ve tanımlamak için ağ-benzersiz bir ad sağlayın. Kontrol edilmezse, veritabanındaki tercihleri ​​kaydetmek için makinenin yerel ana bilgisayar adı kullanılacaktır.",
+        "LocalEnabled_label": "Bu sistem için özel tanımlayıcı kullanın",
         "LocalHostName_desc": "Aynı makinede bu arka uç veya ön uç için ayarları kaydederken kullanılacak bir tanımlayıcı.",
         "LocalHostName_label": "Özel tanımlayıcı",
         "MySQLDatabaseName": "MySQL Veritabanı Adı",

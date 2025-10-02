@@ -1298,6 +1298,7 @@
             "mustrestart": "完成更新後，重新啟動後端。",
             "restart_desc": "重新啟動後端並恢復正常運作。",
             "restart_label": "重啟後端全面運行",
+            "restart_label_short": "重新啟動後端",
             "restart_webonly_desc": "這將啟用更新並停用所有後端操作。如果設定採集卡出現問題，請使用此選項。",
             "restart_webonly_label": "重啟後端受限",
             "restarting": "等待後端",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "需要 IP 地址或主機名",
-        "LocalEnabled_desc": "如果此前端的主機名經常更改，請選中此框並提供網絡唯一名稱來標識它。如果未選中，前端計算機的本地主機名將用於在數據庫中保存首選項。",
-        "LocalEnabled_label": "使用前端首選項的自定義標識符",
+        "LocalEnabled_desc": "如果此系統的主機名稱經常更改，請選中此框並提供網絡唯一的名稱以識別它。如果未選中，則計算機的本地主機名將用於保存數據庫中的首選項。",
+        "LocalEnabled_label": "為此系統使用自定義標識符",
         "LocalHostName_desc": "在同一台計算機上保存此後端或前端的設置時要使用的標識符。",
         "LocalHostName_label": "自定義標識符",
         "MySQLDatabaseName": "MySQL 數據庫名稱",

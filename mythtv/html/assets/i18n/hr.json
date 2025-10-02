@@ -1298,6 +1298,7 @@
             "mustrestart": "Kada završite s ažuriranjima, ponovno pokrenite pozadinu.",
             "restart_desc": "Ponovno pokrenite pozadinu i nastavite s normalnim radom.",
             "restart_label": "Ponovno pokrenite potpunu operaciju pozadine",
+            "restart_label_short": "Ponovo pokrenite podupiranje",
             "restart_webonly_desc": "Ovo će omogućiti ažuriranja i onemogućiti sve pozadinske operacije. Koristite ovo ako imate problema s postavljanjem kartica za snimanje.",
             "restart_webonly_label": "Restart Backend Ograničeno",
             "restarting": "Čeka se Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Potrebna je IP adresa ili ime hosta",
-        "LocalEnabled_desc": "Ako se ime glavnog računala ovog sučelja često mijenja, potvrdite ovaj okvir i navedite naziv jedinstven za mrežu da ga identificirate. Ako nije označeno, lokalni naziv računala sučelja koristit će se za spremanje postavki u bazu podataka.",
-        "LocalEnabled_label": "Koristite prilagođeni identifikator za postavke sučelja",
+        "LocalEnabled_desc": "Ako se naziv domaćina ovog sustava često mijenja, potvrdite ovaj okvir i pružite mrežni naziv da biste ga identificirali. Ako je neprovjeren, lokalni naziv domaćina stroj će se koristiti za spremanje preferencija u bazu podataka.",
+        "LocalEnabled_label": "Koristite prilagođeni identifikator za ovaj sustav",
         "LocalHostName_desc": "Identifikator koji se koristi tijekom spremanja postavki za ovu pozadinu ili sučelje na istom računalu.",
         "LocalHostName_label": "Prilagođeni identifikator",
         "MySQLDatabaseName": "Ime MySQL baze podataka",

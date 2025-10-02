@@ -1298,6 +1298,7 @@
             "mustrestart": "Þegar þú ert búinn með uppfærslur skaltu endurræsa bakendann.",
             "restart_desc": "Endurræstu bakendann og haltu áfram eðlilegri notkun.",
             "restart_label": "Endurræstu fulla aðgerð bakenda",
+            "restart_label_short": "Endurræstu stuðning",
             "restart_webonly_desc": "Þetta mun virkja uppfærslur og gera allar bakendaaðgerðir óvirkar. Notaðu þetta ef vandamál koma upp við að setja upp tökukort.",
             "restart_webonly_label": "Endurræstu bakenda takmarkað",
             "restarting": "Bíð eftir Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "È richiesto l'indirizzo IP o il nome host",
-        "LocalEnabled_desc": "Ef hýsilheiti þessa framenda breytist oft skaltu haka við þennan reit og gefa upp einstakt nafn fyrir netið til að auðkenna það. Ef hakað er ekki við, verður staðbundið hýsilheiti framenda vélarinnar notað til að vista kjörstillingar í gagnagrunninum.",
-        "LocalEnabled_label": "Notaðu sérsniðið auðkenni fyrir framendastillingar",
+        "LocalEnabled_desc": "Ef hýsingarheiti þessa kerfis breytist oft, hakaðu við þennan reit og gefðu upp netheiti til að bera kennsl á það. Ef ekki er hakað verður staðbundið hýsingarheiti vélarinnar notað til að vista óskir í gagnagrunninum.",
+        "LocalEnabled_label": "Notaðu sérsniðið auðkenni fyrir þetta kerfi",
         "LocalHostName_desc": "Auðkenni til að nota þegar stillingar fyrir þennan bakenda eða framenda eru vistaðar á sömu vél.",
         "LocalHostName_label": "Sérsniðið auðkenni",
         "MySQLDatabaseName": "Nome del database MySQL",

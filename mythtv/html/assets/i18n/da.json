@@ -1298,6 +1298,7 @@
             "mustrestart": "Når du er færdig med opdateringer, skal du genstarte backend.",
             "restart_desc": "Genstart backend og genoptag normal drift.",
             "restart_label": "Genstart Backend fuld drift",
+            "restart_label_short": "Genstart backend",
             "restart_webonly_desc": "Dette vil aktivere opdateringer og deaktivere alle backend-operationer. Brug dette, hvis der er problemer med at konfigurere optagelseskort.",
             "restart_webonly_label": "Genstart Backend Begrænset",
             "restarting": "Venter på Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP-adresse eller værtsnavn er påkrævet",
-        "LocalEnabled_desc": "Hvis denne frontends værtsnavn ændres ofte, skal du markere dette felt og angive et unikt netværksnavn for at identificere det. Hvis ikke markeret, vil frontend-maskinens lokale værtsnavn blive brugt til at gemme præferencer i databasen.",
-        "LocalEnabled_label": "Brug tilpasset identifikator til frontend-præferencer",
+        "LocalEnabled_desc": "Hvis dette systems værtsnavn ofte ændres, skal du markere dette felt og give et netværk-unikt navn for at identificere det. Hvis det ikke er markeret, vil maskinens lokale værtsnavn blive brugt til at gemme præferencer i databasen.",
+        "LocalEnabled_label": "Brug brugerdefineret identifikator til dette system",
         "LocalHostName_desc": "Et id, der skal bruges, mens du gemmer indstillingerne for denne backend eller frontend på den samme maskine.",
         "LocalHostName_label": "Brugerdefineret identifikator",
         "MySQLDatabaseName": "MySQL-databasenavn",

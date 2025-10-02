@@ -1298,6 +1298,7 @@
             "mustrestart": "Po zakończeniu aktualizacji uruchom ponownie backend.",
             "restart_desc": "Uruchom ponownie backend i wznów normalne działanie.",
             "restart_label": "Uruchom ponownie pełne działanie backendu",
+            "restart_label_short": "Uruchom ponownie backend",
             "restart_webonly_desc": "Spowoduje to włączenie aktualizacji i wyłączenie wszystkich operacji zaplecza. Użyj tej opcji, jeśli występują problemy z konfiguracją kart przechwytujących.",
             "restart_webonly_label": "Ograniczono ponowne uruchomienie backendu",
             "restarting": "Czekam na Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Wymagany jest adres IP lub nazwa hosta",
-        "LocalEnabled_desc": "Jeśli nazwa hosta tego frontendu często się zmienia, zaznacz to pole i podaj unikalną w sieci nazwę, aby go zidentyfikować. Jeśli to pole nie jest zaznaczone, do zapisywania preferencji w bazie danych zostanie użyta nazwa lokalnego hosta komputera frontendowego.",
-        "LocalEnabled_label": "Użyj niestandardowego identyfikatora dla preferencji frontendu",
+        "LocalEnabled_desc": "Jeśli nazwa hosta tego systemu często się zmienia, zaznacz to pole i podaj nazwę Unique Network-Unique, aby ją zidentyfikować. Po niezazywaniu się, lokalna nazwa hosta maszyny zostanie użyta do zapisywania preferencji w bazie danych.",
+        "LocalEnabled_label": "Użyj niestandardowego identyfikatora tego systemu",
         "LocalHostName_desc": "Identyfikator, który ma być używany podczas zapisywania ustawień tego zaplecza lub interfejsu użytkownika na tej samej maszynie.",
         "LocalHostName_label": "Niestandardowy identyfikator",
         "MySQLDatabaseName": "Nazwa bazy danych MySQL",

@@ -1298,6 +1298,7 @@
             "mustrestart": "Una volta terminati gli aggiornamenti, riavviare il backend.",
             "restart_desc": "Riavviare il backend e riprendere il normale funzionamento.",
             "restart_label": "Riavvia il funzionamento completo del backend",
+            "restart_label_short": "Riavvia backend",
             "restart_webonly_desc": "Ciò abiliterà gli aggiornamenti e disabiliterà tutte le operazioni di backend. Usalo se ci sono problemi con la configurazione delle schede di acquisizione.",
             "restart_webonly_label": "Riavvia il backend limitato",
             "restarting": "In attesa del backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "È richiesto l'indirizzo IP o il nome host",
-        "LocalEnabled_desc": "Se il nome host di questo frontend cambia spesso, seleziona questa casella e fornisci un nome univoco sulla rete per identificarlo. Se deselezionato, le preferenze verranno salvate nel database utilizzando il nome host locale del frontend.",
-        "LocalEnabled_label": "Usa un identificativo personalizzato per le preferenze del front-end",
+        "LocalEnabled_desc": "Se il nome host di questo sistema cambia spesso, controlla questa casella e fornisci un nome unico di rete per identificarlo. Se non controllato, il nome host locale della macchina verrà utilizzato per salvare le preferenze nel database.",
+        "LocalEnabled_label": "Usa l'identificatore personalizzato per questo sistema",
         "LocalHostName_desc": "L'identificativo da utilizzare durante il salvataggio delle impostazioni di questo backend o frontend sulla stessa macchina.",
         "LocalHostName_label": "Identificativo personalizzato",
         "MySQLDatabaseName": "Nome del database MySQL",

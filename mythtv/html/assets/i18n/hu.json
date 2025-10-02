@@ -1298,6 +1298,7 @@
             "mustrestart": "Ha végzett a frissítésekkel, indítsa újra a háttérprogramot.",
             "restart_desc": "Indítsa újra a háttérprogramot, és folytassa a normál működést.",
             "restart_label": "Indítsa újra a Backend teljes működését",
+            "restart_label_short": "Indítsa újra a Backend -et",
             "restart_webonly_desc": "Ez engedélyezi a frissítéseket és letiltja az összes háttérműveletet. Használja ezt, ha problémák vannak a rögzítőkártyák beállításakor.",
             "restart_webonly_label": "Indítsa újra a Backend Restricted",
             "restarting": "Várakozás a Backendre",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "Az IP-cím vagy a gazdagépnév megadása kötelező",
-        "LocalEnabled_desc": "Ha a kezelőfelület gazdagépneve gyakran változik, jelölje be ezt a négyzetet, és adjon meg egy hálózat-egyedi nevet az azonosításhoz. Ha nincs bejelölve, akkor a rendszer a frontend gép helyi gazdagépnevét fogja használni a beállítások adatbázisba mentéséhez.",
-        "LocalEnabled_label": "Használjon egyéni azonosítót a frontend beállításokhoz",
+        "LocalEnabled_desc": "Ha ez a rendszer gazdagépneve gyakran változik, jelölje be ezt a mezőt, és adjon meg egy hálózat-egyedi nevet annak azonosításához. Ha nem jelölik be, akkor a gép helyi gazdagépnevét az adatbázisban való preferenciák mentésére használják.",
+        "LocalEnabled_label": "Használja a rendszer egyedi azonosítóját",
         "LocalHostName_desc": "Azonosító, amelyet a háttér- vagy kezelőfelület beállításainak ugyanazon a gépen való mentésekor kell használni.",
         "LocalHostName_label": "Egyéni azonosító",
         "MySQLDatabaseName": "MySQL adatbázis neve",

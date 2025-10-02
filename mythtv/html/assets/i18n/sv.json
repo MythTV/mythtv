@@ -1298,6 +1298,7 @@
             "mustrestart": "När du är klar med uppdateringarna, starta om backend.",
             "restart_desc": "Starta om backend och återuppta normal drift.",
             "restart_label": "Starta om Backend Full Operation",
+            "restart_label_short": "Starta om backend",
             "restart_webonly_desc": "Detta kommer att aktivera uppdateringar och inaktivera alla backend-operationer. Använd detta om det finns problem med att ställa in fångstkort.",
             "restart_webonly_label": "Starta om Backend Begränsad",
             "restarting": "Väntar på Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP-adress eller värdnamn krävs",
-        "LocalEnabled_desc": "Om gränssnittets värdnamn ändras ofta, markera den här rutan och ange ett nätverksunikt namn för att identifiera det. Om avmarkerat kommer frontend-maskinens lokala värdnamn att användas för att spara inställningar i databasen.",
-        "LocalEnabled_label": "Använd anpassad identifierare för gränssnittsinställningar",
+        "LocalEnabled_desc": "Om det här systemets värdnamn ändras ofta, kontrollera den här rutan och ange ett nätverks-unikt namn för att identifiera det. Om det inte är avmarkerat kommer maskinens lokala värdnamn att användas för att spara preferenser i databasen.",
+        "LocalEnabled_label": "Använd anpassad identifierare för detta system",
         "LocalHostName_desc": "En identifierare att använda när du sparar inställningarna för denna backend eller frontend på samma maskin.",
         "LocalHostName_label": "Anpassad identifierare",
         "MySQLDatabaseName": "MySQL-databasnamn",

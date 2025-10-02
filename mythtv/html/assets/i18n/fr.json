@@ -1298,6 +1298,7 @@
             "mustrestart": "Lorsque vous avez terminé les mises à jour, redémarrez le backend.",
             "restart_desc": "Redémarrez le backend et reprenez le fonctionnement normal.",
             "restart_label": "Redémarrer le fonctionnement complet du backend",
+            "restart_label_short": "Redémarrer le backend",
             "restart_webonly_desc": "Cela activera les mises à jour et désactivera toutes les opérations backend. Utilisez-le en cas de problèmes lors de la configuration des cartes de capture.",
             "restart_webonly_label": "Redémarrer le backend restreint",
             "restarting": "En attente du back-end",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "L'adresse IP ou le nom d'hôte est requis",
-        "LocalEnabled_desc": "Si le nom d'hôte de ce frontend change souvent, cochez cette case et fournissez un nom réseau unique pour l'identifier. Si cette case n'est pas cochée, le nom d'hôte local de la machine frontale sera utilisé pour enregistrer les préférences dans la base de données.",
-        "LocalEnabled_label": "Utiliser un identifiant personnalisé pour les préférences de l'interface",
+        "LocalEnabled_desc": "Si le nom d'hôte de ce système change souvent, cochez cette case et fournissez un nom unique de réseau pour l'identifier. S'il n'est pas contrôlé, le nom d'hôte local de la machine sera utilisé pour enregistrer les préférences dans la base de données.",
+        "LocalEnabled_label": "Utilisez un identifiant personnalisé pour ce système",
         "LocalHostName_desc": "Un identifiant à utiliser lors de l'enregistrement des paramètres de ce backend ou frontend sur la même machine.",
         "LocalHostName_label": "Identifiant personnalisé",
         "MySQLDatabaseName": "Nom de la base de données MySQL",

@@ -1298,6 +1298,7 @@
             "mustrestart": "Kun olet lopettanut päivitykset, käynnistä taustaohjelma uudelleen.",
             "restart_desc": "Käynnistä taustaohjelma uudelleen ja jatka normaalia toimintaa.",
             "restart_label": "Käynnistä taustajärjestelmän täysi toiminta uudelleen",
+            "restart_label_short": "Käynnistää tausta",
             "restart_webonly_desc": "Tämä ottaa päivitykset käyttöön ja poistaa kaikki taustatoiminnot käytöstä. Käytä tätä, jos sieppauskorttien asettamisessa on ongelmia.",
             "restart_webonly_label": "Käynnistä Backend Restricted uudelleen",
             "restarting": "Backendiä odotellessa",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP-osoite tai isäntänimi vaaditaan",
-        "LocalEnabled_desc": "Jos tämän käyttöliittymän isäntänimi muuttuu usein, valitse tämä ruutu ja anna verkkokohtainen nimi sen tunnistamiseksi. Jos tätä ei ole valittu, käyttöliittymäkoneen paikallista isäntänimeä käytetään asetusten tallentamiseen tietokantaan.",
-        "LocalEnabled_label": "Käytä mukautettua tunnistetta käyttöliittymän asetuksissa",
+        "LocalEnabled_desc": "Jos tämän järjestelmän isäntänimi muuttuu usein, tarkista tämä ruutu ja anna verkko-ainutlaatuinen nimi sen tunnistamiseksi. Jos koneen paikallista isäntänimeä ei voida tarkentaa, tietokannan asetusten tallentamiseen käytetään.",
+        "LocalEnabled_label": "Käytä tämän järjestelmän mukautettua tunnistetta",
         "LocalHostName_desc": "Tunniste, jota käytetään tallennettaessa tämän tausta- tai käyttöliittymän asetuksia samalle koneelle.",
         "LocalHostName_label": "Muokattu tunniste",
         "MySQLDatabaseName": "MySQL-tietokannan nimi",

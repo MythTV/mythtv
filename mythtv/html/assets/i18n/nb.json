@@ -1298,6 +1298,7 @@
             "mustrestart": "Når du er ferdig med oppdateringer, start backend på nytt.",
             "restart_desc": "Start bakenden på nytt og gjenoppta normal drift.",
             "restart_label": "Start Backend Full Operation på nytt",
+            "restart_label_short": "Start backend på nytt",
             "restart_webonly_desc": "Dette vil aktivere oppdateringer og deaktivere alle backend-operasjoner. Bruk denne hvis det er problemer med å sette opp fangstkort.",
             "restart_webonly_label": "Start Backend Restricted på nytt",
             "restarting": "Venter på Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP-adresse eller vertsnavn kreves",
-        "LocalEnabled_desc": "Hvis denne grensesnittets vertsnavn endres ofte, merk av i denne boksen og oppgi et nettverksunikt navn for å identifisere det. Hvis det ikke er merket av, vil frontendmaskinens lokale vertsnavn bli brukt til å lagre preferanser i databasen.",
-        "LocalEnabled_label": "Bruk egendefinert identifikator for grensesnittpreferanser",
+        "LocalEnabled_desc": "Hvis dette systemets vertsnavn ofte endres, merker du av i denne boksen og oppgi et nettverk-unikt navn for å identifisere det. Hvis ikke merket, vil maskinens lokale vertsnavn bli brukt til å lagre preferanser i databasen.",
+        "LocalEnabled_label": "Bruk tilpasset identifikator for dette systemet",
         "LocalHostName_desc": "En identifikator som skal brukes mens du lagrer innstillingene for denne backend eller frontend på samme maskin.",
         "LocalHostName_label": "Egendefinert identifikator",
         "MySQLDatabaseName": "MySQL-databasenavn",
