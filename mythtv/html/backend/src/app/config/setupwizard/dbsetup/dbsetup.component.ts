@@ -74,7 +74,7 @@ export class DbsetupComponent implements OnInit {
     }
 
     copyToclipboard(value: string): void {
-        this.clipboard.copy(value);
+        this.clipboard.copy(value.replace(/<br>/g,'\n'));
     }
 
     saveObserver = {

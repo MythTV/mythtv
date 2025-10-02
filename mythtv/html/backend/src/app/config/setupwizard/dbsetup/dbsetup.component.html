@@ -14,7 +14,8 @@
                     <label for="ipaddress" class="label block">{{ 'setupwizard.MySQLServerIP' | translate }}</label>
                     <input pInputText id="ipaddress" type="text" aria-describedby="ipaddress-help"
                         [(ngModel)]="database.Host" name="hostname" #host="ngModel" class="mb-2 form-control w-full"
-                        [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required />
+                        [ngClass]="{'is-invalid': host.invalid }" placeholder="Ex. 127.0.0.1 or localhost" required
+                        (blur)="setCommandList()" />
                     <small id="ipaddress-help">{{ 'setupwizard.ipaddress_help' | translate }}</small>
                     <div *ngIf="host.invalid && (host.dirty || host.touched)">
                         <small id="address-help" class="p-error block">{{ 'setupwizard.IPorAddressRequired' | translate
@@ -26,7 +27,7 @@
                     <label for="port" class="label block">{{ 'setupwizard.MySQLServerPort' | translate }}</label>
                     <input pInputText id="port" type="number" aria-describedby="port-help" [(ngModel)]="database.Port"
                         name="port" #port="ngModel" class=" mb-2 form-control w-full" placeholder="Ex. 3306" min="0"
-                        max="65536" />
+                        max="65536" (blur)="setCommandList()" />
                     <small id="port-help">{{ 'setupwizard.port_help' | translate }}</small>
                     <div *ngIf="port.invalid && (port.dirty || port.touched)">
                         <small class="p-error block">{{ 'setupwizard.portRequired' | translate }}</small>
@@ -37,7 +38,7 @@
                     <label for="user" class="label block">{{ 'setupwizard.MySQLUser' | translate }}</label>
                     <input pInputText id="user" type="text" aria-describedby="user-help" [(ngModel)]="database.UserName"
                         name="user" #user="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythtv"
-                        required />
+                        required (blur)="setCommandList()" />
                     <small id="user-help">{{ 'setupwizard.user_help' | translate }}</small>
                     <div *ngIf="user.invalid && (user.dirty || user.touched)">
                         <small class="p-error block">{{ 'setupwizard.userRequired' | translate }}</small>
@@ -47,7 +48,7 @@
                     <label for="password" class="label block">{{ 'setupwizard.MySQLPassword' | translate }}</label>
                     <input pInputText id="password" type="text" aria-describedby="password-help"
                         [(ngModel)]="database.Password" name="password" #password="ngModel"
-                        class="mb-2 form-control w-full" placeholder="Ex. mythtv" required />
+                        class="mb-2 form-control w-full" placeholder="Ex. mythtv" required (blur)="setCommandList()" />
                     <small id="password-help">{{ 'setupwizard.password_help' | translate }}</small>
                     <div *ngIf="password.invalid && (password.dirty || password.touched)">
                         <small class="p-error block">{{ 'setupwizard.passwordRequired' | translate }}</small>
@@ -58,7 +59,7 @@
                     <label for="dbname" class="label block">{{ 'setupwizard.MySQLDatabaseName' | translate }}</label>
                     <input pInputText id="dbname" type="text" aria-describedby="dbname-help" [(ngModel)]="database.Name"
                         name="dbname" #dbname="ngModel" class="mb-2 form-control w-full" placeholder="Ex. mythconverg"
-                        required />
+                        required (blur)="setCommandList()" />
                     <small id="dbname-help">{{ 'setupwizard.dbname_help' | translate }}</small>
                     <div *ngIf="dbname.invalid && (dbname.dirty || dbname.touched)">
                         <small class="p-error block">{{ 'setupwizard.databaseNameRequired' | translate }}</small>

@@ -1298,6 +1298,7 @@
             "mustrestart": "When you are finished with updates, restart the backend.",
             "restart_desc": "Restart the backend and resume normal operation.",
             "restart_label": "Restart Backend Full Operation",
+            "restart_label_short": "Restart Backend",
             "restart_webonly_desc": "This will enable updates and disable all backend operations. Use this if there are problems setting up capture cards.",
             "restart_webonly_label": "Restart Backend Restricted",
             "restarting": "Waiting for Backend",
@@ -1512,8 +1513,8 @@
     },
     "setupwizard": {
         "IPorAddressRequired": "IP Address or Hostname is required",
-        "LocalEnabled_desc": "If this frontend's host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine's local host name will be used to save preferences in the database.",
-        "LocalEnabled_label": "Use custom identifier for frontend preferences",
+        "LocalEnabled_desc": "If this system's host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the machine's local host name will be used to save preferences in the database.",
+        "LocalEnabled_label": "Use custom identifier for this system",
         "LocalHostName_desc": "An identifier to use while saving the settings for this backend or frontend on the same machine.",
         "LocalHostName_label": "Custom identifier",
         "MySQLDatabaseName": "MySQL Database Name",

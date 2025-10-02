@@ -25,6 +25,7 @@ export class BackendWarningComponent implements OnInit {
   busy = false;
   hostName = '';
   masterServerName = '';
+  rrAllowed = false;
 
   constructor(private mythService: MythService, public setupService: SetupService,
     private dvrService: DvrService, private wizardService: SetupWizardService,
@@ -67,6 +68,8 @@ export class BackendWarningComponent implements OnInit {
           this.setupService.isDatabaseIgnored = data.BackendInfo.Env.IsDatabaseIgnored;
           this.setupService.DBTimezoneSupport = data.BackendInfo.Env.DBTimezoneSupport;
           this.setupService.WebOnlyStartup = data.BackendInfo.Env.WebOnlyStartup;
+          this.rrAllowed = (['WEBONLYPARM', 'DBSETUP', 'DBTIMEZONE', 'SCHEMAUPDATE']
+            .indexOf(this.setupService.WebOnlyStartup) == -1);
           // Sometimes conflicting results are returned by the backend, saying that
           // scheduling is enabled when it could not be beacuse there is no database.
           if (this.setupService.isDatabaseIgnored || !this.setupService.DBTimezoneSupport
