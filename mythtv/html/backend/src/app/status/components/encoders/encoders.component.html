@@ -4,17 +4,15 @@
         <div *ngFor="let encoder of encoders">
             <ul>
                 <li *ngIf="encoder.ParentId == 0">
-                    {{ 'dashboard.status.encoder_text' |
-                    translate: { DisplayName: encoder.Inputs[0].DisplayName, CardDetails: cardDetails(encoder.Id),
-                    HostName: encoder.HostName, State: encoderStatuses(encoder.Id),
-                    }
-                    }}
+                    <div [innerHTML]="'dashboard.status.encoder_text' 
+                        | translate: { DisplayName: encoder.Inputs[0].DisplayName, CardDetails: cardDetails(encoder.Id),
+                        HostName: encoder.HostName, State: encoderStatuses(encoder.Id)}"></div>
                     <ng-container *ngFor="let sub of encoders">
                         <ng-container *ngIf="sub.Recording && (sub.Id == encoder.Id || sub.ParentId == encoder.Id)">
-                            <br>
                             '{{ sub.Recording.Title }}' on {{ sub.Recording.Channel.CallSign }}.
                             {{ 'dashboard.status.endtime_text' |
                             translate: { EndTime: utility.formatTime(sub.Recording.EndTime) } }}
+                            <br>
                         </ng-container>
                     </ng-container>
                 </li>
