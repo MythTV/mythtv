@@ -380,7 +380,7 @@
             "backends_detail": "Backend : {{ Name }} est un {{ Type }} sur l'IP {{ IP }}",
             "backends_none": "Aucun backend",
             "backends_title": "Backends",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} est sur l'hôte {{ HostName }}, état: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} est sur l'hôte {{ HostName }}. <br> État: {{ State }}.",
             "encoder_title": "État de l'encodeur",
             "endtime_text": "Cet enregistrement doit se terminer à {{ EndTime }}.",
             "frontends_detail": "Frontend : {{ Name }}, IP-Port : {{ IP }} :{{ Port }}, Online : {{ OnLine }}",

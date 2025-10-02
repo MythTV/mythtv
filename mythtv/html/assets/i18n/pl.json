@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
             "backends_none": "Brak zaplecza",
             "backends_title": "Backendy",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} jest na hosta {{ HostName }}, stan: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} znajduje się na hosta {{ HostName }}. <br> stan: {{ State }}.",
             "encoder_title": "Stan enkodera",
             "endtime_text": "To nagranie ma zakończyć się o {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, Port IP: {{ IP }}: {{ Port }}, Online: {{ OnLine }}",

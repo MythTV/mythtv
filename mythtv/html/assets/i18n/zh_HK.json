@@ -380,7 +380,7 @@
             "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "無後端",
             "backends_title": "後端",
-            "encoder_text": "{{ DisplayName }}，{{ CardDetails }}在主機上{{ HostName }}，state：{{ State }}",
+            "encoder_text": "{{ DisplayName }}，{{ CardDetails }}在主機{{ HostName }}上。 <br>狀態：{{ State }}。",
             "encoder_title": "編碼器狀態",
             "endtime_text": "該錄製計劃於 {{ EndTime }} 結束。",
             "frontends_detail": "前端：{{ Name }}，IP 端口：{{ IP }}：{{ Port }}，在線：{{ OnLine }}",

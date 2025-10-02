@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Žádné backendy",
             "backends_title": "Backendy",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na hostiteli {{ HostName }}, State: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na hostiteli {{ HostName }}. <br> State: {{ State }}.",
             "encoder_title": "Stav kodéru",
             "endtime_text": "Ukončení tohoto nahrávání je naplánováno na {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

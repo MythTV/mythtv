@@ -380,7 +380,7 @@
             "backends_detail": "Backend: Το {{ Name }} είναι ένα {{ Type }} στην IP {{ IP }}",
             "backends_none": "Χωρίς Backends",
             "backends_title": "Backends",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} είναι στον κεντρικό υπολογιστή {{ HostName }}, κατάσταση: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} είναι στον κεντρικό υπολογιστή {{ HostName }}. <br> κατάσταση: {{ State }}.",
             "encoder_title": "Κατάσταση κωδικοποιητή",
             "endtime_text": "Αυτή η εγγραφή έχει προγραμματιστεί να ολοκληρωθεί στις {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

@@ -380,7 +380,7 @@
             "backends_detail": "אחורי: {{ Name }} הוא {{ Type }} ב-IP {{ IP }}",
             "backends_none": "אין אחוריים",
             "backends_title": "קצוות אחוריים",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} נמצא ב- Host {{ HostName }}, קבע: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} נמצא במארח {{ HostName }}. <br> מצב: {{ State }}.",
             "encoder_title": "מצב מקודד",
             "endtime_text": "הקלטה זו מתוכננת להסתיים ב-{{ EndTime }}.",
             "frontends_detail": "ממשק קצה: {{ Name }}, יציאת IP: {{ IP }}:{{ Port }}, מקוונת: {{ OnLine }}",

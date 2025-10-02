@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} ist ein {{ Type }} auf IP {{ IP }}",
             "backends_none": "Keine Backends",
             "backends_title": "Backends",
-            "encoder_text": "Oder",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} ist auf Host {{ HostName }}. <br> Status: {{ State }}.",
             "encoder_title": "Encoderstatus",
             "endtime_text": "Das Ende dieser Aufzeichnung ist für {{ EndTime }} geplant.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

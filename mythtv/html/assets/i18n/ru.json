@@ -380,7 +380,7 @@
             "backends_detail": "Серверная часть: {{ Name }} – это {{ Type }} на IP {{ IP }}.",
             "backends_none": "Нет бэкендов",
             "backends_title": "Бэкенды",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} на хосте {{ HostName }}, состояние: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} на хосте {{ HostName }}. <br> Состояние: {{ State }}.",
             "encoder_title": "Статус энкодера",
             "endtime_text": "Запись должна закончиться в {{ EndTime }}.",
             "frontends_detail": "Внешний интерфейс: {{ Name }}, IP-порт: {{ IP }}: {{ Port }}, онлайн: {{ OnLine }}",

@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Brez ozadja",
             "backends_title": "Zaledja",
-            "encoder_text": "Nj",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na gostitelju {{ HostName }}. <br> Stanje: {{ State }}.",
             "encoder_title": "Status kodirnika",
             "endtime_text": "To snemanje naj bi se končalo ob {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

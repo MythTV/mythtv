@@ -380,7 +380,7 @@
             "backends_detail": "Back-end: {{ Name }} é um {{ Type }} no IP {{ IP }}",
             "backends_none": "Sem back-ends",
             "backends_title": "Infra-estruturas",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} está no host {{ HostName }}, estado: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} está no host {{ HostName }}. <br> estado: {{ State }}.",
             "encoder_title": "Estado do Codificador",
             "endtime_text": "Esta gravação está programada para terminar em {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

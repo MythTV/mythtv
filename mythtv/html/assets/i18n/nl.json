@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",
             "backends_title": "Back-ends",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} is op host {{ HostName }}, status: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} is op host {{ HostName }}. <br> status: {{ State }}.",
             "encoder_title": "Encoder-status",
             "endtime_text": "Het einde van deze opname is gepland om {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-poort: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

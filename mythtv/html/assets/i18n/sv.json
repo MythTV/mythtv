@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
             "backends_none": "Inga backends",
             "backends_title": "Backends",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} är på värd {{ HostName }}, stat: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} är på värd {{ HostName }}. <br> stat: {{ State }}.",
             "encoder_title": "Kodarstatus",
             "endtime_text": "Den här inspelningen är planerad att avslutas vid {{ EndTime }}.",
             "frontends_detail": "Gränssnitt: {{ Name }}, IP-port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

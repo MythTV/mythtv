@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
             "backends_none": "Ingen backends",
             "backends_title": "Backends",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} er på vært {{ HostName }}, stat: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} er på vært {{ HostName }}. <br> tilstand: {{ State }}.",
             "encoder_title": "Encoder status",
             "endtime_text": "Denne optagelse er planlagt til at slutte kl. {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

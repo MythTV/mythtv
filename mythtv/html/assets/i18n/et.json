@@ -380,7 +380,7 @@
             "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
             "backends_none": "Taustaprogramme pole",
             "backends_title": "Taustaprogrammid",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on hostis {{ HostName }}, olek: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on hostis {{ HostName }}. <br> olek: {{ State }}.",
             "encoder_title": "Kodeerija olek",
             "endtime_text": "See salvestus on kavandatud lõppema {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, IP-port: {{ IP }}:{{ Port }}, võrgus: {{ OnLine }}",

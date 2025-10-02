@@ -380,7 +380,7 @@
             "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
             "backends_none": "Arka Uç Yok",
             "backends_title": "arka uçlar",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} ana bilgisayarda {{ HostName }}, durum: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} ana bilgisayar üzerindedir {{ HostName }}. <br> Durum: {{ State }}.",
             "encoder_title": "Kodlayıcı Durumu",
             "endtime_text": "Bu kayıt, {{ EndTime }} tarihinde sona ermek üzere planlandı.",
             "frontends_detail": "Ön Uç: {{ Name }}, IP Bağlantı Noktası: {{ IP }}:{{ Port }}, Çevrimiçi: {{ OnLine }}",

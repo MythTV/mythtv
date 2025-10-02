@@ -380,7 +380,7 @@
             "backends_detail": "Bakendi: {{ Name }} er {{ Type }} á IP {{ IP }}",
             "backends_none": "Engir bakenda",
             "backends_title": "Bakenda",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} er á hýsingu {{ HostName }}, ríki: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} er á hýsingu {{ HostName }}. <br> ríki: {{ State }}.",
             "encoder_title": "Staða kóðara",
             "endtime_text": "Áætlað er að þessari upptöku ljúki {{ EndTime }}.",
             "frontends_detail": "Framenda: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

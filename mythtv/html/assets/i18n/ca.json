@@ -380,7 +380,7 @@
             "backends_detail": "Backend: {{ Name }} és un {{ Type }} a la IP {{ IP }}",
             "backends_none": "Sense backends",
             "backends_title": "Backends",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} està a l'amfitrió {{ HostName }}, estat: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} està a l'amfitrió {{ HostName }}. <br> estat: {{ State }}.",
             "encoder_title": "Estat del codificador",
             "endtime_text": "Està previst que aquesta gravació finalitzi a les {{ EndTime }}.",
             "frontends_detail": "Frontend: {{ Name }}, Port IP: {{ IP }}:{{ Port }}, En línia: {{ OnLine }}",

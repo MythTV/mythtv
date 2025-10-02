@@ -380,7 +380,7 @@
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",
             "backends_title": "Taustaohjelmat",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on isäntä {{ HostName }}, tila: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on isäntä {{ HostName }}. <br> tila: {{ State }}.",
             "encoder_title": "Enkooderin tila",
             "endtime_text": "Tämän tallennuksen on määrä päättyä {{ EndTime }}.",
             "frontends_detail": "Käyttöliittymä: {{ Name }}, IP-portti: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

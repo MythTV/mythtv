@@ -380,7 +380,7 @@
             "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
             "backends_none": "Nincsenek háttérprogramok",
             "backends_title": "Háttérrendszerek",
-            "encoder_text": "{{DisplayName}}, {{{CardDetails}} a host {{hostName}} hoston van",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} a hoston van {{ HostName }}. <br> állapot: {{ State }}.",
             "encoder_title": "Kódoló állapota",
             "endtime_text": "Ez a felvétel a tervek szerint {{ EndTime }}-kor ér véget.",
             "frontends_detail": "Frontend: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",

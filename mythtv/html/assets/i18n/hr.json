@@ -380,7 +380,7 @@
             "backends_detail": "Pozadina: {{ Name }} je {{ Type }} na IP-u {{ IP }}",
             "backends_none": "Nema pozadine",
             "backends_title": "Pozadine",
-            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} nalazi se na hostu {{ HostName }}, stanju: {{ State }}",
+            "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na host {{ HostName }}. <br> stanja: {{ State }}.",
             "encoder_title": "Status kodera",
             "endtime_text": "Završetak ovog snimanja zakazan je za {{ EndTime }}.",
             "frontends_detail": "Sučelje: {{ Name }}, IP-Port: {{ IP }}:{{ Port }}, Online: {{ OnLine }}",
