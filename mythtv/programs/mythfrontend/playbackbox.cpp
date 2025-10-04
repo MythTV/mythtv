@@ -1557,7 +1557,10 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         else
         {
             ProgramInfo *pginfo = GetCurrentProgram();
-            m_currentLetter = pginfo->GetSortTitle().at(0).toUpper();
+            if (pginfo == nullptr)
+                m_currentLetter = "All";
+            else
+                m_currentLetter = pginfo->GetSortTitle().at(0).toUpper();
             m_groupAlphaList->MoveToNamedPosition(m_currentLetter);
         }
     }
