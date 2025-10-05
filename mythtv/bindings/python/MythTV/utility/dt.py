@@ -304,6 +304,8 @@ class datetime( _pydatetime ):
     _localtz = None
     _utctz = None
 
+    LTZ = object()
+
     @classmethod
     def localTZ(cls):
         global HAVEZONEINFO
@@ -343,8 +345,8 @@ class datetime( _pydatetime ):
         return cls._utctz
 
     @classmethod
-    def fromDatetime(cls, dt, tzinfo=None, fold=None):
-        if tzinfo is None:
+    def fromDatetime(cls, dt, tzinfo=LTZ, fold=None):
+        if tzinfo is cls.LTZ:
             tzinfo = dt.tzinfo
             fold = dt.fold
         return cls(dt.year, dt.month, dt.day, dt.hour, dt.minute,
@@ -382,7 +384,7 @@ class datetime( _pydatetime ):
             return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
-    def strptime(cls, datestring, format, tzinfo=None):
+    def strptime(cls, datestring, format, tzinfo=LTZ):
         obj = super(datetime, cls).strptime(datestring, format)
         return cls.fromDatetime(obj, tzinfo)
 
@@ -393,10 +395,10 @@ class datetime( _pydatetime ):
                                    .astimezone(cls.localTZ())
 
     @classmethod
-    def frommythtime(cls, mtime, tz=None):
+    def frommythtime(cls, mtime, tz=LTZ):
         if tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
-        elif tz is None:
+        elif tz is cls.LTZ:
             tz = cls.localTZ()
         return cls.strptime(str(mtime), '%Y%m%d%H%M%S', tz)
 
@@ -507,9 +509,9 @@ class datetime( _pydatetime ):
         raise TypeError("time data '%s' does not match supported formats"%t)
 
     def __new__(cls, year, month, day, hour=None, minute=None, second=None,
-                      microsecond=None, tzinfo=None, fold=None):
+                      microsecond=None, tzinfo=LTZ, fold=None):
 
-        if tzinfo is None:
+        if tzinfo is cls.LTZ:
             kwargs = {'tzinfo':cls.localTZ()}
         else:
             kwargs = {'tzinfo':tzinfo}
