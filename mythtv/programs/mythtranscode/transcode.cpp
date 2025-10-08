@@ -170,10 +170,9 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
     }
 
-    if (!m_avfMode)
+    if (!m_avfMode && fifodir.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "AVFormat mode not set.");
+        LOG(VB_GENERAL, LOG_ERR, "No output mode is set.");
         return REENCODE_ERROR;
     }
 
