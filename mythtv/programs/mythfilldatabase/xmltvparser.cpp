@@ -17,11 +17,11 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythmetadata/metadatadownload.h"
 #include "libmythtv/channelinfo.h"
 #include "libmythtv/mpeg/dvbdescriptors.h"
 #include "libmythtv/programdata.h"
+#include "libmythtv/programinfo.h"
 
 // filldata headers
 #include "channeldata.h"

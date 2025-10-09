@@ -9,11 +9,10 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/remoteutil.h"
 
 #include "cardutil.h"
 #include "mythsystemevent.h"
+#include "programinfo.h"
 
 #define LOC      QString("MythSystemEventHandler: ")
 

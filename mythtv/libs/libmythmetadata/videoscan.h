@@ -115,4 +115,6 @@ class META_PUBLIC VideoScannerThread : public MThread
     bool m_dbDataChanged {false};
 };
 
+META_PUBLIC bool RemoteGetActiveBackends(QStringList *list);
+
 #endif

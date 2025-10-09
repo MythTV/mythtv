@@ -16,7 +16,7 @@
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/mythsystemlegacy.h>
-#include <libmythbase/programinfo.h>
+#include <libmythtv/programinfo.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythmainwindow.h>
 
