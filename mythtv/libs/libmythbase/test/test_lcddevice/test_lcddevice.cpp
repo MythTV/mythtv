@@ -61,3 +61,5 @@ void TestLcdDevice::test_quotedString (void)
 }
 
 QTEST_APPLESS_MAIN(TestLcdDevice)
+
+#include "moc_test_lcddevice.cpp"

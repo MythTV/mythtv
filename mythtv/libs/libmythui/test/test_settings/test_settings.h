@@ -1,3 +1,6 @@
+#ifndef LIBMYTHUI_TEST_SETTINGS_H
+#define LIBMYTHUI_TEST_SETTINGS_H
+
 #include <QTest>
 
 #include "libmythui/standardsettings.h"
@@ -30,3 +33,5 @@ class TestSettings: public QObject
         QVERIFY(parent.byName("targetedsetting") == targetedSetting);
     }
 };
+
+#endif // LIBMYTHUI_TEST_SETTINGS_H

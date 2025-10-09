@@ -862,3 +862,5 @@ uint8_t *PreviewGenerator::GetScreenGrab(
 
     return retbuf;
 }
+
+#include "moc_previewgenerator.cpp"

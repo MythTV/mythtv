@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_MYTHBINARYPLIST_H
+#define LIBMYTHBASE_TEST_MYTHBINARYPLIST_H
 
 #include <QTest>
 
@@ -34,3 +36,5 @@ class TestMythBinaryPList: public QObject
     // Individual function tests
     static void plist_read(void);
 };
+
+#endif // LIBMYTHBASE_TEST_MYTHBINARYPLIST_H

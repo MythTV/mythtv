@@ -4,11 +4,6 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
-if(NOT TARGET SQLite::SQLite3)
-  message(
-    WARNING "Can't build test for RecordingExtender feature. Missing SQLite3.")
-endif()
-
 add_executable(
   test_videolist ../../upnpscanner.cpp ../../videofilter.cpp
                  ../../videolist.cpp test_videolist.cpp test_videolist.h)

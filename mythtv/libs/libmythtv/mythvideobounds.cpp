@@ -943,3 +943,5 @@ void MythVideoBounds::SetStereoOverride(StereoscopicMode Mode)
         emit UpdateOSDMessage(StereoscopictoString(Mode));
     }
 }
+
+#include "moc_mythvideobounds.cpp"

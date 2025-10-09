@@ -256,4 +256,4 @@ void GameScanner::finishedScan()
     emit finished(m_scanThread->getDataChanged());
 }
 
-////////////////////////////////////////////////////////////////////////
+#include "moc_gamescan.cpp"

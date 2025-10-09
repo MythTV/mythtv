@@ -123,3 +123,5 @@ void MythChannelOverlay::SendResult(int result)
     auto *dce = new DialogCompletionEvent("", result, "", message);
     QCoreApplication::postEvent(m_tv, dce);
 }
+
+#include "moc_mythchanneloverlay.cpp"
