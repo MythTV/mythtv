@@ -348,9 +348,9 @@ jobs:
           key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
           restore-keys: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache
 
-      - name: Update Homebrew Environment
+      - name: Establish Homebrew Environment
         run: |
-          brew update && brew upgrade
+          #brew update && brew upgrade
           PKGMGR_PREFIX=$(brew --prefix)
           echo "PKGMGR_PREFIX=$PKGMGR_PREFIX" >> $GITHUB_ENV
 
