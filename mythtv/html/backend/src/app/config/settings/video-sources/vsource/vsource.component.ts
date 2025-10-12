@@ -118,9 +118,12 @@ export class VsourceComponent implements OnInit, AfterViewInit {
       let confDir = this.backendInfo.BackendInfo.Env.MYTHCONFDIR;
       if (!confDir)
         confDir = this.backendInfo.BackendInfo.Env.HOME + "/.mythtv";
-      this.configCommand1 = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
-        + this.videoSource.Grabber + ' --manage-lineups --config-file "'
-        + confDir + '/' + this.videoSource.SourceName + '.xmltv"';
+      if (this.videoSource.Grabber == 'tv_grab_zz_sdjson_sqlite')
+        this.configCommand1 = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
+          + this.videoSource.Grabber + ' --manage-lineups --config-file "'
+          + confDir + '/' + this.videoSource.SourceName + '.xmltv"';
+      else
+        this.configCommand1 = '';
       this.configCommand2 = "sudo -u " + this.backendInfo.BackendInfo.Env.USER + " "
         + this.videoSource.Grabber + ' --configure --config-file "'
         + confDir + '/' + this.videoSource.SourceName + '.xmltv"';
