@@ -1309,11 +1309,11 @@
             "title": "Nastavení MythTV",
             "upcomingrec": "Další nadcházející nahrávka: {{Title}} v {{StartTime}}. Stav: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend nelze normálně spustit, protože instalace databáze není dokončena.",
-                "DBTIMEZONE": "Backend nelze normálně spustit, protože databázová časová pásma nejsou nastavena.",
-                "IPADDRESS": "Backend nelze normálně spustit, protože není nastavena Obecná, Adresa hostitele a Primární IP adresa.",
-                "SCHEMAUPDATE": "Backend nelze normálně spustit, protože se nezdařila aktualizace schématu databáze.",
-                "WEBONLYPARM": "Backend je v omezeném režimu kvůli požadavku uživatele nebo parametru webonly."
+                "DBSETUP": "Backend nemohl spustit normálně, protože nastavení databáze nebylo úplné.",
+                "DBTIMEZONE": "Backend nemohl začít normálně, protože časové pásma databáze nebyly nastaveny.",
+                "IPADDRESS": "Backend nemohl začít normálně, protože obecná, adresa hostitele, primární IP adresa nebyla nastavena.",
+                "SCHEMAUPDATE": "Backend nemohl spustit normálně, protože aktualizace schématu databáze selhala.",
+                "WEBONLYPARM": "Backend je v omezeném režimu kvůli požadavku uživatele nebo parametru WebOnly."
             }
         },
         "misc": {

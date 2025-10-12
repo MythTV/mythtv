@@ -1309,11 +1309,11 @@
             "title": "Configuração do MythTV",
             "upcomingrec": "Próxima gravação: {{Title}} às {{StartTime}}. Estado: {{Status}}",
             "webonly": {
-                "DBSETUP": "O back-end não pode ser iniciado normalmente porque a configuração do banco de dados não foi concluída.",
-                "DBTIMEZONE": "O back-end não pode iniciar normalmente porque os fusos horários do banco de dados não estão configurados.",
-                "IPADDRESS": "O back-end não pode iniciar normalmente porque Geral, Endereço de host e Endereço IP primário não estão definidos.",
-                "SCHEMAUPDATE": "O back-end não pode ser iniciado normalmente porque a atualização do esquema do banco de dados falhou.",
-                "WEBONLYPARM": "O backend está em modo restrito devido a solicitação do usuário ou parâmetro webonly."
+                "DBSETUP": "O back-end não pôde ser iniciado normalmente porque a configuração do banco de dados não foi concluída.",
+                "DBTIMEZONE": "O back-end não pôde ser iniciado normalmente porque os fusos horários do banco de dados não foram configurados.",
+                "IPADDRESS": "O back-end não pôde ser iniciado normalmente porque Geral, Endereço de host e Endereço IP primário não foram definidos.",
+                "SCHEMAUPDATE": "O back-end não pôde ser iniciado normalmente porque a atualização do esquema do banco de dados falhou.",
+                "WEBONLYPARM": "O back-end está em modo restrito devido a solicitação do usuário ou parâmetro webonly."
             }
         },
         "misc": {

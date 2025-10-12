@@ -1309,11 +1309,11 @@
             "title": "MythTV-oppsett",
             "upcomingrec": "Neste kommende opptak: {{Title}} kl. {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend kan ikke starte normalt fordi databaseoppsettet ikke er fullført.",
-                "DBTIMEZONE": "Backend kan ikke starte normalt fordi databasetidssoner ikke er satt opp.",
-                "IPADDRESS": "Backend kan ikke starte normalt fordi Generelt, Vertsadresse, Primær IP-adresse ikke er angitt.",
-                "SCHEMAUPDATE": "Backend kan ikke starte normalt fordi oppdatering av databaseskjema mislyktes.",
-                "WEBONLYPARM": "Backend er i begrenset modus på grunn av brukerforespørsel eller webonly-parameter."
+                "DBSETUP": "Backend kunne ikke starte normalt fordi databaseoppsettet ikke var fullført.",
+                "DBTIMEZONE": "Backend kunne ikke starte normalt fordi databasetidssoner ikke ble satt opp.",
+                "IPADDRESS": "Backend kunne ikke starte normalt fordi generell, vertsadresse, primær IP -adresse ikke ble angitt.",
+                "SCHEMAUPDATE": "Backend kunne ikke starte normalt fordi databaseskjemaoppdatering mislyktes.",
+                "WEBONLYPARM": "Backend er i begrenset modus på grunn av brukerforespørsel eller webonly parameter."
             }
         },
         "misc": {

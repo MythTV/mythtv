@@ -1309,11 +1309,11 @@
             "title": "MythTV uppsetning",
             "upcomingrec": "Næsta væntanleg upptaka: {{Title}} kl. {{StartTime}}. Staða: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend getur ekki ræst venjulega vegna þess að gagnagrunnsuppsetningu er ekki lokið.",
-                "DBTIMEZONE": "Bakendi getur ekki ræst venjulega vegna þess að tímabelti gagnagrunns eru ekki sett upp.",
-                "IPADDRESS": "Backend getur ekki ræst venjulega vegna þess að General, Host Address, Primary IP Address er ekki stillt.",
-                "SCHEMAUPDATE": "Bakendi getur ekki ræst venjulega vegna þess að uppfærsla gagnagrunnskerfis mistókst.",
-                "WEBONLYPARM": "Bakendi er í takmörkuðum ham vegna beiðni notenda eða færibreytu eingöngu á vefnum."
+                "DBSETUP": "Backend gat ekki byrjað venjulega vegna þess að uppsetning gagnagrunns var ekki lokið.",
+                "DBTIMEZONE": "Backend gat ekki byrjað venjulega vegna þess að tímabelti gagnagrunns voru ekki settir upp.",
+                "IPADDRESS": "Backend gat ekki byrjað venjulega vegna þess að almennt, hýsilfang, aðal IP -tölu var ekki stillt.",
+                "SCHEMAUPDATE": "Backend gat ekki byrjað venjulega vegna þess að uppfærsla á gagnagrunni mistókst.",
+                "WEBONLYPARM": "Backend er í takmarkaðri stillingu vegna notendabeiðni eða breytu á vefnum."
             }
         },
         "misc": {

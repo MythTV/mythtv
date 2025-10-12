@@ -1309,10 +1309,10 @@
             "title": "Configurazione MythTV",
             "upcomingrec": "Prossima registrazione: {{Title}} alle {{StartTime}}. Stato: {{Status}}",
             "webonly": {
-                "DBSETUP": "Il backend non può avviarsi normalmente perché la configurazione del database non è completa.",
-                "DBTIMEZONE": "Il backend non può avviarsi normalmente perché i fusi orari del database non sono impostati.",
-                "IPADDRESS": "Il backend non può avviarsi normalmente perché: Generale, Indirizzo host, Indirizzo IP primario non è impostato.",
-                "SCHEMAUPDATE": "Il backend non può essere avviato normalmente perché l'aggiornamento dello schema del database non è riuscito.",
+                "DBSETUP": "Il backend non può essere avviato normalmente perché la configurazione del database non è stata completata.",
+                "DBTIMEZONE": "Il backend non può essere avviato normalmente perché i fusi orari del database non sono stati impostati.",
+                "IPADDRESS": "Impossibile avviare normalmente il backend perché Generale, Indirizzo host, Indirizzo IP primario non sono stati impostati.",
+                "SCHEMAUPDATE": "Impossibile avviare normalmente il backend perché l'aggiornamento dello schema del database non è riuscito.",
                 "WEBONLYPARM": "Il backend è in modalità limitata a causa della richiesta dell'utente o di un parametro solo web."
             }
         },

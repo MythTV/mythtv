@@ -1309,10 +1309,10 @@
             "title": "Konfiguracja MythTV",
             "upcomingrec": "Następne nadchodzące nagranie: {{Title}} o {{StartTime}}. Stan: {{Status}}",
             "webonly": {
-                "DBSETUP": "Zaplecze nie może uruchomić się normalnie, ponieważ konfiguracja bazy danych nie została ukończona.",
-                "DBTIMEZONE": "Zaplecze nie może uruchomić się normalnie, ponieważ strefy czasowe bazy danych nie są skonfigurowane.",
-                "IPADDRESS": "Backend nie może uruchomić się normalnie, ponieważ nie ustawiono opcji Ogólne, Adres hosta i Podstawowy adres IP.",
-                "SCHEMAUPDATE": "Zaplecze nie może uruchomić się normalnie, ponieważ aktualizacja schematu bazy danych nie powiodła się.",
+                "DBSETUP": "Zaplecze nie mogło zostać normalnie uruchomione, ponieważ konfiguracja bazy danych nie została ukończona.",
+                "DBTIMEZONE": "Zaplecze nie mogło uruchomić się normalnie, ponieważ nie skonfigurowano stref czasowych bazy danych.",
+                "IPADDRESS": "Backend nie mógł uruchomić się normalnie, ponieważ nie ustawiono opcji Ogólne, Adres hosta i Podstawowy adres IP.",
+                "SCHEMAUPDATE": "Zaplecza nie można uruchomić normalnie, ponieważ aktualizacja schematu bazy danych nie powiodła się.",
                 "WEBONLYPARM": "Backend jest w trybie ograniczonym z powodu żądania użytkownika lub parametru webonly."
             }
         },

@@ -1309,11 +1309,11 @@
             "title": "MythTV:n asennus",
             "upcomingrec": "Seuraava tuleva nauhoitus: {{Title}} klo {{StartTime}}. Tila: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend ei voi käynnistyä normaalisti, koska tietokannan asennus ei ole valmis.",
-                "DBTIMEZONE": "Backend ei voi käynnistyä normaalisti, koska tietokannan aikavyöhykkeitä ei ole määritetty.",
-                "IPADDRESS": "Backend ei voi käynnistyä normaalisti, koska Yleistä, Isäntäosoite, Ensisijainen IP-osoite ei ole asetettu.",
-                "SCHEMAUPDATE": "Backend ei voi käynnistyä normaalisti, koska tietokantaskeeman päivitys epäonnistui.",
-                "WEBONLYPARM": "Backend on rajoitetussa tilassa käyttäjän pyynnöstä tai vain webonly -parametrin vuoksi."
+                "DBSETUP": "Taustaohjelma ei voinut aloittaa normaalisti, koska tietokannan asennus ei ollut valmis.",
+                "DBTIMEZONE": "Taustaohjelma ei voinut aloittaa normaalisti, koska tietokannan aikavyöhykkeitä ei ole asetettu.",
+                "IPADDRESS": "Taustaohjelma ei voinut aloittaa normaalisti, koska yleinen isäntäosoite, ensisijainen IP -osoite ei asetettu.",
+                "SCHEMAUPDATE": "Taustaohjelma ei voinut aloittaa normaalisti, koska tietokantakaaviopäivitys epäonnistui.",
+                "WEBONLYPARM": "Taustaohjelma on rajoitetussa tilassa käyttäjän pyynnön tai webonly -parametrin takia."
             }
         },
         "misc": {

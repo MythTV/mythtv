@@ -1310,7 +1310,7 @@
             "upcomingrec": "下一个即将录制的节目：{{Title}}，时间：{{StartTime}}。状态：{{Status}}",
             "webonly": {
                 "DBSETUP": "由于数据库安装未完成，后端无法正常启动。",
-                "DBTIMEZONE": "由于数据库时区未设置，后端无法正常启动。",
+                "DBTIMEZONE": "由于未设置数据库时区，后端无法正常启动。",
                 "IPADDRESS": "由于未设置常规、主机地址、主 IP 地址，后端无法正常启动。",
                 "SCHEMAUPDATE": "由于数据库架构更新失败，后端无法正常启动。",
                 "WEBONLYPARM": "由于用户请求或 webonly 参数，后端处于受限模式。"

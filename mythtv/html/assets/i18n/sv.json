@@ -1309,11 +1309,11 @@
             "title": "MythTV Setup",
             "upcomingrec": "Nästa kommande inspelning: {{Title}} kl. {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend kan inte starta normalt eftersom databasinstallationen inte är klar.",
-                "DBTIMEZONE": "Backend kan inte starta normalt eftersom databastidszoner inte är inställda.",
-                "IPADDRESS": "Backend kan inte starta normalt eftersom Allmänt, Värdadress, Primär IP-adress inte är inställt.",
-                "SCHEMAUPDATE": "Backend kan inte starta normalt eftersom uppdatering av databasschema misslyckades.",
-                "WEBONLYPARM": "Backend är i begränsat läge på grund av användarbegäran eller webonly-parameter."
+                "DBSETUP": "Backend kunde inte börja normalt eftersom databasinställningen inte var fullständig.",
+                "DBTIMEZONE": "Backend kunde inte starta normalt eftersom databastider inte inrättades.",
+                "IPADDRESS": "Backend kunde inte börja normalt eftersom allmän, värdadress, primär IP -adress inte ställdes in.",
+                "SCHEMAUPDATE": "Backend kunde inte börja normalt eftersom databasschemauppdatering misslyckades.",
+                "WEBONLYPARM": "Backend är i begränsat läge på grund av användarbegäran eller WebLonly -parameter."
             }
         },
         "misc": {

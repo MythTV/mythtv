@@ -1309,10 +1309,10 @@
             "title": "MythTV Setup",
             "upcomingrec": "Next upcoming recording: {{Title}} at {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend cannot start normally because Database Setup is not complete.",
-                "DBTIMEZONE": "Backend cannot start normally because Database Timezones are not set up.",
-                "IPADDRESS": "Backend cannot start normally because General, Host Address, Primary IP Address is not set.",
-                "SCHEMAUPDATE": "Backend cannot start normally because Database Schema Update failed.",
+                "DBSETUP": "Backend could not start normally because Database Setup was not complete.",
+                "DBTIMEZONE": "Backend could not start normally because Database Timezones were not set up.",
+                "IPADDRESS": "Backend could not start normally because General, Host Address, Primary IP Address was not set.",
+                "SCHEMAUPDATE": "Backend could not start normally because Database Schema Update failed.",
                 "WEBONLYPARM": "Backend is in restricted mode due to user request or webonly parameter."
             }
         },

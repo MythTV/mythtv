@@ -1309,10 +1309,10 @@
             "title": "MythTV-Setup",
             "upcomingrec": "Nächste bevorstehende Aufnahme: {{Title}} um {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Das Backend kann nicht normal gestartet werden, da die Datenbankeinrichtung nicht abgeschlossen ist.",
-                "DBTIMEZONE": "Das Backend kann nicht normal starten, da die Datenbankzeitzonen nicht eingerichtet sind.",
-                "IPADDRESS": "Das Backend kann nicht normal starten, da „Allgemein“, „Hostadresse“ und „Primäre IP-Adresse“ nicht festgelegt sind.",
-                "SCHEMAUPDATE": "Das Backend kann nicht normal gestartet werden, da die Aktualisierung des Datenbankschemas fehlgeschlagen ist.",
+                "DBSETUP": "Das Backend konnte nicht normal gestartet werden, da die Datenbankeinrichtung nicht abgeschlossen war.",
+                "DBTIMEZONE": "Das Backend konnte nicht normal gestartet werden, da keine Datenbankzeitzonen eingerichtet wurden.",
+                "IPADDRESS": "Das Backend konnte nicht normal starten, da „Allgemein“, „Hostadresse“ und „Primäre IP-Adresse“ nicht festgelegt waren.",
+                "SCHEMAUPDATE": "Das Backend konnte nicht normal gestartet werden, da die Aktualisierung des Datenbankschemas fehlgeschlagen ist.",
                 "WEBONLYPARM": "Das Backend befindet sich aufgrund einer Benutzeranfrage oder eines Webonly-Parameters im eingeschränkten Modus."
             }
         },

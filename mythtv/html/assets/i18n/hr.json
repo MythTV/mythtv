@@ -1309,11 +1309,11 @@
             "title": "Postavljanje MythTV-a",
             "upcomingrec": "Sljedeće nadolazeće snimanje: {{Title}} u {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Pozadina se ne može pokrenuti normalno jer postavljanje baze podataka nije dovršeno.",
-                "DBTIMEZONE": "Pozadina se ne može pokrenuti normalno jer vremenske zone baze podataka nisu postavljene.",
-                "IPADDRESS": "Pozadina se ne može pokrenuti normalno jer Općenito, Adresa glavnog računala, Primarna IP adresa nisu postavljeni.",
-                "SCHEMAUPDATE": "Pozadina se ne može pokrenuti normalno jer ažuriranje sheme baze podataka nije uspjelo.",
-                "WEBONLYPARM": "Pozadina je u ograničenom načinu rada zbog korisničkog zahtjeva ili parametra samo za web."
+                "DBSETUP": "Backlend nije mogao normalno početi jer postavljanje baze podataka nije bilo dovršeno.",
+                "DBTIMEZONE": "Povratak nije mogao početi normalno jer vremenske zone baze podataka nisu postavljene.",
+                "IPADDRESS": "Backlend nije mogao početi normalno jer opća, adresa hosta, primarna IP adresa nije postavljena.",
+                "SCHEMAUPDATE": "BackEnd nije mogao početi normalno jer ažuriranje sheme baze podataka nije uspjelo.",
+                "WEBONLYPARM": "Povratak je u ograničenom načinu rada zbog korisničkog zahtjeva ili parametra WebOnly."
             }
         },
         "misc": {

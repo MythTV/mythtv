@@ -1309,10 +1309,10 @@
             "title": "Configuración de MyTVTV",
             "upcomingrec": "Próxima grabación: {{Title}} a las {{StartTime}}. Estado: {{Status}}",
             "webonly": {
-                "DBSETUP": "El backend no puede iniciarse normalmente porque la configuración de la base de datos no está completa.",
-                "DBTIMEZONE": "El backend no puede iniciarse normalmente porque las zonas horarias de la base de datos no están configuradas.",
-                "IPADDRESS": "El backend no puede iniciarse normalmente porque General, Dirección de host y Dirección IP principal no están configurados.",
-                "SCHEMAUPDATE": "El backend no puede iniciarse normalmente porque falló la actualización del esquema de la base de datos.",
+                "DBSETUP": "El backend no pudo iniciarse normalmente porque la configuración de la base de datos no se completó.",
+                "DBTIMEZONE": "El backend no pudo iniciarse normalmente porque las zonas horarias de la base de datos no estaban configuradas.",
+                "IPADDRESS": "El backend no pudo iniciarse normalmente porque no se configuraron General, Dirección de host y Dirección IP principal.",
+                "SCHEMAUPDATE": "El backend no pudo iniciarse normalmente porque falló la actualización del esquema de la base de datos.",
                 "WEBONLYPARM": "El backend está en modo restringido debido a una solicitud del usuario o un parámetro exclusivo de la web."
             }
         },

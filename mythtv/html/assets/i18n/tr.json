@@ -1309,10 +1309,10 @@
             "title": "MythTV Kurulumu",
             "upcomingrec": "Sıradaki kayıt: {{Title}}, {{StartTime}}. Durum: {{Status}}",
             "webonly": {
-                "DBSETUP": "Veritabanı Kurulumu tamamlanmadığından arka uç normal şekilde başlatılamıyor.",
-                "DBTIMEZONE": "Veritabanı Saat Dilimleri ayarlanmadığından arka uç normal şekilde başlatılamıyor.",
-                "IPADDRESS": "Genel, Ana Bilgisayar Adresi, Birincil IP Adresi ayarlanmadığından arka uç normal şekilde başlatılamıyor.",
-                "SCHEMAUPDATE": "Veritabanı Şeması Güncellemesi başarısız olduğundan arka uç normal şekilde başlatılamıyor.",
+                "DBSETUP": "Veritabanı Kurulumu tamamlanmadığından arka uç normal şekilde başlatılamadı.",
+                "DBTIMEZONE": "Veritabanı Saat Dilimleri ayarlanmadığından arka uç normal şekilde başlatılamadı.",
+                "IPADDRESS": "Genel, Ana Bilgisayar Adresi, Birincil IP Adresi ayarlanmadığından arka uç normal şekilde başlatılamadı.",
+                "SCHEMAUPDATE": "Veritabanı Şeması Güncellemesi başarısız olduğundan arka uç normal şekilde başlatılamadı.",
                 "WEBONLYPARM": "Kullanıcı isteği veya webonly parametresi nedeniyle arka uç kısıtlı modda."
             }
         },

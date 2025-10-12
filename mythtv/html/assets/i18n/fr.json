@@ -1309,11 +1309,11 @@
             "title": "Configuration Myth TV",
             "upcomingrec": "Prochain enregistrement à venir : {{Title}} à {{StartTime}}. Statut : {{Status}}",
             "webonly": {
-                "DBSETUP": "Le backend ne peut pas démarrer normalement car la configuration de la base de données n'est pas terminée.",
-                "DBTIMEZONE": "Le backend ne peut pas démarrer normalement car les fuseaux horaires de la base de données ne sont pas configurés.",
-                "IPADDRESS": "Le backend ne peut pas démarrer normalement car Général, Adresse hôte et Adresse IP principale ne sont pas définis.",
-                "SCHEMAUPDATE": "Le backend ne peut pas démarrer normalement car la mise à jour du schéma de base de données a échoué.",
-                "WEBONLYPARM": "Le backend est en mode restreint en raison d'une demande de l'utilisateur ou d'un paramètre Webonly."
+                "DBSETUP": "Le backend n'a pas pu démarrer normalement car la configuration de la base de données n'était pas terminée.",
+                "DBTIMEZONE": "Le backend n'a pas pu démarrer normalement car les fuseaux horaires de la base de données n'ont pas été configurés.",
+                "IPADDRESS": "Le backend n'a pas pu démarrer normalement car Général, Adresse hôte, Adresse IP principale n'ont pas été définis.",
+                "SCHEMAUPDATE": "Le backend n'a pas pu démarrer normalement car la mise à jour du schéma de base de données a échoué.",
+                "WEBONLYPARM": "Le backend est en mode restreint en raison d'une demande de l'utilisateur ou d'un paramètre webonly."
             }
         },
         "misc": {

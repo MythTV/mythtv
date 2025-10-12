@@ -1309,11 +1309,11 @@
             "title": "Configuració de MythTV",
             "upcomingrec": "Pròxima gravació: {{Title}} a {{StartTime}}. Estat: {{Status}}",
             "webonly": {
-                "DBSETUP": "El backend no pot iniciar-se normalment perquè la configuració de la base de dades no s'ha completat.",
-                "DBTIMEZONE": "El backend no pot començar amb normalitat perquè les zones horàries de la base de dades no estan configurades.",
-                "IPADDRESS": "El backend no pot iniciar-se amb normalitat perquè no s'estableix l'adreça general, l'adreça de l'amfitrió i l'adreça IP principal.",
-                "SCHEMAUPDATE": "El backend no pot iniciar-se normalment perquè l'actualització de l'esquema de la base de dades ha fallat.",
-                "WEBONLYPARM": "El backend està en mode restringit a causa de la sol·licitud de l'usuari o d'un paràmetre només web."
+                "DBSETUP": "Backend no va poder començar normalment perquè la configuració de la base de dades no estava completa.",
+                "DBTIMEZONE": "El backend no podia començar normalment perquè no es configuren zones horàries de base de dades.",
+                "IPADDRESS": "El backend no va poder començar normalment perquè no es va definir l'adreça IP general, l'adreça IP primària.",
+                "SCHEMAUPDATE": "El backend no va poder començar normalment perquè l'actualització de l'esquema de bases de dades ha fallat.",
+                "WEBONLYPARM": "El backend està en mode restringit a causa de la sol·licitud de l'usuari o del paràmetre web."
             }
         },
         "misc": {

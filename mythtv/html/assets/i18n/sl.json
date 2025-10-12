@@ -1309,11 +1309,11 @@
             "title": "Nastavitev MythTV",
             "upcomingrec": "Naslednji prihajajoči posnetek: {{Title}} ob {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Zaledje se ne more normalno zagnati, ker nastavitev baze podatkov ni dokončana.",
-                "DBTIMEZONE": "Zaledje se ne more normalno zagnati, ker časovni pasovi zbirke podatkov niso nastavljeni.",
-                "IPADDRESS": "Zaledje se ne more normalno zagnati, ker Splošno, Naslov gostitelja, Primarni naslov IP ni nastavljen.",
-                "SCHEMAUPDATE": "Zaledje se ne more normalno zagnati, ker posodobitev sheme baze podatkov ni uspela.",
-                "WEBONLYPARM": "Zaledje je v omejenem načinu zaradi zahteve uporabnika ali parametra samo za splet."
+                "DBSETUP": "Backdend se ni mogel zagnati normalno, ker nastavitev baze podatkov ni bila končana.",
+                "DBTIMEZONE": "Backdend se ni mogel zagnati normalno, ker časovne pasove baze podatkov niso bile nastavljene.",
+                "IPADDRESS": "Backdend se ni mogel zagnati normalno, ker splošni, gostiteljski naslov, primarni IP naslov ni bil nastavljen.",
+                "SCHEMAUPDATE": "Backdend se ni mogel zagnati normalno, ker posodobitev sheme baze podatkov ni uspela.",
+                "WEBONLYPARM": "Backdend je v omejenem načinu zaradi zahteve uporabnikov ali parametra WebOnly."
             }
         },
         "misc": {

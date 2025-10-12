@@ -1309,11 +1309,11 @@
             "title": "MythTV beállítása",
             "upcomingrec": "Következő felvétel: {{Title}}, {{StartTime}}. Állapot: {{Status}}",
             "webonly": {
-                "DBSETUP": "A háttérprogram nem indul el normálisan, mert az adatbázis-beállítás nem fejeződött be.",
-                "DBTIMEZONE": "A háttérprogram nem indul el normálisan, mert az adatbázis időzónái nincsenek beállítva.",
-                "IPADDRESS": "A háttérprogram nem indul el normálisan, mert az Általános, a Gazdagép címe és az Elsődleges IP-cím nincs beállítva.",
-                "SCHEMAUPDATE": "A háttérprogram nem indul el rendesen, mert az adatbázisséma frissítése meghiúsult.",
-                "WEBONLYPARM": "A háttérprogram korlátozott módban van a felhasználói kérés vagy a webonly paraméter miatt."
+                "DBSETUP": "A háttér nem tudott normálisan elindulni, mert az adatbázis beállítása nem volt teljes.",
+                "DBTIMEZONE": "A háttér nem tudott normálisan elindulni, mert az adatbázis -időzónákat nem állították be.",
+                "IPADDRESS": "A háttér nem tudott normálisan elindulni, mert az általános, a host címet, az elsődleges IP -címet nem állították be.",
+                "SCHEMAUPDATE": "A háttérkép nem indult normálisan, mert az adatbázis -séma frissítése sikertelen.",
+                "WEBONLYPARM": "A háttér korlátozott módban van a felhasználói kérés vagy a webonly paraméter miatt."
             }
         },
         "misc": {

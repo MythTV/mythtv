@@ -1309,11 +1309,11 @@
             "title": "神話電視設置",
             "upcomingrec": "下一個即將錄製的節目：{{Title}}，時間：{{StartTime}}。狀態：{{Status}}",
             "webonly": {
-                "DBSETUP": "由於資料庫安裝未完成，後端無法正常啟動。",
-                "DBTIMEZONE": "由於資料庫時區未設置，後端無法正常啟動。",
-                "IPADDRESS": "由於未設定常規、主機位址、主 IP 位址，後端無法正常啟動。",
-                "SCHEMAUPDATE": "由於資料庫架構更新失敗，後端無法正常啟動。",
-                "WEBONLYPARM": "由於使用者請求或 webonly 參數，後端處於受限模式。"
+                "DBSETUP": "由於數據庫安裝未完成，後端無法正常啟動。",
+                "DBTIMEZONE": "由於未設置數據庫時區，後端無法正常啟動。",
+                "IPADDRESS": "由於未設置常規、主機地址、主 IP 地址，後端無法正常啟動。",
+                "SCHEMAUPDATE": "由於數據庫架構更新失敗，後端無法正常啟動。",
+                "WEBONLYPARM": "由於用戶請求或 webonly 參數，後端處於受限模式。"
             }
         },
         "misc": {

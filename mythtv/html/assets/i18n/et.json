@@ -1309,11 +1309,11 @@
             "title": "MythTV seadistamine",
             "upcomingrec": "Järgmine salvestus: {{Title}} kell {{StartTime}}. Olek: {{Status}}",
             "webonly": {
-                "DBSETUP": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasi häälestus pole lõppenud.",
-                "DBTIMEZONE": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasi ajavööndid pole seadistatud.",
-                "IPADDRESS": "Taustaprogramm ei saa normaalselt käivituda, kuna Üldine, Hostiaadress, Peamine IP-aadress pole määratud.",
-                "SCHEMAUPDATE": "Taustaprogramm ei saa normaalselt käivituda, kuna andmebaasiskeemi värskendamine ebaõnnestus.",
-                "WEBONLYPARM": "Taustaprogramm on kasutaja taotluse või ainult veebiparameetri tõttu piiratud režiimis."
+                "DBSETUP": "Backend ei saanud normaalselt käivituda, kuna andmebaasi seadistamine polnud täielik.",
+                "DBTIMEZONE": "Taustaprogramm ei saanud normaalselt käivituda, kuna andmebaasi ajavööndeid ei seatud.",
+                "IPADDRESS": "Taustaprogramm ei saanud normaalselt käivituda, kuna üldine, hostiaadress, esmane IP -aadress ei olnud seatud.",
+                "SCHEMAUPDATE": "Backend ei saanud normaalselt käivituda, kuna andmebaasi skeemi värskendus ebaõnnestus.",
+                "WEBONLYPARM": "Backend on kasutajataotluse või parameetri Webonly parameetri tõttu piiratud režiimis."
             }
         },
         "misc": {

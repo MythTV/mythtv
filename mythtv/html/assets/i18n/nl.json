@@ -1309,10 +1309,10 @@
             "title": "MythTV-installatie",
             "upcomingrec": "Eerstvolgende opname: {{Title}} om {{StartTime}}. Status: {{Status}}",
             "webonly": {
-                "DBSETUP": "Backend kan niet normaal starten omdat de database-installatie niet is voltooid.",
-                "DBTIMEZONE": "Backend kan niet normaal starten omdat Database-tijdzones niet zijn ingesteld.",
-                "IPADDRESS": "Backend kan niet normaal starten omdat Algemeen, Hostadres en Primair IP-adres niet zijn ingesteld.",
-                "SCHEMAUPDATE": "Backend kan niet normaal starten omdat het bijwerken van het databaseschema is mislukt.",
+                "DBSETUP": "Backend kon niet normaal starten omdat de database-installatie niet was voltooid.",
+                "DBTIMEZONE": "Backend kon niet normaal starten omdat de databasetijdzones niet waren ingesteld.",
+                "IPADDRESS": "Backend kon niet normaal starten omdat Algemeen, Hostadres en Primair IP-adres niet waren ingesteld.",
+                "SCHEMAUPDATE": "Backend kon niet normaal starten omdat het bijwerken van het databaseschema mislukte.",
                 "WEBONLYPARM": "Backend bevindt zich in de beperkte modus vanwege een gebruikersverzoek of een webonly-parameter."
             }
         },
