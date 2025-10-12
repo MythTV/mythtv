@@ -6254,7 +6254,7 @@ bool LoadFromRecorded(
 
                 else if (field == "originalairdate")
                 {
-                    field = "COALESCE(r.originalairdate, STR_TO_DATE(CONCAT(p.airdate,',01,01'),'%Y,%m,%d'))";
+                    field = "IF(r.originalairdate != '0000-00-00', r.originalairdate, STR_TO_DATE(CONCAT(p.airdate,',01,01'),'%Y,%m,%d'))";
                     table = "";
                 }
 
