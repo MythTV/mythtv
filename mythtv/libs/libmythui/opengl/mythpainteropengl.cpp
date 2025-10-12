@@ -12,9 +12,10 @@
 #include "mythrenderopengl.h"
 #include "mythpainteropengl.h"
 
-MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL* Render, MythMainWindow* Parent)
-  : MythPainterGPU(Parent),
-    m_render(Render)
+MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL* Render,
+                                     MythMainWindow* Parent)
+  : MythPainterGPU(Parent)
+  , m_render(Render)
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
 
@@ -238,12 +239,6 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     return texture;
 }
 
-#ifdef Q_OS_MACOS
-#define DEST dest
-#else
-#define DEST Dest
-#endif
-
 void MythOpenGLPainter::DrawImage(const QRect Dest, MythImage *Image,
                                   const QRect Source, int Alpha)
 {
@@ -252,22 +247,23 @@ void MythOpenGLPainter::DrawImage(const QRect Dest, MythImage *Image,
         qreal pixelratio = 1.0;
         if (m_usingHighDPI && m_viewControl.testFlag(Viewport))
             pixelratio = m_pixelRatio;
-#ifdef Q_OS_MACOS
+
         QRect dest = QRect(static_cast<int>(Dest.left()   * pixelratio),
                            static_cast<int>(Dest.top()    * pixelratio),
                            static_cast<int>(Dest.width()  * pixelratio),
                            static_cast<int>(Dest.height() * pixelratio));
-#endif
 
-        // Drawing an image multiple times with the same VBO will stall most GPUs as
-        // the VBO is re-mapped whilst still in use. Use a pooled VBO instead.
+        // Drawing an image multiple times with the same VBO will
+        // stall most GPUs as the VBO is re-mapped whilst still in
+        // use. Use a pooled VBO instead.
         MythGLTexture *texture = GetTextureFromCache(Image);
         if (texture && m_mappedTextures.contains(texture))
         {
             QOpenGLBuffer *vbo = texture->m_vbo;
             texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx];
             texture->m_destination = QRect();
-            m_render->DrawBitmap(texture, nullptr, Source, DEST, nullptr, Alpha, pixelratio);
+            m_render->DrawBitmap(texture, nullptr, Source, dest,
+                                 nullptr, Alpha, pixelratio);
             texture->m_destination = QRect();
             texture->m_vbo = vbo;
             if (++m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
@@ -275,7 +271,8 @@ void MythOpenGLPainter::DrawImage(const QRect Dest, MythImage *Image,
         }
         else
         {
-            m_render->DrawBitmap(texture, nullptr, Source, DEST, nullptr, Alpha, pixelratio);
+            m_render->DrawBitmap(texture, nullptr, Source, dest,
+                                 nullptr, Alpha, pixelratio);
             m_mappedTextures.append(texture);
         }
     }
