@@ -308,3 +308,5 @@ void UPnp::EnableNotificatins(std::chrono::milliseconds /*unused*/) const
 {
     SSDP::Instance()->EnableNotifications(m_nServicePort);
 }
+
+#include "moc_upnp.cpp"

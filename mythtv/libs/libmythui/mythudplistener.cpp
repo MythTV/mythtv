@@ -235,3 +235,5 @@ void MythUDP::StopUDPListener()
     delete Instance().m_listener;
     Instance().m_listener = nullptr;
 }
+
+#include "moc_mythudplistener.cpp"

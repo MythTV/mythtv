@@ -28,3 +28,5 @@ void MythPainterGPU::CurrentDPIChanged(qreal DPI)
         QString("High DPI scaling %1")
         .arg(m_usingHighDPI ? "enabled" : "disabled"));
 }
+
+#include "moc_mythpaintergpu.cpp"

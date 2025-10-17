@@ -205,3 +205,4 @@ void MythPlayerAudioUI::AdjustAudioTimecodeOffset(std::chrono::milliseconds Delt
         emit AudioStateChanged({ &m_audio, newwrap });
 }
 
+#include "moc_mythplayeraudioui.cpp"

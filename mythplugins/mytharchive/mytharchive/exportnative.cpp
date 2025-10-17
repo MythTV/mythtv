@@ -492,3 +492,5 @@ void ExportNative::handleAddVideo()
     if (selector->Create())
         mainStack->AddScreen(selector);
 }
+
+#include "moc_exportnative.cpp"

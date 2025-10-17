@@ -91,3 +91,4 @@ bool MythScreenSaverAndroid::Asleep()
     return false;
 }
 
+#include "moc_mythscreensaverandroid.cpp"

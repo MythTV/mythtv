@@ -370,3 +370,5 @@ void PlayGroupEditor::Load()
     //TODO select the new one or the edited one
     emit settingsChanged(nullptr);
 }
+
+#include "moc_playgroup.cpp"

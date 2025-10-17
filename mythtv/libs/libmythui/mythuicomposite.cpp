@@ -46,3 +46,5 @@ void MythUIComposite::ResetMap(const InfoMap &infoMap)
             group->ResetMap(infoMap);
     }
 }
+
+#include "moc_mythuicomposite.cpp"

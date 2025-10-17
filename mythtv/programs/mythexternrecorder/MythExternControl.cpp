@@ -659,3 +659,5 @@ void Buffer::Run(void)
     m_parent->m_bufferRunning = false;
     m_parent->m_flowCond.notify_all();
 }
+
+#include "moc_MythExternControl.cpp"
