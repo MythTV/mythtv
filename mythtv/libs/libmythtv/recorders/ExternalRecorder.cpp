@@ -108,7 +108,7 @@ void ExternalRecorder::run(void)
 
         if (m_streamHandler->IsDamaged())
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC +
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Recording is damaged. Setting status to %1")
                 .arg(RecStatus::toString(RecStatus::Failing, kSingleRecord)));
             SetRecordingStatus(RecStatus::Failing, __FILE__, __LINE__);

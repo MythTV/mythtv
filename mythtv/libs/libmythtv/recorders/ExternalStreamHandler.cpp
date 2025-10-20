@@ -1073,7 +1073,7 @@ bool ExternalStreamHandler::RestartStream(void)
 {
     bool streaming = (StreamingCount() > 0);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
+    LOG(VB_RECORD, LOG_WARNING, LOC + "Restarting stream.");
     m_damaged = true;
 
     if (streaming)
@@ -1593,12 +1593,18 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
                     if (serial >= m_serialNo)
                         break;
 
-                    if (elements.contains("status") &&
-                        elements["status"] != "OK")
+                    if (elements.contains("status"))
                     {
-                        LOG(VB_RECORD, LOG_WARNING, LOC + QString("%1: %2")
-                            .arg(elements["status"].toString(),
-                                 elements["message"].toString()));
+                        LogLevel_t level { LOG_INFO };
+
+                        if (elements["status"] == "ERR")
+                            level = LOG_ERR;
+                        else if (elements["status"] == "WARN")
+                            level = LOG_WARNING;
+
+                        LOG(VB_RECORD, level, LOC + QString("%1: %2")
+                                .arg(elements["status"].toString(),
+                                     elements["message"].toString()));
                     }
                 }
             }
@@ -1735,7 +1741,9 @@ bool ExternalStreamHandler::CheckForError(void)
                         m_damaged |= true;
                     }
                     LOG(VB_RECORD, level,
-                        LOC + elements["message"].toString());
+                        LOC + QString("%1:%2%3")
+                        .arg(status, elements["message"].toString())
+                        .arg(m_damaged ? " (Damaged)" : ""));
                 }
             }
         }

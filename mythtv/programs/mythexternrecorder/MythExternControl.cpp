@@ -317,7 +317,7 @@ bool Commands::ProcessCommand(const QString & query)
     else if (cmd == "Description?")
     {
         if (m_parent->m_desc.trimmed().isEmpty())
-            SendStatus(cmd, "WARN", serial, "Not set");
+            SendStatus(cmd, "OK", serial, "Not set");
         else
             SendStatus(cmd, "OK", serial, m_parent->m_desc.trimmed());
     }

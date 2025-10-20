@@ -207,7 +207,7 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
     if (setting)
         SetOption(name, setting->getValue().toInt());
     else
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("SetIntOption(...%1): Option not in profile.").arg(name));
 }
 
@@ -217,7 +217,7 @@ void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
     if (setting)
         SetOption(name, setting->getValue());
     else
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("SetStrOption(...%1): Option not in profile.").arg(name));
 }
 
@@ -886,8 +886,8 @@ RecorderBase *RecorderBase::CreateRecorder(
     }
 #if CONFIG_V4L2
     else if ((genOpt.m_inputType == "MPEG") ||
-	     (genOpt.m_inputType == "HDPVR") ||
-	     (genOpt.m_inputType == "DEMO"))
+             (genOpt.m_inputType == "HDPVR") ||
+             (genOpt.m_inputType == "DEMO"))
     {
         recorder = new MpegRecorder(tvrec);
     }
