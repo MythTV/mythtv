@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_IPTVRECORDER_H
+#define LIBMYTHTV_TEST_IPTVRECORDER_H
 
 #include <QTest>
 
@@ -487,3 +489,5 @@ class TestIPTVRecorder: public QObject
         QCOMPARE (ts_packet2.GetTSDataSize(), (unsigned int)7 * 188);
     }
 };
+
+#endif // LIBMYTHTV_TEST_IPTVRECORDER_H

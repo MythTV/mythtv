@@ -76,3 +76,5 @@ bool PlotDialog::Create()
 
     return true;
 }
+
+#include "moc_videopopups.cpp"

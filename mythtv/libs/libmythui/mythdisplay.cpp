@@ -38,6 +38,7 @@
 #if CONFIG_X11
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
+#include "platforms/mythxdisplay.h"
 #endif
 #if CONFIG_DRM
 #include "platforms/mythdisplaydrm.h"
@@ -1269,3 +1270,5 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     if (forcevrr && !(gsyncchanged || freesyncchanged))
         LOG(VB_GENERAL, LOG_INFO, LOC + "Variable refresh rate not adjusted");
 }
+
+#include "moc_mythdisplay.cpp"

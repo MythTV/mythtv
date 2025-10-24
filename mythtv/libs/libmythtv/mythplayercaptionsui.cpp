@@ -664,3 +664,5 @@ void MythPlayerCaptionsUI::StreamPlay(bool Playing)
     else
         Pause();
 }
+
+#include "moc_mythplayercaptionsui.cpp"

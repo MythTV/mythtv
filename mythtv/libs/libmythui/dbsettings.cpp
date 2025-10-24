@@ -206,3 +206,5 @@ DatabaseSettings::~DatabaseSettings()
 {
     emit isClosing();
 }
+
+#include "moc_dbsettings.cpp"

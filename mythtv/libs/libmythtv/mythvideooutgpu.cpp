@@ -772,3 +772,5 @@ void MythVideoOutputGPU::ResizeForVideo(QSize Size)
     if (hide)
         m_mainWindow->Show();
 }
+
+#include "moc_mythvideooutgpu.cpp"

@@ -538,3 +538,5 @@ void IPTVStreamHandlerWriteHelper::SendRTCPReport(void)
                                           m_parent->m_rtspRtcpPort);
     m_previousLastSequenceNumber = m_lastSequenceNumber;
 }
+
+#include "moc_iptvstreamhandler.cpp"

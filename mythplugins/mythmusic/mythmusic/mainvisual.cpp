@@ -281,3 +281,5 @@ void MainVisual::customEvent(QEvent *event)
         m_playing = false;
     }
 }
+
+#include "moc_mainvisual.cpp"

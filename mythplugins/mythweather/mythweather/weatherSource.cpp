@@ -602,3 +602,4 @@ void WeatherSource::processData()
     }
 }
 
+#include "moc_weatherSource.cpp"
