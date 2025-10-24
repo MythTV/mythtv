@@ -9,31 +9,23 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
 #ifndef UPNPTASKSEARCH_H
 #define UPNPTASKSEARCH_H
 
-// Qt headers
-#include <QList>
-#include <QHostAddress>
+#include <chrono>
+using namespace std::chrono_literals;
 
-#include "libmythupnp/msocketdevice.h"
+// Qt headers
+#include <QHostAddress>
+#include <QString>
+#include <QUdpSocket>
+
 #include "libmythupnp/taskqueue.h"
 #include "libmythupnp/upnpdevice.h"
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpSearchTask Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
 class UPnpSearchTask : public Task
 {
-    protected: 
-
-        QList<QHostAddress>     m_addressList;
+    protected:
         int                     m_nServicePort;
         std::chrono::seconds    m_nMaxAge      {1h};
 
@@ -42,30 +34,21 @@ class UPnpSearchTask : public Task
         QString         m_sST; 
         QString         m_sUDN;
 
-
-    protected:
-
         // Destructor protected to force use of Release Method
-
         ~UPnpSearchTask() override = default;
 
-        void     ProcessDevice ( MSocketDevice *pSocket, UPnpDevice *pDevice );
-        void     SendMsg       ( MSocketDevice  *pSocket,
-                                 const QString&  sST,
-                                 const QString&  sUDN );
+        void ProcessDevice(QUdpSocket& socket, const UPnpDevice& device);
+        void SendMsg(QUdpSocket& socket, const QString& sST, const QString& sUDN);
 
     public:
-
         UPnpSearchTask( int          nServicePort,
-                        const QHostAddress& peerAddress,
+                        QHostAddress peerAddress,
                         int          nPeerPort,  
                         QString      sST, 
                         QString      sUDN );
 
         QString Name() override { return( "Search" ); } // Task
         void Execute( TaskQueue *pQueue ) override; // Task
-
 };
-
 
 #endif // UPNPTASKSEARCH_H
