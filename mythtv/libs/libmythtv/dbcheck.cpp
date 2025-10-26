@@ -1229,6 +1229,14 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1384")
+    {
+        // Add post-season baseball listings for the MLB provider.
+        DBUpdates updates = getRecordingExtenderDbInfo(3);
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1385", dbver))
+            return false;
+    }
     return true;
 }
 
@@ -3674,6 +3682,17 @@ DBUpdates getRecordingExtenderDbInfo (int version)
               (1,1000,'basketball', 'Chattanooga',  'UT-Chattanooga', 0, 'Chattanooga'),
               (1,1100,'basketball', 'UT',           'UT-', 0, 'UT ');
               )A",
+        };
+
+      case 3:
+        return {
+            // Missed post-season baseball listing titles for the MLB provider.
+
+            R"(INSERT INTO sportslisting (api,title)
+            VALUES
+              (1000, '\\A(?:MLB All-Star Game)\\z'),
+              (1000, '\\A(?:World Series)\\z');
+              )",
         };
 
       default:
