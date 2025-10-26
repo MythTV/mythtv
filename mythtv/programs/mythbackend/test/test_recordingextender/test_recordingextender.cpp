@@ -63,6 +63,12 @@ static void convertToSqlite (DBUpdates& updates)
 
 static bool enableSqliteRegex (void)
 {
+    // Skip these sqlite tests for macOS as macports has a dated sqlite-pcre
+    // impementation and homebrew no longer has one available.
+#ifdef Q_OS_DARWIN
+  return false;
+#endif
+
 #if CONFIG_SQLITE3
     MSqlQueryInfo info = MSqlQuery::InitCon();
 
