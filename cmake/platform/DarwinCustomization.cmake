@@ -108,6 +108,9 @@ endif()
 # Qt6 builds need a little help finding the libraries.
 list(APPEND CMAKE_FRAMEWORK_PATH "${_QT_BASE}")
 list(APPEND CMAKE_MODULE_PATH "${_QT_BASE}/lib/cmake")
+# Qt6 builds need a little help finding the plugins.
+set(ENV{QT_PLUGIN_PATH} "${_QT_BASE}/share/qt/plugins")
+set(ENV{QT_QPA_PLATFORM_PLUGIN_PATH} "${_QT_BASE}/share/qt/plugins")
 
 # ~~~
 # Using the Apple Clang compiler (version 13 tested) spits out this error:
