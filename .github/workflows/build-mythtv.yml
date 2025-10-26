@@ -315,12 +315,12 @@ jobs:
             qt_version: 'qt6'
             database_version: 'mariadb'
             extrapkgs: ''
-          #- desc: 'macOS 26 (Tahoe) arm64'
-          #  runner: 'macOS-26'
-          #  arch: 'arm64'
-          #  qt_version: 'qt6'
-          #  database_version: 'mariadb'
-          #  extrapkgs: ''
+          - desc: 'macOS 26 (Tahoe) arm64'
+            runner: 'macOS-26'
+            arch: 'arm64'
+            qt_version: 'qt6'
+            database_version: 'mariadb'
+            extrapkgs: ''
 
         compiler:
           - desc: 'clang'
