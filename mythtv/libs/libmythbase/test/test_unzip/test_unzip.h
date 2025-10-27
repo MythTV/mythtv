@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_UNZIP_H
+#define LIBMYTHBASE_TEST_UNZIP_H
 
 #include <QTest>
 #include <iostream>
@@ -33,3 +35,5 @@ private slots:
     static void test_text_file(void);
     static void test_theme_file(void);
 };
+
+#endif // LIBMYTHBASE_TEST_UNZIP_H

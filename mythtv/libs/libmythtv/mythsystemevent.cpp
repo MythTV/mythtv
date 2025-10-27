@@ -474,4 +474,4 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
         tr("Any event");
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythsystemevent.cpp"

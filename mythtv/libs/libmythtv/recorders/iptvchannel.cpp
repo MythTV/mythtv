@@ -212,4 +212,4 @@ bool IPTVChannel::Tune(const IPTVTuningData &tuning, bool scanning)
     return true;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_iptvchannel.cpp"

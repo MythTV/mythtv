@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHBASE_TEST_MYTHCOMMANDLINEPARSER_H
+#define LIBMYTHBASE_TEST_MYTHCOMMANDLINEPARSER_H
 
 #include <QTest>
 #include <QTemporaryFile>
@@ -44,3 +46,5 @@ private slots:
     static void test_parse_cmdline_data(void);
     static void test_parse_cmdline(void);
 };
+
+#endif // LIBMYTHBASE_TEST_MYTHCOMMANDLINEPARSER_H
