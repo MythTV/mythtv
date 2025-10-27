@@ -364,6 +364,11 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                              [[maybe_unused]] const bool informSystemd)
 {
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
+    QString dbver = gCoreContext->GetSetting("DBSchemaVer");
+    if (dbver != currentDatabaseVersion)
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Ignoring database changes between %1 and %2.")
+            .arg(dbver).arg(currentDatabaseVersion));
     return true;
 #endif
     // Suppress DB messages and turn of the settings cache,
