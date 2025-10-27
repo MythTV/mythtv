@@ -167,9 +167,9 @@ QDomNode MythTVMenu::GetNodeFromPath(const QString& path) const
         for (int i = 0 ; i < children.count(); i++)
         {
             auto child = children.at(i).toElement();
-            if (child.isNull() ||
-                (name == child.attribute("text")) ||
-                (name == child.attribute("XXXtext")))
+            if (!child.isNull() &&
+                ((name == child.attribute("text")) ||
+                (name == child.attribute("XXXtext"))))
             {
                 result = child;
                 found = true;
