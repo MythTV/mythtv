@@ -1224,6 +1224,27 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     // least common multiple of all framerates in a stream; this is a guess
     double estimated_fps = (Stream->r_frame_rate.den == 0) ? 0.0 : av_q2d(Stream->r_frame_rate);
 
+
+    // List of known, standards based frame rates
+    static const std::vector<double> k_standard_rates =
+    {
+        24000.0 / 1001.0,
+        23.976,
+        24.0,
+        25.0,
+        30000.0 / 1001.0,
+        29.97,
+        30.0,
+        50.0,
+        60000.0 / 1001.0,
+        59.94,
+        60.0,
+        100.0,
+        120000.0 / 1001.0,
+        119.88,
+        120.0
+    };
+
     // build a list of possible rates, best first
     std::vector<double> rates;
     rates.reserve(7);
@@ -1262,30 +1283,24 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
             QString("Selected FPS: %1 (Avg:%2 Mult:%3 Codec:%4 Container:%5 Estimated:%6)")
                 .arg(static_cast<double>(rates.front())).arg(avg_fps)
                 .arg(m_fpsMultiplier).arg(codec_fps).arg(container_fps).arg(estimated_fps));
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Sanitise:%1").arg(Sanitise) +
+            QString(" avg_fps:%1").arg(avg_fps) +
+            QString(" codec_fps:%1").arg(codec_fps) +
+            QString(" container_fps:%1").arg(container_fps) +
+            QString(" estimated_fps:%1").arg(estimated_fps) +
+            QString(" m_fps:%1").arg(m_fps));
+
+        QStringList rs;
+        for (auto rate : rates)
+            rs.append(QString::number(rate));
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Frame rates:%1").arg(rs.join(' ')));
     }
 
     auto IsStandard = [&FuzzyEquals](double Rate)
     {
-        // List of known, standards based frame rates
-        static const std::set<double> k_standard_rates =
-        {
-            24000.0 / 1001.0,
-            23.976,
-            24.0,
-            25.0,
-            30000.0 / 1001.0,
-            29.97,
-            30.0,
-            50.0,
-            60000.0 / 1001.0,
-            59.94,
-            60.0,
-            100.0,
-            120000.0 / 1001.0,
-            119.88,
-            120.0
-        };
-
         if (Rate > 23.0 && Rate < 121.0)
         {
             for (auto standard_rate : k_standard_rates)
@@ -1297,8 +1312,35 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
         //return k_standard_rates.find(rate) != k_standard_rates.end();
     };
 
+    auto NearestStandardFrameRate = [](double rate, double epsilon)
+    {
+        double result = rate;
+        double lowest_delta = rate;
+        for (auto standard_rate : k_standard_rates)
+        {
+            double delta = std::abs(rate - standard_rate);
+            if ((delta < lowest_delta) && (delta < epsilon))
+            {
+                lowest_delta = delta;
+                result = standard_rate;
+            }
+        }
+        return result;
+    };
+
     // If the first choice rate is unusual, see if there is something more 'usual'
     double detected = rates.front();
+
+    // Round the detected frame rate to the nearest standard frame rate
+    // when the detected frame rate is within 3 fps of the nearest standard frame rate.
+    {
+        double nearest = NearestStandardFrameRate(detected, 3.0);
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Frame rate %1 rounded to nearest standard rate %2")
+                .arg(detected, 0, 'f', 2).arg(nearest, 0, 'f', 2));
+        detected = nearest;
+    }
+
     if (Sanitise && !IsStandard(detected))
     {
         for (auto rate : rates)
