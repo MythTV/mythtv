@@ -1742,8 +1742,8 @@ bool ExternalStreamHandler::CheckForError(void)
                     }
                     LOG(VB_RECORD, level,
                         LOC + QString("%1:%2%3")
-                        .arg(status, elements["message"].toString())
-                        .arg(m_damaged ? " (Damaged)" : ""));
+                        .arg(status, elements["message"].toString(),
+                             m_damaged ? " (Damaged)" : ""));
                 }
             }
         }
