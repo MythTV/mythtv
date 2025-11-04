@@ -1236,12 +1236,17 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1384")
     {
+        // Remove possible inconsistent data from 1384.
+        DBUpdates updates = getRecordingExtenderDbInfo(-3);
+        performUpdateSeries("MythTV", updates);
+
         // Add post-season baseball listings for the MLB provider.
-        DBUpdates updates = getRecordingExtenderDbInfo(3);
+        updates = getRecordingExtenderDbInfo(3);
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1385", dbver))
             return false;
     }
+
     return true;
 }
 
@@ -3698,6 +3703,12 @@ DBUpdates getRecordingExtenderDbInfo (int version)
               (1000, '\\A(?:MLB All-Star Game)\\z'),
               (1000, '\\A(?:World Series)\\z');
               )",
+        };
+      case -3:
+        return {
+            // Remove data not cleaned up when 1385 reverted to 1384.
+            R"(DELETE FROM sportslisting WHERE api=1000 AND title LIKE '%All-Star Game%')",
+            R"(DELETE FROM sportslisting WHERE api=1000 AND title LIKE '%World Series%')",
         };
 
       default:
