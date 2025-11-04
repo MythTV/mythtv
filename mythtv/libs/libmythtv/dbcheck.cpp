@@ -413,7 +413,7 @@ static bool tryUpgradeTVDatabaseSchema(bool upgradeAllowed, bool upgradeIfNoUI, 
     // In commit 08a7b58a73 the schema was upgraded to 1385 in fixes/35
     // This should not be done in a fixes branch.
     QString ver = gCoreContext->GetSetting("DbSchemaVer");
-    if (ver == "1385" && currentDatabaseVersion == "1384") {
+    if (upgradeAllowed && ver == "1385" && currentDatabaseVersion == "1384") {
         gCoreContext->SaveSettingOnHost("DbSchemaVer","1384", nullptr);
         LOG(VB_GENERAL, LOG_WARNING, "Downgrading Database from version 1385 to 1384.");
     }
