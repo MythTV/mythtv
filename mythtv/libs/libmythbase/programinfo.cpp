@@ -4359,6 +4359,7 @@ static void delete_markup_datum(
         MythDB::DBError("delete_markup_datum", query);
 }
 
+// Delete all marks of the given type
 static void delete_markup_datum(
     MarkTypes type, const QString &videoPath)
 {
@@ -4368,6 +4369,24 @@ static void delete_markup_datum(
                 " WHERE filename = :PATH "
                 " AND type = :TYPE ;");
     query.bindValue(":PATH", videoPath);
+    query.bindValue(":TYPE", type);
+
+    if (!query.exec())
+        MythDB::DBError("delete_markup_datum", query);
+}
+
+// Delete the specified mark of the given type
+static void delete_markup_datum(
+    MarkTypes type, uint mark, const QString &videoPath)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM filemarkup"
+                " WHERE filename = :PATH "
+                " AND mark = :MARK "
+                " AND type = :TYPE ;");
+    query.bindValue(":PATH", videoPath);
+    query.bindValue(":MARK", mark);
     query.bindValue(":TYPE", type);
 
     if (!query.exec())
@@ -4413,12 +4432,17 @@ static void insert_markup_datum(
 
 
 /// \brief Store the Total Duration at frame 0 in the recordedmarkup table
+//
+// The type MARK_DURATION_MS is used for the total duration when mark is 0.
+// For video files this type is also for duration of each key frame
+// when the mark is not 0.
+// For video files the duration is saved in the filemarkup table.
 void ProgramInfo::SaveTotalDuration(std::chrono::milliseconds duration)
 {
     if (IsVideo())
     {
         auto videoPath = StorageGroup::GetRelativePathname(m_pathname);
-        delete_markup_datum(MARK_DURATION_MS, videoPath);
+        delete_markup_datum(MARK_DURATION_MS, 0, videoPath);
         insert_markup_datum(MARK_DURATION_MS, 0, duration.count(), videoPath);
     }
     else if (IsRecording())
