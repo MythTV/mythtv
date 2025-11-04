@@ -544,8 +544,9 @@ uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
         QString("Saving position map [%1,%2] w/%3 keyframes, "
                 "took (%4,%5,%6) ms")
             .arg(first).arg(last).arg(saved)
-            .arg(ttm.elapsed())
-            .arg(ctm.elapsed()-stm.elapsed()).arg(stm.elapsed()));
+            .arg(ttm.elapsed().count())
+            .arg(ctm.elapsed().count()-stm.elapsed().count())
+            .arg(stm.elapsed().count()));
 #endif
 
     return saved;
