@@ -55,7 +55,9 @@
 #define LOC_WARN QString("MythCommFlag, Warning: ")
 #define LOC_ERR  QString("MythCommFlag, Error: ")
 
-int  quiet = 0;
+// File scope variables
+namespace {
+
 bool progress = true;
 bool force = false;
 
@@ -69,6 +71,8 @@ int recorderNum = -1;
 
 int jobID = -1;
 int lastCmd = -1;
+
+} // namespace
 
 static QMap<QString,SkipType> *init_skip_types();
 QMap<QString,SkipType> *skipTypes = init_skip_types();
@@ -963,10 +967,11 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
+    progress = !cmdline.toBool("noprogress");
+
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCOMMFLAG);
-    int retval = cmdline.ConfigureLogging("general",
-                                          !cmdline.toBool("noprogress"));
+    int retval = cmdline.ConfigureLogging("general", false);
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
