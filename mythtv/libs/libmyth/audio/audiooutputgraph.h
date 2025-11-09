@@ -34,6 +34,7 @@ class MPUBLIC AudioOutputGraph : public MythTV::Visual
 
   private:
     MythPainter* m_painter   { nullptr };
+    MythImage*   m_image     { nullptr };
     int          m_dBsilence { -72 };
     int          m_dBquiet   { -60 };
     int          m_dBLoud    { -12 };

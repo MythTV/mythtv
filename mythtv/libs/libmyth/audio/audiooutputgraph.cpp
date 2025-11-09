@@ -2,6 +2,7 @@
 #include <climits>
 #include <cmath>
 #include <cstdint>
+#include <thread>
 
 // Qt
 #include <QtGlobal>
@@ -37,6 +38,11 @@ class AudioOutputGraph::AOBuffer : public QByteArray
     std::chrono::milliseconds First() const { return m_tcFirst; }
 
     using Range = std::pair<std::chrono::milliseconds, std::chrono::milliseconds>;
+
+    // Determine the range of sound samples to use, from first to second, centered
+    // around the requested timecode. The range is clipped against the first and
+    // last timecode of all the sound samples that are available.
+    // It is possible that requested Timecode is not in the resulting range.
     Range Avail(std::chrono::milliseconds Timecode) const
     {
         if (Timecode == 0ms || Timecode == -1ms)
@@ -60,15 +66,26 @@ class AudioOutputGraph::AOBuffer : public QByteArray
         return {first, second};
     }
 
+    // All samples to be shown in the graph are present
+    bool EnoughData(std::chrono::milliseconds Timecode)
+    {
+        // return m_tcNext >= Timecode + Samples2MS(m_maxSamples / 2);
+        return (m_tcFirst <= Timecode) && (m_tcNext >= Timecode + Samples2MS(m_maxSamples / 2));
+    }
+
+    // Number of samples to be shown in the graph
     int Samples(Range Available) const
     {
         return MS2Samples(Available.second - Available.first);
     }
 
+    // Reset all values and release sample buffer
     void Empty()
     {
-        m_tcFirst = m_tcNext = 0ms;
-        m_bits = m_channels = 0;
+        m_tcFirst  = 0ms;
+        m_tcNext   = 0ms;
+        m_bits     = 0;
+        m_channels = 0;
         resize(0);
     }
 
@@ -77,14 +94,20 @@ class AudioOutputGraph::AOBuffer : public QByteArray
     {
         if (m_bits != Bits || m_channels != Channels)
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1, %2 channels, %3 bits")
-                .arg(Timecode.count()).arg(Channels).arg(Bits));
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Length:%1 Timecode:%2 Channels:%3 Bits:%4")
+                .arg(Length).arg(Timecode.count()).arg(Channels).arg(Bits));
             Resize(Channels, Bits);
-            m_tcNext = m_tcFirst = Timecode;
+            m_tcFirst = Timecode;
+            m_tcNext  = Timecode;
         }
 
         auto samples = Bytes2Samples(static_cast<unsigned>(Length));
         std::chrono::milliseconds tcNext = Timecode + Samples2MS(samples);
+
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("m_tcFirst:%1 m_tcNext:%2 Timecode:%3 samples:%4 ms:%5")
+                .arg(m_tcFirst.count()).arg(m_tcNext.count()).arg(Timecode.count())
+                .arg(samples).arg(Samples2MS(samples).count()));
 
         if (qAbs((Timecode - m_tcNext).count()) <= 1)
         {
@@ -94,11 +117,12 @@ class AudioOutputGraph::AOBuffer : public QByteArray
         else if (Timecode >= m_tcFirst && tcNext <= m_tcNext)
         {
             // Duplicate
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Duplicate"));
             return;
         }
         else
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Discontinuity %1 -> %2")
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Discontinuity %1 -> %2")
                 .arg(m_tcNext.count()).arg(Timecode.count()));
 
             Resize(Channels, Bits);
@@ -108,20 +132,33 @@ class AudioOutputGraph::AOBuffer : public QByteArray
         }
 
         auto overflow = size() - m_sizeMax;
+
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Overflow:%1 size:%2 m_sizeMax:%3")
+                .arg(overflow).arg(size()).arg(m_sizeMax));
+
         if (overflow > 0)
         {
             remove(0, overflow);
-            m_tcFirst = m_tcNext - Samples2MS(Bytes2Samples(static_cast<unsigned>(m_sizeMax)));
+
+            auto old_m_tcFirst = m_tcFirst;
+            m_tcFirst = m_tcNext - Samples2MS(Bytes2SamplesNormalized(static_cast<unsigned>(m_sizeMax)));
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                QString("Overflow:%1 m_tcFirst old, new, delta:%2 %3 %4")
+                    .arg(overflow).arg(old_m_tcFirst.count()).arg(m_tcFirst.count())
+                    .arg((m_tcFirst - old_m_tcFirst).count()));
         }
     }
 
+    // Pointer to first sample to be shown in the graph
     const int16_t* Data16(Range Available) const
     {
         auto start = MS2Samples(Available.first - m_tcFirst);
-        return reinterpret_cast<const int16_t*>(constData() + (static_cast<ptrdiff_t>(start) * BytesPerSample()));
+        return reinterpret_cast<const int16_t*>(constData() + (static_cast<ptrdiff_t>(start) * BytesPerSampleNormalized()));
     }
 
   protected:
+
+    // Bytes per sample as received; one value for one channel can be 8, 16 or 32 bits.
     uint BytesPerSample() const
     {
         return static_cast<uint>(m_channels * ((m_bits + 7) / 8));
@@ -130,6 +167,17 @@ class AudioOutputGraph::AOBuffer : public QByteArray
     unsigned Bytes2Samples(unsigned Bytes) const
     {
         return  (m_channels && m_bits) ? Bytes / BytesPerSample() : 0;
+    }
+
+    // Bytes per sample as stored; one value for one channel is always 16 bits
+    uint BytesPerSampleNormalized() const
+    {
+        return static_cast<uint>(m_channels * sizeof(int16_t));
+    }
+
+    unsigned Bytes2SamplesNormalized(unsigned Bytes) const
+    {
+        return  (m_channels && m_bits) ? Bytes / BytesPerSampleNormalized() : 0;
     }
 
     std::chrono::milliseconds Samples2MS(unsigned Samples) const
@@ -142,12 +190,17 @@ class AudioOutputGraph::AOBuffer : public QByteArray
         return Msecs > 0ms ? static_cast<int>((Msecs.count() * m_sampleRate) / 1000) : 0; // NB round down
     }
 
+    // Store all received samples but convert the sample from 8, 16 or 32 bits to 16 bits.
+
+    // All arithmetic that refers to samples stored inside (in the QByteArray that we inherit from)
+    // must be done with the ..Normalized functions which use the fixed size of 16 bits.
+    // Arithmetic on the incoming data must use the number of bits per sample (8, 16 or 32).
     void Append(const void * Buffer, unsigned long Length, int Bits)
     {
         switch (Bits)
         {
           case 8:
-            // 8bit unsigned to 16bit signed
+            // Convert 8bit unsigned to 16bit signed
             {
                 auto count = Length;
                 auto n = size();
@@ -159,10 +212,11 @@ class AudioOutputGraph::AOBuffer : public QByteArray
             }
             break;
           case 16:
+            // Copy 16bit samples without conversion
             append(reinterpret_cast<const char*>(Buffer), static_cast<int>(Length));
             break;
           case 32:
-            // 32bit float to 16bit signed
+            // Convert 32bit float to 16bit signed
             {
                 unsigned long count = Length / sizeof(float);
                 auto n = size();
@@ -185,7 +239,7 @@ class AudioOutputGraph::AOBuffer : public QByteArray
     {
         m_bits = Bits;
         m_channels = Channels;
-        m_sizeMax = static_cast<int>(((m_sampleRate * kBufferMilliSecs) / 1000) * BytesPerSample());
+        m_sizeMax = static_cast<int>(((m_sampleRate * kBufferMilliSecs) / 1000) * BytesPerSampleNormalized());
         resize(0);
     }
 
@@ -207,24 +261,27 @@ AudioOutputGraph::AudioOutputGraph() :
 AudioOutputGraph::~AudioOutputGraph()
 {
     delete m_buffer;
+    if (m_image)
+        m_image->DecrRef();
 }
 
 void AudioOutputGraph::SetPainter(MythPainter* Painter)
 {
     QMutexLocker lock(&m_mutex);
     m_painter = Painter;
+    m_image = new MythImage(m_painter);
 }
 
 void AudioOutputGraph::SetSampleRate(uint16_t SampleRate)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Set sample rate %1)").arg(SampleRate));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Set sample rate %1").arg(SampleRate));
     QMutexLocker lock(&m_mutex);
     m_buffer->SetSampleRate(SampleRate);
 }
 
 void AudioOutputGraph::SetSampleCount(uint16_t SampleCount)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Set sample count %1").arg(SampleCount));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Set sample count %1").arg(SampleCount));
     QMutexLocker lock(&m_mutex);
     m_buffer->SetMaxSamples(SampleCount);
 }
@@ -249,8 +306,45 @@ void AudioOutputGraph::Reset()
 
 MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
 {
+    // Needed to erase a previous image if there is no audio data available.
+    auto EmptyImage = [=, this]() {
+        QImage image(8, 8, QImage::Format_ARGB32);
+        image.fill(0);
+        if (m_image)
+            m_image->Assign(image);
+        return m_image;
+    };
+
     QMutexLocker lock(&m_mutex);
     AOBuffer::Range avail = m_buffer->Avail(Timecode);
+
+    // Wait until all audio data has arrived for our requested timecode.
+    bool data_present = false;
+    for (int i=0; i<10 && !data_present; i++)
+    {
+        if (m_buffer->EnoughData(Timecode))
+        {
+            LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                QString("Audio data for timecode %1 arrived after %2 wait")
+                    .arg(Timecode.count()).arg(i));
+            data_present = true;
+        }
+        else
+        {
+            lock.unlock();
+            std::this_thread::sleep_for(20ms);
+            avail = m_buffer->Avail(Timecode);
+            lock.relock();
+        }
+    }
+
+    if (!data_present)
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("No audio data for timecode %1")
+                .arg(Timecode.count()));
+        return EmptyImage();
+    }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("GetImage for timecode %1 using [%2..%3] available [%4..%5]")
@@ -259,25 +353,39 @@ MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
 
     auto width = m_buffer->Samples(avail);
     if (width <= 0)
-        return nullptr;
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("GetImage for timecode %1 SKIPPED because width <= 0").arg(Timecode.count()));
+        return EmptyImage();
+    }
 
     const unsigned range = 1U << AudioOutputGraph::AOBuffer::BitsPerChannel();
     const auto threshold = 20 * log10(1.0 / range); // 16bit=-96.3296dB => ~6dB/bit
     auto height = static_cast<int>(-ceil(threshold)); // 96
     if (height <= 0)
-        return nullptr;
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("GetImage for timecode %1 SKIPPED because height <= 0").arg(Timecode.count()));
+        return EmptyImage();
+    }
 
     const int channels = m_buffer->Channels();
 
-    // Assume signed 16 bit/sample
+    // Start position of audio data has to be before max (the end of the buffer)
     const auto * data   = m_buffer->Data16(avail);
     const auto * max = reinterpret_cast<const int16_t*>(m_buffer->constData() + m_buffer->size());
     if (data >= max)
-        return nullptr;
-
-    if ((data + (channels * static_cast<ptrdiff_t>(width))) >= max)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Buffer overflow. Clipping samples.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            QString("GetImage for timecode %1 SKIPPED because data starts beyond end of buffer")
+                .arg(Timecode.count()));
+        return EmptyImage();
+    }
+
+    // End position of audio data cannot extend beyond max (the end of the buffer)
+    if ((data + (channels * static_cast<ptrdiff_t>(width))) > max)
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Buffer overflow. Clipping samples.");
         width = static_cast<int>(max - data) / channels;
     }
 
@@ -310,7 +418,7 @@ MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
             image.setPixel(x, height - 1 - y, rgb);
     }
 
-    auto * result = new MythImage(m_painter);
-    result->Assign(image);
-    return result;
+    if (m_image)
+        m_image->Assign(image);
+    return m_image;
 }
