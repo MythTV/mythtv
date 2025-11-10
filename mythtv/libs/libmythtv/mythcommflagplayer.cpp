@@ -66,17 +66,6 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
     m_killDecoder = false;
     m_framesPlayed = 0;
 
-    // clear out any existing seektables
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    if (m_playerCtx->m_playingInfo)
-    {
-        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_KEYFRAME);
-        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_GOP_START);
-        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
-        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_DURATION_MS);
-    }
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-
     if (OpenFile() < 0)
         return false;
 
@@ -90,6 +79,17 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
     }
 
     ClearAfterSeek();
+
+    // Clear out any existing seektables
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_playerCtx->m_playingInfo)
+    {
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_KEYFRAME);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_GOP_START);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_DURATION_MS);
+    }
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     std::chrono::milliseconds save_timeout { 1s + 1ms };
     MythTimer flagTime;
