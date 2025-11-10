@@ -585,7 +585,12 @@ void MythPlayerUI::RefreshPauseFrame()
             if (m_deleteMap.IsEditing())
             {
                 m_osdLock.lock();
-                DeleteMap::UpdateOSD(m_latestVideoTimecode, &m_osd);
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("timecode video:%1 audio:%2")
+                    .arg(m_latestVideoTimecode.count()).arg(m_latestAudioTimecode.count()));
+
+                // Use audio timecode when video timecode is not available for DVB audio recordings.
+                auto timecode = m_latestVideoTimecode > 0ms ? m_latestVideoTimecode: m_latestAudioTimecode;
+                DeleteMap::UpdateOSD(timecode, &m_osd);
                 m_osdLock.unlock();
             }
         }

@@ -1309,6 +1309,7 @@ void MythPlayer::WrapTimecode(std::chrono::milliseconds &timecode, TCTypes tc_ty
 bool MythPlayer::PrepareAudioSample(std::chrono::milliseconds &timecode)
 {
     WrapTimecode(timecode, TC_AUDIO);
+    m_latestAudioTimecode = timecode;
     return false;
 }
 

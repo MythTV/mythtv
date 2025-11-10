@@ -427,6 +427,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     std::chrono::seconds  m_totalDuration {0s};
     long long m_rewindTime                {0};
     std::chrono::milliseconds  m_latestVideoTimecode {-1ms};
+    std::chrono::milliseconds  m_latestAudioTimecode {-1ms};
     MythPlayerAVSync m_avSync;
 
     // -- end state stuff --
