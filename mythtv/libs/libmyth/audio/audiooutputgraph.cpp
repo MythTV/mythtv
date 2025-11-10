@@ -307,7 +307,7 @@ void AudioOutputGraph::Reset()
 MythImage* AudioOutputGraph::GetImage(std::chrono::milliseconds Timecode) const
 {
     // Needed to erase a previous image if there is no audio data available.
-    auto EmptyImage = [=, this]() {
+    auto EmptyImage = [this]() {
         QImage image(8, 8, QImage::Format_ARGB32);
         image.fill(0);
         if (m_image)
