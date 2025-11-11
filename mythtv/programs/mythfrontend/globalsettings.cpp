@@ -1989,11 +1989,11 @@ static HostSpinBoxSetting *FrontendIdleTimeout()
 static HostCheckBoxSetting* ConfirmPowerEvent()
 {
     auto * checkbox = new HostCheckBoxSetting("ConfirmPowerEvent");
-    checkbox->setValue(true);
     checkbox->setLabel(MainGeneralSettings::tr("Confirm before suspending/shutting down"));
     checkbox->setHelpText(MainGeneralSettings::tr(
         "If enabled (the default) then the user will always be asked to confirm before the system "
         "is shutdown, suspended or rebooted."));
+    checkbox->setValue(true);
     return checkbox;
 }
 
@@ -2234,11 +2234,11 @@ static HostComboBoxSetting *LetterboxingColour()
 static HostCheckBoxSetting* StereoDiscard()
 {
     auto * cb = new HostCheckBoxSetting("DiscardStereo3D");
-    cb->setValue(true);
     cb->setLabel(PlaybackSettings::tr("Discard 3D stereoscopic fields"));
     cb->setHelpText(PlaybackSettings::tr(
         "If 'Side by Side' or 'Top and Bottom' 3D material is detected, "
         "enabling this setting will discard one field (enabled by default)."));
+    cb->setValue(true);
     return cb;
 }
 
