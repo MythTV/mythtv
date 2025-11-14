@@ -1673,14 +1673,16 @@ static HostSpinBoxSetting *YScanDisplacement()
     return gs;
 };
 
-static HostCheckBoxSetting *DefaultCCMode()
+static HostComboBoxSetting *DefaultCCMode()
 {
-    auto *gc = new HostCheckBoxSetting("DefaultCCMode");
+    auto *gc = new HostComboBoxSetting("DefaultCCMode");
 
-    gc->setLabel(OSDSettings::tr("Always display closed captioning or "
+    gc->setLabel(OSDSettings::tr("Default to display closed captioning or "
                                  "subtitles"));
 
-    gc->setValue(false);
+    gc->addSelection(OSDSettings::tr("Captions off"), "0");
+    gc->addSelection(OSDSettings::tr("Captions on"), "1");
+    gc->addSelection(OSDSettings::tr("Last captions state"), "2");
 
     gc->setHelpText(OSDSettings::tr("If enabled, captions will be displayed "
                                     "when playing back recordings or watching "
