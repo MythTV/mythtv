@@ -5805,10 +5805,11 @@ if enabled vulkan && enabled libglslang ; then
     # but vulkan support on that platform compiles fine without them.
     # Test to see if these libraries are present, and if not, test
     # again to see if the compile works without them.
-    GLSLANG_LIBS="${EXTRA_GLSLANG_LIBS:-} -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread"
-    check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lHLSL -lOGLCompiler -lOSDependent \
-    || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lHLSL -lOGLCompiler \
-    || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS}  \
+    GLSLANG_LIBS="${EXTRA_GLSLANG_LIBS:-} -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread"
+    check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lSPVRemapper -lHLSL -lOGLCompiler -lOSDependent \
+    || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lSPVRemapper -lHLSL -lOGLCompiler \
+    || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lSPVRemapper \
+    || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} \
     || die "ERROR: libglslang (or dependent) library not found"
 fi
 
