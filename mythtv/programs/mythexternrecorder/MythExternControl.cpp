@@ -22,6 +22,7 @@
 
 #include <array>
 #include <iostream>
+#include <mutex>
 #include <poll.h>
 #include <unistd.h>
 
@@ -57,7 +58,7 @@ MythExternControl::~MythExternControl(void)
 
 Q_SLOT void MythExternControl::Opened(void)
 {
-    std::lock_guard<std::mutex> lock(m_flowMutex);
+    std::scoped_lock lock(m_flowMutex);
 
     m_ready = true;
     m_flowCond.notify_all();
@@ -135,7 +136,7 @@ Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
 
 void Commands::Close(void)
 {
-    std::lock_guard<std::mutex> lock(m_parent->m_flowMutex);
+    std::scoped_lock lock(m_parent->m_flowMutex);
 
     emit m_parent->Close();
     m_parent->m_ready = false;
