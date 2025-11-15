@@ -43,7 +43,7 @@
 #include "platforms/mythdisplaydrm.h"
 #include "platforms/drm/mythdrmvrr.h"
 #endif
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
 #include "platforms/mythdisplaywindows.h"
 #endif
 #if CONFIG_MMAL
@@ -130,7 +130,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
     if (!result)
         result = new MythDisplayAndroid();
 #endif
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
     if (!result)
         result = new MythDisplayWindows();
 #endif

@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(VISIBLE_H)
+#ifndef VISIBLE_H
 #define VISIBLE_H
 #include <QRegion>
 

@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(PROGRAMS_H)
+#ifndef PROGRAMS_H
 #define PROGRAMS_H
 
 #include "Ingredients.h"

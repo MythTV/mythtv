@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(PARSETEXT_H)
+#ifndef PARSETEXT_H
 #define PARSETEXT_H
 
 #include <cstdlib> // malloc etc.

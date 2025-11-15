@@ -99,7 +99,7 @@ static bool enableSqliteRegex (void)
 
     char *errtext {nullptr};
     // The location on Debian/Ubuntu.
-#if defined(__FreeBSD__)
+#ifdef __FreeBSD__
     static constexpr char const * const pcre = "/usr/local/libexec/sqlite-ext/pcre.so";
 #else
     static constexpr char const * const pcre = "/usr/lib/sqlite3/pcre.so";

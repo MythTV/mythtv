@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(BASEACTIONS_H)
+#ifndef BASEACTIONS_H
 #define BASEACTIONS_H
 
 #include "BaseClasses.h"

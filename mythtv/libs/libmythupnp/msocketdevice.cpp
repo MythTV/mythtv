@@ -158,7 +158,7 @@ public:
 MSocketDevice::MSocketDevice(int socket, Type type)
         : m_fd(socket), m_t(type), d(new MSocketDevicePrivate(Unknown))
 {
-#if defined(MSOCKETDEVICE_DEBUG)
+#ifdef MSOCKETDEVICE_DEBUG
     qDebug("MSocketDevice: Created MSocketDevice %p (socket %x, type %d)",
            this, socket, type);
 #endif
@@ -180,7 +180,7 @@ MSocketDevice::MSocketDevice(int socket, Type type)
 MSocketDevice::MSocketDevice(Type type)
         : m_t(type), d(new MSocketDevicePrivate(Unknown))
 {
-#if defined(MSOCKETDEVICE_DEBUG)
+#ifdef MSOCKETDEVICE_DEBUG
     qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
            this, type);
 #endif
@@ -208,7 +208,7 @@ MSocketDevice::MSocketDevice(Type type)
 MSocketDevice::MSocketDevice(Type type, Protocol protocol, int /*dummy*/)
         : m_t(type), d(new MSocketDevicePrivate(protocol))
 {
-#if defined(MSOCKETDEVICE_DEBUG)
+#ifdef MSOCKETDEVICE_DEBUG
     qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
            this, type);
 #endif
@@ -224,7 +224,7 @@ MSocketDevice::~MSocketDevice()
     MSocketDevice::close();
     delete d;
     d = nullptr;
-#if defined(MSOCKETDEVICE_DEBUG)
+#ifdef MSOCKETDEVICE_DEBUG
     qDebug("MSocketDevice: Destroyed MSocketDevice %p", this);
 #endif
 }
@@ -297,7 +297,7 @@ void MSocketDevice::setSocket(int socket, Type type)
     if (m_fd != -1)     // close any open socket
         MSocketDevice::close();
 
-#if defined(MSOCKETDEVICE_DEBUG)
+#ifdef MSOCKETDEVICE_DEBUG
     qDebug("MSocketDevice::setSocket: socket %x, type %d", socket, type);
 
 #endif
@@ -328,7 +328,7 @@ bool MSocketDevice::open(OpenMode mode)
     if (isOpen() || !isValid())
         return false;
 
-#if defined(MSOCKETDEVICE_DEBUG)
+#ifdef MSOCKETDEVICE_DEBUG
     qDebug("MSocketDevice::open: mode %x", mode);
 
 #endif

@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(PRESENTABLE_H)
+#ifndef PRESENTABLE_H
 #define PRESENTABLE_H
 
 #include "Ingredients.h"

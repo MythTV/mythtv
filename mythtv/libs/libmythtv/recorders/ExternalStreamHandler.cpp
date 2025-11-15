@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <algorithm>
-#if !defined( _WIN32 )
+#ifndef _WIN32
 #include <poll.h>
 #include <sys/ioctl.h>
 #endif
@@ -81,7 +81,7 @@ bool ExternIO::Ready([[maybe_unused]] int fd,
                      [[maybe_unused]] std::chrono::milliseconds timeout,
                      [[maybe_unused]] const QString & what)
 {
-#if !defined( _WIN32 )
+#ifndef _WIN32
     std::array<struct pollfd,2> m_poll {};
 
     m_poll[0].fd = fd;
@@ -299,7 +299,7 @@ bool ExternIO::KillIfRunning([[maybe_unused]] const QString & cmd)
 
 void ExternIO::Fork(void)
 {
-#if !defined( _WIN32 )
+#ifndef _WIN32
     if (Error())
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternIO in bad state: '%1'")

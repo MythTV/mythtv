@@ -4,7 +4,7 @@
 #ifdef __cplusplus
 #include <QtCore/qglobal.h>
 
-#if defined(MYTH_API)
+#ifdef MYTH_API
 # define MPUBLIC Q_DECL_EXPORT
 #else
 # define MPUBLIC Q_DECL_IMPORT

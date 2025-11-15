@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(VARIABLES_H)
+#ifndef VARIABLES_H
 #define VARIABLES_H
 
 #include "Ingredients.h"

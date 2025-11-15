@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(GROUPCLASS_H)
+#ifndef GROUPCLASS_H
 #define GROUPCLASS_H
 #include <QString>
 #include <QDateTime>

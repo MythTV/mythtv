@@ -31,7 +31,7 @@ QMap<QString,DVBStreamHandler*> DVBStreamHandler::s_handlers;
 QMap<QString,uint>              DVBStreamHandler::s_handlersRefCnt;
 QMutex                          DVBStreamHandler::s_handlersLock;
 
-#if !defined(__suseconds_t)
+#ifndef __suseconds_t
 #ifdef Q_OS_MACOS
 using __suseconds_t = __darwin_suseconds_t;
 #else

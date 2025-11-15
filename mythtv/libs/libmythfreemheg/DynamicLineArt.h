@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(DYNAMICLINEART_H)
+#ifndef DYNAMICLINEART_H
 #define DYNAMICLINEART_H
 
 #include "Visible.h"

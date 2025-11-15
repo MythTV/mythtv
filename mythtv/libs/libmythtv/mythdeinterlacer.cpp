@@ -549,7 +549,7 @@ static inline void BlendSIMD16x4(unsigned char *Src, int Width, int FirstRow, in
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if defined(Q_PROCESSOR_X86_64)
+#ifdef Q_PROCESSOR_X86_64
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu8(*reinterpret_cast<__m128i*>(&above[col]), mid);
@@ -604,7 +604,7 @@ static inline void BlendSIMD8x4(unsigned char *Src, int Width, int FirstRow, int
         }
         for (int col = 0; col < Width; col += 16)
         {
-#if defined(Q_PROCESSOR_X86_64)
+#ifdef Q_PROCESSOR_X86_64
             __m128i mid = *reinterpret_cast<__m128i*>(&middle[col]);
             *reinterpret_cast<__m128i*>(&dest1[col]) =
                     _mm_avg_epu16(*reinterpret_cast<__m128i*>(&above[col]), mid);

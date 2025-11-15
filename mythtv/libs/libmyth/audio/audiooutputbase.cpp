@@ -32,7 +32,7 @@
 #include "spdifencoder.h"
 
 // AC3 encode currently disabled for Android
-#if defined(Q_OS_ANDROID)
+#ifdef Q_OS_ANDROID
 #define DISABLE_AC3_ENCODE
 #endif
 

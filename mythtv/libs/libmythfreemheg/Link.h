@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(LINK_H)
+#ifndef LINK_H
 #define LINK_H
 
 #include "Ingredients.h"

@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(INGREDIENTS_H)
+#ifndef INGREDIENTS_H
 #define INGREDIENTS_H
 
 #include "Root.h"

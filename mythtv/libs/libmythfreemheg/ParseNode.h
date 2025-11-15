@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(PARSE_NODE_H)
+#ifndef PARSE_NODE_H
 #define PARSE_NODE_H
 
 #include "BaseClasses.h"

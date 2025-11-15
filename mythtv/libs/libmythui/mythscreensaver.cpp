@@ -55,7 +55,7 @@ MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* 
 #elif defined(Q_OS_DARWIN)
     m_screenSavers.push_back(new MythScreenSaverOSX(this));
 #endif
-#if defined(ANDROID)
+#ifdef ANDROID
     m_screenSavers.push_back(new MythScreenSaverAndroid(this));
 #endif
 #if CONFIG_DRM

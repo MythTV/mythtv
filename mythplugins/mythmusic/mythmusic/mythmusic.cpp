@@ -51,7 +51,7 @@
 #include "cdrip.h"
 #endif
 
-#if defined HAVE_CDIO
+#ifdef HAVE_CDIO
 /**
  * \brief Work out the best CD drive to use at this time
  */
@@ -197,7 +197,7 @@ static void startDatabaseTree(void)
 
 static void startRipper(void)
 {
-#if defined HAVE_CDIO
+#ifdef HAVE_CDIO
     if (!checkStorageGroup())
         return;
 
@@ -417,7 +417,7 @@ static void runRipCD(void)
 {
     gMusicData->loadMusic();
 
-#if defined HAVE_CDIO
+#ifdef HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     auto *rip = new Ripper(mainStack, chooseCD());

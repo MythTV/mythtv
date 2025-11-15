@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(TOKENGROUP_H)
+#ifndef TOKENGROUP_H
 #define TOKENGROUP_H
 
 #include "Presentable.h"

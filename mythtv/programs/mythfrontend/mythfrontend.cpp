@@ -2034,7 +2034,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
            .toUtf8().constData(), 1);
 #endif
 
-#if defined(Q_OS_ANDROID)
+#ifdef Q_OS_ANDROID
     auto config = QSslConfiguration::defaultConfiguration();
     config.setCaCertificates(QSslConfiguration::systemCaCertificates());
     QSslConfiguration::setDefaultConfiguration(config);

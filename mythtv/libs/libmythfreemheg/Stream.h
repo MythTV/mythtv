@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(STREAM_H)
+#ifndef STREAM_H
 #define STREAM_H
 
 #include "Presentable.h"

@@ -2454,7 +2454,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
     m_size->setValue(cs);
 }
 
-#if !defined( _WIN32 )
+#ifndef _WIN32
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
                                                        CardType &a_cardtype) :
     m_parent(a_parent),
@@ -2705,7 +2705,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new ImportConfigurationGroup(parent, *cardtype));
     cardtype->addTargetedChild("DEMO",
                                new DemoConfigurationGroup(parent, *cardtype));
-#if !defined( _WIN32 )
+#ifndef _WIN32
     cardtype->addTargetedChild("EXTERNAL",
                                new ExternalConfigurationGroup(parent,
                                                               *cardtype));
@@ -2903,7 +2903,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
-#if !defined( _WIN32 )
+#ifndef _WIN32
     setting->addSelection(QObject::tr("External (black box) recorder"),
                           "EXTERNAL");
 #endif

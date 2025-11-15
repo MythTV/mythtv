@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(PARSEBIN_H)
+#ifndef PARSEBIN_H
 #define PARSEBIN_H
 
 class MHOctetString;

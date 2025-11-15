@@ -39,7 +39,7 @@
 
 #define LOC      QString("LIRC: ")
 
-#if !defined(__suseconds_t)
+#ifndef __suseconds_t
 #ifdef Q_OS_MACOS
 using __suseconds_t = __darwin_suseconds_t;
 #else

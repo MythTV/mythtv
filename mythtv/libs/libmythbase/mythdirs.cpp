@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QCoreApplication>
 
-#if defined(Q_OS_ANDROID)
+#ifdef Q_OS_ANDROID
 #include <QStandardPaths>
 #include <sys/statfs.h>
 #elif defined(Q_OS_WIN)
@@ -185,7 +185,7 @@ void InitializeMythDirs(void)
     if (installprefix.isEmpty())
             installprefix = QString(RUNPREFIX);
 
-    #if defined(Q_OS_DARWIN)
+    #ifdef Q_OS_DARWIN
         // Check to see if the RUNPREFIX exists, if it does not, this is
         // likely an APP bundle and so RUNPREFIX needs to be pointed
         // internally to the APP Bundle.
@@ -226,7 +226,7 @@ void InitializeMythDirs(void)
     themebasecachedir = cachedir + "/themecache";
     thumbnaildir = cachedir + "/thumbnails";
 
-#if defined(Q_OS_ANDROID)
+#ifdef Q_OS_ANDROID
     themedir        = sharedir + "themes/";
     pluginsdir      = libdir;
     translationsdir = sharedir + "i18n/";

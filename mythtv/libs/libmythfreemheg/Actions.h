@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(ACTIONS_H)
+#ifndef ACTIONS_H
 #define ACTIONS_H
 
 class MHParseNode;

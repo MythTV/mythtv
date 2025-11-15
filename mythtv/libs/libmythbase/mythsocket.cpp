@@ -10,7 +10,7 @@
 #include <QMetaType>
 
 // setsockopt -- has to be after Qt includes for Q_OS_WIN definition
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <cstdio>
@@ -186,7 +186,7 @@ void MythSocket::ConnectHandler(void)
     m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
 
     int reuse_addr_val = 1;
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
     int ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
                          SO_REUSEADDR, (char*) &reuse_addr_val,
                          sizeof(reuse_addr_val));
@@ -201,7 +201,7 @@ void MythSocket::ConnectHandler(void)
     }
 
     int rcv_buf_val = kSocketReceiveBufferSize;
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
     ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
                      SO_RCVBUF, (char*) &rcv_buf_val,
                      sizeof(rcv_buf_val));

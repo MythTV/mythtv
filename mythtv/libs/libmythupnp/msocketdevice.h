@@ -195,7 +195,7 @@ private:
     Protocol  getProtocol() const;
 
 private: // Disabled copy constructor and operator=
-#if defined(Q_DISABLE_COPY)
+#ifdef Q_DISABLE_COPY
     MSocketDevice(const MSocketDevice &);
     MSocketDevice &operator=(const MSocketDevice &);
 #endif

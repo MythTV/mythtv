@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(BITMAP_H)
+#ifndef BITMAP_H
 #define BITMAP_H
 
 #include "Visible.h"

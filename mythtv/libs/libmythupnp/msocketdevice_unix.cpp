@@ -51,7 +51,7 @@
 #endif
 
 // Almost always the same. If not, specify in qplatformdefs.h.
-#if !defined(QT_SOCKOPTLEN_T)
+#ifndef QT_SOCKOPTLEN_T
 # define QT_SOCKOPTLEN_T QT_SOCKLEN_T
 #endif
 
@@ -61,7 +61,7 @@ static inline int qt_socket_accept(int s, struct sockaddr *addr, QT_SOCKLEN_T *a
     return ::accept(s, addr, addrlen);
 }
 
-#if defined(accept)
+#ifdef accept
 # undef accept
 #endif
 
@@ -71,7 +71,7 @@ static inline int qt_socket_listen(int s, int backlog)
     return ::listen(s, backlog);
 }
 
-#if defined(listen)
+#ifdef listen
 # undef listen
 #endif
 
@@ -81,7 +81,7 @@ static inline int qt_socket_socket(int domain, int type, int protocol)
     return ::socket(domain, type, protocol);
 }
 
-#if defined(socket)
+#ifdef socket
 # undef socket
 #endif
 
@@ -755,11 +755,11 @@ int MSocketDevice::accept()
                 case EINTR:
                     done = false;
                     break;
-#if defined(EPROTO)
+#ifdef EPROTO
 
                 case EPROTO:
 #endif
-#if defined(ENONET)
+#ifdef ENONET
 
                 case ENONET:
 #endif
@@ -1029,7 +1029,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
                 case ENOTSOCK:
                     m_e = Impossible;
                     break;
-#if defined(ENONET)
+#ifdef ENONET
 
                 case ENONET:
 #endif
@@ -1147,7 +1147,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                 case ENOTSOCK:
                     m_e = Impossible;
                     break;
-#if defined(ENONET)
+#ifdef ENONET
 
                 case ENONET:
 #endif
@@ -1303,7 +1303,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
                 case ENOTSOCK:
                     m_e = Impossible;
                     break;
-#if defined(ENONET)
+#ifdef ENONET
 
                 case ENONET:
 #endif

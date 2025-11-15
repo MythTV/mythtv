@@ -660,7 +660,7 @@ class DemoConfigurationGroup: public GroupSetting
     GroupSetting *m_size {nullptr};
 };
 
-#if !defined( _WIN32 )
+#ifndef _WIN32
 class ExternalConfigurationGroup: public GroupSetting
 {
    Q_OBJECT

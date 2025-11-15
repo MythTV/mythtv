@@ -48,7 +48,7 @@ class MythPainterWindow : public QWidget
     MythRender* GetRenderDevice();
     bool        RenderIsShared ();
     void        resizeEvent    (QResizeEvent* /*ResizeEvent*/) override;
-#if defined(DEBUG_PAINTERWIN_EVENTS)
+#ifdef DEBUG_PAINTERWIN_EVENTS
     bool        event(QEvent* Event) override;
 #endif
 

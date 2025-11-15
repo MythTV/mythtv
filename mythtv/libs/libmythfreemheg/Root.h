@@ -20,7 +20,7 @@
 */
 
 
-#if !defined(ROOTCLASS_H)
+#ifndef ROOTCLASS_H
 #define ROOTCLASS_H
 
 #include "BaseClasses.h"

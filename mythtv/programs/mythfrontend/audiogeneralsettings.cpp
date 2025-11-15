@@ -1129,7 +1129,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
 #ifdef Q_OS_ANDROID
     gc->addSelection("OpenSLES:", "OpenSLES:");
 #endif
-#if !defined(_WIN32)
+#ifndef _WIN32
     gc->addSelection(tr("software"), "software");
 #endif
 

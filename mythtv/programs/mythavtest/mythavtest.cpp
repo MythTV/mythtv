@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_THEME;
     }
 
-#if defined(Q_OS_MACOS)
+#ifdef Q_OS_MACOS
     // Mac OS X doesn't define the AudioOutputDevice setting
 #else
     QString auddevice = gCoreContext->GetSetting("AudioOutputDevice");

@@ -85,7 +85,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 #if CONFIG_VBOX
         success |= (m_vboxScanner != nullptr);
 #endif
-#if !defined( _WIN32 )
+#ifndef _WIN32
         success |= (m_externRecScanner != nullptr);
 #endif
 #if CONFIG_HDHOMERUN

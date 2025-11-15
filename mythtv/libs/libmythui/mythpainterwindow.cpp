@@ -167,7 +167,7 @@ bool MythPainterWindow::RenderIsShared()
     return m_render && m_render->IsShared();
 }
 
-#if defined(DEBUG_PAINTERWIN_EVENTS)
+#ifdef DEBUG_PAINTERWIN_EVENTS
 bool MythPainterWindow::event(QEvent *Event)
 {
     qInfo() << Event;

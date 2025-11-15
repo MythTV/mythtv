@@ -362,7 +362,7 @@ void StreamHandler::WriteMPTS(const unsigned char * buffer, uint len)
 
 bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
 {
-#if !defined( _WIN32 )
+#ifndef _WIN32
     QMutexLocker lk(&m_mptsLock);
 
     m_mptsFiles.insert(file);
@@ -404,7 +404,7 @@ bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
 
 void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
 {
-#if !defined( _WIN32 )
+#ifndef _WIN32
     QMutexLocker lk(&m_mptsLock);
 
     QSet<QString>::iterator it = m_mptsFiles.find(file);

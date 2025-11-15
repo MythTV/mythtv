@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(BASECLASSES_H)
+#ifndef BASECLASSES_H
 #define BASECLASSES_H
 
 #include <cstdlib> // malloc etc.

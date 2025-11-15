@@ -42,7 +42,7 @@ using floatusecs = std::chrono::duration<double, std::micro>;
 
 // There are a handful of places that hold a time value in units of
 // AV_TIME_BASE. Create a unique type for this.
-#if defined AV_TIME_BASE
+#ifdef AV_TIME_BASE
 using av_duration = std::chrono::duration<int64_t,std::ratio<1,AV_TIME_BASE>>;
 #endif
 

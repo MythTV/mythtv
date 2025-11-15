@@ -19,7 +19,7 @@
 
 */
 
-#if !defined(FREEMHEG_H)
+#ifndef FREEMHEG_H
 #define FREEMHEG_H
 
 #include <QtGlobal>
