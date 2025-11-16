@@ -1307,7 +1307,8 @@
             <buttonarea>20,0,-25,100%</buttonarea>
 
             <statetype name="buttonitem">
-                <area>0,0,100%,240</area>
+                <!-- tall to fit very long descriptions, auto-shrinks, fixes #1201 -->
+                <area>0,0,100%,800</area>
                 <minsize shrink="short">100%,5</minsize>
 
                 <state name="active">
