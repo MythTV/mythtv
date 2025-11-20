@@ -158,3 +158,5 @@ void MythOpenGLInterop::DeleteTextures()
         m_openglTextures.clear();
     }
 }
+
+#include "moc_mythopenglinterop.cpp"

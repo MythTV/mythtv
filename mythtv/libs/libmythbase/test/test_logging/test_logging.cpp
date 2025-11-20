@@ -348,3 +348,5 @@ void TestLogging::test_logPropagateCalc (void)
 }
 
 QTEST_APPLESS_MAIN(TestLogging)
+
+#include "moc_test_logging.cpp"

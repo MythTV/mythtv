@@ -1536,3 +1536,5 @@ void ShowNotification(MythNotification::Type type,
     MythNotificationCenter::GetInstance()->Queue(*n);
     delete n;
 }
+
+#include "moc_mythnotificationcenter_private.cpp"

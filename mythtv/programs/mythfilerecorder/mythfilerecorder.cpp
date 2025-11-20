@@ -447,4 +447,4 @@ int main(int argc, char *argv[])
     return GENERIC_EXIT_OK;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythfilerecorder.cpp"

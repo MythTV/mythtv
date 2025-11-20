@@ -15,5 +15,4 @@ void CommDetectorBase::resume()
     m_bPaused = false;
 }
 
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_CommDetectorBase.cpp"
