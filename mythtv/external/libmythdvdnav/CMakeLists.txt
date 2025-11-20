@@ -10,6 +10,11 @@ project(
   DVDREAD
   VERSION 6.0.0
   LANGUAGES C)
+set(DVDREAD_VERSION_MICRO ${DVDREAD_VERSION_PATCH})
+
+set(DVDNAV_MAJOR 6)
+set(DVDNAV_MINOR 0)
+set(DVDNAV_SUB 0)
 
 include(CheckIncludeFile)
 include(CheckSymbolExists)
@@ -25,6 +30,8 @@ list(APPEND CFLAGS " -Wno-unused-variable")
 # the -Wextra flag.
 list(APPEND CFLAGS " -Wno-implicit-fallthrough")
 list(APPEND CFLAGS " -Wno-unused-parameter")
+# libdvdread uses packed structs
+list(APPEND CFLAGS " -Wno-address-of-packed-member")
 
 foreach(_FLAG IN LISTS CFLAGS)
   string(SUBSTRING ${_FLAG} 1 -1 _NAME)
@@ -46,13 +53,29 @@ else()
   set(LIBRARY_TYPE SHARED)
 endif()
 
-add_library(
-  mythdvdnav
-  ${LIBRARY_TYPE}
-  dvdnav/dvdnav.c
+set(LIBDVDNAV_HEADERS
   dvdnav/dvdnav/dvd_types.h
   dvdnav/dvdnav/dvdnav.h
   dvdnav/dvdnav/dvdnav_events.h
+  )
+
+set(LIBDVDREAD_HEADERS
+  dvdread/dvdread/bitreader.h
+  dvdread/dvdread/dvd_reader.h
+  dvdread/dvdread/dvd_udf.h
+  dvdread/dvdread/ifo_print.h
+  dvdread/dvdread/ifo_read.h
+  dvdread/dvdread/ifo_types.h
+  dvdread/dvdread/nav_print.h
+  dvdread/dvdread/nav_read.h
+  dvdread/dvdread/nav_types.h
+  )
+
+add_library(
+  mythdvdnav
+  ${LIBRARY_TYPE}
+  ${LIBDVDNAV_HEADERS}
+  dvdnav/dvdnav.c
   dvdnav/dvdnav_internal.h
   dvdnav/highlight.c
   dvdnav/navigation.c
@@ -73,61 +96,69 @@ add_library(
   dvdnav/vm/vmcmd.c
   dvdnav/vm/vmcmd.h
   dvdnav/vm/vmget.c
+  ${LIBDVDREAD_HEADERS}
   dvdread/bitreader.c
   dvdread/bswap.h
   dvdread/dvd_input.c
   dvdread/dvd_input.h
   dvdread/dvd_reader.c
   dvdread/dvd_udf.c
-  dvdread/dvdread/bitreader.h
-  dvdread/dvdread/dvd_reader.h
-  dvdread/dvdread/dvd_udf.h
-  dvdread/dvdread/ifo_print.h
-  dvdread/dvdread/ifo_read.h
-  dvdread/dvdread/ifo_types.h
-  dvdread/dvdread/nav_print.h
-  dvdread/dvdread/nav_read.h
-  dvdread/dvdread/nav_types.h
   dvdread/dvdread_internal.h
   dvdread/ifo_print.c
   dvdread/ifo_read.c
   dvdread/md5.c
   dvdread/md5.h
-  dvdread/mythdvdreadexp.h
   dvdread/nav_print.c
   dvdread/nav_read.c
-  include/libmythbase/compat.h
   include/libmythtv/mythtvexp.h
   include/libmythtv/io/mythiowrapper.h)
+
+if(WIN32)
+  target_sources(mythdvdnav PRIVATE
+    dvdread/win32_dlfcn.h
+    )
+endif()
 
 # Don't allow the hidden visibility flag for this target.
 set_property(TARGET mythdvdnav PROPERTY C_VISIBILITY_PRESET)
 
-check_include_file(dlfcn.h HAVE_DLFCN_H)
-check_include_file(dvdcss/dvdcss.h HAVE_DVDCSS_DVDCSS_H)
+# libdvdread
+pkg_check_modules(DVDCSS "libdvdcss>=1.2" IMPORTED_TARGET)
+if(TARGET PkgConfig::DVDCSS)
+  target_link_libraries(mythdvdnav PRIVATE PkgConfig::DVDCSS)
+  set(HAVE_DVDCSS_DVDCSS_H 1)
+else()
+  check_include_file(dlfcn.h HAVE_DLFCN_H)
+  target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
+endif()
+
 check_include_file(sys/param.h HAVE_SYS_PARAM_H)
+
+# libdvdnav and libdvdread
 check_symbol_exists(gettimeofday "sys/time.h" HAVE_GETTIMEOFDAY)
 if(CMAKE_CXX_BYTE_ORDER STREQUAL "BIG_ENDIAN")
-  set(HAVE_BIGENDIAN 1)
+  set(WORDS_BIGENDIAN 1)
 endif()
 
 # Create stripped down config.h with only the symbols that are used in this
 # directory.
 configure_file(config.h.in config.h @ONLY)
-configure_file(mythconfig.h.in mythconfig.h @ONLY)
+
+configure_file(dvdread/dvdread/version.h.in dvdread/dvdread/version.h @ONLY)
+configure_file(dvdnav/dvdnav/version.h.in dvdnav/dvdnav/version.h @ONLY)
+
+# libdvdnav
+target_compile_definitions(mythdvdnav PRIVATE
+  HAVE_CONFIG_H
+  )
 
 # Instead of creating a circular dependency by adding an include path into
 # external/libmythdvdnav that points over to libs/libmythxxx, just copy in the
 # files that are needed.
 add_custom_command(
-  OUTPUT include/libmythbase include/libmythtv include/libmythtv/io
-  COMMAND ${CMAKE_COMMAND} -E make_directory include/libmythbase
+  OUTPUT include/libmythtv include/libmythtv/io
+  COMMAND ${CMAKE_COMMAND} -E make_directory
           include/libmythtv/io)
-add_custom_command(
-  OUTPUT include/libmythbase/compat.h
-  DEPENDS include/libmythbase
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-          ${MythTV_SOURCE_DIR}/libs/libmythbase/compat.h include/libmythbase)
 add_custom_command(
   OUTPUT include/libmythtv/mythtvexp.h
   DEPENDS include/libmythtv
@@ -139,14 +170,6 @@ add_custom_command(
   COMMAND
     ${CMAKE_COMMAND} -E copy_if_different
     ${MythTV_SOURCE_DIR}/libs/libmythtv/io/mythiowrapper.h include/libmythtv/io)
-
-target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
-if(APPLE)
-  target_link_libraries(mythdvdnav PRIVATE ${APPLE_CORE_FOUNDATION})
-endif()
-if(HAVE_DVDCSS_DVDCSS_H)
-  target_link_libraries(mythdvdnav PRIVATE dvdcss)
-endif()
 
 #
 # The MythTV customization to dvdnav adds references to the MythFile* functions,
@@ -169,12 +192,6 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   target_link_options(mythdvdnav PRIVATE -undefined dynamic_lookup)
 endif()
 
-# These defines don't appear to be used anywhere in the sources, but they were
-# set up by the libmythdvdnav.pro file... so here they are.
-set_target_properties(
-  mythdvdnav PROPERTIES COMPILE_OPTIONS "-Wno-address-of-packed-member"
-                        COMPILE_DEFINITIONS "HAVE_CONFIG_H")
-
 #
 # Compile PIC code on android.  The default for PIC code is ON for shared
 # libraries, but on android this library is built as a static library because of
@@ -189,10 +206,27 @@ endif()
 target_include_directories(
   mythdvdnav
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/dvdnav ${CMAKE_CURRENT_SOURCE_DIR}/dvdread
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include)
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include
+  # for libdvdnav version.h
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/dvdnav
+  # for libdvdread version.h
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdread/dvdread
+  )
 
 install(
   TARGETS mythdvdnav
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(FILES
+  ${LIBDVDNAV_HEADERS}
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/dvdnav/version.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/dvdnav
+  )
+
+install(FILES
+  ${LIBDVDREAD_HEADERS}
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdread/dvdread/version.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/dvdread
+  )

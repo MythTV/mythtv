@@ -28,7 +28,6 @@
 #include "dvdread/dvd_reader.h"      /* DVD_VIDEO_LB_LEN */
 #include "dvd_input.h"
 #include "libmythtv/io/mythiowrapper.h"
-#include "mythdvdreadexp.h"
 
 /* The function pointers that is the exported interface of this file. */
 dvd_input_t (*dvdinput_open)  (const char *, void *, dvd_reader_stream_cb *);
@@ -54,14 +53,9 @@ int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
 # else
 #   if defined(WIN32)
 /* Only needed on MINGW at the moment */
-/*#    include "../msvc/contrib/dlfcn.c"*/
-#    include "libmythbase/compat.h"
+#    include "win32_dlfcn.h"
 #   endif
 # endif
-
-#ifdef __APPLE__
-# include <CoreFoundation/CFBundle.h>
-#endif
 
 typedef struct dvdcss_s *dvdcss_t;
 typedef struct dvdcss_stream_cb dvdcss_stream_cb;
@@ -291,33 +285,6 @@ int dvdinput_setup(const char *path)
   #define CSS_LIB "libdvdcss.so.2"
 #endif
   dvdcss_library = dlopen(CSS_LIB, RTLD_LAZY);
-
-#ifdef __APPLE__
-  if (!dvdcss_library)
-  {
-    fprintf(stderr, "libdvdread: dlopen(%s) failed.\n", CSS_LIB);
-    CFURLRef     appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-    CFStringRef  macPath   = CFURLCopyFileSystemPath(appUrlRef,
-                                                    kCFURLPOSIXPathStyle);
-    static char const * const paths[]   = {
-        "%s/Contents/Frameworks/%s",
-        "%s/Contents/PlugIns/%s", // proper spelling, important on case sensitive fs
-        "%s/Contents/Plugins/%s", // to be compatible with old bundler
-        NULL
-    };
-    char         pathname[FILENAME_MAX];
-    for (int i = 0; paths[i] != NULL && dvdcss_library == NULL; i++)
-    {
-        snprintf(pathname, FILENAME_MAX-1, paths[i],
-                 CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding()),
-                 CSS_LIB);
-        fprintf(stderr, "Trying %s\n", pathname);
-        dvdcss_library = dlopen(pathname, RTLD_LAZY);
-    }
-    CFRelease(appUrlRef);
-    CFRelease(macPath);
-  }
-#endif
 
   if(dvdcss_library != NULL) {
 #if defined(__OpenBSD__) && !defined(__ELF__) || defined(__OS2__)
