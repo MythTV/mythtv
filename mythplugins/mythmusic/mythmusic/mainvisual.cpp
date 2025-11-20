@@ -141,8 +141,8 @@ void MainVisual::prepare()
         delete m_nodes.takeLast();
 }
 
-// This is called via : mythtv/libs/libmyth/output.cpp :: OutputListeners::dispatchVisual
-//    from : mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
+// This is called via : mythtv/libs/libmythtv/audio/audiooutput.cpp :: AudioOutput::dispatchVisual
+//    from : mythtv/libs/libmythtv/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
 // Caller holds mutex() lock
 void MainVisual::add(const void *buffer, unsigned long b_len,
                      std::chrono::milliseconds timecode,
@@ -266,17 +266,17 @@ void MainVisual::resize(const QSize size)
 
 void MainVisual::customEvent(QEvent *event)
 {
-    if ((event->type() == OutputEvent::kPlaying)   ||
-        (event->type() == OutputEvent::kInfo)      ||
-        (event->type() == OutputEvent::kBuffering) ||
-        (event->type() == OutputEvent::kPaused))
+    if ((event->type() == AudioOutput::Event::kPlaying)   ||
+        (event->type() == AudioOutput::Event::kInfo)      ||
+        (event->type() == AudioOutput::Event::kBuffering) ||
+        (event->type() == AudioOutput::Event::kPaused))
     {
         m_playing = true;
         if (!m_updateTimer->isActive())
             m_updateTimer->start();
     }
-    else if ((event->type() == OutputEvent::kStopped) ||
-             (event->type() == OutputEvent::kError))
+    else if ((event->type() == AudioOutput::Event::kStopped) ||
+             (event->type() == AudioOutput::Event::kError))
     {
         m_playing = false;
     }

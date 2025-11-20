@@ -6,7 +6,8 @@
 #include <QVariant>
 
 // MythTV
-#include "libmyth/audio/audiooutpututil.h"
+#include "libmythtv/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutputsettings.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"
@@ -406,7 +407,7 @@ void AudioSetupWizard::toggleSpeakers(void)
 
     m_testThread =
         new AudioTestThread(this, out, out, channels, settings, false);
-    if (!m_testThread->result().isEmpty())
+    if (!m_testThread->isOutputOpen())
     {
         QString msg = QObject::tr("Audio device is invalid or not useable.");
         ShowOkPopup(msg);

@@ -9,7 +9,7 @@
 #include <QStringList>
 
 // MythTV headers
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 #include "libmythui/standardsettings.h"
 #include "libmythbase/mthread.h"
 #include "libmythui/mythdialogbox.h"
@@ -154,7 +154,7 @@ class AudioTestThread : public MThread
     ~AudioTestThread() override;
 
     void cancel();
-    QString result();
+    bool isOutputOpen() { return m_audioOutput != nullptr && m_audioOutput->isConfigured(); };
     void setChannel(int channel);
 
   protected:
