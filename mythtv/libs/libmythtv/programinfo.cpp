@@ -29,7 +29,6 @@
 
 #include "programinfo.h"
 #include "programinfoupdater.h"
-#include "remoteutil.h"
 
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 
@@ -47,7 +46,7 @@ static constexpr uint    kInvalidDateTime  { UINT_MAX  };
 static constexpr int64_t kLastUpdateOffset { 61LL * 60 };
 
 #define DEFINE_FLAGS_NAMES
-#include "libmythbase/programtypeflags.h"
+#include "programtypeflags.h"
 #undef DEFINE_FLAGS_NAMES
 
 const QString ProgramInfo::kFromRecordedQuery =
@@ -6679,5 +6678,24 @@ QString ProgGroupBy::toString(ProgGroupBy::Type groupBy)
     }
 }
 
+bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
+{
+    QStringList strlist("QUERY_CHECKFILE");
+    strlist << QString::number((int)checkSlaves);
+    pginfo->ToStringList(strlist);
+
+    if (!gCoreContext->SendReceiveStringList(strlist) ||
+        (strlist.size() < 2) || !strlist[0].toInt())
+        return false;
+
+    // Only modify the pathname if the recording file is available locally on
+    // this host
+    QString localpath = strlist[1];
+    QFile checkFile(localpath);
+    if (checkFile.exists())
+        pginfo->SetPathname(localpath);
+
+    return true;
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

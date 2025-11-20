@@ -13,9 +13,9 @@
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythversion.h"
-#include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/mythccextractorplayer.h"
+#include "libmythtv/programinfo.h"
 
 // MythCCExtractor
 #include "mythccextractor_commandlineparser.h"

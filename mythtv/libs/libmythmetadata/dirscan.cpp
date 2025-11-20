@@ -5,7 +5,6 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 
 #include "dbaccess.h"
@@ -136,7 +135,7 @@ namespace
         }
         else
         {
-            ok = RemoteGetFileList(host, start_path, &list, "Videos");
+            ok = StorageGroup::remoteGetFileList(host, start_path, &list, "Videos");
         }
 
         if (!ok || (!list.isEmpty() && list.at(0).startsWith("SLAVE UNREACHABLE")))

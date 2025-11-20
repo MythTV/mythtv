@@ -4,8 +4,8 @@
 #include <QEvent>
 #include <QObject>
 
-#include "libmythbase/programinfo.h"
 #include "libmythui/rawsettingseditor.h"
+#include "programinfo.h"
 #include "recordinginfo.h"
 
 // Helper commands for formatting and sending a MythSystemEvent

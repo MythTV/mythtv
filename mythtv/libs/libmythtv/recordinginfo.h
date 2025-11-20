@@ -5,10 +5,10 @@
 #include <QRegularExpression>
 #include <QString>
 
-#include "libmythbase/programinfo.h"
-#include "libmythbase/recordingstatus.h"
 #include "libmythtv/mythtvexp.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/recordingfile.h"
+#include "libmythtv/recordingstatus.h"
 
 class RecordingRule;
 

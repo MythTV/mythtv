@@ -8,7 +8,6 @@
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h" // for subtitle types and audio and video properties
 
 #include "channelutil.h"
 #include "eitcache.h"
@@ -20,6 +19,7 @@
 #include "mpeg/premieredescriptors.h"
 #include "mpeg/premieretables.h"
 #include "programdata.h"
+#include "programinfo.h" // for subtitle types and audio and video properties
 #include "scheduledrecording.h"  // for ScheduledRecording
 
 const uint EITHelper::kMaxQueueSize   = 10000;

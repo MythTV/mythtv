@@ -7,9 +7,9 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsocket.h"
-#include "libmythbase/programinfo.h"
 
 #include "recorders/signalmonitor.h"
+#include "programinfo.h"
 #include "remoteencoder.h"
 
 #define LOC QString("RemoteEncoder(%1): ").arg(m_recordernum)

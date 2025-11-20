@@ -16,8 +16,6 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"
-#include "libmythbase/programinfo.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 
 #include "cardutil.h"
@@ -32,6 +30,7 @@
 #include "mythsystemevent.h"
 #include "osd.h"
 #include "previewgeneratorqueue.h"
+#include "programinfo.h"
 #include "recorders/channelbase.h"
 #include "recorders/dtvchannel.h"
 #include "recorders/dtvrecorder.h"

@@ -13,8 +13,8 @@ using uint = unsigned int;
 #include <QMutex>
 #include <QString>
 
-#include "libmythbase/programinfo.h" // for subtitle types and audio and video properties
 #include "libmythtv/mythtvexp.h" // MTV_PUBLIC - Symbol Visibility
+#include "libmythtv/programinfo.h" // for subtitle types and audio and video properties
 #include "mpegdescriptors.h"
 
 MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char *buf);
