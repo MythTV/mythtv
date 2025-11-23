@@ -1,10 +1,14 @@
+#include "opengl/mythvaapidrminterop.h"
+
+#include <va/va_drm.h>
+#include <va/va_drmcommon.h>
+
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
-#include "opengl/mythvaapidrminterop.h"
 
 // FFmpeg
 extern "C" {
@@ -378,7 +382,6 @@ bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL* Context)
     return HaveDMABuf(Context);
 }
 
-#if VA_CHECK_VERSION(1, 1, 0)
 static inline void VADRMtoPRIME(VADRMPRIMESurfaceDescriptor* VaDRM, AVDRMFrameDescriptor* Prime)
 {
     Prime->nb_objects = static_cast<int>(VaDRM->num_objects);
@@ -401,7 +404,6 @@ static inline void VADRMtoPRIME(VADRMPRIMESurfaceDescriptor* VaDRM, AVDRMFrameDe
         }
     }
 }
-#endif
 
 /*! \brief Export the given VideoFrame as a DRM PRIME descriptor
  *
@@ -415,19 +417,16 @@ MythVAAPIInteropDRM::AcquirePrime([[maybe_unused]] VASurfaceID Id,
 {
     std::vector<MythVideoTextureOpenGL*> result;
 
-#if VA_CHECK_VERSION(1, 1, 0)
     if (!m_drmFrames.contains(Id))
         m_drmFrames.insert(Id, GetDRMFrameDescriptor(Id));
     if (!m_drmFrames.contains(Id))
         return result;
     result = CreateTextures(m_drmFrames[Id], Context, Frame, false);
-#endif
     return result;
 }
 
 AVDRMFrameDescriptor* MythVAAPIInteropDRM::GetDRMFrameDescriptor([[maybe_unused]] VASurfaceID Id)
 {
-#if VA_CHECK_VERSION(1, 1, 0)
     INIT_ST;
     uint32_t exportflags = VA_EXPORT_SURFACE_SEPARATE_LAYERS | VA_EXPORT_SURFACE_READ_ONLY;
     VADRMPRIMESurfaceDescriptor vadesc;
@@ -439,9 +438,6 @@ AVDRMFrameDescriptor* MythVAAPIInteropDRM::GetDRMFrameDescriptor([[maybe_unused]
     auto * drmdesc = reinterpret_cast<AVDRMFrameDescriptor*>(av_mallocz(sizeof(AVDRMFrameDescriptor)));
     VADRMtoPRIME(&vadesc, drmdesc);
     return drmdesc;
-#else
-    return nullptr;
-#endif
 }
 
 void MythVAAPIInteropDRM::CleanupDRMPRIME()
@@ -461,7 +457,6 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME()
 
 bool MythVAAPIInteropDRM::TestPrimeInterop()
 {
-#if VA_CHECK_VERSION(1, 1, 0)
     static bool s_supported = false;
     static bool s_checked = false;
 
@@ -511,9 +506,6 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI DRM PRIME interop is %1supported")
         .arg(s_supported ? "" : "not "));
     return s_supported;
-#else
-    return false;
-#endif
 }
 
 #if CONFIG_DRM_VIDEO

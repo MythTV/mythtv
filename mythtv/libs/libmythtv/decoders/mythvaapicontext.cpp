@@ -75,14 +75,12 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext* Codec)
             }
             break;
         case AV_CODEC_ID_HEVC:
-#if VA_CHECK_VERSION(0, 37, 0)
             switch (Codec->profile)
             {
                 case FF_PROFILE_HEVC_MAIN: return VAProfileHEVCMain;
                 case FF_PROFILE_HEVC_MAIN_10: return VAProfileHEVCMain10;
                 default: break;
             }
-#endif
             break;
         case AV_CODEC_ID_MJPEG: return VAProfileJPEGBaseline;
         case AV_CODEC_ID_WMV3:
@@ -100,12 +98,8 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext* Codec)
         case AV_CODEC_ID_VP9:
             switch (Codec->profile)
             {
-#if VA_CHECK_VERSION(0, 38, 0)
                 case FF_PROFILE_VP9_0: return VAProfileVP9Profile0;
-#endif
-#if VA_CHECK_VERSION(0, 39, 0)
                 case FF_PROFILE_VP9_2: return VAProfileVP9Profile2;
-#endif
                 default: break;
             }
             break;
@@ -491,16 +485,10 @@ const VAAPIProfiles& MythVAAPIContext::GetProfiles()
             case VAProfileVC1Main:       return MythCodecContext::VC1Main;
             case VAProfileVC1Advanced:   return MythCodecContext::VC1Advanced;
             case VAProfileVP8Version0_3: return MythCodecContext::VP8;
-#if VA_CHECK_VERSION(0, 38, 0)
             case VAProfileVP9Profile0:   return MythCodecContext::VP9_0;
-#endif
-#if VA_CHECK_VERSION(0, 39, 0)
             case VAProfileVP9Profile2:   return MythCodecContext::VP9_2;
-#endif
-#if VA_CHECK_VERSION(0, 37, 0)
             case VAProfileHEVCMain:      return MythCodecContext::HEVCMain;
             case VAProfileHEVCMain10:    return MythCodecContext::HEVCMain10;
-#endif
             case VAProfileJPEGBaseline:  return MythCodecContext::MJPEG;
             default: break;
         }

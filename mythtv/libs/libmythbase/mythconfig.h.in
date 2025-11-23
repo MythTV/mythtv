@@ -75,6 +75,9 @@
 #cmakedefine01 CONFIG_V4L2
 #cmakedefine01 CONFIG_V4L2PRIME
 #cmakedefine01 CONFIG_VAAPI
+#cmakedefine01 CONFIG_VAAPI_DRM
+#cmakedefine01 CONFIG_VAAPI_GLX
+#cmakedefine01 CONFIG_VAAPI_X11
 #cmakedefine01 CONFIG_VALGRIND
 #cmakedefine01 CONFIG_VBOX
 #cmakedefine01 CONFIG_VDPAU
