@@ -1,0 +1,13 @@
+diff --git a/libass/ass.c b/libass/ass.c
+index 25eeed3..77dc323 100644
+--- a/libass/ass.c
++++ b/libass/ass.c
+@@ -1383,7 +1383,7 @@ static char *sub_recode(ASS_Library *library, char *data, size_t size,
+ 
+         while (1) {
+             if (ileft)
+-                rc = iconv(icdsc, &ip, &ileft, &op, &oleft);
++                rc = iconv(icdsc, (WINICONV_CONST char **)&ip, &ileft, &op, &oleft);
+             else {              // clear the conversion state and leave
+                 clear = 1;
+                 rc = iconv(icdsc, NULL, NULL, &op, &oleft);

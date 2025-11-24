@@ -49,11 +49,20 @@ function(find_or_build_libass)
   if(NOT AUTOMAKE_VERSION VERSION_EQUAL 1.16)
     ExternalProject_Add_Step(
       libass pre-configure
-      DEPENDEES patch
+      DEPENDEES patch     # after patch, before configure
       DEPENDERS configure
       COMMAND autoreconf
       WORKING_DIRECTORY <SOURCE_DIR>)
   endif()
+  if(MINGW)
+    ExternalProject_Add_Step(
+      libass win-patch
+      DEPENDEES patch    # after patch, before configure
+      DEPENDERS configure
+      COMMAND patch -p1 < ${PROJECT_SOURCE_DIR}/patches/${LIBASS_PREFIX}.mingw.patch
+      WORKING_DIRECTORY <SOURCE_DIR>)
+  endif()
+
 
   add_dependencies(external_libs libass)
 
