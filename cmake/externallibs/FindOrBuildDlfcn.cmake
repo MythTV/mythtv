@@ -13,7 +13,7 @@ function(find_or_build_dlfcn)
   find_library(DLFCN NAMES dl NO_CACHE)
   if(DLFCN)
     message(STATUS "Found dlfcn at ${DLFCN}")
-    add_library(fdlfcn SHARED IMPORTED)
+    add_library(dlfcn SHARED IMPORTED)
     return()
   endif()
 
