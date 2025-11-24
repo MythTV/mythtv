@@ -110,9 +110,11 @@ function(find_or_build_qt)
   # Ubuntu Rolling Rhino
   set(QT_6.8.2_SHA256
       "659d8bb5931afac9ed5d89a78e868e6bd00465a58ab566e2123db02d674be559")
-  # Fedora Rawhide
   set(QT_6.9.0_SHA256
       "4f61e50551d0004a513fefbdb0a410595d94812a48600646fb7341ea0d17e1cb")
+  # Fedora 43/Rawhide
+  set(QT_6.10.0_SHA256
+      "81895fb038a9c3d6c6f698d7611339a189eb45c3d91746c7789b0b77a5981aa3")
 
   # Qt6 requires that the version of the host tools match the version being
   # built.  What are the fallback target versions to build if there isn't an
@@ -125,6 +127,7 @@ function(find_or_build_qt)
   set(QT_MAP_6.7 "6.7.2")
   set(QT_MAP_6.8 "6.8.1")
   set(QT_MAP_6.9 "6.9.0")
+  set(QT_MAP_6.10 "6.10.0")
 
   # Grab the host version directly. so as not to pollute our cross-build setup.
   file(STRINGS
@@ -149,6 +152,13 @@ function(find_or_build_qt)
       FATAL_ERROR
         "Qt6 requires that the target and host major/minor version are the same.  Your host version is ${HOST_QT_MAJMIN} but there are no instructions on how to build that version."
     )
+  endif()
+
+  # Qt 6.10 on android requires SDK version of 26.
+  if (QT_VERSION VERSION_GREATER_EQUAL 6.10)
+    if(ANDROID AND CMAKE_SYSTEM_VERSION LESS 26)
+      message(FATAL_ERROR "Qt 6.10 requires a minimum of Android 26 (found ${CMAKE_SYSTEM_VERSION}).")
+    endif()
   endif()
 
   # Qt6 cross compiling requires that a native version of Qt6 be installed on
