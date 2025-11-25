@@ -1102,8 +1102,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 QString("%1(%2) m_inputName: %3 ").arg(__FUNCTION__).arg(__LINE__).arg(m_inputName) +
-                QString("tunerType:%1 %2 ").arg(m_scanDTVTunerType).arg(m_scanDTVTunerType.toString()) +
-                QString("m_modSys:%1 %2 ").arg(item.m_tuning.m_modSys).arg(item.m_tuning.m_modSys.toString()) +
+                QString("tunerType:%1 %2 ").arg(m_scanDTVTunerType.toInt()).arg(m_scanDTVTunerType.toString()) +
+                QString("m_modSys:%1 %2 ").arg(item.m_tuning.m_modSys.toInt()).arg(item.m_tuning.m_modSys.toString()) +
                 QString("m_dvbt2Tried:%1").arg(m_dvbt2Tried));
 
             m_channelList << ChannelListItem(m_current, m_currentInfo);
@@ -2598,7 +2598,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
 
     LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
         QString("tunertype:%1 %2 sourceid:%3 sistandard:%4 fn:'%5' mplexid:%6")
-            .arg(tt).arg(tt.toString()).arg(sourceid).arg(sistandard, fn).arg(mplexid));
+            .arg(tt.toInt()).arg(tt.toString()).arg(sourceid).arg(sistandard, fn).arg(mplexid));
 
     if (item.m_tuning.FillFromDB(tt, mplexid))
     {

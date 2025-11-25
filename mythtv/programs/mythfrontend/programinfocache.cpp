@@ -232,7 +232,7 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
     }
 
     LOG(VB_GUI, LOG_DEBUG, QString("Pg %1 %2 update state %3")
-        .arg(recordingId).arg(pg.GetTitle()).arg(flags));
+        .arg(recordingId).arg(pg.GetTitle()).arg(int(flags)));
     return flags;
 }
 
@@ -269,7 +269,7 @@ void ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize,
     if (flags & PIC_MARK_CHANGED)
         pg->m_previewUpdate = pg->GetBookmarkUpdate();
 
-    QString mesg = QString("UPDATE_UI_ITEM %1 %2").arg(recordingID).arg(flags);
+    QString mesg = QString("UPDATE_UI_ITEM %1 %2").arg(recordingID).arg(int(flags));
     QCoreApplication::postEvent(m_listener, new MythEvent(mesg));
 
     LOG(VB_GUI, LOG_DEBUG, mesg);

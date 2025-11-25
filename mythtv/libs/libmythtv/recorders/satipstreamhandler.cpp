@@ -393,7 +393,7 @@ bool SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
     }
     else
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + QString("Unhandled m_tunerType %1 %2").arg(m_tunerType).arg(m_tunerType.toString()));
+        LOG(VB_RECORD, LOG_ERR, LOC + QString("Unhandled m_tunerType %1 %2").arg(m_tunerType.toInt()).arg(m_tunerType.toString()));
         return false;
     }
 

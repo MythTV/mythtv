@@ -62,6 +62,7 @@ class DTVParamHelper
     DTVParamHelper &operator=(int _value) { m_value = _value; return *this; }
 
     operator int()                const { return m_value;        }
+    int  toInt()                  const { return m_value;        }
     bool operator==(const int v)  const { return m_value == v;   }
     bool operator!=(const int v)  const { return m_value != v;   }
 
