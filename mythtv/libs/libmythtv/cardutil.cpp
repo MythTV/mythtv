@@ -732,7 +732,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("(%1) tuner type:%2 %3")
-        .arg(device).arg(type).arg(ret));
+        .arg(device).arg(type.toInt()).arg(ret));
 #endif // USING_DVB
 
     return ret;
@@ -837,7 +837,7 @@ DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)
         default:
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("TODO Add to switch case delivery system:%2 %3")
-                    .arg(delsys).arg(delsys.toString()));
+                    .arg(delsys.toInt()).arg(delsys.toString()));
             break;
     }
 
@@ -934,7 +934,7 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem([[maybe_unused]] const 
     delsys = ProbeCurrentDeliverySystem(fd_frontend);
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("CardUtil(%1): delsys:%2 %3")
-        .arg(device).arg(delsys).arg(delsys.toString()));
+        .arg(device).arg(delsys.toInt()).arg(delsys.toString()));
 
     close(fd_frontend);
 #endif

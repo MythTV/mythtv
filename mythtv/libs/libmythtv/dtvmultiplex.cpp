@@ -495,7 +495,7 @@ bool DTVMultiplex::ParseTuningParams(
 
     LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("ParseTuningParams -- Unknown tuner type = 0x%1")
-        .arg(type,0,16,QChar('0')));
+        .arg(type.toInt(),0,16,QChar('0')));
 
     return false;
 }
