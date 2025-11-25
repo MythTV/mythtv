@@ -345,7 +345,12 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
     streamThread->start();
 
     QFile input;
-    input.open(stdin, QIODevice::ReadOnly);
+    if (!input.open(stdin, QIODevice::ReadOnly))
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + "Opening of stdin failed");
+        return false;
+    }
+
     QTextStream qtin(&input);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Listening for commands");

@@ -454,7 +454,11 @@ void Commands::Run(void)
     polls[0].revents = 0;
 
     QFile input;
-    input.open(stdin, QIODevice::ReadOnly);
+    if (!input.open(stdin, QIODevice::ReadOnly))
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + "Opening of stdin failed");
+        return;
+    }
     QTextStream qtin(&input);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Command parser ready.");
