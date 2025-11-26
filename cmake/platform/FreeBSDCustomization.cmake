@@ -10,3 +10,7 @@ endif()
 
 # FFmpeg needs a little help in finding the mp3lame library.
 list(APPEND FF_PLATFORM_ARGS "--extra-ldflags=-L/usr/local/lib")
+
+# Fix problem with iconv_xxx vs libiconv_xxx function names.
+list(APPEND FF_PLATFORM_ARGS "--extra-cflags=-DLIBICONV_PLUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLIBICONV_PLUG")

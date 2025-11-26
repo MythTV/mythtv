@@ -6461,10 +6461,12 @@ fi
 # incompatible function pointer waring has been promoted to an error.
 # Demoting it back to a warning allows the builds to work again.
 # https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2023-March/307515.html
-if test $target_os = "freebsd" &&
-	enabled clangxx &&
-	test $clangxx_major -ge 16; then
-   ffmpeg_extra_cflags="$ffmpeg_extra_cflags -Wno-error=incompatible-function-pointer-types"
+if test $target_os = "freebsd"; then
+    add_cxxflags -DLIBICONV_PLUG
+    ffmpeg_extra_cflags="$ffmpeg_extra_cflags -DLIBICONV_PLUG"
+    if enabled clangxx && test $clangxx_major -ge 16; then
+       ffmpeg_extra_cflags="$ffmpeg_extra_cflags -Wno-error=incompatible-function-pointer-types"
+    fi
 fi
 
 append ffopts \
