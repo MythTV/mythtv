@@ -135,4 +135,7 @@ if(TOOLCHAIN_PREFIX MATCHES "mingw")
   if(NOT LIBS_INSTALL_PREFIX STREQUAL CMAKE_INSTALL_PREFIX)
     link_directories(${LIBS_INSTALL_PREFIX}/bin)
   endif()
+
+  # libdvdnav uses the dlopen functions and expects this to be set.
+  set(CMAKE_DL_LIBS dl)
 endif()
