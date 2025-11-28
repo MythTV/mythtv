@@ -9,16 +9,7 @@
 #    include <QtGlobal>       // for Q_OS_XXX
 #endif
 
-#include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
-
 #include "mythconfig.h"
-
-// Libdvdnav now uses off64_t lseek64(), which BSD/Darwin doesn't have.
-// Luckily, its lseek() is already 64bit compatible
-#ifdef BSD
-    typedef off_t off64_t; //NOLINT(modernize-use-using) included from dvdnav C code
-#   define lseek64(f,o,w) lseek(f,o,w)
-#endif
 
 #ifdef Q_OS_ANDROID
 #   ifndef S_IREAD
@@ -257,10 +248,9 @@
 
 #include <sys/stat.h>   // S_IREAD/WRITE on MinGW
 #  define S_IRUSR _S_IREAD
-#  ifndef lseek64
-#    define lseek64( f, o, w ) _lseeki64( f, o, w )
-#  endif
 
+#   define lseek _lseeki64
+#   define off_t __int64
 #endif // _MSC_VER
 
 
