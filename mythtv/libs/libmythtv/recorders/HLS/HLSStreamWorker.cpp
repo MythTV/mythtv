@@ -1,7 +1,9 @@
-#include "HLSReader.h"
 #include "HLSStreamWorker.h"
 
 #include "libmythbase/mythlogging.h"
+#include "libmythbase/mythsingledownload.h"
+
+#include "HLSReader.h"
 
 #define LOC QString("%1 worker: ").arg(m_parent->StreamURL().isEmpty() ? "Stream" : m_parent->StreamURL())
 
