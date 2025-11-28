@@ -1,12 +1,19 @@
 #ifndef HLS_STREAM_
 #define HLS_STREAM_
 
+#include <array>
+#include <cstdint>
+
+#include <QByteArray>
+#include <QDateTime>
 #include <QMap>
+#include <QMutex>
 #include <QQueue>
+#include <QString>
 
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/mythsingledownload.h"
-#include "HLSSegment.h"
 
 // 128-bit AES key for HLS segment decryption
 static constexpr uint8_t AES128_KEY_SIZE { 16 };

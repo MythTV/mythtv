@@ -9,8 +9,6 @@
 
 #include "libmythbase/mythlogging.h"
 
-#include "HLSReader.h"
-
 #define LOC QString("HLSSegment[%1]: ").arg(m_inputId)
 
 HLSRecSegment::HLSRecSegment(int inputId)

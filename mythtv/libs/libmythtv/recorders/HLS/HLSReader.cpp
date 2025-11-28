@@ -1,4 +1,7 @@
-#include <sys/time.h>
+#include "HLSReader.h"
+
+#include <cstring>
+
 #include <unistd.h>
 
 #include <QtGlobal>
@@ -6,11 +9,12 @@
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
 #endif
+#include <QUrl>
 
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/mythlogging.h"
 
-#include "HLSReader.h"
 #include "HLS/m3u.h"
 
 #define LOC QString("HLSReader[%1]: ").arg(m_inputId)

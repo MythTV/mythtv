@@ -1,8 +1,9 @@
 #include "HLSStream.h"
 
-#include <unistd.h>
-
+#include <algorithm>
 #include <array>
+#include <cstdint>
+#include <cstring>
 #include <utility>
 
 #if CONFIG_LIBCRYPTO
@@ -10,9 +11,13 @@
 #include <openssl/evp.h>
 #endif
 
+#include <QMutexLocker>
+
 #include "libmythbase/mythlogging.h"
 
+#ifdef HLS_USE_MYTHDOWNLOADMANAGER
 #include "HLSReader.h"
+#endif
 
 #define LOC QString("HLSRecstream[%1]: ").arg(m_inputId)
 

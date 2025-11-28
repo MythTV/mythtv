@@ -9,11 +9,11 @@
 #include <openssl/aes.h>
 #endif // CONFIG_LIBCRYPTO
 
+#include <QByteArray>
 #include <QString>
 #include <QUrl>
 
 #include "libmythbase/mythchrono.h"
-#include "libmythbase/mythsingledownload.h"
 
 class HLSRecSegment
 {

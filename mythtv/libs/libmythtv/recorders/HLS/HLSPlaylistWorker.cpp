@@ -1,5 +1,6 @@
 #include "HLSPlaylistWorker.h"
 
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/mythlogging.h"
 
 #include "HLSReader.h"
