@@ -29,7 +29,7 @@
 #include <mach/mach.h>
 #endif
 
-#ifdef BSD
+#ifdef Q_OS_BSD4
 #include <sys/mount.h>  // for struct statfs
 #include <sys/sysctl.h>
 #include <sys/stat.h> // for umask, chmod

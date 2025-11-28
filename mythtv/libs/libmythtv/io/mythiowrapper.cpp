@@ -234,12 +234,6 @@ int MythfileClose(int FileID)
     return -1;
 }
 
-#ifdef _WIN32
-#   undef  lseek
-#   define lseek  _lseeki64
-#   undef  off_t
-#   define off_t off64_t
-#endif
 off_t MythFileSeek(int FileID, off_t Offset, int Whence)
 {
     off_t result = -1;
@@ -276,11 +270,6 @@ off_t MythFileTell(int FileID)
 
     return result;
 }
-
-#ifdef _WIN32
-#   undef  lseek
-#   undef  off_t
-#endif
 
 ssize_t MythFileRead(int FileID, void *Buffer, size_t Count)
 {

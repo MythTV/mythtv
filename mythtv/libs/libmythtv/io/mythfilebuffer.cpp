@@ -660,7 +660,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
                 }
                 else
                 {
-                    ret = lseek64(m_fd2, m_internalReadPos, SEEK_SET);
+                    ret = lseek(m_fd2, m_internalReadPos, SEEK_SET);
 #ifndef _MSC_VER
                     if (posix_fadvise(m_fd2, m_internalReadPos, static_cast<off_t>(128)*1024, POSIX_FADV_WILLNEED) != 0)
                         LOG(VB_FILE, LOG_DEBUG, LOC + QString("Seek(): fadvise willneed failed: ") + ENO);
@@ -747,7 +747,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
             if (m_remotefile)
                 ret = m_remotefile->Seek(m_ignoreReadPos, SEEK_SET);
             else
-                ret = lseek64(m_fd2, m_ignoreReadPos, SEEK_SET);
+                ret = lseek(m_fd2, m_ignoreReadPos, SEEK_SET);
 
             if (ret < 0)
             {
@@ -763,7 +763,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
                 if (m_remotefile)
                     ret = m_remotefile->Seek(m_internalReadPos, SEEK_SET);
                 else
-                    ret = lseek64(m_fd2, m_internalReadPos, SEEK_SET);
+                    ret = lseek(m_fd2, m_internalReadPos, SEEK_SET);
                 if (ret < 0)
                 {
                     QString cmd2 = QString("Seek(%1, SEEK_SET) int ")
@@ -808,7 +808,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
     }
     else
     {
-        ret = lseek64(m_fd2, Position, Whence);
+        ret = lseek(m_fd2, Position, Whence);
     }
 
     if (ret >= 0)

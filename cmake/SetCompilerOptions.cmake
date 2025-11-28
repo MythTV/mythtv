@@ -42,6 +42,7 @@ list(
   -fno-signed-zeros
   -fno-tree-vectorize
   -mstack-alignment=16
+  -D_FILE_OFFSET_BITS=64
   -Wall
   -Wextra
   -Wduplicated-branches
@@ -66,6 +67,7 @@ list(
   -fno-tree-vectorize
   -funit-at-a-time
   -mstack-alignment=16
+  -D_FILE_OFFSET_BITS=64
   -Qunused-arguments
   -Wall
   -Wextra
