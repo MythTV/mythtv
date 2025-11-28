@@ -1,11 +1,20 @@
 #ifndef HLS_READER_H
 #define HLS_READER_H
 
+#include <QByteArray>
+#include <QMap>
+#include <QMutex>
 #include <QObject>
 #include <QString>
-#include <QUrl>
 #include <QTextStream>
+#include <QtGlobal> // Qt 5 for QtTypes and QtVersionChecks
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtTypes>
+#endif
+#include <QVector>
+#include <QWaitCondition>
 
+#include "libmythbase/mythchrono.h"
 /*
   Use MythSingleDownload.
 
