@@ -395,6 +395,11 @@ target_link_libraries(
          mythupnp
          mythdvdnav)
 
+target_link_libraries(
+  mythtv
+  PRIVATE
+  ${MYTHTV_EXTRA_LIBRARIES})
+
 #
 # Total Android Hack. The check as to whether or not libxml2 is present ends up
 # deciding that iconv is builtin, and thus the Iconv::Iconv target doesn't

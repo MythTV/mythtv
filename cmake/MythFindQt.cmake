@@ -117,7 +117,7 @@ message(STATUS "Checking for OpenGL ES")
 find_file(
   _QTGUI_CONFIG
   NAMES QtGui/qtgui-config.h ${QT_PKG_NAME_LC}/QtGui/qtgui-config.h
-  HINTS AAA ${CMAKE_INSTALL_PREFIX}/qt/include BBB)
+  HINTS AAA ${CMAKE_INSTALL_PREFIX}/qt/include ${QTGUI_CONFIG_EXTRA} BBB)
 if(_QTGUI_CONFIG)
   include(GetDefine)
   get_define(${_QTGUI_CONFIG} QT_OPENGL_ES_2

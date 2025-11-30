@@ -183,7 +183,7 @@ if(ENABLE_BINDINGS_PERL)
 endif()
 
 if(ENABLE_BINDINGS_PHP)
-  find_program(PHP_EXECUTABLE NAMES php)
+  find_program(PHP_EXECUTABLE NAMES php php-8.4)
   if(PHP_EXECUTABLE)
     execute_process(COMMAND ${PHP_EXECUTABLE} --version OUTPUT_VARIABLE _output)
     if("${_output}" MATCHES "PHP ([0-9\.]+).*")
@@ -281,6 +281,16 @@ else(_QT_HAS_GLES)
     target_link_libraries(
       any_opengl INTERFACE Qt${QT_VERSION_MAJOR}::OpenGL OpenGL::GL
                            $<TARGET_NAME_IF_EXISTS:OpenGL::EGL>)
+  endif()
+  if(NOT TARGET any_opengl)
+    pkg_check_modules(OsMesa IMPORTED_TARGET osmesa)
+    add_build_config(PkgConfig::OsMesa "mesa")
+    set_if_target_exists(CONFIG_OPENGL PkgConfig::OsMesa)
+    if(TARGET PkgConfig::OsMesa)
+      add_library(any_opengl INTERFACE)
+      target_link_libraries(
+        any_opengl INTERFACE Qt${QT_VERSION_MAJOR}::OpenGL PkgConfig::OsMesa)
+    endif()
   endif()
 endif(_QT_HAS_GLES)
 

@@ -29,7 +29,7 @@ SignalHandler *SignalHandler::s_singleton;
 static const std::array<const int, 6
 #ifndef _WIN32
     + 1
-#ifndef Q_OS_DARWIN
+#if !defined(Q_OS_DARWIN) && !defined(Q_OS_OPENBSD)
     + 1
 #endif // Q_OS_DARWIN
 #endif // _WIN32
@@ -38,7 +38,7 @@ static const std::array<const int, 6
     SIGINT, SIGTERM, SIGSEGV, SIGABRT, SIGFPE, SIGILL,
 #ifndef _WIN32
     SIGBUS,
-#ifndef Q_OS_DARWIN
+#if !defined(Q_OS_DARWIN) && !defined(Q_OS_OPENBSD)
     SIGRTMIN, // not necessarily constexpr
 #endif // Q_OS_DARWIN
 #endif // _WIN32
@@ -303,7 +303,7 @@ void SignalHandler::handleSignal(void)
     SigHandlerFunc handler = nullptr;
     bool allowNullHandler = false;
 
-#ifndef Q_OS_DARWIN
+#if !defined(Q_OS_DARWIN) && !defined(Q_OS_OPENBSD)
     if (signum == SIGRTMIN)
     {
         // glibc idiots seem to have made SIGRTMIN a macro that expands to a
@@ -311,7 +311,7 @@ void SignalHandler::handleSignal(void)
         // This uses the default handler to just get us here and to ignore it.
         allowNullHandler = true;
     }
-#endif // Q_OS_DARWIN
+#endif // !defined(Q_OS_DARWIN) && !defined(Q_OS_OPENBSD)
 
     switch (signum)
     {

@@ -7,6 +7,12 @@
 #include <fcntl.h>
 #include <pthread.h>
 
+#include <QtGlobal> // for Q_OS_XXX
+#if defined(Q_OS_NETBSD) || defined(Q_OS_OPENBSD)
+#define PTHREAD_NULL nullptr
+#else
+#define PTHREAD_NULL 0
+#endif
 #include <QDateTime>
 #include <QFileInfo>
 #include <QEvent>
@@ -1781,7 +1787,7 @@ void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
     jts->jq = this;
     jts->jobID = jobID;
 
-    pthread_t childThread = 0;
+    pthread_t childThread = PTHREAD_NULL;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
