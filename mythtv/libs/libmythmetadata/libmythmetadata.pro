@@ -48,7 +48,6 @@ LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil -lmythavutil
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavformat -lmythavformat
-LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
 
