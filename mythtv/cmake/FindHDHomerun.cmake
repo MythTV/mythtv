@@ -55,10 +55,14 @@ endif()
 #
 if(HDHomerun_FOUND)
   cmake_path(GET HDHomerun_LIBRARY PARENT_PATH LIB_DIR)
+  check_library_exists(hdhomerun hdhomerun_discover_find_devices_custom_v2
+                       LIB_DIR _HDHOMERUN_DISCOVER1)
   check_library_exists(hdhomerun hdhomerun_discover2_find_devices_broadcast
                        LIB_DIR _HDHOMERUN_DISCOVER2)
   if(_HDHOMERUN_DISCOVER2)
     set(HDHOMERUN_VERSION 20221010)
+  elseif(_HDHOMERUN_DISCOVER1)
+    set(HDHOMERUN_VERSION 20190625)
   else()
     set(HDHOMERUN_VERSION 0)
   endif()
@@ -71,6 +75,7 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   HDHomerun
   FOUND_VAR HDHomerun_FOUND
+  VERSION_VAR HDHOMERUN_VERSION
   REQUIRED_VARS HDHomerun_LIBRARY HDHomerun_INCLUDE_DIR)
 
 # Traditional variables

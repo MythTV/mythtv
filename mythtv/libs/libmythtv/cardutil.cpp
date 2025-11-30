@@ -554,7 +554,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
             hdhomerun_discover_destroy(ds);
             hdhomerun_debug_destroy(dbg);
         }
-#else // HDHOMERUN_VERSION >= 20221010
+#elif HDHOMERUN_VERSION >= 20190625
         uint32_t  target_ip   = 0;
         uint32_t  device_type = HDHOMERUN_DEVICE_TYPE_TUNER;
         uint32_t  device_id   = HDHOMERUN_DEVICE_ID_WILDCARD;
@@ -597,7 +597,9 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
             QString hdhrdev = id.toUpper() + " " + ip + " " + model;
             devs.push_back(hdhrdev);
         }
-#endif // HDHOMERUN_VERSION >= 20221010
+#else
+  #error Unsupported version of libhhomerun
+#endif
     }
 #endif // CONFIG_HDHOMERUN
 #if CONFIG_SATIP

@@ -427,7 +427,7 @@ if(ENABLE_SYSTEMD_NOTIFY OR ENABLE_SYSTEMD_JOURNAL)
 endif()
 
 if(ENABLE_HDHOMERUN)
-  find_package(HDHomerun)
+  find_package(HDHomerun 20190625)
   add_build_config(HDHomerun::HDHomerun "hdhomerun")
 endif()
 if(ENABLE_VBOX)
