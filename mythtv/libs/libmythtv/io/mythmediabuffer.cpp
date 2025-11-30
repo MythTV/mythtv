@@ -1279,7 +1279,7 @@ int MythMediaBuffer::ReadDirect(void *Buffer, int Count, bool Peek)
             if (m_remotefile)
                 cur_pos = m_remotefile->Seek(oldposition, SEEK_SET);
             else if (m_fd2 >= 0)
-                cur_pos = lseek64(m_fd2, oldposition, SEEK_SET);
+                cur_pos = lseek(m_fd2, oldposition, SEEK_SET);
             if (cur_pos < 0)
             {
                 LOG(VB_FILE, LOG_ERR, LOC + "Seek failed repositioning to previous position");

@@ -1,7 +1,3 @@
-#ifdef _WIN32
-    #include <sys/stat.h>
-#endif
-
 #include "mythmiscutil.h"
 
 // C++ headers
@@ -14,25 +10,22 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sched.h>
+#include <sys/stat.h> // for umask, chmod
 
 // System specific C headers
 #include "compat.h"
 #include <QtGlobal>
 
 #ifdef __linux__
-#include <sys/vfs.h>
 #include <sys/sysinfo.h>
-#include <sys/stat.h> // for umask, chmod
 #endif
 
 #ifdef Q_OS_DARWIN
 #include <mach/mach.h>
 #endif
 
-#ifdef BSD
-#include <sys/mount.h>  // for struct statfs
+#ifdef Q_OS_BSD4
 #include <sys/sysctl.h>
-#include <sys/stat.h> // for umask, chmod
 #endif
 
 // Qt headers
@@ -73,8 +66,7 @@ bool getUptime(std::chrono::seconds &uptime)
     }
     uptime = std::chrono::seconds(sinfo.uptime);
 
-#elif defined(__FreeBSD__) || defined(Q_OS_DARWIN)
-
+#elif defined(Q_OS_BSD4)
     std::array<int,2> mib { CTL_KERN, KERN_BOOTTIME };
     struct timeval bootTime;
     size_t         len;

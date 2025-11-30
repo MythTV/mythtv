@@ -23,9 +23,9 @@ void               MythFileOpenRegisterCallback(const char *Pathname, void* Obje
 int                MythFileCheck  (int Id);
 MTV_PUBLIC int     MythFileOpen   (const char *Pathname, int Flags);
 MTV_PUBLIC int     MythfileClose  (int FileID);
-#ifdef _WIN32
-MTV_PUBLIC off64_t MythFileSeek   (int FileID, off64_t Offset, int Whence);
-MTV_PUBLIC off64_t MythFileTell   (int FileID);
+#ifdef _MSC_VER
+MTV_PUBLIC __int64 MythFileSeek   (int FileID, __int64 Offset, int Whence);
+MTV_PUBLIC __int64 MythFileTell   (int FileID);
 #else
 MTV_PUBLIC off_t   MythFileSeek   (int FileID, off_t Offset, int Whence);
 MTV_PUBLIC off_t   MythFileTell   (int FileID);

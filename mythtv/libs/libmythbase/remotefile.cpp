@@ -788,14 +788,14 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         }
         else if (whence == SEEK_CUR)
         {
-            offset = ((curpos > 0) ? curpos : ::lseek64(m_localFile, 0, SEEK_CUR)) + pos;
+            offset = ((curpos > 0) ? curpos : lseek(m_localFile, 0, SEEK_CUR)) + pos;
         }
         else
         {
             return -1;
         }
 
-        off64_t localpos = ::lseek64(m_localFile, pos, whence);
+        off_t localpos = lseek(m_localFile, pos, whence);
         if (localpos != pos)
         {
             LOG(VB_FILE, LOG_ERR,
