@@ -53,9 +53,9 @@ extern "C" {
 
 #if HAVE_FSTAB_H
 #ifndef MNTTYPE_ISO9660
-#   ifdef __linux__
+#   ifdef Q_OS_LINUX
     static constexpr const char* MNTTYPE_ISO9660 { "iso9660" };
-#   elif defined(__FreeBSD__) || defined(Q_OS_DARWIN) || defined(__OpenBSD__)
+#   elif defined(Q_OS_BSD4)
     static constexpr const char* MNTTYPE_ISO9660 { "cd9660" };
 #   endif
 #endif
@@ -363,7 +363,7 @@ bool MediaMonitorUnix::CheckMountable(void)
     // Timed out
     return false;
 
-#elif defined(__linux__)
+#elif defined(Q_OS_LINUX)
     // NB needs script in /etc/udev/rules.d
     mkfifo(kUDEV_FIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     m_fifo = open(kUDEV_FIFO, O_RDONLY | O_NONBLOCK);
@@ -396,7 +396,7 @@ bool MediaMonitorUnix::CheckMountable(void)
  */
 bool MediaMonitorUnix::CheckRemovable(const QString &dev)
 {
-#ifdef __linux__
+#ifdef Q_OS_LINUX
         QString removablePath = dev + "/removable";
         QFile   removable(removablePath);
         if (removable.exists() && removable.open(QIODevice::ReadOnly))
@@ -436,7 +436,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     // In case of error, a working default?  (device names usually match)
     ret.replace(QRegularExpression(".*/"), "/dev/");
 
-#ifdef __linux__
+#ifdef Q_OS_LINUX
 #   if HAVE_LIBUDEV
     // Use libudev to determine the name
     ret.clear();
@@ -569,7 +569,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
         }
     }
 
-#elif defined(__linux__)
+#elif defined(Q_OS_LINUX)
     QFile file("/proc/sys/dev/cdrom/info");
     if (file.open(QIODevice::ReadOnly))
     {
@@ -600,7 +600,7 @@ static void LookupModel(MythMediaDevice* device)
 {
     QString   desc;
 
-#if defined(__linux__)
+#if defined(Q_OS_LINUX)
     // Given something like /dev/hda1, extract hda1
     QString devname = device->getRealDevice().mid(5,5);
 

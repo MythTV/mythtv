@@ -1,17 +1,18 @@
 // -*- Mode: c++ -*-
 
+#include <QtGlobal>
+
 // POSIX headers
 #include <thread>
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
 #include <algorithm>
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
 #include <poll.h>
 #include <sys/ioctl.h>
 #endif
 
-#include <QtGlobal>
 #ifdef Q_OS_ANDROID
 #include <sys/wait.h>
 #endif
@@ -81,7 +82,7 @@ bool ExternIO::Ready([[maybe_unused]] int fd,
                      [[maybe_unused]] std::chrono::milliseconds timeout,
                      [[maybe_unused]] const QString & what)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
     std::array<struct pollfd,2> m_poll {};
 
     m_poll[0].fd = fd;
@@ -107,7 +108,7 @@ bool ExternIO::Ready([[maybe_unused]] int fd,
             m_error = "poll overflow";
         return false;
     }
-#endif // !defined( _WIN32 )
+#endif // !defined( Q_OS_WIN32 )
     return false;
 }
 
@@ -249,9 +250,9 @@ bool ExternIO::Run(void)
 /* Return true if the process is not, or is no longer running */
 bool ExternIO::KillIfRunning([[maybe_unused]] const QString & cmd)
 {
-#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#ifdef Q_OS_BSD4
     return false;
-#elif defined( _WIN32 )
+#elif defined( Q_OS_WIN32 )
     return false;
 #else
     QString grp = QString("pgrep -x -f -- \"%1\" 2>&1 > /dev/null").arg(cmd);
@@ -299,7 +300,7 @@ bool ExternIO::KillIfRunning([[maybe_unused]] const QString & cmd)
 
 void ExternIO::Fork(void)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
     if (Error())
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternIO in bad state: '%1'")
@@ -450,7 +451,7 @@ void ExternIO::Fork(void)
                   << strerror(errno) << std::endl;
     }
 
-#endif // !defined( _WIN32 )
+#endif // !defined( Q_OS_WIN32 )
 
     /* Failed to exec */
     _exit(GENERIC_EXIT_DAEMONIZING_ERROR); // this exit is ok

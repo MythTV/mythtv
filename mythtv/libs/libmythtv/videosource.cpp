@@ -1,9 +1,11 @@
 // -*- Mode: c++ -*-
 
+#include <QtGlobal> // for Q_OS_XXX
+
 // Standard UNIX C headers
 #include <unistd.h>
 #include <fcntl.h>
-#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__OpenBSD__) || defined(_WIN32)
+#if defined(Q_OS_BSD4) || defined(Q_OS_WIN32)
 #include <sys/types.h>
 #else
 #include <sys/sysmacros.h>
@@ -2454,7 +2456,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
     m_size->setValue(cs);
 }
 
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
                                                        CardType &a_cardtype) :
     m_parent(a_parent),
@@ -2507,7 +2509,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     m_info->setValue(ci);
     m_info->setHelpText(ci);
 }
-#endif // !defined( _WIN32 )
+#endif // !defined( Q_OS_WIN32 )
 
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
@@ -2705,7 +2707,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new ImportConfigurationGroup(parent, *cardtype));
     cardtype->addTargetedChild("DEMO",
                                new DemoConfigurationGroup(parent, *cardtype));
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
     cardtype->addTargetedChild("EXTERNAL",
                                new ExternalConfigurationGroup(parent,
                                                               *cardtype));
@@ -2903,7 +2905,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
     setting->addSelection(QObject::tr("External (black box) recorder"),
                           "EXTERNAL");
 #endif

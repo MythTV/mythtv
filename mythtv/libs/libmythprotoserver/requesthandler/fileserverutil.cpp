@@ -2,10 +2,10 @@
 #include <cstdlib> // for llabs
 
 #include <QtGlobal>
-#if defined(Q_OS_DARWIN) || defined(__FreeBSD__)
+#ifdef Q_OS_BSD4
 #include <sys/param.h>
 #include <sys/mount.h>
-#elif defined(__linux__)
+#elif defined(Q_OS_LINUX)
 #include <sys/vfs.h>
 #endif
 

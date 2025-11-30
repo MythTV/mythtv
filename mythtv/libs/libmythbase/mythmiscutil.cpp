@@ -16,7 +16,7 @@
 #include "compat.h"
 #include <QtGlobal>
 
-#ifdef __linux__
+#ifdef Q_OS_LINUX
 #include <sys/sysinfo.h>
 #endif
 
@@ -57,7 +57,7 @@
  */
 bool getUptime(std::chrono::seconds &uptime)
 {
-#ifdef __linux__
+#ifdef Q_OS_LINUX
     struct sysinfo sinfo {};
     if (sysinfo(&sinfo) == -1)
     {
@@ -80,7 +80,7 @@ bool getUptime(std::chrono::seconds &uptime)
         return false;
     }
     uptime = std::chrono::seconds(time(nullptr) - bootTime.tv_sec);
-#elif defined(_WIN32)
+#elif defined(Q_OS_WIN32)
     uptime = std::chrono::seconds(::GetTickCount() / 1000);
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
@@ -103,7 +103,7 @@ bool getMemStats([[maybe_unused]] int &totalMB,
                  [[maybe_unused]] int &totalVM,
                  [[maybe_unused]] int &freeVM)
 {
-#ifdef __linux__
+#ifdef Q_OS_LINUX
     static constexpr size_t MB { 1024LL * 1024 };
     struct sysinfo sinfo {};
     if (sysinfo(&sinfo) == -1)
@@ -167,7 +167,7 @@ bool getMemStats([[maybe_unused]] int &totalMB,
  */
 loadArray getLoadAvgs (void)
 {
-#if !defined(_WIN32) && !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_WIN32) && !defined(Q_OS_ANDROID)
     loadArray loads {};
     if (getloadavg(loads.data(), loads.size()) != -1)
         return loads;
@@ -242,7 +242,7 @@ bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
  */
 bool ping(const QString &host, std::chrono::milliseconds timeout)
 {
-#ifdef _WIN32
+#ifdef Q_OS_WIN32
     QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
                   .arg(timeout.count()) .arg(host);
 
@@ -252,7 +252,7 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
     QString addrstr =
         MythCoreContext::resolveAddress(host, MythCoreContext::ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
-#if defined(__FreeBSD__) || defined(Q_OS_DARWIN)
+#ifdef Q_OS_BSD4
     QString timeoutparam("-t");
 #else
     // Linux, NetBSD, OpenBSD
@@ -368,7 +368,7 @@ QString createTempFile(QString name_template, bool dir)
 {
     int ret = -1;
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN32
     char temppath[MAX_PATH] = ".";
     char tempfilename[MAX_PATH] = "";
     // if GetTempPath fails, use current dir
@@ -681,11 +681,11 @@ bool MythWakeup(const QString &wakeUpCommand, uint flags, std::chrono::seconds t
 
 bool IsPulseAudioRunning(void)
 {
-#ifdef _WIN32
+#ifdef Q_OS_WIN32
     return false;
 #else
 
-#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#ifdef Q_OS_BSD4
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
 #else
     const char *command = "ps ch -C pulseaudio -o pid > /dev/null";
@@ -738,7 +738,7 @@ void myth_yield(void)
  *  Only Linux on i386, ppc, x86_64 and ia64 are currently supported.
  *  This is a no-op on all other architectures and platforms.
  */
-#if defined(__linux__) && ( defined(__i386__) || defined(__ppc__) || \
+#if defined(Q_OS_LINUX) && ( defined(__i386__) || defined(__ppc__) || \
                             defined(__x86_64__) || defined(__ia64__) )
 
 #include <cstdio>

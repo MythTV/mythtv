@@ -27,7 +27,7 @@
 #include <queue>
 #include <unistd.h>       // for usleep()
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN32
 #include <winsock2.h>
 #else
 #include <clocale>
@@ -243,7 +243,7 @@ bool MythCoreContext::Init(void)
         return false;
     }
 
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
     static const QRegularExpression utf8
         { "utf-?8", QRegularExpression::CaseInsensitiveOption };
     QString lang_variables("");
@@ -706,9 +706,9 @@ bool MythCoreContext::IsMasterBackend(void)
 
 bool MythCoreContext::BackendIsRunning(void)
 {
-#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#ifdef Q_OS_BSD4
     const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
-#elif defined _WIN32
+#elif defined(Q_OS_WIN32)
     const char *command = "%systemroot%\\system32\\tasklist.exe "
        " | %systemroot%\\system32\\find.exe /i \"mythbackend.exe\" ";
 #else
