@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QList>
 
-#include "libmythbase/programinfo.h"
 #include "libmythmetadata/metadatafactory.h"
+#include "libmythtv/programinfo.h"
 
 class LookerUpper : public QObject
 {

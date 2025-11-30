@@ -15,7 +15,7 @@
 #include <QMutex>
 #include <QMap>
 
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programinfo.h"
 #include "libmythupnp/httpserver.h"
 
 enum HttpStatusMethod : std::uint8_t

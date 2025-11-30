@@ -4,10 +4,10 @@
 #include <QString>
 #include <QDateTime>
 
-#include "mythbaseexp.h"
+#include "mythtvexp.h"
 #include "programtypes.h"
 
-class MBASE_PUBLIC RecStatus : public QObject
+class MTV_PUBLIC RecStatus : public QObject
 {
   Q_OBJECT
 

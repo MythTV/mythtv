@@ -8,7 +8,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/tvremoteutil.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuibuttonlist.h"
