@@ -1636,7 +1636,6 @@ MYTHTV_HAVE_LIST='
     posix_fadvise
     libudev
     stdint_h
-    sync_file_range
     close_range
     iomainport
 '
@@ -4857,31 +4856,6 @@ fi
 
 check_header stdint.h
 
-# test for lrint in math.h
-check_exec <<EOF && lrint=yes || lrint=no
-#define _ISOC9X_SOURCE  1
-#include <math.h>
-int main( void ) { return (lrint(3.999f) > 0)?0:1; }
-EOF
-
-#test for round()
-check_exec <<EOF && round=yes || round=no
-#define _ISOC9X_SOURCE  1
-#include <math.h>
-int main( void ) { return (round(3.999f) > 0)?0:1; }
-EOF
-
-# test for sync_file_range (linux only system call since 2.6.17)
-check_ld "cc" <<EOF #&& enable sync_file_range
-#define _GNU_SOURCE
-#include <fcntl.h>
-
-int main(int argc, char **argv){
-    sync_file_range(0,0,0,0);
-    return 0;
-}
-EOF
-
 # test for close_range (linux system call since 5.9 and also FreeBSD)
 check_ld "cc" <<EOF && enable close_range
 #define _GNU_SOURCE
@@ -6438,20 +6412,6 @@ cat > $TMPH <<EOF
 #define IMAGE_ALIGN $image_align
 #define PYTHON_EXE "${python}"
 EOF
-
-if enabled cygwin ; then
-  echo "#ifndef llrint" >> $TMPH
-  echo "#define llrint llrint  // make sure not to define twice" >> $TMPH
-  echo "static inline long long int llrint (double x)" >> $TMPH
-  echo "{" >> $TMPH
-  echo "    long long int llrintres;" >> $TMPH
-  echo "    asm" >> $TMPH
-  echo "    (\"fistpll %0\"" >> $TMPH
-  echo "    : \"=m\" (llrintres) : \"t\" (x) : \"st\");" >> $TMPH
-  echo "    return llrintres;" >> $TMPH
-  echo "}" >> $TMPH
-  echo "#endif" >> $TMPH
-fi
 
 print_config ARCH_   "$config_files" $ARCH_LIST
 print_config HAVE_   "$config_files" $HAVE_LIST
