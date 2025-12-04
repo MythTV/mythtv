@@ -746,7 +746,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
             errno = EINVAL;
             if (m_remotefile)
                 ret = m_remotefile->Seek(m_ignoreReadPos, SEEK_SET);
-            else
+            else if (m_fd2 >= 0)
                 ret = lseek(m_fd2, m_ignoreReadPos, SEEK_SET);
 
             if (ret < 0)
