@@ -4877,20 +4877,6 @@ int main(int argc, char **argv){
 }
 EOF
 
-# test for sizeof(int)
-for sizeof in 1 2 4 8 16; do
-    check_cc <<EOF && _sizeof_int=$sizeof && break
-void foo(){switch (0) case 0: case (sizeof(int) == $sizeof):;}
-EOF
-done
-
-# test for sizeof(long)
-for sizeof in 1 2 4 8 16; do
-  check_cc <<EOF && _sizeof_long=$sizeof && break
-void foo(){switch (0) case 0: case (sizeof(long) == $sizeof):;}
-EOF
-done
-
 if require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
     enable freetype2
 else
