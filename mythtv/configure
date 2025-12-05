@@ -252,16 +252,6 @@ tolower(){
     echo "$@" | tr ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
 }
 
-c_escape(){
-    echo "$*" | sed 's/["\\]/\\\0/g'
-}
-
-sh_quote(){
-    v=$(echo "$1" | sed "s/'/'\\\\''/g")
-    test "x$v" = "x${v#*[!A-Za-z0-9_/.+-]}" || v="'$v'"
-    echo "$v"
-}
-
 cleanws(){
     echo "$@" | sed 's/^ *//;s/[[:space:]][[:space:]]*/ /g;s/ *$//'
 }
