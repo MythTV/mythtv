@@ -1093,3 +1093,5 @@ Q_SLOT void MythExternRecApp::ProcReadStandardOutput(void)
     if (!buf.isEmpty())
         emit Fill(buf);
 }
+
+#include "moc_MythExternRecApp.cpp"

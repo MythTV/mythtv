@@ -178,3 +178,5 @@ bool MythTerminal::Create(void)
 
     return true;
 }
+
+#include "moc_mythterminal.cpp"

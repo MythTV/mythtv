@@ -17,6 +17,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#ifndef LIBMYTHTV_TEST_MPEGTABLES_H
+#define LIBMYTHTV_TEST_MPEGTABLES_H
 
 #include <QTest>
 
@@ -117,3 +119,5 @@ class TestMPEGTables: public QObject
     static void atsc_huffman_test_data (void);
     static void atsc_huffman_test (void);
 };
+
+#endif // LIBMYTHTV_TEST_MPEGTABLES_H

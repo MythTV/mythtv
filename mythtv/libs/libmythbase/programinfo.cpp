@@ -6679,5 +6679,4 @@ QString ProgGroupBy::toString(ProgGroupBy::Type groupBy)
     }
 }
 
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_programinfo.cpp"

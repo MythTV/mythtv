@@ -351,3 +351,5 @@ ProgramInfo *ViewScheduleDiff::CurrentProgram()
         return s.m_after;
     return s.m_before;
 }
+
+#include "moc_viewschedulediff.cpp"
