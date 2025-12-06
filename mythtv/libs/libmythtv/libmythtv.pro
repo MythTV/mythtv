@@ -119,6 +119,8 @@ HEADERS += io/mythinteractivebuffer.h
 HEADERS += io/mythopticalbuffer.h
 HEADERS += metadataimagehelper.h
 HEADERS += mythavbufferref.h
+HEADERS += mythaverror.h
+HEADERS += mythavframe.h
 HEADERS += mythavrational.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
@@ -163,6 +165,7 @@ SOURCES += io/mythopticalbuffer.cpp
 SOURCES += metadataimagehelper.cpp
 SOURCES += mythframe.cpp
 SOURCES += mythavbufferref.cpp
+SOURCES += mythaverror.cpp
 SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
 SOURCES += mythhdrvideometadata.cpp
@@ -247,10 +250,98 @@ SOURCES += channelscan/iptvchannelfetcher.cpp
 HEADERS += captions/srtwriter.h
 SOURCES += captions/srtwriter.cpp
 
+# audio
+HEADERS += audio/audioconvert.h
+HEADERS += audio/audiooutput.h
+HEADERS += audio/audiooutputbase.h
+HEADERS += audio/audiooutputdigitalencoder.h
+HEADERS += audio/audiooutputnull.h
+HEADERS += audio/audiooutputsettings.h
+HEADERS += audio/audiosettings.h
+HEADERS += audio/eldutils.h
+HEADERS += audio/freesurround.h
+HEADERS += audio/freesurround_decoder.h
+HEADERS += audio/pink.h
+HEADERS += audio/spdifencoder.h
+HEADERS += audio/visualization.h
+HEADERS += audio/volumebase.h
+
+SOURCES += audio/audioconvert.cpp
+SOURCES += audio/audiooutput.cpp
+SOURCES += audio/audiooutputbase.cpp
+SOURCES += audio/audiooutputdigitalencoder.cpp
+SOURCES += audio/audiooutputnull.cpp
+SOURCES += audio/audiooutputsettings.cpp
+SOURCES += audio/audiosettings.cpp
+SOURCES += audio/eldutils.cpp
+SOURCES += audio/freesurround.cpp
+SOURCES += audio/freesurround_decoder.cpp
+SOURCES += audio/pink.cpp
+SOURCES += audio/spdifencoder.cpp
+SOURCES += audio/volumebase.cpp
+
+using_oss {
+    SOURCES += audio/audiooutputoss.cpp
+    HEADERS += audio/audiooutputoss.h
+}
+
+using_pulse {
+    HEADERS += audio/audiopulsehandler.h
+    SOURCES += audio/audiopulsehandler.cpp
+    using_pulseoutput {
+        HEADERS += audio/audiooutputpulse.h
+        SOURCES += audio/audiooutputpulse.cpp
+    }
+}
+
+android {
+SOURCES += audio/audiooutputopensles.cpp
+SOURCES += audio/audiooutputaudiotrack.cpp
+HEADERS += audio/audiooutputopensles.h
+HEADERS += audio/audiooutputaudiotrack.h
+}
+
+cygwin {
+    QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
+    DEFINES += _WIN32
+}
+
+mingw | win32-msvc* {
+
+    SOURCES += audio/audiooutputwin.cpp
+    SOURCES += audio/audiooutputdx.cpp
+    HEADERS += audio/audiooutputwin.h
+    HEADERS += audio/audiooutputdx.h
+    LIBS += -lwinmm -lws2_32 -luser32 -lsamplerate -lSoundTouch
+}
+
+macx {
+    HEADERS += audio/audiooutputca.h
+    SOURCES += audio/audiooutputca.cpp
+
+    # Mac OS X Frameworks
+    LIBS += -framework ApplicationServices
+    LIBS += -framework AudioUnit
+    LIBS += -framework AudioToolbox
+    LIBS += -framework CoreAudio
+}
+
+using_alsa {
+    HEADERS += audio/audiooutputalsa.h
+    SOURCES += audio/audiooutputalsa.cpp
+}
+
+using_jack {
+    HEADERS += audio/audiooutputjack.h
+    SOURCES += audio/audiooutputjack.cpp
+}
+
 inc.path = $${PREFIX}/include/mythtv/libmythtv
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
 inc.files += mythavutil.h           mythframe.h
+inc.files += mythaverror.h
+inc.files += mythavframe.h
 
 INSTALLS += inc
 
@@ -269,6 +360,17 @@ inc2.files += visualisations/goom/tentacle3d.h
 inc2.files += visualisations/goom/v3d.h
 
 INSTALLS += inc2
+
+inc3.path = $${PREFIX}/include/mythtv/libmythtv/audio
+#inc3.files += audio/audioconvert.h
+inc3.files += audio/audiooutput.h
+inc3.files += audio/audiooutputsettings.h
+inc3.files += audio/audiosettings.h
+inc3.files += audio/eldutils.h
+inc3.files += audio/volumebase.h
+inc3.files += audio/visualization.h
+
+INSTALLS += inc3
 
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
@@ -452,6 +554,7 @@ using_frontend {
     HEADERS += videoouttypes.h
     HEADERS += mythvideobounds.h
     HEADERS += mythvideocolourspace.h
+    HEADERS += visualisations/audiooutputgraph.h
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
     HEADERS += visualisations/videovisualspectrum.h
@@ -466,6 +569,7 @@ using_frontend {
     SOURCES += mythvideoprofile.cpp mythcodecid.cpp
     SOURCES += mythvideobounds.cpp
     SOURCES += mythvideocolourspace.cpp
+    SOURCES += visualisations/audiooutputgraph.cpp
     SOURCES += visualisations/videovisual.cpp
     SOURCES += visualisations/videovisualspectrum.cpp
     SOURCES += mythdeinterlacer.cpp
@@ -1046,7 +1150,6 @@ win32-msvc* {
 # Dependencies and required libraries
 # Have them at the end in order to properly resolve on mingw platform
 # where the order is of significance
-LIBS += -L../libmyth
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../external/FFmpeg/libavutil
 LIBS += -L../../external/FFmpeg/libavcodec
@@ -1056,7 +1159,6 @@ LIBS += -L../../external/FFmpeg/libpostproc
 LIBS += -L../../external/FFmpeg/libavfilter
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythbase
-LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythavcodec
@@ -1070,7 +1172,6 @@ using_hdhomerun: LIBS += -lhdhomerun
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 !mingw || win32-msvc* {
-    POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)

@@ -3,7 +3,7 @@
 // MythTV
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
-#include "libmyth/mythavframe.h"
+#include "libmythtv/mythavframe.h"
 
 #if CONFIG_DRM_VIDEO
 #include "libmythui/platforms/mythdisplaydrm.h"
