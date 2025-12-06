@@ -5,12 +5,14 @@
 #include <QString>
 #include <QStringList>
 #include <QDomDocument>
+#include <QRegularExpression>
 
 // MythTV headers
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythtimer.h"
 #include "libmythupnp/ssdp.h"
+#include "libmythupnp/ssdpcache.h"
 #include "vboxutils.h"
 
 #define LOC QString("VBox: ")
@@ -67,7 +69,7 @@ QStringList VBox::doUPNPSearch(void)
 {
     QStringList result;
 
-    SSDPCacheEntries *vboxes = SSDP::Find(VBOX_URI);
+    SSDPCacheEntries *vboxes = SSDPCache::Instance()->Find(VBOX_URI);
 
     if (!vboxes)
     {
@@ -84,7 +86,7 @@ QStringList VBox::doUPNPSearch(void)
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "No UPnP VBoxes found, but SSDP::Find() not NULL");
+            "No UPnP VBoxes found, but SSDPCache::Instance()->Find() not NULL");
     }
 
     EntryMap map;

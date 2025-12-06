@@ -1187,7 +1187,7 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
         }
     }
 
-    SSDPCacheEntries *backends = SSDP::Find(SSDP::kBackendURI);
+    SSDPCacheEntries *backends = SSDPCache::Instance()->Find(SSDP::kBackendURI);
 
     if (!backends)
     {
@@ -1204,7 +1204,7 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "No UPnP backends found, but SSDP::Find() not NULL");
+            "No UPnP backends found, but SSDPCache::Instance()->Find() not NULL");
     }
 
     if (count != 1)
@@ -1274,7 +1274,7 @@ bool MythContext::Impl::DefaultUPnP(QString& Error)
     searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        devicelocation = SSDP::Find(SSDP::kBackendURI, usn);
+        devicelocation = SSDPCache::Instance()->Find(SSDP::kBackendURI, usn);
         if (devicelocation)
             break;
 

@@ -16,14 +16,13 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 QMAKE_CLEAN += version.cpp
 
 # Input
-
-HEADERS += mmulticastsocketdevice.h
-HEADERS += msocketdevice.h
 HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h upnpsubscription.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
-HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
+HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h upnpmsrr.h
+HEADERS += blockingtcpsocket.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
-HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
+HEADERS += soapclient.h mythxmlclient.h upnpexp.h
+HEADERS += ssdpextension.h
 HEADERS += upnpserviceimpl.h
 HEADERS += htmlserver.h
 HEADERS += upnphelpers.h websocket.h
@@ -34,15 +33,13 @@ HEADERS += serializers/xmlplistSerializer.h
 
 HEADERS += websocket_extensions/*.h
 
-SOURCES += mmulticastsocketdevice.cpp
-SOURCES += msocketdevice.cpp
-unix:SOURCES += msocketdevice_unix.cpp
-mingw | win32-msvc*:SOURCES += msocketdevice_win.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp
-SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
+SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp
+SOURCES += blockingtcpsocket.cpp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
-SOURCES += soapclient.cpp mythxmlclient.cpp mmembuf.cpp
+SOURCES += soapclient.cpp mythxmlclient.cpp
+SOURCES += ssdpextension.cpp
 SOURCES += upnpserviceimpl.cpp
 SOURCES += htmlserver.cpp
 SOURCES += upnpsubscription.cpp
@@ -75,12 +72,12 @@ win32-msvc*:LIBS += -lzlib
 
 inc.path = $${PREFIX}/include/mythtv/libmythupnp/
 
-inc.files  = httprequest.h upnp.h ssdp.h taskqueue.h bufferedsocketdevice.h
+inc.files  = httprequest.h upnp.h ssdp.h taskqueue.h
 inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 inc.files += upnpimpl.h
-inc.files += soapclient.h mythxmlclient.h mmembuf.h upnpsubscription.h
+inc.files += soapclient.h mythxmlclient.h upnpsubscription.h
 inc.files += htmlserver.h serverSideScripting.h
 inc.files += upnphelpers.h
 

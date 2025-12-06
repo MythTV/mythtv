@@ -9,7 +9,6 @@
 // Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
-
 #ifndef UPNPTASKNOTIFY_H
 #define UPNPTASKNOTIFY_H
 
@@ -19,15 +18,10 @@
 // Qt headers
 #include <QString>
 #include <QMutex>
+#include <QUdpSocket>
 
 #include "taskqueue.h"
-
-class MSocketDevice;
-class UPnpDevice;
-
-/////////////////////////////////////////////////////////////////////////////
-// Typedefs
-/////////////////////////////////////////////////////////////////////////////
+#include "upnpdevice.h"
 
 enum UPnpNotifyNTS : std::uint8_t
 {
@@ -35,18 +29,9 @@ enum UPnpNotifyNTS : std::uint8_t
     NTS_byebye  = 1
 };
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-//
-// UPnpNotifyTask Class Definition
-//
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
 class UPnpNotifyTask : public Task
 {
     protected:
-
         QMutex          m_mutex;
 
         QString         m_sMasterIP;
@@ -55,23 +40,17 @@ class UPnpNotifyTask : public Task
 
         UPnpNotifyNTS   m_eNTS          {NTS_alive};
 
-    protected:
-
         // Destructor protected to force use of Release Method
-
         ~UPnpNotifyTask() override = default;
 
-        void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
-        void     SendNotifyMsg( MSocketDevice *pSocket, const QString& sNT, const QString& sUDN );
+        void ProcessDevice(QUdpSocket& socket, const UPnpDevice& device);
+        void SendNotifyMsg(QUdpSocket& socket, const QString& sNT, const QString& sUDN);
 
     public:
-
         explicit UPnpNotifyTask( int nServicePort );
 
         QString Name() override { return( "Notify" ); } // Task
         void Execute( TaskQueue *pQueue ) override; // Task
-
-        // ------------------------------------------------------------------
 
         QString GetNTSString()
         {
@@ -87,8 +66,6 @@ class UPnpNotifyTask : public Task
             return( "unknown" );
         }
 
-        // ------------------------------------------------------------------
-
         UPnpNotifyNTS GetNTS()
         {
             m_mutex.lock();
@@ -98,16 +75,12 @@ class UPnpNotifyTask : public Task
             return( nts );
         }
 
-        // ------------------------------------------------------------------
-
         void SetNTS( UPnpNotifyNTS nts)
         {
             m_mutex.lock();
             m_eNTS = nts;
             m_mutex.unlock();
         }
-
 };
-
 
 #endif // UPNPTASKNOTIFY_H
