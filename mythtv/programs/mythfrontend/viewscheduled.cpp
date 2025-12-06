@@ -7,11 +7,10 @@
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programtypes.h"      // for RecStatus, etc
-#include "libmythbase/recordingtypes.h"    // for toString
-#include "libmythbase/remoteutil.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/recordingrule.h"
+#include "libmythtv/recordingtypes.h"
 #include "libmythtv/tv_actions.h"          // for ACTION_CHANNELSEARCH
 #include "libmythtv/tv_play.h"
 #include "libmythui/mythdialogbox.h"

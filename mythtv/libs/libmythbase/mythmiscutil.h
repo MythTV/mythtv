@@ -22,6 +22,11 @@ MBASE_PUBLIC bool getMemStats(
 using loadArray = std::array<double,3>;
 MBASE_PUBLIC loadArray getLoadAvgs(void);
 
+MBASE_PUBLIC bool RemoteGetLoad(loadArray &load);
+MBASE_PUBLIC bool RemoteGetUptime(std::chrono::seconds &uptime);
+MBASE_PUBLIC
+bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
+
 MBASE_PUBLIC bool ping(const QString &host, std::chrono::milliseconds timeout);
 MBASE_PUBLIC bool telnet(const QString &host, int port);
 

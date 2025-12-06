@@ -21,7 +21,6 @@
 #include "libmythbase/mythrandom.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/remotefile.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/dbaccess.h"
 #include "libmythmetadata/dirscan.h"
@@ -170,7 +169,7 @@ namespace
         {
             QStringList hostFiles;
 
-            RemoteGetFileList(host, "", &hostFiles, sgroup, true);
+            StorageGroup::remoteGetFileList(host, "", &hostFiles, sgroup, true);
             const QString hntm("%2.%3");
 
             for (const auto & ext : image_exts)
@@ -1578,7 +1577,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         path = path + "/" + subdir;
 
                         QStringList tmpList;
-                        bool ok = RemoteGetFileList(host, path, &tmpList, "Videos");
+                        bool ok = StorageGroup::remoteGetFileList(host, path, &tmpList, "Videos");
 
                         if (ok)
                         {

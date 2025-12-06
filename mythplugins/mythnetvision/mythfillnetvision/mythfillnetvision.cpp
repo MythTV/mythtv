@@ -21,7 +21,6 @@
 #include <libmythbase/mythversion.h>
 #include <libmythbase/netgrabbermanager.h>
 #include <libmythbase/netutils.h>
-#include <libmythbase/remoteutil.h>
 #include <libmythbase/rssmanager.h>
 
 GrabberDownloadThread *gdt = nullptr;

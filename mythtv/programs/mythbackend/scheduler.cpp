@@ -36,7 +36,6 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsorthelper.h"
 #include "libmythbase/mythsystemlegacy.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/jobqueue.h"
