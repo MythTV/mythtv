@@ -527,7 +527,7 @@ bool AudioOutputDX::OpenDevice(void)
                     .arg(m_priv->m_device_num).arg(m_priv->m_device_name)};
                 dispatchError(message);
                 LOG(VB_GENERAL, LOG_ERR, message);
-            {
+            }
             else
             {
                 QString message {QCoreApplication::translate("AudioOutputDX", "Failed to create DS buffer 0x%1")
