@@ -8,12 +8,48 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
+set(AUDIO_HEADERS
+    audio/audioconvert.h
+    audio/audiooutput.h
+    audio/audiooutputsettings.h
+    audio/audiosettings.h
+    audio/eldutils.h
+    audio/visualization.h
+    audio/volumebase.h
+    )
+
+set(AUDIO_HEADERS_NOT_INSTALLED
+    audio/audiooutputbase.h
+    audio/audiooutputbase.h
+    audio/audiooutputdigitalencoder.h
+    audio/audiooutputnull.h
+    audio/freesurround.h
+    audio/freesurround_decoder.h
+    audio/pink.h
+    audio/spdifencoder.h
+    )
+
 #
 # Define the library
 #
 
 add_library(
   mythtv # cmake-format: unsort
+  ${AUDIO_HEADERS_NOT_INSTALLED}
+  ${AUDIO_HEADERS}
+  audio/audioconvert.cpp
+  audio/audiooutput.cpp
+  audio/audiooutputbase.cpp
+  audio/audiooutputdigitalencoder.cpp
+  audio/audiooutputnull.cpp
+  audio/audiooutputsettings.cpp
+  audio/audiosettings.cpp
+  audio/eldutils.cpp
+  audio/freesurround.cpp
+  audio/freesurround_decoder.cpp
+  audio/pink.cpp
+  audio/spdifencoder.cpp
+  audio/volumebase.cpp
   bitreader.h
   bytereader.cpp
   bytereader.h
@@ -61,6 +97,9 @@ add_library(
   metadataimagehelper.h
   mythavbufferref.cpp
   mythavbufferref.h
+  mythaverror.cpp
+  mythaverror.h
+  mythavframe.h
   mythavrational.h
   mythavutil.cpp
   mythavutil.h
@@ -248,6 +287,55 @@ if(WIN32)
                                                       O_NONBLOCK=0)
 endif(WIN32)
 
+#
+# Platform stuff
+#
+
+if(TARGET mythtv_oss)
+  target_sources(mythtv PRIVATE audio/audiooutputoss.cpp audio/audiooutputoss.h)
+endif()
+
+if(TARGET PkgConfig::ALSA)
+  target_sources(mythtv PRIVATE audio/audiooutputalsa.cpp audio/audiooutputalsa.h)
+endif()
+if(TARGET PkgConfig::JACK)
+  target_sources(mythtv PRIVATE audio/audiooutputjack.cpp audio/audiooutputjack.h)
+endif()
+if(TARGET PkgConfig::PULSEAUDIO)
+  target_sources(mythtv PRIVATE audio/audiopulsehandler.cpp
+                              audio/audiopulsehandler.h)
+  if(ENABLE_AUDIO_PULSEOUTPUT)
+    target_sources(mythtv PRIVATE audio/audiooutputpulse.cpp
+                                audio/audiooutputpulse.h)
+  endif()
+endif()
+
+if(WIN32)
+  target_sources(
+    mythtv
+    PRIVATE audio/audiooutputwin.cpp audio/audiooutputdx.cpp
+            audio/audiooutputwin.h audio/audiooutputdx.h)
+elseif(ANDROID)
+  target_sources(
+    mythtv PRIVATE audio/audiooutputopensles.cpp audio/audiooutputaudiotrack.cpp
+                 audio/audiooutputopensles.h audio/audiooutputaudiotrack.h)
+endif()
+
+if(MINGW OR win32-msvc)
+  target_sources(mythtv PRIVATE audio/audiooutputwin.cpp
+                              audio/audiooutputdx.cpp)
+  target_link_libraries(mythtv PRIVATE winmm ws2_32 user32 PkgConfig::SAMPLERATE
+                                     PkgConfig::SoundTouch)
+endif()
+
+if(APPLE)
+  target_sources(mythtv PRIVATE audio/audiooutputca.cpp audio/audiooutputca.h)
+  target_link_libraries(
+    mythtv
+    PRIVATE ${APPLE_APPLICATIONSERVICES_LIBRARY} ${APPLE_AUDIOTOOLBOX_LIBRARY}
+            ${APPLE_AUDIOUNIT_LIBRARY} ${APPLE_COREAUDIO_LIBRARY})
+endif()
+
 target_compile_definitions(mythtv PRIVATE MTV_API)
 
 target_include_directories(
@@ -258,6 +346,15 @@ target_include_directories(
 
 target_link_libraries(
   mythtv
+  PRIVATE
+          PkgConfig::SAMPLERATE
+          $<TARGET_NAME_IF_EXISTS:mythtv_oss>
+          $<TARGET_NAME_IF_EXISTS:PkgConfig::ALSA>
+          $<TARGET_NAME_IF_EXISTS:PkgConfig::JACK>
+          $<TARGET_NAME_IF_EXISTS:PkgConfig::PULSEAUDIO>
+          $<$<BOOL:${WIN32}>:winmm>
+          $<$<BOOL:${WIN32}>:ws2_32>
+          $<$<BOOL:${WIN32}>:user32>
   PUBLIC Qt${QT_VERSION_MAJOR}::Core
          Qt${QT_VERSION_MAJOR}::Network
          Qt${QT_VERSION_MAJOR}::Sql
@@ -276,7 +373,6 @@ target_link_libraries(
          PkgConfig::LIBCRYPTO
          PkgConfig::SoundTouch
          mythbluray
-         myth
          mythbase
          mythui
          mythupnp
@@ -329,8 +425,15 @@ endif()
 # Installation section
 #
 
-set(HEADERS_TO_INSTALL1 metadataimagehelper.h mythavutil.h mythframe.h
-                        mythtvexp.h playgroup.h)
+set(HEADERS_TO_INSTALL1
+    metadataimagehelper.h
+    mythaverror.h
+    mythavframe.h
+    mythavutil.h
+    mythframe.h
+    mythtvexp.h
+    playgroup.h
+    )
 
 set(HEADERS_TO_INSTALL2
     visualisations/goom/drawmethods.h
@@ -354,3 +457,6 @@ install(FILES ${HEADERS_TO_INSTALL1}
 install(
   FILES ${HEADERS_TO_INSTALL2}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/libmythtv/visualisations/goom)
+
+install(FILES ${AUDIO_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/libmythtv/audio)

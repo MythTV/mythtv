@@ -9,7 +9,7 @@
 #include <QWidget>
 
 // mythtv
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/mthreadpool.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdb.h>
@@ -288,7 +288,7 @@ void MusicPlayer::stop(bool stopAll)
 
     // because we don't actually stop the audio output we have to fake a Stopped
     // event so any listeners can act on it
-    OutputEvent oe(OutputEvent::kStopped);
+    AudioOutput::Event oe(AudioOutput::Event::kStopped);
     dispatch(oe);
 
     gCoreContext->emitTVPlaybackStopped();
@@ -389,20 +389,10 @@ bool MusicPlayer::openOutputDevice(void)
                    AUDIOOUTPUT_MUSIC, true, false,
                    gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
 
-    if (!m_output)
+    if (m_output == nullptr || !m_output->isConfigured())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
-
-        return false;
-    }
-
-    if (!m_output->GetError().isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("MusicPlayer: Cannot open audio output device: %1").arg(adevice));
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Error was: %1").arg(m_output->GetError()));
 
         delete m_output;
         m_output = nullptr;
@@ -410,14 +400,12 @@ bool MusicPlayer::openOutputDevice(void)
         return false;
     }
 
-    m_output->setBufferSize(256 * 1024);
-
     m_output->addListener(this);
 
     // add any visuals to the audio output
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
-        m_output->addVisual((MythTV::Visual*)(*it));
+        m_output->addVisual((Visualization*)(*it));
 
     // add any listeners to the audio output
     QMutexLocker locker(m_lock);
@@ -816,16 +804,16 @@ void MusicPlayer::customEvent(QEvent *event)
         }
     }
 
-    if (event->type() == OutputEvent::kError)
+    if (event->type() == AudioOutput::Event::kError)
     {
-        auto *aoe = dynamic_cast<OutputEvent *>(event);
+        auto *aoe = dynamic_cast<AudioOutput::Event *>(event);
 
         if (!aoe)
             return;
 
-        LOG(VB_GENERAL, LOG_ERR, QString("Audio Output Error: %1").arg(*aoe->errorMessage()));
+        LOG(VB_GENERAL, LOG_ERR, QString("Audio Output Error: %1").arg(aoe->errorMessage()));
 
-        MythErrorNotification n(tr("Audio Output Error"), tr("MythMusic"), *aoe->errorMessage());
+        MythErrorNotification n(tr("Audio Output Error"), tr("MythMusic"), aoe->errorMessage());
         GetNotificationCenter()->Queue(n);
 
         m_errorCount++;
@@ -882,9 +870,9 @@ void MusicPlayer::customEvent(QEvent *event)
             stop(true);
         }
     }
-    else if (event->type() == OutputEvent::kInfo)
+    else if (event->type() == AudioOutput::Event::kInfo)
     {
-        auto *oe = dynamic_cast<OutputEvent*>(event);
+        auto *oe = dynamic_cast<AudioOutput::Event*>(event);
 
         if (!oe)
             return;
@@ -1579,7 +1567,7 @@ void MusicPlayer::decoderHandlerReady(void)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
     {
-        //m_output->addVisual((MythTV::Visual*)(*it));
+        //m_output->addVisual((Visualization*)(*it));
         //(*it)->setDecoder(decoder);
         //m_visual->setOutput(m_output);
     }

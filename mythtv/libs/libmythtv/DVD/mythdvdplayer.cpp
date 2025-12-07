@@ -1,7 +1,7 @@
 #include <algorithm>
 
 // MythTV
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 

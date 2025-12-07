@@ -123,6 +123,7 @@ target_sources(
           videoouttypes.h
           mythvideobounds.h
           mythvideocolourspace.h
+          visualisations/audiooutputgraph.h
           visualisations/videovisual.h
           visualisations/videovisualdefs.h
           visualisations/videovisualspectrum.h
@@ -138,6 +139,7 @@ target_sources(
           mythcodecid.cpp
           mythvideobounds.cpp
           mythvideocolourspace.cpp
+          visualisations/audiooutputgraph.cpp
           visualisations/videovisual.cpp
           visualisations/videovisualspectrum.cpp
           mythdeinterlacer.cpp

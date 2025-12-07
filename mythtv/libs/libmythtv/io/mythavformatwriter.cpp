@@ -25,8 +25,8 @@
 #include <QtEndian>
 
 // MythTV
-#include "libmyth/audio/audiooutpututil.h"
-#include "libmyth/mythaverror.h"
+#include "libmythtv/audio/audioconvert.h"
+#include "libmythtv/mythaverror.h"
 #include "libmythbase/mythlogging.h"
 #include "mythavutil.h"
 
@@ -308,13 +308,13 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
 
     if (av_get_packed_sample_fmt(avctx->sample_fmt) == AV_SAMPLE_FMT_FLT)
     {
-        AudioOutputUtil::toFloat(FORMAT_S16, static_cast<void*>(m_audioInBuf),
+        AudioConvert::toFloat(FORMAT_S16, static_cast<void*>(m_audioInBuf),
                                  static_cast<void*>(Buffer), samples_per_avframe * sampleSizeIn);
         Buffer = m_audioInBuf;
     }
     if (av_sample_fmt_is_planar(avctx->sample_fmt))
     {
-        AudioOutputUtil::DeinterleaveSamples(format, m_audioChannels,
+        AudioConvert::DeinterleaveSamples(format, m_audioChannels,
                                              m_audioInPBuf, Buffer,
                                              samples_per_avframe * sampleSizeOut);
 

@@ -20,7 +20,6 @@
 #include <QVector>
 
 // MythTV headers
-#include <libmyth/visual.h>
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythbase/mythbaseexp.h>
 

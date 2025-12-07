@@ -14,9 +14,7 @@ extern "C" {
 #include <QMap>
 #include <QString>
 
-#include "libmyth/audio/audiooutputsettings.h"
-#include "libmyth/audio/audiooutpututil.h"
-#include "libmyth/audio/spdifencoder.h"
+#include "libmythtv/audio/audiooutputsettings.h"
 #include "libmythbase/programinfo.h"
 
 #include "captions/vbilut.h"

@@ -40,7 +40,7 @@
 #endif
 
 // MythTV
-#include "libmyth/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutput.h"
 #include "libmythui/langsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmythui/standardsettings.h"

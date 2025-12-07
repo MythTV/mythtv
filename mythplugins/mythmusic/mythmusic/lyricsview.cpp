@@ -9,7 +9,7 @@
 #include <QThread>
 
 // MythTV
-#include <libmyth/audio/audiooutput.h>
+#include <libmythtv/audio/audiooutput.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
@@ -101,11 +101,11 @@ void LyricsView::customEvent(QEvent *event)
     {
         findLyrics();
     }
-    else if (event->type() == OutputEvent::kInfo)
+    else if (event->type() == AudioOutput::Event::kInfo)
     {
         if (m_autoScroll)
         {
-            auto *oe = dynamic_cast<OutputEvent *>(event);
+            auto *oe = dynamic_cast<AudioOutput::Event *>(event);
             MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
 
             if (!oe || !curMeta)

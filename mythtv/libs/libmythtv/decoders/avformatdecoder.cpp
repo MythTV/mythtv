@@ -73,10 +73,10 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #endif
 
 // MythTV headers
-#include "libmyth/audio/audiooutput.h"
-#include "libmyth/audio/audiooutpututil.h"
-#include "libmyth/mythaverror.h"
-#include "libmyth/mythavframe.h"
+#include "libmythtv/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutputsettings.h"
+#include "libmythtv/mythaverror.h"
+#include "libmythtv/mythavframe.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythchrono.h"
@@ -4996,7 +4996,7 @@ inline bool AvFormatDecoder::DecoderWillDownmix(const AVCodecContext *ctx)
 {
     // Until ffmpeg properly implements dialnorm
     // use Myth internal downmixer if machine has SSE2
-    if (m_audio->CanDownmix() && AudioOutputUtil::has_optimized_SIMD())
+    if (m_audio->CanDownmix() && m_audio->GetAudioOutput()->has_optimized_SIMD())
         return false;
     // use ffmpeg only for dolby codecs if we have to
     //return av_opt_find(ctx->priv_data, "downmix", nullptr, 0, 0);

@@ -16,7 +16,8 @@
 #include <utility>
 
 // MythTV headers
-#include "libmyth/audio/audiooutpututil.h"
+#include "libmythtv/audio/audiooutput.h"
+#include "libmythtv/audio/audiooutputsettings.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
@@ -168,6 +169,7 @@ AudioConfigSettings::AudioConfigSettings()
     advancedSettings->addChild(m_mpcm = MPCM());
 
     addChild(m_audioTest = new AudioTest());
+    UpdateAudioTest();
 
         // Set slots
     connect(m_maxAudioChannels, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
@@ -623,7 +625,7 @@ AudioTestThread::AudioTestThread(QObject *parent,
                                            AV_CODEC_ID_NONE, m_samplerate,
                                            AUDIOOUTPUT_VIDEO,
                                            true, false, 0, &settings);
-    if (result().isEmpty())
+    if (isOutputOpen())
     {
         m_audioOutput->Pause(true);
     }
@@ -642,16 +644,6 @@ AudioTestThread::~AudioTestThread()
 void AudioTestThread::cancel()
 {
     m_interrupted = true;
-}
-
-QString AudioTestThread::result()
-{
-    QString errMsg;
-    if (!m_audioOutput)
-        errMsg = tr("Unable to create AudioOutput.");
-    else
-        errMsg = m_audioOutput->GetError();
-    return errMsg;
 }
 
 void AudioTestThread::setChannel(int channel)
@@ -673,7 +665,7 @@ void AudioTestThread::run()
         { 0, 2, 1, 7, 5, 4, 6, 3 },     //7.1
     }};
 
-    if (m_audioOutput && (m_audioOutput->GetError().isEmpty()))
+    if (isOutputOpen())
     {
         char *frames = new (std::align_val_t(16)) char[m_channels * 1024_UZ * sizeof(int32_t)];
 
@@ -747,10 +739,9 @@ void AudioTestThread::run()
                 int top = m_samplerate / 1000 * 3;
                 for (int j = 0; j < top && !m_interrupted; j++)
                 {
-                    AudioOutputUtil::GeneratePinkFrames(frames, m_channels,
+                    if (!m_audioOutput->playPinkNoise(frames, m_channels,
                                                         current, 1000,
-                                                        m_hd ? 32 : 16);
-                    if (!m_audioOutput->AddFrames(frames, 1000 , -1ms))
+                                                        m_hd ? 32 : 16))
                     {
                         LOG(VB_AUDIO, LOG_ERR, "AddData() Audio buffer "
                                                "overflow, audio data lost!");
@@ -993,7 +984,7 @@ void AudioTest::prepareTest()
 
     m_at = new AudioTestThread(this, m_main, m_passthrough, m_channels,
                                m_settings, m_quality);
-    if (!m_at->result().isEmpty())
+    if (!m_at->isOutputOpen())
     {
         QString msg = tr("Audio device is invalid or not useable.");
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
