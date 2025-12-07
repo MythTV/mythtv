@@ -806,7 +806,7 @@ long long MythFileBuffer::SeekInternal(long long Position, int Whence)
         if (ret < 0)
             errno = EINVAL;
     }
-    else
+    else if (m_fd2 >= 0)
     {
         ret = lseek(m_fd2, Position, Whence);
     }

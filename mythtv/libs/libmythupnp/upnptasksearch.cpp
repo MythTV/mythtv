@@ -32,14 +32,14 @@ using namespace std::chrono_literals;
 #include "libmythupnp/upnp.h"
 
 UPnpSearchTask::UPnpSearchTask( int          nServicePort, 
-                                QHostAddress peerAddress,
+                                const QHostAddress& peerAddress,
                                 int          nPeerPort,  
                                 QString      sST, 
                                 QString      sUDN ) :
     Task("UPnpSearchTask"),
     m_nServicePort(nServicePort),
     m_nMaxAge(XmlConfiguration().GetDuration<std::chrono::seconds>("UPnP/SSDP/MaxAge" , 1h)),
-    m_peerAddress(std::move(peerAddress)),
+    m_peerAddress(peerAddress),
     m_nPeerPort(nPeerPort),
     m_sST(std::move(sST)),
     m_sUDN(std::move(sUDN))
