@@ -35,6 +35,7 @@
 #HeaderFilterRegex: '^((\./)?([[:alnum:]]+/)?[[:alnum:]]+\.h|\.\./[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./libmyth[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./external/libmythsoundtouch/[[:alnum:]]+\.h)$'
 #,
 HeaderFilterRegex: '^((\./)?([[:alnum:]]+/)?[[:alnum:]]+\.h|\.\./[[:alnum:]]+/[[:alnum:]]+\.h|\.\./\.\./libmyth[[:alnum:]]+/[[:alnum:]]+\.h)$'
+UseColor: true
 
 Checks: '-*,
 
