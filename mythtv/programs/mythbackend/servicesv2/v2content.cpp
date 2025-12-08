@@ -39,7 +39,6 @@
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/remotefile.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythmetadata/musicmetadata.h"
@@ -47,6 +46,7 @@
 #include "libmythprotoserver/requesthandler/fileserverutil.h"
 #include "libmythtv/metadataimagehelper.h"
 #include "libmythtv/previewgenerator.h"
+#include "libmythtv/programinfo.h"
 
 // MythBackend
 #include "v2content.h"

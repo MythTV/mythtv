@@ -6,8 +6,8 @@
 #include <QEvent>
 
 // MythTV
-#include "libmythbase/programinfo.h"
 #include "libmythtv/playercontext.h"
+#include "libmythtv/programinfo.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythscreentype.h"
 

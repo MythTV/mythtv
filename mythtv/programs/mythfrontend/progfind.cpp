@@ -11,7 +11,7 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programtypes.h"       // for RecStatus
+#include "libmythtv/recordingstatus.h"       // for RecStatus
 #include "libmythtv/tv_actions.h"       // for ACTION_CHANNELSEARCH
 #include "libmythtv/tv_play.h"
 #include "libmythui/mythmainwindow.h"

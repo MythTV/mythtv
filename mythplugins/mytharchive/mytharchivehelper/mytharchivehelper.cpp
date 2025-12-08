@@ -56,8 +56,8 @@
 #include <libmythbase/mythpluginexport.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythbase/mythversion.h>
-#include <libmythbase/programinfo.h>
 #include <libmythtv/mythavutil.h>
+#include <libmythtv/programinfo.h>
 
 extern "C" {
     #include <libavcodec/avcodec.h>

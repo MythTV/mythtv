@@ -33,6 +33,15 @@ set(AUDIO_HEADERS_NOT_INSTALLED
 # Define the library
 #
 
+set(LIBMYTHTV_HEADERS
+    programinfo.h
+    programinforemoteutil.h
+    programtypes.h
+    programtypeflags.h
+    recordingstatus.h
+    recordingtypes.h
+    )
+
 add_library(
   mythtv # cmake-format: unsort
   ${AUDIO_HEADERS_NOT_INSTALLED}
@@ -50,6 +59,7 @@ add_library(
   audio/pink.cpp
   audio/spdifencoder.cpp
   audio/volumebase.cpp
+  ${LIBMYTHTV_HEADERS}
   bitreader.h
   bytereader.cpp
   bytereader.h
@@ -118,6 +128,11 @@ add_library(
   previewgenerator.h
   previewgeneratorqueue.cpp
   previewgeneratorqueue.h
+  programinfo.cpp
+  programinforemoteutil.cpp
+  programinfoupdater.cpp
+  programinfoupdater.h
+  programtypes.cpp
   recordingfile.cpp
   recordingfile.h
   recordinginfo.cpp
@@ -126,6 +141,8 @@ add_library(
   recordingprofile.h
   recordingrule.cpp
   recordingrule.h
+  recordingstatus.cpp
+  recordingtypes.cpp
   remoteencoder.cpp
   remoteencoder.h
   restoredata.cpp
@@ -451,7 +468,7 @@ set(HEADERS_TO_INSTALL2
 
 install(TARGETS mythtv LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(FILES ${HEADERS_TO_INSTALL1}
+install(FILES ${HEADERS_TO_INSTALL1} ${LIBMYTHTV_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/libmythtv)
 
 install(

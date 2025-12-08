@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QMap>
 
-#include "libmythbase/programtypes.h"
+#include "libmythtv/programtypes.h"
 
 static constexpr int64_t MAX_BLANK_FRAMES { 180 };
 

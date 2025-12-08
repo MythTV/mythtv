@@ -1,7 +1,6 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/remoteutil.h"
 #include "libmythui/mythuibutton.h"
 #include "libmythui/mythuibuttonlist.h"
 #include "libmythui/mythuishape.h"

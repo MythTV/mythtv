@@ -6,12 +6,12 @@
 #include <vector>
 
 #include "libmythbase/mythdbcon.h"
-#include "libmythbase/programinfo.h"
 #include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/mythavrational.h"
 #include "libmythtv/mythavutil.h"
 #include "libmythtv/mythcodecid.h"
 #include "libmythtv/mythvideoprofile.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/remoteencoder.h"
 
 class TeletextViewer;

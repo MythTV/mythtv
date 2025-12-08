@@ -14,9 +14,9 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsocket.h"
-#include "libmythbase/programinfo.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythtv/io/mythmediabuffer.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/recordinginfo.h"
 
 #include "sockethandler/filetransfer.h"

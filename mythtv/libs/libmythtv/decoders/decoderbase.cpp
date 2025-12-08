@@ -4,13 +4,13 @@
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 
 #include "Bluray/mythbdbuffer.h"
 #include "DVD/mythdvdbuffer.h"
 #include "decoderbase.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
+#include "programinfo.h"
 
 #define LOC QString("Dec: ")
 

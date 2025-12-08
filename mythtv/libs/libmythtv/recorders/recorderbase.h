@@ -13,12 +13,13 @@
 #include <QMap>
 
 #include "libmythbase/mythtimer.h"
-#include "libmythbase/programtypes.h" // for MarkTypes, frm_pos_map_t
 
 #include "libmythtv/mythtvexp.h"
 #include "libmythtv/mythavrational.h"
+#include "libmythtv/programtypes.h" // for MarkTypes, frm_pos_map_t
 #include "libmythtv/recordingfile.h"
 #include "libmythtv/recordingquality.h"
+#include "libmythtv/recordingstatus.h"
 #include "libmythtv/scantype.h"
 
 extern "C"

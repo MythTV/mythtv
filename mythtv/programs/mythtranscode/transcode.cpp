@@ -24,12 +24,12 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
 #include "libmythtv/HLS/httplivestream.h"
 #include "libmythtv/deletemap.h"
 #include "libmythtv/io/mythavformatwriter.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/mythavutil.h"
+#include "libmythtv/programinfo.h"
 #include "libmythtv/recordingprofile.h"
 #include "libmythtv/tvremoteutil.h"
 

@@ -11,10 +11,10 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"      // for LOG
-#include "libmythbase/programinfo.h"      // for ProgramInfo
 #include "libmythbase/referencecounter.h"
 #include "libmythprotoserver/requesthandler/fileserverutil.h"
 #include "libmythtv/inputinfo.h"          // for InputInfo
+#include "libmythtv/programinfo.h"      // for ProgramInfo
 #include "libmythtv/tv_rec.h"
 
 // MythBackend

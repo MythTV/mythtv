@@ -17,8 +17,8 @@
 
 // MythTV
 #include "libmythbase/http/mythhttpservice.h"
-#include "libmythbase/programtypes.h"
-#include "libmythbase/recordingstatus.h"
+#include "libmythtv/programtypes.h"
+#include "libmythtv/recordingstatus.h"
 
 class V2RecordingInfo : public QObject
 {

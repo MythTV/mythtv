@@ -14,7 +14,6 @@
 
 // MythTV headers
 #include "libmythbase/mythtypes.h"
-#include "libmythbase/programtypes.h"
 #include "libmythtv/mythtvexp.h"
 
 enum ChannelVisibleType : std::int8_t

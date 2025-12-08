@@ -9,12 +9,12 @@
 #include <QCoreApplication>
 
 // MythTV
-#include "libmythbase/programinfo.h"
-#include "libmythbase/programtypes.h"
-#include "libmythbase/recordingtypes.h"
 #include "libmythtv/mythtvexp.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/programtypes.h"
 #include "libmythtv/recordinginfo.h"
 #include "libmythtv/recordingprofile.h"
+#include "libmythtv/recordingtypes.h"
 
 /** \class RecordingRule
  *  \brief Internal representation of a recording rule, mirrors the record

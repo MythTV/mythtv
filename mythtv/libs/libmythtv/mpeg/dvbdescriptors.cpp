@@ -15,7 +15,7 @@
 #include "iso6937tables.h"
 #include "freesat_huffman.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythbase/programinfo.h"
+#include "libmythtv/programinfo.h"
 
 // Decode a text string according to
 //   Draft ETSI EN 300 468 V1.16.1 (2019-05)

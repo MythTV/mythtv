@@ -6,7 +6,6 @@
 #include "libmythbase/mythcorecontext.h"
 
 #include "programinfoupdater.h"
-#include "remoteutil.h"
 
 void ProgramInfoUpdater::insert(
     uint     recordedid, PIAction action, uint64_t filesize)
