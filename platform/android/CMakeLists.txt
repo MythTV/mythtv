@@ -125,6 +125,16 @@ set(ANDROID_VERSION_NAME
 set(QT_ANDROID_APPLICATION_ARGUMENTS "-v general")
 
 #
+# Shorthand
+#
+set(MYTHTV_FULL_DATADIR ${CMAKE_INSTALL_FULL_DATADIR}/mythtv)
+set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build)
+set(ASSETS_DIR ${BUILD_DIR}/assets/mythtv)
+set(JNI_DIR ${BUILD_DIR}/jni)
+set(LIBS_ARCH ${BUILD_DIR}/libs/${CMAKE_ANDROID_ARCH_ABI})
+set(QT_TEMPL_DIR ${LIBS_INSTALL_PREFIX}/qt/src/android/templates)
+
+#
 # Copy android-package-source into the build directory.  This allows Qt version
 # specific customization.
 #
@@ -140,15 +150,10 @@ list(JOIN MANIFEST_APPLICATION_ACTIVITY_EXTRAS " "
      MANIFEST_APPLICATION_ACTIVITY_EXTRAS_STR)
 configure_file(AndroidManifest.xml.${QT_VERSION_MAJOR}.in
                android-package-source/AndroidManifest.xml @ONLY)
-
-#
-# Shorthand
-#
-set(MYTHTV_FULL_DATADIR ${CMAKE_INSTALL_FULL_DATADIR}/mythtv)
-set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/android-build)
-set(ASSETS_DIR ${BUILD_DIR}/assets/mythtv)
-set(JNI_DIR ${BUILD_DIR}/jni)
-set(LIBS_ARCH ${BUILD_DIR}/libs/${CMAKE_ANDROID_ARCH_ABI})
+configure_file(${QT_TEMPL_DIR}/res/values/libs.xml
+               android-package-source/res/values)
+file(CHMOD android-package-source/res/values/libs.xml
+     FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
 #
 # Create the directory structure needed for packaging.
@@ -188,7 +193,7 @@ foreach(DIRNAME ${MYTHTV_FULL_DATADIR}/fonts ${MYTHTV_FULL_DATADIR}/locales
 endforeach()
 
 #
-# Copy additional libraries into the android-build/assets directory.
+# Create list of libraries for the android packaging code to copy
 #
 
 # Library needed by the Qt MySql plugin.

@@ -141,6 +141,9 @@ function(find_or_build_ffmpeg)
     DEPENDS lame external_libs ${after_libs})
 
   add_dependencies(embedded_libs FFmpeg)
+  if(LIBS_INSTALL_FFMPEG)
+    set_target_properties(embedded_libs PROPERTIES REQUIRES_RW TRUE)
+  endif()
 
   message(STATUS "Will build FFmpeg (embedded)")
 

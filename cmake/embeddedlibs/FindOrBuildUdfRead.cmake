@@ -44,6 +44,11 @@ function(find_or_build_udfread)
   set(ProjectDepends
       ${ProjectDepends} udfread
       PARENT_SCOPE)
+
+  add_dependencies(embedded_libs udfread)
+  if(LIBS_INSTALL_UDFREAD)
+    set_target_properties(embedded_libs PROPERTIES REQUIRES_RW TRUE)
+  endif()
 endfunction()
 
 find_or_build_udfread()

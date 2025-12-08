@@ -244,7 +244,6 @@ endif()
 #
 include(ReadOnlyTests)
 ensure_dir_writable("Install" ${CMAKE_INSTALL_PREFIX})
-ensure_dir_writable("Install" ${LIBS_INSTALL_PREFIX})
 
 #
 # Figure out the CPU count and parallel execution flags.  For a build of any
@@ -450,6 +449,15 @@ include(embeddedlibs/FindOrBuildNvCodecHeaders)
 include(embeddedlibs/FindOrBuildUdfRead)
 include(externallibs/FindOrBuildExiv2)
 include(embeddedlibs/FindOrBuildFFmpeg)
+
+#
+# Is the libs install directory read-only
+#
+get_target_property(ext_needs_rw external_libs MANUALLY_ADDED_DEPENDENCIES)
+get_target_property(emb_needs_rw embedded_libs REQUIRES_RW)
+if(ext_needs_rw OR emb_needs_rw)
+  ensure_dir_writable("Libs install" ${LIBS_INSTALL_PREFIX})
+endif()
 
 #
 # Always build MythTV

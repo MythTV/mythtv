@@ -117,6 +117,9 @@ function(find_or_build_exiv2)
     DEPENDS external_libs ${after_libs})
 
   add_dependencies(embedded_libs exiv2)
+  if(LIBS_INSTALL_EXIV2)
+    set_target_properties(embedded_libs PROPERTIES REQUIRES_RW TRUE)
+  endif()
 
   message(STATUS "Will build exiv2 (${EXIV2_VERSION})")
 endfunction()
