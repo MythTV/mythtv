@@ -77,7 +77,7 @@ class MTV_PUBLIC AudioOutput : public VolumeBase, public MythObservable
 
     // reconfigure sound out for new params
     virtual void Reconfigure(const AudioSettings &settings) = 0;
-    bool isConfigured() { return m_isConfigured; };
+    bool isConfigured() const { return m_isConfigured; };
 
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const { return 1.0F; }
@@ -264,14 +264,7 @@ class MTV_PUBLIC AudioOutput::Event : public MythEvent
     static const inline QEvent::Type kError      {static_cast<QEvent::Type>(QEvent::registerEventType())};
 
   private:
-    Event(const Event &o) : MythEvent(o),
-        m_errorMsg(o.m_errorMsg),
-        m_elaspedSeconds(o.m_elaspedSeconds),
-        m_writtenBytes(o.m_writtenBytes),
-        m_brate(o.m_brate), m_freq(o.m_freq),
-        m_prec(o.m_prec), m_chan(o.m_chan)
-    {
-    }
+    Event(const Event &o) = default;
 
   // No implicit copying.
   public:
