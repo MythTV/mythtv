@@ -365,8 +365,8 @@
   commands:
 
   ```
-  $ cmake --build build -t clang-tidy
-  $ cmake --build build -t cppcheck
+  $ cmake --build build -t run-clang-tidy
+  $ cmake --build build -t run-cppcheck
   ```
 
   Its also possible to run these two tools as part of the normal build
