@@ -127,9 +127,13 @@ QString AudioPlayer::ReinitAudio(void)
             aos.m_init = false;
 
         m_audioOutput = AudioOutput::OpenAudio(aos);
-        if (m_audioOutput == nullptr || !m_audioOutput->isConfigured())
+        if (m_audioOutput == nullptr)
         {
             errMsg = tr("Unable to create AudioOutput.");
+        }
+        else if (aos.m_init && !m_audioOutput->isConfigured())
+        {
+            errMsg = tr("AudioOutput has not been successfully configured.");
         }
         AddVisuals();
     }
