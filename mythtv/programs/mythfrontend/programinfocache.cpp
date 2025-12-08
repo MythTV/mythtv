@@ -247,6 +247,9 @@ void ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize,
     if (it == m_cache.end())
         return;
 
+    if ((*it)->GetAvailableStatus() != asAvailable)
+        return;
+
     ProgramInfo *pg = *it;
 
     pg->CalculateProgress(pg->QueryLastPlayPos());
