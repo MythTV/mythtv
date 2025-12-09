@@ -107,9 +107,9 @@ check_c_source_compiles(
 #
 # Check CPU type
 #
-check_c_compiler_flag("-mmmx" HAVE_MMX)
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "(i?86|x86|amd64|ia64|emt64)")
   set(ARCH_X86 1)
+  check_c_compiler_flag("-mmmx" HAVE_MMX)
 elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "(ppc|powerpc)")
   set(ARCH_PPC 1)
 elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "sparc")
