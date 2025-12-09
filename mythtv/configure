@@ -1329,14 +1329,10 @@ LIBRARY_LIST="
     swscale
 "
 
-SUBSYSTEM_LIST="
-"
-
 CONFIG_LIST="
     $EXTERNAL_LIBRARY_LIST
     $HWACCEL_LIBRARY_LIST
     $FEATURE_LIST
-    $SUBSYSTEM_LIST
     autodetect
     fontconfig
     linux_perf
