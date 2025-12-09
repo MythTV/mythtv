@@ -2,7 +2,7 @@
 #define MYTHBASEEXP_H_
 
 #include <QtGlobal>
-#if defined(MBASE_API)
+#ifdef MBASE_API
 # define MBASE_PUBLIC Q_DECL_EXPORT
 #else
 # define MBASE_PUBLIC Q_DECL_IMPORT
