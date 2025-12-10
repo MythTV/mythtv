@@ -64,10 +64,7 @@ const uint8_t* ByteReader::find_start_code(const uint8_t * p,
 
     p = std::min(p, end);
     // read the previous 4 bytes, i.e. bytes {p - 4, p - 3, p - 2, p - 1}
-    *start_code = static_cast<uint32_t>(p[-4]) << 24 |
-                  static_cast<uint32_t>(p[-3]) << 16 |
-                  static_cast<uint32_t>(p[-2]) <<  8 |
-                  static_cast<uint32_t>(p[-1]);
+    *start_code = readBigEndianU32(p - 4);
     return p;
 }
 

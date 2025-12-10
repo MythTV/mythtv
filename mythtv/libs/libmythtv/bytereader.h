@@ -98,6 +98,20 @@ const uint8_t *find_start_code_truncated(const uint8_t * p,
                                          const uint8_t * end,
                                          uint32_t * start_code);
 
+inline uint32_t readBigEndianU32(const uint8_t* x)
+{
+    return uint32_t{x[0]} << 24 |
+           uint32_t{x[1]} << 16 |
+           uint32_t{x[2]} <<  8 |
+           uint32_t{x[3]};
+}
+
+inline uint32_t readBigEndianU24(const uint8_t* x)
+{
+    return uint32_t{x[0]} << 16 |
+           uint32_t{x[1]} <<  8 |
+           uint32_t{x[2]};
+}
 } // namespace ByteReader
 
 #endif // BYTEREADER_H
