@@ -308,6 +308,7 @@ CheckOptions:
   - { key: modernize-use-nullptr.NullMacros,               value: 'Z_NULL' }
   - { key: modernize-use-using.IgnoreMacros,               value: 1 }
 
+  - { key: performance-enum-size.EnumIgnoreList, value: 'some_compilers' }
   - { key: performance-inefficient-vector-operation.VectorLikeClasses,
     value: '::std::vector,QList,QByteArrayList,QItemSelection,QQueue,QStringList' }
 

@@ -357,3 +357,5 @@ void SpinBoxEntryDialog::okClicked(void)
     m_parentList->SetItemCurrent(m_selection);
     Close();
 }
+
+#include "moc_mythuispinbox.cpp"

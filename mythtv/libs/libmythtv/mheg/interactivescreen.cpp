@@ -60,3 +60,5 @@ void InteractiveScreen::OptimiseDisplayedArea()
         img->SetArea(MythRect(img->GetArea().translated(left, top)));
     }
 }
+
+#include "moc_interactivescreen.cpp"

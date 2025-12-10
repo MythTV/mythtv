@@ -1176,4 +1176,4 @@ void BurnMenu::doBurn(int mode)
     showLogViewer();
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythburn.cpp"
