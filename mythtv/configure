@@ -1615,7 +1615,6 @@ MYTHTV_CONFIG_LIST='
 MYTHTV_HAVE_LIST='
     bdj_j2me
     fe_can_2g_modulation
-    ftime
     getifaddrs
     gettimeofday
     is_duration_v
@@ -4580,7 +4579,6 @@ check_header linux/videodev2.h
 
 #Myth check for MYTHTV_HAVE_LIST
 check_func posix_fadvise
-check_func_headers sys/timeb.h ftime
 check_func_headers "sys/types.h sys/socket.h ifaddrs.h" getifaddrs
 check_func_headers sys/time.h gettimeofday
 #End MythTV check
