@@ -1865,14 +1865,6 @@ valgrind_backtrace_deps="valgrind_valgrind_h"
 dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32"
 dxva2_extralibs="-luser32"
 
-# external libraries
-libmp3lame_encoder_deps="libmp3lame"
-libmp3lame_encoder_select="audio_frame_queue mpegaudioheader"
-libx262_encoder_deps="libx262"
-libx264_encoder_deps="libx264"
-libx264rgb_encoder_deps="libx264 x264_csp_bgr"
-libx264rgb_encoder_select="libx264_encoder"
-
 # ffmpeg setting - value for image utils - 32 recommended, 1 used for now
 image_align=1
 
@@ -4568,8 +4560,6 @@ else
     fi
 fi
 
-check_builtin x264_csp_bgr x264.h X264_CSP_BGR
-
 check_func  gettimeofday
 
 check_header dirent.h
@@ -4592,7 +4582,6 @@ check_header linux/videodev2.h
 check_header va/va.h
 check_header va/va_x11.h
 check_header va/va_glx.h
-check_struct dxva2api.h DXVA_PictureParameters wDecodedPictureIndex
 check_func posix_fadvise
 check_func_headers sys/timeb.h ftime
 check_func_headers "sys/types.h sys/socket.h ifaddrs.h" getifaddrs
@@ -4600,18 +4589,6 @@ check_func_headers sys/time.h gettimeofday
 #End MythTV check
 
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
-
-check_type "va/va.h va/va_dec_hevc.h" "VAPictureParameterBufferHEVC"
-check_struct "va/va.h" "VADecPictureParameterBufferVP9" bit_depth
-check_type "va/va.h va/va_vpp.h" "VAProcPipelineParameterBuffer"
-check_type "va/va.h va/va_enc_h264.h" "VAEncPictureParameterBufferH264"
-check_type "va/va.h va/va_enc_hevc.h" "VAEncPictureParameterBufferHEVC"
-check_type "va/va.h va/va_enc_jpeg.h" "VAEncPictureParameterBufferJPEG"
-check_type "va/va.h va/va_enc_mpeg2.h" "VAEncPictureParameterBufferMPEG2"
-check_type "va/va.h va/va_enc_vp8.h"  "VAEncPictureParameterBufferVP8"
-check_type "va/va.h va/va_enc_vp9.h"  "VAEncPictureParameterBufferVP9"
-
-check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
 enable pthreads
 # check for some common methods of building with pthread support
@@ -4880,8 +4857,6 @@ check_lib vfw32 "windows.h vfw.h" capCreateCaptureWindow -lvfw32
 # check that WM_CAP_DRIVER_CONNECT is defined to the proper value
 # w32api 3.12 had it defined wrong
 check_cpp_condition vfw.h "WM_CAP_DRIVER_CONNECT > WM_USER" && enable vfwcap_defines
-
-check_type "dshow.h" IBaseFilter
 
 if check_struct sys/soundcard.h audio_buf_info bytes; then
     enable_safe sys/soundcard.h
