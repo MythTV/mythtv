@@ -2862,14 +2862,6 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             break;
 
         av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
-        // begin MythTV
-        if (pmt_pid <= 0x000F || pmt_pid >= 0x1FFF)
-        {
-            av_log(ts->stream, AV_LOG_ERROR, "Invalid PAT ignored "
-                   "MPEG Program Number=0x%x pid=0x%x\n", sid, pmt_pid);
-            return;
-        }
-        // end MythTV
 
         if (sid == 0x0000) {
             /* NIT info */
