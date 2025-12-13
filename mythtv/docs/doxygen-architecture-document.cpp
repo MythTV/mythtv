@@ -119,9 +119,9 @@ There are also a few simple \ref testing "testing shortcuts".
       ProgramInfo) or to the protocol itself require the protocol version
       number to be incremented.
 
-  <dt>libavcodec/libavformat/libavutil/libpostproc/libswscale
+  <dt>libavcodec/libavformat/libavutil/libswscale
       <dd>These together form the FFmpeg A/V decoding library (aka avlib).
-      <a href="http://ffmpeg.mplayerhq.hu/documentation.html">
+      <a href="https://ffmpeg.org/documentation.html">
           Documented Externally</a>.
 
       These should be modified as little as possible, and any changes

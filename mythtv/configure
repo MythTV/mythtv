@@ -1394,7 +1394,6 @@ LIBRARY_LIST="
     avfilter
     avformat
     avutil
-    postproc
     swresample
     swscale
 "
@@ -5562,7 +5561,7 @@ fi
 
 # add some linker flags
 check_ldflags -Wl,--warn-common
-check_ldflags '-Wl,-rpath-link,\$\${SRC_PATH_BARE}/external/FFmpeg/libpostproc:\$\${SRC_PATH_BARE}/external/FFmpeg/libswresample:\$\${SRC_PATH_BARE}/external/FFmpeg/libswscale:\$\${SRC_PATH_BARE}/external/FFmpeg/libavfilter:\$\${SRC_PATH_BARE}/external/FFmpeg/libavdevice:\$\${SRC_PATH_BARE}/external/FFmpeg/libavformat:\$\${SRC_PATH_BARE}/external/FFmpeg/libavcodec:\$\${SRC_PATH_BARE}/external/FFmpeg/libavutil'
+check_ldflags '-Wl,-rpath-link,\$\${SRC_PATH_BARE}/external/FFmpeg/libswresample:\$\${SRC_PATH_BARE}/external/FFmpeg/libswscale:\$\${SRC_PATH_BARE}/external/FFmpeg/libavfilter:\$\${SRC_PATH_BARE}/external/FFmpeg/libavdevice:\$\${SRC_PATH_BARE}/external/FFmpeg/libavformat:\$\${SRC_PATH_BARE}/external/FFmpeg/libavcodec:\$\${SRC_PATH_BARE}/external/FFmpeg/libavutil'
 enabled rpath && add_ldexeflags -Wl,-rpath,$libdir
 enabled rpath && add_ldlibflags -Wl,-rpath,$libdir
 test_ldflags -Wl,-Bsymbolic && append SHFLAGS -Wl,-Bsymbolic
@@ -6605,7 +6604,6 @@ if enabled source_path_used; then
         libavformat
         libavutil
         libavutil/$arch
-        libpostproc
         libswscale
         libswscale/$arch
         tests
@@ -6625,7 +6623,6 @@ if enabled source_path_used; then
         libavfilter/Makefile
         libavformat/Makefile
         libavutil/Makefile
-        libpostproc/Makefile
         libswscale/Makefile
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
