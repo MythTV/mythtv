@@ -208,10 +208,10 @@ https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/
 
 /* DVB descriptor tag values [0x40, 0x7F] from
    ETSI EN 300 468 Table 12: Possible locations of descriptors */
-#define VBI_DATA_DESCRIPTOR          0x45
-#define VBI_TELETEXT_DESCRIPTOR      0x46
 #define NETWORK_NAME_DESCRIPTOR      0x40
 #define SERVICE_LIST_DESCRIPTOR      0x41
+#define VBI_DATA_DESCRIPTOR          0x45
+#define VBI_TELETEXT_DESCRIPTOR      0x46
 #define SERVICE_DESCRIPTOR           0x48
 #define STREAM_IDENTIFIER_DESCRIPTOR 0x52
 #define TELETEXT_DESCRIPTOR          0x56
