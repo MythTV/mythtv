@@ -619,10 +619,8 @@ export class RecordingsComponent implements OnInit {
     if (this.program) {
       this.editingProgram = this.program;
       this.program = Object.assign({}, this.program);
-      if (this.program.Airdate)
+      if (typeof this.program.Airdate == 'string')
         this.program.Airdate = new Date(this.program.Airdate + ' 00:00');
-      else
-        this.program.Airdate = <Date><unknown>null;
       this.displayMetadataDlg = true;
       this.currentForm.form.markAsPristine();
     }
