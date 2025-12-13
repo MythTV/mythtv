@@ -87,6 +87,7 @@ git push
 ```
 cd $FFMPEG_GIT_DIR
 git checkout master
+git fetch ffmpeg
 git pull ffmpeg master
 git push
 # create a new branch rebase/a.b on master at the branch point for ffmpeg/release/a.b
@@ -146,8 +147,8 @@ rm -rf mythtv/external/FFmpeg/
 cp -r $FFMPEG_GIT_DIR mythtv/external/FFmpeg
 rm -rf mythtv/external/FFmpeg/.git
 # ensure changed files look correct
-git status
 git add -A -- mythtv/external/FFmpeg
+git status
 git commit
 ```
 
