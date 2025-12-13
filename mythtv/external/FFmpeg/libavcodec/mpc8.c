@@ -155,7 +155,13 @@ static av_cold int mpc8_decode_init(AVCodecContext * avctx)
 
     init_get_bits(&gb, avctx->extradata, 16);
 
-    skip_bits(&gb, 3);//sample rate
+    uint8_t sample_rate_idx = get_bits(&gb, 3);
+    static const int sample_rates[] = { 44100, 48000, 37800, 32000 };
+    if (sample_rate_idx >= FF_ARRAY_ELEMS(sample_rates)) {
+        av_log(avctx, AV_LOG_ERROR, "invalid sample rate index (%u)\n", sample_rate_idx);
+        return AVERROR_INVALIDDATA;
+    }
+    avctx->sample_rate = sample_rates[sample_rate_idx];
     c->maxbands = get_bits(&gb, 5) + 1;
     if (c->maxbands >= BANDS) {
         av_log(avctx,AV_LOG_ERROR, "maxbands %d too high\n", c->maxbands);
@@ -393,6 +399,5 @@ const FFCodec ff_mpc8_decoder = {
     FF_CODEC_DECODE_CB(mpc8_decode_frame),
     .flush          = mpc8_decode_flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
-    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
-                                                      AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16P),
 };

@@ -139,7 +139,11 @@ static int send_frame(AVFilterLink *inlink, AVFrame *in)
         return ret;
 
     if (sd) {
+#ifdef LCEVC_DEC_VERSION_MAJOR
+        res = LCEVC_SendDecoderEnhancementData(lcevc->decoder, in->pts, sd->data, sd->size);
+#else
         res = LCEVC_SendDecoderEnhancementData(lcevc->decoder, in->pts, 0, sd->data, sd->size);
+#endif
         if (res == LCEVC_Again)
             return AVERROR(EAGAIN);
         else if (res != LCEVC_Success) {
@@ -148,7 +152,11 @@ static int send_frame(AVFilterLink *inlink, AVFrame *in)
         }
     }
 
+#ifdef LCEVC_DEC_VERSION_MAJOR
+    res = LCEVC_SendDecoderBase(lcevc->decoder, in->pts, picture, -1, in);
+#else
     res = LCEVC_SendDecoderBase(lcevc->decoder, in->pts, 0, picture, -1, in);
+#endif
     if (res != LCEVC_Success) {
         av_log(ctx, AV_LOG_ERROR, "LCEVC_SendDecoderBase failed\n");
         LCEVC_FreePicture(lcevc->decoder, picture);
@@ -417,9 +425,9 @@ static const enum AVPixelFormat pix_fmts[] = {
     AV_PIX_FMT_NONE
 };
 
-const AVFilter ff_vf_lcevc = {
-    .name          = "lcevc",
-    .description   = NULL_IF_CONFIG_SMALL("LCEVC"),
+const FFFilter ff_vf_lcevc = {
+    .p.name        = "lcevc",
+    .p.description = NULL_IF_CONFIG_SMALL("LCEVC"),
     .activate      = activate,
     FILTER_INPUTS(ff_video_default_filterpad),
     FILTER_OUTPUTS(lcevc_outputs),

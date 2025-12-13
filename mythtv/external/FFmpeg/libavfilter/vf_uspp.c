@@ -410,7 +410,7 @@ static int config_input(AVFilterLink *inlink)
         }
         avctx_enc->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
         avctx_enc->global_quality = 123;
-        avctx_enc->thread_count = 1; // We do threading in the filter with muiltiple codecs
+        avctx_enc->thread_count = 1; // We do threading in the filter with multiple codecs
         ret = avcodec_open2(avctx_enc, enc, &opts);
         av_dict_free(&opts);
         if (ret < 0)
@@ -549,14 +549,14 @@ static const AVFilterPad uspp_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_uspp = {
-    .name            = "uspp",
-    .description     = NULL_IF_CONFIG_SMALL("Apply Ultra Simple / Slow Post-processing filter."),
+const FFFilter ff_vf_uspp = {
+    .p.name          = "uspp",
+    .p.description   = NULL_IF_CONFIG_SMALL("Apply Ultra Simple / Slow Post-processing filter."),
+    .p.priv_class    = &uspp_class,
+    .p.flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
     .priv_size       = sizeof(USPPContext),
     .uninit          = uninit,
     FILTER_INPUTS(uspp_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .priv_class      = &uspp_class,
-    .flags           = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
 };

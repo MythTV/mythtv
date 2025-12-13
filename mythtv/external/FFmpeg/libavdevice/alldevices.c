@@ -20,8 +20,8 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/attributes_internal.h"
+#include "libavformat/avformat_internal.h"
 #include "libavformat/demux.h"
-#include "libavformat/internal.h"
 #include "libavformat/mux.h"
 #include "avdevice.h"
 
@@ -32,7 +32,6 @@ extern const FFOutputFormat ff_alsa_muxer;
 extern const FFInputFormat  ff_android_camera_demuxer;
 extern const FFOutputFormat ff_audiotoolbox_muxer;
 extern const FFInputFormat  ff_avfoundation_demuxer;
-extern const FFInputFormat  ff_bktr_demuxer;
 extern const FFOutputFormat ff_caca_muxer;
 extern const FFInputFormat  ff_decklink_demuxer;
 extern const FFOutputFormat ff_decklink_muxer;
@@ -45,12 +44,10 @@ extern const FFInputFormat  ff_jack_demuxer;
 extern const FFInputFormat  ff_kmsgrab_demuxer;
 extern const FFInputFormat  ff_lavfi_demuxer;
 extern const FFInputFormat  ff_openal_demuxer;
-extern const FFOutputFormat ff_opengl_muxer;
 extern const FFInputFormat  ff_oss_demuxer;
 extern const FFOutputFormat ff_oss_muxer;
 extern const FFInputFormat  ff_pulse_demuxer;
 extern const FFOutputFormat ff_pulse_muxer;
-extern const FFOutputFormat ff_sdl2_muxer;
 extern const FFInputFormat  ff_sndio_demuxer;
 extern const FFOutputFormat ff_sndio_muxer;
 extern const FFInputFormat  ff_v4l2_demuxer;

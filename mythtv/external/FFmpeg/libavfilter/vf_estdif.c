@@ -440,11 +440,6 @@ static int filter(AVFilterContext *ctx, AVFrame *in, int64_t pts, int64_t durati
     if (!out)
         return AVERROR(ENOMEM);
     av_frame_copy_props(out, in);
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    out->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     out->flags &= ~AV_FRAME_FLAG_INTERLACED;
     out->pts = pts;
     out->duration = duration;
@@ -580,15 +575,15 @@ static const AVFilterPad estdif_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_estdif = {
-    .name          = "estdif",
-    .description   = NULL_IF_CONFIG_SMALL("Apply Edge Slope Tracing deinterlace."),
+const FFFilter ff_vf_estdif = {
+    .p.name        = "estdif",
+    .p.description = NULL_IF_CONFIG_SMALL("Apply Edge Slope Tracing deinterlace."),
+    .p.priv_class  = &estdif_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(ESTDIFContext),
-    .priv_class    = &estdif_class,
     .uninit        = uninit,
     FILTER_INPUTS(estdif_inputs),
     FILTER_OUTPUTS(estdif_outputs),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

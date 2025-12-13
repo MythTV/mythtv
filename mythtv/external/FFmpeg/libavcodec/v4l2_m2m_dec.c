@@ -169,7 +169,7 @@ static int v4l2_receive_frame(AVCodecContext *avctx, AVFrame *frame)
     if (!s->draining) {
         ret = v4l2_try_start(avctx);
         if (ret) {
-            /* cant recover */
+            /* can't recover */
             if (ret != AVERROR(ENOMEM))
                 ret = 0;
             goto fail;

@@ -37,6 +37,7 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/log.h"
 #include "libavutil/base64.h"
+#include "libavutil/opt.h"
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "encode.h"
@@ -45,6 +46,7 @@
 #include <theora/theoraenc.h>
 
 typedef struct TheoraContext {
+    AVClass    *av_class;                  /**< class for AVOptions            */
     th_enc_ctx *t_state;
     uint8_t    *stats;
     int         stats_size;
@@ -52,7 +54,20 @@ typedef struct TheoraContext {
     int         uv_hshift;
     int         uv_vshift;
     int         keyframe_mask;
+    int         speed_level;
 } TheoraContext;
+
+static const AVOption options[] = {
+    { "speed_level", "Sets the encoding speed level", offsetof(TheoraContext, speed_level), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
+    { NULL }
+};
+
+static const AVClass theora_class = {
+    .class_name = "libtheora",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
 
 /** Concatenate an ogg_packet into the extradata. */
 static int concatenate_packet(unsigned int* offset,
@@ -234,7 +249,7 @@ static av_cold int encode_init(AVCodecContext* avc_context)
         return AVERROR_EXTERNAL;
     }
 
-    h->keyframe_mask = (1 << t_info.keyframe_granule_shift) - 1;
+    h->keyframe_mask = (1 << av_ceil_log2(avc_context->gop_size)) - 1;
     /* Clear up theora_info struct */
     th_info_clear(&t_info);
 
@@ -242,6 +257,15 @@ static av_cold int encode_init(AVCodecContext* avc_context)
                       &gop_size, sizeof(gop_size))) {
         av_log(avc_context, AV_LOG_ERROR, "Error setting GOP size\n");
         return AVERROR_EXTERNAL;
+    }
+
+    // Set encoding speed level
+    if (h->speed_level != -1) {
+        int max_speed_level;
+        int speed_level = h->speed_level;
+        th_encode_ctl(h->t_state, TH_ENCCTL_GET_SPLEVEL_MAX, &max_speed_level, sizeof(max_speed_level));
+        speed_level = FFMIN(speed_level, max_speed_level);
+        th_encode_ctl(h->t_state, TH_ENCCTL_SET_SPLEVEL, &speed_level, sizeof(speed_level));
     }
 
     // need to enable 2 pass (via TH_ENCCTL_2PASS_) before encoding headers
@@ -388,9 +412,8 @@ const FFCodec ff_libtheora_encoder = {
     .init           = encode_init,
     .close          = encode_close,
     FF_CODEC_ENCODE_CB(encode_frame),
-    .p.pix_fmts     = (const enum AVPixelFormat[]){
-        AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P, AV_PIX_FMT_NONE
-    },
+    CODEC_PIXFMTS(AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P),
+    .p.priv_class   = &theora_class,
     .color_ranges   = AVCOL_RANGE_MPEG,
     .p.wrapper_name = "libtheora",
 };

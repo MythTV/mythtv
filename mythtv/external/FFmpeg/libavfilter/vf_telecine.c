@@ -99,13 +99,16 @@ static av_cold int init(AVFilterContext *ctx)
     return 0;
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     int reject_flags = AV_PIX_FMT_FLAG_BITSTREAM |
                        AV_PIX_FMT_FLAG_HWACCEL   |
                        AV_PIX_FMT_FLAG_PAL;
 
-    return ff_set_common_formats(ctx, ff_formats_pixdesc_filter(0, reject_flags));
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out,
+                                  ff_formats_pixdesc_filter(0, reject_flags));
 }
 
 static int config_input(AVFilterLink *inlink)
@@ -206,12 +209,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
                                 s->stride[i],
                                 (s->planeheight[i] - !s->first_field + 1) / 2);
         }
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        s->frame[nout]->interlaced_frame = 1;
-        s->frame[nout]->top_field_first  = !s->first_field;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         s->frame[nout]->flags |= AV_FRAME_FLAG_INTERLACED;
         if (s->first_field)
             s->frame[nout]->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
@@ -234,12 +231,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
                                 inpicref->data[i], inpicref->linesize[i],
                                 s->stride[i],
                                 s->planeheight[i]);
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        s->frame[nout]->interlaced_frame = inpicref->interlaced_frame;
-        s->frame[nout]->top_field_first  = inpicref->top_field_first;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         s->frame[nout]->flags |= (inpicref->flags & (AV_FRAME_FLAG_INTERLACED | AV_FRAME_FLAG_TOP_FIELD_FIRST));
         nout++;
         len -= 2;
@@ -266,12 +257,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
 
         av_frame_copy_props(frame, inpicref);
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->interlaced_frame = interlaced;
-        frame->top_field_first  = tff;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         if (interlaced)
             frame->flags |= AV_FRAME_FLAG_INTERLACED;
         else
@@ -317,14 +302,14 @@ static const AVFilterPad telecine_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_telecine = {
-    .name          = "telecine",
-    .description   = NULL_IF_CONFIG_SMALL("Apply a telecine pattern."),
+const FFFilter ff_vf_telecine = {
+    .p.name        = "telecine",
+    .p.description = NULL_IF_CONFIG_SMALL("Apply a telecine pattern."),
+    .p.priv_class  = &telecine_class,
     .priv_size     = sizeof(TelecineContext),
-    .priv_class    = &telecine_class,
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(telecine_inputs),
     FILTER_OUTPUTS(telecine_outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
 };

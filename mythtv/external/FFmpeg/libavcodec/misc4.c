@@ -180,10 +180,6 @@ const FFCodec ff_misc4_decoder = {
     .init             = misc4_init,
     FF_CODEC_DECODE_CB(misc4_decode),
     .p.capabilities   = AV_CODEC_CAP_DR1 |
-#if FF_API_SUBFRAMES
-                        AV_CODEC_CAP_SUBFRAMES |
-#endif
                         AV_CODEC_CAP_CHANNEL_CONF,
-    .p.sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16,
-                                                        AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16),
 };

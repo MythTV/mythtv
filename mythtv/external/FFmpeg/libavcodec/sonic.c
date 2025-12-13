@@ -96,411 +96,6 @@ static inline int shift_down(int a,int b)
     return (a>>b)+(a<0);
 }
 
-static av_always_inline av_flatten void put_symbol(RangeCoder *c, uint8_t *state, int v, int is_signed, uint64_t rc_stat[256][2], uint64_t rc_stat2[32][2]){
-    int i;
-
-#define put_rac(C,S,B) \
-do{\
-    if(rc_stat){\
-        rc_stat[*(S)][B]++;\
-        rc_stat2[(S)-state][B]++;\
-    }\
-    put_rac(C,S,B);\
-}while(0)
-
-    if(v){
-        const int a= FFABS(v);
-        const int e= av_log2(a);
-        put_rac(c, state+0, 0);
-        if(e<=9){
-            for(i=0; i<e; i++){
-                put_rac(c, state+1+i, 1);  //1..10
-            }
-            put_rac(c, state+1+i, 0);
-
-            for(i=e-1; i>=0; i--){
-                put_rac(c, state+22+i, (a>>i)&1); //22..31
-            }
-
-            if(is_signed)
-                put_rac(c, state+11 + e, v < 0); //11..21
-        }else{
-            for(i=0; i<e; i++){
-                put_rac(c, state+1+FFMIN(i,9), 1);  //1..10
-            }
-            put_rac(c, state+1+9, 0);
-
-            for(i=e-1; i>=0; i--){
-                put_rac(c, state+22+FFMIN(i,9), (a>>i)&1); //22..31
-            }
-
-            if(is_signed)
-                put_rac(c, state+11 + 10, v < 0); //11..21
-        }
-    }else{
-        put_rac(c, state+0, 1);
-    }
-#undef put_rac
-}
-
-static inline av_flatten int get_symbol(RangeCoder *c, uint8_t *state, int is_signed){
-    if(get_rac(c, state+0))
-        return 0;
-    else{
-        int i, e;
-        unsigned a;
-        e= 0;
-        while(get_rac(c, state+1 + FFMIN(e,9))){ //1..10
-            e++;
-            if (e > 31)
-                return AVERROR_INVALIDDATA;
-        }
-
-        a= 1;
-        for(i=e-1; i>=0; i--){
-            a += a + get_rac(c, state+22 + FFMIN(i,9)); //22..31
-        }
-
-        e= -(is_signed && get_rac(c, state+11 + FFMIN(e, 10))); //11..21
-        return (a^e)-e;
-    }
-}
-
-#if 1
-static inline int intlist_write(RangeCoder *c, uint8_t *state, int *buf, int entries, int base_2_part)
-{
-    int i;
-
-    for (i = 0; i < entries; i++)
-        put_symbol(c, state, buf[i], 1, NULL, NULL);
-
-    return 1;
-}
-
-static inline int intlist_read(RangeCoder *c, uint8_t *state, int *buf, int entries, int base_2_part)
-{
-    int i;
-
-    for (i = 0; i < entries; i++)
-        buf[i] = get_symbol(c, state, 1);
-
-    return 1;
-}
-#elif 1
-static inline int intlist_write(PutBitContext *pb, int *buf, int entries, int base_2_part)
-{
-    int i;
-
-    for (i = 0; i < entries; i++)
-        set_se_golomb(pb, buf[i]);
-
-    return 1;
-}
-
-static inline int intlist_read(GetBitContext *gb, int *buf, int entries, int base_2_part)
-{
-    int i;
-
-    for (i = 0; i < entries; i++)
-        buf[i] = get_se_golomb(gb);
-
-    return 1;
-}
-
-#else
-
-#define ADAPT_LEVEL 8
-
-static int bits_to_store(uint64_t x)
-{
-    int res = 0;
-
-    while(x)
-    {
-        res++;
-        x >>= 1;
-    }
-    return res;
-}
-
-static void write_uint_max(PutBitContext *pb, unsigned int value, unsigned int max)
-{
-    int i, bits;
-
-    if (!max)
-        return;
-
-    bits = bits_to_store(max);
-
-    for (i = 0; i < bits-1; i++)
-        put_bits(pb, 1, value & (1 << i));
-
-    if ( (value | (1 << (bits-1))) <= max)
-        put_bits(pb, 1, value & (1 << (bits-1)));
-}
-
-static unsigned int read_uint_max(GetBitContext *gb, int max)
-{
-    int i, bits, value = 0;
-
-    if (!max)
-        return 0;
-
-    bits = bits_to_store(max);
-
-    for (i = 0; i < bits-1; i++)
-        if (get_bits1(gb))
-            value += 1 << i;
-
-    if ( (value | (1<<(bits-1))) <= max)
-        if (get_bits1(gb))
-            value += 1 << (bits-1);
-
-    return value;
-}
-
-static int intlist_write(PutBitContext *pb, int *buf, int entries, int base_2_part)
-{
-    int i, j, x = 0, low_bits = 0, max = 0;
-    int step = 256, pos = 0, dominant = 0, any = 0;
-    int *copy, *bits;
-
-    copy = av_calloc(entries, sizeof(*copy));
-    if (!copy)
-        return AVERROR(ENOMEM);
-
-    if (base_2_part)
-    {
-        int energy = 0;
-
-        for (i = 0; i < entries; i++)
-            energy += abs(buf[i]);
-
-        low_bits = bits_to_store(energy / (entries * 2));
-        if (low_bits > 15)
-            low_bits = 15;
-
-        put_bits(pb, 4, low_bits);
-    }
-
-    for (i = 0; i < entries; i++)
-    {
-        put_bits(pb, low_bits, abs(buf[i]));
-        copy[i] = abs(buf[i]) >> low_bits;
-        if (copy[i] > max)
-            max = abs(copy[i]);
-    }
-
-    bits = av_calloc(entries*max, sizeof(*bits));
-    if (!bits)
-    {
-        av_free(copy);
-        return AVERROR(ENOMEM);
-    }
-
-    for (i = 0; i <= max; i++)
-    {
-        for (j = 0; j < entries; j++)
-            if (copy[j] >= i)
-                bits[x++] = copy[j] > i;
-    }
-
-    // store bitstream
-    while (pos < x)
-    {
-        int steplet = step >> 8;
-
-        if (pos + steplet > x)
-            steplet = x - pos;
-
-        for (i = 0; i < steplet; i++)
-            if (bits[i+pos] != dominant)
-                any = 1;
-
-        put_bits(pb, 1, any);
-
-        if (!any)
-        {
-            pos += steplet;
-            step += step / ADAPT_LEVEL;
-        }
-        else
-        {
-            int interloper = 0;
-
-            while (((pos + interloper) < x) && (bits[pos + interloper] == dominant))
-                interloper++;
-
-            // note change
-            write_uint_max(pb, interloper, (step >> 8) - 1);
-
-            pos += interloper + 1;
-            step -= step / ADAPT_LEVEL;
-        }
-
-        if (step < 256)
-        {
-            step = 65536 / step;
-            dominant = !dominant;
-        }
-    }
-
-    // store signs
-    for (i = 0; i < entries; i++)
-        if (buf[i])
-            put_bits(pb, 1, buf[i] < 0);
-
-    av_free(bits);
-    av_free(copy);
-
-    return 0;
-}
-
-static int intlist_read(GetBitContext *gb, int *buf, int entries, int base_2_part)
-{
-    int i, low_bits = 0, x = 0;
-    int n_zeros = 0, step = 256, dominant = 0;
-    int pos = 0, level = 0;
-    int *bits = av_calloc(entries, sizeof(*bits));
-
-    if (!bits)
-        return AVERROR(ENOMEM);
-
-    if (base_2_part)
-    {
-        low_bits = get_bits(gb, 4);
-
-        if (low_bits)
-            for (i = 0; i < entries; i++)
-                buf[i] = get_bits(gb, low_bits);
-    }
-
-//    av_log(NULL, AV_LOG_INFO, "entries: %d, low bits: %d\n", entries, low_bits);
-
-    while (n_zeros < entries)
-    {
-        int steplet = step >> 8;
-
-        if (!get_bits1(gb))
-        {
-            for (i = 0; i < steplet; i++)
-                bits[x++] = dominant;
-
-            if (!dominant)
-                n_zeros += steplet;
-
-            step += step / ADAPT_LEVEL;
-        }
-        else
-        {
-            int actual_run = read_uint_max(gb, steplet-1);
-
-//            av_log(NULL, AV_LOG_INFO, "actual run: %d\n", actual_run);
-
-            for (i = 0; i < actual_run; i++)
-                bits[x++] = dominant;
-
-            bits[x++] = !dominant;
-
-            if (!dominant)
-                n_zeros += actual_run;
-            else
-                n_zeros++;
-
-            step -= step / ADAPT_LEVEL;
-        }
-
-        if (step < 256)
-        {
-            step = 65536 / step;
-            dominant = !dominant;
-        }
-    }
-
-    // reconstruct unsigned values
-    n_zeros = 0;
-    for (i = 0; n_zeros < entries; i++)
-    {
-        while(1)
-        {
-            if (pos >= entries)
-            {
-                pos = 0;
-                level += 1 << low_bits;
-            }
-
-            if (buf[pos] >= level)
-                break;
-
-            pos++;
-        }
-
-        if (bits[i])
-            buf[pos] += 1 << low_bits;
-        else
-            n_zeros++;
-
-        pos++;
-    }
-    av_free(bits);
-
-    // read signs
-    for (i = 0; i < entries; i++)
-        if (buf[i] && get_bits1(gb))
-            buf[i] = -buf[i];
-
-//    av_log(NULL, AV_LOG_INFO, "zeros: %d pos: %d\n", n_zeros, pos);
-
-    return 0;
-}
-#endif
-
-static void predictor_init_state(int *k, int *state, int order)
-{
-    int i;
-
-    for (i = order-2; i >= 0; i--)
-    {
-        int j, p, x = state[i];
-
-        for (j = 0, p = i+1; p < order; j++,p++)
-            {
-            int tmp = x + shift_down(k[j] * (unsigned)state[p], LATTICE_SHIFT);
-            state[p] += shift_down(k[j]* (unsigned)x, LATTICE_SHIFT);
-            x = tmp;
-        }
-    }
-}
-
-static int predictor_calc_error(int *k, int *state, int order, int error)
-{
-    int i, x = error - (unsigned)shift_down(k[order-1] *  (unsigned)state[order-1], LATTICE_SHIFT);
-
-#if 1
-    int *k_ptr = &(k[order-2]),
-        *state_ptr = &(state[order-2]);
-    for (i = order-2; i >= 0; i--, k_ptr--, state_ptr--)
-    {
-        int k_value = *k_ptr, state_value = *state_ptr;
-        x -= (unsigned)shift_down(k_value * (unsigned)state_value, LATTICE_SHIFT);
-        state_ptr[1] = state_value + shift_down(k_value * (unsigned)x, LATTICE_SHIFT);
-    }
-#else
-    for (i = order-2; i >= 0; i--)
-    {
-        x -= (unsigned)shift_down(k[i] * state[i], LATTICE_SHIFT);
-        state[i+1] = state[i] + shift_down(k[i] * x, LATTICE_SHIFT);
-    }
-#endif
-
-    // don't drift too far, to avoid overflows
-    if (x >  (SAMPLE_FACTOR<<16)) x =  (SAMPLE_FACTOR<<16);
-    if (x < -(SAMPLE_FACTOR<<16)) x = -(SAMPLE_FACTOR<<16);
-
-    state[0] = x;
-
-    return x;
-}
 
 #if CONFIG_SONIC_ENCODER || CONFIG_SONIC_LS_ENCODER
 // Heavily modified Levinson-Durbin algorithm which
@@ -519,7 +114,6 @@ static void modified_levinson_durbin(int *window, int window_entries,
     {
         int step = (i+1)*channels, k, j;
         double xx = 0.0, xy = 0.0;
-#if 1
         int *x_ptr = &(window[step]);
         int *state_ptr = &(state[0]);
         j = window_entries - step;
@@ -530,17 +124,6 @@ static void modified_levinson_durbin(int *window, int window_entries,
             xx += state_value*state_value;
             xy += x_value*state_value;
         }
-#else
-        for (j = 0; j <= (window_entries - step); j++);
-        {
-            double stepval = window[step+j];
-            double stateval = window[j];
-//            xx += (double)window[j]*(double)window[j];
-//            xy += (double)window[step+j]*(double)window[j];
-            xx += stateval*stateval;
-            xy += stepval*stateval;
-        }
-#endif
         if (xx == 0.0)
             k = 0;
         else
@@ -554,7 +137,6 @@ static void modified_levinson_durbin(int *window, int window_entries,
         out[i] = k;
         k *= tap_quant[i];
 
-#if 1
         x_ptr = &(window[step]);
         state_ptr = &(state[0]);
         j = window_entries - step;
@@ -565,15 +147,6 @@ static void modified_levinson_durbin(int *window, int window_entries,
             *x_ptr = x_value + shift_down(k*state_value,LATTICE_SHIFT);
             *state_ptr = state_value + shift_down(k*x_value, LATTICE_SHIFT);
         }
-#else
-        for (j=0; j <= (window_entries - step); j++)
-        {
-            int stepval = window[step+j];
-            int stateval=state[j];
-            window[step+j] += shift_down(k * stateval, LATTICE_SHIFT);
-            state[j] += shift_down(k * stepval, LATTICE_SHIFT);
-        }
-#endif
     }
 }
 
@@ -716,6 +289,63 @@ static av_cold int sonic_encode_close(AVCodecContext *avctx)
     av_freep(&s->int_samples);
 
     return 0;
+}
+
+static av_always_inline av_flatten void put_symbol(RangeCoder *c, uint8_t *state, int v, int is_signed, uint64_t rc_stat[256][2], uint64_t rc_stat2[32][2]){
+    int i;
+
+#define put_rac(C,S,B) \
+do{\
+    if(rc_stat){\
+        rc_stat[*(S)][B]++;\
+        rc_stat2[(S)-state][B]++;\
+    }\
+    put_rac(C,S,B);\
+}while(0)
+
+    if(v){
+        const int a= FFABS(v);
+        const int e= av_log2(a);
+        put_rac(c, state+0, 0);
+        if(e<=9){
+            for(i=0; i<e; i++){
+                put_rac(c, state+1+i, 1);  //1..10
+            }
+            put_rac(c, state+1+i, 0);
+
+            for(i=e-1; i>=0; i--){
+                put_rac(c, state+22+i, (a>>i)&1); //22..31
+            }
+
+            if(is_signed)
+                put_rac(c, state+11 + e, v < 0); //11..21
+        }else{
+            for(i=0; i<e; i++){
+                put_rac(c, state+1+FFMIN(i,9), 1);  //1..10
+            }
+            put_rac(c, state+1+9, 0);
+
+            for(i=e-1; i>=0; i--){
+                put_rac(c, state+22+FFMIN(i,9), (a>>i)&1); //22..31
+            }
+
+            if(is_signed)
+                put_rac(c, state+11 + 10, v < 0); //11..21
+        }
+    }else{
+        put_rac(c, state+0, 1);
+    }
+#undef put_rac
+}
+
+static inline int intlist_write(RangeCoder *c, uint8_t *state, int *buf, int entries, int base_2_part)
+{
+    int i;
+
+    for (i = 0; i < entries; i++)
+        put_symbol(c, state, buf[i], 1, NULL, NULL);
+
+    return 1;
 }
 
 static int sonic_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
@@ -924,6 +554,9 @@ static av_cold int sonic_decode_init(AVCodecContext *avctx)
     if (get_bits1(&gb)) // XXX FIXME
         av_log(avctx, AV_LOG_INFO, "Custom quant table\n");
 
+    if (s->num_taps > 128)
+        return AVERROR_INVALIDDATA;
+
     s->block_align = 2048LL*s->samplerate/(44100*s->downsampling);
     s->frame_size = s->channels*s->block_align*s->downsampling;
 //    avctx->frame_size = s->block_align;
@@ -979,6 +612,78 @@ static av_cold int sonic_decode_close(AVCodecContext *avctx)
     av_freep(&s->coded_samples[0]);
 
     return 0;
+}
+
+static inline av_flatten int get_symbol(RangeCoder *c, uint8_t *state, int is_signed){
+    if(get_rac(c, state+0))
+        return 0;
+    else{
+        int i, e;
+        unsigned a;
+        e= 0;
+        while(get_rac(c, state+1 + FFMIN(e,9))){ //1..10
+            e++;
+            if (e > 31)
+                return AVERROR_INVALIDDATA;
+        }
+
+        a= 1;
+        for(i=e-1; i>=0; i--){
+            a += a + get_rac(c, state+22 + FFMIN(i,9)); //22..31
+        }
+
+        e= -(is_signed && get_rac(c, state+11 + FFMIN(e, 10))); //11..21
+        return (a^e)-e;
+    }
+}
+
+static inline int intlist_read(RangeCoder *c, uint8_t *state, int *buf, int entries, int base_2_part)
+{
+    int i;
+
+    for (i = 0; i < entries; i++)
+        buf[i] = get_symbol(c, state, 1);
+
+    return 1;
+}
+
+static void predictor_init_state(int *k, int *state, int order)
+{
+    int i;
+
+    for (i = order-2; i >= 0; i--)
+    {
+        int j, p, x = state[i];
+
+        for (j = 0, p = i+1; p < order; j++,p++)
+            {
+            int tmp = x + shift_down(k[j] * (unsigned)state[p], LATTICE_SHIFT);
+            state[p] += shift_down(k[j]* (unsigned)x, LATTICE_SHIFT);
+            x = tmp;
+        }
+    }
+}
+
+static int predictor_calc_error(int *k, int *state, int order, int error)
+{
+    int i, x = error - (unsigned)shift_down(k[order-1] *  (unsigned)state[order-1], LATTICE_SHIFT);
+
+    int *k_ptr = &(k[order-2]),
+        *state_ptr = &(state[order-2]);
+    for (i = order-2; i >= 0; i--, k_ptr--, state_ptr--)
+    {
+        int k_value = *k_ptr, state_value = *state_ptr;
+        x -= (unsigned)shift_down(k_value * (unsigned)state_value, LATTICE_SHIFT);
+        state_ptr[1] = state_value + shift_down(k_value * (unsigned)x, LATTICE_SHIFT);
+    }
+
+    // don't drift too far, to avoid overflows
+    if (x >  (SAMPLE_FACTOR<<16)) x =  (SAMPLE_FACTOR<<16);
+    if (x < -(SAMPLE_FACTOR<<16)) x = -(SAMPLE_FACTOR<<16);
+
+    state[0] = x;
+
+    return x;
 }
 
 static int sonic_decode_frame(AVCodecContext *avctx, AVFrame *frame,
@@ -1102,7 +807,7 @@ const FFCodec ff_sonic_encoder = {
     .priv_data_size = sizeof(SonicContext),
     .init           = sonic_encode_init,
     FF_CODEC_ENCODE_CB(sonic_encode_frame),
-    .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .close          = sonic_encode_close,
 };
@@ -1119,7 +824,7 @@ const FFCodec ff_sonic_ls_encoder = {
     .priv_data_size = sizeof(SonicContext),
     .init           = sonic_encode_init,
     FF_CODEC_ENCODE_CB(sonic_encode_frame),
-    .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .close          = sonic_encode_close,
 };

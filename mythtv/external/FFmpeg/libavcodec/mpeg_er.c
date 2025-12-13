@@ -28,11 +28,8 @@ static void set_erpic(ERPicture *dst, const MPVPicture *src)
     int i;
 
     memset(dst, 0, sizeof(*dst));
-    if (!src) {
-        dst->f  = NULL;
-        dst->tf = NULL;
+    if (!src)
         return;
-    }
 
     dst->f = src->f;
     dst->progress = &src->progress;
@@ -54,10 +51,7 @@ void ff_mpeg_er_frame_start(MpegEncContext *s)
     set_erpic(&er->next_pic, s->next_pic.ptr);
     set_erpic(&er->last_pic, s->last_pic.ptr);
 
-    er->pp_time           = s->pp_time;
-    er->pb_time           = s->pb_time;
     er->quarter_sample    = s->quarter_sample;
-    er->partitioned_frame = s->partitioned_frame;
 
     ff_er_frame_start(er);
 }
@@ -79,7 +73,7 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     s->mcsel      = 0;
     memcpy(s->mv, mv, sizeof(*mv));
 
-    // The following disables the IDCT.
+    // The following disables unquantizing and the IDCT.
     for (size_t i = 0; i < FF_ARRAY_ELEMS(s->block_last_index); i++)
         s->block_last_index[i] = -1;
 
@@ -96,14 +90,13 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     if (ref)
         av_log(s->avctx, AV_LOG_DEBUG,
                "Interlaced error concealment is not fully implemented\n");
-    ff_mpv_reconstruct_mb(s, s->block);
+    ff_mpv_reconstruct_mb(s, NULL);
 }
 
-int ff_mpeg_er_init(MpegEncContext *s)
+av_cold int ff_mpeg_er_init(MpegEncContext *s)
 {
     ERContext *er = &s->er;
     int mb_array_size = s->mb_height * s->mb_stride;
-    int i;
 
     er->avctx       = s->avctx;
 
@@ -114,6 +107,10 @@ int ff_mpeg_er_init(MpegEncContext *s)
     er->mb_stride   = s->mb_stride;
     er->b8_stride   = s->b8_stride;
 
+    er->dc_val[0] = s->dc_val;
+    er->dc_val[1] = er->dc_val[0] + s->b8_stride * 2 * s->buffer_pools.alloc_mb_height + s->mb_stride;
+    er->dc_val[2] = er->dc_val[1] + s->mb_stride * (s->buffer_pools.alloc_mb_height + 1);
+
     er->er_temp_buffer     = av_malloc(s->mb_height * s->mb_stride * (4*sizeof(int) + 1));
     er->error_status_table = av_mallocz(mb_array_size);
     if (!er->er_temp_buffer || !er->error_status_table)
@@ -121,9 +118,6 @@ int ff_mpeg_er_init(MpegEncContext *s)
 
     er->mbskip_table  = s->mbskip_table;
     er->mbintra_table = s->mbintra_table;
-
-    for (i = 0; i < FF_ARRAY_ELEMS(s->dc_val); i++)
-        er->dc_val[i] = s->dc_val[i];
 
     er->decode_mb = mpeg_er_decode_mb;
     er->opaque    = s;

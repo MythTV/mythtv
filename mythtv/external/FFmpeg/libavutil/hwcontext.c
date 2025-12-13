@@ -66,6 +66,12 @@ static const HWContextType * const hw_table[] = {
 #if CONFIG_VULKAN
     &ff_hwcontext_type_vulkan,
 #endif
+#if CONFIG_AMF
+    &ff_hwcontext_type_amf,
+#endif
+#if CONFIG_OHCODEC
+    &ff_hwcontext_type_oh,
+#endif
     NULL,
 };
 
@@ -82,6 +88,8 @@ static const char *const hw_type_names[] = {
     [AV_HWDEVICE_TYPE_VIDEOTOOLBOX] = "videotoolbox",
     [AV_HWDEVICE_TYPE_MEDIACODEC] = "mediacodec",
     [AV_HWDEVICE_TYPE_VULKAN] = "vulkan",
+    [AV_HWDEVICE_TYPE_AMF] = "amf",
+    [AV_HWDEVICE_TYPE_OHCODEC] = "ohcodec",
 };
 
 typedef struct FFHWDeviceContext {
@@ -133,9 +141,16 @@ enum AVHWDeviceType av_hwdevice_iterate_types(enum AVHWDeviceType prev)
     return set ? next : AV_HWDEVICE_TYPE_NONE;
 }
 
+static const char *hwdevice_ctx_get_name(void *ptr)
+{
+    FFHWDeviceContext *ctx = ptr;
+    return ctx->hw_type->name;
+}
+
 static const AVClass hwdevice_ctx_class = {
     .class_name = "AVHWDeviceContext",
-    .item_name  = av_default_item_name,
+    .item_name  = hwdevice_ctx_get_name,
+    .category   = AV_CLASS_CATEGORY_HWDEVICE,
     .version    = LIBAVUTIL_VERSION_INT,
 };
 

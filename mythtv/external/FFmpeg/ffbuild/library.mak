@@ -26,7 +26,7 @@ ifdef CONFIG_SHARED
 # for purely shared builds.
 # Test programs are always statically linked against their library
 # to be able to access their library's internals, even with shared builds.
-# Yet linking against dependend libraries still uses dynamic linking.
+# Yet linking against dependent libraries still uses dynamic linking.
 # This means that we are in the scenario described above.
 # In case only static libs are used, the linker will only use
 # one of these copies; this depends on the duplicated object files
@@ -35,8 +35,14 @@ OBJS += $(SHLIBOBJS)
 endif
 $(SUBDIR)$(LIBNAME): $(OBJS) $(STLIBOBJS)
 	$(RM) $@
+ifeq ($(RESPONSE_FILES),yes)
+	$(Q)echo $^ > $@.objs
+	$(AR) $(ARFLAGS) $(AR_O) @$@.objs
+else
 	$(AR) $(ARFLAGS) $(AR_O) $^
+endif
 	$(RANLIB) $@
+	-$(RM) $@.objs
 
 #install-headers: install-lib$(NAME)-headers install-lib$(NAME)-pkgconfig
 install-headers: install-lib$(NAME)-headers
@@ -66,10 +72,16 @@ $(SUBDIR)lib$(NAME).ver: $(SUBDIR)lib$(NAME).v $(OBJS)
 $(SUBDIR)$(SLIBNAME): $(SUBDIR)$(SLIBNAME_WITH_MAJOR)
 	$(Q)cd ./$(SUBDIR) && $(LN_S) $(SLIBNAME_WITH_MAJOR) $(SLIBNAME)
 
-$(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SHLIBOBJS) $(SLIBOBJS) $(SUBDIR)lib$(NAME).ver
+$(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SHLIBOBJS) $(SUBDIR)lib$(NAME).ver
 	$(SLIB_CREATE_DEF_CMD)
+ifeq ($(RESPONSE_FILES),yes)
+	$(Q)echo $$(filter %.o,$$^) > $$@.objs
+	$$(LD) $(SHFLAGS) $(LDFLAGS) $(LDSOFLAGS) $$(LD_O) @$$@.objs $(FFEXTRALIBS)
+else
 	$$(LD) $(SHFLAGS) $(LDFLAGS) $(LDSOFLAGS) $$(LD_O) $$(filter %.o,$$^) $(FFEXTRALIBS)
+endif
 	$(SLIB_EXTRA_CMD)
+	-$(RM) $$@.objs
 
 ifdef SUBDIR
 $(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(DEP_LIBS)

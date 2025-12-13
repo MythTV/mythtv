@@ -61,6 +61,12 @@ static const AVOption options[] = {
     { "baseline",     "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_H264_PROFILE_BASELINE },  0, 0, VE, .unit = "profile" },
     { "main",         "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_H264_PROFILE_MAIN },      0, 0, VE, .unit = "profile" },
     { "high",         "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_H264_PROFILE_HIGH },      0, 0, VE, .unit = "profile" },
+#ifdef NVENC_HAVE_H264_10BIT_SUPPORT
+    { "high10",       "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_H264_PROFILE_HIGH_10 },   0, 0, VE, .unit = "profile" },
+#endif
+#ifdef NVENC_HAVE_422_SUPPORT
+    { "high422",      "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_H264_PROFILE_HIGH_422 },  0, 0, VE, .unit = "profile" },
+#endif
     { "high444p",     "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_H264_PROFILE_HIGH_444P }, 0, 0, VE, .unit = "profile" },
 #ifdef NVENC_HAVE_H264_LVL6
     { "level",        "Set the encoding level restriction", OFFSET(level),        AV_OPT_TYPE_INT,   { .i64 = NV_ENC_LEVEL_AUTOSELECT }, NV_ENC_LEVEL_AUTOSELECT, NV_ENC_LEVEL_H264_62, VE, .unit = "level" },
@@ -168,6 +174,10 @@ static const AVOption options[] = {
                                                             OFFSET(qp_cb_offset), AV_OPT_TYPE_INT,   { .i64 = 0 }, -12, 12, VE },
     { "qp_cr_offset", "Quantization parameter offset for cr channel",
                                                             OFFSET(qp_cr_offset), AV_OPT_TYPE_INT,   { .i64 = 0 }, -12, 12, VE },
+    { "qmin",         "Specifies the minimum QP used for rate control",
+                                                            OFFSET(qmin),         AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, 51, VE },
+    { "qmax",         "Specifies the maximum QP used for rate control",
+                                                            OFFSET(qmax),         AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, 51, VE },
     { "weighted_pred","Set 1 to enable weighted prediction",
                                                             OFFSET(weighted_pred),AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, 1, VE },
     { "coder",        "Coder type",                         OFFSET(coder),        AV_OPT_TYPE_INT,   { .i64 = -1                                         },-1, 2, VE, .unit = "coder" },
@@ -189,6 +199,9 @@ static const AVOption options[] = {
     { "middle",       "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 2 }, 0, 0,         VE, .unit = "b_ref_mode" },
 #endif
     { "a53cc",        "Use A53 Closed Captions (if available)", OFFSET(a53_cc),   AV_OPT_TYPE_BOOL,  { .i64 = 1 }, 0, 1, VE },
+#ifdef NVENC_HAVE_TIME_CODE
+    { "s12m_tc",      "Use timecode (if available)",        OFFSET(s12m_tc),      AV_OPT_TYPE_BOOL,  { .i64 = 1 }, 0, 1, VE },
+#endif
     { "dpb_size",     "Specifies the DPB size used for encoding (0 means automatic)",
                                                             OFFSET(dpb_size),     AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE },
 #ifdef NVENC_HAVE_MULTIPASS
@@ -198,6 +211,9 @@ static const AVOption options[] = {
                                                             0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TWO_PASS_QUARTER_RESOLUTION }, 0,                          0,                               VE, .unit = "multipass" },
     { "fullres",      "Two Pass encoding is enabled where first Pass is full resolution",
                                                             0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TWO_PASS_FULL_RESOLUTION },    0,                          0,                               VE, .unit = "multipass" },
+#endif
+#ifdef NVENC_HAVE_H264_10BIT_SUPPORT
+    { "highbitdepth", "Enable 10 bit encode for 8 bit input",OFFSET(highbitdepth),AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0, 1, VE },
 #endif
 #ifdef NVENC_HAVE_LDKFS
     { "ldkfs",        "Low delay key frame scale; Specifies the Scene Change frame size increase allowed in case of single frame VBV and CBR",
@@ -215,6 +231,16 @@ static const AVOption options[] = {
                                                             OFFSET(max_slice_size), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
     { "constrained-encoding", "Enable constrainedFrame encoding where each slice in the constrained picture is independent of other slices",
                                                             OFFSET(constrained_encoding), AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0, 1, VE },
+#ifdef NVENC_HAVE_FILLER_DATA
+    { "cbr_padding",  "Pad the bitstream to ensure bitrate does not drop below the target in CBR mode",
+                                                            OFFSET(cbr_padding),  AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0, 1, VE },
+#endif
+#ifdef NVENC_HAVE_H264_AND_AV1_TEMPORAL_FILTER
+    { "tf_level",     "Specifies the strength of the temporal filtering",
+                                                            OFFSET(tf_level),     AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, INT_MAX, VE, .unit = "tf_level" },
+    { "0",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TEMPORAL_FILTER_LEVEL_0 }, 0, 0, VE, .unit = "tf_level" },
+    { "4",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TEMPORAL_FILTER_LEVEL_4 }, 0, 0, VE, .unit = "tf_level" },
+#endif
 #ifdef NVENC_HAVE_LOOKAHEAD_LEVEL
     { "lookahead_level", "Specifies the lookahead level. Higher level may improve quality at the expense of performance.",
                                                             OFFSET(lookahead_level), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, NV_ENC_LOOKAHEAD_LEVEL_AUTOSELECT, VE, .unit = "lookahead_level" },
@@ -264,7 +290,7 @@ const FFCodec ff_h264_nvenc_encoder = {
                       AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE |
                       FF_CODEC_CAP_INIT_CLEANUP,
-    .p.pix_fmts     = ff_nvenc_pix_fmts,
+    CODEC_PIXFMTS_ARRAY(ff_nvenc_pix_fmts),
     .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
     .p.wrapper_name = "nvenc",
     .hw_configs     = ff_nvenc_hw_configs,

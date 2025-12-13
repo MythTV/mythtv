@@ -22,47 +22,11 @@
 #include "aacdec_usac.h"
 #include "libavcodec/unary.h"
 
-const uint8_t ff_aac_lpd_mode_tab[32][4] = {
-    { 0, 0, 0, 0 },
-    { 1, 0, 0, 0 },
-    { 0, 1, 0, 0 },
-    { 1, 1, 0, 0 },
-    { 0, 0, 1, 0 },
-    { 1, 0, 1, 0 },
-    { 0, 1, 1, 0 },
-    { 1, 1, 1, 0 },
-    { 0, 0, 0, 1 },
-    { 1, 0, 0, 1 },
-    { 0, 1, 0, 1 },
-    { 1, 1, 0, 1 },
-    { 0, 0, 1, 1 },
-    { 1, 0, 1, 1 },
-    { 0, 1, 1, 1 },
-    { 1, 1, 1, 1 },
-    { 2, 2, 0, 0 },
-    { 2, 2, 1, 0 },
-    { 2, 2, 0, 1 },
-    { 2, 2, 1, 1 },
-    { 0, 0, 2, 2 },
-    { 1, 0, 2, 2 },
-    { 0, 1, 2, 2 },
-    { 1, 1, 2, 2 },
-    { 2, 2, 2, 2 },
-    { 3, 3, 3, 3 },
-    /* Larger values are reserved, but permit them for resilience */
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 },
-};
-
 static void parse_qn(GetBitContext *gb, int *qn, int nk_mode, int no_qn)
 {
     if (nk_mode == 1) {
         for (int k = 0; k < no_qn; k++) {
-            qn[k] = get_unary(gb, 0, INT32_MAX); // TODO: find proper ranges
+            qn[k] = get_unary(gb, 0, 68); // TODO: find proper ranges
             if (qn[k])
                 qn[k]++;
         }
@@ -75,7 +39,7 @@ static void parse_qn(GetBitContext *gb, int *qn, int nk_mode, int no_qn)
     if (nk_mode == 2) {
         for (int k = 0; k < no_qn; k++) {
             if (qn[k] > 4) {
-                qn[k] = get_unary(gb, 0, INT32_MAX);;
+                qn[k] = get_unary(gb, 0, 65);
                 if (qn[k])
                     qn[k] += 4;
             }
@@ -85,7 +49,7 @@ static void parse_qn(GetBitContext *gb, int *qn, int nk_mode, int no_qn)
 
     for (int k = 0; k < no_qn; k++) {
         if (qn[k] > 4) {
-            int qn_ext = get_unary(gb, 0, INT32_MAX);;
+            int qn_ext = get_unary(gb, 0, 65);
             switch (qn_ext) {
             case 0: qn[k] = 5; break;
             case 1: qn[k] = 6; break;
@@ -113,6 +77,9 @@ static int parse_codebook_idx(GetBitContext *gb, uint32_t *kv,
             n = qn[k];
         }
     }
+
+    if (nk > 25)
+        return AVERROR_PATCHWELCOME;
 
     skip_bits(gb, 4*n);
 
@@ -145,8 +112,6 @@ int ff_aac_parse_fac_data(AACUsacElemData *ce, GetBitContext *gb,
 int ff_aac_ldp_parse_channel_stream(AACDecContext *ac, AACUSACConfig *usac,
                                     AACUsacElemData *ce, GetBitContext *gb)
 {
-    int k;
-    const uint8_t *mod;
     int first_ldp_flag;
 
     ce->ldp.acelp_core_mode = get_bits(gb, 3);
@@ -156,34 +121,9 @@ int ff_aac_ldp_parse_channel_stream(AACDecContext *ac, AACUSACConfig *usac,
     ce->ldp.core_mode_last = get_bits1(gb);
     ce->ldp.fac_data_present = get_bits1(gb);
 
-    mod = ff_aac_lpd_mode_tab[ce->ldp.lpd_mode];
-
     first_ldp_flag = !ce->ldp.core_mode_last;
     if (first_ldp_flag)
         ce->ldp.last_lpd_mode = -1; /* last_ldp_mode is a **STATEFUL** value */
-
-    k = 0;
-    while (k < 0) {
-        if (!k) {
-            if (ce->ldp.core_mode_last && ce->ldp.fac_data_present)
-                ff_aac_parse_fac_data(ce, gb, 0, usac->core_frame_len/8);
-        } else {
-            if (!ce->ldp.last_lpd_mode && mod[k] > 0 ||
-                ce->ldp.last_lpd_mode && !mod[k])
-                ff_aac_parse_fac_data(ce, gb, 0, usac->core_frame_len/8);
-        }
-        if (!mod[k]) {
-//            parse_acelp_coding();
-            ce->ldp.last_lpd_mode = 0;
-            k++;
-        } else {
-//            parse_tcx_coding();
-            ce->ldp.last_lpd_mode = mod[k];
-            k += (1 << (mod[k] - 1));
-        }
-    }
-
-//    parse_lpc_data(first_lpd_flag);
 
     if (!ce->ldp.core_mode_last && ce->ldp.fac_data_present) {
         uint16_t len_8 = usac->core_frame_len / 8;

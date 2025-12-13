@@ -92,28 +92,21 @@ static const AVOption ahistogram_options[] = {
 
 AVFILTER_DEFINE_CLASS(ahistogram);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layouts = NULL;
-    AVFilterLink *inlink = ctx->inputs[0];
-    AVFilterLink *outlink = ctx->outputs[0];
     static const enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE };
     static const enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_YUVA444P, AV_PIX_FMT_NONE };
     int ret = AVERROR(EINVAL);
 
     formats = ff_make_format_list(sample_fmts);
-    if ((ret = ff_formats_ref         (formats, &inlink->outcfg.formats        )) < 0 ||
-        (layouts = ff_all_channel_counts()) == NULL ||
-        (ret = ff_channel_layouts_ref (layouts, &inlink->outcfg.channel_layouts)) < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if ((ret = ff_formats_ref(formats, &inlink->outcfg.samplerates)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_in[0]->formats)) < 0)
         return ret;
 
     formats = ff_make_format_list(pix_fmts);
-    if ((ret = ff_formats_ref(formats, &outlink->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_out[0]->formats)) < 0)
         return ret;
 
     return 0;
@@ -501,14 +494,14 @@ static const AVFilterPad ahistogram_outputs[] = {
     },
 };
 
-const AVFilter ff_avf_ahistogram = {
-    .name          = "ahistogram",
-    .description   = NULL_IF_CONFIG_SMALL("Convert input audio to histogram video output."),
+const FFFilter ff_avf_ahistogram = {
+    .p.name        = "ahistogram",
+    .p.description = NULL_IF_CONFIG_SMALL("Convert input audio to histogram video output."),
+    .p.priv_class  = &ahistogram_class,
     .uninit        = uninit,
     .priv_size     = sizeof(AudioHistogramContext),
     .activate      = activate,
     FILTER_INPUTS(ahistogram_inputs),
     FILTER_OUTPUTS(ahistogram_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &ahistogram_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };

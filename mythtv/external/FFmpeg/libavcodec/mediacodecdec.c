@@ -57,6 +57,8 @@ typedef struct MediaCodecH264DecContext {
     int amlogic_mpeg2_api23_workaround;
 
     int use_ndk_codec;
+    // Ref. MediaFormat KEY_OPERATING_RATE
+    int operating_rate;
 } MediaCodecH264DecContext;
 
 static av_cold int mediacodec_decode_close(AVCodecContext *avctx)
@@ -131,13 +133,11 @@ static int h264_set_extradata(AVCodecContext *avctx, FFAMediaFormat *format)
     int i;
     int ret;
 
-    H264ParamSets ps;
+    H264ParamSets ps = {0};
     const PPS *pps = NULL;
     const SPS *sps = NULL;
     int is_avc = 0;
     int nal_length_size = 0;
-
-    memset(&ps, 0, sizeof(ps));
 
     ret = ff_h264_decode_extradata(avctx->extradata, avctx->extradata_size,
                                    &ps, &is_avc, &nal_length_size, 0, avctx);
@@ -197,8 +197,8 @@ static int hevc_set_extradata(AVCodecContext *avctx, FFAMediaFormat *format)
     int i;
     int ret;
 
-    HEVCParamSets ps;
-    HEVCSEI sei;
+    HEVCParamSets ps = {0};
+    HEVCSEI sei = {0};
 
     const HEVCVPS *vps = NULL;
     const HEVCPPS *pps = NULL;
@@ -212,9 +212,6 @@ static int hevc_set_extradata(AVCodecContext *avctx, FFAMediaFormat *format)
     int vps_data_size = 0;
     int sps_data_size = 0;
     int pps_data_size = 0;
-
-    memset(&ps, 0, sizeof(ps));
-    memset(&sei, 0, sizeof(sei));
 
     ret = ff_hevc_decode_extradata(avctx->extradata, avctx->extradata_size,
                                    &ps, &sei, &is_nalff, &nal_length_size, 0, 1, avctx);
@@ -441,6 +438,8 @@ static av_cold int mediacodec_decode_init(AVCodecContext *avctx)
         ff_AMediaFormat_setInt32(format, "channel-count", avctx->ch_layout.nb_channels);
         ff_AMediaFormat_setInt32(format, "sample-rate", avctx->sample_rate);
     }
+    if (s->operating_rate > 0)
+        ff_AMediaFormat_setInt32(format, "operating-rate", s->operating_rate);
 
     s->ctx = av_mallocz(sizeof(*s->ctx));
     if (!s->ctx) {
@@ -599,6 +598,8 @@ static const AVOption ff_mediacodec_vdec_options[] = {
                      OFFSET(delay_flush), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, VD },
     { "ndk_codec", "Use MediaCodec from NDK",
                    OFFSET(use_ndk_codec), AV_OPT_TYPE_BOOL, {.i64 = -1}, -1, 1, VD },
+    { "operating_rate", "The desired operating rate that the codec will need to operate at, zero for unspecified",
+            OFFSET(operating_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, VD },
     { NULL }
 };
 
@@ -662,6 +663,8 @@ DECLARE_MEDIACODEC_VDEC(av1, "AV1", AV_CODEC_ID_AV1, NULL)
 static const AVOption ff_mediacodec_adec_options[] = {
     { "ndk_codec", "Use MediaCodec from NDK",
                    OFFSET(use_ndk_codec), AV_OPT_TYPE_BOOL, {.i64 = -1}, -1, 1, AD },
+    { "operating_rate", "The desired operating rate that the codec will need to operate at, zero for unspecified",
+            OFFSET(operating_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, AD },
     { NULL }
 };
 

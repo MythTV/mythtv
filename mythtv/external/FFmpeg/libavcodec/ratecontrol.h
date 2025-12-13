@@ -77,17 +77,30 @@ typedef struct RateControlContext{
     int frame_count[5];
     int last_non_b_pict_type;
 
+    /**
+     * ratecontrol qmin qmax limiting method
+     * 0-> clipping, 1-> use a nice continuous function to limit qscale within qmin/qmax.
+     */
+    float qsquish;
+    float qmod_amp;
+    int   qmod_freq;
+    float initial_cplx;
+    float buffer_aggressivity;
+
+    char *rc_eq;
     struct AVExpr *rc_eq_eval;
+
+    float *cplx_tab, *bits_tab;
 }RateControlContext;
 
-struct MpegEncContext;
+typedef struct MPVMainEncContext MPVMainEncContext;
 
 /* rate control */
-int ff_rate_control_init(struct MpegEncContext *s);
-float ff_rate_estimate_qscale(struct MpegEncContext *s, int dry_run);
-void ff_write_pass1_stats(struct MpegEncContext *s);
-int ff_vbv_update(struct MpegEncContext *s, int frame_size);
-void ff_get_2pass_fcode(struct MpegEncContext *s);
+int ff_rate_control_init(MPVMainEncContext *m);
+float ff_rate_estimate_qscale(MPVMainEncContext *m, int dry_run);
+void ff_write_pass1_stats(MPVMainEncContext *m);
+int ff_vbv_update(MPVMainEncContext *m, int frame_size);
+void ff_get_2pass_fcode(MPVMainEncContext *m);
 void ff_rate_control_uninit(RateControlContext *rcc);
 
 #endif /* AVCODEC_RATECONTROL_H */

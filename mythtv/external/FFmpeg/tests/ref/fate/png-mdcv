@@ -1,5 +1,5 @@
-fc68fe6c8c72343b96d2695f6913995b *tests/data/fate/png-mdcv.image2pipe
-439248 tests/data/fate/png-mdcv.image2pipe
+e486b461b9c408e616873db8ad93b450 *tests/data/fate/png-mdcv.image2pipe
+493893 tests/data/fate/png-mdcv.image2pipe
 #tb 0: 1/25
 #media_type 0: video
 #codec_id 0: rawvideo

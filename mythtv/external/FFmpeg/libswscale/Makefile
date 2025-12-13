@@ -6,11 +6,15 @@ HEADERS = swscale.h                                                     \
           version_major.h                                               \
 
 OBJS = alphablend.o                                     \
+       cms.o                                            \
+       csputils.o                                       \
        hscale.o                                         \
        hscale_fast_bilinear.o                           \
+       format.o                                         \
        gamma.o                                          \
-       half2float.o                                     \
+       graph.o                                          \
        input.o                                          \
+       lut3d.o                                          \
        options.o                                        \
        output.o                                         \
        rgb2rgb.o                                        \
@@ -23,7 +27,7 @@ OBJS = alphablend.o                                     \
        vscale.o                                         \
 
 # Objects duplicated from other libraries for shared builds
-SHLIBOBJS                    += log2_tab.o
+SHLIBOBJS                    += log2_tab.o half2float.o
 
 # Windows resource file
 SHLIBOBJS-$(HAVE_GNU_WINDRES) += swscaleres.o

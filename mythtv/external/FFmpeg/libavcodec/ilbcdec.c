@@ -658,7 +658,7 @@ static void get_codebook(int16_t * cbvec,   /* (o) Constructed codebook vector *
     int16_t k, base_size;
     int16_t lag;
     /* Stack based */
-    int16_t tempbuff2[SUBL + 5];
+    int16_t tempbuff2[SUBL + 5] = {0};
 
     /* Determine size of codebook sections */
     base_size = lMem - cbveclen + 1;
@@ -675,6 +675,7 @@ static void get_codebook(int16_t * cbvec,   /* (o) Constructed codebook vector *
         /* get vector */
         memcpy(cbvec, mem + lMem - k, cbveclen * 2);
     } else if (index < base_size) {
+        memset(cbvec, 0, cbveclen * 2);
 
         /* Calculate lag */
 
@@ -701,6 +702,7 @@ static void get_codebook(int16_t * cbvec,   /* (o) Constructed codebook vector *
 
             filter_mafq12(&mem[memIndTest + 4], cbvec, kCbFiltersRev, CB_FILTERLEN, cbveclen);
         } else {
+            memset(cbvec, 0, cbveclen * 2);
             /* interpolated vectors */
             /* Stuff zeros outside memory buffer  */
             memIndTest = lMem - cbveclen - CB_FILTERLEN;
@@ -1097,7 +1099,7 @@ static void do_plc(int16_t *plc_residual,      /* (o) concealed residual */
             use_gain = 29491;   /* 0.9 in Q15 */
         }
 
-        /* Compute mixing factor of picth repeatition and noise:
+        /* Compute mixing factor of picth repetition and noise:
            for max_per>0.7 set periodicity to 1.0
            0.4<max_per<0.7 set periodicity to (maxper-0.4)/0.7-0.4)
            max_per<0.4 set periodicity to 0.0
@@ -1142,7 +1144,7 @@ static void do_plc(int16_t *plc_residual,      /* (o) concealed residual */
                 randvec[i] = s->prevResidual[pick];
             }
 
-            /* pitch repeatition component */
+            /* pitch repetition component */
             pick = i - use_lag;
 
             if (pick < 0) {
@@ -1160,7 +1162,7 @@ static void do_plc(int16_t *plc_residual,      /* (o) concealed residual */
                 tot_gain = SPL_MUL_16_16_RSFT(29491, use_gain, 15);    /* 0.9*use_gain */
             }
 
-            /* mix noise and pitch repeatition */
+            /* mix noise and pitch repetition */
             plc_residual[i] = SPL_MUL_16_16_RSFT(tot_gain, (pitchfact * plc_residual[i] + (32767 - pitchfact) * randvec[i] + 16384) >> 15, 15);
 
             /* Shifting down the result one step extra to ensure that no overflow

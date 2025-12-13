@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "avformat_internal.h"
 #include "avio_internal.h"
 #include "demux.h"
 #include "internal.h"
@@ -160,12 +161,15 @@ static int io_close2_default(AVFormatContext *s, AVIOContext *pb)
 
 AVFormatContext *avformat_alloc_context(void)
 {
-    FFFormatContext *const si = av_mallocz(sizeof(*si));
+    FormatContextInternal *fci;
+    FFFormatContext *si;
     AVFormatContext *s;
 
-    if (!si)
+    fci = av_mallocz(sizeof(*fci));
+    if (!fci)
         return NULL;
 
+    si = &fci->fc;
     s = &si->pub;
     s->av_class = &av_format_context_class;
     s->io_open  = io_open_default;
@@ -180,19 +184,8 @@ AVFormatContext *avformat_alloc_context(void)
         return NULL;
     }
 
-#if FF_API_LAVF_SHORTEST
-    si->shortest_end = AV_NOPTS_VALUE;
-#endif
-
     return s;
 }
-
-#if FF_API_GET_DUR_ESTIMATE_METHOD
-enum AVDurationEstimationMethod av_fmt_ctx_get_duration_estimation_method(const AVFormatContext* ctx)
-{
-    return ctx->duration_estimation_method;
-}
-#endif
 
 const AVClass *avformat_get_class(void)
 {
@@ -250,7 +243,6 @@ const AVClass *av_stream_get_class(void)
 
 AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c)
 {
-    FFFormatContext *const si = ffformatcontext(s);
     FFStream *sti;
     AVStream *st;
     AVStream **streams;
@@ -320,10 +312,6 @@ AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c)
     st->sample_aspect_ratio = (AVRational) { 0, 1 };
 #if FF_API_INTERNAL_TIMING
     sti->transferred_mux_tb = (AVRational) { 0, 1 };;
-#endif
-
-#if FF_API_AVSTREAM_SIDE_DATA
-    sti->inject_global_side_data = si->inject_global_side_data;
 #endif
 
     sti->need_context_update = 1;

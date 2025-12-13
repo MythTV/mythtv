@@ -56,7 +56,6 @@ typedef struct MDECContext {
     DECLARE_ALIGNED(16, uint16_t, quant_matrix)[64];
     uint8_t *bitstream_buffer;
     unsigned int bitstream_buffer_size;
-    int block_last_index[6];
 } MDECContext;
 
 //very similar to MPEG-1
@@ -101,9 +100,10 @@ static inline int mdec_decode_block_intra(MDECContext *a, int16_t *block, int n)
                 LAST_SKIP_BITS(re, &a->gb, 1);
             } else {
                 /* escape */
-                run = SHOW_UBITS(re, &a->gb, 6)+1; LAST_SKIP_BITS(re, &a->gb, 6);
-                UPDATE_CACHE(re, &a->gb);
-                level = SHOW_SBITS(re, &a->gb, 10); SKIP_BITS(re, &a->gb, 10);
+                run = SHOW_UBITS(re, &a->gb, 6) + 1;
+                SKIP_BITS(re, &a->gb, 6);
+                level = SHOW_SBITS(re, &a->gb, 10);
+                LAST_SKIP_BITS(re, &a->gb, 10);
                 i += run;
                 if (i > 63) {
                     av_log(a->avctx, AV_LOG_ERROR,
@@ -126,7 +126,6 @@ static inline int mdec_decode_block_intra(MDECContext *a, int16_t *block, int n)
         }
         CLOSE_READER(re, &a->gb);
     }
-    a->block_last_index[n] = i;
     return 0;
 }
 

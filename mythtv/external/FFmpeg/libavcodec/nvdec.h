@@ -41,6 +41,11 @@
     ((major) < 8 || ((major) == 8 && (minor) <= 0))
 #endif
 
+// SDK 13.0 compile time feature checks
+#if NVDECAPI_CHECK_VERSION(13, 0)
+#define NVDEC_HAVE_422_SUPPORT
+#endif
+
 typedef struct NVDECFrame {
     unsigned int idx;
     unsigned int ref_idx;
@@ -52,7 +57,7 @@ typedef struct NVDECFrame {
 typedef struct NVDECContext {
     CUVIDPICPARAMS pic_params;
 
-    struct FFRefStructPool *decoder_pool;
+    struct AVRefStructPool *decoder_pool;
 
     struct NVDECDecoder  *decoder; ///< RefStruct reference
 

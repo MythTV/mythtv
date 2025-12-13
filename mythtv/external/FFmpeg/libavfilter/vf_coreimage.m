@@ -58,7 +58,7 @@ typedef struct CoreImageContext {
     CFTypeRef       *filters;           ///< CIFilter object for all requested filters
     int             num_filters;        ///< Amount of filters in *filters
 
-    char            *output_rect;       ///< Rectangle to be filled with filter intput
+    char            *output_rect;       ///< Rectangle to be filled with filter input
     int             list_filters;       ///< Option used to list all available filters including generators
     int             list_generators;    ///< Option used to list all available generators
 } CoreImageContext;
@@ -102,19 +102,13 @@ static void list_filters(CoreImageContext *ctx)
         filter_categories = [NSArray arrayWithObjects:kCICategoryGenerator, nil];
     }
 
-    NSArray *filter_names = [CIFilter filterNamesInCategories:filter_categories];
-    NSEnumerator *filters = [filter_names objectEnumerator];
+    for (NSString *filter_name in [CIFilter filterNamesInCategories:filter_categories]) {
+        CIFilter *filter = [CIFilter filterWithName:filter_name];
+        NSDictionary<NSString *, id> *filter_attribs = [filter attributes];
 
-    NSString *filter_name;
-    while (filter_name = [filters nextObject]) {
         av_log(ctx, AV_LOG_INFO, "Filter: %s\n", [filter_name UTF8String]);
-        NSString *input;
 
-        CIFilter *filter             = [CIFilter filterWithName:filter_name];
-        NSDictionary *filter_attribs = [filter attributes]; // <nsstring, id>
-        NSArray      *filter_inputs  = [filter inputKeys];  // <nsstring>
-
-        for (input in filter_inputs) {
+        for (NSString *input in [filter inputKeys]) {
             NSDictionary *input_attribs = [filter_attribs valueForKey:input];
             NSString *input_class       = [input_attribs valueForKey:kCIAttributeClass];
             if ([input_class isEqualToString:@"NSNumber"]) {
@@ -303,13 +297,7 @@ static int request_frame(AVFilterLink *link)
 
     frame->pts                 = ctx->pts;
     frame->duration            = 1;
-#if FF_API_FRAME_KEY
-    frame->key_frame           = 1;
-#endif
     frame->flags              |= AV_FRAME_FLAG_KEY;
-#if FF_API_INTERLACED_FRAME
-    frame->interlaced_frame    = 0;
-#endif
     frame->flags              &= ~AV_FRAME_FLAG_INTERLACED;
     frame->pict_type           = AV_PICTURE_TYPE_I;
     frame->sample_aspect_ratio = ctx->sar;
@@ -619,13 +607,13 @@ static const AVOption coreimage_options[] = {
 
 AVFILTER_DEFINE_CLASS(coreimage);
 
-const AVFilter ff_vf_coreimage = {
-    .name          = "coreimage",
-    .description   = NULL_IF_CONFIG_SMALL("Video filtering using CoreImage API."),
+const FFFilter ff_vf_coreimage = {
+    .p.name        = "coreimage",
+    .p.description = NULL_IF_CONFIG_SMALL("Video filtering using CoreImage API."),
+    .p.priv_class  = &coreimage_class,
     .init          = init,
     .uninit        = uninit,
     .priv_size     = sizeof(CoreImageContext),
-    .priv_class    = &coreimage_class,
     FILTER_INPUTS(vf_coreimage_inputs),
     FILTER_OUTPUTS(vf_coreimage_outputs),
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_ARGB),
@@ -640,14 +628,14 @@ static const AVOption coreimagesrc_options[] = {
 
 AVFILTER_DEFINE_CLASS(coreimagesrc);
 
-const AVFilter ff_vsrc_coreimagesrc = {
-    .name          = "coreimagesrc",
-    .description   = NULL_IF_CONFIG_SMALL("Video source using image generators of CoreImage API."),
+const FFFilter ff_vsrc_coreimagesrc = {
+    .p.name        = "coreimagesrc",
+    .p.description = NULL_IF_CONFIG_SMALL("Video source using image generators of CoreImage API."),
+    .p.priv_class  = &coreimagesrc_class,
+    .p.inputs      = NULL,
     .init          = init_src,
     .uninit        = uninit,
     .priv_size     = sizeof(CoreImageContext),
-    .priv_class    = &coreimagesrc_class,
-    .inputs        = NULL,
     FILTER_OUTPUTS(vsrc_coreimagesrc_outputs),
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_ARGB),
 };

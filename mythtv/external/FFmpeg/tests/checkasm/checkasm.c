@@ -58,6 +58,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "checkasm.h"
+#include "libavutil/avassert.h"
 #include "libavutil/common.h"
 #include "libavutil/cpu.h"
 #include "libavutil/intfloat.h"
@@ -94,6 +95,12 @@
 #define isatty(fd) 1
 #endif
 
+#if ARCH_AARCH64
+#include "libavutil/aarch64/cpu.h"
+#elif ARCH_RISCV
+#include "libavutil/riscv/cpu.h"
+#endif
+
 #if ARCH_ARM && HAVE_ARMV5TE_EXTERNAL
 #include "libavutil/arm/cpu.h"
 
@@ -122,6 +129,9 @@ static const struct {
     #if CONFIG_ALAC_DECODER
         { "alacdsp", checkasm_check_alacdsp },
     #endif
+    #if CONFIG_APV_DECODER
+        { "apv_dsp", checkasm_check_apv_dsp },
+    #endif
     #if CONFIG_AUDIODSP
         { "audiodsp", checkasm_check_audiodsp },
     #endif
@@ -133,6 +143,9 @@ static const struct {
     #endif
     #if CONFIG_DCA_DECODER
         { "synth_filter", checkasm_check_synth_filter },
+    #endif
+    #if CONFIG_DIRAC_DECODER
+        { "diracdsp", checkasm_check_diracdsp },
     #endif
     #if CONFIG_EXR_DECODER
         { "exrdsp", checkasm_check_exrdsp },
@@ -195,7 +208,7 @@ static const struct {
     #if CONFIG_ME_CMP
         { "motion", checkasm_check_motion },
     #endif
-    #if CONFIG_MPEGVIDEOENC
+    #if CONFIG_MPEGVIDEOENCDSP
         { "mpegvideoencdsp", checkasm_check_mpegvideoencdsp },
     #endif
     #if CONFIG_OPUS_DECODER
@@ -243,17 +256,27 @@ static const struct {
     #if CONFIG_VVC_DECODER
         { "vvc_alf", checkasm_check_vvc_alf },
         { "vvc_mc",  checkasm_check_vvc_mc  },
+        { "vvc_sao", checkasm_check_vvc_sao },
     #endif
 #endif
 #if CONFIG_AVFILTER
+    #if CONFIG_SCENE_SAD
+        { "scene_sad", checkasm_check_scene_sad },
+    #endif
     #if CONFIG_AFIR_FILTER
         { "af_afir", checkasm_check_afir },
+    #endif
+    #if CONFIG_BLACKDETECT_FILTER
+        { "vf_blackdetect", checkasm_check_blackdetect },
     #endif
     #if CONFIG_BLEND_FILTER
         { "vf_blend", checkasm_check_blend },
     #endif
     #if CONFIG_BWDIF_FILTER
         { "vf_bwdif", checkasm_check_vf_bwdif },
+    #endif
+    #if CONFIG_COLORDETECT_FILTER
+        { "vf_colordetect", checkasm_check_colordetect },
     #endif
     #if CONFIG_COLORSPACE_FILTER
         { "vf_colorspace", checkasm_check_colorspace },
@@ -286,6 +309,7 @@ static const struct {
     { "sw_yuv2yuv", checkasm_check_sw_yuv2yuv },
 #endif
 #if CONFIG_AVUTIL
+        { "aes",       checkasm_check_aes },
         { "fixed_dsp", checkasm_check_fixed_dsp },
         { "float_dsp", checkasm_check_float_dsp },
         { "lls",       checkasm_check_lls },
@@ -305,6 +329,8 @@ static const struct {
     { "NEON",     "neon",     AV_CPU_FLAG_NEON },
     { "DOTPROD",  "dotprod",  AV_CPU_FLAG_DOTPROD },
     { "I8MM",     "i8mm",     AV_CPU_FLAG_I8MM },
+    { "SVE",      "sve",      AV_CPU_FLAG_SVE },
+    { "SVE2",     "sve2",     AV_CPU_FLAG_SVE2 },
 #elif ARCH_ARM
     { "ARMV5TE",  "armv5te",  AV_CPU_FLAG_ARMV5TE },
     { "ARMV6",    "armv6",    AV_CPU_FLAG_ARMV6 },
@@ -352,6 +378,8 @@ static const struct {
 #elif ARCH_LOONGARCH
     { "LSX",      "lsx",      AV_CPU_FLAG_LSX },
     { "LASX",     "lasx",     AV_CPU_FLAG_LASX },
+#elif ARCH_WASM
+    { "SIMD128",    "simd128",  AV_CPU_FLAG_SIMD128 },
 #endif
     { NULL }
 };
@@ -618,34 +646,32 @@ static inline double avg_cycles_per_call(const CheckasmPerf *const p)
 static void print_benchs(CheckasmFunc *f)
 {
     if (f) {
+        CheckasmFuncVersion *v = &f->versions;
+        const CheckasmPerf *p = &v->perf;
+        const double baseline = avg_cycles_per_call(p);
+        double decicycles;
+
         print_benchs(f->child[0]);
 
-        /* Only print functions with at least one assembly version */
-        if (f->versions.cpu || f->versions.next) {
-            CheckasmFuncVersion *v = &f->versions;
-            const CheckasmPerf *p = &v->perf;
-            const double baseline = avg_cycles_per_call(p);
-            double decicycles;
-            do {
-                if (p->iterations) {
-                    p = &v->perf;
-                    decicycles = avg_cycles_per_call(p);
-                    if (state.csv || state.tsv) {
-                        const char sep = state.csv ? ',' : '\t';
-                        printf("%s%c%s%c%.1f\n", f->name, sep,
-                               cpu_suffix(v->cpu), sep,
-                               decicycles / 10.0);
-                    } else {
-                        const int pad_length = 10 + 50 -
-                            printf("%s_%s:", f->name, cpu_suffix(v->cpu));
-                        const double ratio = decicycles ?
-                            baseline / decicycles : 0.0;
-                        printf("%*.1f (%5.2fx)\n", FFMAX(pad_length, 0),
-                            decicycles / 10.0, ratio);
-                    }
+        do {
+            if (p->iterations) {
+                p = &v->perf;
+                decicycles = avg_cycles_per_call(p);
+                if (state.csv || state.tsv) {
+                    const char sep = state.csv ? ',' : '\t';
+                    printf("%s%c%s%c%.1f\n", f->name, sep,
+                           cpu_suffix(v->cpu), sep,
+                           decicycles / 10.0);
+                } else {
+                    const int pad_length = 10 + 50 -
+                        printf("%s_%s:", f->name, cpu_suffix(v->cpu));
+                    const double ratio = decicycles ?
+                        baseline / decicycles : 0.0;
+                    printf("%*.1f (%5.2fx)\n", FFMAX(pad_length, 0),
+                        decicycles / 10.0, ratio);
                 }
-            } while ((v = v->next));
-        }
+            }
+        } while ((v = v->next));
 
         print_benchs(f->child[1]);
     }
@@ -758,7 +784,7 @@ static LONG NTAPI signal_handler(EXCEPTION_POINTERS *e) {
     return EXCEPTION_CONTINUE_EXECUTION; /* never reached, but shuts up gcc */
 }
 #endif
-#else
+#elif !defined(_WASI_EMULATED_SIGNAL)
 static void signal_handler(int s);
 
 static const struct sigaction signal_handler_act = {
@@ -915,12 +941,13 @@ int main(int argc, char *argv[])
 {
     unsigned int seed = av_get_random_seed();
     int i, ret = 0;
+    char arch_info_buf[50] = "";
 
 #ifdef _WIN32
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     AddVectoredExceptionHandler(0, signal_handler);
 #endif
-#else
+#elif !defined(_WASI_EMULATED_SIGNAL)
     sigaction(SIGBUS,  &signal_handler_act, NULL);
     sigaction(SIGFPE,  &signal_handler_act, NULL);
     sigaction(SIGILL,  &signal_handler_act, NULL);
@@ -979,7 +1006,16 @@ int main(int argc, char *argv[])
         }
     }
 
-    fprintf(stderr, "checkasm: using random seed %u\n", seed);
+#if ARCH_AARCH64 && HAVE_SVE
+    if (have_sve(av_get_cpu_flags()))
+        snprintf(arch_info_buf, sizeof(arch_info_buf),
+                 "SVE %d bits, ", 8 * ff_aarch64_sve_length());
+#elif ARCH_RISCV && HAVE_RVV
+    if (av_get_cpu_flags() & AV_CPU_FLAG_RVV_I32)
+        snprintf(arch_info_buf, sizeof (arch_info_buf),
+                 "%zu-bit vectors, ", 8 * ff_get_rv_vlenb());
+#endif
+    fprintf(stderr, "checkasm: %susing random seed %u\n", arch_info_buf, seed);
     av_lfg_init(&checkasm_lfg, seed);
 
     if (state.bench_pattern)
@@ -1060,8 +1096,9 @@ int checkasm_bench_func(void)
            !wildstrcmp(state.current_func->name, state.bench_pattern);
 }
 
-/* Indicate that the current test has failed */
-void checkasm_fail_func(const char *msg, ...)
+/* Indicate that the current test has failed, return whether verbose printing
+ * is requested. */
+int checkasm_fail_func(const char *msg, ...)
 {
     if (state.current_func_ver && state.current_func_ver->cpu &&
         state.current_func_ver->ok)
@@ -1078,6 +1115,7 @@ void checkasm_fail_func(const char *msg, ...)
         state.current_func_ver->ok = 0;
         state.num_failed++;
     }
+    return state.verbose;
 }
 
 void checkasm_set_signal_handler_state(int enabled) {
@@ -1145,38 +1183,90 @@ void checkasm_report(const char *name, ...)
     }
 }
 
+static int check_err(const char *file, int line,
+                     const char *name, int w, int h,
+                     int *err)
+{
+    if (*err)
+        return 0;
+    if (!checkasm_fail_func("%s:%d", file, line))
+        return 1;
+    *err = 1;
+    fprintf(stderr, "%s (%dx%d):\n", name, w, h);
+    return 0;
+}
+
 #define DEF_CHECKASM_CHECK_FUNC(type, fmt) \
 int checkasm_check_##type(const char *file, int line, \
                           const type *buf1, ptrdiff_t stride1, \
                           const type *buf2, ptrdiff_t stride2, \
-                          int w, int h, const char *name) \
+                          int w, int h, const char *name, \
+                          int align_w, int align_h, \
+                          int padding) \
 { \
+    int64_t aligned_w = (w - 1LL + align_w) & ~(align_w - 1); \
+    int64_t aligned_h = (h - 1LL + align_h) & ~(align_h - 1); \
+    int err = 0; \
     int y = 0; \
+    av_assert0(aligned_w == (int32_t)aligned_w);\
+    av_assert0(aligned_h == (int32_t)aligned_h);\
     stride1 /= sizeof(*buf1); \
     stride2 /= sizeof(*buf2); \
     for (y = 0; y < h; y++) \
         if (memcmp(&buf1[y*stride1], &buf2[y*stride2], w*sizeof(*buf1))) \
             break; \
-    if (y == h) \
-        return 0; \
-    checkasm_fail_func("%s:%d", file, line); \
-    if (!state.verbose) \
-        return 1; \
-    fprintf(stderr, "%s:\n", name); \
-    while (h--) { \
-        for (int x = 0; x < w; x++) \
-            fprintf(stderr, " " fmt, buf1[x]); \
-        fprintf(stderr, "    "); \
-        for (int x = 0; x < w; x++) \
-            fprintf(stderr, " " fmt, buf2[x]); \
-        fprintf(stderr, "    "); \
-        for (int x = 0; x < w; x++) \
-            fprintf(stderr, "%c", buf1[x] != buf2[x] ? 'x' : '.'); \
-        buf1 += stride1; \
-        buf2 += stride2; \
-        fprintf(stderr, "\n"); \
+    if (y != h) { \
+        if (check_err(file, line, name, w, h, &err)) \
+            return 1; \
+        for (y = 0; y < h; y++) { \
+            for (int x = 0; x < w; x++) \
+                fprintf(stderr, " " fmt, buf1[x]); \
+            fprintf(stderr, "    "); \
+            for (int x = 0; x < w; x++) \
+                fprintf(stderr, " " fmt, buf2[x]); \
+            fprintf(stderr, "    "); \
+            for (int x = 0; x < w; x++) \
+                fprintf(stderr, "%c", buf1[x] != buf2[x] ? 'x' : '.'); \
+            buf1 += stride1; \
+            buf2 += stride2; \
+            fprintf(stderr, "\n"); \
+        } \
+        buf1 -= h*stride1; \
+        buf2 -= h*stride2; \
     } \
-    return 1; \
+    for (y = -padding; y < 0; y++) \
+        if (memcmp(&buf1[y*stride1 - padding], &buf2[y*stride2 - padding], \
+                   (w + 2*padding)*sizeof(*buf1))) { \
+            if (check_err(file, line, name, w, h, &err)) \
+                return 1; \
+            fprintf(stderr, " overwrite above\n"); \
+            break; \
+        } \
+    for (y = aligned_h; y < aligned_h + padding; y++) \
+        if (memcmp(&buf1[y*stride1 - padding], &buf2[y*stride2 - padding], \
+                   (w + 2*padding)*sizeof(*buf1))) { \
+            if (check_err(file, line, name, w, h, &err)) \
+                return 1; \
+            fprintf(stderr, " overwrite below\n"); \
+            break; \
+        } \
+    for (y = 0; y < h; y++) \
+        if (memcmp(&buf1[y*stride1 - padding], &buf2[y*stride2 - padding], \
+                   padding*sizeof(*buf1))) { \
+            if (check_err(file, line, name, w, h, &err)) \
+                return 1; \
+            fprintf(stderr, " overwrite left\n"); \
+            break; \
+        } \
+    for (y = 0; y < h; y++) \
+        if (memcmp(&buf1[y*stride1 + aligned_w], &buf2[y*stride2 + aligned_w], \
+                   padding*sizeof(*buf1))) { \
+            if (check_err(file, line, name, w, h, &err)) \
+                return 1; \
+            fprintf(stderr, " overwrite right\n"); \
+            break; \
+        } \
+    return err; \
 }
 
 DEF_CHECKASM_CHECK_FUNC(uint8_t,  "%02x")

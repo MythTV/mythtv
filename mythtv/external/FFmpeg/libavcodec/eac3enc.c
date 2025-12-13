@@ -135,6 +135,8 @@ static void eac3_output_frame_header(AC3EncodeContext *s, PutBitContext *pb)
     int blk, ch;
     AC3EncOptions *opt = &s->options;
 
+    put_bits_assume_flushed(pb);
+
     put_bits(pb, 16, 0x0b77);                   /* sync word */
 
     /* BSI header */
@@ -273,11 +275,10 @@ const FFCodec ff_eac3_encoder = {
     .init            = eac3_encode_init,
     FF_CODEC_ENCODE_CB(ff_ac3_encode_frame),
     .close           = ff_ac3_encode_close,
-    .p.sample_fmts   = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
-                                                      AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .p.priv_class    = &eac3enc_class,
-    .p.supported_samplerates = ff_ac3_sample_rate_tab,
-    .p.ch_layouts    = ff_ac3_ch_layouts,
+    CODEC_SAMPLERATES_ARRAY(ff_ac3_sample_rate_tab),
+    CODEC_CH_LAYOUTS_ARRAY(ff_ac3_ch_layouts),
     .defaults        = ff_ac3_enc_defaults,
     .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
 };

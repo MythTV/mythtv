@@ -292,7 +292,6 @@ DVD-Video demuxer, powered by libdvdnav and libdvdread.
 Can directly ingest DVD titles, specifically sequential PGCs, into
 a conversion pipeline. Menu assets, such as background video or audio,
 can also be demuxed given the menu's coordinates (at best effort).
-Seeking is not supported at this time.
 
 Block devices (DVD drives), ISO files, and directory structures are accepted.
 Activate with @code{-f dvdvideo} in front of one of these inputs.
@@ -380,11 +379,11 @@ Default is false.
 
 @item menu_lu @var{int}
 The menu language to demux. In DVD, menus are grouped by language.
-Default is 0, the first language unit.
+Default is 1, the first language unit.
 
 @item menu_vts @var{int}
 The VTS where the menu lives, or 0 if it is a VMG menu (root-level).
-Default is 0, VMG menu.
+Default is 1, menu of the first VTS.
 
 @item pgc @var{int}
 The entry PGC to start playback, in conjunction with @option{pg}.
@@ -397,8 +396,7 @@ Default is 0, automatically resolve from value of @option{title}.
 The entry PG to start playback, in conjunction with @option{pgc}.
 Alternative to setting @option{title}.
 Chapter markers are not supported at this time.
-Default is 0, automatically resolve from value of @option{title}, or
-start from the beginning (PG 1) of the menu.
+Default is 1, the first PG of the PGC.
 
 @item preindex @var{bool}
 Enable this to have accurate chapter (PTT) markers and duration measurement,
@@ -406,7 +404,6 @@ which requires a slow second pass read in order to index the chapter marker
 timestamps from NAV packets. This is non-ideal extra work for real optical drives.
 It is recommended and faster to use this option with a backup of the DVD structure
 stored on a hard drive. Not compatible with @option{pgc} and @option{pg}.
-Not applicable to menus.
 Default is 0, false.
 
 @item trim @var{bool}
@@ -566,6 +563,13 @@ prefer to use #EXT-X-START if it's in playlist instead of live_start_index.
 
 @item allowed_extensions
 ',' separated list of file extensions that hls is allowed to access.
+
+@item extension_picky
+This blocks disallowed extensions from probing
+It also requires all available segments to have matching extensions to the format
+except mpegts, which is always allowed.
+It is recommended to set the whitelists correctly instead of depending on extensions
+Enabled by default.
 
 @item max_reload
 Maximum number of times a insufficient list is attempted to be reloaded.
@@ -851,6 +855,32 @@ Set the sample rate for libopenmpt to output.
 Range is from 1000 to INT_MAX. The value default is 48000.
 @end table
 
+@anchor{mccdec}
+@section mcc
+
+Demuxer for MacCaption MCC files, it supports MCC versions 1.0 and 2.0.
+MCC files store VANC data, which can include closed captions (EIA-608 and CEA-708), ancillary time code, pan-scan data, etc.
+By default, for backward compatibility, the MCC demuxer extracts just the EIA-608 and CEA-708 closed captions and returns a @code{EIA_608} stream, ignoring all other VANC data.
+You can change it to return all VANC data in a @code{SMPTE_436M_ANC} data stream by setting @option{-eia608_extract 0}
+
+@subsection Examples
+
+@itemize
+@item
+Convert a MCC file to Scenarist (SCC) format:
+@example
+ffmpeg -i CC.mcc -c:s copy CC.scc
+@end example
+Note that the SCC format only supports EIA-608, so this will discard all other data such as CEA-708 extensions.
+
+@item
+Merge a MCC file into a MXF file:
+@example
+ffmpeg -i video_and_audio.mxf -eia608_extract 0 -i CC.mcc -c copy -map 0 -map 1 out.mxf
+@end example
+This retains all VANC data and inserts it into the output MXF file as a @code{SMPTE_436M_ANC} data stream.
+@end itemize
+
 @section mov/mp4/3gp
 
 Demuxer for Quicktime File Format & ISO/IEC Base Media File Format (ISO/IEC 14496-12 or MPEG-4 Part 12, ISO/IEC 15444-12 or JPEG 2000 Part 12).
@@ -986,7 +1016,7 @@ to 1 (-1 means automatic setting, 1 means enabled, 0 means
 disabled). Default value is -1.
 
 @item merge_pmt_versions
-Re-use existing streams when a PMT's version is updated and elementary
+Reuse existing streams when a PMT's version is updated and elementary
 streams move to different PIDs. Default value is 0.
 
 @item max_packet_size

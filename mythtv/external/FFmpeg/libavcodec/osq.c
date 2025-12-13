@@ -146,10 +146,12 @@ static void reset_stats(OSQChannel *cb)
 
 static void update_stats(OSQChannel *cb, int val)
 {
-    cb->sum += FFABS(val) - cb->history[cb->pos];
-    cb->history[cb->pos] = FFABS(val);
+    cb->sum += FFABS((int64_t)val) - cb->history[cb->pos];
+    cb->history[cb->pos] = FFABS((int64_t)val);
     cb->pos++;
     cb->count++;
+    //NOTE for this to make sense count would need to be limited to FF_ARRAY_ELEMS(cb->history)
+    //Otherwise the average computation later makes no sense
     if (cb->pos >= FF_ARRAY_ELEMS(cb->history))
         cb->pos = 0;
 }
@@ -163,7 +165,8 @@ static int update_residue_parameter(OSQChannel *cb)
     if (!sum)
         return 0;
     x = sum / cb->count;
-    rice_k = ceil(log2(x));
+    av_assert2(x <= 0x80000000U);
+    rice_k = av_ceil_log2(x);
     if (rice_k >= 30) {
         double f = floor(sum / 1.4426952 + 0.5);
         if (f <= 1) {
@@ -190,7 +193,7 @@ static uint32_t get_urice(GetBitContext *gb, int k)
 
 static int32_t get_srice(GetBitContext *gb, int x)
 {
-    int32_t y = get_urice(gb, x);
+    uint32_t y = get_urice(gb, x);
     return get_bits1(gb) ? -y : y;
 }
 
@@ -209,6 +212,8 @@ static int osq_channel_parameters(AVCodecContext *avctx, int ch)
         cb->residue_parameter = get_urice(gb, 4);
         if (!cb->residue_parameter || cb->residue_parameter >= 31)
             return AVERROR_INVALIDDATA;
+        if (cb->coding_mode == 2)
+            avpriv_request_sample(avctx, "coding mode 2");
     } else if (cb->coding_mode == 3) {
         cb->residue_bits = get_urice(gb, 4);
         if (!cb->residue_bits || cb->residue_bits >= 31)
@@ -300,7 +305,7 @@ static int do_decode(AVCodecContext *avctx, AVFrame *frame, int decorrelate, int
                 dst[n] += (int)(P2 + P3) / 2 + (unsigned)p;
                 break;
             case 8:
-                dst[n] += (int)(P2 + P3) / 2;
+                dst[n] += (int)(P2 + P3) / 2 + 0U;
                 break;
             case 9:
                 dst[n] += (int)(P2 * 2 + P3) / 3 + (unsigned)p;
@@ -309,13 +314,13 @@ static int do_decode(AVCodecContext *avctx, AVFrame *frame, int decorrelate, int
                 dst[n] += (int)(P2 + P3 * 2) / 3 + (unsigned)p;
                 break;
             case 11:
-                dst[n] += (int)((unsigned)dst[A] + dst[B]) / 2;
+                dst[n] += (int)((unsigned)dst[A] + dst[B]) / 2 + 0U;
                 break;
             case 12:
                 dst[n] += (unsigned)dst[B];
                 break;
             case 13:
-                dst[n] += (int)(unsigned)(dst[D] + dst[B]) / 2;
+                dst[n] += (int)((unsigned)dst[D] + dst[B]) / 2 + 0U;
                 break;
             case 14:
                 dst[n] += (int)((unsigned)P2 + dst[A]) / 2 + (unsigned)p;
@@ -385,7 +390,7 @@ static int osq_decode_block(AVCodecContext *avctx, AVFrame *frame)
             int32_t *src = s->decode_buffer[ch] + OFFSET;
 
             for (int n = 0; n < nb_samples; n++)
-                dst[n] = av_clip_uint8(src[n] + 0x80);
+                dst[n] = av_clip_uint8(src[n] + 0x80ll);
         }
         break;
     case AV_SAMPLE_FMT_S16P:
@@ -489,9 +494,6 @@ const FFCodec ff_osq_decoder = {
     .p.capabilities   = AV_CODEC_CAP_CHANNEL_CONF |
                         AV_CODEC_CAP_DR1,
     .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
-                                                        AV_SAMPLE_FMT_S16P,
-                                                        AV_SAMPLE_FMT_S32P,
-                                                        AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_U8P, AV_SAMPLE_FMT_S16P, AV_SAMPLE_FMT_S32P),
     .flush            = osq_flush,
 };

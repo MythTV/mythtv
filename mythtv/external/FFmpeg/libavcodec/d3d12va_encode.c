@@ -299,21 +299,20 @@ static int d3d12va_encode_issue(AVCodecContext *avctx,
                        "header: %d.\n", err);
                 goto fail;
             }
+            pic->header_size = (int)bit_len / 8;
+            pic->aligned_header_size = pic->header_size % ctx->req.CompressedBitstreamBufferAccessAlignment ?
+                                    FFALIGN(pic->header_size, ctx->req.CompressedBitstreamBufferAccessAlignment) :
+                                    pic->header_size;
+
+            hr = ID3D12Resource_Map(pic->output_buffer, 0, NULL, (void **)&ptr);
+            if (FAILED(hr)) {
+                err = AVERROR_UNKNOWN;
+                goto fail;
+            }
+
+            memcpy(ptr, data, pic->aligned_header_size);
+            ID3D12Resource_Unmap(pic->output_buffer, 0, NULL);
         }
-
-        pic->header_size = (int)bit_len / 8;
-        pic->aligned_header_size = pic->header_size % ctx->req.CompressedBitstreamBufferAccessAlignment ?
-                                   FFALIGN(pic->header_size, ctx->req.CompressedBitstreamBufferAccessAlignment) :
-                                   pic->header_size;
-
-        hr = ID3D12Resource_Map(pic->output_buffer, 0, NULL, (void **)&ptr);
-        if (FAILED(hr)) {
-            err = AVERROR_UNKNOWN;
-            goto fail;
-        }
-
-        memcpy(ptr, data, pic->aligned_header_size);
-        ID3D12Resource_Unmap(pic->output_buffer, 0, NULL);
     }
 
     d3d12_refs.NumTexture2Ds = base_pic->nb_refs[0] + base_pic->nb_refs[1];
@@ -634,7 +633,7 @@ static int d3d12va_encode_get_coded_data(AVCodecContext *avctx,
         goto end;
 
     total_size += pic->header_size;
-    av_log(avctx, AV_LOG_DEBUG, "Output buffer size %"PRId64"\n", total_size);
+    av_log(avctx, AV_LOG_DEBUG, "Output buffer size %"SIZE_SPECIFIER"\n", total_size);
 
     hr = ID3D12Resource_Map(pic->output_buffer, 0, NULL, (void **)&mapped_data);
     if (FAILED(hr)) {
@@ -974,8 +973,7 @@ rc_mode_found:
         case RC_MODE_CQP:
             // cqp ConfigParams will be updated in ctx->codec->configure.
             break;
-
-        case RC_MODE_CBR:
+        case RC_MODE_CBR: {
             D3D12_VIDEO_ENCODER_RATE_CONTROL_CBR *cbr_ctl;
 
             ctx->rc.ConfigParams.DataSize = sizeof(D3D12_VIDEO_ENCODER_RATE_CONTROL_CBR);
@@ -996,8 +994,8 @@ rc_mode_found:
 
             ctx->rc.ConfigParams.pConfiguration_CBR = cbr_ctl;
             break;
-
-        case RC_MODE_VBR:
+        }
+        case RC_MODE_VBR: {
             D3D12_VIDEO_ENCODER_RATE_CONTROL_VBR *vbr_ctl;
 
             ctx->rc.ConfigParams.DataSize = sizeof(D3D12_VIDEO_ENCODER_RATE_CONTROL_VBR);
@@ -1019,8 +1017,8 @@ rc_mode_found:
 
             ctx->rc.ConfigParams.pConfiguration_VBR = vbr_ctl;
             break;
-
-        case RC_MODE_QVBR:
+        }
+        case RC_MODE_QVBR: {
             D3D12_VIDEO_ENCODER_RATE_CONTROL_QVBR *qvbr_ctl;
 
             ctx->rc.ConfigParams.DataSize = sizeof(D3D12_VIDEO_ENCODER_RATE_CONTROL_QVBR);
@@ -1040,7 +1038,7 @@ rc_mode_found:
 
             ctx->rc.ConfigParams.pConfiguration_QVBR = qvbr_ctl;
             break;
-
+        }
         default:
             break;
     }
@@ -1088,13 +1086,15 @@ static int d3d12va_encode_init_gop_structure(AVCodecContext *avctx)
         switch (ctx->codec->d3d12_codec) {
             case D3D12_VIDEO_ENCODER_CODEC_H264:
                 ref_l0 = FFMIN(support.PictureSupport.pH264Support->MaxL0ReferencesForP,
-                               support.PictureSupport.pH264Support->MaxL1ReferencesForB);
+                               support.PictureSupport.pH264Support->MaxL1ReferencesForB ?
+                               support.PictureSupport.pH264Support->MaxL1ReferencesForB : UINT_MAX);
                 ref_l1 = support.PictureSupport.pH264Support->MaxL1ReferencesForB;
                 break;
 
             case D3D12_VIDEO_ENCODER_CODEC_HEVC:
                 ref_l0 = FFMIN(support.PictureSupport.pHEVCSupport->MaxL0ReferencesForP,
-                               support.PictureSupport.pHEVCSupport->MaxL1ReferencesForB);
+                               support.PictureSupport.pHEVCSupport->MaxL1ReferencesForB ?
+                               support.PictureSupport.pHEVCSupport->MaxL1ReferencesForB : UINT_MAX);
                 ref_l1 = support.PictureSupport.pHEVCSupport->MaxL1ReferencesForB;
                 break;
 
@@ -1152,7 +1152,7 @@ static int d3d12va_create_encoder_heap(AVCodecContext *avctx)
 
     D3D12_VIDEO_ENCODER_HEAP_DESC desc = {
         .NodeMask             = 0,
-        .Flags                = D3D12_VIDEO_ENCODER_FLAG_NONE,
+        .Flags                = D3D12_VIDEO_ENCODER_HEAP_FLAG_NONE,
         .EncodeCodec          = ctx->codec->d3d12_codec,
         .EncodeProfile        = ctx->profile->d3d12_profile,
         .EncodeLevel          = ctx->level,
@@ -1264,7 +1264,7 @@ static int d3d12va_encode_create_command_objects(AVCodecContext *avctx)
 {
     D3D12VAEncodeContext *ctx = avctx->priv_data;
     ID3D12CommandAllocator *command_allocator = NULL;
-    int err;
+    int err = AVERROR_UNKNOWN;
     HRESULT hr;
 
     D3D12_COMMAND_QUEUE_DESC queue_desc = {

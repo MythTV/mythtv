@@ -100,15 +100,17 @@ static const AVOption palettegen_options[] = {
 
 AVFILTER_DEFINE_CLASS(palettegen);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     static const enum AVPixelFormat in_fmts[]  = {AV_PIX_FMT_RGB32, AV_PIX_FMT_NONE};
     static const enum AVPixelFormat out_fmts[] = {AV_PIX_FMT_RGB32, AV_PIX_FMT_NONE};
     int ret;
 
-    if ((ret = ff_formats_ref(ff_make_format_list(in_fmts) , &ctx->inputs[0]->outcfg.formats)) < 0)
+    if ((ret = ff_formats_ref(ff_make_format_list(in_fmts) , &cfg_in[0]->formats)) < 0)
         return ret;
-    if ((ret = ff_formats_ref(ff_make_format_list(out_fmts), &ctx->outputs[0]->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(ff_make_format_list(out_fmts), &cfg_out[0]->formats)) < 0)
         return ret;
     return 0;
 }
@@ -571,14 +573,14 @@ static const AVFilterPad palettegen_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_palettegen = {
-    .name          = "palettegen",
-    .description   = NULL_IF_CONFIG_SMALL("Find the optimal palette for a given stream."),
+const FFFilter ff_vf_palettegen = {
+    .p.name        = "palettegen",
+    .p.description = NULL_IF_CONFIG_SMALL("Find the optimal palette for a given stream."),
+    .p.priv_class  = &palettegen_class,
     .priv_size     = sizeof(PaletteGenContext),
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(palettegen_inputs),
     FILTER_OUTPUTS(palettegen_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &palettegen_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };

@@ -905,7 +905,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "tgq",
         .long_name = NULL_IF_CONFIG_SMALL("Electronic Arts TGQ video"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_LOSSY,
     },
     {
         .id        = AV_CODEC_ID_TQI,
@@ -1146,6 +1146,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Dxtory"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
+#if FF_API_V408_CODECID
     {
         .id        = AV_CODEC_ID_V410,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -1153,6 +1154,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Uncompressed 4:4:4 10-bit"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
+#endif
     {
         .id        = AV_CODEC_ID_XWD,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -1477,6 +1479,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Pinnacle TARGA CineWave YUV16"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
+#if FF_API_V408_CODECID
     {
         .id        = AV_CODEC_ID_V308,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -1491,6 +1494,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
+#endif
     {
         .id        = AV_CODEC_ID_YUV4,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -1958,6 +1962,43 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "lead",
         .long_name = NULL_IF_CONFIG_SMALL("LEAD MCMP"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_DNXUC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "dnxuc",
+        .long_name = NULL_IF_CONFIG_SMALL("DNxUncompressed / SMPTE RDD 50"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_RV60,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "rv60",
+        .long_name = NULL_IF_CONFIG_SMALL("RealVideo 6.0"),
+        .props     = AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_REORDER,
+    },
+    {
+        .id        = AV_CODEC_ID_JPEGXL_ANIM,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "jpegxl_anim",
+        .long_name = NULL_IF_CONFIG_SMALL("JPEG XL animated"),
+        .props     = AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_LOSSLESS,
+        .mime_types= MT("image/jxl"),
+    },
+    {
+        .id        = AV_CODEC_ID_APV,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "apv",
+        .long_name = NULL_IF_CONFIG_SMALL("Advanced Professional Video"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_PRORES_RAW,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "prores_raw",
+        .long_name = NULL_IF_CONFIG_SMALL("Apple ProRes RAW"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .profiles  = NULL_IF_CONFIG_SMALL(ff_prores_raw_profiles),
     },
 
     /* various PCM "codecs" */
@@ -2579,6 +2620,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM Konami XMD"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_XBOX,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_xbox",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Xbox"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_SANYO,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_sanyo",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Sanyo"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
 
     /* AMR */
     {
@@ -2697,7 +2752,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "aac",
         .long_name = NULL_IF_CONFIG_SMALL("AAC (Advanced Audio Coding)"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_LOSSY,
         .profiles  = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
     },
     {
@@ -3031,7 +3086,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "aac_latm",
         .long_name = NULL_IF_CONFIG_SMALL("AAC LATM (Advanced Audio Coding LATM syntax)"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_LOSSY,
         .profiles  = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
     },
     {
@@ -3433,6 +3488,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("LC3 (Low Complexity Communication Codec)"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_G728,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "g728",
+        .long_name = NULL_IF_CONFIG_SMALL("G.728"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
 
     /* subtitle codecs */
     {
@@ -3713,6 +3775,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "lcevc",
         .long_name = NULL_IF_CONFIG_SMALL("LCEVC (Low Complexity Enhancement Video Coding) / MPEG-5 LCEVC / MPEG-5 part 2"),
+    },
+    {
+        .id        = AV_CODEC_ID_SMPTE_436M_ANC,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "smpte_436m_anc",
+        .long_name = NULL_IF_CONFIG_SMALL("MXF SMPTE-436M ANC"),
     },
     {
         .id        = AV_CODEC_ID_DVB_VBI,

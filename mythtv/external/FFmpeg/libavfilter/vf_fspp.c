@@ -463,7 +463,7 @@ static void row_fdct_c(int16_t *data, const uint8_t *pixels, ptrdiff_t line_size
         tmp12 = tmp1 - tmp2;
         //Even columns are written first, this leads to different order of columns
         //in column_fidct(), but they are processed independently, so all ok.
-        //Later in the row_idct() columns readed at the same order.
+        //Later in the row_idct() columns are read in the same order.
         dataptr[2] = tmp10 + tmp11;
         dataptr[3] = tmp10 - tmp11;
 
@@ -655,14 +655,14 @@ static const AVFilterPad fspp_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_fspp = {
-    .name            = "fspp",
-    .description     = NULL_IF_CONFIG_SMALL("Apply Fast Simple Post-processing filter."),
+const FFFilter ff_vf_fspp = {
+    .p.name          = "fspp",
+    .p.description   = NULL_IF_CONFIG_SMALL("Apply Fast Simple Post-processing filter."),
+    .p.priv_class    = &fspp_class,
+    .p.flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
     .priv_size       = sizeof(FSPPContext),
     .uninit          = uninit,
     FILTER_INPUTS(fspp_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .priv_class      = &fspp_class,
-    .flags           = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 };

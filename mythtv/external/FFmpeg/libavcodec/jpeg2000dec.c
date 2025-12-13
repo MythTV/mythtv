@@ -271,6 +271,25 @@ static int get_siz(Jpeg2000DecoderContext *s)
         return AVERROR_INVALIDDATA;
     }
 
+    for (i = 0; i < s->ncomponents; i++) {
+        if (s->cdef[i] < 0) {
+            for (i = 0; i < s->ncomponents; i++) {
+                s->cdef[i] = i + 1;
+            }
+            if ((s->ncomponents & 1) == 0)
+                s->cdef[s->ncomponents-1] = 0;
+        }
+    }
+    // after here we no longer have to consider negative cdef
+
+    int cdef_used = 0;
+    for (i = 0; i < s->ncomponents; i++)
+        cdef_used |= 1<<s->cdef[i];
+
+    // Check that the channels we have are what we expect for the number of components
+    if (cdef_used != ((int[]){0,2,3,14,15})[s->ncomponents])
+        return AVERROR_INVALIDDATA;
+
     for (i = 0; i < s->ncomponents; i++) { // Ssiz_i XRsiz_i, YRsiz_i
         uint8_t x    = bytestream2_get_byteu(&s->g);
         s->cbps[i]   = (x & 0x7f) + 1;
@@ -283,7 +302,9 @@ static int get_siz(Jpeg2000DecoderContext *s)
             av_log(s->avctx, AV_LOG_ERROR, "Invalid sample separation %d/%d\n", s->cdx[i], s->cdy[i]);
             return AVERROR_INVALIDDATA;
         }
-        log2_chroma_wh |= s->cdy[i] >> 1 << i * 4 | s->cdx[i] >> 1 << i * 4 + 2;
+        int i_remapped = s->cdef[i] ? s->cdef[i]-1 : (s->ncomponents-1);
+
+        log2_chroma_wh |= s->cdy[i] >> 1 << i_remapped * 4 | s->cdx[i] >> 1 << i_remapped * 4 + 2;
     }
 
     s->numXtiles = ff_jpeg2000_ceildiv(s->width  - s->tile_offset_x, s->tile_width);
@@ -542,9 +563,13 @@ static int get_cox(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c)
     /* set integer 9/7 DWT in case of BITEXACT flag */
     if ((s->avctx->flags & AV_CODEC_FLAG_BITEXACT) && (c->transform == FF_DWT97))
         c->transform = FF_DWT97_INT;
+#if FF_API_CODEC_PROPS
     else if (c->transform == FF_DWT53) {
+FF_DISABLE_DEPRECATION_WARNINGS
         s->avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
+FF_ENABLE_DEPRECATION_WARNINGS
     }
+#endif
 
     if (c->csty & JPEG2000_CSTY_PREC) {
         int i;
@@ -1358,7 +1383,7 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
                     }
                     bits_to_read = (uint8_t) (bits_to_read + cblk->lblock);
                     segment_bytes = get_bits(s, bits_to_read);
-                    // Write length information for HT Refinment segment
+                    // Write length information for HT Refinement segment
                     cblk->pass_lengths[1] += segment_bytes;
                 } else if (!(cblk->modes & (JPEG2000_CBLK_TERMALL | JPEG2000_CBLK_BYPASS))) {
                     // Common case for non-HT code-blocks; we have only one segment
@@ -1507,6 +1532,7 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
 
                 bytestream2_get_bufferu(&s->g, cblk->data + cblk->length, cblk->lengthinc[cwsno]);
                 cblk->length   += cblk->lengthinc[cwsno];
+                memset(cblk->data + cblk->length, 0, 4);
                 cblk->lengthinc[cwsno] = 0;
                 if (cblk->nb_terminationsinc) {
                     cblk->nb_terminationsinc--;
@@ -1517,6 +1543,7 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
                 }
             }
             av_freep(&cblk->lengthinc);
+            cblk->nb_lengthinc = 0;
         }
     }
     // Save state of stream
@@ -1885,14 +1912,15 @@ static void decode_sigpass(Jpeg2000T1Context *t1, int width, int height,
                 && !(t1->flags[(y+1) * t1->stride + x+1] & (JPEG2000_T1_SIG | JPEG2000_T1_VIS))) {
                     if (ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ff_jpeg2000_getsigctxno(t1->flags[(y+1) * t1->stride + x+1] & flags_mask, bandno))) {
                         int xorbit, ctxno = ff_jpeg2000_getsgnctxno(t1->flags[(y+1) * t1->stride + x+1] & flags_mask, &xorbit);
-                        if (t1->mqc.raw)
-                             t1->data[(y) * t1->stride + x] = ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ctxno) ? -mask : mask;
-                        else
-                             t1->data[(y) * t1->stride + x] = (ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ctxno) ^ xorbit) ?
-                                               -mask : mask;
-
+                        if (t1->mqc.raw) {
+                            t1->data[(y) * t1->stride + x] |= (uint32_t)(ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ctxno)) << 31;
+                            t1->data[(y) * t1->stride + x] |= mask;
+                        } else {
+                            t1->data[(y) * t1->stride + x] |= (uint32_t)(ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ctxno) ^ xorbit) << 31;
+                            t1->data[(y) * t1->stride + x] |= mask;
+                        }
                         ff_jpeg2000_set_significance(t1, x, y,
-                                                     t1->data[(y) * t1->stride + x] < 0);
+                                                     t1->data[(y) * t1->stride + x] & INT32_MIN);
                     }
                     t1->flags[(y + 1) * t1->stride + x + 1] |= JPEG2000_T1_VIS;
                 }
@@ -1902,11 +1930,10 @@ static void decode_sigpass(Jpeg2000T1Context *t1, int width, int height,
 static void decode_refpass(Jpeg2000T1Context *t1, int width, int height,
                            int bpno, int vert_causal_ctx_csty_symbol)
 {
-    int phalf, nhalf;
+    int phalf;
     int y0, x, y;
 
     phalf = 1 << (bpno - 1);
-    nhalf = -phalf;
 
     for (y0 = 0; y0 < height; y0 += 4)
         for (x = 0; x < width; x++)
@@ -1915,10 +1942,13 @@ static void decode_refpass(Jpeg2000T1Context *t1, int width, int height,
                     int flags_mask = (vert_causal_ctx_csty_symbol && y == y0 + 3) ?
                         ~(JPEG2000_T1_SIG_S | JPEG2000_T1_SIG_SW | JPEG2000_T1_SIG_SE | JPEG2000_T1_SGN_S) : -1;
                     int ctxno = ff_jpeg2000_getrefctxno(t1->flags[(y + 1) * t1->stride + x + 1] & flags_mask);
-                    int r     = ff_mqc_decode(&t1->mqc,
-                                              t1->mqc.cx_states + ctxno)
-                                ? phalf : nhalf;
-                    t1->data[(y) * t1->stride + x]          += t1->data[(y) * t1->stride + x] < 0 ? -r : r;
+                    t1->data[(y) * t1->stride + x] |= phalf;
+                    if (ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ctxno))
+                        t1->data[(y) * t1->stride + x] |= phalf << 1;
+                    else {
+                        t1->data[(y) * t1->stride + x] &= ~(phalf << 1);
+
+                    }
                     t1->flags[(y + 1) * t1->stride + x + 1] |= JPEG2000_T1_REF;
                 }
 }
@@ -1966,11 +1996,9 @@ static void decode_clnpass(const Jpeg2000DecoderContext *s, Jpeg2000T1Context *t
                     int xorbit;
                     int ctxno = ff_jpeg2000_getsgnctxno(t1->flags[(y + 1) * t1->stride + x + 1] & flags_mask,
                                                         &xorbit);
-                    t1->data[(y) * t1->stride + x] = (ff_mqc_decode(&t1->mqc,
-                                                    t1->mqc.cx_states + ctxno) ^
-                                      xorbit)
-                                     ? -mask : mask;
-                    ff_jpeg2000_set_significance(t1, x, y, t1->data[(y) * t1->stride + x] < 0);
+                    t1->data[(y) * t1->stride + x] |= (uint32_t)(ff_mqc_decode(&t1->mqc, t1->mqc.cx_states + ctxno) ^ xorbit) << 31;
+                    t1->data[(y) * t1->stride + x] |= mask;
+                    ff_jpeg2000_set_significance(t1, x, y, t1->data[(y) * t1->stride + x] & INT32_MIN);
                 }
                 dec = 0;
                 t1->flags[(y + 1) * t1->stride + x + 1] &= ~JPEG2000_T1_VIS;
@@ -1991,9 +2019,9 @@ static void decode_clnpass(const Jpeg2000DecoderContext *s, Jpeg2000T1Context *t
 
 static int decode_cblk(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *codsty,
                        Jpeg2000T1Context *t1, Jpeg2000Cblk *cblk,
-                       int width, int height, int bandpos, uint8_t roi_shift)
+                       int width, int height, int bandpos, uint8_t roi_shift, const int M_b)
 {
-    int passno = cblk->npasses, pass_t = 2, bpno = cblk->nonzerobits - 1;
+    int passno = cblk->npasses, pass_t = 2, bpno = cblk->nonzerobits - 1 + 31 - M_b - 1 - roi_shift;
     int pass_cnt = 0;
     int vert_causal_ctx_csty_symbol = codsty->cblk_style & JPEG2000_CBLK_VSC;
     int term_cnt = 0;
@@ -2068,20 +2096,23 @@ static int decode_cblk(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *cod
         av_log(s->avctx, AV_LOG_WARNING, "Synthetic End of Stream Marker Read.\n");
     }
 
+    /* Reconstruct the sample values */
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int32_t sign, n, val;
+            const uint32_t mask  = UINT32_MAX >> (M_b + 1); // bit mask for ROI detection
+
+            n = x + (y * t1->stride);
+            val = t1->data[n];
+            sign = val & INT32_MIN;
+            val &= INT32_MAX;
+            /* ROI shift, if necessary */
+            if (roi_shift && (((uint32_t)val & ~mask) == 0))
+                val <<= roi_shift;
+            t1->data[n] = val | sign; /* NOTE: Binary point for reconstruction value is located in 31 - M_b */
+        }
+    }
     return 1;
-}
-
-static inline int roi_shift_param(Jpeg2000Component *comp,
-                                   int quan_parameter)
-{
-    uint8_t roi_shift;
-    int val;
-    roi_shift = comp->roi_shift;
-    val = (quan_parameter < 0)?-quan_parameter:quan_parameter;
-
-    if (val > (1 << roi_shift))
-        return (quan_parameter < 0)?-(val >> roi_shift):(val >> roi_shift);
-    return quan_parameter;
 }
 
 /* TODO: Verify dequantization for lossless case
@@ -2093,50 +2124,86 @@ static inline int roi_shift_param(Jpeg2000Component *comp,
 /* Float dequantization of a codeblock.*/
 static void dequantization_float(int x, int y, Jpeg2000Cblk *cblk,
                                  Jpeg2000Component *comp,
-                                 Jpeg2000T1Context *t1, Jpeg2000Band *band)
+                                 Jpeg2000T1Context *t1, Jpeg2000Band *band, const int M_b)
 {
     int i, j;
     int w = cblk->coord[0][1] - cblk->coord[0][0];
+    const int downshift = 31 - M_b;
+    float fscale = band->f_stepsize;
+    fscale /= (float)(1 << downshift);
     for (j = 0; j < (cblk->coord[1][1] - cblk->coord[1][0]); ++j) {
         float *datap = &comp->f_data[(comp->coord[0][1] - comp->coord[0][0]) * (y + j) + x];
         int *src = t1->data + j*t1->stride;
-        for (i = 0; i < w; ++i)
-            datap[i] = src[i] * band->f_stepsize;
+        for (i = 0; i < w; ++i) {
+            int val = src[i];
+            if (val < 0) // Convert sign-magnitude to two's complement
+                val = -(val & INT32_MAX);
+            datap[i] = (float)val * fscale;
+        }
     }
 }
 
 /* Integer dequantization of a codeblock.*/
 static void dequantization_int(int x, int y, Jpeg2000Cblk *cblk,
                                Jpeg2000Component *comp,
-                               Jpeg2000T1Context *t1, Jpeg2000Band *band)
+                               Jpeg2000T1Context *t1, Jpeg2000Band *band, const int M_b)
 {
     int i, j;
+    const int downshift = 31 - M_b;
     int w = cblk->coord[0][1] - cblk->coord[0][0];
     for (j = 0; j < (cblk->coord[1][1] - cblk->coord[1][0]); ++j) {
         int32_t *datap = &comp->i_data[(comp->coord[0][1] - comp->coord[0][0]) * (y + j) + x];
         int *src = t1->data + j*t1->stride;
         if (band->i_stepsize == 32768) {
-            for (i = 0; i < w; ++i)
-                datap[i] = src[i] / 2;
+            for (i = 0; i < w; ++i) {
+                int val = src[i];
+                if (val < 0)  // Convert sign-magnitude to two's complement
+                    val = -((val & INT32_MAX) >> downshift);
+                else
+                    val >>= downshift;
+                datap[i] = val;
+            }
         } else {
             // This should be VERY uncommon
-            for (i = 0; i < w; ++i)
-                datap[i] = (src[i] * (int64_t)band->i_stepsize) / 65536;
+            for (i = 0; i < w; ++i) {
+                int val = src[i];
+                if (val < 0)  // Convert sign-magnitude to two's complement
+                    val = -((val & INT32_MAX) >> downshift);
+                else
+                    val >>= downshift;
+                datap[i] = (val * (int64_t)band->i_stepsize) / 65536;
+            }
         }
     }
 }
 
 static void dequantization_int_97(int x, int y, Jpeg2000Cblk *cblk,
                                Jpeg2000Component *comp,
-                               Jpeg2000T1Context *t1, Jpeg2000Band *band)
+                               Jpeg2000T1Context *t1, Jpeg2000Band *band, const int M_b)
 {
     int i, j;
     int w = cblk->coord[0][1] - cblk->coord[0][0];
+    float fscale = band->f_stepsize;
+    const int downshift = 31 - M_b;
+    const int PRESCALE = 6; // At least 6 is required to pass the conformance tests in ISO/IEC 15444-4
+    int scale;
+
+    fscale /= (float)(1 << downshift);
+    fscale *= (float)(1 << PRESCALE);
+    fscale *= (float)(1 << (16 + I_PRESHIFT));
+    scale = (int)(fscale + 0.5);
+    band->i_stepsize = scale;
     for (j = 0; j < (cblk->coord[1][1] - cblk->coord[1][0]); ++j) {
         int32_t *datap = &comp->i_data[(comp->coord[0][1] - comp->coord[0][0]) * (y + j) + x];
         int *src = t1->data + j*t1->stride;
-        for (i = 0; i < w; ++i)
-            datap[i] = (src[i] * (int64_t)band->i_stepsize + (1<<15)) >> 16;
+        for (i = 0; i < w; ++i) {
+            int val = src[i];
+            if (val < 0) // Convert sign-magnitude to two's complement
+                val = -(val & INT32_MAX);
+            // Shifting down to prevent overflow in dequantization
+            val = (val + (1 << (PRESCALE - 1))) >> PRESCALE;
+            datap[i] = RSHIFT(val * (int64_t)band->i_stepsize, 16);
+        }
     }
 }
 
@@ -2168,18 +2235,6 @@ static inline void mct_decode(const Jpeg2000DecoderContext *s, Jpeg2000Tile *til
     s->dsp.mct_decode[tile->codsty[0].transform](src[0], src[1], src[2], csize);
 }
 
-static inline void roi_scale_cblk(Jpeg2000Cblk *cblk,
-                                  Jpeg2000Component *comp,
-                                  Jpeg2000T1Context *t1)
-{
-    int i, j;
-    int w = cblk->coord[0][1] - cblk->coord[0][0];
-    for (j = 0; j < (cblk->coord[1][1] - cblk->coord[1][0]); ++j) {
-        int *src = t1->data + j*t1->stride;
-        for (i = 0; i < w; ++i)
-            src[i] = roi_shift_param(comp, src[i]);
-    }
-}
 
 static inline int tile_codeblocks(const Jpeg2000DecoderContext *s, Jpeg2000Tile *tile)
 {
@@ -2242,7 +2297,7 @@ static inline int tile_codeblocks(const Jpeg2000DecoderContext *s, Jpeg2000Tile 
                             ret = decode_cblk(s, codsty, &t1, cblk,
                                               cblk->coord[0][1] - cblk->coord[0][0],
                                               cblk->coord[1][1] - cblk->coord[1][0],
-                                              bandpos, comp->roi_shift);
+                                              bandpos, comp->roi_shift, M_b);
 
                         if (ret)
                             coded = 1;
@@ -2251,14 +2306,12 @@ static inline int tile_codeblocks(const Jpeg2000DecoderContext *s, Jpeg2000Tile 
                         x = cblk->coord[0][0] - band->coord[0][0];
                         y = cblk->coord[1][0] - band->coord[1][0];
 
-                        if (comp->roi_shift)
-                            roi_scale_cblk(cblk, comp, &t1);
                         if (codsty->transform == FF_DWT97)
-                            dequantization_float(x, y, cblk, comp, &t1, band);
+                            dequantization_float(x, y, cblk, comp, &t1, band, M_b);
                         else if (codsty->transform == FF_DWT97_INT)
-                            dequantization_int_97(x, y, cblk, comp, &t1, band);
+                            dequantization_int_97(x, y, cblk, comp, &t1, band, M_b);
                         else
-                            dequantization_int(x, y, cblk, comp, &t1, band);
+                            dequantization_int(x, y, cblk, comp, &t1, band, M_b);
                    } /* end cblk */
                 } /*end prec */
             } /* end band */
@@ -2402,6 +2455,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
     Jpeg2000QuantStyle *qntsty  = s->qntsty;
     Jpeg2000POC         *poc    = &s->poc;
     uint8_t *properties         = s->properties;
+    uint8_t in_tile_headers     = 0;
 
     for (;;) {
         int len, ret = 0;
@@ -2484,7 +2538,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             ret = get_cap(s, codsty);
             break;
         case JPEG2000_COC:
-            if (s->in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
+            if (in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
                 av_log(s->avctx, AV_LOG_ERROR,
                     "COC marker found in a tile header but the codestream belongs to the HOMOGENEOUS set\n");
                 return AVERROR_INVALIDDATA;
@@ -2492,7 +2546,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             ret = get_coc(s, codsty, properties);
             break;
         case JPEG2000_COD:
-            if (s->in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
+            if (in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
                 av_log(s->avctx, AV_LOG_ERROR,
                     "COD marker found in a tile header but the codestream belongs to the HOMOGENEOUS set\n");
                 return AVERROR_INVALIDDATA;
@@ -2500,7 +2554,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             ret = get_cod(s, codsty, properties);
             break;
         case JPEG2000_RGN:
-            if (s->in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
+            if (in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
                 av_log(s->avctx, AV_LOG_ERROR,
                     "RGN marker found in a tile header but the codestream belongs to the HOMOGENEOUS set\n");
                 return AVERROR_INVALIDDATA;
@@ -2512,7 +2566,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             }
             break;
         case JPEG2000_QCC:
-            if (s->in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
+            if (in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
                 av_log(s->avctx, AV_LOG_ERROR,
                     "QCC marker found in a tile header but the codestream belongs to the HOMOGENEOUS set\n");
                 return AVERROR_INVALIDDATA;
@@ -2520,7 +2574,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             ret = get_qcc(s, len, qntsty, properties);
             break;
         case JPEG2000_QCD:
-            if (s->in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
+            if (in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
                 av_log(s->avctx, AV_LOG_ERROR,
                     "QCD marker found in a tile header but the codestream belongs to the HOMOGENEOUS set\n");
                 return AVERROR_INVALIDDATA;
@@ -2528,7 +2582,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             ret = get_qcd(s, len, qntsty, properties);
             break;
         case JPEG2000_POC:
-            if (s->in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
+            if (in_tile_headers == 1 && s->isHT && (!s->Ccap15_b11)) {
                 av_log(s->avctx, AV_LOG_ERROR,
                     "POC marker found in a tile header but the codestream belongs to the HOMOGENEOUS set\n");
                 return AVERROR_INVALIDDATA;
@@ -2536,8 +2590,8 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             ret = get_poc(s, len, poc);
             break;
         case JPEG2000_SOT:
-            if (!s->in_tile_headers) {
-                s->in_tile_headers = 1;
+            if (!in_tile_headers) {
+                in_tile_headers = 1;
                 if (s->has_ppm) {
                     bytestream2_init(&s->packed_headers_stream, s->packed_headers, s->packed_headers_size);
                 }
@@ -2569,7 +2623,7 @@ static int jpeg2000_read_main_headers(Jpeg2000DecoderContext *s)
             break;
         case JPEG2000_PPM:
             // Packed headers, main header
-            if (s->in_tile_headers) {
+            if (in_tile_headers) {
                 av_log(s->avctx, AV_LOG_ERROR, "PPM Marker can only be in Main header\n");
                 return AVERROR_INVALIDDATA;
             }
@@ -2782,7 +2836,7 @@ static av_cold int jpeg2000_decode_init(AVCodecContext *avctx)
     Jpeg2000DecoderContext *s = avctx->priv_data;
 
     if (avctx->lowres)
-        av_log(avctx, AV_LOG_WARNING, "lowres is overriden by reduction_factor but set anyway\n");
+        av_log(avctx, AV_LOG_WARNING, "lowres is overridden by reduction_factor but set anyway\n");
     if (!s->reduction_factor && avctx->lowres < JPEG2000_MAX_RESLEVELS) {
         s->reduction_factor = avctx->lowres;
     }
@@ -2853,16 +2907,9 @@ static int jpeg2000_decode_frame(AVCodecContext *avctx, AVFrame *picture,
     if (ret = jpeg2000_read_bitstream_packets(s))
         goto end;
 
-    for (int x = 0; x < s->ncomponents; x++) {
-        if (s->cdef[x] < 0) {
-            for (x = 0; x < s->ncomponents; x++) {
-                s->cdef[x] = x + 1;
-            }
-            if ((s->ncomponents & 1) == 0)
-                s->cdef[s->ncomponents-1] = 0;
-            break;
-        }
-    }
+    for (int x = 0; x < s->ncomponents && s->codsty[x].transform == FF_DWT53;)
+        if (++x == s->ncomponents)
+            picture->flags |= AV_FRAME_FLAG_LOSSLESS;
 
     avctx->execute2(avctx, jpeg2000_decode_tile, picture, NULL, s->numXtiles * s->numYtiles);
 

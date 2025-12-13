@@ -19,8 +19,8 @@
 #include "libavutil/avassert.h"
 #include "libavutil/random_seed.h"
 #include "libavutil/opt.h"
+#include "libavutil/vulkan_spirv.h"
 #include "vulkan_filter.h"
-#include "vulkan_spirv.h"
 #include "filters.h"
 #include "video.h"
 
@@ -40,10 +40,9 @@ typedef struct XFadeVulkanContext {
     int64_t             offset;
 
     int                 initialized;
-    FFVulkanPipeline    pl;
     FFVkExecPool        e;
-    FFVkQueueFamilyCtx  qf;
-    FFVkSPIRVShader     shd;
+    AVVulkanDeviceQueueFamily *qf;
+    FFVulkanShader      shd;
     VkSampler           sampler;
 
     // PTS when the fade should start (in IN_A timebase)
@@ -326,7 +325,7 @@ static av_cold int init_vulkan(AVFilterContext *avctx)
     XFadeVulkanContext *s = avctx->priv;
     FFVulkanContext *vkctx = &s->vkctx;
     const int planes = av_pix_fmt_count_planes(s->vkctx.output_format);
-    FFVkSPIRVShader *shd = &s->shd;
+    FFVulkanShader *shd = &s->shd;
     FFVkSPIRVCompiler *spv;
     FFVulkanDescriptorSetBinding *desc;
 
@@ -336,13 +335,20 @@ static av_cold int init_vulkan(AVFilterContext *avctx)
         return AVERROR_EXTERNAL;
     }
 
-    ff_vk_qf_init(vkctx, &s->qf, VK_QUEUE_COMPUTE_BIT);
-    RET(ff_vk_exec_pool_init(vkctx, &s->qf, &s->e, s->qf.nb_queues*4, 0, 0, 0, NULL));
-    RET(ff_vk_init_sampler(vkctx, &s->sampler, 1, VK_FILTER_NEAREST));
-    RET(ff_vk_shader_init(&s->pl, &s->shd, "xfade_compute",
-                          VK_SHADER_STAGE_COMPUTE_BIT, 0));
+    s->qf = ff_vk_qf_find(vkctx, VK_QUEUE_COMPUTE_BIT, 0);
+    if (!s->qf) {
+        av_log(avctx, AV_LOG_ERROR, "Device has no compute queues\n");
+        err = AVERROR(ENOTSUP);
+        goto fail;
+    }
 
-    ff_vk_shader_set_compute_sizes(&s->shd, 32, 32, 1);
+    RET(ff_vk_exec_pool_init(vkctx, s->qf, &s->e, s->qf->num*4, 0, 0, 0, NULL));
+    RET(ff_vk_init_sampler(vkctx, &s->sampler, 1, VK_FILTER_NEAREST));
+    RET(ff_vk_shader_init(vkctx, &s->shd, "xfade",
+                          VK_SHADER_STAGE_COMPUTE_BIT,
+                          NULL, 0,
+                          32, 32, 1,
+                          0));
 
     desc = (FFVulkanDescriptorSetBinding []) {
         {
@@ -364,7 +370,7 @@ static av_cold int init_vulkan(AVFilterContext *avctx)
         {
             .name       = "output_images",
             .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .mem_layout = ff_vk_shader_rep_fmt(s->vkctx.output_format),
+            .mem_layout = ff_vk_shader_rep_fmt(s->vkctx.output_format, FF_VK_REP_FLOAT),
             .mem_quali  = "writeonly",
             .dimensions = 2,
             .elems      = planes,
@@ -372,14 +378,14 @@ static av_cold int init_vulkan(AVFilterContext *avctx)
         },
     };
 
-    RET(ff_vk_pipeline_descriptor_set_add(vkctx, &s->pl, shd, desc, 3, 0, 0));
+    RET(ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 3, 0, 0));
 
     GLSLC(0, layout(push_constant, std430) uniform pushConstants {                 );
     GLSLC(1,    float progress;                                                    );
     GLSLC(0, };                                                                    );
 
-    ff_vk_add_push_constant(&s->pl, 0, sizeof(XFadeParameters),
-                            VK_SHADER_STAGE_COMPUTE_BIT);
+    ff_vk_shader_add_push_const(&s->shd, 0, sizeof(XFadeParameters),
+                                VK_SHADER_STAGE_COMPUTE_BIT);
 
     // Add the right transition type function to the shader
     GLSLD(transitions_map[s->transition]);
@@ -393,12 +399,11 @@ static av_cold int init_vulkan(AVFilterContext *avctx)
     GLSLC(1,     }                                                        );
     GLSLC(0, }                                                            );
 
-    RET(spv->compile_shader(spv, avctx, shd, &spv_data, &spv_len, "main",
+    RET(spv->compile_shader(vkctx, spv, shd, &spv_data, &spv_len, "main",
                             &spv_opaque));
-    RET(ff_vk_shader_create(vkctx, shd, spv_data, spv_len, "main"));
+    RET(ff_vk_shader_link(vkctx, shd, spv_data, spv_len, "main"));
 
-    RET(ff_vk_init_compute_pipeline(vkctx, &s->pl, shd));
-    RET(ff_vk_exec_pipeline_register(vkctx, &s->e, &s->pl));
+    RET(ff_vk_shader_register_exec(vkctx, &s->e, &s->shd));
 
     s->initialized = 1;
 
@@ -441,7 +446,7 @@ static int xfade_frame(AVFilterContext *avctx, AVFrame *frame_a, AVFrame *frame_
     progress = av_clipf((float)(s->pts - s->start_pts) / s->duration_pts,
                         0.f, 1.f);
 
-    RET(ff_vk_filter_process_Nin(&s->vkctx, &s->e, &s->pl, output,
+    RET(ff_vk_filter_process_Nin(&s->vkctx, &s->e, &s->shd, output,
                                  (AVFrame *[]){ frame_a, frame_b }, 2, s->sampler,
                                  &(XFadeParameters){ progress }, sizeof(XFadeParameters)));
 
@@ -632,7 +637,6 @@ static av_cold void uninit(AVFilterContext *avctx)
     FFVulkanFunctions *vk = &vkctx->vkfn;
 
     ff_vk_exec_pool_free(vkctx, &s->e);
-    ff_vk_pipeline_free(vkctx, &s->pl);
     ff_vk_shader_free(vkctx, &s->shd);
 
     if (s->sampler)
@@ -705,9 +709,11 @@ static const AVFilterPad xfade_vulkan_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_xfade_vulkan = {
-    .name            = "xfade_vulkan",
-    .description     = NULL_IF_CONFIG_SMALL("Cross fade one video with another video."),
+const FFFilter ff_vf_xfade_vulkan = {
+    .p.name          = "xfade_vulkan",
+    .p.description   = NULL_IF_CONFIG_SMALL("Cross fade one video with another video."),
+    .p.priv_class    = &xfade_vulkan_class,
+    .p.flags         = AVFILTER_FLAG_HWDEVICE,
     .priv_size       = sizeof(XFadeVulkanContext),
     .init            = &ff_vk_filter_init,
     .uninit          = &uninit,
@@ -715,7 +721,5 @@ const AVFilter ff_vf_xfade_vulkan = {
     FILTER_INPUTS(xfade_vulkan_inputs),
     FILTER_OUTPUTS(xfade_vulkan_outputs),
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_VULKAN),
-    .priv_class      = &xfade_vulkan_class,
     .flags_internal  = FF_FILTER_FLAG_HWFRAME_AWARE,
-    .flags           = AVFILTER_FLAG_HWDEVICE,
 };

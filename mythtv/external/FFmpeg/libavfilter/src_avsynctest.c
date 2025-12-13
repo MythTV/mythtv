@@ -93,13 +93,18 @@ static const AVOption avsynctest_options[] = {
 
 AVFILTER_DEFINE_CLASS(avsynctest);
 
-static av_cold int query_formats(AVFilterContext *ctx)
+static av_cold int query_formats(const AVFilterContext *ctx,
+                                 AVFilterFormatsConfig **cfg_in,
+                                 AVFilterFormatsConfig **cfg_out)
 {
-    AVSyncTestContext *s = ctx->priv;
-    AVFilterChannelLayouts *chlayout = NULL;
+    const AVSyncTestContext *s = ctx->priv;
     int sample_rates[] = { s->sample_rate, -1 };
     static const enum AVSampleFormat sample_fmts[] = {
         AV_SAMPLE_FMT_S32, AV_SAMPLE_FMT_NONE
+    };
+    static const AVChannelLayout layouts[] = {
+        AV_CHANNEL_LAYOUT_MONO,
+        { .nb_channels = 0 },
     };
     AVFilterFormats *formats;
     int ret;
@@ -107,25 +112,20 @@ static av_cold int query_formats(AVFilterContext *ctx)
     formats = ff_make_format_list(sample_fmts);
     if (!formats)
         return AVERROR(ENOMEM);
-    if ((ret = ff_formats_ref(formats, &ctx->outputs[0]->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_out[0]->formats)) < 0)
         return ret;
 
     formats = ff_draw_supported_pixel_formats(0);
     if (!formats)
         return AVERROR(ENOMEM);
-    if ((ret = ff_formats_ref(formats, &ctx->outputs[1]->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_out[1]->formats)) < 0)
         return ret;
 
-    if ((ret = ff_add_channel_layout(&chlayout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_MONO)) < 0)
-        return ret;
-    ret = ff_set_common_channel_layouts(ctx, chlayout);
+    ret = ff_set_common_channel_layouts_from_list2(ctx, cfg_in, cfg_out, layouts);
     if (ret < 0)
         return ret;
 
-    formats = ff_make_format_list(sample_rates);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    return ff_set_common_samplerates(ctx, formats);
+    return ff_set_common_samplerates_from_list2(ctx, cfg_in, cfg_out, sample_rates);
 }
 
 static av_cold int aconfig_props(AVFilterLink *outlink)
@@ -147,6 +147,7 @@ static av_cold int config_props(AVFilterLink *outlink)
     FilterLink *l = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
     AVSyncTestContext *s = ctx->priv;
+    int ret;
 
     outlink->w = s->w;
     outlink->h = s->h;
@@ -160,7 +161,11 @@ static av_cold int config_props(AVFilterLink *outlink)
     s->dir = 1;
     s->prev_intpart = INT64_MIN;
 
-    ff_draw_init2(&s->draw, outlink->format, outlink->colorspace, outlink->color_range, 0);
+    ret = ff_draw_init2(&s->draw, outlink->format, outlink->colorspace, outlink->color_range, 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
 
     ff_draw_color(&s->draw, &s->fg, s->rgba[0]);
     ff_draw_color(&s->draw, &s->bg, s->rgba[1]);
@@ -247,6 +252,7 @@ static int audio_frame(AVFilterLink *outlink)
 static void draw_text(FFDrawContext *draw, AVFrame *out, FFDrawColor *color,
                       int x0, int y0, const uint8_t *text)
 {
+    const uint8_t *cga_font = avpriv_cga_font_get();
     int x = x0;
 
     for (; *text; text++) {
@@ -257,7 +263,7 @@ static void draw_text(FFDrawContext *draw, AVFrame *out, FFDrawColor *color,
         }
         ff_blend_mask(draw, color, out->data, out->linesize,
                       out->width, out->height,
-                      avpriv_cga_font + *text * 8, 1, 8, 8, 0, 0, x, y0);
+                      &cga_font[*text * 8], 1, 8, 8, 0, 0, x, y0);
         x += 8;
     }
 }
@@ -396,14 +402,13 @@ static const AVFilterPad avsynctest_outputs[] = {
     },
 };
 
-const AVFilter ff_avsrc_avsynctest = {
-    .name          = "avsynctest",
-    .description   = NULL_IF_CONFIG_SMALL("Generate an Audio Video Sync Test."),
+const FFFilter ff_avsrc_avsynctest = {
+    .p.name        = "avsynctest",
+    .p.description = NULL_IF_CONFIG_SMALL("Generate an Audio Video Sync Test."),
+    .p.priv_class  = &avsynctest_class,
     .priv_size     = sizeof(AVSyncTestContext),
-    .priv_class    = &avsynctest_class,
-    .inputs        = NULL,
     .activate      = activate,
     FILTER_OUTPUTS(avsynctest_outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = ff_filter_process_command,
 };

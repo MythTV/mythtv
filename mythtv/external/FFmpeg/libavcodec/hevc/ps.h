@@ -205,6 +205,8 @@ typedef struct HEVCVPS {
      */
     int nb_layers;
 
+    uint16_t scalability_mask_flag;
+
     // LayerIdxInVps[nuh_layer_id], i.e. a mapping of nuh_layer_id to VPS layer
     // indices. Valid values are between 0 and HEVC_VPS_MAX_LAYERS. Entries for
     // unmapped values of nuh_layer_id are set to -1.
@@ -235,6 +237,7 @@ typedef struct HEVCVPS {
 
     // NumDirectRefLayers[layer_idx]
     uint8_t num_direct_ref_layers[HEVC_VPS_MAX_LAYERS];
+    uint8_t num_add_layer_sets;
 
     RepFormat rep_format;
 
@@ -343,7 +346,7 @@ typedef struct HEVCSPS {
     int sps_palette_predictor_initializer[3][HEVC_MAX_PALETTE_PREDICTOR_SIZE];
     int motion_vector_resolution_control_idc;
 
-    ///< coded frame dimension in various units
+    /// coded frame dimension in various units
     int width;
     int height;
     int ctb_width;

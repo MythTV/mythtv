@@ -199,7 +199,7 @@ typedef struct WMAVoiceContext {
                                   ///< to #wmavoice_decode_packet() (since
                                   ///< they're part of the previous superframe)
 
-    uint8_t sframe_cache[SFRAME_CACHE_MAXSIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+    uint8_t sframe_cache[SFRAME_CACHE_MAXSIZE + AV_INPUT_BUFFER_PADDING_SIZE]; ///<
                                   ///< cache for superframe data split over
                                   ///< multiple packets
     int sframe_cache_size;        ///< set to >0 if we have data from an
@@ -249,10 +249,9 @@ typedef struct WMAVoiceContext {
                                   ///< only used for comfort noise in #pRNG()
     int nb_superframes;           ///< number of superframes in current packet
     float gain_pred_err[6];       ///< cache for gain prediction
-    float excitation_history[MAX_SIGNAL_HISTORY];
-                                  ///< cache of the signal of previous
-                                  ///< superframes, used as a history for
-                                  ///< signal generation
+    float excitation_history[MAX_SIGNAL_HISTORY]; ///< cache of the signal of
+                                  ///< previous superframes, used as a history
+                                  ///< for signal generation
     float synth_history[MAX_LSPS]; ///< see #excitation_history
     /**
      * @}
@@ -272,18 +271,16 @@ typedef struct WMAVoiceContext {
     float postfilter_agc;         ///< gain control memory, used in
                                   ///< #adaptive_gain_control()
     float dcf_mem[2];             ///< DC filter history
+    /// zero filter output (i.e. excitation) by postfilter
     float zero_exc_pf[MAX_SIGNAL_HISTORY + MAX_SFRAMESIZE];
-                                  ///< zero filter output (i.e. excitation)
-                                  ///< by postfilter
     float denoise_filter_cache[MAX_FRAMESIZE];
     int   denoise_filter_cache_size; ///< samples in #denoise_filter_cache
+    /// aligned buffer for LPC tilting
     DECLARE_ALIGNED(32, float, tilted_lpcs_pf)[0x82];
-                                  ///< aligned buffer for LPC tilting
+    /// aligned buffer for denoise coefficients
     DECLARE_ALIGNED(32, float, denoise_coeffs_pf)[0x82];
-                                  ///< aligned buffer for denoise coefficients
+    /// aligned buffer for postfilter speech synthesis
     DECLARE_ALIGNED(32, float, synth_filter_out_buf)[0x80 + MAX_LSPS_ALIGN16];
-                                  ///< aligned buffer for postfilter speech
-                                  ///< synthesis
     /**
      * @}
      */
@@ -562,7 +559,7 @@ static int kalman_smoothen(WMAVoiceContext *s, int pitch,
 
     /* find best fitting point in history */
     do {
-        dot = avpriv_scalarproduct_float_c(in, ptr, size);
+        dot = ff_scalarproduct_float_c(in, ptr, size);
         if (dot > optimal_gain) {
             optimal_gain  = dot;
             best_hist_ptr = ptr;
@@ -571,7 +568,7 @@ static int kalman_smoothen(WMAVoiceContext *s, int pitch,
 
     if (optimal_gain <= 0)
         return -1;
-    dot = avpriv_scalarproduct_float_c(best_hist_ptr, best_hist_ptr, size);
+    dot = ff_scalarproduct_float_c(best_hist_ptr, best_hist_ptr, size);
     if (dot <= 0) // would be 1.0
         return -1;
 
@@ -601,8 +598,8 @@ static float tilt_factor(const float *lpcs, int n_lpcs)
 {
     float rh0, rh1;
 
-    rh0 = 1.0     + avpriv_scalarproduct_float_c(lpcs,  lpcs,    n_lpcs);
-    rh1 = lpcs[0] + avpriv_scalarproduct_float_c(lpcs, &lpcs[1], n_lpcs - 1);
+    rh0 = 1.0     + ff_scalarproduct_float_c(lpcs,  lpcs,    n_lpcs);
+    rh1 = lpcs[0] + ff_scalarproduct_float_c(lpcs, &lpcs[1], n_lpcs - 1);
 
     return rh1 / rh0;
 }
@@ -702,8 +699,8 @@ static void calc_input_response(WMAVoiceContext *s, float *lpcs_src,
                              -1.8 * tilt_factor(coeffs_dst, remainder - 1),
                              coeffs_dst, remainder);
     }
-    sq = (1.0 / 64.0) * sqrtf(1 / avpriv_scalarproduct_float_c(coeffs_dst, coeffs_dst,
-                                                               remainder));
+    sq = (1.0 / 64.0) * sqrtf(1 / ff_scalarproduct_float_c(coeffs_dst, coeffs_dst,
+                                                           remainder));
     for (n = 0; n < remainder; n++)
         coeffs_dst[n] *= sq;
 }
@@ -1381,8 +1378,8 @@ static void synth_block_fcb_acb(WMAVoiceContext *s, GetBitContext *gb,
     /* Calculate gain for adaptive & fixed codebook signal.
      * see ff_amr_set_fixed_gain(). */
     idx = get_bits(gb, 7);
-    fcb_gain = expf(avpriv_scalarproduct_float_c(s->gain_pred_err,
-                                                 gain_coeff, 6) -
+    fcb_gain = expf(ff_scalarproduct_float_c(s->gain_pred_err,
+                                             gain_coeff, 6) -
                     5.2409161640 + wmavoice_gain_codebook_fcb[idx]);
     acb_gain = wmavoice_gain_codebook_acb[idx];
     pred_err = av_clipf(wmavoice_gain_codebook_fcb[idx],
@@ -2030,11 +2027,7 @@ const FFCodec ff_wmavoice_decoder = {
     .init             = wmavoice_decode_init,
     .close            = wmavoice_decode_end,
     FF_CODEC_DECODE_CB(wmavoice_decode_packet),
-    .p.capabilities   =
-#if FF_API_SUBFRAMES
-                        AV_CODEC_CAP_SUBFRAMES |
-#endif
-                        AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
     .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
     .flush            = wmavoice_flush,
 };

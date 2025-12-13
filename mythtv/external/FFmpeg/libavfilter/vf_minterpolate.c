@@ -387,7 +387,7 @@ static int config_input(AVFilterLink *inlink)
     }
 
     if (mi_ctx->scd_method == SCD_METHOD_FDIFF) {
-        mi_ctx->sad = ff_scene_sad_get_fn(mi_ctx->bitdepth == 8 ? 8 : 16);
+        mi_ctx->sad = ff_scene_sad_get_fn(mi_ctx->bitdepth);
         if (!mi_ctx->sad)
             return AVERROR(EINVAL);
     }
@@ -1252,11 +1252,11 @@ static const AVFilterPad minterpolate_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_minterpolate = {
-    .name          = "minterpolate",
-    .description   = NULL_IF_CONFIG_SMALL("Frame rate conversion using Motion Interpolation."),
+const FFFilter ff_vf_minterpolate = {
+    .p.name        = "minterpolate",
+    .p.description = NULL_IF_CONFIG_SMALL("Frame rate conversion using Motion Interpolation."),
+    .p.priv_class  = &minterpolate_class,
     .priv_size     = sizeof(MIContext),
-    .priv_class    = &minterpolate_class,
     .uninit        = uninit,
     FILTER_INPUTS(minterpolate_inputs),
     FILTER_OUTPUTS(minterpolate_outputs),

@@ -223,6 +223,21 @@ fate-kgv1: CMD = framecrc -i $(TARGET_SAMPLES)/kega/kgv1.avi -pix_fmt rgb555le -
 FATE_VIDEO-$(call FRAMECRC, AVI, KMVC, SCALE_FILTER) += fate-kmvc
 fate-kmvc: CMD = framecrc -i $(TARGET_SAMPLES)/KMVC/LOGO1.AVI -an -t 3 -pix_fmt rgb24 -vf scale
 
+FATE_LEAD_VIDEO-$(call FRAMECRC, AVI, LEAD) += fate-lead-yuv420p
+fate-lead-yuv420p: CMD = framecrc -idct simple -fflags +bitexact -i $(TARGET_SAMPLES)/lead/BeforeEmboss1.avi -an
+
+FATE_LEAD_VIDEO-$(call FRAMECRC, AVI, LEAD) += fate-lead-yuv420p-half
+fate-lead-yuv420p-half: CMD = framecrc -idct simple -fflags +bitexact -i $(TARGET_SAMPLES)/lead/DaDa_CMP1.avi -an
+
+FATE_LEAD_VIDEO-$(call FRAMECRC, AVI, LEAD) += fate-lead-yuv420p-zero
+fate-lead-yuv420p-zero: CMD = framecrc -idct simple -fflags +bitexact -i $(TARGET_SAMPLES)/lead/lead_0x0.avi -an
+
+FATE_LEAD_VIDEO-$(call FRAMECRC, AVI, LEAD) += fate-lead-yuv444p
+fate-lead-yuv444p: CMD = framecrc -idct simple -fflags +bitexact -i $(TARGET_SAMPLES)/lead/version320x240i1.avi -an
+
+FATE_VIDEO-yes += $(FATE_LEAD_VIDEO-yes)
+fate-lead: $(FATE_LEAD_VIDEO-yes)
+
 FATE_VIDEO-$(call FRAMECRC, AVI, LSCR) += fate-lscr
 fate-lscr: CMD = framecrc -i $(TARGET_SAMPLES)/lscr/lscr_compr9_short.avi
 
@@ -251,6 +266,10 @@ fate-mdec: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/ea-dct/NFS2Esprit-pa
 FATE_VIDEO-$(call FRAMECRC, STR, MDEC) += fate-mdec-v3
 fate-mdec-v3: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/psx-str/abc000_cut.str -an
 
+FATE_VIDEO-$(call REMUX, MOV, MEDIA100_TO_MJPEGB_BSF MEDIA100_DECODER MJPEGB_DECODER) += fate-media100
+fate-media100: CMD = transcode mov $(TARGET_SAMPLES)/mjpegb/media100.mov mov \
+                     "-map 0 -map 0 -c copy -bsf:v:0 media100_to_mjpegb -tag:v:0 mjpb" "-map 0"
+
 FATE_VIDEO-$(call FRAMECRC, MSNWC_TCP, MIMIC) += fate-mimic
 fate-mimic: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/mimic/mimic2-womanloveffmpeg.cam
 
@@ -263,7 +282,7 @@ fate-mjpeg-ticket3229: CMD = framecrc -idct simple -fflags +bitexact -i $(TARGET
 FATE_VIDEO-$(call FRAMECRC, MVI, MOTIONPIXELS, SCALE_FILTER) += fate-motionpixels
 fate-motionpixels: CMD = framecrc -i $(TARGET_SAMPLES)/motion-pixels/INTRO-partial.MVI -an -pix_fmt rgb24 -frames:v 111 -vf scale
 
-FATE_VIDEO-$(call FRAMECRC, MPEGTS, MPEG2VIDEO) += fate-mpeg2-field-enc fate-mpeg2-ticket186
+FATE_VIDEO-$(call FRAMECRC, MPEGTS, MPEG2VIDEO, MPEGVIDEO_PARSER) += fate-mpeg2-field-enc fate-mpeg2-ticket186
 fate-mpeg2-field-enc: CMD = framecrc -flags +bitexact -idct simple -i $(TARGET_SAMPLES)/mpeg2/mpeg2_field_encoding.ts -an -frames:v 30
 fate-mpeg2-ticket186: CMD = framecrc -flags +bitexact -idct simple -i $(TARGET_SAMPLES)/mpeg2/t.mpg -an
 
@@ -288,7 +307,7 @@ fate-nuv-rtjpeg: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/nuv/Today.nuv 
 FATE_NUV += fate-nuv-rtjpeg-fh
 fate-nuv-rtjpeg-fh: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/nuv/rtjpeg_frameheader.nuv -an
 
-FATE_VIDEO-$(call DEMDEC, NUV, NUV) += $(FATE_NUV)
+FATE_VIDEO-$(call FRAMECRC, NUV, NUV) += $(FATE_NUV)
 fate-nuv: $(FATE_NUV)
 
 FATE_VIDEO-$(call FRAMECRC, PAF, PAF_VIDEO, SCALE_FILTER) += fate-paf-video
@@ -388,6 +407,14 @@ fate-smvjpeg: CMD = framecrc -idct simple -flags +bitexact -i $(TARGET_SAMPLES)/
 
 FATE_VIDEO-$(call FRAMECRC, AVI, VQC) += fate-vqc
 fate-vqc: CMD = framecrc -i $(TARGET_SAMPLES)/vqc/samp1.avi
+
+FATE_VIDEO-$(call FRAMECRC, RM, RV60) += fate-rv60-512x512
+fate-rv60-512x512: CMD = framecrc -i $(TARGET_SAMPLES)/rv60/test512x512.rmhd -an
+
+FATE_VIDEO-$(call FRAMECRC, RM, RV60) += fate-rv60-72x72
+fate-rv60-72x72: CMD = framecrc -i $(TARGET_SAMPLES)/rv60/test72x72.rmhd -an
+
+fate-rv60: fate-rv60-72x72 fate-rv60-512x512
 
 FATE_VIDEO += $(FATE_VIDEO-yes)
 

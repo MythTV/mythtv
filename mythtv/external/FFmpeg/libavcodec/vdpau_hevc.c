@@ -32,6 +32,7 @@
 
 
 static int vdpau_hevc_start_frame(AVCodecContext *avctx,
+                                  const AVBufferRef *buffer_ref,
                                   const uint8_t *buffer, uint32_t size)
 {
     HEVCContext *h = avctx->priv_data;
@@ -513,7 +514,7 @@ static int vdpau_hevc_parse_rext_profile(AVCodecContext *avctx, VdpDecoderProfil
 }
 
 
-static int vdpau_hevc_init(AVCodecContext *avctx)
+static av_cold int vdpau_hevc_init(AVCodecContext *avctx)
 {
     VdpDecoderProfile profile;
     uint32_t level = avctx->level;

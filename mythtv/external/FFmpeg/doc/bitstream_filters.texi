@@ -189,6 +189,52 @@ see page 44-46 or section 5.5 of
 
 Extract the core from a E-AC-3 stream, dropping extra channels.
 
+@section eia608_to_smpte436m
+
+Convert from a @code{EIA_608} stream to a @code{SMPTE_436M_ANC} data stream, wrapping the closed captions in CTA-708 CDP VANC packets.
+
+@table @option
+@item line_number
+Choose which line number the generated VANC packets should go on. You generally want either line 9 (the default) or 11.
+@item wrapping_type
+Choose the SMPTE 436M wrapping type, defaults to @samp{vanc_frame}.
+It accepts the values:
+@table @samp
+@item vanc_frame
+VANC frame (interlaced or segmented progressive frame)
+@item vanc_field_1
+@item vanc_field_2
+@item vanc_progressive_frame
+@end table
+@item sample_coding
+Choose the SMPTE 436M sample coding, defaults to @samp{8bit_luma}.
+It accepts the values:
+@table @samp
+@item 8bit_luma
+8-bit component luma samples
+@item 8bit_color_diff
+8-bit component color difference samples
+@item 8bit_luma_and_color_diff
+8-bit component luma and color difference samples
+@item 10bit_luma
+10-bit component luma samples
+@item 10bit_color_diff
+10-bit component color difference samples
+@item 10bit_luma_and_color_diff
+10-bit component luma and color difference samples
+@item 8bit_luma_parity_error
+8-bit component luma samples with parity error
+@item 8bit_color_diff_parity_error
+8-bit component color difference samples with parity error
+@item 8bit_luma_and_color_diff_parity_error
+8-bit component luma and color difference samples with parity error
+@end table
+@item initial_cdp_sequence_cntr
+The initial value of the CDP's 16-bit unsigned integer @code{cdp_hdr_sequence_cntr} and @code{cdp_ftr_sequence_cntr} fields. Defaults to 0.
+@item cdp_frame_rate
+Set the CDP's @code{cdp_frame_rate} field. This doesn't actually change the timing of the data stream, it just changes the values inserted in that field in the generated CDP packets. Defaults to @samp{30000/1001}.
+@end table
+
 @section extract_extradata
 
 Extract the in-band extradata.
@@ -423,9 +469,21 @@ Please note that this filter is auto-inserted for MPEG-TS (muxer
 
 @section h264_redundant_pps
 
-This applies a specific fixup to some Blu-ray streams which contain
-redundant PPSs modifying irrelevant parameters of the stream which
-confuse other transformations which require correct extradata.
+This applies a specific fixup to some Blu-ray BDMV H264 streams
+which contain redundant PPSs. The PPSs modify irrelevant parameters
+of the stream, confusing other transformations which require
+the correct extradata.
+
+The encoder used on these impacted streams adds extra PPSs throughout
+the stream, varying the initial QP and whether weighted prediction
+was enabled. This causes issues after copying the stream into
+a global header container, as the starting PPS is not suitable
+for the rest of the stream. One side effect, for example,
+is seeking will return garbled output until a new PPS appears.
+
+This BSF removes the extra PPSs and rewrites the slice headers
+such that the stream uses a single leading PPS in the global header,
+which resolves the issue.
 
 @section hevc_metadata
 
@@ -696,12 +754,12 @@ ffmpeg -i INPUT -c copy -bsf noise=1 output.mkv
 Drop every video packet not marked as a keyframe after timestamp 30s but do not
 modify any of the remaining packets.
 @example
-ffmpeg -i INPUT -c copy -bsf:v noise=drop='gt(t\,30)*not(key)' output.mkv
+ffmpeg -i INPUT -c copy -bsf:v noise=drop='gt(pts*tb\,30)*not(key)' output.mkv
 @end example
 
 Drop one second of audio every 10 seconds and add some random noise to the rest.
 @example
-ffmpeg -i INPUT -c copy -bsf:a noise=amount=-1:drop='between(mod(t\,10)\,9\,10)' output.mkv
+ffmpeg -i INPUT -c copy -bsf:a noise=amount=-1:drop='between(mod(pts*tb\,10)\,9\,10)' output.mkv
 @end example
 
 @section null
@@ -935,6 +993,11 @@ ffmpeg -i INPUT -c:a copy -bsf:a setts=pts=DTS out.mkv
 @section showinfo
 Log basic packet information. Mainly useful for testing, debugging,
 and development.
+
+@section smpte436m_to_eia608
+
+Convert from a @code{SMPTE_436M_ANC} data stream to a @code{EIA_608} stream,
+extracting the closed captions from CTA-708 CDP VANC packets, and ignoring all other data.
 
 @anchor{text2movsub}
 @section text2movsub

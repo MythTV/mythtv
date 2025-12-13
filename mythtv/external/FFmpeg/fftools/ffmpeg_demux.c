@@ -67,17 +67,19 @@ typedef struct DemuxStream {
     int                      reinit_filters;
     int                      autorotate;
     int                      apply_cropping;
+    int                      force_display_matrix;
+    int                      drop_changed;
 
 
     int                      wrap_correction_done;
     int                      saw_first_ts;
-    ///< dts of the first packet read for this stream (in AV_TIME_BASE units)
+    /// dts of the first packet read for this stream (in AV_TIME_BASE units)
     int64_t                  first_dts;
 
     /* predicted dts of the next packet read for this stream or (when there are
      * several frames in a packet) of the next frame in current packet (in AV_TIME_BASE units) */
     int64_t                  next_dts;
-    ///< dts of the last packet read for this stream (in AV_TIME_BASE units)
+    /// dts of the last packet read for this stream (in AV_TIME_BASE units)
     int64_t                  dts;
 
     const AVCodecDescriptor *codec_desc;
@@ -94,6 +96,12 @@ typedef struct DemuxStream {
     uint64_t                 nb_packets;
     // combined size of all the packets read
     uint64_t                 data_size;
+    // latest wallclock time at which packet reading resumed after a stall - used for readrate
+    int64_t                  resume_wc;
+    // timestamp of first packet sent after the latest stall - used for readrate
+    int64_t                  resume_pts;
+    // measure of how far behind packet reading is against spceified readrate
+    int64_t                  lag;
 } DemuxStream;
 
 typedef struct Demuxer {
@@ -127,6 +135,7 @@ typedef struct Demuxer {
 
     float                 readrate;
     double                readrate_initial_burst;
+    float                 readrate_catchup;
 
     Scheduler            *sch;
 
@@ -240,7 +249,7 @@ static void ts_discontinuity_detect(Demuxer *d, InputStream *ist,
             }
         } else {
             if (FFABS(delta) > 1LL * dts_error_threshold * AV_TIME_BASE) {
-                av_log(NULL, AV_LOG_WARNING,
+                av_log(ist, AV_LOG_WARNING,
                        "DTS %"PRId64", next:%"PRId64" st:%d invalid dropping\n",
                        pkt->dts, ds->next_dts, pkt->stream_index);
                 pkt->dts = AV_NOPTS_VALUE;
@@ -249,7 +258,7 @@ static void ts_discontinuity_detect(Demuxer *d, InputStream *ist,
                 int64_t pkt_pts = av_rescale_q(pkt->pts, pkt->time_base, AV_TIME_BASE_Q);
                 delta = pkt_pts - ds->next_dts;
                 if (FFABS(delta) > 1LL * dts_error_threshold * AV_TIME_BASE) {
-                    av_log(NULL, AV_LOG_WARNING,
+                    av_log(ist, AV_LOG_WARNING,
                            "PTS %"PRId64", next:%"PRId64" invalid dropping st:%d\n",
                            pkt->pts, ds->next_dts, pkt->stream_index);
                     pkt->pts = AV_NOPTS_VALUE;
@@ -261,7 +270,7 @@ static void ts_discontinuity_detect(Demuxer *d, InputStream *ist,
         int64_t delta = pkt_dts - d->last_ts;
         if (FFABS(delta) > 1LL * dts_delta_threshold * AV_TIME_BASE) {
             d->ts_offset_discont -= delta;
-            av_log(NULL, AV_LOG_DEBUG,
+            av_log(ist, AV_LOG_DEBUG,
                    "Inter stream timestamp discontinuity %"PRId64", new offset= %"PRId64"\n",
                    delta, d->ts_offset_discont);
             pkt->dts -= av_rescale_q(delta, AV_TIME_BASE_Q, pkt->time_base);
@@ -476,7 +485,7 @@ static int input_packet_process(Demuxer *d, AVPacket *pkt, unsigned *send_flags)
     fd->wallclock[LATENCY_PROBE_DEMUX] = av_gettime_relative();
 
     if (debug_ts) {
-        av_log(NULL, AV_LOG_INFO, "demuxer+ffmpeg -> ist_index:%d:%d type:%s pkt_pts:%s pkt_pts_time:%s pkt_dts:%s pkt_dts_time:%s duration:%s duration_time:%s off:%s off_time:%s\n",
+        av_log(ist, AV_LOG_INFO, "demuxer+ffmpeg -> ist_index:%d:%d type:%s pkt_pts:%s pkt_pts_time:%s pkt_dts:%s pkt_dts_time:%s duration:%s duration_time:%s off:%s off_time:%s\n",
                f->index, pkt->stream_index,
                av_get_media_type_string(ist->par->codec_type),
                av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, &pkt->time_base),
@@ -495,16 +504,42 @@ static void readrate_sleep(Demuxer *d)
                           (f->start_time_effective != AV_NOPTS_VALUE ? f->start_time_effective * !start_at_zero : 0) +
                           (f->start_time != AV_NOPTS_VALUE ? f->start_time : 0)
                          );
-    int64_t burst_until = AV_TIME_BASE * d->readrate_initial_burst;
+    int64_t initial_burst = AV_TIME_BASE * d->readrate_initial_burst;
+    int resume_warn = 0;
+
     for (int i = 0; i < f->nb_streams; i++) {
         InputStream *ist = f->streams[i];
         DemuxStream  *ds = ds_from_ist(ist);
-        int64_t stream_ts_offset, pts, now;
+        int64_t stream_ts_offset, pts, now, wc_elapsed, elapsed, lag, max_pts, limit_pts;
+
+        if (ds->discard) continue;
+
         stream_ts_offset = FFMAX(ds->first_dts != AV_NOPTS_VALUE ? ds->first_dts : 0, file_start);
         pts = av_rescale(ds->dts, 1000000, AV_TIME_BASE);
-        now = (av_gettime_relative() - d->wallclock_start) * d->readrate + stream_ts_offset;
-        if (pts - burst_until > now)
-            av_usleep(pts - burst_until - now);
+        now = av_gettime_relative();
+        wc_elapsed = now - d->wallclock_start;
+        max_pts = stream_ts_offset + initial_burst + wc_elapsed * d->readrate;
+        lag = FFMAX(max_pts - pts, 0);
+        if ( (!ds->lag && lag > 0.3 * AV_TIME_BASE) || ( lag > ds->lag + 0.3 * AV_TIME_BASE) ) {
+            ds->lag = lag;
+            ds->resume_wc = now;
+            ds->resume_pts = pts;
+            av_log_once(ds, AV_LOG_WARNING, AV_LOG_DEBUG, &resume_warn,
+                        "Resumed reading at pts %0.3f with rate %0.3f after a lag of %0.3fs\n",
+                        (float)pts/AV_TIME_BASE, d->readrate_catchup, (float)lag/AV_TIME_BASE);
+        }
+        if (ds->lag && !lag)
+            ds->lag = ds->resume_wc = ds->resume_pts = 0;
+        if (ds->resume_wc) {
+            elapsed = now - ds->resume_wc;
+            limit_pts = ds->resume_pts + elapsed * d->readrate_catchup;
+        } else {
+            elapsed = wc_elapsed;
+            limit_pts = max_pts;
+        }
+
+        if (pts > limit_pts)
+            av_usleep(pts - limit_pts);
     }
 }
 
@@ -840,7 +875,6 @@ static void ist_free(InputStream **pist)
 
     av_dict_free(&ds->decoder_opts);
     av_freep(&ist->filters);
-    av_freep(&ist->outputs);
     av_freep(&ds->dec_opts.hwaccel_device);
 
     avcodec_parameters_free(&ist->par);
@@ -874,8 +908,8 @@ void ifile_close(InputFile **pf)
     av_freep(pf);
 }
 
-static int ist_use(InputStream *ist, int decoding_needed,
-                   const ViewSpecifier *vs, SchedulerNode *src)
+int ist_use(InputStream *ist, int decoding_needed,
+            const ViewSpecifier *vs, SchedulerNode *src)
 {
     Demuxer      *d = demuxer_from_ifile(ist->file);
     DemuxStream *ds = ds_from_ist(ist);
@@ -912,9 +946,18 @@ static int ist_use(InputStream *ist, int decoding_needed,
 
     if (decoding_needed && ds->sch_idx_dec < 0) {
         int is_audio = ist->st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO;
+        int is_unreliable = !!(d->f.ctx->iformat->flags & AVFMT_NOTIMESTAMPS);
+        int64_t use_wallclock_as_timestamps;
+
+        ret = av_opt_get_int(d->f.ctx, "use_wallclock_as_timestamps", 0, &use_wallclock_as_timestamps);
+        if (ret < 0)
+            return ret;
+
+        if (use_wallclock_as_timestamps)
+            is_unreliable = 0;
 
         ds->dec_opts.flags |= (!!ist->fix_sub_duration * DECODER_FLAG_FIX_SUB_DURATION) |
-                              (!!(d->f.ctx->iformat->flags & AVFMT_NOTIMESTAMPS) * DECODER_FLAG_TS_UNRELIABLE) |
+                              (!!is_unreliable * DECODER_FLAG_TS_UNRELIABLE) |
                               (!!(d->loop && is_audio) * DECODER_FLAG_SEND_END_TS)
 #if FFMPEG_OPT_TOP
                               | ((ist->top_field_first >= 0) * DECODER_FLAG_TOP_FIELD_FIRST)
@@ -973,25 +1016,6 @@ static int ist_use(InputStream *ist, int decoding_needed,
     }
 
     return 0;
-}
-
-int ist_output_add(InputStream *ist, OutputStream *ost)
-{
-    DemuxStream *ds = ds_from_ist(ist);
-    SchedulerNode src;
-    int ret;
-
-    ret = ist_use(ist, ost->enc ? DECODING_FOR_OST : 0, NULL, &src);
-    if (ret < 0)
-        return ret;
-
-    ret = GROW_ARRAY(ist->outputs, ist->nb_outputs);
-    if (ret < 0)
-        return ret;
-
-    ist->outputs[ist->nb_outputs - 1] = ost;
-
-    return ost->enc ? ds->sch_idx_dec : ds->sch_idx_stream;
 }
 
 int ist_filter_add(InputStream *ist, InputFilter *ifilter, int is_simple,
@@ -1086,7 +1110,8 @@ int ist_filter_add(InputStream *ist, InputFilter *ifilter, int is_simple,
         return AVERROR(ENOMEM);
 
     opts->flags |= IFILTER_FLAG_AUTOROTATE * !!(ds->autorotate) |
-                   IFILTER_FLAG_REINIT     * !!(ds->reinit_filters);
+                   IFILTER_FLAG_REINIT     * !!(ds->reinit_filters) |
+                   IFILTER_FLAG_DROPCHANGED* !!(ds->drop_changed);
 
     return 0;
 }
@@ -1124,7 +1149,7 @@ static int choose_decoder(const OptionsContext *o, void *logctx,
 
                 for (int j = 0; config = avcodec_get_hw_config(c, j); j++) {
                     if (config->device_type == hwaccel_device_type) {
-                        av_log(NULL, AV_LOG_VERBOSE, "Selecting decoder '%s' because of requested hwaccel method %s\n",
+                        av_log(logctx, AV_LOG_VERBOSE, "Selecting decoder '%s' because of requested hwaccel method %s\n",
                                c->name, av_hwdevice_get_type_name(hwaccel_device_type));
                         *pcodec = c;
                         return 0;
@@ -1159,6 +1184,7 @@ static int add_display_matrix_to_stream(const OptionsContext *o,
                                         AVFormatContext *ctx, InputStream *ist)
 {
     AVStream *st = ist->st;
+    DemuxStream *ds = ds_from_ist(ist);
     AVPacketSideData *sd;
     double rotation = DBL_MAX;
     int hflip = -1, vflip = -1;
@@ -1192,6 +1218,8 @@ static int add_display_matrix_to_stream(const OptionsContext *o,
     av_display_matrix_flip(buf,
                            hflip_set ? hflip : 0,
                            vflip_set ? vflip : 0);
+
+    ds->force_display_matrix = 1;
 
     return 0;
 }
@@ -1397,6 +1425,17 @@ static int ist_add(const OptionsContext *o, Demuxer *d, AVStream *st, AVDictiona
     ds->reinit_filters = -1;
     opt_match_per_stream_int(ist, &o->reinit_filters, ic, st, &ds->reinit_filters);
 
+    ds->drop_changed = 0;
+    opt_match_per_stream_int(ist, &o->drop_changed, ic, st, &ds->drop_changed);
+
+    if (ds->drop_changed && ds->reinit_filters) {
+        if (ds->reinit_filters > 0) {
+            av_log(ist, AV_LOG_ERROR, "drop_changed and reinit_filters both enabled. These are mutually exclusive.\n");
+            return AVERROR(EINVAL);
+        }
+        ds->reinit_filters = 0;
+    }
+
     ist->user_set_discard = AVDISCARD_NONE;
 
     if ((o->video_disable && ist->st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) ||
@@ -1420,6 +1459,15 @@ static int ist_add(const OptionsContext *o, Demuxer *d, AVStream *st, AVDictiona
     av_dict_set_int(&ds->decoder_opts, "apply_cropping",
                     ds->apply_cropping && ds->apply_cropping != CROP_CONTAINER, 0);
 
+    if (ds->force_display_matrix) {
+        char buf[32];
+        if (av_dict_get(ds->decoder_opts, "side_data_prefer_packet", NULL, 0))
+            buf[0] = ',';
+        else
+            buf[0] = '\0';
+        av_strlcat(buf, "displaymatrix", sizeof(buf));
+        av_dict_set(&ds->decoder_opts, "side_data_prefer_packet", buf, AV_DICT_APPEND);
+    }
     /* Attached pics are sparse, therefore we would not want to delay their decoding
      * till EOF. */
     if (ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC)
@@ -1746,8 +1794,9 @@ int ifile_open(const OptionsContext *o, const char *filename, Scheduler *sch)
     /* open the input file with generic avformat function */
     err = avformat_open_input(&ic, filename, file_iformat, &o->g->format_opts);
     if (err < 0) {
-        av_log(d, AV_LOG_ERROR,
-               "Error opening input: %s\n", av_err2str(err));
+        if (err != AVERROR_EXIT)
+            av_log(d, AV_LOG_ERROR,
+                   "Error opening input: %s\n", av_err2str(err));
         if (err == AVERROR_PROTOCOL_NOT_FOUND)
             av_log(d, AV_LOG_ERROR, "Did you mean file:%s?\n", filename);
         return err;
@@ -1878,9 +1927,22 @@ int ifile_open(const OptionsContext *o, const char *filename, Scheduler *sch)
                    d->readrate_initial_burst);
             return AVERROR(EINVAL);
         }
-    } else if (o->readrate_initial_burst) {
-        av_log(d, AV_LOG_WARNING, "Option -readrate_initial_burst ignored "
-               "since neither -readrate nor -re were given\n");
+        d->readrate_catchup = o->readrate_catchup ? o->readrate_catchup : d->readrate * 1.05;
+        if (d->readrate_catchup < d->readrate) {
+            av_log(d, AV_LOG_ERROR,
+                   "Option -readrate_catchup is %0.3f; it must be at least equal to %0.3f.\n",
+                   d->readrate_catchup, d->readrate);
+            return AVERROR(EINVAL);
+        }
+    } else {
+        if (o->readrate_initial_burst) {
+            av_log(d, AV_LOG_WARNING, "Option -readrate_initial_burst ignored "
+                   "since neither -readrate nor -re were given\n");
+        }
+        if (o->readrate_catchup) {
+            av_log(d, AV_LOG_WARNING, "Option -readrate_catchup ignored "
+                   "since neither -readrate nor -re were given\n");
+        }
     }
 
     /* Add all the streams from the given input file to the demuxer */

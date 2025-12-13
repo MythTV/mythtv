@@ -49,6 +49,8 @@ typedef struct SBCEncContext {
     DECLARE_ALIGNED(SBC_ALIGN, SBCDSPContext, dsp);
 } SBCEncContext;
 
+static const int sbc_samplerates[] = { 16000, 32000, 44100, 48000, 0 };
+
 static int sbc_analyze_audio(SBCDSPContext *s, struct sbc_frame *frame)
 {
     int ch, blk;
@@ -194,7 +196,7 @@ static size_t sbc_pack_frame(AVPacket *avpkt, struct sbc_frame *frame,
     return put_bytes_output(&pb);
 }
 
-static int sbc_encode_init(AVCodecContext *avctx)
+static av_cold int sbc_encode_init(AVCodecContext *avctx)
 {
     SBCEncContext *sbc = avctx->priv_data;
     struct sbc_frame *frame = &sbc->frame;
@@ -260,8 +262,8 @@ static int sbc_encode_init(AVCodecContext *avctx)
         avctx->frame_size = 4*((frame->subbands >> 3) + 1) * 4*(frame->blocks >> 2);
     }
 
-    for (int i = 0; avctx->codec->supported_samplerates[i]; i++)
-        if (avctx->sample_rate == avctx->codec->supported_samplerates[i])
+    for (int i = 0; sbc_samplerates[i]; i++)
+        if (avctx->sample_rate == sbc_samplerates[i])
             frame->frequency = i;
 
     frame->channels = avctx->ch_layout.nb_channels;
@@ -354,12 +356,9 @@ const FFCodec ff_sbc_encoder = {
     .priv_data_size        = sizeof(SBCEncContext),
     .init                  = sbc_encode_init,
     FF_CODEC_ENCODE_CB(sbc_encode_frame),
-    .p.ch_layouts          = (const AVChannelLayout[]) { AV_CHANNEL_LAYOUT_MONO,
-                                                         AV_CHANNEL_LAYOUT_STEREO,
-                                                         { 0 } },
-    .p.sample_fmts         = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16,
-                                                             AV_SAMPLE_FMT_NONE },
-    .p.supported_samplerates = (const int[]) { 16000, 32000, 44100, 48000, 0 },
+    CODEC_CH_LAYOUTS(AV_CHANNEL_LAYOUT_MONO, AV_CHANNEL_LAYOUT_STEREO),
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16),
+    CODEC_SAMPLERATES_ARRAY(sbc_samplerates),
     .p.priv_class          = &sbc_class,
     .p.profiles            = NULL_IF_CONFIG_SMALL(ff_sbc_profiles),
 };

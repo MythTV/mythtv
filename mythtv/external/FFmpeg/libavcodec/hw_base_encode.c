@@ -18,6 +18,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
+#include "libavutil/error.h"
 #include "libavutil/internal.h"
 #include "libavutil/log.h"
 #include "libavutil/mem.h"
@@ -190,12 +191,12 @@ static void hw_base_encode_add_next_prev(FFHWBaseEncodeContext *ctx,
         return;
     }
 
-    if (ctx->nb_next_prev < MAX_PICTURE_REFERENCES) {
+    if (ctx->nb_next_prev < ctx->ref_l0) {
         ctx->next_prev[ctx->nb_next_prev++] = pic;
         ++pic->ref_count[0];
     } else {
         --ctx->next_prev[0]->ref_count[0];
-        for (i = 0; i < MAX_PICTURE_REFERENCES - 1; i++)
+        for (i = 0; i < ctx->ref_l0 - 1; i++)
             ctx->next_prev[i] = ctx->next_prev[i + 1];
         ctx->next_prev[i] = pic;
         ++pic->ref_count[0];
@@ -603,7 +604,7 @@ start:
                     av_fifo_can_read(ctx->encode_fifo);
                 err = ctx->op->issue(avctx, pic);
                 if (err < 0) {
-                    av_log(avctx, AV_LOG_ERROR, "Encode failed: %d.\n", err);
+                    av_log(avctx, AV_LOG_ERROR, "Encode failed: %s.\n", av_err2str(err));
                     return err;
                 }
                 pic->encode_issued = 1;
@@ -630,7 +631,7 @@ start:
 
         err = ctx->op->issue(avctx, pic);
         if (err < 0) {
-            av_log(avctx, AV_LOG_ERROR, "Encode failed: %d.\n", err);
+            av_log(avctx, AV_LOG_ERROR, "Encode failed: %s.\n", av_err2str(err));
             return err;
         }
 
@@ -662,6 +663,9 @@ int ff_hw_base_init_gop_structure(FFHWBaseEncodeContext *ctx, AVCodecContext *av
                                   uint32_t ref_l0, uint32_t ref_l1,
                                   int flags, int prediction_pre_only)
 {
+    ctx->ref_l0 = FFMIN(ref_l0, MAX_PICTURE_REFERENCES);
+    ctx->ref_l1 = FFMIN(ref_l1, MAX_PICTURE_REFERENCES);
+
     if (flags & FF_HW_FLAG_INTRA_ONLY || avctx->gop_size <= 1) {
         av_log(avctx, AV_LOG_VERBOSE, "Using intra frames only.\n");
         ctx->gop_size = 1;
@@ -804,6 +808,11 @@ int ff_hw_base_encode_init(AVCodecContext *avctx, FFHWBaseEncodeContext *ctx)
 
 int ff_hw_base_encode_close(FFHWBaseEncodeContext *ctx)
 {
+    for (FFHWBaseEncodePicture *pic = ctx->pic_start, *next_pic = pic; pic; pic = next_pic) {
+        next_pic = pic->next;
+        base_encode_pic_free(pic);
+    }
+
     av_fifo_freep2(&ctx->encode_fifo);
 
     av_frame_free(&ctx->frame);

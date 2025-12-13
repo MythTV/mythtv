@@ -189,6 +189,7 @@ typedef struct VariantStream {
     const char *sgroup;   /* subtitle group name */
     const char *ccgroup;  /* closed caption group name */
     const char *varname;  /* variant name */
+    const char *subtitle_varname;  /* subtitle variant name */
 } VariantStream;
 
 typedef struct ClosedCaptionsStream {
@@ -378,7 +379,10 @@ static void write_codec_attr(AVStream *st, VariantStream *vs)
     } else if (st->codecpar->codec_id == AV_CODEC_ID_HEVC) {
         uint8_t *data = st->codecpar->extradata;
         int profile = AV_PROFILE_UNKNOWN;
+        uint32_t profile_compatibility = AV_PROFILE_UNKNOWN;
+        char tier = 0;
         int level = AV_LEVEL_UNKNOWN;
+        char constraints[8] = "";
 
         if (st->codecpar->profile != AV_PROFILE_UNKNOWN)
             profile = st->codecpar->profile;
@@ -392,6 +396,8 @@ static void write_codec_attr(AVStream *st, VariantStream *vs)
                 uint8_t *rbsp_buf;
                 int remain_size = 0;
                 int rbsp_size = 0;
+                uint32_t profile_compatibility_flags = 0;
+                uint8_t high_nibble = 0;
                 /* skip start code + nalu header */
                 data += 6;
                 /* process by reference General NAL unit syntax */
@@ -405,8 +411,32 @@ static void write_codec_attr(AVStream *st, VariantStream *vs)
                 }
                 /* skip sps_video_parameter_set_id   u(4),
                  *      sps_max_sub_layers_minus1    u(3),
-                 *  and sps_temporal_id_nesting_flag u(1) */
+                 *  and sps_temporal_id_nesting_flag u(1)
+                 *
+                 * TIER represents the general_tier_flag, with 'L' indicating the flag is 0,
+                 * and 'H' indicating the flag is 1
+                 */
+                tier = (rbsp_buf[1] & 0x20) == 0 ? 'L' : 'H';
                 profile = rbsp_buf[1] & 0x1f;
+                /* PROFILE_COMPATIBILITY is general_profile_compatibility_flags, but in reverse bit order,
+                 * in a hexadecimal representation (leading zeroes may be omitted).
+                 */
+                profile_compatibility_flags = AV_RB32(rbsp_buf + 2);
+                /* revise these bits to get the profile compatibility value */
+                profile_compatibility_flags = ((profile_compatibility_flags & 0x55555555U) << 1) | ((profile_compatibility_flags >> 1) & 0x55555555U);
+                profile_compatibility_flags = ((profile_compatibility_flags & 0x33333333U) << 2) | ((profile_compatibility_flags >> 2) & 0x33333333U);
+                profile_compatibility_flags = ((profile_compatibility_flags & 0x0F0F0F0FU) << 4) | ((profile_compatibility_flags >> 4) & 0x0F0F0F0FU);
+                profile_compatibility_flags = ((profile_compatibility_flags & 0x00FF00FFU) << 8) | ((profile_compatibility_flags >> 8) & 0x00FF00FFU);
+                profile_compatibility = (profile_compatibility_flags << 16) | (profile_compatibility_flags >> 16);
+                /* skip 8 + 8 + 32
+                 * CONSTRAINTS is a hexadecimal representation of the general_constraint_indicator_flags.
+                 * each byte is separated by a '.', and trailing zero bytes may be omitted.
+                 * drop the trailing zero bytes refer to ISO/IEC14496-15.
+                 */
+                high_nibble = rbsp_buf[7] >> 4;
+                snprintf(constraints, sizeof(constraints),
+                         high_nibble ? "%02x.%x" : "%02x",
+                         rbsp_buf[6], high_nibble);
                 /* skip 8 + 8 + 32 + 4 + 43 + 1 bit */
                 level = rbsp_buf[12];
                 av_freep(&rbsp_buf);
@@ -416,8 +446,11 @@ static void write_codec_attr(AVStream *st, VariantStream *vs)
         }
         if (st->codecpar->codec_tag == MKTAG('h','v','c','1') &&
             profile != AV_PROFILE_UNKNOWN &&
-            level != AV_LEVEL_UNKNOWN) {
-            snprintf(attr, sizeof(attr), "%s.%d.4.L%d.B01", av_fourcc2str(st->codecpar->codec_tag), profile, level);
+            profile_compatibility != AV_PROFILE_UNKNOWN &&
+            tier != 0 &&
+            level != AV_LEVEL_UNKNOWN &&
+            constraints[0] != '\0') {
+            snprintf(attr, sizeof(attr), "%s.%d.%x.%c%d.%s", av_fourcc2str(st->codecpar->codec_tag), profile, profile_compatibility, tier, level, constraints);
         } else
             goto fail;
     } else if (st->codecpar->codec_id == AV_CODEC_ID_MP2) {
@@ -887,7 +920,9 @@ static int hls_mux_init(AVFormatContext *s, VariantStream *vs)
 
         if (!(st = avformat_new_stream(loc, NULL)))
             return AVERROR(ENOMEM);
-        avcodec_parameters_copy(st->codecpar, vs->streams[i]->codecpar);
+        ret = avcodec_parameters_copy(st->codecpar, vs->streams[i]->codecpar);
+        if (ret < 0)
+            return ret;
         if (!oc->oformat->codec_tag ||
             av_codec_get_id (oc->oformat->codec_tag, vs->streams[i]->codecpar->codec_tag) == st->codecpar->codec_id ||
             av_codec_get_tag(oc->oformat->codec_tag, vs->streams[i]->codecpar->codec_id) <= 0) {
@@ -1137,7 +1172,7 @@ static int hls_append_segment(struct AVFormatContext *s, HLSContext *hls,
     if (hls->use_localtime_mkdir) {
         filename = vs->avf->url;
     }
-    if ((find_segment_by_filename(vs->segments, filename) || find_segment_by_filename(vs->old_segments, filename))
+    if (vs->nb_entries <= 5000 && (find_segment_by_filename(vs->segments, filename) || find_segment_by_filename(vs->old_segments, filename))
         && !byterange_mode) {
         av_log(hls, AV_LOG_WARNING, "Duplicated segment filename detected: %s\n", filename);
     }
@@ -1200,6 +1235,22 @@ static int hls_append_segment(struct AVFormatContext *s, HLSContext *hls,
     vs->sequence++;
 
     return 0;
+}
+
+static int extract_segment_number(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    const char *num_start = dot - 1;
+
+    while (num_start > filename && *num_start >= '0' && *num_start <= '9') {
+        num_start--;
+    }
+
+    num_start++;
+
+    if (num_start == dot)
+        return -1;
+
+    return atoi(num_start);
 }
 
 static int parse_playlist(AVFormatContext *s, const char *url, VariantStream *vs)
@@ -1295,6 +1346,20 @@ static int parse_playlist(AVFormatContext *s, const char *url, VariantStream *vs
                     goto fail;
                 }
                 ff_format_set_url(vs->avf, new_file);
+
+                if (vs->has_subtitle) {
+                    int vtt_index = extract_segment_number(line);
+                    const char *vtt_basename = av_basename(vs->vtt_basename);
+                    int len = strlen(vtt_basename) + 11;
+                    char *vtt_file = av_mallocz(len);
+                    if (!vtt_file) {
+                        ret = AVERROR(ENOMEM);
+                        goto fail;
+                    }
+                    snprintf(vtt_file, len, vtt_basename, vtt_index);
+                    ff_format_set_url(vs->vtt_avf, vtt_file);
+                }
+
                 is_segment = 0;
                 new_start_pos = avio_tell(vs->avf->pb);
                 vs->size = new_start_pos - vs->start_pos;
@@ -1533,7 +1598,8 @@ static int create_master_playlist(AVFormatContext *s,
                 break;
             }
 
-            ff_hls_write_subtitle_rendition(hls->m3u8_out, sgroup, vtt_m3u8_rel_name, vs->language, i, hls->has_default_key ? vs->is_default : 1);
+            ff_hls_write_subtitle_rendition(hls->m3u8_out, sgroup, vtt_m3u8_rel_name, vs->language,
+                    vs->subtitle_varname, i, hls->has_default_key ? vs->is_default : 1);
         }
 
         if (!hls->has_default_key || !hls->has_video_m3u8) {
@@ -1668,7 +1734,7 @@ static int hls_window(AVFormatContext *s, int last, VariantStream *vs)
         ff_hls_write_playlist_header(hls->sub_m3u8_out, hls->version, hls->allowcache,
                                      target_duration, sequence, PLAYLIST_TYPE_NONE, 0);
         for (en = vs->segments; en; en = en->next) {
-            ret = ff_hls_write_file_entry(hls->sub_m3u8_out, 0, byterange_mode,
+            ret = ff_hls_write_file_entry(hls->sub_m3u8_out, en->discont, byterange_mode,
                                           en->duration, 0, en->size, en->pos,
                                           hls->baseurl, en->sub_filename, NULL, 0, 0, 0);
             if (ret < 0) {
@@ -1676,7 +1742,7 @@ static int hls_window(AVFormatContext *s, int last, VariantStream *vs)
             }
         }
 
-        if (last)
+        if (last && !(hls->flags & HLS_OMIT_ENDLIST))
             ff_hls_write_end_list(hls->sub_m3u8_out);
 
     }
@@ -2106,6 +2172,9 @@ static int parse_variant_stream_mapstring(AVFormatContext *s)
                 continue;
             } else if (av_strstart(keyval, "name:", &val)) {
                 vs->varname  = val;
+                continue;
+            } else if (av_strstart(keyval, "sname:", &val)) {
+                vs->subtitle_varname  = val;
                 continue;
             } else if (av_strstart(keyval, "agroup:", &val)) {
                 vs->agroup   = val;
@@ -3219,11 +3288,7 @@ const FFOutputFormat ff_hls_muxer = {
     .p.audio_codec    = AV_CODEC_ID_AAC,
     .p.video_codec    = AV_CODEC_ID_H264,
     .p.subtitle_codec = AV_CODEC_ID_WEBVTT,
-#if FF_API_ALLOW_FLUSH
-    .p.flags          = AVFMT_NOFILE | AVFMT_GLOBALHEADER | AVFMT_ALLOW_FLUSH | AVFMT_NODIMENSIONS,
-#else
     .p.flags          = AVFMT_NOFILE | AVFMT_GLOBALHEADER | AVFMT_NODIMENSIONS,
-#endif
     .p.priv_class     = &hls_class,
     .flags_internal   = FF_OFMT_FLAG_ALLOW_FLUSH,
     .priv_data_size = sizeof(HLSContext),

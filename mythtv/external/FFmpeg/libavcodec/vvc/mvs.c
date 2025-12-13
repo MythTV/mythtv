@@ -144,7 +144,9 @@ static int derive_temporal_colocated_mvs(const VVCLocalContext *lc, MvField temp
     const SliceContext *sc      = lc->sc;
     RefPicList* refPicList      = sc->rpl;
 
-    if (temp_col.pred_flag == PF_INTRA)
+    if (temp_col.pred_flag == PF_INTRA ||
+        temp_col.pred_flag == PF_IBC   ||
+        temp_col.pred_flag == PF_PLT)
         return 0;
 
     if (sb_flag){
@@ -266,7 +268,7 @@ void ff_vvc_set_mvf(const VVCLocalContext *lc, const int x0, const int y0, const
     }
 }
 
-void ff_vvc_set_intra_mvf(const VVCLocalContext *lc, const int dmvr)
+void ff_vvc_set_intra_mvf(const VVCLocalContext *lc, const bool dmvr, const PredFlag pf, const bool ciip_flag)
 {
     const VVCFrameContext *fc   = lc->fc;
     const CodingUnit *cu        = lc->cu;
@@ -277,7 +279,10 @@ void ff_vvc_set_intra_mvf(const VVCLocalContext *lc, const int dmvr)
         for (int dx = 0; dx < cu->cb_width; dx += min_pu_size) {
             const int x = cu->x0 + dx;
             const int y = cu->y0 + dy;
-            TAB_MVF(x, y).pred_flag = PF_INTRA;
+            MvField *mv = &TAB_MVF(x, y);
+
+            mv->pred_flag = pf;
+            mv->ciip_flag = ciip_flag;
         }
     }
 }
@@ -599,7 +604,19 @@ static void init_neighbour_context(NeighbourContext *ctx, const VVCLocalContext 
 
 static av_always_inline PredMode pred_flag_to_mode(PredFlag pred)
 {
-    return pred == PF_IBC ? MODE_IBC : (pred == PF_INTRA ? MODE_INTRA : MODE_INTER);
+    static const PredMode lut[] = {
+        MODE_INTRA, // PF_INTRA
+        MODE_INTER, // PF_L0
+        MODE_INTER, // PF_L1
+        MODE_INTER, // PF_BI
+        0,          // invalid
+        MODE_IBC,   // PF_IBC
+        0,          // invalid
+        0,          // invalid
+        MODE_PLT,   // PF_PLT
+    };
+
+    return lut[pred];
 }
 
 static int check_available(Neighbour *n, const VVCLocalContext *lc, const int check_mer)
@@ -909,7 +926,7 @@ static void affine_cps_from_nb(const VVCLocalContext *lc,
     }
 }
 
-//derive affine neighbour's postion, width and height,
+//derive affine neighbour's position, width and height,
 static int affine_neighbour_cb(const VVCFrameContext *fc, const int x_nb, const int y_nb, int *x_cb, int *y_cb, int *cbw, int *cbh)
 {
     const int log2_min_cb_size  = fc->ps.sps->min_cb_log2_size_y;
@@ -1627,12 +1644,12 @@ static int ibc_spatial_candidates(const VVCLocalContext *lc, const int merge_idx
 
     init_neighbour_context(&nctx, lc);
 
-    if (check_available(a1, lc, 1)) {
+    if (check_available(a1, lc, 0)) {
         cand_list[num_cands++] = TAB_MVF(a1->x, a1->y).mv[L0];
         if (num_cands > merge_idx)
             return 1;
     }
-    if (check_available(b1, lc, 1)) {
+    if (check_available(b1, lc, 0)) {
         const MvField *mvf = &TAB_MVF(b1->x, b1->y);
         if (!num_cands || !IS_SAME_MV(&cand_list[0], mvf->mv)) {
             cand_list[num_cands++] = mvf->mv[L0];

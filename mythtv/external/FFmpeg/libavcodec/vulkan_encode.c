@@ -220,8 +220,7 @@ static int vulkan_encode_issue(AVCodecContext *avctx,
         .sType = VK_STRUCTURE_TYPE_VIDEO_PICTURE_RESOURCE_INFO_KHR,
         .pNext = NULL,
         .codedOffset = { 0 },
-        .codedExtent = (VkExtent2D){ ctx->base.surface_width,
-                                     ctx->base.surface_height },
+        .codedExtent = (VkExtent2D){ avctx->width, avctx->height },
         .baseArrayLayer = ctx->common.layered_dpb ? slot_index : 0,
         .imageViewBinding = vp->dpb.view,
     };
@@ -339,7 +338,7 @@ static int vulkan_encode_issue(AVCodecContext *avctx,
                                          size_align);
 
     /* Start command buffer recording */
-    exec = vp->exec = ff_vk_exec_get(&ctx->enc_pool);
+    exec = vp->exec = ff_vk_exec_get(&ctx->s, &ctx->enc_pool);
     ff_vk_exec_start(&ctx->s, exec);
     cmd_buf = exec->buf;
 
@@ -565,14 +564,13 @@ static int vulkan_encode_create_dpb(AVCodecContext *avctx, FFVulkanEncodeContext
 
     base_ctx->recon_frames->format    = AV_PIX_FMT_VULKAN;
     base_ctx->recon_frames->sw_format = dpb_format;
-    base_ctx->recon_frames->width     = base_ctx->surface_width;
-    base_ctx->recon_frames->height    = base_ctx->surface_height;
+    base_ctx->recon_frames->width     = avctx->width;
+    base_ctx->recon_frames->height    = avctx->height;
 
     hwfc->format[0]    = ctx->pic_format;
     hwfc->create_pnext = &ctx->profile_list;
     hwfc->tiling       = VK_IMAGE_TILING_OPTIMAL;
-    hwfc->usage        = VK_IMAGE_USAGE_SAMPLED_BIT              |
-                         VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR;
+    hwfc->usage        = VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR;
 
     if (ctx->common.layered_dpb)
         hwfc->nb_layers = ctx->caps.maxDpbSlots;
@@ -770,10 +768,8 @@ av_cold int ff_vulkan_encode_init(AVCodecContext *avctx, FFVulkanEncodeContext *
         return err;
 
     /* Create queue context */
-    err = ff_vk_video_qf_init(s, &ctx->qf_enc,
-                              VK_QUEUE_VIDEO_ENCODE_BIT_KHR,
-                              vk_desc->encode_op);
-    if (err < 0) {
+    ctx->qf_enc = ff_vk_qf_find(s, VK_QUEUE_VIDEO_ENCODE_BIT_KHR, vk_desc->encode_op);
+    if (!ctx->qf_enc) {
         av_log(avctx, AV_LOG_ERROR, "Encoding of %s is not supported by this device\n",
                avcodec_get_name(avctx->codec_id));
         return err;
@@ -847,7 +843,7 @@ av_cold int ff_vulkan_encode_init(AVCodecContext *avctx, FFVulkanEncodeContext *
         .encodeFeedbackFlags = ctx->enc_caps.supportedEncodeFeedbackFlags &
                                (~VK_VIDEO_ENCODE_FEEDBACK_BITSTREAM_HAS_OVERRIDES_BIT_KHR),
     };
-    err = ff_vk_exec_pool_init(s, &ctx->qf_enc, &ctx->enc_pool, base_ctx->async_depth,
+    err = ff_vk_exec_pool_init(s, ctx->qf_enc, &ctx->enc_pool, base_ctx->async_depth,
                                1, VK_QUERY_TYPE_VIDEO_ENCODE_FEEDBACK_KHR, 0,
                                &query_create);
     if (err < 0)
@@ -915,9 +911,9 @@ av_cold int ff_vulkan_encode_init(AVCodecContext *avctx, FFVulkanEncodeContext *
 
     /* Setup width/height alignment */
     base_ctx->surface_width = avctx->coded_width =
-        FFALIGN(avctx->width, ctx->caps.pictureAccessGranularity.width);
+        FFALIGN(avctx->width, ctx->enc_caps.encodeInputPictureGranularity.width);
     base_ctx->surface_height = avctx->coded_height =
-        FFALIGN(avctx->height, ctx->caps.pictureAccessGranularity.height);
+        FFALIGN(avctx->height, ctx->enc_caps.encodeInputPictureGranularity.height);
 
     /* Setup slice width/height */
     base_ctx->slice_block_width = ctx->enc_caps.encodeInputPictureGranularity.width;
@@ -934,8 +930,7 @@ av_cold int ff_vulkan_encode_init(AVCodecContext *avctx, FFVulkanEncodeContext *
         return AVERROR(EINVAL);
     }
 
-    fmt_info.imageUsage = VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR |
-                          VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR;
+    fmt_info.imageUsage = VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR;
 
     ctx->common.layered_dpb = !(ctx->caps.flags & VK_VIDEO_CAPABILITY_SEPARATE_REFERENCE_IMAGES_BIT_KHR);
 
@@ -995,7 +990,7 @@ av_cold int ff_vulkan_encode_init(AVCodecContext *avctx, FFVulkanEncodeContext *
     /* Create session */
     session_create.pVideoProfile = &ctx->profile;
     session_create.flags = 0x0;
-    session_create.queueFamilyIndex = ctx->qf_enc.queue_family;
+    session_create.queueFamilyIndex = ctx->qf_enc->idx;
     session_create.maxCodedExtent = ctx->caps.maxCodedExtent;
     session_create.maxDpbSlots = ctx->caps.maxDpbSlots;
     session_create.maxActiveReferencePictures = ctx->caps.maxActiveReferencePictures;
