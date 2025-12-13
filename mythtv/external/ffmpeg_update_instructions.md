@@ -1,7 +1,8 @@
 # FFmpeg Update Instructions
 
-FFmpeg was last updated to FFmpeg 7.1 `5c59d97e8ab90daefa198dcfb0ee4fdf9c57e37f` on 2024-10-12,
-which branched from FFmpeg master at `e1094ac45d3bc7942043e72a23b6ab30faaddb8a`.
+FFmpeg was last updated to FFmpeg 8.0 `9c93070155903e2c2d08f9f7234a920877903f80`
+on 2025-12-12, which branched from FFmpeg master at
+`7eaa0f799ab30e723209cc64777f10063ae55a23`.
 
 
 ## Branches in MythTV/FFmpeg:
