@@ -18,6 +18,7 @@ extern "C" {
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
+#include "libavcodec/defs.h"
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
 #include "libswscale/swscale.h"
@@ -4128,7 +4129,7 @@ int AvFormatDecoder::selectBestAudioTrack(int lang_key, const std::vector<int> &
     if (m_audio->CanDTSHD())
     {
         selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                 FF_PROFILE_DTS_HD_MA);
+                                 AV_PROFILE_DTS_HD_MA);
         if (selTrack >= 0)
             return selTrack;
     }
@@ -4139,7 +4140,7 @@ int AvFormatDecoder::selectBestAudioTrack(int lang_key, const std::vector<int> &
     if (m_audio->CanDTSHD())
     {
         selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
-                                 FF_PROFILE_DTS_HD_HRA);
+                                 AV_PROFILE_DTS_HD_HRA);
         if (selTrack >= 0)
             return selTrack;
     }
@@ -5025,7 +5026,7 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfi
     if (!withProfile && par->codec_id == AV_CODEC_ID_DTS && !m_audio->CanDTSHD())
     {
         passthru = m_audio->CanPassthrough(par->sample_rate, par->ch_layout.nb_channels,
-                                           par->codec_id, FF_PROFILE_DTS);
+                                           par->codec_id, AV_PROFILE_DTS);
     }
     else
     {

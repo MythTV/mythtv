@@ -15,6 +15,10 @@
 #include <SoundTouch.h>
 #endif
 
+extern "C" {
+#include "libavcodec/defs.h"
+}
+
 // Qt headers
 #include <QtGlobal>
 #include <QMutexLocker>
@@ -549,13 +553,13 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
         case AV_CODEC_ID_DTS:
             switch(profile)
             {
-                case FF_PROFILE_DTS:
-                case FF_PROFILE_DTS_ES:
-                case FF_PROFILE_DTS_96_24:
+                case AV_PROFILE_DTS:
+                case AV_PROFILE_DTS_ES:
+                case AV_PROFILE_DTS_96_24:
                     arg = FEATURE_DTS;
                     break;
-                case FF_PROFILE_DTS_HD_HRA:
-                case FF_PROFILE_DTS_HD_MA:
+                case AV_PROFILE_DTS_HD_HRA:
+                case AV_PROFILE_DTS_HD_MA:
                     arg = FEATURE_DTSHD;
                     break;
                 default:
@@ -743,7 +747,7 @@ bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
     {
         // We do not support DTS-HD bitstream so force extraction of the
         // DTS core track instead
-        codec_profile = FF_PROFILE_DTS;
+        codec_profile = AV_PROFILE_DTS;
     }
     QString log = AudioOutputSettings::GetPassthroughParams(
         codec, codec_profile,
@@ -762,13 +766,13 @@ bool AudioOutputBase::SetupPassthrough(AVCodecID codec, int codec_profile,
     {
         switch(codec_profile)
         {
-            case FF_PROFILE_DTS:
-            case FF_PROFILE_DTS_ES:
-            case FF_PROFILE_DTS_96_24:
+            case AV_PROFILE_DTS:
+            case AV_PROFILE_DTS_ES:
+            case AV_PROFILE_DTS_96_24:
                 m_spdifEnc->SetMaxHDRate(0);
                 break;
-            case FF_PROFILE_DTS_HD_HRA:
-            case FF_PROFILE_DTS_HD_MA:
+            case AV_PROFILE_DTS_HD_HRA:
+            case AV_PROFILE_DTS_HD_MA:
                 m_spdifEnc->SetMaxHDRate(samplerate_tmp * channels_tmp / 2);
                 break;
         }

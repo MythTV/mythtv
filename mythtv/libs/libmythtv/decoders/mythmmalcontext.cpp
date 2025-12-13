@@ -7,6 +7,7 @@
 
 // FFmpeg
 extern "C" {
+#include "libavcodec/defs.h"
 #include "libavutil/opt.h"
 }
 
@@ -60,8 +61,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
         case AV_CODEC_ID_MPEG4:      mythprofile = MythCodecContext::MPEG4; break;
         case AV_CODEC_ID_VC1:        mythprofile = MythCodecContext::VC1;   break;
         case AV_CODEC_ID_H264:
-            if ((*Context)->profile == FF_PROFILE_H264_HIGH_10 ||
-                (*Context)->profile == FF_PROFILE_H264_HIGH_10_INTRA)
+            if ((*Context)->profile == AV_PROFILE_H264_HIGH_10 ||
+                (*Context)->profile == AV_PROFILE_H264_HIGH_10_INTRA)
             {
                 return failure;
             }
