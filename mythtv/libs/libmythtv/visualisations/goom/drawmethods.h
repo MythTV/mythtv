@@ -2,10 +2,11 @@
 #define DRAWMETHODS_H
 
 #include "goomconfig.h"
+#include "libmythbase/mythconfig.h"
 
 #define DRAWMETHOD_NORMAL(adr,col) {*(adr) = (col);}
 
-#ifdef MMX
+#if HAVE_MMX
 #include "mmx.h"
 
 #define DRAWMETHOD_PLUS(_out,_backbuf,_col) \
@@ -34,7 +35,7 @@ movd_r2m (mm0, _out); \
 
 #define DRAWMETHOD_OR(adr,col) {*(adr)|=(col);}
 
-#ifdef MMX
+#if HAVE_MMX
 #define DRAWMETHOD_DONE() {__asm__ __volatile__ ("emms");}
 #else
 #define DRAWMETHOD_DONE() {}

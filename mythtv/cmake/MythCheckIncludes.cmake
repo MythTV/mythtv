@@ -48,7 +48,6 @@ set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
 check_symbol_exists(close_range "unistd.h" HAVE_CLOSE_RANGE)
 cmake_pop_check_state()
 check_symbol_exists(fcntl "fcntl.h" HAVE_FCNTL)
-check_symbol_exists(getifaddrs "ifaddrs.h" HAVE_GETIFADDRS)
 check_symbol_exists(getmntent_r "mntent.h" HAVE_GETMNTENT_R)
 check_symbol_exists(getopt "unistd.h" HAVE_GETOPT)
 check_symbol_exists(gettimeofday "sys/time.h" HAVE_GETTIMEOFDAY)
@@ -107,9 +106,9 @@ check_c_source_compiles(
 #
 # Check CPU type
 #
-check_c_compiler_flag("-mmmx" HAVE_MMX)
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "(i?86|x86|amd64|ia64|emt64)")
   set(ARCH_X86 1)
+  check_c_compiler_flag("-mmmx" HAVE_MMX)
 elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "(ppc|powerpc)")
   set(ARCH_PPC 1)
 elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "sparc")

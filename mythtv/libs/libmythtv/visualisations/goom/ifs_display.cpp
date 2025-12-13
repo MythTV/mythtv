@@ -2,8 +2,9 @@
 
 #include "ifs.h"
 #include "goomconfig.h"
+#include "libmythbase/mythconfig.h"
 
-#ifdef MMX
+#if HAVE_MMX
 #include "mmx.h"
 #endif
 
@@ -50,7 +51,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 	IFSPoint *points = draw_ifs (&nbpt);
 	nbpt--;
 
-#ifdef MMX
+#if HAVE_MMX
 	movd_m2r (couleursl, mm1);
 	punpckldq_r2r (mm1, mm1);
 	for (int i = 0; i < nbpt; i += increment) {
@@ -89,7 +90,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 			}
 		}
 	}
-#endif /*MMX*/
+#endif /* HAVE_MMX */
 		s_justChanged--;
 
 	s_col[ALPHA] = s_couleur >> (ALPHA * 8) & 0xff;

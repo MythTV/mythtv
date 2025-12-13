@@ -2063,19 +2063,16 @@ int AvFormatDecoder::autoSelectVideoTrack(int& scanerror)
     if (FlagIsSet(kDecodeSingleThreaded))
         thread_count = 1;
 
-    if (HAVE_THREADS)
+    // Only use a single thread for hardware decoding. There is no
+    // performance improvement with multithreaded hardware decode
+    // and asynchronous callbacks create issues with decoders that
+    // use AVHWFrameContext where we need to release video resources
+    // before they are recreated
+    if (!foundgpudecoder)
     {
-        // Only use a single thread for hardware decoding. There is no
-        // performance improvement with multithreaded hardware decode
-        // and asynchronous callbacks create issues with decoders that
-        // use AVHWFrameContext where we need to release video resources
-        // before they are recreated
-        if (!foundgpudecoder)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
-                .arg(HAVE_THREADS ? thread_count : 1));
-            codecContext->thread_count = static_cast<int>(thread_count);
-        }
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
+            .arg(thread_count));
+        codecContext->thread_count = static_cast<int>(thread_count);
     }
 
     InitVideoCodec(stream, codecContext, true);

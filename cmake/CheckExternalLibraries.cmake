@@ -23,7 +23,6 @@ find_package(PkgConfig REQUIRED)
 # Does the system have threads?
 #
 include(FindThreads)
-set(HAVE_THREADS ${Threads_FOUND}) # avformatdecoder and globalsettings
 
 #
 # Check libraries

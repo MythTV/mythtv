@@ -21,10 +21,6 @@
 #ifndef AVCODEC_X86_MMX_H
 #define AVCODEC_X86_MMX_H
 
-#include "libmythbase/mythconfig.h"
-
-#if HAVE_MMX
-
 /*
  * The type of an value that fits in an MMX register (note that long
  * long constant values MUST be suffixed by LL and unsigned long long
@@ -311,7 +307,5 @@ union mmx_t {
 
 #define         punpcklqdq_r2r(regs,regd)   mmx_r2r (punpcklqdq, regs, regd)
 #define         punpckhqdq_r2r(regs,regd)   mmx_r2r (punpckhqdq, regs, regd)
-
-#endif
 
 #endif /* AVCODEC_X86_MMX_H */

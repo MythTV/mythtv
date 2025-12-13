@@ -23,8 +23,6 @@
 #define XMMS_PLUGIN
 //#define STANDALONE
 
-//#define POWERPC
-
 //#define HAVE_ATHLON
 
 //#define VERBOSE

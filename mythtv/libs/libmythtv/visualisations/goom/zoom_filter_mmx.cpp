@@ -2,8 +2,9 @@
 #include <cstdint>
 
 #include "visualisations/goom/zoom_filters.h"
+#include "libmythbase/mythconfig.h"
 
-#ifdef MMX
+#if HAVE_MMX
 static   constexpr uint8_t  BUFFPOINTNB   { 16     };
 //static constexpr uint16_t BUFFPOINTMASK { 0xffff };
 //static constexpr uint8_t  BUFFINCR      { 0xff   };
