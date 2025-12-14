@@ -16,6 +16,7 @@
 #include "eldutils.h"
 
 extern "C" {
+#include "libavcodec/defs.h"
 #include "libavutil/avutil.h"    // to check version of libavformat
 }
 
@@ -474,17 +475,17 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
         case AV_CODEC_ID_DTS:
             switch(codec_profile)
             {
-                case FF_PROFILE_DTS_ES:
+                case AV_PROFILE_DTS_ES:
                     log = "DTS-ES";
                     break;
-                case FF_PROFILE_DTS_96_24:
+                case AV_PROFILE_DTS_96_24:
                     log = "DTS 96/24";
                     break;
-                case FF_PROFILE_DTS_HD_HRA:
+                case AV_PROFILE_DTS_HD_HRA:
                     samplerate = 192000;
                     log = "DTS-HD High-Res";
                     break;
-                case FF_PROFILE_DTS_HD_MA:
+                case AV_PROFILE_DTS_HD_MA:
                     samplerate = 192000;
                     if (canDTSHDMA)
                     {
@@ -496,7 +497,7 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
                         log = "DTS-HD High-Res";
                     }
                     break;
-                case FF_PROFILE_DTS:
+                case AV_PROFILE_DTS:
                 default:
                     log = "DTS Core";
                     break;

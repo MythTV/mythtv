@@ -1013,7 +1013,7 @@ static void fcb_search(G723_1_ChannelContext *p, int16_t *impulse_resp,
     int pulse_cnt = pulses[index];
     int i;
 
-    optim.min_err = 1 << 30;
+    optim.min_err = 1LL << 31;
     get_fcb_param(&optim, impulse_resp, buf, pulse_cnt, SUBFRAME_LEN);
 
     if (p->pitch_lag[index >> 1] < SUBFRAME_LEN - 2) {
@@ -1246,10 +1246,6 @@ const FFCodec ff_g723_1_encoder = {
     .init           = g723_1_encode_init,
     FF_CODEC_ENCODE_CB(g723_1_encode_frame),
     .defaults       = defaults,
-    .p.sample_fmts  = (const enum AVSampleFormat[]) {
-        AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE
-    },
-    .p.ch_layouts   = (const AVChannelLayout[]){
-        AV_CHANNEL_LAYOUT_MONO, { 0 }
-    },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16),
+    CODEC_CH_LAYOUTS(AV_CHANNEL_LAYOUT_MONO),
 };

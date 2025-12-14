@@ -423,23 +423,23 @@ static const AVOption vibrance_options[] = {
     { "rbal", "set the red balance value",      OFFSET(balance[2]), AV_OPT_TYPE_FLOAT, {.dbl=1},      -10, 10, VF },
     { "gbal", "set the green balance value",    OFFSET(balance[0]), AV_OPT_TYPE_FLOAT, {.dbl=1},      -10, 10, VF },
     { "bbal", "set the blue balance value",     OFFSET(balance[1]), AV_OPT_TYPE_FLOAT, {.dbl=1},      -10, 10, VF },
-    { "rlum", "set the red luma coefficient",   OFFSET(lcoeffs[2]), AV_OPT_TYPE_FLOAT, {.dbl=0.072186}, 0,  1, VF },
+    { "rlum", "set the red luma coefficient",   OFFSET(lcoeffs[2]), AV_OPT_TYPE_FLOAT, {.dbl=0.212656}, 0,  1, VF },
     { "glum", "set the green luma coefficient", OFFSET(lcoeffs[0]), AV_OPT_TYPE_FLOAT, {.dbl=0.715158}, 0,  1, VF },
-    { "blum", "set the blue luma coefficient",  OFFSET(lcoeffs[1]), AV_OPT_TYPE_FLOAT, {.dbl=0.212656}, 0,  1, VF },
+    { "blum", "set the blue luma coefficient",  OFFSET(lcoeffs[1]), AV_OPT_TYPE_FLOAT, {.dbl=0.072186}, 0,  1, VF },
     { "alternate", "use alternate colors",      OFFSET(alternate),  AV_OPT_TYPE_BOOL,  {.i64=0},        0,  1, VF },
     { NULL }
 };
 
 AVFILTER_DEFINE_CLASS(vibrance);
 
-const AVFilter ff_vf_vibrance = {
-    .name          = "vibrance",
-    .description   = NULL_IF_CONFIG_SMALL("Boost or alter saturation."),
+const FFFilter ff_vf_vibrance = {
+    .p.name        = "vibrance",
+    .p.description = NULL_IF_CONFIG_SMALL("Boost or alter saturation."),
+    .p.priv_class  = &vibrance_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(VibranceContext),
-    .priv_class    = &vibrance_class,
     FILTER_INPUTS(vibrance_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pixel_fmts),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

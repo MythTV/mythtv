@@ -2,6 +2,7 @@ clean::
 	$(RM) $(CLEANSUFFIXES:%=libavcodec/bsf/%)
 
 OBJS-$(CONFIG_AAC_ADTSTOASC_BSF)          += bsf/aac_adtstoasc.o
+OBJS-$(CONFIG_APV_METADATA_BSF)           += bsf/apv_metadata.o
 OBJS-$(CONFIG_AV1_FRAME_MERGE_BSF)        += bsf/av1_frame_merge.o
 OBJS-$(CONFIG_AV1_FRAME_SPLIT_BSF)        += bsf/av1_frame_split.o
 OBJS-$(CONFIG_AV1_METADATA_BSF)           += bsf/av1_metadata.o
@@ -11,6 +12,7 @@ OBJS-$(CONFIG_DTS2PTS_BSF)                += bsf/dts2pts.o
 OBJS-$(CONFIG_DUMP_EXTRADATA_BSF)         += bsf/dump_extradata.o
 OBJS-$(CONFIG_DV_ERROR_MARKER_BSF)        += bsf/dv_error_marker.o
 OBJS-$(CONFIG_EAC3_CORE_BSF)              += bsf/eac3_core.o
+OBJS-$(CONFIG_EIA608_TO_SMPTE436M_BSF)    += bsf/eia608_to_smpte436m.o
 OBJS-$(CONFIG_EVC_FRAME_MERGE_BSF)        += bsf/evc_frame_merge.o
 OBJS-$(CONFIG_EXTRACT_EXTRADATA_BSF)      += bsf/extract_extradata.o
 OBJS-$(CONFIG_FILTER_UNITS_BSF)           += bsf/filter_units.o
@@ -37,6 +39,7 @@ OBJS-$(CONFIG_PRORES_METADATA_BSF)        += bsf/prores_metadata.o
 OBJS-$(CONFIG_REMOVE_EXTRADATA_BSF)       += bsf/remove_extradata.o
 OBJS-$(CONFIG_SETTS_BSF)                  += bsf/setts.o
 OBJS-$(CONFIG_SHOWINFO_BSF)               += bsf/showinfo.o
+OBJS-$(CONFIG_SMPTE436M_TO_EIA608_BSF)    += bsf/smpte436m_to_eia608.o
 OBJS-$(CONFIG_TEXT2MOVSUB_BSF)            += bsf/movsub.o
 OBJS-$(CONFIG_TRACE_HEADERS_BSF)          += bsf/trace_headers.o
 OBJS-$(CONFIG_TRUEHD_CORE_BSF)            += bsf/truehd_core.o

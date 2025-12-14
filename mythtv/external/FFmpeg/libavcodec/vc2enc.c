@@ -22,6 +22,7 @@
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
+#include "libavutil/thread.h"
 #include "libavutil/version.h"
 #include "codec_internal.h"
 #include "dirac.h"
@@ -186,51 +187,53 @@ typedef struct VC2EncContext {
     enum DiracParseCodes last_parse_code;
 } VC2EncContext;
 
-static av_always_inline void put_vc2_ue_uint(PutBitContext *pb, uint32_t val)
+/// x_k x_{k-1} ... x_0 -> 0 x_k 0 x_{k - 1} ... 0 x_0
+static uint16_t interleaved_ue_golomb_tab[256];
+/// 1 x_{k-1} ... x_0 -> 0 0 0 x_{k - 1} ... 0 x_0
+static uint16_t top_interleaved_ue_golomb_tab[256];
+/// 1 x_{k-1} ... x_0 -> 2 * k
+static uint8_t golomb_len_tab[256];
+/// quant -> av_log2(ff_dirac_qscale_tab[quant]) + 32
+static uint8_t qscale_len_tab[FF_ARRAY_ELEMS(ff_dirac_qscale_tab)];
+
+static av_cold void vc2_init_static_data(void)
 {
-    int i;
-    int bits = 0;
-    unsigned topbit = 1, maxval = 1;
-    uint64_t pbits = 0;
-
-    if (!val++) {
-        put_bits(pb, 1, 1);
-        return;
+    interleaved_ue_golomb_tab[1] = 1;
+    for (unsigned i = 2; i < 256; ++i) {
+        golomb_len_tab[i] = golomb_len_tab[i >> 1] + 2;
+        interleaved_ue_golomb_tab[i] = (interleaved_ue_golomb_tab[i >> 1] << 2) | (i & 1);
+        top_interleaved_ue_golomb_tab[i] = interleaved_ue_golomb_tab[i] ^ (1 << golomb_len_tab[i]);
     }
+    for (size_t i = 0; i < FF_ARRAY_ELEMS(qscale_len_tab); ++i)
+        qscale_len_tab[i] = av_log2(ff_dirac_qscale_tab[i]) + 32;
+}
 
-    while (val > maxval) {
-        topbit <<= 1;
-        maxval <<= 1;
-        maxval |=  1;
+static av_always_inline void put_vc2_ue_uint_inline(PutBitContext *pb, uint32_t val)
+{
+    uint64_t pbits = 1;
+    int bits = 1;
+
+    ++val;
+
+    while (val >> 8) {
+        pbits |= (uint64_t)interleaved_ue_golomb_tab[val & 0xff] << bits;
+        val  >>= 8;
+        bits  += 16;
     }
+    pbits |= (uint64_t)top_interleaved_ue_golomb_tab[val] << bits;
+    bits  += golomb_len_tab[val];
 
-    bits = ff_log2(topbit);
+    put_bits63(pb, bits, pbits);
+}
 
-    for (i = 0; i < bits; i++) {
-        topbit >>= 1;
-        av_assert2(pbits <= UINT64_MAX>>3);
-        pbits <<= 2;
-        if (val & topbit)
-            pbits |= 0x1;
-    }
-
-    put_bits64(pb, bits*2 + 1, (pbits << 1) | 1);
+static av_noinline void put_vc2_ue_uint(PutBitContext *pb, uint32_t val)
+{
+    put_vc2_ue_uint_inline(pb, val);
 }
 
 static av_always_inline int count_vc2_ue_uint(uint32_t val)
 {
-    int topbit = 1, maxval = 1;
-
-    if (!val++)
-        return 1;
-
-    while (val > maxval) {
-        topbit <<= 1;
-        maxval <<= 1;
-        maxval |=  1;
-    }
-
-    return ff_log2(topbit)*2 + 1;
+    return 2 * av_log2(val + 1) + 1;
 }
 
 /* VC-2 10.4 - parse_info() */
@@ -546,12 +549,12 @@ static void encode_subband(const VC2EncContext *s, PutBitContext *pb,
     dwtcoef *coeff = b->buf + top * b->stride;
     const uint64_t q_m = ((uint64_t)(s->qmagic_lut[quant][0])) << 2;
     const uint64_t q_a = s->qmagic_lut[quant][1];
-    const int q_s = av_log2(ff_dirac_qscale_tab[quant]) + 32;
+    const int q_s = qscale_len_tab[quant];
 
     for (y = top; y < bottom; y++) {
         for (x = left; x < right; x++) {
             uint32_t c_abs = QUANT(FFABS(coeff[x]), q_m, q_a, q_s);
-            put_vc2_ue_uint(pb, c_abs);
+            put_vc2_ue_uint_inline(pb, c_abs);
             if (c_abs)
                 put_bits(pb, 1, coeff[x] < 0);
         }
@@ -587,7 +590,7 @@ static int count_hq_slice(SliceArgs *slice, int quant_idx)
                 const int q_idx = quants[level][orientation];
                 const uint64_t q_m = ((uint64_t)s->qmagic_lut[q_idx][0]) << 2;
                 const uint64_t q_a = s->qmagic_lut[q_idx][1];
-                const int q_s = av_log2(ff_dirac_qscale_tab[q_idx]) + 32;
+                const int q_s = qscale_len_tab[q_idx];
 
                 const int left   = b->width  * slice->x    / s->num_x;
                 const int right  = b->width  *(slice->x+1) / s->num_x;
@@ -618,7 +621,7 @@ static int count_hq_slice(SliceArgs *slice, int quant_idx)
     return bits;
 }
 
-/* Approaches the best possible quantizer asymptotically, its kinda exaustive
+/* Approaches the best possible quantizer asymptotically, its kinda exhaustive
  * but we have a LUT to get the coefficient size in bits. Guaranteed to never
  * overshoot, which is apparently very important when streaming */
 static int rate_control(AVCodecContext *avctx, void *arg)
@@ -1027,6 +1030,7 @@ static av_cold int vc2_encode_end(AVCodecContext *avctx)
 
 static av_cold int vc2_encode_init(AVCodecContext *avctx)
 {
+    static AVOnce init_static_once = AV_ONCE_INIT;
     Plane *p;
     SubBand *b;
     int i, level, o, shift;
@@ -1080,13 +1084,13 @@ static av_cold int vc2_encode_init(AVCodecContext *avctx)
     if ((s->slice_width  & (s->slice_width  - 1)) ||
         (s->slice_height & (s->slice_height - 1))) {
         av_log(avctx, AV_LOG_ERROR, "Slice size is not a power of two!\n");
-        return AVERROR_UNKNOWN;
+        return AVERROR(EINVAL);
     }
 
     if ((s->slice_width > avctx->width) ||
         (s->slice_height > avctx->height)) {
         av_log(avctx, AV_LOG_ERROR, "Slice size is bigger than the image!\n");
-        return AVERROR_UNKNOWN;
+        return AVERROR(EINVAL);
     }
 
     if (s->base_vf <= 0) {
@@ -1096,7 +1100,7 @@ static av_cold int vc2_encode_init(AVCodecContext *avctx)
         } else {
             av_log(avctx, AV_LOG_WARNING, "Given format does not strictly comply with "
                    "the specifications, decrease strictness to use it.\n");
-            return AVERROR_UNKNOWN;
+            return AVERROR(EINVAL);
         }
     } else {
         av_log(avctx, AV_LOG_INFO, "Selected base video format = %i (%s)\n",
@@ -1189,6 +1193,8 @@ static av_cold int vc2_encode_init(AVCodecContext *avctx)
         }
     }
 
+    ff_thread_once(&init_static_once, vc2_init_static_data);
+
     return 0;
 }
 
@@ -1244,6 +1250,6 @@ const FFCodec ff_vc2_encoder = {
     FF_CODEC_ENCODE_CB(vc2_encode_frame),
     .p.priv_class   = &vc2enc_class,
     .defaults       = vc2enc_defaults,
-    .p.pix_fmts     = allowed_pix_fmts,
+    CODEC_PIXFMTS_ARRAY(allowed_pix_fmts),
     .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
 };

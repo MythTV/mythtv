@@ -71,10 +71,7 @@ static const float surmixlev_options[SURMIXLEV_NUM_OPTIONS] = {
 };
 
 #define EXTMIXLEV_NUM_OPTIONS 8
-static const float extmixlev_options[EXTMIXLEV_NUM_OPTIONS] = {
-    LEVEL_PLUS_3DB,  LEVEL_PLUS_1POINT5DB,  LEVEL_ONE,       LEVEL_MINUS_1POINT5DB,
-    LEVEL_MINUS_3DB, LEVEL_MINUS_4POINT5DB, LEVEL_MINUS_6DB, LEVEL_ZERO
-};
+#define extmixlev_options ff_ac3_gain_levels
 
 /* The first two options apply only to the AC-3 encoders;
  * the rest is also valid for EAC-3. When modifying it,
@@ -1637,6 +1634,8 @@ static void ac3_quantize_mantissas(AC3EncodeContext *s)
 static void ac3_output_frame_header(AC3EncodeContext *s, PutBitContext *pb)
 {
     AC3EncOptions *opt = &s->options;
+
+    put_bits_assume_flushed(pb);
 
     put_bits(pb, 16, 0x0b77);   /* frame header */
     put_bits(pb, 16, 0);        /* crc1: will be filled later */

@@ -337,7 +337,8 @@ static inline void mcdc(uint16_t *dst, const uint16_t *src, int log2w,
         }
         break;
     default:
-        av_assert0(0);
+        av_unreachable("log2w starts at 3 and gets only decremented during "
+                       "recursive calls to decode_p_block");
     }
 }
 
@@ -927,8 +928,11 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *picture,
         frame_size = buf_size - 12;
     }
 
-    if ((ret = ff_get_buffer(avctx, picture, 0)) < 0)
-        return ret;
+    if (   frame_4cc == AV_RL32("ifr2") || frame_4cc == AV_RL32("ifrm")
+        || frame_4cc == AV_RL32("pfrm") || frame_4cc == AV_RL32("pfr2")) {
+        if ((ret = ff_get_buffer(avctx, picture, 0)) < 0)
+            return ret;
+    }
 
     if (frame_4cc == AV_RL32("ifr2")) {
         picture->pict_type = AV_PICTURE_TYPE_I;

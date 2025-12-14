@@ -27,7 +27,7 @@
 ; horizontal line scaling
 ;
 ; void hscale<source_width>to<intermediate_nbits>_<filterSize>_<opt>
-;                               (SwsContext *c, int{16,32}_t *dst,
+;                               (SwsInternal *c, int{16,32}_t *dst,
 ;                                int dstW, const uint{8,16}_t *src,
 ;                                const int16_t *filter,
 ;                                const int32_t *filterPos, int filterSize);
@@ -92,7 +92,7 @@ function ff_hscale8to15_X8_neon, export=1
 endfunc
 
 function ff_hscale8to15_X4_neon, export=1
-// x0  SwsContext *c (not used)
+// x0  SwsInternal *c (not used)
 // x1  int16_t *dst
 // w2  int dstW
 // x3  const uint8_t *src
@@ -199,7 +199,7 @@ function ff_hscale8to15_X4_neon, export=1
 endfunc
 
 function ff_hscale8to15_4_neon, export=1
-// x0  SwsContext *c (not used)
+// x0  SwsInternal *c (not used)
 // x1  int16_t *dst
 // x2  int dstW
 // x3  const uint8_t *src
@@ -261,12 +261,12 @@ function ff_hscale8to15_4_neon, export=1
         add             x5, x5, #32                 // advance filterPos
 
         // interleaved SIMD and prefetching intended to keep ld/st and vector pipelines busy
-        uxtl            v16.8h, v16.8b              // unsigned extend long, covert src data to 16-bit
-        uxtl            v17.8h, v17.8b              // unsigned extend long, covert src data to 16-bit
+        uxtl            v16.8h, v16.8b              // unsigned extend long, convert src data to 16-bit
+        uxtl            v17.8h, v17.8b              // unsigned extend long, convert src data to 16-bit
         ldr             w8, [x3, w8, uxtw]          // src[filterPos[idx + 0]], next iteration
         ldr             w9, [x3, w9, uxtw]          // src[filterPos[idx + 1]], next iteration
-        uxtl            v18.8h, v18.8b              // unsigned extend long, covert src data to 16-bit
-        uxtl            v19.8h, v19.8b              // unsigned extend long, covert src data to 16-bit
+        uxtl            v18.8h, v18.8b              // unsigned extend long, convert src data to 16-bit
+        uxtl            v19.8h, v19.8b              // unsigned extend long, convert src data to 16-bit
         ldr             w10, [x3, w10, uxtw]        // src[filterPos[idx + 2]], next iteration
         ldr             w11, [x3, w11, uxtw]        // src[filterPos[idx + 3]], next iteration
 
@@ -302,10 +302,10 @@ function ff_hscale8to15_4_neon, export=1
         movi            v0.16b, #0                  // Clear madd accumulator for idx 0..3
         movi            v5.16b, #0                  // Clear madd accumulator for idx 4..7
 
-        uxtl            v16.8h, v16.8b              // unsigned extend long, covert src data to 16-bit
-        uxtl            v17.8h, v17.8b              // unsigned extend long, covert src data to 16-bit
-        uxtl            v18.8h, v18.8b              // unsigned extend long, covert src data to 16-bit
-        uxtl            v19.8h, v19.8b              // unsigned extend long, covert src data to 16-bit
+        uxtl            v16.8h, v16.8b              // unsigned extend long, convert src data to 16-bit
+        uxtl            v17.8h, v17.8b              // unsigned extend long, convert src data to 16-bit
+        uxtl            v18.8h, v18.8b              // unsigned extend long, convert src data to 16-bit
+        uxtl            v19.8h, v19.8b              // unsigned extend long, convert src data to 16-bit
 
         smlal           v0.4s, v1.4h, v16.4h        // multiply accumulate inner loop j = 0, idx = 0..3
         smlal           v0.4s, v2.4h, v17.4h        // multiply accumulate inner loop j = 1, idx = 0..3
@@ -336,7 +336,7 @@ function ff_hscale8to15_4_neon, export=1
         // load filter
         ld1             {v6.4h}, [x4], #8           // filter[filterSize * i + 0..3]
 
-        uxtl            v5.8h, v5.8b                // unsigned exten long, convert src data to 16-bit
+        uxtl            v5.8h, v5.8b                // unsigned extend long, convert src data to 16-bit
         smull           v0.4s, v5.4h, v6.4h         // 4 iterations of src[...] * filter[...]
         addv            s0, v0.4s                   // add up products of src and filter values
         sqshrn          h0, s0, #7                  // shift and clip the 2x16-bit final value
@@ -349,7 +349,7 @@ function ff_hscale8to15_4_neon, export=1
 endfunc
 
 function ff_hscale8to19_4_neon, export=1
-        // x0               SwsContext *c (unused)
+        // x0               SwsInternal *c (unused)
         // x1               int32_t *dst
         // w2               int dstW
         // x3               const uint8_t *src // treat it as uint16_t *src
@@ -542,7 +542,7 @@ function ff_hscale8to19_X8_neon, export=1
 endfunc
 
 function ff_hscale8to19_X4_neon, export=1
-        // x0  SwsContext *c (not used)
+        // x0  SwsInternal *c (not used)
         // x1  int16_t *dst
         // w2  int dstW
         // x3  const uint8_t *src
@@ -638,6 +638,16 @@ function ff_hscale8to19_X4_neon, export=1
         ret
 endfunc
 
+
+.macro hscale_iter src, src2, filter, dst1, dst2
+        uxtl            \src\().4s, \src\().4h
+        sxtl            v19.4s, \filter\().4h
+        mul             \dst1\().4s, \src\().4s, v19.4s
+        uxtl            \src2\().4s, \src2\().4h
+        sxtl2           \filter\().4s, \filter\().8h
+        mul             \dst2\().4s, \src2\().4s, \filter\().4s
+.endm
+
 function ff_hscale16to15_4_neon_asm, export=1
         // w0               int shift
         // x1               int32_t *dst
@@ -664,6 +674,7 @@ function ff_hscale16to15_4_neon_asm, export=1
         add             x5, x5, #32
 
         // shift all filterPos left by one, as uint16_t will be read
+        ld1             {v28.8h, v29.8h, v30.8h, v31.8h}, [x4], #64 // filter[0..7]
         lsl             x8, x8, #1
         lsl             x9, x9, #1
         lsl             x10, x10, #1
@@ -674,154 +685,101 @@ function ff_hscale16to15_4_neon_asm, export=1
         lsl             x15, x15, #1
 
         // load src with given offset
-        ldr             x8,  [x3, w8,  uxtw]
-        ldr             x9,  [x3, w9,  uxtw]
-        ldr             x10, [x3, w10, uxtw]
-        ldr             x11, [x3, w11, uxtw]
-        ldr             x12, [x3, w12, uxtw]
-        ldr             x13, [x3, w13, uxtw]
-        ldr             x14, [x3, w14, uxtw]
-        ldr             x15, [x3, w15, uxtw]
-
-        sub             sp, sp, #64
-        // push src on stack so it can be loaded into vectors later
-        stp             x8, x9, [sp]
-        stp             x10, x11, [sp, #16]
-        stp             x12, x13, [sp, #32]
-        stp             x14, x15, [sp, #48]
+        ldr             d0, [x3, w8,  uxtw]
+        ldr             d1, [x3, w9,  uxtw]
+        ldr             d2, [x3, w10, uxtw]
+        ldr             d3, [x3, w11, uxtw]
+        ldr             d4, [x3, w12, uxtw]
+        ldr             d5, [x3, w13, uxtw]
+        ldr             d6, [x3, w14, uxtw]
+        ldr             d7, [x3, w15, uxtw]
 
 1:
-        ld4             {v0.8h, v1.8h, v2.8h, v3.8h}, [sp]
-        ld4             {v28.8h, v29.8h, v30.8h, v31.8h}, [x4], #64 // filter[0..7]
-
-        // Each of blocks does the following:
-        // Extend src and filter to 32 bits with uxtl and sxtl
-        // multiply or multiply and accumulate results
-        // Extending to 32 bits is necessary, as unit16_t values can't
-        // be represented as int16_t without type promotion.
-        uxtl            v26.4s, v0.4h
-        sxtl            v27.4s, v28.4h
-        uxtl2           v0.4s, v0.8h
-        mul             v5.4s, v26.4s, v27.4s
-        sxtl2           v28.4s, v28.8h
-        uxtl            v26.4s, v1.4h
-        mul             v6.4s, v0.4s, v28.4s
-
-        sxtl            v27.4s, v29.4h
-        uxtl2           v0.4s, v1.8h
-        mla             v5.4s, v27.4s, v26.4s
-        sxtl2           v28.4s, v29.8h
-        uxtl            v26.4s, v2.4h
-        mla             v6.4s, v28.4s, v0.4s
-
-        sxtl            v27.4s, v30.4h
-        uxtl2           v0.4s, v2.8h
-        mla             v5.4s, v27.4s, v26.4s
-        sxtl2           v28.4s, v30.8h
-        uxtl            v26.4s, v3.4h
-        mla             v6.4s, v28.4s, v0.4s
-
-        sxtl            v27.4s, v31.4h
-        uxtl2           v0.4s, v3.8h
-        mla             v5.4s, v27.4s, v26.4s
-        sxtl2           v28.4s, v31.8h
-        sub             w2, w2, #8
-        mla             v6.4s, v28.4s, v0.4s
-
-        sshl            v5.4s, v5.4s, v17.4s
-        sshl            v6.4s, v6.4s, v17.4s
-        smin            v5.4s, v5.4s, v18.4s
-        smin            v6.4s, v6.4s, v18.4s
-        xtn             v5.4h, v5.4s
-        xtn2            v5.8h, v6.4s
-
-        st1             {v5.8h}, [x1], #16
-        cmp             w2, #16
 
         // load filterPositions into registers for next iteration
+
+        hscale_iter     v0, v1, v28, v20, v21
         ldp             w8, w9, [x5]                // filterPos[0], filterPos[1]
+        hscale_iter     v2, v3, v29, v22, v23
         ldp             w10, w11, [x5, #8]          // filterPos[2], filterPos[3]
+        hscale_iter     v4, v5, v30, v24, v25
         ldp             w12, w13, [x5, #16]         // filterPos[4], filterPos[5]
+        hscale_iter     v6, v7, v31, v26, v27
         ldp             w14, w15, [x5, #24]         // filterPos[6], filterPos[7]
+        subs            w2, w2, #8
         add             x5, x5, #32
 
+        ldp             q28, q29, [x4], #32 // filter[0..7]
         lsl             x8, x8, #1
         lsl             x9, x9, #1
         lsl             x10, x10, #1
         lsl             x11, x11, #1
+        ldp             q30, q31, [x4], #32 // filter[0..7]
         lsl             x12, x12, #1
         lsl             x13, x13, #1
         lsl             x14, x14, #1
         lsl             x15, x15, #1
 
-        ldr             x8,  [x3, w8,  uxtw]
-        ldr             x9,  [x3, w9,  uxtw]
-        ldr             x10, [x3, w10, uxtw]
-        ldr             x11, [x3, w11, uxtw]
-        ldr             x12, [x3, w12, uxtw]
-        ldr             x13, [x3, w13, uxtw]
-        ldr             x14, [x3, w14, uxtw]
-        ldr             x15, [x3, w15, uxtw]
+        addp            v20.4s, v20.4s, v21.4s
+        ldr             d0, [x3, w8,  uxtw]
+        addp            v22.4s, v22.4s, v23.4s
+        ldr             d1, [x3, w9,  uxtw]
+        addp            v24.4s, v24.4s, v25.4s
+        ldr             d2, [x3, w10, uxtw]
+        addp            v26.4s, v26.4s, v27.4s
+        ldr             d3, [x3, w11, uxtw]
+        addp            v20.4s, v20.4s, v22.4s
+        ldr             d4, [x3, w12, uxtw]
+        addp            v21.4s, v24.4s, v26.4s
+        ldr             d5, [x3, w13, uxtw]
+        cmp             w2, #16
 
-        stp             x8, x9, [sp]
-        stp             x10, x11, [sp, #16]
-        stp             x12, x13, [sp, #32]
-        stp             x14, x15, [sp, #48]
+        sshl            v20.4s, v20.4s, v17.4s
+        ldr             d6, [x3, w14, uxtw]
+        sshl            v21.4s, v21.4s, v17.4s
+        ldr             d7, [x3, w15, uxtw]
+        smin            v20.4s, v20.4s, v18.4s
+        smin            v21.4s, v21.4s, v18.4s
+        xtn             v20.4h, v20.4s
+        xtn2            v20.8h, v21.4s
+
+        st1             {v20.8h}, [x1], #16
 
         b.ge            1b
 
         // here we make last iteration, without updating the registers
-        ld4             {v0.8h, v1.8h, v2.8h, v3.8h}, [sp]
-        ld4             {v28.8h, v29.8h, v30.8h, v31.8h}, [x4], #64
 
-        uxtl            v26.4s, v0.4h
-        sxtl            v27.4s, v28.4h
-        uxtl2           v0.4s, v0.8h
-        mul             v5.4s, v26.4s, v27.4s
-        sxtl2           v28.4s, v28.8h
-        uxtl            v26.4s, v1.4h
-        mul             v6.4s, v0.4s, v28.4s
-
-        sxtl            v27.4s, v29.4h
-        uxtl2           v0.4s, v1.8h
-        mla             v5.4s, v26.4s, v27.4s
-        sxtl2           v28.4s, v29.8h
-        uxtl            v26.4s, v2.4h
-        mla             v6.4s, v0.4s, v28.4s
-
-        sxtl            v27.4s, v30.4h
-        uxtl2           v0.4s, v2.8h
-        mla             v5.4s, v26.4s, v27.4s
-        sxtl2           v28.4s, v30.8h
-        uxtl            v26.4s, v3.4h
-        mla             v6.4s, v0.4s, v28.4s
-
-        sxtl            v27.4s, v31.4h
-        uxtl2           v0.4s, v3.8h
-        mla             v5.4s, v26.4s, v27.4s
-        sxtl2           v28.4s, v31.8h
+        hscale_iter     v0, v1, v28, v20, v21
+        hscale_iter     v2, v3, v29, v22, v23
+        hscale_iter     v4, v5, v30, v24, v25
+        hscale_iter     v6, v7, v31, v26, v27
         subs            w2, w2, #8
-        mla             v6.4s, v0.4s, v28.4s
 
-        sshl            v5.4s, v5.4s, v17.4s
-        sshl            v6.4s, v6.4s, v17.4s
-        smin            v5.4s, v5.4s, v18.4s
-        smin            v6.4s, v6.4s, v18.4s
-        xtn             v5.4h, v5.4s
-        xtn2            v5.8h, v6.4s
+        addp            v20.4s, v20.4s, v21.4s
+        addp            v22.4s, v22.4s, v23.4s
+        addp            v24.4s, v24.4s, v25.4s
+        addp            v26.4s, v26.4s, v27.4s
+        addp            v0.4s, v20.4s, v22.4s
+        addp            v1.4s, v24.4s, v26.4s
 
-        st1             {v5.8h}, [x1], #16
-        add             sp, sp, #64                 // restore stack
+        sshl            v0.4s, v0.4s, v17.4s
+        sshl            v1.4s, v1.4s, v17.4s
+        smin            v0.4s, v0.4s, v18.4s
+        smin            v1.4s, v1.4s, v18.4s
+        xtn             v0.4h, v0.4s
+        xtn2            v0.8h, v1.4s
+
+        st1             {v0.8h}, [x1], #16
         cbnz            w2, 2f
 
         ret
 
 2:
         ldr             w8, [x5], #4                // load filterPos
-        lsl             w8, w8, #1
-        add             x9, x3, w8, uxtw            // src + filterPos
+        add             x9, x3, w8, uxtw #1         // src + filterPos
         ld1             {v0.4h}, [x9]               // load 4 * uint16_t
         ld1             {v31.4h}, [x4], #8
+        sub             w2, w2, #1
 
         uxtl            v0.4s, v0.4h
         sxtl            v31.4s, v31.4h
@@ -830,7 +788,6 @@ function ff_hscale16to15_4_neon_asm, export=1
         sshl            v0.4s, v0.4s, v17.4s
         smin            v0.4s, v0.4s, v18.4s
         st1             {v0.h}[0], [x1], #2
-        sub             w2, w2, #1
         cbnz            w2, 2b                      // if iterations remain jump to beginning
 
         ret
@@ -885,7 +842,7 @@ function ff_hscale16to15_X8_neon_asm, export=1
         sxtl2           v5.4s, v5.8h                // extend filter upper half to 32 bits
         uxtl            v26.4s, v6.4h               // extend srcp lower half to 32 bits
         mla             v0.4s, v4.4s, v5.4s         // multiply accumulate upper half of v4 * v5
-        sxtl            v27.4s, v7.4h               // exted filter lower half
+        sxtl            v27.4s, v7.4h               // extend filter lower half
         uxtl2           v6.4s, v6.8h                // extend srcp upper half
         sxtl2           v7.4s, v7.8h                // extend filter upper half
         ld1             {v16.8h}, [x10], #16        // srcp[filterPos[2] + {0..7}]
@@ -912,7 +869,7 @@ function ff_hscale16to15_X8_neon_asm, export=1
         addp            v2.4s, v2.4s, v3.4s         // part23 horizontal pair adding
         addp            v0.4s, v0.4s, v2.4s         // part0123 horizontal pair adding
         subs            w2, w2, #4                  // dstW -= 4
-        sshl            v0.4s, v0.4s, v21.4s        // shift right (effectively rigth, as shift is negative); overflow expected
+        sshl            v0.4s, v0.4s, v21.4s        // shift right (effectively right, as shift is negative); overflow expected
         smin            v0.4s, v0.4s, v20.4s        // apply min (do not use sqshl)
         xtn             v0.4h, v0.4s                // narrow down to 16 bits
 
@@ -1290,7 +1247,7 @@ function ff_hscale16to19_X8_neon_asm, export=1
         sxtl2           v5.4s, v5.8h                // extend filter upper half to 32 bits
         uxtl            v26.4s, v6.4h               // extend srcp lower half to 32 bits
         mla             v0.4s, v4.4s, v5.4s         // multiply accumulate upper half of v4 * v5
-        sxtl            v27.4s, v7.4h               // exted filter lower half
+        sxtl            v27.4s, v7.4h               // extend filter lower half
         uxtl2           v6.4s, v6.8h                // extend srcp upper half
         sxtl2           v7.4s, v7.8h                // extend filter upper half
         ld1             {v16.8h}, [x10], #16        // srcp[filterPos[2] + {0..7}]
@@ -1317,7 +1274,7 @@ function ff_hscale16to19_X8_neon_asm, export=1
         addp            v2.4s, v2.4s, v3.4s         // part23 horizontal pair adding
         addp            v0.4s, v0.4s, v2.4s         // part0123 horizontal pair adding
         subs            w2, w2, #4                  // dstW -= 4
-        sshl            v0.4s, v0.4s, v21.4s        // shift right (effectively rigth, as shift is negative); overflow expected
+        sshl            v0.4s, v0.4s, v21.4s        // shift right (effectively right, as shift is negative); overflow expected
         smin            v0.4s, v0.4s, v20.4s        // apply min (do not use sqshl)
         st1             {v0.4s}, [x1], #16          // write to destination part0123
         b.gt            1b                          // loop until end of line

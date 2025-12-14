@@ -83,11 +83,14 @@ static const AVOption il_options[] = {
 
 AVFILTER_DEFINE_CLASS(il);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     int reject_flags = AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_HWACCEL;
 
-    return ff_set_common_formats(ctx, ff_formats_pixdesc_filter(0, reject_flags));
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out,
+                                  ff_formats_pixdesc_filter(0, reject_flags));
 }
 
 static int config_input(AVFilterLink *inlink)
@@ -185,14 +188,14 @@ static const AVFilterPad inputs[] = {
     },
 };
 
-const AVFilter ff_vf_il = {
-    .name          = "il",
-    .description   = NULL_IF_CONFIG_SMALL("Deinterleave or interleave fields."),
+const FFFilter ff_vf_il = {
+    .p.name        = "il",
+    .p.description = NULL_IF_CONFIG_SMALL("Deinterleave or interleave fields."),
+    .p.priv_class  = &il_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     .priv_size     = sizeof(IlContext),
     FILTER_INPUTS(inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &il_class,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = ff_filter_process_command,
 };

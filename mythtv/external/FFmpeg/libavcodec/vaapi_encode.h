@@ -202,7 +202,7 @@ typedef struct VAAPIEncodeContext {
     AVVAAPIDeviceContext *hwctx;
 
     // Pool of (reusable) bitstream output buffers.
-    struct FFRefStructPool *output_buffer_pool;
+    struct AVRefStructPool *output_buffer_pool;
 
     // Global parameters which will be applied at the start of the
     // sequence (includes rate control parameters below).
@@ -260,6 +260,10 @@ typedef struct VAAPIEncodeContext {
      * This is a RefStruct reference.
      */
     VABufferID     *coded_buffer_ref;
+
+    // Surface alignment required by driver.
+    int             surface_alignment_width;
+    int             surface_alignment_height;
 } VAAPIEncodeContext;
 
 typedef struct VAAPIEncodeType {

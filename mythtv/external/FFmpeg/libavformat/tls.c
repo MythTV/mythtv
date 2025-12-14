@@ -1,6 +1,7 @@
 /*
- * TLS/SSL Protocol
+ * TLS/DTLS/SSL Protocol
  * Copyright (c) 2011 Martin Storsjo
+ * Copyright (c) 2025 Jack Lau
  *
  * This file is part of FFmpeg.
  *
@@ -20,6 +21,7 @@
  */
 
 #include "avformat.h"
+#include "internal.h"
 #include "network.h"
 #include "os_support.h"
 #include "url.h"
@@ -79,7 +81,7 @@ int ff_tls_open_underlying(TLSShared *c, URLContext *parent, const char *uri, AV
     if (ret < 0)
         return ret;
 
-    if (c->listen)
+    if (c->listen && !c->is_dtls)
         snprintf(opts, sizeof(opts), "?listen=1");
 
     av_url_split(NULL, 0, NULL, 0, c->underlying_host, sizeof(c->underlying_host), &port, NULL, 0, uri);
@@ -93,7 +95,7 @@ int ff_tls_open_underlying(TLSShared *c, URLContext *parent, const char *uri, AV
             c->listen = 1;
     }
 
-    ff_url_join(buf, sizeof(buf), "tcp", NULL, c->underlying_host, port, "%s", p);
+    ff_url_join(buf, sizeof(buf), c->is_dtls ? "udp" : "tcp", NULL, (c->is_dtls && c->listen) ? "" : c->underlying_host, port, "%s", p);
 
     hints.ai_flags = AI_NUMERICHOST;
     if (!getaddrinfo(c->underlying_host, NULL, &hints, &ai)) {
@@ -112,7 +114,7 @@ int ff_tls_open_underlying(TLSShared *c, URLContext *parent, const char *uri, AV
                 proxy_path && av_strstart(proxy_path, "http://", NULL);
     freeenv_utf8(env_no_proxy);
 
-    if (use_proxy) {
+    if (!c->is_dtls && use_proxy) {
         char proxy_host[200], proxy_auth[200], dest[200];
         int proxy_port;
         av_url_split(NULL, 0, proxy_auth, sizeof(proxy_auth),
@@ -124,7 +126,62 @@ int ff_tls_open_underlying(TLSShared *c, URLContext *parent, const char *uri, AV
     }
 
     freeenv_utf8(env_http_proxy);
-    return ffurl_open_whitelist(&c->tcp, buf, AVIO_FLAG_READ_WRITE,
-                                &parent->interrupt_callback, options,
-                                parent->protocol_whitelist, parent->protocol_blacklist, parent);
+    if (c->is_dtls) {
+        if (c->listen) {
+            av_dict_set_int(options, "localport", port, 0);
+            av_dict_set(options, "localaddr", c->underlying_host, 0);
+        } else {
+            av_dict_set_int(options, "localport", 0, 0);
+            av_dict_set_int(options, "connect", 1, 0);
+        }
+        av_dict_set_int(options, "fifo_size", 0, 0);
+        /* Set the max packet size to the buffer size. */
+        av_dict_set_int(options, "pkt_size", c->mtu, 0);
+    }
+    ret = ffurl_open_whitelist(c->is_dtls ? &c->udp : &c->tcp, buf, AVIO_FLAG_READ_WRITE,
+                               &parent->interrupt_callback, options,
+                               parent->protocol_whitelist, parent->protocol_blacklist, parent);
+    return ret;
+}
+
+/**
+ * Read all data from the given URL url and store it in the given buffer bp.
+ */
+int ff_url_read_all(const char *url, AVBPrint *bp)
+{
+    int ret = 0;
+    AVDictionary *opts = NULL;
+    URLContext *uc = NULL;
+    char buf[MAX_URL_SIZE];
+
+    ret = ffurl_open_whitelist(&uc, url, AVIO_FLAG_READ, NULL, &opts, NULL, NULL, NULL);
+    if (ret < 0) {
+        av_log(NULL, AV_LOG_ERROR, "TLS: Failed to open url %s\n", url);
+        goto end;
+    }
+
+    while (1) {
+        ret = ffurl_read(uc, buf, sizeof(buf));
+        if (ret == AVERROR_EOF) {
+            /* Reset the error because we read all response as answer util EOF. */
+            ret = 0;
+            break;
+        }
+        if (ret <= 0) {
+            av_log(NULL, AV_LOG_ERROR, "TLS: Failed to read from url=%s, key is %s\n", url, bp->str);
+            goto end;
+        }
+
+        av_bprintf(bp, "%.*s", ret, buf);
+        if (!av_bprint_is_complete(bp)) {
+            av_log(NULL, AV_LOG_ERROR, "TLS: Exceed max size %.*s, %s\n", ret, buf, bp->str);
+            ret = AVERROR(EIO);
+            goto end;
+        }
+    }
+
+end:
+    ffurl_closep(&uc);
+    av_dict_free(&opts);
+    return ret;
 }

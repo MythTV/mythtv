@@ -24,11 +24,12 @@
 #include "aacdec_ac.h"
 
 #include "libavcodec/aacsbr.h"
-
 #include "libavcodec/aactab.h"
-#include "libavutil/mem.h"
 #include "libavcodec/mpeg4audio.h"
 #include "libavcodec/unary.h"
+
+#include "libavutil/mem.h"
+#include "libavutil/refstruct.h"
 
 /* Number of scalefactor bands per complex prediction band, equal to 2. */
 #define SFB_PER_PRED_BAND 2
@@ -265,6 +266,7 @@ static int decode_usac_extension(AACDecContext *ac, AACUsacElemConfig *e,
         /* No configuration needed - fallthrough (len should be 0) */
     default:
         skip_bits(gb, 8*ext_config_len);
+        e->ext.type = ID_EXT_ELE_FILL;
         break;
     };
 
@@ -566,15 +568,8 @@ static int decode_usac_scale_factors(AACDecContext *ac,
     int offset_sf = global_gain;
     for (int g = 0; g < ics->num_window_groups; g++) {
         for (int sfb = 0; sfb < ics->max_sfb; sfb++) {
-            /* First coefficient is just the global gain */
-            if (!g && !sfb) {
-                /* The cannonical representation of quantized scalefactors
-                 * in the spec is with 100 subtracted. */
-                sce->sfo[0] = offset_sf - 100;
-                continue;
-            }
-
-            offset_sf += get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - SCALE_DIFF_ZERO;
+            if (g || sfb)
+                offset_sf += get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - SCALE_DIFF_ZERO;
             if (offset_sf > 255U) {
                 av_log(ac->avctx, AV_LOG_ERROR,
                        "Scalefactor (%d) out of range.\n", offset_sf);
@@ -917,8 +912,10 @@ static int decode_usac_stereo_info(AACDecContext *ac, AACUSACConfig *usac,
         }
 
         ret = setup_sce(ac, sce1, usac);
-        if (ret < 0)
+        if (ret < 0) {
+            ics2->max_sfb = 0;
             return ret;
+        }
 
         ret = setup_sce(ac, sce2, usac);
         if (ret < 0)
@@ -1027,8 +1024,9 @@ static void apply_noise_fill(AACDecContext *ac, SingleChannelElement *sce,
                 }
             }
 
-            if (band_quantized_to_zero)
-                sce->sfo[g*ics->max_sfb + sfb] += noise_offset;
+            if (band_quantized_to_zero) {
+                sce->sfo[g*ics->max_sfb + sfb] = FFMAX(sce->sfo[g*ics->max_sfb + sfb] + noise_offset, -200);
+            }
         }
         coef += g_len << 7;
     }
@@ -1482,11 +1480,11 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
         ret = ff_aac_sbr_decode_usac_data(ac, che, ec, gb, sbr_ch, indep_flag);
         if (ret < 0)
             return ret;
+    }
 
-        if (ec->stereo_config_index) {
-            avpriv_report_missing_feature(ac->avctx, "AAC USAC Mps212");
-            return AVERROR_PATCHWELCOME;
-        }
+    if (ec->stereo_config_index) {
+        avpriv_report_missing_feature(ac->avctx, "AAC USAC Mps212");
+        return AVERROR_PATCHWELCOME;
     }
 
     spectrum_decode(ac, usac, che, core_nb_channels);
@@ -1577,7 +1575,6 @@ static int parse_audio_preroll(AACDecContext *ac, GetBitContext *gb)
 static int parse_ext_ele(AACDecContext *ac, AACUsacElemConfig *e,
                          GetBitContext *gb)
 {
-    uint8_t *tmp;
     uint8_t pl_frag_start = 1;
     uint8_t pl_frag_end = 1;
     uint32_t len;
@@ -1604,18 +1601,26 @@ static int parse_ext_ele(AACDecContext *ac, AACUsacElemConfig *e,
     if (pl_frag_start)
         e->ext.pl_data_offset = 0;
 
-    /* If an extension starts and ends this packet, we can directly use it */
+    /* If an extension starts and ends this packet, we can directly use it below.
+     * Otherwise, we have to copy it to a buffer and accumulate it. */
     if (!(pl_frag_start && pl_frag_end)) {
-        tmp = av_realloc(e->ext.pl_data, e->ext.pl_data_offset + len);
-        if (!tmp) {
-            av_free(e->ext.pl_data);
+        /* Reallocate the data */
+        uint8_t *tmp_buf = av_refstruct_alloc_ext(e->ext.pl_data_offset + len,
+                                                  AV_REFSTRUCT_FLAG_NO_ZEROING,
+                                                  NULL, NULL);
+        if (!tmp_buf)
             return AVERROR(ENOMEM);
-        }
-        e->ext.pl_data = tmp;
+
+        /* Copy the data over only if we had saved data to begin with */
+        if (e->ext.pl_buf)
+            memcpy(tmp_buf, e->ext.pl_buf, e->ext.pl_data_offset);
+
+        av_refstruct_unref(&e->ext.pl_buf);
+        e->ext.pl_buf = tmp_buf;
 
         /* Readout data to a buffer */
         for (int i = 0; i < len; i++)
-            e->ext.pl_data[e->ext.pl_data_offset + i] = get_bits(gb, 8);
+            e->ext.pl_buf[e->ext.pl_data_offset + i] = get_bits(gb, 8);
     }
 
     e->ext.pl_data_offset += len;
@@ -1627,7 +1632,7 @@ static int parse_ext_ele(AACDecContext *ac, AACUsacElemConfig *e,
         GetBitContext *gb2 = gb;
         GetBitContext gbc;
         if (!(pl_frag_start && pl_frag_end)) {
-            ret = init_get_bits8(&gbc, e->ext.pl_data, pl_len);
+            ret = init_get_bits8(&gbc, e->ext.pl_buf, pl_len);
             if (ret < 0)
                 return ret;
 
@@ -1645,7 +1650,7 @@ static int parse_ext_ele(AACDecContext *ac, AACUsacElemConfig *e,
             /* This should never happen */
             av_assert0(0);
         }
-        av_freep(&e->ext.pl_data);
+        av_refstruct_unref(&e->ext.pl_buf);
         if (ret < 0)
             return ret;
 

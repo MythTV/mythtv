@@ -74,22 +74,24 @@ static int activate(AVFilterContext *ctx)
     return ff_filter_frame(outlink, frame);
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    SincContext *s = ctx->priv;
+    const SincContext *s = ctx->priv;
     static const AVChannelLayout chlayouts[] = { AV_CHANNEL_LAYOUT_MONO, { 0 } };
     int sample_rates[] = { s->sample_rate, -1 };
     static const enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_FLT,
                                                        AV_SAMPLE_FMT_NONE };
-    int ret = ff_set_common_formats_from_list(ctx, sample_fmts);
+    int ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts);
     if (ret < 0)
         return ret;
 
-    ret = ff_set_common_channel_layouts_from_list(ctx, chlayouts);
+    ret = ff_set_common_channel_layouts_from_list2(ctx, cfg_in, cfg_out, chlayouts);
     if (ret < 0)
         return ret;
 
-    return ff_set_common_samplerates_from_list(ctx, sample_rates);
+    return ff_set_common_samplerates_from_list2(ctx, cfg_in, cfg_out, sample_rates);
 }
 
 static float *make_lpf(int num_taps, float Fc, float beta, float rho,
@@ -327,7 +329,7 @@ static int config_output(AVFilterLink *outlink)
     SincContext *s = ctx->priv;
     float Fn = s->sample_rate * .5f;
     float *h[2];
-    int i, n, post_peak, longer;
+    int i, n, post_peak, longer, ret;
 
     outlink->sample_rate = s->sample_rate;
     s->pts = 0;
@@ -358,9 +360,9 @@ static int config_output(AVFilterLink *outlink)
     }
 
     if (s->phase != 50.f) {
-        int ret = fir_to_phase(s, &h[longer], &n, &post_peak, s->phase);
+        ret = fir_to_phase(s, &h[longer], &n, &post_peak, s->phase);
         if (ret < 0)
-            return ret;
+            goto cleanup;
     } else {
         post_peak = n >> 1;
     }
@@ -368,17 +370,21 @@ static int config_output(AVFilterLink *outlink)
     s->n = 1 << (av_log2(n) + 1);
     s->rdft_len = 1 << av_log2(n);
     s->coeffs = av_calloc(s->n, sizeof(*s->coeffs));
-    if (!s->coeffs)
-        return AVERROR(ENOMEM);
+    if (!s->coeffs) {
+        ret = AVERROR(ENOMEM);
+        goto cleanup;
+    }
 
     for (i = 0; i < n; i++)
         s->coeffs[i] = h[longer][i];
-    av_free(h[longer]);
 
     av_tx_uninit(&s->tx);
     av_tx_uninit(&s->itx);
+    ret = 0;
 
-    return 0;
+cleanup:
+    av_free(h[longer]);
+    return ret;
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -419,14 +425,13 @@ static const AVOption sinc_options[] = {
 
 AVFILTER_DEFINE_CLASS(sinc);
 
-const AVFilter ff_asrc_sinc = {
-    .name          = "sinc",
-    .description   = NULL_IF_CONFIG_SMALL("Generate a sinc kaiser-windowed low-pass, high-pass, band-pass, or band-reject FIR coefficients."),
+const FFFilter ff_asrc_sinc = {
+    .p.name        = "sinc",
+    .p.description = NULL_IF_CONFIG_SMALL("Generate a sinc kaiser-windowed low-pass, high-pass, band-pass, or band-reject FIR coefficients."),
+    .p.priv_class  = &sinc_class,
     .priv_size     = sizeof(SincContext),
-    .priv_class    = &sinc_class,
     .uninit        = uninit,
     .activate      = activate,
-    .inputs        = NULL,
     FILTER_OUTPUTS(sinc_outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
 };

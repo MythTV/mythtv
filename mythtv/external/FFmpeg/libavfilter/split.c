@@ -98,6 +98,7 @@ static int activate(AVFilterContext *ctx)
         av_frame_free(&in);
         if (ret < 0)
             return ret;
+        return 0;
     }
 
     if (ff_inlink_acknowledge_status(inlink, &status, &pts)) {
@@ -109,15 +110,7 @@ static int activate(AVFilterContext *ctx)
         return 0;
     }
 
-    for (int i = 0; i < ctx->nb_outputs; i++) {
-        if (ff_outlink_get_status(ctx->outputs[i]))
-            continue;
-
-        if (ff_outlink_frame_wanted(ctx->outputs[i])) {
-            ff_inlink_request_frame(inlink);
-            return 0;
-        }
-    }
+    FF_FILTER_FORWARD_WANTED_ANY(ctx, inlink);
 
     return FFERROR_NOT_READY;
 }
@@ -131,26 +124,24 @@ static const AVOption options[] = {
 
 AVFILTER_DEFINE_CLASS_EXT(split, "(a)split", options);
 
-const AVFilter ff_vf_split = {
-    .name        = "split",
-    .description = NULL_IF_CONFIG_SMALL("Pass on the input to N video outputs."),
+const FFFilter ff_vf_split = {
+    .p.name        = "split",
+    .p.description = NULL_IF_CONFIG_SMALL("Pass on the input to N video outputs."),
+    .p.priv_class  = &split_class,
+    .p.flags       = AVFILTER_FLAG_DYNAMIC_OUTPUTS | AVFILTER_FLAG_METADATA_ONLY,
     .priv_size   = sizeof(SplitContext),
-    .priv_class  = &split_class,
     .init        = split_init,
     .activate    = activate,
     FILTER_INPUTS(ff_video_default_filterpad),
-    .outputs     = NULL,
-    .flags       = AVFILTER_FLAG_DYNAMIC_OUTPUTS | AVFILTER_FLAG_METADATA_ONLY,
 };
 
-const AVFilter ff_af_asplit = {
-    .name        = "asplit",
-    .description = NULL_IF_CONFIG_SMALL("Pass on the audio input to N audio outputs."),
-    .priv_class  = &split_class,
+const FFFilter ff_af_asplit = {
+    .p.name        = "asplit",
+    .p.description = NULL_IF_CONFIG_SMALL("Pass on the audio input to N audio outputs."),
+    .p.priv_class  = &split_class,
+    .p.flags       = AVFILTER_FLAG_DYNAMIC_OUTPUTS | AVFILTER_FLAG_METADATA_ONLY,
     .priv_size   = sizeof(SplitContext),
     .init        = split_init,
     .activate    = activate,
     FILTER_INPUTS(ff_audio_default_filterpad),
-    .outputs     = NULL,
-    .flags       = AVFILTER_FLAG_DYNAMIC_OUTPUTS | AVFILTER_FLAG_METADATA_ONLY,
 };

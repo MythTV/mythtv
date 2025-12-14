@@ -253,64 +253,44 @@ static int huff_reader_get_symbol(HuffReader *r, GetBitContext *gb)
 }
 
 static int huff_reader_build_canonical(HuffReader *r, const uint8_t *code_lengths,
-                                       int alphabet_size)
+                                       uint16_t len_counts[MAX_HUFFMAN_CODE_LENGTH + 1],
+                                       uint8_t lens[], uint16_t syms[],
+                                       int alphabet_size, void *logctx)
 {
-    int len = 0, sym, code = 0, ret;
-    int max_code_length = 0;
-    uint16_t *codes;
+    unsigned nb_codes = 0;
+    int ret;
 
-    /* special-case 1 symbol since the vlc reader cannot handle it */
-    for (sym = 0; sym < alphabet_size; sym++) {
-        if (code_lengths[sym] > 0) {
-            len++;
-            code = sym;
-            if (len > 1)
-                break;
+    // Count the number of symbols of each length and transform len_counts
+    // into an array of offsets.
+    for (int len = 1; len <= MAX_HUFFMAN_CODE_LENGTH; ++len) {
+        unsigned cnt = len_counts[len];
+        len_counts[len] = nb_codes;
+        nb_codes += cnt;
+    }
+
+    for (int sym = 0; sym < alphabet_size; ++sym) {
+        if (code_lengths[sym]) {
+            unsigned idx = len_counts[code_lengths[sym]]++;
+            syms[idx] = sym;
+            lens[idx] = code_lengths[sym];
         }
     }
-    if (len == 1) {
-        r->nb_symbols = 1;
-        r->simple_symbols[0] = code;
-        r->simple = 1;
-        return 0;
-    }
-
-    for (sym = 0; sym < alphabet_size; sym++)
-        max_code_length = FFMAX(max_code_length, code_lengths[sym]);
-
-    if (max_code_length == 0 || max_code_length > MAX_HUFFMAN_CODE_LENGTH)
-        return AVERROR(EINVAL);
-
-    codes = av_malloc_array(alphabet_size, sizeof(*codes));
-    if (!codes)
-        return AVERROR(ENOMEM);
-
-    code = 0;
-    r->nb_symbols = 0;
-    for (len = 1; len <= max_code_length; len++) {
-        for (sym = 0; sym < alphabet_size; sym++) {
-            if (code_lengths[sym] != len)
-                continue;
-            codes[sym] = code++;
-            r->nb_symbols++;
+    if (nb_codes <= 1) {
+        if (nb_codes == 1) {
+            /* special-case 1 symbol since the vlc reader cannot handle it */
+            r->nb_symbols = 1;
+            r->simple = 1;
+            r->simple_symbols[0] = syms[0];
         }
-        code <<= 1;
-    }
-    if (!r->nb_symbols) {
-        av_free(codes);
+        // No symbols
         return AVERROR_INVALIDDATA;
     }
-
-    ret = vlc_init(&r->vlc, 8, alphabet_size,
-                   code_lengths, sizeof(*code_lengths), sizeof(*code_lengths),
-                   codes, sizeof(*codes), sizeof(*codes), VLC_INIT_OUTPUT_LE);
-    if (ret < 0) {
-        av_free(codes);
+    ret = ff_vlc_init_from_lengths(&r->vlc, 8, nb_codes, lens, 1,
+                                   syms, 2, 2, 0, VLC_INIT_OUTPUT_LE, logctx);
+    if (ret < 0)
         return ret;
-    }
     r->simple = 0;
 
-    av_free(codes);
     return 0;
 }
 
@@ -335,23 +315,18 @@ static int read_huffman_code_normal(WebPContext *s, HuffReader *hc,
     HuffReader code_len_hc = { { 0 }, 0, 0, { 0 } };
     uint8_t *code_lengths;
     uint8_t code_length_code_lengths[NUM_CODE_LENGTH_CODES] = { 0 };
-    int i, symbol, max_symbol, prev_code_len, ret;
+    uint8_t reordered_code_length_code_lengths[NUM_CODE_LENGTH_CODES];
+    uint16_t reordered_code_length_syms[NUM_CODE_LENGTH_CODES];
+    uint16_t len_counts[MAX_HUFFMAN_CODE_LENGTH + 1] = { 0 };
+    int symbol, max_symbol, prev_code_len, ret;
     int num_codes = 4 + get_bits(&s->gb, 4);
 
     av_assert1(num_codes <= NUM_CODE_LENGTH_CODES);
 
-    for (i = 0; i < num_codes; i++)
-        code_length_code_lengths[code_length_code_order[i]] = get_bits(&s->gb, 3);
-
-    ret = huff_reader_build_canonical(&code_len_hc, code_length_code_lengths,
-                                      NUM_CODE_LENGTH_CODES);
-    if (ret < 0)
-        return ret;
-
-    code_lengths = av_mallocz(alphabet_size);
-    if (!code_lengths) {
-        ret = AVERROR(ENOMEM);
-        goto finish;
+    for (int i = 0; i < num_codes; i++) {
+        unsigned len = get_bits(&s->gb, 3);
+        code_length_code_lengths[code_length_code_order[i]] = len;
+        len_counts[len]++;
     }
 
     if (get_bits1(&s->gb)) {
@@ -360,35 +335,53 @@ static int read_huffman_code_normal(WebPContext *s, HuffReader *hc,
         if (max_symbol > alphabet_size) {
             av_log(s->avctx, AV_LOG_ERROR, "max symbol %d > alphabet size %d\n",
                    max_symbol, alphabet_size);
-            ret = AVERROR_INVALIDDATA;
-            goto finish;
+            return AVERROR_INVALIDDATA;
         }
     } else {
         max_symbol = alphabet_size;
     }
 
+    ret = huff_reader_build_canonical(&code_len_hc, code_length_code_lengths, len_counts,
+                                      reordered_code_length_code_lengths,
+                                      reordered_code_length_syms,
+                                      NUM_CODE_LENGTH_CODES, s->avctx);
+    if (ret < 0)
+        return ret;
+
+    code_lengths = av_malloc_array(alphabet_size, 2 * sizeof(uint8_t) + sizeof(uint16_t));
+    if (!code_lengths) {
+        ret = AVERROR(ENOMEM);
+        goto finish;
+    }
+
     prev_code_len = 8;
     symbol        = 0;
+    memset(len_counts, 0, sizeof(len_counts));
     while (symbol < alphabet_size) {
         int code_len;
 
         if (!max_symbol--)
             break;
         code_len = huff_reader_get_symbol(&code_len_hc, &s->gb);
-        if (code_len < 16) {
+        if (code_len < 16U) {
             /* Code length code [0..15] indicates literal code lengths. */
             code_lengths[symbol++] = code_len;
+            len_counts[code_len]++;
             if (code_len)
                 prev_code_len = code_len;
         } else {
             int repeat = 0, length = 0;
             switch (code_len) {
+            default:
+                ret = AVERROR_INVALIDDATA;
+                goto finish;
             case 16:
                 /* Code 16 repeats the previous non-zero value [3..6] times,
                  * i.e., 3 + ReadBits(2) times. If code 16 is used before a
                  * non-zero value has been emitted, a value of 8 is repeated. */
                 repeat = 3 + get_bits(&s->gb, 2);
                 length = prev_code_len;
+                len_counts[length] += repeat;
                 break;
             case 17:
                 /* Code 17 emits a streak of zeros [3..10], i.e.,
@@ -413,7 +406,10 @@ static int read_huffman_code_normal(WebPContext *s, HuffReader *hc,
         }
     }
 
-    ret = huff_reader_build_canonical(hc, code_lengths, alphabet_size);
+    ret = huff_reader_build_canonical(hc, code_lengths, len_counts,
+                                      code_lengths + symbol,
+                                      (uint16_t*)(code_lengths + 2 * symbol),
+                                      symbol, s->avctx);
 
 finish:
     ff_vlc_free(&code_len_hc.vlc);
@@ -703,6 +699,9 @@ static int decode_entropy_coded_image(WebPContext *s, enum ImageRole role,
             }
             ref_x = FFMAX(0, ref_x);
             ref_y = FFMAX(0, ref_y);
+
+            if (ref_y == y && ref_x >= x)
+                return AVERROR_INVALIDDATA;
 
             /* copy pixels
              * source and dest regions can overlap and wrap lines, so just
@@ -1188,6 +1187,7 @@ static int vp8_lossless_decode_frame(AVCodecContext *avctx, AVFrame *p,
     *got_frame   = 1;
     p->pict_type = AV_PICTURE_TYPE_I;
     p->flags |= AV_FRAME_FLAG_KEY;
+    p->flags |= AV_FRAME_FLAG_LOSSLESS;
     ret          = data_size;
 
 free_and_return:
@@ -1403,7 +1403,11 @@ static int webp_decode_frame(AVCodecContext *avctx, AVFrame *p,
                                                 chunk_size, 0);
                 if (ret < 0)
                     return ret;
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
                 avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
             }
             bytestream2_skip(&gb, chunk_size);
             break;

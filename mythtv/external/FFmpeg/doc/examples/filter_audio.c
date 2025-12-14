@@ -270,7 +270,6 @@ int main(int argc, char *argv[])
     AVFilterGraph *graph;
     AVFilterContext *src, *sink;
     AVFrame *frame;
-    uint8_t errstr[1024];
     float duration;
     int err, nb_frames, i;
 
@@ -295,6 +294,7 @@ int main(int argc, char *argv[])
 
     md5 = av_md5_alloc();
     if (!md5) {
+        av_frame_free(&frame);
         fprintf(stderr, "Error allocating the MD5 context\n");
         return 1;
     }
@@ -302,8 +302,10 @@ int main(int argc, char *argv[])
     /* Set up the filtergraph. */
     err = init_filter_graph(&graph, &src, &sink);
     if (err < 0) {
+        av_frame_free(&frame);
+        av_freep(&md5);
         fprintf(stderr, "Unable to init filter graph:");
-        goto fail;
+        return 1;
     }
 
     /* the main filtering loop */
@@ -354,7 +356,10 @@ int main(int argc, char *argv[])
     return 0;
 
 fail:
-    av_strerror(err, errstr, sizeof(errstr));
-    fprintf(stderr, "%s\n", errstr);
+    avfilter_graph_free(&graph);
+    av_frame_free(&frame);
+    av_freep(&md5);
+
+    fprintf(stderr, "%s\n", av_err2str(err));
     return 1;
 }

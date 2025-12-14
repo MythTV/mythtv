@@ -31,6 +31,7 @@
 #include "libavutil/file.h"
 #include "libavutil/mem.h"
 #include "libavutil/time.h"
+#include "libavutil/time_internal.h"
 
 static int ff_expand_text_function_internal(FFExpandTextContext *expand_text, AVBPrint *bp,
                                             char *name, unsigned argc, char **argv)
@@ -380,4 +381,3 @@ int ff_load_textfile(void *log_ctx, const char *textfile,
 
     return 0;
 }
-

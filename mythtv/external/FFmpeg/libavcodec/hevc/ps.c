@@ -30,7 +30,7 @@
 #include "data.h"
 #include "ps.h"
 #include "profiles.h"
-#include "refstruct.h"
+#include "libavutil/refstruct.h"
 
 static const uint8_t default_scaling_list_intra[] = {
     16, 16, 16, 16, 17, 18, 21, 24,
@@ -69,9 +69,9 @@ static void remove_sps(HEVCParamSets *s, int id)
         /* drop all PPS that depend on this SPS */
         for (i = 0; i < FF_ARRAY_ELEMS(s->pps_list); i++)
             if (s->pps_list[i] && s->pps_list[i]->sps_id == id)
-                ff_refstruct_unref(&s->pps_list[i]);
+                av_refstruct_unref(&s->pps_list[i]);
 
-        ff_refstruct_unref(&s->sps_list[id]);
+        av_refstruct_unref(&s->sps_list[id]);
     }
 }
 
@@ -82,7 +82,7 @@ static void remove_vps(HEVCParamSets *s, int id)
         for (i = 0; i < FF_ARRAY_ELEMS(s->sps_list); i++)
             if (s->sps_list[i] && s->sps_list[i]->vps_id == id)
                 remove_sps(s, i);
-        ff_refstruct_unref(&s->vps_list[id]);
+        av_refstruct_unref(&s->vps_list[id]);
     }
 }
 
@@ -442,21 +442,13 @@ static int decode_hrd(GetBitContext *gb, int common_inf_present,
     return 0;
 }
 
-static void hevc_vps_free(FFRefStructOpaque opaque, void *obj)
+static void hevc_vps_free(AVRefStructOpaque opaque, void *obj)
 {
     HEVCVPS *vps = obj;
 
     av_freep(&vps->hdr);
     av_freep(&vps->data);
 }
-
-enum ScalabilityMask {
-    HEVC_SCALABILITY_DEPTH      = 0,
-    HEVC_SCALABILITY_MULTIVIEW  = 1,
-    HEVC_SCALABILITY_SPATIAL    = 2,
-    HEVC_SCALABILITY_AUXILIARY  = 3,
-    HEVC_SCALABILITY_MASK_MAX   = 15,
-};
 
 enum DependencyType {
     HEVC_DEP_TYPE_SAMPLE = 0,
@@ -468,14 +460,17 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
                           uint64_t layer1_id_included)
 {
     PTL ptl_dummy;
-    uint8_t max_sub_layers[HEVC_MAX_LAYERS];
+    uint8_t max_sub_layers[HEVC_MAX_LAYERS] = {1, 1};
+    uint8_t dimension_id_len[16] = {0};
+    uint8_t dimension_id[16] = {0};
+    unsigned n;
 
-    int splitting_flag, dimension_id_len, view_id_len, num_add_olss,
+    int splitting_flag, view_id_len, num_add_olss, num_scalability_types,
         default_output_layer_idc, direct_dep_type_len, direct_dep_type,
         sub_layers_max_present, sub_layer_flag_info_present_flag, nb_ptl;
     unsigned non_vui_extension_length;
 
-    if (vps->vps_max_layers == 1 || vps->vps_num_layer_sets == 1) {
+    if (vps->vps_max_layers == 1) {
         av_log(avctx, AV_LOG_VERBOSE, "Ignoring VPS extensions with a single layer\n");
         return 0;
     }
@@ -528,20 +523,35 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
      */
     vps->nb_layers = 2;
 
+    /* vps_base_layer_internal_flag is true has been checked before */
     if (parse_ptl(gb, avctx, 0, &ptl_dummy, vps->vps_max_sub_layers) < 0)
         return AVERROR_INVALIDDATA;
 
     splitting_flag = get_bits1(gb);
-    for (int i = 0; i <= HEVC_SCALABILITY_MASK_MAX; i++) {
-        int scalability_mask_flag = get_bits1(gb);
-        if (scalability_mask_flag != (i == HEVC_SCALABILITY_MULTIVIEW)) {
-            av_log(avctx, AV_LOG_ERROR, "Scalability type %d not supported\n", i);
-            return AVERROR_PATCHWELCOME;
-        }
+    vps->scalability_mask_flag = get_bits(gb, 16);
+    num_scalability_types = av_popcount(vps->scalability_mask_flag);
+    if (!num_scalability_types) {
+        av_log(avctx, AV_LOG_ERROR, "Missing scalability mask\n");
+        return AVERROR_INVALIDDATA;
     }
 
-    if (!splitting_flag)
-        dimension_id_len = get_bits(gb, 3) + 1;
+    if (!(vps->scalability_mask_flag &
+          (HEVC_SCALABILITY_MULTIVIEW | HEVC_SCALABILITY_AUXILIARY))) {
+        av_log(avctx, AV_LOG_ERROR, "Scalability type %d not supported\n",
+               15 - ff_ctz(vps->scalability_mask_flag));
+        return AVERROR_PATCHWELCOME;
+    }
+    // x265 specify MULTIVIEW when the stream really is alpha video only.
+    if (num_scalability_types > 1)
+        av_log(avctx, AV_LOG_WARNING, "Multiple scalability types presented\n");
+
+    n = 0;
+    for (int i = 0; i < num_scalability_types - splitting_flag; i++) {
+        dimension_id_len[i] = get_bits(gb, 3) + 1;
+        n += dimension_id_len[i];
+    }
+    if (splitting_flag)
+        dimension_id_len[num_scalability_types - 1] = 5 - n;
 
     if (get_bits1(gb)) { /* vps_nuh_layer_id_present_flag */
         int layer_id_in_nuh = get_bits(gb, 6);
@@ -558,28 +568,57 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
     }
 
     if (!splitting_flag) {
-        int view_idx = get_bits(gb, dimension_id_len);
-        if (view_idx != 1) {
-            av_log(avctx, AV_LOG_ERROR, "Unexpected ViewOrderIdx: %d\n", view_idx);
+        int index = 0;
+
+        for (int i = 0; i < num_scalability_types; i++)
+            dimension_id[i] = get_bits(gb, dimension_id_len[i]);
+
+        if (vps->scalability_mask_flag & HEVC_SCALABILITY_MULTIVIEW)
+            index++;
+
+        /* AuxId 1 is alpha, 2 is depth. Only support alpha */
+        if (vps->scalability_mask_flag & HEVC_SCALABILITY_AUXILIARY &&
+            dimension_id[index] != HEVC_AUX_ALPHA) {
+            av_log(avctx, AV_LOG_WARNING,
+                   "Unsupported dimension_id %d for HEVC_SCALABILITY_AUXILIARY\n",
+                   dimension_id[index]);
             return AVERROR_PATCHWELCOME;
         }
     }
 
     view_id_len = get_bits(gb, 4);
-    if (view_id_len)
-        for (int i = 0; i < 2 /* NumViews */; i++)
+    if (view_id_len) {
+        n = (vps->scalability_mask_flag & HEVC_SCALABILITY_MULTIVIEW) ? 2 : 1;
+        for (int i = 0; i < n; i++)
             vps->view_id[i] = get_bits(gb, view_id_len);
-
-    if (!get_bits1(gb) /* direct_dependency_flag */) {
-        av_log(avctx, AV_LOG_WARNING, "Independent output layers not supported\n");
-        return AVERROR_PATCHWELCOME;
     }
-    vps->num_direct_ref_layers[1] = 1;
+
+    /* direct_dependency_flag */
+    vps->num_direct_ref_layers[1] = get_bits1(gb);
+    if (!vps->num_direct_ref_layers[1]) {
+        vps->num_add_layer_sets = get_ue_golomb(gb);
+        if (vps->num_add_layer_sets > 1) {
+            av_log(avctx, AV_LOG_WARNING,
+                   "Unsupported num_add_layer_sets: %d\n", vps->num_add_layer_sets);
+            return AVERROR_PATCHWELCOME;
+        }
+
+        if (vps->num_add_layer_sets) {
+            /* highest_layer_idx_plus1 */
+            if (!get_bits1(gb))
+                return AVERROR_PATCHWELCOME;
+        }
+    }
+    vps->num_output_layer_sets = vps->vps_num_layer_sets + vps->num_add_layer_sets;
+    if (vps->num_output_layer_sets != 2)
+        return AVERROR_INVALIDDATA;
 
     sub_layers_max_present = get_bits1(gb); // vps_sub_layers_max_minus1_present_flag
-    for (int i = 0; i < vps->vps_max_layers; i++)
-        max_sub_layers[i] = sub_layers_max_present ? get_bits(gb, 3) + 1 :
-                                                     vps->vps_max_sub_layers;
+    if (sub_layers_max_present) {
+        for (int i = 0; i < vps->vps_max_layers; i++)
+            max_sub_layers[i] = sub_layers_max_present ? get_bits(gb, 3) + 1 :
+                                                         vps->vps_max_sub_layers;
+    }
 
     if (get_bits1(gb) /* max_tid_ref_present_flag */)
         skip_bits(gb, 3); // max_tid_il_ref_pics_plus1
@@ -612,18 +651,24 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
     }
 
     /* Consequence of established layer dependencies */
-    if (layer1_id_included != ((1 << vps->layer_id_in_nuh[0]) |
-                               (1 << vps->layer_id_in_nuh[1]))) {
-        av_log(avctx, AV_LOG_ERROR, "Dependent layer not included in layer ID?\n");
-        return AVERROR_PATCHWELCOME;
+    if (layer1_id_included &&
+        layer1_id_included != ((1ULL << vps->layer_id_in_nuh[0]) |
+                               (1ULL << vps->layer_id_in_nuh[1]))) {
+            av_log(avctx, AV_LOG_ERROR,
+                   "Dependent layer not included in layer ID?\n");
+            return AVERROR_PATCHWELCOME;
     }
+    if (!layer1_id_included)
+        vps->ols[1] = 2;
+    else
+        vps->ols[1] = 3;
 
-    vps->num_output_layer_sets = 2;
-    vps->ols[1] = 3;
+    if (vps->vps_num_layer_sets == 1 || default_output_layer_idc == 2)
+        skip_bits1(gb);
 
     for (int j = 0; j < av_popcount64(vps->ols[1]); j++) {
         int ptl_idx = get_bits(gb, av_ceil_log2(nb_ptl));
-        if (ptl_idx < 1 || ptl_idx >= nb_ptl) {
+        if (ptl_idx >= nb_ptl) {
             av_log(avctx, AV_LOG_ERROR, "Invalid PTL index: %d\n", ptl_idx);
             return AVERROR_INVALIDDATA;
         }
@@ -666,6 +711,8 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
 
     vps->max_one_active_ref_layer = get_bits1(gb);
     vps->poc_lsb_aligned          = get_bits1(gb);
+    if (!vps->num_direct_ref_layers[1])
+        vps->poc_lsb_not_present = get_bits1(gb) << 1;
 
     sub_layer_flag_info_present_flag = get_bits1(gb);
     for (int j = 0; j < FFMAX(max_sub_layers[0], max_sub_layers[1]); j++) {
@@ -687,12 +734,14 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
         return AVERROR_INVALIDDATA;
     }
 
-    skip_bits1(gb); /* direct_depenency_all_layers_flag */
-    direct_dep_type = get_bits_long(gb, direct_dep_type_len);
-    if (direct_dep_type > HEVC_DEP_TYPE_BOTH) {
-        av_log(avctx, AV_LOG_WARNING, "Unsupported direct_dep_type: %d\n",
-               direct_dep_type);
-        return AVERROR_PATCHWELCOME;
+    /* direct_depenency_all_layers_flag */
+    if (get_bits1(gb)) {
+        direct_dep_type = get_bits_long(gb, direct_dep_type_len);
+        if (direct_dep_type > HEVC_DEP_TYPE_BOTH) {
+            av_log(avctx, AV_LOG_WARNING, "Unsupported direct_dep_type: %d\n",
+                   direct_dep_type);
+            return AVERROR_PATCHWELCOME;
+        }
     }
 
     non_vui_extension_length = get_ue_golomb(gb);
@@ -714,9 +763,10 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
 {
     int i;
     int vps_id = get_bits(gb, 4);
-    ptrdiff_t nal_size = gb->buffer_end - gb->buffer;
+    ptrdiff_t nal_size = get_bits_bytesize(gb, 1);
     int ret = AVERROR_INVALIDDATA;
     uint64_t layer1_id_included = 0;
+    unsigned vps_base_layer_internal_flag, vps_base_layer_available_flag;
     HEVCVPS *vps;
 
     if (ps->vps_list[vps_id]) {
@@ -726,7 +776,7 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
             return 0;
     }
 
-    vps = ff_refstruct_alloc_ext(sizeof(*vps), 0, NULL, hevc_vps_free);
+    vps = av_refstruct_alloc_ext(sizeof(*vps), 0, NULL, hevc_vps_free);
     if (!vps)
         return AVERROR(ENOMEM);
 
@@ -740,8 +790,12 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
     }
     vps->vps_id = vps_id;
 
-    if (get_bits(gb, 2) != 3) { // vps_reserved_three_2bits
-        av_log(avctx, AV_LOG_ERROR, "vps_reserved_three_2bits is not three\n");
+    vps_base_layer_internal_flag = get_bits1(gb);
+    vps_base_layer_available_flag = get_bits1(gb);
+    if (!vps_base_layer_internal_flag || !vps_base_layer_available_flag) {
+        av_log(avctx, AV_LOG_ERROR,
+               "vps_base_layer_internal_flag or vps_base_layer_available_flag not set\n");
+        ret = AVERROR_PATCHWELCOME;
         goto err;
     }
 
@@ -860,7 +914,7 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
     return 0;
 
 err:
-    ff_refstruct_unref(&vps);
+    av_refstruct_unref(&vps);
     return ret;
 }
 
@@ -1154,6 +1208,7 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
     HEVCWindow *ow;
     int ret = 0;
     int bit_depth_chroma, num_comps, multi_layer_ext;
+    int vps_max_sub_layers;
     int i;
 
     // Coded parameters
@@ -1166,7 +1221,7 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
                    sps->vps_id);
             return AVERROR_INVALIDDATA;
         }
-        sps->vps = ff_refstruct_ref_c(vps_list[sps->vps_id]);
+        sps->vps = av_refstruct_ref_c(vps_list[sps->vps_id]);
     }
 
     sps->max_sub_layers = get_bits(gb, 3) + 1;
@@ -1178,7 +1233,10 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
         sps->max_sub_layers = sps->vps->vps_max_sub_layers;
     }
-    if (sps->max_sub_layers > HEVC_MAX_SUB_LAYERS) {
+    vps_max_sub_layers = sps->vps ? sps->vps->vps_max_sub_layers
+                                  : FFMIN(sps->max_sub_layers, HEVC_MAX_SUB_LAYERS);
+
+    if (sps->max_sub_layers > vps_max_sub_layers) {
         av_log(avctx, AV_LOG_ERROR, "sps_max_sub_layers out of range: %d\n",
                sps->max_sub_layers);
         return AVERROR_INVALIDDATA;
@@ -1202,6 +1260,12 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
     if (multi_layer_ext) {
         const RepFormat *rf = &sps->vps->rep_format;
+
+        if (sps->vps->nb_layers == 1) {
+            av_log(avctx, AV_LOG_WARNING, "SPS %d references an unsupported VPS extension. Ignoring\n",
+                   *sps_id);
+            return AVERROR(ENOSYS);
+        }
 
         if (get_bits1(gb) &&    // update_rep_format_flag
             get_bits(gb, 8)) {  // sps_rep_format_idx
@@ -1618,11 +1682,11 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
     return 0;
 }
 
-static void hevc_sps_free(FFRefStructOpaque opaque, void *obj)
+static void hevc_sps_free(AVRefStructOpaque opaque, void *obj)
 {
     HEVCSPS *sps = obj;
 
-    ff_refstruct_unref(&sps->vps);
+    av_refstruct_unref(&sps->vps);
 
     av_freep(&sps->data);
 }
@@ -1637,7 +1701,7 @@ int ff_hevc_decode_nal_sps(GetBitContext *gb, AVCodecContext *avctx,
                            HEVCParamSets *ps, unsigned nuh_layer_id,
                            int apply_defdispwin)
 {
-    HEVCSPS *sps = ff_refstruct_alloc_ext(sizeof(*sps), 0, NULL, hevc_sps_free);
+    HEVCSPS *sps = av_refstruct_alloc_ext(sizeof(*sps), 0, NULL, hevc_sps_free);
     unsigned int sps_id;
     int ret;
 
@@ -1646,7 +1710,7 @@ int ff_hevc_decode_nal_sps(GetBitContext *gb, AVCodecContext *avctx,
 
     av_log(avctx, AV_LOG_DEBUG, "Decoding SPS\n");
 
-    sps->data_size = gb->buffer_end - gb->buffer;
+    sps->data_size = get_bits_bytesize(gb, 1);
     sps->data = av_memdup(gb->buffer, sps->data_size);
     if (!sps->data) {
         ret = AVERROR(ENOMEM);
@@ -1674,7 +1738,7 @@ int ff_hevc_decode_nal_sps(GetBitContext *gb, AVCodecContext *avctx,
      * otherwise drop all PPSes that depend on it */
     if (ps->sps_list[sps_id] &&
         compare_sps(ps->sps_list[sps_id], sps)) {
-        ff_refstruct_unref(&sps);
+        av_refstruct_unref(&sps);
     } else {
         remove_sps(ps, sps_id);
         ps->sps_list[sps_id] = sps;
@@ -1682,15 +1746,15 @@ int ff_hevc_decode_nal_sps(GetBitContext *gb, AVCodecContext *avctx,
 
     return 0;
 err:
-    ff_refstruct_unref(&sps);
+    av_refstruct_unref(&sps);
     return ret;
 }
 
-static void hevc_pps_free(FFRefStructOpaque unused, void *obj)
+static void hevc_pps_free(AVRefStructOpaque unused, void *obj)
 {
     HEVCPPS *pps = obj;
 
-    ff_refstruct_unref(&pps->sps);
+    av_refstruct_unref(&pps->sps);
 
     av_freep(&pps->column_width);
     av_freep(&pps->row_height);
@@ -2101,7 +2165,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
     const HEVCSPS *sps = NULL;
     const HEVCVPS *vps = NULL;
     int i, ret = 0;
-    ptrdiff_t nal_size = gb->buffer_end - gb->buffer;
+    ptrdiff_t nal_size = get_bits_bytesize(gb, 1);
     unsigned int pps_id = get_ue_golomb_long(gb);
     unsigned log2_parallel_merge_level_minus2;
     HEVCPPS *pps;
@@ -2120,7 +2184,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
             return 0;
     }
 
-    pps = ff_refstruct_alloc_ext(sizeof(*pps), 0, NULL, hevc_pps_free);
+    pps = av_refstruct_alloc_ext(sizeof(*pps), 0, NULL, hevc_pps_free);
     if (!pps)
         return AVERROR(ENOMEM);
 
@@ -2157,7 +2221,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
     sps = ps->sps_list[pps->sps_id];
     vps = ps->vps_list[sps->vps_id];
 
-    pps->sps = ff_refstruct_ref_c(sps);
+    pps->sps = av_refstruct_ref_c(sps);
 
     pps->dependent_slice_segments_enabled_flag = get_bits1(gb);
     pps->output_flag_present_flag              = get_bits1(gb);
@@ -2357,13 +2421,13 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
                "Overread PPS by %d bits\n", -get_bits_left(gb));
     }
 
-    ff_refstruct_unref(&ps->pps_list[pps_id]);
+    av_refstruct_unref(&ps->pps_list[pps_id]);
     ps->pps_list[pps_id] = pps;
 
     return 0;
 
 err:
-    ff_refstruct_unref(&pps);
+    av_refstruct_unref(&pps);
     return ret;
 }
 
@@ -2372,11 +2436,11 @@ void ff_hevc_ps_uninit(HEVCParamSets *ps)
     int i;
 
     for (i = 0; i < FF_ARRAY_ELEMS(ps->vps_list); i++)
-        ff_refstruct_unref(&ps->vps_list[i]);
+        av_refstruct_unref(&ps->vps_list[i]);
     for (i = 0; i < FF_ARRAY_ELEMS(ps->sps_list); i++)
-        ff_refstruct_unref(&ps->sps_list[i]);
+        av_refstruct_unref(&ps->sps_list[i]);
     for (i = 0; i < FF_ARRAY_ELEMS(ps->pps_list); i++)
-        ff_refstruct_unref(&ps->pps_list[i]);
+        av_refstruct_unref(&ps->pps_list[i]);
 }
 
 int ff_hevc_compute_poc(const HEVCSPS *sps, int pocTid0, int poc_lsb, int nal_unit_type)

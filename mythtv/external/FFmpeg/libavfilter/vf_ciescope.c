@@ -139,14 +139,16 @@ static const enum AVPixelFormat out_pix_fmts[] = {
     AV_PIX_FMT_NONE
 };
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     int ret;
 
-    if ((ret = ff_formats_ref(ff_make_format_list(in_pix_fmts), &ctx->inputs[0]->outcfg.formats)) < 0)
+    if ((ret = ff_formats_ref(ff_make_format_list(in_pix_fmts), &cfg_in[0]->formats)) < 0)
         return ret;
 
-    if ((ret = ff_formats_ref(ff_make_format_list(out_pix_fmts), &ctx->outputs[0]->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(ff_make_format_list(out_pix_fmts), &cfg_out[0]->formats)) < 0)
         return ret;
 
     return 0;
@@ -1130,7 +1132,7 @@ fill_in_tongue(uint16_t*                  const pixels,
 
     /* Scan the image line by line and  fill  the  tongue  outline
        with the RGB values determined by the color system for the x-y
-       co-ordinates within the tongue.
+       coordinates within the tongue.
     */
 
     for (y = 0; y < h; ++y) {
@@ -1551,13 +1553,13 @@ static const AVFilterPad outputs[] = {
     },
 };
 
-const AVFilter ff_vf_ciescope = {
-    .name          = "ciescope",
-    .description   = NULL_IF_CONFIG_SMALL("Video CIE scope."),
+const FFFilter ff_vf_ciescope = {
+    .p.name        = "ciescope",
+    .p.description = NULL_IF_CONFIG_SMALL("Video CIE scope."),
+    .p.priv_class  = &ciescope_class,
     .priv_size     = sizeof(CiescopeContext),
-    .priv_class    = &ciescope_class,
     .uninit        = uninit,
     FILTER_INPUTS(inputs),
     FILTER_OUTPUTS(outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
 };

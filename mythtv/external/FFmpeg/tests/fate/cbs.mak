@@ -2,7 +2,7 @@
 # arguments, it decomposes the stream fully and then recomposes it
 # without making any changes.
 
-fate-cbs: fate-cbs-av1 fate-cbs-h264 fate-cbs-hevc fate-cbs-mpeg2 fate-cbs-vp9 fate-cbs-vvc
+fate-cbs: fate-cbs-apv fate-cbs-av1 fate-cbs-h264 fate-cbs-hevc fate-cbs-mpeg2 fate-cbs-vp9 fate-cbs-vvc
 
 FATE_CBS_DEPS = $(call ALLYES, $(1)_DEMUXER $(2)_PARSER $(3)_METADATA_BSF $(4)_DECODER $(5)_MUXER)
 FATE_CBS_NO_DEC_DEPS = $(call ALLYES, $(1)_DEMUXER $(1)_PARSER $(1)_METADATA_BSF $(1)_MUXER)
@@ -24,6 +24,17 @@ define FATE_CBS_DISCARD_TEST
 FATE_CBS_$(1)_DISCARD += fate-cbs-$(1)-discard-$(2)
 fate-cbs-$(1)-discard-$(2): CMD = md5 -i $(TARGET_SAMPLES)/$(3) -c:v copy -y -bsf:v filter_units=discard=$(2) -f $(4)
 endef
+
+# APV read/write
+
+FATE_CBS_APV_SAMPLES =             \
+    profile_422-10.apv
+
+$(foreach N,$(FATE_CBS_APV_SAMPLES),$(eval $(call FATE_CBS_TEST,apv,$(basename $(N)),apv,apv/$(N),apv)))
+
+FATE_CBS_APV-$(call FATE_CBS_DEPS, APV, APV, APV, APV, APV) = $(FATE_CBS_apv)
+FATE_SAMPLES_AVCONV += $(FATE_CBS_APV-yes)
+fate-cbs-apv: $(FATE_CBS_APV-yes)
 
 # AV1 read/write
 
@@ -88,7 +99,7 @@ FATE_CBS_DISCARD_TYPES = \
 
 $(foreach N,$(FATE_CBS_DISCARD_TYPES),$(eval $(call FATE_CBS_DISCARD_TEST,h264,$(N),h264/interlaced_crop.mp4,h264)))
 
-FATE_CBS_H264-$(call ALLYES, MOV_DEMUXER H264_MUXER H264_PARSER FILTER_UNITS_BSF H264_METADATA_BSF FILE_PROTOCOL) += $(FATE_CBS_h264_DISCARD)
+FATE_CBS_H264-$(call ALLYES, MOV_DEMUXER H264_MUXER H264_PARSER FILTER_UNITS_BSF H264_METADATA_BSF) += $(FATE_CBS_h264_DISCARD)
 
 
 FATE_H264_REDUNDANT_PPS-$(call REMUX, H264, MOV_DEMUXER H264_REDUNDANT_PPS_BSF   \
@@ -159,7 +170,12 @@ FATE_CBS_HEVC-$(call FATE_CBS_DEPS, HEVC, HEVC, HEVC, HEVC, HEVC) = $(FATE_CBS_h
 
 $(foreach N,$(FATE_CBS_DISCARD_TYPES),$(eval $(call FATE_CBS_DISCARD_TEST,hevc,$(N),hevc-conformance/WPP_A_ericsson_MAIN10_2.bit,hevc)))
 
-FATE_CBS_HEVC-$(call ALLYES, HEVC_DEMUXER HEVC_MUXER HEVC_PARSER FILTER_UNITS_BSF HEVC_METADATA_BSF FILE_PROTOCOL) += $(FATE_CBS_hevc_DISCARD)
+FATE_CBS_HEVC-$(call ALLYES, HEVC_DEMUXER HEVC_MUXER HEVC_PARSER FILTER_UNITS_BSF HEVC_METADATA_BSF) += $(FATE_CBS_hevc_DISCARD)
+
+fate-cbs-hevc-metadata-set-color: CMD = md5 -i $(TARGET_SAMPLES)/hevc-conformance/AMP_A_Samsung_4.bit -c:v copy -bsf:v hevc_metadata=colour_primaries=0:transfer_characteristics=0:matrix_coefficients=3 -f hevc
+fate-cbs-hevc-metadata-set-color: CMP = oneline
+fate-cbs-hevc-metadata-set-color: REF = d073124fca9e30a46c173292f948967c
+FATE_CBS_HEVC-$(call ALLYES, HEVC_DEMUXER HEVC_METADATA_BSF HEVC_MUXER) += fate-cbs-hevc-metadata-set-color
 
 FATE_SAMPLES_AVCONV += $(FATE_CBS_HEVC-yes)
 fate-cbs-hevc: $(FATE_CBS_HEVC-yes)

@@ -20,35 +20,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/thread.h"
-
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "mpeg4video.h"
 #include "mpeg4data.h"
 
-static av_cold void mpeg4_init_rl_intra(void)
+int ff_mpeg4_get_video_packet_prefix_length(enum AVPictureType pict_type,
+                                            int f_code, int b_code)
 {
-    static uint8_t mpeg4_rl_intra_table[2][2 * MAX_RUN + MAX_LEVEL + 3];
-    ff_rl_init(&ff_mpeg4_rl_intra, mpeg4_rl_intra_table);
-}
-
-av_cold void ff_mpeg4_init_rl_intra(void)
-{
-    static AVOnce init_static_once = AV_ONCE_INIT;
-    ff_thread_once(&init_static_once, mpeg4_init_rl_intra);
-}
-
-int ff_mpeg4_get_video_packet_prefix_length(MpegEncContext *s)
-{
-    switch (s->pict_type) {
+    switch (pict_type) {
     case AV_PICTURE_TYPE_I:
         return 16;
     case AV_PICTURE_TYPE_P:
     case AV_PICTURE_TYPE_S:
-        return s->f_code + 15;
+        return f_code + 15;
     case AV_PICTURE_TYPE_B:
-        return FFMAX3(s->f_code, s->b_code, 2) + 15;
+        return FFMAX3(f_code, b_code, 2) + 15;
     default:
         return -1;
     }
@@ -56,17 +43,20 @@ int ff_mpeg4_get_video_packet_prefix_length(MpegEncContext *s)
 
 void ff_mpeg4_clean_buffers(MpegEncContext *s)
 {
-    int c_wrap, c_xy, l_wrap, l_xy;
+    const int mb_height = s->mb_height;
+    int c_wrap, l_wrap, l_xy;
 
     l_wrap = s->b8_stride;
     l_xy   = (2 * s->mb_y - 1) * l_wrap + s->mb_x * 2 - 1;
     c_wrap = s->mb_stride;
-    c_xy   = (s->mb_y - 1) * c_wrap + s->mb_x - 1;
+    int u_xy = 2 * mb_height * l_wrap + s->mb_y * c_wrap + s->mb_x - 1;
+    int v_xy = u_xy + c_wrap * (mb_height + 1);
+    int16_t (*ac_val)[16] = s->ac_val;
 
     /* clean AC */
-    memset(s->ac_val[0] + l_xy, 0, (l_wrap * 2 + 1) * 16 * sizeof(int16_t));
-    memset(s->ac_val[1] + c_xy, 0, (c_wrap     + 1) * 16 * sizeof(int16_t));
-    memset(s->ac_val[2] + c_xy, 0, (c_wrap     + 1) * 16 * sizeof(int16_t));
+    memset(ac_val + l_xy, 0, (l_wrap * 2 + 1) * sizeof(*ac_val));
+    memset(ac_val + u_xy, 0, (c_wrap     + 1) * sizeof(*ac_val));
+    memset(ac_val + v_xy, 0, (c_wrap     + 1) * sizeof(*ac_val));
 
     /* clean MV */
     // we can't clear the MVs as they might be needed by a B-frame

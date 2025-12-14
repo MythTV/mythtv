@@ -131,7 +131,6 @@ static void rv40_parse_picture_size(GetBitContext *gb, int *w, int *h)
 
 static int rv40_parse_slice_header(RV34DecContext *r, GetBitContext *gb, SliceInfo *si)
 {
-    int mb_bits;
     int w = r->s.width, h = r->s.height;
     int mb_size;
     int ret;
@@ -154,8 +153,7 @@ static int rv40_parse_slice_header(RV34DecContext *r, GetBitContext *gb, SliceIn
     si->width  = w;
     si->height = h;
     mb_size = ((w + 15) >> 4) * ((h + 15) >> 4);
-    mb_bits = ff_rv34_get_start_offset(gb, mb_size);
-    si->start = get_bits(gb, mb_bits);
+    si->start = ff_rv34_get_start_offset(gb, mb_size);
 
     return 0;
 }
@@ -228,18 +226,18 @@ static int rv40_decode_intra_types(RV34DecContext *r, GetBitContext *gb, int8_t 
 static int rv40_decode_mb_info(RV34DecContext *r)
 {
     MpegEncContext *s = &r->s;
-    GetBitContext *gb = &s->gb;
+    GetBitContext *const gb = &r->gb;
     int q, i;
     int prev_type = 0;
     int mb_pos = s->mb_x + s->mb_y * s->mb_stride;
 
-    if(!r->s.mb_skip_run) {
-        r->s.mb_skip_run = get_interleaved_ue_golomb(gb) + 1;
-        if(r->s.mb_skip_run > (unsigned)s->mb_num)
+    if (!r->mb_skip_run) {
+        r->mb_skip_run = get_interleaved_ue_golomb(gb) + 1;
+        if (r->mb_skip_run > (unsigned)s->mb_num)
             return -1;
     }
 
-    if(--r->s.mb_skip_run)
+    if (--r->mb_skip_run)
          return RV34_MB_SKIP;
 
     if(r->avail_cache[6-4]){

@@ -61,12 +61,6 @@ static const RTPDynamicProtocolHandler speex_dynamic_handler = {
     .codec_id   = AV_CODEC_ID_SPEEX,
 };
 
-static const RTPDynamicProtocolHandler opus_dynamic_handler = {
-    .enc_name   = "opus",
-    .codec_type = AVMEDIA_TYPE_AUDIO,
-    .codec_id   = AV_CODEC_ID_OPUS,
-};
-
 static const RTPDynamicProtocolHandler t140_dynamic_handler = { /* RFC 4103 */
     .enc_name   = "t140",
     .codec_type = AVMEDIA_TYPE_SUBTITLE,
@@ -83,6 +77,7 @@ static const RTPDynamicProtocolHandler *const rtp_dynamic_protocol_handler_list[
     &ff_ac3_dynamic_handler,
     &ff_amr_nb_dynamic_handler,
     &ff_amr_wb_dynamic_handler,
+    &ff_av1_dynamic_handler,
     &ff_dv_dynamic_handler,
     &ff_g726_16_dynamic_handler,
     &ff_g726_24_dynamic_handler,
@@ -124,7 +119,7 @@ static const RTPDynamicProtocolHandler *const rtp_dynamic_protocol_handler_list[
     &ff_vp9_dynamic_handler,
     &gsm_dynamic_handler,
     &l24_dynamic_handler,
-    &opus_dynamic_handler,
+    &ff_opus_dynamic_handler,
     &realmedia_mp3_dynamic_handler,
     &speex_dynamic_handler,
     &t140_dynamic_handler,
@@ -192,19 +187,25 @@ static int rtcp_parse_packet(RTPDemuxContext *s, const unsigned char *buf,
 
         switch (buf[1]) {
         case RTCP_SR:
-            if (payload_len < 20) {
+            if (payload_len < 28) {
                 av_log(s->ic, AV_LOG_ERROR, "Invalid RTCP SR packet length\n");
                 return AVERROR_INVALIDDATA;
             }
 
+            s->last_sr.ssrc = AV_RB32(buf + 4);
+            s->last_sr.ntp_timestamp = AV_RB64(buf + 8);
+            s->last_sr.rtp_timestamp = AV_RB32(buf + 16);
+            s->last_sr.sender_nb_packets = AV_RB32(buf + 20);
+            s->last_sr.sender_nb_bytes = AV_RB32(buf + 24);
+
+            s->pending_sr = 1;
             s->last_rtcp_reception_time = av_gettime_relative();
-            s->last_rtcp_ntp_time  = AV_RB64(buf + 8);
-            s->last_rtcp_timestamp = AV_RB32(buf + 16);
+
             if (s->first_rtcp_ntp_time == AV_NOPTS_VALUE) {
-                s->first_rtcp_ntp_time = s->last_rtcp_ntp_time;
+                s->first_rtcp_ntp_time = s->last_sr.ntp_timestamp;
                 if (!s->base_timestamp)
-                    s->base_timestamp = s->last_rtcp_timestamp;
-                s->rtcp_ts_offset = (int32_t)(s->last_rtcp_timestamp - s->base_timestamp);
+                    s->base_timestamp = s->last_sr.rtp_timestamp;
+                s->rtcp_ts_offset = (int32_t)(s->last_sr.rtp_timestamp - s->base_timestamp);
             }
 
             break;
@@ -372,11 +373,11 @@ int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, URLContext *fd,
     avio_wb32(pb, extended_max); /* max sequence received */
     avio_wb32(pb, stats->jitter >> 4); /* jitter */
 
-    if (s->last_rtcp_ntp_time == AV_NOPTS_VALUE) {
+    if (s->last_sr.ntp_timestamp == AV_NOPTS_VALUE) {
         avio_wb32(pb, 0); /* last SR timestamp */
         avio_wb32(pb, 0); /* delay since last SR */
     } else {
-        uint32_t middle_32_bits   = s->last_rtcp_ntp_time >> 16; // this is valid, right? do we need to handle 64 bit values special?
+        uint32_t middle_32_bits   = s->last_sr.ntp_timestamp >> 16; // this is valid, right? do we need to handle 64 bit values special?
         uint32_t delay_since_last = av_rescale(av_gettime_relative() - s->last_rtcp_reception_time,
                                                65536, AV_TIME_BASE);
 
@@ -530,43 +531,6 @@ int ff_rtp_send_rtcp_feedback(RTPDemuxContext *s, URLContext *fd,
     return 0;
 }
 
-static int opus_write_extradata(AVCodecParameters *codecpar)
-{
-    uint8_t *bs;
-    int ret;
-
-    /* This function writes an extradata with a channel mapping family of 0.
-     * This mapping family only supports mono and stereo layouts. And RFC7587
-     * specifies that the number of channels in the SDP must be 2.
-     */
-    if (codecpar->ch_layout.nb_channels > 2) {
-        return AVERROR_INVALIDDATA;
-    }
-
-    ret = ff_alloc_extradata(codecpar, 19);
-    if (ret < 0)
-        return ret;
-
-    bs = (uint8_t *)codecpar->extradata;
-
-    /* Opus magic */
-    bytestream_put_buffer(&bs, "OpusHead", 8);
-    /* Version */
-    bytestream_put_byte  (&bs, 0x1);
-    /* Channel count */
-    bytestream_put_byte  (&bs, codecpar->ch_layout.nb_channels);
-    /* Pre skip */
-    bytestream_put_le16  (&bs, 0);
-    /* Input sample rate */
-    bytestream_put_le32  (&bs, 48000);
-    /* Output gain */
-    bytestream_put_le16  (&bs, 0x0);
-    /* Mapping family */
-    bytestream_put_byte  (&bs, 0x0);
-
-    return 0;
-}
-
 /**
  * open a new RTP parse context for stream 'st'. 'st' can be NULL for
  * MPEG-2 TS streams.
@@ -575,13 +539,12 @@ RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
                                    int payload_type, int queue_size)
 {
     RTPDemuxContext *s;
-    int ret;
 
     s = av_mallocz(sizeof(RTPDemuxContext));
     if (!s)
         return NULL;
     s->payload_type        = payload_type;
-    s->last_rtcp_ntp_time  = AV_NOPTS_VALUE;
+    s->last_sr.ntp_timestamp  = AV_NOPTS_VALUE;
     s->first_rtcp_ntp_time = AV_NOPTS_VALUE;
     s->ic                  = s1;
     s->st                  = st;
@@ -599,16 +562,13 @@ RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
             if (st->codecpar->sample_rate == 8000)
                 st->codecpar->sample_rate = 16000;
             break;
-        case AV_CODEC_ID_OPUS:
-            ret = opus_write_extradata(st->codecpar);
-            if (ret < 0) {
-                av_log(s1, AV_LOG_ERROR,
-                       "Error creating opus extradata: %s\n",
-                       av_err2str(ret));
-                av_free(s);
-                return NULL;
-            }
+        case AV_CODEC_ID_PCM_MULAW: {
+            AVCodecParameters *par = st->codecpar;
+            par->bits_per_coded_sample = av_get_bits_per_sample(par->codec_id);
+            par->block_align           = par->ch_layout.nb_channels * par->bits_per_coded_sample / 8;
+            par->bit_rate              = par->block_align * 8LL * par->sample_rate;
             break;
+        }
         default:
             break;
         }
@@ -633,7 +593,8 @@ void ff_rtp_parse_set_crypto(RTPDemuxContext *s, const char *suite,
 }
 
 static int rtp_set_prft(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestamp) {
-    int64_t rtcp_time, delta_timestamp, delta_time;
+    int64_t rtcp_time, delta_time;
+    int32_t delta_timestamp;
 
     AVProducerReferenceTime *prft =
         (AVProducerReferenceTime *) av_packet_new_side_data(
@@ -641,12 +602,25 @@ static int rtp_set_prft(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestamp) {
     if (!prft)
         return AVERROR(ENOMEM);
 
-    rtcp_time = ff_parse_ntp_time(s->last_rtcp_ntp_time) - NTP_OFFSET_US;
-    delta_timestamp = (int64_t)timestamp - (int64_t)s->last_rtcp_timestamp;
+    rtcp_time = ff_parse_ntp_time(s->last_sr.ntp_timestamp) - NTP_OFFSET_US;
+    /* Cast to int32_t to handle timestamp wraparound correctly */
+    delta_timestamp = (int32_t)(timestamp - s->last_sr.rtp_timestamp);
     delta_time = av_rescale_q(delta_timestamp, s->st->time_base, AV_TIME_BASE_Q);
 
     prft->wallclock = rtcp_time + delta_time;
     prft->flags = 24;
+    return 0;
+}
+
+static int rtp_add_sr_sidedata(RTPDemuxContext *s, AVPacket *pkt) {
+    AVRTCPSenderReport *sr =
+        (AVRTCPSenderReport *) av_packet_new_side_data(
+            pkt, AV_PKT_DATA_RTCP_SR, sizeof(AVRTCPSenderReport));
+    if (!sr)
+        return AVERROR(ENOMEM);
+
+    memcpy(sr, &s->last_sr, sizeof(AVRTCPSenderReport));
+    s->pending_sr = 0;
     return 0;
 }
 
@@ -656,25 +630,32 @@ static int rtp_set_prft(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestamp) {
  */
 static void finalize_packet(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestamp)
 {
+    if (s->pending_sr) {
+        int ret = rtp_add_sr_sidedata(s, pkt);
+        if (ret < 0)
+            av_log(s->ic, AV_LOG_WARNING, "rtpdec: failed to add SR sidedata\n");
+    }
+
     if (pkt->pts != AV_NOPTS_VALUE || pkt->dts != AV_NOPTS_VALUE)
         return; /* Timestamp already set by depacketizer */
     if (timestamp == RTP_NOTS_VALUE)
         return;
 
-    if (s->last_rtcp_ntp_time != AV_NOPTS_VALUE) {
+    if (s->last_sr.ntp_timestamp != AV_NOPTS_VALUE) {
         if (rtp_set_prft(s, pkt, timestamp) < 0) {
             av_log(s->ic, AV_LOG_WARNING, "rtpdec: failed to set prft");
         }
     }
 
-    if (s->last_rtcp_ntp_time != AV_NOPTS_VALUE && s->ic->nb_streams > 1) {
+    if (s->last_sr.ntp_timestamp != AV_NOPTS_VALUE && s->ic->nb_streams > 1) {
         int64_t addend;
-        int delta_timestamp;
+        int32_t delta_timestamp;
 
         /* compute pts from timestamp with received ntp_time */
-        delta_timestamp = timestamp - s->last_rtcp_timestamp;
+        /* Cast to int32_t to handle timestamp wraparound correctly */
+        delta_timestamp = (int32_t)(timestamp - s->last_sr.rtp_timestamp);
         /* convert to the PTS timebase */
-        addend = av_rescale(s->last_rtcp_ntp_time - s->first_rtcp_ntp_time,
+        addend = av_rescale(s->last_sr.ntp_timestamp - s->first_rtcp_ntp_time,
                             s->st->time_base.den,
                             (uint64_t) s->st->time_base.num << 32);
         pkt->pts = s->range_start_offset + s->rtcp_ts_offset + addend +

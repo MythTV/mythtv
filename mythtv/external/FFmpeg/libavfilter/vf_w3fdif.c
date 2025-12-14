@@ -488,11 +488,6 @@ static int filter(AVFilterContext *ctx, int is_second)
     if (!out)
         return AVERROR(ENOMEM);
     av_frame_copy_props(out, s->cur);
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    out->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     out->flags &= ~AV_FRAME_FLAG_INTERLACED;
 
     if (!is_second) {
@@ -616,15 +611,15 @@ static const AVFilterPad w3fdif_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_w3fdif = {
-    .name          = "w3fdif",
-    .description   = NULL_IF_CONFIG_SMALL("Apply Martin Weston three field deinterlace."),
+const FFFilter ff_vf_w3fdif = {
+    .p.name        = "w3fdif",
+    .p.description = NULL_IF_CONFIG_SMALL("Apply Martin Weston three field deinterlace."),
+    .p.priv_class  = &w3fdif_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(W3FDIFContext),
-    .priv_class    = &w3fdif_class,
     .uninit        = uninit,
     FILTER_INPUTS(w3fdif_inputs),
     FILTER_OUTPUTS(w3fdif_outputs),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

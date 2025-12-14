@@ -26,6 +26,7 @@
 const FFVulkanDecodeDescriptor ff_vk_dec_av1_desc = {
     .codec_id         = AV_CODEC_ID_AV1,
     .decode_extension = FF_VK_EXT_VIDEO_DECODE_AV1,
+    .queue_flags      = VK_QUEUE_VIDEO_DECODE_BIT_KHR,
     .decode_op        = VK_VIDEO_CODEC_OPERATION_DECODE_AV1_BIT_KHR,
     .ext_props = {
         .extensionName = VK_STD_VULKAN_VIDEO_CODEC_AV1_DECODE_EXTENSION_NAME,
@@ -122,7 +123,7 @@ static int vk_av1_fill_pict(AVCodecContext *avctx, const AV1Frame **ref_src,
         .codedExtent = (VkExtent2D){ pic->f->width, pic->f->height },
         .baseArrayLayer = ((has_grain || dec->dedicated_dpb) && ctx->common.layered_dpb) ?
                           hp->frame_id : 0,
-        .imageViewBinding = vkpic->img_view_ref,
+        .imageViewBinding = vkpic->view.ref[0],
     };
 
     *ref_slot = (VkVideoReferenceSlotInfoKHR) {
@@ -138,23 +139,15 @@ static int vk_av1_fill_pict(AVCodecContext *avctx, const AV1Frame **ref_src,
     return 0;
 }
 
-static int vk_av1_create_params(AVCodecContext *avctx, AVBufferRef **buf)
+static void vk_av1_params_fill(AVCodecContext *avctx,
+                               StdVideoAV1TimingInfo *av1_timing_info,
+                               StdVideoAV1ColorConfig *av1_color_config,
+                               StdVideoAV1SequenceHeader *av1_sequence_header)
 {
     const AV1DecContext *s = avctx->priv_data;
-    FFVulkanDecodeContext *dec = avctx->internal->hwaccel_priv_data;
-    FFVulkanDecodeShared *ctx = dec->shared_ctx;
-
     const AV1RawSequenceHeader *seq = s->raw_seq;
 
-    StdVideoAV1SequenceHeader av1_sequence_header;
-    StdVideoAV1TimingInfo av1_timing_info;
-    StdVideoAV1ColorConfig av1_color_config;
-    VkVideoDecodeAV1SessionParametersCreateInfoKHR av1_params;
-    VkVideoSessionParametersCreateInfoKHR session_params_create;
-
-    int err;
-
-    av1_timing_info = (StdVideoAV1TimingInfo) {
+    *av1_timing_info = (StdVideoAV1TimingInfo) {
         .flags = (StdVideoAV1TimingInfoFlags) {
             .equal_picture_interval = seq->timing_info.equal_picture_interval,
         },
@@ -163,7 +156,7 @@ static int vk_av1_create_params(AVCodecContext *avctx, AVBufferRef **buf)
         .num_ticks_per_picture_minus_1 = seq->timing_info.num_ticks_per_picture_minus_1,
     };
 
-    av1_color_config = (StdVideoAV1ColorConfig) {
+    *av1_color_config = (StdVideoAV1ColorConfig) {
         .flags = (StdVideoAV1ColorConfigFlags) {
             .mono_chrome = seq->color_config.mono_chrome,
             .color_range = seq->color_config.color_range,
@@ -178,7 +171,7 @@ static int vk_av1_create_params(AVCodecContext *avctx, AVBufferRef **buf)
         .matrix_coefficients = seq->color_config.matrix_coefficients,
     };
 
-    av1_sequence_header = (StdVideoAV1SequenceHeader) {
+    *av1_sequence_header = (StdVideoAV1SequenceHeader) {
         .flags = (StdVideoAV1SequenceHeaderFlags) {
             .still_picture = seq->still_picture,
             .reduced_still_picture_header = seq->reduced_still_picture_header,
@@ -210,9 +203,26 @@ static int vk_av1_create_params(AVCodecContext *avctx, AVBufferRef **buf)
         .order_hint_bits_minus_1 = seq->order_hint_bits_minus_1,
         .seq_force_integer_mv = seq->seq_force_integer_mv,
         .seq_force_screen_content_tools = seq->seq_force_screen_content_tools,
-        .pTimingInfo = &av1_timing_info,
-        .pColorConfig = &av1_color_config,
+        .pTimingInfo = av1_timing_info,
+        .pColorConfig = av1_color_config,
     };
+}
+
+static int vk_av1_create_params(AVCodecContext *avctx, AVBufferRef **buf,
+                                AV1VulkanDecodePicture *ap)
+{
+    int err;
+    FFVulkanDecodeContext *dec = avctx->internal->hwaccel_priv_data;
+    FFVulkanDecodeShared *ctx = dec->shared_ctx;
+
+    StdVideoAV1SequenceHeader av1_sequence_header;
+    StdVideoAV1TimingInfo av1_timing_info;
+    StdVideoAV1ColorConfig av1_color_config;
+    VkVideoDecodeAV1SessionParametersCreateInfoKHR av1_params;
+    VkVideoSessionParametersCreateInfoKHR session_params_create;
+
+    vk_av1_params_fill(avctx, &av1_timing_info, &av1_color_config,
+                       &av1_sequence_header);
 
     av1_params = (VkVideoDecodeAV1SessionParametersCreateInfoKHR) {
         .sType = VK_STRUCTURE_TYPE_VIDEO_DECODE_AV1_SESSION_PARAMETERS_CREATE_INFO_KHR,
@@ -235,6 +245,7 @@ static int vk_av1_create_params(AVCodecContext *avctx, AVBufferRef **buf)
 }
 
 static int vk_av1_start_frame(AVCodecContext          *avctx,
+                              av_unused const AVBufferRef *buffer_ref,
                               av_unused const uint8_t *buffer,
                               av_unused uint32_t       size)
 {
@@ -243,6 +254,8 @@ static int vk_av1_start_frame(AVCodecContext          *avctx,
     AV1DecContext *s = avctx->priv_data;
     const AV1Frame *pic = &s->cur_frame;
     FFVulkanDecodeContext *dec = avctx->internal->hwaccel_priv_data;
+    uint32_t frame_id_alloc_mask = 0;
+
     AV1VulkanDecodePicture *ap = pic->hwaccel_picture_private;
     FFVulkanDecodePicture *vp = &ap->vp;
 
@@ -256,23 +269,24 @@ static int vk_av1_start_frame(AVCodecContext          *avctx,
                                                          STD_VIDEO_AV1_FRAME_RESTORATION_TYPE_WIENER,
                                                          STD_VIDEO_AV1_FRAME_RESTORATION_TYPE_SGRPROJ };
 
-    if (!dec->session_params) {
-        err = vk_av1_create_params(avctx, &dec->session_params);
-        if (err < 0)
-            return err;
+    /* Use the current frame_ids in ref[] to decide occupied frame_ids */
+    for (int i = 0; i < STD_VIDEO_AV1_NUM_REF_FRAMES; i++) {
+        const AV1VulkanDecodePicture* rp = s->ref[i].hwaccel_picture_private;
+        if (rp)
+            frame_id_alloc_mask |= 1 << rp->frame_id;
     }
 
     if (!ap->frame_id_set) {
         unsigned slot_idx = 0;
         for (unsigned i = 0; i < 32; i++) {
-            if (!(dec->frame_id_alloc_mask & (1 << i))) {
+            if (!(frame_id_alloc_mask & (1 << i))) {
                 slot_idx = i;
                 break;
             }
         }
         ap->frame_id = slot_idx;
         ap->frame_id_set = 1;
-        dec->frame_id_alloc_mask |= (1 << slot_idx);
+        frame_id_alloc_mask |= (1 << slot_idx);
     }
 
     ap->ref_frame_sign_bias_mask = 0x0;
@@ -345,7 +359,7 @@ static int vk_av1_start_frame(AVCodecContext          *avctx,
             .codedOffset = (VkOffset2D){ 0, 0 },
             .codedExtent = (VkExtent2D){ pic->f->width, pic->f->height },
             .baseArrayLayer = 0,
-            .imageViewBinding = vp->img_view_out,
+            .imageViewBinding = vp->view.out[0],
         },
     };
 
@@ -577,17 +591,37 @@ static int vk_av1_end_frame(AVCodecContext *avctx)
 {
     const AV1DecContext *s = avctx->priv_data;
     FFVulkanDecodeContext *dec = avctx->internal->hwaccel_priv_data;
+    FFVulkanDecodeShared *ctx = dec->shared_ctx;
+
     const AV1Frame *pic = &s->cur_frame;
     AV1VulkanDecodePicture *ap = pic->hwaccel_picture_private;
     FFVulkanDecodePicture *vp = &ap->vp;
     FFVulkanDecodePicture *rvp[AV1_NUM_REF_FRAMES] = { 0 };
     AVFrame *rav[AV1_NUM_REF_FRAMES] = { 0 };
 
+#ifdef VK_KHR_video_maintenance2
+    StdVideoAV1SequenceHeader av1_sequence_header;
+    StdVideoAV1TimingInfo av1_timing_info;
+    StdVideoAV1ColorConfig av1_color_config;
+    VkVideoDecodeAV1InlineSessionParametersInfoKHR av1_params;
+
+    if (ctx->s.extensions & FF_VK_EXT_VIDEO_MAINTENANCE_2) {
+        vk_av1_params_fill(avctx, &av1_timing_info, &av1_color_config,
+                           &av1_sequence_header);
+        av1_params = (VkVideoDecodeAV1InlineSessionParametersInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_VIDEO_DECODE_AV1_INLINE_SESSION_PARAMETERS_INFO_KHR,
+            .pStdSequenceHeader = &av1_sequence_header,
+        };
+        ap->av1_pic_info.pNext = &av1_params;
+    }
+#endif
+
     if (!ap->av1_pic_info.tileCount)
         return 0;
 
-    if (!dec->session_params) {
-        int err = vk_av1_create_params(avctx, &dec->session_params);
+    if (!dec->session_params &&
+        !(ctx->s.extensions & FF_VK_EXT_VIDEO_MAINTENANCE_2)) {
+        int err = vk_av1_create_params(avctx, &dec->session_params, ap);
         if (err < 0)
             return err;
     }
@@ -600,20 +634,16 @@ static int vk_av1_end_frame(AVCodecContext *avctx)
         rav[i] = ap->ref_src[i]->f;
     }
 
-    av_log(avctx, AV_LOG_VERBOSE, "Decoding frame, %"SIZE_SPECIFIER" bytes, %i tiles\n",
+    av_log(avctx, AV_LOG_DEBUG, "Decoding frame, %"SIZE_SPECIFIER" bytes, %i tiles\n",
            vp->slices_size, ap->av1_pic_info.tileCount);
 
     return ff_vk_decode_frame(avctx, pic->f, vp, rav, rvp);
 }
 
-static void vk_av1_free_frame_priv(FFRefStructOpaque _hwctx, void *data)
+static void vk_av1_free_frame_priv(AVRefStructOpaque _hwctx, void *data)
 {
     AVHWDeviceContext *hwctx = _hwctx.nc;
     AV1VulkanDecodePicture *ap = data;
-
-    /* Workaround for a spec issue. */
-    if (ap->frame_id_set)
-        ap->dec->frame_id_alloc_mask &= ~(1 << ap->frame_id);
 
     /* Free frame resources, this also destroys the session parameters. */
     ff_vk_decode_free_frame(hwctx, &ap->vp);
@@ -636,15 +666,5 @@ const FFHWAccel ff_av1_vulkan_hwaccel = {
     .uninit                = &ff_vk_decode_uninit,
     .frame_params          = &ff_vk_frame_params,
     .priv_data_size        = sizeof(FFVulkanDecodeContext),
-
-    /* NOTE: Threading is intentionally disabled here. Due to the design of Vulkan,
-     * where frames are opaque to users, and mostly opaque for driver developers,
-     * there's an issue with current hardware accelerator implementations of AV1,
-     * where they require an internal index. With regular hwaccel APIs, this index
-     * is given to users as an opaque handle directly. With Vulkan, due to increased
-     * flexibility, this index cannot be present anywhere.
-     * The current implementation tracks the index for the driver and submits it
-     * as necessary information. Due to needing to modify the decoding context,
-     * which is not thread-safe, on frame free, threading is disabled. */
     .caps_internal         = HWACCEL_CAP_ASYNC_SAFE,
 };

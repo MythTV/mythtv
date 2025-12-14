@@ -88,6 +88,40 @@ static const int ass_libavfilter_log_level_map[] = {
     [7] = AV_LOG_DEBUG,     /* MSGL_DBG2 */
 };
 
+static enum AVColorSpace ass_get_color_space(ASS_YCbCrMatrix ass_matrix, enum AVColorSpace inlink_space) {
+    switch (ass_matrix) {
+    case YCBCR_NONE:            return inlink_space;
+    case YCBCR_SMPTE240M_TV:
+    case YCBCR_SMPTE240M_PC:    return AVCOL_SPC_SMPTE240M;
+    case YCBCR_FCC_TV:
+    case YCBCR_FCC_PC:          return AVCOL_SPC_FCC;
+    case YCBCR_BT709_TV:
+    case YCBCR_BT709_PC:        return AVCOL_SPC_BT709;
+    case YCBCR_BT601_TV:
+    case YCBCR_BT601_PC:
+    case YCBCR_DEFAULT:
+    case YCBCR_UNKNOWN:
+    default:                    return AVCOL_SPC_SMPTE170M;
+    }
+}
+
+static enum AVColorRange ass_get_color_range(ASS_YCbCrMatrix ass_matrix, enum AVColorRange inlink_range) {
+    switch (ass_matrix) {
+    case YCBCR_NONE:            return inlink_range;
+    case YCBCR_SMPTE240M_PC:
+    case YCBCR_FCC_PC:
+    case YCBCR_BT709_PC:
+    case YCBCR_BT601_PC:        return AVCOL_RANGE_JPEG;
+    case YCBCR_SMPTE240M_TV:
+    case YCBCR_FCC_TV:
+    case YCBCR_BT709_TV:
+    case YCBCR_BT601_TV:
+    case YCBCR_DEFAULT:
+    case YCBCR_UNKNOWN:
+    default:                    return AVCOL_RANGE_MPEG;
+    }
+}
+
 static void ass_log(int ass_level, const char *fmt, va_list args, void *ctx)
 {
     const int ass_level_clip = av_clip(ass_level, 0,
@@ -138,17 +172,28 @@ static av_cold void uninit(AVFilterContext *ctx)
         ass_library_done(ass->library);
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    return ff_set_common_formats(ctx, ff_draw_supported_pixel_formats(0));
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out,
+                                  ff_draw_supported_pixel_formats(0));
 }
 
 static int config_input(AVFilterLink *inlink)
 {
-    AssContext *ass = inlink->dst->priv;
+    AVFilterContext *ctx = inlink->dst;
+    AssContext *ass = ctx->priv;
+    int ret;
 
-    ff_draw_init2(&ass->draw, inlink->format, inlink->colorspace, inlink->color_range,
-                  ass->alpha ? FF_DRAW_PROCESS_ALPHA : 0);
+    ret = ff_draw_init2(&ass->draw, inlink->format,
+                        ass_get_color_space(ass->track->YCbCrMatrix, inlink->colorspace),
+                        ass_get_color_range(ass->track->YCbCrMatrix, inlink->color_range),
+                        ass->alpha ? FF_DRAW_PROCESS_ALPHA : 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
 
     ass_set_frame_size  (ass->renderer, inlink->w, inlink->h);
     if (ass->original_w && ass->original_h) {
@@ -247,16 +292,16 @@ static av_cold int init_ass(AVFilterContext *ctx)
     return 0;
 }
 
-const AVFilter ff_vf_ass = {
-    .name          = "ass",
-    .description   = NULL_IF_CONFIG_SMALL("Render ASS subtitles onto input video using the libass library."),
+const FFFilter ff_vf_ass = {
+    .p.name        = "ass",
+    .p.description = NULL_IF_CONFIG_SMALL("Render ASS subtitles onto input video using the libass library."),
+    .p.priv_class  = &ass_class,
     .priv_size     = sizeof(AssContext),
     .init          = init_ass,
     .uninit        = uninit,
     FILTER_INPUTS(ass_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &ass_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };
 #endif
 
@@ -502,15 +547,15 @@ end:
     return ret;
 }
 
-const AVFilter ff_vf_subtitles = {
-    .name          = "subtitles",
-    .description   = NULL_IF_CONFIG_SMALL("Render text subtitles onto input video using the libass library."),
+const FFFilter ff_vf_subtitles = {
+    .p.name        = "subtitles",
+    .p.description = NULL_IF_CONFIG_SMALL("Render text subtitles onto input video using the libass library."),
+    .p.priv_class  = &subtitles_class,
     .priv_size     = sizeof(AssContext),
     .init          = init_subtitles,
     .uninit        = uninit,
     FILTER_INPUTS(ass_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &subtitles_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };
 #endif

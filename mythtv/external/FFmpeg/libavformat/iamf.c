@@ -28,9 +28,9 @@ const AVChannelLayout ff_iamf_scalable_ch_layouts[10] = {
     AV_CHANNEL_LAYOUT_MONO,
     AV_CHANNEL_LAYOUT_STEREO,
     // "Loudspeaker configuration for Sound System B"
-    AV_CHANNEL_LAYOUT_5POINT1_BACK,
+    AV_CHANNEL_LAYOUT_5POINT1,
     // "Loudspeaker configuration for Sound System C"
-    AV_CHANNEL_LAYOUT_5POINT1POINT2_BACK,
+    AV_CHANNEL_LAYOUT_5POINT1POINT2,
     // "Loudspeaker configuration for Sound System D"
     AV_CHANNEL_LAYOUT_5POINT1POINT4_BACK,
     // "Loudspeaker configuration for Sound System I"
@@ -42,13 +42,85 @@ const AVChannelLayout ff_iamf_scalable_ch_layouts[10] = {
     // Front subset of "Loudspeaker configuration for Sound System J"
     AV_CHANNEL_LAYOUT_3POINT1POINT2,
     // Binaural
-    AV_CHANNEL_LAYOUT_STEREO,
+    AV_CHANNEL_LAYOUT_BINAURAL,
 };
 
-const struct IAMFSoundSystemMap ff_iamf_sound_system_map[13] = {
+const AVChannelLayout ff_iamf_expanded_scalable_ch_layouts[13] = {
+    // The low-frequency effects subset (LFE) of "Loudspeaker configuration for Sound System J"
+    {
+        .nb_channels = 1,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_LOW_FREQUENCY,
+    },
+    // The surround subset (Ls/Rs) of "Loudspeaker configuration for Sound System I"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT,
+    },
+    // The side surround subset (Lss/Rss) of "Loudspeaker configuration for Sound System J"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT,
+    },
+    // The rear surround subset (Lrs/Rrs) of "Loudspeaker configuration for Sound System J"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT,
+    },
+    // The top front subset (Ltf/Rtf) of "Loudspeaker configuration for Sound System J"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_TOP_FRONT_LEFT | AV_CH_TOP_FRONT_RIGHT,
+    },
+    // The top back subset (Ltb/Rtb) of "Loudspeaker configuration for Sound System J"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_TOP_BACK_LEFT | AV_CH_TOP_BACK_RIGHT,
+    },
+    // The top 4 channels (Ltf/Rtf/Ltb/Rtb) of "Loudspeaker configuration for Sound System J"
+    {
+        .nb_channels = 4,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_TOP_FRONT_LEFT | AV_CH_TOP_FRONT_RIGHT |
+                       AV_CH_TOP_BACK_LEFT | AV_CH_TOP_BACK_RIGHT,
+    },
+    // The front 3 channels (L/C/R)  of "Loudspeaker configuration for Sound System J"
+    AV_CHANNEL_LAYOUT_SURROUND,
+    // Subset of "Loudspeaker configuration for Sound System H"
+    AV_CHANNEL_LAYOUT_9POINT1POINT6,
+    // Front subset of "Loudspeaker configuration for Sound System H"
+    AV_CHANNEL_LAYOUT_STEREO,
+    // The side subset (SiL/SiR) of "Loudspeaker configuration for Sound System H"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT,
+    },
+    // The top side subset (TpSiL/TpSiR) of "Loudspeaker configuration for Sound System H"
+    {
+        .nb_channels = 2,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_TOP_SIDE_LEFT | AV_CH_TOP_SIDE_RIGHT,
+    },
+    // The top 6 channels (TpFL/TpFR/TpSiL/TpSiR/TpBL/TpBR) of "Loudspeaker configuration for Sound System H"
+    {
+        .nb_channels = 6,
+        .order       = AV_CHANNEL_ORDER_NATIVE,
+        .u.mask      = AV_CH_TOP_FRONT_LEFT | AV_CH_TOP_FRONT_RIGHT |
+                       AV_CH_TOP_BACK_LEFT | AV_CH_TOP_BACK_RIGHT |
+                       AV_CH_TOP_SIDE_LEFT | AV_CH_TOP_SIDE_RIGHT,
+    },
+};
+
+const struct IAMFSoundSystemMap ff_iamf_sound_system_map[14] = {
     { SOUND_SYSTEM_A_0_2_0, AV_CHANNEL_LAYOUT_STEREO },
-    { SOUND_SYSTEM_B_0_5_0, AV_CHANNEL_LAYOUT_5POINT1_BACK },
-    { SOUND_SYSTEM_C_2_5_0, AV_CHANNEL_LAYOUT_5POINT1POINT2_BACK },
+    { SOUND_SYSTEM_B_0_5_0, AV_CHANNEL_LAYOUT_5POINT1 },
+    { SOUND_SYSTEM_C_2_5_0, AV_CHANNEL_LAYOUT_5POINT1POINT2 },
     { SOUND_SYSTEM_D_4_5_0, AV_CHANNEL_LAYOUT_5POINT1POINT4_BACK },
     { SOUND_SYSTEM_E_4_5_1,
         {
@@ -65,6 +137,7 @@ const struct IAMFSoundSystemMap ff_iamf_sound_system_map[13] = {
     { SOUND_SYSTEM_10_2_7_0, AV_CHANNEL_LAYOUT_7POINT1POINT2 },
     { SOUND_SYSTEM_11_2_3_0, AV_CHANNEL_LAYOUT_3POINT1POINT2 },
     { SOUND_SYSTEM_12_0_1_0, AV_CHANNEL_LAYOUT_MONO },
+    { SOUND_SYSTEM_13_9_1_6, AV_CHANNEL_LAYOUT_9POINT1POINT6 },
 };
 
 void ff_iamf_free_audio_element(IAMFAudioElement **paudio_element)

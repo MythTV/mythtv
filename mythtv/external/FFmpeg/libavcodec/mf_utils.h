@@ -53,6 +53,13 @@ typedef struct MFFunctions {
                                                    IMFMediaBuffer **ppBuffer);
     HRESULT (WINAPI *MFCreateSample) (IMFSample **ppIMFSample);
     HRESULT (WINAPI *MFCreateMediaType) (IMFMediaType **ppMFType);
+    HRESULT (WINAPI *MFCreateDXGISurfaceBuffer) (REFIID riid,
+                                IUnknown* punkSurface,
+                                UINT uSubresourceIndex,
+                                BOOL fBottomUpWhenLinear,
+                                IMFMediaBuffer** ppBuffer);
+    HRESULT (WINAPI *MFCreateDXGIDeviceManager) (UINT* resetToken,
+                                                IMFDXGIDeviceManager** ppDeviceManager);
     // MFTEnumEx is missing in Windows Vista's mfplat.dll.
     HRESULT (WINAPI *MFTEnumEx)(GUID guidCategory, UINT32 Flags,
                                 const MFT_REGISTER_TYPE_INFO *pInputType,
@@ -113,6 +120,7 @@ DEFINE_GUID(ff_MF_SA_MINIMUM_OUTPUT_SAMPLE_COUNT_PROGRESSIVE, 0xf5523a5, 0x1cb2,
 
 DEFINE_MEDIATYPE_GUID(ff_MFVideoFormat_HEVC, 0x43564548); // FCC('HEVC')
 DEFINE_MEDIATYPE_GUID(ff_MFVideoFormat_HEVC_ES, 0x53564548); // FCC('HEVS')
+DEFINE_MEDIATYPE_GUID(ff_MFVideoFormat_AV1, 0x31305641); // FCC('AV01')
 
 
 // This enum is missing from mingw-w64's codecapi.h by v7.0.0.

@@ -249,7 +249,10 @@ static inline void vc1_pack_bitplanes(uint8_t *bitplane, int n, const uint8_t *f
     bitplane[bitplane_index] = (bitplane[bitplane_index] << 4) | v;
 }
 
-static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t *buffer, av_unused uint32_t size)
+static int vaapi_vc1_start_frame(AVCodecContext *avctx,
+                                 av_unused const AVBufferRef *buffer_ref,
+                                 av_unused const uint8_t *buffer,
+                                 av_unused uint32_t size)
 {
     const VC1Context *v = avctx->priv_data;
     const MpegEncContext *s = &v->s;
@@ -282,7 +285,7 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
             .broken_link                   = v->broken_link,
             .closed_entry                  = v->closed_entry,
             .panscan_flag                  = v->panscanflag,
-            .loopfilter                    = s->loop_filter,
+            .loopfilter                    = v->loop_filter,
         },
         .conditional_overlap_flag          = v->condover,
         .fast_uvmc_flag                    = v->fastuvmc,
@@ -340,7 +343,7 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
         .mv_fields.bits = {
             .mv_mode                       = vc1_get_MVMODE(v),
             .mv_mode2                      = vc1_get_MVMODE2(v),
-            .mv_table                      = (v->fcm == PROGRESSIVE ? s->mv_table_index : v->imvtab),
+            .mv_table                      = (v->fcm == PROGRESSIVE ? v->mv_table_index : v->imvtab),
             .two_mv_block_pattern_table    = v->twomvbptab,
             .four_mv_switch                = v->fourmvswitch,
             .four_mv_block_pattern_table   = v->fourmvbptab,
@@ -368,7 +371,7 @@ static int vaapi_vc1_start_frame(AVCodecContext *avctx, av_unused const uint8_t 
             .frame_level_transform_type    = vc1_get_TTFRM(v),
             .transform_ac_codingset_idx1   = v->c_ac_table_index,
             .transform_ac_codingset_idx2   = v->y_ac_table_index,
-            .intra_transform_dc_table      = v->s.dc_table_index,
+            .intra_transform_dc_table      = v->dc_table_index,
         },
     };
 
@@ -487,7 +490,7 @@ static int vaapi_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
         .slice_data_size         = size,
         .slice_data_offset       = 0,
         .slice_data_flag         = VA_SLICE_DATA_FLAG_ALL,
-        .macroblock_offset       = get_bits_count(&s->gb),
+        .macroblock_offset       = get_bits_count(&v->gb),
         .slice_vertical_position = s->mb_y % mb_height,
     };
 

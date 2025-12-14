@@ -27,49 +27,14 @@
 #include "libavutil/mem_internal.h"
 #include "avcodec.h"
 #include "copy_block.h"
+#include "mathops.h"
 #include "simple_idct.h"
 #include "me_cmp.h"
 #include "mpegvideoenc.h"
 #include "config.h"
 #include "config_components.h"
 
-/* (i - 256) * (i - 256) */
-const uint32_t ff_square_tab[512] = {
-    65536, 65025, 64516, 64009, 63504, 63001, 62500, 62001, 61504, 61009, 60516, 60025, 59536, 59049, 58564, 58081,
-    57600, 57121, 56644, 56169, 55696, 55225, 54756, 54289, 53824, 53361, 52900, 52441, 51984, 51529, 51076, 50625,
-    50176, 49729, 49284, 48841, 48400, 47961, 47524, 47089, 46656, 46225, 45796, 45369, 44944, 44521, 44100, 43681,
-    43264, 42849, 42436, 42025, 41616, 41209, 40804, 40401, 40000, 39601, 39204, 38809, 38416, 38025, 37636, 37249,
-    36864, 36481, 36100, 35721, 35344, 34969, 34596, 34225, 33856, 33489, 33124, 32761, 32400, 32041, 31684, 31329,
-    30976, 30625, 30276, 29929, 29584, 29241, 28900, 28561, 28224, 27889, 27556, 27225, 26896, 26569, 26244, 25921,
-    25600, 25281, 24964, 24649, 24336, 24025, 23716, 23409, 23104, 22801, 22500, 22201, 21904, 21609, 21316, 21025,
-    20736, 20449, 20164, 19881, 19600, 19321, 19044, 18769, 18496, 18225, 17956, 17689, 17424, 17161, 16900, 16641,
-    16384, 16129, 15876, 15625, 15376, 15129, 14884, 14641, 14400, 14161, 13924, 13689, 13456, 13225, 12996, 12769,
-    12544, 12321, 12100, 11881, 11664, 11449, 11236, 11025, 10816, 10609, 10404, 10201, 10000,  9801,  9604,  9409,
-     9216,  9025,  8836,  8649,  8464,  8281,  8100,  7921,  7744,  7569,  7396,  7225,  7056,  6889,  6724,  6561,
-     6400,  6241,  6084,  5929,  5776,  5625,  5476,  5329,  5184,  5041,  4900,  4761,  4624,  4489,  4356,  4225,
-     4096,  3969,  3844,  3721,  3600,  3481,  3364,  3249,  3136,  3025,  2916,  2809,  2704,  2601,  2500,  2401,
-     2304,  2209,  2116,  2025,  1936,  1849,  1764,  1681,  1600,  1521,  1444,  1369,  1296,  1225,  1156,  1089,
-     1024,   961,   900,   841,   784,   729,   676,   625,   576,   529,   484,   441,   400,   361,   324,   289,
-      256,   225,   196,   169,   144,   121,   100,    81,    64,    49,    36,    25,    16,     9,     4,     1,
-        0,     1,     4,     9,    16,    25,    36,    49,    64,    81,   100,   121,   144,   169,   196,   225,
-      256,   289,   324,   361,   400,   441,   484,   529,   576,   625,   676,   729,   784,   841,   900,   961,
-     1024,  1089,  1156,  1225,  1296,  1369,  1444,  1521,  1600,  1681,  1764,  1849,  1936,  2025,  2116,  2209,
-     2304,  2401,  2500,  2601,  2704,  2809,  2916,  3025,  3136,  3249,  3364,  3481,  3600,  3721,  3844,  3969,
-     4096,  4225,  4356,  4489,  4624,  4761,  4900,  5041,  5184,  5329,  5476,  5625,  5776,  5929,  6084,  6241,
-     6400,  6561,  6724,  6889,  7056,  7225,  7396,  7569,  7744,  7921,  8100,  8281,  8464,  8649,  8836,  9025,
-     9216,  9409,  9604,  9801, 10000, 10201, 10404, 10609, 10816, 11025, 11236, 11449, 11664, 11881, 12100, 12321,
-    12544, 12769, 12996, 13225, 13456, 13689, 13924, 14161, 14400, 14641, 14884, 15129, 15376, 15625, 15876, 16129,
-    16384, 16641, 16900, 17161, 17424, 17689, 17956, 18225, 18496, 18769, 19044, 19321, 19600, 19881, 20164, 20449,
-    20736, 21025, 21316, 21609, 21904, 22201, 22500, 22801, 23104, 23409, 23716, 24025, 24336, 24649, 24964, 25281,
-    25600, 25921, 26244, 26569, 26896, 27225, 27556, 27889, 28224, 28561, 28900, 29241, 29584, 29929, 30276, 30625,
-    30976, 31329, 31684, 32041, 32400, 32761, 33124, 33489, 33856, 34225, 34596, 34969, 35344, 35721, 36100, 36481,
-    36864, 37249, 37636, 38025, 38416, 38809, 39204, 39601, 40000, 40401, 40804, 41209, 41616, 42025, 42436, 42849,
-    43264, 43681, 44100, 44521, 44944, 45369, 45796, 46225, 46656, 47089, 47524, 47961, 48400, 48841, 49284, 49729,
-    50176, 50625, 51076, 51529, 51984, 52441, 52900, 53361, 53824, 54289, 54756, 55225, 55696, 56169, 56644, 57121,
-    57600, 58081, 58564, 59049, 59536, 60025, 60516, 61009, 61504, 62001, 62500, 63001, 63504, 64009, 64516, 65025,
-};
-
-static int sse4_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int sse4_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                   ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -86,7 +51,7 @@ static int sse4_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
     return s;
 }
 
-static int sse8_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int sse8_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                   ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -107,7 +72,7 @@ static int sse8_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
     return s;
 }
 
-static int sse16_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int sse16_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                    ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -149,7 +114,7 @@ static int sum_abs_dctelem_c(const int16_t *block)
 #define avg2(a, b) (((a) + (b) + 1) >> 1)
 #define avg4(a, b, c, d) (((a) + (b) + (c) + (d) + 2) >> 2)
 
-static inline int pix_abs16_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static inline int pix_abs16_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                               ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -177,7 +142,7 @@ static inline int pix_abs16_c(MpegEncContext *v, const uint8_t *pix1, const uint
     return s;
 }
 
-static inline int pix_median_abs16_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static inline int pix_median_abs16_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                              ptrdiff_t stride, int h)
 {
     int s = 0, i, j;
@@ -216,7 +181,7 @@ static inline int pix_median_abs16_c(MpegEncContext *v, const uint8_t *pix1, con
     return s;
 }
 
-static int pix_abs16_x2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int pix_abs16_x2_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                           ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -244,7 +209,7 @@ static int pix_abs16_x2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t 
     return s;
 }
 
-static int pix_abs16_y2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int pix_abs16_y2_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                           ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -274,7 +239,7 @@ static int pix_abs16_y2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t 
     return s;
 }
 
-static int pix_abs16_xy2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int pix_abs16_xy2_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                            ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -304,7 +269,7 @@ static int pix_abs16_xy2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t
     return s;
 }
 
-static inline int pix_abs8_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static inline int pix_abs8_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                              ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -324,7 +289,7 @@ static inline int pix_abs8_c(MpegEncContext *v, const uint8_t *pix1, const uint8
     return s;
 }
 
-static inline int pix_median_abs8_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static inline int pix_median_abs8_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                              ptrdiff_t stride, int h)
 {
     int s = 0, i, j;
@@ -355,7 +320,7 @@ static inline int pix_median_abs8_c(MpegEncContext *v, const uint8_t *pix1, cons
     return s;
 }
 
-static int pix_abs8_x2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int pix_abs8_x2_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                          ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -375,7 +340,7 @@ static int pix_abs8_x2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *
     return s;
 }
 
-static int pix_abs8_y2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int pix_abs8_y2_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                          ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -397,7 +362,7 @@ static int pix_abs8_y2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *
     return s;
 }
 
-static int pix_abs8_xy2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
+static int pix_abs8_xy2_c(MPVEncContext *unused, const uint8_t *pix1, const uint8_t *pix2,
                           ptrdiff_t stride, int h)
 {
     int s = 0, i;
@@ -419,7 +384,7 @@ static int pix_abs8_xy2_c(MpegEncContext *v, const uint8_t *pix1, const uint8_t 
     return s;
 }
 
-static int nsse16_c(MpegEncContext *c, const uint8_t *s1, const uint8_t *s2,
+static int nsse16_c(MPVEncContext *const c, const uint8_t *s1, const uint8_t *s2,
                     ptrdiff_t stride, int h)
 {
     int score1 = 0, score2 = 0, x, y;
@@ -439,12 +404,12 @@ static int nsse16_c(MpegEncContext *c, const uint8_t *s1, const uint8_t *s2,
     }
 
     if (c)
-        return score1 + FFABS(score2) * c->avctx->nsse_weight;
+        return score1 + FFABS(score2) * c->c.avctx->nsse_weight;
     else
         return score1 + FFABS(score2) * 8;
 }
 
-static int nsse8_c(MpegEncContext *c, const uint8_t *s1, const uint8_t *s2,
+static int nsse8_c(MPVEncContext *const c, const uint8_t *s1, const uint8_t *s2,
                    ptrdiff_t stride, int h)
 {
     int score1 = 0, score2 = 0, x, y;
@@ -464,12 +429,12 @@ static int nsse8_c(MpegEncContext *c, const uint8_t *s1, const uint8_t *s2,
     }
 
     if (c)
-        return score1 + FFABS(score2) * c->avctx->nsse_weight;
+        return score1 + FFABS(score2) * c->c.avctx->nsse_weight;
     else
         return score1 + FFABS(score2) * 8;
 }
 
-static int zero_cmp(MpegEncContext *s, const uint8_t *a, const uint8_t *b,
+static int zero_cmp(MPVEncContext *s, const uint8_t *a, const uint8_t *b,
                     ptrdiff_t stride, int h)
 {
     return 0;
@@ -546,7 +511,7 @@ av_cold int ff_set_cmp(const MECmpContext *c, me_cmp_func *cmp, int type, int mp
 
 #define BUTTERFLYA(x, y) (FFABS((x) + (y)) + FFABS((x) - (y)))
 
-static int hadamard8_diff8x8_c(MpegEncContext *s, const uint8_t *dst,
+static int hadamard8_diff8x8_c(MPVEncContext *unused, const uint8_t *dst,
                                const uint8_t *src, ptrdiff_t stride, int h)
 {
     int i, temp[64], sum = 0;
@@ -596,7 +561,7 @@ static int hadamard8_diff8x8_c(MpegEncContext *s, const uint8_t *dst,
     return sum;
 }
 
-static int hadamard8_intra8x8_c(MpegEncContext *s, const uint8_t *src,
+static int hadamard8_intra8x8_c(MPVEncContext *unused, const uint8_t *src,
                                 const uint8_t *dummy, ptrdiff_t stride, int h)
 {
     int i, temp[64], sum = 0;
@@ -646,7 +611,7 @@ static int hadamard8_intra8x8_c(MpegEncContext *s, const uint8_t *src,
     return sum;
 }
 
-static int dct_sad8x8_c(MpegEncContext *s, const uint8_t *src1,
+static int dct_sad8x8_c(MPVEncContext *const s, const uint8_t *src1,
                         const uint8_t *src2, ptrdiff_t stride, int h)
 {
     LOCAL_ALIGNED_16(int16_t, temp, [64]);
@@ -685,7 +650,7 @@ static int dct_sad8x8_c(MpegEncContext *s, const uint8_t *src1,
         DST(7, (a4 >> 2) - a7);                         \
     }
 
-static int dct264_sad8x8_c(MpegEncContext *s, const uint8_t *src1,
+static int dct264_sad8x8_c(MPVEncContext *const s, const uint8_t *src1,
                            const uint8_t *src2, ptrdiff_t stride, int h)
 {
     int16_t dct[8][8];
@@ -710,7 +675,7 @@ static int dct264_sad8x8_c(MpegEncContext *s, const uint8_t *src1,
 }
 #endif
 
-static int dct_max8x8_c(MpegEncContext *s, const uint8_t *src1,
+static int dct_max8x8_c(MPVEncContext *const s, const uint8_t *src1,
                         const uint8_t *src2, ptrdiff_t stride, int h)
 {
     LOCAL_ALIGNED_16(int16_t, temp, [64]);
@@ -725,22 +690,22 @@ static int dct_max8x8_c(MpegEncContext *s, const uint8_t *src1,
     return sum;
 }
 
-static int quant_psnr8x8_c(MpegEncContext *s, const uint8_t *src1,
+static int quant_psnr8x8_c(MPVEncContext *const s, const uint8_t *src1,
                            const uint8_t *src2, ptrdiff_t stride, int h)
 {
     LOCAL_ALIGNED_16(int16_t, temp, [64 * 2]);
     int16_t *const bak = temp + 64;
     int sum = 0, i;
 
-    s->mb_intra = 0;
+    s->c.mb_intra = 0;
 
     s->pdsp.diff_pixels_unaligned(temp, src1, src2, stride);
 
     memcpy(bak, temp, 64 * sizeof(int16_t));
 
-    s->block_last_index[0 /* FIXME */] =
-        s->dct_quantize(s, temp, 0 /* FIXME */, s->qscale, &i);
-    s->dct_unquantize_inter(s, temp, 0, s->qscale);
+    s->c.block_last_index[0 /* FIXME */] =
+        s->dct_quantize(s, temp, 0 /* FIXME */, s->c.qscale, &i);
+    s->c.dct_unquantize_inter(&s->c, temp, 0, s->c.qscale);
     ff_simple_idct_int16_8bit(temp); // FIXME
 
     for (i = 0; i < 64; i++)
@@ -749,29 +714,29 @@ static int quant_psnr8x8_c(MpegEncContext *s, const uint8_t *src1,
     return sum;
 }
 
-static int rd8x8_c(MpegEncContext *s, const uint8_t *src1, const uint8_t *src2,
+static int rd8x8_c(MPVEncContext *const s, const uint8_t *src1, const uint8_t *src2,
                    ptrdiff_t stride, int h)
 {
-    const uint8_t *scantable = s->intra_scantable.permutated;
+    const uint8_t *scantable = s->c.intra_scantable.permutated;
     LOCAL_ALIGNED_16(int16_t, temp, [64]);
     LOCAL_ALIGNED_16(uint8_t, lsrc1, [64]);
     LOCAL_ALIGNED_16(uint8_t, lsrc2, [64]);
     int i, last, run, bits, level, distortion, start_i;
     const int esc_length = s->ac_esc_length;
-    uint8_t *length, *last_length;
+    const uint8_t *length, *last_length;
 
     copy_block8(lsrc1, src1, 8, stride, 8);
     copy_block8(lsrc2, src2, 8, stride, 8);
 
     s->pdsp.diff_pixels(temp, lsrc1, lsrc2, 8);
 
-    s->block_last_index[0 /* FIXME */] =
+    s->c.block_last_index[0 /* FIXME */] =
     last                               =
-        s->dct_quantize(s, temp, 0 /* FIXME */, s->qscale, &i);
+        s->dct_quantize(s, temp, 0 /* FIXME */, s->c.qscale, &i);
 
     bits = 0;
 
-    if (s->mb_intra) {
+    if (s->c.mb_intra) {
         start_i     = 1;
         length      = s->intra_ac_vlc_length;
         last_length = s->intra_ac_vlc_last_length;
@@ -811,37 +776,37 @@ static int rd8x8_c(MpegEncContext *s, const uint8_t *src1, const uint8_t *src2,
     }
 
     if (last >= 0) {
-        if (s->mb_intra)
-            s->dct_unquantize_intra(s, temp, 0, s->qscale);
+        if (s->c.mb_intra)
+            s->c.dct_unquantize_intra(&s->c, temp, 0, s->c.qscale);
         else
-            s->dct_unquantize_inter(s, temp, 0, s->qscale);
+            s->c.dct_unquantize_inter(&s->c, temp, 0, s->c.qscale);
     }
 
-    s->idsp.idct_add(lsrc2, 8, temp);
+    s->c.idsp.idct_add(lsrc2, 8, temp);
 
     distortion = s->sse_cmp[1](NULL, lsrc2, lsrc1, 8, 8);
 
-    return distortion + ((bits * s->qscale * s->qscale * 109 + 64) >> 7);
+    return distortion + ((bits * s->c.qscale * s->c.qscale * 109 + 64) >> 7);
 }
 
-static int bit8x8_c(MpegEncContext *s, const uint8_t *src1, const uint8_t *src2,
+static int bit8x8_c(MPVEncContext *const s, const uint8_t *src1, const uint8_t *src2,
                     ptrdiff_t stride, int h)
 {
-    const uint8_t *scantable = s->intra_scantable.permutated;
+    const uint8_t *scantable = s->c.intra_scantable.permutated;
     LOCAL_ALIGNED_16(int16_t, temp, [64]);
     int i, last, run, bits, level, start_i;
     const int esc_length = s->ac_esc_length;
-    uint8_t *length, *last_length;
+    const uint8_t *length, *last_length;
 
     s->pdsp.diff_pixels_unaligned(temp, src1, src2, stride);
 
-    s->block_last_index[0 /* FIXME */] =
+    s->c.block_last_index[0 /* FIXME */] =
     last                               =
-        s->dct_quantize(s, temp, 0 /* FIXME */, s->qscale, &i);
+        s->dct_quantize(s, temp, 0 /* FIXME */, s->c.qscale, &i);
 
     bits = 0;
 
-    if (s->mb_intra) {
+    if (s->c.mb_intra) {
         start_i     = 1;
         length      = s->intra_ac_vlc_length;
         last_length = s->intra_ac_vlc_last_length;
@@ -884,7 +849,7 @@ static int bit8x8_c(MpegEncContext *s, const uint8_t *src1, const uint8_t *src2,
 }
 
 #define VSAD_INTRA(size)                                                \
-static int vsad_intra ## size ## _c(MpegEncContext *c,                  \
+static int vsad_intra ## size ## _c(MPVEncContext *unused,              \
                                     const uint8_t *s, const uint8_t *dummy, \
                                     ptrdiff_t stride, int h)            \
 {                                                                       \
@@ -906,7 +871,7 @@ VSAD_INTRA(8)
 VSAD_INTRA(16)
 
 #define VSAD(size)                                                             \
-static int vsad ## size ## _c(MpegEncContext *c,                               \
+static int vsad ## size ## _c(MPVEncContext *unused,                           \
                               const uint8_t *s1, const uint8_t *s2,            \
                               ptrdiff_t stride, int h)                               \
 {                                                                              \
@@ -926,7 +891,7 @@ VSAD(16)
 
 #define SQ(a) ((a) * (a))
 #define VSSE_INTRA(size)                                                \
-static int vsse_intra ## size ## _c(MpegEncContext *c,                  \
+static int vsse_intra ## size ## _c(MPVEncContext *unused,              \
                                     const uint8_t *s, const uint8_t *dummy, \
                                     ptrdiff_t stride, int h)            \
 {                                                                       \
@@ -948,8 +913,8 @@ VSSE_INTRA(8)
 VSSE_INTRA(16)
 
 #define VSSE(size)                                                             \
-static int vsse ## size ## _c(MpegEncContext *c, const uint8_t *s1, const uint8_t *s2, \
-                              ptrdiff_t stride, int h)                         \
+static int vsse ## size ## _c(MPVEncContext *unused, const uint8_t *s1,        \
+                              const uint8_t *s2, ptrdiff_t stride, int h)      \
 {                                                                              \
     int score = 0, x, y;                                                       \
                                                                                \
@@ -966,8 +931,8 @@ VSSE(8)
 VSSE(16)
 
 #define WRAPPER8_16_SQ(name8, name16)                                   \
-static int name16(MpegEncContext *s, const uint8_t *dst, const uint8_t *src, \
-                  ptrdiff_t stride, int h)                              \
+static int name16(MPVEncContext *const s, const uint8_t *dst,           \
+                  const uint8_t *src, ptrdiff_t stride, int h)          \
 {                                                                       \
     int score = 0;                                                      \
                                                                         \

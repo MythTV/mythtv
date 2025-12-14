@@ -408,18 +408,7 @@ static int activate(AVFilterContext *ctx)
         if (!frame)
             return AVERROR(ENOMEM);
 
-#if FF_API_FRAME_KEY
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->key_frame           = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
         frame->flags              |= AV_FRAME_FLAG_KEY;
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->interlaced_frame    = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         frame->flags              &= ~AV_FRAME_FLAG_INTERLACED;
         frame->pict_type           = AV_PICTURE_TYPE_I;
         frame->sample_aspect_ratio = (AVRational) {1, 1};
@@ -443,15 +432,15 @@ static const AVFilterPad gradients_outputs[] = {
     },
 };
 
-const AVFilter ff_vsrc_gradients = {
-    .name          = "gradients",
-    .description   = NULL_IF_CONFIG_SMALL("Draw a gradients."),
+const FFFilter ff_vsrc_gradients = {
+    .p.name        = "gradients",
+    .p.description = NULL_IF_CONFIG_SMALL("Draw a gradients."),
+    .p.priv_class  = &gradients_class,
+    .p.inputs      = NULL,
+    .p.flags       = AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(GradientsContext),
-    .priv_class    = &gradients_class,
-    .inputs        = NULL,
     FILTER_OUTPUTS(gradients_outputs),
     FILTER_PIXFMTS(AV_PIX_FMT_RGBA, AV_PIX_FMT_RGBA64, AV_PIX_FMT_GBRAPF32),
     .activate      = activate,
-    .flags         = AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

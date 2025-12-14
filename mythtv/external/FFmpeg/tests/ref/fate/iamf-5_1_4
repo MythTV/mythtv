@@ -111,17 +111,17 @@ output_gain_flags=0
 output_gain=0/1
 [/SUBCOMPONENT]
 [SUBCOMPONENT]
-channel_layout=5.1
+channel_layout=6 channels (FL+FR+SL+SR+FC+LFE)
 output_gain_flags=0
 output_gain=0/1
 [/SUBCOMPONENT]
 [SUBCOMPONENT]
-channel_layout=5.1.2
+channel_layout=8 channels (FL+FR+SL+SR+FC+LFE+TFL+TFR)
 output_gain_flags=0
 output_gain=0/1
 [/SUBCOMPONENT]
 [SUBCOMPONENT]
-channel_layout=5.1.4
+channel_layout=10 channels (FL+FR+SL+SR+FC+LFE+TFL+TFR+TBL+TBR)
 output_gain_flags=0
 output_gain=0/1
 [/SUBCOMPONENT]
@@ -327,7 +327,7 @@ dialogue_anchored_loudness=0/1
 album_anchored_loudness=0/1
 [/PIECE]
 [PIECE]
-sound_system=5.1
+sound_system=5.1(side)
 integrated_loudness=0/256
 digital_peak=0/256
 true_peak=0/1

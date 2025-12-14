@@ -4,6 +4,10 @@
 #include "mythvdpauhelper.h"
 
 extern "C" {
+#include "libavcodec/defs.h"
+}
+
+extern "C" {
 #define Cursor XCursor // Prevent conflicts with Qt6.
 #define pointer Xpointer // Prevent conflicts with Qt6.
 #if defined(_X11_XLIB_H_) && !defined(Bool)
@@ -375,20 +379,20 @@ bool MythVDPAUHelper::CheckH264Decode(AVCodecContext *Context)
     }
 
     VdpDecoderProfile profile = 0;
-    switch (Context->profile & ~FF_PROFILE_H264_INTRA)
+    switch (Context->profile & ~AV_PROFILE_H264_INTRA)
     {
-        case FF_PROFILE_H264_BASELINE: profile = VDP_DECODER_PROFILE_H264_BASELINE; break;
-        case FF_PROFILE_H264_CONSTRAINED_BASELINE: profile = VDP_DECODER_PROFILE_H264_CONSTRAINED_BASELINE; break;
-        case FF_PROFILE_H264_MAIN: profile = VDP_DECODER_PROFILE_H264_MAIN; break;
-        case FF_PROFILE_H264_HIGH: profile = VDP_DECODER_PROFILE_H264_HIGH; break;
+        case AV_PROFILE_H264_BASELINE: profile = VDP_DECODER_PROFILE_H264_BASELINE; break;
+        case AV_PROFILE_H264_CONSTRAINED_BASELINE: profile = VDP_DECODER_PROFILE_H264_CONSTRAINED_BASELINE; break;
+        case AV_PROFILE_H264_MAIN: profile = VDP_DECODER_PROFILE_H264_MAIN; break;
+        case AV_PROFILE_H264_HIGH: profile = VDP_DECODER_PROFILE_H264_HIGH; break;
 #ifdef VDP_DECODER_PROFILE_H264_EXTENDED
-        case FF_PROFILE_H264_EXTENDED: profile = VDP_DECODER_PROFILE_H264_EXTENDED; break;
+        case AV_PROFILE_H264_EXTENDED: profile = VDP_DECODER_PROFILE_H264_EXTENDED; break;
 #endif
-        case FF_PROFILE_H264_HIGH_10: profile = VDP_DECODER_PROFILE_H264_HIGH; break;
+        case AV_PROFILE_H264_HIGH_10: profile = VDP_DECODER_PROFILE_H264_HIGH; break;
 #ifdef VDP_DECODER_PROFILE_H264_HIGH_444_PREDICTIVE
-        case FF_PROFILE_H264_HIGH_422:
-        case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
-        case FF_PROFILE_H264_CAVLC_444: profile = VDP_DECODER_PROFILE_H264_HIGH_444_PREDICTIVE; break;
+        case AV_PROFILE_H264_HIGH_422:
+        case AV_PROFILE_H264_HIGH_444_PREDICTIVE:
+        case AV_PROFILE_H264_CAVLC_444: profile = VDP_DECODER_PROFILE_H264_HIGH_444_PREDICTIVE; break;
 #endif
         default: return false;
     }

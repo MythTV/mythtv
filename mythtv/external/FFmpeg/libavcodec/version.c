@@ -31,12 +31,12 @@ const char av_codec_ffversion[] = "FFmpeg version " FFMPEG_VERSION;
 
 unsigned avcodec_version(void)
 {
-    static_assert(AV_CODEC_ID_LEAD         ==   269 &&
+    static_assert(AV_CODEC_ID_DNXUC        ==   270 &&
                   AV_CODEC_ID_PCM_SGA      == 65572 &&
                   AV_CODEC_ID_ADPCM_XMD    == 69683 &&
                   AV_CODEC_ID_CBD2_DPCM    == 81928 &&
                   AV_CODEC_ID_QOA          == 86121 &&
-                  AV_CODEC_ID_ARIB_CAPTION == 94233 &&
+                  AV_CODEC_ID_IVTV_VBI     == 94234 &&
                   AV_CODEC_ID_SMPTE_2038   == 98315,
                   "Don't insert new codec ids in the middle of a list");
     static_assert(LIBAVCODEC_VERSION_MICRO >= 100, "micro version starts at 100");

@@ -73,6 +73,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -115,6 +116,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -190,6 +192,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -232,6 +235,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -340,6 +344,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -382,6 +387,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -490,6 +496,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         },
         {
@@ -532,6 +539,7 @@
             "pict_type": "I",
             "interlaced_frame": 0,
             "top_field_first": 0,
+            "lossless": 0,
             "repeat_pict": 0
         }
     ],
@@ -577,8 +585,8 @@
                 "multilayer": 0
             },
             "tags": {
-                "E": "mc²",
-                "encoder": "Lavc pcm_s16le"
+                "encoder": "Lavc pcm_s16le",
+                "E": "mc²"
             }
         },
         {
@@ -591,8 +599,6 @@
             "height": 240,
             "coded_width": 320,
             "coded_height": 240,
-            "closed_captions": 0,
-            "film_grain": 0,
             "has_b_frames": 0,
             "sample_aspect_ratio": "1:1",
             "display_aspect_ratio": "4:3",
@@ -628,9 +634,9 @@
                 "multilayer": 0
             },
             "tags": {
+                "encoder": "Lavc rawvideo",
                 "title": "foobar",
-                "duration_ts": "field-and-tags-conflict-attempt",
-                "encoder": "Lavc rawvideo"
+                "duration_ts": "field-and-tags-conflict-attempt"
             }
         },
         {
@@ -643,8 +649,6 @@
             "height": 100,
             "coded_width": 100,
             "coded_height": 100,
-            "closed_captions": 0,
-            "film_grain": 0,
             "has_b_frames": 0,
             "sample_aspect_ratio": "1:1",
             "display_aspect_ratio": "1:1",

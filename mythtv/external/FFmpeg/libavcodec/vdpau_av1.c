@@ -41,7 +41,8 @@ static int get_bit_depth_from_seq(const AV1RawSequenceHeader *seq)
 }
 
 static int vdpau_av1_start_frame(AVCodecContext *avctx,
-                                  const uint8_t *buffer, uint32_t size)
+                                 const AVBufferRef *buffer_ref,
+                                 const uint8_t *buffer, uint32_t size)
 {
     AV1DecContext *s = avctx->priv_data;
     const AV1RawSequenceHeader *seq = s->raw_seq;
@@ -330,7 +331,7 @@ static int vdpau_av1_end_frame(AVCodecContext *avctx)
     return 0;
 }
 
-static int vdpau_av1_init(AVCodecContext *avctx)
+static av_cold int vdpau_av1_init(AVCodecContext *avctx)
 {
     VdpDecoderProfile profile;
     uint32_t level = avctx->level;

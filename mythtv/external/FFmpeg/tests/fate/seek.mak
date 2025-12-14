@@ -62,7 +62,6 @@ FATE_SEEK_VSYNTH_LENA += asv1 asv2                      \
                          mpeg2-422    mpeg2-idct-int    \
                          mpeg2-ilace  mpeg2-ivlc-qprd   \
                          mpeg2-thread mpeg2-thread-ivlc \
-                         mpeg4 $(FATE_MPEG4_AVI)        \
                          msmpeg4 msmpeg4v2              \
                          rgb                            \
                          roqvideo                       \
@@ -71,6 +70,8 @@ FATE_SEEK_VSYNTH_LENA += asv1 asv2                      \
                          svq1                           \
                          wmv1 wmv2                      \
                          yuv                            \
+
+FATE_SEEK_VSYNTH_LENA += $(if $(CONFIG_MPEG4VIDEO_PARSER), mpeg4 $(FATE_MPEG4_AVI))
 
 fate-seek-vsynth_lena-asv1:              SRC = fate/vsynth_lena-asv1.avi
 fate-seek-vsynth_lena-asv2:              SRC = fate/vsynth_lena-asv2.avi
@@ -183,10 +184,10 @@ FATE_SEEK += $(FATE_SEEK_LAVF_IMAGE2PIPE)
 FATE_SEEK_EXTRA-$(CONFIG_MP3_DEMUXER)   += fate-seek-extra-mp3
 FATE_SEEK_EXTRA-$(call ALLYES, CACHE_PROTOCOL PIPE_PROTOCOL MP3_DEMUXER) += fate-seek-cache-pipe
 FATE_SEEK_EXTRA-$(CONFIG_MATROSKA_DEMUXER) += fate-seek-mkv-codec-delay
-FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER FILE_PROTOCOL) += fate-seek-extra-mp4
-FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER FILE_PROTOCOL) += fate-seek-empty-edit-mp4
-FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER FILE_PROTOCOL) += fate-seek-test-iibbibb-mp4
-FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER FILE_PROTOCOL) += fate-seek-test-iibbibb-neg-ctts-mp4
+FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER) += fate-seek-extra-mp4
+FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER) += fate-seek-empty-edit-mp4
+FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER) += fate-seek-test-iibbibb-mp4
+FATE_SEEK_EXTRA-$(call ALLYES, MOV_DEMUXER) += fate-seek-test-iibbibb-neg-ctts-mp4
 
 fate-seek-extra-mp3:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/gapless/gapless.mp3 -fastseek 1
 fate-seek-extra-mp4:  CMD = run libavformat/tests/seek$(EXESUF) $(TARGET_SAMPLES)/mov/buck480p30_na.mp4 -duration 180 -frames 4

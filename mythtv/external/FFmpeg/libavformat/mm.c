@@ -34,30 +34,30 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "avio_internal.h"
 #include "demux.h"
 #include "internal.h"
 
 #define MM_PREAMBLE_SIZE    6
 
 #define MM_TYPE_HEADER      0x0
+#define MM_TYPE_RAW         0x2
 #define MM_TYPE_INTER       0x5
 #define MM_TYPE_INTRA       0x8
 #define MM_TYPE_INTRA_HH    0xc
 #define MM_TYPE_INTER_HH    0xd
 #define MM_TYPE_INTRA_HHV   0xe
 #define MM_TYPE_INTER_HHV   0xf
+#define MM_TYPE_AUDIO2      0x14
 #define MM_TYPE_AUDIO       0x15
 #define MM_TYPE_PALETTE     0x31
 
 #define MM_HEADER_LEN_V     0x16    /* video only */
 #define MM_HEADER_LEN_AV    0x18    /* video + audio */
+#define MM_HEADER_LEN_AV2   0x1a
 
 #define MM_PALETTE_COUNT    128
 #define MM_PALETTE_SIZE     (MM_PALETTE_COUNT*3)
-
-typedef struct MmDemuxContext {
-  unsigned int audio_pts, video_pts;
-} MmDemuxContext;
 
 static int probe(const AVProbeData *p)
 {
@@ -68,7 +68,7 @@ static int probe(const AVProbeData *p)
     if (AV_RL16(&p->buf[0]) != MM_TYPE_HEADER)
         return 0;
     len = AV_RL32(&p->buf[2]);
-    if (len != MM_HEADER_LEN_V && len != MM_HEADER_LEN_AV)
+    if (len != MM_HEADER_LEN_V && len != MM_HEADER_LEN_AV && len != MM_HEADER_LEN_AV2)
         return 0;
     fps = AV_RL16(&p->buf[8]);
     w = AV_RL16(&p->buf[12]);
@@ -85,7 +85,6 @@ static int probe(const AVProbeData *p)
 
 static int read_header(AVFormatContext *s)
 {
-    MmDemuxContext *mm = s->priv_data;
     AVIOContext *pb = s->pb;
     AVStream *st;
 
@@ -118,7 +117,7 @@ static int read_header(AVFormatContext *s)
     avpriv_set_pts_info(st, 64, 1, frame_rate);
 
     /* audio stream */
-    if (length == MM_HEADER_LEN_AV) {
+    if (length >= MM_HEADER_LEN_AV) {
         st = avformat_new_stream(s, NULL);
         if (!st)
             return AVERROR(ENOMEM);
@@ -130,30 +129,31 @@ static int read_header(AVFormatContext *s)
         avpriv_set_pts_info(st, 64, 1, 8000); /* 8000 hz */
     }
 
-    mm->audio_pts = 0;
-    mm->video_pts = 0;
     return 0;
 }
 
 static int read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
-    MmDemuxContext *mm = s->priv_data;
     AVIOContext *pb = s->pb;
     unsigned char preamble[MM_PREAMBLE_SIZE];
     unsigned int type, length;
+    int64_t pos = avio_tell(pb);
     int ret;
 
-    while(1) {
+    while (1) {
+        if (avio_feof(pb))
+            return AVERROR_EOF;
 
-        if (avio_read(pb, preamble, MM_PREAMBLE_SIZE) != MM_PREAMBLE_SIZE) {
-            return AVERROR(EIO);
-        }
+        ret = ffio_read_size(pb, preamble, MM_PREAMBLE_SIZE);
+        if (ret < 0)
+            return ret;
 
         type = AV_RL16(&preamble[0]);
         length = AV_RL16(&preamble[2]);
 
-        switch(type) {
+        switch (type) {
+        case MM_TYPE_RAW :
         case MM_TYPE_PALETTE :
         case MM_TYPE_INTER :
         case MM_TYPE_INTRA :
@@ -165,13 +165,17 @@ static int read_packet(AVFormatContext *s,
             if ((ret = av_new_packet(pkt, length + MM_PREAMBLE_SIZE)) < 0)
                 return ret;
             memcpy(pkt->data, preamble, MM_PREAMBLE_SIZE);
-            if (avio_read(pb, pkt->data + MM_PREAMBLE_SIZE, length) != length)
-                return AVERROR(EIO);
+            ret = ffio_read_size(pb, pkt->data + MM_PREAMBLE_SIZE, length);
+            if (ret < 0)
+                return ret;
             pkt->size = length + MM_PREAMBLE_SIZE;
             pkt->stream_index = 0;
-            pkt->pts = mm->video_pts;
             if (type!=MM_TYPE_PALETTE)
-                mm->video_pts++;
+                pkt->duration = 1;
+            if (type == MM_TYPE_RAW ||
+                type == MM_TYPE_INTRA)
+                pkt->flags |= AV_PKT_FLAG_KEY;
+            pkt->pos = pos;
             return 0;
 
         case MM_TYPE_AUDIO :
@@ -180,11 +184,14 @@ static int read_packet(AVFormatContext *s,
             if ((ret = av_get_packet(s->pb, pkt, length)) < 0)
                 return ret;
             pkt->stream_index = 1;
-            pkt->pts = mm->audio_pts++;
+            pkt->duration = length;
+            pkt->pos = pos;
             return 0;
 
         default :
             av_log(s, AV_LOG_INFO, "unknown chunk type 0x%x\n", type);
+            /* fallthrough */
+        case MM_TYPE_AUDIO2 :
             avio_skip(pb, length);
         }
     }
@@ -193,7 +200,7 @@ static int read_packet(AVFormatContext *s,
 const FFInputFormat ff_mm_demuxer = {
     .p.name         = "mm",
     .p.long_name    = NULL_IF_CONFIG_SMALL("American Laser Games MM"),
-    .priv_data_size = sizeof(MmDemuxContext),
+    .p.flags        = AVFMT_GENERIC_INDEX,
     .read_probe     = probe,
     .read_header    = read_header,
     .read_packet    = read_packet,

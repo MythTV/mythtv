@@ -72,11 +72,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inpicref)
     int ret;
 
     inpicref->height = outlink->h;
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    inpicref->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     inpicref->flags &= ~AV_FRAME_FLAG_INTERLACED;
 
     if (!s->second) {
@@ -171,9 +166,9 @@ static const AVFilterPad separatefields_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_separatefields = {
-    .name        = "separatefields",
-    .description = NULL_IF_CONFIG_SMALL("Split input video frames into fields."),
+const FFFilter ff_vf_separatefields = {
+    .p.name        = "separatefields",
+    .p.description = NULL_IF_CONFIG_SMALL("Split input video frames into fields."),
     .priv_size   = sizeof(SeparateFieldsContext),
     .activate    = activate,
     .uninit      = uninit,

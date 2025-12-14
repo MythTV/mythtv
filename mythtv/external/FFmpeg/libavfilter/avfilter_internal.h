@@ -100,9 +100,22 @@ typedef struct FFFilterContext {
 
     avfilter_execute_func *execute;
 
-    // 1 when avfilter_init_*() was successfully called on this filter
-    // 0 otherwise
-    int initialized;
+    // AV_CLASS_STATE_FLAG_*
+    unsigned state_flags;
+
+    /**
+     * Ready status of the filter.
+     * A non-0 value means that the filter needs activating;
+     * a higher value suggests a more urgent activation.
+     */
+    unsigned ready;
+
+    /// parsed expression
+    struct AVExpr *enable;
+    /// variable values for the enable expression
+    double *var_values;
+
+    struct AVFilterCommand *command_queue;
 } FFFilterContext;
 
 static inline FFFilterContext *fffilterctx(AVFilterContext *ctx)
@@ -208,13 +221,5 @@ int ff_filter_graph_run_once(AVFilterGraph *graph);
  * @return  >= 0 or AVERROR code.
  */
 int ff_inlink_process_commands(AVFilterLink *link, const AVFrame *frame);
-
-/**
- * Evaluate the timeline expression of the link for the time and properties
- * of the frame.
- * @return  >0 if enabled, 0 if disabled
- * @note  It does not update link->dst->is_disabled.
- */
-int ff_inlink_evaluate_timeline_at_frame(AVFilterLink *link, const AVFrame *frame);
 
 #endif /* AVFILTER_AVFILTER_INTERNAL_H */

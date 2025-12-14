@@ -526,7 +526,7 @@ static int vaapi_encode_h265_init_picture_params(AVCodecContext *avctx,
     priv->sei_needed = 0;
 
     // Only look for the metadata on I/IDR frame on the output. We
-    // may force an IDR frame on the output where the medadata gets
+    // may force an IDR frame on the output where the metadata gets
     // changed on the input frame.
     if ((priv->sei & SEI_MASTERING_DISPLAY) &&
         (pic->type == FF_HW_PICTURE_TYPE_I || pic->type == FF_HW_PICTURE_TYPE_IDR)) {
@@ -951,8 +951,10 @@ static av_cold int vaapi_encode_h265_get_encoder_caps(AVCodecContext *avctx)
            "min CB size %dx%d.\n", priv->ctu_size, priv->ctu_size,
            priv->min_cb_size, priv->min_cb_size);
 
-    base_ctx->surface_width  = FFALIGN(avctx->width,  priv->min_cb_size);
-    base_ctx->surface_height = FFALIGN(avctx->height, priv->min_cb_size);
+    base_ctx->surface_width  = FFALIGN(avctx->width,
+        FFMAX(priv->min_cb_size, priv->common.surface_alignment_width));
+    base_ctx->surface_height = FFALIGN(avctx->height,
+        FFMAX(priv->min_cb_size, priv->common.surface_alignment_height));
 
     base_ctx->slice_block_width = base_ctx->slice_block_height = priv->ctu_size;
 
@@ -1207,10 +1209,7 @@ const FFCodec ff_hevc_vaapi_encoder = {
     .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE |
                       FF_CODEC_CAP_INIT_CLEANUP,
     .defaults       = vaapi_encode_h265_defaults,
-    .p.pix_fmts = (const enum AVPixelFormat[]) {
-        AV_PIX_FMT_VAAPI,
-        AV_PIX_FMT_NONE,
-    },
+    CODEC_PIXFMTS(AV_PIX_FMT_VAAPI),
     .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
     .hw_configs     = ff_vaapi_encode_hw_configs,
     .p.wrapper_name = "vaapi",

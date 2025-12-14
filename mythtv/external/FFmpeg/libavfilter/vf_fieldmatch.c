@@ -823,20 +823,10 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
     /* mark the frame we are unable to match properly as interlaced so a proper
      * de-interlacer can take the relay */
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    dst->interlaced_frame = interlaced_frame;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     if (interlaced_frame) {
         dst->flags |= AV_FRAME_FLAG_INTERLACED;
         av_log(ctx, AV_LOG_WARNING, "Frame #%"PRId64" at %s is still interlaced\n",
                outl->frame_count_in, av_ts2timestr(in->pts, &inlink->time_base));
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        dst->top_field_first = field;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         if (field)
             dst->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
         else
@@ -908,9 +898,11 @@ static int activate(AVFilterContext *ctx)
     }
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    FieldMatchContext *fm = ctx->priv;
+    const FieldMatchContext *fm = ctx->priv;
 
     static const enum AVPixelFormat pix_fmts[] = {
         AV_PIX_FMT_YUV444P,  AV_PIX_FMT_YUV422P,  AV_PIX_FMT_YUV420P,
@@ -939,17 +931,17 @@ static int query_formats(AVFilterContext *ctx)
     if (!fmts_list)
         return AVERROR(ENOMEM);
     if (!fm->ppsrc) {
-        return ff_set_common_formats(ctx, fmts_list);
+        return ff_set_common_formats2(ctx, cfg_in, cfg_out, fmts_list);
     }
 
-    if ((ret = ff_formats_ref(fmts_list, &ctx->inputs[INPUT_MAIN]->outcfg.formats)) < 0)
+    if ((ret = ff_formats_ref(fmts_list, &cfg_in[INPUT_MAIN]->formats)) < 0)
         return ret;
     fmts_list = ff_make_format_list(unproc_pix_fmts);
     if (!fmts_list)
         return AVERROR(ENOMEM);
-    if ((ret = ff_formats_ref(fmts_list, &ctx->outputs[0]->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(fmts_list, &cfg_out[0]->formats)) < 0)
         return ret;
-    if ((ret = ff_formats_ref(fmts_list, &ctx->inputs[INPUT_CLEANSRC]->outcfg.formats)) < 0)
+    if ((ret = ff_formats_ref(fmts_list, &cfg_in[INPUT_CLEANSRC]->formats)) < 0)
         return ret;
     return 0;
 }
@@ -1071,16 +1063,15 @@ static const AVFilterPad fieldmatch_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_fieldmatch = {
-    .name           = "fieldmatch",
-    .description    = NULL_IF_CONFIG_SMALL("Field matching for inverse telecine."),
+const FFFilter ff_vf_fieldmatch = {
+    .p.name         = "fieldmatch",
+    .p.description  = NULL_IF_CONFIG_SMALL("Field matching for inverse telecine."),
+    .p.priv_class   = &fieldmatch_class,
+    .p.flags        = AVFILTER_FLAG_DYNAMIC_INPUTS,
     .priv_size      = sizeof(FieldMatchContext),
     .init           = fieldmatch_init,
     .activate       = activate,
     .uninit         = fieldmatch_uninit,
-    .inputs         = NULL,
     FILTER_OUTPUTS(fieldmatch_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class     = &fieldmatch_class,
-    .flags          = AVFILTER_FLAG_DYNAMIC_INPUTS,
+    FILTER_QUERY_FUNC2(query_formats),
 };

@@ -370,14 +370,6 @@ static av_cold int decode_init(WMAProDecodeCtx *s, AVCodecContext *avctx, int nu
     int log2_max_num_subframes;
     int num_possible_block_sizes;
 
-    if (avctx->codec_id == AV_CODEC_ID_XMA1 || avctx->codec_id == AV_CODEC_ID_XMA2)
-        avctx->block_align = 2048;
-
-    if (!avctx->block_align) {
-        av_log(avctx, AV_LOG_ERROR, "block_align is not set\n");
-        return AVERROR(EINVAL);
-    }
-
     s->avctx = avctx;
 
     init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
@@ -468,11 +460,6 @@ static av_cold int decode_init(WMAProDecodeCtx *s, AVCodecContext *avctx, int nu
     if (s->min_samples_per_subframe < WMAPRO_BLOCK_MIN_SIZE) {
         av_log(avctx, AV_LOG_ERROR, "min_samples_per_subframe of %d too small\n",
                s->min_samples_per_subframe);
-        return AVERROR_INVALIDDATA;
-    }
-
-    if (s->avctx->sample_rate <= 0) {
-        av_log(avctx, AV_LOG_ERROR, "invalid sample rate\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -607,6 +594,11 @@ static av_cold int decode_init(WMAProDecodeCtx *s, AVCodecContext *avctx, int nu
 static av_cold int wmapro_decode_init(AVCodecContext *avctx)
 {
     WMAProDecodeCtx *s = avctx->priv_data;
+
+    if (!avctx->block_align) {
+        av_log(avctx, AV_LOG_ERROR, "block_align is not set\n");
+        return AVERROR(EINVAL);
+    }
 
     return decode_init(s, avctx, 0);
 }
@@ -1962,6 +1954,8 @@ static av_cold int xma_decode_init(AVCodecContext *avctx)
     XMADecodeCtx *s = avctx->priv_data;
     int i, ret, start_channels = 0;
 
+    avctx->block_align = 2048;
+
     if (avctx->ch_layout.nb_channels <= 0 || avctx->extradata_size == 0)
         return AVERROR_INVALIDDATA;
 
@@ -2100,14 +2094,9 @@ const FFCodec ff_wmapro_decoder = {
     .init           = wmapro_decode_init,
     .close          = wmapro_decode_end,
     FF_CODEC_DECODE_CB(wmapro_decode_packet),
-    .p.capabilities =
-#if FF_API_SUBFRAMES
-                      AV_CODEC_CAP_SUBFRAMES |
-#endif
-                      AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1,
     .flush          = wmapro_flush,
-    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
-                                                      AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 
@@ -2121,13 +2110,8 @@ const FFCodec ff_xma1_decoder = {
     .close          = xma_decode_end,
     FF_CODEC_DECODE_CB(xma_decode_packet),
     .flush          = xma_flush,
-    .p.capabilities =
-#if FF_API_SUBFRAMES
-                      AV_CODEC_CAP_SUBFRAMES |
-#endif
-                      AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
-                                                      AV_SAMPLE_FMT_NONE },
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 
@@ -2141,12 +2125,7 @@ const FFCodec ff_xma2_decoder = {
     .close          = xma_decode_end,
     FF_CODEC_DECODE_CB(xma_decode_packet),
     .flush          = xma_flush,
-    .p.capabilities =
-#if FF_API_SUBFRAMES
-                      AV_CODEC_CAP_SUBFRAMES |
-#endif
-                      AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
-                                                      AV_SAMPLE_FMT_NONE },
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

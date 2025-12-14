@@ -2635,7 +2635,7 @@ static void draw_htext(AVFrame *out, int x, int y, int mult, float o1, float o2,
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2661,7 +2661,7 @@ static void draw_htext16(AVFrame *out, int x, int y, int mult, float o1, float o
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2687,7 +2687,7 @@ static void draw_vtext(AVFrame *out, int x, int y, int mult, float o1, float o2,
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2712,7 +2712,7 @@ static void draw_vtext16(AVFrame *out, int x, int y, int mult, float o1, float o
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2779,7 +2779,7 @@ static void idraw_htext(AVFrame *out, int x, int y, int mult, float o1, float o2
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2805,7 +2805,7 @@ static void idraw_htext16(AVFrame *out, int x, int y, int mult, float o1, float 
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2831,7 +2831,7 @@ static void idraw_vtext(AVFrame *out, int x, int y, int mult, float o1, float o2
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -2856,7 +2856,7 @@ static void idraw_vtext16(AVFrame *out, int x, int y, int mult, float o1, float 
     int font_height;
     int i, plane;
 
-    font = avpriv_cga_font,   font_height =  8;
+    font = avpriv_cga_font_get(),   font_height =  8;
 
     for (plane = 0; plane < 4 && out->data[plane]; plane++) {
         for (i = 0; txt[i]; i++) {
@@ -3517,15 +3517,15 @@ static const AVFilterPad outputs[] = {
     },
 };
 
-const AVFilter ff_vf_waveform = {
-    .name          = "waveform",
-    .description   = NULL_IF_CONFIG_SMALL("Video waveform monitor."),
+const FFFilter ff_vf_waveform = {
+    .p.name        = "waveform",
+    .p.description = NULL_IF_CONFIG_SMALL("Video waveform monitor."),
+    .p.priv_class  = &waveform_class,
+    .p.flags       = AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(WaveformContext),
-    .priv_class    = &waveform_class,
     .uninit        = uninit,
     FILTER_INPUTS(inputs),
     FILTER_OUTPUTS(outputs),
     FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SLICE_THREADS,
     .process_command = ff_filter_process_command,
 };

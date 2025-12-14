@@ -238,14 +238,6 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     desc = av_pix_fmt_desc_get(inlink->format);
 
     eq->var_values[VAR_N]   = inl->frame_count_out;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-    {
-        int64_t pos = in->pkt_pos;
-        eq->var_values[VAR_POS] = pos == -1 ? NAN : pos;
-    }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     eq->var_values[VAR_T]   = TS2T(in->pts, inlink->time_base);
 
     if (eq->eval_mode == EVAL_MODE_FRAME) {
@@ -345,16 +337,16 @@ static const AVOption eq_options[] = {
 
 AVFILTER_DEFINE_CLASS(eq);
 
-const AVFilter ff_vf_eq = {
-    .name            = "eq",
-    .description     = NULL_IF_CONFIG_SMALL("Adjust brightness, contrast, gamma, and saturation."),
+const FFFilter ff_vf_eq = {
+    .p.name          = "eq",
+    .p.description   = NULL_IF_CONFIG_SMALL("Adjust brightness, contrast, gamma, and saturation."),
+    .p.priv_class    = &eq_class,
+    .p.flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     .priv_size       = sizeof(EQContext),
-    .priv_class      = &eq_class,
     FILTER_INPUTS(eq_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pixel_fmts_eq),
     .process_command = process_command,
     .init            = initialize,
     .uninit          = uninit,
-    .flags           = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
 };

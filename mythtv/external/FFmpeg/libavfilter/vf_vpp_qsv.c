@@ -832,20 +832,20 @@ static const AVClass x##_class = { \
     .option     = x##_options, \
     .version    = LIBAVUTIL_VERSION_INT, \
 }; \
-const AVFilter ff_vf_##sn##_qsv = { \
-    .name           = #sn "_qsv", \
-    .description    = NULL_IF_CONFIG_SMALL("Quick Sync Video " #ln), \
+const FFFilter ff_vf_##sn##_qsv = { \
+    .p.name         = #sn "_qsv", \
+    .p.description  = NULL_IF_CONFIG_SMALL("Quick Sync Video " #ln), \
+    .p.priv_class   = &x##_class, \
+    .p.flags        = AVFILTER_FLAG_HWDEVICE, \
     .preinit        = x##_preinit, \
     .init           = vpp_init, \
     .uninit         = vpp_uninit, \
     .priv_size      = sizeof(VPPContext), \
-    .priv_class     = &x##_class, \
     FILTER_INPUTS(vpp_inputs), \
     FILTER_OUTPUTS(vpp_outputs), \
     fmts, \
     .activate       = activate, \
     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE, \
-    .flags          = AVFILTER_FLAG_HWDEVICE,       \
 };
 
 #if CONFIG_VPP_QSV_FILTER
@@ -932,9 +932,11 @@ static const AVOption vpp_options[] = {
     { NULL }
 };
 
-static int vpp_query_formats(AVFilterContext *ctx)
+static int vpp_query_formats(const AVFilterContext *ctx,
+                             AVFilterFormatsConfig **cfg_in,
+                             AVFilterFormatsConfig **cfg_out)
 {
-    VPPContext *vpp = ctx->priv;
+    const VPPContext *vpp = ctx->priv;
     int ret, i = 0;
     static const enum AVPixelFormat in_pix_fmts[] = {
         AV_PIX_FMT_YUV420P,
@@ -951,7 +953,7 @@ static int vpp_query_formats(AVFilterContext *ctx)
     static enum AVPixelFormat out_pix_fmts[4];
 
     ret = ff_formats_ref(ff_make_format_list(in_pix_fmts),
-                         &ctx->inputs[0]->outcfg.formats);
+                         &cfg_in[0]->formats);
     if (ret < 0)
         return ret;
 
@@ -968,10 +970,10 @@ static int vpp_query_formats(AVFilterContext *ctx)
     out_pix_fmts[i++] = AV_PIX_FMT_NONE;
 
     return ff_formats_ref(ff_make_format_list(out_pix_fmts),
-                          &ctx->outputs[0]->incfg.formats);
+                          &cfg_out[0]->formats);
 }
 
-DEFINE_QSV_FILTER(vpp, vpp, "VPP", FILTER_QUERY_FUNC(vpp_query_formats));
+DEFINE_QSV_FILTER(vpp, vpp, "VPP", FILTER_QUERY_FUNC2(vpp_query_formats));
 
 #endif
 

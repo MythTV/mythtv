@@ -28,7 +28,7 @@
 #include "dovi_rpu.h"
 #include "golomb.h"
 #include "get_bits.h"
-#include "refstruct.h"
+#include "libavutil/refstruct.h"
 
 int ff_dovi_get_metadata(DOVIContext *s, AVDOVIMetadata **out_metadata)
 {
@@ -188,8 +188,7 @@ static int parse_ext_v1(DOVIContext *s, GetBitContext *gb, AVDOVIDmData *dm)
             dm->l255.dm_debug[i] = get_bits(gb, 8);
         break;
     default:
-        av_log(s->logctx, AV_LOG_WARNING,
-               "Unknown Dolby Vision DM v1 level: %u\n", dm->level);
+        avpriv_request_sample(s->logctx, "Dolby Vision DM v1 level %u", dm->level);
     }
 
     return 0;
@@ -274,8 +273,7 @@ static int parse_ext_v2(DOVIContext *s, GetBitContext *gb, AVDOVIDmData *dm,
         dm->l254.dm_version_index = get_bits(gb, 8);
         break;
     default:
-        av_log(s->logctx, AV_LOG_WARNING,
-               "Unknown Dolby Vision DM v2 level: %u\n", dm->level);
+        avpriv_request_sample(s->logctx, "Dolby Vision DM v2 level %u", dm->level);
     }
 
     return 0;
@@ -291,7 +289,7 @@ static int parse_ext_blocks(DOVIContext *s, GetBitContext *gb, int ver,
     align_get_bits(gb);
 
     if (num_ext_blocks && !ext) {
-        ext = s->ext_blocks = ff_refstruct_allocz(sizeof(*s->ext_blocks));
+        ext = s->ext_blocks = av_refstruct_allocz(sizeof(*s->ext_blocks));
         if (!ext)
             return AVERROR(ENOMEM);
     }
@@ -328,12 +326,15 @@ static int parse_ext_blocks(DOVIContext *s, GetBitContext *gb, int ver,
         switch (ver) {
         case 1: ret = parse_ext_v1(s, gb, dm); break;
         case 2: ret = parse_ext_v2(s, gb, dm, ext_block_length); break;
-        default: return AVERROR_BUG;
+        default:
+            avpriv_request_sample(s->logctx, "Dolby Vision DM v%d", ver);
+            goto skip;
         }
 
         if (ret < 0)
             return ret;
 
+skip:
         parsed_bits = get_bits_count(gb) - start_pos;
         if (parsed_bits > ext_block_length * 8)
             return AVERROR_INVALIDDATA;
@@ -364,7 +365,7 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
 
     /* Container */
     if (s->cfg.dv_profile == 10 /* dav1.10 */) {
-        /* DV inside AV1 re-uses an EMDF container skeleton, but with fixed
+        /* DV inside AV1 reuses an EMDF container skeleton, but with fixed
          * values - so we can effectively treat this as a magic byte sequence.
          *
          * The exact fields are, as follows:
@@ -408,22 +409,6 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         VALIDATE(rpu[0], 25, 25); /* NAL prefix */
         rpu++;
         rpu_size--;
-        /* Strip trailing padding bytes */
-        while (rpu_size && rpu[rpu_size - 1] == 0)
-            rpu_size--;
-    }
-
-    if (!rpu_size || rpu[rpu_size - 1] != 0x80)
-        return AVERROR_INVALIDDATA;
-
-    if (err_recognition & AV_EF_CRCCHECK) {
-        uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
-                                  -1, rpu, rpu_size - 1)); /* exclude 0x80 */
-        if (crc) {
-            av_log(s->logctx, AV_LOG_ERROR, "RPU CRC mismatch: %X\n", crc);
-            if (err_recognition & AV_EF_EXPLODE)
-                return AVERROR_INVALIDDATA;
-        }
     }
 
     if ((ret = init_get_bits8(gb, rpu, rpu_size)) < 0)
@@ -556,7 +541,7 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         int vdr_rpu_id = get_ue_golomb_31(gb);
         VALIDATE(vdr_rpu_id, 0, DOVI_MAX_DM_ID);
         if (!s->vdr[vdr_rpu_id]) {
-            s->vdr[vdr_rpu_id] = ff_refstruct_allocz(sizeof(AVDOVIDataMapping));
+            s->vdr[vdr_rpu_id] = av_refstruct_allocz(sizeof(AVDOVIDataMapping));
             if (!s->vdr[vdr_rpu_id]) {
                 ff_dovi_ctx_unref(s);
                 return AVERROR(ENOMEM);
@@ -675,7 +660,7 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         }
 
         if (!s->dm) {
-            s->dm = ff_refstruct_allocz(sizeof(AVDOVIColorMetadata));
+            s->dm = av_refstruct_allocz(sizeof(AVDOVIColorMetadata));
             if (!s->dm) {
                 ff_dovi_ctx_unref(s);
                 return AVERROR(ENOMEM);
@@ -735,7 +720,28 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         }
     } else {
         s->color = &ff_dovi_color_default;
-        ff_refstruct_unref(&s->ext_blocks);
+        av_refstruct_unref(&s->ext_blocks);
+    }
+
+    align_get_bits(gb);
+    skip_bits(gb, 32); /* CRC32 */
+    if (get_bits(gb, 8) != 0x80) {
+        avpriv_request_sample(s->logctx, "Unexpected RPU format");
+        ff_dovi_ctx_unref(s);
+        return AVERROR_PATCHWELCOME;
+    }
+
+    if (err_recognition & AV_EF_CRCCHECK) {
+        rpu_size = get_bits_count(gb) / 8;
+        uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
+                                  -1, rpu, rpu_size - 1)); /* exclude 0x80 */
+        if (crc) {
+            av_log(s->logctx, AV_LOG_ERROR, "RPU CRC mismatch: %X\n", crc);
+            if (err_recognition & AV_EF_EXPLODE) {
+                ff_dovi_ctx_unref(s);
+                return AVERROR_INVALIDDATA;
+            }
+        }
     }
 
     return 0;

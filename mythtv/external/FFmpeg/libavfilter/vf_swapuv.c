@@ -67,7 +67,9 @@ static int is_planar_yuv(const AVPixFmtDescriptor *desc)
     return 1;
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     AVFilterFormats *formats = NULL;
     int fmt, ret;
@@ -78,7 +80,7 @@ static int query_formats(AVFilterContext *ctx)
             return ret;
     }
 
-    return ff_set_common_formats(ctx, formats);
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out, formats);
 }
 
 static const AVFilterPad swapuv_inputs[] = {
@@ -90,11 +92,11 @@ static const AVFilterPad swapuv_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_swapuv = {
-    .name          = "swapuv",
-    .description   = NULL_IF_CONFIG_SMALL("Swap U and V components."),
+const FFFilter ff_vf_swapuv = {
+    .p.name        = "swapuv",
+    .p.description = NULL_IF_CONFIG_SMALL("Swap U and V components."),
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     FILTER_INPUTS(swapuv_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    FILTER_QUERY_FUNC2(query_formats),
 };

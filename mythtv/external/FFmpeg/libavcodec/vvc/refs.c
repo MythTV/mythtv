@@ -21,18 +21,16 @@
  */
 
 #include <stdatomic.h>
+#include <stdbool.h>
 
 #include "libavutil/mem.h"
 #include "libavutil/thread.h"
-#include "libavcodec/refstruct.h"
+#include "libavutil/refstruct.h"
 #include "libavcodec/thread.h"
+#include "libavcodec/decode.h"
 
 #include "refs.h"
 
-#define VVC_FRAME_FLAG_OUTPUT    (1 << 0)
-#define VVC_FRAME_FLAG_SHORT_REF (1 << 1)
-#define VVC_FRAME_FLAG_LONG_REF  (1 << 2)
-#define VVC_FRAME_FLAG_BUMPING   (1 << 3)
 
 typedef struct FrameProgress {
     atomic_int progress[VVC_PROGRESS_LAST];
@@ -50,19 +48,28 @@ void ff_vvc_unref_frame(VVCFrameContext *fc, VVCFrame *frame, int flags)
         return;
 
     frame->flags &= ~flags;
+    if (!(frame->flags & ~VVC_FRAME_FLAG_CORRUPT))
+        frame->flags = 0;
     if (!frame->flags) {
         av_frame_unref(frame->frame);
-        ff_refstruct_unref(&frame->sps);
-        ff_refstruct_unref(&frame->pps);
-        ff_refstruct_unref(&frame->progress);
 
-        ff_refstruct_unref(&frame->tab_dmvr_mvf);
+        if (frame->needs_fg) {
+            av_frame_unref(frame->frame_grain);
+            frame->needs_fg = 0;
+        }
 
-        ff_refstruct_unref(&frame->rpl);
+        av_refstruct_unref(&frame->sps);
+        av_refstruct_unref(&frame->pps);
+        av_refstruct_unref(&frame->progress);
+
+        av_refstruct_unref(&frame->tab_dmvr_mvf);
+
+        av_refstruct_unref(&frame->rpl);
         frame->nb_rpl_elems = 0;
-        ff_refstruct_unref(&frame->rpl_tab);
+        av_refstruct_unref(&frame->rpl_tab);
 
         frame->collocated_ref = NULL;
+        av_refstruct_unref(&frame->hwaccel_picture_private);
     }
 }
 
@@ -89,7 +96,7 @@ void ff_vvc_flush_dpb(VVCFrameContext *fc)
         ff_vvc_unref_frame(fc, &fc->DPB[i], ~0);
 }
 
-static void free_progress(FFRefStructOpaque unused, void *obj)
+static void free_progress(AVRefStructOpaque unused, void *obj)
 {
     FrameProgress *p = (FrameProgress *)obj;
 
@@ -101,13 +108,13 @@ static void free_progress(FFRefStructOpaque unused, void *obj)
 
 static FrameProgress *alloc_progress(void)
 {
-    FrameProgress *p = ff_refstruct_alloc_ext(sizeof(*p), 0, NULL, free_progress);
+    FrameProgress *p = av_refstruct_alloc_ext(sizeof(*p), 0, NULL, free_progress);
 
     if (p) {
         p->has_lock = !ff_mutex_init(&p->lock, NULL);
         p->has_cond = !ff_cond_init(&p->cond, NULL);
         if (!p->has_lock || !p->has_cond)
-            ff_refstruct_unref(&p);
+            av_refstruct_unref(&p);
     }
     return p;
 }
@@ -123,38 +130,50 @@ static VVCFrame *alloc_frame(VVCContext *s, VVCFrameContext *fc)
         if (frame->frame->buf[0])
             continue;
 
-        frame->sps = ff_refstruct_ref_c(fc->ps.sps);
-        frame->pps = ff_refstruct_ref_c(fc->ps.pps);
+        frame->sps = av_refstruct_ref_c(fc->ps.sps);
+        frame->pps = av_refstruct_ref_c(fc->ps.pps);
 
         ret = ff_thread_get_buffer(s->avctx, frame->frame, AV_GET_BUFFER_FLAG_REF);
         if (ret < 0)
             return NULL;
 
-        frame->rpl = ff_refstruct_allocz(s->current_frame.nb_units * sizeof(RefPicListTab));
+        frame->rpl = av_refstruct_allocz(s->current_frame.nb_units * sizeof(RefPicListTab));
         if (!frame->rpl)
             goto fail;
         frame->nb_rpl_elems = s->current_frame.nb_units;
 
-        frame->tab_dmvr_mvf = ff_refstruct_pool_get(fc->tab_dmvr_mvf_pool);
+        frame->tab_dmvr_mvf = av_refstruct_pool_get(fc->tab_dmvr_mvf_pool);
         if (!frame->tab_dmvr_mvf)
             goto fail;
 
-        frame->rpl_tab = ff_refstruct_pool_get(fc->rpl_tab_pool);
+        frame->rpl_tab = av_refstruct_pool_get(fc->rpl_tab_pool);
         if (!frame->rpl_tab)
             goto fail;
         frame->ctb_count = pps->ctb_width * pps->ctb_height;
         for (int j = 0; j < frame->ctb_count; j++)
             frame->rpl_tab[j] = frame->rpl;
 
-        win->left_offset   = pps->r->pps_scaling_win_left_offset   << sps->hshift[CHROMA];
-        win->right_offset  = pps->r->pps_scaling_win_right_offset  << sps->hshift[CHROMA];
-        win->top_offset    = pps->r->pps_scaling_win_top_offset    << sps->vshift[CHROMA];
-        win->bottom_offset = pps->r->pps_scaling_win_bottom_offset << sps->vshift[CHROMA];
+        win->left_offset   = pps->r->pps_scaling_win_left_offset   * (1 << sps->hshift[CHROMA]);
+        win->right_offset  = pps->r->pps_scaling_win_right_offset  * (1 << sps->hshift[CHROMA]);
+        win->top_offset    = pps->r->pps_scaling_win_top_offset    * (1 << sps->vshift[CHROMA]);
+        win->bottom_offset = pps->r->pps_scaling_win_bottom_offset * (1 << sps->vshift[CHROMA]);
         frame->ref_width   = pps->r->pps_pic_width_in_luma_samples  - win->left_offset   - win->right_offset;
         frame->ref_height  = pps->r->pps_pic_height_in_luma_samples - win->bottom_offset - win->top_offset;
 
+        if (fc->sei.frame_field_info.present) {
+            if (fc->sei.frame_field_info.picture_struct == AV_PICTURE_STRUCTURE_TOP_FIELD)
+                frame->frame->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+            if (fc->sei.frame_field_info.picture_struct == AV_PICTURE_STRUCTURE_TOP_FIELD ||
+                fc->sei.frame_field_info.picture_struct == AV_PICTURE_STRUCTURE_BOTTOM_FIELD)
+                frame->frame->flags |= AV_FRAME_FLAG_INTERLACED;
+        }
+
         frame->progress = alloc_progress();
         if (!frame->progress)
+            goto fail;
+
+        ret = ff_hwaccel_frame_priv_alloc(s->avctx, &frame->hwaccel_picture_private);
+        if (ret < 0)
             goto fail;
 
         return frame;
@@ -164,6 +183,36 @@ fail:
     }
     av_log(s->avctx, AV_LOG_ERROR, "Error allocating frame, DPB full.\n");
     return NULL;
+}
+
+static void set_pict_type(AVFrame *frame, const VVCContext *s, const VVCFrameContext *fc)
+{
+    bool has_b = false, has_inter = false;
+
+    if (IS_IRAP(s)) {
+        frame->pict_type = AV_PICTURE_TYPE_I;
+        frame->flags |= AV_FRAME_FLAG_KEY;
+        return;
+    }
+
+    if (fc->ps.ph.r->ph_inter_slice_allowed_flag) {
+        // At this point, fc->slices is not fully initialized; we need to inspect the CBS directly.
+        const CodedBitstreamFragment *current = &s->current_frame;
+        for (int i = 0; i < current->nb_units && !has_b; i++) {
+            const CodedBitstreamUnit *unit = current->units + i;
+            if (unit->content_ref && unit->type <= VVC_RSV_IRAP_11) {
+                const H266RawSliceHeader *rsh = unit->content_ref;
+                has_inter |= !IS_I(rsh);
+                has_b     |= IS_B(rsh);
+            }
+        }
+    }
+    if (!has_inter)
+        frame->pict_type = AV_PICTURE_TYPE_I;
+    else if (has_b)
+        frame->pict_type = AV_PICTURE_TYPE_B;
+    else
+        frame->pict_type = AV_PICTURE_TYPE_P;
 }
 
 int ff_vvc_set_new_ref(VVCContext *s, VVCFrameContext *fc, AVFrame **frame)
@@ -187,6 +236,7 @@ int ff_vvc_set_new_ref(VVCContext *s, VVCFrameContext *fc, AVFrame **frame)
     if (!ref)
         return AVERROR(ENOMEM);
 
+    set_pict_type(ref->frame, s, fc);
     *frame = ref->frame;
     fc->ref = ref;
 
@@ -246,11 +296,19 @@ int ff_vvc_output_frame(VVCContext *s, VVCFrameContext *fc, AVFrame *out, const 
         if (nb_output) {
             VVCFrame *frame = &fc->DPB[min_idx];
 
-            ret = av_frame_ref(out, frame->frame);
+            if (frame->flags & VVC_FRAME_FLAG_CORRUPT)
+                frame->frame->flags |= AV_FRAME_FLAG_CORRUPT;
+
+            ret = av_frame_ref(out, frame->needs_fg ? frame->frame_grain : frame->frame);
+
+            if (!ret && !(s->avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN))
+                av_frame_remove_side_data(out, AV_FRAME_DATA_FILM_GRAIN_PARAMS);
+
             if (frame->flags & VVC_FRAME_FLAG_BUMPING)
                 ff_vvc_unref_frame(fc, frame, VVC_FRAME_FLAG_OUTPUT | VVC_FRAME_FLAG_BUMPING);
             else
                 ff_vvc_unref_frame(fc, frame, VVC_FRAME_FLAG_OUTPUT);
+
             if (ret < 0)
                 return ret;
 
@@ -355,7 +413,7 @@ static VVCFrame *generate_missing_ref(VVCContext *s, VVCFrameContext *fc, int po
 
     frame->poc      = poc;
     frame->sequence = s->seq_decode;
-    frame->flags    = 0;
+    frame->flags    = VVC_FRAME_FLAG_CORRUPT;
 
     ff_vvc_report_frame_finished(frame);
 
@@ -389,6 +447,19 @@ static int add_candidate_ref(VVCContext *s, VVCFrameContext *fc, RefPicList *lis
 
     if (ref == fc->ref || list->nb_refs >= VVC_MAX_REF_ENTRIES)
         return AVERROR_INVALIDDATA;
+
+    if (!IS_CVSS(s)) {
+        const bool ref_corrupt = !ref || (ref->flags & VVC_FRAME_FLAG_CORRUPT);
+        const bool recovering  = s->no_output_before_recovery_flag && !GDR_IS_RECOVERED(s);
+
+        if (ref_corrupt && !recovering) {
+            if (!(s->avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) &&
+                !(s->avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL))
+                return AVERROR_INVALIDDATA;
+
+            fc->ref->flags |= VVC_FRAME_FLAG_CORRUPT;
+        }
+    }
 
     if (!ref) {
         ref = generate_missing_ref(s, fc, poc);

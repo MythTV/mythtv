@@ -111,9 +111,12 @@ static av_cold int init(AVFilterContext *ctx)
     return 0;
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    return ff_set_common_formats(ctx, ff_draw_supported_pixel_formats(0));
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out,
+                                  ff_draw_supported_pixel_formats(0));
 }
 
 static int config_props(AVFilterLink *outlink)
@@ -125,6 +128,7 @@ static int config_props(AVFilterLink *outlink)
     FilterLink *ol = ff_filter_link(outlink);
     const unsigned total_margin_w = (tile->w - 1) * tile->padding + 2*tile->margin;
     const unsigned total_margin_h = (tile->h - 1) * tile->padding + 2*tile->margin;
+    int ret;
 
     if (inlink->w > (INT_MAX - total_margin_w) / tile->w) {
         av_log(ctx, AV_LOG_ERROR, "Total width %ux%u is too much.\n",
@@ -140,7 +144,11 @@ static int config_props(AVFilterLink *outlink)
     outlink->h = tile->h * inlink->h + total_margin_h;
     outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
     ol->frame_rate = av_mul_q(il->frame_rate, av_make_q(1, tile->nb_frames - tile->overlap));
-    ff_draw_init2(&tile->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    ret = ff_draw_init2(&tile->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
     ff_draw_color(&tile->draw, &tile->blank, tile->rgba_color);
 
     return 0;
@@ -284,14 +292,14 @@ static const AVFilterPad tile_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_tile = {
-    .name          = "tile",
-    .description   = NULL_IF_CONFIG_SMALL("Tile several successive frames together."),
+const FFFilter ff_vf_tile = {
+    .p.name        = "tile",
+    .p.description = NULL_IF_CONFIG_SMALL("Tile several successive frames together."),
+    .p.priv_class  = &tile_class,
     .init          = init,
     .uninit        = uninit,
     .priv_size     = sizeof(TileContext),
     FILTER_INPUTS(tile_inputs),
     FILTER_OUTPUTS(tile_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &tile_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };

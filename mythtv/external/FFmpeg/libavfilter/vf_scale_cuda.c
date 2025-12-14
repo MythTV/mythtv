@@ -96,6 +96,7 @@ typedef struct CUDAScaleContext {
 
     int force_original_aspect_ratio;
     int force_divisible_by;
+    int reset_sar;
 
     CUcontext   cu_ctx;
     CUmodule    cu_module;
@@ -355,6 +356,7 @@ static av_cold int cudascale_config_props(AVFilterLink *outlink)
     AVHWFramesContext     *frames_ctx;
     AVCUDADeviceContext *device_hwctx;
     int w, h;
+    double w_adj = 1.0;
     int ret;
 
     if ((ret = ff_scale_eval_dimensions(s,
@@ -363,8 +365,12 @@ static av_cold int cudascale_config_props(AVFilterLink *outlink)
                                         &w, &h)) < 0)
         goto fail;
 
+    if (s->reset_sar)
+        w_adj = inlink->sample_aspect_ratio.num ?
+        (double)inlink->sample_aspect_ratio.num / inlink->sample_aspect_ratio.den : 1;
+
     ff_scale_adjust_dimensions(inlink, &w, &h,
-                               s->force_original_aspect_ratio, s->force_divisible_by);
+                               s->force_original_aspect_ratio, s->force_divisible_by, w_adj);
 
     if (((int64_t)h * inlink->w) > INT_MAX  ||
         ((int64_t)w * inlink->h) > INT_MAX)
@@ -383,7 +389,9 @@ static av_cold int cudascale_config_props(AVFilterLink *outlink)
     s->hwctx = device_hwctx;
     s->cu_stream = s->hwctx->stream;
 
-    if (inlink->sample_aspect_ratio.num) {
+    if (s->reset_sar)
+        outlink->sample_aspect_ratio = (AVRational){1, 1};
+    else if (inlink->sample_aspect_ratio.num) {
         outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h*inlink->w,
                                                              outlink->w*inlink->h},
                                                 inlink->sample_aspect_ratio);
@@ -407,7 +415,7 @@ fail:
 }
 
 static int call_resize_kernel(AVFilterContext *ctx, CUfunction func,
-                              CUtexObject src_tex[4], int src_width, int src_height,
+                              CUtexObject src_tex[4], int src_left, int src_top, int src_width, int src_height,
                               AVFrame *out_frame, int dst_width, int dst_height, int dst_pitch)
 {
     CUDAScaleContext *s = ctx->priv;
@@ -422,7 +430,7 @@ static int call_resize_kernel(AVFilterContext *ctx, CUfunction func,
         &src_tex[0], &src_tex[1], &src_tex[2], &src_tex[3],
         &dst_devptr[0], &dst_devptr[1], &dst_devptr[2], &dst_devptr[3],
         &dst_width, &dst_height, &dst_pitch,
-        &src_width, &src_height, &s->param
+        &src_left, &src_top, &src_width, &src_height, &s->param
     };
 
     return CHECK_CU(cu->cuLaunchKernel(func,
@@ -439,6 +447,9 @@ static int scalecuda_resize(AVFilterContext *ctx,
     int i, ret;
 
     CUtexObject tex[4] = { 0, 0, 0, 0 };
+
+    int crop_width = (in->width - in->crop_right) - in->crop_left;
+    int crop_height = (in->height - in->crop_bottom) - in->crop_top;
 
     ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
     if (ret < 0)
@@ -477,7 +488,7 @@ static int scalecuda_resize(AVFilterContext *ctx,
 
     // scale primary plane(s). Usually Y (and A), or single plane of RGB frames.
     ret = call_resize_kernel(ctx, s->cu_func,
-                             tex, in->width, in->height,
+                             tex, in->crop_left, in->crop_top, crop_width, crop_height,
                              out, out->width, out->height, out->linesize[0]);
     if (ret < 0)
         goto exit;
@@ -485,8 +496,10 @@ static int scalecuda_resize(AVFilterContext *ctx,
     if (s->out_planes > 1) {
         // scale UV plane. Scale function sets both U and V plane, or singular interleaved plane.
         ret = call_resize_kernel(ctx, s->cu_func_uv, tex,
-                                 AV_CEIL_RSHIFT(in->width, s->in_desc->log2_chroma_w),
-                                 AV_CEIL_RSHIFT(in->height, s->in_desc->log2_chroma_h),
+                                 AV_CEIL_RSHIFT(in->crop_left, s->in_desc->log2_chroma_w),
+                                 AV_CEIL_RSHIFT(in->crop_top, s->in_desc->log2_chroma_h),
+                                 AV_CEIL_RSHIFT(crop_width, s->in_desc->log2_chroma_w),
+                                 AV_CEIL_RSHIFT(crop_height, s->in_desc->log2_chroma_h),
                                  out,
                                  AV_CEIL_RSHIFT(out->width, s->out_desc->log2_chroma_w),
                                  AV_CEIL_RSHIFT(out->height, s->out_desc->log2_chroma_h),
@@ -531,6 +544,11 @@ static int cudascale_scale(AVFilterContext *ctx, AVFrame *out, AVFrame *in)
     if (ret < 0)
         return ret;
 
+    if (out->width != in->width || out->height != in->height) {
+        av_frame_side_data_remove_by_props(&out->side_data, &out->nb_side_data,
+                                           AV_SIDE_DATA_PROP_SIZE_DEPENDENT);
+    }
+
     return 0;
 }
 
@@ -564,10 +582,14 @@ static int cudascale_filter_frame(AVFilterLink *link, AVFrame *in)
     if (ret < 0)
         goto fail;
 
-    av_reduce(&out->sample_aspect_ratio.num, &out->sample_aspect_ratio.den,
-              (int64_t)in->sample_aspect_ratio.num * outlink->h * link->w,
-              (int64_t)in->sample_aspect_ratio.den * outlink->w * link->h,
-              INT_MAX);
+    if (s->reset_sar) {
+        out->sample_aspect_ratio = (AVRational){1, 1};
+    } else {
+        av_reduce(&out->sample_aspect_ratio.num, &out->sample_aspect_ratio.den,
+                  (int64_t)in->sample_aspect_ratio.num * outlink->h * link->w,
+                  (int64_t)in->sample_aspect_ratio.den * outlink->w * link->h,
+                  INT_MAX);
+    }
 
     av_frame_free(&in);
     return ff_filter_frame(outlink, out);
@@ -604,6 +626,7 @@ static const AVOption options[] = {
         { "decrease", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, .unit = "force_oar" },
         { "increase", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 2 }, 0, 0, FLAGS, .unit = "force_oar" },
     { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, 256, FLAGS },
+    { "reset_sar", "reset SAR to 1 and scale to square pixels if scaling proportionally", OFFSET(reset_sar), AV_OPT_TYPE_BOOL, { .i64 = 0}, 0, 1, FLAGS },
     { NULL },
 };
 
@@ -631,15 +654,16 @@ static const AVFilterPad cudascale_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_scale_cuda = {
-    .name      = "scale_cuda",
-    .description = NULL_IF_CONFIG_SMALL("GPU accelerated video resizer"),
+const FFFilter ff_vf_scale_cuda = {
+    .p.name        = "scale_cuda",
+    .p.description = NULL_IF_CONFIG_SMALL("GPU accelerated video resizer"),
+
+    .p.priv_class  = &cudascale_class,
 
     .init          = cudascale_init,
     .uninit        = cudascale_uninit,
 
     .priv_size = sizeof(CUDAScaleContext),
-    .priv_class = &cudascale_class,
 
     FILTER_INPUTS(cudascale_inputs),
     FILTER_OUTPUTS(cudascale_outputs),
