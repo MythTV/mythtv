@@ -1471,6 +1471,9 @@ QString propsValueToString (const QString& name, QMap<T,QString> propNames,
             result += propNames[bit];
             continue;
         }
+        // Ignore ProgramTypeMask (recording, video, DVD, etc)
+        if (bit & FL_TYPEMASK)
+            continue;
         QString tmp = QString("0x%1").arg(bit, sizeof(T)*2,16,QChar('0'));
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown name for %1 flag 0x%2.")
             .arg(name, tmp));
