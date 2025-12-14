@@ -151,6 +151,7 @@ bool MythPlayerEditorUI::HandleProgramEditorActions(const QStringList& Actions)
         handled = true;
         float seekamount = m_deleteMap.GetSeekAmount();
         bool  seekzero   = qFuzzyCompare(seekamount + 1.0F, 1.0F);
+
         if (action == ACTION_LEFT)
         {
             if (seekzero) // 1 frame
@@ -159,9 +160,9 @@ bool MythPlayerEditorUI::HandleProgramEditorActions(const QStringList& Actions)
             }
             else if (seekamount > 0)
             {
-                // Use fully-accurate seeks for less than 1 second.
-                DoRewindSecs(seekamount, seekamount < 1.0F ? kInaccuracyNone :
-                             kInaccuracyEditor, false);
+                // Use fully-accurate seeks for seek amounts less than 6 seconds.
+                auto accuracy = seekamount < 6.0F ? kInaccuracyNone : kInaccuracyEditor;
+                DoRewindSecs(seekamount, accuracy, false);
             }
             else
             {
@@ -176,9 +177,9 @@ bool MythPlayerEditorUI::HandleProgramEditorActions(const QStringList& Actions)
             }
             else if (seekamount > 0)
             {
-                // Use fully-accurate seeks for less than 1 second.
-                DoFastForwardSecs(seekamount, seekamount < 1.0F ? kInaccuracyNone :
-                             kInaccuracyEditor, false);
+                // Use fully-accurate seeks for seek amounts less than 6 seconds.
+                auto accuracy = seekamount < 6.0F ? kInaccuracyNone : kInaccuracyEditor;
+                DoFastForwardSecs(seekamount, accuracy, false);
             }
             else
             {
