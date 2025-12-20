@@ -24,12 +24,28 @@ endif()
 #
 # Always use position independent code.
 #
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# CMake always creates libraries using PIC.  According to the
+# documentation, the following will create position independent code
+# for executables, but cmake insists on doing this by setting "-pie
+# -fPIE" instead of setting "-fPIC".  That doesn't fix the problem
+# with Qt6 builds and protected symbols, and in fact makes it worse.
+# The solution to force cmake to set "-fPIC" instead of "-pie -fPIE"
+# on executables by manually updating the linker flags.
+#
+# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# include(CheckPIESupported)
+# check_pie_supported()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIC")
+
+#
+# Add additional build specific compiler options.
+#
 if(CMAKE_BUILD_TYPE MATCHES "([A-Za-z])(.*)")
   string(TOUPPER ${CMAKE_MATCH_1} _INIT)
   string(TOLOWER ${CMAKE_MATCH_2} _REST)
   include(SetCompilerOptions${_INIT}${_REST} OPTIONAL)
 endif()
+
 
 #
 # Always used flags
