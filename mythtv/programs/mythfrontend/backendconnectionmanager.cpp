@@ -128,3 +128,5 @@ void BackendConnectionManager::ReconnectToBackend(void)
     m_reconnecting = new Reconnect();
     MThreadPool::globalInstance()->start(m_reconnecting, "Reconnect");
 }
+
+#include "moc_backendconnectionmanager.cpp"

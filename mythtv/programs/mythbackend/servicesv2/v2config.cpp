@@ -244,3 +244,5 @@ V2SystemEventList* V2Config::GetSystemEvents(const QString &Host)
     }
     return pList;
 }
+
+#include "moc_v2config.cpp"

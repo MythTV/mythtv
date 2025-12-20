@@ -1654,4 +1654,4 @@ void StatusBox::doAutoExpireList(bool updateExpList)
 
 Q_DECLARE_METATYPE(LogLine)
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_statusbox.cpp"
