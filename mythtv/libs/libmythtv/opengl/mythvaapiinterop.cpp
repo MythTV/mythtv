@@ -227,7 +227,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     if (DEINT_MEDIUM == Deinterlacer)
         deinterlacer = "motion_adaptive";
     else if (DEINT_HIGH == Deinterlacer)
-        deinterlacer = "motion_compensated";
+        deinterlacer = "default";
 
     // N.B. set auto to 0 otherwise we confuse playback if VAAPI does not deinterlace
     QString filters = QString("deinterlace_vaapi=mode=%1:rate=%2:auto=0")
