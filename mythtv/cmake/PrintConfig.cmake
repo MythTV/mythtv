@@ -196,7 +196,6 @@ message_vrbl("Frontend                " ENABLE_FRONTEND)
 message_vrbl("Backend                 " ENABLE_BACKEND)
 message_trgt("Qt private headers      " Qt${QT_VERSION_MAJOR}::GuiPrivate)
 message_vrbl("Wayland extras          " CONFIG_WAYLANDEXTRAS)
-message("multi threaded libavcodec ${threads-no}")
 message_trgt("libxml2 support         " PkgConfig::LibXml2
              ${LIBXML2_INCLUDE_DIR})
 message_trgt("libdns_sd (Bonjour)     " PkgConfig::LIBDNS_SD)

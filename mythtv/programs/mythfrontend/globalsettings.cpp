@@ -753,7 +753,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_parentConfig(parent),
     m_index(idx)
 {
-    m_maxCpus      = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? VIDEO_MAX_CPUS : 1, 1, 1);
+    m_maxCpus      = new TransMythUISpinBoxSetting(1, VIDEO_MAX_CPUS, 1, 1);
 
     const QString rangeHelp(tr(" Valid formats for the setting are "
         "[nnnn - nnnn], [> nnnn], [>= nnnn], [< nnnn], "
@@ -839,11 +839,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     }
 
     m_maxCpus->setHelpText(
-        tr("Maximum number of CPU cores used for video decoding and filtering.") +
-        (HAVE_THREADS ? "" :
-         tr(" Multithreaded decoding disabled-only one CPU "
-            "will be used, please recompile with "
-            "--enable-ffmpeg-pthreads to enable.")));
+        tr("Maximum number of CPU cores used for video decoding and filtering."));
 
     m_skipLoop->setHelpText(
         tr("When unchecked the deblocking loopfilter will be disabled. ") + "\n" +
