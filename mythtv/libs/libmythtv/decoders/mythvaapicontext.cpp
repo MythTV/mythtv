@@ -295,14 +295,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
     // This may need extending for AMD etc
 
     auto vendor = interop->GetVendor();
-    // Intel NUC
-    if (vendor.contains("iHD", Qt::CaseInsensitive) && vendor.contains("Intel", Qt::CaseInsensitive))
-    {
-        vaapi_frames_ctx->attributes = nullptr;
-        vaapi_frames_ctx->nb_attributes = 0;
-    }
-    // i965 series
-    else
+    if (vendor.contains("i965", Qt::CaseInsensitive))
     {
         int format = VA_FOURCC_NV12;
         if (vendor.contains("ironlake", Qt::CaseInsensitive))
