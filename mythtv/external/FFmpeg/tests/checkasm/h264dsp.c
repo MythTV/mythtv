@@ -22,6 +22,7 @@
 #include "checkasm.h"
 #include "libavcodec/h264dsp.h"
 #include "libavcodec/h264data.h"
+#include "libavcodec/h264idct.h"
 #include "libavcodec/h264_parse.h"
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
@@ -324,6 +325,52 @@ static void check_idct_multiple(void)
     }
 }
 
+static void check_idct_dequant(void)
+{
+    static const int depths[5] = { 8, 9, 10, 12, 14 };
+    LOCAL_ALIGNED_16(int16_t, src16, [16]);
+    LOCAL_ALIGNED_16(int32_t, src32, [16]);
+    LOCAL_ALIGNED_16(int16_t, dst0_16, [16 * 16]);
+    LOCAL_ALIGNED_16(int16_t, dst1_16, [16 * 16]);
+    LOCAL_ALIGNED_16(int32_t, dst0_32, [16 * 16]);
+    LOCAL_ALIGNED_16(int32_t, dst1_32, [16 * 16]);
+    H264DSPContext h;
+    int bit_depth, i, qmul;
+    declare_func_emms(AV_CPU_FLAG_MMX | AV_CPU_FLAG_SSE2, void, int16_t *output, int16_t *input, int qmul);
+
+    qmul = rnd() % 4096;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(depths); i++) {
+        bit_depth = depths[i];
+        ff_h264dsp_init(&h, bit_depth, 1);
+
+        void *src, *dst_ref, *dst_new;
+        if (bit_depth == 8) {
+            src     = src16;
+            dst_ref = dst0_16;
+            dst_new = dst1_16;
+            for (int j = 0; j < 16; j++)
+                src16[j] = (rnd() % 512) - 256;
+        } else {
+            src     = src32;
+            dst_ref = dst0_32;
+            dst_new = dst1_32;
+            for (int j = 0; j < 16; j++)
+                src32[j] = (rnd() % (1 << (bit_depth + 1))) - (1 << bit_depth);
+        }
+        memset(dst_ref, 0, 16 * 16 * SIZEOF_COEF);
+        memset(dst_new, 0, 16 * 16 * SIZEOF_COEF);
+
+        if (check_func(h.h264_luma_dc_dequant_idct, "h264_luma_dc_dequant_idct_%d", bit_depth)) {
+
+            call_ref(dst_ref, src, qmul);
+            call_new(dst_new, src, qmul);
+            checkasm_check_dctcoef(dst0, 16*SIZEOF_COEF, dst1, 16*SIZEOF_COEF, 16, 16, "dst");
+            bench_new(dst_new, src, qmul);
+        }
+    }
+}
+
 
 static void check_loop_filter(void)
 {
@@ -453,6 +500,7 @@ void checkasm_check_h264dsp(void)
 {
     check_idct();
     check_idct_multiple();
+    check_idct_dequant();
     report("idct");
 
     check_loop_filter();

@@ -808,6 +808,8 @@ static int config_input(AVFilterLink *inlink)
         if ((ret = av_tx_init(&s->analysis_rdft, &s->analysis_rdft_fn, AV_TX_FLOAT_RDFT, 0, 1 << rdft_bits, &scale, 0)) < 0)
             return ret;
         s->dump_buf = av_malloc_array(s->analysis_rdft_len + 2, sizeof(*s->dump_buf));
+        if (!s->dump_buf)
+            return AVERROR(ENOMEM);
     }
 
     s->analysis_buf = av_malloc_array((s->analysis_rdft_len + 2), sizeof(*s->analysis_buf));
@@ -955,14 +957,14 @@ static const AVFilterPad firequalizer_outputs[] = {
     },
 };
 
-const AVFilter ff_af_firequalizer = {
-    .name               = "firequalizer",
-    .description        = NULL_IF_CONFIG_SMALL("Finite Impulse Response Equalizer."),
+const FFFilter ff_af_firequalizer = {
+    .p.name             = "firequalizer",
+    .p.description      = NULL_IF_CONFIG_SMALL("Finite Impulse Response Equalizer."),
+    .p.priv_class       = &firequalizer_class,
     .uninit             = uninit,
     .process_command    = process_command,
     .priv_size          = sizeof(FIREqualizerContext),
     FILTER_INPUTS(firequalizer_inputs),
     FILTER_OUTPUTS(firequalizer_outputs),
     FILTER_SINGLE_SAMPLEFMT(AV_SAMPLE_FMT_FLTP),
-    .priv_class         = &firequalizer_class,
 };

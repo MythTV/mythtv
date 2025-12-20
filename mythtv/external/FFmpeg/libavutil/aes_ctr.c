@@ -24,6 +24,7 @@
 #include "aes_ctr.h"
 #include "aes.h"
 #include "aes_internal.h"
+#include "intreadwrite.h"
 #include "macros.h"
 #include "mem.h"
 #include "random_seed.h"
@@ -31,8 +32,8 @@
 #define AES_BLOCK_SIZE (16)
 
 typedef struct AVAESCTR {
-    uint8_t counter[AES_BLOCK_SIZE];
-    uint8_t encrypted_counter[AES_BLOCK_SIZE];
+    DECLARE_ALIGNED(8, uint8_t, counter)[AES_BLOCK_SIZE];
+    DECLARE_ALIGNED(8, uint8_t, encrypted_counter)[AES_BLOCK_SIZE];
     int block_offset;
     AVAES aes;
 } AVAESCTR;
@@ -85,16 +86,10 @@ void av_aes_ctr_free(struct AVAESCTR *a)
     av_free(a);
 }
 
-static void av_aes_ctr_increment_be64(uint8_t* counter)
+static inline void av_aes_ctr_increment_be64(uint8_t* counter)
 {
-    uint8_t* cur_pos;
-
-    for (cur_pos = counter + 7; cur_pos >= counter; cur_pos--) {
-        (*cur_pos)++;
-        if (*cur_pos != 0) {
-            break;
-        }
-    }
+    uint64_t c = AV_RB64A(counter) + 1;
+    AV_WB64A(counter, c);
 }
 
 void av_aes_ctr_increment_iv(struct AVAESCTR *a)
@@ -106,26 +101,35 @@ void av_aes_ctr_increment_iv(struct AVAESCTR *a)
 
 void av_aes_ctr_crypt(struct AVAESCTR *a, uint8_t *dst, const uint8_t *src, int count)
 {
-    const uint8_t* src_end = src + count;
-    const uint8_t* cur_end_pos;
-    uint8_t* encrypted_counter_pos;
+    if (a->block_offset && count > 0) {
+        int left = FFMIN(count, AES_BLOCK_SIZE - a->block_offset);
+        for (int len = 0; len < left; len++)
+            dst[len] = src[len] ^ a->encrypted_counter[a->block_offset++];
+        a->block_offset &= AES_BLOCK_SIZE - 1;
+        dst += left;
+        src += left;
+        count -= left;
+    }
 
-    while (src < src_end) {
-        if (a->block_offset == 0) {
-            av_aes_crypt(&a->aes, a->encrypted_counter, a->counter, 1, NULL, 0);
+    while (count >= AES_BLOCK_SIZE) {
+        av_aes_crypt(&a->aes, a->encrypted_counter, a->counter, 1, NULL, 0);
+        av_aes_ctr_increment_be64(a->counter + 8);
+#if HAVE_FAST_64BIT
+        for (int len = 0; len < AES_BLOCK_SIZE; len += 8)
+            AV_WN64(&dst[len], AV_RN64(&src[len]) ^ AV_RN64A(&a->encrypted_counter[len]));
+#else
+        for (int len = 0; len < AES_BLOCK_SIZE; len += 4)
+            AV_WN32(&dst[len], AV_RN32(&src[len]) ^ AV_RN32A(&a->encrypted_counter[len]));
+#endif
+        dst += AES_BLOCK_SIZE;
+        src += AES_BLOCK_SIZE;
+        count -= AES_BLOCK_SIZE;
+    }
 
-            av_aes_ctr_increment_be64(a->counter + 8);
-        }
-
-        encrypted_counter_pos = a->encrypted_counter + a->block_offset;
-        cur_end_pos = src + AES_BLOCK_SIZE - a->block_offset;
-        cur_end_pos = FFMIN(cur_end_pos, src_end);
-
-        a->block_offset += cur_end_pos - src;
-        a->block_offset &= (AES_BLOCK_SIZE - 1);
-
-        while (src < cur_end_pos) {
-            *dst++ = *src++ ^ *encrypted_counter_pos++;
-        }
+    if (count > 0) {
+        av_aes_crypt(&a->aes, a->encrypted_counter, a->counter, 1, NULL, 0);
+        av_aes_ctr_increment_be64(a->counter + 8);
+        for (int len = 0; len < count; len++)
+            dst[len] = src[len] ^ a->encrypted_counter[a->block_offset++];
     }
 }

@@ -214,21 +214,6 @@ int ff_encode_get_frame(AVCodecContext *avctx, AVFrame *frame)
 
     av_frame_move_ref(frame, avci->buffer_frame);
 
-#if FF_API_FRAME_KEY
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (frame->key_frame)
-        frame->flags |= AV_FRAME_FLAG_KEY;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (frame->interlaced_frame)
-        frame->flags |= AV_FRAME_FLAG_INTERLACED;
-    if (frame->top_field_first)
-        frame->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     return 0;
 }
 
@@ -613,20 +598,6 @@ static int encode_preinit_video(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
 
-#if FF_API_TICKS_PER_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (avctx->ticks_per_frame && avctx->time_base.num &&
-        avctx->ticks_per_frame > INT_MAX / avctx->time_base.num) {
-        av_log(avctx, AV_LOG_ERROR,
-               "ticks_per_frame %d too large for the timebase %d/%d.",
-               avctx->ticks_per_frame,
-               avctx->time_base.num,
-               avctx->time_base.den);
-        return AVERROR(EINVAL);
-    }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     if (avctx->hw_frames_ctx) {
         AVHWFramesContext *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
         if (frames_ctx->format != avctx->pix_fmt) {
@@ -660,11 +631,6 @@ static int encode_preinit_audio(AVCodecContext *avctx)
     if (!av_get_sample_fmt_name(avctx->sample_fmt)) {
         av_log(avctx, AV_LOG_ERROR, "Invalid audio sample format: %d\n",
                avctx->sample_fmt);
-        return AVERROR(EINVAL);
-    }
-    if (avctx->sample_rate <= 0) {
-        av_log(avctx, AV_LOG_ERROR, "Invalid audio sample rate: %d\n",
-               avctx->sample_rate);
         return AVERROR(EINVAL);
     }
 
@@ -935,4 +901,23 @@ AVCPBProperties *ff_encode_add_cpb_side_data(AVCodecContext *avctx)
     avctx->coded_side_data[avctx->nb_coded_side_data - 1].size = size;
 
     return props;
+}
+
+int ff_check_codec_matrices(AVCodecContext *avctx, unsigned types, uint16_t min, uint16_t max)
+{
+    uint16_t  *matrices[] = {avctx->intra_matrix, avctx->inter_matrix, avctx->chroma_intra_matrix};
+    const char   *names[] = {"Intra", "Inter", "Chroma Intra"};
+    static_assert(FF_ARRAY_ELEMS(matrices) == FF_ARRAY_ELEMS(names), "matrix count mismatch");
+    for (int m = 0; m < FF_ARRAY_ELEMS(matrices); m++) {
+        uint16_t *matrix = matrices[m];
+        if (matrix && (types & (1U << m))) {
+            for (int i = 0; i < 64; i++) {
+                if (matrix[i] < min || matrix[i] > max) {
+                    av_log(avctx, AV_LOG_ERROR, "%s matrix[%d] is %d which is out of the allowed range [%"PRIu16"-%"PRIu16"].\n", names[m], i, matrix[i], min, max);
+                    return AVERROR(EINVAL);
+                }
+            }
+        }
+    }
+    return 0;
 }

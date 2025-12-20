@@ -173,7 +173,6 @@ exit:
 static av_cold void do_uninit(AVFilterContext *ctx) API_AVAILABLE(macos(10.11), ios(8.0))
 {
     YADIFVTContext *s = ctx->priv;
-    YADIFContext *y = &s->yadif;
 
     ff_yadif_uninit(ctx);
 
@@ -433,16 +432,16 @@ static const AVFilterPad yadif_videotoolbox_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_yadif_videotoolbox = {
-    .name           = "yadif_videotoolbox",
-    .description    = NULL_IF_CONFIG_SMALL("YADIF for VideoToolbox frames using Metal compute"),
+const FFFilter ff_vf_yadif_videotoolbox = {
+    .p.name         = "yadif_videotoolbox",
+    .p.description  = NULL_IF_CONFIG_SMALL("YADIF for VideoToolbox frames using Metal compute"),
+    .p.priv_class   = &yadif_videotoolbox_class,
+    .p.flags        = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
     .priv_size      = YADIF_VT_CTX_SIZE,
-    .priv_class     = &yadif_videotoolbox_class,
     .init           = yadif_videotoolbox_init,
     .uninit         = yadif_videotoolbox_uninit,
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_VIDEOTOOLBOX),
     FILTER_INPUTS(yadif_videotoolbox_inputs),
     FILTER_OUTPUTS(yadif_videotoolbox_outputs),
-    .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 };

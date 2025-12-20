@@ -42,7 +42,6 @@
 #define CLIP_AVOIDANCE_FACTOR 0.95f
 
 typedef enum AACCoder {
-    AAC_CODER_ANMR = 0,
     AAC_CODER_TWOLOOP,
     AAC_CODER_FAST,
 
@@ -67,23 +66,10 @@ typedef struct AACEncOptions {
     int coder;
     int pns;
     int tns;
-    int ltp;
     int pce;
-    int pred;
     int mid_side;
     int intensity_stereo;
 } AACEncOptions;
-
-/**
- * Long Term Prediction
- */
-typedef struct LongTermPrediction {
-    int8_t present;
-    int16_t lag;
-    int coef_idx;
-    float coef;
-    int8_t used[MAX_LTP_LONG_SFB];
-} LongTermPrediction;
 
 /**
  * Individual Channel Stream
@@ -93,17 +79,11 @@ typedef struct IndividualChannelStream {
     enum WindowSequence window_sequence[2];
     uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sine window.
     uint8_t group_len[8];
-    LongTermPrediction ltp;
     const uint16_t *swb_offset; ///< table of offsets to the lowest spectral coefficient of a scalefactor band, sfb, for a particular window
     const uint8_t *swb_sizes;   ///< table of scalefactor band sizes for a particular window
     int num_swb;                ///< number of scalefactor window bands
     int num_windows;
     int tns_max_bands;
-    int predictor_present;
-    int predictor_initialized;
-    int predictor_reset_group;
-    int predictor_reset_count[31];  ///< used to count prediction resets
-    uint8_t prediction_used[41];
     uint8_t window_clipping[8]; ///< set if a certain window is near clipping
     float clip_avoidance_factor; ///< set if any window is near clipping to the necessary atennuation factor to avoid it
 } IndividualChannelStream;
@@ -138,9 +118,6 @@ typedef struct SingleChannelElement {
     DECLARE_ALIGNED(32, float, pcoeffs)[1024];      ///< coefficients for IMDCT, pristine
     DECLARE_ALIGNED(32, float, coeffs)[1024];       ///< coefficients for IMDCT, maybe processed
     DECLARE_ALIGNED(32, float, ret_buf)[2048];      ///< PCM output buffer
-    DECLARE_ALIGNED(16, float, ltp_state)[3072];    ///< time signal for LTP
-    DECLARE_ALIGNED(32, float, lcoeffs)[1024];      ///< MDCT of LTP coefficients
-    DECLARE_ALIGNED(32, float, prcoeffs)[1024];     ///< Main prediction coefs
     PredictorState predictor_state[MAX_PREDICTORS];
 } SingleChannelElement;
 
@@ -168,22 +145,13 @@ typedef struct AACCoefficientsEncoder {
     void (*quantize_and_encode_band)(struct AACEncContext *s, PutBitContext *pb, const float *in, float *out, int size,
                                      int scale_idx, int cb, const float lambda, int rtz);
     void (*encode_tns_info)(struct AACEncContext *s, SingleChannelElement *sce);
-    void (*encode_ltp_info)(struct AACEncContext *s, SingleChannelElement *sce, int common_window);
-    void (*encode_main_pred)(struct AACEncContext *s, SingleChannelElement *sce);
-    void (*adjust_common_pred)(struct AACEncContext *s, ChannelElement *cpe);
-    void (*adjust_common_ltp)(struct AACEncContext *s, ChannelElement *cpe);
-    void (*apply_main_pred)(struct AACEncContext *s, SingleChannelElement *sce);
     void (*apply_tns_filt)(struct AACEncContext *s, SingleChannelElement *sce);
-    void (*update_ltp)(struct AACEncContext *s, SingleChannelElement *sce);
-    void (*ltp_insert_new_frame)(struct AACEncContext *s);
     void (*set_special_band_scalefactors)(struct AACEncContext *s, SingleChannelElement *sce);
     void (*search_for_pns)(struct AACEncContext *s, AVCodecContext *avctx, SingleChannelElement *sce);
     void (*mark_pns)(struct AACEncContext *s, AVCodecContext *avctx, SingleChannelElement *sce);
     void (*search_for_tns)(struct AACEncContext *s, SingleChannelElement *sce);
-    void (*search_for_ltp)(struct AACEncContext *s, SingleChannelElement *sce, int common_window);
     void (*search_for_ms)(struct AACEncContext *s, ChannelElement *cpe);
     void (*search_for_is)(struct AACEncContext *s, AVCodecContext *avctx, ChannelElement *cpe);
-    void (*search_for_pred)(struct AACEncContext *s, SingleChannelElement *sce);
 } AACCoefficientsEncoder;
 
 extern const AACCoefficientsEncoder ff_aac_coders[];
@@ -231,7 +199,6 @@ typedef struct AACEncContext {
 
     ChannelElement *cpe;                         ///< channel elements
     FFPsyContext psy;
-    struct FFPsyPreprocessContext* psypp;
     const AACCoefficientsEncoder *coder;
     int cur_channel;                             ///< current channel for coder context
     int random_state;

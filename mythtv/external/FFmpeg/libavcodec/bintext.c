@@ -93,10 +93,10 @@ static av_cold int decode_init(AVCodecContext *avctx)
             av_log(avctx, AV_LOG_WARNING, "font height %i not supported\n", s->font_height);
             s->font_height = 8;
         case 8:
-            s->font = avpriv_cga_font;
+            s->font = avpriv_cga_font_get();
             break;
         case 16:
-            s->font = avpriv_vga16_font;
+            s->font = avpriv_vga16_font_get();
             break;
         }
     }
@@ -157,11 +157,6 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
     if ((ret = ff_get_buffer(avctx, s->frame, 0)) < 0)
         return ret;
     s->frame->pict_type           = AV_PICTURE_TYPE_I;
-#if FF_API_PALETTE_HAS_CHANGED
-FF_DISABLE_DEPRECATION_WARNINGS
-    s->frame->palette_has_changed = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     memcpy(s->frame->data[1], s->palette, 16 * 4);
 
     if (avctx->codec_id == AV_CODEC_ID_XBIN) {

@@ -46,6 +46,12 @@ fate-vp60: CMD = framecrc -flags +bitexact -i $(TARGET_SAMPLES)/ea-vp6/g36.vp6
 FATE_VP6-$(call FRAMECRC, EA, VP6) += fate-vp61
 fate-vp61: CMD = framecrc -flags +bitexact -i $(TARGET_SAMPLES)/ea-vp6/MovieSkirmishGondor.vp6 -t 4
 
+FATE_VP6-$(call FRAMECRC, AVI, VP6) += fate-vp60-interlace1
+fate-vp60-interlace1: CMD = framecrc -flags +bitexact -i $(TARGET_SAMPLES)/vp6/interlaced32x32.avi
+
+FATE_VP6-$(call FRAMECRC, AVI, VP6) += fate-vp60-interlace2
+fate-vp60-interlace2: CMD = framecrc -flags +bitexact -i $(TARGET_SAMPLES)/vp6/interlaced32x64.avi
+
 FATE_VP6-$(call FRAMECRC, MOV, VP6A) += fate-vp6a
 fate-vp6a: CMD = framecrc -flags +bitexact -i $(TARGET_SAMPLES)/flash-vp6/300x180-Scr-f8-056alpha.mov
 
@@ -138,8 +144,8 @@ fate-vp9-05-resize: REF = $(SRC_PATH)/tests/ref/fate/vp9-05-resize
 fate-vp9-encparams: CMD = venc_data $(TARGET_SAMPLES)/vp9-test-vectors/vp90-2-segmentation-aq-akiyo.webm 0 5
 FATE_SAMPLES_DUMP_DATA-$(call DEMDEC, MATROSKA, VP9) += fate-vp9-encparams
 
-FATE_VP9-$(call ALLYES, MATROSKA_DEMUXER VP9_PARSER VP9_SUPERFRAME_SPLIT_BSF \
-                        VP9_SUPERFRAME_BSF FILE_PROTOCOL FRAMECRC_MUXER) += fate-vp9-superframe-bsf
+FATE_VP9-$(call FRAMECRC, MATROSKA,, VP9_PARSER VP9_SUPERFRAME_SPLIT_BSF \
+                        VP9_SUPERFRAME_BSF FRAMECRC_MUXER) += fate-vp9-superframe-bsf
 fate-vp9-superframe-bsf: CMD = framecrc -i $(TARGET_SAMPLES)/vp9-test-vectors/vp90-2-segmentation-sf-akiyo.webm -c:v copy -bsf:v vp9_superframe_split,vp9_superframe
 
 FATE_VP9-$(call DEMDEC, MATROSKA, VP9) += fate-vp9-encparams

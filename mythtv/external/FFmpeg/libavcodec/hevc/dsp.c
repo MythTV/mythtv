@@ -265,6 +265,10 @@ int i = 0;
     ff_hevc_dsp_init_arm(hevcdsp, bit_depth);
 #elif ARCH_PPC
     ff_hevc_dsp_init_ppc(hevcdsp, bit_depth);
+#elif ARCH_RISCV
+    ff_hevc_dsp_init_riscv(hevcdsp, bit_depth);
+#elif ARCH_WASM
+    ff_hevc_dsp_init_wasm(hevcdsp, bit_depth);
 #elif ARCH_X86
     ff_hevc_dsp_init_x86(hevcdsp, bit_depth);
 #elif ARCH_MIPS

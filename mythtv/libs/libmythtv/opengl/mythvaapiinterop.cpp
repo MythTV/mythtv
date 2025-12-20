@@ -223,12 +223,11 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     }
 
     int ret = 0;
-    QString args;
     QString deinterlacer = "bob";
     if (DEINT_MEDIUM == Deinterlacer)
         deinterlacer = "motion_adaptive";
     else if (DEINT_HIGH == Deinterlacer)
-        deinterlacer = "motion_compensated";
+        deinterlacer = "default";
 
     // N.B. set auto to 0 otherwise we confuse playback if VAAPI does not deinterlace
     QString filters = QString("deinterlace_vaapi=mode=%1:rate=%2:auto=0")
@@ -237,11 +236,12 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
-    AVBufferSrcParameters* params = nullptr;
 
     // Automatically clean up memory allocation at function exit
     auto cleanup_fn = [&](int */*x*/) {
         if (ret < 0) {
+            avfilter_free(Source);
+            Source = nullptr;
             avfilter_graph_free(&Graph);
             Graph = nullptr;
         }
@@ -258,27 +258,40 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     }
 
     /* buffer video source: the decoded frames from the decoder will be inserted here. */
-    args = QString("video_size=%1x%2:pix_fmt=%3:time_base=1/1")
-                .arg(Width).arg(Height).arg(AV_PIX_FMT_VAAPI);
-
-    ret = avfilter_graph_create_filter(&Source, buffersrc, "in",
-                                       args.toLocal8Bit().constData(), nullptr, Graph);
-    if (ret < 0)
+    Source = avfilter_graph_alloc_filter(Graph, buffersrc, "in");
+    if (Source == nullptr)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer source");
+        ret = AVERROR(ENOMEM);
+        LOG(VB_GENERAL, LOG_ERR, "avfilter_graph_alloc_filter() failed to allocate memory.");
         return false;
     }
 
-    params = av_buffersrc_parameters_alloc();
+    AVBufferSrcParameters* params = av_buffersrc_parameters_alloc();
+    if (params == nullptr)
+    {
+        ret = AVERROR(ENOMEM);
+        LOG(VB_GENERAL, LOG_ERR, "av_buffersrc_parameters_alloc() failed to allocate memory.");
+        return false;
+    }
+    params->format        = AV_PIX_FMT_VAAPI;
+    params->time_base     = {1, 1};
+    params->width         = Width;
+    params->height        = Height;
     params->hw_frames_ctx = FramesContext;
     ret = av_buffersrc_parameters_set(Source, params);
-
+    av_freep(reinterpret_cast<void*>(&params));
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "av_buffersrc_parameters_set failed");
         return false;
     }
-    av_freep(reinterpret_cast<void*>(&params));
+
+    ret = avfilter_init_str(Source, nullptr);
+    if (ret < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_init_str() failed for buffer source");
+        return false;
+    }
 
     /* buffer video sink: to terminate the filter chain. */
     ret = avfilter_graph_create_filter(&Sink, buffersink, "out",

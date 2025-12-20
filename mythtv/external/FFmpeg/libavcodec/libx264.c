@@ -22,7 +22,6 @@
 #include "config_components.h"
 
 #include "libavutil/buffer.h"
-#include "libavutil/eval.h"
 #include "libavutil/internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/mastering_display_metadata.h"
@@ -30,7 +29,6 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/stereo3d.h"
 #include "libavutil/time.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/video_hint.h"
 #include "avcodec.h"
 #include "codec_internal.h"
@@ -1317,13 +1315,7 @@ static av_cold int X264_init(AVCodecContext *avctx)
         x4->params.i_fps_den = avctx->framerate.den;
     } else {
         x4->params.i_fps_num = avctx->time_base.den;
-FF_DISABLE_DEPRECATION_WARNINGS
-        x4->params.i_fps_den = avctx->time_base.num
-#if FF_API_TICKS_PER_FRAME
-            * avctx->ticks_per_frame
-#endif
-            ;
-FF_ENABLE_DEPRECATION_WARNINGS
+        x4->params.i_fps_den = avctx->time_base.num;
     }
 
     x4->params.analyse.b_psnr = avctx->flags & AV_CODEC_FLAG_PSNR;
@@ -1633,7 +1625,7 @@ const FFCodec ff_libx264_encoder = {
     .flush            = X264_flush,
     .close            = X264_close,
     .defaults         = x264_defaults,
-    .p.pix_fmts       = pix_fmts_all,
+    CODEC_PIXFMTS_ARRAY(pix_fmts_all),
     .color_ranges     = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_AUTO_THREADS
 #if X264_BUILD < 158
@@ -1659,7 +1651,7 @@ const FFCodec ff_libx264rgb_encoder = {
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                       AV_CODEC_CAP_OTHER_THREADS |
                       AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
-    .p.pix_fmts     = pix_fmts_8bit_rgb,
+    CODEC_PIXFMTS_ARRAY(pix_fmts_8bit_rgb),
     .p.priv_class   = &rgbclass,
     .p.wrapper_name = "libx264",
     .priv_data_size = sizeof(X264Context),
@@ -1691,7 +1683,7 @@ const FFCodec ff_libx262_encoder = {
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                         AV_CODEC_CAP_OTHER_THREADS |
                         AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
-    .p.pix_fmts       = pix_fmts_8bit,
+    CODEC_PIXFMTS_ARRAY(pix_fmts_8bit),
     .color_ranges     = AVCOL_RANGE_MPEG,
     .p.priv_class     = &X262_class,
     .p.wrapper_name   = "libx264",

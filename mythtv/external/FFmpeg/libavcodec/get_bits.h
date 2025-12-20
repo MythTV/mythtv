@@ -76,6 +76,7 @@
 typedef BitstreamContext GetBitContext;
 
 #define get_bits_count      bits_tell
+#define get_bits_bytesize   bits_bytesize
 #define get_bits_left       bits_left
 #define skip_bits_long      bits_skip
 #define skip_bits           bits_skip
@@ -106,7 +107,7 @@ typedef BitstreamContext GetBitContext;
 #else   // CACHED_BITSTREAM_READER
 
 typedef struct GetBitContext {
-    const uint8_t *buffer, *buffer_end;
+    const uint8_t *buffer;
     int index;
     int size_in_bits;
     int size_in_bits_plus8;
@@ -163,11 +164,7 @@ static inline unsigned int show_bits(GetBitContext *s, int n);
  * For examples see get_bits, show_bits, skip_bits, get_vlc.
  */
 
-#if defined LONG_BITSTREAM_READER
-#   define MIN_CACHE_BITS 32
-#else
-#   define MIN_CACHE_BITS 25
-#endif
+#define MIN_CACHE_BITS 25
 
 #define OPEN_READER_NOSIZE(name, gb)            \
     unsigned int name ## _index = (gb)->index;  \
@@ -195,23 +192,10 @@ static inline unsigned int show_bits(GetBitContext *s, int n);
 
 /* Using these two macros ensures that 32 bits are available. */
 # define UPDATE_CACHE_LE_32(name, gb) UPDATE_CACHE_LE_EXT(name, (gb), 64, 32)
-
 # define UPDATE_CACHE_BE_32(name, gb) UPDATE_CACHE_BE_EXT(name, (gb), 64, 32)
 
-# ifdef LONG_BITSTREAM_READER
-
-# define UPDATE_CACHE_LE(name, gb) UPDATE_CACHE_LE_32(name, (gb))
-
-# define UPDATE_CACHE_BE(name, gb) UPDATE_CACHE_BE_32(name, (gb))
-
-#else
-
 # define UPDATE_CACHE_LE(name, gb) UPDATE_CACHE_LE_EXT(name, (gb), 32, 32)
-
 # define UPDATE_CACHE_BE(name, gb) UPDATE_CACHE_BE_EXT(name, (gb), 32, 32)
-
-#endif
-
 
 #ifdef BITSTREAM_READER_LE
 
@@ -266,6 +250,20 @@ static inline unsigned int show_bits(GetBitContext *s, int n);
 static inline int get_bits_count(const GetBitContext *s)
 {
     return s->index;
+}
+
+/**
+ * Get the size of the GetBitContext's buffer in bytes.
+ *
+ * @param s        the GetBitContext
+ * @param round_up If set, the number of bits will be rounded up to full bytes;
+ *                 this does not matter if the number of bits is known to be
+ *                 a multiple of eight, e.g. if the GetBitContext has been
+ *                 initialized with init_get_bits8.
+ */
+static inline int get_bits_bytesize(const GetBitContext *s, int round_up)
+{
+    return (s->size_in_bits + (round_up ? 7 : 0)) >> 3;
 }
 
 /**
@@ -514,7 +512,6 @@ static inline unsigned int show_bits_long(GetBitContext *s, int n)
 static inline int init_get_bits(GetBitContext *s, const uint8_t *buffer,
                                 int bit_size)
 {
-    int buffer_size;
     int ret = 0;
 
     if (bit_size >= INT_MAX - FFMAX(7, AV_INPUT_BUFFER_PADDING_SIZE*8) || bit_size < 0 || !buffer) {
@@ -523,12 +520,9 @@ static inline int init_get_bits(GetBitContext *s, const uint8_t *buffer,
         ret         = AVERROR_INVALIDDATA;
     }
 
-    buffer_size = (bit_size + 7) >> 3;
-
     s->buffer             = buffer;
     s->size_in_bits       = bit_size;
     s->size_in_bits_plus8 = bit_size + 8;
-    s->buffer_end         = buffer + buffer_size;
     s->index              = 0;
 
     return ret;
@@ -611,7 +605,7 @@ static inline const uint8_t *align_get_bits(GetBitContext *s)
                                                                 \
         index = SHOW_UBITS(name, gb, bits);                     \
         level = table[index].level;                             \
-        n     = table[index].len;                               \
+        n     = table[index].len8;                              \
                                                                 \
         if (max_depth > 1 && n < 0) {                           \
             SKIP_BITS(name, gb, bits);                          \
@@ -623,7 +617,7 @@ static inline const uint8_t *align_get_bits(GetBitContext *s)
                                                                 \
             index = SHOW_UBITS(name, gb, nb_bits) + level;      \
             level = table[index].level;                         \
-            n     = table[index].len;                           \
+            n     = table[index].len8;                          \
             if (max_depth > 2 && n < 0) {                       \
                 LAST_SKIP_BITS(name, gb, nb_bits);              \
                 if (need_update) {                              \
@@ -633,7 +627,7 @@ static inline const uint8_t *align_get_bits(GetBitContext *s)
                                                                 \
                 index = SHOW_UBITS(name, gb, nb_bits) + level;  \
                 level = table[index].level;                     \
-                n     = table[index].len;                       \
+                n     = table[index].len8;                      \
             }                                                   \
         }                                                       \
         run = table[index].run;                                 \

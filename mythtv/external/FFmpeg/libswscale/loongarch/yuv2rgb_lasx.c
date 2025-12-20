@@ -160,9 +160,9 @@
 }
 
 #define YUV2RGBFUNC(func_name, dst_type, alpha)                                     \
-           int func_name(SwsContext *c, const uint8_t *src[],                       \
-                         int srcStride[], int srcSliceY, int srcSliceH,             \
-                         uint8_t *dst[], int dstStride[])                           \
+           int func_name(SwsInternal *c, const uint8_t *const src[],                \
+                         const int srcStride[], int srcSliceY, int srcSliceH,       \
+                         uint8_t *const dst[], const int dstStride[])               \
 {                                                                                   \
     int x, y, h_size, vshift, res;                                                  \
     __m256i m_y1, m_y2, m_u, m_v;                                                   \
@@ -173,11 +173,11 @@
     __m256i shuf3 = {0x1E0F0E1C0D0C1A0B, 0x0101010101010101,                        \
                      0x1E0F0E1C0D0C1A0B, 0x0101010101010101};                       \
     YUV2RGB_LOAD_COE                                                                \
-    y      = (c->dstW + 7) & ~7;                                                    \
+    y      = (c->opts.dst_w + 7) & ~7;                                              \
     h_size = y >> 4;                                                                \
     res    = y & 15;                                                                \
                                                                                     \
-    vshift = c->srcFormat != AV_PIX_FMT_YUV422P;                                    \
+    vshift = c->opts.src_format != AV_PIX_FMT_YUV422P;                              \
     for (y = 0; y < srcSliceH; y += 2) {                                            \
         dst_type *image1    = (dst_type *)(dst[0] + (y + srcSliceY) * dstStride[0]);\
         dst_type *image2    = (dst_type *)(image1 +                   dstStride[0]);\
@@ -188,9 +188,9 @@
         for(x = 0; x < h_size; x++) {                                               \
 
 #define YUV2RGBFUNC32(func_name, dst_type, alpha)                                   \
-           int func_name(SwsContext *c, const uint8_t *src[],                       \
-                         int srcStride[], int srcSliceY, int srcSliceH,             \
-                         uint8_t *dst[], int dstStride[])                           \
+           int func_name(SwsInternal *c, const uint8_t *const src[],                \
+                         const int srcStride[], int srcSliceY, int srcSliceH,       \
+                         uint8_t *const dst[], const int dstStride[])               \
 {                                                                                   \
     int x, y, h_size, vshift, res;                                                  \
     __m256i m_y1, m_y2, m_u, m_v;                                                   \
@@ -199,11 +199,11 @@
     __m256i a = __lasx_xvldi(0xFF);                                                 \
                                                                                     \
     YUV2RGB_LOAD_COE                                                                \
-    y      = (c->dstW + 7) & ~7;                                                    \
+    y      = (c->opts.dst_w + 7) & ~7;                                              \
     h_size = y >> 4;                                                                \
     res    = y & 15;                                                                \
                                                                                     \
-    vshift = c->srcFormat != AV_PIX_FMT_YUV422P;                                    \
+    vshift = c->opts.src_format != AV_PIX_FMT_YUV422P;                              \
     for (y = 0; y < srcSliceH; y += 2) {                                            \
         int yd = y + srcSliceY;                                                     \
         dst_type av_unused *r, *g, *b;                                              \

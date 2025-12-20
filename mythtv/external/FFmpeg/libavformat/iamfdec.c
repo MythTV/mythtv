@@ -109,7 +109,7 @@ static int iamf_read_header(AVFormatContext *s)
 
             if (!i && !j && audio_element->layers[0].substream_count == 1)
                 st->disposition |= AV_DISPOSITION_DEFAULT;
-            else
+            else if (audio_element->nb_layers > 1 || audio_element->layers[0].substream_count > 1)
                 st->disposition |= AV_DISPOSITION_DEPENDENT;
             st->id = substream->audio_substream_id;
             avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
@@ -165,7 +165,7 @@ static int iamf_read_packet(AVFormatContext *s, AVPacket *pkt)
     IAMFDemuxContext *const c = s->priv_data;
     int ret;
 
-    ret = ff_iamf_read_packet(s, c, s->pb, INT_MAX, pkt);
+    ret = ff_iamf_read_packet(s, c, s->pb, INT_MAX, 0, pkt);
     if (ret < 0)
         return ret;
 

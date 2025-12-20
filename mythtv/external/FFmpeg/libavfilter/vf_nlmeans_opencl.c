@@ -207,7 +207,7 @@ static int nlmeans_plane(AVFilterContext *avctx, cl_mem dst, cl_mem src,
             }
         }
     }
-    // repack dx/dy seperately, as we want to do four pairs of dx/dy in a batch
+    // repack dx/dy separately, as we want to do four pairs of dx/dy in a batch
     for (i = 0; i < nb_pixel / 4; i++) {
         dxdy[i * 8] = tmp[i * 8];         // dx0
         dxdy[i * 8 + 1] = tmp[i * 8 + 2]; // dx1
@@ -427,16 +427,16 @@ static const AVFilterPad nlmeans_opencl_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_nlmeans_opencl = {
-    .name           = "nlmeans_opencl",
-    .description    = NULL_IF_CONFIG_SMALL("Non-local means denoiser through OpenCL"),
+const FFFilter ff_vf_nlmeans_opencl = {
+    .p.name         = "nlmeans_opencl",
+    .p.description  = NULL_IF_CONFIG_SMALL("Non-local means denoiser through OpenCL"),
+    .p.priv_class   = &nlmeans_opencl_class,
+    .p.flags        = AVFILTER_FLAG_HWDEVICE,
     .priv_size      = sizeof(NLMeansOpenCLContext),
-    .priv_class     = &nlmeans_opencl_class,
     .init           = &ff_opencl_filter_init,
     .uninit         = &nlmeans_opencl_uninit,
     FILTER_INPUTS(nlmeans_opencl_inputs),
     FILTER_OUTPUTS(nlmeans_opencl_outputs),
     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
-    .flags          = AVFILTER_FLAG_HWDEVICE,
 };

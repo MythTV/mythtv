@@ -60,19 +60,15 @@ DECLARE_ASM_CONST(8, uint64_t, mask15r)      = 0x7C007C007C007C00ULL;
 #define mask16b mask15b
 DECLARE_ASM_CONST(8, uint64_t, mask16g)      = 0x07E007E007E007E0ULL;
 DECLARE_ASM_CONST(8, uint64_t, mask16r)      = 0xF800F800F800F800ULL;
-DECLARE_ASM_CONST(8, uint64_t, red_16mask)   = 0x0000f8000000f800ULL;
+#define red_16mask mask3215g
 DECLARE_ASM_CONST(8, uint64_t, green_16mask) = 0x000007e0000007e0ULL;
 DECLARE_ASM_CONST(8, uint64_t, blue_16mask)  = 0x0000001f0000001fULL;
 DECLARE_ASM_CONST(8, uint64_t, red_15mask)   = 0x00007c0000007c00ULL;
 DECLARE_ASM_CONST(8, uint64_t, green_15mask) = 0x000003e0000003e0ULL;
-DECLARE_ASM_CONST(8, uint64_t, blue_15mask)  = 0x0000001f0000001fULL;
+#define blue_15mask blue_16mask
 DECLARE_ASM_CONST(8, uint64_t, mul15_mid)    = 0x4200420042004200ULL;
 DECLARE_ASM_CONST(8, uint64_t, mul15_hi)     = 0x0210021002100210ULL;
 DECLARE_ASM_CONST(8, uint64_t, mul16_mid)    = 0x2080208020802080ULL;
-
-DECLARE_ALIGNED(8, extern const uint64_t, ff_bgr2YOffset);
-DECLARE_ALIGNED(8, extern const uint64_t, ff_w1111);
-DECLARE_ALIGNED(8, extern const uint64_t, ff_bgr2UVOffset);
 
 #define BY ((int)( 0.098*(1<<RGB2YUV_SHIFT)+0.5))
 #define BV ((int)(-0.071*(1<<RGB2YUV_SHIFT)+0.5))
@@ -1481,10 +1477,14 @@ static inline void planar2x_mmxext(const uint8_t *src, uint8_t *dst, int srcWidt
  * FIXME: Write HQ version.
  */
 #if ARCH_X86_32 && HAVE_7REGS
+DECLARE_ASM_CONST(8, uint64_t, bgr2YOffset)  = 0x1010101010101010ULL;
+DECLARE_ASM_CONST(8, uint64_t, bgr2UVOffset) = 0x8080808080808080ULL;
+DECLARE_ASM_CONST(8, uint64_t, w1111)        = 0x0001000100010001ULL;
+
 static inline void rgb24toyv12_mmxext(const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                                        int width, int height,
                                        int lumStride, int chromStride, int srcStride,
-                                       int32_t *rgb2yuv)
+                                       const int32_t *rgb2yuv)
 {
 #define BGR2Y_IDX "16*4+16*32"
 #define BGR2U_IDX "16*4+16*33"
@@ -1506,7 +1506,7 @@ static inline void rgb24toyv12_mmxext(const uint8_t *src, uint8_t *ydst, uint8_t
             __asm__ volatile(
                 "mov                        %2, %%"FF_REG_a"\n\t"
                 "movq          "BGR2Y_IDX"(%3), %%mm6       \n\t"
-                "movq       "MANGLE(ff_w1111)", %%mm5       \n\t"
+                "movq          "MANGLE(w1111)", %%mm5       \n\t"
                 "pxor                    %%mm7, %%mm7       \n\t"
                 "lea (%%"FF_REG_a", %%"FF_REG_a", 2), %%"FF_REG_d" \n\t"
                 ".p2align                    4              \n\t"
@@ -1560,13 +1560,13 @@ static inline void rgb24toyv12_mmxext(const uint8_t *src, uint8_t *ydst, uint8_t
                 "psraw                      $7, %%mm4       \n\t"
 
                 "packuswb                %%mm4, %%mm0       \n\t"
-                "paddusb "MANGLE(ff_bgr2YOffset)", %%mm0    \n\t"
+                "paddusb "MANGLE(bgr2YOffset)", %%mm0       \n\t"
 
                 MOVNTQ"                  %%mm0, (%1, %%"FF_REG_a") \n\t"
                 "add                        $8,      %%"FF_REG_a"  \n\t"
                 " js                        1b                     \n\t"
                 : : "r" (src+width*3), "r" (ydst+width), "g" ((x86_reg)-width), "r"(rgb2yuv)
-                  NAMED_CONSTRAINTS_ADD(ff_w1111,ff_bgr2YOffset)
+                  NAMED_CONSTRAINTS_ADD(w1111,bgr2YOffset)
                 : "%"FF_REG_a, "%"FF_REG_d
             );
             ydst += lumStride;
@@ -1575,7 +1575,7 @@ static inline void rgb24toyv12_mmxext(const uint8_t *src, uint8_t *ydst, uint8_t
         src -= srcStride*2;
         __asm__ volatile(
             "mov                        %4, %%"FF_REG_a"\n\t"
-            "movq       "MANGLE(ff_w1111)", %%mm5       \n\t"
+            "movq          "MANGLE(w1111)", %%mm5       \n\t"
             "movq          "BGR2U_IDX"(%5), %%mm6       \n\t"
             "pxor                    %%mm7, %%mm7       \n\t"
             "lea (%%"FF_REG_a", %%"FF_REG_a", 2), %%"FF_REG_d" \n\t"
@@ -1653,14 +1653,14 @@ static inline void rgb24toyv12_mmxext(const uint8_t *src, uint8_t *ydst, uint8_t
             "punpckldq               %%mm4, %%mm0           \n\t"
             "punpckhdq               %%mm4, %%mm1           \n\t"
             "packsswb                %%mm1, %%mm0           \n\t"
-            "paddb "MANGLE(ff_bgr2UVOffset)", %%mm0         \n\t"
+            "paddb  "MANGLE(bgr2UVOffset)", %%mm0           \n\t"
             "movd                    %%mm0, (%2, %%"FF_REG_a") \n\t"
             "punpckhdq               %%mm0, %%mm0              \n\t"
             "movd                    %%mm0, (%3, %%"FF_REG_a") \n\t"
             "add                        $4, %%"FF_REG_a"       \n\t"
             " js                        1b              \n\t"
             : : "r" (src+chromWidth*6), "r" (src+srcStride+chromWidth*6), "r" (udst+chromWidth), "r" (vdst+chromWidth), "g" (-chromWidth), "r"(rgb2yuv)
-              NAMED_CONSTRAINTS_ADD(ff_w1111,ff_bgr2UVOffset)
+              NAMED_CONSTRAINTS_ADD(w1111,bgr2UVOffset)
             : "%"FF_REG_a, "%"FF_REG_d
         );
 
@@ -2348,6 +2348,10 @@ void ff_shuffle_bytes_0321_ssse3(const uint8_t *src, uint8_t *dst, int src_size)
 void ff_shuffle_bytes_1230_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
 void ff_shuffle_bytes_3012_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
 void ff_shuffle_bytes_3210_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3102_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_2013_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_2130_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_1203_ssse3(const uint8_t *src, uint8_t *dst, int src_size);
 
 #if ARCH_X86_64
 void ff_shuffle_bytes_2103_avx2(const uint8_t *src, uint8_t *dst, int src_size);
@@ -2355,6 +2359,20 @@ void ff_shuffle_bytes_0321_avx2(const uint8_t *src, uint8_t *dst, int src_size);
 void ff_shuffle_bytes_1230_avx2(const uint8_t *src, uint8_t *dst, int src_size);
 void ff_shuffle_bytes_3012_avx2(const uint8_t *src, uint8_t *dst, int src_size);
 void ff_shuffle_bytes_3210_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3102_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_2013_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_2130_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_1203_avx2(const uint8_t *src, uint8_t *dst, int src_size);
+
+void ff_shuffle_bytes_2103_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_0321_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_1230_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3012_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3210_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_3102_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_2013_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_2130_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
+void ff_shuffle_bytes_1203_avx512icl(const uint8_t *src, uint8_t *dst, int src_size);
 
 void ff_uyvytoyuv422_sse2(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                           const uint8_t *src, int width, int height,
@@ -2365,6 +2383,9 @@ void ff_uyvytoyuv422_avx(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
 void ff_uyvytoyuv422_avx2(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                           const uint8_t *src, int width, int height,
                           int lumStride, int chromStride, int srcStride);
+void ff_uyvytoyuv422_avx512icl(uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
+                               const uint8_t *src, int width, int height,
+                               int lumStride, int chromStride, int srcStride);
 #endif
 
 #define DEINTERLEAVE_BYTES(cpuext)                                            \
@@ -2424,6 +2445,10 @@ av_cold void rgb2rgb_init_x86(void)
         shuffle_bytes_1230 = ff_shuffle_bytes_1230_ssse3;
         shuffle_bytes_3012 = ff_shuffle_bytes_3012_ssse3;
         shuffle_bytes_3210 = ff_shuffle_bytes_3210_ssse3;
+        shuffle_bytes_3102 = ff_shuffle_bytes_3102_ssse3;
+        shuffle_bytes_2013 = ff_shuffle_bytes_2013_ssse3;
+        shuffle_bytes_2130 = ff_shuffle_bytes_2130_ssse3;
+        shuffle_bytes_1203 = ff_shuffle_bytes_1203_ssse3;
     }
 #if HAVE_AVX_EXTERNAL
     if (EXTERNAL_AVX(cpu_flags)) {
@@ -2437,9 +2462,27 @@ av_cold void rgb2rgb_init_x86(void)
         shuffle_bytes_1230 = ff_shuffle_bytes_1230_avx2;
         shuffle_bytes_3012 = ff_shuffle_bytes_3012_avx2;
         shuffle_bytes_3210 = ff_shuffle_bytes_3210_avx2;
+        shuffle_bytes_3102 = ff_shuffle_bytes_3102_avx2;
+        shuffle_bytes_2013 = ff_shuffle_bytes_2013_avx2;
+        shuffle_bytes_2130 = ff_shuffle_bytes_2130_avx2;
+        shuffle_bytes_1203 = ff_shuffle_bytes_1203_avx2;
+    }
+    if (EXTERNAL_AVX512ICL(cpu_flags)) {
+        shuffle_bytes_0321 = ff_shuffle_bytes_0321_avx512icl;
+        shuffle_bytes_2103 = ff_shuffle_bytes_2103_avx512icl;
+        shuffle_bytes_1230 = ff_shuffle_bytes_1230_avx512icl;
+        shuffle_bytes_3012 = ff_shuffle_bytes_3012_avx512icl;
+        shuffle_bytes_3210 = ff_shuffle_bytes_3210_avx512icl;
+        shuffle_bytes_3102 = ff_shuffle_bytes_3102_avx512icl;
+        shuffle_bytes_2013 = ff_shuffle_bytes_2013_avx512icl;
+        shuffle_bytes_2130 = ff_shuffle_bytes_2130_avx512icl;
+        shuffle_bytes_1203 = ff_shuffle_bytes_1203_avx512icl;
     }
     if (EXTERNAL_AVX2_FAST(cpu_flags)) {
         uyvytoyuv422 = ff_uyvytoyuv422_avx2;
+    }
+    if (EXTERNAL_AVX512ICL(cpu_flags)) {
+        uyvytoyuv422 = ff_uyvytoyuv422_avx512icl;
 #endif
     }
 #endif

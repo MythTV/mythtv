@@ -197,7 +197,7 @@ static int open_slave(AVFormatContext *avf, char *slave, TeeSlave *tee_slave)
     PROCESS_OPTION("fifo_options",
                    parse_slave_fifo_options(value, tee_slave), ;);
     entry = NULL;
-    while ((entry = av_dict_get(options, "bsfs", entry, AV_DICT_IGNORE_SUFFIX))) {
+    while ((entry = av_dict_get(options, "bsfs", NULL, AV_DICT_IGNORE_SUFFIX))) {
         /* trim out strlen("bsfs") characters from key */
         av_dict_set(&bsf_options, entry->key + 4, entry->value, 0);
         av_dict_set(&options, entry->key, NULL, 0);
@@ -610,10 +610,6 @@ const FFOutputFormat ff_tee_muxer = {
     .write_trailer     = tee_write_trailer,
     .write_packet      = tee_write_packet,
     .p.priv_class      = &tee_muxer_class,
-#if FF_API_ALLOW_FLUSH
-    .p.flags           = AVFMT_NOFILE | AVFMT_ALLOW_FLUSH | AVFMT_TS_NEGATIVE,
-#else
     .p.flags           = AVFMT_NOFILE | AVFMT_TS_NEGATIVE,
-#endif
     .flags_internal    = FF_OFMT_FLAG_ALLOW_FLUSH,
 };

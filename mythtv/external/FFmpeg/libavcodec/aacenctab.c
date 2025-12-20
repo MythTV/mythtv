@@ -25,9 +25,7 @@ static const uint8_t swb_size_128_96[] = {
     4, 4, 4, 4, 4, 4, 8, 8, 8, 16, 28, 36
 };
 
-static const uint8_t swb_size_128_64[] = {
-    4, 4, 4, 4, 4, 4, 8, 8, 8, 16, 28, 36
-};
+#define swb_size_128_64 swb_size_128_96
 
 static const uint8_t swb_size_128_48[] = {
     4, 4, 4, 4, 4, 8, 8, 8, 12, 12, 12, 16, 16, 16
@@ -103,6 +101,3 @@ const uint8_t *const ff_aac_swb_size_1024[] = {
     swb_size_1024_16, swb_size_1024_16, swb_size_1024_8,
     swb_size_1024_8
 };
-
-const int ff_aac_swb_size_128_len  = FF_ARRAY_ELEMS(ff_aac_swb_size_128);
-const int ff_aac_swb_size_1024_len = FF_ARRAY_ELEMS(ff_aac_swb_size_1024);

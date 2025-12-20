@@ -15,6 +15,7 @@
 #include "videobuffers.h"
 
 extern "C" {
+#include "libavcodec/defs.h"
 #include "libavutil/hwcontext_vaapi.h"
 #include "libavutil/pixdesc.h"
 #include "libavfilter/buffersink.h"
@@ -50,8 +51,8 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext* Codec)
         case AV_CODEC_ID_MPEG2VIDEO:
             switch (Codec->profile)
             {
-                case FF_PROFILE_MPEG2_SIMPLE: return VAProfileMPEG2Simple;
-                case FF_PROFILE_MPEG2_MAIN: return VAProfileMPEG2Main;
+                case AV_PROFILE_MPEG2_SIMPLE: return VAProfileMPEG2Simple;
+                case AV_PROFILE_MPEG2_MAIN: return VAProfileMPEG2Main;
                 default: break;
             }
             break;
@@ -59,26 +60,26 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext* Codec)
         case AV_CODEC_ID_MPEG4:
             switch (Codec->profile)
             {
-                case FF_PROFILE_MPEG4_SIMPLE: return VAProfileMPEG4Simple;
-                case FF_PROFILE_MPEG4_ADVANCED_SIMPLE: return VAProfileMPEG4AdvancedSimple;
-                case FF_PROFILE_MPEG4_MAIN: return VAProfileMPEG4Main;
+                case AV_PROFILE_MPEG4_SIMPLE: return VAProfileMPEG4Simple;
+                case AV_PROFILE_MPEG4_ADVANCED_SIMPLE: return VAProfileMPEG4AdvancedSimple;
+                case AV_PROFILE_MPEG4_MAIN: return VAProfileMPEG4Main;
                 default: break;
             }
             break;
         case AV_CODEC_ID_H264:
             switch (Codec->profile)
             {
-                case FF_PROFILE_H264_CONSTRAINED_BASELINE: return VAProfileH264ConstrainedBaseline;
-                case FF_PROFILE_H264_MAIN: return VAProfileH264Main;
-                case FF_PROFILE_H264_HIGH: return VAProfileH264High;
+                case AV_PROFILE_H264_CONSTRAINED_BASELINE: return VAProfileH264ConstrainedBaseline;
+                case AV_PROFILE_H264_MAIN: return VAProfileH264Main;
+                case AV_PROFILE_H264_HIGH: return VAProfileH264High;
                 default: break;
             }
             break;
         case AV_CODEC_ID_HEVC:
             switch (Codec->profile)
             {
-                case FF_PROFILE_HEVC_MAIN: return VAProfileHEVCMain;
-                case FF_PROFILE_HEVC_MAIN_10: return VAProfileHEVCMain10;
+                case AV_PROFILE_HEVC_MAIN: return VAProfileHEVCMain;
+                case AV_PROFILE_HEVC_MAIN_10: return VAProfileHEVCMain10;
                 default: break;
             }
             break;
@@ -87,10 +88,10 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext* Codec)
         case AV_CODEC_ID_VC1:
             switch (Codec->profile)
             {
-                case FF_PROFILE_VC1_SIMPLE: return VAProfileVC1Simple;
-                case FF_PROFILE_VC1_MAIN: return VAProfileVC1Main;
-                case FF_PROFILE_VC1_ADVANCED:
-                case FF_PROFILE_VC1_COMPLEX: return VAProfileVC1Advanced;
+                case AV_PROFILE_VC1_SIMPLE: return VAProfileVC1Simple;
+                case AV_PROFILE_VC1_MAIN: return VAProfileVC1Main;
+                case AV_PROFILE_VC1_ADVANCED:
+                case AV_PROFILE_VC1_COMPLEX: return VAProfileVC1Advanced;
                 default: break;
             }
             break;
@@ -98,8 +99,8 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext* Codec)
         case AV_CODEC_ID_VP9:
             switch (Codec->profile)
             {
-                case FF_PROFILE_VP9_0: return VAProfileVP9Profile0;
-                case FF_PROFILE_VP9_2: return VAProfileVP9Profile2;
+                case AV_PROFILE_VP9_0: return VAProfileVP9Profile0;
+                case AV_PROFILE_VP9_2: return VAProfileVP9Profile2;
                 default: break;
             }
             break;
@@ -294,14 +295,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
     // This may need extending for AMD etc
 
     auto vendor = interop->GetVendor();
-    // Intel NUC
-    if (vendor.contains("iHD", Qt::CaseInsensitive) && vendor.contains("Intel", Qt::CaseInsensitive))
-    {
-        vaapi_frames_ctx->attributes = nullptr;
-        vaapi_frames_ctx->nb_attributes = 0;
-    }
-    // i965 series
-    else
+    if (vendor.contains("i965", Qt::CaseInsensitive))
     {
         int format = VA_FOURCC_NV12;
         if (vendor.contains("ironlake", Qt::CaseInsensitive))

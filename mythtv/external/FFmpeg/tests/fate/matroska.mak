@@ -1,34 +1,34 @@
-FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER ZLIB) += fate-matroska-prores-zlib
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA,, ZLIB) += fate-matroska-prores-zlib
 fate-matroska-prores-zlib: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/prores_zlib.mkv -c:v copy
 
 # This tests that the matroska demuxer correctly adds the icpf header atom
 # upon demuxing; it also tests bz2 decompression and unknown-length cluster.
-FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER BZLIB) += fate-matroska-prores-header-insertion-bz2
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA,, BZLIB) += fate-matroska-prores-header-insertion-bz2
 fate-matroska-prores-header-insertion-bz2: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/prores_bz2.mkv -map 0 -c copy
 
 # This tests that the matroska demuxer supports modifying the colorspace
 # properties in remuxing (-c:v copy)
 # It also tests automatic insertion of the vp9_superframe bitstream filter
-FATE_MATROSKA-$(call DEMMUX, MATROSKA, MATROSKA) += fate-matroska-remux
+FATE_MATROSKA-$(call DEMMUX, MATROSKA, MATROSKA, VP9_DECODER VP9_PARSER MD5_PROTOCOL) += fate-matroska-remux
 fate-matroska-remux: CMD = md5pipe -i $(TARGET_SAMPLES)/vp9-test-vectors/vp90-2-2pass-akiyo.webm -color_trc 4 -c:v copy -fflags +bitexact -strict -2 -f matroska
 fate-matroska-remux: CMP = oneline
 fate-matroska-remux: REF = b9c7b650349972c9dce42ab79b472917
 
-FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER VORBIS_PARSER) += fate-matroska-xiph-lacing
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA,,  VORBIS_PARSER) += fate-matroska-xiph-lacing
 fate-matroska-xiph-lacing: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/xiph_lacing.mka -c:a copy
 
 # This tests that the Matroska demuxer correctly demuxes WavPack
 # without CodecPrivate; it also tests zlib compressed WavPack.
-FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER ZLIB) += fate-matroska-wavpack-missing-codecprivate
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA,,  ZLIB) += fate-matroska-wavpack-missing-codecprivate
 fate-matroska-wavpack-missing-codecprivate: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/wavpack_missing_codecprivate.mka -c copy
 
 # This tests that the matroska demuxer supports decompressing
 # zlib compressed tracks (both the CodecPrivate as well as the actual frames).
-FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER ZLIB) += fate-matroska-zlib-decompression
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA,,  ZLIB) += fate-matroska-zlib-decompression
 fate-matroska-zlib-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/subtitle_zlib.mks -c:s copy
 
 # This tests that the matroska demuxer can decompress lzo compressed tracks.
-FATE_MATROSKA-$(CONFIG_MATROSKA_DEMUXER) += fate-matroska-lzo-decompression
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA) += fate-matroska-lzo-decompression
 fate-matroska-lzo-decompression: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/lzo.mka -c copy
 
 # This tests that the ALAC extradata is correctly transformed upon remuxing.
@@ -40,7 +40,7 @@ fate-matroska-alac-remux: CMD = transcode mov $(TARGET_SAMPLES)/lossless-audio/i
 # This tests that the matroska demuxer correctly propagates
 # the channel layout contained in vorbis comments in the CodecPrivate
 # of flac tracks. It also tests header removal compression.
-FATE_MATROSKA-$(call ALLYES, MATROSKA_DEMUXER FLAC_PARSER) += fate-matroska-flac-channel-mapping
+FATE_MATROSKA-$(call FRAMECRC, MATROSKA,, FLAC_PARSER) += fate-matroska-flac-channel-mapping
 fate-matroska-flac-channel-mapping: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/flac_channel_layouts.mka -map 0 -c:a copy
 
 # This tests that the Matroska muxer writes the channel layout
@@ -50,8 +50,7 @@ fate-matroska-flac-channel-mapping: CMD = framecrc -i $(TARGET_SAMPLES)/mkv/flac
 # Furthermore it tests everything the matroska-flac-channel-mapping test
 # tests and it also tests the FLAC decoder and encoder, in particular
 # the latter's ability to send updated extradata.
-FATE_MATROSKA-$(call ALLYES, FLAC_DECODER FLAC_ENCODER FLAC_PARSER \
-                MATROSKA_DEMUXER MATROSKA_MUXER) += fate-matroska-flac-extradata-update
+FATE_MATROSKA-$(call TRANSCODE, FLAC, MATROSKA, FLAC_PARSER) += fate-matroska-flac-extradata-update
 fate-matroska-flac-extradata-update: CMD = transcode matroska $(TARGET_SAMPLES)/mkv/flac_channel_layouts.mka \
                                            matroska "-map 0 -map 0:0 -c flac -frames:a:2 8" "-map 0 -c copy"
 
@@ -64,9 +63,8 @@ fate-webm-av1-extradata-update: CMD = transcode ivf $(TARGET_SAMPLES)/av1/decode
 # This test tests demuxing Vorbis and chapters from ogg and muxing it in and
 # demuxing it from Matroska/WebM. It furthermore tests the WebM muxer, in
 # particular its DASH mode. Finally, it tests writing the Cues at the front.
-FATE_MATROSKA_FFMPEG_FFPROBE-$(call ALLYES, MATROSKA_DEMUXER OGG_DEMUXER  \
-                                 VORBIS_DECODER VORBIS_PARSER WEBM_MUXER) \
-                               += fate-webm-dash-chapters
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, WEBM MATROSKA, OGG_DEMUXER VORBIS_DECODER VORBIS_PARSER) \
+                                += fate-webm-dash-chapters
 fate-webm-dash-chapters: CMD = transcode ogg $(TARGET_SAMPLES)/vorbis/vorbis_chapter_extension_demo.ogg webm "-c copy -cluster_time_limit 1500 -dash 1 -dash_track_number 124 -reserve_index_space 400" "-c copy -t 0.5" -show_chapters
 
 # The input file has a Block whose payload has a size of zero before reversing
@@ -75,7 +73,7 @@ fate-webm-dash-chapters: CMD = transcode ogg $(TARGET_SAMPLES)/vorbis/vorbis_cha
 # For the muxer this tests that it can correctly write huge TrackNumbers and
 # that it can expand the Cues element's length field by one byte if necessary.
 # It furthermore tests correct propagation of the description tag.
-FATE_MATROSKA_FFMPEG_FFPROBE-$(call DEMMUX, MATROSKA, MATROSKA) \
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call FRAMECRC, MATROSKA,, MATROSKA_MUXER) \
                                += fate-matroska-zero-length-block
 fate-matroska-zero-length-block: CMD = transcode matroska $(TARGET_SAMPLES)/mkv/zero_length_block.mks matroska "-c:s copy -dash 1 -dash_track_number 2000000000 -reserve_index_space 62 -metadata_header_padding 1 -default_mode infer_no_subs" "-c:s copy" "-show_entries stream_tags=description"
 
@@ -99,6 +97,18 @@ fate-matroska-non-rotation-displaymatrix: CMD = transcode mov $(TARGET_SAMPLES)/
     "-c copy -frames:v 5" \
     "-c copy" \
     "-show_entries stream_side_data_list"
+
+# This test tests container cropping. The expected output is that
+# only the copied streams have cropping (and displaymatrix) side data
+# and that stream #1 (for which applying cropping was not disabled)
+# and the reencoded stream #2 decode to the same.
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call TRANSCODE, UTVIDEO, MATROSKA, MOV_DEMUXER HEVC_DECODER) \
+                               += fate-matroska-crop
+fate-matroska-crop: CMD = transcode mov $(TARGET_SAMPLES)/heif-conformance/MIAF007.heic matroska \
+    "-map 0:0 -map 0:0 -map 0:0 -c:0 copy -c:1 copy -c:2 utvideo" \
+    "-map 0" \
+    "-show_entries stream=index,codec_name,width,height:stream_side_data_list" "" \
+    "-apply_cropping:0 none"
 
 # This tests DOVI (reading from MP4 and Matroska and writing to Matroska)
 # as well as writing the Cues at the front (by shifting data) if
@@ -201,6 +211,7 @@ fate-matroska-ogg-opus-remux: CMD = transcode ogg $(TARGET_SAMPLES)/ogg/intro-pa
 FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, MXF_DEMUXER PCM_S16LE_DECODER \
                                            MP2FIXED_ENCODER ARESAMPLE_FILTER       \
                                            MPEG2VIDEO_DECODER MPEGVIDEO_PARSER     \
+                                           MPEGAUDIO_PARSER                        \
                                            EXTRACT_EXTRADATA_BSF) += fate-matroska-encoding-delay
 fate-matroska-encoding-delay: CMD = transcode mxf $(TARGET_SAMPLES)/mxf/Sony-00001.mxf matroska "-c:v copy -af aresample -c:a mp2fixed" "-copyts -c copy" "-show_packets -show_entries stream=codec_name,initial_padding -read_intervals %0.05"
 
@@ -222,7 +233,7 @@ fate-matroska-pgs-remux-durations: CMD = transcode sup $(TARGET_SAMPLES)/sub/pgs
 FATE_MATROSKA-$(call REMUX, MATROSKA, MPEGTS_DEMUXER DVBSUB_PARSER SETTS_BSF) += fate-matroska-dvbsub-remux
 fate-matroska-dvbsub-remux: CMD = transcode mpegts $(TARGET_SAMPLES)/sub/dvbsubtest_filter.ts matroska "-map 0:s -map 0:s -t 20 -c copy -bsf:0 setts=duration=if(gt(DURATION\,0)\,DURATION\,if(eq(PTS\,NOPTS)\,0\,if(eq(NEXT_PTS\,NOPTS)\,0\,NEXT_PTS-PTS))):pts=PTS" "-map 0 -c copy"
 
-FATE_MATROSKA_FFPROBE-$(call ALLYES, MATROSKA_DEMUXER) += fate-matroska-spherical-mono
+FATE_MATROSKA_FFPROBE-$(call DEMDEC, MATROSKA, H264) += fate-matroska-spherical-mono
 fate-matroska-spherical-mono: CMD = run ffprobe$(PROGSSUF)$(EXESUF) -show_entries stream_side_data_list -select_streams v -v 0 $(TARGET_SAMPLES)/mkv/spherical.mkv
 
 # This test tests the handling of AVStereo3D information, in particular
@@ -260,7 +271,7 @@ FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, WEBM MATROSKA, VP9_PARSER) \
                                += fate-webm-hdr10-plus-remux
 fate-webm-hdr10-plus-remux: CMD = transcode webm $(TARGET_SAMPLES)/mkv/hdr10_plus_vp9_sample.webm webm "-map 0 -c:v copy" "-map 0 -c:v copy" "-show_packets"
 
-FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, VP9_PARSER) \
+FATE_MATROSKA_FFMPEG_FFPROBE-$(call REMUX, MATROSKA, VP9_DECODER VP9_PARSER) \
                                += fate-matroska-hdr10-plus-remux
 fate-matroska-hdr10-plus-remux: CMD = transcode webm $(TARGET_SAMPLES)/mkv/hdr10_plus_vp9_sample.webm matroska "-map 0 -c:v copy" "-map 0 -c:v copy" "-show_packets"
 

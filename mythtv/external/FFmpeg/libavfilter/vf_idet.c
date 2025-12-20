@@ -183,28 +183,11 @@ static void filter(AVFilterContext *ctx)
     }
 
     if      (idet->last_type == TFF){
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        idet->cur->top_field_first = 1;
-        idet->cur->interlaced_frame = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         idet->cur->flags |= (AV_FRAME_FLAG_INTERLACED | AV_FRAME_FLAG_TOP_FIELD_FIRST);
     }else if(idet->last_type == BFF){
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        idet->cur->top_field_first = 0;
-        idet->cur->interlaced_frame = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         idet->cur->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
         idet->cur->flags |= AV_FRAME_FLAG_INTERLACED;
     }else if(idet->last_type == PROGRESSIVE){
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-        idet->cur->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         idet->cur->flags &= ~AV_FRAME_FLAG_INTERLACED;
     }
 
@@ -260,11 +243,6 @@ static int filter_frame(AVFilterLink *link, AVFrame *picref)
     }
     if (idet->analyze_interlaced_flag_done) {
         if ((picref->flags & AV_FRAME_FLAG_INTERLACED) && idet->interlaced_flag_accuracy < 0) {
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-            picref->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
             picref->flags &= ~AV_FRAME_FLAG_INTERLACED;
         }
         return ff_filter_frame(ctx->outputs[0], picref);
@@ -305,11 +283,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     if (idet->analyze_interlaced_flag) {
         if (idet->cur->flags & AV_FRAME_FLAG_INTERLACED) {
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-            idet->cur->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
             idet->cur->flags &= ~AV_FRAME_FLAG_INTERLACED;
             filter(ctx);
             if (idet->last_type == PROGRESSIVE) {
@@ -323,11 +296,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 ff_filter_frame(ctx->outputs[0], av_frame_clone(idet->cur));
 
                 if ((idet->next->flags & AV_FRAME_FLAG_INTERLACED) && idet->interlaced_flag_accuracy < 0) {
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-                    idet->next->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
                     idet->next->flags &= ~AV_FRAME_FLAG_INTERLACED;
                 }
                 idet->analyze_interlaced_flag_done = 1;
@@ -465,15 +433,15 @@ static const AVFilterPad idet_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_idet = {
-    .name          = "idet",
-    .description   = NULL_IF_CONFIG_SMALL("Interlace detect Filter."),
+const FFFilter ff_vf_idet = {
+    .p.name        = "idet",
+    .p.description = NULL_IF_CONFIG_SMALL("Interlace detect Filter."),
+    .p.flags       = AVFILTER_FLAG_METADATA_ONLY,
+    .p.priv_class  = &idet_class,
     .priv_size     = sizeof(IDETContext),
     .init          = init,
     .uninit        = uninit,
-    .flags         = AVFILTER_FLAG_METADATA_ONLY,
     FILTER_INPUTS(idet_inputs),
     FILTER_OUTPUTS(idet_outputs),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .priv_class    = &idet_class,
 };

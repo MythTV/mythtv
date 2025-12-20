@@ -79,7 +79,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     char out_layout_string[256];
     uint8_t * ain[SWR_CH_MAX];
     uint8_t *aout[SWR_CH_MAX];
-    uint8_t *out_data;
+    uint8_t *out_data = NULL;
     int in_sample_nb;
     int out_sample_nb = size;
     int count;
@@ -98,7 +98,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         av_channel_layout_copy(& in_ch_layout,  &layouts[bytestream2_get_byte(&gbc) % FF_ARRAY_ELEMS(layouts)]);
         av_channel_layout_copy(&out_ch_layout,  &layouts[bytestream2_get_byte(&gbc) % FF_ARRAY_ELEMS(layouts)]);
 
-        out_sample_nb = bytestream2_get_le32(&gbc);
+        out_sample_nb = bytestream2_get_le32(&gbc) & 0x7FFFFFFF;
 
         flags64 = bytestream2_get_le64(&gbc);
         if (flags64 & 0x10)
@@ -110,9 +110,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     av_channel_layout_describe(& in_ch_layout,  in_layout_string, sizeof( in_layout_string));
     av_channel_layout_describe(&out_ch_layout, out_layout_string, sizeof(out_layout_string));
 
-    fprintf(stderr, "%s %d %s -> %s %d %s\n",
-            av_get_sample_fmt_name( in_sample_fmt),  in_sample_rate,  in_layout_string,
-            av_get_sample_fmt_name(out_sample_fmt), out_sample_rate, out_layout_string);
+    // fprintf(stderr, "%s %d %s -> %s %d %s\n",
+    //         av_get_sample_fmt_name( in_sample_fmt),  in_sample_rate,  in_layout_string,
+    //         av_get_sample_fmt_name(out_sample_fmt), out_sample_rate, out_layout_string);
 
     if (swr_alloc_set_opts2(&swr, &out_ch_layout, out_sample_fmt, out_sample_rate,
                                   &in_ch_layout,   in_sample_fmt,  in_sample_rate,
@@ -145,9 +145,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     count = swr_convert(swr, aout, out_sample_nb, (const uint8_t **)ain, in_sample_nb);
 
-    av_freep(&out_data);
-
 end:
+    av_freep(&out_data);
     swr_free(&swr);
 
     return 0;

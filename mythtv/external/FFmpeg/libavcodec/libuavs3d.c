@@ -79,12 +79,6 @@ static void uavs3d_output_callback(uavs3d_io_frm_t *dec_frame) {
 
     frm->pts       = dec_frame->pts;
     frm->pkt_dts   = dec_frame->dts;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-    frm->pkt_pos   = dec_frame->pkt_pos;
-    frm->pkt_size  = dec_frame->pkt_size;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     if (dec_frame->type < 0 || dec_frame->type >= FF_ARRAY_ELEMS(ff_avs3_image_type)) {
         av_log(NULL, AV_LOG_WARNING, "Error frame type in uavs3d: %d.\n", dec_frame->type);
@@ -106,6 +100,91 @@ FF_ENABLE_DEPRECATION_WARNINGS
     uavs3d_img_cpy_cvt(&frm_out, dec_frame, dec_frame->bit_depth);
 }
 
+#define UAVS3D_CHECK_INVALID_RANGE(v, l, r) ((v)<(l)||(v)>(r))
+
+static int libuavs3d_on_seq_header(AVCodecContext *avctx)
+{
+    uavs3d_context *h = avctx->priv_data;
+    uavs3d_io_frm_t *frm_dec = &h->dec_frame;
+    struct uavs3d_com_seqh_t *seqh = frm_dec->seqhdr;
+    int ret;
+
+    if (UAVS3D_CHECK_INVALID_RANGE(seqh->frame_rate_code, 0, 15)) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid frame rate code: %d.\n", seqh->frame_rate_code);
+        seqh->frame_rate_code = 3; // default 25 fps
+    } else {
+        avctx->framerate.num = ff_avs3_frame_rate_tab[seqh->frame_rate_code].num;
+        avctx->framerate.den = ff_avs3_frame_rate_tab[seqh->frame_rate_code].den;
+    }
+    avctx->has_b_frames = seqh->output_reorder_delay;
+    avctx->pix_fmt = seqh->bit_depth_internal == 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P10;
+    ret = ff_set_dimensions(avctx, seqh->horizontal_size, seqh->vertical_size);
+    if (ret < 0)
+        return ret;
+    h->got_seqhdr = 1;
+
+    if (seqh->colour_description) {
+        if (UAVS3D_CHECK_INVALID_RANGE(seqh->colour_primaries, 0, 9) ||
+            UAVS3D_CHECK_INVALID_RANGE(seqh->transfer_characteristics, 0, 14) ||
+            UAVS3D_CHECK_INVALID_RANGE(seqh->matrix_coefficients, 0, 11)) {
+            av_log(avctx, AV_LOG_ERROR,
+                   "Invalid colour description: primaries: %d"
+                   "transfer characteristics: %d"
+                   "matrix coefficients: %d.\n",
+                   seqh->colour_primaries,
+                   seqh->transfer_characteristics,
+                   seqh->matrix_coefficients);
+        } else {
+            avctx->color_primaries = ff_avs3_color_primaries_tab[seqh->colour_primaries];
+            avctx->color_trc       = ff_avs3_color_transfer_tab [seqh->transfer_characteristics];
+            avctx->colorspace      = ff_avs3_color_matrix_tab   [seqh->matrix_coefficients];
+        }
+    }
+
+    return 0;
+}
+
+static int libuavs3d_decode_extradata(AVCodecContext *avctx)
+{
+    uavs3d_context *h = avctx->priv_data;
+    uint8_t *header = avctx->extradata;
+    int header_size = avctx->extradata_size;
+    uavs3d_io_frm_t *frm_dec = &h->dec_frame;
+
+    if (avctx->extradata_size < 4) {
+        av_log(avctx, AV_LOG_WARNING, "Invalid extradata size %d\n",
+               avctx->extradata_size);
+        return 0;
+    }
+
+    if (header[0] == 1) {
+        // Skip configurationVersion and sequence_header_length
+        header += 3;
+        // Also remove library_dependency_idc at the end
+        header_size -= 4;
+    }
+
+    frm_dec->nal_type = 0;
+    frm_dec->pkt_pos = 0;
+    frm_dec->pkt_size = header_size;
+    frm_dec->bs = header;
+    frm_dec->bs_len = header_size;
+    frm_dec->pts = 0;
+    frm_dec->dts = 0;
+    uavs3d_decode(h->dec_handle, frm_dec);
+    if (frm_dec->nal_type == NAL_SEQ_HEADER) {
+        int ret = libuavs3d_on_seq_header(avctx);
+        if (ret < 0)
+            av_log(avctx, AV_LOG_WARNING,
+                   "Process sequence header failed, %s\n", av_err2str(ret));
+    } else {
+        av_log(avctx, AV_LOG_WARNING,
+               "Missing sequence header in extradata\n");
+    }
+
+    return 0;
+}
+
 static av_cold int libuavs3d_init(AVCodecContext *avctx)
 {
     uavs3d_context *h = avctx->priv_data;
@@ -119,6 +198,9 @@ static av_cold int libuavs3d_init(AVCodecContext *avctx)
     if (!h->dec_handle) {
         return AVERROR(ENOMEM);
     }
+
+    if (avctx->extradata)
+        return libuavs3d_decode_extradata(avctx);
 
     return 0;
 }
@@ -146,7 +228,6 @@ static void libuavs3d_flush(AVCodecContext * avctx)
     }
 }
 
-#define UAVS3D_CHECK_INVALID_RANGE(v, l, r) ((v)<(l)||(v)>(r))
 static int libuavs3d_decode_frame(AVCodecContext *avctx, AVFrame *frm,
                                   int *got_frame, AVPacket *avpkt)
 {
@@ -176,12 +257,6 @@ static int libuavs3d_decode_frame(AVCodecContext *avctx, AVFrame *frm,
         uavs3d_io_frm_t *frm_dec = &h->dec_frame;
 
         buf_end = buf + buf_size;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-        frm_dec->pkt_pos  = avpkt->pos;
-        frm_dec->pkt_size = avpkt->size;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
         while (!finish) {
             int bs_len;
@@ -207,38 +282,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
             buf_ptr += bs_len;
 
             if (frm_dec->nal_type == NAL_SEQ_HEADER) {
-                struct uavs3d_com_seqh_t *seqh = frm_dec->seqhdr;
-                if (UAVS3D_CHECK_INVALID_RANGE(seqh->frame_rate_code, 0, 15)) {
-                    av_log(avctx, AV_LOG_ERROR, "Invalid frame rate code: %d.\n", seqh->frame_rate_code);
-                    seqh->frame_rate_code = 3; // default 25 fps
-                } else {
-                    avctx->framerate.num = ff_avs3_frame_rate_tab[seqh->frame_rate_code].num;
-                    avctx->framerate.den = ff_avs3_frame_rate_tab[seqh->frame_rate_code].den;
-                }
-                avctx->has_b_frames = seqh->output_reorder_delay;
-                avctx->pix_fmt = seqh->bit_depth_internal == 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P10LE;
-                ret = ff_set_dimensions(avctx, seqh->horizontal_size, seqh->vertical_size);
+                ret = libuavs3d_on_seq_header(avctx);
                 if (ret < 0)
                     return ret;
-                h->got_seqhdr = 1;
-
-                if (seqh->colour_description) {
-                    if (UAVS3D_CHECK_INVALID_RANGE(seqh->colour_primaries, 0, 9) ||
-                        UAVS3D_CHECK_INVALID_RANGE(seqh->transfer_characteristics, 0, 14) ||
-                        UAVS3D_CHECK_INVALID_RANGE(seqh->matrix_coefficients, 0, 11)) {
-                        av_log(avctx, AV_LOG_ERROR,
-                               "Invalid colour description: primaries: %d"
-                               "transfer characteristics: %d"
-                               "matrix coefficients: %d.\n",
-                               seqh->colour_primaries,
-                               seqh->transfer_characteristics,
-                               seqh->matrix_coefficients);
-                    } else {
-                        avctx->color_primaries = ff_avs3_color_primaries_tab[seqh->colour_primaries];
-                        avctx->color_trc       = ff_avs3_color_transfer_tab [seqh->transfer_characteristics];
-                        avctx->colorspace      = ff_avs3_color_matrix_tab   [seqh->matrix_coefficients];
-                    }
-                }
             }
             if (frm_dec->got_pic) {
                 break;

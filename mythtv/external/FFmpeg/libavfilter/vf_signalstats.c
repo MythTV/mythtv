@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Mark Heath mjpeg0 @ silicontrip dot org
  * Copyright (c) 2014 Clément Bœsch
- * Copyright (c) 2014 Dave Rice @dericed
+ * Copyright (c) 2014 Dave Rice
  *
  * This file is part of FFmpeg.
  *
@@ -304,7 +304,7 @@ static int filter8_tout(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
             continue;
 
         // detect two pixels above and below (to eliminate interlace artefacts)
-        // should check that video format is infact interlaced.
+        // should check that video format is in fact interlaced.
 
 #define FILTER(i, j) \
         filter_tout_outlier(p[(y-j) * lw + x + i], \
@@ -352,7 +352,7 @@ static int filter16_tout(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs
             continue;
 
         // detect two pixels above and below (to eliminate interlace artefacts)
-        // should check that video format is infact interlaced.
+        // should check that video format is in fact interlaced.
 
         if (y - 2 >= 0 && y + 2 < h) {
             for (x = 1; x < w - 1; x++) {
@@ -827,15 +827,15 @@ static const AVFilterPad signalstats_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_signalstats = {
-    .name          = "signalstats",
-    .description   = "Generate statistics from video analysis.",
+const FFFilter ff_vf_signalstats = {
+    .p.name        = "signalstats",
+    .p.description = "Generate statistics from video analysis.",
+    .p.priv_class  = &signalstats_class,
+    .p.flags       = AVFILTER_FLAG_SLICE_THREADS,
     .init          = init,
     .uninit        = uninit,
     .priv_size     = sizeof(SignalstatsContext),
     FILTER_INPUTS(signalstats_inputs),
     FILTER_OUTPUTS(signalstats_outputs),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .priv_class    = &signalstats_class,
-    .flags         = AVFILTER_FLAG_SLICE_THREADS,
 };

@@ -27,12 +27,14 @@
 #include "config.h"
 
 #include "libavutil/attributes.h"
+#include "libavutil/avassert.h"
 #include "libavutil/cpu.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/ppc/cpu.h"
 #include "libavutil/ppc/util_altivec.h"
 
 #include "libavcodec/mpegvideo.h"
+#include "libavcodec/mpegvideo_unquantize.h"
 
 #if HAVE_ALTIVEC
 
@@ -41,7 +43,7 @@
 static void dct_unquantize_h263_altivec(MpegEncContext *s,
                                  int16_t *block, int n, int qscale)
 {
-    int i, level, qmul, qadd;
+    int i, qmul, qadd;
     int nCoeffs;
 
     qadd = (qscale - 1) | 1;
@@ -56,11 +58,14 @@ static void dct_unquantize_h263_altivec(MpegEncContext *s,
         }else
             qadd = 0;
         i = 1;
-        nCoeffs= 63; //does not always use zigzag table
+        if (s->ac_pred)
+            nCoeffs = 63;
+        else
+            nCoeffs = s->intra_scantable.raster_end[s->block_last_index[n]];
     } else {
         i = 0;
         av_assert2(s->block_last_index[n]>=0);
-        nCoeffs= s->intra_scantable.raster_end[ s->block_last_index[n] ];
+        nCoeffs = s->inter_scantable.raster_end[s->block_last_index[n]];
     }
 
     {
@@ -70,7 +75,6 @@ static void dct_unquantize_h263_altivec(MpegEncContext *s,
         register vector signed short blockv, qmulv, qaddv, nqaddv, temp1;
         register vector bool short blockv_null, blockv_neg;
         register short backup_0 = block[0];
-        register int j = 0;
 
         qmulv = vec_splat((vec_s16)vec_lde(0, &qmul8), 0);
         qaddv = vec_splat((vec_s16)vec_lde(0, &qadd8), 0);
@@ -78,7 +82,7 @@ static void dct_unquantize_h263_altivec(MpegEncContext *s,
 
         // vectorize all the 16 bytes-aligned blocks
         // of 8 elements
-        for(; (j + 7) <= nCoeffs ; j+=8) {
+        for (register int j = 0; j <= nCoeffs ; j += 8) {
             blockv = vec_ld(j << 1, block);
             blockv_neg = vec_cmplt(blockv, vczero);
             blockv_null = vec_cmpeq(blockv, vczero);
@@ -91,22 +95,6 @@ static void dct_unquantize_h263_altivec(MpegEncContext *s,
             vec_st(blockv, j << 1, block);
         }
 
-        // if nCoeffs isn't a multiple of 8, finish the job
-        // using good old scalar units.
-        // (we could do it using a truncated vector,
-        // but I'm not sure it's worth the hassle)
-        for(; j <= nCoeffs ; j++) {
-            level = block[j];
-            if (level) {
-                if (level < 0) {
-                    level = level * qmul - qadd;
-                } else {
-                    level = level * qmul + qadd;
-                }
-                block[j] = level;
-            }
-        }
-
         if (i == 1) {
             // cheat. this avoid special-casing the first iteration
             block[0] = backup_0;
@@ -116,16 +104,13 @@ static void dct_unquantize_h263_altivec(MpegEncContext *s,
 
 #endif /* HAVE_ALTIVEC */
 
-av_cold void ff_mpv_common_init_ppc(MpegEncContext *s)
+av_cold void ff_mpv_unquantize_init_ppc(MPVUnquantDSPContext *s, int bitexact)
 {
 #if HAVE_ALTIVEC
     if (!PPC_ALTIVEC(av_get_cpu_flags()))
         return;
 
-    if ((s->avctx->dct_algo == FF_DCT_AUTO) ||
-        (s->avctx->dct_algo == FF_DCT_ALTIVEC)) {
-        s->dct_unquantize_h263_intra = dct_unquantize_h263_altivec;
-        s->dct_unquantize_h263_inter = dct_unquantize_h263_altivec;
-    }
+    s->dct_unquantize_h263_intra = dct_unquantize_h263_altivec;
+    s->dct_unquantize_h263_inter = dct_unquantize_h263_altivec;
 #endif /* HAVE_ALTIVEC */
 }

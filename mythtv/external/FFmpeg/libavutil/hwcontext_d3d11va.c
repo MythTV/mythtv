@@ -42,6 +42,8 @@
 #include "thread.h"
 #include "compat/w32dlfcn.h"
 
+#define MAX_ARRAY_SIZE 64 // Driver specification limits ArraySize to 64 for decoder-bound resources
+
 typedef HRESULT(WINAPI *PFN_CREATE_DXGI_FACTORY)(REFIID riid, void **ppFactory);
 
 static AVOnce functions_loaded = AV_ONCE_INIT;
@@ -102,6 +104,10 @@ static const struct {
     { DXGI_FORMAT_Y210,         AV_PIX_FMT_Y210 },
     { DXGI_FORMAT_Y410,         AV_PIX_FMT_XV30 },
     { DXGI_FORMAT_P016,         AV_PIX_FMT_P012 },
+    { DXGI_FORMAT_Y216,         AV_PIX_FMT_Y216 },
+    { DXGI_FORMAT_Y416,         AV_PIX_FMT_XV48 },
+    // There is no 12bit pixel format defined in DXGI_FORMAT*, use 16bit to compatible
+    // with 12 bit AV_PIX_FMT* formats.
     { DXGI_FORMAT_Y216,         AV_PIX_FMT_Y212 },
     { DXGI_FORMAT_Y416,         AV_PIX_FMT_XV36 },
     // Special opaque formats. The pix_fmt is merely a place holder, as the
@@ -283,6 +289,8 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
                av_get_pix_fmt_name(ctx->sw_format));
         return AVERROR(EINVAL);
     }
+
+    ctx->initial_pool_size = FFMIN(ctx->initial_pool_size, MAX_ARRAY_SIZE);
 
     texDesc = (D3D11_TEXTURE2D_DESC){
         .Width      = ctx->width,

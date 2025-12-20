@@ -140,9 +140,11 @@ static av_cold void uninit(AVFilterContext *ctx)
     AV_PIX_FMT_YUVA420P16, AV_PIX_FMT_YUVA422P16, AV_PIX_FMT_YUVA444P16, \
     AV_PIX_FMT_GBRP16, AV_PIX_FMT_GBRAP16, AV_PIX_FMT_GRAY16,
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    LUT2Context *s = ctx->priv;
+    const LUT2Context *s = ctx->priv;
     static const enum AVPixelFormat all_pix_fmts[] = {
         BIT8_FMTS
         BIT9_FMTS
@@ -178,9 +180,9 @@ static int query_formats(AVFilterContext *ctx)
     int ret;
 
     if (s->tlut2 || !s->odepth)
-        return ff_set_common_formats_from_list(ctx, all_pix_fmts);
+        return ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, all_pix_fmts);
 
-    ret = ff_formats_ref(ff_make_format_list(all_pix_fmts), &ctx->inputs[0]->outcfg.formats);
+    ret = ff_formats_ref(ff_make_format_list(all_pix_fmts), &cfg_in[0]->formats);
     if (ret < 0)
         return ret;
 
@@ -191,11 +193,10 @@ static int query_formats(AVFilterContext *ctx)
     case 12: pix_fmts = bit12_pix_fmts; break;
     case 14: pix_fmts = bit14_pix_fmts; break;
     case 16: pix_fmts = bit16_pix_fmts; break;
-    default: av_log(ctx, AV_LOG_ERROR, "Unsupported output bit depth %d.\n", s->odepth);
-             return AVERROR(EINVAL);
+    default: av_assert0(0);
     }
 
-    return ff_formats_ref(ff_make_format_list(pix_fmts), &ctx->outputs[0]->incfg.formats);
+    return ff_formats_ref(ff_make_format_list(pix_fmts), &cfg_out[0]->formats);
 }
 
 static int config_inputx(AVFilterLink *inlink)
@@ -563,19 +564,19 @@ static int process_command(AVFilterContext *ctx, const char *cmd, const char *ar
 
 FRAMESYNC_DEFINE_CLASS(lut2, LUT2Context, fs);
 
-const AVFilter ff_vf_lut2 = {
-    .name          = "lut2",
-    .description   = NULL_IF_CONFIG_SMALL("Compute and apply a lookup table from two video inputs."),
+const FFFilter ff_vf_lut2 = {
+    .p.name        = "lut2",
+    .p.description = NULL_IF_CONFIG_SMALL("Compute and apply a lookup table from two video inputs."),
+    .p.priv_class  = &lut2_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
+                     AVFILTER_FLAG_SLICE_THREADS,
     .preinit       = lut2_framesync_preinit,
     .priv_size     = sizeof(LUT2Context),
-    .priv_class    = &lut2_class,
     .uninit        = uninit,
     .activate      = activate,
     FILTER_INPUTS(inputs),
     FILTER_OUTPUTS(outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
-                     AVFILTER_FLAG_SLICE_THREADS,
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = process_command,
 };
 
@@ -586,6 +587,12 @@ static av_cold int init(AVFilterContext *ctx)
     LUT2Context *s = ctx->priv;
 
     s->tlut2 = !strcmp(ctx->filter->name, "tlut2");
+
+    if (!(s->odepth == 0 || s->odepth == 8 || s->odepth == 9 || s->odepth == 10 ||
+          s->odepth == 12 || s->odepth == 14 || s->odepth == 16)) {
+        av_log(ctx, AV_LOG_ERROR, "Unsupported output bit depth %d.\n", s->odepth);
+        return AVERROR(EINVAL);
+    }
 
     return 0;
 }
@@ -612,6 +619,8 @@ static int tlut2_filter_frame(AVFilterLink *inlink, AVFrame *frame)
             }
 
             av_frame_copy_props(out, frame);
+            av_frame_side_data_remove_by_props(&out->side_data, &out->nb_side_data,
+                                               AV_SIDE_DATA_PROP_COLOR_DEPENDENT);
 
             td.out  = out;
             td.srcx = frame;
@@ -654,18 +663,18 @@ static const AVFilterPad tlut2_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_tlut2 = {
-    .name          = "tlut2",
-    .description   = NULL_IF_CONFIG_SMALL("Compute and apply a lookup table from two successive frames."),
+const FFFilter ff_vf_tlut2 = {
+    .p.name        = "tlut2",
+    .p.description = NULL_IF_CONFIG_SMALL("Compute and apply a lookup table from two successive frames."),
+    .p.priv_class  = &tlut2_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
+                     AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(LUT2Context),
-    .priv_class    = &tlut2_class,
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(tlut2_inputs),
     FILTER_OUTPUTS(tlut2_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
-                     AVFILTER_FLAG_SLICE_THREADS,
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = process_command,
 };
 

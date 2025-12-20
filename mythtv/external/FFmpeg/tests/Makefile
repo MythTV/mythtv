@@ -97,21 +97,24 @@ TRANSCODE = $(call ALLYES, $(firstword $(1))_ENCODER $(lastword $(1))_DECODER \
 REMUX = $(call ALLYES, $(firstword $(1))_MUXER $(lastword $(1))_DEMUXER \
                        $(2) FILE_PROTOCOL PIPE_PROTOCOL FRAMECRC_MUXER)
 
-DEMDEC  = $(call ALLYES, $(1)_DEMUXER $(2:%=%_DECODER) $(3) FILE_PROTOCOL)
-ENCMUX  = $(call ALLYES, $(1:%=%_ENCODER) $(2)_MUXER   $(3))
+DEMDEC  = $(call ALLYES, $(1:%=%_DEMUXER) $(2:%=%_DECODER) $(3) FILE_PROTOCOL)
+ENCMUX  = $(call ALLYES, $(1:%=%_ENCODER) $(2:%=%_MUXER)   $(3))
 
-FRAMEMD5 = $(call ALLYES, $(1)_DEMUXER $(2:%=%_DECODER) $(3)                  \
+FRAMEMD5 = $(call ALLYES, $(1:%=%_DEMUXER) $(2:%=%_DECODER) $(3)              \
                           PCM_S16LE_ENCODER RAWVIDEO_ENCODER FRAMEMD5_MUXER   \
                           PIPE_PROTOCOL FILE_PROTOCOL)
-FRAMECRC = $(call ALLYES, $(1)_DEMUXER $(2:%=%_DECODER) $(3)                  \
+FRAMECRC = $(call ALLYES, $(1:%=%_DEMUXER) $(2:%=%_DECODER) $(3)              \
                           PCM_S16LE_ENCODER RAWVIDEO_ENCODER FRAMECRC_MUXER   \
+                          PIPE_PROTOCOL FILE_PROTOCOL)
+CRC = $(call ALLYES, $(1:%=%_DEMUXER) $(2:%=%_DECODER) $(3)              \
+                          PCM_S16LE_ENCODER RAWVIDEO_ENCODER CRC_MUXER   \
                           PIPE_PROTOCOL FILE_PROTOCOL)
 
 # Variant of DEMDEC for use with the "pcm" command.
-PCM = $(call ALLYES, $(1)_DEMUXER $(2)_DECODER  $(3) FILE_PROTOCOL            \
+PCM = $(call ALLYES, $(1:%=%_DEMUXER) $(2:%=%_DECODER)  $(3) FILE_PROTOCOL    \
                      PCM_S16LE_ENCODER PCM_S16LE_MUXER PIPE_PROTOCOL)
 
-DEMMUX  = $(call ALLYES, $(1)_DEMUXER $(2)_MUXER $(3) FILE_PROTOCOL)
+DEMMUX  = $(call ALLYES, $(1:%=%_DEMUXER) $(2:%=%_MUXER) $(3) FILE_PROTOCOL)
 
 # Variant of FRAMECRC for the cases with -lavfi where no demuxer is involved.
 FILTERFRAMECRC     = $(call ALLYES, $(1:%=%_FILTER) $(2) PCM_S16LE_ENCODER    \
@@ -120,9 +123,9 @@ FILTERFRAMECRC     = $(call ALLYES, $(1:%=%_FILTER) $(2) PCM_S16LE_ENCODER    \
 FILTERDEMDEC       = $(call ALLYES, $(1:%=%_FILTER) $(2:%=%_DEMUXER) $(3:%=%_DECODER) \
                                     $(4) PCM_S16LE_ENCODER RAWVIDEO_ENCODER   \
                                     FRAMECRC_MUXER FILE_PROTOCOL PIPE_PROTOCOL)
-FILTERDEMDECENCMUX = $(call ALLYES, $(1:%=%_FILTER) $(2)_DEMUXER $(3)_DECODER $(4)_ENCODER $(5)_MUXER $(6) FILE_PROTOCOL)
+FILTERDEMDECENCMUX = $(call ALLYES, $(1:%=%_FILTER) $(2:%=%_DEMUXER) $(3:%=%_DECODER) $(4:%=%_ENCODER) $(5:%=%_MUXER) $(6) FILE_PROTOCOL)
 
-PARSERDEMDEC       = $(call ALLYES, $(1)_PARSER $(2)_DEMUXER $(3)_DECODER $(4) FILE_PROTOCOL)
+PARSERDEMDEC       = $(call ALLYES, $(1:%=%_PARSER) $(2:%=%_DEMUXER) $(3:%=%_DECODER) $(4) FILE_PROTOCOL)
 
 # Allow overriding CONFIG_LARGE_TESTS via LARGE_TESTS, if set on the
 # make command line.
@@ -156,6 +159,7 @@ include $(SRC_PATH)/tests/fate/amrnb.mak
 include $(SRC_PATH)/tests/fate/amrwb.mak
 include $(SRC_PATH)/tests/fate/api.mak
 include $(SRC_PATH)/tests/fate/apng.mak
+include $(SRC_PATH)/tests/fate/apv.mak
 include $(SRC_PATH)/tests/fate/atrac.mak
 include $(SRC_PATH)/tests/fate/audio.mak
 include $(SRC_PATH)/tests/fate/bmp.mak
@@ -219,6 +223,9 @@ include $(SRC_PATH)/tests/fate/mpeg4.mak
 include $(SRC_PATH)/tests/fate/mpegps.mak
 include $(SRC_PATH)/tests/fate/mpegts.mak
 include $(SRC_PATH)/tests/fate/mxf.mak
+include $(SRC_PATH)/tests/fate/ogg-vorbis.mak
+include $(SRC_PATH)/tests/fate/ogg-flac.mak
+include $(SRC_PATH)/tests/fate/ogg-opus.mak
 include $(SRC_PATH)/tests/fate/oma.mak
 include $(SRC_PATH)/tests/fate/opus.mak
 include $(SRC_PATH)/tests/fate/pcm.mak
@@ -263,6 +270,7 @@ FATE_EXTERN-$(CONFIG_FFMPEG)  += $(FATE_SAMPLES_AVCONV) $(FATE_SAMPLES_FFMPEG)
 FATE_EXTERN-$(CONFIG_FFPROBE) += $(FATE_SAMPLES_FFPROBE)
 FATE_SAMPLES_FFMPEG_FFPROBE   += $(FATE_SAMPLES_FFMPEG_FFPROBE-yes)
 FATE_EXTERN-$(call ALLYES, FFMPEG FFPROBE) += $(FATE_SAMPLES_FFMPEG_FFPROBE)
+FATE_EXTERN-yes := $(if $(CONFIG_FILE_PROTOCOL), $(FATE_EXTERN-yes))
 FATE_EXTERN                   += $(FATE_EXTERN-yes) $(FATE_SAMPLES_FASTSTART)
 
 FATE += $(FATE-yes)
@@ -277,6 +285,7 @@ $(FATE_FFPROBE) $(FATE_FFMPEG_FFPROBE) $(FATE_SAMPLES_FFPROBE) $(FATE_SAMPLES_FF
 $(FATE_SAMPLES_FASTSTART): tools/qt-faststart$(EXESUF)
 $(FATE_SAMPLES_DUMP_DATA) $(FATE_SAMPLES_DUMP_DATA-yes): tools/venc_data_dump$(EXESUF)
 $(FATE_SAMPLES_SCALE_SLICE): tools/scale_slice_test$(EXESUF)
+$(FATE_SAMPLES_DUMP_STREAM_META): tests/api/api-dump-stream-meta-test$(EXESUF)
 
 ifdef SAMPLES
 FATE += $(FATE_EXTERN)
@@ -312,6 +321,12 @@ $(FATE): $(FATE_UTILS:%=tests/%$(HOSTEXESUF)) | $(FATE_OUTDIRS)
 
 fate-list:
 	@printf '%s\n' $(sort $(FATE))
+
+fate-list-failing:
+	@! ls tests/data/fate/*.rep >/dev/null 2>&1 || awk -F: '$$2 != 0 { print "fate-" $$1 }' tests/data/fate/*.rep
+
+fate-clear-reports:
+	@rm -f tests/data/fate/*.rep
 
 coverage.info: TAG = LCOV
 coverage.info:

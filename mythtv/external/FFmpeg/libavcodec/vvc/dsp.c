@@ -44,6 +44,15 @@ static int vvc_sad(const int16_t *src0, const int16_t *src1, int dx, int dy,
     return sad;
 }
 
+static av_always_inline void unpack_mip_info(int *intra_mip_transposed_flag,
+    int *intra_mip_mode, const uint8_t mip_info)
+{
+    if (intra_mip_transposed_flag)
+        *intra_mip_transposed_flag = (mip_info >> 1) & 0x1;
+    if (intra_mip_mode)
+        *intra_mip_mode = (mip_info >> 2) & 0xf;
+}
+
 typedef struct IntraEdgeParams {
     uint8_t* top;
     uint8_t* left;
@@ -102,6 +111,8 @@ void ff_vvc_dsp_init(VVCDSPContext *vvcdsp, int bit_depth)
 
 #if ARCH_AARCH64
     ff_vvc_dsp_init_aarch64(vvcdsp, bit_depth);
+#elif ARCH_RISCV
+    ff_vvc_dsp_init_riscv(vvcdsp, bit_depth);
 #elif ARCH_X86
     ff_vvc_dsp_init_x86(vvcdsp, bit_depth);
 #endif

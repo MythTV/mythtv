@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Institue of Software Chinese Academy of Sciences (ISCAS).
+ * Copyright (c) 2024 Institute of Software Chinese Academy of Sciences (ISCAS).
  * Copyright © 2024 Rémi Denis-Courmont.
  *
  * This file is part of FFmpeg.
@@ -97,7 +97,6 @@ func ff_vp8_luma_dc_wht_rvv, zve64x
         vsse16.v    v3, (t3), t0
         ret
 endfunc
-#endif
 
 func ff_vp8_idct_add_rvv, zve32x
         lpad    0
@@ -158,6 +157,7 @@ func ff_vp8_idct_add_rvv, zve32x
         vsub.vv    v3, v4, v7
         jr         t0
 endfunc
+#endif
 
 func ff_vp8_idct_dc_add_rvv, zve32x
         lpad    0
@@ -365,7 +365,7 @@ func ff_put_vp8_bilin\len\()_hv_rvv, zve32x
 endfunc
 .endr
 
-const subpel_filters
+const subpel_filters, align=0
         .byte 0,  -6, 123,  12,  -1, 0
         .byte 2, -11, 108,  36,  -8, 1
         .byte 0,  -9,  93,  50,  -6, 0

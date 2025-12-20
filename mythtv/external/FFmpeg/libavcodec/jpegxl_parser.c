@@ -155,12 +155,12 @@ typedef struct JXLParseContext {
 
     /* using ISOBMFF-based container */
     int container;
-    int skip;
+    int64_t skip;
     int copied;
-    int collected_size;
-    int codestream_length;
+    int64_t collected_size;
+    int64_t codestream_length;
     int skipped_icc;
-    int next;
+    int64_t next;
 
     uint8_t cs_buffer[4096 + AV_INPUT_BUFFER_PADDING_SIZE];
 } JXLParseContext;
@@ -352,6 +352,8 @@ static int decode_hybrid_varlen_uint(GetBitContext *gb, JXLEntropyDecoder *dec,
 
     if (bundle->lz77_enabled && token >= bundle->lz77_min_symbol) {
         const JXLSymbolDistribution *lz77dist = &bundle->dists[bundle->cluster_map[bundle->num_dist - 1]];
+        if (!dec->num_decoded)
+            return AVERROR_INVALIDDATA;
         ret = read_hybrid_uint(gb, &bundle->lz_len_conf, token - bundle->lz77_min_symbol, &dec->num_to_copy);
         if (ret < 0)
             return ret;
@@ -531,6 +533,7 @@ static int read_dist_clustering(GetBitContext *gb, JXLEntropyDecoder *dec, JXLDi
         dec->state = -1;
         /* it's not going to necessarily be zero after reading */
         dec->num_to_copy = 0;
+        dec->num_decoded = 0;
         dist_bundle_close(&nested);
         if (use_mtf) {
             uint8_t mtf[256];
@@ -1311,7 +1314,14 @@ static int parse_frame_header(void *avctx, JXLParseContext *ctx, GetBitContext *
     // permuted toc
     if (get_bits1(gb)) {
         JXLEntropyDecoder dec;
-        uint32_t end, lehmer = 0;
+        int64_t end, lehmer = 0;
+        /* parser sanity check to prevent TOC perm from spinning cpu */
+        if (width > meta->coded_width * 8 || height > meta->coded_height * 8) {
+            av_log(avctx, AV_LOG_WARNING, "frame of size %" PRIu32 "x%" PRIu32
+                " exceeds max size of %" PRIu32 "x%" PRIu32 ", aborting parser\n",
+                width, height, meta->coded_width * 8, meta->coded_height * 8);
+            return AVERROR_INVALIDDATA;
+        }
         ret = entropy_decoder_init(avctx, gb, &dec, 8);
         if (ret < 0)
             return ret;
@@ -1320,15 +1330,15 @@ static int parse_frame_header(void *avctx, JXLParseContext *ctx, GetBitContext *
             return AVERROR_BUFFER_TOO_SMALL;
         }
         end = entropy_decoder_read_symbol(gb, &dec, toc_context(toc_count));
-        if (end > toc_count) {
+        if (end < 0 || end > toc_count) {
             entropy_decoder_close(&dec);
             return AVERROR_INVALIDDATA;
         }
         for (uint32_t i = 0; i < end; i++) {
             lehmer = entropy_decoder_read_symbol(gb, &dec, toc_context(lehmer));
-            if (get_bits_left(gb) < 0) {
+            if (lehmer < 0 || get_bits_left(gb) < 0) {
                 entropy_decoder_close(&dec);
-                return AVERROR_BUFFER_TOO_SMALL;
+                return lehmer < 0 ? lehmer : AVERROR_BUFFER_TOO_SMALL;
             }
         }
         entropy_decoder_close(&dec);
@@ -1393,7 +1403,7 @@ static int skip_boxes(JXLParseContext *ctx, const uint8_t *buf, int buf_size)
     return 0;
 }
 
-static int try_parse(AVCodecParserContext *s, AVCodecContext *avctx, JXLParseContext *ctx,
+static int64_t try_parse(AVCodecParserContext *s, AVCodecContext *avctx, JXLParseContext *ctx,
                      const uint8_t *buf, int buf_size)
 {
     int ret, cs_buflen, header_skip;
@@ -1486,10 +1496,10 @@ static int jpegxl_parse(AVCodecParserContext *s, AVCodecContext *avctx,
     }
 
     if ((!ctx->container || !ctx->codestream_length) && !ctx->next) {
-        ret = try_parse(s, avctx, ctx, pbuf, pindex);
-        if (ret < 0)
+        int64_t ret64 = try_parse(s, avctx, ctx, pbuf, pindex);
+        if (ret64 < 0)
             goto flush;
-        ctx->next = ret;
+        ctx->next = ret64;
         if (ctx->container)
             ctx->skip += ctx->next;
     }
@@ -1531,7 +1541,7 @@ flush:
 }
 
 const AVCodecParser ff_jpegxl_parser = {
-    .codec_ids      = { AV_CODEC_ID_JPEGXL },
+    .codec_ids      = { AV_CODEC_ID_JPEGXL, AV_CODEC_ID_JPEGXL_ANIM },
     .priv_data_size = sizeof(JXLParseContext),
     .parser_parse   = jpegxl_parse,
     .parser_close   = ff_parse_close,

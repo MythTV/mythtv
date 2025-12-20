@@ -311,7 +311,7 @@
     out      = __lasx_xvadd_w(out, out0);                             \
 }
 
-void ff_hscale_8_to_15_lasx(SwsContext *c, int16_t *dst, int dstW,
+void ff_hscale_8_to_15_lasx(SwsInternal *c, int16_t *dst, int dstW,
                             const uint8_t *src, const int16_t *filter,
                             const int32_t *filterPos, int filterSize)
 {
@@ -471,7 +471,7 @@ void ff_hscale_8_to_15_lasx(SwsContext *c, int16_t *dst, int dstW,
     }
 }
 
-void ff_hscale_8_to_19_lasx(SwsContext *c, int16_t *_dst, int dstW,
+void ff_hscale_8_to_19_lasx(SwsInternal *c, int16_t *_dst, int dstW,
                             const uint8_t *src, const int16_t *filter,
                             const int32_t *filterPos, int filterSize)
 {
@@ -673,11 +673,11 @@ void ff_hscale_8_to_19_lasx(SwsContext *c, int16_t *_dst, int dstW,
     out      = __lasx_xvadd_w(out, out0);                                    \
 }
 
-void ff_hscale_16_to_15_lasx(SwsContext *c, int16_t *dst, int dstW,
+void ff_hscale_16_to_15_lasx(SwsInternal *c, int16_t *dst, int dstW,
                              const uint8_t *_src, const int16_t *filter,
                              const int32_t *filterPos, int filterSize)
 {
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(c->srcFormat);
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(c->opts.src_format);
     int i;
     const uint16_t *src = (const uint16_t *) _src;
     int sh              = desc->comp[0].depth - 1;
@@ -688,7 +688,7 @@ void ff_hscale_16_to_15_lasx(SwsContext *c, int16_t *dst, int dstW,
     __m256i zero = __lasx_xvldi(0);
 
     if (sh < 15) {
-        sh = isAnyRGB(c->srcFormat) || c->srcFormat==AV_PIX_FMT_PAL8 ? 13 :
+        sh = isAnyRGB(c->opts.src_format) || c->opts.src_format==AV_PIX_FMT_PAL8 ? 13 :
                       (desc->comp[0].depth - 1);
     } else if (desc->flags && AV_PIX_FMT_FLAG_FLOAT) {
         sh = 15;
@@ -820,11 +820,11 @@ void ff_hscale_16_to_15_lasx(SwsContext *c, int16_t *dst, int dstW,
     }
 }
 
-void ff_hscale_16_to_19_lasx(SwsContext *c, int16_t *_dst, int dstW,
+void ff_hscale_16_to_19_lasx(SwsInternal *c, int16_t *_dst, int dstW,
                              const uint8_t *_src, const int16_t *filter,
                              const int32_t *filterPos, int filterSize)
 {
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(c->srcFormat);
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(c->opts.src_format);
     int i;
     int32_t *dst        = (int32_t *) _dst;
     const uint16_t *src = (const uint16_t *) _src;
@@ -835,7 +835,7 @@ void ff_hscale_16_to_19_lasx(SwsContext *c, int16_t *_dst, int dstW,
     __m256i shift;
     __m256i zero = __lasx_xvldi(0);
 
-    if ((isAnyRGB(c->srcFormat) || c->srcFormat == AV_PIX_FMT_PAL8)
+    if ((isAnyRGB(c->opts.src_format) || c->opts.src_format == AV_PIX_FMT_PAL8)
          && desc->comp[0].depth<16) {
         sh = 9;
     } else if (desc->flags & AV_PIX_FMT_FLAG_FLOAT) {

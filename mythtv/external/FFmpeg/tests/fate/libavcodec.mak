@@ -3,6 +3,11 @@ fate-av1-levels: libavcodec/tests/av1_levels$(EXESUF)
 fate-av1-levels: CMD = run libavcodec/tests/av1_levels$(EXESUF)
 fate-av1-levels: REF = /dev/null
 
+FATE_LIBAVCODEC-$(CONFIG_APV_DECODER) += fate-apv-entropy
+fate-apv-entropy: libavcodec/tests/apv$(EXESUF)
+fate-apv-entropy: CMD = run libavcodec/tests/apv$(EXESUF)
+fate-apv-entropy: REF = /dev/null
+
 FATE_LIBAVCODEC-yes += fate-avpacket
 fate-avpacket: libavcodec/tests/avpacket$(EXESUF)
 fate-avpacket: CMD = run libavcodec/tests/avpacket$(EXESUF)
@@ -23,7 +28,7 @@ fate-cabac: libavcodec/tests/cabac$(EXESUF)
 fate-cabac: CMD = run libavcodec/tests/cabac$(EXESUF)
 fate-cabac: CMP = null
 
-FATE_LIBAVCODEC-yes += fate-celp_math
+FATE_LIBAVCODEC-$(CONFIG_CELP_MATH) += fate-celp_math
 fate-celp_math: libavcodec/tests/celp_math$(EXESUF)
 fate-celp_math: CMD = run libavcodec/tests/celp_math$(EXESUF)
 fate-celp_math: CMP = null
@@ -37,6 +42,11 @@ FATE_LIBAVCODEC-$(CONFIG_GOLOMB) += fate-golomb
 fate-golomb: libavcodec/tests/golomb$(EXESUF)
 fate-golomb: CMD = run libavcodec/tests/golomb$(EXESUF)
 fate-golomb: CMP = null
+
+FATE_LIBAVCODEC-$(CONFIG_DXV_ENCODER) += fate-hashtable
+fate-hashtable: libavcodec/tests/hashtable$(EXESUF)
+fate-hashtable: CMD = run libavcodec/tests/hashtable$(EXESUF)
+fate-hashtable: CMP = null
 
 FATE_LIBAVCODEC-$(CONFIG_IDCTDSP) += fate-idct8x8-0 fate-idct8x8-1 fate-idct8x8-2 fate-idct248
 
@@ -70,10 +80,6 @@ FATE_LIBAVCODEC-$(CONFIG_HEVC_METADATA_BSF) += fate-h265-levels
 fate-h265-levels: libavcodec/tests/h265_levels$(EXESUF)
 fate-h265-levels: CMD = run libavcodec/tests/h265_levels$(EXESUF)
 fate-h265-levels: REF = /dev/null
-
-FATE_LIBAVCODEC-$(CONFIG_IIRFILTER) += fate-iirfilter
-fate-iirfilter: libavcodec/tests/iirfilter$(EXESUF)
-fate-iirfilter: CMD = run libavcodec/tests/iirfilter$(EXESUF)
 
 FATE_LIBAVCODEC-$(CONFIG_MPEGVIDEO) += fate-mpeg12framerate
 fate-mpeg12framerate: libavcodec/tests/mpeg12framerate$(EXESUF)

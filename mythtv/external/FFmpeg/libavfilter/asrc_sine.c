@@ -30,6 +30,14 @@
 #include "filters.h"
 #include "formats.h"
 
+typedef struct SamplingContext {
+    uint32_t phi;  ///< current phase of the sine (2pi = 1<<32)
+    uint32_t dphi; ///< phase increment between two samples
+    int phi_rem;   ///< current fractional phase in 1/dphi_den subfractions
+    int dphi_rem;
+    int dphi_den;
+} SamplingContext;
+
 typedef struct SineContext {
     const AVClass *class;
     double frequency;
@@ -40,13 +48,11 @@ typedef struct SineContext {
     int64_t duration;
     int16_t *sin;
     int64_t pts;
-    uint32_t phi;  ///< current phase of the sine (2pi = 1<<32)
-    uint32_t dphi; ///< phase increment between two samples
+    SamplingContext signal;
+    SamplingContext beep;
     unsigned beep_period;
     unsigned beep_index;
     unsigned beep_length;
-    uint32_t phi_beep;  ///< current phase of the beep
-    uint32_t dphi_beep; ///< phase increment of the beep
 } SineContext;
 
 #define CONTEXT SineContext
@@ -143,6 +149,35 @@ enum {
     VAR_VARS_NB
 };
 
+static void sampling_init(SamplingContext *c, double frequency, int sample_rate)
+{
+    AVRational r;
+    int r_den, max_r_den;
+
+    max_r_den   = INT_MAX / sample_rate;
+    frequency   = fmod(frequency, sample_rate);
+    r           = av_d2q(fmod(frequency, 1.0), max_r_den);
+    r_den       = FFMIN(r.den, max_r_den);
+    c->dphi     = ldexp(frequency, 32) / sample_rate;
+    c->dphi_den = r_den * sample_rate;
+    c->dphi_rem = round((ldexp(frequency, 32) / sample_rate - c->dphi) * c->dphi_den);
+    if (c->dphi_rem >= c->dphi_den) {
+        c->dphi++;
+        c->dphi_rem = 0;
+    }
+    c->phi_rem  = (-c->dphi_den - 1) / 2;
+}
+
+static av_always_inline void sampling_advance(SamplingContext *c)
+{
+    c->phi += c->dphi;
+    c->phi_rem += c->dphi_rem;
+    if (c->phi_rem >= 0) {
+        c->phi_rem -= c->dphi_den;
+        c->phi++;
+    }
+}
+
 static av_cold int init(AVFilterContext *ctx)
 {
     int ret;
@@ -150,14 +185,13 @@ static av_cold int init(AVFilterContext *ctx)
 
     if (!(sine->sin = av_malloc(sizeof(*sine->sin) << LOG_PERIOD)))
         return AVERROR(ENOMEM);
-    sine->dphi = ldexp(sine->frequency, 32) / sine->sample_rate + 0.5;
+    sampling_init(&sine->signal, sine->frequency, sine->sample_rate);
     make_sin_table(sine->sin);
 
     if (sine->beep_factor) {
         sine->beep_period = sine->sample_rate;
         sine->beep_length = sine->beep_period / 25;
-        sine->dphi_beep = ldexp(sine->beep_factor * sine->frequency, 32) /
-                          sine->sample_rate + 0.5;
+        sampling_init(&sine->beep, sine->beep_factor * sine->frequency, sine->sample_rate);
     }
 
     ret = av_expr_parse(&sine->samples_per_frame_expr,
@@ -178,22 +212,24 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_freep(&sine->sin);
 }
 
-static av_cold int query_formats(AVFilterContext *ctx)
+static av_cold int query_formats(const AVFilterContext *ctx,
+                                 AVFilterFormatsConfig **cfg_in,
+                                 AVFilterFormatsConfig **cfg_out)
 {
-    SineContext *sine = ctx->priv;
+    const SineContext *sine = ctx->priv;
     static const AVChannelLayout chlayouts[] = { AV_CHANNEL_LAYOUT_MONO, { 0 } };
     int sample_rates[] = { sine->sample_rate, -1 };
     static const enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_S16,
                                                        AV_SAMPLE_FMT_NONE };
-    int ret = ff_set_common_formats_from_list(ctx, sample_fmts);
+    int ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts);
     if (ret < 0)
         return ret;
 
-    ret = ff_set_common_channel_layouts_from_list(ctx, chlayouts);
+    ret = ff_set_common_channel_layouts_from_list2(ctx, cfg_in, cfg_out, chlayouts);
     if (ret < 0)
         return ret;
 
-    return ff_set_common_samplerates_from_list(ctx, sample_rates);
+    return ff_set_common_samplerates_from_list2(ctx, cfg_in, cfg_out, sample_rates);
 }
 
 static av_cold int config_props(AVFilterLink *outlink)
@@ -239,11 +275,11 @@ static int activate(AVFilterContext *ctx)
     samples = (int16_t *)frame->data[0];
 
     for (i = 0; i < nb_samples; i++) {
-        samples[i] = sine->sin[sine->phi >> (32 - LOG_PERIOD)];
-        sine->phi += sine->dphi;
+        samples[i] = sine->sin[sine->signal.phi >> (32 - LOG_PERIOD)];
+        sampling_advance(&sine->signal);
         if (sine->beep_index < sine->beep_length) {
-            samples[i] += sine->sin[sine->phi_beep >> (32 - LOG_PERIOD)] * 2;
-            sine->phi_beep += sine->dphi_beep;
+            samples[i] += sine->sin[sine->beep.phi >> (32 - LOG_PERIOD)] * 2;
+            sampling_advance(&sine->beep);
         }
         if (++sine->beep_index == sine->beep_period)
             sine->beep_index = 0;
@@ -262,15 +298,14 @@ static const AVFilterPad sine_outputs[] = {
     },
 };
 
-const AVFilter ff_asrc_sine = {
-    .name          = "sine",
-    .description   = NULL_IF_CONFIG_SMALL("Generate sine wave audio signal."),
+const FFFilter ff_asrc_sine = {
+    .p.name        = "sine",
+    .p.description = NULL_IF_CONFIG_SMALL("Generate sine wave audio signal."),
+    .p.priv_class  = &sine_class,
     .init          = init,
     .uninit        = uninit,
     .activate      = activate,
     .priv_size     = sizeof(SineContext),
-    .inputs        = NULL,
     FILTER_OUTPUTS(sine_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &sine_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };

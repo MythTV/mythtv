@@ -108,7 +108,7 @@ static int eval_expr(AVFilterContext *avctx)
     var_values[VAR_OVERLAY_X] =
     var_values[VAR_OX]        = av_expr_eval(ox_expr, var_values, NULL);
 
-    /* calc overlay_w and overlay_h again incase relative to ox,oy */
+    /* calc overlay_w and overlay_h again in case relative to ox,oy */
     var_values[VAR_OVERLAY_W] =
     var_values[VAR_OW]        = av_expr_eval(ow_expr, var_values, NULL);
     var_values[VAR_OVERLAY_H] =
@@ -414,11 +414,11 @@ static const AVFilterPad overlay_vaapi_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_overlay_vaapi = {
-    .name            = "overlay_vaapi",
-    .description     = NULL_IF_CONFIG_SMALL("Overlay one video on top of another"),
+const FFFilter ff_vf_overlay_vaapi = {
+    .p.name          = "overlay_vaapi",
+    .p.description   = NULL_IF_CONFIG_SMALL("Overlay one video on top of another"),
+    .p.priv_class    = &overlay_vaapi_class,
     .priv_size       = sizeof(OverlayVAAPIContext),
-    .priv_class      = &overlay_vaapi_class,
     .init            = &overlay_vaapi_init,
     .uninit          = &overlay_vaapi_uninit,
     .activate        = &overlay_vaapi_activate,

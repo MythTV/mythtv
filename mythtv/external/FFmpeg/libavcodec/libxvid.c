@@ -617,6 +617,10 @@ static av_cold int xvid_encode_init(AVCodecContext *avctx)
     x->intra_matrix =
     x->inter_matrix = NULL;
 
+    ret = ff_check_codec_matrices(avctx, FF_MATRIX_TYPE_INTRA | FF_MATRIX_TYPE_INTER, 1, 255);
+    if (ret < 0)
+        return ret;
+
     if (x->mpeg_quant)
         x->vol_flags |= XVID_VOL_MPEGQUANT;
     if ((avctx->intra_matrix || avctx->inter_matrix)) {
@@ -907,7 +911,7 @@ const FFCodec ff_libxvid_encoder = {
     .init           = xvid_encode_init,
     FF_CODEC_ENCODE_CB(xvid_encode_frame),
     .close          = xvid_encode_close,
-    .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+    CODEC_PIXFMTS(AV_PIX_FMT_YUV420P),
     .color_ranges   = AVCOL_RANGE_MPEG,
     .p.priv_class   = &xvid_class,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,

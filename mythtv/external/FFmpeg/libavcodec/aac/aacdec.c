@@ -62,6 +62,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/tx.h"
 #include "libavutil/version.h"
+#include "libavutil/refstruct.h"
 
 /*
  * supported tools
@@ -395,8 +396,8 @@ static uint64_t sniff_channel_order(uint8_t (*layout_map)[3], int tags)
         FFSWAP(struct elem_to_channel, e2c_vec[6], e2c_vec[4]);   // FLc & FRc fifth (final), SiL & SiR seventh
         FFSWAP(struct elem_to_channel, e2c_vec[7], e2c_vec[6]);   // LFE2 seventh (final), SiL & SiR eight (final)
         FFSWAP(struct elem_to_channel, e2c_vec[9], e2c_vec[8]);   // TpFL & TpFR ninth (final), TFC tenth (final)
-        FFSWAP(struct elem_to_channel, e2c_vec[11], e2c_vec[10]); // TC eleventh (final), TpSiL & TpSiR twelth
-        FFSWAP(struct elem_to_channel, e2c_vec[12], e2c_vec[11]); // TpBL & TpBR twelth (final), TpSiL & TpSiR thirteenth (final)
+        FFSWAP(struct elem_to_channel, e2c_vec[11], e2c_vec[10]); // TC eleventh (final), TpSiL & TpSiR twelfth
+        FFSWAP(struct elem_to_channel, e2c_vec[12], e2c_vec[11]); // TpBL & TpBR twelfth (final), TpSiL & TpSiR thirteenth (final)
     } else {
         // For everything else, utilize the AV channel position define as a
         // stable sort.
@@ -421,6 +422,26 @@ static uint64_t sniff_channel_order(uint8_t (*layout_map)[3], int tags)
     return layout;
 }
 
+static void copy_oc(OutputConfiguration *dst, OutputConfiguration *src)
+{
+    int i;
+
+    for (i = 0; i < src->usac.nb_elems; i++) {
+        AACUsacElemConfig *src_e = &src->usac.elems[i];
+        AACUsacElemConfig *dst_e = &dst->usac.elems[i];
+        /* dst_e->ext.pl_buf is guaranteed to be set to src_e->ext.pl_buf
+         * upon this function's return */
+        av_refstruct_replace(&dst_e->ext.pl_buf, src_e->ext.pl_buf);
+    }
+
+    /* Unref all additional buffers to close leaks */
+    for (; i < dst->usac.nb_elems; i++)
+        av_refstruct_unref(&dst->usac.elems[i].ext.pl_buf);
+
+    /* Set all other properties */
+    *dst = *src;
+}
+
 /**
  * Save current output configuration if and only if it has been locked.
  */
@@ -429,7 +450,7 @@ static int push_output_configuration(AACDecContext *ac)
     int pushed = 0;
 
     if (ac->oc[1].status == OC_LOCKED || ac->oc[0].status == OC_NONE) {
-        ac->oc[0] = ac->oc[1];
+        copy_oc(&ac->oc[0], &ac->oc[1]);
         pushed = 1;
     }
     ac->oc[1].status = OC_NONE;
@@ -443,7 +464,8 @@ static int push_output_configuration(AACDecContext *ac)
 static void pop_output_configuration(AACDecContext *ac)
 {
     if (ac->oc[1].status != OC_LOCKED && ac->oc[0].status != OC_NONE) {
-        ac->oc[1] = ac->oc[0];
+        copy_oc(&ac->oc[1], &ac->oc[0]);
+
         ac->avctx->ch_layout = ac->oc[1].ch_layout;
         ff_aac_output_configure(ac, ac->oc[1].layout_map, ac->oc[1].layout_map_tags,
                                 ac->oc[1].status, 0);
@@ -465,6 +487,9 @@ int ff_aac_output_configure(AACDecContext *ac,
     uint64_t layout = 0;
     uint8_t id_map[TYPE_END][MAX_ELEM_ID] = {{ 0 }};
     uint8_t type_counts[TYPE_END] = { 0 };
+
+    if (get_new_frame && !ac->frame)
+        return AVERROR_INVALIDDATA;
 
     if (ac->oc[1].layout_map != layout_map) {
         memcpy(ac->oc[1].layout_map, layout_map, tags * sizeof(layout_map[0]));
@@ -538,7 +563,9 @@ static av_cold void flush(AVCodecContext *avctx)
         }
     }
 
+#if CONFIG_AAC_DECODER
     ff_aac_usac_reset_state(ac, &ac->oc[1]);
+#endif
 }
 
 /**
@@ -1105,8 +1132,10 @@ static av_cold int decode_close(AVCodecContext *avctx)
         AACUSACConfig *usac = &oc->usac;
         for (int j = 0; j < usac->nb_elems; j++) {
             AACUsacElemConfig *ec = &usac->elems[j];
-            av_freep(&ec->ext.pl_data);
+            av_refstruct_unref(&ec->ext.pl_buf);
         }
+
+        av_channel_layout_uninit(&ac->oc[i].ch_layout);
     }
 
     for (int type = 0; type < FF_ARRAY_ELEMS(ac->che); type++) {
@@ -1724,7 +1753,7 @@ int ff_aac_decode_ics(AACDecContext *ac, SingleChannelElement *sce,
             }
         }
         // I see no textual basis in the spec for this occurring after SSR gain
-        // control, but this is what both reference and real implmentations do
+        // control, but this is what both reference and real implementations do
         if (tns->present && er_syntax) {
             ret = ff_aac_decode_tns(ac, tns, gb, ics);
             if (ret < 0)
@@ -1743,6 +1772,7 @@ int ff_aac_decode_ics(AACDecContext *ac, SingleChannelElement *sce,
 
     return 0;
 fail:
+    memset(sce->sfo, 0, sizeof(sce->sfo));
     tns->present = 0;
     return ret;
 }
@@ -2194,6 +2224,7 @@ static int aac_decode_er_frame(AVCodecContext *avctx, AVFrame *frame,
 
     ac->frame->nb_samples = samples;
     ac->frame->sample_rate = avctx->sample_rate;
+    ac->frame->flags |= AV_FRAME_FLAG_KEY;
     *got_frame_ptr = 1;
 
     skip_bits_long(gb, get_bits_left(gb));
@@ -2354,6 +2385,7 @@ static int decode_frame_ga(AVCodecContext *avctx, AACDecContext *ac,
     if (samples) {
         ac->frame->nb_samples = samples;
         ac->frame->sample_rate = avctx->sample_rate;
+        ac->frame->flags |= AV_FRAME_FLAG_KEY;
         *got_frame_ptr = 1;
     } else {
         av_frame_unref(ac->frame);
@@ -2384,7 +2416,8 @@ static int aac_decode_frame_int(AVCodecContext *avctx, AVFrame *frame,
     ac->frame = frame;
     *got_frame_ptr = 0;
 
-    if (show_bits(gb, 12) == 0xfff) {
+    // USAC can't be packed into ADTS due to field size limitations.
+    if (show_bits(gb, 12) == 0xfff && ac->oc[1].m4ac.object_type != AOT_USAC) {
         if ((err = parse_adts_frame_header(ac, gb)) < 0) {
             av_log(avctx, AV_LOG_ERROR, "Error decoding AAC frame header.\n");
             goto fail;
@@ -2540,12 +2573,10 @@ const FFCodec ff_aac_decoder = {
     .init            = ff_aac_decode_init_float,
     .close           = decode_close,
     FF_CODEC_DECODE_CB(aac_decode_frame),
-    .p.sample_fmts   = (const enum AVSampleFormat[]) {
-        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
-    },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .p.capabilities  = AV_CODEC_CAP_CHANNEL_CONF | AV_CODEC_CAP_DR1,
     .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.ch_layouts    = ff_aac_ch_layout,
+    CODEC_CH_LAYOUTS_ARRAY(ff_aac_ch_layout),
     .flush = flush,
     .p.profiles      = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
 };
@@ -2562,12 +2593,10 @@ const FFCodec ff_aac_fixed_decoder = {
     .init            = ff_aac_decode_init_fixed,
     .close           = decode_close,
     FF_CODEC_DECODE_CB(aac_decode_frame),
-    .p.sample_fmts   = (const enum AVSampleFormat[]) {
-        AV_SAMPLE_FMT_S32P, AV_SAMPLE_FMT_NONE
-    },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S32P),
     .p.capabilities  = AV_CODEC_CAP_CHANNEL_CONF | AV_CODEC_CAP_DR1,
     .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.ch_layouts    = ff_aac_ch_layout,
+    CODEC_CH_LAYOUTS_ARRAY(ff_aac_ch_layout),
     .p.profiles      = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
     .flush = flush,
 };

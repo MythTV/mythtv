@@ -420,7 +420,7 @@ void ff_vc1_pred_mv(VC1Context *v, int n, int dmv_x, int dmv_y,
             else
                 sum = FFABS(px - field_predA[0]) + FFABS(py - field_predA[1]);
             if (sum > hybridmv_thresh) {
-                if (get_bits1(&s->gb)) {     // read HYBRIDPRED bit
+                if (get_bits1(&v->gb)) {     // read HYBRIDPRED bit
                     px = field_predA[0];
                     py = field_predA[1];
                 } else {
@@ -433,7 +433,7 @@ void ff_vc1_pred_mv(VC1Context *v, int n, int dmv_x, int dmv_y,
                 else
                     sum = FFABS(px - field_predC[0]) + FFABS(py - field_predC[1]);
                 if (sum > hybridmv_thresh) {
-                    if (get_bits1(&s->gb)) {
+                    if (get_bits1(&v->gb)) {
                         px = field_predA[0];
                         py = field_predA[1];
                     } else {
@@ -695,7 +695,7 @@ void ff_vc1_pred_b_mv(VC1Context *v, int dmv_x[2], int dmv_y[2],
     int px, py;
     int sum;
     int r_x, r_y;
-    const uint8_t *is_intra = v->mb_type[0];
+    const uint8_t *is_intra = v->mb_type;
 
     av_assert0(!v->field_mode);
 
@@ -782,7 +782,7 @@ void ff_vc1_pred_b_mv(VC1Context *v, int dmv_x[2], int dmv_y[2],
             else
                 sum = FFABS(px - A[0]) + FFABS(py - A[1]);
             if (sum > 32) {
-                if (get_bits1(&s->gb)) {
+                if (get_bits1(&v->gb)) {
                     px = A[0];
                     py = A[1];
                 } else {
@@ -795,7 +795,7 @@ void ff_vc1_pred_b_mv(VC1Context *v, int dmv_x[2], int dmv_y[2],
                 else
                     sum = FFABS(px - C[0]) + FFABS(py - C[1]);
                 if (sum > 32) {
-                    if (get_bits1(&s->gb)) {
+                    if (get_bits1(&v->gb)) {
                         px = A[0];
                         py = A[1];
                     } else {
@@ -852,7 +852,7 @@ void ff_vc1_pred_b_mv(VC1Context *v, int dmv_x[2], int dmv_y[2],
             else
                 sum = FFABS(px - A[0]) + FFABS(py - A[1]);
             if (sum > 32) {
-                if (get_bits1(&s->gb)) {
+                if (get_bits1(&v->gb)) {
                     px = A[0];
                     py = A[1];
                 } else {
@@ -865,7 +865,7 @@ void ff_vc1_pred_b_mv(VC1Context *v, int dmv_x[2], int dmv_y[2],
                 else
                     sum = FFABS(px - C[0]) + FFABS(py - C[1]);
                 if (sum > 32) {
-                    if (get_bits1(&s->gb)) {
+                    if (get_bits1(&v->gb)) {
                         px = A[0];
                         py = A[1];
                     } else {
@@ -927,19 +927,19 @@ void ff_vc1_pred_b_mv_intfi(VC1Context *v, int n, int *dmv_x, int *dmv_y,
         return;
     }
     if (v->bmvtype == BMV_TYPE_INTERPOLATED) {
-        ff_vc1_pred_mv(v, 0, dmv_x[0], dmv_y[0],   1, v->range_x, v->range_y, v->mb_type[0], pred_flag[0], 0);
-        ff_vc1_pred_mv(v, 0, dmv_x[1], dmv_y[1],   1, v->range_x, v->range_y, v->mb_type[0], pred_flag[1], 1);
+        ff_vc1_pred_mv(v, 0, dmv_x[0], dmv_y[0],   1, v->range_x, v->range_y, v->mb_type, pred_flag[0], 0);
+        ff_vc1_pred_mv(v, 0, dmv_x[1], dmv_y[1],   1, v->range_x, v->range_y, v->mb_type, pred_flag[1], 1);
         return;
     }
     if (dir) { // backward
-        ff_vc1_pred_mv(v, n, dmv_x[1], dmv_y[1], mv1, v->range_x, v->range_y, v->mb_type[0], pred_flag[1], 1);
+        ff_vc1_pred_mv(v, n, dmv_x[1], dmv_y[1], mv1, v->range_x, v->range_y, v->mb_type, pred_flag[1], 1);
         if (n == 3 || mv1) {
-            ff_vc1_pred_mv(v, 0, dmv_x[0], dmv_y[0],   1, v->range_x, v->range_y, v->mb_type[0], 0, 0);
+            ff_vc1_pred_mv(v, 0, dmv_x[0], dmv_y[0],   1, v->range_x, v->range_y, v->mb_type, 0, 0);
         }
     } else { // forward
-        ff_vc1_pred_mv(v, n, dmv_x[0], dmv_y[0], mv1, v->range_x, v->range_y, v->mb_type[0], pred_flag[0], 0);
+        ff_vc1_pred_mv(v, n, dmv_x[0], dmv_y[0], mv1, v->range_x, v->range_y, v->mb_type, pred_flag[0], 0);
         if (n == 3 || mv1) {
-            ff_vc1_pred_mv(v, 0, dmv_x[1], dmv_y[1],   1, v->range_x, v->range_y, v->mb_type[0], 0, 1);
+            ff_vc1_pred_mv(v, 0, dmv_x[1], dmv_y[1],   1, v->range_x, v->range_y, v->mb_type, 0, 1);
         }
     }
 }

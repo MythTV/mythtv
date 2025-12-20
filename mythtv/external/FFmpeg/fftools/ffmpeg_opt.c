@@ -47,12 +47,12 @@
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/stereo3d.h"
+#include "graph/graphprint.h"
 
 HWDevice *filter_hw_device;
 
 char *vstats_filename;
 
-float audio_drift_threshold = 0.1;
 float dts_delta_threshold   = 10;
 float dts_error_threshold   = 3600*30;
 
@@ -75,7 +75,11 @@ int stdin_interaction = 1;
 float max_error_rate  = 2.0/3;
 char *filter_nbthreads;
 int filter_complex_nbthreads = 0;
+int filter_buffered_frames = 0;
 int vstats_version = 2;
+int print_graphs = 0;
+char *print_graphs_file = NULL;
+char *print_graphs_format = NULL;
 int auto_conversion_filters = 1;
 int64_t stats_period = 500000;
 
@@ -85,6 +89,15 @@ static int no_file_overwrite  = 0;
 int ignore_unknown_streams = 0;
 int copy_unknown_streams = 0;
 int recast_media = 0;
+
+// this struct is passed as the optctx argument
+// to func_arg() for global options
+typedef struct GlobalOptionsContext {
+    Scheduler      *sch;
+
+    char          **filtergraphs;
+    int          nb_filtergraphs;
+} GlobalOptionsContext;
 
 static void uninit_options(OptionsContext *o)
 {
@@ -345,7 +358,7 @@ static void correct_input_start_times(void)
             if (copy_ts && start_at_zero)
                 ifile->ts_offset = -new_start_time;
             else if (!copy_ts) {
-                abs_start_seek = is->start_time + (ifile->start_time != AV_NOPTS_VALUE) ? ifile->start_time : 0;
+                abs_start_seek = is->start_time + ((ifile->start_time != AV_NOPTS_VALUE) ? ifile->start_time : 0);
                 ifile->ts_offset = abs_start_seek > new_start_time ? -abs_start_seek : -new_start_time;
             } else if (copy_ts)
                 ifile->ts_offset = 0;
@@ -611,8 +624,8 @@ static int opt_attach(void *optctx, const char *opt, const char *arg)
 
 static int opt_sdp_file(void *optctx, const char *opt, const char *arg)
 {
-    Scheduler *sch = optctx;
-    return sch_sdp_filename(sch, arg);
+    GlobalOptionsContext *go = optctx;
+    return sch_sdp_filename(go->sch, arg);
 }
 
 #if CONFIG_VAAPI
@@ -1150,26 +1163,46 @@ static int opt_audio_qscale(void *optctx, const char *opt, const char *arg)
 
 static int opt_filter_complex(void *optctx, const char *opt, const char *arg)
 {
-    Scheduler *sch = optctx;
-    char *graph_desc = av_strdup(arg);
+    GlobalOptionsContext *go = optctx;
+    char *graph_desc;
+    int ret;
+
+    graph_desc = av_strdup(arg);
     if (!graph_desc)
         return AVERROR(ENOMEM);
 
-    return fg_create(NULL, graph_desc, sch);
+    ret = GROW_ARRAY(go->filtergraphs, go->nb_filtergraphs);
+    if (ret < 0) {
+        av_freep(&graph_desc);
+        return ret;
+    }
+    go->filtergraphs[go->nb_filtergraphs - 1] = graph_desc;
+
+    return 0;
 }
 
 #if FFMPEG_OPT_FILTER_SCRIPT
 static int opt_filter_complex_script(void *optctx, const char *opt, const char *arg)
 {
-    Scheduler *sch = optctx;
-    char *graph_desc = file_read(arg);
+    GlobalOptionsContext *go = optctx;
+    char *graph_desc;
+    int ret;
+
+    graph_desc = file_read(arg);
     if (!graph_desc)
         return AVERROR(EINVAL);
 
     av_log(NULL, AV_LOG_WARNING, "-%s is deprecated, use -/filter_complex %s instead\n",
            opt, arg);
 
-    return fg_create(NULL, graph_desc, sch);
+    ret = GROW_ARRAY(go->filtergraphs, go->nb_filtergraphs);
+    if (ret < 0) {
+        av_freep(&graph_desc);
+        return ret;
+    }
+    go->filtergraphs[go->nb_filtergraphs - 1] = graph_desc;
+
+    return 0;
 }
 #endif
 
@@ -1346,6 +1379,7 @@ static int open_files(OptionGroupList *l, const char *inout, Scheduler *sch,
 
 int ffmpeg_parse_options(int argc, char **argv, Scheduler *sch)
 {
+    GlobalOptionsContext go = { .sch = sch };
     OptionParseContext octx;
     const char *errmsg = NULL;
     int ret;
@@ -1361,7 +1395,7 @@ int ffmpeg_parse_options(int argc, char **argv, Scheduler *sch)
     }
 
     /* apply global options */
-    ret = parse_optgroup(sch, &octx.global_opts, options);
+    ret = parse_optgroup(&go, &octx.global_opts, options);
     if (ret < 0) {
         errmsg = "parsing global options";
         goto fail;
@@ -1369,6 +1403,14 @@ int ffmpeg_parse_options(int argc, char **argv, Scheduler *sch)
 
     /* configure terminal and setup signal handlers */
     term_init();
+
+    /* create complex filtergraphs */
+    for (int i = 0; i < go.nb_filtergraphs; i++) {
+        ret = fg_create(NULL, go.filtergraphs[i], sch);
+        go.filtergraphs[i] = NULL;
+        if (ret < 0)
+            goto fail;
+    }
 
     /* open input files */
     ret = open_files(&octx.groups[GROUP_INFILE], "input", sch, ifile_open);
@@ -1405,6 +1447,10 @@ int ffmpeg_parse_options(int argc, char **argv, Scheduler *sch)
         goto fail;
 
 fail:
+    for (int i = 0; i < go.nb_filtergraphs; i++)
+        av_freep(&go.filtergraphs[i]);
+    av_freep(&go.filtergraphs);
+
     uninit_parse_context(&octx);
     if (ret < 0 && ret != AVERROR_EXIT) {
         av_log(NULL, AV_LOG_FATAL, "Error %s: %s\n",
@@ -1466,7 +1512,6 @@ static int opt_adrift_threshold(void *optctx, const char *opt, const char *arg)
 }
 #endif
 
-static const char *const alt_bsf[]            = { "absf", "vbsf", NULL };
 static const char *const alt_channel_layout[] = { "ch_layout", NULL};
 static const char *const alt_codec[]          = { "c", "acodec", "vcodec", "scodec", "dcodec", NULL };
 static const char *const alt_filter[]         = { "af", "vf", NULL };
@@ -1598,6 +1643,9 @@ const OptionDef options[] = {
     { "readrate_initial_burst", OPT_TYPE_DOUBLE, OPT_OFFSET | OPT_EXPERT | OPT_INPUT,
         { .off = OFFSET(readrate_initial_burst) },
         "The initial amount of input to burst read before imposing any readrate", "seconds" },
+    { "readrate_catchup",       OPT_TYPE_FLOAT, OPT_OFFSET | OPT_EXPERT | OPT_INPUT,
+        { .off = OFFSET(readrate_catchup) },
+        "Temporary readrate used to catch up if an input lags behind the specified readrate", "speed" },
     { "target",                 OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_PERFILE | OPT_EXPERT | OPT_OUTPUT,
         { .func_arg = opt_target },
         "specify target file type (\"vcd\", \"svcd\", \"dvd\", \"dv\" or \"dv50\" "
@@ -1667,6 +1715,9 @@ const OptionDef options[] = {
     { "filter_threads",         OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
         { .func_arg = opt_filter_threads },
         "number of non-complex filter threads" },
+    { "filter_buffered_frames", OPT_TYPE_INT, OPT_EXPERT,
+        { &filter_buffered_frames },
+        "maximum number of buffered frames in a filter graph" },
 #if FFMPEG_OPT_FILTER_SCRIPT
     { "filter_script",          OPT_TYPE_STRING, OPT_PERSTREAM | OPT_EXPERT | OPT_OUTPUT,
         { .off = OFFSET(filter_scripts) },
@@ -1675,6 +1726,9 @@ const OptionDef options[] = {
     { "reinit_filter",          OPT_TYPE_INT, OPT_PERSTREAM | OPT_INPUT | OPT_EXPERT,
         { .off = OFFSET(reinit_filters) },
         "reinit filtergraph on input parameter changes", "" },
+    { "drop_changed",          OPT_TYPE_INT, OPT_PERSTREAM | OPT_INPUT | OPT_EXPERT,
+        { .off = OFFSET(drop_changed) },
+        "drop frame instead of reiniting filtergraph on input parameter changes", "" },
     { "filter_complex",         OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
         { .func_arg = opt_filter_complex },
         "create a complex filtergraph", "graph_description" },
@@ -1689,6 +1743,15 @@ const OptionDef options[] = {
         { .func_arg = opt_filter_complex_script },
         "deprecated, use -/filter_complex instead", "filename" },
 #endif
+    { "print_graphs",   OPT_TYPE_BOOL, 0,
+        { &print_graphs },
+        "print execution graph data to stderr" },
+    { "print_graphs_file", OPT_TYPE_STRING, 0,
+        { &print_graphs_file },
+        "write execution graph data to the specified file", "filename" },
+    { "print_graphs_format", OPT_TYPE_STRING, 0,
+        { &print_graphs_format },
+      "set the output printing format (available formats are: default, compact, csv, flat, ini, json, xml, mermaid, mermaidhtml)", "format" },
     { "auto_conversion_filters", OPT_TYPE_BOOL, OPT_EXPERT,
         { &auto_conversion_filters },
         "enable automatic conversion filters globally" },

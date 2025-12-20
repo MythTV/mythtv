@@ -42,7 +42,7 @@
 #include "qsv.h"
 #include "qsv_internal.h"
 #include "qsvenc.h"
-#include "refstruct.h"
+#include "libavutil/refstruct.h"
 
 struct profile_names {
     mfxU16 profile;
@@ -2057,7 +2057,7 @@ static int submit_frame(QSVEncContext *q, const AVFrame *frame,
         }
     } else {
         /* make a copy if the input is not padded as libmfx requires */
-        /* and to make allocation continious for data[0]/data[1] */
+        /* and to make allocation continuous for data[0]/data[1] */
          if ((frame->height & (q->height_align - 1) || frame->linesize[0] & (q->width_align - 1)) ||
             ((frame->format == AV_PIX_FMT_NV12 || frame->format == AV_PIX_FMT_P010 || frame->format == AV_PIX_FMT_P012) &&
              (frame->data[1] - frame->data[0] != frame->linesize[0] * FFALIGN(qf->frame->height, q->height_align)))) {
@@ -2716,7 +2716,7 @@ int ff_qsv_enc_close(AVCodecContext *avctx, QSVEncContext *q)
     ff_qsv_close_internal_session(&q->internal_qs);
 
     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
-    ff_refstruct_unref(&q->frames_ctx.mids);
+    av_refstruct_unref(&q->frames_ctx.mids);
 
     cur = q->work_frames;
     while (cur) {

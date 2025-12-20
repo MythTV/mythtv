@@ -433,7 +433,7 @@ static void celt_encode_frame(OpusEncContext *s, OpusRangeCoder *rc,
 
     if (f->silence) {
         if (f->framebits >= 16)
-            ff_opus_rc_enc_log(rc, 1, 15); /* Silence (if using explicit singalling) */
+            ff_opus_rc_enc_log(rc, 1, 15); /* Silence (if using explicit signalling) */
         for (int ch = 0; ch < s->channels; ch++)
             memset(s->last_quantized_energy[ch], 0.0f, sizeof(float)*CELT_MAX_BANDS);
         return;
@@ -746,9 +746,7 @@ const FFCodec ff_opus_encoder = {
     FF_CODEC_ENCODE_CB(opus_encode_frame),
     .close          = opus_encode_end,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.supported_samplerates = (const int []){ 48000, 0 },
-    .p.ch_layouts    = (const AVChannelLayout []){ AV_CHANNEL_LAYOUT_MONO,
-                                                   AV_CHANNEL_LAYOUT_STEREO, { 0 } },
-    .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
-                                                     AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLERATES(48000),
+    CODEC_CH_LAYOUTS(AV_CHANNEL_LAYOUT_MONO, AV_CHANNEL_LAYOUT_STEREO),
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
 };

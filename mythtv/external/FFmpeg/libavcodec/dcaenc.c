@@ -199,7 +199,7 @@ static av_cold void dcaenc_init_static_tables(void)
         create_enc_table(&bitalloc_12_table[i][1], 12, &src_table);
 }
 
-static int encode_init(AVCodecContext *avctx)
+static av_cold int encode_init(AVCodecContext *avctx)
 {
     static AVOnce init_static_once = AV_ONCE_INIT;
     DCAEncContext *c = avctx->priv_data;
@@ -854,7 +854,7 @@ static int init_quantization_noise(DCAEncContext *c, int noise, int forbid_zero)
     if (c->lfe_channel)
         c->consumed_bits += 72;
 
-    /* attempt to guess the bit distribution based on the prevoius frame */
+    /* attempt to guess the bit distribution based on the previous frame */
     for (ch = 0; ch < c->fullband_channels; ch++) {
         for (band = 0; band < 32; band++) {
             int snr_cb = c->peak_cb[ch][band] - c->band_masking_cb[band] - noise;
@@ -1322,17 +1322,11 @@ const FFCodec ff_dca_encoder = {
     .close                 = encode_close,
     FF_CODEC_ENCODE_CB(encode_frame),
     .caps_internal         = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.sample_fmts         = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
-                                                            AV_SAMPLE_FMT_NONE },
-    .p.supported_samplerates = sample_rates,
-    .p.ch_layouts     = (const AVChannelLayout[]){
-        AV_CHANNEL_LAYOUT_MONO,
-        AV_CHANNEL_LAYOUT_STEREO,
-        AV_CHANNEL_LAYOUT_2_2,
-        AV_CHANNEL_LAYOUT_5POINT0,
-        AV_CHANNEL_LAYOUT_5POINT1,
-        { 0 },
-    },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S32),
+    CODEC_SAMPLERATES_ARRAY(sample_rates),
+    CODEC_CH_LAYOUTS(AV_CHANNEL_LAYOUT_MONO, AV_CHANNEL_LAYOUT_STEREO,
+                     AV_CHANNEL_LAYOUT_2_2,  AV_CHANNEL_LAYOUT_5POINT0,
+                     AV_CHANNEL_LAYOUT_5POINT1),
     .defaults              = defaults,
     .p.priv_class          = &dcaenc_class,
 };

@@ -77,14 +77,18 @@ static const AVOption datascope_options[] = {
 
 AVFILTER_DEFINE_CLASS(datascope);
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    return ff_set_common_formats(ctx, ff_draw_supported_pixel_formats(0));
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out,
+                                  ff_draw_supported_pixel_formats(0));
 }
 
 static void draw_text(FFDrawContext *draw, AVFrame *frame, FFDrawColor *color,
                       int x0, int y0, const uint8_t *text, int vertical)
 {
+    const uint8_t *cga_font = avpriv_cga_font_get();
     int x = x0;
 
     for (; *text; text++) {
@@ -95,7 +99,7 @@ static void draw_text(FFDrawContext *draw, AVFrame *frame, FFDrawColor *color,
         }
         ff_blend_mask(draw, color, frame->data, frame->linesize,
                       frame->width, frame->height,
-                      avpriv_cga_font + *text * 8, 1, 8, 8, 0, 0, x, y0);
+                      &cga_font[*text * 8], 1, 8, 8, 0, 0, x, y0);
         if (vertical) {
             x = x0;
             y0 += 8;
@@ -379,11 +383,18 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 
 static int config_input(AVFilterLink *inlink)
 {
-    DatascopeContext *s = inlink->dst->priv;
+    AVFilterContext *ctx = inlink->dst;
+    DatascopeContext *s = ctx->priv;
+
     uint8_t alpha = s->opacity * 255;
+    int ret;
 
     s->nb_planes = av_pix_fmt_count_planes(inlink->format);
-    ff_draw_init2(&s->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    ret = ff_draw_init2(&s->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
     ff_draw_color(&s->draw, &s->white,  (uint8_t[]){ 255, 255, 255, 255} );
     ff_draw_color(&s->draw, &s->black,  (uint8_t[]){ 0, 0, 0, alpha} );
     ff_draw_color(&s->draw, &s->yellow, (uint8_t[]){ 255, 255, 0, 255} );
@@ -448,15 +459,15 @@ static const AVFilterPad outputs[] = {
     },
 };
 
-const AVFilter ff_vf_datascope = {
-    .name          = "datascope",
-    .description   = NULL_IF_CONFIG_SMALL("Video data analysis."),
+const FFFilter ff_vf_datascope = {
+    .p.name        = "datascope",
+    .p.description = NULL_IF_CONFIG_SMALL("Video data analysis."),
+    .p.priv_class  = &datascope_class,
+    .p.flags       = AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(DatascopeContext),
-    .priv_class    = &datascope_class,
     FILTER_INPUTS(inputs),
     FILTER_OUTPUTS(outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SLICE_THREADS,
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = process_command,
 };
 
@@ -506,10 +517,16 @@ AVFILTER_DEFINE_CLASS(pixscope);
 
 static int pixscope_config_input(AVFilterLink *inlink)
 {
-    PixscopeContext *s = inlink->dst->priv;
+    AVFilterContext *ctx = inlink->dst;
+    PixscopeContext *s = ctx->priv;
+    int ret;
 
     s->nb_planes = av_pix_fmt_count_planes(inlink->format);
-    ff_draw_init(&s->draw, inlink->format, 0);
+    ret = ff_draw_init(&s->draw, inlink->format, 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
     ff_draw_color(&s->draw, &s->dark,  (uint8_t[]){ 0, 0, 0, s->o * 255} );
     ff_draw_color(&s->draw, &s->black, (uint8_t[]){ 0, 0, 0, 255} );
     ff_draw_color(&s->draw, &s->white, (uint8_t[]){ 255, 255, 255, 255} );
@@ -728,15 +745,15 @@ static const AVFilterPad pixscope_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_pixscope = {
-    .name          = "pixscope",
-    .description   = NULL_IF_CONFIG_SMALL("Pixel data analysis."),
+const FFFilter ff_vf_pixscope = {
+    .p.name        = "pixscope",
+    .p.description = NULL_IF_CONFIG_SMALL("Pixel data analysis."),
+    .p.priv_class  = &pixscope_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     .priv_size     = sizeof(PixscopeContext),
-    .priv_class    = &pixscope_class,
     FILTER_INPUTS(pixscope_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = pixscope_process_command,
 };
 
@@ -924,11 +941,17 @@ static void update_oscilloscope(AVFilterContext *ctx)
 
 static int oscilloscope_config_input(AVFilterLink *inlink)
 {
-    OscilloscopeContext *s = inlink->dst->priv;
+    AVFilterContext *ctx = inlink->dst;
+    OscilloscopeContext *s = ctx->priv;
     int size;
+    int ret;
 
     s->nb_planes = av_pix_fmt_count_planes(inlink->format);
-    ff_draw_init(&s->draw, inlink->format, 0);
+    ret = ff_draw_init(&s->draw, inlink->format, 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
     ff_draw_color(&s->draw, &s->black,   (uint8_t[]){   0,   0,   0, 255} );
     ff_draw_color(&s->draw, &s->white,   (uint8_t[]){ 255, 255, 255, 255} );
     ff_draw_color(&s->draw, &s->green,   (uint8_t[]){   0, 255,   0, 255} );
@@ -1126,15 +1149,15 @@ static const AVFilterPad oscilloscope_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_oscilloscope = {
-    .name          = "oscilloscope",
-    .description   = NULL_IF_CONFIG_SMALL("2D Video Oscilloscope."),
+const FFFilter ff_vf_oscilloscope = {
+    .p.name        = "oscilloscope",
+    .p.description = NULL_IF_CONFIG_SMALL("2D Video Oscilloscope."),
+    .p.priv_class  = &oscilloscope_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     .priv_size     = sizeof(OscilloscopeContext),
-    .priv_class    = &oscilloscope_class,
     .uninit        = oscilloscope_uninit,
     FILTER_INPUTS(oscilloscope_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    FILTER_QUERY_FUNC2(query_formats),
     .process_command = oscilloscope_process_command,
 };

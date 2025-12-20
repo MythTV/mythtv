@@ -230,16 +230,6 @@ fate-aac-yoraw-encode: CMP_TARGET = 226
 fate-aac-yoraw-encode: SIZE_TOLERANCE = 3560
 fate-aac-yoraw-encode: FUZZ = 17
 
-
-FATE_AAC_ENCODE += fate-aac-pred-encode
-fate-aac-pred-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -profile:a aac_main -c:a aac -aac_coder fast -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 128k -cutoff 22050 -fflags +bitexact -flags +bitexact
-fate-aac-pred-encode: CMP = stddev
-fate-aac-pred-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-pred-encode: CMP_SHIFT = -4096
-fate-aac-pred-encode: CMP_TARGET = 662
-fate-aac-pred-encode: FUZZ = 12
-fate-aac-pred-encode: SIZE_TOLERANCE = 3560
-
 FATE_AAC_LATM += fate-aac-latm_000000001180bc60
 fate-aac-latm_000000001180bc60: CMD = pcm -i $(TARGET_SAMPLES)/aac/latm_000000001180bc60.mpg
 fate-aac-latm_000000001180bc60: REF = $(SAMPLES)/aac/latm_000000001180bc60.s16
@@ -251,21 +241,21 @@ fate-aac-latm_stereo_to_51: REF = $(SAMPLES)/aac/latm_stereo_to_51_ref.s16
 fate-aac-autobsf-adtstoasc: CMD = transcode "aac" $(TARGET_SAMPLES)/audiomatch/tones_afconvert_16000_mono_aac_lc.adts \
                                             matroska "-c:a copy" "-c:a copy"
 
-FATE_AAC-$(call      DEMDEC, AAC,    AAC,       ARESAMPLE_FILTER) += $(FATE_AAC_CT_RAW)
-FATE_AAC-$(call      DEMDEC, MOV,    AAC,       ARESAMPLE_FILTER) += $(FATE_AAC)
-FATE_AAC_LATM-$(call DEMDEC, MPEGTS, AAC_LATM,  ARESAMPLE_FILTER) += $(FATE_AAC_LATM)
-FATE_AAC-$(call      DEMDEC, AAC,    AAC_FIXED, ARESAMPLE_FILTER) += $(FATE_AAC_FIXED)
+FATE_AAC-$(call      PCM,    AAC,    AAC,       ARESAMPLE_FILTER) += $(FATE_AAC_CT_RAW)
+FATE_AAC-$(call      PCM,    MOV,    AAC,       ARESAMPLE_FILTER) += $(FATE_AAC)
+FATE_AAC_LATM-$(call PCM,    MPEGTS, AAC_LATM,  ARESAMPLE_FILTER) += $(FATE_AAC_LATM)
+FATE_AAC-$(call      PCM,    MOV,    AAC_FIXED, ARESAMPLE_FILTER) += $(FATE_AAC_FIXED)
 
 FATE_AAC_ALL = $(FATE_AAC-yes) $(FATE_AAC_LATM-yes) $(FATE_AAC_FIXED-yes)
 
 $(FATE_AAC_ALL): CMP  = oneoff
 $(FATE_AAC_ALL): FUZZ = 2
 
-FATE_AAC_ENCODE-$(call ENCMUX, AAC, ADTS, ARESAMPLE_FILTER) += $(FATE_AAC_ENCODE)
+FATE_AAC_ENCODE-$(call TRANSCODE, AAC, ADTS AAC, WAV_MUXER WAV_DEMUXER PCM_S16LE_DECODER ARESAMPLE_FILTER) += $(FATE_AAC_ENCODE)
 
-FATE_AAC_BSF-$(call ALLYES, AAC_DEMUXER AAC_ADTSTOASC_BSF MATROSKA_MUXER) += fate-aac-autobsf-adtstoasc
+FATE_AAC_BSF-$(call FRAMECRC, AAC MATROSKA, AAC, AAC_PARSER AAC_ADTSTOASC_BSF MATROSKA_MUXER) += fate-aac-autobsf-adtstoasc
 
 FATE_SAMPLES_FFMPEG += $(FATE_AAC_ALL) $(FATE_AAC_ENCODE-yes) $(FATE_AAC_BSF-yes)
 
-fate-aac: $(FATE_AAC_ALL) $(FATE_AAC_ENCODE) $(FATE_AAC_BSF-yes)
+fate-aac: $(FATE_AAC_ALL) $(FATE_AAC_ENCODE-yes) $(FATE_AAC_BSF-yes)
 fate-aac-latm: $(FATE_AAC_LATM-yes)

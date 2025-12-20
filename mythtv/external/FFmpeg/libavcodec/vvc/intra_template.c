@@ -428,7 +428,7 @@ static int FUNC(lmcs_derive_chroma_scale)(VVCLocalContext *lc, const int x0, con
 }
 
 // 8.7.5.3 Picture reconstruction with luma dependent chroma residual scaling process for chroma samples
-static void FUNC(lmcs_scale_chroma)(VVCLocalContext *lc, int *dst, const int *coeff,
+static void FUNC(lmcs_scale_chroma)(VVCLocalContext *lc, int *coeff,
     const int width, const int height, const int x0_cu, const int y0_cu)
 {
     const int chroma_scale = FUNC(lmcs_derive_chroma_scale)(lc, x0_cu, y0_cu);
@@ -438,11 +438,10 @@ static void FUNC(lmcs_scale_chroma)(VVCLocalContext *lc, int *dst, const int *co
             const int c = av_clip_intp2(*coeff, BIT_DEPTH);
 
             if (c > 0)
-                *dst = (c * chroma_scale + (1 << 10)) >> 11;
+                *coeff = (c * chroma_scale + (1 << 10)) >> 11;
             else
-                *dst = -((-c * chroma_scale + (1 << 10)) >> 11);
+                *coeff = -((-c * chroma_scale + (1 << 10)) >> 11);
             coeff++;
-            dst++;
         }
     }
 }
@@ -627,8 +626,9 @@ static void FUNC(intra_pred)(const VVCLocalContext *lc, int x0, int y0,
     FUNC(prepare_intra_edge_params)(lc, &edge, src, stride, x, y, w, h, c_idx, is_intra_mip, mode, ref_idx, need_pdpc);
 
     if (is_intra_mip) {
-        int intra_mip_transposed_flag = SAMPLE_CTB(fc->tab.imtf, x_cb, y_cb);
-        int intra_mip_mode = SAMPLE_CTB(fc->tab.imm, x_cb, y_cb);
+        int intra_mip_transposed_flag;
+        int intra_mip_mode;
+        unpack_mip_info(&intra_mip_transposed_flag, &intra_mip_mode, intra_mip_flag);
 
         fc->vvcdsp.intra.pred_mip((uint8_t *)src, edge.top, edge.left,
                         w, h, stride, intra_mip_mode, intra_mip_transposed_flag);

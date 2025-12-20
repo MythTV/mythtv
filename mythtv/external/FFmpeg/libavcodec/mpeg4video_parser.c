@@ -84,7 +84,7 @@ static int mpeg4_decode_header(AVCodecParserContext *s1, AVCodecContext *avctx,
 {
     struct Mp4vParseContext *pc = s1->priv_data;
     Mpeg4DecContext *dec_ctx = &pc->dec_ctx;
-    MpegEncContext *s = &dec_ctx->m;
+    MPVContext *const s = &dec_ctx->h.c;
     GetBitContext gb1, *gb = &gb1;
     int ret;
 
@@ -92,13 +92,14 @@ static int mpeg4_decode_header(AVCodecParserContext *s1, AVCodecContext *avctx,
 
     if (avctx->extradata_size && pc->first_picture) {
         init_get_bits(gb, avctx->extradata, avctx->extradata_size * 8);
-        ret = ff_mpeg4_decode_picture_header(dec_ctx, gb, 1, 1);
+        ret = ff_mpeg4_parse_picture_header(dec_ctx, gb, 1, 1);
         if (ret < 0)
             av_log(avctx, AV_LOG_WARNING, "Failed to parse extradata\n");
     }
 
     init_get_bits(gb, buf, 8 * buf_size);
-    ret = ff_mpeg4_decode_picture_header(dec_ctx, gb, 0, 1);
+    ret = ff_mpeg4_parse_picture_header(dec_ctx, gb, 0, 1);
+    avctx->has_b_frames = !s->low_delay;
     if (s->width && (!avctx->width || !avctx->height ||
                      !avctx->coded_width || !avctx->coded_height)) {
         ret = ff_set_dimensions(avctx, s->width, s->height);
@@ -123,7 +124,7 @@ static av_cold int mpeg4video_parse_init(AVCodecParserContext *s)
 
     pc->first_picture           = 1;
     pc->dec_ctx.quant_precision       = 5;
-    pc->dec_ctx.m.slice_context_count = 1;
+    pc->dec_ctx.h.c.slice_context_count = 1;
     pc->dec_ctx.showed_packed_warning = 1;
     return 0;
 }

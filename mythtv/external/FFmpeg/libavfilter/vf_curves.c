@@ -493,7 +493,7 @@ static inline int interpolate_pchip(void *log_ctx, uint16_t *y,
         goto end;
     }
 
-    fi = xi + n;     /* output values at inteval endpoints */
+    fi = xi + n;     /* output values at interval endpoints */
     di = fi + n;     /* output slope wrt normalized input at interval endpoints */
     hi = di + n;     /* interval widths */
     mi = hi + n - 1; /* linear slope over intervals */
@@ -813,11 +813,11 @@ static int filter_slice_planar(AVFilterContext *ctx, void *arg, int jobnr, int n
             uint16_t       *dstrp = (      uint16_t *)(out->data[r] + y * out->linesize[r]);
             uint16_t       *dstgp = (      uint16_t *)(out->data[g] + y * out->linesize[g]);
             uint16_t       *dstbp = (      uint16_t *)(out->data[b] + y * out->linesize[b]);
-            uint16_t       *dstap = (      uint16_t *)(out->data[a] + y * out->linesize[a]);
+            uint16_t       *dstap = (      uint16_t *)(step == 4 ? out->data[a] + y * out->linesize[a] : NULL);
             const uint16_t *srcrp = (const uint16_t *)(in ->data[r] + y *  in->linesize[r]);
             const uint16_t *srcgp = (const uint16_t *)(in ->data[g] + y *  in->linesize[g]);
             const uint16_t *srcbp = (const uint16_t *)(in ->data[b] + y *  in->linesize[b]);
-            const uint16_t *srcap = (const uint16_t *)(in ->data[a] + y *  in->linesize[a]);
+            const uint16_t *srcap = (const uint16_t *)(step == 4 ? in ->data[a] + y *  in->linesize[a] : NULL);
 
             for (x = 0; x < in->width; x++) {
                 dstrp[x] = curves->graph[R][srcrp[x]];
@@ -831,11 +831,13 @@ static int filter_slice_planar(AVFilterContext *ctx, void *arg, int jobnr, int n
         uint8_t       *dstr = out->data[r] + slice_start * out->linesize[r];
         uint8_t       *dstg = out->data[g] + slice_start * out->linesize[g];
         uint8_t       *dstb = out->data[b] + slice_start * out->linesize[b];
-        uint8_t       *dsta = out->data[a] + slice_start * out->linesize[a];
+        uint8_t       *dsta =    step == 4 ? out->data[a]
+                                           + slice_start * out->linesize[a] : NULL;
         const uint8_t *srcr =  in->data[r] + slice_start *  in->linesize[r];
         const uint8_t *srcg =  in->data[g] + slice_start *  in->linesize[g];
         const uint8_t *srcb =  in->data[b] + slice_start *  in->linesize[b];
-        const uint8_t *srca =  in->data[a] + slice_start *  in->linesize[a];
+        const uint8_t *srca =    step == 4 ?  in->data[a]
+                                           + slice_start *  in->linesize[a] : NULL;
 
         for (y = slice_start; y < slice_end; y++) {
             for (x = 0; x < in->width; x++) {
@@ -848,11 +850,13 @@ static int filter_slice_planar(AVFilterContext *ctx, void *arg, int jobnr, int n
             dstr += out->linesize[r];
             dstg += out->linesize[g];
             dstb += out->linesize[b];
-            dsta += out->linesize[a];
             srcr += in ->linesize[r];
             srcg += in ->linesize[g];
             srcb += in ->linesize[b];
-            srca += in ->linesize[a];
+            if (step == 4) {
+                dsta += out->linesize[a];
+                srca += in ->linesize[a];
+            }
         }
     }
     return 0;
@@ -1008,9 +1012,11 @@ static const AVFilterPad curves_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_curves = {
-    .name          = "curves",
-    .description   = NULL_IF_CONFIG_SMALL("Adjust components curves."),
+const FFFilter ff_vf_curves = {
+    .p.name        = "curves",
+    .p.description = NULL_IF_CONFIG_SMALL("Adjust components curves."),
+    .p.priv_class  = &curves_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .priv_size     = sizeof(CurvesContext),
     .init          = curves_init,
     .uninit        = curves_uninit,
@@ -1029,7 +1035,5 @@ const AVFilter ff_vf_curves = {
                    AV_PIX_FMT_GBRP12, AV_PIX_FMT_GBRAP12,
                    AV_PIX_FMT_GBRP14,
                    AV_PIX_FMT_GBRP16, AV_PIX_FMT_GBRAP16),
-    .priv_class    = &curves_class,
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
     .process_command = process_command,
 };

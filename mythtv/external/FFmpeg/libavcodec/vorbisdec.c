@@ -375,13 +375,13 @@ static int vorbis_parse_setup_hdr_codebooks(vorbis_context *vc)
             }
             ff_dlog(NULL, " We expect %d numbers for building the codevectors. \n",
                     codebook_lookup_values);
-            ff_dlog(NULL, "  delta %f minmum %f \n",
+            ff_dlog(NULL, "  delta %f minimum %f \n",
                     codebook_delta_value, codebook_minimum_value);
 
             for (i = 0; i < codebook_lookup_values; ++i) {
                 codebook_multiplicands[i] = get_bits(gb, codebook_value_bits);
 
-                ff_dlog(NULL, " multiplicands*delta+minmum : %e \n",
+                ff_dlog(NULL, " multiplicands*delta+minimum : %e \n",
                         (float)codebook_multiplicands[i] * codebook_delta_value + codebook_minimum_value);
                 ff_dlog(NULL, " multiplicand %u\n", codebook_multiplicands[i]);
             }
@@ -1150,7 +1150,7 @@ static int vorbis_floor0_decode(vorbis_context *vc,
             ff_dlog(NULL, "floor0 dec: maximum depth: %d\n", codebook.maxdepth);
             /* read temp vector */
             vec_off = get_vlc2(&vc->gb, codebook.vlc.table,
-                               codebook.nb_bits, codebook.maxdepth);
+                               codebook.nb_bits, 3);
             if (vec_off < 0)
                 return AVERROR_INVALIDDATA;
             vec_off *= codebook.dimensions;
@@ -1469,8 +1469,10 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
                             unsigned step = FASTDIV(vr->partition_size << 1, dim << 1);
                             vorbis_codebook codebook = vc->codebooks[vqbook];
 
-                            if (get_bits_left(gb) <= 0)
-                                return AVERROR_INVALIDDATA;
+                            if (get_bits_left(gb) < 0) {
+                                av_log(vc->avctx, AV_LOG_ERROR, "Overread %d bits\n", -get_bits_left(gb));
+                                return 0;
+                            }
 
                             if (vr_type == 0) {
 
@@ -1894,7 +1896,6 @@ const FFCodec ff_vorbis_decoder = {
     .flush           = vorbis_decode_flush,
     .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.ch_layouts    = ff_vorbis_ch_layouts,
-    .p.sample_fmts   = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
-                                                       AV_SAMPLE_FMT_NONE },
+    CODEC_CH_LAYOUTS_ARRAY(ff_vorbis_ch_layouts),
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
 };

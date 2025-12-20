@@ -35,7 +35,8 @@ typedef struct OggVorbisDecContext {
 
 static int oggvorbis_decode_close(AVCodecContext *avccontext);
 
-static int oggvorbis_decode_init(AVCodecContext *avccontext) {
+static av_cold int oggvorbis_decode_init(AVCodecContext *avccontext)
+{
     OggVorbisDecContext *context = avccontext->priv_data ;
     uint8_t *p= avccontext->extradata;
     int i, hsizes[3], ret;
@@ -111,6 +112,12 @@ static int oggvorbis_decode_init(AVCodecContext *avccontext) {
             ret = AVERROR_INVALIDDATA;
             goto error;
         }
+    }
+
+    if (context->vi.rate <= 0 || context->vi.rate > INT_MAX) {
+        av_log(avccontext, AV_LOG_ERROR, "vorbis rate is invalid\n");
+        ret = AVERROR_INVALIDDATA;
+        goto error;
     }
 
     av_channel_layout_uninit(&avccontext->ch_layout);
@@ -198,7 +205,8 @@ static int oggvorbis_decode_frame(AVCodecContext *avccontext, AVFrame *frame,
 }
 
 
-static int oggvorbis_decode_close(AVCodecContext *avccontext) {
+static av_cold int oggvorbis_decode_close(AVCodecContext *avccontext)
+{
     OggVorbisDecContext *context = avccontext->priv_data ;
 
     vorbis_block_clear(&context->vb);

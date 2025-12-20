@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/mem.h"
 
@@ -206,7 +207,7 @@ static int vk_enc_h265_update_pic_info(AVCodecContext *avctx,
     }
 
     // Only look for the metadata on I/IDR frame on the output. We
-    // may force an IDR frame on the output where the medadata gets
+    // may force an IDR frame on the output where the metadata gets
     // changed on the input frame.
     if ((enc->unit_elems & UNIT_SEI_MASTERING_DISPLAY) &&
         (pic->type == FF_HW_PICTURE_TYPE_I || pic->type == FF_HW_PICTURE_TYPE_IDR)) {
@@ -1213,11 +1214,11 @@ static int parse_feedback_units(AVCodecContext *avctx,
     if (err < 0)
         return err;
 
-    err = ff_cbs_read(cbs, &au, data, size);
+    err = ff_cbs_read(cbs, &au, NULL, data, size);
     if (err < 0) {
         av_log(avctx, AV_LOG_ERROR, "Unable to parse feedback units, bad drivers: %s\n",
                av_err2str(err));
-        return err;
+        goto fail;
     }
 
     if (sps_override) {
@@ -1245,10 +1246,12 @@ static int parse_feedback_units(AVCodecContext *avctx,
         }
     }
 
+    err = 0;
+fail:
     ff_cbs_fragment_free(&au);
     ff_cbs_close(&cbs);
 
-    return 0;
+    return err;
 }
 
 static int init_base_units(AVCodecContext *avctx)
@@ -1313,7 +1316,7 @@ static int init_base_units(AVCodecContext *avctx)
         if (!data)
             return AVERROR(ENOMEM);
     } else {
-        av_log(avctx, AV_LOG_ERROR, "Unable to get feedback for H.265 units = %lu\n", data_size);
+        av_log(avctx, AV_LOG_ERROR, "Unable to get feedback for H.265 units = %"SIZE_SPECIFIER"\n", data_size);
         return err;
     }
 
@@ -1470,6 +1473,7 @@ static int write_extra_headers(AVCodecContext *avctx,
         if (err < 0)
             goto fail;
     } else {
+        err = 0;
         *data_len = 0;
     }
 
@@ -1784,10 +1788,7 @@ const FFCodec ff_hevc_vulkan_encoder = {
                       AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .defaults       = vulkan_encode_h265_defaults,
-    .p.pix_fmts = (const enum AVPixelFormat[]) {
-        AV_PIX_FMT_VULKAN,
-        AV_PIX_FMT_NONE,
-    },
+    CODEC_PIXFMTS(AV_PIX_FMT_VULKAN),
     .hw_configs     = ff_vulkan_encode_hw_configs,
     .p.wrapper_name = "vulkan",
 };

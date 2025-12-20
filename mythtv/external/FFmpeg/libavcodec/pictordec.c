@@ -172,7 +172,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         1 byte run (=0)
         2 bytes run
         1 byte val
-        thats 5 bytes and the maximum run we can code is 65535
+        that's 5 bytes and the maximum run we can code is 65535
 
         The RLE decoder can exit prematurly but it does not on any image available
         Based on this the formula is assumed correct for undamaged images.
@@ -192,11 +192,6 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return ret;
     memset(frame->data[0], 0, s->height * frame->linesize[0]);
     frame->pict_type           = AV_PICTURE_TYPE_I;
-#if FF_API_PALETTE_HAS_CHANGED
-FF_DISABLE_DEPRECATION_WARNINGS
-    frame->palette_has_changed = 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     pos_after_pal = bytestream2_tell(&s->g) + esize;
     palette = (uint32_t*)frame->data[1];
