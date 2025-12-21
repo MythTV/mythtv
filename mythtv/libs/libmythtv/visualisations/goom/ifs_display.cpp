@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 
 #include "ifs.h"
@@ -81,8 +82,7 @@ void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 			for (int j = 0; j < 4; j++) {
 				tra = *cra;
 				tra += *bra;
-				if (tra > 255)
-					tra = 255;
+				tra = std::min(tra, 255);
 				*dra = tra;
 				++dra;
 				++cra;
