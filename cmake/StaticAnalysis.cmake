@@ -52,7 +52,7 @@ function(sa_super)
   add_custom_target(
     compdb
     COMMENT "Installing compile_commands.json in ${PROJECT_SOURCE_DIR}"
-    COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/concatenate-compdb.sh
+    COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/concatenate-compdb.py
             ${PROJECT_SOURCE_DIR}
             ${MythTV_BINARY_DIR}
             ${MythPlugins_BINARY_DIR}
