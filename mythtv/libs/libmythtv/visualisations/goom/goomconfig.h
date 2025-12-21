@@ -26,12 +26,3 @@
 //#define HAVE_ATHLON
 
 //#define VERBOSE
-
-#ifndef guint32
-#define guint8 unsigned char
-#define guin16 unsigned short
-#define guint32 unsigned int
-#define gint8 signed char
-#define gint16 signed short int
-#define gint32 signed int
-#endif

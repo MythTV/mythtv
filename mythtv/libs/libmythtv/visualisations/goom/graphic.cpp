@@ -12,19 +12,3 @@ const Color VIOLET = { 0x55, 0x00, 0xff };
 unsigned int SIZE;
 unsigned int HEIGHT;
 unsigned int WIDTH;
-
-int    *rand_tab = nullptr;
-//unsigned short int rand_pos = 0;
-/*
-inline unsigned int RAND(void)
-{
-    rand_pos++;
-    return rand_tab[rand_pos];
-}
-
-inline unsigned int iRAND(int i)
-{
-    rand_pos++;
-    return (rand_tab[rand_pos])%i;
-}
-*/

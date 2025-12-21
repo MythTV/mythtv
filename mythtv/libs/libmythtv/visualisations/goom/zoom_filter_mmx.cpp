@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cstdint>
 
-#include "visualisations/goom/zoom_filters.h"
+#include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
 
 #if HAVE_MMX

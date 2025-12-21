@@ -5,9 +5,9 @@
  *  Created by guillaum on Tue Aug 14 2001.
  *  Copyright (c) 2001 ios. All rights reserved.
  */
+#include <cstdint>
 
 #include "graphic.h"
-#include "goomconfig.h"
 #include "goom_core.h"
 
 struct GMUnitPointer
@@ -28,8 +28,8 @@ struct GMLine
 	float   amplitude;
 
 	int     nbPoints;
-	guint32 color;
-	guint32 color2;
+	uint32_t color;
+	uint32_t color2;
 
 	int     screenX;
 	int     screenY;

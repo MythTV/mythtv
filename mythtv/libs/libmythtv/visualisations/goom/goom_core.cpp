@@ -1,9 +1,9 @@
-#include "../config.h"
+#include "goomconfig.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <random>
 
 #include "goom_core.h"
 #include "goom_tools.h"
@@ -13,18 +13,20 @@
 #include "tentacle3d.h"
 //#include "gfontlib.h"
 
+#include "libmythbase/mythrandom.h"
+
 //#define VERBOSE
 
-static constexpr gint32  STOP_SPEED   { 128 };
+static constexpr int32_t STOP_SPEED   { 128 };
 static constexpr int16_t TIME_BTW_CHG { 300 };
 
 /**-----------------------------------------------------**
  **  SHARED DATA                                        **
  **-----------------------------------------------------**/
-static guint32 *pixel;
-static guint32 *back;
-static guint32 *p1, *p2, *tmp;
-static guint32 cycle;
+static uint32_t *pixel;
+static uint32_t *back;
+static uint32_t *p1, *p2, *tmp;
+static uint32_t cycle;
 
 struct GoomState {
 	int m_drawIfs;
@@ -53,7 +55,7 @@ const std::array<const GoomState,STATES_NB> kStates {{
 
 const GoomState *curGState = &kStates[4];
 
-guint32 resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
+uint32_t resolx, resoly, buffsize, c_black_height = 0, c_offset = 0, c_resoly = 0;	/* avec prise en compte de ca */
 
 // effet de ligne..
 static GMLine *gmline1 = nullptr;
@@ -61,7 +63,7 @@ static GMLine *gmline2 = nullptr;
 
 void    choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far);
 
-void goom_init (guint32 resx, guint32 resy, int cinemascope) {
+void goom_init (uint32_t resx, uint32_t resy, int cinemascope) {
 #ifdef VERBOSE
 	printf ("GOOM: init (%d, %d);\n", resx, resy);
 #endif
@@ -77,19 +79,13 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 	c_offset = c_black_height * resx;
 	c_resoly = resy - (c_black_height * 2);
 
-	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	//RAND_INIT ();
-	srand ((uintptr_t) pixel);
-	if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
-	for (size_t i = 0; i < NB_RAND; i++)
-		rand_tab[i] = goom_rand();
-	rand_pos = 0;
-                
+	pixel = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+	back  = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+
 	cycle = 0;
 
-	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
-	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
+	p1 = (uint32_t *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
+	p2 = (uint32_t *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
 	init_ifs (resx, c_resoly);
 	gmline1 = goom_lines_init (resx, c_resoly, GML_HLINE, c_resoly, GML_BLACK, GML_CIRCLE, 0.4F * (float) c_resoly, GML_VERT);
@@ -101,7 +97,7 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 }
 
 
-void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
+void goom_set_resolution (uint32_t resx, uint32_t resy, int cinemascope) {
 	free (pixel);
 	free (back);
 
@@ -117,12 +113,12 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 	resoly = resy;
 	buffsize = resx * resy;
 
-	pixel = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	memset (pixel, 0, (buffsize * sizeof (guint32)) + 128);
-	back = (guint32 *) malloc ((buffsize * sizeof (guint32)) + 128);
-	memset (back, 0,  (buffsize * sizeof (guint32)) + 128);
-	p1 = (guint32 *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
-	p2 = (guint32 *) ((1 + ((uintptr_t) (back)) / 128) * 128);
+	pixel = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+	memset (pixel, 0, (buffsize * sizeof (uint32_t)) + 128);
+	back = (uint32_t *) malloc ((buffsize * sizeof (uint32_t)) + 128);
+	memset (back, 0,  (buffsize * sizeof (uint32_t)) + 128);
+	p1 = (uint32_t *) ((1 + ((uintptr_t) (pixel)) / 128) * 128);
+	p2 = (uint32_t *) ((1 + ((uintptr_t) (back)) / 128) * 128);
 
 	init_ifs (resx, c_resoly);
 	goom_lines_set_res (gmline1, resx, c_resoly);
@@ -130,7 +126,7 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 }
 
 
-guint32 * goom_update (GoomDualData& data, int forceMode) {
+uint32_t * goom_update (GoomDualData& data, int forceMode) {
 	static int s_lockVar = 0;		// pour empecher de nouveaux changements
 	static int s_totalGoom = 0;		// nombre de gooms par seconds
 	static int s_aGoom = 0;			// un goom a eu lieu..
@@ -164,8 +160,8 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	ZoomFilterData *pzfd = nullptr;
 
 	/* test if the config has changed, update it if so */
-	guint32 pointWidth = (resolx * 2) / 5;
-	guint32 pointHeight = ((c_resoly) * 2) / 5;
+	uint32_t pointWidth = (resolx * 2) / 5;
+	uint32_t pointHeight = ((c_resoly) * 2) / 5;
 
 	/* ! etude du signal ... */
 	int incvar = 0;				// volume du son
@@ -303,12 +299,12 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		s_aGoom = 20;			// mais pdt 20 cycles, il n'y en aura plus.
 
 		// changement eventuel de mode
-		if (iRAND(16) == 0)
+		if (rand_bool(16))
                 {
-                    switch (iRAND (32)) {
+                    switch (MythRandomInt(0, 31)) {
                     case 0:
                     case 10:
-			s_zfd.hypercosEffect = iRAND (2);
+			s_zfd.hypercosEffect = rand_bool();
 			// Checked Fedora26 get-plugins-good sources.
 			// No break statement there.
 			[[fallthrough]];
@@ -317,8 +313,8 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
                     case 21:
 			s_zfd.mode = WAVE_MODE;
 			s_zfd.reverse = false;
-			s_zfd.waveEffect = (iRAND (3) == 0);
-			if (iRAND (2))
+			s_zfd.waveEffect = rand_bool(3);
+			if (rand_bool())
                             s_zfd.vitesse = (s_zfd.vitesse + 127) >> 1;
 			break;
                     case 1:
@@ -349,7 +345,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
                     case 22:
 			s_zfd.mode = HYPERCOS1_MODE;
 			s_zfd.waveEffect = false;
-			s_zfd.hypercosEffect = (iRAND (3) == 0);
+			s_zfd.hypercosEffect = rand_bool(3);
 			break;
                     case 6:
                     case 16:
@@ -360,8 +356,8 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
                     case 7:
                     case 17:
 			s_zfd.mode = CRYSTAL_BALL_MODE;
-			s_zfd.waveEffect = (iRAND (4) == 0);
-			s_zfd.hypercosEffect = iRAND (2);
+			s_zfd.waveEffect = rand_bool(4);
+			s_zfd.hypercosEffect = rand_bool();
 			break;
                     case 8:
                     case 18:
@@ -395,8 +391,8 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			static int s_blocker = 0;
 
 			/* SELECTION OF THE GOOM STATE */
-			if ((!s_blocker)&&(iRAND(3))) {
-				s_rndn = iRAND(STATES_RANGEMAX);
+			if ((!s_blocker) && !rand_bool(3)) {
+				s_rndn = MythRandomInt(0, STATES_RANGEMAX - 1);
 				s_blocker = 3;
 			}
 			else if (s_blocker)
@@ -429,27 +425,25 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			// if (goomvar % 1 == 0)
 			{
 				s_lockVar = 50;
-				guint32 newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
+				uint32_t newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
 				// retablir le zoom avant..
-                                // Pseudo-random is good enough. Don't need a true random.
-                                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-				if ((s_zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
+				if ((s_zfd.reverse) && (!(cycle % 13)) && rand_bool(5)) {
 					s_zfd.reverse = false;
 					s_zfd.vitesse = STOP_SPEED - 2;
 					s_lockVar = 75;
 				}
-				if (iRAND (10) == 0) {
+				if (rand_bool(10)) {
 					s_zfd.reverse = true;
 					s_lockVar = 100;
 				}
 
-				if (iRAND (10) == 0)
+				if (rand_bool(10))
 					s_zfd.vitesse = STOP_SPEED - 1;
-				if (iRAND (12) == 0)
+				if (rand_bool(12))
 					s_zfd.vitesse = STOP_SPEED + 1;
 
 				// changement de milieu..
-				switch (iRAND (25)) {
+				switch (MythRandomInt(0, 24)) {
 				case 0:
 				case 3:
 				case 6:
@@ -476,46 +470,38 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 					s_zfd.middleY = c_resoly / 2;
 				}
 
-				guint32 vtmp = iRAND (15);
+				uint32_t vtmp = MythRandom(0, 14);
 				switch (vtmp) {
 				case 0:
-                                    
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.vPlaneEffect = iRAND (3) - iRAND (3);
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.hPlaneEffect = iRAND (3) - iRAND (3);
+					s_zfd.vPlaneEffect = MythRandomTriangularInt(2);
+					s_zfd.hPlaneEffect = MythRandomTriangularInt(2);
 					break;
 				case 3:
 					s_zfd.vPlaneEffect = 0;
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.hPlaneEffect = iRAND (8) - iRAND (8);
+					s_zfd.hPlaneEffect = MythRandomTriangularInt(7);
 					break;
 				case 4:
 				case 5:
 				case 6:
 				case 7:
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.vPlaneEffect = iRAND (5) - iRAND (5);
+					s_zfd.vPlaneEffect = MythRandomTriangularInt(4);
 					s_zfd.hPlaneEffect = -s_zfd.vPlaneEffect;
 					break;
 				case 8:
-					s_zfd.hPlaneEffect = 5 + iRAND (8);
+					s_zfd.hPlaneEffect = MythRandomInt(5, 12);
 					s_zfd.vPlaneEffect = -s_zfd.hPlaneEffect;
 					break;
 				case 9:
-					s_zfd.vPlaneEffect = 5 + iRAND (8);
+					s_zfd.vPlaneEffect = MythRandomInt(5, 12);
 					s_zfd.hPlaneEffect = -s_zfd.hPlaneEffect;
 					break;
 				case 13:
 					s_zfd.hPlaneEffect = 0;
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.vPlaneEffect = iRAND (10) - iRAND (10);
+					s_zfd.vPlaneEffect = MythRandomTriangularInt(9);
 					break;
 				case 14:
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.hPlaneEffect = iRAND (10) - iRAND (10);
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_zfd.vPlaneEffect = iRAND (10) - iRAND (10);
+					s_zfd.hPlaneEffect = MythRandomTriangularInt(9);
+					s_zfd.vPlaneEffect = MythRandomTriangularInt(9);
 					break;
 				default:
 					if (vtmp < 10) {
@@ -524,10 +510,10 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 					}
 				}
 
-				if (iRAND (5) != 0)
+				if (!rand_bool(5))
 					s_zfd.noisify = 0;
 				else {
-					s_zfd.noisify = iRAND (2) + 1;
+					s_zfd.noisify = MythRandomInt(1, 2);
 					s_lockVar *= 2;
 				}
 
@@ -539,16 +525,16 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 
 				if ((s_zfd.middleX == 1) || (s_zfd.middleX == (int)resolx - 1)) {
 					s_zfd.vPlaneEffect = 0;
-					s_zfd.hPlaneEffect = iRAND (2) ? 0 : s_zfd.hPlaneEffect;
+					s_zfd.hPlaneEffect = rand_bool() ? 0 : s_zfd.hPlaneEffect;
 				}
 
-				if (newvit < (guint32)s_zfd.vitesse)	// on accelere
+				if (newvit < (uint32_t)s_zfd.vitesse)	// on accelere
 				{
 					pzfd = &s_zfd;
 					if (((newvit < STOP_SPEED - 7) &&
 							 (s_zfd.vitesse < STOP_SPEED - 6) &&
-							 (cycle % 3 == 0)) || (iRAND (40) == 0)) {
-						s_zfd.vitesse = STOP_SPEED - iRAND (2) + iRAND (2);
+							 (cycle % 3 == 0)) || rand_bool(40)) {
+						s_zfd.vitesse = STOP_SPEED + MythRandomTriangularInt(1);
 						s_zfd.reverse = !s_zfd.reverse;
 					}
 					else {
@@ -564,7 +550,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			}
 		}
 		// mode mega-lent
-		if (iRAND (700) == 0) {
+		if (rand_bool(700)) {
 			pzfd = &s_zfd;
 			s_zfd.vitesse = STOP_SPEED - 1;
 			s_zfd.pertedec = 8;
@@ -664,9 +650,9 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	 */
 
 	if (s_goomLimit!=0)
-        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data, (float)s_accelVar/s_goomLimit, curGState->m_drawTentacle);
+        tentacle_update((int32_t*)(p2 + c_offset), (int32_t*)(p1 + c_offset), resolx, c_resoly, data, (float)s_accelVar/s_goomLimit, curGState->m_drawTentacle);
 	else
-        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data,0.0F, curGState->m_drawTentacle);
+        tentacle_update((int32_t*)(p2 + c_offset), (int32_t*)(p1 + c_offset), resolx, c_resoly, data,0.0F, curGState->m_drawTentacle);
 
 /*
 	{
@@ -750,13 +736,13 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			s_lineMode = 0;
 	}
 	else
-		if ((cycle%80==0)&&(iRAND(5)==0)&&s_lineMode)
+		if ((cycle % 80 == 0) && rand_bool(5) && s_lineMode)
 		{
 			s_lineMode--;
 		}
 
 	if ((cycle % 120 == 0)
-			&& (iRAND (4) == 0)
+			&& rand_bool(4)
 			&& (curGState->m_drawScope)) {
 		if (s_lineMode == 0)
 			s_lineMode = DRAWLINES;
@@ -774,7 +760,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			couleur2 = 5-couleur1;
 			if (s_stopLines) {
 				s_stopLines--;
-				if (iRAND(2))
+				if (rand_bool())
 					couleur2=couleur1 = GML_BLACK;
 			}
 
@@ -792,7 +778,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		goom_lines_draw (gmline1, data[0], p2 + c_offset);
 		goom_lines_draw (gmline2, data[1], p2 + c_offset);
 
-		if (((cycle % 121) == 9) && (iRAND (3) == 1)
+		if (((cycle % 121) == 9) && rand_bool(3)
 				&& ((s_lineMode == 0) || (s_lineMode == DRAWLINES))) {
 			float   param1 = NAN;
 			float   param2 = NAN;
@@ -806,7 +792,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			
 			if (s_stopLines) {
 				s_stopLines--;
-				if (iRAND(2))
+				if (rand_bool())
 					couleur2=couleur1 = GML_BLACK;
 			}
 			goom_lines_switch_to (gmline1, mode, param1, amplitude, couleur1);
@@ -814,7 +800,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 		}
 	}
 
-	guint32 *return_val = p1;
+	uint32_t *return_val = p1;
 	tmp = p1;
 	p1 = p2;
 	p2 = tmp;
@@ -849,7 +835,6 @@ void goom_close () {
 	if (back != nullptr)
 		free (back);
 	pixel = back = nullptr;
-	RAND_CLOSE ();
 	release_ifs ();
 	goom_lines_free (&gmline1);
 	goom_lines_free (&gmline2);
@@ -858,7 +843,7 @@ void goom_close () {
 
 
 void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, float *amplitude, int far) {
-	*mode = iRAND (3);
+	*mode = MythRandomInt(0, 2);
 	*amplitude = 1.0F;
 	switch (*mode) {
 	case GML_CIRCLE:
@@ -867,11 +852,11 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 			*amplitude = 0.8F;
 			break;
 		}
-		if (iRAND (3) == 0) {
+		if (rand_bool(3)) {
 			*param1 = *param2 = 0;
 			*amplitude = 3.0F;
 		}
-		else if (iRAND (2)) {
+		else if (rand_bool()) {
 			*param1 = 0.40F * c_resoly;
 			*param2 = 0.22F * c_resoly;
 		}
@@ -880,7 +865,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 		}
 		break;
 	case GML_HLINE:
-		if (iRAND (4) || far) {
+		if (!rand_bool(4) || far) {
 			*param1 = c_resoly / 7.0F;
 			*param2 = 6.0F * c_resoly / 7.0F;
 		}
@@ -890,7 +875,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 		}
 		break;
 	case GML_VLINE:
-		if (iRAND (3) || far) {
+		if (!rand_bool(4) || far) {
 			*param1 = resolx / 7.0F;
 			*param2 = 6.0F * resolx / 7.0F;
 		}
@@ -901,7 +886,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 		break;
 	}
 
-	*couleur = iRAND (6);
+	*couleur = MythRandomInt(0, 5);
 }
 
 /*
@@ -968,10 +953,3 @@ void update_message (char *message) {
 	}
 }
 */
-
-guint32 goom_rand (void)
-{
-    static std::random_device rd;
-    static std::mt19937 mt(rd());
-    return mt();
-}

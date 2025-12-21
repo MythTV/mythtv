@@ -5,11 +5,11 @@
 #ifndef IFS_H
 #define IFS_H
 
-#include "goomconfig.h"
+#include <cstdint>
 
 struct IFSPoint
 {
-	gint32  x, y;
+	int32_t  x, y;
 };
 
 // init ifs for a (width)x(height) output.
@@ -17,7 +17,7 @@ void    init_ifs (int width, int height);
 
 // draw an ifs on the buffer (which size is width * height)
 // increment means that we draw 1/increment of the ifs's points
-void    ifs_update (guint32 * data, const guint32 * back, int width, int height, int increment);
+void    ifs_update (uint32_t * data, const uint32_t * back, int width, int height, int increment);
 
 // free all ifs's data.
 void    release_ifs (void);

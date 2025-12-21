@@ -1,8 +1,6 @@
 #ifndef GRAPHIC_H
 #define GRAPHIC_H
 
-using Uint = unsigned int;
-
 struct Color
 {
 	unsigned short r, v, b;
@@ -17,7 +15,7 @@ extern const Color YELLOW;
 extern const Color ORANGE;
 extern const Color VIOLET;
 
-//inline void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
-//inline void getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c);
+//inline void setPixelRGB (unsigned int * buffer, unsigned int x, unsigned int y, Color c);
+//inline void getPixelRGB (unsigned int * buffer, unsigned int x, unsigned int y, Color * c);
 
 #endif /* GRAPHIC_H */

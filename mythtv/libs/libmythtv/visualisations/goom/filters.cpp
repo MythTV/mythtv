@@ -14,22 +14,24 @@
 
 #include <algorithm>
 #include <array>
-#include <cinttypes>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 
 #include "filters.h"
 #include "goom_tools.h"
+#include "goomconfig.h"
 #include "graphic.h"
-#include "visualisations/goom/zoom_filters.h"
+#include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
+#include "libmythbase/mythrandom.h"
 
 static constexpr int8_t EFFECT_DISTORS    { 4 };
 static constexpr int8_t EFFECT_DISTORS_SL { 2 };
 
-extern volatile guint32 resolx;
-extern volatile guint32 c_resoly;
+extern volatile uint32_t resolx;
+extern volatile uint32_t c_resoly;
 
 void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, const signed int *brutS, const signed int *brutD);
 
@@ -72,7 +74,7 @@ static void select_zoom_filter (void) {
 #endif /* HAVE_MMX */
 
 
-guint32 mmx_zoom_size;
+uint32_t mmx_zoom_size;
 
 unsigned int *coeffs = nullptr, *freecoeffs = nullptr;
 
@@ -81,11 +83,11 @@ signed int *brutD = nullptr, *freebrutD = nullptr;	// dest
 signed int *brutT = nullptr, *freebrutT = nullptr;	// temp (en cours de génération)
 
 // TODO : virer
-guint32 *expix1 = nullptr;				// pointeur exporte vers p1
-guint32 *expix2 = nullptr;				// pointeur exporte vers p2
+uint32_t *expix1 = nullptr;				// pointeur exporte vers p1
+uint32_t *expix2 = nullptr;				// pointeur exporte vers p2
 // fin TODO
 
-guint32 zoom_width;
+uint32_t zoom_width;
 
 unsigned int     prevX = 0, prevY = 0;
 
@@ -96,7 +98,7 @@ static bool waveEffect = false;
 static bool hypercosEffect = false;
 static int vPlaneEffect = 0;
 static int hPlaneEffect = 0;
-static char noisify = 2;
+static char noisify = 1;
 static int middleX, middleY;
 
 //static unsigned char sqrtperte = 16 ;
@@ -127,10 +129,10 @@ GoomCoefficients precalCoef = {};
 /* Prototypes to keep gcc from spewing warnings */
 void generatePrecalCoef (void);
 void calculatePXandPY (int x, int y, int *px, int *py);
-void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
-void setPixelRGB_ (Uint * buffer, Uint x, Color c);
-inline void getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c);
-void getPixelRGB_ (const Uint * buffer, Uint x, Color * c);
+void setPixelRGB (unsigned int * buffer, unsigned int x, unsigned int y, Color c);
+void setPixelRGB_ (unsigned int * buffer, unsigned int x, Color c);
+inline void getPixelRGB (const unsigned int * buffer, unsigned int x, unsigned int y, Color * c);
+void getPixelRGB_ (const unsigned int * buffer, unsigned int x, Color * c);
 
 void
 generatePrecalCoef ()
@@ -185,7 +187,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		static int s_wave = 0;
 		static int s_wavesp = 0;
 
-		int yy = y + (RAND () % 4) - (RAND () % 4) + (s_wave / 10);
+		int yy = y + MythRandomTriangularInt(3) + (s_wave / 10);
 		yy = std::max(yy, 0);
 		if (yy >= (int)c_resoly)
 			yy = c_resoly - 1;
@@ -193,13 +195,12 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		*px = (x << 4) + firedec[yy] + (s_wave / 10);
 		*py = (y << 4) + 132 - ((vitesse < 131) ? vitesse : 130);
 
-		// NOLINTNEXTLINE(misc-redundant-expression)
-		s_wavesp += (RAND () % 3) - (RAND () % 3);
+		s_wavesp += MythRandomTriangularInt(2);
 		if (s_wave < -10)
 			s_wavesp += 2;
 		if (s_wave > 10)
 			s_wavesp -= 2;
-		s_wave += (s_wavesp / 10) + (RAND () % 3) - (RAND () % 3);
+		s_wave += (s_wavesp / 10) + MythRandomTriangularInt(2);
 		if (s_wavesp > 100)
 			s_wavesp = (s_wavesp * 9) / 10;
 	}
@@ -207,11 +208,9 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		int     dist = 0;
 		int     fvitesse = vitesse << 4;
 
-		if (noisify) {
-                        // NOLINTNEXTLINE(misc-redundant-expression)
-			x += (RAND () % noisify) - (RAND () % noisify);
-                        // NOLINTNEXTLINE(misc-redundant-expression)
-			y += (RAND () % noisify) - (RAND () % noisify);
+		if (noisify != 0) {
+			x += MythRandomTriangularInt(noisify);
+			y += MythRandomTriangularInt(noisify);
 		}
 		int vx = (x - middleX) << 9;
 		int vy = (y - middleY) << 9;
@@ -301,7 +300,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 //#define _DEBUG
 
 /*inline*/ void
-setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
+setPixelRGB (unsigned int * buffer, unsigned int x, unsigned int y, Color c)
 {
 	// buffer[ y*WIDTH + x ] = (c.r<<16)|(c.v<<8)|c.b
 #ifdef _DEBUG_PIXEL
@@ -317,7 +316,7 @@ setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
 
 
 /*inline*/ void
-setPixelRGB_ (Uint * buffer, Uint x, Color c)
+setPixelRGB_ (unsigned int * buffer, unsigned int x, Color c)
 {
 #ifdef _DEBUG
 	if (x >= resolx * c_resoly) {
@@ -332,7 +331,7 @@ setPixelRGB_ (Uint * buffer, Uint x, Color c)
 
 
 inline void
-getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
+getPixelRGB (const unsigned int * buffer, unsigned int x, unsigned int y, Color * c)
 {
 #ifdef _DEBUG
 	if (x + y * resolx >= resolx * c_resoly) {
@@ -350,7 +349,7 @@ getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 
 
 /*inline*/ void
-getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
+getPixelRGB_ (const unsigned int * buffer, unsigned int x, Color * c)
 {
 	unsigned char *tmp8 = nullptr;
 
@@ -448,7 +447,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 
 /*===============================================================*/
 void
-zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
+zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf, unsigned int resx, unsigned int resy, int switchIncr, float switchMult)
 {
 	[[maybe_unused]] static unsigned char s_pertedec = 8;
 	static char s_firstTime = 1;
@@ -528,11 +527,11 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 				int     yperte = 0;
                                 int     yofs = 0;
 
-				for (Uint y = 0; y < resy; y++, yofs += resx) {
+				for (unsigned int y = 0; y < resy; y++, yofs += resx) {
 					int     xofs = yofs << 1;
 					int     xperte = 0;
 
-					for (Uint x = 0; x < resx; x++) {
+					for (unsigned int x = 0; x < resx; x++) {
 						brutS[xofs++] = xperte;
 						brutS[xofs++] = yperte;
 						xperte += sqrtperte;
@@ -560,8 +559,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 					loopv--;
 					firedec[loopv] = s_decc;
 					s_decc += s_spdc / 10;
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_spdc += (RAND () % 3) - (RAND () % 3);
+					s_spdc += MythRandomTriangularInt(2);
 
 					if (s_decc > 4)
 						s_spdc -= 1;
@@ -569,21 +567,20 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 						s_spdc += 1;
 
 					if (s_spdc > 30)
-						s_spdc = s_spdc - (RAND () % 3) + (s_accel / 10);
+						s_spdc = s_spdc - MythRandomInt(0, 2) + (s_accel / 10);
 					if (s_spdc < -30)
-						s_spdc = s_spdc + (RAND () % 3) + (s_accel / 10);
+						s_spdc = s_spdc + MythRandomInt(0, 2) + (s_accel / 10);
 
 					if (s_decc > 8 && s_spdc > 1)
-						s_spdc -= (RAND () % 3) - 2;
+						s_spdc -= MythRandomInt(-2, 0);
 
 					if (s_decc < -8 && s_spdc < -1)
-						s_spdc += (RAND () % 3) + 2;
+						s_spdc += MythRandomInt(2, 4);
 
 					if (s_decc > 8 || s_decc < -8)
 						s_decc = s_decc * 8 / 9;
 
-                                        // NOLINTNEXTLINE(misc-redundant-expression)
-					s_accel += (RAND () % 2) - (RAND () % 2);
+					s_accel += MythRandomTriangularInt(1);
 					if (s_accel > 20)
 						s_accel -= 2;
 					if (s_accel < -20)
@@ -599,8 +596,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 			/* sauvegarde de l'etat actuel dans la nouvelle source */
 
-			Uint y = prevX * prevY * 2;
-			for (Uint x = 0; x < y; x += 2) {
+			unsigned int y = prevX * prevY * 2;
+			for (unsigned int x = 0; x < y; x += 2) {
 				int     brutSmypos = brutS[x];
 				int     x2 = x + 1;
 				
@@ -625,10 +622,10 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	if (s_interlaceStart>=0) {
             int maxEnd = (s_interlaceStart+INTERLACE_INCR);
 		/* creation de la nouvelle destination */
-                Uint y = (Uint)s_interlaceStart;
-		for ( ; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
-			Uint premul_y_prevX = y * prevX * 2;
-			for (Uint x = 0; x < prevX; x++) {
+                unsigned int y = (unsigned int)s_interlaceStart;
+		for ( ; (y < (unsigned int)prevY) && (y < (unsigned int)maxEnd); y++) {
+			unsigned int premul_y_prevX = y * prevX * 2;
+			for (unsigned int x = 0; x < prevX; x++) {
 				int     px = 0;
 				int     py = 0;
 				
@@ -673,10 +670,10 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 }
 
 void
-pointFilter (Uint * pix1, Color c, float t1, float t2, float t3, float t4, Uint cycle)
+pointFilter (unsigned int * pix1, Color c, float t1, float t2, float t3, float t4, unsigned int cycle)
 {
-	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
-	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
+	unsigned int    x = (unsigned int) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
+	unsigned int    y = (unsigned int) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
 
 	if ((x > 1) && (y > 1) && (x < resolx - 2) && (y < c_resoly - 2)) {
 		setPixelRGB (pix1, x + 1, y, c);
