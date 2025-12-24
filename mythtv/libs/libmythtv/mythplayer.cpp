@@ -81,9 +81,9 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
     m_playerFlags(Flags),
     m_liveTV(Context->m_tvchain),
     //AV subtitles
-    m_subReader(this),
+    m_subReader(),
     // CC608/708
-    m_cc608(this), m_cc708(this),
+    m_cc608(this), m_cc708(),
     // Audio
     m_audio(this, (Flags & kAudioMuted) != 0)
 {

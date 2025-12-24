@@ -17,8 +17,6 @@ extern "C" {
 QString toString(const AVSubtitle& sub);
 #endif
 
-class MythPlayer;
-
 class AVSubtitles
 {
   public:
@@ -47,7 +45,7 @@ class SubtitleReader : public QObject
     void TextSubtitlesUpdated();
 
   public:
-    SubtitleReader(MythPlayer *parent);
+    SubtitleReader();
    ~SubtitleReader() override;
 
     void EnableAVSubtitles(bool enable);
@@ -72,8 +70,6 @@ class SubtitleReader : public QObject
     void ClearRawTextSubtitles(void);
 
   private:
-    MythPlayer    *m_parent                 {nullptr};
-
     AVSubtitles   m_avSubtitles;
     bool          m_avSubtitlesEnabled      {false};
     TextSubtitles m_textSubtitles;
