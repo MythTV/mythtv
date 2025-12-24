@@ -5,14 +5,10 @@
 #include <cstdint>
 #include <string>
 
-extern const std::array<const std::array<const uint8_t,16>,1+8+8> lang_chars;
 extern const std::array<const uint8_t,     13> chartab_original;
 extern const std::array<const uint16_t,   256> hammtab;
 extern const std::array<const uint8_t,    256> hamm84tab;
 extern const std::array<const uint8_t,    256> unham84tab;
-extern const std::array<const uint8_t,    256> vbi_bit_reverse;
-extern const std::array<const std::string,  8> formats;
-extern const std::array<const std::string,  4> subtitles;
 extern const std::array<const std::array<const uint8_t,256>,3> hamm24par;
 extern const std::array<const uint8_t,    256> hamm24val;
 extern const std::array<const uint16_t,    64> hamm24err;
