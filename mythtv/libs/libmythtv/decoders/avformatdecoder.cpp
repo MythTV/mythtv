@@ -14,7 +14,6 @@
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
-#include "libavutil/intreadwrite.h" // for AV_RB32 and AV_RB24
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
@@ -1387,10 +1386,10 @@ int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
                 uint8_t offset = 0;
                 if (Context->extradata[0] == 1)
                     offset = 9; // avCC
-                else if (AV_RB24(Context->extradata) == 0x01) // Annex B - 3 byte startcode 0x000001
-                    offset = 4;
-                else if (AV_RB32(Context->extradata) == 0x01) // Annex B - 4 byte startcode 0x00000001
-                    offset= 5;
+                else if (ByteReader::readBigEndianU24(Context->extradata) == 0x01)
+                    offset = 4; // Annex B - 3 byte startcode 0x000001
+                else if (ByteReader::readBigEndianU32(Context->extradata) == 0x01)
+                    offset= 5; // Annex B - 4 byte startcode 0x00000001
 
                 if (offset)
                 {
