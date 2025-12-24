@@ -75,8 +75,6 @@ add_library(
   captions/cc708window.h
   captions/subtitlereader.cpp
   captions/subtitlereader.h
-  captions/vbi608extractor.cpp
-  captions/vbi608extractor.h
   cardutil.cpp
   cardutil.h
   channelgroup.cpp

@@ -16,13 +16,13 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "vbi608extractor.h"
 
 #include <algorithm>
 #include <cfloat>
 #include <cstdint>
 
 #include "libmythbase/mythlogging.h"
-#include "captions/vbi608extractor.h"
 
 #define LOC QString("VBI608Extractor: ")
 

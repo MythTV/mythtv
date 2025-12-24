@@ -94,7 +94,6 @@ HEADERS += recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
 HEADERS += videometadatautil.h
-HEADERS += captions/vbi608extractor.h
 HEADERS += captions/cc608decoder.h
 HEADERS += captions/cc608reader.h
 HEADERS += captions/cc708decoder.h
@@ -146,7 +145,6 @@ SOURCES += recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
 SOURCES += videometadatautil.cpp
-SOURCES += captions/vbi608extractor.cpp
 SOURCES += captions/cc608decoder.cpp
 SOURCES += captions/cc608reader.cpp
 SOURCES += captions/cc708decoder.cpp
@@ -920,7 +918,9 @@ using_backend {
 
     !mingw:!win32-msvc* {
         HEADERS += recorders/v4lrecorder.h
+        HEADERS += recorders/vbi608extractor.h
         SOURCES += recorders/v4lrecorder.cpp
+        SOURCES += recorders/vbi608extractor.cpp
     }
 
     using_v4l2 {
