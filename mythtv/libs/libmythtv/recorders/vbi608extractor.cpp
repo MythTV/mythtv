@@ -254,69 +254,6 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     return true;
 }
 
-bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
-{
-    int ypitch = picframe->m_pitches[0];
-    int ywidth = picframe->m_width;
-
-    m_code[0] = UINT16_MAX;
-    m_code[1] = UINT16_MAX;
-
-    // find CC
-    uint found_cnt = 0;
-    for (uint i = 0; i < max_lines; i++)
-    {
-        const unsigned char *y = picframe->m_buffer +
-            picframe->m_offsets[0] + (i * static_cast<ptrdiff_t>(ypitch));
-        if (FindClocks(y, ywidth))
-        {
-            uint maxv = 0;
-            for (uint j = 0; j < m_start + (8 * m_rate); j++)
-                maxv = std::max(uint((y+(i * static_cast<ptrdiff_t>(ypitch)))[j]), maxv);
-            uint avgv = maxv / 2;
-
-            if (y[uint(m_start + ((0+7) * m_rate))] > avgv ||
-                y[uint(m_start + ((1+7) * m_rate))] > avgv ||
-                y[uint(m_start + ((2+7) * m_rate))] < avgv)
-            {
-                continue; // need 001 at run in..
-            }
-
-            m_code[found_cnt] = 0;
-            for (uint j = 0; j < 8+8; j++)
-            {
-                bool bit = y[uint(m_start + ((j+7+3) * m_rate))] > avgv;
-                m_code[found_cnt] =
-                    (m_code[found_cnt]>>1) | (bit?(1<<15):0);
-            }
-
-            found_cnt++;
-            if (found_cnt>=2)
-                break;
-#if 0
-            unsigned char *Y = const_cast<unsigned char*>(y);
-            unsigned char *u = const_cast<unsigned char*>
-                (picframe->buf + picframe->offsets[1] +
-                 (i*picframe->pitches[1]));
-            unsigned char *v = const_cast<unsigned char*>
-                (picframe->buf + picframe->offsets[2] +
-                 (i*picframe->pitches[2]));
-            unsigned uwidth = picframe->pitches[1];
-            v[uwidth / 3] = 0x40;
-            for (uint j = 0; j < 7+3+8+8; j++)
-            {
-                uint yloc = uint (m_start + j * m_rate + 0.5);
-                Y[yloc] = 0xFF;
-                uint uloc = uint (uwidth * (m_start + j * m_rate + 0.5) / ywidth);
-                u[uloc] = 0x40;
-            }
-#endif
-        }
-    }
-
-    return found_cnt > 0;
-}
-
 bool VBI608Extractor::ExtractCC12(const unsigned char *buf, uint width)
 {
     m_code[0] = UINT16_MAX;
@@ -373,32 +310,4 @@ bool VBI608Extractor::ExtractCC34(const unsigned char *buf, uint width)
         return true;
     }
     return false;
-}
-
-uint VBI608Extractor::FillCCData(cc608_data &cc_data) const
-{
-    uint cc_count = 0;
-    if (m_code[0] != UINT16_MAX)
-    {
-        cc_data[2] = 0x04;
-        cc_data[3] = (m_code[0])    & 0xff;
-        cc_data[4] = (m_code[0]>>8) & 0xff;
-        cc_count++;
-    }
-
-    if (m_code[1] != UINT16_MAX)
-    {
-        cc_data[2+(3*cc_count)] = 0x04|0x01;
-        cc_data[3+(3*cc_count)] = (m_code[1])    & 0xff;
-        cc_data[4+(3*cc_count)] = (m_code[1]>>8) & 0xff;
-        cc_count++;
-    }
-
-    if (cc_count)
-    {
-        cc_data[0] = 0x40 | cc_count;
-        cc_data[1] = 0x00;
-        return 2+(3*cc_count);
-    }
-    return 0;
 }
