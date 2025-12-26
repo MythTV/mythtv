@@ -236,12 +236,6 @@ add_library(
 
 target_compile_definitions(mythbase PRIVATE MBASE_API)
 
-# The libudfread library is guaranteed to be installed by this point. Either by
-# the system, or by the higher level CMakeLists.txt file that includes MythTV as
-# an external project.
-set_source_files_properties(mythcdrom.cpp PROPERTIES COMPILE_DEFINITIONS
-                                                     HAVE_LIBUDFREAD)
-
 set_source_files_properties(
   mythdirs.cpp
   PROPERTIES

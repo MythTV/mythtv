@@ -6,14 +6,11 @@
 #include "libmythbase/mythlogging.h"
 
 #include "captions/cc708reader.h"
-#include "decoders/decoderbase.h"
-#include "mythplayer.h"
 
 #define LOC QString("CC708Reader: ")
 #define CHECKENABLED if (!m_enabled) return
 
-CC708Reader::CC708Reader(MythPlayer *owner)
-  : m_parent(owner)
+CC708Reader::CC708Reader()
 {
     for (uint i=0; i < k708MaxServices; i++)
     {

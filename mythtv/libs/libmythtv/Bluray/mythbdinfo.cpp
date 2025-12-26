@@ -1,21 +1,23 @@
+#include "mythbdinfo.h"
+
 // Qt
 #include <QDir>
 #include <QCryptographicHash>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcdrom.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 
 #include "io/mythiowrapper.h"
-#include "Bluray/mythbdiowrapper.h"
-#include "Bluray/mythbdinfo.h"
+#include "mythbdiowrapper.h"
 
 // Std
 #include <fcntl.h>
 
 // BluRay
-#ifdef HAVE_LIBBLURAY
+#if HAVE_LIBBLURAY
 #include <libbluray/bluray.h>
 #include <libbluray/log_control.h>
 #include <libbluray/meta_data.h>

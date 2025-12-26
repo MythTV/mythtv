@@ -87,8 +87,6 @@ endif()
 #
 pkg_check_modules(SYSTEM_LIBBLURAY "libbluray>=0.9.3" IMPORTED_TARGET)
 if(SYSTEM_LIBBLURAY_FOUND)
-  target_compile_definitions(PkgConfig::SYSTEM_LIBBLURAY
-                             INTERFACE HAVE_LIBBLURAY)
   # Create alias, so that all the rest of the CMakeLists files just refer to
   # mythbluray.
   add_library(mythbluray ALIAS PkgConfig::SYSTEM_LIBBLURAY)

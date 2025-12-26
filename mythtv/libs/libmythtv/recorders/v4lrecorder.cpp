@@ -1,4 +1,5 @@
 // -*- Mode: c++ -*-
+#include "v4lrecorder.h"
 
 #include "libmythbase/mythconfig.h"
 
@@ -13,8 +14,7 @@
 
 #include "libmythbase/mythlogging.h"
 
-#include "captions/vbi608extractor.h"
-#include "v4lrecorder.h"
+#include "vbi608extractor.h"
 #include "tv_rec.h"
 
 #define TVREC_CARDNUM \

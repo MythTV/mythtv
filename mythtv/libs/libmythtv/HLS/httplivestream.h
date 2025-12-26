@@ -1,9 +1,11 @@
 #ifndef HTTPLIVESTREAM_H
 #define HTTPLIVESTREAM_H
 
+#include <cstdint>
+
 #include <QString>
 
-#include "libmythtv/mythframe.h"
+#include "libmythtv/mythtvexp.h"
 
 enum HTTPLiveStreamStatus : std::int8_t {
     kHLSStatusUndefined    = -1,

@@ -16,18 +16,19 @@
 #include <QRunnable>
 #include <QFile>
 #include <QDataStream>
+#include <QHash>
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QTextCodec>
 #elif QT_VERSION < QT_VERSION_CHECK(6,3,0)
 #include <QStringConverter>
 #endif
+#include <QWaitCondition>
 
 // MythTV
 #include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/remotefile.h"
-#include "libmythtv/io/mythmediabuffer.h"
 #include "libmythtv/mythaverror.h"
 
 #include "captions/textsubtitleparser.h"

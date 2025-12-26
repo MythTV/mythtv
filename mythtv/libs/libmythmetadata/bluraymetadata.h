@@ -3,7 +3,9 @@
 
 #include <utility>
 
-#ifdef HAVE_LIBBLURAY
+#include "libmythbase/mythconfig.h"
+
+#if HAVE_LIBBLURAY
 #include <libbluray/bluray.h>
 #else
 #include "libbluray/bluray.h"

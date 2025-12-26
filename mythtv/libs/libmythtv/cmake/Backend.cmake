@@ -141,8 +141,14 @@ target_sources(
 if(NOT WIN32)
   target_sources(
     mythtv
-    PRIVATE channelscan/externrecscanner.cpp channelscan/externrecscanner.h
-            recorders/v4lrecorder.cpp recorders/v4lrecorder.h)
+    PRIVATE
+    channelscan/externrecscanner.cpp
+    channelscan/externrecscanner.h
+    recorders/v4lrecorder.cpp
+    recorders/v4lrecorder.h
+    recorders/vbi608extractor.cpp
+    recorders/vbi608extractor.h
+    )
 endif()
 if(TARGET PkgConfig::ALSA)
   target_link_libraries(mythtv PUBLIC PkgConfig::ALSA)
