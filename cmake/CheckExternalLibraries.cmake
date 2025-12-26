@@ -183,9 +183,9 @@ endif()
 # bluray: fedora:libbluray-devel debian:libbluray-dev
 pkg_check_modules(SYSTEM_LIBBLURAY "libbluray>=0.9.3" IMPORTED_TARGET)
 add_build_config(PkgConfig::SYSTEM_LIBBLURAY "system_libbluray")
-if(SYSTEM_LIBBLURAY_FOUND)
-  target_compile_definitions(PkgConfig::SYSTEM_LIBBLURAY
-                             INTERFACE HAVE_LIBBLURAY)
+if(TARGET PkgConfig::SYSTEM_LIBBLURAY)
+  message(STATUS
+    "Found libbluray ${SYSTEM_LIBBLURAY_VERSION} ${SYSTEM_LIBBLURAY_LINK_LIBRARIES}")
 endif()
 
 # valgrind - needs valgrind-tools-devel

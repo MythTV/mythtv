@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythcdrom.h"
 #include "libmythbase/mythcorecontext.h"
@@ -28,7 +29,7 @@
 #include "Bluray/mythbdbuffer.h"
 
 // BluRay
-#ifdef HAVE_LIBBLURAY
+#if HAVE_LIBBLURAY
 #include <libbluray/log_control.h>
 #include <libbluray/meta_data.h>
 #include <libbluray/overlay.h>

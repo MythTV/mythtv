@@ -1,6 +1,8 @@
 #include "mythcdrom.h"
 
-#ifdef HAVE_LIBUDFREAD
+#include "mythconfig.h"
+
+#if HAVE_LIBUDFREAD
 #include <udfread/udfread.h>
 #include <udfread/blockinput.h>
 #else
@@ -13,7 +15,6 @@
 #include <QFileInfo>
 
 #include "compat.h"
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "remotefile.h"
 

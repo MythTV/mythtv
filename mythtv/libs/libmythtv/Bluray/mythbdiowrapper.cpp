@@ -1,6 +1,8 @@
+#include "mythbdiowrapper.h"
+
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "io/mythiowrapper.h"
-#include "Bluray/mythbdiowrapper.h"
 
 // Std
 #include <cstdio>
@@ -10,7 +12,7 @@
 #include <sys/types.h>
 
 // Bluray
-#ifdef HAVE_LIBBLURAY
+#if HAVE_LIBBLURAY
 #include <libbluray/filesystem.h>
 #else
 #include "file/filesystem.h"

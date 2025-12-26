@@ -444,8 +444,6 @@ using_frontend {
     DEPENDPATH += ../../external/libmythbluray
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
     !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-} else {
-    DEFINES += HAVE_LIBBLURAY
 }
 using_system_libbluray:mingw {
     LIBS += -lbluray

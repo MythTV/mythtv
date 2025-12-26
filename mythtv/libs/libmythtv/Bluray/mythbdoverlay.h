@@ -4,8 +4,10 @@
 // Qt
 #include <QImage>
 
+#include "libmythbase/mythconfig.h"
+
 // BluRay
-#ifdef HAVE_LIBBLURAY
+#if HAVE_LIBBLURAY
 #include <libbluray/bluray.h>
 #include <libbluray/overlay.h>
 #else

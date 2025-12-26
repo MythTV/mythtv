@@ -1514,6 +1514,8 @@ HAVE_LIST="
     vaapi_glx
     vaapi_x11
     vdpau_x11
+    libbluray
+    libudfread
 "
 
 # options emitted with CONFIG_ prefix but not available on the command line
