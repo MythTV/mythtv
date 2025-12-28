@@ -59,6 +59,7 @@ class MBASE_PUBLIC PortChecker : public QObject
 
   private:
     bool m_cancelCheck {false};
+    static void processEvents(void);
 };
 
 #endif
