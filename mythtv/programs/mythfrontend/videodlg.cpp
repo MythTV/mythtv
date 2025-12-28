@@ -3120,33 +3120,27 @@ void VideoDialog::playFolder()
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
-    int list_count = 0;
-
-    if (node && !(node->getInt() >= 0))
-        list_count = node->childCount();
-    else
+    if (!node || (node->getInt() >= 0))
+        return;
+    int list_count = node->childCount();
+    if (list_count <= 0)
         return;
 
-    if (list_count > 0)
+    bool video_started = false;
+    int i = 0;
+    while (i < list_count &&
+           (!video_started || playing_time.hasExpired(WATCHED_WATERMARK)))
     {
-        bool video_started = false;
-        int i = 0;
-        while (i < list_count &&
-               (!video_started || playing_time.hasExpired(WATCHED_WATERMARK)))
-        {
-            MythGenericTree *subnode = node->getChildAt(i);
-            if (subnode)
-            {
-                VideoMetadata *metadata = GetMetadataPtrFromNode(subnode);
-                if (metadata && m_d->m_videoList)
-                {
-                    PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
-                    playing_time.start();
-                    video_started = true;
-                }
-            }
-            i++;
-        }
+        MythGenericTree *subnode = node->getChildAt(i);
+        i++;
+        if (!subnode)
+            continue;
+        VideoMetadata *metadata = GetMetadataPtrFromNode(subnode);
+        if (!metadata || !m_d->m_videoList)
+            continue;
+        PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
+        playing_time.start();
+        video_started = true;
     }
 }
 
