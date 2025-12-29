@@ -44,7 +44,9 @@ class MediaMonitorUnix : public MediaMonitor
 #endif
 
     bool AddDevice(MythMediaDevice* pDevice) override; // MediaMonitor
+#if HAVE_FSTAB_H
     bool AddDevice(struct fstab* mep);
+#endif
 
 #if !CONFIG_QTDBUS
     static QString GetDeviceFile(const QString &sysfs);
