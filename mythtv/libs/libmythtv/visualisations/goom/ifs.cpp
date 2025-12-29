@@ -44,10 +44,7 @@
 #include "goom_core.h"
 #include "goom_tools.h"
 
-
-static inline long LRAND()      { return static_cast<long>( RAND() & 0x7fffffff); }
-static inline int  NRAND(int n) { return static_cast<int>( LRAND() % n ); }
-static constexpr double MAXRAND { 2147483648.0 }; /* unsigned 1<<31 as a * * * * float */
+#include "libmythbase/mythrandom.h"
 
 /*****************************************************/
 
@@ -106,13 +103,14 @@ IFSPoint *Buf;
 static int Cur_Pt;
 
 /*****************************************************/
+static constexpr double MAXRAND { 2147483648.0 }; /* unsigned 1<<31 as a * * * * float */
 
 static  DBL
 Gauss_Rand (DBL c, DBL A, DBL S)
 {
-	DBL y = (DBL) LRAND () / MAXRAND;
+	DBL y = static_cast<double>(MythRandom(0, (1U << 31) - 1)) / MAXRAND;
 	y = A * (1.0 - exp (-y * y * S)) / (1.0 - exp (-S));
-	if (NRAND (2))
+	if (rand_bool())
 		return (c + y);
 	return (c - y);
 }
@@ -120,7 +118,7 @@ Gauss_Rand (DBL c, DBL A, DBL S)
 static  DBL
 Half_Gauss_Rand (DBL c, DBL A, DBL S)
 {
-	DBL y = (DBL) LRAND () / MAXRAND;
+	DBL y = static_cast<double>(MythRandom(0, (1U << 31) - 1)) / MAXRAND;
 	y = A * (1.0 - exp (-y * y * S)) / (1.0 - exp (-S));
 	return (c + y);
 }
@@ -180,7 +178,7 @@ init_ifs (int width, int height)
 	free_ifs_buffers (Fractal);
 //      fprintf (stderr,"--ifs ok\n");
 
-	int i = (NRAND (4)) + 2;					/* Number of centers */
+	int i = MythRandomInt(2, 5);					/* Number of centers */
 	switch (i) {
 	case 3:
 		Fractal->m_depth = MAX_DEPTH_3;
@@ -236,7 +234,7 @@ init_ifs (int width, int height)
 	Fractal->m_count = 0;
 	Fractal->m_lx = (Fractal->m_width - 1) / 2;
 	Fractal->m_ly = (Fractal->m_height - 1) / 2;
-	Fractal->m_col = goom_rand () % (width * height);	/* modif by JeKo */
+	Fractal->m_col = MythRandomInt(0, width * height - 1);	/* modif by JeKo */
 
 	Random_Simis (Fractal, Fractal->m_components, 0, 5 * MAX_SIMI);
 

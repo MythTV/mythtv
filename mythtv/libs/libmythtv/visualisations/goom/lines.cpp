@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 
@@ -11,6 +12,9 @@
 #include "drawmethods.h"
 #include "goom_core.h"
 #include "goom_tools.h"
+#include "goomconfig.h"
+
+#include "libmythbase/mythrandom.h"
 
 extern unsigned int resolx, c_resoly;
 
@@ -70,7 +74,7 @@ genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 	}
 }
 
-static guint32 getcouleur (int mode)
+static uint32_t getcouleur (int mode)
 {
 	switch (mode) {
 	case GML_RED:
@@ -128,11 +132,11 @@ goom_lines_move (GMLine * l)
 	l->power += l->powinc;
 	if (l->power < 1.1F) {
 		l->power = 1.1F;
-		l->powinc = (float) (iRAND (20) + 10) / 300.0F;
+		l->powinc = (float) MythRandomInt(10, 29) / 300.0F;
 	}
 	if (l->power > 17.5F) {
 		l->power = 17.5F;
-		l->powinc = -(float) (iRAND (20) + 10) / 300.0F;
+		l->powinc = -(float) MythRandomInt(10, 29) / 300.0F;
 	}
 
 	l->amplitude = (99.0F * l->amplitude + l->amplitudeF) / 100.0F;
@@ -200,7 +204,7 @@ void
 goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 {
 	if (line != nullptr) {
-		guint32 color = line->color;
+		uint32_t color = line->color;
 		GMUnitPointer *pt = &(line->points[0]);
 
 		float   cosa = cosf (pt->angle) / 1000.0F;

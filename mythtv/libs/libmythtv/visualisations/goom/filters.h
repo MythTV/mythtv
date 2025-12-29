@@ -2,8 +2,8 @@
 #define FILTERS_H
 
 #include <cmath>
+#include <cstdint>
 
-#include "goomconfig.h"
 #include "graphic.h"
 
 struct ZoomFilterData
@@ -37,7 +37,7 @@ struct ZoomFilterData
 #define YONLY_MODE 8
 #define SPEEDWAY_MODE 9
 
-void    pointFilter (guint32 * pix1, Color c, float t1, float t2, float t3, float t4, guint32 cycle);
+void    pointFilter (uint32_t * pix1, Color c, float t1, float t2, float t3, float t4, uint32_t cycle);
 
 /* filtre de zoom :
  * le contenu de pix1 est copie dans pix2.
@@ -45,7 +45,7 @@ void    pointFilter (guint32 * pix1, Color c, float t1, float t2, float t3, floa
  * resx,resy : taille des buffers.
  */
 
-void    zoomFilterFastRGB (guint32 * pix1, guint32 * pix2, ZoomFilterData * zf, guint32 resx, guint32 resy, int switchIncr, float switchMult);
+void    zoomFilterFastRGB (uint32_t * pix1, uint32_t * pix2, ZoomFilterData * zf, uint32_t resx, uint32_t resy, int switchIncr, float switchMult);
 
 #define SIN_MUL 1
 #define SIN_ADD 2
