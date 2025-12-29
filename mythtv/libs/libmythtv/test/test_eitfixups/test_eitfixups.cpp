@@ -986,7 +986,7 @@ void TestEITFixups::testDvbEitAuthority()
 
     PRINT_EVENT(event);
     QCOMPARE(event.m_subtitle, QString(""));
-    QCOMPARE(event.m_videoProps & VID_HDTV, (int)VID_HDTV);
+    QCOMPARE(event.m_videoProps & VID_HDTV, (uint)VID_HDTV);
     QCOMPARE(event.m_seriesId, e_seriesID);
     QCOMPARE(event.m_programId, e_programID);
 }
