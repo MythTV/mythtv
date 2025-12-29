@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+#include "mediamonitor-unix.h"
+#include "mediamonitor.h"
+
 // Standard C headers
 #include <cstdio>
 
@@ -7,7 +10,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
-#ifndef ANDROID
+#if HAVE_FSTAB_H
 #include <fstab.h>
 #endif
 
@@ -17,8 +20,6 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/param.h>
-
-#include "libmythbase/mythconfig.h"
 
 // Qt headers
 #include <QtGlobal>
@@ -43,9 +44,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsystemlegacy.h"
 
-#include "mediamonitor-unix.h"
-#include "mediamonitor.h"
-
 #if HAVE_LIBUDEV
 extern "C" {
     #include <libudev.h>
@@ -53,7 +51,7 @@ extern "C" {
 #endif
 
 
-#ifndef Q_OS_ANDROID
+#if HAVE_FSTAB_H
 #ifndef MNTTYPE_ISO9660
 #   ifdef __linux__
     static constexpr const char* MNTTYPE_ISO9660 { "iso9660" };
@@ -94,7 +92,7 @@ static constexpr const char* UDISKS2_MIN_VERSION        { "2.7.3" };
 
 static const QString LOC = QString("MMUnix:");
 
-#ifndef Q_OS_ANDROID
+#if HAVE_FSTAB_H
 // TODO: are these used?
 static void fstabError(const QString &methodName)
 {
@@ -149,7 +147,7 @@ void MediaMonitorUnix::deleteLater(void)
 // Loop through the file system table and add any supported devices.
 bool MediaMonitorUnix::CheckFileSystemTable(void)
 {
-#ifndef Q_OS_ANDROID
+#if HAVE_FSTAB_H
     struct fstab * mep = nullptr;
 
     // Attempt to open the file system descriptor entry.
@@ -723,13 +721,13 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     return true;
 }
 
+#if HAVE_FSTAB_H
 // Given a fstab entry to a media device determine what type of device it is
 bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 {
     if (!mep)
         return false;
 
-#ifndef Q_OS_ANDROID
 #if 0
     QString devicePath( mep->fs_spec );
     LOG(VB_GENERAL, LOG_DEBUG, "AddDevice - " + devicePath);
@@ -803,10 +801,10 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
         }
         pDevice->deleteLater();
     }
-#endif
 
     return false;
 }
+#endif
 
 #if CONFIG_QTDBUS
 /*

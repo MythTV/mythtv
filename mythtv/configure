@@ -1471,6 +1471,7 @@ HEADERS_LIST="
     dirent_h
     dlfcn_h
     fcntl_h
+    fstab_h
     mntent_h
     pthread_h
     strings_h
