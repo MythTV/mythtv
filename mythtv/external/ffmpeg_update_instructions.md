@@ -13,15 +13,19 @@ MythTV's changes are currently being maintained at
 
 `release/x.y` is all of the MythTV changes rebased onto `ffmpeg/release/x.y`.
 
-`release/mythtv/x.y` is the previous `rebase/a.b` plus all of ffmpeg's commits from `ffmpeg/release/x.y` cherry-picked on top.
+`release/mythtv/x.y` is the previous `rebase/a.b` plus all of ffmpeg's commits
+from `ffmpeg/release/x.y` cherry-picked on top.
 
 `rebase/x.y` is `release/x.y` rebased onto the branch point from `master`.
 
-The `release/mythtv` branches are for bisecting the FFmpeg changes when updating FFmpeg in MythTV.
+The `release/mythtv` branches are for bisecting the FFmpeg changes when updating
+FFmpeg in MythTV.
 
-The `release` branches will allow us to easily see what are changes are, making it easier to upstream them.
+The `release` branches will allow us to easily see what are changes are, making
+it easier to upstream them.
 
-`git diff release/x.y release/mythtv/x.y` should show they are identical when initially created.
+`git diff release/x.y release/mythtv/x.y` should show they are identical when
+initially created.
 
 Commits to `mythtv/external/FFmpeg` after the update shall be added to `release/x.y`
 and shall include a link to the mythtv commit in the
@@ -30,11 +34,11 @@ and shall include a link to the mythtv commit in the
 
 ## Notes:
 
-This document assumes a remote named `ffmpeg` pointed at either `https://git.ffmpeg.org/ffmpeg.git`
-or `https://github.com/ffmpeg/ffmpeg`.
+This document assumes a remote named `ffmpeg` pointed at either
+`https://git.ffmpeg.org/ffmpeg.git` or `https://github.com/ffmpeg/ffmpeg`.
 
-`MYTHTV_GIT_DIR` and `FFMPEG_GIT_DIR` will be used as placeholders for the git directories
-for MythTV and FFmpeg, respectively.
+`MYTHTV_GIT_DIR` and `FFMPEG_GIT_DIR` will be used as placeholders for the git
+directories for MythTV and FFmpeg, respectively.
 
 ## Update Instructions
 
@@ -58,8 +62,9 @@ rm -rf mythtv/external/FFmpeg
 mv mythtv/external/FFmpeg1 mythtv/external/FFmpeg
 ```
 
-If `git status` showed any modified files or any untracked files other than mythtv/external/FFmpeg1:
-Find the last commit added to FFmpeg:
+If `git status` showed any modified files or any untracked files other than
+`mythtv/external/FFmpeg1`, find the last commit added to FFmpeg:
+
 ```sh
 cd $FFMPEG_GIT_DIR
 git log
@@ -68,14 +73,14 @@ git log -- mythtv/external/FFmpeg
 git format-patch <commit> -- mythtv/external/FFmpeg
 ```
 
-Remove diff sections from each patch that change files not in mythtv/external/FFmpeg
-
 Append
+
 ```
 
 From:
 https://github.com/MythTV/mythtv/commit/<commit hash>
 ```
+
 to each commit message.
 
 ```sh
@@ -111,17 +116,22 @@ git push
 ```
 
 If you want to ensure mpegts-mythtv compiles, instead of
+
 ```sh
 git cherry-pick ..ffmpeg/release/x.y
 ```
+
 , do
+
 ```sh
 git log --reverse -p ..ffmpeg/release/x.y -- libavformat/mpegts.c libavformat/mpegts.h
 ```
-and cherry-pick until each commit in turn and create a new commit copying the changes to
-`mpegts-mythtv.c` and `mpegts-mythtv.h`.
+
+and cherry-pick until each commit in turn and create a new commit copying the
+changes to `mpegts-mythtv.c` and `mpegts-mythtv.h`.
 
 For each commit:
+
 ```sh
 git cherry-pick <commit hash of last commit from FFmpeg>..<commit hash>
 git log -p -- libavformat/mpegts.c libavformat/mpegts.h
@@ -133,6 +143,7 @@ rm *.patch
 ```
 
 and finally:
+
 ```sh
 git cherry-pick <commit hash of last commit from FFmpeg>..ffmpeg/release/x.y
 ```
@@ -140,6 +151,7 @@ git cherry-pick <commit hash of last commit from FFmpeg>..ffmpeg/release/x.y
 ### Step 3: Copying the updated FFmpeg to MythTV
 
 After final compile test of FFmpeg:
+
 ```sh
 cd $FFMPEG_GIT_DIR
 git clean -xdf
@@ -155,8 +167,8 @@ git status
 git commit
 ```
 
-Create a separate commit updating this document with the new FFmpeg version, commit hashes,
-and date.
+Create a separate commit updating this document with the new FFmpeg version,
+commit hashes, and date.
 
 Update MythTV to compile with the new version of FFmpeg.  It may be beneficial
 for bisecting if the changes can be moved before the FFmpeg update commit, perhaps
@@ -164,13 +176,15 @@ using FFmpeg's various `version.h` headers.
 
 #### Ensure FFmpeg can still use our included version of nv-codec-headers
 
-The current version can be found in `nv-codec-headers/ffnvcodec.pc.in` and `nv-codec-headers/CMakeLists.txt`,
-which should agree.
+The current version can be found in `nv-codec-headers/ffnvcodec.pc.in` and
+`nv-codec-headers/CMakeLists.txt`, which should agree.
 
 In `FFmpeg/configure` look for the section containing `if ! disabled ffnvcodec; then`
 or `check_pkg_config ffnvcodec` and see if the current version is still allowed.
 
-If the current version is no longer allowed by FFmpeg, update nv-codec-headers to an allowed version:
+If the current version is no longer allowed by FFmpeg, update nv-codec-headers
+to an allowed version:
+
 ```sh
 cd $MYTHTV_GIT_DIR/mythtv/external
 mv nv-codec-headers/CMakeLists.txt nv-codec-headers_CMakeLists.txt
@@ -183,7 +197,8 @@ git checkout <tag>
 
 rm -rf .git
 cd ..
-# update the version in CMakeLists.txt to match the new version in nv-codec-headers/ffnvcodec.pc.in
+# update the version in CMakeLists.txt to match the new version in
+# nv-codec-headers/ffnvcodec.pc.in
 # TODO: sed/awk command?
 grep "Version: " nv-codec-headers/ffnvcodec.pc.in
 nano nv-codec-headers_CMakeLists.txt
@@ -193,7 +208,8 @@ git add -A -- nv-codec-headers
 git commit
 ```
 
-This commit should be after the commit updating this document and before any commits modifying MythTV.
+This commit should be after the commit updating this document and before any
+commits modifying MythTV.
 
 ### Step 4: Testing
 
@@ -204,6 +220,7 @@ after running whatever tests you can do yourself.
 ### Step 5: Rebasing FFmpeg modifications
 
 This can be done simultaneously with testing:
+
 ```sh
 cd $FFMPEG_GIT_DIR
 git checkout release/mythtv/x.y
