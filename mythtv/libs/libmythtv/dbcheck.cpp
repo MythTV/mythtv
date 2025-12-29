@@ -368,7 +368,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (dbver != currentDatabaseVersion)
         LOG(VB_GENERAL, LOG_INFO,
             QString("Ignoring database changes between %1 and %2.")
-            .arg(dbver).arg(currentDatabaseVersion));
+            .arg(dbver, currentDatabaseVersion));
     return true;
 #endif
     // Suppress DB messages and turn of the settings cache,
