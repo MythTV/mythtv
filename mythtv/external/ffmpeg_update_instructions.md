@@ -4,6 +4,9 @@ FFmpeg was last updated to FFmpeg 8.0 `9c93070155903e2c2d08f9f7234a920877903f80`
 on 2025-12-12, which branched from FFmpeg master at
 `7eaa0f799ab30e723209cc64777f10063ae55a23`.
 
+MythTV's changes are currently being maintained at
+[ulmus-scott/FFmpeg](https://github.com/ulmus-scott/FFmpeg), not
+[MythTV/FFmpeg](https://github.com/MythTV/FFmpeg).
 
 ## Branches in MythTV/FFmpeg:
 `master` is `ffmpeg/master`.
