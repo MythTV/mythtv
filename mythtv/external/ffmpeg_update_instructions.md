@@ -40,7 +40,7 @@ for MythTV and FFmpeg, respectively.
 
 ### Step 0: Ensure `mythtv/external/FFmpeg` is identical to the latest release branch
 
-```
+```sh
 cd $MYTHTV_GIT_DIR
 git checkout master
 git pull
@@ -60,7 +60,7 @@ mv mythtv/external/FFmpeg1 mythtv/external/FFmpeg
 
 If `git status` showed any modified files or any untracked files other than mythtv/external/FFmpeg1:
 Find the last commit added to FFmpeg:
-```
+```sh
 cd $FFMPEG_GIT_DIR
 git log
 cd $MYTHTV_GIT_DIR
@@ -78,7 +78,7 @@ https://github.com/MythTV/mythtv/commit/<commit hash>
 ```
 to each commit message.
 
-```
+```sh
 cp *.patch $FFMPEG_GIT_DIR
 cd $FFMPEG_GIT_DIR
 git am -p4 *.patch
@@ -87,7 +87,7 @@ git push
 
 ### Step 1: Rebase `release/x.y` onto `ffmpeg/master`
 
-```
+```sh
 cd $FFMPEG_GIT_DIR
 git checkout master
 git fetch ffmpeg
@@ -102,7 +102,7 @@ git push
 
 ### Step 2: Add the new FFmpeg commits
 
-```
+```sh
 # create a new branch release/mythtv/x.y
 git checkout -b release/mythtv/x.y
 # cherry-pick the commits from ffmpeg/release/x.y into release/mythtv/x.y
@@ -111,18 +111,18 @@ git push
 ```
 
 If you want to ensure mpegts-mythtv compiles, instead of
-```
+```sh
 git cherry-pick ..ffmpeg/release/x.y
 ```
 , do
-```
+```sh
 git log --reverse -p ..ffmpeg/release/x.y -- libavformat/mpegts.c libavformat/mpegts.h
 ```
 and cherry-pick until each commit in turn and create a new commit copying the changes to
 `mpegts-mythtv.c` and `mpegts-mythtv.h`.
 
 For each commit:
-```
+```sh
 git cherry-pick <commit hash of last commit from FFmpeg>..<commit hash>
 git log -p -- libavformat/mpegts.c libavformat/mpegts.h
 git format-patch HEAD~ -- libavformat/mpegts.c libavformat/mpegts.h
@@ -133,14 +133,14 @@ rm *.patch
 ```
 
 and finally:
-```
+```sh
 git cherry-pick <commit hash of last commit from FFmpeg>..ffmpeg/release/x.y
 ```
 
 ### Step 3: Copying the updated FFmpeg to MythTV
 
 After final compile test of FFmpeg:
-```
+```sh
 cd $FFMPEG_GIT_DIR
 git clean -xdf
 cd $MYTHTV_GIT_DIR
@@ -171,7 +171,7 @@ In `FFmpeg/configure` look for the section containing `if ! disabled ffnvcodec; 
 or `check_pkg_config ffnvcodec` and see if the current version is still allowed.
 
 If the current version is no longer allowed by FFmpeg, update nv-codec-headers to an allowed version:
-```
+```sh
 cd $MYTHTV_GIT_DIR/mythtv/external
 mv nv-codec-headers/CMakeLists.txt nv-codec-headers_CMakeLists.txt
 rm -rf nv-codec-headers
@@ -204,7 +204,7 @@ after running whatever tests you can do yourself.
 ### Step 5: Rebasing FFmpeg modifications
 
 This can be done simultaneously with testing:
-```
+```sh
 cd $FFMPEG_GIT_DIR
 git checkout release/mythtv/x.y
 git checkout -b release/x.y
