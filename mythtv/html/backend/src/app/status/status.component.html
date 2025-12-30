@@ -3,7 +3,7 @@
     <app-status-encoders [encoders]="st.Encoders"></app-status-encoders>
     <app-status-scheduled [scheduled]="st.Scheduled"></app-status-scheduled>
     <app-status-jobqueue [jobqueue]="st.JobQueue"></app-status-jobqueue>
-    <app-status-machineinfo [machineinfo]="st.MachineInfo"></app-status-machineinfo>
+    <app-status-machineinfo [machineinfo]="st.MachineInfo" [status]="st"></app-status-machineinfo>
     <app-status-backends [backends]="st.Backends"></app-status-backends>
     <app-status-frontends [frontends]="st.Frontends"></app-status-frontends>
     <div class="statusBox" *ngIf="st.Miscellaneous">

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MachineInfo } from 'src/app/services/interfaces/status.interface';
+import { BackendStatus,  MachineInfo } from 'src/app/services/interfaces/status.interface';
 import { StorageGroup } from "src/app/services/interfaces/storagegroup.interface";
 import { UtilityService } from 'src/app/services/utility.service';
 
@@ -10,6 +10,7 @@ import { UtilityService } from 'src/app/services/utility.service';
 })
 export class MachineinfoComponent implements OnInit {
   @Input() machineinfo?: MachineInfo;
+  @Input() status?: BackendStatus;
 
   constructor(public utility: UtilityService) { }
 

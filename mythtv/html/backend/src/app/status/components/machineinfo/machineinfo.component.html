@@ -34,6 +34,9 @@
             </div>
         </div>
         <div>
+            <p>{{ 'dashboard.status.mach.backendver' | translate }}:
+                {{status?.SourcePath}} {{status?.SourceVer}}<br>
+                {{ 'dashboard.status.mach.hostname' | translate }}: {{status?.HostName}}</p>
             <p>{{ 'dashboard.status.mach.mythfill_last'
                 | translate: {GuideStart: utility.formatDateTime(machineinfo.GuideStart),
                 GuideEnd: utility.formatDateTime(machineinfo.GuideEnd),

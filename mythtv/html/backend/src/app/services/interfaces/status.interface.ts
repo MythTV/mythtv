@@ -29,6 +29,9 @@ export interface BackendStatus {
     ProtoVer:       string;
     Scheduled:      ScheduleOrProgram[];
     Version:        string;
+    SourceVer:      string;
+    SourcePath:     string;
+    HostName:       string;
 }
 
 export interface BackendStatusResponse {

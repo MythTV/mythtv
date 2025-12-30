@@ -11,6 +11,7 @@ import { tap } from 'rxjs/operators';
 })
 export class StatusComponent implements OnInit {
   m_status$!: Observable<BackendStatusResponse>;
+  status?: BackendStatusResponse;
 
   constructor(private statusService: StatusService) { }
 
