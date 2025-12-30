@@ -1589,7 +1589,6 @@ MYTHTV_HAVE_LIST='
     fe_can_2g_modulation
     is_duration_v
     libudev
-    stdint_h
     close_range
     iomainport
 '
@@ -4768,8 +4767,6 @@ if enabled hdhomerun; then
         HDHOMERUN_VERSION=0
     fi
 fi
-
-check_header stdint.h
 
 # test for close_range (linux system call since 5.9 and also FreeBSD)
 check_ld "cc" <<EOF && enable close_range
