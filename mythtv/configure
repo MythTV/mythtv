@@ -1515,6 +1515,9 @@ HAVE_LIST="
     $INTRINSICS_LIST
     $SYSTEM_FUNCS
     $TYPES_LIST
+    bdj_j2me
+    iomainport
+    libudev
     vaapi_drm
     vaapi_glx
     vaapi_x11
@@ -1584,12 +1587,6 @@ MYTHTV_CONFIG_LIST='
     drm
     drm_video
     force_loglong
-'
-
-MYTHTV_HAVE_LIST='
-    bdj_j2me
-    libudev
-    iomainport
 '
 
 MYTHTV_LIST='
@@ -5641,7 +5638,6 @@ check_deps $CONFIG_LIST       \
            $HAVE_LIST         \
            $MYTHTV_LIST       \
            $MYTHTV_CONFIG_LIST \
-           $MYTHTV_HAVE_LIST  \
            $USING_LIST        \
 
 # add_dep lib dep
@@ -6299,7 +6295,6 @@ EOF
 
 print_config ARCH_   "$config_files" $ARCH_LIST
 print_config HAVE_   "$config_files" $HAVE_LIST
-print_config HAVE_   "$config_files" $MYTHTV_HAVE_LIST
 print_config CONFIG_ "$config_files" $CONFIG_LIST       \
                                      $CONFIG_EXTRA      \
                                      $MYTHTV_LIST       \
