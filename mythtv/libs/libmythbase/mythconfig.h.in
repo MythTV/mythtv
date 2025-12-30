@@ -94,7 +94,6 @@
 #cmakedefine01 HAVE_BYTESWAP_H
 #cmakedefine01 HAVE_CLOSE_RANGE
 #cmakedefine01 HAVE_DIRENT_H
-#cmakedefine01 HAVE_FE_CAN_2G_MODULATION
 #cmakedefine01 HAVE_FSTAB_H
 #cmakedefine01 HAVE_GETOPT_H
 #cmakedefine01 HAVE_GETTIMEOFDAY
@@ -105,7 +104,6 @@
 #cmakedefine01 HAVE_MALLOC_H
 #cmakedefine01 HAVE_POSIX_FADVISE
 #cmakedefine01 HAVE_POSIX_MEMALIGN
-#cmakedefine01 HAVE_STDINT_H
 #cmakedefine01 HAVE_STRUCT_HDR_METADATA_INFOFRAME
 #cmakedefine01 HAVE_SYS_DL_H
 #cmakedefine01 HAVE_SYS_ENDIAN_H

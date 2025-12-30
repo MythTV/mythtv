@@ -59,6 +59,8 @@ list(
   -fno-tree-vectorize
   -mstack-alignment=16
   -D_FILE_OFFSET_BITS=64
+  -D_GNU_SOURCE
+  -D_DEFAULT_SOURCE
   -Wall
   -Wextra
   -Wduplicated-branches
@@ -84,6 +86,8 @@ list(
   -funit-at-a-time
   -mstack-alignment=16
   -D_FILE_OFFSET_BITS=64
+  -D_GNU_SOURCE
+  -D_DEFAULT_SOURCE
   -Qunused-arguments
   -Wall
   -Wextra

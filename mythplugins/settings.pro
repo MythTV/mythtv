@@ -23,7 +23,6 @@ isEmpty(TARGET_OS) : win32 {
     LIBS += -L/bin
 }
 
-DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 
 INCLUDEPATH += $$CONFIG_INCLUDEPATH
@@ -49,7 +48,6 @@ QMAKE_CFLAGS += $$CFLAGS
 
 # figure out defines
 
-DEFINES += $$CONFIG_DEFINES
 DEFINES += _FILE_OFFSET_BITS=64
 
 # construct linking path

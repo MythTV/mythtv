@@ -1494,6 +1494,10 @@ SYSTEM_FUNCS_DVDNAV="
 
 SYSTEM_FUNCS="
     $SYSTEM_FUNCS_BLURAY
+    gettimeofday
+    posix_fadvise
+    close_range
+    is_duration_v
 "
 
 TYPES_LIST="
@@ -1511,6 +1515,9 @@ HAVE_LIST="
     $INTRINSICS_LIST
     $SYSTEM_FUNCS
     $TYPES_LIST
+    bdj_j2me
+    iomainport
+    libudev
     vaapi_drm
     vaapi_glx
     vaapi_x11
@@ -1580,18 +1587,6 @@ MYTHTV_CONFIG_LIST='
     drm
     drm_video
     force_loglong
-'
-
-MYTHTV_HAVE_LIST='
-    bdj_j2me
-    fe_can_2g_modulation
-    gettimeofday
-    is_duration_v
-    posix_fadvise
-    libudev
-    stdint_h
-    close_range
-    iomainport
 '
 
 MYTHTV_LIST='
@@ -1962,7 +1957,6 @@ set_default sws_max_filter_size
 
 # mythtv settings
 
-CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
 
@@ -3661,6 +3655,8 @@ check_cppflags -D_FILE_OFFSET_BITS=64
 check_cxx -D_FILE_OFFSET_BITS=64 <<EOF && add_cxxppflags -D_FILE_OFFSET_BITS=64
 #include <stdlib.h>
 EOF
+add_cppflags -D_GNU_SOURCE -D_DEFAULT_SOURCE
+add_cxxppflags -D_GNU_SOURCE -D_DEFAULT_SOURCE
 
 check_host_cflags -Wall
 check_host_cflags $host_cflags_speed
@@ -4516,31 +4512,44 @@ else
     fi
 fi
 
-check_func  gettimeofday
-
+# HEADERS_LIST
 check_header dirent.h
 check_header dlfcn.h
-check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_header fcntl.h
 check_header fstab.h
 check_header mntent.h
-check_func_headers mntent.h getmntent_r
 check_header pthread.h
 check_header strings.h
 check_header sys/dl.h
 check_header sys/param.h
 check_header sys/time.h
 check_header unistd.h
+
+# for check_deps
 check_header valgrind/valgrind.h
 check_header vulkan/vulkan_core.h
 check_header linux/videodev2.h
 
-#Myth check for MYTHTV_HAVE_LIST
-check_func posix_fadvise
-check_func_headers sys/time.h gettimeofday
-#End MythTV check
-
+check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
+
+# SYSTEM_FUNCS
+check_func_headers mntent.h getmntent_r
+check_func_headers sys/time.h gettimeofday
+check_func_headers fcntl.h posix_fadvise
+
+# test for close_range (linux system call since 5.9 and also FreeBSD)
+check_func_headers unistd.h close_range
+
+# test for std::chrono:__is_duration_v<T>
+check_ld "cxx" <<EOF && enable is_duration_v
+#include <chrono>
+
+int main(int argc, char **argv){
+    bool value = std::chrono::__is_duration_v<int>;
+    return 0;
+}
+EOF
 
 enable pthreads
 # check for some common methods of building with pthread support
@@ -4768,29 +4777,6 @@ if enabled hdhomerun; then
         HDHOMERUN_VERSION=0
     fi
 fi
-
-check_header stdint.h
-
-# test for close_range (linux system call since 5.9 and also FreeBSD)
-check_ld "cc" <<EOF && enable close_range
-#define _GNU_SOURCE
-#include <unistd.h>
-
-int main(int argc, char **argv){
-    close_range(0,0,0);
-    return 0;
-}
-EOF
-
-# test for std::chrono:__is_duration_v<T>
-check_ld "cxx" <<EOF && enable is_duration_v
-#include <chrono>
-
-int main(int argc, char **argv){
-    bool value = std::chrono::__is_duration_v<int>;
-    return 0;
-}
-EOF
 
 if require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
     enable freetype2
@@ -5023,16 +5009,6 @@ if enabled dvb; then
         fi
     fi
 fi
-
-
-enabled dvb && check_cc -I"$dvb_path" <<EOF && enable fe_can_2g_modulation
-#include <linux/dvb/frontend.h>
-int main(void) {
-    if (FE_CAN_2G_MODULATION)
-        return 1;
-    return 0;
-}
-EOF
 
 enabled asi && check_cc <<EOF || disable asi
 #include <dveo/asi.h>
@@ -5655,7 +5631,6 @@ check_deps $CONFIG_LIST       \
            $HAVE_LIST         \
            $MYTHTV_LIST       \
            $MYTHTV_CONFIG_LIST \
-           $MYTHTV_HAVE_LIST  \
            $USING_LIST        \
 
 # add_dep lib dep
@@ -5945,7 +5920,6 @@ if enabled backend; then
   echo "Video4Linux support       ${v4l2-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
-  echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "Sat>IP support            ${satip-no}"
   echo "V@Box TV Gateway support  ${vbox-no}"
@@ -6314,7 +6288,6 @@ EOF
 
 print_config ARCH_   "$config_files" $ARCH_LIST
 print_config HAVE_   "$config_files" $HAVE_LIST
-print_config HAVE_   "$config_files" $MYTHTV_HAVE_LIST
 print_config CONFIG_ "$config_files" $CONFIG_LIST       \
                                      $CONFIG_EXTRA      \
                                      $MYTHTV_LIST       \
@@ -6367,16 +6340,11 @@ if enabled libass; then
     append CCONFIG "using_libass"
 fi
 
-if enabled appleremote; then
-  append CONFIG_DEFINES "USING_APPLEREMOTE"
-fi
-
 if enabled dvb && non_standard_header $dvb_path; then
   append CONFIG_INCLUDEPATH "$dvb_path"
 fi
 
 if enabled libcec; then
-  append CONFIG_DEFINES "using_libcec"
   if non_standard_header $libcec_path; then
     append CONFIG_INCLUDEPATH "$libcec_path"
   fi
@@ -6417,10 +6385,6 @@ fi
 if test x"$CCONFIG" != x"" ; then
   echo "CCONFIG=$CCONFIG" >> $TMPMAK
   echo "#define MYTH_BUILD_CONFIG \"$CCONFIG\"" >>$TMPH
-fi
-
-if test x"$CONFIG_DEFINES" != x"" ; then
-  echo "CONFIG_DEFINES=$CONFIG_DEFINES" >> $TMPMAK
 fi
 
 if test x"$CONFIG_INCLUDEPATH" != x"" ; then

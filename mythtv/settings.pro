@@ -279,10 +279,6 @@ macx {
 
 profile:!win32:!macx:CONFIG += debug
 
-# figure out defines
-DEFINES += $$CONFIG_DEFINES
-DEFINES += _GNU_SOURCE
-
 !isEmpty( QMAKE_LIBDIR_QT ) {
     !macx {
         LATE_LIBS += "-L$$QMAKE_LIBDIR_QT"

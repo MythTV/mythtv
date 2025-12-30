@@ -33,7 +33,6 @@ check_include_file(malloc.h HAVE_MALLOC_H)
 check_include_file(mntent.h HAVE_MNTENT_H)
 check_include_file(pthread.h HAVE_PTHREAD_H)
 check_include_file(soundcard.h HAVE_SOUNDCARD_H)
-check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(strings.h HAVE_STRINGS_H)
 check_include_file(sys/dl.h HAVE_SYS_DL_H)
 check_include_file(sys/endian_h HAVE_SYS_ENDIAN_H)
@@ -44,10 +43,7 @@ check_include_file(unistd.h HAVE_UNISTD_H)
 #
 # Check for symbols in include files
 #
-cmake_push_check_state(RESET)
-set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
 check_symbol_exists(close_range "unistd.h" HAVE_CLOSE_RANGE)
-cmake_pop_check_state()
 check_symbol_exists(fcntl "fcntl.h" HAVE_FCNTL)
 check_symbol_exists(getmntent_r "mntent.h" HAVE_GETMNTENT_R)
 check_symbol_exists(getopt "unistd.h" HAVE_GETOPT)
@@ -87,13 +83,6 @@ check_c_source_compiles(
   "
     #include <arm_neon.h>
     int16x8_t test = vdupq_n_s16(0);" HAVE_INTRINSICS_NEON)
-check_c_source_compiles(
-  "
-  #include <linux/dvb/frontend.h>
-  int main(void) {
-    return FE_CAN_2G_MODULATION;
-  }"
-  HAVE_FE_CAN_2G_MODULATION)
 
 #
 # Check compiler features
