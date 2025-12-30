@@ -3655,6 +3655,8 @@ check_cppflags -D_FILE_OFFSET_BITS=64
 check_cxx -D_FILE_OFFSET_BITS=64 <<EOF && add_cxxppflags -D_FILE_OFFSET_BITS=64
 #include <stdlib.h>
 EOF
+add_cppflags -D_GNU_SOURCE -D_DEFAULT_SOURCE
+add_cxxppflags -D_GNU_SOURCE -D_DEFAULT_SOURCE
 
 check_host_cflags -Wall
 check_host_cflags $host_cflags_speed
@@ -4537,15 +4539,7 @@ check_func_headers sys/time.h gettimeofday
 check_func_headers fcntl.h posix_fadvise
 
 # test for close_range (linux system call since 5.9 and also FreeBSD)
-check_ld "cc" <<EOF && enable close_range
-#define _GNU_SOURCE
-#include <unistd.h>
-
-int main(int argc, char **argv){
-    close_range(0,0,0);
-    return 0;
-}
-EOF
+check_func_headers unistd.h close_range
 
 # test for std::chrono:__is_duration_v<T>
 check_ld "cxx" <<EOF && enable is_duration_v
