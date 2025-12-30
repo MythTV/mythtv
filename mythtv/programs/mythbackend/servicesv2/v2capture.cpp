@@ -381,12 +381,14 @@ int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
     return nResult;
 }
 
+// Value can be null or empty string, to clear out a value
+// such as external channel change command
 bool V2Capture::UpdateCaptureCard  ( int              nCardId,
                                    const QString    &sSetting,
                                    const QString    &sValue )
 {
-    if ( nCardId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
-        throw( QString( "Card ID, Setting Name, and Value are required." ));
+    if ( nCardId < 1 || sSetting.isEmpty() )
+        throw( QString( "Card ID and Setting Name are required." ));
 
     return set_on_input(sSetting, nCardId, sValue);
 }
