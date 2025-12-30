@@ -1496,6 +1496,8 @@ SYSTEM_FUNCS="
     $SYSTEM_FUNCS_BLURAY
     gettimeofday
     posix_fadvise
+    close_range
+    is_duration_v
 "
 
 TYPES_LIST="
@@ -1586,9 +1588,7 @@ MYTHTV_CONFIG_LIST='
 
 MYTHTV_HAVE_LIST='
     bdj_j2me
-    is_duration_v
     libudev
-    close_range
     iomainport
 '
 
@@ -4540,6 +4540,27 @@ check_func_headers mntent.h getmntent_r
 check_func_headers sys/time.h gettimeofday
 check_func_headers fcntl.h posix_fadvise
 
+# test for close_range (linux system call since 5.9 and also FreeBSD)
+check_ld "cc" <<EOF && enable close_range
+#define _GNU_SOURCE
+#include <unistd.h>
+
+int main(int argc, char **argv){
+    close_range(0,0,0);
+    return 0;
+}
+EOF
+
+# test for std::chrono:__is_duration_v<T>
+check_ld "cxx" <<EOF && enable is_duration_v
+#include <chrono>
+
+int main(int argc, char **argv){
+    bool value = std::chrono::__is_duration_v<int>;
+    return 0;
+}
+EOF
+
 enable pthreads
 # check for some common methods of building with pthread support
 # do this before the optional library checks as some of them require pthreads
@@ -4766,27 +4787,6 @@ if enabled hdhomerun; then
         HDHOMERUN_VERSION=0
     fi
 fi
-
-# test for close_range (linux system call since 5.9 and also FreeBSD)
-check_ld "cc" <<EOF && enable close_range
-#define _GNU_SOURCE
-#include <unistd.h>
-
-int main(int argc, char **argv){
-    close_range(0,0,0);
-    return 0;
-}
-EOF
-
-# test for std::chrono:__is_duration_v<T>
-check_ld "cxx" <<EOF && enable is_duration_v
-#include <chrono>
-
-int main(int argc, char **argv){
-    bool value = std::chrono::__is_duration_v<int>;
-    return 0;
-}
-EOF
 
 if require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
     enable freetype2
