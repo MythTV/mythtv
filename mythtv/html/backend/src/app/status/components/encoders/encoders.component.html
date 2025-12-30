@@ -11,7 +11,7 @@
                         <ng-container *ngIf="sub.Recording && (sub.Id == encoder.Id || sub.ParentId == encoder.Id)">
                             '{{ sub.Recording.Title }}' on {{ sub.Recording.Channel.CallSign }}.
                             {{ 'dashboard.status.endtime_text' |
-                            translate: { EndTime: utility.formatTime(sub.Recording.EndTime) } }}
+                            translate: { EndTime: utility.formatTime(sub.Recording.Recording.EndTs) } }}
                             <br>
                         </ng-container>
                     </ng-container>
