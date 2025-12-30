@@ -391,11 +391,13 @@
             "jobs_text": "Trabajos actualmente en cola o terminados recientemente",
             "jobs_title": "Cola de trabajos",
             "mach": {
+                "backendver": "Versión de fondo mitológico",
                 "disk_details": "Detalles de uso del disco",
                 "disk_dirs": "Directorios",
                 "disk_none": "No hay información de disco disponible",
                 "disk_summ": "Resumen de uso del disco",
                 "disk_total": "Espacio total en disco",
+                "hostname": "Nombre del anfitrión",
                 "load": "El promedio de carga de esta máquina",
                 "minute": "Minuto",
                 "minutes": "Minutos",

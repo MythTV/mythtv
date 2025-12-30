@@ -391,11 +391,13 @@
             "jobs_text": "当前在队列中或最近结束的作业",
             "jobs_title": "作业队列",
             "mach": {
+                "backendver": "神话后端版本",
                 "disk_details": "磁盘使用详情",
                 "disk_dirs": "目录",
                 "disk_none": "没有可用的磁盘信息",
                 "disk_summ": "磁盘使用情况摘要",
                 "disk_total": "总磁盘空间",
+                "hostname": "主机名",
                 "load": "这台机器的平均负载",
                 "minute": "分钟",
                 "minutes": "分钟",

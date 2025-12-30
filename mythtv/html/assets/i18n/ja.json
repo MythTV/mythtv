@@ -391,11 +391,13 @@
             "jobs_text": "現在キューにあるジョブ、または最近終了したジョブ",
             "jobs_title": "ジョブキュー",
             "mach": {
+                "backendver": "Mythbackend バージョン",
                 "disk_details": "ディスク使用量の詳細",
                 "disk_dirs": "ディレクトリ",
                 "disk_none": "利用可能なディスク情報がありません",
                 "disk_summ": "ディスク使用量の概要",
                 "disk_total": "総ディスク容量",
+                "hostname": "ホスト名",
                 "load": "このマシンのロードアベレージ",
                 "minute": "分",
                 "minutes": "分",

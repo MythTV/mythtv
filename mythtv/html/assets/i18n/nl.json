@@ -391,11 +391,13 @@
             "jobs_text": "Taken die momenteel in de wachtrij staan ​​of onlangs zijn beëindigd",
             "jobs_title": "Taak wachtrij",
             "mach": {
+                "backendver": "Mythbackend-versie",
                 "disk_details": "Gegevens over schijfgebruik",
                 "disk_dirs": "Directories",
                 "disk_none": "Geen schijfinfo beschikbaar",
                 "disk_summ": "Samenvatting schijfgebruik",
                 "disk_total": "Totale schijfruimte",
+                "hostname": "Hostnaam",
                 "load": "Het laadgemiddelde van deze machine",
                 "minute": "Minuut",
                 "minutes": "Minuten",

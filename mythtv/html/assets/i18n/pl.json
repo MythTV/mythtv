@@ -391,11 +391,13 @@
             "jobs_text": "Oferty pracy znajdujące się obecnie w kolejce lub niedawno zakończone",
             "jobs_title": "Kolejka zadań",
             "mach": {
+                "backendver": "Wersja Mythbackend",
                 "disk_details": "Szczegóły wykorzystania dysku",
                 "disk_dirs": "Katalogi",
                 "disk_none": "Brak dostępnych informacji o dysku",
                 "disk_summ": "Podsumowanie użycia dysku",
                 "disk_total": "Całkowita przestrzeń dyskowa",
+                "hostname": "Nazwa hosta",
                 "load": "Średnie obciążenie tej maszyny",
                 "minute": "Minuta",
                 "minutes": "Minuty",

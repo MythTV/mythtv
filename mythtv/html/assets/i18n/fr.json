@@ -391,11 +391,13 @@
             "jobs_text": "Emplois actuellement en file d'attente ou récemment terminés",
             "jobs_title": "File d'attente des travaux",
             "mach": {
+                "backendver": "Version Mythebackend",
                 "disk_details": "Détails de l'utilisation du disque",
                 "disk_dirs": "Annuaires",
                 "disk_none": "Aucune information de disque disponible",
                 "disk_summ": "Résumé de l'utilisation du disque",
                 "disk_total": "Espace disque total",
+                "hostname": "Nom d'hôte",
                 "load": "La charge moyenne de cette machine",
                 "minute": "Minute",
                 "minutes": "Minutes",

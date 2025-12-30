@@ -391,11 +391,13 @@
             "jobs_text": "Tällä hetkellä jonossa tai äskettäin päättyneet työpaikat",
             "jobs_title": "Työjono",
             "mach": {
+                "backendver": "Mythbackend-versio",
                 "disk_details": "Levyn käyttötiedot",
                 "disk_dirs": "Hakemistot",
                 "disk_none": "Levytietoja ei ole saatavilla",
                 "disk_summ": "Levyn käytön yhteenveto",
                 "disk_total": "Levytila ​​yhteensä",
+                "hostname": "Isäntänimi",
                 "load": "Tämän koneen keskimääräinen kuormitus",
                 "minute": "Minuutti",
                 "minutes": "Pöytäkirja",

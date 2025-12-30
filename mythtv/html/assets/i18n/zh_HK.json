@@ -391,11 +391,13 @@
             "jobs_text": "當前在隊列中或最近結束的作業",
             "jobs_title": "作業隊列",
             "mach": {
+                "backendver": "神話後端版本",
                 "disk_details": "磁盤使用詳情",
                 "disk_dirs": "目錄",
                 "disk_none": "沒有可用的磁盤信息",
                 "disk_summ": "磁盤使用情況摘要",
                 "disk_total": "總磁盤空間",
+                "hostname": "主機名",
                 "load": "這台機器的平均負載",
                 "minute": "分鐘",
                 "minutes": "分鐘",

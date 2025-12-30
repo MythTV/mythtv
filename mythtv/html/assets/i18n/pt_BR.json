@@ -391,11 +391,13 @@
             "jobs_text": "Trabalhos atualmente na fila ou encerrados recentemente",
             "jobs_title": "Fila de trabalho",
             "mach": {
+                "backendver": "Versão do Mythbackend",
                 "disk_details": "Detalhes de uso do disco",
                 "disk_dirs": "Diretórios",
                 "disk_none": "Nenhuma informação de disco disponível",
                 "disk_summ": "Resumo do uso do disco",
                 "disk_total": "Espaço Total em Disco",
+                "hostname": "Nome do anfitrião",
                 "load": "Média de carga desta máquina",
                 "minute": "Minuto",
                 "minutes": "Minutos",

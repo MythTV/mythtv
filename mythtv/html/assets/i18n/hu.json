@@ -391,11 +391,13 @@
             "jobs_text": "Jelenleg várólistában lévő vagy nemrégiben véget ért munkák",
             "jobs_title": "Munkasor",
             "mach": {
+                "backendver": "Mythbackend verzió",
                 "disk_details": "Lemezhasználati részletek",
                 "disk_dirs": "Könyvtárak",
                 "disk_none": "Nincs elérhető lemezinformáció",
                 "disk_summ": "Lemezhasználati összefoglaló",
                 "disk_total": "Teljes lemezterület",
+                "hostname": "Gazda neve",
                 "load": "A gép átlagos terhelése",
                 "minute": "Perc",
                 "minutes": "Percek",

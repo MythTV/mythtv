@@ -391,11 +391,13 @@
             "jobs_text": "Jobber som er i kø eller nylig avsluttet",
             "jobs_title": "Jobbkø",
             "mach": {
+                "backendver": "Mythbackend versjon",
                 "disk_details": "Diskbruksdetaljer",
                 "disk_dirs": "Kataloger",
                 "disk_none": "Ingen diskinformasjon tilgjengelig",
                 "disk_summ": "Oppsummering av diskbruk",
                 "disk_total": "Total diskplass",
+                "hostname": "Vertsnavn",
                 "load": "Denne maskinens belastningsgjennomsnitt",
                 "minute": "Minutt",
                 "minutes": "Minutter",

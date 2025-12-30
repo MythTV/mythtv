@@ -391,11 +391,13 @@
             "jobs_text": "Jobs, die sich derzeit in der Warteschlange befinden oder kürzlich beendet wurden",
             "jobs_title": "Auftragswarteschlange",
             "mach": {
+                "backendver": "Mythbackend-Version",
                 "disk_details": "Details zur Festplattennutzung",
                 "disk_dirs": "Verzeichnisse",
                 "disk_none": "Keine Festplatteninformationen verfügbar",
                 "disk_summ": "Zusammenfassung der Festplattennutzung",
                 "disk_total": "Gesamter Speicherplatz",
+                "hostname": "Hostname",
                 "load": "Der Auslastungsdurchschnitt dieser Maschine",
                 "minute": "Minute",
                 "minutes": "Protokoll",

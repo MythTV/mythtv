@@ -391,11 +391,13 @@
             "jobs_text": "Störf sem eru í biðröð eða nýlega lokið",
             "jobs_title": "Atvinnuröð",
             "mach": {
+                "backendver": "Mythbackend útgáfa",
                 "disk_details": "Upplýsingar um notkun disks",
                 "disk_dirs": "Möppur",
                 "disk_none": "Engar diskaupplýsingar tiltækar",
                 "disk_summ": "Yfirlit yfir disknotkun",
                 "disk_total": "Heildarpláss",
+                "hostname": "Nafn gestgjafa",
                 "load": "Meðalhleðsla þessarar vélar",
                 "minute": "Mínúta",
                 "minutes": "Fundargerð",

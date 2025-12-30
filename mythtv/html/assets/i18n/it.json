@@ -391,11 +391,13 @@
             "jobs_text": "Lavori attualmente in coda o terminati di recente",
             "jobs_title": "Coda lavori",
             "mach": {
+                "backendver": "Versione Mythbackend",
                 "disk_details": "Dettagli utilizzo disco",
                 "disk_dirs": "Directory",
                 "disk_none": "Informazione disco non disponibile",
                 "disk_summ": "Riepilogo utilizzo disco",
                 "disk_total": "Spazio totale su disco",
+                "hostname": "Nome dell'ospite",
                 "load": "Il carico medio di questa macchina",
                 "minute": "Minuto",
                 "minutes": "Minuti",

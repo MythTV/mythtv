@@ -391,11 +391,13 @@
             "jobs_text": "Töökohad on praegu järjekorras või hiljuti lõppenud",
             "jobs_title": "Tööjärjekord",
             "mach": {
+                "backendver": "Mythbackend versioon",
                 "disk_details": "Ketta kasutamise üksikasjad",
                 "disk_dirs": "Kataloogid",
                 "disk_none": "Kettateave pole saadaval",
                 "disk_summ": "Ketta kasutamise kokkuvõte",
                 "disk_total": "Kokku kettaruumi",
+                "hostname": "Hosti nimi",
                 "load": "Selle masina keskmine koormus",
                 "minute": "Minut",
                 "minutes": "Minutid",

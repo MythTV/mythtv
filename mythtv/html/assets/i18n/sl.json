@@ -391,11 +391,13 @@
             "jobs_text": "Opravila, ki so trenutno v čakalni vrsti ali so bila nedavno zaključena",
             "jobs_title": "Čakalna vrsta opravil",
             "mach": {
+                "backendver": "Različica Mythbackend",
                 "disk_details": "Podrobnosti o uporabi diska",
                 "disk_dirs": "Imeniki",
                 "disk_none": "Informacije o disku niso na voljo",
                 "disk_summ": "Povzetek uporabe diska",
                 "disk_total": "Skupni prostor na disku",
+                "hostname": "Ime gostitelja",
                 "load": "Povprečna obremenitev tega stroja",
                 "minute": "minuta",
                 "minutes": "minute",

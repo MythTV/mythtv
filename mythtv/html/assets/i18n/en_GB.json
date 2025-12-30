@@ -391,11 +391,13 @@
             "jobs_text": "Jobs currently in Queue or recently ended",
             "jobs_title": "Job queue",
             "mach": {
+                "backendver": "Mythbackend Version",
                 "disk_details": "Disk Usage Details",
                 "disk_dirs": "Directories",
                 "disk_none": "No Disk Info available",
                 "disk_summ": "Disk Usage Summary",
                 "disk_total": "Total Disk Space",
+                "hostname": "Host Name",
                 "load": "This machine's load average",
                 "minute": "Minute",
                 "minutes": "Minutes",

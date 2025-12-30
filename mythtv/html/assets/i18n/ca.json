@@ -391,11 +391,13 @@
             "jobs_text": "Feines actualment a la cua o acabades recentment",
             "jobs_title": "Cua de treball",
             "mach": {
+                "backendver": "Versió Mythbackend",
                 "disk_details": "Detalls d'ús del disc",
                 "disk_dirs": "Directoris",
                 "disk_none": "No hi ha informació del disc disponible",
                 "disk_summ": "Resum d'ús del disc",
                 "disk_total": "Espai total en disc",
+                "hostname": "Nom de l'amfitrió",
                 "load": "La càrrega mitjana d'aquesta màquina",
                 "minute": "Minut",
                 "minutes": "Minuts",

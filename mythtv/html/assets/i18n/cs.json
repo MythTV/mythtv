@@ -391,11 +391,13 @@
             "jobs_text": "Úlohy aktuálně ve frontě nebo nedávno ukončené",
             "jobs_title": "Fronta práce",
             "mach": {
+                "backendver": "Verze Mythbackend",
                 "disk_details": "Podrobnosti o využití disku",
                 "disk_dirs": "Adresáře",
                 "disk_none": "Nejsou k dispozici žádné informace o disku",
                 "disk_summ": "Shrnutí využití disku",
                 "disk_total": "Celkový prostor na disku",
+                "hostname": "Název hostitele",
                 "load": "Průměrná zátěž tohoto stroje",
                 "minute": "Minuta",
                 "minutes": "Minut",

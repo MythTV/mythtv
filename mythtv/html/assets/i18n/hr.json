@@ -391,11 +391,13 @@
             "jobs_text": "Poslovi trenutno u redu čekanja ili nedavno završeni",
             "jobs_title": "Red čekanja poslova",
             "mach": {
+                "backendver": "Mythbackend verzija",
                 "disk_details": "Pojedinosti o korištenju diska",
                 "disk_dirs": "Imenici",
                 "disk_none": "Informacije o disku nisu dostupne",
                 "disk_summ": "Sažetak korištenja diska",
                 "disk_total": "Ukupni prostor na disku",
+                "hostname": "Ime domaćina",
                 "load": "Prosječno opterećenje ovog stroja",
                 "minute": "Minuta",
                 "minutes": "minuta",

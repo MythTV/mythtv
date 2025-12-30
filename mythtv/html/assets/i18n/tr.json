@@ -391,11 +391,13 @@
             "jobs_text": "Şu anda Kuyrukta olan veya yakın zamanda sona eren işler",
             "jobs_title": "iş kuyruğu",
             "mach": {
+                "backendver": "Efsane Arka Uç Sürümü",
                 "disk_details": "Disk Kullanım Ayrıntıları",
                 "disk_dirs": "dizinler",
                 "disk_none": "Disk Bilgisi yok",
                 "disk_summ": "Disk Kullanım Özeti",
                 "disk_total": "Toplam Disk Alanı",
+                "hostname": "Ana Bilgisayar Adı",
                 "load": "Bu makinenin yük ortalaması",
                 "minute": "Dakika",
                 "minutes": "Dakika",
