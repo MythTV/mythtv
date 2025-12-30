@@ -4522,6 +4522,7 @@ check_header dirent.h
 check_header dlfcn.h
 check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_header fcntl.h
+check_header fstab.h
 check_header mntent.h
 check_func_headers mntent.h getmntent_r
 check_header pthread.h
