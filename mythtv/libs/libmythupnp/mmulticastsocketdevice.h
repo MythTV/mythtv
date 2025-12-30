@@ -13,7 +13,8 @@
 #ifndef MULTICAST_SOCKET_DEVICE_H
 #define MULTICAST_SOCKET_DEVICE_H
 
-#ifdef __FreeBSD__
+#include <QtGlobal>
+#if defined(Q_OS_LINUX) || defined(Q_OS_BSD4)
 #  include <sys/types.h>
 #endif
 
