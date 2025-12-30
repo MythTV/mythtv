@@ -1586,7 +1586,6 @@ MYTHTV_CONFIG_LIST='
 
 MYTHTV_HAVE_LIST='
     bdj_j2me
-    fe_can_2g_modulation
     is_duration_v
     libudev
     close_range
@@ -5021,16 +5020,6 @@ if enabled dvb; then
     fi
 fi
 
-
-enabled dvb && check_cc -I"$dvb_path" <<EOF && enable fe_can_2g_modulation
-#include <linux/dvb/frontend.h>
-int main(void) {
-    if (FE_CAN_2G_MODULATION)
-        return 1;
-    return 0;
-}
-EOF
-
 enabled asi && check_cc <<EOF || disable asi
 #include <dveo/asi.h>
 #include <dveo/master.h>
@@ -5942,7 +5931,6 @@ if enabled backend; then
   echo "Video4Linux support       ${v4l2-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
-  echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "Sat>IP support            ${satip-no}"
   echo "V@Box TV Gateway support  ${vbox-no}"

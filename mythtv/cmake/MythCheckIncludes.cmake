@@ -86,13 +86,6 @@ check_c_source_compiles(
   "
     #include <arm_neon.h>
     int16x8_t test = vdupq_n_s16(0);" HAVE_INTRINSICS_NEON)
-check_c_source_compiles(
-  "
-  #include <linux/dvb/frontend.h>
-  int main(void) {
-    return FE_CAN_2G_MODULATION;
-  }"
-  HAVE_FE_CAN_2G_MODULATION)
 
 #
 # Check compiler features
