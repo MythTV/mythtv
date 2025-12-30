@@ -1494,6 +1494,8 @@ SYSTEM_FUNCS_DVDNAV="
 
 SYSTEM_FUNCS="
     $SYSTEM_FUNCS_BLURAY
+    gettimeofday
+    posix_fadvise
 "
 
 TYPES_LIST="
@@ -1585,9 +1587,7 @@ MYTHTV_CONFIG_LIST='
 MYTHTV_HAVE_LIST='
     bdj_j2me
     fe_can_2g_modulation
-    gettimeofday
     is_duration_v
-    posix_fadvise
     libudev
     stdint_h
     close_range
@@ -4516,31 +4516,31 @@ else
     fi
 fi
 
-check_func  gettimeofday
-
+# HEADERS_LIST
 check_header dirent.h
 check_header dlfcn.h
-check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_header fcntl.h
 check_header fstab.h
 check_header mntent.h
-check_func_headers mntent.h getmntent_r
 check_header pthread.h
 check_header strings.h
 check_header sys/dl.h
 check_header sys/param.h
 check_header sys/time.h
 check_header unistd.h
+
+# for check_deps
 check_header valgrind/valgrind.h
 check_header vulkan/vulkan_core.h
 check_header linux/videodev2.h
 
-#Myth check for MYTHTV_HAVE_LIST
-check_func posix_fadvise
-check_func_headers sys/time.h gettimeofday
-#End MythTV check
-
+check_header dxva2api.h -D_WIN32_WINNT=0x0600
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
+
+# SYSTEM_FUNCS
+check_func_headers mntent.h getmntent_r
+check_func_headers sys/time.h gettimeofday
+check_func_headers fcntl.h posix_fadvise
 
 enable pthreads
 # check for some common methods of building with pthread support
