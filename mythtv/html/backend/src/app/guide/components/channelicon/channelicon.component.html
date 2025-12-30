@@ -1,5 +1,5 @@
 <div class="flex flex-column align-items-center channelBox cursor-pointer" (click)="guideComponent.onChannel(channel)"
-    id="{{'Chan'+channel.ChanId}}">
+    id="{{'Chan'+channel.ChanId}}" pTooltip="{{channel.ChannelName}}">
     <div class="channelIcon">
         <img src="{{'./Guide/GetChannelIcon?Filename=' + channel.Icon + authorization}}" height="57" *ngIf="channel.IconURL; else nullIcon">
         <ng-template #nullIcon><img height="0" width="0"></ng-template>
