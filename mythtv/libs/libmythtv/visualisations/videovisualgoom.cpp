@@ -47,7 +47,6 @@ void VideoVisualGoom::Draw(const QRect Area, MythPainter* /*Painter*/, QPaintDev
         return;
 
     QMutexLocker lock(mutex());
-    unsigned int* last = m_buffer;
     VisualNode* node = GetNode();
     if (node)
     {
@@ -66,6 +65,7 @@ void VideoVisualGoom::Draw(const QRect Area, MythPainter* /*Painter*/, QPaintDev
     }
 
 #if CONFIG_OPENGL
+    unsigned int* last = m_buffer;
     if ((m_render->Type() == kRenderOpenGL))
     {
         auto * glrender = dynamic_cast<MythRenderOpenGL*>(m_render);

@@ -357,8 +357,8 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
  *
  * \note We always save the image in JPEG format
  */
-bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
-                              const AlbumArtImage *albumart)
+bool MetaIOFLACVorbis::writeAlbumArt([[ maybe_unused ]] const QString &filename,
+                                     [[ maybe_unused ]] const AlbumArtImage *albumart)
 {
 #if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION >= 8
     if (filename.isEmpty() || !albumart)
@@ -433,8 +433,8 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
  * \param albumart The Album Art image to remove
  * \returns True if successful
  */
-bool MetaIOFLACVorbis::removeAlbumArt(const QString &filename,
-                               const AlbumArtImage *albumart)
+bool MetaIOFLACVorbis::removeAlbumArt([[ maybe_unused ]] const QString &filename,
+                                      [[ maybe_unused ]] const AlbumArtImage *albumart)
 {
 #if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION >= 8
 

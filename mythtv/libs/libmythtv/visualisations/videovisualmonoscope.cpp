@@ -92,7 +92,8 @@ static class VideoVisualMonoScopeFactory : public VideoVisualFactory
         return s_name;
     }
 
-    VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
+    VideoVisual* Create([[maybe_unused]] AudioPlayer* Audio,
+                        [[maybe_unused]] MythRender* Render) const override
     {
 #if CONFIG_OPENGL
         auto * render1 = dynamic_cast<MythRenderOpenGL*>(Render);
@@ -124,7 +125,8 @@ static class VideoVisualSimpleScopeFactory : public VideoVisualFactory
         return s_name;
     }
 
-    VideoVisual* Create(AudioPlayer* Audio, MythRender* Render) const override
+    VideoVisual* Create([[maybe_unused]] AudioPlayer* Audio,
+			[[maybe_unused]] MythRender* Render) const override
     {
 #if CONFIG_OPENGL
         auto * render1 = dynamic_cast<MythRenderOpenGL*>(Render);

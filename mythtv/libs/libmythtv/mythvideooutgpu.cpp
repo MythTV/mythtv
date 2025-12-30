@@ -24,7 +24,8 @@
 
 #define LOC QString("VidOutGPU: ")
 
-void MythVideoOutputGPU::GetRenderOptions(RenderOptions& Options, MythRender* Render)
+void MythVideoOutputGPU::GetRenderOptions([[ maybe_unused ]] RenderOptions& Options,
+                                          [[ maybe_unused ]] MythRender* Render)
 {
 #if CONFIG_OPENGL
     if (dynamic_cast<MythRenderOpenGL*>(Render) != nullptr)

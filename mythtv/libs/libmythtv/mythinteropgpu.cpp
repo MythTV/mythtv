@@ -8,7 +8,7 @@
 #include "opengl/mythopenglinterop.h"
 #endif
 
-MythInteropGPU::InteropMap MythInteropGPU::GetTypes(MythRender* Render)
+MythInteropGPU::InteropMap MythInteropGPU::GetTypes([[ maybe_unused ]] MythRender* Render)
 {
     InteropMap result;
     if (!gCoreContext->IsUIThread())
