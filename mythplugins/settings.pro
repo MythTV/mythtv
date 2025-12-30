@@ -49,7 +49,6 @@ QMAKE_CFLAGS += $$CFLAGS
 
 # figure out defines
 
-DEFINES += $$CONFIG_DEFINES
 DEFINES += _FILE_OFFSET_BITS=64
 
 # construct linking path

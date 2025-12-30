@@ -1957,7 +1957,6 @@ set_default sws_max_filter_size
 
 # mythtv settings
 
-CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
 
@@ -6347,16 +6346,11 @@ if enabled libass; then
     append CCONFIG "using_libass"
 fi
 
-if enabled appleremote; then
-  append CONFIG_DEFINES "USING_APPLEREMOTE"
-fi
-
 if enabled dvb && non_standard_header $dvb_path; then
   append CONFIG_INCLUDEPATH "$dvb_path"
 fi
 
 if enabled libcec; then
-  append CONFIG_DEFINES "using_libcec"
   if non_standard_header $libcec_path; then
     append CONFIG_INCLUDEPATH "$libcec_path"
   fi
@@ -6397,10 +6391,6 @@ fi
 if test x"$CCONFIG" != x"" ; then
   echo "CCONFIG=$CCONFIG" >> $TMPMAK
   echo "#define MYTH_BUILD_CONFIG \"$CCONFIG\"" >>$TMPH
-fi
-
-if test x"$CONFIG_DEFINES" != x"" ; then
-  echo "CONFIG_DEFINES=$CONFIG_DEFINES" >> $TMPMAK
 fi
 
 if test x"$CONFIG_INCLUDEPATH" != x"" ; then
