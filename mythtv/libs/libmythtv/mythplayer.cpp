@@ -1755,7 +1755,7 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
     std::chrono::milliseconds position_ms = 0ms;
     auto offset_ms = std::chrono::milliseconds(llroundf(fabsf(offset) * 1000));
 
-    if (signbit(offset))
+    if (std::signbit(offset))
     {
         // Always get an updated totalFrame value for in progress recordings
         if (islivetvcur || IsWatchingInprogress())

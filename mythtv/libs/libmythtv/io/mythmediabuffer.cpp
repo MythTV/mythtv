@@ -374,7 +374,8 @@ void MythMediaBuffer::CalcReadAheadThresh(void)
     // loop without sleeping if the buffered data is less than this
     m_fillThreshold = 7 * m_bufferSize / 8;
 
-    estbitrate     = static_cast<uint>(std::max(abs(m_rawBitrate * m_playSpeed), 0.5F * m_rawBitrate));
+    estbitrate     = static_cast<uint>(std::max(std::fabs(m_rawBitrate * m_playSpeed),
+                                                0.5F * m_rawBitrate));
     estbitrate     = std::min(m_rawBitrate * 3, estbitrate);
     int const rbs = estbitrate_to_rbs(estbitrate);
 
@@ -423,7 +424,8 @@ bool MythMediaBuffer::IsNearEnd(double /*Framerate*/, uint Frames) const
     m_posLock.unlock();
 
     // telecom kilobytes (i.e. 1000 per k not 1024)
-    uint tmp = static_cast<uint>(std::max(abs(m_rawBitrate * m_playSpeed), 0.5F * m_rawBitrate));
+    uint tmp = static_cast<uint>(std::max(std::fabs(m_rawBitrate * m_playSpeed),
+                                          0.5F * m_rawBitrate));
     uint kbitspersec = std::min(m_rawBitrate * 3, tmp);
     if (kbitspersec == 0)
         return false;

@@ -1299,7 +1299,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
 
 double Spectrogram::clamp(double cur, double max, double min)
 {
-    if (isnan(cur)) return 0;
+    if (std::isnan(cur)) return 0;
     return std::clamp(cur, min, max);
 }
 
