@@ -210,9 +210,7 @@ endif()
 
 if(TARGET X11::X11)
   target_link_libraries(mythui PRIVATE X11::X11 X11::Xrandr X11::Xrender)
-  if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    target_link_libraries(mythui PRIVATE X11::Xext X11::Xxf86vm)
-  endif()
+  target_link_libraries(mythui PRIVATE ${X11_EXTRA_LIBS})
   target_sources(
     mythui
     PRIVATE platforms/mythxdisplay.cpp
