@@ -29,10 +29,8 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 
-#ifdef __linux__
-#  include <sys/vfs.h>
+#if defined(__linux__) || defined(__FreeBSD__)
 #  include <sys/statvfs.h>
-#  include <sys/sysinfo.h>
 #else
 #  include <sys/param.h>
 #  include <sys/mount.h>
@@ -744,7 +742,7 @@ void ZMServer::handleHello()
 
 long long ZMServer::getDiskSpace(const std::string &filename, long long &total, long long &used)
 {
-    struct statfs statbuf {};
+    struct statvfs statbuf {};
     long long freespace = -1;
 
     total = used = -1;
@@ -753,7 +751,7 @@ long long ZMServer::getDiskSpace(const std::string &filename, long long &total, 
     // others are invalid and set to 0 (such as when an automounted directory
     // is not mounted but still visible because --ghost was used),
     // so check to make sure we can have a total size > 0
-    if ((statfs(filename.c_str(), &statbuf) == 0) &&
+    if ((statvfs(filename.c_str(), &statbuf) == 0) &&
          (statbuf.f_blocks > 0) &&
          (statbuf.f_bsize > 0))
     {
