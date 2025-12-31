@@ -43,18 +43,6 @@
 #endif
 #include <csignal>
 
-// Various ways to get to thread's tid
-#ifdef __linux__
-#include <sys/syscall.h>
-#elif defined(__FreeBSD__)
-extern "C" {
-#include <sys/ucontext.h>
-#include <sys/thr.h>
-}
-#elif defined(Q_OS_DARWIN)
-#include <mach/mach.h>
-#endif
-
 static QMutex                      loggerMapMutex;
 static QMap<QString, LoggerBase *> loggerMap;
 
