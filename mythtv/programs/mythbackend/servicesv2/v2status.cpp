@@ -51,7 +51,6 @@
 #include "v2backendStatus.h"
 #include "v2serviceUtil.h"
 #include "v2status.h"
-#include "version.h"
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
@@ -150,8 +149,8 @@ V2BackendStatus*  V2Status::GetBackendStatus()
     pStatus->setAsOf          ( MythDate::current() );
     pStatus->setVersion       ( MYTH_BINARY_VERSION );
     pStatus->setProtoVer      ( MYTH_PROTO_VERSION  );
-    pStatus->setSourcePath    ( MYTH_SOURCE_PATH );
-    pStatus->setSourceVer     ( MYTH_SOURCE_VERSION );
+    pStatus->setSourcePath    ( GetMythSourcePath() );
+    pStatus->setSourceVer     ( GetMythSourceVersion() );
     pStatus->setHostName      ( gCoreContext->GetHostName() );
     // Encoders
     FillEncoderList(pStatus->GetEncoders(), pStatus);
