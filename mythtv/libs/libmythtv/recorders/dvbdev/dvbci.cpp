@@ -26,6 +26,8 @@
 
 #include "dvbci.h"
 
+#include <QtGlobal> // for Q_OS_XXX
+
 #include <array>
 #include <cctype>
 #include <cerrno>
@@ -38,7 +40,7 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <unistd.h>
-#ifdef __FreeBSD__
+#ifdef Q_OS_FREEBSD
 #  include <stdlib.h>
 #else
 #  include <malloc.h>

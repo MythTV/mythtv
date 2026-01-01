@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     auto *sysEventHandler = new MythSystemEventHandler();
 
     auto *housekeeping = new HouseKeeper();
-#ifdef __linux__
+#ifdef Q_OS_LINUX
  #ifdef CONFIG_BINDINGS_PYTHON
     housekeeping->RegisterTask(new HardwareProfileTask());
  #endif

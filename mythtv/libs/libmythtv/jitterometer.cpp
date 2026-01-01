@@ -9,10 +9,10 @@
 #include <cstdlib>
 #include <utility>
 
-#if defined(__linux__) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_LINUX) || defined(Q_OS_ANDROID)
 static constexpr const char* UNIX_PROC_STAT { "/proc/stat" };
 #endif
-#if defined(__linux__) || defined(Q_OS_ANDROID) || defined(Q_OS_MACOS)
+#if defined(Q_OS_LINUX) || defined(Q_OS_ANDROID) || defined(Q_OS_MACOS)
 static constexpr size_t MAX_CORES { 8 };
 #endif
 
@@ -31,7 +31,7 @@ Jitterometer::Jitterometer(QString nname, int ncycles)
     if (m_name.isEmpty())
         m_name = "Jitterometer";
 
-#if defined(__linux__) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_LINUX) || defined(Q_OS_ANDROID)
     // N.B. Access to /proc/stat was revoked on Android for API >=26 (Oreo)
     if (QFile::exists(UNIX_PROC_STAT))
     {
@@ -150,7 +150,7 @@ QString Jitterometer::GetCPUStat(void)
 {
     QString result = "N/A";
 
-#if defined(__linux__) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_LINUX) || defined(Q_OS_ANDROID)
     if (m_cpuStat)
     {
         m_cpuStat->seek(0);

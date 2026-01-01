@@ -1,13 +1,15 @@
+#include <QtGlobal> // for Q_OS_XXX
+
 // System headers
 #include <sys/stat.h>
-#ifdef __linux__
+#ifdef Q_OS_LINUX
 #  include <sys/vfs.h>
-#else // if !__linux__
+#else // if !Q_OS_LINUX
 #  include <sys/param.h>
-#  ifndef _WIN32
+#  ifndef Q_OS_WIN32
 #    include <sys/mount.h>
-#  endif // _WIN32
-#endif // !__linux__
+#  endif // Q_OS_WIN32
+#endif // !Q_OS_LINUX
 
 // POSIX headers
 #include <unistd.h>

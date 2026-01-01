@@ -18,6 +18,7 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 #include <iostream>
+#include <QtGlobal>
 #include <QDateTime>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -99,7 +100,7 @@ static bool enableSqliteRegex (void)
 
     char *errtext {nullptr};
     // The location on Debian/Ubuntu.
-#ifdef __FreeBSD__
+#ifdef Q_OS_FREEBSD
     static constexpr char const * const pcre = "/usr/local/libexec/sqlite-ext/pcre.so";
 #else
     static constexpr char const * const pcre = "/usr/lib/sqlite3/pcre.so";

@@ -17,9 +17,9 @@
 #include "mythlogging.h"
 #include "remotefile.h"
 
-#ifdef __linux__
+#ifdef Q_OS_LINUX
 #   include "mythcdrom-linux.h"
-#elif defined(__FreeBSD__)
+#elif defined(Q_OS_FREEBSD)
 #   include "mythcdrom-freebsd.h"
 #elif defined(Q_OS_DARWIN)
 #   include "mythcdrom-darwin.h"
@@ -43,9 +43,9 @@ static constexpr const char* PATHTO_AUDIO_DETECT  { "/.TOC.plist" };
 MythCDROM* MythCDROM::get(QObject* par, const QString& devicePath,
                           bool SuperMount, bool AllowEject)
 {
-#if defined(__linux__) && !defined(Q_OS_ANDROID)
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
-#elif defined(__FreeBSD__)
+#elif defined(Q_OS_FREEBSD)
     return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
 #elif defined(Q_OS_DARWIN)
     return GetMythCDROMDarwin(par, devicePath, SuperMount, AllowEject);

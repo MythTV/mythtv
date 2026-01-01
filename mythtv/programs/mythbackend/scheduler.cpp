@@ -1,3 +1,5 @@
+#include <QtGlobal> // for Q_OS_XXX
+
 // C++
 #include <algorithm>
 #include <chrono> // for milliseconds
@@ -5,14 +7,14 @@
 #include <list>
 #include <thread> // for sleep_for
 
-#ifdef __linux__
+#ifdef Q_OS_LINUX
 #  include <sys/vfs.h>
-#else // if !__linux__
+#else // if !Q_OS_LINUX
 #  include <sys/param.h>
-#  ifndef _WIN32
+#  ifndef Q_OS_WIN32
 #    include <sys/mount.h>
-#  endif // _WIN32
-#endif // !__linux__
+#  endif // Q_OS_WIN32
+#endif // !Q_OS_LINUX
 
 #include <sys/stat.h>
 #include <sys/time.h>

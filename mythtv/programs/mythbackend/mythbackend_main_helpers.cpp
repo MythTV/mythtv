@@ -17,6 +17,7 @@ static inline void be_sd_notify(const char */*str*/) {};
 #include <unistd.h>
 
 // Qt
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QFile>
@@ -636,7 +637,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         }
 
         gHousekeeping->RegisterTask(new JobQueueRecoverTask());
-#ifdef __linux__
+#ifdef Q_OS_LINUX
  #ifdef CONFIG_BINDINGS_PYTHON
         gHousekeeping->RegisterTask(new HardwareProfileTask());
  #endif

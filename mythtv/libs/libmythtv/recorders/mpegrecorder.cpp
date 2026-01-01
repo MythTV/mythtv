@@ -16,6 +16,8 @@
 #include <sys/time.h>
 #include <sys/poll.h>
 
+#include <QtGlobal>
+
 #include <linux/videodev2.h>
 
 #include "libmythbase/mythconfig.h"
@@ -918,7 +920,7 @@ void MpegRecorder::run(void)
 
     bool has_select = true;
 
-#ifdef __FreeBSD__
+#ifdef Q_OS_FREEBSD
     // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
     has_select = false;
 #endif

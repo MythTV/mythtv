@@ -20,6 +20,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
 
+#include <QtGlobal> // for Q_OS_XXX
+
 #if defined ANDROID && __ANDROID_API__ < 24
 // ftello and fseeko do not exist in android before api level 24
 #define ftello ftell
@@ -37,17 +39,16 @@
 
 // System headers
 #include <sys/types.h>
-#ifndef _WIN32
+#ifndef Q_OS_WIN32
 #   include <sys/ioctl.h>
 #   include <pwd.h>
 #   include <grp.h>
-#   if defined(__linux__) || defined(__LINUX__)
+#   ifdef Q_OS_LINUX
 #       include <sys/prctl.h>
 #   endif // linux
-#endif // not _WIN32
+#endif // not Q_OS_WIN32
 
 // Qt headers
-#include <QtGlobal>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
@@ -80,7 +81,7 @@ static constexpr int k_defaultWidth = 79;
  */
 static int GetTermWidth(void)
 {
-#if defined(_WIN32) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_WIN32) || defined(Q_OS_ANDROID)
     return k_defaultWidth;
 #else
     struct winsize ws {};
@@ -2984,11 +2985,11 @@ static bool setUser(const QString &username)
     if (username.isEmpty())
         return true;
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN32
     std::cerr << "--user option is not supported on Windows" << std::endl;
     return false;
-#else // ! _WIN32
-#if defined(__linux__) || defined(__LINUX__)
+#else // ! Q_OS_WIN32
+#ifdef Q_OS_LINUX
     // Check the current dumpability of core dumps, which will be disabled
     // by setuid, so we can re-enable, if appropriate
     int dumpability = prctl(PR_GET_DUMPABLE);
@@ -3028,7 +3029,7 @@ static bool setUser(const QString &username)
             std::cerr << "Error setting effective user." << std::endl;
             return false;
         }
-#if defined(__linux__) || defined(__LINUX__)
+#ifdef Q_OS_LINUX
         if (dumpability && (prctl(PR_SET_DUMPABLE, dumpability) == -1))
         {
             LOG(VB_GENERAL, LOG_WARNING, "Unable to re-enable core file "
@@ -3044,7 +3045,7 @@ static bool setUser(const QString &username)
         return false;
     }
     return true;
-#endif // ! _WIN32
+#endif // ! Q_OS_WIN32
 }
 
 

@@ -980,7 +980,7 @@ void MediaMonitor::ejectOpticalDisc()
     else
     {
         LOG(VB_MEDIA, LOG_INFO, "CD/DVD Monitor isn't enabled.");
-#ifdef __linux__
+#ifdef Q_OS_LINUX
         LOG(VB_MEDIA, LOG_INFO, "Trying Linux 'eject -T' command");
         myth_system("eject -T");
 #elif defined(Q_OS_DARWIN)

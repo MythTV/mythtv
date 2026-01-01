@@ -2296,7 +2296,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 
     fe_sd_notify("STATUS=Creating housekeeper");
     auto *housekeeping = new HouseKeeper();
-#ifdef __linux__
+#ifdef Q_OS_LINUX
  #ifdef CONFIG_BINDINGS_PYTHON
     housekeeping->RegisterTask(new HardwareProfileTask());
  #endif

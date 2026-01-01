@@ -1,4 +1,5 @@
 // Qt
+#include <QtGlobal>
 #include <QString>
 #include <QVariant>
 
@@ -69,7 +70,7 @@ bool GeneralSetupWizard::Create()
     BuildFocusList();
     loadData();
 
-#ifndef __linux__
+#ifndef Q_OS_LINUX
 #ifndef CONFIG_BINDINGS_PYTHON
     // The hardware profiler only works on linux.
     // Make the widgets invisible on other platforms.
