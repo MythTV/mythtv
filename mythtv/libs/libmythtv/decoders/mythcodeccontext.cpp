@@ -452,12 +452,13 @@ void MythCodecContext::DeviceContextFinished(AVHWDeviceContext* Context)
     auto * interop = reinterpret_cast<MythInteropGPU*>(Context->user_opaque);
     if (interop)
     {
-        DestroyInterop(interop);
         FreeAVHWDeviceContext free = interop->GetDefaultFree();
+        void *io_user_opaque = interop->GetDefaultUserOpaque();
+        DestroyInterop(interop);
         if (free)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Calling default device context free");
-            Context->user_opaque = interop->GetDefaultUserOpaque();
+            Context->user_opaque = io_user_opaque;
             free(Context);
         }
     }
