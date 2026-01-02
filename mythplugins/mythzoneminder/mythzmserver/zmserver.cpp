@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
@@ -28,18 +29,6 @@
 #include <sys/stat.h>
 #include <sys/shm.h>
 #include <sys/mman.h>
-
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#  include <sys/statvfs.h>
-#else
-#  include <sys/param.h>
-#  include <sys/mount.h>
-#  ifdef __CYGWIN__
-#    include <sys/statfs.h>
-#  else // if !__CYGWIN__
-#    include <sys/sysctl.h>
-#  endif // !__CYGWIN__
-#endif
 
 #ifndef MSG_NOSIGNAL
 static constexpr int MSG_NOSIGNAL { 0 };  // Apple also has SO_NOSIGPIPE?
@@ -740,33 +729,23 @@ void ZMServer::handleHello()
     send(outStr);
 }
 
-long long ZMServer::getDiskSpace(const std::string &filename, long long &total, long long &used)
+static uintmax_t disk_usage_percent(const std::filesystem::space_info& space_info)
 {
-    struct statvfs statbuf {};
-    long long freespace = -1;
-
-    total = used = -1;
-
-    // there are cases where statfs will return 0 (good), but f_blocks and
-    // others are invalid and set to 0 (such as when an automounted directory
-    // is not mounted but still visible because --ghost was used),
-    // so check to make sure we can have a total size > 0
-    if ((statvfs(filename.c_str(), &statbuf) == 0) &&
-         (statbuf.f_blocks > 0) &&
-         (statbuf.f_bsize > 0))
+    constexpr uintmax_t k_unknown_size {static_cast<std::uintmax_t>(-1)};
+    if (
+        (space_info.capacity == 0
+         || space_info.free == 0
+         || space_info.available == 0
+         ) ||
+        (space_info.capacity == k_unknown_size
+         || space_info.free == k_unknown_size
+         || space_info.available == k_unknown_size
+         )
+        )
     {
-        total      = statbuf.f_blocks;
-        total     *= statbuf.f_bsize;
-        total      = total >> 10;
-
-        freespace  = statbuf.f_bavail;
-        freespace *= statbuf.f_bsize;
-        freespace  = freespace >> 10;
-
-        used       = total - freespace;
+        return 100;
     }
-
-    return freespace;
+    return (100 * (space_info.capacity - space_info.available)) / space_info.capacity;
 }
 
 void ZMServer::handleGetServerStatus(void)
@@ -792,12 +771,9 @@ void ZMServer::handleGetServerStatus(void)
         ADD_STR(outStr, buf);
     }
 
-    // get free space on the disk where the events are stored
-    long long total = 0;
-    long long used = 0;
     std::string eventsDir = g_webPath + "/events/";
-    getDiskSpace(eventsDir, total, used);
-    std::string buf = std::to_string(static_cast<int>((used * 100) / total)) + "%";
+    std::string buf =
+        std::to_string(disk_usage_percent(std::filesystem::space(eventsDir))) + "%";
     ADD_STR(outStr, buf);
 
     send(outStr);

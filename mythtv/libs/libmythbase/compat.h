@@ -76,36 +76,6 @@
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0
 
-
-    struct statfs {
-    //   long    f_type;     /* type of filesystem */
-       long    f_bsize;    /* optimal transfer block size */
-       long    f_blocks;   /* total data blocks in file system */
-    //   long    f_bfree;    /* free blocks in fs */
-       long    f_bavail;   /* free blocks avail to non-superuser */
-    //   long    f_files;    /* total file nodes in file system */
-    //   long    f_ffree;    /* free file nodes in fs */
-    //   long    f_fsid;     /* file system id */
-    //   long    f_namelen;  /* maximum length of filenames */
-    //   long    f_spare[6]; /* spare for later */
-    };
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-    inline int statfs(const char* path, struct statfs* buffer)
-    {
-        DWORD spc = 0, bps = 0, fc = 0, c = 0;
-
-        if (buffer && GetDiskFreeSpaceA(path, &spc, &bps, &fc, &c))
-        {
-            buffer->f_bsize = bps;
-            buffer->f_blocks = spc * c;
-            buffer->f_bavail = spc * fc;
-            return 0;
-        }
-
-        return -1;
-    }
-#pragma GCC diagnostic pop
 #   endif
 
 #define lstat stat

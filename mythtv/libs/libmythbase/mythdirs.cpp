@@ -6,8 +6,8 @@
 #include <QCoreApplication>
 
 #ifdef Q_OS_ANDROID
+#include <filesystem>
 #include <QStandardPaths>
-#include <sys/statfs.h>
 #elif defined(Q_OS_WIN)
 #include <QStandardPaths>
 #endif
@@ -139,40 +139,59 @@ void InitializeMythDirs(void)
 #if 0
     // TODO allow choice of base fs or the SD card for data
     QStringList appLocs = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-    uint64_t maxFreeSpace = 0;
-    for(auto s : appLocs)
+    uintmax_t maxFreeSpace = 0;
+    constexpr uintmax_t k_unknown_size {static_cast<std::uintmax_t>(-1)};
+    for(const auto & s : appLocs)
     {
-        struct statfs statFs;
-        memset(&statFs, 0, sizeof(statFs));
-        int ret = statfs(s.toLocal8Bit().data(), &statFs);
-        if (ret == 0 && statFs.f_bavail >= maxFreeSpace)
+        std::filesystem::space_info space_info = std::filesystem::space(s.toStdString());
+        if (!(
+              (space_info.capacity == 0
+               || space_info.free == 0
+               || space_info.available == 0
+               ) ||
+              (space_info.capacity == k_unknown_size
+               || space_info.free == k_unknown_size
+               || space_info.available == k_unknown_size
+               )
+              ) && space_info.available >= maxFreeSpace
+            )
         {
-            maxFreeSpace = statFs.f_bavail;
+            maxFreeSpace = space_info.available;
             confdir = s;
         }
         LOG(VB_GENERAL, LOG_NOTICE, QString(" appdatadir      = %1 (%2, %3, %4)")
             .arg(s)
-            .arg(statFs.f_bavail)
-            .arg(statFs.f_bfree)
-            .arg(statFs.f_bsize));
+            .arg(space_info.available)
+            .arg(space_info.free)
+            .arg(space_info.capacity)
+            );
     }
     QStringList cacheLocs = QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
     maxFreeSpace = 0;
-    for(auto s : cacheLocs)
+    for(const auto & s : cacheLocs)
     {
-        struct statfs statFs;
-        memset(&statFs, 0, sizeof(statFs));
-        int ret = statfs(s.toLocal8Bit().data(), &statFs);
-        if (ret == 0 && statFs.f_bavail >= maxFreeSpace)
+        std::filesystem::space_info space_info = std::filesystem::space(s.toStdString());
+        if (!(
+              (space_info.capacity == 0
+               || space_info.free == 0
+               || space_info.available == 0
+               ) ||
+              (space_info.capacity == k_unknown_size
+               || space_info.free == k_unknown_size
+               || space_info.available == k_unknown_size
+               )
+              ) && space_info.available >= maxFreeSpace
+            )
         {
-            maxFreeSpace = statFs.f_bavail;
+            maxFreeSpace = space_info.available;
             //confdir = s;
         }
         LOG(VB_GENERAL, LOG_NOTICE, QString(" cachedir      = %1 (%2, %3, %4)")
-                                            .arg(s)
-                                            .arg(statFs.f_bavail)
-                                            .arg(statFs.f_bfree)
-                                            .arg(statFs.f_bsize));
+            .arg(s)
+            .arg(space_info.available)
+            .arg(space_info.free)
+            .arg(space_info.capacity)
+            );
     }
 #endif
 

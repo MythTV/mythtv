@@ -314,7 +314,6 @@ class ZMServer
     void sendError(const std::string &error);
     void getMonitorList(void);
     static int  getFrame(FrameData &buffer, MONITOR *monitor);
-    static long long getDiskSpace(const std::string &filename, long long &total, long long &used);
     static void tokenize(const std::string &command, std::vector<std::string> &tokens);
     void handleHello(void);
     static std::string runCommand(const std::string& command);
