@@ -29,7 +29,7 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
 #  include <sys/statvfs.h>
 #else
 #  include <sys/param.h>
