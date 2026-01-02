@@ -4773,6 +4773,8 @@ if enabled hdhomerun; then
     # Figure out the API version
     if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover2_find_devices_broadcast -lhdhomerun; then
         HDHOMERUN_VERSION=20221010
+    elif check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices_custom_v2 -lhdhomerun; then
+        HDHOMERUN_VERSION=20190625
     else
         HDHOMERUN_VERSION=0
     fi
