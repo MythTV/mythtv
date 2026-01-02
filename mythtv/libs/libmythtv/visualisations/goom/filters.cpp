@@ -622,8 +622,8 @@ zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf
 	if (s_interlaceStart>=0) {
             int maxEnd = (s_interlaceStart+INTERLACE_INCR);
 		/* creation de la nouvelle destination */
-                unsigned int y = (unsigned int)s_interlaceStart;
-		for ( ; (y < (unsigned int)prevY) && (y < (unsigned int)maxEnd); y++) {
+		auto y = (unsigned int)s_interlaceStart;
+		for ( ; (y < prevY) && (y < (unsigned int)maxEnd); y++) {
 			unsigned int premul_y_prevX = y * prevX * 2;
 			for (unsigned int x = 0; x < prevX; x++) {
 				int     px = 0;
@@ -672,8 +672,8 @@ zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf
 void
 pointFilter (unsigned int * pix1, Color c, float t1, float t2, float t3, float t4, unsigned int cycle)
 {
-	unsigned int    x = (unsigned int) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
-	unsigned int    y = (unsigned int) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
+	auto x = (unsigned int) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
+	auto y = (unsigned int) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
 
 	if ((x > 1) && (y > 1) && (x < resolx - 2) && (y < c_resoly - 2)) {
 		setPixelRGB (pix1, x + 1, y, c);

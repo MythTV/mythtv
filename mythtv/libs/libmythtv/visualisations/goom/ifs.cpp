@@ -234,7 +234,7 @@ init_ifs (int width, int height)
 	Fractal->m_count = 0;
 	Fractal->m_lx = (Fractal->m_width - 1) / 2;
 	Fractal->m_ly = (Fractal->m_height - 1) / 2;
-	Fractal->m_col = MythRandomInt(0, width * height - 1);	/* modif by JeKo */
+	Fractal->m_col = MythRandomInt(0, (width * height) - 1);	/* modif by JeKo */
 
 	Random_Simis (Fractal, Fractal->m_components, 0, 5 * MAX_SIMI);
 
