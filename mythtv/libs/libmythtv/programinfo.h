@@ -373,6 +373,7 @@ class MTV_PUBLIC ProgramInfo
     uint    GetSeason(void)       const { return m_season; }
     uint    GetEpisode(void)      const { return m_episode; }
     uint    GetEpisodeTotal(void) const { return m_totalEpisodes; }
+    QString GetSyndicatedEpisode(void) const { return m_syndicatedEpisode; }
     QString GetCategory(void)     const { return m_category; }
     /// This is the unique key used in the database to locate tuning
     /// information. [1..2^32] are valid keys, 0 is not.
@@ -878,10 +879,10 @@ class MTV_PUBLIC ProgGroupBy : public QObject
 
 public:
     enum Type : uint8_t {
-	None,			// Don't group programs
-	ChanNum,		// Group by number and callsign
-	CallSign,		// Group by call sign
-	ProgramId		// Group by program ID
+        None,                   // Don't group programs
+        ChanNum,                // Group by number and callsign
+        CallSign,               // Group by call sign
+        ProgramId               // Group by program ID
     };
     static QString toString(ProgGroupBy::Type groupBy);
     Q_ENUM(Type)

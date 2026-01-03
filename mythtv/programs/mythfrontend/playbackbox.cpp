@@ -128,26 +128,67 @@ static int comp_recordDate_rev(const ProgramInfo *a, const ProgramInfo *b)
             b->GetScheduledStartTime().date() ? 1 : -1);
 }
 
+/*
+Syndicated Season/Episode is returned by some listing grabbers, for some
+shows. If it exists, it is likely to be more accurate than the
+Season/Episode returned by the metadata grabber which often makes
+mistakes.
+ */
+static bool retrieve_SeasonEpisode(int& season, int& episode,
+                                   const ProgramInfo* prog)
+{
+    QString synd;
+    int     eIndex;
+
+    if ((synd = prog->GetSyndicatedEpisode()).isEmpty() ||
+        !synd.startsWith('S') ||
+        (eIndex = synd.indexOf('E')) == -1)
+    {
+        season  = prog->GetSeason();
+        episode = prog->GetEpisode();
+        return false;
+    }
+
+    // S##E## as set by mythfilldatabase
+    bool okSeason, okEpisode;
+    season = synd.mid(1, eIndex - 1).toInt(&okSeason);
+    episode = synd.mid(eIndex + 1).toInt(&okEpisode);
+
+    return okSeason && okEpisode;
+}
+
 static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
 {
-    if (a->GetSeason() == 0 || b->GetSeason() == 0)
+    int a_season, a_episode;
+    int b_season, b_episode;
+
+    retrieve_SeasonEpisode(a_season, a_episode, a);
+    retrieve_SeasonEpisode(b_season, b_episode, b);
+
+    if (a_season == 0 || b_season == 0)
         return comp_originalAirDate(a, b);
-    if (a->GetSeason() != b->GetSeason())
-        return (a->GetSeason() < b->GetSeason() ? 1 : -1);
-    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
+    if (a_season != b_season)
+        return (a_season < b_season ? 1 : -1);
+    if (a_episode == 0 && b_episode == 0)
         return comp_originalAirDate(a, b);
-    return (a->GetEpisode() < b->GetEpisode() ? 1 : -1);
+    return (a_episode < b_episode ? 1 : -1);
 }
 
 static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
 {
-    if (a->GetSeason() == 0 || b->GetSeason() == 0)
+    int a_season, a_episode;
+    int b_season, b_episode;
+
+    retrieve_SeasonEpisode(a_season, a_episode, a);
+    retrieve_SeasonEpisode(b_season, b_episode, b);
+
+    if (a_season == 0 || b_season == 0)
         return comp_originalAirDate_rev(a, b);
-    if (a->GetSeason() != b->GetSeason())
-        return (a->GetSeason() > b->GetSeason() ? 1 : -1);
-    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
+    if (a_season != b_season)
+        return (a_season > b_season ? 1 : -1);
+    if (a_episode == 0 && b_episode == 0)
         return comp_originalAirDate_rev(a, b);
-    return (a->GetEpisode() > b->GetEpisode() ? 1 : -1);
+    return (a_episode > b_episode ? 1 : -1);
 }
 
 static bool comp_programid_less_than(
