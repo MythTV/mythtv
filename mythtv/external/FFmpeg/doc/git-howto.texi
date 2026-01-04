@@ -71,7 +71,6 @@ git clone git@@ffmpeg.org:ffmpeg-web <target>
 
 This will put the source of the FFmpeg website into the directory
 @var{<target>} and let you push back your changes to the remote repository.
-(Note that @var{gil} stands for GItoLite and is not a typo of @var{git}.)
 
 If you don't have write-access to the ffmpeg-web repository, you can
 create patches after making a read-only ffmpeg-web clone:
@@ -143,7 +142,7 @@ git log <filename(s)>
 @end example
 
 You may also use the graphical tools like @command{gitview} or @command{gitk}
-or the web interface available at @url{http://source.ffmpeg.org/}.
+or the web interface available at @url{https://git.ffmpeg.org/ffmpeg.git}.
 
 @section Checking source tree status
 

@@ -106,15 +106,8 @@ debugging by setting the option to "disable".
 Enables the use of the long term prediction extension which increases coding
 efficiency in very low bandwidth situations such as encoding of voice or
 solo piano music by extending constant harmonic peaks in bands throughout
-frames. This option is implied by profile:a aac_low and is incompatible with
-aac_pred. Use in conjunction with @option{-ar} to decrease the samplerate.
-
-@item aac_pred
-Enables the use of a more traditional style of prediction where the spectral
-coefficients transmitted are replaced by the difference of the current
-coefficients minus the previous "predicted" coefficients. In theory and sometimes
-in practice this can improve quality for low to mid bitrate audio.
-This option implies the aac_main profile and is incompatible with aac_ltp.
+frames. This option is implied by profile:a aac_low.
+Use in conjunction with @option{-ar} to decrease the samplerate.
 
 @item profile
 Sets the encoding profile, possible values:
@@ -131,10 +124,6 @@ MPEG4 specifications.
 @item aac_ltp
 Long term prediction profile, is enabled by and will enable the @option{aac_ltp}
 option. Introduced in MPEG4.
-
-@item aac_main
-Main-type prediction profile, is enabled by and will enable the @option{aac_pred}
-option. Introduced in MPEG2.
 
 @end table
 If this option is unspecified it is set to @samp{aac_low}.
@@ -1049,7 +1038,7 @@ forces a wideband cutoff for bitrates < 15 kbps, unless CELT-only
 Set channel mapping family to be used by the encoder. The default value of -1
 uses mapping family 0 for mono and stereo inputs, and mapping family 1
 otherwise. The default also disables the surround masking and LFE bandwidth
-optimzations in libopus, and requires that the input contains 8 channels or
+optimizations in libopus, and requires that the input contains 8 channels or
 fewer.
 
 Other values include 0 for mono and stereo, 1 for surround sound with masking
@@ -1388,6 +1377,48 @@ Vintage compatible is 1..3.
 @item strip_number_adaptivity @var{integer}
 How much number of strips is allowed to change between frames.
 Higher is better but slower.
+
+@end table
+
+@anchor{ffv1}
+@section ffv1
+
+FFv1 Encoder
+
+@subsection Options
+
+The following options are supported by FFmpeg's FFv1 encoder.
+
+@table @option
+@item context
+Sets the context size, 0 (default) is small, 1 is big.
+
+@item coder
+Set the coder,
+@table @samp
+@item rice
+Golomb rice coder
+@item range_def
+Range coder with default table
+@item range_tab
+Range coder with custom table
+@end table
+
+@item slicecrc
+-1 (default, automatic), 1 use crc with zero initial and final state, 2 use crc with non zero initial and final state
+
+@item qtable
+@table @samp
+@item default
+default, automatic
+@item 8bit
+use 8bit default
+@item greater8bit
+use >8bit default
+@end table
+
+@item remap_optimizer
+0 - 5, default 3, how much effort the encoder puts into optimizing the remap table.
 
 @end table
 
@@ -1856,6 +1887,42 @@ For example to specify libaom encoding options with @option{-aom-params}:
 ffmpeg -i input -c:v libaom-av1 -b:v 500K -aom-params tune=psnr:enable-tpl-model=1 output.mp4
 @end example
 
+@end table
+
+@section liboapv
+
+Advanced Professional Video codec encoder wrapper.
+
+This encoder requires the presence of the liboapv headers and library
+during configuration. You need to explicitly configure the build with
+@option{--enable-liboapv}.
+
+@float NOTE
+Many liboapv encoder options are mapped to FFmpeg global codec options,
+while unique encoder options are provided through private options.
+@end float
+
+The apv project website is at @url{https://github.com/AcademySoftwareFoundation/openapv}.
+
+@subsection Options
+
+The following options are supported by the liboapv wrapper.
+
+@float NOTE
+To get a more extensive documentation of the liboapv options, consult the
+liboapv documentation.
+@end float
+
+@table @option
+@item preset
+Set the quality-speed tradeoff [fastest, fast, medium, slow, placebo, default]
+
+@item qp
+Set the quantization parameter value for CQP rate control mode.
+
+@item oapv-params (@emph{parse_apv_params})
+Set liboapvenc options using a list of @var{key}=@var{value} pairs separated
+by ":". See the liboapv encoder user guide for a list of accepted parameters.
 @end table
 
 @section libsvtav1
@@ -3275,6 +3342,75 @@ fastest.
 
 @end table
 
+@section MediaCodec
+
+MediaCodec encoder wrapper enables hardware-accelerated video encoding on
+Android device. It supports H.264, H.265 (HEVC), VP8, VP9, MPEG-4, and AV1
+encoding (whether works or not is device dependent).
+
+Android provides two sets of APIs: Java MediaCodec and NDK MediaCodec. The
+MediaCodec encoder wrapper supports both. Note that the NDK MediaCodec API
+operates without requiring JVM, but may fail to function outside the JVM
+environment due to dependencies on system framework services, particularly
+after Android 15.
+
+@table @option
+@item ndk_codec @var{boolean}
+Use the NDK-based MediaCodec API instead of the Java API. Enabled by default
+if @code{av_jni_get_java_vm()} return NULL.
+
+@item ndk_async @var{boolean}
+Use NDK MediaCodec in async mode. Async mode has less overhead than poll in a
+loop in sync mode. The drawback of async mode is AV_CODEC_FLAG_GLOBAL_HEADER
+doesn't work (use extract_extradata bsf when necessary). It doesn't work and
+will be disabled automatically on devices below Android 8.0.
+
+@item codec_name @var{string}
+A codec type can have multiple implementations on a single device, this option
+specify which backend to use (via MediaCodec createCodecByName API). It's NULL
+by default, and encoder is created by createEncoderByType.
+
+@item bitrate_mode @var{integer}
+
+Possible values:
+@table @samp
+@item cq
+Constant quality mode
+@item vbr
+Variable bitrate mode
+@item cbr
+Constant bitrate mode
+@item cbr_fd
+Constant bitrate mode with frame drops
+@end table
+
+@item pts_as_dts @var{boolean}
+Use PTS as DTS. This is a workaround since MediaCodec API doesn't provide
+decoding timestamp. It is enabled automatically if B frame is 0.
+
+@item operating_rate @var{integer}
+The desired operating rate that the codec will need to operate at, zero for
+unspecified. This is used for cases like high-speed/slow-motion video capture,
+where the video encoder format contains the target playback rate (e.g. 30fps),
+but the component must be able to handle the high operating capture rate (e.g.
+240fps). This rate will be used by codec for resource planning and setting the
+operating points.
+
+@item qp_i_min @var{integer}
+Minimum quantization parameter for I frame.
+@item qp_p_min @var{integer}
+Minimum quantization parameter for P frame.
+@item qp_b_min @var{integer}
+Minimum quantization parameter for B frame.
+@item qp_i_max @var{integer}
+Maximum quantization parameter for I frame.
+@item qp_p_max @var{integer}
+Maximum quantization parameter for P frame.
+@item qp_b_max @var{integer}
+Maximum quantization parameter for B frame.
+
+@end table
+
 @section MediaFoundation
 
 This provides wrappers to encoders (both audio and video) in the
@@ -3357,6 +3493,13 @@ Default is 1 (on).
 
 PNG image encoder.
 
+@subsection Options
+
+@table @option
+@item compression_level
+Sets the compression level, from 0 to 9(default)
+@end table
+
 @subsection Private options
 
 @table @option
@@ -3364,6 +3507,8 @@ PNG image encoder.
 Set physical density of pixels, in dots per inch, unset by default
 @item dpm @var{integer}
 Set physical density of pixels, in dots per meter, unset by default
+@item pred @var{method}
+Set prediction method (none, sub, up, avg, paeth, mixed), default is paeth
 @end table
 
 @section ProRes
@@ -3558,7 +3703,7 @@ For encoders set this flag to ON to reduce power consumption and GPU usage.
 @end table
 
 @subsection Runtime Options
-Following options can be used durning qsv encoding.
+Following options can be used during qsv encoding.
 
 @table @option
 @item @var{global_quality}
@@ -3668,7 +3813,7 @@ improves subjective visual quality. Enabling this flag may have negative impact
 on performance and objective visual quality metric.
 
 @item @var{low_delay_brc}
-Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+Setting this flag turns on or off LowDelayBRC feature in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: -1-default 0-off 1-on
 
@@ -3867,7 +4012,7 @@ improves subjective visual quality. Enabling this flag may have negative impact
 on performance and objective visual quality metric.
 
 @item @var{low_delay_brc}
-Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+Setting this flag turns on or off LowDelayBRC feature in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: -1-default 0-off 1-on
 
@@ -4101,7 +4246,7 @@ Extended bitrate control.
 Depth of look ahead in number frames, available when extbrc option is enabled.
 
 @item @var{low_delay_brc}
-Setting this flag turns on or off LowDelayBRC feautre in qsv plugin, which provides
+Setting this flag turns on or off LowDelayBRC feature in qsv plugin, which provides
 more accurate bitrate control to minimize the variance of bitstream size frame
 by frame. Value: -1-default 0-off 1-on
 
@@ -4457,6 +4602,25 @@ Reduces detail but attempts to preserve color at extremely low bitrates.
 @chapter Subtitles Encoders
 @c man begin SUBTITLES ENCODERS
 
+@section dvbsub
+
+This codec encodes the bitmap subtitle format that is used in DVB
+broadcasts and recordings. The bitmaps are typically embedded in a
+container such as MPEG-TS as a separate stream.
+
+@subsection Options
+
+@table @option
+@item min_bpp @var{integer (2, 4, or 8)}
+Set a minimum bits-per-pixel value for the subtitle color lookup tables.
+
+DVB supports 2, 4, and 8 bits-per-pixel color lookup tables.  This
+option enables forcing a particular bits-per-pixel value regardless of
+the number of colors.  Since not all players support or properly
+support 2 bits-per-pixel, this value defaults to 4.
+
+@end table
+
 @section dvdsub
 
 This codec encodes the bitmap subtitle format that is used in DVDs.
@@ -4482,6 +4646,20 @@ a fully transparent row if needed.  The overhead is low, typically
 one byte per subtitle on average.
 
 By default, this work-around is disabled.
+@end table
+
+@section lrc
+
+This codec encodes the LRC lyrics format.
+
+@subsection Options
+
+@table @option
+@item precision
+Specify the precision of the fractional part of the timestamp. Time base is
+determined based on this value.
+
+Defaults to 2 for centiseconds.
 @end table
 
 @c man end SUBTITLES ENCODERS

@@ -450,7 +450,7 @@ static void write_timestamp(AVFormatContext *s, AVPacket *pkt)
     write_pad(pb, 8);
     avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? -1 : pkt->pts);
     avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? -1 : pkt->pts);
-    avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? -1 : pkt->pts);
+    avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? 0 : pkt->pts);
     avio_wl64(pb, 0);
     avio_wl64(pb, par->codec_type == AVMEDIA_TYPE_VIDEO && (pkt->flags & AV_PKT_FLAG_KEY) ? 1 : 0);
     avio_wl64(pb, 0);
@@ -575,7 +575,7 @@ static int write_root_table(AVFormatContext *s, int64_t sector_pos)
         }
     }
 
-    // caculate root table size
+    // calculate root table size
     size = avio_tell(pb) - sector_pos;
     pad = WTV_SECTOR_SIZE- size;
     write_pad(pb, pad);

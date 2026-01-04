@@ -471,7 +471,8 @@ static QSVFrame *submit_frame(QSVVPPContext *s, AVFilterLink *inlink, AVFrame *p
 }
 
 /* get the output surface */
-static QSVFrame *query_frame(QSVVPPContext *s, AVFilterLink *outlink, const AVFrame *in)
+static QSVFrame *query_frame(QSVVPPContext *s, AVFilterLink *outlink, const AVFrame *in,
+                             const AVFrame *propref)
 {
     FilterLink *l = ff_filter_link(outlink);
     AVFilterContext *ctx = outlink->src;
@@ -513,6 +514,15 @@ static QSVFrame *query_frame(QSVVPPContext *s, AVFilterLink *outlink, const AVFr
             return NULL;
     }
 
+    if (propref) {
+        ret = av_frame_copy_props(out_frame->frame, propref);
+        if (ret < 0) {
+            av_frame_free(&out_frame->frame);
+            av_log(ctx, AV_LOG_ERROR, "Failed to copy metadata fields from src to dst.\n");
+            return NULL;
+        }
+    }
+
     if (l->frame_rate.num && l->frame_rate.den)
         out_frame->frame->duration = av_rescale_q(1, av_inv_q(l->frame_rate), outlink->time_base);
     else
@@ -526,11 +536,6 @@ static QSVFrame *query_frame(QSVVPPContext *s, AVFilterLink *outlink, const AVFr
         mfxExtBuffer *extbuf = s->vpp_param.ExtParam[i];
 
         if (extbuf->BufferId == MFX_EXTBUFF_VPP_DEINTERLACING) {
-#if FF_API_INTERLACED_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-            out_frame->frame->interlaced_frame = 0;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
             out_frame->frame->flags &= ~AV_FRAME_FLAG_INTERLACED;
             break;
         }
@@ -985,7 +990,7 @@ int ff_qsvvpp_filter_frame(QSVVPPContext *s, AVFilterLink *inlink, AVFrame *picr
     }
 
     do {
-        out_frame = query_frame(s, outlink, in_frame->frame);
+        out_frame = query_frame(s, outlink, in_frame->frame, propref);
         if (!out_frame) {
             av_log(ctx, AV_LOG_ERROR, "Failed to query an output frame.\n");
             return AVERROR(ENOMEM);
@@ -1007,15 +1012,6 @@ int ff_qsvvpp_filter_frame(QSVVPPContext *s, AVFilterLink *inlink, AVFrame *picr
             if (ret == MFX_ERR_MORE_DATA)
                 return AVERROR(EAGAIN);
             break;
-        }
-
-        if (propref) {
-            ret1 = av_frame_copy_props(out_frame->frame, propref);
-            if (ret1 < 0) {
-                av_frame_free(&out_frame->frame);
-                av_log(ctx, AV_LOG_ERROR, "Failed to copy metadata fields from src to dst.\n");
-                return ret1;
-            }
         }
 
         out_frame->frame->pts = av_rescale_q(out_frame->surface.Data.TimeStamp,

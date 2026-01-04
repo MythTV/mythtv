@@ -542,7 +542,7 @@ func ff_h264_idct8_dc_add_\depth\()_rvv, zve64x
 endfunc
 .endr
 
-const ff_h264_scan8
+const ff_h264_scan8, align=0
         .byte    014,  015,  024,  025,  016,  017,  026,  027
         .byte    034,  035,  044,  045,  036,  037,  046,  047
         .byte    064,  065,  074,  075,  066,  067,  076,  077
@@ -629,6 +629,7 @@ endfunc
 .endm
 
 .macro idct4_add8 type, depth
+#if (__riscv_xlen == 64)
 func ff_h264_idct4_add\type\()_\depth\()_rvv, zve32x
 .if \depth == 8
         lpad    0
@@ -644,7 +645,7 @@ func ff_h264_idct4_add\type\()_\depth\()_rvv, zve32x
         sd      a4, 24(sp)
         ld      a0,  0(a0)                               # dest[0]
         addi    a1, a1, 16 * 4                           # &block_offset[16]
-        vsetivli    zero, 4, e8, mf4, ta, ma
+        vsetivli    zero, 4, e8, m1, ta, ma
         jal     .Lidct4_add4_\depth\()_rvv
 
         ld      a4, 24(sp)                               # nnzc
@@ -655,7 +656,7 @@ func ff_h264_idct4_add\type\()_\depth\()_rvv, zve32x
         ld      a0,  8(a0)                               # dest[1]
         lla     t0, ff_h264_scan8 + 32
 .ifc \type, 8_422
-        vsetivli    zero, 4, e8, mf4, ta, ma
+        vsetivli    zero, 4, e8, m1, ta, ma
         jal     .Lidct4_add4_\depth\()_rvv
 
         ld      a4, 24(sp)                               # nnzc
@@ -665,7 +666,7 @@ func ff_h264_idct4_add\type\()_\depth\()_rvv, zve32x
         addi    a1, t5, (-8 - 4) * 4                     # &block_offset[24]
         ld      a0,  0(a0)                               # dest[0]
         lla     t0, ff_h264_scan8 + 24
-        vsetivli    zero, 4, e8, mf4, ta, ma
+        vsetivli    zero, 4, e8, m1, ta, ma
         jal     .Lidct4_add4_\depth\()_rvv
 
         ld      a4, 24(sp)                               # nnzc
@@ -679,9 +680,10 @@ func ff_h264_idct4_add\type\()_\depth\()_rvv, zve32x
         ld      ra,  8(sp)
         ld      s0,  0(sp)
         addi    sp, sp, 32
-        vsetivli    zero, 4, e8, mf4, ta, ma
+        vsetivli    zero, 4, e8, m1, ta, ma
         j       .Lidct4_add4_\depth\()_rvv
 endfunc
+#endif
 .endm
 
 .irp    depth, 8, 16

@@ -31,6 +31,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/detection_bbox.h"
 #include "libavutil/fifo.h"
+#include <float.h>
 
 typedef enum {
     DDMT_SSD,
@@ -53,10 +54,11 @@ typedef struct DnnDetectContext {
     AVFifo *bboxes_fifo;
     int scale_width;
     int scale_height;
-    char *anchors_str;
     float *anchors;
     int nb_anchor;
 } DnnDetectContext;
+
+static const AVOptionArrayDef anchor_array_def = { .sep = '&' };
 
 #define OFFSET(x) offsetof(DnnDetectContext, dnnctx.x)
 #define OFFSET2(x) offsetof(DnnDetectContext, x)
@@ -79,7 +81,7 @@ static const AVOption dnn_detect_options[] = {
     { "cell_w",      "cell width",                 OFFSET2(cell_w),          AV_OPT_TYPE_INT,       { .i64 = 0 },    0, INTMAX_MAX, FLAGS },
     { "cell_h",      "cell height",                OFFSET2(cell_h),          AV_OPT_TYPE_INT,       { .i64 = 0 },    0, INTMAX_MAX, FLAGS },
     { "nb_classes",  "The number of class",        OFFSET2(nb_classes),      AV_OPT_TYPE_INT,       { .i64 = 0 },    0, INTMAX_MAX, FLAGS },
-    { "anchors",     "anchors, splited by '&'",    OFFSET2(anchors_str),         AV_OPT_TYPE_STRING,    { .str = NULL }, 0, 0, FLAGS },
+    { "anchors",     "anchors, split by '&'",    OFFSET2(anchors),         AV_OPT_TYPE_FLOAT | AV_OPT_TYPE_FLAG_ARRAY,    { .arr = &anchor_array_def }, FLT_MIN, FLT_MAX, FLAGS },
     { NULL }
 };
 
@@ -104,34 +106,6 @@ static int dnn_detect_get_label_id(int nb_classes, int cell_size, float *label_d
         }
     }
     return label_id;
-}
-
-static int dnn_detect_parse_anchors(char *anchors_str, float **anchors)
-{
-    char *saveptr = NULL, *token;
-    float *anchors_buf;
-    int nb_anchor = 0, i = 0;
-    while(anchors_str[i] != '\0') {
-        if(anchors_str[i] == '&')
-            nb_anchor++;
-        i++;
-    }
-    nb_anchor++;
-    anchors_buf = av_mallocz(nb_anchor * sizeof(**anchors));
-    if (!anchors_buf) {
-        return 0;
-    }
-    for (int i = 0; i < nb_anchor; i++) {
-        token = av_strtok(anchors_str, "&", &saveptr);
-        if (!token) {
-            av_freep(&anchors_buf);
-            return 0;
-        }
-        anchors_buf[i] = strtof(token, NULL);
-        anchors_str = NULL;
-    }
-    *anchors = anchors_buf;
-    return nb_anchor;
 }
 
 /* Calculate Intersection Over Union */
@@ -196,11 +170,6 @@ static int dnn_detect_parse_yolo_output(AVFrame *frame, DNNData *output, int out
 
     if (!nb_classes) {
         av_log(filter_ctx, AV_LOG_ERROR, "nb_classes is not set\n");
-        return AVERROR(EINVAL);
-    }
-
-    if (!anchors) {
-        av_log(filter_ctx, AV_LOG_ERROR, "anchors is not set\n");
         return AVERROR(EINVAL);
     }
 
@@ -682,6 +651,14 @@ static av_cold int dnn_detect_init(AVFilterContext *context)
     DnnDetectContext *ctx = context->priv;
     DnnContext *dnn_ctx = &ctx->dnnctx;
     int ret;
+    int using_yolo = (ctx->model_type == DDMT_YOLOV3 ||
+                      ctx->model_type == DDMT_YOLOV4 ||
+                      ctx->model_type == DDMT_YOLOV1V2);
+
+    if (using_yolo && !ctx->anchors) {
+        av_log(ctx, AV_LOG_ERROR, "anchors is not set while being required for YOLO models\n");
+        return AVERROR(EINVAL);
+    }
 
     ret = ff_dnn_init(&ctx->dnnctx, DFT_ANALYTICS_DETECT, context);
     if (ret < 0)
@@ -695,16 +672,12 @@ static av_cold int dnn_detect_init(AVFilterContext *context)
     ff_dnn_set_detect_post_proc(&ctx->dnnctx, dnn_detect_post_proc);
 
     if (ctx->labels_filename) {
-        return read_detect_label_file(context);
-    }
-    if (ctx->anchors_str) {
-        ret = dnn_detect_parse_anchors(ctx->anchors_str, &ctx->anchors);
-        if (!ctx->anchors) {
-            av_log(context, AV_LOG_ERROR, "failed to parse anchors_str\n");
-            return AVERROR(EINVAL);
+        ret = read_detect_label_file(context);
+        if (ret) {
+          return ret;
         }
-        ctx->nb_anchor = ret;
     }
+
     return 0;
 }
 
@@ -847,9 +820,10 @@ static const AVFilterPad dnn_detect_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_dnn_detect = {
-    .name          = "dnn_detect",
-    .description   = NULL_IF_CONFIG_SMALL("Apply DNN detect filter to the input."),
+const FFFilter ff_vf_dnn_detect = {
+    .p.name        = "dnn_detect",
+    .p.description = NULL_IF_CONFIG_SMALL("Apply DNN detect filter to the input."),
+    .p.priv_class  = &dnn_detect_class,
     .priv_size     = sizeof(DnnDetectContext),
     .preinit       = ff_dnn_filter_init_child_class,
     .init          = dnn_detect_init,
@@ -857,6 +831,5 @@ const AVFilter ff_vf_dnn_detect = {
     FILTER_INPUTS(dnn_detect_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
     FILTER_PIXFMTS_ARRAY(pix_fmts),
-    .priv_class    = &dnn_detect_class,
     .activate      = dnn_detect_activate,
 };

@@ -619,7 +619,7 @@ static int render_fontconfig(ShowCQTContext *s, AVFrame *tmp, char* font)
     FcDefaultSubstitute(pat);
 
     if (!FcConfigSubstitute(fontconfig, pat, FcMatchPattern)) {
-        av_log(s->ctx, AV_LOG_ERROR, "could not substitue fontconfig options.\n");
+        av_log(s->ctx, AV_LOG_ERROR, "could not substitute fontconfig options.\n");
         FcPatternDestroy(pat);
         FcConfigDestroy(fontconfig);
         return AVERROR(ENOMEM);
@@ -655,6 +655,7 @@ fail:
 static int render_default_font(AVFrame *tmp)
 {
     const char *str = "EF G A BC D ";
+    const uint8_t *vga16_font = avpriv_vga16_font_get();
     int x, u, v, mask;
     uint8_t *data = tmp->data[0];
     int linesize = tmp->linesize[0];
@@ -666,7 +667,7 @@ static int render_default_font(AVFrame *tmp)
             for (v = 0; v < height; v++) {
                 uint8_t *p = startptr + v * linesize + height/2 * 4 * u;
                 for (mask = 0x80; mask; mask >>= 1, p += 4) {
-                    if (mask & avpriv_vga16_font[str[u] * 16 + v])
+                    if (mask & vga16_font[str[u] * 16 + v])
                         p[3] = 255;
                     else
                         p[3] = 0;
@@ -1314,12 +1315,11 @@ static av_cold void uninit(AVFilterContext *ctx)
     common_uninit(ctx->priv);
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     AVFilterFormats *formats = NULL;
-    AVFilterChannelLayouts *layouts = NULL;
-    AVFilterLink *inlink = ctx->inputs[0];
-    AVFilterLink *outlink = ctx->outputs[0];
     static const enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_FLT, AV_SAMPLE_FMT_NONE };
     static const enum AVPixelFormat pix_fmts[] = {
         AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P,
@@ -1331,20 +1331,16 @@ static int query_formats(AVFilterContext *ctx)
 
     /* set input audio formats */
     formats = ff_make_format_list(sample_fmts);
-    if ((ret = ff_formats_ref(formats, &inlink->outcfg.formats)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_in[0]->formats)) < 0)
         return ret;
 
-    layouts = ff_make_channel_layout_list(channel_layouts);
-    if ((ret = ff_channel_layouts_ref(layouts, &inlink->outcfg.channel_layouts)) < 0)
-        return ret;
-
-    formats = ff_all_samplerates();
-    if ((ret = ff_formats_ref(formats, &inlink->outcfg.samplerates)) < 0)
+    ret = ff_set_common_channel_layouts_from_list2(ctx, cfg_in, cfg_out, channel_layouts);
+    if (ret < 0)
         return ret;
 
     /* set output video format */
     formats = ff_make_format_list(pix_fmts);
-    if ((ret = ff_formats_ref(formats, &outlink->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_out[0]->formats)) < 0)
         return ret;
 
     return 0;
@@ -1520,7 +1516,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
         i = insamples->nb_samples - remaining;
         j = s->fft_len/2 + s->remaining_fill_max - s->remaining_fill;
         if (remaining >= s->remaining_fill) {
-            for (m = 0; m < s->remaining_fill; m++) {
+            for (m = FFMAX(0, -j); m < s->remaining_fill; m++) {
                 s->fft_data[j+m].re = audio_data[2*(i+m)];
                 s->fft_data[j+m].im = audio_data[2*(i+m)+1];
             }
@@ -1549,7 +1545,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *insamples)
                 s->fft_data[m] = s->fft_data[m+step];
             s->remaining_fill = step;
         } else {
-            for (m = 0; m < remaining; m++) {
+            for (m = FFMAX(0, -j); m < remaining; m++) {
                 s->fft_data[j+m].re = audio_data[2*(i+m)];
                 s->fft_data[j+m].im = audio_data[2*(i+m)+1];
             }
@@ -1603,15 +1599,15 @@ static const AVFilterPad showcqt_outputs[] = {
     },
 };
 
-const AVFilter ff_avf_showcqt = {
-    .name          = "showcqt",
-    .description   = NULL_IF_CONFIG_SMALL("Convert input audio to a CQT (Constant/Clamped Q Transform) spectrum video output."),
+const FFFilter ff_avf_showcqt = {
+    .p.name        = "showcqt",
+    .p.description = NULL_IF_CONFIG_SMALL("Convert input audio to a CQT (Constant/Clamped Q Transform) spectrum video output."),
+    .p.priv_class  = &showcqt_class,
     .init          = init,
     .activate      = activate,
     .uninit        = uninit,
     .priv_size     = sizeof(ShowCQTContext),
     FILTER_INPUTS(ff_audio_default_filterpad),
     FILTER_OUTPUTS(showcqt_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .priv_class    = &showcqt_class,
+    FILTER_QUERY_FUNC2(query_formats),
 };

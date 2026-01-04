@@ -86,13 +86,7 @@ static av_cold int libkvazaar_init(AVCodecContext *avctx)
         cfg->framerate_denom = avctx->framerate.den;
     } else {
         cfg->framerate_num   = avctx->time_base.den;
-FF_DISABLE_DEPRECATION_WARNINGS
-        cfg->framerate_denom = avctx->time_base.num
-#if FF_API_TICKS_PER_FRAME
-            * avctx->ticks_per_frame
-#endif
-            ;
-FF_ENABLE_DEPRECATION_WARNINGS
+        cfg->framerate_denom = avctx->time_base.num;
     }
     cfg->target_bitrate = avctx->bit_rate;
     cfg->vui.sar_width  = avctx->sample_aspect_ratio.num;
@@ -333,7 +327,7 @@ const FFCodec ff_libkvazaar_encoder = {
     .p.id             = AV_CODEC_ID_HEVC,
     .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                         AV_CODEC_CAP_OTHER_THREADS,
-    .p.pix_fmts       = pix_fmts,
+    CODEC_PIXFMTS_ARRAY(pix_fmts),
     .color_ranges     = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
 
     .p.priv_class     = &class,

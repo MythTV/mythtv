@@ -269,6 +269,43 @@ p412be          planes: 2, linesizes: 128 256   0   0, plane_sizes:  6144 12288 
 p412le          planes: 2, linesizes: 128 256   0   0, plane_sizes:  6144 12288     0     0, plane_offsets:  6144     0     0, total_size: 18432
 gbrap14be       planes: 4, linesizes: 128 128 128 128, plane_sizes:  6144  6144  6144  6144, plane_offsets:  6144  6144  6144, total_size: 24576
 gbrap14le       planes: 4, linesizes: 128 128 128 128, plane_sizes:  6144  6144  6144  6144, plane_offsets:  6144  6144  6144, total_size: 24576
+ayuv            planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+uyva            planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+vyu444          planes: 1, linesizes: 192   0   0   0, plane_sizes:  9216     0     0     0, plane_offsets:     0     0     0, total_size: 9216
+v30xbe          planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+v30xle          planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+rgbf16be        planes: 1, linesizes: 384   0   0   0, plane_sizes: 18432     0     0     0, plane_offsets:     0     0     0, total_size: 18432
+rgbf16le        planes: 1, linesizes: 384   0   0   0, plane_sizes: 18432     0     0     0, plane_offsets:     0     0     0, total_size: 18432
+rgba128be       planes: 1, linesizes: 1024   0   0   0, plane_sizes: 49152     0     0     0, plane_offsets:     0     0     0, total_size: 49152
+rgba128le       planes: 1, linesizes: 1024   0   0   0, plane_sizes: 49152     0     0     0, plane_offsets:     0     0     0, total_size: 49152
+rgb96be         planes: 1, linesizes: 768   0   0   0, plane_sizes: 36864     0     0     0, plane_offsets:     0     0     0, total_size: 36864
+rgb96le         planes: 1, linesizes: 768   0   0   0, plane_sizes: 36864     0     0     0, plane_offsets:     0     0     0, total_size: 36864
+y216be          planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+y216le          planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+xv48be          planes: 1, linesizes: 512   0   0   0, plane_sizes: 24576     0     0     0, plane_offsets:     0     0     0, total_size: 24576
+xv48le          planes: 1, linesizes: 512   0   0   0, plane_sizes: 24576     0     0     0, plane_offsets:     0     0     0, total_size: 24576
+gbrpf16be       planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+gbrpf16le       planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+gbrapf16be      planes: 4, linesizes: 128 128 128 128, plane_sizes:  6144  6144  6144  6144, plane_offsets:  6144  6144  6144, total_size: 24576
+gbrapf16le      planes: 4, linesizes: 128 128 128 128, plane_sizes:  6144  6144  6144  6144, plane_offsets:  6144  6144  6144, total_size: 24576
+grayf16be       planes: 1, linesizes: 128   0   0   0, plane_sizes:  6144     0     0     0, plane_offsets:     0     0     0, total_size: 6144
+grayf16le       planes: 1, linesizes: 128   0   0   0, plane_sizes:  6144     0     0     0, plane_offsets:     0     0     0, total_size: 6144
+gray32be        planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+gray32le        planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+yaf32be         planes: 1, linesizes: 512   0   0   0, plane_sizes: 24576     0     0     0, plane_offsets:     0     0     0, total_size: 24576
+yaf32le         planes: 1, linesizes: 512   0   0   0, plane_sizes: 24576     0     0     0, plane_offsets:     0     0     0, total_size: 24576
+yaf16be         planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+yaf16le         planes: 1, linesizes: 256   0   0   0, plane_sizes: 12288     0     0     0, plane_offsets:     0     0     0, total_size: 12288
+gbrap32be       planes: 4, linesizes: 256 256 256 256, plane_sizes: 12288 12288 12288 12288, plane_offsets: 12288 12288 12288, total_size: 49152
+gbrap32le       planes: 4, linesizes: 256 256 256 256, plane_sizes: 12288 12288 12288 12288, plane_offsets: 12288 12288 12288, total_size: 49152
+yuv444p10msbbe  planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+yuv444p10msble  planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+yuv444p12msbbe  planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+yuv444p12msble  planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+gbrp10msbbe     planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+gbrp10msble     planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+gbrp12msbbe     planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
+gbrp12msble     planes: 3, linesizes: 128 128 128   0, plane_sizes:  6144  6144  6144     0, plane_offsets:  6144  6144     0, total_size: 18432
 
 image_fill_black tests
 yuv420p         total_size:   4608,  black_unknown_crc: 0xd00f6cc6,  black_tv_crc: 0xd00f6cc6,  black_pc_crc: 0x234969af
@@ -485,3 +522,40 @@ p412be          total_size:  18432,  black_unknown_crc: 0x26991800,  black_tv_cr
 p412le          total_size:  18432,  black_unknown_crc: 0x4028ac30,  black_tv_crc: 0x4028ac30,  black_pc_crc: 0xab7c7698
 gbrap14be       total_size:  24576,  black_unknown_crc: 0x4ec0d987,  black_tv_crc: 0x4ec0d987,  black_pc_crc: 0x4ec0d987
 gbrap14le       total_size:  24576,  black_unknown_crc: 0x13bde353,  black_tv_crc: 0x13bde353,  black_pc_crc: 0x13bde353
+ayuv            total_size:  12288,  black_unknown_crc: 0xcc44368b,  black_tv_crc: 0xcc44368b,  black_pc_crc: 0x1e04c638
+uyva            total_size:  12288,  black_unknown_crc: 0xdd657297,  black_tv_crc: 0xdd657297,  black_pc_crc: 0x0f258224
+vyu444          total_size:   9216,  black_unknown_crc: 0x575e6fb1,  black_tv_crc: 0x575e6fb1,  black_pc_crc: 0x16564599
+v30xbe          total_size:  12288,  black_unknown_crc: 0x7108457c,  black_tv_crc: 0x7108457c,  black_pc_crc: 0xdefcbbe0
+v30xle          total_size:  12288,  black_unknown_crc: 0xf5b3c795,  black_tv_crc: 0xf5b3c795,  black_pc_crc: 0x0b56173c
+rgbf16be        total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+rgbf16le        total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+rgba128be       total_size:  49152,  black_unknown_crc: 0x59ef499b,  black_tv_crc: 0x59ef499b,  black_pc_crc: 0x59ef499b
+rgba128le       total_size:  49152,  black_unknown_crc: 0x59ef499b,  black_tv_crc: 0x59ef499b,  black_pc_crc: 0x59ef499b
+rgb96be         total_size:  36864,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+rgb96le         total_size:  36864,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+y216be          total_size:  12288,  black_unknown_crc: 0x5483d935,  black_tv_crc: 0x5483d935,  black_pc_crc: 0x06397bf3
+y216le          total_size:  12288,  black_unknown_crc: 0x5d8e1cf6,  black_tv_crc: 0x5d8e1cf6,  black_pc_crc: 0x8fceec45
+xv48be          total_size:  24576,  black_unknown_crc: 0x6ba828bd,  black_tv_crc: 0x6ba828bd,  black_pc_crc: 0x5f450f41
+xv48le          total_size:  24576,  black_unknown_crc: 0xc3794950,  black_tv_crc: 0xc3794950,  black_pc_crc: 0x40874939
+gbrpf16be       total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+gbrpf16le       total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+gbrapf16be      total_size:  24576,  black_unknown_crc: 0x707ede8d,  black_tv_crc: 0x707ede8d,  black_pc_crc: 0x707ede8d
+gbrapf16le      total_size:  24576,  black_unknown_crc: 0x142a0205,  black_tv_crc: 0x142a0205,  black_pc_crc: 0x142a0205
+grayf16be       total_size:   6144,  black_unknown_crc: 0x72aa7ce2,  black_tv_crc: 0x72aa7ce2,  black_pc_crc: 0x00000000
+grayf16le       total_size:   6144,  black_unknown_crc: 0xad1b67c6,  black_tv_crc: 0xad1b67c6,  black_pc_crc: 0x00000000
+gray32be        total_size:  12288,  black_unknown_crc: 0x52baa2c6,  black_tv_crc: 0x52baa2c6,  black_pc_crc: 0x00000000
+gray32le        total_size:  12288,  black_unknown_crc: 0xc72f7e60,  black_tv_crc: 0xc72f7e60,  black_pc_crc: 0x00000000
+yaf32be         total_size:  24576,  black_unknown_crc: 0xa3dc1529,  black_tv_crc: 0xa3dc1529,  black_pc_crc: 0x0bbcb13e
+yaf32le         total_size:  24576,  black_unknown_crc: 0xfd900236,  black_tv_crc: 0xfd900236,  black_pc_crc: 0xdcaf0cb1
+yaf16be         total_size:  12288,  black_unknown_crc: 0x7afe9aae,  black_tv_crc: 0x7afe9aae,  black_pc_crc: 0x0fc0a5d0
+yaf16le         total_size:  12288,  black_unknown_crc: 0x94c0068b,  black_tv_crc: 0x94c0068b,  black_pc_crc: 0xc05ce449
+gbrap32be       total_size:  49152,  black_unknown_crc: 0x7bd30c95,  black_tv_crc: 0x7bd30c95,  black_pc_crc: 0x7bd30c95
+gbrap32le       total_size:  49152,  black_unknown_crc: 0x7bd30c95,  black_tv_crc: 0x7bd30c95,  black_pc_crc: 0x7bd30c95
+yuv444p10msbbe  total_size:  18432,  black_unknown_crc: 0x26991800,  black_tv_crc: 0x26991800,  black_pc_crc: 0xfe7f6700
+yuv444p10msble  total_size:  18432,  black_unknown_crc: 0x4028ac30,  black_tv_crc: 0x4028ac30,  black_pc_crc: 0xab7c7698
+yuv444p12msbbe  total_size:  18432,  black_unknown_crc: 0x26991800,  black_tv_crc: 0x26991800,  black_pc_crc: 0xfe7f6700
+yuv444p12msble  total_size:  18432,  black_unknown_crc: 0x4028ac30,  black_tv_crc: 0x4028ac30,  black_pc_crc: 0xab7c7698
+gbrp10msbbe     total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+gbrp10msble     total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+gbrp12msbbe     total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000
+gbrp12msble     total_size:  18432,  black_unknown_crc: 0x00000000,  black_tv_crc: 0x00000000,  black_pc_crc: 0x00000000

@@ -18,7 +18,7 @@ BIN2C = $(BIN2CEXE)
 ifndef V
 Q      = @
 ECHO   = printf "$(1)\t%s\n" $(2)
-BRIEF  = CC CXX OBJCC HOSTCC HOSTLD AS X86ASM AR LD STRIP CP WINDRES NVCC BIN2C
+BRIEF  = CC CXX OBJCC HOSTCC HOSTLD AS X86ASM AR LD STRIP CP WINDRES NVCC BIN2C METALCC METALLIB
 SILENT = DEPCC DEPHOSTCC DEPAS DEPX86ASM RANLIB RM
 
 MSG    = $@
@@ -139,6 +139,46 @@ else
 	$(BIN2C) $(patsubst $(SRC_PATH)/%,$(SRC_LINK)/%,$<) $@ $(subst .,_,$(basename $(notdir $@)))
 endif
 
+# 1) Preprocess CSS to a minified version
+%.css.min: TAG = SED
+%.css.min: %.css
+	$(M)sed 's!/\\*.*\\*/!!g' $< \
+	| tr '\n' ' ' \
+	| tr -s ' ' \
+	| sed 's/^ //; s/ $$//' \
+	> $@
+
+ifdef CONFIG_RESOURCE_COMPRESSION
+
+# 2) Gzip the minified CSS
+%.css.min.gz: TAG = GZIP
+%.css.min.gz: %.css.min
+	$(M)gzip -nc9 $< > $@
+
+# 3) Convert the gzipped CSS to a .c array
+%.css.c: %.css.min.gz $(BIN2CEXE)
+	$(BIN2C) $< $@ $(subst .,_,$(basename $(notdir $@)))
+
+# 4) Gzip the HTML file (no minification needed)
+%.html.gz: TAG = GZIP
+%.html.gz: %.html
+	$(M)gzip -nc9 $< > $@
+
+# 5) Convert the gzipped HTML to a .c array
+%.html.c: %.html.gz $(BIN2CEXE)
+	$(BIN2C) $< $@ $(subst .,_,$(basename $(notdir $@)))
+
+else   # NO COMPRESSION
+
+# 2) Convert the minified CSS to a .c array
+%.css.c: %.css.min $(BIN2CEXE)
+	$(BIN2C) $< $@ $(subst .,_,$(basename $(notdir $@)))
+
+# 3) Convert the plain HTML to a .c array
+%.html.c: %.html $(BIN2CEXE)
+	$(BIN2C) $< $@ $(subst .,_,$(basename $(notdir $@)))
+endif
+
 clean::
 	$(RM) $(BIN2CEXE) $(CLEANSUFFIXES:%=ffbuild/%)
 
@@ -159,7 +199,6 @@ endif
 include $(SRC_PATH)/ffbuild/arch.mak
 
 OBJS      += $(OBJS-yes)
-SLIBOBJS  += $(SLIBOBJS-yes)
 SHLIBOBJS += $(SHLIBOBJS-yes)
 STLIBOBJS += $(STLIBOBJS-yes)
 FFLIBS    := $($(NAME)_FFLIBS) $(FFLIBS-yes) $(FFLIBS)
@@ -169,7 +208,6 @@ LDLIBS       = $(FFLIBS:%=%$(BUILDSUF))
 FFEXTRALIBS := $(LDLIBS:%=$(LD_MYTH_LIB)) $(foreach lib,EXTRALIBS-$(NAME) $(FFLIBS:%=EXTRALIBS-%),$($(lib))) $(EXTRALIBS)
 
 OBJS      := $(sort $(OBJS:%=$(SUBDIR)%))
-SLIBOBJS  := $(sort $(SLIBOBJS:%=$(SUBDIR)%))
 SHLIBOBJS := $(sort $(SHLIBOBJS:%=$(SUBDIR)%))
 STLIBOBJS := $(sort $(STLIBOBJS:%=$(SUBDIR)%))
 TESTOBJS  := $(TESTOBJS:%=$(SUBDIR)tests/%) $(TESTPROGS:%=$(SUBDIR)tests/%.o)
@@ -191,9 +229,10 @@ SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
 SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
 HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
 PTXOBJS      = $(filter %.ptx.o,$(OBJS))
+RESOURCEOBJS = $(filter %.css.o %.html.o,$(OBJS))
 $(HOBJS):     CCFLAGS += $(CFLAGS_HEADERS)
 checkheaders: $(HOBJS)
-.SECONDARY:   $(HOBJS:.o=.c) $(PTXOBJS:.o=.c) $(PTXOBJS:.o=.gz) $(PTXOBJS:.o=)
+.SECONDARY:   $(HOBJS:.o=.c) $(PTXOBJS:.o=.c) $(PTXOBJS:.o=.gz) $(PTXOBJS:.o=) $(RESOURCEOBJS:.o=.c) $(RESOURCEOBJS:%.css.o=%.css.min) $(RESOURCEOBJS:%.css.o=%.css.min.gz) $(RESOURCEOBJS:%.html.o=%.html.gz) $(RESOURCEOBJS:.o=)
 
 alltools: $(TOOLS)
 
@@ -206,15 +245,14 @@ $(HOSTPROGS): %$(HOSTEXESUF): %.o
 $(OBJS):     | $(sort $(dir $(OBJS)))
 $(HOBJS):    | $(sort $(dir $(HOBJS)))
 $(HOSTOBJS): | $(sort $(dir $(HOSTOBJS)))
-$(SLIBOBJS): | $(sort $(dir $(SLIBOBJS)))
 $(SHLIBOBJS): | $(sort $(dir $(SHLIBOBJS)))
 $(STLIBOBJS): | $(sort $(dir $(STLIBOBJS)))
 $(TESTOBJS): | $(sort $(dir $(TESTOBJS)))
 $(TOOLOBJS): | tools
 
-OUTDIRS := $(OUTDIRS) $(dir $(OBJS) $(HOBJS) $(HOSTOBJS) $(SLIBOBJS) $(SHLIBOBJS) $(STLIBOBJS) $(TESTOBJS))
+OUTDIRS := $(OUTDIRS) $(dir $(OBJS) $(HOBJS) $(HOSTOBJS) $(SHLIBOBJS) $(STLIBOBJS) $(TESTOBJS))
 
-CLEANSUFFIXES     = *.d *.gcda *.gcno *.h.c *.ho *.map *.o *.pc *.ptx *.ptx.gz *.ptx.c *.ver *.version *$(DEFAULT_X86ASMD).asm *~ *.ilk *.pdb
+CLEANSUFFIXES     = *.d *.gcda *.gcno *.h.c *.ho *.map *.o *.objs *.pc *.ptx *.ptx.gz *.ptx.c *.ver *.version *.html.gz *.html.c *.css.gz *.css.c  *$(DEFAULT_X86ASMD).asm *~ *.ilk *.pdb
 LIBSUFFIXES       = *.a *.lib *.so *.so.* *.dylib *.dll *.def *.dll.a
 
 define RULES
@@ -224,4 +262,4 @@ endef
 
 $(eval $(RULES))
 
--include $(wildcard $(OBJS:.o=.d) $(HOSTOBJS:.o=.d) $(TESTOBJS:.o=.d) $(HOBJS:.o=.d) $(SHLIBOBJS:.o=.d) $(STLIBOBJS:.o=.d) $(SLIBOBJS:.o=.d)) $(OBJS:.o=$(DEFAULT_X86ASMD).d)
+-include $(wildcard $(OBJS:.o=.d) $(HOSTOBJS:.o=.d) $(TESTOBJS:.o=.d) $(HOBJS:.o=.d) $(SHLIBOBJS:.o=.d) $(STLIBOBJS:.o=.d)) $(OBJS:.o=$(DEFAULT_X86ASMD).d)

@@ -184,6 +184,7 @@ FATE_H264 = aud_mw_e                                                    \
             sva_fm1_e                                                   \
             sva_nl1_b                                                   \
             sva_nl2_e                                                   \
+            slice2_field_aurora4                                        \
             $(if $(CONFIG_SCALE_FILTER),$(FATE_H264_HIGH_BIT_DEPTH))
 
 FATE_H264_REINIT_TESTS := large_420_8-to-small_420_8                    \
@@ -224,20 +225,22 @@ FATE_H264-$(call FRAMECRC, MOV, H264) += fate-h264-unescaped-extradata
 # this sample contains field-coded frames, with both fields in a single packet
 FATE_H264-$(call FRAMECRC, MOV, H264) += fate-h264-twofields-packet
 
-FATE_H264-$(call DEMMUX, MOV, H264, H264_MP4TOANNEXB_BSF SCALE_FILTER) += fate-h264-bsf-mp4toannexb-new-extradata
+FATE_H264-$(call FRAMECRC, MOV H264, H264, H264_PARSER H264_MUXER H264_MP4TOANNEXB_BSF H264_METADATA_BSF SCALE_FILTER) += fate-h264-bsf-mp4toannexb-new-extradata
 
-FATE_H264-$(call DEMMUX, MOV, H264, H264_MP4TOANNEXB_BSF) += fate-h264-bsf-mp4toannexb \
+FATE_H264-$(call FRAMECRC, MOV,, H264_MUXER H264_MP4TOANNEXB_BSF) += fate-h264-bsf-mp4toannexb \
                                                              fate-h264-bsf-mp4toannexb-2 \
-                                                             fate-h264_mp4toannexb_ticket5927 \
-                                                             fate-h264_mp4toannexb_ticket5927_2 \
 
-FATE_H264-$(call DEMMUX, H264, MOV, DTS2PTS_BSF) += fate-h264-bsf-dts2pts
+FATE_H264-$(call FRAMECRC, MOV H264, H264, H264_PARSER H264_MUXER H264_MP4TOANNEXB_BSF EXTRACT_EXTRADATA_BSF) += fate-h264_mp4toannexb_ticket5927 \
+                                                             fate-h264_mp4toannexb_ticket5927_2
+
+FATE_H264-$(call FRAMECRC, MOV H264,, H264_PARSER MOV_MUXER DTS2PTS_BSF) += fate-h264-bsf-dts2pts
 
 FATE_H264-$(call FRAMECRC, MATROSKA, H264) += fate-h264-direct-bff
 FATE_H264-$(call FRAMECRC, FLV, H264, SCALE_FILTER) += fate-h264-brokensps-2580
 FATE_H264-$(call FRAMECRC, MXF, H264, PCM_S24LE_DECODER SCALE_FILTER ARESAMPLE_FILTER) += fate-h264-xavc-4389
 FATE_H264-$(call FRAMECRC, MOV, H264) += fate-h264-attachment-631
-FATE_H264-$(call FRAMECRC, MPEGTS, H264, H264_PARSER MP3_DECODER SCALE_FILTER ARESAMPLE_FILTER) += fate-h264-skip-nokey fate-h264-skip-nointra
+FATE_H264-$(call FRAMECRC, MPEGTS, H264, H264_PARSER MP3_DECODER SCALE_FILTER ARESAMPLE_FILTER) += fate-h264-skip-nokey
+FATE_H264-$(call FRAMECRC, MPEGTS, H264, H264_PARSER MP3_DECODER SCALE_FILTER ARESAMPLE_FILTER EXTRACT_EXTRADATA_BSF) += fate-h264-skip-nointra
 FATE_H264_FFPROBE-$(call DEMDEC, MATROSKA, H264) += fate-h264-dts_5frames
 FATE_H264_FFPROBE-$(call PARSERDEMDEC, H264, H264, H264) += fate-h264-afd
 
@@ -247,7 +250,7 @@ fate-h264: $(FATE_H264-yes) $(FATE_H264_FFPROBE-yes)
 
 fate-h264-conformance-aud_mw_e:                   CMD = framecrc -i $(TARGET_SAMPLES)/h264-conformance/AUD_MW_E.264
 
-#force framerate so that the option is tested, theres no other case that tests it, its not needed at all otherwise here
+#force framerate so that the option is tested, there's no other case that tests it, its not needed at all otherwise here
 fate-h264-conformance-ba1_ft_c:                   CMD = framecrc -framerate 19 -i $(TARGET_SAMPLES)/h264-conformance/BA1_FT_C.264
 
 fate-h264-conformance-ba1_sony_d:                 CMD = framecrc -i $(TARGET_SAMPLES)/h264-conformance/BA1_Sony_D.jsv
@@ -432,13 +435,14 @@ fate-h264-conformance-sva_cl1_e:                  CMD = framecrc -i $(TARGET_SAM
 fate-h264-conformance-sva_fm1_e:                  CMD = framecrc -i $(TARGET_SAMPLES)/h264-conformance/SVA_FM1_E.264
 fate-h264-conformance-sva_nl1_b:                  CMD = framecrc -i $(TARGET_SAMPLES)/h264-conformance/SVA_NL1_B.264
 fate-h264-conformance-sva_nl2_e:                  CMD = framecrc -i $(TARGET_SAMPLES)/h264-conformance/SVA_NL2_E.264
+fate-h264-conformance-slice2_field_aurora4:       CMD = framecrc -i $(TARGET_SAMPLES)/h264-conformance/slice2_field_aurora4.264
 
 fate-h264-bsf-mp4toannexb:                        CMD = md5 -i $(TARGET_SAMPLES)/h264/interlaced_crop.mp4 -c:v copy -f h264
 # First IDR is prefixed by SPS/PPS
 fate-h264-bsf-mp4toannexb-2:                      CMD = md5 -i $(TARGET_SAMPLES)/h264/ps_prefix_first_idr.mp4 -c:v copy -f h264
 fate-h264-bsf-mp4toannexb-2:                      CMP = oneline
 fate-h264-bsf-mp4toannexb-2:                      REF = cffcfa6a2d0b58c9de1f5785f099f41d
-fate-h264-bsf-mp4toannexb-new-extradata:          CMD = stream_remux mov $(TARGET_SAMPLES)/h264/extradata-reload-multi-stsd.mov "" h264 "-map 0:v"
+fate-h264-bsf-mp4toannexb-new-extradata:          CMD = stream_remux mov $(TARGET_SAMPLES)/h264/extradata-reload-multi-stsd.mov "" h264 "-bsf h264_mp4toannexb,h264_metadata -map 0:v"
 fate-h264-bsf-dts2pts:                            CMD = transcode "h264" $(TARGET_SAMPLES)/h264-conformance/CAPAMA3_Sand_F.264 \
                                                         mov "-c:v copy -bsf:v dts2pts -frames:v 50" "-c:v copy"
 fate-h264_mp4toannexb_ticket5927:                 CMD = transcode "mp4" $(TARGET_SAMPLES)/h264/thezerotheorem-cut.mp4 \

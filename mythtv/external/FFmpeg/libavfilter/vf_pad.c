@@ -72,9 +72,12 @@ enum var_name {
     VARS_NB
 };
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    return ff_set_common_formats(ctx, ff_draw_supported_pixel_formats(0));
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out,
+                                  ff_draw_supported_pixel_formats(0));
 }
 
 enum EvalMode {
@@ -111,7 +114,11 @@ static int config_input(AVFilterLink *inlink)
     double var_values[VARS_NB], res;
     char *expr;
 
-    ff_draw_init2(&s->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    ret = ff_draw_init2(&s->draw, inlink->format, inlink->colorspace, inlink->color_range, 0);
+    if (ret < 0) {
+        av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+        return ret;
+    }
     ff_draw_color(&s->draw, &s->color, s->rgba_color);
 
     var_values[VAR_IN_W]  = var_values[VAR_IW] = inlink->w;
@@ -451,12 +458,12 @@ static const AVFilterPad avfilter_vf_pad_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_pad = {
-    .name          = "pad",
-    .description   = NULL_IF_CONFIG_SMALL("Pad the input video."),
+const FFFilter ff_vf_pad = {
+    .p.name        = "pad",
+    .p.description = NULL_IF_CONFIG_SMALL("Pad the input video."),
+    .p.priv_class  = &pad_class,
     .priv_size     = sizeof(PadContext),
-    .priv_class    = &pad_class,
     FILTER_INPUTS(avfilter_vf_pad_inputs),
     FILTER_OUTPUTS(avfilter_vf_pad_outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
 };

@@ -407,7 +407,7 @@ static av_always_inline void mc_part_weighted(const H264Context *h, H264SliceCon
         /* don't optimize for luma-only case, since B-frames usually
          * use implicit weights => chroma too. */
         uint8_t *tmp_cb = sl->bipred_scratchpad;
-        uint8_t *tmp_cr = sl->bipred_scratchpad + (16 << pixel_shift);
+        uint8_t *tmp_cr = sl->bipred_scratchpad + (8 << pixel_shift + (chroma_idc == 3));
         uint8_t *tmp_y  = sl->bipred_scratchpad + 16 * sl->mb_uvlinesize;
         int refn0       = sl->ref_cache[0][scan8[n]];
         int refn1       = sl->ref_cache[1][scan8[n]];
@@ -529,7 +529,7 @@ static av_always_inline void xchg_mb_border(const H264Context *h, H264SliceConte
     }
 
     if (sl->deblocking_filter == 2) {
-        deblock_topleft = h->slice_table[sl->mb_xy - 1 - h->mb_stride] == sl->slice_num;
+        deblock_topleft = h->slice_table[sl->mb_xy - 1 - (h->mb_stride << MB_FIELD(sl))] == sl->slice_num;
         deblock_top     = sl->top_type;
     } else {
         deblock_topleft = (sl->mb_x > 0);

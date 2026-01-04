@@ -156,7 +156,7 @@ static int crypto_open2(URLContext *h, const char *uri, int flags, AVDictionary 
         if (ret < 0)
             goto err;
 
-        // pass back information about the context we openned
+        // pass back information about the context we opened
         if (c->hd->is_streamed)
             h->is_streamed = c->hd->is_streamed;
     }
@@ -171,7 +171,7 @@ static int crypto_open2(URLContext *h, const char *uri, int flags, AVDictionary 
         if (ret < 0)
             goto err;
         // for write, we must be streamed
-        // - linear write only for crytpo aes-128-cbc
+        // - linear write only for crypto aes-128-cbc
         h->is_streamed = 1;
     }
 
@@ -313,11 +313,9 @@ static int64_t crypto_seek(URLContext *h, int64_t pos, int whence)
 
         // if we did not get all the bytes
         if (len != 0) {
-            char errbuf[100] = "unknown error";
-            av_strerror(res, errbuf, sizeof(errbuf));
             av_log(h, AV_LOG_ERROR,
                 "Crypto: discard read did not get all the bytes (%d remain) - read returned (%d)-%s\n",
-                len, res, errbuf);
+                len, res, av_err2str(res));
             return AVERROR(EINVAL);
         }
     }

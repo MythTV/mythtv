@@ -39,9 +39,9 @@
 #include "hwconfig.h"
 #include "profiles.h"
 #include "progressframe.h"
-#include "refstruct.h"
+#include "libavutil/refstruct.h"
 
-/**< same with Div_Lut defined in spec 7.11.3.7 */
+/** same with Div_Lut defined in spec 7.11.3.7 */
 static const uint16_t div_lut[AV1_DIV_LUT_NUM] = {
   16384, 16320, 16257, 16194, 16132, 16070, 16009, 15948, 15888, 15828, 15768,
   15709, 15650, 15592, 15534, 15477, 15420, 15364, 15308, 15252, 15197, 15142,
@@ -281,6 +281,8 @@ static void skip_mode_params(AV1DecContext *s)
     forward_idx  = -1;
     backward_idx = -1;
     for (i = 0; i < AV1_REFS_PER_FRAME; i++) {
+        if (!s->ref[header->ref_frame_idx[i]].raw_frame_header)
+            return;
         ref_hint = s->ref[header->ref_frame_idx[i]].raw_frame_header->order_hint;
         dist = get_relative_dist(seq, ref_hint, header->order_hint);
         if (dist < 0) {
@@ -541,6 +543,7 @@ static int get_pixel_format(AVCodecContext *avctx)
                      CONFIG_AV1_NVDEC_HWACCEL + \
                      CONFIG_AV1_VAAPI_HWACCEL + \
                      CONFIG_AV1_VDPAU_HWACCEL + \
+                     CONFIG_AV1_VIDEOTOOLBOX_HWACCEL + \
                      CONFIG_AV1_VULKAN_HWACCEL)
     enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmtp = pix_fmts;
 
@@ -568,6 +571,9 @@ static int get_pixel_format(AVCodecContext *avctx)
 #if CONFIG_AV1_VDPAU_HWACCEL
         *fmtp++ = AV_PIX_FMT_VDPAU;
 #endif
+#if CONFIG_AV1_VIDEOTOOLBOX_HWACCEL
+        *fmtp++ = AV_PIX_FMT_VIDEOTOOLBOX;
+#endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         *fmtp++ = AV_PIX_FMT_VULKAN;
 #endif
@@ -591,6 +597,9 @@ static int get_pixel_format(AVCodecContext *avctx)
 #endif
 #if CONFIG_AV1_VDPAU_HWACCEL
         *fmtp++ = AV_PIX_FMT_VDPAU;
+#endif
+#if CONFIG_AV1_VIDEOTOOLBOX_HWACCEL
+        *fmtp++ = AV_PIX_FMT_VIDEOTOOLBOX;
 #endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         *fmtp++ = AV_PIX_FMT_VULKAN;
@@ -678,8 +687,8 @@ static int get_pixel_format(AVCodecContext *avctx)
 static void av1_frame_unref(AV1Frame *f)
 {
     ff_progress_frame_unref(&f->pf);
-    ff_refstruct_unref(&f->hwaccel_picture_private);
-    ff_refstruct_unref(&f->header_ref);
+    av_refstruct_unref(&f->hwaccel_picture_private);
+    av_refstruct_unref(&f->header_ref);
     f->raw_frame_header = NULL;
     f->spatial_id = f->temporal_id = 0;
     memset(f->skip_mode_frame_idx, 0,
@@ -692,13 +701,13 @@ static void av1_frame_replace(AV1Frame *dst, const AV1Frame *src)
 {
     av_assert1(dst != src);
 
-    ff_refstruct_replace(&dst->header_ref, src->header_ref);
+    av_refstruct_replace(&dst->header_ref, src->header_ref);
 
     dst->raw_frame_header = src->raw_frame_header;
 
     ff_progress_frame_replace(&dst->pf, &src->pf);
 
-    ff_refstruct_replace(&dst->hwaccel_picture_private,
+    av_refstruct_replace(&dst->hwaccel_picture_private,
                           src->hwaccel_picture_private);
 
     dst->spatial_id = src->spatial_id;
@@ -738,10 +747,10 @@ static av_cold int av1_decode_free(AVCodecContext *avctx)
         av1_frame_unref(&s->ref[i]);
     av1_frame_unref(&s->cur_frame);
     av_buffer_unref(&s->seq_data_ref);
-    ff_refstruct_unref(&s->seq_ref);
-    ff_refstruct_unref(&s->header_ref);
-    ff_refstruct_unref(&s->cll_ref);
-    ff_refstruct_unref(&s->mdcv_ref);
+    av_refstruct_unref(&s->seq_ref);
+    av_refstruct_unref(&s->header_ref);
+    av_refstruct_unref(&s->cll_ref);
+    av_refstruct_unref(&s->mdcv_ref);
     av_freep(&s->tile_group_info);
 
     while (s->itut_t35_fifo && av_fifo_read(s->itut_t35_fifo, &itut_t35, 1) >= 0)
@@ -779,10 +788,14 @@ static int set_context_with_sequence(AVCodecContext *avctx,
         break;
     }
 
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
     if (seq->film_grain_params_present)
         avctx->properties |= FF_CODEC_PROPERTY_FILM_GRAIN;
     else
         avctx->properties &= ~FF_CODEC_PROPERTY_FILM_GRAIN;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
     if (avctx->width != width || avctx->height != height) {
         int ret = ff_set_dimensions(avctx, width, height);
@@ -952,13 +965,13 @@ static int export_itut_t35(AVCodecContext *avctx, AVFrame *frame,
 {
     GetByteContext gb;
     AV1DecContext *s = avctx->priv_data;
-    int ret, provider_code;
+    int ret, provider_code, country_code;
 
     bytestream2_init(&gb, itut_t35->payload, itut_t35->payload_size);
 
     provider_code = bytestream2_get_be16(&gb);
-    switch (provider_code) {
-    case ITU_T_T35_PROVIDER_CODE_ATSC: {
+    country_code = itut_t35->itu_t_t35_country_code ;
+    if (country_code == ITU_T_T35_COUNTRY_CODE_US && provider_code == ITU_T_T35_PROVIDER_CODE_ATSC) {
         uint32_t user_identifier = bytestream2_get_be32(&gb);
         switch (user_identifier) {
         case MKBETAG('G', 'A', '9', '4'): { // closed captions
@@ -974,22 +987,23 @@ static int export_itut_t35(AVCodecContext *avctx, AVFrame *frame,
             if (ret < 0)
                 return ret;
 
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
             avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
             break;
         }
         default: // ignore unsupported identifiers
             break;
         }
-        break;
-    }
-    case ITU_T_T35_PROVIDER_CODE_SMTPE: {
+    } else if (country_code == ITU_T_T35_COUNTRY_CODE_US && provider_code == ITU_T_T35_PROVIDER_CODE_SAMSUNG) {
         AVDynamicHDRPlus *hdrplus;
         int provider_oriented_code = bytestream2_get_be16(&gb);
         int application_identifier = bytestream2_get_byte(&gb);
 
-        if (itut_t35->itu_t_t35_country_code != ITU_T_T35_COUNTRY_CODE_US ||
-            provider_oriented_code != 1 || application_identifier != 4)
-            break;
+        if (provider_oriented_code != 1 || application_identifier != 4)
+            return 0; // ignore
 
         hdrplus = av_dynamic_hdr_plus_create_side_data(frame);
         if (!hdrplus)
@@ -999,28 +1013,23 @@ static int export_itut_t35(AVCodecContext *avctx, AVFrame *frame,
                                            bytestream2_get_bytes_left(&gb));
         if (ret < 0)
             return ret;
-        break;
-    }
-    case ITU_T_T35_PROVIDER_CODE_DOLBY: {
+    } else if (country_code == ITU_T_T35_COUNTRY_CODE_US && provider_code == ITU_T_T35_PROVIDER_CODE_DOLBY) {
         int provider_oriented_code = bytestream2_get_be32(&gb);
-        if (itut_t35->itu_t_t35_country_code != ITU_T_T35_COUNTRY_CODE_US ||
-            provider_oriented_code != 0x800)
-            break;
+        if (provider_oriented_code != 0x800)
+            return 0; // ignore
 
         ret = ff_dovi_rpu_parse(&s->dovi, gb.buffer, gb.buffer_end - gb.buffer,
                                 avctx->err_recognition);
         if (ret < 0) {
             av_log(avctx, AV_LOG_WARNING, "Error parsing DOVI OBU.\n");
-            break; // ignore
+            return 0; // ignore
         }
 
         ret = ff_dovi_attach_side_data(&s->dovi, frame);
         if (ret < 0)
             return ret;
-        break;
-    }
-    default: // ignore unsupported provider codes
-        break;
+    } else {
+        // ignore unsupported provider codes
     }
 
     return 0;
@@ -1179,12 +1188,6 @@ static int set_output_frame(AVCodecContext *avctx, AVFrame *frame)
 
     frame->pts = pkt->pts;
     frame->pkt_dts = pkt->dts;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-    frame->pkt_size = pkt->size;
-    frame->pkt_pos = pkt->pos;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     av_packet_unref(pkt);
 
@@ -1209,7 +1212,7 @@ static int get_current_frame(AVCodecContext *avctx)
 
     av1_frame_unref(&s->cur_frame);
 
-    s->cur_frame.header_ref = ff_refstruct_ref(s->header_ref);
+    s->cur_frame.header_ref = av_refstruct_ref(s->header_ref);
 
     s->cur_frame.raw_frame_header = s->raw_frame_header;
 
@@ -1297,7 +1300,7 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 
             s->seq_data_ref->data = unit->data;
             s->seq_data_ref->size = unit->data_size;
-            ff_refstruct_replace(&s->seq_ref, unit->content_ref);
+            av_refstruct_replace(&s->seq_ref, unit->content_ref);
 
             s->raw_seq = &obu->obu.sequence_header;
 
@@ -1312,6 +1315,15 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 
             s->pix_fmt = AV_PIX_FMT_NONE;
 
+            if (FF_HW_HAS_CB(avctx, decode_params)) {
+                ret = FF_HW_CALL(avctx, decode_params, AV1_OBU_SEQUENCE_HEADER,
+                                 s->seq_data_ref->data, s->seq_data_ref->size);
+                if (ret < 0) {
+                    av_log(avctx, AV_LOG_ERROR, "HW accel decode params fail.\n");
+                    return ret;
+                }
+            }
+
             break;
         case AV1_OBU_REDUNDANT_FRAME_HEADER:
             if (s->raw_frame_header)
@@ -1325,7 +1337,7 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
                 goto end;
             }
 
-            ff_refstruct_replace(&s->header_ref, unit->content_ref);
+            av_refstruct_replace(&s->header_ref, unit->content_ref);
 
             if (unit->type == AV1_OBU_FRAME)
                 s->raw_frame_header = &obu->obu.frame.header;
@@ -1363,7 +1375,8 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
             s->cur_frame.temporal_id = header->temporal_id;
 
             if (avctx->hwaccel && s->cur_frame.f) {
-                ret = FF_HW_CALL(avctx, start_frame, unit->data, unit->data_size);
+                ret = FF_HW_CALL(avctx, start_frame, s->pkt->buf,
+                                 unit->data, unit->data_size);
                 if (ret < 0) {
                     av_log(avctx, AV_LOG_ERROR, "HW accel start frame fail.\n");
                     goto end;
@@ -1405,11 +1418,11 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
         case AV1_OBU_METADATA:
             switch (obu->obu.metadata.metadata_type) {
             case AV1_METADATA_TYPE_HDR_CLL:
-                ff_refstruct_replace(&s->cll_ref, unit->content_ref);
+                av_refstruct_replace(&s->cll_ref, unit->content_ref);
                 s->cll = &obu->obu.metadata.metadata.hdr_cll;
                 break;
             case AV1_METADATA_TYPE_HDR_MDCV:
-                ff_refstruct_replace(&s->mdcv_ref, unit->content_ref);
+                av_refstruct_replace(&s->mdcv_ref, unit->content_ref);
                 s->mdcv = &obu->obu.metadata.metadata.hdr_mdcv;
                 break;
             case AV1_METADATA_TYPE_ITUT_T35: {
@@ -1439,6 +1452,10 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 
         if (raw_tile_group && (s->tile_num == raw_tile_group->tg_end + 1)) {
             int show_frame = s->raw_frame_header->show_frame;
+            // Set nb_unit to point at the next OBU, to indicate which
+            // OBUs have been processed for this current frame. (If this
+            // frame gets output, we set nb_unit to this value later too.)
+            s->nb_unit = i + 1;
             if (avctx->hwaccel && s->cur_frame.f) {
                 ret = FF_HW_SIMPLE_CALL(avctx, end_frame);
                 if (ret < 0) {
@@ -1449,6 +1466,8 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 
             update_reference_list(avctx);
 
+            // Set start_unit to indicate the first OBU of the next frame.
+            s->start_unit       = s->nb_unit;
             raw_tile_group      = NULL;
             s->raw_frame_header = NULL;
 
@@ -1478,7 +1497,7 @@ end:
             s->raw_frame_header = NULL;
         av_packet_unref(s->pkt);
         ff_cbs_fragment_reset(&s->current_obu);
-        s->nb_unit = 0;
+        s->nb_unit = s->start_unit = 0;
     }
     if (!ret && !frame->buf[0])
         ret = AVERROR(EAGAIN);
@@ -1505,7 +1524,7 @@ static int av1_receive_frame(AVCodecContext *avctx, AVFrame *frame)
                 return ret;
             }
 
-            s->nb_unit = 0;
+            s->nb_unit = s->start_unit = 0;
             av_log(avctx, AV_LOG_DEBUG, "Total OBUs on this packet: %d.\n",
                    s->current_obu.nb_units);
         }
@@ -1526,7 +1545,7 @@ static void av1_decode_flush(AVCodecContext *avctx)
 
     av1_frame_unref(&s->cur_frame);
     s->operating_point_idc = 0;
-    s->nb_unit = 0;
+    s->nb_unit = s->start_unit = 0;
     s->raw_frame_header = NULL;
     s->raw_seq = NULL;
     s->cll = NULL;
@@ -1593,6 +1612,9 @@ const FFCodec ff_av1_decoder = {
 #endif
 #if CONFIG_AV1_VDPAU_HWACCEL
         HWACCEL_VDPAU(av1),
+#endif
+#if CONFIG_AV1_VIDEOTOOLBOX_HWACCEL
+        HWACCEL_VIDEOTOOLBOX(av1),
 #endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         HWACCEL_VULKAN(av1),

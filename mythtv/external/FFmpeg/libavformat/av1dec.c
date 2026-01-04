@@ -36,6 +36,7 @@ typedef struct AV1DemuxContext {
     AVRational framerate;
     uint32_t temporal_unit_size;
     uint32_t frame_unit_size;
+    int64_t pos;
 } AV1DemuxContext;
 
 //return < 0 if we need more data
@@ -224,6 +225,7 @@ static int annexb_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AV1DemuxContext *const c = s->priv_data;
     uint32_t obu_unit_size;
+    int64_t pos = c->pos;
     int ret, len;
 
 retry:
@@ -234,6 +236,7 @@ retry:
     }
 
     if (!c->temporal_unit_size) {
+        c->pos = avio_tell(s->pb);
         len = leb(s->pb, &c->temporal_unit_size, 1);
         if (len == AVERROR_EOF) goto end;
         else if (len < 0) return len;
@@ -272,14 +275,18 @@ end:
     }
 
     ret = av_bsf_receive_packet(c->bsf, pkt);
-    if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
-        av_log(s, AV_LOG_ERROR, "av1_frame_merge filter failed to "
-                                "send output packet\n");
+    if (ret < 0) {
+        if (ret == AVERROR(EAGAIN))
+            goto retry;
+        if (ret != AVERROR_EOF)
+            av_log(s, AV_LOG_ERROR, "av1_frame_merge filter failed to "
+                                    "send output packet\n");
+        return ret;
+    }
 
-    if (ret == AVERROR(EAGAIN))
-        goto retry;
+    pkt->pos = pos;
 
-    return ret;
+    return 0;
 }
 
 const FFInputFormat ff_av1_demuxer = {

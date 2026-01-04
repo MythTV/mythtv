@@ -172,6 +172,8 @@ static int FUNC(loop_filter_params)(CodedBitstreamContext *ctx, RWContext *rw,
                     ss(6, loop_filter_mode_deltas[i], 1, i);
             }
         }
+    } else {
+        infer(loop_filter_delta_update, 0);
     }
 
     return 0;
@@ -196,7 +198,6 @@ static int FUNC(segmentation_params)(CodedBitstreamContext *ctx, RWContext *rw,
 {
     static const uint8_t segmentation_feature_bits[VP9_SEG_LVL_MAX]   = { 8, 6, 2, 0 };
     static const uint8_t segmentation_feature_signed[VP9_SEG_LVL_MAX] = { 1, 1, 0, 0 };
-
     int err, i, j;
 
     f(1, segmentation_enabled);
@@ -236,6 +237,8 @@ static int FUNC(segmentation_params)(CodedBitstreamContext *ctx, RWContext *rw,
                 }
             }
         }
+    } else {
+        infer(segmentation_update_data, 0);
     }
 
     return 0;
@@ -368,6 +371,60 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
                 .subsampling_y  = vp9->subsampling_y,
                 .bit_depth      = vp9->bit_depth,
             };
+        }
+    }
+
+    // Update top-level loop filter and segmentation state with changes
+    // from this frame.
+    if (current->frame_type == VP9_KEY_FRAME ||
+        current->intra_only                  ||
+        current->error_resilient_mode) {
+        // setup_past_independence() - fill with the initial values.
+
+        vp9->loop_filter_ref_deltas[VP9_INTRA_FRAME]  = 1;
+        vp9->loop_filter_ref_deltas[VP9_LAST_FRAME]   = 0;
+        vp9->loop_filter_ref_deltas[VP9_GOLDEN_FRAME] = -1;
+        vp9->loop_filter_ref_deltas[VP9_ALTREF_FRAME] = -1;
+
+        vp9->loop_filter_mode_deltas[0] = 0;
+        vp9->loop_filter_mode_deltas[1] = 0;
+
+        memset(vp9->feature_enabled, 0, sizeof(vp9->feature_enabled));
+        memset(vp9->feature_value,   0, sizeof(vp9->feature_value));
+        memset(vp9->feature_sign,    0, sizeof(vp9->feature_sign));
+
+    } else {
+        // Modify previous state based on updates in this frame.
+
+        if (current->loop_filter_delta_update) {
+            for (i = 0; i < 4; i++) {
+                if (current->update_ref_delta[i])
+                    vp9->loop_filter_ref_deltas[i] =
+                        current->loop_filter_ref_deltas[i];
+            }
+            for (i = 0; i < 2; i++) {
+                if (current->update_mode_delta[i])
+                    vp9->loop_filter_mode_deltas[i] =
+                        current->loop_filter_mode_deltas[i];
+            }
+        }
+
+        if (current->segmentation_update_data) {
+            memcpy(vp9->feature_enabled, current->feature_enabled,
+                   sizeof(vp9->feature_enabled));
+            memcpy(vp9->feature_value,   current->feature_value,
+                   sizeof(vp9->feature_value));
+            memcpy(vp9->feature_sign,    current->feature_sign,
+                   sizeof(vp9->feature_sign));
+
+            if (current->segmentation_update_map) {
+                memcpy(vp9->segmentation_tree_probs,
+                       current->segmentation_tree_probs,
+                       sizeof(vp9->segmentation_tree_probs));
+                memcpy(vp9->segmentation_pred_prob,
+                       current->segmentation_pred_prob,
+                       sizeof(vp9->segmentation_pred_prob));
+            }
         }
     }
 

@@ -56,8 +56,26 @@
 #define DISABLE_I8MM
 #endif
 
+#if HAVE_AS_ARCHEXT_SVE_DIRECTIVE
+#define ENABLE_SVE  .arch_extension sve
+#define DISABLE_SVE .arch_extension nosve
+#else
+#define ENABLE_SVE
+#define DISABLE_SVE
+#endif
+
+#if HAVE_AS_ARCHEXT_SVE2_DIRECTIVE
+#define ENABLE_SVE2  .arch_extension sve2
+#define DISABLE_SVE2 .arch_extension nosve2
+#else
+#define ENABLE_SVE2
+#define DISABLE_SVE2
+#endif
+
 DISABLE_DOTPROD
 DISABLE_I8MM
+DISABLE_SVE
+DISABLE_SVE2
 
 
 /* Support macros for
@@ -178,7 +196,7 @@ DISABLE_I8MM
         .popsection
 #endif
 
-.macro  function name, export=0, align=2
+.macro  function name, export=0, align=4
     .macro endfunc
 ELF     .size   \name, . - \name
 FUNC    .endfunc
@@ -199,7 +217,7 @@ FUNC    .func   \name
     .endif
 .endm
 
-.macro  const   name, align=2, relocate=0
+.macro  const   name, align=4, relocate=0
     .macro endconst
 ELF     .size   \name, . - \name
         .purgem endconst

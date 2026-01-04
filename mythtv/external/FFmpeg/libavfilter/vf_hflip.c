@@ -37,7 +37,9 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     AVFilterFormats *pix_fmts = NULL;
     const AVPixFmtDescriptor *desc;
@@ -52,7 +54,7 @@ static int query_formats(AVFilterContext *ctx)
             return ret;
     }
 
-    return ff_set_common_formats(ctx, pix_fmts);
+    return ff_set_common_formats2(ctx, cfg_in, cfg_out, pix_fmts);
 }
 
 static int config_props(AVFilterLink *inlink)
@@ -144,12 +146,12 @@ static const AVFilterPad avfilter_vf_hflip_inputs[] = {
     },
 };
 
-const AVFilter ff_vf_hflip = {
-    .name          = "hflip",
-    .description   = NULL_IF_CONFIG_SMALL("Horizontally flip the input video."),
+const FFFilter ff_vf_hflip = {
+    .p.name        = "hflip",
+    .p.description = NULL_IF_CONFIG_SMALL("Horizontally flip the input video."),
+    .p.flags       = AVFILTER_FLAG_SLICE_THREADS | AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
     .priv_size     = sizeof(FlipContext),
     FILTER_INPUTS(avfilter_vf_hflip_inputs),
     FILTER_OUTPUTS(ff_video_default_filterpad),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SLICE_THREADS | AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC,
+    FILTER_QUERY_FUNC2(query_formats),
 };

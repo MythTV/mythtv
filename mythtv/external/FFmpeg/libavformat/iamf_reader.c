@@ -31,10 +31,10 @@
 #include "iamf_parse.h"
 #include "iamf_reader.h"
 
-static AVStream *find_stream_by_id(AVFormatContext *s, int id)
+static AVStream *find_stream_by_id(AVFormatContext *s, int id, int stream_id_offset)
 {
     for (int i = 0; i < s->nb_streams; i++)
-        if (s->streams[i]->id == id)
+        if (s->streams[i]->id == id + stream_id_offset)
             return s->streams[i];
 
     av_log(s, AV_LOG_ERROR, "Invalid stream id %d\n", id);
@@ -45,7 +45,7 @@ static int audio_frame_obu(AVFormatContext *s, const IAMFDemuxContext *c,
                            AVIOContext *pb, AVPacket *pkt,
                            int len, enum IAMF_OBU_Type type,
                            unsigned skip_samples, unsigned discard_padding,
-                           int id_in_bitstream)
+                           int stream_id_offset, int id_in_bitstream)
 {
     AVStream *st;
     int ret, audio_substream_id;
@@ -59,7 +59,7 @@ static int audio_frame_obu(AVFormatContext *s, const IAMFDemuxContext *c,
     } else
         audio_substream_id = type - IAMF_OBU_IA_AUDIO_FRAME_ID0;
 
-    st = find_stream_by_id(s, audio_substream_id);
+    st = find_stream_by_id(s, audio_substream_id, stream_id_offset);
     if (!st)
         return AVERROR_INVALIDDATA;
 
@@ -109,6 +109,7 @@ static int parameter_block_obu(AVFormatContext *s, IAMFDemuxContext *c,
     AVIOContext *pb;
     uint8_t *buf;
     unsigned int duration, constant_subblock_duration;
+    unsigned int total_duration = 0;
     unsigned int nb_subblocks;
     unsigned int parameter_id;
     size_t out_param_size;
@@ -131,7 +132,7 @@ static int parameter_block_obu(AVFormatContext *s, IAMFDemuxContext *c,
     parameter_id = ffio_read_leb(pb);
     param_definition = ff_iamf_get_param_definition(&c->iamf, parameter_id);
     if (!param_definition) {
-        av_log(s, AV_LOG_VERBOSE, "Non existant parameter_id %d referenced in a parameter block. Ignoring\n",
+        av_log(s, AV_LOG_VERBOSE, "Non existent parameter_id %d referenced in a parameter block. Ignoring\n",
                parameter_id);
         ret = 0;
         goto fail;
@@ -147,8 +148,10 @@ static int parameter_block_obu(AVFormatContext *s, IAMFDemuxContext *c,
         constant_subblock_duration = ffio_read_leb(pb);
         if (constant_subblock_duration == 0)
             nb_subblocks = ffio_read_leb(pb);
-        else
+        else {
             nb_subblocks = duration / constant_subblock_duration;
+            total_duration = duration;
+        }
     } else {
         duration = param->duration;
         constant_subblock_duration = param->constant_subblock_duration;
@@ -172,8 +175,11 @@ static int parameter_block_obu(AVFormatContext *s, IAMFDemuxContext *c,
         void *subblock = av_iamf_param_definition_get_subblock(out_param, i);
         unsigned int subblock_duration = constant_subblock_duration;
 
-        if (!param_definition->mode && !constant_subblock_duration)
+        if (!param_definition->mode && !constant_subblock_duration) {
             subblock_duration = ffio_read_leb(pb);
+            total_duration += subblock_duration;
+        } else if (i == nb_subblocks - 1)
+            subblock_duration = duration - i * constant_subblock_duration;
 
         switch (param->type) {
         case AV_IAMF_PARAMETER_DEFINITION_MIX_GAIN: {
@@ -235,6 +241,12 @@ static int parameter_block_obu(AVFormatContext *s, IAMFDemuxContext *c,
        av_log(s, level, "Underread in parameter_block_obu. %d bytes left at the end\n", len);
     }
 
+    if (!param_definition->mode && !constant_subblock_duration && total_duration != duration) {
+        av_log(s, AV_LOG_ERROR, "Invalid duration in parameter block\n");
+        ret = AVERROR_INVALIDDATA;
+        goto fail;
+    }
+
     switch (param->type) {
     case AV_IAMF_PARAMETER_DEFINITION_MIX_GAIN:
         av_free(c->mix);
@@ -265,12 +277,12 @@ fail:
 }
 
 int ff_iamf_read_packet(AVFormatContext *s, IAMFDemuxContext *c,
-                        AVIOContext *pb, int max_size, AVPacket *pkt)
+                        AVIOContext *pb, int max_size, int stream_id_offset, AVPacket *pkt)
 {
     int read = 0;
 
     while (1) {
-        uint8_t header[MAX_IAMF_OBU_HEADER_SIZE + AV_INPUT_BUFFER_PADDING_SIZE];
+        uint8_t header[MAX_IAMF_OBU_HEADER_SIZE + AV_INPUT_BUFFER_PADDING_SIZE] = {0};
         enum IAMF_OBU_Type type;
         unsigned obu_size;
         unsigned skip_samples, discard_padding;
@@ -282,6 +294,8 @@ int ff_iamf_read_packet(AVFormatContext *s, IAMFDemuxContext *c,
         size = avio_read(pb, header, FFMIN(MAX_IAMF_OBU_HEADER_SIZE, max_size));
         if (size < 0)
             return size;
+        if (size != FFMIN(MAX_IAMF_OBU_HEADER_SIZE, max_size))
+            return AVERROR_INVALIDDATA;
 
         len = ff_iamf_parse_obu_header(header, size, &obu_size, &start_pos, &type,
                                        &skip_samples, &discard_padding);
@@ -294,7 +308,7 @@ int ff_iamf_read_packet(AVFormatContext *s, IAMFDemuxContext *c,
         read += len;
         if (type >= IAMF_OBU_IA_AUDIO_FRAME && type <= IAMF_OBU_IA_AUDIO_FRAME_ID17) {
             ret = audio_frame_obu(s, c, pb, pkt, obu_size, type,
-                                   skip_samples, discard_padding,
+                                   skip_samples, discard_padding, stream_id_offset,
                                    type == IAMF_OBU_IA_AUDIO_FRAME);
             if (ret < 0)
                 return ret;

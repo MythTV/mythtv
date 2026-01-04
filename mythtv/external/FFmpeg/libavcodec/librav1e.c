@@ -217,15 +217,9 @@ static av_cold int librav1e_encode_init(AVCodecContext *avctx)
                                    avctx->framerate.den, avctx->framerate.num
                                    });
     } else {
-FF_DISABLE_DEPRECATION_WARNINGS
         rav1e_config_set_time_base(cfg, (RaRational) {
-                                   avctx->time_base.num
-#if FF_API_TICKS_PER_FRAME
-                                   * avctx->ticks_per_frame
-#endif
-                                   , avctx->time_base.den
+                                   avctx->time_base.num, avctx->time_base.den
                                    });
-FF_ENABLE_DEPRECATION_WARNINGS
     }
 
     if ((avctx->flags & AV_CODEC_FLAG_PASS1 || avctx->flags & AV_CODEC_FLAG_PASS2) && !avctx->bit_rate) {
@@ -667,7 +661,7 @@ const FFCodec ff_librav1e_encoder = {
     .priv_data_size = sizeof(librav1eContext),
     .p.priv_class   = &class,
     .defaults       = librav1e_defaults,
-    .p.pix_fmts     = librav1e_pix_fmts,
+    CODEC_PIXFMTS_ARRAY(librav1e_pix_fmts),
     .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS |
                       AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_RECON_FRAME |

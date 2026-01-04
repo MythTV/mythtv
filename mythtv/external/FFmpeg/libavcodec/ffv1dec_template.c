@@ -36,6 +36,12 @@ RENAME(decode_line)(FFV1Context *f, FFV1SliceContext *sc,
     int run_mode  = 0;
     int run_index = sc->run_index;
 
+    if (bits == 0) {
+        for (x = 0; x < w; x++)
+            sample[1][x] = 0;
+        return 0;
+    }
+
     if (is_input_end(c, gb, ac))
         return AVERROR_INVALIDDATA;
 
@@ -138,10 +144,15 @@ static int RENAME(decode_rgb_frame)(FFV1Context *f, FFV1SliceContext *sc,
     int x, y, p;
     TYPE *sample[4][2];
     int lbd    = f->avctx->bits_per_raw_sample <= 8;
-    int bits   = f->avctx->bits_per_raw_sample > 0 ? f->avctx->bits_per_raw_sample : 8;
-    int offset = 1 << bits;
+    int bits[4], offset;
     int transparency = f->transparency;
     int ac = f->ac;
+    unsigned mask[4];
+
+    ff_ffv1_compute_bits_per_plane(f, sc, bits, &offset, mask, f->avctx->bits_per_raw_sample);
+
+    if (sc->slice_coding_mode == 1)
+        ac = 1;
 
     for (x = 0; x < 4; x++) {
         sample[x][0] = RENAME(sc->sample_buffer) +  x * 2      * (w + 6) + 3;
@@ -162,10 +173,10 @@ static int RENAME(decode_rgb_frame)(FFV1Context *f, FFV1SliceContext *sc,
 
             sample[p][1][-1]= sample[p][0][0  ];
             sample[p][0][ w]= sample[p][0][w-1];
-            if (lbd && sc->slice_coding_mode == 0)
+            if (bits[p] == 9)
                 ret = RENAME(decode_line)(f, sc, gb, w, sample[p], (p + 1)/2, 9, ac);
             else
-                ret = RENAME(decode_line)(f, sc, gb, w, sample[p], (p + 1)/2, bits + (sc->slice_coding_mode != 1), ac);
+                ret = RENAME(decode_line)(f, sc, gb, w, sample[p], (p + 1)/2, bits[p], ac);
             if (ret < 0)
                 return ret;
         }
@@ -182,10 +193,31 @@ static int RENAME(decode_rgb_frame)(FFV1Context *f, FFV1SliceContext *sc,
                 b += g;
                 r += g;
             }
+            if (sc->remap) {
+                if (f->avctx->bits_per_raw_sample == 32) {
+                    g = sc->fltmap32[0][g & mask[0]];
+                    b = sc->fltmap32[1][b & mask[1]];
+                    r = sc->fltmap32[2][r & mask[2]];
+                    if (transparency)
+                        a = sc->fltmap32[3][a & mask[3]];
+                } else {
+                    g = sc->fltmap[0][g & mask[0]];
+                    b = sc->fltmap[1][b & mask[1]];
+                    r = sc->fltmap[2][r & mask[2]];
+                    if (transparency)
+                        a = sc->fltmap[3][a & mask[3]];
+                }
+            }
 
-            if (lbd)
+            if (lbd) {
                 *((uint32_t*)(src[0] + x*4 + stride[0]*y)) = b + ((unsigned)g<<8) + ((unsigned)r<<16) + ((unsigned)a<<24);
-            else if (sizeof(TYPE) == 4 || transparency) {
+            } else if (f->avctx->bits_per_raw_sample == 32) {
+                *((uint32_t*)(src[0] + x*4 + stride[0]*y)) = g;
+                *((uint32_t*)(src[1] + x*4 + stride[1]*y)) = b;
+                *((uint32_t*)(src[2] + x*4 + stride[2]*y)) = r;
+                if (transparency)
+                    *((uint32_t*)(src[3] + x*4 + stride[3]*y)) = a;
+            } else if (sizeof(TYPE) == 4 || transparency) {
                 *((uint16_t*)(src[0] + x*2 + stride[0]*y)) = g;
                 *((uint16_t*)(src[1] + x*2 + stride[1]*y)) = b;
                 *((uint16_t*)(src[2] + x*2 + stride[2]*y)) = r;

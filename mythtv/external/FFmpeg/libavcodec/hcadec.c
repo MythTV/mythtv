@@ -245,6 +245,7 @@ static int init_hca(AVCodecContext *avctx, const uint8_t *extradata,
         c->base_band_count     = bytestream2_get_byteu(gb);
         c->stereo_band_count   = bytestream2_get_byte (gb);
         c->bands_per_hfr_group = bytestream2_get_byte (gb);
+        bytestream2_skipu(gb, 2);
     } else if (chunk == MKBETAG('d', 'e', 'c', 0)) {
         bytestream2_skipu(gb, 2);
         bytestream2_skipu(gb, 1);
@@ -634,6 +635,5 @@ const FFCodec ff_hca_decoder = {
     .close          = decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.sample_fmts  = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
-                                                      AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
 };

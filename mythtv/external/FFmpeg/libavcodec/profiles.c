@@ -182,6 +182,12 @@ const AVProfile ff_prores_profiles[] = {
     { AV_PROFILE_UNKNOWN }
 };
 
+const AVProfile ff_prores_raw_profiles[] = {
+    { AV_PROFILE_PRORES_RAW,    "RAW"    },
+    { AV_PROFILE_PRORES_RAW_HQ, "RAW HQ" },
+    { AV_PROFILE_UNKNOWN }
+};
+
 const AVProfile ff_mjpeg_profiles[] = {
     { AV_PROFILE_MJPEG_HUFFMAN_BASELINE_DCT,            "Baseline"    },
     { AV_PROFILE_MJPEG_HUFFMAN_EXTENDED_SEQUENTIAL_DCT, "Sequential"  },
@@ -200,6 +206,17 @@ const AVProfile ff_arib_caption_profiles[] = {
 const AVProfile ff_evc_profiles[] = {
     { AV_PROFILE_EVC_BASELINE,             "Baseline"              },
     { AV_PROFILE_EVC_MAIN,                 "Main"                  },
+    { AV_PROFILE_UNKNOWN },
+};
+
+const AVProfile ff_apv_profiles[] = {
+    { AV_PROFILE_APV_422_10,             "422-10"          },
+    { AV_PROFILE_APV_422_12,             "422-12"          },
+    { AV_PROFILE_APV_444_10,             "444-10"          },
+    { AV_PROFILE_APV_444_12,             "444-12"          },
+    { AV_PROFILE_APV_4444_10,            "4444-10"         },
+    { AV_PROFILE_APV_4444_12,            "4444-12"         },
+    { AV_PROFILE_APV_400_10,             "400-10"          },
     { AV_PROFILE_UNKNOWN },
 };
 

@@ -21,22 +21,24 @@ ffmpeg [@var{global_options}] @{[@var{input_file_options}] -i @file{input_url}@}
 inputs - including live grabbing/recording devices - filter, and transcode them
 into a plethora of output formats.
 
-@command{ffmpeg} reads from an arbitrary number of input "files" (which can be regular
+@command{ffmpeg} reads from an arbitrary number of inputs (which can be regular
 files, pipes, network streams, grabbing devices, etc.), specified by the
-@code{-i} option, and writes to an arbitrary number of output "files", which are
-specified by a plain output url. Anything found on the command line which
-cannot be interpreted as an option is considered to be an output url.
+@code{-i} option, and writes to an arbitrary number of outputs, which are
+specified by a plain output url. Anything found on the command line which cannot
+be interpreted as an option is considered to be an output url.
 
-Each input or output url can, in principle, contain any number of streams of
-different types (video/audio/subtitle/attachment/data). The allowed number and/or
-types of streams may be limited by the container format. Selecting which
-streams from which inputs will go into which output is either done automatically
-or with the @code{-map} option (see the Stream selection chapter).
+Each input or output can, in principle, contain any number of elementary streams
+of different types (video/audio/subtitle/attachment/data), though the allowed
+stream counts and/or types may be limited by the container format. Selecting
+which streams from which inputs will go into which output is either done
+automatically or with the @code{-map} option (see the @ref{Stream selection}
+chapter).
 
-To refer to input files in options, you must use their indices (0-based). E.g.
-the first input file is @code{0}, the second is @code{1}, etc. Similarly, streams
-within a file are referred to by their indices. E.g. @code{2:3} refers to the
-fourth stream in the third input file. Also see the Stream specifiers chapter.
+To refer to inputs/outputs in options, you must use their indices (0-based).
+E.g. the first input is @code{0}, the second is @code{1}, etc. Similarly,
+streams within an input/output are referred to by their indices. E.g. @code{2:3}
+refers to the fourth stream in the third input or output. Also see the
+@ref{Stream specifiers} chapter.
 
 As a general rule, options are applied to the next specified
 file. Therefore, order is important, and you can have the same
@@ -85,140 +87,405 @@ The format option may be needed for raw input files.
 @chapter Detailed description
 @c man begin DETAILED DESCRIPTION
 
-The transcoding process in @command{ffmpeg} for each output can be described by
-the following diagram:
+@command{ffmpeg} builds a transcoding pipeline out of the components listed
+below. The program's operation then consists of input data chunks flowing from
+the sources down the pipes towards the sinks, while being transformed by the
+components they encounter along the way.
 
+The following kinds of components are available:
+@itemize
+@item
+@emph{Demuxers} (short for "demultiplexers") read an input source in order to
+extract
+
+@itemize
+@item
+global properties such as metadata or chapters;
+@item
+list of input elementary streams and their properties
+@end itemize
+
+One demuxer instance is created for each @option{-i} option, and sends encoded
+@emph{packets} to @emph{decoders} or @emph{muxers}.
+
+In other literature, demuxers are sometimes called @emph{splitters}, because
+their main function is splitting a file into elementary streams (though some
+files only contain one elementary stream).
+
+A schematic representation of a demuxer looks like this:
 @verbatim
- _______              ______________
-|       |            |              |
-| input |  demuxer   | encoded data |   decoder
-| file  | ---------> | packets      | -----+
-|_______|            |______________|      |
-                                           v
-                                       _________
-                                      |         |
-                                      | decoded |
-                                      | frames  |
-                                      |_________|
- ________             ______________       |
-|        |           |              |      |
-| output | <-------- | encoded data | <----+
-| file   |   muxer   | packets      |   encoder
-|________|           |______________|
-
-
+┌──────────┬───────────────────────┐
+│ demuxer  │                       │ packets for stream 0
+╞══════════╡ elementary stream 0   ├──────────────────────►
+│          │                       │
+│  global  ├───────────────────────┤
+│properties│                       │ packets for stream 1
+│   and    │ elementary stream 1   ├──────────────────────►
+│ metadata │                       │
+│          ├───────────────────────┤
+│          │                       │
+│          │     ...........       │
+│          │                       │
+│          ├───────────────────────┤
+│          │                       │ packets for stream N
+│          │ elementary stream N   ├──────────────────────►
+│          │                       │
+└──────────┴───────────────────────┘
+     ▲
+     │
+     │ read from file, network stream,
+     │     grabbing device, etc.
+     │
 @end verbatim
 
-@command{ffmpeg} calls the libavformat library (containing demuxers) to read
-input files and get packets containing encoded data from them. When there are
-multiple input files, @command{ffmpeg} tries to keep them synchronized by
-tracking lowest timestamp on any active input stream.
+@item
+@emph{Decoders} receive encoded (compressed) @emph{packets} for an audio, video,
+or subtitle elementary stream, and decode them into raw @emph{frames} (arrays of
+pixels for video, PCM for audio). A decoder is typically associated with (and
+receives its input from) an elementary stream in a @emph{demuxer}, but sometimes
+may also exist on its own (see @ref{Loopback decoders}).
 
-Encoded packets are then passed to the decoder (unless streamcopy is selected
-for the stream, see further for a description). The decoder produces
-uncompressed frames (raw video/PCM audio/...) which can be processed further by
-filtering (see next section). After filtering, the frames are passed to the
-encoder, which encodes them and outputs encoded packets. Finally, those are
-passed to the muxer, which writes the encoded packets to the output file.
+A schematic representation of a decoder looks like this:
+@verbatim
+          ┌─────────┐
+ packets  │         │ raw frames
+─────────►│ decoder ├────────────►
+          │         │
+          └─────────┘
+@end verbatim
+
+@item
+@emph{Filtergraphs} process and transform raw audio or video @emph{frames}. A
+filtergraph consists of one or more individual @emph{filters} linked into a
+graph. Filtergraphs come in two flavors - @emph{simple} and @emph{complex},
+configured with the @option{-filter} and @option{-filter_complex} options,
+respectively.
+
+A simple filtergraph is associated with an @emph{output elementary stream}; it
+receives the input to be filtered from a @emph{decoder} and sends filtered
+output to that output stream's @emph{encoder}.
+
+A simple video filtergraph that performs deinterlacing (using the @code{yadif}
+deinterlacer) followed by resizing (using the @code{scale} filter) can look like
+this:
+@verbatim
+
+             ┌────────────────────────┐
+             │  simple filtergraph    │
+ frames from ╞════════════════════════╡ frames for
+ a decoder   │  ┌───────┐  ┌───────┐  │ an encoder
+────────────►├─►│ yadif ├─►│ scale ├─►│────────────►
+             │  └───────┘  └───────┘  │
+             └────────────────────────┘
+@end verbatim
+
+A complex filtergraph is standalone and not associated with any specific stream.
+It may have multiple (or zero) inputs, potentially of different types (audio or
+video), each of which receiving data either from a decoder or another complex
+filtergraph's output. It also has one or more outputs that feed either an
+encoder or another complex filtergraph's input.
+
+The following example diagram represents a complex filtergraph with 3 inputs and
+2 outputs (all video):
+@verbatim
+          ┌─────────────────────────────────────────────────┐
+          │               complex filtergraph               │
+          ╞═════════════════════════════════════════════════╡
+ frames   ├───────┐  ┌─────────┐      ┌─────────┐  ┌────────┤ frames
+─────────►│input 0├─►│ overlay ├─────►│ overlay ├─►│output 0├────────►
+          ├───────┘  │         │      │         │  └────────┤
+ frames   ├───────┐╭►│         │    ╭►│         │           │
+─────────►│input 1├╯ └─────────┘    │ └─────────┘           │
+          ├───────┘                 │                       │
+ frames   ├───────┐ ┌─────┐ ┌─────┬─╯              ┌────────┤ frames
+─────────►│input 2├►│scale├►│split├───────────────►│output 1├────────►
+          ├───────┘ └─────┘ └─────┘                └────────┤
+          └─────────────────────────────────────────────────┘
+@end verbatim
+Frames from second input are overlaid over those from the first. Frames from the
+third input are rescaled, then the duplicated into two identical streams. One of
+them is overlaid over the combined first two inputs, with the result exposed as
+the filtergraph's first output. The other duplicate ends up being the
+filtergraph's second output.
+
+@item
+@emph{Encoders} receive raw audio, video, or subtitle @emph{frames} and encode
+them into encoded @emph{packets}. The encoding (compression) process is
+typically @emph{lossy} - it degrades stream quality to make the output smaller;
+some encoders are @emph{lossless}, but at the cost of much higher output size. A
+video or audio encoder receives its input from some filtergraph's output,
+subtitle encoders receive input from a decoder (since subtitle filtering is not
+supported yet). Every encoder is associated with some muxer's @emph{output
+elementary stream} and sends its output to that muxer.
+
+A schematic representation of an encoder looks like this:
+@verbatim
+             ┌─────────┐
+ raw frames  │         │ packets
+────────────►│ encoder ├─────────►
+             │         │
+             └─────────┘
+@end verbatim
+
+@item
+@emph{Muxers} (short for "multiplexers") receive encoded @emph{packets} for
+their elementary streams from encoders (the @emph{transcoding} path) or directly
+from demuxers (the @emph{streamcopy} path), interleave them (when there is more
+than one elementary stream), and write the resulting bytes into the output file
+(or pipe, network stream, etc.).
+
+A schematic representation of a muxer looks like this:
+@verbatim
+                       ┌──────────────────────┬───────────┐
+ packets for stream 0  │                      │   muxer   │
+──────────────────────►│  elementary stream 0 ╞═══════════╡
+                       │                      │           │
+                       ├──────────────────────┤  global   │
+ packets for stream 1  │                      │properties │
+──────────────────────►│  elementary stream 1 │   and     │
+                       │                      │ metadata  │
+                       ├──────────────────────┤           │
+                       │                      │           │
+                       │     ...........      │           │
+                       │                      │           │
+                       ├──────────────────────┤           │
+ packets for stream N  │                      │           │
+──────────────────────►│  elementary stream N │           │
+                       │                      │           │
+                       └──────────────────────┴─────┬─────┘
+                                                    │
+                     write to file, network stream, │
+                         grabbing device, etc.      │
+                                                    │
+                                                    ▼
+@end verbatim
+
+@end itemize
+
+@section Streamcopy
+The simplest pipeline in @command{ffmpeg} is single-stream
+@emph{streamcopy}, that is copying one @emph{input elementary stream}'s packets
+without decoding, filtering, or encoding them. As an example, consider an input
+file called @file{INPUT.mkv} with 3 elementary streams, from which we take the
+second and write it to file @file{OUTPUT.mp4}. A schematic representation of
+such a pipeline looks like this:
+@verbatim
+┌──────────┬─────────────────────┐
+│ demuxer  │                     │ unused
+╞══════════╡ elementary stream 0 ├────────╳
+│          │                     │
+│INPUT.mkv ├─────────────────────┤          ┌──────────────────────┬───────────┐
+│          │                     │ packets  │                      │   muxer   │
+│          │ elementary stream 1 ├─────────►│  elementary stream 0 ╞═══════════╡
+│          │                     │          │                      │OUTPUT.mp4 │
+│          ├─────────────────────┤          └──────────────────────┴───────────┘
+│          │                     │ unused
+│          │ elementary stream 2 ├────────╳
+│          │                     │
+└──────────┴─────────────────────┘
+@end verbatim
+
+The above pipeline can be constructed with the following commandline:
+@example
+ffmpeg -i INPUT.mkv -map 0:1 -c copy OUTPUT.mp4
+@end example
+
+In this commandline
+@itemize
+
+@item
+there is a single input @file{INPUT.mkv};
+
+@item
+there are no input options for this input;
+
+@item
+there is a single output @file{OUTPUT.mp4};
+
+@item
+there are two output options for this output:
+
+@itemize
+@item
+@code{-map 0:1} selects the input stream to be used - from input with index 0
+(i.e. the first one) the stream with index 1 (i.e. the second one);
+
+@item
+@code{-c copy} selects the @code{copy} encoder, i.e. streamcopy with no decoding
+or encoding.
+@end itemize
+
+@end itemize
+
+Streamcopy is useful for changing the elementary stream count, container format,
+or modifying container-level metadata. Since there is no decoding or encoding,
+it is very fast and there is no quality loss. However, it might not work in some
+cases because of a variety of factors (e.g. certain information required by the
+target container is not available in the source). Applying filters is obviously
+also impossible, since filters work on decoded frames.
+
+More complex streamcopy scenarios can be constructed - e.g. combining streams
+from two input files into a single output:
+@verbatim
+┌──────────┬────────────────────┐         ┌────────────────────┬───────────┐
+│ demuxer 0│                    │ packets │                    │   muxer   │
+╞══════════╡elementary stream 0 ├────────►│elementary stream 0 ╞═══════════╡
+│INPUT0.mkv│                    │         │                    │OUTPUT.mp4 │
+└──────────┴────────────────────┘         ├────────────────────┤           │
+┌──────────┬────────────────────┐         │                    │           │
+│ demuxer 1│                    │ packets │elementary stream 1 │           │
+╞══════════╡elementary stream 0 ├────────►│                    │           │
+│INPUT1.aac│                    │         └────────────────────┴───────────┘
+└──────────┴────────────────────┘
+@end verbatim
+that can be built by the commandline
+@example
+ffmpeg -i INPUT0.mkv -i INPUT1.aac -map 0:0 -map 1:0 -c copy OUTPUT.mp4
+@end example
+
+The output @option{-map} option is used twice here, creating two streams in the
+output file - one fed by the first input and one by the second. The single
+instance of the @option{-c} option selects streamcopy for both of those streams.
+You could also use multiple instances of this option together with
+@ref{Stream specifiers} to apply different values to each stream, as will be
+demonstrated in following sections.
+
+A converse scenario is splitting multiple streams from a single input into
+multiple outputs:
+@verbatim
+┌──────────┬─────────────────────┐          ┌───────────────────┬───────────┐
+│ demuxer  │                     │ packets  │                   │ muxer 0   │
+╞══════════╡ elementary stream 0 ├─────────►│elementary stream 0╞═══════════╡
+│          │                     │          │                   │OUTPUT0.mp4│
+│INPUT.mkv ├─────────────────────┤          └───────────────────┴───────────┘
+│          │                     │ packets  ┌───────────────────┬───────────┐
+│          │ elementary stream 1 ├─────────►│                   │ muxer 1   │
+│          │                     │          │elementary stream 0╞═══════════╡
+└──────────┴─────────────────────┘          │                   │OUTPUT1.mp4│
+                                            └───────────────────┴───────────┘
+@end verbatim
+built with
+@example
+ffmpeg -i INPUT.mkv -map 0:0 -c copy OUTPUT0.mp4 -map 0:1 -c copy OUTPUT1.mp4
+@end example
+Note how a separate instance of the @option{-c} option is needed for every
+output file even though their values are the same. This is because non-global
+options (which is most of them) only apply in the context of the file before
+which they are placed.
+
+These  examples can of course be further generalized into arbitrary remappings
+of any number of inputs into any number of outputs.
+
+@section Transcoding
+@emph{Transcoding} is the process of decoding a stream and then encoding it
+again. Since encoding tends to be computationally expensive and in most cases
+degrades the stream quality (i.e. it is @emph{lossy}), you should only transcode
+when you need to and perform streamcopy otherwise. Typical reasons to transcode
+are:
+
+@itemize
+@item
+applying filters - e.g. resizing, deinterlacing, or overlaying video; resampling
+or mixing audio;
+
+@item
+you want to feed the stream to something that cannot decode the original codec.
+@end itemize
+Note that @command{ffmpeg} will transcode all audio, video, and subtitle streams
+unless you specify @option{-c copy} for them.
+
+Consider an example pipeline that reads an input file with one audio and one
+video stream, transcodes the video and copies the audio into a single output
+file. This can be schematically represented as follows
+@verbatim
+┌──────────┬─────────────────────┐
+│ demuxer  │                     │       audio packets
+╞══════════╡ stream 0 (audio)    ├─────────────────────────────────────╮
+│          │                     │                                     │
+│INPUT.mkv ├─────────────────────┤ video    ┌─────────┐     raw        │
+│          │                     │ packets  │  video  │ video frames   │
+│          │ stream 1 (video)    ├─────────►│ decoder ├──────────────╮ │
+│          │                     │          │         │              │ │
+└──────────┴─────────────────────┘          └─────────┘              │ │
+                                                                     ▼ ▼
+                                                                     │ │
+┌──────────┬─────────────────────┐ video    ┌─────────┐              │ │
+│ muxer    │                     │ packets  │  video  │              │ │
+╞══════════╡ stream 0 (video)    │◄─────────┤ encoder ├──────────────╯ │
+│          │                     │          │(libx264)│                │
+│OUTPUT.mp4├─────────────────────┤          └─────────┘                │
+│          │                     │                                     │
+│          │ stream 1 (audio)    │◄────────────────────────────────────╯
+│          │                     │
+└──────────┴─────────────────────┘
+@end verbatim
+and implemented with the following commandline:
+@example
+ffmpeg -i INPUT.mkv -map 0:v -map 0:a -c:v libx264 -c:a copy OUTPUT.mp4
+@end example
+Note how it uses stream specifiers @code{:v} and @code{:a} to select input
+streams and apply different values of the @option{-c} option to them; see the
+@ref{Stream specifiers} section for more details.
+
 
 @section Filtering
-Before encoding, @command{ffmpeg} can process raw audio and video frames using
-filters from the libavfilter library. Several chained filters form a filter
-graph. @command{ffmpeg} distinguishes between two types of filtergraphs:
-simple and complex.
+
+When transcoding, audio and video streams can be filtered before encoding, with
+either a @emph{simple} or @emph{complex} filtergraph.
 
 @subsection Simple filtergraphs
+
 Simple filtergraphs are those that have exactly one input and output, both of
-the same type. In the above diagram they can be represented by simply inserting
-an additional step between decoding and encoding:
+the same type (audio or video). They are configured with the per-stream
+@option{-filter} option (with @option{-vf} and @option{-af} aliases for
+@option{-filter:v} (video) and @option{-filter:a} (audio) respectively). Note
+that simple filtergraphs are tied to their output stream, so e.g. if you have
+multiple audio streams, @option{-af} will create a separate filtergraph for each
+one.
 
+Taking the transcoding example from above, adding filtering (and omitting audio,
+for clarity) makes it look like this:
 @verbatim
- _________                        ______________
-|         |                      |              |
-| decoded |                      | encoded data |
-| frames  |\                   _ | packets      |
-|_________| \                  /||______________|
-             \   __________   /
-  simple     _\||          | /  encoder
-  filtergraph   | filtered |/
-                | frames   |
-                |__________|
-
+┌──────────┬───────────────┐
+│ demuxer  │               │          ┌─────────┐
+╞══════════╡ video stream  │ packets  │  video  │ frames
+│INPUT.mkv │               ├─────────►│ decoder ├─────►───╮
+│          │               │          └─────────┘         │
+└──────────┴───────────────┘                              │
+                                  ╭───────────◄───────────╯
+                                  │   ┌────────────────────────┐
+                                  │   │  simple filtergraph    │
+                                  │   ╞════════════════════════╡
+                                  │   │  ┌───────┐  ┌───────┐  │
+                                  ╰──►├─►│ yadif ├─►│ scale ├─►├╮
+                                      │  └───────┘  └───────┘  ││
+                                      └────────────────────────┘│
+                                                                │
+                                                                │
+┌──────────┬───────────────┐ video    ┌─────────┐               │
+│ muxer    │               │ packets  │  video  │               │
+╞══════════╡ video stream  │◄─────────┤ encoder ├───────◄───────╯
+│OUTPUT.mp4│               │          │         │
+│          │               │          └─────────┘
+└──────────┴───────────────┘
 @end verbatim
-
-Simple filtergraphs are configured with the per-stream @option{-filter} option
-(with @option{-vf} and @option{-af} aliases for video and audio respectively).
-A simple filtergraph for video can look for example like this:
-
-@verbatim
- _______        _____________        _______        ________
-|       |      |             |      |       |      |        |
-| input | ---> | deinterlace | ---> | scale | ---> | output |
-|_______|      |_____________|      |_______|      |________|
-
-@end verbatim
-
-Note that some filters change frame properties but not frame contents. E.g. the
-@code{fps} filter in the example above changes number of frames, but does not
-touch the frame contents. Another example is the @code{setpts} filter, which
-only sets timestamps and otherwise passes the frames unchanged.
 
 @subsection Complex filtergraphs
+
 Complex filtergraphs are those which cannot be described as simply a linear
-processing chain applied to one stream. This is the case, for example, when the graph has
-more than one input and/or output, or when output stream type is different from
-input. They can be represented with the following diagram:
-
-@verbatim
- _________
-|         |
-| input 0 |\                    __________
-|_________| \                  |          |
-             \   _________    /| output 0 |
-              \ |         |  / |__________|
- _________     \| complex | /
-|         |     |         |/
-| input 1 |---->| filter  |\
-|_________|     |         | \   __________
-               /| graph   |  \ |          |
-              / |         |   \| output 1 |
- _________   /  |_________|    |__________|
-|         | /
-| input 2 |/
-|_________|
-
-@end verbatim
-
-Complex filtergraphs are configured with the @option{-filter_complex} option.
-Note that this option is global, since a complex filtergraph, by its nature,
-cannot be unambiguously associated with a single stream or file.
-
-The @option{-lavfi} option is equivalent to @option{-filter_complex}.
+processing chain applied to one stream. This is the case, for example, when the
+graph has more than one input and/or output, or when output stream type is
+different from input. Complex filtergraphs are configured with the
+@option{-filter_complex} option. Note that this option is global, since a
+complex filtergraph, by its nature, cannot be unambiguously associated with a
+single stream or file. Each instance of @option{-filter_complex} creates a new
+complex filtergraph, and there can be any number of them.
 
 A trivial example of a complex filtergraph is the @code{overlay} filter, which
 has two video inputs and one video output, containing one video overlaid on top
 of the other. Its audio counterpart is the @code{amix} filter.
 
-@section Stream copy
-Stream copy is a mode selected by supplying the @code{copy} parameter to the
-@option{-codec} option. It makes @command{ffmpeg} omit the decoding and encoding
-step for the specified stream, so it does only demuxing and muxing. It is useful
-for changing the container format or modifying container-level metadata. The
-diagram above will, in this case, simplify to this:
-
-@verbatim
- _______              ______________            ________
-|       |            |              |          |        |
-| input |  demuxer   | encoded data |  muxer   | output |
-| file  | ---------> | packets      | -------> | file   |
-|_______|            |______________|          |________|
-
-@end verbatim
-
-Since there is no decoding or encoding, it is very fast and there is no quality
-loss. However, it might not work in some cases because of many factors. Applying
-filters is obviously also impossible, since filters work on uncompressed data.
-
+@anchor{Loopback decoders}
 @section Loopback decoders
 While decoders are normally associated with demuxer streams, it is also possible
 to create "loopback" decoders that decode the output from some encoder and allow
@@ -259,8 +526,41 @@ reads an input video and
 
 @end itemize
 
+Such a transcoding pipeline can be represented with the following diagram:
+@verbatim
+┌──────────┬───────────────┐
+│ demuxer  │               │   ┌─────────┐            ┌─────────┐    ┌────────────────────┐
+╞══════════╡ video stream  │   │  video  │            │  video  │    │ null muxer         │
+│   INPUT  │               ├──►│ decoder ├──┬────────►│ encoder ├─┬─►│(discards its input)│
+│          │               │   └─────────┘  │         │(libx264)│ │  └────────────────────┘
+└──────────┴───────────────┘                │         └─────────┘ │
+                                 ╭───────◄──╯   ┌─────────┐       │
+                                 │              │loopback │       │
+                                 │ ╭─────◄──────┤ decoder ├────◄──╯
+                                 │ │            └─────────┘
+                                 │ │
+                                 │ │
+                                 │ │  ┌───────────────────┐
+                                 │ │  │complex filtergraph│
+                                 │ │  ╞═══════════════════╡
+                                 │ │  │  ┌─────────────┐  │
+                                 ╰─╫─►├─►│   hstack    ├─►├╮
+                                   ╰─►├─►│             │  ││
+                                      │  └─────────────┘  ││
+                                      └───────────────────┘│
+                                                           │
+┌──────────┬───────────────┐  ┌─────────┐                  │
+│ muxer    │               │  │  video  │                  │
+╞══════════╡ video stream  │◄─┤ encoder ├───────◄──────────╯
+│  OUTPUT  │               │  │ (ffv1)  │
+│          │               │  └─────────┘
+└──────────┴───────────────┘
+@end verbatim
+
+
 @c man end DETAILED DESCRIPTION
 
+@anchor{Stream selection}
 @chapter Stream selection
 @c man begin STREAM SELECTION
 
@@ -621,24 +921,25 @@ ffmpeg -i INPUT -metadata:s:a:0 language=eng OUTPUT
 @end example
 
 @item -disposition[:stream_specifier] @var{value} (@emph{output,per-stream})
-Sets the disposition for a stream.
+Sets the disposition flags for a stream.
 
-By default, the disposition is copied from the input stream, unless the output
-stream this option applies to is fed by a complex filtergraph - in that case the
-disposition is unset by default.
+Default value: by default, all disposition flags are copied from the input stream,
+unless the output stream this option applies to is fed by a complex filtergraph
+- in that case no disposition flags are set by default.
 
-@var{value} is a sequence of items separated by '+' or '-'. The first item may
-also be prefixed with '+' or '-', in which case this option modifies the default
-value. Otherwise (the first item is not prefixed) this options overrides the
-default value. A '+' prefix adds the given disposition, '-' removes it. It is
-also possible to clear the disposition by setting it to 0.
+@var{value} is a sequence of disposition flags separated by '+' or '-'. A '+'
+prefix adds the given disposition, '-' removes it. If the first flag is also
+prefixed with '+' or '-', the resulting disposition is the default value
+updated by @var{value}. If the first flag is not prefixed, the resulting
+disposition is @var{value}. It is also possible to clear the disposition by
+setting it to 0.
 
 If no @code{-disposition} options were specified for an output file, ffmpeg will
-automatically set the 'default' disposition on the first stream of each type,
+automatically set the 'default' disposition flag on the first stream of each type,
 when there are multiple streams of this type in the output file and no stream of
 that type is already marked as default.
 
-The @code{-dispositions} option lists the known dispositions.
+The @code{-dispositions} option lists the known disposition flags.
 
 For example, to make the second audio stream the default stream:
 @example
@@ -654,6 +955,29 @@ ffmpeg -i in.mkv -c copy -disposition:s:0 0 -disposition:s:1 default out.mkv
 To add an embedded cover/thumbnail:
 @example
 ffmpeg -i in.mp4 -i IMAGE -map 0 -map 1 -c copy -c:v:1 png -disposition:v:1 attached_pic out.mp4
+@end example
+
+To add the 'original' and remove the 'comment' disposition flag from the first
+audio stream without removing its other disposition flags:
+@example
+ffmpeg -i in.mkv -c copy -disposition:a:0 +original-comment out.mkv
+@end example
+
+To remove the 'original' and add the 'comment' disposition flag to the first
+audio stream without removing its other disposition flags:
+@example
+ffmpeg -i in.mkv -c copy -disposition:a:0 -original+comment out.mkv
+@end example
+
+To set only the 'original' and 'comment' disposition flags on the first audio
+stream (and remove its other disposition flags):
+@example
+ffmpeg -i in.mkv -c copy -disposition:a:0 original+comment out.mkv
+@end example
+
+To remove all disposition flags from the first audio stream:
+@example
+ffmpeg -i in.mkv -c copy -disposition:a:0 0 out.mkv
 @end example
 
 Not all muxers support embedded thumbnails, and those who do, only support a few formats, like JPEG or PNG.
@@ -724,7 +1048,7 @@ The following flags are available:
 
 @table @option
 @item recon_gain
-Wether to signal if recon_gain is present as metadata in parameter blocks within frames
+Whether to signal if recon_gain is present as metadata in parameter blocks within frames
 @end table
 
 @item output_gain
@@ -872,9 +1196,9 @@ ffmpeg -i front.wav -i back.wav -i center.wav -i lfe.wav
 demixing=parameter_id=998,
 recon_gain=parameter_id=101,
 layer=ch_layout=stereo,
-layer=ch_layout=5.1,
+layer=ch_layout=5.1(side),
 -stream_group type=iamf_mix_presentation:id=2:stg=0:annotations=en-us=Mix_Presentation,
-submix=parameter_id=100:parameter_rate=48000|element=stg=0:parameter_id=100:annotations=en-us=Scalable_Submix|layout=sound_system=stereo|layout=sound_system=5.1
+submix=parameter_id=100:parameter_rate=48000|element=stg=0:parameter_id=100:annotations=en-us=Scalable_Submix|layout=sound_system=stereo|layout=sound_system=5.1(side)
 -streamid 0:0 -streamid 1:1 -streamid 2:2 -streamid 3:3 output.iamf
 @end example
 
@@ -1049,20 +1373,45 @@ The properties where a change triggers reinitialization are,
 for video, frame resolution or pixel format;
 for audio, sample format, sample rate, channel count or channel layout.
 
+@item -drop_changed[:@var{stream_specifier}] @var{integer} (@emph{input,per-stream})
+This boolean option determines whether a frame with differing frame parameters mid-stream
+gets dropped instead of leading to filtergraph reinitialization, as that would lead to loss
+of filter state. Generally useful to avoid corrupted yet decodable packets in live streaming
+inputs. Default is false.
+
 @item -filter_threads @var{nb_threads} (@emph{global})
 Defines how many threads are used to process a filter pipeline. Each pipeline
 will produce a thread pool with this many threads available for parallel processing.
 The default is the number of available CPUs.
 
+@item -filter_buffered_frames @var{nb_frames} (@emph{global})
+Defines the maximum number of buffered frames allowed in a filtergraph. Under
+normal circumstances, a filtergraph should not buffer more than a few frames,
+especially if frames are being fed to it and read from it in a balanced way
+(which is the intended behavior in ffmpeg). That said, this option allows you
+to limit the total number of frames buffered across all links in a filtergraph.
+If more frames are generated, filtering is aborted and an error is returned.
+The default value is 0, which means no limit.
+
 @item -pre[:@var{stream_specifier}] @var{preset_name} (@emph{output,per-stream})
 Specify the preset for matching stream(s).
 
 @item -stats (@emph{global})
-Print encoding progress/statistics. It is on by default, to explicitly
-disable it you need to specify @code{-nostats}.
+Log encoding progress/statistics as "info"-level log (see @code{-loglevel}).
+It is on by default, to explicitly disable it you need to specify @code{-nostats}.
 
 @item -stats_period @var{time} (@emph{global})
 Set period at which encoding progress/statistics are updated. Default is 0.5 seconds.
+
+@item -print_graphs (@emph{global})
+Prints execution graph details to stderr in the format set via -print_graphs_format.
+
+@item -print_graphs_file @var{filename} (@emph{global})
+Writes execution graph details to the specified file in the format set via -print_graphs_format.
+
+@item -print_graphs_format @var{format} (@emph{global})
+Sets the output format (available formats are: default, compact, csv, flat, ini, json, xml, mermaid, mermaidhtml)
+The default format is json.
 
 @item -progress @var{url} (@emph{global})
 Send program-friendly progress information to @var{url}.
@@ -1070,9 +1419,15 @@ Send program-friendly progress information to @var{url}.
 Progress information is written periodically and at the end of
 the encoding process. It is made of "@var{key}=@var{value}" lines. @var{key}
 consists of only alphanumeric characters. The last key of a sequence of
-progress information is always "progress".
+progress information is always "progress" with the value "continue" or "end".
 
 The update period is set using @code{-stats_period}.
+
+For example, log progress information to stdout:
+
+@example
+ffmpeg -progress pipe:1 -i in.mkv out.mkv
+@end example
 
 @anchor{stdin option}
 @item -stdin
@@ -1655,6 +2010,9 @@ transcoding, without copying the frames into the system memory.
 
 For it to work, both the decoder and the encoder must support QSV acceleration
 and no filters must be used.
+
+@item videotoolbox
+Use Video Toolbox hardware acceleration.
 @end table
 
 This option has no effect if the selected hwaccel is not available or not
@@ -1799,7 +2157,7 @@ Set the size of the canvas used to render subtitles.
 @section Advanced options
 
 @table @option
-@item -map [-]@var{input_file_id}[:@var{stream_specifier}][:@var{view_specifier}][?] | @var{[linklabel]} (@emph{output})
+@item -map [-]@var{input_file_id}[:@var{stream_specifier}][:@var{view_specifier}][:?] | @var{[linklabel]} (@emph{output})
 
 Create one or more streams in the output file. This option has two forms for
 specifying the data source(s): the first selects one or more streams from some
@@ -1995,6 +2353,11 @@ Read input at native frame rate. This is equivalent to setting @code{-readrate 1
 @item -readrate_initial_burst @var{seconds}
 Set an initial read burst time, in seconds, after which @option{-re/-readrate}
 will be enforced.
+@item -readrate_catchup @var{speed} (@emph{input})
+If either the input or output is blocked leading to actual read speed falling behind the
+specified readrate, then this rate takes effect till the input catches up with the
+specified readrate. Must not be lower than the primary readrate.
+
 @item -vsync @var{parameter} (@emph{global})
 @itemx -fps_mode[:@var{stream_specifier}] @var{parameter} (@emph{output,per-stream})
 Set video sync method / framerate mode. vsync is applied to all output video streams

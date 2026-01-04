@@ -42,6 +42,14 @@
 #include "atsc_a53.h"
 #include "sei.h"
 
+#if defined(X265_ENABLE_ALPHA) && MAX_LAYERS > 2
+#define FF_X265_MAX_LAYERS MAX_LAYERS
+#elif X265_BUILD >= 210
+#define FF_X265_MAX_LAYERS 2
+#else
+#define FF_X265_MAX_LAYERS 1
+#endif
+
 typedef struct ReorderedData {
     int64_t duration;
 
@@ -284,12 +292,7 @@ static av_cold int libx265_encode_init(AVCodecContext *avctx)
         ctx->params->fpsDenom    = avctx->framerate.den;
     } else {
         ctx->params->fpsNum      = avctx->time_base.den;
-FF_DISABLE_DEPRECATION_WARNINGS
-        ctx->params->fpsDenom    = avctx->time_base.num
-#if FF_API_TICKS_PER_FRAME
-                                   * avctx->ticks_per_frame
-#endif
-                                   ;
+        ctx->params->fpsDenom    = avctx->time_base.num;
 FF_ENABLE_DEPRECATION_WARNINGS
     }
     ctx->params->sourceWidth     = avctx->width;
@@ -497,8 +500,22 @@ FF_ENABLE_DEPRECATION_WARNINGS
     {
         const AVDictionaryEntry *en = NULL;
         while ((en = av_dict_iterate(ctx->x265_opts, en))) {
-            int parse_ret = ctx->api->param_parse(ctx->params, en->key, en->value);
+            int parse_ret;
 
+            // ignore forced alpha option. The pixel format is all we need.
+            if (!strncmp(en->key, "alpha", 5)) {
+                if (desc->nb_components == 4) {
+                    av_log(avctx, AV_LOG_WARNING,
+                           "Ignoring redundant \"alpha\" option.\n");
+                    continue;
+                }
+                av_log(avctx, AV_LOG_ERROR,
+                       "Alpha encoding was requested through an unsupported "
+                       "option when no alpha plane is present\n");
+                return AVERROR(EINVAL);
+            }
+
+            parse_ret = ctx->api->param_parse(ctx->params, en->key, en->value);
             switch (parse_ret) {
             case X265_PARAM_BAD_NAME:
                 av_log(avctx, AV_LOG_WARNING,
@@ -537,6 +554,15 @@ FF_ENABLE_DEPRECATION_WARNINGS
         return ret;
     ctx->params->dolbyProfile = ctx->dovi.cfg.dv_profile * 10 +
                                 ctx->dovi.cfg.dv_bl_signal_compatibility_id;
+#endif
+
+#if X265_BUILD >= 210 && FF_X265_MAX_LAYERS > 1
+    if (desc->flags & AV_PIX_FMT_FLAG_ALPHA) {
+        if (ctx->api->param_parse(ctx->params, "alpha", "1") < 0) {
+            av_log(avctx, AV_LOG_ERROR, "Loaded libx265 does not support alpha layer encoding.\n");
+            return AVERROR(ENOTSUP);
+        }
+    }
 #endif
 
     ctx->encoder = ctx->api->encoder_open(ctx->params);
@@ -659,15 +685,13 @@ static void free_picture(libx265Context *ctx, x265_picture *pic)
 static int libx265_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                                 const AVFrame *pic, int *got_packet)
 {
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
     libx265Context *ctx = avctx->priv_data;
     x265_picture x265pic;
+    x265_picture x265pic_out[FF_X265_MAX_LAYERS] = { 0 };
 #if (X265_BUILD >= 210) && (X265_BUILD < 213)
-    x265_picture x265pic_layers_out[MAX_SCALABLE_LAYERS];
-    x265_picture* x265pic_lyrptr_out[MAX_SCALABLE_LAYERS];
-#else
-    x265_picture x265pic_solo_out = { 0 };
+    x265_picture *x265pic_lyrptr_out[FF_X265_MAX_LAYERS];
 #endif
-    x265_picture* x265pic_out;
     x265_nal *nal;
     x265_sei *sei;
     uint8_t *dst;
@@ -687,7 +711,7 @@ static int libx265_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         ReorderedData *rd;
         int rd_idx;
 
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < desc->nb_components; i++) {
            x265pic.planes[i] = pic->data[i];
            x265pic.stride[i] = pic->linesize[i];
         }
@@ -806,14 +830,14 @@ static int libx265_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     }
 
 #if (X265_BUILD >= 210) && (X265_BUILD < 213)
-    for (i = 0; i < MAX_SCALABLE_LAYERS; i++)
-        x265pic_lyrptr_out[i] = &x265pic_layers_out[i];
+    for (i = 0; i < FF_ARRAY_ELEMS(x265pic_out); i++)
+        x265pic_lyrptr_out[i] = &x265pic_out[i];
 
     ret = ctx->api->encoder_encode(ctx->encoder, &nal, &nnal,
                                    pic ? &x265pic : NULL, x265pic_lyrptr_out);
 #else
     ret = ctx->api->encoder_encode(ctx->encoder, &nal, &nnal,
-                                   pic ? &x265pic : NULL, &x265pic_solo_out);
+                                   pic ? &x265pic : NULL, x265pic_out);
 #endif
 
     for (i = 0; i < sei->numPayloads; i++)
@@ -843,12 +867,6 @@ static int libx265_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
         if (is_keyframe(nal[i].type))
             pkt->flags |= AV_PKT_FLAG_KEY;
     }
-
-#if (X265_BUILD >= 210) && (X265_BUILD < 213)
-    x265pic_out = x265pic_lyrptr_out[0];
-#else
-    x265pic_out = &x265pic_solo_out;
-#endif
 
     pkt->pts = x265pic_out->pts;
     pkt->dts = x265pic_out->dts;
@@ -907,6 +925,9 @@ static const enum AVPixelFormat x265_csp_eight[] = {
     AV_PIX_FMT_YUVJ444P,
     AV_PIX_FMT_GBRP,
     AV_PIX_FMT_GRAY8,
+#if X265_BUILD >= 210 && FF_X265_MAX_LAYERS > 1
+    AV_PIX_FMT_YUVA420P,
+#endif
     AV_PIX_FMT_NONE
 };
 
@@ -924,6 +945,10 @@ static const enum AVPixelFormat x265_csp_ten[] = {
     AV_PIX_FMT_GBRP10,
     AV_PIX_FMT_GRAY8,
     AV_PIX_FMT_GRAY10,
+#if X265_BUILD >= 210 && FF_X265_MAX_LAYERS > 1
+    AV_PIX_FMT_YUVA420P,
+    AV_PIX_FMT_YUVA420P10,
+#endif
     AV_PIX_FMT_NONE
 };
 
@@ -946,6 +971,10 @@ static const enum AVPixelFormat x265_csp_twelve[] = {
     AV_PIX_FMT_GRAY8,
     AV_PIX_FMT_GRAY10,
     AV_PIX_FMT_GRAY12,
+#if X265_BUILD >= 210 && FF_X265_MAX_LAYERS > 1
+    AV_PIX_FMT_YUVA420P,
+    AV_PIX_FMT_YUVA420P10,
+#endif
     AV_PIX_FMT_NONE
 };
 

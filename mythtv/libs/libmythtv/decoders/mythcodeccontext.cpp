@@ -61,6 +61,7 @@
 #include "mythcodeccontext.h"
 
 extern "C" {
+#include "libavcodec/defs.h"
 #include "libavutil/pixdesc.h"
 }
 
@@ -603,13 +604,13 @@ bool MythCodecContext::IsUnsupportedProfile(AVCodecContext *Context)
         case AV_CODEC_ID_H264:
             switch (Context->profile)
             {
-                case FF_PROFILE_H264_HIGH_10:
-                case FF_PROFILE_H264_HIGH_10_INTRA:
-                case FF_PROFILE_H264_HIGH_422:
-                case FF_PROFILE_H264_HIGH_422_INTRA:
-                case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
-                case FF_PROFILE_H264_HIGH_444_INTRA:
-                case FF_PROFILE_H264_CAVLC_444: return true;
+                case AV_PROFILE_H264_HIGH_10:
+                case AV_PROFILE_H264_HIGH_10_INTRA:
+                case AV_PROFILE_H264_HIGH_422:
+                case AV_PROFILE_H264_HIGH_422_INTRA:
+                case AV_PROFILE_H264_HIGH_444_PREDICTIVE:
+                case AV_PROFILE_H264_HIGH_444_INTRA:
+                case AV_PROFILE_H264_CAVLC_444: return true;
                 default: break;
             }
             break;
@@ -692,34 +693,34 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
         case AV_CODEC_ID_MPEG2VIDEO:
             switch (Profile)
             {
-                case FF_PROFILE_MPEG2_422:          return MPEG2422;
-                case FF_PROFILE_MPEG2_HIGH:         return MPEG2High;
-                case FF_PROFILE_MPEG2_SS:           return MPEG2Spatial;
-                case FF_PROFILE_MPEG2_SNR_SCALABLE: return MPEG2SNR;
-                case FF_PROFILE_MPEG2_SIMPLE:       return MPEG2Simple;
-                case FF_PROFILE_MPEG2_MAIN:         return MPEG2Main;
+                case AV_PROFILE_MPEG2_422:          return MPEG2422;
+                case AV_PROFILE_MPEG2_HIGH:         return MPEG2High;
+                case AV_PROFILE_MPEG2_SS:           return MPEG2Spatial;
+                case AV_PROFILE_MPEG2_SNR_SCALABLE: return MPEG2SNR;
+                case AV_PROFILE_MPEG2_SIMPLE:       return MPEG2Simple;
+                case AV_PROFILE_MPEG2_MAIN:         return MPEG2Main;
                 default: break;
             }
             break;
         case AV_CODEC_ID_MPEG4:
             switch (Profile)
             {
-                case FF_PROFILE_MPEG4_SIMPLE:             return MPEG4Simple;
-                case FF_PROFILE_MPEG4_SIMPLE_SCALABLE:    return MPEG4SimpleScaleable;
-                case FF_PROFILE_MPEG4_CORE:               return MPEG4Core;
-                case FF_PROFILE_MPEG4_MAIN:               return MPEG4Main;
-                case FF_PROFILE_MPEG4_N_BIT:              return MPEG4NBit;
-                case FF_PROFILE_MPEG4_SCALABLE_TEXTURE:   return MPEG4ScaleableTexture;
-                case FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION:  return MPEG4SimpleFace;
-                case FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE: return MPEG4BasicAnimated;
-                case FF_PROFILE_MPEG4_HYBRID:             return MPEG4Hybrid;
-                case FF_PROFILE_MPEG4_ADVANCED_REAL_TIME: return MPEG4AdvancedRT;
-                case FF_PROFILE_MPEG4_CORE_SCALABLE:      return MPEG4CoreScaleable;
-                case FF_PROFILE_MPEG4_ADVANCED_CODING:    return MPEG4AdvancedCoding;
-                case FF_PROFILE_MPEG4_ADVANCED_CORE:      return MPEG4AdvancedCore;
-                case FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE: return MPEG4AdvancedScaleableTexture;
-                case FF_PROFILE_MPEG4_SIMPLE_STUDIO:      return MPEG4SimpleStudio;
-                case FF_PROFILE_MPEG4_ADVANCED_SIMPLE:    return MPEG4AdvancedSimple;
+                case AV_PROFILE_MPEG4_SIMPLE:             return MPEG4Simple;
+                case AV_PROFILE_MPEG4_SIMPLE_SCALABLE:    return MPEG4SimpleScaleable;
+                case AV_PROFILE_MPEG4_CORE:               return MPEG4Core;
+                case AV_PROFILE_MPEG4_MAIN:               return MPEG4Main;
+                case AV_PROFILE_MPEG4_N_BIT:              return MPEG4NBit;
+                case AV_PROFILE_MPEG4_SCALABLE_TEXTURE:   return MPEG4ScaleableTexture;
+                case AV_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION:  return MPEG4SimpleFace;
+                case AV_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE: return MPEG4BasicAnimated;
+                case AV_PROFILE_MPEG4_HYBRID:             return MPEG4Hybrid;
+                case AV_PROFILE_MPEG4_ADVANCED_REAL_TIME: return MPEG4AdvancedRT;
+                case AV_PROFILE_MPEG4_CORE_SCALABLE:      return MPEG4CoreScaleable;
+                case AV_PROFILE_MPEG4_ADVANCED_CODING:    return MPEG4AdvancedCoding;
+                case AV_PROFILE_MPEG4_ADVANCED_CORE:      return MPEG4AdvancedCore;
+                case AV_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE: return MPEG4AdvancedScaleableTexture;
+                case AV_PROFILE_MPEG4_SIMPLE_STUDIO:      return MPEG4SimpleStudio;
+                case AV_PROFILE_MPEG4_ADVANCED_SIMPLE:    return MPEG4AdvancedSimple;
             }
             break;
         case AV_CODEC_ID_H263: return H263;
@@ -727,57 +728,57 @@ MythCodecContext::CodecProfile MythCodecContext::FFmpegToMythProfile(AVCodecID C
             switch (Profile)
             {
                 // Mapping of H264MainExtended, H264ConstrainedHigh?
-                case FF_PROFILE_H264_BASELINE: return H264Baseline;
-                case FF_PROFILE_H264_CONSTRAINED_BASELINE: return H264ConstrainedBaseline;
-                case FF_PROFILE_H264_MAIN:     return H264Main;
-                case FF_PROFILE_H264_EXTENDED: return H264Extended;
-                case FF_PROFILE_H264_HIGH:     return H264High;
-                case FF_PROFILE_H264_HIGH_10:  return H264High10;
-                //case FF_PROFILE_H264_HIGH_10_INTRA:
-                //case FF_PROFILE_H264_MULTIVIEW_HIGH:
-                case FF_PROFILE_H264_HIGH_422: return H264High422;
-                //case FF_PROFILE_H264_HIGH_422_INTRA:
-                //case FF_PROFILE_H264_STEREO_HIGH:
-                case FF_PROFILE_H264_HIGH_444: return H264High444;
-                //case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
-                //case FF_PROFILE_H264_HIGH_444_INTRA:
-                //case FF_PROFILE_H264_CAVLC_444:
+                case AV_PROFILE_H264_BASELINE: return H264Baseline;
+                case AV_PROFILE_H264_CONSTRAINED_BASELINE: return H264ConstrainedBaseline;
+                case AV_PROFILE_H264_MAIN:     return H264Main;
+                case AV_PROFILE_H264_EXTENDED: return H264Extended;
+                case AV_PROFILE_H264_HIGH:     return H264High;
+                case AV_PROFILE_H264_HIGH_10:  return H264High10;
+                //case AV_PROFILE_H264_HIGH_10_INTRA:
+                //case AV_PROFILE_H264_MULTIVIEW_HIGH:
+                case AV_PROFILE_H264_HIGH_422: return H264High422;
+                //case AV_PROFILE_H264_HIGH_422_INTRA:
+                //case AV_PROFILE_H264_STEREO_HIGH:
+                case AV_PROFILE_H264_HIGH_444: return H264High444;
+                //case AV_PROFILE_H264_HIGH_444_PREDICTIVE:
+                //case AV_PROFILE_H264_HIGH_444_INTRA:
+                //case AV_PROFILE_H264_CAVLC_444:
             }
             break;
         case AV_CODEC_ID_HEVC:
             switch (Profile)
             {
-                case FF_PROFILE_HEVC_MAIN:    return HEVCMain;
-                case FF_PROFILE_HEVC_MAIN_10: return HEVCMain10;
-                case FF_PROFILE_HEVC_MAIN_STILL_PICTURE: return HEVCMainStill;
-                case FF_PROFILE_HEVC_REXT:    return HEVCRext;
+                case AV_PROFILE_HEVC_MAIN:    return HEVCMain;
+                case AV_PROFILE_HEVC_MAIN_10: return HEVCMain10;
+                case AV_PROFILE_HEVC_MAIN_STILL_PICTURE: return HEVCMainStill;
+                case AV_PROFILE_HEVC_REXT:    return HEVCRext;
             }
             break;
         case AV_CODEC_ID_VC1:
             switch (Profile)
             {
-                case FF_PROFILE_VC1_SIMPLE:   return VC1Simple;
-                case FF_PROFILE_VC1_MAIN:     return VC1Main;
-                case FF_PROFILE_VC1_COMPLEX:  return VC1Complex;
-                case FF_PROFILE_VC1_ADVANCED: return VC1Advanced;
+                case AV_PROFILE_VC1_SIMPLE:   return VC1Simple;
+                case AV_PROFILE_VC1_MAIN:     return VC1Main;
+                case AV_PROFILE_VC1_COMPLEX:  return VC1Complex;
+                case AV_PROFILE_VC1_ADVANCED: return VC1Advanced;
             }
             break;
         case AV_CODEC_ID_VP8: return VP8;
         case AV_CODEC_ID_VP9:
             switch (Profile)
             {
-                case FF_PROFILE_VP9_0: return VP9_0;
-                case FF_PROFILE_VP9_1: return VP9_1;
-                case FF_PROFILE_VP9_2: return VP9_2;
-                case FF_PROFILE_VP9_3: return VP9_3;
+                case AV_PROFILE_VP9_0: return VP9_0;
+                case AV_PROFILE_VP9_1: return VP9_1;
+                case AV_PROFILE_VP9_2: return VP9_2;
+                case AV_PROFILE_VP9_3: return VP9_3;
             }
             break;
         case AV_CODEC_ID_AV1:
             switch (Profile)
             {
-                case FF_PROFILE_AV1_MAIN: return AV1Main;
-                case FF_PROFILE_AV1_HIGH: return AV1High;
-                case FF_PROFILE_AV1_PROFESSIONAL: return AV1Professional;
+                case AV_PROFILE_AV1_MAIN: return AV1Main;
+                case AV_PROFILE_AV1_HIGH: return AV1High;
+                case AV_PROFILE_AV1_PROFESSIONAL: return AV1Professional;
             }
             break;
         case AV_CODEC_ID_MJPEG: return MJPEG;

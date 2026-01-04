@@ -355,15 +355,15 @@ static const AVFilterPad drawbox_vaapi_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_drawbox_vaapi = {
-    .name           = "drawbox_vaapi",
-    .description    = NULL_IF_CONFIG_SMALL("Draw a colored box on the input video."),
+const FFFilter ff_vf_drawbox_vaapi = {
+    .p.name         = "drawbox_vaapi",
+    .p.description  = NULL_IF_CONFIG_SMALL("Draw a colored box on the input video."),
+    .p.priv_class   = &drawbox_vaapi_class,
     .priv_size      = sizeof(DrawboxVAAPIContext),
-    .priv_class     = &drawbox_vaapi_class,
     .init           = &drawbox_vaapi_init,
     .uninit         = &drawbox_vaapi_uninit,
     FILTER_INPUTS(drawbox_vaapi_inputs),
     FILTER_OUTPUTS(drawbox_vaapi_outputs),
-    FILTER_QUERY_FUNC(&ff_vaapi_vpp_query_formats),
+    FILTER_QUERY_FUNC2(&ff_vaapi_vpp_query_formats),
     .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 };

@@ -44,14 +44,20 @@ static inline int err_merge(int err0, int err1)
     return (err0 < 0) ? err0 : FFMIN(err1, 0);
 }
 
-static inline void pkt_move(void *dst, void *src)
+/**
+ * Wrapper calling av_frame_side_data_clone() in a loop for all source entries.
+ * It does not clear dst beforehand. */
+static inline int clone_side_data(AVFrameSideData ***dst, int *nb_dst,
+                                  AVFrameSideData * const *src, int nb_src,
+                                  unsigned int flags)
 {
-    av_packet_move_ref(dst, src);
-}
+    for (int i = 0; i < nb_src; i++) {
+        int ret = av_frame_side_data_clone(dst, nb_dst, src[i], flags);
+        if (ret < 0)
+            return ret;
+    }
 
-static inline void frame_move(void *dst, void *src)
-{
-    av_frame_move_ref(dst, src);
+    return 0;
 }
 
 #endif // FFTOOLS_FFMPEG_UTILS_H

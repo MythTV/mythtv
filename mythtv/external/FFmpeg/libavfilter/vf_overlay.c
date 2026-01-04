@@ -55,9 +55,6 @@ static const char *const var_names[] = {
     "x",
     "y",
     "n",            ///< number of frame
-#if FF_API_FRAME_PKT
-    "pos",          ///< position in the file
-#endif
     "t",            ///< timestamp expressed in seconds
     NULL
 };
@@ -161,9 +158,11 @@ static const enum AVPixelFormat alpha_pix_fmts[] = {
     AV_PIX_FMT_BGRA, AV_PIX_FMT_GBRAP, AV_PIX_FMT_NONE
 };
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
-    OverlayContext *s = ctx->priv;
+    const OverlayContext *s = ctx->priv;
 
     /* overlay formats contains alpha, for avoiding conversion with alpha information loss */
     static const enum AVPixelFormat main_pix_fmts_yuv420[] = {
@@ -268,18 +267,18 @@ static int query_formats(AVFilterContext *ctx)
         overlay_formats = overlay_pix_fmts_gbrp;
         break;
     case OVERLAY_FORMAT_AUTO:
-        return ff_set_common_formats_from_list(ctx, alpha_pix_fmts);
+        return ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, alpha_pix_fmts);
     default:
         av_assert0(0);
     }
 
     formats = ff_make_format_list(main_formats);
-    if ((ret = ff_formats_ref(formats, &ctx->inputs[MAIN]->outcfg.formats)) < 0 ||
-        (ret = ff_formats_ref(formats, &ctx->outputs[MAIN]->incfg.formats)) < 0)
+    if ((ret = ff_formats_ref(formats, &cfg_in[MAIN]->formats)) < 0 ||
+        (ret = ff_formats_ref(formats, &cfg_out[MAIN]->formats)) < 0)
         return ret;
 
     return ff_formats_ref(ff_make_format_list(overlay_formats),
-                          &ctx->inputs[OVERLAY]->outcfg.formats);
+                          &cfg_in[OVERLAY]->formats);
 }
 
 static int config_input_overlay(AVFilterLink *inlink)
@@ -303,9 +302,6 @@ static int config_input_overlay(AVFilterLink *inlink)
     s->var_values[VAR_Y]     = NAN;
     s->var_values[VAR_N]     = 0;
     s->var_values[VAR_T]     = NAN;
-#if FF_API_FRAME_PKT
-    s->var_values[VAR_POS]   = NAN;
-#endif
 
     if ((ret = set_expr(&s->x_pexpr,      s->x_expr,      "x",      ctx)) < 0 ||
         (ret = set_expr(&s->y_pexpr,      s->y_expr,      "y",      ctx)) < 0)
@@ -356,6 +352,9 @@ static int config_output(AVFilterLink *outlink)
 // (((x) << 16) - ((x) << 9) + (x)) is a faster version of: 255 * 255 * x
 // ((((x) + (y)) << 8) - ((x) + (y)) - (y) * (x)) is a faster version of: 255 * (x + y)
 #define UNPREMULTIPLY_ALPHA(x, y) ((((x) << 16) - ((x) << 9) + (x)) / ((((x) + (y)) << 8) - ((x) + (y)) - (y) * (x)))
+
+#define PTR_ADD(TYPE, ptr, byte_addend) ((TYPE*)((uint8_t*)ptr + (byte_addend)))
+#define CPTR_ADD(TYPE, ptr, byte_addend) ((const TYPE*)((const uint8_t*)ptr + (byte_addend)))
 
 /**
  * Blend image in src to destination buffer dst at position (x, y).
@@ -448,7 +447,7 @@ static av_always_inline void blend_slice_packed_rgb(AVFilterContext *ctx,
     }
 }
 
-#define DEFINE_BLEND_PLANE(depth, nbits)                                                                   \
+#define DEFINE_BLEND_PLANE(depth, T, nbits)                                                                \
 static av_always_inline void blend_plane_##depth##_##nbits##bits(AVFilterContext *ctx,                     \
                                          AVFrame *dst, const AVFrame *src,                                 \
                                          int src_w, int src_h,                                             \
@@ -471,42 +470,36 @@ static av_always_inline void blend_plane_##depth##_##nbits##bits(AVFilterContext
     int dst_hp = AV_CEIL_RSHIFT(dst_h, vsub);                                                              \
     int yp = y>>vsub;                                                                                      \
     int xp = x>>hsub;                                                                                      \
-    uint##depth##_t *s, *sp, *d, *dp, *dap, *a, *da, *ap;                                                  \
-    int jmax, j, k, kmax;                                                                                  \
-    int slice_start, slice_end;                                                                            \
-    const uint##depth##_t max = (1 << nbits) - 1;                                                          \
-    const uint##depth##_t mid = (1 << (nbits -1)) ;                                                        \
-    int bytes = depth / 8;                                                                                 \
+    const T max = (1 << nbits) - 1;                                                                        \
+    const T mid = (1 << (nbits - 1));                                                                      \
                                                                                                            \
-    dst_step /= bytes;                                                                                     \
-    j = FFMAX(-yp, 0);                                                                                     \
-    jmax = FFMIN3(-yp + dst_hp, FFMIN(src_hp, dst_hp), yp + src_hp);                                       \
+    const int jmin = FFMAX(-yp, 0), jmax = FFMIN3(-yp + dst_hp, FFMIN(src_hp, dst_hp), yp + src_hp);       \
+    const int kmin = FFMAX(-xp, 0), kmax = FFMIN(-xp + dst_wp, src_wp);                                    \
+    const int slice_start = jmin + (jmax *  jobnr)      / nb_jobs;                                         \
+    const int slice_end   = jmin + (jmax * (jobnr + 1)) / nb_jobs;                                         \
                                                                                                            \
-    slice_start = j + (jmax * jobnr) / nb_jobs;                                                            \
-    slice_end = j + (jmax * (jobnr+1)) / nb_jobs;                                                          \
-                                                                                                           \
-    sp = (uint##depth##_t *)(src->data[i] + (slice_start) * src->linesize[i]);                             \
-    dp = (uint##depth##_t *)(dst->data[dst_plane]                                                          \
+    const uint8_t *sp = src->data[i] + (slice_start) * src->linesize[i];                                   \
+    uint8_t       *dp = dst->data[dst_plane]                                                               \
                       + (yp + slice_start) * dst->linesize[dst_plane]                                      \
-                      + dst_offset);                                                                       \
-    ap = (uint##depth##_t *)(src->data[3] + (slice_start << vsub) * src->linesize[3]);                     \
-    dap = (uint##depth##_t *)(dst->data[3] + ((yp + slice_start) << vsub) * dst->linesize[3]);             \
+                      + dst_offset;                                                                        \
+    const uint8_t *ap = src->data[3] + (slice_start << vsub) * src->linesize[3];                           \
+    const uint8_t *dap = main_has_alpha ? dst->data[3] + ((yp + slice_start) << vsub) * dst->linesize[3] : NULL; \
                                                                                                            \
-    for (j = slice_start; j < slice_end; j++) {                                                            \
-        k = FFMAX(-xp, 0);                                                                                 \
-        d = dp + (xp+k) * dst_step;                                                                        \
-        s = sp + k;                                                                                        \
-        a = ap + (k<<hsub);                                                                                \
-        da = dap + ((xp+k) << hsub);                                                                       \
-        kmax = FFMIN(-xp + dst_wp, src_wp);                                                                \
+    for (int j = slice_start; j < slice_end; ++j) {                                                        \
+        int k = kmin;                                                                                      \
+        const T  *s = (const T *)sp + k;                                                                   \
+        const T  *a = (const T *)ap + (k << hsub);                                                         \
+        const T *da = main_has_alpha ? (T *)dap + ((xp + k) << hsub) : NULL;                               \
+        T *d  = (T *)(dp + (xp + k) * dst_step);                                                           \
                                                                                                            \
         if (nbits == 8 && ((vsub && j+1 < src_hp) || !vsub) && octx->blend_row[i]) {                       \
             int c = octx->blend_row[i]((uint8_t*)d, (uint8_t*)da, (uint8_t*)s,                             \
                     (uint8_t*)a, kmax - k, src->linesize[3]);                                              \
                                                                                                            \
             s += c;                                                                                        \
-            d += dst_step * c;                                                                             \
-            da += (1 << hsub) * c;                                                                         \
+            d  = PTR_ADD(T, d, dst_step * c);                                                              \
+            if (main_has_alpha)                                                                            \
+                da += (1 << hsub) * c;                                                                     \
             a += (1 << hsub) * c;                                                                          \
             k += c;                                                                                        \
         }                                                                                                  \
@@ -515,13 +508,14 @@ static av_always_inline void blend_plane_##depth##_##nbits##bits(AVFilterContext
                                                                                                            \
             /* average alpha for color components, improve quality */                                      \
             if (hsub && vsub && j+1 < src_hp && k+1 < src_wp) {                                            \
-                alpha = (a[0] + a[src->linesize[3]] +                                                      \
-                         a[1] + a[src->linesize[3]+1]) >> 2;                                               \
+                const T *next_line = CPTR_ADD(T, a, src->linesize[3]);                                     \
+                alpha = (a[0] + next_line[0] +                                                             \
+                         a[1] + next_line[1]) >> 2;                                                        \
             } else if (hsub || vsub) {                                                                     \
                 alpha_h = hsub && k+1 < src_wp ?                                                           \
                     (a[0] + a[1]) >> 1 : a[0];                                                             \
                 alpha_v = vsub && j+1 < src_hp ?                                                           \
-                    (a[0] + a[src->linesize[3]]) >> 1 : a[0];                                              \
+                    (a[0] + *CPTR_ADD(T, a, src->linesize[3])) >> 1 : a[0];                                \
                 alpha = (alpha_v + alpha_h) >> 1;                                                          \
             } else                                                                                         \
                 alpha = a[0];                                                                              \
@@ -531,13 +525,14 @@ static av_always_inline void blend_plane_##depth##_##nbits##bits(AVFilterContext
                 /* average alpha for color components, improve quality */                                  \
                 uint8_t alpha_d;                                                                           \
                 if (hsub && vsub && j+1 < src_hp && k+1 < src_wp) {                                        \
-                    alpha_d = (da[0] + da[dst->linesize[3]] +                                              \
-                               da[1] + da[dst->linesize[3]+1]) >> 2;                                       \
+                    const T *next_line = CPTR_ADD(T, da, dst->linesize[3]);                                \
+                    alpha_d = (da[0] + next_line[0] +                                                      \
+                               da[1] + next_line[1]) >> 2;                                                 \
                 } else if (hsub || vsub) {                                                                 \
                     alpha_h = hsub && k+1 < src_wp ?                                                       \
                         (da[0] + da[1]) >> 1 : da[0];                                                      \
                     alpha_v = vsub && j+1 < src_hp ?                                                       \
-                        (da[0] + da[dst->linesize[3]]) >> 1 : da[0];                                       \
+                        (da[0] + *CPTR_ADD(T, da, dst->linesize[3])) >> 1 : da[0];                         \
                     alpha_d = (alpha_v + alpha_h) >> 1;                                                    \
                 } else                                                                                     \
                     alpha_d = da[0];                                                                       \
@@ -563,48 +558,44 @@ static av_always_inline void blend_plane_##depth##_##nbits##bits(AVFilterContext
                 }                                                                                          \
             }                                                                                              \
             s++;                                                                                           \
-            d += dst_step;                                                                                 \
-            da += 1 << hsub;                                                                               \
+            d  = PTR_ADD(T, d, dst_step);                                                                  \
+            if (main_has_alpha)                                                                            \
+                da += 1 << hsub;                                                                           \
             a += 1 << hsub;                                                                                \
         }                                                                                                  \
-        dp += dst->linesize[dst_plane] / bytes;                                                            \
-        sp += src->linesize[i] / bytes;                                                                    \
-        ap += (1 << vsub) * src->linesize[3] / bytes;                                                      \
-        dap += (1 << vsub) * dst->linesize[3] / bytes;                                                     \
+        dp += dst->linesize[dst_plane];                                                                    \
+        sp += src->linesize[i];                                                                            \
+        ap += (1 << vsub) * src->linesize[3];                                                              \
+        if (main_has_alpha)                                                                                \
+            dap += (1 << vsub) * dst->linesize[3];                                                         \
     }                                                                                                      \
 }
-DEFINE_BLEND_PLANE(8, 8)
-DEFINE_BLEND_PLANE(16, 10)
+DEFINE_BLEND_PLANE(8,  uint8_t,  8)
+DEFINE_BLEND_PLANE(16, uint16_t, 10)
 
-#define DEFINE_ALPHA_COMPOSITE(depth, nbits)                                                               \
+#define DEFINE_ALPHA_COMPOSITE(depth, T, nbits)                                                            \
 static inline void alpha_composite_##depth##_##nbits##bits(const AVFrame *src, const AVFrame *dst,         \
                                    int src_w, int src_h,                                                   \
                                    int dst_w, int dst_h,                                                   \
                                    int x, int y,                                                           \
                                    int jobnr, int nb_jobs)                                                 \
 {                                                                                                          \
-    uint##depth##_t alpha;          /* the amount of overlay to blend on to main */                        \
-    uint##depth##_t *s, *sa, *d, *da;                                                                      \
-    int i, imax, j, jmax;                                                                                  \
-    int slice_start, slice_end;                                                                            \
-    const uint##depth##_t max = (1 << nbits) - 1;                                                          \
-    int bytes = depth / 8;                                                                                 \
+    T alpha;          /* the amount of overlay to blend on to main */                                      \
+    const T max = (1 << nbits) - 1;                                                                        \
                                                                                                            \
-    imax = FFMIN3(-y + dst_h, FFMIN(src_h, dst_h), y + src_h);                                             \
-    i = FFMAX(-y, 0);                                                                                      \
+    const int imin = FFMAX(-y, 0), imax = FFMIN3(-y + dst_h, FFMIN(src_h, dst_h), y + src_h);              \
+    const int jmin = FFMAX(-x, 0), jmax = FFMIN(-x + dst_w, src_w);                                        \
+    const int slice_start = imin + ( imax *  jobnr)      / nb_jobs;                                        \
+    const int slice_end   = imin + ((imax * (jobnr + 1)) / nb_jobs);                                       \
                                                                                                            \
-    slice_start = i + (imax * jobnr) / nb_jobs;                                                            \
-    slice_end = i + ((imax * (jobnr+1)) / nb_jobs);                                                        \
+    const uint8_t *sa = src->data[3] +     (slice_start) * src->linesize[3];                               \
+    uint8_t       *da = dst->data[3] + (y + slice_start) * dst->linesize[3];                               \
                                                                                                            \
-    sa = (uint##depth##_t *)(src->data[3] + (slice_start) * src->linesize[3]);                             \
-    da = (uint##depth##_t *)(dst->data[3] + (y + slice_start) * dst->linesize[3]);                         \
+    for (int i = slice_start; i < slice_end; ++i) {                                                        \
+        const T *s = (const T *)sa + jmin;                                                                 \
+        T *d = (T *)da + x + jmin;                                                                         \
                                                                                                            \
-    for (i = slice_start; i < slice_end; i++) {                                                            \
-        j = FFMAX(-x, 0);                                                                                  \
-        s = sa + j;                                                                                        \
-        d = da + x+j;                                                                                      \
-                                                                                                           \
-        for (jmax = FFMIN(-x + dst_w, src_w); j < jmax; j++) {                                             \
+        for (int j = jmin; j < jmax; ++j) {                                                                \
             alpha = *s;                                                                                    \
             if (alpha != 0 && alpha != max) {                                                              \
                 uint8_t alpha_d = *d;                                                                      \
@@ -622,12 +613,12 @@ static inline void alpha_composite_##depth##_##nbits##bits(const AVFrame *src, c
             d += 1;                                                                                        \
             s += 1;                                                                                        \
         }                                                                                                  \
-        da += dst->linesize[3] / bytes;                                                                    \
-        sa += src->linesize[3] / bytes;                                                                    \
+        da += dst->linesize[3];                                                                            \
+        sa += src->linesize[3];                                                                            \
     }                                                                                                      \
 }
-DEFINE_ALPHA_COMPOSITE(8, 8)
-DEFINE_ALPHA_COMPOSITE(16, 10)
+DEFINE_ALPHA_COMPOSITE(8,  uint8_t,  8)
+DEFINE_ALPHA_COMPOSITE(16, uint16_t, 10)
 
 #define DEFINE_BLEND_SLICE_YUV(depth, nbits)                                                               \
 static av_always_inline void blend_slice_yuv_##depth##_##nbits##bits(AVFilterContext *ctx,                 \
@@ -703,28 +694,28 @@ static int blend_slice_##format_(AVFilterContext *ctx, void *arg, int jobnr, int
 }
 
 //                            FMT          FN             H  V  A  D
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv420,      yuv_8_8bits,   1, 1, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva420,     yuv_8_8bits,   1, 1, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv420p10,   yuv_16_10bits, 1, 1, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva420p10,  yuv_16_10bits, 1, 1, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv422p10,   yuv_16_10bits, 1, 0, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva422p10,  yuv_16_10bits, 1, 0, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv422,      yuv_8_8bits,   1, 0, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva422,     yuv_8_8bits,   1, 0, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv444,      yuv_8_8bits,   0, 0, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva444,     yuv_8_8bits,   0, 0, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv444p10,   yuv_16_10bits, 0, 0, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva444p10,  yuv_16_10bits, 0, 0, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(gbrp,        planar_rgb,    0, 0, 0, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(gbrap,       planar_rgb,    0, 0, 1, 1);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv420_pm,   yuv_8_8bits,   1, 1, 0, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva420_pm,  yuv_8_8bits,   1, 1, 1, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv422_pm,   yuv_8_8bits,   1, 0, 0, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva422_pm,  yuv_8_8bits,   1, 0, 1, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuv444_pm,   yuv_8_8bits,   0, 0, 0, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(yuva444_pm,  yuv_8_8bits,   0, 0, 1, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(gbrp_pm,     planar_rgb,    0, 0, 0, 0);
-DEFINE_BLEND_SLICE_PLANAR_FMT(gbrap_pm,    planar_rgb,    0, 0, 1, 0);
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv420,      yuv_8_8bits,   1, 1, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva420,     yuv_8_8bits,   1, 1, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv420p10,   yuv_16_10bits, 1, 1, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva420p10,  yuv_16_10bits, 1, 1, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv422p10,   yuv_16_10bits, 1, 0, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva422p10,  yuv_16_10bits, 1, 0, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv422,      yuv_8_8bits,   1, 0, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva422,     yuv_8_8bits,   1, 0, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv444,      yuv_8_8bits,   0, 0, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva444,     yuv_8_8bits,   0, 0, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv444p10,   yuv_16_10bits, 0, 0, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva444p10,  yuv_16_10bits, 0, 0, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(gbrp,        planar_rgb,    0, 0, 0, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(gbrap,       planar_rgb,    0, 0, 1, 1)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv420_pm,   yuv_8_8bits,   1, 1, 0, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva420_pm,  yuv_8_8bits,   1, 1, 1, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv422_pm,   yuv_8_8bits,   1, 0, 0, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva422_pm,  yuv_8_8bits,   1, 0, 1, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuv444_pm,   yuv_8_8bits,   0, 0, 0, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(yuva444_pm,  yuv_8_8bits,   0, 0, 1, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(gbrp_pm,     planar_rgb,    0, 0, 0, 0)
+DEFINE_BLEND_SLICE_PLANAR_FMT(gbrap_pm,    planar_rgb,    0, 0, 1, 0)
 
 #define DEFINE_BLEND_SLICE_PACKED_FMT(format_, blend_slice_fn_suffix_, main_has_alpha_, direct_) \
 static int blend_slice_##format_(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)        \
@@ -739,10 +730,10 @@ static int blend_slice_##format_(AVFilterContext *ctx, void *arg, int jobnr, int
 }
 
 //                            FMT      FN   A  D
-DEFINE_BLEND_SLICE_PACKED_FMT(rgb,     rgb, 0, 1);
-DEFINE_BLEND_SLICE_PACKED_FMT(rgba,    rgb, 1, 1);
-DEFINE_BLEND_SLICE_PACKED_FMT(rgb_pm,  rgb, 0, 0);
-DEFINE_BLEND_SLICE_PACKED_FMT(rgba_pm, rgb, 1, 0);
+DEFINE_BLEND_SLICE_PACKED_FMT(rgb,     rgb, 0, 1)
+DEFINE_BLEND_SLICE_PACKED_FMT(rgba,    rgb, 1, 1)
+DEFINE_BLEND_SLICE_PACKED_FMT(rgb_pm,  rgb, 0, 0)
+DEFINE_BLEND_SLICE_PACKED_FMT(rgba_pm, rgb, 1, 0)
 
 static int config_input_main(AVFilterLink *inlink)
 {
@@ -895,14 +886,6 @@ static int do_blend(FFFrameSync *fs)
         s->var_values[VAR_N] = inl->frame_count_out;
         s->var_values[VAR_T] = mainpic->pts == AV_NOPTS_VALUE ?
             NAN : mainpic->pts * av_q2d(inlink->time_base);
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-        {
-            int64_t pos = mainpic->pkt_pos;
-            s->var_values[VAR_POS] = pos == -1 ? NAN : pos;
-        }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
         s->var_values[VAR_OVERLAY_W] = s->var_values[VAR_OW] = second->width;
         s->var_values[VAR_OVERLAY_H] = s->var_values[VAR_OH] = second->height;
@@ -944,10 +927,11 @@ static int activate(AVFilterContext *ctx)
 
 #define OFFSET(x) offsetof(OverlayContext, x)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+#define TFLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_RUNTIME_PARAM
 
 static const AVOption overlay_options[] = {
-    { "x", "set the x expression", OFFSET(x_expr), AV_OPT_TYPE_STRING, {.str = "0"}, 0, 0, FLAGS },
-    { "y", "set the y expression", OFFSET(y_expr), AV_OPT_TYPE_STRING, {.str = "0"}, 0, 0, FLAGS },
+    { "x", "set the x expression", OFFSET(x_expr), AV_OPT_TYPE_STRING, {.str = "0"}, 0, 0, TFLAGS },
+    { "y", "set the y expression", OFFSET(y_expr), AV_OPT_TYPE_STRING, {.str = "0"}, 0, 0, TFLAGS },
     { "eof_action", "Action to take when encountering EOF from secondary input ",
         OFFSET(fs.opt_eof_action), AV_OPT_TYPE_INT, { .i64 = EOF_ACTION_REPEAT },
         EOF_ACTION_REPEAT, EOF_ACTION_PASS, .flags = FLAGS, .unit = "eof_action" },
@@ -998,19 +982,19 @@ static const AVFilterPad avfilter_vf_overlay_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_overlay = {
-    .name          = "overlay",
-    .description   = NULL_IF_CONFIG_SMALL("Overlay a video source on top of the input."),
+const FFFilter ff_vf_overlay = {
+    .p.name        = "overlay",
+    .p.description = NULL_IF_CONFIG_SMALL("Overlay a video source on top of the input."),
+    .p.priv_class  = &overlay_class,
+    .p.flags       = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
+                     AVFILTER_FLAG_SLICE_THREADS,
     .preinit       = overlay_framesync_preinit,
     .init          = init,
     .uninit        = uninit,
     .priv_size     = sizeof(OverlayContext),
-    .priv_class    = &overlay_class,
     .activate      = activate,
     .process_command = process_command,
     FILTER_INPUTS(avfilter_vf_overlay_inputs),
     FILTER_OUTPUTS(avfilter_vf_overlay_outputs),
-    FILTER_QUERY_FUNC(query_formats),
-    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL |
-                     AVFILTER_FLAG_SLICE_THREADS,
+    FILTER_QUERY_FUNC2(query_formats),
 };

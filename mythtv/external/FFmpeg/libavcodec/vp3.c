@@ -46,11 +46,10 @@
 #include "decode.h"
 #include "get_bits.h"
 #include "hpeldsp.h"
-#include "internal.h"
 #include "jpegquanttables.h"
 #include "mathops.h"
 #include "progressframe.h"
-#include "refstruct.h"
+#include "libavutil/refstruct.h"
 #include "thread.h"
 #include "videodsp.h"
 #include "vp3data.h"
@@ -370,7 +369,7 @@ static av_cold int vp3_decode_end(AVCodecContext *avctx)
     /* release all frames */
     vp3_decode_flush(avctx);
 
-    ff_refstruct_unref(&s->coeff_vlc);
+    av_refstruct_unref(&s->coeff_vlc);
 
     return 0;
 }
@@ -2346,7 +2345,7 @@ static av_cold int allocate_tables(AVCodecContext *avctx)
 }
 
 
-static av_cold void free_vlc_tables(FFRefStructOpaque unused, void *obj)
+static av_cold void free_vlc_tables(AVRefStructOpaque unused, void *obj)
 {
     CoeffVLCs *vlcs = obj;
 
@@ -2458,8 +2457,8 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
         }
     }
 
-    if (!avctx->internal->is_copy) {
-        CoeffVLCs *vlcs = ff_refstruct_alloc_ext(sizeof(*s->coeff_vlc), 0,
+    if (ff_thread_sync_ref(avctx, offsetof(Vp3DecodeContext, coeff_vlc)) != FF_THREAD_IS_COPY) {
+        CoeffVLCs *vlcs = av_refstruct_alloc_ext(sizeof(*s->coeff_vlc), 0,
                                                  NULL, free_vlc_tables);
         if (!vlcs)
             return AVERROR(ENOMEM);
@@ -2526,8 +2525,6 @@ static int vp3_update_thread_context(AVCodecContext *dst, const AVCodecContext *
     Vp3DecodeContext *s = dst->priv_data;
     const Vp3DecodeContext *s1 = src->priv_data;
     int qps_changed = 0;
-
-    ff_refstruct_replace(&s->coeff_vlc, s1->coeff_vlc);
 
     // copy previous frame data
     ref_frames(s, s1);
@@ -2713,7 +2710,7 @@ static int vp3_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                 mb_height_mul = get_bits(&gb, 5);
                 mb_height_div = get_bits(&gb, 3);
                 if (mb_width_mul != 1 || mb_width_div != 1 || mb_height_mul != 1 || mb_height_div != 1)
-                    avpriv_request_sample(s->avctx, "unexpected macroblock dimension multipler/divider");
+                    avpriv_request_sample(s->avctx, "unexpected macroblock dimension multiplier/divider");
 
                 if (get_bits(&gb, 2))
                     avpriv_request_sample(s->avctx, "unknown bits");

@@ -27,15 +27,18 @@
  * SpeedHQ encoder.
  */
 
+#include "libavutil/avassert.h"
 #include "libavutil/thread.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
+#include "mathops.h"
 #include "mpeg12data.h"
 #include "mpeg12vlc.h"
 #include "mpegvideo.h"
 #include "mpegvideodata.h"
 #include "mpegvideoenc.h"
+#include "put_bits.h"
 #include "rl.h"
 #include "speedhq.h"
 #include "speedhqenc.h"
@@ -59,7 +62,7 @@ static uint32_t speedhq_chr_dc_uni[512];
 static uint8_t uni_speedhq_ac_vlc_len[64 * 64 * 2];
 
 typedef struct SpeedHQEncContext {
-    MpegEncContext m;
+    MPVMainEncContext m;
 
     int slice_start;
 } SpeedHQEncContext;
@@ -95,64 +98,24 @@ static av_cold void speedhq_init_static_data(void)
                              ff_speedhq_vlc_table, uni_speedhq_ac_vlc_len);
 }
 
-av_cold int ff_speedhq_encode_init(MpegEncContext *s)
+static int speedhq_encode_picture_header(MPVMainEncContext *const m)
 {
-    static AVOnce init_static_once = AV_ONCE_INIT;
+    SpeedHQEncContext *const ctx = (SpeedHQEncContext*)m;
+    MPVEncContext *const s = &m->s;
 
-    if (s->width > 65500 || s->height > 65500) {
-        av_log(s, AV_LOG_ERROR, "SpeedHQ does not support resolutions above 65500x65500\n");
-        return AVERROR(EINVAL);
-    }
+    put_bits_assume_flushed(&s->pb);
 
-    // border is not implemented correctly at the moment, see ticket #10078
-    if (s->width % 16) {
-        av_log(s, AV_LOG_ERROR, "width must be a multiple of 16\n");
-        return AVERROR_PATCHWELCOME;
-    }
-
-    s->min_qcoeff = -2048;
-    s->max_qcoeff = 2047;
-
-    ff_thread_once(&init_static_once, speedhq_init_static_data);
-
-    s->intra_ac_vlc_length      =
-    s->intra_ac_vlc_last_length =
-    s->intra_chroma_ac_vlc_length      =
-    s->intra_chroma_ac_vlc_last_length = uni_speedhq_ac_vlc_len;
-
-    s->y_dc_scale_table =
-    s->c_dc_scale_table = ff_mpeg12_dc_scale_table[3];
-
-    switch (s->avctx->pix_fmt) {
-    case AV_PIX_FMT_YUV420P:
-        s->avctx->codec_tag = MKTAG('S','H','Q','0');
-        break;
-    case AV_PIX_FMT_YUV422P:
-        s->avctx->codec_tag = MKTAG('S','H','Q','2');
-        break;
-    case AV_PIX_FMT_YUV444P:
-        s->avctx->codec_tag = MKTAG('S','H','Q','4');
-        break;
-    default:
-        av_assert0(0);
-    }
-
-    return 0;
-}
-
-void ff_speedhq_encode_picture_header(MpegEncContext *s)
-{
-    SpeedHQEncContext *ctx = (SpeedHQEncContext*)s;
-
-    put_bits_le(&s->pb, 8, 100 - s->qscale * 2);  /* FIXME why doubled */
+    put_bits_le(&s->pb, 8, 100 - s->c.qscale * 2);  /* FIXME why doubled */
     put_bits_le(&s->pb, 24, 4);  /* no second field */
 
     ctx->slice_start = 4;
     /* length of first slice, will be filled out later */
     put_bits_le(&s->pb, 24, 0);
+
+    return 0;
 }
 
-void ff_speedhq_end_slice(MpegEncContext *s)
+void ff_speedhq_end_slice(MPVEncContext *const s)
 {
     SpeedHQEncContext *ctx = (SpeedHQEncContext*)s;
     int slice_len;
@@ -200,7 +163,7 @@ static inline void encode_dc(PutBitContext *pb, int diff, int component)
     }
 }
 
-static void encode_block(MpegEncContext *s, int16_t *block, int n)
+static void encode_block(MPVEncContext *const s, const int16_t block[], int n)
 {
     int alevel, level, last_non_zero, dc, i, j, run, last_index, sign;
     int code;
@@ -209,16 +172,16 @@ static void encode_block(MpegEncContext *s, int16_t *block, int n)
     /* DC coef */
     component = (n <= 3 ? 0 : (n&1) + 1);
     dc = block[0]; /* overflow is impossible */
-    val = s->last_dc[component] - dc;  /* opposite of most codecs */
+    val = s->c.last_dc[component] - dc;  /* opposite of most codecs */
     encode_dc(&s->pb, val, component);
-    s->last_dc[component] = dc;
+    s->c.last_dc[component] = dc;
 
     /* now quantify & encode AC coefs */
     last_non_zero = 0;
-    last_index = s->block_last_index[n];
+    last_index = s->c.block_last_index[n];
 
     for (i = 1; i <= last_index; i++) {
-        j     = s->intra_scantable.permutated[i];
+        j     = s->c.intra_scantable.permutated[i];
         level = block[j];
 
         /* encode using VLC */
@@ -236,11 +199,10 @@ static void encode_block(MpegEncContext *s, int16_t *block, int n)
                             ff_speedhq_vlc_table[code][0] | (sign << ff_speedhq_vlc_table[code][1]));
             } else {
                 /* escape seems to be pretty rare <5% so I do not optimize it;
-                 * the values correspond to ff_speedhq_vlc_table[121] */
-                put_bits_le(&s->pb, 6, 32);
-                /* escape: only clip in this case */
-                put_bits_le(&s->pb, 6, run);
-                put_bits_le(&s->pb, 12, level + 2048);
+                 * The following encodes the escape value 100000b together with
+                 * run and level. */
+                put_bits_le(&s->pb, 6 + 6 + 12, 0x20 | run << 6 |
+                                                (level + 2048) << 12);
             }
             last_non_zero = i;
         }
@@ -249,13 +211,14 @@ static void encode_block(MpegEncContext *s, int16_t *block, int n)
     put_bits_le(&s->pb, 4, 6);
 }
 
-void ff_speedhq_encode_mb(MpegEncContext *s, int16_t block[12][64])
+static void speedhq_encode_mb(MPVEncContext *const s, int16_t block[12][64],
+                              int unused_x, int unused_y)
 {
     int i;
     for(i=0;i<6;i++) {
         encode_block(s, block[i], i);
     }
-    if (s->chroma_format == CHROMA_444) {
+    if (s->c.chroma_format == CHROMA_444) {
         encode_block(s, block[8], 8);
         encode_block(s, block[9], 9);
 
@@ -264,7 +227,7 @@ void ff_speedhq_encode_mb(MpegEncContext *s, int16_t block[12][64])
 
         encode_block(s, block[10], 10);
         encode_block(s, block[11], 11);
-    } else if (s->chroma_format == CHROMA_422) {
+    } else if (s->c.chroma_format == CHROMA_422) {
         encode_block(s, block[6], 6);
         encode_block(s, block[7], 7);
     }
@@ -272,20 +235,59 @@ void ff_speedhq_encode_mb(MpegEncContext *s, int16_t block[12][64])
     s->i_tex_bits += get_bits_diff(s);
 }
 
-static int ff_speedhq_mb_rows_in_slice(int slice_num, int mb_height)
+static av_cold int speedhq_encode_init(AVCodecContext *avctx)
 {
-    return mb_height / 4 + (slice_num < (mb_height % 4));
-}
+    static AVOnce init_static_once = AV_ONCE_INIT;
+    MPVMainEncContext *const m = avctx->priv_data;
+    MPVEncContext *const s = &m->s;
+    int ret;
 
-int ff_speedhq_mb_y_order_to_mb(int mb_y_order, int mb_height, int *first_in_slice)
-{
-    int slice_num = 0;
-    while (mb_y_order >= ff_speedhq_mb_rows_in_slice(slice_num, mb_height)) {
-         mb_y_order -= ff_speedhq_mb_rows_in_slice(slice_num, mb_height);
-         slice_num++;
+    if (avctx->width > 65500 || avctx->height > 65500) {
+        av_log(avctx, AV_LOG_ERROR, "SpeedHQ does not support resolutions above 65500x65500\n");
+        return AVERROR(EINVAL);
     }
-    *first_in_slice = (mb_y_order == 0);
-    return mb_y_order * 4 + slice_num;
+
+    // border is not implemented correctly at the moment, see ticket #10078
+    if (avctx->width % 16) {
+        av_log(avctx, AV_LOG_ERROR, "width must be a multiple of 16\n");
+        return AVERROR_PATCHWELCOME;
+    }
+
+    switch (avctx->pix_fmt) {
+    case AV_PIX_FMT_YUV420P:
+        avctx->codec_tag = MKTAG('S','H','Q','0');
+        break;
+    case AV_PIX_FMT_YUV422P:
+        avctx->codec_tag = MKTAG('S','H','Q','2');
+        break;
+    case AV_PIX_FMT_YUV444P:
+        avctx->codec_tag = MKTAG('S','H','Q','4');
+        break;
+    default:
+        av_unreachable("Already checked via CODEC_PIXFMTS");
+    }
+
+    m->encode_picture_header = speedhq_encode_picture_header;
+    s->encode_mb             = speedhq_encode_mb;
+
+    s->min_qcoeff = -2048;
+    s->max_qcoeff = 2047;
+
+    s->intra_ac_vlc_length      =
+    s->intra_ac_vlc_last_length =
+    s->intra_chroma_ac_vlc_length      =
+    s->intra_chroma_ac_vlc_last_length = uni_speedhq_ac_vlc_len;
+
+    s->c.y_dc_scale_table =
+    s->c.c_dc_scale_table = ff_mpeg12_dc_scale_table[3];
+
+    ret = ff_mpv_encode_init(avctx);
+    if (ret < 0)
+        return ret;
+
+    ff_thread_once(&init_static_once, speedhq_init_static_data);
+
+    return 0;
 }
 
 const FFCodec ff_speedhq_encoder = {
@@ -294,15 +296,12 @@ const FFCodec ff_speedhq_encoder = {
     .p.type         = AVMEDIA_TYPE_VIDEO,
     .p.id           = AV_CODEC_ID_SPEEDHQ,
     .p.priv_class   = &ff_mpv_enc_class,
-    .p.capabilities = AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size = sizeof(SpeedHQEncContext),
-    .init           = ff_mpv_encode_init,
+    .init           = speedhq_encode_init,
     FF_CODEC_ENCODE_CB(ff_mpv_encode_picture),
     .close          = ff_mpv_encode_end,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .color_ranges   = AVCOL_RANGE_MPEG,
-    .p.pix_fmts     = (const enum AVPixelFormat[]) {
-        AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P,
-        AV_PIX_FMT_NONE
-    },
+    CODEC_PIXFMTS(AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P),
 };

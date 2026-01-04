@@ -928,6 +928,32 @@ static int truncated_binary_decode(VVCLocalContext *lc, const int c_max)
     return v;
 }
 
+// 9.3.3.5 k-th order Exp - Golomb binarization process
+static int kth_order_egk_decode(CABACContext *c, int k, const int max)
+{
+    int bit    = 1;
+    int value  = 0;
+    int symbol = 0;
+
+    while (bit) {
+        bit = get_cabac_bypass(c);
+        if (max - value < (bit << k))
+            return AVERROR_INVALIDDATA;
+        value += bit << k++;
+    }
+
+    if (--k) {
+        for (int i = 0; i < k; i++)
+            symbol = (symbol << 1) | get_cabac_bypass(c);
+        value += symbol;
+    }
+
+    if (value > max)
+        return AVERROR_INVALIDDATA;
+
+    return value;
+}
+
 // 9.3.3.6 Limited k-th order Exp-Golomb binarization process
 static int limited_kth_order_egk_decode(CABACContext *c, const int k, const int max_pre_ext_len, const int trunc_suffix_len)
 {
@@ -945,6 +971,17 @@ static int limited_kth_order_egk_decode(CABACContext *c, const int k, const int 
     }
     val += ((1 << pre_ext_len) - 1) << k;
     return val;
+}
+
+// 9.3.3.7 Fixed-length binarization process
+static int fixed_length_decode(CABACContext* c, const int len)
+{
+    int value = 0;
+
+    for (int i = 0; i < len; i++)
+        value = (value << 1) | get_cabac_bypass(c);
+
+    return value;
 }
 
 static av_always_inline
@@ -990,11 +1027,7 @@ int ff_vvc_sao_type_idx_decode(VVCLocalContext *lc)
 
 int ff_vvc_sao_band_position_decode(VVCLocalContext *lc)
 {
-    int value = get_cabac_bypass(&lc->ep->cc);
-
-    for (int i = 0; i < 4; i++)
-        value = (value << 1) | get_cabac_bypass(&lc->ep->cc);
-    return value;
+    return fixed_length_decode(&lc->ep->cc, 5);
 }
 
 int ff_vvc_sao_offset_abs_decode(VVCLocalContext *lc)
@@ -1014,9 +1047,7 @@ int ff_vvc_sao_offset_sign_decode(VVCLocalContext *lc)
 
 int ff_vvc_sao_eo_class_decode(VVCLocalContext *lc)
 {
-    int ret = get_cabac_bypass(&lc->ep->cc) << 1;
-    ret    |= get_cabac_bypass(&lc->ep->cc);
-    return ret;
+    return (get_cabac_bypass(&lc->ep->cc) << 1) | get_cabac_bypass(&lc->ep->cc);
 }
 
 int ff_vvc_alf_ctb_flag(VVCLocalContext *lc, const int rx, const int ry, const int c_idx)
@@ -1257,11 +1288,19 @@ int ff_vvc_pred_mode_ibc_flag(VVCLocalContext *lc, const int is_chroma)
     return GET_CABAC(PRED_MODE_IBC_FLAG + inc);
 }
 
+static av_always_inline
+uint8_t get_mip_inc(VVCLocalContext *lc, const uint8_t *ctx)
+{
+    uint8_t left = 0, top = 0;
+    get_left_top(lc, &left, &top, lc->cu->x0, lc->cu->y0, ctx, ctx);
+    return (left & 1) + (top & 1);
+}
+
 int ff_vvc_intra_mip_flag(VVCLocalContext *lc, const uint8_t *intra_mip_flag)
 {
     const int w   = lc->cu->cb_width;
     const int h   = lc->cu->cb_height;
-    const int inc =  (w > h * 2 || h > w * 2) ? 3 : get_inc(lc, intra_mip_flag);
+    const int inc =  (w > h * 2 || h > w * 2) ? 3 : get_mip_inc(lc, intra_mip_flag);
     return GET_CABAC(INTRA_MIP_FLAG + inc);
 }
 
@@ -1341,6 +1380,58 @@ int ff_vvc_intra_chroma_pred_mode(VVCLocalContext *lc)
     if (!GET_CABAC(INTRA_CHROMA_PRED_MODE))
         return 4;
     return (get_cabac_bypass(&lc->ep->cc) << 1) | get_cabac_bypass(&lc->ep->cc);
+}
+
+int ff_vvc_palette_predictor_run(VVCLocalContext *lc, const int max)
+{
+    return kth_order_egk_decode(&lc->ep->cc, 0, max);
+}
+
+int ff_vvc_num_signalled_palette_entries(VVCLocalContext *lc, const int max)
+{
+    return kth_order_egk_decode(&lc->ep->cc, 0, max);
+}
+
+int ff_vvc_new_palette_entries(VVCLocalContext *lc, const int bit_depth)
+{
+    return fixed_length_decode(&lc->ep->cc, bit_depth);
+}
+
+bool ff_vvc_palette_escape_val_present_flag(VVCLocalContext *lc)
+{
+    return get_cabac_bypass(&lc->ep->cc);
+}
+
+bool ff_vvc_palette_transpose_flag(VVCLocalContext *lc)
+{
+    return GET_CABAC(PALETTE_TRANSPOSE_FLAG);
+}
+
+bool ff_vvc_run_copy_flag(VVCLocalContext *lc, const int prev_run_type, const int prev_run_position, const int cur_pos)
+{
+    uint8_t run_left_lut[] = { 0, 1, 2, 3, 4 };
+    uint8_t run_top_lut[] = { 5, 6, 6, 7, 7 };
+
+    int bin_dist = cur_pos - prev_run_position - 1;
+    uint8_t *run_lut = prev_run_type == 1 ? run_top_lut : run_left_lut;
+    uint8_t ctx_inc = bin_dist <= 4 ? run_lut[bin_dist] : run_lut[4];
+
+    return GET_CABAC(RUN_COPY_FLAG + ctx_inc);
+}
+
+bool ff_vvc_copy_above_palette_indices_flag(VVCLocalContext *lc)
+{
+    return GET_CABAC(COPY_ABOVE_PALETTE_INDICES_FLAG);
+}
+
+int ff_vvc_palette_idx_idc(VVCLocalContext *lc, const int max_palette_index, const bool adjust)
+{
+    return truncated_binary_decode(lc, max_palette_index - adjust);
+}
+
+int ff_vvc_palette_escape_val(VVCLocalContext *lc, const int max)
+{
+    return kth_order_egk_decode(&lc->ep->cc, 5, max);
 }
 
 int ff_vvc_general_merge_flag(VVCLocalContext *lc)
@@ -1450,12 +1541,7 @@ int ff_vvc_merge_idx(VVCLocalContext *lc)
 
 int ff_vvc_merge_gpm_partition_idx(VVCLocalContext *lc)
 {
-    int i = 0;
-
-    for (int j = 0; j < 6; j++)
-        i = (i << 1) | get_cabac_bypass(&lc->ep->cc);
-
-    return i;
+    return fixed_length_decode(&lc->ep->cc, 6);
 }
 
 int ff_vvc_merge_gpm_idx(VVCLocalContext *lc, const int idx)
@@ -1620,6 +1706,11 @@ int ff_vvc_tu_y_coded_flag(VVCLocalContext *lc)
         inc = 2 + lc->parse.prev_tu_cbf_y;
     lc->parse.prev_tu_cbf_y = GET_CABAC(TU_Y_CODED_FLAG + inc);
     return lc->parse.prev_tu_cbf_y;
+}
+
+int ff_vvc_cu_act_enabled_flag(VVCLocalContext *lc)
+{
+    return GET_CABAC(CU_ACT_ENABLED_FLAG);
 }
 
 int ff_vvc_cu_qp_delta_abs(VVCLocalContext *lc)

@@ -1,6 +1,6 @@
 /*
  * Resolume DXV encoder
- * Copyright (C) 2024 Connor Worley <connorbworley@gmail.com>
+ * Copyright (C) 2024 Emma Worley <emma@emma.gg>
  *
  * This file is part of FFmpeg.
  *
@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-#include "libavutil/crc.h"
+#include "libavcodec/hashtable.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
@@ -35,75 +35,17 @@
 #define DXV_HEADER_LENGTH 12
 
 /*
+ * Resolume will refuse to display frames that are not padded to 16x16 pixels.
+ */
+#define DXV_ALIGN(x) FFALIGN(x, 16)
+
+/*
  * DXV uses LZ-like back-references to avoid copying words that have already
  * appeared in the decompressed stream. Using a simple hash table (HT)
  * significantly speeds up the lookback process while encoding.
  */
-#define LOOKBACK_HT_ELEMS 0x40000
+#define LOOKBACK_HT_ELEMS 0x20202
 #define LOOKBACK_WORDS    0x20202
-
-typedef struct HTEntry {
-    uint32_t key;
-    uint32_t pos;
-} HTEntry;
-
-static void ht_init(HTEntry *ht)
-{
-    for (size_t i = 0; i < LOOKBACK_HT_ELEMS; i++) {
-        ht[i].pos = -1;
-    }
-}
-
-static uint32_t ht_lookup_and_upsert(HTEntry *ht, const AVCRC *hash_ctx,
-                                    uint32_t key, uint32_t pos)
-{
-    uint32_t ret = -1;
-    size_t hash = av_crc(hash_ctx, 0, (uint8_t*)&key, 4) % LOOKBACK_HT_ELEMS;
-    for (size_t i = hash; i < hash + LOOKBACK_HT_ELEMS; i++) {
-        size_t wrapped_index = i % LOOKBACK_HT_ELEMS;
-        HTEntry *entry = &ht[wrapped_index];
-        if (entry->key == key || entry->pos == -1) {
-            ret = entry->pos;
-            entry->key = key;
-            entry->pos = pos;
-            break;
-        }
-    }
-    return ret;
-}
-
-static void ht_delete(HTEntry *ht, const AVCRC *hash_ctx,
-                      uint32_t key, uint32_t pos)
-{
-    HTEntry *removed_entry = NULL;
-    size_t removed_hash;
-    size_t hash = av_crc(hash_ctx, 0, (uint8_t*)&key, 4) % LOOKBACK_HT_ELEMS;
-
-    for (size_t i = hash; i < hash + LOOKBACK_HT_ELEMS; i++) {
-        size_t wrapped_index = i % LOOKBACK_HT_ELEMS;
-        HTEntry *entry = &ht[wrapped_index];
-        if (entry->pos == -1)
-            return;
-        if (removed_entry) {
-            size_t candidate_hash = av_crc(hash_ctx, 0, (uint8_t*)&entry->key, 4) % LOOKBACK_HT_ELEMS;
-            if ((wrapped_index > removed_hash && (candidate_hash <= removed_hash || candidate_hash > wrapped_index)) ||
-                (wrapped_index < removed_hash && (candidate_hash <= removed_hash && candidate_hash > wrapped_index))) {
-                *removed_entry = *entry;
-                entry->pos = -1;
-                removed_entry = entry;
-                removed_hash = wrapped_index;
-            }
-        } else if (entry->key == key) {
-            if (entry->pos <= pos) {
-                entry->pos = -1;
-                removed_entry = entry;
-                removed_hash = wrapped_index;
-            } else {
-                return;
-            }
-        }
-    }
-}
 
 typedef struct DXVEncContext {
     AVClass *class;
@@ -121,10 +63,9 @@ typedef struct DXVEncContext {
     DXVTextureFormat tex_fmt;
     int (*compress_tex)(AVCodecContext *avctx);
 
-    const AVCRC *crc_ctx;
-
-    HTEntry color_lookback_ht[LOOKBACK_HT_ELEMS];
-    HTEntry lut_lookback_ht[LOOKBACK_HT_ELEMS];
+    FFHashtableContext *color_ht;
+    FFHashtableContext *lut_ht;
+    FFHashtableContext *combo_ht;
 } DXVEncContext;
 
 /* Converts an index offset value to a 2-bit opcode and pushes it to a stream.
@@ -159,58 +100,59 @@ static int dxv_compress_dxt1(AVCodecContext *avctx)
     DXVEncContext *ctx = avctx->priv_data;
     PutByteContext *pbc = &ctx->pbc;
     void *value;
-    uint32_t color, lut, idx, color_idx, lut_idx, prev_pos, state = 16, pos = 2, op = 0;
+    uint32_t idx, combo_idx, prev_pos, old_pos, state = 16, pos = 0, op = 0;
 
-    ht_init(ctx->color_lookback_ht);
-    ht_init(ctx->lut_lookback_ht);
+    ff_hashtable_clear(ctx->color_ht);
+    ff_hashtable_clear(ctx->lut_ht);
+    ff_hashtable_clear(ctx->combo_ht);
+
+    ff_hashtable_set(ctx->combo_ht, ctx->tex_data, &pos);
 
     bytestream2_put_le32(pbc, AV_RL32(ctx->tex_data));
+    ff_hashtable_set(ctx->color_ht, ctx->tex_data, &pos);
+    pos++;
     bytestream2_put_le32(pbc, AV_RL32(ctx->tex_data + 4));
-
-    ht_lookup_and_upsert(ctx->color_lookback_ht, ctx->crc_ctx, AV_RL32(ctx->tex_data), 0);
-    ht_lookup_and_upsert(ctx->lut_lookback_ht, ctx->crc_ctx, AV_RL32(ctx->tex_data + 4), 1);
+    ff_hashtable_set(ctx->lut_ht, ctx->tex_data + 4, &pos);
+    pos++;
 
     while (pos + 2 <= ctx->tex_size / 4) {
-        idx = 0;
-
-        color = AV_RL32(ctx->tex_data + pos * 4);
-        prev_pos = ht_lookup_and_upsert(ctx->color_lookback_ht, ctx->crc_ctx, color, pos);
-        color_idx = prev_pos != -1 ? pos - prev_pos : 0;
-        if (pos >= LOOKBACK_WORDS) {
-            uint32_t old_pos = pos - LOOKBACK_WORDS;
-            uint32_t old_color = AV_RL32(ctx->tex_data + old_pos * 4);
-            ht_delete(ctx->color_lookback_ht, ctx->crc_ctx, old_color, old_pos);
-        }
-        pos++;
-
-        lut = AV_RL32(ctx->tex_data + pos * 4);
-        if (color_idx && lut == AV_RL32(ctx->tex_data + (pos - color_idx) * 4)) {
-            idx = color_idx;
-        } else {
-            idx = 0;
-            prev_pos = ht_lookup_and_upsert(ctx->lut_lookback_ht, ctx->crc_ctx, lut, pos);
-            lut_idx = prev_pos != -1 ? pos - prev_pos : 0;
-        }
-        if (pos >= LOOKBACK_WORDS) {
-            uint32_t old_pos = pos - LOOKBACK_WORDS;
-            uint32_t old_lut = AV_RL32(ctx->tex_data + old_pos * 4);
-            ht_delete(ctx->lut_lookback_ht, ctx->crc_ctx, old_lut, old_pos);
-        }
-        pos++;
-
+        combo_idx = ff_hashtable_get(ctx->combo_ht, ctx->tex_data + pos * 4, &prev_pos) ? pos - prev_pos : 0;
+        idx = combo_idx;
         PUSH_OP(2);
-
-        if (!idx) {
-            idx = color_idx;
-            PUSH_OP(2);
-            if (!idx)
-                bytestream2_put_le32(pbc,  color);
-
-            idx = lut_idx;
-            PUSH_OP(2);
-            if (!idx)
-                bytestream2_put_le32(pbc,  lut);
+        if (pos >= LOOKBACK_WORDS) {
+            old_pos = pos - LOOKBACK_WORDS;
+            if (ff_hashtable_get(ctx->combo_ht, ctx->tex_data + old_pos * 4, &prev_pos) && prev_pos <= old_pos)
+                ff_hashtable_delete(ctx->combo_ht, ctx->tex_data + old_pos * 4);
         }
+        ff_hashtable_set(ctx->combo_ht, ctx->tex_data + pos * 4, &pos);
+
+        if (!combo_idx) {
+            idx = ff_hashtable_get(ctx->color_ht, ctx->tex_data + pos * 4, &prev_pos) ? pos - prev_pos : 0;
+            PUSH_OP(2);
+            if (!idx)
+                bytestream2_put_le32(pbc, AV_RL32(ctx->tex_data + pos * 4));
+        }
+        if (pos >= LOOKBACK_WORDS) {
+            old_pos = pos - LOOKBACK_WORDS;
+            if (ff_hashtable_get(ctx->color_ht, ctx->tex_data + old_pos * 4, &prev_pos) && prev_pos <= old_pos)
+                ff_hashtable_delete(ctx->color_ht, ctx->tex_data + old_pos * 4);
+        }
+        ff_hashtable_set(ctx->color_ht, ctx->tex_data + pos * 4, &pos);
+        pos++;
+
+        if (!combo_idx) {
+            idx = ff_hashtable_get(ctx->lut_ht, ctx->tex_data + pos * 4, &prev_pos) ? pos - prev_pos : 0;
+            PUSH_OP(2);
+            if (!idx)
+                bytestream2_put_le32(pbc, AV_RL32(ctx->tex_data + pos * 4));
+        }
+        if (pos >= LOOKBACK_WORDS) {
+            old_pos = pos - LOOKBACK_WORDS;
+            if (ff_hashtable_get(ctx->lut_ht, ctx->tex_data + old_pos * 4, &prev_pos) && prev_pos <= old_pos)
+                ff_hashtable_delete(ctx->lut_ht, ctx->tex_data + old_pos * 4);
+        }
+        ff_hashtable_set(ctx->lut_ht, ctx->tex_data + pos * 4, &pos);
+        pos++;
     }
 
     return 0;
@@ -231,12 +173,51 @@ static int dxv_encode(AVCodecContext *avctx, AVPacket *pkt,
         return ret;
 
     if (ctx->enc.tex_funct) {
+        uint8_t *safe_data[4] = {frame->data[0], 0, 0, 0};
+        int safe_linesize[4] = {frame->linesize[0], 0, 0, 0};
+
+        if (avctx->width != DXV_ALIGN(avctx->width) || avctx->height != DXV_ALIGN(avctx->height)) {
+            ret = av_image_alloc(
+                safe_data,
+                safe_linesize,
+                DXV_ALIGN(avctx->width),
+                DXV_ALIGN(avctx->height),
+                avctx->pix_fmt,
+                1);
+            if (ret < 0)
+                return ret;
+
+            av_image_copy2(
+                safe_data,
+                safe_linesize,
+                frame->data,
+                frame->linesize,
+                avctx->pix_fmt,
+                avctx->width,
+                avctx->height);
+
+            if (avctx->width != DXV_ALIGN(avctx->width)) {
+                av_assert0(frame->format == AV_PIX_FMT_RGBA);
+                for (int y = 0; y < avctx->height; y++) {
+                    memset(safe_data[0] + y * safe_linesize[0] + 4*avctx->width, 0, safe_linesize[0] - 4*avctx->width);
+                }
+            }
+            if (avctx->height != DXV_ALIGN(avctx->height)) {
+                for (int y = avctx->height; y < DXV_ALIGN(avctx->height); y++) {
+                    memset(safe_data[0] + y * safe_linesize[0], 0, safe_linesize[0]);
+                }
+            }
+        }
+
         ctx->enc.tex_data.out = ctx->tex_data;
-        ctx->enc.frame_data.in = frame->data[0];
-        ctx->enc.stride = frame->linesize[0];
-        ctx->enc.width  = avctx->width;
-        ctx->enc.height = avctx->height;
+        ctx->enc.frame_data.in = safe_data[0];
+        ctx->enc.stride = safe_linesize[0];
+        ctx->enc.width  = DXV_ALIGN(avctx->width);
+        ctx->enc.height = DXV_ALIGN(avctx->height);
         ff_texturedsp_exec_compress_threads(avctx, &ctx->enc);
+
+        if (safe_data[0] != frame->data[0])
+            av_freep(&safe_data[0]);
     } else {
         /* unimplemented: YCoCg formats */
         return AVERROR_INVALIDDATA;
@@ -275,14 +256,6 @@ static av_cold int dxv_init(AVCodecContext *avctx)
         return ret;
     }
 
-    if (avctx->width % TEXTURE_BLOCK_W || avctx->height % TEXTURE_BLOCK_H) {
-        av_log(avctx,
-               AV_LOG_ERROR,
-               "Video size %dx%d is not multiple of "AV_STRINGIFY(TEXTURE_BLOCK_W)"x"AV_STRINGIFY(TEXTURE_BLOCK_H)".\n",
-               avctx->width, avctx->height);
-        return AVERROR_INVALIDDATA;
-    }
-
     ff_texturedspenc_init(&texdsp);
 
     switch (ctx->tex_fmt) {
@@ -296,21 +269,25 @@ static av_cold int dxv_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
     }
     ctx->enc.raw_ratio = 16;
-    ctx->tex_size = avctx->width  / TEXTURE_BLOCK_W *
-                    avctx->height / TEXTURE_BLOCK_H *
+    ctx->tex_size = DXV_ALIGN(avctx->width) / TEXTURE_BLOCK_W *
+                    DXV_ALIGN(avctx->height) / TEXTURE_BLOCK_H *
                     ctx->enc.tex_ratio;
-    ctx->enc.slice_count = av_clip(avctx->thread_count, 1, avctx->height / TEXTURE_BLOCK_H);
+    ctx->enc.slice_count = av_clip(avctx->thread_count, 1, DXV_ALIGN(avctx->height) / TEXTURE_BLOCK_H);
 
     ctx->tex_data = av_malloc(ctx->tex_size);
     if (!ctx->tex_data) {
         return AVERROR(ENOMEM);
     }
 
-    ctx->crc_ctx = av_crc_get_table(AV_CRC_32_IEEE);
-    if (!ctx->crc_ctx) {
-        av_log(avctx, AV_LOG_ERROR, "Could not initialize CRC table.\n");
-        return AVERROR_BUG;
-    }
+    ret = ff_hashtable_alloc(&ctx->color_ht, sizeof(uint32_t), sizeof(uint32_t), LOOKBACK_HT_ELEMS);
+    if (ret < 0)
+        return ret;
+    ret = ff_hashtable_alloc(&ctx->lut_ht, sizeof(uint32_t), sizeof(uint32_t), LOOKBACK_HT_ELEMS);
+    if (ret < 0)
+        return ret;
+    ret = ff_hashtable_alloc(&ctx->combo_ht, sizeof(uint64_t), sizeof(uint32_t), LOOKBACK_HT_ELEMS);
+    if (ret < 0)
+        return ret;
 
     return 0;
 }
@@ -320,6 +297,10 @@ static av_cold int dxv_close(AVCodecContext *avctx)
     DXVEncContext *ctx = avctx->priv_data;
 
     av_freep(&ctx->tex_data);
+
+    ff_hashtable_freep(&ctx->color_ht);
+    ff_hashtable_freep(&ctx->lut_ht);
+    ff_hashtable_freep(&ctx->combo_ht);
 
     return 0;
 }
@@ -351,8 +332,6 @@ const FFCodec ff_dxv_encoder = {
                       AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_FRAME_THREADS,
     .p.priv_class   = &dxvenc_class,
-    .p.pix_fmts     = (const enum AVPixelFormat[]) {
-        AV_PIX_FMT_RGBA, AV_PIX_FMT_NONE,
-    },
+    CODEC_PIXFMTS(AV_PIX_FMT_RGBA),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

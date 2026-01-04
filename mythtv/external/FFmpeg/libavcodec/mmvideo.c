@@ -39,6 +39,7 @@
 
 #define MM_PREAMBLE_SIZE    6
 
+#define MM_TYPE_RAW         0x2
 #define MM_TYPE_INTER       0x5
 #define MM_TYPE_INTRA       0x8
 #define MM_TYPE_INTRA_HH    0xc
@@ -76,15 +77,21 @@ static av_cold int mm_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
+static int mm_decode_raw(MmContext * s)
+{
+    if (bytestream2_get_bytes_left(&s->gb) < s->avctx->width * s->avctx->height)
+        return AVERROR_INVALIDDATA;
+    for (int y = 0; y < s->avctx->height; y++)
+        bytestream2_get_buffer(&s->gb, s->frame->data[0] + y*s->frame->linesize[0], s->avctx->width);
+    return 0;
+}
+
 static void mm_decode_pal(MmContext *s)
 {
-    int i;
-
-    bytestream2_skip(&s->gb, 4);
-    for (i = 0; i < 128; i++) {
-        s->palette[i] = 0xFFU << 24 | bytestream2_get_be24(&s->gb);
-        s->palette[i+128] = s->palette[i]<<2;
-    }
+    int start = bytestream2_get_le16(&s->gb);
+    int count = bytestream2_get_le16(&s->gb);
+    for (int i = 0; i < count; i++)
+        s->palette[(start+i)&0xFF] = 0xFFU << 24 | (bytestream2_get_be24(&s->gb) << 2);
 }
 
 /**
@@ -164,7 +171,7 @@ static int mm_decode_inter(MmContext * s, int half_horiz, int half_vert)
             for(j=0; j<8; j++) {
                 int replace = (replace_array >> (7-j)) & 1;
                 if (x + half_horiz >= s->avctx->width)
-                    return AVERROR_INVALIDDATA;
+                    break;
                 if (replace) {
                     int color = bytestream2_get_byte(&data_ptr);
                     s->frame->data[0][y*s->frame->linesize[0] + x] = color;
@@ -205,6 +212,7 @@ static int mm_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         return res;
 
     switch(type) {
+    case MM_TYPE_RAW       : res = mm_decode_raw(s); break;
     case MM_TYPE_PALETTE   : mm_decode_pal(s); return avpkt->size;
     case MM_TYPE_INTRA     : res = mm_decode_intra(s, 0, 0); break;
     case MM_TYPE_INTRA_HH  : res = mm_decode_intra(s, 1, 0); break;

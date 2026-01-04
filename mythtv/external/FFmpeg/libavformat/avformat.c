@@ -36,6 +36,7 @@
 #include "libavcodec/codec_desc.h"
 #include "libavcodec/packet_internal.h"
 #include "avformat.h"
+#include "avformat_internal.h"
 #include "avio.h"
 #include "demux.h"
 #include "mux.h"
@@ -48,14 +49,6 @@ void ff_free_stream(AVStream **pst)
 
     if (!st)
         return;
-
-#if FF_API_AVSTREAM_SIDE_DATA
-FF_DISABLE_DEPRECATION_WARNINGS
-    for (int i = 0; i < st->nb_side_data; i++)
-        av_freep(&st->side_data[i].data);
-    av_freep(&st->side_data);
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     if (st->attached_pic.data)
         av_packet_unref(&st->attached_pic);
@@ -102,6 +95,8 @@ void ff_free_stream_group(AVStreamGroup **pstg)
     case AV_STREAM_GROUP_PARAMS_TILE_GRID:
         av_opt_free(stg->params.tile_grid);
         av_freep(&stg->params.tile_grid->offsets);
+        av_packet_side_data_free(&stg->params.tile_grid->coded_side_data,
+                                 &stg->params.tile_grid->nb_coded_side_data);
         av_freep(&stg->params.tile_grid);
         break;
     case AV_STREAM_GROUP_PARAMS_LCEVC:
@@ -134,23 +129,26 @@ void ff_remove_stream_group(AVFormatContext *s, AVStreamGroup *stg)
 /* XXX: suppress the packet queue */
 void ff_flush_packet_queue(AVFormatContext *s)
 {
-    FFFormatContext *const si = ffformatcontext(s);
-    avpriv_packet_list_free(&si->parse_queue);
+    FormatContextInternal *const fci = ff_fc_internal(s);
+    FFFormatContext *const si = &fci->fc;
+    avpriv_packet_list_free(&fci->parse_queue);
     avpriv_packet_list_free(&si->packet_buffer);
-    avpriv_packet_list_free(&si->raw_packet_buffer);
+    avpriv_packet_list_free(&fci->raw_packet_buffer);
 
-    si->raw_packet_buffer_size = 0;
+    fci->raw_packet_buffer_size = 0;
 }
 
 void avformat_free_context(AVFormatContext *s)
 {
+    FormatContextInternal *fci;
     FFFormatContext *si;
 
     if (!s)
         return;
-    si = ffformatcontext(s);
+    fci = ff_fc_internal(s);
+    si  = &fci->fc;
 
-    if (s->oformat && ffofmt(s->oformat)->deinit && si->initialized)
+    if (s->oformat && ffofmt(s->oformat)->deinit && fci->initialized)
         ffofmt(s->oformat)->deinit(s);
 
     av_opt_free(s);
@@ -184,84 +182,14 @@ void avformat_free_context(AVFormatContext *s)
     av_dict_free(&si->id3v2_meta);
     av_packet_free(&si->pkt);
     av_packet_free(&si->parse_pkt);
+    avpriv_packet_list_free(&si->packet_buffer);
     av_freep(&s->streams);
     av_freep(&s->stream_groups);
-    ff_flush_packet_queue(s);
+    if (s->iformat)
+        ff_flush_packet_queue(s);
     av_freep(&s->url);
     av_free(s);
 }
-
-#if FF_API_AVSTREAM_SIDE_DATA
-FF_DISABLE_DEPRECATION_WARNINGS
-uint8_t *av_stream_get_side_data(const AVStream *st,
-                                 enum AVPacketSideDataType type, size_t *size)
-{
-    for (int i = 0; i < st->nb_side_data; i++) {
-        if (st->side_data[i].type == type) {
-            if (size)
-                *size = st->side_data[i].size;
-            return st->side_data[i].data;
-        }
-    }
-    if (size)
-        *size = 0;
-    return NULL;
-}
-
-int av_stream_add_side_data(AVStream *st, enum AVPacketSideDataType type,
-                            uint8_t *data, size_t size)
-{
-    AVPacketSideData *sd, *tmp;
-
-    for (int i = 0; i < st->nb_side_data; i++) {
-        sd = &st->side_data[i];
-
-        if (sd->type == type) {
-            av_freep(&sd->data);
-            sd->data = data;
-            sd->size = size;
-            return 0;
-        }
-    }
-
-    if (st->nb_side_data + 1U > FFMIN(INT_MAX, SIZE_MAX / sizeof(*tmp)))
-        return AVERROR(ERANGE);
-
-    tmp = av_realloc_array(st->side_data, st->nb_side_data + 1, sizeof(*tmp));
-    if (!tmp) {
-        return AVERROR(ENOMEM);
-    }
-
-    st->side_data = tmp;
-    st->nb_side_data++;
-
-    sd = &st->side_data[st->nb_side_data - 1];
-    sd->type = type;
-    sd->data = data;
-    sd->size = size;
-
-    return 0;
-}
-
-uint8_t *av_stream_new_side_data(AVStream *st, enum AVPacketSideDataType type,
-                                 size_t size)
-{
-    int ret;
-    uint8_t *data = av_malloc(size);
-
-    if (!data)
-        return NULL;
-
-    ret = av_stream_add_side_data(st, type, data, size);
-    if (ret < 0) {
-        av_freep(&data);
-        return NULL;
-    }
-
-    return data;
-}
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
 /**
  * Copy all stream parameters from source to destination stream, with the
@@ -789,11 +717,6 @@ int avformat_transfer_internal_stream_timing_info(const AVOutputFormat *ofmt,
                                                    : (ist->codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? (AVRational){0, 1}
                                                                                                       : ist->time_base);
     AVRational enc_tb = ist->time_base;
-#if FF_API_TICKS_PER_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    int ticks_per_frame = dec_ctx ? dec_ctx->ticks_per_frame : 1;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     /*
      * Avi is a special case here because it supports variable fps but
@@ -819,9 +742,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
                        (dec_ctx_framerate.num || ist->codecpar->codec_type == AVMEDIA_TYPE_AUDIO))) {
             enc_tb = dec_ctx_tb;
             enc_tb.den *= 2;
-#if FF_API_TICKS_PER_FRAME
-            enc_tb.num *= ticks_per_frame;
-#endif
         }
     } else if (!(ofmt->flags & AVFMT_VARIABLE_FPS)
                && !av_match_name(ofmt->name, "mov,mp4,3gp,3g2,psp,ipod,ismv,f4v")) {
@@ -831,9 +751,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
             || (copy_tb == AVFMT_TBCF_DECODER &&
                 (dec_ctx_framerate.num || ist->codecpar->codec_type == AVMEDIA_TYPE_AUDIO))) {
             enc_tb = dec_ctx_tb;
-#if FF_API_TICKS_PER_FRAME
-            enc_tb.num *= ticks_per_frame;
-#endif
         }
     }
 

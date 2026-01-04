@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "bytestream.h"
@@ -45,7 +46,7 @@ static av_cold int pcm_dvd_encode_init(AVCodecContext *avctx)
         freq = 1;
         break;
     default:
-        av_assert1(0);
+        av_unreachable("Already checked via CODEC_SAMPLERATES");
     }
 
     switch (avctx->sample_fmt) {
@@ -58,7 +59,7 @@ static av_cold int pcm_dvd_encode_init(AVCodecContext *avctx)
         quant = 2;
         break;
     default:
-        av_assert1(0);
+        av_unreachable("Already checked via CODEC_SAMPLEFMTS");
     }
 
     avctx->bits_per_coded_sample = 16 + quant * 4;
@@ -181,13 +182,8 @@ const FFCodec ff_pcm_dvd_encoder = {
     .priv_data_size = sizeof(PCMDVDContext),
     .init           = pcm_dvd_encode_init,
     FF_CODEC_ENCODE_CB(pcm_dvd_encode_frame),
-    .p.supported_samplerates = (const int[]) { 48000, 96000, 0},
-    .p.ch_layouts   = (const AVChannelLayout[]) { AV_CHANNEL_LAYOUT_MONO,
-                                                  AV_CHANNEL_LAYOUT_STEREO,
-                                                  AV_CHANNEL_LAYOUT_5POINT1,
-                                                  AV_CHANNEL_LAYOUT_7POINT1,
-                                                  { 0 } },
-    .p.sample_fmts  = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
-                                                     AV_SAMPLE_FMT_S32,
-                                                     AV_SAMPLE_FMT_NONE },
+    CODEC_SAMPLERATES(48000, 96000),
+    CODEC_CH_LAYOUTS(AV_CHANNEL_LAYOUT_MONO,    AV_CHANNEL_LAYOUT_STEREO,
+                     AV_CHANNEL_LAYOUT_5POINT1, AV_CHANNEL_LAYOUT_7POINT1),
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S32),
 };

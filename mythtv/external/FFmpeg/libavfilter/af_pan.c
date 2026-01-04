@@ -196,7 +196,7 @@ static av_cold int init(AVFilterContext *ctx)
         sign = 1;
         while (1) {
             gain = 1;
-            if (sscanf(arg, "%lf%n *%n", &gain, &len, &len))
+            if (sscanf(arg, "%lf%n *%n", &gain, &len, &len) >= 1)
                 arg += len;
             if (parse_channel_name(&arg, &in_ch_id, &named)){
                 av_log(ctx, AV_LOG_ERROR,
@@ -416,11 +416,11 @@ static const AVFilterPad pan_inputs[] = {
     },
 };
 
-const AVFilter ff_af_pan = {
-    .name          = "pan",
-    .description   = NULL_IF_CONFIG_SMALL("Remix channels with coefficients (panning)."),
+const FFFilter ff_af_pan = {
+    .p.name        = "pan",
+    .p.description = NULL_IF_CONFIG_SMALL("Remix channels with coefficients (panning)."),
+    .p.priv_class  = &pan_class,
     .priv_size     = sizeof(PanContext),
-    .priv_class    = &pan_class,
     .init          = init,
     .uninit        = uninit,
     FILTER_INPUTS(pan_inputs),

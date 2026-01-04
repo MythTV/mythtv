@@ -142,11 +142,13 @@ static int request_frame(AVFilterLink *outlink)
     return ff_filter_frame(outlink, picref);
 }
 
-static int query_formats(AVFilterContext *ctx)
+static int query_formats(const AVFilterContext *ctx,
+                         AVFilterFormatsConfig **cfg_in,
+                         AVFilterFormatsConfig **cfg_out)
 {
     enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE };
 
-    return ff_set_common_formats_from_list(ctx, pix_fmts);
+    return ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, pix_fmts);
 }
 
 static const AVFilterPad perlin_outputs[] = {
@@ -158,13 +160,13 @@ static const AVFilterPad perlin_outputs[] = {
     },
 };
 
-const AVFilter ff_vsrc_perlin = {
-    .name          = "perlin",
-    .description   = NULL_IF_CONFIG_SMALL("Generate Perlin noise"),
+const FFFilter ff_vsrc_perlin = {
+    .p.name        = "perlin",
+    .p.description = NULL_IF_CONFIG_SMALL("Generate Perlin noise"),
+    .p.priv_class  = &perlin_class,
+    .p.inputs      = NULL,
     .priv_size     = sizeof(PerlinContext),
-    .priv_class    = &perlin_class,
     .init          = init,
-    .inputs        = NULL,
     FILTER_OUTPUTS(perlin_outputs),
-    FILTER_QUERY_FUNC(query_formats),
+    FILTER_QUERY_FUNC2(query_formats),
 };
