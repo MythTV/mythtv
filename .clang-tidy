@@ -290,6 +290,7 @@ Checks: '-*,
 
 CheckOptions:
   - { key: bugprone-narrowing-conversions.PedanticMode, value: 0 }
+  - { key: bugprone-suspicious-include.IgnoredRegex, value: '^(.*/)?(moc_.+)(\.cpp)$' }
   - { key: bugprone-suspicious-string-compare.WarnOnLogicalNotComparison, value: 1 }
   - { key: bugprone-pointer-arithmetic-on-polymorphic-object.IgnoreInheritedVirtualFunctions, value: 1 }
   - { key: bugprone-unused-return-value.AllowCastToVoid, value: 1 }
