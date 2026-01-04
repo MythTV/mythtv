@@ -87,7 +87,9 @@ function(find_or_build_exiv2)
   else(CMAKE_CROSSCOMPILING OR ENABLE_EXIV2_DOWNLOAD)
     set(EXIV2_VERSION embedded)
     set(BUILD_INSTRUCTIONS SOURCE_DIR
-                           ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/libexiv2)
+                           ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/libexiv2
+                           DOWNLOAD_COMMAND
+                           ${CMAKE_COMMAND} -E echo "Using exiv2 sources in <SOURCE_DIR>")
   endif(CMAKE_CROSSCOMPILING OR ENABLE_EXIV2_DOWNLOAD)
 
   ExternalProject_Add(

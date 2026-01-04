@@ -109,6 +109,8 @@ function(find_or_build_ffmpeg)
   ExternalProject_Add(
     FFmpeg
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/FFmpeg
+    DOWNLOAD_COMMAND
+      ${CMAKE_COMMAND} -E echo "Using FFmpeg sources in <SOURCE_DIR>"
     CONFIGURE_COMMAND
       ${CMAKE_COMMAND} -E env ${_PROGS} PKG_CONFIG_PATH=${PKG_CONFIG_PATH_STR}
       ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/FFmpeg/configure ${FF_ARGS}

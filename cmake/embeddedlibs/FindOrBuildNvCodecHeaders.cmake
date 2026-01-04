@@ -35,6 +35,8 @@ endif()
 ExternalProject_Add(
   nv-codec-headers
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/mythtv/external/nv-codec-headers
+  DOWNLOAD_COMMAND
+    ${CMAKE_COMMAND} -E echo "Using nv-codec-headers in <SOURCE_DIR>"
   CMAKE_ARGS --no-warn-unused-cli ${CMDLINE_ARGS} ${PLATFORM_ARGS}
   CMAKE_CACHE_ARGS
     -DCMAKE_FIND_ROOT_PATH:STRING=${CMAKE_FIND_ROOT_PATH}
