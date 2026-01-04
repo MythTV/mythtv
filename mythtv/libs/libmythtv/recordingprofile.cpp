@@ -925,9 +925,7 @@ class VideoCompressionSettings : public GroupSetting
 
         m_codecName->addTargetedChild(label, new MPEG4OptionIDCT(m_parent));
         m_codecName->addTargetedChild(label, new MPEG4OptionIME(m_parent));
-#ifdef USING_FFMPEG_THREADS
         m_codecName->addTargetedChild(label, new EncodingThreadCount(m_parent));
-#endif
 
         label = "MPEG-2";
         m_codecName->addTargetedChild(label, new AverageBitrate(m_parent));
@@ -937,9 +935,7 @@ class VideoCompressionSettings : public GroupSetting
         //m_codecName->addTargetedChild(label, new MPEG4QualDiff(m_parent));
         //m_codecName->addTargetedChild(label, new MPEG4OptionVHQ(m_parent));
         //m_codecName->addTargetedChild(label, new MPEG4Option4MV(m_parent));
-#ifdef USING_FFMPEG_THREADS
         addTargetedChild(label, new EncodingThreadCount(m_parent));
-#endif
 
         label = "Hardware MJPEG";
         m_codecName->addTargetedChild(label, new HardwareMJPEGQuality(m_parent));
