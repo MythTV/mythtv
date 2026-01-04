@@ -1,9 +1,12 @@
 #include "libmythbase/mythconfig.h"
 
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDir>
 #include <QMutex>
-#include <QtGlobal>
 #include <QScreen>
 #include <QGuiApplication>
 
@@ -377,7 +380,7 @@ std::tuple<QString, QStringList> MythDRMDevice::GetDeviceList()
     const QString root(QString(DRM_DIR_NAME) + "/");
     QDir dir(root);
     QStringList namefilters;
-#ifdef __OpenBSD__
+#ifdef Q_OS_OPENBSD
     namefilters.append("drm*");
 #else
     namefilters.append("card*");
