@@ -126,7 +126,7 @@ class TestMythSystemLegacy: public QObject
     static void stdin_works(void)
     {
         QTemporaryFile tempfile;
-        tempfile.open();
+        QCOMPARE(tempfile.open(), true);
         QByteArray in = QString(__FUNCTION__).toLatin1();
         MythSystemLegacy cmd(QString("cat - > %1").arg(tempfile.fileName()),
                              kMSStdIn | kMSRunShell);

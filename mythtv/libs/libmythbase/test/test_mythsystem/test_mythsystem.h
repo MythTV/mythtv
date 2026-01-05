@@ -112,7 +112,7 @@ class TestMythSystem: public QObject
     {
         QSKIP("stdin_works -- currently blocks forever");
         QTemporaryFile tempfile;
-        tempfile.open();
+        QCOMPARE(tempfile.open(), true);
         QByteArray in = QString(__FUNCTION__).toLatin1();
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(QString("cat - > %1").arg(tempfile.fileName()),
