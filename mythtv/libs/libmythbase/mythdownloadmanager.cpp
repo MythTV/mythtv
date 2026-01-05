@@ -931,7 +931,7 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
     QUrl url(dlInfo->m_url);
     QString host(url.host());
     int port(url.port(80));
-    if (ok && PortChecker::resolveLinkLocal(host, port))
+    if (ok && PortChecker{}.resolveLinkLocal(host, port))
     {
         QString reqType;
         switch (dlInfo->m_requestType)

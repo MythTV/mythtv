@@ -659,7 +659,7 @@ void MythSocket::ConnectToHostReal(const QHostAddress& _addr, quint16 port, bool
     if (!usingLoopback)
     {
         QString host = addr.toString();
-        if (PortChecker::resolveLinkLocal(host, port))
+        if (PortChecker{}.resolveLinkLocal(host, port))
             addr.setAddress(host);
     }
 
