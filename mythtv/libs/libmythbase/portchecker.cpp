@@ -125,9 +125,9 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
 // Windows does not need the scope on the ip address so we can skip
 // some processing
 #ifndef Q_OS_WINDOWS
-            int iCardsEnd = 0;
             if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
             {
+                int iCardsEnd = 0;
                 addr.setScopeId(QString());
                 while (addr.scopeId().isEmpty() && iCardsEnd<2)
                 {
@@ -168,12 +168,13 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                         iCardsEnd++;
                     }
                 }
-            }
-            if (iCardsEnd > 1)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("There is no IPV6 compatible interface for %1")
-                  .arg(host));
-                break;
+                if (iCardsEnd > 1)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("There is no IPV6 compatible interface for %1").arg(host)
+                        );
+                    break;
+                }
             }
 #endif
             QString dest;
