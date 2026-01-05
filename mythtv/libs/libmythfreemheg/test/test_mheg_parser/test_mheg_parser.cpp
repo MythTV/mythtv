@@ -9,6 +9,11 @@
 
 #include <memory>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtProcessorDetection>
+#endif
+
 #include "libmythfreemheg/ASN1Codes.h"
 #include "libmythfreemheg/ParseBinary.h"
 #include "libmythfreemheg/ParseNode.h"
@@ -5952,7 +5957,7 @@ void TestMhegParser::cleanup()
 
 void TestMhegParser::test_parser_asn1(void)
 {
-#ifndef __x86_64__
+#ifndef Q_PROCESSOR_X86_64
     QSKIP("This test requires a lot of memory.");
     return;
 #endif
@@ -5969,7 +5974,7 @@ void TestMhegParser::test_parser_asn1(void)
 
 void TestMhegParser::test_parser_text(void)
 {
-#ifndef __x86_64__
+#ifndef Q_PROCESSOR_X86_64
     QSKIP("This test requires a lot of memory.");
     return;
 #endif

@@ -16,6 +16,7 @@
 #include "compat.h"
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtProcessorDetection>
 #include <QtSystemDetection>
 #endif
 
@@ -741,8 +742,8 @@ void myth_yield(void)
  *  Only Linux on i386, ppc, x86_64 and ia64 are currently supported.
  *  This is a no-op on all other architectures and platforms.
  */
-#if defined(Q_OS_LINUX) && ( defined(__i386__) || defined(__ppc__) || \
-                            defined(__x86_64__) || defined(__ia64__) )
+#if defined(Q_OS_LINUX) && ( defined(Q_PROCESSOR_X86) || defined(Q_PROCESSOR_POWER) || \
+                            defined(Q_PROCESSOR_IA64) )
 
 #include <cstdio>
 #include <getopt.h>

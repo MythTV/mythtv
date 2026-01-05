@@ -1,7 +1,11 @@
 #include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
 
-#if HAVE_MMX && !(defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64))
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtProcessorDetection>
+#endif
+#if HAVE_MMX && !defined(Q_PROCESSOR_X86_64)
 /* a definir pour avoir exactement le meme resultat que la fonction C
  * (un chouillat plus lent)
  */
