@@ -211,20 +211,21 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
 */
 bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::milliseconds timeLimit)
 {
+    // Windows does not need the scope on the ip address so we can skip
+    // some processing
+#ifdef Q_OS_WINDOWS
+    return false;
+#else
     LOG(VB_GENERAL, LOG_ALERT, LOC + QString("host %1 port %2 timeLimit %3")
         .arg(host).arg(port).arg(timeLimit.count()));
     m_cancelCheck = false;
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);
     bool islinkLocal = false;
-// Windows does not need the scope on the ip address so we can skip
-// some processing
-#ifndef Q_OS_WINDOWS
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
         islinkLocal = true;
-#endif
     {
         if (islinkLocal)
         {
@@ -241,9 +242,7 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
         }
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
-#ifndef Q_OS_WINDOWS
     QListIterator<QNetworkInterface> iCard = cards;
-#endif
     MythTimer timer(MythTimer::kStartRunning);
     QTcpSocket socket(this);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
@@ -255,9 +254,6 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     {
         if (state == QAbstractSocket::UnconnectedState)
         {
-// Windows does not need the scope on the ip address so we can skip
-// some processing
-#ifndef Q_OS_WINDOWS
             if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
             {
                 int iCardsEnd = 0;
@@ -310,7 +306,6 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                     break;
                 }
             }
-#endif
             QString dest;
             if (isIPAddress)
                 dest=addr.toString();
@@ -347,6 +342,7 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     socket.abort();
     processEvents();
     return (state == QAbstractSocket::ConnectedState);
+#endif
 }
 
 void PortChecker::processEvents(void)
