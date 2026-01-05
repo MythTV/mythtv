@@ -408,10 +408,9 @@ endif()
 #         debian:libavahi-compat-libdnssd-dev
 # ~~~
 if(ENABLE_LIBDNS_SD)
-  pkg_check_modules(LIBDNS_SD "libdns_sd" IMPORTED_TARGET)
-  if(NOT LIBDNS_SD)
-    pkg_check_modules(LIBDNS_SD "avahi-compat-libdns_sd" IMPORTED_TARGET)
-  endif()
+  pkg_search_module(LIBDNS_SD
+                    libdns_sd avahi-compat-libdns_sd
+                    IMPORTED_TARGET)
   add_build_config(PkgConfig::LIBDNS_SD "libdns_sd")
   if(LIBDNS_SD_FOUND)
     set(CONFIG_LIBDNS_SD TRUE)
