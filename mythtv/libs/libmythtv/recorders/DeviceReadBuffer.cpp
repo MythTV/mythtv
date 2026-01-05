@@ -72,8 +72,10 @@ DeviceReadBuffer::DeviceReadBuffer(
       m_usingPoll(use_poll),
       m_pollTimeoutIsError(error_exit_on_poll_timeout)
 {
-#ifdef __MINGW32__
-#warning mingw DeviceReadBuffer::Poll
+#ifdef Q_OS_WINDOWS
+# if !defined(_MSC_VER) || __cplusplus >= 202302L
+#   warning mingw DeviceReadBuffer::Poll is not implemented
+# endif
     if (m_usingPoll)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
