@@ -123,7 +123,7 @@ set(QT6_PLATFORM_ARGS
 
 if(TOOLCHAIN_PREFIX MATCHES "mingw")
   # From settings.pro
-  add_compile_definitions(WIN32 WIN32_LEAN_AND_MEAN NOMINMAX)
+  add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)
 
   # Fix: redeclared without dllimport attribute after being referenced with dll
   # linkage

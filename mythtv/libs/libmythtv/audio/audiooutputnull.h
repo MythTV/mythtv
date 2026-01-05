@@ -1,6 +1,11 @@
 #ifndef AUDIOOUTPUTNULL
 #define AUDIOOUTPUTNULL
 
+#include <cstdint>
+#include <vector>
+
+#include <QMutex>
+
 #include "audiooutputbase.h"
 
 static constexpr int32_t NULLAUDIO_OUTPUT_BUFFER_SIZE { 32768 };

@@ -6,6 +6,9 @@
 
 // Qt utils: to parse audio list
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QtEndian>
 #include <QFile>
 #include <QDateTime>
@@ -18,7 +21,7 @@
 
 #include "audiooutput.h"
 #include "audiooutputnull.h"
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #include "audiooutputdx.h"
 #include "audiooutputwin.h"
 #endif
@@ -182,7 +185,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
     else if (main_device.startsWith("DirectX:"))
     {
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
         ret = new AudioOutputDX(settings);
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to DirectX device "
@@ -191,7 +194,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
     else if (main_device.startsWith("Windows:"))
     {
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
         ret = new AudioOutputWin(settings);
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a Windows "
@@ -479,7 +482,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
     }
 #endif
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     {
         QString name = "Windows:";
         QString desc = "Windows default output";

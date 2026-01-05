@@ -8,7 +8,12 @@
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
-#ifdef _WIN32
+
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+#ifdef Q_OS_WINDOWS
 #include <processthreadsapi.h>
 #endif
 
@@ -72,7 +77,7 @@ static bool checkProcess(const QString &lockFile)
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Checking if PID %1 is still running").arg(pid));
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     HANDLE handy = OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE, TRUE, pid);
     return TerminateProcess(handy,0) == 0;
 #else

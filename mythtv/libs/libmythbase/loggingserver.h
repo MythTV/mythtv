@@ -1,6 +1,10 @@
 #ifndef LOGGINGSERVER_H_
 #define LOGGINGSERVER_H_
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QMutexLocker>
 #include <QSocketNotifier>
 #include <QMutex>
@@ -50,7 +54,7 @@ class FileLogger : public LoggerBase
     std::ofstream m_ofstream; ///< Output file stream for the log file.
 };
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 /// \brief Syslog-based logger (not available in Windows)
 class SyslogLogger : public LoggerBase
 {
@@ -108,7 +112,7 @@ MBASE_PUBLIC void logForwardStop(void);
 MBASE_PUBLIC void logForwardMessage(LoggingItem *item);
 
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 MBASE_PUBLIC void logSigHup(void);
 #endif
 

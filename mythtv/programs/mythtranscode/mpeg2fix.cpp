@@ -13,6 +13,10 @@
 #include <utility>
 
 // Qt headers
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QFileInfo>
 #include <QList>
 #include <QMap>
@@ -36,7 +40,7 @@ extern "C" {
 // MythTranscode
 #include "mpeg2fix.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #include <winsock2.h>
 #else
 #include <netinet/in.h>

@@ -2,6 +2,10 @@
 #include <algorithm>
 
 //Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QTimer>
 #include <QThread>
 #include <QApplication>
@@ -44,7 +48,7 @@
 #include "platforms/mythdisplaydrm.h"
 #include "platforms/drm/mythdrmvrr.h"
 #endif
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
 #include "platforms/mythdisplaywindows.h"
 #endif
 #if CONFIG_MMAL
@@ -131,7 +135,7 @@ MythDisplay* MythDisplay::Create([[maybe_unused]] MythMainWindow* MainWindow)
     if (!result)
         result = new MythDisplayAndroid();
 #endif
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
     if (!result)
         result = new MythDisplayWindows();
 #endif

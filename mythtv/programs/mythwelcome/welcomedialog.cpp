@@ -6,6 +6,10 @@
 #include <cstdlib>
 
 // qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QEvent>
 #include <QGuiApplication>
 #include <QKeyEvent>
@@ -718,7 +722,7 @@ void WelcomeDialog::shutdownNow(void)
     // run command to set wakeuptime in bios and shutdown the system
     command = QString();
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     command = "sudo ";
 #endif
 

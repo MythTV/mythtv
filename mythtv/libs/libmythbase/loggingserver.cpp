@@ -1,6 +1,9 @@
 #include <fstream>
 
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
@@ -24,7 +27,7 @@
 #include "compat.h"
 
 #include <cstdlib>
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include "mythsyslog.h"
 #if CONFIG_SYSTEMD_JOURNAL
 #define SD_JOURNAL_SUPPRESS_LOCATION 1 // NOLINT(cppcoreguidelines-macro-usage)
@@ -162,7 +165,7 @@ bool FileLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 /// \brief SyslogLogger constructor \param facility Syslog facility to
 /// use in logging
 SyslogLogger::SyslogLogger(bool open) :
@@ -267,7 +270,7 @@ bool JournalLogger::logmsg(LoggingItem *item)
 #endif
 #endif
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 /// \brief Signal handler for SIGHUP.  This passes it to the LogForwardThread
 ///        for processing.
 
@@ -366,7 +369,7 @@ void LogForwardThread::run(void)
 /// \brief  SIGHUP handler - reopen all open logfiles for logrollers
 void LogForwardThread::handleSigHup(void)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     LOG(VB_GENERAL, LOG_INFO, "SIGHUP received, rolling log files.");
 
     /* SIGHUP was sent.  Close and reopen debug logfiles */
@@ -405,7 +408,7 @@ void LogForwardThread::forwardMessage(LoggingItem *item)
                 loggers->insert(0, logger);
         }
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
         // SyslogLogger from facility
         int facility = item->facility();
         if (facility > 0)

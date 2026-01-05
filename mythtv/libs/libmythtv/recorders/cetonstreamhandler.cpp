@@ -5,10 +5,15 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 // POSIX headers
 #include <fcntl.h>
 #include <unistd.h>
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/select.h>
 #include <sys/ioctl.h>
 #endif

@@ -35,6 +35,9 @@
 
 // QT headers
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 
 // libmythbase headers
@@ -43,7 +46,7 @@
 #include "mythevent.h"
 #include "mythlogging.h"
 
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
 #include "mythsystemwindows.h"
 #else
 #include "mythsystemunix.h"
@@ -56,7 +59,7 @@
 
 void MythSystemLegacy::initializePrivate(void)
 {
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
     d = new MythSystemLegacyWindows(this);
 #else
     d = new MythSystemLegacyUnix(this);

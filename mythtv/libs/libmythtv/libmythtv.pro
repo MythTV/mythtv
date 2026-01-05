@@ -71,7 +71,6 @@ macx {
 }
 
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
-cygwin:DEFINES += _WIN32
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -316,7 +315,6 @@ HEADERS += audio/audiooutputaudiotrack.h
 
 cygwin {
     QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
-    DEFINES += _WIN32
 }
 
 mingw | win32-msvc* {
@@ -873,10 +871,8 @@ using_backend {
     SOURCES += channelscan/scanmonitor.cpp
     SOURCES += channelscan/scanwizardconfig.cpp
 
-#if !defined( _WIN32 )
     HEADERS += channelscan/externrecscanner.h
     SOURCES += channelscan/externrecscanner.cpp
-#endif
 
     # EIT stuff
     HEADERS += eithelper.h                 eitscanner.h

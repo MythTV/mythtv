@@ -18,8 +18,13 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 // POSIX
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/select.h>
 #endif
 #include <sys/types.h>

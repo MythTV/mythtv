@@ -1,20 +1,10 @@
+#include "audiooutputnull.h"
+
 #include <algorithm>
-#include <cerrno>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fcntl.h>
-#include <iostream>
-#include <sys/time.h>
-#include <unistd.h>
-#ifndef _WIN32
-#include <sys/ioctl.h>
-#else
-#include "libmythbase/compat.h"
-#endif
+#include <cstddef>
+#include <cstdint>
 
 #include "libmythbase/mythlogging.h"
-#include "audiooutputnull.h"
 
 static constexpr uint8_t CHANNELS_MIN { 1 };
 static constexpr uint8_t CHANNELS_MAX { 8 };
@@ -63,7 +53,7 @@ AudioOutputSettings* AudioOutputNULL::GetOutputSettings(bool /*digital*/)
         settings->AddSupportedFormat(fmt);
     }
 
-    for (uint channels = CHANNELS_MIN; channels <= CHANNELS_MAX; channels++)
+    for (unsigned channels = CHANNELS_MIN; channels <= CHANNELS_MAX; channels++)
     {
         settings->AddSupportedChannels(channels);
     }

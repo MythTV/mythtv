@@ -10,6 +10,9 @@
 
 // Qt headers
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QDir>
 #include <QEvent>
@@ -45,7 +48,7 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     QString dflt = "PulseAudio:default";
 #elif defined(Q_OS_DARWIN)
     QString dflt = "CoreAudio:";
-#elif defined(_WIN32)
+#elif defined(Q_OS_WINDOWS)
     QString dflt = "Windows:";
 #else
     QString dflt = "NULL";
@@ -1113,14 +1116,14 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
 #if CONFIG_AUDIO_ALSA
     gc->addSelection("ALSA:default", "ALSA:default");
 #endif
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     gc->addSelection("DirectX:", "DirectX:");
     gc->addSelection("Windows:", "Windows:");
 #endif
 #ifdef Q_OS_ANDROID
     gc->addSelection("OpenSLES:", "OpenSLES:");
 #endif
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     gc->addSelection(tr("software"), "software");
 #endif
 
@@ -1262,7 +1265,7 @@ HostComboBoxSetting *AudioConfigSettings::PassThroughOutputDevice()
     //PassThruDeviceOverridedsetting could be removed
     gc->addSelection(QCoreApplication::translate("(Common)", "Default"),
                      "Default");
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     gc->addSelection("DirectX:Primary Sound Driver");
 #else
     gc->addSelection("ALSA:iec958:{ AES0 0x02 }",

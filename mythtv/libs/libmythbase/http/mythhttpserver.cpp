@@ -1,4 +1,8 @@
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDirIterator>
 #include <QNetworkInterface>
 #include <QCoreApplication>
@@ -22,7 +26,7 @@
 #include "http/mythhttpserver.h"
 
 // Std
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/utsname.h>
 #endif
 
@@ -165,7 +169,7 @@ void MythHTTPServer::Init()
     if (version.startsWith("v"))
         version = version.right(version.length() - 1);
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     QString server = QStringLiteral("Windows");
 #else
     struct utsname uname_info {};

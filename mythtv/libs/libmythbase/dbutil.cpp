@@ -5,6 +5,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDir>
 #include <QFile>
 #include <QRegularExpression>
@@ -188,7 +192,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename,
 {
     filename = QString();
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     LOG(VB_GENERAL, LOG_CRIT, "Database backups disabled on Windows.");
     return kDB_Backup_Disabled;
 #else
@@ -258,7 +262,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename,
         return kDB_Backup_Completed;
 
     return kDB_Backup_Failed;
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 }
 
 /** \fn DBUtil::CheckTables(const bool repair, const QString options)

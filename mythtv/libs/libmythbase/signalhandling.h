@@ -1,6 +1,10 @@
 #ifndef SIGNALHANDLING_H_
 #define SIGNALHANDLING_H_
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QObject>
 #include <QSocketNotifier>
 #include <QMutex>
@@ -14,7 +18,7 @@
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 // Quick fix to let this compile for Windows:  we have it disabled on the
 // calling side for Windows anyways, IIRC.
 using siginfo_t = void;

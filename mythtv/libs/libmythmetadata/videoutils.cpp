@@ -1,6 +1,10 @@
 
 #include "videoutils.h"
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDir>
 #include <QCoreApplication>
 
@@ -83,7 +87,7 @@ QStringList GetVideoDirsByHost(const QString& host)
 
     if (host.isEmpty())
     {
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
         QString seperator = ";";
 #else
         QString seperator = ":";

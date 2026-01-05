@@ -24,6 +24,10 @@
  */
 
 // Qt headers
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <iostream>
 
@@ -486,7 +490,7 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
 #if CONFIG_VBOX
         success |= (m_vboxScanner != nullptr);
 #endif
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
         success |= (m_externRecScanner != nullptr);
 #endif
 #if CONFIG_HDHOMERUN

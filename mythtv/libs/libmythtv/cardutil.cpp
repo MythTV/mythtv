@@ -11,6 +11,10 @@
 #endif
 
 // Qt headers
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QMap>
 #include <QDir>
 #include <QRegularExpression>
@@ -96,7 +100,7 @@ QString CardUtil::GetScanableInputTypes(void)
     inputTypes += "'CETON'";
 #endif // CONFIG_CETON
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     inputTypes += "'EXTERNAL'";
 #endif
 

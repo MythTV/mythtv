@@ -39,12 +39,6 @@ This is very basic and is only there to enable some test programs to be run.
 #include "Engine.h"
 #include "Logging.h"
 
-
-#ifndef WIN32
-#define stricmp strcasecmp
-#endif
-
-
 MHParseText::~MHParseText()
 {
     free(m_string);

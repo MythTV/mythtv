@@ -1,13 +1,5 @@
 // -*- Mode: c++ -*-
-
-#include <cerrno>
-#include <cstring>
-
-#include <fcntl.h>
-#include <unistd.h>
-#ifndef __MINGW32__
-#include <sys/select.h>
-#endif
+#include "v4l2encsignalmonitor.h"
 
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
@@ -19,7 +11,6 @@
 #include "v4lchannel.h"
 #include "v4l2encrecorder.h"
 #include "v4l2encstreamhandler.h"
-#include "v4l2encsignalmonitor.h"
 
 #define LOC QString("V4L2SigMon[%1](%2): ").arg(m_inputid).arg(m_channel->GetDevice())
 

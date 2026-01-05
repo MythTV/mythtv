@@ -1,13 +1,9 @@
 // -*- Mode: c++ -*-
+#include "v4l2encstreamhandler.h"
 
 // POSIX headers
-#include <fcntl.h>
-#include <unistd.h>
-#ifndef __MINGW32__
-#include <poll.h>
-//#include <sys/select.h>
-#include <sys/ioctl.h>
-#endif
+#include <fcntl.h> // open
+#include <unistd.h> // close, read
 
 #include <chrono> // for milliseconds
 #include <iostream>
@@ -25,7 +21,6 @@
 #include "dtvsignalmonitor.h"
 #include "mpeg/mpegstreamdata.h"
 #include "mpeg/streamlisteners.h"
-#include "recorders/v4l2encstreamhandler.h"
 #include "recorders/v4lchannel.h"
 
 const std::array<const std::string,15> V4L2encStreamHandler::kStreamTypes

@@ -19,8 +19,12 @@
 #include <cmath>
 #include <thread>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 // POSIX headers
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/utsname.h> 
 #endif
 
@@ -130,7 +134,7 @@ HttpServer::HttpServer() :
     // ----------------------------------------------------------------------
     {
         QMutexLocker locker(&s_platformLock);
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
         s_platform = QString("Windows/%1.%2")
             .arg(LOBYTE(LOWORD(GetVersion())))
             .arg(HIBYTE(LOWORD(GetVersion())));

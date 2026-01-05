@@ -22,6 +22,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QTcpSocket>
@@ -81,7 +85,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
     bool islinkLocal = false;
 // Windows does not need the scope on the ip address so we can skip
 // some processing
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
@@ -104,7 +108,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
         }
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     QListIterator<QNetworkInterface> iCard = cards;
 #endif
     MythTimer timer(MythTimer::kStartRunning);
@@ -120,7 +124,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
         {
 // Windows does not need the scope on the ip address so we can skip
 // some processing
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
             int iCardsEnd = 0;
             if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
             {

@@ -7,6 +7,10 @@
 #include <unistd.h>
 
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QFile>
 #include <QIODevice>
 #include <QObject>
@@ -104,7 +108,7 @@ CdDecoder::~CdDecoder()
 void CdDecoder::setDevice(const QString &dev)
 {
     m_deviceName = dev;
-#ifdef WIN32
+#ifdef Q_OS_WINDOWS
     // libcdio needs the drive letter with no path
     if (m_deviceName.endsWith('\\'))
         m_deviceName.chop(1);

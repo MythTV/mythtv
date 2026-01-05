@@ -1,4 +1,7 @@
-#include <QtGlobal> // for Q_OS_XXX
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 
 // C++
 #include <algorithm>
@@ -11,9 +14,9 @@
 #  include <sys/vfs.h>
 #else // if !Q_OS_LINUX
 #  include <sys/param.h>
-#  ifndef Q_OS_WIN32
+#  ifndef Q_OS_WINDOWS
 #    include <sys/mount.h>
-#  endif // Q_OS_WIN32
+#  endif // Q_OS_WINDOWS
 #endif // !Q_OS_LINUX
 
 #include <sys/stat.h>

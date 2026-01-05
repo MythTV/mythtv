@@ -20,7 +20,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
 
-#include <QtGlobal> // for Q_OS_XXX
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 
 #if defined ANDROID && __ANDROID_API__ < 24
 // ftello and fseeko do not exist in android before api level 24
@@ -39,14 +42,14 @@
 
 // System headers
 #include <sys/types.h>
-#ifndef Q_OS_WIN32
+#ifndef Q_OS_WINDOWS
 #   include <sys/ioctl.h>
 #   include <pwd.h>
 #   include <grp.h>
 #   ifdef Q_OS_LINUX
 #       include <sys/prctl.h>
 #   endif // linux
-#endif // not Q_OS_WIN32
+#endif // not Q_OS_WINDOWS
 
 // Qt headers
 #include <QCoreApplication>
@@ -81,7 +84,7 @@ static constexpr int k_defaultWidth = 79;
  */
 static int GetTermWidth(void)
 {
-#if defined(Q_OS_WIN32) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_WINDOWS) || defined(Q_OS_ANDROID)
     return k_defaultWidth;
 #else
     struct winsize ws {};
@@ -2985,10 +2988,10 @@ static bool setUser(const QString &username)
     if (username.isEmpty())
         return true;
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WINDOWS
     std::cerr << "--user option is not supported on Windows" << std::endl;
     return false;
-#else // ! Q_OS_WIN32
+#else // ! Q_OS_WINDOWS
 #ifdef Q_OS_LINUX
     // Check the current dumpability of core dumps, which will be disabled
     // by setuid, so we can re-enable, if appropriate
@@ -3045,7 +3048,7 @@ static bool setUser(const QString &username)
         return false;
     }
     return true;
-#endif // ! Q_OS_WIN32
+#endif // ! Q_OS_WINDOWS
 }
 
 

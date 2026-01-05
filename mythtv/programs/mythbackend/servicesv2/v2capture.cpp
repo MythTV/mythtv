@@ -24,6 +24,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QList>
 #include <QFile>
 #include <QMutex>
@@ -511,7 +515,7 @@ V2CardTypeList*  V2Capture::GetCardTypeList ( )
 
     pCardTypeList->AddCardType(QObject::tr("Import test recorder"), "IMPORT");
     pCardTypeList->AddCardType(QObject::tr("Demo test recorder"),   "DEMO");
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     pCardTypeList->AddCardType(QObject::tr("External (black box) recorder"),
                           "EXTERNAL");
 #endif

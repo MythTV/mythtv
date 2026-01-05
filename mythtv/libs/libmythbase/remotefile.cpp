@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
@@ -532,7 +536,7 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
             fileinfo->st_gid       = strlist[7].toLongLong();
             fileinfo->st_rdev      = strlist[8].toLongLong();
             fileinfo->st_size      = strlist[9].toLongLong();
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
             fileinfo->st_blksize   = strlist[10].toLongLong();
             fileinfo->st_blocks    = strlist[11].toLongLong();
 #endif

@@ -1,4 +1,7 @@
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
@@ -36,7 +39,7 @@
 #include <sys/time.h>
 #endif
 #define SYSLOG_NAMES
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include "mythsyslog.h"
 #endif
 #include <unistd.h>
@@ -608,7 +611,7 @@ void logPropagateCalc(void)
         logPropagateArgList << "--loglong";
     }
 
-#if !defined(_WIN32) && !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_WINDOWS) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.m_facility >= 0)
     {
         const CODE *syslogname = nullptr;
@@ -740,7 +743,7 @@ void loggingDeregisterThread(void)
 /// \return Syslog facility as enumerated type.  Negative if not found.
 int syslogGetFacility([[maybe_unused]] const QString& facility)
 {
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     LOG(VB_GENERAL, LOG_NOTICE,
         "Windows does not support syslog, disabling" );
     return( -2 );

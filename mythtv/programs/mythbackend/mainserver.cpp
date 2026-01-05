@@ -14,7 +14,11 @@
 
 #include "libmythbase/mythconfig.h"
 
-#ifndef _WIN32
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+#ifndef Q_OS_WINDOWS
 #include <sys/ioctl.h>
 #endif
 #if CONFIG_SYSTEMD_NOTIFY
@@ -22,7 +26,6 @@
 #endif
 
 // Qt
-#include <QtGlobal>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QFile>
@@ -3482,7 +3485,7 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 
     QStringList strlist;
 
-#if defined(_WIN32) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_WINDOWS) || defined(Q_OS_ANDROID)
     strlist << "0" << "0" << "0";
 #else
     loadArray loads = getLoadAvgs();
@@ -3749,7 +3752,7 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
             retlist << QString::number(fileinfo.st_gid);
             retlist << QString::number(fileinfo.st_rdev);
             retlist << QString::number(fileinfo.st_size);
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
             retlist << "0"; // st_blksize
             retlist << "0"; // st_blocks
 #else

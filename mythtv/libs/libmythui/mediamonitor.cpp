@@ -9,6 +9,9 @@
 
 // Qt headers
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QFile>
 #include <QList>
@@ -27,7 +30,7 @@
 
 #if CONFIG_DARWIN_DA
 #include "mediamonitor-darwin.h"
-#elif defined(Q_OS_WIN)
+#elif defined(Q_OS_WINDOWS)
 #include "mediamonitor-windows.h"
 #else
 #include "mediamonitor-unix.h"
@@ -79,7 +82,7 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 
 #if CONFIG_DARWIN_DA
     s_monitor = new MediaMonitorDarwin(nullptr, MONITOR_INTERVAL, true);
-#elif defined(Q_OS_WIN)
+#elif defined(Q_OS_WINDOWS)
     s_monitor = new MediaMonitorWindows(nullptr, MONITOR_INTERVAL, true);
 #else
     s_monitor = new MediaMonitorUnix(nullptr, MONITOR_INTERVAL, true);

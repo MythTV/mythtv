@@ -280,8 +280,6 @@ using_libcec {
     SOURCES += devices/mythcecadapter.cpp
 }
 
-cygwin:DEFINES += _WIN32
-
 mingw | win32-msvc*{
 #   HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
 #   SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp

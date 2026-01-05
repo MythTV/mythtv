@@ -11,6 +11,9 @@
 
 // Qt
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #ifdef Q_OS_ANDROID
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
@@ -837,7 +840,7 @@ static void playDisc()
 #ifdef Q_OS_DARWIN
             // Convert a BSD 'leaf' name into a raw device path
             QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
-#elif defined(_WIN32)
+#elif defined(Q_OS_WINDOWS)
             QString filename = "dvd:";          // e.g. 'dvd:E\\'
 #else
             QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
