@@ -503,7 +503,7 @@ int64_t dvdnav_get_current_time(dvdnav_t *this) {
 
 dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
                                             int32_t *event, int32_t *len) {
-  dvd_state_t *state;
+  dvd_state_t *save_state;
   int32_t result;
 
   if(!this)
@@ -527,7 +527,7 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
       return DVDNAV_STATUS_ERR;
   }
 
-  state = &(this->vm->state);
+  save_state = &(this->vm->state);
   (*event) = DVDNAV_NOP;
   (*len) = 0;
 
@@ -561,12 +561,12 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
       /* we seeked -> check for multiple angles */
       vm_get_angle_info(this->vm, &current, &num_angles);
       if (num_angles > 1) {
-        int32_t result, block;
+        int32_t result2, block;
         /* we have to skip the first VOBU when seeking in a multiangle feature,
          * because it might belong to the wrong angle */
         block = this->position_next.cell_start + this->position_next.block;
-        result = dvdnav_read_cache_block(this->cache, block, 1, buf);
-        if(result <= 0) {
+        result2 = dvdnav_read_cache_block(this->cache, block, 1, buf);
+        if(result2 <= 0) {
           printerr("Error reading NAV packet.");
           pthread_mutex_unlock(&this->vm_lock);
           return DVDNAV_STATUS_ERR;
@@ -766,7 +766,7 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
     fprintf(MSG_OUT, "libdvdnav: SPU_CLUT_CHANGE\n");
 #endif
     (*len) = 16 * sizeof(uint32_t);
-    memcpy(*buf, state->pgc->palette, sizeof(state->pgc->palette));
+    memcpy(*buf, save_state->pgc->palette, sizeof(save_state->pgc->palette));
     this->spu_clut_changed = 0;
     pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_OK;
