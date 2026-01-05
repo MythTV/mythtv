@@ -5,8 +5,9 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#ifdef __cplusplus
-#    include <QtGlobal>       // for Q_OS_XXX
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
 #endif
 
 #include "mythconfig.h"
@@ -20,12 +21,12 @@
 #   endif
 #endif
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #    include <sys/time.h>     // Mac OS X needs this before sys/resource
 #    include <sys/resource.h> // for setpriority
 #    include <sys/socket.h>
 #    include <sys/wait.h>     // For WIFEXITED on Mac OS X
-#else // _WIN32
+#else // Q_OS_WINDOWS
 #    ifndef _MSC_VER
 #        define close wsock_close
 #    endif
@@ -64,19 +65,10 @@
 //used in videodevice only - that code is not windows-compatible anyway
 #    define minor(X) 0
 
-    #if defined(__cplusplus)
             using uint = unsigned int;
-    #else
-            typedef unsigned int uint;
-   #endif
-
-
-#   if defined(__cplusplus)
 
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0
-
-#   endif
 
 #define lstat stat
 #define nice(x) ((int)!::SetPriorityClass(\
@@ -115,7 +107,6 @@
 #    define dlclose(x) !FreeLibrary((HMODULE)(x))
 #    define dlsym(x, y) GetProcAddress((HMODULE)(x), (y))
 
-#    ifdef __cplusplus
 #       include <cstdio>
         inline const char *dlerror(void)
         {
@@ -134,10 +125,6 @@
 
             return errStr;
         }
-#    else  // __cplusplus
-#        include <stdio.h>
-#        define dlerror()  "dlerror() is unimplemented."
-#   endif // __cplusplus
 
     // getuid/geteuid/setuid - not implemented
 #   define getuid() 0
@@ -157,7 +144,7 @@
 #    define WEXITSTATUS(w) (((w) >> 8) & 0xff)
 #    define WTERMSIG(w)    ((w) & 0x7f)
 
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 
 
 #ifdef _MSC_VER
@@ -175,7 +162,7 @@
     #define strncasecmp         _strnicmp
     #define snprintf            _snprintf
 
-    #ifdef  _WIN64
+    #ifdef  Q_OS_WIN64
         using ssize_t = __int64;
     #else
         using ssize_t = int;
