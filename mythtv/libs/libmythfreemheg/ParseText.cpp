@@ -62,7 +62,7 @@ void MHParseText::GetNextChar()
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 static constexpr int MAX_TAG_LENGTH { 30 };
 #else
-static constexpr size_t MAX_TAG_LENGTH { 30 };
+static constexpr ssize_t MAX_TAG_LENGTH { 30 };
 #endif
 
 const std::array<const QString,253> rchTagNames
@@ -367,7 +367,7 @@ static int FindTag(const QString& str)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 static constexpr int    MAX_ENUM { 30 };
 #else
-static constexpr size_t MAX_ENUM { 30 };
+static constexpr ssize_t MAX_ENUM { 30 };
 #endif
 
 void MHParseText::Error(const char *str) const
