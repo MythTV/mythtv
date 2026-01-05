@@ -77,7 +77,7 @@
 */
 bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds timeLimit, bool linkLocalOnly)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
+    LOG(VB_GENERAL, LOG_ALERT, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
         .arg(host).arg(port).arg(timeLimit.count()).arg(linkLocalOnly));
     m_cancelCheck = false;
     QHostAddress addr;
@@ -135,7 +135,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                     if (iCard.hasNext())
                     {
                         QNetworkInterface card = iCard.next();
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
+                        LOG(VB_GENERAL, LOG_ALERT, QString("Trying interface %1").arg(card.name()));
                         unsigned int flags = card.flags();
                         if ((flags & QNetworkInterface::IsLoopBack)
                          || !(flags & QNetworkInterface::IsRunning))
@@ -172,7 +172,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
             }
             if (iCardsEnd > 1)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("There is no IPV6 compatible interface for %1")
+                LOG(VB_GENERAL, LOG_ALERT, LOC + QString("There is no IPV6 compatible interface for %1")
                   .arg(host));
                 break;
             }
@@ -199,7 +199,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
             break;
         std::this_thread::sleep_for(500ms);
         state = socket.state();
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("socket state %1")
+        LOG(VB_GENERAL, LOG_ALERT, LOC + QString("socket state %1")
             .arg(state));
         if (linkLocalOnly
           && state == QAbstractSocket::UnconnectedState
