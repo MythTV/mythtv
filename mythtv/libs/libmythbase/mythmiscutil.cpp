@@ -15,6 +15,9 @@
 // System specific C headers
 #include "compat.h"
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 
 #ifdef Q_OS_LINUX
 #include <sys/sysinfo.h>
@@ -80,7 +83,7 @@ bool getUptime(std::chrono::seconds &uptime)
         return false;
     }
     uptime = std::chrono::seconds(time(nullptr) - bootTime.tv_sec);
-#elif defined(Q_OS_WIN32)
+#elif defined(Q_OS_WINDOWS)
     uptime = std::chrono::seconds(::GetTickCount() / 1000);
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
@@ -167,7 +170,7 @@ bool getMemStats([[maybe_unused]] int &totalMB,
  */
 loadArray getLoadAvgs (void)
 {
-#if !defined(Q_OS_WIN32) && !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_WINDOWS) && !defined(Q_OS_ANDROID)
     loadArray loads {};
     if (getloadavg(loads.data(), loads.size()) != -1)
         return loads;
@@ -242,7 +245,7 @@ bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
  */
 bool ping(const QString &host, std::chrono::milliseconds timeout)
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WINDOWS
     QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
                   .arg(timeout.count()) .arg(host);
 
@@ -267,7 +270,7 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 }
 
 /**
@@ -368,7 +371,7 @@ QString createTempFile(QString name_template, bool dir)
 {
     int ret = -1;
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WINDOWS
     char temppath[MAX_PATH] = ".";
     char tempfilename[MAX_PATH] = "";
     // if GetTempPath fails, use current dir
@@ -681,7 +684,7 @@ bool MythWakeup(const QString &wakeUpCommand, uint flags, std::chrono::seconds t
 
 bool IsPulseAudioRunning(void)
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WINDOWS
     return false;
 #else
 
@@ -694,7 +697,7 @@ bool IsPulseAudioRunning(void)
     uint res = myth_system(command, kMSDontBlockInputDevs |
                                     kMSDontDisableDrawing);
     return (res == GENERIC_EXIT_OK);
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 }
 
 bool myth_nice(int val)

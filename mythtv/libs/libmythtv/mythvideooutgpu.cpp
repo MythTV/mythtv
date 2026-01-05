@@ -1,3 +1,8 @@
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 // MythTV
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
@@ -9,7 +14,7 @@
 #include "mythvideogpu.h"
 #include "mythvideooutgpu.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #include "libmythui/mythpainter_d3d9.h"
 #include "videoout_d3d.h"
 #endif
@@ -61,7 +66,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 
     QStringList renderers;
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 //    auto * d3drender = dynamic_cast<MythRenderD3D9*>(Render);
 //    auto * d3dpainter = dynamic_cast<MythD3D9Painter*>(Painter);
 //    if (Render->Type() == kRenderDirect3D9)
@@ -141,7 +146,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 
         MythVideoOutputGPU* video = nullptr;
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 //        if (renderer == "direct3d")
 //            video = new VideoOutputD3D(MainWindow, d3drender,
 //                                       d3dpainter, MDisplay,

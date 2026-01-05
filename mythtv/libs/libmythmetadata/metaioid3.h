@@ -1,6 +1,11 @@
 #ifndef METAIOID3_H_
 #define METAIOID3_H_
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 // libmythmetadata
 #include "metaiotaglib.h"
 #include "musicmetadata.h"
@@ -8,7 +13,7 @@
 // Taglib
 #include <taglib/id3v1tag.h>
 #include <taglib/id3v2tag.h>
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
 // The above indirectly includes winuser.h, which unconditionally
 // redefines the string SendMessage to SendMessageA.
 #undef SendMessage

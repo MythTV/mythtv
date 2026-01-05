@@ -11,6 +11,11 @@
 #include <vector>
 
 // QT
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#include <QtVersionChecks>
+#endif
 #include <QWaitCondition>
 #include <QApplication>
 #include <QHash>
@@ -665,7 +670,7 @@ void MythMainWindow::Init(bool MayReInit)
     }
 
     // Workaround Qt/Windows playback bug?
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     flags |= Qt::MSWindowsOwnDC;
 #endif
 

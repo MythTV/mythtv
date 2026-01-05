@@ -31,6 +31,10 @@
 #define CHANNEL_SCANNER_H
 
 // Qt headers
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 
 // MythTV headers
@@ -48,7 +52,7 @@
 #include "vboxchannelfetcher.h"
 #endif
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include "externrecscanner.h"
 #endif
 
@@ -142,7 +146,7 @@ class MTV_PUBLIC ChannelScanner
 #if CONFIG_VBOX
     VBoxChannelFetcher      *m_vboxScanner         {nullptr};
 #endif
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     ExternRecChannelScanner *m_externRecScanner    {nullptr};
 #endif
     // HDHomeRun channel list import

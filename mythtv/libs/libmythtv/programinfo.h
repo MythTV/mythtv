@@ -8,6 +8,10 @@
 #include <utility>
 #include <vector> // for GetNextRecordingList
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QStringList>
 #include <QDateTime>
 
@@ -352,7 +356,7 @@ class MTV_PUBLIC ProgramInfo
     bool IsVideoBD(void) const
         { return GetProgramInfoType() == kProgramInfoTypeVideoBD; }
     bool IsLocal(void) const { return m_pathname.startsWith("/")
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
         || m_pathname.at(1) == ':'
 #endif
             ; }

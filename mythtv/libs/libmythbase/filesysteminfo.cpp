@@ -1,6 +1,9 @@
 #include "filesysteminfo.h"
 
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 
 #include <algorithm>
 
@@ -90,7 +93,7 @@ bool FileSystemInfo::refresh()
         m_total >>= 10;
         m_used  >>= 10;
 
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
         QByteArray device = info.device();
         m_local = (device.startsWith(R"(\\?\)") && !device.startsWith(R"(\\?\UNC\)")) ||
                   (device.startsWith(R"(\\.\)") && !device.startsWith(R"(\\.\UNC\)"));

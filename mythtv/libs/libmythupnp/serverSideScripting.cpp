@@ -11,6 +11,10 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "serverSideScripting.h"
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
@@ -53,7 +57,7 @@ ServerSideScripting::ServerSideScripting()
 {
     Lock();
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     m_debugger.attachTo( &m_engine );
 #endif
 

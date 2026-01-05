@@ -3,6 +3,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QReadLocker>
 #include <QString>
 #include <QWriteLocker>
@@ -598,7 +602,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
                 << QString::number(fileinfo.st_gid)
                 << QString::number(fileinfo.st_rdev)
                 << QString::number(fileinfo.st_size)
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
                 << "0"
                 << "0"
 #else

@@ -26,6 +26,13 @@ extern "C" {
 #include "libavutil/display.h"
 }
 
+#include "libmythbase/mythconfig.h"
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#include <QtVersionChecks>
+#endif
+
 #if CONFIG_MEDIACODEC // Android
 extern "C" {
 #include "libavcodec/jni.h"
@@ -68,7 +75,7 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include <QStringDecoder>
 #endif // Qt 6
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #   undef mkdir
 #endif
 
@@ -80,7 +87,6 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "libmythbase/iso639.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythchrono.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdbcon.h"

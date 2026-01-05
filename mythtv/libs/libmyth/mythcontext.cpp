@@ -9,6 +9,10 @@
 #include <unistd.h> // for usleep(), gethostname
 #include <vector>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
@@ -29,7 +33,7 @@
 #endif
 #endif
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #include "libmythbase/compat.h"
 #endif
 #include "libmythbase/configuration.h"
@@ -1558,7 +1562,7 @@ MythContext::MythContext(QString binversion, bool needsBackend)
     : m_impl(new MythContext::Impl()),
       m_appBinaryVersion(std::move(binversion))
 {
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     static bool WSAStarted = false;
     if (!WSAStarted)
     {
@@ -1627,7 +1631,7 @@ bool MythContext::Init(const bool gui,
         return false;
     }
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     // HOME environment variable might not be defined
     // some libraries will fail without it
     QString home = getenv("HOME");

@@ -4,10 +4,15 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 // C includes
 #include <unistd.h>
 #include <sys/types.h>
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

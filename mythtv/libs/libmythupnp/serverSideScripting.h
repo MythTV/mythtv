@@ -16,6 +16,10 @@
 #include <utility>
 
 // Qt headers
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDateTime>
 #include <QMap>
 #include <QMutex>
@@ -28,7 +32,7 @@
 #include "upnpexp.h"
 #include "httprequest.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #include <QScriptEngineDebugger>
 #endif
 
@@ -51,7 +55,7 @@ class UPNP_PUBLIC ServerSideScripting
 
         QScriptEngine                   m_engine;
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
         QScriptEngineDebugger           m_debugger;
 #endif
 

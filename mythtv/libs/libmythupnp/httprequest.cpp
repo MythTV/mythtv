@@ -12,6 +12,10 @@
 
 #include "httprequest.h"
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QFile>
 #include <QFileInfo>
 #include <QHostInfo>
@@ -30,7 +34,7 @@
 // FOR DEBUGGING
 #include <iostream>
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <netinet/tcp.h>
 #endif
 

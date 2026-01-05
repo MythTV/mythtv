@@ -1,3 +1,7 @@
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QString>
 #include <QStringList>
 
@@ -100,7 +104,7 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
 {
     QStringList strlist;
 
-#if defined(_WIN32) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_WINDOWS) || defined(Q_OS_ANDROID)
     strlist << "ERROR";
     strlist << "getloadavg() not supported";
 #else

@@ -2,13 +2,16 @@
 #include <cstdlib>
 
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDir>
 #include <QCoreApplication>
 
 #ifdef Q_OS_ANDROID
 #include <filesystem>
 #include <QStandardPaths>
-#elif defined(Q_OS_WIN)
+#elif defined(Q_OS_WINDOWS)
 #include <QStandardPaths>
 #endif
 
@@ -40,7 +43,7 @@ void InitializeMythDirs(void)
         confdir.replace("$HOME", QDir::homePath());
     }
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 
     if (installprefix.isEmpty())
         installprefix = QDir( qApp->applicationDirPath() )
@@ -321,7 +324,7 @@ static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dylib";
 static const QString kFilterLibPrefix = "lib";
 static const QString kFilterLibSuffix = ".dylib";
-#elif defined(_WIN32)
+#elif defined(Q_OS_WINDOWS)
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dll";
 static const QString kFilterLibPrefix = "lib";

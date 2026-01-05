@@ -3,6 +3,10 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QString>
 
 #include "libmythbase/compat.h"
@@ -14,11 +18,11 @@
 #include "DeviceReadBuffer.h"
 #include "mpeg/tspacket.h"
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/poll.h>
 #endif
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 void DeviceReadBuffer::setup_pipe(pipe_fd_array&, pipe_flag_array&) {}
 #else
 void DeviceReadBuffer::setup_pipe(pipe_fd_array& mypipe, pipe_flag_array& myflags)
@@ -451,7 +455,7 @@ bool DeviceReadBuffer::HandlePausing(void)
 
 bool DeviceReadBuffer::Poll(void) const
 {
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 # ifdef _MSC_VER
 #  pragma message( "mingw DeviceReadBuffer::Poll" )
 # else
@@ -572,7 +576,7 @@ bool DeviceReadBuffer::Poll(void) const
     }
 
     return retval;
-#endif //!_WIN32
+#endif //!Q_OS_WINDOWS
 }
 
 bool DeviceReadBuffer::CheckForErrors(
@@ -591,7 +595,7 @@ bool DeviceReadBuffer::CheckForErrors(
         return false;
     }
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 # ifdef _MSC_VER
 #  pragma message( "mingw DeviceReadBuffer::CheckForErrors" )
 # else

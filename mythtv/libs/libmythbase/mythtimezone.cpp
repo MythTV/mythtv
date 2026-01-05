@@ -1,9 +1,10 @@
 #include "mythtimezone.h"
 
-#if __has_include(<QtEnvironmentVariables>) // Qt 6
-#include <QtEnvironmentVariables>
-#else
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtEnvironmentVariables>
+#include <QtSystemDetection>
+#include <QtVersionChecks>
 #endif
 #include <QDataStream>
 #include <QTextStream>
@@ -36,7 +37,7 @@ int calc_utc_offset(void)
 QString getTimeZoneID(void)
 {
     QString zone_id("UNDEF");
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     // First, try the TZ environment variable to check for environment-specific
     // overrides
     QString tz = qEnvironmentVariable("TZ");

@@ -15,6 +15,10 @@
 #include <iostream>
 
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QApplication>
 #include <QCoreApplication>
 #include <QImage>
@@ -73,7 +77,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize size, 
     // Taken from removed MythUIHelper::GetMediumFont
     QFont font = QApplication::font();
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     // logicalDpiY not supported in Windows.
     int logicalDpiY = 100;
     HDC hdc = GetDC(nullptr);

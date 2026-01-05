@@ -2,6 +2,9 @@
 
 // Qt
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QUrl>
 #include <QDir>
@@ -27,7 +30,7 @@
 #include <queue>
 #include <unistd.h>       // for usleep()
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WINDOWS
 #include <winsock2.h>
 #else
 #include <clocale>
@@ -243,7 +246,7 @@ bool MythCoreContext::Init(void)
         return false;
     }
 
-#ifndef Q_OS_WIN32
+#ifndef Q_OS_WINDOWS
     static const QRegularExpression utf8
         { "utf-?8", QRegularExpression::CaseInsensitiveOption };
     QString lang_variables("");
@@ -708,7 +711,7 @@ bool MythCoreContext::BackendIsRunning(void)
 {
 #ifdef Q_OS_BSD4
     const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
-#elif defined(Q_OS_WIN32)
+#elif defined(Q_OS_WINDOWS)
     const char *command = "%systemroot%\\system32\\tasklist.exe "
        " | %systemroot%\\system32\\find.exe /i \"mythbackend.exe\" ";
 #else

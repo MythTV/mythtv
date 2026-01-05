@@ -1,4 +1,8 @@
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QFile>
 #include <QMap>
 #include <QUrl>
@@ -15,7 +19,7 @@
 #include "mythiowrapper.h"
 
 // Std
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #include <windows.h>
 #else
 #include <dlfcn.h>

@@ -8,6 +8,9 @@
 
 // Qt Headers
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
@@ -21,7 +24,7 @@
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
 #   undef O_NONBLOCK
 #   define O_NONBLOCK 0
 #endif

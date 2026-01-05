@@ -1,9 +1,12 @@
-#include <QtGlobal> // for Q_OS_XXX
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 
 // Standard UNIX C headers
 #include <unistd.h>
 #include <fcntl.h>
-#if defined(Q_OS_BSD4) || defined(Q_OS_WIN32)
+#if defined(Q_OS_BSD4) || defined(Q_OS_WINDOWS)
 #include <sys/types.h>
 #else
 #include <sys/sysmacros.h>

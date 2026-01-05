@@ -12,6 +12,10 @@
 #include <memory>
 
 // Qt includes
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QApplication>
 #include <QDir>
 #include <QEvent>
@@ -166,10 +170,10 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
     m_cdDevice(std::move(device)), m_quality(quality),
     m_tracks(tracks)
 {
-#ifdef WIN32 // libcdio needs the drive letter with no path
+#ifdef Q_OS_WINDOWS // libcdio needs the drive letter with no path
     if (m_cdDevice.endsWith('\\'))
         m_cdDevice.chop(1);
-#endif // WIN32
+#endif // Q_OS_WINDOWS
 
     QString lastHost = gCoreContext->GetSetting("MythMusicLastRipHost", gCoreContext->GetMasterHostName());
     QStringList dirs = StorageGroup::getGroupDirs("Music", lastHost);
@@ -519,7 +523,7 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
     m_tracks(new QVector<RipTrack*>),
     m_cdDevice(std::move(device))
 {
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     // if the MediaMonitor is running stop it
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon && mon->IsActive())
@@ -527,7 +531,7 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
         m_mediaMonitorActive = true;
         mon->StopMonitoring();
     }
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 
     // make sure the directory where we temporarily save the rips is present
     QDir dir;
@@ -552,7 +556,7 @@ Ripper::~Ripper(void)
 
     delete m_decoder;
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     // if the MediaMonitor was active when we started then restart it
     if (m_mediaMonitorActive)
     {
@@ -560,7 +564,7 @@ Ripper::~Ripper(void)
         if (mon)
             mon->StartMonitoring();
     }
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 
     if (m_somethingwasripped)
         emit ripFinished();

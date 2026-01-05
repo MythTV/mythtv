@@ -6,6 +6,11 @@
 // MythTV headers
 #include "streamhandler.h"
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/threadedfilewriter.h"
 
@@ -362,7 +367,7 @@ void StreamHandler::WriteMPTS(const unsigned char * buffer, uint len)
 
 bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     QMutexLocker lk(&m_mptsLock);
 
     m_mptsFiles.insert(file);
@@ -398,13 +403,13 @@ bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
                 .arg(m_mptsBaseFile, fn));
         }
     }
-#endif //  !defined( _WIN32 )
+#endif //  !defined( Q_OS_WINDOWS )
     return true;
 }
 
 void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     QMutexLocker lk(&m_mptsLock);
 
     QSet<QString>::iterator it = m_mptsFiles.find(file);
@@ -417,5 +422,5 @@ void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
             m_mptsTfw = nullptr;
         }
     }
-#endif //  !defined( _WIN32 )
+#endif //  !defined( Q_OS_WINDOWS )
 }

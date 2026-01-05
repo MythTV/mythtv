@@ -1,6 +1,9 @@
 // Qt includes
 #include <QtGlobal>
-#ifndef _WIN32
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+#ifndef Q_OS_WINDOWS
 #include <QCoreApplication>
 #else
 #include <QApplication>
@@ -105,7 +108,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     QCoreApplication a(argc, argv);
 #else
     // MINGW application needs a window to receive messages

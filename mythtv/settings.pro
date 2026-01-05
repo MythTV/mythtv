@@ -111,7 +111,7 @@ win32 {
             QMAKE_CFLAGS   += "/FI mathex.h"
         }
 
-        DEFINES += _WIN32 WIN32 WIN32_LEAN_AND_MEAN NOMINMAX _USE_MATH_DEFINES
+        DEFINES += WIN32_LEAN_AND_MEAN NOMINMAX _USE_MATH_DEFINES
         DEFINES += _CRT_SECURE_NO_WARNINGS
 
         debug  :DEFINES += _DEBUG
@@ -172,7 +172,7 @@ win32 {
         # Qt4 creates separate compile directories by default. This disables:
         CONFIG -= debug_and_release debug_and_release_target
         CONFIG += mingw
-        DEFINES += WIN32 WIN32_LEAN_AND_MEAN NOMINMAX
+        DEFINES += WIN32_LEAN_AND_MEAN NOMINMAX
         DEFINES -= UNICODE
         # win32-packager.pl builds Qt under DOS, but MythTV is built in MinGW.
         # This corrects the moc tool path from a DOS-style to a unix style:

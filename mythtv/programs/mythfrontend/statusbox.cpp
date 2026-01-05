@@ -1,4 +1,8 @@
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QHostAddress>
 #include <QNetworkInterface>
 
@@ -1240,7 +1244,7 @@ void StatusBox::doMachineStatus()
     }
 
     // weighted average loads
-#if !defined(_WIN32) && !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_WINDOWS) && !defined(Q_OS_ANDROID)
     auto UpdateLoad = [](StatusBoxItem* Item)
     {
         loadArray loads = getLoadAvgs();

@@ -1,4 +1,8 @@
 // qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QCoreApplication>
 #include <QRunnable>
 #include <QString>
@@ -816,7 +820,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     // Special handling for link-local
     // Not needed for Windows because windows does not need
     // the scope id.
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     if (dlInfo->m_url.startsWith("http://[fe80::",Qt::CaseInsensitive))
         return downloadNowLinkLocal(dlInfo, deleteInfo);
 #endif
@@ -869,7 +873,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     return success;
 }
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 /** \brief Download blocking methods with link-local address.
  *
  * Special processing for IPV6 link-local addresses, which

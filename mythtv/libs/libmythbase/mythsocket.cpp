@@ -1,4 +1,8 @@
 // Qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QNetworkInterface> // for QNetworkInterface::allAddresses ()
 #include <QCoreApplication>
 #include <QWaitCondition>
@@ -9,15 +13,15 @@
 #include <QThread>
 #include <QMetaType>
 
-// setsockopt -- has to be after Qt includes for Q_OS_WIN definition
-#ifdef Q_OS_WIN
+// setsockopt
+#ifdef Q_OS_WINDOWS
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <cstdio>
 #else
 #include <sys/socket.h>
 #endif
-#include <unistd.h> // for usleep (and socket code on Q_OS_WIN)
+#include <unistd.h> // for usleep
 #include <algorithm> // for max
 #include <vector> // for vector
 
@@ -186,7 +190,7 @@ void MythSocket::ConnectHandler(void)
     m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));
 
     int reuse_addr_val = 1;
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
     int ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
                          SO_REUSEADDR, (char*) &reuse_addr_val,
                          sizeof(reuse_addr_val));
@@ -201,7 +205,7 @@ void MythSocket::ConnectHandler(void)
     }
 
     int rcv_buf_val = kSocketReceiveBufferSize;
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WINDOWS
     ret = setsockopt(m_tcpSocket->socketDescriptor(), SOL_SOCKET,
                      SO_RCVBUF, (char*) &rcv_buf_val,
                      sizeof(rcv_buf_val));

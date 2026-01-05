@@ -29,6 +29,11 @@
 
 #include <algorithm>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
+
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
@@ -93,7 +98,7 @@ void ChannelScanner::Teardown(void)
     }
 #endif
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     if (m_externRecScanner)
     {
         m_externRecScanner->Stop();
@@ -404,7 +409,7 @@ bool ChannelScanner::ImportExternRecorder([[maybe_unused]] uint cardid,
                                           uint sourceid)
 {
     m_sourceid = sourceid;
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     if (!m_scanMonitor)
         m_scanMonitor = new ScanMonitor(this);
 
@@ -543,7 +548,7 @@ void ChannelScanner::PreScanCommon(
     }
 #endif
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     if ("EXTERNAL" == card_type)
     {
         m_channel = new ExternalChannel(nullptr, device);

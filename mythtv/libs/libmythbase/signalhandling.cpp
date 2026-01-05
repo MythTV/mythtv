@@ -1,4 +1,7 @@
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QtSystemDetection>
+#endif
 #include <QObject>
 #include <QSocketNotifier>
 #include <QCoreApplication>
@@ -11,7 +14,7 @@
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
 #include <sys/socket.h>
 #endif
 
@@ -27,21 +30,21 @@ QMutex SignalHandler::s_singletonLock;
 SignalHandler *SignalHandler::s_singleton;
 
 static const std::array<const int, 6
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     + 1
 #if !defined(Q_OS_DARWIN) && !defined(Q_OS_OPENBSD)
     + 1
 #endif // Q_OS_DARWIN
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
     > kDefaultSignalList
 {
     SIGINT, SIGTERM, SIGSEGV, SIGABRT, SIGFPE, SIGILL,
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     SIGBUS,
 #if !defined(Q_OS_DARWIN) && !defined(Q_OS_OPENBSD)
     SIGRTMIN, // not necessarily constexpr
 #endif // Q_OS_DARWIN
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 };
 
 // We may need to write out signal info using just the write() function
@@ -69,7 +72,7 @@ SignalHandler::SignalHandler(QObject *parent) :
     s_exit_program = false; // set here due to "C++ static initializer madness"
     sig_str_init();
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     //NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
     m_sigStack = new char[SIGSTKSZ];
     stack_t stack;
@@ -98,14 +101,14 @@ SignalHandler::SignalHandler(QObject *parent) :
         SetHandlerPrivate(signum, nullptr);
     }
     SetHandlerPrivate(SIGHUP, logSigHup);
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 }
 
 SignalHandler::~SignalHandler()
 {
     s_singleton = nullptr;
 
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     if (m_notifier)
     {
         ::close(s_sigFd[0]);
@@ -152,7 +155,7 @@ void SignalHandler::SetHandler(int signum, SigHandlerFunc handler)
 void SignalHandler::SetHandlerPrivate([[maybe_unused]] int signum,
                                       [[maybe_unused]] SigHandlerFunc handler)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     const char *signame = strsignal(signum);
     QString signal_name = signame ?
         QString(signame) : QString("Unknown(%1)").arg(signum);
@@ -203,7 +206,7 @@ void SignalHandler::signalHandler(int signum,
     SignalInfo signalInfo {};
 
     signalInfo.m_signum = signum;
-#ifdef _WIN32
+#ifdef Q_OS_WINDOWS
     signalInfo.m_code   = 0;
     signalInfo.m_pid    = 0;
     signalInfo.m_uid    = 0;
@@ -243,7 +246,7 @@ void SignalHandler::signalHandler(int signum,
     {
     case SIGSEGV:
     case SIGILL:
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     case SIGBUS:
 #endif
     case SIGFPE:
@@ -281,7 +284,7 @@ void SignalHandler::signalHandler(int signum,
 
 void SignalHandler::handleSignal(void)
 {
-#ifndef _WIN32
+#ifndef Q_OS_WINDOWS
     m_notifier->setEnabled(false);
 
     SignalInfo signalInfo {};
@@ -352,7 +355,7 @@ void SignalHandler::handleSignal(void)
     }
 
     m_notifier->setEnabled(true);
-#endif // _WIN32
+#endif // Q_OS_WINDOWS
 }
 
 /*
