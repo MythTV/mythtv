@@ -256,7 +256,7 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
     QString addrstr =
         MythCoreContext::resolveAddress(host, MythCoreContext::ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
-#ifdef Q_OS_BSD4
+#if defined(Q_OS_FREEBSD) || defined(Q_OS_DARWIN)
     QString timeoutparam("-t");
 #else
     // Linux, NetBSD, OpenBSD
