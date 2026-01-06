@@ -357,6 +357,7 @@ void PortChecker::processEvents(void)
 */
 void PortChecker::cancelPortCheck(void)
 {
+    LOG(VB_GENERAL, LOG_EMERG, LOC + QString("Aborting port check"));
     m_cancelCheck = true;
 }
 
