@@ -156,12 +156,10 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     m_cancelCheck = false;
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);
-    bool islinkLocal = false;
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
     {
-        islinkLocal = true;
         // If we already know the scope, set it here and return
         if (gCoreContext->GetScopeForAddress(addr))
         {
@@ -186,7 +184,7 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     {
         if (state == QAbstractSocket::UnconnectedState)
         {
-            if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
+            if (!gCoreContext->GetScopeForAddress(addr))
             {
                 int iCardsEnd = 0;
                 addr.setScopeId(QString());
@@ -238,12 +236,7 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                     break;
                 }
             }
-            QString dest;
-            if (isIPAddress)
-                dest=addr.toString();
-            else
-                dest=host;
-            socket.connectToHost(dest, port);
+            socket.connectToHost(addr.toString(), port);
             retryCount=0;
         }
         else
@@ -265,8 +258,7 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
         if (state == QAbstractSocket::UnconnectedState && testedAll)
             break;
     }
-    if (state == QAbstractSocket::ConnectedState
-      && islinkLocal && !scope.isEmpty())
+    if (state == QAbstractSocket::ConnectedState && !scope.isEmpty())
     {
        gCoreContext->SetScopeForAddress(addr);
        host = addr.toString();
