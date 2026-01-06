@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "libmythbase/mythlogging.h"
-#include "recorders/dtvrecorder.h" // for FrameRate and ScanType
 #include "bitreader.h"
 
 #include <strings.h>

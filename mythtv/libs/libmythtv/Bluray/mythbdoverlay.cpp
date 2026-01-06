@@ -1,10 +1,9 @@
+#include "mythbdoverlay.h"
+
 #include <algorithm>
 
 // Qt
 #include <QPainter>
-
-// MythTV
-#include "Bluray/mythbdoverlay.h"
 
 MythBDOverlay::MythBDOverlay(const bd_overlay_s* const Overlay)
   : m_image(Overlay->w, Overlay->h, QImage::Format_Indexed8),

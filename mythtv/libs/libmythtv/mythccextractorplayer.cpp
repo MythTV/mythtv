@@ -789,7 +789,7 @@ CC708Reader *MythCCExtractorPlayer::GetCC708Reader(uint id)
 {
     if (!m_cc708Info[id].m_reader)
     {
-        m_cc708Info[id].m_reader = new CC708Reader(this);
+        m_cc708Info[id].m_reader = new CC708Reader();
         m_cc708Info[id].m_reader->SetEnabled(true);
         LOG(VB_GENERAL, LOG_INFO, "Created CC708Reader");
     }
@@ -817,7 +817,7 @@ SubtitleReader *MythCCExtractorPlayer::GetSubReader(uint id)
 {
     if (!m_dvbsubInfo[id].m_reader)
     {
-        m_dvbsubInfo[id].m_reader = new SubtitleReader(this);
+        m_dvbsubInfo[id].m_reader = new SubtitleReader();
         m_dvbsubInfo[id].m_reader->EnableAVSubtitles(true);
         m_dvbsubInfo[id].m_reader->EnableTextSubtitles(true);
         m_dvbsubInfo[id].m_reader->EnableRawTextSubtitles(true);

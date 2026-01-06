@@ -102,6 +102,7 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "captions/cc708decoder.h"
 #include "captions/subtitlereader.h"
 #include "captions/teletextdecoder.h"
+#include "captions/vbilut.h"
 #include "io/mythmediabuffer.h"
 #include "mheg/interactivetv.h"
 #include "mpeg/atscdescriptors.h"

@@ -15,7 +15,7 @@ const uint k708MaxServices = 64;
 class CC708Reader
 {
   public:
-    explicit CC708Reader(MythPlayer *owner);
+    explicit CC708Reader();
     virtual ~CC708Reader();
 
     void SetCurrentService(int service) { m_currentService = service; }
@@ -87,7 +87,6 @@ class CC708Reader
     std::array<CC708Service,k708MaxServices>    m_cc708services;
     std::array<int,k708MaxServices>             m_cc708DelayedDeletes {};
 
-    MythPlayer    *m_parent  {nullptr};
     bool           m_enabled {false};
 };
 #endif // CC708READER_H

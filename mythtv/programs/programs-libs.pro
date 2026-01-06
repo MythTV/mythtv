@@ -60,7 +60,6 @@ using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -lhdhomerun
 using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
-using_system_libbluray: DEFINES += HAVE_LIBBLURAY
 !using_system_libexiv2 {
     LIBS += -L../../external/libexiv2 -lmythexiv2-0.28 -lexpat
     freebsd: LIBS += -lprocstat -liconv

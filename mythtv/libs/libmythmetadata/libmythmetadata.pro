@@ -65,8 +65,6 @@ LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
     INCLUDEPATH += ../../external/libmythbluray/src
     DEPENDPATH += ../../external/libmythbluray
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
-} else {
-    DEFINES += HAVE_LIBBLURAY
 }
 
 using_system_libbluray:android {

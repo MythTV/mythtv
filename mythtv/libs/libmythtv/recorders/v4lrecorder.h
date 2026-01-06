@@ -4,7 +4,6 @@
 
 #include "libmythbase/mthread.h"
 
-#include "libmythtv/captions/cc608decoder.h"
 #include "libmythtv/recorders/dtvrecorder.h"
 #include "libmythtv/tv.h" // for VBIMode
 

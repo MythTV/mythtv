@@ -15,7 +15,6 @@ extern "C" {
 #include <QString>
 
 #include "audio/audiooutputsettings.h"
-#include "captions/vbilut.h"
 #include "decoderbase.h"
 #include "io/mythavformatbuffer.h"
 #include "mpeg/AVCParser.h"
