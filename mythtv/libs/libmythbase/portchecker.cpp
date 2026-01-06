@@ -66,18 +66,17 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3")
         .arg(host).arg(port).arg(timeLimit.count()));
     m_cancelCheck = false;
-    QHostAddress addr;
-    bool isIPAddress = addr.setAddress(host);
-    bool islinkLocal = false;
 // Windows does not need the scope on the ip address so we can skip
 // some processing
 #ifndef Q_OS_WINDOWS
+    QHostAddress addr;
+    bool isIPAddress = addr.setAddress(host);
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
-        islinkLocal = true;
-    QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
-    auto iCard = cards.cbegin();
+    {
+        return resolveLinkLocal(host, port, timeLimit);
+    }
 #endif
     MythTimer timer(MythTimer::kStartRunning);
     QTcpSocket socket(this);
@@ -89,66 +88,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
     {
         if (state == QAbstractSocket::UnconnectedState)
         {
-// Windows does not need the scope on the ip address so we can skip
-// some processing
-#ifndef Q_OS_WINDOWS
-            if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
-            {
-                int iCardsEnd = 0;
-                addr.setScopeId(QString());
-                while (addr.scopeId().isEmpty() && iCardsEnd<2)
-                {
-                    // search for the next available IPV6 interface.
-                    if (iCard != cards.cend())
-                    {
-                        QNetworkInterface card = *iCard++;
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
-                        unsigned int flags = card.flags();
-                        if ((flags & QNetworkInterface::IsLoopBack)
-                         || !(flags & QNetworkInterface::IsRunning))
-                            continue;
-                        // check that IPv6 is enabled on that interface
-                        QList<QNetworkAddressEntry> addresses = card.addressEntries();
-                        bool foundv6 = false;
-                        for (const auto& ae : std::as_const(addresses))
-                        {
-                            if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                            {
-                                foundv6 = true;
-                                break;
-                            }
-                        }
-                        if (foundv6)
-                        {
-                            scope = card.name();
-                            addr.setScopeId(scope);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // Get a new list in case a new interface
-                        // has been added.
-                        cards = QNetworkInterface::allInterfaces();
-                        iCard = cards.cbegin();
-                        iCardsEnd++;
-                    }
-                }
-                if (iCardsEnd > 1)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("There is no IPV6 compatible interface for %1").arg(host)
-                        );
-                    break;
-                }
-            }
-#endif
-            QString dest;
-            if (isIPAddress)
-                dest=addr.toString();
-            else
-                dest=host;
-            socket.connectToHost(dest, port);
+            socket.connectToHost(host, port);
             retryCount=0;
         }
         else
@@ -167,12 +107,6 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
         state = socket.state();
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("socket state %1")
             .arg(state));
-    }
-    if (state == QAbstractSocket::ConnectedState
-      && islinkLocal && !scope.isEmpty())
-    {
-       gCoreContext->SetScopeForAddress(addr);
-       host = addr.toString();
     }
     socket.abort();
     processEvents();
