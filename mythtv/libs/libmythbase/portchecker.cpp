@@ -230,21 +230,18 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
-        islinkLocal = true;
     {
-        if (islinkLocal)
+        islinkLocal = true;
+        // If we already know the scope, set it here and return
+        if (gCoreContext->GetScopeForAddress(addr))
         {
-            // If we already know the scope, set it here and return
-            if (gCoreContext->GetScopeForAddress(addr))
-            {
-                host = addr.toString();
-                return true;
-            }
+            host = addr.toString();
+            return true;
         }
-        else
-        {
-            return false;
-        }
+    }
+    else
+    {
+        return false;
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
     auto iCard = cards.cbegin();
