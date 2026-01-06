@@ -192,15 +192,15 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
     auto iCard = cards.cbegin();
     MythTimer timer(MythTimer::kStartRunning);
-    QTcpSocket socket(this);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    int retryCount = 0;
     QString scope;
     bool testedAll = false;
     while (state != QAbstractSocket::ConnectedState
-        && (timer.elapsed() < timeLimit))
+           && (timer.elapsed() < timeLimit)
+           && !m_cancelCheck
+           && !testedAll
+           )
     {
-        if (state == QAbstractSocket::UnconnectedState)
         {
             if (!gCoreContext->GetScopeForAddress(addr))
             {
@@ -253,43 +253,52 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                     break;
                 }
             }
-            socket.connectToHost(addr.toString(), port);
-            retryCount=0;
         }
-        else
+        QTcpSocket socket;
+        socket.connectToHost(addr.toString(), port);
+
+        MythTimer attempt_time {MythTimer::kStartRunning};
+        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
+        static constexpr std::chrono::milliseconds k_poll_interval {1ms};
+        static constexpr std::chrono::milliseconds k_log_interval {100ms};
+        std::chrono::milliseconds next_log {k_log_interval};
+        while (state != QAbstractSocket::ConnectedState
+               && !m_cancelCheck
+               && (timer.elapsed() < timeLimit)
+               && attempt_time.elapsed() < k_attempt_time_limit
+               )
         {
-            retryCount++;
+            {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
+            }
+            state = socket.state();
+            if (attempt_time.elapsed() > next_log)
+            {
+                next_log += k_log_interval;
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                    QString("host %1 port %2 socket state %3, attempt time: %4")
+                    .arg(host, QString::number(port), QString::number(state),
+                         QString::number(attempt_time.elapsed().count())
+                         )
+                    );
+            }
         }
-        // This retry count of 6 means 3 seconds of waiting for
-        // connection before aborting and starting a new connection attempt.
-        if (retryCount > 6)
-            socket.abort();
-        processEvents();
-        // Check if user got impatient and canceled
-        if (m_cancelCheck)
-            break;
-        std::this_thread::sleep_for(500ms);
         state = socket.state();
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("socket state %1")
-            .arg(state));
-        if (state == QAbstractSocket::UnconnectedState && testedAll)
-            break;
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("host %1 port %2 socket state %3, attempt time: %4")
+            .arg(host, QString::number(port), QString::number(state),
+                 QString::number(attempt_time.elapsed().count())
+                 )
+            );
     }
     if (state == QAbstractSocket::ConnectedState && !scope.isEmpty())
     {
        gCoreContext->SetScopeForAddress(addr);
        host = addr.toString();
     }
-    socket.abort();
-    processEvents();
     return (state == QAbstractSocket::ConnectedState);
 #endif
-}
-
-void PortChecker::processEvents(void)
-{
-    qApp->processEvents(QEventLoop::AllEvents, 250);
-    qApp->processEvents(QEventLoop::AllEvents, 250);
 }
 
 /**
