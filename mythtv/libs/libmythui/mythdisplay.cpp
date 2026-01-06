@@ -1274,3 +1274,5 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     if (forcevrr && !(gsyncchanged || freesyncchanged))
         LOG(VB_GENERAL, LOG_INFO, LOC + "Variable refresh rate not adjusted");
 }
+
+#include "moc_mythdisplay.cpp"

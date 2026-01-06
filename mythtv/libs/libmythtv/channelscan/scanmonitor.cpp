@@ -167,3 +167,5 @@ void ScanMonitor::customEvent(QEvent *e)
             m_channelScanner->HandleEvent(scanEvent);
     }
 }
+
+#include "moc_scanmonitor.cpp"

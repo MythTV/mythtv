@@ -75,3 +75,5 @@ void WebSocketMythEvent::customEvent(QEvent* event)
         emit SendTextMessage(message);
     }
 }
+
+#include "moc_websocket_mythevent.cpp"

@@ -2020,3 +2020,5 @@ static unsigned dbg_ident(const MythPlayer *player)
         return *it;
     return s_dbgIdent[player] = s_dbgNextIdent++;
 }
+
+#include "moc_mythplayer.cpp"

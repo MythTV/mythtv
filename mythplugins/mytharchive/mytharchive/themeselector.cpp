@@ -252,3 +252,5 @@ void DVDThemeSelector::saveConfiguration(void)
     theme = theme.replace(QString(" "), QString("_"));
     gCoreContext->SaveSetting("MythBurnMenuTheme", theme);
 }
+
+#include "moc_themeselector.cpp"

@@ -223,4 +223,4 @@ void RawSettingsEditor::valueChanged(void)
         m_settingValue->GetText();
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_rawsettingseditor.cpp"

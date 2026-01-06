@@ -144,3 +144,5 @@ bool MythVideoDRM::RenderFrame(AVDRMFrameDescriptor* DRMDesc, MythVideoFrame* Fr
 
     return m_device->QueueAtomics({{ id, m_videoPlane->m_fbIdProp->m_id, handle->GetFB() }});
 }
+
+#include "moc_mythvideodrm.cpp"

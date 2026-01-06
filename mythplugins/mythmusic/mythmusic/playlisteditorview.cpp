@@ -1806,3 +1806,5 @@ void PlaylistEditorView::deletePlaylist(bool ok)
         }
     }
 }
+
+#include "moc_playlisteditorview.cpp"

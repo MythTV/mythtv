@@ -561,3 +561,5 @@ QString MythMediaDevice::MediaTypeString(uint type)
 
     return mediatype;
 }
+
+#include "moc_mythmedia.cpp"
