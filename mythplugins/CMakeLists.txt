@@ -125,7 +125,6 @@ message(VERBOSE "including MythFindFFmpeg")
 include(MythFindFFmpeg)
 message(VERBOSE "including MythFindQt")
 include(MythFindQt)
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX})
 
 # Qt changes target build names. Reset them.
 include(ResetTargetSuffixes)

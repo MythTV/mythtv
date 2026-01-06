@@ -46,3 +46,11 @@ version_to_number(QT_MIN_VERSION_HEX ${QT${QT_VERSION_MAJOR}_MIN_VERSION_STR}
 set(QT_PKG_NAME Qt${QT_VERSION_MAJOR})
 set(QT_PKG_NAME_UC QT${QT_VERSION_MAJOR})
 set(QT_PKG_NAME_LC qt${QT_VERSION_MAJOR})
+
+#
+# Qt deprecated code removed up to this version.  The compiler
+# argument is now version dependent, so its definition is in the
+# MythFindQt.cmake file after we know the current version.
+#
+set(QT5_DEPRECATION_FIXED "5.15.2")
+set(QT6_DEPRECATION_FIXED "6.10.0")
