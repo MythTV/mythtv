@@ -55,20 +55,32 @@ static constexpr std::chrono::milliseconds AUDIOCARD_BUFFER { 500ms };
 // anything lower than 50ms on windows, isn't reliable
 static constexpr std::chrono::milliseconds AUDIO_BUFFER { 100ms };
 
-class RaopNetStream : public QTextStream
+class RaopNetStream
 {
 public:
-    explicit RaopNetStream(QIODevice *device) : QTextStream(device)
+    explicit RaopNetStream(QIODevice *device) : m_q(new QTextStream(device))
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        m_q->setCodec("UTF-8");
+#else
+        m_q->setEncoding(QStringConverter::Utf8);
+#endif
     };
+    ~RaopNetStream()
+    {
+        delete m_q;
+    }
     RaopNetStream &operator<<(const QString &str)
     {
         LOG(VB_PLAYBACK, LOG_DEBUG,
             LOC + QString("Sending(%1): ").arg(str.length()) + str.trimmed());
-        QTextStream *q = this;
-        *q << str;
+        *m_q << str;
         return *this;
     };
+    void flush() { m_q->flush(); }
+
+private:
+    QTextStream *m_q {nullptr};
 };
 
 MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
@@ -202,11 +214,6 @@ bool MythRAOPConnection::Init(void)
 {
     // connect up the request socket
     m_textStream = new RaopNetStream(m_socket);
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    m_textStream->setCodec("UTF-8");
-#else
-    m_textStream->setEncoding(QStringConverter::Utf8);
-#endif
     if (!connect(m_socket, &QIODevice::readyRead, this, &MythRAOPConnection::readClient))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to connect client socket signal.");
