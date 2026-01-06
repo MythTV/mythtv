@@ -29,6 +29,7 @@
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QTcpSocket>
+#include <QThread>
 #include <QEventLoop>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
@@ -100,9 +101,16 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
                && attempt_time.elapsed() < k_attempt_time_limit
                )
         {
+            if (QCoreApplication::instance() != nullptr &&
+                QThread::currentThread() == QCoreApplication::instance()->thread()
+                )
             {
                 QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
                 std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
+            }
+            else
+            {
+                std::this_thread::sleep_for(k_poll_interval);
             }
             state = socket.state();
             if (attempt_time.elapsed() > next_log)
@@ -268,9 +276,16 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                && attempt_time.elapsed() < k_attempt_time_limit
                )
         {
+            if (QCoreApplication::instance() != nullptr &&
+                QThread::currentThread() == QCoreApplication::instance()->thread()
+                )
             {
                 QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
                 std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
+            }
+            else
+            {
+                std::this_thread::sleep_for(k_poll_interval);
             }
             state = socket.state();
             if (attempt_time.elapsed() > next_log)
