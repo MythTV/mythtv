@@ -223,7 +223,8 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
     }
 
     QJsonObject json = doc.object();
-    foreach(const QString& key, json.keys())
+    QStringList keys = json.keys();
+    for (const QString& key : std::as_const(keys))
     {
         if (!key.isEmpty())
         {

@@ -133,7 +133,7 @@ int MythHTTPMetaService::ParseRequestTypes(const QMetaObject& Meta, const QStrin
     if (index > -1)
     {
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
-        foreach (const QString &info, infos)
+        for (const QString &info : std::as_const(infos))
         {
             if (info.startsWith(QStringLiteral("methods=")))
                 custom |= MythHTTP::RequestsFromString(info.mid(8));

@@ -232,7 +232,7 @@ QString MythXMLPListSerialiser::GetContentName(const QString& Name, const QMetaO
     {
         QStringList infos = QString(MetaObject->classInfo(index).value()).split(';', Qt::SkipEmptyParts);
         QString type; // fallback
-        foreach (const QString &info, infos)
+        for (const QString &info : std::as_const(infos))
         {
             if (info.startsWith(QStringLiteral("name=")))
                 if (auto name = info.mid(5).trimmed(); !name.isEmpty())

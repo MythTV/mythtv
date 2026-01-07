@@ -135,7 +135,7 @@ bool MythWebEngineView::eventFilter(QObject *obj, QEvent *event)
 
 void MythWebEngineView::sendKeyPress(int key, Qt::KeyboardModifiers modifiers, const QString &text)
 {
-    Q_FOREACH(QObject* obj, children())
+    for (QObject* obj : children())
     {
         if (qobject_cast<QWidget*>(obj))
         {
