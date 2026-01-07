@@ -599,6 +599,11 @@ int main(int argc, char *argv[])
             transcode->SetCMDAudioBitrate(cmdline.toInt("audiobitrate") * 1000);
     }
 
+    if (!cmdline.toBool("avf") && !cmdline.toBool("hls") && fifodir.isEmpty())
+    {
+        mpeg2 = true;
+    }
+
     if (showprogress)
         transcode->ShowProgress(true);
     if (!recorderOptions.isEmpty())
@@ -629,7 +634,7 @@ int main(int argc, char *argv[])
     }
 
     int exitcode = GENERIC_EXIT_OK;
-    if ((result == REENCODE_MPEG2TRANS) || mpeg2 || build_index)
+    if (mpeg2 || build_index)
     {
         void (*update_func)(float) = nullptr;
         int (*check_func)() = nullptr;

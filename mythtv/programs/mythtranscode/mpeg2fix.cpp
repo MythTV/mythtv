@@ -2131,6 +2131,12 @@ int MPEG2fixup::Start()
         return GENERIC_EXIT_NOT_OK;
     }
 
+    if (m_inputFC->streams[m_vidId]->codecpar->codec_id != AV_CODEC_ID_MPEG2VIDEO)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Input video codec is not MPEG-2.");
+        return GENERIC_EXIT_NOT_OK;
+    }
+
     if (!FindStart())
     {
         av_packet_free(&pkt);
