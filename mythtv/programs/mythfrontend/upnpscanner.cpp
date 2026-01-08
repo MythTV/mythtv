@@ -530,7 +530,7 @@ void UPNPScanner::Update(void)
             (it.value()->m_controlURL.isEmpty()))
         {
             bool sent = false;
-            QUrl url = it.value()->m_url;
+            QUrl url { it.value()->m_url };
             if (!m_descriptionRequests.contains(url) &&
                 (m_descriptionRequests.empty()) &&
                 url.isValid())
@@ -937,6 +937,11 @@ void UPNPScanner::AddServer(const QString &usn, const QString &url)
     }
 
     QUrl qurl(url);
+    if (!qurl.isValid())
+    {
+        LOG(VB_UPNP, LOG_INFO, LOC + "Ignoring invalid url: " + url);
+        return;
+    }
     if (qurl.host() == m_masterHost && qurl.port() == m_masterPort)
     {
         LOG(VB_UPNP, LOG_INFO, LOC + "Ignoring master backend.");
@@ -946,7 +951,7 @@ void UPNPScanner::AddServer(const QString &usn, const QString &url)
     m_lock.lock();
     if (!m_servers.contains(usn))
     {
-        m_servers.insert(usn, new UpnpMediaServer(url));
+        m_servers.insert(usn, new UpnpMediaServer(qurl));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding: %1").arg(usn));
         ScheduleUpdate();
     }

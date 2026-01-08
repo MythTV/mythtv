@@ -46,5 +46,6 @@ QUrl GetMythXMLSearch(const QString& url, const QString& query, const QString& g
 {
     QString tmp = QString("%1GetInternetSearch?Query=%2&Grabber=%3&Page=%4")
         .arg(url, query, grabber, pagenum);
-    return {tmp};
+    QUrl tmpUrl {tmp};
+    return tmpUrl;
 }

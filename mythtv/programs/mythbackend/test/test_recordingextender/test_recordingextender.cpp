@@ -132,7 +132,8 @@ QUrl TestRecExtEspnDataSource::makeInfoUrl(const SportInfo& info, const QDateTim
     QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         QString("/data/espn_%1_%2_%3xx.json")
         .arg(info.sport, info.league, dt2.toString("yyyyMM"));
-    return {path};
+    QUrl url {path};
+    return url;
 }
 
 QUrl TestRecExtEspnDataSource::makeGameUrl(const ActiveGame& game, const QString& str)
@@ -141,7 +142,8 @@ QUrl TestRecExtEspnDataSource::makeGameUrl(const ActiveGame& game, const QString
     QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
         QString("/data/espn_%1_%2_game_%3.json")
         .arg(info.sport, info.league, str);
-    return {path};
+    QUrl url {path};
+    return url;
 }
 
 RecExtDataPage* TestRecExtMlbDataSource::newPage(const QJsonDocument& doc)
@@ -582,9 +584,9 @@ void TestRecordingExtender::test_parseJson(void)
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "", ""};
     ActiveGame game(0, "MLB Baseball", info);
-    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
-        "/data/mlb_baseball_20210921_1720.json";
-    game.setInfoUrl(path);
+    QUrl url { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
+               "/data/mlb_baseball_20210921_1720.json" };
+    game.setInfoUrl(url);
     game.setTeams("Washington Nationals", "Miami Marlins");
 
     // Test loading info page
@@ -707,9 +709,9 @@ void TestRecordingExtender::test_parseEspn(void)
 
     SportInfo info {"MLB Baseball", AutoExtendType::ESPN, sport, league};
     ActiveGame game(0, "MLB Baseball", info);
-    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
-        "/data/" + infoFile;
-    game.setInfoUrl(path);
+    QUrl url { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
+               "/data/" + infoFile };
+    game.setInfoUrl(url);
 
     // Previous case tested parsing of team names.
     QString team1;
@@ -804,9 +806,9 @@ void TestRecordingExtender::test_parseMlb(void)
 
     SportInfo info {"MLB Baseball", AutoExtendType::MLB, "sport", "league"};
     ActiveGame game(0, "MLB Baseball", info);
-    QString path = "file://" + QStringLiteral(TEST_SOURCE_DIR) +
-        "/data/" + infoFile;
-    game.setInfoUrl(path);
+    QUrl url1 { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
+                "/data/" + infoFile };
+    game.setInfoUrl(url1);
 
     // Previous case tested parsing of team names.
     QString team1;
@@ -833,8 +835,8 @@ void TestRecordingExtender::test_parseMlb(void)
     QVERIFY(game.getGameUrl().url().endsWith(expectedGameURL));
 
     // Test loading games status page
-    path = "file://" + QStringLiteral(TEST_SOURCE_DIR) + "/data/" + gameFile;
-    game.setGameUrl(path);
+    QUrl url2 { "file://" + QStringLiteral(TEST_SOURCE_DIR) + "/data/" + gameFile };
+    game.setGameUrl(url2);
     page = source->loadPage(game, game.getGameUrl());
     QCOMPARE(page != nullptr, true);
 

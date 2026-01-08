@@ -1438,7 +1438,8 @@ QString VideoDialog::RemoteImageCheck(const QString& host, const QString& filena
     {
         for (const auto & dir : std::as_const(dirs))
         {
-            QUrl sgurl = dir;
+            // These are in the form: myth://Videos@<backend>/path/to/dir
+            QUrl sgurl { dir };
             QString path = sgurl.path();
 
             QString fname = QString("%1/%2").arg(path, filename);
@@ -1569,7 +1570,8 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 {
                     for (const auto & dir : std::as_const(dirs))
                     {
-                        QUrl sgurl = dir;
+                        // These are in the form: myth://Videos@<backend>/path/to/dir
+                        QUrl sgurl { dir };
                         QString path = sgurl.path();
 
                         QString subdir = folder_path.right(folder_path.length() - (prefix.length() + 1));
