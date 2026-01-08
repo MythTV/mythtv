@@ -288,7 +288,7 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
         }
         else
         {
-            volumes[channel] = 1.0 / 1.0; // ie no effect
+            volumes[channel] = 1.0; // ie no effect
         }
     }
 
