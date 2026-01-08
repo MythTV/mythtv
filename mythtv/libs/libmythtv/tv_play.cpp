@@ -1027,9 +1027,9 @@ TV::TV(MythMainWindow* MainWindow)
         m_mainWindow->PauseIdleTimer(true);
 
     // Setup various state signals
-    connect(this, &TV::ChangeAudioOffset,   [&]() { m_audiosyncAdjustment = true; });
-    connect(this, &TV::AdjustSubtitleZoom,  [&]() { m_subtitleZoomAdjustment = true; });
-    connect(this, &TV::AdjustSubtitleDelay, [&]() { m_subtitleDelayAdjustment = true; });
+    connect(this, &TV::ChangeAudioOffset,   this, [&]() { m_audiosyncAdjustment = true; });
+    connect(this, &TV::AdjustSubtitleZoom,  this, [&]() { m_subtitleZoomAdjustment = true; });
+    connect(this, &TV::AdjustSubtitleDelay, this, [&]() { m_subtitleDelayAdjustment = true; });
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Finished creating TV object");
 }

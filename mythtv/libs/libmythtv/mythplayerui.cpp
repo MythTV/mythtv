@@ -29,14 +29,14 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     m_captionsOverlay.SetPlayer(this);
 
     // User feedback during slow seeks
-    connect(this, &MythPlayerUI::SeekingSlow, [&](int Count)
+    connect(this, &MythPlayerUI::SeekingSlow, this, [&](int Count)
     {
         UpdateOSDMessage(tr("Searching") + QString().fill('.', Count % 3), kOSDTimeout_Short);
         DisplayPauseFrame();
     });
 
     // Seeking has finished; remove slow seek user feedback window
-    connect(this, &MythPlayerUI::SeekingComplete, [&]()
+    connect(this, &MythPlayerUI::SeekingComplete, this, [&]()
     {
         m_osdLock.lock();
         m_osd.HideWindow(OSD_WIN_MESSAGE);
@@ -44,7 +44,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     });
 
     // Seeking has finished; update position on OSD
-    connect(this, &MythPlayerUI::SeekingDone, [&]()
+    connect(this, &MythPlayerUI::SeekingDone, this, [&]()
     {
         UpdateOSDPosition();
     });

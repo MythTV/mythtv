@@ -78,7 +78,7 @@ bool MythPlayerVideoUI::InitVideo()
     connect(m_tv,  &TV::ChangeAspectOverride,     this,  &MythPlayerVideoUI::ReinitOSD);
     connect(m_tv,  &TV::ChangeZoom,               this,  &MythPlayerVideoUI::ReinitOSD);
     connect(m_tv,  &TV::ToggleMoveBottomLine,     this,  &MythPlayerVideoUI::ReinitOSD);
-    connect(m_tv,  &TV::ToggleDetectLetterBox, toggleDetectLetterbox);
+    connect(m_tv,  &TV::ToggleDetectLetterBox,    this, toggleDetectLetterbox);
 
     // Passthrough signals
     connect(m_tv, &TV::ResizeScreenForVideo,     video, &MythVideoOutputGPU::ResizeForVideo);
