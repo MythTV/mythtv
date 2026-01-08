@@ -1296,7 +1296,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
             return false;
         }
 
-        QByteArray buf(cmd.toUtf8(), cmd.size());
+        QByteArray buf = cmd.toUtf8();
         buf += '\n';
 
         if (m_io->Error())
@@ -1407,7 +1407,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
             return false;
         }
 
-        QByteArray buf(cmd.toUtf8(), cmd.size());
+        QByteArray buf = cmd.toUtf8();
         buf += '\n';
 
         if (m_io->Error())

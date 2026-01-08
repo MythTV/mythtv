@@ -184,8 +184,7 @@ void MetadataImageDownload::run()
 
                     if (dest_file.open(QIODevice::WriteOnly))
                     {
-                        off_t size = dest_file.write(download,
-                                                     download.size());
+                        off_t size = dest_file.write(download);
                         dest_file.close();
                         if (size != download.size())
                         {
@@ -292,8 +291,7 @@ void MetadataImageDownload::run()
                         QFile dest_file(resolvedFN);
                         if (dest_file.open(QIODevice::WriteOnly))
                         {
-                            off_t size = dest_file.write(download,
-                                                         download.size());
+                            off_t size = dest_file.write(download);
                             dest_file.close();
                             if (size != download.size())
                             {
