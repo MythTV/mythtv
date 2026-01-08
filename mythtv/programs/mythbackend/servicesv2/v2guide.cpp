@@ -240,7 +240,7 @@ V2ProgramList* V2Guide::GetProgramList(int              nStartIndex,
         // Handle ProgGroupBy enum name
         auto meta = QMetaEnum::fromType<ProgGroupBy::Type>();
         bool ok = false;
-        nGroupBy = ProgGroupBy::Type(meta.keyToValue(sGroupBy.toLocal8Bit(), &ok));
+        nGroupBy = ProgGroupBy::Type(meta.keyToValue(sGroupBy.toLocal8Bit().constData(), &ok));
         if (!ok)
             throw QString( "GroupBy is invalid" );
     }

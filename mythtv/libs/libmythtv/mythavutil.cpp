@@ -382,7 +382,8 @@ MythStreamInfoList::MythStreamInfoList(const QString& filename)
     if (m_errorCode==0)
     {
         ctx = avformat_alloc_context();
-        m_errorCode = avformat_open_input(&ctx, filename.toUtf8(), fmt, nullptr);
+        m_errorCode = avformat_open_input(&ctx, filename.toUtf8().constData(),
+                                          fmt, nullptr);
     }
     if (m_errorCode==0)
         m_errorCode = avformat_find_stream_info(ctx, nullptr);

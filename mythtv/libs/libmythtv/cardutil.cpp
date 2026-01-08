@@ -119,7 +119,7 @@ bool CardUtil::IsCableCardPresent([[maybe_unused]] uint inputid,
         hdhomerun_tuner_status_t status {};
         QString device = GetVideoDevice(inputid);
         hdhomerun_device_t *hdhr =
-            hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+            hdhomerun_device_create_from_str(device.toLatin1().constData(), nullptr);
         if (!hdhr)
             return false;
 
@@ -517,7 +517,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                 uint8_t tuners = hdhomerun_discover2_device_get_tuner_count(device);
                 uint32_t device_id = hdhomerun_discover2_device_get_device_id(device);
                 QString id = QString("%1").arg(device_id, 0, 16, QChar('0')).toUpper();
-                auto *dev1 = hdhomerun_device_create_from_str(id.toLatin1(), nullptr);
+                auto *dev1 = hdhomerun_device_create_from_str(id.toLatin1().constData(), nullptr);
                 QString model = hdhomerun_device_get_model_str(dev1);
 
                 QHostAddress ip;
@@ -3087,7 +3087,7 @@ bool CardUtil::HDHRdoesDVB([[maybe_unused]] const QString &device)
 {
 #if CONFIG_HDHOMERUN
     hdhomerun_device_t *hdhr =
-        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+        hdhomerun_device_create_from_str(device.toLatin1().constData(), nullptr);
     if (!hdhr)
         return false;
 
@@ -3113,7 +3113,7 @@ bool CardUtil::HDHRdoesDVBC([[maybe_unused]] const QString &device)
 {
 #if CONFIG_HDHOMERUN
     hdhomerun_device_t *hdhr =
-        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+        hdhomerun_device_create_from_str(device.toLatin1().constData(), nullptr);
     if (!hdhr)
         return false;
 
@@ -3157,7 +3157,7 @@ QString CardUtil::GetHDHRdesc([[maybe_unused]] const QString &device)
                               ") - trying to locate device");
 
     hdhomerun_device_t *hdhr =
-        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+        hdhomerun_device_create_from_str(device.toLatin1().constData(), nullptr);
     if (!hdhr)
         return QObject::tr("Invalid Device ID or address.");
 

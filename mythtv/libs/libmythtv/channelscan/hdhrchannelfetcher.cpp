@@ -174,7 +174,7 @@ QString HDHRIPv4Address([[maybe_unused]] const QString &device)
 {
 #if CONFIG_HDHOMERUN
     hdhomerun_device_t *hdhr =
-        hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+        hdhomerun_device_create_from_str(device.toLatin1().constData(), nullptr);
     if (!hdhr)
         return {};
 

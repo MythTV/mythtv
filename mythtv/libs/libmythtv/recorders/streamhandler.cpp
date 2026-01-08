@@ -390,7 +390,9 @@ bool StreamHandler::AddNamedOutputFile([[maybe_unused]] const QString &file)
     }
     else
     {
-        if (link(m_mptsBaseFile.toLocal8Bit(), fn.toLocal8Bit()) < 0)
+        if (link(m_mptsBaseFile.toLocal8Bit().constData(),
+                 fn.toLocal8Bit().constData())
+            < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to link '%1' to '%2'")

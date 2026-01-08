@@ -195,7 +195,7 @@ void MythUIThemeCache::PruneCacheDir(const QString& dirname)
         QString fullname = fi.filePath();
         if (not fullname.startsWith('/'))
             fullname = dirname + "/" + fullname;
-        int rc = stat(fullname.toLocal8Bit(), &buf);
+        int rc = stat(fullname.toLocal8Bit().constData(), &buf);
         if (rc >= 0)
         {
             if (buf.st_atime < cutoffsecs)

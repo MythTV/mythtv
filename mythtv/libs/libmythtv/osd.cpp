@@ -775,7 +775,7 @@ void OSD::DialogShow(const QString &Window, const QString &Text, std::chrono::mi
         else if (Window == OSD_DLG_NAVIGATE)
             dialog = new MythNavigationOverlay(m_mainWindow, m_tv, m_player, Window, this);
         else
-            dialog = new MythDialogBox(Text, nullptr, Window.toLatin1(), false, true);
+            dialog = new MythDialogBox(Text, nullptr, Window.toLatin1().constData(), false, true);
 
         dialog->SetPainter(m_painter);
         if (dialog->Create())

@@ -252,7 +252,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
             QString sMethodClassInfo = oInfo.m_sName + "_Method";
 
             int nClassIdx =
-                m_oMetaObject.indexOfClassInfo(sMethodClassInfo.toLatin1());
+                m_oMetaObject.indexOfClassInfo(sMethodClassInfo.toLatin1().constData());
 
             if (nClassIdx >=0)
             {

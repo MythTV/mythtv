@@ -517,7 +517,7 @@ QString Wsdl::ReadClassInfo( const QMetaObject *pMeta, const QString &sKey )
     int nIdx = -1;
 
     if (pMeta)
-        nIdx = pMeta->indexOfClassInfo( sKey.toUtf8() );
+        nIdx = pMeta->indexOfClassInfo( sKey.toUtf8().constData() );
 
     if (nIdx >=0)
         return pMeta->classInfo( nIdx ).value();

@@ -123,7 +123,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) &&
             (config->device_type == AV_HWDEVICE_TYPE_CUDA))
         {
-            const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+            const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit().constData());
             if (codec)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));
@@ -320,7 +320,7 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     QString mode = "adaptive";
     if (DEINT_BASIC == deinterlacer)
         mode = "bob";
-    int result = av_opt_set(Context->priv_data, "deint", mode.toLocal8Bit(), 0);
+    int result = av_opt_set(Context->priv_data, "deint", mode.toLocal8Bit().constData(), 0);
     if (result == 0)
     {
         if (av_opt_set_int(Context->priv_data, "drop_second_field", static_cast<int>(!DoubleRate), 0) == 0)

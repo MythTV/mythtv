@@ -441,11 +441,11 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
     // We store the volume name for user activities like ChooseAndEjectMedia().
     media->setVolumeID(volName);
-    media->setDeviceModel(model.toLatin1());  // Same for the Manufacturer and model
+    media->setDeviceModel(model.toLatin1().constData());  // Same for the Manufacturer and model
 
     // Mac OS X devices are pre-mounted here:
     QString mnt = "/Volumes/"; mnt += volName;
-    media->setMountPath(mnt.toLatin1());
+    media->setMountPath(mnt.toLatin1().constData());
 
     int  attempts = 0;
     QDir d(mnt);
@@ -514,7 +514,7 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
         pDevice->setStatus(MEDIASTAT_NODISK);
 
         pDevice->setVolumeID(volName);
-        pDevice->setMountPath((QString("/Volumes/") + volName).toLatin1());
+        pDevice->setMountPath((QString("/Volumes/") + volName).toLatin1().constData());
 
         // Plugins can now use it again:
         pDevice->setStatus(MEDIASTAT_USEABLE);

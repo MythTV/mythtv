@@ -95,11 +95,11 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
         else
         {
             // Entry missing in table.
-            QString result = QString::fromUtf8(uncompressed, p);
+            QString result = QString::fromUtf8(uncompressed.constData(), p);
             result.append("...");
             return result;
         }
     } while (lastch != STOP && byte < size+4);
 
-    return QString::fromUtf8(uncompressed, p);
+    return QString::fromUtf8(uncompressed.constData(), p);
 }

@@ -464,7 +464,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     text = QCoreApplication::translate("ThemeUI",
-                                           parseText(info).toUtf8() );
+                                           parseText(info).toUtf8().constData() );
                 }
                 else if ((info.attribute("lang","").toLower() ==
                           gCoreContext->GetLanguageAndVariant()) ||
@@ -480,7 +480,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     alttext = QCoreApplication::translate("ThemeUI",
-                                              parseText(info).toUtf8());
+                                              parseText(info).toUtf8().constData());
                 }
                 else if ((info.attribute("lang","").toLower() ==
                           gCoreContext->GetLanguageAndVariant()) ||
@@ -526,7 +526,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     info.attribute("lang","").isEmpty())
                 {
                     description = QCoreApplication::translate("ThemeUI",
-                                                  getFirstText(info).toUtf8());
+                                                  getFirstText(info).toUtf8().constData());
                 }
                 else if ((info.attribute("lang","").toLower() ==
                           gCoreContext->GetLanguageAndVariant()) ||

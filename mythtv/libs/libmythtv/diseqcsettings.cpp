@@ -744,7 +744,7 @@ class LNBPresetSetting : public MythUIComboBoxSetting
 
         uint i = 0;
         for (; !lnb_presets[i].m_name.isEmpty(); i++)
-                        addSelection(DeviceTree::tr( lnb_presets[i].m_name.toUtf8() ),
+                        addSelection(DeviceTree::tr( lnb_presets[i].m_name.toUtf8().constData() ),
                          QString::number(i));
         addSelection(DeviceTree::tr("Custom"), QString::number(i));
     }

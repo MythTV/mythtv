@@ -1606,7 +1606,8 @@ bool MythRAOPConnection::LoadKey(void)
         return true;
 
     QString sName( "/RAOPKey.rsa" );
-    FILE *file = fopen(GetConfDir().toUtf8() + sName.toUtf8(), "rb");
+    QString sPath = GetConfDir() + sName;
+    FILE *file = fopen(sPath.toUtf8().constData(), "rb");
 
     if ( !file )
     {

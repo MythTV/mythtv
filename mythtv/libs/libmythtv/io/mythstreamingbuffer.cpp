@@ -74,7 +74,8 @@ bool MythStreamingBuffer::OpenFile(const QString &Filename, std::chrono::millise
     if (url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive))
         url.setScheme("hls+http");
 
-    int res = avio_open(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ);
+    int res = avio_open(&m_context, url.toString().toLatin1().constData(),
+                        AVIO_FLAG_READ);
     if (res < 0 || !m_context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open stream (%1) (error %2)")

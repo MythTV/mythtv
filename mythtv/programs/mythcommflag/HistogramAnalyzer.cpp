@@ -114,8 +114,7 @@ writeData(const QString& filename, float *mean, unsigned char *median, float *st
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
 {
-    QByteArray fname = filename.toLocal8Bit();
-    FILE *fp = fopen(fname, "w");
+    FILE *fp = fopen(filename.toLocal8Bit().constData(), "w");
     if (fp == nullptr)
         return false;
     for (long long frameno = 0; frameno < nframes; frameno++)

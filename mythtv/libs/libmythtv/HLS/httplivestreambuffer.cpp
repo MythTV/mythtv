@@ -1796,7 +1796,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
     MythMediaBuffer::AVFormatInitNetwork();
 
     AVIOContext* context = nullptr;
-    int ret = avio_open(&context, filename.toLatin1(), AVIO_FLAG_READ);
+    int ret = avio_open(&context, filename.toLatin1().constData(), AVIO_FLAG_READ);
     if (ret >= 0)
     {
         std::array<uint8_t,1024> buffer {};

@@ -91,7 +91,7 @@ void MythUIText::ResetMap(const InfoMap &map)
     if (!replaced && !newText.isEmpty() && newText.contains(re))
     {
         QString translatedTemplate = QCoreApplication::translate("ThemeUI",
-                                                     newText.toUtf8());
+                                                     newText.toUtf8().constData());
 
         QRegularExpressionMatchIterator i = re.globalMatch(translatedTemplate);
         while (i.hasNext()) {
@@ -148,7 +148,7 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     if (!newText.isEmpty() && newText.contains(re))
     {
         QString translatedTemplate = QCoreApplication::translate("ThemeUI",
-                                                     newText.toUtf8());
+                                                     newText.toUtf8().constData());
 
         QString tempString = translatedTemplate;
         bool replaced = map.contains(objectName());
@@ -778,12 +778,13 @@ void MythUIText::FillCutMessage(void)
         if (isNumber && m_templateText.contains("%n"))
         {
             m_cutMessage = QCoreApplication::translate("ThemeUI",
-                                           m_templateText.toUtf8(), nullptr,
-                                           qAbs(value));
+                                           m_templateText.toUtf8().constData(),
+                                           nullptr, qAbs(value));
         }
         else if (m_templateText.contains("%1"))
         {
-            QString tmp = QCoreApplication::translate("ThemeUI", m_templateText.toUtf8());
+            QString tmp = QCoreApplication::translate("ThemeUI",
+                                           m_templateText.toUtf8().constData());
             m_cutMessage = tmp.arg(m_message);
         }
     }
@@ -1417,7 +1418,7 @@ bool MythUIText::ParseElement(
         if (element.attribute("lang", "").isEmpty())
         {
             m_message = QCoreApplication::translate("ThemeUI",
-                                        parseText(element).toUtf8());
+                                        parseText(element).toUtf8().constData());
         }
         else if ((element.attribute("lang", "").toLower() ==
                   gCoreContext->GetLanguageAndVariant()) ||

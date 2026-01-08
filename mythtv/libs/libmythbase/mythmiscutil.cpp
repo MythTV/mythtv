@@ -949,8 +949,8 @@ void setHttpProxy(void)
         }
 
         url = url.arg(p.hostName()).arg(p.port());
-        setenv("HTTP_PROXY", url.toLatin1(), 1);
-        setenv("http_proxy", url.toLatin1(), 0);
+        setenv("HTTP_PROXY", url.toLatin1().constData(), 1);
+        setenv("http_proxy", url.toLatin1().constData(), 0);
 
         return;
     }

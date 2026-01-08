@@ -158,11 +158,11 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
 #endif
             if (metaobject)
             {
-                int enumindex = metaobject->indexOfEnumerator(enumname.toUtf8());
+                int enumindex = metaobject->indexOfEnumerator(enumname.toUtf8().constData());
                 if (enumindex >= 0)
                 {
                     QMetaEnum metaEnum = metaobject->enumerator(enumindex);
-                    value = metaEnum.keyToValue(Value.toUtf8());
+                    value = metaEnum.keyToValue(Value.toUtf8().constData());
                 }
             }
         }

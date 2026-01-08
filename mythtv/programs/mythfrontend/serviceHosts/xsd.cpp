@@ -82,7 +82,7 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName )
     // Now look up enum
     // ----------------------------------------------------------------------
 
-    int nEnumIdx = pMetaObject->indexOfEnumerator( lstTypeParts[1].toUtf8() );
+    int nEnumIdx = pMetaObject->indexOfEnumerator( lstTypeParts[1].toUtf8().constData() );
 
     if (nEnumIdx < 0 )
         return false;
@@ -159,7 +159,7 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName )
 
         oEnumVal .appendChild( createTextNode( QString::number( metaEnum.value( nIdx ))));
         oEnumDesc.appendChild( createTextNode( QCoreApplication::translate("Enums",
-                                                                           sFQNKey.toUtf8() )));
+                                                                           sFQNKey.toUtf8().constData() )));
 
         oRestrictNode.appendChild( oEnum );
     }
@@ -924,7 +924,7 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, const QString& sPropName, c
     int nIdx = -1;
 
     if (pMeta)
-        nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8() );
+        nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8().constData() );
 
     if (nIdx >=0)
     {

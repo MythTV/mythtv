@@ -156,7 +156,7 @@ QString Serializer::ReadPropertyMetadata( const QObject *pObject,
     int nIdx = -1;
 
     if (pMeta)
-        nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8());
+        nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8().constData() );
 
     if (nIdx >=0)
     {

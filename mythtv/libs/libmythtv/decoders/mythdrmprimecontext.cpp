@@ -53,7 +53,7 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
     QString name = QString((*Codec)->name) + "_" + CodecName;
     if (name.startsWith("mpeg2video"))
         name = "mpeg2_" + CodecName;
-    const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
+    const AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit().constData());
     auto *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     if (!codec || !decoder)
     {

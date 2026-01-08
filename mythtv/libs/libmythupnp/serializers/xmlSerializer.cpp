@@ -336,7 +336,7 @@ QString XmlSerializer::GetContentName( const QString        &sName,
     int nClassIdx = -1;
 
     if ( pMetaObject )
-        nClassIdx = pMetaObject->indexOfClassInfo( sName.toLatin1() );
+        nClassIdx = pMetaObject->indexOfClassInfo( sName.toLatin1().constData() );
 
     if (nClassIdx >=0 )
     {

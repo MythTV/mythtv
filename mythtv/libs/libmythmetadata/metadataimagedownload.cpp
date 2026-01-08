@@ -272,7 +272,7 @@ void MetadataImageDownload::run()
                             errored = true;
                             break;
                         }
-                        off_t written = outFile.Write(download,
+                        off_t written = outFile.Write(download.constData(),
                                                       download.size());
                         if (written != download.size())
                         {

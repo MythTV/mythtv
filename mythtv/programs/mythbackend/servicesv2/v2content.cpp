@@ -650,7 +650,7 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
             image = image.scaled(nWidth, nHeight, Qt::IgnoreAspectRatio,
                                         Qt::SmoothTransformation);
 
-        image.save(sNewFileName, sImageFormat.toUpper().toLocal8Bit());
+        image.save(sNewFileName, sImageFormat.toUpper().toLocal8Bit().constData());
 
         // Let anybody update it
         bool ret = makeFileAccessible(sNewFileName.toLocal8Bit().constData());

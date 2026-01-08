@@ -69,7 +69,7 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
     if (Name.isEmpty() && Serialnum.isEmpty())
     {
         struct stat stat {};
-        if ((MythFileStat(Filename.toLocal8Bit(), &stat) == 0) && S_ISDIR(stat.st_mode))
+        if ((MythFileStat(Filename.toLocal8Bit().constData(), &stat) == 0) && S_ISDIR(stat.st_mode))
         {
             // Name and serial number are empty because we're reading
             // from a directory (and not a device or image).
@@ -82,7 +82,7 @@ void MythDVDInfo::GetNameAndSerialNum(dvdnav_t* Nav,
 
             // And use the CRC of VTS_01_0.IFO as a serial number
             QString ifo = Filename + QString("/VIDEO_TS/VTS_01_0.IFO");
-            int fd = MythFileOpen(ifo.toLocal8Bit(), O_RDONLY);
+            int fd = MythFileOpen(ifo.toLocal8Bit().constData(), O_RDONLY);
 
             if (fd > 0)
             {

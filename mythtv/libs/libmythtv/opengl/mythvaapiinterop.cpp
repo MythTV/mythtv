@@ -329,7 +329,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     inputs->pad_idx    = 0;
     inputs->next       = nullptr;
 
-    ret = avfilter_graph_parse_ptr(Graph, filters.toLocal8Bit(),
+    ret = avfilter_graph_parse_ptr(Graph, filters.toLocal8Bit().constData(),
                                    &inputs, &outputs, nullptr);
     if (ret < 0)
     {

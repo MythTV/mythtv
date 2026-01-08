@@ -556,7 +556,7 @@ bool MythMainWindow::SaveScreenShot(const QImage& Image, QString Filename)
     LOG(VB_GENERAL, LOG_INFO, QString("Saving screenshot to %1 (%2x%3)")
                        .arg(Filename).arg(Image.width()).arg(Image.height()));
 
-    if (Image.save(Filename, extension.toLatin1(), 100))
+    if (Image.save(Filename, extension.toLatin1().constData(), 100))
     {
         LOG(VB_GENERAL, LOG_INFO, "MythMainWindow::screenShot succeeded");
         return true;

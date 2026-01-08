@@ -117,7 +117,7 @@ const QString& MythTVMenu::GetKeyBindingContext() const
 
 QString MythTVMenu::Translate(const QString& Text) const
 {
-    return QCoreApplication::translate(m_translationContext, Text.toUtf8(), nullptr);
+    return QCoreApplication::translate(m_translationContext, Text.toUtf8().constData(), nullptr);
 }
 
 bool MythTVMenu::MatchesGroup(const QString &Name, const QString &Prefix,

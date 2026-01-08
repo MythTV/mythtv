@@ -129,7 +129,7 @@ MythHTTPMetaService::MythHTTPMetaService(const QString& Name, const QMetaObject&
 int MythHTTPMetaService::ParseRequestTypes(const QMetaObject& Meta, const QString& Method, QString& ReturnName)
 {
     int custom = HTTPUnknown;
-    int index = Meta.indexOfClassInfo(Method.toLatin1());
+    int index = Meta.indexOfClassInfo(Method.toLatin1().constData());
     if (index > -1)
     {
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
@@ -167,7 +167,7 @@ int MythHTTPMetaService::ParseRequestTypes(const QMetaObject& Meta, const QStrin
 
 bool MythHTTPMetaService::isProtected(const QMetaObject& Meta, const QString& Method)
 {
-    int index = Meta.indexOfClassInfo(Method.toLatin1());
+    int index = Meta.indexOfClassInfo(Method.toLatin1().constData());
     if (index > -1)
     {
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);

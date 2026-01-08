@@ -147,14 +147,14 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
             // Now look up enum
             // --------------------------------------------------------------
 
-            int nEnumIdx = pMetaObject->indexOfEnumerator( sEnumName.toUtf8());
+            int nEnumIdx = pMetaObject->indexOfEnumerator( sEnumName.toUtf8().constData() );
 
             if (nEnumIdx < 0 )
                 break;
 
             QMetaEnum metaEnum = pMetaObject->enumerator( nEnumIdx );
 
-            *(( int *)pParam) = metaEnum.keyToValue( sValue.toUtf8() );
+            *(( int *)pParam) = metaEnum.keyToValue( sValue.toUtf8().constData() );
 
             break;
     }

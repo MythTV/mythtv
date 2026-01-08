@@ -40,7 +40,7 @@ QString GetGameTypeName(const QString &GameType)
         { return console.m_idStr == GameType; };
     const auto *const con = std::find_if(GameTypeList.cbegin(), GameTypeList.cend(), sametype);
     return (con != GameTypeList.cend())
-        ? QCoreApplication::translate("(GameTypes)", con->m_nameStr.toUtf8())
+        ? QCoreApplication::translate("(GameTypes)", con->m_nameStr.toUtf8().constData())
         : "";
 }
 
@@ -254,7 +254,7 @@ struct GameType : public MythUIComboBoxSetting
         for (const auto & console : GameTypeList)
         {
             addSelection(QCoreApplication::translate("(GameTypes)",
-                                                     console.m_nameStr.toUtf8()),
+                                                     console.m_nameStr.toUtf8().constData()),
                          console.m_idStr);
         }
         setValue(0);

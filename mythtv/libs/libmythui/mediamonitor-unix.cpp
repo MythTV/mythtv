@@ -343,7 +343,7 @@ bool MediaMonitorUnix::CheckMountable(void)
                 }
                 else if (mythdevice == UDisks2HDD)
                 {
-                    pDevice = MythHDD::Get(this, path.toLatin1(), false, false);
+                    pDevice = MythHDD::Get(this, path.toLatin1().constData(), false, false);
                     LOG(VB_MEDIA, LOG_DEBUG, LOC +
                         "deviceAdded: Added MythHDD: " + path);
                 }
@@ -836,7 +836,7 @@ void MediaMonitorUnix::deviceAdded( const QDBusObjectPath& o,
         }
         else if (mythdevice == UDisks2HDD)
         {
-            pDevice = MythHDD::Get(this, path.toLatin1(), false, false);
+            pDevice = MythHDD::Get(this, path.toLatin1().constData(), false, false);
             LOG(VB_MEDIA, LOG_DEBUG, LOC +
                 "deviceAdded: Added MythHDD: " + path);
         }
