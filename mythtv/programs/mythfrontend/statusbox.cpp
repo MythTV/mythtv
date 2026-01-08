@@ -45,7 +45,8 @@ struct LogLine {
 
 void StatusBoxItem::Start(std::chrono::seconds Interval)
 {
-    connect(this, &QTimer::timeout, [this]() { emit UpdateRequired(this); });
+    connect(this, &QTimer::timeout,
+            this, [this]() { emit UpdateRequired(this); });
     start(Interval);
 }
 
@@ -240,13 +241,13 @@ void StatusBox::updateLogList(MythUIButtonListItem *item)
     if (item->GetData().value<MythUICallbackMF>())
     {
         connect(this, &StatusBox::updateLog,
-                item->GetData().value<MythUICallbackMF>());
+                this, item->GetData().value<MythUICallbackMF>());
         emit updateLog();
     }
     else if (item->GetData().value<MythUICallbackMFc>())
     {
         connect(this, &StatusBox::updateLog,
-                item->GetData().value<MythUICallbackMFc>());
+                this, item->GetData().value<MythUICallbackMFc>());
         emit updateLog();
     }
 }
@@ -1192,7 +1193,8 @@ void StatusBox::doMachineStatus()
         Item->SetText("   " + tr("System time") + ": " + QDateTime::currentDateTime().toString());
     };
     UpdateTime(timebox);
-    connect(timebox, &StatusBoxItem::UpdateRequired, UpdateTime);
+    connect(timebox, &StatusBoxItem::UpdateRequired,
+            timebox, UpdateTime);
     timebox->Start();
 
     // Hostname & IP
@@ -1239,7 +1241,8 @@ void StatusBox::doMachineStatus()
                 Item->SetText(uptimeStr(time));
         };
         StatusBoxItem *uptimeitem = AddLogLine(uptimeStr(uptime));
-        connect(uptimeitem, &StatusBoxItem::UpdateRequired, UpdateUptime);
+        connect(uptimeitem, &StatusBoxItem::UpdateRequired,
+                uptimeitem, UpdateUptime);
         uptimeitem->Start(1min);
     }
 
@@ -1253,7 +1256,8 @@ void StatusBox::doMachineStatus()
     };
     StatusBoxItem* loaditem = AddLogLine("");
     UpdateLoad(loaditem);
-    connect(loaditem, &StatusBoxItem::UpdateRequired, UpdateLoad);
+    connect(loaditem, &StatusBoxItem::UpdateRequired,
+            loaditem, UpdateLoad);
     loaditem->Start();
 #endif
 
@@ -1287,8 +1291,10 @@ void StatusBox::doMachineStatus()
         StatusBoxItem* swap = AddLogLine("", machineStr);
         UpdateMem(mem);
         UpdateSwap(swap);
-        connect(mem,  &StatusBoxItem::UpdateRequired, UpdateMem);
-        connect(swap, &StatusBoxItem::UpdateRequired, UpdateSwap);
+        connect(mem,  &StatusBoxItem::UpdateRequired,
+                mem, UpdateMem);
+        connect(swap, &StatusBoxItem::UpdateRequired,
+                swap, UpdateSwap);
         mem->Start(3s);
         swap->Start(3s);
     }
@@ -1313,7 +1319,8 @@ void StatusBox::doMachineStatus()
                 Item->SetText(uptimeStr(time));
             };
             StatusBoxItem *remoteuptime = AddLogLine(uptimeStr(uptime));
-            connect(remoteuptime, &StatusBoxItem::UpdateRequired, UpdateRemoteUptime);
+            connect(remoteuptime, &StatusBoxItem::UpdateRequired,
+                    remoteuptime, UpdateRemoteUptime);
             remoteuptime->Start(1min);
         }
 
@@ -1330,7 +1337,8 @@ void StatusBox::doMachineStatus()
             };
             StatusBoxItem* remoteloaditem = AddLogLine("");
             UpdateRemoteLoad(remoteloaditem);
-            connect(remoteloaditem, &StatusBoxItem::UpdateRequired, UpdateRemoteLoad);
+            connect(remoteloaditem, &StatusBoxItem::UpdateRequired,
+                    remoteloaditem, UpdateRemoteLoad);
             remoteloaditem->Start();
         }
 
@@ -1360,8 +1368,10 @@ void StatusBox::doMachineStatus()
             StatusBoxItem* rswap = AddLogLine("", machineStr);
             UpdateRemoteMem(rmem);
             UpdateRemoteSwap(rswap);
-            connect(rmem,  &StatusBoxItem::UpdateRequired, UpdateRemoteMem);
-            connect(rswap, &StatusBoxItem::UpdateRequired, UpdateRemoteSwap);
+            connect(rmem,  &StatusBoxItem::UpdateRequired,
+                    rmem, UpdateRemoteMem);
+            connect(rswap, &StatusBoxItem::UpdateRequired,
+                    rswap, UpdateRemoteSwap);
             rmem->Start(10s);
             rswap->Start(11s);
         }
@@ -1498,7 +1508,8 @@ void StatusBox::doRenderStatus()
             // Reset the frame counter
             (void)opengl->GetSwapCount();
             UpdateFPS(fps);
-            connect(fps, &StatusBoxItem::UpdateRequired, UpdateFPS);
+            connect(fps, &StatusBoxItem::UpdateRequired,
+                    fps, UpdateFPS);
             fps->Start();
         }
 
@@ -1542,8 +1553,10 @@ void StatusBox::doRenderStatus()
             auto * freemem = AddLogLine("");
             UpdateUsed(used);
             UpdateFree(freemem);
-            connect(used, &StatusBoxItem::UpdateRequired, UpdateUsed);
-            connect(freemem, &StatusBoxItem::UpdateRequired, UpdateFree);
+            connect(used, &StatusBoxItem::UpdateRequired,
+                    used, UpdateUsed);
+            connect(freemem, &StatusBoxItem::UpdateRequired,
+                    freemem, UpdateFree);
             used->Start();
             freemem->Start();
         }
