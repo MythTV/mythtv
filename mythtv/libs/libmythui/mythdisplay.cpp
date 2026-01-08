@@ -1096,7 +1096,8 @@ void MythDisplay::WaitForScreenChange()
     QEventLoop loop;
     QTimer timer;
     timer.setSingleShot(true);
-    connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out wating for screen change"); });
+    connect(&timer, &QTimer::timeout,
+            &timer, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out wating for screen change"); });
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_screen, &QScreen::geometryChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait
@@ -1116,7 +1117,8 @@ void MythDisplay::WaitForNewScreen()
     QEventLoop loop;
     QTimer timer;
     timer.setSingleShot(true);
-    connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for new screen"); });
+    connect(&timer, &QTimer::timeout,
+            &timer, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for new screen"); });
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_widget->windowHandle(), &QWindow::screenChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait

@@ -133,8 +133,10 @@ void MythHTTPS::InitSSLSocket(QSslSocket *Socket, QSslConfiguration& Config)
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("SslError: %1").arg(error.errorString()));
     };
 
-    QObject::connect(Socket, &QSslSocket::encrypted, [Encrypted, Socket] { Encrypted(Socket); } );
-    QObject::connect(Socket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors), SSLErrors);
+    QObject::connect(Socket, &QSslSocket::encrypted,
+                     Socket, [Encrypted, Socket] { Encrypted(Socket); } );
+    QObject::connect(Socket, qOverload<const QList<QSslError> &>(&QSslSocket::sslErrors),
+                     Socket, SSLErrors);
     Socket->setSslConfiguration(Config);
     Socket->startServerEncryption();
 }
