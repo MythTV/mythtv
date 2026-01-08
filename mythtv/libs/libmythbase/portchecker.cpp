@@ -43,7 +43,7 @@
 #define LOC QString("PortChecker::%1(): ").arg(__func__)
 
 /**
- * Check if a port is open and sort out the link-local scope.
+ * Check if a port is open.
  *
  * Checks the specified port repeatedly
  * until either it connects or the time limit is reached
@@ -55,13 +55,12 @@
  * This routine does call event processor, so the GUI can be responsive
  * on the same thread.
  *
- * \param host [in,out] Host id or ip address (IPV4 or IPV6).
- * This is updated with scope if the address is link-local IPV6.
+ * \param host Host id or ip address (IPV4 or IPV6).
  * \param port Port number to check.
  * \param timeLimit limit in milliseconds for testing.
  * \return true if the port could be contacted.
 */
-bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds timeLimit)
+bool PortChecker::checkPort(const QString &host, int port, std::chrono::milliseconds timeLimit)
 {
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3")
         .arg(host).arg(port).arg(timeLimit.count()));
@@ -75,7 +74,8 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
     {
-        return resolveLinkLocal(host, port, timeLimit);
+        QString dest {host};
+        return resolveLinkLocal(dest, port, timeLimit);
     }
 #endif
     MythTimer timer(MythTimer::kStartRunning);

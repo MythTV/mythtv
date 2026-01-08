@@ -138,7 +138,7 @@ class MythContext::Impl : public QObject
     static bool    DefaultUPnP(QString& Error);
     static bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup();
-    bool    checkPort(QString &host, int port, std::chrono::seconds timeLimit) const;
+    bool    checkPort(const QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents();
 
   protected:
@@ -346,15 +346,14 @@ void MythContext::Impl::LanguagePrompt()
 }
 
 /**
- * Check if a port is open and sort out the link-local scope.
+ * Check if a port is open.
  *
- * \param host      Host or IP address. Will be updated with link-local
- *                  scope if needed.
+ * \param host      Host or IP address.
  * \param port      Port number to check.
  * \param timeLimit Limit in seconds for testing.
  */
 
-bool MythContext::Impl::checkPort(QString &host, int port, std::chrono::seconds timeLimit) const
+bool MythContext::Impl::checkPort(const QString &host, int port, std::chrono::seconds timeLimit) const
 {
     PortChecker checker;
     if (m_guiStartup)
@@ -910,6 +909,7 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
             case st_dbStarted:
                 // If the database is connecting with link-local
                 // address, it may have changed
+                PortChecker{}.resolveLinkLocal(host, port, useTimeout);
                 if (dbParams.m_dbHostName != host)
                 {
                     dbParams.m_dbHostName = host;
