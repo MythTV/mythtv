@@ -342,7 +342,7 @@ void SatIPStreamHandler::run(void)
         QMutexLocker locker(&m_tunelock);
         m_rtsp->Teardown();
         m_setupinvoked = false;
-        m_oldtuningurl = "";
+        m_oldtuningurl = QUrl();
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): end");
@@ -486,7 +486,7 @@ void SatIPStreamHandler::Close(void)
 {
     delete m_rtsp;
     m_rtsp = nullptr;
-    m_baseurl = nullptr;
+    m_baseurl = QUrl();
 }
 
 bool SatIPStreamHandler::HasLock()

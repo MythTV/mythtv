@@ -24,7 +24,7 @@ bool IPTVTuningData::CanReadHTTP(QByteArray &buffer) const
 
     QString url = m_dataUrl.toString();
     MythSingleDownload downloader;
-    downloader.DownloadURL(url, &buffer, 5s, 0, 2000);
+    downloader.DownloadURL(m_dataUrl, &buffer, 5s, 0, 2000);
     if (buffer.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("CanReadHTTP - Failed, error:%1 url:%2")

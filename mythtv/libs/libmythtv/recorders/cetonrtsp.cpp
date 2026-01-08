@@ -315,11 +315,13 @@ QUrl CetonRTSP::GetBaseUrl(void)
 {
     if (m_responseHeaders.contains("Content-Base"))
     {
-        return m_responseHeaders["Content-Base"];
+        QUrl url { m_responseHeaders["Content-Base"] };
+        return url;
     }
     if (m_responseHeaders.contains("Content-Location"))
     {
-        return m_responseHeaders["Content-Location"];
+        QUrl url { m_responseHeaders["Content-Location"] };
+        return url;
     }
     return m_requestUrl;
 }
@@ -371,7 +373,7 @@ bool CetonRTSP::Describe(void)
             // This attribute may contain either relative and absolute URLs,
             // following the rules and conventions set out in RFC 1808 [25].
             QString url = line.mid(10).trimmed();
-            m_controlUrl = url;
+            m_controlUrl = QUrl(url);
             if (url == "*")
             {
                 m_controlUrl = base;

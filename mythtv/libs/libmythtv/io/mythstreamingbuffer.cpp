@@ -62,7 +62,15 @@ bool MythStreamingBuffer::OpenFile(const QString &Filename, std::chrono::millise
 
     // TODO check whether local area file
 
-    QUrl url = m_filename;
+    QUrl url { m_filename };
+    if (!url.isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid URL (%1)").arg(m_filename));
+        m_lastError = QObject::tr("Invalid URL (%1)").arg(m_filename);
+        m_rwLock.unlock();
+        return false;
+    }
+
     if (url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive))
         url.setScheme("hls+http");
 

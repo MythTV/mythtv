@@ -1811,7 +1811,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
     else
     {
         // couldn't peek, rely on URL analysis
-        QUrl url = filename;
+        QUrl url { filename };
         isHLS =
         url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive) ||
         url.query( QUrl::FullyEncoded ).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);

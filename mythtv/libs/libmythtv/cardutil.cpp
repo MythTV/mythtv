@@ -3454,9 +3454,15 @@ bool CardUtil::IsVBoxPresent(uint inputid)
     if (!query.exec())
         MythDB::DBError("CardUtil::IsVBoxPresent url", query);
     else if (query.next())
-        url = query.value(0).toString();
+        url = QUrl(query.value(0).toString());
 
     // now get just the IP address from the url
+    if (!url.isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("VBOX invalid url: %1")
+            .arg(url.toString()));
+        return false;
+    }
     QString ip = url.host();
     LOG(VB_GENERAL, LOG_INFO, QString("VBOX IP found (%1) for inputid (%2)")
                 .arg(ip).arg(inputid));

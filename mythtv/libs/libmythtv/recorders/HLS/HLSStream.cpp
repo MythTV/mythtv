@@ -56,7 +56,13 @@ bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
     bool ret = HLSReader::DownloadURL(keypath, &key);
 #else
-    bool ret = downloader.DownloadURL(keypath, &key);
+    QUrl keyUrl { keypath };
+    if (!keyUrl.isValid())
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + "Invalid key path: " + keypath);
+        return false;
+    }
+    bool ret = downloader.DownloadURL(keyUrl, &key);
 #endif
 
     if (!ret || key.size() != AES128_KEY_SIZE)

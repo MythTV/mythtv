@@ -38,24 +38,30 @@ bool MythInteractiveBuffer::IsOpen(void) const
  *  \param Url   Url of the stream to read.
  *  \return Returns true if the stream was opened.
  */
-bool MythInteractiveBuffer::OpenFile(const QString &Url, std::chrono::milliseconds /*Retry*/)
+bool MythInteractiveBuffer::OpenFile(const QString &UrlStr, std::chrono::milliseconds /*Retry*/)
 {
+    QUrl Url { UrlStr };
+    if (!Url.isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid URL '%1'").arg(UrlStr));
+        return false;
+    }
     if (!NetStream::IsSupported(Url))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported URL '%1'").arg(Url));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported URL '%1'").arg(UrlStr));
         return false;
     }
 
     std::unique_ptr<NetStream> stream(new NetStream(Url, NetStream::kNeverCache));
     if (!stream || !stream->IsOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open '%1'").arg(Url));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open '%1'").arg(UrlStr));
         return false;
     }
 
     if (!stream->WaitTillReady(30s))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Stream not ready '%1'").arg(Url));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Stream not ready '%1'").arg(UrlStr));
         return false;
     }
 
@@ -64,8 +70,8 @@ bool MythInteractiveBuffer::OpenFile(const QString &Url, std::chrono::millisecon
 
     QWriteLocker locker(&m_rwLock);
 
-    m_safeFilename = Url;
-    m_filename = Url;
+    m_safeFilename = UrlStr;
+    m_filename = UrlStr;
 
     delete m_stream;
     m_stream = stream.release();
@@ -80,7 +86,7 @@ bool MythInteractiveBuffer::OpenFile(const QString &Url, std::chrono::millisecon
     locker.unlock();
     Reset(true, false, true);
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened '%1'").arg(Url));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opened '%1'").arg(UrlStr));
     return true;
 }
 
