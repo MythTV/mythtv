@@ -251,7 +251,7 @@ bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
         LOG(VB_GENERAL, LOG_INFO,
             QString("MythVideo::ScanVideoDirectory Scanning Group (%1)")
                 .arg(start_path));
-        QUrl sgurl = start_path;
+        QUrl sgurl { start_path };
         QString host = sgurl.host();
         QString path = sgurl.path();
 

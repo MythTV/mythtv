@@ -657,7 +657,7 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
         {
             pDevice = new UPnpDeviceDesc();
             pDevice->Load( xml );
-            pDevice->m_hostUrl   = sURL;
+            pDevice->m_hostUrl   = QUrl(sURL);
             pDevice->m_sHostName = pDevice->m_hostUrl.host();
         }
         else

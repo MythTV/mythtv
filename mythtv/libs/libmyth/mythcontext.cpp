@@ -1323,7 +1323,8 @@ bool MythContext::Impl::UPnPconnect(const DeviceLocation *backend,
     QString        error;
     QString        loc = "UPnPconnect() - ";
     QString        URL = backend->m_sLocation;
-    MythXMLClient  client(URL);
+    QUrl           theURL(URL);
+    MythXMLClient  client(theURL);
     DatabaseParams dbParams = GetMythDB()->GetDatabaseParams();
 
     LOG(VB_UPNP, LOG_INFO, loc + QString("Trying host at %1").arg(URL));
@@ -1350,7 +1351,6 @@ bool MythContext::Impl::UPnPconnect(const DeviceLocation *backend,
     // This backend may have a local DB with the default user/pass/DBname.
     // For whatever reason, we have failed to get anything back via UPnP,
     // so we might as well try the database directly as a last resort.
-    QUrl theURL(URL);
     URL = theURL.host();
     if (URL.isEmpty())
         return false;

@@ -1303,11 +1303,18 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         // HACK Insert a Date header into the cached metadata if one doesn't
         // already exist
-        QUrl fileUrl = dlInfo->m_url;
+        QUrl fileUrl { dlInfo->m_url };
         QString redirectLoc;
         int limit = 0;
         while (!(redirectLoc = getHeader(fileUrl, "Location")).isNull())
         {
+            QUrl redirUrl { redirectLoc };
+            if (!redirUrl.isValid())
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("Invalid redirect %1 for %2")
+                    .arg(redirectLoc, fileUrl.toString()));
+                return;
+            }
             if (limit == CACHE_REDIRECTION_LIMIT)
             {
                 LOG(VB_GENERAL, LOG_WARNING, QString("Cache Redirection limit "

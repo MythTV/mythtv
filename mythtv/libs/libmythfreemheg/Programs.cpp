@@ -798,7 +798,12 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
-                QUrl url = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                QString urlStr = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                QUrl url { urlStr };
+                if (!url.isValid())
+                {
+                    MHLOG(MHLogNotifications, QString("Invalid URL: %1").arg(urlStr));
+                }
 
                 // Variable name/value pairs
                 int i = 1;

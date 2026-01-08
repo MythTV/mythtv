@@ -47,7 +47,7 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
     // tokens[2] = HTTP/1.1
 
     m_type   = MythHTTP::RequestFromString(tokens[0]);
-    m_url = tokens[1];
+    m_url    = QUrl(tokens[1]);
 
     // If no version, assume HTTP/1.1
     m_version = HTTPOneDotOne;

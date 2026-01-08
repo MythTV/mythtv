@@ -107,7 +107,7 @@ void VideoScannerThread::SetDirs(QStringList dirs)
     {
         if (iter->startsWith("myth://"))
         {
-            QUrl sgurl = *iter;
+            QUrl sgurl { *iter };
             QString host = sgurl.host().toLower();
             QString path = sgurl.path();
 
@@ -181,7 +181,7 @@ void VideoScannerThread::run()
         {
             if (dir.startsWith("myth://"))
             {
-                QUrl sgurl = dir;
+                QUrl sgurl { dir };
                 QString host = sgurl.host().toLower();
 
                 m_liveSGHosts.removeAll(host);

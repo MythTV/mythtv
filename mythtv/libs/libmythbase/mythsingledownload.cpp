@@ -71,14 +71,23 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
         {
             if (redirs <= 3)
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("%1 -> %2").arg(url.toString(), redir));
-                m_replylock.unlock();
-                m_lock.unlock();
-                return DownloadURL(redir, buffer, timeout, redirs + 1, maxsize, final_url);
+                QUrl redirUrl { redir };
+                if (redirUrl.isValid())
+                {
+                    LOG(VB_GENERAL, LOG_INFO, QString("%1 -> %2").arg(url.toString(), redir));
+                    m_replylock.unlock();
+                    m_lock.unlock();
+                    return DownloadURL(redirUrl, buffer, timeout, redirs + 1, maxsize, final_url);
+                }
+                LOG(VB_GENERAL, LOG_INFO, QString("%1 -> %2 (invalid)").arg(url.toString(), redir));
+                m_errorstring = QString("invalid redirect: %1").arg(redir);
+                ret = false;
             }
-
-            LOG(VB_GENERAL, LOG_ERR, QString("%1: too many redirects").arg(url.toString()));
-            ret = false;
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("%1: too many redirects").arg(url.toString()));
+                ret = false;
+            }
         }
         else if (m_errorcode == QNetworkReply::NoError)
         {

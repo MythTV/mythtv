@@ -404,7 +404,7 @@ void SSDPCache::Add( const QString &sURI,
     DeviceLocation *pEntry = pEntries->Find(sUSN);
     if (pEntry == nullptr)
     {
-        QUrl url = sLocation;
+        QUrl url { sLocation };
         QString host = url.host();
         QString hostport = QString("%1:%2").arg(host).arg(url.port(80));
         // Check if the port can be reached. If not we won't use it.

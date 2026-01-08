@@ -201,7 +201,14 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 
     m_usn   = dev->m_sUSN;
 
-    MythXMLClient client( dev->m_sLocation );
+    QUrl url { dev->m_sLocation };
+    if (!url.isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("ConnectBackend() invalid url: %1")
+            .arg(dev->m_sLocation));
+        return false;
+    }
+    MythXMLClient client( url );
 
     UPnPResultCode stat = client.GetConnectionInfo(m_pinCode, m_dbParams, message);
 
