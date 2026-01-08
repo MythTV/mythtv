@@ -910,6 +910,7 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
             case st_dbStarted:
                 // If the database is connecting with link-local
                 // address, it may have changed
+                PortChecker{}.resolveLinkLocal(host, port, useTimeout);
                 if (dbParams.m_dbHostName != host)
                 {
                     dbParams.m_dbHostName = host;
