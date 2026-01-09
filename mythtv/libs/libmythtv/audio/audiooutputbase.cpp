@@ -2098,7 +2098,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
         written_size = frag_size;
     }
 
-    if (!avail_size || (frag_size > avail_size))
+    if (!avail_size || (frag_size <= 0) || (frag_size > avail_size))
         return 0;
 
     int bdiff = kAudioRingBufferSize - m_raud;
