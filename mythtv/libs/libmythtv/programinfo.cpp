@@ -1620,7 +1620,18 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["titlesubtitle"] = tempSubTitle;
     progMap["sorttitlesubtitle"] = tempSortSubtitle;
 
-    progMap["description"] = progMap["description0"] = m_description;
+    progMap["description"] = progMap["description0"]
+                           = progMap["description1"] = m_description;
+
+    progMap["syndicatedepisode"] = m_syndicatedEpisode;
+    progMap["season"] = progMap["episode"] = "";
+    progMap["totalepisodes"] = "";
+    progMap["s00e00"] = progMap["00x00"] = "";
+
+    if (m_syndicatedEpisode.isEmpty())
+        progMap["seasonepisode"] = "";
+    else
+        progMap["seasonepisode"] = m_syndicatedEpisode.toLower();
 
     if (m_season > 0 || m_episode > 0)
     {
@@ -1633,14 +1644,13 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["00x00"] = QString("%1x%2")
             .arg(StringUtil::intToPaddedString(GetSeason(), 1),
                  StringUtil::intToPaddedString(GetEpisode(), 2));
+
+        if (progMap["seasonepisode"].isEmpty())
+        {
+            progMap["seasonepisode"] = QString("s%1e%2")
+                                       .arg(GetSeason()).arg(GetEpisode());
+        }
     }
-    else
-    {
-        progMap["season"] = progMap["episode"] = "";
-        progMap["totalepisodes"] = "";
-        progMap["s00e00"] = progMap["00x00"] = "";
-    }
-    progMap["syndicatedepisode"] = m_syndicatedEpisode;
 
     progMap["category"] = m_category;
     progMap["director"] = m_director;
