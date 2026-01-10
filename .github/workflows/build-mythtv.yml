@@ -441,3 +441,129 @@ jobs:
 
       - name: ccache statistics [post]
         run: ccache -s
+
+  build-mythtv-linux-aarch64:
+    name: Building MythTV on ${{ matrix.container.desc }}
+
+    runs-on: ubuntu-24.04-arm
+
+    env:
+      TZ: Etc/UTC
+      CCACHE_DIR: $HOME/.ccache
+      CCACHE_COMPRESS: true
+      CCACHE_MAXSIZE: 250M
+      DEBIAN_FRONTEND: noninteractive
+
+    strategy:
+      matrix:
+        container:
+          - desc: 'Fedora - CMake Qt6 aarch64'
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost -e "qt6=true" mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant -y'
+            core_working_subdirectory: ''
+            core_configure_cmd: 'cmake --preset qt6 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'cmake --build build-qt6'
+            core_install_cmd: ''
+            core_test_cmd: 'cmake --build build-qt6 -t MythTV-tests'
+            plugins_working_subdirectory: ''
+            plugins_configure_cmd: ''
+            plugins_build_cmd: ''
+            plugins_install_cmd: ''
+
+      fail-fast: false
+
+    container:
+      image: ${{ matrix.container.image }}
+
+    steps:
+      - name: Checkout ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.container.desc }}-build-core-ccache-${{ github.sha }}
+          restore-keys: ${{ matrix.container.desc }}-build-core-ccache
+
+      - name: Detect OS release
+        run: |
+          . /etc/os-release
+          echo "OS_RELEASE_ID=$ID" >> $GITHUB_ENV
+          echo "OS_RELEASE_VERSION=$VERSION_ID" >> $GITHUB_ENV
+          echo "OS_RELEASE_VERSION_MAJOR=${VERSION_ID%%.*}" >> $GITHUB_ENV
+          echo "OS_RELEASE_VERSION_CODENAME=$VERSION_CODENAME" >> $GITHUB_ENV
+
+      - name: Debian OS obtain codename for prerelease vesions
+        run: echo "OS_RELEASE_VERSION_CODENAME=`dpkg --status tzdata | grep 'Provides' | cut -f2 -d'-'`" >> $GITHUB_ENV
+        if: env.OS_RELEASE_ID == 'debian' && env.OS_RELEASE_VERSION_CODENAME == ''
+
+      - name: OS update
+        run: ${{ matrix.container.update_cmd }}
+        if: ${{ matrix.container.update_cmd != '' }}
+
+      - name: OS install ansible
+        run: ${{ matrix.container.install_ansible_cmd }}
+        if: ${{ matrix.container.install_ansible_cmd != '' }}
+
+      - name: Checkout MythTV/ansible repository
+        uses: actions/checkout@v4
+        with:
+          repository: MythTV/ansible
+          path: ansible
+
+      - name: Run ansible to install build requirements
+        working-directory: ansible
+        run: ${{ matrix.container.ansible_cmd }}
+        if: ${{ matrix.container.ansible_cmd != '' }}
+
+      - name: Install extra packages for additional coverage
+        run: ${{ matrix.container.install_extra_pkgs_cmd }}
+        if: ${{ matrix.container.install_extra_pkgs_cmd != '' }}
+
+      - name: Checkout Mythtv/mythtv repository
+        uses: actions/checkout@v4
+        with:
+          path: mythtv
+          fetch-depth: 0
+
+      - name: ccache statistics [pre]
+        run: ccache -s
+
+      - name: Configure
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_configure_cmd }}
+        if: ${{ matrix.container.core_configure_cmd != '' }}
+
+      - name: Build
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_build_cmd }}
+        if: ${{ matrix.container.core_build_cmd != '' }}
+
+      - name: Install
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_install_cmd }}
+        if: ${{ matrix.container.core_install_cmd != '' }}
+
+      - name: Test
+        working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
+        run: ${{ matrix.container.core_test_cmd }}
+        if: ${{ matrix.container.core_test_cmd != '' }}
+
+      - name: Configure Plugins
+        working-directory: mythtv/${{ matrix.container.plugins_working_subdirectory }}
+        run: ${{ matrix.container.plugins_configure_cmd }}
+        if: ${{ matrix.container.plugins_configure_cmd != '' }}
+
+      - name: Build Plugins
+        working-directory: mythtv/${{ matrix.container.plugins_working_subdirectory }}
+        run: ${{ matrix.container.plugins_build_cmd }}
+        if: ${{ matrix.container.plugins_build_cmd != '' }}
+
+      - name: Install Plugins
+        working-directory: mythtv/${{ matrix.container.plugins_working_subdirectory }}
+        run: ${{ matrix.container.plugins_install_cmd }}
+        if: ${{ matrix.container.plugins_install_cmd != '' }}
+
+      - name: ccache statistics [post]
+        run: ccache -s
