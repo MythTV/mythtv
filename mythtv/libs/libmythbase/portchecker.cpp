@@ -29,6 +29,7 @@
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QTcpSocket>
+#include <QThread>
 #include <QEventLoop>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
@@ -48,13 +49,105 @@
  * Checks the specified port repeatedly
  * until either it connects or the time limit is reached
  *
+ * This routine does call event processor, so the GUI can be responsive
+ * on the same thread.
+ *
+ * \param host [in] Host id or ip address (IPV4 or IPV6).
+ * \param port Port number to check.
+ * \param timeLimit limit in milliseconds for testing.
+ * \return true if the port could be contacted.
+*/
+bool PortChecker::checkPort(const QString &host, int port, std::chrono::milliseconds timeLimit)
+{
+    LOG(VB_GENERAL, LOG_ALERT, LOC + QString("host %1 port %2 timeLimit %3")
+        .arg(host).arg(port).arg(timeLimit.count()));
+    m_cancelCheck = false;
+// Windows does not need the scope on the ip address so we can skip
+// some processing
+#ifndef Q_OS_WINDOWS
+    QHostAddress addr;
+    bool isIPAddress = addr.setAddress(host);
+    if (isIPAddress
+      && addr.protocol() == QAbstractSocket::IPv6Protocol
+      && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
+    {
+        QString dest {host};
+        return resolveLinkLocal(dest, port, timeLimit);
+    }
+#endif
+    MythTimer timer(MythTimer::kStartRunning);
+    QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
+    QString scope;
+    while (state != QAbstractSocket::ConnectedState
+           && (timer.elapsed() < timeLimit)
+           && !m_cancelCheck
+           )
+    {
+        QTcpSocket socket;
+        socket.connectToHost(host, port);
+
+        MythTimer attempt_time {MythTimer::kStartRunning};
+        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
+        static constexpr std::chrono::milliseconds k_poll_interval {1ms};
+        static constexpr std::chrono::milliseconds k_log_interval {100ms};
+        std::chrono::milliseconds next_log {k_log_interval};
+        while (state != QAbstractSocket::ConnectedState
+               && !m_cancelCheck
+               && (timer.elapsed() < timeLimit)
+               && attempt_time.elapsed() < k_attempt_time_limit
+               )
+        {
+            if (QCoreApplication::instance() != nullptr &&
+                QThread::currentThread() == QCoreApplication::instance()->thread()
+                )
+            {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
+            }
+            else
+            {
+                std::this_thread::sleep_for(k_poll_interval);
+            }
+            state = socket.state();
+            if (attempt_time.elapsed() > next_log)
+            {
+                next_log += k_log_interval;
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("host %1 port %2 socket state %3, attempt time: %4")
+                    .arg(host, QString::number(port), QString::number(state),
+                         QString::number(attempt_time.elapsed().count())
+                         )
+                    );
+            }
+        }
+        state = socket.state();
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("host %1 port %2 socket state %3, attempt time: %4")
+            .arg(host, QString::number(port), QString::number(state),
+                 QString::number(attempt_time.elapsed().count())
+                 )
+            );
+    }
+    return (state == QAbstractSocket::ConnectedState);
+}
+
+/**
+ * Convenience method to resolve link-local address.
+ *
+ * Update a host id to include the correct scope if it
+ * is link-local. If this is called with anything that
+ * is not a link-local address, it remains unchanged.
+ *
+ * Check if a port is open and sort out the link-local scope.
+ *
+ * Checks the specified port repeatedly
+ * until either it connects or the time limit is reached
+ *
  * This routine also finds the correct scope id in case of an
  * IPV6 link-local address, and caches it in
  * gCoreContext->SetScopeForAddress
  *
- * If linkLocalOnly is specified, it only obtains link-local
- * address scope.
- * In this case, the port is not checked unless needed to
+ * The port is not checked unless needed to
  * find the scope. This will also return after 1 check of all available
  * interfaces. If will not repeatedly check the port. To make sure all
  * interfaces are checked, make sure enough time is allowed, up to 3
@@ -70,64 +163,52 @@
  * This is updated with scope if the address is link-local IPV6.
  * \param port Port number to check.
  * \param timeLimit limit in milliseconds for testing.
- * \param linkLocalOnly Only obtain Link-local address scope.
- * \return true if the port could be contacted. In the case
- * of linkLocalOnly, return true if it was link local and
- * was changed, false in other cases.
+ * \return true if it was link local and was resolved,
+ * false in other cases.
 */
-bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds timeLimit, bool linkLocalOnly)
+bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::milliseconds timeLimit)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
-        .arg(host).arg(port).arg(timeLimit.count()).arg(linkLocalOnly));
+    // Windows does not need the scope on the ip address so we can skip
+    // some processing
+#ifdef Q_OS_WINDOWS
+    return false;
+#else
+    LOG(VB_GENERAL, LOG_ALERT, LOC + QString("host %1 port %2 timeLimit %3")
+        .arg(host).arg(port).arg(timeLimit.count()));
     m_cancelCheck = false;
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);
-    bool islinkLocal = false;
-// Windows does not need the scope on the ip address so we can skip
-// some processing
-#ifndef Q_OS_WINDOWS
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
-        islinkLocal = true;
-#endif
-    if (linkLocalOnly)
     {
-        if (islinkLocal)
+        // If we already know the scope, set it here and return
+        if (gCoreContext->GetScopeForAddress(addr))
         {
-            // If we already know the scope, set it here and return
-            if (gCoreContext->GetScopeForAddress(addr))
-            {
-                host = addr.toString();
-                return true;
-            }
-        }
-        else
-        {
-            return false;
+            host = addr.toString();
+            return true;
         }
     }
+    else
+    {
+        return false;
+    }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
-#ifndef Q_OS_WINDOWS
     QListIterator<QNetworkInterface> iCard = cards;
-#endif
     MythTimer timer(MythTimer::kStartRunning);
-    QTcpSocket socket(this);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    int retryCount = 0;
     QString scope;
     bool testedAll = false;
     while (state != QAbstractSocket::ConnectedState
-        && (timer.elapsed() < timeLimit))
+           && (timer.elapsed() < timeLimit)
+           && !m_cancelCheck
+           && !testedAll
+           )
     {
-        if (state == QAbstractSocket::UnconnectedState)
         {
-// Windows does not need the scope on the ip address so we can skip
-// some processing
-#ifndef Q_OS_WINDOWS
-            int iCardsEnd = 0;
-            if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
+            if (!gCoreContext->GetScopeForAddress(addr))
             {
+                int iCardsEnd = 0;
                 addr.setScopeId(QString());
                 while (addr.scopeId().isEmpty() && iCardsEnd<2)
                 {
@@ -135,7 +216,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                     if (iCard.hasNext())
                     {
                         QNetworkInterface card = iCard.next();
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
+                        LOG(VB_GENERAL, LOG_ALERT, QString("Trying interface %1").arg(card.name()));
                         unsigned int flags = card.flags();
                         if ((flags & QNetworkInterface::IsLoopBack)
                          || !(flags & QNetworkInterface::IsRunning))
@@ -169,79 +250,67 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                         iCardsEnd++;
                     }
                 }
+                if (iCardsEnd > 1)
+                {
+                    LOG(VB_GENERAL, LOG_ALERT, LOC +
+                        QString("There is no IPV6 compatible interface for %1")
+                    .arg(host));
+                    break;
+                }
             }
-            if (iCardsEnd > 1)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("There is no IPV6 compatible interface for %1")
-                  .arg(host));
-                break;
-            }
-#endif
-            QString dest;
-            if (isIPAddress)
-                dest=addr.toString();
-            else
-                dest=host;
-            socket.connectToHost(dest, port);
-            retryCount=0;
         }
-        else
+        QTcpSocket socket;
+        socket.connectToHost(addr.toString(), port);
+
+        MythTimer attempt_time {MythTimer::kStartRunning};
+        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
+        static constexpr std::chrono::milliseconds k_poll_interval {1ms};
+        static constexpr std::chrono::milliseconds k_log_interval {100ms};
+        std::chrono::milliseconds next_log {k_log_interval};
+        while (state != QAbstractSocket::ConnectedState
+               && !m_cancelCheck
+               && (timer.elapsed() < timeLimit)
+               && attempt_time.elapsed() < k_attempt_time_limit
+               )
         {
-            retryCount++;
+            if (QCoreApplication::instance() != nullptr &&
+                QThread::currentThread() == QCoreApplication::instance()->thread()
+                )
+            {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
+            }
+            else
+            {
+                std::this_thread::sleep_for(k_poll_interval);
+            }
+            state = socket.state();
+            if (attempt_time.elapsed() > next_log)
+            {
+                next_log += k_log_interval;
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("host %1 port %2 socket state %3, attempt time: %4")
+                    .arg(host, QString::number(port), QString::number(state),
+                         QString::number(attempt_time.elapsed().count())
+                         )
+                    );
+            }
         }
-        // This retry count of 6 means 3 seconds of waiting for
-        // connection before aborting and starting a new connection attempt.
-        if (retryCount > 6)
-            socket.abort();
-        processEvents();
-        // Check if user got impatient and canceled
-        if (m_cancelCheck)
-            break;
-        std::this_thread::sleep_for(500ms);
         state = socket.state();
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("socket state %1")
-            .arg(state));
-        if (linkLocalOnly
-          && state == QAbstractSocket::UnconnectedState
-          && testedAll)
-            break;
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("host %1 port %2 socket state %3, attempt time: %4")
+            .arg(host, QString::number(port), QString::number(state),
+                 QString::number(attempt_time.elapsed().count())
+                 )
+            );
     }
-    if (state == QAbstractSocket::ConnectedState
-      && islinkLocal && !scope.isEmpty())
+    if (state == QAbstractSocket::ConnectedState && !scope.isEmpty())
     {
        gCoreContext->SetScopeForAddress(addr);
        host = addr.toString();
     }
-    socket.abort();
-    processEvents();
     return (state == QAbstractSocket::ConnectedState);
-}
-
-/**
- * Convenience method to resolve link-local address.
- *
- * Update a host id to include the correct scope if it
- * is link-local. If this is called with anything that
- * is not a link-local address, it remains unchanged.
- *
- * \param host [in,out] Host id or ip address (IPV4 or IPV6).
- * This is updated with scope if the address is link-local IPV6.
- * \param port Port number to check.
- * \param timeLimit limit in milliseconds for testing.
- * \return true if it was link local and was resolved,
- * false in other cases.
-*/
-// static method
-bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::milliseconds timeLimit)
-{
-    PortChecker checker;
-    return checker.checkPort(host,port,timeLimit,true);
-}
-
-void PortChecker::processEvents(void)
-{
-    qApp->processEvents(QEventLoop::AllEvents, 250);
-    qApp->processEvents(QEventLoop::AllEvents, 250);
+#endif
 }
 
 /**
@@ -253,6 +322,7 @@ void PortChecker::processEvents(void)
 */
 void PortChecker::cancelPortCheck(void)
 {
+    LOG(VB_GENERAL, LOG_EMERG, LOC + QString("Aborting port check"));
     m_cancelCheck = true;
 }
 

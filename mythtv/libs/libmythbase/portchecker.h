@@ -48,18 +48,16 @@ class MBASE_PUBLIC PortChecker : public QObject
   public:
     PortChecker() = default;
     ~PortChecker() override = default;
-    bool checkPort(QString &host, int port, std::chrono::milliseconds timeLimit=30s,
-      bool linkLocalOnly=false);
+    bool checkPort(const QString &host, int port, std::chrono::milliseconds timeLimit = 30s);
 
-    static bool resolveLinkLocal(QString &host, int port,
-      std::chrono::milliseconds timeLimit=30s);
+    bool resolveLinkLocal(QString &host, int port,
+                          std::chrono::milliseconds timeLimit = 30s);
 
   public slots:
     void cancelPortCheck(void);
 
   private:
     bool m_cancelCheck {false};
-    static void processEvents(void);
 };
 
 #endif
