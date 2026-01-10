@@ -105,7 +105,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     MythUIImage(MythUIType *parent, const QString &name);
    ~MythUIImage() override;
 
-    QString GetFilename(void) { return m_imageProperties.m_filename; }
+    QString GetFilename(void) const { return m_imageProperties.m_filename; }
 
     /** Must be followed by a call to Load() to load the image. */
     void SetFilename(const QString &filename);
