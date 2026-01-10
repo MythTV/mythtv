@@ -1764,7 +1764,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["rectypestatus"] = GetRecTypeStatus(showrerecord);
 
     progMap["card"] = RecStatus::toString(GetRecordingStatus(),
-					  GetShortInputName());
+                                          GetShortInputName());
     progMap["input"] = RecStatus::toString(GetRecordingStatus(), m_inputId);
     progMap["inputname"] = m_inputName;
     // Don't add bookmarkupdate to progMap, for now.
@@ -5704,7 +5704,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
         "program.season,          program.episode,         program.totalepisodes ");  // 29-31
 
     QString querystr = QString(
-	"SELECT %1 FROM ( "
+        "SELECT %1 FROM ( "
         "    SELECT %2 "
         "    FROM program "
         "    LEFT JOIN channel ON program.chanid = channel.chanid "
@@ -5714,7 +5714,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
         "        channel.callsign = oldrecstatus.station AND "
         "        program.starttime = oldrecstatus.starttime "
         ) + sql +
-	") groupsq ";
+        ") groupsq ";
 
     // If a ProgGroupBy option is specified, wrap the query in an outer
     // query using row_number() and select only rows with value 1.  We
@@ -5727,7 +5727,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
             "      partition by ";
         if (groupBy == ProgGroupBy::ChanNum)
             columns += "channel.channum, "
-		"       channel.callsign, ";
+                "       channel.callsign, ";
         else if (groupBy == ProgGroupBy::CallSign)
             columns += "channel.callsign, ";
         else if (groupBy == ProgGroupBy::ProgramId)
@@ -5736,9 +5736,9 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
             "           program.title,     "
             "           program.starttime  "
             "      order by channel.recpriority desc, "
-	    "               channel.sourceid, "
+            "               channel.sourceid, "
             "               channel.channum+0 "
-	    ") grouprn ";
+            ") grouprn ";
         querystr += "WHERE grouprn = 1 ";
     }
 
@@ -5769,7 +5769,7 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     if (start > 0 || limit > 0)
     {
         QString countStr = querystr
-	    .arg("SQL_CALC_FOUND_ROWS chanid", columns);
+            .arg("SQL_CALC_FOUND_ROWS chanid", columns);
         query.prepare(countStr);
         for (it = bindings.begin(); it != bindings.end(); ++it)
         {
@@ -6669,15 +6669,15 @@ QString ProgGroupBy::toString(ProgGroupBy::Type groupBy)
     switch (groupBy)
     {
         case ProgGroupBy::None:
-	    return tr("None");
+            return tr("None");
         case ProgGroupBy::ChanNum:
-	    return tr("Channel Number");
-	case ProgGroupBy::CallSign:
-	    return tr("CallSign");
-	case ProgGroupBy::ProgramId:
-	    return tr("ProgramId");
-	default:
-	    return tr("Unknown");
+            return tr("Channel Number");
+        case ProgGroupBy::CallSign:
+            return tr("CallSign");
+        case ProgGroupBy::ProgramId:
+            return tr("ProgramId");
+        default:
+            return tr("Unknown");
     }
 }
 
