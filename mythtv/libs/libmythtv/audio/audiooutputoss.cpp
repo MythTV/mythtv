@@ -3,8 +3,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <fcntl.h>
 #include <iostream>
+#include <thread>
+
+#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -134,7 +136,7 @@ bool AudioOutputOSS::OpenDevice()
             return false;
         }
         if (m_audioFd < 0)
-            usleep(50us);
+            std::this_thread::sleep_for(50us);
     }
 
     if (m_audioFd == -1)

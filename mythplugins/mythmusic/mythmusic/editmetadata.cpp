@@ -1,4 +1,5 @@
 // C++
+#include <thread>
 #include <utility>
 
 // qt
@@ -1353,8 +1354,7 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
     while (copyThread->isRunning())
     {
         qApp->processEvents();
-        const struct timespec onems {0, 1000000};
-        nanosleep(&onems, nullptr);
+        std::this_thread::sleep_for(1ms);
     }
 
     strList = copyThread->getResult();

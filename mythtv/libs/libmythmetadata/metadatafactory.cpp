@@ -3,7 +3,7 @@
 
 // C++
 #include <algorithm>
-#include <unistd.h> // for sleep()
+#include <thread>
 
 // QT
 #include <QApplication>
@@ -249,7 +249,7 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
 
     while (m_returnList.isEmpty() && m_sync)
     {
-        sleep(1);
+        std::this_thread::sleep_for(1s);
         QCoreApplication::processEvents();
     }
 

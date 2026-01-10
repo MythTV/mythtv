@@ -4,7 +4,7 @@
 // C
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
+#include <thread>
 
 // Qt
 #include <QtGlobal>
@@ -135,7 +135,7 @@ void CdDecoder::writeBlock()
             }
             break;
         }
-        ::usleep(output()->GetAudioBufferedTime().count()<<9);
+        std::this_thread::sleep_for(output()->GetAudioBufferedTime() / 2);
     }
 }
 
@@ -386,7 +386,7 @@ void CdDecoder::run()
             if (fill < (thresh << 6))
                 break;
             // Wait for half of the buffer to drain
-            ::usleep(output()->GetAudioBufferedTime().count()<<9);
+            std::this_thread::sleep_for(output()->GetAudioBufferedTime() / 2);
         }
 
         // write a block if there's sufficient space for it

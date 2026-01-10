@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <cerrno>
+#include <thread>
+
 #include <fcntl.h>
 #include <sys/types.h>
 
@@ -373,7 +375,7 @@ void DeviceReadBuffer::run(void)
 
         if (!IsOpen())
         {
-            usleep(5ms);
+            std::this_thread::sleep_for(5ms);
             continue;
         }
 
@@ -419,7 +421,7 @@ void DeviceReadBuffer::run(void)
 
         // Slow down reading if not under load
         if (errcnt == 0 && total < throttle)
-            usleep(1ms);
+            std::this_thread::sleep_for(1ms);
     }
 
     ClosePipes();
@@ -444,7 +446,7 @@ bool DeviceReadBuffer::HandlePausing(void)
         if (m_readerCB)
             m_readerCB->ReaderPaused(m_streamFd);
 
-        usleep(5ms);
+        std::this_thread::sleep_for(5ms);
         return false;
     }
     if (IsPaused())
@@ -536,7 +538,7 @@ bool DeviceReadBuffer::Poll(void) const
                 if ((EAGAIN == errno) || (EINTR  == errno))
                     continue; // errors that tell you to try again
 
-                usleep(2.5ms);
+                std::this_thread::sleep_for(2500us);
             }
             else //  ret == 0
             {
@@ -613,7 +615,7 @@ bool DeviceReadBuffer::CheckForErrors(
             return false;
         if (EAGAIN == errno)
         {
-            usleep(2.5ms);
+            std::this_thread::sleep_for(2500us);
             return false;
         }
         if (EOVERFLOW == errno)
@@ -633,7 +635,7 @@ bool DeviceReadBuffer::CheckForErrors(
             return false;
         }
 
-        usleep(500ms);
+        std::this_thread::sleep_for(500ms);
         return false;
     }
     if (len == 0)
@@ -649,7 +651,7 @@ bool DeviceReadBuffer::CheckForErrors(
 
             return false;
         }
-        usleep(500ms);
+        std::this_thread::sleep_for(500ms);
         return false;
     }
     return true;
@@ -715,7 +717,7 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
             unused = GetUnused();
             if (IsPauseRequested() || !IsOpen() || !m_doRun)
                 return 0;
-            usleep(5ms);
+            std::this_thread::sleep_for(5ms);
         }
         if (IsPauseRequested() || !IsOpen() || !m_doRun)
             return 0;

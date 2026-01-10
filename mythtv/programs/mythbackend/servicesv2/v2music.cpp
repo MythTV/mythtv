@@ -10,7 +10,7 @@
 
 // C/C++
 #include <cmath>
-#include <unistd.h>
+#include <thread>
 
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
@@ -48,7 +48,7 @@ V2MusicMetadataInfoList* V2Music::GetTrackList(int nStartIndex,
     while (!all_music->doneLoading())
     {
         qApp->processEvents();
-        usleep(50000);
+        std::this_thread::sleep_for(50ms);
     }
 
     MetadataPtrList *musicList = all_music->getAllMetadata();
@@ -113,7 +113,7 @@ V2MusicMetadataInfo* V2Music::GetTrack(int Id)
     while (!all_music->doneLoading())
     {
         qApp->processEvents();
-        usleep(50000);
+        std::this_thread::sleep_for(50ms);
     }
 
     MusicMetadata *metadata = all_music->getMetadata(Id);

@@ -1,5 +1,4 @@
-// Posix headers
-#include <unistd.h> // for usleep()
+#include <thread>
 
 // MythTV headers
 #include "libmythbase/mthreadpool.h"
@@ -53,7 +52,7 @@ void ProgramInfoUpdater::run(void)
         // we don't need instant updates allow a few to queue up
         // if they come in quick succession, this allows multiple
         // updates to be consolidated into one update...
-        usleep(200 * 1000); // 200ms
+        std::this_thread::sleep_for(200ms);
 
         m_lock.lock();
 

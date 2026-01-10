@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <cstdlib>
+#include <thread>
 #include <fcntl.h>
 #include <pthread.h>
 
@@ -791,7 +792,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
     std::chrono::seconds maxSleep   = 90s;
     while (jobsAreRunning && totalSlept < maxSleep)
     {
-        usleep(1000);
+        std::this_thread::sleep_for(1ms);
         query.prepare("SELECT id FROM jobqueue "
                       "WHERE chanid = :CHANID and starttime = :STARTTIME "
                       "AND status NOT IN "
@@ -822,7 +823,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
             LOG(VB_JOBQUEUE, LOG_INFO, LOC + message);
         }
 
-        sleep(1);
+        std::this_thread::sleep_for(1s);
         totalSlept++;
     }
 

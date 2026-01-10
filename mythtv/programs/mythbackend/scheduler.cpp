@@ -2052,7 +2052,7 @@ void Scheduler::run(void)
     OldRecordedFixups();
 
     // wait for slaves to connect
-    usleep(3s);
+    std::this_thread::sleep_for(3s);
 
     QMutexLocker lockit(&m_schedLock);
 

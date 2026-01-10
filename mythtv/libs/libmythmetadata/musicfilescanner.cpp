@@ -1,6 +1,4 @@
-// POSIX headers
-#include <sys/stat.h>
-#include <unistd.h>
+#include <thread>
 
 // Qt headers
 #include <QDir>
@@ -681,7 +679,7 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
                     gCoreContext->SendMessage(QString("MUSIC_SCANNER_ERROR %1 %2").arg(host, "Stalled"));
 
                     // give the user time to read the notification before restarting the scan
-                    sleep(5);
+                    std::this_thread::sleep_for(5s);
                 }
                 else
                 {

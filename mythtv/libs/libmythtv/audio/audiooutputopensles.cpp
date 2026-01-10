@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 #include <dlfcn.h>
 
@@ -442,7 +443,7 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
         if (numBufferesQueued == OPENSLES_BUFFERS)
         {
             // wait for a buffer period, should be clear next time around
-            usleep(OPENSLES_BUFLEN);
+            std::this_thread::sleep_for(OPENSLES_BUFLEN);
             continue;
         }
 

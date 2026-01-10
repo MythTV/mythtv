@@ -1,5 +1,7 @@
 #include "imagescanner.h"
 
+#include <thread>
+
 #include "libmythbase/mythcorecontext.h"  // for gCoreContext
 #include "libmythbase/mythlogging.h"
 
@@ -216,7 +218,7 @@ void ImageScanThread<DBFS>::run()
             // For initial scans pause briefly to give thumb generator a headstart
             // before being deluged by client requests
             if (firstScan)
-                usleep(1s);
+                std::this_thread::sleep_for(1s);
 
             // Notify clients of completion with removed & changed images
             m_dbfs.Notify("IMAGE_DB_CHANGED", mesg);

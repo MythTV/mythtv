@@ -7,7 +7,7 @@
 // Std C headers
 #include <cstring>
 #include <cmath>
-#include <unistd.h>
+#include <thread>
 
 // POSIX headers
 #include <sys/time.h>
@@ -17,6 +17,7 @@
 
 // MythTV headers
 #include "libmythbase/compat.h"
+#include "libmythbase/mythchrono.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"
@@ -33,15 +34,15 @@ static constexpr uint8_t SEC_VOLTAGE_OFF { 2 };
 #endif
 
 // DiSEqC sleep intervals per eutelsat spec
-static constexpr useconds_t DISEQC_SHORT_WAIT     {  15 * 1000 };
-static constexpr useconds_t DISEQC_LONG_WAIT      { 100 * 1000 };
-static constexpr useconds_t DISEQC_POWER_ON_WAIT  { 500 * 1000 };
-static constexpr useconds_t DISEQC_POWER_OFF_WAIT { (1000 * 1000) - 1 };
+static constexpr std::chrono::milliseconds DISEQC_SHORT_WAIT     {  15ms };
+static constexpr std::chrono::milliseconds DISEQC_LONG_WAIT      { 100ms };
+static constexpr std::chrono::milliseconds DISEQC_POWER_ON_WAIT  { 500ms };
+static constexpr std::chrono::milliseconds DISEQC_POWER_OFF_WAIT {    1s };
 
 #if CONFIG_DVB
 // Number of times to retry ioctls after receiving ETIMEDOUT before giving up
 static constexpr uint8_t    TIMEOUT_RETRIES       { 10 };
-static constexpr useconds_t TIMEOUT_WAIT          { 250 * 1000 };
+static constexpr std::chrono::milliseconds TIMEOUT_WAIT          { 250ms };
 
 // Framing byte
 static constexpr uint8_t    DISEQC_FRM            { 0xe0 };
@@ -490,7 +491,7 @@ bool DiSEqCDevTree::SetTone([[maybe_unused]] bool on) const
                   on ? SEC_TONE_ON : SEC_TONE_OFF) == 0)
             success = true;
         else
-            usleep(TIMEOUT_WAIT);
+            std::this_thread::sleep_for(TIMEOUT_WAIT);
     }
 #endif // CONFIG_DVB
 
@@ -522,7 +523,7 @@ bool DiSEqCDevTree::Execute(const DiSEqCDevSettings &settings,
     if (m_root->IsCommandNeeded(settings, tuning))
     {
         SetTone(false);
-        usleep(DISEQC_SHORT_WAIT);
+        std::this_thread::sleep_for(DISEQC_SHORT_WAIT);
     }
 
     return m_root->Execute(settings, tuning);
@@ -648,7 +649,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
         if (ioctl(fd, FE_DISEQC_SEND_MASTER_CMD, &cmd) == 0)
             success = true;
         else
-            usleep(TIMEOUT_WAIT);
+            std::this_thread::sleep_for(TIMEOUT_WAIT);
     }
 
     if (!success)
@@ -724,7 +725,7 @@ bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
         if (!resend_cmd)
             mcmd.msg[0] |= DISEQC_FRM_REPEAT;
 
-        usleep(DISEQC_SHORT_WAIT);
+        std::this_thread::sleep_for(DISEQC_SHORT_WAIT);
     }
 
     return true;
@@ -749,7 +750,7 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset, bool is_SCR)
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Power-cycling DiSEqC Bus");
 
         SetVoltage(SEC_VOLTAGE_OFF);
-        usleep(DISEQC_POWER_OFF_WAIT);
+        std::this_thread::sleep_for(DISEQC_POWER_OFF_WAIT);
         diseqc_bus_already_reset = false;
     }
 
@@ -757,9 +758,9 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset, bool is_SCR)
     {
         // make sure the bus is powered
         SetVoltage(SEC_VOLTAGE_18);
-        usleep(DISEQC_POWER_ON_WAIT);
+        std::this_thread::sleep_for(DISEQC_POWER_ON_WAIT);
         // some DiSEqC devices need more time. see #8465
-        usleep(DISEQC_POWER_ON_WAIT);
+        std::this_thread::sleep_for(DISEQC_POWER_ON_WAIT);
 
         // issue a global reset command
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Resetting DiSEqC Bus");
@@ -777,7 +778,7 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset, bool is_SCR)
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Skipping reset: already done for this SCR bus");
     }
 
-    usleep(DISEQC_LONG_WAIT);
+    std::this_thread::sleep_for(DISEQC_LONG_WAIT);
 
     return true;
 }
@@ -817,7 +818,7 @@ bool DiSEqCDevTree::SetVoltage(uint voltage)
         if (ioctl(m_fdFrontend, FE_SET_VOLTAGE, voltage) == 0)
             success = true;
         else
-            usleep(TIMEOUT_WAIT);
+            std::this_thread::sleep_for(TIMEOUT_WAIT);
     }
 #endif // CONFIG_DVB
 
@@ -1121,7 +1122,7 @@ bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
         if (m_children[pos]->IsCommandNeeded(settings, tuning))
         {
             LOG(VB_CHANNEL, LOG_INFO, LOC + "Waiting for switch");
-            usleep(DISEQC_LONG_WAIT);
+            std::this_thread::sleep_for(DISEQC_LONG_WAIT);
         }
 
         m_lastPos = pos;
@@ -1435,7 +1436,7 @@ static bool set_tone(int fd, fe_sec_tone_mode tone)
         if (ioctl(fd, FE_SET_TONE, tone) == 0)
             success = true;
         else
-            usleep(TIMEOUT_WAIT);
+            std::this_thread::sleep_for(TIMEOUT_WAIT);
     }
 
     if (!success)
@@ -1457,7 +1458,7 @@ static bool set_voltage(int fd, fe_sec_voltage volt)
         if (0 == ioctl(fd, FE_SET_VOLTAGE, volt))
             success = true;
         else
-            usleep(TIMEOUT_WAIT);
+            std::this_thread::sleep_for(TIMEOUT_WAIT);
     }
 
     if (!success)
@@ -1479,7 +1480,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
         if (ioctl(fd, FE_DISEQC_SEND_BURST, cmd) == 0)
             success = true;
         else
-            usleep(TIMEOUT_WAIT);
+            std::this_thread::sleep_for(TIMEOUT_WAIT);
     }
 
     if (!success)
@@ -1712,7 +1713,7 @@ bool DiSEqCDevRotor::Execute(const DiSEqCDevSettings &settings,
         m_reset = false;
         if (success)
             // prevent tuning parameters overriding rotor parameters
-            usleep(DISEQC_LONG_WAIT);
+            std::this_thread::sleep_for(DISEQC_LONG_WAIT);
     }
 
     // chain to child
@@ -2195,7 +2196,7 @@ bool DiSEqCDevSCR::SendCommand(uint cmd,
     // power on bus
     if (!m_tree.SetVoltage(SEC_VOLTAGE_18))
         return false;
-    usleep(DISEQC_LONG_WAIT);
+    std::this_thread::sleep_for(DISEQC_LONG_WAIT);
 
     // send command
     bool ret = m_tree.SendCommand(DISEQC_ADR_SW_ALL, cmd, repeats, data);

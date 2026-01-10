@@ -21,8 +21,8 @@
 #else
 #include <sys/socket.h>
 #endif
-#include <unistd.h> // for usleep
 #include <algorithm> // for max
+#include <thread>
 #include <vector> // for vector
 
 // MythTV
@@ -782,7 +782,7 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
                 *ret = false;
                 return;
             }
-            usleep(1000);
+            std::this_thread::sleep_for(1ms);
         }
     }
 

@@ -28,7 +28,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <queue>
-#include <unistd.h>       // for usleep()
+#include <thread>
 
 #ifdef Q_OS_WINDOWS
 #include <winsock2.h>
@@ -525,7 +525,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
         }
 
         if (sleepus != 0us)
-            usleep(sleepus.count());
+            std::this_thread::sleep_for(sleepus);
     }
 
     if (we_attempted_wol)

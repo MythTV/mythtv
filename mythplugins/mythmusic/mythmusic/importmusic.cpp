@@ -1,3 +1,5 @@
+#include <thread>
+
 // qt
 #include <QApplication>
 #include <QDir>
@@ -489,8 +491,7 @@ bool ImportMusicDialog::copyFile(const QString &src, const QString &dst)
 
     while (!copy->isFinished())
     {
-        const struct timespec halfms {0, 500000};
-        nanosleep(&halfms, nullptr);
+        std::this_thread::sleep_for(500us);
         QCoreApplication::processEvents();
     }
 
@@ -529,8 +530,7 @@ void ImportMusicDialog::startScan()
 
     while (!scanner->isFinished())
     {
-        const struct timespec halfms {0, 500000};
-        nanosleep(&halfms, nullptr);
+        std::this_thread::sleep_for(500us);
         QCoreApplication::processEvents();
     }
 

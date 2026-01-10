@@ -12,6 +12,7 @@
 #include <cstdlib> // for free
 #include <iostream>
 #include <string>
+#include <thread>
 #include <sys/types.h>
 #include <unistd.h>
 #ifndef Q_OS_WINDOWS
@@ -256,7 +257,8 @@ void SignalHandler::signalHandler(int signum,
 
         // Wait for UI event loop to handle this, however we may be
         // blocking it if this signal occured in the UI thread.
-        // Note, can not use usleep() as it is not a signal safe function.
+        // Note, we cannot use std::this_thread::sleep_for()
+        // since it is not a signal safe function.
         sleep(1);
 
         if (!s_exit_program)
@@ -335,7 +337,7 @@ void SignalHandler::handleSignal(void)
     case SIGBUS:
     case SIGFPE:
     case SIGILL:
-        usleep(100000);
+        std::this_thread::sleep_for(100ms);
         s_exit_program = true;
         break;
     default:

@@ -2,7 +2,7 @@
 // C/C++
 #include <cstdlib>
 #include <iostream>
-#include <unistd.h>
+#include <thread>
 
 // Qt
 #include <QtGlobal>
@@ -92,7 +92,7 @@ static int lockShutdown()
     while (!query.exec("LOCK TABLE settings WRITE;") && tries < 5)
     {
         LOG(VB_GENERAL, LOG_INFO, "Waiting for lock on setting table");
-        sleep(1);
+        std::this_thread::sleep_for(1s);
         tries++;
     }
 
@@ -146,7 +146,7 @@ static int unlockShutdown()
     while (!query.exec("LOCK TABLE settings WRITE;") && tries < 5)
     {
         LOG(VB_GENERAL, LOG_INFO, "Waiting for lock on setting table");
-        sleep(1);
+        std::this_thread::sleep_for(1s);
         tries++;
     }
 

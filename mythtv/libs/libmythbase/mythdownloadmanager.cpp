@@ -19,7 +19,7 @@
 #include <QTcpSocket>
 
 #include <cstdlib>
-#include <unistd.h> // for usleep()
+#include <thread>
 
 // libmythbase
 #include "compat.h"
@@ -161,13 +161,13 @@ MythDownloadManager *GetMythDownloadManager(void)
     auto *tmpDLM = new MythDownloadManager();
     tmpDLM->start();
     while (!tmpDLM->getQueueThread())
-        usleep(10000);
+        std::this_thread::sleep_for(10ms);
 
     tmpDLM->moveToThread(tmpDLM->getQueueThread());
     tmpDLM->setRunThread();
 
     while (!tmpDLM->isRunning())
-        usleep(10000);
+        std::this_thread::sleep_for(10ms);
 
     downloadManager = tmpDLM;
 
@@ -204,7 +204,7 @@ void MythDownloadManager::run(void)
     m_queueThread = QThread::currentThread();
 
     while (!m_runThread)
-        usleep(50ms);
+        std::this_thread::sleep_for(50ms);
 
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
@@ -1074,7 +1074,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 
     while (!m_cancellationQueue.isEmpty())
     {
-        usleep(50ms); // re-test in another 50ms
+        std::this_thread::sleep_for(50ms); // re-test in another 50ms
     }
 }
 
@@ -1530,7 +1530,7 @@ bool MythDownloadManager::saveFile(const QString &outFile,
         if (written < 0)
         {
             failure_cnt++;
-            usleep(50ms);
+            std::this_thread::sleep_for(50ms);
             continue;
         }
 

@@ -1,7 +1,6 @@
-#include <unistd.h> // for usleep()
-
 #include <algorithm>
 #include <limits> // workaround QTBUG-90395
+#include <thread>
 #include <utility>
 
 #include <QTcpSocket>
@@ -1849,7 +1848,7 @@ std::chrono::milliseconds MythRAOPConnection::AudioCardLatency(void)
                      0ms,
                      frames);
     av_free(samples);
-    usleep(duration_cast<std::chrono::microseconds>(AUDIOCARD_BUFFER).count());
+    std::this_thread::sleep_for(AUDIOCARD_BUFFER);
     std::chrono::milliseconds audiots = m_audio->GetAudiotime();
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("AudioCardLatency: ts=%1ms")
         .arg(audiots.count()));

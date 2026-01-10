@@ -87,8 +87,6 @@ class MThreadInternal : public QThread
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }
 
-    static void USleep(std::chrono::microseconds time) { QThread::usleep(time.count()); }
-
   private:
     MThread &m_parent;
 };
@@ -330,11 +328,6 @@ int MThread::exec(void)
 void MThread::setTerminationEnabled(bool enabled)
 {
     MThreadInternal::SetTerminationEnabled(enabled);
-}
-
-void MThread::usleep(std::chrono::microseconds time)
-{
-    MThreadInternal::USleep(time);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

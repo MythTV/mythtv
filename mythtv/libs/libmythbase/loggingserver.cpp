@@ -1,4 +1,5 @@
 #include <fstream>
+#include <thread>
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
@@ -460,7 +461,7 @@ bool logForwardStart(void)
     logForwardThread = new LogForwardThread();
     logForwardThread->start();
 
-    usleep(10000);
+    std::this_thread::sleep_for(10ms);
     return (logForwardThread && logForwardThread->isRunning());
 }
 

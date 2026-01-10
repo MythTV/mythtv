@@ -1,4 +1,5 @@
 // C/C++
+#include <thread>
 #include <utility>
 
 // MythTV
@@ -16,7 +17,7 @@ void PlaylistLoadingThread::run()
     RunProlog();
     while (!m_allMusic->doneLoading())
     {
-        usleep(250ms); // cppcheck-suppress usleepCalled
+        std::this_thread::sleep_for(250ms);
     }
     m_parent->load();
     RunEpilog();

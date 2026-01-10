@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <sys/time.h>
+#include <thread>
 
 #include <QFile>
 #include "libmythbase/mythcorecontext.h"
@@ -608,7 +608,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             case -ESTRPIPE:
                 LOG(VB_AUDIO, LOG_INFO, LOC + "WriteAudio: device is suspended");
                 while ((err = snd_pcm_resume(m_pcmHandle)) == -EAGAIN)
-                    usleep(200us);
+                    std::this_thread::sleep_for(200us);
 
                 if (err < 0)
                 {

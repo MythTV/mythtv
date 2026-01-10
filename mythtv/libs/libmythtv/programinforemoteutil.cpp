@@ -1,6 +1,6 @@
 #include "programinforemoteutil.h"
 
-#include <unistd.h>
+#include <thread>
 
 #include <QFileInfo>
 #include <QFile>
@@ -237,7 +237,7 @@ QDateTime RemoteGetPreviewIfModified(
         if (written < 0)
         {
             failure_cnt++;
-            usleep(50000);
+            std::this_thread::sleep_for(50ms);
             continue;
         }
 

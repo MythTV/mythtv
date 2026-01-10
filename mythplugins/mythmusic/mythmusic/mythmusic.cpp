@@ -1,8 +1,8 @@
 // C++ headers
 #include <cstdlib>
+#include <thread>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 // Qt headers
 #include <QApplication>
@@ -687,7 +687,7 @@ static void handleCDMedia(MythMediaDevice *cd, bool forcePlayback)
            || !gMusicData->m_all_music->doneLoading())
     {
         QCoreApplication::processEvents();
-        usleep(50000);
+        std::this_thread::sleep_for(50ms);
     }
 
     // remove any existing CD tracks

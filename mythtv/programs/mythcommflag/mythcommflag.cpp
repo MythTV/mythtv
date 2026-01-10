@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <thread>
 
 // Qt headers
 #include <QCoreApplication>
@@ -448,7 +449,7 @@ static int DoFlagCommercials(
 
     CommDetectorBase *tmp = commDetector;
     commDetector = nullptr;
-    sleep(1);
+    std::this_thread::sleep_for(1s);
     tmp->deleteLater();
 
     cer->deleteLater();

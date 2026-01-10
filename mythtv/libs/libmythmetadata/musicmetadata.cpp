@@ -1,13 +1,15 @@
 
 #include "musicmetadata.h"
 
+#include <thread>
+#include <utility>
+
 // qt
 #include <QApplication>
 #include <QDateTime>
 #include <QDir>
 #include <QDomDocument>
 #include <QScopedPointer>
-#include <utility>
 
 // mythtv
 #include "libmythbase/mythcorecontext.h"
@@ -1429,7 +1431,7 @@ void MetadataLoadingThread::run()
 {
     RunProlog();
     //if you want to simulate a big music collection load
-    //sleep(3);
+    //std::this_thread::sleep_for(3s);
     m_parent->resync();
     RunEpilog();
 }
@@ -2079,7 +2081,7 @@ void AlbumArtImages::scanForImages()
     while (scanThread->isRunning())
     {
         QCoreApplication::processEvents();
-        usleep(1000);
+        std::this_thread::sleep_for(1ms);
     }
 
     strList = scanThread->getResult();

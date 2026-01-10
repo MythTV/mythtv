@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include <cstdlib>
 #include <map>
-#include <unistd.h>
+#include <thread>
 
 // qt
 #include <QApplication>
@@ -1387,7 +1387,7 @@ int Playlist::CreateCDMP3(void)
     m_proc->Run();
 
     while( m_procExitVal == GENERIC_EXIT_RUNNING )
-        usleep( 100000 );
+        std::this_thread::sleep_for(100ms);
 
     uint retval = m_procExitVal;
 
@@ -1436,7 +1436,7 @@ int Playlist::CreateCDMP3(void)
         m_proc->Run();
 
         while( m_procExitVal == GENERIC_EXIT_RUNNING )
-            usleep( 100000 );
+            std::this_thread::sleep_for(100ms);
 
         retval = m_procExitVal;
 

@@ -1,3 +1,5 @@
+#include <thread>
+
 // QT
 #include <QFileInfo>
 #include <QDir>
@@ -223,7 +225,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
                 }
 
                 lasterror = 1;
-                usleep(10ms);
+                std::this_thread::sleep_for(10ms);
                 continue;
             }
 
@@ -241,7 +243,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
 
                 if (m_oldfile)
                     break; // if it's an old file it won't grow..
-                usleep(10ms);
+                std::this_thread::sleep_for(10ms);
                 continue;
             }
 
@@ -504,7 +506,7 @@ int MythFileBuffer::SafeRead(int /*fd*/, void *Buffer, uint Size)
 
             zerocnt++;
 
-            // 0.36 second timeout for livetvchain with usleep(60000),
+            // 0.36 second timeout for livetvchain,
             // or 2.4 seconds if it's a new file less than 30 minutes old.
             if (zerocnt >= (m_liveTVChain ? 6 : 40))
             {
@@ -514,7 +516,7 @@ int MythFileBuffer::SafeRead(int /*fd*/, void *Buffer, uint Size)
         if (m_stopReads)
             break;
         if (tot < Size)
-            usleep(60ms);
+            std::this_thread::sleep_for(60ms);
     }
     return static_cast<int>(tot);
 }

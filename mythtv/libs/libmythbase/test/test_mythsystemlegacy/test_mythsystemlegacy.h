@@ -20,8 +20,6 @@
 #ifndef LIBMYTHBASE_TEST_MYTHSYSTEMLEGACY_H
 #define LIBMYTHBASE_TEST_MYTHSYSTEMLEGACY_H
 
-#include <unistd.h> // for usleep()
-
 #include <QTest>
 #include <QTemporaryFile>
 #include <QDateTime>

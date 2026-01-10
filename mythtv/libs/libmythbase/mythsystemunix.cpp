@@ -228,7 +228,7 @@ void MythSystemLegacyIOHandler::Wait(int fd)
     while (m_pMap.contains(fd))
     {
         locker.unlock();
-        usleep(10ms);
+        std::this_thread::sleep_for(10ms);
         locker.relock();
     }
 }

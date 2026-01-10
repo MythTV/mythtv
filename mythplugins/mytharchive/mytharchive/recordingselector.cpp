@@ -1,7 +1,7 @@
 
 // c++
 #include <cstdlib>
-#include <unistd.h>
+#include <thread>
 
 // qt
 #include <QApplication>
@@ -125,7 +125,7 @@ void RecordingSelector::Init(void)
     while (thread->isRunning())
     {
         QCoreApplication::processEvents();
-        usleep(2000);
+        std::this_thread::sleep_for(2ms);
     }
 
     if (!m_recordingList || m_recordingList->empty())

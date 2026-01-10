@@ -20,6 +20,7 @@
 
 // C++ headers
 #include <chrono>
+#include <thread>
 
 // QT headers
 #include <QFile>
@@ -512,10 +513,7 @@ void avfDecoder::run()
                 // never go below 1s buffered
                 if (buffered < 1s)
                     break;
-                // wait
-                long count = buffered.count();
-                const struct timespec ns {0, (count - 1000) * 1000000};
-                nanosleep(&ns, nullptr);
+                std::this_thread::sleep_for(buffered - 1s);
             }
         }
     }

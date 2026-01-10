@@ -1,7 +1,5 @@
 #include "avformatdecoder.h"
 
-#include <unistd.h>
-
 // C++ headers
 #include <algorithm>
 #include <array>
@@ -10,6 +8,7 @@
 #include <cstring>
 #include <iostream>
 #include <set>
+#include <thread>
 
 extern "C" {
 #include "libavutil/avutil.h"
@@ -991,7 +990,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                 {
                     // wait a little to buffer more data
                     // 50*0.1 = 5 seconds max
-                    QThread::usleep(100000);
+                    std::this_thread::sleep_for(100ms);
                     // resets the read position
                     m_avfRingBuffer->SetInInit(false);
                     continue;
@@ -1052,7 +1051,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
                 {
                     CloseContext();
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stream scan incomplete - retrying");
-                    QThread::usleep(250000); // wait 250ms
+                    std::this_thread::sleep_for(250ms);
                 }
                 break;
             }

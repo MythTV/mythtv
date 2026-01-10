@@ -1107,7 +1107,8 @@ void MythMediaBuffer::run(void)
         {
             // To give other threads a good chance to handle these
             // conditions, even if they are only requesting a read lock
-            // like us, yield (currently implemented with short usleep).
+            // like us, yield (currently implemented with short
+            // std::this_thread::sleep_for).
             m_generalWait.wakeAll();
             m_rwLock.unlock();
             std::this_thread::sleep_for(5ms);

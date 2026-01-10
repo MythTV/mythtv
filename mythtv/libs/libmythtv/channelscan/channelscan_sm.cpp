@@ -27,11 +27,9 @@
  *
  */
 
-// C includes
-#include <unistd.h>
-
 // C++ includes
 #include <algorithm>
+#include <thread>
 #include <utility>
 
 // Qt includes
@@ -2019,7 +2017,7 @@ void ChannelScanSM::run(void)
         if (m_scanning)
             HandleActiveScan();
 
-        usleep(10 * 1000);
+        std::this_thread::sleep_for(10ms);
     }
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "run -- end");

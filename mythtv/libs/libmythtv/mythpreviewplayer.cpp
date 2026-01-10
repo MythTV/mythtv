@@ -1,5 +1,4 @@
-// Qt
-#include <QThread>
+#include <thread>
 
 // MythTV
 #include "mythpreviewplayer.h"
@@ -115,7 +114,7 @@ uint8_t *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolut
     {
         tries += 1;
         m_decodeOneFrame = true;
-        QThread::usleep(10000);
+        std::this_thread::sleep_for(10ms);
         if ((tries % 10) == 0)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms for video frame");
     }

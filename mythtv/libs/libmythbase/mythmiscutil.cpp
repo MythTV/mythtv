@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <iostream>
+#include <thread>
 
 // POSIX
 #include <unistd.h>
@@ -719,9 +720,9 @@ void myth_yield(void)
 {
 #ifdef _POSIX_PRIORITY_SCHEDULING
     if (sched_yield()<0)
-        usleep(5000);
+        std::this_thread::sleep_for(5ms);
 #else
-    usleep(5000);
+    std::this_thread::sleep_for(5ms);
 #endif
 }
 

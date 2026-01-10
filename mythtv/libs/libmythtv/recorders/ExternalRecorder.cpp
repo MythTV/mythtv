@@ -17,6 +17,7 @@
  *   along with this program; if not, write to the Free Software Foundation,
  *   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#include <thread>
 
 // Qt includes
 #include <QString>
@@ -96,7 +97,7 @@ void ExternalRecorder::run(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");
-            usleep(5000);
+            std::this_thread::sleep_for(5ms);
             continue;
         }
 

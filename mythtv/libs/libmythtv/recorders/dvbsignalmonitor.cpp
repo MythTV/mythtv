@@ -3,8 +3,7 @@
 #include <cerrno>
 #include <cmath>
 #include <cstring>
-
-#include <unistd.h>
+#include <thread>
 
 //Qt headers
 #include <QCoreApplication>
@@ -160,7 +159,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 
     m_minimumUpdateRate = _channel->GetMinSignalMonitorDelay();
     if (m_minimumUpdateRate > 30ms)
-        usleep(m_minimumUpdateRate);
+        std::this_thread::sleep_for(m_minimumUpdateRate);
 
     m_streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
 }

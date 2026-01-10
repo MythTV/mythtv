@@ -20,13 +20,12 @@
 #ifndef LIBMYTHBASE_TEST_MYTHSYSTEM_H
 #define LIBMYTHBASE_TEST_MYTHSYSTEM_H
 
-#include <unistd.h> // for usleep()
-
 #include <QTest>
 #include <QTemporaryFile>
 #include <QDateTime>
 
 #include <iostream>
+#include <thread>
 
 //#define NEW_LOGGING
 #ifdef NEW_LOGGING
@@ -273,7 +272,7 @@ class TestMythSystem: public QObject
     {
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("sleep 5", kMSRunShell));
-        usleep(50 * 1000);
+        std::this_thread::sleep_for(50ms);
         cmd->Signal(kSignalTerm);
         cmd->Wait();
         QCOMPARE(cmd->GetExitCode(), -1);

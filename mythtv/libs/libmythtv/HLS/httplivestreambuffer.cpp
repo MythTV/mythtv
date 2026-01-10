@@ -37,6 +37,7 @@
 // C++
 #include <algorithm> // for min/max
 #include <array>
+#include <thread>
 
 // libmythbase
 #include "libmythbase/mthread.h"
@@ -1222,7 +1223,7 @@ protected:
                         QString("download failed, retry #%1").arg(retries));
                     if (retries == 1)   // first error
                         continue;       // will retry immediately
-                    usleep(500ms);      // cppcheck-suppress usleepCalled
+                    std::this_thread::sleep_for(500ms);
                     if (retries == 2)   // and retry once again
                         continue;
                     if (!m_parent->m_meta) // NOLINT(bugprone-branch-clone)
