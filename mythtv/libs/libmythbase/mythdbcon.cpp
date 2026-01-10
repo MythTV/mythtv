@@ -2,6 +2,7 @@
 
 // ANSI C
 #include <cstdlib>
+#include <thread>
 
 // Qt
 #include <QCoreApplication>
@@ -198,7 +199,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                             .arg(m_dbparms.m_wolCommand));
                 }
 
-                sleep(m_dbparms.m_wolReconnect.count());
+                std::this_thread::sleep_for(m_dbparms.m_wolReconnect);
                 connected = m_db.open();
             }
 

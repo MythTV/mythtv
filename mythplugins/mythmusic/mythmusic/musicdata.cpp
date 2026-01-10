@@ -1,5 +1,5 @@
 // C/C++
-#include <unistd.h> // for usleep()
+#include <thread>
 
 // qt
 #include <QApplication>
@@ -87,7 +87,7 @@ void MusicData::reloadMusic(void) const
     while (!m_all_music->doneLoading())
     {
         QCoreApplication::processEvents();
-        usleep(50000);
+        std::this_thread::sleep_for(50ms);
     }
 
     m_all_playlists->resync();
@@ -133,7 +133,7 @@ void MusicData::loadMusic(void) const
            || !gMusicData->m_all_music->doneLoading())
     {
         QCoreApplication::processEvents();
-        usleep(50000);
+        std::this_thread::sleep_for(50ms);
     }
 
     gPlayer->loadStreamPlaylist();

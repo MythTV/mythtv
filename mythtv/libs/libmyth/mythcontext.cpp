@@ -6,7 +6,6 @@
 #include <iostream>
 #include <queue>
 #include <thread>
-#include <unistd.h> // for usleep(), gethostname
 #include <vector>
 
 #include <QtGlobal>
@@ -34,6 +33,7 @@
 #endif
 
 #ifdef Q_OS_WINDOWS
+#include <cstdlib> // getenv, _putenv
 #include "libmythbase/compat.h"
 #endif
 #include "libmythbase/configuration.h"
@@ -1179,7 +1179,7 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < milliSeconds)
     {
-        usleep(25000);
+        std::this_thread::sleep_for(25ms);
         auto ttl = milliSeconds - totalTime.elapsed();
         if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
@@ -1282,7 +1282,7 @@ bool MythContext::Impl::DefaultUPnP(QString& Error)
         if (devicelocation)
             break;
 
-        usleep(25000);
+        std::this_thread::sleep_for(25ms);
 
         auto ttl = timeout_ms - totalTime.elapsed();
         if ((searchTime.elapsed() > 249ms) && (ttl > 1s))

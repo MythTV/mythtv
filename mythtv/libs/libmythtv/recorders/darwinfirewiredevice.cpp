@@ -21,6 +21,7 @@
 
 // Std C++ headers
 #include <algorithm>
+#include <thread>
 #include <vector>
 
 // MythTV headers
@@ -189,7 +190,7 @@ void DarwinFirewireDevice::StartController(void)
     while (!m_priv->m_controller_thread_running)
     {
         m_lock.unlock();
-        usleep(5000);
+        std::this_thread::sleep_for(5ms);
         m_lock.lock();
     }
 }
@@ -222,7 +223,7 @@ void DarwinFirewireDevice::StopController(void)
     while (m_priv->m_controller_thread_running)
     {
         m_lock.unlock();
-        usleep(100 * 1000);
+        std::this_thread::sleep_for(100ms);
         m_lock.lock();
     }
 }

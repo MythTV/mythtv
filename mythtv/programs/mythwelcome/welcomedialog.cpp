@@ -4,6 +4,7 @@
 // C++
 #include <chrono>
 #include <cstdlib>
+#include <thread>
 
 // qt
 #include <QtGlobal>
@@ -636,7 +637,7 @@ void WelcomeDialog::unlockShutdown(void)
 void WelcomeDialog::runEPGGrabber(void)
 {
     runMythFillDatabase();
-    sleep(1);
+    std::this_thread::sleep_for(1s);
     updateStatusMessage();
     updateScreen();
 }

@@ -1,6 +1,7 @@
 // C header
 #include <fcntl.h>
 #include <unistd.h>
+#include <thread>
 #include <utility>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -152,7 +153,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         int ret = myth_system(MountCommand, kMSDontBlockInputDevs);
         if (ret !=  GENERIC_EXIT_OK)
         {
-            usleep(300000);
+            std::this_thread::sleep_for(300ms);
             LOG(VB_MEDIA, LOG_INFO, QString("Retrying '%1'").arg(MountCommand));
             ret = myth_system(MountCommand, kMSDontBlockInputDevs);
         }
@@ -165,13 +166,13 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 // In the case that m_devicePath is a symlink to a device
                 // in /etc/fstab then pmount delegates to mount which
                 // performs the mount asynchronously so we must wait a bit
-                usleep(1000000-1);
+                std::this_thread::sleep_for(1s);
                 for (int tries = 2; !findMountPath() && tries > 0; --tries)
                 {
                     LOG(VB_MEDIA, LOG_INFO,
                         QString("Repeating '%1'").arg(MountCommand));
                     myth_system(MountCommand, kMSDontBlockInputDevs);
-                    usleep(500000);
+                    std::this_thread::sleep_for(500ms);
                 }
                 if (!findMountPath())
                 {

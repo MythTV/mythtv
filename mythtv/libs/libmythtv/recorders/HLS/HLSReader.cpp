@@ -1,8 +1,7 @@
 #include "HLSReader.h"
 
 #include <cstring>
-
-#include <unistd.h>
+#include <thread>
 
 #include <QtGlobal>
 #include <QRegularExpression>
@@ -970,7 +969,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
         }
         else
         {
-            usleep(5000);
+            std::this_thread::sleep_for(5ms);
         }
 
         if (m_prebufferCnt == 0)

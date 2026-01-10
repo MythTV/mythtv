@@ -35,6 +35,8 @@
 // C/C++ headers
 #include <cstdio>
 #include <cerrno>
+#include <thread>
+
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -243,7 +245,7 @@ void JoystickMenuThread::run(void)
             /* Get the file descriptor (fd) for the monitor.
             This fd will get passed to select() */
             int fd = udev_monitor_get_fd(mon);
-            /* This section will run till no error, calling usleep() at
+            /* This section will run till no error, calling sleep_for() at
             the end of each pass. This is to use a udev_monitor in a
             non-blocking way. */
             /*===========================================================
@@ -274,7 +276,7 @@ void JoystickMenuThread::run(void)
                         udev_device_unref(dev);
                     }
                 }
-                usleep(250ms);
+                std::this_thread::sleep_for(250ms);
             }
             // unref the monitor
             udev_monitor_unref(mon); // Also closes fd.

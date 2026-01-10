@@ -20,6 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#include <thread>
 
 // Qt
 #include <QFile>
@@ -1684,7 +1685,7 @@ void RecordingExtender::run()
 
     while (m_running)
     {
-        usleep(kExtensionTime); // cppcheck-suppress usleepCalled
+        std::this_thread::sleep_for(kExtensionTime);
 
         clearDownloadedInfo();
         processNewRecordings();

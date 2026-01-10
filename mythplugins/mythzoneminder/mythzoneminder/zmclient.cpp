@@ -3,7 +3,7 @@
 */
 
 // C++
-#include <unistd.h>
+#include <thread>
 
 // qt
 #include <QTimer>
@@ -93,7 +93,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
             m_bConnected = true;
         }
 
-        usleep(999999);
+        std::this_thread::sleep_for(1s);
     }
 
     if (!m_bConnected)

@@ -15,6 +15,7 @@
 #include <SoundTouch.h>
 
 #include <array>
+#include <thread>
 #include <vector>
 
 #include <CoreServices/CoreServices.h>
@@ -279,7 +280,7 @@ bool AudioOutputCA::OpenDevice()
             if (result < 0)
             {
                 d->CloseAnalog();
-                usleep(1s - 1us); // Argument to usleep must be less than 1 second
+                std::this_thread::sleep_for(1s);
             }
         }
         deviceOpened = (result > 0);
@@ -1740,7 +1741,7 @@ void CoreAudioData::ResetStream(AudioStreamID s)
                     continue;
                 }
                 
-                sleep(1);   // For the change to take effect
+                std::this_thread::sleep_for(1s);   // For the change to take effect
             }
         }
     }

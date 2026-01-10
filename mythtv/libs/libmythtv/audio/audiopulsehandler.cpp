@@ -1,9 +1,9 @@
+#include <thread>
+
 #include <QMutexLocker>
 #include <QString>
 #include <QMutex>
 #include <QElapsedTimer>
-
-#include <unistd.h> // for usleep
 
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythlogging.h"
@@ -273,7 +273,7 @@ bool PulseHandler::Init(void)
     while ((tries++ < 100) && !IS_READY(m_ctxState))
     {
         pa_mainloop_iterate(m_loop, 0, &ret);
-        usleep(10000);
+        std::this_thread::sleep_for(10ms);
     }
 
     if (PA_CONTEXT_READY != m_ctxState)
@@ -326,7 +326,7 @@ bool PulseHandler::SuspendInternal(bool suspend)
     while (m_pendingOperations && count++ < 100)
     {
         pa_mainloop_iterate(m_loop, 0, &ret);
-        usleep(10000);
+        std::this_thread::sleep_for(10ms);
     }
 
     // a failure isn't necessarily disastrous

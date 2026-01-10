@@ -5,6 +5,7 @@
 
 // Standard C headers
 #include <cstdio>
+#include <thread>
 
 // POSIX headers
 #include <dirent.h>
@@ -260,7 +261,7 @@ static bool DetectDevice(const QDBusObjectPath& entry, MythUdisksDevice& device,
 bool MediaMonitorUnix::CheckMountable(void)
 {
 #if CONFIG_QTDBUS
-    for (int i = 0; i < 10; ++i, usleep(500000))
+    for (int i = 0; i < 10; ++i, std::this_thread::sleep_for(500ms))
     {
         // Connect to UDisks2.  This can sometimes fail if mythfrontend
         // is started during system init

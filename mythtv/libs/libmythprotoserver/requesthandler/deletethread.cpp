@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include <iostream>
+#include <thread>
+
 #include <fcntl.h>
 
 #include <QList>
@@ -43,7 +45,7 @@ void DeleteThread::run(void)
         // loop through any stored files every half second 
         ProcessNew();
         ProcessOld();
-        usleep(0.5s);
+        std::this_thread::sleep_for(500ms);
     }
 
     if (!m_files.empty())

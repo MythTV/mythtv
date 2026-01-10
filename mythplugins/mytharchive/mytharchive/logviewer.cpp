@@ -1,7 +1,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
-#include <unistd.h>
+#include <thread>
 
 // qt
 #include <QCoreApplication>
@@ -62,7 +62,7 @@ void showLogViewer(void)
             }
         }
 
-        sleep(1);
+        std::this_thread::sleep_for(1s);
     }
 
     // do any logs exist?

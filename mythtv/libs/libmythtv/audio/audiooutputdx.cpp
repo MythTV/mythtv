@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <thread>
 
 #include "libmythbase/mythlogging.h"
 #include "audiooutputdx.h"
@@ -321,7 +322,7 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
             (m_writeCursor >= play_pos &&
              m_writeCursor + size >= play_pos + m_parent->m_soundcardBufferSize))
         {
-            usleep(50000);
+            std::this_thread::sleep_for(50ms);
             continue;
         }
 

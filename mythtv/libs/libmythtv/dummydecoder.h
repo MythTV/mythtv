@@ -1,6 +1,8 @@
 #ifndef DUMMYDECODER_H_
 #define DUMMYDECODER_H_
 
+#include <thread>
+
 #include "decoders/decoderbase.h"
 #include "mythframe.h"
 #include "programinfo.h"
@@ -16,7 +18,7 @@ class DummyDecoder : public DecoderBase
     int         OpenFile(MythMediaBuffer* /*Buffer*/, bool /*novideo*/, TestBufferVec & /*testbuf*/) override
                     { return 0; }
     bool        GetFrame(DecodeType /*Type*/, bool &/*Retry*/) override
-                    { usleep(10000); return false; }
+                    { std::this_thread::sleep_for(10ms); return false; }
     bool        IsLastFrameKey(void) const override       { return true; }
     QString     GetCodecDecoderName(void) const override  { return "dummy"; }
     MythCodecID GetVideoCodecID(void) const override      { return kCodec_NONE; }

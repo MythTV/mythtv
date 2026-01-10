@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <thread>
 
 #include <QString>
 #include <QMutex>
@@ -73,7 +74,7 @@ class VolumeWriteBackThread : public MThread
 
             // Ignore further volume changes for the holdoff period
             setTerminationEnabled(true);
-            usleep(holdoff); // cppcheck-suppress usleepCalled
+            std::this_thread::sleep_for(holdoff);
             setTerminationEnabled(false);
 
             lock.relock();

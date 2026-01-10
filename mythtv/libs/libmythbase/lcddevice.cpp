@@ -12,8 +12,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
-#include <fcntl.h>
-#include <unistd.h> // for usleep()
+#include <thread>
 
 // Qt headers
 #include <QApplication>
@@ -139,7 +138,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
             return m_connected;
         }
 
-        usleep(500000);
+        std::this_thread::sleep_for(500ms);
     }
 
     for (int count = 1; count <= 10 && !m_connected; count++)
@@ -169,7 +168,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         }
         m_socket->close();
 
-        usleep(500000);
+        std::this_thread::sleep_for(500ms);
     }
 
     if (!m_connected)

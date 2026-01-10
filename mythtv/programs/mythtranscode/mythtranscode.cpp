@@ -3,6 +3,7 @@
 #include <fcntl.h> // for open flags
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 // Qt headers
 #include <QtGlobal>
@@ -840,11 +841,11 @@ static void WaitToDelete(ProgramInfo *pginfo)
 
         if (inUse)
         {
-            const unsigned kSecondsToWait = 10;
+            constexpr std::chrono::seconds kSecondsToWait = 10s;
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Transcode: program in use, rechecking in %1 seconds.")
-                    .arg(kSecondsToWait));
-            sleep(kSecondsToWait);
+                    .arg(kSecondsToWait.count()));
+            std::this_thread::sleep_for(kSecondsToWait);
         }
     }
     LOG(VB_GENERAL, LOG_NOTICE, "Transcode: program is no longer in use.");

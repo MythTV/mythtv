@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 MythFIFOThread::MythFIFOThread()
   : MThread("FIFOThread")
@@ -150,7 +151,7 @@ bool MythFIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
     m_fifoThrds[Id].start();
 
     while (0 == m_killWr[Id] && !m_fifoThrds[Id].isRunning())
-        usleep(1000);
+        std::this_thread::sleep_for(1ms);
 
     return m_fifoThrds[Id].isRunning();
 }
@@ -271,6 +272,6 @@ void MythFIFOWriter::FIFODrain(void)
                 count++;
             }
         }
-        usleep(1000);
+        std::this_thread::sleep_for(1ms);
     }
 }

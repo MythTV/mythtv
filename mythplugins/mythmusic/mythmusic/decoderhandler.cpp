@@ -1,7 +1,7 @@
 // c/c++
 #include <cassert>
 #include <cstdio>
-#include <unistd.h>
+#include <thread>
 
 // qt
 #include <QApplication>
@@ -329,7 +329,7 @@ void DecoderHandler::createPlaylistFromRemoteUrl(const QUrl &url)
         }
 
         QCoreApplication::processEvents();
-        usleep(500);
+        std::this_thread::sleep_for(500us);
     }
 }
 

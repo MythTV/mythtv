@@ -1,9 +1,10 @@
 // C headers
-#include <unistd.h>
+#include <unistd.h> // close
 
 // C++ headers
 #include <iostream>
 #include <memory>
+#include <thread>
 
 // Qt headers
 #include <QtGlobal>
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
 
     while (lookup->StillWorking())
     {
-        sleep(1);
+        std::this_thread::sleep_for(1s);
         qApp->processEvents();
     }
 

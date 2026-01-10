@@ -3,10 +3,9 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <thread>
 
-// POSIX headers
-#include <unistd.h>
-#include <sys/time.h>
+#include <unistd.h> // getpid
 
 // SoundTouch
 #if __has_include(<soundtouch/SoundTouch.h>)
@@ -2034,7 +2033,7 @@ void AudioOutputBase::OutputAudioLoop(void)
                           .arg(ready).arg(m_fragmentSize));
             }
 
-            usleep(10ms);
+            std::this_thread::sleep_for(10ms);
             continue;
         }
 
@@ -2167,7 +2166,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
 void AudioOutputBase::Drain()
 {
     while (!m_pauseAudio && audioready() > m_fragmentSize)
-        usleep(1ms);
+        std::this_thread::sleep_for(1ms);
     if (m_pauseAudio)
     {
         // Audio is paused and can't be drained, clear ringbuffer

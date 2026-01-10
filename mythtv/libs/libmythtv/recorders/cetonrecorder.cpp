@@ -4,6 +4,7 @@
  *  Copyright (c) 2006-2009 by Silicondust Engineering Ltd.
  *  Distributed as part of MythTV under GPL v2 and later.
  */
+#include <thread>
 
 // MythTV includes
 #include "libmythbase/mythlogging.h"
@@ -96,7 +97,7 @@ void CetonRecorder::run(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
-            usleep(5000);
+            std::this_thread::sleep_for(5ms);
             continue;
         }
 

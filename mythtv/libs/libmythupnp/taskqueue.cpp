@@ -11,6 +11,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "taskqueue.h"
 
+#include <thread>
+
 #include "libmythbase/mythlogging.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -134,7 +136,7 @@ void TaskQueue::run( )
         }
         // Make sure to throttle our processing.
 
-        usleep( 100ms );
+        std::this_thread::sleep_for(100ms);
     }
 
     RunEpilog();

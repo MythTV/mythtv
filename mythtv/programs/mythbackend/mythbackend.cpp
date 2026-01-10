@@ -5,6 +5,7 @@
 
 #include <csignal> // for signal
 #include <cstdlib>
+#include <thread>
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
@@ -194,7 +195,7 @@ int main(int argc, char **argv)
         newargv[newargc] = nullptr;
         LOG(VB_GENERAL, LOG_INFO,
             QString("Restarting mythbackend"));
-        usleep(50000);
+        std::this_thread::sleep_for(50ms);
         int rc = execvp(newargv[0], newargv);
         LOG(VB_GENERAL, LOG_ERR,
             QString("execvp failed prog %1 rc=%2 errno=%3").arg(argv[0]).arg(rc).arg(errno));
