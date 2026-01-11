@@ -62,8 +62,6 @@ jobs:
   build-mythtv-linux:
     name: Building MythTV on ${{ matrix.container.desc }}
 
-    runs-on: ubuntu-latest
-
     env:
       TZ: Etc/UTC
       CCACHE_DIR: $HOME/.ccache
@@ -77,6 +75,7 @@ jobs:
           # Ubuntu group
           - desc: 'Ubuntu interim'
             image: 'ubuntu:rolling'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -92,6 +91,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Ubuntu LTS'
             image: 'ubuntu:latest'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -107,6 +107,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Ubuntu devel'
             image: 'ubuntu:devel'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -124,6 +125,7 @@ jobs:
           # Debian group
           - desc: 'Debian stable'
             image: 'debian:stable'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -141,6 +143,7 @@ jobs:
           # Fedora group
           - desc: 'Fedora'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -158,6 +161,7 @@ jobs:
           # Qt6, clang, and cmake alternative(s) group
           - desc: 'Fedora - Qt6'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost --extra-vars "{''qt6'':true}" mythtv.yml'
@@ -173,6 +177,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Fedora - clang'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -188,6 +193,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Fedora - CMake'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -202,7 +208,27 @@ jobs:
             plugins_build_cmd: ''
             plugins_install_cmd: ''
 
+          # aarch64 group
+          - desc: 'Fedora - CMake Qt6 aarch64'
+            runner: ubuntu-24.04-arm
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost --extra-vars "{''qt6'':true}" mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant -y'
+            core_working_subdirectory: ''
+            core_configure_cmd: 'cmake --preset qt6 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'cmake --build build-qt6'
+            core_install_cmd: ''
+            core_test_cmd: 'cmake --build build-qt6 -t MythTV-tests'
+            plugins_working_subdirectory: ''
+            plugins_configure_cmd: ''
+            plugins_build_cmd: ''
+            plugins_install_cmd: ''
+
       fail-fast: false
+
+    runs-on: ${{ matrix.container.runner }}
 
     container:
       image: ${{ matrix.container.image }}
