@@ -596,6 +596,7 @@ class MTV_PUBLIC ProgramInfo
 
     void CalculateRecordedProgress();
     uint GetRecordedPercent() const       { return m_recordedPercent; }
+    void SetRecordedPercent(uint progress) { m_recordedPercent = progress; }
     void CalculateWatchedProgress(uint64_t pos);
     uint GetWatchedPercent() const        { return m_watchedPercent; }
     void SetWatchedPercent(uint progress) { m_watchedPercent = progress; }

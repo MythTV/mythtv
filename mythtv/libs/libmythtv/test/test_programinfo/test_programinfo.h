@@ -112,7 +112,7 @@ class TestProgramInfo : public QObject
         "train Jesse ...|3|4|23||Drama|1514|514|WNUVDT|"
         "WNUBDT (WNUV-DT)|/recordings/1514_20161025235800.ts|6056109800|"
         "1477440000|1477443600|20141007|localhost|0|0|0|7|0|19890314|0|15|8|1477439880|"
-        "1477443720|131600|Default||EP01922936|EP019229360055|ttvdb4.py_279121|"
+        "1477443720|135184|Default||EP01922936|EP019229360055|ttvdb4.py_279121|"
         "1477444354|0.95|2016-10-26|Default|0|0|Default|8|1090|1|2016|50|133|4|715|"
         "Prime A-1|4294967295";
     QString m_supergirl23List = "Supergirl|Welcome to Earth|An attack is made "
@@ -154,6 +154,7 @@ class TestProgramInfo : public QObject
         {"lenmins", "64 minute(s)"},
         {"lentime", "1 hour(s) 4 minute(s)"},
         {"longchannel", "514 WNUBDT (WNUV-DT)"},
+        {"longrepeat","(Repeat Wed 26 October 2016) "},
         {"mediatype", "recording"},
         {"mediatypestring", "Recording"},
         {"numstars", "10"},
@@ -161,13 +162,15 @@ class TestProgramInfo : public QObject
         {"partnumber", "50"},
         {"parttotal", "133"},
         {"playgroup", "Default"},
-        {"programflags", "131600"},
-        {"programflags_names", "BOOKMARK|WATCHED|IGNORELASTPLAYPOS"},
+        {"programflags", "135184"},
+        {"programflags_names", "BOOKMARK|REPEAT|IGNORELASTPLAYPOS"},
         {"programid", "EP019229360055"},
         {"recenddate", "Wed 26"},
         {"recendtime", "1:02 AM"},
         {"recordedid", "715"},
+        {"recordedpercent", "75"},
         {"recordinggroup", "Default"},
+        {"repeat","(Repeat) "},
         {"recpriority", "7"},
         {"recpriority2", "0"},
         {"recstartdate", "Tue 25"},
@@ -206,6 +209,7 @@ class TestProgramInfo : public QObject
         {"totalepisodes", "23"},
         {"videoproperties", "1090"},
         {"videoproperties_names", "HDTV|1080|DAMAGED"},
+        {"watchedpercent", "25"},
         {"year", "2016"},
         {"yearstars", "(2016, 10 star(s))"},
     };
@@ -241,6 +245,7 @@ class TestProgramInfo : public QObject
         {"lenmins", "64 minute(s)"},
         {"lentime", "1 hour(s) 4 minute(s)"},
         {"longchannel", "514 WNUBDT (WNUV-DT)"},
+        {"longrepeat",""},
         {"mediatype", "recording"},
         {"mediatypestring", "Recording"},
         {"numstars", "9"},
@@ -255,6 +260,7 @@ class TestProgramInfo : public QObject
         {"recenddate", "Tue 25"},
         {"recendtime", "1:02 AM"},
         {"recordedid", "66247"},
+        {"recordedpercent", "63"},
         {"recordinggroup", "Default"},
         {"recpriority", "-1"},
         {"recpriority2", "0"},
@@ -265,6 +271,7 @@ class TestProgramInfo : public QObject
         {"rectype", "Not Recording"},
         {"rectypechar", " "},
         {"rectypestatus", "Not Recording"},
+        {"repeat",""},
         {"s00e00", "s02e03"},
         {"season", "2"},
         {"seasonepisode", "temporada 2, episodio 3"},
@@ -294,6 +301,7 @@ class TestProgramInfo : public QObject
         {"totalepisodes", "23"},
         {"videoproperties", "33"},
         {"videoproperties_names", "WIDESCREEN|720"},
+        {"watchedpercent", ""}, // Should be empty because WATCHED flag set.
         {"year", "2016"},
         {"yearstars", "(2016, 9 star(s))"},
     };
@@ -333,12 +341,14 @@ class TestProgramInfo : public QObject
              RecStatus::Unknown, 19890314, // recordid
              kDupsInAll, kDupCheckSubThenDesc,
              20141007, // findId
-             FL_IGNORELASTPLAYPOS | FL_WATCHED | FL_BOOKMARK,
+             FL_IGNORELASTPLAYPOS | FL_BOOKMARK | FL_REPEAT,
              AUD_DOLBY,
              VID_DAMAGED | VID_1080 | VID_HDTV,
              SUB_HARDHEAR,
              "Prime A-1",
              QDateTime());
+        m_flash34.SetRecordedPercent(75);
+        m_flash34.SetWatchedPercent(25); // Not WATCHED. Should appear in map.
         m_supergirl23 = ProgramInfo
             (65536+711,
              "Supergirl", "",
@@ -366,6 +376,8 @@ class TestProgramInfo : public QObject
              SUB_SIGNED,
              "Prime A-0",
              QDateTime());
+        m_supergirl23.SetRecordedPercent(63);
+        m_supergirl23.SetWatchedPercent(25); // WATCHED. Should be empty in map.
     }
 
     void cleanupTestCase()
