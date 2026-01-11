@@ -208,8 +208,8 @@ jobs:
       image: ${{ matrix.container.image }}
 
     steps:
-      - name: Checkout ccache
-        uses: actions/cache@v4
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
           path: ~/.ccache
           key: ${{ matrix.container.desc }}-build-core-ccache-${{ github.sha }}
@@ -297,6 +297,13 @@ jobs:
       - name: ccache statistics [post]
         run: ccache -s
 
+      - name: Save ccache
+        uses: actions/cache/save@v5
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.container.desc }}-build-core-ccache-${{ github.sha }}
+
   build-mythtv-macos:
     name: Building MythTV on ${{ matrix.os.desc }} using ${{ matrix.compiler.desc }}
 
@@ -341,8 +348,8 @@ jobs:
       TEST_CMD: 'cmake --build build-${{ matrix.os.qt_version }} -t MythTV-tests'
 
     steps:
-      - name: Checkout ccache
-        uses: actions/cache@v4
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
           path: ~/.ccache
           key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
@@ -441,3 +448,10 @@ jobs:
 
       - name: ccache statistics [post]
         run: ccache -s
+
+      - name: Save ccache
+        uses: actions/cache/save@v5
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
