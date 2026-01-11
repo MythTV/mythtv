@@ -109,14 +109,14 @@ class TestProgramInfo : public QObject
         "946690200|0|Default|||tt0051554|11868|4294967295|0||Default|0|0|"
         "Default|0|0|0|1958|0|0|1|0||4294967295";
     QString m_flash34List = "The Flash (2014)|The New Rogues|Barry continues to "
-        "train Jesse ...|3|4|23|syndicatedepisode|Drama|1514|514|WNUVDT|"
+        "train Jesse ...|3|4|23||Drama|1514|514|WNUVDT|"
         "WNUBDT (WNUV-DT)|/recordings/1514_20161025235800.ts|6056109800|"
         "1477440000|1477443600|20141007|localhost|0|0|0|7|0|19890314|0|15|8|1477439880|"
         "1477443720|131600|Default||EP01922936|EP019229360055|ttvdb4.py_279121|"
         "1477444354|0.95|2016-10-26|Default|0|0|Default|8|1090|1|2016|50|133|4|715|"
         "Prime A-1|4294967295";
     QString m_supergirl23List = "Supergirl|Welcome to Earth|An attack is made "
-        "on the President as hot-button...|2|3|23|syndicatedepisode|Drama|"
+        "on the President as hot-button...|2|3|23|temporada 2, episodio 3|Drama|"
         "1514|514|WNUVDT|WNUBDT (WNUV-DT)|/recordings/1514_20161024235800.ts|"
         "6056109670|1477353600|1477357200|20151026|localhost|0|0|0|-1|0|19660922|0|15|8|"
         "1477353480|1477357320|1538|Default||EP02185451|EP021854510025|"
@@ -137,6 +137,7 @@ class TestProgramInfo : public QObject
         {"commfree", "0"},
         {"description", "Barry continues to train Jesse ..."},
         {"description0", "Barry continues to train Jesse ..."},
+        {"description1", "Barry continues to train Jesse ..."},
         {"enddate", "Wed 26 October"},
         {"endtime", "1:00 AM"},
         {"endts", "1477443600"},
@@ -178,6 +179,7 @@ class TestProgramInfo : public QObject
         {"rectypestatus", "Not Recording"},
         {"s00e00", "s03e04"},
         {"season", "3"},
+        {"seasonepisode", "s3e4"},
         {"seriesid", "EP01922936"},
         {"shortenddate", "Wed 26"},
         {"shortoriginalairdate", "Wed 26"},
@@ -197,7 +199,7 @@ class TestProgramInfo : public QObject
         {"subtitle", "The New Rogues"},
         {"subtitleType", "1"},
         {"subtitleType_names", "HARDHEAR"},
-        {"syndicatedepisode", "syndicatedepisode"},
+        {"syndicatedepisode", ""},
         {"timedate", "Tue 25 October, 11:58 PM - 1:02 AM"},
         {"title", "The Flash (2014)"},
         {"titlesubtitle", "The Flash (2014) - \"The New Rogues\""},
@@ -222,6 +224,7 @@ class TestProgramInfo : public QObject
         {"commfree", "0"},
         {"description", "An attack is made on the President as hot-button..."},
         {"description0", "An attack is made on the President as hot-button..."},
+        {"description1", "An attack is made on the President as hot-button..."},
         {"enddate", "Tue 25 October"},
         {"endtime", "1:00 AM"},
         {"endts", "1477357200"},
@@ -264,6 +267,7 @@ class TestProgramInfo : public QObject
         {"rectypestatus", "Not Recording"},
         {"s00e00", "s02e03"},
         {"season", "2"},
+        {"seasonepisode", "temporada 2, episodio 3"},
         {"seriesid", "EP02185451"},
         {"shortenddate", "Tue 25"},
         {"shortoriginalairdate", "Tue 25"},
@@ -283,7 +287,7 @@ class TestProgramInfo : public QObject
         {"subtitle", "Welcome to Earth"},
         {"subtitleType", "8"},
         {"subtitleType_names", "SIGNED"},
-        {"syndicatedepisode", "syndicatedepisode"},
+        {"syndicatedepisode", "temporada 2, episodio 3"},
         {"timedate", "Mon 24 October, 11:58 PM - 1:02 AM"},
         {"title", "Supergirl"},
         {"titlesubtitle", "Supergirl - \"Welcome to Earth\""},
@@ -313,7 +317,7 @@ class TestProgramInfo : public QObject
              "The Flash (2014)", "",
              "The New Rogues", "",
              "Barry continues to train Jesse ...",
-             3, 4, 23, "syndicatedepisode", "Drama",
+             3, 4, 23, "", "Drama",
              1514, "514", "WNUVDT", "WNUBDT (WNUV-DT)", "",
              QString("Default"), QString("Default"),
              "/recordings/1514_20161025235800.ts",
@@ -340,7 +344,7 @@ class TestProgramInfo : public QObject
              "Supergirl", "",
              "Welcome to Earth", "",
              "An attack is made on the President as hot-button...",
-             2, 3, 23, "syndicatedepisode", "Drama",
+             2, 3, 23, "temporada 2, episodio 3", "Drama",
              1514, "514", "WNUVDT", "WNUBDT (WNUV-DT)", "",
              "Default", "Default",
              "/recordings/1514_20161024235800.ts",
@@ -498,6 +502,14 @@ class TestProgramInfo : public QObject
 
         m_flash34.ToStringList(program_list);
         printList(program_list);
+#if DEBUG
+        std::cerr << qPrintable(QString("Actual: '%1'")
+                                .arg(program_list.join('|')))
+                  << std::endl;
+        std::cerr << qPrintable(QString("Expected: '%1'")
+                                .arg(m_flash34List))
+                  << std::endl;
+#endif
         QVERIFY (program_list.join('|') == m_flash34List);
         program_list.clear();
 
@@ -604,20 +616,25 @@ class TestProgramInfo : public QObject
             }
             else
             {
+#if DEBUG
+                std::cerr << qPrintable(QString("Unknown data: key '%1', value '%2'")
+                                        .arg(key, actualValue))
+                          << std::endl;
+#else
                 QVERIFY2(actualValue == QString(""),
-                         qPrintable(QString("Key '%1': actual '%2' is not empty")
+                         qPrintable(QString("Unknown key '%1' with non-empty value '%2'")
                                     .arg(key, actualValue)));
+#endif
             }
         }
         QStringList missingKeys = expected.keys();
         QCOMPARE(QString(""), missingKeys.join('|'));
     }
 
-    void printMap (const QString& title, const QString& subtitle, const InfoMap& progMap)
+    void printMap ([[maybe_unused]] const QString& title,
+                   [[maybe_unused]] const QString& subtitle,
+                   [[maybe_unused]] const InfoMap& progMap)
     {
-        Q_UNUSED(title);
-        Q_UNUSED(subtitle);
-        Q_UNUSED(progMap);
 #if DEBUG
         std::cerr << qPrintable(QString("progMap for title '%1' subtitle '%2'")
                                 .arg(title).arg(subtitle))
