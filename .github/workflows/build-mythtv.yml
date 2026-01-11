@@ -257,7 +257,7 @@ jobs:
           fetch-depth: 0
 
       - name: ccache statistics [pre]
-        run: ccache -s
+        run: ccache -sz
 
       - name: Configure
         working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
@@ -425,7 +425,7 @@ jobs:
           path: mythtv
 
       - name: ccache statistics [pre]
-        run: ccache -s
+        run: ccache -sz
 
       - name: Configure core
         working-directory: mythtv
