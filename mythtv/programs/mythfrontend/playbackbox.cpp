@@ -137,12 +137,9 @@ mistakes.
 static bool retrieve_SeasonEpisode(int& season, int& episode,
                                    const ProgramInfo* prog)
 {
-    QString synd;
-    int     eIndex;
-
-    if ((synd = prog->GetSyndicatedEpisode()).isEmpty() ||
-        !synd.startsWith('S') ||
-        (eIndex = synd.indexOf('E')) == -1)
+    QString synd = prog->GetSyndicatedEpisode();
+    int eIndex = synd.indexOf('E');
+    if (synd.isEmpty() || !synd.startsWith('S') || (eIndex == -1))
     {
         season  = prog->GetSeason();
         episode = prog->GetEpisode();
@@ -150,7 +147,8 @@ static bool retrieve_SeasonEpisode(int& season, int& episode,
     }
 
     // S##E## as set by mythfilldatabase
-    bool okSeason, okEpisode;
+    bool okSeason  { false };
+    bool okEpisode { false };
     season = synd.mid(1, eIndex - 1).toInt(&okSeason);
     episode = synd.mid(eIndex + 1).toInt(&okEpisode);
 
@@ -159,8 +157,10 @@ static bool retrieve_SeasonEpisode(int& season, int& episode,
 
 static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
 {
-    int a_season, a_episode;
-    int b_season, b_episode;
+    int a_season  {0};
+    int a_episode {0};
+    int b_season  {0};
+    int b_episode {0};
 
     retrieve_SeasonEpisode(a_season, a_episode, a);
     retrieve_SeasonEpisode(b_season, b_episode, b);
@@ -176,8 +176,10 @@ static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
 
 static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
 {
-    int a_season, a_episode;
-    int b_season, b_episode;
+    int a_season  {0};
+    int a_episode {0};
+    int b_season  {0};
+    int b_episode {0};
 
     retrieve_SeasonEpisode(a_season, a_episode, a);
     retrieve_SeasonEpisode(b_season, b_episode, b);
