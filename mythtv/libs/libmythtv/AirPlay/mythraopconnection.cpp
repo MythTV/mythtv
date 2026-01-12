@@ -788,49 +788,47 @@ void MythRAOPConnection::ProcessAudio()
             break;
         }
 
+        if (!m_audioStarted)
         {
-            if (!m_audioStarted)
-            {
-                m_audio->Reset(); // clear audio card
-            }
-            AudioPacket frames = packet_it.value();
-
-            if (m_lastSequence != frames.seq)
-            {
-                LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                    QString("Audio discontinuity seen. Played %1 (%3) expected %2")
-                    .arg(frames.seq).arg(m_lastSequence).arg(timestamp.count()));
-                m_lastSequence = frames.seq;
-            }
-            m_lastSequence++;
-
-            for (const auto & data : std::as_const(*frames.data))
-            {
-                int offset = 0;
-                int framecnt = 0;
-
-                if (m_adjustedLatency > 0ms)
-                {
-                        // calculate how many frames we have to drop to catch up
-                    offset = (m_adjustedLatency.count() * m_frameRate / 1000) *
-                        m_audio->GetBytesPerFrame();
-                    offset = std::min(offset, data.length);
-                    framecnt = offset / m_audio->GetBytesPerFrame();
-                    m_adjustedLatency -= framesToMs(framecnt+1);
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                        QString("ProcessAudio: Dropping %1 frames to catch up "
-                                "(%2ms to go)")
-                        .arg(framecnt).arg(m_adjustedLatency.count()));
-                    timestamp += framesToMs(framecnt);
-                }
-                m_audio->AddData((char *)data.data + offset,
-                                 data.length - offset,
-                                 std::chrono::milliseconds(timestamp), framecnt);
-                timestamp += m_audio->LengthLastData();
-            }
-            i++;
-            m_audioStarted = true;
+            m_audio->Reset(); // clear audio card
         }
+        AudioPacket frames = packet_it.value();
+
+        if (m_lastSequence != frames.seq)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                QString("Audio discontinuity seen. Played %1 (%3) expected %2")
+                .arg(frames.seq).arg(m_lastSequence).arg(timestamp.count()));
+            m_lastSequence = frames.seq;
+        }
+        m_lastSequence++;
+
+        for (const auto & data : std::as_const(*frames.data))
+        {
+            int offset = 0;
+            int framecnt = 0;
+
+            if (m_adjustedLatency > 0ms)
+            {
+                    // calculate how many frames we have to drop to catch up
+                offset = (m_adjustedLatency.count() * m_frameRate / 1000) *
+                    m_audio->GetBytesPerFrame();
+                offset = std::min(offset, data.length);
+                framecnt = offset / m_audio->GetBytesPerFrame();
+                m_adjustedLatency -= framesToMs(framecnt+1);
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                    QString("ProcessAudio: Dropping %1 frames to catch up "
+                            "(%2ms to go)")
+                    .arg(framecnt).arg(m_adjustedLatency.count()));
+                timestamp += framesToMs(framecnt);
+            }
+            m_audio->AddData((char *)data.data + offset,
+                             data.length - offset,
+                             std::chrono::milliseconds(timestamp), framecnt);
+            timestamp += m_audio->LengthLastData();
+        }
+        i++;
+        m_audioStarted = true;
     }
 
     ExpireAudio(timestamp);
@@ -850,17 +848,15 @@ int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
         packet_it.next();
         if (packet_it.key() >= timestamp)
             continue;
+        AudioPacket frames = packet_it.value();
+        if (frames.data)
         {
-            AudioPacket frames = packet_it.value();
-            if (frames.data)
-            {
-                for (const auto & data : std::as_const(*frames.data))
-                    av_free(data.data);
-                delete frames.data;
-            }
-            m_audioQueue.remove(packet_it.key());
-            res++;
+            for (const auto & data : std::as_const(*frames.data))
+                av_free(data.data);
+            delete frames.data;
         }
+        m_audioQueue.remove(packet_it.key());
+        res++;
     }
     return res;
 }
