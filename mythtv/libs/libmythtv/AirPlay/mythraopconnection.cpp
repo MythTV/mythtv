@@ -782,7 +782,12 @@ void MythRAOPConnection::ProcessAudio()
         packet_it.next();
 
         timestamp = packet_it.key();
-        if (timestamp < rtp)
+        if (timestamp >= rtp)
+        {
+            // QMap is sorted, so no need to continue if not found
+            break;
+        }
+
         {
             if (!m_audioStarted)
             {
@@ -826,11 +831,6 @@ void MythRAOPConnection::ProcessAudio()
             i++;
             m_audioStarted = true;
         }
-        else
-        {
-            // QMap is sorted, so no need to continue if not found
-            break;
-        }
     }
 
     ExpireAudio(timestamp);
@@ -848,7 +848,8 @@ int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
     while (packet_it.hasNext())
     {
         packet_it.next();
-        if (packet_it.key() < timestamp)
+        if (packet_it.key() >= timestamp)
+            continue;
         {
             AudioPacket frames = packet_it.value();
             if (frames.data)
