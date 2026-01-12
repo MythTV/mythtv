@@ -66,7 +66,7 @@ jobs:
       TZ: Etc/UTC
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
-      CCACHE_MAXSIZE: 250M
+      CCACHE_MAXSIZE: 300M
       DEBIAN_FRONTEND: noninteractive
 
     strategy:
@@ -368,7 +368,7 @@ jobs:
       TZ: Etc/UTC
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
-      CCACHE_MAXSIZE: 250M
+      CCACHE_MAXSIZE: 300M
       CONFIGURE_CMD: 'cmake --preset ${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_LTO=OFF'
       MAKE_CMD: 'cmake --build build-${{ matrix.os.qt_version }}'
       TEST_CMD: 'cmake --build build-${{ matrix.os.qt_version }} -t MythTV-tests'
