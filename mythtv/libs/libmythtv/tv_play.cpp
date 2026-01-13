@@ -9600,7 +9600,6 @@ void TV::RetrieveCast(const ProgramInfo& ProgInfo)
 
     if (query.exec() && query.size() > 0)
     {
-        QStringList plist;
         QString role;
         QString pname;
         QString character;

@@ -58,9 +58,9 @@ void MythUDPListener::DoEnable(bool Enable)
 void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Sender*/,
                               quint16 /*SenderPort*/)
 {
-    QString errormsg;
     QDomDocument doc;
 #if QT_VERSION < QT_VERSION_CHECK(6,5,0)
+    QString errormsg;
     int line = 0;
     int column = 0;
     if (!doc.setContent(Buffer, false, &errormsg, &line, &column))
