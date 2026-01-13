@@ -4701,9 +4701,17 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 SetEof(true);
                 av_packet_free(&pkt);
 
-                LOG(VB_GENERAL, LOG_ERR, QString("decoding error %1 (%2)")
-                    .arg(QString::fromStdString(av_make_error_stdstring_unknown(retval)),
-                        QString::number(retval)));
+                if (retval == AVERROR_EOF)
+                {
+                    // Reaching the end of file isn't an error
+                    LOG(VB_GENERAL, LOG_INFO, QString("decoding reached end of file"));
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("decoding error %1 (%2)")
+                        .arg(QString::fromStdString(av_make_error_stdstring_unknown(retval)),
+                            QString::number(retval)));
+                }
                 return false;
             }
 
