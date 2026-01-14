@@ -603,24 +603,21 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, const QString &app_name,
     s += ' ' + QString(popMenu ? "TRUE" : "FALSE");
 
 
-    QListIterator<LCDMenuItem> it(menuItems);
-
-    while (it.hasNext())
+    for (const auto& curItem : std::as_const(menuItems))
     {
-        const LCDMenuItem *curItem = &(it.next());
-        s += ' ' + quotedString(curItem->ItemName());
+        s += ' ' + quotedString(curItem.ItemName());
 
-        if (curItem->isChecked() == CHECKED)
+        if (curItem.isChecked() == CHECKED)
             s += " CHECKED";
-        else if (curItem->isChecked() == UNCHECKED)
+        else if (curItem.isChecked() == UNCHECKED)
             s += " UNCHECKED";
-        else if (curItem->isChecked() == NOTCHECKABLE)
+        else if (curItem.isChecked() == NOTCHECKABLE)
             s += " NOTCHECKABLE";
 
-        s += ' ' + QString(curItem->isSelected() ? "TRUE" : "FALSE");
-        s += ' ' + QString(curItem->Scroll() ? "TRUE" : "FALSE");
+        s += ' ' + QString(curItem.isSelected() ? "TRUE" : "FALSE");
+        s += ' ' + QString(curItem.Scroll() ? "TRUE" : "FALSE");
         QString sIndent;
-        sIndent.setNum(curItem->getIndent());
+        sIndent.setNum(curItem.getIndent());
         s += ' ' + sIndent;
     }
 
@@ -639,26 +636,22 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
 
     QString s = "SWITCH_TO_GENERIC";
 
-    QListIterator<LCDTextItem> it(textItems);
-
-    while (it.hasNext())
+    for (const auto& curItem : std::as_const(textItems))
     {
-        const LCDTextItem *curItem = &(it.next());
-
         QString sRow;
-        sRow.setNum(curItem->getRow());
+        sRow.setNum(curItem.getRow());
         s += ' ' + sRow;
 
-        if (curItem->getAlignment() == ALIGN_LEFT)
+        if (curItem.getAlignment() == ALIGN_LEFT)
             s += " ALIGN_LEFT";
-        else if (curItem->getAlignment() == ALIGN_RIGHT)
+        else if (curItem.getAlignment() == ALIGN_RIGHT)
             s += " ALIGN_RIGHT";
-        else if (curItem->getAlignment() == ALIGN_CENTERED)
+        else if (curItem.getAlignment() == ALIGN_CENTERED)
             s += " ALIGN_CENTERED";
 
-        s += ' ' + quotedString(curItem->getText());
-        s += ' ' + quotedString(curItem->getScreen());
-        s += ' ' + QString(curItem->getScroll() ? "TRUE" : "FALSE");
+        s += ' ' + quotedString(curItem.getText());
+        s += ' ' + quotedString(curItem.getScreen());
+        s += ' ' + QString(curItem.getScroll() ? "TRUE" : "FALSE");
     }
 
     emit sendToServer(s);

@@ -1032,16 +1032,20 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
     m_infoLock->lock();
     for (const auto& url : std::as_const(urls))
     {
-        QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
-        while (lit.hasNext())
+        for (auto lit = m_downloadQueue.begin();
+             lit != m_downloadQueue.end();
+             /* no inc */)
         {
-            lit.next();
-            MythDownloadInfo *dlInfo = lit.value();
+            MythDownloadInfo *dlInfo = *lit;
             if (dlInfo->m_url == url)
             {
                 if (!m_cancellationQueue.contains(dlInfo))
                     m_cancellationQueue.append(dlInfo);
-                lit.remove();
+                lit = m_downloadQueue.erase(lit);
+            }
+            else
+            {
+                ++lit;
             }
         }
 
