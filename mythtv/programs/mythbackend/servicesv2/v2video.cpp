@@ -346,16 +346,8 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         }
         // Insert directory entries at the front of the list, ordered ascending
         // or descending, depending on the value of bDescending
-        QMapIterator<QString, QString> it(map);
-        if (bDescending)
-            it.toBack();
-
-        while (bDescending? it.hasPrevious() : it.hasNext())
+        auto addMetadata = [&](const auto it)
         {
-            if (bDescending)
-                it.previous();
-            else
-                it.next();
             if (totalCount >= nStartIndex && (nCount == 0 || selectedCount < nCount)) {
                 V2VideoMetadataInfo *pVideoMetadataInfo =
                     pVideoMetadataInfos->AddNewVideoMetadataInfo();
@@ -365,6 +357,23 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
                 selectedCount++;
             }
             totalCount++;
+        };
+        if (bDescending)
+        {
+            if (!map.empty())
+            {
+                for (auto it = map.cend(); it != map.cbegin(); )
+                {
+                    --it;
+                    addMetadata(it);
+                }
+            }
+        }
+        else
+        {
+            for (auto it = map.cbegin(); it != map.cend(); it++) {
+                addMetadata(it);
+            }
         }
     }
 

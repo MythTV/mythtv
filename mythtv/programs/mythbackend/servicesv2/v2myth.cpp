@@ -1356,13 +1356,8 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
         api_sd_notify("STATUS=Scheduling disabled via Services API/Web App.");
     }
     // Stop EIT scanning
-    QMapIterator<uint,TVRec*> iter(TVRec::s_inputs);
-    while (iter.hasNext())
-    {
-        iter.next();
-        auto *tvrec = iter.value();
+    for (auto * tvrec : std::as_const(TVRec::s_inputs))
         tvrec->EnableActiveScan(Enable);
-    }
     return true;
 }
 
