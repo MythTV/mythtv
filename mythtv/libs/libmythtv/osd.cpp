@@ -100,10 +100,8 @@ void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)
             return; // we've removed the top window, don't process any further
     }
 
-    QMutableMapIterator<QString, MythScreenType*> it(m_children);
-    while (it.hasNext())
+    for (auto it = m_children.cbegin(); it != m_children.cend(); ++it)
     {
-        it.next();
         if (Except && Except->objectName() == OSD_DLG_NAVIGATE
             && it.value()->objectName() == OSD_WIN_STATUS)
             continue;
@@ -393,11 +391,9 @@ void OSD::SetRegions(const QString &Window, frm_dir_map_t &Map, long long Total)
     long long start = -1;
     long long end   = -1;
     bool first = true;
-    QMapIterator<uint64_t, MarkTypes> it(Map);
-    while (it.hasNext())
+    for (auto it = Map.begin(); it != Map.end(); ++it)
     {
         bool error = false;
-        it.next();
         if (it.value() == MARK_CUT_START)
         {
             start = static_cast<long long>(it.key());
@@ -548,22 +544,32 @@ void OSD::Draw()
 void OSD::CheckExpiry()
 {
     QDateTime now = MythDate::current();
-    QMutableHashIterator<MythScreenType*, QDateTime> it(m_expireTimes);
-    while (it.hasNext())
+    bool quitDialog = false;
+    QStringList hideWindows {};
+
+    for (auto it = m_expireTimes.begin(); it != m_expireTimes.end(); ++it)
     {
-        it.next();
+        // Both DialogQuit and HideWindow alter m_expireTimes.  Do
+        // them after running the list is finished.
         if (it.value() < now)
         {
             if (it.key() == m_dialog)
-                DialogQuit();
-            else
-                HideWindow(m_children.key(it.key()));
+            {
+                quitDialog = true;
+                continue;
+            }
+            hideWindows << m_children.key(it.key());
+            continue;
         }
-        else if (it.key() == m_dialog)
+        if (it.key() == m_dialog)
         {
             DoPulse(now, it.value());
         }
     }
+    if (quitDialog)
+        DialogQuit();
+    for (const auto& window : std::as_const(hideWindows))
+        HideWindow(window);
 }
 
 void OSD::SetExpiry(const QString &Window, enum OSDTimeout Timeout,
