@@ -314,34 +314,23 @@ MetadataLookup::MetadataLookup(
 
 QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
 {
+    // QMultiMap::values() returns items in reverse order
+    // See https://doc.qt.io/qt-6/qmultimap.html#values-1
+    QList<PersonInfo> orig = m_people.values(type);
     QList<PersonInfo> ret;
-    // QMultiMap::values() returns items in reverse order which we need to
-    // correct by iterating back over the list
-    // See http://qt-project.org/doc/qt-4.8/qmultimap.html#details
-    // Specifically "The items that share the same key are available from "
-    //              "most recently to least recently inserted."
-    QListIterator<PersonInfo> it(m_people.values(type));
-    it.toBack();
-    while (it.hasPrevious())
-        ret.append(it.previous());
-
+    ret.reserve(orig.size());
+    std::copy(orig.rbegin(), orig.rend(), std::back_inserter(ret));
     return ret;
 }
 
 ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
 {
+    // QMultiMap::values() returns items in reverse order
+    // See https://doc.qt.io/qt-6/qmultimap.html#values-1
+    ArtworkList orig = m_artwork.values(type);
     ArtworkList ret;
-
-    // QMultiMap::values() returns items in reverse order which we need to
-    // correct by iterating back over the list
-    // See http://qt-project.org/doc/qt-4.8/qmultimap.html#details
-    // Specifically "The items that share the same key are available from "
-    //              "most recently to least recently inserted."
-    QListIterator<ArtworkInfo> it(m_artwork.values(type));
-    it.toBack();
-    while (it.hasPrevious())
-        ret.append(it.previous());
-
+    ret.reserve(orig.size());
+    std::copy(orig.rbegin(), orig.rend(), std::back_inserter(ret));
     return ret;
 }
 

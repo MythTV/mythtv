@@ -1720,15 +1720,16 @@ QStringList ImageHandler<DBFS>::HandleCreateThumbnails
 template <class DBFS>
 void ImageHandler<DBFS>::RemoveFiles(ImageList &images) const
 {
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    QMutableVectorIterator<ImagePtr> it(images);
-#else
-    QMutableListIterator<ImagePtr> it(images);
-#endif
-    it.toBack();
-    while (it.hasPrevious())
+    if (images.empty())
+        return;
+
+    // Qt6 changed the iterator, so 'auto*' fails to compile.
+    // NOLINTNEXTLINE(readability-qualified-auto)
+    for (auto it = images.end();
+         it != images.begin();
+         /* no inc */)
     {
-        ImagePtrK im = it.previous();
+        ImagePtrK im = *(--it);
 
         // Remove file or directory
         QString absFilename = DBFS::GetAbsFilePath(im);
@@ -1743,7 +1744,7 @@ void ImageHandler<DBFS>::RemoveFiles(ImageList &images) const
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Can't delete %1").arg(absFilename));
             // Remove from list
-            it.remove();
+            it = images.erase(it);
         }
     }
 }
