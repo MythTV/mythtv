@@ -22,7 +22,6 @@
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
-#include "libmythupnp/htmlserver.h"
 
 // MythBackend
 #include "httpconfig.h"
@@ -117,21 +116,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
-    auto *pHtmlServer =
-        new HtmlServerExtension(m_sSharePath + "html", "backend_");
-    pHttpServer->RegisterExtension( pHtmlServer );
     pHttpServer->RegisterExtension( new HttpConfig() );
     pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
-
-    // ------------------------------------------------------------------
-    // Register Service Types with Scripting Engine
-    //
-    // -=>NOTE: We need to know the actual type at compile time for this
-    //          to work, so it needs to be done here.  I'm still looking
-    //          into ways that we may encapsulate this in the service
-    //          classes. - dblain
-    // ------------------------------------------------------------------
-
 
     if (bDisableUPnp)
     {
