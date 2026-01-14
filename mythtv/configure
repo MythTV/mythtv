@@ -4267,9 +4267,7 @@ for i in $CHECK_QMAKE; do
             case $qt_version_str in
                 5*|6\.[0-4]\.*)  check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$QT_FIXED_VERSION_HEX ;;
                 6\.[567]\.*) check_cxxflags -DQT_DISABLE_DEPRECATED_UP_TO=$QT_FIXED_VERSION_HEX ;;
-                # Once "strict mode" is supported this case statement can be fixed.
-                #*) check_cxxflags -DQT_ENABLE_STRICT_MODE_UP_TO=$QT_FIXED_VERSION_HEX ;;
-                *) check_cxxflags -DQT_DISABLE_DEPRECATED_UP_TO=$QT_FIXED_VERSION_HEX ;;
+                *) check_cxxflags -DQT_ENABLE_STRICT_MODE_UP_TO=$QT_FIXED_VERSION_HEX ;;
             esac
             break;
         else

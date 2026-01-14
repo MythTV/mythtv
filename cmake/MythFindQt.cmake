@@ -115,33 +115,12 @@ set_if_target_exists(CONFIG_QTWEBENGINE ${QT_PKG_NAME}::WebEngineWidgets)
 #
 version_to_number(QT_FIXED_VERSION_HEX
                   ${QT${QT_VERSION_MAJOR}_DEPRECATION_FIXED} TRUE)
-#
-# Can't enable "strict mode" yet.  More work is needed to remove all
-# "Java-style iterators for Qt containers".
-#
-#if(${${QT_PKG_NAME}_VERSION} VERSION_GREATER_EQUAL 6.8)
-#  add_compile_definitions(QT_ENABLE_STRICT_MODE_UP_TO=${QT_FIXED_VERSION_HEX})
-#  message(STATUS "  Setting: -DQT_ENABLE_STRICT_MODE_UP_TO=${QT_FIXED_VERSION_HEX}")
-#else
-if(${${QT_PKG_NAME}_VERSION} VERSION_GREATER_EQUAL 6.5)
+if(${${QT_PKG_NAME}_VERSION} VERSION_GREATER_EQUAL 6.8)
+  add_compile_definitions(QT_ENABLE_STRICT_MODE_UP_TO=${QT_FIXED_VERSION_HEX})
+  message(STATUS "  Setting: -DQT_ENABLE_STRICT_MODE_UP_TO=${QT_FIXED_VERSION_HEX}")
+elseif(${${QT_PKG_NAME}_VERSION} VERSION_GREATER_EQUAL 6.5)
   add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=${QT_FIXED_VERSION_HEX})
   message(STATUS "  Setting: -DQT_DISABLE_DEPRECATED_UP_TO=${QT_FIXED_VERSION_HEX}")
-  # Once "strict mode" is supported this foreach loop can go away.
-  foreach(opt
-          QT_NO_FOREACH
-          QT_NO_CAST_TO_ASCII
-          QT_NO_CAST_FROM_BYTEARRAY
-          QT_NO_URL_CAST_FROM_STRING
-          QT_NO_NARROWING_CONVERSIONS_IN_CONNECT
-          QT_NO_QEXCHANGE
-          QT_NO_CONTEXTLESS_CONNECT
-          QT_NO_QASCONST
-          QT_USE_NODISCARD_FILE_OPEN
-          QT_NO_QSNPRINTF
-        )
-    add_compile_definitions(${opt})
-    message(STATUS "  Setting: -D${opt}")
-  endforeach()
 else()
   add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=${QT_FIXED_VERSION_HEX})
   message(STATUS "  Setting: -DQT_DISABLE_DEPRECATED_BEFORE=${QT_FIXED_VERSION_HEX}")
