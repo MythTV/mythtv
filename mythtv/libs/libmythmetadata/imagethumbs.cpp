@@ -100,15 +100,15 @@ void ThumbThread<DBFS>::AbortDevice(int devId, const QString &action)
 template <class DBFS>
 void ThumbThread<DBFS>::RemoveTasks(ThumbQueue &queue, int devId)
 {
-    QMutableMultiMapIterator<int, TaskPtr> it(queue);
-    while (it.hasNext())
+    for (auto it = queue.begin(); it != queue.end(); /* no inc */)
     {
-        it.next();
         TaskPtr task = it.value();
         // All thumbs in a task come from same device
         if (task && !task->m_images.isEmpty()
                 && task->m_images.at(0)->m_device == devId)
-            it.remove();
+            it = queue.erase(it);
+        else
+            ++it;
     }
 }
 
