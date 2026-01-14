@@ -79,10 +79,9 @@ void MythOpenGLPainter::ClearCache(void)
     LOG(VB_GENERAL, LOG_INFO, "Clearing OpenGL painter cache.");
 
     QMutexLocker locker(&m_imageAndTextureLock);
-    QMapIterator<MythImage *, MythGLTexture*> it(m_imageToTextureMap);
-    while (it.hasNext())
+    for (auto it = m_imageToTextureMap.cbegin();
+         it != m_imageToTextureMap.cend(); ++it)
     {
-        it.next();
         m_textureDeleteList.push_back(m_imageToTextureMap[it.key()]);
         m_imageExpireList.remove(it.key());
     }

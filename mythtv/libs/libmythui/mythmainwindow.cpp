@@ -1199,14 +1199,16 @@ void MythMainWindow::ClearKey(const QString& Context, const QString& Action)
     if (keycontext == nullptr)
         return;
 
-    QMutableMapIterator<int, QStringList> it(keycontext->m_actionMap);
-    while (it.hasNext())
+    for (auto it = keycontext->m_actionMap.begin();
+         it != keycontext->m_actionMap.end();
+         /* no inc */)
     {
-        it.next();
         QStringList list = it.value();
         list.removeAll(Action);
         if (list.isEmpty())
-            it.remove();
+            it = keycontext->m_actionMap.erase(it);
+        else
+            ++it;
     }
 }
 
@@ -1366,13 +1368,15 @@ void MythMainWindow::ClearJump(const QString& Destination)
        return;
     }
 
-    QMutableMapIterator<int, JumpData*> it(m_priv->m_jumpMap);
-    while (it.hasNext())
+    for (auto it = m_priv->m_jumpMap.begin();
+         it != m_priv->m_jumpMap.end();
+         /* no inc */)
     {
-        it.next();
         JumpData *jd = it.value();
         if (jd->m_destination == Destination)
-            it.remove();
+            it = m_priv->m_jumpMap.erase(it);
+        else
+            ++it;
     }
 }
 

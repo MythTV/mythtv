@@ -9,12 +9,8 @@ MythUIComposite::MythUIComposite(QObject *parent, const QString &name) :
 void MythUIComposite::SetTextFromMap(const InfoMap &infoMap)
 {
     QList<MythUIType *> *children = GetAllChildren();
-    QMutableListIterator<MythUIType *> i(*children);
-
-    while (i.hasNext())
+    for (auto *type : std::as_const(*children))
     {
-        MythUIType *type = i.next();
-
         auto *textType = dynamic_cast<MythUIText *> (type);
         if (textType)
             textType->SetTextFromMap(infoMap);
@@ -31,12 +27,8 @@ void MythUIComposite::ResetMap(const InfoMap &infoMap)
         return;
 
     QList<MythUIType *> *children = GetAllChildren();
-    QMutableListIterator<MythUIType *> i(*children);
-
-    while (i.hasNext())
+    for (auto *type : std::as_const(*children))
     {
-        MythUIType *type = i.next();
-
         auto *textType = dynamic_cast<MythUIText *> (type);
         if (textType)
             textType->ResetMap(infoMap);

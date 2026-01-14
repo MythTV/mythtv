@@ -73,14 +73,8 @@ MythUIType::~MythUIType()
 void MythUIType::Reset()
 {
     // Reset all children
-    QMutableListIterator<MythUIType *> it(m_childrenList);
-
-    while (it.hasNext())
-    {
-        it.next();
-        MythUIType *type = it.value();
+    for (auto *type : std::as_const(m_childrenList))
         type->Reset();
-    }
 }
 
 /**
@@ -152,19 +146,16 @@ MythUIType *MythUIType::GetChild(const QString &name) const
  */
 void MythUIType::DeleteChild(const QString &name)
 {
-    QMutableListIterator<MythUIType *> it(m_childrenList);
-
-    while (it.hasNext())
+    for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc*/)
     {
-        it.next();
-        MythUIType *type = it.value();
-
+        MythUIType *type = *it;
         if (type->objectName() == name)
         {
             delete type;
-            it.remove();
+            it = m_childrenList.erase(it);
             return;
         }
+        ++it;
     }
 }
 
@@ -179,20 +170,17 @@ void MythUIType::DeleteChild(MythUIType *child)
     if (!child)
         return;
 
-    QMutableListIterator<MythUIType *> it(m_childrenList);
-
-    while (it.hasNext())
+    for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc */)
     {
-        it.next();
-        MythUIType *type = it.value();
-
+        MythUIType *type = *it;
         if (type == child)
         {
             delete type;
-            it.remove();
+            it = m_childrenList.erase(it);
             child = nullptr;
             return;
         }
+        ++it;
     }
 }
 
@@ -1443,17 +1431,14 @@ void MythUIType::SetReverseDependence(MythUIType *dependee, bool reverse)
 
 void MythUIType::ConnectDependants(bool recurse)
 {
-    QMapIterator<QString, QString> it(m_dependsMap);
     QStringList dependees;
     QList<int> operators;
-    while(it.hasNext())
+    for (auto it = m_dependsMap.begin(); it != m_dependsMap.end(); ++it)
     {
-        it.next();
-
         // build list of operators and dependeees.
         dependees.clear();
         operators.clear();
-        QString name = it.value();
+        QString& name = it.value();
         QStringList tmp1 = name.split("&");
         for (const QString& t1 : std::as_const(tmp1))
         {

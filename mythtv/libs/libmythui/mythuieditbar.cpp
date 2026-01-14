@@ -131,28 +131,28 @@ void MythUIEditBar::Display(void)
     auto *rightshape = dynamic_cast<MythUIShape *>(cuttoright);
     auto *rightimage = dynamic_cast<MythUIImage *>(cuttoright);
 
-    QListIterator<QPair<float, float> > regions(m_regions);
-
-    while (regions.hasNext() && cutarea.isValid())
+    if (cutarea.isValid())
     {
-        QPair<float, float> region = regions.next();
-        int left  = lroundf(region.first * cutarea.width());
-        int right = lroundf(region.second * cutarea.width());
-
-        if (left >= right)
-            right = left + 1;
-
-        if (cut)
+        for (const auto region : std::as_const(m_regions))
         {
-            AddBar(barshape, barimage, QRect(left, cutarea.top(), right - left,
-                                             cutarea.height()));
+            int left  = lroundf(region.first * cutarea.width());
+            int right = lroundf(region.second * cutarea.width());
+
+            if (left >= right)
+                right = left + 1;
+
+            if (cut)
+            {
+                AddBar(barshape, barimage, QRect(left, cutarea.top(), right - left,
+                                                 cutarea.height()));
+            }
+
+            if (cuttoleft && (region.second < 1.0F))
+                AddMark(leftshape, leftimage, right, true);
+
+            if (cuttoright && (region.first > 0.0F))
+                AddMark(rightshape, rightimage, left, false);
         }
-
-        if (cuttoleft && (region.second < 1.0F))
-            AddMark(leftshape, leftimage, right, true);
-
-        if (cuttoright && (region.first > 0.0F))
-            AddMark(rightshape, rightimage, left, false);
     }
 
     CalcInverseRegions();
@@ -164,28 +164,28 @@ void MythUIEditBar::Display(void)
     rightshape = dynamic_cast<MythUIShape *>(keeptoright);
     rightimage = dynamic_cast<MythUIImage *>(keeptoright);
 
-    QListIterator<QPair<float, float> > regions2(m_invregions);
-
-    while (regions2.hasNext() && keeparea.isValid())
+    if (keeparea.isValid())
     {
-        QPair<float, float> region = regions2.next();
-        int left  = lroundf(region.first * keeparea.width());
-        int right = lroundf(region.second * keeparea.width());
-
-        if (left >= right)
-            right = left + 1;
-
-        if (keep)
+        for (const auto region : std::as_const(m_invregions))
         {
-            AddBar(barshape, barimage, QRect(left, keeparea.top(), right - left,
-                                             keeparea.height()));
+            int left  = lroundf(region.first * keeparea.width());
+            int right = lroundf(region.second * keeparea.width());
+
+            if (left >= right)
+                right = left + 1;
+
+            if (keep)
+            {
+                AddBar(barshape, barimage, QRect(left, keeparea.top(), right - left,
+                                                 keeparea.height()));
+            }
+
+            if (keeptoleft && (region.second < 1.0F))
+                AddMark(leftshape, leftimage, right, true);
+
+            if (keeptoright && (region.first > 0.0F))
+                AddMark(rightshape, rightimage, left, false);
         }
-
-        if (keeptoleft && (region.second < 1.0F))
-            AddMark(leftshape, leftimage, right, true);
-
-        if (keeptoright && (region.first > 0.0F))
-            AddMark(rightshape, rightimage, left, false);
     }
 
     if (position)
@@ -264,12 +264,8 @@ void MythUIEditBar::CalcInverseRegions(void)
 
     bool first = true;
     float start = 0.0F;
-    QListIterator<QPair<float, float> > regions(m_regions);
-
-    while (regions.hasNext())
+    for (const auto region : std::as_const(m_regions))
     {
-        QPair<float, float> region = regions.next();
-
         if (first)
         {
             if (region.first > 0.0F)
@@ -308,10 +304,8 @@ void MythUIEditBar::CopyFrom(MythUIType *base)
 
     m_editPosition = editbar->m_editPosition;
 
-    QListIterator<QPair<float, float> > it(m_regions);
-
-    while (it.hasNext())
-        editbar->m_regions.append(it.next());
+    for (const auto region : std::as_const(m_regions))
+        editbar->m_regions.append(region);
 
     MythUIType::CopyFrom(base);
 }

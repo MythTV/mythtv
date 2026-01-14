@@ -1620,13 +1620,8 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_lineHeight = text->m_lineHeight;
     m_textCursor = text->m_textCursor;
 
-    QMutableMapIterator<QString, MythFontProperties> it(text->m_fontStates);
-
-    while (it.hasNext())
-    {
-        it.next();
+    for (auto it = text->m_fontStates.cbegin(); it != text->m_fontStates.cend(); ++it)
         m_fontStates.insert(it.key(), it.value());
-    }
 
     *m_font = m_fontStates["default"];
 

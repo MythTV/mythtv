@@ -400,10 +400,9 @@ void MythPainterVulkan::ClearCache()
 {
     LOG(VB_GENERAL, LOG_INFO, "Clearing Vulkan painter cache.");
 
-    QMapIterator<MythImage *, MythTextureVulkan*> it(m_imageToTextureMap);
-    while (it.hasNext())
+    for (auto it = m_imageToTextureMap.cbegin();
+         it != m_imageToTextureMap.cend(); ++it)
     {
-        it.next();
         m_texturesToDelete.push_back(m_imageToTextureMap[it.key()]);
         m_imageExpire.remove(it.key());
     }
