@@ -109,7 +109,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
 #ifndef Q_OS_WINDOWS
-    QListIterator<QNetworkInterface> iCard = cards;
+    auto iCard = cards.cbegin();
 #endif
     MythTimer timer(MythTimer::kStartRunning);
     QTcpSocket socket(this);
@@ -132,9 +132,9 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                 while (addr.scopeId().isEmpty() && iCardsEnd<2)
                 {
                     // search for the next available IPV6 interface.
-                    if (iCard.hasNext())
+                    if (iCard != cards.cend())
                     {
-                        QNetworkInterface card = iCard.next();
+                        QNetworkInterface card = *iCard++;
                         LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
                         unsigned int flags = card.flags();
                         if ((flags & QNetworkInterface::IsLoopBack)
@@ -163,8 +163,7 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
                         // Get a new list in case a new interface
                         // has been added.
                         cards = QNetworkInterface::allInterfaces();
-                        iCard = cards;
-                        iCard.toFront();
+                        iCard = cards.cbegin();
                         testedAll=true;
                         iCardsEnd++;
                     }

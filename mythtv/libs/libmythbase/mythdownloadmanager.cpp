@@ -962,10 +962,8 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
         requestMessage.append("POST ");
         requestMessage.append(path.toLatin1());
         requestMessage.append(" HTTP/1.1\r\n");
-        QHashIterator<QByteArray, QByteArray> it(headers);
-        while (it.hasNext())
+        for (auto it = headers.cbegin(); it != headers.cend(); ++it)
         {
-            it.next();
             requestMessage.append(it.key());
             requestMessage.append(": ");
             requestMessage.append(it.value());

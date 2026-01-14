@@ -198,9 +198,8 @@ void MythXMLPListSerialiser::AddList(const QString& Name, const QVariantList &Va
     m_writer.writeTextElement("key", name);
     m_writer.writeStartElement(array ? "array" : "dict");
 
-    QListIterator<QVariant> it(Values);
-    while (it.hasNext())
-        AddValue(name, it.next(), !array);
+    for (const auto& variant : Values)
+        AddValue(name, variant, !array);
     m_writer.writeEndElement();
 }
 
