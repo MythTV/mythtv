@@ -438,7 +438,7 @@ bool MythContext::Impl::FindDatabaseChoose(bool loaded, bool manualSelect, bool 
 
     // 2. If the user isn't forcing up the chooser UI, look for a default
     //    backend in XmlConfiguration::k_default_filename, then test DB settings we've got so far:
-    if (!manualSelect)
+    if (!manualSelect && XmlConfiguration().FileExists())
     {
         // XmlConfiguration::k_default_filename may contain a backend host UUID and PIN.
         // If so, try to AutoDiscover UPnP server, and use its DB settings:
@@ -1190,6 +1190,9 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
             searchTime.start();
         }
     }
+
+    usleep(25000);
+    processEvents();
 
     SSDPCacheEntries *backends = SSDPCache::Instance()->Find(SSDP::kBackendURI);
 
