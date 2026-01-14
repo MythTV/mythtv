@@ -176,10 +176,9 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
         "<html>\n" << PROCESS_ACTION <<
         "  <body>\n" << HIDDEN_IFRAME;
 
-    QHashIterator<QString,QStringList> contexts(Frontend::gActionDescriptions);
-    while (contexts.hasNext())
+    for (auto contexts = Frontend::gActionDescriptions.cbegin();
+         contexts != Frontend::gActionDescriptions.cend(); ++contexts)
     {
-        contexts.next();
         QStringList actions = contexts.value();
         for (const QString & action : std::as_const(actions))
         {

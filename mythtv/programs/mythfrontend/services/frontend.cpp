@@ -262,10 +262,9 @@ DTC::FrontendActionList* Frontend::GetActionList(const QString &lContext)
 
     InitialiseActions();
 
-    QHashIterator<QString,QStringList> contexts(gActionDescriptions);
-    while (contexts.hasNext())
+    for (auto contexts = Frontend::gActionDescriptions.cbegin();
+         contexts != Frontend::gActionDescriptions.cend(); ++contexts)
     {
-        contexts.next();
         if (!lContext.isEmpty() && contexts.key() != lContext)
             continue;
 

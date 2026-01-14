@@ -217,10 +217,8 @@ void CustomPriority::loadExampleRules()
                     "capturecard.cardid = 1 AND "
                     "channel.channum IN (3, 5, 39, 66) ");
 
-    QMapIterator<QString, QString> it(examples);
-    while (it.hasNext())
+    for (auto it = examples.cbegin(); it != examples.cend(); ++it)
     {
-        it.next();
         new MythUIButtonListItem(m_clauseList, it.key(),
                                  QVariant::fromValue(it.value()));
     }

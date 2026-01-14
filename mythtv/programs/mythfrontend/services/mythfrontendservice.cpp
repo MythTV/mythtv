@@ -192,10 +192,9 @@ bool MythFrontendService::SendNotification(bool  Error,                const QSt
 FrontendActionList* MythFrontendService::GetActionList(const QString& Context)
 {
     QVariantMap result;
-    QHashIterator<QString,QStringList> contexts(s_actions->Descriptions());
-    while (contexts.hasNext())
+    for (auto contexts = s_actions->Descriptions().cbegin();
+         contexts != s_actions->Descriptions().cend(); ++contexts)
     {
-        contexts.next();
         if (!Context.isEmpty() && contexts.key() != Context)
             continue;
 
