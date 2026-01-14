@@ -499,15 +499,17 @@ void MythRAOPConnection::ExpireResendRequests(std::chrono::milliseconds timestam
     if (m_resends.isEmpty())
         return;
 
-    QMutableMapIterator<uint16_t,std::chrono::milliseconds> it(m_resends);
-    while (it.hasNext())
+    for (auto it = m_resends.begin(); it != m_resends.end(); /* no inc */)
     {
-        it.next();
         if (it.value() < timestamp && m_streamingStarted)
         {
             LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                 QString("Never received resend packet %1").arg(it.key()));
-            m_resends.remove(it.key());
+            it = m_resends.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -776,11 +778,10 @@ void MythRAOPConnection::ProcessAudio()
     int i              = 0;
     std::chrono::milliseconds timestamp = 0ms;
 
-    QMapIterator<std::chrono::milliseconds,AudioPacket> packet_it(m_audioQueue);
-    while (packet_it.hasNext() && i <= max_packets)
+    for (auto packet_it = m_audioQueue.begin();
+         packet_it != m_audioQueue.end() && i <= max_packets;
+         ++packet_it)
     {
-        packet_it.next();
-
         timestamp = packet_it.key();
         if (timestamp >= rtp)
         {
@@ -842,12 +843,15 @@ void MythRAOPConnection::ProcessAudio()
 int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
 {
     int res = 0;
-    QMutableMapIterator<std::chrono::milliseconds,AudioPacket> packet_it(m_audioQueue);
-    while (packet_it.hasNext())
+    for (auto packet_it = m_audioQueue.begin();
+         packet_it != m_audioQueue.end();
+         /* no inc */)
     {
-        packet_it.next();
         if (packet_it.key() >= timestamp)
+        {
+            ++packet_it;
             continue;
+        }
         AudioPacket frames = packet_it.value();
         if (frames.data)
         {
@@ -855,7 +859,7 @@ int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
                 av_free(data.data);
             delete frames.data;
         }
-        m_audioQueue.remove(packet_it.key());
+        packet_it = m_audioQueue.erase(packet_it);
         res++;
     }
     return res;

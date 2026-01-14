@@ -1833,11 +1833,9 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
         return;
 
     QRegion visible;
-    QListIterator<MythUIType *> i(m_childrenList);
-    while (i.hasNext())
+    for (const auto *img : std::as_const(m_childrenList))
     {
-        MythUIType *img = i.next();
-        auto *wrapper = dynamic_cast<SubWrapper *>(img);
+        const auto *wrapper = dynamic_cast<const SubWrapper *>(img);
         if (wrapper && img->IsVisible())
             visible = visible.united(wrapper->GetOrigArea());
     }
@@ -1852,10 +1850,8 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
     int top  = m_safeArea.top()  - bounding.top();
     SetArea(MythRect(bounding));
 
-    i.toFront();
-    while (i.hasNext())
+    for (auto *img : std::as_const(m_childrenList))
     {
-        MythUIType *img = i.next();
         auto *wrapper = dynamic_cast<SubWrapper *>(img);
         if (wrapper && img->IsVisible())
             img->SetArea(MythRect(wrapper->GetOrigArea().translated(left, top)));

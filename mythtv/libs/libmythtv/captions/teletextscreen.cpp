@@ -135,10 +135,8 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
 
 void TeletextScreen::OptimiseDisplayedArea()
 {
-    QHashIterator<int, QImage*> it(m_rowImages);
-    while (it.hasNext())
+    for (auto it = m_rowImages.begin(); it != m_rowImages.end(); ++it)
     {
-        it.next();
         MythImage *image = m_painter->GetFormatImage();
         if (!image || !it.value())
             continue;
@@ -155,12 +153,8 @@ void TeletextScreen::OptimiseDisplayedArea()
     }
 
     QRegion visible;
-    QListIterator<MythUIType *> i(m_childrenList);
-    while (i.hasNext())
-    {
-        MythUIType *img = i.next();
+    for (const auto *img : std::as_const(m_childrenList))
         visible = visible.united(img->GetArea());
-    }
 
     if (visible.isEmpty())
         return;
@@ -172,12 +166,8 @@ void TeletextScreen::OptimiseDisplayedArea()
     int top  = m_safeArea.top()  - bounding.top();
     SetArea(MythRect(bounding));
 
-    i.toFront();;
-    while (i.hasNext())
-    {
-        MythUIType *img = i.next();
+    for (MythUIType *img : std::as_const(m_childrenList))
         img->SetArea(MythRect(img->GetArea().translated(left, top)));
-    }
 }
 
 void TeletextScreen::Pulse()

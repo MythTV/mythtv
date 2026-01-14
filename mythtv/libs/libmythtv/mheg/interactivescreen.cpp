@@ -36,12 +36,8 @@ void InteractiveScreen::OptimiseDisplayedArea()
     UpdateArea();
 
     QRegion visible;
-    QListIterator<MythUIType *> i(m_childrenList);
-    while (i.hasNext())
-    {
-        MythUIType *img = i.next();
+    for (const auto *img : std::as_const(m_childrenList))
         visible = visible.united(img->GetArea());
-    }
 
     if (visible.isEmpty())
         return;
@@ -53,10 +49,6 @@ void InteractiveScreen::OptimiseDisplayedArea()
     int top  = m_safeArea.top()  - bounding.top();
     SetArea(MythRect(bounding));
 
-    i.toFront();;
-    while (i.hasNext())
-    {
-        MythUIType *img = i.next();
+    for (auto *img : std::as_const(m_childrenList))
         img->SetArea(MythRect(img->GetArea().translated(left, top)));
-    }
 }

@@ -312,14 +312,12 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
     int       lasttype  = MARK_UNSET;
     long long lastframe = -1;
     long long remove    = -1;
-    QMutableMapIterator<uint64_t, MarkTypes> it(m_deleteMap);
 
     if (type == MARK_CUT_END)
     {
         // remove curent end marker if it exists
-        while (it.hasNext())
+        for (auto it = m_deleteMap.cbegin(); it != m_deleteMap.cend(); ++it)
         {
-            it.next();
             if (it.key() > frame)
             {
                 if ((lasttype == MARK_CUT_END) && (lastframe > -1))
@@ -333,13 +331,12 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
             (lastframe > -1) && (lastframe < (int64_t)frame))
             remove = lastframe;
     }
-    else if (type == MARK_CUT_START)
+    else if ((type == MARK_CUT_START) && !m_deleteMap.empty())
     {
         // remove curent start marker if it exists
-        it.toBack();
-        while (it.hasPrevious())
+        for (auto it = m_deleteMap.cend(); it != m_deleteMap.cbegin(); )
         {
-            it.previous();
+            --it;
             if (it.key() <= frame)
             {
                 if (lasttype == MARK_CUT_START && (lastframe > -1))
@@ -783,14 +780,16 @@ void DeleteMap::SaveMap(bool isAutoSave)
     if (!isAutoSave)
     {
         // Remove temporary placeholder marks
-        QMutableMapIterator<uint64_t, MarkTypes> it(m_deleteMap);
-        while (it.hasNext())
+        for (auto it = m_deleteMap.begin(); it != m_deleteMap.end(); /*no inc*/)
         {
-            it.next();
             if (MARK_PLACEHOLDER == it.value())
             {
-                it.remove();
+                it = m_deleteMap.erase(it);
                 m_changed = true;
+            }
+            else
+            {
+                ++it;
             }
         }
 
@@ -888,12 +887,12 @@ bool DeleteMap::IsSaved(void) const
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     // Remove temporary placeholder marks from currentMap
-    QMutableMapIterator<uint64_t, MarkTypes> it(currentMap);
-    while (it.hasNext())
+    for (auto it = currentMap.begin(); it != currentMap.end(); /* no inc */)
     {
-        it.next();
         if (MARK_PLACEHOLDER == it.value())
-            it.remove();
+            it = currentMap.erase(it);
+        else
+            ++it;
     }
 
     return currentMap == savedMap;

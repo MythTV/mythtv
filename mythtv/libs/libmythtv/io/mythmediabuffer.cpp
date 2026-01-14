@@ -1580,14 +1580,19 @@ uint64_t MythMediaBuffer::UpdateDecoderRate(uint64_t Latest)
     if (Latest)
         m_decoderReads.insert(current, Latest);
     uint64_t total = 0;
-    QMutableMapIterator<std::chrono::milliseconds,uint64_t> it(m_decoderReads);
-    while (it.hasNext())
+    for (auto it = m_decoderReads.begin();
+         it != m_decoderReads.end();
+         /* no inc */)
     {
-        it.next();
         if (it.key() < expire || it.key() > current)
-            it.remove();
+        {
+            it = m_decoderReads.erase(it);
+        }
         else
+        {
             total += it.value();
+            ++it;
+        }
     }
 
     int size = m_decoderReads.size();
@@ -1611,14 +1616,19 @@ uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
     if (Latest)
         m_storageReads.insert(current, Latest);
     uint64_t total = 0;
-    QMutableMapIterator<std::chrono::milliseconds,uint64_t> it(m_storageReads);
-    while (it.hasNext())
+    for (auto it = m_storageReads.begin();
+         it != m_storageReads.end();
+         /* no inc */)
     {
-        it.next();
         if (it.key() < expire || it.key() > current)
-            it.remove();
+        {
+            it = m_storageReads.erase(it);
+        }
         else
+        {
             total += it.value();
+            ++it;
+        }
     }
 
     int size = m_storageReads.size();

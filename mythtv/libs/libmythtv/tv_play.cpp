@@ -1513,12 +1513,8 @@ void TV::GetStatus()
     for (auto tit =info.text.cbegin(); tit != info.text.cend(); ++tit)
         status.insert(tit.key(), tit.value());
 
-    QHashIterator<QString,int> vit(info.values);
-    while (vit.hasNext())
-    {
-        vit.next();
+    for (auto vit = info.values.cbegin(); vit != info.values.cend(); ++vit)
         status.insert(vit.key(), vit.value());
-    }
 
     MythUIStateTracker::SetState(status);
 }
