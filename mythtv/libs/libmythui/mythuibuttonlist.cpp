@@ -1677,12 +1677,12 @@ MythUIButtonListItem *MythUIButtonList::GetItemFirst() const
 MythUIButtonListItem *MythUIButtonList::GetItemNext(MythUIButtonListItem *item)
 const
 {
-    QListIterator<MythUIButtonListItem *> it(m_itemList);
-
-    if (!it.findNext(item))
+    // Find item
+    auto it = std::find(m_itemList.begin(), m_itemList.end(), item);
+    if (it == m_itemList.end())
         return nullptr;
-
-    return it.previous();
+    // Return next
+    return (++it != m_itemList.end()) ? *it : nullptr;
 }
 
 int MythUIButtonList::GetCount() const
@@ -2407,10 +2407,9 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
 
 void MythUIButtonList::SetAllChecked(MythUIButtonListItem::CheckState state)
 {
-    QMutableListIterator<MythUIButtonListItem *> it(m_itemList);
-
-    while (it.hasNext())
-        it.next()->setChecked(state);
+    for (const auto & it : std::as_const(m_itemList)) {
+        it->setChecked(state);
+    }
 }
 
 void MythUIButtonList::Init()
