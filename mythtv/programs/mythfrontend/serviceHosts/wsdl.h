@@ -46,13 +46,13 @@ class Wsdl : public QDomDocument
     protected:
 
 
-        QDomElement CreateBindingOperation( MethodInfo    &oInfo,
+        QDomElement CreateBindingOperation( const MethodInfo &oInfo,
                                             const QString &sClassName );
 
         QDomElement CreateMessage         ( const QString& sMsgName,
                                             const QString& sTypeName );
 
-        QDomElement CreateMethodType      ( MethodInfo   &oInfo,
+        QDomElement CreateMethodType      ( const MethodInfo &oInfo,
                                             QString       sTypeName,
                                             bool          bReturnType = false );
 

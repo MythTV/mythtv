@@ -299,7 +299,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement Wsdl::CreateBindingOperation( MethodInfo    &oInfo,
+QDomElement Wsdl::CreateBindingOperation( const MethodInfo &oInfo,
                                           const QString &sClassName)
 {
     // ------------------------------------------------------------------
@@ -371,7 +371,7 @@ QDomElement Wsdl::CreateMessage( const QString& sMsgName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
+QDomElement Wsdl::CreateMethodType( const MethodInfo &oInfo,
                                     QString       sTypeName,
                                     bool          bReturnType /* = false */)
 {
