@@ -170,9 +170,8 @@ void XmlPListSerializer::RenderList(const QString &sName,
     m_pXmlWriter->writeTextElement("key", sName);
     m_pXmlWriter->writeStartElement(array ? "array" : "dict");
 
-    QListIterator<QVariant> it(list);
-    while (it.hasNext())
-        RenderValue(sItemName, it.next(), !array);
+    for (const auto& variant : list)
+        RenderValue(sItemName, variant, !array);
 
     m_pXmlWriter->writeEndElement();
 }
@@ -183,9 +182,8 @@ void XmlPListSerializer::RenderStringList(const QString &sName,
     m_pXmlWriter->writeTextElement("key", sName);
     m_pXmlWriter->writeStartElement("array");
 
-    QListIterator<QString> it(list);
-    while (it.hasNext())
-        m_pXmlWriter->writeTextElement("string", it.next());
+    for (const QString& str : list)
+        m_pXmlWriter->writeTextElement("string", str);
 
     m_pXmlWriter->writeEndElement();
 }
@@ -197,12 +195,8 @@ void XmlPListSerializer::RenderMap(const QString &sName,
     m_pXmlWriter->writeTextElement("key", sItemName);
     m_pXmlWriter->writeStartElement("dict");
 
-    QMapIterator<QString,QVariant> it(map);
-    while (it.hasNext())
-    {
-        it.next();
+    for (auto it = map.cbegin(); it != map.cend(); ++it)
         RenderValue(it.key(), it.value());
-    }
 
     m_pXmlWriter->writeEndElement();
 }

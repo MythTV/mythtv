@@ -157,16 +157,14 @@ void JSONSerializer::RenderList( const QVariantList &list )
 
     m_stream << "[";
 
-    QListIterator< QVariant > it( list );
-
-    while (it.hasNext())
+    for (const auto& variant : list)
     {
         if (bFirst)
             bFirst = false;
         else
             m_stream << ",";
 
-        RenderValue( it.next() );
+        RenderValue( variant );
     }
 
     m_stream << "]";
@@ -182,16 +180,14 @@ void JSONSerializer::RenderStringList( const QStringList &list )
 
     m_stream << "[";
 
-    QListIterator< QString > it( list );
-
-    while (it.hasNext())
+    for (const auto& str : list)
     {
         if (bFirst)
             bFirst = false;
         else
             m_stream << ",";
 
-          m_stream << "\"" << Encode( it.next() ) << "\"";
+          m_stream << "\"" << Encode( str ) << "\"";
     }
 
     m_stream << "]";
@@ -207,12 +203,8 @@ void JSONSerializer::RenderMap( const QVariantMap &map )
 
     m_stream << "{";
 
-    QMapIterator< QString, QVariant > it( map );
-
-    while (it.hasNext()) 
+    for (auto it = map.cbegin(); it != map.cend(); ++it)
     {
-        it.next();
-        
         if (bFirst)
             bFirst = false;
         else
