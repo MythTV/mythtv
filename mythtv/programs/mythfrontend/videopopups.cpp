@@ -35,11 +35,8 @@ bool CastDialog::Create()
         connect(okButton, &MythUIButton::Clicked, this, &MythScreenType::Close);
 
     QStringList cast = GetDisplayCast(*m_metadata);
-    QStringListIterator castIterator(cast);
-    while (castIterator.hasNext())
-    {
-        new MythUIButtonListItem(castList, castIterator.next());
-    }
+    for (const auto& person : std::as_const(cast))
+        new MythUIButtonListItem(castList, person);
 
     BuildFocusList();
 

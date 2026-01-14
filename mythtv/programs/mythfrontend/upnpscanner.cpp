@@ -397,12 +397,8 @@ QMap<QString,QString> UPNPScanner::ServerList(void)
 {
     QMap<QString,QString> servers;
     m_lock.lock();
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
-    {
-        it.next();
+    for (auto it = m_servers.cbegin(); it != m_servers.cend(); ++it)
         servers.insert(it.key(), it.value()->m_friendlyName);
-    }
     m_lock.unlock();
     return servers;
 }
@@ -466,10 +462,8 @@ void UPNPScanner::Stop(void)
         m_watchdogTimer->stop();
 
     // cleanup our servers and subscriptions
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto it = m_servers.cbegin(); it != m_servers.cend(); ++it)
     {
-        it.next();
         if (m_subscription && it.value()->m_subscribed)
             m_subscription->Unsubscribe(it.key());
         if (it.value()->m_renewalTimerId)
@@ -522,15 +516,13 @@ void UPNPScanner::Update(void)
     // if our network queue is full, then we may need to come back later
     bool reschedule = false;
 
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto *server : std::as_const(m_servers))
     {
-        it.next();
-        if ((it.value()->m_connectionAttempts < MAX_ATTEMPTS) &&
-            (it.value()->m_controlURL.isEmpty()))
+        if ((server->m_connectionAttempts < MAX_ATTEMPTS) &&
+            (server->m_controlURL.isEmpty()))
         {
             bool sent = false;
-            QUrl url { it.value()->m_url };
+            QUrl url { server->m_url };
             if (!m_descriptionRequests.contains(url) &&
                 (m_descriptionRequests.empty()) &&
                 url.isValid())
@@ -540,7 +532,7 @@ void UPNPScanner::Update(void)
                 {
                     sent = true;
                     m_descriptionRequests.insert(url, reply);
-                    it.value()->m_connectionAttempts++;
+                    server->m_connectionAttempts++;
                 }
             }
             if (!sent)
@@ -563,18 +555,20 @@ void UPNPScanner::CheckStatus(void)
     // Remove stale servers - the SSDP cache code does not send out removal
     // notifications for expired (rather than explicitly closed) connections
     m_lock.lock();
-    QMutableHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto it = m_servers.begin(); it != m_servers.end(); /* no inc */)
     {
-        it.next();
         // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
         if (!SSDPCache::Instance()->Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
         {
             LOG(VB_UPNP, LOG_INFO, LOC + QString("%1 no longer in SSDP cache. Removing")
                 .arg(it.value()->m_serverURL.toString()));
             UpnpMediaServer* last = it.value();
-            it.remove();
+            it = m_servers.erase(it);
             delete last;
+        }
+        else
+        {
+            ++it;
         }
     }
     m_lock.unlock();
