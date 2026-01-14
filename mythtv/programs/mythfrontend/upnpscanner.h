@@ -29,7 +29,7 @@ class MediaServerItem
                     QString  name, QString  url)
       : m_id(std::move(id)), m_parentid(std::move(parent)),
         m_name(std::move(name)), m_url(std::move(url)) { }
-    QString NextUnbrowsed(void);
+    QString NextUnbrowsed(void) const;
     MediaServerItem* Find(QString &id);
     bool Add(const MediaServerItem &item);
     void Reset(void);
@@ -100,7 +100,7 @@ class UPNPScanner : public QObject
                              QUrl &eventURL);
 
     // convert MediaServerItems to video metadata
-    void GetServerContent(QString &usn, MediaServerItem *content,
+    void GetServerContent(const QString &usn, const MediaServerItem *content,
                           VideoMetadataListManager::metadata_list* list,
                           meta_dir_node *node);
 
