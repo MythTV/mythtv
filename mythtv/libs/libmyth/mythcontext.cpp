@@ -1191,7 +1191,7 @@ int MythContext::Impl::UPnPautoconf(const std::chrono::milliseconds milliSeconds
         }
     }
 
-    usleep(25000);
+    std::this_thread::sleep_for(25ms);
     processEvents();
 
     SSDPCacheEntries *backends = SSDPCache::Instance()->Find(SSDP::kBackendURI);
