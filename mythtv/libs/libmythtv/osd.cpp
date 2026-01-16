@@ -143,7 +143,6 @@ void OSD::LoadWindows()
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1").arg(window));
             delete win;
         }
     }

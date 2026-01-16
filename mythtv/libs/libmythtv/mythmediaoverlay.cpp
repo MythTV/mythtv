@@ -20,7 +20,15 @@ MythOverlayWindow::MythOverlayWindow(MythScreenStack* Parent, MythPainter* Paint
 bool MythOverlayWindow::Create()
 {
     if (m_themed)
-        return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
+    {
+        bool result = XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
+        if (!result)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1")
+                .arg(objectName()));
+        }
+        return result;
+    }
     return false;
 }
 
@@ -113,8 +121,6 @@ MythScreenType *MythMediaOverlay::InitWindow(const QString& Window, MythScreenTy
         }
     }
 
-    if (!Screen)
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1").arg(Window));
     return Screen;
 }
 
