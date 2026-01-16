@@ -106,6 +106,11 @@ void UPnpSearchTask::SendMsg(QUdpSocket& socket, const QString& sST, const QStri
                         .arg(ipaddress, QString::number(m_nServicePort)).toUtf8()
                     + data;
 
+                LOG(VB_UPNP, LOG_DEBUG,
+                    QString("Sending SSDP search reply datagram to %1:%2\n%3")
+                    .arg(m_peerAddress.toString(), QString::number(m_nPeerPort),
+                         QString::fromUtf8(datagram))
+                    );
                 // Send Packet to UDP Socket (Send same packet twice)
                 socket.writeDatagram(datagram, m_peerAddress, m_nPeerPort);
 

@@ -167,7 +167,7 @@ void SSDPReceiver::performSearch(const QString &sST, std::chrono::seconds timeou
                                "\r\n")
         .arg(timeout.count()).arg(sST);
 
-    LOG(VB_UPNP, LOG_DEBUG, QString("\n\n%1\n").arg(rRequest));
+    LOG(VB_UPNP, LOG_DEBUG, QString("Sending SSDP search datagram\n%1").arg(rRequest));
 
     QByteArray sRequest = rRequest.toUtf8();
     int nSize = sRequest.size();

@@ -93,6 +93,10 @@ void UPnpNotifyTask::SendNotifyMsg(QUdpSocket& socket, const QString& sNT, const
                      ).toUtf8()
              + data;
 
+        LOG(VB_UPNP, LOG_DEBUG, QString("Sending SSDP notify datagram\n%1")
+            .arg(QString::fromUtf8(datagram))
+            );
+
         // Send Packet to Socket (Send same packet twice)
         socket.writeDatagram(datagram, QHostAddress(QString(SSDP_GROUP)), SSDP_PORT);
         if (m_eNTS != NTS_byebye)
