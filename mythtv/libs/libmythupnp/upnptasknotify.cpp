@@ -71,6 +71,10 @@ void UPnpNotifyTask::SendNotifyMsg(QUdpSocket& socket, const QString& sNT, const
                 "UPnpNotifyTask::SendNotifyMsg - NULL in address list");
             continue;
         }
+        if (addr.isLoopback())
+        {
+            continue; // LOCATION will be invalid for any peer not on this host
+        }
 
         QHostAddress ip = addr;
         // Descope the Link Local address. The scope is only valid
