@@ -246,15 +246,13 @@ void InitializeMythDirs(void)
     remotecachedir = cachedir + "/remotecache";
     themebasecachedir = cachedir + "/themecache";
     thumbnaildir = cachedir + "/thumbnails";
+    themedir        = sharedir + "themes/";
+    translationsdir = sharedir + "i18n/";
 
 #ifdef Q_OS_ANDROID
-    themedir        = sharedir + "themes/";
     pluginsdir      = libdir;
-    translationsdir = sharedir + "i18n/";
 #else
-    themedir        = sharedir + "themes/";
     pluginsdir      = libdir   + "plugins/";
-    translationsdir = sharedir + "i18n/";
 #endif
 
     LOG(VB_GENERAL, LOG_NOTICE, "Using runtime prefix = " + installprefix);
