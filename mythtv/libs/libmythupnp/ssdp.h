@@ -49,7 +49,7 @@ class SSDPReceiver : public QObject
     void processPendingDatagrams();
 
   private:
-    QUdpSocket          m_socket;
+    QUdpSocket          m_socket        {this};
     const uint16_t      m_port          {SSDP_PORT};
     const QHostAddress  m_groupAddress  {SSDP_GROUP};
 };
