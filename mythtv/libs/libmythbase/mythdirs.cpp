@@ -214,14 +214,12 @@ void InitializeMythDirs(void)
             installprefix = QString("../Resources");
     #endif
 
-    QDir prefixDir = qApp->applicationDirPath();
-
     if (QDir(installprefix).isRelative())
     {
         // If the PREFIX is relative, evaluate it relative to our
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
-
+        QDir prefixDir = qApp->applicationDirPath();
         LOG(VB_GENERAL, LOG_DEBUG, QString("Relative PREFIX! (%1), appDir=%2")
             .arg(installprefix, prefixDir.canonicalPath()));
 
