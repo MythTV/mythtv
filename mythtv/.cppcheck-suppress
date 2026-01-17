@@ -6,7 +6,6 @@
 
 // Ignore all warnings in these files (MythTV code)
 *:*/docs/doxygen-architecture-document.cpp
-*:*/filters/*
 *:*/html/*
 *:*/libs/libmythfreemheg/*
 *:*/libs/libmythmpeg2/*
