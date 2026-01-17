@@ -551,7 +551,6 @@ to access these assets:
     <li>GetInstallPrefix() + /bin/mtd</li>
     <li>GetInstallPrefix() + LIBDIRNAME + /mythtv/ = GetLibraryDir()</li>
     <li>GetLibraryDir() + /plugins/ = GetPluginsDir()</li>
-    <li>GetLibraryDir() + /filters/ = GetFiltersDir()</li>
   </ul></li>
 
   <li>GetConfDir() returns the value of the runtime env. var. $MYTHCONFDIR,
