@@ -202,7 +202,6 @@ INSTALLS += inc inc2
 INCLUDEPATH += ..
 DEPENDPATH  +=  ../../external/libudfread
 
-DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
 DEFINES += MBASE_API
 

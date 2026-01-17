@@ -531,8 +531,8 @@ locations. The following methods in MythContext allow programs and plugins
 to access these assets:
 <ol>
   <li>GetInstallPrefix() returns either the runtime env. var. $MYTHTVDIR
-      or the compile-time var. RUNPREFIX. If these are relative paths,
-      it is initialised relative to the application's location.
+      or uses QCoreApplication::applicationDirPath() to determine the install
+      location if $MYTHTVDIR is a relative path or empty.
       The value is used thus:
   <ul>
     <li>GetInstallPrefix() + /share/mythtv/ = GetShareDir(), GetFontsDir()</li>
