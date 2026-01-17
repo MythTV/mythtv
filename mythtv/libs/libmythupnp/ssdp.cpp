@@ -77,6 +77,8 @@ void SSDP::Shutdown()
 
 SSDP::SSDP()
 {
+    m_receiver.moveToThread(m_thread.qthread());
+    m_thread.start();
     LOG(VB_UPNP, LOG_NOTICE, "SSDP instance created." );
 }
 
@@ -94,6 +96,8 @@ SSDP::~SSDP()
         m_pNotifyTask->DecrRef();
         m_pNotifyTask = nullptr;
     }
+    m_thread.quit();
+    m_thread.wait();
 
     LOG(VB_UPNP, LOG_INFO, "SSDP instance destroyed." );
 }

@@ -21,6 +21,8 @@ using namespace std::chrono_literals;
 #include <QString>
 #include <QUdpSocket>
 
+#include "libmythbase/mthread.h"
+
 #include "upnpexp.h"
 
 static constexpr const char* SSDP_GROUP { "239.255.255.250" };
@@ -63,6 +65,7 @@ class UPNP_PUBLIC SSDP
         class UPnpNotifyTask* m_pNotifyTask         {nullptr};
 
         SSDPReceiver m_receiver;
+        MThread m_thread {"SSDP"};
 
     private:
 
