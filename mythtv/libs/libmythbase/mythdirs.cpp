@@ -26,7 +26,6 @@ static QString confdir;
 static QString themedir;
 static QString pluginsdir;
 static QString translationsdir;
-static QString filtersdir;
 static QString cachedir;
 static QString remotecachedir;
 static QString themebasecachedir;
@@ -252,12 +251,10 @@ void InitializeMythDirs(void)
     themedir        = sharedir + "themes/";
     pluginsdir      = libdir;
     translationsdir = sharedir + "i18n/";
-    filtersdir      = libdir;
 #else
     themedir        = sharedir + "themes/";
     pluginsdir      = libdir   + "plugins/";
     translationsdir = sharedir + "i18n/";
-    filtersdir      = libdir   + "filters/";
 #endif
 
     LOG(VB_GENERAL, LOG_NOTICE, "Using runtime prefix = " + installprefix);
@@ -270,7 +267,6 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_DEBUG, "themedir          = "+ themedir         );
     LOG(VB_GENERAL, LOG_DEBUG, "pluginsdir        = "+ pluginsdir       );
     LOG(VB_GENERAL, LOG_DEBUG, "translationsdir   = "+ translationsdir  );
-    LOG(VB_GENERAL, LOG_DEBUG, "filtersdir        = "+ filtersdir       );
     LOG(VB_GENERAL, LOG_DEBUG, "confdir           = "+ confdir          );
     LOG(VB_GENERAL, LOG_DEBUG, "cachedir          = "+ cachedir         );
     LOG(VB_GENERAL, LOG_DEBUG, "remotecachedir    = "+ remotecachedir   );
@@ -286,7 +282,6 @@ QString GetConfDir(void) { return confdir; }
 QString GetThemesParentDir(void) { return themedir; }
 QString GetPluginsDir(void) { return pluginsdir; }
 QString GetTranslationsDir(void) { return translationsdir; }
-QString GetFiltersDir(void) { return filtersdir; }
 
 /**
  * Returns the base directory for all cached files.  On linux this
@@ -322,29 +317,16 @@ QString GetThemeBaseCacheDir(void) { return themebasecachedir; }
 #ifdef Q_OS_DARWIN
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dylib";
-static const QString kFilterLibPrefix = "lib";
-static const QString kFilterLibSuffix = ".dylib";
 #elif defined(Q_OS_WINDOWS)
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dll";
-static const QString kFilterLibPrefix = "lib";
-static const QString kFilterLibSuffix = ".dll";
 #elif defined(Q_OS_ANDROID)
 static const QString kPluginLibPrefix = "libmythplugin";
 static const QString kPluginLibSuffix = ".so";
-static const QString kFilterLibPrefix = "libmythfilter";
-static const QString kFilterLibSuffix = ".so";
 #else
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".so";
-static const QString kFilterLibPrefix = "lib";
-static const QString kFilterLibSuffix = ".so";
 #endif
-
-QString GetFiltersNameFilter(void)
-{
-    return kFilterLibPrefix + '*' + kFilterLibSuffix;
-}
 
 QString GetPluginsNameFilter(void)
 {
