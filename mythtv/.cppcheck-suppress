@@ -10,6 +10,4 @@
 *:*/libs/libmythfreemheg/*
 *:*/libs/libmythmpeg2/*
 *:*/libs/libmythtv/visualisations/goom/*
-*:*/programs/mythbackend/serviceHosts/*
-*:*/programs/mythbackend/services/*
 *:*/test/*
