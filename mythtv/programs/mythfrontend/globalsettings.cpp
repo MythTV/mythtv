@@ -4611,7 +4611,7 @@ OSDSettings::OSDSettings()
 
 GeneralSettings::GeneralSettings()
 {
-    setLabel(tr("General (Basic)"));
+    setLabel(tr("General"));
     auto *general = new GroupSetting();
     general->setLabel(tr("General (Basic)"));
     general->addChild(ChannelOrdering());
