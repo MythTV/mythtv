@@ -242,10 +242,12 @@ void InitializeMythDirs(void)
 
     if (confdir.isEmpty())
         confdir = QDir::homePath() + "/.mythtv";
+
     cachedir = confdir + "/cache";
-    remotecachedir = cachedir + "/remotecache";
+    remotecachedir    = cachedir + "/remotecache";
     themebasecachedir = cachedir + "/themecache";
-    thumbnaildir = cachedir + "/thumbnails";
+    thumbnaildir      = cachedir + "/thumbnails";
+
     themedir        = sharedir + "themes/";
     translationsdir = sharedir + "i18n/";
 
