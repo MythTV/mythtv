@@ -1,6 +1,4 @@
-body{font:normal 13px Verdana, Geneva, sans-serif;background-color:#657b83;border:0px;margin:0px;padding:0px;max-width:100%;overflow-x:hidden;text-overflow:ellipsis}
 logo.svelte-vwmtlq{color:#26c}
-remote.svelte-1elvvux{background-color:#073642}remotelayout.svelte-1elvvux{grid-template-columns:repeat(3, 80px);grid-template-rows:repeat(4, 58px) 10px 58px 10px repeat(3, 58px) 10px repeat(2, 58px);width:auto;display:grid}linktext.svelte-1elvvux{color:#fdf6e3}
 status.svelte-6yj4bq{position:absolute;top:64px;right:0px;left:27px;width:calc(100% - 27px);height:calc(100% - 64px);padding:0px;box-sizing:border-box}linktext.svelte-6yj4bq{color:#002b36}
-
-/*# sourceMappingURL=frontend.css.map */
+remote.svelte-1elvvux{background-color:#073642}remotelayout.svelte-1elvvux{grid-template-columns:repeat(3, 80px);grid-template-rows:repeat(4, 58px) 10px 58px 10px repeat(3, 58px) 10px repeat(2, 58px);width:auto;display:grid}linktext.svelte-1elvvux{color:#fdf6e3}
+body{font:normal 13px Verdana, Geneva, sans-serif;background-color:#657b83;border:0px;margin:0px;padding:0px;max-width:100%;overflow-x:hidden;text-overflow:ellipsis}
