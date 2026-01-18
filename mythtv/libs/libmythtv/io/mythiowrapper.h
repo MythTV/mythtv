@@ -1,24 +1,13 @@
 #ifndef MYTHIOWRAPPER_H
 #define MYTHIOWRAPPER_H
 
-#ifdef __cplusplus
-#include <cstring>
-#else
-#include <string.h>
-#endif
-#include <strings.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include "libmythtv/mythtvexp.h"
 
-#ifdef __cplusplus
+using callback_t = void (*)(void*);
 extern "C" {
-#endif
-
-typedef void (*callback_t)(void*); //NOLINT(modernize-use-using) included from C code
-
 void               MythFileOpenRegisterCallback(const char *Pathname, void* Object, callback_t Func);
 int                MythFileCheck  (int Id);
 MTV_PUBLIC int     MythFileOpen   (const char *Pathname, int Flags);
@@ -34,9 +23,6 @@ int                MythDirCheck   (int DirID);
 MTV_PUBLIC int     MythDirOpen    (const char *DirName);
 MTV_PUBLIC int     MythDirClose   (int DirID);
 MTV_PUBLIC char*   MythDirRead    (int DirID);
-
-#ifdef __cplusplus
 }
-#endif
 #endif
 

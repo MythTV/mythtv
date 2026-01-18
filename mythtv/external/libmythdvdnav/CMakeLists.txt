@@ -44,7 +44,7 @@ endforeach()
 #
 # Compile this library as a static library on Android because of the circular
 # linking dependency issue with libmythtv (specifically the calls to the
-# MythFile* functions).  Cmake only enables PIC code by default on shared
+# MythDVD_* functions).  Cmake only enables PIC code by default on shared
 # libraries, so need to enable PIC on the library later after its defined.
 #
 if(ANDROID OR WIN32)
@@ -66,6 +66,7 @@ set(LIBDVDREAD_HEADERS
   dvdread/dvdread/ifo_print.h
   dvdread/dvdread/ifo_read.h
   dvdread/dvdread/ifo_types.h
+  dvdread/dvdread/mythdvdio.h
   dvdread/dvdread/nav_print.h
   dvdread/dvdread/nav_read.h
   dvdread/dvdread/nav_types.h
@@ -110,8 +111,7 @@ add_library(
   dvdread/md5.h
   dvdread/nav_print.c
   dvdread/nav_read.c
-  include/libmythtv/mythtvexp.h
-  include/libmythtv/io/mythiowrapper.h)
+  )
 
 if(WIN32)
   target_sources(mythdvdnav PRIVATE
@@ -152,27 +152,8 @@ target_compile_definitions(mythdvdnav PRIVATE
   HAVE_CONFIG_H
   )
 
-# Instead of creating a circular dependency by adding an include path into
-# external/libmythdvdnav that points over to libs/libmythxxx, just copy in the
-# files that are needed.
-add_custom_command(
-  OUTPUT include/libmythtv include/libmythtv/io
-  COMMAND ${CMAKE_COMMAND} -E make_directory
-          include/libmythtv/io)
-add_custom_command(
-  OUTPUT include/libmythtv/mythtvexp.h
-  DEPENDS include/libmythtv
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-          ${MythTV_SOURCE_DIR}/libs/libmythtv/mythtvexp.h include/libmythtv)
-add_custom_command(
-  OUTPUT include/libmythtv/io/mythiowrapper.h
-  DEPENDS include/libmythtv/io
-  COMMAND
-    ${CMAKE_COMMAND} -E copy_if_different
-    ${MythTV_SOURCE_DIR}/libs/libmythtv/io/mythiowrapper.h include/libmythtv/io)
-
 #
-# The MythTV customization to dvdnav adds references to the MythFile* functions,
+# The MythTV customization to dvdnav adds references to the MythDVD_* functions,
 # which are defined in libs/libmythtv. to allow these symbols to remain
 # undefined while linking mythdvdnav, the "-Wl,--no-undefined" option cannot be
 # a part of the link line. The android toolchain file adds this argument by

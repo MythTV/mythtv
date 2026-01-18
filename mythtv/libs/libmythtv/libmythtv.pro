@@ -407,6 +407,7 @@ HEADERS += DVD/mythdvdstream.h
 SOURCES += DVD/mythdvdbuffer.cpp
 SOURCES += DVD/mythdvdcontext.cpp
 SOURCES += DVD/mythdvdinfo.cpp
+SOURCES += DVD/mythdvdio.cpp
 SOURCES += DVD/mythdvdstream.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h
