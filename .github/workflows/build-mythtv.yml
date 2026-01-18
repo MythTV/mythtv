@@ -160,7 +160,7 @@ jobs:
             image: 'quay.io/fedora/fedora:latest'
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
-            ansible_cmd: 'ansible-playbook --limit localhost -e "qt6=true" mythtv.yml'
+            ansible_cmd: 'ansible-playbook --limit localhost --extra-vars "{''qt6'':true}" mythtv.yml'
             install_extra_pkgs_cmd: 'dnf install ant -y'
             core_working_subdirectory: 'mythtv'
             core_configure_cmd: './configure --qmake=qmake6 --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
@@ -375,7 +375,7 @@ jobs:
           echo "QMAKE_CMD=${PKGMGR_PREFIX}/opt/${{ matrix.os.qt_version }}/bin/qmake" >> $GITHUB_ENV
 
       - name: Setup qt6 variables
-        run: echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA qt6=true" >> $GITHUB_ENV
+        run: echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA \\\"{'qt6':true}\\\"" >> $GITHUB_ENV
         if: matrix.os.qt_version == 'qt6'
 
       - name: Checkout MythTV/ansible repository
