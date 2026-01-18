@@ -140,6 +140,7 @@ class OSD : public MythMediaOverlay
     void LoadWindows();
     void CheckExpiry();
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, std::chrono::milliseconds CustomTimeout);
+    void DoPulse(const QDateTime& now, const QDateTime& expire);
 
   private:
     bool            m_embedded          { false };

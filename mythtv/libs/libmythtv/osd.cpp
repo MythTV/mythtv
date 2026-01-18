@@ -561,27 +561,7 @@ void OSD::CheckExpiry()
         }
         else if (it.key() == m_dialog)
         {
-            if (!m_pulsedDialogText.isEmpty() && now > m_nextPulseUpdate)
-            {
-                QString newtext = m_pulsedDialogText;
-                auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
-                if (dialog)
-                {
-                    // The disambiguation string must be an empty string
-                    // and not a NULL to get extracted by the Qt tools.
-                    QString replace = QCoreApplication::translate("(Common)",
-                                          "%n second(s)", "",
-                                          static_cast<int>(now.secsTo(it.value())));
-                    dialog->SetText(newtext.replace("%d", replace));
-                }
-                auto *cdialog = qobject_cast<MythConfirmationDialog*>(m_dialog);
-                if (cdialog)
-                {
-                    QString replace = QString::number(now.secsTo(it.value()));
-                    cdialog->SetMessage(newtext.replace("%d", replace));
-                }
-                m_nextPulseUpdate = now.addSecs(1);
-            }
+            DoPulse(now, it.value());
         }
     }
 }
@@ -621,6 +601,35 @@ void OSD::SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout,
     {
         if (m_expireTimes.contains(win))
             m_expireTimes.remove(win);
+    }
+}
+
+void OSD::DoPulse(const QDateTime& now, const QDateTime& expire)
+{
+    if (m_pulsedDialogText.isEmpty() || (now <= m_nextPulseUpdate))
+        return;
+    m_nextPulseUpdate = now.addSecs(1);
+
+    uint64_t seconds = now.secsTo(expire);
+    QString newtext = m_pulsedDialogText;
+    auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
+    if (dialog)
+    {
+        // The disambiguation string must be an empty string
+        // and not a NULL to get extracted by the Qt tools.
+        QString replace = QCoreApplication::translate("(Common)",
+                              "%n second(s)", "",
+                              static_cast<int>(seconds));
+        dialog->SetText(newtext.replace("%d", replace));
+        return;
+    }
+
+    auto *cdialog = qobject_cast<MythConfirmationDialog*>(m_dialog);
+    if (cdialog)
+    {
+        QString replace = QString::number(seconds);
+        cdialog->SetMessage(newtext.replace("%d", replace));
+        return;
     }
 }
 
