@@ -44,8 +44,7 @@ QString MythUILocation::GetCurrentLocation(bool FullPath, bool MainStackOnly)
         // if there's a location in the stringlist add that (non mythui screen or external app running)
         if (!m_currentLocation.isEmpty())
         {
-            for (int x = 0; x < m_currentLocation.count(); x++)
-                result += '/' + m_currentLocation[x];
+            result += '/' + m_currentLocation.join('/');
         }
     }
     else
@@ -65,7 +64,7 @@ QString MythUILocation::GetCurrentLocation(bool FullPath, bool MainStackOnly)
 
         // if there's a location in the stringlist use that (non mythui screen or external app running)
         if (!m_currentLocation.isEmpty())
-            result = m_currentLocation.last();
+            result = m_currentLocation.at(m_currentLocation.size()-1);
     }
 
     if (result.isEmpty())
