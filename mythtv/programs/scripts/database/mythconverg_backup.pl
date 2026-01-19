@@ -1267,6 +1267,21 @@ EOF
                 '', "$mysqldump exited with status: $exit");
         verbose($verbose_level_debug,
                 "$mysqldump output:", $result) if ($exit);
+
+        # In very rare conditions a backup of size 0 could be
+        # generated. This is not useful, and we don't want it
+        # to waste one of our limited number of backup slots.
+        if (-e $output_file && -z _)
+        {
+            verbose($verbose_level_debug, '',
+                ${safe_mysqldump}.' generated an empty backup');
+            unlink $output_file;
+            if (!$exit)
+            {
+                $exit = 61; # ENODATA
+            }
+        }
+
         reset_environment;
         return $exit;
     }
