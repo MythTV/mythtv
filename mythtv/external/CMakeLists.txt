@@ -12,9 +12,9 @@
 # libexiv2         (no dependancies or customizations)
 # libudfread       (no dependancies or customizations)
 # nv-codec-headers (no dependancies or customizations)
+# libmythdvdnav    (customized)
 # ~~~
 
-add_subdirectory(libmythdvdnav)
 if(NOT SYSTEM_LIBBLURAY_FOUND)
   add_subdirectory(libmythbluray)
 endif()

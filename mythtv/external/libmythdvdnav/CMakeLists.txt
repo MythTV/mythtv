@@ -4,8 +4,7 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
-# This is set up to be a separate sub-project, but is currently
-# included by the MythTV sub-project.
+cmake_minimum_required(VERSION 3.20)
 project(
   DVDREAD
   VERSION 6.0.0
@@ -16,8 +15,12 @@ set(DVDNAV_MAJOR 6)
 set(DVDNAV_MINOR 0)
 set(DVDNAV_SUB 0)
 
+include(../../../cmake/SetCompilerOptions.cmake)
+include(CheckCCompilerFlag)
 include(CheckIncludeFile)
 include(CheckSymbolExists)
+include(GNUInstallDirs)
+include(FindPkgConfig)
 
 # Remove some of the compilation flags that were added to MythTV by
 # the -Wall flag.
@@ -186,8 +189,9 @@ endif()
 
 target_include_directories(
   mythdvdnav
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/dvdnav ${CMAKE_CURRENT_SOURCE_DIR}/dvdread
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include
+  INTERFACE ${CMAKE_INSTALL_INCLUDEDIR}/mythtv
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/dvdnav ${CMAKE_CURRENT_SOURCE_DIR}/dvdread
   # for libdvdnav version.h
   ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/dvdnav
   # for libdvdread version.h

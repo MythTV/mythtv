@@ -386,7 +386,6 @@ INSTALLS += inc3
 
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
-DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
 INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
 INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 

@@ -277,7 +277,6 @@ add_subdirectory(bindings)
 set_target_properties(
   myth
   mythbase
-  mythdvdnav
   mythmetadata
   mythmpeg2
   mythprotoserver

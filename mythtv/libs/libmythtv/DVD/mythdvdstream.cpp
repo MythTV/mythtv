@@ -18,9 +18,6 @@
 // DVD
 #include "dvdread/dvd_reader.h"
 #include "dvdread/dvd_udf.h"
-extern "C" {
-#include "dvd_input.h"
-}
 
 #define LOC QString("DVDStream: ")
 
@@ -50,6 +47,14 @@ class MythDVDStream::BlockRange
     int m_title      { 0 };
 };
 
+// from internal libdvdread header dvd_input.h
+/**
+ * Defines and flags.  Make sure they fit the libdvdcss API!
+ */
+#define DVDINPUT_NOFLAGS         0
+
+#define DVDINPUT_READ_DECRYPT    (1 << 0)
+#define DVDCSS_SEEK_KEY          (1 << 1)
 
 // Private but located in/shared with dvd_reader.c
 extern "C" int InternalUDFReadBlocksRaw(dvd_reader_t *device, uint32_t lb_number,
