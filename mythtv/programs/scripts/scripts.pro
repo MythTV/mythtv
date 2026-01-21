@@ -65,9 +65,6 @@ using_bindings_python {
     INSTALLS += hardwareprofile_scripts metadata_scripts internetcontent_scripts
 
     unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}
-    win32-msvc*:QMAKE_DISTCLEAN += /s /f /q $${OBJECTS_DIR}/*.* $$escape_expand(\n\t) \
-                                   rd /s /q $${OBJECTS_DIR}
-
 } else {
 
     # Try to verify our python exists
@@ -112,7 +109,4 @@ using_bindings_python {
     }
 
     unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}
-    win32-msvc*:QMAKE_DISTCLEAN += /s /f /q $${OBJECTS_DIR}/metadata/*.* $$escape_expand(\n\t) \
-                                   rd /s /q $${OBJECTS_DIR}
-
 }

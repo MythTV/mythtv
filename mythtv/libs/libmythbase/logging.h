@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <string>
 
+#include <sys/types.h>
+
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
@@ -18,10 +20,6 @@
 #include "referencecounter.h"
 #include "compat.h"
 #include "mythchrono.h"
-
-#ifdef _MSC_VER
-#  include <unistd.h>	// pid_t
-#endif
 
 #if CONFIG_SYSTEMD_JOURNAL
 static constexpr int SYSTEMD_JOURNAL_FACILITY { -99 };

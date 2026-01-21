@@ -16,12 +16,9 @@ class QColor;
 
 #include "mythuiexp.h"
 
+#include <cstdint>
 #include <list>
 #include <memory>
-
-#ifdef _MSC_VER
-#  include <cstdint>    // int64_t
-#endif
 
 class MythFontProperties;
 class MythImage;

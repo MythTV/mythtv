@@ -552,12 +552,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     item->m_message = std::move(message);
 
     QMutexLocker qLock(&logQueueMutex);
-
-#if defined( _MSC_VER ) && defined( _DEBUG )
-        OutputDebugStringA( qPrintable(item->m_message) );
-        OutputDebugStringA( "\n" );
-#endif
-
     logQueue.enqueue(item);
 
     if (logThread && logThreadFinished && !logThread->isRunning())

@@ -109,12 +109,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
 
   protected:
     MythNotification(const MythNotification& Notification);
-
-#ifndef _MSC_VER
     MythNotification &operator=(const MythNotification&);
-#else
-    MythNotification &operator=(const MythNotification &other) = default;
-#endif
 
   protected:
     int      m_id          { -1 };

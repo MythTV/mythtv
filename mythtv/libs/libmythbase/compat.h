@@ -25,9 +25,7 @@
 #    include <sys/socket.h>
 #    include <sys/wait.h>     // For WIFEXITED on Mac OS X
 #else // Q_OS_WINDOWS
-#    ifndef _MSC_VER
 #        define close wsock_close
-#    endif
 
 #    ifndef NOMINMAX
 #        define NOMINMAX
@@ -47,12 +45,8 @@
 #    undef SetJob
 #    undef SendMessage
 
-#    ifndef _MSC_VER
 #        include <winsock2.h>
 #        include <ws2tcpip.h>
-#    else
-#        include <io.h>
-#    endif
 
 #    undef close
 
@@ -143,71 +137,6 @@
 #    define WTERMSIG(w)    ((w) & 0x7f)
 
 #endif // Q_OS_WINDOWS
-
-
-#ifdef _MSC_VER
-    #include <cstdlib>       // for rand()
-    #include <sys/time.h>
-
-    // Turn off the visual studio warnings (identifier was truncated)
-    #pragma warning(disable:4786)
-
-    #include <cinttypes>
-    #include <direct.h>
-    #include <process.h>
-
-    #define strtoll             _strtoi64
-    #define strncasecmp         _strnicmp
-    #define snprintf            _snprintf
-
-    #ifdef  Q_OS_WIN64
-        using ssize_t = __int64;
-    #else
-        using ssize_t = int;
-    #endif
-
-    // Check for execute, only checking existance in MSVC
-    #define X_OK    0
-
-    #define getpid()                _getpid()
-    #define ftruncate( fd, fsize )  _chsize( fd, fsize )
-
-    #ifndef S_ISCHR
-    #   ifdef S_IFCHR
-    #       define S_ISCHR(m) (((m) & S_IFMT) == S_IFCHR)
-    #   else
-    #       define S_ISCHR(m) 0
-    #   endif
-    #endif /* !S_ISCHR */
-
-    #ifndef S_ISBLK
-    #   define S_ISBLK(m) 0
-    #endif
-
-    #ifndef S_ISREG
-    #   define S_ISREG(m) 1
-    #endif
-
-    #ifndef S_ISDIR
-    #  ifdef S_IFDIR
-    #       define S_ISDIR(m) (((m) & S_IFDIR) == S_IFDIR )
-    #   else
-    #       define S_ISDIR(m) 0
-    #   endif
-    #endif
-
-    using mode_t = uint32_t;
-
-#   define SIGTRAP    SIGBREAK
-#   define STDERR_FILENO (int)GetStdHandle( STD_ERROR_HANDLE )
-
-#include <sys/stat.h>   // S_IREAD/WRITE on MinGW
-#  define S_IRUSR _S_IREAD
-
-#   define lseek _lseeki64
-#   define off_t __int64
-#endif // _MSC_VER
-
 
 #ifndef O_NONBLOCK
 #   define O_NONBLOCK    04000 /* NOLINT(cppcoreguidelines-macro-usage) */

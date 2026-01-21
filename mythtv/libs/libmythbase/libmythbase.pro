@@ -158,7 +158,7 @@ unix {
     HEADERS += mythsystemunix.h
 }
 
-mingw | win32-msvc* {
+mingw {
     SOURCES += mythsystemwindows.cpp
     HEADERS += mythsystemwindows.h
     LIBS += -lzip
@@ -242,21 +242,6 @@ using_libdns_sd {
 }
 
 mingw:LIBS += -lws2_32 -lz
-
-win32-msvc* {
-
-    LIBS += -lws2_32
-    EXTRA_LIBS += -lzlib
-
-    # we need to make sure version.h is generated.
-
-    versionTarget.target  = version.h
-    versionTarget.depends = FORCE
-    versionTarget.commands = powershell -noprofile -executionpolicy bypass -File ../../version.ps1 ../..
-
-    PRE_TARGETDEPS += version.h
-    QMAKE_EXTRA_TARGETS += versionTarget
-}
 
 QT += xml sql network widgets
 

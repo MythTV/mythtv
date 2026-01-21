@@ -224,7 +224,7 @@ unix:!cygwin {
     }
 }
 
-mingw | win32-msvc* {
+mingw {
     SOURCES += mediamonitor-windows.cpp
     HEADERS += mediamonitor-windows.h
 }
@@ -280,7 +280,7 @@ using_libcec {
     SOURCES += devices/mythcecadapter.cpp
 }
 
-mingw | win32-msvc*{
+mingw {
 #   HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
 #   SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
     HEADERS += platforms/mythdisplaywindows.h
@@ -331,7 +331,7 @@ using_opengl {
         LIBS    += -lEGL
     }
 
-    mingw|win32-msvc*:LIBS += -lopengl32
+    mingw:LIBS += -lopengl32
 }
 
 DEFINES += MUI_API

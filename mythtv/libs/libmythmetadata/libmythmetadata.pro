@@ -74,19 +74,10 @@ using_system_libbluray:android {
 # for TagLib
 LIBS += $${CONFIG_TAGLIB_LIBS}
 
-win32-msvc*:LIBS += -ltag
-
 using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
 
 mingw:LIBS += -lws2_32
 mingw:LIBS += libbluray
-
-win32-msvc* {
-
-    LIBS += -lws2_32
-    LIBS += -ltag
-    INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/taglib/include/taglib
-}
 
 inc.path = $${PREFIX}/include/mythtv/libmythmetadata/
 

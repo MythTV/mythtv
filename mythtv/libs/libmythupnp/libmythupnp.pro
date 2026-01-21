@@ -55,13 +55,7 @@ LIBS      += -L../libmythbase -lmythbase-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 
-mingw | win32-msvc* {
-
-    LIBS += -lws2_32
-}
-
-win32-msvc*:LIBS += -lzlib
-
+mingw: LIBS += -lws2_32
 
 inc.path = $${PREFIX}/include/mythtv/libmythupnp/
 

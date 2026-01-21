@@ -1,22 +1,10 @@
-#pthreads directory has config.h, need path to be after library paths
-win32-msvc*:INCLUDEPATH -= $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
-
 INCLUDEPATH += ../../libs/
 INCLUDEPATH += ../../external/FFmpeg
 
-!win32-msvc* {
   QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
   QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
-}
-
-win32-msvc* {
-  INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
-  INCLUDEPATH += ../../external/libmythdvdnav/dvdread
-}
 
 !using_system_libbluray:INCLUDEPATH += ../../external/libmythbluray/src
-
-win32-msvc*:INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../external/FFmpeg/libswresample
@@ -67,7 +55,7 @@ win32 {
     CONFIG += console
 }
 
-!mingw || win32-msvc* {
+!mingw {
     POST_TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}

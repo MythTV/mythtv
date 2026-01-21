@@ -13,14 +13,6 @@ equals(HAVE_PTHREAD_H, "yes") : DEFINES += HAVE_PTHREAD_H
 equals(HAVE_UNISTD_H,  "yes") : DEFINES += HAVE_UNISTD_H
 equals(HAVE_FCNTL_H,   "yes") : DEFINES += HAVE_FCNTL_H
 
-win32-msvc* {
-    !contains(QMAKE_TARGET.arch, x86_64) {
-        DEFINES += ssize_t=int
-    } else {
-        DEFINES += ssize_t=__int64
-    }
-}
-
 QMAKE_CLEAN += $(TARGET)
 
 HEADERS += attributes.h

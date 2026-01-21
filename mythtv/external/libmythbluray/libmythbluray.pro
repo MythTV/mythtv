@@ -54,10 +54,6 @@ equals(HAVE_SYS_TIME_H,  "yes") : DEFINES += HAVE_SYS_TIME_H
 
 equals(HAVE_BDJ_J2ME,    "yes") : DEFINES += HAVE_BDJ_J2ME
 
-win32-msvc* {
-    DEFINES += strncasecmp=_strnicmp
-}
-
 # bdnav
 HEADERS += src/libbluray/bluray.h src/libbluray/bluray_internal.h src/libbluray/bluray-version.h
 HEADERS += src/libbluray/player_settings.h src/libbluray/register.h

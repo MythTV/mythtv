@@ -55,8 +55,6 @@
 #else // !defined(MYTH_IMPLEMENT_VERBOSE)
 
 // This is used to define the enumerated type (used by all files)
-
-#ifndef _MSC_VER
     #define VERBOSE_PREAMBLE \
         enum VerboseMask {
     #define VERBOSE_POSTAMBLE \
@@ -64,13 +62,6 @@
         };
     #define VERBOSE_MAP(name,mask,additive,help) \
         name = (mask),
-#else
-    // msvc can't have 64bit enums
-    #define VERBOSE_PREAMBLE
-    #define VERBOSE_POSTAMBLE
-    #define VERBOSE_MAP(name,mask,additive,help) \
-    const uint64_t name = mask;
-#endif
 
 #define LOGLEVEL_PREAMBLE \
     enum LogLevel_t : std::int8_t {
