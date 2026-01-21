@@ -60,15 +60,12 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
 
     auto rawHostKey = hostKeyFile.readAll();
     auto hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-    if (!hostKey.isNull())
-    {
-        Config.setPrivateKey(hostKey);
-    }
-    else
+    if (hostKey.isNull())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to load host key from file (%1)").arg(hostKeyPath));
         return false;
     }
+    Config.setPrivateKey(hostKey);
 
     auto hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
     if (hostCertPath.isEmpty())
@@ -79,27 +76,23 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
     if (!certList.isEmpty())
         hostCert = certList.first();
 
-    if (!hostCert.isNull())
-    {
-        if (hostCert.effectiveDate() > QDateTime::currentDateTime())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Host certificate start date in future (%1)").arg(hostCertPath));
-            return false;
-        }
-
-        if (hostCert.expiryDate() < QDateTime::currentDateTime())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Host certificate has expired (%1)").arg(hostCertPath));
-            return false;
-        }
-
-        Config.setLocalCertificate(hostCert);
-    }
-    else
+    if (hostCert.isNull())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to load host cert from file (%1)").arg(hostCertPath));
         return false;
     }
+    if (hostCert.effectiveDate() > QDateTime::currentDateTime())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Host certificate start date in future (%1)").arg(hostCertPath));
+        return false;
+    }
+    if (hostCert.expiryDate() < QDateTime::currentDateTime())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Host certificate has expired (%1)").arg(hostCertPath));
+        return false;
+    }
+
+    Config.setLocalCertificate(hostCert);
 
     auto caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
     auto CACertList = QSslCertificate::fromPath(caCertPath);
