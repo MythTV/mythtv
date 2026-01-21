@@ -49,6 +49,7 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
     auto hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
     if (hostKeyPath.isEmpty())
         hostKeyPath = configdir + "key.pem";
+    LOG(VB_HTTP, LOG_DEBUG, LOC + "key " + hostKeyPath);
 
     QFile hostKeyFile(hostKeyPath);
     if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
@@ -70,6 +71,7 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
     auto hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
     if (hostCertPath.isEmpty())
         hostCertPath = configdir + "cert.pem";
+    LOG(VB_HTTP, LOG_DEBUG, LOC + "cert " + hostCertPath);
 
     QSslCertificate hostCert;
     auto certList = QSslCertificate::fromPath(hostCertPath);
@@ -95,12 +97,19 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
     Config.setLocalCertificate(hostCert);
 
     auto caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
+    bool caCertPathDefault {false};
+    if (caCertPath.isEmpty())
+    {
+        caCertPath = configdir + "cacert.pem";
+        caCertPathDefault = true;
+    }
+    LOG(VB_HTTP, LOG_DEBUG, LOC + "cacert " + caCertPath);
     auto CACertList = QSslCertificate::fromPath(caCertPath);
     if (!CACertList.isEmpty())
     {
         Config.setCaCertificates(CACertList);
     }
-    else if (!caCertPath.isEmpty())
+    else if (!caCertPathDefault)
     {
         // Only warn if a path was actually configured, this isn't an error otherwise
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to load CA cert file (%1)").arg(caCertPath));
