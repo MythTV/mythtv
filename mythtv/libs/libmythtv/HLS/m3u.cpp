@@ -419,7 +419,6 @@ namespace M3U
 #endif
         else
         {
-#ifndef _MSC_VER
             LOG(VB_RECORD, LOG_ERR, loc +
                 "invalid encryption type, only NONE "
 #if CONFIG_LIBCRYPTO
@@ -428,10 +427,6 @@ namespace M3U
                 "is supported."
 #endif
                 );
-#else
-// msvc doesn't like #ifdef in the middle of the LOG macro.
-// Errors with '#':invalid character: possibly the result of a macro expansion
-#endif
             return false;
         }
         return true;

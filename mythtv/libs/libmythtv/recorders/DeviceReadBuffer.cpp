@@ -75,9 +75,7 @@ DeviceReadBuffer::DeviceReadBuffer(
       m_pollTimeoutIsError(error_exit_on_poll_timeout)
 {
 #ifdef Q_OS_WINDOWS
-# if !defined(_MSC_VER) || __cplusplus >= 202302L
 #   warning mingw DeviceReadBuffer::Poll is not implemented
-# endif
     if (m_usingPoll)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -460,11 +458,7 @@ bool DeviceReadBuffer::HandlePausing(void)
 bool DeviceReadBuffer::Poll(void) const
 {
 #ifdef Q_OS_WINDOWS
-# ifdef _MSC_VER
-#  pragma message( "mingw DeviceReadBuffer::Poll" )
-# else
 #  warning mingw DeviceReadBuffer::Poll
-# endif
     LOG(VB_GENERAL, LOG_ERR, LOC +
         "mingw DeviceReadBuffer::Poll is not implemented");
     return false;
@@ -600,11 +594,7 @@ bool DeviceReadBuffer::CheckForErrors(
     }
 
 #ifdef Q_OS_WINDOWS
-# ifdef _MSC_VER
-#  pragma message( "mingw DeviceReadBuffer::CheckForErrors" )
-# else
 #  warning mingw DeviceReadBuffer::CheckForErrors
-# endif
     LOG(VB_GENERAL, LOG_ERR, LOC +
         "mingw DeviceReadBuffer::CheckForErrors is not implemented");
     return false;

@@ -12,9 +12,6 @@
 #include <QMap>
 
 // MythTV
-#ifdef _MSC_VER
-#  include "libmythbase/compat.h"               // for random
-#endif
 #include "libmythbase/mconcurrent.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"

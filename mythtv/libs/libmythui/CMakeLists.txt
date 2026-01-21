@@ -354,10 +354,6 @@ if(WIN32)
   target_link_libraries(mythui PUBLIC user32 gdi32)
 endif()
 
-if(MINGW OR win32-msvc)
-  target_sources(mythui PRIVATE mediamonitor-windows.cpp mediamonitor-windows.h)
-endif()
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   target_link_libraries(mythui PRIVATE ${APPLE_COCOA_LIBRARY}
                                        ${APPLE_IOKIT_LIBRARY})

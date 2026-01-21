@@ -19,9 +19,6 @@
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmedia.h"
 #include "libmythbase/mythrandom.h"
-#ifdef _MSC_VER
-#  include "libmythbase/compat.h"   // random
-#endif
 
 // MythUI headers
 #include "mythgesture.h"

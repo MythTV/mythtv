@@ -2077,7 +2077,6 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
 #endif
     else
     {
-#ifndef _MSC_VER
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "invalid encryption type, only NONE "
 #if CONFIG_LIBCRYPTO
@@ -2086,10 +2085,6 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
             "is supported."
 #endif
             );
-#else
-// msvc doesn't like #ifdef in the middle of the LOG macro.
-// Errors with '#':invalid character: possibly the result of a macro expansion
-#endif
         err = RET_ERROR;
     }
     return err;

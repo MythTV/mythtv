@@ -304,11 +304,6 @@ class XMLTVGrabber : public MythUIComboBoxSetting
         QString d3;
         SourceUtil::GetListingsLoginData(m_parent.getSourceID(), gname, d1, d2, d3);
 
-#ifdef _MSC_VER
-#pragma message( "tv_find_grabbers is not supported yet on windows." )
-        //-=>TODO:Screen doesn't show up if the call to MythSysemLegacy is executed
-#else
-
         QString loc = QString("XMLTVGrabber::Load(%1): ").arg(m_parent.getSourceName());
 
         QMutexLocker lock(&m_lock);
@@ -353,7 +348,6 @@ class XMLTVGrabber : public MythUIComboBoxSetting
 
         LoadXMLTVGrabbers(m_nameList, m_progList);
         MythUIComboBoxSetting::Load();
-#endif
     }
 
     void Save(void) override // StandardSetting

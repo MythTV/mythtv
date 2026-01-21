@@ -30,9 +30,7 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 
 INCLUDEPATH += .. ../../external/FFmpeg
 
-!win32-msvc* {
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
-}
 
 mingw: LIBS += -liconv
 
@@ -314,7 +312,7 @@ cygwin {
     QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
 }
 
-mingw | win32-msvc* {
+mingw {
 
     SOURCES += audio/audiooutputwin.cpp
     SOURCES += audio/audiooutputdx.cpp
@@ -392,7 +390,7 @@ DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_inp
 INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
 INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 
-win32-msvc*|freebsd {
+freebsd {
   INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
   INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 } else {
@@ -400,7 +398,7 @@ win32-msvc*|freebsd {
   QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
 }
 
-!win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
 HEADERS += DVD/mythdvdbuffer.h
 HEADERS += DVD/mythdvdcontext.h
@@ -440,7 +438,7 @@ using_frontend {
     INCLUDEPATH += ../../external/libmythbluray/src
     DEPENDPATH += ../../external/libmythbluray
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
-    !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+    POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 }
 using_system_libbluray:mingw {
     LIBS += -lbluray
@@ -518,8 +516,6 @@ using_frontend {
     # Input/output
     HEADERS += io/mythiowrapper.h
     SOURCES += io/mythiowrapper.cpp
-
-    win32-msvc*:SOURCES += ../../../platform/win32/msvc/src/posix/dirent.c
 
     # Text subtitle parser
     HEADERS += captions/textsubtitleparser.h
@@ -737,7 +733,7 @@ using_frontend {
             }
         }
 
-        !win32-msvc* {
+        {
             # Goom
             HEADERS += visualisations/goom/filters.h
             HEADERS += visualisations/goom/goomconfig.h
@@ -909,7 +905,7 @@ using_backend {
 
     # Support for Video4Linux devices
 
-    !mingw:!win32-msvc* {
+    !mingw {
         HEADERS += recorders/v4lrecorder.h
         HEADERS += recorders/vbi608extractor.h
         SOURCES += recorders/v4lrecorder.cpp
@@ -1141,7 +1137,7 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-mingw || win32-msvc* {
+mingw {
 
     #HEADERS += videoout_d3d.h
     #SOURCES += videoout_d3d.cpp
@@ -1151,13 +1147,6 @@ mingw || win32-msvc* {
 
     LIBS += -lws2_32 -lfreetype -lz
 }
-
-win32-msvc* {
-  LIBS += -lzlib
-  QMAKE_CXXFLAGS += "/FI compat.h"
-  DEFINES += HAVE_STRUCT_TIMESPEC
-}
-
 
 # Dependencies and required libraries
 # Have them at the end in order to properly resolve on mingw platform
@@ -1181,7 +1170,7 @@ using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun: LIBS += -lhdhomerun
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
-!mingw || win32-msvc* {
+!mingw {
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)

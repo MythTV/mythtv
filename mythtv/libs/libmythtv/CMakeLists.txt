@@ -330,17 +330,12 @@ if(WIN32)
     mythtv
     PRIVATE audio/audiooutputwin.cpp audio/audiooutputdx.cpp
             audio/audiooutputwin.h audio/audiooutputdx.h)
+  target_link_libraries(mythtv PRIVATE winmm ws2_32 user32 PkgConfig::SAMPLERATE
+                                     PkgConfig::SoundTouch)
 elseif(ANDROID)
   target_sources(
     mythtv PRIVATE audio/audiooutputopensles.cpp audio/audiooutputaudiotrack.cpp
                  audio/audiooutputopensles.h audio/audiooutputaudiotrack.h)
-endif()
-
-if(MINGW OR win32-msvc)
-  target_sources(mythtv PRIVATE audio/audiooutputwin.cpp
-                              audio/audiooutputdx.cpp)
-  target_link_libraries(mythtv PRIVATE winmm ws2_32 user32 PkgConfig::SAMPLERATE
-                                     PkgConfig::SoundTouch)
 endif()
 
 if(APPLE)
