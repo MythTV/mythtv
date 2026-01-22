@@ -24,7 +24,6 @@ HEADERS += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 HEADERS += soapclient.h mythxmlclient.h upnpexp.h
 HEADERS += ssdpextension.h
 HEADERS += upnpserviceimpl.h
-HEADERS += htmlserver.h
 HEADERS += upnphelpers.h websocket.h
 
 HEADERS += serializers/serializer.h     serializers/xmlSerializer.h 
@@ -41,7 +40,6 @@ SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cp
 SOURCES += soapclient.cpp mythxmlclient.cpp
 SOURCES += ssdpextension.cpp
 SOURCES += upnpserviceimpl.cpp
-SOURCES += htmlserver.cpp
 SOURCES += upnpsubscription.cpp
 SOURCES += upnphelpers.cpp websocket.cpp
 
@@ -50,11 +48,6 @@ SOURCES += serializers/jsonSerializer.cpp
 SOURCES += serializers/xmlplistSerializer.cpp
 
 SOURCES += websocket_extensions/*.cpp
-
-using_qtscript: {
-    HEADERS += serverSideScripting.h
-    SOURCES += serverSideScripting.cpp
-}
 
 INCLUDEPATH += ..
 
@@ -78,7 +71,6 @@ inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 inc.files += upnpimpl.h
 inc.files += soapclient.h mythxmlclient.h upnpsubscription.h
-inc.files += htmlserver.h serverSideScripting.h
 inc.files += upnphelpers.h
 
 inc2.path = $${PREFIX}/include/mythtv/libmythupnp/serializers
@@ -93,16 +85,6 @@ macx {
 }
 
 QT += network xml sql
-
-using_qtscript: QT += script
-
-mingw | win32-msvc* {
-
-  # script debugger currently only enabled for WIN32 builds
-
-  QT += scripttools
-
-}
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

@@ -45,7 +45,6 @@
 #include "libmythbase/mythversion.h"
 
 #include "upnputil.h"
-#include "htmlserver.h"
 
 /**
  * \brief Handle an OPTIONS request
@@ -404,9 +403,6 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
         }
     }
     m_rwlock.unlock();
-
-//     if (!bProcessed)
-//         bProcessed = m_pHtmlServer->ProcessRequest(pRequest);
 
     if (!bProcessed)
     {

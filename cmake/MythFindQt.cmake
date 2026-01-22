@@ -25,9 +25,8 @@ set(_REQUIRED_COMPONENTS
 if(NOT CMAKE_CROSSCOMPILING)
   list(APPEND _REQUIRED_COMPONENTS DBus)
   if(${QT_VERSION_MAJOR} EQUAL 5)
-    set(_OPTIONAL_COMPONENTS Script ScriptTools)
     if(ENABLE_QTWEBENGINE)
-      list(APPEND _OPTIONAL_COMPONENTS Quick WebEngine WebEngineWidgets)
+      set(_OPTIONAL_COMPONENTS Quick WebEngine WebEngineWidgets)
     endif()
   else()
     if(ENABLE_QTWEBENGINE)
@@ -95,7 +94,6 @@ endif(ANDROID)
 #
 add_build_config(${QT_PKG_NAME}::DBus "qtdbus")
 add_build_config(${QT_PKG_NAME}::GuiPrivate "qtprivateheaders")
-add_build_config(${QT_PKG_NAME}::Script "qtscript")
 add_build_config(${QT_PKG_NAME}::Quick "qtquick")
 add_build_config(${QT_PKG_NAME}::WebEngine "qtwebengine")
 add_build_config(${QT_PKG_NAME}::WebEngineWidgets "qtwebenginewidgets")
@@ -107,7 +105,6 @@ get_target_property(QMAKE_EXECUTABLE ${QT_PKG_NAME}::qmake IMPORTED_LOCATION)
 
 set_if_target_exists(CONFIG_QTDBUS ${QT_PKG_NAME}::DBus)
 set_if_target_exists(CONFIG_QTPRIVATEHEADERS ${QT_PKG_NAME}::GuiPrivate)
-set_if_target_exists(CONFIG_QTSCRIPT ${QT_PKG_NAME}::Script)
 set_if_target_exists(CONFIG_QTWEBENGINE ${QT_PKG_NAME}::WebEngineWidgets)
 
 #

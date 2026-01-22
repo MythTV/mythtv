@@ -1566,7 +1566,6 @@ MYTHTV_CONFIG_LIST='
     egl
     qtprivateheaders
     qtwebengine
-    qtscript
     qtdbus
     sqlite3
     taglib
@@ -2009,7 +2008,6 @@ enable system_libexiv2
 enable system_libbluray
 enable system_libudfread
 enable waylandextras
-enable qtscript
 enable qtwebengine
 
 # mythtv paths
@@ -5233,26 +5231,6 @@ if enabled qtwebengine ; then
     enabled qtwebengine || warn "QtWebEngine headers not found. MythBrowser won't build."
 else
     warn "QtWebEngine support is disabled on commandline. MythBrowser won't build."
-fi
-
-# Omit Qt5 modules that aren't in Qt6.
-# qtscript is enabled by default.
-# if it is disabled on the command line we will
-# not enable it here.
-if [ $qt_version -lt $(version2num "6.0.0") ]; then
-    if enabled qtscript ; then
-        if ! pkg-config --exists Qt5Script && ! pkg-config --exists QtScript ; then
-            check_ecxx ${qt_inc} <<EOF || disable qtscript
-#include <QtScript/QtScript>
-int main(void){ return 0; }
-EOF
-        fi
-    fi
-
-    enabled qtscript || warn "QtScript disabled."
-else
-    # Disable for QT6 and above
-    disable qtscript
 fi
 
 # Check if Qt was built with DBus support:

@@ -9,7 +9,6 @@
 install(
   FILES
         favicon.ico
-        frontend_index.qsp
         mythbackend.html
         mythfrontend.html
         robots.txt
