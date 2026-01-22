@@ -184,8 +184,13 @@ void ImageScanThread<DBFS>::run()
             StringMap::const_iterator i = paths.constBegin();
             while (i != paths.constEnd() && IsScanning())
             {
+                LOG(VB_FILE, LOG_INFO, QString("Synchronizing %1").arg(i.value()));
+                QElapsedTimer timer;
+                timer.start();
                 SyncSubTree(QFileInfo(i.value()), GALLERY_DB_ID, i.key(), i.value());
                 ++i;
+                LOG(VB_FILE, LOG_INFO, QString("Synchronize took %2 seconds")
+                    .arg(timer.elapsed()/1000));
             }
 
             // Release thumb generator asap
@@ -596,8 +601,16 @@ void ImageScanThread<DBFS>::CountFiles(const QStringList &paths)
     for (const auto& sgDir : std::as_const(paths))
     {
         // Ignore missing dirs
-        if (dir.cd(sgDir))
-            CountTree(dir);
+        if (!dir.cd(sgDir))
+            continue;
+        LOG(VB_FILE, LOG_INFO, QString("Counting %1").arg(dir.absolutePath()));
+        int startCount {m_progressTotalCount};
+        QElapsedTimer timer;
+        timer.start();
+        CountTree(dir);
+        LOG(VB_FILE, LOG_INFO, QString("Counted %1 files in %2 seconds")
+            .arg(m_progressTotalCount - startCount)
+            .arg(timer.elapsed()/1000));
     }
     // 0 signifies a scan start
     Broadcast(0);
