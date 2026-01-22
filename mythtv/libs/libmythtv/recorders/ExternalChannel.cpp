@@ -152,6 +152,8 @@ bool ExternalChannel::Tune(const QString &channum)
         }
 
         uint     chanid           = 0;
+        QString  name;
+        QString  callsign;
         QString  tvformat;
         QString  modulation;
         QString  freqtable;
@@ -168,7 +170,9 @@ bool ExternalChannel::Tune(const QString &channum)
         bool     commfree         = false;
 
         if (!ChannelUtil::GetChannelData(m_sourceId, chanid, channum,
-                                         tvformat, modulation, freqtable, freqid,
+                                         name, callsign,
+                                         tvformat, modulation,
+                                         freqtable, freqid,
                                          finetune, frequency, dtv_si_std,
                                          mpeg_prog_num, atsc_major, atsc_minor,
                                          dvb_transportid, dvb_networkid,
@@ -180,6 +184,8 @@ bool ExternalChannel::Tune(const QString &channum)
         }
         else
         {
+            cmd["name"] = name;
+            cmd["callsign"] = callsign;
             cmd["chanid"] = chanid;
             cmd["freqid"] = freqid;
             cmd["atsc_major"] = atsc_major;

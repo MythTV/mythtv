@@ -1917,6 +1917,7 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
 bool ChannelUtil::GetChannelData(
     uint    sourceid,
     uint    &chanid,          const QString &channum,
+    QString &name,            QString       &callsign,
     QString &tvformat,        QString       &modulation,
     QString &freqtable,       QString       &freqid,
     int     &finetune,        uint64_t      &frequency,
@@ -1945,7 +1946,7 @@ bool ChannelUtil::GetChannelData(
         "SELECT finetune, freqid, tvformat, freqtable, "
         "       commmethod, mplexid, "
         "       atsc_major_chan, atsc_minor_chan, serviceid, "
-        "       chanid,  visible "
+        "       chanid, channel.name, callsign, visible "
         "FROM channel, videosource "
         "WHERE channel.deleted      IS NULL            AND "
         "      videosource.sourceid = channel.sourceid AND "
@@ -1974,14 +1975,16 @@ bool ChannelUtil::GetChannelData(
         mpeg_prog_num = (query.value(8).isNull()) ? -1
                         : query.value(8).toInt();
         chanid        = query.value(9).toUInt();
+        name          = query.value(10).toString();
+        callsign      = query.value(11).toString();
 
-        if (query.value(10).toInt() > kChannelNotVisible)
-            found++;
+        if (query.value(12).toInt() > kChannelNotVisible)
+            ++found;
     }
 
     while (query.next())
-        if (query.value(10).toInt() > kChannelNotVisible)
-            found++;
+        if (query.value(12).toInt() > kChannelNotVisible)
+            ++found;
 
     if (found == 0 && chanid)
     {

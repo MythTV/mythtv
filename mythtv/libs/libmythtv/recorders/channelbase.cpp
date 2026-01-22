@@ -156,6 +156,8 @@ bool ChannelBase::IsTunable(const QString &channum) const
     }
 
     // Fetch tuning data from the database.
+    QString name;
+    QString callsign;
     QString tvformat;
     QString modulation;
     QString freqtable;
@@ -173,6 +175,7 @@ bool ChannelBase::IsTunable(const QString &channum) const
     bool commfree = false;
 
     if (!ChannelUtil::GetChannelData(m_sourceId, chanid, channum,
+                                     name, callsign,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,

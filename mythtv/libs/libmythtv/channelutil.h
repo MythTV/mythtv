@@ -187,10 +187,11 @@ class MTV_PUBLIC ChannelUtil
     static bool    GetChannelData(
         uint    sourceid,
         uint    &chanid,          const QString &channum,
+        QString &name,            QString       &callsign,
         QString &tvformat,        QString       &modulation,
         QString &freqtable,       QString       &freqid,
         int     &finetune,        uint64_t      &frequency,
-        QString &dtv_si_std,      int     &mpeg_prog_num,
+        QString &dtv_si_std,      int           &mpeg_prog_num,
         uint    &atsc_major,      uint          &atsc_minor,
         uint    &dvb_transportid, uint          &dvb_networkid,
         uint    &mplexid,         bool          &commfree);
@@ -249,7 +250,7 @@ class MTV_PUBLIC ChannelUtil
      * \deprecated Use LoadChannels instead
      */
     static ChannelInfoList GetChannels(
-        uint sourceid, bool visible_only, 
+        uint sourceid, bool visible_only,
         const QString &group_by = QString(), uint channel_groupid = 0)
     {
         return GetChannelsInternal(sourceid, visible_only, false,
