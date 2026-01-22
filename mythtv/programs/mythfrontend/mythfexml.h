@@ -17,7 +17,6 @@ enum MythFEXMLMethod : std::uint8_t
     MFEXML_GetServiceDescription,
     MFEXML_GetScreenShot,
     MFEXML_ActionListTest,
-    MFEXML_GetRemote,
 };
 
 class MythFEXML : public Eventing
@@ -46,7 +45,6 @@ class MythFEXML : public Eventing
 
     static void GetScreenShot    ( HTTPRequest *pRequest );
     static void GetActionListTest( HTTPRequest *pRequest );
-    static void GetRemote        ( HTTPRequest *pRequest );
 
   public:
     MythFEXML( UPnpDevice *pDevice ,  const QString &sSharePath);

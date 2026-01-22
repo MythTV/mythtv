@@ -6,15 +6,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 // Qt
-#include <QBuffer>
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
-#include <QKeyEvent>
 #include <QTextStream>
 
 // MythTV
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
@@ -23,7 +17,6 @@
 #include "libmythui/mythmainwindow.h"
 
 // MythFrontend
-#include "keybindings.h"
 #include "mythfexml.h"
 #include "services/frontend.h"
 
@@ -54,7 +47,6 @@ MythFEXMLMethod MythFEXML::GetMethod(const QString &sURI)
     if (sURI == "GetServDesc")   return MFEXML_GetServiceDescription;
     if (sURI == "GetScreenShot") return MFEXML_GetScreenShot;
     if (sURI == "GetActionTest") return MFEXML_ActionListTest;
-    if (sURI == "GetRemote")     return MFEXML_GetRemote;
 
     return( MFEXML_Unknown );
 }
@@ -93,9 +85,6 @@ bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
             break;
         case MFEXML_ActionListTest:
             GetActionListTest(pRequest);
-            break;
-        case MFEXML_GetRemote:
-            pRequest->FormatFileResponse(m_sSharePath + "html/frontend_index.qsp");
             break;
         default:
             UPnp::FormatErrorResponse(pRequest, UPnPResult_InvalidAction);
@@ -196,63 +185,4 @@ void MythFEXML::GetActionListTest(HTTPRequest *pRequest)
         "  </body>\n"
         "</html>\n";
 
-}
-
-static inline QString BUTTON(const char *action, const char *desc)
-{
-    return QString("      <input class=\"bigb\" type=\"button\" value=\"%1\" onClick=\"postaction('%2');\"></input>\r\n").arg(action, desc);
-};
-
-void MythFEXML::GetRemote(HTTPRequest *pRequest)
-{
-    pRequest->m_eResponseType = ResponseTypeHTML;
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
-
-    QTextStream stream( &pRequest->m_response );
-
-    stream <<
-        "<html>\n" << PROCESS_ACTION <<
-        "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
-        "  <!--\r\n"
-        "  body {\r\n"
-        "    margin: 0px;\r\n"
-        "    width : 310px;\r\n"
-        "  }\r\n"
-        "  -->\r\n"
-        "  .bigb {\r\n"
-        "    width : 100px;\r\n"
-        "    height: 50px;\r\n"
-        "    margin: 0px;\r\n"
-        "    text-align: center;\r\n"
-        "  }\r\n"
-        "  </style>\r\n"
-        "  <title>MythFrontend Control</title>\r\n" <<
-        "  <body>\n" << HIDDEN_IFRAME;
-
-    stream <<
-        "    <div>\r\n" <<
-        BUTTON("1","1") << BUTTON("2","2") << BUTTON("3","3") <<
-        "    </div>\r\n" <<
-        "    <div>\r\n" <<
-        BUTTON("4","4") << BUTTON("5","5") << BUTTON("6","6") <<
-        "    </div>\r\n" <<
-        "    <div>\r\n" <<
-        BUTTON("7","7") << BUTTON("8","8") << BUTTON("9","9") <<
-        "    </div>\r\n" <<
-        "    <div>\r\n" <<
-        BUTTON("MENU","MENU") << BUTTON("0","0") << BUTTON("INFO","INFO") <<
-        "    </div>\r\n" <<
-        "    <div>\r\n" <<
-        BUTTON("Back","ESCAPE") << BUTTON("^","UP") << BUTTON("MUTE","MUTE") <<
-        "    </div>\r\n" <<
-        "    <div>\r\n" <<
-        BUTTON("<","LEFT") << BUTTON("Enter","SELECT") << BUTTON(">","RIGHT") <<
-        "    </div>\r\n" <<
-        "    <div>\r\n" <<
-        BUTTON("<<","JUMPRWND") << BUTTON("v","DOWN") << BUTTON(">>","JUMPFFWD") <<
-        "    </div>\r\n";
-
-    stream <<
-        "  </body>\n"
-        "</html>\n";
 }

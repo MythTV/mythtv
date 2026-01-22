@@ -10,11 +10,9 @@
 
 set(HEADERS_TO_INSTALL1
     eventing.h
-    htmlserver.h
     httprequest.h
     httpserver.h
     mythxmlclient.h
-    serverSideScripting.h
     soapclient.h
     ssdp.h
     ssdpcache.h
@@ -45,8 +43,6 @@ add_library(
   blockingtcpsocket.h
   eventing.cpp
   eventing.h
-  htmlserver.cpp
-  htmlserver.h
   httprequest.cpp
   httprequest.h
   httpserver.cpp
@@ -126,12 +122,6 @@ target_link_libraries(
 #
 # conditionally included code
 #
-if(TARGET Qt${QT_VERSION_MAJOR}::Script)
-  target_link_libraries(mythupnp PUBLIC Qt${QT_VERSION_MAJOR}::Script
-                                        Qt${QT_VERSION_MAJOR}::ScriptTools)
-  target_sources(mythupnp PRIVATE serverSideScripting.cpp serverSideScripting.h)
-endif()
-
 if(APPLE)
   # set(QMAKE_LFLAGS_SHLIB -flat_namespace)
 endif()

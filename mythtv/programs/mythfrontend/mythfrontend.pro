@@ -3,11 +3,6 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network xml sql widgets
-using_qtscript: QT += script
-mingw | win32-msvc* {
-   # script debugger currently only enabled for WIN32 builds
-   QT += scripttools
-}
 using_qtwebengine {
     equals(QT_MAJOR_VERSION, 6) {
         QT += webenginequick
