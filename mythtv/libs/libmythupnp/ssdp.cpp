@@ -96,6 +96,7 @@ SSDP::~SSDP()
         m_pNotifyTask->DecrRef();
         m_pNotifyTask = nullptr;
     }
+    m_receiver.setIsRunning(false);
     m_thread.quit();
     m_thread.wait();
 
@@ -403,7 +404,7 @@ SSDPReceiver::SSDPReceiver() :
 
 void SSDPReceiver::processPendingDatagrams()
 {
-    while (m_socket.hasPendingDatagrams())
+    while (m_socket.hasPendingDatagrams() && m_isRunning)
     {
         QNetworkDatagram datagram = m_socket.receiveDatagram();
         QString     str          = QString::fromUtf8(datagram.data());
