@@ -522,7 +522,7 @@ void UPNPScanner::Update(void)
             (server->m_controlURL.isEmpty()))
         {
             bool sent = false;
-            QUrl url { server->m_url };
+            QUrl url { server->m_serverURL };
             if (!m_descriptionRequests.contains(url) &&
                 (m_descriptionRequests.empty()) &&
                 url.isValid())

@@ -50,9 +50,11 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
 {
     m_nSupportedMethods = (uint)RequestTypeNotify; // Only NOTIFY supported
 
-    QHostAddress addr;
-    if (!UPnp::g_IPAddrList.isEmpty())
-        addr = UPnp::g_IPAddrList.at(0);
+    auto it = std::find_if(UPnp::g_IPAddrList.cbegin(), UPnp::g_IPAddrList.cend(),
+                           [](const QHostAddress& tmp) {return !tmp.isLoopback(); });
+    if (it == UPnp::g_IPAddrList.cend())
+        return;
+    const QHostAddress& addr = *it;
 
     QString host;
     if (addr.protocol() == QAbstractSocket::IPv6Protocol)
