@@ -44,6 +44,7 @@ class SSDPReceiver : public QObject
     SSDPReceiver();
 
     void performSearch(const QString &sST, std::chrono::seconds timeout = 2s);
+    void setIsRunning(bool isRunning) { m_isRunning = isRunning; }
 
   private slots:
     void processPendingDatagrams();
@@ -52,6 +53,7 @@ class SSDPReceiver : public QObject
     QUdpSocket          m_socket        {this};
     const uint16_t      m_port          {SSDP_PORT};
     const QHostAddress  m_groupAddress  {SSDP_GROUP};
+    bool                m_isRunning     {true};
 };
 
 class UPNP_PUBLIC SSDP
