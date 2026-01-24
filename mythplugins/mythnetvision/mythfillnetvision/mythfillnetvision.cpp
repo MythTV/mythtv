@@ -9,7 +9,6 @@
 #include <QEventLoop>
 
 // MythTV headers
-#include <mythconfig.h>
 #include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythcommandlineparser.h>

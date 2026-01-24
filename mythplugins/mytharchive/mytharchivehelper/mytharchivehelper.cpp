@@ -41,7 +41,7 @@
 #include <QTextStream>
 
 // MythTV headers
-#include <mythconfig.h>
+#include <libmythbase/mythconfig.h> // IMAGE_ALIGN
 #include <libmythtv/mythavframe.h>
 #include <libmyth/mythcontext.h>
 #include <libmythbase/exitcodes.h>

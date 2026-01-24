@@ -330,11 +330,9 @@ add_custom_target(
 
 install(TARGETS mythbase LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mythconfig.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv)
-
 install(FILES ${LIBMYTHBASE_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/version.h
               ${CMAKE_CURRENT_BINARY_DIR}/mythversion.h
+              ${CMAKE_CURRENT_BINARY_DIR}/mythconfig.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mythtv/libmythbase)
 
 if(ANDROID)
