@@ -1,11 +1,7 @@
 #ifndef PLAYGROUP_H
 #define PLAYGROUP_H
 
-#if __has_include("libmythbase/mythconfig.h")
 #include "libmythbase/mythconfig.h"
-#else
-#include "mythconfig.h"
-#endif
 
 #include <QStringList>
 

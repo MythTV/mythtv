@@ -1,9 +1,6 @@
 #pthreads directory has config.h, need path to be after library paths
 win32-msvc*:INCLUDEPATH -= $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
 
-# Find MythTV's config.h instead of FFmpeg's config.h
-INCLUDEPATH += ../..
-# Find everything else
 INCLUDEPATH += ../../libs/
 INCLUDEPATH += ../../external/FFmpeg
 

@@ -1,5 +1,9 @@
 /* Include config options from main configure script.         */
-#include "../../config.h"
+#ifdef USING_CMAKE
+#include "config.h"
+#else
+#include "../libmythbase/mythconfig.h"
+#endif
 
 /* Enable CPU-specific optimizations.                         */
 #define ACCEL_DETECT

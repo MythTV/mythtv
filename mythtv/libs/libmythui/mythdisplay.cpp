@@ -12,7 +12,7 @@
 #include <QElapsedTimer>
 #include <QWindow>
 
-#include "config.h"
+#include "libmythbase/mythconfig.h"
 
 #if CONFIG_QTWEBENGINE
 #include <QQuickWindow>

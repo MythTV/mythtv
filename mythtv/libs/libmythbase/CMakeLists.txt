@@ -248,7 +248,7 @@ target_include_directories(
          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/libs>
          # Generated includes with dir name
          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/libs>
-         # For mythconfig.h
+         # For mythconfig.h and mythversion.h
          $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mythtv>)
 
@@ -311,8 +311,6 @@ endif()
 #
 configure_file(mythversion.h.in mythversion.h @ONLY)
 configure_file(mythconfig.h.in mythconfig.h @ONLY)
-file(CREATE_LINK ${CMAKE_CURRENT_BINARY_DIR}/mythconfig.h
-     ${PROJECT_BINARY_DIR}/config.h SYMBOLIC)
 
 #
 # Regenerate version.h every compile

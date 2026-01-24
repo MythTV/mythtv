@@ -2080,8 +2080,8 @@ else
     case "$source_path" in
         *[[:blank:]]*) die "Out of tree builds are impossible with whitespace in source path." ;;
     esac
-    test -e "$source_path/config.h" &&
-        die "Out of tree builds are impossible with config.h in source dir."
+    test -e "$source_path/libs/libmythbase/mythconfig.h" &&
+        die "Out of tree builds are impossible with mythconfig.h in source dir."
 fi
 
 for v in "$@"; do
@@ -6401,14 +6401,6 @@ echo "QMAKE_LFLAGS+=\"$LDFLAGS\"" >> $TMPMAK
 
 cp_if_changed $TMPH $MYTH_CONFIG_H
 
-if ! test -L config.h ; then
-  ${ln_s} $MYTH_CONFIG_H config.h
-fi
-
-if [ ! -e config.h ] ; then
-  ${ln_s} $MYTH_CONFIG_H config.h
-fi
-
 cat $TMPMAK | sed -e 's/^!/#/' > $TMPPRO
 
 cp_if_changed $TMPPRO $MYTH_CONFIG_MAK
@@ -6419,14 +6411,6 @@ fi
 
 if [ ! -e config.mak ] ; then
   ${ln_s} $MYTH_CONFIG_MAK config.mak
-fi
-
-# delete old myth config files in old location
-if [ -e libs/libmyth/mythconfig.mak ] ; then
-    rm -f libs/libmyth/mythconfig.mak
-fi
-if [ -e libs/libmyth/mythconfig.h ] ; then
-    rm -f libs/libmyth/mythconfig.h
 fi
 
 #

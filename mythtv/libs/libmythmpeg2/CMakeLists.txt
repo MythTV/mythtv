@@ -48,6 +48,7 @@ target_include_directories(
   mythmpeg2
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR} # For config.h
   INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mythtv>)
+target_compile_definitions(mythmpeg2 PRIVATE USING_CMAKE)
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
   target_link_libraries(mythmpeg2 PUBLIC Threads::Threads)

@@ -1,11 +1,7 @@
 #ifndef MUSICMETADATA_H_
 #define MUSICMETADATA_H_
 
-#if __has_include("libmythbase/mythconfig.h")
 #include "libmythbase/mythconfig.h"
-#else
-#include "mythconfig.h"
-#endif
 
 // C/C++
 #include <array>
