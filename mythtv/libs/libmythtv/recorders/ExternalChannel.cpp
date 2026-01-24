@@ -148,6 +148,13 @@ bool ExternalChannel::Tune(const QString &channum)
             {
                 uint recordid = prog->GetRecordingRuleID();
                 cmd["recordid"] = recordid;
+                cmd["title"] = prog->GetTitle();
+                cmd["subtitle"] = prog->GetSubtitle();
+                cmd["description"] = prog->GetDescription();
+                cmd["duration"] = prog->GetRecordingStartTime()
+                                  .secsTo(prog->GetRecordingEndTime());
+                cmd["programid"] = prog->GetProgramID();
+                cmd["seriesid"] = prog->GetSeriesID();
             }
         }
 
