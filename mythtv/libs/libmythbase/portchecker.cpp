@@ -81,7 +81,6 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
 #endif
     MythTimer timer(MythTimer::kStartRunning);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    QString scope;
     while (state != QAbstractSocket::ConnectedState
            && (timer.elapsed() < timeLimit)
            && !m_cancelCheck
