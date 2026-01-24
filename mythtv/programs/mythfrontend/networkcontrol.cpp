@@ -15,7 +15,7 @@
 #include <QStringList>
 #include <QTextStream>
 
-#include "config.h"
+#include "libmythbase/mythconfig.h"
 
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"

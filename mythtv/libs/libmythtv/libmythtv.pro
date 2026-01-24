@@ -28,8 +28,7 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 }
 
 
-INCLUDEPATH += .. ../.. # for avlib headers
-INCLUDEPATH += ../.. ../../external/FFmpeg
+INCLUDEPATH += .. ../../external/FFmpeg
 
 !win32-msvc* {
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}

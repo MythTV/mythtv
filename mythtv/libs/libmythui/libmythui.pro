@@ -11,7 +11,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH += ../.. ../
+INCLUDEPATH += ..
 
 LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 

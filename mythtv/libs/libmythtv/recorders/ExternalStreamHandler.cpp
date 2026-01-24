@@ -27,7 +27,7 @@
 #include <QJsonObject>
 
 // MythTV headers
-#include "config.h"
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythrandom.h"

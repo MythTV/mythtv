@@ -64,7 +64,6 @@ target_compile_definitions(mythfreemheg PRIVATE MHEG_API)
 
 target_include_directories(
   mythfreemheg
-  PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> # For config.h
   PUBLIC # For including without directory name
          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
          # For including with directory name

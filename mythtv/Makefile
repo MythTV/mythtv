@@ -81,9 +81,8 @@ clean: $(addsuffix _clean,$(SUBDIRS))
 
 distclean: $(addsuffix _distclean,$(SUBDIRS))
 	-rm -f libs/libmythbase/mythconfig.mak config.mak
-	-rm -f libs/libmythbase/mythconfig.h   config.h
+	-rm -f libs/libmythbase/mythconfig.h
 	-rm -f libs/libmythbase/version.h
-	-rm -f libs/libavutil/avconfig.h
 	-rm -f external/FFmpeg/libavutil/avconfig.h
 	-rm -f config.ep .qmake.stash
 	-rm -f $(addsuffix /Makefile,$(QT_SUBDIRS))
