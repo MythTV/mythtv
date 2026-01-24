@@ -39,10 +39,10 @@ export class ErrorInterceptor implements HttpInterceptor {
           sessionStorage.setItem('APIAuthReqd','true');
           location.reload();
         }
+        const error = err.error?.message || err.statusText;
+        console.error(err);
       }
-      const error = err.error?.message || err.statusText;
-      console.error(err);
-      return throwError(() => error);
+      return throwError(() => err);
     }))
   }
 
