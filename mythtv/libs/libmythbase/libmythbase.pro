@@ -184,6 +184,7 @@ inc.files += mythpluginexport.h
 inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
 inc.files += threadedfilewriter.h mythsingledownload.h mythsession.h
 inc.files += mythsorthelper.h mythdbcheck.h
+inc.files += mythconfig.h
 inc.files += mythrandom.h
 inc.files += netgrabbermanager.h
 inc.files += netutils.h
@@ -194,7 +195,7 @@ inc.files += unziputil.h
 inc.files += sizetliteral.h
 
 inc2.path = $${PREFIX}/include/mythtv
-inc2.files += mythconfig.h mythconfig.mak
+inc2.files += mythconfig.mak
 
 INSTALLS += inc inc2
 

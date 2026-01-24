@@ -30,7 +30,6 @@
 #include <QTimer>
 
 // MythTV headers
-#include <mythconfig.h>
 #include <libmythtv/audio/audiooutput.h>
 #include <libmythtv/audio/audiooutputsettings.h>
 #include <libmythbase/mythlogging.h>

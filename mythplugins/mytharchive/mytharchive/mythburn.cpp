@@ -11,7 +11,7 @@
 #include <QTextStream>
 
 // myth
-#include <mythconfig.h>
+#include <libmythbase/mythconfig.h> // PYTHON_EXE
 #include <libmythbase/exitcodes.h>
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>

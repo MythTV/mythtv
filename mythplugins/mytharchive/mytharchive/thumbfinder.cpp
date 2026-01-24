@@ -40,7 +40,7 @@
 #include <QPainter>
 
 // myth
-#include <mythconfig.h>
+#include <libmythbase/mythconfig.h> // IMAGE_ALIGN
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdbcon.h>
 #include <libmythbase/mythdirs.h>
