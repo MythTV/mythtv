@@ -13,7 +13,6 @@
 #include <QStandardPaths>
 
 #include "configuration.h"
-#include "mythconfig.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
 #include "mythdirs.h"

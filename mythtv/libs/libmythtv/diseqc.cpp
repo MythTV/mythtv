@@ -16,6 +16,7 @@
 #include <QString>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythchrono.h"
 #include "libmythbase/mythcorecontext.h"

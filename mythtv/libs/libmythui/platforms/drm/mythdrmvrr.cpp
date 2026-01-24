@@ -1,5 +1,7 @@
 // MythTV
 #include "mythdrmvrr.h"
+
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #define LOC QString("FreeSync: ")

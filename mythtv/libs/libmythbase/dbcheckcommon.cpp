@@ -1,12 +1,6 @@
 /*
  * Common functions used by all the *dbcheck.cpp files.
  */
-
-#include "mythconfig.h"
-
-#include <cstdio>
-#include <iostream>
-
 #include <QString>
 #include <QSqlError>
 #include "mythdb.h"

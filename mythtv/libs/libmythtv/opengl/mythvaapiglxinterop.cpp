@@ -1,5 +1,7 @@
 #include "opengl/mythvaapiglxinterop.h"
 
+#include "libmythbase/mythconfig.h"
+
 #define Cursor XCursor // Prevent conflicts with Qt6.
 #define pointer Xpointer // Prevent conflicts with Qt6.
 #if defined(_X11_XLIB_H_) && !defined(Bool)

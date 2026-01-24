@@ -13,7 +13,6 @@
  * $Id$
  *****************************************************************************/
 
-#include "libmythbase/mythconfig.h"
 #include <string>
 
 #ifdef __cplusplus

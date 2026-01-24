@@ -34,6 +34,7 @@
 #include <vector>
 
 // MythTV includes
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 

@@ -20,6 +20,7 @@
 #include <QJsonObject>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"

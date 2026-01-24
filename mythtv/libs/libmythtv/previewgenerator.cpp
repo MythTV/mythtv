@@ -21,7 +21,6 @@
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"

@@ -14,6 +14,8 @@
 #include <QMetaEnum>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
+
 #include "mythtvexp.h"
 #include "dtvconfparserhelpers.h"
 

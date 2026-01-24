@@ -23,7 +23,6 @@
 #include <QSize>                        // for QSize
 
 // MythTV headers
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythfreemheg/freemheg.h"
 

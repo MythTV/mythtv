@@ -20,8 +20,6 @@
 
 #include <linux/videodev2.h>
 
-#include "libmythbase/mythconfig.h"
-
 // MythTV headers
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"

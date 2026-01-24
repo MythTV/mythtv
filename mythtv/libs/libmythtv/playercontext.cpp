@@ -3,7 +3,6 @@
 
 #include <QPainter>
 
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/storagegroup.h"

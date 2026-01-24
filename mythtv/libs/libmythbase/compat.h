@@ -10,8 +10,6 @@
 #include <QtSystemDetection>
 #endif
 
-#include "mythconfig.h"
-
 #ifdef Q_OS_ANDROID
 #   ifndef S_IREAD
 #       define S_IREAD S_IRUSR

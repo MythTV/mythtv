@@ -5,6 +5,7 @@
 #include <QPen>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/opengl/mythrenderopengl.h"

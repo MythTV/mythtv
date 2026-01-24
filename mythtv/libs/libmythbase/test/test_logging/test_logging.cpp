@@ -28,6 +28,7 @@
 #endif
 #include <QTest>
 
+#include "mythconfig.h"
 #include "mythsyslog.h"
 #include "exitcodes.h"
 #include "logging.h"

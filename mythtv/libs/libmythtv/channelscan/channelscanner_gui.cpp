@@ -39,6 +39,7 @@
 #endif
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythui/mythdialogbox.h"
 
 #include "channelscanner_gui.h"

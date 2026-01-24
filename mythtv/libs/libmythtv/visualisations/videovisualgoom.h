@@ -1,6 +1,8 @@
 #ifndef VIDEOVISUALGOOM_H
 #define VIDEOVISUALGOOM_H
 
+#include "libmythbase/mythconfig.h"
+
 #include "videovisual.h"
 
 class MythGLTexture;

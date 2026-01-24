@@ -2,6 +2,7 @@
 #include <QSize>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythtv/mythavutil.h"
 #include "libmythtv/mythframe.h"          /* VideoFrame */

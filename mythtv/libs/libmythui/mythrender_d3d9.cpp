@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QMutex>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "mythrender_d3d9.h"
 

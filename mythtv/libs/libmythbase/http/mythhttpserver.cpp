@@ -11,6 +11,7 @@
 #include <QSslCertificate>
 
 // MythTV
+#include "mythconfig.h"
 #include "mythversion.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"

@@ -4,6 +4,7 @@
 #include <QVariant>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/hardwareprofile.h"
 #include "libmythbase/mythdbcon.h"

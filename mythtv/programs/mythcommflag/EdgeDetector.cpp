@@ -2,8 +2,6 @@
 #include <algorithm>
 #include <cstdlib>
 
-#include "libmythbase/mythconfig.h"
-
 // avlib/ffmpeg headers
 extern "C" {
 #include "libavcodec/avcodec.h"        // AVFrame

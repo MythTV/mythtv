@@ -24,7 +24,6 @@ extern "C" {
 
 // MythTV headers
 #include "libmythbase/compat.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 

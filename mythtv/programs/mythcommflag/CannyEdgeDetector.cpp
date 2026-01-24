@@ -2,6 +2,7 @@
 #include <cmath>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/sizetliteral.h"
 #include "libmythtv/mythframe.h"          // VideoFrame

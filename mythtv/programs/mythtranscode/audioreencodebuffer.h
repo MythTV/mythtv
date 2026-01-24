@@ -2,7 +2,6 @@
 #define AUDIOREENCODEBUFFER_H
 
 #include "libmythtv/audio/audiooutput.h"
-#include "libmythbase/mythconfig.h"
 
 static constexpr size_t ABLOCK_SIZE { 8192 };
 

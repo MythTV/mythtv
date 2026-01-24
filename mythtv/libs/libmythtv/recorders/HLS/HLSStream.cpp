@@ -6,6 +6,8 @@
 #include <cstring>
 #include <utility>
 
+#include "libmythbase/mythconfig.h"
+
 #if CONFIG_LIBCRYPTO
 #include <openssl/aes.h>
 #include <openssl/evp.h>

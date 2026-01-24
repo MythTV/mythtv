@@ -2,6 +2,7 @@
 #include "recordingprofile.h"
 
 #include "cardutil.h"
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythlogging.h"

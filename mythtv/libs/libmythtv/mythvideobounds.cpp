@@ -27,7 +27,6 @@
 #include <QApplication>
 
 // MythtTV
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"

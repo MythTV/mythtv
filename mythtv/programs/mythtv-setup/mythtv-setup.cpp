@@ -19,7 +19,6 @@
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythappname.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythdirs.h"

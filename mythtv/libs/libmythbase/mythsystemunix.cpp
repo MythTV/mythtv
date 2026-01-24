@@ -27,6 +27,7 @@
 #include <QStringList>
 
 // libmythbase headers
+#include "mythconfig.h"
 #include "mythevent.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
