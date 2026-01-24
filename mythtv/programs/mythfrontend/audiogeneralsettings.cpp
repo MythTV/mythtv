@@ -1316,4 +1316,5 @@ void AudioConfigSettings::setMPCMEnabled(bool flag)
 {
     m_mpcm->setEnabled(flag);
 }
-// vim:set sw=4 ts=4 expandtab:
+
+#include "moc_audiogeneralsettings.cpp"

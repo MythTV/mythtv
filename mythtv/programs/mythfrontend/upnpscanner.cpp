@@ -1445,3 +1445,5 @@ void UPNPScanner::ParseService(QDomElement &element, QString &controlURL,
         eventURL   = event_url;
     }
 }
+
+#include "moc_upnpscanner.cpp"

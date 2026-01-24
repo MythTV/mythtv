@@ -1635,3 +1635,5 @@ void RipStatus::startRip(void)
     m_ripperThread = new CDRipperThread(this, m_cdDevice, m_tracks, m_quality);
     m_ripperThread->start();
 }
+
+#include "moc_cdrip.cpp"

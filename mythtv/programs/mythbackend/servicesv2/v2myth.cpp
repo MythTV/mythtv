@@ -1401,3 +1401,5 @@ QString  V2Myth::Proxy ( const QString &urlString)
 
     return {};
 }
+
+#include "moc_v2myth.cpp"

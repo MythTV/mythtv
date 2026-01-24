@@ -137,3 +137,5 @@ void MythSingleDownload::Progress(qint64 bytesRead, qint64 /*totalBytes*/)
         Cancel();
     }
 }
+
+#include "moc_mythsingledownload.cpp"
