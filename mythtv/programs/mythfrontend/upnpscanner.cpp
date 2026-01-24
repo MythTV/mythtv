@@ -114,7 +114,7 @@ class UpnpMediaServer : public MediaServerItem
     QUrl    m_serverURL;
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
-    QString m_eventSubPath;
+    QUrl    m_eventSubPath;
     QString m_friendlyName;
     uint8_t m_connectionAttempts {0};
     bool    m_subscribed         {false};
@@ -1237,6 +1237,14 @@ QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
     return result;
 }
 
+static QUrl urlAddBaseAndPath (QUrl base, const QUrl& relative)
+{
+    base.setFragment("");
+    base.setQuery("");
+    base.setPath(relative.path());
+    return base;
+}
+
 /**
  * \fn UPNPScanner::ParseDescription(const QUrl&, QNetworkReply*)
  *  Parse the device description XML return my a media server.
@@ -1256,10 +1264,10 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     }
 
     // parse the device description
-    QString controlURL = QString();
-    QString eventURL   = QString();
+    QUrl    URLBase;
+    QUrl    controlURL;
+    QUrl    eventURL;
     QString friendlyName = QString("Unknown");
-    QString URLBase = QString();
 
     QDomDocument doc;
 #if QT_VERSION < QT_VERSION_CHECK(6,5,0)
@@ -1299,12 +1307,12 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
             if(e1.tagName() == "device")
                 ParseDevice(e1, controlURL, eventURL, friendlyName);
             if (e1.tagName() == "URLBase")
-                URLBase = e1.text();
+                URLBase = QUrl(e1.text());
         }
         n = n.nextSibling();
     }
 
-    if (controlURL.isEmpty())
+    if (!controlURL.isValid())
     {
         LOG(VB_UPNP, LOG_ERR, LOC +
             QString("Failed to parse device description for %1")
@@ -1313,34 +1321,27 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     }
 
     // if no URLBase was provided, use the known url
-    if (URLBase.isEmpty())
-        URLBase = url.toString(QUrl::RemovePath | QUrl::RemoveFragment |
-                               QUrl::RemoveQuery);
+    if (!URLBase.isValid())
+    {
+        URLBase = url;
+        URLBase.setPath("");
+        URLBase.setFragment("");
+        URLBase.setQuery("");
+    }
 
-    // strip leading slashes off the controlURL
-    while (!controlURL.isEmpty() && controlURL.startsWith("/"))
-        controlURL = controlURL.mid(1);
-
-    // strip leading slashes off the eventURL
-    //while (!eventURL.isEmpty() && eventURL.startsWith("/"))
-    //    eventURL = eventURL.mid(1);
-
-    // strip trailing slashes off URLBase
-    while (!URLBase.isEmpty() && URLBase.endsWith("/"))
-        URLBase = URLBase.mid(0, URLBase.size() - 1);
-
-    controlURL = URLBase + "/" + controlURL;
-    QString fulleventURL = URLBase + "/" + eventURL;
+    if (controlURL.isRelative())
+        controlURL = urlAddBaseAndPath(URLBase, controlURL);
+    if (eventURL.isRelative())
+        eventURL = urlAddBaseAndPath(URLBase, eventURL);
 
     LOG(VB_UPNP, LOG_INFO, LOC + QString("Control URL for %1 at %2")
-            .arg(friendlyName, controlURL));
+            .arg(friendlyName, controlURL.toString()));
     LOG(VB_UPNP, LOG_INFO, LOC + QString("Event URL for %1 at %2")
-            .arg(friendlyName, fulleventURL));
+            .arg(friendlyName, eventURL.toString()));
 
     // update the server details. If the server has gone away since the request
     // was posted, this will silently fail and we won't try again
     QString usn;
-    QUrl qeventurl = QUrl(fulleventURL);
     std::chrono::seconds timeout = 0s;
 
     m_lock.lock();
@@ -1351,9 +1352,8 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
         if (it.value()->m_serverURL == url)
         {
             usn = it.key();
-            QUrl qcontrolurl(controlURL);
-            it.value()->m_controlURL   = qcontrolurl;
-            it.value()->m_eventSubURL  = qeventurl;
+            it.value()->m_controlURL   = controlURL;
+            it.value()->m_eventSubURL  = eventURL;
             it.value()->m_eventSubPath = eventURL;
             it.value()->m_friendlyName = friendlyName;
             it.value()->m_name         = friendlyName;
@@ -1363,7 +1363,7 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
 
     if (m_subscription && !usn.isEmpty())
     {
-        timeout = m_subscription->Subscribe(usn, qeventurl, eventURL);
+        timeout = m_subscription->Subscribe(usn, eventURL, eventURL.toString());
         m_servers[usn]->m_subscribed = (timeout > 0s);
     }
     m_lock.unlock();
@@ -1383,8 +1383,8 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
 }
 
 
-void UPNPScanner::ParseDevice(QDomElement &element, QString &controlURL,
-                              QString &eventURL, QString &friendlyName)
+void UPNPScanner::ParseDevice(QDomElement &element, QUrl &controlURL,
+                              QUrl &eventURL, QString &friendlyName)
 {
     QDomNode dev = element.firstChild();
     while (!dev.isNull())
@@ -1401,8 +1401,8 @@ void UPNPScanner::ParseDevice(QDomElement &element, QString &controlURL,
     }
 }
 
-void UPNPScanner::ParseServiceList(QDomElement &element, QString &controlURL,
-                                   QString &eventURL)
+void UPNPScanner::ParseServiceList(QDomElement &element, QUrl &controlURL,
+                                   QUrl &eventURL)
 {
     QDomNode list = element.firstChild();
     while (!list.isNull())
@@ -1415,12 +1415,12 @@ void UPNPScanner::ParseServiceList(QDomElement &element, QString &controlURL,
     }
 }
 
-void UPNPScanner::ParseService(QDomElement &element, QString &controlURL,
-                               QString &eventURL)
+void UPNPScanner::ParseService(QDomElement &element, QUrl &controlURL,
+                               QUrl &eventURL)
 {
     bool     iscds       = false;
-    QString  control_url = QString();
-    QString  event_url   = QString();
+    QUrl     control_url;
+    QUrl     event_url;
     QDomNode service     = element.firstChild();
 
     while (!service.isNull())
@@ -1432,9 +1432,9 @@ void UPNPScanner::ParseService(QDomElement &element, QString &controlURL,
                 // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
                 iscds = (e.text() == "urn:schemas-upnp-org:service:ContentDirectory:1");
             if (e.tagName() == "controlURL")
-                control_url = e.text();
+                control_url = QUrl(e.text());
             if (e.tagName() == "eventSubURL")
-                event_url = e.text();
+                event_url = QUrl(e.text());
         }
         service = service.nextSibling();
     }
