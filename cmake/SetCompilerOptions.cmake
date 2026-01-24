@@ -68,6 +68,7 @@ list(
   -Werror=format-security
   -Werror=implicit-function-declaration
   -Werror=return-type
+  -Werror=undef
   -Werror=vla
   -Wjump-misses-init
   -Wlogical-op
@@ -96,6 +97,7 @@ list(
   -Werror=format-security
   -Werror=implicit-function-declaration
   -Werror=return-type
+  -Werror=undef
   -Werror=vla
   -Wimplicit-fallthrough
   -Wjump-misses-init
@@ -106,7 +108,6 @@ list(
   -Wpointer-arith
   -Wredundant-decls
   -Wsuggest-override
-  -Wundef
   # -Wall flags to disable
   -Wno-unknown-pragmas # gcc doesn't recognize clang pragmas
 )

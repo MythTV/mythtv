@@ -4895,7 +4895,7 @@ fi
 check_cflags -Wpointer-arith
 disabled icc && check_cflags -Wredundant-decls
 check_cflags -Wwrite-strings
-check_cflags -Wundef
+check_cflags -Werror=undef
 #-Wmissing-prototypes breaks zeromq compilation in universal mode
 if [ "$target_os" != "darwin" ]; then
     check_cflags -Wmissing-prototypes
@@ -4938,7 +4938,7 @@ check_disable_warning_headers -Wno-unused-variable
 check_cxxflags -Wall
 check_cxxflags -Wextra
 check_cxxflags -Wpointer-arith
-check_cxxflags -Wundef
+check_cxxflags -Werror=undef
 check_cxxflags -Wno-unknown-pragmas
 if disabled deprecation_warnings; then
     check_cxxflags -Wno-deprecated-declarations

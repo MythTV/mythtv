@@ -73,9 +73,7 @@ struct read_cache_s {
   dvdnav_t           *dvd_self;
 };
 
-/*
 #define READ_CACHE_TRACE 0
-*/
 
 #ifdef __GNUC__
 # if READ_CACHE_TRACE
