@@ -3,6 +3,8 @@
 // C/C++
 #include <utility>
 
+#include "libmythbase/mythconfig.h"
+
 #if CONFIG_LIBCRYPTO
 #include <openssl/aes.h>
 #endif // CONFIG_LIBCRYPTO

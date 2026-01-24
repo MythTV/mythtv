@@ -1,8 +1,6 @@
 #include <sys/time.h>
 #include <algorithm>
 
-#include "libmythbase/mythconfig.h"
-
 extern "C" {
 #include "libavcodec/avcodec.h"        /* AVFrame */
 }

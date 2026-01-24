@@ -5,7 +5,6 @@
 #include <QList>
 
 // MythTV
-#include "libmythbase/mythconfig.h"
 #include "libmythtv/io/mythavformatbuffer.h"
 #include "libmythtv/io/mythmediawriter.h"
 #include "libmythtv/mythavutil.h"

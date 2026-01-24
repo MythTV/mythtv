@@ -19,6 +19,7 @@
 #include <QSocketNotifier>
 #include <iostream>
 
+#include "mythconfig.h"
 #include "mythlogging.h"
 #include "logging.h"
 #include "loggingserver.h"

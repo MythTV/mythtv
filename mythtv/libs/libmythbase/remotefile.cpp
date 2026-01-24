@@ -13,8 +13,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "mythconfig.h"
-
 #ifndef O_LARGEFILE
 static constexpr int8_t O_LARGEFILE { 0 };
 #endif

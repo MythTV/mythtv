@@ -7,7 +7,6 @@
 
 // MythTV
 #include "libmythbase/compat.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "fourcc.h"

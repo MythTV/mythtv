@@ -17,6 +17,7 @@
 #include <cstring>                      // for memcpy, memset
 #include <deque>                        // for _Deque_iterator, operator!=
 
+#include "libmythbase/mythconfig.h"
 #include "libmythtv/mythaverror.h"
 #include "libmythtv/mythavframe.h"
 #include "libmythbase/mthread.h"        // for MThread

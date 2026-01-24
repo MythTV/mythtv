@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QRecursiveMutex>
 
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdate.h"
 
 #include "DeviceReadBuffer.h"

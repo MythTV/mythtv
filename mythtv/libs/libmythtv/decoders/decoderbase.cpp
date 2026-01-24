@@ -2,7 +2,6 @@
 #include <algorithm>
 
 #include "libmythbase/iso639.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 
 #include "Bluray/mythbdbuffer.h"

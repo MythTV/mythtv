@@ -12,7 +12,6 @@
 
 // MythTV
 #include "libmythbase/mthread.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 #include "libmythbase/referencecounter.h"

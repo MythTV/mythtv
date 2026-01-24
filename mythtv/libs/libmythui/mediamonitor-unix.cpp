@@ -2,6 +2,7 @@
 
 #include "mediamonitor-unix.h"
 #include "mediamonitor.h"
+#include "libmythbase/mythconfig.h"
 
 // Standard C headers
 #include <cstdio>

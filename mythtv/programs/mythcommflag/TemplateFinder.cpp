@@ -10,6 +10,7 @@
 #include <QTextStream>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"

@@ -7,6 +7,7 @@
 #include <QNetworkRequest>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/filesysteminfo.h"
 #include "libmythbase/hardwareprofile.h"

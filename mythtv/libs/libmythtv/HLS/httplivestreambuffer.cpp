@@ -40,6 +40,7 @@
 #include <thread>
 
 // libmythbase
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"

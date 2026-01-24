@@ -19,7 +19,6 @@
 
 // MythTV headers
 #include "libmythbase/mthread.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythtimer.h"
 

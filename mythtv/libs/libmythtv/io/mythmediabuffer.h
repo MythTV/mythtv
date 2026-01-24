@@ -9,7 +9,6 @@
 #include <QMap>
 
 // MythTV
-#include "libmythbase/mythconfig.h"
 #include "libmythtv/mythtvexp.h"
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythchrono.h"

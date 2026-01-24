@@ -1,4 +1,5 @@
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "vulkan/mythshadersvulkan.h"
 #include "vulkan/mythshadervulkan.h"

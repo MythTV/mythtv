@@ -3,8 +3,6 @@
 #ifndef ATSC_TABLES_H
 #define ATSC_TABLES_H
 
-#include "libmythbase/mythconfig.h"
-
 #include <cstdint>  // uint32_t
 #include <ctime>
 #include <limits> // workaround QTBUG-90395

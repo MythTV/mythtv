@@ -21,6 +21,7 @@
 #include <QVector>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythdeque.h"
 #include "libmythbase/mythtimer.h"
 #include "libmythbase/referencecounter.h"

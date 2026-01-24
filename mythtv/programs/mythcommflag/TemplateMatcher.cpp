@@ -9,6 +9,7 @@
 #include <utility>
 
 // MythTV headers
+#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythtv/mythplayer.h"

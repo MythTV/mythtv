@@ -10,6 +10,7 @@ extern "C"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 
+#include "libmythbase/mythconfig.h"
 //libmpeg2
 #if CONFIG_LIBMPEG2EXTERNAL
 #include <mpeg2dec/mpeg2.h>

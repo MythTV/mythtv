@@ -16,8 +16,6 @@
 #include <QtAlgorithms>
 
 // MythTV
-#include "libmythbase/mythconfig.h"
-
 #include "libmythtv/audio/audiooutput.h"
 #include "libmythbase/exitcodes.h"
 #include "libmythbase/mthreadpool.h"

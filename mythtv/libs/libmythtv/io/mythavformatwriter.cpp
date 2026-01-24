@@ -25,6 +25,7 @@
 #include <QtEndian>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythtv/audio/audioconvert.h"
 #include "libmythtv/mythaverror.h"
 #include "libmythbase/mythlogging.h"

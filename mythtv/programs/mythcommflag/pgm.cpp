@@ -1,7 +1,6 @@
 #include <climits>
 
 // MythTV
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythtv/mythframe.h"
 
