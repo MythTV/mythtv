@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
-           QString("%1/../Resources/lib/%2:/../Resources/lib/%2/site-packages:/../Resources/lib/%2/lib-dynload:%3")
+           QString("%1/../Resources/lib/%2:%1/../Resources/lib/%2/site-packages:%1/../Resources/lib/%2/lib-dynload:%3")
            .arg(path)
            .arg(QFileInfo(PYTHON_EXE).fileName())
            .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
