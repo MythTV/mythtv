@@ -50,9 +50,11 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
 {
     m_nSupportedMethods = (uint)RequestTypeNotify; // Only NOTIFY supported
 
-    QHostAddress addr;
-    if (!UPnp::g_IPAddrList.isEmpty())
-        addr = UPnp::g_IPAddrList.at(0);
+    auto it = std::find_if(UPnp::g_IPAddrList.cbegin(), UPnp::g_IPAddrList.cend(),
+                           [](const QHostAddress& tmp) {return !tmp.isLoopback(); });
+    if (it == UPnp::g_IPAddrList.cend())
+        return;
+    const QHostAddress& addr = *it;
 
     QString host;
     if (addr.protocol() == QAbstractSocket::IPv6Protocol)
@@ -375,6 +377,7 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
 
     LOG(VB_UPNP, LOG_DEBUG, LOC + "\n\n" + sub);
 
+    QString error {"unknown"};
     QString uuid;
     QString timeout;
     std::chrono::seconds result = 0s;
@@ -388,9 +391,11 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
             QString line = socket.readLine(MAX_WAIT);
             while (!line.isEmpty())
             {
-                LOG(VB_UPNP, LOG_DEBUG, LOC + line);
+                LOG(VB_UPNP, LOG_DEBUG, LOC + line.trimmed());
                 if (line.contains("HTTP/1.1 200 OK", Qt::CaseInsensitive))
                     ok = true;
+                else if (line.contains("HTTP/1.1", Qt::CaseInsensitive))
+                    error = line.mid(8).trimmed();
                 if (line.startsWith("SID:", Qt::CaseInsensitive))
                     uuid = line.mid(4).trimmed().mid(5).trimmed();
                 if (line.startsWith("TIMEOUT:", Qt::CaseInsensitive))
@@ -408,7 +413,7 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Failed to subscribe to %1").arg(usn));
+                    QString("Error '%1' subscribing to %2").arg(error,usn));
             }
         }
     }

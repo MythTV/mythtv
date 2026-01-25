@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 #include <utility>
@@ -24,7 +25,7 @@
 
 static constexpr uint8_t MAX_ATTEMPTS { 5 };
 
-QString MediaServerItem::NextUnbrowsed(void)
+QString MediaServerItem::NextUnbrowsed(void) const
 {
     // items don't need scanning
     if (!m_url.isEmpty())
@@ -35,11 +36,9 @@ QString MediaServerItem::NextUnbrowsed(void)
         return m_id;
 
     // scan children
-    QMutableMapIterator<QString,MediaServerItem> it(m_children);
-    while (it.hasNext())
+    for (const auto& value : std::as_const(m_children))
     {
-        it.next();
-        QString result = it.value().NextUnbrowsed();
+        QString result = value.NextUnbrowsed();
         if (!result.isEmpty())
             return result;
     }
@@ -52,11 +51,9 @@ MediaServerItem* MediaServerItem::Find(QString &id)
     if (m_id == id)
         return this;
 
-    QMutableMapIterator<QString,MediaServerItem> it(m_children);
-    while (it.hasNext())
+    for (auto& value : m_children)
     {
-        it.next();
-        MediaServerItem* result = it.value().Find(id);
+        MediaServerItem* result = value.Find(id);
         if (result)
             return result;
     }
@@ -114,7 +111,7 @@ class UpnpMediaServer : public MediaServerItem
     QUrl    m_serverURL;
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
-    QString m_eventSubPath;
+    QUrl    m_eventSubPath;
     QString m_friendlyName;
     uint8_t m_connectionAttempts {0};
     bool    m_subscribed         {false};
@@ -224,14 +221,12 @@ void UPNPScanner::GetInitialMetadata(VideoMetadataListManager::metadata_list* li
     mediaservers->setPathRoot();
 
     m_lock.lock();
-    QMutableHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto it = m_servers.cbegin(); it != m_servers.cend(); ++it)
     {
-        it.next();
         if (!it.value()->m_subscribed)
             continue;
 
-        QString usn = it.key();
+        const QString& usn = it.key();
         GetServerContent(usn, it.value(), list, mediaservers.get());
     }
     m_lock.unlock();
@@ -270,14 +265,12 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
     mediaservers->setPathRoot();
 
     m_lock.lock();
-    QMutableHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto it = m_servers.cbegin(); it != m_servers.cend(); ++it)
     {
-        it.next();
         if (!it.value()->m_subscribed)
             continue;
 
-        QString usn = it.key();
+        const QString& usn = it.key();
         GetServerContent(usn, it.value(), list, mediaservers.get());
     }
     m_lock.unlock();
@@ -347,8 +340,8 @@ bool UPNPScanner::GetMetadata(QVariant &data)
  *  Recursively search a MediaServerItem for video metadata and add it to
  *  the metadata_list and meta_dir_node.
  */
-void UPNPScanner::GetServerContent(QString &usn,
-                                   MediaServerItem *content,
+void UPNPScanner::GetServerContent(const QString &usn,
+                                   const MediaServerItem *content,
                                    VideoMetadataListManager::metadata_list* list,
                                    meta_dir_node *node)
 {
@@ -373,12 +366,8 @@ void UPNPScanner::GetServerContent(QString &usn,
     if (content->m_url.isEmpty())
     {
         smart_dir_node container = node->addSubDir(content->m_name);
-        QMutableMapIterator<QString,MediaServerItem> it(content->m_children);
-        while (it.hasNext())
-        {
-            it.next();
-            GetServerContent(usn, &it.value(), list, container.get());
-        }
+        for (const auto& child : std::as_const(content->m_children))
+            GetServerContent(usn, &child, list, container.get());
         return;
     }
 
@@ -522,7 +511,7 @@ void UPNPScanner::Update(void)
             (server->m_controlURL.isEmpty()))
         {
             bool sent = false;
-            QUrl url { server->m_url };
+            QUrl url { server->m_serverURL };
             if (!m_descriptionRequests.contains(url) &&
                 (m_descriptionRequests.empty()) &&
                 url.isValid())
@@ -729,10 +718,8 @@ void UPNPScanner::timerEvent(QTimerEvent * event)
     QString usn;
 
     m_lock.lock();
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto it = m_servers.cbegin(); it != m_servers.cend(); ++it)
     {
-        it.next();
         if (it.value()->m_renewalTimerId == id)
         {
             it.value()->m_renewalTimerId = 0;
@@ -770,11 +757,9 @@ void UPNPScanner::ScheduleUpdate(void)
 void UPNPScanner::CheckFailure(const QUrl &url)
 {
     m_lock.lock();
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto *server : std::as_const(m_servers))
     {
-        it.next();
-        if (it.value()->m_serverURL == url && it.value()->m_connectionAttempts == MAX_ATTEMPTS)
+        if (server->m_serverURL == url && server->m_connectionAttempts == MAX_ATTEMPTS)
         {
             Debug();
             break;
@@ -791,14 +776,12 @@ void UPNPScanner::Debug(void)
     m_lock.lock();
     LOG(VB_UPNP, LOG_INFO, LOC + QString("%1 media servers discovered:")
                                    .arg(m_servers.size()));
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    for (auto *server: std::as_const(m_servers))
     {
-        it.next();
         QString status = "Probing";
-        if (it.value()->m_controlURL.toString().isEmpty())
+        if (server->m_controlURL.toString().isEmpty())
         {
-            if (it.value()->m_connectionAttempts >= MAX_ATTEMPTS)
+            if (server->m_connectionAttempts >= MAX_ATTEMPTS)
                 status = "Failed";
         }
         else
@@ -808,10 +791,10 @@ void UPNPScanner::Debug(void)
         LOG(VB_UPNP, LOG_INFO, LOC +
             QString("'%1' Connected: %2 Subscribed: %3 SystemUpdateID: "
                     "%4 timerId: %5")
-                .arg(it.value()->m_friendlyName, status,
-                     it.value()->m_subscribed ? "Yes" : "No",
-                     QString::number(it.value()->m_systemUpdateID),
-                     QString::number(it.value()->m_renewalTimerId)));
+                .arg(server->m_friendlyName, status,
+                     server->m_subscribed ? "Yes" : "No",
+                     QString::number(server->m_systemUpdateID),
+                     QString::number(server->m_renewalTimerId)));
     }
     m_lock.unlock();
 }
@@ -828,30 +811,28 @@ void UPNPScanner::BrowseNextContainer(void)
 {
     QMutexLocker locker(&m_lock);
 
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
     bool complete = true;
-    while (it.hasNext())
+    for (auto *server : std::as_const(m_servers))
     {
-        it.next();
-        if (it.value()->m_subscribed)
+        if (server->m_subscribed)
         {
             // limit browse requests to one active per server
-            if (m_browseRequests.contains(it.value()->m_controlURL))
+            if (m_browseRequests.contains(server->m_controlURL))
             {
                 complete = false;
                 continue;
             }
 
-            QString next = it.value()->NextUnbrowsed();
+            QString next = server->NextUnbrowsed();
             if (!next.isEmpty())
             {
                 complete = false;
-                SendBrowseRequest(it.value()->m_controlURL, next);
+                SendBrowseRequest(server->m_controlURL, next);
                 continue;
             }
 
             LOG(VB_UPNP, LOG_INFO, LOC + QString("Scan completed for %1")
-                .arg(it.value()->m_friendlyName));
+                .arg(server->m_friendlyName));
         }
     }
 
@@ -1051,16 +1032,10 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     m_lock.lock();
 
     UpnpMediaServer* server = nullptr;
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
-    {
-        it.next();
-        if (url == it.value()->m_controlURL)
-        {
-            server = it.value();
-            break;
-        }
-    }
+    auto it = std::find_if(m_servers.cbegin(), m_servers.cend(),
+                            [&url](UpnpMediaServer* s){ return url == s->m_controlURL;} );
+    if (it != m_servers.cend())
+        server = it.value();
 
     // discard unmatched responses
     if (!server)
@@ -1237,6 +1212,14 @@ QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
     return result;
 }
 
+static QUrl urlAddBaseAndPath (QUrl base, const QUrl& relative)
+{
+    base.setFragment("");
+    base.setQuery("");
+    base.setPath(relative.path());
+    return base;
+}
+
 /**
  * \fn UPNPScanner::ParseDescription(const QUrl&, QNetworkReply*)
  *  Parse the device description XML return my a media server.
@@ -1256,10 +1239,10 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     }
 
     // parse the device description
-    QString controlURL = QString();
-    QString eventURL   = QString();
+    QUrl    URLBase;
+    QUrl    controlURL;
+    QUrl    eventURL;
     QString friendlyName = QString("Unknown");
-    QString URLBase = QString();
 
     QDomDocument doc;
 #if QT_VERSION < QT_VERSION_CHECK(6,5,0)
@@ -1299,12 +1282,12 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
             if(e1.tagName() == "device")
                 ParseDevice(e1, controlURL, eventURL, friendlyName);
             if (e1.tagName() == "URLBase")
-                URLBase = e1.text();
+                URLBase = QUrl(e1.text());
         }
         n = n.nextSibling();
     }
 
-    if (controlURL.isEmpty())
+    if (!controlURL.isValid())
     {
         LOG(VB_UPNP, LOG_ERR, LOC +
             QString("Failed to parse device description for %1")
@@ -1313,57 +1296,46 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     }
 
     // if no URLBase was provided, use the known url
-    if (URLBase.isEmpty())
-        URLBase = url.toString(QUrl::RemovePath | QUrl::RemoveFragment |
-                               QUrl::RemoveQuery);
+    if (!URLBase.isValid())
+    {
+        URLBase = url;
+        URLBase.setPath("");
+        URLBase.setFragment("");
+        URLBase.setQuery("");
+    }
 
-    // strip leading slashes off the controlURL
-    while (!controlURL.isEmpty() && controlURL.startsWith("/"))
-        controlURL = controlURL.mid(1);
-
-    // strip leading slashes off the eventURL
-    //while (!eventURL.isEmpty() && eventURL.startsWith("/"))
-    //    eventURL = eventURL.mid(1);
-
-    // strip trailing slashes off URLBase
-    while (!URLBase.isEmpty() && URLBase.endsWith("/"))
-        URLBase = URLBase.mid(0, URLBase.size() - 1);
-
-    controlURL = URLBase + "/" + controlURL;
-    QString fulleventURL = URLBase + "/" + eventURL;
+    if (controlURL.isRelative())
+        controlURL = urlAddBaseAndPath(URLBase, controlURL);
+    if (eventURL.isRelative())
+        eventURL = urlAddBaseAndPath(URLBase, eventURL);
 
     LOG(VB_UPNP, LOG_INFO, LOC + QString("Control URL for %1 at %2")
-            .arg(friendlyName, controlURL));
+            .arg(friendlyName, controlURL.toString()));
     LOG(VB_UPNP, LOG_INFO, LOC + QString("Event URL for %1 at %2")
-            .arg(friendlyName, fulleventURL));
+            .arg(friendlyName, eventURL.toString()));
 
     // update the server details. If the server has gone away since the request
     // was posted, this will silently fail and we won't try again
     QString usn;
-    QUrl qeventurl = QUrl(fulleventURL);
     std::chrono::seconds timeout = 0s;
 
     m_lock.lock();
-    QHashIterator<QString,UpnpMediaServer*> it(m_servers);
-    while (it.hasNext())
+    auto it = std::find_if(m_servers.cbegin(), m_servers.cend(),
+                           [&url](UpnpMediaServer* server){ return url == server->m_serverURL;} );
+    if (it != m_servers.cend())
     {
-        it.next();
-        if (it.value()->m_serverURL == url)
-        {
-            usn = it.key();
-            QUrl qcontrolurl(controlURL);
-            it.value()->m_controlURL   = qcontrolurl;
-            it.value()->m_eventSubURL  = qeventurl;
-            it.value()->m_eventSubPath = eventURL;
-            it.value()->m_friendlyName = friendlyName;
-            it.value()->m_name         = friendlyName;
-            break;
-        }
+        usn = it.key();
+        UpnpMediaServer* server = it.value();
+        server->m_controlURL   = controlURL;
+        server->m_eventSubURL  = eventURL;
+        server->m_eventSubPath = eventURL;
+        server->m_friendlyName = friendlyName;
+        server->m_name         = friendlyName;
     }
 
     if (m_subscription && !usn.isEmpty())
     {
-        timeout = m_subscription->Subscribe(usn, qeventurl, eventURL);
+        timeout = m_subscription->Subscribe(usn, eventURL, eventURL.toString());
         m_servers[usn]->m_subscribed = (timeout > 0s);
     }
     m_lock.unlock();
@@ -1383,8 +1355,8 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
 }
 
 
-void UPNPScanner::ParseDevice(QDomElement &element, QString &controlURL,
-                              QString &eventURL, QString &friendlyName)
+void UPNPScanner::ParseDevice(QDomElement &element, QUrl &controlURL,
+                              QUrl &eventURL, QString &friendlyName)
 {
     QDomNode dev = element.firstChild();
     while (!dev.isNull())
@@ -1401,8 +1373,8 @@ void UPNPScanner::ParseDevice(QDomElement &element, QString &controlURL,
     }
 }
 
-void UPNPScanner::ParseServiceList(QDomElement &element, QString &controlURL,
-                                   QString &eventURL)
+void UPNPScanner::ParseServiceList(QDomElement &element, QUrl &controlURL,
+                                   QUrl &eventURL)
 {
     QDomNode list = element.firstChild();
     while (!list.isNull())
@@ -1415,12 +1387,12 @@ void UPNPScanner::ParseServiceList(QDomElement &element, QString &controlURL,
     }
 }
 
-void UPNPScanner::ParseService(QDomElement &element, QString &controlURL,
-                               QString &eventURL)
+void UPNPScanner::ParseService(QDomElement &element, QUrl &controlURL,
+                               QUrl &eventURL)
 {
     bool     iscds       = false;
-    QString  control_url = QString();
-    QString  event_url   = QString();
+    QUrl     control_url;
+    QUrl     event_url;
     QDomNode service     = element.firstChild();
 
     while (!service.isNull())
@@ -1432,9 +1404,9 @@ void UPNPScanner::ParseService(QDomElement &element, QString &controlURL,
                 // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
                 iscds = (e.text() == "urn:schemas-upnp-org:service:ContentDirectory:1");
             if (e.tagName() == "controlURL")
-                control_url = e.text();
+                control_url = QUrl(e.text());
             if (e.tagName() == "eventSubURL")
-                event_url = e.text();
+                event_url = QUrl(e.text());
         }
         service = service.nextSibling();
     }

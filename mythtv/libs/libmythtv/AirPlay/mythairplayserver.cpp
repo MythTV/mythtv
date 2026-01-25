@@ -557,10 +557,8 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
     m_sockets.removeOne(socket);
 
     QByteArray remove;
-    QMutableHashIterator<QByteArray,AirplayConnection> it(m_connections);
-    while (it.hasNext())
+    for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
-        it.next();
         if (it.value().m_reverseSocket == socket)
             it.value().m_reverseSocket = nullptr;
         if (it.value().m_controlSocket == socket)

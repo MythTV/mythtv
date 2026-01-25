@@ -2803,7 +2803,13 @@ void VideoDialog::handleDynamicDirSelect(MythGenericTree *node)
     QStringList route = node->getRouteByString();
     if (m_d->m_videoList && m_d->m_videoList->refreshNode(node))
         reloadData();
-    m_videoButtonTree->SetNodeByString(route);
+    if (m_d->m_type == DLG_TREE)
+    {
+        m_videoButtonTree->SetNodeByString(route);
+    }
+    else
+    {
+    }
 }
 
 /** \fn VideoDialog::handleSelect(MythUIButtonListItem *item)

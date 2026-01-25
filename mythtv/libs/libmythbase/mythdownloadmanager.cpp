@@ -1084,11 +1084,11 @@ void MythDownloadManager::downloadCanceled()
 {
     QMutexLocker locker(m_infoLock);
 
-    QMutableListIterator<MythDownloadInfo*> lit(m_cancellationQueue);
-    while (lit.hasNext())
+    for (auto lit = m_cancellationQueue.begin();
+         lit != m_cancellationQueue.end();
+         /* no inc */)
     {
-        lit.next();
-        MythDownloadInfo *dlInfo = lit.value();
+        MythDownloadInfo *dlInfo = *lit;
         dlInfo->m_lock.lock();
 
         if (dlInfo->m_reply)
@@ -1097,7 +1097,7 @@ void MythDownloadManager::downloadCanceled()
                 LOC + QString("Aborting download - user request"));
             dlInfo->m_reply->abort();
         }
-        lit.remove();
+        lit = m_cancellationQueue.erase(lit);
         if (dlInfo->m_done)
         {
             dlInfo->m_lock.unlock();
