@@ -3234,7 +3234,8 @@ static QString sys_dev(uint device_num, const QString& dev)
 static QString read_sys(const QString& sys_dev)
 {
     QFile f(sys_dev);
-    f.open(QIODevice::ReadOnly);
+    if (!f.open(QIODevice::ReadOnly))
+        return {};
     QByteArray sdba = f.readAll();
     f.close();
     return sdba;
@@ -3243,7 +3244,8 @@ static QString read_sys(const QString& sys_dev)
 static bool write_sys(const QString& sys_dev, const QString& str)
 {
     QFile f(sys_dev);
-    f.open(QIODevice::WriteOnly);
+    if (!f.open(QIODevice::WriteOnly))
+        return false;
     QByteArray ba = str.toLocal8Bit();
     qint64 offset = 0;
     for (uint tries = 0; (offset < ba.size()) && tries < 5; tries++)
