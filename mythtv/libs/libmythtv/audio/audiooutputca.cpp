@@ -12,8 +12,6 @@
  * Jeremiah Morris, Andrew Kimpton, Nigel Pearson, Jean-Yves Avenard
  *****************************************************************************/
 
-#include <SoundTouch.h>
-
 #include <array>
 #include <thread>
 #include <vector>

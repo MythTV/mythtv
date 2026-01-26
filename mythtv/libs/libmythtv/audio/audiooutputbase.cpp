@@ -8,11 +8,14 @@
 #include <unistd.h> // getpid
 
 // SoundTouch
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wundef"
 #if __has_include(<soundtouch/SoundTouch.h>)
 #include <soundtouch/SoundTouch.h>
 #else
 #include <SoundTouch.h>
 #endif
+#pragma GCC diagnostic pop
 
 extern "C" {
 #include "libavcodec/defs.h"
