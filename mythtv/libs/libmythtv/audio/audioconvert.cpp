@@ -205,7 +205,7 @@ static int fromFloat8(uint8_t* out, const float* in, int len)
     }
 #endif //Q_PROCESSOR_X86
     for (;i < len; i++)
-        *out++ = clip_uint8(lrintf(*in++ * f) + 0x80);
+        *out++ = clip_uint8(std::lrintf(*in++ * f) + 0x80);
     return len;
 }
 
@@ -314,7 +314,7 @@ static int fromFloat16(short* out, const float* in, int len)
     }
 #endif //Q_PROCESSOR_X86
     for (;i < len;i++)
-        *out++ = clip_short(lrintf(*in++ * f));
+        *out++ = clip_short(std::lrintf(*in++ * f));
     return len << 1;
 }
 
@@ -458,7 +458,7 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
             *out++ = (-range) << shift;
             continue;
         }
-        *out++ = lrintf(valf * f) << shift;
+        *out++ = std::lrintf(valf * f) << shift;
     }
     return len << 2;
 }
