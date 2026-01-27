@@ -1,2 +1,1 @@
-SOURCE_VERSION="$Format:%h$"
-BRANCH="$Format:%d$"
+SOURCE_VERSION="$Format:%(describe:tags=true,abbrev=40)$"
