@@ -3724,7 +3724,8 @@ void Scheduler::UpdateManuals(uint recordid)
 
     query.prepare(QString("SELECT type,title,subtitle,description,"
                           "station,startdate,starttime,"
-                          "enddate,endtime,season,episode,inetref,last_record "
+                          "enddate,endtime,season,episode,category,"
+                          "seriesid,programid,inetref,last_record "
                   "FROM %1 WHERE recordid = :RECORDID").arg(m_recordTable));
     query.bindValue(":RECORDID", recordid);
     if (!query.exec() || query.size() != 1)
@@ -3759,11 +3760,14 @@ void Scheduler::UpdateManuals(uint recordid)
 
     int season = query.value(9).toInt();
     int episode = query.value(10).toInt();
-    QString inetref = query.value(11).toString();
+    QString category = query.value(11).toString();
+    QString seriesid = query.value(12).toString();
+    QString programid = query.value(13).toString();
+    QString inetref = query.value(14).toString();
 
     // A bit of a hack: mythconverg.record.last_record can be used by
     // the services API to propegate originalairdate information.
-    QDate originalairdate = QDate(query.value(12).toDate());
+    QDate originalairdate = QDate(query.value(15).toDate());
 
     if (description.isEmpty())
         description = startdt.toLocalTime().toString();
@@ -3845,10 +3849,12 @@ void Scheduler::UpdateManuals(uint recordid)
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
                           " title, subtitle, description, manualid,"
-                          " season, episode, inetref, originalairdate, generic) "
+                          " season, episode, category, seriesid, programid,"
+                          " inetref, originalairdate, generic) "
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :DESCRIPTION, :RECORDID, "
-                          " :SEASON, :EPISODE, :INETREF, :ORIGINALAIRDATE, 1)");
+                          " :SEASON, :EPISODE, :CATEGORY, :SERIESID,"
+                          " :PROGRAMID, :INETREF, :ORIGINALAIRDATE, 1)");
             query.bindValue(":CHANID", id);
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
@@ -3857,6 +3863,9 @@ void Scheduler::UpdateManuals(uint recordid)
             query.bindValue(":DESCRIPTION", description);
             query.bindValue(":SEASON", season);
             query.bindValue(":EPISODE", episode);
+            query.bindValue(":CATEGORY", category);
+            query.bindValue(":SERIESID", seriesid);
+            query.bindValue(":PROGRAMID", programid);
             query.bindValue(":INETREF", inetref);
             query.bindValue(":ORIGINALAIRDATE", originalairdate);
             query.bindValue(":RECORDID", recordid);

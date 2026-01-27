@@ -156,6 +156,7 @@ bool ExternalChannel::Tune(const QString &channum)
                 cmd["programid"] = prog->GetProgramID();
                 cmd["seriesid"] = prog->GetSeriesID();
             }
+            delete prog;
         }
 
         uint     chanid           = 0;
