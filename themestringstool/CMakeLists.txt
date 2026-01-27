@@ -73,9 +73,11 @@ include(SetSearchPaths)
 include(SetCompilerOptions)
 include(MythFindQt)
 
-add_executable(themestringtool themestrings.cpp)
+add_executable(themestrings themestrings.cpp)
 
 target_link_libraries(
-  themestringtool
+  themestrings
   PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets
          Qt${QT_VERSION_MAJOR}::Xml)
+
+install(TARGETS themestrings RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

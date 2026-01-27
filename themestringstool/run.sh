@@ -20,6 +20,9 @@
 set -e
 
 TS=$(pwd)/themestrings
+if ! [ -e "${TS}" ]; then
+    TS=$(which themestrings)
+fi
 DOWNLOAD_DIR="temp_download"
 MYTHTHEMES_CORE=$(ls ../mythtv/themes/ --file-type |grep "/$")
 MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
