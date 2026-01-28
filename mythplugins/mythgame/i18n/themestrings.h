@@ -81,7 +81,6 @@ void strings_null() {
     ThemeUI::tr("Plot:");
     ThemeUI::tr("Publisher");
     ThemeUI::tr("Publisher:");
-    ThemeUI::tr("ROM Name:");
     ThemeUI::tr("ROM Path:");
     ThemeUI::tr("ROM path");
     ThemeUI::tr("ROM path:");

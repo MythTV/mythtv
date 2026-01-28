@@ -166,6 +166,7 @@ void strings_null() {
     ThemeUI::tr("Description:");
     ThemeUI::tr("Destination:");
     ThemeUI::tr("Directory to hold music:");
+    ThemeUI::tr("Disc No.:");
     ThemeUI::tr("Disc:");
     ThemeUI::tr("Disk Size:");
     ThemeUI::tr("Done");

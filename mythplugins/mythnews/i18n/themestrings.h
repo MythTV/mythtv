@@ -4,7 +4,6 @@
 void strings_null() {
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("%\"|SUBTITLE|\"\n\n%%DESCRIPTION%");
-    ThemeUI::tr("Actions");
     ThemeUI::tr("Available Categories");
     ThemeUI::tr("Available Sites");
     ThemeUI::tr("Bookmark Manager");
@@ -15,7 +14,6 @@ void strings_null() {
     ThemeUI::tr("Choose sites you want to receive news from");
     ThemeUI::tr("Choose the news sites you would like to read.");
     ThemeUI::tr("Choose which news channels interest you");
-    ThemeUI::tr("Contexts");
     ThemeUI::tr("Date:");
     ThemeUI::tr("Edit News");
     ThemeUI::tr("Edit RSS News Feed");
