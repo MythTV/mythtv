@@ -19,5 +19,6 @@ install(
             apps
             assets
             images
+            css
             xslt
   DESTINATION ${CMAKE_INSTALL_DATADIR}/mythtv/html)
