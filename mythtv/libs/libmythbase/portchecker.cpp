@@ -115,12 +115,14 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
             if (attempt_time.elapsed() > next_log)
             {
                 next_log += k_log_interval;
+#if 0
                 LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     QString("host %1 port %2 socket state %3, attempt time: %4")
                     .arg(host, QString::number(port), QString::number(state),
                          QString::number(attempt_time.elapsed().count())
                          )
                     );
+#endif
             }
         }
         state = socket.state();
@@ -290,12 +292,14 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
             if (attempt_time.elapsed() > next_log)
             {
                 next_log += k_log_interval;
+#if 0
                 LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     QString("host %1 port %2 socket state %3, attempt time: %4")
                     .arg(host, QString::number(port), QString::number(state),
                          QString::number(attempt_time.elapsed().count())
                          )
                     );
+#endif
             }
         }
         state = socket.state();
