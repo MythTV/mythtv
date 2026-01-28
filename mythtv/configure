@@ -10,14 +10,14 @@
 #
 # All versioning information needed to create a release of MythTV.
 #
-MYTHTV_VERSION_MAJMIN="36.0"
-MYTHTV_LIBVERSION="36"
+MYTHTV_VERSION_MAJMIN="37.0"
+MYTHTV_LIBVERSION="37"
 # See mythtv/libs/libmythbase/mythversion.h.in
-MYTHTV_BINARY_VERSION="36.20251207-1"
+MYTHTV_BINARY_VERSION="37.20251207-1"
 # See bindings/python/MythTV/static.py.in
-MYTHTV_PYTHON_OWN_VERSION="(36,0,-1,0)"
+MYTHTV_PYTHON_OWN_VERSION="(37,0,-1,0)"
 # See python/MythTV/services_api/send.py.in
-MYTHTV_PYTHON_VERSION_LIST="('0.27', '0.28', '29', '30', '31', '32', '33', '34', '35', '36')"
+MYTHTV_PYTHON_VERSION_LIST="('0.27', '0.28', '29', '30', '31', '32', '33', '34', '35', '36', '37')"
 
 # Prevent locale nonsense from breaking basic text processing.
 LC_ALL=C
