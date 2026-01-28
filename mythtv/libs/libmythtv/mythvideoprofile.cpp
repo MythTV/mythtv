@@ -1333,7 +1333,10 @@ void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
 
     if (!HasMythMainWindow())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No window!");
+        if (gCoreContext->IsFrontend())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No window!");
+        }
         return;
     }
 
