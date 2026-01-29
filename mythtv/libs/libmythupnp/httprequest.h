@@ -243,8 +243,6 @@ class UPNP_PUBLIC HTTPRequest
         static QStringList GetSupportedMimeTypes ();
         static QString  TestMimeType    ( const QString &sFileName );
         static long     GetParameters   ( QString  sParams, QStringMap &mapParams );
-        static QString  Encode          ( const QString &sIn );
-        static QString  Decode          ( const QString &sIn );
         static QString  GetETagHash     ( const QByteArray &data );
 
         void            SetKeepAliveTimeout ( std::chrono::seconds nTimeout ) { m_nKeepAliveTimeout = nTimeout; }

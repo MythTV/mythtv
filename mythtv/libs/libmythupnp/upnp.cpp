@@ -12,6 +12,7 @@
 #include "upnp.h"
 
 #include <QNetworkInterface>
+#include <QUrl>
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
@@ -259,7 +260,7 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
         sDetails += QString( "<errorCode>%1</errorCode>"
                              "<errorDescription>%2</errorDescription>" )
                        .arg( eCode )
-                       .arg( HTTPRequest::Encode( sMsg ) );
+                       .arg(QString::fromUtf8(QUrl::toPercentEncoding(sMsg)));
 
         if (pRequest->m_bSOAPRequest)
             sDetails += "</UPnPResult>";

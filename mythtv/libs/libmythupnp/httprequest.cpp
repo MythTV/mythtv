@@ -748,14 +748,14 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
             for (const auto & attr : std::as_const(*arg.m_pAttributes))
             {
                 stream << " " << attr.m_sName << "='"
-                       << Encode( attr.m_sValue ) << "'";
+                       << QUrl::toPercentEncoding(attr.m_sValue) << "'";
             }
         }
 
         stream << ">";
 
         if (m_bSOAPRequest)
-            stream << Encode( arg.m_sValue );
+            stream << QUrl::toPercentEncoding(arg.m_sValue);
         else
             stream << arg.m_sValue;
 
@@ -1724,46 +1724,6 @@ Serializer *HTTPRequest::GetSerializer()
         pSerializer = (Serializer *)new XmlSerializer(&m_response, m_sMethod);
 
     return pSerializer;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString HTTPRequest::Encode(const QString &sIn)
-{
-    QString sStr = sIn;
-#if 0
-    LOG(VB_HTTP, LOG_DEBUG,
-        QString("HTTPRequest::Encode Input : %1").arg(sStr));
-#endif
-    sStr.replace('&', "&amp;" ); // This _must_ come first
-    sStr.replace('<', "&lt;"  );
-    sStr.replace('>', "&gt;"  );
-    sStr.replace('"', "&quot;");
-    sStr.replace("'", "&apos;");
-
-#if 0
-    LOG(VB_HTTP, LOG_DEBUG,
-        QString("HTTPRequest::Encode Output : %1").arg(sStr));
-#endif
-    return sStr;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString HTTPRequest::Decode(const QString& sIn)
-{
-    QString sStr = sIn;
-    sStr.replace("&amp;", "&");
-    sStr.replace("&lt;", "<");
-    sStr.replace("&gt;", ">");
-    sStr.replace("&quot;", "\"");
-    sStr.replace("&apos;", "'");
-
-    return sStr;
 }
 
 /////////////////////////////////////////////////////////////////////////////

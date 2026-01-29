@@ -15,10 +15,13 @@
 #include <cmath>
 #include <cstdint>
 
+#include <QUrl>
+
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 
+#include "httprequest.h"
 #include "upnp.h"
 #include "upnputil.h"
 
@@ -1108,7 +1111,8 @@ QString UPnPShortcutFeature::CreateXML()
         const QString& objectID = *it;
         xml += "<shortcut>\r\n";
         xml += QString("<name>%1</name>\r\n").arg(TypeToName(type));
-        xml += QString("<objectID>%1</objectID>\r\n").arg(HTTPRequest::Encode(objectID));
+        xml += QString{"<objectID>%1</objectID>\r\n"}
+                .arg(QString::fromUtf8(QUrl::toPercentEncoding(objectID)));
         xml += "</shortcut>\r\n";
     }
 

@@ -36,9 +36,9 @@ CDSObject::CDSObject( const QString &sId,
                       const QString &sTitle, 
                       const QString &sParentId )
     : ReferenceCounter("CDSObject", false),
-      m_sId(HTTPRequest::Encode(sId)),
-      m_sParentId(HTTPRequest::Encode(sParentId)),
-      m_sTitle(HTTPRequest::Encode(sTitle))
+      m_sId(QUrl::toPercentEncoding(sId)),
+      m_sParentId(QUrl::toPercentEncoding(sParentId)),
+      m_sTitle(QUrl::toPercentEncoding(sTitle))
 {
 }
 
