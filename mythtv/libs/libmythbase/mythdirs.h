@@ -14,7 +14,6 @@
  MBASE_PUBLIC  QString GetThemesParentDir(void);
  MBASE_PUBLIC  QString GetPluginsDir(void);
  MBASE_PUBLIC  QString GetTranslationsDir(void);
- MBASE_PUBLIC  QString GetFiltersDir(void);
  MBASE_PUBLIC  QString GetCacheDir(void);
  MBASE_PUBLIC  QString GetRemoteCacheDir(void);
  MBASE_PUBLIC  QString GetThemeBaseCacheDir(void);
