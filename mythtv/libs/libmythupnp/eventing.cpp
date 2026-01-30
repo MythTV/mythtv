@@ -22,6 +22,7 @@
 #include <QTextStream>
 
 #include "upnp.h"
+#include "httprequest.h"
 #include "taskqueue.h"
 #include "upnptaskevent.h"
 #include "libmythbase/mythlogging.h"
@@ -162,7 +163,7 @@ bool Eventing::ProcessRequest( HTTPRequest *pRequest )
             case RequestTypeSubscribe   : HandleSubscribe   ( pRequest ); break;
             case RequestTypeUnsubscribe : HandleUnsubscribe ( pRequest ); break;
             default:
-                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
+                pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
                 break;
         }       
     }

@@ -22,7 +22,7 @@
 #include "libmythbase/mythversion.h"
 
 #include "httprequest.h"
-#include "upnp.h"
+#include "upnpresultcode.h"
 #include "upnputil.h"
 
 static constexpr const char* DIDL_LITE_BEGIN { R"(<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">)" };
@@ -271,7 +271,7 @@ bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
                 HandleGetServiceResetToken( pRequest );
                 break;
             default:
-                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
+                pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
                 break;
         }
 
@@ -534,7 +534,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     }
     else
     {
-        UPnp::FormatErrorResponse ( pRequest, eErrorCode, sErrorDesc );
+        pRequest->FormatErrorResponse(eErrorCode, sErrorDesc);
     }
 
 }
@@ -676,7 +676,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     }
     else
     {
-        UPnp::FormatErrorResponse( pRequest, eErrorCode, sErrorDesc );
+        pRequest->FormatErrorResponse(eErrorCode, sErrorDesc);
     }
 }
 

@@ -24,7 +24,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnpdevice.h"
-#include "upnpresultcode.h"
 #include "httpserver.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -68,13 +67,6 @@ class UPNP_PUBLIC UPnp : public QObject
         HttpServer *GetHttpServer() { return m_pHttpServer; }
 
         static UPnpDeviceDesc *GetDeviceDesc( QString &sURL );
-
-        static void            FormatErrorResponse( HTTPRequest   *pRequest, 
-                                                    UPnPResultCode  eCode, 
-                                                    const QString &sMsg = "" );
-
-        static void            FormatRedirectResponse( HTTPRequest   *pRequest,
-                                                       const QString &hostName );
 
     public slots:
         static void DisableNotifications(std::chrono::milliseconds /*unused*/);

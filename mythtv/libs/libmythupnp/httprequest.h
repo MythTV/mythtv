@@ -28,6 +28,7 @@
 #include "libmythbase/mythsession.h"
 
 #include "upnpexp.h"
+#include "upnpresultcode.h"
 #include "upnputil.h"
 #include "serializers/serializer.h"
 
@@ -208,6 +209,7 @@ class UPNP_PUBLIC HTTPRequest
         void            FormatErrorResponse ( bool  bServerError,
                                               const QString &sFaultString,
                                               const QString &sDetails );
+        void FormatErrorResponse(UPnPResultCode eCode, const QString &sMsg = "");
 
         void            FormatActionResponse( Serializer *ser );
         void            FormatActionResponse( const NameValues &pArgs );
@@ -215,6 +217,7 @@ class UPNP_PUBLIC HTTPRequest
         void            FormatRawResponse   ( const QString &sXML );
 
         qint64          SendResponse    ( void );
+        void SendResponseRedirect(const QString &hostName);
         qint64          SendResponseFile( const QString& sFileName );
 
         void            SetResponseHeader ( const QString &sKey,
