@@ -1246,7 +1246,7 @@ static ssize_t save_read(struct replex *rx, void *buf, size_t count)
 		
 		per = (uint8_t)(rx->finread*100/rx->inflength);
 		if (per % 10 == 0 && rx->lastper < per){
-			LOG(VB_GENERAL, LOG_DEBUG, QString("read %1%%")
+			LOG(VB_GENERAL, LOG_DEBUG, QString("read %1%")
 			    .arg(per,3));
 			rx->lastper = per;
 		}

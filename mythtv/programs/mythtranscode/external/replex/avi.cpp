@@ -503,7 +503,7 @@ int get_avi_from_index(pes_in_t *p, int fd, avi_context *ac,
 	
 	per = (int)(100*(pos-ac->movi_start)/ac->movi_length);
 	if (per % 10 == 0 && per>lastper)
-                LOG(VB_GENERAL, LOG_INFO, QString("read %1%%").arg(per,3));
+                LOG(VB_GENERAL, LOG_INFO, QString("read %1%").arg(per,3));
 	lastper = per;
 
 	if (ring_write(p->rbuf, buf+c, p->plength)<0){

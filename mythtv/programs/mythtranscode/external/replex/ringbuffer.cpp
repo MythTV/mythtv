@@ -116,7 +116,7 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	}
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%")
 		    .arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return count;
 }
@@ -227,7 +227,7 @@ int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 	}
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%")
 		    .arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return count;
 }
@@ -254,7 +254,7 @@ int ring_skip(ringbuffer *rbuf, int count)
 	}
 
 	if (DEBUG>1)
-	    LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+	    LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%")
 		.arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return count;
 }
@@ -292,7 +292,7 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 	}
 
 	if (DEBUG>1)
-	    LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %.2f%%")
+	    LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %.2f%")
 		.arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return rr;
 }
@@ -332,7 +332,7 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 
 
 	if (DEBUG>1)
-		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%%")
+		LOG(VB_GENERAL, LOG_ERR, QString("Buffer empty %1%")
 		    .arg(ring_free(rbuf)*100.0/rbuf->size, 0,'f',2,QChar('0')));
 	return rr;
 }

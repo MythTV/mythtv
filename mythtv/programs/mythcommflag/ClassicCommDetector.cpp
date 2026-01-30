@@ -542,7 +542,7 @@ bool ClassicCommDetector::go()
             if (percentage % 10 == 0 && prevpercent != percentage)
             {
                 prevpercent = percentage;
-                LOG(VB_GENERAL, LOG_INFO, QString("%1%% Completed @ %2 fps.")
+                LOG(VB_GENERAL, LOG_INFO, QString("%1% Completed @ %2 fps.")
                     .arg(percentage) .arg(flagFPS));
             }
         }
