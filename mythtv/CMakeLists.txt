@@ -278,7 +278,6 @@ set_target_properties(
   myth
   mythbase
   mythdvdnav
-  mythfreemheg
   mythmetadata
   mythmpeg2
   mythprotoserver
@@ -288,6 +287,13 @@ set_target_properties(
   PROPERTIES SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
              VERSION
              ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR})
+if(TARGET mythfreemheg)
+  set_target_properties(
+    mythfreemheg
+    PROPERTIES SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
+               VERSION
+               ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR})
+endif()
 
 #
 # Dump build status information, ala the "configure" script.
