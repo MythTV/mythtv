@@ -29,6 +29,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Require the C17 standard, and disable compiler extensions.
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 # This is propagated to sub-projects, so only needs to be included for the
 # top level project
 include(CompilerCaching OPTIONAL)

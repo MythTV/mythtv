@@ -24,6 +24,7 @@ LC_ALL=C
 export LC_ALL
 
 CPP_STANDARD=c++17
+C_STANDARD=c17
 
 # make sure we are running under a compatible shell
 # try to make this part work with most shells
@@ -3628,12 +3629,7 @@ if test "$?" != 0; then
 fi
 
 check_cxxflags -std=$CPP_STANDARD -faligned-new
-
-# some compilers silently accept -std=c11, so we also need to check that the
-# version macro is defined properly
-test_cflags_cc -std=c11 ctype.h "__STDC_VERSION__ >= 201112L" &&
-    add_cflags -std=c11 ||
-    check_cflags -std=c99
+check_cflags -std=$C_STANDARD
 
 # C++ compiler sanity check
 check_exec_cxx <<EOF

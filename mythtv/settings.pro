@@ -2,7 +2,7 @@ include (settings2.pro)
 include ( config.mak )
 
 CONFIG += $$CCONFIG
-CONFIG += c++17
+CONFIG += c17 c++17
 CONFIG += no_qt_rpath
 
 # Make sure all the Qt header files are marked as system headers

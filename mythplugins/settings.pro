@@ -1,5 +1,5 @@
 CONFIG += $$CCONFIG
-CONFIG += c++17
+CONFIG += c17 c++17
 
 # Make sure all the Qt header files are marked as system headers
 QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
