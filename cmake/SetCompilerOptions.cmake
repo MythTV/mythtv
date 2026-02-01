@@ -5,6 +5,34 @@
 #
 
 #
+# Test for required minimum compiler versions.
+#
+get_cmake_property(_ENABLED_LANGUAGES ENABLED_LANGUAGES)
+if("CXX" IN_LIST _ENABLED_LANGUAGES)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0.0)
+      message(FATAL_ERROR "GCC version 8 or better required.")
+    endif()
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0.0)
+      message(FATAL_ERROR "Clang version 11 or better required.")
+    endif()
+  else()
+    message(FATAL_ERROR "Unknown compiler.")
+  endif()
+endif()
+
+#
+# Require the C++17 standard, and allow compiler extensions.
+#
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
+# This is propagated to sub-projects, so only needs to be included for the
+# top level project
+include(CompilerCaching OPTIONAL)
+#
 # Load needed functions
 #
 include(CheckCCompilerFlag)
@@ -167,7 +195,6 @@ endif()
 #
 # Now test each flag and see if its valid.
 #
-get_cmake_property(_ENABLED_LANGUAGES ENABLED_LANGUAGES)
 list(FIND _ENABLED_LANGUAGES "C" _ENABLED_C)
 if(NOT _ENABLED_C EQUAL -1)
   foreach(_FLAG IN LISTS CFLAGS)
