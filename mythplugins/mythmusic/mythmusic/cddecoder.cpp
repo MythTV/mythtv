@@ -152,7 +152,9 @@ bool CdDecoder::initialize()
     if (m_inited)
         return true;
 
-    m_inited = m_userStop = m_finish = false;
+    m_inited = false;
+    m_userStop = false;
+    m_finish = false;
     m_freq = m_bitrate = 0L;
     m_stat = DecoderEvent::kError;
     m_chan = 0;
@@ -285,7 +287,9 @@ void CdDecoder::deinit()
     if (m_outputBuf)
         ::av_free(m_outputBuf), m_outputBuf = nullptr;
 
-    m_inited = m_userStop = m_finish = false;
+    m_inited = false;
+    m_userStop = false;
+    m_finish = false;
     m_freq = m_bitrate = 0L;
     m_stat = DecoderEvent::kFinished;
     m_chan = 0;

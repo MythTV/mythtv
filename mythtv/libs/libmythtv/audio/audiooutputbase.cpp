@@ -638,7 +638,8 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
             m_pSoundStretch = nullptr;
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Cancelling time stretch"));
             m_bytesPerFrame = m_previousBpf;
-            m_waud = m_raud = 0;
+            m_raud = 0;
+            m_waud = 0;
             m_resetActive.Ref();
         }
         else
@@ -675,7 +676,8 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
                               AudioOutputSettings::SampleSize(FORMAT_FLT);
             m_audbufTimecode = m_audioTime = 0ms;
             m_framesBuffered = 0;
-            m_waud = m_raud = 0;
+            m_raud = 0;
+            m_waud = 0;
             m_resetActive.Ref();
             m_wasPaused = m_pauseAudio;
             m_pauseAudio = true;
@@ -935,7 +937,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     QMutexLocker lock(&m_audioBufLock);
     QMutexLocker lockav(&m_avsyncLock);
 
-    m_waud = m_raud = 0;
+    m_raud = 0;
+    m_waud = 0;
     m_resetActive.Clear();
     m_actuallyPaused = m_processing = m_forcedProcessing = false;
 
@@ -1271,7 +1274,8 @@ void AudioOutputBase::Reset()
     m_framesBuffered = 0;
     if (m_encoder)
     {
-        m_waud = m_raud = 0;    // empty ring buffer
+        m_raud = 0;    // empty ring buffer
+        m_waud = 0;
         m_audioBuffer.fill(0);
     }
     else
@@ -2174,7 +2178,8 @@ void AudioOutputBase::Drain()
         // Audio is paused and can't be drained, clear ringbuffer
         QMutexLocker lock(&m_audioBufLock);
 
-        m_waud = m_raud = 0;
+        m_raud = 0;
+        m_waud = 0;
     }
 }
 
