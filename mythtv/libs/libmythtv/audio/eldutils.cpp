@@ -217,16 +217,20 @@ void eld::update_sad(int index,
 
         case TYPE_REF_CXT:
             a->format = GRAB_BITS(buf, 2, 3, 5);
-            if (a->format == XTYPE_HE_REF_CT ||
-                a->format >= XTYPE_FIRST_RESERVED)
-            {
+            switch (a->format) {
+              case XTYPE_HE_AAC:
+                a->format = TYPE_HE_AAC;
+                break;
+              case XTYPE_HE_AAC2:
+                a->format = TYPE_HE_AAC2;
+                break;
+              case XTYPE_MPEG_SURROUND:
+                a->format = TYPE_MPEG_SURROUND;
+                break;
+              default:
                 LOG(VB_AUDIO, LOG_INFO, LOC + QString("audio coding xtype %1 not expected")
                         .arg(a->format));
                 a->format = 0;
-            }
-            else
-            {
-                a->format += TYPE_HE_AAC - XTYPE_HE_AAC;
             }
             break;
     }
