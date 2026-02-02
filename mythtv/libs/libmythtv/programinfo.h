@@ -303,7 +303,7 @@ class MTV_PUBLIC ProgramInfo
             ProgramInfo::clear();
     }
 
-    bool operator==(const ProgramInfo& rhs);
+    bool operator==(const ProgramInfo& rhs) const;
     ProgramInfo &operator=(const ProgramInfo &other);
     virtual void clone(const ProgramInfo &other,
                        bool ignore_non_serialized_data = false);

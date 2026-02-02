@@ -1049,7 +1049,7 @@ bool qstringEqualOrDefault(const QString& a, const QString& b)
  *
  *  \return True if all the serialized fields match, False otherwise.
  */
-bool ProgramInfo::operator==(const ProgramInfo& rhs)
+bool ProgramInfo::operator==(const ProgramInfo& rhs) const
 {
     if ((m_title != rhs.m_title) ||
         (m_subtitle != rhs.m_subtitle) ||
