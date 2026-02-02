@@ -405,7 +405,7 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
     if (percentage % 10 == 0 && s_prevpercent != percentage)
     {
         s_prevpercent = percentage;
-        LOG(VB_GENERAL, LOG_INFO, QString("%1%% Completed @ %2 fps.")
+        LOG(VB_GENERAL, LOG_INFO, QString("%1% Completed @ %2 fps.")
             .arg(percentage) .arg(fps));
     }
 }
