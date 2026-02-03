@@ -68,7 +68,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void LoadExternalSubtitles();
 
     MythCaptionsOverlay m_captionsOverlay;
-    MythCaptionsState m_captionsState { };
+    MythCaptionsState m_captionsState;
     bool m_textDesired                { false };
     uint m_lastTextDisplayMode        { kDisplayNone };
     uint m_lastValidTextDisplayMode   { kDisplayNone };

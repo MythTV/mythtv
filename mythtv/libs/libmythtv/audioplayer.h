@@ -107,7 +107,7 @@ class MTV_PUBLIC AudioPlayer : public QObject
   private:
     MythPlayer  *m_parent            {nullptr};
     AudioOutput *m_audioOutput       {nullptr};
-    MythAudioPlayerState m_state     { };
+    MythAudioPlayerState m_state;
     float        m_stretchFactor     {1.0F};
     QRecursiveMutex m_lock;
     bool         m_mutedOnCreation   {false};

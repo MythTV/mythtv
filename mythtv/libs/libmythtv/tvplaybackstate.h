@@ -102,9 +102,9 @@ class MTV_PUBLIC TVPlaybackState : public QObject
 
   protected:
     MythOverlayState     m_overlayState;
-    MythAudioPlayerState m_audioPlayerState { };
+    MythAudioPlayerState m_audioPlayerState;
     MythAudioState       m_audioState;
-    MythCaptionsState    m_captionsState    { };
+    MythCaptionsState    m_captionsState;
     MythVideoBoundsState m_videoBoundsState;
     MythVideoColourState m_videoColourState;
     MythVisualiserState  m_visualiserState;
