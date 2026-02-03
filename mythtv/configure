@@ -998,6 +998,17 @@ check_struct(){
         enable_safe "${struct}_${member}"
 }
 
+check_cxx_struct(){
+    log check_struct "$@"
+    headers=$1
+    struct=$2
+    member=$3
+    shift 3
+    disable_safe "${struct}_${member}"
+    check_code cxx "$headers" "const void *p = &(($struct *)0)->$member" "$@" &&
+        enable_safe "${struct}_${member}"
+}
+
 check_builtin(){
     log check_builtin "$@"
     name=$1
@@ -1492,8 +1503,13 @@ SYSTEM_FUNCS_DVDNAV="
     gettimeofday
 "
 
+SYSTEM_FUNCS_GLSLANG="
+    tbuiltinresource_ext_fields
+"
+
 SYSTEM_FUNCS="
     $SYSTEM_FUNCS_BLURAY
+    $SYSTEM_FUNCS_GLSLANG
     gettimeofday
     posix_fadvise
     close_range
@@ -5177,6 +5193,10 @@ if enabled vulkan && enabled libglslang ; then
     || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} -lSPVRemapper \
     || check_lib_cpp glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${GLSLANG_LIBS} \
     || die "ERROR: libglslang (or dependent) library not found"
+
+    if check_cxx_struct glslang/Include/ResourceLimits.h TBuiltInResource maxMeshOutputVerticesEXT; then
+       enable tbuiltinresource_ext_fields
+    fi
 fi
 
 # Qt private headers are required for wayland extras and some DRM functionality on linux
