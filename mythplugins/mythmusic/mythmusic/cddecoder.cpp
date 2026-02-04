@@ -322,7 +322,7 @@ void CdDecoder::run()
         if (m_seekTime >= +0.)
         {
             m_curPos = m_start + static_cast< lsn_t >(
-                (m_seekTime * kSamplesPerSec) / CD_FRAMESAMPLES);
+                (m_seekTime * kSamplesPerSec) / static_cast<int>(CD_FRAMESAMPLES));
             if (m_paranoia)
             {
                 QMutexLocker lock(&getCdioMutex());
