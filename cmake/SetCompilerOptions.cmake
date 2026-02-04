@@ -26,7 +26,7 @@ endif()
 # Require the C++17 standard as a minimum, and disable compiler
 # extensions.
 #
-set(_CXX_MINIMUM 17)
+set(_CXX_MINIMUM 20)
 if(DEFINED CMAKE_CXX_STANDARD)
   if (CMAKE_CXX_STANDARD LESS ${_CXX_MINIMUM})
     message(FATAL_ERROR "C++${_CXX_MINIMUM} or better required.")

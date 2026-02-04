@@ -23,7 +23,7 @@ MYTHTV_PYTHON_VERSION_LIST="('0.27', '0.28', '29', '30', '31', '32', '33', '34',
 LC_ALL=C
 export LC_ALL
 
-CPP_STANDARD=c++17
+CPP_STANDARD=c++20
 C_STANDARD=c17
 
 # make sure we are running under a compatible shell

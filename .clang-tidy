@@ -228,6 +228,18 @@ Checks: '-*,
         # by us. ,
        -modernize-type-traits,
 
+        # As of 2026-02-11 there are 440 instances that are pointed
+        # out by clang-tidy. ,
+       -modernize-use-designated-initializers,
+
+        # A number of these could be cleaned up now, but many of these
+        # are from comparing the result of the Qt count functions to a
+        # [uint].  These count functions return an [int] in Qt5 which
+        # triggers this warning, but in Qt6 they will return a [uint]
+        # and the code wont trigger the warning.  Wait until Qt6 is
+        # required and revisit then. ,
+       -modernize-use-integer-sign-comparison,
+
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
 
