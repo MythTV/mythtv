@@ -686,7 +686,7 @@ QString MythNews::cleanText(const QString &text)
     // replace a few HTML characters
     result.replace("&#8232;", "");   // LSEP
     result.replace("&#8233;", "");   // PSEP
-    result.replace("&#163;",  u8"\u00A3");  // POUND
+    result.replace("&#163;",  "£");  // POUND
     result.replace("&#173;",  "");   // ?
     result.replace("&#8211;", "-");  // EN-DASH
     result.replace("&#8220;", """"); // LEFT-DOUBLE-QUOTE
