@@ -291,7 +291,7 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
 
     // ensure we have sources and bindings
     for (const auto & stage : Stages)
-        if (Sources->find(stage) == Sources->end() || Bindings->find(stage) == Bindings->end())
+        if (!Sources->contains(stage) || !Bindings->contains(stage))
             return;
 
     // build the descriptor set layouts from the shader descriptions
@@ -313,13 +313,13 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
             if (stagelayout.second.stageFlags == VK_SHADER_STAGE_VERTEX_BIT)
                 isvertex = true;
 
-            if (layoutbindings.find(stagelayout.first) != layoutbindings.end())
+            if (layoutbindings.contains(stagelayout.first))
                 layoutbindings.at(stagelayout.first).emplace_back(stagelayout.second);
             else
                 layoutbindings.insert( { stagelayout.first, { stagelayout.second } } );
 
             VkDescriptorPoolSize poolsize = {stagelayout.second.descriptorType, stagelayout.second.descriptorCount};
-            if (poolsizes.find(stagelayout.first) != poolsizes.end())
+            if (poolsizes.contains(stagelayout.first))
                 poolsizes.at(stagelayout.first).emplace_back(poolsize);
             else
                 poolsizes.insert( { stagelayout.first, { poolsize } } );

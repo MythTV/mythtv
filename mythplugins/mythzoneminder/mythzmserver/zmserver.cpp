@@ -1398,7 +1398,7 @@ void ZMServer::handleGetLiveFrame(std::vector<std::string> tokens)
     ADD_INT(outStr, monitorID);
 
     // try to find the correct MONITOR
-    if (m_monitorMap.find(monitorID) == m_monitorMap.end())
+    if (!m_monitorMap.contains(monitorID))
     {
         sendError(ERROR_INVALID_MONITOR);
         return;
@@ -1938,7 +1938,7 @@ void ZMServer::handleSetMonitorFunction(std::vector<std::string> tokens)
     const std::string& enabled(tokens[3]);
 
     // Check validity of input passed to server. Does monitor exist && is function ok
-    if (m_monitorMap.find(atoi(monitorID.c_str())) == m_monitorMap.end())
+    if (!m_monitorMap.contains(atoi(monitorID.c_str())))
     {
         sendError(ERROR_INVALID_MONITOR);
         return;

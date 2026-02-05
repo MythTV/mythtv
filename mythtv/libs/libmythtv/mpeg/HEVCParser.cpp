@@ -1256,7 +1256,7 @@ bool HEVCParser::parseSliceSegmentHeader(BitReader& br)
     }
 
     int pps_id = br.get_ue_golomb(); // slice_pic_parameter_set_id; ue(v)
-    if (m_pps.find(pps_id) == m_pps.end())
+    if (!m_pps.contains(pps_id))
     {
         LOG(VB_RECORD, LOG_DEBUG, LOC +
             QString("PPS Id %1 not valid yet. Skipping parsing of slice.")
@@ -1590,7 +1590,7 @@ bool HEVCParser::parseSPS(BitReader& br)
         max_sub_layers_minus1 = ext_or_max_sub_layers_minus1;
     else
     {
-        if (m_vps.find(vps_id) == m_vps.end())
+        if (!m_vps.contains(vps_id))
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Could not find VPS[%1]").arg(vps_id));

@@ -163,7 +163,7 @@ const MythDisplayModes& MythDisplayX11::GetVideoModes()
             QSize resolution(width, height);
             QSize physical(mmwidth, mmheight);
             auto key = MythDisplayMode::CalcKey(resolution, 0.0);
-            if (screenmap.find(key) == screenmap.end())
+            if (!screenmap.contains(key))
                 screenmap[key] = MythDisplayMode(resolution, physical, -1.0, rate);
             else
                 screenmap[key].AddRefreshRate(rate);

@@ -7,12 +7,13 @@
 
 inline bool IsActionable(const QString& Action, const QStringList& Actions)
 {
-    return std::find(Actions.cbegin(), Actions.cend(), Action) != Actions.cend();
+    return Actions.contains(Action);
 }
 
 inline bool IsActionable(const QStringList& Action, const QStringList& Actions)
 {
-    return std::any_of(Action.cbegin(), Action.cend(), [&](const QString& A) { return IsActionable(A, Actions); });
+    return std::any_of(Action.cbegin(), Action.cend(),
+                       [&](const QString& A) { return Actions.contains(A); });
 }
 
 inline StereoscopicMode ActionToStereoscopic(const QString& Action)

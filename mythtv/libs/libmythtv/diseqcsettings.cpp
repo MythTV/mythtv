@@ -319,8 +319,7 @@ bool DiseqcConfigBase::keyPressEvent(QKeyEvent *e)
     if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
         return true;
 
-    auto isdelete = [](const QString & action) { return action == "DELETE"; };
-    if (std::any_of(actions.cbegin(), actions.cend(), isdelete))
+    if (actions.contains("DELETE"))
     {
         emit DeleteClicked();
         return true;

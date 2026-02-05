@@ -1216,7 +1216,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
         QString sel = current;
         for (const QString& dev : std::as_const(sdevs))
         {
-            in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
+            in_use[dev] = db.contains(dev);
             if (sel.isEmpty() && !in_use[dev])
                 sel = dev;
         }
@@ -1932,8 +1932,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         QStringList sdevs = CardUtil::ProbeVideoDevices("ASI");
 
         // Add current if needed
-        if (!current.isEmpty() &&
-            (std::find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+        if (!current.isEmpty() && !sdevs.contains(current))
         {
             std::stable_sort(sdevs.begin(), sdevs.end());
         }
@@ -1948,7 +1947,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         QString sel = current;
         for (const QString& dev : std::as_const(sdevs))
         {
-            in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
+            in_use[dev] = db.contains(dev);
             if (sel.isEmpty() && !in_use[dev])
                 sel = dev;
         }

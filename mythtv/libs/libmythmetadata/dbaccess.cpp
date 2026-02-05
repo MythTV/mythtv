@@ -116,7 +116,7 @@ class SingleValueImp
 
     bool exists(int id)
     {
-        return m_entries.find(id) != m_entries.end();
+        return m_entries.contains(id);
     }
 
     bool exists(const QString &name, int *id = nullptr)
@@ -393,7 +393,7 @@ class MultiValueImp
 
     bool exists(int id)
     {
-        return m_valMap.find(id) != m_valMap.end();
+        return m_valMap.contains(id);
     }
 
   private:
