@@ -390,7 +390,7 @@ class HLSSegment
         }
         else
         {
-            std::copy(IV.cbegin(), IV.cend(), iv.begin());
+            std::ranges::copy(std::as_const(IV), iv.begin());
         }
 
         int aeslen = m_data.size() & ~0xf;
@@ -901,7 +901,7 @@ class HLSStream
 #endif
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
-        std::copy(ba.cbegin(), ba.cend(), m_aesIv.begin());
+        std::ranges::copy(std::as_const(ba), m_aesIv.begin());
         m_ivloaded = true;
         return true;
     }

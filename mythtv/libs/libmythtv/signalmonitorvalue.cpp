@@ -176,7 +176,7 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
 bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
 {
     auto isgood = [](const auto & smv){ return smv.IsGood(); };
-    bool good = std::all_of(slist.cbegin(), slist.cend(), isgood);
+    bool good = std::ranges::all_of(slist, isgood);
 #if DEBUG_SIGNAL_MONITOR_VALUE
     if (!good)
     {

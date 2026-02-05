@@ -2,6 +2,7 @@
  *  Copyright (C) David C.J. Matthews 2005, 2006
  *     Derived from libdsmcc by Richard Palmer
  */
+#include <algorithm>
 #include <cstdint>
 
 #include "libmythbase/mythlogging.h"
@@ -42,10 +43,8 @@ static uint32_t crc32(const unsigned char *data, int len);
  */
 ObjCarousel *Dsmcc::GetCarouselById(unsigned int carouselId)
 {
-    auto it = std::find_if(m_carousels.cbegin(), m_carousels.cend(),
-                           [carouselId](ObjCarousel const * const car) -> bool
-                               { return car->m_id == carouselId; });
-    if (it != m_carousels.cend())
+    auto it = std::ranges::find(m_carousels, carouselId, &ObjCarousel::m_id);
+    if (it != m_carousels.end())
         return *it;
     return nullptr;
 }

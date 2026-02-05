@@ -345,7 +345,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
     if (grpid == -1)
       return sorted[0].m_grpId;
 
-    auto it = std::find(sorted.cbegin(), sorted.cend(), grpid);
+    auto it = std::ranges::find(sorted, grpid, &ChannelGroupItem::m_grpId);
 
     // If grpid is not in the list, return -1 for "All Channels"
     if (it == sorted.end())
@@ -362,7 +362,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
 
 bool ChannelGroup::InChannelGroupList(const ChannelGroupList &groupList, int grpid)
 {
-    auto it = std::find(groupList.cbegin(), groupList.cend(), grpid);
+    auto it = std::ranges::find(groupList, grpid, &ChannelGroupItem::m_grpId);
     return it != groupList.end();
 }
 

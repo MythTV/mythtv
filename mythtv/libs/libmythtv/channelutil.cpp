@@ -878,7 +878,7 @@ bool ChannelUtil::GetCachedPids(uint chanid,
         if ((pid >= 0) && (tid >= 0))
             pid_cache.emplace_back(pid, tid);
     }
-    stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
+    std::ranges::stable_sort(pid_cache, lt_pidcache);
 
     return true;
 }
@@ -916,7 +916,7 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     pid_cache_t old_cache;
     GetCachedPids(chanid, old_cache);
     pid_cache_t pid_cache = _pid_cache;
-    stable_sort(pid_cache.begin(), pid_cache.end(), lt_pidcache);
+    std::ranges::stable_sort(pid_cache, lt_pidcache);
 
     /// insert
     query.prepare(
@@ -2343,9 +2343,9 @@ void ChannelUtil::SortChannels(ChannelInfoList &list, const QString &order,
 {
     bool cs = order.toLower() == "callsign";
     if (cs)
-        stable_sort(list.begin(), list.end(), lt_callsign);
+        std::ranges::stable_sort(list, lt_callsign);
     else /* if (sortorder == "channum") */
-        stable_sort(list.begin(), list.end(), lt_smart);
+        std::ranges::stable_sort(list, lt_smart);
 
     if (eliminate_duplicates && !list.empty())
     {
@@ -2404,7 +2404,8 @@ namespace {
         {
             if (it != l.begin())
                 return --it;
-            it = find(l.begin(), l.end(), l.rbegin()->m_chanId);
+            it = std::ranges::find(l, l.rbegin()->m_chanId,
+                                   &ChannelInfo::m_chanId);
             if (it == l.end())
                 return --it;
             return it;
@@ -2431,7 +2432,7 @@ uint ChannelUtil::GetNextChannel(
     if (sorted.empty())
         return 0; // no channels..
 
-    auto it = find(sorted.cbegin(), sorted.cend(), old_chanid);
+    auto it = std::ranges::find(sorted, old_chanid, &ChannelInfo::m_chanId);
     if (it == sorted.end())
         it = sorted.begin(); // not in list, pretend we are on first channel
 

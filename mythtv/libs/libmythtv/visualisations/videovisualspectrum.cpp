@@ -116,7 +116,7 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
 
 void VideoVisualSpectrum::prepare()
 {
-    std::fill(m_magnitudes.begin(), m_magnitudes.end(), 0.0);
+    std::ranges::fill(m_magnitudes, 0.0);
     VideoVisual::prepare();
 }
 
@@ -148,7 +148,7 @@ bool VideoVisualSpectrum::Initialise(const QRect Area)
     m_scale.setMax(192, m_area.width() / m_barWidth);
 
     m_magnitudes.resize(m_scale.range() * 2);
-    std::fill(m_magnitudes.begin(), m_magnitudes.end(), 0.0);
+    std::ranges::fill(m_magnitudes, 0.0);
     InitialisePriv();
     return true;
 }

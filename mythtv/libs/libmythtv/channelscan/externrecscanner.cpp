@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 // Std C headers
+#include <algorithm>
 #include <cmath>
 #include <unistd.h>
 #include <utility>
@@ -190,7 +191,7 @@ void ExternRecChannelScanner::run(void)
 
         SetNumChannelsInserted(cnt);
 
-        Iold = std::find(existing.begin(), existing.end(), chanid);
+        Iold = std::ranges::find(existing, chanid);
         if (Iold != existing.end())
         {
             existing.erase(Iold);

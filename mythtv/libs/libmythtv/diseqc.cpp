@@ -5,6 +5,7 @@
  */
 
 // Std C headers
+#include <algorithm>
 #include <cstring>
 #include <cmath>
 #include <thread>
@@ -699,7 +700,7 @@ bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
     mcmd.msg_len = data.size() + 3;
 
     if (!data.empty())
-        std::copy(data.cbegin(), data.cend(), mcmd.msg + 3);
+        std::ranges::copy(data, mcmd.msg + 3);
 
     // diagnostic
     QString cmdstr;

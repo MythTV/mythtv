@@ -1205,7 +1205,12 @@ class DVBCardNum : public CaptureCardComboBoxSetting
 
         // Add current if needed
         if (!current.isEmpty() &&
-            (std::find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+#ifdef __cpp_lib_ranges_contains
+            !std::ranges::contains(sdevs, current)
+#else
+            (std::ranges::find(sdevs, current) == sdevs.end())
+#endif
+            )
         {
             std::stable_sort(sdevs.begin(), sdevs.end());
         }

@@ -7,9 +7,9 @@
  */
 
 // C++ includes
+#include <algorithm>
 #include <iostream>
 #include <utility>
-#include <algorithm>
 
 // Qt includes
 #include <QTextStream>
@@ -255,7 +255,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     if (m_doDelete)
     {
         ScanDTVTransportList trans = transports;
-        std::copy(db_trans.cbegin(), db_trans.cend(), std::back_inserter(trans));
+        std::ranges::copy(db_trans, std::back_inserter(trans));
         uint deleted_count = DeleteChannels(trans);
         if (deleted_count)
             transports = trans;
@@ -1695,7 +1695,7 @@ QString ChannelImporter::FormatChannels(
         }
     };
     ScanDTVTransportList transports(transports_in);
-    std::sort(transports.begin(), transports.end(), less_than_key());
+    std::ranges::sort(transports, less_than_key());
 
     QString msg;
 
@@ -1734,7 +1734,7 @@ QString ChannelImporter::FormatTransports(
         }
     };
     ScanDTVTransportList transports(transports_in);
-    std::sort(transports.begin(), transports.end(), less_than_key());
+    std::ranges::sort(transports, less_than_key());
 
     auto fmt_trans = [](const QString& msg, const auto & transport)
         { return msg + FormatTransport(transport) + "\n"; };

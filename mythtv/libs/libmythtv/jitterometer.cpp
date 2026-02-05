@@ -4,6 +4,7 @@
 #include "jitterometer.h"
 
 // Std
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -183,7 +184,7 @@ QString Jitterometer::GetCPUStat(void)
                 float total = load + stats[3] - m_lastStats[ptr + 3];
                 if (total > 0)
                     result += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
-                std::copy(stats.cbegin(), stats.cend(), &m_lastStats[ptr]);
+                std::ranges::copy(stats, &m_lastStats[ptr]);
             }
             line = m_cpuStat->readLine(256);
             cores++;

@@ -1725,8 +1725,12 @@ void TV::ShowOSDAskAllow()
 
             for (uint grp : input_grps)
             {
-                if (find(busy_input_grps.begin(), busy_input_grps.end(),
+#ifdef __cpp_lib_ranges_contains
+                if (std::ranges::contains(busy_input_grps, grp))
+#else
+                if (std::ranges::find(busy_input_grps,
                          grp) !=  busy_input_grps.end())
+#endif
                 {
                     (*it).m_isInSameInputGroup = true;
                     break;

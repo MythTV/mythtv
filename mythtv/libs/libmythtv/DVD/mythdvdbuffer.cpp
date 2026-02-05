@@ -374,7 +374,7 @@ void MythDVDBuffer::GetChapterTimes(QList<std::chrono::seconds> &Times)
     if (!m_chapterMap.contains(m_title))
         return;
     const QList<std::chrono::seconds>& chapters = m_chapterMap.value(m_title);
-    std::copy(chapters.cbegin(), chapters.cend(), std::back_inserter(Times));
+    std::ranges::copy(std::as_const(chapters), std::back_inserter(Times));
 }
 
 static constexpr mpeg::chrono::pts HALFSECOND { 45000_pts };

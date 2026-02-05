@@ -403,7 +403,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
                             { return (s_rndn >= state.m_rangeMin) &&
                                      (s_rndn <= state.m_rangeMax); };
                         const auto *it =
-                            std::find_if(kStates.cbegin(), kStates.cend(), goodstate);
+                            std::ranges::find_if(std::as_const(kStates), goodstate);
                         if (it != kStates.cend())
                             curGState = &(*it);
 

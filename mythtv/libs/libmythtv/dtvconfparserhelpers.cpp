@@ -1,6 +1,7 @@
 
 #include <QMutex>
 #include <QMap>
+#include <algorithm>
 
 #include "libmythbase/mythlogging.h"
 #include "dtvconfparserhelpers.h"
@@ -8,10 +9,8 @@
 bool DTVParamHelper::ParseParam(const QString &symbol, int &value,
                                 const DTVParamHelperVec &table)
 {
-    auto it = std::find_if(table.cbegin(), table.cend(),
-                           [symbol](const auto& item) -> bool
-                               {return item.symbol == symbol;});
-    if (it == table.cend())
+    auto it = std::ranges::find(table, symbol, &DTVParamHelperStruct::symbol);
+    if (it == table.end())
         return false;
 
     value = it->value;

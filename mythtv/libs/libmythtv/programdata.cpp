@@ -1457,7 +1457,7 @@ bool ProgramData::ClearDataBySource(
     bool ok = true;
     auto cleardata = [&](uint chanid)
         { ok &= ClearDataByChannel(chanid, from, to, use_channel_time_offset); };
-    std::for_each(chanids.cbegin(), chanids.cend(), cleardata);
+    std::ranges::for_each(chanids, cleardata);
     return ok;
 }
 

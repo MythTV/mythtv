@@ -1,6 +1,9 @@
 #ifndef MYTHTVACTIONUTILS_H
 #define MYTHTVACTIONUTILS_H
 
+// C++ headers
+#include <algorithm>
+
 // MythTV
 #include "tv_actions.h"
 #include "videoouttypes.h"
@@ -12,7 +15,7 @@ inline bool IsActionable(const QString& Action, const QStringList& Actions)
 
 inline bool IsActionable(const QStringList& Action, const QStringList& Actions)
 {
-    return std::any_of(Action.cbegin(), Action.cend(),
+    return std::ranges::any_of(std::as_const(Action),
                        [&](const QString& A) { return Actions.contains(A); });
 }
 
