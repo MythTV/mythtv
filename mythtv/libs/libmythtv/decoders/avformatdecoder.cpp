@@ -1254,7 +1254,8 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     rates.emplace_back(30000.0 / 1001.0);
 
     auto invalid_fps = [](double rate) { return rate < 3.0 || rate > 121.0; };
-    rates.erase(std::remove_if(rates.begin(), rates.end(), invalid_fps), rates.end());
+    auto [first, last] = std::ranges::remove_if(rates, invalid_fps);
+    rates.erase(first, last);
 
     auto FuzzyEquals = [](double First, double Second) { return std::abs(First - Second) < 0.03; };
 
@@ -2090,11 +2091,12 @@ void AvFormatDecoder::remove_tracks_not_in_same_AVProgram(int stream_index)
     {
         LOG(VB_PLAYBACK, LOG_DEBUG,
             QString("Size before: %1").arg(QString::number(track_list.size())));
-        track_list.erase(std::remove_if(track_list.begin(), track_list.end(),
+        auto [first, last] = std::ranges::remove_if(track_list,
             [&](const StreamInfo& i)
             {
                 return std::find(begin, end, i.m_av_stream_index) == end;
-            }), track_list.end());
+            });
+        track_list.erase(first, last);
         LOG(VB_PLAYBACK, LOG_DEBUG,
             QString("Size after: %1").arg(QString::number(track_list.size())));
     }
@@ -2685,8 +2687,12 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = MythAVUtil::PixelFormatToFrameType(c->pix_fmt);
-    if (!std::any_of(decoder->m_renderFormats->cbegin(), decoder->m_renderFormats->cend(),
+#ifdef __cpp_lib_ranges_contains
+    if (!std::ranges::contains(*decoder->m_renderFormats, type))
+#else
+    if (!std::ranges::any_of(*decoder->m_renderFormats,
                      [&type](auto Format) { return type == Format; }))
+#endif
     {
         decoder->m_directRendering = false;
         return avcodec_default_get_buffer2(c, pic, flags);

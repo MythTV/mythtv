@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
@@ -102,7 +105,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     const auto & profiles = MythNVDECContext::GetProfiles();
     auto capcheck = [&](const MythNVDECCaps& Cap)
         { return Cap.Supports(cudacodec, cudaformat, depth, (*Context)->width, (*Context)->height); };
-    if (!std::any_of(profiles.cbegin(), profiles.cend(), capcheck))
+    if (!std::ranges::any_of(profiles, capcheck))
     {
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "No matching profile support");
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC does NOT support %1").arg(desc));

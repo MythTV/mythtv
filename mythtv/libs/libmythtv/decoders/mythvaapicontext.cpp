@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // Qt
 #include <QCoreApplication>
 #include <QWaitCondition>
@@ -171,7 +174,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext** Context,
     auto mythprofile = MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
     auto haveprofile = [&](MythCodecContext::CodecProfile Profile, QSize Size)
     {
-        return std::any_of(profiles.cbegin(), profiles.cend(),
+        return std::ranges::any_of(std::as_const(profiles),
                            [&Profile,Size](auto vaprofile)
                                { return vaprofile.first == Profile &&
                                         vaprofile.second.first.width() <= Size.width() &&
