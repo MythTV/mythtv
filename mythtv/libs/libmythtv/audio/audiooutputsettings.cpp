@@ -5,8 +5,8 @@
  * Licensed under the GPL v2 or a later version at your choosing.
  */
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <vector>
 
 #include "libmythbase/mythcorecontext.h"
@@ -88,8 +88,12 @@ bool AudioOutputSettings::IsSupportedRate(int rate)
     if (m_rates.empty() && rate == 48000)
         return true;
 
-    auto result = std::find(m_rates.cbegin(), m_rates.cend(), rate);
+#ifdef __cpp_lib_ranges_contains
+    return std::ranges::contains(m_rates, rate);
+#else
+    auto result = std::ranges::find(m_rates, rate);
     return result != m_rates.end();
+#endif
 }
 
 int AudioOutputSettings::BestSupportedRate()
@@ -105,9 +109,9 @@ int AudioOutputSettings::NearestSupportedRate(int rate)
         return 48000;
 
     // Assume rates vector is sorted
-    auto it = std::find_if(m_rates.cbegin(), m_rates.cend(),
+    auto it = std::ranges::find_if(m_rates,
                            [rate](const auto entry){ return entry >= rate; } );
-    if (it != m_rates.cend())
+    if (it != m_rates.end())
         return *it;
 
     // Not found, so return highest available rate
@@ -137,8 +141,12 @@ bool AudioOutputSettings::IsSupportedFormat(AudioFormat format)
     if (m_formats.empty() && format == FORMAT_S16)
         return true;
 
-    auto result = std::find(m_formats.cbegin(), m_formats.cend(), format);
+#ifdef __cpp_lib_ranges_contains
+    return std::ranges::contains(m_formats, format);
+#else
+    auto result = std::ranges::find(m_formats, format);
     return result != m_formats.end();
+#endif
 }
 
 AudioFormat AudioOutputSettings::BestSupportedFormat()
@@ -247,9 +255,13 @@ bool AudioOutputSettings::IsSupportedChannels(int channels)
     if (m_channels.empty() && channels == 2)
         return true;
 
-    return std::any_of(m_channels.cbegin(), m_channels.cend(),
+#ifdef __cpp_lib_ranges_contains
+    return std::ranges::contains(m_channels, channels);
+#else
+    return std::ranges::any_of(m_channels,
                        [channels](const auto entry)
                            { return entry == channels; } );
+#endif
 }
 
 int AudioOutputSettings::BestSupportedChannels()
@@ -264,7 +276,7 @@ void AudioOutputSettings::SortSupportedChannels()
 {
     if (m_channels.empty())
         return;
-    sort(m_channels.begin(), m_channels.end());
+    std::ranges::sort(m_channels);
 }
 
 void AudioOutputSettings::SetBestSupportedChannels(int channels)
@@ -276,7 +288,7 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
     }
 
     std::vector<int>tmp;
-    std::copy_if(m_channels.cbegin(), m_channels.cend(),
+    std::ranges::copy_if(m_channels,
                  std::back_inserter(tmp),
                  [channels](int value){ return channels > value; } );
     m_channels = tmp;
