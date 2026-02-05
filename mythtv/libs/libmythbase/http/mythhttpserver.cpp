@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // Qt
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
@@ -371,7 +374,7 @@ void MythHTTPServer::NewHandlers(const HTTPHandlers& Handlers)
     {
         if (ReservedPath(handler.first))
             continue;
-        if (!std::any_of(m_config.m_handlers.cbegin(), m_config.m_handlers.cend(),
+        if (!std::ranges::any_of(m_config.m_handlers,
                          [&handler](const HTTPHandler& Handler) { return Handler.first == handler.first; }))
         {
             LOG(VB_HTTP, LOG_INFO, LOC + QString("Adding handler for '%1'").arg(handler.first));
@@ -393,8 +396,8 @@ void MythHTTPServer::StaleHandlers(const HTTPHandlers& Handlers)
     bool stalehandlers = false;
     for (const auto & handler : std::as_const(Handlers))
     {
-        auto found = std::find_if(m_config.m_handlers.begin(), m_config.m_handlers.end(),
-                                  [&handler](const HTTPHandler& Handler) {  return Handler.first == handler.first; });
+        auto found = std::ranges::find(m_config.m_handlers, handler.first,
+                                       &HTTPHandler::first);
         if (found != m_config.m_handlers.end())
         {
             m_config.m_handlers.erase(found);
@@ -412,7 +415,7 @@ void MythHTTPServer::NewServices(const HTTPServices& Services)
     {
         if (ReservedPath(service.first))
             continue;
-        if (!std::any_of(m_config.m_services.cbegin(), m_config.m_services.cend(),
+        if (!std::ranges::any_of(m_config.m_services,
                          [&service](const HTTPService& Service) { return Service.first == service.first; }))
         {
             LOG(VB_HTTP, LOG_INFO, LOC + QString("Adding service for '%1'").arg(service.first));
@@ -434,8 +437,8 @@ void MythHTTPServer::StaleServices(const HTTPServices& Services)
     bool staleservices = false;
     for (const auto & service : std::as_const(Services))
     {
-        auto found = std::find_if(m_config.m_services.begin(), m_config.m_services.end(),
-                                  [&service](const HTTPService& Service) {  return Service.first == service.first; });
+        auto found = std::ranges::find(m_config.m_services, service.first,
+                                       &HTTPService::first);
         if (found != m_config.m_services.end())
         {
             m_config.m_services.erase(found);

@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // MythTV
 #include "mythlogging.h"
 #include "http/mythhttpthread.h"
@@ -52,7 +55,7 @@ void MythHTTPThreadPool::AddThread(MythHTTPThread *Thread)
 void MythHTTPThreadPool::ThreadFinished()
 {
     auto * qthread = dynamic_cast<QThread*>(sender());
-    auto found = std::find_if(m_threads.cbegin(), m_threads.cend(),
+    auto found = std::ranges::find_if(std::as_const(m_threads),
             [&qthread](MythHTTPThread* Thread) { return Thread->qthread() == qthread; });
     if (found == m_threads.cend())
     {
@@ -61,7 +64,7 @@ void MythHTTPThreadPool::ThreadFinished()
     }
 
     // Remove from list of upgraded threads if necessary
-    auto upgraded = std::find_if(m_upgradedThreads.cbegin(), m_upgradedThreads.cend(),
+    auto upgraded = std::ranges::find_if(std::as_const(m_upgradedThreads),
             [&qthread](MythHTTPThread* Thread) { return Thread->qthread() == qthread; });
     if (upgraded != m_upgradedThreads.cend())
         m_upgradedThreads.erase(upgraded);
@@ -73,7 +76,7 @@ void MythHTTPThreadPool::ThreadFinished()
 
 void MythHTTPThreadPool::ThreadUpgraded(QThread* Thread)
 {
-    auto found = std::find_if(m_threads.cbegin(), m_threads.cend(),
+    auto found = std::ranges::find_if(std::as_const(m_threads),
             [&Thread](MythHTTPThread* QThread) { return QThread->qthread() == Thread; });
     if (found == m_threads.cend())
     {

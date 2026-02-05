@@ -3,6 +3,10 @@
 
 #include "mythsorthelper.h"
 
+// C++ headers
+#include <algorithm>
+
+// MythTV
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
@@ -203,7 +207,7 @@ QString MythSortHelper::doPathname(const QString& pathname) const
     QStringList parts = lpathname.split("/");
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < parts.size(); ++i) {
-        if (std::any_of(m_exclList.cbegin(), m_exclList.cend(),
+        if (std::ranges::any_of(std::as_const(m_exclList),
                         [&parts,i](const QString& excl)
                             { return parts[i].startsWith(excl); } ))
             continue;

@@ -1,5 +1,6 @@
 // Qt
 #include <QMetaClassInfo>
+#include <algorithm>
 
 // MythTV
 #include "mythlogging.h"
@@ -173,7 +174,7 @@ bool MythHTTPMetaService::isProtected(const QMetaObject& Meta, const QString& Me
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
         auto isAuth = [](const QString& info)
             { return info.startsWith(QStringLiteral("AuthRequired=")); };
-        return std::any_of(infos.cbegin(), infos.cend(), isAuth);
+        return std::ranges::any_of(std::as_const(infos), isAuth);
     }
     return false;
 }
