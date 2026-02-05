@@ -1,9 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
-#include <cmath>
-
 #include <algorithm>
+#include <cmath>
 
 #include "atscstreamdata.h"
 
@@ -525,18 +524,25 @@ bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
     for (uint i = 0; it2 != m_atscEttPids.end() && (i < ett_count); (++it2),(i++))
         add_pids_tmp.push_back(*it2);
 
-    uint_vec_t::const_iterator it3;
     for (uint pid : cur_pids)
     {
-        it3 = find(add_pids_tmp.begin(), add_pids_tmp.end(), pid);
+#ifdef __cpp_lib_ranges_contains
+        if (!std::ranges::contains(add_pids_tmp, pid))
+#else
+        auto it3 = std::ranges::find(add_pids_tmp, pid);
         if (it3 == add_pids_tmp.end())
+#endif
             del_pids.push_back(pid);
     }
 
     for (uint pid : add_pids_tmp)
     {
-        it3 = find(cur_pids.begin(), cur_pids.end(), pid);
+#ifdef __cpp_lib_ranges_contains
+        if (!std::ranges::contains(cur_pids, pid))
+#else
+        auto it3 = std::ranges::find(cur_pids, pid);
         if (it3 == cur_pids.end())
+#endif
             add_pids.push_back(pid);
     }
 
@@ -942,8 +948,12 @@ void ATSCStreamData::AddATSCMainListener(ATSCMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    if (std::any_of(m_atscMainListeners.cbegin(), m_atscMainListeners.cend(),
+#ifdef __cpp_lib_ranges_contains
+    if (std::ranges::contains(m_atscMainListeners, val))
+#else
+    if (std::ranges::any_of(m_atscMainListeners,
                     [val](auto & listener){ return val == listener; } ))
+#endif
         return;
     m_atscMainListeners.push_back(val);
 }
@@ -952,22 +962,21 @@ void ATSCStreamData::RemoveATSCMainListener(ATSCMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto it = m_atscMainListeners.begin(); it != m_atscMainListeners.end(); ++it)
-    {
-        if (((void*)val) == ((void*)*it))
-        {
-            m_atscMainListeners.erase(it);
-            return;
-        }
-    }
+    auto it = std::ranges::find(m_atscMainListeners, val);
+    if (it != m_atscMainListeners.end())
+        m_atscMainListeners.erase(it);
 }
 
 void ATSCStreamData::AddSCTEMainListener(SCTEMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    if (std::any_of(m_scteMainlisteners.cbegin(), m_scteMainlisteners.cend(),
+#ifdef __cpp_lib_ranges_contains
+    if (std::ranges::contains(m_scteMainlisteners, val))
+#else
+    if (std::ranges::any_of(m_scteMainlisteners,
                     [val](auto & listener){ return val == listener; } ))
+#endif
         return;
 
     m_scteMainlisteners.push_back(val);
@@ -977,22 +986,21 @@ void ATSCStreamData::RemoveSCTEMainListener(SCTEMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto it = m_scteMainlisteners.begin(); it != m_scteMainlisteners.end(); ++it)
-    {
-        if (((void*)val) == ((void*)*it))
-        {
-            m_scteMainlisteners.erase(it);
-            return;
-        }
-    }
+    auto it = std::ranges::find(m_scteMainlisteners, val);
+    if (it != m_scteMainlisteners.end())
+        m_scteMainlisteners.erase(it);
 }
 
 void ATSCStreamData::AddATSCAuxListener(ATSCAuxStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    if (std::any_of(m_atscAuxListeners.cbegin(), m_atscAuxListeners.cend(),
+#ifdef __cpp_lib_ranges_contains
+    if (std::ranges::contains(m_atscAuxListeners, val))
+#else
+    if (std::ranges::any_of(m_atscAuxListeners,
                     [val](auto & listener){ return val == listener; } ))
+#endif
         return;
 
     m_atscAuxListeners.push_back(val);
@@ -1002,22 +1010,21 @@ void ATSCStreamData::RemoveATSCAuxListener(ATSCAuxStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto it = m_atscAuxListeners.begin(); it != m_atscAuxListeners.end(); ++it)
-    {
-        if (((void*)val) == ((void*)*it))
-        {
-            m_atscAuxListeners.erase(it);
-            return;
-        }
-    }
+    auto it = std::ranges::find(m_atscAuxListeners, val);
+    if (it != m_atscAuxListeners.end())
+        m_atscAuxListeners.erase(it);
 }
 
 void ATSCStreamData::AddATSCEITListener(ATSCEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    if (std::any_of(m_atscEitListeners.cbegin(), m_atscEitListeners.cend(),
+#ifdef __cpp_lib_ranges_contains
+    if (std::ranges::contains(m_atscEitListeners, val))
+#else
+    if (std::ranges::any_of(m_atscEitListeners,
                     [val](auto & listener){ return val == listener; } ))
+#endif
         return;
 
     m_atscEitListeners.push_back(val);
@@ -1027,22 +1034,21 @@ void ATSCStreamData::RemoveATSCEITListener(ATSCEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto it = m_atscEitListeners.begin(); it != m_atscEitListeners.end(); ++it)
-    {
-        if (((void*)val) == ((void*)*it))
-        {
-            m_atscEitListeners.erase(it);
-            return;
-        }
-    }
+    auto it = std::ranges::find(m_atscEitListeners, val);
+    if (it != m_atscEitListeners.end())
+        m_atscEitListeners.erase(it);
 }
 
 void ATSCStreamData::AddATSC81EITListener(ATSC81EITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    if (std::any_of(m_atsc81EitListeners.cbegin(), m_atsc81EitListeners.cend(),
+#ifdef __cpp_lib_ranges_contains
+    if (std::ranges::contains(m_atsc81EitListeners, val))
+#else
+    if (std::ranges::any_of(std::as_const(m_atsc81EitListeners),
                     [val](auto & listener){ return val == listener; } ))
+#endif
         return;
 
     m_atsc81EitListeners.push_back(val);
@@ -1052,12 +1058,7 @@ void ATSCStreamData::RemoveATSC81EITListener(ATSC81EITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    for (auto it = m_atsc81EitListeners.begin(); it != m_atsc81EitListeners.end(); ++it)
-    {
-        if (((void*)val) == ((void*)*it))
-        {
-            m_atsc81EitListeners.erase(it);
-            return;
-        }
-    }
+    auto it = std::ranges::find(m_atsc81EitListeners, val);
+    if (it != m_atsc81EitListeners.end())
+        m_atsc81EitListeners.erase(it);
 }

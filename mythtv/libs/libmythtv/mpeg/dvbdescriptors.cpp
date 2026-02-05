@@ -170,7 +170,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     uint length = 0;
     if (!encoding_override.empty() && (src[0] >= 0x20)) {
-        std::copy(encoding_override.cbegin(), encoding_override.cend(), dst);
+        std::ranges::copy(encoding_override, dst);
         length = encoding_override.size();
     }
 

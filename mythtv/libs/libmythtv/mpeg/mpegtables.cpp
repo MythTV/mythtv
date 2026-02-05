@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QString>
 #include <QTime>
+#include <algorithm>
 
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/stringutil.h"
@@ -337,7 +338,7 @@ ProgramAssociationTable* ProgramAssociationTable::CreateBlank([[maybe_unused]] b
 {
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     auto *dst = tspacket->data() + sizeof(TSHeader) + 1; /* start of field pointer */
-    std::copy(DEFAULT_PAT_HEADER.cbegin(), DEFAULT_PAT_HEADER.cend(), dst);
+    std::ranges::copy(DEFAULT_PAT_HEADER, dst);
     PSIPTable psip = PSIPTable::View(*tspacket);
     psip.SetLength(TSPacket::kPayloadSize
                    - 1 /* for start of field pointer */
@@ -388,7 +389,7 @@ ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
     ProgramMapTable *pmt = nullptr;
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     auto *dst = tspacket->data() + sizeof(TSHeader) + 1; /* start of field pointer */
-    std::copy(DEFAULT_PMT_HEADER.cbegin(), DEFAULT_PMT_HEADER.cend(), dst);
+    std::ranges::copy(DEFAULT_PMT_HEADER, dst);
 
     if (smallPacket)
     {

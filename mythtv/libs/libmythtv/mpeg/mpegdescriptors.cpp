@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
+#include <algorithm>
 #include <climits>
 #include <cstdint>
 
@@ -79,7 +80,7 @@ const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
                                           uint desc_tag)
 {
     auto sametag = [desc_tag](const auto *item){ return item[0] == desc_tag; };
-    auto it = std::find_if(parsed.cbegin(), parsed.cend(), sametag);
+    auto it = std::ranges::find_if(parsed, sametag);
     return (it != parsed.cend()) ? *it : nullptr;
 }
 
@@ -90,7 +91,7 @@ const unsigned char *MPEGDescriptor::FindExtension(const desc_list_t &parsed,
         { return item[0] == DescriptorID::extension &&
                  item[1] > 1 &&
                  item[2] == desc_tag; };
-    auto it = std::find_if(parsed.cbegin(), parsed.cend(), sametag);
+    auto it = std::ranges::find_if(parsed, sametag);
     return (it != parsed.cend()) ? *it : nullptr;
 }
 
@@ -98,7 +99,7 @@ desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
 {
     desc_list_t tmp;
     auto sametag = [desc_tag](const auto *item){ return item[0] == desc_tag; };
-    std::copy_if(parsed.cbegin(), parsed.cend(), std::back_inserter(tmp), sametag);
+    std::ranges::copy_if(parsed, std::back_inserter(tmp), sametag);
     return tmp;
 }
 
