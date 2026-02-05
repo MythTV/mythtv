@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 // C++ headers
+#include <algorithm>
 #include <utility>
 
 // MythTV headers
@@ -278,7 +279,7 @@ void StreamHandler::UpdateListeningForEIT(void)
             for (uint eit : del_eit)
             {
                 uint_vec_t::iterator it2;
-                it2 = find(m_eitPids.begin(), m_eitPids.end(), eit);
+                it2 = std::ranges::find(m_eitPids, eit);
                 if (it2 != m_eitPids.end())
                     m_eitPids.erase(it2);
                 sd->RemoveListeningPID(eit);

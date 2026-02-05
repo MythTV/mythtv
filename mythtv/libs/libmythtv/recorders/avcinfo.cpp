@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// C++ headers
+#include <algorithm>
+
 // MythTV headers
 #include "avcinfo.h"
 #ifndef GUID_ONLY
@@ -65,7 +68,7 @@ bool AVCInfo::GetSubunitInfo(void)
 
 bool AVCInfo::IsSubunitType(int subunit_type) const
 {
-    return std::any_of(m_unit_table.cbegin(), m_unit_table.cend(),
+    return std::ranges::any_of(m_unit_table,
                        [subunit_type](int subunit)
                            { return (subunit != 0xff) &&
                                     (subunit & FirewireDevice::kAVCSubunitTypeUnit) == subunit_type; } );

@@ -24,7 +24,7 @@ static bool insert_crc(QList<uint64_t> &seen_crc, const PSIPTable &psip)
     uint64_t key = (((uint64_t)psip.TableID()) << 32) | psip.CRC();
 
     QList<uint64_t>::iterator it =
-        std::lower_bound(seen_crc.begin(), seen_crc.end(), key);
+        std::ranges::lower_bound(seen_crc, key);
 
     if ((it == seen_crc.end()) || (*it != key))
     {
@@ -180,7 +180,7 @@ void DTVSignalMonitor::UpdateListeningForEIT(void)
         for (uint eit : del_eit)
         {
             uint_vec_t::iterator it;
-            it = find(m_eitPids.begin(), m_eitPids.end(), eit);
+            it = std::ranges::find(m_eitPids, eit);
             if (it != m_eitPids.end())
                 m_eitPids.erase(it);
             GetStreamData()->RemoveListeningPID(eit);

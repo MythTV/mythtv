@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 // POSIX headers
+#include <algorithm>
 #include <chrono> // for milliseconds
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -399,7 +400,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
     }
 
     for (auto & it : priority_queue)
-        std::sort(it.begin(), it.end());
+        std::ranges::sort(it);
 
     for (PIDPriority i = kPIDPriorityHigh; i > kPIDPriorityNone;
          i = (PIDPriority)((int)i-1))
