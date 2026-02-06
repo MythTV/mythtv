@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <chrono>
 #include <functional>   //binary_negate
 #include <map>
@@ -737,7 +738,7 @@ class VideoDialogPrivate
                         ratingstring.split(':', Qt::SkipEmptyParts);
                 auto to_pl = [sl](const auto & rating)
                     { return parental_level_map::value_type(rating, sl.GetLevel()); };
-                std::transform(ratings.cbegin(), ratings.cend(),
+                std::ranges::transform(std::as_const(ratings),
                                std::back_inserter(m_ratingToPl), to_pl);
             }
             m_ratingToPl.sort(rating_to_pl_greater);

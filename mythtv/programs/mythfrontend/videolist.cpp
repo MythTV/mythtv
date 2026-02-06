@@ -729,7 +729,7 @@ void VideoListImp::sort_view_data(bool flat_list)
 {
     if (flat_list)
     {
-        sort(m_metadataViewFlat.begin(), m_metadataViewFlat.end(),
+        std::ranges::sort(m_metadataViewFlat,
              metadata_sort(m_videoFilter));
     }
     else
@@ -816,7 +816,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 const std::vector<std::pair <int, QString> >& genres =
                     data->GetGenres();
 
-                std::transform(genres.cbegin(), genres.cend(),
+                std::ranges::transform(genres,
                                std::back_inserter(groups), take_second);
                 break;
             }
@@ -844,7 +844,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             {
                 const std::vector<std::pair<int, QString> >& cast = data->GetCast();
 
-                std::transform(cast.cbegin(), cast.cend(),
+                std::ranges::transform(cast,
                                std::back_inserter(groups), take_second);
                 break;
             }
@@ -1008,7 +1008,8 @@ void VideoListImp::buildFsysList()
     {
         auto new_pl = [](const auto& dir)
             { return node_to_path_list::value_type(path_to_node_name(dir), dir); };
-        std::transform(dirs.cbegin(), dirs.cend(), std::back_inserter(node_paths), new_pl);
+        std::ranges::transform(std::as_const(dirs),
+                               std::back_inserter(node_paths), new_pl);
     }
     else
     {

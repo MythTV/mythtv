@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <utility>
 
 // MythTV
@@ -18,7 +19,8 @@
 static QString clean_comment(const QString &comment)
 {
     QString result;
-    std::copy_if(comment.cbegin(), comment.cend(), std::back_inserter(result), [](QChar x) { return x.isPrint(); } );
+    std::ranges::copy_if(std::as_const(comment), std::back_inserter(result),
+                         [](QChar x) { return x.isPrint(); } );
     return result;
 }
 

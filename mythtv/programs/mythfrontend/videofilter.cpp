@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <set>
 
 // MythTV
@@ -222,14 +223,14 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     {
         const VideoMetadata::genre_list &gl = mdata.GetGenres();
         auto samegenre = [this](const auto & g) {return g.first == m_genre; };
-        matches = std::any_of(gl.cbegin(), gl.cend(), samegenre);
+        matches = std::ranges::any_of(gl, samegenre);
     }
 
     if (matches && m_country != kCountryFilterAll)
     {
         const VideoMetadata::country_list &cl = mdata.GetCountries();
         auto samecountry = [this](const auto & c) {return c.first == m_country; };
-        matches = std::any_of(cl.cbegin(), cl.cend(), samecountry);
+        matches = std::ranges::any_of(cl, samecountry);
     }
 
     if (matches && m_cast != kCastFilterAll)
@@ -243,7 +244,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         else
         {
             auto samecast = [this](const auto & c){return c.first == m_cast; };
-            matches = std::any_of(cl.cbegin(), cl.cend(), samecast);
+            matches = std::ranges::any_of(cl, samecast);
         }
     }
 

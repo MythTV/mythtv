@@ -1,3 +1,6 @@
+// Standard UNIX C headers
+#include <algorithm>
+
 // Qt
 #include <QDir>
 
@@ -187,7 +190,7 @@ class VideoPlayerCommandPrivate
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {
         auto playerclone = [](auto *player) { return player->Clone(); };
-        std::transform(other.m_playerProcs.cbegin(), other.m_playerProcs.cend(),
+        std::ranges::transform(other.m_playerProcs,
                        std::back_inserter(m_playerProcs), playerclone);
     }
 
@@ -282,7 +285,7 @@ class VideoPlayerCommandPrivate
         auto sameext = [extension](const auto & fa)
             { return fa.extension.toLower() == extension.toLower() &&
                      !fa.use_default; };
-        auto fa = std::find_if(fa_list.cbegin(), fa_list.cend(), sameext);
+        auto fa = std::ranges::find_if(fa_list, sameext);
         if (fa != fa_list.cend())
             play_command = fa->playcommand;
 
@@ -328,7 +331,7 @@ class VideoPlayerCommandPrivate
     void Play() const
     {
         // Do this until one of the players returns true
-        (void)std::any_of(m_playerProcs.cbegin(), m_playerProcs.cend(),
+        (void)std::ranges::any_of(m_playerProcs,
                           [](auto *player){ return player->Play(); } );
     }
 

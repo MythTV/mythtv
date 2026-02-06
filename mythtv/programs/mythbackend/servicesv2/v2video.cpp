@@ -1,3 +1,6 @@
+// Standard UNIX C headers
+#include <algorithm>
+
 // MythTV
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "libmythbase/mythcorecontext.h"
@@ -921,7 +924,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
     {
         VideoMetadata::genre_list genres;
         QStringList genresList = sGenres.split(',', Qt::SkipEmptyParts);
-        std::transform(genresList.cbegin(), genresList.cend(), std::back_inserter(genres),
+        std::ranges::transform(std::as_const(genresList), std::back_inserter(genres),
                        [](const QString& name)
                            {return VideoMetadata::genre_list::value_type(-1, name.simplified());} );
 
@@ -933,7 +936,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
     {
         VideoMetadata::cast_list cast;
         QStringList castList = sCast.split(',', Qt::SkipEmptyParts);
-        std::transform(castList.cbegin(), castList.cend(), std::back_inserter(cast),
+        std::ranges::transform(std::as_const(castList), std::back_inserter(cast),
                        [](const QString& name)
                            {return VideoMetadata::cast_list::value_type(-1, name.simplified());} );
 
@@ -945,7 +948,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
     {
         VideoMetadata::country_list countries;
         QStringList countryList = sCountries.split(',', Qt::SkipEmptyParts);
-        std::transform(countryList.cbegin(), countryList.cend(), std::back_inserter(countries),
+        std::ranges::transform(std::as_const(countryList), std::back_inserter(countries),
                        [](const QString& name)
                            {return VideoMetadata::country_list::value_type(-1, name.simplified());} );
 
