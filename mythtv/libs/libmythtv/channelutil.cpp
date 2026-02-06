@@ -2603,7 +2603,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         return channelList;
     }
 
-    QList<uint> groupIdList;
+    std::vector<uint> groupIdList;
     while (query.next())
     {
         ChannelInfo channelInfo;
@@ -2641,7 +2641,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         groupIdList.clear();
         while (!groupIDs.isEmpty())
                 groupIdList.push_back(groupIDs.takeFirst().toUInt());
-        std::sort(groupIdList.begin(), groupIdList.end());
+        std::ranges::sort(groupIdList);
         for (auto groupId : groupIdList)
             channelInfo.AddGroupId(groupId);
 
