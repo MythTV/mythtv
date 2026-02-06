@@ -6,6 +6,7 @@
 #include "mythdisplaymode.h"
 
 // Std
+#include <algorithm>
 #include <cmath>
 
 MythDisplayMode::MythDisplayMode(QSize Resolution, QSize PhysicalSize,
@@ -110,7 +111,7 @@ void MythDisplayMode::SetAspectRatio(double AspectRatio)
 void MythDisplayMode::AddRefreshRate(double Rate)
 {
     m_refreshRates.push_back(Rate);
-    std::sort(m_refreshRates.begin(), m_refreshRates.end());
+    std::ranges::sort(m_refreshRates);
 }
 
 void MythDisplayMode::ClearRefreshRates()

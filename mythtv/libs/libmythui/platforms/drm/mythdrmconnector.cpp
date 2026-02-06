@@ -19,8 +19,8 @@ DRMConn MythDRMConnector::Create(int FD, uint32_t Id)
 
 DRMConn MythDRMConnector::GetConnector(const DRMConns &Connectors, uint32_t Id)
 {
-    auto match = [&Id](const auto & Conn) { return Conn->m_id == Id; };
-    if (auto found = std::find_if(Connectors.cbegin(), Connectors.cend(), match); found != Connectors.cend())
+    auto found = std::ranges::find(Connectors, Id, &MythDRMConnector::m_id);
+    if (found != Connectors.end())
         return *found;
     return nullptr;
 }

@@ -13,8 +13,8 @@
  *
  * System wide LIRCRC support by Michal Svec <rebel@atrey.karlin.mff.cuni.cz>
  */ 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cerrno>
 #include <climits>
@@ -842,7 +842,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		{
 			size_t next = 0;
 			std::string token = parse_token(string, next);
-			std::transform(token.begin(), token.end(), token.begin(),
+			std::ranges::transform(token, token.begin(),
 				       [](char c){return std::tolower(c);  });
 			if (token[0]=='#')
 			{
@@ -893,7 +893,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 			else
 			{
 				std::string token2 = parse_token(string, next);
-				std::transform(token2.begin(), token2.end(), token2.begin(),
+				std::ranges::transform(token2, token2.begin(),
 					       [](char c){return std::tolower(c);  });
 				if (string.find_first_not_of(" \t", next) != std::string::npos)
 				{
@@ -928,7 +928,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		{
 			std::string token=lirc_trim(string.substr(0,eq));
 			std::string token2=lirc_trim(string.substr(eq+1));
-			std::transform(token.begin(), token.end(), token.begin(),
+			std::ranges::transform(token, token.begin(),
 				       [](char c){return std::tolower(c);  });
 			if(token[0]=='#')
 			{
@@ -1270,9 +1270,9 @@ static std::string lirc_execute(const struct lirc_state *state,
 
 static int sstrcasecmp(std::string s1, std::string s2)
 {
-	std::transform(s1.begin(), s1.end(), s1.begin(),
+	std::ranges::transform(s1, s1.begin(),
 		       [](char c){ return std::tolower(c); });
-	std::transform(s2.begin(), s2.end(), s2.begin(),
+	std::ranges::transform(s2, s2.begin(),
 		       [](char c){ return std::tolower(c); });
 	return(strcasecmp(s1.data(), s2.data()));
 }

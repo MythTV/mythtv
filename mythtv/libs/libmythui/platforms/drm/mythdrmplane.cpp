@@ -2,6 +2,8 @@
 #include "libmythbase/mythlogging.h"
 #include "platforms/drm/mythdrmplane.h"
 
+#include <algorithm>
+
 #define LOC QString("DRMPlane: ")
 
 /*! \class MythDRMPlane
@@ -173,7 +175,11 @@ bool MythDRMPlane::FormatIsVideo(uint32_t Format)
         DRM_FORMAT_YUYV, DRM_FORMAT_YVYU, DRM_FORMAT_UYVY, DRM_FORMAT_VYUY
     };
 
-    return std::find(s_yuvFormats.cbegin(), s_yuvFormats.cend(), Format) != s_yuvFormats.cend();
+#ifdef __cpp_lib_ranges_contains
+    return std::ranges::contains(s_yuvFormats, Format);
+#else
+    return std::ranges::find(s_yuvFormats, Format) != s_yuvFormats.end();
+#endif
 }
 
 /*! \brief Enusure list of supplied formats contains a format that is suitable for OpenGL/Vulkan.
@@ -189,11 +195,15 @@ bool MythDRMPlane::HasOverlayFormat(const FOURCCVec &Formats)
         DRM_FORMAT_ARGB2101010, DRM_FORMAT_ABGR2101010
     };
 
-    for (auto format : Formats)
-        if (std::any_of(s_rgbFormats.cbegin(), s_rgbFormats.cend(), [&format](auto Format) { return Format == format; }))
-            return true;
-
-    return false;
+    return std::ranges::any_of(Formats,
+               [](uint32_t format) {
+#ifdef __cpp_lib_ranges_contains
+                   return std::ranges::contains(s_rgbFormats, format);
+#else
+                   return std::ranges::any_of(s_rgbFormats,
+                          [&format](auto Format) { return Format == format; });
+#endif
+               });
 }
 
 uint32_t MythDRMPlane::GetAlphaFormat(const FOURCCVec &Formats)
@@ -205,8 +215,15 @@ uint32_t MythDRMPlane::GetAlphaFormat(const FOURCCVec &Formats)
     };
 
     for (auto format : s_alphaFormats)
-        if (std::any_of(Formats.cbegin(), Formats.cend(), [&format](auto Format) { return Format == format; }))
+    {
+#ifdef __cpp_lib_ranges_contains
+        if (std::ranges::contains(Formats, format))
+#else
+        if (std::ranges::any_of(Formats,
+                                [&format](auto Format) { return Format == format; }))
+#endif
             return format;
+    }
 
     return DRM_FORMAT_INVALID;
 }

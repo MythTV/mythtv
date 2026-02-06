@@ -2,6 +2,7 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <QGuiApplication>
+#include <algorithm>
 // N.B. Private headers
 #include <qpa/qplatformnativeinterface.h>
 
@@ -81,7 +82,7 @@ void MythWaylandExtras::AnnounceGlobal(void *Opaque, struct wl_registry *Reg,
                                        uint32_t Name, const char *Interface, uint32_t Version)
 {
     auto * registry = reinterpret_cast<MythWaylandRegistry*>(Opaque);
-    auto found = std::find_if(registry->begin(), registry->end(), [&](const auto IFace)
+    auto found = std::ranges::find_if(*registry, [&](const auto IFace)
     {
         return (strcmp(Interface, IFace.first->name) == 0) && (IFace.first->version == static_cast<int>(Version));
     });
