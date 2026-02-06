@@ -1,4 +1,5 @@
 // C/C++
+#include <algorithm>
 #include <thread>
 #include <utility>
 
@@ -144,7 +145,7 @@ Playlist *PlaylistContainer::getPlaylist(int id)
 
     auto idmatch = [id](const auto & playlist)
         { return playlist->getID() == id; };
-    auto it = std::find_if(m_allPlaylists->cbegin(), m_allPlaylists->cend(), idmatch);
+    auto it = std::ranges::find_if(std::as_const(*m_allPlaylists), idmatch);
     if (it != m_allPlaylists->cend())
         return *it;
 
@@ -159,7 +160,7 @@ Playlist *PlaylistContainer::getPlaylist(const QString &name)
     //  by name;
     auto namematch = [name](const auto & playlist)
         { return playlist->getName() == name; };
-    auto it = std::find_if(m_allPlaylists->cbegin(), m_allPlaylists->cend(), namematch);
+    auto it = std::ranges::find_if(std::as_const(*m_allPlaylists), namematch);
     if (it != m_allPlaylists->cend())
         return *it;
 
@@ -261,7 +262,7 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
 
         auto indexmatch = [index](const auto & playlist)
             { return playlist->getID() == index; };
-        auto it = std::find_if(m_allPlaylists->cbegin(), m_allPlaylists->cend(), indexmatch);
+        auto it = std::ranges::find_if(std::as_const(*m_allPlaylists), indexmatch);
         if (it != m_allPlaylists->cend())
             return (*it)->getName();
     }
@@ -281,7 +282,7 @@ bool PlaylistContainer::nameIsUnique(const QString& a_name, int which_id)
     auto itemfound = [a_name,which_id](const auto & playlist)
         { return playlist->getName() == a_name &&
                  playlist->getID() != which_id; };
-    return std::none_of(m_allPlaylists->cbegin(), m_allPlaylists->cend(), itemfound);
+    return std::ranges::none_of(std::as_const(*m_allPlaylists), itemfound);
 }
 
 QStringList PlaylistContainer::getPlaylistNames(void)

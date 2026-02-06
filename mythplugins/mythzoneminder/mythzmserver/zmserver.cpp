@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <sys/shm.h>
 #include <sys/mman.h>
+#include <utility>
 
 #ifndef MSG_NOSIGNAL
 static constexpr int MSG_NOSIGNAL { 0 };  // Apple also has SO_NOSIGPIPE?
@@ -144,7 +145,7 @@ void loadZMConfig(const std::string &configfile)
             val = val.substr(begin);
 
         // convert name to uppercase
-        std::transform(name.cbegin(), name.cend(), name.begin(), ::toupper);
+        std::ranges::transform(name, name.begin(), ::toupper);
 
         if      ( name == "ZM_DB_HOST"    ) g_server = val;
         else if ( name == "ZM_DB_NAME"    ) g_database = val;

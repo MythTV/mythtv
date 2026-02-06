@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 
 // Qt
@@ -215,7 +216,7 @@ void FileSelector::OKPressed()
         {
             if (a->type != "File")
                 continue;
-            if (std::none_of(m_selectedList.cbegin(), m_selectedList.cend(),
+            if (std::ranges::none_of(std::as_const(m_selectedList),
                              [a](const auto & f)
                                  {return a->filename == f; } ))
                 tempAList.append(a);
@@ -229,7 +230,7 @@ void FileSelector::OKPressed()
         for (const QString & f : std::as_const(m_selectedList))
         {
             auto namematch = [f](const auto *a){ return a->filename == f; };
-            if (std::any_of(m_archiveList->cbegin(), m_archiveList->cend(), namematch))
+            if (std::ranges::any_of(std::as_const(*m_archiveList), namematch))
                 tempSList.append(f);
         }
 
@@ -333,9 +334,8 @@ void FileSelector::updateSelectedList()
 
     for (const auto *a : std::as_const(*m_archiveList))
     {
-        auto samename = [a](const auto *f)
-            { return f->filename == a->filename; };
-        auto f = std::find_if(m_fileData.cbegin(), m_fileData.cend(), samename);
+        auto f = std::ranges::find(std::as_const(m_fileData), a->filename,
+                                   &FileData::filename);
         if (f != m_fileData.cend())
         {
             if (m_selectedList.indexOf((*f)->filename) == -1)

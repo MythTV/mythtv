@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 // C headers
+#include <algorithm>
 #include <cmath>
 
 // QT headers
@@ -177,7 +178,7 @@ void MythNews::loadSites(void)
         bool podcast = query.value(4).toBool();
         m_newsSites.push_back(new NewsSite(name, url, time, podcast));
     }
-    std::sort(m_newsSites.begin(), m_newsSites.end(), NewsSite::sortByName);
+    std::ranges::sort(m_newsSites, NewsSite::sortByName);
 
     for (auto & site : m_newsSites)
     {

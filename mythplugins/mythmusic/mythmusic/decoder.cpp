@@ -6,6 +6,7 @@
 
 // qt
 #include <QDir>
+#include <algorithm>
 
 // MythTV
 #include <libmythmetadata/metaio.h>
@@ -83,7 +84,7 @@ bool Decoder::supports(const QString &source)
 {
     checkFactories();
 
-    return std::any_of(factories->cbegin(), factories->cend(),
+    return std::ranges::any_of(std::as_const(*factories),
                        [source](const auto & factory)
                            {return factory->supports(source); } );
 }
@@ -99,7 +100,7 @@ Decoder *Decoder::create(const QString &source, AudioOutput *output, bool deleta
 
     auto supported = [source](const auto & factory)
         { return factory->supports(source); };
-    auto f = std::find_if(factories->cbegin(), factories->cend(), supported);
+    auto f = std::ranges::find_if(std::as_const(*factories), supported);
     return (f != factories->cend())
         ? (*f)->create(source, output, deletable)
         : nullptr;
