@@ -15,6 +15,7 @@ QObject::customEvent to receive event notifications for subscribed services.
 #else
 #include <QTextCodec>
 #endif
+#include <algorithm>
 #include <utility>
 
 #include <QHostAddress>
@@ -50,7 +51,7 @@ UPNPSubscription::UPNPSubscription(const QString &share_path, int port)
 {
     m_nSupportedMethods = (uint)RequestTypeNotify; // Only NOTIFY supported
 
-    auto it = std::find_if(UPnp::g_IPAddrList.cbegin(), UPnp::g_IPAddrList.cend(),
+    auto it = std::ranges::find_if(std::as_const(UPnp::g_IPAddrList),
                            [](const QHostAddress& tmp) {return !tmp.isLoopback(); });
     if (it == UPnp::g_IPAddrList.cend())
         return;

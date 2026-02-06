@@ -25,6 +25,7 @@
 #include <Qt>
 #include <QUrl>
 
+#include <algorithm>
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>
@@ -452,7 +453,7 @@ qint64 HTTPRequest::SendResponse( void )
     QBuffer compBuffer;
 
     auto values = m_mapHeaders.values("accept-encoding");
-    bool gzip_found = std::any_of(values.cbegin(), values.cend(),
+    bool gzip_found = std::ranges::any_of(std::as_const(values),
                                   [](const auto & value)
                                       {return value.contains( "gzip" ); });
 
