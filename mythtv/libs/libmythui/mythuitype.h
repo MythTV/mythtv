@@ -48,14 +48,25 @@ Q_DECLARE_METATYPE(MythUICallbackNMF)
 Q_DECLARE_METATYPE(MythUICallbackMF)
 Q_DECLARE_METATYPE(MythUICallbackMFc)
 
-// Templates for determining if an argument is a "Pointer to a
-// Member Function"
-template<typename Func> struct FunctionPointerTest
-{ enum : std::uint8_t {MemberFunction = false, MemberConstFunction = false}; };
-template<class Obj, typename Ret, typename... Args> struct FunctionPointerTest<Ret (Obj::*) (Args...)>
-{ enum : std::uint8_t {MemberFunction = true, MemberConstFunction = false}; };
-template<class Obj, typename Ret, typename... Args> struct FunctionPointerTest<Ret (Obj::*) (Args...) const>
-{ enum {MemberFunction = false, MemberConstFunction = true}; };
+// std::is_member_function_pointer_v is true for both const and
+// non-const member functions.  Need a way to distinguish between
+// these two cases.
+
+// Base template
+template <typename T>
+struct is_const_member_func : std::false_type {};
+// Specialization for const member functions
+template <typename Return, typename Class, typename... Args>
+struct is_const_member_func<Return (Class::*)(Args...) const> : std::true_type {};
+
+// Helpers for convenience
+template <typename T>
+constexpr bool is_const_member_func_v =
+    std::is_member_function_pointer_v<T> && is_const_member_func<T>::value;
+template <typename T>
+constexpr bool is_nonconst_member_func_v =
+    std::is_member_function_pointer_v<T> && !is_const_member_func<T>::value;
+
 
 /**
  * \defgroup MythUI MythTV User Interface Library
