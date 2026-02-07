@@ -203,12 +203,9 @@ class META_PUBLIC MusicMetadata
     void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
 
     std::chrono::milliseconds Length() const { return m_length; }
-#if HAVE_IS_DURATION_V
-    template <typename T, std::enable_if_t<std::chrono::__is_duration_v<T>, bool> = true>
-#else
-    template <typename T, std::enable_if_t<std::chrono::__is_duration<T>::value, bool> = true>
-#endif
-    void setLength(T llength) { m_length = llength; }
+    template <typename T>
+    void setLength(T llength) requires
+    (std::chrono::__is_duration<T>::value) { m_length = llength; }
 
     int DiscNumber() const {return m_discNum;}
     void setDiscNumber(int discnum) { m_discNum = discnum; }

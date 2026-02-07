@@ -4549,16 +4549,6 @@ check_func_headers fcntl.h posix_fadvise
 # test for close_range (linux system call since 5.9 and also FreeBSD)
 check_func_headers unistd.h close_range
 
-# test for std::chrono:__is_duration_v<T>
-check_ld "cxx" <<EOF && enable is_duration_v
-#include <chrono>
-
-int main(int argc, char **argv){
-    bool value = std::chrono::__is_duration_v<int>;
-    return 0;
-}
-EOF
-
 enable pthreads
 # check for some common methods of building with pthread support
 # do this before the optional library checks as some of them require pthreads

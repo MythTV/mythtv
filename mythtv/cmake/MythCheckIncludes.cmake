@@ -50,7 +50,6 @@ check_symbol_exists(getopt "unistd.h" HAVE_GETOPT)
 check_symbol_exists(gettimeofday "sys/time.h" HAVE_GETTIMEOFDAY)
 check_symbol_exists(posix_fadvise "fcntl.h" HAVE_POSIX_FADVISE)
 check_symbol_exists(posix_memalign "stdlib.h" HAVE_POSIX_MEMALIGN)
-check_cxx_symbol_exists(std::chrono::__is_duration_v<int> "chrono" HAVE_IS_DURATION_V)
 
 #
 # More complex checks for symbols in include files

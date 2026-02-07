@@ -19,8 +19,8 @@ comparison for less than.  Hopefully, the compiler will superoptimize this into
 a single, branchless comparison.
 */
 template<typename T>
-std::enable_if_t<std::is_integral_v<T>, int>
-inline ternary_compare(const T a, const T b)
+inline int ternary_compare(const T a, const T b)
+requires (std::is_integral_v<T>)
 {
     if (a < b) return -1;
     if (a > b) return +1;
