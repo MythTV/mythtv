@@ -1,5 +1,6 @@
 // Std
 #include <algorithm>
+#include <ranges>
 
 //Qt
 #include <QtGlobal>
@@ -207,8 +208,8 @@ QStringList MythDisplay::GetDescription()
                 if (!modes.empty())
                 {
                     result.append(tr("Available modes:"));
-                    for (auto it = modes.crbegin(); it != modes.crend(); ++it)
-                        result.append("  " + it->ToString());
+                    for (const auto & mode : std::ranges::reverse_view(modes))
+                        result.append("  " + mode.ToString());
                 }
             }
         }
@@ -1156,16 +1157,16 @@ void MythDisplay::DebugModes() const
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Available modes:");
-        for (auto it = m_videoModes.crbegin(); it != m_videoModes.crend(); ++it)
+        for (const auto & videoMode : std::ranges::reverse_view(m_videoModes))
         {
-            auto rates = (*it).RefreshRates();
+            auto rates = videoMode.RefreshRates();
             QStringList rateslist;
-            for (auto it2 = rates.crbegin(); it2 != rates.crend(); ++it2)
-                rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
+            for (double rate : std::ranges::reverse_view(rates))
+                rateslist.append(QString("%1").arg(rate, 2, 'f', 2, '0'));
             if (rateslist.empty())
                 rateslist.append("Variable rate?");
             LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")
-                .arg((*it).Width()).arg((*it).Height()).arg(rateslist.join("\t")));
+                .arg(videoMode.Width()).arg(videoMode.Height()).arg(rateslist.join("\t")));
         }
     }
 }

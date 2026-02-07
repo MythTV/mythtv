@@ -1,5 +1,6 @@
 // C++
 #include <algorithm>
+#include <ranges>
 #include <set>
 
 // MythTV
@@ -573,9 +574,9 @@ void VideoFilterDialog::fillWidgets()
     // Year
     new MythUIButtonListItem(m_yearList, tr("All", "Year"), kYearFilterAll);
 
-    for (auto p = years.crbegin(); p != years.crend(); ++p)
+    for (int year : std::ranges::reverse_view(years))
     {
-        new MythUIButtonListItem(m_yearList, QString::number(*p), *p);
+        new MythUIButtonListItem(m_yearList, QString::number(year), year);
     }
 
     if (have_unknown_year)
@@ -604,11 +605,11 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_userRatingList, tr("All", "User rating"),
                            kUserRatingFilterAll);
 
-    for (auto p = user_ratings.crbegin(); p != user_ratings.crend(); ++p)
+    for (int rating : std::ranges::reverse_view(user_ratings))
     {
         new MythUIButtonListItem(m_userRatingList,
-                               QString(">= %1").arg(QString::number(*p)),
-                               *p);
+                               QString(">= %1").arg(QString::number(rating)),
+                               rating);
     }
 
     m_userRatingList->SetValueByData(m_settings.GetUserRating());

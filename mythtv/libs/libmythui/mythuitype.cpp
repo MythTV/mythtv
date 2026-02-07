@@ -4,6 +4,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <ranges>
 #include <utility>
 
 // QT headers
@@ -1142,8 +1143,8 @@ void MythUIType::AddFocusableChildrenToList(FocusInfoType &focusList)
     if (m_canHaveFocus)
         focusList.insert(m_focusOrder, this);
 
-    for (auto it = m_childrenList.crbegin(); it != m_childrenList.crend(); ++it)
-        (*it)->AddFocusableChildrenToList(focusList);
+    for (auto *child : std::ranges::reverse_view(m_childrenList))
+        child->AddFocusableChildrenToList(focusList);
 }
 
 int MythUIType::NormX(const int width)
