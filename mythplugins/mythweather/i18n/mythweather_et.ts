@@ -4,37 +4,37 @@
 <context>
     <name>(Weather Screens)</name>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="17"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="18"/>
         <source>Current Conditions</source>
         <translation>Hetke ilm</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="20"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="21"/>
         <source>Three Day Forecast</source>
         <translation>Kolme päeva ilmateade</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="23"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="24"/>
         <source>18 Hour Forecast</source>
         <translation>18 tunni ilmateade</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="26"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Severe Weather Alerts</source>
         <translation>Ilma hoiatused</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="29"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="30"/>
         <source>Six Day Forecast</source>
         <translation>Kuue päeva ilmateade</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="32"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="33"/>
         <source>Static Map</source>
         <translation>Staatiline kaart</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherUtils.cpp" line="35"/>
+        <location filename="../mythweather/weatherUtils.cpp" line="36"/>
         <source>Animated Map</source>
         <translation>Animeeritud kaart</translation>
     </message>
@@ -42,7 +42,7 @@
 <context>
     <name>GlobalSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="36"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="38"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
@@ -50,27 +50,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="884"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="886"/>
         <source>Search</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="895"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="897"/>
         <source>Searching...</source>
         <translation>Otsin...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="917"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="919"/>
         <source>Searching... Results: %1</source>
         <translation>Otsin... Vasteid: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="970"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="972"/>
         <source>Search Complete. Results: %1</source>
         <translation>Otsing lõpetatud. Vasteid: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="991"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="993"/>
         <source>Source: %1</source>
         <translation>Allikas: %1</translation>
     </message>
@@ -78,19 +78,19 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythweather/mythweather.cpp" line="47"/>
+        <location filename="../mythweather/mythweather.cpp" line="48"/>
         <source>Weather forecasts</source>
         <translation>Ilmateade</translation>
     </message>
     <message>
-        <location filename="../mythweather/mythweather.cpp" line="49"/>
+        <location filename="../mythweather/mythweather.cpp" line="50"/>
         <source>Pause current page</source>
         <translation>Peata leht</translation>
     </message>
     <message>
-        <location filename="../mythweather/mythweather.cpp" line="51"/>
-        <location filename="../mythweather/mythweather.cpp" line="53"/>
-        <location filename="../mythweather/mythweather.cpp" line="55"/>
+        <location filename="../mythweather/mythweather.cpp" line="52"/>
+        <location filename="../mythweather/mythweather.cpp" line="54"/>
+        <location filename="../mythweather/mythweather.cpp" line="56"/>
         <source>Search List</source>
         <translation>Otsimis loend</translation>
     </message>
@@ -98,116 +98,116 @@
 <context>
     <name>ScreenSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="118"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="120"/>
         <source>Active Screens</source>
         <translation>Aktiivsed kuvad</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="122"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="124"/>
         <source>Inactive Screens</source>
         <translation>Passiivsed kuvad</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="143"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="145"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="201"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="203"/>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
         <translation>Valimiseks vajuta &quot;OK&quot; .</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="204"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="206"/>
         <source>Sources</source>
         <translation>Allikad</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="219"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="221"/>
         <source>Units: </source>
         <translation>Ühikud:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="221"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="546"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="223"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="548"/>
         <source>English Units</source>
         <translation>Inglise mõõdustik</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="221"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="547"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="223"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="549"/>
         <source>SI Units</source>
         <translation>SI mõõdustik</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="227"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="229"/>
         <source>Location: </source>
         <translation>Asukoht:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="228"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="231"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="230"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="233"/>
         <source>Not Defined</source>
         <translation>Pole määratud</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="230"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="232"/>
         <source>Source: </source>
         <translation>Allikas:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="234"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="236"/>
         <source>Press SELECT to </source>
         <translation>Klõpsa VALI, et</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="236"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="238"/>
         <source>change location; </source>
         <translation>muuta asukohta;</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="238"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="240"/>
         <source>change units; </source>
         <translation>muuta mõõdustikku;</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="239"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="241"/>
         <source>move screen up or down; or remove screen.</source>
         <translation>Liiguta ekraan üles või alla; või eemalda kuva.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="452"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="454"/>
         <source>Manipulate Screen</source>
         <translation>Muuda kuva</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="466"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="468"/>
         <source>Move Up</source>
         <translation>Nihuta üles</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="467"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="469"/>
         <source>Move Down</source>
         <translation>Nihuta alla</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="468"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="470"/>
         <source>Remove</source>
         <translation>Eemalda</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="469"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="471"/>
         <source>Change Location</source>
         <translation>Muuda asukohta</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="471"/>
-        <location filename="../mythweather/weatherSetup.cpp" line="534"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="473"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="536"/>
         <source>Change Units</source>
         <translation>Muuda mõõdustikku</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="472"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="474"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
@@ -215,7 +215,7 @@
 <context>
     <name>SourceManager</name>
     <message>
-        <location filename="../mythweather/sourceManager.cpp" line="92"/>
+        <location filename="../mythweather/sourceManager.cpp" line="93"/>
         <source>Searching for scripts</source>
         <translation>Otsin skripte</translation>
     </message>
@@ -223,22 +223,22 @@
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="719"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="721"/>
         <source>Finish</source>
         <translation>Lõpeta</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="831"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="833"/>
         <source>Author: </source>
         <translation>Autor:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="833"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="835"/>
         <source>Email: </source>
         <translation>E-mail:</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="834"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="836"/>
         <source>Version: </source>
         <translation>Versioon:</translation>
     </message>
@@ -1424,12 +1424,12 @@ Kui kõik on tehtud, vajuta jätkamiseks &quot;Lõpeta&quot;.</translation>
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="85"/>
+        <location filename="../mythweather/weather.cpp" line="86"/>
         <source>Paused</source>
         <translation>Peatatud</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="196"/>
+        <location filename="../mythweather/weather.cpp" line="197"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>See teema ei võimalda konfigureeritud vaadet (muutub autoriõiguste info).</translation>
     </message>
@@ -1437,37 +1437,37 @@ Kui kõik on tehtud, vajuta jätkamiseks &quot;Lõpeta&quot;.</translation>
 <context>
     <name>WeatherScreen</name>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="201"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="200"/>
         <source>Sunday</source>
         <translation>Pühapäev</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="204"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="203"/>
         <source>Monday</source>
         <translation>Esmaspäev</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="207"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="206"/>
         <source>Tuesday</source>
         <translation>Teisipäev</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="210"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="209"/>
         <source>Wednesday</source>
         <translation>Kolmapäev</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="213"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="212"/>
         <source>Thursday</source>
         <translation>Neljapäev</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="216"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="215"/>
         <source>Friday</source>
         <translation>Reede</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherScreen.cpp" line="219"/>
+        <location filename="../mythweather/weatherScreen.cpp" line="218"/>
         <source>Saturday</source>
         <translation>Laupäev</translation>
     </message>

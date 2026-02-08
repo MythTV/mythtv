@@ -65,73 +65,73 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="175"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="174"/>
         <source>Search Options</source>
         <translation>Suchoptionen</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="192"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="191"/>
         <source>Stream Video</source>
         <translation>Video streamen</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="193"/>
         <source>Open Web Link</source>
         <translation>Web Link öffnen</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="210"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="209"/>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="215"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
         <source>Save This Video</source>
         <translation>Dieses Video speichern</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="224"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="223"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="229"/>
         <source>Previous Page</source>
         <translation>Vorherige Seite</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="231"/>
         <source>Next Page</source>
         <translation>Nächste Seite</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="234"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="233"/>
         <source>Skip 10 Pages Back</source>
         <translation>Springe 10 Seiten zurück</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="238"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="237"/>
         <source>Skip 10 Pages Forward</source>
         <translation>Springe 10 Seiten vor</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="241"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="240"/>
         <source>Manage Search Scripts</source>
         <translation>Suchskripte verwalten</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="291"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="290"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Suche %1 für &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="315"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="333"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="314"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Wechsle zu Seite %1 der Suche &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="408"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Zeitüberschreitung beim Warten auf das Ende der Abfrage. API könnte unerreichbar sein.</translation>
     </message>

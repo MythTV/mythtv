@@ -65,73 +65,73 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="175"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="174"/>
         <source>Search Options</source>
         <translation>Επιλογές Αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="192"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="191"/>
         <source>Stream Video</source>
         <translation>Ροή Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="193"/>
         <source>Open Web Link</source>
         <translation>Άνοιγμα Σύνδεσης Ιστού</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="210"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="209"/>
         <source>Play</source>
         <translation>Αναπαραγωγή</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="215"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
         <source>Save This Video</source>
         <translation>Αποθήκευση αυτής της Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="224"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="223"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="229"/>
         <source>Previous Page</source>
         <translation>Προηγούμενη Σελίδα</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="231"/>
         <source>Next Page</source>
         <translation>Επόμενη Σελίδα</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="234"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="233"/>
         <source>Skip 10 Pages Back</source>
         <translation>Πήγαινε 10 Σελίδες Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="238"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="237"/>
         <source>Skip 10 Pages Forward</source>
         <translation>Πήγαινε 10 Σελίδες Μπροστά</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="241"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="240"/>
         <source>Manage Search Scripts</source>
         <translation>Διαχείριση script Αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="291"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="290"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Ψάχνω το %1 για &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="315"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="333"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="314"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Γυρίζω στη σελίδα %1 της αναζήτησης &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="408"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Τέλος ορίου αναμονής για ολοκλήρωση αναζήτησης. Πιθανό σφάλμα API.</translation>
     </message>

@@ -65,73 +65,73 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="175"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="174"/>
         <source>Search Options</source>
         <translation>Otsinguvalikud</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="192"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="191"/>
         <source>Stream Video</source>
         <translation>Video voogesitus</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="193"/>
         <source>Open Web Link</source>
         <translation>Ava URL</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="210"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="209"/>
         <source>Play</source>
         <translation>Mängi</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="215"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
         <source>Save This Video</source>
         <translation>Salvesta see video</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="224"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="223"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="229"/>
         <source>Previous Page</source>
         <translation>Eelmine leht</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="231"/>
         <source>Next Page</source>
         <translation>Järgmine leht</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="234"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="233"/>
         <source>Skip 10 Pages Back</source>
         <translation>Tagasi 10 lehte</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="238"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="237"/>
         <source>Skip 10 Pages Forward</source>
         <translation>Edasi 10 lehte</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="241"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="240"/>
         <source>Manage Search Scripts</source>
         <translation>Muuda otsinguskripte</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="291"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="290"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Otsin %1 &quot;%2&quot;-st ...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="315"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="333"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="314"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Lähen lehele %1 otsingust &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="408"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Päringu ajalimiit lõppes. API võib maas olla.</translation>
     </message>
