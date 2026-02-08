@@ -18,6 +18,7 @@
 #include <QCoreApplication>
 #include <QPainter>
 #include <QImage>
+#include <numbers>
 
 // MythTV
 #include <libmythbase/compat.h>
@@ -214,8 +215,8 @@ void Synaesthesia::coreInit(void)
 {
     for (size_t i = 0; i < NumSamples; i++)
     {
-        m_negSinTable[i] = -sin(3.141592 * 2.0 / NumSamples * i);
-        m_cosTable[i] = cos(3.141592 * 2.0 / NumSamples * i);
+        m_negSinTable[i] = -sin(std::numbers::pi * 2.0 / NumSamples * i);
+        m_cosTable[i] = cos(std::numbers::pi * 2.0 / NumSamples * i);
         m_bitReverse[i] = bitReverser(i);
     }
 }
