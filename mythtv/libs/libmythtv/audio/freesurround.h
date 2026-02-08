@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define FREESURROUND_H
 
 #include <cstdint>
+#include <numbers>
 
 using uint = unsigned int;
 
@@ -65,8 +66,9 @@ private:
     struct fsurround_params {
         int32_t center_width { 100 };   // presence of the center channel
         int32_t dimension {      0 };   // dimension
-        float   coeff_a   { 0.8165 };   // surround mixing coefficients
-        float   coeff_b   { 0.5774 };   // surround mixing coefficients
+        float   coeff_a   { std::numbers::sqrt2 /
+                            std::numbers::sqrt3 };     // surround mixing coefficients
+        float   coeff_b   { std::numbers::inv_sqrt3 }; // surround mixing coefficients
         int32_t phasemode {      0 };   // phase shifting mode
         int32_t steering  {      1 };   // steering mode (0=simple, 1=linear)
         int32_t front_sep {    100 };   // front stereo separation

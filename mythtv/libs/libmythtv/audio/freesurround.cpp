@@ -23,8 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <cstdlib>
 #include <cerrno>
 #include <cmath>
-
 #include <iostream>
+#include <numbers>
 #include <sstream>
 #include <vector>
 #include <list>
@@ -37,14 +37,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "freesurround_decoder.h"
 
 // our default internal block size, in floats
-static const unsigned default_block_size = SURROUND_BUFSIZE;
+static constexpr unsigned default_block_size = SURROUND_BUFSIZE;
 // Gain of center and lfe channels in passive mode (sqrt 0.5)
-//static const float center_level = 0.707107;
-static const float m3db = 0.7071067811865476F;           // 3dB  = SQRT(2)
-static const float m6db = 0.5;                           // 6dB  = SQRT(4)
-//static const float m7db = 0.44721359549996;            // 7dB  = SQRT(5)
+//static constexpr float center_level = 1.0F/std::numbers::sqrt2;
+static constexpr float m3db = 1.0F/std::numbers::sqrt2;  // 3dB  = SQRT(2)
+static constexpr float m6db = 0.5;                       // 6dB  = SQRT(4)
+//static constexpr float m7db = 0.44721359549996;        // 7dB  = SQRT(5)
 
-unsigned int block_size = default_block_size;
+namespace {
+    unsigned int block_size = default_block_size;
+}
 
 struct buffers
 {
