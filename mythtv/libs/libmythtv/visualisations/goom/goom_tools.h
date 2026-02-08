@@ -4,10 +4,11 @@
 #include <cinttypes>
 #include <cstddef>
 #include <cstdlib>
+#include <numbers>
 
 #if !defined( M_PI ) 
-static constexpr double M_PI    {  3.14159265358979323846  };
+static constexpr double M_PI    { std::numbers::pi };
 #endif
-static constexpr float  M_PI_F  { static_cast<float>(M_PI) };
+static constexpr float  M_PI_F  { std::numbers::pi_v<float> };
 
 #endif // GOOMTOOLS_H
