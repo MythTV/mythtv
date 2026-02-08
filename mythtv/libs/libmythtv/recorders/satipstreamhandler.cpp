@@ -265,14 +265,31 @@ bool SatIPStreamHandler::UpdateFilters(void)
     bool rval = true;
     if (m_rtsp && m_oldpids != pids)
     {
-        QString pids_str = QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none");
+        // Create a list without the low priority PIDs.
+        // There is no need to receive the PMT PIDs of
+        // the other channels on the same multiplex.
+        QStringList pids_used;
+        for (auto it = m_pidInfo.cbegin(); it != m_pidInfo.cend(); ++it)
+        {
+            auto pid_priority = GetPIDPriority(it.key());
+            if (pid_priority == kPIDPriorityNormal ||
+                pid_priority == kPIDPriorityHigh)
+            {
+                pids_used.append(QString("%1").arg(it.key()));
+            }
+        }
+
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Number of PIDs used:%1  All PIDs:%2").arg(pids_used.size()).arg(pids.size()));
+
+        QString pids_str = QString("pids=%1").arg(!pids_used.empty() ? pids_used.join(",") : "none");
         LOG(VB_RECORD, LOG_INFO, LOC + "Play(pids_str) " + pids_str);
 
         // Telestar Digibit R1 Sat>IP box cannot handle a lot of pids
-        if (pids.size() > 32)
+        if (pids_used.size() > 32)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("Receive full TS, number of PIDs:%1 is more than 32").arg(pids.size()));
+                QString("Receive full TS, number of PIDs:%1 is more than 32").arg(pids_used.size()));
             LOG(VB_RECORD, LOG_DEBUG, LOC + pids_str);
             pids_str = QString("pids=all");
         }
