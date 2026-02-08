@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <numbers>
 #include <thread>
 
 #include <unistd.h> // getpid
@@ -79,12 +80,14 @@ static constexpr bool IS_VALID_UPMIX_CHANNEL(int ch)
  */
 
 static const float m6db = 0.5;
-static const float m3db = 0.7071067811865476F;           // 3dB  = SQRT(2)
-static const float mm3db = -0.7071067811865476F;         // -3dB = SQRT(1/2)
-static const float msqrt_1_3 = -0.577350269189626F;      // -SQRT(1/3)
-static const float sqrt_2_3 = 0.816496580927726F;        // SQRT(2/3)
-static const float sqrt_2_3by3db = 0.577350269189626F;   // SQRT(2/3)*-3dB = SQRT(2/3)*SQRT(1/2)=SQRT(1/3)
-static const float msqrt_1_3bym3db = 0.408248290463863F; // -SQRT(1/3)*-3dB = -SQRT(1/3)*SQRT(1/2) = -SQRT(1/6)
+static const float m3db =       1.0F / std::numbers::sqrt2_v<float>; //  3dB = SQRT(1/2)
+static const float mm3db =     -1.0F / std::numbers::sqrt2_v<float>; // -3dB = SQRT(1/2)
+static const float msqrt_1_3 = -std::numbers::inv_sqrt3_v<float>;    // -SQRT(1/3)
+static const float sqrt_2_3  =  std::numbers::sqrt2_v<float> /
+                                std::numbers::sqrt3_v<float>;        // SQRT(2/3)
+static const float sqrt_2_3by3db = std::numbers::inv_sqrt3_v<float>; // SQRT(2/3)*-3dB = SQRT(2/3)*SQRT(1/2)=SQRT(1/3)
+static const float msqrt_1_3bym3db = 1.0F / (std::numbers::sqrt2_v<float> *
+                                             std::numbers::sqrt3_v<float>); // -SQRT(1/3)*-3dB = -SQRT(1/3)*SQRT(1/2) = -SQRT(1/6)
 
 using two_speaker_ratio = std::array<float,2>;
 using two_speaker_set   = std::array<two_speaker_ratio,8>;
