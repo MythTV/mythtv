@@ -42,7 +42,7 @@ QStringList SatIP::probeDevices(void)
         if (searchTime.elapsed() > 249ms && ttl > 1s)
         {
             auto ttl_s = duration_cast<std::chrono::seconds>(ttl);
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP search %1 ms")
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP search %1 secs")
                 .arg(ttl_s.count()));
             SSDP::Instance()->PerformSearch(SATIP_URI, ttl_s);
             searchTime.start();
