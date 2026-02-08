@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="42"/>
+        <location filename="../mythnews/libmythnews.cpp" line="43"/>
         <source>RSS News feed reader</source>
         <translation>Τροφοδότης Ροών RSS</translation>
     </message>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="46"/>
+        <location filename="../mythnews/libmythnews.cpp" line="47"/>
         <source>Update news items</source>
         <translation>Ενημέρωση Ειδήσεων</translation>
     </message>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="48"/>
+        <location filename="../mythnews/libmythnews.cpp" line="49"/>
         <source>Force update news items</source>
         <translation>Ψάχνει για καινούριες ειδήσεις</translation>
     </message>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="50"/>
+        <location filename="../mythnews/libmythnews.cpp" line="51"/>
         <source>Cancel news item updating</source>
         <translation>Ακύρωση αναζήτησης ειδήσεων</translation>
     </message>
@@ -27,47 +27,47 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="105"/>
+        <location filename="../mythnews/mythnews.cpp" line="106"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Δεν έχετε ορίσει ιστοσελίδες αναζήτησης Ειδήσεων.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="346"/>
+        <location filename="../mythnews/mythnews.cpp" line="347"/>
         <source>Updated</source>
         <translation>Τελευταία ενημέρωση</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="354"/>
+        <location filename="../mythnews/mythnews.cpp" line="355"/>
         <source>Unknown</source>
         <translation>Άγνωστο</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="521"/>
+        <location filename="../mythnews/mythnews.cpp" line="522"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Δεν έχει οριστεί Περιηγητής! Οι Ειδήσεις απαιτούν την εγκατάσταση του MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="601"/>
+        <location filename="../mythnews/mythnews.cpp" line="602"/>
         <source>Options</source>
         <translation>Επιλογές</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="614"/>
+        <location filename="../mythnews/mythnews.cpp" line="615"/>
         <source>Manage Feeds</source>
         <translation>Ρύθμιση Τροφοδοσιών</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="615"/>
+        <location filename="../mythnews/mythnews.cpp" line="616"/>
         <source>Add Feed</source>
         <translation>Προσθήκη Τροφοδοσίας</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="618"/>
+        <location filename="../mythnews/mythnews.cpp" line="619"/>
         <source>Edit Feed</source>
         <translation>Επεξεργασία Τροφοδοσίας</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="619"/>
+        <location filename="../mythnews/mythnews.cpp" line="620"/>
         <source>Delete Feed</source>
         <translation>Διαγραφή Τροφοδοσίας</translation>
     </message>
@@ -158,12 +158,12 @@
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Edit RSS News Feeds</source>
         <translation>Επεξεργασία Τροφοδοσιών RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="61"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -172,92 +172,92 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Όταν τελειώσετε, πατήστε &quot;OK&quot; ή &quot;Ακύρωση&quot; για συνέχεια.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Name:</source>
         <translation>Όνομα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="56"/>
         <source>URL:</source>
         <translation>Διεύθ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Icon:</source>
         <translation>Εικονίδιο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Podcast:</source>
         <translation>Podcast:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Genre:</source>
         <translation>Είδος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Channel:</source>
         <translation>Κανάλι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Bookmark Manager</source>
         <translation>Διαχειριστής Αγαπημένων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="40"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="34"/>
         <source>News Subscriptions</source>
         <translation>Συνδρομές Ειδήσεων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Επιλέξτε τις ειδήσεις που θα θέλατε να διαβάζετε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="31"/>
         <source>News Feeds</source>
         <translation>Τροφοδοσίες Ειδήσεων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="33"/>
         <source>News Settings</source>
         <translation>Ρυθμίσεις Ειδήσεων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="29"/>
         <source>News</source>
         <translation>Ειδήσεις</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="60"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
         <translation>Δεν έχετε ορίσει Πηγές Γεγονότων.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Edit News</source>
         <translation>Επεξεργασία Ειδήσεων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="30"/>
         <source>News Config</source>
         <translation>Ρύθμιση Ειδήσεων</translation>
     </message>
@@ -269,194 +269,192 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Available Categories</source>
         <translation>Διαθέσιμες Κατηγοριές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Available Sites</source>
         <translation>Διαθέσιμες Ιστοσελίδες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Categories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Category</source>
         <translation>Κατηγορία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Choose sites you want to receive news from</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Choose which news channels interest you</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Date:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Enclosures:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Is Podcast:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="25"/>
         <source>NEWS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Name site:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Needs Download:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="32"/>
         <source>News Feeds Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="35"/>
         <source>News catagories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="36"/>
         <source>News settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="37"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="38"/>
         <source>No news sites available, please configure your subscriptions using the configuration menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Not Applicable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="43"/>
         <source>RSS Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="44"/>
         <source>RSS Icon:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="45"/>
         <source>RSS Newsfeeds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="46"/>
         <source>RSS URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="47"/>
         <source>RSS feed is podcast:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="48"/>
         <source>RSS feed name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Rating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Select a feed to views</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Site icon:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Subscribe to News Feeds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Title:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="55"/>
         <source>URL site:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Unknown</source>
         <translation type="unfinished">Άγνωστο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="62"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Web Site</source>
         <translation>Ιστοσελίδα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Edit RSS News Feed</source>
         <translation>Επεξεργασία Τροφοδοσίας RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
         <source>Contexts</source>
-        <translation>Θέματα</translation>
+        <translation type="vanished">Θέματα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
         <source>Actions</source>
-        <translation>Ενέργειες</translation>
+        <translation type="vanished">Ενέργειες</translation>
     </message>
 </context>
 </TS>

@@ -631,17 +631,17 @@
         <translation type="obsolete">Няма връзка с сървъра - работи ли? Настроихте ли правилно IP адреса и порта в настройките?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="104"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="103"/>
         <source>Can&apos;t connect to the mythzmserver</source>
         <translation>Няма връзка с mythzmserver</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="105"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="104"/>
         <source>Is it running? Have you set the correct IP and port in the settings?</source>
         <translation>Работи ли? Настроени ли са коректно IP адреса и порта?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="188"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="187"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>Сървъра за видеонаблюдение не отговори на запитването за версията на протокола!!</translation>
     </message>
@@ -649,12 +649,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="200"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="201"/>
         <source>Running</source>
         <translation>Работи</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="205"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="206"/>
         <source>Stopped</source>
         <translation>Спрян</translation>
     </message>
@@ -662,60 +662,60 @@
 <context>
     <name>ZMEvents</name>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="79"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="80"/>
         <source>Play</source>
         <translation>Старт</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="86"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="87"/>
         <source>Delete</source>
         <translation>Изтрии</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="175"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="343"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="358"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="176"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="344"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="359"/>
         <source>All Cameras</source>
         <translation>Всички камери</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="178"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="367"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="368"/>
         <source>All Dates</source>
         <translation>Всички дати</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="444"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="445"/>
         <source>Refresh</source>
         <translation>Обнови</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="447"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="448"/>
         <source>Hide Continuous Events</source>
         <translation>Скриване постоянни Събития</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="449"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="450"/>
         <source>Show Continuous Events</source>
         <translation>Показване постоянни Събития</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
         <source>Change View</source>
         <translation>Смяна изглед</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="453"/>
         <source>Delete All</source>
         <translation>Изтрии всичко</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="470"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="471"/>
         <source>Delete All Events?</source>
         <translation>Изтрии всички събития?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="471"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="472"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Изтрии %1 събития в този изглед.</translation>
     </message>
@@ -723,57 +723,57 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="147"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="148"/>
         <source>Can&apos;t show live view.</source>
         <translation>Неможе да покаже Изглед на живо.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="148"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="149"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Няма дефинирани монитори!</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="252"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="253"/>
         <source>Change View</source>
         <translation type="unfinished">Смяна изглед</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="253"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="254"/>
         <source>Change Camera 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="256"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="257"/>
         <source>Change Camera 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="260"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="261"/>
         <source>Change Camera 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="261"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="262"/>
         <source>Change Camera 4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="266"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="267"/>
         <source>Change Camera 5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="267"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="268"/>
         <source>Change Camera 6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="272"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="273"/>
         <source>Change Camera 7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="273"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="274"/>
         <source>Change Camera 8</source>
         <translation type="unfinished"></translation>
     </message>
@@ -811,58 +811,58 @@
 <context>
     <name>ZMSettings</name>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
         <source>IP address of the MythZoneMinder server</source>
         <translation>IP адрес на сървъра за Видеонаблюдение</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="21"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
         <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
         <translation>Въведете IP адреса на сървър за Видеонаблюдение за връзка с приложението.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="30"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
         <source>Port the server runs on</source>
         <translation>Порт на който работи сървъра</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="32"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="31"/>
         <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
         <translation>Не променяйте това, освен ако нямате основателна причина.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="40"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="39"/>
         <source>Date format</source>
         <translation>Формат на дата</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="43"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Примерите се визуализират с днешна дата.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="48"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Примерите се визуализират с утрешна дата.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="67"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="66"/>
         <source>Your preferred date format to use on the events screens. %1</source>
         <extracomment>%1 gives additional info on the date used</extracomment>
         <translation>Избран формат за дата при показване на екран събития.  %1</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="76"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="75"/>
         <source>Time format</source>
         <translation>Формат на време</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="84"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="83"/>
         <source>Your preferred time format to display on the events screens.</source>
         <translation>Избран формат за време за показване на екран събития.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="91"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
         <source>MythZoneMinder Settings</source>
         <translation>Видеонаблюдение Настройки</translation>
     </message>

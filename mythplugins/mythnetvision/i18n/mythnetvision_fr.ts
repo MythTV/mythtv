@@ -65,74 +65,74 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="175"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="174"/>
         <source>Search Options</source>
         <translation>Options de recherche</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="192"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="191"/>
         <source>Stream Video</source>
         <translation>Lecture du flux vidéo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="193"/>
         <source>Open Web Link</source>
         <translation>Ouvrir le lien Web</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="210"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="209"/>
         <source>Play</source>
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="215"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
         <source>Save This Video</source>
         <translation>Sauvegarder cette vidéo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="224"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="223"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="229"/>
         <source>Previous Page</source>
         <translation>Page précédente</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="231"/>
         <source>Next Page</source>
         <translation>Page suivante</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="234"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="233"/>
         <source>Skip 10 Pages Back</source>
         <translation>Sauter en arrière de 10 pages</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="238"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="237"/>
         <source>Skip 10 Pages Forward</source>
         <translation>Sauter en avant de 10 pages</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="241"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="240"/>
         <source>Manage Search Scripts</source>
         <translation>Gérer les scripts de recherche</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="291"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="290"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translatorcomment>Rechercher &quot;mythtv&quot; sur &quot;daily motion&quot; ...</translatorcomment>
         <translation>Rechercher &quot;%2&quot; sur &quot;%1&quot; ...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="315"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="333"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="314"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Passage à la page %1 de la recherche sur &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="408"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Le délai d&apos;attente a été dépassé lors de la consultation. L&apos;API est peut-être non accessible.</translation>
     </message>

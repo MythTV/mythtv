@@ -4,22 +4,22 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="42"/>
+        <location filename="../mythnews/libmythnews.cpp" line="43"/>
         <source>RSS News feed reader</source>
         <translation>RSS Uutissyötteidenlukija</translation>
     </message>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="46"/>
+        <location filename="../mythnews/libmythnews.cpp" line="47"/>
         <source>Update news items</source>
         <translation>Päivitä uutiset</translation>
     </message>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="48"/>
+        <location filename="../mythnews/libmythnews.cpp" line="49"/>
         <source>Force update news items</source>
         <translation>Pakota uutisten päivitys</translation>
     </message>
     <message>
-        <location filename="../mythnews/libmythnews.cpp" line="50"/>
+        <location filename="../mythnews/libmythnews.cpp" line="51"/>
         <source>Cancel news item updating</source>
         <translation>Peru uutisten päivitys</translation>
     </message>
@@ -27,12 +27,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="346"/>
+        <location filename="../mythnews/mythnews.cpp" line="347"/>
         <source>Updated</source>
         <translation>Päivitetty</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="354"/>
+        <location filename="../mythnews/mythnews.cpp" line="355"/>
         <source>Unknown</source>
         <translation>Tuntematon</translation>
     </message>
@@ -41,22 +41,22 @@
         <translation type="vanished">Ladataan uutisia...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="614"/>
+        <location filename="../mythnews/mythnews.cpp" line="615"/>
         <source>Manage Feeds</source>
         <translation>Hallitse syötteitä</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="615"/>
+        <location filename="../mythnews/mythnews.cpp" line="616"/>
         <source>Add Feed</source>
         <translation>Lisää syöte</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="618"/>
+        <location filename="../mythnews/mythnews.cpp" line="619"/>
         <source>Edit Feed</source>
         <translation>Muokkaa syötettä</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="619"/>
+        <location filename="../mythnews/mythnews.cpp" line="620"/>
         <source>Delete Feed</source>
         <translation>Poista syöte</translation>
     </message>
@@ -65,17 +65,17 @@
         <translation type="vanished">%1 of %2 (%3 prosenttia)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="521"/>
+        <location filename="../mythnews/mythnews.cpp" line="522"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Selainkomento asettamatta! MythNews vaatii että MythBrowser on asennettu.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="601"/>
+        <location filename="../mythnews/mythnews.cpp" line="602"/>
         <source>Options</source>
         <translation>Asetukset</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="105"/>
+        <location filename="../mythnews/mythnews.cpp" line="106"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Et ole asettanut MythNewsiä käyttämään mitään sivustoa.</translation>
     </message>
@@ -166,12 +166,12 @@
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Edit RSS News Feeds</source>
         <translation>Muokkaa RSS uutissyötteitä</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="61"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -180,87 +180,87 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="56"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Icon:</source>
         <translation>Ikoni:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Podcast:</source>
         <translation>Podcast:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Genre:</source>
         <translation>Laji:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Channel:</source>
         <translation>Kanava:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="40"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Bookmark Manager</source>
         <translation>Kirjanmerkkien hallinta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="34"/>
         <source>News Subscriptions</source>
         <translation>Uutistilaukset</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Choose the news sites you would like to read.</source>
         <translation>Valitse uutispalvelut joita haluat lukea.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="31"/>
         <source>News Feeds</source>
         <translation>Uutissyötteet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="33"/>
         <source>News Settings</source>
         <translation>Uutisten asetukset</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="29"/>
         <source>News</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="60"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Edit News</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="30"/>
         <source>News Config</source>
         <translation type="unfinished"></translation>
     </message>
@@ -272,197 +272,195 @@ Kun olet valmis, valitse&quot;OK&quot; tai &quot;Peruuta&quot; jatkaaksesi.</tra
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Available Categories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Available Sites</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Categories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Category</source>
         <translation>Kategoria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Choose sites you want to receive news from</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Choose which news channels interest you</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Date:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Enclosures:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Is Podcast:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="25"/>
         <source>NEWS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Name site:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Needs Download:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="32"/>
         <source>News Feeds Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="35"/>
         <source>News catagories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="36"/>
         <source>News settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="37"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="38"/>
         <source>No news sites available, please configure your subscriptions using the configuration menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Not Applicable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="43"/>
         <source>RSS Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="44"/>
         <source>RSS Icon:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="45"/>
         <source>RSS Newsfeeds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="46"/>
         <source>RSS URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="47"/>
         <source>RSS feed is podcast:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="48"/>
         <source>RSS feed name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Rating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Select a feed to views</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Site icon:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Subscribe to News Feeds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Title:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="55"/>
         <source>URL site:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Unknown</source>
         <translation type="unfinished">Tuntematon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="62"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Web Site</source>
         <translation>Nettisivusto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Edit RSS News Feed</source>
         <translation>Muokkaa RSS uutissyötteitä</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
         <source>Contexts</source>
-        <translation>Sisällöt</translation>
+        <translation type="vanished">Sisällöt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
         <source>Actions</source>
-        <translation>Toiminnot</translation>
+        <translation type="vanished">Toiminnot</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Cancel</source>
         <translation>Peru</translation>
     </message>
