@@ -29,7 +29,6 @@
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QTcpSocket>
-#include <QThread>
 #include <QEventLoop>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
@@ -79,24 +78,53 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
         return resolveLinkLocal(dest, port, timeLimit);
     }
 #endif
-    QTcpSocket socket;
-    socket.connectToHost(host, port);
-    static constexpr std::chrono::milliseconds k_poll_interval {10ms};
     MythTimer timer(MythTimer::kStartRunning);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
     while (state != QAbstractSocket::ConnectedState
            && (timer.elapsed() < timeLimit)
-           && !m_cancelCheck)
+           && !m_cancelCheck
+           )
     {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
-        std::this_thread::sleep_for(k_poll_interval);
+        QTcpSocket socket;
+        socket.connectToHost(host, port);
+
+        MythTimer attempt_time {MythTimer::kStartRunning};
+        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
+        static constexpr std::chrono::milliseconds k_poll_interval {1ms};
+        static constexpr std::chrono::milliseconds k_log_interval {100ms};
+        std::chrono::milliseconds next_log {k_log_interval};
+        while (state != QAbstractSocket::ConnectedState
+               && !m_cancelCheck
+               && (timer.elapsed() < timeLimit)
+               && attempt_time.elapsed() < k_attempt_time_limit
+               )
+        {
+            {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
+            }
+            state = socket.state();
+            if (attempt_time.elapsed() > next_log)
+            {
+                next_log += k_log_interval;
+#if 0
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                    QString("host %1 port %2 socket state %3, attempt time: %4")
+                    .arg(host, QString::number(port), QString::number(state),
+                         QString::number(attempt_time.elapsed().count())
+                         )
+                    );
+#endif
+            }
+        }
         state = socket.state();
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
-            QString("host %1 port %2 socket state %3, time: %4")
+            QString("host %1 port %2 socket state %3, attempt time: %4")
             .arg(host, QString::number(port), QString::number(state),
-                 QString::number(timer.elapsed().count())));
+                 QString::number(attempt_time.elapsed().count())
+                 )
+            );
     }
-    socket.abort();
     return (state == QAbstractSocket::ConnectedState);
 }
 
@@ -241,16 +269,9 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                && attempt_time.elapsed() < k_attempt_time_limit
                )
         {
-            if (QCoreApplication::instance() != nullptr &&
-                QThread::currentThread() == QCoreApplication::instance()->thread()
-                )
             {
                 QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
                 std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
-            }
-            else
-            {
-                std::this_thread::sleep_for(k_poll_interval);
             }
             state = socket.state();
             if (attempt_time.elapsed() > next_log)
