@@ -45,8 +45,7 @@ void InitializeMythDirs(void)
 #ifdef Q_OS_WINDOWS
 
     if (installprefix.isEmpty())
-        installprefix = QDir( qApp->applicationDirPath() )
-                            .absolutePath();
+        installprefix = QDir{QCoreApplication::applicationDirPath()}.absolutePath();
 
     appbindir = installprefix + "/";
     libdir    = appbindir;
@@ -129,8 +128,7 @@ void InitializeMythDirs(void)
 
 #elif defined(Q_OS_ANDROID)
     if (installprefix.isEmpty())
-        installprefix = QDir( qApp->applicationDirPath() )
-                            .absolutePath();
+        installprefix = QDir{QCoreApplication::applicationDirPath()}.absolutePath();
     QString extdir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Mythtv";
     if (!QDir(extdir).exists())
         QDir(extdir).mkdir(".");
@@ -223,7 +221,7 @@ void InitializeMythDirs(void)
         // If the PREFIX is relative, evaluate it relative to our
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
-        QDir prefixDir = qApp->applicationDirPath();
+        QDir prefixDir {QCoreApplication::applicationDirPath()};
         LOG(VB_GENERAL, LOG_DEBUG, QString("Relative PREFIX! (%1), appDir=%2")
             .arg(installprefix, prefixDir.canonicalPath()));
 
