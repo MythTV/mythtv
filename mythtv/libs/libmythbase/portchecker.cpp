@@ -78,6 +78,8 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
         return resolveLinkLocal(dest, port, timeLimit);
     }
 #endif
+    QTcpSocket socket;
+    socket.connectToHost(host, port);
     MythTimer timer(MythTimer::kStartRunning);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
     while (state != QAbstractSocket::ConnectedState
@@ -85,46 +87,18 @@ bool PortChecker::checkPort(const QString &host, int port, std::chrono::millisec
            && !m_cancelCheck
            )
     {
-        QTcpSocket socket;
-        socket.connectToHost(host, port);
-
-        MythTimer attempt_time {MythTimer::kStartRunning};
-        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
         static constexpr std::chrono::milliseconds k_poll_interval {1ms};
-        static constexpr std::chrono::milliseconds k_log_interval {100ms};
-        std::chrono::milliseconds next_log {k_log_interval};
-        while (state != QAbstractSocket::ConnectedState
-               && !m_cancelCheck
-               && (timer.elapsed() < timeLimit)
-               && attempt_time.elapsed() < k_attempt_time_limit
-               )
-        {
-            {
-                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
-                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
-            }
-            state = socket.state();
-            if (attempt_time.elapsed() > next_log)
-            {
-                next_log += k_log_interval;
-#if 0
-                LOG(VB_GENERAL, LOG_DEBUG, LOC +
-                    QString("host %1 port %2 socket state %3, attempt time: %4")
-                    .arg(host, QString::number(port), QString::number(state),
-                         QString::number(attempt_time.elapsed().count())
-                         )
-                    );
-#endif
-            }
-        }
+        QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+        std::this_thread::sleep_for(1ns); // force thread to yield
         state = socket.state();
-        LOG(VB_GENERAL, LOG_DEBUG, LOC +
-            QString("host %1 port %2 socket state %3, attempt time: %4")
-            .arg(host, QString::number(port), QString::number(state),
-                 QString::number(attempt_time.elapsed().count())
-                 )
-            );
     }
+    state = socket.state();
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("host %1 port %2 socket state %3, attempt time: %4")
+        .arg(host, QString::number(port), QString::number(state),
+                QString::number(timer.elapsed().count())
+                )
+        );
     return (state == QAbstractSocket::ConnectedState);
 }
 
@@ -194,108 +168,78 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     auto iCard = cards.cbegin();
     MythTimer timer(MythTimer::kStartRunning);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    QString scope;
-    bool testedAll = false;
+    int iCardsEnd = 0;
     while (state != QAbstractSocket::ConnectedState
            && (timer.elapsed() < timeLimit)
            && !m_cancelCheck
-           && !testedAll
            )
     {
+        // Determine the IPv6 scope to check
+        addr.setScopeId(QString());
+        while (addr.scopeId().isEmpty())
         {
-            if (!gCoreContext->GetScopeForAddress(addr))
+            // search for the next available IPV6 interface.
+            if (iCard != cards.cend())
             {
-                int iCardsEnd = 0;
-                addr.setScopeId(QString());
-                while (addr.scopeId().isEmpty() && iCardsEnd<2)
+                unsigned int flags = iCard->flags();
+                if (!(flags & QNetworkInterface::IsLoopBack)
+                    && (flags & QNetworkInterface::IsRunning))
                 {
-                    // search for the next available IPV6 interface.
-                    if (iCard != cards.cend())
+                    // check that IPv6 is enabled on that interface
+                    QList<QNetworkAddressEntry> addresses = iCard->addressEntries();
+                    for (const auto& ae : std::as_const(addresses))
                     {
-                        QNetworkInterface card = *iCard++;
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
-                        unsigned int flags = card.flags();
-                        if ((flags & QNetworkInterface::IsLoopBack)
-                         || !(flags & QNetworkInterface::IsRunning))
-                            continue;
-                        // check that IPv6 is enabled on that interface
-                        QList<QNetworkAddressEntry> addresses = card.addressEntries();
-                        bool foundv6 = false;
-                        for (const auto& ae : std::as_const(addresses))
+                        if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
                         {
-                            if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                            {
-                                foundv6 = true;
-                                break;
-                            }
-                        }
-                        if (foundv6)
-                        {
-                            scope = card.name();
-                            addr.setScopeId(scope);
+                            addr.setScopeId(iCard->name());
                             break;
                         }
                     }
-                    else
-                    {
-                        // Get a new list in case a new interface
-                        // has been added.
-                        cards = QNetworkInterface::allInterfaces();
-                        iCard = cards.cbegin();
-                        testedAll=true;
-                        iCardsEnd++;
-                    }
                 }
-                if (iCardsEnd > 1)
+                iCard++;
+            }
+            else
+            {
+                iCardsEnd++;
+                if (iCardsEnd >= 2)
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("There is no IPV6 compatible interface for %1").arg(host)
                         );
-                    break;
+                    return false;
                 }
+                // Get a new list in case a new interface
+                // has been added.
+                cards = QNetworkInterface::allInterfaces();
+                iCard = cards.cbegin();
             }
         }
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Checking host %1 port %2")
+            .arg(addr.toString(), QString::number(port))
+            );
         QTcpSocket socket;
         socket.connectToHost(addr.toString(), port);
-
-        MythTimer attempt_time {MythTimer::kStartRunning};
-        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
-        static constexpr std::chrono::milliseconds k_poll_interval {1ms};
-        static constexpr std::chrono::milliseconds k_log_interval {100ms};
-        std::chrono::milliseconds next_log {k_log_interval};
+        std::chrono::milliseconds attempt_time_limit
+            {std::min(3s + timer.elapsed(), timeLimit)};
         while (state != QAbstractSocket::ConnectedState
                && !m_cancelCheck
-               && (timer.elapsed() < timeLimit)
-               && attempt_time.elapsed() < k_attempt_time_limit
+               && timer.elapsed() < attempt_time_limit
                )
         {
-            {
-                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
-                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
-            }
+            static constexpr std::chrono::milliseconds k_poll_interval {1ms};
+            QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+            std::this_thread::sleep_for(1ns); // force thread to yield
             state = socket.state();
-            if (attempt_time.elapsed() > next_log)
-            {
-                next_log += k_log_interval;
-#if 0
-                LOG(VB_GENERAL, LOG_DEBUG, LOC +
-                    QString("host %1 port %2 socket state %3, attempt time: %4")
-                    .arg(host, QString::number(port), QString::number(state),
-                         QString::number(attempt_time.elapsed().count())
-                         )
-                    );
-#endif
-            }
         }
         state = socket.state();
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("host %1 port %2 socket state %3, attempt time: %4")
             .arg(host, QString::number(port), QString::number(state),
-                 QString::number(attempt_time.elapsed().count())
+                 QString::number(timer.elapsed().count())
                  )
             );
     }
-    if (state == QAbstractSocket::ConnectedState && !scope.isEmpty())
+    if (state == QAbstractSocket::ConnectedState && !addr.scopeId().isEmpty())
     {
        gCoreContext->SetScopeForAddress(addr);
        host = addr.toString();
