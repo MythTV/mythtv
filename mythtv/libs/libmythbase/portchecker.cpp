@@ -181,7 +181,6 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
             // search for the next available IPV6 interface.
             if (iCard != cards.cend())
             {
-                LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(iCard->name()));
                 unsigned int flags = iCard->flags();
                 if (!(flags & QNetworkInterface::IsLoopBack)
                     && (flags & QNetworkInterface::IsRunning))
@@ -215,6 +214,9 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                 iCard = cards.cbegin();
             }
         }
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Checking host %1 port %2")
+            .arg(addr.toString(), QString::number(port))
+            );
         QTcpSocket socket;
         socket.connectToHost(addr.toString(), port);
 
