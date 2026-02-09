@@ -165,6 +165,7 @@ HttpServer::~HttpServer()
     m_rwlock.unlock();
 
     m_threadPool.Stop();
+    m_threadPool.waitForDone();
 
     while (!m_extensions.empty())
     {
