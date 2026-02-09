@@ -7,7 +7,6 @@
 #include <iostream>
 #include <libgen.h>
 #include <sys/stat.h>
-#include <sys/time.h>     // for setpriority
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -43,8 +42,6 @@
 #include "mythpreviewgen_commandlineparser.h"
 
 #define LOC      QString("MythPreviewGen: ")
-#define LOC_WARN QString("MythPreviewGen, Warning: ")
-#define LOC_ERR  QString("MythPreviewGen, Error: ")
 
 #ifdef Q_OS_MACOS
 // 10.6 uses some file handles for its new Grand Central Dispatch thingy
@@ -68,10 +65,6 @@ int preview_helper(uint chanid, QDateTime starttime,
                    const QSize previewSize,
                    const QString &infile, const QString &outfile)
 {
-    // Lower scheduling priority, to avoid problems with recordings.
-    if (setpriority(PRIO_PROCESS, 0, 9))
-        LOG(VB_GENERAL, LOG_ERR, "Setting priority failed." + ENO);
-
     if (!QFileInfo(infile).isReadable() && ((chanid == 0U) || !starttime.isValid()))
         ProgramInfo::QueryKeyFromPathname(infile, chanid, starttime);
 
