@@ -168,7 +168,6 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     auto iCard = cards.cbegin();
     MythTimer timer(MythTimer::kStartRunning);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    QString scope;
     bool testedAll = false;
     while (state != QAbstractSocket::ConnectedState
            && (timer.elapsed() < timeLimit)
@@ -176,9 +175,6 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
            && !testedAll
            )
     {
-        {
-            if (!gCoreContext->GetScopeForAddress(addr))
-            {
                 int iCardsEnd = 0;
                 addr.setScopeId(QString());
                 while (addr.scopeId().isEmpty() && iCardsEnd<2)
@@ -194,20 +190,13 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                             continue;
                         // check that IPv6 is enabled on that interface
                         QList<QNetworkAddressEntry> addresses = card.addressEntries();
-                        bool foundv6 = false;
                         for (const auto& ae : std::as_const(addresses))
                         {
                             if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
                             {
-                                foundv6 = true;
+                                addr.setScopeId(card.name());
                                 break;
                             }
-                        }
-                        if (foundv6)
-                        {
-                            scope = card.name();
-                            addr.setScopeId(scope);
-                            break;
                         }
                     }
                     else
@@ -225,10 +214,8 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                     LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("There is no IPV6 compatible interface for %1").arg(host)
                         );
-                    break;
+                    return false;
                 }
-            }
-        }
         QTcpSocket socket;
         socket.connectToHost(addr.toString(), port);
 
@@ -269,7 +256,7 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                  )
             );
     }
-    if (state == QAbstractSocket::ConnectedState && !scope.isEmpty())
+    if (state == QAbstractSocket::ConnectedState && !addr.scopeId().isEmpty())
     {
        gCoreContext->SetScopeForAddress(addr);
        host = addr.toString();
