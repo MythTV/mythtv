@@ -174,46 +174,47 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
            && !m_cancelCheck
            )
     {
-                addr.setScopeId(QString());
-                while (addr.scopeId().isEmpty())
+        // Determine the IPv6 scope to check
+        addr.setScopeId(QString());
+        while (addr.scopeId().isEmpty())
+        {
+            // search for the next available IPV6 interface.
+            if (iCard != cards.cend())
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(iCard->name()));
+                unsigned int flags = iCard->flags();
+                if (!(flags & QNetworkInterface::IsLoopBack)
+                    && (flags & QNetworkInterface::IsRunning))
                 {
-                    // search for the next available IPV6 interface.
-                    if (iCard != cards.cend())
+                    // check that IPv6 is enabled on that interface
+                    QList<QNetworkAddressEntry> addresses = iCard->addressEntries();
+                    for (const auto& ae : std::as_const(addresses))
                     {
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(iCard->name()));
-                        unsigned int flags = iCard->flags();
-                        if (!(flags & QNetworkInterface::IsLoopBack)
-                            && (flags & QNetworkInterface::IsRunning))
+                        if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
                         {
-                        // check that IPv6 is enabled on that interface
-                        QList<QNetworkAddressEntry> addresses = iCard->addressEntries();
-                        for (const auto& ae : std::as_const(addresses))
-                        {
-                            if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                            {
-                                addr.setScopeId(iCard->name());
-                                break;
-                            }
+                            addr.setScopeId(iCard->name());
+                            break;
                         }
-                        }
-                        iCard++;
-                    }
-                    else
-                    {
-                        iCardsEnd++;
-                        if (iCardsEnd >= 2)
-                        {
-                            LOG(VB_GENERAL, LOG_ERR, LOC +
-                                QString("There is no IPV6 compatible interface for %1").arg(host)
-                                );
-                            return false;
-                        }
-                        // Get a new list in case a new interface
-                        // has been added.
-                        cards = QNetworkInterface::allInterfaces();
-                        iCard = cards.cbegin();
                     }
                 }
+                iCard++;
+            }
+            else
+            {
+                iCardsEnd++;
+                if (iCardsEnd >= 2)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("There is no IPV6 compatible interface for %1").arg(host)
+                        );
+                    return false;
+                }
+                // Get a new list in case a new interface
+                // has been added.
+                cards = QNetworkInterface::allInterfaces();
+                iCard = cards.cbegin();
+            }
+        }
         QTcpSocket socket;
         socket.connectToHost(addr.toString(), port);
 
