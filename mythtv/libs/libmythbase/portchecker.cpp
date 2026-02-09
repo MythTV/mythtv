@@ -168,16 +168,14 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
     auto iCard = cards.cbegin();
     MythTimer timer(MythTimer::kStartRunning);
     QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    bool testedAll = false;
+    int iCardsEnd = 0;
     while (state != QAbstractSocket::ConnectedState
            && (timer.elapsed() < timeLimit)
            && !m_cancelCheck
-           && !testedAll
            )
     {
-                int iCardsEnd = 0;
                 addr.setScopeId(QString());
-                while (addr.scopeId().isEmpty() && iCardsEnd<2)
+                while (addr.scopeId().isEmpty())
                 {
                     // search for the next available IPV6 interface.
                     if (iCard != cards.cend())
@@ -201,20 +199,19 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                     }
                     else
                     {
+                        iCardsEnd++;
+                        if (iCardsEnd >= 2)
+                        {
+                            LOG(VB_GENERAL, LOG_ERR, LOC +
+                                QString("There is no IPV6 compatible interface for %1").arg(host)
+                                );
+                            return false;
+                        }
                         // Get a new list in case a new interface
                         // has been added.
                         cards = QNetworkInterface::allInterfaces();
                         iCard = cards.cbegin();
-                        testedAll=true;
-                        iCardsEnd++;
                     }
-                }
-                if (iCardsEnd > 1)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("There is no IPV6 compatible interface for %1").arg(host)
-                        );
-                    return false;
                 }
         QTcpSocket socket;
         socket.connectToHost(addr.toString(), port);
