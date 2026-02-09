@@ -180,22 +180,23 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
                     // search for the next available IPV6 interface.
                     if (iCard != cards.cend())
                     {
-                        QNetworkInterface card = *iCard++;
-                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
-                        unsigned int flags = card.flags();
-                        if ((flags & QNetworkInterface::IsLoopBack)
-                         || !(flags & QNetworkInterface::IsRunning))
-                            continue;
+                        LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(iCard->name()));
+                        unsigned int flags = iCard->flags();
+                        if (!(flags & QNetworkInterface::IsLoopBack)
+                            && (flags & QNetworkInterface::IsRunning))
+                        {
                         // check that IPv6 is enabled on that interface
-                        QList<QNetworkAddressEntry> addresses = card.addressEntries();
+                        QList<QNetworkAddressEntry> addresses = iCard->addressEntries();
                         for (const auto& ae : std::as_const(addresses))
                         {
                             if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
                             {
-                                addr.setScopeId(card.name());
+                                addr.setScopeId(iCard->name());
                                 break;
                             }
                         }
+                        }
+                        iCard++;
                     }
                     else
                     {
