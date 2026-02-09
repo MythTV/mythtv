@@ -219,41 +219,23 @@ bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::millise
             );
         QTcpSocket socket;
         socket.connectToHost(addr.toString(), port);
-
-        MythTimer attempt_time {MythTimer::kStartRunning};
-        static constexpr std::chrono::milliseconds k_attempt_time_limit {3s};
-        static constexpr std::chrono::milliseconds k_poll_interval {1ms};
-        static constexpr std::chrono::milliseconds k_log_interval {100ms};
-        std::chrono::milliseconds next_log {k_log_interval};
+        std::chrono::milliseconds attempt_time_limit
+            {std::min(3s + timer.elapsed(), timeLimit)};
         while (state != QAbstractSocket::ConnectedState
                && !m_cancelCheck
-               && (timer.elapsed() < timeLimit)
-               && attempt_time.elapsed() < k_attempt_time_limit
+               && timer.elapsed() < attempt_time_limit
                )
         {
-            {
-                QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
-                std::this_thread::sleep_for(1ns); // force thread to be de-scheduled
-            }
+            static constexpr std::chrono::milliseconds k_poll_interval {1ms};
+            QCoreApplication::processEvents(QEventLoop::AllEvents, k_poll_interval.count());
+            std::this_thread::sleep_for(1ns); // force thread to yield
             state = socket.state();
-            if (attempt_time.elapsed() > next_log)
-            {
-                next_log += k_log_interval;
-#if 0
-                LOG(VB_GENERAL, LOG_DEBUG, LOC +
-                    QString("host %1 port %2 socket state %3, attempt time: %4")
-                    .arg(host, QString::number(port), QString::number(state),
-                         QString::number(attempt_time.elapsed().count())
-                         )
-                    );
-#endif
-            }
         }
         state = socket.state();
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("host %1 port %2 socket state %3, attempt time: %4")
             .arg(host, QString::number(port), QString::number(state),
-                 QString::number(attempt_time.elapsed().count())
+                 QString::number(timer.elapsed().count())
                  )
             );
     }
