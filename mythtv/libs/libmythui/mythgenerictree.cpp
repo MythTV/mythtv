@@ -20,12 +20,12 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
     void SetAttributeIndex(int index)
                                 { m_attributeIndex = (index >= 0) ? index : 0; }
 
-    static bool sortByString(MythGenericTree *one, MythGenericTree *two)
+    static bool sortByString(const MythGenericTree *one, const MythGenericTree *two)
     {
         return one->GetSortText() < two->GetSortText();
     }
 
-    static int sortBySelectable(MythGenericTree *one, MythGenericTree *two)
+    static int sortBySelectable(const MythGenericTree *one, const MythGenericTree *two)
     {
         bool onesel = one->isSelectable();
         bool twosel = two->isSelectable();
@@ -44,9 +44,13 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
         switch (m_sortType)
         {
             case SORT_STRING:
+                // QList doesn't always play well with std::ranges
+                // NOLINTNEXTLINE(modernize-use-ranges)
                 std::sort(begin(), end(), sortByString);
                 break;
             case SORT_SELECTABLE:
+                // QList doesn't always play well with std::ranges
+                // NOLINTNEXTLINE(modernize-use-ranges)
                 std::sort(begin(), end(), sortBySelectable);
                 break;
         }

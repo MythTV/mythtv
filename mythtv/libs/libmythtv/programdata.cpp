@@ -1468,6 +1468,8 @@ static bool start_time_less_than(const DBEvent *a, const DBEvent *b)
 
 void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
 {
+    // QList doesn't always play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::stable_sort(fixlist.begin(), fixlist.end(), start_time_less_than);
 
     QList<ProgInfo*>::iterator it = fixlist.begin();

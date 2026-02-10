@@ -2651,6 +2651,8 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, std::chrono::milliseconds
 
     /* HLS standard doesn't provide any guaranty about streams
      being sorted by bitrate, so we sort them, higher bitrate being first */
+    // QList doesn't play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::sort(m_streams.begin(), m_streams.end(), HLSStream::IsGreater);
 
     // if we want as close to live. We should be selecting a further segment

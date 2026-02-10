@@ -1212,6 +1212,8 @@ class DVBCardNum : public CaptureCardComboBoxSetting
 #endif
             )
         {
+            // QList doesn't always play well with std::ranges
+            // NOLINTNEXTLINE(modernize-use-ranges)
             std::stable_sort(sdevs.begin(), sdevs.end());
         }
 
@@ -1939,6 +1941,8 @@ class ASIDevice : public CaptureCardComboBoxSetting
         // Add current if needed
         if (!current.isEmpty() && !sdevs.contains(current))
         {
+            // QList doesn't always play well with std::ranges
+            // NOLINTNEXTLINE(modernize-use-ranges)
             std::stable_sort(sdevs.begin(), sdevs.end());
         }
 

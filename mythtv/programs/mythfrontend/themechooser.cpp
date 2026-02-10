@@ -191,6 +191,8 @@ void ThemeChooser::Load(void)
 
             ResetBusyPopup();
 
+            // QList doesn't always play well with std::range
+            // NOLINTNEXTLINE(modernize-use-ranges)
             std::sort(m_infoList.begin(), m_infoList.end(), sortThemeNames);
         }
         else

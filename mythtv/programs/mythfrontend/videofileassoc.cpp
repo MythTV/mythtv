@@ -222,6 +222,7 @@ class FileAssocDialogPrivate
                 test_fa_state<FileAssociationWrap::efsDELETE>());
         ret.erase(first, last);
 
+        // NOLINTNEXTLINE(modernize-use-ranges)
         std::sort(ret.begin(), ret.end());
 
         return ret;

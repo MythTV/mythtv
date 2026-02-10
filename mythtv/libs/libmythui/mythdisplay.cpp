@@ -1003,6 +1003,8 @@ double MythDisplay::EstimateVirtualAspectRatio()
         return result;
 
     // N.B. This sorting may not be needed
+    // QList doesn't always play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::sort(screens.begin(), screens.end(), sortscreens);
     QList<double> aspectratios;
     QSize totalresolution;

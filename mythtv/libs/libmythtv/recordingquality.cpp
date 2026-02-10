@@ -20,6 +20,8 @@ RecordingQuality::RecordingQuality(const RecordingInfo *ri,
     if (!ri)
         return;
 
+    // QList doesn't play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::stable_sort(m_recordingGaps.begin(), m_recordingGaps.end());
     merge_overlapping(m_recordingGaps);
 
@@ -75,6 +77,8 @@ RecordingQuality::RecordingQuality(
     if (end_gap > max_end)
         m_recordingGaps.push_back(RecordingGap(latest, end));
 
+    // QList doesn't play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::stable_sort(m_recordingGaps.begin(), m_recordingGaps.end());
     merge_overlapping(m_recordingGaps);
 
