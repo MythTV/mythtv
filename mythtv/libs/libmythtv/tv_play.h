@@ -513,6 +513,11 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void ShowLCDChannelInfo();
     void ShowLCDDVDInfo();
 
+    // Active ChannelGroup
+    static inline int m_activeChannelGroupId {-1};
+    static void SetActiveChannelGroupId(int channelgroupid) {m_activeChannelGroupId = channelgroupid; }
+    static int GetActiveChannelGroupId() {return m_activeChannelGroupId; }
+
   private:
     void RetrieveCast(const ProgramInfo& ProgInfo);
 

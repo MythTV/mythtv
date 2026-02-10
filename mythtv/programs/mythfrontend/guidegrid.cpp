@@ -2035,6 +2035,17 @@ void GuideGrid::customEvent(QEvent *event)
 
                 if (m_changroupname)
                     m_changroupname->SetText(changrpname);
+
+                // Use the selected channel group as default, overriding the default
+                // channel group from the database, if the guide is not embedded
+                // in an active player.
+                if (!m_player)
+                {
+                    TV::SetActiveChannelGroupId(m_changrpid);
+                    LOG(VB_GENERAL, LOG_INFO, LOC +
+                        QString("Change active channel group to %1 %2")
+                            .arg(m_changrpid).arg(changrpname));
+                }
             }
         }
         else if (resultid == "jumptotime")

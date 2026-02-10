@@ -1108,6 +1108,10 @@ void TV::InitFromDB()
     m_dbRememberLastChannelGroup = (kv["ChannelGroupRememberLast"].toInt() != 0);
     m_channelGroupId       = kv["ChannelGroupDefault"].toInt();
 
+    // Use channel group selected in Guide Grid
+    if (GetActiveChannelGroupId() > -1)
+        m_channelGroupId = GetActiveChannelGroupId();
+
     QString beVBI          = kv["VbiFormat"];
     QString feVBI          = kv["DecodeVBIFormat"];
 
