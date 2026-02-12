@@ -1380,3 +1380,5 @@ void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
             .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
     }
 }
+
+#include "moc_mythvideoprofile.cpp"

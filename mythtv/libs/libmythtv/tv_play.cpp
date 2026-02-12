@@ -10541,3 +10541,5 @@ void SavePositionThread::run()
         }
     }
 }
+
+#include "moc_tv_play.cpp"

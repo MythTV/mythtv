@@ -1916,3 +1916,5 @@ void MythRAOPConnection::SendNotification(bool update)
     m_firstSend = true;
     delete n;
 }
+
+#include "moc_mythraopconnection.cpp"

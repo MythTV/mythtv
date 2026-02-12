@@ -569,3 +569,5 @@ void MythPowerDBus::ReleaseLock(void)
     close(m_lockHandle);
     m_lockHandle = -1;
 }
+
+#include "moc_mythpowerdbus.cpp"

@@ -1222,3 +1222,5 @@ BackendSettings::~BackendSettings()
     delete m_masterServerPort;
     m_masterServerPort=nullptr;
 }
+
+#include "moc_backendsettings.cpp"

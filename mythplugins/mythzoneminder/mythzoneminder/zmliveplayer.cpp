@@ -516,3 +516,5 @@ void Player::updateCamera()
     if (m_cameraText)
         m_cameraText->SetText(m_monitor.name);
 }
+
+#include "moc_zmliveplayer.cpp"

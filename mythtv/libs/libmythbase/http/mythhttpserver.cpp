@@ -624,3 +624,5 @@ void MythHTTPServer::DebugHosts()
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Host: %1").arg(address));
     }
 }
+
+#include "moc_mythhttpserver.cpp"

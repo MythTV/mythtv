@@ -625,3 +625,5 @@ Decoder *avfDecoderFactory::create(const QString &file, AudioOutput *output, boo
 
     return s_decoder;
 }
+
+#include "moc_avfdecoder.cpp"

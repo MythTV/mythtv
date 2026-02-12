@@ -936,3 +936,5 @@ void TestRecordingExtender::test_processNewRecordings(void)
 }
 
 QTEST_GUILESS_MAIN(TestRecordingExtender)
+
+#include "moc_test_recordingextender.cpp"

@@ -783,3 +783,5 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create graphics pipeline");
     return MYTH_NULL_DISPATCH;
 }
+
+#include "moc_mythrendervulkan.cpp"

@@ -765,3 +765,5 @@ uint SatIPStreamHandler::SetUDPReceiveBufferSize(QUdpSocket *socket, uint rcvbuf
     }
     return SatIPStreamHandler::GetUDPReceiveBufferSize(socket);
 }
+
+#include "moc_satipstreamhandler.cpp"

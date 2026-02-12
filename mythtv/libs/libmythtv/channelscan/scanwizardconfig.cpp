@@ -721,3 +721,5 @@ void ScanOptionalConfig::SetTuningPaneValuesATSC(const QString &freqtable)
         pane->SetFrequencyTable(freqtable);
     }
 }
+
+#include "moc_scanwizardconfig.cpp"

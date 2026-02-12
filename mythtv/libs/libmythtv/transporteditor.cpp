@@ -961,3 +961,5 @@ uint TransportSetting::getMplexId() const
 {
     return m_mplexid->getValue().toUInt();
 }
+
+#include "moc_transporteditor.cpp"

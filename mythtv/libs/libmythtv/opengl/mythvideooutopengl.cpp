@@ -390,3 +390,5 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythRenderOpenGL *Render,
     }
     return allowed;
 }
+
+#include "moc_mythvideooutopengl.cpp"

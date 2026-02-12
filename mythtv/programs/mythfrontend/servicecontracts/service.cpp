@@ -179,3 +179,5 @@ bool Service::ToBool( const QString &sVal )
 
     return false;
 }
+
+#include "moc_service.cpp"
