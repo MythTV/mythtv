@@ -22,7 +22,7 @@ HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
 HEADERS += playbacksock.h scheduler.h backendhousekeeper.h
 HEADERS += upnpcdstv.h upnpcdsmusic.h upnpcdsvideo.h mediaserver.h
 HEADERS += internetContent.h mythbackend_main_helpers.h backendcontext.h
-HEADERS += httpconfig.h mythsettings.h mythbackend_commandlineparser.h
+HEADERS += mythsettings.h mythbackend_commandlineparser.h
 HEADERS += recordingextender.h
 
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
@@ -30,7 +30,7 @@ SOURCES += mythbackend.cpp mainserver.cpp playbacksock.cpp scheduler.cpp
 SOURCES += backendhousekeeper.cpp
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
 SOURCES += internetContent.cpp mythbackend_main_helpers.cpp backendcontext.cpp
-SOURCES += httpconfig.cpp mythsettings.cpp mythbackend_commandlineparser.cpp
+SOURCES += mythsettings.cpp mythbackend_commandlineparser.cpp
 SOURCES += recordingextender.cpp
 
 HEADERS += servicesv2/v2myth.h servicesv2/v2connectionInfo.h servicesv2/v2wolInfo.h
@@ -95,8 +95,3 @@ SOURCES += servicesv2/v2capture.cpp
 SOURCES += servicesv2/v2music.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
 SOURCES += servicesv2/v2config.cpp
-
-xml_conf.path = $${PREFIX}/share/mythtv/backend-config/
-xml_conf.files = config_backend_general.xml config_backend_database.xml
-
-INSTALLS += xml_conf

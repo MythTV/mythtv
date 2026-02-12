@@ -25,8 +25,8 @@
 #include "libmythbase/mythdbcon.h"
 
 #include "libmythupnp/eventing.h"
-#include "libmythupnp/upnp.h"
 #include "libmythupnp/upnpcdsobjects.h"
+#include "libmythupnp/upnpresultcode.h"
 
 class UPnpCDS;
 

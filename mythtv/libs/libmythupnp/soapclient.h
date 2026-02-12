@@ -14,6 +14,7 @@
 #define SOAPCLIENT_H_
 
 #include <QDomDocument>
+#include <QDomNode>
 #include <QString>
 #include <QUrl>
 

@@ -13,17 +13,19 @@
 #ifndef UPNPCDSOBJECTS_H
 #define UPNPCDSOBJECTS_H
 
+#include <cstdint>
 #include <utility>
 
 #include <QDateTime>
 #include <QList>
 #include <QMap>
 #include <QString>
+#include <QUrl>
 
 #include "libmythbase/referencecounter.h"
 
 #include "upnpexp.h"
-#include "httprequest.h"
+#include "upnputil.h"
 
 class CDSObject;
 class QTextStream;
@@ -65,9 +67,9 @@ class Property
           : m_sName(std::move(sName)),
             m_sNameSpace(std::move(sNameSpace)),
             m_bRequired(bRequired),
-            m_bMultiValue(bMultiValue)
+            m_bMultiValue(bMultiValue),
+            m_sValue(QUrl::toPercentEncoding(sValue))
         {
-            m_sValue      = HTTPRequest::Encode(sValue);
         }
 
         void SetValue(const QString &value)
@@ -82,13 +84,14 @@ class Property
 
         QString GetEncodedValue(void) const
         {
-            return HTTPRequest::Encode(m_sValue);
+            return QUrl::toPercentEncoding(m_sValue);
         }
 
         void AddAttribute( const QString &sName,
                            const QString &sValue )
         {
-            m_lstAttributes.push_back(NameValue(sName, HTTPRequest::Encode(sValue)));
+            m_lstAttributes.push_back(NameValue(sName,
+                QString::fromUtf8(QUrl::toPercentEncoding(sValue))));
         }
 
     protected:
@@ -113,17 +116,17 @@ class Resource
 
     public:
 
-        Resource( QString sProtocolInfo,
-                  const QString &sURI )
-          : m_sProtocolInfo(std::move(sProtocolInfo))
+        Resource(QString sProtocolInfo, const QString &sURI) :
+            m_sProtocolInfo(std::move(sProtocolInfo)),
+            m_sURI(QUrl::toPercentEncoding(sURI))
         {
-            m_sURI          = HTTPRequest::Encode(sURI);
         }
 
         void AddAttribute( const QString &sName,
                            const QString &sValue )
         {
-            m_lstAttributes.push_back(NameValue(sName, HTTPRequest::Encode(sValue)));
+            m_lstAttributes.push_back(NameValue(sName,
+                QString::fromUtf8(QUrl::toPercentEncoding(sValue))));
         }
 };
 

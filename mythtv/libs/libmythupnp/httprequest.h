@@ -28,6 +28,7 @@
 #include "libmythbase/mythsession.h"
 
 #include "upnpexp.h"
+#include "upnpresultcode.h"
 #include "upnputil.h"
 #include "serializers/serializer.h"
 
@@ -139,7 +140,6 @@ class UPNP_PUBLIC HTTPRequest
         int                 m_nMajor            {0};
         int                 m_nMinor            {0};
 
-        bool                m_bProtected        {false};
         bool                m_bEncrypted        {false};
 
         bool                m_bSOAPRequest      {false};
@@ -195,15 +195,8 @@ class UPNP_PUBLIC HTTPRequest
         qint64          SendData            ( QIODevice *pDevice, qint64 llStart, qint64 llBytes );
         qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
 
-        bool            IsProtected         () const { return m_bProtected; }
         bool            IsEncrypted         () const { return m_bEncrypted; }
-        bool            Authenticated       ();
 
-        QString         GetAuthenticationHeader (bool isStale = false);
-        QString         CalculateDigestNonce ( const QString &timeStamp) const;
-
-        bool            BasicAuthentication ();
-        bool            DigestAuthentication ();
         void            AddCORSHeaders ( const QString &sOrigin );
 
     public:
@@ -216,6 +209,7 @@ class UPNP_PUBLIC HTTPRequest
         void            FormatErrorResponse ( bool  bServerError,
                                               const QString &sFaultString,
                                               const QString &sDetails );
+        void FormatErrorResponse(UPnPResultCode eCode, const QString &sMsg = "");
 
         void            FormatActionResponse( Serializer *ser );
         void            FormatActionResponse( const NameValues &pArgs );
@@ -223,6 +217,7 @@ class UPNP_PUBLIC HTTPRequest
         void            FormatRawResponse   ( const QString &sXML );
 
         qint64          SendResponse    ( void );
+        void SendResponseRedirect(const QString &hostName);
         qint64          SendResponseFile( const QString& sFileName );
 
         void            SetResponseHeader ( const QString &sKey,
@@ -251,13 +246,9 @@ class UPNP_PUBLIC HTTPRequest
         static QStringList GetSupportedMimeTypes ();
         static QString  TestMimeType    ( const QString &sFileName );
         static long     GetParameters   ( QString  sParams, QStringMap &mapParams );
-        static QString  Encode          ( const QString &sIn );
-        static QString  Decode          ( const QString &sIn );
         static QString  GetETagHash     ( const QByteArray &data );
 
         void            SetKeepAliveTimeout ( std::chrono::seconds nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
-
-        static bool            IsUrlProtected      ( const QString &sBaseUrl );
 
         // ------------------------------------------------------------------
 

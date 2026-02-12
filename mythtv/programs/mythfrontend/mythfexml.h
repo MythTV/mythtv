@@ -8,8 +8,13 @@
 #ifndef MYTHFEXML_H_
 #define MYTHFEXML_H_
 
+#include <cstdint>
+
+#include <QString>
+#include <QStringList>
+
 #include "libmythupnp/eventing.h"
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/httprequest.h"
 
 enum MythFEXMLMethod : std::uint8_t
 {

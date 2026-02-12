@@ -15,6 +15,8 @@
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
+#include "libmythupnp/httprequest.h"
+#include "libmythupnp/upnpresultcode.h"
 
 // MythFrontend
 #include "mythfexml.h"
@@ -87,7 +89,7 @@ bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
             GetActionListTest(pRequest);
             break;
         default:
-            UPnp::FormatErrorResponse(pRequest, UPnPResult_InvalidAction);
+            pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
     }
     return true;
 }

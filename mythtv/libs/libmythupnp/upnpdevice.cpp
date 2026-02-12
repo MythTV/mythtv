@@ -319,7 +319,11 @@ void UPnpDeviceDesc::SetBoolValue( const QDomNode &n, bool &nValue )
 QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 {
     QString     sXML;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QTextStream os( &sXML, QIODevice::WriteOnly );
+#else
+    QTextStream os(&sXML, QIODeviceBase::WriteOnly);
+#endif
 
     GetValidXML( sBaseAddress, nPort, os );
     os << Qt::flush;

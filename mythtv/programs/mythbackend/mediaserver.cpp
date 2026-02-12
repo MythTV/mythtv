@@ -24,7 +24,6 @@
 #include "libmythbase/mythlogging.h"
 
 // MythBackend
-#include "httpconfig.h"
 #include "internetContent.h"
 #include "mediaserver.h"
 #include "upnpcdsmusic.h"
@@ -116,7 +115,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
-    pHttpServer->RegisterExtension( new HttpConfig() );
     pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));
 
     if (bDisableUPnp)

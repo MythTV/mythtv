@@ -36,9 +36,9 @@ CDSObject::CDSObject( const QString &sId,
                       const QString &sTitle, 
                       const QString &sParentId )
     : ReferenceCounter("CDSObject", false),
-      m_sId(HTTPRequest::Encode(sId)),
-      m_sParentId(HTTPRequest::Encode(sParentId)),
-      m_sTitle(HTTPRequest::Encode(sTitle))
+      m_sId(QUrl::toPercentEncoding(sId)),
+      m_sParentId(QUrl::toPercentEncoding(sParentId)),
+      m_sTitle(QUrl::toPercentEncoding(sTitle))
 {
 }
 
@@ -264,10 +264,11 @@ QString CDSObject::toXml( FilterMap &filter,
                           bool ignoreChildren ) const
 {
     QString     sXML;
-    QTextStream os( &sXML, QIODevice::WriteOnly );
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QTextStream os( &sXML, QIODevice::WriteOnly );
     os.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
+    QTextStream os(&sXML, QIODeviceBase::WriteOnly);
     os.setEncoding(QStringConverter::Utf8);
 #endif
     toXml(os, filter, ignoreChildren);

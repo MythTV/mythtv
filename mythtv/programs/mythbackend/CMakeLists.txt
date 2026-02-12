@@ -20,8 +20,6 @@ add_executable(
   encoderlink.h
   filetransfer.cpp
   filetransfer.h
-  httpconfig.cpp
-  httpconfig.h
   httpstatus.cpp
   httpstatus.h
   internetContent.cpp
@@ -165,6 +163,3 @@ install(TARGETS mythbackend RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 install(FILES devicemaster.xml deviceslave.xml MXML_scpd.xml
         DESTINATION ${CMAKE_INSTALL_DATADIR}/mythtv)
-
-install(FILES config_backend_general.xml config_backend_database.xml
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/mythtv/backend-config)

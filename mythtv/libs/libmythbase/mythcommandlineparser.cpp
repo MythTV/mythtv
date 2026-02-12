@@ -366,7 +366,11 @@ int CommandLineArg::GetKeywordLength(void) const
 QString CommandLineArg::GetHelpString(int off, const QString& group, bool force) const
 {
     QString helpstr;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
+#else
+    QTextStream msg(&helpstr, QIODeviceBase::WriteOnly);
+#endif
     int termwidth = GetTermWidth();
     if (termwidth < off)
     {
@@ -441,7 +445,11 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
 QString CommandLineArg::GetLongHelpString(QString keyword) const
 {
     QString helpstr;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
+#else
+    QTextStream msg(&helpstr, QIODeviceBase::WriteOnly);
+#endif
     int termwidth = GetTermWidth();
 
     // help called for an argument that is not me, this should not happen
@@ -1417,7 +1425,11 @@ void MythCommandLineParser::PrintHelp(void) const
 QString MythCommandLineParser::GetHelpString(void) const
 {
     QString helpstr;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
+#else
+    QTextStream msg(&helpstr, QIODeviceBase::WriteOnly);
+#endif
 
     QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
         .arg(m_appname, GetMythSourcePath(), GetMythSourceVersion());

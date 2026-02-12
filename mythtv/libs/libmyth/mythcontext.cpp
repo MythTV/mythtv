@@ -39,6 +39,7 @@
 #include "libmythbase/configuration.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
+#include "libmythbase/mthreadpool.h"
 #include "libmythbase/mythappname.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
@@ -66,7 +67,7 @@
 #include "libmythupnp/ssdp.h"
 #include "libmythupnp/ssdpcache.h"
 #include "libmythupnp/taskqueue.h"
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/upnpresultcode.h"
 
 #include "backendselect.h"
 #include "guistartup.h"

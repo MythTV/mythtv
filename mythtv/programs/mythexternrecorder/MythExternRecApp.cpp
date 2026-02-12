@@ -919,7 +919,11 @@ Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
 
     QStringList args = MythCommandLineParser::MythSplitCommandString(streamcmd);
     QString cmd = args.takeFirst();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     m_proc.start(cmd, args, QIODevice::ReadOnly|QIODevice::Unbuffered);
+#else
+    m_proc.start(cmd, args, QIODeviceBase::ReadOnly | QIODeviceBase::Unbuffered);
+#endif
     m_proc.setTextModeEnabled(false);
     m_proc.setReadChannel(QProcess::StandardOutput);
 

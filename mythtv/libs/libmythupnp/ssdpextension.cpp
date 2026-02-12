@@ -106,7 +106,11 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     LOG(VB_UPNP, LOG_DEBUG, "SSDPExtension::GetDeviceList");
 
     QString     sXML;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QTextStream os(&sXML, QIODevice::WriteOnly);
+#else
+    QTextStream os(&sXML, QIODeviceBase::WriteOnly);
+#endif
 
     uint nDevCount = 0;
     uint nEntryCount = 0;
