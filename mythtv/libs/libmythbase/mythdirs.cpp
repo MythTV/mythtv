@@ -26,7 +26,6 @@ static QString confdir;
 static QString themedir;
 static QString pluginsdir;
 static QString translationsdir;
-static QString filtersdir;
 static QString cachedir;
 static QString remotecachedir;
 static QString themebasecachedir;
@@ -46,8 +45,7 @@ void InitializeMythDirs(void)
 #ifdef Q_OS_WINDOWS
 
     if (installprefix.isEmpty())
-        installprefix = QDir( qApp->applicationDirPath() )
-                            .absolutePath();
+        installprefix = QDir{QCoreApplication::applicationDirPath()}.absolutePath();
 
     appbindir = installprefix + "/";
     libdir    = appbindir;
@@ -130,8 +128,7 @@ void InitializeMythDirs(void)
 
 #elif defined(Q_OS_ANDROID)
     if (installprefix.isEmpty())
-        installprefix = QDir( qApp->applicationDirPath() )
-                            .absolutePath();
+        installprefix = QDir{QCoreApplication::applicationDirPath()}.absolutePath();
     QString extdir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/Mythtv";
     if (!QDir(extdir).exists())
         QDir(extdir).mkdir(".");
@@ -205,24 +202,26 @@ void InitializeMythDirs(void)
 #else
 
     if (installprefix.isEmpty())
-            installprefix = QString(RUNPREFIX);
+    {
+        QDir installdir {QCoreApplication::applicationDirPath()};
+        installdir.cdUp();
+        installprefix = installdir.absolutePath();
+    }
 
     #ifdef Q_OS_DARWIN
-        // Check to see if the RUNPREFIX exists, if it does not, this is
-        // likely an APP bundle and so RUNPREFIX needs to be pointed
+        // Check to see if the installprefix directory exists, if it does not,
+        // this is likely an APP bundle and so needs to be pointed
         // internally to the APP Bundle.
         if (! QDir(installprefix).exists())
             installprefix = QString("../Resources");
     #endif
-
-    QDir prefixDir = qApp->applicationDirPath();
 
     if (QDir(installprefix).isRelative())
     {
         // If the PREFIX is relative, evaluate it relative to our
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
-
+        QDir prefixDir {QCoreApplication::applicationDirPath()};
         LOG(VB_GENERAL, LOG_DEBUG, QString("Relative PREFIX! (%1), appDir=%2")
             .arg(installprefix, prefixDir.canonicalPath()));
 
@@ -243,21 +242,19 @@ void InitializeMythDirs(void)
 
     if (confdir.isEmpty())
         confdir = QDir::homePath() + "/.mythtv";
+
     cachedir = confdir + "/cache";
-    remotecachedir = cachedir + "/remotecache";
+    remotecachedir    = cachedir + "/remotecache";
     themebasecachedir = cachedir + "/themecache";
-    thumbnaildir = cachedir + "/thumbnails";
+    thumbnaildir      = cachedir + "/thumbnails";
+
+    themedir        = sharedir + "themes/";
+    translationsdir = sharedir + "i18n/";
 
 #ifdef Q_OS_ANDROID
-    themedir        = sharedir + "themes/";
     pluginsdir      = libdir;
-    translationsdir = sharedir + "i18n/";
-    filtersdir      = libdir;
 #else
-    themedir        = sharedir + "themes/";
     pluginsdir      = libdir   + "plugins/";
-    translationsdir = sharedir + "i18n/";
-    filtersdir      = libdir   + "filters/";
 #endif
 
     LOG(VB_GENERAL, LOG_NOTICE, "Using runtime prefix = " + installprefix);
@@ -270,7 +267,6 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_DEBUG, "themedir          = "+ themedir         );
     LOG(VB_GENERAL, LOG_DEBUG, "pluginsdir        = "+ pluginsdir       );
     LOG(VB_GENERAL, LOG_DEBUG, "translationsdir   = "+ translationsdir  );
-    LOG(VB_GENERAL, LOG_DEBUG, "filtersdir        = "+ filtersdir       );
     LOG(VB_GENERAL, LOG_DEBUG, "confdir           = "+ confdir          );
     LOG(VB_GENERAL, LOG_DEBUG, "cachedir          = "+ cachedir         );
     LOG(VB_GENERAL, LOG_DEBUG, "remotecachedir    = "+ remotecachedir   );
@@ -286,7 +282,6 @@ QString GetConfDir(void) { return confdir; }
 QString GetThemesParentDir(void) { return themedir; }
 QString GetPluginsDir(void) { return pluginsdir; }
 QString GetTranslationsDir(void) { return translationsdir; }
-QString GetFiltersDir(void) { return filtersdir; }
 
 /**
  * Returns the base directory for all cached files.  On linux this
@@ -322,29 +317,16 @@ QString GetThemeBaseCacheDir(void) { return themebasecachedir; }
 #ifdef Q_OS_DARWIN
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dylib";
-static const QString kFilterLibPrefix = "lib";
-static const QString kFilterLibSuffix = ".dylib";
 #elif defined(Q_OS_WINDOWS)
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dll";
-static const QString kFilterLibPrefix = "lib";
-static const QString kFilterLibSuffix = ".dll";
 #elif defined(Q_OS_ANDROID)
 static const QString kPluginLibPrefix = "libmythplugin";
 static const QString kPluginLibSuffix = ".so";
-static const QString kFilterLibPrefix = "libmythfilter";
-static const QString kFilterLibSuffix = ".so";
 #else
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".so";
-static const QString kFilterLibPrefix = "lib";
-static const QString kFilterLibSuffix = ".so";
 #endif
-
-QString GetFiltersNameFilter(void)
-{
-    return kFilterLibPrefix + '*' + kFilterLibSuffix;
-}
 
 QString GetPluginsNameFilter(void)
 {
