@@ -176,11 +176,7 @@ UPnpDeviceDesc *UPnp::GetDeviceDesc( QString &sURL )
     return UPnpDeviceDesc::Retrieve( sURL );
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-QString UPnp::GetResultDesc( UPnPResultCode eCode )
+QString UPnPResultCodeDesc(UPnPResultCode eCode)
 {
     switch( eCode )
     {
@@ -255,7 +251,7 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
             sDetails = "<UPnPResult xmlns=\"urn:schemas-upnp-org:control-1-0\">";
 
         if (sMsg.length() == 0)
-            sMsg = GetResultDesc( eCode );
+            sMsg = UPnPResultCodeDesc( eCode );
 
         sDetails += QString( "<errorCode>%1</errorCode>"
                              "<errorDescription>%2</errorDescription>" )

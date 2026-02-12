@@ -14,11 +14,13 @@
 #define MYTHXMLCLIENT_H_
 
 #include <QDomDocument>
+#include <QString>
+#include <QUrl>
 
 #include "libmythbase/mythdbparams.h"
 #include "libmythupnp/upnpexp.h"
 #include "libmythupnp/soapclient.h"
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/upnpresultcode.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

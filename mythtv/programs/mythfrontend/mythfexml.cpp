@@ -15,6 +15,7 @@
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
+#include "libmythupnp/upnp.h"
 
 // MythFrontend
 #include "mythfexml.h"

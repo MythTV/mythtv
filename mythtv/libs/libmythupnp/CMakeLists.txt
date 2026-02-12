@@ -23,6 +23,7 @@ set(HEADERS_TO_INSTALL1
     upnpcmgr.h
     upnpdevice.h
     upnphelpers.h
+    upnpresultcode.h
     upnpsubscription.h
     upnptaskevent.h
     upnptasknotify.h
@@ -83,6 +84,7 @@ add_library(
   upnphelpers.h
   upnpmsrr.cpp
   upnpmsrr.h
+  upnpresultcode.h
   upnpserviceimpl.cpp
   upnpserviceimpl.h
   upnpsubscription.cpp
