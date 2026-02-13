@@ -8,7 +8,6 @@ target.path = $${LIBDIR}
 
 INCLUDEPATH += .
 INCLUDEPATH += ./dvdnav ./dvdread
-INCLUDEPATH += ../../libs
 
 POSTINC =
 
@@ -77,6 +76,7 @@ HEADERS += dvdread/dvdread/dvd_udf.h
 HEADERS += dvdread/dvdread/ifo_print.h
 HEADERS += dvdread/dvdread/ifo_read.h
 HEADERS += dvdread/dvdread/ifo_types.h
+HEADERS += dvdread/dvdread/mythdvdio.h
 HEADERS += dvdread/dvdread/nav_print.h
 HEADERS += dvdread/dvdread/nav_read.h
 HEADERS += dvdread/dvdread/nav_types.h
@@ -115,6 +115,7 @@ inc_dvdread.files += dvdread/dvdread/dvd_udf.h
 inc_dvdread.files += dvdread/dvdread/ifo_print.h
 inc_dvdread.files += dvdread/dvdread/ifo_read.h
 inc_dvdread.files += dvdread/dvdread/ifo_types.h
+inc_dvdread.files += dvdread/dvdread/mythdvdio.h
 inc_dvdread.files += dvdread/dvdread/nav_print.h
 inc_dvdread.files += dvdread/dvdread/nav_read.h
 inc_dvdread.files += dvdread/dvdread/nav_types.h

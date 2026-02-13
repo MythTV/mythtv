@@ -427,6 +427,7 @@ message(VERBOSE "Setting up sub-projects for embedded libraries.")
 include(embeddedlibs/FindOrBuildNvCodecHeaders)
 include(embeddedlibs/FindOrBuildUdfRead)
 include(externallibs/FindOrBuildExiv2)
+include(embeddedlibs/BuildMythDvdNav)
 include(embeddedlibs/FindOrBuildFFmpeg)
 
 #

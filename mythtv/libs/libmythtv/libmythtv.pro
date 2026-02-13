@@ -386,7 +386,6 @@ INSTALLS += inc3
 
 #DVD stuff
 DEPENDPATH  += ../../external/libmythdvdnav/
-DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
 INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
 INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 
@@ -407,6 +406,7 @@ HEADERS += DVD/mythdvdstream.h
 SOURCES += DVD/mythdvdbuffer.cpp
 SOURCES += DVD/mythdvdcontext.cpp
 SOURCES += DVD/mythdvdinfo.cpp
+SOURCES += DVD/mythdvdio.cpp
 SOURCES += DVD/mythdvdstream.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h

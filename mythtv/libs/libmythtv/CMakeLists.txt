@@ -272,6 +272,7 @@ add_library(
   DVD/mythdvdcontext.h
   DVD/mythdvdinfo.cpp
   DVD/mythdvdinfo.h
+  DVD/mythdvdio.cpp
   DVD/mythdvdstream.cpp
   DVD/mythdvdstream.h
   # Bluray
@@ -381,11 +382,12 @@ target_link_libraries(
          $<TARGET_NAME_IF_EXISTS:PkgConfig::SYSTEMD>
          PkgConfig::LIBCRYPTO
          PkgConfig::SoundTouch
+         mythdvdnav
          mythbluray
          mythbase
          mythui
          mythupnp
-         mythdvdnav)
+         )
 
 target_link_libraries(
   mythtv
