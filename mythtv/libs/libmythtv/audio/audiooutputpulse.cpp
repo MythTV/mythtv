@@ -610,7 +610,15 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                                      (char*)"under");
     if (m_setInitialVol)
     {
-        int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
+        int volume;
+        if (gCoreContext->GetSetting("MixerControl", "PCM") == "PCM")
+        {
+            volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
+        }
+        else
+        {
+            volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
+        }
         pa_cvolume_set(&m_volumeControl, m_channels,
                        (float)volume * (float)PA_VOLUME_NORM / 100.0F);
     }
