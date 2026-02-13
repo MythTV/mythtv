@@ -29,13 +29,6 @@ cmake_minimum_required(VERSION 3.20)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 #
-# Require the C++17 standard, and allow compiler extensions.
-#
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
-
-#
 # Set CMake features
 #
 include(SetCmakePolicies NO_POLICY_SCOPE)
@@ -210,19 +203,9 @@ include(ProcessorCount)
 include(GetLinuxInfo)
 
 #
-# Test for required minimum compiler versions.
+# Check compiler and set flags
 #
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0.0)
-    message(FATAL_ERROR "GCC version 8 or better required.")
-  endif()
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0.0)
-    message(FATAL_ERROR "Clang version 11 or better required.")
-  endif()
-else()
-  message(FATAL_ERROR "Unknown compiler.")
-endif()
+include(SetCompilerOptions)
 
 #
 # Extract the MythTV source version number (either from Git, or from a file if
@@ -333,12 +316,6 @@ if(CMAKE_CROSSCOMPILING)
   endif()
   message(VERBOSE "Found automake: ${AUTOMAKE_EXECUTABLE}, version ${AUTOMAKE_VERSION}")
 endif()
-
-#
-# Check compiler and installed header files
-#
-include(CompilerCaching)
-include(SetCompilerOptions)
 
 #
 # Build a set of *.pc files for this platform.
