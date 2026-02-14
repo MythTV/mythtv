@@ -292,18 +292,28 @@ else(_QT_HAS_GLES)
   endif()
 endif(_QT_HAS_GLES)
 
+if ("Qt${QT_VERSION_MAJOR}" EQUAL 5)
+  # Set the QT_FEATURE_vulkan variable that Qt6 sets.
+  get_property(
+    _guiprops
+    TARGET Qt${QT_VERSION_MAJOR}::Gui
+    PROPERTY INTERFACE_QT_ENABLED_FEATURES)
+  if("vulkan" IN_LIST _guiprops)
+    set(QT_FEATURE_vulkan ON)
+  else()
+    set(QT_FEATURE_vulkan OFF)
+  endif()
+endif()
+if(ENABLE_VULKAN AND NOT QT_FEATURE_vulkan)
+  message(STATUS "Vulkan not supported by installed Qt")
+  set(ENABLE_VULKAN OFF)
+endif()
 if(ENABLE_VULKAN)
   find_package(Vulkan)
   add_build_config(Vulkan::Vulkan "vulkan")
   if(TARGET Vulkan::Vulkan)
     set(CONFIG_VULKAN TRUE)
-    get_property(
-      _guiprops
-      TARGET Qt${QT_VERSION_MAJOR}::Gui
-      PROPERTY INTERFACE_QT_ENABLED_FEATURES)
-    if(ENABLE_GLSLANG
-       AND "vulkan" IN_LIST _guiprops
-       AND NOT CMAKE_CROSSCOMPILING)
+    if(ENABLE_GLSLANG AND NOT CMAKE_CROSSCOMPILING)
       list(APPEND CMAKE_PREFIX_PATH ${PROJECT_BINARY_DIR})
       pkg_check_modules(GLSLANG IMPORTED_TARGET glslang)
       add_build_config(PkgConfig::GLSLANG "libglslang")
