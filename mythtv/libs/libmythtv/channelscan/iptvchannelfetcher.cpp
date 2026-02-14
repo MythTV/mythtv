@@ -619,7 +619,7 @@ static bool parse_chan_info(const QString   &rawdata,
 static QString parse_extinf_name_trailing(const QString& line)
 {
     QString result;
-    static const QRegularExpression re_name { R"([^\,+],(.*)$)" };
+    static const QRegularExpression re_name { R"(.*,(.*)$)" };
     auto match = re_name.match(line);
     if (match.hasMatch())
     {
