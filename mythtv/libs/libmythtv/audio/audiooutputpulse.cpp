@@ -610,7 +610,7 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
                                      (char*)"under");
     if (m_setInitialVol)
     {
-        int volume;
+        int volume {80};
         if (gCoreContext->GetSetting("MixerControl", "PCM") == "PCM")
         {
             volume = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
