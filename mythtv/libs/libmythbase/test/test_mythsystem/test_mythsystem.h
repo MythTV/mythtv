@@ -275,7 +275,11 @@ class TestMythSystem: public QObject
         std::this_thread::sleep_for(50ms);
         cmd->Signal(kSignalTerm);
         cmd->Wait();
+#ifndef Q_OS_OPENBSD
         QCOMPARE(cmd->GetExitCode(), -1);
+#else
+        QCOMPARE(cmd->GetExitCode(), 143); // 128 + SIGTERM = Please quit
+#endif
     }
 
     static void getexitcode_returns_neg_2_when_still_running(void)
