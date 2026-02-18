@@ -361,11 +361,11 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
 
     @classmethod
     def _parsemask(cls, mstr=None):
-        bwlist = (  'important','general','record','playback','channel','osd',
+        bwlist = (  'general','record','playback','channel','osd',
                     'file','schedule','network','commflag','audio','libav',
                     'jobqueue','siparser','eit','vbi','database','dsmcc',
                     'mheg','upnp','socket','xmltv','dvbcam','media','idle',
-                    'channelscan','extra','timestamp')
+                    'channelscan','system','timestamp')
         if mstr:
             mask = cls.NONE
             for m in mstr.split(','):
