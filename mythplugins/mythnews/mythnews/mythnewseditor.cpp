@@ -135,3 +135,5 @@ void MythNewsEditor::Save(void)
     }
     Close();
 }
+
+#include "moc_mythnewseditor.cpp"

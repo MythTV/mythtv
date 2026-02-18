@@ -275,3 +275,5 @@ void ManualSchedule::scheduleCreated(int ruleid)
     if (ruleid > 0)
         Close();
 }
+
+#include "moc_manualschedule.cpp"

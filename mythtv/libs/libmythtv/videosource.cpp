@@ -4439,3 +4439,5 @@ SatIPDeviceAttribute::SatIPDeviceAttribute(const QString& label, const QString& 
     setHelpText(helptext);
 };
 #endif // CONFIG_SATIP
+
+#include "moc_videosource.cpp"

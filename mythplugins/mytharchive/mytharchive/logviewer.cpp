@@ -354,3 +354,5 @@ void LogViewer::ShowMenu()
     menuPopup->AddButton(tr("Show Progress Log"), &LogViewer::showProgressLog);
     menuPopup->AddButton(tr("Show Full Log"), &LogViewer::showFullLog);
 }
+
+#include "moc_logviewer.cpp"

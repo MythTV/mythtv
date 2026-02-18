@@ -132,3 +132,5 @@ V2MusicMetadataInfo* V2Music::GetTrack(int Id)
 
     return pMusicMetadataInfo;
 }
+
+#include "moc_v2music.cpp"

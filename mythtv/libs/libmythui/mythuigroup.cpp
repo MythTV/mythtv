@@ -20,3 +20,5 @@ void MythUIGroup::CreateCopy(MythUIType *parent)
     auto *group = new MythUIGroup(parent, objectName());
     group->CopyFrom(this);
 }
+
+#include "moc_mythuigroup.cpp"

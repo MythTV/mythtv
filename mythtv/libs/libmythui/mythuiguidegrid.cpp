@@ -841,3 +841,5 @@ void MythUIGuideGrid::SetMultiLine(bool multiline)
     else
         m_justification &= ~Qt::TextWordWrap;
 }
+
+#include "moc_mythuiguidegrid.cpp"

@@ -124,3 +124,5 @@ void ImportSettings::slotSave(void)
 
     Close();
 }
+
+#include "moc_importsettings.cpp"

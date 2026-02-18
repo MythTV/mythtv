@@ -184,4 +184,4 @@ void MHInteractionChannel::slotFinished(QObject *obj)
     m_finished.insert(url, p);
 }
 
-/* End of file */
+#include "moc_mhegic.cpp"

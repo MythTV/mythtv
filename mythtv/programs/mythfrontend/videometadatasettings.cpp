@@ -152,3 +152,5 @@ void MetadataSettings::toggleTrailers()
 
     m_trailerSpin->SetVisible(checkstate != 0);
 }
+
+#include "moc_videometadatasettings.cpp"

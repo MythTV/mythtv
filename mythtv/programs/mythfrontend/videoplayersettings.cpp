@@ -172,3 +172,5 @@ void PlayerSettings::fillRegionList()
     if (item)
         m_blurayRegionList->SetItemCurrent(item);
 }
+
+#include "moc_videoplayersettings.cpp"

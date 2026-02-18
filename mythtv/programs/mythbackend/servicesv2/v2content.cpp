@@ -1157,3 +1157,5 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 // }
 
 // NOLINTEND(modernize-return-braced-init-list)
+
+#include "moc_v2content.cpp"

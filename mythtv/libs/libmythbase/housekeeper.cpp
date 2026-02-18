@@ -871,3 +871,5 @@ void HouseKeeper::customEvent(QEvent *e)
         }
     }
 }
+
+#include "moc_housekeeper.cpp"

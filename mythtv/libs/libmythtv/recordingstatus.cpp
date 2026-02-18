@@ -312,3 +312,5 @@ QString RecStatus::toDescription(RecStatus::Type recstatus, RecordingType rectyp
 
     return message;
 }
+
+#include "moc_recordingstatus.cpp"

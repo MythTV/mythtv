@@ -764,4 +764,4 @@ void MythControls::customEvent(QEvent *event)
 
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythcontrols.cpp"

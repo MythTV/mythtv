@@ -662,3 +662,5 @@ void EditLyricsDialog::cancelPressed(void )
     emit haveResult(false);
     Close();
 }
+
+#include "moc_lyricsview.cpp"

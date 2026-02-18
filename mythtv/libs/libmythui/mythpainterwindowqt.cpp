@@ -13,3 +13,5 @@ void MythPainterWindowQt::paintEvent(QPaintEvent *Event)
 {
     m_parent->drawScreen(Event);
 }
+
+#include "moc_mythpainterwindowqt.cpp"

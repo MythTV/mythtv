@@ -283,3 +283,5 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_visualizerview.cpp"

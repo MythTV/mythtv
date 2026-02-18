@@ -87,3 +87,5 @@ void MultiplexSetting::SetSourceID(uint sourceid)
     m_sourceid = sourceid;
     Load();
 }
+
+#include "moc_multiplexsetting.cpp"

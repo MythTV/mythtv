@@ -223,3 +223,5 @@ void ScanWizard::SetInput(const QString &cardid_inputname)
         m_lastHWCardType  = CardUtil::toInputType(subtype);
     }
 }
+
+#include "moc_scanwizard.cpp"

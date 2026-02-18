@@ -95,3 +95,5 @@ void TestUnzip::test_theme_file(void)
 }
 
 QTEST_APPLESS_MAIN(TestUnzip)
+
+#include "moc_test_unzip.cpp"

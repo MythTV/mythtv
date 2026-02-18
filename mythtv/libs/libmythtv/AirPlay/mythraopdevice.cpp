@@ -285,3 +285,5 @@ void MythRAOPDevice::DeleteAllClients(MythRAOPConnection *keep)
     }
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Exiting DeleteAllClients.");
 }
+
+#include "moc_mythraopdevice.cpp"

@@ -56,3 +56,5 @@ bool PlaylistView::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_playlistview.cpp"

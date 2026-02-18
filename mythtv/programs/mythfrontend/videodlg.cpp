@@ -3862,3 +3862,4 @@ void VideoDialog::PromptToScan()
 }
 
 #include "videodlg.moc"
+#include "moc_videodlg.cpp"

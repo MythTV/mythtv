@@ -1,3 +1,6 @@
+#ifndef LIBMYTHBASE_HTTP_MYTHWEBSOCKETEVENT_H
+#define LIBMYTHBASE_HTTP_MYTHWEBSOCKETEVENT_H
+
 #include <QObject>
 #include <QString>
 
@@ -25,3 +28,5 @@ class MythWebSocketEvent : public QObject
         QStringList m_filters;
         bool        m_sendEvents {false}; /// True if the client has enabled events
 };
+
+#endif // LIBMYTHBASE_HTTP_MYTHWEBSOCKETEVENT_H

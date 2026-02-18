@@ -105,3 +105,5 @@ void TestSubtitleScreen::test608()
 
 
 QTEST_APPLESS_MAIN(TestSubtitleScreen)
+
+#include "moc_test_subtitlescreen.cpp"

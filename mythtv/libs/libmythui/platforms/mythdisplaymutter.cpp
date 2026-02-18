@@ -588,3 +588,5 @@ void MythDisplayMutter::UpdateResources()
     m_physicalSize  = QSize(m_outputs[m_outputIdx].widthmm, m_outputs[m_outputIdx].heightmm);
     m_edid = MythEDID(m_outputs[m_outputIdx].edid);
 }
+
+#include "moc_mythdisplaymutter.cpp"
