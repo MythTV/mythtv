@@ -5,12 +5,11 @@
 #include <cstdio>
 
 // Qt headers
+#include <QFile>
 #include <QString>
 
-class QFile;
-
 bool dash_open(QFile &file, const QString &filename,
-               int m, FILE *handle = nullptr);
+               QIODevice::OpenMode m, FILE *handle = nullptr);
 
 QString SetupIconCacheDirectory(void);
 

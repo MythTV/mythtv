@@ -45,7 +45,11 @@
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
     : m_app(QFileInfo(app)),
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
       m_status(&m_statusBuf, QIODevice::ReadWrite)
+#else
+      m_status(&m_statusBuf, QIODeviceBase::ReadWrite)
+#endif
 {
     if (!m_app.exists())
     {

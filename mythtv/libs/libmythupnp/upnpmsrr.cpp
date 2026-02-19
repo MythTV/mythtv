@@ -9,7 +9,8 @@
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythlogging.h"
 
-#include "upnp.h"
+#include "httprequest.h"
+#include "upnpresultcode.h"
 #include "upnputil.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,7 @@ bool UPnpMSRR::ProcessRequest( HTTPRequest *pRequest )
                 HandleIsValidated( pRequest );
                 break;
             default:
-                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
+                pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
                 break;
         }       
     }

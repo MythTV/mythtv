@@ -53,10 +53,68 @@
 #include "serializers/xmlplistSerializer.h"
 
 #include "httpserver.h"
+#include "upnpresultcode.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif
+
+QString UPnPResultCodeDesc(UPnPResultCode eCode)
+{
+    switch( eCode )
+    {
+        case UPnPResult_Success                     : return "Success";
+        case UPnPResult_InvalidAction               : return "Invalid Action";
+        case UPnPResult_InvalidArgs                 : return "Invalid Args";
+        case UPnPResult_ActionFailed                : return "Action Failed";
+        case UPnPResult_ArgumentValueInvalid        : return "Argument Value Invalid";
+        case UPnPResult_ArgumentValueOutOfRange     : return "Argument Value Out Of Range";
+        case UPnPResult_OptionalActionNotImplemented: return "Optional Action Not Implemented";
+        case UPnPResult_OutOfMemory                 : return "Out Of Memory";
+        case UPnPResult_HumanInterventionRequired   : return "Human Intervention Required";
+        case UPnPResult_StringArgumentTooLong       : return "String Argument Too Long";
+        case UPnPResult_ActionNotAuthorized         : return "Action Not Authorized";
+        case UPnPResult_SignatureFailure            : return "Signature Failure";
+        case UPnPResult_SignatureMissing            : return "Signature Missing";
+        case UPnPResult_NotEncrypted                : return "Not Encrypted";
+        case UPnPResult_InvalidSequence             : return "Invalid Sequence";
+        case UPnPResult_InvalidControlURL           : return "Invalid Control URL";
+        case UPnPResult_NoSuchSession               : return "No Such Session";
+        case UPnPResult_MS_AccessDenied             : return "Access Denied";
+
+        case UPnPResult_CDS_NoSuchObject            : return "No Such Object";
+        case UPnPResult_CDS_InvalidCurrentTagValue  : return "Invalid CurrentTagValue";
+        case UPnPResult_CDS_InvalidNewTagValue      : return "Invalid NewTagValue";
+        case UPnPResult_CDS_RequiredTag             : return "Required Tag";
+        case UPnPResult_CDS_ReadOnlyTag             : return "Read Only Tag";
+        case UPnPResult_CDS_ParameterMismatch       : return "Parameter Mismatch";
+        case UPnPResult_CDS_InvalidSearchCriteria   : return "Invalid Search Criteria";
+        case UPnPResult_CDS_InvalidSortCriteria     : return "Invalid Sort Criteria";
+        case UPnPResult_CDS_NoSuchContainer         : return "No Such Container";
+        case UPnPResult_CDS_RestrictedObject        : return "Restricted Object";
+        case UPnPResult_CDS_BadMetadata             : return "Bad Metadata";
+        case UPnPResult_CDS_ResrtictedParentObject  : return "Resrticted Parent Object";
+        case UPnPResult_CDS_NoSuchSourceResource    : return "No Such Source Resource";
+        case UPnPResult_CDS_ResourceAccessDenied    : return "Resource Access Denied";
+        case UPnPResult_CDS_TransferBusy            : return "Transfer Busy";
+        case UPnPResult_CDS_NoSuchFileTransfer      : return "No Such File Transfer";
+        case UPnPResult_CDS_NoSuchDestRes           : return "No Such Destination Resource";
+        case UPnPResult_CDS_DestResAccessDenied     : return "Destination Resource Access Denied";
+        case UPnPResult_CDS_CannotProcessRequest    : return "Cannot Process The Request";
+
+        //case UPnPResult_CMGR_IncompatibleProtocol     = 701,
+        //case UPnPResult_CMGR_IncompatibleDirections   = 702,
+        //case UPnPResult_CMGR_InsufficientNetResources = 703,
+        //case UPnPResult_CMGR_LocalRestrictions        = 704,
+        //case UPnPResult_CMGR_AccessDenied             = 705,
+        //case UPnPResult_CMGR_InvalidConnectionRef     = 706,
+        case UPnPResult_CMGR_NotInNetwork           : return "Not In Network";
+        case UPnPResult_MythTV_NoNamespaceGiven:      return "No Namespace Given";
+        case UPnPResult_MythTV_XmlParseError        : return "XML Parse Error";
+    }
+
+    return "Unknown";
+}
 
 static std::array<const MIMETypes,66> g_MIMETypes
 {{
@@ -451,6 +509,26 @@ qint64 HTTPRequest::SendResponse( void )
     return( nBytes );
 }
 
+void HTTPRequest::SendResponseRedirect(const QString &hostName)
+{
+    m_eResponseType     = ResponseTypeOther;
+    m_nResponseStatus   = 301;
+
+    QStringList sItems = m_sRawRequest.split( ' ' );
+    QString sUrl = "http://" + GetLastHeader( "host" ) + sItems[1];
+    QUrl url( sUrl );
+    QString ipAddress = gCoreContext->GetSettingOnHost
+                            ("BackendServerAddr",hostName,hostName);
+    url.setHost( ipAddress );
+
+    m_mapRespHeaders[ "Location" ] = url.toString();
+
+    LOG(VB_UPNP, LOG_INFO, QString("Sending http redirect to: %1")
+                               .arg(url.toString()));
+
+    SendResponse();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -698,6 +776,29 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
     stream.flush();
 }
 
+void HTTPRequest::FormatErrorResponse(UPnPResultCode eCode, const QString &msg)
+{
+    QString sMsg( msg );
+    QString sDetails = "";
+
+    if (m_bSOAPRequest)
+        sDetails = "<UPnPResult xmlns=\"urn:schemas-upnp-org:control-1-0\">";
+
+    if (sMsg.length() == 0)
+        sMsg = UPnPResultCodeDesc(eCode);
+
+    sDetails += QString( "<errorCode>%1</errorCode>"
+                            "<errorDescription>%2</errorDescription>" )
+                    .arg( eCode )
+                    .arg(QString::fromUtf8(QUrl::toPercentEncoding(sMsg)));
+
+    if (m_bSOAPRequest)
+        sDetails += "</UPnPResult>";
+
+    FormatErrorResponse(true, // -=>TODO: Should make this dynamic
+                        "UPnPResult", sDetails);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -748,14 +849,14 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
             for (const auto & attr : std::as_const(*arg.m_pAttributes))
             {
                 stream << " " << attr.m_sName << "='"
-                       << Encode( attr.m_sValue ) << "'";
+                       << QUrl::toPercentEncoding(attr.m_sValue) << "'";
             }
         }
 
         stream << ">";
 
         if (m_bSOAPRequest)
-            stream << Encode( arg.m_sValue );
+            stream << QUrl::toPercentEncoding(arg.m_sValue);
         else
             stream << arg.m_sValue;
 
@@ -1317,24 +1418,6 @@ bool HTTPRequest::ParseRequest()
                 m_userSession = session;
         }
 
-        if (IsUrlProtected( m_sBaseUrl ))
-        {
-            if (!Authenticated())
-            {
-                m_eResponseType   = ResponseTypeHTML;
-                m_nResponseStatus = 401;
-                m_response.write( GetResponsePage() );
-                // Since this may not be the first attempt at authentication,
-                // Authenticated may have set the header with the appropriate
-                // stale attribute
-                SetResponseHeader("WWW-Authenticate", GetAuthenticationHeader(false));
-
-                return true;
-            }
-
-            m_bProtected = true;
-        }
-
         bSuccess = true;
 
         SetContentType( GetLastHeader( "content-type" ) );
@@ -1748,354 +1831,11 @@ Serializer *HTTPRequest::GetSerializer()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::Encode(const QString &sIn)
-{
-    QString sStr = sIn;
-#if 0
-    LOG(VB_HTTP, LOG_DEBUG,
-        QString("HTTPRequest::Encode Input : %1").arg(sStr));
-#endif
-    sStr.replace('&', "&amp;" ); // This _must_ come first
-    sStr.replace('<', "&lt;"  );
-    sStr.replace('>', "&gt;"  );
-    sStr.replace('"', "&quot;");
-    sStr.replace("'", "&apos;");
-
-#if 0
-    LOG(VB_HTTP, LOG_DEBUG,
-        QString("HTTPRequest::Encode Output : %1").arg(sStr));
-#endif
-    return sStr;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString HTTPRequest::Decode(const QString& sIn)
-{
-    QString sStr = sIn;
-    sStr.replace("&amp;", "&");
-    sStr.replace("&lt;", "<");
-    sStr.replace("&gt;", ">");
-    sStr.replace("&quot;", "\"");
-    sStr.replace("&apos;", "'");
-
-    return sStr;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 QString HTTPRequest::GetETagHash(const QByteArray &data)
 {
     QByteArray hash = QCryptographicHash::hash( data.data(), QCryptographicHash::Sha1);
 
     return ("\"" + hash.toHex() + "\"");
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
-{
-    QString sProtected = XmlConfiguration().GetValue("HTTP/Protected/Urls", "/setup;/Config");
-
-    QStringList oList = sProtected.split( ';' );
-
-    for( int nIdx = 0; nIdx < oList.count(); nIdx++)
-    {
-        if (sBaseUrl.startsWith( oList[nIdx], Qt::CaseInsensitive ))
-            return true;
-    }
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString HTTPRequest::GetAuthenticationHeader(bool isStale)
-{
-    QString authHeader;
-
-    // For now we support a single realm, that will change
-    QString realm = "MythTV";
-
-    // Always use digest authentication where supported, it may be available
-    // with HTTP 1.0 client as an extension, but we can't tell if that's the
-    // case. It's guaranteed to be available for HTTP 1.1+
-    if (m_nMajor >= 1 && m_nMinor > 0)
-    {
-        QString nonce = CalculateDigestNonce(MythDate::current_iso_string());
-        QString stale = isStale ? "true" : "false"; // FIXME
-        authHeader = QString("Digest realm=\"%1\",nonce=\"%2\","
-                             "qop=\"auth\",stale=\"%3\",algorithm=\"MD5\"")
-                        .arg(realm, nonce, stale);
-    }
-    else
-    {
-        authHeader = QString("Basic realm=\"%1\"").arg(realm);
-    }
-
-    return authHeader;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp) const
-{
-    QString uniqueID = QString("%1:%2").arg(timeStamp, m_sPrivateToken);
-    QString hash = QCryptographicHash::hash( uniqueID.toLatin1(), QCryptographicHash::Sha1).toHex(); // TODO: Change to Sha2 with QT5?
-    QString nonce = QString("%1%2").arg(timeStamp, hash); // Note: since this is going in a header it should avoid illegal chars
-    return nonce;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool HTTPRequest::BasicAuthentication()
-{
-    LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Basic Authentication");
-    QStringList oList = GetLastHeader( "authorization" ).split( ' ' );
-
-    if (m_nMajor == 1 && m_nMinor == 0) // We only support Basic auth for http 1.0 clients
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Basic authentication is only allowed for HTTP 1.0");
-        return false;
-    }
-
-    QString sCredentials = QByteArray::fromBase64( oList[1].toUtf8() );
-
-    oList = sCredentials.split( ':' );
-
-    if (oList.count() < 2)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid number of tokens");
-        return false;
-    }
-
-    QString sUsername = oList[0];
-    QString sPassword = oList[1];
-
-    if (sUsername == "nouser") // Special logout username
-        return false;
-
-    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
-    if (!MythSessionManager::IsValidUser(sUsername))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
-        return false;
-    }
-
-    QString client = QString("WebFrontend_%1").arg(GetPeerAddress());
-    MythUserSession session = sessionManager->LoginUser(sUsername, sPassword,
-                                                        client);
-
-    if (!session.IsValid())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password");
-        return false;
-    }
-
-    LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
-
-    if (IsEncrypted()) // Only set a session cookie for encrypted connections, not safe otherwise
-        SetCookie("sessionToken", session.GetSessionToken(),
-                    session.GetSessionExpires(), true);
-
-    m_userSession = session;
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool HTTPRequest::DigestAuthentication()
-{
-    LOG(VB_HTTP, LOG_NOTICE, "Attempting HTTP Digest Authentication");
-    QString realm = "MythTV"; // TODO Check which realm applies for the request path
-
-    QString authMethod = GetLastHeader( "authorization" ).section(' ', 0, 0).toLower();
-
-    if (authMethod != "digest")
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Invalid method in Authorization header");
-        return false;
-    }
-
-    QString parameterStr = GetLastHeader( "authorization" ).section(' ', 1);
-
-    QMap<QString, QString> paramMap;
-    QStringList paramList = parameterStr.split(',');
-    QStringList::iterator it;
-    for (it = paramList.begin(); it != paramList.end(); ++it)
-    {
-        QString key = (*it).section('=', 0, 0).toLower().trimmed();
-        // Since the value may contain '=' return everything after first occurence
-        QString value = (*it).section('=', 1).trimmed();
-        // Remove any quotes surrounding the value
-        value.remove("\"");
-        paramMap[key] = value;
-    }
-
-    if (paramMap.size() < 8)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Invalid number of parameters in Authorization header");
-        return false;
-    }
-
-    if (paramMap["nonce"].isEmpty()    || paramMap["username"].isEmpty() ||
-        paramMap["realm"].isEmpty()    || paramMap["uri"].isEmpty() ||
-        paramMap["response"].isEmpty() || paramMap["qop"].isEmpty() ||
-        paramMap["cnonce"].isEmpty()   || paramMap["nc"].isEmpty())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Missing required parameters in Authorization header");
-        return false;
-    }
-
-    if (paramMap["username"] == "nouser") // Special logout username
-        return false;
-
-    if (paramMap["uri"] != m_sOriginalUrl)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization URI doesn't match the "
-                                     "request URI");
-        m_nResponseStatus = 400; // Bad Request
-        return false;
-    }
-
-    if (paramMap["realm"] != realm)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization realm doesn't match the "
-                                  "realm of the requested content");
-        return false;
-    }
-
-    QByteArray nonce = paramMap["nonce"].toLatin1();
-    if (nonce.length() < 20)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce is too short");
-        return false;
-    }
-
-    QString  nonceTimeStampStr = nonce.left(20); // ISO 8601 fixed length
-    if (nonce != CalculateDigestNonce(nonceTimeStampStr))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce doesn't match reference");
-        LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce),
-                                                          CalculateDigestNonce(nonceTimeStampStr)));
-        return false;
-    }
-
-    constexpr std::chrono::seconds AUTH_TIMEOUT { 2min }; // 2 Minute timeout to login, to reduce replay attack window
-    QDateTime nonceTimeStamp = MythDate::fromString(nonceTimeStampStr);
-    if (!nonceTimeStamp.isValid())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce timestamp is invalid.");
-        LOG(VB_HTTP, LOG_DEBUG, QString("Timestamp was '%1'").arg(nonceTimeStampStr));
-        return false;
-    }
-
-    if (MythDate::secsInPast(nonceTimeStamp) > AUTH_TIMEOUT)
-    {
-        LOG(VB_HTTP, LOG_NOTICE, "Authorization nonce timestamp is invalid or too old.");
-        // Tell the client that the submitted nonce has expired at which
-        // point they may wish to try again with a fresh nonce instead of
-        // telling the user that their credentials were invalid
-        SetResponseHeader("WWW-Authenticate", GetAuthenticationHeader(true), true);
-        return false;
-    }
-
-    MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
-    if (!MythSessionManager::IsValidUser(paramMap["username"]))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
-        return false;
-    }
-
-    if (paramMap["response"].length() != 32)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Authorization response field is invalid length");
-        return false;
-    }
-
-    // If you're still reading this, well done, not far to go now
-
-    QByteArray a1 = MythSessionManager::GetPasswordDigest(paramMap["username"]).toLatin1();
-    //QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
-    QString methodDigest = QString("%1:%2").arg(GetRequestType(), paramMap["uri"]);
-    QByteArray a2 = QCryptographicHash::hash(methodDigest.toLatin1(),
-                                          QCryptographicHash::Md5).toHex();
-
-    QString responseDigest = QString("%1:%2:%3:%4:%5:%6").arg(a1,
-                                                              paramMap["nonce"],
-                                                              paramMap["nc"],
-                                                              paramMap["cnonce"],
-                                                              paramMap["qop"],
-                                                              a2);
-    QByteArray kd = QCryptographicHash::hash(responseDigest.toLatin1(),
-                                             QCryptographicHash::Md5).toHex();
-
-    if (paramMap["response"].toLatin1() == kd)
-    {
-        LOG(VB_HTTP, LOG_NOTICE, "Valid Authorization received");
-        QString client = QString("WebFrontend_%1").arg(GetPeerAddress());
-        MythUserSession session = sessionManager->LoginUser(paramMap["username"],
-                                                            a1,
-                                                            client);
-        if (!session.IsValid())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Valid Authorization received, but we "
-                                     "failed to create a valid session");
-            return false;
-        }
-
-        if (IsEncrypted()) // Only set a session cookie for encrypted connections, not safe otherwise
-            SetCookie("sessionToken", session.GetSessionToken(),
-                      session.GetSessionExpires(), true);
-
-        m_userSession = session;
-
-        return true;
-    }
-
-    LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
-    LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
-                            .arg(paramMap["response"], QString(kd)));
-
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-bool HTTPRequest::Authenticated()
-{
-    // Check if the existing user has permission to access this resource
-    if (m_userSession.IsValid()) //m_userSession.CheckPermission())
-        return true;
-
-    QStringList oList = GetLastHeader( "authorization" ).split( ' ' );
-
-    if (oList.count() < 2)
-        return false;
-
-    if (oList[0].compare( "basic", Qt::CaseInsensitive ) == 0)
-        return BasicAuthentication();
-    if (oList[0].compare( "digest", Qt::CaseInsensitive ) == 0)
-        return DigestAuthentication();
-
-    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@
 
 #include "libmythbase/mythlogging.h"
 
-#include "libmythupnp/upnp.h"
+#include "libmythupnp/upnpresultcode.h"
 #include "wsdl.h"
 #include "xsd.h"
 
@@ -427,18 +427,18 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             }
 
             if (!bHandled)
-                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
+                pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
         }
     }
     catch (HttpRedirectException &ex)
     {
-        UPnp::FormatRedirectResponse( pRequest, ex.m_hostName );
+        pRequest->SendResponseRedirect(ex.m_hostName);
         bHandled = true;
     }
     catch (HttpException &ex)
     {
         LOG(VB_GENERAL, LOG_ERR, ex.m_msg);
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, ex.m_msg );
+        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, ex.m_msg);
 
         bHandled = true;
 
@@ -446,7 +446,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
     catch (QString &sMsg)
     {
         LOG(VB_GENERAL, LOG_ERR, sMsg);
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
+        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, sMsg);
 
         bHandled = true;
     }
@@ -455,7 +455,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
         QString sMsg( "ServiceHost::ProcessRequest - Unexpected Exception" );
 
         LOG(VB_GENERAL, LOG_ERR, sMsg);
-        UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, sMsg );
+        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, sMsg);
 
         bHandled = true;
     }
@@ -482,7 +482,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 
         return true;
     }
-    UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed, "Call to method failed" );
+    LOG(VB_GENERAL, LOG_ERR, "Response not created - pRequest == NULL" );
 
     return false;
 }

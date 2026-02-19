@@ -8,7 +8,7 @@
 // filldata headers
 #include "fillutil.h"
 
-bool dash_open(QFile &file, const QString &filename, int m, FILE *handle)
+bool dash_open(QFile &file, const QString &filename, QIODevice::OpenMode m, FILE *handle)
 {
     bool retval = false;
     if (filename == "-")
@@ -21,12 +21,12 @@ bool dash_open(QFile &file, const QString &filename, int m, FILE *handle)
                 handle = stdin;
             }
         }
-        retval = file.open( handle, (QIODevice::OpenMode)m );
+        retval = file.open(handle, m);
     }
     else
     {
         file.setFileName(filename);
-        retval = file.open( (QIODevice::OpenMode)m );
+        retval = file.open(m);
     }
 
     return retval;

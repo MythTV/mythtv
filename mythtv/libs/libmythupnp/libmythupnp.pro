@@ -23,6 +23,7 @@ HEADERS += blockingtcpsocket.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 HEADERS += soapclient.h mythxmlclient.h upnpexp.h
 HEADERS += ssdpextension.h
+HEADERS += upnpresultcode.h
 HEADERS += upnpserviceimpl.h
 HEADERS += upnphelpers.h websocket.h
 
@@ -64,6 +65,7 @@ inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h upnputil.h
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h ssdpcache.h
 inc.files += upnpimpl.h
+inc.files += upnpresultcode.h
 inc.files += soapclient.h mythxmlclient.h upnpsubscription.h
 inc.files += upnphelpers.h
 

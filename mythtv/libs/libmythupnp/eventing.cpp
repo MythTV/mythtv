@@ -22,6 +22,7 @@
 #include <QTextStream>
 
 #include "upnp.h"
+#include "httprequest.h"
 #include "taskqueue.h"
 #include "upnptaskevent.h"
 #include "libmythbase/mythlogging.h"
@@ -162,7 +163,7 @@ bool Eventing::ProcessRequest( HTTPRequest *pRequest )
             case RequestTypeSubscribe   : HandleSubscribe   ( pRequest ); break;
             case RequestTypeUnsubscribe : HandleUnsubscribe ( pRequest ); break;
             default:
-                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
+                pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
                 break;
         }       
     }
@@ -363,11 +364,11 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         return;
 
     QByteArray   aBody;
-    QTextStream  tsBody( &aBody, QIODevice::WriteOnly );
-
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QTextStream  tsBody( &aBody, QIODevice::WriteOnly );
     tsBody.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
+    QTextStream tsBody(&aBody, QIODeviceBase::WriteOnly);
     tsBody.setEncoding(QStringConverter::Utf8);
 #endif
 
@@ -382,11 +383,11 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         // -=>TODO: Need to add support for more than one CallBack URL.
 
         auto *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
-        QTextStream  tsMsg( pBuffer, QIODevice::WriteOnly );
-
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        QTextStream  tsMsg( pBuffer, QIODevice::WriteOnly );
         tsMsg.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
+        QTextStream tsMsg(pBuffer, QIODeviceBase::WriteOnly);
         tsMsg.setEncoding(QStringConverter::Utf8);
 #endif
 

@@ -15,11 +15,14 @@
 #include <cmath>
 #include <cstdint>
 
+#include <QUrl>
+
 #include "libmythbase/configuration.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythversion.h"
 
-#include "upnp.h"
+#include "httprequest.h"
+#include "upnpresultcode.h"
 #include "upnputil.h"
 
 static constexpr const char* DIDL_LITE_BEGIN { R"(<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">)" };
@@ -268,7 +271,7 @@ bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
                 HandleGetServiceResetToken( pRequest );
                 break;
             default:
-                UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidAction );
+                pRequest->FormatErrorResponse(UPnPResult_InvalidAction);
                 break;
         }
 
@@ -531,7 +534,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     }
     else
     {
-        UPnp::FormatErrorResponse ( pRequest, eErrorCode, sErrorDesc );
+        pRequest->FormatErrorResponse(eErrorCode, sErrorDesc);
     }
 
 }
@@ -673,7 +676,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     }
     else
     {
-        UPnp::FormatErrorResponse( pRequest, eErrorCode, sErrorDesc );
+        pRequest->FormatErrorResponse(eErrorCode, sErrorDesc);
     }
 }
 
@@ -1108,7 +1111,8 @@ QString UPnPShortcutFeature::CreateXML()
         const QString& objectID = *it;
         xml += "<shortcut>\r\n";
         xml += QString("<name>%1</name>\r\n").arg(TypeToName(type));
-        xml += QString("<objectID>%1</objectID>\r\n").arg(HTTPRequest::Encode(objectID));
+        xml += QString{"<objectID>%1</objectID>\r\n"}
+                .arg(QString::fromUtf8(QUrl::toPercentEncoding(objectID)));
         xml += "</shortcut>\r\n";
     }
 

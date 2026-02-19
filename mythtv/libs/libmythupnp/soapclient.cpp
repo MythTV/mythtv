@@ -15,12 +15,12 @@
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
 #endif
+#include <QUrlQuery>
 
 #include "libmythbase/mythdownloadmanager.h"
 #include "libmythbase/mythlogging.h"
 
-#include "httprequest.h"
-#include "upnp.h"
+#include "upnpresultcode.h"
 
 #define LOC      QString("SOAPClient: ")
 
