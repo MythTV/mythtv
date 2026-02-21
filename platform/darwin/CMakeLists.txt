@@ -63,12 +63,7 @@ include(${MYTH_USER_OVERRIDES2} OPTIONAL)
 include(GNUInstallDirs)
 include(DumpAllVariables)
 
-#
-# Require the C++17 standard, and allow compiler extensions.
-#
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
+include(SetCompilerOptions)
 
 #
 # Set search paths

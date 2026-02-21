@@ -39,13 +39,6 @@ list(APPEND CMAKE_MODULE_PATH "${SUPER_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 #
-# Require the C++17 standard, and allow compiler extensions.
-#
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
-
-#
 # Set CMake features
 #
 include(SetCmakePolicies NO_POLICY_SCOPE)
@@ -137,7 +130,6 @@ include(StaticAnalysis)
 #
 # Check compiler and installed header files
 #
-include(CompilerCaching)
 include(SetCompilerOptions)
 include(MythCheckIncludes)
 include(MythFindFFmpeg)
