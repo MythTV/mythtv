@@ -160,12 +160,6 @@ include(PrintProperties)
 add_subdirectory(external)
 
 #
-# Allow all subsequently included directories to find the MythTV (myth)config.h
-# file.
-#
-include_directories(${PROJECT_BINARY_DIR})
-
-#
 # Find all the libs created by installed external projects
 #
 link_directories(${CMAKE_INSTALL_FULL_LIBDIR})
