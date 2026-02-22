@@ -1828,6 +1828,7 @@ valgrind_backtrace_deps="valgrind_valgrind_h"
 # hardware accelerators
 dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode ole32"
 dxva2_extralibs="-luser32"
+vdpau_deps="x11"
 
 # ffmpeg setting - value for image utils - 32 recommended, 1 used for now
 image_align=1
@@ -1844,6 +1845,9 @@ mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h EGL_egl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
 egl_deps="EGL_egl_h"
+vaapi_drm_deps="drm"
+vaapi_glx_deps="x11"
+vaapi_x11_deps="x11"
 v4l2_deps="linux_videodev2_h"
 v4l2prime_deps="v4l2 drm"
 vulkan_deps="vulkan_vulkan_core_h"

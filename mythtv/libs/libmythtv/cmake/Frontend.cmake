@@ -165,7 +165,7 @@ if(TARGET mythtv_mmal)
                                 decoders/mythmmalcontext.h)
 endif()
 
-if(TARGET PkgConfig::VDPAU AND TARGET X11::X11)
+if(TARGET PkgConfig::VDPAU)
   target_link_libraries(mythtv PUBLIC PkgConfig::VDPAU)
   target_sources(
     mythtv PRIVATE decoders/mythvdpaucontext.cpp decoders/mythvdpaucontext.h
@@ -255,7 +255,7 @@ if(TARGET any_opengl)
     endif()
   endif()
 
-  if(TARGET PkgConfig::VDPAU AND TARGET X11::X11)
+  if(TARGET PkgConfig::VDPAU)
     target_sources(mythtv PRIVATE opengl/mythvdpauinterop.h
                                   opengl/mythvdpauinterop.cpp)
   endif()

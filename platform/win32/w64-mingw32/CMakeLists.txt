@@ -53,13 +53,6 @@ set(TOOLCHAIN_PREFIX
 include(GNUInstallDirs)
 include(DumpAllVariables)
 
-#
-# Require the C++17 standard, and allow compiler extensions.
-#
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
-
 # Inject code from super-project provided modules (part 1).  We need the options
 # before setting up variables for Qt.
 include(MythOptions)
@@ -68,6 +61,7 @@ include(${MYTH_USER_OVERRIDES1} OPTIONAL)
 message(STATUS "Including user overrides ${MYTH_USER_OVERRIDES2}")
 include(${MYTH_USER_OVERRIDES2} OPTIONAL)
 
+include(SetCompilerOptions)
 include(SetSearchPaths)
 
 if(MYTH_VERSIONED_EXTENSIONS)

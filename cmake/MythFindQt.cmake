@@ -85,7 +85,7 @@ endif(CMAKE_CROSSCOMPILING)
 #
 if(ANDROID)
   if(QT_DIR MATCHES "^/usr")
-    message(FATAL_ERROR "Found system androiddeplayqt in ${QT_DIR}")
+    message(FATAL_ERROR "Found system androiddeployqt in ${QT_DIR}")
   endif()
 endif(ANDROID)
 
