@@ -596,7 +596,7 @@ using_frontend {
         QMAKE_CXXFLAGS += -isystem /opt/vc/include
     }
 
-    using_vdpau:using_x11 {
+    using_vdpau {
         HEADERS += decoders/mythvdpaucontext.h   decoders/mythvdpauhelper.h
         SOURCES += decoders/mythvdpaucontext.cpp decoders/mythvdpauhelper.cpp
         LIBS += -lvdpau
@@ -693,7 +693,7 @@ using_frontend {
             }
         }
 
-        using_vdpau:using_x11 {
+        using_vdpau {
             HEADERS += opengl/mythvdpauinterop.h
             SOURCES += opengl/mythvdpauinterop.cpp
         }
