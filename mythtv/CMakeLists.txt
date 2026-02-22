@@ -135,6 +135,8 @@ include(MythCheckIncludes)
 include(MythFindFFmpeg)
 include(MythFindQt)
 include(CheckExternalLibraries)
+include(MythCheckBindings)
+include(MythFindPackages)
 
 # Debian policy requires that shared libraries be installed without executable
 # permission.  Fedora policy requires that shared libraries be installed with
@@ -148,7 +150,6 @@ set(CMAKE_INSTALL_SO_NO_EXE OFF)
 include(ResetTargetSuffixes)
 reset_target_suffixes(${MYTH_VERSIONED_EXTENSIONS})
 
-include(MythFindPackages)
 include(PrintProperties)
 
 #
