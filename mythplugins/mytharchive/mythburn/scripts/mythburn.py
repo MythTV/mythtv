@@ -4693,18 +4693,19 @@ def doProcessFile(file, folder, count):
     # check if we need to convert any of the audio streams to ac3
     processAudio(folder)
 
-    # if we don't already have one find a title thumbnail image
-    titleImage = os.path.join(folder, "title.jpg")
-    if not os.path.exists(titleImage):
-        # if the file is a recording try to use its preview image for the thumb
-        if file.attributes["type"].value == "recording":
-            previewImage = file.attributes["filename"].value + ".png"
-            if usebookmark == True and os.path.exists(previewImage):
-                copy(previewImage, titleImage)
+    # if necessary and we don't already have one, find a title thumbnail image    
+    if wantMainMenu:
+        titleImage = os.path.join(folder, "title.jpg")
+        if not os.path.exists(titleImage):
+            # if the file is a recording try to use its preview image for the thumb
+            if file.attributes["type"].value == "recording":
+                previewImage = file.attributes["filename"].value + ".png"
+                if usebookmark == True and os.path.exists(previewImage):
+                    copy(previewImage, titleImage)
+                else:
+                    extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
             else:
                 extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
-        else:
-            extractVideoFrame(os.path.join(folder, "stream.mv2"), titleImage, thumboffset)
 
     write( "*************************************************************")
     write( "Finished processing '%s'" % file.attributes["filename"].value)
