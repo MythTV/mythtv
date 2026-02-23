@@ -240,7 +240,7 @@ set_source_files_properties(
   mythdirs.cpp
   PROPERTIES
     COMPILE_DEFINITIONS
-    "RUNPREFIX=\"${MYTH_RUN_PREFIX}\";LIBDIRNAME=\"${CMAKE_INSTALL_LIBDIR}\"")
+    "LIBDIRNAME=\"${CMAKE_INSTALL_LIBDIR}\"")
 target_include_directories(
   mythbase
   PRIVATE .

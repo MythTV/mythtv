@@ -82,7 +82,7 @@ Standard options:
   --compile-type=CTYPE     one of release, profile, debug [$compile_type]
                            NOTE: profile is for sampling profilers
   --prefix=PREFIX          install in PREFIX [$prefix]
-  --runprefix=PREFIX       prefix to be used at runtime (e.g. .. or /myth/latest)
+  --runprefix=PREFIX       prefix to be used at runtime by the Python bindings
   --libdir-name=LIBNAME    search/install libraries in PREFIX/LIBNAME [$libdir_name]
   --disable-ccache         disable compiler cache (ccache)
   --disable-distcc         disable distributed compilation (distcc)
@@ -6201,7 +6201,6 @@ get_version(){
 
 map 'get_version $v' $LIBRARY_LIST
 
-echo "RUNPREFIX=$runprefix" >> $TMPMAK
 echo "SYSROOT=$sysroot" >> $TMPMAK
 
 enabled audio_alsa        && append CCONFIG "using_alsa"
@@ -6437,7 +6436,7 @@ cp_if_changed $TMPPRO bindings/python/setup.cfg
 
 echo "Creating bindings/python/MythTV/_versions.py"
 sed -e "s/@MYTHTV_PYTHON_OWN_VERSION@/${MYTHTV_PYTHON_OWN_VERSION}/g" \
-    -e "s!@MYTHTV_INSTALL_PREFIX@!${prefix}!g" \
+    -e "s!@MYTHTV_INSTALL_PREFIX@!${runprefix}!g" \
     bindings/python/MythTV/_versions.py.in > $TMPPRO
 cp_if_changed $TMPPRO bindings/python/MythTV/_versions.py
 

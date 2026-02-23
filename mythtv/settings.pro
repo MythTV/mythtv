@@ -33,11 +33,6 @@ isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
 
-# Where the binaries actually locate the assets/filters/plugins at runtime
-isEmpty( RUNPREFIX ) {
-    RUNPREFIX = $$PREFIX
-}
-
 # Alternate library dir for OSes and packagers (e.g. lib64)
 
 isEmpty( LIBDIRNAME ) {
@@ -46,7 +41,7 @@ isEmpty( LIBDIRNAME ) {
 
 # Where libraries, plugins and filters are installed
 isEmpty( LIBDIR ) {
-    LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
+    LIBDIR = $${PREFIX}/$${LIBDIRNAME}
 }
 
 # Die on the (common) case where OS X users inadvertently use Fink's
