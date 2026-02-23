@@ -128,3 +128,9 @@ bool ScanStreamData::DeleteCachedTable(const PSIPTable *psip) const
         return true;
     return DVBStreamData::DeleteCachedTable(psip);
 }
+
+void ScanStreamData::DumpErrors() const
+{
+    ATSCStreamData::DumpErrors();
+    DVBStreamData::DumpErrors();
+}

@@ -222,16 +222,23 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::MGT:
         {
             SetVersionMGT(version);
-            if (m_cacheTables)
+            try
             {
-                auto *mgt = new MasterGuideTable(psip);
-                CacheMGT(mgt);
-                ProcessMGT(mgt);
+                if (m_cacheTables)
+                {
+                    auto *mgt = new MasterGuideTable(psip);
+                    CacheMGT(mgt);
+                    ProcessMGT(mgt);
+                }
+                else
+                {
+                    MasterGuideTable mgt(psip);
+                    ProcessMGT(&mgt);
+                }
             }
-            else
+            catch (const PsipParseException& e)
             {
-                MasterGuideTable mgt(psip);
-                ProcessMGT(&mgt);
+                m_parseErrors[e.m_error]++;
             }
             return true;
         }
@@ -239,16 +246,23 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             uint tsid = psip.TableIDExtension();
             SetVersionTVCT(tsid, version);
-            if (m_cacheTables)
+            try
             {
-                auto *vct = new TerrestrialVirtualChannelTable(psip);
-                CacheTVCT(pid, vct);
-                ProcessTVCT(tsid, vct);
+                if (m_cacheTables)
+                {
+                    auto *vct = new TerrestrialVirtualChannelTable(psip);
+                    CacheTVCT(pid, vct);
+                    ProcessTVCT(tsid, vct);
+                }
+                else
+                {
+                    TerrestrialVirtualChannelTable vct(psip);
+                    ProcessTVCT(tsid, &vct);
+                }
             }
-            else
+            catch (const PsipParseException& e)
             {
-                TerrestrialVirtualChannelTable vct(psip);
-                ProcessTVCT(tsid, &vct);
+                m_parseErrors[e.m_error]++;
             }
             return true;
         }
@@ -256,16 +270,23 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             uint tsid = psip.TableIDExtension();
             SetVersionCVCT(tsid, version);
-            if (m_cacheTables)
+            try
             {
-                auto *vct = new CableVirtualChannelTable(psip);
-                CacheCVCT(pid, vct);
-                ProcessCVCT(tsid, vct);
+                if (m_cacheTables)
+                {
+                    auto *vct = new CableVirtualChannelTable(psip);
+                    CacheCVCT(pid, vct);
+                    ProcessCVCT(tsid, vct);
+                }
+                else
+                {
+                    CableVirtualChannelTable vct(psip);
+                    ProcessCVCT(tsid, &vct);
+                }
             }
-            else
+            catch (const PsipParseException& e)
             {
-                CableVirtualChannelTable vct(psip);
-                ProcessCVCT(tsid, &vct);
+                m_parseErrors[e.m_error]++;
             }
             return true;
         }
@@ -273,10 +294,19 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             uint region = psip.TableIDExtension();
             SetVersionRRT(region, version);
-            RatingRegionTable rrt(psip);
-            QMutexLocker locker(&m_listenerLock);
-            for (auto & listener : m_atscAuxListeners)
-                listener->HandleRRT(&rrt);
+            try
+            {
+                RatingRegionTable rrt(psip);
+                QMutexLocker locker(&m_listenerLock);
+                for (auto & listener : m_atscAuxListeners)
+                    listener->HandleRRT(&rrt);
+            }
+            catch (const PsipParseException& e)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("RatingRegionTable constructor failed (%1): %2")
+                    .arg(1).arg(e.what()));
+            }
             return true;
         }
         case TableID::EIT:
@@ -288,51 +318,69 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             uint key = (pid<<16) | psip.TableIDExtension();
             m_eitStatus.SetSectionSeen(key, version, psip.Section(), psip.LastSection());
 
-            EventInformationTable eit(psip);
-            for (auto & listener : m_atscEitListeners)
-                listener->HandleEIT(pid, &eit);
+            try
+            {
+                EventInformationTable eit(psip);
+                for (auto & listener : m_atscEitListeners)
+                    listener->HandleEIT(pid, &eit);
 
-            const uint mm = GetATSCMajorMinor(eit.SourceID());
-            if (mm && m_eitHelper)
-                m_eitHelper->AddEIT(mm >> 16, mm & 0xffff, &eit);
-
+                const uint mm = GetATSCMajorMinor(eit.SourceID());
+                if (mm && m_eitHelper)
+                    m_eitHelper->AddEIT(mm >> 16, mm & 0xffff, &eit);
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
             return true;
         }
         case TableID::ETT:
         {
-            ExtendedTextTable ett(psip);
-
-            QMutexLocker locker(&m_listenerLock);
-            for (auto & listener : m_atscEitListeners)
-                listener->HandleETT(pid, &ett);
-
-            if (ett.IsEventETM() && m_eitHelper) // Guide ETTs
+            try
             {
-                const uint mm = GetATSCMajorMinor(ett.SourceID());
-                if (mm)
-                    m_eitHelper->AddETT(mm >> 16, mm & 0xffff, &ett);
-            }
+                ExtendedTextTable ett(psip);
 
+                QMutexLocker locker(&m_listenerLock);
+                for (auto & listener : m_atscEitListeners)
+                    listener->HandleETT(pid, &ett);
+
+                if (ett.IsEventETM() && m_eitHelper) // Guide ETTs
+                {
+                    const uint mm = GetATSCMajorMinor(ett.SourceID());
+                    if (mm)
+                        m_eitHelper->AddETT(mm >> 16, mm & 0xffff, &ett);
+                }
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
             return true;
         }
         case TableID::STT:
         {
-            SystemTimeTable stt(psip);
+            try
+            {
+                SystemTimeTable stt(psip);
 
-            UpdateTimeOffset(stt.UTCUnix());
+                UpdateTimeOffset(stt.UTCUnix());
 
-            // only update internal offset if it changes
-            if (stt.GPSOffset() != m_gpsUtcOffset)
-                m_gpsUtcOffset = stt.GPSOffset();
+                // only update internal offset if it changes
+                if (stt.GPSOffset() != m_gpsUtcOffset)
+                    m_gpsUtcOffset = stt.GPSOffset();
 
-            m_listenerLock.lock();
-            for (auto & listener : m_atscMainListeners)
-                listener->HandleSTT(&stt);
-            m_listenerLock.unlock();
+                m_listenerLock.lock();
+                for (auto & listener : m_atscMainListeners)
+                    listener->HandleSTT(&stt);
+                m_listenerLock.unlock();
 
-            if (m_eitHelper && GPSOffset() != m_eitHelper->GetGPSOffset())
-                m_eitHelper->SetGPSOffset(GPSOffset());
-
+                if (m_eitHelper && GPSOffset() != m_eitHelper->GetGPSOffset())
+                    m_eitHelper->SetGPSOffset(GPSOffset());
+            }
+            catch (const PsipParseException& e)
+            {
+                m_parseErrors[e.m_error]++;
+            }
             return true;
         }
         case TableID::DCCT:
@@ -1060,4 +1108,46 @@ void ATSCStreamData::RemoveATSC81EITListener(ATSC81EITStreamListener *val)
             return;
         }
     }
+}
+
+void ATSCStreamData::DumpErrors() const
+{
+    if (m_parseErrors[PsipParseException::MgtLength] ||
+        m_parseErrors[PsipParseException::MgtTableCount] ||
+        m_parseErrors[PsipParseException::MgtTableDescriptors] ||
+        m_parseErrors[PsipParseException::MgtGlobalDescriptors] ||
+        m_parseErrors[PsipParseException::MgtBadParse])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("MGT parsing error: %1/%2/%3/%4/%5")
+            .arg(m_parseErrors[PsipParseException::MgtLength])
+            .arg(m_parseErrors[PsipParseException::MgtTableCount])
+            .arg(m_parseErrors[PsipParseException::MgtTableDescriptors])
+            .arg(m_parseErrors[PsipParseException::MgtGlobalDescriptors])
+            .arg(m_parseErrors[PsipParseException::MgtBadParse]));
+    }
+    if (m_parseErrors[PsipParseException::VctLength] ||
+        m_parseErrors[PsipParseException::VctChannelCount] ||
+        m_parseErrors[PsipParseException::VctChannelDescriptors] ||
+        m_parseErrors[PsipParseException::VctGlobalDescriptors] ||
+        m_parseErrors[PsipParseException::VctBadParse])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("xVCT parsing error: %1/%2/%3/%4/%5")
+            .arg(m_parseErrors[PsipParseException::VctLength])
+            .arg(m_parseErrors[PsipParseException::VctChannelCount])
+            .arg(m_parseErrors[PsipParseException::VctChannelDescriptors])
+            .arg(m_parseErrors[PsipParseException::VctGlobalDescriptors])
+            .arg(m_parseErrors[PsipParseException::VctBadParse]));
+    }
+    if (m_parseErrors[PsipParseException::EitEventCount] ||
+        m_parseErrors[PsipParseException::EitEventDescriptors] ||
+        m_parseErrors[PsipParseException::EitBadParse])
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("EIT parsing error: %1/%2/%3/%4")
+            .arg(m_parseErrors[PsipParseException::EitLength])
+            .arg(m_parseErrors[PsipParseException::EitEventCount])
+            .arg(m_parseErrors[PsipParseException::EitEventDescriptors])
+            .arg(m_parseErrors[PsipParseException::EitBadParse]));
+    }
+
+    MPEGStreamData::DumpErrors();
 }

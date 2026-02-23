@@ -73,6 +73,13 @@ class MTV_PUBLIC TableClass
     };
 };
 
+class AtscParseException : public PsipParseException {
+public:
+    AtscParseException(Code code)
+      : PsipParseException("Atsc Parse Error", code)
+        { }
+};
+
 /** \class MasterGuideTable
  *  \brief This table tells the decoder on which PIDs to find other tables,
  *         and their sizes and each table's current version number.
@@ -80,6 +87,10 @@ class MTV_PUBLIC TableClass
 class MTV_PUBLIC MasterGuideTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kMGTHeaderSize     { 11 };
+    static constexpr uint8_t kMGTTableEntrySize { 11 }; // No table type descriptors
+    static constexpr uint8_t kMGTMinTrailerSize {  6 }; // Global descriptor count, CRC
+
     MasterGuideTable(const MasterGuideTable& table) : PSIPTable(table)
     {
         assert(TableID::MGT == TableID());
@@ -118,7 +129,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // protocol_version         8   8.0       0x00 for now
 
     // tables_defined          16   9.0, 6-370 valid OTA, 2-370 valid w/Cable
-    uint TableCount()    const { return (pesdata()[9]<<8) | pesdata()[10]; }
+    uint TableCount()    const { return m_tableCount; }
     uint TableCountRaw() const { return (pesdata()[9]<<8) | pesdata()[10]; }
     // for (i=0; i<tableCount(); i++) {
     //   table_type                    16  0.0
@@ -178,10 +189,11 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // }
     // CRC_32                          32
 
-    void Parse(void) const;
+    void Parse(void);
     QString toString(void) const override; // PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
   private:
+    uint m_tableCount {0};
     mutable std::vector<unsigned char*> m_ptrs; // used to parse
 };
 
@@ -194,6 +206,10 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
 class MTV_PUBLIC VirtualChannelTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kVCTHeaderSize     { 10 };
+    static constexpr uint8_t kVCTTableEntrySize { 32 }; // No descriptors
+    static constexpr uint8_t kVCTMinTrailerSize {  6 }; // Addl descriptor count, CRC
+
     VirtualChannelTable(const VirtualChannelTable &table) : PSIPTable(table)
     {
         assert(TableID::TVCT == TableID() || TableID::CVCT == TableID());
@@ -223,7 +239,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     uint TransportStreamID() const { return TableIDExtension(); }
 
     // num_channels_in_section  8   9.0
-    uint ChannelCount()      const { return pesdata()[9]; }
+    uint ChannelCount()      const { return m_channelCount; }
     uint ChannelCountRaw()   const { return pesdata()[9]; }
 
     // for(i=0; i<num_channels_in_section; i++) {
@@ -331,7 +347,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
         return m_ptrs[ChannelCount()]+2;
     }
     // CRC_32                  32
-    void Parse() const;
+    void Parse();
     int Find(int major, int minor) const;
     QString GetExtendedChannelName(uint idx) const;
     QString toString(void) const override; // PSIPTable
@@ -340,6 +356,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     virtual QString ChannelStringXML(uint indent_level, uint channel) const;
     virtual QString XMLChannelValues(uint indent_level, uint channel) const;
   protected:
+    uint m_channelCount {0};
     mutable std::vector<unsigned char*> m_ptrs;
 };
 
@@ -526,6 +543,10 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
 class MTV_PUBLIC EventInformationTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kEITHeaderSize     { 10 };
+    static constexpr uint8_t kEITTableEntrySize { 12 }; // No text, no descriptors
+    static constexpr uint8_t kEITMinTrailerSize {  4 }; // CRC
+
     EventInformationTable(const EventInformationTable &table)
         : PSIPTable(table)
     {
@@ -555,7 +576,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     uint SourceID() const { return TableIDExtension(); }
 
     // num_events_in_section    8   9.0
-    uint EventCount()    const { return psipdata()[1]; }
+    uint EventCount()    const { return m_eventCount; }
     uint EventCountRaw() const { return psipdata()[1]; }
     // for (j = 0; j< num_events_in_section;j++)
     // {
@@ -613,9 +634,10 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     //   }
     // }
     // CRC_32 32
-    void Parse() const;
+    void Parse();
     QString toString() const override; // PSIPTable
   private:
+    uint m_eventCount {0};
     mutable std::vector<unsigned char*> m_ptrs;
 };
 

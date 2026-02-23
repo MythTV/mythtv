@@ -19,6 +19,7 @@ class MTV_PUBLIC ScanStreamData :
 
     bool IsRedundant(uint pid, const PSIPTable &psip) const override; // ATSCStreamData
     bool HandleTables(uint pid, const PSIPTable &psip) override; // ATSCStreamData
+    void DumpErrors() const override; // MPEGStreamData
 
     void AddAllListeningPIDs(void);
     using DVBStreamData::Reset;

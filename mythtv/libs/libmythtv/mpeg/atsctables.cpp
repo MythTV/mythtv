@@ -44,29 +44,107 @@ int MasterGuideTable::TableClass(uint i) const
     return TableClass::UNKNOWN;
 }
 
-void MasterGuideTable::Parse(void) const
+void MasterGuideTable::Parse(void)
 {
+    if (SectionLength() > TSSizeInBuffer())
+        throw AtscParseException(PsipParseException::MgtLength);
+
+    // If no descriptors are present, what is the maximum possible number
+    // of table entries?
+    uint maxEntriesPossible =
+        (SectionLength() - kMGTHeaderSize - kMGTMinTrailerSize) / kMGTTableEntrySize;
+    m_tableCount = TableCountRaw();
+    if ((m_tableCount == 0) || (m_tableCount > maxEntriesPossible))
+        throw AtscParseException(PsipParseException::MgtTableCount);
+
+    // Pre-allocate the entire vector
     m_ptrs.clear();
+    m_ptrs.reserve(m_tableCount+1);
     m_ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 3);
-    for (uint i = 0; i < TableCount(); i++)
-        m_ptrs.push_back(m_ptrs[i] + 11 + TableDescriptorsLength(i));
+
+    // Process tables
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+    for (uint i = 0; i < m_tableCount; i++)
+    {
+        uint8_t *next = m_ptrs[i] + kMGTTableEntrySize + TableDescriptorsLength(i);
+        if (next > limit)
+            throw AtscParseException(PsipParseException::MgtTableDescriptors);
+        m_ptrs.push_back(next);
+    }
+
+    // Validate global descriptor count
+    const uint8_t *gd_end = m_ptrs[m_tableCount] + 2 + GlobalDescriptorsLength();
+    if (gd_end > limit)
+        throw AtscParseException(PsipParseException::MgtGlobalDescriptors);
+    if (gd_end < limit)
+        throw AtscParseException(PsipParseException::MgtBadParse);
 }
 
 
-void VirtualChannelTable::Parse(void) const
+void VirtualChannelTable::Parse(void)
 {
+    if (SectionLength() > TSSizeInBuffer())
+        throw AtscParseException(PsipParseException::VctLength);
+
+    // If no descriptors are present, what is the maximum possible number
+    // of channel entries?
+    uint maxEntriesPossible =
+        (SectionLength() - kVCTHeaderSize - kVCTMinTrailerSize) / kVCTTableEntrySize;
+    m_channelCount = ChannelCountRaw();
+    if ((m_channelCount == 0) || (m_channelCount > maxEntriesPossible))
+        throw AtscParseException(PsipParseException::VctChannelCount);
+
+    // Pre-allocate the entire vector
     m_ptrs.clear();
+    m_ptrs.reserve(m_channelCount+1);
     m_ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 2);
-    for (uint i = 0; i < ChannelCount(); i++)
-        m_ptrs.push_back(m_ptrs[i] + 32 + DescriptorsLength(i));
+
+    // Process tables
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+    for (uint i = 0; i < m_channelCount; i++)
+    {
+        uint8_t *next = m_ptrs[i] + kVCTTableEntrySize + DescriptorsLength(i);
+        if (next > limit)
+            throw AtscParseException(PsipParseException::VctChannelDescriptors);
+        m_ptrs.push_back(next);
+    }
+
+    // Validate additional descriptor count
+    const uint8_t *gd_end = m_ptrs[m_channelCount] + 2 + GlobalDescriptorsLength();
+    if (gd_end > limit)
+        throw AtscParseException(PsipParseException::VctGlobalDescriptors);
+    if (gd_end < limit)
+        throw AtscParseException(PsipParseException::VctBadParse);
 }
 
-void EventInformationTable::Parse(void) const
+void EventInformationTable::Parse(void)
 {
+    if (SectionLength() > TSSizeInBuffer())
+        throw AtscParseException(PsipParseException::EitLength);
+
+    // If no descriptors are present, what is the maximum possible number
+    // of event entries?
+    uint maxEntriesPossible =
+        (SectionLength() - kEITHeaderSize - kEITMinTrailerSize) / kEITTableEntrySize;
+    m_eventCount = EventCountRaw();
+    if ((m_eventCount == 0) || (m_eventCount > maxEntriesPossible))
+        throw AtscParseException(PsipParseException::EitEventCount);
+
+    // Pre-allocate the entire vector
     m_ptrs.clear();
+    m_ptrs.reserve(m_eventCount+1);
     m_ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 2);
-    for (uint i = 0; i < EventCount(); i++)
-        m_ptrs.push_back(m_ptrs[i] + 12 + TitleLength(i) + DescriptorsLength(i));
+
+    // Process tables
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+    uint8_t *next { nullptr};
+    for (uint i = 0; i < m_eventCount; i++)
+    {
+        next = m_ptrs[i] + kEITTableEntrySize + TitleLength(i) + DescriptorsLength(i);
+        if (next > limit)
+            throw AtscParseException(PsipParseException::EitEventDescriptors);
+        m_ptrs.push_back(next);
+    }
 }
 
 QString MasterGuideTable::toString(void) const

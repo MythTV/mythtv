@@ -21,12 +21,31 @@ static uint GetPrivateDataSpecifier(const unsigned char *desc, uint priv_dsid)
 
 void NetworkInformationTable::Parse(void) const
 {
-    m_tscPtr = pesdata() + 10 + NetworkDescriptorsLength();
+    if (SectionLength() > TSSizeInBuffer())
+        throw DvbParseException(PsipParseException::NitLength);
+
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+    m_tscPtr = pesdata() + kNITHeaderSize + NetworkDescriptorsLength();
+    if (m_tscPtr > limit)
+        throw DvbParseException(PsipParseException::NitNetworkDescriptorsLength);
+
+    // Assuming no transport descriptors, what is the maximum possible
+    // number of transport entries?
+    uint maxTransportPossible = (limit - m_tscPtr) / kNITTableEntrySize;
 
     m_ptrs.clear();
-    m_ptrs.push_back(m_tscPtr + 2);
-    for (uint i=0; m_ptrs[i] + 6 <= m_ptrs[0] + TransportStreamDataLength(); i++)
-        m_ptrs.push_back(m_ptrs[i] + 6 + TransportDescriptorsLength(i));
+    m_ptrs.reserve(maxTransportPossible);
+
+    // Process table
+    const uint8_t *next = m_tscPtr + kNITMiddleSize;
+    m_ptrs.push_back(next);
+    for (uint i = 0; (i < maxTransportPossible-1) && (next < limit); i++)
+    {
+        next = m_ptrs[i] + kNITTableEntrySize + TransportDescriptorsLength(i);
+        if (next > limit)
+            throw DvbParseException(PsipParseException::NitTransportDescriptors);
+        m_ptrs.push_back(next);
+    }
 }
 
 QString NetworkInformationTable::toString(void) const
@@ -116,13 +135,27 @@ bool NetworkInformationTable::Mutate(void)
 
 void ServiceDescriptionTable::Parse(void) const
 {
+    if (SectionLength() > TSSizeInBuffer())
+        throw DvbParseException(PsipParseException::SdtLength);
+
+    // Assuming no stream descriptors, what is the maximum possible
+    // number of stream entries?
+    uint maxServicesPossible =
+        (SectionLength() - kSDTHeaderSize - kMpegCRCSize) / kSDTTableEntrySize;
+
     m_ptrs.clear();
-    m_ptrs.push_back(pesdata() + 11);
-    uint i = 0;
-    while ((m_ptrs[i] + 5) < (pesdata() + Length()))
+    m_ptrs.reserve(maxServicesPossible);
+
+    // Process table
+    const uint8_t *next = pesdata() + kSDTHeaderSize;
+    const uint8_t *limit = pesdata() + SectionLength() - kMpegCRCSize;
+    m_ptrs.push_back(next);
+    for (uint i = 0; (i < maxServicesPossible-1) && (next < limit); i++)
     {
-        m_ptrs.push_back(m_ptrs[i] + 5 + ServiceDescriptorsLength(i));
-        i++;
+        next = m_ptrs[i] + kSDTTableEntrySize + ServiceDescriptorsLength(i);
+        if (next > limit)
+            throw DvbParseException(PsipParseException::SdtDescriptors);
+        m_ptrs.push_back(next);
     }
 }
 

@@ -21,6 +21,7 @@
 #include "test_mpegtables.h"
 
 #include <iconv.h>
+#include <iostream>
 
 #include "libmythtv/mpeg/atsc_huffman.h"
 #include "libmythtv/mpeg/atsctables.h"
@@ -30,6 +31,78 @@
 extern "C" {
 #include "libavutil/crc.h"
 #include "libavutil/bswap.h"
+}
+
+template <typename T>
+void mpeg_test_throw(const PSIPTable& si_table,
+                     PsipParseException::Code error_code)
+{
+    try
+    {
+        T table(si_table);
+        QFAIL(qPrintable(QStringLiteral("This test should throw a MpegParseException.")));
+    }
+    catch (const MpegParseException& e)
+    {
+        QCOMPARE(e.what(), "Mpeg Parse Error");
+        QCOMPARE(e.m_error, error_code);
+    }
+    catch (const PsipParseException& e)
+    {
+        QFAIL("Expected a MpegParseException error, received a PsipParseException");
+    }
+    catch (const std::runtime_error& e)
+    {
+        QFAIL("Expected a MpegParseException error, received a runtime_error");
+    }
+}
+
+template <typename T>
+void atsc_test_throw(const PSIPTable& si_table,
+                     PsipParseException::Code error_code)
+{
+    try
+    {
+        T table(si_table);
+        QFAIL(qPrintable(QStringLiteral("This test should throw an AtscParseException.")));
+    }
+    catch (const AtscParseException& e)
+    {
+        QCOMPARE(e.what(), "Atsc Parse Error");
+        QCOMPARE(e.m_error, error_code);
+    }
+    catch (const PsipParseException& e)
+    {
+        QFAIL("Expected a AtscParseException error, received a PsipParseException");
+    }
+    catch (const std::runtime_error& e)
+    {
+        QFAIL("Expected a AtscParseException error, received a runtime_error");
+    }
+}
+
+template <typename T>
+void dvb_test_throw(const PSIPTable& si_table,
+                    PsipParseException::Code error_code)
+{
+    try
+    {
+        T table(si_table);
+        QFAIL(qPrintable(QStringLiteral("This test should throw a DvbParseException.")));
+    }
+    catch (const DvbParseException& e)
+    {
+        QCOMPARE(e.what(), "Dvb Parse Error");
+        QCOMPARE(e.m_error, error_code);
+    }
+    catch (const PsipParseException& e)
+    {
+        QFAIL("Expected a DvbParseException error, received a PsipParseException");
+    }
+    catch (const std::runtime_error& e)
+    {
+        QFAIL("Expected a DvbParseException error, received a runtime_error");
+    }
 }
 
 void TestMPEGTables::update_crc(std::vector<uint8_t> &data)
@@ -257,6 +330,32 @@ void TestMPEGTables::mpeg_pmt_test1(void)
     QCOMPARE (pmt.FindPID(5022),                    1);
     QCOMPARE (pmt.FindPID(5024),                   -1);
     QCOMPARE (pmt.FindUnusedPID(),                32U);
+}
+
+void TestMPEGTables::mpeg_pmt_test1b(void)
+{
+    // This is the packet from the test 1 modified to state that the
+    // program info length is 255 bytes. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = wbal_pmt_data;
+    si_data[11] = 0xFF;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    mpeg_test_throw<ProgramMapTable>(si_table, PsipParseException::PmtProgramDescriptors);
+}
+
+void TestMPEGTables::mpeg_pmt_test1c(void)
+{
+    // This is the packet from the test 1 modified to state that the
+    // length of the first stream descriptor is 255 bytes. The CRC on
+    // this packet is valid.
+    std::vector<uint8_t> si_data = wbal_pmt_data;
+    si_data[43] = 0xFF;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    mpeg_test_throw<ProgramMapTable>(si_table, PsipParseException::PmtStreamDescriptors);
 }
 
 void TestMPEGTables::mpeg_pmt_test2(void)
@@ -703,6 +802,60 @@ void TestMPEGTables::atsc_mgt_test1b(void)
     QCOMPARE(end, end2);
 }
 
+void TestMPEGTables::atsc_mgt_test1c(void)
+{
+    // This is the packet from the test 1a modified to state there are
+    // 14 tables present when there are only 10. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wbal_mgt_data;
+    si_data[10] = 0x0E;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 124U);
+
+    atsc_test_throw<MasterGuideTable>(si_table, PsipParseException::MgtTableCount);
+}
+
+void TestMPEGTables::atsc_mgt_test1d(void)
+{
+    // This is the packet from the test 1a modified so that the second
+    // table entry says it has 81 descriptor bytes. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wbal_mgt_data;
+    si_data[43] = 0x51;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 124U);
+
+    atsc_test_throw<MasterGuideTable>(si_table, PsipParseException::MgtTableDescriptors);
+}
+
+void TestMPEGTables::atsc_mgt_test1e(void)
+{
+    // This is the packet from the test 1a modified so that the global
+    // desriptor count says it has 100 bytes. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = wbal_mgt_data;
+    si_data[122] = 0x4A;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 124U);
+
+    atsc_test_throw<MasterGuideTable>(si_table, PsipParseException::MgtGlobalDescriptors);
+}
+
 void TestMPEGTables::atsc_mgt_test2(void)
 {
     PSIPTable si_table(wjz_mgt_data);
@@ -987,6 +1140,60 @@ void TestMPEGTables::atsc_tvct_test1a(void)
     QCOMPARE(tvct.Find(4,4), 3);
     QCOMPARE(tvct.Find(44,2), 5);
     QCOMPARE(tvct.Find(1,1), -1);
+}
+
+void TestMPEGTables::atsc_tvct_test1b(void)
+{
+    // This is the packet from the test 1a modified to state there are
+    // 14 tables present when there are only 6. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wrc_tvct_data;
+    si_data[9] = 0x0E;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),             404U);
+
+    atsc_test_throw<TerrestrialVirtualChannelTable>(si_table, PsipParseException::VctChannelCount);
+}
+
+void TestMPEGTables::atsc_tvct_test1c(void)
+{
+    // This is the packet from the test 1a modified so that the second
+    // channel entry says it has 256 descriptor bytes. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wrc_tvct_data;
+    si_data[129] = 0xFF;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  404U);
+
+    atsc_test_throw<TerrestrialVirtualChannelTable>(si_table, PsipParseException::VctChannelDescriptors);
+}
+
+void TestMPEGTables::atsc_tvct_test1d(void)
+{
+    // This is the packet from the test 1a modified so that the global
+    // desriptor count says it has 100 bytes. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = wrc_tvct_data;
+    si_data[402] = 0x4A;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  404U);
+
+    atsc_test_throw<TerrestrialVirtualChannelTable>(si_table, PsipParseException::VctGlobalDescriptors);
 }
 
 //
@@ -1359,6 +1566,44 @@ void TestMPEGTables::atsc_eit_test1a(void)
     QCOMPARE (eit.DescriptorsLength(2),            33U);
 }
 
+void TestMPEGTables::atsc_eit_test1b(void)
+{
+    // This is the packet from the test 1a modified to state there are
+    // 100 events present when there are only 6. The CRC on this packet
+    // is valid.
+    std::vector<uint8_t> si_data = wbal_eit_data;
+    si_data[9] = 0x64;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+//    std::cerr << qPrintable(QString("%1").arg(si_table.CalcCRC(),8,16,QChar('0'))) << std::endl;
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 507U);
+
+    atsc_test_throw<EventInformationTable>(si_table, PsipParseException::EitEventCount);
+}
+
+void TestMPEGTables::atsc_eit_test1c(void)
+{
+    // This is the packet from the test 1a modified so that the second
+    // channel entry says it has 511 descriptor bytes. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = wbal_eit_data;
+    si_data[140] = 0xF1;
+    si_data[141] = 0x55;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 507U);
+
+    atsc_test_throw<EventInformationTable>(si_table, PsipParseException::EitEventDescriptors);
+}
+
 //
 // ExtendedTextTable Tests
 //
@@ -1572,6 +1817,365 @@ void TestMPEGTables::scte35_sit_test1(void)
     QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTNull);
 }
 
+// A sample splict_scheule packet created by the tstabcomp command
+// from https://tsduck.io/.  These values were picked randomly for
+// testing and probably don't match what would be in an actual
+// packet.
+const std::vector<uint8_t> tsduck_sit_schedule {
+    0xFC, 0x30, 0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x33, 0x04, 0x03, 0x00,
+    0xBC, 0x61, 0x4E, 0xFF, 0x00, 0xBC, 0x61, 0x4F, 0x7F, 0xFF, 0x50, 0xB2, 0xBF, 0x22, 0x7E, 0x00,
+    0x29, 0x32, 0xE0, 0x38, 0xA8, 0x03, 0x04, 0x00, 0xBC, 0x61, 0x50, 0x7F, 0xBF, 0x02, 0x7B, 0x50,
+    0xB2, 0xC0, 0x4E, 0x7C, 0x50, 0xB2, 0xC1, 0x7A, 0xFE, 0x00, 0x52, 0x65, 0xC0, 0x38, 0xA9, 0x05,
+    0x06, 0x00, 0x00, 0xA8, 0xA5, 0xA9, 0x06,
+};
+
+// A sample splict_insert packet created by the tstabcomp command
+// from https://tsduck.io/. This tests the splice_cancel section
+// of SpliceInformationTable::Parse insert processing.  These
+// values were picked randomly for testing and probably don't
+// match what would be in an actual packet.
+const std::vector<uint8_t> tsduck_sit_insert1 {
+    0xFC, 0x30, 0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x05, 0x05, 0x00, 0xBC,
+    0x61, 0x4E, 0xFF, 0x00, 0x14, 0x00, 0x08, 0x43, 0x55, 0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00,
+    0x08, 0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65, 0xA9, 0x3A, 0x69, 0xAE,
+};
+
+// A sample splict_insert packet created by the tstabcomp command
+// from https://tsduck.io/. This tests the program_slice section
+// of SpliceInformationTable::Parse insert processing.  These
+// values were picked randomly for testing and probably don't
+// match what would be in an actual packet.
+const std::vector<uint8_t> tsduck_sit_insert2 {
+    0xFC, 0x30, 0x39, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x14, 0x05, 0x00, 0xBC,
+    0x61, 0x4E, 0x7F, 0x6F, 0xFE, 0x34, 0x3E, 0xFC, 0xEA, 0xFE, 0x00, 0x29, 0x32, 0xE0, 0x38, 0xA8,
+    0x03, 0x04, 0x00, 0x14, 0x00, 0x08, 0x43, 0x55, 0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00, 0x08,
+    0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65, 0x73, 0x4C, 0x98, 0x04,
+};
+
+// A sample splict_insert packet created by the tstabcomp command
+// from https://tsduck.io/. This tests the splice_immediate
+// section of SpliceInformationTable::Parse insert processing.
+// These values were picked randomly for testing and probably
+// don't match what would be in an actual packet.
+const std::vector<uint8_t> tsduck_sit_insert3 {
+    0xFC, 0x30, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0x00, 0x00, 0xC0, 0x1C, 0x05, 0x00, 0xBC,
+    0x61, 0x4E, 0x7F, 0x2F, 0x02, 0xD3, 0xFE, 0x34, 0x3E, 0xFC, 0xF4, 0xD5, 0xFE, 0x34, 0x3E, 0xFC,
+    0xF6, 0x7E, 0x00, 0x52, 0x65, 0xC0, 0x38, 0xA8, 0x05, 0x06, 0x00, 0x14, 0x00, 0x08, 0x43, 0x55,
+    0x45, 0x49, 0x64, 0x75, 0x64, 0x65, 0x00, 0x08, 0x43, 0x55, 0x45, 0x4A, 0x64, 0x75, 0x64, 0x65,
+    0xF6, 0x15, 0x88, 0x56,
+};
+
+void TestMPEGTables::scte35_sit_schedule_test1a(void)
+{
+    PSIPTable si_table(tsduck_sit_schedule);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  68U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             68U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),          51U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceSchedule);
+
+    SpliceScheduleView schedule = sit.SpliceSchedule();
+    QCOMPARE (schedule.SpliceCount(),              3U);
+    QCOMPARE (schedule.SpliceEventID(0),    12345678U);
+    QCOMPARE (schedule.IsSpliceEventCancel(0),   true);
+
+    QCOMPARE (schedule.SpliceEventID(1),    12345679U);
+    QCOMPARE (schedule.IsSpliceEventCancel(1),  false);
+    QCOMPARE (schedule.IsOutOfNetwork(1),        true);
+    QCOMPARE (schedule.IsProgramSplice(1),       true);
+    QCOMPARE (schedule.IsDuration(1),            true);
+    BreakDurationView bd = schedule.BreakDuration(1);
+    QCOMPARE (bd.IsAutoReturn(),                false);
+    QCOMPARE (bd.PTSTime(),              0x0002932E0U);
+    QCOMPARE (schedule.SpliceTime(1),     0x50B2BF22U);
+    QCOMPARE (schedule.UniqueProgramID(1),     14504U);
+    QCOMPARE (schedule.AvailNum(1),                3U);
+    QCOMPARE (schedule.AvailsExpected(1),          4U);
+
+    QCOMPARE (schedule.SpliceEventID(2),    12345680U);
+    QCOMPARE (schedule.IsSpliceEventCancel(2),  false);
+    QCOMPARE (schedule.IsOutOfNetwork(2),        true);
+    QCOMPARE (schedule.IsProgramSplice(2),      false);
+    QCOMPARE (schedule.IsDuration(2),            true);
+    bd = schedule.BreakDuration(2);
+    QCOMPARE (bd.IsAutoReturn(),                 true);
+    QCOMPARE (bd.PTSTime(),              0x0005265C0U);
+    QCOMPARE (schedule.ComponentCount(2),          2U);
+
+    QCOMPARE (schedule.ComponentTag(2,0),        123U);
+    QCOMPARE (schedule.ComponentSpliceTime(2,0), 0x50B2C04EU);
+    QCOMPARE (schedule.ComponentTag(2,1),        124U);
+    QCOMPARE (schedule.ComponentSpliceTime(2,1), 0x50B2C17AU);
+
+    QCOMPARE (schedule.UniqueProgramID(2),     14505U);
+    QCOMPARE (schedule.AvailNum(2),                5U);
+    QCOMPARE (schedule.AvailsExpected(2),          6U);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),       0U);
+}
+
+void TestMPEGTables::scte35_sit_schedule_test1b(void)
+{
+    // This is the packet from the test 1a modified so that the splice
+    // count is 16 instead of 3. Muck the first splice event identifier
+    // to ensure that the code sees the phantom 4th splice as a
+    // cancel. (The bit is in the checksum field).
+    std::vector<uint8_t> si_data = tsduck_sit_schedule;
+    si_data[14] = 0x4;
+    si_data[18] = 0x67;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 68U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceSchedInfo1);
+}
+
+void TestMPEGTables::scte35_sit_schedule_test1c(void)
+{
+    // This is the packet from the test 1a modified so that the splice
+    // count is 16 instead of 3. Muck the first splice event identifier
+    // to ensure that the code doesn't sees the phantom 4th splice as a
+    // cancel. (The bit is in the checksum field).
+    std::vector<uint8_t> si_data = tsduck_sit_schedule;
+    si_data[14] = 0x10;
+    si_data[18] = 0xC6;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 68U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceSchedInfo2);
+}
+
+void TestMPEGTables::scte35_sit_insert_test1a(void)
+{
+    PSIPTable si_table(tsduck_sit_insert1);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  42U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             42U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),           5U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceInsert);
+
+    SpliceInsertView insert = sit.SpliceInsert();
+    QCOMPARE (insert.SpliceEventID(),       12345678U);
+    QCOMPARE (insert.IsSpliceEventCancel(),      true);
+    QCOMPARE (insert.IsOutOfNetwork(),          false);
+    QCOMPARE (insert.IsProgramSplice(),         false);
+    QCOMPARE (insert.IsDuration(),              false);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
+    QCOMPARE (sit.SpliceDescriptors(),  sit.data()+21);
+    QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
+void TestMPEGTables::scte35_sit_insert_test1b(void)
+{
+    // This is the packet from the test 1a truncated right after the
+    // byte containing the cancel indicator.
+    std::vector<uint8_t> si_data = tsduck_sit_insert1;
+    si_data.resize(19);
+    si_data[02] = 16;
+    si_data[14] = 0x67;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 16U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo1);
+}
+
+void TestMPEGTables::scte35_sit_insert_test2a(void)
+{
+    PSIPTable si_table(tsduck_sit_insert2);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  57U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             57U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),          20U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceInsert);
+
+    SpliceInsertView insert = sit.SpliceInsert();
+    QCOMPARE (insert.SpliceEventID(),       12345678U);
+    QCOMPARE (insert.IsSpliceEventCancel(),     false);
+    QCOMPARE (insert.IsOutOfNetwork(),          false);
+    QCOMPARE (insert.IsProgramSplice(),          true);
+    QCOMPARE (insert.IsDuration(),               true);
+    QCOMPARE (insert.IsSpliceImmediate(),       false);
+    BreakDurationView bd = insert.BreakDuration();
+    QCOMPARE (bd.IsAutoReturn(),                 true);
+    QCOMPARE (bd.PTSTime(),              0x0002932E0U);
+    QCOMPARE (insert.UniqueProgramID(),        14504U);
+    QCOMPARE (insert.AvailNum(),                   3U);
+    QCOMPARE (insert.AvailsExpected(),             4U);
+    QCOMPARE (insert.ComponentCount(),             0U);
+
+    SpliceTimeView time = insert.SpliceTime();
+    QCOMPARE (time.IsTimeSpecified(),            true);
+    QCOMPARE (time.PTSTime(),            0x0343EFCEAU);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
+    QCOMPARE (sit.SpliceDescriptors(),  sit.data()+36);
+    QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
+void TestMPEGTables::scte35_sit_insert_test2b(void)
+{
+    // This is the packet from the test 2a truncated right after the
+    // byte containing the program_splice and splice_immediate flags.
+    std::vector<uint8_t> si_data = tsduck_sit_insert2;
+    si_data.resize(25);
+    si_data[02] = 22;
+    si_data[20] = 0xFE;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 22U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo2);
+}
+
+void TestMPEGTables::scte35_sit_insert_test3a(void)
+{
+    PSIPTable si_table(tsduck_sit_insert3);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(),                  65U);
+
+    // Splice specific fields
+    SpliceInformationTable sit(si_table);
+    QCOMPARE (sit.SectionSyntaxIndicator(),     false);
+    QCOMPARE (sit.PrivateIndicator(),           false);
+    QCOMPARE (sit.SectionLengthRaw(),             65U);
+    QCOMPARE (sit.SpliceProtocolVersion(),         0U);
+    QCOMPARE (sit.IsEncryptedPacket(),          false);
+    QCOMPARE (sit.EncryptionAlgorithm(), (uint)SpliceInformationTable::kNoEncryption);
+    QCOMPARE (sit.PTSAdjustment(),              90ULL);
+    QCOMPARE (sit.CodeWordIndex(),                 0U);
+    QCOMPARE (sit.Tier(),                         12U);
+
+    QCOMPARE (sit.SpliceCommandLength(),          28U);
+    QCOMPARE (sit.SpliceCommandType(), (uint)SpliceInformationTable::kSCTSpliceInsert);
+
+    SpliceInsertView insert = sit.SpliceInsert();
+    QCOMPARE (insert.SpliceEventID(),       12345678U);
+    QCOMPARE (insert.IsSpliceEventCancel(),     false);
+    QCOMPARE (insert.IsOutOfNetwork(),          false);
+    QCOMPARE (insert.IsProgramSplice(),         false);
+    QCOMPARE (insert.IsDuration(),               true);
+    QCOMPARE (insert.IsSpliceImmediate(),       false);
+    BreakDurationView bd = insert.BreakDuration();
+    QCOMPARE (bd.IsAutoReturn(),                false);
+    QCOMPARE (bd.PTSTime(),              0x0005265C0U);
+    QCOMPARE (insert.UniqueProgramID(),        14504U);
+    QCOMPARE (insert.AvailNum(),                   5U);
+    QCOMPARE (insert.AvailsExpected(),             6U);
+    QCOMPARE (insert.ComponentCount(),             2U);
+
+    QCOMPARE (insert.ComponentTag(0),            211U);
+    SpliceTimeView time = insert.ComponentSpliceTime(0);
+    QCOMPARE (time.IsTimeSpecified(),            true);
+    QCOMPARE (time.PTSTime(),            0x0343EFCF4U);
+
+    QCOMPARE (insert.ComponentTag(1),            213U);
+    time = insert.ComponentSpliceTime(1);
+    QCOMPARE (time.IsTimeSpecified(),            true);
+    QCOMPARE (time.PTSTime(),            0x0343EFCF6U);
+
+    QCOMPARE (sit.SpliceDescriptorsLength(),      20U);
+    QCOMPARE (sit.SpliceDescriptors(),  sit.data()+44);
+    QCOMPARE (sit.SpliceDescriptors()[2],       0x43U);
+}
+
+void TestMPEGTables::scte35_sit_insert_test3b(void)
+{
+    // This is the packet from the test 3a modified to say there are 100
+    // components.
+    std::vector<uint8_t> si_data = tsduck_sit_insert3;
+    si_data[20] = 0x64;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 65U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo3);
+}
+
+void TestMPEGTables::scte35_sit_insert_test3c(void)
+{
+    // This is the packet from the test 3a modified to truncate the packet
+    // just after the component tags.
+    std::vector<uint8_t> si_data = tsduck_sit_insert3;
+    si_data.resize(42);
+    si_data[2] = 0x27;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    QVERIFY  (si_table.IsGood());
+    QVERIFY  (si_table.HasCRC());
+    QVERIFY  (si_table.VerifyCRC());
+    QCOMPARE (si_table.Length(), 39U);
+
+    mpeg_test_throw<SpliceInformationTable>(si_table, PsipParseException::SitSpliceInsertInfo4);
+}
+
 //
 // DVB NetworkInformationTable Tests
 //
@@ -1747,6 +2351,46 @@ void TestMPEGTables::dvb_nit_test2(void)
     QCOMPARE (nit.TransportDescriptors(6), nit.data()+831);
 }
 
+void TestMPEGTables::dvb_nit_test2b(void)
+{
+    // This is the packet from the test 2 modified to cnange the
+    // network descriptor length to 1024. The CRC on this packet is
+    // valid.
+    std::vector<uint8_t> si_data = nz_nit_data;
+    si_data[8] = 0xF4;
+    si_data[9] = 0x00;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<NetworkInformationTable>(si_table, PsipParseException::NitNetworkDescriptorsLength);
+}
+
+void TestMPEGTables::dvb_nit_test2c(void)
+{
+    // This is the packet from the test 2 modified to increase the
+    // descriptor length on the last transport by one. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = nz_nit_data;
+    si_data[830] = 0x9C;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<NetworkInformationTable>(si_table, PsipParseException::NitTransportDescriptors);
+}
+
+void TestMPEGTables::dvb_nit_test2d(void)
+{
+    // This is the packet from the test 2 modified to decrease the
+    // descriptor length on the last transport by one. The CRC on this
+    // packet is valid.
+    std::vector<uint8_t> si_data = nz_nit_data;
+    si_data[830] = 0x9A;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<NetworkInformationTable>(si_table, PsipParseException::NitTransportDescriptors);
+}
+
 //
 // DVB ServiceDescriptionTable Tests
 //
@@ -1892,6 +2536,19 @@ void TestMPEGTables::dvb_sdt_test1(void)
         QCOMPARE (sd->ServiceName(),         "10 SHAKE");
         delete sd;
     }
+}
+
+void TestMPEGTables::dvb_sdt_test1b(void)
+{
+    // This is the packet from the test 1 modified to change the
+    // descriptor length on the last service to 255 bytes. The CRC on
+    // this packet is valid.
+    std::vector<uint8_t> si_data = au_sdt_data;
+    si_data[0x136] = 0x24;
+    update_crc(si_data);
+
+    PSIPTable si_table(si_data);
+    dvb_test_throw<ServiceDescriptionTable>(si_table, PsipParseException::SdtDescriptors);
 }
 
 void TestMPEGTables::dvb_sdt_test2a(void)
