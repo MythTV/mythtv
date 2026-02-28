@@ -344,6 +344,7 @@ cc="gcc"
 python="python3"
 
 targetos=`uname -s`
+unplugs=""
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
@@ -613,6 +614,11 @@ WEBENGINE=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBENGINE=yes")
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
+SLIBPREF=$(cat mythconfig.mak | grep -e "^SLIBPREF=")
+SLIBPREF=${SLIBPREF#SLIBPREF=}
+SLIBSUF=$(cat mythconfig.mak | grep -e "^SLIBSUF=")
+SLIBSUF=${SLIBSUF#SLIBSUF=}
+
 MYTHTV_VERSION_MAJMIN=$(cat mythconfig.mak | grep -e "^MYTHTV_VERSION_MAJMIN=")
 MYTHTV_VERSION_MAJMIN=${MYTHTV_VERSION_MAJMIN#MYTHTV_VERSION_MAJMIN=}
 MYTHTV_LIBVERSION=$(cat mythconfig.mak | grep -e "^MYTHTV_LIBVERSION=")
@@ -812,6 +818,7 @@ if enabled archive ; then
   echo "SUBDIRS += mytharchive" >> ./config.pro
 else
   echo "        MythArchive    plugin will not be built"
+  unplugs="archive"
 fi
 
 if enabled browser ; then
@@ -819,6 +826,7 @@ if enabled browser ; then
   echo "SUBDIRS += mythbrowser" >> ./config.pro
 else
   echo "        MythBrowser    plugin will not be built"
+  unplugs="$unplugs browser"
 fi
 
 if enabled game ; then
@@ -826,6 +834,7 @@ if enabled game ; then
   echo "SUBDIRS += mythgame" >> ./config.pro
 else
   echo "        MythGame       plugin will not be built"
+  unplugs="$unplugs game"
 fi
 
 if enabled music ; then
@@ -833,6 +842,7 @@ if enabled music ; then
   echo "SUBDIRS += mythmusic" >> ./config.pro
 else
   echo "        MythMusic      plugin will not be built"
+  unplugs="$unplugs music"
 fi
 
 if enabled netvision ; then
@@ -840,6 +850,7 @@ if enabled netvision ; then
   echo "SUBDIRS += mythnetvision" >> ./config.pro
 else
   echo "        MythNetvision  plugin will not be built"
+  unplugs="$unplugs netvision"
 fi
 
 if enabled news ; then
@@ -847,6 +858,7 @@ if enabled news ; then
   echo "SUBDIRS += mythnews" >> ./config.pro
 else
   echo "        MythNews       plugin will not be built"
+  unplugs="$unplugs news"
 fi
 
 if enabled weather ; then
@@ -854,6 +866,7 @@ if enabled weather ; then
   echo "SUBDIRS += mythweather" >> ./config.pro
 else
   echo "        MythWeather    plugin will not be built"
+  unplugs="$unplugs weather"
 fi
 
 if enabled zoneminder ; then
@@ -872,6 +885,7 @@ if enabled zoneminder ; then
   fi
 else
   echo "        MythZoneMinder plugin will not be built"
+  unplugs="$unplugs zoneminder"
 fi
 
 ###########################################################
@@ -930,6 +944,9 @@ fi
 #                                                         #
 ###########################################################
 
+# Strip off any slash at beginning of prefix
+unslashprefix=$(echo "$prefix" | sed "s/^\///")
+
 mkdir -p cleanup
 cat << END_CLEANUP > cleanup/Makefile
 check:
@@ -941,9 +958,13 @@ qmake_all:
 	\$(NONE)
 
 # Hack to remove some empty directories that qmake doesn't create rules for
+# Also, remove any old plugins which we are no longer building, but
+# might have been left behind.
 uninstall:
-	-rmdir \$(INSTALL_ROOT)/$prefix/share/mythtv/*
-	-rmdir \$(INSTALL_ROOT)/$prefix/share/mythtv
+	-rmdir \$(INSTALL_ROOT)/$unslashprefix/share/mythtv/*
+	-rmdir \$(INSTALL_ROOT)/$unslashprefix/share/mythtv
+	rm -f \$(foreach slib, $unplugs, \\
+            \$(INSTALL_ROOT)/$unslashprefix/$libdir_name/mythtv/plugins/$SLIBPREF\$(slib)$SLIBSUF)
 
 END_CLEANUP
 
