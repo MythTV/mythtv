@@ -953,21 +953,18 @@ check:
 all:
 clean:
 distclean:
+install:
 qmake_all:
 	\$(NONE)
 
-# Remove any old plugins which we are no longer building. This helps
-# prevent memory corruption caused by mismatches between library
-# versions at the time the old plugin was built and the current
-# versions of those libraries.
-install:
-	rm -f \$(foreach slib, $unplugs, \\
-            \$(INSTALL_ROOT)/$unslashprefix/$libdir_name/mythtv/plugins/$SLIBPREF\$(slib)$SLIBSUF)
-
 # Hack to remove some empty directories that qmake doesn't create rules for
+# Also, remove any old plugins which we are no longer building, but
+# might have been left behind.
 uninstall:
 	-rmdir \$(INSTALL_ROOT)/$unslashprefix/share/mythtv/*
 	-rmdir \$(INSTALL_ROOT)/$unslashprefix/share/mythtv
+	rm -f \$(foreach slib, $unplugs, \\
+            \$(INSTALL_ROOT)/$unslashprefix/$libdir_name/mythtv/plugins/$SLIBPREF\$(slib)$SLIBSUF)
 
 END_CLEANUP
 
