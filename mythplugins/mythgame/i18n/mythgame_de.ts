@@ -980,7 +980,8 @@ dass sie dies tun möchten?</translation>
         <location filename="themestrings.h" line="5"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;\n%%|YEARSTARS| - %%DESCRIPTION%</translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
@@ -992,7 +993,9 @@ dass sie dies tun möchten?</translation>
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;\n\n%%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
