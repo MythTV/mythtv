@@ -408,13 +408,15 @@
         <location filename="themestrings.h" line="5"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|RATING| - %%DESCRIPTION%</source>
-        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;\n%%|RATING| - %%DESCRIPTION%</translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|RATING| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;\n%%|YEARSTARS| - %%DESCRIPTION%</translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -430,20 +432,24 @@
         <location filename="themestrings.h" line="11"/>
         <source>%Userrating: |RATING|
 %%DESCRIPTION%</source>
-        <translation>%Bewertung: |RATING|\n%%DESCRIPTION%</translation>
+        <translation>%Bewertung: |RATING|
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;\n%%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;\n\n%%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>

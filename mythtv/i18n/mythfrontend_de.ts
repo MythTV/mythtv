@@ -3367,7 +3367,8 @@ Gerät unterstützt bis zu %1</translation>
     <message>
         <source>Calling jack_connect failed on port: %1
 </source>
-        <translation type="vanished">Fehler bei Aufruf von &apos;jack_connect&apos; auf Port: %1\n</translation>
+        <translation type="vanished">Fehler bei Aufruf von &apos;jack_connect&apos; auf Port: %1
+</translation>
     </message>
     <message>
         <source>Error closing Jack output device. Error: %1</source>
@@ -6488,7 +6489,8 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
         <location filename="../libs/libmythtv/videosource.cpp" line="2465"/>
         <source>A &apos;black box&apos; application controlled via stdin, status on stderr and TransportStream read from stdout.
 Use absolute path or path relative to the current directory.</source>
-        <translation>Eine &apos;Black Box&apos;-Anwendung, gesteuert über stdin, Status über stderr und TransportStream gelesen von stdout\nAbsoluten Dateipad oder relativen Pfad zu aktuellem Verzeichnis verwenden.</translation>
+        <translation>Eine &apos;Black Box&apos;-Anwendung, gesteuert über stdin, Status über stderr und TransportStream gelesen von stdout
+Absoluten Dateipad oder relativen Pfad zu aktuellem Verzeichnis verwenden.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2470"/>
@@ -16129,13 +16131,15 @@ wird bereits verwendet.</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1406"/>
         <source>Sorry, playback group
 name cannot be blank.</source>
-        <translation>Der Name der Wiedergabegruppe\nkann nicht leer sein.</translation>
+        <translation>Der Name der Wiedergabegruppe
+kann nicht leer sein.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1407"/>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
-        <translation>Der Name &apos;%1&apos;\nwird bereits verwendet.</translation>
+        <translation>Der Name &apos;%1&apos;
+wird bereits verwendet.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1426"/>
@@ -18088,7 +18092,9 @@ name cannot be blank.</source>
         <source>mythtv-setup is deprecated.
 To set up MythTV, start mythbackend and use:
 http://localhost:6544/setupwizard</source>
-        <translation>mythtv-setup ist veraltet.\nUm MythTV einzurichten, starte mythbackend und verwende:\nhttp://localhost:6544/setupwizard</translation>
+        <translation>mythtv-setup ist veraltet.
+Um MythTV einzurichten, starte mythbackend und verwende:
+http://localhost:6544/setupwizard</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1624"/>
@@ -19722,13 +19728,15 @@ http://localhost:6544/setupwizard</source>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="301"/>
         <source>Symbol Rate (symbols/second).
 Most DVB-S transponders transmit at 27500000 symbols per second.</source>
-        <translation>Symbol-Rate (Symbole/Sekunde)\nDie meisten DVB-S Sendestationen übertragen mit 27500000 Symbolen pro Sekunde.</translation>
+        <translation>Symbol-Rate (Symbole/Sekunde)
+Die meisten DVB-S Sendestationen übertragen mit 27500000 Symbolen pro Sekunde.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="325"/>
         <source>Symbol Rate (symbols/second).
 Most DVB-C transports transmit at 6900000 or 6875000 symbols per second.</source>
-        <translation>Symbol-Rate (Symbole/Sekunde)\nDie meisten DVB-C Sendestationen übertragen mit 6900000 oder 6875000  Symbolen pro Sekunde.</translation>
+        <translation>Symbol-Rate (Symbole/Sekunde)
+Die meisten DVB-C Sendestationen übertragen mit 6900000 oder 6875000  Symbolen pro Sekunde.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="482"/>
@@ -19782,13 +19790,15 @@ Most DVB-C transports transmit at 6900000 or 6875000 symbols per second.</source
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="278"/>
         <source>Frequency (Option has no default)
 The frequency for this transport (multiplex) in kHz.</source>
-        <translation>Frequenz (ohne Standard)\nDie Frequenz für diesen Transponder (Multiplex) in kHz.</translation>
+        <translation>Frequenz (ohne Standard)
+Die Frequenz für diesen Transponder (Multiplex) in kHz.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="289"/>
         <source>Frequency (Option has no default)
 The frequency for this transport (multiplex) in Hz.</source>
-        <translation>Frequenz (ohne Standard)\nDie Frequenz für diesen Transponder (Multiplex) in Hz.</translation>
+        <translation>Frequenz (ohne Standard)
+Die Frequenz für diesen Transponder (Multiplex) in Hz.</translation>
     </message>
     <message>
         <source>Frequency (Option has no default)
@@ -21686,7 +21696,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../libs/libmythtv/transporteditor.cpp" line="475"/>
         <source>Frequency (Option has no default).
 The frequency for this transport (multiplex) in</source>
-        <translation>Frequenz (ohne Standard)\nDie Frequenz für diesen Transponder (Multiplex) in</translation>
+        <translation>Frequenz (ohne Standard)
+Die Frequenz für diesen Transponder (Multiplex) in</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="623"/>
@@ -29641,7 +29652,8 @@ Device supports up to %1</source>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="653"/>
         <source>No capture card!
 Connect video source &apos;%1&apos; to a capture card in the &apos;Input Connections&apos; menu page.</source>
-        <translation>Keine TV-Karte\nDie Videoquelle &apos;%1&apos; kann zu einer TV-Karte in der &apos;Eingangsverknüpfungen&apos;-Menüseite verbunden werden.</translation>
+        <translation>Keine TV-Karte
+Die Videoquelle &apos;%1&apos; kann zu einer TV-Karte in der &apos;Eingangsverknüpfungen&apos;-Menüseite verbunden werden.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="667"/>
@@ -31627,7 +31639,8 @@ Keine weiteren Informationen</translation>
         <location filename="../libs/libmythui/storagegroupeditor.cpp" line="208"/>
         <source>Remove &apos;%1&apos;
 Directory From Storage Group?</source>
-        <translation>Verzeichnis &quot;%1&quot;\naus der Speichergruppe entfernen?</translation>
+        <translation>Verzeichnis &quot;%1&quot;
+aus der Speichergruppe entfernen?</translation>
     </message>
 </context>
 <context>
@@ -31658,13 +31671,15 @@ Directory From Storage Group?</source>
         <location filename="../libs/libmythui/storagegroupeditor.cpp" line="88"/>
         <source>Delete &apos;%1&apos; Storage Group?
 (from remote hosts)</source>
-        <translation>Lösche Speichergruppe &quot;%1&quot;?\n(von entfernten Rechnern)</translation>
+        <translation>Lösche Speichergruppe &quot;%1&quot;?
+(von entfernten Rechnern)</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/storagegroupeditor.cpp" line="92"/>
         <source>Delete &apos;%1&apos; Storage Group?
 (from all hosts)</source>
-        <translation>Lösche Speichergruppe &quot;%1&quot;?\n(von allen Rechnern)</translation>
+        <translation>Lösche Speichergruppe &quot;%1&quot;?
+(von allen Rechnern)</translation>
     </message>
     <message>
         <source>Add Storage Group Directory</source>
@@ -35227,7 +35242,8 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
-        <translation type="vanished">Sie haben noch keine Aufnahmen geplant.\n Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos; </translation>
+        <translation type="vanished">Sie haben noch keine Aufnahmen geplant.
+ Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos; </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1626"/>
@@ -35467,13 +35483,15 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <location filename="../themes/themestrings.h" line="2195"/>
         <source>key pressed:
 %osd_number_entry%</source>
-        <translation>Taste gedrückt:\n%osd_number_entry%</translation>
+        <translation>Taste gedrückt:
+%osd_number_entry%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2196"/>
         <source>message:
 %message_text%</source>
-        <translation>Nachricht:\n%message_text%</translation>
+        <translation>Nachricht:
+%message_text%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2199"/>
@@ -35519,7 +35537,8 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <location filename="../themes/themestrings.h" line="2209"/>
         <source>starring
 %cast%</source>
-        <translation>Hauptdarsteller\n%cast%</translation>
+        <translation>Hauptdarsteller
+%cast%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2210"/>
@@ -36468,7 +36487,8 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <location filename="../themes/themestrings.h" line="2153"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded!
 To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;.</source>
-        <translation>Sie haben noch keine Aufnahmen geplant!\nUm eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;.</translation>
+        <translation>Sie haben noch keine Aufnahmen geplant!
+Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2154"/>
@@ -37786,7 +37806,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="15"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;\n%%|YEARSTARS| - %%DESCRIPTION%</translation>
+        <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="17"/>
@@ -37852,7 +37873,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="39"/>
         <source>%CHANNUM| %%CALLSIGN|
 %%NAME%</source>
-        <translation>%CHANNUM| %%CALLSIGN|\n%%NAME%</translation>
+        <translation>%CHANNUM| %%CALLSIGN|
+%%NAME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="40"/>
@@ -38002,7 +38024,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="95"/>
         <source>%SOURCENAME|
 %%CHANID| %</source>
-        <translation>%SOURCENAME|\n%%CHANID| %</translation>
+        <translation>%SOURCENAME|
+%%CHANID| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="96"/>
@@ -38013,7 +38036,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="97"/>
         <source>%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %
 %&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|)%</source>
-        <translation>%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %\n%\&quot;|SUBTITLE|\&quot; %%(|ORIGINALAIRDATE|)%</translation>
+        <translation>%STARTDATE% %STARTTIME%%-|ENDTIME| %%00X00| %
+%&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="98"/>
@@ -38236,20 +38260,24 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="172"/>
         <source>%&quot;|SUBTITLE|&quot;
 %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;\n%%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="175"/>
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation>%&quot;|SUBTITLE|&quot;\n\n%%DESCRIPTION%</translation>
+        <translation>%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="176"/>
         <source>%&quot;|subtitle|&quot;
 %%description%</source>
-        <translation>%&quot;|subtitle|&quot;\n%%description%</translation>
+        <translation>%&quot;|subtitle|&quot;
+%%description%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="177"/>
@@ -38270,7 +38298,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="180"/>
         <source>%buttontext%
 %time%</source>
-        <translation>%buttontext%\n%time%</translation>
+        <translation>%buttontext%
+%time%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="181"/>
@@ -38423,7 +38452,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="216"/>
         <source>%startdate%% - |00x00%
 %title%</source>
-        <translation>%startdate%% - |00x00%\n%title%</translation>
+        <translation>%startdate%% - |00x00%
+%title%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="217"/>
@@ -40404,7 +40434,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="1105"/>
         <source>Loading Video Library
  If no videos appear your library is either empty or unconfigured (Press M to adjust settings)</source>
-        <translation>Lade Videothek\nWenn keine Videos erscheinen ist die Sammlung leer oder nicht konfiguriert (M drücken für Konfiguration)</translation>
+        <translation>Lade Videothek
+Wenn keine Videos erscheinen ist die Sammlung leer oder nicht konfiguriert (M drücken für Konfiguration)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1106"/>
@@ -41314,7 +41345,8 @@ Regie: |DIRECTOR%</translation>
         <location filename="../themes/themestrings.h" line="1527"/>
         <source>Resolution: %resolution% - %aspect| 
 %%DESCRIPTION%</source>
-        <translation>Auflösung: %resolution% - %aspect| \n%%DESCRIPTION%</translation>
+        <translation>Auflösung: %resolution% - %aspect| 
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1528"/>
@@ -43017,7 +43049,8 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
         <location filename="../themes/themestrings.h" line="2159"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
-        <translation>Sie haben noch keine Aufnahmen geplant\n Um Aufnahmen zu planen, wählen Sie &apos;Programmübersicht&apos; oder&apos;Sendung suchen&apos; </translation>
+        <translation>Sie haben noch keine Aufnahmen geplant
+ Um Aufnahmen zu planen, wählen Sie &apos;Programmübersicht&apos; oder&apos;Sendung suchen&apos; </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2160"/>
@@ -43025,7 +43058,10 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
 
 To schedule a recording, exit this screen and
 Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Sie haben noch keine Aufnahmen geplant.\n\n Um eine Aufnahme zu planen, beenden Sie diese Seite und\nwählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
+        <translation>Sie haben noch keine Aufnahmen geplant.
+
+ Um eine Aufnahme zu planen, beenden Sie diese Seite und
+wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2163"/>
@@ -43341,13 +43377,15 @@ Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
         <location filename="../themes/themestrings.h" line="2156"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded.
 To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Sie haben noch keine Aufnahmen geplant.\nUm eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
+        <translation>Sie haben noch keine Aufnahmen geplant.
+Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2157"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Sie haben noch keine Aufnahmen geplant.\n Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
+        <translation>Sie haben noch keine Aufnahmen geplant.
+ Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="720"/>
@@ -45032,7 +45070,8 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <location filename="../themes/themestrings.h" line="2158"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Sie haben noch keine Aufnahmen geplant.\n Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
+        <translation>Sie haben noch keine Aufnahmen geplant.
+ Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Sendung suchen&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1136"/>
@@ -45541,7 +45580,8 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <location filename="../themes/themestrings.h" line="2179"/>
         <source>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
 [font]myverysmallsub[/font]|CAST| %</source>
-        <translation>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%\n[font]myverysmallsub[/font]|CAST| %</translation>
+        <translation>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
+[font]myverysmallsub[/font]|CAST| %</translation>
     </message>
     <message>
         <source>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%
@@ -45549,13 +45589,18 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
 [font]myverysmallsub[/font]Part |PARTNUMBER| of %%PARTTOTAL%%
 [font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  
 [font]myverysmalllabel[/font]Director: |DIRECTOR| %</source>
-        <translation type="vanished">[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%\n\n[font]myverysmallsub[/font]Teil |PARTNUMBER| von %%PARTTOTAL%%\n[font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  \n[font]myverysmalllabel[/font]Regie: |DIRECTOR| %</translation>
+        <translation type="vanished">[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%
+
+[font]myverysmallsub[/font]Teil |PARTNUMBER| von %%PARTTOTAL%%
+[font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]
+[font]myverysmalllabel[/font]Regie: |DIRECTOR| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2180"/>
         <source>[font]myverysmalllabel[/font]%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
 [font]myverysmallsub[/font]|CAST| %</source>
-        <translation>[font]myverysmalllabel[/font]%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%\n[font]myverysmallsub[/font]|CAST| %</translation>
+        <translation>[font]myverysmalllabel[/font]%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
+[font]myverysmallsub[/font]|CAST| %</translation>
     </message>
     <message>
         <source>]</source>
