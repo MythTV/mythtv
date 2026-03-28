@@ -1,48 +1,9 @@
 #include <array>
+#include <bit>
 #include <QObject>
 #include "stringutil.h"
 
-#if __has_include(<bit>) // C++20
-#include <bit>
-#endif
-
-#include <climits> // for CHAR_BIT
-
 #include "ternarycompare.h"
-
-#if defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L
-using std::countl_one;
-#else
-// 8 bit LUT based count leading ones
-static int countl_one(unsigned char x)
-{
-#if CHAR_BIT != 8
-    if (x > 256)
-        return 8; // works for our purposes even if not correct
-#endif
-    static constexpr std::array<uint8_t,256> leading_ones =
-    {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-        4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 8,
-    };
-    return leading_ones[x];
-}
-#endif // C++20 feature test macro
 
 bool StringUtil::isValidUTF8(const QByteArray& data)
 {
@@ -50,7 +11,7 @@ bool StringUtil::isValidUTF8(const QByteArray& data)
     const unsigned char* const end = p + data.size();
     while (p < end)
     {
-        int code_point_length = countl_one(*p);
+        int code_point_length = std::countl_one(*p);
 
         switch (code_point_length)
         {
@@ -74,19 +35,19 @@ bool StringUtil::isValidUTF8(const QByteArray& data)
         switch (code_point_length)
         {
         case 4:
-            if (countl_one(p[3]) != 1)
+            if (std::countl_one(p[3]) != 1)
             {
                 return false;
             }
             [[fallthrough]];
         case 3:
-            if (countl_one(p[2]) != 1)
+            if (std::countl_one(p[2]) != 1)
             {
                 return false;
             }
             [[fallthrough]];
         case 2:
-            if (countl_one(p[1]) != 1)
+            if (std::countl_one(p[1]) != 1)
             {
                 return false;
             }

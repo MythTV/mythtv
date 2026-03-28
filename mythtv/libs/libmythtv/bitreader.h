@@ -38,11 +38,8 @@ For more information, please refer to <https://unlicense.org>
 
 #include <algorithm>
 #include <array>
-#include <cstdint>
-
-#if __has_include(<bit>) // C++20
 #include <bit>
-#endif
+#include <cstdint>
 
 class BitReader
 {
@@ -171,29 +168,7 @@ class BitReader
     int get_ue_golomb(unsigned max_length);
     static unsigned clz(uint32_t v)
     {
-#if defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L // C++20 <bit>
         return std::countl_zero(v);
-#else
-        // based on public domain log2_floor
-        // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
-        if (v == 0)
-        {
-            return 32;
-        }
-        static constexpr std::array<int,32> MultiplyDeBruijnBitPosition =
-        {
-             0,  9,  1, 10, 13, 21,  2, 29, 11, 14, 16, 18, 22, 25,  3, 30,
-             8, 12, 20, 28, 15, 17, 24,  7, 19, 27, 23,  6, 26,  5,  4, 31
-        };
-
-        v |= v >> 1; // first round down to one less than a power of 2 
-        v |= v >> 2;
-        v |= v >> 4;
-        v |= v >> 8;
-        v |= v >> 16;
-
-        return 31 - MultiplyDeBruijnBitPosition[static_cast<uint32_t>(v * 0x07C4ACDDU) >> 27];
-#endif
     }
 
     static constexpr uint64_t get_upper_bits(uint64_t val, unsigned bits)
