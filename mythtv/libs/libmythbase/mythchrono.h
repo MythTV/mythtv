@@ -18,17 +18,6 @@ Q_DECLARE_METATYPE(std::chrono::microseconds);
 // Grab the underlying std::chrono::duration data type for future use.
 using CHRONO_TYPE = std::chrono::seconds::rep;
 
-// Copy these c++20 literals from the chrono header file
-#if __cplusplus <= 201703L
-namespace std::chrono // NOLINT(cert-dcl58-cpp)
-{
-    using days   = duration<CHRONO_TYPE, ratio<86400>>;
-    using weeks  = duration<CHRONO_TYPE, ratio<604800>>;
-    using months = duration<CHRONO_TYPE, ratio<2629746>>;
-    using years  = duration<CHRONO_TYPE, ratio<31556952>>;
-}
-#endif // C++20
-
 
 //
 // Set up some additional data types for use by MythTV.
