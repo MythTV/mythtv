@@ -570,7 +570,7 @@ static std::string lirc_getfilename(const struct lirc_state *state,
 		}
 		filename += state->lircrc_user_file;
 	}
-	else if(file.compare(0,2,"~/")==0)
+	else if(file.starts_with("~/"))
 	{
 		const char *home=getenv("HOME");
 		if(home==nullptr)
@@ -831,7 +831,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		if(firstline)
 		{
 			firstline = 0;
-			if(string.compare(0,2,"#!")==0)
+			if(string.starts_with("#!"))
 			{
 				sha_bang=string.substr(2);
 			}
