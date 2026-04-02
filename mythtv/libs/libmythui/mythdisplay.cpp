@@ -1242,7 +1242,8 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     // NOTE disable using EGL by setting MYTHTV_NO_EGL
     // NOTE We have no Qt platform information, window/surface or logging when this is called.
     QString soft = qgetenv("LIBGL_ALWAYS_SOFTWARE");
-    bool ignore = soft == "1" || soft.compare("true", Qt::CaseInsensitive) == 0;
+    bool ignore = soft == "1" || soft.compare("true", Qt::CaseInsensitive) == 0
+        || qEnvironmentVariableIsSet("WAYLAND_DISPLAY");
     bool allow = qEnvironmentVariableIsEmpty("MYTHTV_NO_EGL") && !ignore;
     bool force = !qEnvironmentVariableIsEmpty("MYTHTV_FORCE_EGL");
     if ((force || allow) && MythDisplayX11::IsAvailable())
