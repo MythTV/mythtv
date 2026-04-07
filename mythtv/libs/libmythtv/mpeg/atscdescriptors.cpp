@@ -2,6 +2,7 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 
 #include <algorithm>
+#include <cstdint>
 
 #include "libmythbase/iso639.h"
 #include "libmythbase/mythlogging.h"
@@ -131,7 +132,7 @@ QString MultipleStringStructure::Uncompressed(
         (0x10==mode) ||
         (0x20<=mode && mode<=0x27) ||
         (0x30<=mode && mode<=0x33)) { // basic runlength encoding
-        int hb=mode<<8;
+        uint16_t hb = mode << 8;
         for (int j=0; j<len; j++)
         {
 #if 0

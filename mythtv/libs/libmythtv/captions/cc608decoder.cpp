@@ -4,6 +4,7 @@
 #include "captions/cc608decoder.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 
 // Qt headers
@@ -78,7 +79,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
       m_rbuf(new unsigned char[sizeof(ccsubtitle)+255])
 {
     // fill translation table
-    for (uint i = 0; i < 128; i++)
+    for (uint8_t i = 0; i < 128; i++)
         m_stdChar[i] = QChar(i);
     m_stdChar[42]  = QLatin1Char(0xE1); // á
     m_stdChar[92]  = QLatin1Char(0xE9); // é
@@ -886,7 +887,7 @@ int CC608Decoder::NewRowCC(size_t mode, int len)
 
     if (m_newAttr[mode])
     {
-        m_ccBuf[mode] += QChar(m_newAttr[mode] + 0x7000);
+        m_ccBuf[mode] += QChar(static_cast<uint8_t>(m_newAttr[mode]) + 0x7000);
         len++;
     }
 

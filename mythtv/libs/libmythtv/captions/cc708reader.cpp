@@ -79,7 +79,7 @@ void CC708Reader::DeleteWindows(uint service_num, int window_map)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("DeleteWindows(%1, %2)")
-            .arg(service_num).arg(window_map, 8, 2, QChar(48)));
+            .arg(service_num).arg(window_map, 8, 2, QChar{'0'}));
 
     for (uint i = 0; i < 8; i++)
         if ((1 << i) & window_map)
@@ -91,7 +91,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("DisplayWindows(%1, %2)")
-            .arg(service_num).arg(window_map, 8, 2, QChar(48)));
+            .arg(service_num).arg(window_map, 8, 2, QChar{'0'}));
 
     for (uint i = 0; i < 8; i++)
     {
@@ -126,7 +126,7 @@ void CC708Reader::HideWindows(uint service_num, int window_map)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("HideWindows(%1, %2)")
-            .arg(service_num).arg(window_map, 8, 2, QChar(48)));
+            .arg(service_num).arg(window_map, 8, 2, QChar{'0'}));
 
     for (uint i = 0; i < 8; i++)
     {
@@ -142,7 +142,7 @@ void CC708Reader::ClearWindows(uint service_num, int window_map)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("ClearWindows(%1, %2)")
-            .arg(service_num).arg(window_map, 8, 2, QChar(48)));
+            .arg(service_num).arg(window_map, 8, 2, QChar{'0'}));
 
     for (uint i = 0; i < 8; i++)
         if ((1 << i) & window_map)
@@ -153,7 +153,7 @@ void CC708Reader::ToggleWindows(uint service_num, int window_map)
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("ToggleWindows(%1, %2)")
-            .arg(service_num).arg(window_map, 8, 2, QChar(48)));
+            .arg(service_num).arg(window_map, 8, 2, QChar{'0'}));
 
     for (uint i = 0; i < 8; i++)
     {

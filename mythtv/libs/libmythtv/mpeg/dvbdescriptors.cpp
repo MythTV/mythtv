@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <algorithm>
 #include <cerrno>
+#include <cstdint>
 
 // Qt headers
 #include <QCoreApplication>
@@ -139,13 +140,13 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     /* UCS-2 aka ISO/IEC 10646-1 Basic Multilingual Plane */
     if (src[0] == 0x11)
     {
-        size_t length = (raw_length - 1) / 2;
-        auto *to = new QChar[length];
-        for (size_t i=0; i<length; i++)
-            to[i] = QChar((src[1 + (i*2)] << 8) + src[1 + (i*2) + 1]);
-        QString to2(to, length);
-        delete [] to;
-        return to2;
+        QString s;
+        s.reserve((raw_length - 1) / 2);
+        for (size_t i = 1; i < raw_length - 1; i += 2)
+        {
+            s += QChar{(static_cast<uint16_t>(src[i]) << 8) + src[i + 1]};
+        }
+        return s;
     }
 
     if (((0x11 < src[0]) && (src[0] < 0x15)) ||

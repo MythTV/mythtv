@@ -92,7 +92,7 @@ class TeletextReader
     void SetIsSubtitle(bool sub)        { m_curpageIsSubtitle = sub;   }
     bool IsTransparent(void) const      { return m_transparent;        }
     bool RevealHidden(void) const       { return m_revealHidden;       }
-    int  GetPageInput(uint num) const   { return m_pageinput[num];     }
+    char  GetPageInput(uint num) const  { return m_pageinput[num];     }
     TeletextSubPage* FindSubPage(void)
         { return FindSubPage(m_curpage, m_cursubpage); }
     tt_line_array GetHeader(void)       { return m_header;             }
@@ -130,7 +130,7 @@ class TeletextReader
     int              m_cursubpage         {-1};
     bool             m_curpageShowHeader  {true};
     bool             m_curpageIsSubtitle  {false};
-    std::array<int,3> m_pageinput         {0};
+    std::array<char,3> m_pageinput        {0};
     bool             m_transparent        {false};
     bool             m_revealHidden       {false};
     tt_line_array    m_header             {0};

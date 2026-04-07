@@ -2,6 +2,7 @@
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
 #include <climits>
+#include <cstdint>
 
 #include "libmythbase/stringutil.h"
 
@@ -736,7 +737,7 @@ QString MPEGDescriptor::hexdump(void) const
     QString prt;
     for (i=0; i<DescriptorLength(); i++)
     {
-        uint ch = m_data[i+2];
+        uint8_t ch = m_data[i+2];
         hex.append(QString(" %1").arg(ch, 2, 16, QChar('0')));
         prt.append(QString("%1").arg(isprint(ch) ? QChar(ch) : '.'));
         if (((i+1) % 8) == 0)

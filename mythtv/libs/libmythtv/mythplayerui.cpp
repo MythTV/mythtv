@@ -843,8 +843,8 @@ void MythPlayerUI::GetPlaybackData(InfoMap& Map)
     if (m_decoder)
         Map["videodecoder"] = m_decoder->GetCodecDecoderName();
 
-    Map["framerate"] = QString("%1%2%3")
-            .arg(static_cast<double>(m_outputJmeter.GetLastFPS()), 0, 'f', 2).arg(QChar(0xB1, 0))
+    Map["framerate"] = QString::fromUtf8("%1±%2")
+            .arg(static_cast<double>(m_outputJmeter.GetLastFPS()), 0, 'f', 2)
             .arg(static_cast<double>(m_outputJmeter.GetLastSD()), 0, 'f', 2);
     Map["load"] = m_outputJmeter.GetLastCPUStats();
 

@@ -193,9 +193,9 @@ MythGestureEvent *MythGesture::GetGesture(void) const
 }
 
 /* comments in header */
-static int determineBin (QPoint p, int x1, int x2, int y1, int y2)
+static uint8_t determineBin (QPoint p, int x1, int x2, int y1, int y2)
 {
-    int bin_num = 1;
+    uint8_t bin_num = 1;
     if (p.x() > x1)
         bin_num += 1;
     if (p.x() > x2)
@@ -240,8 +240,8 @@ QString MythGesture::Translate(bool Timeout)
     size_t sequence_count = 0;
 
     /* points-->sequence translation scratch variables */
-    int prev_bin = 0;
-    int current_bin = 0;
+    uint8_t prev_bin = 0;
+    uint8_t current_bin = 0;
     int bin_count = 0;
 
     /*flag indicating the start of a stroke - always count it in the sequence*/
@@ -294,7 +294,7 @@ QString MythGesture::Translate(bool Timeout)
             if ((bin_count > (total_points * m_binPercent)) || first_bin)
             {
                 first_bin = false;
-                sequence += '0' + QChar(prev_bin);
+                sequence += QChar{'0' + prev_bin};
                 sequence_count ++;
             }
 
@@ -305,7 +305,7 @@ QString MythGesture::Translate(bool Timeout)
     }
 
     /* add the last run of points to the sequence */
-    sequence += '0' + QChar(current_bin);
+    sequence += QChar{'0' + current_bin};
     sequence_count++;
 
     /* bail out on error cases */

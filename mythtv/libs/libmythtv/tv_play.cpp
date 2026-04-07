@@ -8899,8 +8899,8 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context,
             int size = QString::number(m_tvmNumChapters).size();
             for (int i = 0; i < m_tvmNumChapters; i++)
             {
-                QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
-                QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
+                QString chapter1 = QString("%1").arg(i+1, size, 10, QChar{'0'});
+                QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar{'0'});
                 QString timestr = MythDate::formatTime(m_tvmChapterTimes[i], "HH:mm:ss");
                 QString desc = chapter1 + QString(" (%1)").arg(timestr);
                 QString action = prefix + chapter2;
@@ -8915,7 +8915,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context,
         {
             for (int i = 1; i <= m_tvmNumAngles; i++)
             {
-                QString angleIdx = QString("%1").arg(i, 3, 10, QChar(48));
+                QString angleIdx = QString("%1").arg(i, 3, 10, QChar{'0'});
                 QString desc = GetAngleName(i);
                 QString action = prefix + angleIdx;
                 active = (m_tvmCurrentAngle == i);
@@ -8930,7 +8930,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context,
             if (GetTitleDuration(i) < 2min) // Ignore < 2 minutes long
                 continue;
 
-            QString titleIdx = QString("%1").arg(i, 3, 10, QChar(48));
+            QString titleIdx = QString("%1").arg(i, 3, 10, QChar{'0'});
             QString desc = GetTitleName(i);
             QString action = prefix + titleIdx;
             active = (m_tvmCurrentTitle == i);

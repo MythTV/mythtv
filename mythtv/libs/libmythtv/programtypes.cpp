@@ -95,8 +95,7 @@ QString SkipTypeToString(int flags)
     if (COMM_DETECT_UNINIT == flags)
         return QObject::tr("Use Global Setting");
 
-    QChar chr = '0';
-    QString ret = QString("0x%1").arg(flags,3,16,chr);
+    QString ret = QString("0x%1").arg(flags, 3, 16, QChar{'0'});
     bool blank = (COMM_DETECT_BLANK & flags) != 0;
     bool scene = (COMM_DETECT_SCENE & flags) != 0;
     bool logo  = (COMM_DETECT_LOGO  & flags) != 0;
