@@ -394,7 +394,7 @@ void LIRC::Process(const QByteArray &data)
 #endif
 
             QString text = "";
-            if (!mod)
+            if (!mod && keycode <= 0xFFFF)
                 text = QString(QChar(keycode));
 
             QCoreApplication::postEvent(
