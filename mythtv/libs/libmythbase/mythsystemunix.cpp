@@ -110,7 +110,7 @@ void MythSystemLegacyIOHandler::run(void)
                 break;
             }
 
-            timeval tv {0, 0};
+            timeval tv {.tv_sec=0, .tv_usec=0};
 
             int retval = -1;
             fd_set fds = m_fds;

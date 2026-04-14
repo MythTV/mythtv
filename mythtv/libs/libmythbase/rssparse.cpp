@@ -443,10 +443,10 @@ private:
             int height = heightOpt ? heightOpt : 0;
             MRSSThumbnail thumb =
             {
-                thumbNode.attribute("url"),
-                width,
-                height,
-                thumbNode.attribute("time")
+                .URL=thumbNode.attribute("url"),
+                .Width=width,
+                .Height=height,
+                .Time=thumbNode.attribute("time")
              };
              result << thumb;
         }
@@ -466,8 +466,8 @@ private:
                  continue;
             MRSSCredit credit =
             {
-                creditNode.attribute("role"),
-                creditNode.text()
+                .Role=creditNode.attribute("role"),
+                .Who=creditNode.text()
             };
             result << credit;
         }
@@ -489,8 +489,8 @@ private:
             {
                 MRSSComment comment =
                 {
-                    QObject::tr("Comments"),
-                    comments.at(i).toElement().text()
+                    .Type=QObject::tr("Comments"),
+                    .Comment=comments.at(i).toElement().text()
                 };
                 result << comment;
             }
@@ -508,8 +508,8 @@ private:
             {
                 MRSSComment comment =
                 {
-                    QObject::tr("Responses"),
-                    responses.at(i).toElement().text()
+                    .Type=QObject::tr("Responses"),
+                    .Comment=responses.at(i).toElement().text()
                 };
                 result << comment;
             }
@@ -527,8 +527,8 @@ private:
             {
                 MRSSComment comment =
                 {
-                    QObject::tr("Backlinks"),
-                    backlinks.at(i).toElement().text()
+                    .Type=QObject::tr("Backlinks"),
+                    .Comment=backlinks.at(i).toElement().text()
                 };
                 result << comment;
             }
@@ -547,8 +547,8 @@ private:
             QDomElement linkNode = dom.toElement();
             MRSSPeerLink pl =
             {
-                linkNode.attribute("type"),
-                linkNode.attribute("href")
+                .Type=linkNode.attribute("type"),
+                .Link=linkNode.attribute("href")
             };
             result << pl;
         }
@@ -571,10 +571,10 @@ private:
                 QDomElement sceneNode = scenesNodes.at(i).toElement();
                 MRSSScene scene =
                 {
-                    sceneNode.firstChildElement("sceneTitle").text(),
-                    sceneNode.firstChildElement("sceneDescription").text(),
-                    sceneNode.firstChildElement("sceneStartTime").text(),
-                    sceneNode.firstChildElement("sceneEndTime").text()
+                    .Title=sceneNode.firstChildElement("sceneTitle").text(),
+                    .Description=sceneNode.firstChildElement("sceneDescription").text(),
+                    .StartTime=sceneNode.firstChildElement("sceneStartTime").text(),
+                    .EndTime=sceneNode.firstChildElement("sceneEndTime").text()
                 };
                 result << scene;
             }
@@ -1124,10 +1124,10 @@ QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry)
 
         Enclosure e =
         {
-            link.attribute("url"),
-            link.attribute("type"),
-            link.attribute("length", "-1").toLongLong(),
-            link.attribute("hreflang")
+            .URL=link.attribute("url"),
+            .Type=link.attribute("type"),
+            .Length=link.attribute("length", "-1").toLongLong(),
+            .Lang=link.attribute("hreflang")
         };
 
         result << e;
