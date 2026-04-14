@@ -25,10 +25,10 @@ Q_DECLARE_METATYPE (ARCHIVEDESTINATION);
 
 struct ArchiveDestination
 {
-    ARCHIVEDESTINATION type;
-    const char *name;
-    const char *description;
-    int64_t freeSpace;
+    ARCHIVEDESTINATION type { AD_DVD_SL } ;
+    const char *name        { nullptr };
+    const char *description { nullptr };
+    int64_t freeSpace       { 0 };
 };
 
 extern std::vector<ArchiveDestination> ArchiveDestinations;

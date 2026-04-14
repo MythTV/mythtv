@@ -362,7 +362,7 @@ void ChannelRecPriority::SortList()
             ++pit, ++i)
     {
         ChannelInfo *chanInfo = &(*pit);
-        RecPriorityInfo tmp = {chanInfo, i};
+        RecPriorityInfo tmp = {.m_chan=chanInfo, .m_cnt=i};
         sortingList.push_back(tmp);
     }
 

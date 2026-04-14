@@ -230,10 +230,10 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
     };
     static constexpr std::array<const breakType,4> kBreakType {{
         /* Sort by "len". */
-        { 15s,   2s },
-        { 20s,   2s },
-        { 30s,   5s },
-        { 60s,   5s },
+        { .m_len=15s,  .m_delta=2s },
+        { .m_len=20s,  .m_delta=2s },
+        { .m_len=30s,  .m_delta=5s },
+        { .m_len=60s,  .m_delta=5s },
     }};
 
     /*

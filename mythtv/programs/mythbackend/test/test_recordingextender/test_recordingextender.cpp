@@ -460,7 +460,10 @@ void TestRecordingExtender::test_nameCleanup(void)
     QFETCH(QString, expectedTeam);
 
     QString dummy;
-    SportInfo info {title, autoExtendTypeFromInt(autoExtendType), sport, dummy};
+    SportInfo info {.showTitle=title,
+                    .dataProvider=autoExtendTypeFromInt(autoExtendType),
+                    .sport=sport,
+                    .league=dummy};
     nameCleanup(info, team, dummy);
     QCOMPARE(team, expectedTeam);
 }
@@ -582,7 +585,10 @@ void TestRecordingExtender::test_parseJson(void)
     m_nowForTest = QDateTime::fromString("2021-09-22T23:59:00Z", Qt::ISODate);
     auto source = std::make_unique<TestRecExtMlbDataSource>(this);
 
-    SportInfo info {"MLB Baseball", AutoExtendType::MLB, "", ""};
+    SportInfo info {.showTitle="MLB Baseball",
+                    .dataProvider=AutoExtendType::MLB,
+                    .sport="",
+                    .league=""};
     ActiveGame game(0, "MLB Baseball", info);
     QUrl url { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
                "/data/mlb_baseball_20210921_1720.json" };
@@ -707,7 +713,10 @@ void TestRecordingExtender::test_parseEspn(void)
     m_nowForTest = QDateTime::fromString(nowForTest, Qt::ISODate);
     auto source = std::make_unique<TestRecExtEspnDataSource>(this);
 
-    SportInfo info {"MLB Baseball", AutoExtendType::ESPN, sport, league};
+    SportInfo info {.showTitle="MLB Baseball",
+                    .dataProvider=AutoExtendType::ESPN,
+                    .sport=sport,
+                    .league=league};
     ActiveGame game(0, "MLB Baseball", info);
     QUrl url { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
                "/data/" + infoFile };
@@ -804,7 +813,10 @@ void TestRecordingExtender::test_parseMlb(void)
     m_nowForTest = QDateTime::fromString(nowForTest, Qt::ISODate);
     auto source = std::make_unique<TestRecExtMlbDataSource>(this);
 
-    SportInfo info {"MLB Baseball", AutoExtendType::MLB, "sport", "league"};
+    SportInfo info {.showTitle="MLB Baseball",
+                    .dataProvider=AutoExtendType::MLB,
+                    .sport="sport",
+                    .league="league"};
     ActiveGame game(0, "MLB Baseball", info);
     QUrl url1 { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
                 "/data/" + infoFile };
