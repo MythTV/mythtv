@@ -120,77 +120,77 @@ QString UPnPResultCodeDesc(UPnPResultCode eCode)
 static std::array<const MIMETypes,66> g_MIMETypes
 {{
     // Image Mime Types
-    { "gif" , "image/gif"                  },
-    { "ico" , "image/x-icon"               },
-    { "jpeg", "image/jpeg"                 },
-    { "jpg" , "image/jpeg"                 },
-    { "mng" , "image/x-mng"                },
-    { "png" , "image/png"                  },
-    { "svg" , "image/svg+xml"              },
-    { "svgz", "image/svg+xml"              },
-    { "tif" , "image/tiff"                 },
-    { "tiff", "image/tiff"                 },
+    { .pszExtension="gif" , .pszType="image/gif"                  },
+    { .pszExtension="ico" , .pszType="image/x-icon"               },
+    { .pszExtension="jpeg", .pszType="image/jpeg"                 },
+    { .pszExtension="jpg" , .pszType="image/jpeg"                 },
+    { .pszExtension="mng" , .pszType="image/x-mng"                },
+    { .pszExtension="png" , .pszType="image/png"                  },
+    { .pszExtension="svg" , .pszType="image/svg+xml"              },
+    { .pszExtension="svgz", .pszType="image/svg+xml"              },
+    { .pszExtension="tif" , .pszType="image/tiff"                 },
+    { .pszExtension="tiff", .pszType="image/tiff"                 },
     // Text Mime Types
-    { "htm" , "text/html"                  },
-    { "html", "text/html"                  },
-    { "qsp" , "text/html"                  },
-    { "txt" , "text/plain"                 },
-    { "xml" , "text/xml"                   },
-    { "qxml", "text/xml"                   },
-    { "xslt", "text/xml"                   },
-    { "css" , "text/css"                   },
+    { .pszExtension="htm" , .pszType="text/html"                  },
+    { .pszExtension="html", .pszType="text/html"                  },
+    { .pszExtension="qsp" , .pszType="text/html"                  },
+    { .pszExtension="txt" , .pszType="text/plain"                 },
+    { .pszExtension="xml" , .pszType="text/xml"                   },
+    { .pszExtension="qxml", .pszType="text/xml"                   },
+    { .pszExtension="xslt", .pszType="text/xml"                   },
+    { .pszExtension="css" , .pszType="text/css"                   },
     // Application Mime Types
-    { "crt" , "application/x-x509-ca-cert" },
-    { "doc" , "application/vnd.ms-word"    },
-    { "gz"  , "application/x-tar"          },
-    { "js"  , "application/javascript"     },
-    { "m3u" , "application/x-mpegurl"      }, // HTTP Live Streaming
-    { "m3u8", "application/x-mpegurl"      }, // HTTP Live Streaming
-    { "ogx" , "application/ogg"            }, // http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "pdf" , "application/pdf"            },
-    { "pem" , "application/x-x509-ca-cert" },
-    { "qjs" , "application/javascript"     },
-    { "rm"  , "application/vnd.rn-realmedia" },
-    { "swf" , "application/x-shockwave-flash" },
-    { "xls" , "application/vnd.ms-excel"   },
-    { "zip" , "application/x-tar"          },
+    { .pszExtension="crt" , .pszType="application/x-x509-ca-cert" },
+    { .pszExtension="doc" , .pszType="application/vnd.ms-word"    },
+    { .pszExtension="gz"  , .pszType="application/x-tar"          },
+    { .pszExtension="js"  , .pszType="application/javascript"     },
+    { .pszExtension="m3u" , .pszType="application/x-mpegurl"      }, // HTTP Live Streaming
+    { .pszExtension="m3u8", .pszType="application/x-mpegurl"      }, // HTTP Live Streaming
+    { .pszExtension="ogx" , .pszType="application/ogg"            }, // http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { .pszExtension="pdf" , .pszType="application/pdf"            },
+    { .pszExtension="pem" , .pszType="application/x-x509-ca-cert" },
+    { .pszExtension="qjs" , .pszType="application/javascript"     },
+    { .pszExtension="rm"  , .pszType="application/vnd.rn-realmedia" },
+    { .pszExtension="swf" , .pszType="application/x-shockwave-flash" },
+    { .pszExtension="xls" , .pszType="application/vnd.ms-excel"   },
+    { .pszExtension="zip" , .pszType="application/x-tar"          },
     // Audio Mime Types:
-    { "aac" , "audio/mp4"                  },
-    { "ac3" , "audio/vnd.dolby.dd-raw"     }, // DLNA?
-    { "flac", "audio/x-flac"               }, // This may become audio/flac in the future
-    { "m4a" , "audio/x-m4a"                },
-    { "mid" , "audio/midi"                 },
-    { "mka" , "audio/x-matroska"           },
-    { "mp3" , "audio/mpeg"                 },
-    { "oga" , "audio/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "ogg" , "audio/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "wav" , "audio/wav"                  },
-    { "wma" , "audio/x-ms-wma"             },
+    { .pszExtension="aac" , .pszType="audio/mp4"                  },
+    { .pszExtension="ac3" , .pszType="audio/vnd.dolby.dd-raw"     }, // DLNA?
+    { .pszExtension="flac", .pszType="audio/x-flac"               }, // This may become audio/flac in the future
+    { .pszExtension="m4a" , .pszType="audio/x-m4a"                },
+    { .pszExtension="mid" , .pszType="audio/midi"                 },
+    { .pszExtension="mka" , .pszType="audio/x-matroska"           },
+    { .pszExtension="mp3" , .pszType="audio/mpeg"                 },
+    { .pszExtension="oga" , .pszType="audio/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { .pszExtension="ogg" , .pszType="audio/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { .pszExtension="wav" , .pszType="audio/wav"                  },
+    { .pszExtension="wma" , .pszType="audio/x-ms-wma"             },
     // Video Mime Types
-    { "3gp" , "video/3gpp"                 }, // Also audio/3gpp
-    { "3g2" , "video/3gpp2"                }, // Also audio/3gpp2
-    { "asx" , "video/x-ms-asf"             },
-    { "asf" , "video/x-ms-asf"             },
-    { "avi" , "video/x-msvideo"            }, // Also video/avi
-    { "m2p" , "video/mp2p"                 }, // RFC 3555
-    { "m4v" , "video/mp4"                  },
-    { "mpeg", "video/mp2p"                 }, // RFC 3555
-    { "mpeg2","video/mp2p"                 }, // RFC 3555
-    { "mpg" , "video/mp2p"                 }, // RFC 3555
-    { "mpg2", "video/mp2p"                 }, // RFC 3555
-    { "mov" , "video/quicktime"            },
-    { "mp4" , "video/mp4"                  },
-    { "mkv" , "video/x-matroska"           }, // See http://matroska.org/technical/specs/notes.html#MIME (See NOTE 1)
-    { "nuv" , "video/nupplevideo"          },
-    { "ogv" , "video/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "ps"  , "video/mp2p"                 }, // RFC 3555
-    { "ts"  , "video/mp2t"                 }, // RFC 3555
-    { "vob" , "video/mpeg"                 }, // Also video/dvd
-    { "wmv" , "video/x-ms-wmv"             },
+    { .pszExtension="3gp" , .pszType="video/3gpp"                 }, // Also audio/3gpp
+    { .pszExtension="3g2" , .pszType="video/3gpp2"                }, // Also audio/3gpp2
+    { .pszExtension="asx" , .pszType="video/x-ms-asf"             },
+    { .pszExtension="asf" , .pszType="video/x-ms-asf"             },
+    { .pszExtension="avi" , .pszType="video/x-msvideo"            }, // Also video/avi
+    { .pszExtension="m2p" , .pszType="video/mp2p"                 }, // RFC 3555
+    { .pszExtension="m4v" , .pszType="video/mp4"                  },
+    { .pszExtension="mpeg", .pszType="video/mp2p"                 }, // RFC 3555
+    { .pszExtension="mpeg2",.pszType="video/mp2p"                 }, // RFC 3555
+    { .pszExtension="mpg" , .pszType="video/mp2p"                 }, // RFC 3555
+    { .pszExtension="mpg2", .pszType="video/mp2p"                 }, // RFC 3555
+    { .pszExtension="mov" , .pszType="video/quicktime"            },
+    { .pszExtension="mp4" , .pszType="video/mp4"                  },
+    { .pszExtension="mkv" , .pszType="video/x-matroska"           }, // See http://matroska.org/technical/specs/notes.html#MIME (See NOTE 1)
+    { .pszExtension="nuv" , .pszType="video/nupplevideo"          },
+    { .pszExtension="ogv" , .pszType="video/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { .pszExtension="ps"  , .pszType="video/mp2p"                 }, // RFC 3555
+    { .pszExtension="ts"  , .pszType="video/mp2t"                 }, // RFC 3555
+    { .pszExtension="vob" , .pszType="video/mpeg"                 }, // Also video/dvd
+    { .pszExtension="wmv" , .pszType="video/x-ms-wmv"             },
     // Font Mime Types
-    { "ttf"  , "font/ttf"                  },
-    { "woff" , "font/woff"                 },
-    { "woff2", "font/woff2"                }
+    { .pszExtension="ttf"  , .pszType="font/ttf"                  },
+    { .pszExtension="woff" , .pszType="font/woff"                 },
+    { .pszExtension="woff2", .pszType="font/woff2"                }
 }};
 
 // NOTE 1
