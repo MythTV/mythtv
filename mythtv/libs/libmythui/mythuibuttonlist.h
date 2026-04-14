@@ -167,8 +167,8 @@ class MUI_PUBLIC MythUIButtonListItem
     bool            m_isVisible     {false};
     bool            m_enabled       {true};
     bool            m_debugme       {false};
-    ProgressInfo    m_progress1      {0,0,0};
-    ProgressInfo    m_progress2      {0,0,0};
+    ProgressInfo    m_progress1;
+    ProgressInfo    m_progress2;
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;

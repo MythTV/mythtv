@@ -13,11 +13,11 @@
 
 struct MUI_PUBLIC MythUIMenuCallbacks
 {
-    void (*exec_program)(const QString &cmd);
-    void (*exec_program_tv)(const QString &cmd);
-    void (*configplugin)(const QString &cmd);
-    void (*plugin)(const QString &cmd);
-    void (*eject)();
+    void (*exec_program)(const QString &cmd)    { nullptr };
+    void (*exec_program_tv)(const QString &cmd) { nullptr };
+    void (*configplugin)(const QString &cmd)    { nullptr };
+    void (*plugin)(const QString &cmd)          { nullptr };
+    void (*eject)()                             { nullptr };
 };
 
 class MUI_PUBLIC MythUIHelper : public MythUIThemeCache, public MythUIThemeHelper,
@@ -40,7 +40,7 @@ class MUI_PUBLIC MythUIHelper : public MythUIThemeCache, public MythUIThemeHelpe
    ~MythUIHelper() = default;
 
   private:
-    MythUIMenuCallbacks m_callbacks { nullptr,nullptr,nullptr,nullptr,nullptr };
+    MythUIMenuCallbacks m_callbacks;
     bool m_screenSetup { false };
 };
 

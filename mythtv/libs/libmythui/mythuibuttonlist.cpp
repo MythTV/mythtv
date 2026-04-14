@@ -3405,12 +3405,12 @@ QString MythUIButtonListItem::GetText(const QString &name) const
 TextProperties MythUIButtonListItem::GetTextProp(const QString &name) const
 {
     if (name.isEmpty())
-        return {m_text, ""};
+        return {.text=m_text, .state=""};
     if (m_textCb.fn != nullptr)
     {
         QString result = m_textCb.fn(name, m_textCb.data);
         if (!result.isEmpty())
-            return {result, ""};
+            return {.text=result, .state=""};
     }
     if (m_strings.contains(name))
         return m_strings[name];

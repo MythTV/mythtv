@@ -71,7 +71,8 @@ bool MythWaylandDevice::SetOpaqueRegion(const QRect Region) const
     return true;
 }
 
-const struct wl_registry_listener MythWaylandExtras::kRegistryListener = { &MythWaylandExtras::AnnounceGlobal, nullptr };
+const struct wl_registry_listener MythWaylandExtras::kRegistryListener =
+    { .global=&MythWaylandExtras::AnnounceGlobal, .global_remove=nullptr };
 
 /*! \brief MythTV implementation of the Wayland registry callback.
  *
