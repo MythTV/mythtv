@@ -560,7 +560,7 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
     int ctrl_volume = std::clamp(value, qctrl.minimum, qctrl.maximum);
 
     // Set recording volume
-    struct v4l2_control ctrl {V4L2_CID_AUDIO_VOLUME, ctrl_volume};
+    struct v4l2_control ctrl {.id=V4L2_CID_AUDIO_VOLUME, .value=ctrl_volume};
 
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {

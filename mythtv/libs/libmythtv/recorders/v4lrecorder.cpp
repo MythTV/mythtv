@@ -190,7 +190,7 @@ void V4LRecorder::RunVBIDevice(void)
         if (!IsHelperRequested() || IsErrored())
             break;
 
-        struct timeval tv {0, 5000};
+        struct timeval tv {.tv_sec=0, .tv_usec=5000};
         fd_set rdset;
 
         FD_ZERO(&rdset); // NOLINT(readability-isolate-declaration)

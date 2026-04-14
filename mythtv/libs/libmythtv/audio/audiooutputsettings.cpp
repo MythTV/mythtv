@@ -445,13 +445,13 @@ struct featureStruct
     const std::string name;
 };
 static const std::array<featureStruct,7> feature {{
-    { FEATURE_AC3,    "AC3"},
-    { FEATURE_DTS,    "DTS"},
-    { FEATURE_LPCM,   "LPCM"},
-    { FEATURE_EAC3,   "EAC3"},
-    { FEATURE_TRUEHD, "TRUEHD"},
-    { FEATURE_DTSHD,  "DTSHD"},
-    { FEATURE_AAC,    "AAC"},
+    { .flag=FEATURE_AC3,    .name="AC3"},
+    { .flag=FEATURE_DTS,    .name="DTS"},
+    { .flag=FEATURE_LPCM,   .name="LPCM"},
+    { .flag=FEATURE_EAC3,   .name="EAC3"},
+    { .flag=FEATURE_TRUEHD, .name="TRUEHD"},
+    { .flag=FEATURE_DTSHD,  .name="DTSHD"},
+    { .flag=FEATURE_AAC,    .name="AAC"},
 }};
 
 QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)

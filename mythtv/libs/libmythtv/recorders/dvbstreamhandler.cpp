@@ -235,7 +235,7 @@ void DVBStreamHandler::RunTS(void)
         else
         {
             // timeout gets reset by select, so we need to create new one
-            struct timeval timeout = { 0, k50Milliseconds };
+            struct timeval timeout = { .tv_sec=0, .tv_usec=k50Milliseconds };
             int ret = select(dvr_fd+1, &fd_select_set, nullptr, nullptr, &timeout);
             if (ret == -1 && errno != EINTR)
             {

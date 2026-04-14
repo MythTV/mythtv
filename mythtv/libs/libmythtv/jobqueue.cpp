@@ -1893,15 +1893,15 @@ QString JobQueue::PrettyPrint(off_t bytes)
         int           m_precision;
     };
     static constexpr std::array<const PpTab_t,9> kPpTab {{
-        { "bytes", 9999, 0 },
-        { "kB", 999, 0 },
-        { "MB", 999, 1 },
-        { "GB", 999, 1 },
-        { "TB", 999, 1 },
-        { "PB", 999, 1 },
-        { "EB", 999, 1 },
-        { "ZB", 999, 1 },
-        { "YB", 0, 0 },
+        { .m_suffix="bytes", .m_max=9999, .m_precision=0 },
+        { .m_suffix="kB",    .m_max=999,  .m_precision=0 },
+        { .m_suffix="MB",    .m_max=999,  .m_precision=1 },
+        { .m_suffix="GB",    .m_max=999,  .m_precision=1 },
+        { .m_suffix="TB",    .m_max=999,  .m_precision=1 },
+        { .m_suffix="PB",    .m_max=999,  .m_precision=1 },
+        { .m_suffix="EB",    .m_max=999,  .m_precision=1 },
+        { .m_suffix="ZB",    .m_max=999,  .m_precision=1 },
+        { .m_suffix="YB",    .m_max=0,    .m_precision=0 },
     }};
     float fbytes = bytes;
 

@@ -43,14 +43,22 @@ struct GoomState {
 static constexpr size_t   STATES_NB       {   8 };
 static constexpr uint16_t STATES_RANGEMAX { 510 };
 const std::array<const GoomState,STATES_NB> kStates {{
-	{1,0,0,1,4, 000, 100},
-	{1,0,0,1,1, 101, 140}, // turned on drawScope
-	{1,0,0,1,2, 141, 200},
-	{0,1,0,1,2, 201, 260},
-	{0,1,0,1,0, 261, 330},
-	{0,1,1,1,4, 331, 400},
-	{0,0,1,1,5, 401, 450}, // turned on drawScope
-        {0,0,1,1,1, 451, 510}
+	{.m_drawIfs=1,  .m_drawPoints=0, .m_drawTentacle=0, .m_drawScope=1,
+	 .m_farScope=4, .m_rangeMin=000, .m_rangeMax=100},
+	{.m_drawIfs=1,  .m_drawPoints=0, .m_drawTentacle=0, .m_drawScope=1,
+	 .m_farScope=1, .m_rangeMin=101, .m_rangeMax=140}, // turned on drawScope
+	{.m_drawIfs=1,  .m_drawPoints=0, .m_drawTentacle=0, .m_drawScope=1,
+	 .m_farScope=2, .m_rangeMin=141, .m_rangeMax=200},
+	{.m_drawIfs=0,  .m_drawPoints=1, .m_drawTentacle=0, .m_drawScope=1,
+	 .m_farScope=2, .m_rangeMin=201, .m_rangeMax=260},
+	{.m_drawIfs=0,  .m_drawPoints=1, .m_drawTentacle=0, .m_drawScope=1,
+	 .m_farScope=0, .m_rangeMin=261, .m_rangeMax=330},
+	{.m_drawIfs=0,  .m_drawPoints=1, .m_drawTentacle=1, .m_drawScope=1,
+	 .m_farScope=4, .m_rangeMin=331, .m_rangeMax=400},
+	{.m_drawIfs=0,  .m_drawPoints=0, .m_drawTentacle=1, .m_drawScope=1,
+	 .m_farScope=5, .m_rangeMin=401, .m_rangeMax=450}, // turned on drawScope
+	{.m_drawIfs=0,  .m_drawPoints=0, .m_drawTentacle=1, .m_drawScope=1,
+	 .m_farScope=1, .m_rangeMin=451, .m_rangeMax=510}
 }};
 
 const GoomState *curGState = &kStates[4];
@@ -150,9 +158,10 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 
 	static char s_goomLimit = 2;		// sensibilité du goom
 	static ZoomFilterData s_zfd = {
-		127, 8, 16,
-		1, 1, false, NORMAL_MODE,
-		0, 0, false, false, 0
+		.vitesse=127, .pertedec=8, .sqrtperte=16,
+		.middleX=1, .middleY=1, .reverse=false, .mode=NORMAL_MODE,
+		.hPlaneEffect=0, .vPlaneEffect=0, .waveEffect=false,
+		.hypercosEffect=false, .noisify=0
 	};
 
 	ZoomFilterData *pzfd = nullptr;

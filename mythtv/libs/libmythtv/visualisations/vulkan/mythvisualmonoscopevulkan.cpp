@@ -11,10 +11,14 @@
 static const MythBindingMap k450LineBindings = {
     { LineVertex450,
         { VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
-        { { 0, { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr } } },
-        { 0, 2 * sizeof(float), VK_VERTEX_INPUT_RATE_VERTEX },
+        { { 0, { .binding=0, .descriptorType=VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                 .descriptorCount=1, .stageFlags=VK_SHADER_STAGE_VERTEX_BIT,
+                 .pImmutableSamplers=nullptr } } },
+        { .binding=0, .stride=2 * sizeof(float),
+          .inputRate=VK_VERTEX_INPUT_RATE_VERTEX },
         { { 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } },
-        { VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushBuffer) } }
+        { .stageFlags=VK_SHADER_STAGE_VERTEX_BIT, .offset=0,
+          .size=sizeof(PushBuffer) } }
     },
     { LineFragment450,
         { VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,

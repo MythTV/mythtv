@@ -2968,7 +2968,9 @@ void AvFormatDecoder::HandleGopStart(
                 QString("positionMap[ %1 ] == %2.")
                     .arg(m_framesRead).arg(startpos));
 
-            PosMapEntry entry = {m_framesRead, m_framesRead, startpos};
+            PosMapEntry entry = {.index=m_framesRead,
+                                 .adjFrame=m_framesRead,
+                                 .pos=startpos};
 
             QMutexLocker locker(&m_positionMapLock);
             // Create a dummy positionmap entry for frame 0 so that
@@ -2977,7 +2979,7 @@ void AvFormatDecoder::HandleGopStart(
             // DecoderBase::indexOffset from each frame number.)
             if (m_positionMap.empty())
             {
-                PosMapEntry dur = {0, 0, 0};
+                PosMapEntry dur = {.index=0, .adjFrame=0, .pos=0};
                 m_positionMap.push_back(dur);
             }
             m_positionMap.push_back(entry);

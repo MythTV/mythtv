@@ -179,7 +179,9 @@ bool DecoderBase::PosMapFromDb(void)
 
     for (auto it = posMap.cbegin(); it != posMap.cend(); ++it)
     {
-        PosMapEntry e = {it.key(), it.key() * m_keyframeDist, *it};
+        PosMapEntry e = {.index=it.key(),
+                         .adjFrame=it.key() * m_keyframeDist,
+                         .pos=*it};
         m_positionMap.push_back(e);
     }
 
@@ -248,7 +250,9 @@ bool DecoderBase::PosMapFromEnc(void)
         if (it.key() <= last_index)
             continue;
 
-        PosMapEntry e = {it.key(), it.key() * m_keyframeDist, *it};
+        PosMapEntry e = {.index=it.key(),
+                         .adjFrame=it.key() * m_keyframeDist,
+                         .pos=*it};
         m_positionMap.push_back(e);
     }
 
