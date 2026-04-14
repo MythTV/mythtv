@@ -21,18 +21,18 @@ struct GameTypes {
 
 const std::array<GameTypes,12> GameTypeList
 {{
-    { QT_TRANSLATE_NOOP("(GameTypes)", "OTHER"),   "OTHER",  "" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "AMIGA"),   "AMIGA",  "adf,ipf" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "ATARI"),   "ATARI",  "bin,a26" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "GAMEGEAR"),    "GAMEGEAR",   "gg" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "MAME"),    "MAME",   "" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "N64"),     "N64",    "v64,n64" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "NES"),     "NES",    "zip,nes" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "PC GAME"), "PC",     "" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "PCE/TG16"),"PCE",    "pce" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "SEGA/MASTER SYSTEM"), "SEGA", "sms" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "OTHER"),   .m_idStr="OTHER",  .m_extensions="" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "AMIGA"),   .m_idStr="AMIGA",  .m_extensions="adf,ipf" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "ATARI"),   .m_idStr="ATARI",  .m_extensions="bin,a26" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "GAMEGEAR"),    .m_idStr="GAMEGEAR",   .m_extensions="gg" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "GENESIS/MEGADRIVE"), .m_idStr="GENESIS", .m_extensions="smd,bin,md" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "MAME"),    .m_idStr="MAME",   .m_extensions="" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "N64"),     .m_idStr="N64",    .m_extensions="v64,n64" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "NES"),     .m_idStr="NES",    .m_extensions="zip,nes" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "PC GAME"), .m_idStr="PC",     .m_extensions="" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "PCE/TG16"),.m_idStr="PCE",    .m_extensions="pce" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "SEGA/MASTER SYSTEM"), .m_idStr="SEGA", .m_extensions="sms" },
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    .m_idStr="SNES",   .m_extensions="zip,smc,sfc,fig,swc" }
 }};
 
 QString GetGameTypeName(const QString &GameType)

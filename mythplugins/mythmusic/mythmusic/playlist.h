@@ -36,8 +36,8 @@ enum PlayPLOption : std::uint8_t
 
 struct PlaylistOptions
 {
-    InsertPLOption insertPLOption;
-    PlayPLOption playPLOption;
+    InsertPLOption insertPLOption {PL_REPLACE};
+    PlayPLOption playPLOption     {PL_CURRENT};
 };
 
 using SongList = QList<MusicMetadata::IdType>;

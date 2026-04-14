@@ -163,7 +163,7 @@ class MPLUGIN_PUBLIC MusicCommon : public MythScreenType
     std::chrono::seconds   m_playlistMaxTime    {0s};
 
     // for quick playlists
-    PlaylistOptions        m_playlistOptions    {PL_REPLACE, PL_CURRENT};
+    PlaylistOptions        m_playlistOptions;
     QString                m_whereClause;
 
     // for adding tracks from playlist editor

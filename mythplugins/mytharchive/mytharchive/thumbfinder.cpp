@@ -72,15 +72,15 @@ static constexpr int8_t PRE_SEEK_AMOUNT { 50 };
 
 static const std::array<const SeekAmount,9> kSeekAmounts
 {{
-    {"frame",       -1},
-    {"1 second",     1},
-    {"5 seconds",    5},
-    {"10 seconds",  10},
-    {"30 seconds",  30},
-    {"1 minute",    60},
-    {"5 minutes",  300},
-    {"10 minutes", 600},
-    {"Cut Point",   -2},
+    {.name="frame",      .amount=-1},
+    {.name="1 second",   .amount=1},
+    {.name="5 seconds",  .amount=5},
+    {.name="10 seconds", .amount=10},
+    {.name="30 seconds", .amount=30},
+    {.name="1 minute",   .amount=60},
+    {.name="5 minutes",  .amount=300},
+    {.name="10 minutes", .amount=600},
+    {.name="Cut Point",  .amount=-2},
 }};
 
 ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
