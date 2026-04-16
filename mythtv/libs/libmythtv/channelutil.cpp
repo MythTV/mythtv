@@ -2311,8 +2311,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     else
     {
         // neither of channels have a numeric channum
-        int cmp = StringUtil::naturalCompare(a.m_chanNum, b.m_chanNum);
-        if (cmp)
+        auto cmp = StringUtil::naturalCompare(a.m_chanNum, b.m_chanNum);
+        if (cmp != 0)
             return cmp < 0;
     }
 

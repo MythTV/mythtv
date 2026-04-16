@@ -3,8 +3,6 @@
 #include <QObject>
 #include "stringutil.h"
 
-#include "ternarycompare.h"
-
 bool StringUtil::isValidUTF8(const QByteArray& data)
 {
     const auto* p = (const unsigned char*)data.data();
@@ -118,7 +116,7 @@ A task has been filled for this in Qt Task Tracker with ID 205990.
 http://trolltech.com/developer/task-tracker/index_html?method=entry&id=205990
 Dead link.  QCollator might be of relevance.
 */
-int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity caseSensitivity)
+std::strong_ordering StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity caseSensitivity)
 {
     QString a;
     QString b;
@@ -139,7 +137,7 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
 
     if (currA == currB)
     {
-        return 0;
+        return std::strong_ordering::equal;
     }
 
     while (!currA->isNull() && !currB->isNull())
@@ -149,22 +147,22 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
 
         if (currA->unicode() == QChar::ObjectReplacementCharacter)
         {
-            return 1;
+            return std::strong_ordering::greater;
         }
 
         if (currB->unicode() == QChar::ObjectReplacementCharacter)
         {
-            return -1;
+            return std::strong_ordering::less;
         }
 
         if (currA->unicode() == QChar::ReplacementCharacter)
         {
-            return 1;
+            return std::strong_ordering::greater;
         }
 
         if (currB->unicode() == QChar::ReplacementCharacter)
         {
-            return -1;
+            return std::strong_ordering::less;
         }
 
         // find sequence of characters ending at the first non-character
@@ -187,7 +185,7 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
 
         if (cmp != 0)
         {
-            return cmp < 0 ? -1 : +1;
+            return cmp < 0 ? std::strong_ordering::less : std::strong_ordering::greater;
         }
 
         if (currA->isNull() || currB->isNull())
@@ -199,10 +197,10 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
         while ((currA->isPunct() || currA->isSpace()) &&
                (currB->isPunct() || currB->isSpace()))
         {
-            cmp = ternary_compare(*currA, *currB);
-            if (cmp != 0)
+            auto cmp2 = (currA->unicode() <=> currB->unicode());
+            if (cmp2 != 0)
             {
-                return cmp;
+                return cmp2;
             }
             ++currA;
             ++currB;
@@ -225,19 +223,16 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
                 }
                 if (!currA->isDigit())
                 {
-                    return +1;
+                    return std::strong_ordering::greater;
                 }
                 if (!currB->isDigit())
                 {
-                    return -1;
+                    return std::strong_ordering::less;
                 }
-                if (*currA < *currB)
+                auto cmp2 = (currA->unicode() <=> currB->unicode());
+                if (cmp2 != 0)
                 {
-                    return -1;
-                }
-                if (*currA > *currB)
-                {
-                    return + 1;
+                    return cmp2;
                 }
                 ++currA;
                 ++currB;
@@ -253,7 +248,7 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
             // both numbers to know that they have the same magnitude.
 
             bool isFirstRun = true;
-            int weight = 0;
+            std::strong_ordering weight = std::strong_ordering::equal;
 
             while (true)
             {
@@ -269,25 +264,21 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
                 {
                     if (isFirstRun)
                     {
-                        return *currA < *currB ? -1 : +1;
+                        return currA->unicode() <=> currB->unicode();
                     }
-                    return -1;
+                    return std::strong_ordering::less;
                 }
                 if (!currB->isDigit())
                 {
                     if (isFirstRun)
                     {
-                        return *currA < *currB ? -1 : +1;
+                        return currA->unicode() <=> currB->unicode();
                     }
-                    return +1;
+                    return std::strong_ordering::greater;
                 }
-                if ((*currA < *currB) && (weight == 0))
+                if (weight == 0)
                 {
-                    weight = -1;
-                }
-                else if ((*currA > *currB) && (weight == 0))
-                {
-                    weight = + 1;
+                    weight = (currA->unicode() <=> currB->unicode());
                 }
                 ++currA;
                 ++currB;
@@ -298,10 +289,12 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
 
     if (currA->isNull() && currB->isNull())
     {
-        return 0;
+        if (caseSensitivity == Qt::CaseSensitive)
+            return std::strong_ordering::equal;
+        return std::strong_ordering::equivalent;
     }
 
-    return currA->isNull() ? -1 : + 1;
+    return currA->isNull() ? std::strong_ordering::less : std::strong_ordering::greater;
 }
 
 static constexpr int64_t kOneTerabyte { 1024 * 1024LL * 1024};

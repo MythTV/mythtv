@@ -167,7 +167,9 @@ endif()
 # Add compiler specific flags.
 #
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
+  # This warning prevents comparison of tthe C++20 spaceship operator
+  # to the literal value 0.
+  # list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
 
   # This warning flag isn't enabled yet because it will require a large number
   # of changes to the code to eliminate all the warnings.
@@ -196,7 +198,9 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
   # Clang on MacOSX also doesn't ignore warnings in system headers.
   if(NOT CMAKE_SYSTEM_NAME MATCHES "(FreeBSD|Darwin)")
-    list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
+    # This warning prevents comparison of tthe C++20 spaceship operator
+    # to the literal value 0.
+   # list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
   endif()
 
 endif()

@@ -5515,9 +5515,13 @@ if enabled gxx; then
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new
-    if enabled enforce_nullptr; then
-        check_cxxflags -Wzero-as-null-pointer-constant
-    fi
+
+    # This warning prevents comparison of tthe C++20 spaceship operator
+    # to the literal value 0.
+    # if enabled enforce_nullptr; then
+    #     check_cxxflags -Wzero-as-null-pointer-constant
+    # fi
+
     # The Q_OBJECT macro gets included in every subclass that is based
     # on QOBject, and has a couple of functions marked as "virtual"
     # instead of "override". Apparently earlier version of GCC didn't
@@ -5569,9 +5573,11 @@ elif enabled clangxx; then
             check_cxxflags -faligned-allocation
             ;;
     esac
-    if enabled enforce_nullptr; then
-        check_cxxflags -Wzero-as-null-pointer-constant
-    fi
+    # This warning prevents comparison of tthe C++20 spaceship operator
+    # to the literal value 0.
+    # if enabled enforce_nullptr; then
+    #     check_cxxflags -Wzero-as-null-pointer-constant
+    # fi
 fi
 
 # Check for python dependencies

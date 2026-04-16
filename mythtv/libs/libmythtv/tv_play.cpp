@@ -106,7 +106,7 @@ static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
 
 static bool comp_title(const ProgramInfo *a, const ProgramInfo *b)
 {
-    int cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+    auto cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
     if (cmp != 0)
         return cmp < 0;
     return comp_season_rev(a, b) < 0;

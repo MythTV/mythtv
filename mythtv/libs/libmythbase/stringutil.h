@@ -47,7 +47,7 @@ inline QString bool_to_string(bool val)
 }
 
 MBASE_PUBLIC
-int naturalCompare(const QString &_a, const QString &_b,
+std::strong_ordering naturalCompare(const QString &_a, const QString &_b,
                    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
 /**
