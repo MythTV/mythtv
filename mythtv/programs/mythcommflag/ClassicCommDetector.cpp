@@ -12,7 +12,9 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythmiscutil.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 #include "libmythtv/mythcommflagplayer.h"
 #include "libmythtv/programtypes.h"
 
@@ -1856,9 +1858,15 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     if (m_blankFrameMap.count() == 0)
         return;
 
+#ifdef __cpp_size_t_suffix
+    auto *bframes = new long long[2UZ * m_blankFrameMap.count()];
+    auto *c_start = new long long[1UZ * m_blankFrameMap.count()];
+    auto *c_end   = new long long[1UZ * m_blankFrameMap.count()];
+#else
     auto *bframes = new long long[2_UZ * m_blankFrameMap.count()];
     auto *c_start = new long long[1_UZ * m_blankFrameMap.count()];
     auto *c_end   = new long long[1_UZ * m_blankFrameMap.count()];
+#endif
     int frames = 0;
     int commercials = 0;
 

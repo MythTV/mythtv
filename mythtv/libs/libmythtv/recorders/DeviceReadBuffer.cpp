@@ -15,7 +15,9 @@
 #include "libmythbase/mthread.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 
 #include "DeviceReadBuffer.h"
 #include "mpeg/tspacket.h"
@@ -115,8 +117,13 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
 
     m_readQuanta   = (readQuanta) ? readQuanta : m_readQuanta;
     m_devBufferCount = deviceBufferCount;
+#ifdef __cpp_size_t_suffix
+    m_size          = gCoreContext->GetNumSetting(
+        "HDRingbufferSize", static_cast<int>(50 * m_readQuanta)) * 1024UZ;
+#else
     m_size          = gCoreContext->GetNumSetting(
         "HDRingbufferSize", static_cast<int>(50 * m_readQuanta)) * 1024_UZ;
+#endif
     m_used          = 0;
     m_devReadSize = m_readQuanta * (m_usingPoll ? 256 : 48);
     m_devReadSize = (deviceBufferSize) ?

@@ -2,7 +2,7 @@
 #define SIZETLITERAL_H
 
 #ifdef __cpp_size_t_suffix
-# warning "This code should be converted to use the c++23 Z/UZ literals."
+# error "This code should be converted to use the c++23 Z/UZ literals."
 #endif
 
 // From https://en.cppreference.com:

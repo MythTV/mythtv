@@ -6,9 +6,15 @@
 #include <FLAC/stream_encoder.h>
 
 #include "encoder.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 
+#ifdef __cpp_size_t_suffix
+static constexpr size_t MAX_SAMPLES  { 588UZ  * 4 };
+#else
 static constexpr size_t MAX_SAMPLES  { 588_UZ * 4 };
+#endif
 static constexpr int8_t NUM_CHANNELS { 2          };
 
 class MusicMetadata;
