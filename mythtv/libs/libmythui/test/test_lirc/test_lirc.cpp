@@ -914,7 +914,7 @@ void TestLirc::test_tcp_sending(void)
     QVERIFY(sock != nullptr);
 
     sock->connectToHost(QHostAddress::LocalHost, s_tcp_port);
-    QVERIFY(sock->waitForConnected(500));
+    QVERIFY(sock->waitForConnected());
 
     s_response.clear();
     s_response.emplace_back("Go away");
@@ -933,7 +933,7 @@ void TestLirc::test_udp_sending(void)
     QVERIFY(sock != nullptr);
 
     sock->connectToServer(s_unix_sockname);
-    QVERIFY(sock->waitForConnected(500));
+    QVERIFY(sock->waitForConnected());
 
     s_response.clear();
     s_response.emplace_back("Go away");
@@ -955,7 +955,7 @@ void TestLirc::test_identify(void)
     QVERIFY(sock != nullptr);
 
     sock->connectToServer(s_unix_sockname);
-    QVERIFY(sock->waitForConnected(500));
+    QVERIFY(sock->waitForConnected());
     int const sockfd = sock->socketDescriptor();
     QVERIFY(sockfd != -1);
 
@@ -1037,7 +1037,7 @@ void TestLirc::test_send_command(void)
     int ret_status {-2};
 
     sock->connectToServer(s_unix_sockname);
-    QVERIFY(sock->waitForConnected(500));
+    QVERIFY(sock->waitForConnected());
     int const sockfd = sock->socketDescriptor();
     QVERIFY(sockfd != -1);
 
