@@ -1053,8 +1053,13 @@ std::string ZMServer::runCommand(const std::string& command)
 {
     std::string outStr;
     FILE *fd = popen(command.c_str(), "r");
-    std::array<char,100> buffer {};
+    if (nullptr == fd)
+    {
+        std::cout << "Call to popen() failed.\n";
+        return {};
+    }
 
+    std::array<char,100> buffer {};
     while (fgets(buffer.data(), buffer.size(), fd) != nullptr)
     {
         outStr += buffer.data();
