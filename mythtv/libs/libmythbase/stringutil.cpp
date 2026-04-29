@@ -146,24 +146,14 @@ std::strong_ordering StringUtil::naturalCompare(const QString &_a, const QString
         const QChar* begSeqB = currB;
 
         if (currA->unicode() == QChar::ObjectReplacementCharacter)
-        {
             return std::strong_ordering::greater;
-        }
-
         if (currB->unicode() == QChar::ObjectReplacementCharacter)
-        {
             return std::strong_ordering::less;
-        }
 
         if (currA->unicode() == QChar::ReplacementCharacter)
-        {
             return std::strong_ordering::greater;
-        }
-
         if (currB->unicode() == QChar::ReplacementCharacter)
-        {
             return std::strong_ordering::less;
-        }
 
         // find sequence of characters ending at the first non-character
         while (!currA->isNull() && !currA->isDigit() && !currA->isPunct() &&
@@ -182,16 +172,11 @@ std::strong_ordering StringUtil::naturalCompare(const QString &_a, const QString
         const QString& subA(a.mid(begSeqA - a.unicode(), currA - begSeqA));
         const QString& subB(b.mid(begSeqB - b.unicode(), currB - begSeqB));
         int cmp = QString::localeAwareCompare(subA, subB);
-
         if (cmp != 0)
-        {
             return cmp < 0 ? std::strong_ordering::less : std::strong_ordering::greater;
-        }
 
         if (currA->isNull() || currB->isNull())
-        {
             break;
-        }
 
         // find sequence of characters ending at the first non-character
         while ((currA->isPunct() || currA->isSpace()) &&
@@ -199,9 +184,7 @@ std::strong_ordering StringUtil::naturalCompare(const QString &_a, const QString
         {
             auto cmp2 = (currA->unicode() <=> currB->unicode());
             if (cmp2 != 0)
-            {
                 return cmp2;
-            }
             ++currA;
             ++currB;
             if (currA->isNull() || currB->isNull())
@@ -218,22 +201,14 @@ std::strong_ordering StringUtil::naturalCompare(const QString &_a, const QString
             while (true)
             {
                 if (!currA->isDigit() && !currB->isDigit())
-                {
                     break;
-                }
                 if (!currA->isDigit())
-                {
                     return std::strong_ordering::greater;
-                }
                 if (!currB->isDigit())
-                {
                     return std::strong_ordering::less;
-                }
                 auto cmp2 = (currA->unicode() <=> currB->unicode());
                 if (cmp2 != 0)
-                {
                     return cmp2;
-                }
                 ++currA;
                 ++currB;
             }
@@ -255,31 +230,23 @@ std::strong_ordering StringUtil::naturalCompare(const QString &_a, const QString
                 if (!currA->isDigit() && !currB->isDigit())
                 {
                     if (weight != 0)
-                    {
                         return weight;
-                    }
                     break;
                 }
                 if (!currA->isDigit())
                 {
                     if (isFirstRun)
-                    {
                         return currA->unicode() <=> currB->unicode();
-                    }
                     return std::strong_ordering::less;
                 }
                 if (!currB->isDigit())
                 {
                     if (isFirstRun)
-                    {
                         return currA->unicode() <=> currB->unicode();
-                    }
                     return std::strong_ordering::greater;
                 }
                 if (weight == 0)
-                {
                     weight = (currA->unicode() <=> currB->unicode());
-                }
                 ++currA;
                 ++currB;
                 isFirstRun = false;
