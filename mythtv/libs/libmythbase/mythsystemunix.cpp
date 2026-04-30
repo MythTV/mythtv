@@ -48,7 +48,7 @@ using FDMap_t = QMap<int, FDType_t*>;
 /**********************************
  * MythSystemLegacyManager method defines
  *********************************/
-static bool                     run_system = true;
+static volatile bool                  run_system = true;
 static MythSystemLegacyManager       *manager = nullptr;
 static MythSystemLegacySignalManager *smanager = nullptr;
 static MythSystemLegacyIOHandler     *readThread = nullptr;

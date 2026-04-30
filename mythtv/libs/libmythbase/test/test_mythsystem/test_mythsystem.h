@@ -35,6 +35,7 @@
 
 #include "mythcorecontext.h"
 #include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #ifdef NEW_LOGGING
 static DebugLogHandler *console_dbg(void)
@@ -65,6 +66,7 @@ class TestMythSystem: public QObject
     // called at the end of these sets of tests
     void cleanupTestCase(void)
     {
+        ShutdownMythSystemLegacy();
     }
 
     // called before each test case
