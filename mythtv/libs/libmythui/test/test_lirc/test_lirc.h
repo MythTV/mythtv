@@ -11,6 +11,11 @@
 
 #include "lirc_client.h"
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtProcessorDetection>
+#endif
+
 class TestLirc: public QObject
 {
     Q_OBJECT;
@@ -61,12 +66,14 @@ class TestLirc: public QObject
            void test_code2char_internal(void);
            void test_readstring(void);
     static void test_getsocketname(void);
+#ifndef Q_PROCESSOR_S390
 #ifdef INCLUDE_TCP_SERVER
            void test_tcp_sending(void);
 #endif
            static void test_udp_sending(void);
            void test_identify(void);
            void test_send_command(void);
+#endif
 };
 
 #endif // LIBMYTHUI_TEST_LIRC_H

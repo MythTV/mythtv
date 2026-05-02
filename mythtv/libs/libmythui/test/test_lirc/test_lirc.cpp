@@ -904,6 +904,7 @@ void TestLirc::test_getsocketname(void)
     QCOMPARE(addr.sun_path, output.data());
 }
 
+#ifndef Q_PROCESSOR_S390
 #ifdef INCLUDE_TCP_SERVER
 void TestLirc::test_tcp_sending(void)
 {
@@ -1131,5 +1132,6 @@ void TestLirc::test_send_command(void)
     QByteArray const data = sock->readAll(); // clazy:exclude=unused-non-trivial-variable
     sock->close();
 }
+#endif
 
 QTEST_APPLESS_MAIN(TestLirc)
