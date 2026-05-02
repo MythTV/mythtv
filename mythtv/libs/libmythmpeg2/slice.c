@@ -1558,7 +1558,7 @@ do {									\
 void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
 		      uint8_t * forward_fbuf[3], uint8_t * backward_fbuf[3])
 {
-    int stride = decoder->stride_frame;
+    ptrdiff_t stride = decoder->stride_frame;
     int bottom_field = (decoder->picture_structure == BOTTOM_FIELD);
     int offset = bottom_field ? stride : 0;
     int height = decoder->height;

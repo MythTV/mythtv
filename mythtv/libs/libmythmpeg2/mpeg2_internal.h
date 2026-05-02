@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 #include "mpeg2config.h"
+#include <stddef.h>
 
 #define STATE_INTERNAL_NORETURN ((mpeg2_state_t)-1)
 
@@ -74,11 +75,11 @@ struct mpeg2_decoder_s {
     uint8_t * dest[3];
 
     int offset;
-    int stride;
-    int uv_stride;
-    int slice_stride;
-    int slice_uv_stride;
-    int stride_frame;
+    ptrdiff_t stride;
+    ptrdiff_t uv_stride;
+    ptrdiff_t slice_stride;
+    ptrdiff_t slice_uv_stride;
+    ptrdiff_t stride_frame;
     unsigned int limit_x;
     unsigned int limit_y_16;
     unsigned int limit_y_8;

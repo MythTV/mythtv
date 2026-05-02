@@ -25,6 +25,7 @@
 #include "mpeg2config.h"
 
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdlib.h>	/* defines NULL */
 #include <string.h>	/* memcmp */
 
@@ -662,7 +663,7 @@ static int picture_display_ext (mpeg2dec_t * mpeg2dec)
 {
     uint8_t * buffer = mpeg2dec->chunk_start;
     mpeg2_picture_t * picture = &(mpeg2dec->new_picture);
-    int i = 0;
+    ptrdiff_t i = 0;
 
     int nb_pos = picture->nb_fields;
     if (mpeg2dec->sequence.flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)

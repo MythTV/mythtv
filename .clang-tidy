@@ -47,9 +47,6 @@ Checks: '-*,
         # As of 2022-12-19, there are 1014 unique warnings. ,
        -bugprone-easily-swappable-parameters,
 
-        # As of 2023-05-22, there are 97 unique warnings. ,
-       -bugprone-implicit-widening-of-multiplication-result,
-
         # As of 2023-09-19, there are 140 unique warnings. ,
        -bugprone-switch-missing-default-case,
 
