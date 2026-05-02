@@ -26,6 +26,9 @@
 #include "zoom_filters.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythrandom.h"
+#ifndef __cpp_size_t_suffix
+#include <libmythbase/sizetliteral.h>
+#endif
 
 static constexpr int8_t EFFECT_DISTORS    { 4 };
 static constexpr int8_t EFFECT_DISTORS_SL { 2 };
@@ -504,10 +507,15 @@ zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf
 			generatePrecalCoef ();
 			select_zoom_filter ();
 
-			brutS.resize(resx * resy * 2);
-			brutD.resize(resx * resy * 2);
-			brutT.resize(resx * resy * 2);
-
+#ifdef __cpp_size_t_suffix
+			brutS.resize(2Z * resx * resy);
+			brutD.resize(2Z * resx * resy);
+			brutT.resize(2Z * resx * resy);
+#else
+			brutS.resize(2_Z * resx * resy);
+			brutD.resize(2_Z * resx * resy);
+			brutT.resize(2_Z * resx * resy);
+#endif
 			/** modif here by jeko : plus de multiplications **/
 			{
 				int     yperte = 0;

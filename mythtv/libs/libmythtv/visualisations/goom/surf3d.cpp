@@ -5,6 +5,10 @@
 
 #include "surf3d.h"
 
+#ifndef __cpp_size_t_suffix
+#include <libmythbase/sizetliteral.h>
+#endif
+
 void grid3d_free(grid3d **grid)
 {
     (*grid)->surf.vertex.clear();
@@ -19,8 +23,13 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 	auto *g = new grid3d;
 	surf3d *s = &(g->surf);
 	s->nbvertex = x*y;
-	s->vertex.resize(x*y);
-	s->svertex.resize(x*y);
+#ifdef __cpp_size_t_suffix
+	s->vertex.resize(1Z*x*y);
+	s->svertex.resize(1Z*x*y);
+#else
+	s->vertex.resize(1_Z*x*y);
+	s->svertex.resize(1_Z*x*y);
+#endif
 	s->center = center;
 	
 	g->defx=defx;
