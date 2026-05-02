@@ -84,9 +84,8 @@ static MythSystemEventHandler *gSysEventHandler { nullptr };
 static MediaServer            *g_pUPnp          { nullptr };
 static MainServer             *mainServer       { nullptr };
 
-bool setupTVs(bool ismaster, bool &error)
+bool setupTVs(bool ismaster)
 {
-    error = false;
     QString localhostname = gCoreContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -586,10 +585,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     print_warnings(cmdline);
 
-    bool fatal_error = false;
-    bool runsched = setupTVs(ismaster, fatal_error);
-    if (fatal_error)
-        return GENERIC_EXIT_SETUP_ERROR;
+    bool runsched = setupTVs(ismaster);
 
     Scheduler *sched = nullptr;
     if (ismaster)

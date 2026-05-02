@@ -9,7 +9,7 @@ class MythBackendCommandLineParser;
 class QString;
 class QSize;
 
-bool setupTVs(bool ismaster, bool &error);
+bool setupTVs(bool ismaster);
 void cleanup(void);
 int  handle_command(const MythBackendCommandLineParser &cmdline);
 int  connect_to_master(void);
