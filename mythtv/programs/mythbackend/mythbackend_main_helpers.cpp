@@ -84,65 +84,67 @@ static MythSystemEventHandler *gSysEventHandler { nullptr };
 static MediaServer            *g_pUPnp          { nullptr };
 static MainServer             *mainServer       { nullptr };
 
-bool setupTVs(bool ismaster)
+void doDatabaseHacks()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // Hack to make sure recorded.basename gets set if the user
+    // downgrades to a prior version and creates new entries
+    // without it.
+    if (!query.exec("UPDATE recorded SET basename = CONCAT(chanid, '_', "
+                    "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
+                    "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
+                    "WHERE basename = '';"))
+        MythDB::DBError("Updating record basename", query);
+
+    // Hack to make sure record.station gets set if the user
+    // downgrades to a prior version and creates new entries
+    // without it.
+    if (!query.exec("UPDATE channel SET callsign=chanid "
+                    "WHERE callsign IS NULL OR callsign='';"))
+        MythDB::DBError("Updating channel callsign", query);
+
+    if (query.exec("SELECT MIN(chanid) FROM channel;"))
+    {
+        query.first();
+        int min_chanid = query.value(0).toInt();
+        if (!query.exec(QString("UPDATE record SET chanid = %1 "
+                                "WHERE chanid IS NULL;").arg(min_chanid)))
+            MythDB::DBError("Updating record chanid", query);
+    }
+    else
+    {
+        MythDB::DBError("Querying minimum chanid", query);
+    }
+
+    MSqlQuery records_without_station(MSqlQuery::InitCon());
+    records_without_station.prepare("SELECT record.chanid,"
+            " channel.callsign FROM record LEFT JOIN channel"
+            " ON record.chanid = channel.chanid WHERE record.station='';");
+    if (records_without_station.exec())
+    {
+        MSqlQuery update_record(MSqlQuery::InitCon());
+        update_record.prepare("UPDATE record SET station = :CALLSIGN"
+                " WHERE chanid = :CHANID;");
+        while (records_without_station.next())
+        {
+            update_record.bindValue(":CALLSIGN",
+                    records_without_station.value(1));
+            update_record.bindValue(":CHANID",
+                    records_without_station.value(0));
+            if (!update_record.exec())
+            {
+                MythDB::DBError("Updating record station", update_record);
+            }
+        }
+    }
+}
+
+bool createTVRecorders(bool ismaster)
 {
     QString localhostname = gCoreContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
-
-    if (ismaster)
-    {
-        // Hack to make sure recorded.basename gets set if the user
-        // downgrades to a prior version and creates new entries
-        // without it.
-        if (!query.exec("UPDATE recorded SET basename = CONCAT(chanid, '_', "
-                        "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
-                        "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
-                        "WHERE basename = '';"))
-            MythDB::DBError("Updating record basename", query);
-
-        // Hack to make sure record.station gets set if the user
-        // downgrades to a prior version and creates new entries
-        // without it.
-        if (!query.exec("UPDATE channel SET callsign=chanid "
-                        "WHERE callsign IS NULL OR callsign='';"))
-            MythDB::DBError("Updating channel callsign", query);
-
-        if (query.exec("SELECT MIN(chanid) FROM channel;"))
-        {
-            query.first();
-            int min_chanid = query.value(0).toInt();
-            if (!query.exec(QString("UPDATE record SET chanid = %1 "
-                                    "WHERE chanid IS NULL;").arg(min_chanid)))
-                MythDB::DBError("Updating record chanid", query);
-        }
-        else
-        {
-            MythDB::DBError("Querying minimum chanid", query);
-        }
-
-        MSqlQuery records_without_station(MSqlQuery::InitCon());
-        records_without_station.prepare("SELECT record.chanid,"
-                " channel.callsign FROM record LEFT JOIN channel"
-                " ON record.chanid = channel.chanid WHERE record.station='';");
-        if (records_without_station.exec())
-        {
-            MSqlQuery update_record(MSqlQuery::InitCon());
-            update_record.prepare("UPDATE record SET station = :CALLSIGN"
-                    " WHERE chanid = :CHANID;");
-            while (records_without_station.next())
-            {
-                update_record.bindValue(":CALLSIGN",
-                        records_without_station.value(1));
-                update_record.bindValue(":CHANID",
-                        records_without_station.value(0));
-                if (!update_record.exec())
-                {
-                    MythDB::DBError("Updating record station", update_record);
-                }
-            }
-        }
-    }
 
     if (!query.exec(
             "SELECT cardid, parentid, videodevice, hostname, sourceid "
@@ -585,7 +587,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     print_warnings(cmdline);
 
-    bool runsched = setupTVs(ismaster);
+    if (ismaster)
+        doDatabaseHacks();
+    bool runsched = createTVRecorders(ismaster);
 
     Scheduler *sched = nullptr;
     if (ismaster)
