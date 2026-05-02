@@ -23,6 +23,9 @@
 // MythTV headers
 #include <libmythmetadata/musicmetadata.h>
 #include <libmythbase/mythbaseexp.h>
+#ifndef __cpp_size_t_suffix
+#include <libmythbase/sizetliteral.h>
+#endif
 
 // MythMusic headers
 #include "constants.h"
@@ -259,9 +262,15 @@ class Spectrogram : public VisualBase
     AVTXContext*   m_rdftContext { nullptr };
     av_tx_fn       m_rdft        { nullptr };
 
-    std::array<int,256*6> m_red   {0}; // continuous color spectrum
-    std::array<int,256*6> m_green {0};
-    std::array<int,256*6> m_blue  {0};
+#ifdef __cpp_size_t_suffix
+    std::array<int,256Z*6> m_red   {0}; // continuous color spectrum
+    std::array<int,256Z*6> m_green {0};
+    std::array<int,256Z*6> m_blue  {0};
+#else
+    std::array<int,256_Z*6> m_red   {0}; // continuous color spectrum
+    std::array<int,256_Z*6> m_green {0};
+    std::array<int,256_Z*6> m_blue  {0};
+#endif
     bool           m_binpeak { true }; // peak of bins, else mean
     bool           m_history { true }; // spectrogram? or spectrum
     bool           m_showtext {false}; // freq overlay?
