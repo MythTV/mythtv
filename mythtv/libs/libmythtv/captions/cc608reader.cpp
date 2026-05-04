@@ -368,7 +368,7 @@ void CC608Reader::Update608Text(
         QString("streamIdx:%1 ").arg(streamIdx));
 #endif
     std::vector<CC608Text*>::iterator i;
-    int visible = 0;
+    size_t visible = 0;
 
     m_state[streamIdx].m_output.m_lock.lock();
     if (!m_state[streamIdx].m_output.m_buffers.empty() && (scroll || replace))
@@ -494,7 +494,7 @@ int CC608Reader::NumInputBuffers(bool need_to_lock)
     return ret;
 }
 
-void CC608Reader::AddTextData(unsigned char *buffer, int len,
+void CC608Reader::AddTextData(unsigned char *buffer, size_t len,
                               std::chrono::milliseconds timecode, char type)
 {
     if (m_parent)

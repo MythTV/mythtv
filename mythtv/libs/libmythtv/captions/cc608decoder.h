@@ -67,7 +67,7 @@ class CC608Input
 {
   public:
     virtual ~CC608Input() = default;
-    virtual void AddTextData(unsigned char *buf, int len,
+    virtual void AddTextData(unsigned char *buf, size_t len,
                              std::chrono::milliseconds timecode, char type) = 0;
 };
 
@@ -95,7 +95,7 @@ class CC608Decoder
 
     void FormatCC(std::chrono::milliseconds tc, int code1, int code2);
     void FormatCCField(std::chrono::milliseconds tc, size_t field, int data);
-    bool FalseDup(std::chrono::milliseconds tc, int field, int data);
+    bool FalseDup(std::chrono::milliseconds tc, size_t field, int data);
 
     void DecodeVPS(const unsigned char *buf);
     void DecodeWSS(const unsigned char *buf);
@@ -117,14 +117,14 @@ class CC608Decoder
   private:
     QChar CharCC(int code) const { return m_stdChar[code]; }
     void ResetCC(size_t mode);
-    void BufferCC(size_t mode, int len, int clr);
-    int NewRowCC(size_t mode, int len);
+    void BufferCC(size_t mode, size_t len, int clr);
+    size_t NewRowCC(size_t mode, size_t len);
 
     void FormatTextCode(std::chrono::milliseconds tc, size_t field, size_t mode, size_t len, int b1, int b2);
     void FormatControlCode(std::chrono::milliseconds tc, size_t field, int b1, int b2);
     QString XDSDecodeString(const std::vector<unsigned char>&buf,
                             uint start, uint end) const;
-    bool XDSDecode(int field, int b1, int b2);
+    bool XDSDecode(size_t field, int b1, int b2);
 
     bool XDSPacketParseProgram(const std::vector<unsigned char> &xds_buf,
                                bool future);
