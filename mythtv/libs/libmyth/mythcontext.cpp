@@ -982,8 +982,12 @@ QString MythContext::Impl::TestDBconnection(bool prompt)
             }
             if (m_guiStartup)
             {
-                if (m_guiStartup->m_Exit
-                  || m_guiStartup->m_Setup
+                if (m_guiStartup->m_Exit)
+                {
+                    keep_trying = false;
+                    break;
+                }
+                if (m_guiStartup->m_Setup
                   || m_guiStartup->m_Search
                   || m_guiStartup->m_Retry)
                     break;
