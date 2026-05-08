@@ -44,6 +44,8 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
                     HouseKeeperStartup startup=kHKNormal);
    ~HouseKeeperTask() override = default;
 
+    bool            IsFinished(void) const          { return m_finished;       }
+    void            SetFinished(bool fini)          { m_finished = fini;       }
     bool            CheckRun(const QDateTime& now);
     bool            Run(void);
     bool            ConfirmRun(void) const          { return m_confirm;     }
@@ -71,6 +73,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
   private:
     void            QueryLast(void);
 
+    bool                m_finished {false};
     QString             m_dbTag;
     bool                m_confirm {false};
     HouseKeeperScope    m_scope;
@@ -155,6 +158,7 @@ class MBASE_PUBLIC HouseKeeper : public QObject
    ~HouseKeeper() override;
 
     void RegisterTask(HouseKeeperTask *task);
+    void UnregisterTask(const QString& tag);
     void Start(void);
     void StartThread(void);
     HouseKeeperTask* GetQueuedTask(void);

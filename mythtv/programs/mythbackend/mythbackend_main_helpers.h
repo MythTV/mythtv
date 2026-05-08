@@ -10,7 +10,7 @@ class QString;
 class QSize;
 
 void doDatabaseHacks();
-bool createTVRecorders(bool ismaster);
+bool createTVRecorders(bool ismaster, bool retry = false);
 void cleanup(void);
 int  handle_command(const MythBackendCommandLineParser &cmdline);
 int  connect_to_master(void);

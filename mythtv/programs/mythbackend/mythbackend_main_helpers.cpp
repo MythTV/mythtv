@@ -140,7 +140,7 @@ void doDatabaseHacks()
     }
 }
 
-bool createTVRecorders(bool ismaster)
+bool createTVRecorders(bool ismaster, bool retry)
 {
     QString localhostname = gCoreContext->GetHostName();
 
@@ -166,7 +166,7 @@ bool createTVRecorders(bool ismaster)
         uint    sourceid    = query.value(4).toUInt();
         QString cidmsg      = QString("Card[%1](%2)").arg(cardid).arg(videodevice);
 
-        if (hostname.isEmpty())
+        if (hostname.isEmpty() && !retry)
         {
             LOG(VB_GENERAL, LOG_ERR, cidmsg +
                 " does not have a hostname defined.\n"
@@ -177,11 +177,17 @@ bool createTVRecorders(bool ismaster)
         // Skip all cards that do not have a video source
         if (sourceid == 0)
         {
-            if (parentid == 0)
+            if (parentid == 0 && !retry)
             {
                 LOG(VB_GENERAL, LOG_WARNING, cidmsg +
                     " does not have a video source");
             }
+            continue;
+        }
+
+        if (retry && (TVRec::GetTVRec(cardid) != nullptr))
+        {
+            // We're retrying, so ignore existing encoders
             continue;
         }
 
@@ -253,7 +259,7 @@ bool createTVRecorders(bool ismaster)
         }
     }
 
-    if (gTVList.empty())
+    if (gTVList.empty() && !retry)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "No valid capture cards are defined in the database.");
@@ -642,6 +648,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         gHousekeeping->RegisterTask(new HardwareProfileTask());
  #endif
 #endif
+        gHousekeeping->RegisterTask(new FindEncoders());
 
         gHousekeeping->Start();
     }

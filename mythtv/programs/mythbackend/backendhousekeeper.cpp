@@ -30,7 +30,9 @@
 #include "libmythtv/recordingtypes.h"
 
 // MythBackend
+#include "backendcontext.h"
 #include "backendhousekeeper.h"
+#include "mythbackend_main_helpers.h"
 
 static constexpr int64_t kFourHours {4LL * 60 * 60};
 
@@ -699,4 +701,69 @@ void MythFillDatabaseTask::Terminate(void)
     if (m_msMFD && (m_msMFD->GetStatus() == GENERIC_EXIT_RUNNING))
         // just kill it, the runner thread will handle any necessary cleanup
         m_msMFD->Term(true);
+}
+
+bool FindEncoders::DoRun(void)
+{
+    LOG(VB_GENERAL, LOG_INFO, QString("FindEncoders: run %1").arg(++m_called));
+
+    // Get the number of configured encoders
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.exec("SELECT COUNT(cardid) FROM capturecard "
+                    "WHERE sourceid!=0 and hostname!=\"\""))
+    {
+        MythDB::DBError("Querying Recorders", query);
+        SetFinished(true);
+        return false;
+    }
+    int cardcount {0};
+    if (query.next())
+        cardcount = query.value(0).toInt();
+    if (cardcount == 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("FindEncoders: query yields no cards"));
+        SetFinished(true);
+        return false;
+    }
+
+    // Try scanning for encoders again.
+    if (cardcount != gTVList.size())
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FindEncoders: Have %1 of %2 encoders. Rescanning...")
+            .arg(gTVList.size()).arg(cardcount));
+        createTVRecorders(gCoreContext->IsMasterHost(), true);
+        LOG(VB_GENERAL, LOG_INFO, QString("FindEncoders: Rescan complete"));
+    }
+
+    // Now have all the encoders been found?
+    if (cardcount == gTVList.size())
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FindEncoders: All %1 encoders found.")
+            .arg(cardcount));
+        SetFinished(true);
+        return true;
+    }
+
+    // Backoff on retries
+    std::chrono::minutes newPeriod { 0min };
+    switch (m_called)
+    {
+      case  5: newPeriod = kINTERVAL2; break;
+      case 10: newPeriod = kINTERVAL3; break;
+      case 15: newPeriod = kINTERVAL4; break;
+      case 20: newPeriod = kINTERVAL5; break;
+      default: break;
+    }
+    if (newPeriod != 0min)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("FindEncoders: Changing retry to %1 minutes")
+            .arg(newPeriod.count()));
+        m_period = newPeriod;
+        m_retry = newPeriod;
+    }
+
+    return true;
 }
