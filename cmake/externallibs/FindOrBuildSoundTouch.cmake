@@ -38,6 +38,8 @@ function(find_or_build_soundtouch)
     DOWNLOAD_DIR ${TARBALL_DIR}
     URL https://www.surina.net/soundtouch/${SOUNDTOUCH_PREFIX}.tar.gz
     URL_HASH SHA256=${SOUNDTOUCH_${SOUNDTOUCH_VERSION}_SHA256}
+    PATCH_COMMAND patch -p1 <
+                  ${PROJECT_SOURCE_DIR}/patches/${SOUNDTOUCH_PREFIX}.patch
     CMAKE_ARGS --no-warn-unused-cli ${CMDLINE_ARGS_LIBS} ${PLATFORM_ARGS}
                -DBUILD_SHARED_LIBS:BOOL=ON
     CMAKE_CACHE_ARGS

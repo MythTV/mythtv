@@ -1,0 +1,23 @@
+diff --git a/qtbase/src/corelib/Qt6AndroidMacros.cmake b/qtbase/src/corelib/Qt6AndroidMacros.cmake
+index af87f6a7eb..346592024c 100644
+--- a/qtbase/src/corelib/Qt6AndroidMacros.cmake
++++ b/qtbase/src/corelib/Qt6AndroidMacros.cmake
+@@ -394,7 +394,7 @@ function(qt6_android_generate_deployment_settings target)
+ 
+     # base location of stdlibc++, will be suffixed by androiddeploy qt
+     # Sysroot is set by Android toolchain file and is composed of ANDROID_TOOLCHAIN_ROOT.
+-    set(android_ndk_stdlib_base_path "${CMAKE_SYSROOT}/usr/lib/")
++    set(android_ndk_stdlib_base_path "${CMAKE_ANDROID_NDK_TOOLCHAIN_UNIFIED}/sysroot/usr/lib/")
+     string(APPEND file_contents
+         "   \"stdcpp-path\": \"${android_ndk_stdlib_base_path}\"\n")
+ 
+@@ -620,6 +620,9 @@ function(qt6_android_add_apk_target target)
+             )
+         endif()
+     endif()
++    if(QT_ANDROID_PLATFORM)
++        list(APPEND extra_args "--android-platform" ${QT_ANDROID_PLATFORM})
++    endif()
+ 
+     add_custom_target(${target}_prepare_apk_dir ALL
+         COMMAND ${copy_command}

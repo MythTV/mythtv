@@ -25,7 +25,7 @@ function(find_or_build_taglib)
       PROPERTY MANUALLY_ADDED_DEPENDENCIES)
   endif()
 
-  set(TAGLIB_VERSION "1.13.1")
+  set(TAGLIB_VERSION "2.2.1")
   set(TAGLIB_PREFIX "taglib-${TAGLIB_VERSION}")
   set(TAGLIB_1.12_SHA256
       "7fccd07669a523b07a15bd24c8da1bbb92206cb19e9366c3692af3d79253b703")
@@ -33,6 +33,8 @@ function(find_or_build_taglib)
       "58f08b4db3dc31ed152c04896ee9172d22052bc7ef12888028c01d8b1d60ade0")
   set(TAGLIB_1.13.1_SHA256
       "c8da2b10f1bfec2cd7dbfcd33f4a2338db0765d851a50583d410bacf055cfd0b")
+  set(TAGLIB_2.2.1_SHA256
+      "7e76b5299dcef427c486bffe455098470c8da91cf3ccb9ea804893df57389b5e")
   ExternalProject_Add(
     taglib
     DOWNLOAD_DIR ${TARBALL_DIR}

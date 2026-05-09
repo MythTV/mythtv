@@ -1,0 +1,56 @@
+diff --git a/src/libpcre2-16.sym b/src/libpcre2-16.sym
+index fd5257d..a404f92 100644
+--- a/src/libpcre2-16.sym
++++ b/src/libpcre2-16.sym
+@@ -80,9 +80,6 @@ PCRE2_10.47 {
+     pcre2_substring_list_get_16;
+     pcre2_substring_nametable_scan_16;
+     pcre2_substring_number_from_name_16;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;
+diff --git a/src/libpcre2-32.sym b/src/libpcre2-32.sym
+index d4606c2..d65f784 100644
+--- a/src/libpcre2-32.sym
++++ b/src/libpcre2-32.sym
+@@ -80,9 +80,6 @@ PCRE2_10.47 {
+     pcre2_substring_list_get_32;
+     pcre2_substring_nametable_scan_32;
+     pcre2_substring_number_from_name_32;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;
+diff --git a/src/libpcre2-8.sym b/src/libpcre2-8.sym
+index 368b4e4..7b06ed2 100644
+--- a/src/libpcre2-8.sym
++++ b/src/libpcre2-8.sym
+@@ -80,9 +80,6 @@ PCRE2_10.47 {
+     pcre2_substring_list_get_8;
+     pcre2_substring_nametable_scan_8;
+     pcre2_substring_number_from_name_8;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;
+diff --git a/src/libpcre2-posix.sym b/src/libpcre2-posix.sym
+index 04a56cf..675c4a2 100644
+--- a/src/libpcre2-posix.sym
++++ b/src/libpcre2-posix.sym
+@@ -5,9 +5,6 @@ PCRE2_10.47 {
+     pcre2_regerror;
+     pcre2_regexec;
+     pcre2_regfree;
+-  local:
+-    _fini;
+-    _init;
+ };
+ 
+ # PCRE2_10.48 {} PCRE2_10.47;

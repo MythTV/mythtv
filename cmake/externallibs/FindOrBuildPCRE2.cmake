@@ -25,17 +25,19 @@ function(find_or_build_pcre2)
       PROPERTY MANUALLY_ADDED_DEPENDENCIES)
   endif()
 
-  set(PCRE2_VERSION "10.42")
+  set(PCRE2_VERSION "10.47")
   set(PCRE2_PREFIX "pcre2-${PCRE2_VERSION}")
   set(PCRE2_10.42_SHA256
       "8d36cd8cb6ea2a4c2bb358ff6411b0c788633a2a45dabbf1aeb4b701d1b5e840")
+  set(PCRE2_10.47_SHA256
+      "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7")
   ExternalProject_Add(
     libpcre2
     DOWNLOAD_DIR ${TARBALL_DIR}
     URL https://github.com/PCRE2Project/pcre2/releases/download/${PCRE2_PREFIX}/${PCRE2_PREFIX}.tar.bz2
     URL_HASH SHA256=${PCRE2_${PCRE2_VERSION}_SHA256}
-    # PATCH_COMMAND patch -p1 <
-    # ${PROJECT_SOURCE_DIR}/patches/${PCRE2_PREFIX}.patch
+    PATCH_COMMAND patch -p1 <
+                  ${PROJECT_SOURCE_DIR}/patches/${PCRE2_PREFIX}.patch
     CMAKE_ARGS --no-warn-unused-cli
                ${CMDLINE_ARGS_LIBS}
                ${PLATFORM_ARGS}

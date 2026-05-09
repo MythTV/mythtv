@@ -1,3 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f377c42..8c5c8c0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8.12)
++cmake_minimum_required(VERSION 3.20)
+ project(vorbis)
+ 
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 diff --git a/win32/vorbis.def b/win32/vorbis.def
 index 884f8f0..0af396a 100644
 --- a/win32/vorbis.def

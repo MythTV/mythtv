@@ -110,11 +110,24 @@ function(find_or_build_qt)
   # Ubuntu Rolling Rhino
   set(QT_6.8.2_SHA256
       "659d8bb5931afac9ed5d89a78e868e6bd00465a58ab566e2123db02d674be559")
+  # Fedora 41
+  set(QT_6.8.3_SHA256
+      "cdd3a69967208276bb01af7ace7dba0ba53e679f886a4cbe624225c60fb73f2c")
   set(QT_6.9.0_SHA256
       "4f61e50551d0004a513fefbdb0a410595d94812a48600646fb7341ea0d17e1cb")
-  # Fedora 43/Rawhide
   set(QT_6.10.0_SHA256
       "81895fb038a9c3d6c6f698d7611339a189eb45c3d91746c7789b0b77a5981aa3")
+  set(QT_6.10.1_SHA256
+      "0ed08b079719394303cd2054b66b2dc0c5895ceeb88fb6131c18991c980bf00f")
+  # Fedora 42
+  set(QT_6.10.2_SHA256
+      "c3df0f0e421130cc52ed81cb712358804471ce9bd2a41d97828f9f5b1bf7fed2")
+  # Fedora 43/44
+  set(QT_6.10.3_SHA256
+      "cbc81e726b0ff3c0cdb0219bf74545e91cec013c4a8503c20f93f83d73dff5d2")
+  # Fedora Rawhide
+  set(QT_6.11.0_SHA256
+      "acf3b3db04c9e5d0820e8324b097320388954c297cee83d2bd698789234f68a4")
 
   # Qt6 requires that the version of the host tools match the version being
   # built.  What are the fallback target versions to build if there isn't an
@@ -128,6 +141,7 @@ function(find_or_build_qt)
   set(QT_MAP_6.8 "6.8.1")
   set(QT_MAP_6.9 "6.9.0")
   set(QT_MAP_6.10 "6.10.0")
+  set(QT_MAP_6.11 "6.11.0")
 
   # Grab the host version directly. so as not to pollute our cross-build setup.
   file(STRINGS
@@ -159,6 +173,11 @@ function(find_or_build_qt)
     if(ANDROID AND CMAKE_SYSTEM_VERSION LESS 26)
       message(FATAL_ERROR "Qt 6.10 requires a minimum of Android 26 (found ${CMAKE_SYSTEM_VERSION}).")
     endif()
+  endif()
+
+  # Qt 6.11 on android needs an extra argument to disable a new subsystem
+  if (QT_VERSION VERSION_GREATER_EQUAL 6.11)
+    list(APPEND QT6_BUILD_ARGS ${QT6_BUILD_ARGS} -DBUILD_qtcanvaspainter=OFF)
   endif()
 
   # Qt6 cross compiling requires that a native version of Qt6 be installed on
@@ -271,6 +290,8 @@ function(find_or_build_qt)
        -DBUILD_qtwebengine=OFF
        -DBUILD_qtwebsockets=OFF
        -DBUILD_qtwebview=OFF
+
+       ${QT6_BUILD_ARGS}
 
        -DMySQL_INCLUDE_DIR=${MARIADB_INCLUDE_DIR}
        -DMySQL_LIBRARY=${MARIADB_LIBRARY}

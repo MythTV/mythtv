@@ -26,12 +26,14 @@ function(find_or_build_freetype)
       PROPERTY MANUALLY_ADDED_DEPENDENCIES)
   endif()
 
-  set(FREETYPE_VERSION "2.13.2")
+  set(FREETYPE_VERSION "2.14.3")
   set(FREETYPE_PREFIX "freetype-${FREETYPE_VERSION}")
   set(FREETYPE_2.12.1_SHA256
       "4766f20157cc4cf0cd292f80bf917f92d1c439b243ac3018debf6b9140c41a7f")
   set(FREETYPE_2.13.2_SHA256
       "12991c4e55c506dd7f9b765933e62fd2be2e06d421505d7950a132e4f1bb484d")
+  set(FREETYPE_2.14.3_SHA256
+      "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f")
   ExternalProject_Add(
     freetype
     DOWNLOAD_DIR ${TARBALL_DIR}
