@@ -376,6 +376,29 @@ static QString normalizeString(const QString& s)
 ///                    ESPN                    ///
 //////////////////////////////////////////////////
 
+// The URL to get the names of all sports:
+// https://sports.core.api.espn.com/v2/sports/
+//
+// The list as of 2026-05-12 is this:
+//
+//     australian-football
+//     baseball
+//     basketball
+//     cricket
+//     field-hockey
+//     football
+//     golf
+//     hockey
+//     lacrosse
+//     mma
+//     racing
+//     rugby
+//     rugby-league
+//     soccer
+//     tennis
+//     volleyball
+//     water-polo
+//
 // The URL to get the names of all the leagues in a given sport:
 // https://site.api.espn.com/apis/site/v2/leagues/dropdown?sport=${sport}&limit=100
 //
