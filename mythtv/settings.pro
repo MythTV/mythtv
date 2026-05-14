@@ -9,6 +9,12 @@ CONFIG += no_qt_rpath
 QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
 INCLUDEPATH += $$[QT_INSTALL_HEADERS]
 
+# On Qt5 builds, bump the minimum OSX version number
+# up to one that fully supports C++20.
+lessThan(QT_MAJOR_VERSION, 6) {
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 13.3
+}
+
 defineReplace(avLibName) {
         NAME = $$1
 
