@@ -4,7 +4,9 @@
 
 // MythTV
 #include "libmythbase/mythlogging.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 #include "libmythmetadata/imagemetadata.h"
 #include "libmythui/mythmainwindow.h"
 
@@ -610,7 +612,11 @@ void SlideBuffer::Initialise(MythUIImage &image)
 {
     // Require at least 4 slides: 2 for transitions, 1 to handle further requests
     // and 1 to prevent solitary slide from being used whilst it is loading
+#ifdef __cpp_size_t_suffix
+    size_t size = std::max(SLIDE_BUFFER_SIZE, 4UZ);
+#else
     size_t size = std::max(SLIDE_BUFFER_SIZE, 4_UZ);
+#endif
 
     // Fill buffer with slides cloned from the XML image widget
 

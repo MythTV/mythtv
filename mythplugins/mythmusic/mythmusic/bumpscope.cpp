@@ -17,7 +17,9 @@
 #include <libmythbase/compat.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/mythrandom.h>
+#ifndef __cpp_size_t_suffix
 #include <libmythbase/sizetliteral.h>
+#endif
 
 // Mythmusic Headers
 #include "bumpscope.h"
@@ -70,9 +72,15 @@ void BumpScope::resize(const QSize &newsize)
     m_x = m_width / 2;
     m_y = m_height;
 
+#ifdef __cpp_size_t_suffix
+    m_phongDat.resize(m_phongRad * 2UZ);
+    for (auto & dat : m_phongDat)
+        dat.resize(m_phongRad * 2UZ);
+#else
     m_phongDat.resize(m_phongRad * 2_UZ);
     for (auto & dat : m_phongDat)
         dat.resize(m_phongRad * 2_UZ);
+#endif
 
     generate_phongdat();
     generate_cmap(m_color);

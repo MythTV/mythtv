@@ -25,7 +25,9 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdbcon.h"
 #include "libmythbase/mythlogging.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 
@@ -670,7 +672,11 @@ void AudioTestThread::run()
 
     if (isOutputOpen())
     {
+#ifdef __cpp_size_t_suffix
+        char *frames = new (std::align_val_t(16)) char[m_channels * 1024UZ * sizeof(int32_t)];
+#else
         char *frames = new (std::align_val_t(16)) char[m_channels * 1024_UZ * sizeof(int32_t)];
+#endif
 
         m_audioOutput->Pause(false);
 

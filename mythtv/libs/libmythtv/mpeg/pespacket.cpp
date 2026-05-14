@@ -1,7 +1,9 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include "libmythbase/mythlogging.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 #include "pespacket.h"
 #include "mpegtables.h"
 
@@ -254,7 +256,11 @@ float SequenceHeader::aspect(bool mpeg1) const
 
 #if !CONFIG_VALGRIND
 static constexpr size_t BLOCKS188 { 512 };
+#ifdef __cpp_size_t_suffix
+using block188 = std::array<uint8_t, 188UZ>;
+#else
 using block188 = std::array<uint8_t, 188_UZ>;
+#endif
 class groupof188s {
   public:
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,modernize-use-equals-default)
@@ -264,7 +270,11 @@ class groupof188s {
 };
 
 static constexpr size_t BLOCKS4096 { 128 };
+#ifdef __cpp_size_t_suffix
+using block4096 = std::array<uint8_t, 4096UZ>;
+#else
 using block4096 = std::array<uint8_t, 4096_UZ>;
+#endif
 class groupof4096s {
   public:
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,modernize-use-equals-default)

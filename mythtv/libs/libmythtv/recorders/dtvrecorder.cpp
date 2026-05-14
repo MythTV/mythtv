@@ -20,7 +20,9 @@
 
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
+#ifndef __cpp_size_t_suffix
 #include "libmythbase/sizetliteral.h"
+#endif
 
 #include "bytereader.h"
 #include "dtvrecorder.h"
@@ -54,7 +56,11 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     m_h2645Parser(reinterpret_cast<H2645Parser *>(new AVCParser))
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
+#ifdef __cpp_size_t_suffix
+    m_payloadBuffer.reserve(TSPacket::kSize * (50UZ + 1));
+#else
     m_payloadBuffer.reserve(TSPacket::kSize * (50_UZ + 1));
+#endif
 
     DTVRecorder::ResetForNewFile();
 
