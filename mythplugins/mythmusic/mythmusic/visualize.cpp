@@ -1220,7 +1220,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
         float right = 0;
         float tmp = 0;
         int count = 0;
-        for (auto j = prev + 1; j <= index; j++) // log scale!
+        for (ptrdiff_t j = prev + 1; j <= index; j++) // log scale!
         {    // for the freqency bins of this pixel, find peak or mean
             tmp = sq(m_dftL[2 * j]) + sq(m_dftL[(2 * j) + 1]);
             left  = m_binpeak ? std::max(tmp, left) : left + tmp;
@@ -1537,7 +1537,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
         float magL = 0;         // modified from Spectrogram
         float magR = 0;
         float tmp = 0;
-        for (auto j = prev + 1; j <= index; j++) // log scale!
+        for (ptrdiff_t j = prev + 1; j <= index; j++) // log scale!
         {    // for the freqency bins of this pixel, find peak or mean
             tmp = sq(m_dftL[2 * j]) + sq(m_dftL[(2 * j) + 1]);
             magL  = tmp > magL  ? tmp : magL;

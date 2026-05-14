@@ -81,15 +81,15 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     // fill translation table
     for (uint8_t i = 0; i < 128; i++)
         m_stdChar[i] = QChar(i);
-    m_stdChar[42]  = QLatin1Char(0xE1); // á
-    m_stdChar[92]  = QLatin1Char(0xE9); // é
-    m_stdChar[94]  = QLatin1Char(0xED); // í
-    m_stdChar[95]  = QLatin1Char(0xF3); // ó
-    m_stdChar[96]  = QLatin1Char(0xFA); // ú
-    m_stdChar[123] = QLatin1Char(0xE7); // ç
-    m_stdChar[124] = QLatin1Char(0xF7); // ÷
-    m_stdChar[125] = QLatin1Char(0xD1); // Ñ
-    m_stdChar[126] = QLatin1Char(0xF1); // ñ
+    m_stdChar[42]  = QChar(0xE1);       // á
+    m_stdChar[92]  = QChar(0xE9);       // é
+    m_stdChar[94]  = QChar(0xED);       // í
+    m_stdChar[95]  = QChar(0xF3);       // ó
+    m_stdChar[96]  = QChar(0xFA);       // ú
+    m_stdChar[123] = QChar(0xE7);       // ç
+    m_stdChar[124] = QChar(0xF7);       // ÷
+    m_stdChar[125] = QChar(0xD1);       // Ñ
+    m_stdChar[126] = QChar(0xF1);       // ñ
     m_stdChar[127] = QChar(0x2588);     // full block
 
     init_xds_program_type(m_xdsProgramTypeString);
@@ -121,34 +121,34 @@ static const std::array<const int,16> rowdata =
 
 static const std::array<const QChar,16> specialchar =
 {
-    QLatin1Char(0xAE), QLatin1Char(0xB0), QLatin1Char(0xBD), QLatin1Char(0xBF), // ®°½¿
-    QChar(0x2122),     QLatin1Char(0xA2), QLatin1Char(0xA3), QChar(0x266A),     // ™¢£♪
-    QLatin1Char(0xE0), QLatin1Char(' '),  QLatin1Char(0xE8), QLatin1Char(0xE2), // à èâ
-    QLatin1Char(0xEA), QLatin1Char(0xEE), QLatin1Char(0xF4), QLatin1Char(0xFB)  // êîôû
+    QChar(0xAE),   QChar(0xB0),   QChar(0xBD),   QChar(0xBF),   // ®°½¿
+    QChar(0x2122), QChar(0xA2),   QChar(0xA3),   QChar(0x266A), // ™¢£♪
+    QChar(0xE0),   QChar(' '),    QChar(0xE8),   QChar(0xE2),   // à èâ
+    QChar(0xEA),   QChar(0xEE),   QChar(0xF4),   QChar(0xFB)    // êîôû
 };
 
 static const std::array<const QChar,32> extendedchar2 =
 {
-    QLatin1Char(0xC1), QLatin1Char(0xC9),  QLatin1Char(0xD3), QLatin1Char(0xDA), // ÁÉÓÚ
-    QLatin1Char(0xDC), QLatin1Char(0xFC),  QLatin1Char('`'),  QLatin1Char(0xA1), // Üü`¡
-    QLatin1Char('*'),  QLatin1Char('\''),  QChar(0x2014),     QLatin1Char(0xA9), // *'-©
-    QChar(0x2120),     QLatin1Char(0xB7),  QChar(0x201C),     QChar(0x201D),     // ℠·“”
-    QLatin1Char(0xC0), QLatin1Char(0xC2),  QLatin1Char(0xC7), QLatin1Char(0xC8), // ÀÂÇÈ
-    QLatin1Char(0xCA), QLatin1Char(0xCB),  QLatin1Char(0xEB), QLatin1Char(0xCE), // ÊËëÎ
-    QLatin1Char(0xCF), QLatin1Char(0xEF),  QLatin1Char(0xD4), QLatin1Char(0xD9), // ÏïÔÙ
-    QLatin1Char(0xF9), QLatin1Char(0xDB),  QLatin1Char(0xAB), QLatin1Char(0xBB)  // ùÛ«»
+    QChar(0xC1),   QChar(0xC9),   QChar(0xD3),   QChar(0xDA),   // ÁÉÓÚ
+    QChar(0xDC),   QChar(0xFC),   QChar('`'),    QChar(0xA1),   // Üü`¡
+    QChar('*'),    QChar('\''),   QChar(0x2014), QChar(0xA9),   // *'-©
+    QChar(0x2120), QChar(0xB7),   QChar(0x201C), QChar(0x201D), // ℠·“”
+    QChar(0xC0),   QChar(0xC2),   QChar(0xC7),   QChar(0xC8),   // ÀÂÇÈ
+    QChar(0xCA),   QChar(0xCB),   QChar(0xEB),   QChar(0xCE),   // ÊËëÎ
+    QChar(0xCF),   QChar(0xEF),   QChar(0xD4),   QChar(0xD9),   // ÏïÔÙ
+    QChar(0xF9),   QChar(0xDB),   QChar(0xAB),   QChar(0xBB)    // ùÛ«»
 };
 
 static const std::array<const QChar,32> extendedchar3 =
 {
-    QLatin1Char(0xC3), QLatin1Char(0xE3), QLatin1Char(0xCD), QLatin1Char(0xCC), // ÃãÍÌ
-    QLatin1Char(0xEC), QLatin1Char(0xD2), QLatin1Char(0xF2), QLatin1Char(0xD5), // ìÒòÕ
-    QLatin1Char(0xF5), QLatin1Char('{'),  QLatin1Char('}'),  QLatin1Char('\\'), // õ{}
-    QLatin1Char('^'),  QLatin1Char('_'),  QLatin1Char(0xA6), QLatin1Char('~'),  // ^_¦~
-    QLatin1Char(0xC4), QLatin1Char(0xE4), QLatin1Char(0xD6), QLatin1Char(0xF6), // ÄäÖö
-    QLatin1Char(0xDF), QLatin1Char(0xA5), QLatin1Char(0xA4), QLatin1Char('|'),  // ß¥¤|
-    QLatin1Char(0xC5), QLatin1Char(0xE5), QLatin1Char(0xD8), QLatin1Char(0xF8), // ÅåØø
-    QChar(0x250C),     QChar(0x2510),     QChar(0x2514),     QChar(0x2518)      // ┌┐└┘
+    QChar(0xC3),   QChar(0xE3),   QChar(0xCD),   QChar(0xCC),   // ÃãÍÌ
+    QChar(0xEC),   QChar(0xD2),   QChar(0xF2),   QChar(0xD5),   // ìÒòÕ
+    QChar(0xF5),   QChar('{'),    QChar('}'),    QChar('\\'),   // õ{}
+    QChar('^'),    QChar('_'),    QChar(0xA6),   QChar('~'),    // ^_¦~
+    QChar(0xC4),   QChar(0xE4),   QChar(0xD6),   QChar(0xF6),   // ÄäÖö
+    QChar(0xDF),   QChar(0xA5),   QChar(0xA4),   QChar('|'),    // ß¥¤|
+    QChar(0xC5),   QChar(0xE5),   QChar(0xD8),   QChar(0xF8),   // ÅåØø
+    QChar(0x250C), QChar(0x2510), QChar(0x2514), QChar(0x2518)  // ┌┐└┘
 };
 
 void CC608Decoder::FormatTextCode(std::chrono::milliseconds tc, size_t field, size_t mode, size_t len, int b1, int b2)
@@ -603,7 +603,7 @@ void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, size_t field, int
     m_lastTc[field] = tc;
 }
 
-bool CC608Decoder::FalseDup(std::chrono::milliseconds tc, int field, int data)
+bool CC608Decoder::FalseDup(std::chrono::milliseconds tc, size_t field, int data)
 {
     int b1 = data & 0x7f;
     int b2 = (data >> 8) & 0x7f;
@@ -728,7 +728,7 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
     return ret;
 }
 
-void CC608Decoder::BufferCC(size_t mode, int len, int clr)
+void CC608Decoder::BufferCC(size_t mode, size_t len, int clr)
 {
     QByteArray tmpbuf;
     if (len)
@@ -796,7 +796,7 @@ void CC608Decoder::BufferCC(size_t mode, int len, int clr)
         m_lastClr[mode] = 0ms;
 }
 
-int CC608Decoder::NewRowCC(size_t mode, int len)
+size_t CC608Decoder::NewRowCC(size_t mode, size_t len)
 {
     if (m_style[mode] == CC_STYLE_ROLLUP)
     {
@@ -898,12 +898,12 @@ int CC608Decoder::NewRowCC(size_t mode, int len)
 }
 
 
-static bool IsPrintable(char c)
+static bool IsPrintable(uint8_t c)
 {
     return ((c) & 0x7F) >= 0x20 && ((c) & 0x7F) <= 0x7E;
 }
 
-static char Printable(char c)
+static int8_t Printable(uint8_t c)
 {
     return IsPrintable(c) ? ((c) & 0x7F) : '.';
 }
@@ -1188,7 +1188,7 @@ static std::array<const int,16> b1_to_service
   -1, // 0xF
 };
 
-bool CC608Decoder::XDSDecode([[maybe_unused]] int field, int b1, int b2)
+bool CC608Decoder::XDSDecode([[maybe_unused]] size_t field, int b1, int b2)
 {
     if (field == 0)
         return false; // XDS is only on second field

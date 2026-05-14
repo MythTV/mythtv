@@ -34,7 +34,7 @@
 
 static int mpeg2_accels = 0;
 
-static size_t BUFFER_SIZE = 1194 * 1024;
+static size_t BUFFER_SIZE = (size_t)1194 * 1024;
 
 const mpeg2_info_t * mpeg2_info (mpeg2dec_t * mpeg2dec)
 {

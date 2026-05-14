@@ -28,7 +28,7 @@ class CC608Text
 struct TextContainer
 {
     std::chrono::milliseconds timecode;
-    int len;
+    size_t len;
     unsigned char *buffer;
     char type;
 };
@@ -73,7 +73,7 @@ class CC608StateTracker
 
 class MythPlayer;
 
-using CC608WriteFn = void (*) (void *, unsigned char *, int, std::chrono::milliseconds, int);
+using CC608WriteFn = void (*) (void *, unsigned char *, size_t, std::chrono::milliseconds, int);
 
 class MTV_PUBLIC CC608Reader : public CC608Input
 {
@@ -88,7 +88,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
     CC608Buffer* GetOutputText(bool &changed);
     void SetMode(int mode);
     void ClearBuffers(bool input, bool output, int outputStreamIdx = -1);
-    void AddTextData(unsigned char *buf, int len,
+    void AddTextData(unsigned char *buf, size_t len,
                      std::chrono::milliseconds timecode, char type) override; // CC608Input
     void TranscodeWriteText(CC608WriteFn func, void * ptr);
 
@@ -107,7 +107,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
     int               m_readPosition  {0};
     int               m_writePosition {0};
     QMutex            m_inputBufLock;
-    int               m_maxTextSize   {0};
+    size_t            m_maxTextSize   {0};
     std::array<TextContainer,MAXTBUFFER+1> m_inputBuffers {};
     int               m_ccMode        {CC_CC1};
     int               m_ccPageNum     {0x888};
