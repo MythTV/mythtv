@@ -2189,8 +2189,8 @@ struct huff2_parts {
 
 const std::array<const huff2_parts,2> huff2_tables
 {{
-        {Table128, Huff2Lookup128, 3, 12},
-        {Table255, Huff2Lookup256, 2, 14}
+        {.table=Table128, .lookup=Huff2Lookup128, .min_size=3, .max_size=12},
+        {.table=Table255, .lookup=Huff2Lookup256, .min_size=2, .max_size=14}
 }};
 
 

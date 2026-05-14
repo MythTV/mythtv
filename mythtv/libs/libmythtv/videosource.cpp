@@ -420,9 +420,10 @@ class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
     void setValueMs (std::chrono::milliseconds newValue)
         { setValue(newValue.count()); }
     // Handle non-integer seconds
-    template<typename T, typename = std::enable_if_t<!std::is_integral<T>()>>
+    template<typename T>
     void setValueMs (std::chrono::duration<T> newSecs)
-        { setValueMs(duration_cast<std::chrono::milliseconds>(newSecs)); }
+    requires (!std::is_integral<T>())
+    { setValueMs(duration_cast<std::chrono::milliseconds>(newSecs)); }
 };
 
 class CaptureCardTextEditSetting : public MythUITextEditSetting
@@ -1105,11 +1106,13 @@ class SignalTimeout : public CaptureCardSpinBoxSetting
                         "a signal when scanning for channels."));
     };
     // Handle non-integer seconds
-    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
-    SignalTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
+    template<typename T>
+    SignalTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs)
+        requires (std::is_floating_point_v<T>) :
         SignalTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
-    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
-    SignalTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
+    template<typename T>
+    SignalTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs)
+        requires (std::is_floating_point_v<T>) :
         SignalTimeout(parent,
                       duration_cast<std::chrono::milliseconds>(value),
                       duration_cast<std::chrono::milliseconds>(min_secs)) {};
@@ -1131,11 +1134,13 @@ class ChannelTimeout : public CaptureCardSpinBoxSetting
                         "exceeded, the recording will be marked as failed."));
     };
     // Handle non-integer seconds
-    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
-    ChannelTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
+    template<typename T>
+    ChannelTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs)
+        requires (std::is_floating_point_v<T>) :
         ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
-    template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>> >
-    ChannelTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
+    template<typename T>
+    ChannelTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs)
+        requires (std::is_floating_point_v<T>) :
         ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
 };
 
@@ -1205,8 +1210,15 @@ class DVBCardNum : public CaptureCardComboBoxSetting
 
         // Add current if needed
         if (!current.isEmpty() &&
-            (std::find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+#ifdef __cpp_lib_ranges_contains
+            !std::ranges::contains(sdevs, current)
+#else
+            (std::ranges::find(sdevs, current) == sdevs.end())
+#endif
+            )
         {
+            // QList doesn't always play well with std::ranges
+            // NOLINTNEXTLINE(modernize-use-ranges)
             std::stable_sort(sdevs.begin(), sdevs.end());
         }
 
@@ -1216,7 +1228,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
         QString sel = current;
         for (const QString& dev : std::as_const(sdevs))
         {
-            in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
+            in_use[dev] = db.contains(dev);
             if (sel.isEmpty() && !in_use[dev])
                 sel = dev;
         }
@@ -1932,9 +1944,10 @@ class ASIDevice : public CaptureCardComboBoxSetting
         QStringList sdevs = CardUtil::ProbeVideoDevices("ASI");
 
         // Add current if needed
-        if (!current.isEmpty() &&
-            (std::find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+        if (!current.isEmpty() && !sdevs.contains(current))
         {
+            // QList doesn't always play well with std::ranges
+            // NOLINTNEXTLINE(modernize-use-ranges)
             std::stable_sort(sdevs.begin(), sdevs.end());
         }
 
@@ -1948,7 +1961,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         QString sel = current;
         for (const QString& dev : std::as_const(sdevs))
         {
-            in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
+            in_use[dev] = db.contains(dev);
             if (sel.isEmpty() && !in_use[dev])
                 sel = dev;
         }

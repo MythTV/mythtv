@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // MythTV
 #include "mythlogging.h"
 #include "unziputil.h"
@@ -55,7 +58,7 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
 
     // Sort the list
     auto comp = [](const MimePair& First, const MimePair& Second) { return First.first > Second.first; };
-    std::sort(weightings.begin(), weightings.end(), comp);
+    std::ranges::sort(weightings, comp);
 
     // Build the final result. This will pass through invalid types - which should
     // be handled by the consumer (e.g. wildcard specifiers are not handled).

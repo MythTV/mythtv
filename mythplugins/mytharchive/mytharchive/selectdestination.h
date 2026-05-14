@@ -47,7 +47,7 @@ class SelectDestination : public MythScreenType
 
     bool               m_nativeMode;
 
-    ArchiveDestination m_archiveDestination  {AD_FILE, nullptr, nullptr, 0LL};
+    ArchiveDestination m_archiveDestination  { .type=AD_FILE };
     int                m_freeSpace           {0};
 
     MythUIButton      *m_nextButton          {nullptr};

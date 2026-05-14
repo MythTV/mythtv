@@ -390,7 +390,7 @@ class HLSSegment
         }
         else
         {
-            std::copy(IV.cbegin(), IV.cend(), iv.begin());
+            std::ranges::copy(std::as_const(IV), iv.begin());
         }
 
         int aeslen = m_data.size() & ~0xf;
@@ -901,7 +901,7 @@ class HLSStream
 #endif
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
-        std::copy(ba.cbegin(), ba.cend(), m_aesIv.begin());
+        std::ranges::copy(std::as_const(ba), m_aesIv.begin());
         m_ivloaded = true;
         return true;
     }
@@ -2651,6 +2651,8 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, std::chrono::milliseconds
 
     /* HLS standard doesn't provide any guaranty about streams
      being sorted by bitrate, so we sort them, higher bitrate being first */
+    // QList doesn't play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     std::sort(m_streams.begin(), m_streams.end(), HLSStream::IsGreater);
 
     // if we want as close to live. We should be selecting a further segment

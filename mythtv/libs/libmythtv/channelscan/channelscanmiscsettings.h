@@ -231,15 +231,42 @@ class ScanTransponder: public TransMythUIComboBoxSetting
         addSelection("(Select Satellite)", "Select", true);
 
         // Satellite tuning data
-        m_tdm["1 TH"] = { "1 TH", "Thor 5/6/7  0.8W", "10872000", "h", "25000000", "8PSK", "DVB-S2", "3/4" };
-        m_tdm["2 E7"] = { "2 E7", "Eutelsat    7.0E", "10721000", "h", "22000000", "QPSK", "DVB-S",  "3/4" };
-        m_tdm["3 HB"] = { "3 HB", "Hotbird    13.0E", "12015000", "h", "27500000", "8PSK", "DVB-S2", "3/4" };
-        m_tdm["4 A1"] = { "4 A1", "Astra-1    19.2E", "11229000", "v", "22000000", "8PSK", "DVB-S2", "2/3" };
-        m_tdm["5 A3"] = { "5 A3", "Astra-3    23.5E", "12031500", "h", "27500000", "QPSK", "DVB-S2", "auto"};
-        m_tdm["6 A2"] = { "6 A2", "Astra-2    28.2E", "10773000", "h", "23000000", "8PSK", "DVB-S2", "3/4" };
-        m_tdm["7 T3"] = { "7 T3", "Turksat-3A 42.0E", "12610000", "h", "20830000", "QPSK", "DVB-S",  "3/4" };
-        m_tdm["8 T4"] = { "8 T4", "Turksat-4A 42.0E", "11916000", "v", "30000000", "QPSK", "DVB-S",  "3/4" };
-        m_tdm["9 T8"] = { "9 T8", "Turksat-8K 42.0E", "12605000", "v", "34285000","16APSK","DVB-S2", "2/3" };
+        m_tdm["1 TH"] = { .name="1 TH",           .fullname="Thor 5/6/7  0.8W",
+                          .frequency="10872000",  .polarity="h",
+                          .symbolrate="25000000", .modulation="8PSK",
+                          .modSys="DVB-S2",       .fec="3/4" };
+        m_tdm["2 E7"] = { .name="2 E7",           .fullname="Eutelsat    7.0E",
+                          .frequency="10721000",  .polarity="h",
+                          .symbolrate="22000000", .modulation="QPSK",
+                          .modSys="DVB-S",        .fec="3/4" };
+        m_tdm["3 HB"] = { .name="3 HB",           .fullname="Hotbird    13.0E",
+                          .frequency="12015000",  .polarity="h",
+                          .symbolrate="27500000", .modulation="8PSK",
+                          .modSys="DVB-S2",       .fec="3/4" };
+        m_tdm["4 A1"] = { .name="4 A1",           .fullname="Astra-1    19.2E",
+                          .frequency="11229000",  .polarity="v",
+                          .symbolrate="22000000", .modulation="8PSK",
+                          .modSys="DVB-S2",       .fec="2/3" };
+        m_tdm["5 A3"] = { .name="5 A3",           .fullname="Astra-3    23.5E",
+                          .frequency="12031500",  .polarity="h",
+                          .symbolrate="27500000", .modulation="QPSK",
+                          .modSys="DVB-S2",       .fec="auto"};
+        m_tdm["6 A2"] = { .name="6 A2",           .fullname="Astra-2    28.2E",
+                          .frequency="10773000",  .polarity="h",
+                          .symbolrate="23000000", .modulation="8PSK",
+                          .modSys="DVB-S2",       .fec="3/4" };
+        m_tdm["7 T3"] = { .name="7 T3",           .fullname="Turksat-3A 42.0E",
+                          .frequency="12610000",  .polarity="h",
+                          .symbolrate="20830000", .modulation="QPSK",
+                          .modSys="DVB-S",        .fec="3/4" };
+        m_tdm["8 T4"] = { .name="8 T4",           .fullname="Turksat-4A 42.0E",
+                          .frequency="11916000",  .polarity="v",
+                          .symbolrate="30000000", .modulation="QPSK",
+                          .modSys="DVB-S",        .fec="3/4" };
+        m_tdm["9 T8"] = { .name="9 T8",           .fullname="Turksat-8K 42.0E",
+                          .frequency="12605000",  .polarity="v",
+                          .symbolrate="34285000", .modulation="16APSK",
+                          .modSys="DVB-S2",       .fec="2/3" };
 
         for (auto &td: m_tdm)
         {

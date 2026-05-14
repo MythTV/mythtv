@@ -4465,7 +4465,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
     }
 
     // Return the results in livetvorder.
-    stable_sort(freeinputs.begin(), freeinputs.end(), comp_livetvorder);
+    std::ranges::stable_sort(freeinputs, comp_livetvorder);
     QStringList strlist;
     for (auto & input : freeinputs)
     {
@@ -7818,7 +7818,7 @@ PlaybackSock *MainServer::GetMediaServerByHostname(const QString &hostname)
 /// Warning you must hold a sockListLock lock before calling this
 PlaybackSock *MainServer::GetPlaybackBySock(MythSocket *sock)
 {
-    auto it = std::find_if(m_playbackList.cbegin(), m_playbackList.cend(),
+    auto it = std::ranges::find_if(m_playbackList,
                            [sock](auto & pbs)
                                { return sock == pbs->getSocket(); });
     return (it != m_playbackList.cend()) ? *it : nullptr;

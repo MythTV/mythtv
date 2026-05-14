@@ -13,6 +13,7 @@
 #include "xmlSerializer.h"
 #include "libmythbase/mythdate.h"
 
+#include <algorithm>
 #include <utility>
 
 #include <QMetaClassInfo>
@@ -364,7 +365,7 @@ QString XmlSerializer::FindOptionValue( const QStringList &sOptions, const QStri
     QString sKey = sName + "=";
 
     auto hasKey = [&sKey](const QString& o) { return o.startsWith( sKey ); };
-    auto it = std::find_if(sOptions.cbegin(), sOptions.cend(), hasKey);
+    auto it = std::ranges::find_if(std::as_const(sOptions), hasKey);
     if (it != sOptions.cend())
         return (*it).mid( sKey.length() );
 

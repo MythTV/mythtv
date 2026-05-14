@@ -152,6 +152,8 @@ bool MythDVDStream::OpenFile(const QString &Filename, std::chrono::milliseconds 
             }
         }
 
+        // QList doesn't play well with std::ranges
+        // NOLINTNEXTLINE(modernize-use-ranges)
         std::sort(m_blocks.begin(), m_blocks.end());
 
         // Open the root menu so that CSS keys are generated now
@@ -189,6 +191,8 @@ int MythDVDStream::SafeRead(void *Buffer, uint Size)
     int ret = 0;
 
     // Are any blocks in the range encrypted?
+    // QList doesn't play well with std::ranges
+    // NOLINTNEXTLINE(modernize-use-ranges)
     auto it = std::lower_bound(m_blocks.begin(), m_blocks.end(), BlockRange(m_pos, block, -1));
     uint32_t b {0};
     if (it == m_blocks.end())

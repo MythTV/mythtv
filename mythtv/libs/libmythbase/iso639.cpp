@@ -3,9 +3,14 @@
 
 #include "iso639.h"
 
-#include "mythcorecontext.h"
+// C++ headers
+#include <algorithm>
 
+// Qt
 #include <QStringList>
+
+// MythTV
+#include "mythcorecontext.h"
 
 QMap<int, QString>    iso639_key_to_english_name;
 static QMap<int, int> s_iso639_key2_to_key3;
@@ -58,7 +63,7 @@ std::vector<int> iso639_get_language_key_list(void)
     if (s_language_keys.empty())
     {
         const QStringList list = iso639_get_language_list();
-        std::transform(list.cbegin(), list.cend(),
+        std::ranges::transform(std::as_const(list),
                        std::back_inserter(s_language_keys),
                        [](const QString &str) -> int {return iso639_str3_to_key(str);});
     }

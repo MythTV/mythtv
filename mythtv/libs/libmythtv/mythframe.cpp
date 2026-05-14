@@ -1,6 +1,10 @@
+// C++ headers
+#include <algorithm>
+
 // MythTV
 #include "libmythbase/mythlogging.h"
 #include "mythframe.h"
+
 #include "mythvideoprofile.h"
 
 // FFmpeg - for av_malloc/av_free
@@ -62,7 +66,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         return;
     }
 
-    if (std::any_of(m_priv.cbegin(), m_priv.cend(), [](const uint8_t* P) { return P != nullptr; }))
+    if (std::ranges::any_of(std::as_const(m_priv), [](const uint8_t* P) { return P != nullptr; }))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Priv buffers are set (hardware frame?). Ignoring Init");
         return;

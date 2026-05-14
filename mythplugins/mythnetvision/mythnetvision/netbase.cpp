@@ -1,5 +1,10 @@
+// C++
+#include <ranges>
+
+// Qt
 #include <QDir>
 
+// MythTV
 #include <libmythbase/mythcorecontext.h>
 #include <libmythbase/mythdate.h>
 #include <libmythbase/mythdirs.h>
@@ -71,9 +76,9 @@ void NetBase::CleanCacheDir()
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);
 
-    for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
+    for (const auto & thumb : std::ranges::reverse_view(thumbs))
     {
-        QString filename = QString("%1/%2").arg(cache, *i);
+        QString filename = QString("%1/%2").arg(cache, thumb);
         LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();

@@ -1,4 +1,5 @@
 // C++
+#include <algorithm>
 #include <utility>
 
 // Qt
@@ -592,7 +593,7 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
                 QRegularExpression::CaseInsensitiveOption };
             QStringList result;
             QStringList& exts = handler->m_validextensions;
-            std::copy_if(exts.cbegin(), exts.cend(), std::back_inserter(result),
+            std::ranges::copy_if(std::as_const(exts), std::back_inserter(result),
                          [&r](const QString& extension){ return extension.contains(r); } );
             if (result.isEmpty())
                 continue;
@@ -654,7 +655,7 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
                 QRegularExpression::CaseInsensitiveOption };
             QStringList result;
             QStringList& exts = handler->m_validextensions;
-            std::copy_if(exts.cbegin(), exts.cend(), std::back_inserter(result),
+            std::ranges::copy_if(std::as_const(exts), std::back_inserter(result),
                          [&r](const QString& extension){ return extension.contains(r); } );
             if (result.isEmpty())
                 continue;

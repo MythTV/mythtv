@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <complex>
 #include <cstdlib>
 #include <cstring>
+#include <numbers>
 #include <vector>
 extern "C" {
 #include "libavutil/mem.h"
@@ -33,7 +34,7 @@ using cfloat = std::complex<float>;
 using InputBufs  = std::array<float*,2>;
 using OutputBufs = std::array<float*,6>;
 
-static const float PI = 3.141592654;
+static const float PI = std::numbers::pi;
 static const float epsilon = 0.000001;
 static const float center_level = 0.5F*sqrtf(0.5F);
 
@@ -81,7 +82,8 @@ public:
         m_inbufs.fill(nullptr);
         m_outbufs.fill(nullptr);
         // set the default coefficients
-        surround_coefficients(0.8165,0.5774);
+        surround_coefficients(std::numbers::sqrt2 / std::numbers::sqrt3,
+                              std::numbers::inv_sqrt3);
         phase_mode(0);
         separation(1,1);
         steering_mode(true);

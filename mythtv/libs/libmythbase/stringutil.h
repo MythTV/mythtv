@@ -1,6 +1,10 @@
 #ifndef STRINGUTIL_H_
 #define STRINGUTIL_H_
 
+// The following distributions have a C++20 compiler but don't
+// support std::format:
+//
+// Centos/RHEL 9, Debian 11&12, NetBSD10, Ubuntu 22.04
 #if __has_include(<format>) // C++20
 #include <format>
 #endif
@@ -47,7 +51,7 @@ inline QString bool_to_string(bool val)
 }
 
 MBASE_PUBLIC
-int naturalCompare(const QString &_a, const QString &_b,
+std::strong_ordering naturalCompare(const QString &_a, const QString &_b,
                    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
 /**

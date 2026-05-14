@@ -28,7 +28,7 @@ void tentacle_free (void) {
 }
 
 void tentacle_new (void) {
-	v3d center = {0,-17.0,0};
+	v3d center = {.x=0, .y=-17.0, .z=0};
 	vals.resize(definitionx+20);
 	
 	for (auto & tmp : grille) {

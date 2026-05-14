@@ -380,7 +380,7 @@ void EditMetadataDialog::fillWidgets()
         }
         tc.emplace_back(md->GetID(), title);
     }
-    std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
+    std::ranges::sort(tc, title_sort<title_list::value_type>());
 
     for (const auto & t : tc)
     {

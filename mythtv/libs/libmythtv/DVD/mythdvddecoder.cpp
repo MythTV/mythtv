@@ -466,7 +466,7 @@ void MythDVDDecoder::PostProcessTracks(void)
                     uint lang_indx = lang_sub_cnt[lang]++;
                     int trackNo = -1;
 
-                    if (stream2idx.count(streamid) != 0)
+                    if (stream2idx.contains(streamid))
                         trackNo = stream2idx[streamid];
 
                     if (trackNo == -1)

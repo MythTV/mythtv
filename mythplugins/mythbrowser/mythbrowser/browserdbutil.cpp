@@ -226,6 +226,8 @@ int GetSiteList(QList<Bookmark*>  &siteList)
             site->m_selected = false;
             siteList.append(site);
         }
+        // QList doesn't play well with std::ranges
+        // NOLINTNEXTLINE(modernize-use-ranges)
         std::sort(siteList.begin(), siteList.end(), Bookmark::sortByName);
     }
 

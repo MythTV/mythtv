@@ -15,7 +15,6 @@
 #include "libmythbase/remotefile.h"
 #include "libmythbase/storagegroup.h"
 #include "libmythbase/stringutil.h"
-#include "libmythbase/ternarycompare.h"
 
 #include "dbaccess.h"
 #include "globals.h"
@@ -398,11 +397,11 @@ class VideoMetadataImp
  */
 bool VideoMetadataImp::sortBefore(const VideoMetadataImp *rhs) const
 {
-    int cmp = StringUtil::naturalCompare(m_sortTitle, rhs->m_sortTitle);
+    auto cmp = StringUtil::naturalCompare(m_sortTitle, rhs->m_sortTitle);
     if (cmp == 0)
         cmp = StringUtil::naturalCompare(m_sortFilename, rhs->m_sortFilename);
     if (cmp == 0)
-        cmp = ternary_compare(m_id, rhs->m_id);
+        cmp = m_id <=> rhs->m_id;
     return cmp < 0;
 }
 

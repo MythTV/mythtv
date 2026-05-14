@@ -1,4 +1,6 @@
+// C++ headers
 #include <algorithm>
+#include <ranges>
 #include <utility>
 
 // Qt headers
@@ -319,7 +321,7 @@ QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
     QList<PersonInfo> orig = m_people.values(type);
     QList<PersonInfo> ret;
     ret.reserve(orig.size());
-    std::copy(orig.rbegin(), orig.rend(), std::back_inserter(ret));
+    std::ranges::copy(std::ranges::reverse_view(orig), std::back_inserter(ret));
     return ret;
 }
 
@@ -330,7 +332,7 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
     ArtworkList orig = m_artwork.values(type);
     ArtworkList ret;
     ret.reserve(orig.size());
-    std::copy(orig.rbegin(), orig.rend(), std::back_inserter(ret));
+    std::ranges::copy(std::ranges::reverse_view(orig), std::back_inserter(ret));
     return ret;
 }
 

@@ -148,7 +148,7 @@ MythVideoDRMBuffer::~MythVideoDRMBuffer()
     {
         if (m_handles[i] && m_device)
         {
-            struct drm_gem_close close = { m_handles[i], 0 };
+            struct drm_gem_close close = { .handle=m_handles[i], .pad=0 };
             drmIoctl(m_device->GetFD(), DRM_IOCTL_GEM_CLOSE, &close);
         }
     }

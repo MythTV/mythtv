@@ -652,7 +652,8 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
 {
     if (!m_handlerMap.contains(destination))
     {
-        MHData  mhd = { callback, mediaType, destination, description };
+        MHData  mhd = { .callback=callback, .MythMediaType=mediaType,
+                        .destination=destination, .description=description };
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (!extensions.isEmpty())

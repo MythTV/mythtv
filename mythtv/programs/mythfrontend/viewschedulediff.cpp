@@ -1,3 +1,6 @@
+// Standard UNIX C headers
+#include <algorithm>
+
 // MythTV
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
@@ -188,9 +191,9 @@ void ViewScheduleDiff::fillList(void)
     LoadFromScheduler(m_recListBefore, dummy);
     LoadFromScheduler(m_recListAfter,  dummy, m_altTable, m_recordid);
 
-    std::stable_sort(m_recListBefore.begin(), m_recListBefore.end(),
+    std::ranges::stable_sort(m_recListBefore,
                      comp_recstart_less_than);
-    std::stable_sort(m_recListAfter.begin(), m_recListAfter.end(),
+    std::ranges::stable_sort(m_recListAfter,
                      comp_recstart_less_than);
 
     QDateTime now = MythDate::current();

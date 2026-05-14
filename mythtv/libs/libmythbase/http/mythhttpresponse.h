@@ -31,15 +31,15 @@ class MBASE_PUBLIC MythHTTPResponse
 
     void Finalise  (const MythHTTPConfig& Config);
     template <class T>
-    std::enable_if_t<std::is_convertible_v<T, QString>, void>
-    AddHeader (const QString& key, const T& val)
+    void AddHeader (const QString& key, const T& val)
+    requires (std::is_convertible_v<T, QString>)
     {
         QByteArray bytes = QString("%1: %2\r\n").arg(key, val).toUtf8();
         m_responseHeaders.emplace_back(MythHTTPData::Create(bytes));
     }
     template <class T>
-    std::enable_if_t<!std::is_convertible_v<T, QString>, void>
-    AddHeader (const QString& key, T val)
+    void AddHeader (const QString& key, T val)
+    requires (!std::is_convertible_v<T, QString>)
     {
         QByteArray bytes = QString("%1: %2\r\n").arg(key).arg(val).toUtf8();
         m_responseHeaders.emplace_back(MythHTTPData::Create(bytes));

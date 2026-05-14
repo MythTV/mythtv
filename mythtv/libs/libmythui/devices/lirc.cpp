@@ -460,7 +460,7 @@ void LIRC::run(void)
         FD_SET(d->m_lircState->lirc_lircd, &readfds);
 
         // the maximum time select() should wait
-        struct timeval timeout {1, k100Milliseconds}; // 1 second, 100 ms
+        struct timeval timeout {.tv_sec=1, .tv_usec=k100Milliseconds};
 
         int ret = select(d->m_lircState->lirc_lircd + 1, &readfds, nullptr, nullptr,
                          &timeout);

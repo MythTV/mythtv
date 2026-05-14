@@ -84,7 +84,7 @@ class V2GrabberList : public QObject
                 auto *grabber = entry.value<V2Grabber*>();
                 return (grabber->GetProgram() == program);
             };
-            return std::any_of(m_Grabbers.cbegin(), m_Grabbers.cend(), matchProgram);
+            return std::ranges::any_of(std::as_const(m_Grabbers), matchProgram);
         }
 
     private:

@@ -1,4 +1,5 @@
-// Qt
+// C++ headers
+#include <algorithm>
 #include <utility>
 
 // libmythbase
@@ -88,7 +89,7 @@ void OSD::IsOSDVisible(bool& Visible)
         return;
     }
 
-    Visible = std::any_of(m_children.cbegin(), m_children.cend(),
+    Visible = std::ranges::any_of(std::as_const(m_children),
                 [](MythScreenType* child) { return child->IsVisible(); });
 }
 
@@ -751,7 +752,7 @@ void OSD::DialogQuit()
 void OSD::ShowDialog(const MythOSDDialogData& Data)
 {
     DialogShow(Data.m_dialogName, Data.m_message, Data.m_timeout);
-    std::for_each(Data.m_buttons.cbegin(), Data.m_buttons.cend(),
+    std::ranges::for_each(Data.m_buttons,
         [this](const MythOSDDialogData::MythOSDDialogButton& B) {
             DialogAddButton(B.m_text, B.m_data, B.m_menu, B.m_current); });
     DialogBack(Data.m_back.m_text, Data.m_back.m_data, Data.m_back.m_exit);

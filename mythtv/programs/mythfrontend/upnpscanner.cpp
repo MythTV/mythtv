@@ -1032,8 +1032,8 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     m_lock.lock();
 
     UpnpMediaServer* server = nullptr;
-    auto it = std::find_if(m_servers.cbegin(), m_servers.cend(),
-                            [&url](UpnpMediaServer* s){ return url == s->m_controlURL;} );
+    auto it = std::ranges::find(std::as_const(m_servers), url,
+                                &UpnpMediaServer::m_controlURL);
     if (it != m_servers.cend())
         server = it.value();
 
@@ -1320,8 +1320,8 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     std::chrono::seconds timeout = 0s;
 
     m_lock.lock();
-    auto it = std::find_if(m_servers.cbegin(), m_servers.cend(),
-                           [&url](UpnpMediaServer* server){ return url == server->m_serverURL;} );
+    auto it = std::ranges::find(std::as_const(m_servers), url,
+                                &UpnpMediaServer::m_serverURL);
     if (it != m_servers.cend())
     {
         usn = it.key();

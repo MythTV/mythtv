@@ -179,7 +179,9 @@ bool DecoderBase::PosMapFromDb(void)
 
     for (auto it = posMap.cbegin(); it != posMap.cend(); ++it)
     {
-        PosMapEntry e = {it.key(), it.key() * m_keyframeDist, *it};
+        PosMapEntry e = {.index=it.key(),
+                         .adjFrame=it.key() * m_keyframeDist,
+                         .pos=*it};
         m_positionMap.push_back(e);
     }
 
@@ -248,7 +250,9 @@ bool DecoderBase::PosMapFromEnc(void)
         if (it.key() <= last_index)
             continue;
 
-        PosMapEntry e = {it.key(), it.key() * m_keyframeDist, *it};
+        PosMapEntry e = {.index=it.key(),
+                         .adjFrame=it.key() * m_keyframeDist,
+                         .pos=*it};
         m_positionMap.push_back(e);
     }
 
@@ -1174,7 +1178,7 @@ void DecoderBase::AutoSelectTracks(void)
 void DecoderBase::ResetTracks(void)
 {
     QMutexLocker locker(&m_trackLock);
-    std::fill(m_currentTrack.begin(), m_currentTrack.end(), -1);
+    std::ranges::fill(m_currentTrack, -1);
 }
 
 QString toString(TrackType type)

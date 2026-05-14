@@ -19,6 +19,7 @@
 */
 
 // C++ headers
+#include <algorithm>
 #include <chrono>
 #include <thread>
 
@@ -592,7 +593,7 @@ void avfDecoder::checkMetatdata(void)
 bool avfDecoderFactory::supports(const QString &source) const
 {
     QStringList list = extension().split("|", Qt::SkipEmptyParts);
-    return std::any_of(list.cbegin(), list.cend(),
+    return std::ranges::any_of(std::as_const(list),
                        [source](const auto& str)
                            { return str == source.right(str.length()).toLower(); } );
 }

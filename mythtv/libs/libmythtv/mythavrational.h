@@ -14,7 +14,7 @@ C++ wrapper for FFmpeg libavutil AVRational.
 class MythAVRational
 {
   public:
-    explicit MythAVRational(int n = 0, int d = 1) : m_q({n, d}) {}
+    explicit MythAVRational(int n = 0, int d = 1) : m_q({.num=n, .den=d}) {}
     explicit MythAVRational(AVRational q) : m_q(q) {}
     /**
     @brief Convert a double to a MythAVRational.

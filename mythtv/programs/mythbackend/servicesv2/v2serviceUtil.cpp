@@ -4,6 +4,7 @@
 #endif
 
 // Standard UNIX C headers
+#include <algorithm>
 #include <unistd.h>
 #include <fcntl.h>
 #if defined(Q_OS_BSD4) || defined(Q_OS_WINDOWS)
@@ -959,7 +960,7 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
 
     // no need to sort when zero because that is the default order from the scheduler
     if (sortType > 0)
-        std::stable_sort(recordingList.begin(), recordingList.end(), comp);
+        std::ranges::stable_sort(recordingList, comp);
 
     // ----------------------------------------------------------------------
     // Build Response

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <numbers>
 
 // QT headers
 #include <QCoreApplication>
@@ -28,7 +29,7 @@ BumpScope::BumpScope()
 
     for (unsigned int i = 255; i > 0; i--)
     {
-        m_intense1[i] = cos(((double)(255 - i) * M_PI) / 512.0);
+        m_intense1[i] = cos(((double)(255 - i) * std::numbers::pi) / 512.0);
         m_intense2[i] = pow(m_intense1[i], 250) * 150;
     }
     m_intense1[0] = m_intense1[1];
@@ -160,7 +161,7 @@ void BumpScope::generate_phongdat(void)
     }
 }
 
-#define M_PI_F static_cast<float>(M_PI)
+static constexpr float  M_PI_F  { std::numbers::pi_v<float> };
 void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
                           int *angle) const
 {

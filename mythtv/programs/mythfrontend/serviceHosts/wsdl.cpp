@@ -496,7 +496,7 @@ QString Wsdl::AddTypeInfo( QString sType )
         sCustomAttr = "enum";
     }
 
-    TypeInfo info = { sCustomAttr, QString() };
+    TypeInfo info = { .sAttrName=sCustomAttr, .sContentType=QString() };
 
     m_typesToInclude.insert( sType, info );
 

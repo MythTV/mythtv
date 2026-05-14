@@ -2132,8 +2132,7 @@ bool PlaybackBox::UpdateUILists(void)
     if (!m_progLists[m_watchGroupLabel].empty())
         m_titleList << m_watchGroupName;
     if ((!m_progLists["livetv"].empty()) &&
-        (std::find(sortedList.cbegin(), sortedList.cend(), tr("Live TV"))
-         == sortedList.cend()))
+        !sortedList.contains(tr("Live TV")))
         m_titleList << tr("Live TV");
     m_titleList << sortedList.values();
 

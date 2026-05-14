@@ -550,7 +550,7 @@ std::vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
                 .arg(profileid).arg(error));
     }
 
-    sort(list.begin(), list.end());
+    std::ranges::sort(list);
     return list;
 }
 

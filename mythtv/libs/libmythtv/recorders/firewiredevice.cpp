@@ -39,8 +39,12 @@ void FirewireDevice::AddListener(TSDataListener *listener)
 {
     if (listener)
     {
-        auto it = find(m_listeners.begin(), m_listeners.end(), listener);
+#ifdef __cpp_lib_ranges_contains
+        if (!std::ranges::contains(m_listeners, listener))
+#else
+        auto it = std::ranges::find(m_listeners, listener);
         if (it == m_listeners.end())
+#endif
             m_listeners.push_back(listener);
     }
 
@@ -50,7 +54,7 @@ void FirewireDevice::AddListener(TSDataListener *listener)
 
 void FirewireDevice::RemoveListener(TSDataListener *listener)
 {
-    auto it = find(m_listeners.begin(), m_listeners.end(), listener);
+    auto it = std::ranges::find(m_listeners, listener);
     while (it != m_listeners.end())
     {
         it = m_listeners.erase(it);

@@ -113,10 +113,10 @@ class MUI_PUBLIC MythMenu
                  bool checked = false);
     // For class member non-const functions.
     template <typename SLOT>
-    typename std::enable_if_t<FunctionPointerTest<SLOT>::MemberFunction>
-    AddItem(const QString &title, const SLOT &slot,
+    void AddItem(const QString &title, const SLOT &slot,
                   MythMenu *subMenu = nullptr, bool selected = false,
                   bool checked = false)
+    requires is_nonconst_member_func_v<SLOT>
     {
         auto slot2 = static_cast<MythUICallbackMF>(slot);
         auto *item = new MythMenuItem(title, slot2, checked, subMenu);
@@ -124,10 +124,10 @@ class MUI_PUBLIC MythMenu
     }
     // For class member const functions.
     template <typename SLOT>
-    typename std::enable_if_t<FunctionPointerTest<SLOT>::MemberConstFunction>
-    AddItem(const QString &title, const SLOT &slot,
+    void AddItem(const QString &title, const SLOT &slot,
                   MythMenu *subMenu = nullptr, bool selected = false,
                   bool checked = false)
+    requires is_const_member_func_v<SLOT>
     {
         auto slot2 = static_cast<MythUICallbackMFc>(slot);
         auto *item = new MythMenuItem(title, slot2, checked, subMenu);
@@ -204,9 +204,9 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     }
     // For class member non-const functions.
     template <typename SLOT>
-    typename std::enable_if_t<FunctionPointerTest<SLOT>::MemberFunction>
-    AddButton(const QString &title, const SLOT &slot,
+    void AddButton(const QString &title, const SLOT &slot,
                     bool newMenu = false, bool setCurrent = false)
+    requires is_nonconst_member_func_v<SLOT>
     {
         auto slot2 = static_cast<MythUICallbackMF>(slot);
         AddButtonV(title, QVariant::fromValue(slot2), newMenu, setCurrent);
@@ -214,9 +214,9 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     }
     // For class member const functions.
     template <typename SLOT>
-    typename std::enable_if_t<FunctionPointerTest<SLOT>::MemberConstFunction>
-    AddButton(const QString &title, const SLOT &slot,
+    void AddButton(const QString &title, const SLOT &slot,
                     bool newMenu = false, bool setCurrent = false)
+    requires is_const_member_func_v<SLOT>
     {
         auto slot2 = static_cast<MythUICallbackMFc>(slot);
         AddButtonV(title, QVariant::fromValue(slot2), newMenu, setCurrent);

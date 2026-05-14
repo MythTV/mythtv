@@ -362,20 +362,18 @@ void ChannelRecPriority::SortList()
             ++pit, ++i)
     {
         ChannelInfo *chanInfo = &(*pit);
-        RecPriorityInfo tmp = {chanInfo, i};
+        RecPriorityInfo tmp = {.m_chan=chanInfo, .m_cnt=i};
         sortingList.push_back(tmp);
     }
 
     switch(m_sortType)
     {
         case byRecPriority:
-            std::sort(sortingList.begin(), sortingList.end(),
-            channelRecPrioritySort());
+            std::ranges::sort(sortingList, channelRecPrioritySort());
             break;
         case byChannel:
         default:
-            std::sort(sortingList.begin(), sortingList.end(),
-            channelSort());
+            std::ranges::sort(sortingList, channelSort());
             break;
     }
 

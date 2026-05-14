@@ -3,6 +3,7 @@
 
 // Qt
 #include <QDir>
+#include <algorithm>
 
 // MythTV
 #include "libmythbase/mythconfig.h"
@@ -219,9 +220,13 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Fram
     auto * decoder = static_cast<AvFormatDecoder*>(Context->opaque);
     auto type = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(AvFrame->format));
     const auto * supported = Frame->m_renderFormats;
-    auto found = std::find(supported->cbegin(), supported->cend(), type);
     // No fallback currently (unlikely)
+#ifdef __cpp_lib_ranges_contains
+    if (!std::ranges::contains(*supported, type))
+#else
+    auto found = std::ranges::find(*supported, type);
     if (found == supported->end())
+#endif
         return false;
 
     // Re-allocate if necessary
@@ -365,7 +370,11 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
                     if (res)
                         break;
                     pixformats.append(fourcc_str(static_cast<int>(fdesc.pixelformat)));
-                    if (std::find(s_formats.cbegin(), s_formats.cend(), fdesc.pixelformat) != s_formats.cend())
+#ifdef __cpp_lib_ranges_contains
+                    if (std::ranges::contains(s_formats, fdesc.pixelformat))
+#else
+                    if (std::ranges::find(s_formats, fdesc.pixelformat) != s_formats.cend())
+#endif
                     {
                         if (!result.contains(mythprofile))
                             result.append(mythprofile);

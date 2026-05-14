@@ -3,6 +3,7 @@
 // race on startup?
 // http date format and locale
 
+#include <algorithm>
 #include <chrono>
 #include <vector>
 
@@ -209,6 +210,8 @@ QByteArray DigestMd5Response(const QString& response, const QString& option,
     return hash.result().toHex();
 }
 
+using RequestQuery = QPair<QByteArray, QByteArray>;
+
 class APHTTPRequest
 {
   public:
@@ -233,8 +236,8 @@ class APHTTPRequest
 
     QByteArray GetQueryValue(const QByteArray& key)
     {
-        auto samekey = [key](const auto& query) { return query.first == key; };;
-        auto query = std::find_if(m_queries.cbegin(), m_queries.cend(), samekey);
+        auto query = std::ranges::find(std::as_const(m_queries), key,
+                                       &RequestQuery::first);
         return (query != m_queries.cend()) ? query->second : "";
     }
 
@@ -342,7 +345,7 @@ class APHTTPRequest
     QByteArray m_data;
     QByteArray m_method;
     QByteArray m_uri;
-    QList<QPair<QByteArray, QByteArray> > m_queries;
+    QList<RequestQuery> m_queries;
     QMap<QByteArray,QByteArray> m_headers;
     QByteArray m_body;
     int        m_size            {0};

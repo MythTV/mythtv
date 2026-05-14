@@ -1,4 +1,5 @@
 // std
+#include <algorithm>
 #include <utility>
 
 // Qt
@@ -1061,7 +1062,7 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, std::vector<MythVideoText
         }
     }
 
-    std::transform(Current.cbegin(), Current.cend(), std::back_inserter(Textures),
+    std::ranges::transform(Current, std::back_inserter(Textures),
                    [](MythVideoTextureOpenGL* Tex) { return reinterpret_cast<MythGLTexture*>(Tex); });
 }
 

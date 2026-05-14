@@ -283,25 +283,25 @@ bool UPnpCDS::ProcessRequest( HTTPRequest *pRequest )
 
 static const std::array<const UPnpCDSClientException,5> clientExceptions {{
     // Windows Media Player version 12
-    { CDS_ClientWMP, 
-      "User-Agent",
-      "Windows-Media-Player/" },
+    { .nClientType=CDS_ClientWMP,
+      .sHeaderKey="User-Agent",
+      .sHeaderValue="Windows-Media-Player/" },
     // Windows Media Player version < 12
-    { CDS_ClientWMP,
-      "User-Agent",
-      "Mozilla/4.0 (compatible; UPnP/1.0; Windows 9x" },
+    { .nClientType=CDS_ClientWMP,
+      .sHeaderKey="User-Agent",
+      .sHeaderValue="Mozilla/4.0 (compatible; UPnP/1.0; Windows 9x" },
     // XBMC
-    { CDS_ClientXBMC,
-      "User-Agent",
-      "Platinum/" },
+    { .nClientType=CDS_ClientXBMC,
+      .sHeaderKey="User-Agent",
+      .sHeaderValue="Platinum/" },
     // XBox 360
-    { CDS_ClientXBox,
-      "User-Agent",
-      "Xbox" },
+    { .nClientType=CDS_ClientXBox,
+      .sHeaderKey="User-Agent",
+      .sHeaderValue="Xbox" },
     // Sony Blu-ray players
-    { CDS_ClientSonyDB,
-      "X-AV-Client-Info",
-      R"(cn="Sony Corporation"; mn="Blu-ray Disc Player")" },
+    { .nClientType=CDS_ClientSonyDB,
+      .sHeaderKey="X-AV-Client-Info",
+      .sHeaderValue=R"(cn="Sony Corporation"; mn="Blu-ray Disc Player")" },
 }};
 
 void UPnpCDS::DetermineClient( HTTPRequest *pRequest,

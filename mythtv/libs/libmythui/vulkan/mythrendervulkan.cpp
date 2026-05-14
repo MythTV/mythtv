@@ -424,8 +424,8 @@ void MythRenderVulkan::CopyBufferToImage(VkBuffer Buffer, VkImage Image,
     region.imageSubresource.mipLevel = 0;
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
-    region.imageOffset = { 0, 0, 0 };
-    region.imageExtent = { Width, Height, 1 };
+    region.imageOffset = { .x=0, .y=0, .z=0 };
+    region.imageExtent = { .width=Width, .height=Height, .depth=1 };
     m_devFuncs->vkCmdCopyBufferToImage(commandbuffer, Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
     if (!CommandBuffer)
         FinishSingleUseCommandBuffer(commandbuffer);
@@ -663,8 +663,9 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
     viewport.maxDepth = 1.0F;
 
     VkRect2D scissor { };
-    scissor.offset = { Viewport.left(), Viewport.top() };
-    scissor.extent = { static_cast<uint32_t>(Viewport.width()), static_cast<uint32_t>(Viewport.height()) };
+    scissor.offset = { .x=Viewport.left(), .y=Viewport.top() };
+    scissor.extent = { .width=static_cast<uint32_t>(Viewport.width()),
+                       .height=static_cast<uint32_t>(Viewport.height()) };
 
     VkPipelineViewportStateCreateInfo viewportstate { };
     viewportstate.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

@@ -132,13 +132,9 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetSetting(const QString &key, const QString &defaultval = "");
     // No conversion between duration ratios. Just extract the number.
     template <typename T>
-#if HAVE_IS_DURATION_V
-        typename std::enable_if_t<std::chrono::__is_duration_v<T>, void>
-#else
-        typename std::enable_if_t<std::chrono::__is_duration<T>::value, void>
-#endif
-        SaveDurSetting(const QString &key, T newValue)
-        { SaveSetting(key, static_cast<int>(newValue.count())); }
+    void SaveDurSetting(const QString &key, T newValue)
+    requires (std::chrono::__is_duration<T>::value)
+    { SaveSetting(key, static_cast<int>(newValue.count())); }
 
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
@@ -149,12 +145,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     bool GetBoolSetting(const QString &key, bool defaultval = false);
     int GetNumSetting(const QString &key, int defaultval = 0);
     template <typename T>
-#if HAVE_IS_DURATION_V
-        typename std::enable_if_t<std::chrono::__is_duration_v<T>, T>
-#else
-        typename std::enable_if_t<std::chrono::__is_duration<T>::value, T>
-#endif
-        GetDurSetting(const QString &key, T defaultval = T::zero())
+    T GetDurSetting(const QString &key, T defaultval = T::zero())
+    requires (std::chrono::__is_duration<T>::value)
     { return T(GetNumSetting(key, static_cast<int>(defaultval.count()))); }
     int GetBoolSetting(const QString &key, int defaultval) = delete;
     bool GetNumSetting(const QString &key, bool defaultvalue) = delete;
@@ -241,8 +233,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void RegisterForPlayback(QObject *sender, PlaybackStartCb method);
 
     template <class OBJ, typename SLOT>
-    typename std::enable_if_t<std::is_member_function_pointer_v<SLOT>, void>
-    RegisterForPlayback(OBJ *sender, SLOT method)
+    void RegisterForPlayback(OBJ *sender, SLOT method)
+    requires (std::is_member_function_pointer_v<SLOT>)
     {
         RegisterForPlayback(qobject_cast<QObject*>(sender),
                             static_cast<PlaybackStartCb>(method));

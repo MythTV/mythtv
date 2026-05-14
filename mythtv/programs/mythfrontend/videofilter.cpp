@@ -1,4 +1,6 @@
 // C++
+#include <algorithm>
+#include <ranges>
 #include <set>
 
 // MythTV
@@ -222,14 +224,14 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     {
         const VideoMetadata::genre_list &gl = mdata.GetGenres();
         auto samegenre = [this](const auto & g) {return g.first == m_genre; };
-        matches = std::any_of(gl.cbegin(), gl.cend(), samegenre);
+        matches = std::ranges::any_of(gl, samegenre);
     }
 
     if (matches && m_country != kCountryFilterAll)
     {
         const VideoMetadata::country_list &cl = mdata.GetCountries();
         auto samecountry = [this](const auto & c) {return c.first == m_country; };
-        matches = std::any_of(cl.cbegin(), cl.cend(), samecountry);
+        matches = std::ranges::any_of(cl, samecountry);
     }
 
     if (matches && m_cast != kCastFilterAll)
@@ -243,7 +245,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         else
         {
             auto samecast = [this](const auto & c){return c.first == m_cast; };
-            matches = std::any_of(cl.cbegin(), cl.cend(), samecast);
+            matches = std::ranges::any_of(cl, samecast);
         }
     }
 
@@ -572,9 +574,9 @@ void VideoFilterDialog::fillWidgets()
     // Year
     new MythUIButtonListItem(m_yearList, tr("All", "Year"), kYearFilterAll);
 
-    for (auto p = years.crbegin(); p != years.crend(); ++p)
+    for (int year : std::ranges::reverse_view(years))
     {
-        new MythUIButtonListItem(m_yearList, QString::number(*p), *p);
+        new MythUIButtonListItem(m_yearList, QString::number(year), year);
     }
 
     if (have_unknown_year)
@@ -603,11 +605,11 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_userRatingList, tr("All", "User rating"),
                            kUserRatingFilterAll);
 
-    for (auto p = user_ratings.crbegin(); p != user_ratings.crend(); ++p)
+    for (int rating : std::ranges::reverse_view(user_ratings))
     {
         new MythUIButtonListItem(m_userRatingList,
-                               QString(">= %1").arg(QString::number(*p)),
-                               *p);
+                               QString(">= %1").arg(QString::number(rating)),
+                               rating);
     }
 
     m_userRatingList->SetValueByData(m_settings.GetUserRating());

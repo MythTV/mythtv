@@ -1,6 +1,10 @@
 
 #include "mythuimetadataresults.h"
 
+// C++
+#include <ranges>
+
+// MythTV
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
@@ -110,9 +114,9 @@ void MetadataResultsDialog::cleanCacheDir()
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);
 
-    for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
+    for (const auto & thumb : std::ranges::reverse_view(std::as_const(thumbs)))
     {
-        QString filename = QString("%1/%2").arg(cache, *i);
+        QString filename = QString("%1/%2").arg(cache, thumb);
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < MythDate::current())

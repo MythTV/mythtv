@@ -226,5 +226,5 @@ message("")
 
 message("# Compilation Options")
 message("C++ standard supported    c++${CMAKE_CXX_STANDARD}")
-message_vrbl("Enforce c++11 nullptr   " HAVE_CXX_Wzero-as-null-pointer-constant)
+#message_vrbl("Enforce c++11 nullptr   " HAVE_CXX_Wzero-as-null-pointer-constant)
 message_vrbl("Enforce shadowed vars   " HAVE_CXX_Wshadow)

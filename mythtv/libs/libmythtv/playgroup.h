@@ -19,12 +19,8 @@ class MTV_PUBLIC PlayGroup
     static int GetSetting(const QString &name, const QString &field,
                           int defval);
     template <typename T>
-#if HAVE_IS_DURATION_V
-        static std::enable_if_t<std::chrono::__is_duration_v<T>, T>
-#else
-        static std::enable_if_t<std::chrono::__is_duration<T>::value, T>
-#endif
-        GetDurSetting(const QString &name, const QString &field, T defval)
+    static T GetDurSetting(const QString &name, const QString &field, T defval)
+    requires (std::chrono::__is_duration<T>::value)
     { return T(GetSetting(name, field, static_cast<int>(defval.count()))); }
 };
 

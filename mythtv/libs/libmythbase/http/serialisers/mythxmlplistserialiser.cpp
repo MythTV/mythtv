@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // Qt
 #include <QMetaProperty>
 #include <QSequentialIterable>
@@ -191,7 +194,7 @@ void MythXMLPListSerialiser::AddList(const QString& Name, const QVariantList &Va
         auto typesEqual = [type](const QVariant& value)
             { return (static_cast<QMetaType::Type>(value.typeId()) == type); };
 #endif
-        array = std::all_of(Values.cbegin(), Values.cend(), typesEqual);
+        array = std::ranges::all_of(std::as_const(Values), typesEqual);
     }
 
     QString name = GetItemName(Name);

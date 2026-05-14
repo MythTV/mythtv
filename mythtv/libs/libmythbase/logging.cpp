@@ -75,14 +75,14 @@ static bool                    logThreadFinished = false;
 static bool                    debugRegistration = false;
 
 struct LogPropagateOpts {
-    bool    m_propagate;
-    int     m_quiet;
-    int     m_facility;
-    QString m_path;
-    bool    m_loglong;
+    bool    m_propagate { false };
+    int     m_quiet     { 0 };
+    int     m_facility  { 0 };
+    QString m_path      { "" };
+    bool    m_loglong   { false };
 };
 
-LogPropagateOpts        logPropagateOpts {false, 0, 0, "", false};
+LogPropagateOpts        logPropagateOpts {};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 

@@ -29,6 +29,9 @@
 #ifndef PANE_EXISTING_SCAN_IMPORT_H
 #define PANE_EXISTING_SCAN_IMPORT_H
 
+// C++
+#include <ranges>
+
 // Qt headers
 #include <QString>
 #include <QObject>
@@ -58,9 +61,8 @@ class PaneExistingScanImport : public GroupSetting
             return;
 
         std::vector<ScanInfo> scans = LoadScanList(m_sourceid);
-        for (auto it = scans.rbegin(); it != scans.rend(); ++it)
+        for (auto & scan : std::ranges::reverse_view(scans))
         {
-            ScanInfo &scan   = *it;
             QString scanDate = MythDate::toString(scan.m_scandate, MythDate::kDateTimeFull);
             QString proc     = (scan.m_processed) ? tr("processed") : tr("unprocessed");
 

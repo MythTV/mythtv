@@ -1,3 +1,5 @@
+// C++ headers
+#include <algorithm>
 
 #include "libmythtv/audio/audiooutput.h"
 #include "libmythbase/mythcorecontext.h"
@@ -31,8 +33,12 @@ void AudioPlayer::addVisual(Visualization *vis)
         return;
 
     QMutexLocker lock(&m_lock);
-    auto it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+#ifdef __cpp_lib_ranges_contains
+    if (!std::ranges::contains(m_visuals, vis))
+#else
+    auto it = std::ranges::find(m_visuals, vis);
     if (it == m_visuals.end())
+#endif
     {
         m_visuals.push_back(vis);
         m_audioOutput->addVisual(vis);
@@ -45,7 +51,7 @@ void AudioPlayer::removeVisual(Visualization *vis)
         return;
 
     QMutexLocker lock(&m_lock);
-    auto it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    auto it = std::ranges::find(m_visuals, vis);
     if (it != m_visuals.end())
     {
         m_visuals.erase(it);

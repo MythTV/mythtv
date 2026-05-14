@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
+#include <algorithm>
 
 // MythTV headers
 #include <libmythbase/mythcorecontext.h>
@@ -241,8 +242,7 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
     }
 
     // no matching source, make one
-    auto idmatch = [id](auto *si){ return si->id == id; };
-    auto it = std::find_if(m_scripts.cbegin(), m_scripts.cend(), idmatch);
+    auto it = std::ranges::find(std::as_const(m_scripts), id, &ScriptInfo::id);
     if (it != m_scripts.cend())
     {
         auto *ws = new WeatherSource(*it);

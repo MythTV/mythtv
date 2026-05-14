@@ -1129,7 +1129,7 @@ bool AutoExpire::IsInDontExpireSet(
 bool AutoExpire::IsInExpireList(
     const pginfolist_t &expireList, uint chanid, const QDateTime &recstartts)
 {
-    return std::any_of(expireList.cbegin(), expireList.cend(),
+    return std::ranges::any_of(expireList,
                        [chanid,&recstartts](auto *info)
                            { return ((info->GetChanID()             == chanid) &&
                                      (info->GetRecordingStartTime() == recstartts)); } );

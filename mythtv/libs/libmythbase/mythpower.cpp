@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // MythTV
 #include "mythconfig.h"
 
@@ -114,7 +117,7 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, std::chrono:
     if (s_instance)
     {
         // Update the maximum requested delay
-        std::chrono::seconds max = std::max_element(s_delays.cbegin(), s_delays.cend()).value();
+        std::chrono::seconds max = std::ranges::max_element(std::as_const(s_delays)).value();
         s_instance->SetRequestedDelay(max);
     }
     return s_instance;

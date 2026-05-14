@@ -10,8 +10,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+// C++ headers
+#include <algorithm>
+
+// Qt
 #include <QCoreApplication>
 
+// MythTV
 #include "mythlogging.h"
 #include "http/mythxsd.h"
 #include "http/mythmimedatabase.h"
@@ -483,7 +488,8 @@ bool MythXSD::RenderXSD( const HTTPRequest2& pRequest, QObject *pClass )
 
             if (bCustomType)
             {
-                TypeInfo info = { sCustomAttr, sContentType };
+                TypeInfo info = { .sAttrName=sCustomAttr,
+                                  .sContentType=sContentType };
                 typesToInclude.insert( sType, info );
             }
 
@@ -972,7 +978,7 @@ QString MythXSD::ReadPropertyMetadata( QObject *pObject, const QString& sPropNam
         QString     sFullKey  = sKey + "=";
 
         auto hasKey = [&sFullKey](const QString& o) { return o.startsWith( sFullKey ); };
-        auto it = std::find_if(sOptions.cbegin(), sOptions.cend(), hasKey);
+        auto it = std::ranges::find_if(std::as_const(sOptions), hasKey);
         if (it != sOptions.cend())
             return (*it).mid( sFullKey.length() );
     }

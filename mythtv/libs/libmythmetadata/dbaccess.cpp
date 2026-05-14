@@ -116,7 +116,7 @@ class SingleValueImp
 
     bool exists(int id)
     {
-        return m_entries.find(id) != m_entries.end();
+        return m_entries.contains(id);
     }
 
     bool exists(const QString &name, int *id = nullptr)
@@ -142,7 +142,7 @@ class SingleValueImp
             {
                 m_retEntries.emplace_back(item.first, item.second);
             }
-            std::sort(m_retEntries.begin(), m_retEntries.end(),
+            std::ranges::sort(m_retEntries,
                       call_sort<SingleValueImp, entry>(*this));
         }
 
@@ -295,8 +295,12 @@ class MultiValueImp
         if (p != m_valMap.end())
         {
             entry::values_type &va = p->second.values;
-            auto v = std::find(va.begin(), va.end(), value);
+#ifdef __cpp_lib_ranges_contains
+            if (!std::ranges::contains(va, value))
+#else
+            auto v = std::ranges::find(va, value);
             if (v == va.end())
+#endif
             {
                 va.push_back(value);
                 db_insert = true;
@@ -393,7 +397,7 @@ class MultiValueImp
 
     bool exists(int id)
     {
-        return m_valMap.find(id) != m_valMap.end();
+        return m_valMap.contains(id);
     }
 
   private:

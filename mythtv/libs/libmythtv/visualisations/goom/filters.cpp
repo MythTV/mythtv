@@ -531,7 +531,7 @@ zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf
                                 sintable[us] =
                                     roundf(1024 * sinf ((float) us * 360
                                                        / ((float)sintable.size() - 1)
-                                                       * 3.141592F / 180));
+                                                       * std::numbers::pi_v<float> / 180));
 			}
 
 			{

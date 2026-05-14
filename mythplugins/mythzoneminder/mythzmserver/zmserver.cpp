@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <sys/shm.h>
 #include <sys/mman.h>
+#include <utility>
 
 #ifndef MSG_NOSIGNAL
 static constexpr int MSG_NOSIGNAL { 0 };  // Apple also has SO_NOSIGPIPE?
@@ -144,7 +145,7 @@ void loadZMConfig(const std::string &configfile)
             val = val.substr(begin);
 
         // convert name to uppercase
-        std::transform(name.cbegin(), name.cend(), name.begin(), ::toupper);
+        std::ranges::transform(name, name.begin(), ::toupper);
 
         if      ( name == "ZM_DB_HOST"    ) g_server = val;
         else if ( name == "ZM_DB_NAME"    ) g_database = val;
@@ -1403,7 +1404,7 @@ void ZMServer::handleGetLiveFrame(std::vector<std::string> tokens)
     ADD_INT(outStr, monitorID);
 
     // try to find the correct MONITOR
-    if (m_monitorMap.find(monitorID) == m_monitorMap.end())
+    if (!m_monitorMap.contains(monitorID))
     {
         sendError(ERROR_INVALID_MONITOR);
         return;
@@ -1943,7 +1944,7 @@ void ZMServer::handleSetMonitorFunction(std::vector<std::string> tokens)
     const std::string& enabled(tokens[3]);
 
     // Check validity of input passed to server. Does monitor exist && is function ok
-    if (m_monitorMap.find(atoi(monitorID.c_str())) == m_monitorMap.end())
+    if (!m_monitorMap.contains(atoi(monitorID.c_str())))
     {
         sendError(ERROR_INVALID_MONITOR);
         return;

@@ -274,7 +274,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
         return false;
     }
     params->format        = AV_PIX_FMT_VAAPI;
-    params->time_base     = {1, 1};
+    params->time_base     = {.num=1, .den=1};
     params->width         = Width;
     params->height        = Height;
     params->hw_frames_ctx = FramesContext;

@@ -921,7 +921,8 @@ bool AudioOutputALSA::OpenMixer(void)
 
     QByteArray dev_ba = m_mixer.device.toLatin1();
     struct snd_mixer_selem_regopt regopts =
-        {1, SND_MIXER_SABSTRACT_NONE, dev_ba.constData(), nullptr, nullptr};
+        {.ver=1, .abstract=SND_MIXER_SABSTRACT_NONE, .device=dev_ba.constData(),
+         .playback_pcm=nullptr, .capture_pcm=nullptr};
 
     chk = snd_mixer_selem_register(m_mixer.handle, &regopts, nullptr);
     if (chk < 0)

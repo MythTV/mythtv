@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 // Std C headers
+#include <algorithm>
 #include <cmath>
 #include <unistd.h>
 #include <utility>
@@ -211,7 +212,7 @@ void IPTVChannelFetcher::run(void)
             {
                 acno[i] = it;
             }
-            std::sort(acno.begin(), acno.end(),
+            std::ranges::sort(acno,
                 [] (fbox_chan_map_t::const_iterator s1, fbox_chan_map_t::const_iterator s2) -> bool
                 {
                     return s1.key().toInt() < s2.key().toInt();

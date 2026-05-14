@@ -3,6 +3,7 @@
 #include <deque>                        // for _Deque_iterator, operator-, etc
 #include <functional>
 #include <iterator>                     // for reverse_iterator
+#include <ranges>
 #include <utility>
 
 // Qt
@@ -1474,31 +1475,31 @@ void ProgLister::SortList(SortBy sortby, bool reverseSort)
     {
         if (kTimeSort == sortby)
         {
-            std::stable_sort(m_itemList.rbegin(), m_itemList.rend(), plTimeSort);
+            std::ranges::stable_sort(std::ranges::reverse_view(m_itemList), plTimeSort);
         }
         else if (kPrevTitleSort == sortby)
         {
-            std::stable_sort(m_itemList.rbegin(), m_itemList.rend(),
+            std::ranges::stable_sort(std::ranges::reverse_view(m_itemList),
                         plPrevTitleSort);
         }
         else
         {
-            std::stable_sort(m_itemList.rbegin(), m_itemList.rend(), plTitleSort);
+            std::ranges::stable_sort(std::ranges::reverse_view(m_itemList), plTitleSort);
         }
     }
     else
     {
         if (kTimeSort == sortby)
         {
-            std::stable_sort(m_itemList.begin(), m_itemList.end(), plTimeSort);
+            std::ranges::stable_sort(m_itemList, plTimeSort);
         }
         else if (kPrevTitleSort == sortby)
         {
-            std::stable_sort(m_itemList.begin(), m_itemList.end(),plPrevTitleSort);
+            std::ranges::stable_sort(m_itemList,plPrevTitleSort);
         }
         else
         {
-            std::stable_sort(m_itemList.begin(), m_itemList.end(), plTitleSort);
+            std::ranges::stable_sort(m_itemList, plTitleSort);
         }
     }
 }

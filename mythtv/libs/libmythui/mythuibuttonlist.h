@@ -56,12 +56,14 @@ class MUI_PUBLIC MythUIButtonListItem
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          QVariant data, int listPosition = -1);
     template <typename SLOT>
-    MythUIButtonListItem(std::enable_if_t<FunctionPointerTest<SLOT>::MemberFunction, MythUIButtonList *>lbtype,
+    MythUIButtonListItem(MythUIButtonList *lbtype,
                          const QString& text, SLOT slot, int listPosition = -1)
+    requires is_nonconst_member_func_v<SLOT>
         : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMF>(slot)), listPosition) { }
     template <typename SLOT>
-    MythUIButtonListItem(std::enable_if_t<FunctionPointerTest<SLOT>::MemberConstFunction, MythUIButtonList *>lbtype,
+    MythUIButtonListItem(MythUIButtonList *lbtype,
                          const QString& text, SLOT slot, int listPosition = -1)
+    requires is_const_member_func_v<SLOT>
         : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMFc>(slot)), listPosition) { }
     virtual ~MythUIButtonListItem();
 
@@ -165,8 +167,8 @@ class MUI_PUBLIC MythUIButtonListItem
     bool            m_isVisible     {false};
     bool            m_enabled       {true};
     bool            m_debugme       {false};
-    ProgressInfo    m_progress1      {0,0,0};
-    ProgressInfo    m_progress2      {0,0,0};
+    ProgressInfo    m_progress1;
+    ProgressInfo    m_progress2;
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;

@@ -193,7 +193,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
     }
     else
     {
-        std::copy(IV.cbegin(), IV.cend(), iv.data());
+        std::ranges::copy(std::as_const(IV), iv.data());
     }
 
     int aeslen = data.size() & ~0xf;

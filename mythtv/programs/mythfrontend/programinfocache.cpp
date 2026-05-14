@@ -324,12 +324,12 @@ namespace {
 
 void ProgramInfoCache::GetOrdered(std::vector<ProgramInfo*> &list, bool newest_first)
 {
-    std::copy(m_cache.cbegin(), m_cache.cend(), std::back_inserter(list));
+    std::ranges::copy(std::as_const(m_cache), std::back_inserter(list));
 
     if (newest_first)
-        std::sort(list.begin(), list.end(), reversePISort);
+        std::ranges::sort(list, reversePISort);
     else
-        std::sort(list.begin(), list.end(), PISort);
+        std::ranges::sort(list, PISort);
 
 }
 

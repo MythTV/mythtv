@@ -1454,7 +1454,9 @@ void MythMainWindow::RegisterJump(const QString& Destination, const QString& Des
         }
     }
 
-    JumpData jd = { Callback, Destination, Description, Exittomain, std::move(LocalAction) };
+    JumpData jd = { .m_callback=Callback, .m_destination=Destination,
+                    .m_description=Description, .m_exittomain=Exittomain,
+                    .m_localAction=std::move(LocalAction) };
     m_priv->m_destinationMap[Destination] = jd;
     BindJump(Destination, keybind);
 }

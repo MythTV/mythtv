@@ -23,14 +23,30 @@ if("CXX" IN_LIST _ENABLED_LANGUAGES)
 endif()
 
 #
-# Require the C++17 standard, and disable compiler extensions.
+# Require the C++17 standard as a minimum, and disable compiler
+# extensions.
 #
-set(CMAKE_CXX_STANDARD 17)
+set(_CXX_MINIMUM 20)
+if(DEFINED CMAKE_CXX_STANDARD)
+  if (CMAKE_CXX_STANDARD LESS ${_CXX_MINIMUM})
+    message(FATAL_ERROR "C++${_CXX_MINIMUM} or better required.")
+  endif()
+else()
+  set(CMAKE_CXX_STANDARD ${_CXX_MINIMUM})
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Require the C17 standard, and disable compiler extensions.
-set(CMAKE_C_STANDARD 17)
+# Require the C17 standard as a minimum, and disable compiler
+# extensions.
+set(_C_MINIMUM 17)
+if(DEFINED CMAKE_C_STANDARD)
+  if (CMAKE_C_STANDARD LESS ${_C_MINIMUM})
+    message(FATAL_ERROR "C${_C_MINIMUM} or better required.")
+  endif()
+else()
+  set(CMAKE_C_STANDARD ${_C_MINIMUM})
+endif()
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
@@ -151,7 +167,9 @@ endif()
 # Add compiler specific flags.
 #
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
+  # This warning prevents comparison of tthe C++20 spaceship operator
+  # to the literal value 0.
+  # list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
 
   # This warning flag isn't enabled yet because it will require a large number
   # of changes to the code to eliminate all the warnings.
@@ -180,7 +198,9 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
   # Clang on MacOSX also doesn't ignore warnings in system headers.
   if(NOT CMAKE_SYSTEM_NAME MATCHES "(FreeBSD|Darwin)")
-    list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
+    # This warning prevents comparison of tthe C++20 spaceship operator
+    # to the literal value 0.
+   # list(APPEND CXXFLAGS -Wzero-as-null-pointer-constant)
   endif()
 
 endif()

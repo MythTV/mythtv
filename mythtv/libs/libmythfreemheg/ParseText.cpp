@@ -327,19 +327,19 @@ struct colourTable
 };
 static std::array<const struct colourTable,13> colourTable
 {{
-    { "black",          0,  0,  0,  0   },
-    { "transparent",    0,  0,  0,  255 },
-    { "gray"/*sic*/,    128, 128, 128, 0 },
-    { "darkgray"/*sic*/, 192, 192, 192, 0 },
-    { "red",            255, 0,  0,  0 },
-    { "darkred",        128, 0,  0,  0 },
-    { "blue",           0,  0,  255, 0 },
-    { "darkblue",       0,  0,  128, 0 },
-    { "green",          0,  255, 0,  0 },
-    { "darkgreen",      0,  128, 0,  0 },
-    { "yellow",         255, 255, 0,  0 },
-    { "cyan",           0,  255, 255, 0 },
-    { "magenta",        255, 0,  255, 0 }
+    { .m_name="black",           .m_r=0,   .m_g=0,   .m_b=0,   .m_t=0   },
+    { .m_name="transparent",     .m_r=0,   .m_g=0,   .m_b=0,   .m_t=255 },
+    { .m_name="gray"/*sic*/,     .m_r=128, .m_g=128, .m_b=128, .m_t=0 },
+    { .m_name="darkgray"/*sic*/, .m_r=192, .m_g=192, .m_b=192, .m_t=0 },
+    { .m_name="red",             .m_r=255, .m_g=0,   .m_b=0,   .m_t=0 },
+    { .m_name="darkred",         .m_r=128, .m_g=0,   .m_b=0,   .m_t=0 },
+    { .m_name="blue",            .m_r=0,   .m_g=0,   .m_b=255, .m_t=0 },
+    { .m_name="darkblue",        .m_r=0,   .m_g=0,   .m_b=128, .m_t=0 },
+    { .m_name="green",           .m_r=0,   .m_g=255, .m_b=0,   .m_t=0 },
+    { .m_name="darkgreen",       .m_r=0,   .m_g=128, .m_b=0,   .m_t=0 },
+    { .m_name="yellow",          .m_r=255, .m_g=255, .m_b=0,   .m_t=0 },
+    { .m_name="cyan",            .m_r=0,   .m_g=255, .m_b=255, .m_t=0 },
+    { .m_name="magenta",         .m_r=255, .m_g=0,   .m_b=255, .m_t=0 }
 }};
 
 

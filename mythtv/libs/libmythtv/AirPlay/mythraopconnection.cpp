@@ -368,7 +368,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
         delete decoded;
         return;
     }
-    AudioPacket frames { seq, decoded };
+    AudioPacket frames { .seq=seq, .data=decoded };
     m_audioQueue.insert(timestamp, frames);
     ProcessAudio();
 }
@@ -734,7 +734,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
                 (ctx->ch_layout.nb_channels * av_get_bytes_per_sample(ctx->sample_fmt));
 
             frames_added += num_samples;
-            AudioData block {samples, data_size, num_samples};
+            AudioData block {.data=samples, .length=data_size, .frames=num_samples};
             dest->append(block);
         }
         tmp_pkt->data += ret;

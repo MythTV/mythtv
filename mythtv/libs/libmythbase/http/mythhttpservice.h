@@ -74,19 +74,21 @@ class MBASE_PUBLIC V2HttpRedirectException
     public:                                              \
         Type Get##Name() const { return m_##Name; }      \
         template <class T>                                         \
-        typename std::enable_if_t<std::is_same_v<T, QString> || \
-                                  std::is_same_v<T, QStringList> || \
-                                  std::is_same_v<T, QDateTime> || \
-                                  std::is_same_v<T, QVariantMap> ||     \
-                                  std::is_same_v<T, QVariantList>,void> \
-        set##Name(const T& value) { m_##Name = value; }             \
+        void set##Name(const T& value)              \
+        requires (std::is_same_v<T, QString>     || \
+                  std::is_same_v<T, QStringList> || \
+                  std::is_same_v<T, QDateTime>   || \
+                  std::is_same_v<T, QVariantMap> || \
+                  std::is_same_v<T, QVariantList>)  \
+        { m_##Name = value; }                       \
         template <class T>                                          \
-        typename std::enable_if_t<!std::is_same_v<T, QString> && \
-                                  !std::is_same_v<T, QStringList> && \
-                                  !std::is_same_v<T, QDateTime> && \
-                                  !std::is_same_v<T, QVariantMap> &&    \
-                                  !std::is_same_v<T, QVariantList>,void> \
-        set##Name(T value) { m_##Name = value; }                    \
+        void set##Name(T value)                      \
+        requires (!std::is_same_v<T, QString> &&     \
+                  !std::is_same_v<T, QStringList> && \
+                  !std::is_same_v<T, QDateTime> &&   \
+                  !std::is_same_v<T, QVariantMap> && \
+                  !std::is_same_v<T, QVariantList>)  \
+        { m_##Name = value; }                        \
     private:                                             \
     Type m_##Name { }; // NOLINT(readability-redundant-member-init)
 

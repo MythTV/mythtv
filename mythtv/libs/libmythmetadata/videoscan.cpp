@@ -56,7 +56,7 @@ namespace
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("handleFile: %1 :: %2").arg(fq_file_name).arg(host));
 #endif
-            if (m_imageExt.find(extension.toLower()) == m_imageExt.end())
+            if (!m_imageExt.contains(extension.toLower()))
             {
                 m_videoFiles[fq_file_name].check = false;
                 m_videoFiles[fq_file_name].host = host;

@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 
+// C++ headers
+#include <algorithm>
+
 // Qt Headers
 #include <QRegularExpression>
 
@@ -309,7 +312,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 {
     QStringList types = get_inputtypes(sourceid);
     auto isencoder = [](const auto & type){ return CardUtil::IsEncoder(type); };
-    bool encoder = std::all_of(types.cbegin(), types.cend(), isencoder);
+    bool encoder = std::ranges::all_of(std::as_const(types), isencoder);
 
     // Source is connected, go by input types for type determination
     if (!types.empty())
@@ -345,7 +348,7 @@ bool SourceUtil::IsUnscanable(uint sourceid)
     if (types.empty())
         return true;
     auto unscannable = [](const auto & type) { return CardUtil::IsUnscanable(type); };
-    return std::all_of(types.cbegin(), types.cend(), unscannable);
+    return std::ranges::all_of(std::as_const(types), unscannable);
 }
 
 bool SourceUtil::IsCableCardPresent(uint sourceid)
@@ -354,7 +357,7 @@ bool SourceUtil::IsCableCardPresent(uint sourceid)
     auto ccpresent = [](uint input)
         { return CardUtil::IsCableCardPresent(input, CardUtil::GetRawInputType(input)) ||
                  CardUtil::GetRawInputType(input) == "HDHOMERUN"; };
-    return std::any_of(inputs.cbegin(), inputs.cend(), ccpresent);
+    return std::ranges::any_of(std::as_const(inputs), ccpresent);
 }
 
 bool SourceUtil::IsAnySourceScanable(void)

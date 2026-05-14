@@ -75,6 +75,11 @@ class MTV_PUBLIC MythVideoProfileItem
     bool operator<(const MythVideoProfileItem &Other) const;
     QString toString() const;
 
+    bool operator==(const MythVideoProfileItem& o) const
+        { return m_profileid == o.m_profileid; }
+    std::strong_ordering operator<=>(const MythVideoProfileItem& o) const
+        { return m_profileid <=> o.m_profileid; }
+
   private:
     uint       m_profileid        { 0 };
     QMap<QString,QString> m_pref;

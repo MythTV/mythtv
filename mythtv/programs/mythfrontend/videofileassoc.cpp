@@ -216,14 +216,13 @@ class FileAssocDialogPrivate
     UIReadyList_type GetUIReadyList()
     {
         UIReadyList_type ret;
-        std::transform(m_fileAssociations.begin(), m_fileAssociations.end(),
+        std::ranges::transform(std::as_const(m_fileAssociations),
                 std::back_inserter(ret), fa_col_ent_2_UIDFAPair());
-        auto deleted = std::remove_if(ret.begin(),
-                ret.end(), test_fa_state<FileAssociationWrap::efsDELETE>());
+        auto [first, last] = std::ranges::remove_if(ret,
+                test_fa_state<FileAssociationWrap::efsDELETE>());
+        ret.erase(first, last);
 
-        if (deleted != ret.end())
-            ret.erase(deleted, ret.end());
-
+        // NOLINTNEXTLINE(modernize-use-ranges)
         std::sort(ret.begin(), ret.end());
 
         return ret;
@@ -287,7 +286,8 @@ class FileAssocDialogPrivate
 
         auto newpair = [this](const auto & fa)
             { return UIDToFAPair(++m_nextFAID, new FileAssociationWrap(fa)); };
-        std::transform(fa_list.cbegin(), fa_list.cend(), std::back_inserter(tmp_fa), newpair);
+        std::ranges::transform(std::as_const(fa_list),
+                               std::back_inserter(tmp_fa), newpair);
 
         std::shuffle(tmp_fa.begin(), tmp_fa.end(),
                      std::mt19937(std::random_device()()));

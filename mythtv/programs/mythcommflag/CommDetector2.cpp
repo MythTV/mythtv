@@ -180,8 +180,11 @@ bool searchingForLogo(TemplateFinder *tf, const FrameAnalyzerItem &pass)
     if (!tf)
         return false;
 
-    auto it = std::find(pass.cbegin(), pass.cend(), tf);
-    return it != pass.end();
+#ifdef __cpp_lib_ranges_contains
+    return std::ranges::contains(pass, tf);
+#else
+    return std::ranges::find(pass, tf) != pass.cend();
+#endif
 }
 
 };  // namespace

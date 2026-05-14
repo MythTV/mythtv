@@ -4,6 +4,10 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// C++ headers
+#include <algorithm>
+
+// Qt
 #include <QRegularExpression>
 #include <QStringList>
 #include <QTcpSocket>
@@ -200,7 +204,7 @@ bool CetonRTSP::ProcessRequest(
     {
         // Handle broken implementation, such as VLC
         // doesn't respect the case of "CSeq", so find it regardless of the spelling
-        auto it = std::find_if(m_responseHeaders.cbegin(), m_responseHeaders.cend(),
+        auto it = std::ranges::find_if(std::as_const(m_responseHeaders),
                                [](const QString& key) -> bool
                                    {return key.compare("CSeq", Qt::CaseInsensitive) == 0;});
         if (it != m_responseHeaders.cend())

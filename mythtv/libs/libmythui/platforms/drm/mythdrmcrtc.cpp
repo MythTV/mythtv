@@ -1,6 +1,8 @@
 // MythTV
 #include "platforms/drm/mythdrmcrtc.h"
 
+#include <algorithm>
+
 /*! \class MythDRMCrtc
  * \brief A simple wrapper around a DRM CRTC object.
  *
@@ -18,8 +20,8 @@ DRMCrtc MythDRMCrtc::Create(int FD, uint32_t Id, int Index)
 
 DRMCrtc MythDRMCrtc::GetCrtc(const DRMCrtcs &Crtcs, uint32_t Id)
 {
-    auto match = [&Id](const auto & Crtc) { return Crtc->m_id == Id; };
-    if (auto found = std::find_if(Crtcs.cbegin(), Crtcs.cend(), match); found != Crtcs.cend())
+    auto found = std::ranges::find(Crtcs, Id, &MythDRMCrtc::m_id);
+    if (found != Crtcs.end())
         return *found;
     return nullptr;
 }

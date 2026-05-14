@@ -289,7 +289,7 @@ void FlatView::Populate(ImageList &files)
                 for (int count = 0; count < files.size(); ++count)
                 {
                     uint32_t randWeight = MythRandom(0, maxWeight);
-                    auto it = std::upper_bound(weights.begin(), weights.end(), randWeight);
+                    auto it = std::ranges::upper_bound(weights, randWeight);
                     int    index      = std::distance(weights.begin(), it);
                     m_sequence.append(files.at(index)->m_id);
                 }

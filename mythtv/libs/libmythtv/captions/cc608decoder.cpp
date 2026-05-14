@@ -1062,7 +1062,7 @@ static bool is_better(const QString &newStr, const QString &oldStr)
             return true;
 
         // check if the string contains any bogus characters
-        return std::all_of(newStr.cbegin(), newStr.cend(),
+        return std::ranges::all_of(std::as_const(newStr),
                            [](auto ch){ return ch.toLatin1() >= 0x20; } );
     }
     return false;

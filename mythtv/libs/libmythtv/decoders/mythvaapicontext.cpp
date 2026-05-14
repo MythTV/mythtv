@@ -1,3 +1,6 @@
+// C++ headers
+#include <algorithm>
+
 // Qt
 #include <QCoreApplication>
 #include <QWaitCondition>
@@ -171,7 +174,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext** Context,
     auto mythprofile = MythCodecContext::FFmpegToMythProfile((*Context)->codec_id, (*Context)->profile);
     auto haveprofile = [&](MythCodecContext::CodecProfile Profile, QSize Size)
     {
-        return std::any_of(profiles.cbegin(), profiles.cend(),
+        return std::ranges::any_of(std::as_const(profiles),
                            [&Profile,Size](auto vaprofile)
                                { return vaprofile.first == Profile &&
                                         vaprofile.second.first.width() <= Size.width() &&
@@ -310,9 +313,15 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
         }
 
         std::array<VASurfaceAttrib,3> prefs {{
-            { VASurfaceAttribPixelFormat, VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { format } } },
-            { VASurfaceAttribUsageHint,   VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
-            { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } }};
+            { .type=VASurfaceAttribPixelFormat,
+              .flags=VA_SURFACE_ATTRIB_SETTABLE,
+              .value={ VAGenericValueTypeInteger, { format } } },
+            { .type=VASurfaceAttribUsageHint,
+              .flags=VA_SURFACE_ATTRIB_SETTABLE,
+              .value={ VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
+            { .type=VASurfaceAttribMemoryType,
+              .flags=VA_SURFACE_ATTRIB_SETTABLE,
+              .value={ VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } }};
         vaapi_frames_ctx->attributes = prefs.data();
         vaapi_frames_ctx->nb_attributes = 3;
     }

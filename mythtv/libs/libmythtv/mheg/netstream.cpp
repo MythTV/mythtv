@@ -925,7 +925,7 @@ bool NAMThread::AbortRequest(NetStreamAbort *p)
 bool NAMThread::isAvailable()
 {
     auto interfaces = QNetworkInterface::allInterfaces();
-    return std::any_of(interfaces.begin(), interfaces.end(),
+    return std::ranges::any_of(interfaces,
 		       [](const QNetworkInterface& iface)
 			   {
                                auto f = iface.flags();
