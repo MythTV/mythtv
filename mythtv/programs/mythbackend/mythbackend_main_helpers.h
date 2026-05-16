@@ -9,7 +9,8 @@ class MythBackendCommandLineParser;
 class QString;
 class QSize;
 
-bool setupTVs(bool ismaster, bool &error);
+void doDatabaseHacks();
+bool createTVRecorders(bool ismaster, bool retry = false);
 void cleanup(void);
 int  handle_command(const MythBackendCommandLineParser &cmdline);
 int  connect_to_master(void);

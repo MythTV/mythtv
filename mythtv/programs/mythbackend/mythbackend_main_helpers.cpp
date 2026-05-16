@@ -84,66 +84,67 @@ static MythSystemEventHandler *gSysEventHandler { nullptr };
 static MediaServer            *g_pUPnp          { nullptr };
 static MainServer             *mainServer       { nullptr };
 
-bool setupTVs(bool ismaster, bool &error)
+void doDatabaseHacks()
 {
-    error = false;
-    QString localhostname = gCoreContext->GetHostName();
-
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (ismaster)
+    // Hack to make sure recorded.basename gets set if the user
+    // downgrades to a prior version and creates new entries
+    // without it.
+    if (!query.exec("UPDATE recorded SET basename = CONCAT(chanid, '_', "
+                    "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
+                    "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
+                    "WHERE basename = '';"))
+        MythDB::DBError("Updating record basename", query);
+
+    // Hack to make sure record.station gets set if the user
+    // downgrades to a prior version and creates new entries
+    // without it.
+    if (!query.exec("UPDATE channel SET callsign=chanid "
+                    "WHERE callsign IS NULL OR callsign='';"))
+        MythDB::DBError("Updating channel callsign", query);
+
+    if (query.exec("SELECT MIN(chanid) FROM channel;"))
     {
-        // Hack to make sure recorded.basename gets set if the user
-        // downgrades to a prior version and creates new entries
-        // without it.
-        if (!query.exec("UPDATE recorded SET basename = CONCAT(chanid, '_', "
-                        "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
-                        "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
-                        "WHERE basename = '';"))
-            MythDB::DBError("Updating record basename", query);
+        query.first();
+        int min_chanid = query.value(0).toInt();
+        if (!query.exec(QString("UPDATE record SET chanid = %1 "
+                                "WHERE chanid IS NULL;").arg(min_chanid)))
+            MythDB::DBError("Updating record chanid", query);
+    }
+    else
+    {
+        MythDB::DBError("Querying minimum chanid", query);
+    }
 
-        // Hack to make sure record.station gets set if the user
-        // downgrades to a prior version and creates new entries
-        // without it.
-        if (!query.exec("UPDATE channel SET callsign=chanid "
-                        "WHERE callsign IS NULL OR callsign='';"))
-            MythDB::DBError("Updating channel callsign", query);
-
-        if (query.exec("SELECT MIN(chanid) FROM channel;"))
+    MSqlQuery records_without_station(MSqlQuery::InitCon());
+    records_without_station.prepare("SELECT record.chanid,"
+            " channel.callsign FROM record LEFT JOIN channel"
+            " ON record.chanid = channel.chanid WHERE record.station='';");
+    if (records_without_station.exec())
+    {
+        MSqlQuery update_record(MSqlQuery::InitCon());
+        update_record.prepare("UPDATE record SET station = :CALLSIGN"
+                " WHERE chanid = :CHANID;");
+        while (records_without_station.next())
         {
-            query.first();
-            int min_chanid = query.value(0).toInt();
-            if (!query.exec(QString("UPDATE record SET chanid = %1 "
-                                    "WHERE chanid IS NULL;").arg(min_chanid)))
-                MythDB::DBError("Updating record chanid", query);
-        }
-        else
-        {
-            MythDB::DBError("Querying minimum chanid", query);
-        }
-
-        MSqlQuery records_without_station(MSqlQuery::InitCon());
-        records_without_station.prepare("SELECT record.chanid,"
-                " channel.callsign FROM record LEFT JOIN channel"
-                " ON record.chanid = channel.chanid WHERE record.station='';");
-        if (records_without_station.exec())
-        {
-            MSqlQuery update_record(MSqlQuery::InitCon());
-            update_record.prepare("UPDATE record SET station = :CALLSIGN"
-                    " WHERE chanid = :CHANID;");
-            while (records_without_station.next())
+            update_record.bindValue(":CALLSIGN",
+                    records_without_station.value(1));
+            update_record.bindValue(":CHANID",
+                    records_without_station.value(0));
+            if (!update_record.exec())
             {
-                update_record.bindValue(":CALLSIGN",
-                        records_without_station.value(1));
-                update_record.bindValue(":CHANID",
-                        records_without_station.value(0));
-                if (!update_record.exec())
-                {
-                    MythDB::DBError("Updating record station", update_record);
-                }
+                MythDB::DBError("Updating record station", update_record);
             }
         }
     }
+}
+
+bool createTVRecorders(bool ismaster, bool retry)
+{
+    QString localhostname = gCoreContext->GetHostName();
+
+    MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.exec(
             "SELECT cardid, parentid, videodevice, hostname, sourceid "
@@ -165,7 +166,7 @@ bool setupTVs(bool ismaster, bool &error)
         uint    sourceid    = query.value(4).toUInt();
         QString cidmsg      = QString("Card[%1](%2)").arg(cardid).arg(videodevice);
 
-        if (hostname.isEmpty())
+        if (hostname.isEmpty() && !retry)
         {
             LOG(VB_GENERAL, LOG_ERR, cidmsg +
                 " does not have a hostname defined.\n"
@@ -176,11 +177,17 @@ bool setupTVs(bool ismaster, bool &error)
         // Skip all cards that do not have a video source
         if (sourceid == 0)
         {
-            if (parentid == 0)
+            if (parentid == 0 && !retry)
             {
                 LOG(VB_GENERAL, LOG_WARNING, cidmsg +
                     " does not have a video source");
             }
+            continue;
+        }
+
+        if (retry && (TVRec::GetTVRec(cardid) != nullptr))
+        {
+            // We're retrying, so ignore existing encoders
             continue;
         }
 
@@ -252,7 +259,7 @@ bool setupTVs(bool ismaster, bool &error)
         }
     }
 
-    if (gTVList.empty())
+    if (gTVList.empty() && !retry)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "No valid capture cards are defined in the database.");
@@ -586,10 +593,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     print_warnings(cmdline);
 
-    bool fatal_error = false;
-    bool runsched = setupTVs(ismaster, fatal_error);
-    if (fatal_error)
-        return GENERIC_EXIT_SETUP_ERROR;
+    if (ismaster)
+        doDatabaseHacks();
+    bool runsched = createTVRecorders(ismaster);
 
     Scheduler *sched = nullptr;
     if (ismaster)
@@ -642,6 +648,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         gHousekeeping->RegisterTask(new HardwareProfileTask());
  #endif
 #endif
+        gHousekeeping->RegisterTask(new FindEncoders());
 
         gHousekeeping->Start();
     }
