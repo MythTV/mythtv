@@ -83,6 +83,21 @@ function(find_or_build_ffmpeg)
     list(APPEND FF_ARGS --disable-alsa)
   endif()
 
+  # Special handling for Vulkan. On Debian 12 and Ubuntu 24.04 systems
+  # the cmake test and the FFmpeg test for whether or not Vulkan is
+  # installed give different results.  The problem appears to be a
+  # missing stdbit.h file in libc6-dev on those systems causing the
+  # FFmpeg test to fail.  (Perhaps this is a change in the FFmpeg test
+  # in the latest version?)  If this code tries to force FFmpeg Vulkan
+  # support based on the cmake test, the compile will fail.  If this
+  # code allows FFmpeg to determine for itself whether Vulkan is
+  # present the compile will succeed.  Instead of explicitly forcing
+  # Vulkan on/off like before, only force it off when requested.
+  # Otherwise allow FFmpeg to do its own thing.
+  if(NOT ENABLE_VULKAN OR NOT TARGET:Vulkan::Vulkan)
+    list(APPEND FF_ARGS --disable-vulkan)
+  endif()
+
   #
   # Handle platform args for a native system.
   #
@@ -137,7 +152,6 @@ function(find_or_build_ffmpeg)
       $<IF:$<TARGET_EXISTS:PkgConfig::LIBXVID>,--enable-libxvid,--disable-libxvid>
       $<IF:$<TARGET_EXISTS:PkgConfig::VAAPI>,--enable-vaapi,--disable-vaapi>
       $<IF:$<TARGET_EXISTS:PkgConfig::VDPAU>,--enable-vdpau,--disable-vdpau>
-      $<IF:$<TARGET_EXISTS:Vulkan::Vulkan>,--enable-vulkan,--disable-vulkan>
     # $<IF:$<TARGET_EXISTS:PkgConfig::SDL2>,--enable-sdl2,--disable-sdl2>
       ${FF_USER_OPTS}
     BUILD_COMMAND ${MAKE_EXECUTABLE} ${MAKE_JFLAG}
