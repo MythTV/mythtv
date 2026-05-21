@@ -38,7 +38,11 @@
 #include <QtGlobal>
 #include <QtEndian>
 #include <QDateTime>
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
 #include <QSequentialIterable>
+#else
+#include <QMetaSequence>
+#endif
 #include <QTextStream>
 #include <QTimeZone>
 #include <QBuffer>
@@ -217,7 +221,11 @@ void MythBinaryPList::DictToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 void MythBinaryPList::ArrayToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
     Xml.writeStartElement("array");
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
     auto list = Data.value<QSequentialIterable>();
+#else
+    auto list = Data.value<QMetaSequence::Iterable>();
+#endif
     for (const auto & item : std::as_const(list))
         ToXML(item, Xml);
     Xml.writeEndElement();
