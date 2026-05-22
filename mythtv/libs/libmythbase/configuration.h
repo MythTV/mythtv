@@ -119,14 +119,23 @@ class MBASE_PUBLIC XmlConfiguration
 
     template <typename T>
     T GetDuration(const QString &setting, T defaultValue = T::zero())
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
     requires (std::chrono::__is_duration<T>::value)
+#endif
     {
         return T(GetValue(setting, static_cast<int>(defaultValue.count())));
     }
 
     template <typename T>
     void SetDuration(const QString &setting, T value)
-    requires (std::chrono::__is_duration<T>::value) {
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
+    requires (std::chrono::__is_duration<T>::value)
+#endif
+    {
         SetValue(setting, static_cast<int>(value.count()));
     }
 };

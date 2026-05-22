@@ -38,12 +38,20 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
 
     template <typename T>
     T GetDuration()
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
     requires (std::chrono::__is_duration<T>::value)
+#endif
     { return T(GetDataValue().toInt()); }
 
     template <typename T>
     void SetDuration(T val)
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
     requires (std::chrono::__is_duration<T>::value)
+#endif
     { SetValueByData(static_cast<int>(val.count())); }
 
   protected:

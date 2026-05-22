@@ -133,7 +133,11 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     // No conversion between duration ratios. Just extract the number.
     template <typename T>
     void SaveDurSetting(const QString &key, T newValue)
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
     requires (std::chrono::__is_duration<T>::value)
+#endif
     { SaveSetting(key, static_cast<int>(newValue.count())); }
 
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
@@ -146,7 +150,11 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     int GetNumSetting(const QString &key, int defaultval = 0);
     template <typename T>
     T GetDurSetting(const QString &key, T defaultval = T::zero())
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
     requires (std::chrono::__is_duration<T>::value)
+#endif
     { return T(GetNumSetting(key, static_cast<int>(defaultval.count()))); }
     int GetBoolSetting(const QString &key, int defaultval) = delete;
     bool GetNumSetting(const QString &key, bool defaultvalue) = delete;

@@ -20,7 +20,11 @@ class MTV_PUBLIC PlayGroup
                           int defval);
     template <typename T>
     static T GetDurSetting(const QString &name, const QString &field, T defval)
+#if HAVE_IS_DURATION_V
+    requires (std::chrono::__is_duration_v<T>)
+#else
     requires (std::chrono::__is_duration<T>::value)
+#endif
     { return T(GetSetting(name, field, static_cast<int>(defval.count()))); }
 };
 
