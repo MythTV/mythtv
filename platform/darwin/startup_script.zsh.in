@@ -32,5 +32,8 @@ export PYTHONPATH=$PYTHON_BASE_PATH:$PYTHON_BASE_PATH/site-packages:$PYTHON_BASE
 # set the mythtv share dir
 export MYTHTVDIR="$RSRC_DIR"
 
+# Automatically trust the mariadb server ssl certificate
+export MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
+
 cd $BASE_DIR
 ./@APP_EXE_NAME@ $@
