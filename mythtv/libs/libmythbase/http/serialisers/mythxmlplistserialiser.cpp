@@ -3,7 +3,11 @@
 
 // Qt
 #include <QMetaProperty>
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
 #include <QSequentialIterable>
+#else
+#include <QMetaSequence>
+#endif
 
 // MythTV
 #include "mythdate.h"
@@ -174,7 +178,11 @@ void MythXMLPListSerialiser::AddStringList(const QString& Name, const QVariant& 
 {
     m_writer.writeTextElement("key", Name);
     m_writer.writeStartElement("array");
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
     auto values = Values.value<QSequentialIterable>();
+#else
+    auto values = Values.value<QMetaSequence::Iterable>();
+#endif
     for (const auto & value : values)
         m_writer.writeTextElement("string", value.toString());
     m_writer.writeEndElement();

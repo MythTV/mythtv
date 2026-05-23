@@ -34,7 +34,11 @@ find_package(Iconv REQUIRED)
 find_package(expat NO_MODULE)
 find_package(ZLIB REQUIRED)
 find_package(SQLite3 3.13)
-add_build_config(SQLite::SQLite3 "sqlite3")
+if (NOT TARGET SQLite3::SQLite3 AND TARGET SQLite::SQLite3)
+  # Use the cmake4 name for this library
+  add_library(SQLite3::SQLite3 ALIAS SQLite::SQLite3)
+endif()
+add_build_config(SQLite3::SQLite3 "sqlite3")
 set(CONFIG_SQLITE3 ${SQLite3_FOUND})
 
 #

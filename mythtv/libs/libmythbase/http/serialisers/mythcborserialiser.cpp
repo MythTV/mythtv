@@ -1,6 +1,10 @@
 // Qt
 #include <QMetaProperty>
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
 #include <QSequentialIterable>
+#else
+#include <QMetaSequence>
+#endif
 
 // MythTV
 #include "mythdate.h"
@@ -132,7 +136,11 @@ void MythCBORSerialiser::AddQObject(const QObject* Object)
 void MythCBORSerialiser::AddStringList(const QVariant &Values)
 {
     m_writer->startArray();
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
     auto values = Values.value<QSequentialIterable>();
+#else
+    auto values = Values.value<QMetaSequence::Iterable>();
+#endif
     for (const auto & value : values)
     {
         auto utf8 = value.toString().toUtf8();
@@ -144,7 +152,11 @@ void MythCBORSerialiser::AddStringList(const QVariant &Values)
 void MythCBORSerialiser::AddList(const QVariant& Values)
 {
     m_writer->startArray();
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
     auto values = Values.value<QSequentialIterable>();
+#else
+    auto values = Values.value<QMetaSequence::Iterable>();
+#endif
     for (const auto & value : values)
         AddValue(value);
     m_writer->endArray();

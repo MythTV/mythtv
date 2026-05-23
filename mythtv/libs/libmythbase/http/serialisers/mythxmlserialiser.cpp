@@ -1,6 +1,10 @@
 // Qt
 #include <QMetaProperty>
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
 #include <QSequentialIterable>
+#else
+#include <QMetaSequence>
+#endif
 
 // MythTV
 #include "mythdate.h"
@@ -133,7 +137,11 @@ void MythXMLSerialiser::AddProperty(const QString& Name, const QVariant& Value,
 
 void MythXMLSerialiser::AddStringList(const QVariant& Values)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
     auto values = Values.value<QSequentialIterable>();
+#else
+    auto values = Values.value<QMetaSequence::Iterable>();
+#endif
     for (const auto & value : values)
     {
         m_writer.writeStartElement("String");
@@ -144,7 +152,11 @@ void MythXMLSerialiser::AddStringList(const QVariant& Values)
 
 void MythXMLSerialiser::AddList(const QString& Name, const QVariant& Values)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,11,0)
     auto values = Values.value<QSequentialIterable>();
+#else
+    auto values = Values.value<QMetaSequence::Iterable>();
+#endif
     for (const auto & value : values)
     {
         m_writer.writeStartElement(Name);
