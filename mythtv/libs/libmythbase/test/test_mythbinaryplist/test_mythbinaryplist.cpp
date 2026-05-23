@@ -180,3 +180,5 @@ void TestMythBinaryPList::plist_read(void)
 
 
 QTEST_APPLESS_MAIN(TestMythBinaryPList)
+
+#include "moc_test_mythbinaryplist.cpp"

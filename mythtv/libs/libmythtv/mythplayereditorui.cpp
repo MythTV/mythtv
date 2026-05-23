@@ -295,3 +295,5 @@ bool MythPlayerEditorUI::DoRewindSecs(float Seconds, double Inaccuracy, bool Use
     uint64_t targetFrame = FindFrame(target, UseCutlist);
     return DoRewind(m_framesPlayed - targetFrame, Inaccuracy);
 }
+
+#include "moc_mythplayereditorui.cpp"

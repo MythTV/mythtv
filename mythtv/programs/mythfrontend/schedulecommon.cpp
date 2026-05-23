@@ -607,3 +607,5 @@ void ScheduleCommon::AddGroupMenuItems(MythMenu *sortGroupMenu)
     sortGroupMenu->AddItem(tr("Group By Program ID"));
     sortGroupMenu->AddItem(tr("Group By None"));
 }
+
+#include "moc_schedulecommon.cpp"

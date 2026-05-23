@@ -1010,3 +1010,5 @@ void GameHandler::CreateProgress(const QString& message)
         m_progressDlg = nullptr;
     }
 }
+
+#include "moc_gamehandler.cpp"

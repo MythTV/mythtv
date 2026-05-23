@@ -8,9 +8,6 @@ TEMPLATE = app
 TARGET = test_iptvrecorder
 INCLUDEPATH += ../../..
 
-LIBS += ../../$(OBJECTS_DIR)iptvchannelfetcher.o
-LIBS += ../../$(OBJECTS_DIR)scanmonitor.o
-LIBS += ../../$(OBJECTS_DIR)moc_scanmonitor.o
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION

@@ -529,3 +529,5 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
 }
 
 Q_DECLARE_METATYPE(UIDToFAPair)
+
+#include "moc_videofileassoc.cpp"

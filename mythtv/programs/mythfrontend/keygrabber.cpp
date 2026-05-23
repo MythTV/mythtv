@@ -121,3 +121,5 @@ void KeyGrabPopupBox::SendResult()
     emit HaveResult(m_capturedKey);
     Close();
 }
+
+#include "moc_keygrabber.cpp"

@@ -52,3 +52,5 @@ void InteractiveScreen::OptimiseDisplayedArea()
     for (auto *img : std::as_const(m_childrenList))
         img->SetArea(MythRect(img->GetArea().translated(left, top)));
 }
+
+#include "moc_interactivescreen.cpp"

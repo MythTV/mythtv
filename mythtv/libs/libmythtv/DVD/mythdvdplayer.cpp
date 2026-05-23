@@ -725,3 +725,5 @@ void MythDVDPlayer::CreateDecoder(TestBufferVec & Testbuf)
     if (MythDVDDecoder::CanHandle(Testbuf, m_playerCtx->m_buffer->GetFilename()))
         SetDecoder(new MythDVDDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
 }
+
+#include "moc_mythdvdplayer.cpp"

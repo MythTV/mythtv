@@ -182,3 +182,5 @@ void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
         m_waylandDev->SetOpaqueRegion(rect());
 #endif
 }
+
+#include "moc_mythpainterwindow.cpp"

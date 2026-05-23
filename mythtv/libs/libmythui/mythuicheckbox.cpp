@@ -217,3 +217,5 @@ void MythUICheckBox::Finalize()
 {
     SetInitialStates();
 }
+
+#include "moc_mythuicheckbox.cpp"

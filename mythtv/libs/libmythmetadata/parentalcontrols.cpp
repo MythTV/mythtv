@@ -374,3 +374,4 @@ void ParentalLevelChangeChecker::OnResultReady(bool passwordValid,
 }
 
 #include "parentalcontrols.moc"
+#include "moc_parentalcontrols.cpp"

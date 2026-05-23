@@ -2931,3 +2931,5 @@ bool TrackInfoDialog::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_musiccommon.cpp"

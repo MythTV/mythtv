@@ -244,3 +244,5 @@ bool MythNewsConfig::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_mythnewsconfig.cpp"

@@ -113,3 +113,5 @@ void StartPrompter::quit()
 {
     qApp->exit(GENERIC_EXIT_OK);
 }
+
+#include "moc_startprompt.cpp"

@@ -94,3 +94,5 @@ void GameDetailsPopup::SetReturnEvent(QObject *retobject,
     m_id = resultid;
 }
 
+
+#include "moc_gamedetails.cpp"

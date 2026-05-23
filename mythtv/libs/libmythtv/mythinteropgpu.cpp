@@ -102,3 +102,4 @@ void* MythInteropGPU::GetDefaultUserOpaque()
     return m_defaultUserOpaque;
 }
 
+#include "moc_mythinteropgpu.cpp"

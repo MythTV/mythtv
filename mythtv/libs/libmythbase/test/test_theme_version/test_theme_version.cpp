@@ -67,3 +67,5 @@ void TestThemeVersion::test_version(void)
 }
 
 QTEST_APPLESS_MAIN(TestThemeVersion)
+
+#include "moc_test_theme_version.cpp"

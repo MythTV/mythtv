@@ -10,8 +10,8 @@ INCLUDEPATH += . ../..
 INCLUDEPATH += ../../../../libs
 
 LIBS += ../../obj/videolist.o
-LIBS += ../../obj/videofilter.o ../../obj/moc_videofilter.o
-LIBS += ../../obj/upnpscanner.o ../../obj/moc_upnpscanner.o
+LIBS += ../../obj/videofilter.o
+LIBS += ../../obj/upnpscanner.o
 
 # Add all the necessary libraries
 LIBS += -L../../../../libs/libmythbase -lmythbase-$$LIBVERSION

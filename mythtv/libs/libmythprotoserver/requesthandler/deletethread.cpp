@@ -261,3 +261,5 @@ void DeleteThread::ProcessOld(void)
             break;
     }
 }
+
+#include "moc_deletethread.cpp"

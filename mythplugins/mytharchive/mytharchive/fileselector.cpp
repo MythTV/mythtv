@@ -439,3 +439,5 @@ void FileSelector::updateFileList()
             "MythArchive:  current directory does not exist!");
     }
 }
+
+#include "moc_fileselector.cpp"

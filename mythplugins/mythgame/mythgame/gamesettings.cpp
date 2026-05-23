@@ -429,3 +429,5 @@ void GamePlayersList::CreateNewPlayer(const QString& name)
     // Redraw list
     setVisible(true);
 }
+
+#include "moc_gamesettings.cpp"

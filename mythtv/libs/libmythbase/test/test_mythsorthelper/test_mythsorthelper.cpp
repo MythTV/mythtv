@@ -165,3 +165,5 @@ void TestSortHelper::Variations_test(void)
 }
 
 QTEST_APPLESS_MAIN(TestSortHelper)
+
+#include "moc_test_mythsorthelper.cpp"

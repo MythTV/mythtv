@@ -260,3 +260,5 @@ void MythUIScreenBounds::SetFontStretch(int Stretch)
 {
     m_fontStretch = Stretch;
 }
+
+#include "moc_mythuiscreenbounds.cpp"

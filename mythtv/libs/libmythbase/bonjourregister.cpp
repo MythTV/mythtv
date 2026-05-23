@@ -166,3 +166,5 @@ bool BonjourRegister::ReAnnounceService(void)
     }
     return kDNSServiceErr_NoError != res;
 }
+
+#include "moc_bonjourregister.cpp"

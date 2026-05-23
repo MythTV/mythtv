@@ -155,4 +155,4 @@ void MythVideoVulkan::ColourSpaceUpdate(bool /*PrimariesChanged*/)
 {
 }
 
-
+#include "moc_mythvideovulkan.cpp"

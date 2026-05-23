@@ -1376,3 +1376,5 @@ void EditAlbumartDialog::removeCachedImage(const AlbumArtImage *image)
 
     GetMythUI()->RemoveFromCacheByFile(image->m_filename);
 }
+
+#include "moc_editmetadata.cpp"

@@ -321,3 +321,5 @@ void SatIPRTSP::timerEvent(QTimerEvent* timerEvent)
 
     sendMessage("OPTIONS");
 }
+
+#include "moc_satiprtsp.cpp"

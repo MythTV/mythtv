@@ -268,3 +268,5 @@ void TestCommandLineParser::test_parse_cmdline(void)
 }
 
 QTEST_APPLESS_MAIN(TestCommandLineParser)
+
+#include "moc_test_mythcommandlineparser.cpp"

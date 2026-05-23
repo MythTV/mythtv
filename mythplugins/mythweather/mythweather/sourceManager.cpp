@@ -379,3 +379,5 @@ void SourceManager::recurseDirs( QDir dir )
         }
     }
 }
+
+#include "moc_sourceManager.cpp"

@@ -1075,3 +1075,5 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         GetNotificationCenter()->Queue(n);
     }
 }
+
+#include "moc_editvideometadata.cpp"

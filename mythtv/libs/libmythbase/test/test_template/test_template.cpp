@@ -88,3 +88,5 @@ void TestTemplate::example_repeated_test(void)
 }
 
 QTEST_APPLESS_MAIN(TestTemplate)
+
+#include "moc_test_template.cpp"

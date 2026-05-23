@@ -950,4 +950,4 @@ void WebSocketWorker::DeregisterExtension(WebSocketExtension* extension)
     }
 }
 
-
+#include "moc_websocket.cpp"

@@ -470,3 +470,5 @@ void CustomPriority::testSchedule(void)
         LOG(VB_GENERAL, LOG_ERR, msg);
     }
 }
+
+#include "moc_custompriority.cpp"

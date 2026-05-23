@@ -959,4 +959,4 @@ void ChannelOptionsRawTS::Save(void)
     ChannelUtil::SaveCachedPids(chanid, pid_cache, true /* delete_all */);
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_channelsettings.cpp"

@@ -776,3 +776,5 @@ void SlideBuffer::Flush(Slide *slide)
 {
     Flush(slide, "Loaded");
 };
+
+#include "moc_galleryslide.cpp"

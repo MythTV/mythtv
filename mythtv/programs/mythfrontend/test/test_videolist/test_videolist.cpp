@@ -140,3 +140,5 @@ void TestVideoList::cleanupTestCase()
 }
 
 QTEST_GUILESS_MAIN(TestVideoList)
+
+#include "moc_test_videolist.cpp"

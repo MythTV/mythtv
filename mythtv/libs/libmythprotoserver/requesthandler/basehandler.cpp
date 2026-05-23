@@ -207,3 +207,4 @@ bool BaseRequestHandler::HandleQueryTimeZone(SocketHandler *sock)
     return true;
 }
 
+#include "moc_basehandler.cpp"

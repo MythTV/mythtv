@@ -82,3 +82,5 @@ void MythWebSocketEvent::customEvent(QEvent* event)
         emit SendTextMessage(message);
     }
 }
+
+#include "moc_mythwebsocketevent.cpp"

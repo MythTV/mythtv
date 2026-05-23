@@ -1144,3 +1144,5 @@ void ImportCoverArtDialog::updateTypeSelector()
     else
         m_typeList->SetValue(tr("<Unknown>"));
 }
+
+#include "moc_importmusic.cpp"

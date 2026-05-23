@@ -10,7 +10,6 @@ INCLUDEPATH += . ../..
 INCLUDEPATH += ../../../../libs
 
 LIBS += ../../obj/recordingextender.o
-LIBS += ../../obj/moc_recordingextender.o
 
 # Add all the necessary libraries
 LIBS += -L../../../../libs/libmythbase -lmythbase-$$LIBVERSION

@@ -21,3 +21,5 @@ bool SearchEditor::Matches(bool search, bool /*tree*/)
 {
     return search;
 }
+
+#include "moc_searcheditor.cpp"

@@ -1824,5 +1824,4 @@ void MythCookieJar::save(const QString &filename)
         stream << cookie.toRawForm() << Qt::endl;
 }
 
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythdownloadmanager.cpp"

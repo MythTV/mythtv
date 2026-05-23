@@ -2643,3 +2643,5 @@ void SubtitleScreen::RenderAssTrack(std::chrono::milliseconds timecode, bool for
     }
 }
 #endif // CONFIG_LIBASS
+
+#include "moc_subtitlescreen.cpp"

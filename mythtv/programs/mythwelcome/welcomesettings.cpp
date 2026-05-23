@@ -170,3 +170,5 @@ MythShutdownSettings::MythShutdownSettings()
     addChild(MythShutdownXTermCmd());
     addChild(MythShutdownStartFECmd());
 }
+
+#include "moc_welcomesettings.cpp"

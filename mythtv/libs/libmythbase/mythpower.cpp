@@ -384,3 +384,5 @@ void MythPower::PowerLevelChanged(int Level)
 
     m_powerLevel = Level;
 }
+
+#include "moc_mythpower.cpp"

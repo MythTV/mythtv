@@ -1111,3 +1111,5 @@ void GameUI::reloadAllData(bool dbChanged)
         BuildTree();
 }
 
+
+#include "moc_gameui.cpp"

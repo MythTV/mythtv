@@ -704,3 +704,5 @@ bool V2Guide::UpdateChannelGroup  ( const QString & oldName, const QString & new
 
 
 // NOLINTEND(modernize-return-braced-init-list)
+
+#include "moc_v2guide.cpp"

@@ -2747,3 +2747,5 @@ QString V2Dvr::CheckPowerQuery(const QString & SelectClause)
     }
     return msg;
 }
+
+#include "moc_v2dvr.cpp"

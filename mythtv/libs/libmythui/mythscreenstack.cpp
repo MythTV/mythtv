@@ -390,3 +390,5 @@ MythPainter* MythScreenStack::GetPainter(void)
 {
     return GetMythPainter();
 }
+
+#include "moc_mythscreenstack.cpp"

@@ -810,3 +810,5 @@ void PrevRecordedList::DeleteOldSeries(bool ok)
         }
     }
 }
+
+#include "moc_prevreclist.cpp"

@@ -698,3 +698,5 @@ void MythUIVirtualKeyboard::loadEventKeyDefinitions(
     *keyDef = a[0];
 #endif
 }
+
+#include "moc_mythvirtualkeyboard.cpp"

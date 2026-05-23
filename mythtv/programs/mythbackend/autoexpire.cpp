@@ -1135,4 +1135,4 @@ bool AutoExpire::IsInExpireList(
                                      (info->GetRecordingStartTime() == recstartts)); } );
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_autoexpire.cpp"

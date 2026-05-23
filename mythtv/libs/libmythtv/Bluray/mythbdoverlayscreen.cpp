@@ -53,3 +53,5 @@ void MythBDOverlayScreen::DisplayBDOverlay(MythBDOverlay *Overlay)
     SetRedraw();
     delete Overlay;
 }
+
+#include "moc_mythbdoverlayscreen.cpp"

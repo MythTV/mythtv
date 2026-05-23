@@ -149,3 +149,5 @@ bool ZMMiniPlayer::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_zmminiplayer.cpp"

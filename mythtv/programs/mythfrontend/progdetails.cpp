@@ -936,3 +936,5 @@ void ProgDetails::loadPage(void)
 
     delete record;
 }
+
+#include "moc_progdetails.cpp"

@@ -723,4 +723,4 @@ bool MythUIFileBrowser::GetRemoteFileList(const QString &url,
 
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythuifilebrowser.cpp"

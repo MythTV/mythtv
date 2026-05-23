@@ -745,3 +745,5 @@ ProgramInfo *ViewScheduled::GetCurrentProgram(void) const
     MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
     return item ? item->GetData().value<ProgramInfo*>() : nullptr;
 }
+
+#include "moc_viewscheduled.cpp"

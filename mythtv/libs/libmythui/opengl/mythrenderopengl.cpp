@@ -1581,3 +1581,5 @@ void MythRenderOpenGL::Check16BitFBO(void)
         delete fbo;
     }
 }
+
+#include "moc_mythrenderopengl.cpp"

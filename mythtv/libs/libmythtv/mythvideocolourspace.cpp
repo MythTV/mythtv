@@ -579,3 +579,5 @@ MythColourSpace MythVideoColourSpace::GetPrimaries(int Primary, float &Gamma)
         default: return MythColourSpace::s_BT709;
     }
 }
+
+#include "moc_mythvideocolourspace.cpp"

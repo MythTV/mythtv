@@ -1041,7 +1041,4 @@ QString logStrerror(int errnum)
     return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
-
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
+#include "moc_logging.cpp"

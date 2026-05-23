@@ -392,3 +392,5 @@ bool MythGesture::Record(QPoint Point, Qt::MouseButton Button)
 
     return true;
 }
+
+#include "moc_mythgesture.cpp"

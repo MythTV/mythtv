@@ -903,3 +903,5 @@ int ServerPool::tryBindingPort(QUdpSocket *socket, int baseport,
     }
     return port;
 }
+
+#include "moc_serverpool.cpp"

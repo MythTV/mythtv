@@ -495,3 +495,5 @@ bool RemoteGetActiveBackends(QStringList *list)
     list->removeFirst();
     return true;
 }
+
+#include "moc_videoscan.cpp"

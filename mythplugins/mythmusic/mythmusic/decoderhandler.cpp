@@ -381,3 +381,5 @@ void DecoderHandler::doOperationStop(void)
     DecoderHandlerEvent ev(DecoderHandlerEvent::kOperationStop);
     dispatch(ev);
 }
+
+#include "moc_decoderhandler.cpp"

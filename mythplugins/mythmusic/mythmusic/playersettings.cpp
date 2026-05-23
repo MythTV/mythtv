@@ -108,3 +108,4 @@ void PlayerSettings::slotSave(void)
     Close();
 }
 
+#include "moc_playersettings.cpp"

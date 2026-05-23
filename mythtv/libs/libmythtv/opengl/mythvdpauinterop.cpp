@@ -391,3 +391,5 @@ bool MythVDPAUInterop::IsPreempted(void) const
 {
     return m_preempted;
 }
+
+#include "moc_mythvdpauinterop.cpp"

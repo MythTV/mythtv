@@ -280,4 +280,4 @@ std::chrono::seconds MythPlayerOverlayUI::GetTotalSeconds(bool HonorCutList) con
     return duration_cast<std::chrono::seconds>(GetTotalMilliseconds(HonorCutList));
 }
 
-
+#include "moc_mythplayeroverlayui.cpp"

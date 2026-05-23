@@ -108,3 +108,5 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_miniplayer.cpp"

@@ -1492,3 +1492,5 @@ void MythUIType::ConnectDependants(bool recurse)
         }
     }
 }
+
+#include "moc_mythuitype.cpp"

@@ -2536,3 +2536,5 @@ bool ChannelImporter::CheckChannelNumber(
         num, chan.m_sourceId, chan.m_channelId);
     return ok;
 }
+
+#include "moc_channelimporter.cpp"

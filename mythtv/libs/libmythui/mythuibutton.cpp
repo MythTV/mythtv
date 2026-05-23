@@ -310,3 +310,5 @@ void MythUIButton::Finalize()
     SetInitialStates();
     SetText(m_valueText);
 }
+
+#include "moc_mythuibutton.cpp"

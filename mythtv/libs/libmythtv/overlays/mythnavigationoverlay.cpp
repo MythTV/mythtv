@@ -208,3 +208,5 @@ void MythNavigationOverlay::More()
     if (group != nullptr)
         group->SetVisible(true);
 }
+
+#include "moc_mythnavigationoverlay.cpp"

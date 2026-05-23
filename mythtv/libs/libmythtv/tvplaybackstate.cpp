@@ -54,3 +54,5 @@ void TVPlaybackState::EditorStateChanged(const MythEditorState& EditorState)
 {
     m_editorState = EditorState;
 }
+
+#include "moc_tvplaybackstate.cpp"

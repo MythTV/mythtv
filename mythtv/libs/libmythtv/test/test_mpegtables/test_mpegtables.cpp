@@ -2783,3 +2783,5 @@ void TestMPEGTables::mss_test(void)
 }
 
 QTEST_APPLESS_MAIN(TestMPEGTables)
+
+#include "moc_test_mpegtables.cpp"

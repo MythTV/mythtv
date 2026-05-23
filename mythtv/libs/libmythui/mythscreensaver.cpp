@@ -83,3 +83,5 @@ bool MythScreenSaverControl::Asleep()
             return true;
     return false;
 }
+
+#include "moc_mythscreensaver.cpp"

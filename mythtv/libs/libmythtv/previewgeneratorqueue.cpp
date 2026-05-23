@@ -788,3 +788,5 @@ void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
  * \addtogroup myth_network_protocol
  * \par PREVIEW_FAILED \e recordingId \e outFileName \e msg \e datetime \e token
  */
+
+#include "moc_previewgeneratorqueue.cpp"

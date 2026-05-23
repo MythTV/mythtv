@@ -1131,4 +1131,4 @@ void ThemeUpdateChecker::checkForUpdate(void)
     delete localTheme;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_themechooser.cpp"

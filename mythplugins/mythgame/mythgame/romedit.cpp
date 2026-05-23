@@ -256,3 +256,5 @@ void EditRomInfoDialog::SetBoxart(const QString& file)
     m_workingRomInfo->setBoxart(file);
     m_boxartText->SetText(file);
 }
+
+#include "moc_romedit.cpp"

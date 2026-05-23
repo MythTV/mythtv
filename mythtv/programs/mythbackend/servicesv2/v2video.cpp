@@ -1306,3 +1306,5 @@ V2VideoCategoryList*  V2Video::GetCategoryList (  )
 
     return pCatList;
 }
+
+#include "moc_v2video.cpp"
