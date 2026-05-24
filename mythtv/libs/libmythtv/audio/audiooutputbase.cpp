@@ -25,6 +25,9 @@ extern "C" {
 // Qt headers
 #include <QtGlobal>
 #include <QMutexLocker>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtProcessorDetection>
+#endif
 
 // MythTV headers
 #include "libmythbase/compat.h"

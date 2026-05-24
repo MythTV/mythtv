@@ -33,6 +33,9 @@ extern "C" {
 }
 
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtProcessorDetection>
+#endif
 
 #include "libmythbase/mythlogging.h"
 
