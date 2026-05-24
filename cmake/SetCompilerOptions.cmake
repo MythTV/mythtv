@@ -158,9 +158,21 @@ list(
   # -Wall flags to disable
   -Wno-unknown-pragmas # gcc doesn't recognize clang pragmas
 )
+
+#
+# Add platform specific flags.
+#
 if(NOT ANDROID)
   list(APPEND CXXFLAGS "-Wshadow")
   list(APPEND CFLAGS "-Wshadow")
+endif()
+
+#
+# Add processor specific flags.
+#
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "i686")
+  list(APPEND CXXFLAGS "-msse")
+  list(APPEND CFLAGS "-msse")
 endif()
 
 #
