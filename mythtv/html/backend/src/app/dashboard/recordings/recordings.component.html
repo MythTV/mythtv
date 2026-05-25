@@ -63,7 +63,7 @@
             [metaKeySelection]="true" dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()"
             (onRowUnselect)="onSelectChange()" [showGridlines]="true" [stripedRows]="true" scrollHeight="flex"
             [scrollable]="true" [sortField]="sortField" [sortOrder]="sortOrder" (onSort)="onSort($event)"
-            (onLazyLoad)="loadLazy($event)" [rows]="100" [lazy]="true" [virtualScroll]="true" size="small">
+            (onLazyLoad)="loadLazy($event)" [lazy]="true" [virtualScroll]="true" size="small">
             <ng-template pTemplate="header">
                 <tr>
                     <!-- Column Headings. -->
@@ -104,7 +104,7 @@
                     <!-- lazy - filesize, page - Recording.FileSize -->
                     <th style="width: 9%" class="justify-end p-1" pSortableColumn="filesize">{{
                         'dashboard.recordings.file_size' | translate }}<p-sortIcon field="filesize"></p-sortIcon></th>
-                    <th style="width: 5%; white-space: nowrap; background: var(--surface-card);" class="p-1">
+                    <th style="width: 5%; white-space: nowrap;" class="p-1">
                         <a target="_blank">
                             <i class="pi pi-download"></i></a>
                         <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"

@@ -7,7 +7,7 @@
         <div style="height: 90vh">
             @if (showTable) {
             <p-table #table [value]="programs" scrollHeight="flex" [scrollable]="true" [totalRecords]="totalRecords"
-                 [virtualScroll]="true" [rows]="100" [lazy]="true"
+                 [virtualScroll]="true" [lazy]="true"
                 (onLazyLoad)="loadLazy($event)" [rowHover]="true" [sortField]="sortField" [sortOrder]="sortOrder"
                 (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small">
                 <ng-template pTemplate="caption">

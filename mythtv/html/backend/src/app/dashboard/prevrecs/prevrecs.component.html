@@ -64,7 +64,7 @@
             <!-- styleClass="p-datatable-gridlines p-datatable-sm  p-datatable-striped" -->
             @if (showTable) {
             <p-table #table [value]="programs" scrollHeight="flex" [scrollable]="true" [totalRecords]="totalRecords"
-                [virtualScroll]="true" [rows]="100" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+                [virtualScroll]="true" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
                 [sortField]="sortField" [sortOrder]="sortOrder" selectionMode="multiple" [metaKeySelection]="true"
                 [(selection)]="selection" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
                 (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small">
@@ -93,7 +93,7 @@
                         <th style="width: 12%" class="p-1" pSortableColumn="recstatus">
                             {{ 'dashboard.upcoming.status' | translate }}<p-sortIcon field="recstatus"></p-sortIcon>
                         </th>
-                        <th style="width: 5%; white-space: nowrap; background: var(--surface-card);" class="p-1">
+                        <th style="width: 5%; white-space: nowrap;" class="p-1">
                             <button pButton pRipple icon="pi pi-ellipsis-v" class="p-button-text p-button-primary"
                                 [disabled]="true"></button>
                         </th>

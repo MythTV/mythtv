@@ -7,7 +7,7 @@
         <p-menu #menu [popup]="true" [model]="menuToShow"></p-menu>
         @if (showTable) {
         <p-table #table name="table" [value]="videos" scrollHeight="flex" [scrollable]="true" [virtualScroll]="true"
-            [rows]="100" [lazy]="true" [totalRecords]="totalRecords" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
+            [lazy]="true" [totalRecords]="totalRecords" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
             responsiveLayout="scroll" [sortField]="sortField" [sortOrder]="sortOrder" [scrollable]="true"
             (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small">
             <ng-template pTemplate="caption">
