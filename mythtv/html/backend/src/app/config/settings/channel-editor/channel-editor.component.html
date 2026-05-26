@@ -35,20 +35,27 @@
             <tr>
                 <th style="width:  8%">{{ 'settings.chanedit.col_icon' | translate }}</th>
                 <th style="width:  8%" pSortableColumn="ChanSeq">
-                    {{ 'settings.chanedit.col_channum' | translate }} <p-sortIcon field="ChanSeq"></p-sortIcon></th>
-                <th style="width:  6%">{{ 'settings.chanedit.col_freqid' | translate }}</th>
-                <th style="width:  10%">{{ 'settings.chanedit.col_callsign' | translate }}</th>
-                <th style="width:  23%">{{ 'settings.chanedit.col_name' | translate }}</th>
+                    {{ 'settings.chanedit.col_channum' | translate }} <p-sortIcon field="ChanSeq"/></th>
+                <th style="width:  6%" pSortableColumn="FreqIdSeq">
+                    {{ 'settings.chanedit.col_freqid' | translate }}<p-sortIcon field="FreqIdSeq"/></th>
+                <th style="width:  10%" pSortableColumn="CallSign">
+                    {{ 'settings.chanedit.col_callsign' | translate }}<p-sortIcon field="CallSign"/></th>
+                <th style="width:  23%" pSortableColumn="ChannelName">
+                    {{ 'settings.chanedit.col_name' | translate }}<p-sortIcon field="ChannelName"/></th>
                 <th style="width:  16%" pSortableColumn="Source">
                     {{ 'settings.chanedit.col_source' | translate }} <p-sortIcon field="Source"></p-sortIcon>
                 </th>
-                <th style="width:  6%">{{ 'settings.chanedit.col_priority' | translate }}</th>
-                <th style="width:  10%">{{ 'settings.chanedit.col_visibility' | translate }}</th>
-                <th style="width:  6%">{{ 'settings.chanedit.col_useeit' | translate }}</th>
-                <th style="width:  6%">{{ 'settings.chanedit.col_commfree' | translate }}</th>
+                <th style="width:  6%" pSortableColumn="RecPriority">
+                    {{ 'settings.chanedit.col_priority' | translate }}<p-sortIcon field="RecPriority"/></th>
+                <th style="width:  10%" pSortableColumn="ExtendedVisible">
+                    {{ 'settings.chanedit.col_visibility' | translate }}<p-sortIcon field="ExtendedVisible"/></th>
+                <th style="width:  6%" pSortableColumn="UseEIT">
+                    {{ 'settings.chanedit.col_useeit' | translate }}<p-sortIcon field="UseEIT"/></th>
+                <th style="width:  6%" pSortableColumn="CommMethod">
+                    {{ 'settings.chanedit.col_commfree' | translate }}<p-sortIcon field="CommMethod"/></th>
                 <th style="width:  7%; white-space: nowrap;">
                     <!-- These are disabled buttons to ensure the spacing of the heading
-              matches the spacing of the rows -->
+                        matches the spacing of the rows -->
                     <button pButton pRipple icon="pi pi-pencil" class="p-button-text" disabled="true"></button>
                     @if (setupService.pageType == 'S') {
                     <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger"

@@ -27,6 +27,7 @@ import { PanelModule } from 'primeng/panel';
 
 interface MyChannel extends Channel {
     ChanSeq?: number;
+    FreqIdSeq?: number;
     Source?: string;
 }
 
@@ -206,7 +207,8 @@ export class ChannelEditorComponent implements OnInit {
             UseEIT: false,
             Visible: true,
             XMLTVID: '',
-            ChanSeq: 0
+            ChanSeq: 0,
+            FreqIdSeq: 0
         };
     }
 
@@ -225,7 +227,11 @@ export class ChannelEditorComponent implements OnInit {
                 this.videoSources.unshift(<VideoSource>{ Id: 0, SourceName: this.unassignedText });
                 this.videoSources.forEach((entry) => this.sourceNames.push(entry.SourceName));
                 this.allChannels.forEach((entry, index) => {
-                    entry.ChanSeq = index;
+                    let s = entry.ChanNum.split(/[^0-9]/);
+                    if (s.length < 2)
+                        s[1]='0';
+                    entry.ChanSeq = Number.parseInt(s[0] + s[1].padStart(5,'0'));
+                    entry.FreqIdSeq = Number.parseInt(entry.FrequencyId);
                     entry.Source = this.getSource(entry);
                 });
             });
