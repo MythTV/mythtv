@@ -37,3 +37,24 @@ export interface BackendStatus {
 export interface BackendStatusResponse {
     BackendStatus: BackendStatus;
 }
+
+export interface ShowStats {
+    Title: string;
+    Count: number;
+    LastRecDate: string; // date
+}
+
+export interface RecStats {
+    ShowCount: number;
+    EpisodeCount: number;
+    FirstRecDate: string; // date
+    LastRecDate: string; // date
+    RunTimeSecs: number;
+    RecTimeSecs: number;
+    Shows:  ShowStats[];
+    Channels: ShowStats[];
+}
+
+export interface StatsResponse {
+    RecStats: RecStats;
+}

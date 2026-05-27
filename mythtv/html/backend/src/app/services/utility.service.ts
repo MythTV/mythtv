@@ -45,7 +45,7 @@ export class UtilityService {
             localStorage.setItem('RememberSort', 'N')
     }
 
-    formatDate(dateStr: string, innerHtml?: boolean, withDay?: boolean): string {
+    formatDate(dateStr?: string, innerHtml?: boolean, withDay?: boolean): string {
         if (!dateStr)
             return '';
         if (dateStr.length == 10)
@@ -60,7 +60,7 @@ export class UtilityService {
         return resp;
     }
 
-    formatTime(date: string): string {
+    formatTime(date?: string): string {
         if (!date)
             return '';
         // Get the locale specific time and remove the seconds
@@ -69,7 +69,7 @@ export class UtilityService {
         return tWithSecs.replace(/:.. /, '');
     }
 
-    formatDateTime(date: string, innerHtml?: boolean) {
+    formatDateTime(date?: string, innerHtml?: boolean) {
         return this.formatDate(date, innerHtml) + ' ' + this.formatTime(date);
     }
 

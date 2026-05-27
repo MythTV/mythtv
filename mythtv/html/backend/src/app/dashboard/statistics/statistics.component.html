@@ -1,0 +1,68 @@
+<h2>{{ 'dashboard.statistics.heading' | translate }} </h2>
+<br>
+<table>
+    <tr>
+        <td>{{ 'dashboard.statistics.showcount_head' | translate }}:&nbsp;</td>
+        <td>{{ statistics?.RecStats?.ShowCount }}</td>
+    </tr>
+    <tr>
+        <td>{{ 'dashboard.statistics.episodecount_head' | translate }}:&nbsp;</td>
+        <td>{{ statistics?.RecStats?.EpisodeCount }}</td>
+    </tr>
+    <tr>
+        <td>{{ 'dashboard.statistics.firstrecdate_head' | translate }}:&nbsp;</td>
+        <td>{{ utility.formatDateTime(statistics?.RecStats?.FirstRecDate) }}</td>
+    </tr>
+    <tr>
+        <td>{{ 'dashboard.statistics.lastrecdate_head' | translate }}:&nbsp;</td>
+        <td>{{ utility.formatDateTime(statistics?.RecStats?.LastRecDate) }}</td>
+    </tr>
+    <tr>
+        <td>{{ 'dashboard.statistics.runtime_head' | translate }}:&nbsp;</td>
+        <td>{{ formatperiod(statistics?.RecStats?.RunTimeSecs) }}</td>
+    </tr>
+    <tr>
+        <td>{{ 'dashboard.statistics.rectime_head' | translate }}:&nbsp;</td>
+        <td>{{ formatperiod(statistics?.RecStats?.RecTimeSecs) }}</td>
+    </tr>
+</table>
+@if (statistics) {
+<br>
+<h2>{{ 'dashboard.statistics.shows_head' | translate }} </h2>
+<p-table [value]="statistics.RecStats.Shows" size="small" [showGridlines]="true" [stripedRows]="true"
+     style="width: 35rem">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="text-align: center; width: 50%;">{{ 'dashboard.statistics.title_head' | translate }}</th>
+            <th style="text-align: center; width: 5%;">{{ 'dashboard.statistics.recorded_head' | translate }}</th>
+            <th style="width: 40%;">{{ 'dashboard.statistics.lastrecdate_head' | translate }}</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-show>
+        <tr>
+            <td>{{ show.Title }}</td>
+            <td style="text-align: center;" >{{ show.Count }}</td>
+            <td>{{ utility.formatDateTime(show.LastRecDate) }}</td>
+        </tr>
+    </ng-template>
+</p-table><br>
+<h2>{{ 'dashboard.statistics.channels_head' | translate }} </h2>
+<p-table [value]="statistics.RecStats.Channels" size="small" [showGridlines]="true" [stripedRows]="true"
+     style="width: 35rem">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="text-align: center; width: 50%;">{{ 'dashboard.statistics.channel_head' | translate }}</th>
+            <th style="text-align: center; width: 5%;">{{ 'dashboard.statistics.recorded_head' | translate }}</th>
+            <th style="width: 40%;">{{ 'dashboard.statistics.lastrecdate_head' | translate }}</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-show>
+        <tr>
+            <td>{{ show.Title }}</td>
+            <td style="text-align: center;" >{{ show.Count }}</td>
+            <td>{{ utility.formatDateTime(show.LastRecDate) }}</td>
+        </tr>
+    </ng-template>
+</p-table>
+
+}

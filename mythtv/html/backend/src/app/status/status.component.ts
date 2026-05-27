@@ -15,7 +15,8 @@ import { AsyncPipe } from '@angular/common';
     selector: 'app-status',
     templateUrl: './status.component.html',
     styleUrls: ['./status.component.css'],
-    imports: [EncodersComponent, ScheduledComponent, JobqueueComponent, MachineinfoComponent, BackendsComponent, FrontendsComponent, AsyncPipe, TranslatePipe]
+    imports: [EncodersComponent, ScheduledComponent, JobqueueComponent, MachineinfoComponent,
+         BackendsComponent, FrontendsComponent, AsyncPipe, TranslatePipe]
 })
 export class StatusComponent implements OnInit {
     m_status$!: Observable<BackendStatusResponse>;

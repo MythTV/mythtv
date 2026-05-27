@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     fullMenu: MenuItem[] = [
         { label: 'dashboard.backendStatus', routerLink: 'status' },
+        { label: 'dashboard.statistics.menu', routerLink: 'statistics' },
         { label: 'dashboard.channeleditor', routerLink: 'channel-editor' },
         { label: 'dashboard.programguide', routerLink: 'program-guide' },
         { label: 'dashboard.recordings.heading', routerLink: 'recordings' },

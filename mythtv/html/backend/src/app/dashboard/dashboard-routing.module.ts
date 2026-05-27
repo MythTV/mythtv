@@ -11,6 +11,7 @@ import { VideosComponent } from './videos/videos.component';
 import { DashboardSettingsComponent } from './dashboard-settings/dashboard-settings.component';
 import { CanDeactivateGuardService } from '../can-deactivate-guard.service';
 import { PrevrecsComponent } from './prevrecs/prevrecs.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 @NgModule({
 	imports: [
@@ -18,6 +19,7 @@ import { PrevrecsComponent } from './prevrecs/prevrecs.component';
 			{
 				path: 'dashboard', component: DashboardComponent, children: [
 					{ path: 'status', component: StatusComponent },
+					{ path: 'statistics', component: StatisticsComponent },
 					{ path: 'channel-editor', component: ChannelEditorComponent },
 					{ path: 'program-guide', component: GuideComponent },
 					{ path: 'recordings', component: RecordingsComponent },
