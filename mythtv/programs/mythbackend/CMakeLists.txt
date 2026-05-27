@@ -119,6 +119,7 @@ add_executable(
   servicesv2/v2settingList.h
   servicesv2/v2status.cpp
   servicesv2/v2status.h
+  servicesv2/v2recStats.h
   servicesv2/v2storageGroupDir.h
   servicesv2/v2storageGroupDirList.h
   servicesv2/v2systemEventList.h

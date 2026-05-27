@@ -51,6 +51,7 @@
 #include "v2serviceUtil.h"
 #include "v2status.h"
 
+
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
     (STATUS_HANDLE, V2Status::staticMetaObject, &V2Status::RegisterCustomTypes))
@@ -300,6 +301,77 @@ V2BackendStatus*  V2Status::GetBackendStatus()
 
         QByteArray input = ms.ReadAll();
         pStatus->setMiscellaneous(QString(input));
+    }
+    return pStatus;
+}
+
+/*
+    Recording stats, such as number of shows, episodes, total recording time, etc.
+    Note RecStatus of -3 means "recorded". Hard coded -3 is used instead of RecStatus.Recorded
+    for efficiency instead of converting the enum to a string for each SQL query.
+*/
+V2RecStats*  V2Status::GetRecStats()
+{
+    auto* pStatus = new V2RecStats();
+    MSqlQuery query(MSqlQuery::InitCon());
+    // Numnber of shows
+    query.prepare("select count(distinct title) from oldrecorded "
+        "where recstatus = -3 and future = 0;");
+    if (query.exec() && query.next())
+        pStatus->setShowCount(query.value(0).toInt());
+    // Number of episodes
+    query.prepare("select count(title) from oldrecorded "
+        "where recstatus = -3 and future = 0;");
+    if (query.exec() && query.next())
+        pStatus->setEpisodeCount(query.value(0).toInt());
+    // First and last recording dates, total recording time, etc.
+    query.prepare("select starttime from oldrecorded "
+        "where recstatus = -3 and future = 0 "
+        "order by starttime asc limit 1;");
+    if (query.exec() && query.next())
+        pStatus->setFirstRecDate(query.value(0).toDateTime());
+    query.prepare("select endtime from oldrecorded "
+        "where recstatus = -3 and future = 0 "
+        "order by starttime desc limit 1;");
+    if (query.exec() && query.next())
+        pStatus->setLastRecDate(query.value(0).toDateTime());
+    query.prepare("select SUM( TIMESTAMPDIFF(SECOND, starttime, endtime) ) "
+        "from oldrecorded "
+        "where recstatus = -3 and future = 0;");
+    if (query.exec() && query.next())
+        pStatus->setRecTimeSecs(query.value(0).toLongLong());
+    pStatus->setRunTimeSecs(pStatus->GetFirstRecDate().secsTo(pStatus->GetLastRecDate()));
+    // Top 10 shows
+    query.prepare("select title, COUNT(*) as recorded, MAX(starttime) as last_recorded "
+        "from oldrecorded "
+        "where recstatus = -3 and future = 0 "
+            "group by title "
+            "order by recorded desc, last_recorded desc, title asc "
+            "limit 10;");
+    if (query.exec()) {
+        while (query.next())
+        {
+            auto show = pStatus->AddNewShow();
+            show->setTitle(query.value(0).toString());
+            show->setCount(query.value(1).toInt());
+            show->setLastRecDate(query.value(2).toDateTime());
+        }
+    }
+    // Top 10 channels
+    query.prepare("select  c.name, COUNT(*) as recorded, MAX(r.starttime) as last_recorded "
+        "from oldrecorded r "
+        "join channel c on r.chanid = c.chanid "
+        "where r.recstatus = -3 and r.future = 0 "
+            "group by c.callsign "
+            "order by recorded desc, last_recorded desc, c.name asc "
+            "limit 10;");
+    if (query.exec()) {
+        while (query.next()) {
+            auto channel = pStatus->AddNewChannel();
+            channel->setTitle(query.value(0).toString());
+            channel->setCount(query.value(1).toInt());
+            channel->setLastRecDate(query.value(2).toDateTime());
+        }
     }
     return pStatus;
 }

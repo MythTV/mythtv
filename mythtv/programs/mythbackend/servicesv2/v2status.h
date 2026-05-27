@@ -25,6 +25,7 @@
 // MythBackend
 #include "preformat.h"
 #include "v2backendStatus.h"
+#include "v2recStats.h"
 
 class Scheduler;
 class AutoExpire;
@@ -54,6 +55,7 @@ class V2Status : public MythHTTPService
         Preformat*         GetStatus ();  // XML
         Preformat*         xml ();        // XML
         V2BackendStatus*   GetBackendStatus(); // Standardized version of GetStatus
+        V2RecStats*        GetRecStats();
 
     private:
 
