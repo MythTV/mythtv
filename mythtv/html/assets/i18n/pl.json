@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Ustawienia"
         },
+        "statistics": {
+            "channel_head": "Kanał",
+            "channels_head": "Najlepsze kanały",
+            "episodecount_head": "Liczba odcinków",
+            "firstrecdate_head": "Pierwsze nagranie",
+            "heading": "Statystyki nagrywania",
+            "lastrecdate_head": "Ostatnie nagranie",
+            "menu": "Statystyka",
+            "recorded_head": "Nagrany",
+            "rectime_head": "Łącznie nagrano",
+            "runtime_head": "Całkowity czas działania",
+            "showcount_head": "Liczba przedstawień",
+            "shows_head": "Najlepsze programy",
+            "title_head": "Tytuł"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
             "backends_none": "Brak zaplecza",

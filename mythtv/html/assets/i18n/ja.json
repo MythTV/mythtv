@@ -376,6 +376,21 @@
         "settings": {
             "heading": "設定"
         },
+        "statistics": {
+            "channel_head": "チャネル",
+            "channels_head": "トップチャンネル",
+            "episodecount_head": "話数",
+            "firstrecdate_head": "最初の録音",
+            "heading": "記録の統計",
+            "lastrecdate_head": "最後の録音",
+            "menu": "統計",
+            "recorded_head": "録音済み",
+            "rectime_head": "合計記録",
+            "runtime_head": "総実行時間",
+            "showcount_head": "ショー数",
+            "shows_head": "人気番組",
+            "title_head": "タイトル"
+        },
         "status": {
             "backends_detail": "バックエンド: {{ Name }} は IP {{ Type }} 上の {{ IP }}}} です",
             "backends_none": "バックエンドなし",

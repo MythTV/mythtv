@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Seaded"
         },
+        "statistics": {
+            "channel_head": "Kanal",
+            "channels_head": "Populaarseimad kanalid",
+            "episodecount_head": "Episoodide arv",
+            "firstrecdate_head": "Esimene salvestus",
+            "heading": "Statistika salvestamine",
+            "lastrecdate_head": "Viimane salvestus",
+            "menu": "Statistika",
+            "recorded_head": "Salvestatud",
+            "rectime_head": "Salvestatud kokku",
+            "runtime_head": "Kogu tööaeg",
+            "showcount_head": "Näituste arv",
+            "shows_head": "Populaarseimad saated",
+            "title_head": "Pealkiri"
+        },
         "status": {
             "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
             "backends_none": "Taustaprogramme pole",

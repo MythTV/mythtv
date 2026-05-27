@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Stillingar"
         },
+        "statistics": {
+            "channel_head": "Rás",
+            "channels_head": "Helstu rásir",
+            "episodecount_head": "Fjöldi þátta",
+            "firstrecdate_head": "Fyrsta upptaka",
+            "heading": "Upptökutölfræði",
+            "lastrecdate_head": "Síðasta upptaka",
+            "menu": "Tölfræði",
+            "recorded_head": "Skráð",
+            "rectime_head": "Samtals skráð",
+            "runtime_head": "Heildarhlaupstími",
+            "showcount_head": "Fjöldi sýninga",
+            "shows_head": "Topp sýningar",
+            "title_head": "Titill"
+        },
         "status": {
             "backends_detail": "Bakendi: {{ Name }} er {{ Type }} á IP {{ IP }}",
             "backends_none": "Engir bakenda",

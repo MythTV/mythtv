@@ -376,6 +376,21 @@
         "settings": {
             "heading": "postavke"
         },
+        "statistics": {
+            "channel_head": "Kanal",
+            "channels_head": "Najbolji kanali",
+            "episodecount_head": "Broj epizoda",
+            "firstrecdate_head": "Prvo snimanje",
+            "heading": "Snimanje statistike",
+            "lastrecdate_head": "Zadnja snimka",
+            "menu": "Statistika",
+            "recorded_head": "Snimljeno",
+            "rectime_head": "Ukupno zabilježeno",
+            "runtime_head": "Ukupno trajanje",
+            "showcount_head": "Broj emisija",
+            "shows_head": "Vrhunske emisije",
+            "title_head": "Titula"
+        },
         "status": {
             "backends_detail": "Pozadina: {{ Name }} je {{ Type }} na IP-u {{ IP }}",
             "backends_none": "Nema pozadine",

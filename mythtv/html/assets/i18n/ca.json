@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Configuració"
         },
+        "statistics": {
+            "channel_head": "Canal",
+            "channels_head": "Canals principals",
+            "episodecount_head": "Nombre d'episodis",
+            "firstrecdate_head": "Primera gravació",
+            "heading": "Estadístiques de gravació",
+            "lastrecdate_head": "Última gravació",
+            "menu": "Estadístiques",
+            "recorded_head": "Gravat",
+            "rectime_head": "Total enregistrats",
+            "runtime_head": "Temps total de funcionament",
+            "showcount_head": "Nombre d'espectacles",
+            "shows_head": "Espectacles principals",
+            "title_head": "Títol"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} és un {{ Type }} a la IP {{ IP }}",
             "backends_none": "Sense backends",

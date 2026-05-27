@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Inställningar"
         },
+        "statistics": {
+            "channel_head": "Kanal",
+            "channels_head": "Toppkanaler",
+            "episodecount_head": "Antal avsnitt",
+            "firstrecdate_head": "Första inspelningen",
+            "heading": "Inspelningsstatistik",
+            "lastrecdate_head": "Senaste inspelningen",
+            "menu": "Statistik",
+            "recorded_head": "Inspelad",
+            "rectime_head": "Totalt inspelat",
+            "runtime_head": "Total körtid",
+            "showcount_head": "Antal föreställningar",
+            "shows_head": "Toppshower",
+            "title_head": "Titel"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
             "backends_none": "Inga backends",

@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Indstillinger"
         },
+        "statistics": {
+            "channel_head": "Kanal",
+            "channels_head": "Top kanaler",
+            "episodecount_head": "Antal episoder",
+            "firstrecdate_head": "Første optagelse",
+            "heading": "Registrering af statistik",
+            "lastrecdate_head": "Sidste optagelse",
+            "menu": "Statistik",
+            "recorded_head": "Optaget",
+            "rectime_head": "Samlet optaget",
+            "runtime_head": "Samlet løbetid",
+            "showcount_head": "Antal shows",
+            "shows_head": "Topshows",
+            "title_head": "Titel"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
             "backends_none": "Ingen backends",

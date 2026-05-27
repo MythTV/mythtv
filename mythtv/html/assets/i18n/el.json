@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Ρυθμίσεις"
         },
+        "statistics": {
+            "channel_head": "Κανάλι",
+            "channels_head": "Κορυφαία κανάλια",
+            "episodecount_head": "Αριθμός επεισοδίων",
+            "firstrecdate_head": "Πρώτη Ηχογράφηση",
+            "heading": "Καταγραφή στατιστικών",
+            "lastrecdate_head": "Τελευταία ηχογράφηση",
+            "menu": "Στατιστική",
+            "recorded_head": "Εγγεγραμμένος",
+            "rectime_head": "Συνολικά καταγεγραμμένα",
+            "runtime_head": "Συνολικός χρόνος λειτουργίας",
+            "showcount_head": "Αριθμός παραστάσεων",
+            "shows_head": "Κορυφαίες εκπομπές",
+            "title_head": "Τίτλος"
+        },
         "status": {
             "backends_detail": "Backend: Το {{ Name }} είναι ένα {{ Type }} στην IP {{ IP }}",
             "backends_none": "Χωρίς Backends",

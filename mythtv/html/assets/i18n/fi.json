@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Asetukset"
         },
+        "statistics": {
+            "channel_head": "kanava",
+            "channels_head": "Suosituimmat kanavat",
+            "episodecount_head": "Jaksojen määrä",
+            "firstrecdate_head": "Ensimmäinen äänitys",
+            "heading": "Tilastojen tallennus",
+            "lastrecdate_head": "Viimeinen tallennus",
+            "menu": "Tilastot",
+            "recorded_head": "Äänitetty",
+            "rectime_head": "Yhteensä tallennettu",
+            "runtime_head": "Kokonaiskesto",
+            "showcount_head": "Esitysten määrä",
+            "shows_head": "Parhaat esitykset",
+            "title_head": "Otsikko"
+        },
         "status": {
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",

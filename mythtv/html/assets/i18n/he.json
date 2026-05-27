@@ -376,6 +376,21 @@
         "settings": {
             "heading": "הגדרות"
         },
+        "statistics": {
+            "channel_head": "עָרוּץ",
+            "channels_head": "ערוצים מובילים",
+            "episodecount_head": "מספר פרקים",
+            "firstrecdate_head": "הקלטה ראשונה",
+            "heading": "רישום סטטיסטיקה",
+            "lastrecdate_head": "הקלטה אחרונה",
+            "menu": "סטָטִיסטִיקָה",
+            "recorded_head": "מוּקלָט",
+            "rectime_head": "סך הכל מוקלט",
+            "runtime_head": "זמן ריצה כולל",
+            "showcount_head": "מספר הופעות",
+            "shows_head": "הופעות מובילות",
+            "title_head": "כּוֹתֶרֶת"
+        },
         "status": {
             "backends_detail": "אחורי: {{ Name }} הוא {{ Type }} ב-IP {{ IP }}",
             "backends_none": "אין אחוריים",

@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Настройки"
         },
+        "statistics": {
+            "channel_head": "Канал",
+            "channels_head": "Лучшие каналы",
+            "episodecount_head": "Количество серий",
+            "firstrecdate_head": "Первая запись",
+            "heading": "Запись статистики",
+            "lastrecdate_head": "Последняя запись",
+            "menu": "Статистика",
+            "recorded_head": "Записано",
+            "rectime_head": "Всего записано",
+            "runtime_head": "Общее время работы",
+            "showcount_head": "Количество шоу",
+            "shows_head": "Лучшие шоу",
+            "title_head": "Заголовок"
+        },
         "status": {
             "backends_detail": "Серверная часть: {{ Name }} – это {{ Type }} на IP {{ IP }}.",
             "backends_none": "Нет бэкендов",

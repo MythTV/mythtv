@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Настройки"
         },
+        "statistics": {
+            "channel_head": "Канал",
+            "channels_head": "Топ канали",
+            "episodecount_head": "Брой епизоди",
+            "firstrecdate_head": "Първи запис",
+            "heading": "Записване на статистика",
+            "lastrecdate_head": "Последен запис",
+            "menu": "Статистика",
+            "recorded_head": "Записано",
+            "rectime_head": "Общо записано",
+            "runtime_head": "Общо време на работа",
+            "showcount_head": "Брой предавания",
+            "shows_head": "Топ предавания",
+            "title_head": "Заглавие"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} е {{ Type }} на IP {{ IP }}",
             "backends_none": "Без бекенд",

@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Instellingen"
         },
+        "statistics": {
+            "channel_head": "Kanaal",
+            "channels_head": "Topkanalen",
+            "episodecount_head": "Aantal afleveringen",
+            "firstrecdate_head": "Eerste opname",
+            "heading": "Statistieken opnemen",
+            "lastrecdate_head": "Laatste opname",
+            "menu": "Statistieken",
+            "recorded_head": "Opgenomen",
+            "rectime_head": "Totaal opgenomen",
+            "runtime_head": "Totale looptijd",
+            "showcount_head": "Aantal voorstellingen",
+            "shows_head": "Topshows",
+            "title_head": "Titel"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",

@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Beállítások elemre"
         },
+        "statistics": {
+            "channel_head": "Csatorna",
+            "channels_head": "Legnépszerűbb csatornák",
+            "episodecount_head": "Epizódok száma",
+            "firstrecdate_head": "Első felvétel",
+            "heading": "Statisztikák rögzítése",
+            "lastrecdate_head": "Utolsó felvétel",
+            "menu": "Statisztika",
+            "recorded_head": "Rögzítve",
+            "rectime_head": "Összesen rögzített",
+            "runtime_head": "Teljes futási idő",
+            "showcount_head": "Előadások száma",
+            "shows_head": "Legjobb műsorok",
+            "title_head": "Cím"
+        },
         "status": {
             "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
             "backends_none": "Nincsenek háttérprogramok",

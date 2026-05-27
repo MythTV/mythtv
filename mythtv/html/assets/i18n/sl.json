@@ -376,6 +376,21 @@
         "settings": {
             "heading": "nastavitve"
         },
+        "statistics": {
+            "channel_head": "Kanal",
+            "channels_head": "Najboljši kanali",
+            "episodecount_head": "Število epizod",
+            "firstrecdate_head": "Prvi posnetek",
+            "heading": "Snemanje statistike",
+            "lastrecdate_head": "Zadnji posnetek",
+            "menu": "Statistika",
+            "recorded_head": "Posneto",
+            "rectime_head": "Skupno zabeleženo",
+            "runtime_head": "Skupni čas delovanja",
+            "showcount_head": "Število predstav",
+            "shows_head": "Najboljše oddaje",
+            "title_head": "Naslov"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Brez ozadja",

@@ -376,6 +376,21 @@
         "settings": {
             "heading": "設定"
         },
+        "statistics": {
+            "channel_head": "頻道",
+            "channels_head": "熱門頻道",
+            "episodecount_head": "集數",
+            "firstrecdate_head": "第一次錄音",
+            "heading": "記錄統計",
+            "lastrecdate_head": "最後錄音",
+            "menu": "統計數據",
+            "recorded_head": "已錄製",
+            "rectime_head": "總記錄數",
+            "runtime_head": "總運轉時間",
+            "showcount_head": "演出場數",
+            "shows_head": "熱門節目",
+            "title_head": "標題"
+        },
         "status": {
             "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "無後端",

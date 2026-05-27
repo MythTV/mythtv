@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Nastavení"
         },
+        "statistics": {
+            "channel_head": "Kanál",
+            "channels_head": "Nejlepší kanály",
+            "episodecount_head": "Počet epizod",
+            "firstrecdate_head": "První nahrávka",
+            "heading": "Statistika nahrávání",
+            "lastrecdate_head": "Poslední záznam",
+            "menu": "Statistika",
+            "recorded_head": "Zaznamenáno",
+            "rectime_head": "Celkem zaznamenáno",
+            "runtime_head": "Celková doba provozu",
+            "showcount_head": "Počet představení",
+            "shows_head": "Nejlepší pořady",
+            "title_head": "Titul"
+        },
         "status": {
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Žádné backendy",

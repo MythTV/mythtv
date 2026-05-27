@@ -376,6 +376,21 @@
         "settings": {
             "heading": "Ayarlar"
         },
+        "statistics": {
+            "channel_head": "Kanal",
+            "channels_head": "En İyi Kanallar",
+            "episodecount_head": "Bölüm Sayısı",
+            "firstrecdate_head": "İlk Kayıt",
+            "heading": "İstatistikleri Kaydetmek",
+            "lastrecdate_head": "Son Kayıt",
+            "menu": "İstatistikler",
+            "recorded_head": "Kaydedildi",
+            "rectime_head": "Toplam Kaydedilen",
+            "runtime_head": "Toplam Çalışma Süresi",
+            "showcount_head": "Gösteri sayısı",
+            "shows_head": "En Popüler Programlar",
+            "title_head": "Başlık"
+        },
         "status": {
             "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
             "backends_none": "Arka Uç Yok",
