@@ -23,7 +23,6 @@ list(APPEND PLATFORM_ARGS "-DANDROID:BOOL=ON")
 # Additional early configuration for android.
 #
 set(CMAKE_SYSTEM_NAME Android)
-set(CMAKE_SYSTEM_VERSION ${ANDROID_TARGET_SDK_VERSION})
 
 #
 # Check CMAKE_ANDROID_ARCH_ABI to ensure its one that has been tested.
@@ -53,6 +52,8 @@ endif()
 #
 if(SDK)
   unset(SDK)
+  message(STATUS "Setting CMAKE_SYSTEM_VERSION=${SDK} from SDK variable.")
+  message(STATUS "Setting ANDROID_TARGET_SDK_VERSION=${SDK} from SDK variable.")
   set(CMAKE_SYSTEM_VERSION ${SDK})
   set(ANDROID_TARGET_SDK_VERSION ${SDK})
   list(FILTER CMDLINE_ARGS EXCLUDE REGEX "-DSDK=")
@@ -61,7 +62,7 @@ if(SDK)
 else()
   set(CMAKE_SYSTEM_VERSION ${ANDROID_TARGET_SDK_VERSION})
   message(
-    STATUS "Setting CMAKE_SYSTEM_VERSION to ${ANDROID_TARGET_SDK_VERSION}")
+    STATUS "Setting CMAKE_SYSTEM_VERSION=${ANDROID_TARGET_SDK_VERSION} from ANDROID_TARGET_SDK_VERSION")
 endif()
 include(platform/AndroidEnsureSdkValue)
 
