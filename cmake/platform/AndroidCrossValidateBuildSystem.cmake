@@ -71,8 +71,18 @@ if(CMAKE_ANDROID_NDK_VERSION VERSION_LESS 23.0)
     FATAL_ERROR
       "Android NDK version 23.0 or better required. Found version ${CMAKE_ANDROID_NDK_VERSION}."
   )
+elseif(CMAKE_ANDROID_NDK_VERSION VERSION_LESS 28.0.13004108)
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.0)
+    message(
+      WARNING
+      "When using CMake 4.x you should use NDK 28.0 or higher. "
+      "Otherwise CMake will print a deprecation warning every time it "
+      "launches a sub-process.  The cmake files in NDK 28.0 are new "
+      "enough that they don't trigger this warning.")
+  endif()
 endif()
-set(ANDROID_HIGHEST_NDK_TESTED 27.1)
+
+set(ANDROID_HIGHEST_NDK_TESTED 30.0)
 if(NOT CMAKE_ANDROID_NDK_VERSION VERSION_LESS_EQUAL
    ${ANDROID_HIGHEST_NDK_TESTED})
   message(

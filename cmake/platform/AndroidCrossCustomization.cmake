@@ -18,19 +18,20 @@ endif()
 if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX STREQUAL "")
   message(FATAL_ERROR "CMAKE_INSTALL_PREFIX isn't set.")
 endif()
+set(ANDROID_HIGHEST_PLATFORM_TESTED 36)
 if(NOT ANDROID_PLATFORM)
-  if(CMAKE_SYSTEM_VERSION GREATER 34)
+  if(CMAKE_SYSTEM_VERSION GREATER ANDROID_HIGHEST_PLATFORM_TESTED)
     message(
       FATAL_ERROR
-        "Cannot build to version ${CMAKE_SYSTEM_VERSION}.  ANDROID_PLATFORM higher than 34 is not currently supported."
+        "Cannot build to version ${CMAKE_SYSTEM_VERSION}.  ANDROID_PLATFORM higher than ${ANDROID_HIGHEST_PLATFORM_TESTED} is not currently supported."
     )
   endif()
   set(ANDROID_PLATFORM android-${CMAKE_SYSTEM_VERSION})
 else()
   string(REPLACE "android-" "" PLATFORM_NUM ${ANDROID_PLATFORM})
-  if(PLATFORM_NUM GREATER 34)
+  if(PLATFORM_NUM GREATER ANDROID_HIGHEST_PLATFORM_TESTED)
     message(
-      FATAL_ERROR "ANDROID_PLATFORM higher than 34 is not currently supported.")
+      FATAL_ERROR "ANDROID_PLATFORM higher than ${ANDROID_HIGHEST_PLATFORM_TESTED} is not currently supported.")
   endif()
 endif()
 
