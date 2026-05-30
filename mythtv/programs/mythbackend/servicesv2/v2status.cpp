@@ -351,7 +351,7 @@ V2RecStats*  V2Status::GetRecStats()
     if (query.exec()) {
         while (query.next())
         {
-            auto show = pStatus->AddNewShow();
+            auto* show = pStatus->AddNewShow();
             show->setTitle(query.value(0).toString());
             show->setCount(query.value(1).toInt());
             show->setLastRecDate(query.value(2).toDateTime());
@@ -367,7 +367,7 @@ V2RecStats*  V2Status::GetRecStats()
             "limit 10;");
     if (query.exec()) {
         while (query.next()) {
-            auto channel = pStatus->AddNewChannel();
+            auto* channel = pStatus->AddNewChannel();
             channel->setTitle(query.value(0).toString());
             channel->setCount(query.value(1).toInt());
             channel->setLastRecDate(query.value(2).toDateTime());

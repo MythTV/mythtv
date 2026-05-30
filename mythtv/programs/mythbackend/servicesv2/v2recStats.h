@@ -55,11 +55,7 @@ class V2RecStats : public QObject
 
     public:
         Q_INVOKABLE V2RecStats(QObject *parent = nullptr)
-            : QObject(parent),
-            m_ShowCount(0),
-            m_EpisodeCount(0),
-            m_RunTimeSecs(0),
-            m_RecTimeSecs(0)
+            : QObject(parent)
         {
         }
         // These are here so that a routine in serviceutil

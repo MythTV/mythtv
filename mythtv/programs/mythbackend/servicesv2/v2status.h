@@ -55,7 +55,7 @@ class V2Status : public MythHTTPService
         Preformat*         GetStatus ();  // XML
         Preformat*         xml ();        // XML
         V2BackendStatus*   GetBackendStatus(); // Standardized version of GetStatus
-        V2RecStats*        GetRecStats();
+        static V2RecStats* GetRecStats();
 
     private:
 
