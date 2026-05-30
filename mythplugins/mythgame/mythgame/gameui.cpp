@@ -238,7 +238,9 @@ void GameUI::nodeChanged(MythGenericTree* node)
         updateRomInfo(romInfo);
         if (!romInfo->Screenshot().isEmpty() || !romInfo->Fanart().isEmpty() ||
             !romInfo->Boxart().isEmpty())
+        {
             showImages();
+        }
         else
         {
             if (m_gameImage)

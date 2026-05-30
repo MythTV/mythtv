@@ -563,7 +563,9 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
         {
             m_startTime = -1;
             if (m_inputFC->streams[i]->start_time != (int) AV_NOPTS_VALUE)
+            {
                 m_startTime = m_inputFC->streams[i]->start_time;
+            }
             else
             {
                 LOG(VB_GENERAL, LOG_ERR,
@@ -686,7 +688,9 @@ bool ThumbFinder::seekForward()
     int inc = kSeekAmounts[m_currentSeek].amount;
 
     if (inc == -1)
+    {
         inc = 1;
+    }
     else if (inc == -2)
     {
         int pos = 0;
@@ -724,7 +728,9 @@ bool ThumbFinder::seekBackward()
 
     int inc = kSeekAmounts[m_currentSeek].amount;
     if (inc == -1)
+    {
         inc = -1;
+    }
     else if (inc == -2)
     {
         // seek to previous cut point

@@ -79,7 +79,9 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr) cons
     }
 
     if (vbr)
+    {
         lame_set_preset(gf, preset);
+    }
     else
     {
         lame_set_preset(gf, meanbitrate);

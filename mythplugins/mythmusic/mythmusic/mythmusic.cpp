@@ -78,7 +78,9 @@ static bool checkStorageGroup(void)
                   "FROM storagegroup "
                   "WHERE groupname = 'Music'";
     if (!query.exec(sql) || !query.isActive())
+    {
         MythDB::DBError("checkStorageGroup get host list", query);
+    }
     else
     {
         while(query.next())
@@ -101,7 +103,9 @@ static bool checkStorageGroup(void)
                   "FROM storagegroup "
                   "WHERE groupname = 'MusicArt'";
     if (!query.exec(sql) || !query.isActive())
+    {
         MythDB::DBError("checkStorageGroup get host list", query);
+    }
     else
     {
         while(query.next())
@@ -268,11 +272,17 @@ static void MusicCallback([[maybe_unused]] void *data, QString &selection)
 {
     QString sel = selection.toLower();
     if (sel == "music_create_playlist")
+    {
         startDatabaseTree();
+    }
     else if (sel == "music_play")
+    {
         startPlayback();
+    }
     else if (sel == "stream_play")
+    {
         startStreamPlayback();
+    }
     else if (sel == "music_rip")
     {
         startRipper();
@@ -423,7 +433,9 @@ static void runRipCD(void)
     auto *rip = new Ripper(mainStack, chooseCD());
 
     if (rip->Create())
+    {
         mainStack->AddScreen(rip);
+    }
     else
     {
         delete rip;
@@ -545,7 +557,9 @@ static void handleMedia(MythMediaDevice *cd, bool forcePlayback)
                                       "Searching for music files...");
     auto *busy = new MythUIBusyDialog( message, popupStack, "musicscanbusydialog");
     if (busy->Create())
+    {
         popupStack->AddScreen(busy, false);
+    }
     else
     {
         delete busy;
@@ -719,7 +733,9 @@ static void handleCDMedia(MythMediaDevice *cd, bool forcePlayback)
                 }
 
                 if (track->Album().length() > 0)
+                {
                     parenttitle += track->Album();
+                }
                 else
                 {
                     parenttitle = " " + QCoreApplication::translate("(MythMusicMain)",

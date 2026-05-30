@@ -299,7 +299,10 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
   if (max != 0.0) *s = (max - min) / max;
   else *s = 0.0;
 
-  if (*s == 0.0) *h = 0.0;
+  if (*s == 0.0)
+    {
+      *h = 0.0;
+    }
   else
     {
       double delta = max - min;
@@ -497,7 +500,9 @@ bool BumpScope::draw(QPainter *p, [[maybe_unused]] const QColor &back)
             {
                 m_is = std::max<double>(m_is, 0);
                 if (m_is > 0.52)
+                {
                     m_isd = -0.01;
+                }
                 else if (m_is == 0)
                 {
                     m_ihd = MythRandom(0, 360 - 1);

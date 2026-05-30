@@ -163,7 +163,9 @@ bool DecoderHandler::next(void)
 
     // we use the avfdecoder for everything except CD tracks
     if (m_url.toString().endsWith(".cda"))
+    {
         doConnectDecoder(m_url, ".cda");
+    }
     else
     {
         // we don't know what format radio stations are so fake a format

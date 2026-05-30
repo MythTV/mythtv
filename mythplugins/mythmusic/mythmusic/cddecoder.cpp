@@ -403,7 +403,9 @@ void CdDecoder::run()
     }
 
     if (m_userStop)
+    {
         m_inited = false;
+    }
     else if (output())
     {
         // Drain our buffer
@@ -516,7 +518,9 @@ MusicMetadata *CdDecoder::getMetadata()
     track_t tracknum = 0;
 
     if (-1 == m_setTrackNum)
+    {
         tracknum = getURL().toUInt();
+    }
     else
     {
         tracknum = m_setTrackNum;

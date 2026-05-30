@@ -114,7 +114,9 @@ void RecordingSelector::Init(void)
             MythUIBusyDialog(message, popupStack, "recordingselectorbusydialog");
 
     if (busyPopup->Create())
+    {
         popupStack->AddScreen(busyPopup, false);
+    }
     else
     {
         delete busyPopup;

@@ -415,7 +415,9 @@ void Synaesthesia::fadeHeat(void)
                               int(lastOutput[i2 + step])) >> 2) +
                 lastOutput[i2];
             if (!j2)
+            {
                 output[i2] = 0;
+            }
             else
             {
                 j2 = j2 - lastLastOutput[i2] +

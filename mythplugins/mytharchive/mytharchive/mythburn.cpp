@@ -395,7 +395,9 @@ void MythBurn::updateArchiveList(void)
             MythUIBusyDialog(message, popupStack, "mythburnbusydialog");
 
     if (busyPopup->Create())
+    {
         popupStack->AddScreen(busyPopup, false);
+    }
     else
     {
         delete busyPopup;

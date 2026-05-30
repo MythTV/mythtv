@@ -651,7 +651,9 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
         {
             // check this is a valid stream ID
             if (gMusicData->m_all_streams->isValidID(id))
+            {
                 m_songs.push_back(id);
+            }
             else
             {
                 badTrack = true;
@@ -662,7 +664,9 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
         {
             // check this is a valid track ID
             if (gMusicData->m_all_music->isValidID(id))
+            {
                 m_songs.push_back(id);
+            }
             else
             {
                 badTrack = true;

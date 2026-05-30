@@ -342,9 +342,13 @@ QString SmartPLCriteriaRow::toString(void) const
     {
         QString result;
         if (PLOperator->m_noOfArguments == 0)
+        {
             result = m_field + " " + m_operator;
+        }
         else if (PLOperator->m_noOfArguments == 1)
+        {
             result = m_field + " " + m_operator + " " + m_value1;
+        }
         else
         {
             result = m_field + " " + m_operator + " " + m_value1;
@@ -1354,7 +1358,9 @@ void CriteriaRowEditor::enableSaveButton()
     if (Field && Operator)
     {
         if (Field->m_type == ftNumeric || Field->m_type == ftBoolean)
+        {
             enabled = true;
+        }
         else if (Field->m_type == ftDate)
         {
             if ((Operator->m_noOfArguments == 0) ||
@@ -2170,7 +2176,9 @@ void SmartPLDateDialog::valueChanged(void)
         QString sDate = m_yearSpin->GetValue() + "-" + month + "-" + day;
         QDate date = QDate::fromString(sDate, Qt::ISODate);
         if (date.isValid())
+        {
             m_statusText->SetText(date.toString("dddd, d MMMM yyyy"));
+        }
         else
         {
             bValidDate = false;

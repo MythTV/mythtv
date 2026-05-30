@@ -1402,7 +1402,9 @@ void MusicCommon::customEvent(QEvent *event)
         if (resultid == "mainmenu")
         {
             if (resulttext == tr("Fullscreen Visualizer"))
+            {
                 switchView(MV_VISUALIZER);
+            }
             else if (resulttext == tr("Playlist Editor") ||
                      resulttext == tr("Browse Music Library"))
             {

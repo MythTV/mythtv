@@ -2185,7 +2185,9 @@ void AlbumArt::findFrontCover(void)
     // if a front cover image is available show that first
     AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
     if (albumArt->getImage(IT_FRONTCOVER))
+    {
         m_currImageType = IT_FRONTCOVER;
+    }
     else
     {
         // not available so just show the first image available

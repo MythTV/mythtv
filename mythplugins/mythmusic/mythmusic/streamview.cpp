@@ -233,7 +233,9 @@ void StreamView::customEvent(QEvent *event)
                 const QString& filename = args[1];
 
                 if ((errorCode != 0) || (fileSize == 0))
+                {
                     LOG(VB_GENERAL, LOG_ERR, QString("StreamView: failed to download radio icon from '%1'").arg(url));
+                }
                 else
                 {
                     for (int x = 0; x < m_streamList->GetCount(); x++)

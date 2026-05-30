@@ -286,7 +286,9 @@ void SearchView::ShowMenu(void)
             if (mdata)
             {
                 if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
+                {
                     menu->AddItem(tr("Remove From Playlist"));
+                }
                 else
                 {
                     if (MusicPlayer::getPlayNow())

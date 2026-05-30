@@ -102,7 +102,9 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
         }
 
         if (action == "INFO")
+        {
             showTrackInfoPopup();
+        }
         else if (
             action == "NEXTTRACK" ||
             action == "PREVTRACK" ||
@@ -249,9 +251,13 @@ bool TrackInfoPopup::keyPressEvent(QKeyEvent *event)
             return true;
         }
         if (action == "ESCAPE")
+        {
             Close();
+        }
         else if (action == "INFO")
+        {
             showTrackInfo(gPlayer->getCurrentMetadata());
+        }
         else if (action == "MENU")
         {
             // menu over info misbehaves: if we close after 8 seconds,

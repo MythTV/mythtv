@@ -132,7 +132,9 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
+        {
             ShowMenu();
+        }
         else if (action == "PAGELEFT" && m_pagenum > 1)
         {
             if (m_prevPageToken.isEmpty())
@@ -382,7 +384,9 @@ void NetSearch::SearchFinished(void)
         SetText(QString::number(searchresults), "count");
 
     if (firstitem + returned == searchresults)
+    {
         m_maxpage = m_pagenum;
+    }
     else
     {
         m_maxpage = searchresults / returned; // Whole pages
@@ -413,7 +417,9 @@ void NetSearch::SearchTimeout(Search * /*item*/)
         m_okPopup = new MythConfirmationDialog(m_popupStack, message, false);
 
         if (m_okPopup->Create())
+        {
             m_popupStack->AddScreen(m_okPopup);
+        }
         else
         {
             delete m_okPopup;

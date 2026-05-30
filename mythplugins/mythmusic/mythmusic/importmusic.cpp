@@ -570,7 +570,9 @@ void ImportMusicDialog::scanDirectory(QString &directory, std::vector<TrackInfo*
         ++it;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
+        {
             scanDirectory(filename, tracks);
+        }
         else
         {
             MetaIO *tagger = MetaIO::createTagger(filename);
@@ -637,7 +639,9 @@ void ImportMusicDialog::ShowMenu()
     auto *menu = new MythDialogBox("", popupStack, "importmusicmenu");
 
     if (menu->Create())
+    {
         popupStack->AddScreen(menu);
+    }
     else
     {
         delete menu;
@@ -671,7 +675,9 @@ void ImportMusicDialog::chooseBackend(void) const
                   "FROM storagegroup "
                   "WHERE groupname = 'Music'";
     if (!query.exec(sql) || !query.isActive())
+    {
         MythDB::DBError("ImportMusicDialog::chooseBackend get host list", query);
+    }
     else
     {
         while(query.next())

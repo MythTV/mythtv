@@ -484,10 +484,9 @@ static void png4file_flush(Png4File * self)
 
 static void png4file_addpixel(Png4File * self, eu8 pixel) 
 {
-    if (self->m_nibble < 0)
+    if (self->m_nibble < 0) {
         self->m_nibble = (pixel << 4);
-    else 
-    {
+    } else {
         self->m_buffer[self->m_bufPos++] = self->m_nibble | pixel;
         self->m_nibble = -1;
         if (self->m_bufPos == sizeof self->m_buffer - 4)
@@ -512,10 +511,9 @@ static void png4file_close(Png4File * self)
 {
     eu8 adlerbuf[4];
     self->m_buffer[0] = 0x01;
-    if (self->m_bufPos)
+    if (self->m_bufPos) {
         png4file_flush(self);
-    else 
-    {
+    } else {
         self->m_bufPos = 5;
         png4file_flush(self); 
     }
