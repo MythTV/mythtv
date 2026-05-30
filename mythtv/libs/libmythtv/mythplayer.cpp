@@ -97,7 +97,7 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
     bool valid = false;
     uint tmp = mypage.toInt(&valid, 16);
-    m_ttPageNum = (valid) ? tmp : m_ttPageNum;
+    m_ttPageNum = valid ? tmp : m_ttPageNum;
     m_cc608.SetTTPageNum(m_ttPageNum);
 }
 
@@ -1197,7 +1197,7 @@ void MythPlayer::DoFFRewSkip(void)
     {
         long long cur_frame    = m_decoder->GetFramesPlayed();
         bool      toBegin      = -cur_frame > m_ffrewSkip + m_ffrewAdjust;
-        long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
+        long long real_skip    = toBegin ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
         long long target_frame = cur_frame + real_skip;
         m_decoder->DoRewind(target_frame, true);
 

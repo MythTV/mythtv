@@ -120,7 +120,7 @@ int SOAPClient::GetNodeValue(
 bool SOAPClient::GetNodeValue(
     const QDomNode &node, const QString &sName, bool bDefault) const
 {
-    QString sDefault = (bDefault) ? "true" : "false";
+    QString sDefault = bDefault ? "true" : "false";
     QString sValue   = GetNodeValue(node, sName, sDefault);
     if (sValue.isEmpty())
         return bDefault;

@@ -109,7 +109,7 @@ int preview_helper(uint chanid, QDateTime starttime,
 
     delete pginfo;
 
-    return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_NOT_OK;
+    return ok ? GENERIC_EXIT_OK : GENERIC_EXIT_NOT_OK;
 }
 
 int main(int argc, char **argv)

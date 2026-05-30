@@ -17,7 +17,7 @@ static int buffers_filled(multiplex_t *mx)
 				     sizeof(index_unit);
 	}
 
-	if (aavail+vavail) return ((aavail+vavail));
+	if (aavail+vavail) return (aavail+vavail);
 	return 0;
 }
 

@@ -263,7 +263,7 @@ void JobQueue::ProcessQueue(void)
                                       .arg(jobs[x].startts);
 
                 // Should we even be looking at this job?
-                if ((inTimeWindow) &&
+                if (inTimeWindow &&
                     (!hostname.isEmpty()) &&
                     (hostname != m_hostname))
                 {
@@ -303,7 +303,7 @@ void JobQueue::ProcessQueue(void)
                 jobStatus[jobID] = status;
 
                 // Are we allowed to run this job?
-                if ((inTimeWindow) && (!AllowedToRun(jobs[x])))
+                if (inTimeWindow && (!AllowedToRun(jobs[x])))
                 {
                     message = QString("Skipping '%1' job for %2, "
                                       "not allowed to run on this backend.")
@@ -428,7 +428,7 @@ void JobQueue::ProcessQueue(void)
                 if (startedJobAlready)
                     continue;
 
-                if ((inTimeWindow) &&
+                if (inTimeWindow &&
                     (hostname.isEmpty()) &&
                     (!ChangeJobHost(jobID, m_hostname)))
                 {
@@ -486,7 +486,7 @@ void JobQueue::ProcessQueue(void)
         locker.relock();
         if (m_processQueue)
         {
-            std::chrono::milliseconds st = (startedJobAlready) ? 5s : sleepTime;
+            std::chrono::milliseconds st = startedJobAlready ? 5s : sleepTime;
             if (st > 0ms)
                 m_queueThreadCond.wait(locker.mutex(), st.count());
         }

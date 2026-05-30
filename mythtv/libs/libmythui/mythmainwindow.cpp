@@ -2124,7 +2124,7 @@ void MythMainWindow::ShowMouseCursor(bool Show)
         return;
 
     // Set cursor call must come after Show() to work on some systems.
-    setCursor(Show ? (Qt::ArrowCursor) : (Qt::BlankCursor));
+    setCursor(Show ? Qt::ArrowCursor : Qt::BlankCursor);
     if (Show)
         m_priv->m_hideMouseTimer->start();
 }

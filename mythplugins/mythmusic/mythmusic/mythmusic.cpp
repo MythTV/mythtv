@@ -754,7 +754,7 @@ static void handleCDMedia(MythMediaDevice *cd, bool forcePlayback)
         {
             MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(x);
             if (mdata)
-                songList.append((mdata)->ID());
+                songList.append(mdata->ID());
         }
 
         if (!songList.isEmpty())

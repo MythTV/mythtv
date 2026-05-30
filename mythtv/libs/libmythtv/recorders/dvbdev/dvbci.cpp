@@ -849,7 +849,7 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
     static_cast<uint8_t>((m_sessionId     ) & 0xFF),
     static_cast<uint8_t>((Tag >> 16) & 0xFF),
     static_cast<uint8_t>((Tag >>  8) & 0xFF),
-    static_cast<uint8_t>((Tag      ) & 0xFF)} ;
+    static_cast<uint8_t>( Tag        & 0xFF)};
   buffer.reserve(2048);
 
   SetLength(buffer, Length);

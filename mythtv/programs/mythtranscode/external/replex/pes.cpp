@@ -630,7 +630,7 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	length -= 6;
 
 	le[0] |= ((uint8_t)(length >> 8) & 0xFF); 
-	le[1] |= ((uint8_t)(length) & 0xFF); 
+	le[1] |= ((uint8_t)length & 0xFF);
 	memcpy(obuf+c,le.data(),2);
 	c += 2;
 
@@ -817,7 +817,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 	buf[pos] = 0x80 + n;
 	buf[pos+1] = nframes;
 	buf[pos+2] = (ac3_off >> 8)& 0xFF;
-	buf[pos+3] = (ac3_off)& 0xFF;
+	buf[pos+3] = ac3_off& 0xFF;
 	pos += 4;
 
 	int add = ring_read( ac3rbuffer, buf+pos, length-pos);

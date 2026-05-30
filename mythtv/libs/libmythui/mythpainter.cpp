@@ -461,14 +461,14 @@ MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
     if (area.width() <= 0 || area.height() <= 0)
         return nullptr;
 
-    uint64_t hash1 = ((0xfff & (uint64_t)area.width())) +
+    uint64_t hash1 = ( 0xfff & (uint64_t)area.width()) +
                      ((0xfff & (uint64_t)area.height())     << 12) +
                      ((0xff  & (uint64_t)fillBrush.style()) << 24) +
                      ((0xff  & (uint64_t)linePen.width())   << 32) +
                      ((0xff  & (uint64_t)radius)            << 40) +
                      ((0xff  & (uint64_t)linePen.style())   << 48) +
                      ((0xff  & (uint64_t)ellipse)           << 56);
-    uint64_t hash2 = ((0xffffffff & (uint64_t)linePen.color().rgba())) +
+    uint64_t hash2 = ( 0xffffffff & (uint64_t)linePen.color().rgba()) +
                      ((0xffffffff & (uint64_t)fillBrush.color().rgba()) << 32);
 
     QString incoming("R");
@@ -481,7 +481,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
         if (gradient)
         {
             incoming = QString::number(
-                             ((0xfff & (uint64_t)gradient->start().x())) +
+                             ( 0xfff & (uint64_t)gradient->start().x()) +
                              ((0xfff & (uint64_t)gradient->start().y()) << 12) +
                              ((0xfff & (uint64_t)gradient->finalStop().x()) << 24) +
                              ((0xfff & (uint64_t)gradient->finalStop().y()) << 36));
@@ -489,7 +489,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
             for (const auto & stop : std::as_const(stops))
             {
                 incoming += QString::number(
-                             ((0xfff * (uint64_t)(stop.first * 100))) +
+                             (0xfff * (uint64_t)(stop.first * 100)) +
                              ((uint64_t)stop.second.rgba() << 12));
             }
         }

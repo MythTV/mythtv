@@ -111,7 +111,7 @@ unsigned int ChannelData::promptForChannelUpdates(
                                      "(relative path to icon storage group) "),
                                      (*chaninfo).m_icon);
 
-    return(chanid);
+    return chanid;
 }
 
 QString ChannelData::normalizeChannelKey(const QString &chanName)

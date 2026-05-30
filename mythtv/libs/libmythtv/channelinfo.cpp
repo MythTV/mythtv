@@ -391,7 +391,7 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
     if (!other.m_serviceName.isEmpty() && m_serviceName.isEmpty())
         m_serviceName        = other.m_serviceName;
     if (!other.m_chanNum.isEmpty() &&
-        ((m_chanNum.isEmpty() || m_chanNum == "0")))
+        (m_chanNum.isEmpty() || m_chanNum == "0"))
         m_chanNum            = other.m_chanNum;
     if (other.m_serviceId && !m_serviceId)
         m_serviceId          = other.m_serviceId;

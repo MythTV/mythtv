@@ -186,7 +186,7 @@ void MHIContext::Restart(int chanid, int sourceid, bool isLive)
         QMutexLocker locker(&m_channelMutex);
         m_channelCache.clear();
     }
-    m_currentStream = (chanid) ? chanid : -1;
+    m_currentStream = chanid ? chanid : -1;
     if (!(tuneinfo & kTuneKeepChnl))
         m_currentChannel = m_currentStream;
 

@@ -250,7 +250,7 @@ class SSDPCacheTask : public Task
 
         QString Name() override // Task
         {
-            return( "SSDPCache" );
+            return "SSDPCache";
         }
 
         void Execute( TaskQueue *pQueue ) override // Task

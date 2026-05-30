@@ -79,7 +79,7 @@ bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
 
     delete oggfile;
 
-    return (result);
+    return result;
 }
 
 /*!

@@ -82,7 +82,7 @@ uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64
 	
 	if ( s->pulldown == NOPULLDOWN ) {
 		newdts = ( ((fcount-1) * SEC_PER) + *pts);
-		newpts = (((fnum ) * SEC_PER) + *pts);
+		newpts = ((fnum * SEC_PER) + *pts);
 	} else {
 		uint64_t extra_time = 0;
 #if 0
@@ -163,15 +163,15 @@ void pts2time(uint64_t pts, uint8_t *buf, int len)
 	while (c+7 < len){
 		if (buf[c] == 0x00 && buf[c+1] == 0x00 && buf[c+2] == 0x01 && 
 		    buf[c+3] == GROUP_START_CODE && (buf[c+5] & 0x08)){
-			buf[c+4] &= ~(0x7F);
+			buf[c+4] &= ~0x7F;
 			buf[c+4] |= (h & 0x1F) << 2;
 			buf[c+4] |= (m & 0x30) >> 4;
 
-			buf[c+5] &= ~(0xF7);
+			buf[c+5] &= ~0xF7;
 			buf[c+5] |= (m & 0x0F) << 4;
 			buf[c+5] |= (s & 0x38) >> 3;
 
-			buf[c+6] &= ~(0xE0);
+			buf[c+6] &= ~0xE0;
 			buf[c+6] |= (s & 0x07) << 5;
 
 /* 1hhhhhmm|mmmm1sss|sss */

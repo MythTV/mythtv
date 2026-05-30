@@ -493,7 +493,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 MythDB::DBError("GameHandler::UpdateGameDB - "
                                 "insert gamemetadata", query);
         }
-        else if ((game.FoundLoc() == inDatabase) && (removalprompt))
+        else if ((game.FoundLoc() == inDatabase) && removalprompt)
         {
 
             promptForRemoval( game );

@@ -240,7 +240,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     int rating = mdata->Rating();
                     int playcount = mdata->PlayCount();
                     double lastplaydbl = mdata->LastPlay().toSecsSinceEpoch();
-                    double ratingValue = (double)(rating) / 10;
+                    double ratingValue = (double)rating / 10;
                     double playcountValue = __builtin_nan("");
                     double lastplayValue = __builtin_nan("");
 

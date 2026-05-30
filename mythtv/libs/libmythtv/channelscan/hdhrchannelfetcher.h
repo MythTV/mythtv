@@ -103,7 +103,7 @@ class HDHRChannelFetcher : public QRunnable
     hdhr_chan_map_t GetChannels(void);
 
   private:
-    void SetTotalNumChannels(uint val) { m_chanCnt = (val) ? val : 1; }
+    void SetTotalNumChannels(uint val) { m_chanCnt = val ? val : 1; }
     void SetNumChannelsInserted(uint val);
 
   protected:

@@ -491,7 +491,7 @@ void ChannelScanner::PreScanCommon(
         if ((ScanTypeSetting::TransportScan     == scantype) ||
             (ScanTypeSetting::FullTransportScan == scantype))
         {
-            signal_timeout = (do_ignore_signal_timeout) ?
+            signal_timeout = do_ignore_signal_timeout ?
                 channel_timeout * 10 : signal_timeout;
         }
 

@@ -1215,7 +1215,7 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
         tspacket_fake->SetContinuityCounter(cc);
     }
 
-    const TSPacket &tspacket = (tspacket_fake)
+    const TSPacket &tspacket = tspacket_fake
         ? *tspacket_fake : tspacket_real;
 
     bool ret = DTVRecorder::ProcessTSPacket(tspacket);

@@ -3156,7 +3156,7 @@ void InputGroup::Load(void)
     for (size_t i = 0; i < names.size(); i++)
     {
         bool sel = (m_groupId == grpid[i]);
-        index = (sel) ? i : index;
+        index = sel ? i : index;
 
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("grpid %1, name '%2', i %3, s %4")

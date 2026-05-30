@@ -247,7 +247,7 @@ void MythMediaBuffer::Reset(bool Full, bool ToAdjust, bool ResetInternal)
     m_setSwitchToNext = false;
 
     m_writePos = 0;
-    m_readPos = (ToAdjust) ? (m_readPos - m_readAdjust) : 0;
+    m_readPos = ToAdjust ? (m_readPos - m_readAdjust) : 0;
 
     if (m_readPos != 0)
     {

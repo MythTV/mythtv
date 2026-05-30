@@ -466,7 +466,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     if (pbs)
         pbs->IncrRef();
 
-    bool bIsControl = (pbs) ? false : m_controlSocketList.contains(sock);
+    bool bIsControl = pbs ? false : m_controlSocketList.contains(sock);
     m_sockListLock.unlock();
 
     QStringList listline;
@@ -2057,7 +2057,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             for (const auto & file : std::as_const(checkfiles))
             {
                 if (dir.exists(file) &&
-                    ((file).endsWith(".srt") ||
+                    (file.endsWith(".srt") ||
                      QFileInfo(dir, file).size() >= kReadTestSize))
                 {
                     retlist<<file;
@@ -3602,7 +3602,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
     if (recinfo.HasPathname() && (m_ismaster) &&
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
-        (checkSlaves))
+        checkSlaves)
     {
         PlaybackSock *slave = GetMediaServerByHostname(recinfo.GetHostname());
 
@@ -4931,7 +4931,7 @@ void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
     }
     TVRec::s_inputsLock.unlock();
 
-    retlist << ((ok) ? "1" : "0");
+    retlist << (ok ? "1" : "0");
     SendResponse(pbssock, retlist);
 }
 
@@ -7253,12 +7253,12 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (it != slist.cend())
     {
         width = (*it).toInt(&ok); ++it;
-        width = (ok) ? width : -1;
+        width = ok ? width : -1;
     }
     if (it != slist.cend())
     {
         height = (*it).toInt(&ok); ++it;
-        height = (ok) ? height : -1;
+        height = ok ? height : -1;
         has_extra_data = true;
     }
     QSize outputsize = QSize(width, height);
@@ -7498,7 +7498,7 @@ void MainServer::HandlePixmapGetIfModified(
                     strlist +=
                         QString("3: Failed to read preview file '%1'%2")
                         .arg(pginfo.GetPathname(),
-                             (open_ok) ? "" : " open failed");
+                             open_ok ? "" : " open failed");
                 }
             }
             else if (out_of_date && (max_file_size > 0))
@@ -8108,7 +8108,7 @@ bool MainServer::isClientConnected(bool onlyBlockingClients)
 
     m_sockListLock.unlock();
 
-    return (foundClient);
+    return foundClient;
 }
 
 /// Sends the Slavebackends the request to shut down using haltcmd

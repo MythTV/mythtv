@@ -670,7 +670,7 @@ bool XMLTVParser::parseFile(
                             {
                                 bool ok = false;
                                 partno = partnumber.toUInt(&ok) + 1;
-                                partno = (ok) ? partno : 0;
+                                partno = ok ? partno : 0;
                             }
                             if (!parttotal.isEmpty() && partno > 0)
                             {

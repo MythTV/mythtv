@@ -375,7 +375,7 @@ QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
 {
     bool spcat = (!m_overRecordCategory.isEmpty() &&
                   pi->GetCategory() == m_overRecordCategory);
-    std::chrono::seconds secs = (spcat) ? m_overRecordSecCat : m_overRecordSecNrml;
+    std::chrono::seconds secs = spcat ? m_overRecordSecCat : m_overRecordSecNrml;
     return pi->GetRecordingEndTime().addSecs(secs.count());
 }
 
@@ -1136,7 +1136,7 @@ void TVRec::HandleStateChange(void)
         SET_NEXT();
     }
 
-    QString msg = (changed) ? "Changing from" : "Unknown state transition:";
+    QString msg = changed ? "Changing from" : "Unknown state transition:";
     LOG(VB_GENERAL, LOG_INFO, LOC + msg + transMsg);
 
     // update internal state variable
@@ -2444,7 +2444,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         needed_spacer = fspacer[0];
         bool nc       = (fchannum[0] != add_spacer(prefix, fspacer[0]));
 
-        complete_valid_channel_on_rec = (nc) ? 0 : finputid[0];
+        complete_valid_channel_on_rec = nc ? 0 : finputid[0];
         is_extra_char_useful             = nc;
         return true;
     }
@@ -2489,7 +2489,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     // If it isn't useful to wait for more characters,
     // then try to commit to any true match immediately.
-    for (size_t i = 0; i < ((is_extra_char_useful) ? 0 : fchanid.size()); i++)
+    for (size_t i = 0; i < (is_extra_char_useful ? 0 : fchanid.size()); i++)
     {
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {
@@ -4156,7 +4156,7 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
         // When allowed, metadata lookup should occur at the
         // start of a recording to make the additional info
         // available immediately (and for use in future jobs).
-        QString host = (on_host) ? gCoreContext->GetHostName() : "";
+        QString host = on_host ? gCoreContext->GetHostName() : "";
         JobQueue::QueueJob(JOB_METADATA,
                            rec->GetChanID(),
                            rec->GetRecordingStartTime(), "", "",
@@ -4175,7 +4175,7 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
     if (rt)
     {
         // queue up real-time (i.e. on-line) commercial flagging.
-        QString host = (on_host) ? gCoreContext->GetHostName() : "";
+        QString host = on_host ? gCoreContext->GetHostName() : "";
         JobQueue::QueueJob(JOB_COMMFLAG,
                            rec->GetChanID(),
                            rec->GetRecordingStartTime(), "", "",

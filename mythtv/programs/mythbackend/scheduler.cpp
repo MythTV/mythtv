@@ -4925,9 +4925,9 @@ void Scheduler::AddNotListed(void) {
         auto *p = new RecordingInfo(
             result.value(0).toString(), // Title
             QString(), // Title Sort
-            (sor) ? result.value(1).toString() : QString(), // Subtitle
+            sor ? result.value(1).toString() : QString(), // Subtitle
             QString(), // Subtitle Sort
-            (sor) ? result.value(2).toString() : QString(), // Description
+            sor ? result.value(2).toString() : QString(), // Description
             result.value(3).toUInt(), // Season
             result.value(4).toUInt(), // Episode
             QString(), // Category

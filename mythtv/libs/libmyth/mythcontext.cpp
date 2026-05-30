@@ -1422,7 +1422,7 @@ void MythContext::Impl::ShowConnectionFailurePopup(bool persistent)
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
 
-    QString description = (persistent) ?
+    QString description = persistent ?
         QObject::tr(
             "The connection to the master backend "
             "server has gone away for some reason. "

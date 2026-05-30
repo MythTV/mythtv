@@ -168,7 +168,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 
 	/* test if the config has changed, update it if so */
 	uint32_t pointWidth = (resolx * 2) / 5;
-	uint32_t pointHeight = ((c_resoly) * 2) / 5;
+	uint32_t pointHeight = (c_resoly * 2) / 5;
 
 	/* ! etude du signal ... */
 	int incvar = 0;				// volume du son
@@ -192,10 +192,10 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 
 	s_speedVar += (s_speedVar + (i/2));
 	s_speedVar /= 2;
-	if ((s_speedVar) && (cycle%9==0)) {
+	if (s_speedVar && (cycle%9==0)) {
 		s_speedVar -= 1;
 	}
-	if ((s_speedVar) && (cycle%5==0)) {
+	if (s_speedVar && (cycle%5==0)) {
 		s_speedVar = (s_speedVar*7)/8;
 	}
 

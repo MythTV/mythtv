@@ -208,7 +208,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
             if (pIngredient && gMHLogStream)
                 pIngredient->PrintMe(gMHLogStream, 0);
 
-            delete(pIngredient);
+            delete pIngredient;
             throw;
         }
     }

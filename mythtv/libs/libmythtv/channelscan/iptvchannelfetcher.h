@@ -82,7 +82,7 @@ class IPTVChannelFetcher : public QRunnable
         const QString &rawdata, IPTVChannelFetcher *fetcher = nullptr);
 
   private:
-    void SetTotalNumChannels(uint val) { m_chanCnt = (val) ? val : 1; }
+    void SetTotalNumChannels(uint val) { m_chanCnt = val ? val : 1; }
     void SetNumChannelsParsed(uint val);
     void SetNumChannelsInserted(uint val);
     void SetMessage(const QString &status);

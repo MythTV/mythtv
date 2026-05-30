@@ -47,7 +47,7 @@ This is equivalent to QVariant(bool).toString()
 */
 inline QString bool_to_string(bool val)
 {
-    return (val) ? QStringLiteral("true") : QStringLiteral("false");
+    return val ? QStringLiteral("true") : QStringLiteral("false");
 }
 
 MBASE_PUBLIC

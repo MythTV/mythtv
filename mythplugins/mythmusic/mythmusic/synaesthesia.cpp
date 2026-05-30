@@ -612,12 +612,12 @@ bool Synaesthesia::draw(QPainter *p, [[maybe_unused]] const QColor &back)
             *(ptrTop++) = v | (((r2 & 0x000000f0UL) << 12) |
                                ((r2 & 0x0000f000UL) << 8) |
                                ((r2 & 0x00f00000UL) << 4) |
-                               ((r2 & 0xf0000000UL)));
+                               ( r2 & 0xf0000000UL));
 
             *(ptrBot++) = v | (((r2 & 0x000000f0UL) << 12) |
                                ((r2 & 0x0000f000UL) << 8) |
                                ((r2 & 0x00f00000UL) << 4) |
-                               ((r2 & 0xf0000000UL)));
+                               ( r2 & 0xf0000000UL));
         }
     }
 

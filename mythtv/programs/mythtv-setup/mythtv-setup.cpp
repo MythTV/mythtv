@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
                          startChan, frequencyStandard, modulation, region);
             ret = QCoreApplication::exec();
         }
-        return (ret) ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
+        return ret ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
     }
 
     if (doScanList)

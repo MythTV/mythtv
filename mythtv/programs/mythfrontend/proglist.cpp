@@ -1404,7 +1404,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
 
     ProgramInfo        selected;
-    const ProgramInfo *selectedP = (restorePosition) ? GetCurrentProgram() : nullptr;
+    const ProgramInfo *selectedP = restorePosition ? GetCurrentProgram() : nullptr;
     if (selectedP)
     {
         selected = *selectedP;
@@ -1669,7 +1669,7 @@ void ProgLister::customEvent(QEvent *event)
 
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
 //      QString resulttext = dce->GetResultText();
@@ -1741,7 +1741,7 @@ void ProgLister::customEvent(QEvent *event)
     }
     else if (event->type() == ScreenLoadCompletionEvent::kEventType)
     {
-        auto *slce = (ScreenLoadCompletionEvent*)(event);
+        auto *slce = (ScreenLoadCompletionEvent*)event;
         QString id = slce->GetId();
 
         if (id == objectName())

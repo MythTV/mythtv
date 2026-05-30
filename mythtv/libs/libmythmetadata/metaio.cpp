@@ -176,7 +176,7 @@ MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 
     readFromFilename(filename, artist, album, title, genre, tracknum);
 
-    std::chrono::milliseconds length = (blnLength) ? getTrackLength(filename) : 0ms;
+    std::chrono::milliseconds length = blnLength ? getTrackLength(filename) : 0ms;
 
     auto *retdata = new MusicMetadata(filename, artist, "", album, title, genre,
                                       0, tracknum, length);

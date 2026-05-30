@@ -87,18 +87,18 @@ static QString toStringFrameFormats(int format, bool verbose)
     switch (format)
     {
         case COMM_FORMAT_NORMAL:
-            return (verbose) ? "normal" : " N ";
+            return verbose ? "normal" : " N ";
         case COMM_FORMAT_LETTERBOX:
-            return (verbose) ? "letter" : " L ";
+            return verbose ? "letter" : " L ";
         case COMM_FORMAT_PILLARBOX:
-            return (verbose) ? "pillar" : " P ";
+            return verbose ? "pillar" : " P ";
         case COMM_FORMAT_LETTERBOX | COMM_FORMAT_PILLARBOX:
-            return (verbose) ? "letter,pillar" : "L,P";
+            return verbose ? "letter,pillar" : "L,P";
         case COMM_FORMAT_MAX:
-            return (verbose) ? " max  " : " M ";
+            return verbose ? " max  " : " M ";
     }
 
-    return (verbose) ? "unknown" : " U ";
+    return verbose ? "unknown" : " U ";
 }
 
 QString FrameInfoEntry::GetHeader(void)
@@ -337,7 +337,7 @@ bool ClassicCommDetector::go()
     }
 
     // Don't bother flagging short ~realtime recordings
-    if ((wereRecording) && (!m_stillRecording) && (secsSince < requiredHeadStart))
+    if (wereRecording && (!m_stillRecording) && (secsSince < requiredHeadStart))
         return false;
 
     m_aggressiveDetection =
@@ -670,7 +670,7 @@ void ClassicCommDetector::GetCommercialBreakList(frm_dir_map_t &marks)
         marks = m_logoCommBreakMap;
     }
 
-    int cnt = ((blank) ? 1 : 0) + ((scene) ? 1 : 0) + ((logo) ? 1 : 0);
+    int cnt = (blank ? 1 : 0) + (scene ? 1 : 0) + (logo ? 1 : 0);
     if (cnt == 2)
     {
         if (blank && scene)
@@ -1108,7 +1108,7 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
 
                 allTrue = true;
 
-                while ((f <= m_framesProcessed) && (f < it_b.key()) && (allTrue))
+                while ((f <= m_framesProcessed) && (f < it_b.key()) && allTrue)
                     allTrue = FrameIsInBreakMap(f++, b);
             }
 
@@ -1952,7 +1952,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
         long long adjustment = 0;
 
         if ((r < (30 * m_fps)) &&
-            (first_comm))
+            first_comm)
             r = 1;
 
         m_blankCommMap[r] = MARK_COMM_START;
@@ -2498,7 +2498,7 @@ void ClassicCommDetector::PrintFullMap(
             frm_dir_map_t::const_iterator mit = comm_breaks->find(i);
             if (mit != comm_breaks->end())
             {
-                QString tmp = (verbose) ?
+                QString tmp = verbose ?
                     toString((MarkTypes)*mit) : QString::number(*mit);
                 atmp = tmp.toLatin1();
 

@@ -237,7 +237,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
 
     QStringList checkfiles;
     while (++it != slist.cend())
-        checkfiles += *(it);
+        checkfiles += *it;
 
     slist.clear();
 

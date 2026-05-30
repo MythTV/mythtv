@@ -724,9 +724,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 if (chan.m_channelId)
                 {
                     uint tsid = chan.m_vctTsId;
-                    tsid = (tsid) ? tsid : chan.m_sdtTsId;
-                    tsid = (tsid) ? tsid : chan.m_patTsId;
-                    tsid = (tsid) ? tsid : chan.m_vctChanTsId;
+                    tsid = tsid ? tsid : chan.m_sdtTsId;
+                    tsid = tsid ? tsid : chan.m_patTsId;
+                    tsid = tsid ? tsid : chan.m_vctChanTsId;
 
                     chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
                         chan.m_sourceId, transport, tsid, chan.m_origNetId);
@@ -867,9 +867,9 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 // transport and network ID's in case the transport
                 // was created manually
                 uint tsid = chan.m_vctTsId;
-                tsid = (tsid) ? tsid : chan.m_sdtTsId;
-                tsid = (tsid) ? tsid : chan.m_patTsId;
-                tsid = (tsid) ? tsid : chan.m_vctChanTsId;
+                tsid = tsid ? tsid : chan.m_sdtTsId;
+                tsid = tsid ? tsid : chan.m_patTsId;
+                tsid = tsid ? tsid : chan.m_vctChanTsId;
 
                 chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
                     chan.m_sourceId, transport, tsid, chan.m_origNetId);
@@ -971,7 +971,7 @@ void ChannelImporter::MergeSameFrequency(ScanDTVTransportList &transports)
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
                     (DTVTunerType::kTunerTypeDVBS2 == tuner_type));
 
-    uint freq_mult = (is_dvbs) ? 1 : 1000;
+    uint freq_mult = is_dvbs ? 1 : 1000;
 
     std::vector<bool> ignore;
     ignore.resize(transports.size());
@@ -1317,7 +1317,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         (DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
         (DTVTunerType::kTunerTypeDVBS2 == tuner_type);
 
-    uint freq_mult = (is_dvbs) ? 1 : 1000;
+    uint freq_mult = is_dvbs ? 1 : 1000;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1781,13 +1781,13 @@ bool ChannelImporter::IsType(
     switch (type)
     {
         case kATSCNonConflicting:
-            return ((chan.m_siStandard == "atsc") /* &&
+            return (chan.m_siStandard == "atsc") /* &&
                     (info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
-                                        (chan.m_atscMinorChannel)] == 1) */);
+                                        (chan.m_atscMinorChannel)] == 1) */;
 
         case kDVBNonConflicting:
-            return ((chan.m_siStandard == "dvb") /* &&
-                    (info.m_progNumCnt[chan.m_serviceId] == 1) */);
+            return (chan.m_siStandard == "dvb") /* &&
+                    (info.m_progNumCnt[chan.m_serviceId] == 1) */;
 
         case kMPEGNonConflicting:
             return ((chan.m_siStandard == "mpeg") &&

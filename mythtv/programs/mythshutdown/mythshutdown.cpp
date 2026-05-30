@@ -879,7 +879,7 @@ int main(int argc, char **argv)
         bool utc = cmdline.toBool("utc");
         QString tmp = cmdline.toString("setwakeup");
 
-        QDateTime wakeuptime = (utc) ?
+        QDateTime wakeuptime = utc ?
             MythDate::fromString(tmp) :
             QDateTime::fromString(tmp, Qt::ISODate).toUTC();
 

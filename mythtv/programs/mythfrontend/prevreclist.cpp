@@ -597,7 +597,7 @@ void PrevRecordedList::customEvent(QEvent *event)
 
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
 //      QString resulttext = dce->GetResultText();
@@ -640,7 +640,7 @@ void PrevRecordedList::customEvent(QEvent *event)
     }
     else if (event->type() == ScreenLoadCompletionEvent::kEventType)
     {
-        auto *slce = (ScreenLoadCompletionEvent*)(event);
+        auto *slce = (ScreenLoadCompletionEvent*)event;
         QString id = slce->GetId();
 
         if (id == objectName())

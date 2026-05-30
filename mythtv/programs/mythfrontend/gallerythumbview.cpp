@@ -473,7 +473,7 @@ void GalleryThumbView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)event;
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();

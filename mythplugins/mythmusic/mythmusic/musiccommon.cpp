@@ -2531,7 +2531,7 @@ void MusicCommon::fromCD(void)
         MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(x);
         if (mdata)
         {
-            m_songList.append((mdata)->ID());
+            m_songList.append(mdata->ID());
         }
     }
 

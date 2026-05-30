@@ -685,7 +685,7 @@ bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
 {
     const uint64_t caps = m_capabilities;
     return
-        ((DTVCodeRate::kFECNone == rate))                            ||
+        (DTVCodeRate::kFECNone == rate)                           ||
         ((DTVCodeRate::kFEC_1_2 == rate) && ((caps & FE_CAN_FEC_1_2) != 0U)) ||
         ((DTVCodeRate::kFEC_2_3 == rate) && ((caps & FE_CAN_FEC_2_3) != 0U)) ||
         ((DTVCodeRate::kFEC_3_4 == rate) && ((caps & FE_CAN_FEC_3_4) != 0U)) ||
@@ -816,8 +816,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     // DVB-S/S2 is in kHz, other DVB is in Hz
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == m_tunerType) ||
                     (DTVTunerType::kTunerTypeDVBS2 == m_tunerType));
-    int     freq_mult = (is_dvbs) ? 1 : 1000;
-    QString suffix    = (is_dvbs) ? "kHz" : "Hz";
+    int     freq_mult = is_dvbs ? 1 : 1000;
+    QString suffix    = is_dvbs ? "kHz" : "Hz";
 
     if (reset || !m_prevTuning.IsEqual(m_tunerType, tuning, 500 * freq_mult))
     {

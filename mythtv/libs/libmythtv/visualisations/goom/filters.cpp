@@ -168,7 +168,7 @@ generatePrecalCoef ()
 					if (i4)
 						i4--;
 
-					i = (i1) | (i2 << 8) | (i3 << 16) | (i4 << 24);
+					i = i1 | (i2 << 8) | (i3 << 16) | (i4 << 24);
 				}
 				precalCoef[coefh][coefv] = i;
 			}

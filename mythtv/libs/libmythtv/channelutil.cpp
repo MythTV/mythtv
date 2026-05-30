@@ -148,7 +148,7 @@ static uint insert_dtv_multiplex(
         "WHERE sourceid    = :SOURCEID      AND "
         "      sistandard  = :SISTANDARD    AND ";
 
-    updateStr += (isDVB) ?
+    updateStr += isDVB ?
         " polarity     = :WHEREPOLARITY      AND "
         " transportid = :TRANSPORTID AND networkid = :NETWORKID " :
         " frequency = :FREQUENCY2 ";
@@ -159,7 +159,7 @@ static uint insert_dtv_multiplex(
 
     insertStr += (!modulation.isNull())     ? "modulation, "        : "";
     insertStr += (transport_id || isDVB)    ? "transportid, "       : "";
-    insertStr += (isDVB)                    ? "networkid, "         : "";
+    insertStr += isDVB                      ? "networkid, "         : "";
     insertStr += (symbol_rate >= 0)         ? "symbolrate, "        : "";
     insertStr += (bandwidth   >= 0)         ? "bandwidth, "         : "";
     insertStr += (polarity    >= 0)         ? "polarity, "          : "";
@@ -180,7 +180,7 @@ static uint insert_dtv_multiplex(
         "  (:SOURCEID,      :SISTANDARD,       :FREQUENCY1, ";
     insertStr += (!modulation.isNull())     ? ":MODULATION, "       : "";
     insertStr += (transport_id || isDVB)    ? ":TRANSPORTID, "      : "";
-    insertStr += (isDVB)                    ? ":NETWORKID, "        : "";
+    insertStr += isDVB                      ? ":NETWORKID, "        : "";
     insertStr += (symbol_rate >= 0)         ? ":SYMBOLRATE, "       : "";
     insertStr += (bandwidth   >= 0)         ? ":BANDWIDTH, "        : "";
     insertStr += (polarity    >= 0)         ? ":POLARITY, "         : "";
@@ -196,7 +196,7 @@ static uint insert_dtv_multiplex(
     insertStr += (!rolloff.isNull())        ? ":ROLLOFF, "          : "";
     insertStr = insertStr.left(insertStr.length()-2) + ");";
 
-    query.prepare((mplex) ? updateStr : insertStr);
+    query.prepare(mplex ? updateStr : insertStr);
 
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
@@ -986,7 +986,7 @@ int ChannelUtil::GetChannelValueInt(const QString &channel_field,
     if (!val.isEmpty())
         retval = val.toInt();
 
-    return (retval) ? retval : -1;
+    return retval ? retval : -1;
 }
 
 QString ChannelUtil::GetChannelNumber(uint sourceid, const QString &channel_name)
@@ -1430,7 +1430,7 @@ uint ChannelUtil::FindChannel(uint sourceid, const QString &freqid)
 static uint get_max_chanid(uint sourceid)
 {
     QString qstr = "SELECT MAX(chanid) FROM channel ";
-    qstr += (sourceid) ? "WHERE sourceid = :SOURCEID" : "";
+    qstr += sourceid ? "WHERE sourceid = :SOURCEID" : "";
 
     MSqlQuery query(MSqlQuery::ChannelCon());
     query.prepare(qstr);
@@ -2104,7 +2104,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         "FROM videosource "
         "%1 JOIN capturecard ON capturecard.sourceid = videosource.sourceid "
         "GROUP BY videosource.sourceid")
-        .arg((include_disconnected) ? "LEFT" : "");
+        .arg(include_disconnected ? "LEFT" : "");
 
     query.prepare(qstr);
     if (!query.exec())

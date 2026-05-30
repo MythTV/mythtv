@@ -260,7 +260,7 @@ bool StereoScope::process( VisualNode *node )
         for ( int i = 0; i < m_size.width(); i++)
         {
             auto indexTo = (unsigned long)(index + step);
-            if (indexTo == (unsigned long)(index))
+            if (indexTo == (unsigned long)index)
                 indexTo = (unsigned long)(index + 1);
 
             double valL = 0;

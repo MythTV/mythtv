@@ -148,7 +148,7 @@ UPnpCDSMethod UPnpCDS::GetMethod( const QString &sURI )
         sURI == "GetFeatureList"        ) return CDSM_GetFeatureList       ;
     if (sURI == "GetServiceResetToken"  ) return CDSM_GetServiceResetToken ;
 
-    return(  CDSM_Unknown );
+    return CDSM_Unknown;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -157,10 +157,10 @@ UPnpCDSMethod UPnpCDS::GetMethod( const QString &sURI )
 
 UPnpCDSBrowseFlag UPnpCDS::GetBrowseFlag( const QString &sFlag )
 {
-    if (sFlag == "BrowseMetadata"       ) return( CDS_BrowseMetadata        );
-    if (sFlag == "BrowseDirectChildren" ) return( CDS_BrowseDirectChildren  );
+    if (sFlag == "BrowseMetadata"       ) return CDS_BrowseMetadata;
+    if (sFlag == "BrowseDirectChildren" ) return CDS_BrowseDirectChildren;
 
-    return( CDS_BrowseUnknown );
+    return CDS_BrowseUnknown;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -824,7 +824,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
     // -=>TODO: Need to add Filter & Sorting Support.
 
     if (!IsBrowseRequestForUs( pRequest ))
-        return( nullptr );
+        return nullptr;
 
     // ----------------------------------------------------------------------
     // Split the request ID into token key/value
@@ -885,7 +885,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     }
 
-    return( pResults );
+    return pResults;
 }
 
 /////////////////////////////////////////////////////////////////////////////

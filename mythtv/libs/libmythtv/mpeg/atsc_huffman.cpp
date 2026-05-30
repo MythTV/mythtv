@@ -2226,7 +2226,7 @@ QString atsc_huffman1_to_string(const unsigned char *compressed,
     while (bit < totalbits)
     {
         bool thebit = huffman1_get_bit(compressed, bit);
-        unsigned char val = (thebit) ? table[root + (node*2) + 1] : table[root + (node*2)];
+        unsigned char val = thebit ? table[root + (node*2) + 1] : table[root + (node*2)];
 
         if (val & 0x80)
         {

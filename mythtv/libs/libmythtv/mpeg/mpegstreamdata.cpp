@@ -72,7 +72,7 @@ void MPEGStreamData::SetDesiredProgram(int p)
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetDesiredProgram(%2)").arg(p));
 
-    for (uint i = (p) ? 0 : pats.size(); i < pats.size() && !pid; i++)
+    for (uint i = p ? 0 : pats.size(); i < pats.size() && !pid; i++)
     {
         pat = pats[i];
         pid = pats[i]->FindPID(p);
@@ -1782,7 +1782,7 @@ void MPEGStreamData::AddEncryptionTestPID(uint pnum, uint pid, bool isvideo)
 
     AddListeningPID(pid);
 
-    m_encryptionPidToInfo[pid] = CryptInfo((isvideo) ? 10000 : 500, 8);
+    m_encryptionPidToInfo[pid] = CryptInfo(isvideo ? 10000 : 500, 8);
 
     m_encryptionPidToPnums[pid].push_back(pnum);
     m_encryptionPnumToPids[pnum].push_back(pid);

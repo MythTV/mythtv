@@ -1349,7 +1349,7 @@ bool SpliceInformationTable::Parse(void)
         if (splice_count)
         {
             bool duration = (m_ptrs0.back()[5] & 0x2) != 0;
-            m_epilog = m_ptrs1.back() + ((duration) ? 9 : 4);
+            m_epilog = m_ptrs1.back() + (duration ? 9 : 4);
         }
         else
         {
@@ -1381,7 +1381,7 @@ bool SpliceInformationTable::Parse(void)
                 for (uint i = 0; i < component_count; i++)
                 {
                     m_ptrs0.push_back(cur);
-                    cur += (splice_immediate) ?
+                    cur += splice_immediate ?
                         1 : 1 + SpliceTimeView(cur).size();
                 }
             }

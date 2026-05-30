@@ -327,7 +327,7 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 
     GetValidXML( sBaseAddress, nPort, os );
     os << Qt::flush;
-    return( sXML );
+    return sXML;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -529,7 +529,7 @@ QString UPnpDeviceDesc::FormatValue(const NameValue& node)
     }
     sStr = QString("<%1%2>%3</%1>\n").arg(node.m_sName, sAttributes, node.m_sValue);
 
-    return( sStr );
+    return sStr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -544,7 +544,7 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName,
     if (sValue.length() > 0)
         sStr = QString("<%1>%2</%1>\n") .arg(sName, sValue);
 
-    return( sStr );
+    return sStr;
 }
 
 /////////////////////////////////////////////////////////////////////////////

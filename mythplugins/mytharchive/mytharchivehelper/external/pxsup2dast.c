@@ -371,7 +371,7 @@ static void ifopalette(const char * filename,
         eu8 r = 0;
         eu8 g = 0;
         eu8 b = 0;
-        eu8 * p = buf + ((ptrdiff_t)(i) * 4) + 1;
+        eu8 * p = buf + ((ptrdiff_t)i * 4) + 1;
         yuvpalette[i][0] =p[0]; yuvpalette[i][1] =p[1]; yuvpalette[i][2] =p[2];
         yuv2rgb(p[0], p[1], p[2], &r, &g, &b);
         rgbpalette[i][0] = r; rgbpalette[i][1] = g; rgbpalette[i][2] = b; 

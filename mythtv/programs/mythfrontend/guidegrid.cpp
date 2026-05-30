@@ -795,7 +795,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         {
             ProgramInfo *pginfo =
                 m_programInfos[m_currentRow][m_currentCol];
-            auto secsTillStart = (pginfo)
+            auto secsTillStart = pginfo
                 ? MythDate::secsInFuture(pginfo->GetScheduledStartTime()) : 0s;
             if (m_player && (m_player->GetState() == kState_WatchingLiveTV))
             {
@@ -966,7 +966,7 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
                                         // instead of changing the channel.
                                         ProgramInfo *pginfo =
                                             m_programInfos[m_currentRow][m_currentCol];
-                                        auto secsTillStart = (pginfo)
+                                        auto secsTillStart = pginfo
                                             ? MythDate::secsInFuture(pginfo->GetScheduledStartTime()) : 0s;
                                         if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
                                             (secsTillStart >= m_selectRecThreshold))
@@ -1470,7 +1470,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
                            bool exact) const
 {
     // first check chanid
-    uint i = (chanid) ? 0 : GetChannelCount();
+    uint i = chanid ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); ++i)
     {
         if (m_channelInfos[i][0].m_chanId == chanid)
@@ -1478,7 +1478,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     }
 
     // then check for chanid in duplicates
-    i = (chanid) ? 0 : GetChannelCount();
+    i = chanid ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); ++i)
     {
         for (size_t j = 1; j < m_channelInfos[i].size(); ++j)
@@ -1818,7 +1818,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             {
                 tempRect = QRect((int)(row * ydifference),
                                  (int)(x * xdifference),
-                                 (int)(ydifference),
+                                 (int)ydifference,
                                  (int)(xdifference * pginfo->m_spread));
             }
             else
@@ -1909,7 +1909,7 @@ void GuideGrid::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();

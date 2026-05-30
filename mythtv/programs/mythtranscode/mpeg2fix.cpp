@@ -215,7 +215,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt)
             QString("Moving PTS offset of stream %1 by %2")
                 .arg(idx).arg(PtsTime(delta)));
     }
-    return (delta);
+    return delta;
 }
 
 MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,

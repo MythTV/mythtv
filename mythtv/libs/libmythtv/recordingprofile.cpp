@@ -1303,7 +1303,7 @@ class ImageSize : public GroupSetting
             setLabel(QObject::tr("Width"));
             setValue(defaultwidth);
 
-            QString help = (transcoding) ?
+            QString help = transcoding ?
                 QObject::tr("If the width is set to 'Auto', the width "
                             "will be calculated based on the height and "
                             "the recording's physical aspect ratio.") :
@@ -1330,7 +1330,7 @@ class ImageSize : public GroupSetting
             setLabel(QObject::tr("Height"));
             setValue(defaultheight);
 
-            QString help = (transcoding) ?
+            QString help = transcoding ?
                 QObject::tr("If the height is set to 'Auto', the height "
                             "will be calculated based on the width and "
                             "the recording's physical aspect ratio.") :
@@ -1364,7 +1364,7 @@ class ImageSize : public GroupSetting
         else if (tvFormat.startsWith("ntsc", Qt::CaseInsensitive))
         {
             maxsize     = QSize(720, 480);
-            defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);
+            defaultsize = ivtv ? QSize(720, 480) : QSize(480, 480);
         }
         else if (tvFormat.toLower() == "atsc")
         {
@@ -1374,7 +1374,7 @@ class ImageSize : public GroupSetting
         else
         {
             maxsize     = QSize(768, 576);
-            defaultsize = (ivtv) ? QSize(720, 576) : QSize(480, 576);
+            defaultsize = ivtv ? QSize(720, 576) : QSize(480, 576);
         }
 
         addChild(new Width(parent, defaultsize.width(),
@@ -1441,7 +1441,7 @@ void RecordingProfile::ResizeTranscode(const QString & /*val*/)
 void RecordingProfile::SetLosslessTranscode(const QString & /*val*/)
 {
     bool lossless = m_trLossless->boolValue();
-    bool show_size = (lossless) ? false : m_trResize->boolValue();
+    bool show_size = lossless ? false : m_trResize->boolValue();
     if (m_imageSize)
         m_imageSize->setEnabled(show_size);
     m_videoSettings->setEnabled(! lossless);

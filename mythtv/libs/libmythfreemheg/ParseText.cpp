@@ -1065,7 +1065,7 @@ MHParseNode *MHParseText::DoParse()
     }
     catch (...)
     {
-        delete(pRes);
+        delete pRes;
         throw;
     }
 }

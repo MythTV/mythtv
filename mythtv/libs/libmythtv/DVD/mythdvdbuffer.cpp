@@ -2109,7 +2109,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
     }
 
     for (int i = 0; i < Subtitle->rects[0]->nb_colors; i++)
-        if (((reinterpret_cast<uint32_t*>(Subtitle->rects[0]->data[1])[i] >> 24)) == 0)
+        if ((reinterpret_cast<uint32_t*>(Subtitle->rects[0]->data[1])[i] >> 24) == 0)
             colors[i] = 1;
 
     ptrdiff_t bottom = 0;

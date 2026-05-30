@@ -286,7 +286,7 @@ namespace
             if (event->type() != DialogCompletionEvent::kEventType)
                 return;
 
-            auto *dce = (DialogCompletionEvent*)(event);
+            auto *dce = (DialogCompletionEvent*)event;
             QString buttonText = dce->GetResultText();
 
             if (dce->GetId() != "bookmarkdialog")

@@ -239,7 +239,7 @@ float SequenceHeader::aspect(bool mpeg1) const
         return 1.0F; // avoid segfaults on broken seq data
 
     uint  index  = aspectNum();
-    float aspect = (mpeg1) ? kMpeg1Aspect[index] : kMpeg2Aspect[index];
+    float aspect = mpeg1 ? kMpeg1Aspect[index] : kMpeg2Aspect[index];
 
     float retval = 0.0F;
     retval = (aspect >  0.0F) ? width() / (aspect * height()) : retval;

@@ -121,7 +121,7 @@ class TuningRequest
     int            m_progNum   {-1};
 };
 using TuningQueue = MythDeque<TuningRequest>;
-inline TuningRequest myth_deque_init(const TuningRequest */*request*/) { return (TuningRequest)(0); }
+inline TuningRequest myth_deque_init(const TuningRequest */*request*/) { return (TuningRequest)0; }
 
 class PendingInfo
 {

@@ -910,7 +910,7 @@ static uint get_chan_id_from_db_atsc(uint sourceid,
     else if (query.next())
     {
         bool useOnAirGuide = query.value(1).toBool();
-        return (useOnAirGuide) ? query.value(0).toUInt() : 0;
+        return useOnAirGuide ? query.value(0).toUInt() : 0;
     }
 
     return 0;

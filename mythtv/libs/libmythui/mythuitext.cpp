@@ -928,8 +928,8 @@ void MythUIText::FillCutMessage(void)
             min_rect.width() < m_minSize.x())
         {
             m_drawRect.moveLeft(m_area.x() +
-                                (((m_minSize.x() - min_rect.width() +
-                                   fm.averageCharWidth()) / 2)));
+                                ((m_minSize.x() - min_rect.width() +
+                                   fm.averageCharWidth()) / 2));
             min_rect.setWidth(m_minSize.x());
         }
         else
@@ -946,8 +946,8 @@ void MythUIText::FillCutMessage(void)
             min_rect.width() < m_minSize.x())
         {
             m_drawRect.moveRight(m_area.x() + m_area.width() -
-                                (((m_minSize.x() - min_rect.width() +
-                                   fm.averageCharWidth()) / 2)));
+                                ((m_minSize.x() - min_rect.width() +
+                                   fm.averageCharWidth()) / 2));
             min_rect.setWidth(m_minSize.x());
         }
         else

@@ -49,7 +49,7 @@ class UPnpNotifyTask : public Task
     public:
         explicit UPnpNotifyTask( int nServicePort );
 
-        QString Name() override { return( "Notify" ); } // Task
+        QString Name() override { return "Notify"; } // Task
         void Execute( TaskQueue *pQueue ) override; // Task
 
         QString GetNTSString()
@@ -60,10 +60,10 @@ class UPnpNotifyTask : public Task
 
             switch( nts )
             {
-                case NTS_alive : return( "ssdp:alive"  );
-                case NTS_byebye: return( "ssdp:byebye" );
+                case NTS_alive : return "ssdp:alive";
+                case NTS_byebye: return "ssdp:byebye";
             }
-            return( "unknown" );
+            return "unknown";
         }
 
         UPnpNotifyNTS GetNTS()
@@ -72,7 +72,7 @@ class UPnpNotifyTask : public Task
             UPnpNotifyNTS nts = m_eNTS;
             m_mutex.unlock();
 
-            return( nts );
+            return nts ;
         }
 
         void SetNTS( UPnpNotifyNTS nts)

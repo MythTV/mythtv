@@ -473,7 +473,7 @@ ProgramInfo::ProgramInfo(
     m_recordId(_recordid),
     m_findId(_findid),
 
-    m_programFlags((duplicate) ? FL_DUPLICATE : FL_NONE),
+    m_programFlags(duplicate ? FL_DUPLICATE : FL_NONE),
 
     m_recStatus(_recstatus),
     m_recType(_rectype),
@@ -578,8 +578,8 @@ ProgramInfo::ProgramInfo(
     m_recStatus(_recstatus),
     m_recType(_rectype)
 {
-    m_programFlags |= (commfree) ? FL_CHANCOMMFREE : FL_NONE;
-    m_programFlags |= (repeat)   ? FL_REPEAT       : FL_NONE;
+    m_programFlags |= commfree ? FL_CHANCOMMFREE : FL_NONE;
+    m_programFlags |= repeat   ? FL_REPEAT       : FL_NONE;
 
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
@@ -2648,7 +2648,7 @@ QString ProgramInfo::GetPlaybackURL(
     }
 
     // Check to see if we should stream from the master backend
-    if ((checkMaster) &&
+    if (checkMaster &&
         (gCoreContext->GetBoolSetting("MasterBackendOverride", false)) &&
         (RemoteCheckFile(this, false)))
     {
@@ -2955,7 +2955,7 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields)
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString serialid    = *(it);
+    QString serialid    = *it;
     QString name        = *(++it);
 
     if( fields.count() == 3 )
@@ -3017,7 +3017,7 @@ void ProgramInfo::SaveBDBookmark(const QStringList &fields)
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString serialid    = *(it);
+    QString serialid    = *it;
     QString name        = *(++it);
 
     if( fields.count() == 3 )
@@ -5122,7 +5122,7 @@ QString ProgramInfo::QueryRecordingGroupPassword(const QString &group)
     if (query.exec() && query.next())
         result = query.value(0).toString();
 
-    return(result);
+    return result;
 }
 
 /** \brief Query recgroup from recorded
@@ -6468,7 +6468,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
     nextRecordingStart = QDateTime();
 
     bool dummy = false;
-    bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
+    bool *conflicts = hasConflicts ? hasConflicts : &dummy;
 
     ProgramList progList;
     if (!LoadFromScheduler(progList, *conflicts))

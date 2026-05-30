@@ -277,7 +277,7 @@ void MythWebEngineView::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)event;
 
         // make sure the user didn't ESCAPE out of the dialog
         if (dce->GetResult() < 0)

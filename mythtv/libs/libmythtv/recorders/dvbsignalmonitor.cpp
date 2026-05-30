@@ -361,7 +361,7 @@ void DVBSignalMonitor::UpdateValues(void)
         // normalize these to a time period.
 
         wasLocked = m_signalLock.IsGood();
-        m_signalLock.SetValue((has_lock) ? 1 : 0);
+        m_signalLock.SetValue(has_lock ? 1 : 0);
         isLocked = m_signalLock.IsGood();
 
         if (HasFlags(kSigMon_WaitForSig))

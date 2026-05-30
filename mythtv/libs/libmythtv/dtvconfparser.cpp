@@ -130,7 +130,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
     }
     file.close();
 
-    return (ok) ? return_t::OK : return_t::ERROR_PARSE;
+    return ok ? return_t::OK : return_t::ERROR_PARSE;
 }
 
 bool DTVConfParser::ParseConfOFDM(const QStringList &tokens)
