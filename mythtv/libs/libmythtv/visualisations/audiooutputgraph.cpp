@@ -182,7 +182,7 @@ class AudioOutputGraph::AOBuffer : public QByteArray
 
     std::chrono::milliseconds Samples2MS(unsigned Samples) const
     {
-        return m_sampleRate ? std::chrono::milliseconds((Samples * 1000UL + m_sampleRate - 1) / m_sampleRate) : 0ms; // round up
+        return m_sampleRate ? std::chrono::milliseconds(((Samples * 1000UL) + m_sampleRate - 1) / m_sampleRate) : 0ms; // round up
     }
 
     int MS2Samples(std::chrono::milliseconds Msecs) const

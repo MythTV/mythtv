@@ -507,9 +507,9 @@ bool MonoScope::process( VisualNode *node )
             for (auto s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
                 double tmp = ( static_cast<double>(node->m_left[s]) +
-                               (node->m_right ? static_cast<double>(node->m_right[s])
+                               ((node->m_right ? static_cast<double>(node->m_right[s])
                                 : static_cast<double>(node->m_left[s])) *
-                               ( static_cast<double>(m_size.height()) / 2.0 ) ) / 65536.0;
+                               ( static_cast<double>(m_size.height()) / 2.0 )) ) / 65536.0;
                 if (tmp > 0)
                 {
                     val = (tmp > val) ? tmp : val;
@@ -1169,7 +1169,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
             if (k > start - i && start > i)
             {
                 mult = mult + ((1 - mult) *
-                    (1 - (float)(start - k) / (float)(start - i)));
+                    (1 - ((float)(start - k) / (float)(start - i))));
             }
             m_sigL[k] = mult * m_sigL[i + k];
             m_sigR[k] = mult * m_sigR[i + k];
@@ -1491,7 +1491,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
             if (k > start - i && start > i)
             {
                 mult = mult + ((1 - mult) *
-                    (1 - (float)(start - k) / (float)(start - i)));
+                    (1 - ((float)(start - k) / (float)(start - i))));
             }
             m_sigL[k] = mult * m_sigL[i + k];
             m_sigR[k] = mult * m_sigR[i + k];
@@ -1831,7 +1831,7 @@ void Piano::resize(const QSize &newsize)
 
     // This is the starting position of the keyboard (may be beyond LHS)
     // - actually position of C below bottom A (will be added to...).  This is 4 octaves below middle C.
-    double left =  ((double)m_size.width() / 2.0) - ((4.0*7.0 + 3.5) * key_unit_size); // The extra 3.5 centers 'F' inthe middle of the screen
+    double left =  ((double)m_size.width() / 2.0) - (((4.0*7.0) + 3.5) * key_unit_size); // The extra 3.5 centers 'F' inthe middle of the screen
     double top_of_keys = ((double)m_size.height() / 2.0) - (key_unit_size * white_height_pct / 2.0); // Vertically center keys
 
     m_rects.resize(kPianoNumKeys);

@@ -103,13 +103,13 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 //	happens = 1;
 	
 	float tmp = s_happens?8.0F:0;
-	*dist2 = s_distT2 = (tmp + 15.0F*s_distT2)/16.0F;
+	*dist2 = s_distT2 = (tmp + (15.0F*s_distT2))/16.0F;
 
 	tmp = 30+D-(90.0F*(1.0F+sinf(lcycle*19/20)));
 	if (s_happens)
 		tmp *= 0.6F;
 
-	*dist = s_distT = (tmp + 3.0F*s_distT)/4.0F;
+	*dist = s_distT = (tmp + (3.0F*s_distT))/4.0F;
 
 	if (!s_happens){
 		tmp = (M_PI_F*sinf(lcycle)/32)+(3*M_PI_F/2);
@@ -124,20 +124,20 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 		tmp = lcycle - ((M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F)));
 	}
 	
-	if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot+2.0F*M_PI_F))) {
-		s_rot = (tmp + 15.0F*(s_rot+2*M_PI_F)) / 16.0F;
+	if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot+(2.0F*M_PI_F)))) {
+		s_rot = (tmp + (15.0F*(s_rot+(2*M_PI_F)))) / 16.0F;
 		if (s_rot>2.0F*M_PI_F)
 			s_rot -= 2.0F*M_PI_F;
 		*rotangle = s_rot;
 	}
-	else if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot-2.0F*M_PI_F))) {
-		s_rot = (tmp + 15.0F*(s_rot-2.0F*M_PI_F)) / 16.0F;
+	else if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot-(2.0F*M_PI_F)))) {
+		s_rot = (tmp + (15.0F*(s_rot-(2.0F*M_PI_F)))) / 16.0F;
 		if (s_rot<0.0F)
 			s_rot += 2.0F*M_PI_F;
 		*rotangle = s_rot;
 	}
 	else {
-		*rotangle = s_rot = (tmp + 15.0F*s_rot) / 16.0F;
+		*rotangle = s_rot = (tmp + (15.0F*s_rot)) / 16.0F;
 	}
 }
 

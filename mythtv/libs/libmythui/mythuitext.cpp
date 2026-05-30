@@ -724,7 +724,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             if (lines >= 1)
             {
                 // Too wide?
-                width -= width * (lines / num_lines - 1 + lines);
+                width -= width * ((lines / num_lines) - 1 + lines);
                 if (static_cast<int>(width) == last_width)
                 {
                     m_cutdown = cutdown;
@@ -734,7 +734,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             else if (last_line_width < m_area.width())
             {
                 // Is the last line fully used?
-                width -= (1.0 - last_line_width / width) / num_lines;
+                width -= (1.0 - (last_line_width / width)) / num_lines;
                 width = std::min(width, last_line_width);
                 if (static_cast<int>(width) == last_width)
                 {
@@ -1351,14 +1351,23 @@ void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor, in
     m_numSteps = numSteps;
     m_curStep = 0;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     m_curR = startColor.red();
     m_curG = startColor.green();
     m_curB = startColor.blue();
 
-    m_incR = (endColor.red()   * 1.0F - m_curR) / m_numSteps;
-    m_incG = (endColor.green() * 1.0F - m_curG) / m_numSteps;
-    m_incB = (endColor.blue()  * 1.0F - m_curB) / m_numSteps;
+    m_incR = ((endColor.red()   * 1.0F) - m_curR) / m_numSteps;
+    m_incG = ((endColor.green() * 1.0F) - m_curG) / m_numSteps;
+    m_incB = ((endColor.blue()  * 1.0F) - m_curB) / m_numSteps;
+#else
+    m_curR = startColor.redF();
+    m_curG = startColor.greenF();
+    m_curB = startColor.blueF();
 
+    m_incR = (endColor.redF()   - m_curR) / m_numSteps;
+    m_incG = (endColor.greenF() - m_curG) / m_numSteps;
+    m_incB = (endColor.blueF()  - m_curB) / m_numSteps;
+#endif
     m_colorCycling = true;
 }
 

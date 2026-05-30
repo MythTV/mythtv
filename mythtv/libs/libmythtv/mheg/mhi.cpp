@@ -761,12 +761,12 @@ void MHIContext::RequireRedraw(const QRegion & /*region*/)
 
 inline int MHIContext::ScaleX(int n, bool roundup) const
 {
-    return (n * m_displayRect.width() + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
+    return ((n * m_displayRect.width()) + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
 }
 
 inline int MHIContext::ScaleY(int n, bool roundup) const
 {
-    return (n * m_displayRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
+    return ((n * m_displayRect.height()) + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
 inline QRect MHIContext::Scale(const QRect r) const
@@ -777,12 +777,12 @@ inline QRect MHIContext::Scale(const QRect r) const
 
 inline int MHIContext::ScaleVideoX(int n, bool roundup) const
 {
-    return (n * m_videoRect.width() + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
+    return ((n * m_videoRect.width()) + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
 }
 
 inline int MHIContext::ScaleVideoY(int n, bool roundup) const
 {
-    return (n * m_videoRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
+    return ((n * m_videoRect.height()) + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
 inline QRect MHIContext::ScaleVideo(const QRect r) const

@@ -205,7 +205,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 	/* ! calcul du deplacement des petits points ... */
 
         // largfactor: elargissement de l'intervalle d'évolution
-	float largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
+	float largfactor = (((float) s_speedVar / 40.0F) + ((float) incvar / 50000.0F)) / 1.5F;
 	largfactor = std::min(largfactor, 1.5F);
 
 	s_decayIfs--;
@@ -239,16 +239,16 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
                                      (((pointHeight / 2.0F) * largfactor) / i) + (10.0F * i),
                                      96.0F, i * 80.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, VIOLET,
-                                     (((pointHeight / 3.0F + 5.0F) * largfactor) / i) + (10.0F * i),
-                                     (((pointHeight / 3.0F + 5.0F) * largfactor) / i) + (10.0F * i),
+                                     ((((pointHeight / 3.0F) + 5.0F) * largfactor) / i) + (10.0F * i),
+                                     ((((pointHeight / 3.0F) + 5.0F) * largfactor) / i) + (10.0F * i),
                                      i + 122.0F, 134.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, BLACK,
                                      (((pointHeight / 3.0F) * largfactor) + 20.0F),
                                      (((pointHeight / 3.0F) * largfactor) + 20.0F),
                                      58.0F, i * 66.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, WHITE,
-                                     (pointHeight * largfactor + 10.0F * i) / i,
-                                     (pointHeight * largfactor + 10.0F * i) / i,
+                                     ((pointHeight * largfactor) + (10.0F * i)) / i,
+                                     ((pointHeight * largfactor) + (10.0F * i)) / i,
                                      66.0F, 74.0F, s_loopVar + (i * 500)); }
 	}
 
@@ -545,7 +545,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 						s_zfd.reverse = !s_zfd.reverse;
 					}
 					else {
-						s_zfd.vitesse = (newvit + s_zfd.vitesse * 7) / 8;
+						s_zfd.vitesse = (newvit + (s_zfd.vitesse * 7)) / 8;
 					}
 					s_lockVar += 50;
 				}

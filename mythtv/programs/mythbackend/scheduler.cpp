@@ -5518,7 +5518,7 @@ int Scheduler::FillRecordingDir(
     // uses
     EncoderLink *nexttv = (*m_tvList)[cardid];
     long long maxByterate = nexttv->GetMaxBitrate() / 8;
-    long long maxSizeKB = (maxByterate + maxByterate/3) *
+    long long maxSizeKB = (maxByterate + (maxByterate/3)) *
         recstartts.secsTo(recendts) / 1024;
 
     bool simulateAutoExpire =

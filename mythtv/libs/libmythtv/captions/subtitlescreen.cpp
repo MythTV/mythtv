@@ -1303,7 +1303,7 @@ void FormattedTextSubtitle608::Init(const std::vector<CC608Text*> &buffers)
         if (xmid)
         {
             // center horizontally
-            x = xmid + ((orig_x - xscale / 2) * fontwidth);
+            x = xmid + ((orig_x - (xscale / 2)) * fontwidth);
         }
         else
         {
@@ -2204,7 +2204,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     int hsize = m_safeArea.width();
     int vsize = m_safeArea.height();
 
-    scaled.moveLeft(((100 - m_textFontZoom) * hsize / 2 + m_textFontZoom * scaled.left()) / 100);
+    scaled.moveLeft((((100 - m_textFontZoom) * hsize / 2) + (m_textFontZoom * scaled.left())) / 100);
     if (top)
     {
         // anchor up
@@ -2213,7 +2213,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     else
     {
         // anchor down
-        scaled.moveTop(((100 - m_textFontZoom) * vsize + m_textFontZoom * scaled.top()) / 100);
+        scaled.moveTop((((100 - m_textFontZoom) * vsize) + (m_textFontZoom * scaled.top())) / 100);
     }
 
     MythImage* image = m_painter->GetFormatImage();

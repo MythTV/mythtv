@@ -92,7 +92,7 @@ void Synaesthesia::setupPalette(void)
             if (blue > 255) { excess += blue - 255; blue = 255; }
         }
 
-        double scale2 = (0.5 + (red + green + blue) / 768.0) / 1.5;
+        double scale2 = (0.5 + ((red + green + blue) / 768.0)) / 1.5;
         red *= scale2;
         green *= scale2;
         blue *= scale2;
@@ -486,7 +486,7 @@ bool Synaesthesia::process(VisualNode *node)
         b[i] = sqrt(bb);
         if (aa + bb != 0.0)
         {
-            clarity[i] = (int)(((x1 + x2) * (x1 - x2) + (y1 + y2) * (y1 - y2)) /
+            clarity[i] = (int)((((x1 + x2) * (x1 - x2)) + ((y1 + y2) * (y1 - y2))) /
                          (aa + bb) * 256);
         }
         else

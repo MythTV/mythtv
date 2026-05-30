@@ -1674,7 +1674,7 @@ bool MythDVDBuffer::DVDButtonUpdate(bool ButtonMode)
     for (uint i = 0 ; i < 4 ; i++)
     {
         m_buttonAlpha[i] = 0xf & (highlight.palette >> (4 * i));
-        m_buttonColor[i] = 0xf & (highlight.palette >> (16 + 4 * i));
+        m_buttonColor[i] = 0xf & (highlight.palette >> (16 + (4 * i)));
     }
 
     // If the button overlay has already been decoded, make sure

@@ -1143,7 +1143,7 @@ bool cCiDateTime::SendDateTime(void)
      int M = tm_gmt.tm_mon + 1;
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
-     int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
+     int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + (L * 12)) * 30.6001);
      uint16_t mjd = htons(MJD);
      int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
      std::vector<uint8_t> T {

@@ -254,9 +254,9 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     else
                         lastplayValue = (((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin)) + 1);
 
-                    double weight = (RatingWeight * ratingValue +
-                                        PlayCountWeight * playcountValue +
-                                        LastPlayWeight * lastplayValue) / TotalWeight;
+                    double weight = ((RatingWeight * ratingValue) +
+                                        (PlayCountWeight * playcountValue) +
+                                        (LastPlayWeight * lastplayValue)) / TotalWeight;
                     weights[mdata->ID()] = weight;
                     ratings[mdata->ID()] = rating;
                     ++ratingCounts[rating];

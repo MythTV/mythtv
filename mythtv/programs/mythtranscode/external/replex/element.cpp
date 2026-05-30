@@ -66,7 +66,7 @@ void fix_audio_count(uint64_t *acount, audio_frame_t *aframe, uint64_t origpts, 
 {
 	uint64_t di = (samples [3-aframe->layer] * 27000000ULL);
 	int64_t diff = ptsdiff(origpts,pts);
-	int c=(aframe->frequency * diff+di/2)/di;
+	int c=((aframe->frequency * diff)+(di/2))/di;
 	if (c)
             LOG(VB_GENERAL, LOG_INFO, QString("fix audio frames %1").arg(c));
 	*acount += c;
@@ -133,11 +133,11 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 	if (!dsig) ddiff = -ddiff;
 
 	if ( s->pulldown == NOPULLDOWN ) {
-		dframe = (ddiff+SEC_PER/2ULL) / SEC_PER;
-		pframe = (pdiff+SEC_PER/2ULL) / SEC_PER;
+		dframe = (ddiff+(SEC_PER/2ULL)) / SEC_PER;
+		pframe = (pdiff+(SEC_PER/2ULL)) / SEC_PER;
 	} else {
-		dframe = (4ULL*ddiff/5ULL+SEC_PER/2ULL) / SEC_PER;
-		pframe = (4ULL*pdiff/5ULL+SEC_PER/2ULL) / SEC_PER;
+		dframe = ((4ULL*ddiff/5ULL)+(SEC_PER/2ULL)) / SEC_PER;
+		pframe = ((4ULL*pdiff/5ULL)+(SEC_PER/2ULL)) / SEC_PER;
 	}
 
 	if (!psig) fr = -(int)pframe;
@@ -571,7 +571,7 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 		break;
 
 	case 0x40:
-		af->framesize = 2 * (320 * af->bit_rate / 147000 + (frame & 1));
+		af->framesize = 2 * ((320 * af->bit_rate / 147000) + (frame & 1));
 		break;
 
 	case 0x80:

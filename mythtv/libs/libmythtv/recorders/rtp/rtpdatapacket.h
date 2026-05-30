@@ -74,7 +74,7 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
     uint GetContributingSource(uint i) const
     {
         const uint32_t tmp =
-            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + 4 * i);
+            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4 * i));
         return qFromBigEndian(tmp);
     }
 

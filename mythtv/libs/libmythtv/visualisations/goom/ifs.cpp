@@ -284,9 +284,9 @@ Transform (SIMI * Simi, F_PT xo, F_PT yo, F_PT * x, F_PT * y)
 	yy = (yy * Simi->m_fR2) / UNIT;
 
 	*x =
-		((xo * Simi->m_fCt - yo * Simi->m_fSt + xx * Simi->m_fCt2 - yy * Simi->m_fSt2) / UNIT ) + Simi->m_fCx;
+		(((xo * Simi->m_fCt) - (yo * Simi->m_fSt) + (xx * Simi->m_fCt2) - (yy * Simi->m_fSt2)) / UNIT ) + Simi->m_fCx;
 	*y =
-		((xo * Simi->m_fSt + yo * Simi->m_fCt + xx * Simi->m_fSt2 + yy * Simi->m_fCt2) / UNIT ) + Simi->m_fCy;
+		(((xo * Simi->m_fSt) + (yo * Simi->m_fCt) + (xx * Simi->m_fSt2) + (yy * Simi->m_fCt2)) / UNIT ) + Simi->m_fCy;
 }
 
 /***************************************************************/

@@ -207,8 +207,8 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     int cur  = pfile.readAll().trimmed().toInt();
     int max  = mfile.readAll().trimmed().toInt();
 
-    int size = ((int)(cur * (float)requested / (float)buffer_time)
-                / 64 + 1) * 64;
+    int size = (((int)(cur * (float)requested / (float)buffer_time)
+                / 64) + 1) * 64;
 
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Hardware audio buffer cur: %1 need: %2 max allowed: %3")
             .arg(cur).arg(size).arg(max));

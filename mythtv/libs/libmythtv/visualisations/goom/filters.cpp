@@ -342,7 +342,7 @@ getPixelRGB (const unsigned int * buffer, unsigned int x, unsigned int y, Color 
 #endif
 
 	/* ATTENTION AU PETIT INDIEN  */
-	unsigned int i = *(buffer + (x + y * resolx));
+	unsigned int i = *(buffer + (x + (y * resolx)));
 	c->b = (i >> (BLEU * 8)) & 0xff;
 	c->v = (i >> (VERT * 8)) & 0xff;
 	c->r = (i >> (ROUGE * 8)) & 0xff;

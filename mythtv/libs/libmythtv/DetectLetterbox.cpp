@@ -43,8 +43,8 @@ bool DetectLetterbox::Detect(MythVideoFrame *Frame, float VideoAspect, AdjustFil
     //    const int halfLimit = (static_cast<int>(((height - width * 9 / 14) / 2) * m_detectLetterboxLimit / 100);
 
     // If the black bars is larger than this limit we switch to Half or Full Mode
-    const int fullLimit = static_cast<int>((height * (1 - VideoAspect * 9 / 16) / 2) * m_detectLetterboxLimit / 100);
-    const int halfLimit = static_cast<int>((height * (1 - VideoAspect * 9 / 14) / 2) * m_detectLetterboxLimit / 100);
+    const int fullLimit = static_cast<int>((height * (1 - (VideoAspect * 9 / 16)) / 2) * m_detectLetterboxLimit / 100);
+    const int halfLimit = static_cast<int>((height * (1 - (VideoAspect * 9 / 14)) / 2) * m_detectLetterboxLimit / 100);
 
     // Lines to scan for black letterbox edge
     const std::array<int,3> xPos { Frame->m_width / 4, Frame->m_width / 2, Frame->m_width * 3 / 4} ;

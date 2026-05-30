@@ -211,9 +211,9 @@ static void yuv2rgb(int y,   int cr,  int cb,
             eu8 * r, eu8 * g, eu8 * b)  
 {
     /* from dvdauthor... */
-    int lr = (500 + 1164 * (y - 16) + 1596 * (cr - 128)              ) /1000;
-    int lg = (500 + 1164 * (y - 16) -  813 * (cr - 128) - 391 * (cb - 128)) / 1000;
-    int lb = (500 + 1164 * (y - 16)                    + 2018 * (cb - 128)) / 1000;
+    int lr = (500 + (1164 * (y - 16)) + (1596 * (cr - 128))                      ) / 1000;
+    int lg = (500 + (1164 * (y - 16)) - ( 813 * (cr - 128)) - ( 391 * (cb - 128))) / 1000;
+    int lb = (500 + (1164 * (y - 16))                       + (2018 * (cb - 128))) / 1000;
 
     *r = clamp(lr, 0, 255);
     *g = clamp(lg, 0, 255);
@@ -226,9 +226,9 @@ static void rgb2yuv(eu8 r,   eu8   g,  eu8 b,
     /* int ly, lcr, lcb; */
 
     /* from dvdauthor... */
-    *y  = ( 257 * r + 504 * g +  98 * b +  16500) / 1000;
-    *cr = ( 439 * r - 368 * g -  71 * b + 128500) / 1000;
-    *cb = (-148 * r - 291 * g + 439 * b + 128500) / 1000; 
+    *y  = ( (257 * r) + (504 * g) +  (98 * b) +  16500) / 1000;
+    *cr = ( (439 * r) - (368 * g) -  (71 * b) + 128500) / 1000;
+    *cb = ((-148 * r) - (291 * g) + (439 * b) + 128500) / 1000;
 }
 
 /* the code above matches nicely with http://www.fourcc.org/fccyvrgb.php

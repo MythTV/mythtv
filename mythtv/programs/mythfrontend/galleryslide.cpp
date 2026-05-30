@@ -468,7 +468,7 @@ void Slide::Zoom(int percentage)
     // Sentinel indicates reset to default zoom
     float newZoom = (percentage == 0)
             ? 1.0F
-            : std::clamp(m_zoom * (1.0F + percentage / 100.0F), MIN_ZOOM, MAX_ZOOM);
+            : std::clamp(m_zoom * (1.0F + (percentage / 100.0F)), MIN_ZOOM, MAX_ZOOM);
     if (newZoom != m_zoom)
     {
         if (m_zoomAnimation)

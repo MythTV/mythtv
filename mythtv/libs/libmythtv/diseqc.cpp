@@ -2116,7 +2116,7 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     bool     high_band  = lnb->IsHighBand(tuning);
     bool     horizontal = lnb->IsHorizontal(tuning);
     uint32_t frequency  = lnb->GetIntermediateFrequency(settings, tuning);
-    uint t = ((frequency / 1000 + m_scrFrequency + 2) / 4) - 350;
+    uint t = (((frequency / 1000) + m_scrFrequency + 2) / 4) - 350;
 
     // retrieve position settings (value should be 0 or 1)
     auto scr_position = (dvbdev_pos_t)int(settings.GetValue(GetDeviceID()));
@@ -2218,7 +2218,7 @@ uint DiSEqCDevSCR::GetVoltage(const DiSEqCDevSettings &/*settings*/,
 
 uint32_t DiSEqCDevSCR::GetIntermediateFrequency(const uint32_t frequency) const
 {
-    uint t = ((frequency / 1000 + m_scrFrequency + 2) / 4) - 350;
+    uint t = (((frequency / 1000) + m_scrFrequency + 2) / 4) - 350;
     return (((t + 350) * 4) * 1000) - frequency;
 }
 
