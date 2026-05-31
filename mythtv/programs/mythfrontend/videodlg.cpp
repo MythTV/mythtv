@@ -3485,7 +3485,9 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     {
         if ((child->getInt() == kSubFolder) ||
             (child->getInt() == kUpFolder))
+        {
             VideoAutoSearch(child);
+        }
         else
         {
             VideoMetadata *metadata = GetMetadataPtrFromNode(child);

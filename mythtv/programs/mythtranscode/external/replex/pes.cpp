@@ -184,8 +184,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				c++;
 				break;
 			case 2:
-				if (buf[c] == 0x01) p->found++;
-				else if (buf[c] == 0){
+				if (buf[c] == 0x01) {
+					p->found++;
+				} else if (buf[c] == 0) {
 					p->found = 2;
 				} else {
 					p->found = 0;
@@ -251,8 +252,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					p->flag1 = buf[c];
 					c++;
 					p->found++;
-					if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
-					else {
+					if ( (p->flag1 & 0xC0) == 0x80 ) {
+						p->mpeg = 2;
+					} else {
 						LOG(VB_GENERAL, LOG_ERR,
 						"Error: THIS IS AN MPEG1 FILE");
 						exit(1);
@@ -345,9 +347,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					int l = count -c;
 					if (l+p->found > p->plength+6)
 						l = p->plength+6-p->found;
-					if (p->withbuf)
+					if (p->withbuf) {
 						memcpy(p->buf.data()+p->found, buf+c, l);
-					else {
+					} else {
 						if ( p->found < 
                                                      (unsigned int)p->hlength+9 ){
 							int rest = p->hlength+9-p->found;

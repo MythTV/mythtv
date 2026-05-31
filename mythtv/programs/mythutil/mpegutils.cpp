@@ -478,9 +478,13 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
                     audio_pid = pmt->StreamPID(i);
             }
             if (video_pid)
+            {
                 m_sd->AddWritingPID(video_pid);
+            }
             else if (audio_pid)
+            {
                 m_sd->AddWritingPID(audio_pid);
+            }
             else
             {
                 LOG(VB_STDIO|VB_FLUSH, LOG_WARNING,

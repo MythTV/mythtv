@@ -156,17 +156,29 @@ bool GallerySlideView::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "LEFT")
+        {
             ShowPrevSlide(1);
+        }
         else if (action == "RIGHT")
+        {
             ShowNextSlide(1);
+        }
         else if (action == "UP")
+        {
             ShowPrevSlide(10);
+        }
         else if (action == "DOWN")
+        {
             ShowNextSlide(10);
+        }
         else if (action == "INFO")
+        {
             ShowInfo();
+        }
         else if (action == "MENU")
+        {
             MenuMain();
+        }
         else if (action == "PLAY")
         {
             if (m_playing)

@@ -164,9 +164,13 @@ QStringList LCDServer::parseCommand(QString &command)
     {
         c = x;
         if (!bInString && c == '"')
+        {
             bInString = true;
+        }
         else if (bInString && c == '"')
+        {
             bInString = false;
+        }
         else if (!bInString && c == ' ')
         {
             tokens.append(s);
@@ -387,14 +391,13 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         }
 
         TEXT_ALIGNMENT align = ALIGN_LEFT;
-        if (tokens[x + 1] == "ALIGN_LEFT")
+        if (tokens[x + 1] == "ALIGN_LEFT") {
             align = ALIGN_LEFT;
-        else if (tokens[x + 1] == "ALIGN_RIGHT")
+        } else if (tokens[x + 1] == "ALIGN_RIGHT") {
             align = ALIGN_RIGHT;
-        else if (tokens[x + 1] == "ALIGN_CENTERED")
+        } else if (tokens[x + 1] == "ALIGN_CENTERED") {
             align = ALIGN_CENTERED;
-        else
-        {
+        } else {
             LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: bad align in SWITCH_TO_GENERIC command: " +
                 tokens[x + 1]);
@@ -405,12 +408,11 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         const QString& text = tokens[x + 2];
         const QString& screen = tokens[x + 3];
         bool scrollable = false;
-        if (tokens[x + 4] == "TRUE")
+        if (tokens[x + 4] == "TRUE") {
             scrollable = true;
-        else if (tokens[x + 4] == "FALSE")
+        } else if (tokens[x + 4] == "FALSE") {
             scrollable = false;
-        else
-        {
+        } else {
             LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: bad scrollable bool in SWITCH_TO_GENERIC "
                 "command: " + tokens[x + 4]);
@@ -499,12 +501,11 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
     const QString& appName = tokens[1];
 
     bool bPopup = false;
-    if (tokens[2] == "TRUE")
+    if (tokens[2] == "TRUE") {
         bPopup = true;
-    else if (tokens[2] == "FALSE")
+    } else if (tokens[2] == "FALSE") {
         bPopup = false;
-    else
-    {
+    } else {
         LOG(VB_GENERAL, LOG_ERR,
             "LCDServer: bad popup bool in SWITCH_TO_MENU command: " +
              tokens[2]);
@@ -519,14 +520,13 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         const QString& text = tokens[x];
 
         CHECKED_STATE checked = CHECKED;
-        if (tokens[x + 1] == "CHECKED")
+        if (tokens[x + 1] == "CHECKED") {
             checked = CHECKED;
-        else if (tokens[x + 1] == "UNCHECKED")
+        } else if (tokens[x + 1] == "UNCHECKED") {
             checked = UNCHECKED;
-        else if (tokens[x + 1] == "NOTCHECKABLE")
+        } else if (tokens[x + 1] == "NOTCHECKABLE") {
             checked = NOTCHECKABLE;
-        else
-        {
+        } else {
             LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: bad checked state in SWITCH_TO_MENU command: " +
                 tokens[x + 1]);
@@ -535,12 +535,11 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         }
 
         bool selected = false;
-        if (tokens[x + 2] == "TRUE")
+        if (tokens[x + 2] == "TRUE") {
             selected = true;
-        else if (tokens[x + 2] == "FALSE")
+        } else if (tokens[x + 2] == "FALSE") {
             selected = false;
-        else
-        {
+        } else {
             LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: bad selected state in SWITCH_TO_MENU command: " +
                 tokens[x + 2]);
@@ -549,12 +548,11 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         }
 
         bool scrollable = false;
-        if (tokens[x + 3] == "TRUE")
+        if (tokens[x + 3] == "TRUE") {
             scrollable = true;
-        else if (tokens[x + 3] == "FALSE")
+        } else if (tokens[x + 3] == "FALSE") {
             scrollable = false;
-        else
-        {
+        } else {
             LOG(VB_GENERAL, LOG_ERR,
                 "LCDServer: bad scrollable bool in SWITCH_TO_MENU command: " +
                 tokens[x + 3]);

@@ -352,9 +352,13 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "RANKINC")
+        {
             changeRecPriority(1);
+        }
         else if (action == "RANKDEC")
+        {
             changeRecPriority(-1);
+        }
         else if (action == "ESCAPE")
         {
             saveRecPriority();
@@ -1002,7 +1006,9 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
 
         // order may change if sorting by recording priority, so resort
         if (m_sortType == byRecPriority)
+        {
             SortList();
+        }
         else
         {
             // No need to re-fill the entire list, just update this entry
@@ -1144,9 +1150,13 @@ void ProgramRecPriority::countMatches()
         {
             m_listMatch[recordid]++;
             if (recstatus == RecStatus::Conflict || recstatus == RecStatus::Offline)
+            {
                 m_conMatch[recordid]++;
+            }
             else if (recstatus == RecStatus::WillRecord)
+            {
                 m_recMatch[recordid]++;
+            }
             else if (recstatus == RecStatus::Recording)
             {
                 m_nowMatch[recordid]++;
@@ -1159,7 +1169,9 @@ void ProgramRecPriority::countMatches()
 void ProgramRecPriority::SortList(ProgramRecPriorityInfo *newCurrentItem)
 {
     if (newCurrentItem)
+    {
         m_currentItem = newCurrentItem;
+    }
     else
     {
         MythUIButtonListItem *item = m_programList->GetItemCurrent();

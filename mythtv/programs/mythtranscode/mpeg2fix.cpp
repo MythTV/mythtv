@@ -587,9 +587,13 @@ void MPEG2fixup::InitReplex()
     {
         LOG(VB_GENERAL, LOG_NOTICE, "MPEG2fixup::InitReplex(): High Definition input, increasing replex buffers");
         if (m_rx.m_otype == REPLEX_MPEG2)
+        {
             m_rx.m_otype = REPLEX_HDTV;
+        }
         else if (m_rx.m_otype == REPLEX_TS_SD)
+        {
             m_rx.m_otype = REPLEX_TS_HD;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_WARNING, "MPEG2fixup::InitReplex(): Using '--ostream=dvd' with HD video is an invalid combination");

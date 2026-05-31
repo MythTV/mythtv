@@ -809,9 +809,13 @@ bool V2Dvr::ReactivateRecording(int RecordedId,
 {
     RecordingInfo ri;
     if (RecordedId > 0)
+    {
         ri = RecordingInfo(RecordedId);
+    }
     else if (ChanId > 0 && StartTime.isValid())
+    {
         ri = RecordingInfo(ChanId, StartTime.toUTC());
+    }
     else if (RecordId > 0)
     {
         // Find latest recording for that record id
@@ -1178,9 +1182,13 @@ V2CutList* V2Dvr::GetRecordedSeek ( int RecordedId,
 
     auto* pCutList = new V2CutList();
     if (offsettype.toLower() == "bytes")
+    {
         marktype = MARK_GOP_BYFRAME;
+    }
     else if (offsettype.toLower() == "duration")
+    {
         marktype = MARK_DURATION_MS;
+    }
     else
     {
         delete pCutList;

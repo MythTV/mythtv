@@ -108,7 +108,9 @@ bool Transcode::GetProfile(const QString& profileName, const QString& encodingTy
         int profileID = profileName.toInt(&isNum);
         // If a bad profile is specified, there will be trouble
         if (isNum && profileID > 0)
+        {
             m_recProfile->loadByID(profileID);
+        }
         else if (!m_recProfile->loadByGroup(profileName, "Transcoders"))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find profile #: %1")
@@ -237,7 +239,9 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
         }
         if (cutStr.isEmpty())
+        {
             cutStr = "Is Empty";
+        }
         else if (cutStr.endsWith('-') && (total_frame_count > lastStart))
         {
             new_frame_count -= (total_frame_count - lastStart);
@@ -294,9 +298,13 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         // If height or width are 0, then we need to calculate them
         if (newHeight == 0 && newWidth > 0)
+        {
             newHeight = (int)(1.0F * newWidth / video_aspect);
+        }
         else if (newWidth == 0 && newHeight > 0)
+        {
             newWidth = (int)(1.0F * newHeight * video_aspect);
+        }
         else if (newWidth == 0 && newHeight == 0)
         {
             newHeight = 480;

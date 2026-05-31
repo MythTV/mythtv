@@ -306,9 +306,9 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
                 .arg(16*1024*(s->vbv_buffer_size)));
 
 	c += 8;
-	if ( !(s->flags & INTRAQ_FLAG) ) 
+	if ( !(s->flags & INTRAQ_FLAG) ) {
 		s->flags = ( headr[7] & 0x07);
-	else {
+	} else {
 		s->flags |= headr[c+63] & 0x01;
 		memset(s->intra_quant, 0, 64);
 		for (int i=0;i<64;i++)

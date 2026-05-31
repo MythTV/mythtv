@@ -621,9 +621,13 @@ void PlaybackBox::Init()
     m_recordingList->SetSearchFields("titlesubtitle");
 
     if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+    {
         showGroupFilter();
+    }
     else if (!m_player)
+    {
         displayRecGroup(m_recGroup);
+    }
     else
     {
         UpdateUILists();
@@ -1576,7 +1580,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     if (m_noRecordingsText)
     {
         if (!progList.empty())
+        {
             m_noRecordingsText->SetVisible(false);
+        }
         else
         {
             QString txt = m_programInfoCache.empty() ?
@@ -2984,7 +2990,9 @@ void PlaybackBox::ShowMenu()
         return;
 
     if (GetFocusWidget() == m_groupList)
+    {
         ShowGroupPopup();
+    }
     else
     {
         ProgramInfo *pginfo = GetCurrentProgram();
@@ -3921,7 +3929,9 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == ACTION_1 || action == "HELP")
+        {
             showIconHelp();
+        }
         else if (action == "MENU")
         {
             ShowMenu();
@@ -4131,7 +4141,9 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message == "UPDATE_UI_LIST")
         {
             if (m_playingSomething)
+            {
                 m_needUpdate = true;
+            }
             else
             {
                 UpdateUILists();

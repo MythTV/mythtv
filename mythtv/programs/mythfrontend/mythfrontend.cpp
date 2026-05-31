@@ -293,11 +293,17 @@ namespace
                 return;
 
             if (buttonText == m_btnPlayLast)
+            {
                 TV::StartTV(m_pgi, kStartTVNoFlags);
+            }
             else if (buttonText == m_btnPlayBookmark)
+            {
                 TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos );
+            }
             else if (buttonText == m_btnPlayBegin)
+            {
                 TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos | kStartTVIgnoreBookmark);
+            }
             else if (buttonText == m_btnClearBookmark)
             {
                 m_pgi->SaveBookmark(0);
@@ -966,7 +972,9 @@ static void TVMenuCallback(void * /* data */, QString &selection)
     }
 
     if (sel == "tv_watch_live")
+    {
         startTVNormal();
+    }
     else if (sel.startsWith("tv_watch_recording"))
     {
         // use selection here because its case is untouched
@@ -2313,9 +2321,13 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         QStringList plugins = g_pmanager->EnumeratePlugins();
 
         if (plugins.contains(cmdline.toString("runplugin")))
+        {
             g_pmanager->run_plugin(cmdline.toString("runplugin"));
+        }
         else if (plugins.contains("myth" + cmdline.toString("runplugin")))
+        {
             g_pmanager->run_plugin("myth" + cmdline.toString("runplugin"));
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -2332,7 +2344,9 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         MythMainWindow *mmw = GetMythMainWindow();
 
         if (mmw->DestinationExists(cmdline.toString("jumppoint")))
+        {
             mmw->JumpTo(cmdline.toString("jumppoint"));
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR,

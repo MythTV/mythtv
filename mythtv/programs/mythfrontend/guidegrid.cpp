@@ -1672,9 +1672,13 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
     QDateTime tnow = MythDate::current();
     int progPast = 0;
     if (tnow > m_currentEndTime)
+    {
         progPast = 100;
+    }
     else if (tnow < m_currentStartTime)
+    {
         progPast = 0;
+    }
     else
     {
         int played = m_currentStartTime.secsTo(tnow);

@@ -95,7 +95,9 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 
     AvailableStatusType availableStatus = asAvailable;
     if (!evinfo.HasPathname() && !evinfo.GetChanID())
+    {
         availableStatus = asFileNotFound;
+    }
     else
     {
         // Note IsFileReadable() implicitly calls GetPlaybackURL

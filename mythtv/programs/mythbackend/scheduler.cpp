@@ -1239,7 +1239,9 @@ void Scheduler::MarkShowingsList(const RecList &showinglist, RecordingInfo *p)
             q->GetRecordingStatus() != RecStatus::LaterShowing)
             continue;
         if (q->IsSameTitleStartTimeAndChannel(*p))
+        {
             q->SetRecordingStatus(RecStatus::LaterShowing);
+        }
         else if (q->GetRecordingRuleType() != kSingleRecord &&
                  q->GetRecordingRuleType() != kOverrideRecord &&
                  IsSameProgram(q,p))
@@ -4790,9 +4792,13 @@ void Scheduler::AddNewRecords(void)
 
         // Check for RecStatus::CurrentRecording and RecStatus::PreviousRecording
         if (p->GetRecordingRuleType() == kDontRecord)
+        {
             newrecstatus = RecStatus::DontRecord;
+        }
         else if (result.value(15).toBool() && !p->IsReactivated())
+        {
             newrecstatus = RecStatus::PreviousRecording;
+        }
         else if (p->GetRecordingRuleType() != kSingleRecord &&
                  p->GetRecordingRuleType() != kOverrideRecord &&
                  !p->IsReactivated() &&

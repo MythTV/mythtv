@@ -270,7 +270,9 @@ void PowerSearchPopup::phraseClicked(MythUIButtonListItem *item)
     int pos = m_phraseList->GetCurrentPos();
 
     if (pos == 0)
+    {
         editClicked();
+    }
     else
     {
         emit haveResult(m_phraseList->GetValue());

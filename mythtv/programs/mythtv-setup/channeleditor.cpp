@@ -583,7 +583,9 @@ void ChannelEditor::menu()
 
     int chanid = item->GetData().toInt();
     if (chanid == 0)
+    {
        edit(item);
+    }
     else
     {
         QString label = tr("Channel Options");

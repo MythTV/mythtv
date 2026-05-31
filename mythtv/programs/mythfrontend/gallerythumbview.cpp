@@ -287,21 +287,37 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
+        {
             MenuMain();
+        }
         else if (action == "INFO")
+        {
             ShowDetails();
+        }
         else if (action == "ZOOMIN")
+        {
             ZoomIn();
+        }
         else if (action == "ZOOMOUT")
+        {
             ZoomOut();
+        }
         else if (action == "ROTRIGHT")
+        {
             RotateCW();
+        }
         else if (action == "ROTLEFT")
+        {
             RotateCCW();
+        }
         else if (action == "FLIPHORIZONTAL")
+        {
             FlipHorizontal();
+        }
         else if (action == "FLIPVERTICAL")
+        {
             FlipVertical();
+        }
         else if (action == "COVER")
         {
             ImagePtrK im = m_view->GetSelected();
@@ -1982,7 +1998,9 @@ void GalleryThumbView::Copy(bool deleteAfter)
     auto *progress = new MythUIProgressDialog(tr("Copying files"), popupStack,
                                               "copydialog");
     if (progress->Create())
+    {
         popupStack->AddScreen(progress, false);
+    }
     else
     {
         delete progress;
@@ -2122,7 +2140,9 @@ void GalleryThumbView::Move()
                                               "movedialog");
 
     if (progress->Create())
+    {
         popupStack->AddScreen(progress, false);
+    }
     else
     {
         delete progress;

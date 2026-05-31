@@ -433,7 +433,9 @@ void PrevRecordedList::LoadShowsByDate(void)
         sortorder = "DESC";
     QString sql;
     if (dateParts[0] == "0000")
+    {
         sql = "AND TIMESTAMPDIFF(DAY, starttime, NOW()) < 14 ";
+    }
     else
     {
         sql =
@@ -472,20 +474,19 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
         const QString& action = actions[i];
         handled = true;
 
-        if (action == "CUSTOMEDIT")
+        if (action == "CUSTOMEDIT") {
              EditCustom();
-        else if (action == "EDIT")
+        } else if (action == "EDIT") {
              EditScheduled();
-        else if (action == "DELETE")
+        } else if (action == "DELETE") {
              ShowDeleteOldEpisodeMenu();
-        else if (action == "DETAILS" || action == "INFO")
+        } else if (action == "DETAILS" || action == "INFO") {
              ShowDetails();
-        else if (action == "GUIDE")
+        } else if (action == "GUIDE") {
              ShowGuide();
-        else if (action == "UPCOMING")
+        } else if (action == "UPCOMING") {
             ShowUpcoming();
-        else if (action == "1")
-        {
+        } else if (action == "1") {
             if (m_titleGroup)
             {
                 m_titleGroup = false;
@@ -496,9 +497,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
                 m_reverseSort = !m_reverseSort;
             }
             needUpdate = true;
-        }
-        else if (action == "2")
-        {
+        } else if (action == "2") {
             if (!m_titleGroup)
             {
                 m_titleGroup = true;
@@ -509,9 +508,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
                 m_reverseSort = !m_reverseSort;
             }
             needUpdate = true;
-        }
-        else
-        {
+        } else {
             handled = false;
         }
     }

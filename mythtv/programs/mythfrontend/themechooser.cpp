@@ -251,7 +251,9 @@ bool ThemeChooser::LoadVersion(const QString &version,
     {
         QFile test(remoteThemesFile);
         if (test.open(QIODevice::WriteOnly))
+        {
             test.remove();
+        }
         else
         {
             ShowOkPopup(tr("Unable to create '%1'").arg(remoteThemesFile));
@@ -449,7 +451,9 @@ void ThemeChooser::Init(void)
     QString testFile = m_userThemeDir + "/.test";
     QFile test(testFile);
     if (test.open(QIODevice::WriteOnly))
+    {
         test.remove();
+    }
     else
     {
         ShowOkPopup(tr("Error creating test file, %1 themes directory is "
@@ -498,7 +502,9 @@ void ThemeChooser::showPopupMenu(void)
     connect(m_popupMenu, &MythDialogBox::Closed, this, &ThemeChooser::popupClosed);
 
     if (m_popupMenu->Create())
+    {
         popupStack->AddScreen(m_popupMenu);
+    }
     else
     {
         delete m_popupMenu;
@@ -573,9 +579,13 @@ bool ThemeChooser::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
+        {
             showPopupMenu();
+        }
         else if (action == "DELETE")
+        {
             removeTheme();
+        }
         else if ((action == "ESCAPE") &&
                  (m_fullPreviewShowing))
         {
@@ -665,7 +675,9 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
         QString testFile = m_userThemeDir + "/.test";
         QFile test(testFile);
         if (test.open(QIODevice::WriteOnly))
+        {
             test.remove();
+        }
         else
         {
             ShowOkPopup(tr("Unable to install theme, %1 themes directory is "

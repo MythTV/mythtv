@@ -269,28 +269,29 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         const QString& action = actions[i];
         handled = true;
 
-        if (action == "PREVVIEW")
+        if (action == "PREVVIEW") {
             SwitchToPreviousView();
-        else if (action == "NEXTVIEW")
+        } else if (action == "NEXTVIEW") {
             SwitchToNextView();
-        else if (action == "CUSTOMEDIT")
+        } else if (action == "CUSTOMEDIT") {
             EditCustom();
-        else if (action == "EDIT")
+        } else if (action == "EDIT") {
             EditScheduled();
-        else if (action == "DELETE")
+        } else if (action == "DELETE") {
             ShowDeleteItemMenu();
-        else if (action == "UPCOMING" && m_type != plTitle)
+        } else if (action == "UPCOMING" && m_type != plTitle) {
             ShowUpcoming();
-        else if (action == "PREVRECORDED" && m_type != plPreviouslyRecorded)
+        } else if (action == "PREVRECORDED" && m_type != plPreviouslyRecorded) {
             ShowPrevious();
-        else if (action == "DETAILS" || action == "INFO")
+        } else if (action == "DETAILS" || action == "INFO") {
             ShowDetails();
-        else if (action == "GUIDE")
+        } else if (action == "GUIDE") {
             ShowGuide();
-        else if (action == ACTION_CHANNELSEARCH && m_type != plChannel)
+        } else if (action == ACTION_CHANNELSEARCH && m_type != plChannel) {
             ShowChannelSearch();
-        else if (action == "TOGGLERECORD")
+        } else if (action == "TOGGLERECORD") {
             QuickRecord();
+        }
         else if (action == "1")
         {
             if (m_titleSort)
@@ -1535,7 +1536,9 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
     UpdateButtonList();
 
     if (selected)
+    {
         RestoreSelection(selected, offset);
+    }
     else if (m_selectedTime.isValid())
     {
         size_t i = 0;

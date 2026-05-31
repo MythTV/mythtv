@@ -419,7 +419,9 @@ bool Frontend::SendKey(const QString &sKey)
     }
 
     if (GetMythMainWindow())
+    {
         keyDest = GetMythMainWindow();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,

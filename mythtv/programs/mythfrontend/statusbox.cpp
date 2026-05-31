@@ -1071,7 +1071,9 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         QString minstring = StatusBox::tr("%n minute(s)", "", minLeft%60);
         QString remainstring = StatusBox::tr("%1 remaining", "time");
         if (minLeft%60 == 0)
+        {
             out<<remainstring.arg(hourstring) + pro;
+        }
         else if (minLeft > 60)
         {
             out<<StatusBox::tr("%1 and %2 remaining", "time")

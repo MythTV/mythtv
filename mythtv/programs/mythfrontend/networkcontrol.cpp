@@ -306,33 +306,30 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
 
     int clientID = m_clients.indexOf(nc->getClient());
 
-    if (is_abbrev("jump", nc->getArg(0)))
+    if (is_abbrev("jump", nc->getArg(0))) {
         result = processJump(nc);
-    else if (is_abbrev("key", nc->getArg(0)))
+    } else if (is_abbrev("key", nc->getArg(0))) {
         result = processKey(nc);
-    else if (is_abbrev("play", nc->getArg(0)))
+    } else if (is_abbrev("play", nc->getArg(0))) {
         result = processPlay(nc, clientID);
-    else if (is_abbrev("query", nc->getArg(0)))
+    } else if (is_abbrev("query", nc->getArg(0))) {
         result = processQuery(nc);
-    else if (is_abbrev("set", nc->getArg(0)))
+    } else if (is_abbrev("set", nc->getArg(0))) {
         result = processSet(nc);
-    else if (is_abbrev("screenshot", nc->getArg(0)))
+    } else if (is_abbrev("screenshot", nc->getArg(0))) {
         result = saveScreenshot(nc);
-    else if (is_abbrev("help", nc->getArg(0)))
+    } else if (is_abbrev("help", nc->getArg(0))) {
         result = processHelp(nc);
-    else if (is_abbrev("message", nc->getArg(0)))
+    } else if (is_abbrev("message", nc->getArg(0))) {
         result = processMessage(nc);
-    else if (is_abbrev("notification", nc->getArg(0)))
+    } else if (is_abbrev("notification", nc->getArg(0))) {
         result = processNotification(nc);
-    else if (is_abbrev("theme", nc->getArg(0)))
+    } else if (is_abbrev("theme", nc->getArg(0))) {
         result = processTheme(nc);
-    else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
-    {
+    } else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit")) {
         QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
-    }
-    else if (! nc->getArg(0).isEmpty())
-    {
+    } else if (! nc->getArg(0).isEmpty()) {
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(nc->getArg(0));
     }
@@ -709,11 +706,17 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         if (nc->getArgCount() == 3)
         {
             if (is_abbrev("play", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 PLAY").arg(hostname);
+            }
             else if (is_abbrev("pause", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 PAUSE").arg(hostname);
+            }
             else if (is_abbrev("stop", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 STOP").arg(hostname);
+            }
             else if (is_abbrev("getvolume", nc->getArg(2)))
             {
                 m_gotAnswer = false;
@@ -853,12 +856,18 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                            .arg(nc->getArg(0));
 
         if (is_abbrev("beginning", nc->getArg(2)))
+        {
             message = "NETWORK_CONTROL SEEK BEGINNING";
+        }
         else if (is_abbrev("forward", nc->getArg(2)))
+        {
             message = "NETWORK_CONTROL SEEK FORWARD";
+        }
         else if (is_abbrev("rewind",   nc->getArg(2)) ||
                  is_abbrev("backward", nc->getArg(2)))
+        {
             message = "NETWORK_CONTROL SEEK BACKWARD";
+        }
         else if (nc->getArg(2).contains(kSeekTimeRE))
         {
             int hours   = nc->getArg(2).mid(0, 2).toInt();
@@ -923,7 +932,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     {
         static const QRegularExpression kNumberRE { "^\\d+$" };
         if (nc->getArgCount() < 3)
+        {
             message = QString("NETWORK_CONTROL SUBTITLES 0");
+        }
         else if (!nc->getArg(2).toLower().contains(kNumberRE))
         {
             return QString("ERROR: See 'help %1' for usage information")

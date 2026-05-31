@@ -420,7 +420,9 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
             // if the user specified a specific grabber assume they want to
             // re-search for the lyrics using the given grabber
             if (grabberName != "ALL")
+            {
                 QFile::remove(lyricsFile);
+            }
             else
             {
                 // load these lyrics to speed up future lookups

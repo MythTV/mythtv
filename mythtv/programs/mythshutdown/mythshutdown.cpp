@@ -788,7 +788,9 @@ static int startup()
 
     // if we don't have a valid startup time assume we were started manually
     if (!startupTime.isValid())
+    {
         res = 1;
+    }
     else
     {
         // if we started within 15mins of the saved wakeup time assume we started
@@ -858,22 +860,21 @@ int main(int argc, char **argv)
 
     int res = 0;
 
-    if (cmdline.toBool("lock"))
+    if (cmdline.toBool("lock")) {
         res = lockShutdown();
-    else if (cmdline.toBool("unlock"))
+    } else if (cmdline.toBool("unlock")) {
         res = unlockShutdown();
-    else if (cmdline.toBool("check"))
+    } else if (cmdline.toBool("check")) {
         res = checkOKShutdown(cmdline.toInt("check") == 1);
-    else if (cmdline.toBool("setschedwakeup"))
+    } else if (cmdline.toBool("setschedwakeup")) {
         res = setScheduledWakeupTime();
-    else if (cmdline.toBool("startup"))
+    } else if (cmdline.toBool("startup")) {
         res = startup();
-    else if (cmdline.toBool("shutdown"))
+    } else if (cmdline.toBool("shutdown")) {
         res = shutdown();
-    else if (cmdline.toBool("status"))
+    } else if (cmdline.toBool("status")) {
         res = getStatus(cmdline.toInt("status") == 1);
-    else if (cmdline.toBool("setwakeup"))
-    {
+    } else if (cmdline.toBool("setwakeup")) {
         // only one of --utc or --localtime can be passed per
         // CommandLineArg::AllowOneOf() in commandlineparser.cpp
         bool utc = cmdline.toBool("utc");

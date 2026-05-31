@@ -114,7 +114,9 @@ long V2Video::GetSavedBookmark( int  Id )
     QString fileName;
 
     if (query.next())
+    {
         fileName = query.value(0).toString();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetSavedBookmark Video id %1 Not found.").arg(Id));
@@ -161,7 +163,9 @@ long V2Video::GetLastPlayPos( int  Id )
     QString fileName;
 
     if (query.next())
+    {
         fileName = query.value(0).toString();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetLastPlayPos Video id %1 Not found.").arg(Id));
@@ -409,7 +413,9 @@ V2VideoMetadataInfoList* V2Video::GetVideoList( const QString &Folder,
         totalPages = (int)ceil((float)totalCount / nCount);
 
     if (totalPages == 1)
+    {
         curPage = 1;
+    }
     else
     {
         curPage = (int)ceil((float)nStartIndex / nCount) + 1;
@@ -984,7 +990,9 @@ bool V2Video::SetSavedBookmark( int  Id, long Offset )
     QString fileName;
 
     if (query.next())
+    {
         fileName = query.value(0).toString();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Video/SetSavedBookmark Video id %1 Not found.").arg(Id));
@@ -1031,7 +1039,9 @@ bool V2Video::SetLastPlayPos( int  Id, long Offset )
     QString fileName;
 
     if (query.next())
+    {
         fileName = query.value(0).toString();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Video/SetLastPlayPos Video id %1 Not found.").arg(Id));
@@ -1184,7 +1194,9 @@ V2CutList* V2Video::GetVideoCutList ( int Id,
     QString fileName;
 
     if (query.next())
+    {
         fileName = query.value(0).toString();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetVideoCommBreak Video id %1 Not found.").arg(Id));
@@ -1246,7 +1258,9 @@ V2CutList* V2Video::GetVideoCommBreak ( int Id,
     QString fileName;
 
     if (query.next())
+    {
         fileName = query.value(0).toString();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetVideoCommBreak Video id %1 Not found.").arg(Id));

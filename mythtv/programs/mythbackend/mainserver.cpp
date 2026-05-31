@@ -1052,7 +1052,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "SHUTDOWN_NOW")
     {
         if (tokens.size() != 1)
+        {
             SendErrorResponse(pbs, "Bad SHUTDOWN_NOW query");
+        }
         else if (!m_ismaster)
         {
             QString halt_cmd;
@@ -2520,7 +2522,9 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
         bool deleteInDB = false;
 
         if (basename == QFileInfo(ds->m_filename).fileName())
+        {
             deleteInDB = true;
+        }
         else
         {
 //             LOG(VB_FILE, LOG_INFO, LOC +
@@ -2654,7 +2658,9 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     if (followLinks && finfo.isSymLink())
     {
         if (!finfo.exists() && deleteBrokenSymlinks)
+        {
             unlink(fname.constData());
+        }
         else
         {
             fd = OpenAndUnlink(linktext);
@@ -3517,7 +3523,9 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
     std::chrono::seconds uptime = 0s;
 
     if (getUptime(uptime))
+    {
         strlist << QString::number(uptime.count());
+    }
     else
     {
         strlist << "ERROR";
@@ -3809,7 +3817,9 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
     if (m_sched)
     {
         if (tmptable.isEmpty())
+        {
             m_sched->GetAllPending(strList);
+        }
         else
         {
             auto *sched = new Scheduler(false, m_encoderList, tmptable, m_sched);
@@ -5716,7 +5726,9 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
                       "FROM storagegroup "
                       "WHERE groupname = 'Music'";
         if (!query.exec(sql) || !query.isActive())
+        {
             MythDB::DBError("MainServer::HandleScanMusic get host list", query);
+        }
         else
         {
             while(query.next())
@@ -6306,7 +6318,9 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
             // rename the old cached file to the new one
             if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
+            {
                 QFile::rename(oldImage.m_filename, image->m_filename);
+            }
             else
             {
                 // extract the image from the tag and cache it
@@ -7720,7 +7734,9 @@ void MainServer::connectionClosed(MythSocket *socket)
             // Since we may already be holding the scheduler lock
             // delay handling the disconnect until a little later. #9885
             if (!disconnectedSlaves.isEmpty())
+            {
                 SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
+            }
             else
             {
                 // During idle periods customEvent() might never be called,
