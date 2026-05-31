@@ -731,7 +731,9 @@ void ExternalStreamHandler::run(void)
         if (read_len == 0)
         {
             if (!nodata_timer.isRunning())
+            {
                 nodata_timer.start();
+            }
             else
             {
                 if (nodata_timer.elapsed() >= 50s)

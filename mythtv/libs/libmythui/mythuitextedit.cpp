@@ -100,18 +100,17 @@ bool MythUITextEdit::ParseElement(
     {
         QString pos = getFirstText(element);
 
-        if (pos == "aboveedit")
+        if (pos == "aboveedit") {
             m_keyboardPosition = VK_POSABOVEEDIT;
-        else if (pos == "belowedit")
+        } else if (pos == "belowedit") {
             m_keyboardPosition = VK_POSBELOWEDIT;
-        else if (pos == "screentop")
+        } else if (pos == "screentop") {
             m_keyboardPosition = VK_POSTOPDIALOG;
-        else if (pos == "screenbottom")
+        } else if (pos == "screenbottom") {
             m_keyboardPosition = VK_POSBOTTOMDIALOG;
-        else if (pos == "screencenter")
+        } else if (pos == "screencenter") {
             m_keyboardPosition = VK_POSCENTERDIALOG;
-        else
-        {
+        } else {
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                         QString("Unknown popup position '%1'").arg(pos));
             m_keyboardPosition = VK_POSBELOWEDIT;

@@ -479,7 +479,9 @@ void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
 
             default:
                 if ((ch >= 0x80) && (ch <=0x9f)) // these aren't used
+                {
                     ch = ' '; // BAD_CHAR;
+                }
                 else
                 {
                     if (conceal && !m_teletextReader->RevealHidden())

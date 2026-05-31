@@ -1375,7 +1375,9 @@ std::chrono::milliseconds AudioOutputBase::GetAudiotime(void)
     int64_t obpf = 0;
 
     if (m_passthru && !usesSpdif())
+    {
         obpf = m_sourceBitRate * 10 / m_sourceSampleRate;
+    }
     else if (m_enc && !usesSpdif())
     {
         // re-encode bitrate is hardcoded at 448000

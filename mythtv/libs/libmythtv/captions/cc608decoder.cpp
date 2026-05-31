@@ -818,7 +818,9 @@ size_t CC608Decoder::NewRowCC(size_t mode, size_t len)
         if (m_row[mode] == 0)
         {
             if (len == 0)
+            {
                 m_row[mode] = m_newRow[mode];
+            }
             else
             {
                 // previous line was missing a row address

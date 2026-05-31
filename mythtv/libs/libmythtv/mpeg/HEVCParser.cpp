@@ -1587,7 +1587,9 @@ bool HEVCParser::parseSPS(BitReader& br)
     uint max_sub_layers_minus1 = 0;
 
     if (m_nuhLayerId == 0)
+    {
         max_sub_layers_minus1 = ext_or_max_sub_layers_minus1;
+    }
     else
     {
         if (!m_vps.contains(vps_id))

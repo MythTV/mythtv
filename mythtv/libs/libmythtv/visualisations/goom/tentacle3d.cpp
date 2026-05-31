@@ -91,9 +91,9 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 	static int s_happens = 0;
 	static int s_lock = 0;
 
-	if (s_happens)
+	if (s_happens) {
 		s_happens -= 1;
-	else if (s_lock == 0) {
+	} else if (s_lock == 0) {
 		s_happens = !rand_bool(200) ? 0 : MythRandomInt(100, 159);
 		s_lock = s_happens * 3 / 2;
 	}

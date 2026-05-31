@@ -517,9 +517,9 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 					}
 				}
 
-				if (!rand_bool(5))
+				if (!rand_bool(5)) {
 					s_zfd.noisify = 0;
-				else {
+				} else {
 					s_zfd.noisify = MythRandomInt(1, 2);
 					s_lockVar *= 2;
 				}
@@ -751,9 +751,9 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 	if ((cycle % 120 == 0)
 			&& rand_bool(4)
 			&& (curGState->m_drawScope)) {
-		if (s_lineMode == 0)
+		if (s_lineMode == 0) {
 			s_lineMode = DRAWLINES;
-		else if (s_lineMode == DRAWLINES) {
+		} else if (s_lineMode == DRAWLINES) {
 			float   param1 = NAN;
 			float   param2 = NAN;
 			float   amplitude = NAN;

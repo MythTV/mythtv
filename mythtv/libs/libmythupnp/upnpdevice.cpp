@@ -132,42 +132,41 @@ void UPnpDeviceDesc::InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
             continue;
 
         // TODO: make this table driven (using offset within structure)
-        if ( e.tagName() == "deviceType" )
+        if ( e.tagName() == "deviceType" ) {
             SetStrValue( e, pCurDevice->m_sDeviceType);
-        else if ( e.tagName() == "friendlyName" )
+        } else if ( e.tagName() == "friendlyName" ) {
             SetStrValue( e, pCurDevice->m_sFriendlyName );
-        else if ( e.tagName() == "manufacturer" )
+        } else if ( e.tagName() == "manufacturer" ) {
             SetStrValue( e, pCurDevice->m_sManufacturer );
-        else if ( e.tagName() == "manufacturerURL" )
+        } else if ( e.tagName() == "manufacturerURL" ) {
             SetStrValue( e, pCurDevice->m_sManufacturerURL );
-        else if ( e.tagName() == "modelDescription" )
+        } else if ( e.tagName() == "modelDescription" ) {
             SetStrValue( e, pCurDevice->m_sModelDescription);
-        else if ( e.tagName() == "modelName" )
+        } else if ( e.tagName() == "modelName" ) {
             SetStrValue( e, pCurDevice->m_sModelName );
-        else if ( e.tagName() == "modelNumber" )
+        } else if ( e.tagName() == "modelNumber" ) {
             SetStrValue( e, pCurDevice->m_sModelNumber );
-        else if ( e.tagName() == "modelURL" )
+        } else if ( e.tagName() == "modelURL" ) {
             SetStrValue( e, pCurDevice->m_sModelURL );
-        else if ( e.tagName() == "serialNumber" )
+        } else if ( e.tagName() == "serialNumber" ) {
             SetStrValue( e, pCurDevice->m_sSerialNumber );
-        else if ( e.tagName() == "UPC" )
+        } else if ( e.tagName() == "UPC" ) {
             SetStrValue( e, pCurDevice->m_sUPC );
-        else if ( e.tagName() == "presentationURL" )
+        } else if ( e.tagName() == "presentationURL" ) {
             SetStrValue( e, pCurDevice->m_sPresentationURL );
-        else if ( e.tagName() == "UDN" )
+        } else if ( e.tagName() == "UDN" ) {
             SetStrValue( e, pCurDevice->m_sUDN );
-        else if ( e.tagName() == "iconList" )
+        } else if ( e.tagName() == "iconList" ) {
             ProcessIconList( oNode, pCurDevice );
-        else if ( e.tagName() == "serviceList" )
+        } else if ( e.tagName() == "serviceList" ) {
             ProcessServiceList( oNode, pCurDevice );
-        else if ( e.tagName() == "deviceList" )
+        } else if ( e.tagName() == "deviceList" ) {
             ProcessDeviceList ( oNode, pCurDevice );
-        else if ( e.tagName() == "mythtv:X_secure" )
+        } else if ( e.tagName() == "mythtv:X_secure" ) {
             SetBoolValue( e, pCurDevice->m_securityPin );
-        else if ( e.tagName() == "mythtv:X_protocol" )
+        } else if ( e.tagName() == "mythtv:X_protocol" ) {
             SetStrValue( e, pCurDevice->m_protocolVersion );
-        else
-        {
+        } else {
             // Not one of the expected element names... add to extra list.
             QString sValue = "";
             SetStrValue( e, sValue );

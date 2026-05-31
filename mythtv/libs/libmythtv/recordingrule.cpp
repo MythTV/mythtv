@@ -784,7 +784,9 @@ void RecordingRule::AssignProgramInfo()
     else
     {
         if (m_findid > 0)
+        {
             m_findid = m_progInfo->GetFindID();
+        }
         else
         {
             QDate epoch(1970, 1, 1);

@@ -1342,7 +1342,9 @@ std::vector<uint> CardUtil::GetInputIDs(const QString& videodevice,
         query.bindValue(":INPUTTYPE", rawtype.toUpper());
 
     if (!query.exec())
+    {
         MythDB::DBError("CardUtil::GetInputIDs(videodevice...)", query);
+    }
     else
     {
         while (query.next())
@@ -1394,7 +1396,9 @@ std::vector<uint> CardUtil::GetChildInputIDs(uint inputid)
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
+    {
         MythDB::DBError("CardUtil::GetChildInputIDs()", query);
+    }
     else
     {
         while (query.next())
@@ -1891,7 +1895,9 @@ QString CardUtil::GetDisplayName(uint inputid)
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
+    {
         MythDB::DBError("CardUtil::GetDisplayName(uint)", query);
+    }
     else if (query.next())
     {
         QString result = query.value(0).toString();
@@ -2303,7 +2309,9 @@ bool CardUtil::GetTimeouts(uint inputid,
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("CardUtil::GetTimeouts()", query);
+    }
     else if (query.next())
     {
         signal_timeout  = std::max(std::chrono::milliseconds(query.value(0).toInt()), 250ms);
@@ -2465,7 +2473,9 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
     query.bindValue(":DEVICE", device);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("CardUtil::GetConfiguredDVBInputs", query);
+    }
     else
     {
         while (query.next())
@@ -2916,7 +2926,9 @@ std::vector<uint> CardUtil::GetInputList(void)
         "ORDER BY cardid");
 
     if (!query.exec())
+    {
         MythDB::DBError("CardUtil::GetInputList()", query);
+    }
     else
     {
         while (query.next())
@@ -2938,7 +2950,9 @@ std::vector<uint> CardUtil::GetSchedInputList(void)
         "ORDER BY schedorder, cardid");
 
     if (!query.exec())
+    {
         MythDB::DBError("CardUtil::GetSchedInputList()", query);
+    }
     else
     {
         while (query.next())
@@ -2960,7 +2974,9 @@ std::vector<uint> CardUtil::GetLiveTVInputList(void)
         "ORDER BY livetvorder, cardid");
 
     if (!query.exec())
+    {
         MythDB::DBError("CardUtil::GetLiveTVInputList()", query);
+    }
     else
     {
         while (query.next())
@@ -3143,7 +3159,9 @@ QString CardUtil::GetHDHRdesc([[maybe_unused]] const QString &device)
     [[maybe_unused]] bool deviceIsIP = false;
 
     if (device.contains('.'))  // Simplistic check, but also allows DNS names
+    {
         deviceIsIP = true;
+    }
     else
     {
         bool validID = false;

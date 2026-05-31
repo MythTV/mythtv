@@ -769,7 +769,9 @@ uint ProgramMapTable::FindUnusedPID(uint desired_pid) const
 void PSIPTable::InitPESPacket(TSPacket& tspacket)
 {
     if (tspacket.PayloadStart())
+    {
         m_psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");

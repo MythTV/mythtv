@@ -527,7 +527,9 @@ class AudioCompressionSettings : public GroupSetting
         if (!groupType.isNull())
         {
             if (groupType == "MPEG")
+            {
                m_codecName->addSelection("MPEG-2 Hardware Encoder");
+            }
             else if (groupType == "HDPVR")
             {
                 m_codecName->addSelection("AC3 Hardware Encoder");
@@ -1139,7 +1141,9 @@ class VideoCompressionSettings : public GroupSetting
         if (!groupType.isNull())
         {
             if (groupType == "HDPVR")
+            {
                m_codecName->addSelection("MPEG-4 AVC Hardware Encoder");
+            }
             else if (groupType.startsWith("V4L2:"))
             {
                 for (const auto & codec : std::as_const(m_v4l2codecs))

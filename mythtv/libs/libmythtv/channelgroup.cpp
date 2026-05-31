@@ -206,7 +206,9 @@ ChannelGroupList ChannelGroup::GetManualChannelGroups(bool includeEmpty)
     }
     query.prepare(qstr);
     if (!query.exec())
+    {
         MythDB::DBError("ChannelGroup::GetChannelGroups Favorites", query);
+    }
     else
     {
         if (query.next())
@@ -237,7 +239,9 @@ ChannelGroupList ChannelGroup::GetManualChannelGroups(bool includeEmpty)
     }
     query.prepare(qstr);
     if (!query.exec())
+    {
         MythDB::DBError("ChannelGroup::GetChannelGroups manual", query);
+    }
     else
     {
         while (query.next())
@@ -277,7 +281,9 @@ ChannelGroupList ChannelGroup::GetAutomaticChannelGroups(bool includeEmpty)
     }
     query.prepare(qstr);
     if (!query.exec())
+    {
         MythDB::DBError("ChannelGroup::GetChannelGroups Priority", query);
+    }
     else
     {
         if (query.next())
@@ -304,7 +310,9 @@ ChannelGroupList ChannelGroup::GetAutomaticChannelGroups(bool includeEmpty)
     }
     query.prepare(qstr);
     if (!query.exec())
+    {
         MythDB::DBError("ChannelGroup::GetChannelGroups videosources", query);
+    }
     else
     {
         while (query.next())

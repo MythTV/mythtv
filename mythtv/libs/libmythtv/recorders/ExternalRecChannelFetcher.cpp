@@ -141,9 +141,13 @@ int ExternalRecChannelFetcher::LoadChannels(void)
     }
 
     if (result.startsWith("FOUND"))
+    {
         cnt = result.mid(6).toInt();
+    }
     else if (result.startsWith("OK"))
+    {
         cnt = result.mid(3).toInt();
+    }
     else
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + QString("LoadChannels: %1").arg(result));

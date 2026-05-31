@@ -2005,7 +2005,9 @@ void MythMainWindow::customEvent(QEvent* Event)
         if (message.startsWith(ACTION_HANDLEMEDIA))
         {
             if (event->ExtraDataCount() == 1)
+            {
                 HandleMedia("Internal", event->ExtraData(0));
+            }
             else if (event->ExtraDataCount() >= 11)
             {
                 bool usebookmark = true;

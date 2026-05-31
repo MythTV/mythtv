@@ -641,7 +641,9 @@ bool PreviewGenerator::LocalPreviewRun(void)
     QDateTime dt = MythDate::current();
 
     if (captime > 0s)
+    {
         LOG(VB_GENERAL, LOG_INFO, "Preview from time spec");
+    }
     else
     {
         capframe = m_programInfo.QueryStartMark();

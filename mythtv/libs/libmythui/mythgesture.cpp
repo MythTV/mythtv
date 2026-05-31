@@ -285,7 +285,9 @@ QString MythGesture::Translate(bool Timeout)
         prev_bin = (prev_bin == 0) ? current_bin : prev_bin;
 
         if (prev_bin == current_bin)
+        {
             bin_count++;
+        }
         else
         {
 

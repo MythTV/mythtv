@@ -619,7 +619,9 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
         m_bufferPackets = false;  // We now know if it is a keyframe, or not
         m_framesSeenCount++;
         if (!m_waitForKeyframeOption || m_firstKeyframe >= 0)
+        {
             UpdateFramesWritten();
+        }
         else
         {
             /* Found a frame that is not a keyframe, and we want to
@@ -1045,7 +1047,9 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
         m_bufferPackets = false;  // We now know if this is a keyframe
         m_framesSeenCount++;
         if (!m_waitForKeyframeOption || m_firstKeyframe >= 0)
+        {
             UpdateFramesWritten();
+        }
         else
         {
             /* Found a frame that is not a keyframe, and we want to

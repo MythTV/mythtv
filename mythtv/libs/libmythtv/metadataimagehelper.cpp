@@ -22,7 +22,9 @@ ArtworkMap GetArtwork(const QString& inetref,
         "FROM recordedartwork WHERE inetref = :INETREF ";
 
     if (strict)
+    {
         querystring += "AND season = :SEASON;";
+    }
     else
     {
         if (season > 0)

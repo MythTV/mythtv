@@ -2292,7 +2292,9 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     {
         HLSStream *hls = nullptr;
         if (m_meta)
+        {
             hls = GetLastStream(streams);
+        }
         else
         {
             /* No Meta playlist used */

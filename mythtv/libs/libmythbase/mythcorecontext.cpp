@@ -822,7 +822,9 @@ QString MythCoreContext::GetMasterHostName(void)
     {
 
         if (IsMasterBackend())
+        {
             d->m_masterHostname = d->m_localHostname;
+        }
         else
         {
             QStringList strlist("QUERY_HOSTNAME");
@@ -1491,7 +1493,9 @@ bool MythCoreContext::SendReceiveStringList(
     if (ok)
     {
         if (strlist.isEmpty())
+        {
             ok = false;
+        }
         else if (strlist[0] == "ERROR")
         {
             if (strlist.size() == 2)

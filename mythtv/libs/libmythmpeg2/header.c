@@ -899,9 +899,9 @@ mpeg2_state_t mpeg2_header_slice_start (mpeg2dec_t * mpeg2dec)
 	}
     }
 
-    if (!(mpeg2dec->nb_decode_slices))
+    if (!(mpeg2dec->nb_decode_slices)) {
 	mpeg2dec->picture->flags |= PIC_FLAG_SKIP;
-    else if (mpeg2dec->convert_start) {
+    } else if (mpeg2dec->convert_start) {
 	mpeg2dec->convert_start (decoder->convert_id, mpeg2dec->fbuf[0],
 				 mpeg2dec->picture, mpeg2dec->info.gop);
 

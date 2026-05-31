@@ -522,8 +522,10 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
         m_monitor->Unlock(pDevice);
     }
     else
+    {
         LOG(VB_MEDIA, LOG_INFO,
                  QString("Couldn't find MythMediaDevice: %1").arg(devName));
+    }
 }
 
 /**
@@ -690,8 +692,10 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
             }
         }
         else
+	{
             LOG(VB_GENERAL, LOG_ALERT,
                      msg + "Could not retrieve drive properties");
+	}
 
         IOObjectRelease(drive);
     }

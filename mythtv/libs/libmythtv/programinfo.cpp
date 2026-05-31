@@ -1786,7 +1786,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["playgroup"] = m_playGroup;
 
     if (m_storageGroup == "Default")
+    {
         progMap["storagegroup"] = QObject::tr("Default");
+    }
     else if (StorageGroup::kSpecialGroups.contains(m_storageGroup))
     {
         // This relies upon the translation established in the
@@ -2403,7 +2405,9 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
             "SELECT DISTINCT LEFT(programid, LOCATE('/', programid)) "
             "FROM %1 WHERE programid <> ''").arg(table));
         if (!query.exec())
+        {
             MythDB::DBError("CheckProgramIDAuthorities", query);
+        }
         else
         {
             while (query.next())
@@ -2438,11 +2442,17 @@ static ProgramInfoType discover_program_info_type(
     QString fn_lower = pathname.toLower();
     ProgramInfoType pit = kProgramInfoTypeVideoFile;
     if (chanid)
+    {
         pit = kProgramInfoTypeRecording;
+    }
     else if (fn_lower.startsWith("http:"))
+    {
         pit = kProgramInfoTypeVideoStreamingHTML;
+    }
     else if (fn_lower.startsWith("rtsp:"))
+    {
         pit = kProgramInfoTypeVideoStreamingRTSP;
+    }
     else
     {
         fn_lower = determineURLType(pathname);
@@ -4289,7 +4299,9 @@ void ProgramInfo::SaveAspect(
     query.bindValue(":TYPE", type);
 
     if (type == MARK_ASPECT_CUSTOM)
+    {
         query.bindValue(":DATA", customAspect);
+    }
     else
     {
         // create NULL value
@@ -6037,7 +6049,9 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
     // If a limit arg was given then append the LIMIT, otherwise set a hard
     // limit of 20000, which can be overridden by a setting
     if (limit > 0)
+    {
         querystr += QString("LIMIT %1 ").arg(limit);
+    }
     else if (!hasLimit)
     {
         // For performance reasons we have to have an upper limit

@@ -105,7 +105,9 @@ void JobQueue::customEvent(QEvent *e)
             int jobID = -1;
 
             if (tokens[2] == "ID")
+            {
                 jobID = tokens[3].toInt();
+            }
             else
             {
                 jobID = GetJobID(

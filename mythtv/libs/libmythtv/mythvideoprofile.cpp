@@ -172,7 +172,9 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
                         // Other operators == > < >= <=
                         // Convert to a range
                         if (oper == "==")
+                        {
                             value1 = value2;
+                        }
                         else if (oper == ">")
                         {
                             value1 = value2 + 1;

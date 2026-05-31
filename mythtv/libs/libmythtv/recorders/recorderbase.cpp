@@ -154,9 +154,13 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, MythMediaBuffer *Bu
 void RecorderBase::SetOption(const QString &name, const QString &value)
 {
     if (name == "videocodec")
+    {
         m_videocodec = value;
+    }
     else if (name == "videodevice")
+    {
         m_videodevice = value;
+    }
     else if (name == "tvformat")
     {
         m_ntsc = false;

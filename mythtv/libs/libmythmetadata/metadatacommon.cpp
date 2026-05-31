@@ -1359,7 +1359,9 @@ int editDistance( const QString& s, const QString& t )
                 s[i - 1] == t[j - 1]
 #endif
                 )
+            {
                 D( i, j ) = D( i - 1, j - 1 );
+            }
             else
             {
                 int x = D( i - 1, j );

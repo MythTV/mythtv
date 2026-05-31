@@ -1049,9 +1049,13 @@ void FormattedTextSubtitleSRT::Init(const QStringList &subs)
                 QString html = text.left(htmlLen).toLower();
                 text = text.mid(htmlLen);
                 if (html == "<i>")
+                {
                     isItalic = true;
+                }
                 else if (html == "</i>")
+                {
                     isItalic = false;
+                }
                 else if (html.startsWith(htmlPrefix) &&
                          html.endsWith(htmlSuffix))
                 {

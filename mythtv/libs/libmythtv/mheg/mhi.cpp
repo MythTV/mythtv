@@ -806,7 +806,9 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect displayRect, bool
 
     QMutexLocker locker(&m_displayLock);
     if (!bUnder)
+    {
         m_display.push_back(data);
+    }
     else
     {
         // Replace any existing items under the video with this
@@ -815,7 +817,9 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect displayRect, bool
         {
             MHIImageData *old = *it;
             if (!old->m_bUnder)
+            {
                 ++it;
+            }
             else
             {
                 it = m_display.erase(it);
@@ -927,7 +931,9 @@ int MHIContext::GetChannelIndex(const QString &str)
             if (it == m_channelCache.constEnd())
                 break;
             if (transportID < 0)
+            {
                 nResult = Cid(it);
+            }
             else
             {
                 for ( ; it != m_channelCache.constEnd() ; it++)

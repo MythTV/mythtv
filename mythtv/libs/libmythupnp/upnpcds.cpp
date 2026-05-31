@@ -1125,7 +1125,9 @@ bool UPnPShortcutFeature::AddShortCut(ShortCutType type,
                                          const QString &objectID)
 {
     if (!m_shortcuts.contains(type))
+    {
         m_shortcuts.insert(type, objectID);
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("UPnPCDSShortcuts::AddShortCut(): "

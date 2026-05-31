@@ -750,7 +750,9 @@ void TVRec::StopRecording(bool killFile)
     {
         QMutexLocker lock(&m_stateChangeLock);
         if (killFile)
+        {
             SetFlags(kFlagKillRec, __FILE__, __LINE__);
+        }
         else if (m_curRecording)
         {
             QDateTime now = MythDate::current(true);
@@ -3035,7 +3037,9 @@ void TVRec::ToggleChannelFavorite(const QString& changroupname)
         bool result = ChannelGroup::ToggleChannel(chanid, changrpid, true);
 
         if (!result)
+        {
            LOG(VB_RECORD, LOG_ERR, LOC + "Unable to toggle channel favorite.");
+        }
         else
         {
            LOG(VB_RECORD, LOG_INFO, LOC +
@@ -3227,21 +3231,16 @@ void TVRec::GetNextProgram(BrowseDirection direction,
     {
         chanid = sourceChanid;
 
-        if (BROWSE_UP == direction)
+        if (BROWSE_UP == direction) {
             chanid = m_channel->GetNextChannel(chanid, CHANNEL_DIRECTION_UP);
-        else if (BROWSE_DOWN == direction)
+        } else if (BROWSE_DOWN == direction) {
             chanid = m_channel->GetNextChannel(chanid, CHANNEL_DIRECTION_DOWN);
-        else if (BROWSE_FAVORITE == direction)
-        {
+        } else if (BROWSE_FAVORITE == direction) {
             chanid = m_channel->GetNextChannel(
                 chanid, CHANNEL_DIRECTION_FAVORITE);
-        }
-        else if (BROWSE_LEFT == direction)
-        {
+        } else if (BROWSE_LEFT == direction) {
             compare = "<";
-        }
-        else if (BROWSE_RIGHT == direction)
-        {
+        } else if (BROWSE_RIGHT == direction) {
             compare = ">";
             sortorder = "asc";
         }
@@ -3249,24 +3248,19 @@ void TVRec::GetNextProgram(BrowseDirection direction,
 
     if (!chanid)
     {
-        if (BROWSE_SAME == direction)
+        if (BROWSE_SAME == direction) {
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
-        else if (BROWSE_UP == direction)
+        } else if (BROWSE_UP == direction) {
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_UP);
-        else if (BROWSE_DOWN == direction)
+        } else if (BROWSE_DOWN == direction) {
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_DOWN);
-        else if (BROWSE_FAVORITE == direction)
-        {
+        } else if (BROWSE_FAVORITE == direction) {
             chanid = m_channel->GetNextChannel(channum,
                                              CHANNEL_DIRECTION_FAVORITE);
-        }
-        else if (BROWSE_LEFT == direction)
-        {
+        } else if (BROWSE_LEFT == direction) {
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
             compare = "<";
-        }
-        else if (BROWSE_RIGHT == direction)
-        {
+        } else if (BROWSE_RIGHT == direction) {
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
             compare = ">";
             sortorder = "asc";
@@ -3483,7 +3477,9 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
     if (channum.isEmpty() && (request.m_flags & kFlagLiveTV))
     {
         if (!m_liveTVStartChannel.isEmpty())
+        {
             channum = m_liveTVStartChannel;
+        }
         else
         {
             input   = CardUtil::GetInputName(m_inputId);
@@ -4066,7 +4062,9 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     else
     {
         if (m_signalMonitorCheckCnt) // Don't flood log file
+        {
             --m_signalMonitorCheckCnt;
+        }
         else
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -4540,7 +4538,9 @@ QString TVRec::FlagToString(uint f)
 
     // Tuning flags
     if ((kFlagRec & f) == kFlagRec)
+    {
         msg += "REC,";
+    }
     else
     {
         if (kFlagLiveTV & f)
@@ -4549,7 +4549,9 @@ QString TVRec::FlagToString(uint f)
             msg += "Recording,";
     }
     if ((kFlagNoRec & f) == kFlagNoRec)
+    {
         msg += "NOREC,";
+    }
     else
     {
         if (kFlagEITScan & f)
@@ -4562,7 +4564,9 @@ QString TVRec::FlagToString(uint f)
             msg += "AntennaAdjust,";
     }
     if ((kFlagPendingActions & f) == kFlagPendingActions)
+    {
         msg += "PENDINGACTIONS,";
+    }
     else
     {
         if (kFlagWaitingForRecPause & f)
@@ -4575,7 +4579,9 @@ QString TVRec::FlagToString(uint f)
             msg += "KillRingBuffer,";
     }
     if ((kFlagAnyRunning & f) == kFlagAnyRunning)
+    {
         msg += "ANYRUNNING,";
+    }
     else
     {
         if (kFlagSignalMonitorRunning & f)
@@ -4583,7 +4589,9 @@ QString TVRec::FlagToString(uint f)
         if (kFlagEITScannerRunning & f)
             msg += "EITScannerRunning,";
         if ((kFlagAnyRecRunning & f) == kFlagAnyRecRunning)
+        {
             msg += "ANYRECRUNNING,";
+        }
         else
         {
             if (kFlagDummyRecorderRunning & f)
@@ -4645,7 +4653,9 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     {
         // Test setups might have zero channels
         if (m_genOpt.m_inputType == "IMPORT" || m_genOpt.m_inputType == "DEMO")
+        {
             chanid = 9999;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -4664,7 +4674,9 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
 
     RecordingInfo *prog = nullptr;
     if (m_pseudoLiveTVRecording)
+    {
         prog = new RecordingInfo(*m_pseudoLiveTVRecording);
+    }
     else
     {
         prog = new RecordingInfo(

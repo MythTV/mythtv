@@ -1316,7 +1316,9 @@ uint64_t MythPlayer::GetBookmark(void)
 
     if (gCoreContext->IsDatabaseIgnored() ||
         (m_playerCtx->m_buffer && !m_playerCtx->m_buffer->IsBookmarkAllowed()))
+    {
         bookmark = 0;
+    }
     else
     {
         m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -1484,7 +1486,9 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         float behind = secsWritten - secsPlayed;
 
         if (behind < maxtime) // if we're close, do nothing
+        {
             ret = 0;
+        }
         else if (behind - ff <= maxtime)
         {
             auto msec = millisecondsFromFloat(1000 * (secsWritten - maxtime));
@@ -1505,7 +1509,9 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
     {
         float secsMax = secsWritten - (2.F * maxtime);
         if (secsMax <= 0.F)
+        {
             ret = 0;
+        }
         else if (secsMax < secsPlayed + ff)
         {
             auto msec = millisecondsFromFloat(1000 * secsMax);

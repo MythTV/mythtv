@@ -455,7 +455,9 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
     // store changed and new nodes
     uint devid = 0;
     if (m_root && m_root->Store())
+    {
         devid = m_root->GetDeviceID();
+    }
     else if (m_root)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to save DiSEqC tree.");

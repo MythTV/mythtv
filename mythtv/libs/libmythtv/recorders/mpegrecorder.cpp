@@ -103,20 +103,32 @@ static int find_index(const std::array<const int,14> &audio_rate, int value)
 void MpegRecorder::SetOption(const QString &opt, int value)
 {
     if (opt == "width")
+    {
         m_width = value;
+    }
     else if (opt == "height")
+    {
         m_height = value;
+    }
     else if (opt == "mpeg2bitrate")
+    {
         m_bitrate = value;
+    }
     else if (opt == "mpeg2maxbitrate")
+    {
         m_maxBitrate = value;
+    }
     else if (opt == "samplerate")
+    {
         m_audSampleRate = value;
+    }
     else if (opt == "mpeg2audbitratel1")
     {
         int index = find_index(kAudRateL1, value);
         if (index >= 0)
+        {
             m_audBitrateL1 = index + 1;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Audiorate(L1): " +
@@ -127,7 +139,9 @@ void MpegRecorder::SetOption(const QString &opt, int value)
     {
         int index = find_index(kAudRateL2, value);
         if (index >= 0)
+        {
             m_audBitrateL2 = index + 1;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Audiorate(L2): " +
@@ -138,7 +152,9 @@ void MpegRecorder::SetOption(const QString &opt, int value)
     {
         int index = find_index(kAudRateL3, value);
         if (index >= 0)
+        {
             m_audBitrateL3 = index + 1;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Audiorate(L2): " +
@@ -245,11 +261,17 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     else if (opt == "mpeg2audtype")
     {
         if (value == "Layer I")
+        {
             m_audType = V4L2_MPEG_AUDIO_ENCODING_LAYER_1 + 1;
+        }
         else if (value == "Layer II")
+        {
             m_audType = V4L2_MPEG_AUDIO_ENCODING_LAYER_2 + 1;
+        }
         else if (value == "Layer III")
+        {
             m_audType = V4L2_MPEG_AUDIO_ENCODING_LAYER_3 + 1;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "MPEG2 audio layer: " +
@@ -975,7 +997,9 @@ void MpegRecorder::run(void)
     fd_set rdset;
 
     if (m_deviceIsMpegFile)
+    {
         elapsedTimer.start();
+    }
     else if (m_deviceReadBuffer)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Initial startup of recorder");

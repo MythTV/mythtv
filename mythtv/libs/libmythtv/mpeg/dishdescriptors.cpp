@@ -96,9 +96,13 @@ QString DishEventTagsDescriptor::programid(void) const
     uint episode = ((m_data[6] & 0x3f) << 0x08) | m_data[7];
 
     if (m_data[2] == 0x7c)
+    {
         prefix = "MV";
+    }
     else if (m_data[2] == 0x7d)
+    {
         prefix = "SP";
+    }
     else if (m_data[2] == 0x7e)
     {
         if (episode > 0)

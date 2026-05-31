@@ -1361,7 +1361,9 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
     CommandLineArg *arg = nullptr;
 
     if (m_namedArgs.contains(name))
+    {
         arg = m_namedArgs[name];
+    }
     else
     {
         arg = new CommandLineArg(name, type, std::move(def), std::move(help), std::move(longhelp));

@@ -227,7 +227,9 @@ void MythPower::CancelFeature(void)
     QMutexLocker locker(&s_lock);
 
     if (!m_featureTimer.isActive() || !m_scheduledFeature)
+    {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No power request to cancel");
+    }
     else
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Cancelling %1 request with %2 seconds remaining")

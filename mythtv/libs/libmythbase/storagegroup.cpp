@@ -336,7 +336,9 @@ QStringList StorageGroup::GetFileInfoList(const QString &Path)
         QString tmp;
 
         if (entry.isDir())
+        {
             tmp = QString("dir::%1::0").arg(entry.fileName());
+        }
         else
         {
             tmp = QString("file::%1::%2::%3%4").arg(entry.fileName())
@@ -753,7 +755,9 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
         {
             testFile.setFileName(dirname + "/.test");
             if (testFile.open(QIODevice::WriteOnly))
+            {
                 testFile.remove();
+            }
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +

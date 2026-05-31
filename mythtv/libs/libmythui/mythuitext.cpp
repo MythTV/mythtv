@@ -1121,7 +1121,9 @@ QPoint MythUIText::CursorPosition(int text_offset)
 
     int mid = m_drawRect.width() / 2;
     if (m_canvas.width() <= m_drawRect.width() || pos.x() <= mid)
+    {
         x = 0;  // start
+    }
     else if (pos.x() >= m_canvas.width() - mid) // end
     {
         x = m_canvas.width() - m_drawRect.width();
@@ -1139,7 +1141,9 @@ QPoint MythUIText::CursorPosition(int text_offset)
     y = pos.y() - mid;
 
     if (y <= 0 || m_canvas.height() <= m_area.height()) // Top of buffer
+    {
         y = 0;
+    }
     else if (y + m_area.height() > m_canvas.height()) // Bottom of buffer
     {
         int visible_lines = ((m_area.height() / line_height) * line_height);
@@ -1211,7 +1215,9 @@ void MythUIText::Pulse(void)
     if (m_scrolling)
     {
         if (m_scrollPause > 0.0F)
+        {
             m_scrollPause -= rate;
+        }
         else
         {
             if (m_scrollBounce)
@@ -1505,20 +1511,19 @@ bool MythUIText::ParseElement(
             {
                 tmp = tmp.toLower();
 
-                if (tmp == "left")
+                if (tmp == "left") {
                     m_scrollDirection = ScrollLeft;
-                else if (tmp == "right")
+                } else if (tmp == "right") {
                     m_scrollDirection = ScrollRight;
-                else if (tmp == "up")
+                } else if (tmp == "up") {
                     m_scrollDirection = ScrollUp;
-                else if (tmp == "down")
+                } else if (tmp == "down") {
                     m_scrollDirection = ScrollDown;
-                else if (tmp == "horizontal")
+                } else if (tmp == "horizontal") {
                     m_scrollDirection = ScrollHorizontal;
-                else if (tmp == "vertical")
+                } else if (tmp == "vertical") {
                     m_scrollDirection = ScrollVertical;
-                else
-                {
+                } else {
                     m_scrollDirection = ScrollNone;
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("'%1' (%2) Invalid scroll attribute")

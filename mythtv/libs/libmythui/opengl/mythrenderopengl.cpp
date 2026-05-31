@@ -547,7 +547,9 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
 #endif
 
     if (!create())
+    {
         LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create OpenGLContext!");
+    }
     else
     {
         Widget->setAttribute(Qt::WA_PaintOnScreen);

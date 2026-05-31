@@ -501,7 +501,9 @@ bool MythPlayerUI::VideoLoop()
     ProcessCallbacks();
 
     if (m_videoPaused || m_isDummy)
+    {
         DisplayPauseFrame();
+    }
     else if (DisplayNormalFrame())
     {
         if (FlagIsSet(kVideoIsNull) && m_decoder)

@@ -481,33 +481,33 @@ MythUIType *XMLParseBase::ParseUIType(
 
     QString shadow = element.attribute("shadow", "");
 
-    if (type == "imagetype")
+    if (type == "imagetype") {
         uitype = new MythUIImage(parent, name);
-    else if (type == "procedural")
+    } else if (type == "procedural") {
         uitype = new MythUIProcedural(parent, name);
-    else if (type == "textarea")
+    } else if (type == "textarea") {
         uitype = new MythUIText(parent, name);
-    else if (type == "group")
+    } else if (type == "group") {
         uitype = new MythUIGroup(parent, name);
-    else if (type == "textedit")
+    } else if (type == "textedit") {
         uitype = new MythUITextEdit(parent, name);
-    else if (type == "button")
+    } else if (type == "button") {
         uitype = new MythUIButton(parent, name);
-    else if (type == "buttonlist2" || type == "buttonlist")
+    } else if (type == "buttonlist2" || type == "buttonlist") {
         uitype = new MythUIButtonList(parent, name, shadow);
-    else if (type == "buttontree")
+    } else if (type == "buttontree") {
         uitype = new MythUIButtonTree(parent, name);
-    else if (type == "spinbox")
+    } else if (type == "spinbox") {
         uitype = new MythUISpinBox(parent, name);
-    else if (type == "checkbox")
+    } else if (type == "checkbox") {
         uitype = new MythUICheckBox(parent, name);
-    else if (type == "statetype")
+    } else if (type == "statetype") {
         uitype = new MythUIStateType(parent, name);
-    else if (type == "clock")
+    } else if (type == "clock") {
         uitype = new MythUIClock(parent, name);
-    else if (type == "progressbar")
+    } else if (type == "progressbar") {
         uitype = new MythUIProgressBar(parent, name);
-    else if (type == "scrollbar") {
+    } else if (type == "scrollbar") {
         uitype = new MythUIScrollBar(parent, name);
 #if CONFIG_QTWEBENGINE
     } else if (type == "webbrowser") {

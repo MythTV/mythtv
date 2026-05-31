@@ -45,9 +45,13 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         numeric_input = true;
         m_curpageShowHeader = true;
         if (m_pageinput[0] == ' ')
+        {
             m_pageinput[0] = '0' + Key.toInt();
+        }
         else if (m_pageinput[1] == ' ')
+        {
             m_pageinput[1] = '0' + Key.toInt();
+        }
         else if (m_pageinput[2] == ' ')
         {
             m_pageinput[2] = '0' + Key.toInt();

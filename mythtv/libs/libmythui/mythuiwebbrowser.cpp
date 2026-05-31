@@ -159,7 +159,9 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         if (action == "ESCAPE")
         {
             if (history()->canGoBack())
+            {
                 back();
+            }
             else
             {
                 m_parentBrowser->GetParentScreen()->keyPressEvent(event);
@@ -1166,7 +1168,9 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType * /* screen */)
     UpdateBuffer();
 
     if (IsOnTopScreen())
+    {
         SetActive(m_wasActive);
+    }
     else
     {
         bool wasActive = (m_wasActive || m_active);

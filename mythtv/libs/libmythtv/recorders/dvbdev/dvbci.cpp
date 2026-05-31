@@ -129,9 +129,9 @@ static uint8_t *SetLength(uint8_t *Data, int Length)
 ///< \return Returns a pointer to the first byte after the length.
 {
   uint8_t *p = Data;
-  if (Length < 128)
+  if (Length < 128) {
      *p++ = Length;
-  else {
+  } else {
      int n = sizeof(Length);
      for (int i = n - 1; i >= 0; i--) {
          int b = (Length >> (8 * i)) & 0xFF;

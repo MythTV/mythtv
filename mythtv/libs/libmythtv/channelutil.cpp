@@ -41,7 +41,9 @@ static uint get_dtv_multiplex(uint     db_source_id,  const QString& sistandard,
         "  AND sistandard   = :SISTANDARD ";
 
     if (sistandard.toLower() != "dvb")
+    {
         qstr += "AND frequency    = :FREQUENCY   ";
+    }
     else
     {
         qstr += "AND transportid  = :TRANSPORTID ";
@@ -57,7 +59,9 @@ static uint get_dtv_multiplex(uint     db_source_id,  const QString& sistandard,
     query.bindValue(":SISTANDARD",        sistandard);
 
     if (sistandard.toLower() != "dvb")
+    {
         query.bindValue(":FREQUENCY",   QString::number(frequency));
+    }
     else
     {
         query.bindValue(":TRANSPORTID", transport_id);
@@ -627,7 +631,9 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     query.bindValue(":MPLEX_ID", current_mplexid);
 
     if (!query.exec())
+    {
         MythDB::DBError("Getting mplexid global search", query);
+    }
     else if (query.next())
     {
         q_networkid   = query.value(0).toInt();
@@ -897,7 +903,9 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
 
     /// delete
     if (delete_all)
+    {
         query.prepare("DELETE FROM pidcache WHERE chanid = :CHANID");
+    }
     else
     {
         query.prepare(
@@ -1903,7 +1911,9 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
     query.bindValue(":CHANNUM",  channum);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("getatscchannel", query);
+    }
     else if (query.next())
     {
         major = query.value(0).toUInt();
@@ -2548,7 +2558,9 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         sql += "GROUP BY channel.chanid "; // We must always group for this query
 
     if (orderBy == kChanOrderByName)
+    {
         sql += "ORDER BY channel.name ";
+    }
     else if (orderBy == kChanOrderByChanNum)
     {
         // Natural sorting including subchannels e.g. 2_4, 1.3

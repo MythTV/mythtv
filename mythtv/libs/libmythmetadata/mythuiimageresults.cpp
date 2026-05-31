@@ -79,7 +79,9 @@ bool ImageSearchResultsDialog::Create()
                 int pos = m_resultsList->GetItemPos(button);
 
                 if (QFile::exists(dlfile))
+                {
                     button->SetImage(dlfile);
+                }
                 else
                 {
                     m_imageDownload->addThumb(info.label,

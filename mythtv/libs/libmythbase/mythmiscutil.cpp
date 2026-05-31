@@ -603,7 +603,9 @@ QString FileHash(const QString& filename)
         return {"NULL"};
 
     if (file.open(QIODevice::ReadOnly))
+    {
         hash = initialsize;
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,

@@ -1184,7 +1184,9 @@ void MPEGStreamData::SavePartialPSIP(uint pid, PSIPTable* packet)
 {
     pid_psip_map_t::iterator it = m_partialPsipPacketCache.find(pid);
     if (it == m_partialPsipPacketCache.end())
+    {
         m_partialPsipPacketCache[pid] = packet;
+    }
     else
     {
         PSIPTable *old = *it;

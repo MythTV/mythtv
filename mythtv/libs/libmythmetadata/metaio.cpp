@@ -127,13 +127,21 @@ void MetaIO::readFromFilename(const QString &filename,
         QString part_str = lfilename.section( "/", part_num, part_num);
 
         if ( *fmt_it == "GENRE" )
+        {
             genre = part_str;
+        }
         else if ( *fmt_it == "ARTIST" )
+        {
             artist = part_str;
+        }
         else if ( *fmt_it == "ALBUM" )
+        {
             album = part_str;
+        }
         else if ( *fmt_it == "TITLE" )
+        {
             title = part_str;
+        }
         else if ( *fmt_it == "TRACK_TITLE" )
         {
             QStringList tracktitle_list = part_str.split("-");

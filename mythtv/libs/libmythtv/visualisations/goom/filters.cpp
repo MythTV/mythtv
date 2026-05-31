@@ -152,9 +152,9 @@ generatePrecalCoef ()
 
 				// coeffs[myPos] = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC)) <<
 				// 2;
-				if (!(coefh || coefv))
+				if (!(coefh || coefv)) {
 					i = 255;
-				else {
+				} else {
 					int i1 = diffcoeffh * diffcoeffv;
 					int i2 = coefh * diffcoeffv;
 					int i3 = diffcoeffh * coefv;

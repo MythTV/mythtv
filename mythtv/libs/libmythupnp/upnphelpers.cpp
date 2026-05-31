@@ -115,7 +115,9 @@ QString DLNAProfileName(const QString &mimeType, const QSize resolution,
     if (container == "MPEG2-PS")
     {
         if (isHD && audioCodec == "DTS")
+        {
             sProfileName = "MPEG_PS_HD_DTS";
+        }
         else if (isHD)
         {
             // Fallthough, no DLNA profiles

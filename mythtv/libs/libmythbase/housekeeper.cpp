@@ -707,7 +707,9 @@ void HouseKeeper::Start(void)
     query.bindValue(":HOST", gCoreContext->GetHostName());
 
     if (!query.exec())
+    {
         MythDB::DBError("HouseKeeper::Run", query);
+    }
     else
     {
         while (query.next())
@@ -798,7 +800,9 @@ void HouseKeeper::Run(void)
         while (it != m_threadList.end())
         {
             if ((*it)->isRunning())
+            {
                 ++it;
+            }
             else
             {
                 delete *it;

@@ -249,7 +249,9 @@ void ChannelInfo::LoadInputIds()
         query.bindValue(":CHANID", m_chanId);
 
         if (!query.exec())
+        {
             MythDB::DBError("ChannelInfo::LoadInputIds()", query);
+        }
         else
         {
             while(query.next())
@@ -270,7 +272,9 @@ void ChannelInfo::LoadGroupIds()
         query.bindValue(":CHANID", m_chanId);
 
         if (!query.exec())
+        {
             MythDB::DBError("ChannelInfo::LoadGroupIds()", query);
+        }
         else if (query.size() == 0)
         {
             // HACK Avoid re-running this query each time for channels

@@ -415,7 +415,9 @@ void SSDPCache::Add( const QString &sURI,
         {
             bool isGoodUrl = false;
             if (m_goodUrlList.contains(hostport))
+            {
                 isGoodUrl = true;
+            }
             else
             {
                 PortChecker checker;

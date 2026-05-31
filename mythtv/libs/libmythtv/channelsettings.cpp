@@ -788,7 +788,9 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("sourceChanged -- supports eit", query);
+    }
     else
     {
         supports_eit = (query.size() == 0);
@@ -804,7 +806,9 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         query.bindValue(":SOURCEID", sourceid);
 
         if (!query.exec() || !query.isActive())
+        {
             MythDB::DBError("sourceChanged -- eit only", query);
+        }
         else
         {
             uses_eit_only = (query.size() != 0);

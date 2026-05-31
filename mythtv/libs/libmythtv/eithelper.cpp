@@ -471,7 +471,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             }
 
             if (!advisory.isEmpty() && !rating.isEmpty())
+            {
                 rating += ", " + advisory;
+            }
             else if (!advisory.isEmpty())
             {
                 rating = advisory;
@@ -906,7 +908,9 @@ static uint get_chan_id_from_db_atsc(uint sourceid,
     query.bindValue(":SOURCEID",  sourceid);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Looking up chanid 1", query);
+    }
     else if (query.next())
     {
         bool useOnAirGuide = query.value(1).toBool();

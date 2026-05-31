@@ -218,7 +218,9 @@ void HttpServer::LoadSSLConfig()
     QByteArray rawHostKey = hostKeyFile.readAll();
     QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
     if (!hostKey.isNull())
+    {
         m_sslConfig.setPrivateKey(hostKey);
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key from file (%1)").arg(hostKeyPath));
