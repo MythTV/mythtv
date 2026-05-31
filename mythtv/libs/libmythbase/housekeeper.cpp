@@ -59,6 +59,7 @@
 #include "housekeeper.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#include "mythrandom.h"
 
 /** \class HouseKeeperTask
  *  \ingroup housekeeper
@@ -408,9 +409,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
     //      of these tests has returned positive, so each individual test has
     //      a necessarily low probability
     //
-    // Pseudo-random is good enough. Don't need a true random.
-    // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-    bool res = (rand() > (int)(prob2 * static_cast<double>(RAND_MAX)));
+    bool res = (MythRandom() > (uint32_t)(prob2 * std::numeric_limits<uint32_t>::max()));
     m_currentProb = prob;
 //  if (res)
 //      LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")
