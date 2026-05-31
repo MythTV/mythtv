@@ -27,6 +27,9 @@
  #
  */
 
+/* This file hides braces inside of #define statement. */
+/* NOLINTBEGIN(readability-inconsistent-ifelse-braces) */
+
 #include <unistd.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -1016,3 +1019,5 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 
     return 0; 
 }
+
+/* NOLINTEND(readability-inconsistent-ifelse-braces) */
