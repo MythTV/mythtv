@@ -2676,7 +2676,7 @@ bool V2Dvr::AddPowerPriority    ( const QString & PriorityName,
         throw QString("ERROR: SelectClause is required");
     QString msg = CheckPowerQuery(SelectClause);
     if (! msg.isEmpty() )
-        throw msg;
+        throw std::move(msg);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO powerpriority "
                 " (priorityname, recpriority, selectclause) "
@@ -2702,7 +2702,7 @@ bool V2Dvr::UpdatePowerPriority ( const QString & PriorityName,
     {
         QString msg = CheckPowerQuery(SelectClause);
         if (! msg.isEmpty() )
-            throw msg;
+            throw std::move(msg);
     }
     MSqlQuery query(MSqlQuery::InitCon());
     bool comma = false;
