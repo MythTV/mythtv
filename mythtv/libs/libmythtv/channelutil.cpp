@@ -2232,6 +2232,9 @@ std::vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
 
 inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 {
+    // For the spaceship operator, the c++ standard library explicitly
+    // requires '0' and not nullptr.
+    // NOLINTNEXTLINE(modernize-use-nullptr)
     return StringUtil::naturalCompare(a.m_callSign, b.m_callSign) < 0;
 }
 
@@ -2321,9 +2324,13 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     else
     {
         // neither of channels have a numeric channum
+        // For the spaceship operator, the c++ standard library explicitly
+        // requires '0' and not nullptr.
+        // NOLINTBEGIN(modernize-use-nullptr)
         auto cmp = StringUtil::naturalCompare(a.m_chanNum, b.m_chanNum);
         if (cmp != 0)
             return cmp < 0;
+        // NOLINTEND(modernize-use-nullptr)
     }
 
     return lt_callsign(a,b);

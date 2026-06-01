@@ -100,6 +100,7 @@ class NewsSite : public QObject
     void parseRSS(const QDomDocument& domDoc);
     void parseAtom(const QDomDocument& domDoc);
     static bool sortByName(NewsSite *a, NewsSite *b)
+        // NOLINTNEXTLINE(modernize-use-nullptr)
         { return StringUtil::naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 
     bool     successful(void) const;

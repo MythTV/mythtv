@@ -104,6 +104,8 @@ static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
     return (a->GetEpisode() > b->GetEpisode() ? 1 : -1);
 }
 
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
 static bool comp_title(const ProgramInfo *a, const ProgramInfo *b)
 {
     auto cmp = StringUtil::naturalCompare(a->GetSortTitle(), b->GetSortTitle());
@@ -111,6 +113,7 @@ static bool comp_title(const ProgramInfo *a, const ProgramInfo *b)
         return cmp < 0;
     return comp_season_rev(a, b) < 0;
 }
+// NOLINTEND(modernize-use-nullptr)
 
 /**
  * \brief If any cards are configured, return the number.

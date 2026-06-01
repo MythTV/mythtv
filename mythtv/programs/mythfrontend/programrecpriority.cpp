@@ -108,6 +108,8 @@ void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
         QObject::tr("Default") : m_recordingGroup;
 }
 
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
 class TitleSort
 {
   public:
@@ -276,6 +278,7 @@ class ProgramAvgDelaySort
   private:
     bool m_reverse {false};
 };
+// NOLINTEND(modernize-use-nullptr)
 
 ////////////////////////////////////////////////////////
 

@@ -61,6 +61,7 @@ which is never used).
 inline bool naturalSortCompare(const QString &a, const QString &b,
                    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive)
 {
+    // NOLINTNEXTLINE(modernize-use-nullptr)
     return naturalCompare(a, b, caseSensitivity) < 0;
 }
 

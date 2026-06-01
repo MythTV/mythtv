@@ -1081,6 +1081,8 @@ void ProgLister::FillViewList(const QString &view)
         m_curView = m_viewList.size() - 1;
 }
 
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
 static bool plTitleSort(const ProgramInfo *a, const ProgramInfo *b)
 {
     if (a->GetSortTitle() != b->GetSortTitle())
@@ -1122,6 +1124,7 @@ static bool plPrevTitleSort(const ProgramInfo *a, const ProgramInfo *b)
 
     return a->GetScheduledStartTime() < b->GetScheduledStartTime();
 };
+// NOLINTEND(modernize-use-nullptr)
 
 static bool plTimeSort(const ProgramInfo *a, const ProgramInfo *b)
 {
