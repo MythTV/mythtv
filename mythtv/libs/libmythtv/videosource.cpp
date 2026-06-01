@@ -885,7 +885,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
     void fillSelectionsFromDir(const QDir &dir,
-                               [[maybe_unused]] bool absPath = true)
+                               [[maybe_unused]] bool absPath = true) override
     {
         fillSelectionsFromDir(dir, 0, 255, QString(), QRegularExpression(), false);
     }
@@ -994,7 +994,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
     void fillSelectionsFromDir(const QDir &dir,
-                               [[maybe_unused]] bool absPath = true)
+                               [[maybe_unused]] bool absPath = true) override
     {
         fillSelectionsFromDir(dir, QString(), QString());
     }

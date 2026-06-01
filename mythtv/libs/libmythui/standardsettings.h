@@ -239,10 +239,10 @@ class MUI_PUBLIC MythUIComboBoxSetting : public StandardSetting
     QString getValueLabel(void) const;
     void resultEdit(DialogCompletionEvent *dce) override; // StandardSetting
     void edit(MythScreenType *screen) override; // StandardSetting
-    void addSelection(const QString &label, QString value = QString(),
+    virtual void addSelection(const QString &label, QString value = QString(),
                       bool select = false);
     void clearSelections();
-    void fillSelectionsFromDir(const QDir &dir, bool absPath = true);
+    virtual void fillSelectionsFromDir(const QDir &dir, bool absPath = true);
     void updateButton(MythUIButtonListItem *item) override; // StandardSetting
     virtual int size(void) const;
 

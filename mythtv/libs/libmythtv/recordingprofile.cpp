@@ -149,8 +149,8 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
     }
 
     void addSelection(const QString &label,
-                      const QString& value  = QString(),
-                      bool           select = false)
+                      const QString  value  = QString(), // clazy:exclude=function-args-by-ref
+                      bool           select = false) override
     {
         QString val = value.isEmpty() ? label : value;
         uint rate = val.toUInt();
