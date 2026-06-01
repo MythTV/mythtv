@@ -903,3 +903,9 @@ void HouseKeeper::customEvent(QEvent *e)
         }
     }
 }
+
+bool DBConnPurgeTask::DoRun()
+{
+    GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
+    return true;
+}

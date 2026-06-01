@@ -56,21 +56,6 @@ bool is_current_thread(MThread &thread)
     return QThread::currentThread() == thread.qthread();
 }
 
-class DBPurgeHandler : public QObject
-{
-  public:
-    DBPurgeHandler()
-    {
-        m_purgeTimer = startTimer(5min);
-    }
-    void timerEvent(QTimerEvent *event) override // QObject
-    {
-        if (event->timerId() == m_purgeTimer)
-            GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
-    }
-    int m_purgeTimer;
-};
-
 class MThreadInternal : public QThread
 {
   public:
@@ -80,7 +65,6 @@ class MThreadInternal : public QThread
     void QThreadRun(void) { QThread::run(); }
     int exec(void)
     {
-        DBPurgeHandler ph;
         return QThread::exec();
     }
 

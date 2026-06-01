@@ -181,4 +181,17 @@ class MBASE_PUBLIC HouseKeeper : public QObject
     QMutex                          m_threadLock;
 };
 
+class MBASE_PUBLIC DBConnPurgeTask : public PeriodicHouseKeeperTask
+{
+  public:
+    DBConnPurgeTask(void) : PeriodicHouseKeeperTask("DBConnPurge",
+                                            5min,
+                                            0.9F, 1.1F,
+                                            5min,
+                                            kHKLocal, kHKRunOnStartup) {}
+    bool DoRun(void) override; // HouseKeeperTask
+  private:
+
+};
+
 #endif
