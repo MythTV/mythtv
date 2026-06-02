@@ -242,13 +242,15 @@ class ScheduleEditor : public ScheduleCommon,
 class SchedEditChild : public MythScreenType
 {
   Q_OBJECT
+  public:
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+
   protected:
     SchedEditChild(MythScreenStack *parent, const QString &name,
                    ScheduleEditor &editor, RecordingRule &rule,
                    RecordingInfo *recinfo);
    ~SchedEditChild() override = default;
 
-    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     virtual bool CreateEditChild(
         const QString &xmlfile, const QString &winname, bool isTemplate);
 

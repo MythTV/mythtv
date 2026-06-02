@@ -678,7 +678,7 @@ class ItemDetailPopup : public MythScreenType
         return handled;
     }
 
-  protected:
+  public:
     bool keyPressEvent(QKeyEvent *levent) override // MythScreenType
     {
         if (MythScreenType::keyPressEvent(levent))

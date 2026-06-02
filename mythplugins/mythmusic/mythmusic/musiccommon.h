@@ -50,6 +50,10 @@ class MPLUGIN_PUBLIC MusicCommon : public MythScreenType
 {
     Q_OBJECT
 
+  public:
+
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
+
   protected:
 
     MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
@@ -61,7 +65,6 @@ class MPLUGIN_PUBLIC MusicCommon : public MythScreenType
     void switchView(MusicView view);
 
     void customEvent(QEvent *event) override; // MythUIType
-    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
     void ShowMenu(void) override; // MythScreenType
 

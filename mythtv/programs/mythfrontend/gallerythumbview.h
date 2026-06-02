@@ -27,6 +27,9 @@ public:
     GalleryThumbView(MythScreenStack *parent, const char *name);
     ~GalleryThumbView() override;
     bool    Create() override; // MythScreenType
+    bool    keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void    mediaEvent(MythMediaEvent *event) override // MythUIType
+            { m_mgr.DeviceEvent(event); }
 
 public slots:
     void    Start();
@@ -37,9 +40,6 @@ protected:
     void    customEvent(QEvent *event) override; // MythUIType
 
 private:
-    bool    keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void    mediaEvent(MythMediaEvent *event) override // MythUIType
-            { m_mgr.DeviceEvent(event); }
     void    RemoveImages(const QStringList &ids, bool deleted = true);
     void    BuildImageList();
     void    ResetUiSelection();
