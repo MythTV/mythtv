@@ -99,14 +99,12 @@ class NetworkControl : public ServerPool, public QRunnable
   public:
     NetworkControl();
     ~NetworkControl() override;
+    void run(void) override; // QRunnable
 
   private slots:
     void newControlConnection(QTcpSocket *client);
     void receiveCommand(QString &command);
     void deleteClient(void);
-
-  protected:
-    void run(void) override; // QRunnable
 
   private:
     QString processJump(NetworkCommand *nc);

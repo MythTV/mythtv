@@ -47,7 +47,6 @@ class ScreenLoadTask : public QRunnable
   public:
     explicit ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
 
-  private:
     void run(void) override // QRunnable
     {
         m_parent.Load();
@@ -56,6 +55,7 @@ class ScreenLoadTask : public QRunnable
         m_parent.m_loadLock.release();
     }
 
+  private:
     MythScreenType &m_parent;
 };
 

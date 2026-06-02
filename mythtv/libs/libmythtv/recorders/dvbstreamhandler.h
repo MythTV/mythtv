@@ -45,10 +45,12 @@ class DVBStreamHandler : public StreamHandler
                           DTVSignalMonitor *sigmon,
                           DVBChannel       *dvbchan);
 
+  protected:
+    void run(void) override; // MThread
+
   private:
     explicit DVBStreamHandler(const QString &dvb_device, int inputid);
 
-    void run(void) override; // MThread
     void RunTS(void);
     void RunSR(void);
 

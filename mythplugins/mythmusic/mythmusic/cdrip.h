@@ -30,6 +30,8 @@ class CDScannerThread: public MThread
   public:
     explicit CDScannerThread(Ripper *ripper)
         : MThread("CDScanner"), m_parent(ripper) {}
+
+  protected:
     void run() override; // MThread
 
   private:
@@ -41,7 +43,9 @@ class CDEjectorThread: public MThread
     public:
     explicit CDEjectorThread(Ripper *ripper)
         : MThread("CDEjector"), m_parent(ripper) {}
-    void run() override; // MThread
+
+    protected:
+        void run() override; // MThread
 
     private:
         Ripper    *m_parent {nullptr};
@@ -70,8 +74,10 @@ class CDRipperThread: public MThread
 
         void cancel(void);
 
-    private:
+    protected:
         void run(void) override; // MThread
+
+    private:
         int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
 
         bool isCancelled(void) const;

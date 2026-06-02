@@ -42,6 +42,7 @@ public:
 
     int GetResult(void) const { return m_result; }
 
+protected:
     void run() override // MThread
     {
         RunProlog();
@@ -77,6 +78,7 @@ public:
 
     ImageSet GetResult(void) { return m_failed; }
 
+protected:
     void run() override // MThread
     {
         RunProlog();

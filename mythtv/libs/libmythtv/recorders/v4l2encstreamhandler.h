@@ -34,7 +34,6 @@ class V4L2encStreamHandler : public StreamHandler
     V4L2encStreamHandler(const QString & device, int audio_input, int inputid);
     ~V4L2encStreamHandler(void) override;
 
-    void run(void) override; // MThread
 #if 0
     void PriorityEvent(int fd) override; // DeviceReaderCB
 #endif
@@ -60,6 +59,7 @@ class V4L2encStreamHandler : public StreamHandler
     QString ErrorString(void) const { return m_error; }
 
   protected:
+    void run(void) override; // MThread
     bool Status(bool &failed, bool &failing);
 
     static QString RequestDescription(int request);

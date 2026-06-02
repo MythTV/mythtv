@@ -81,14 +81,13 @@ class IPTVChannelFetcher : public QRunnable
     MTV_PUBLIC static fbox_chan_map_t ParsePlaylist(
         const QString &rawdata, IPTVChannelFetcher *fetcher = nullptr);
 
+    void run(void) override; // QRunnable
+
   private:
     void SetTotalNumChannels(uint val) { m_chanCnt = val ? val : 1; }
     void SetNumChannelsParsed(uint val);
     void SetNumChannelsInserted(uint val);
     void SetMessage(const QString &status);
-
-  protected:
-    void run(void) override; // QRunnable
 
   private:
     ScanMonitor     *m_scanMonitor    {nullptr};

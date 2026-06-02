@@ -36,9 +36,10 @@ class MonitorThread : public MThread
         m_lastCheckTime(QDateTime::currentDateTimeUtc()) {}
     ~MonitorThread() override { wait(); m_monitor = nullptr; }
     void setMonitor(MediaMonitor* pMon) { m_monitor = pMon; }
-    void run(void) override; // MThread
 
   protected:
+    void run(void) override; // MThread
+
     QPointer<MediaMonitor> m_monitor;
     unsigned long m_interval;
     QDateTime m_lastCheckTime;

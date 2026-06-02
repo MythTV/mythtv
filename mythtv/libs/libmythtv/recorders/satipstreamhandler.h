@@ -38,14 +38,15 @@ class SatIPStreamHandler : public StreamHandler
     bool UpdateFilters() override;  // StreamHandler
     bool Tune(const DTVMultiplex &tuning);
 
+  protected:
+    void run(void) override; // MThread
+
   private:
     explicit SatIPStreamHandler(const QString & device, int inputid);
     ~SatIPStreamHandler() override;
 
     bool Open(void);
     void Close(void);
-
-    void run(void) override; // MThread
 
     // For implementing Get & Return
     static QMap<QString, SatIPStreamHandler*> s_handlers;

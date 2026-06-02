@@ -23,6 +23,7 @@ class PlaylistLoadingThread : public MThread
         : MThread("PlaylistLoading"), m_parent(parent_ptr),
           m_allMusic(all_music_ptr) {}
 
+  protected:
     void run() override; // MThread
 
   private:

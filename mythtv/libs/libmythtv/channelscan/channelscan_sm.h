@@ -98,6 +98,8 @@ class ChannelScanSM : public MPEGStreamListener,
                   QString inputname, bool test_decryption);
     ~ChannelScanSM() override;
 
+    void run(void) override; // QRunnable
+
     void StartScanner(void);
     void StopScanner(void);
 
@@ -165,8 +167,6 @@ class ChannelScanSM : public MPEGStreamListener,
     HDHRChannel      *GetHDHRChannel(void);
     DVBChannel       *GetDVBChannel(void);
     const DVBChannel *GetDVBChannel(void) const;
-
-    void run(void) override; // QRunnable
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);

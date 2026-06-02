@@ -63,10 +63,12 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
     QString GetToken(void) const { return m_token; }
 
-    void run(void) override; // MThread
     bool Run(void);
 
     void AttachSignals(QObject *obj);
+
+  protected:
+    void run(void) override; // MThread
 
   public slots:
     void deleteLater();

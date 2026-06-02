@@ -39,6 +39,7 @@ class GetRecordingListThread : public MThread
         start();
     }
 
+  protected:
     void run(void) override // MThread
     {
         RunProlog();

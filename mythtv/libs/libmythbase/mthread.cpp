@@ -62,9 +62,11 @@ class MThreadInternal : public QThread
     // QThread::exec function (which is a protected function).
     friend int MThread::exec(void);
 
+  protected:
+    void run(void) override { m_parent.run(); } // QThread
+
   public:
     explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
-    void run(void) override { m_parent.run(); } // QThread
 
     void QThreadRun(void) { QThread::run(); }
 

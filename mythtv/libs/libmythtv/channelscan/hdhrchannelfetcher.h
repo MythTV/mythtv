@@ -102,12 +102,11 @@ class HDHRChannelFetcher : public QRunnable
     void Stop(void);
     hdhr_chan_map_t GetChannels(void);
 
+    void run(void) override; // QRunnable
+
   private:
     void SetTotalNumChannels(uint val) { m_chanCnt = val ? val : 1; }
     void SetNumChannelsInserted(uint val);
-
-  protected:
-    void run(void) override; // QRunnable
 
   private:
     ScanMonitor         *m_scanMonitor    {nullptr};

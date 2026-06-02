@@ -95,8 +95,9 @@ class LogForwardThread : public QObject, public MThread
   public:
     LogForwardThread();
     ~LogForwardThread() override;
-    void run(void) override; // MThread
     void stop(void);
+  protected:
+    void run(void) override; // MThread
   private:
     bool m_aborted {false};          ///< Flag to abort the thread.
 

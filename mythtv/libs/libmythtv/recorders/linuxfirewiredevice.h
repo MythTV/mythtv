@@ -26,6 +26,7 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
                         uint speed, bool use_p2p,
                         uint av_buffer_size_in_bytes = 0);
     ~LinuxFirewireDevice() override;
+    void run(void) override; // QRunnable
 
     // Commands
     bool OpenPort(void) override; // FirewireDevice
@@ -66,7 +67,6 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    void run(void) override; // QRunnable
     void PrintDropped(uint dropped_packets);
 
     bool SetAVStreamBufferSize(uint size_in_bytes);

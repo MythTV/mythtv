@@ -1310,14 +1310,15 @@ class CopyImageThread: public MThread
     explicit CopyImageThread(QStringList strList) :
             MThread("CopyImage"), m_strList(std::move(strList)) {}
 
+    QStringList getResult(void) { return m_strList; }
+
+  protected:
     void run() override // MThread
     {
         RunProlog();
         gCoreContext->SendReceiveStringList(m_strList);
         RunEpilog();
     }
-
-    QStringList getResult(void) { return m_strList; }
 
   private:
     QStringList m_strList;
