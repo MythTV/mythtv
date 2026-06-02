@@ -20,13 +20,8 @@ class AudioOutputAudioTrack : public AudioOutputBase
     ~AudioOutputAudioTrack() override;
 
     bool AddData(void *buffer, int len, std::chrono::milliseconds timecode, int frames) override; // AudioOutput
-
-    // Volume control
-    int GetVolumeChannel(int /* channel */) const override // VolumeBase
-        { return 100; }
-    void SetVolumeChannel(int /* channel */, int /* volume */) override // VolumeBase
-        {}
     void Pause(bool paused) override; // AudioOutput
+    void SetSourceBitrate(int rate) override; // AudioOutputBase
 
   protected:
     bool OpenDevice(void) override; // AudioOutputBase
@@ -34,9 +29,16 @@ class AudioOutputAudioTrack : public AudioOutputBase
     void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
     int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
-    void SetSourceBitrate(int rate) override; // AudioOutputBase
     bool StartOutputThread(void) override; // AudioOutputBase
     void StopOutputThread(void) override; // AudioOutputBase
+
+    // Volume control
+    int GetVolumeChannel(int /* channel */) const override // VolumeBase
+        { return 100; }
+    void SetVolumeChannel(int /* channel */, int /* volume */) override // VolumeBase
+        {}
+
+  private:
     QAndroidJniObject *m_audioTrack {nullptr};
     int m_bitsPer10Frames {0};
 };

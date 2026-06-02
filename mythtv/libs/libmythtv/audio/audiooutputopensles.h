@@ -21,16 +21,16 @@ class AudioOutputOpenSLES : public AudioOutputBase
     explicit AudioOutputOpenSLES(const AudioSettings &settings);
     virtual ~AudioOutputOpenSLES();
 
-    // Volume control
-    int  GetVolumeChannel(int channel) const override; // VolumeBase
-    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
-
   protected:
     bool OpenDevice(void) override; // AudioOutputBase
     void CloseDevice(void) override; // AudioOutputBase
     void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
     int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
+
+    // Volume control
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   private:
     int GetNumberOfBuffersQueued() const;
