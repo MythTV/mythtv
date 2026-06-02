@@ -21,8 +21,11 @@ class ProfileGroupStorage : public SimpleDBStorage
     {
     }
 
+  protected:
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+
+  private:
     const ProfileGroup& m_parent;
 };
 

@@ -92,6 +92,7 @@ class MUI_PUBLIC MediaMonitor : public QObject
 
     static void ejectOpticalDisc(void);
 
+  protected:
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:

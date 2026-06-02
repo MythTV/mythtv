@@ -52,9 +52,10 @@ class MpegRecorder : public V4LRecorder,
 
   protected:
     bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
+    void InitStreamData(void) override; // DTVRecorder
+    void FormatCC(uint code1, uint code2) override; // V4LRecorder
 
   private:
-    void InitStreamData(void) override; // DTVRecorder
     void SetIntOption(RecordingProfile *profile, const QString &name);
     void SetStrOption(RecordingProfile *profile, const QString &name);
 
@@ -76,8 +77,6 @@ class MpegRecorder : public V4LRecorder,
 
     void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
     bool HandleResolutionChanges(void);
-
-    void FormatCC(uint code1, uint code2) override; // V4LRecorder
 
     bool           m_deviceIsMpegFile         {false};
     int            m_bufferSize               {0};

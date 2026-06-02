@@ -23,11 +23,11 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
             MythVideoColourSpace* ColourSpace,
             MythVideoFrame* Frame, FrameScanType Scan) override;
     static bool    IsSupported(MythRenderOpenGL* Context);
-    void           DeleteTextures() override;
 
   protected:
     void           DestroyDeinterlacer() override;
     void           PostInitDeinterlacer() override;
+    void           DeleteTextures() override;
 
   private:
     static VideoFrameType VATypeToMythType(uint32_t Fourcc);

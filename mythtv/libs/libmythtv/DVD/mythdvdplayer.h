@@ -21,8 +21,6 @@ class MythDVDPlayer : public MythPlayerUI
     bool     HasReachedEof(void) const override;
     bool     PrepareAudioSample(std::chrono::milliseconds &Timecode) override;
     uint64_t GetBookmark(void) override;
-    std::chrono::milliseconds  GetMillisecondsPlayed(bool HonorCutList) override;
-    std::chrono::milliseconds  GetTotalMilliseconds(bool HonorCutList) const override;
     bool     IsInStillFrame() const override;
     int      GetNumAngles(void) const override;
     int      GetCurrentAngle(void) const override;
@@ -35,6 +33,12 @@ class MythDVDPlayer : public MythPlayerUI
     void     SetStillFrameTimeout(std::chrono::seconds Length);
     void     StillFrameCheck(void);
 
+    void     PreProcessNormalFrame(void) override;
+    void     VideoStart(void) override;
+    bool     VideoLoop(void) override;
+    void     EventStart(void) override;
+    void     InitialSeek(void) override;
+
   protected:
     void     ResetPlaying(bool ResetFrames = true) override;
     bool     PrebufferEnoughFrames(int MinBuffers = 0) override;
@@ -42,12 +46,7 @@ class MythDVDPlayer : public MythPlayerUI
     void     DoFFRewSkip(void) override;
     void     ChangeSpeed(void) override;
     void     DisplayPauseFrame(void) override;
-    void     PreProcessNormalFrame(void) override;
-    void     VideoStart(void) override;
-    bool     VideoLoop(void) override;
-    void     EventStart(void) override;
     virtual void EventEnd(void);
-    void     InitialSeek(void) override;
     void     AutoDeint(MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
                        std::chrono::microseconds FrameInterval, bool AllowLock = true) override;
     long long CalcMaxFFTime(long long FastFwd, bool Setjump = true) const override;
@@ -56,6 +55,8 @@ class MythDVDPlayer : public MythPlayerUI
     bool     JumpToFrame(uint64_t Frame) override;
     void     CreateDecoder(TestBufferVec & Testbuf) override;
     bool     DoJumpChapter(int Chapter) override;
+    std::chrono::milliseconds  GetMillisecondsPlayed(bool HonorCutList) override;
+    std::chrono::milliseconds  GetTotalMilliseconds(bool HonorCutList) const override;
 
   protected slots:
     void     GoToMenu(const QString& Menu);

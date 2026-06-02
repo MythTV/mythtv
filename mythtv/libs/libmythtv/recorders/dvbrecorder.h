@@ -32,8 +32,6 @@ class DVBRecorder : public DTVRecorder
   protected:
     void StartNewFile(void) override; // RecorderBase
     bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
-
-  private:
     QString GetSIStandard(void) const override; // DTVRecorder
     void SetCAMPMT(const ProgramMapTable *pmt) override; // DTVRecorder
     void UpdateCAMTimeOffset(void) override; // DTVRecorder

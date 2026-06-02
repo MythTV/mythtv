@@ -37,6 +37,10 @@ class V4L2encRecorder : public V4LRecorder
     bool IsOpen(void) const { return m_streamHandler; }
     void Close(void);
 
+    void SetOptionsFromProfile(RecordingProfile *profile,
+                               const QString &videodev,
+                               const QString &audiodev,
+                               const QString &vbidev) override; // DTVRecorder
   protected:
     bool StartEncoding(void);
     bool StopEncoding(void);
@@ -45,10 +49,6 @@ class V4L2encRecorder : public V4LRecorder
 
     void SetIntOption(RecordingProfile *profile, const QString &name);
     void SetStrOption(RecordingProfile *profile, const QString &name);
-    void SetOptionsFromProfile(RecordingProfile *profile,
-                               const QString &videodev,
-                               const QString &audiodev,
-                               const QString &vbidev) override; // DTVRecorder
 
   private:
     V4LChannel           *m_channel        {nullptr};

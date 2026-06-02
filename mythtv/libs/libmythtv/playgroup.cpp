@@ -19,8 +19,10 @@ class PlayGroupDBStorage : public SimpleDBStorage
     {
     }
 
+  protected:
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
+  private:
     const PlayGroupConfig &m_parent;
 };
 

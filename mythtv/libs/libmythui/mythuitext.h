@@ -39,6 +39,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void Reset(void) override; // MythUIType
     void ResetMap(const InfoMap &map);
 
+    void SetArea(const MythRect &rect) override; // MythUIType
+    void SetPosition(const MythPoint &pos) override; // MythUIType
     virtual void SetText(const QString &text);
     QString GetText(void) const { return m_message; }
     QString GetDefaultText(void) const { return m_defaultMessage; }
@@ -87,8 +89,6 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetMultiLine(bool multiline);
     bool GetMultiLine(void) const { return m_multiLine; }
 
-    void SetArea(const MythRect &rect) override; // MythUIType
-    void SetPosition(const MythPoint &pos) override; // MythUIType
     MythRect GetDrawRect(void) { return m_drawRect; }
 
     void SetCanvasPosition(int x, int y);

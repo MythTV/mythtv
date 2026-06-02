@@ -90,6 +90,9 @@ class DTVRecorder :
     // Common audio/visual processing
     bool ProcessAVTSPacket(const TSPacket &tspacket);
 
+    // MPEG2 PS support (Hauppauge PVR-x50/PVR-500)
+    void FindPSKeyFrames(const uint8_t *buffer, uint len) override; // PSStreamListener
+
   protected:
     virtual void InitStreamData(void);
 
@@ -112,9 +115,6 @@ class DTVRecorder :
     // MPEG4 AVC / H.264 TS support
     bool FindH2645Keyframes(const TSPacket* tspacket);
     void HandleH2645Keyframe(void);
-
-    // MPEG2 PS support (Hauppauge PVR-x50/PVR-500)
-    void FindPSKeyFrames(const uint8_t *buffer, uint len) override; // PSStreamListener
 
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);

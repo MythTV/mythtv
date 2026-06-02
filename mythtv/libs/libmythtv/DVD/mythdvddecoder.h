@@ -18,23 +18,22 @@ class MythDVDDecoder : public AvFormatDecoder
     ~MythDVDDecoder() override;
 
     void Reset             (bool ResetVideoData, bool SeekReset, bool ResetFile) override;
-    void UpdateFramesPlayed(void) override;
     bool GetFrame          (DecodeType Type, bool &Retry) override;
+    void UpdateFramesPlayed(void) override;
+    int  GetAudioLanguage  (uint AudioIndex, uint StreamIndex) override;
+    AudioTrackType GetAudioTrackType(uint Index) override;
 
   protected:
     int  ReadPacket        (AVFormatContext *Ctx, AVPacket *Pkt, bool &StorePacket) override;
     bool ProcessVideoPacket(AVCodecContext* codecContext, AVStream *Stream, AVPacket *Pkt, bool &Retry) override;
     bool ProcessVideoFrame (AVCodecContext* codecContext, AVStream *Stream, AVFrame *Frame) override;
     bool ProcessDataPacket (AVStream *Curstream, AVPacket *Pkt, DecodeType Decodetype) override;
-
-  private:
     bool DoRewindSeek      (long long DesiredFrame) override;
     void DoFastForwardSeek (long long DesiredFrame, bool &NeedFlush) override;
     void StreamChangeCheck (void) override;
     void PostProcessTracks (void) override;
-    int  GetAudioLanguage  (uint AudioIndex, uint StreamIndex) override;
-    AudioTrackType GetAudioTrackType(uint Index) override;
 
+  private:
     void CheckContext          (int64_t Pts);
     void ReleaseLastVideoPkt   (void);
     static void ReleaseContext (MythDVDContext *&Context);

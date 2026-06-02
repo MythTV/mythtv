@@ -54,10 +54,10 @@ class DVBStreamHandler : public StreamHandler
     void RunTS(void);
     void RunSR(void);
 
-    void CycleFiltersByPriority(void) override; // StreamHandler
-
     bool SupportsTSMonitoring(void);
 
+  protected:
+    void CycleFiltersByPriority(void) override; // StreamHandler
     PIDInfo *CreatePIDInfo(uint pid, uint stream_type, int pes_type) override // StreamHandler
         { return new DVBPIDInfo(pid, stream_type, pes_type); }
 

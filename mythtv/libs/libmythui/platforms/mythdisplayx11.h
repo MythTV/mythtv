@@ -15,11 +15,13 @@ class MythDisplayX11 : public MythDisplay
    ~MythDisplayX11() override = default;
 
     static bool IsAvailable ();
-    void UpdateCurrentMode  () override;
     bool VideoModesAvailable() override { return true; }
     bool UsingVideoModes    () override;
-    bool SwitchToVideoMode  (QSize Size, double DesiredRate) override;
     const MythDisplayModes& GetVideoModes() override;
+
+  protected:
+    void UpdateCurrentMode  () override;
+    bool SwitchToVideoMode  (QSize Size, double DesiredRate) override;
 
   private:
     void GetEDID(MythXDisplay* mDisplay);

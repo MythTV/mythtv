@@ -51,6 +51,11 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     static const uint kConnectionBroadcast;
     static const uint kMaxBufferedPackets;
 
+  protected:
+    bool SendAVCCommand(const std::vector<uint8_t> &cmd,
+                        std::vector<uint8_t>       &result,
+                        int                    retry_cnt) override; // FirewireDevice
+
   private:
     bool OpenNode(void);
     bool CloseNode(void);
@@ -78,10 +83,6 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     bool UpdateDeviceList(void);
     void UpdateDeviceListItem(uint64_t guid, void *pitem);
     std::vector<AVCInfo> GetSTBListPrivate(void);
-
-    bool SendAVCCommand(const std::vector<uint8_t> &cmd,
-                        std::vector<uint8_t>       &result,
-                        int                    retry_cnt) override; // FirewireDevice
 
     LinuxAVCInfo *GetInfoPtr(void);
     const LinuxAVCInfo *GetInfoPtr(void) const;

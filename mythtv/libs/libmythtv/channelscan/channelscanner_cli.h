@@ -44,11 +44,10 @@ class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
         : m_onlysavescan(doScanSaveOnly), m_interactive(promptsOk) {}
     ~ChannelScannerCLI() override = default;
 
-    void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
-
     bool IsDone(void) const { return m_done; }
 
   protected:
+    void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
     void InformUser(const QString &error) override; // ChannelScanner
     virtual void Process(const ScanDTVTransportList &_transports);
     void MonitorProgress(bool lock, bool strength,

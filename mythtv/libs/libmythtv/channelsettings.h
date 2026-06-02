@@ -67,9 +67,11 @@ class ChannelDBStorage : public SimpleDBStorage
     ChannelDBStorage(StorageUser *_user, const ChannelID &_id, const QString& _name) :
         SimpleDBStorage(_user, "channel", _name), m_id(_id) { }
 
+  protected:
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
+  private:
     const ChannelID& m_id;
 };
 
@@ -79,9 +81,11 @@ class IPTVChannelDBStorage : public SimpleDBStorage
     IPTVChannelDBStorage(StorageUser *_user, const ChannelID &_id, const QString& _name) :
         SimpleDBStorage(_user, "iptv_channel", _name), m_id(_id) { }
 
+  protected:
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
+  public:
     const ChannelID& m_id;
 };
 

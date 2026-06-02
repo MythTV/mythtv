@@ -71,6 +71,7 @@ class HDHRStreamHandler : public StreamHandler
 
   protected:
     void run(void) override; // MThread
+    bool UpdateFilters(void) override; // StreamHandler
 
   private:
     explicit HDHRStreamHandler(const QString &device, int inputid, int majorid);
@@ -82,8 +83,6 @@ class HDHRStreamHandler : public StreamHandler
 
     bool Open(void);
     void Close(void);
-
-    bool UpdateFilters(void) override; // StreamHandler
 
   private:
     hdhomerun_device_t          *m_hdhomerunDevice  {nullptr};

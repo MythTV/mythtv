@@ -50,7 +50,6 @@ private:
 
 public:
   ~ChannelScannerWeb() override = default;
-  void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
   static ChannelScannerWeb * getInstance();
   void ResetStatus();
   void setupScan(int CardId);
@@ -91,6 +90,7 @@ public:
                             const QString &Hierarchy,
                             const QString &RollOff);
 protected:
+  void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
   void InformUser(const QString &error) override; // ChannelScanner
   void Process(const ScanDTVTransportList &_transports, bool success = false);
   void MonitorProgress(bool lock, bool strength,

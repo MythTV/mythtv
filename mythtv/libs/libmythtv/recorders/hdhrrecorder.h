@@ -27,11 +27,11 @@ class HDHRRecorder : public DTVRecorder
     bool Open(void);
     bool IsOpen(void) const { return m_streamHandler; }
     void Close(void);
-    QString GetSIStandard(void) const override; // DTVRecorder
 
   protected:
     void StartNewFile(void) override; // RecorderBase
     bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
+    QString GetSIStandard(void) const override; // DTVRecorder
 
   private:
     void ReaderPaused(int fd);
