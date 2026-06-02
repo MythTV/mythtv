@@ -118,11 +118,10 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void SetJumpToChannel(JumpToChannel *ptr) override; // JumpToChannelListener
 
     bool Create(void) override; // MythScreenType
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     bool gestureEvent(MythGestureEvent *event) override; // MythScreenType
 
+    void ShowMenu(void) override; // MythScreenType
     void aboutToShow() override; // MythScreenType
     void aboutToHide() override; // MythScreenType
     // Allow class GuideUpdateProgramRow to figure out whether the
@@ -132,6 +131,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QDateTime GetCurrentStartTime(void) const { return m_currentStartTime; }
 
   public slots:
+    void Close() override; // MythScreenType
     void PlayerExiting(TV* Player);
 
   signals:
@@ -156,10 +156,10 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void deleteRule();
 
-    void Close() override; // MythScreenType
-
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
     GuideGrid(MythScreenStack *parentStack,
               uint chanid, QString channum,
@@ -200,7 +200,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void moveUpDown(MoveVector movement);
     void moveToTime(const QDateTime& datetime);
 
-    void ShowMenu(void) override; // MythScreenType
     void ShowRecordingMenu(void);
     void ShowJumpToTime(void);
 

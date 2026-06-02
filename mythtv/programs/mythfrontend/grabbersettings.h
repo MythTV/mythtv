@@ -23,10 +23,11 @@ class GrabberSettings : public MythScreenType
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
-  private:
+  protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
 
+  private:
     GrabberList m_movieGrabberList;
     GrabberList m_tvGrabberList;
     GrabberList m_gameGrabberList;

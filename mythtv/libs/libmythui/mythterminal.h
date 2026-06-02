@@ -27,7 +27,6 @@ class MUI_PUBLIC MythTerminal : public MythScreenType
                  QStringList arguments);
     virtual void deleteLater(void)
         { TeardownAll(); MythScreenType::deleteLater(); }
-    void Init(void) override; // MythScreenType
     bool Create(void) override; // MythScreenType
     bool IsDone(void) const;
 
@@ -42,6 +41,7 @@ class MUI_PUBLIC MythTerminal : public MythScreenType
 
   protected:
     ~MythTerminal() override { TeardownAll(); }
+    void Init(void) override; // MythScreenType
     void TeardownAll(void);
 
     mutable QRecursiveMutex m_lock;

@@ -32,6 +32,7 @@ class GameUI : public MythScreenType
 
     bool Create() override; // MythScreenType
     void BuildTree();
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   public slots:
@@ -56,7 +57,6 @@ class GameUI : public MythScreenType
     void clearRomInfo(void);
     void edit(void);
     void showInfo(void);
-    void ShowMenu(void) override; // MythScreenType
     void searchStart(void);
     void toggleFavorite(void);
     void createBusyDialog(const QString& title);

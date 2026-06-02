@@ -31,12 +31,16 @@ class MUI_PUBLIC LanguageSelection : public MythScreenType
     static bool prompt(bool force = false);
 
     bool Create(void) override; // MythScreenType
+
+  public slots:
+    void Close(void) override; // MythScreenType
+
+  protected:
     void Load(void) override; // MythScreenType
 
   private slots:
     //void LanguageClicked(MythUIButtonListItem *item);
     //void CountryClicked(MythUIButtonListItem *item);
-    void Close(void) override; // MythScreenType
     void Save(void);
 
   private:

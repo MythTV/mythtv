@@ -64,6 +64,7 @@ class GUIStartup : public MythScreenType
     void setTotal(std::chrono::seconds total);
 
   public slots:
+    void Close(void) override; // MythScreenType
     bool updateProgress(bool finished);
     void updateProgress(void);
 
@@ -71,7 +72,6 @@ class GUIStartup : public MythScreenType
     void Retry(void);
     void Search(void);
     void Setup(void);
-    void Close(void) override; // MythScreenType
     void OnClosePromptReturn(bool submit);
 
   signals:

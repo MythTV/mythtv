@@ -177,9 +177,11 @@ class ScheduleEditor : public ScheduleCommon,
     void ShowNextView(void);
     void ShowPreview(void);
     void Save(void);
+    void Close(void) override; // MythScreenType
 
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
 
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
@@ -190,11 +192,9 @@ class ScheduleEditor : public ScheduleCommon,
     void TranscodeChanged(bool enable);
     void ShowSchedInfo(void);
     void ChildClosing(void);
-    void Close(void) override; // MythScreenType
 
   private:
     Q_DISABLE_COPY(ScheduleEditor);
-    void Load(void) override; // MythScreenType
     void LoadTemplate(const QString& name);
     void DeleteRule(void);
 
@@ -259,10 +259,10 @@ class SchedEditChild : public MythScreenType
 
   public slots:
     void Close(void) override; // MythScreenType
-    void Load(void) override = 0; // MythScreenType
     virtual void Save(void) = 0;
 
   protected:
+    void Load(void) override = 0; // MythScreenType
     void SetTextFromMaps(void);
 
     ScheduleEditor *m_editor {nullptr};
@@ -283,14 +283,15 @@ class SchedOptEditor : public SchedEditChild, public SchedOptMixin
    ~SchedOptEditor() override = default;
 
     bool Create(void) override; // MythScreenType
+    void Save(void) override; // SchedEditChild
+
+  protected:
+    void Load(void) override; // SchedEditChild
 
   protected slots:
     void DupMethodChanged(MythUIButtonListItem *item);
 
   private:
-    void Load(void) override; // SchedEditChild
-    void Save(void) override; // SchedEditChild
-
     MythUIButton  *m_filtersButton {nullptr};
 };
 
@@ -303,13 +304,13 @@ class SchedFilterEditor : public SchedEditChild, public FilterOptMixin
    ~SchedFilterEditor() override = default;
 
     bool Create(void) override; // MythScreenType
+    void Save(void) override; // SchedEditChild
+
+  protected:
+    void Load(void) override; // SchedEditChild
 
   protected slots:
     static void ToggleSelected(MythUIButtonListItem *item);
-
-  private:
-    void Load(void) override; // SchedEditChild
-    void Save(void) override; // SchedEditChild
 };
 
 class StoreOptEditor : public SchedEditChild, public StoreOptMixin
@@ -321,17 +322,15 @@ class StoreOptEditor : public SchedEditChild, public StoreOptMixin
    ~StoreOptEditor() override = default;
 
     bool Create(void) override; // MythScreenType
+    void Save(void) override; // SchedEditChild
 
   protected:
     void customEvent(QEvent *event) override; // MythUIType
+    void Load(void) override; // SchedEditChild
 
   protected slots:
     void MaxEpisodesChanged(MythUIButtonListItem *item);
     void PromptForRecGroup(void);
-
-  private:
-    void Load(void) override; // SchedEditChild
-    void Save(void) override; // SchedEditChild
 };
 
 class PostProcEditor : public SchedEditChild, public PostProcMixin
@@ -343,13 +342,13 @@ class PostProcEditor : public SchedEditChild, public PostProcMixin
    ~PostProcEditor() override = default;
 
     bool Create(void) override; // MythScreenType
+    void Save(void) override; // SchedEditChild
+
+  protected:
+    void Load(void) override; // SchedEditChild
 
   protected slots:
     void TranscodeChanged(bool enable);
-
-  private:
-    void Load(void) override; // SchedEditChild
-    void Save(void) override; // SchedEditChild
 };
 
 class MetadataOptions : public SchedEditChild
@@ -361,9 +360,11 @@ class MetadataOptions : public SchedEditChild
    ~MetadataOptions() override;
 
     bool Create(void) override; // MythScreenType
+    void Save(void) override; // SchedEditChild
 
   protected:
     void customEvent(QEvent *event) override; // MythUIType
+    void Load(void) override; // SchedEditChild
 
   protected slots:
     void ClearInetref();
@@ -384,9 +385,6 @@ class MetadataOptions : public SchedEditChild
     void ValuesChanged();
 
   private:
-    void Load(void) override; // SchedEditChild
-    void Save(void) override; // SchedEditChild
-
     void CreateBusyDialog(const QString& title);
     static void FindImagePopup(const QString &prefix,
                                const QString &prefixAlt,

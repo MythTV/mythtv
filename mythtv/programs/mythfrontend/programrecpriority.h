@@ -84,6 +84,8 @@ class ProgramRecPriority : public ScheduleCommon
 
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   protected slots:
     void updateInfo(MythUIButtonListItem *item);
@@ -91,9 +93,6 @@ class ProgramRecPriority : public ScheduleCommon
     void scheduleChanged(int recid);
 
   private:
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
-
     void FillList(void);
     void SortList(ProgramRecPriorityInfo *newCurrentItem = nullptr);
     void UpdateList();

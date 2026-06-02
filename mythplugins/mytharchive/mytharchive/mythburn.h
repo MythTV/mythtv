@@ -66,6 +66,7 @@ class MythBurn : public MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void createConfigFile(const QString &filename);
+    void ShowMenu(void) override; // MythScreenType
 
   protected slots:
     void handleNextPage(void);
@@ -76,7 +77,6 @@ class MythBurn : public MythScreenType
     void handleAddFile(void);
 
     void toggleUseCutlist(void);
-    void ShowMenu(void) override; // MythScreenType
     void editDetails(void);
     void editThumbnails(void);
     void changeProfile(void);

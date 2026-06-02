@@ -236,7 +236,7 @@ namespace
     /// This dialog is used when playing something from the "Watch
     /// Videos" page. Playing from the "Watch Recordings" page uses
     /// the code in PlaybackBox::createPlayFromMenu.
-    class BookmarkDialog : MythScreenType
+    class BookmarkDialog : public MythScreenType
     {
         Q_DECLARE_TR_FUNCTIONS(BookmarkDialog)
 

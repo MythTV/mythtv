@@ -126,8 +126,7 @@ class PlaybackBox : public ScheduleCommon
    ~PlaybackBox(void) override;
 
     bool Create(void) override; // MythScreenType
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void setInitialRecGroup(const QString& initialGroup) { m_recGroup = initialGroup; }
@@ -139,6 +138,8 @@ class PlaybackBox : public ScheduleCommon
 
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   protected slots:
     void updateRecList(MythUIButtonListItem *sel_item);
@@ -344,7 +345,6 @@ class PlaybackBox : public ScheduleCommon
     void HandleUpdateItemEvent(uint recordingId, uint flags);
 
     void ScheduleUpdateUIList(void);
-    void ShowMenu(void) override; // MythScreenType
     bool CreatePopupMenu(const QString &title);
     void DisplayPopupMenu(void);
     //bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)

@@ -25,6 +25,7 @@ class WelcomeDialog : public MythScreenType
     ~WelcomeDialog() override;
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
@@ -37,7 +38,6 @@ class WelcomeDialog : public MythScreenType
     void updateStatus(void);
     void updateScreen(void);
     void closeDialog(void);
-    void ShowMenu(void) override; // MythScreenType
     void shutdownNow(void);
     void runEPGGrabber(void);
     void lockShutdown(void);

@@ -34,6 +34,8 @@ class MUI_PUBLIC RawSettingsEditor : public MythScreenType
 
     // MythScreenType overrides
     bool Create(void) override; // MythScreenType
+
+  protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
 

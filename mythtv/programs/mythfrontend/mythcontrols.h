@@ -64,6 +64,7 @@ class MythControls : public MythScreenType
     ~MythControls() override;
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
 
     enum ListType : std::uint8_t
     {
@@ -76,6 +77,9 @@ class MythControls : public MythScreenType
     QString GetCurrentContext(void);
     QString GetCurrentAction(void);
     QString GetCurrentKey(void);
+
+  public slots:
+    void Close(void) override; // MythScreenType
 
   protected:
     void customEvent(QEvent *event) override; // MythUIType
@@ -114,9 +118,6 @@ class MythControls : public MythScreenType
     void AddKeyToAction(const QString& key);
 
   private:
-    void ShowMenu(void) override; // MythScreenType
-    void Close(void) override; // MythScreenType
-
     ViewType          m_currentView       {kActionsByContext};
     MythUIButtonList  *m_leftList         {nullptr};
     MythUIButtonList  *m_rightList        {nullptr};

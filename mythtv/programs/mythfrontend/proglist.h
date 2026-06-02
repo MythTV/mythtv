@@ -55,14 +55,17 @@ class ProgLister : public ScheduleCommon
                                  const QString & extraArg);
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+
+  public slots:
+    void Close(void) override; // MythScreenType
 
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
 
   protected slots:
-    void Close(void) override; // MythScreenType
-
     void HandleSelected(MythUIButtonListItem *item);
     void HandleVisible(MythUIButtonListItem *item);
 
@@ -78,8 +81,6 @@ class ProgLister : public ScheduleCommon
     void ShowOldRecordedMenu(void);
 
   private:
-    void Load(void) override; // MythScreenType
-
     void FillViewList(const QString &view);
     void FillItemList(bool restorePosition, bool updateDisp = true);
 
@@ -89,7 +90,6 @@ class ProgLister : public ScheduleCommon
     void UpdateButtonList(void);
     void UpdateKeywordInDB(const QString &text, const QString &oldValue);
 
-    void ShowMenu(void) override; // MythScreenType
     void ShowDeleteItemMenu(void);
     void ShowDeleteOldSeriesMenu(void);
 
