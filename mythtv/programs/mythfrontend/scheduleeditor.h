@@ -182,6 +182,8 @@ class ScheduleEditor : public ScheduleCommon,
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
     void Load(void) override; // MythScreenType
+    ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
+        { return m_recInfo; };
 
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
@@ -199,9 +201,6 @@ class ScheduleEditor : public ScheduleCommon,
     void DeleteRule(void);
 
     void showTemplateMenu(void);
-
-    ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
-        { return m_recInfo; };
 
     RecordingInfo    *m_recInfo         {nullptr};
     RecordingRule    *m_recordingRule   {nullptr};

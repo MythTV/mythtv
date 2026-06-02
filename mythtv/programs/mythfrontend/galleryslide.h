@@ -70,9 +70,10 @@ public:
              std::chrono::milliseconds duration = 500ms,
              const QEasingCurve& curve = QEasingCurve::InOutCubic,
              UIEffects::Centre centre = UIEffects::Middle);
-    void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
 
 protected:
+    void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
+
     //! Image to be animated
     // Should be MythUItype but that impacts elsewhere: SetZoom must become
     // virtual, which causes compiler (fn hiding) warnings in subtitles
@@ -148,6 +149,7 @@ class PanAnimation : public Animation
 {
 public:
     explicit PanAnimation(Slide *image) : Animation(image) {}
+protected:
     void updateCurrentValue(const QVariant &value) override; // Animation
 };
 

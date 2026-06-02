@@ -129,6 +129,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     // skip the work if not.
     uint GetCurrentStartChannel(void) const { return m_currentStartChannel; }
     QDateTime GetCurrentStartTime(void) const { return m_currentStartTime; }
+    int  FindChannel(uint chanid, const QString &channum,
+                     bool exact = true) const override; // JumpToChannelListener
 
   public slots:
     void Close() override; // MythScreenType
@@ -202,9 +204,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void ShowRecordingMenu(void);
     void ShowJumpToTime(void);
-
-    int  FindChannel(uint chanid, const QString &channum,
-                     bool exact = true) const override; // JumpToChannelListener
 
     void fillChannelInfos(bool gotostartchannel = true);
     void fillTimeInfos(void);

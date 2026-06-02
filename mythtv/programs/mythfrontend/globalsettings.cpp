@@ -4110,7 +4110,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
 
-  private slots:
+  public slots:
     void childChanged(StandardSetting* /*unused*/) override;
 
   private:
@@ -4317,7 +4317,7 @@ class PlayBackScaling : public GroupSetting
     PlayBackScaling();
     void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
-  private slots:
+  public slots:
     void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
@@ -4702,7 +4702,7 @@ class GuiDimension : public GroupSetting
         //QString getValue() override; // StandardSetting
         void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
-    private slots:
+    public slots:
         void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
         StandardSetting *m_width   {nullptr};

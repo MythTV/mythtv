@@ -38,7 +38,6 @@ class ProgFinder : public ScheduleCommon
     void timesListTakeFocus(void);
     void timesListLosingFocus(void);
 
-    void ShowGuide() const override; // ScheduleCommon
     void select();
 
     void updateInfo(void);
@@ -47,6 +46,7 @@ class ProgFinder : public ScheduleCommon
     using ShowName = QMap<QString,QString>;
 
     void Init(void) override; // MythScreenType
+    void ShowGuide() const override; // ScheduleCommon
     void customEvent(QEvent *e) override; // ScheduleCommon
 
     virtual void initAlphabetList(void);

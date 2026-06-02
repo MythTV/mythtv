@@ -86,6 +86,7 @@ class ProgramRecPriority : public ScheduleCommon
     void customEvent(QEvent *event) override; // ScheduleCommon
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
   protected slots:
     void updateInfo(MythUIButtonListItem *item);
@@ -106,8 +107,6 @@ class ProgramRecPriority : public ScheduleCommon
 
     void showMenu(void);
     void showSortMenu(void);
-
-    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     QMap<int, ProgramRecPriorityInfo> m_programData;
     std::vector<ProgramRecPriorityInfo*> m_sortedProgram;

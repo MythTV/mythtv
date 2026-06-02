@@ -64,6 +64,7 @@ class ProgLister : public ScheduleCommon
   protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
     void Load(void) override; // MythScreenType
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
   protected slots:
     void HandleSelected(MythUIButtonListItem *item);
@@ -99,8 +100,6 @@ class ProgLister : public ScheduleCommon
     enum SortBy : std::uint8_t { kTimeSort, kPrevTitleSort, kTitleSort, };
     SortBy GetSortBy(void) const;
     void SortList(SortBy sortby, bool reverseSort);
-
-    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     static bool PowerStringToSQL(
         const QString &qphrase, QString &output, MSqlBindings &bindings) ;

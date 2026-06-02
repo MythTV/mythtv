@@ -140,6 +140,7 @@ class PlaybackBox : public ScheduleCommon
     void customEvent(QEvent *event) override; // ScheduleCommon
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
   protected slots:
     void updateRecList(MythUIButtonListItem *sel_item);
@@ -304,8 +305,6 @@ class PlaybackBox : public ScheduleCommon
               bool ignoreProgStart,
               bool ignoreLastPlayPos,
               bool underNetworkControl);
-
-    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
