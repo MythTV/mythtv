@@ -24,12 +24,14 @@ class IPTVRecorder : public DTVRecorder
     bool Open(void);
     void Close(void);
     bool IsOpen(void) const;
-    void StartNewFile(void) override; // RecorderBase
 
     void SetStreamData(MPEGStreamData *data) override; // DTVRecorder
-    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
     void run(void) override; // RecorderBase
+
+  protected:
+    void StartNewFile(void) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
   private:
     IPTVChannel *m_channel {nullptr};

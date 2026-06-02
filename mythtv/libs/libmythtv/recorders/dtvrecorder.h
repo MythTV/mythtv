@@ -58,7 +58,6 @@ class DTVRecorder :
     MPEGStreamData *GetStreamData(void) const { return m_streamData; }
 
     void Reset(void) override; // RecorderBase
-    void ClearStatistics(void) override; // RecorderBase
     RecordingQuality *GetRecordingQuality(const RecordingInfo *r) const override; // RecorderBase
 
     // MPEG Stream Listener
@@ -94,6 +93,7 @@ class DTVRecorder :
   protected:
     virtual void InitStreamData(void);
 
+    void ClearStatistics(void) override; // RecorderBase
     void FinishRecording(void) override; // RecorderBase
     void ResetForNewFile(void) override; // RecorderBase
 

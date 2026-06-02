@@ -34,7 +34,6 @@ class MpegRecorder : public V4LRecorder,
     void Reset(void) override; // DTVRecorder
 
     void Pause(bool clear = true) override; // RecorderBase
-    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
     bool IsRecording(void) override // RecorderBase
         { return m_recording; }
@@ -50,6 +49,9 @@ class MpegRecorder : public V4LRecorder,
     void ReaderPaused(int /*fd*/) override // DeviceReaderCB
         { m_pauseWait.wakeAll(); }
     void PriorityEvent(int /*fd*/) override { } //DeviceReaderCB
+
+  protected:
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
   private:
     void InitStreamData(void) override; // DTVRecorder

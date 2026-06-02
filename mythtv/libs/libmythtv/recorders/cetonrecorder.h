@@ -27,15 +27,15 @@ class CetonRecorder : public DTVRecorder
 
     bool Open(void);
     void Close(void);
-    void StartNewFile(void) override; // RecorderBase
-
     bool IsOpen(void) const { return m_streamHandler; }
 
+  protected:
+    void StartNewFile(void) override; // RecorderBase
     QString GetSIStandard(void) const override; // DTVRecorder
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
   private:
     void ReaderPaused(int fd);
-    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
   private:
     CetonChannel       *m_channel        {nullptr};
