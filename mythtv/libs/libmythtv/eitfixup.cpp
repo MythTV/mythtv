@@ -2096,7 +2096,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
     int position = event.m_title.indexOf(":");
-    if ((position != -1) &&
+    if ((position != -1) && ((position + 1) < event.m_title.size()) &&
         (event.m_title[position + 1].toUpper() == event.m_title[position + 1]) &&
         (event.m_subtitle.isEmpty()))
     {
