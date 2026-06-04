@@ -801,7 +801,7 @@ bool myth_ioprio(int val)
 
 #else
 
-bool myth_ioprio(int) { return true; }
+bool myth_ioprio(int /*val*/) { return true; }
 
 #endif
 

@@ -147,6 +147,7 @@ void MediaMonitorUnix::deleteLater(void)
 
 
 // Loop through the file system table and add any supported devices.
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool MediaMonitorUnix::CheckFileSystemTable(void)
 {
 #if HAVE_FSTAB_H

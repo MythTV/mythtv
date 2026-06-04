@@ -1931,6 +1931,7 @@ DTVSignalMonitor* ChannelScanSM::GetDTVSignalMonitor(void)
     return dynamic_cast<DTVSignalMonitor*>(m_signalMonitor);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 DVBSignalMonitor* ChannelScanSM::GetDVBSignalMonitor(void)
 {
 #if CONFIG_DVB
@@ -1950,6 +1951,7 @@ const DTVChannel *ChannelScanSM::GetDTVChannel(void) const
     return dynamic_cast<const DTVChannel*>(m_channel);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
 {
 #if CONFIG_HDHOMERUN
@@ -1959,6 +1961,7 @@ HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
 #endif
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 DVBChannel *ChannelScanSM::GetDVBChannel(void)
 {
 #if CONFIG_DVB
@@ -1968,6 +1971,7 @@ DVBChannel *ChannelScanSM::GetDVBChannel(void)
 #endif
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 {
 #if CONFIG_DVB
@@ -1977,6 +1981,7 @@ const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 #endif
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 V4LChannel *ChannelScanSM::GetV4LChannel(void)
 {
 #if CONFIG_V4L2

@@ -30,15 +30,7 @@ MythMediaCodecInterop* MythMediaCodecInterop::CreateMediaCodec(MythPlayerUI* Pla
 }
 
 MythMediaCodecInterop::MythMediaCodecInterop(MythPlayerUI* Player, MythRenderOpenGL* Context)
-  : MythOpenGLInterop(Context, GL_MEDIACODEC, Player),
-    m_frameWait(),
-    m_frameWaitLock(),
-    m_colourSpaceInitialised(false),
-    m_surface(),
-    m_surfaceTexture(),
-    m_surfaceListener(),
-    m_textureTransform(nullptr),
-    m_transform()
+  : MythOpenGLInterop(Context, GL_MEDIACODEC, Player)
 {
     jfloatArray transform = QAndroidJniEnvironment()->NewFloatArray(16);
     m_textureTransform = jfloatArray(QAndroidJniEnvironment()->NewGlobalRef(transform));
@@ -55,7 +47,7 @@ void* MythMediaCodecInterop::GetSurface(void)
     return m_surface.object();
 }
 
-void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
+void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv* /*env*/, jobject /*listener*/, jlong Wait, jobject /*texture*/)
 {
     // NOLINTNEXTLINE(performance-no-int-to-ptr)
     auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
@@ -120,7 +112,7 @@ std::vector<MythVideoTextureOpenGL*>
 MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
                                MythVideoColourSpace *ColourSpace,
                                MythVideoFrame *Frame,
-                               FrameScanType)
+                               FrameScanType /*Scan*/)
 {
     std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)

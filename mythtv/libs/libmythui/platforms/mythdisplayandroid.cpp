@@ -17,7 +17,6 @@
 #define LOC QString("Display: ")
 
 MythDisplayAndroid::MythDisplayAndroid()
-  : MythDisplay()
 {
     Initialise();
 }

@@ -536,7 +536,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "OpenSLES:";
         QString desc =  tr("OpenSLES default output. Stereo support only.");
-        auto adc = GetAudioDeviceConfig(name, desc);
+        auto *adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -546,7 +546,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "AudioTrack:";
         QString desc =  tr("Android AudioTrack output. Supports surround sound.");
-        auto adc = GetAudioDeviceConfig(name, desc);
+        auto *adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);

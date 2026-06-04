@@ -1263,6 +1263,7 @@ DTVChannel *TVRec::GetDTVChannel(void)
     return dynamic_cast<DTVChannel*>(m_channel);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 V4LChannel *TVRec::GetV4LChannel(void)
 {
 #if CONFIG_V4L2

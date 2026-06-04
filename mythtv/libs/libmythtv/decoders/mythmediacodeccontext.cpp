@@ -314,7 +314,7 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (codec_is_mediacodec_dec(m_codecID))
         return 0;
-    else if (codec_is_mediacodec(m_codecID))
+    if (codec_is_mediacodec(m_codecID))
         return MythCodecContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
     return -1;
 }
@@ -328,7 +328,7 @@ bool MythMediaCodecContext::RetrieveFrame(AVCodecContext *Context, MythVideoFram
     return false;
 }
 
-AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext* /*Context*/, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
@@ -343,7 +343,7 @@ AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFor
  *
  * \note This may not be appropriate for all devices
 */
-void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Frame)
+void MythMediaCodecContext::PostProcessFrame(AVCodecContext* /*Context*/, MythVideoFrame* Frame)
 {
     if (!Frame)
         return;
@@ -361,7 +361,7 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Fr
  *
  * \note As for PostProcessFrame this may not be accurate.
 */
-bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool)
+bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool /*StreamChange*/)
 {
     DoubleRate = true;
     return true;
@@ -418,7 +418,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
         return s_profiles;
 
     // Iterate over MediaCodecInfo's
-    auto codecs = qtcodecs.object<jobjectArray>();
+    auto *codecs = qtcodecs.object<jobjectArray>();
     jsize codeccount = env->GetArrayLength(codecs);
     for (jsize i = 0; i < codeccount; ++i)
     {
@@ -437,7 +437,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
 
         // Retrieve supported mimetypes (there is usually just one)
         QAndroidJniObject qttypes = codec.callObjectMethod("getSupportedTypes", "()[Ljava/lang/String;");
-        auto types = qttypes.object<jobjectArray>();
+        auto *types = qttypes.object<jobjectArray>();
         jsize typecount = env->GetArrayLength(types);
         for (jsize j = 0; j < typecount; ++j)
         {
@@ -475,7 +475,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
                 // Profiles are available from CodecCapabilities.profileLevel field
                 QAndroidJniObject profiles = caps.getObjectField("profileLevels",
                         "[Landroid/media/MediaCodecInfo$CodecProfileLevel;");
-                auto profilearr = profiles.object<jobjectArray>();
+                auto *profilearr = profiles.object<jobjectArray>();
                 jsize profilecount = env->GetArrayLength(profilearr);
                 if (profilecount < 1)
                 {

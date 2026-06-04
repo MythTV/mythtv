@@ -2,6 +2,7 @@
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
+#include <algorithm>
 #else
 #include <QJniEnvironment>
 #include <QJniObject>
@@ -78,8 +79,7 @@ bool AudioOutputAudioTrack::OpenDevice()
     // 50 milliseconds
     m_fragmentSize = m_bitsPer10Frames * m_sourceSampleRate * 5 / 8000;
 
-    if (m_fragmentSize < 1536)
-        m_fragmentSize = 1536;
+    m_fragmentSize = std::max(m_fragmentSize, 1536);
 
 
     if (m_passthru || m_enc)
@@ -200,7 +200,7 @@ AudioOutputSettings* AudioOutputAudioTrack::GetOutputSettings(bool /* digital */
             supportedrate, AF_CHANNEL_OUT_MONO, AF_ENCODING_PCM_FLOAT);
     ANDROID_EXCEPTION_CHECK
     if (bufsize > 0 && !exception)
-    settings->AddSupportedFormat(FORMAT_FLT);
+        settings->AddSupportedFormat(FORMAT_FLT);
 
     for (uint channels = CHANNELS_MIN; channels <= CHANNELS_MAX; channels++)
     {

@@ -429,7 +429,7 @@ int AudioOutputOpenSLES::GetNumberOfBuffersQueued() const
     return st.count;
 }
 
-void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
+void AudioOutputOpenSLES::WriteAudio(unsigned char * aubuf, int size)
 {
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("WriteAudio %1").arg(size));
     while (size > 0)
@@ -448,16 +448,14 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
 
         if (size < (m_fragmentSize + m_bufWriteIndex))
         {
-            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, size);
+            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], aubuf, size);
             size = 0;
             // no more to do so exit now, dont have a full buffer
             break;
         }
-        else
-        {
-            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, m_fragmentSize - m_bufWriteIndex);
-            size -= m_fragmentSize - m_bufWriteIndex;
-        }
+
+        memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], aubuf, m_fragmentSize - m_bufWriteIndex);
+        size -= m_fragmentSize - m_bufWriteIndex;
 
         SLresult r = Enqueue(m_playerBufferQueue, &m_buf[m_bufWriteBase], m_fragmentSize);
         LOG(VB_AUDIO, LOG_INFO, LOC + QString("Enqueue %1").arg(m_bufWriteBase));
@@ -525,7 +523,7 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     // Volume is 0-100
     // android expects 0-1.0 before conversion
     // Convert UI volume to linear factor (cube) in log
-    float vol = volume / 100.f;
+    float vol = volume / 100.0F;
 
     int mb;
     if (volume == 0)

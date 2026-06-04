@@ -367,6 +367,7 @@ void ChannelBase::HandleScript(const QString &freqid)
     }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool ChannelBase::ChangeInternalChannel([[maybe_unused]] const QString &freqid,
                                         [[maybe_unused]] uint inputid) const
 {
