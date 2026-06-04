@@ -578,7 +578,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     {
         QString     line;
         QTextStream stream(&file);
-        do
+        while (!stream.atEnd())
         {
             line = stream.readLine();
             if (line.startsWith("drive name:"))
@@ -588,7 +588,6 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
                 break;           // file should only contain one drive table?
             }
         }
-        while (!stream.atEnd());
         file.close();
     }
 #endif // linux

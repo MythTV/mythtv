@@ -93,8 +93,6 @@ int GetNativeOutputFramesPerBuffer(void)
 
 bool AudioOutputOpenSLES::CreateEngine()
 {
-    SLresult result;
-
     m_soHandle = dlopen("libOpenSLES.so", RTLD_NOW);
     if (m_soHandle == nullptr)
     {
@@ -130,7 +128,7 @@ bool AudioOutputOpenSLES::CreateEngine()
 #undef OPENSL_DLSYM
 
     // create engine
-    result = m_slCreateEnginePtr(&m_engineObject, 0, nullptr, 0, nullptr, nullptr);
+    SLresult result = m_slCreateEnginePtr(&m_engineObject, 0, nullptr, 0, nullptr, nullptr);
     CHECK_OPENSL_ERROR("Failed to create engine");
 
     // realize the engine in synchronous mode
@@ -157,8 +155,6 @@ bool AudioOutputOpenSLES::CreateEngine()
 
 bool AudioOutputOpenSLES::StartPlayer()
 {
-    SLresult       result;
-
     // configure audio source - this defines the number of samples you can enqueue.
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
         SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
@@ -208,6 +204,7 @@ bool AudioOutputOpenSLES::StartPlayer()
     const std::array<SLInterfaceID,2> ids2 { m_slIidAndroidSimpleBufferQueue, m_slIidVolume };
     static const std::array<SLboolean,2> req2 { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
+    SLresult result {0};
     if (GetNativeOutputSampleRate() >= m_sampleRate) { // FIXME
         result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
                                    &audioSnk, ids2.size(), ids2.data(), req2.data());
@@ -253,9 +250,9 @@ bool AudioOutputOpenSLES::StartPlayer()
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
     uint32_t samplesPerBuf = OPENSLES_BUFLEN.count() * m_sampleRate / 1000;
-    m_buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * m_bytesPerFrame);
-    if (!m_buf)
-    {
+    try {
+        m_buf.resize(OPENSLES_BUFFERS * samplesPerBuf * m_bytesPerFrame);
+    } catch (std::bad_alloc &ex) {
         Stop();
         return false;
     }
@@ -280,20 +277,16 @@ bool AudioOutputOpenSLES::StartPlayer()
 
 bool AudioOutputOpenSLES::Stop()
 {
-    SLresult       result;
     if (m_playerObject)
     {
         // set the player's state to playing
-        result = SetPlayState(m_playerPlay, SL_PLAYSTATE_STOPPED);
+        SLresult result = SetPlayState(m_playerPlay, SL_PLAYSTATE_STOPPED);
         CHECK_OPENSL_ERROR("Failed to switch to not playing state");
         Destroy(m_playerObject);
         m_playerObject = nullptr;
     }
-    if (m_buf)
-    {
-        free(m_buf);
-        m_buf = nullptr;
-    }
+    m_buf.clear();
+    m_buf.shrink_to_fit();
     return true;
 }
 
@@ -525,7 +518,7 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     // Convert UI volume to linear factor (cube) in log
     float vol = volume / 100.0F;
 
-    int mb;
+    int mb = 0;
     if (volume == 0)
     {
         mb = SL_MILLIBEL_MIN;

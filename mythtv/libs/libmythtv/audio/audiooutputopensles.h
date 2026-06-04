@@ -65,7 +65,7 @@ class AudioOutputOpenSLES : public AudioOutputBase
     SLInterfaceID                   m_slIidPlay         {nullptr};
 
     /* audio buffered through opensles */
-    uint8_t                        *m_buf               {nullptr};
+    std::vector<uint8_t>            m_buf;
     int                             m_bufWriteBase     {0}; // always fragment aligned
     int                             m_bufWriteIndex    {0}; // offset from base
 
