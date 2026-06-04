@@ -1497,16 +1497,18 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
                                   [[maybe_unused]] const QString &videodev)
 {
     QString hostname = gCoreContext->GetHostName().toLower();
-    QString cardtype = card;
     uint profileId = 0;
 
 #if CONFIG_V4L2
+    QString cardtype = card;
     if (cardtype == "V4L2ENC")
     {
         m_v4l2util = new V4L2util(videodev);
         if (m_v4l2util->IsOpen())
             cardtype = m_v4l2util->ProfileName();
     }
+#else
+    const QString& cardtype = card;
 #endif
 
     MSqlQuery result(MSqlQuery::InitCon());

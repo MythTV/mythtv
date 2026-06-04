@@ -57,6 +57,7 @@ void* MythMediaCodecInterop::GetSurface(void)
 
 void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
 {
+    // NOLINTNEXTLINE(performance-no-int-to-ptr)
     QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
     if (wait)
         wait->wakeAll();

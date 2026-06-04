@@ -432,7 +432,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
 
             // Match mimetype to types supported by FFmpeg
             QString typestr = type.toString();
-            for (auto mimetype : mimetypes)
+            for (const auto& mimetype : mimetypes)
             {
                 if (mimetype.first != typestr)
                     continue;
