@@ -22,7 +22,7 @@ class MythMediaCodecInterop : public MythOpenGLInterop
 {
   public:
     static MythMediaCodecInterop* CreateMediaCodec(MythPlayerUI* Player, MythRenderOpenGL* Context, QSize Size);
-    virtual std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
+    std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
                                                          MythVideoColourSpace *ColourSpace,
                                                          MythVideoFrame *Frame, FrameScanType Scan) override;
     void* GetSurface(void);

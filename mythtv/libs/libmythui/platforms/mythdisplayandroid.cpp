@@ -22,10 +22,6 @@ MythDisplayAndroid::MythDisplayAndroid()
     Initialise();
 }
 
-MythDisplayAndroid::~MythDisplayAndroid()
-{
-}
-
 void MythDisplayAndroid::UpdateCurrentMode(void)
 {
     QAndroidJniEnvironment env;
@@ -44,11 +40,11 @@ void MythDisplayAndroid::UpdateCurrentMode(void)
         env->ExceptionClear();
         display.callMethod<void>("getMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
     }
-    float xdpi = displayMetrics.getField<jfloat>("xdpi");
-    float ydpi = displayMetrics.getField<jfloat>("ydpi");
+    auto xdpi = displayMetrics.getField<jfloat>("xdpi");
+    auto ydpi = displayMetrics.getField<jfloat>("ydpi");
     int height = displayMetrics.getField<jint>("heightPixels");
     int width = displayMetrics.getField<jint>("widthPixels");
-    float rate = display.callMethod<jfloat>("getRefreshRate");
+    auto rate = display.callMethod<jfloat>("getRefreshRate");
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("rate:%1 h:%2 w:%3 xdpi:%4 ydpi:%5")
         .arg(rate).arg(height).arg(width)

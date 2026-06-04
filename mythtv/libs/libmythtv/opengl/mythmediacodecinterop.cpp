@@ -58,7 +58,7 @@ void* MythMediaCodecInterop::GetSurface(void)
 void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject)
 {
     // NOLINTNEXTLINE(performance-no-int-to-ptr)
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
     if (wait)
         wait->wakeAll();
 }
@@ -150,7 +150,7 @@ MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Retrieve buffer
-    AVMediaCodecBuffer *buffer = reinterpret_cast<AVMediaCodecBuffer*>(Frame->m_buffer);
+    auto *buffer = reinterpret_cast<AVMediaCodecBuffer*>(Frame->m_buffer);
     if (!buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "No AVMediaCodecBuffer");

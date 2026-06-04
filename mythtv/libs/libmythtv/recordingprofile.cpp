@@ -1428,6 +1428,7 @@ RecordingProfile::RecordingProfile(const QString& profName)
     }
 };
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 RecordingProfile::~RecordingProfile(void)
 {
 #if CONFIG_V4L2

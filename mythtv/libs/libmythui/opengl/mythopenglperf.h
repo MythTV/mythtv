@@ -19,14 +19,14 @@ using GLuint64 = uint64_t;
 class QOpenGLTimeMonitor
 {
   public:
-    QOpenGLTimeMonitor() {};
+    QOpenGLTimeMonitor() = default;
     void setSampleCount(int) {};
     int  sampleCount() const { return 0; };
     bool create() { return false; };
     bool isCreated() const { return false; };
     int  recordSample() { return 0; };
     bool isResultAvailable() const { return false; };
-    QVector<GLuint64> waitForIntervals() const { return QVector<GLuint64>(); };
+    QVector<GLuint64> waitForIntervals() const { return {}; };
     void reset() {};
 };
 #endif

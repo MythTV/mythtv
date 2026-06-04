@@ -8,7 +8,7 @@ class MythDisplayAndroid : public MythDisplay
 {
   public:
     MythDisplayAndroid();
-   ~MythDisplayAndroid() override;
+   ~MythDisplayAndroid() override = default;
 
   protected:
     void UpdateCurrentMode(void) override;

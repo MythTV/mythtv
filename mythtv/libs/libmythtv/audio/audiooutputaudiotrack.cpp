@@ -13,8 +13,8 @@
 #include "libmythbase/mythlogging.h"
 #include "audiooutputaudiotrack.h"
 
-#define CHANNELS_MIN 1
-#define CHANNELS_MAX 8
+static constexpr uint8_t CHANNELS_MIN { 1 };
+static constexpr uint8_t CHANNELS_MAX { 8 };
 
 #define ANDROID_EXCEPTION_CHECK \
   if (env->ExceptionCheck()) { \
@@ -35,14 +35,16 @@
 
 // Constants from Android Java API
 // class android.media.AudioFormat
-#define AF_CHANNEL_OUT_MONO 4
-#define AF_ENCODING_AC3 5
-#define AF_ENCODING_E_AC3 6
-#define AF_ENCODING_DTS 7
-#define AF_ENCODING_DOLBY_TRUEHD 14
-#define AF_ENCODING_PCM_8BIT 3
-#define AF_ENCODING_PCM_16BIT 2
-#define AF_ENCODING_PCM_FLOAT 4
+enum AF : uint8_t {
+    AF_CHANNEL_OUT_MONO = 4,
+    AF_ENCODING_AC3 = 5,
+    AF_ENCODING_E_AC3 = 6,
+    AF_ENCODING_DTS = 7,
+    AF_ENCODING_DOLBY_TRUEHD = 14,
+    AF_ENCODING_PCM_8BIT = 3,
+    AF_ENCODING_PCM_16BIT = 2,
+    AF_ENCODING_PCM_FLOAT = 4,
+};
 
 // for debugging
 #include <android/log.h>
@@ -164,7 +166,7 @@ AudioOutputSettings* AudioOutputAudioTrack::GetOutputSettings(bool /* digital */
     QAndroidJniEnvironment env;
     jint bufsize = 0;
 
-    AudioOutputSettings *settings = new AudioOutputSettings();
+    auto *settings = new AudioOutputSettings();
 
     int supportedrate = 0;
     while (int rate = settings->GetNextRate())

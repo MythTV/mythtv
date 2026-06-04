@@ -19,12 +19,12 @@
 
 #define LOC QString("AOSLES: ")
 
-#define OPENSLES_BUFFERS 10  /* maximum number of buffers */
+static constexpr size_t OPENSLES_BUFFERS { 10 };  /* maximum number of buffers */
 static constexpr std::chrono::milliseconds OPENSLES_BUFLEN { 10ms };
-//#define POSITIONUPDATEPERIOD 1000
-//#define POSITIONUPDATEPERIOD 25000
-#define POSITIONUPDATEPERIOD 40
-//#define POSITIONUPDATEPERIOD 200000
+// static constexpr int32_t POSITIONUPDATEPERIOD { 1000 };
+// static constexpr int32_t POSITIONUPDATEPERIOD { 25000 };
+static constexpr int32_t POSITIONUPDATEPERIOD { 40 };
+// static constexpr int32_t POSITIONUPDATEPERIOD { 200000 };
 
 #define CHECK_OPENSL_ERROR(msg)                \
     if (result != SL_RESULT_SUCCESS) \
@@ -142,9 +142,10 @@ bool AudioOutputOpenSLES::CreateEngine()
     CHECK_OPENSL_ERROR("Failed to get the engine interface");
 
     // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids1[] = { m_SL_IID_VOLUME };
-    const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = CreateOutputMix(m_engineEngine, &m_outputMixObject, 1, ids1, req1);
+    const std::array<SLInterfaceID,1> ids1 { m_SL_IID_VOLUME };
+    const std::array<SLboolean,1> req1 { SL_BOOLEAN_FALSE };
+    result = CreateOutputMix(m_engineEngine, &m_outputMixObject,
+                             1, ids1.data(), req1.data());
     CHECK_OPENSL_ERROR("Failed to create output mix");
 
     // realize the output mix in synchronous mode
@@ -204,13 +205,12 @@ bool AudioOutputOpenSLES::StartPlayer()
     SLDataSink audioSnk = {&loc_outmix, nullptr};
 
     //create audio player
-    const SLInterfaceID ids2[] = { m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, m_SL_IID_VOLUME };
-    static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+    const std::array<SLInterfaceID,2> ids2 { m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, m_SL_IID_VOLUME };
+    static const std::array<SLboolean,2> req2 { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
     if (GetNativeOutputSampleRate() >= m_sampleRate) { // FIXME
         result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
-                                    &audioSnk, sizeof(ids2) / sizeof(*ids2),
-                                    ids2, req2);
+                                   &audioSnk, ids2.size(), ids2.data(), req2.data());
     } else {
         // Don't try to play back a sample rate higher than the native one,
         // since OpenSL ES will try to use the fast path, which AudioFlinger
@@ -225,8 +225,7 @@ bool AudioOutputOpenSLES::StartPlayer()
         //fmt->i_rate = 44100;
         format_pcm.samplesPerSec = ((SLuint32) 48000 * 1000) ;
         result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
-                &audioSnk, sizeof(ids2) / sizeof(*ids2),
-                ids2, req2);
+                &audioSnk, ids2.size(), ids2.data(), req2.data());
     }
     CHECK_OPENSL_ERROR("Failed to create audio player");
 
@@ -351,7 +350,7 @@ AudioOutputOpenSLES::~AudioOutputOpenSLES()
 
 AudioOutputSettings* AudioOutputOpenSLES::GetOutputSettings(bool /*digital*/)
 {
-    AudioOutputSettings *settings = new AudioOutputSettings();
+    auto *settings = new AudioOutputSettings();
 
     int32_t nativeRate = GetNativeOutputSampleRate(); // in Hz
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Native Rate %1").arg(nativeRate));

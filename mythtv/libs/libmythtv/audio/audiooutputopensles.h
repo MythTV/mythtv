@@ -19,7 +19,7 @@ class AudioOutputOpenSLES : public AudioOutputBase
   friend class AudioOutputOpenSLESPrivate;
   public:
     explicit AudioOutputOpenSLES(const AudioSettings &settings);
-    virtual ~AudioOutputOpenSLES();
+    ~AudioOutputOpenSLES() override;
 
   protected:
     bool OpenDevice(void) override; // AudioOutputBase

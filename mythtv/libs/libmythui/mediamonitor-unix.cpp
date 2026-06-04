@@ -487,7 +487,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         flags |= kMSStdErr;
 
     // TODO: change this to a MythSystemLegacy on the stack?
-    MythSystemLegacy *udevinfo = new MythSystemLegacy("udevinfo", args, flags);
+    auto *udevinfo = new MythSystemLegacy("udevinfo", args, flags);
     udevinfo->Run(4s);
     if( udevinfo->Wait() != GENERIC_EXIT_OK )
     {
