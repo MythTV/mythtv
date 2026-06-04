@@ -136,7 +136,8 @@ bool AudioOutputOpenSLES::CreateEngine()
     CHECK_OPENSL_ERROR("Failed to realize engine");
 
     // get the engine interface, needed to create other objects
-    result = GetInterface(m_engineObject, m_slIidEngine, &m_engineEngine);
+    result = GetInterface(m_engineObject, m_slIidEngine,
+                          static_cast<void*>(&m_engineEngine));
     CHECK_OPENSL_ERROR("Failed to get the engine interface");
 
     // create output mix, with environmental reverb specified as a non-required interface
@@ -229,14 +230,16 @@ bool AudioOutputOpenSLES::StartPlayer()
     result = Realize(m_playerObject, SL_BOOLEAN_FALSE);
     CHECK_OPENSL_ERROR("Failed to realize player object.");
 
-    result = GetInterface(m_playerObject, m_slIidPlay, &m_playerPlay);
+    result = GetInterface(m_playerObject, m_slIidPlay,
+                          static_cast<void*>(&m_playerPlay));
     CHECK_OPENSL_ERROR("Failed to get player interface.");
 
-    result = GetInterface(m_playerObject, m_slIidVolume, &m_volumeItf);
+    result = GetInterface(m_playerObject, m_slIidVolume,
+                          static_cast<void*>(&m_volumeItf));
     CHECK_OPENSL_ERROR("failed to get volume interface.");
 
     result = GetInterface(m_playerObject, m_slIidAndroidSimpleBufferQueue,
-                                                  &m_playerBufferQueue);
+                          static_cast<void*>(&m_playerBufferQueue));
     CHECK_OPENSL_ERROR("Failed to get buff queue interface");
 
     result = RegisterCallback(m_playerBufferQueue,
