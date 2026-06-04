@@ -880,7 +880,7 @@ RecorderBase *RecorderBase::CreateRecorder(
 
     RecorderBase *recorder = nullptr;
     if (genOpt.m_inputType == "IMPORT")
-    {
+    { //NOLINT(bugprone-branch-clone)
         recorder = new ImportRecorder(tvrec);
     }
     else if (genOpt.m_inputType == "EXTERNAL")
@@ -902,7 +902,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     }
 #else
     else if (genOpt.m_inputType == "DEMO")
-    {
+    { //NOLINT(bugprone-branch-clone)
         recorder = new ImportRecorder(tvrec);
     }
 #endif // CONFIG_V4L2
