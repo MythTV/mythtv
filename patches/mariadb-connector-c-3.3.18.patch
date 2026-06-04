@@ -1,0 +1,54 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4ddf618..2a39c38 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,7 +2,9 @@
+ 
+ # This is the LGPL libmariadb project.
+ 
+-CMAKE_MINIMUM_REQUIRED(VERSION 3.5.1 FATAL_ERROR)
++#MythTV requires a minimum of 3.16. Bump the version here to eliminate a warning about 2.8.12.
++CMAKE_MINIMUM_REQUIRED(VERSION 3.16 FATAL_ERROR)
++
+ INCLUDE(CheckFunctionExists)
+ IF(COMMAND CMAKE_POLICY)
+   SET(NEW_POLICIES CMP0003 CMP0022 CMP0023 CMP0057 CMP0077 CMP0069 CMP0075)
+@@ -151,6 +153,9 @@ IF(CMAKE_COMPILER_IS_GNUCC)
+   ENDFOREACH()
+ ENDIF()
+ 
++# MythTV tweaks
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dushort=uint16_t -Wno-pointer-sign")
++
+ # If the build type isn't specified, set to Relwithdebinfo as default.
+ IF(NOT CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE "RelWithDebInfo")
+diff --git a/cmake/check_include_files.cmake b/cmake/check_include_files.cmake
+index 50e289f..6ccb2cc 100644
+--- a/cmake/check_include_files.cmake
++++ b/cmake/check_include_files.cmake
+@@ -50,7 +50,7 @@ ENDIF()
+ IF(APPLE)
+   SET(CMAKE_REQUIRED_DEFINITIONS -D_XOPEN_SOURCE=600)
+ ENDIF()
+-CHECK_INCLUDE_FILES (ucontext.h HAVE_FILE_UCONTEXT_H)
++#CHECK_INCLUDE_FILES (ucontext.h HAVE_FILE_UCONTEXT_H)
+ IF(NOT HAVE_FILE_UCONTEXT_H)
+-  CHECK_INCLUDE_FILES (sys/ucontext.h HAVE_FILE_UCONTEXT_H)
++  #CHECK_INCLUDE_FILES (sys/ucontext.h HAVE_FILE_UCONTEXT_H)
+ ENDIF()
+diff --git a/include/ma_global.h b/include/ma_global.h
+index 1b9b346..c5911ce 100644
+--- a/include/ma_global.h
++++ b/include/ma_global.h
+@@ -685,8 +685,10 @@ typedef unsigned long	size_s; /* Size of strings (In string-funcs) */
+ typedef int		myf;	/* Type of MyFlags in my_funcs */
+ typedef char		my_bool; /* Small bool */
+ typedef unsigned long long my_ulonglong;
++#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
+ #if !defined(bool) && !defined(bool_defined) && (!defined(HAVE_BOOL) || !defined(__cplusplus)) && (__STDC_VERSION__ < 202300L)
+ typedef char		bool;	/* Ordinary boolean values 0 1 */
++#endif
+ #endif
+ 	/* Macros for converting *constants* to the right type */
+ #define INT8(v)		(int8) (v)

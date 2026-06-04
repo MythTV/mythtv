@@ -25,16 +25,22 @@ function(find_or_build_maria_db_connector)
       PROPERTY MANUALLY_ADDED_DEPENDENCIES)
   endif()
 
-  set(MARIADB_C_VERSION "3.3.5")
+  set(MARIADB_C_VERSION "3.3.18")
   set(MARIADB_C_PREFIX "mariadb-connector-c-${MARIADB_C_VERSION}")
   set(MARIADB_C_2.3.7_SHA256
       "94f9582da738809ae1d9f1813185165ec7c8caf9195bdd04e511f6bdcb883f8e")
   set(MARIADB_C_3.3.5_SHA256
       "ca72eb26f6db2befa77e48ff966f71bcd3cb44b33bd8bbb810b65e6d011c1e5c")
+  set(MARIADB_C_3.3.18_SHA256
+      "292c0f2e6ce5cb6f1217f3a53c72f792e55fb20393e00924b11943e2f9f6e9d5")
+  set(MARIADB_C_3.4.8_SHA256
+      "156aed3b49f857d0ac74fb76f1982968bcbfd8382da3f5b6ae71f616729920d7")
   ExternalProject_Add(
     mariadb-connector
     DOWNLOAD_DIR ${TARBALL_DIR}
-    URL https://downloads.mariadb.com/Connectors/c/connector-c-${MARIADB_C_VERSION}/${MARIADB_C_PREFIX}-src.tar.gz
+#    URL https://downloads.mariadb.com/Connectors/c/connector-c-${MARIADB_C_VERSION}/${MARIADB_C_PREFIX}-src.tar.gz
+    URL https://dlm.mariadb.com/4516876/Connectors/c/connector-c-3.3.18/mariadb-connector-c-3.3.18-src.tar.gz
+#    URL https://dlm.mariadb.com/4516944/Connectors/c/connector-c-3.4.8/mariadb-connector-c-3.4.8-src.tar.gz
     URL_HASH SHA256=${MARIADB_C_${MARIADB_C_VERSION}_SHA256}
     PATCH_COMMAND patch -p1 <
                   ${PROJECT_SOURCE_DIR}/patches/${MARIADB_C_PREFIX}.patch
