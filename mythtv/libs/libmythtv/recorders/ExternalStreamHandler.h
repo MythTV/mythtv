@@ -101,10 +101,10 @@ class ExternalStreamHandler : public StreamHandler
     void UnlockReplay(bool enable_replay = false)
         { m_replay = enable_replay; m_replayLock.unlock(); }
     void ReplayStream(void);
-    bool StartStreaming(void);
+    bool StartStreaming(bool recording);
     bool StopStreaming(void);
 
-    bool CheckForError(void);
+    bool Monitor(void);
 
     void PurgeBuffer(void);
 
@@ -146,6 +146,7 @@ class ExternalStreamHandler : public StreamHandler
     QByteArray    m_replayBuffer;
     bool          m_replay               {false};
     bool          m_xon                  {false};
+    bool          m_recording            {false};
     bool          m_damaged              {false};
 
     // for implementing Get & Return

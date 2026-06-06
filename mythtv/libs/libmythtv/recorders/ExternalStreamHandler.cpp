@@ -679,7 +679,7 @@ void ExternalStreamHandler::run(void)
                 // Since we may never need to send the XOFF
                 // command, occationally check to see if the
                 // External recorder needs to report an issue.
-                if (CheckForError())
+                if (Monitor())
                 {
                     if (restart_cnt++)
                         std::this_thread::sleep_for(20s);
@@ -1090,7 +1090,7 @@ bool ExternalStreamHandler::RestartStream(void)
     std::this_thread::sleep_for(1s);
 
     if (streaming)
-        return StartStreaming();
+        return StartStreaming(m_recording);
 
     return true;
 }
@@ -1138,7 +1138,7 @@ void ExternalStreamHandler::ReplayStream(void)
     }
 }
 
-bool ExternalStreamHandler::StartStreaming(void)
+bool ExternalStreamHandler::StartStreaming(bool recording)
 {
     QString result;
 
@@ -1171,13 +1171,13 @@ bool ExternalStreamHandler::StartStreaming(void)
 
             return false;
         }
-
         LOG(VB_RECORD, LOG_INFO, LOC + "Streaming started");
     }
     else
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Already streaming");
     }
+    m_recording = recording;
 
     m_streamingCnt.ref();
 
@@ -1241,6 +1241,7 @@ bool ExternalStreamHandler::StopStreaming(void)
         return false;
     }
 
+    m_recording = false;
     PurgeBuffer();
     LOG(VB_RECORD, LOG_INFO, LOC + "Streaming stopped");
 
@@ -1686,7 +1687,7 @@ bool ExternalStreamHandler::ProcessJson(const QVariantMap & vmsg,
     return false;
 }
 
-bool ExternalStreamHandler::CheckForError(void)
+bool ExternalStreamHandler::Monitor(void)
 {
     QByteArray response;
     bool       err = false;
@@ -1762,13 +1763,15 @@ bool ExternalStreamHandler::CheckForError(void)
                                                Qt::CaseInsensitive))
                     {
                         level = LOG_WARNING;
-                        m_damaged |= true;
+                        if (m_recording)
+                            m_damaged |= true;
                     }
 
                     if (message.trimmed().startsWith("damage",
                                                      Qt::CaseInsensitive))
                     {
-                        m_damaged |= true;
+                        if (m_recording)
+                            m_damaged |= true;
                     }
 
                     LOG(VB_RECORD, level,
@@ -1790,16 +1793,18 @@ bool ExternalStreamHandler::CheckForError(void)
                 {
                     err |= tokens[idx].startsWith("ERR",
                                                   Qt::CaseInsensitive);
-                    m_damaged |= tokens[idx].startsWith("damage",
-                                                       Qt::CaseInsensitive);
+                    if (m_recording)
+                        m_damaged |= tokens[idx].startsWith("damage",
+                                                     Qt::CaseInsensitive);
                 }
             }
             else
             {
                 err |= res.startsWith("STATUS:ERR",
                                       Qt::CaseInsensitive);
-                m_damaged |= res.startsWith("STATUS:DAMAGE",
-                                           Qt::CaseInsensitive);
+                if (m_recording)
+                    m_damaged |= res.startsWith("STATUS:DAMAGE",
+                                                Qt::CaseInsensitive);
             }
 
             LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + res);

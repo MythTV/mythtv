@@ -228,7 +228,7 @@ bool ExternalRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 bool ExternalRecorder::StartStreaming(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "StartStreaming");
-    return m_streamHandler && m_streamHandler->StartStreaming();
+    return m_streamHandler && m_streamHandler->StartStreaming(true);
 }
 
 bool ExternalRecorder::StopStreaming(void)

@@ -174,7 +174,7 @@ void ExternalSignalMonitor::UpdateValues(void)
         if (!m_streamHandlerStarted)
         {
             m_streamHandler->AddListener(GetStreamData());
-            m_streamHandler->StartStreaming();
+            m_streamHandler->StartStreaming(false);
             m_streamHandlerStarted = true;
         }
     }
