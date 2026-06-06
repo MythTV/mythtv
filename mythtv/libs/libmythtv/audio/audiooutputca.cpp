@@ -105,8 +105,8 @@ public:
     CoreAudioData(AudioOutputCA *parent, const QString& deviceName);
 
     static AudioDeviceID GetDefaultOutputDevice();
-    int  GetTotalOutputChannels();
-    QString *GetName();
+    int GetTotalOutputChannels() const;
+    QString *GetName() const;
     static AudioDeviceID GetDeviceWithName(const QString& deviceName);
 
     bool OpenDevice();
@@ -120,13 +120,13 @@ public:
     static pid_t GetHogStatus();
     bool SetHogStatus(bool hog);
     bool SetMixingSupport(bool mix);
-    bool GetMixingSupport();
+    bool GetMixingSupport() const;
 
-    bool FindAC3Stream();
+    bool FindAC3Stream() const;
     static void ResetAudioDevices();
     static void ResetStream(AudioStreamID s);
     static RatesVec RatesList(AudioDeviceID d);
-    bool ChannelsList(AudioDeviceID d, bool passthru, ChannelsArr& chans);
+    bool ChannelsList(AudioDeviceID d, bool passthru, ChannelsArr& chans) const;
 
     static AudioStreamIDVec      StreamsList(AudioDeviceID d);
     static AudioStreamRangedVec  FormatsList(AudioStreamID s);
@@ -602,7 +602,7 @@ AudioDeviceID CoreAudioData::GetDefaultOutputDevice()
     return deviceId;
 }
 
-int CoreAudioData::GetTotalOutputChannels()
+int CoreAudioData::GetTotalOutputChannels() const
 {
     if (!mDeviceID)
         return 0;
@@ -647,7 +647,7 @@ int CoreAudioData::GetTotalOutputChannels()
     return channels;
 }
 
-QString *CoreAudioData::GetName()
+QString *CoreAudioData::GetName() const
 {
     if (!mDeviceID)
         return nullptr;
@@ -826,7 +826,7 @@ bool CoreAudioData::SetMixingSupport(bool mix)
     return true;
 }
 
-bool CoreAudioData::GetMixingSupport()
+bool CoreAudioData::GetMixingSupport() const
 {
     if (!mDeviceID)
         return false;
@@ -1026,7 +1026,7 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
     return finalvec;
 }
 
-bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr& chans)
+bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr& chans) const
 {
     AudioStreamIDVec            streams;
     AudioStreamRangedVec        formats;
@@ -1620,7 +1620,7 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
     return true;
 }
 
-bool CoreAudioData::FindAC3Stream()
+bool CoreAudioData::FindAC3Stream() const
 {
     AudioStreamIDVec streams;
 

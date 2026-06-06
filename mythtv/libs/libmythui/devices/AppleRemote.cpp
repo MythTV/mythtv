@@ -216,9 +216,7 @@ bool AppleRemote::_initCookies()
     IOReturn                  success;
 
     handle  = (IOHIDDeviceInterface122**)hidDeviceInterface;
-    success = (*handle)->copyMatchingElements(handle,
-                                              nullptr,
-                                              (CFArrayRef*)&elements);
+    success = (*handle)->copyMatchingElements(handle, nullptr, &elements);
 
     if (success == kIOReturnSuccess)
     {

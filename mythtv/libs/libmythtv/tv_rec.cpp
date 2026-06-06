@@ -4978,7 +4978,7 @@ static void apply_broken_dvb_driver_crc_hack(ChannelBase *c, MPEGStreamData *s)
         s->SetIgnoreCRC(dvb->HasCRCBug());
 }
 #else
-static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*) {}
+static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/) {}
 #endif // CONFIG_DVB
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -464,7 +464,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
                 const QString& desc = i.value();
                 QString devname = QString("CoreAudio:%1").arg(key);
 
-                auto adc = GetAudioDeviceConfig(devname, desc);
+                auto *adc = GetAudioDeviceConfig(devname, desc);
                 if (!adc)
                     continue;
                 list->append(*adc);
@@ -474,7 +474,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         delete devs;
         QString name = "CoreAudio:Default Output Device";
         QString desc = tr("CoreAudio default output");
-        auto adc = GetAudioDeviceConfig(name, desc);
+        auto *adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);

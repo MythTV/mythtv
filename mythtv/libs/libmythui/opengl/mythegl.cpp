@@ -33,6 +33,7 @@ bool MythEGL::IsEGL()
     return InitEGL();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool MythEGL::InitEGL(void)
 {
     // N.B. Strictly speaking this reports both whether EGL is in use and whether
@@ -62,6 +63,7 @@ bool MythEGL::InitEGL(void)
     return false;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool MythEGL::HasEGLExtension([[maybe_unused]] const QString& Extension)
 {
 #if CONFIG_EGL

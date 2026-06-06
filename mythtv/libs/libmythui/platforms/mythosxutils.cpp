@@ -25,7 +25,7 @@
 
 int get_int_CF(CFDictionaryRef dict, CFStringRef key)
 {
-    auto ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
+    const auto *ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
     int val = 0;
     if (!ref )
         puts("get_int_CF() - Failed to get number reference");
@@ -36,7 +36,7 @@ int get_int_CF(CFDictionaryRef dict, CFStringRef key)
 
 float get_float_CF(CFDictionaryRef dict, CFStringRef key)
 {
-    auto ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
+    const auto *ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
     float val = 0.0;
     if (!ref )
         puts("get_float_CF() - Failed to get number reference");
@@ -47,7 +47,7 @@ float get_float_CF(CFDictionaryRef dict, CFStringRef key)
 
 double get_double_CF(CFDictionaryRef dict, CFStringRef key)
 {
-    auto ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
+    const auto *ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
     double val = 0.0;
     if (!ref )
         puts("get_float_CF() - Failed to get number reference");
@@ -58,7 +58,7 @@ double get_double_CF(CFDictionaryRef dict, CFStringRef key)
 
 bool get_bool_CF(CFDictionaryRef dict, CFStringRef key)
 {
-    auto ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
+    const auto *ref = (CFNumberRef)CFDictionaryGetValue(dict, key);
     bool val = false;
     if (!ref)
         puts("get_float_CF() - Failed to get number reference");

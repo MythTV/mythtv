@@ -9,7 +9,6 @@
 #define LOC QString("DisplayOSX: ")
 
 MythDisplayOSX::MythDisplayOSX()
-  : MythDisplay()
 {
     Initialise();
 }
@@ -85,7 +84,7 @@ const MythDisplayModes& MythDisplayOSX::GetVideoModes(void)
 
     for (int i = 0; i < CFArrayGetCount(modes); ++i)
     {
-        auto mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
+        auto *mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
         double rate     = CGDisplayModeGetRefreshRate(mode);
         bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
         int width       = static_cast<int>(CGDisplayModeGetWidth(mode));
@@ -146,7 +145,7 @@ bool MythDisplayOSX::SwitchToVideoMode(QSize Size, double DesiredRate)
     CGDisplayCapture(disp);
     CGDisplayConfigRef cfg;
     CGBeginDisplayConfiguration(&cfg);
-    CGConfigureDisplayFadeEffect(cfg, 0.3f, 0.5f, 0, 0, 0);
+    CGConfigureDisplayFadeEffect(cfg, 0.3F, 0.5F, 0, 0, 0);
     CGDisplaySetDisplayMode(disp, m_modeMap.value(mode), nullptr);
     CGError err = CGCompleteDisplayConfiguration(cfg, kCGConfigureForAppOnly);
     CGDisplayRelease(disp);
