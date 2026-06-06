@@ -13,7 +13,7 @@
 
 CGDirectDisplayID GetOSXCocoaDisplay(void* View)
 {
-    NSView *thisview = static_cast<NSView *>(View);
+    auto* thisview = static_cast<NSView *>(View);
     if (!thisview)
         return 0;
     NSScreen *screen = [[thisview window] screen];
@@ -52,15 +52,15 @@ QByteArray GetOSXEDID(CGDirectDisplayID Display)
     while ((service = IOIteratorNext(iter)) != 0)
     {
         CFDictionaryRef info     = IODisplayCreateInfoDictionary(service, kIODisplayOnlyPreferredName);
-        CFNumberRef vendorID     = static_cast<CFNumberRef>(CFDictionaryGetValue(info, CFSTR(kDisplayVendorID)));
-        CFNumberRef productID    = static_cast<CFNumberRef>(CFDictionaryGetValue(info, CFSTR(kDisplayProductID)));
-        CFNumberRef serialNumber = static_cast<CFNumberRef>(CFDictionaryGetValue(info, CFSTR(kDisplaySerialNumber)));
+        auto vendorID     = static_cast<CFNumberRef>(CFDictionaryGetValue(info, CFSTR(kDisplayVendorID)));
+        auto productID    = static_cast<CFNumberRef>(CFDictionaryGetValue(info, CFSTR(kDisplayProductID)));
+        auto serialNumber = static_cast<CFNumberRef>(CFDictionaryGetValue(info, CFSTR(kDisplaySerialNumber)));
 
         if (CFNumberEqualsUInt32(vendorID, vendor) &&
             CFNumberEqualsUInt32(productID, model) &&
             CFNumberEqualsUInt32(serialNumber, serial))
         {
-            CFDataRef edid = static_cast<CFDataRef>(CFDictionaryGetValue(info, CFSTR(kIODisplayEDIDKey)));
+            auto edid = static_cast<CFDataRef>(CFDictionaryGetValue(info, CFSTR(kIODisplayEDIDKey)));
             if (edid)
             {
                 const char* data = reinterpret_cast<const char*>(CFDataGetBytePtr(edid));

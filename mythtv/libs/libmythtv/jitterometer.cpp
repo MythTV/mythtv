@@ -212,7 +212,7 @@ QString Jitterometer::GetCPUStat(void)
             double totaldelta = stats[1] - m_lastStats[ptr + 1];
             if (totaldelta > 0)
                 result += QString("%1% ").arg(((totaldelta - idledelta) / totaldelta) * 100.0, 0, 'f', 0);
-            std::copy(stats.cbegin(), stats.cend(), &m_lastStats[ptr]);
+            std::ranges::copy(stats, &m_lastStats[ptr]);
             ptr += 2;
         }
     }

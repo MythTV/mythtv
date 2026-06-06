@@ -21,14 +21,16 @@ class MythVTBInterop : public MythOpenGLInterop
     CVPixelBufferRef Verify(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
                             MythVideoFrame* Frame);
     MythVTBInterop(MythPlayerUI* Player, MythRenderOpenGL *Context, MythOpenGLInterop::InteropType Type);
-   ~MythVTBInterop() override;
+   ~MythVTBInterop() override = default;
+
 };
 
 class MythVTBSurfaceInterop : public MythVTBInterop
 {
   public:
     explicit MythVTBSurfaceInterop(MythPlayerUI* Player, MythRenderOpenGL *Context);
-   ~MythVTBSurfaceInterop() override;
+   ~MythVTBSurfaceInterop() override= default;
+
 
     std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL*     Context,
                                                  MythVideoColourSpace* ColourSpace,

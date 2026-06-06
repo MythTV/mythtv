@@ -32,8 +32,8 @@ static constexpr int8_t kMythAudioObjectPropertyElementMain { 0 };
 
 #define LOC QString("CoreAudio: ")
 
-#define CHANNELS_MIN 1
-#define CHANNELS_MAX 8
+static constexpr int CHANNELS_MIN { 1 };
+static constexpr int CHANNELS_MAX { 8 };
 
 using AudioStreamIDVec = std::vector<AudioStreamID>;
 using AudioStreamRangedVec = std::vector<AudioStreamRangedDescription>;
@@ -46,13 +46,13 @@ char* UInt32ToFourCC(const UInt32* pVal)
 {
     UInt32 inVal = *pVal;
     char* pIn = (char*)&inVal;
-    static char fourCC[5];
+    static std::array<char,5> fourCC;
     fourCC[4] = 0;
     fourCC[3] = pIn[0];
     fourCC[2] = pIn[1];
     fourCC[1] = pIn[2];
     fourCC[0] = pIn[3];
-    return fourCC;
+    return fourCC.data();
 }
 
 QString StreamDescriptionToString(AudioStreamBasicDescription desc)
@@ -937,8 +937,8 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
     return vec;
 }
 
-static UInt32   sNumberCommonSampleRates = 15;
-static Float64  sCommonSampleRates[] = {
+static constexpr UInt32   sNumberCommonSampleRates = 15;
+static std::array<Float64,sNumberCommonSampleRates>  sCommonSampleRates = {
     8000.0,   11025.0,  12000.0,
     16000.0,  22050.0,  24000.0,
     32000.0,  44100.0,  48000.0,

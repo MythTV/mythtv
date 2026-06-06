@@ -31,9 +31,8 @@
 AppleRemote*    AppleRemote::_instance = nullptr;
 
 
-#define REMOTE_SWITCH_COOKIE 19
-#define REMOTE_COOKIE_STR    "19_"
-#define LONG_PRESS_COUNT     10
+static constexpr int REMOTE_SWITCH_COOKIE { 19 };
+static constexpr const char* REMOTE_COOKIE_STR { "19_" };
 
 #define LOC QString("AppleRemote::")
 

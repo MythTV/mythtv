@@ -328,7 +328,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     avformat_close_input(&inputFC);
     inputFC = nullptr;
 
-    std::chrono::seconds dbLength = duration_cast<std::chrono::seconds>(mdata->Length());
+    auto dbLength = duration_cast<std::chrono::seconds>(mdata->Length());
     if (dbLength != duration)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("The length of this track in the database was %1s "

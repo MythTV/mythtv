@@ -85,7 +85,7 @@ const MythDisplayModes& MythDisplayOSX::GetVideoModes(void)
 
     for (int i = 0; i < CFArrayGetCount(modes); ++i)
     {
-        CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
+        auto mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
         double rate     = CGDisplayModeGetRefreshRate(mode);
         bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
         int width       = static_cast<int>(CGDisplayModeGetWidth(mode));
@@ -111,8 +111,8 @@ const MythDisplayModes& MythDisplayOSX::GetVideoModes(void)
 
     CFRelease(modes);
 
-    for (auto it = screen_map.begin(); screen_map.end() != it; ++it)
-        m_videoModes.push_back(it->second);
+    for (auto & screen : screen_map)
+        m_videoModes.push_back(screen.second);
     DebugModes();
     return m_videoModes;
 }

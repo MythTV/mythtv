@@ -43,10 +43,6 @@ MythVTBInterop::MythVTBInterop(MythPlayerUI* Player, MythRenderOpenGL* Context,
 {
 }
 
-MythVTBInterop::~MythVTBInterop()
-{
-}
-
 CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace, MythVideoFrame* Frame)
 {
     if (!Frame)
@@ -172,10 +168,6 @@ MythVTBSurfaceInterop::MythVTBSurfaceInterop(MythPlayerUI* Player, MythRenderOpe
 {
 }
 
-MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
-{
-}
-
 std::vector<MythVideoTextureOpenGL*>
 MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
                                MythVideoColourSpace* ColourSpace,
@@ -241,7 +233,7 @@ MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
     {
         int width  = IOSurfaceGetWidthOfPlane(surface, plane);
         int height = IOSurfaceGetHeightOfPlane(surface, plane);
-        sizes.push_back(QSize(width, height));
+        sizes.emplace_back(width, height);
     }
     // NB P010 support is untested
     // NB P010 support was added to FFmpeg in https://github.com/FFmpeg/FFmpeg/commit/036b4b0f85933f49a709

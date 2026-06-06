@@ -128,7 +128,7 @@ QString MythEGL::GetEGLVendor(void)
 
     return CheckDisplay(eglGetDisplay(EGL_DEFAULT_DISPLAY));
 #else
-    return QString();
+    return {};
 #endif
 }
 
