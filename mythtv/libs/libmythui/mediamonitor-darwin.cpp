@@ -47,8 +47,8 @@ static mach_port_t sMasterPort;
  */
 MythMediaType FindMediaType(io_service_t service)
 {
-    kern_return_t  kernResult;
-    io_iterator_t  iter;
+    kern_return_t  kernResult = 0;
+    io_iterator_t  iter = 0;
     MythMediaType  mediaType = MEDIATYPE_UNKNOWN;
     QString        msg = QString("FindMediaType() - ");
 
@@ -76,12 +76,12 @@ MythMediaType FindMediaType(io_service_t service)
         // the do-while loop below, so add a reference to balance
         IOObjectRetain(service);
 
-        do
+        while (service && (mediaType == MEDIATYPE_UNKNOWN))
         {
             bool isWholeMedia = false;
             if (IOObjectConformsTo(service, kIOMediaClass))
             {
-                CFTypeRef wholeMedia;
+                CFTypeRef wholeMedia = nullptr;
 
                 wholeMedia = IORegistryEntryCreateCFProperty
                              (service, CFSTR(kIOMediaWholeKey),
@@ -108,9 +108,8 @@ MythMediaType FindMediaType(io_service_t service)
             }
 
             IOObjectRelease(service);
-
-        } while ((service = IOIteratorNext(iter))
-                 && (mediaType == MEDIATYPE_UNKNOWN));
+            service = IOIteratorNext(iter);
+	}
 
         IOObjectRelease(iter);
     }
@@ -122,14 +121,12 @@ MythMediaType FindMediaType(io_service_t service)
  */
 MythMediaType MediaTypeForBSDName(const char *bsdName)
 {
-    CFMutableDictionaryRef  matchingDict;
-    kern_return_t           kernResult;
-    io_iterator_t           iter;
-    io_service_t            service;
+    CFMutableDictionaryRef  matchingDict = nullptr;
+    kern_return_t           kernResult = 0;
+    io_iterator_t           iter = 0;
+    io_service_t            service = 0;
     QString                 msg = QString("MediaTypeForBSDName(%1)")
                                   .arg(bsdName);
-    MythMediaType           mediaType;
-
 
     if (!bsdName || !*bsdName)
     {
@@ -176,7 +173,7 @@ MythMediaType MediaTypeForBSDName(const char *bsdName)
                  msg + " - IOIteratorNext() returned a NULL iterator");
         return MEDIATYPE_UNKNOWN;
     }
-    mediaType = FindMediaType(service);
+    MythMediaType mediaType = FindMediaType(service);
     IOObjectRelease(service);
     return mediaType;
 }
@@ -185,34 +182,31 @@ MythMediaType MediaTypeForBSDName(const char *bsdName)
 /**
  * Given a description of a disk, copy and return the volume name
  */
-static char * getVolName(CFDictionaryRef diskDetails)
+static std::string getVolName(CFDictionaryRef diskDetails)
 {
-    CFStringRef name;
-    CFIndex     size;
-    char       *volName;
+    CFStringRef name = nullptr;
+    CFIndex     size = 0;
 
     name = (CFStringRef)
            CFDictionaryGetValue(diskDetails, kDADiskDescriptionVolumeNameKey);
 
     if (!name)
-        return nullptr;
+        return {};
 
     size = CFStringGetLength(name) + 1;
-    volName = (char *) malloc(size);
-    if (!volName)
-    {
+    std::string volName;
+    try {
+      volName.resize(size);
+    } catch (std::bad_alloc &ex) {
         LOG(VB_GENERAL, LOG_ALERT,
-                QString("getVolName() - Can't malloc(%1)?").arg(size));
-        return nullptr;
+                QString("getVolName() - Can't resize string(%1)?").arg(size));
+        return {};
     }
 
-    if (!CFStringGetCString(name, volName, size, kCFStringEncodingUTF8))
-    {
-        free(volName);
-        return nullptr;
-    }
+    if (!CFStringGetCString(name, volName.data(), size, kCFStringEncodingUTF8))
+      return {};
 
-    return volName;
+    return { volName };
 }
 
 /*
@@ -221,7 +215,7 @@ static char * getVolName(CFDictionaryRef diskDetails)
 static QString getModel(CFDictionaryRef diskDetails)
 {
     QString     desc;
-    const void  *strRef;
+    const void  *strRef = nullptr;
 
     // Location
     if (kCFBooleanTrue ==
@@ -267,13 +261,12 @@ static QString getModel(CFDictionaryRef diskDetails)
 void diskAppearedCallback(DADiskRef disk, void *context)
 {
     const char          *BSDname = DADiskGetBSDName(disk);
-    CFDictionaryRef      details;
-    bool                 isCDorDVD;
-    MythMediaType        mediaType;
+    CFDictionaryRef      details = nullptr;
+    bool                 isCDorDVD = false;
     QString              model;
-    MonitorThreadDarwin *mtd;
+    MonitorThreadDarwin *mtd = nullptr;
     QString              msg = "diskAppearedCallback() - ";
-    char                *volName;
+    std::string          volName;
 
 
     if (!BSDname)
@@ -309,7 +302,7 @@ void diskAppearedCallback(DADiskRef disk, void *context)
 
     // Get the volume and model name for more user-friendly interaction
     volName = getVolName(details);
-    if (!volName)
+    if (volName.empty())
     {
         LOG(VB_MEDIA, LOG_INFO, msg + QString("No volume name for dev %1")
             .arg(BSDname));
@@ -324,11 +317,10 @@ void diskAppearedCallback(DADiskRef disk, void *context)
         LOG(VB_MEDIA, LOG_INFO, msg + QString("DMG %1 mounted, ignoring")
             .arg(BSDname));
         CFRelease(details);
-        free(volName);
         return;
     }
 
-    mediaType = MediaTypeForBSDName(BSDname);
+    MythMediaType mediaType = MediaTypeForBSDName(BSDname);
     isCDorDVD = (mediaType == MEDIATYPE_DVD) || (mediaType == MEDIATYPE_AUDIO);
 
 
@@ -336,12 +328,11 @@ void diskAppearedCallback(DADiskRef disk, void *context)
     // Call a helper function to create appropriate objects and insert
 
     LOG(VB_MEDIA, LOG_INFO, QString("Found disk %1 - volume name '%2'.")
-                      .arg(BSDname).arg(volName));
+                      .arg(BSDname).arg(volName.c_str()));
 
-    mtd->diskInsert(BSDname, volName, model, isCDorDVD);
+    mtd->diskInsert(BSDname, volName.c_str(), model, isCDorDVD);
 
     CFRelease(details);
-    free(volName);
 }
 
 void diskDisappearedCallback(DADiskRef disk, void *context)
@@ -359,15 +350,14 @@ void diskChangedCallback(DADiskRef disk, CFArrayRef keys, void *context)
     {
         const char     *BSDname = DADiskGetBSDName(disk);
         CFDictionaryRef details = DADiskCopyDescription(disk);
-        char           *volName = getVolName(details);
+        std::string     volName = getVolName(details);
 
         LOG(VB_MEDIA, LOG_INFO, QString("Disk %1 - changed name to '%2'.")
-                          .arg(BSDname).arg(volName));
+                          .arg(BSDname).arg(volName.c_str()));
 
         reinterpret_cast<MonitorThreadDarwin *>(context)
-            ->diskRename(BSDname, volName);
+            ->diskRename(BSDname, volName.c_str());
         CFRelease(details);
-        free(volName);
     }
 }
 
@@ -422,7 +412,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
                                      const char *volName,
                                      const QString& model, bool isCDorDVD)
 {
-    MythMediaDevice  *media;
+    MythMediaDevice  *media = nullptr;
     QString           msg = "MonitorThreadDarwin::diskInsert";
 
     LOG(VB_MEDIA, LOG_DEBUG, msg + QString("(%1,%2,'%3',%4)")
@@ -640,9 +630,9 @@ CFShow(props);
  */
 QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
 {
-    kern_return_t          kernResult;
-    CFMutableDictionaryRef devices;
-    io_iterator_t          iter;
+    kern_return_t          kernResult = 0;
+    CFMutableDictionaryRef devices = nullptr;
+    io_iterator_t          iter = 0;
     QStringList            list;
     QString                msg = QString("GetCDRomBlockDevices() - ");
 
@@ -671,7 +661,7 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
         return list;
     }
 
-    io_object_t  drive;
+    io_object_t  drive = 0;
 
     while ((drive = IOIteratorNext(iter)))
     {

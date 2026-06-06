@@ -74,7 +74,7 @@ bool getUptime(std::chrono::seconds &uptime)
 #elif defined(Q_OS_BSD4)
     std::array<int,2> mib { CTL_KERN, KERN_BOOTTIME };
     struct timeval bootTime;
-    size_t         len;
+    size_t         len = 0;
 
     // Uptime is calculated. Get this machine's boot time
     // and subtract it from the current machine time
@@ -124,9 +124,9 @@ bool getMemStats([[maybe_unused]] int &totalMB,
     freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
     return true;
 #elif defined(Q_OS_DARWIN)
-    mach_port_t             mp;
-    mach_msg_type_number_t  count;
-    vm_size_t               pageSize;
+    mach_port_t             mp = 0;
+    mach_msg_type_number_t  count = 0;
+    vm_size_t               pageSize = 0;
     vm_statistics_data_t    s;
 
     mp = mach_host_self();

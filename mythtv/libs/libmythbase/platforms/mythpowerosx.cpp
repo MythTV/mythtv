@@ -133,8 +133,8 @@ void MythPowerOSX::Refresh(void)
             }
             else if (state && CFStringCompare(state, CFSTR(kIOPSBatteryPowerValue), 0) == kCFCompareEqualTo)
             {
-                int32_t current;
-                int32_t max;
+                int32_t current = 0;
+                int32_t max = 0;
                 const auto *capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSCurrentCapacityKey)));
                 CFNumberGetValue(capacity, kCFNumberSInt32Type, &current);
                 capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSMaxCapacityKey)));

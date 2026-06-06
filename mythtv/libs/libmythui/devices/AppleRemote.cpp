@@ -187,7 +187,7 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
     CFMutableDictionaryRef hidMatchDictionary = nullptr;
     io_iterator_t          hidObjectIterator = 0;
     io_object_t            hidDevice = 0;
-    IOReturn               ioReturnValue;
+    IOReturn               ioReturnValue = 0;
 
 
     hidMatchDictionary = IOServiceMatching(devName);
@@ -211,9 +211,9 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
 
 bool AppleRemote::_initCookies()
 {
-    IOHIDDeviceInterface122** handle;
-    CFArrayRef                elements;
-    IOReturn                  success;
+    IOHIDDeviceInterface122** handle = nullptr;
+    CFArrayRef                elements = nullptr;
+    IOReturn                  success = 0;
 
     handle  = (IOHIDDeviceInterface122**)hidDeviceInterface;
     success = (*handle)->copyMatchingElements(handle, nullptr, &elements);
@@ -222,10 +222,10 @@ bool AppleRemote::_initCookies()
     {
         for (CFIndex i = 0; i < CFArrayGetCount(elements); ++i)
         {
-            CFDictionaryRef    element;
-            CFTypeRef          object;
-            long               number;
-            IOHIDElementCookie cookie;
+            CFDictionaryRef    element = nullptr;
+            CFTypeRef          object = nullptr;
+            long               number = 0;
+            IOHIDElementCookie cookie = 0;
 
             element = (CFDictionaryRef)CFArrayGetValueAtIndex(elements, i);
             object  = CFDictionaryGetValue(element,
@@ -249,7 +249,7 @@ bool AppleRemote::_initCookies()
 
 bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
 {
-    IOReturn              ioReturnValue;
+    IOReturn              ioReturnValue = 0;
     IOCFPlugInInterface** plugInInterface = nullptr;
     SInt32                score = 0;
 
@@ -278,9 +278,9 @@ bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
 
 bool AppleRemote::_openDevice()
 {
-    CFRunLoopSourceRef eventSource;
-    IOReturn           ioReturnValue;
-    IOHIDOptionsType   openMode;
+    CFRunLoopSourceRef eventSource = nullptr;
+    IOReturn           ioReturnValue = 0;
+    IOHIDOptionsType   openMode = 0;
 
 
     if (openInExclusiveMode)

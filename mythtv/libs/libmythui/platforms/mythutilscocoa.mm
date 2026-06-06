@@ -27,7 +27,7 @@ static Boolean CFNumberEqualsUInt32(CFNumberRef Number, uint32_t Uint32)
 {
     if (Number == nullptr)
         return (Uint32 == 0);
-    int64_t Int64;
+    int64_t Int64 = 0;
     if (!CFNumberGetValue(Number, kCFNumberSInt64Type, &Int64))
         return false;
     return Int64 == Uint32;
@@ -44,7 +44,7 @@ QByteArray GetOSXEDID(CGDirectDisplayID Display)
     uint32_t serial = CGDisplaySerialNumber(Display);
     CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
 
-    io_iterator_t iter;
+    io_iterator_t iter = 0;
     if (IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iter))
       return result;
 

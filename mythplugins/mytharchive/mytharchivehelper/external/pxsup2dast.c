@@ -134,7 +134,7 @@ GCCATTR_NORETURN static void exc_throw(int type, const char * format, ...)
 {
     if (format != NULL) 
     {
-        va_list ap;
+        va_list ap; // NOLINT(cppcoreguidelines-init-variables) for macos
         int err = errno;
 
         va_start(ap, format);

@@ -194,9 +194,9 @@ QString Jitterometer::GetCPUStat(void)
 #endif
 
 #ifdef Q_OS_MACOS
-    processor_cpu_load_info_t load;
-    mach_msg_type_number_t    msgcount;
-    natural_t                 processorcount;
+    processor_cpu_load_info_t load = nullptr;
+    mach_msg_type_number_t    msgcount = 0;
+    natural_t                 processorcount = 0;
 
     if (host_processor_info(mach_host_self(), PROCESSOR_CPU_LOAD_INFO, &processorcount, (processor_info_array_t *)&load, &msgcount) == KERN_SUCCESS)
     {

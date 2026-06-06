@@ -143,7 +143,7 @@ bool MythDisplayOSX::SwitchToVideoMode(QSize Size, double DesiredRate)
 
     // switch mode and return success
     CGDisplayCapture(disp);
-    CGDisplayConfigRef cfg;
+    CGDisplayConfigRef cfg = nullptr;
     CGBeginDisplayConfiguration(&cfg);
     CGConfigureDisplayFadeEffect(cfg, 0.3F, 0.5F, 0, 0, 0);
     CGDisplaySetDisplayMode(disp, m_modeMap.value(mode), nullptr);
