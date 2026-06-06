@@ -62,7 +62,7 @@ bool MythEGL::InitEGL(void)
     return false;
 }
 
-bool MythEGL::HasEGLExtension([[maybe_unused]] QString Extension)
+bool MythEGL::HasEGLExtension([[maybe_unused]] const QString& Extension)
 {
 #if CONFIG_EGL
     OpenGLLocker locker(m_context);

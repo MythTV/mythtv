@@ -71,5 +71,6 @@ CGDirectDisplayID GetOSXDisplay(WId win)
 {
     if (!win)
         return 0;
+    // NOLINTNEXTLINE(performance-no-int-to-ptr)
     return GetOSXCocoaDisplay((void*)win);
 }

@@ -460,8 +460,8 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
             for (QMap<QString, QString>::const_iterator i = devs->begin();
                  i != devs->end(); ++i)
             {
-                QString key = i.key();
-                QString desc = i.value();
+                const QString& key = i.key();
+                const QString& desc = i.value();
                 QString devname = QString("CoreAudio:%1").arg(key);
 
                 auto adc = GetAudioDeviceConfig(devname, desc);

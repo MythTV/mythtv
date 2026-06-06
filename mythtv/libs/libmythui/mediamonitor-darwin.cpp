@@ -420,7 +420,7 @@ void MonitorThreadDarwin::run(void)
  */
 void MonitorThreadDarwin::diskInsert(const char *devName,
                                      const char *volName,
-                                     QString model, bool isCDorDVD)
+                                     const QString& model, bool isCDorDVD)
 {
     MythMediaDevice  *media;
     QString           msg = "MonitorThreadDarwin::diskInsert";
@@ -479,7 +479,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     m_monitor->AddDevice(media);
 }
 
-void MonitorThreadDarwin::diskRemove(QString devName)
+void MonitorThreadDarwin::diskRemove(const QString& devName)
 {
     LOG(VB_MEDIA, LOG_DEBUG,
             QString("MonitorThreadDarwin::diskRemove(%1)").arg(devName));

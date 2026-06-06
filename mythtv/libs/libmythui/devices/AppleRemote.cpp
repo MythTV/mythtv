@@ -376,7 +376,7 @@ void AppleRemote::_queueCallbackFunction(IOReturn result,
     _handleEventWithCookieString(cookieString.str(), sumOfValues);
 }
 
-void AppleRemote::_handleEventWithCookieString(std::string cookieString,
+void AppleRemote::_handleEventWithCookieString(const std::string& cookieString,
                                                SInt32 sumOfValues)
 {
     std::map<std::string,AppleRemote::Event>::iterator ii;

@@ -102,7 +102,7 @@ class CoreAudioData {
 public:
     explicit CoreAudioData(AudioOutputCA *parent);
     CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID);
-    CoreAudioData(AudioOutputCA *parent, QString deviceName);
+    CoreAudioData(AudioOutputCA *parent, const QString& deviceName);
 
     static AudioDeviceID GetDefaultOutputDevice();
     int  GetTotalOutputChannels();
@@ -503,7 +503,7 @@ CoreAudioData::CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID) :
     mDeviceID = deviceID;
 }
 
-CoreAudioData::CoreAudioData(AudioOutputCA *parent, QString deviceName) :
+CoreAudioData::CoreAudioData(AudioOutputCA *parent, const QString& deviceName) :
     mCA(parent)
 {
     ResetAudioDevices();
