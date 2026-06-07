@@ -40,9 +40,11 @@ class META_PUBLIC MusicFileScanner
         void BuildFileList(QString &directory, MusicLoadedMap &music_files, MusicLoadedMap &art_files, int parentid);
         static int  GetDirectoryId(const QString &directory, int parentid);
         static bool HasFileChanged(const QString &filename, const QString &date_modified);
-        void AddFileToDB(const QString &filename, const QString &startDir);
-        void RemoveFileFromDB (const QString &filename, const QString &startDir);
-        void UpdateFileInDB(const QString &filename, const QString &startDir);
+        void AddMusicToDB(const QString &filename, const QString &startDir);
+        void AddArtworkToDB(const QString &filename, const QString &startDir);
+        void RemoveMusicFromDB (const QString &filename, const QString &startDir);
+        void RemoveArtworkFromDB (const QString &filename, const QString &startDir);
+        void UpdateMusicInDB(const QString &filename, const QString &startDir);
         void ScanMusic(MusicLoadedMap &music_files);
         void ScanArtwork(MusicLoadedMap &art_files);
         static void cleanDB();

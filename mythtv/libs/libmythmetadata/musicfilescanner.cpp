@@ -233,59 +233,21 @@ bool MusicFileScanner::HasFileChanged(
 }
 
 /*!
- * \brief Insert file details into database.
- *        If it is an audio file, read the metadata and insert
- *        that information at the same time.
- *
- *        If it is an image file, just insert the filename and
- *        type.
+ * \brief Insert music file details into database. Read the metadata
+ *        and insert that information at the same time.
  *
  * \param filename Full path to file.
- * \param startDir The starting directory fir the search. This will be
+ * \param startDir The starting directory for the search. This will be
  *                 removed making the stored name relative to the
  *                 storage directory where it was found.
  *
  * \returns Nothing.
  */
-void MusicFileScanner::AddFileToDB(const QString &filename, const QString &startDir)
+void MusicFileScanner::AddMusicToDB(const QString &filename, const QString &startDir)
 {
-    QString extension = filename.section( '.', -1 ) ;
     QString directory = filename;
     directory.remove(0, startDir.length());
     directory = directory.section( '/', 0, -2);
-
-    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
-
-    // If this file is an image, insert the details into the music_albumart table
-    if (nameFilter.indexOf(extension.toLower()) > -1)
-    {
-        QString name = filename.section( '/', -1);
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("INSERT INTO music_albumart "
-                       "SET filename = :FILE, directory_id = :DIRID, "
-                       "imagetype = :TYPE, hostname = :HOSTNAME;");
-
-        query.bindValue(":FILE", name);
-        query.bindValue(":DIRID", m_directoryid[directory]);
-        query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
-        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-
-        if (!query.exec() || query.numRowsAffected() <= 0)
-        {
-            MythDB::DBError("music insert artwork", query);
-        }
-
-        ++m_coverartAdded;
-
-        return;
-    }
-
-    if (extension.isEmpty() || !MetaIO::kValidFileExtensions.contains(extension.toLower()))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring filename with unsupported filename: '%1'").arg(filename));
-        return;
-    }
 
     LOG(VB_FILE, LOG_INFO, QString("Reading metadata from %1").arg(filename));
     MusicMetadata *data = MetaIO::readMetadata(filename);
@@ -357,6 +319,42 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
 
         ++m_tracksAdded;
     }
+}
+
+/*!
+ * \brief Insert artwork file details into database.
+ *
+ * \param filename Full path to file.
+ * \param startDir The starting directory for the search. This will be
+ *                 removed making the stored name relative to the
+ *                 storage directory where it was found.
+ *
+ * \returns Nothing.
+ */
+void MusicFileScanner::AddArtworkToDB(const QString &filename, const QString &startDir)
+{
+    QString directory = filename;
+    directory.remove(0, startDir.length());
+    directory = directory.section( '/', 0, -2);
+
+    QString name = filename.section( '/', -1);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO music_albumart "
+                  "SET filename = :FILE, directory_id = :DIRID, "
+                  "imagetype = :TYPE, hostname = :HOSTNAME;");
+
+    query.bindValue(":FILE", name);
+    query.bindValue(":DIRID", m_directoryid[directory]);
+    query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+
+    if (!query.exec() || query.numRowsAffected() <= 0)
+    {
+        MythDB::DBError("music insert artwork", query);
+    }
+
+    ++m_coverartAdded;
 }
 
 /*!
@@ -509,16 +507,43 @@ void MusicFileScanner::cleanDB()
 }
 
 /*!
- * \brief Removes a file from the database.
+ * \brief Removes a music file from the database.
  *
  * \param filename Full path to file.
- * \param startDir The starting directory fir the search. This will be
+ * \param startDir The starting directory for the search. This will be
  *                 removed making the stored name relative to the
  *                 storage directory where it was found.
  *
  * \returns Nothing.
  */
-void MusicFileScanner::RemoveFileFromDB(const QString &filename, const QString &startDir)
+void MusicFileScanner::RemoveMusicFromDB(const QString &filename, const QString &startDir)
+{
+    QString sqlfilename(filename);
+    sqlfilename.remove(0, startDir.length());
+    // We know that the filename will not contain :// as the SQL limits this
+    sqlfilename = sqlfilename.section( '/', -1 ) ;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM music_songs WHERE filename = :NAME ;");
+    query.bindValue(":NAME", sqlfilename);
+    if (!query.exec())
+        MythDB::DBError("MusicFileScanner::RemoveMusicFromDB - deleting music_songs",
+                        query);
+
+    ++m_tracksRemoved;
+}
+
+/*!
+ * \brief Removes an artwork file from the database.
+ *
+ * \param filename Full path to file.
+ * \param startDir The starting directory for the search. This will be
+ *                 removed making the stored name relative to the
+ *                 storage directory where it was found.
+ *
+ * \returns Nothing.
+ */
+void MusicFileScanner::RemoveArtworkFromDB(const QString &filename, const QString &startDir)
 {
     QString sqlfilename(filename);
     sqlfilename.remove(0, startDir.length());
@@ -526,50 +551,31 @@ void MusicFileScanner::RemoveFileFromDB(const QString &filename, const QString &
     QString directory = sqlfilename.section( '/', 0, -2 ) ;
     sqlfilename = sqlfilename.section( '/', -1 ) ;
 
-    QString extension = sqlfilename.section( '.', -1 ) ;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
+                  "directory_id= :DIRID;");
+    query.bindValue(":FILE", sqlfilename);
+    query.bindValue(":DIRID", m_directoryid[directory]);
 
-    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
-                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
-
-    if (nameFilter.indexOf(extension.toLower()) > -1)
+    if (!query.exec() || query.numRowsAffected() <= 0)
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
-                      "directory_id= :DIRID;");
-        query.bindValue(":FILE", sqlfilename);
-        query.bindValue(":DIRID", m_directoryid[directory]);
-
-        if (!query.exec() || query.numRowsAffected() <= 0)
-        {
-            MythDB::DBError("music delete artwork", query);
-        }
-
-        ++m_coverartRemoved;
-
-        return;
+        MythDB::DBError("music delete artwork", query);
     }
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM music_songs WHERE filename = :NAME ;");
-    query.bindValue(":NAME", sqlfilename);
-    if (!query.exec())
-        MythDB::DBError("MusicFileScanner::RemoveFileFromDB - deleting music_songs",
-                        query);
-
-    ++m_tracksRemoved;
+    ++m_coverartRemoved;
 }
 
 /*!
- * \brief Updates a file in the database.
+ * \brief Updates a music file in the database.
  *
  * \param filename Full path to file.
- * \param startDir The starting directory fir the search. This will be
+ * \param startDir The starting directory for the search. This will be
  *                 removed making the stored name relative to the
  *                 storage directory where it was found.
  *
  * \returns Nothing.
  */
-void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &startDir)
+void MusicFileScanner::UpdateMusicInDB(const QString &filename, const QString &startDir)
 {
     QString dbFilename = filename;
     dbFilename.remove(0, startDir.length());
@@ -729,23 +735,24 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
         via a lot of refactoring.
 
         1) group all files of the same decoder type, and don't
-        create/delete a Decoder pr. AddFileToDB. Or make Decoders be
+        create/delete a Decoder pr. AddMusicToDB. Or make Decoders be
         singletons, it should be a fairly simple change.
 
-        2) RemoveFileFromDB should group the remove into one big SQL.
+        2) RemoveMusicFromDB and RemoveArtworkFromDB should group the
+        remove into one big SQL.
 
-        3) UpdateFileInDB, same as 1.
+        3) UpdateMusicInDB, same as 1.
         */
 
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if ((*iter).location == MusicFileScanner::kFileSystem)
-            AddFileToDB(iter.key(), (*iter).startDir);
+            AddMusicToDB(iter.key(), (*iter).startDir);
         else if ((*iter).location == MusicFileScanner::kDatabase)
-            RemoveFileFromDB(iter.key(), (*iter).startDir);
+            RemoveMusicFromDB(iter.key(), (*iter).startDir);
         else if ((*iter).location == MusicFileScanner::kNeedUpdate)
         {
-            UpdateFileInDB(iter.key(), (*iter).startDir);
+            UpdateMusicInDB(iter.key(), (*iter).startDir);
             ++m_tracksUpdated;
         }
     }
@@ -753,14 +760,9 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
     for (iter = art_files.begin(); iter != art_files.end(); iter++)
     {
         if ((*iter).location == MusicFileScanner::kFileSystem)
-            AddFileToDB(iter.key(), (*iter).startDir);
+            AddArtworkToDB(iter.key(), (*iter).startDir);
         else if ((*iter).location == MusicFileScanner::kDatabase)
-            RemoveFileFromDB(iter.key(), (*iter).startDir);
-        else if ((*iter).location == MusicFileScanner::kNeedUpdate)
-        {
-            UpdateFileInDB(iter.key(), (*iter).startDir);
-            ++m_coverartUpdated;
-        }
+            RemoveArtworkFromDB(iter.key(), (*iter).startDir);
     }
 
     // Cleanup orphaned entries from the database
@@ -788,7 +790,7 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
 }
 
 /*!
- * \brief Check a list of files against musics files already in the database
+ * \brief Check a list of files against music files already in the database
  *
  * \param music_files MusicLoadedMap
  *
