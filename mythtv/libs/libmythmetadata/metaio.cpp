@@ -9,6 +9,7 @@
 #include "metaio.h"
 #include "musicmetadata.h"
 #include "metaioid3.h"
+#include "metaiooggopus.h"
 #include "metaiooggvorbis.h"
 #include "metaioflacvorbis.h"
 #include "metaiomp4.h"
@@ -19,8 +20,8 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
 
-const QString MetaIO::kValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
-                                          ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
+const QString MetaIO::kValidFileExtensions(".mp3|.mp2|.ogg|.oga|.opus|.flac|.wma|.wav|.ac3|.oma|.omg|"
+                                           ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
 
 MetaIO::MetaIO()
     : m_filenameFormat(gCoreContext->GetSetting("NonID3FileNameFormat").toUpper())
@@ -43,6 +44,8 @@ MetaIO* MetaIO::createTagger(const QString& filename)
         return new MetaIOID3;
     if (extension == "ogg" || extension == "oga")
         return new MetaIOOggVorbis;
+    if (extension == "opus")
+        return new MetaIOOggOpus;
     if (extension == "flac")
     {
         auto *tagger = new MetaIOFLACVorbis;

@@ -95,6 +95,23 @@ void TestMusicMetadata::test_ogg(void)
     QCOMPARE(data->Year(), 2021);
 }
 
+void TestMusicMetadata::test_opus(void)
+{
+    MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +
+                                               "/samples/silence.opus");
+    QVERIFY(data != nullptr);
+//  dump(data);
+    QCOMPARE(data->Length(), 5000ms);
+    QCOMPARE(data->Title(), QString("The Silence, #99"));
+    QCOMPARE(data->TitleSort(), QString("silence, #99"));
+    QCOMPARE(data->Artist(), QString("Mother Nature"));
+    QCOMPARE(data->ArtistSort(), QString("mother nature"));
+    QCOMPARE(data->Track(), 123);
+    // metaiooggopus doesn't read track count
+    // QCOMPARE(data->GetTrackCount(), 999999999);
+    QCOMPARE(data->Year(), 2021);
+}
+
 void TestMusicMetadata::test_mp4(void)
 {
     MusicMetadata *data = MetaIO::readMetadata(QStringLiteral(TEST_SOURCE_DIR) +

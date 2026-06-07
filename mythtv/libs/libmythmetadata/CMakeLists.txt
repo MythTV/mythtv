@@ -28,6 +28,7 @@ set(HEADERS_TO_INSTALL
     metaioflacvorbis.h
     metaioid3.h
     metaiomp4.h
+    metaiooggopus.h
     metaiooggvorbis.h
     metaiotaglib.h
     metaiowavpack.h
@@ -67,6 +68,7 @@ add_library(
   metaioflacvorbis.cpp
   metaioid3.cpp
   metaiomp4.cpp
+  metaiooggopus.cpp
   metaiooggvorbis.cpp
   metaiotaglib.cpp
   metaiowavpack.cpp
