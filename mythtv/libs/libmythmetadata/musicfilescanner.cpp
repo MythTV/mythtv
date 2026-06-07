@@ -849,11 +849,11 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
 /*!
  * \brief Check a list of files against images already in the database
  *
- * \param music_files MusicLoadedMap
+ * \param art_files MusicLoadedMap
  *
  * \returns Nothing.
  */
-void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
+void MusicFileScanner::ScanArtwork(MusicLoadedMap &art_files)
 {
     MusicLoadedMap::Iterator iter;
 
@@ -880,21 +880,21 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
             for (int x = 0; x < m_startDirs.count(); x++)
             {
                 name = m_startDirs[x] + query.value(0).toString();
-                iter = music_files.find(name);
-                if (iter != music_files.end())
+                iter = art_files.find(name);
+                if (iter != art_files.end())
                     break;
             }
 
-            if (iter != music_files.end())
+            if (iter != art_files.end())
             {
-                if (music_files[name].location == MusicFileScanner::kDatabase)
+                if (art_files[name].location == MusicFileScanner::kDatabase)
                     continue;
                 ++m_coverartUnchanged;
-                music_files.erase(iter);
+                art_files.erase(iter);
             }
             else
             {
-                music_files[name].location = MusicFileScanner::kDatabase;
+                art_files[name].location = MusicFileScanner::kDatabase;
             }
         }
     }

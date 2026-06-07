@@ -44,7 +44,7 @@ class META_PUBLIC MusicFileScanner
         void RemoveFileFromDB (const QString &filename, const QString &startDir);
         void UpdateFileInDB(const QString &filename, const QString &startDir);
         void ScanMusic(MusicLoadedMap &music_files);
-        void ScanArtwork(MusicLoadedMap &music_files);
+        void ScanArtwork(MusicLoadedMap &art_files);
         static void cleanDB();
         static bool IsArtFile(const QString &filename);
         static bool IsMusicFile(const QString &filename);
