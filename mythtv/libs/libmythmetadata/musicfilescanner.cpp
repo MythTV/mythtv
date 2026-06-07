@@ -422,13 +422,15 @@ void MusicFileScanner::cleanDB()
 
     // delete unused directory_ids from music_directories
     //
-    // Get a list of directory_ids not referenced in music_songs.
+    // Get a list of directory_ids not referenced in music_songs or music_albumart.
     // This list will contain any directory that is only used for
     // organization.  I.E. If your songs are organized by artist and
     // then by album, this will contain all of the artist directories.
     if (!query.exec("SELECT d.directory_id, d.parent_id FROM music_directories d "
                     "LEFT JOIN music_songs s ON d.directory_id=s.directory_id "
-                    "WHERE s.directory_id IS NULL ORDER BY directory_id DESC;"))
+                    "LEFT JOIN music_albumart a ON d.directory_id=a.directory_id "
+                    "WHERE s.directory_id IS NULL AND a.directory_id IS NULL "
+                    "ORDER BY directory_id DESC;"))
         MythDB::DBError("MusicFileScanner::cleanDB - select music_directories", query);
 
     deletequery.prepare("DELETE FROM music_directories WHERE directory_id=:DIRECTORYID");
@@ -848,7 +850,8 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &art_files, QList<int> &albuma
     albumartidsToDelete.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONCAT_WS('/', path, filename), albumart_id "
+    query.prepare("SELECT CONCAT_WS('/', path, filename), albumart_id, "
+                  "music_albumart.directory_id, music_directories.directory_id "
                   "FROM music_albumart LEFT JOIN music_directories ON "
                   "music_albumart.directory_id=music_directories.directory_id "
                   "WHERE music_albumart.embedded = 0 "
@@ -867,6 +870,14 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &art_files, QList<int> &albuma
     {
         while (query.next())
         {
+            // cleanDB() used to have a bug where it could delete entries from
+            // music_directories that were still referenced in music_albumart,
+            // so we check for that here and delete any affected rows.
+            if (query.value(2).toInt() != 0 && query.isNull(3)) {
+                albumartidsToDelete.append(query.value(1).toInt());
+                continue;
+            }
+
             for (int x = 0; x < m_startDirs.count(); x++)
             {
                 name = m_startDirs[x] + query.value(0).toString();
