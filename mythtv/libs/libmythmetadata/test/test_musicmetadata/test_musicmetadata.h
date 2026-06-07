@@ -34,6 +34,7 @@ private slots:
     static void dump(MusicMetadata *data);
     static void test_flac(void);
     static void test_ogg(void);
+    static void test_opus(void);
     static void test_mp4(void);
     static void test_mp3(void);
     static void test_wv(void);
