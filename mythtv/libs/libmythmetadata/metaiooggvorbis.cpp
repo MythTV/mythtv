@@ -33,10 +33,10 @@ bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
     if (!mdata)
         return false;
 
-    m_filename = filename;
-
-    if (m_filename.isEmpty())
+    if (filename.isEmpty())
         return false;
+
+    m_filename = filename;
 
     TagLib::Ogg::Vorbis::File *oggfile = OpenFile(m_filename);
 
