@@ -131,7 +131,7 @@ static bool IsSubtitlePossible(const QString &Extension)
     auto it = std::find_if(kSubExtNoCheck.cbegin(), kSubExtNoCheck.cend(),
                            [Extension] (const QString& ext) -> bool
                                {return ext.contains(Extension);});
-    return (it != nullptr);
+    return (it == kSubExtNoCheck.cend());
 }
 
 static QString LocalSubtitleFilename(QFileInfo &FileInfo)
