@@ -445,7 +445,6 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * aubuf, int size)
         if (size < (m_fragmentSize + m_bufWriteIndex))
         {
             memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], aubuf, size);
-            size = 0;
             // no more to do so exit now, dont have a full buffer
             break;
         }
