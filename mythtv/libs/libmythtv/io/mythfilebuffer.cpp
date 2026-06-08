@@ -129,7 +129,7 @@ static bool CheckPermissions(const QString &Filename)
 
 static bool IsSubtitlePossible(const QString &Extension)
 {
-    return std::ranges::any_of(std::as_const(kSubExtNoCheck),
+    return std::ranges::none_of(std::as_const(kSubExtNoCheck),
                            [Extension] (const QString& ext) -> bool
                                {return ext.contains(Extension);});
 }
