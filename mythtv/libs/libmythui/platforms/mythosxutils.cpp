@@ -62,7 +62,7 @@ bool get_bool_CF(CFDictionaryRef dict, CFStringRef key)
     bool val = false;
     if (!ref)
         puts("get_float_CF() - Failed to get number reference");
-    else if (!CFNumberGetValue(ref, kCFNumberFloatType, &val) )
+    else if (!CFNumberGetValue(ref, kCFNumberSInt8Type, &val) )
         puts("get_float_CF() - Failed to get float from number");
     return val;
 }
