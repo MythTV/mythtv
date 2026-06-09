@@ -36,7 +36,7 @@ static constexpr const char* REMOTE_COOKIE_STR { "19_" };
 
 #define LOC QString("AppleRemote::")
 
-static io_object_t _findAppleRemoteDevice(const char *devName);
+static io_object_t findAppleRemoteDevice(const char *devName);
 
 AppleRemote * AppleRemote::Get()
 {
@@ -75,10 +75,10 @@ void AppleRemote::startListening()
     if (queue != nullptr)   // already listening
         return;
 
-    io_object_t hidDevice = _findAppleRemoteDevice("AppleIRController");
+    io_object_t hidDevice = findAppleRemoteDevice("AppleIRController");
 
     if (!hidDevice)
-        hidDevice = _findAppleRemoteDevice("AppleTVIRReceiver");
+        hidDevice = findAppleRemoteDevice("AppleTVIRReceiver");
 
     if (!hidDevice ||
         !_createDeviceInterface(hidDevice) ||
@@ -92,6 +92,7 @@ void AppleRemote::startListening()
     IOObjectRelease(hidDevice);
 }
 
+// NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
 void AppleRemote::stopListening()
 {
     if (queue != nullptr)
@@ -112,6 +113,7 @@ void AppleRemote::stopListening()
         hidDeviceInterface = nullptr;
     }
 }
+// NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
 void AppleRemote::run()
 {
@@ -182,7 +184,7 @@ void AppleRemote::_initCookieMap()
     cookieToButtonMapping["33_21_20_11_2_33_21_20_11_2_"] = PlayHold;
 }
 
-static io_object_t _findAppleRemoteDevice(const char *devName)
+static io_object_t findAppleRemoteDevice(const char *devName)
 {
     CFMutableDictionaryRef hidMatchDictionary = nullptr;
     io_iterator_t          hidObjectIterator = 0;
@@ -201,7 +203,7 @@ static io_object_t _findAppleRemoteDevice(const char *devName)
         hidDevice = IOIteratorNext(hidObjectIterator);
     else
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("_findAppleRemoteDevice(%1) failed").arg(devName));
+            QString("findAppleRemoteDevice(%1) failed").arg(devName));
 
     // IOServiceGetMatchingServices consumes a reference to the dictionary,
     // so we don't need to release the dictionary ref.
@@ -216,7 +218,7 @@ bool AppleRemote::_initCookies()
     IOReturn                  success = 0;
 
     handle  = (IOHIDDeviceInterface122**)hidDeviceInterface;
-    success = (*handle)->copyMatchingElements(handle, nullptr, &elements);
+    success = (*handle)->copyMatchingElements((void*)handle, nullptr, &elements);
 
     if (success == kIOReturnSuccess)
     {
@@ -264,18 +266,19 @@ bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
         plugInInterface && *plugInInterface)
     {
         HRESULT plugInResult = (*plugInInterface)->QueryInterface
-                                (plugInInterface,
+                                ((void*)plugInInterface,
                                  CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID),
                                  (LPVOID*) (&hidDeviceInterface));
 
         if (plugInResult != S_OK)
             LOG(VB_GENERAL, LOG_ERR, LOC + "_createDeviceInterface() failed");
 
-        (*plugInInterface)->Release(plugInInterface);
+        (*plugInInterface)->Release((void*)plugInInterface);
     }
     return hidDeviceInterface != nullptr;
 }
 
+// NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
 bool AppleRemote::_openDevice()
 {
     CFRunLoopSourceRef eventSource = nullptr;
@@ -335,6 +338,7 @@ bool AppleRemote::_openDevice()
     (*queue)->start(queue);
     return true;
 }
+// NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
 void AppleRemote::QueueCallbackFunction(void* target, IOReturn result,
                                         void* refcon, void* sender)
@@ -355,7 +359,7 @@ void AppleRemote::_queueCallbackFunction(IOReturn result,
     {
         IOHIDEventStruct event;
 
-        result = (*queue)->getNextEvent(queue, &event, zeroTime, 0);
+        result = (*queue)->getNextEvent((void*)queue, &event, zeroTime, 0);
         if (result != kIOReturnSuccess)
             break;
 

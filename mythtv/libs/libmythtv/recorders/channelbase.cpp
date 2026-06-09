@@ -725,12 +725,12 @@ ChannelBase *ChannelBase::CreateChannel(
             dvbchannel->SetSlowTuning(dvbOpt.m_dvbTuningDelay);
 #endif
     }
+#if CONFIG_FIREWIRE
     else if (genOpt.m_inputType == "FIREWIRE")
     {
-#if CONFIG_FIREWIRE
         channel = new FirewireChannel(tvrec, genOpt.m_videoDev, fwOpt);
-#endif
     }
+#endif
 #if CONFIG_HDHOMERUN
     else if (genOpt.m_inputType == "HDHOMERUN")
     {

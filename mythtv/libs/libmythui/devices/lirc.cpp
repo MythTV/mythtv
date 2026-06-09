@@ -41,6 +41,7 @@
 
 #ifndef __suseconds_t
 #ifdef Q_OS_MACOS
+// NOLINTNEXTLINE(bugprone-reserved-identifier)
 using __suseconds_t = __darwin_suseconds_t;
 #else
 using __suseconds_t = long int;

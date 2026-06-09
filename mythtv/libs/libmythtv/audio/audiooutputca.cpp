@@ -264,7 +264,8 @@ bool AudioOutputCA::OpenDevice()
     if (m_passthru || m_enc)
     {
         LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice() Trying Digital.");
-        if (!(deviceOpened = d->OpenSPDIF()))
+        deviceOpened = d->OpenSPDIF();
+        if (!deviceOpened)
             d->CloseSPDIF();
     }
 
@@ -313,7 +314,7 @@ void AudioOutputCA::CloseDevice()
 }
 
 template <class AudioDataType>
-static inline void _ReorderSmpteToCA(AudioDataType *buf, uint frames)
+static inline void ReorderSmpteToCA(AudioDataType *buf, uint frames)
 {
     AudioDataType tmpLS;
     AudioDataType tmpRS;
@@ -339,9 +340,9 @@ static inline void ReorderSmpteToCA(void *buf, uint frames, AudioFormat format)
 {
     switch(AudioOutputSettings::FormatToBits(format))
     {
-        case  8: _ReorderSmpteToCA((uchar *)buf, frames); break;
-        case 16: _ReorderSmpteToCA((short *)buf, frames); break;
-        default: _ReorderSmpteToCA((int   *)buf, frames); break;
+        case  8: ReorderSmpteToCA((uchar *)buf, frames); break;
+        case 16: ReorderSmpteToCA((short *)buf, frames); break;
+        default: ReorderSmpteToCA((int   *)buf, frames); break;
     }
 }
 
@@ -660,7 +661,7 @@ QString *CoreAudioData::GetName() const
     CFStringRef name = nullptr;
     UInt32 propertySize = sizeof(CFStringRef);
     OSStatus err = AudioObjectGetPropertyData(mDeviceID, &pa,
-                                              0, nullptr, &propertySize, &name);
+                                              0, nullptr, &propertySize, (void*)&name);
     if (err)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:AudioObjectGetPropertyData for kAudioObjectPropertyName error: [%1]")
