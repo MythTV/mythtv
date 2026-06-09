@@ -588,6 +588,10 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
 /*
  * Given a device, return a compound description to help identify it.
  * We try to find out if it is internal, its manufacturer, and model.
+ *
+ * The Core Foundation library owns all data returned returned by
+ * "Get" functions. There can't be a memory leak here.
+ * NOLINTBEGIN(clang-analyzer-osx.cocoa.RetainCount)
  */
 static QString getModel(io_object_t drive)
 {
@@ -625,6 +629,7 @@ CFShow(props);
 
     return desc;
 }
+// NOLINTEND(clang-analyzer-osx.cocoa.RetainCount)
 
 /**
  * \brief List of CD/DVD devices
