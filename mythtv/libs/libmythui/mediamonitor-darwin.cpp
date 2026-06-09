@@ -371,6 +371,13 @@ void MonitorThreadDarwin::run(void)
     CFDictionaryRef match     = kDADiskDescriptionMatchVolumeMountable;
     DASessionRef    daSession = DASessionCreate(kCFAllocatorDefault);
 
+    if (daSession == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ALERT, "Couldn't create session for MonitorThreadDarwin.");
+        RunEpilog();
+        return;
+    }
+
     IOMainPort(MACH_PORT_NULL, &sMasterPort);
 
     DARegisterDiskAppearedCallback(daSession, match,
