@@ -434,6 +434,12 @@ void ExternIO::Fork(void)
     /* run command */
     char *command = strdup(m_app.canonicalFilePath()
                                  .toUtf8().constData());
+    if (command == nullptr)
+    {
+        std::cerr << "ExternIO: strdup() failed: " << strerror(errno) << '\n';
+        _exit(GENERIC_EXIT_DAEMONIZING_ERROR);
+    }
+
     // Copy QStringList to char**
     char **arguments = new char*[m_args.size() + 1];
     for (int i = 0; i < m_args.size(); ++i)
