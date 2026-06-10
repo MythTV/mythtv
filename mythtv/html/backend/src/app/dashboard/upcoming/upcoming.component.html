@@ -9,7 +9,7 @@
             <p-table #table [value]="programs" scrollHeight="flex" [scrollable]="true" [totalRecords]="totalRecords"
                  [virtualScroll]="true" [lazy]="true"
                 (onLazyLoad)="loadLazy($event)" [rowHover]="true" [sortField]="sortField" [sortOrder]="sortOrder"
-                (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small">
+                (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small" [virtualScrollItemSize]="43" >
                 <ng-template pTemplate="caption">
                     <!-- Top Buttons -->
                     <div class="flex items-center">

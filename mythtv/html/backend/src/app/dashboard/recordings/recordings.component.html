@@ -63,7 +63,7 @@
             [metaKeySelection]="true" dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()"
             (onRowUnselect)="onSelectChange()" [showGridlines]="true" [stripedRows]="true" scrollHeight="flex"
             [scrollable]="true" [sortField]="sortField" [sortOrder]="sortOrder" (onSort)="onSort($event)"
-            (onLazyLoad)="loadLazy($event)" [lazy]="true" [virtualScroll]="true" size="small">
+            (onLazyLoad)="loadLazy($event)" [lazy]="true" [virtualScroll]="true" size="small" [virtualScrollItemSize]="43" >
             <ng-template pTemplate="header">
                 <tr>
                     <!-- Column Headings. -->
