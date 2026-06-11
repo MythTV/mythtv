@@ -74,6 +74,8 @@ void V2Status::RegisterCustomTypes()
     qRegisterMetaType<V2CastMember*>("V2CastMember");
     qRegisterMetaType<V2Input*>("V2Input");
     qRegisterMetaType<V2Backend*>("V2Backend");
+    qRegisterMetaType<V2ShowStats*>("V2ShowStats");
+    qRegisterMetaType<V2RecStats*>("V2RecStats");
 }
 
 V2Status::V2Status () : MythHTTPService(s_service),
