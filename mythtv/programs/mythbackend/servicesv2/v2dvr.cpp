@@ -2396,9 +2396,9 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
     if (!gCoreContext->GetBoolSettingOnHost(QString("JobAllow%1").arg(sJobName),
                                             sRemoteHost, false))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, QString("Note: %1 hasn't been allowed on host %2.")
-                                            .arg(sJobName, sRemoteHost));
-        // return nReturn;
+        LOG(VB_GENERAL, LOG_INFO, QString("JobAllow%1 hasn't been setup for "
+                                          "host %2 (will be run by default.)")
+                                          .arg(sJobName, sRemoteHost));
     }
 
     if (!JobStartTime.isValid())
