@@ -5,8 +5,6 @@
 #include "mythgenerictree.h"
 #include "mythuibuttonlist.h"
 
-class MythUIButtonListItem;
-
 /** \class MythUIButtonTree
  *
  * \brief A tree widget for displaying and navigating a MythGenericTree()

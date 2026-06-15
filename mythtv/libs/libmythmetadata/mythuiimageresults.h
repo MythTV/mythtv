@@ -5,10 +5,10 @@
 
 #include "libmythtv/metadataimagehelper.h"
 #include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibuttonlist.h"
 
 #include "mythmetaexp.h"
 
-class MythUIButtonList;
 class MetadataImageDownload;
 
 class META_PUBLIC ImageSearchResultsDialog : public MythScreenType

@@ -12,8 +12,7 @@
 #include <libmythbase/netgrabbermanager.h>
 #include <libmythui/mythprogressdialog.h>
 #include <libmythui/mythscreentype.h>
-
-class MythUIButtonList;
+#include <libmythui/mythuibuttonlist.h>
 
 /** \class TreeEdit
  *  \brief Modify subscribed trees.

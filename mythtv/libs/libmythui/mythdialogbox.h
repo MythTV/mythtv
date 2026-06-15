@@ -13,13 +13,12 @@
 // MythTV headers
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibuttonlist.h"
 #include "libmythui/mythuitextedit.h"
 
 
 class QTimer;
 
-class MythUIButtonListItem;
-class MythUIButtonList;
 class MythUIButton;
 class MythUITextEdit;
 class MythUISpinBox;

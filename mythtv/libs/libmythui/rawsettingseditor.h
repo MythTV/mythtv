@@ -7,9 +7,8 @@
 
 #include "mythuiexp.h"
 #include "libmythui/mythscreentype.h"
+#include "mythuibuttonlist.h"
 
-class MythUIButtonList;
-class MythUIButtonListItem;
 class MythUIText;
 class MythUITextEdit;
 class MythUIButton;
