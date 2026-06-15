@@ -22,12 +22,12 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^20.3.0",
+    "@angular/common": "^22.0.1",
     "@angular/compiler": "^20.3.0",
-    "@angular/core": "^20.3.0",
-    "@angular/forms": "^20.3.0",
-    "@angular/platform-browser": "^20.3.0",
-    "@angular/router": "^20.3.0",
+    "@angular/core": "^22.0.1",
+    "@angular/forms": "^22.0.1",
+    "@angular/platform-browser": "^22.0.1",
+    "@angular/router": "^22.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "rxjs": "~7.8.0",
@@ -35,7 +35,7 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.22",
+    "@angular/build": "^22.0.1",
     "@angular/cli": "^20.3.22",
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
