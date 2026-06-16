@@ -12,7 +12,7 @@
   "dependencies": {
     "@angular/animations": "^20.3.18",
     "@angular/cli": "^20.3.22",
-    "@angular/common": "^20.3.18",
+    "@angular/common": "^20.3.25",
     "@angular/compiler": "^20.3.18",
     "@angular/core": "^20.3.18",
     "@angular/forms": "^20.3.18",
