@@ -50,6 +50,18 @@ foreach(_FLAG IN LISTS CFLAGS)
   endif()
 endforeach()
 
+#
+# Compile this library as a static library on Android because of the circular
+# linking dependency issue with libmythtv (specifically the calls to the
+# MythDVD_* functions).  Cmake only enables PIC code by default on shared
+# libraries, so need to enable PIC on the library later after its defined.
+#
+if(ANDROID OR WIN32)
+  set(LIBRARY_TYPE STATIC)
+else()
+  set(LIBRARY_TYPE SHARED)
+endif()
+
 set(LIBDVDNAV_HEADERS
   dvdnav/dvdnav/dvd_types.h
   dvdnav/dvdnav/dvdnav.h
@@ -71,7 +83,7 @@ set(LIBDVDREAD_HEADERS
 
 add_library(
   mythdvdnav
-  SHARED
+  ${LIBRARY_TYPE}
   ${LIBDVDNAV_HEADERS}
   dvdnav/dvdnav.c
   dvdnav/dvdnav_internal.h
@@ -116,7 +128,6 @@ if(WIN32)
   target_sources(mythdvdnav PRIVATE
     dvdread/win32_dlfcn.h
     )
-  message(WARNING "mythdvdnav won't link because of undefined symbols referencing the frontend.")
 endif()
 
 # Don't allow the hidden visibility flag for this target.
@@ -178,6 +189,16 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   # to the loader.  Its not clear if this helps on Android (since the explicit
   # opposite has just been removed), but it couldn't hurt.
   target_link_options(mythdvdnav PRIVATE -undefined dynamic_lookup)
+endif()
+
+#
+# Compile PIC code on android.  The default for PIC code is ON for shared
+# libraries, but on android this library is built as a static library because of
+# the circular linking dependency issue with libmythtv.
+#
+if(ANDROID)
+  set_target_properties(
+    mythdvdnav PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
 target_include_directories(
