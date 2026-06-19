@@ -621,12 +621,12 @@ bool UPnpCDSTv::LoadDates(const UPnpCDSRequest* pRequest,
     MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
 
     QString sql = "SELECT SQL_CALC_FOUND_ROWS "
-                  "r.starttime, COUNT(r.recordedid) "
+                  "CONVERT_TZ(r.starttime, 'UTC', 'SYSTEM') AS starttime_local, COUNT(r.recordedid) "
                   "FROM recorded r "
                   "LEFT JOIN recgroups g ON g.recgroup=r.recgroup "
                   "%1 " // WHERE clauses
-                  "GROUP BY DATE(CONVERT_TZ(r.starttime, 'UTC', 'SYSTEM')) "
-                  "ORDER BY r.starttime DESC "
+                  "GROUP BY DATE(starttime_local) "
+                  "ORDER BY starttime_local DESC "
                   "LIMIT :OFFSET,:COUNT";
 
     QStringList clauses;
