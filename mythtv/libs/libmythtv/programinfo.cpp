@@ -787,7 +787,9 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
 /** \fn ProgramInfo::ProgramInfo()
  *  \brief Constructs a manual record ProgramInfo.
  */
-ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
+ProgramInfo::ProgramInfo(const QString &_title,
+                         const QString &subtitle,
+                         uint _chanid,
                          const QDateTime &_startts,
                          const QDateTime &_endts)
 {
@@ -822,6 +824,7 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
         m_title = QString("%1 - %2").arg(ChannelText(channelFormat),
             MythDate::toString(m_startTs, MythDate::kTime));
     }
+    m_subtitle = subtitle;
 
     m_description = m_title =
         QString("%1 (%2)").arg(m_title, QObject::tr("Manual Record"));
