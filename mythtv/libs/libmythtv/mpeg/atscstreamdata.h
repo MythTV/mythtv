@@ -42,6 +42,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     // Table processing
     bool HandleTables(uint pid, const PSIPTable &psip) override; // MPEGStreamData
     bool IsRedundant(uint pid, const PSIPTable &psip) const override; // MPEGStreamData
+    void DumpErrors() const override; // MPEGStreamData
 
     /// Current UTC to GPS time offset in seconds
     uint GPSOffset(void) const { return m_gpsUtcOffset; }

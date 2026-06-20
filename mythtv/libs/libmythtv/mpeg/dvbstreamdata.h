@@ -51,6 +51,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool HandleTables(uint pid, const PSIPTable &psip) override; // MPEGStreamData
     bool IsRedundant(uint pid, const PSIPTable &psip) const override; // MPEGStreamData
     void ProcessSDT(uint tsid, const ServiceDescriptionTable *sdt);
+    void DumpErrors() const override; // MPEGStreamData
 
     // NIT for broken providers
     inline void SetRealNetworkID(int real_network_id);
