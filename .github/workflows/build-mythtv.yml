@@ -62,13 +62,11 @@ jobs:
   build-mythtv-linux:
     name: Building MythTV on ${{ matrix.container.desc }}
 
-    runs-on: ubuntu-latest
-
     env:
       TZ: Etc/UTC
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
-      CCACHE_MAXSIZE: 250M
+      CCACHE_MAXSIZE: 300M
       DEBIAN_FRONTEND: noninteractive
 
     strategy:
@@ -77,6 +75,7 @@ jobs:
           # Ubuntu group
           - desc: 'Ubuntu interim'
             image: 'ubuntu:rolling'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -92,6 +91,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Ubuntu LTS'
             image: 'ubuntu:latest'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -107,6 +107,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Ubuntu devel'
             image: 'ubuntu:devel'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -124,6 +125,7 @@ jobs:
           # Debian group
           - desc: 'Debian stable'
             image: 'debian:stable'
+            runner: ubuntu-latest
             update_cmd: 'apt update -y && apt upgrade -y'
             install_ansible_cmd: 'apt install ansible apt-utils -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -141,6 +143,7 @@ jobs:
           # Fedora group
           - desc: 'Fedora'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -158,9 +161,10 @@ jobs:
           # Qt6, clang, and cmake alternative(s) group
           - desc: 'Fedora - Qt6'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
-            ansible_cmd: 'ansible-playbook --limit localhost -e "qt6=true" mythtv.yml'
+            ansible_cmd: 'ansible-playbook --limit localhost --extra-vars "{''qt6'':true}" mythtv.yml'
             install_extra_pkgs_cmd: 'dnf install ant -y'
             core_working_subdirectory: 'mythtv'
             core_configure_cmd: './configure --qmake=qmake6 --compile-type=release --enable-debug=0 --disable-debug --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan --prefix=$GITHUB_WORKSPACE/build/install'
@@ -173,6 +177,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Fedora - clang'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -188,6 +193,7 @@ jobs:
             plugins_install_cmd: 'make -j4'
           - desc: 'Fedora - CMake'
             image: 'quay.io/fedora/fedora:latest'
+            runner: ubuntu-latest
             update_cmd: 'dnf upgrade -y'
             install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
             ansible_cmd: 'ansible-playbook --limit localhost mythtv.yml'
@@ -202,14 +208,34 @@ jobs:
             plugins_build_cmd: ''
             plugins_install_cmd: ''
 
+          # aarch64 group
+          - desc: 'Fedora - CMake Qt6 aarch64'
+            runner: ubuntu-24.04-arm
+            image: 'quay.io/fedora/fedora:latest'
+            update_cmd: 'dnf upgrade -y'
+            install_ansible_cmd: 'dnf install ansible dnf-plugins-core -y'
+            ansible_cmd: 'ansible-playbook --limit localhost --extra-vars "{''qt6'':true}" mythtv.yml'
+            install_extra_pkgs_cmd: 'dnf install ant -y'
+            core_working_subdirectory: ''
+            core_configure_cmd: 'cmake --preset qt6 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/build/install'
+            core_build_cmd: 'cmake --build build-qt6'
+            core_install_cmd: ''
+            core_test_cmd: 'cmake --build build-qt6 -t MythTV-tests'
+            plugins_working_subdirectory: ''
+            plugins_configure_cmd: ''
+            plugins_build_cmd: ''
+            plugins_install_cmd: ''
+
       fail-fast: false
+
+    runs-on: ${{ matrix.container.runner }}
 
     container:
       image: ${{ matrix.container.image }}
 
     steps:
-      - name: Checkout ccache
-        uses: actions/cache@v4
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
           path: ~/.ccache
           key: ${{ matrix.container.desc }}-build-core-ccache-${{ github.sha }}
@@ -257,7 +283,7 @@ jobs:
           fetch-depth: 0
 
       - name: ccache statistics [pre]
-        run: ccache -s
+        run: ccache -sz
 
       - name: Configure
         working-directory: mythtv/${{ matrix.container.core_working_subdirectory }}
@@ -297,6 +323,13 @@ jobs:
       - name: ccache statistics [post]
         run: ccache -s
 
+      - name: Save ccache
+        uses: actions/cache/save@v5
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.container.desc }}-build-core-ccache-${{ github.sha }}
+
   build-mythtv-macos:
     name: Building MythTV on ${{ matrix.os.desc }} using ${{ matrix.compiler.desc }}
 
@@ -335,14 +368,14 @@ jobs:
       TZ: Etc/UTC
       CCACHE_DIR: $HOME/.ccache
       CCACHE_COMPRESS: true
-      CCACHE_MAXSIZE: 250M
+      CCACHE_MAXSIZE: 300M
       CONFIGURE_CMD: 'cmake --preset ${{ matrix.os.qt_version }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_LTO=OFF'
       MAKE_CMD: 'cmake --build build-${{ matrix.os.qt_version }}'
       TEST_CMD: 'cmake --build build-${{ matrix.os.qt_version }} -t MythTV-tests'
 
     steps:
-      - name: Checkout ccache
-        uses: actions/cache@v4
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
           path: ~/.ccache
           key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
@@ -375,7 +408,7 @@ jobs:
           echo "QMAKE_CMD=${PKGMGR_PREFIX}/opt/${{ matrix.os.qt_version }}/bin/qmake" >> $GITHUB_ENV
 
       - name: Setup qt6 variables
-        run: echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA qt6=true" >> $GITHUB_ENV
+        run: echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA \\\"{'qt6':true}\\\"" >> $GITHUB_ENV
         if: matrix.os.qt_version == 'qt6'
 
       - name: Checkout MythTV/ansible repository
@@ -425,7 +458,7 @@ jobs:
           path: mythtv
 
       - name: ccache statistics [pre]
-        run: ccache -s
+        run: ccache -sz
 
       - name: Configure core
         working-directory: mythtv
@@ -441,3 +474,10 @@ jobs:
 
       - name: ccache statistics [post]
         run: ccache -s
+
+      - name: Save ccache
+        uses: actions/cache/save@v5
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.os.desc }}-${{ matrix.compiler.desc }}-build-core-ccache-${{ github.sha }}
