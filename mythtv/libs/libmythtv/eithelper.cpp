@@ -1239,21 +1239,21 @@ static void init_fixup(FixupMap &fix)
     fix[4098U << 16] |= EITFixUp::kEFixForceISO8859_1;
 
     // DVB-C Vodafone Germany
-    fix[ 10000LL<<32 | 61441U << 16 | 53626 ] = EITFixUp::kFixP7S1; // SAT.1
+    fix[ 10002LL<<32 | 61441U << 16 | 53009 ] = EITFixUp::kFixP7S1; // ProSieben MAXX
+    fix[ 10002LL<<32 | 61441U << 16 | 53324 ] = EITFixUp::kFixP7S1; // SAT.1 Gold
+    fix[ 10005LL<<32 | 61441U << 16 | 50122 ] = EITFixUp::kFixP7S1; // kabel eins Doku
+    fix[ 10005LL<<32 | 61441U << 16 | 50700 ] = EITFixUp::kFixP7S1; // sixx
+    fix[ 10005LL<<32 | 61441U << 16 | 53621 ] = EITFixUp::kFixP7S1; // ProSieben
+    fix[ 10005LL<<32 | 61441U << 16 | 53622 ] = EITFixUp::kFixP7S1; // kabel eins
     fix[ 10006LL<<32 | 61441U << 16 | 50019 ] = EITFixUp::kFixP7S1; // sixx HD
-    fix[ 10008LL<<32 | 61441U << 16 | 53621 ] = EITFixUp::kFixP7S1; // ProSieben
-    fix[ 10008LL<<32 | 61441U << 16 | 53622 ] = EITFixUp::kFixP7S1; // kabel eins
-    fix[ 10008LL<<32 | 61441U << 16 | 50700 ] = EITFixUp::kFixP7S1; // sixx
     fix[ 10011LL<<32 | 61441U << 16 | 50056 ] = EITFixUp::kFixP7S1; // kabel eins CLASSICS HD
     fix[ 10011LL<<32 | 61441U << 16 | 50058 ] = EITFixUp::kFixP7S1; // SAT.1 emotions HD
     fix[ 10013LL<<32 | 61441U << 16 | 50015 ] = EITFixUp::kFixP7S1; // ProSieben HD
     fix[ 10013LL<<32 | 61441U << 16 | 50057 ] = EITFixUp::kFixP7S1; // ProSieben FUN HD
     fix[ 10013LL<<32 | 61441U << 16 | 50086 ] = EITFixUp::kFixP7S1; // Kabel eins Doku HD
-    fix[ 10014LL<<32 | 61441U << 16 | 50086 ] = EITFixUp::kFixP7S1; // kabel eins HD
-    fix[ 10017LL<<32 | 61441U << 16 | 50122 ] = EITFixUp::kFixP7S1; // kabel eins Doku
-    fix[ 10017LL<<32 | 61441U << 16 | 53009 ] = EITFixUp::kFixP7S1; // ProSieben MAXX
-    fix[ 10017LL<<32 | 61441U << 16 | 53324 ] = EITFixUp::kFixP7S1; // SAT.1 Gold
+    fix[ 10014LL<<32 | 61441U << 16 | 50009 ] = EITFixUp::kFixP7S1; // kabel eins HD
     fix[ 10019LL<<32 | 61441U << 16 | 50018 ] = EITFixUp::kFixP7S1; // SAT.1 HD
+    fix[ 10019LL<<32 | 61441U << 16 | 53626 ] = EITFixUp::kFixP7S1; // SAT.1
     fix[ 10020LL<<32 | 61441U << 16 | 50046 ] = EITFixUp::kFixP7S1; // ProSieben MAXX HD
     fix[ 10020LL<<32 | 61441U << 16 | 50074 ] = EITFixUp::kFixP7S1; // SAT.1 Gold HD
 
