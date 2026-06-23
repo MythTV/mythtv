@@ -304,7 +304,7 @@ void SignalHandler::handleSignal(void)
     m_notifier->setEnabled(false);
 
     total_top += 1;
-    int available;
+    int available {0};
     ioctl(s_sigFd[1], FIONREAD, &available);
 
     errno = 0;
