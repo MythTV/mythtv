@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <unistd.h>
 #ifndef Q_OS_WINDOWS
@@ -29,6 +30,13 @@ std::array<int,2> SignalHandler::s_sigFd;
 volatile bool SignalHandler::s_exit_program = false;
 QMutex SignalHandler::s_singletonLock;
 SignalHandler *SignalHandler::s_singleton;
+
+volatile uint64_t SignalHandler::write_failed {0};
+volatile uint64_t SignalHandler::read_failed  {0};
+volatile uint64_t SignalHandler::total_bottom {0};
+volatile uint64_t SignalHandler::total_top    {0};
+volatile uint64_t SignalHandler::counts_bottom[my_nsig];
+volatile uint64_t SignalHandler::counts_top[my_nsig];
 
 static const std::array<const int, 6
 #ifndef Q_OS_WINDOWS
@@ -204,6 +212,9 @@ void SignalHandler::signalHandler(int signum,
                                   [[maybe_unused]] siginfo_t *info,
                                   [[maybe_unused]] void *context)
 {
+    total_bottom += 1;
+    counts_bottom[signum] = counts_bottom[signum] + 1;
+
     SignalInfo signalInfo {};
 
     signalInfo.m_signum = signum;
@@ -229,7 +240,10 @@ void SignalHandler::signalHandler(int signum,
         // If there's an error, the signal will not be seen be the application,
         // but we can't keep trying.
         if (written < 0)
+        {
+            write_failed += 1;
             break;
+        }
         index += written;
         size  -= written;
     }
@@ -289,10 +303,64 @@ void SignalHandler::handleSignal(void)
 #ifndef Q_OS_WINDOWS
     m_notifier->setEnabled(false);
 
+    total_top += 1;
+    int available;
+    ioctl(s_sigFd[1], FIONREAD, &available);
+
+    errno = 0;
     SignalInfo signalInfo {};
     int ret = ::read(s_sigFd[1], &signalInfo, sizeof(SignalInfo));
+    if (ret < 0)
+    {
+        read_failed += 1;
+        LOG(VB_GENERAL, LOG_CRIT,
+            QString("Read failed on socket. Avail: %1. Error %2: %3. B/T %4/%5, WF/RF %6/%7")
+            .arg(available)
+            .arg(errno).arg(strerror(errno))
+            .arg(total_bottom).arg(total_top)
+            .arg(write_failed).arg(read_failed));
+        std::this_thread::sleep_for(100ms);
+        QCoreApplication::exit(0);
+        s_exit_program = true;
+        return;
+    }
+
     bool infoComplete = (ret == sizeof(SignalInfo));
     int signum = (infoComplete ? signalInfo.m_signum : 0);
+
+    counts_top[signum] = counts_top[signum] + 1;
+    if ( (total_top <= 10) ||
+        ((total_top <= 100) && (total_top % 10 == 0)))
+    {
+        LOG(VB_GENERAL, LOG_CRIT,
+            QString("Read returned %1 of %2 bytes: %3 %4 %5 %6 %7, RUN %8/%9, FAIL %10/%11")
+            .arg(ret).arg(available)
+            .arg(signum)
+            .arg(signalInfo.m_code)
+            .arg(signalInfo.m_pid)
+            .arg(signalInfo.m_uid)
+            .arg(signalInfo.m_value,8,16,QChar('0'))
+            .arg(total_bottom).arg(total_top).arg(write_failed).arg(read_failed));
+    }
+    if ((total_top == 10) || (total_top % 100 == 0))
+    {
+        LOG(VB_GENERAL, LOG_CRIT, QString("There are %1 signals. RUN %2/%3, FAIL %4/%5")
+            .arg(_NSIG)
+            .arg(total_bottom).arg(total_top).arg(write_failed).arg(read_failed));
+        for (int i = 0; i < _NSIG; i += 8)
+            LOG(VB_GENERAL, LOG_CRIT,
+                QString("Signal %1: %2/%3 %4/%5 %6/%7 %8/%9 %10/%11 %12/%13 %14/%15 %16/%17")
+                .arg(i,2)
+                .arg(counts_bottom[i+0]).arg(counts_top[i+0])
+                .arg(counts_bottom[i+1]).arg(counts_top[i+1])
+                .arg(counts_bottom[i+2]).arg(counts_top[i+2])
+                .arg(counts_bottom[i+3]).arg(counts_top[i+3])
+                .arg(counts_bottom[i+4]).arg(counts_top[i+4])
+                .arg(counts_bottom[i+5]).arg(counts_top[i+5])
+                .arg(counts_bottom[i+6]).arg(counts_top[i+6])
+                .arg(counts_bottom[i+7]).arg(counts_top[i+7])
+                );
+    }
 
     if (infoComplete)
     {
@@ -300,9 +368,10 @@ void SignalHandler::handleSignal(void)
         if (signame.isEmpty())
             signame = "Unknown Signal";
         LOG(VB_GENERAL, LOG_CRIT,
-            QString("Received %1: Code %2, PID %3, UID %4, Value 0x%5")
-            .arg(signame) .arg(signalInfo.m_code) .arg(signalInfo.m_pid)
-            .arg(signalInfo.m_uid) .arg(signalInfo.m_value,8,16,QChar('0')));
+            QString("Received %1(%2): Code %3, PID %4, UID %5, Value 0x%6, RUN %7/%8, FAIL %10/%11")
+            .arg(signame) .arg(signum) .arg(signalInfo.m_code) .arg(signalInfo.m_pid)
+            .arg(signalInfo.m_uid) .arg(signalInfo.m_value,8,16,QChar('0'))
+            .arg(total_bottom).arg(total_top).arg(write_failed).arg(read_failed));
     }
 
     SigHandlerFunc handler = nullptr;

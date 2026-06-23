@@ -18,6 +18,8 @@
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 
+constexpr size_t my_nsig { ((_NSIG + 8 - 1) / 8) * 8 };
+
 #ifdef Q_OS_WINDOWS
 // Quick fix to let this compile for Windows:  we have it disabled on the
 // calling side for Windows anyways, IIRC.
@@ -62,6 +64,13 @@ class MBASE_PUBLIC SignalHandler: public QObject
 
     static QMutex s_singletonLock;
     static SignalHandler *s_singleton;
+
+    static volatile uint64_t write_failed;
+    static volatile uint64_t read_failed;
+    static volatile uint64_t total_bottom;
+    static volatile uint64_t total_top;
+    static volatile uint64_t counts_bottom[my_nsig];
+    static volatile uint64_t counts_top[my_nsig];
 };
 
 #endif
