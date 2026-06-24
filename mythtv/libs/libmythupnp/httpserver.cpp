@@ -206,23 +206,6 @@ void HttpServer::LoadSSLConfig()
     if (hostKeyPath.isEmpty()) // No key, assume no SSL
         return;
 
-    QFile hostKeyFile(hostKeyPath);
-    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
-        return;
-    }
-
-    QByteArray rawHostKey = hostKeyFile.readAll();
-    QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-    if (!hostKey.isNull())
-        m_sslConfig.setPrivateKey(hostKey);
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key from file (%1)").arg(hostKeyPath));
-        return;
-    }
-
     QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
     QSslCertificate hostCert;
     QList<QSslCertificate> certList = QSslCertificate::fromPath(hostCertPath);
@@ -248,6 +231,23 @@ void HttpServer::LoadSSLConfig()
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert from file (%1)").arg(hostCertPath));
+        return;
+    }
+
+    QFile hostKeyFile(hostKeyPath);
+    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
+        return;
+    }
+
+    QByteArray rawHostKey = hostKeyFile.readAll();
+    QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+    if (!hostKey.isNull())
+        m_sslConfig.setPrivateKey(hostKey);
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key from file (%1)").arg(hostKeyPath));
         return;
     }
 
