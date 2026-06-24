@@ -88,7 +88,7 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
     }
 
     auto rawHostKey = hostKeyFile.readAll();
-    auto hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+    auto hostKey = QSslKey(rawHostKey, hostCert.publicKey().algorithm(), QSsl::Pem, QSsl::PrivateKey);
     if (hostKey.isNull())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to load host key from file (%1)").arg(hostKeyPath));
