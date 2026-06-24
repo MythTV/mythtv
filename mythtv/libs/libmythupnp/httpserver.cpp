@@ -242,7 +242,7 @@ void HttpServer::LoadSSLConfig()
     }
 
     QByteArray rawHostKey = hostKeyFile.readAll();
-    QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+    QSslKey hostKey = QSslKey(rawHostKey, hostCert.publicKey().algorithm(), QSsl::Pem, QSsl::PrivateKey);
     if (!hostKey.isNull())
         m_sslConfig.setPrivateKey(hostKey);
     else
