@@ -200,7 +200,6 @@ void HttpServer::LoadSSLConfig()
         secureCiphers.append(*it);
     }
     m_sslConfig.setCiphers(secureCiphers);
-#endif
 
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
 
@@ -214,7 +213,6 @@ void HttpServer::LoadSSLConfig()
         return;
     }
 
-#ifndef QT_NO_OPENSSL
     QByteArray rawHostKey = hostKeyFile.readAll();
     QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
     if (!hostKey.isNull())
