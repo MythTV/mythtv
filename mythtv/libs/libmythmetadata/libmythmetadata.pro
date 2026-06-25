@@ -21,7 +21,7 @@ HEADERS += bluraymetadata.h mythmetaexp.h metadatafactory.h mythuimetadataresult
 HEADERS += mythuiimageresults.h
 HEADERS += musicmetadata.h musicutils.h metaio.h metaiotaglib.h
 HEADERS += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
-HEADERS += metaiowavpack.h metaioid3.h metaiooggvorbis.h
+HEADERS += metaiowavpack.h metaioid3.h metaiooggopus.h metaiooggvorbis.h
 HEADERS += imagetypes.h imagemetadata.h imagethumbs.h imagescanner.h imagemanager.h
 HEADERS += musicfilescanner.h metadatagrabber.h lyricsdata.h
 
@@ -33,7 +33,7 @@ SOURCES += bluraymetadata.cpp metadatafactory.cpp mythuimetadataresults.cpp
 SOURCES += mythuiimageresults.cpp
 SOURCES += musicmetadata.cpp musicutils.cpp metaio.cpp metaiotaglib.cpp
 SOURCES += metaioflacvorbis.cpp metaioavfcomment.cpp metaiomp4.cpp
-SOURCES += metaiowavpack.cpp metaioid3.cpp metaiooggvorbis.cpp
+SOURCES += metaiowavpack.cpp metaioid3.cpp metaiooggopus.cpp metaiooggvorbis.cpp
 SOURCES += imagemetadata.cpp imagethumbs.cpp imagescanner.cpp imagemanager.cpp
 SOURCES += musicfilescanner.cpp metadatagrabber.cpp lyricsdata.cpp
 
@@ -89,7 +89,7 @@ inc.files += mythuiimageresults.h metadataimagehelper.h
 inc.files += musicmetadata.h musicutils.h
 inc.files += metaio.h metaiotaglib.h
 inc.files += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
-inc.files += metaiowavpack.h metaioid3.h metaiooggvorbis.h
+inc.files += metaiowavpack.h metaioid3.h metaiooggopus.h metaiooggvorbis.h
 inc.files += imagetypes.h imagemetadata.h imagemanager.h
 inc.files += musicfilescanner.h metadatagrabber.h lyricsdata.h
 
