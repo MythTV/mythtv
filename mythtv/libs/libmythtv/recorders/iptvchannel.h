@@ -21,7 +21,7 @@ class IPTVTuningData;
 class IPTVRecorder;
 class MPEGStreamData;
 
-class IPTVChannel : QObject, public DTVChannel
+class IPTVChannel : public QObject, public DTVChannel
 {
     Q_OBJECT
     friend class IPTVRecorder;

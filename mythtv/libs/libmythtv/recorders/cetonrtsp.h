@@ -23,7 +23,7 @@ class QUdpSocket;
 
 using Params = QMap<QString, QString>;
 
-class CetonRTSP : QObject
+class CetonRTSP : public QObject
 {
     Q_OBJECT
 

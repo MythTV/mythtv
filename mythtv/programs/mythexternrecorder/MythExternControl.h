@@ -33,7 +33,7 @@
 
 class MythExternControl;
 
-class Buffer : QObject
+class Buffer : public QObject
 {
     Q_OBJECT
 
