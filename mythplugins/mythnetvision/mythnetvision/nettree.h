@@ -54,6 +54,7 @@ class NetTree : public NetBase
   protected:
     ResultItem *GetStreamItem() override; // NetBase
     void Load() override; // MythScreenType
+    void LoadData(void) override; // NetBase
 
   private:
     void FillTree(void);
@@ -103,7 +104,6 @@ class NetTree : public NetBase
     MythMenu* CreateShowManageMenu(void);
     void RunTreeEditor(void) const;
     void RunRSSEditor(void) const;
-    void LoadData(void) override; // NetBase
     void HandleSelect(MythUIButtonListItem *item);
 
     void SwitchTreeView(void);

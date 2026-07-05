@@ -34,6 +34,7 @@ class NetSearch : public NetBase
   protected:
     void customEvent(QEvent *levent) override; // NetBase
     void Load() override; // MythScreenType
+    void LoadData(void) override; // NetBase
     ResultItem *GetStreamItem() override; // NetBase
 
   private:
@@ -73,7 +74,6 @@ class NetSearch : public NetBase
     void DoSearch(void);
     void SearchFinished(void);
     void SearchTimeout(Search *item);
-    void LoadData(void) override; // NetBase
     void FillGrabberButtonList(void);
     void SlotItemChanged(void);
     void SetTextAndThumbnail(MythUIButtonListItem *btn, ResultItem *item);
