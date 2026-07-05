@@ -62,7 +62,7 @@ public:
 
     void SendRTCPReport(void);
 
-private:
+protected:
     void timerEvent(QTimerEvent *event) override; // QObject
 
 private:

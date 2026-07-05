@@ -43,6 +43,7 @@ class CetonRTSP : public QObject
     void StopKeepAlive(void);
 
 protected:
+    void timerEvent(QTimerEvent *event) override; // QObject
     bool ProcessRequest(
         const QString &method, const QStringList *headers = nullptr,
                         bool use_control = false, bool waitforanswer = true,
@@ -51,7 +52,6 @@ protected:
   private:
     QString readParameters(const QString &key, Params &parameters);
     QUrl GetBaseUrl(void);
-    void timerEvent(QTimerEvent *event) override; // QObject
 
     QTcpSocket    *m_socket          {nullptr};
     uint           m_sequenceNumber  {0};

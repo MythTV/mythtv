@@ -163,6 +163,9 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     Q_OBJECT
 
   public:
+    bool event(QEvent* Event) override;
+    bool eventFilter(QObject* Object, QEvent* Event) override;
+
     static bool IsTVRunning();
     static bool StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection = ChannelInfoList());
     static bool IsPaused();
@@ -176,14 +179,14 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool IsSameProgram(const ProgramInfo* ProgInfo) const;
 
   public slots:
-    bool event(QEvent* Event) override;
-    bool eventFilter(QObject* Object, QEvent* Event) override;
-    void timerEvent(QTimerEvent* Event) override;
     void StopPlayback();
     void HandleOSDClosed(int OSDType);
 
   signals:
     void PlaybackExiting(TV* Player);
+
+  protected:
+    void timerEvent(QTimerEvent* Event) override;
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);

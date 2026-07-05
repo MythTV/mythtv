@@ -142,9 +142,9 @@ class MythContext::Impl : public QObject
     bool    checkPort(const QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents();
 
-  protected:
     bool event(QEvent* /*e*/) override; // QObject
 
+  protected:
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup();
 

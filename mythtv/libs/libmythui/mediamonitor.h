@@ -53,6 +53,7 @@ class MUI_PUBLIC MediaMonitor : public QObject
 
   public:
     virtual void deleteLater(void);
+    bool eventFilter(QObject *obj, QEvent *event) override; // QObject
     bool IsActive(void) const { return m_active; }
 
     virtual void StartMonitoring(void);
@@ -106,7 +107,6 @@ class MUI_PUBLIC MediaMonitor : public QObject
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
     bool shouldIgnore(const MythMediaDevice *device);
-    bool eventFilter(QObject *obj, QEvent *event) override; // QObject
 
     QString listDevices(void);
 

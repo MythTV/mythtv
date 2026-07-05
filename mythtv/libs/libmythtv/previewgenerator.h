@@ -67,6 +67,8 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
     void AttachSignals(QObject *obj);
 
+    bool event(QEvent *e) override; // QObject
+
   protected:
     void run(void) override; // MThread
 
@@ -102,7 +104,6 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     static QString CreateAccessibleFilename(
         const QString &pathname, const QString &outFileName);
 
-    bool event(QEvent *e) override; // QObject
     bool SaveOutFile(const QByteArray &data, const QDateTime &dt);
 
   protected:
