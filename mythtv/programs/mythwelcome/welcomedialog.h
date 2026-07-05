@@ -26,6 +26,8 @@ class WelcomeDialog : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+
+  protected:
     void customEvent(QEvent *e) override; // MythUIType
 
   protected slots:

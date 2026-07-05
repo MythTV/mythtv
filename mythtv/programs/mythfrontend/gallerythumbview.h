@@ -33,11 +33,13 @@ public slots:
     void    Close() override; // MythScreenType
     static void    ClearSgDb()  { ImageManagerFe::ClearStorageGroup(); }
 
+protected:
+    void    customEvent(QEvent *event) override; // MythUIType
+
 private:
     bool    keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void    mediaEvent(MythMediaEvent *event) override // MythUIType
             { m_mgr.DeviceEvent(event); }
-    void    customEvent(QEvent *event) override; // MythUIType
     void    RemoveImages(const QStringList &ids, bool deleted = true);
     void    BuildImageList();
     void    ResetUiSelection();

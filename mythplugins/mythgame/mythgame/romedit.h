@@ -18,7 +18,6 @@ class EditRomInfoDialog : public MythScreenType
     ~EditRomInfoDialog() override;
 
     bool Create() override; // MythScreenType
-    void customEvent(QEvent *levent) override; // MythUIType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   public slots:
@@ -33,6 +32,9 @@ class EditRomInfoDialog : public MythScreenType
     void FindFanart();
     void FindBoxart();
     void SaveAndExit();
+
+  protected:
+    void customEvent(QEvent *levent) override; // MythUIType
 
   private:
     void fillWidgets();

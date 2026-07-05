@@ -81,7 +81,6 @@ class SmartPlaylistEditor : public MythScreenType
     bool Create(void) override; // MythScreenType
 
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     QString getSQL(const QString& fields);
     QString getWhereClause(void);
@@ -95,6 +94,9 @@ class SmartPlaylistEditor : public MythScreenType
 
   signals:
     void smartPLChanged(const QString &category, const QString &name);
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
 

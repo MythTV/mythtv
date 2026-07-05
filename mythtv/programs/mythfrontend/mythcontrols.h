@@ -64,7 +64,6 @@ class MythControls : public MythScreenType
     ~MythControls() override;
 
     bool Create(void) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     enum ListType : std::uint8_t
     {
@@ -79,6 +78,7 @@ class MythControls : public MythScreenType
     QString GetCurrentKey(void);
 
   protected:
+    void customEvent(QEvent *event) override; // MythUIType
     void Teardown(void);
 
     // Commands

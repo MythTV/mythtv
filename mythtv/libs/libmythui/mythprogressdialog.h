@@ -66,12 +66,12 @@ class MUI_PUBLIC MythUIProgressDialog : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
     void SetTotal(uint total);
     void SetProgress(uint count);
     void SetMessage(const QString &message);
 
   protected:
+    void customEvent(QEvent *event) override; // MythUIType
     void UpdateProgress(void);
 
     QString            m_message;

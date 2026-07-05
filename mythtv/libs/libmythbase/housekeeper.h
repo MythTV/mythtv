@@ -165,6 +165,7 @@ class MBASE_PUBLIC HouseKeeper : public QObject
     void StartThread(void);
     HouseKeeperTask* GetQueuedTask(void);
 
+  protected:
     void customEvent(QEvent *e) override; // QObject
 
   public slots:

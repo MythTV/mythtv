@@ -521,7 +521,6 @@ class MUI_PUBLIC StandardSettingDialog : public MythScreenType
         : MythScreenType(parent, name), m_settingsTree(groupSettings) {}
     ~StandardSettingDialog() override;
     bool Create(void) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void deleteEntry(void);
@@ -536,6 +535,7 @@ class MUI_PUBLIC StandardSettingDialog : public MythScreenType
   protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
     GroupSetting *GetGroupSettings(void) const;
     MythUIButtonList *m_buttonList         {nullptr};
 

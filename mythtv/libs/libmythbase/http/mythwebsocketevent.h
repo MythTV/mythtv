@@ -11,8 +11,6 @@ class MythWebSocketEvent : public QObject
         MythWebSocketEvent();
         ~MythWebSocketEvent() override;
 
-        void customEvent(QEvent* /*event*/) override; // QObject
-
         bool HandleTextMessage   (const StringPayload& Text);
         bool HandleRawTextMessage(const DataPayloads& Payloads);
         //void HandleBinaryMessage (const DataPayloads& Payloads);
@@ -20,6 +18,9 @@ class MythWebSocketEvent : public QObject
     signals:
         void SendTextMessage(const QString &);
         void SendBinaryMessage(const QByteArray &);
+
+    protected:
+        void customEvent(QEvent* /*event*/) override; // QObject
 
     private:
         QStringList m_filters;

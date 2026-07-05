@@ -31,6 +31,7 @@ class NetSearch : public NetBase
     void PopulateResultList(const ResultItem::resultList& list);
 
   protected:
+    void customEvent(QEvent *levent) override; // NetBase
     ResultItem *GetStreamItem() override; // NetBase
 
   private:
@@ -78,7 +79,6 @@ class NetSearch : public NetBase
     void SlotItemChanged(void);
     void SetTextAndThumbnail(MythUIButtonListItem *btn, ResultItem *item);
     void SetThumbnail(MythUIButtonListItem *btn);
-    void customEvent(QEvent *levent) override; // NetBase
 };
 
 #endif

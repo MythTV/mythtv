@@ -40,13 +40,13 @@ class ProgFinder : public ScheduleCommon
     void ShowGuide() const override; // ScheduleCommon
     void select();
 
-    void customEvent(QEvent *e) override; // ScheduleCommon
     void updateInfo(void);
 
   protected:
     using ShowName = QMap<QString,QString>;
 
     void Init(void) override; // MythScreenType
+    void customEvent(QEvent *e) override; // ScheduleCommon
 
     virtual void initAlphabetList(void);
     virtual bool formatSelectedData(QString &data);

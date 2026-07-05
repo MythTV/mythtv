@@ -31,8 +31,6 @@ class MPLUGIN_PUBLIC ZMClient : public QObject
     static ZMClient *get(void);
     static bool setupZMClient (void);
 
-    void customEvent(QEvent *event) override; // QObject
-
     // Used to actually connect to an ZM server
     bool connectToHost(const QString &hostname, unsigned int port);
     bool connected(void) const { return m_bConnected; }
@@ -69,6 +67,9 @@ class MPLUGIN_PUBLIC ZMClient : public QObject
 
     void saveNotificationMonitors(void);
     void showMiniPlayer(int monitorID) const;
+
+  protected:
+    void customEvent(QEvent *event) override; // QObject
 
   private slots:
     void restartConnection(void);  // Try to re-establish the connection to 

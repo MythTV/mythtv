@@ -157,9 +157,10 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void deleteRule();
 
     void Close() override; // MythScreenType
-    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected:
+    void customEvent(QEvent *event) override; // ScheduleCommon
+
     GuideGrid(MythScreenStack *parentStack,
               uint chanid, QString channum,
               const QDateTime &startTime,

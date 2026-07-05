@@ -16,6 +16,8 @@ class PROTOSERVER_PUBLIC MessageHandler : public SocketRequestHandler
                       QStringList &slist) override; // SocketRequestHandler
     QString GetHandlerName(void) override // SocketRequestHandler
         { return "MESSAGE"; }
+
+  protected:
     void customEvent(QEvent *e) override; // QObject
 
   private:

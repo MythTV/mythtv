@@ -107,13 +107,15 @@ class Ripper : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasRipped() const;
     void scanCD(void);
     void ejectCD(void);
 
     void ShowMenu(void) override; // MythScreenType
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
     void startRipper(void);
@@ -236,9 +238,10 @@ class RipStatus : public MythScreenType
   protected slots:
     void startRip(void);
 
-  private:
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
+  private:
     QVector<RipTrack*> *m_tracks         {nullptr};
     int                m_quality;
     QString            m_cdDevice;

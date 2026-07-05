@@ -36,9 +36,11 @@ public slots:
 signals:
     void ImageSelected(int);
 
+protected:
+    void customEvent(QEvent *event) override; // MythUIType
+
 private:
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
     void MenuMain();
     void MenuTransforms(MythMenu &mainMenu);
     void Suspend();

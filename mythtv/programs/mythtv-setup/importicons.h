@@ -39,7 +39,6 @@ class ImportIconsWizard : public MythScreenType
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
 //    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     struct SearchEntry               //! search entry results
     {
@@ -47,6 +46,9 @@ class ImportIconsWizard : public MythScreenType
         QString strName;             //!< the remote name
         QString strLogo;             //!< the actual logo
     };
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   private:
 

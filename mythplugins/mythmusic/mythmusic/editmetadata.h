@@ -70,6 +70,8 @@ class EditMetadataDialog : public EditMetadataCommon
     bool Create(void) override; // MythScreenType
 
     bool keyPressEvent(QKeyEvent *event) override; // EditMetadataCommon
+
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
@@ -151,6 +153,8 @@ class EditAlbumartDialog : public EditMetadataCommon
     bool Create(void) override; // MythScreenType
 
     bool keyPressEvent(QKeyEvent *event) override; // EditMetadataCommon
+
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:

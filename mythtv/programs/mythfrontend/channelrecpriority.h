@@ -26,13 +26,15 @@ class ChannelRecPriority : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     enum SortType : std::uint8_t
     {
         byChannel,
         byRecPriority,
     };
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
     void updateInfo(MythUIButtonListItem *item);

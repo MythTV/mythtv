@@ -70,7 +70,6 @@ class ProgramRecPriority : public ScheduleCommon
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // ScheduleCommon
 
     enum SortType : std::uint8_t
     {
@@ -82,6 +81,9 @@ class ProgramRecPriority : public ScheduleCommon
         byLastRecord,
         byAvgDelay
     };
+
+  protected:
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
     void updateInfo(MythUIButtonListItem *item);

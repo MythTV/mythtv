@@ -144,8 +144,10 @@ class BurnMenu : public QObject
 
     void start(void);
 
-  private:
+  protected:
     void customEvent(QEvent *event) override; // QObject
+
+  private:
     static void doBurn(int mode);
 };
 

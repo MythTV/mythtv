@@ -281,6 +281,7 @@ namespace
             return true;
         }
 
+      protected:
         void customEvent(QEvent *event) override // MythUIType
         {
             if (event->type() != DialogCompletionEvent::kEventType)

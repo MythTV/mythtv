@@ -154,7 +154,6 @@ class ScheduleEditor : public ScheduleCommon,
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // ScheduleCommon
 
     void showMenu(void);
     void showUpcomingByRule(void);
@@ -178,6 +177,9 @@ class ScheduleEditor : public ScheduleCommon,
     void ShowNextView(void);
     void ShowPreview(void);
     void Save(void);
+
+  protected:
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
@@ -317,6 +319,8 @@ class StoreOptEditor : public SchedEditChild, public StoreOptMixin
    ~StoreOptEditor() override = default;
 
     bool Create(void) override; // MythScreenType
+
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
@@ -356,6 +360,9 @@ class MetadataOptions : public SchedEditChild
 
     bool Create(void) override; // MythScreenType
 
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
+
   protected slots:
     void ClearInetref();
     void PerformQuery();
@@ -389,8 +396,6 @@ class MetadataOptions : public SchedEditChild
     MetadataLookup *CreateLookup(MetadataType mtype);
 
     bool CanSetArtwork(void);
-
-    void customEvent(QEvent *event) override; // MythUIType
 
     // For all metadata downloads
     MetadataFactory *m_metadataFactory {nullptr};

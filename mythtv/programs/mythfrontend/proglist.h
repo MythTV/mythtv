@@ -56,6 +56,8 @@ class ProgLister : public ScheduleCommon
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+
+  protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:

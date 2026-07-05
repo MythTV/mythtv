@@ -72,7 +72,6 @@ class ImportMusicDialog : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasImported() const { return m_somethingWasImported; }
     void doScan(void);
@@ -111,6 +110,9 @@ class ImportMusicDialog : public MythScreenType
 
   signals:
     void importFinished(void);
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   private:
     void fillWidgets();

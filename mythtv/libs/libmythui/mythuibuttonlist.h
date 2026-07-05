@@ -204,7 +204,6 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
-    void customEvent(QEvent *event) override; // MythUIType
 
     enum MovementUnit : std::uint8_t
                       { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
@@ -281,6 +280,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void itemLoaded(MythUIButtonListItem* item);
 
   protected:
+    void customEvent(QEvent *event) override; // MythUIType
+
     enum ScrollStyle : std::uint8_t
                      { ScrollFree, ScrollCenter, ScrollGroupCenter };
     enum ArrangeType : std::uint8_t

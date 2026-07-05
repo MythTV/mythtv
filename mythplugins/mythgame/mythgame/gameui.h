@@ -48,6 +48,9 @@ class GameUI : public MythScreenType
     void doScan(void);
     void reloadAllData(bool dbchanged);
 
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
+
   private:
     void updateRomInfo(RomInfo *rom);
     void clearRomInfo(void);
@@ -56,7 +59,6 @@ class GameUI : public MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void searchStart(void);
     void toggleFavorite(void);
-    void customEvent(QEvent *event) override; // MythUIType
     void createBusyDialog(const QString& title);
 
     QString getFillSql(MythGenericTree* node) const;

@@ -25,8 +25,6 @@ class LCDProcClient : public QObject
 
     explicit LCDProcClient(LCDServer *lparent);
 
-    void customEvent(QEvent  *e) override; // QObject
-
    ~LCDProcClient() override;
 
     bool SetupLCD(void);
@@ -62,6 +60,9 @@ class LCDProcClient : public QObject
 
     int  getLCDWidth(void) const { return m_lcdWidth; }
     int  getLCDHeight(void) const { return m_lcdHeight; }
+
+  protected:
+    void customEvent(QEvent  *e) override; // QObject
 
   private slots: 
     void veryBadThings(QAbstractSocket::SocketError error); // Communication Errors

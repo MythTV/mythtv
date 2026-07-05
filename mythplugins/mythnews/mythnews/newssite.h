@@ -78,8 +78,6 @@ class NewsSite : public QObject
              QDateTime updated, bool     podcast);
     virtual void deleteLater();
 
-    void customEvent(QEvent *event) override; // QObject
-
     QString   url(void)  const;
     QString   name(void) const;
     QString   sortName(void) const;
@@ -105,6 +103,9 @@ class NewsSite : public QObject
 
     bool     successful(void) const;
     QString  errorMsg(void) const;
+
+  protected:
+    void customEvent(QEvent *event) override; // QObject
 
   private:
     ~NewsSite() override;

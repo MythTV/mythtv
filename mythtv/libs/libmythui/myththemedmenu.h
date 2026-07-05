@@ -75,10 +75,10 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
     void ShowMenu() override; // MythScreenType
     void aboutScreen();
-    void customEvent(QEvent *event) override; // MythUIType
     void mediaEvent(MythMediaEvent *event) override; // MythUIType
     
   protected:
+    void customEvent(QEvent *event) override; // MythUIType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   private slots:
