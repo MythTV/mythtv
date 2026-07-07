@@ -50,7 +50,7 @@ class TestPinkNoise: public QObject
              0.0609781742,  0.0504443944,  0.0259989072,  0.0029377376
         };
 
-        pink_noise_t pink;
+        pink_noise_t pink {};
         initialize_pink_noise(&pink, 16);
         for (auto & val : output)
             val = generate_pink_noise_sample(&pink);

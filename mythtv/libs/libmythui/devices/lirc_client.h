@@ -37,8 +37,8 @@ enum lirc_flags {none=0x00,
 
 struct lirc_state
 {
-	int lirc_lircd;
-	int lirc_verbose;
+	int lirc_lircd {};
+	int lirc_verbose {};
 	std::string lirc_prog;
 	std::string lircrc_root_file;
 	std::string lircrc_user_file;
@@ -63,7 +63,7 @@ struct lirc_config
 	struct lirc_config_entry *next  { nullptr };
 	struct lirc_config_entry *first { nullptr };
 	
-	int sockfd;
+	int sockfd {};
 };
 
 struct lirc_config_entry
