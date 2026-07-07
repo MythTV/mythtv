@@ -54,7 +54,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int   SIZEARRAY = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
         auto *arrays1   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrays2   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
 
@@ -90,7 +90,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int   SIZEARRAY = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
         auto *arrays1   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrays2   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrayf    = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
@@ -132,7 +132,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY  = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
 
         auto *arrays1  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrays2  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
@@ -177,7 +177,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY  = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
 
         auto *arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
         auto *arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
@@ -220,7 +220,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY  = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
 
         auto *arrays1  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrays2  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
@@ -264,7 +264,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY  = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
 
         auto *arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
         auto *arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
@@ -307,7 +307,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY  = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
 
         auto *arrays1  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrays2  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
@@ -350,7 +350,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY  = 256;
+        size_t SIZEARRAY = 256;
 
         auto *arrays1  = (uint8_t*)av_malloc(SIZEARRAY * ISIZEOF(uint8_t));
         auto *arrays2  = (uint8_t*)av_malloc(SIZEARRAY * ISIZEOF(uint8_t));
@@ -381,7 +381,7 @@ class TestAudioConvert: public QObject
 
     static void S32ClipTest(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetint32_t   = 0;
         int offsetfloat1    = 1;
@@ -433,7 +433,7 @@ class TestAudioConvert: public QObject
 
     static void FloatS32ClipTest3(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         QFETCH(int, OFFSET);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetint32_t   = 0;
@@ -489,7 +489,7 @@ class TestAudioConvert: public QObject
 
     static void FloatS16ClipTest3(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         QFETCH(int, OFFSET);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetint32_t   = 0;
@@ -545,7 +545,7 @@ class TestAudioConvert: public QObject
 
     static void FloatU8ClipTest3(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         QFETCH(int, OFFSET);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetint32_t   = 0;
@@ -606,7 +606,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
         auto *arrays1 = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrays2 = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
         auto *arrayf  = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
@@ -647,7 +647,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = SAMPLES;
+        size_t SIZEARRAY    = SAMPLES;
         int offsetshort     = 1;
         int offsetfloat     = 1;
 
@@ -682,7 +682,7 @@ class TestAudioConvert: public QObject
     // test s16 -> float -> s16 SSE vs C-code. Also compare converted floats
     static void S16ToFloatCvsSSE(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        size_t SIZEARRAY    = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 1;
         int offsetfloat     = 0;
@@ -741,7 +741,7 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY    = SAMPLES;
+        size_t SIZEARRAY = SAMPLES;
         int offsetshort = SSEALIGN / ISIZEOF(uint16_t);
         int offsetfloat = SSEALIGN / ISIZEOF(float);
 
@@ -815,7 +815,7 @@ class TestAudioConvert: public QObject
 
     static void S16ClipTest(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        size_t SIZEARRAY    = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 0;
         int offsetfloat1    = 1;
@@ -870,7 +870,7 @@ class TestAudioConvert: public QObject
 
     static void S16ToFloatCvsSSESpeed(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        size_t SIZEARRAY    = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 1;
         int offsetfloat     = 1;
@@ -923,7 +923,7 @@ class TestAudioConvert: public QObject
     // test u8 -> float -> u8 is lossless (SSE code)
     static void U8ToFloatSSE(void)
     {
-        int SIZEARRAY = 256;
+        size_t SIZEARRAY = 256;
         auto *arrays1 = (uint8_t*)av_malloc(SIZEARRAY * ISIZEOF(uint8_t));
         auto *arrays2 = (uint8_t*)av_malloc(SIZEARRAY * ISIZEOF(uint8_t));
         auto *arrayf  = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
@@ -953,7 +953,7 @@ class TestAudioConvert: public QObject
     // test u8 -> float -> u8 is lossless (C code)
     static void U8ToFloatC(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetuchar     = SSEALIGN / ISIZEOF(uint8_t);
         int offsetfloat     = SSEALIGN / ISIZEOF(float);
@@ -988,7 +988,7 @@ class TestAudioConvert: public QObject
     // test u8 -> float -> u8 SSE vs C-code. Also compare converted floats
     static void U8ToFloatCvsSSE(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetuchar     = 1;
         int offsetfloat =   0;
@@ -1034,7 +1034,7 @@ class TestAudioConvert: public QObject
     // Test that float conversion only write where it's supposed to (SSE code)
     static void U8ToFloatBoundsSSE(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         int offsetuchar     = SSEALIGN / ISIZEOF(uint8_t);
         int offsetfloat     = SSEALIGN / ISIZEOF(float);
 
@@ -1043,7 +1043,7 @@ class TestAudioConvert: public QObject
         auto *arrayf  = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
         uint8_t j = 0;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -1107,7 +1107,7 @@ class TestAudioConvert: public QObject
 
     static void U8ClipTest(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetuchar     = 0;
         int offsetfloat1    = 1;
@@ -1154,7 +1154,7 @@ class TestAudioConvert: public QObject
     // test s16 -> float -> s16 SSE vs C-code. Also compare converted floats
     static void S32ToFloatCvsSSE(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        size_t SIZEARRAY    = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetint32_t   = 1;
         int offsetfloat1    = 0;
@@ -1205,7 +1205,7 @@ class TestAudioConvert: public QObject
     // Test that float conversion only write where it's supposed to (SSE code)
     static void S32ToFloatBoundsSSE(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        size_t SIZEARRAY    = (INT16_MAX - INT16_MIN);
         int offsetint32_t   = SSEALIGN / ISIZEOF(int32_t);
         int offsetfloat     = SSEALIGN / ISIZEOF(float);
 
@@ -1279,7 +1279,7 @@ class TestAudioConvert: public QObject
 
     static void S32ClipTest2(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetint32_t   = 0;
         int offsetfloat1    = 1;
@@ -1334,7 +1334,7 @@ class TestAudioConvert: public QObject
 
     static void FloatToS32CvsSSESpeed(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        size_t SIZEARRAY    = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 1;
         int offsetfloat     = 1;
@@ -1386,7 +1386,7 @@ class TestAudioConvert: public QObject
 
     static void FloatClipping(void)
     {
-        int SIZEARRAY       = 256;
+        size_t SIZEARRAY    = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetfloat1    = 1;
         int offsetfloat2    = 0;

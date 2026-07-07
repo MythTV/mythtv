@@ -10,6 +10,9 @@
 
 #include <QtEndian>
 
+#ifndef __cpp_size_t_suffix
+#include "libmythbase/sizetliteral.h"
+#endif
 #include "libmythtv/mythtvexp.h"
 #include "udppacket.h"
 
@@ -73,8 +76,13 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
 
     uint GetContributingSource(uint i) const
     {
+#ifdef __cpp_size_t_suffix
         const uint32_t tmp =
-            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4 * i));
+            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4UZ * i));
+#else
+        const uint32_t tmp =
+            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4_UZ * i));
+#endif
         return qFromBigEndian(tmp);
     }
 
