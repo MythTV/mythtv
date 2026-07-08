@@ -36,7 +36,7 @@ class TestProgramInfo : public QObject
   private:
     static ProgramInfo mockMovie (QString const &inetref, QString const &programid, QString const &title, unsigned int year)
     {
-        return ProgramInfo (
+        return {
             (uint) 0, /* recordedid */
             title,          /* title */
             "",              /* sortTitle */
@@ -101,7 +101,7 @@ class TestProgramInfo : public QObject
             (uint) 0, /* subtitle type */
             "", /* inputname */
             QDateTime() /* bookmark update */
-        );
+        };
     }
 
     QString m_draculaList = "Dracula||Its a movie.|0|0|0|||4294967295|||||0|"

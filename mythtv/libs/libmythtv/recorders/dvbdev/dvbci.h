@@ -27,6 +27,7 @@
 #ifndef DVBCI_H
 #define DVBCI_H
 
+#include <array>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
@@ -110,12 +111,14 @@ public:
 
 // Ca Pmt List Management:
 
-#define CPLM_MORE    0x00
-#define CPLM_FIRST   0x01
-#define CPLM_LAST    0x02
-#define CPLM_ONLY    0x03
-#define CPLM_ADD     0x04
-#define CPLM_UPDATE  0x05
+enum CPLM : uint8_t {
+    CPLM_MORE    = 0x00,
+    CPLM_FIRST   = 0x01,
+    CPLM_LAST    = 0x02,
+    CPLM_ONLY    = 0x03,
+    CPLM_ADD     = 0x04,
+    CPLM_UPDATE  = 0x05,
+};
 
 class cCiCaPmt {
   friend class cCiConditionalAccessSupport;
@@ -123,7 +126,7 @@ class cCiCaPmt {
 private:
   int     m_length        {0};
   int     m_infoLengthPos {0};
-  uint8_t m_capmt[2048]   {0}; ///< XXX is there a specified maximum?
+  std::array<uint8_t,2048> m_capmt   {0}; ///< XXX is there a specified maximum?
 public:
   explicit cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddElementaryStream(int type, int pid);
@@ -131,7 +134,7 @@ public:
                        const uint8_t *data);
   };
 
-#define MAX_CI_SESSION  16 //XXX
+static constexpr int8_t MAX_CI_SESSION  {16};  //XXX
 
 class cCiSession;
 class cCiTransportLayer;
@@ -162,7 +165,7 @@ private:
   bool                    m_newCaSupport {false};
   bool                    m_hasUserIO    {false};
   bool                    m_needCaPmt    {false};
-  cCiSession             *m_sessions[MAX_CI_SESSION] {};
+  std::array<cCiSession*,MAX_CI_SESSION> m_sessions {};
   cCiTransportLayer      *m_tpl          {nullptr};
   cCiTransportConnection *m_tc           {nullptr};
   static int ResourceIdToInt(const uint8_t *Data);

@@ -22,7 +22,7 @@
 #include "libmythbase/http/mythhttpcommon.h"
 #include "libmythbase/http/mythmimetype.h"
 
-#define HTTP_SOCKET_TIMEOUT_MS 10000 // 10 seconds
+static constexpr int HTTP_SOCKET_TIMEOUT_MS { 10000 }; // 10 seconds
 #define HTTP_SERVICES_DIR QString("/services/")
 
 class MythHTTPData;

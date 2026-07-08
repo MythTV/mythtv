@@ -41,7 +41,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
 
     RenderType  m_type;
     QSize       m_size;
-    bool        m_errored;
+    bool        m_errored {false};
 
   private:
     Q_DISABLE_COPY(MythRender)

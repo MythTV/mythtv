@@ -4,6 +4,7 @@
 #define TVPLAY_H
 
 // C++
+#include <array>
 #include <cstdint>
 #include <utility>
 #include <vector>
@@ -707,8 +708,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // XXX This ignores kTrackTypeTextSubtitle which is greater than
     // kTrackTypeCount, and it unnecessarily includes
     // kTrackTypeUnknown.
-    QStringList m_tvmTracks[kTrackTypeCount];
-    int         m_tvmCurtrack[kTrackTypeCount] {};
+    std::array<QStringList,kTrackTypeCount> m_tvmTracks;
+    std::array<int,kTrackTypeCount>         m_tvmCurtrack {};
 
     // Audio
     bool    m_tvmAvsync {true};

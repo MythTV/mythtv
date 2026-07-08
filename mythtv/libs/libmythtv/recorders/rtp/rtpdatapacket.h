@@ -32,8 +32,8 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
 {
   public:
     RTPDataPacket(const RTPDataPacket&)  = default;
-    explicit RTPDataPacket(const UDPPacket &o) : UDPPacket(o), m_off(0) { }
-    explicit RTPDataPacket(uint64_t key) : UDPPacket(key), m_off(0) { }
+    explicit RTPDataPacket(const UDPPacket &o) : UDPPacket(o) { }
+    explicit RTPDataPacket(uint64_t key) : UDPPacket(key) { }
     RTPDataPacket(void) : UDPPacket(0ULL) { }
 
     RTPDataPacket& operator=(const RTPDataPacket&) = default;

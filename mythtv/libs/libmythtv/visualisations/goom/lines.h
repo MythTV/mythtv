@@ -39,25 +39,29 @@ struct GMLine
 	float   powinc;
 };
 
+enum GML_TYPE : uint8_t {
 // les ID possibles
-#define GML_CIRCLE 0
+    GML_CIRCLE = 0,
 // (param = radius)
 
-#define GML_HLINE 1
+    GML_HLINE = 1,
 // (param = y)
 
-#define GML_VLINE 2
+    GML_VLINE = 2,
 // (param = x)
+};
 
 // les modes couleur possible (si tu mets un autre c'est noir)
 
-#define GML_BLEUBLANC 0
-#define GML_RED 1
-#define GML_ORANGE_V 2
-#define GML_ORANGE_J 3
-#define GML_VERT 4
-#define GML_BLEU 5
-#define GML_BLACK 6
+enum GML_COLOR : uint8_t {
+    GML_BLEUBLANC = 0,
+    GML_RED = 1,
+    GML_ORANGE_V = 2,
+    GML_ORANGE_J = 3,
+    GML_VERT = 4,
+    GML_BLEU = 5,
+    GML_BLACK = 6,
+};
 
 /* construit un effet de line (une ligne horitontale pour commencer) */
 GMLine *goom_lines_init (int rx, int ry, int IDsrc, float paramS, int coulS, int IDdest, float paramD, int coulD);

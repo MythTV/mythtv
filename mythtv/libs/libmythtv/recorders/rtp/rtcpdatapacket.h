@@ -17,9 +17,9 @@
 
 #include "udppacket.h"
 
-#define RTP_VERSION 2
-#define RTCP_RR     201
-#define RTCP_SDES   202
+static constexpr uint8_t RTP_VERSION {   2 };
+static constexpr uint8_t RTCP_RR     { 201 };
+static constexpr uint8_t RTCP_SDES   { 202 };
 
 /** \brief RTCP Data Packet
  *
@@ -60,13 +60,13 @@ public:
         if (m_sequence == 0)
         {
             // No packet received yet, send an empty RTPC RR packet
-            uchar rtcp[10];
+            std::array<uint8_t,10> rtcp;
 
             rtcp[0] = RTP_VERSION << 6;         // RTP version
             rtcp[1] = RTCP_RR;                  // RTCP_RR
             qToBigEndian((qint16)1, &rtcp[2]);  // length in words - 1
             qToBigEndian(        0, &rtcp[4]);  // our own SSRC
-            buffer = QByteArray((char *)rtcp, 10);
+            buffer = QByteArray(reinterpret_cast<char*>(rtcp.data()), rtcp.size());
         }
         else
         {

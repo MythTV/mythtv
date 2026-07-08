@@ -14,7 +14,7 @@
 class MythDebugVulkan;
 class MythUniformBufferVulkan;
 
-#define MAX_TEXTURE_COUNT (1000)
+static constexpr int16_t MAX_TEXTURE_COUNT {1000};
 
 class MUI_PUBLIC MythPainterVulkan : public MythPainterGPU
 {

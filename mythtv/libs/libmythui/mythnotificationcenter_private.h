@@ -28,7 +28,7 @@
 class MythNotificationScreen;
 class MythNotificationScreenStack;
 
-#define MIN_LIFE 1000
+static constexpr int MIN_LIFE {1000};
 
 class NCPrivate : public QObject
 {
