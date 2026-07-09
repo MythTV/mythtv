@@ -95,15 +95,15 @@ bool AudioOutputOpenSLES::CreateEngine()
 {
     SLresult result;
 
-    m_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
-    if (m_so_handle == nullptr)
+    m_soHandle = dlopen("libOpenSLES.so", RTLD_NOW);
+    if (m_soHandle == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error: Failed to load libOpenSLES");
         Close();
         return false;
     }
 
-    m_slCreateEnginePtr = (slCreateEngine_t)dlsym(m_so_handle, "slCreateEngine");
+    m_slCreateEnginePtr = (slCreateEngine_t)dlsym(m_soHandle, "slCreateEngine");
     if (m_slCreateEnginePtr == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error: Failed to load symbol slCreateEngine");
@@ -113,7 +113,7 @@ bool AudioOutputOpenSLES::CreateEngine()
 
 #define OPENSL_DLSYM(dest, name)                       \
     do {                                                       \
-        const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(m_so_handle, "SL_IID_" name);        \
+        const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(m_soHandle, "SL_IID_" name);        \
         if (sym == nullptr)                             \
         {                                                      \
             LOG(VB_GENERAL, LOG_ERR, "AOOSLES Error: Failed to load symbol SL_IID_" name); \
@@ -123,10 +123,10 @@ bool AudioOutputOpenSLES::CreateEngine()
         (dest) = *sym;                                         \
     } while(0)
 
-    OPENSL_DLSYM(m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
-    OPENSL_DLSYM(m_SL_IID_ENGINE, "ENGINE");
-    OPENSL_DLSYM(m_SL_IID_PLAY, "PLAY");
-    OPENSL_DLSYM(m_SL_IID_VOLUME, "VOLUME");
+    OPENSL_DLSYM(m_slIidAndroidSimpleBufferQueue, "ANDROIDSIMPLEBUFFERQUEUE");
+    OPENSL_DLSYM(m_slIidEngine, "ENGINE");
+    OPENSL_DLSYM(m_slIidPlay, "PLAY");
+    OPENSL_DLSYM(m_slIidVolume, "VOLUME");
 #undef OPENSL_DLSYM
 
     // create engine
@@ -138,11 +138,11 @@ bool AudioOutputOpenSLES::CreateEngine()
     CHECK_OPENSL_ERROR("Failed to realize engine");
 
     // get the engine interface, needed to create other objects
-    result = GetInterface(m_engineObject, m_SL_IID_ENGINE, &m_engineEngine);
+    result = GetInterface(m_engineObject, m_slIidEngine, &m_engineEngine);
     CHECK_OPENSL_ERROR("Failed to get the engine interface");
 
     // create output mix, with environmental reverb specified as a non-required interface
-    const std::array<SLInterfaceID,1> ids1 { m_SL_IID_VOLUME };
+    const std::array<SLInterfaceID,1> ids1 { m_slIidVolume };
     const std::array<SLboolean,1> req1 { SL_BOOLEAN_FALSE };
     result = CreateOutputMix(m_engineEngine, &m_outputMixObject,
                              1, ids1.data(), req1.data());
@@ -205,7 +205,7 @@ bool AudioOutputOpenSLES::StartPlayer()
     SLDataSink audioSnk = {&loc_outmix, nullptr};
 
     //create audio player
-    const std::array<SLInterfaceID,2> ids2 { m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, m_SL_IID_VOLUME };
+    const std::array<SLInterfaceID,2> ids2 { m_slIidAndroidSimpleBufferQueue, m_slIidVolume };
     static const std::array<SLboolean,2> req2 { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
     if (GetNativeOutputSampleRate() >= m_sampleRate) { // FIXME
@@ -232,13 +232,13 @@ bool AudioOutputOpenSLES::StartPlayer()
     result = Realize(m_playerObject, SL_BOOLEAN_FALSE);
     CHECK_OPENSL_ERROR("Failed to realize player object.");
 
-    result = GetInterface(m_playerObject, m_SL_IID_PLAY, &m_playerPlay);
+    result = GetInterface(m_playerObject, m_slIidPlay, &m_playerPlay);
     CHECK_OPENSL_ERROR("Failed to get player interface.");
 
-    result = GetInterface(m_playerObject, m_SL_IID_VOLUME, &m_volumeItf);
+    result = GetInterface(m_playerObject, m_slIidVolume, &m_volumeItf);
     CHECK_OPENSL_ERROR("failed to get volume interface.");
 
-    result = GetInterface(m_playerObject, m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+    result = GetInterface(m_playerObject, m_slIidAndroidSimpleBufferQueue,
                                                   &m_playerBufferQueue);
     CHECK_OPENSL_ERROR("Failed to get buff queue interface");
 
@@ -324,10 +324,10 @@ void AudioOutputOpenSLES::Close()
         Destroy(m_engineObject);
         m_engineObject = nullptr;
     }
-    if (m_so_handle)
+    if (m_soHandle)
     {
-        dlclose(m_so_handle);
-        m_so_handle = nullptr;
+        dlclose(m_soHandle);
+        m_soHandle = nullptr;
     }
 }
 

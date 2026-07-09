@@ -56,13 +56,13 @@ class AudioOutputOpenSLES : public AudioOutputBase
     SLPlayItf                       m_playerPlay        {nullptr};
 
     /* OpenSL symbols */
-    void                           *m_so_handle         {nullptr};
+    void                           *m_soHandle          {nullptr};
 
     slCreateEngine_t                m_slCreateEnginePtr {nullptr};
-    SLInterfaceID                   m_SL_IID_ENGINE     {nullptr};
-    SLInterfaceID                   m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE {nullptr};
-    SLInterfaceID                   m_SL_IID_VOLUME     {nullptr};
-    SLInterfaceID                   m_SL_IID_PLAY       {nullptr};
+    SLInterfaceID                   m_slIidEngine       {nullptr};
+    SLInterfaceID                   m_slIidAndroidSimpleBufferQueue {nullptr};
+    SLInterfaceID                   m_slIidVolume       {nullptr};
+    SLInterfaceID                   m_slIidPlay         {nullptr};
 
     /* audio buffered through opensles */
     uint8_t                        *m_buf               {nullptr};
