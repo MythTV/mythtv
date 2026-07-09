@@ -988,7 +988,7 @@ class TV::SleepTimerInfo
     std::chrono::milliseconds milliseconds;
 };
 
-const std::vector<TV::SleepTimerInfo> TV::s_sleepTimes =
+const std::vector<TV::SleepTimerInfo> TV::kSleepTimes =
 {
     { tr("Off",   "Sleep timer"),   0min },
     { tr("30m",   "Sleep timer"),  30min },
@@ -7128,7 +7128,7 @@ void TV::ToggleSleepTimer()
     QString text;
 
     // increment sleep index, cycle through
-    if (++m_sleepIndex == s_sleepTimes.size())
+    if (++m_sleepIndex == kSleepTimes.size())
         m_sleepIndex = 0;
 
     // set sleep timer to next sleep_index timeout
@@ -7139,13 +7139,13 @@ void TV::ToggleSleepTimer()
         m_sleepTimerTimeout = 0ms;
     }
 
-    if (s_sleepTimes[m_sleepIndex].milliseconds != 0ms)
+    if (kSleepTimes[m_sleepIndex].milliseconds != 0ms)
     {
-        m_sleepTimerTimeout = s_sleepTimes[m_sleepIndex].milliseconds;
+        m_sleepTimerTimeout = kSleepTimes[m_sleepIndex].milliseconds;
         m_sleepTimerId = StartTimer(m_sleepTimerTimeout, __LINE__);
     }
 
-    text = tr("Sleep ") + " " + s_sleepTimes[m_sleepIndex].dispString;
+    text = tr("Sleep ") + " " + kSleepTimes[m_sleepIndex].dispString;
     emit ChangeOSDMessage(text);
 }
 
@@ -9268,7 +9268,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context,
         }
         else if (actionName == ACTION_CAST)
         {
-            if (!m_actors.isEmpty() || !m_guest_stars.isEmpty() ||
+            if (!m_actors.isEmpty() || !m_guestStars.isEmpty() ||
                 !m_guests.isEmpty())
                 BUTTON(actionName, tr("Cast"));
         }
@@ -9611,7 +9611,7 @@ void TV::RetrieveCast(const ProgramInfo& ProgInfo)
     QString table = recorded ? "recordedcredits" : "credits";
 
     m_actors.clear();
-    m_guest_stars.clear();
+    m_guestStars.clear();
     m_guests.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -9664,7 +9664,7 @@ void TV::RetrieveCast(const ProgramInfo& ProgInfo)
             if (role == "actor")
                 m_actors.append(qMakePair(pname, character));
             else if (role == "guest_star")
-                m_guest_stars.append(qMakePair(pname, character));
+                m_guestStars.append(qMakePair(pname, character));
             else if (role == "guest")
                 m_guests.append(qMakePair(pname, character));
         }
@@ -9697,7 +9697,7 @@ void TV::FillOSDMenuCast(void)
     const ProgramInfo pginfo(*m_playerContext.m_playingInfo);
 
     FillOSDMenuCastButton(dialog, m_actors);
-    FillOSDMenuCastButton(dialog, m_guest_stars);
+    FillOSDMenuCastButton(dialog, m_guestStars);
     FillOSDMenuCastButton(dialog, m_guests);
 
     emit ChangeOSDDialog(dialog);
@@ -9973,7 +9973,7 @@ void TV::ToggleSleepTimer(const QString& Time)
     if (mins != 0min)
         out = tr("Sleep") + " " + QString::number(mins.count());
     else
-        out = tr("Sleep") + " " + s_sleepTimes[0].dispString;
+        out = tr("Sleep") + " " + kSleepTimes[0].dispString;
     emit ChangeOSDMessage(out);
 }
 

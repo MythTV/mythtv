@@ -583,14 +583,14 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     QMap<QString,ProgramList> m_progLists;
 
     QVector<string_pair> m_actors;
-    QVector<string_pair> m_guest_stars;
+    QVector<string_pair> m_guestStars;
     QVector<string_pair> m_guests;
 
     mutable QRecursiveMutex m_chanEditMapLock; ///< Lock for chanEditMap and ddMap
     InfoMap        m_chanEditMap;          ///< Channel Editing initial map
 
     class SleepTimerInfo;
-    static const std::vector<SleepTimerInfo> s_sleepTimes;
+    static const std::vector<SleepTimerInfo> kSleepTimes;
     uint                   m_sleepIndex {0};          ///< Index into sleep_times.
     std::chrono::milliseconds m_sleepTimerTimeout {0ms};   ///< Current sleep timeout in msec
     int                    m_sleepTimerId {0};        ///< Timer for turning off playback.

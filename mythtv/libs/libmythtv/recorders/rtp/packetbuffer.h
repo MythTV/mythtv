@@ -46,13 +46,13 @@ class PacketBuffer
     /** @brief Packets key to use for next empty packet.
     The upper 32 bits are random and the lower 32 bits are incremented from 0.
     */
-    uint64_t m_next_empty_packet_key;
+    uint64_t m_nextEmptyPacketKey;
     
     /// Packets ready for reuse
-    QMap<uint64_t, UDPPacket> m_empty_packets;
+    QMap<uint64_t, UDPPacket> m_emptyPackets;
 
     /// Ordered list of available packets
-    QList<UDPPacket> m_available_packets;
+    QList<UDPPacket> m_availablePackets;
 };
 
 #endif // PACKET_BUFFER_H

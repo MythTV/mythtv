@@ -39,8 +39,8 @@ class RTCPDataPacket : public UDPPacket
 public:
     RTCPDataPacket(const RTCPDataPacket &o)
   : UDPPacket(o),
-    m_timestamp(o.m_timestamp), m_last_timestamp(o.m_last_timestamp),
-    m_sequence(o.m_sequence),   m_last_sequence(o.m_last_sequence),
+    m_timestamp(o.m_timestamp), m_lastTimestamp(o.m_lastTimestamp),
+    m_sequence(o.m_sequence),   m_lastSequence(o.m_lastSequence),
     m_lost(o.m_lost),           m_ssrc(o.m_ssrc)
     { }
 
@@ -48,9 +48,9 @@ public:
                    uint32_t sequence, uint32_t last_sequence,
                    uint32_t lost, uint32_t lost_interval,
                    uint32_t ssrc)
-  : m_timestamp(timestamp),     m_last_timestamp(last_timestamp),
-    m_sequence(sequence),       m_last_sequence(last_sequence),
-    m_lost(lost),               m_lost_interval(lost_interval),
+  : m_timestamp(timestamp),     m_lastTimestamp(last_timestamp),
+    m_sequence(sequence),       m_lastSequence(last_sequence),
+    m_lost(lost),               m_lostInterval(lost_interval),
     m_ssrc(ssrc) { }
 
     QByteArray GetData(void) const
@@ -119,7 +119,7 @@ public:
             qToBigEndian((quint32) 0, &rtcp[20]); /* jitter */
 
             qToBigEndian((quint32) m_timestamp, &rtcp[24]); /* last SR timestamp */
-            qToBigEndian((quint32) m_last_timestamp, &rtcp[28]); /* delay since last SR timestamp */
+            qToBigEndian((quint32) m_lastTimestamp, &rtcp[28]); /* delay since last SR timestamp */
 
             // CNAME
             rtcp[32] = (RTP_VERSION << 6) + 1;  // 1 report block
@@ -152,11 +152,11 @@ public:
 
 protected:
     uint32_t m_timestamp;
-    uint32_t m_last_timestamp;
+    uint32_t m_lastTimestamp;
     uint32_t m_sequence;
-    uint32_t m_last_sequence;
+    uint32_t m_lastSequence;
     uint32_t m_lost;
-    uint32_t m_lost_interval {0};
+    uint32_t m_lostInterval {0};
     uint32_t m_ssrc;
 };
 #endif

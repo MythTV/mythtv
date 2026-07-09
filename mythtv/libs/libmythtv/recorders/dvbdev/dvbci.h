@@ -73,7 +73,7 @@ class cCiMMI;
 class cCiMenu {
   friend class cCiMMI;
 private:
-  static constexpr int MAX_CIMENU_ENTRIES { 64 }; ///< XXX is there a specified maximum?
+  static constexpr int kMAX_CIMENU_ENTRIES { 64 }; ///< XXX is there a specified maximum?
   cCiMMI *m_mmi          {nullptr};
   bool    m_selectable;
   std::string m_titleText;

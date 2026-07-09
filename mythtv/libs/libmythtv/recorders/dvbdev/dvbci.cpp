@@ -1435,7 +1435,7 @@ cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
   : m_mmi(MMI),
     m_selectable(Selectable)
 {
-  m_entries.resize(MAX_CIMENU_ENTRIES);
+  m_entries.resize(kMAX_CIMENU_ENTRIES);
 }
 
 bool cCiMenu::Select(int Index)
