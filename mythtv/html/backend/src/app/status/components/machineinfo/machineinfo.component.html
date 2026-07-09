@@ -20,18 +20,24 @@
                 <!-- pretty print values in MB/GB -->
                 <li>{{ 'dashboard.status.mach.disk_total' | translate }}:</li>
                 <ul class="list-disc list-inside ml-8">
-                    <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ sg.Total.toLocaleString() }} MiB</li>
-                    <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ sg.Used.toLocaleString() }} MiB</li>
-                    <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ sg.Free.toLocaleString() }} MiB</li>
-                    <li>{{ 'dashboard.status.mach.space_after_expire' | translate }}: {{ (sg.Free +
-                        sg.Expirable).toLocaleString() }} MiB</li>
+                    <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{
+                        (sg.Total/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB</li>
+                    <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{
+                        (sg.Used/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB</li>
+                    <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{
+                        (sg.Free/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB</li>
+                    <li>{{ 'dashboard.status.mach.space_after_expire' | translate }}: {{ ((sg.Free +
+                        sg.Expirable)/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB</li>
                     <ul class="list-disc list-inside ml-12">
-                        <li>{{ 'dashboard.status.mach.space_livetv' | translate }}: {{ sg.LiveTV.toLocaleString() }} MiB
+                        <li>{{ 'dashboard.status.mach.space_livetv' | translate }}: {{
+                            (sg.LiveTV/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB
                         </li>
-                        <li>{{ 'dashboard.status.mach.space_deleted' | translate }}: {{ sg.Deleted.toLocaleString() }}
-                            MiB</li>
-                        <li>{{ 'dashboard.status.mach.space_expirable' | translate }}: {{ sg.Expirable.toLocaleString()
-                            }} MiB</li>
+                        <li>{{ 'dashboard.status.mach.space_deleted' | translate }}: {{
+                            (sg.Deleted/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB
+                        </li>
+                        <li>{{ 'dashboard.status.mach.space_expirable' | translate }}: {{
+                            (sg.Expirable/1024).toLocaleString(undefined, {maximumFractionDigits: 1}) }} GiB
+                        </li>
                     </ul>
                 </ul>
             </ul>
@@ -75,9 +81,12 @@
         <li>{{ 'dashboard.status.mach.myth_drive' | translate }} #{{ Id }}</li>
         <ul class="list-disc list-inside ml-8">
             <li>{{ 'dashboard.status.mach.disk_dirs' | translate }}: {{ Directory }}</li>
-            <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ Total.toLocaleString() }} MiB</li>
-            <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ Used.toLocaleString() }} MiB</li>
-            <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ Free.toLocaleString() }} MiB</li>
+            <li>{{ 'dashboard.status.mach.total_space' | translate }}: {{ (Total/1024).toLocaleString(undefined,
+                {maximumFractionDigits: 1}) }} GiB</li>
+            <li>{{ 'dashboard.status.mach.space_used' | translate }}: {{ (Used/1024).toLocaleString(undefined,
+                {maximumFractionDigits: 1}) }} GiB</li>
+            <li>{{ 'dashboard.status.mach.space_free' | translate }}: {{ (Free/1024).toLocaleString(undefined,
+                {maximumFractionDigits: 1}) }} GiB</li>
         </ul>
     </ul>
 </ng-template>
