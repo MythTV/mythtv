@@ -64,7 +64,7 @@ class TestMythSystem: public QObject
     }
 
     // called at the end of these sets of tests
-    void cleanupTestCase(void)
+    static void cleanupTestCase(void)
     {
         ShutdownMythSystemLegacy();
     }

@@ -322,7 +322,7 @@ class MythHTTP
         return Default;
     }
 
-    static inline QString GetContentType(const MythMimeType& Mime)
+    static QString GetContentType(const MythMimeType& Mime)
     {
         QString type = Mime.Name();
         if (Mime.Inherits("text/plain"))
@@ -330,7 +330,7 @@ class MythHTTP
         return type;
     }
 
-    static inline QString AddressToString(QHostAddress& Address)
+    static QString AddressToString(QHostAddress& Address)
     {
         if (Address.protocol() == QAbstractSocket::IPv6Protocol)
         {

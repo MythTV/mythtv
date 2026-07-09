@@ -82,10 +82,10 @@ private:
   std::vector<std::string> m_entries;
   cCiMenu(cCiMMI *MMI, bool Selectable);
 public:
-  const std::string TitleText(void) { return m_titleText; }
-  const std::string SubTitleText(void) { return m_subTitleText; }
-  const std::string BottomText(void) { return m_bottomText; }
-  const std::string Entry(int n)
+  std::string TitleText(void) { return m_titleText; }
+  std::string SubTitleText(void) { return m_subTitleText; }
+  std::string BottomText(void) { return m_bottomText; }
+  std::string Entry(int n)
         { if (n < static_cast<int>(m_entries.size())) return m_entries[n]; return {}; }
   int NumEntries(void) const { return m_entries.size(); }
   bool Selectable(void) const { return m_selectable; }
@@ -102,7 +102,7 @@ private:
   int     m_expectedLength {0};
   explicit cCiEnquiry(cCiMMI *MMI) : m_mmi(MMI) {}
 public:
-  const std::string Text(void) { return m_text; }
+  std::string Text(void) { return m_text; }
   bool Blind(void) const { return m_blind; }
   int ExpectedLength(void) const { return m_expectedLength; }
   bool Reply(const char *s);
@@ -207,7 +207,7 @@ class cHlCiHandler : public cCiHandler {
     int            m_numSlots;
     int            m_state          {0};
     int            m_numCaSystemIds {0};
-    dvbca_vector   m_caSystemIds    {};
+    dvbca_vector   m_caSystemIds;
     cHlCiHandler(int Fd, int NumSlots);
     int CommHL(unsigned tag, unsigned function, struct ca_msg *msg) const;
     int GetData(unsigned tag, struct ca_msg *msg);
