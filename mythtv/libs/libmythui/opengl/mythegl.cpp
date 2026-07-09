@@ -1,5 +1,4 @@
 // MythTV
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "mythrenderopengl.h"
 #include "mythegl.h"
@@ -23,8 +22,10 @@
 #define EGL_PLATFORM_X11_EXT     0x31D5
 #endif
 
-MythEGL::MythEGL(MythRenderOpenGL* Context)
+MythEGL::MythEGL([[maybe_unused]] MythRenderOpenGL* Context)
+#if CONFIG_EGL
   : m_context(Context)
+#endif
 {
 }
 
