@@ -92,7 +92,7 @@ using EMBEDRETURNVOIDSCHEDIT = void (*) (const ProgramInfo *, void *);
 // desirable and should be avoided when possible.)
 //
 
-enum scheduleEditTypes {
+enum scheduleEditTypes : uint8_t {
     kScheduleProgramGuide = 0,
     kScheduleProgramFinder,
     kScheduledRecording,
@@ -104,14 +104,14 @@ enum scheduleEditTypes {
 /**
  * Type of message displayed in ShowNoRecorderDialog()
  */
-enum NoRecorderMsg
+enum NoRecorderMsg : uint8_t
 {
     kNoRecorders = 0,  ///< No free recorders
     kNoCurrRec = 1,    ///< No current recordings
     kNoTuners = 2,     ///< No capture cards configured
 };
 
-enum {
+enum : uint8_t {
     kStartTVNoFlags           = 0x00,
     kStartTVInPlayList        = 0x02,
     kStartTVByNetworkCommand  = 0x04,
@@ -298,7 +298,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void SetInPlayList(bool InPlayList) { m_inPlaylist = InPlayList; }
     void setUnderNetworkControl(bool setting) { m_underNetworkControl = setting; }
     void PrepToSwitchToRecordedProgram(const ProgramInfo& ProgInfo);
-    enum BookmarkAction {
+    enum BookmarkAction : uint8_t {
         kBookmarkAlways,
         kBookmarkNever,
         kBookmarkAuto // set iff db_playback_exit_prompt==2
@@ -374,7 +374,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
         DoSeek(TimeInSec.count(), Msg, TimeIsOffset, HonorCutlist); };
     bool DoPlayerSeek(float Time);
     bool DoPlayerSeekToFrame(uint64_t FrameNum);
-    enum ArbSeekWhence { ARBSEEK_SET = 0, ARBSEEK_REWIND, ARBSEEK_FORWARD, ARBSEEK_END };
+    enum ArbSeekWhence : uint8_t { ARBSEEK_SET = 0, ARBSEEK_REWIND, ARBSEEK_FORWARD, ARBSEEK_END };
     void DoSeekAbsolute(long long Seconds, bool HonorCutlist);
     void DoArbSeek(ArbSeekWhence Whence, bool HonorCutlist);
     void DoJumpFFWD();

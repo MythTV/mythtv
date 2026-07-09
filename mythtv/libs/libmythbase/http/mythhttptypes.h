@@ -79,7 +79,7 @@ class MythHTTPConfig
 #endif
 };
 
-enum MythHTTPVersion
+enum MythHTTPVersion : uint8_t
 {
     HTTPUnknownVersion = 0,
     HTTPZeroDotNine,
@@ -87,7 +87,7 @@ enum MythHTTPVersion
     HTTPOneDotOne
 };
 
-enum MythHTTPRequestType
+enum MythHTTPRequestType : uint8_t
 {
     HTTPUnknown = 0x0000,
     HTTPHead    = 0x0001,
@@ -102,7 +102,7 @@ enum MythHTTPRequestType
 // SOAP, regardless of whether they require POST or not
 #define HTTP_DEFAULT_ALLOWED (HTTPHead | HTTPGet | HTTPOptions | HTTPPost)
 
-enum MythHTTPStatus
+enum MythHTTPStatus : uint16_t
 {
     HTTPSwitchingProtocols  = 101,
     HTTPOK                  = 200,
@@ -125,21 +125,21 @@ enum MythHTTPStatus
     HTTPNetworkAuthenticationRequired = 511
 };
 
-enum MythHTTPConnection
+enum MythHTTPConnection : uint8_t
 {
     HTTPConnectionClose     = 0,
     HTTPConnectionKeepAlive,
     HTTPConnectionUpgrade
 };
 
-enum MythHTTPEncode
+enum MythHTTPEncode : uint8_t
 {
     HTTPNoEncode = 0,
     HTTPGzip,
     HTTPChunked
 };
 
-enum MythHTTPCacheType
+enum MythHTTPCacheType : uint16_t
 {
     HTTPIgnoreCache  = 0x0000,
     HTTPNoCache      = 0x0001,

@@ -31,7 +31,7 @@ class AutoDeleteDeque
     }
 
     T take(uint i);
-    iterator erase(iterator it)
+    iterator erase(const iterator& it)
     {
         if (m_autodelete)
             delete *it;

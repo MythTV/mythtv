@@ -45,7 +45,7 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
     bool HasExtension(void) const { return (m_data[0] >> 4) & 0x1; }
     uint GetCSRCCount(void) const { return m_data[0] & 0xf; }
 
-    enum {
+    enum : uint8_t {
         kPayLoadTypePCMAudio   = 8,
         kPayLoadTypeMPEGAudio  = 12,
         kPayLoadTypeH261Video  = 31,

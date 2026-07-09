@@ -12,7 +12,7 @@
 #include "libmythbase/referencecounter.h"
 #include "mythuiexp.h"
 
-enum RenderType
+enum RenderType : uint8_t
 {
     kRenderUnknown = 0,
     kRenderDirect3D9,
