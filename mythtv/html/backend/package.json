@@ -24,7 +24,7 @@
     "@primeuix/themes": "^1.2.5",
     "cookie": "^0.7.0",
     "cross-spawn": "^7.0.6",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "primeicons": "^7.0.0",
     "primeng": "^20.4.0",
     "rxjs": "^7.8.1",
