@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
-import { FilterMatchMode, MenuItem, MessageService, SelectItem, SortMeta, SharedModule } from 'primeng/api';
+import { FilterMatchMode, MenuItem, MessageService, SelectItem, SortMeta, SharedModule, ConfirmationService } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { PartialObserver } from 'rxjs';
@@ -23,13 +23,16 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
     selector: 'app-recordings',
     templateUrl: './recordings.component.html',
     styleUrls: ['./recordings.component.css'],
-    providers: [MessageService],
-    imports: [FormsModule, ToastModule, MenuModule, ButtonModule, RippleModule, TooltipModule, SelectModule, TableModule, SharedModule, NgClass, DialogModule, TextareaModule, InputNumberModule, DatePickerModule, MessageModule, ListboxModule, DecimalPipe, TranslatePipe]
+    providers: [MessageService, ConfirmationService],
+    imports: [FormsModule, ToastModule, MenuModule, ButtonModule, RippleModule, TooltipModule, SelectModule,
+        TableModule, SharedModule, NgClass, DialogModule, TextareaModule, InputNumberModule, DatePickerModule,
+        MessageModule, ListboxModule, DecimalPipe, TranslatePipe, ConfirmDialogModule]
 })
 export class RecordingsComponent implements OnInit {
 
@@ -65,6 +68,7 @@ export class RecordingsComponent implements OnInit {
     authorization = '';
     sortField = 'Title';
     sortOrder = 1;
+    deleteAccepted = false;
 
     msg = {
         Success: 'common.success',
@@ -72,6 +76,7 @@ export class RecordingsComponent implements OnInit {
         NetFail: 'common.networkfail',
         CanUndo: 'dashboard.recordings.canundel',
         AlreadyDel: 'dashboard.recordings.alreadydel',
+        DeleteWarning: 'dashboard.recordings.deletewarning',
         NonReRec: 'dashboard.recordings.nonrerec',
         ActionsSelected: 'dashboard.recordings.actionsselected',
         JobsSelected: 'dashboard.recordings.jobsselected',
@@ -93,6 +98,7 @@ export class RecordingsComponent implements OnInit {
     mnu_delete: MenuItem = { label: 'dashboard.recordings.mnu_delete', command: (event) => this.delete(event, false) };
     mnu_delete_rerec: MenuItem = { label: 'dashboard.recordings.mnu_delete_rerec', command: (event) => this.delete(event, true) };
     mnu_undelete: MenuItem = { label: 'dashboard.recordings.mnu_undelete', command: (event) => this.undelete(event) };
+    mnu_permdelete: MenuItem = { label: 'dashboard.recordings.mnu_permdelete', command: (event) => { this.deleteAccepted = false; this.permdelete(event, false) } };
     mnu_rerec: MenuItem = { label: 'dashboard.recordings.mnu_rerec', command: (event) => this.rerec(event) };
     mnu_markwatched: MenuItem = { label: 'dashboard.recordings.mnu_markwatched', command: (event) => this.markwatched(event, true) };
     mnu_markunwatched: MenuItem = { label: 'dashboard.recordings.mnu_markunwatched', command: (event) => this.markwatched(event, false) };
@@ -127,7 +133,7 @@ export class RecordingsComponent implements OnInit {
 
     constructor(private dvrService: DvrService, private messageService: MessageService,
         public translate: TranslateService, private setupService: SetupService,
-        public utility: UtilityService) {
+        public utility: UtilityService, private confirmationService: ConfirmationService) {
         this.JobQCmds = this.setupService.getJobQCommands();
 
         this.dvrService.GetRecGroupList()
@@ -145,7 +151,8 @@ export class RecordingsComponent implements OnInit {
             });
         }
 
-        const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_rerec, this.mnu_markwatched,
+        const mnu_entries = [this.mnu_delete, this.mnu_delete_rerec, this.mnu_undelete, this.mnu_permdelete, this.mnu_rerec,
+        this.mnu_markwatched,
         this.mnu_markunwatched, this.mnu_markdamaged, this.mnu_markundamaged, this.mnu_updatemeta, this.mnu_updaterecrule,
         this.mnu_stoprec, this.mnu_updaterecgrp, this.mnu_runjobs, this.jobs[0], this.jobs[1], this.jobs[2],
         ...this.matchModeRecGrp, ...this.matchModeTitle]
@@ -367,7 +374,11 @@ export class RecordingsComponent implements OnInit {
         let subMenu: MenuItem[] = [];
         if (this.actionList.some((x) => x.Recording.RecGroup == 'Deleted'))
             subMenu.push(this.mnu_undelete);
-        if (this.actionList.some((x) => x.Recording.RecGroup != 'Deleted')) {
+        if (this.actionList.some((x) => x.Recording.RecGroup == 'Deleted'
+            || this.actionList.some((x) => x.Recording.RecGroup == 'LiveTV')))
+            subMenu.push(this.mnu_permdelete);
+        if (this.actionList.some((x) => x.Recording.RecGroup != 'Deleted'
+            && this.actionList.some((x) => x.Recording.RecGroup != 'LiveTV'))) {
             subMenu.push(this.mnu_delete);
             subMenu.push(this.mnu_delete_rerec);
         }
@@ -416,9 +427,10 @@ export class RecordingsComponent implements OnInit {
             this.dvrService.GetRecorded({ RecordedId: program.Recording.RecordedId })
                 .subscribe({
                     next: (x) => {
-                        if (x.Program.Recording.RecGroup == 'Deleted') {
+                        if (x.Program.Recording.RecGroup == 'Deleted'
+                            || x.Program.Recording.RecGroup == 'LiveTV') {
                             this.sendMessage('error', program, event.item.label, this.msg.AlreadyDel);
-                            program.Recording.RecGroup = 'Deleted';
+                            program.Recording.RecGroup = x.Program.Recording.RecGroup;
                         }
                         else {
                             this.dvrService.DeleteRecording({
@@ -437,14 +449,89 @@ export class RecordingsComponent implements OnInit {
                                 error: (err: any) => this.networkError(program, err)
                             });
                         }
+                        // Get next entry for multiple delete
                         this.delete(event, rerec);
                     },
                     error: (err: any) => {
                         this.networkError(program, err);
+                        // Get next entry for multiple delete
                         this.delete(event, rerec);
                     }
                 });
         }
+    }
+
+    permdelete(event: any, rerec: boolean) {
+        let program = <ScheduleOrProgram>this.actionList.shift();
+        if (program) {
+            // check with backend not already deleted by another user
+            this.dvrService.GetRecorded({ RecordedId: program.Recording.RecordedId })
+                .subscribe({
+                    next: (x) => {
+                        if (x.Program.Recording.RecGroup == 'Deleted'
+                            || x.Program.Recording.RecGroup == 'LiveTV') {
+                            if (this.deleteAccepted) {
+                                this.realPermDelete(program, rerec, event);
+                            }
+                            else
+                                this.confirmationService.confirm({
+                                    message: this.msg.DeleteWarning,
+                                    header: program.Title + ': ' + program.SubTitle,
+                                    icon: 'pi pi-exclamation-triangle',
+                                    accept: () => {
+                                        this.deleteAccepted = true;
+                                        this.realPermDelete(program, rerec, event);
+                                    },
+                                    reject: () => {
+                                        this.actionList = [];
+                                    }
+
+                                });
+                        }
+                        else
+                            // Get next entry for multiple delete
+                            this.permdelete(event, rerec);
+                    },
+                    error: (err: any) => {
+                        this.networkError(program, err);
+                        // Get next entry for multiple delete
+                        this.permdelete(event, rerec);
+                    }
+                });
+        }
+        else {
+            // All done
+            setTimeout(() => {
+                this.refresh();
+            }, 1000);
+            this.refresh();
+            this.deleteAccepted = false;
+        }
+    }
+
+    realPermDelete(program: ScheduleOrProgram, rerec: boolean, event: any) {
+        // this.dvrService.DisableRecordSchedule(3)
+        this.dvrService.DeleteRecording({
+            RecordedId: program.Recording.RecordedId,
+            AllowRerecord: rerec
+        })
+            .subscribe({
+                next: (x) => {
+                    if (x.bool) {
+                        this.sendMessage('success', program, event.item.label, this.msg.Success, this.msg.CanUndo);
+                    }
+                    else {
+                        this.sendMessage('error', program, event.item.label, this.msg.Failed);
+                    }
+                    // Get next entry for multiple delete
+                    this.permdelete(event, rerec);
+                },
+                error: (err: any) => {
+                    this.networkError(program, err);
+                    // Get next entry for multiple delete
+                    this.permdelete(event, rerec);
+                }
+            });
     }
 
     undelete(event: any) {
