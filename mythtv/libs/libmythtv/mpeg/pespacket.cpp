@@ -97,7 +97,6 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
                 QString("PID: 0x%1, continuity counter: %2 ").arg(packet->PID(),0,16).arg(cc) +
                 QString("(expected %1)").arg(ccExp));
         }
-        return true;
     }
     else
     {
