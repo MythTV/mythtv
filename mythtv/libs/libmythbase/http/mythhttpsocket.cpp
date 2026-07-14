@@ -82,7 +82,7 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, MythHTTPConfig Config)
     // service would appear again as /services/services/
     auto service = MythHTTPService::Create<MythHTTPServices>();
     m_activeServices.emplace_back(service);
-    auto * services = dynamic_cast<MythHTTPServices*>(service.get());
+    auto * services = qobject_cast<MythHTTPServices*>(service.get());
     if (services == nullptr)
     {
         LOG(VB_HTTP, LOG_ERR, LOC + "Failed to get root services handler.");

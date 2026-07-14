@@ -73,7 +73,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* MDisplay)
     // FreeSync is only currently *controllable* via DRM with an AMD GPU/APU and Display Port
     if (!result)
     {
-        if (auto * display = dynamic_cast<MythDisplayDRM*>(MDisplay); display && display->GetDevice())
+        if (auto * display = qobject_cast<MythDisplayDRM*>(MDisplay); display && display->GetDevice())
             if (auto freesync = MythDRMVRR::CreateFreeSync(display->GetDevice(), range); freesync)
                 result =  freesync;
     }

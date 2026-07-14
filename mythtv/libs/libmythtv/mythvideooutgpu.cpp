@@ -75,14 +75,14 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 
 #if CONFIG_OPENGL
     auto * openglrender = dynamic_cast<MythRenderOpenGL*>(Render);
-    auto * openglpainter = dynamic_cast<MythOpenGLPainter*>(Painter);
+    auto * openglpainter = qobject_cast<MythOpenGLPainter*>(Painter);
     if (openglrender && openglpainter && (Render->Type() == kRenderOpenGL))
         renderers += MythVideoOutputOpenGL::GetAllowedRenderers(openglrender, CodecID, VideoDispDim);
 #endif
 
 #if CONFIG_VULKAN
     auto * vulkanrender = dynamic_cast<MythRenderVulkan*>(Render);
-    auto * vulkanpainter = dynamic_cast<MythPainterVulkan*>(Painter);
+    auto * vulkanpainter = qobject_cast<MythPainterVulkan*>(Painter);
     if (vulkanrender && vulkanpainter && (Render->Type() == kRenderVulkan))
         renderers += MythVideoOutputVulkan::GetAllowedRenderers(CodecID);
 #endif

@@ -51,7 +51,7 @@ struct hdr_output_metadata {
 
 MythHDRPtr MythDRMHDR::Create(MythDisplay* MDisplay, const MythHDRDesc& Desc)
 {
-    auto * display = dynamic_cast<MythDisplayDRM*>(MDisplay);
+    auto * display = qobject_cast<MythDisplayDRM*>(MDisplay);
     if (!display)
         return nullptr;
 

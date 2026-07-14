@@ -518,14 +518,14 @@ void MythDVDDecoder::PostProcessTracks(void)
         }
 
         int trackcount = static_cast<int>(m_tracks[kTrackTypeSubtitle].size());
-        if (auto * dvdplayer = dynamic_cast<MythDVDPlayer*>(m_parent); dvdplayer && (track < 0 || track >= trackcount))
+        if (auto * dvdplayer = qobject_cast<MythDVDPlayer*>(m_parent); dvdplayer && (track < 0 || track >= trackcount))
         {
             emit dvdplayer->DisableDVDSubtitles();
         }
         else if (track >= 0 && track < trackcount)
         {
             SetTrack(kTrackTypeSubtitle, track);
-            if (auto * player = dynamic_cast<MythPlayerUI*>(m_parent); player)
+            if (auto * player = qobject_cast<MythPlayerUI*>(m_parent); player)
                 emit player->EnableSubtitles(true);
         }
     }

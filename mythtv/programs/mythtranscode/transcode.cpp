@@ -170,7 +170,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player_ctx->SetRingBuffer(rb);
     player_ctx->SetPlayer(new MythTranscodePlayer(player_ctx, static_cast<PlayerFlags>(kVideoIsNull | kNoITV)));
     SetPlayerContext(player_ctx);
-    auto * player = dynamic_cast<MythTranscodePlayer*>(GetPlayer());
+    auto * player = qobject_cast<MythTranscodePlayer*>(GetPlayer());
     if (player == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR,

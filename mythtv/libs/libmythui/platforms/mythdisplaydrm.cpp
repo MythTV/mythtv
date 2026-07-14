@@ -24,7 +24,7 @@ bool MythDisplayDRM::DirectRenderingAvailable()
 
     if (auto *mainwindow = GetMythMainWindow(); mainwindow)
     {
-        if (auto *drmdisplay = dynamic_cast<MythDisplayDRM*>(mainwindow->GetDisplay()); drmdisplay)
+        if (auto *drmdisplay = qobject_cast<MythDisplayDRM*>(mainwindow->GetDisplay()); drmdisplay)
         {
             if (auto drm = drmdisplay->GetDevice(); drm && drm->Atomic() && drm->Authenticated())
             {
