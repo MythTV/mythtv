@@ -34,6 +34,7 @@
 #include "libmythbase/mythmiscutil.h"
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/mythversion.h"
+#include "libmythbase/storagegroup.h"
 #include "libmythtv/cardutil.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/tv.h"
@@ -1910,6 +1911,18 @@ void V2Status::FillChannelInfo( QDomElement &channel,
     }
 }
 
+QStringList V2Status::GetBackupsList()
+{
+    QRegularExpression re(".*\\.sql\\.gz$");
+    QString thisHost = gCoreContext->GetHostName();
+    StorageGroup sg1("DB Backups", thisHost);
+    QStringList fileList = sg1.GetFileList("/");
+    QStringList result = fileList.filter(re);
+    StorageGroup sg2("Default", thisHost);
+    fileList = sg2.GetFileList("/");
+    result.append(fileList.filter(re));
+    return result;
+}
 
 
 
