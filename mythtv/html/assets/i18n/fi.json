@@ -142,7 +142,7 @@
             "speedup_label": "Kokeellinen kaupallisen havaitsemisen nopeuttaminen",
             "strict_desc": "Ota käyttöön tiukempi kaupallinen tunnistuskoodi. Poista käytöstä, jos joitain mainoksia ei havaita.",
             "strict_label": "Tiukka kaupallinen havaitseminen",
-            "subtitle": "Kaupalliset tunnistus- ja transkoodaustyöasetukset"
+            "subtitle": "Kaupallisen tunnistus- ja transkoodaustyöasetukset"
         },
         "playgroup": {
             "delete_details": "Tämä poistaa toistoryhmän {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",
             "backends_title": "Taustaohjelmat",
+            "dbbackups_none": "Ei tietokannan varmuuskopioita.",
+            "dbbackups_title": "Tietokannan varmuuskopiot",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on isännässä {{ HostName }}. Tila: {{ State }}.",
             "encoder_title": "Enkooderin tila",
             "endtime_text": "Tämän tallennuksen on määrä päättyä {{ EndTime }}.",

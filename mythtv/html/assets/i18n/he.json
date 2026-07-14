@@ -142,7 +142,7 @@
             "speedup_label": "האצת ניסוי של זיהוי מסחרי",
             "strict_desc": "אפשר קוד זיהוי מסחרי מחמיר יותר. השבת אם חלק מהפרסומות לא מזוהות.",
             "strict_label": "איתור מסחרי קפדני",
-            "subtitle": "איתור מסחרי והגדרות עבודה להמרה"
+            "subtitle": "הגדרות עבודה של איתור מסחרי והמרת קידוד"
         },
         "playgroup": {
             "delete_details": "פעולה זו תמחק את קבוצת ההשמעה {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "אחורי: {{ Name }} הוא {{ Type }} ב-IP {{ IP }}",
             "backends_none": "אין אחוריים",
             "backends_title": "קצוות אחוריים",
+            "dbbackups_none": "אין גיבויים למסד נתונים.",
+            "dbbackups_title": "גיבויים של מסדי נתונים",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} נמצא במארח {{ HostName }}. מדינה: {{ State }}.",
             "encoder_title": "מצב מקודד",
             "endtime_text": "הקלטה זו מתוכננת להסתיים ב-{{ EndTime }}.",

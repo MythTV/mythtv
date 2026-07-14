@@ -142,7 +142,7 @@
             "speedup_label": "A kereskedelmi felderítés kísérleti felgyorsítása",
             "strict_desc": "Engedélyezze a szigorúbb kereskedelmi észlelési kódot. Tiltsa le, ha egyes reklámokat nem észlel a rendszer.",
             "strict_label": "Szigorú kereskedelmi észlelés",
-            "subtitle": "Kereskedelmi Detectiona és Transcode Job beállítások"
+            "subtitle": "Kereskedelmi felismerés és átkódolási feladat beállításai"
         },
         "playgroup": {
             "delete_details": "Ezzel törli a lejátszási csoportot: {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Háttérrendszer: a {{ Name }} egy {{ Type }} az {{ IP }} IP-n",
             "backends_none": "Nincsenek háttérprogramok",
             "backends_title": "Háttérrendszerek",
+            "dbbackups_none": "Nincs adatbázis biztonsági mentés.",
+            "dbbackups_title": "Adatbázis biztonsági mentések",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} a(z) {{ HostName }} gazdagépen található. Állapot: {{ State }}.",
             "encoder_title": "Kódoló állapota",
             "endtime_text": "Ez a felvétel a tervek szerint {{ EndTime }}-kor ér véget.",

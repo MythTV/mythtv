@@ -142,7 +142,7 @@
             "speedup_label": "Experimentelle Beschleunigung der kommerziellen Erkennung",
             "strict_desc": "Aktivieren Sie einen strengeren kommerziellen Erkennungscode. Deaktivieren Sie diese Option, wenn einige Werbespots nicht erkannt werden.",
             "strict_label": "Strenge kommerzielle Erkennung",
-            "subtitle": "Kommerzielle Erkennung und Transkodierungsauftragseinstellungen"
+            "subtitle": "Einstellungen für kommerzielle Erkennung und Transkodierungsjobs"
         },
         "playgroup": {
             "delete_details": "Dadurch wird die Wiedergabegruppe {{ Name }} gelöscht.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} ist ein {{ Type }} auf IP {{ IP }}",
             "backends_none": "Keine Backends",
             "backends_title": "Backends",
+            "dbbackups_none": "Keine Datenbanksicherungen.",
+            "dbbackups_title": "Datenbanksicherungen",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} ist auf Host {{ HostName }}. Bundesstaat: {{ State }}.",
             "encoder_title": "Encoderstatus",
             "endtime_text": "Das Ende dieser Aufzeichnung ist für {{ EndTime }} geplant.",

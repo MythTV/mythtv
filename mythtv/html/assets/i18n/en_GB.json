@@ -142,7 +142,7 @@
             "speedup_label": "Experimental speedup of advert detection",
             "strict_desc": "Enable stricter advert detection code. Disable if some adverts are not being detected.",
             "strict_label": "Strict advert detection",
-            "subtitle": "Advert Detection and Transcode Job Settings"
+            "subtitle": "Commercial Detection and Transcode Job Settings"
         },
         "playgroup": {
             "delete_details": "This will delete Playback Group {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
             "backends_none": "No Backends",
             "backends_title": "Backends",
+            "dbbackups_none": "No database backups.",
+            "dbbackups_title": "Database Backups",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} is on host {{ HostName }}. State: {{ State }}.",
             "encoder_title": "Encoder Status",
             "endtime_text": "This recording is scheduled to end at {{ EndTime }}.",

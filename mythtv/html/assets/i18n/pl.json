@@ -142,7 +142,7 @@
             "speedup_label": "Eksperymentalne przyspieszenie wykrywania komercyjnego",
             "strict_desc": "Włącz bardziej rygorystyczny komercyjny kod wykrywania. Wyłącz, jeśli niektóre reklamy nie są wykrywane.",
             "strict_label": "Ścisłe wykrywanie komercyjne",
-            "subtitle": "Ustawienia zadań wykrywania komercyjnych i transkodowania"
+            "subtitle": "Ustawienia zadań wykrywania handlu i transkodowania"
         },
         "playgroup": {
             "delete_details": "Spowoduje to usunięcie grupy odtwarzania {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
             "backends_none": "Brak zaplecza",
             "backends_title": "Backendy",
+            "dbbackups_none": "Brak kopii zapasowych baz danych.",
+            "dbbackups_title": "Kopie zapasowe baz danych",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} jest na hoście {{ HostName }}. Stan: {{ State }}.",
             "encoder_title": "Stan enkodera",
             "endtime_text": "To nagranie ma zakończyć się o {{ EndTime }}.",

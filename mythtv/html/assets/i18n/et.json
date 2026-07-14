@@ -397,6 +397,8 @@
             "backends_detail": "Taustaprogramm: {{ Name }} on {{ Type }} IP-l {{ IP }}",
             "backends_none": "Taustaprogramme pole",
             "backends_title": "Taustaprogrammid",
+            "dbbackups_none": "Andmebaasi varukoopiaid pole.",
+            "dbbackups_title": "Andmebaasi varukoopiad",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on hostis {{ HostName }}. Olek: {{ State }}.",
             "encoder_title": "Kodeerija olek",
             "endtime_text": "See salvestus on kavandatud lõppema {{ EndTime }}.",

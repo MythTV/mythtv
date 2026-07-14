@@ -142,7 +142,7 @@
             "speedup_label": "Experimentální zrychlení komerční detekce",
             "strict_desc": "Povolit přísnější kód komerční detekce. Zakázat, pokud některé reklamy nejsou detekovány.",
             "strict_label": "Přísná komerční detekce",
-            "subtitle": "Komerční detekce a nastavení úlohy Transcode"
+            "subtitle": "Nastavení úlohy komerční detekce a překódování"
         },
         "playgroup": {
             "delete_details": "Tím se odstraní skupina přehrávání {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Žádné backendy",
             "backends_title": "Backendy",
+            "dbbackups_none": "Žádné zálohy databáze.",
+            "dbbackups_title": "Zálohy databáze",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na hostiteli {{ HostName }}. Stav: {{ State }}.",
             "encoder_title": "Stav kodéru",
             "endtime_text": "Ukončení tohoto nahrávání je naplánováno na {{ EndTime }}.",

@@ -142,7 +142,7 @@
             "speedup_label": "Eksperimentalna pospešitev komercialne detekcije",
             "strict_desc": "Omogoči strožjo komercialno zaznavno kodo. Onemogoči, če nekatere reklame niso zaznane.",
             "strict_label": "Strogo komercialno odkrivanje",
-            "subtitle": "Komercialno zaznavanje in nastavitve posla za prekodiranje"
+            "subtitle": "Komercialno odkrivanje in nastavitve opravila prekodiranja"
         },
         "playgroup": {
             "delete_details": "S tem boste izbrisali skupino za predvajanje {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Brez ozadja",
             "backends_title": "Zaledja",
+            "dbbackups_none": "Brez varnostnih kopij baze podatkov.",
+            "dbbackups_title": "Varnostne kopije baz podatkov",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na gostitelju {{ HostName }}. Država: {{ State }}.",
             "encoder_title": "Status kodirnika",
             "endtime_text": "To snemanje naj bi se končalo ob {{ EndTime }}.",

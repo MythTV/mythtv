@@ -142,7 +142,7 @@
             "speedup_label": "Accélération expérimentale de la détection commerciale",
             "strict_desc": "Activez un code de détection commerciale plus strict. Désactivez-le si certaines publicités ne sont pas détectées.",
             "strict_label": "Détection commerciale stricte",
-            "subtitle": "Paramètres de détection commerciale et de travail de transcodage"
+            "subtitle": "Paramètres des tâches de détection commerciale et de transcodage"
         },
         "playgroup": {
             "delete_details": "Cela supprimera le groupe de lecture {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend : {{ Name }} est un {{ Type }} sur l'IP {{ IP }}",
             "backends_none": "Aucun backend",
             "backends_title": "Backends",
+            "dbbackups_none": "Aucune sauvegarde de base de données.",
+            "dbbackups_title": "Sauvegardes de base de données",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} est sur l'hôte {{ HostName }}. État : {{ State }}.",
             "encoder_title": "État de l'encodeur",
             "endtime_text": "Cet enregistrement doit se terminer à {{ EndTime }}.",

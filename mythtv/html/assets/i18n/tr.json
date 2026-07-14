@@ -142,7 +142,7 @@
             "speedup_label": "Ticari tespitin deneysel olarak hızlandırılması",
             "strict_desc": "Daha katı ticari tespit kodunu etkinleştirin. Bazı reklamlar algılanmıyorsa devre dışı bırakın.",
             "strict_label": "Sıkı ticari tespit",
-            "subtitle": "Ticari Tespit ve Kod Dönüştürme İş Ayarları"
+            "subtitle": "Ticari Algılama ve Kod Dönüştürme İşi Ayarları"
         },
         "playgroup": {
             "delete_details": "Bu, {{ Name }} Oynatma Grubunu silecektir.",
@@ -397,6 +397,8 @@
             "backends_detail": "Arka uç: {{ Name }}, IP {{ Type }} üzerinde bir {{ IP }}'dir",
             "backends_none": "Arka Uç Yok",
             "backends_title": "arka uçlar",
+            "dbbackups_none": "Veritabanı yedeklemesi yok.",
+            "dbbackups_title": "Veritabanı Yedeklemeleri",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }}, {{ HostName }} ana bilgisayarında. Durum: {{ State }}.",
             "encoder_title": "Kodlayıcı Durumu",
             "endtime_text": "Bu kayıt, {{ EndTime }} tarihinde sona ermek üzere planlandı.",

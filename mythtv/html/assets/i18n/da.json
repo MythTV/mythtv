@@ -142,7 +142,7 @@
             "speedup_label": "Eksperimentel fremskyndelse af kommerciel detektion",
             "strict_desc": "Aktiver strengere kommerciel registreringskode. Deaktiver, hvis nogle reklamer ikke bliver fundet.",
             "strict_label": "Streng kommerciel detektion",
-            "subtitle": "Kommerciel registrering og omkodning af jobindstillinger"
+            "subtitle": "Indstillinger for kommerciel registrering og omkodning af job"
         },
         "playgroup": {
             "delete_details": "Dette vil slette afspilningsgruppen {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} er en {{ Type }} på IP {{ IP }}",
             "backends_none": "Ingen backends",
             "backends_title": "Backends",
+            "dbbackups_none": "Ingen database backup.",
+            "dbbackups_title": "Database sikkerhedskopier",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} er på værten {{ HostName }}. Tilstand: {{ State }}.",
             "encoder_title": "Encoder status",
             "endtime_text": "Denne optagelse er planlagt til at slutte kl. {{ EndTime }}.",

@@ -142,7 +142,7 @@
             "speedup_label": "Experimentell påskyndning av kommersiell upptäckt",
             "strict_desc": "Aktivera striktare kommersiell identifieringskod. Inaktivera om vissa reklamfilmer inte upptäcks.",
             "strict_label": "Strikt kommersiell upptäckt",
-            "subtitle": "Kommersiell upptäckt och omkodningsjobbinställningar"
+            "subtitle": "Inställningar för kommersiell upptäckt och omkodning"
         },
         "playgroup": {
             "delete_details": "Detta tar bort uppspelningsgruppen {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} är en {{ Type }} på IP {{ IP }}",
             "backends_none": "Inga backends",
             "backends_title": "Backends",
+            "dbbackups_none": "Inga säkerhetskopior av databas.",
+            "dbbackups_title": "Säkerhetskopiering av databas",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} finns på värden {{ HostName }}. Tillstånd: {{ State }}.",
             "encoder_title": "Kodarstatus",
             "endtime_text": "Den här inspelningen är planerad att avslutas vid {{ EndTime }}.",

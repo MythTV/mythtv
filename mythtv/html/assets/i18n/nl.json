@@ -142,7 +142,7 @@
             "speedup_label": "Experimentele versnelling van commerciële detectie",
             "strict_desc": "Schakel strengere commerciële detectiecode in. Schakel uit als bepaalde reclames niet worden gedetecteerd.",
             "strict_label": "Strikte commerciële detectie",
-            "subtitle": "Commerciële detectiea en transcodeeropdrachtinstellingen"
+            "subtitle": "Commerciële detectie en transcoderingstaakinstellingen"
         },
         "playgroup": {
             "delete_details": "Hierdoor wordt de afspeelgroep {{ Name }} verwijderd.",
@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",
             "backends_title": "Back-ends",
+            "dbbackups_none": "Geen databaseback-ups.",
+            "dbbackups_title": "Database-back-ups",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} bevindt zich op host {{ HostName }}. Staat: {{ State }}.",
             "encoder_title": "Encoder-status",
             "endtime_text": "Het einde van deze opname is gepland om {{ EndTime }}.",

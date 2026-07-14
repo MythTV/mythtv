@@ -142,7 +142,7 @@
             "speedup_label": "Aceleração experimental de detecção comercial",
             "strict_desc": "Habilite um código de detecção comercial mais rigoroso. Desative se alguns comerciais não estiverem sendo detectados.",
             "strict_label": "Detecção comercial estrita",
-            "subtitle": "Configurações de trabalho de detecção e transcodificação comercial"
+            "subtitle": "Configurações de trabalho de detecção comercial e transcodificação"
         },
         "playgroup": {
             "delete_details": "Isso excluirá o grupo de reprodução {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Back-end: {{ Name }} é um {{ Type }} no IP {{ IP }}",
             "backends_none": "Sem back-ends",
             "backends_title": "Infra-estruturas",
+            "dbbackups_none": "Sem backups de banco de dados.",
+            "dbbackups_title": "Backups de banco de dados",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} está no host {{ HostName }}. Estado: {{ State }}.",
             "encoder_title": "Estado do Codificador",
             "endtime_text": "Esta gravação está programada para terminar em {{ EndTime }}.",

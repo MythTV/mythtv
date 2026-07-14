@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} és un {{ Type }} a la IP {{ IP }}",
             "backends_none": "Sense backends",
             "backends_title": "Backends",
+            "dbbackups_none": "No hi ha còpies de seguretat de la base de dades.",
+            "dbbackups_title": "Còpies de seguretat de bases de dades",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} és a l'amfitrió {{ HostName }}. Estat: {{ State }}.",
             "encoder_title": "Estat del codificador",
             "endtime_text": "Està previst que aquesta gravació finalitzi a les {{ EndTime }}.",

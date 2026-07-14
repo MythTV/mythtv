@@ -142,7 +142,7 @@
             "speedup_label": "Eksperimentalno ubrzanje komercijalne detekcije",
             "strict_desc": "Omogući stroži komercijalni kod za otkrivanje. Isključite ako se neke reklame ne otkrivaju.",
             "strict_label": "Stroga komercijalna detekcija",
-            "subtitle": "Komercijalno otkrivanje i postavke poslova transkodiranja"
+            "subtitle": "Postavke poslova komercijalne detekcije i transkodiranja"
         },
         "playgroup": {
             "delete_details": "Ovo će izbrisati grupu za reprodukciju {{ Name }}.",
@@ -397,6 +397,8 @@
             "backends_detail": "Pozadina: {{ Name }} je {{ Type }} na IP-u {{ IP }}",
             "backends_none": "Nema pozadine",
             "backends_title": "Pozadine",
+            "dbbackups_none": "Nema sigurnosnih kopija baze podataka.",
+            "dbbackups_title": "Sigurnosne kopije baze podataka",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na hostu {{ HostName }}. Država: {{ State }}.",
             "encoder_title": "Status kodera",
             "endtime_text": "Završetak ovog snimanja zakazan je za {{ EndTime }}.",

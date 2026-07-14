@@ -397,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} è un {{ Type }} su IP {{ IP }}",
             "backends_none": "Nessun Backend",
             "backends_title": "Backend",
+            "dbbackups_none": "Nessun backup del database.",
+            "dbbackups_title": "Backup del database",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} è sull'host {{ HostName }}. Stato: {{ State }}.",
             "encoder_title": "Stato dell'encoder",
             "endtime_text": "Questa registrazione dovrebbe terminare alle {{ EndTime }}.",
