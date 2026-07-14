@@ -10,13 +10,14 @@ import { JobqueueComponent } from './components/jobqueue/jobqueue.component';
 import { ScheduledComponent } from './components/scheduled/scheduled.component';
 import { EncodersComponent } from './components/encoders/encoders.component';
 import { AsyncPipe } from '@angular/common';
+import { DbBackupsComponent } from './components/db-backups/db-backups.component';
 
 @Component({
     selector: 'app-status',
     templateUrl: './status.component.html',
     styleUrls: ['./status.component.css'],
     imports: [EncodersComponent, ScheduledComponent, JobqueueComponent, MachineinfoComponent,
-         BackendsComponent, FrontendsComponent, AsyncPipe, TranslatePipe]
+         DbBackupsComponent, BackendsComponent, FrontendsComponent, AsyncPipe, TranslatePipe]
 })
 export class StatusComponent implements OnInit {
     m_status$!: Observable<BackendStatusResponse>;

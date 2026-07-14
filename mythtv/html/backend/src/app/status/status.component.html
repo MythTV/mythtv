@@ -5,6 +5,7 @@
     <app-status-scheduled [scheduled]="st.Scheduled"></app-status-scheduled>
     <app-status-jobqueue [jobqueue]="st.JobQueue"></app-status-jobqueue>
     <app-status-machineinfo [machineinfo]="st.MachineInfo" [status]="st"></app-status-machineinfo>
+    <app-db-backups></app-db-backups>
     <app-status-backends [backends]="st.Backends"></app-status-backends>
     <app-status-frontends [frontends]="st.Frontends"></app-status-frontends>
     @if (st.Miscellaneous) {
