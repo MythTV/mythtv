@@ -145,9 +145,9 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                     std::cout << "Running - " << qPrintable(command) << '\n';
                     QScopedPointer<MythSystem> cmd(MythSystem::Create(command));
                     cmd->Wait(0s);
-                    if (cmd.data()->GetExitCode() != GENERIC_EXIT_OK)
+                    if (cmd->GetExitCode() != GENERIC_EXIT_OK)
                     {
-                        std::cout << "ERROR - mythcommflag exited with result: " << cmd.data()->GetExitCode() << '\n';
+                        std::cout << "ERROR - mythcommflag exited with result: " << cmd->GetExitCode() << '\n';
                     }
                 }
             }
