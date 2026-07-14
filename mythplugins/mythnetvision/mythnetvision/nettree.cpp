@@ -966,7 +966,7 @@ void NetTree::customEvent(QEvent *event)
 
         QString title = data->title;
         QString file = data->url;
-        uint pos = data->data.value<uint>();
+        uint pos = data->data.toUInt();
 
         if (file.isEmpty())
             return;

@@ -133,7 +133,7 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
         ThumbnailData *data = tde->m_thumb;
 
         QString file = data->url;
-        uint pos = data->data.value<uint>();
+        uint pos = data->data.toUInt();
 
         if (file.isEmpty())
             return;

@@ -44,7 +44,7 @@ void MythJSONSerialiser::AddValue(const QVariant& Value, const QMetaProperty *Me
     if (object)
     {
         QVariant isNull = object->property("isNull");
-        if (isNull.value<bool>())
+        if (isNull.toBool())
         {
             m_writer << "null";
             return;

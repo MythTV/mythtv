@@ -72,7 +72,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::QString);
 #endif
-    auto icon_name = variant.value<QString>();
+    auto icon_name = variant.toString();
     QCOMPARE(icon_name, QString("@ICON@"));
 
     variant = plist.GetValue("CFBundleDocumentTypes");
@@ -112,11 +112,11 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant3.typeId(), QMetaType::QString);
 #endif
-    auto ext_name = variant3.value<QString>();
+    auto ext_name = variant3.toString();
     QCOMPARE(ext_name, QString("xhtml"));
     
     QVERIFY(map.contains("CFBundleTypeRole"));
-    auto role_name = map["CFBundleTypeRole"].value<QString>();
+    auto role_name = map["CFBundleTypeRole"].toString();
     QCOMPARE(role_name, QString("Viewer"));
 
     // Test float twice. Catch conversion in place.
@@ -127,7 +127,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::Double);
 #endif
-    auto pi = variant.value<double>();
+    auto pi = variant.toDouble();
     QCOMPARE(pi, 3.1415926545897932);
     variant = plist.GetValue("TestFloat");
     QVERIFY(variant.isValid());
@@ -136,7 +136,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::Double);
 #endif
-    pi = variant.value<double>();
+    pi = variant.toDouble();
     QCOMPARE(pi, 3.1415926545897932);
     variant = plist.GetValue("TestFloat2");
     QVERIFY(variant.isValid());
@@ -145,7 +145,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::Double);
 #endif
-    pi = variant.value<double>();
+    pi = variant.toDouble();
     QCOMPARE(pi, 3.1415926545897932);
 
     // Check dates
@@ -156,7 +156,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::QDateTime);
 #endif
-    auto when = variant.value<QDateTime>();
+    auto when = variant.toDateTime();
     QCOMPARE(when, test_datetime);
     variant = plist.GetValue("TestDate");
     QVERIFY(variant.isValid());
@@ -165,7 +165,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::QDateTime);
 #endif
-    when = variant.value<QDateTime>();
+    when = variant.toDateTime();
     QCOMPARE(when, test_datetime);
     variant = plist.GetValue("TestDate2");
     QVERIFY(variant.isValid());
@@ -174,7 +174,7 @@ void TestMythBinaryPList::plist_read(void)
 #else
     QCOMPARE(variant.typeId(), QMetaType::QDateTime);
 #endif
-    when = variant.value<QDateTime>();
+    when = variant.toDateTime();
     QCOMPARE(when, test_datetime);
 }
 

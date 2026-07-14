@@ -141,7 +141,7 @@ void MetadataResultsDialog::customEvent(QEvent *event)
         ThumbnailData *data = tde->m_thumb;
 
         QString file = data->url;
-        uint pos = data->data.value<uint>();
+        uint pos = data->data.toUInt();
 
         if (file.isEmpty())
             return;
@@ -161,7 +161,7 @@ void MetadataResultsDialog::customEvent(QEvent *event)
 
 void MetadataResultsDialog::sendResult(MythUIButtonListItem* item)
 {
-    RefCountHandler<MetadataLookup> lookup = m_results.takeAtAndDecr(item->GetData().value<uint>());
+    RefCountHandler<MetadataLookup> lookup = m_results.takeAtAndDecr(item->GetData().toUInt());
     m_results.clear();
     emit haveResult(lookup);
     Close();

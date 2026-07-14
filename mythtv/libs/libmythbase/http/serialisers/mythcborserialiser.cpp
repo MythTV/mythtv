@@ -48,7 +48,7 @@ void MythCBORSerialiser::AddValue(const QVariant& Value)
     if (object)
     {
         QVariant isNull = object->property("isNull");
-        if (isNull.value<bool>())
+        if (isNull.toBool())
         {
             m_writer->append(QCborSimpleType::Null);
             return;
