@@ -241,6 +241,10 @@ function(find_or_build_qt)
        -DQT_FEATURE_system_sqlite=OFF
        -DQT_FEATURE_openssl_linked=ON
 
+       # Prevent Qt6 from compiling in support for the backtrace()
+       # function.  This function doesn't exist on Android.
+       -DQT_FEATURE_backtrace=OFF
+
        # Qt6 no longer allows disabling dpi scaling with the
        # AA_DisableHighDpiScaling attribute like it did in Qt5.  This
        # next line will prevent scaling support from being built for
