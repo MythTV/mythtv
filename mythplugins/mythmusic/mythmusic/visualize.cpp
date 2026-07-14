@@ -1523,7 +1523,6 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     m_rdftTmp[1] = m_rdftTmp[m_fftlen];
     memcpy(m_dftR, m_rdftTmp, m_fftlen * sizeof(float));
 
-    long w = 0;
     QRect *rectspL = m_rectsL.data();
     QRect *rectspR = m_rectsR.data();
     float *magnitudesp = m_magnitudes.data();
@@ -1532,7 +1531,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     int prev = 0;               // frequency index of previous pixel
     float adjHeight = m_size.height() / 2.0F;
 
-    for (int i = 0; i < m_rectsL.size(); i++, w += m_analyzerBarWidth)
+    for (int i = 0; i < m_rectsL.size(); i++)
     {
         float magL = 0;         // modified from Spectrogram
         float magR = 0;
