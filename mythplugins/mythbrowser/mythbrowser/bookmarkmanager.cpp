@@ -185,6 +185,7 @@ void BookmarkManager::UpdateGroupList(void)
 {
     m_groupList->Reset();
     QStringList groups;
+    groups.reserve(m_siteList.count());
     for (int x = 0; x < m_siteList.count(); x++)
     {
         Bookmark *site = m_siteList.at(x);

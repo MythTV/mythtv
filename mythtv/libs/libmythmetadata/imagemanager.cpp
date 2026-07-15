@@ -292,6 +292,7 @@ ImageAdapterBase::ImageAdapterBase() :
     // Generate glob list from supported extensions
     QStringList glob;
     QStringList allExt = m_imageFileExt + m_videoFileExt;
+    glob.reserve(allExt.size());
     for (const auto& ext : std::as_const(allExt))
         glob << "*." + ext;
 
@@ -314,6 +315,7 @@ QStringList ImageAdapterBase::SupportedImages()
     // Determine supported picture formats from Qt
     QStringList formats;
     QList<QByteArray> supported = QImageReader::supportedImageFormats();
+    formats.reserve(supported.size());
     for (const auto& ext : std::as_const(supported))
         formats << QString(ext);
     return formats;
@@ -2254,6 +2256,8 @@ QString ImageManagerFe::CreateImages(int destId, const ImageListK &images)
     const QString seperator("...");
     QStringList imageDefs(seperator);
     ImageIdList ids;
+    imageDefs.reserve(1 + images.size());
+    ids.reserve(images.size());
     for (const auto& im : std::as_const(images))
     {
         ids << im->m_id;
@@ -2293,6 +2297,7 @@ QString ImageManagerFe::MoveDbImages(const ImagePtrK& destDir, ImageListK &image
                                      const QString &srcPath)
 {
     QStringList idents;
+    idents.reserve(images.size());
     for (const auto& im : std::as_const(images))
         idents << QString::number(im->m_id);
 

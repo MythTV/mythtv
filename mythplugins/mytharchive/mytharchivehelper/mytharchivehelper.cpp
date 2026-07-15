@@ -993,6 +993,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     QStringList bindList;
     QDomNodeList nodes =  recordedNode.childNodes();
 
+    fieldList.reserve(nodes.count());
+    bindList.reserve(nodes.count());
     for (int x = 0; x < nodes.count(); x++)
     {
         QDomNode n2 = nodes.item(x);

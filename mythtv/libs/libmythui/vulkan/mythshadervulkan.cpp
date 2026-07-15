@@ -360,6 +360,7 @@ MythShaderVulkan::MythShaderVulkan(MythVulkanObject *Vulkan,
         m_descriptorPoolSizes.emplace_back(poolsize.second);
 
     // create the desriptor layouts
+    m_descriptorSetLayouts.reserve(layoutbindings.size());
     for (auto & layoutbinding : layoutbindings)
     {
         VkDescriptorSetLayout layout = MYTH_NULL_DISPATCH;

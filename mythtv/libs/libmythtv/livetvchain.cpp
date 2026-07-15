@@ -763,6 +763,7 @@ QStringList LiveTVChain::entriesToStringList() const
 {
     QMutexLocker lock(&m_lock);
     QStringList ret;
+    ret.reserve(1 + (8 * m_chain.size()));
     ret << QString::number(m_maxPos);
     for (const auto & entry : std::as_const(m_chain))
     {

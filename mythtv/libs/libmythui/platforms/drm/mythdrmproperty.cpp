@@ -109,6 +109,7 @@ MythDRMEnumProperty::MythDRMEnumProperty(uint64_t Value, drmModePropertyPtr Prop
 QString MythDRMEnumProperty::ToString()
 {
     QStringList values;
+    values.reserve(m_enums.size());
     for (const auto & value : m_enums)
         values.append(QString("%1(%2)").arg(value.first).arg(value.second));
     return QString("%1 Value: %2 Values: %3").arg(m_name).arg(m_value).arg(values.join(", "));

@@ -420,6 +420,7 @@ static desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
     desc_list_t desc;
 
     std::vector<const VirtualChannelTable*> vct;
+    vct.reserve(tvct.size() + cvct.size());
 
     for (const auto *i : tvct)
         vct.push_back(i);
@@ -503,10 +504,18 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     std::vector<uint> pids;
     std::vector<uint> types;
     std::vector<desc_list_t> pdesc;
+    pids.reserve(pmt.StreamCount());
+    types.reserve(pmt.StreamCount());
+    pdesc.reserve(pmt.StreamCount());
 
     std::vector<uint> videoPIDs;
     std::vector<uint> audioPIDs;
     std::vector<uint> dataPIDs;
+    // Guessing two audio streams per video stream.  Hopefully
+    // slightly oversized so only one memory allocation occurs.
+    videoPIDs.reserve(pmt.StreamCount()/3);
+    audioPIDs.reserve(pmt.StreamCount()/2);
+    dataPIDs.reserve(pmt.StreamCount()/3);
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1369,6 +1378,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(uint tsid) const
     QMutexLocker locker(&m_cacheLock);
     pat_vec_t pats;
 
+    pats.reserve(256);
     for (uint i=0; i < 256; i++)
     {
         pat_const_ptr_t pat = GetCachedPAT(tsid, i);
@@ -1384,6 +1394,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     QMutexLocker locker(&m_cacheLock);
     pat_vec_t pats;
 
+    pats.reserve(m_cachedPats.size());
     for (auto *pat : std::as_const(m_cachedPats))
     {
         IncrementRefCnt(pat);
@@ -1411,6 +1422,7 @@ cat_vec_t MPEGStreamData::GetCachedCATs(uint tsid) const
     QMutexLocker locker(&m_cacheLock);
     cat_vec_t cats;
 
+    cats.reserve(256);
     for (uint i=0; i < 256; i++)
     {
         cat_const_ptr_t cat = GetCachedCAT(tsid, i);
@@ -1426,6 +1438,7 @@ cat_vec_t MPEGStreamData::GetCachedCATs(void) const
     QMutexLocker locker(&m_cacheLock);
     cat_vec_t cats;
 
+    cats.reserve(m_cachedCats.size());
     for (auto *cat : std::as_const(m_cachedCats))
     {
         IncrementRefCnt(cat);
@@ -1454,6 +1467,7 @@ pmt_vec_t MPEGStreamData::GetCachedPMTs(void) const
     QMutexLocker locker(&m_cacheLock);
     std::vector<const ProgramMapTable*> pmts;
 
+    pmts.reserve(m_cachedPmts.size());
     for (auto *pmt : std::as_const(m_cachedPmts))
     {
         IncrementRefCnt(pmt);

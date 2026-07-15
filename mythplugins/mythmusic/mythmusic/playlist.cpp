@@ -99,6 +99,7 @@ void Playlist::removeAllCDTracks(void)
 {
     // find the cd tracks
     SongList cdTracks;
+    cdTracks.reserve(m_songs.count());
     for (int x = 0; x < m_songs.count(); x++)
     {
         MusicMetadata *mdata = getRawSongAt(x);

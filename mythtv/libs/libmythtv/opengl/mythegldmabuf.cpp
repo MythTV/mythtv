@@ -127,6 +127,7 @@ inline std::vector<MythVideoTextureOpenGL*> MythEGLDMABUF::CreateComposed(AVDRMF
             EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, EGL_YUV_CHROMA_SITING_0_EXT
         };
 
+        attribs.reserve(attribs.size() + (10 * layer->nb_planes) + 1);
         for (int plane = 0; plane < layer->nb_planes; ++plane)
         {
             AVDRMPlaneDescriptor* drmplane = &layer->planes[plane];

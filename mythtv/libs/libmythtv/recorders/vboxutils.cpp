@@ -281,6 +281,7 @@ QStringList VBox::getTuners(void)
     {
         int noTuners = getIntValue(elem, "TunersNumber");
 
+        result.reserve(noTuners);
         for (int x = 1; x <= noTuners; x++)
         {
             QString tuner = getStrValue(elem, QString("Tuner%1").arg(x));

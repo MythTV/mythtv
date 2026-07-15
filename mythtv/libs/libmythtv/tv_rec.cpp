@@ -521,6 +521,9 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         std::vector<unsigned int> inputids2;
         std::vector<TVState> states;
 
+        inputids2.reserve(inputids.size());
+        states.reserve(inputids.size());
+
         // Stop remote recordings if needed
         for (uint inputid : inputids)
         {

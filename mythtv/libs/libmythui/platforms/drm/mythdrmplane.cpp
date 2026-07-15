@@ -153,6 +153,7 @@ QString MythDRMPlane::FormatToString(uint32_t Format)
 QString MythDRMPlane::FormatsToString(const FOURCCVec &Formats)
 {
     QStringList formats;
+    formats.reserve(Formats.size());
     for (auto format : Formats)
         formats.append(FormatToString(format));
     return formats.join(",");

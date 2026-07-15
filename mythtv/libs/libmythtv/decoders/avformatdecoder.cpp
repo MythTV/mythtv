@@ -1276,6 +1276,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
             QString(" m_fps:%1").arg(m_fps));
 
         QStringList rs;
+        rs.reserve(rates.size());
         for (auto rate : rates)
             rs.append(QString::number(rate));
         LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -4276,6 +4277,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
                 {
                     LOG(VB_AUDIO, LOG_WARNING, "No audio tracks matched the type filter, "
                                                "so trying all tracks.");
+                    ftype.reserve(atracks.size());
                     for (int i = 0; i < static_cast<int>(atracks.size()); i++)
                         ftype.push_back(i);
                 }

@@ -1334,6 +1334,7 @@ public:
         // Interrupt on-going downloads of all stream playlists
         int streams = m_parent->NumStreams();
         QStringList listurls;
+        listurls.reserve(streams);
         for (int i = 0; i < streams; i++)
         {
             HLSStream *hls = m_parent->GetStream(i);

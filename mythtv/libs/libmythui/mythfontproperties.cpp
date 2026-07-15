@@ -471,12 +471,13 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             {
                 QStringList family_styles;
 
-                family_styles << family + "::";
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                 QStringList styles = database.styles(family);
 #else
                 QStringList styles = QFontDatabase::styles(family);
 #endif
+                family_styles.reserve(1 + (2 * styles.size()));
+                family_styles << family + "::";
                 for (const QString & style : std::as_const(styles))
                 {
                     family_styles << style + ":";

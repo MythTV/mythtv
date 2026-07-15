@@ -1407,6 +1407,7 @@ void TV::GetStatus()
             QList<std::chrono::seconds> chapters;
             m_player->GetChapterTimes(chapters);
             QVariantList var;
+            var.reserve(chapters.size());
             for (std::chrono::seconds chapter : std::as_const(chapters))
                 var << QVariant((long long)chapter.count());
             status.insert("chaptertimes", var);
@@ -3243,6 +3244,7 @@ QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
     QList<QKeyEvent*> keyPressList;
     int i = 0;
     QStringList stringKeyList = KeyList.split(',');
+    keyPressList.reserve(kScreenPressRegionCount);
     for (const auto & str : std::as_const(stringKeyList))
     {
         QKeySequence keySequence(str);

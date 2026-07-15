@@ -147,10 +147,9 @@ bool GameScannerThread::buildFileList()
         QDir dir(handler->SystemRomPath());
         QStringList extensions = handler->ValidExtensions();
         QStringList filters;
+        filters.reserve(extensions.size());
         for (const auto & ext : std::as_const(extensions))
-        {
             filters.append(QString("*.%1").arg(ext));
-        }
 
         dir.setNameFilters(filters);
         dir.setFilter(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);

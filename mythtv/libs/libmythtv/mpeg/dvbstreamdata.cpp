@@ -887,7 +887,7 @@ nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
     QMutexLocker locker(&m_cacheLock);
 
     nit_vec_t nits;
-
+    nits.reserve(256);
     for (uint i = 0; i < 256; i++)
     {
         nit_const_ptr_t nit = GetCachedNIT(i, current);
@@ -926,7 +926,7 @@ bat_vec_t DVBStreamData::GetCachedBATs(bool current) const
             "Currently we ignore \'current\' param");
 
     bat_vec_t bats;
-
+    bats.reserve(m_cachedBats.size());
     for (auto *bat : std::as_const(m_cachedBats))
     {
         IncrementRefCnt(bat);
@@ -970,6 +970,7 @@ sdt_vec_t DVBStreamData::GetCachedSDTSections(uint tsid, bool current) const
     {
         uint lastSection = sdt->LastSection();
 
+        sdts.reserve(1 + lastSection);
         sdts.push_back(sdt);
 
         for (uint section = 1; section <= lastSection; section++)
@@ -993,7 +994,7 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
             "Currently we ignore \'current\' param");
 
     sdt_vec_t sdts;
-
+    sdts.reserve(m_cachedSdts.size());
     for (auto *sdt : std::as_const(m_cachedSdts))
     {
         IncrementRefCnt(sdt);

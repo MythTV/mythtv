@@ -289,11 +289,9 @@ QStringList PlaylistContainer::getPlaylistNames(void)
 {
     QStringList res;
 
+    res.reserve(m_allPlaylists->size());
     for (const auto & playlist : std::as_const(*m_allPlaylists))
-    {
         res.append(playlist->getName());
-    }
-
     return res;
 }
 

@@ -76,6 +76,7 @@ void ExitPrompter::handleExit()
 #else
         int limit = std::min(static_cast<qsizetype>(4), allproblems.size());
 #endif
+        problems.reserve(limit + 1);
         for (int i = 0; i < limit; ++i)
         {
             problems.push_back(allproblems[i]);

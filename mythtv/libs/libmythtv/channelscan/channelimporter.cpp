@@ -392,6 +392,7 @@ uint ChannelImporter::DeleteChannels(
 
     // Create a new transports list without the deleted channels
     ScanDTVTransportList newlist;
+    newlist.reserve(transports.size());
     for (size_t i = 0; i < transports.size(); ++i)
     {
         newlist.push_back(transports[i]);
@@ -614,6 +615,11 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
     bool cancel_all = false;
     bool ok_all = false;
 
+    // Reserve list memory up front.  These lists will likely be over-sized.
+    inserted_list.reserve(transports.size());
+    skipped_list.reserve(transports.size());
+    next_list.reserve(transports.size());
+
     // Insert all channels with non-conflicting channum
     // and complete tuning information.
     for (const auto & transport : transports)
@@ -812,6 +818,11 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
     ScanDTVTransportList &skipped_list) const
 {
     ScanDTVTransportList next_list;
+
+    // Reserve list memory up front.  These lists will likely be over-sized.
+    updated_list.reserve(transports.size());
+    skipped_list.reserve(transports.size());
+    next_list.reserve(transports.size());
 
     // update all channels with non-conflicting channum
     // and complete tuning information.
@@ -1030,6 +1041,7 @@ void ChannelImporter::RemoveDuplicates(ScanDTVTransportList &transports, ScanDTV
 
     ScanDTVTransportList no_dups;
     std::vector<bool> ignore;
+    no_dups.reserve(transports.size());
     ignore.resize(transports.size());
     for (size_t i = 0; i < transports.size(); ++i)
     {

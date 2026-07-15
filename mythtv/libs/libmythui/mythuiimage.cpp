@@ -875,6 +875,8 @@ void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
     QVector<std::chrono::milliseconds> delays;
     QVector<MythImage *> images;
 
+    delays.reserve(frames.size());
+    images.reserve(frames.size());
     for (const auto & frame : std::as_const(frames))
     {
         images.append(frame.first);
@@ -1659,6 +1661,7 @@ void MythUIImage::FindRandomImage(void)
         QStringList imageTypes;
 
         QList< QByteArray > exts = QImageReader::supportedImageFormats();
+        imageTypes.reserve(exts.size());
         for (const auto & ext : std::as_const(exts))
         {
             imageTypes.append(QString("*.").append(ext));

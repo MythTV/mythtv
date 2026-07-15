@@ -499,7 +499,7 @@ int RemoteGetRecordingMask(void)
         cmd = QString("QUERY_RECORDER %1").arg(i + 1);
 
         strlist = QStringList( cmd );
-        strlist << "IS_RECORDING";
+        strlist << "IS_RECORDING"; // clazy:exclude=reserve-candidates
 
         if (gCoreContext->SendReceiveStringList(strlist) && !strlist.isEmpty())
         {

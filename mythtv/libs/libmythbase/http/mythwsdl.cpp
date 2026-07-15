@@ -443,6 +443,8 @@ QDomElement MythWSDL::CreateMethodType( const HTTPMethodPtr& handler,
         size_t count = 1;
         QList<QByteArray> paramNames;
         QList<QByteArray> paramTypes;
+        paramNames.reserve(typecount);
+        paramTypes.reserve(typecount);
         for (count=1; count < typecount; count++)
         {
             auto name  = handler->m_names[count];

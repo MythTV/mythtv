@@ -104,6 +104,7 @@ bool CetonRTSP::ProcessRequest(
         uri = m_controlUrl.toString();
     else
         uri = m_requestUrl.toString();
+    requestHeaders.reserve(5 + (headers ? headers->count() : 0));
     requestHeaders.append(QString("%1 %2 RTSP/1.0").arg(method, uri));
     requestHeaders.append(QString("User-Agent: MythTV Ceton Recorder"));
     requestHeaders.append(QString("CSeq: %1").arg(++m_sequenceNumber));

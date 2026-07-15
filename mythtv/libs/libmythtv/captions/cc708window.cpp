@@ -370,7 +370,7 @@ std::vector<CC708String*> CC708Window::GetStrings(void) const
                 if (length)
                     createdNonblankStrings = true;
                 cur->m_str = QString(&chars[strStart], length);
-                list.push_back(cur);
+                list.push_back(cur); // clazy:exclude=reserve-candidates
             }
             else
             {

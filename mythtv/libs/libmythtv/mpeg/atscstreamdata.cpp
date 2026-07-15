@@ -834,6 +834,7 @@ tvct_vec_t ATSCStreamData::GetCachedTVCTs(bool current) const
             "Currently we ignore \'current\' param");
 
     std::vector<const TerrestrialVirtualChannelTable*> tvcts;
+    tvcts.reserve(m_cachedTvcts.size());
 
     m_cacheLock.lock();
     for (auto *tvct : std::as_const(m_cachedTvcts))
@@ -853,6 +854,7 @@ cvct_vec_t ATSCStreamData::GetCachedCVCTs(bool current) const
             "Currently we ignore \'current\' param");
 
     std::vector<const CableVirtualChannelTable*> cvcts;
+    cvcts.reserve(m_cachedCvcts.size());
 
     m_cacheLock.lock();
     for (auto *cvct : std::as_const(m_cachedCvcts))

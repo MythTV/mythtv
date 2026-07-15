@@ -1920,6 +1920,7 @@ AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, bool loadFromDB)
 AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &other)
     : m_parent(metadata)
 {
+    m_imageList.reserve(other.m_imageList.size());
     for (const auto &srcImage : std::as_const(other.m_imageList))
     {
         m_imageList.append(new AlbumArtImage(srcImage));
@@ -2159,6 +2160,7 @@ QStringList AlbumArtImages::getImageFilenames(void) const
 {
     QStringList paths;
 
+    paths.reserve(m_imageList.size());
     for (const auto *item : std::as_const(m_imageList))
         paths += item->m_filename;
 

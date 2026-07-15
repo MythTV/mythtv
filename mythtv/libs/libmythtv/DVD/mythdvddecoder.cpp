@@ -456,6 +456,7 @@ void MythDVDDecoder::PostProcessTracks(void)
 
         if (!m_ringBuffer->DVD()->IsInMenu())
         {
+            filteredTracks.reserve(32);
             for (uint i = 0; i < 32; ++i)
             {
                 int8_t streamid = m_ringBuffer->DVD()->GetSubtitleTrackNum(i);

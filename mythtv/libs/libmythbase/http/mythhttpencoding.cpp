@@ -63,6 +63,7 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
     // Build the final result. This will pass through invalid types - which should
     // be handled by the consumer (e.g. wildcard specifiers are not handled).
     QStringList result;
+    result.reserve(weightings.size());
     for (const auto & weight : weightings)
         result.append(weight.second);
 

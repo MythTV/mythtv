@@ -950,6 +950,7 @@ QString MediaMonitor::defaultDVDWriter()
 QString MediaMonitor::listDevices(void)
 {
     QStringList list;
+    list.reserve(m_devices.size());
 
     for (const auto *dev : std::as_const(m_devices))
     {

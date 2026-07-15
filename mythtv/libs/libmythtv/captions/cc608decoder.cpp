@@ -1370,6 +1370,7 @@ bool CC608Decoder::XDSPacketParseProgram(
     else if ((b2 == 0x04) && (xds_buf.size() >= 6))
     {
         std::vector<uint> program_type;
+        program_type.reserve(xds_buf.size() - 2);
         for (size_t i = 2; i < xds_buf.size() - 2; i++)
         {
             int cur = xds_buf[i] - 0x20;

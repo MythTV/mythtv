@@ -255,6 +255,7 @@ freq_table_list_t get_matching_freq_tables(
         get_matching_freq_tables_internal(format, modulation, country);
 
     freq_table_list_t new_list;
+    new_list.reserve(list.size());
     for (auto & ft : list)
         new_list.push_back(new FrequencyTable(*ft));
 

@@ -1138,6 +1138,7 @@ int DVBChannel::GetChanID() const
         if (idlist.count() > 1)
         {
             QStringList sl;
+            sl.reserve(idlist.size());
             for (auto chanid : idlist)
             {
                 sl.append(QString::number(chanid));

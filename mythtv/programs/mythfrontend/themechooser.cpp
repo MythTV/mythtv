@@ -997,6 +997,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) : m_updateTimer(new QTimer(this))
     }
     else
     {
+        m_mythVersions.reserve(minor + 1);
         for (int i = minor ; i > 0; i--)
             m_mythVersions << QString("%1.%2").arg(major).arg(i);
         m_mythVersions << QString::number(major);

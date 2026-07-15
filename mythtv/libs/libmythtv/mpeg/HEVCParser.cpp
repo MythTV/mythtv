@@ -743,6 +743,8 @@ bool HEVCParser::profileTierLevel(BitReader& br,
 
     std::vector<bool> sub_layer_profile_present_flag;
     std::vector<bool> sub_layer_level_present_flag;
+    sub_layer_profile_present_flag.reserve(maxNumSubLayersMinus1);
+    sub_layer_level_present_flag.reserve(maxNumSubLayersMinus1);
     for (i = 0; i < maxNumSubLayersMinus1; ++i)
     {
         sub_layer_profile_present_flag.push_back(br.get_bits(1)); // u(1)

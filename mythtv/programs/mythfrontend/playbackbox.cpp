@@ -3565,6 +3565,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
     QString forceDeleteStr("0");
 
     QStringList list;
+    list.reserve(3 * m_playList.size());
     for (int id : std::as_const(m_playList))
     {
         ProgramInfo *tmpItem = FindProgramInUILists(id);
@@ -4831,6 +4832,8 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
     QStringList displayNames("Default");
 
     QStringList list = PlayGroup::GetNames();
+    groupNames.reserve(1 + list.size());
+    displayNames.reserve(1 + list.size());
     for (const auto& name : std::as_const(list))
     {
         displayNames.push_back(name);

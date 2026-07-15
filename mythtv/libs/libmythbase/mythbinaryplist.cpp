@@ -385,6 +385,7 @@ QList<QVariant> MythBinaryPList::ParseBinaryArray(uint8_t* Data)
     if (!count)
         return result;
 
+    result.reserve(count);
     for (uint64_t i = 0; i < count; i++, Data += m_parmSize)
     {
         uint64_t obj = GetBinaryUInt(Data, m_parmSize);

@@ -949,6 +949,7 @@ void FormattedTextSubtitle::Draw(void)
 QStringList FormattedTextSubtitle::ToSRT(void) const
 {
     QStringList result;
+    result.reserve(m_lines.size());
     for (const auto & ftl : std::as_const(m_lines))
     {
         QString line;

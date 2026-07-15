@@ -698,6 +698,7 @@ QStringList CardUtil::ProbeDeliverySystems([[maybe_unused]] int fd_frontend)
     cmd.props = &prop;
     if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
+        delsyslist.reserve(prop.u.buffer.len);
         for (unsigned int i = 0; i < prop.u.buffer.len; i++)
         {
             delsyslist.push_back(DTVModulationSystem::toString(prop.u.buffer.data[i]));
@@ -2287,6 +2288,7 @@ std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
     {
         QString msg = QString("CardUtil[%1]: GetConflictingInputs(%1) ").arg(inputid);
         QStringList ids;
+        ids.reserve(inputids.size());
         for (auto id : inputids)
         {
             ids.append(QString::number(id));

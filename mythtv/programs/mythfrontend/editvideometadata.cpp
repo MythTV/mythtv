@@ -215,6 +215,7 @@ namespace
         QStringList ret;
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
+        ret.reserve(exts.size());
         for (const auto & ext : std::as_const(exts))
             ret.append(QString("*.").append(ext));
         return ret;
@@ -262,6 +263,7 @@ namespace
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
+        exts.reserve(fa_list.size());
         for (const auto & fa : fa_list)
             exts << QString("*.%1").arg(fa.extension.toUpper());
 

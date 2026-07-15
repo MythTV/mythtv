@@ -2026,9 +2026,11 @@ void GalleryThumbView::Copy(bool deleteAfter)
         transfers.remove(im);
 
     ImageListK newImages = transfers.keys();
+    newImages.reserve(newImages.size() + dirs.size());
 
     // Include dirs
     QStringList dirPaths;
+    dirPaths.reserve(dirs.size());
     for (const ImagePtr & im : std::as_const(dirs))
     {
         QString relPath = im->m_filePath.mid(basePathSize);
@@ -2057,6 +2059,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
             // Delete files/dirs that have been successfully copied
             // Will fail for dirs containing images that failed to copy
             ImageIdList ids;
+            ids.reserve(newImages.size());
             for (const ImagePtrK & im : std::as_const(newImages))
                 ids << im->m_id;
 

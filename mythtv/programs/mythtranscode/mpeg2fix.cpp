@@ -129,7 +129,10 @@ PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
     idx.type = false;
 
     for (const int key : std::as_const(m_keyList))
+    {
+        // clazy:exclude-next-line=reserve-candidates - no QMap::reserve
         m_offset[key].push_back(idx);
+    }
 }
 
 int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
@@ -2504,6 +2507,12 @@ int MPEG2fixup::Start()
                             return GENERIC_EXIT_WRITE_FRAME_ERROR;
                         }
 
+                        // Target size = current + loop iterations
+                        // Target = Lreorder.count() +
+                        //          (m_vFrame.count() - (frame_pos - Lreorder.count()))
+                        // Target = Lreorder.count() +
+                        //          m_vFrame.count() - frame_pos - Lreorder.count()
+                        Lreorder.reserve(m_vFrame.count() - frame_pos);
                         for (int index = frame_pos + Lreorder.count();
                              ret && index < m_vFrame.count(); index++, --ret)
                         {

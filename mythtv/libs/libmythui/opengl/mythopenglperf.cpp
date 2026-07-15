@@ -75,6 +75,7 @@ void MythOpenGLPerf::LogSamples(void)
     {
         QStringList results;
         GLuint64 total = 0;
+        results.reserve(m_timerData.size());
         for (int i = 0; i < m_timerData.size(); ++i)
         {
             results.append(m_timerNames[i] + QString::number((m_timerData[i] / 1000000000.0) / m_sampleCount, '0', 4));

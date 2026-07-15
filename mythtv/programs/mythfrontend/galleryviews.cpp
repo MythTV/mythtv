@@ -54,6 +54,7 @@ void MarkedFiles::Invert(const ImageIdList &all)
 ImageListK FlatView::GetAllNodes() const
 {
     ImageListK files;
+    files.reserve(m_sequence.size());
     for (int id : std::as_const(m_sequence))
         files.append(m_images.value(id));
     return files;
@@ -463,6 +464,7 @@ void FlatView::Cache(int id, int parent, const QString &url, const QString &thum
 QString DirCacheEntry::ToString(int id) const
 {
     QStringList ids;
+    ids.reserve(m_thumbs.size());
     for (const auto & thumb : std::as_const(m_thumbs))
         ids << QString::number(thumb.first);
     return QString("Dir %1 (%2, %3) Thumbs %4 (%5) Parent %6")

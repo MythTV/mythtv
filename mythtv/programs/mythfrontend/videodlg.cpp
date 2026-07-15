@@ -1728,6 +1728,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
     if (list_count > 0)
     {
         QList<MythGenericTree *> subDirs;
+        subDirs.reserve(list_count);
         static constexpr int maxRecurse { 1 };
 
         for (int i = 0; i < list_count; i++)
@@ -2219,6 +2220,7 @@ void VideoDialog::searchStart(void)
     else
         children = m_d->m_currentNode->getAllChildren();
 
+    childList.reserve(children->size());
     for (auto * child : std::as_const(*children))
     {
         childList << child->GetText();
@@ -3784,15 +3786,17 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
     QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
 
+    actors.reserve(gueststars.size());
     for (const auto & name : std::as_const(gueststars))
         actors.append(name);
 
     VideoMetadata::cast_list cast;
     QStringList cl;
-
+    cl.reserve(actors.size());
     for (const auto & person : std::as_const(actors))
         cl.append(person.name);
 
+    cast.reserve(cl.size());
     for (const auto & name : std::as_const(cl))
     {
         QString cn = name.trimmed();

@@ -207,6 +207,7 @@ bool PBHEventHandler::event(QEvent *e)
                                                  forgetHistory);
 
                 QStringList &res = ok ? successes : failures;
+                res.reserve(3);
                 for (uint i = 0; i < 3; i++)
                 {
                     res.push_back(list.front());

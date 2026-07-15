@@ -226,13 +226,16 @@ QStringList StorageGroup::GetDirFileList(const QString &dir,
         QStringList list =
             d.entryList(QDir::Dirs|QDir::NoDotAndDotDot|QDir::Readable);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+        files.reserve(files.capacity() + list.size());
+#endif
         for (const auto& p : std::as_const(list))
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("GetDirFileList: Dir: %1/%2").arg(base, p));
 
             if (onlyDirs)
-                files.append(base + p);
+                files.append(base + p); // clazy:exclude=reserve-candidates
 
             files << GetDirFileList(dir + "/" + p, base + p, true, onlyDirs);
         }
@@ -241,14 +244,17 @@ QStringList StorageGroup::GetDirFileList(const QString &dir,
     if (!onlyDirs)
     {
         QStringList list = d.entryList(QDir::Files|QDir::Readable);
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+        files.reserve(files.capacity() + list.size());
+#endif
         for (const auto& p : std::as_const(list))
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("GetDirFileList: File: %1%2").arg(base, p));
             if (recursive)
-                files.append(base + p);
+                files.append(base + p); // clazy:exclude=reserve-candidates
             else
-                files.append(p);
+                files.append(p); // clazy:exclude=reserve-candidates
         }
     }
     return files;
@@ -295,6 +301,7 @@ QStringList StorageGroup::GetFileInfoList(const QString &Path)
 
     if (Path.isEmpty() || Path == "/")
     {
+        files.reserve(m_dirlist.size());
         for (const auto& dir : std::as_const(m_dirlist))
             files << QString("sgdir::%1").arg(dir);
 
