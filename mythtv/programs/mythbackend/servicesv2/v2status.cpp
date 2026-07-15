@@ -1913,7 +1913,7 @@ void V2Status::FillChannelInfo( QDomElement &channel,
 
 QStringList V2Status::GetBackupsList()
 {
-    QRegularExpression re(".*\\.sql\\.gz$");
+    static QRegularExpression re(".*\\.sql\\.gz$");
     QString thisHost = gCoreContext->GetHostName();
     StorageGroup sg1("DB Backups", thisHost);
     QStringList fileList = sg1.GetFileList("/");
