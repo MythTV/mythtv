@@ -246,7 +246,7 @@ void zoom_filter_xmmx (int prevX, int prevY,
 
 			movd_r2m (mm0,expix2[loop]);
 			
-			++loop;
+			loop += 1;
 		}
 #ifdef HAVE_ATHLON
 	__asm__ __volatile__ ("femms\n");
