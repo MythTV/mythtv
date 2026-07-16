@@ -1789,6 +1789,7 @@ void JobQueue::ProcessJob(const JobQueueEntry& job)
 
 void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
 {
+    // clazy:exclude-next-line=heap-allocated-small-trivial-type
     auto *jts = new JobThreadStruct;
     jts->jq = this;
     jts->jobID = jobID;
