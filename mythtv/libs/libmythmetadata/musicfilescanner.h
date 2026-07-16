@@ -16,7 +16,6 @@ class META_PUBLIC MusicFileScanner
     enum MusicFileLocation : std::uint8_t
     {
         kFileSystem,
-        kDatabase,
         kNeedUpdate,
         kBoth
     };
@@ -40,11 +39,13 @@ class META_PUBLIC MusicFileScanner
         void BuildFileList(QString &directory, MusicLoadedMap &music_files, MusicLoadedMap &art_files, int parentid);
         static int  GetDirectoryId(const QString &directory, int parentid);
         static bool HasFileChanged(const QString &filename, const QString &date_modified);
-        void AddFileToDB(const QString &filename, const QString &startDir);
-        void RemoveFileFromDB (const QString &filename, const QString &startDir);
-        void UpdateFileInDB(const QString &filename, const QString &startDir);
-        void ScanMusic(MusicLoadedMap &music_files);
-        void ScanArtwork(MusicLoadedMap &music_files);
+        void AddMusicToDB(const QString &filename, const QString &startDir);
+        void AddArtworkToDB(const QString &filename, const QString &startDir);
+        void RemoveMusicFromDB(int songid);
+        void RemoveArtworkFromDB(int albumartid);
+        void UpdateMusicInDB(const QString &filename, const QString &startDir);
+        void ScanMusic(MusicLoadedMap &music_files, QList<int> &songidsToDelete);
+        void ScanArtwork(MusicLoadedMap &art_files, QList<int> &albumartidsToDelete);
         static void cleanDB();
         static bool IsArtFile(const QString &filename);
         static bool IsMusicFile(const QString &filename);
