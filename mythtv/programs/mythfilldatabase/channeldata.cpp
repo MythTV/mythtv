@@ -484,7 +484,11 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
                     else
                     {
                         callsign = w1.left(w2.length() == 1 ? 4:3);
-                        callsign += w2.left(5 - callsign.length());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                        callsign += w2.leftRef(5 - callsign.length());
+#else
+                        callsign += QStringView(w2).left(5 - callsign.length());
+#endif
                     }
                     (*i).m_callSign = callsign;
                 }

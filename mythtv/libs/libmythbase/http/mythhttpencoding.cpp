@@ -48,7 +48,11 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
             if (auto index2 = qual.lastIndexOf("="); index2 > -1)
             {
                 bool ok = false;
-                auto newquality = qual.mid(index2 + 1).toFloat(&ok);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                auto newquality = qual.midRef(index2 + 1).toFloat(&ok);
+#else
+                auto newquality = QStringView(qual).mid(index2 + 1).toFloat(&ok);
+#endif
                 if (ok)
                     quality = newquality;
             }

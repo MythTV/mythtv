@@ -322,12 +322,21 @@ vbox_chan_map_t *VBox::getChannels(void)
         QString triplet = getStrValue(chanElem, "display-name", 2);
         bool    fta = (getStrValue(chanElem, "display-name", 3) == "Free");
         QString lcn = getStrValue(chanElem, "display-name", 4);
-        uint serviceID = triplet.right(4).toUInt(nullptr, 16);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        uint serviceID = triplet.rightRef(4).toUInt(nullptr, 16);
+#else
+        uint serviceID = QStringView(triplet).right(4).toUInt(nullptr, 16);
+#endif
 
         QString transType = "UNKNOWN";
         QStringList slist = triplet.split('-');
-        uint networkID = slist[2].left(4).toUInt(nullptr, 16);
-        uint transportID = slist[2].mid(4, 4).toUInt(nullptr, 16);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        uint networkID = slist[2].leftRef(4).toUInt(nullptr, 16);
+        uint transportID = slist[2].midRef(4, 4).toUInt(nullptr, 16);
+#else
+        uint networkID = QStringView(slist[2]).left(4).toUInt(nullptr, 16);
+        uint transportID = QStringView(slist[2]).mid(4, 4).toUInt(nullptr, 16);
+#endif
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("NIT/TID/SID %1 %2 %3)").arg(networkID).arg(transportID).arg(serviceID));
 
         //sanity check - the triplet should look something like this: T-GER-111100020001

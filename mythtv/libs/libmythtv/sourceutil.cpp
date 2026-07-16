@@ -110,7 +110,13 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
         {
             const QString channum = query.value(0).toString();
             const int where = channum.indexOf(kSeparatorRE);
-            if (channum.right(2).startsWith("0"))
+            if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                channum.rightRef(2).startsWith("0")
+#else
+                QStringView(channum).right(2).startsWith(QStringLiteral("0"))
+#endif
+                )
                 counts["0"]++;
             else
                 counts[(where < 0) ? "" : QString(channum.at(where))]++;

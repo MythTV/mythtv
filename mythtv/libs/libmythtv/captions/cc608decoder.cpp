@@ -1146,17 +1146,31 @@ QString CC608Decoder::GetXDS(const QString &key) const
 
     if (key == "ratings")
         return QString::number(GetRatingSystems(false));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     if (key.startsWith("has_rating_"))
-        return ((1<<key.right(1).toUInt()) & GetRatingSystems(false))?"1":"0";
+        return ((1<<key.rightRef(1).toUInt()) & GetRatingSystems(false))?"1":"0";
     if (key.startsWith("rating_"))
-        return GetRatingString(key.right(1).toUInt(), false);
+        return GetRatingString(key.rightRef(1).toUInt(), false);
+#else
+    if (key.startsWith("has_rating_"))
+        return ((1<<QStringView(key).right(1).toUInt()) & GetRatingSystems(false))?"1":"0";
+    if (key.startsWith("rating_"))
+        return GetRatingString(QStringView(key).right(1).toUInt(), false);
+#endif
 
     if (key == "future_ratings")
         return QString::number(GetRatingSystems(true));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     if (key.startsWith("has_future_rating_"))
-        return ((1<<key.right(1).toUInt()) & GetRatingSystems(true))?"1":"0";
+        return ((1<<key.rightRef(1).toUInt()) & GetRatingSystems(true))?"1":"0";
     if (key.startsWith("future_rating_"))
-        return GetRatingString(key.right(1).toUInt(), true);
+        return GetRatingString(key.rightRef(1).toUInt(), true);
+#else
+    if (key.startsWith("has_future_rating_"))
+        return ((1<<QStringView(key).right(1).toUInt()) & GetRatingSystems(true))?"1":"0";
+    if (key.startsWith("future_rating_"))
+        return GetRatingString(QStringView(key).right(1).toUInt(), true);
+#endif
 
     if (key == "programname")
         return GetProgramName(false);

@@ -146,8 +146,13 @@ static bool retrieve_SeasonEpisode(int& season, int& episode,
     // S##E## as set by mythfilldatabase
     bool okSeason  { false };
     bool okEpisode { false };
-    season = synd.mid(1, eIndex - 1).toInt(&okSeason);
-    episode = synd.mid(eIndex + 1).toInt(&okEpisode);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    season = synd.midRef(1, eIndex - 1).toInt(&okSeason);
+    episode = synd.midRef(eIndex + 1).toInt(&okEpisode);
+#else
+    season = QStringView(synd).mid(1, eIndex - 1).toInt(&okSeason);
+    episode = QStringView(synd).mid(eIndex + 1).toInt(&okEpisode);
+#endif
 
     return okSeason && okEpisode;
 }

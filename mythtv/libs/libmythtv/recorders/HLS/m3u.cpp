@@ -66,7 +66,11 @@ namespace M3U
                 break;
         if (i == p + 1)
             return false;
-        target = line.mid(p + 1, i - p - 1).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        target = line.midRef(p + 1, i - p - 1).toInt();
+#else
+        target = QStringView(line).mid(p + 1, i - p - 1).toInt();
+#endif
         return true;
     }
 
@@ -85,7 +89,11 @@ namespace M3U
                 break;
         if (i == p + 1)
             return false;
-        target = line.mid(p + 1, i - p - 1).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        target = line.midRef(p + 1, i - p - 1).toInt();
+#else
+        target = QStringView(line).mid(p + 1, i - p - 1).toInt();
+#endif
         return true;
     }
 

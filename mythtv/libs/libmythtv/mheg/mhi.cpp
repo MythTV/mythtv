@@ -950,7 +950,11 @@ int MHIContext::GetChannelIndex(const QString &str)
         {
             // I haven't seen this yet so this is untested.
             bool ok = false;
-            int channelNo = str.mid(14).toInt(&ok); // Decimal integer
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int channelNo = str.midRef(14).toInt(&ok); // Decimal integer
+#else
+            int channelNo = QStringView(str).mid(14).toInt(&ok); // Decimal integer
+#endif
             if (!ok)
                 break;
             MSqlQuery query(MSqlQuery::InitCon());
