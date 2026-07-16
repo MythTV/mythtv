@@ -26,6 +26,13 @@ static inline time_t dvbdate2unix(const std::array<uint8_t,5> buf)
     return dvbdate2unix(buf.data());
 }
 
+class DvbParseException : public PsipParseException {
+public:
+    DvbParseException(Code code)
+      : PsipParseException("Dvb Parse Error", code)
+        { }
+};
+
 /** \class NetworkInformationTable
  *  \brief This table tells the decoder on which PIDs to find other tables.
  *  \todo This is just a stub.
@@ -33,6 +40,10 @@ static inline time_t dvbdate2unix(const std::array<uint8_t,5> buf)
 class MTV_PUBLIC NetworkInformationTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kNITHeaderSize     { 10 };
+    static constexpr uint8_t kNITMiddleSize     {  2 };
+    static constexpr uint8_t kNITTableEntrySize {  6 }; // No descriptors
+
     NetworkInformationTable(const NetworkInformationTable& table)
         : PSIPTable(table)
     {
@@ -113,6 +124,9 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
 class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kSDTHeaderSize     { 11 };
+    static constexpr uint8_t kSDTTableEntrySize {  5 }; // No descriptors
+
     ServiceDescriptionTable(const ServiceDescriptionTable& table)
         : PSIPTable(table)
     {

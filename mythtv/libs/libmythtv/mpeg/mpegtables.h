@@ -402,6 +402,73 @@ class MTV_PUBLIC TableID
     };
 };
 
+/*
+ *  Class PsipParseException
+ */
+class PsipParseException : public std::runtime_error {
+  public:
+    enum Code
+    {
+        Unknown = 0,
+
+        // MPEG Tables
+        PmtLength,
+        PmtProgramDescriptors,
+        PmtStreamDescriptors,
+
+        // SCTE Tables
+        SitLength,
+        SitBandwidth,
+        SitTimeSignal,
+        SitSpliceSchedInfo1,
+        SitSpliceSchedInfo2,
+        SitSpliceInsertInfo1,
+        SitSpliceInsertInfo2,
+        SitSpliceInsertInfo3,
+        SitSpliceInsertInfo4,
+
+        // ATSC Tables
+        MgtLength,
+        MgtTableCount,
+        MgtTableDescriptors,
+        MgtGlobalDescriptors,
+        MgtBadParse,
+
+        VctLength,
+        VctChannelCount,
+        VctChannelDescriptors,
+        VctGlobalDescriptors,
+        VctBadParse,
+
+        EitLength,
+        EitEventCount,
+        EitEventDescriptors,
+        EitBadParse,
+
+        // DVB Tables
+        NitLength,
+        NitNetworkDescriptorsLength,
+        NitTransportDescriptors,
+
+        SdtLength,
+        SdtDescriptors,
+
+        Max
+    };
+
+    PsipParseException(Code code)
+        : std::runtime_error("PSIP Parse Error"),
+          m_error(code)
+        { }
+    PsipParseException(const char* text, Code code)
+        : std::runtime_error(text),
+          m_error(code)
+        { }
+
+    Code m_error;
+};
+
+
 /** \class PSIPTable
  *  \brief A PSIP table is a variant of a PES packet containing an
  *         MPEG, ATSC or DVB table.
@@ -577,6 +644,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     QString XMLValues(uint indent_level) const;
 };
 
+class MpegParseException : public PsipParseException {
+public:
+    MpegParseException(Code code)
+      : PsipParseException("Mpeg Parse Error", code)
+        { }
+};
+
 /** \class ProgramAssociationTable
  *  \brief The Program Association Table lists all the programs
  *         in a stream, and is always found on PID 0.
@@ -675,17 +749,20 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 class MTV_PUBLIC ProgramMapTable : public PSIPTable
 {
   public:
+    static constexpr uint8_t kPMTHeaderSize     { 12 }; // Incl Pgm Info Len
+    static constexpr uint8_t kPMTTableEntrySize {  5 }; // No table type descriptors
+    static constexpr uint8_t kPMTMinTrailerSize {  4 }; // Global descriptor count, CRC
 
-    ProgramMapTable(const ProgramMapTable& table) : PSIPTable(table)
+    ProgramMapTable(const ProgramMapTable& table, bool validate = true) : PSIPTable(table)
     {
         assert(TableID::PMT == TableID());
-        Parse();
+        Parse(validate);
     }
 
-    explicit ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
+    explicit ProgramMapTable(const PSIPTable& table, bool validate = true) : PSIPTable(table)
     {
         assert(TableID::PMT == TableID());
-        Parse();
+        Parse(validate);
     }
 
     static ProgramMapTable ViewData(const unsigned char* pesdata)
@@ -794,7 +871,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     }
     void AppendStream(uint pid, uint type, unsigned char* streamInfo = nullptr, uint infoLength = 0);
 
-    void Parse(void) const;
+    void Parse(bool validate = true) const;
     QString toString(void) const override; // PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
     // unsafe sets
@@ -868,6 +945,33 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
     // CRC_32 32 rpchof
 };
 
+class MTV_PUBLIC BreakDurationView
+{
+  public:
+    explicit BreakDurationView(const unsigned char *data) : m_data(data) { }
+    //   time_specified_flag    1  0.0
+    bool IsAutoReturn(void) const { return ( m_data[0] & 0x80 ) != 0; }
+    //   if (time_specified_flag == 1)
+    //     reserved             6  0.1
+    //     pts_time            33  0.6
+    uint64_t PTSTime(void) const
+    {
+        return ((uint64_t(m_data[0] & 0x1) << 32) |
+                (uint64_t(m_data[1])       << 24) |
+                (uint64_t(m_data[2])       << 16) |
+                (uint64_t(m_data[3])       <<  8) |
+                (uint64_t(m_data[4])));
+    }
+    //   else
+    //     reserved             7  0.1
+    // }
+    virtual QString toString(void) const;
+    virtual QString toStringXML(uint indent_level) const;
+
+  private:
+    const unsigned char *m_data;
+};
+
 class MTV_PUBLIC SpliceTimeView
 {
   public:
@@ -892,7 +996,7 @@ class MTV_PUBLIC SpliceTimeView
     virtual QString toStringXML(
         uint indent_level, int64_t first, int64_t last) const;
 
-    uint size(void) const { return IsTimeSpecified() ? 1 : 5; }
+    uint size(void) const { return IsTimeSpecified() ? 5 : 1; }
   private:
     const unsigned char *m_data;
 };
@@ -915,29 +1019,53 @@ class MTV_PUBLIC SpliceScheduleView
                 (m_ptrs0[i][2] <<  8) | (m_ptrs0[i][3]));
     }
     //   splice_event_cancel_indicator 1 4.0 + m_ptrs0[i]
+    bool IsSpliceEventCancel(uint i) const { return ( m_ptrs0[i][4] & 0x80 ) != 0; }
     //   reserved               7   4.1 + m_ptrs0[i]
     //   if (splice_event_cancel_indicator == ‘0’) {
     //     out_of_network_indicator 1 5.0 + m_ptrs0[i]
+    bool IsOutOfNetwork(uint i) const { return ( m_ptrs0[i][5] & 0x80 ) != 0; }
     //     program_splice_flag  1 5.1 + m_ptrs0[i]
+    bool IsProgramSplice(uint i) const { return ( m_ptrs0[i][5] & 0x40 ) != 0; }
     //     duration_flag        1 5.2 + m_ptrs0[i]
+    bool IsDuration(uint i) const { return ( m_ptrs0[i][5] & 0x20 ) != 0; }
     //     reserved             5 5.3 + m_ptrs0[i]
     //     if (program_splice_flag == ‘1’)
     //       utc_splice_time   32 6.0 + m_ptrs0[i]
+    uint64_t SpliceTime(uint i) const
+        { return ((uint64_t(m_ptrs0[i][6])       << 24) |
+                  (uint64_t(m_ptrs0[i][7])       << 16) |
+                  (uint64_t(m_ptrs0[i][8])       <<  8) |
+                  (uint64_t(m_ptrs0[i][9])));
+        }
     //     else {
     //       component_count    8 6.0 + m_ptrs0[i]
+    uint ComponentCount(uint i) const { return m_ptrs0[i][6]; }
     //       for(j = 0; j < component_count; j++) {
     //         component_tag    8 7.0 + m_ptrs0[i]+j*5
+    uint ComponentTag(uint i, uint j) const { return m_ptrs0[i][7+j*5]; }
     //         utc_splice_time 32 8.0 + m_ptrs0[i]+j*5
+    uint64_t ComponentSpliceTime(uint i, uint j) const
+        { return ((uint64_t(m_ptrs0[i][ 8+j*5])       << 24) |
+                  (uint64_t(m_ptrs0[i][ 9+j*5])       << 16) |
+                  (uint64_t(m_ptrs0[i][10+j*5])       <<  8) |
+                  (uint64_t(m_ptrs0[i][11+j*5])));
+        }
     //       }
     //     }
     //     if (duration_flag) {
+    BreakDurationView BreakDuration(uint i) const
+        { return BreakDurationView(m_ptrs1[i]); }
     //       auto_return        1 0.0 + m_ptrs1[i]
     //       reserved           6 0.1 + m_ptrs1[i]
     //       duration          33 0.7 + m_ptrs1[i]
     //     }
     //     unique_program_id   16 0.0 + m_ptrs1[i] + (duration_flag)?5:0
+    uint UniqueProgramID(uint i) const
+        { return (m_ptrs1[i][IsDuration(i)?5:0]<<8) | m_ptrs1[i][IsDuration(i)?6:1]; }
     //     avail_num            8 2.0 + m_ptrs1[i] + (duration_flag)?5:0
+    uint AvailNum(uint i) const { return m_ptrs1[i][IsDuration(i)?7:2]; }
     //     avails_expected      8 3.0 + m_ptrs1[i] + (duration_flag)?5:0
+    uint AvailsExpected(uint i) const { return m_ptrs1[i][IsDuration(i)?8:3]; }
     //   }
 
   private:
@@ -971,7 +1099,7 @@ class MTV_PUBLIC SpliceInsertView
     //     duration_flag        1    5.2 + m_ptrs1[0]
     bool IsDuration(void) const { return ( m_ptrs1[0][5] & 0x20 ) != 0; }
     //     splice_immediate_flag 1   5.3 + m_ptrs1[0]
-    bool IsSpliceImmediate(void) const { return ( m_ptrs1[0][5] & 0x20 ) != 0; }
+    bool IsSpliceImmediate(void) const { return ( m_ptrs1[0][5] & 0x10 ) != 0; }
     //     reserved             4    5.4 + m_ptrs1[0]
     //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
     //       splice_time()   8-38    6.0 + m_ptrs1[0]
@@ -979,13 +1107,19 @@ class MTV_PUBLIC SpliceInsertView
         { return SpliceTimeView(m_ptrs1[0]+6); }
     //     if (program_splice_flag == 0) {
     //       component_count    8    6.0 + m_ptrs1[0]
+    uint ComponentCount() { return m_ptrs0.size(); }
     //       for (i = 0; i < component_count; i++) {
     //         component_tag    8    0.0 + m_ptrs0[i]
+    uint ComponentTag(uint i) { return m_ptrs0[i][0]; }
     //         if (splice_immediate_flag == ‘0’)
     //           splice_time() 8-38  1.0 + m_ptrs0[i]
+    SpliceTimeView ComponentSpliceTime(uint i)
+        { return SpliceTimeView(m_ptrs0[i]+1); }
     //       }
     //     }
     //     if (duration_flag == ‘1’)
+    BreakDurationView BreakDuration(void) const
+        { return BreakDurationView(m_ptrs1[1]); }
     //       auto_return        1    0.0 + m_ptrs1[1]
     //       reserved           6    0.1 + m_ptrs1[1]
     //       duration          33    0.7 + m_ptrs1[1]
@@ -1082,7 +1216,17 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     // cw_index (enc key)       8   9.0
     uint CodeWordIndex(void) const { return pesdata()[9]; }
     void SetCodeWordIndex(uint val) { pesdata()[9] = val; }
-    // reserved                12  10.0
+    // tier                    12  10.0
+    uint Tier(void) const
+    {
+        return ((pesdata()[10]) << 4) | ((pesdata()[11] & 0xF0) >> 4);
+    }
+    void SetTier(uint tier)
+    {
+        pesdata()[10] = (tier >> 4) & 0xff;
+        pesdata()[11] &= ~0xf0;
+        pesdata()[11] |= (tier & 0x0F) << 4;
+    }
     // splice_command_length   12  11.4
     uint SpliceCommandLength(void) const
     {
@@ -1119,6 +1263,8 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 
     //////////// SPLICE SCHEDULE ////////////
 
+    static constexpr uint8_t kSpliceScheduleMinSize { 5 }; // No descriptors
+
     // if (splice_command_type == 0x04) splice_schedule()
     SpliceScheduleView SpliceSchedule(void) const
         { return {m_ptrs0, m_ptrs1}; }
@@ -1152,16 +1298,16 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     // this comment with private or reserved commands.
 
     // descriptor_loop_length  16   0.0 + m_epilog
-    uint SpliceDescriptorsLength(uint /*i*/) const
+    uint SpliceDescriptorsLength() const
     {
-        return (m_epilog[0] << 8) | m_epilog[1];
+        return m_epilog ? (m_epilog[0] << 8) | m_epilog[1] : 0;
     }
 
     // for (i = 0; i < ? ; i++)
     //   splice_descriptor()   ??   ??.?
     const unsigned char *SpliceDescriptors(void) const
     {
-        return (m_epilog) ? m_epilog + 2 : nullptr;
+        return (SpliceDescriptorsLength() > 0) ? m_epilog + 2 : nullptr;
     }
     // for (i = 0; i < ?; i++)
     //   alignment_stuffing     8   ??.0

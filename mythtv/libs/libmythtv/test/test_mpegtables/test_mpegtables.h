@@ -35,6 +35,8 @@ class TestMPEGTables: public QObject
   private slots:
     static void pat_test(void);
     static void mpeg_pmt_test1(void);
+    static void mpeg_pmt_test1b(void);
+    static void mpeg_pmt_test1c(void);
     static void mpeg_pmt_test2(void);
     static void mpeg_pmt_test3(void);
     static void mpeg_pmt_test4(void);
@@ -42,23 +44,45 @@ class TestMPEGTables: public QObject
     // ATSC Tables
     static void atsc_mgt_test1a(void);
     static void atsc_mgt_test1b(void);
+    static void atsc_mgt_test1c(void);
+    static void atsc_mgt_test1d(void);
+    static void atsc_mgt_test1e(void);
     static void atsc_mgt_test2(void);
     static void atsc_mgt_test3(void);
     static void atsc_tvct_test1a(void);
+    static void atsc_tvct_test1b(void);
+    static void atsc_tvct_test1c(void);
+    static void atsc_tvct_test1d(void);
     static void atsc_cvct_test1(void);
     static void atsc_cvct_test2(void);
     static void atsc_eit_test1a(void);
+    static void atsc_eit_test1b(void);
+    static void atsc_eit_test1c(void);
     static void atsc_ett_test(void);
     static void atsc_rrt_test(void);
     static void atsc_stt_test(void);
 
     // SCTE 35 Splice Points
     static void scte35_sit_test1(void);
+    static void scte35_sit_schedule_test1a(void);
+    static void scte35_sit_schedule_test1b(void);
+    static void scte35_sit_schedule_test1c(void);
+    static void scte35_sit_insert_test1a(void);
+    static void scte35_sit_insert_test1b(void);
+    static void scte35_sit_insert_test2a(void);
+    static void scte35_sit_insert_test2b(void);
+    static void scte35_sit_insert_test3a(void);
+    static void scte35_sit_insert_test3b(void);
+    static void scte35_sit_insert_test3c(void);
 
     //DVB Tables
     static void dvb_nit_test1(void);
     static void dvb_nit_test2(void);
+    static void dvb_nit_test2b(void);
+    static void dvb_nit_test2c(void);
+    static void dvb_nit_test2d(void);
     static void dvb_sdt_test1(void);
+    static void dvb_sdt_test1b(void);
     static void dvb_sdt_test2a(void);
     static void dvb_sdt_test2o(void);
     static void dvb_eit_test1(void);
