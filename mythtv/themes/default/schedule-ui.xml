@@ -380,56 +380,67 @@
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>40,130,250,30</area>
+            <area>40,80,250,30</area>
             <font>basemedium</font>
             <align>right</align>
             <value>Title (Optional):</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>300,120</position>
+            <position>300,70</position>
+        </textedit>
+
+        <textarea name="subtitlelabel" from="basetextarea">
+            <area>40,145,250,30</area>
+            <font>basemedium</font>
+            <align>right</align>
+            <value>Subtitle (Optional):</value>
+        </textarea>
+
+        <textedit name="subtitle" from="basetextedit">
+            <position>300,135</position>
         </textedit>
 
         <textarea name="channellabel" from="titlelabel">
-            <position>40,208</position>
+            <position>40,213</position>
             <value>Channel:</value>
         </textarea>
 
         <buttonlist name="channel" from="basewideselector">
-            <position>300,200</position>
+            <position>300,205</position>
         </buttonlist>
 
         <textarea name="datelabel" from="titlelabel">
-            <position>40,288</position>
+            <position>40,293</position>
             <value>Date, or day of week:</value>
         </textarea>
 
         <buttonlist name="startdate" from="basewideselector">
-            <position>300,280</position>
+            <position>300,285</position>
         </buttonlist>
 
         <textarea name="timelabel" from="titlelabel">
-            <area>40,368,160,30</area>
+            <area>40,373,160,30</area>
             <value>Start Time:</value>
         </textarea>
 
         <textarea name="hourlabel" from="basetextarea">
-            <area>210,370,80,30</area>
+            <area>210,375,80,30</area>
             <value>Hour</value>
             <align>right</align>
         </textarea>
 
         <spinbox name="starthour" from="basespinbox">
-            <position>300,360</position>
+            <position>300,365</position>
         </spinbox>
 
         <textarea name="minutelabel" from="hourlabel">
-            <position>410,370</position>
+            <position>410,375</position>
             <value>Minute</value>
         </textarea>
 
         <spinbox name="startminute" from="basespinbox">
-            <position>500,360</position>
+            <position>500,365</position>
         </spinbox>
 
         <textarea name="durationlabel" from="titlelabel">
